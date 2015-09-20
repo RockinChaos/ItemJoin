@@ -1,0 +1,57 @@
+#// <>==<>==<> ItemJoin's Join Items <>==<>==<> //#
+#// <>==<>==<> By XSilverSlayerX <>==<>==<> //#
+#// For per-world support this best works with Multiverse-Inventories! http://dev.bukkit.org/bukkit-plugins/multiverse-inventories //#
+#// Otherwise you will need to set clear-on-world-change to true if you want to get the new items when you change worlds. //#
+#// Then you will need to set give-on-world-change to true to recieve the new items. //#
+
+worldlist: #// This is the list of worlds that have custom join items. //#
+  - world
+  - world_nether
+
+#// For every world listed in the worldlist, you need to make a section for it. //#
+world:
+  items:
+    1: #// This is the slot, 1 is first slot in hot bar, 36 is bottom right in inventory. //#
+      id: WOOD_SWORD #// This is a wooden sword. See http://www.kiwike.se/wiki/index.php/Item_Names for item names! //#
+      name: '&3Junk Sword' #// Colors are shown with & and then it's code.  Use two &s to denote an actual &. //#
+      lore:
+        - '&7This is a pretty junk sword'
+        - '&7You will probably want to get'
+        - '&7A &bDiamond &7one'
+      commands:
+        - 'say this is item slot 1' #// This is a command! //#
+        - 'say how is your day?' #// You can even execute more than one command! //#
+    3:
+      id: WOOD_PICKAXE #Wood pick
+      name: '&aJunk pick' #Leave off options that are unused.
+      commands:
+        - 'gamemode 1 %player%' #// Also supports the variable %player%. The end result would be /gamemode 1 XSilverSlayerX. Only if I was the one to click the item though. //#
+        - 'say this is item 3'
+    4:
+      id: WOOD_SPADE #// Remember to use the right names!  This is a shovel! //#
+#//      commands: Remove this line if you do not want commands for this item. //#
+#//        - 'say i am a command' Same for this line. Remove it. //#
+    5:
+      id: WHEAT
+      count: 32
+      commands:
+        - 'server survival' #// Supports BungeeCord too! (Since its in instance of the player). //#
+    9:
+      id: COMPASS
+      lore:
+        - '&l&1BOLD'
+world_nether:
+  items:
+    1:
+      id: WOOD_HOE
+      name: 'JUNK'
+    2:
+      id: SEEDS
+    3:
+      id: WHEAT
+      commands:
+        - 'say i enjoy life!'
+    4:
+      id: MINECART
+      lore:
+        - '&l&1BOLD'

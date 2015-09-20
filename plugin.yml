@@ -1,0 +1,48 @@
+name: ItemJoin
+main: me.xsilverslayerx.itemjoin.ItemJoin
+version: 1.9
+author: XSilverSlayerX
+commands:
+   itemjoin:
+      description: Displays some options
+      usage: |
+          /itemjoin
+   itemjoin help:
+      description: Displays some options
+      usage: |
+          /itemjoin help
+   itemjoin reload:
+      description: Reloads the ItemJoin config.yml
+      usage: |
+          /itemjoin reload
+   itemjoin updates:
+      description: Checks for updates
+      usage: |
+          /itemjoin updates
+   ij:
+      description: Displays some options
+      usage: |
+          /ij
+   ij help:
+      description: Displays help options
+      usage: |
+          /ij help
+   ij reload:
+      description: Reloads the ItemJoin config.yml
+      usage: |
+          /ij reload
+   ij updates:
+      description: Checks for updates
+      usage: |
+          /ij updates
+          
+permissions:
+   itemjoin.use:
+      description: Currently allows use of base commands
+      default: op
+   itemjoin.reload:
+      description: Allows use of reload command. You need itemjoin.use with this permission to use reload command.
+      default: op
+   itemjoin.updates:
+      description: Use of the /itemjoin update command.
+      default: op

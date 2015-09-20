@@ -1,0 +1,54 @@
+#// <>==<>==<> ItemJoin's Global Settings  <>==<>==<> //#
+#// <>==<>==<> By XSilverSlayerX <>==<>==<> //#
+#// These options work best with Multiverse-Inventories! http://dev.bukkit.org/bukkit-plugins/multiverse-inventories //#
+#// NOTE!: ALL WORLDS DEFINED UNDER HERE MUST BE SETUP IN THE items.yml FILE! //#
+CheckforUpdates: true #// Disable this if you dont want to be notified if there is an update. //#
+
+#// Give items on world change //#
+give-on-world-change: false #// Set this to true if you want to receive the items for each specified world below once you enter it. "Changed World" //#
+AllowOPBypass-give-on-world-change: false #//Set this to true if you wish for OP players to bypass this //#
+give-on-world-change-worldlist:
+  - world
+  - world_nether
+
+#// Clear items on world change //#
+clear-on-world-change: false #// Set this to true if you want to clear your inventory on "Changed World" You can define what worlds under clear-inventory-worldlist. //#
+AllowOPBypass-clear-on-world-change: false #//Set this to true if you wish for OP players to bypass this //#
+clear-on-world-change-worldlist: #List the worlds below that you want to be involved in the Global Settings. //
+  - world
+  - world_nether
+
+#// Clear items on join //#
+clear-on-join: false #// Set this to true if you want your inventory to be cleared on join. Must be in that world on join. Define allowed worlds under clear-on-join-worldlist. //#
+AllowOPBypass-clear-on-join: false #//Set this to true if you wish for OP players to bypass this //#
+clear-on-join-worldlist: 
+  - world
+  - world_nether
+
+#// Prevent the dropping of items on death //#
+prevent-death-drop: false #// Set to true to prevent players from dropping items on death. //#
+AllowOPBypass-prevent-death-drops: false #//Set this to true if you wish for OP players to bypass this //#
+prevent-death-drops-worldlist:
+  - world
+  - world_nether
+
+#// Prevent players from moving items around in their inventory //#
+prevent-inventory-modify: false #// Set to true to prevent players from moving items in their inventory and storing items in chests. //#
+AllowOPBypass-prevent-inventory-modify: false #//Set this to true if you wish for OP players to bypass this //#
+prevent-inventory-modify-worldlist:
+  - world
+  - world_nether
+
+#// Prevent players from picking up items on the ground //#
+prevent-pickups: false #// Set to true to prevent players from picking up items. //#
+AllowOPBypass-prevent-pickups: false #//Set this to true if you wish for OP players to bypass this //#
+prevent-pickups-worldlist:
+  - world
+  - world_nether
+
+#// Prevent players from dropping items out of their inventory //#
+prevent-drops: false #// Set to true to prevent ALIVE players from dropping items. //#
+AllowOPBypass-prevent-drops: false #//Set this to true if you wish for OP players to bypass this //#
+prevent-drops-worldlist:
+  - world
+  - world_nether
