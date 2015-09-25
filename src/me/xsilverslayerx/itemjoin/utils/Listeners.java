@@ -1,4 +1,4 @@
-package me.xsilverslayerx.utils;
+package me.xsilverslayerx.itemjoin.utils;
 
 import java.util.List;
 import me.xsilverslayerx.itemjoin.ItemJoin;

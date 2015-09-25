@@ -1,4 +1,4 @@
-package me.xsilverslayerx.utils;
+package me.xsilverslayerx.itemjoin.utils;
 
 import me.xsilverslayerx.itemjoin.ItemJoin;
 
@@ -14,10 +14,10 @@ public class Commands implements CommandExecutor
             if (args.length == 0) {
                 if (!sender.hasPermission("use"))
                 {
-                        sender.sendMessage(ChatColor.GREEN + "You do not have permission!");
+                        sender.sendMessage(ChatColor.DARK_RED + "You do not have permission!");
                         return true;
                 }
-                sender.sendMessage(ChatColor.GREEN + "ItemJoin v." + ChatColor.YELLOW + ItemJoin.pl.getDescription().getVersion() + " by XSilverSlayerX");
+                sender.sendMessage(ChatColor.GREEN + "ItemJoin v" + ChatColor.YELLOW + ItemJoin.pl.getDescription().getVersion() + " by XSilverSlayerX");
                 sender.sendMessage(ChatColor.GREEN + "Type /itemjoin help for the help menu.");
                     return true;
             }
@@ -66,8 +66,8 @@ public class Commands implements CommandExecutor
                                               if (checker.updateNeeded())
                                                 {
                                         	      sender.sendMessage("");
-                                            	  sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.RED + "Your current version: v." + ChatColor.RED + ItemJoin.pl.getDescription().getVersion());
-                                            	  sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.RED + "A new version of ItemJoin is available: " + ChatColor.GREEN +  checker.getVersion() + ChatColor.WHITE);
+                                            	  sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.RED + "Your current version: v" + ChatColor.RED + ItemJoin.pl.getDescription().getVersion());
+                                            	  sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.RED + "A new version of ItemJoin is available: v" + ChatColor.GREEN +  checker.getVersion() + ChatColor.WHITE);
                                             	  sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.GREEN + "Get it from: " + checker.getLink() + ChatColor.WHITE);
                                             	  sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.GREEN + "Direct Link: " + checker.getJarLink() + ChatColor.WHITE);
                                             	  return true;

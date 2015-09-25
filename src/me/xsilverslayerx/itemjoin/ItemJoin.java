@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import me.xsilverslayerx.utils.Commands;
-import me.xsilverslayerx.utils.Listeners;
-import me.xsilverslayerx.utils.UpdateChecker;
+import me.xsilverslayerx.itemjoin.utils.Commands;
+import me.xsilverslayerx.itemjoin.utils.Listeners;
+import me.xsilverslayerx.itemjoin.utils.UpdateChecker;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -51,7 +51,6 @@ import com.onarandombox.MultiverseCore.listeners.MVPlayerListener;
   	  saveDefaultConfig();
       getConfig().options().copyDefaults(false);
       getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.GREEN + "Enabled!");
-      //getServer().getPluginManager().registerEvents(this, this);
 	  pl.getCommand("itemjoin").setExecutor(new Commands());
 	  pl.getCommand("ij").setExecutor(new Commands());
 	  pl.getServer().getPluginManager().registerEvents(new Listeners(),this); 
@@ -63,8 +62,8 @@ import com.onarandombox.MultiverseCore.listeners.MVPlayerListener;
 			getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.GREEN + "Checking for updates...");
               if (checker.updateNeeded())
                 {
-      			  getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.RED + "Your current version: v." + ChatColor.RED + getDescription().getVersion());
-                  getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.RED + "A new version of ItemJoin is available: v." + ChatColor.GREEN +  checker.getVersion());
+      			  getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.RED + "Your current version: v" + ChatColor.RED + getDescription().getVersion());
+                  getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.RED + "A new version of ItemJoin is available: v" + ChatColor.GREEN +  checker.getVersion());
                   getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.GREEN + "Get it from: " + checker.getLink());
                   getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.GREEN + "Direct Link: " + checker.getJarLink());
               }

@@ -1,4 +1,4 @@
-package me.xsilverslayerx.utils;
+package me.xsilverslayerx.itemjoin.utils;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
