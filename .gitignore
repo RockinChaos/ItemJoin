@@ -49,3 +49,6 @@ bin/me/xsilverslayerx/utils/UpdateChecker.class
 .classpath
 .project
 .settings/org.eclipse.jdt.core.prefs
+*.class
+*.class
+bin/me/xsilverslayerx/itemjoin/utils/Commands.class
