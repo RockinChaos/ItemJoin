@@ -32,6 +32,7 @@ import com.onarandombox.MultiverseCore.listeners.MVPlayerListener;
     public List<String> worlds;
     public List<String> clearonworldchange;
     public List<String> giveonworldchange;
+    public List<String> giveonrespawn;
     public List<String> clearonjoin;
     public List<String> preventdeathdrops;
     public List<String> preventinventorymodify;
@@ -77,7 +78,7 @@ import com.onarandombox.MultiverseCore.listeners.MVPlayerListener;
     public void onDisable()
     {
     	getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.RED + "Disabled!");
-    }
+}
 	
 // Items.yml File Do Stuff //
 
@@ -114,6 +115,7 @@ import com.onarandombox.MultiverseCore.listeners.MVPlayerListener;
      this.clearonjoin = getConfig().getStringList("clear-on-join-worldlist");
      this.clearonworldchange = getConfig().getStringList("clear-on-world-change-worldlist");
      this.giveonworldchange = getConfig().getStringList("give-on-world-change-worldlist");
+     this.giveonrespawn = getConfig().getStringList("give-on-respawn-worldlist");
      this.preventdeathdrops = getConfig().getStringList("prevent-death-drops-worldlist");
      this.preventinventorymodify = getConfig().getStringList("prevent-inventory-modify-worldlist");
      this.preventpickups = getConfig().getStringList("prevent-pickups-worldlist");

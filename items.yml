@@ -12,7 +12,7 @@ worldlist: #// This is the list of worlds that have custom join items. //#
 world:
   items:
     1: #// This is the slot, 1 is first slot in hot bar, 36 is bottom right in inventory. //#
-      id: WOOD_SWORD #// This is a wooden sword. See http://www.kiwike.se/wiki/index.php/Item_Names for item names! //#
+      id: WOOD_SWORD #// This is a wooden sword. See https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html for item names! //#
       name: '&3Junk Sword' #// Colors are shown with & and then it's code.  Use two &s to denote an actual &. //#
       lore:
         - '&7This is a pretty junk sword'

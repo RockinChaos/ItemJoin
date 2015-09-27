@@ -29,6 +29,12 @@ public class Listeners implements Listener{
      @EventHandler(priority=EventPriority.HIGHEST)
      public void onPlayerRespawn(PlayerRespawnEvent event)
      {
+	    	Player player = event.getPlayer();
+   	      	if(ItemJoin.pl.getConfig().getBoolean("give-on-respawn") == true && (ItemJoin.pl.giveonrespawn.contains(player.getWorld().getName()))){
+   	    		if(ItemJoin.pl.getConfig().getBoolean("AllowOPBypass-give-on-respawn") == true && event.getPlayer().isOp()) {
+   	              // Do nothing because he is OP //
+   	      		}
+   	              else {
        if (ItemJoin.pl.worlds.contains(ItemJoin.pl.playermap.get(event.getPlayer().getPlayerListName())))
        {
          ItemStack[] itemz = (ItemStack[])ItemJoin.pl.items.get(ItemJoin.pl.playermap.get(event.getPlayer().getPlayerListName().trim()));
@@ -41,6 +47,8 @@ public class Listeners implements Listener{
          }
        }
      }
+   }
+}
 
      @EventHandler(priority=EventPriority.MONITOR)
      public void onPlayerChangedWorldEvent (PlayerChangedWorldEvent event)
@@ -97,6 +105,7 @@ public class Listeners implements Listener{
          ItemJoin.pl.preventinventorymodify = ItemJoin.pl.getConfig().getStringList("prevent-inventory-modify-worldlist");
          ItemJoin.pl.preventpickups = ItemJoin.pl.getConfig().getStringList("prevent-pickups-worldlist");
          ItemJoin.pl.preventdrops = ItemJoin.pl.getConfig().getStringList("prevent-drops-worldlist");
+         ItemJoin.pl.playermap = ItemJoin.pl.listen.getPlayerWorld();
      	Player player = event.getPlayer();
        	if(ItemJoin.pl.getConfig().getBoolean("clear-on-join") == true && (ItemJoin.pl.clearonjoin.contains(player.getWorld().getName()))){
      		if(ItemJoin.pl.getConfig().getBoolean("AllowOPBypass-clear-on-join") == true && event.getPlayer().isOp()) {
@@ -113,7 +122,17 @@ public class Listeners implements Listener{
           }
        	}
        	{
-       ItemJoin.pl.playermap = ItemJoin.pl.listen.getPlayerWorld();
+       	 if(ItemJoin.pl.getConfig().getBoolean("First-Join-Only") == true && (ItemJoin.pl.worlds.contains(event.getPlayer().getWorld().getName()) && (!event.getPlayer().hasPlayedBefore()))){
+             ItemStack[] itemz = (ItemStack[])ItemJoin.pl.items.get(ItemJoin.pl.playermap.get(event.getPlayer().getPlayerListName().trim()));
+             event.getPlayer().getInventory().clear();
+             for (int i = 0; i < event.getPlayer().getInventory().getSize(); i++) {
+               if (((event.getPlayer().hasPermission("" + (String)ItemJoin.pl.playermap.get(event.getPlayer().getPlayerListName()) + "." + i)) || (event.getPlayer().hasPermission("" + (String)ItemJoin.pl.playermap.get(event.getPlayer().getPlayerListName()) + ".*"))) && 
+                 (itemz[i] != null)) {
+                 event.getPlayer().getInventory().setItem(i, itemz[i]);
+    		    }
+             }
+    	 }
+    	 else if(ItemJoin.pl.getConfig().getBoolean("First-Join-Only") == false) {
        if (ItemJoin.pl.worlds.contains(ItemJoin.pl.playermap.get(event.getPlayer().getPlayerListName())))
        {
          boolean setItem = false;
@@ -198,7 +217,8 @@ public class Listeners implements Listener{
          }
        }
       }
-     }
+   }
+}
      
      @EventHandler(priority=EventPriority.HIGHEST)
      public void onPreventPlayerDropping(PlayerDropItemEvent event)
