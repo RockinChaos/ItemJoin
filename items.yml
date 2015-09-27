@@ -12,7 +12,8 @@ worldlist: #// This is the list of worlds that have custom join items. //#
 world:
   items:
     1: #// This is the slot, 1 is first slot in hot bar, 36 is bottom right in inventory. //#
-      id: WOOD_SWORD #// This is a wooden sword. See https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html for item names! //#
+      id: WOODEN_SWORD #// This is a wooden sword. See https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html for item names! //#
+      data-value: 0
       name: '&3Junk Sword' #// Colors are shown with & and then it's code.  Use two &s to denote an actual &. //#
       lore:
         - '&7This is a pretty junk sword'
@@ -29,15 +30,17 @@ world:
         - 'say this is item 3'
     4:
       id: WOOD_SPADE #// Remember to use the right names!  This is a shovel! //#
-#//      commands: Remove this line if you do not want commands for this item. //#
-#//        - 'say i am a command' Same for this line. Remove it. //#
+      commands: #// Remove this line if you do not want commands for this item. //#
+        - 'say i am a command' #// Same for this line. Remove it. //#
     5:
-      id: WHEAT
+      id: STAINED_GLASS
+      data-value: 12 #// Support for data-values. This is the ending number of the item ID. Since brown stained glass is 95:12 we would put 12. So you would get STAINED_GLASS:12. //#
       count: 32
       commands:
         - 'server survival' #// Supports BungeeCord too! (Since its in instance of the player). //#
     9:
       id: COMPASS
+      data-value: 0 #// Default data value for an item is 0. So since this is a compass you can just remove the data-value line.
       lore:
         - '&l&1BOLD'
 world_nether:
@@ -53,5 +56,6 @@ world_nether:
         - 'say i enjoy life!'
     4:
       id: MINECART
+      data-value: 0
       lore:
         - '&l&1BOLD'

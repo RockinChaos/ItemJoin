@@ -130,6 +130,7 @@ import com.onarandombox.MultiverseCore.listeners.MVPlayerListener;
        }
        for (int j = 1; j <= 36; j++)
        {
+         int dataValue = getItemsConfig().getInt(world + ".items." + j + ".data-value");
          Material tempmat = Material.getMaterial(getItemsConfig().getString(world + ".items." + j + ".id"));
          if (tempmat == null)
          {
@@ -137,7 +138,7 @@ import com.onarandombox.MultiverseCore.listeners.MVPlayerListener;
          }
          else
          {
-           tempitems[(j - 1)] = new ItemStack(tempmat, getItemsConfig().getInt(world + ".items." + j + ".count", 1));
+           tempitems[(j - 1)] = new ItemStack(tempmat, getItemsConfig().getInt(world + ".items." + j + ".count", 1),(short)dataValue);
            ItemMeta tempmeta = tempitems[(j - 1)].getItemMeta();
            if (getItemsConfig().getStringList(world + ".items." + j + ".lore") != null)
            {
