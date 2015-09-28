@@ -67,8 +67,8 @@ public class Listeners implements Listener{
        	            pinve.setLeggings(null);
        	            pinve.setBoots(null);
        	         }
-       	      	}
-       	      	{
+       	      }
+       	  {
      	if(ItemJoin.pl.getConfig().getBoolean("give-on-world-change") == true && (ItemJoin.pl.giveonworldchange.contains(event.getPlayer().getWorld().getName()))){
  	    		if(ItemJoin.pl.getConfig().getBoolean("AllowOPBypass-give-on-world-change") == true && event.getPlayer().isOp()) {
      	              // Do nothing because he is OP //
@@ -89,7 +89,7 @@ public class Listeners implements Listener{
        }
      }
    }
- }
+}
 
      @EventHandler(priority=EventPriority.MONITOR)
      public void onPlayerJoin(PlayerJoinEvent event)
@@ -231,7 +231,7 @@ public class Listeners implements Listener{
              	event.setCancelled(true);
    	       }
        }
- }
+}
 
      @EventHandler(priority=EventPriority.HIGH)
      public void onPreventModifyInventory(InventoryClickEvent event)
@@ -244,7 +244,7 @@ public class Listeners implements Listener{
                  	event.setCancelled(true);
        }
     }
- }
+}
 
      @EventHandler(priority=EventPriority.HIGH)
  	  public void onPreventItemPickups(PlayerPickupItemEvent event)
@@ -257,7 +257,7 @@ public class Listeners implements Listener{
                  	event.setCancelled(true);
  	  }
     }
- }
+}
  	  
      @EventHandler(priority=EventPriority.HIGH)
  	  public void onPreventDeathDrops(PlayerDeathEvent event)
@@ -271,7 +271,7 @@ public class Listeners implements Listener{
                      event.getDrops().clear();
  	  }
     }
- }
+}
 
  // Bind Commands //
      

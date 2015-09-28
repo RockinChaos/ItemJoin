@@ -43,7 +43,7 @@ public class Commands implements CommandExecutor
         	if (sender.hasPermission("reload")) {
                 ItemJoin.pl.reloadConfig(); // Reloads config.yml //
                 ItemJoin.pl.loadItemsConfigSetup(); // Reloads items.yml //
-                ItemJoin.pl.getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + "Configuration Reloaded!");
+  		        ItemJoin.pl.getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.RED + sender.getName() + " has reloaded the Configuration files.");
                 sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.GREEN + "Configuration Reloaded!");
                 return true;
             } else {

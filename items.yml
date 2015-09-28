@@ -12,7 +12,7 @@ worldlist: #// This is the list of worlds that have custom join items. //#
 world:
   items:
     1: #// This is the slot, 1 is first slot in hot bar, 36 is bottom right in inventory. //#
-      id: WOODEN_SWORD #// This is a wooden sword. See https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html for item names! //#
+      id: WOOD_SWORD #// This is a wooden sword. See https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html for item names! //#
       data-value: 0
       name: '&3Junk Sword' #// Colors are shown with & and then it's code.  Use two &s to denote an actual &. //#
       lore:
@@ -35,12 +35,12 @@ world:
     5:
       id: STAINED_GLASS
       data-value: 12 #// Support for data-values. This is the ending number of the item ID. Since brown stained glass is 95:12 we would put 12. So you would get STAINED_GLASS:12. //#
-      count: 32
+      count: 32 #// How many of this item you would like to recieve. Since this item stacks, you would get 32 brown stained glass. //#
       commands:
         - 'server survival' #// Supports BungeeCord too! (Since its in instance of the player). //#
     9:
       id: COMPASS
-      data-value: 0 #// Default data value for an item is 0. So since this is a compass you can just remove the data-value line.
+      data-value: 0 #// Default data value for an item is 0. So since this is a compass you can just remove the data-value line. //#
       lore:
         - '&l&1BOLD'
 world_nether:

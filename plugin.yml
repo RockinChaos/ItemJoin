@@ -1,6 +1,6 @@
 name: ItemJoin
 main: me.xsilverslayerx.itemjoin.ItemJoin
-version: 1.9
+version: 2.0
 author: XSilverSlayerX
 commands:
    itemjoin:

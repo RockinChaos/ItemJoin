@@ -3,7 +3,7 @@
 #// These options work best with Multiverse-Inventories! http://dev.bukkit.org/bukkit-plugins/multiverse-inventories //#
 #// NOTE!: ALL WORLDS DEFINED UNDER HERE MUST BE SETUP IN THE items.yml FILE! //#
 CheckforUpdates: true #// Disable this if you dont want to be notified if there is an update. //#
-First-Join-Only: false #// Set this to true if you wish to get the items on the players first login on the server. You must be in that world under items.yml worldlist. //#
+First-Join-Only: false #// Set this to true if you wish to get the items on the players first login on the server. You must be in that world listed under items.yml worldlist. //#
 
 #// Give items on respawn //#
 give-on-respawn: false #// Set this to true if you want to receive the items for each specified world below once you respawn from death. //#

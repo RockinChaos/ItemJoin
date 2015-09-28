@@ -162,8 +162,8 @@ import com.onarandombox.MultiverseCore.listeners.MVPlayerListener;
          }
        }
        this.items.put(world, tempitems);
-     }
    }
+}
 
 // Supports Color Codes //
     
@@ -194,4 +194,4 @@ import com.onarandombox.MultiverseCore.listeners.MVPlayerListener;
       name = name.replace("&&", "&");
       return name;
     }
-  }
+}
