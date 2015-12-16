@@ -320,32 +320,30 @@ public class Listeners implements Listener{
     }
 }
 
-	@SuppressWarnings("deprecation")
+    @SuppressWarnings("deprecation")
 	@EventHandler(priority=EventPriority.HIGHEST)
- 	public void onPreventPlayerPlace(PlayerInteractEvent event)
- 	{
- 		if (event.getAction() == Action.RIGHT_CLICK_BLOCK){
- 	         if(ItemJoin.pl.getConfig().getBoolean("prevent-itemjoin-itemplacement") == true && (ItemJoin.pl.preventijplacement.contains(event.getPlayer().getWorld().getName()))){
- 	        	 if(ItemJoin.pl.getConfig().getBoolean("AllowOPBypass-prevent-itemjoin-itemplacement") == true && event.getPlayer().isOp()) {
-          		}
-                 else {
-                	 ItemStack[] toSet = (ItemStack[])ItemJoin.pl.items.get(event.getPlayer().getWorld().getName());
-     				ItemStack[] inventory = event.getPlayer().getInventory().getContents();
-     		         for (int i = 0; i < inventory.length; i++) {
-     		            	 for (int j = 0; j < inventory.length; j++) {
-        		            	 if ((inventory[j] != null) && (toSet[i] != null) && (inventory[j].isSimilar(toSet[i])) && event.getPlayer().getInventory().getItemInHand().isSimilar(inventory[j]) || event.getPlayer().getItemInHand().getType() == Material.SKULL_ITEM && ((SkullMeta) event.getPlayer().getItemInHand().getItemMeta()).hasOwner() && ((SkullMeta) event.getPlayer().getItemInHand().getItemMeta()).getOwner().equalsIgnoreCase(ItemJoin.pl.isSkullOwner)) {
- 		                     		event.setCancelled(true);
- 		                     		event.getPlayer().updateInventory();
- 		                        	 }
- 		                    else {
- 		            	 }
- 		             }
- 		         }
-            }
+	public void onPreventPlayerPlace(PlayerInteractEvent event)
+	{
+		if (event.getAction() == Action.RIGHT_CLICK_BLOCK && ItemJoin.pl.getConfig().getBoolean("prevent-itemjoin-itemplacement") == true && ItemJoin.pl.preventijplacement.contains(event.getPlayer().getWorld().getName())){
+	        	 if(ItemJoin.pl.getConfig().getBoolean("AllowOPBypass-prevent-itemjoin-itemplacement") == true && event.getPlayer().isOp()) {
+         		}
+                else if (event.getPlayer().getItemInHand().getType().isBlock() || event.getPlayer().getItemInHand().getType() == Material.SKULL_ITEM && ((SkullMeta) event.getPlayer().getItemInHand().getItemMeta()).hasOwner() && ((SkullMeta) event.getPlayer().getItemInHand().getItemMeta()).getOwner().equalsIgnoreCase(ItemJoin.pl.isSkullOwner)){
+                	ItemStack[] toSet = (ItemStack[])ItemJoin.pl.items.get(event.getPlayer().getWorld().getName());
+    				ItemStack[] inventory = event.getPlayer().getInventory().getContents();
+    		         for (int i = 0; i < inventory.length; i++) {
+    		            	 for (int j = 0; j < inventory.length; j++) {
+    		            	 if ((inventory[j] != null) && (toSet[i] != null) && (inventory[j].isSimilar(toSet[i])) && event.getPlayer().getInventory().getItemInHand().isSimilar(inventory[j]) || event.getPlayer().getItemInHand().getType() == Material.SKULL_ITEM && ((SkullMeta) event.getPlayer().getItemInHand().getItemMeta()).hasOwner() && ((SkullMeta) event.getPlayer().getItemInHand().getItemMeta()).getOwner().equalsIgnoreCase(ItemJoin.pl.isSkullOwner)) {
+    		                     		event.setCancelled(true);
+    		                     		event.getPlayer().updateInventory();
+    		                        	 }
+    		                    else {
+    		            	 }
+    		             }
+    		         }
+               }
 	      }
-	}
 }
-     
+
  // Bind Commands //
 
      @EventHandler(priority=EventPriority.HIGHEST)
