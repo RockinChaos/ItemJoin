@@ -280,11 +280,10 @@ public class MvListeners implements Listener{
 	@EventHandler(priority=EventPriority.HIGHEST)
 	public void onPreventPlayerPlace(PlayerInteractEvent event)
 	{
-		if (event.getAction() == Action.RIGHT_CLICK_BLOCK){
-	         if(ItemJoin.pl.getConfig().getBoolean("prevent-itemjoin-itemplacement") == true && (ItemJoin.pl.preventijplacement.contains(event.getPlayer().getWorld().getName()))){
+		if (event.getAction() == Action.RIGHT_CLICK_BLOCK && ItemJoin.pl.getConfig().getBoolean("prevent-itemjoin-itemplacement") == true && ItemJoin.pl.preventijplacement.contains(event.getPlayer().getWorld().getName())){
 	        	 if(ItemJoin.pl.getConfig().getBoolean("AllowOPBypass-prevent-itemjoin-itemplacement") == true && event.getPlayer().isOp()) {
          		}
-                else {
+                else if (event.getPlayer().getItemInHand().getType().isBlock() || event.getPlayer().getItemInHand().getType() == Material.SKULL_ITEM && ((SkullMeta) event.getPlayer().getItemInHand().getItemMeta()).hasOwner() && ((SkullMeta) event.getPlayer().getItemInHand().getItemMeta()).getOwner().equalsIgnoreCase(ItemJoin.pl.isSkullOwner)){
                 	ItemStack[] toSet = (ItemStack[])ItemJoin.pl.items.get(ItemJoin.pl.mvplayermap.get(event.getPlayer().getDisplayName()));
     				ItemStack[] inventory = event.getPlayer().getInventory().getContents();
     		         for (int i = 0; i < inventory.length; i++) {
@@ -299,7 +298,6 @@ public class MvListeners implements Listener{
     		         }
                }
 	      }
-	}
 }
 	
      @EventHandler(priority=EventPriority.HIGHEST)

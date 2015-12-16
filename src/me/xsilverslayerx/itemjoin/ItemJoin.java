@@ -204,7 +204,7 @@ import com.onarandombox.MultiverseCore.listeners.MVPlayerListener;
              name = translateCodes(name);
              tempmeta.setDisplayName(name);
            }
-           if (pl.getSpecialConfig("items.yml").getString(world + ".items." + j + ".skull-owner") != null)
+           if (pl.getSpecialConfig("items.yml").getString(world + ".items." + j + ".skull-owner") != null  && Material.getMaterial(pl.getSpecialConfig("items.yml").getString(world + ".items." + j + ".id")) == Material.SKULL_ITEM)
            {
                String owner = pl.getSpecialConfig("items.yml").getString(world + ".items." + j + ".skull-owner");
                owner = translateCodes(owner);
