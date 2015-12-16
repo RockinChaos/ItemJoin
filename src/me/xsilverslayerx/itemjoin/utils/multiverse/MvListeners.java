@@ -1,4 +1,4 @@
-package me.xsilverslayerx.itemjoin.utils;
+package me.xsilverslayerx.itemjoin.utils.multiverse;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,7 +31,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.SkullMeta;
 
-public class Listeners implements Listener{
+import com.onarandombox.MultiverseCore.MultiverseCore;
+
+public class MvListeners implements Listener{
 
     private Map<String, Long> playersOnCooldown = new HashMap<String, Long>();
 	private int cdtime = 0;
@@ -46,12 +48,12 @@ public class Listeners implements Listener{
    	    		if(ItemJoin.pl.getConfig().getBoolean("AllowOPBypass-give-on-respawn") == true && event.getPlayer().isOp()) {
    	      		}
    	              else {
-       if (ItemJoin.pl.worlds.contains(event.getPlayer().getWorld().getName()))
+       if (ItemJoin.pl.worlds.contains(ItemJoin.pl.mvplayermap.get(event.getPlayer().getPlayerListName())))
        {
-         ItemStack[] itemz = (ItemStack[])ItemJoin.pl.items.get(event.getPlayer().getWorld().getName().trim());
+         ItemStack[] itemz = (ItemStack[])ItemJoin.pl.items.get(ItemJoin.pl.mvplayermap.get(event.getPlayer().getPlayerListName().trim()));
          event.getPlayer().getInventory().clear();
          for (int i = 0; i < event.getPlayer().getInventory().getSize(); i++) {
-             if (!event.getPlayer().hasPermission("itemjoin." + event.getPlayer().getWorld().getName() + "." + i) && !event.getPlayer().hasPermission("itemjoin." + event.getPlayer().getWorld().getName() + ".*") || itemz[i] == null) continue;
+             if (!event.getPlayer().hasPermission("itemjoin." + ItemJoin.pl.mvplayermap.get(event.getPlayer().getPlayerListName()) + "." + i) && !event.getPlayer().hasPermission("itemjoin." + ItemJoin.pl.mvplayermap.get(event.getPlayer().getPlayerListName()) + ".*") || itemz[i] == null) continue;
              event.getPlayer().getInventory().setItem(i, itemz[i]);
              ArmorSetup(event.getPlayer());
          }
@@ -83,12 +85,12 @@ public class Listeners implements Listener{
      	      		}
      	              else {
          player.getWorld();
-         if (ItemJoin.pl.worlds.contains(event.getPlayer().getWorld().getName()))
+         if (ItemJoin.pl.worlds.contains(ItemJoin.pl.mvplayermap.get(event.getPlayer().getPlayerListName())))
        {
          player.getWorld();
-         ItemStack[] itemz = (ItemStack[])ItemJoin.pl.items.get(event.getPlayer().getWorld().getName().trim());
+         ItemStack[] itemz = (ItemStack[])ItemJoin.pl.items.get(ItemJoin.pl.mvplayermap.get(event.getPlayer().getPlayerListName().trim()));
          for (int i = 0; i < event.getPlayer().getInventory().getSize(); i++) {
-             if (!event.getPlayer().hasPermission("itemjoin." + event.getPlayer().getWorld().getName() + "." + i) && !event.getPlayer().hasPermission("itemjoin." + event.getPlayer().getWorld().getName() + ".*") || itemz[i] == null) continue;
+             if (!event.getPlayer().hasPermission("itemjoin." + ItemJoin.pl.mvplayermap.get(event.getPlayer().getPlayerListName()) + "." + i) && !event.getPlayer().hasPermission("itemjoin." + ItemJoin.pl.mvplayermap.get(event.getPlayer().getPlayerListName()) + ".*") || itemz[i] == null) continue;
              event.getPlayer().getInventory().setItem(i, itemz[i]);
              ArmorSetup(event.getPlayer());
            }
@@ -97,7 +99,6 @@ public class Listeners implements Listener{
      }
    }
 }
-
 	@EventHandler(priority=EventPriority.MONITOR)
      public void onPlayerJoin(PlayerJoinEvent event)
      {
@@ -105,6 +106,9 @@ public class Listeners implements Listener{
     	 ItemJoin.pl.PlayerJoin2 = event.getPlayer().getDisplayName();
          ItemJoin.pl.loadItemsConfigSetup();
     	 if (ItemJoin.pl.hasMultiverse = true) {
+             MultiverseCore multiverseCore = (MultiverseCore)ItemJoin.pl.getServer().getPluginManager().getPlugin("Multiverse-Core");
+             ItemJoin.pl.listen = multiverseCore.getPlayerListener();
+             ItemJoin.pl.mvplayermap = ItemJoin.pl.listen.getPlayerWorld();
     	 } else {
     	 }
          ItemJoin.pl.worlds = ItemJoin.pl.getSpecialConfig("items.yml").getStringList("worldlist");
@@ -114,10 +118,11 @@ public class Listeners implements Listener{
          ItemJoin.pl.preventdeathdrops = ItemJoin.pl.getConfig().getStringList("prevent-death-drops-worldlist");
          ItemJoin.pl.preventinventorymodify = ItemJoin.pl.getConfig().getStringList("prevent-inventory-modify-worldlist");
          ItemJoin.pl.preventpickups = ItemJoin.pl.getConfig().getStringList("prevent-pickups-worldlist");
+         ItemJoin.pl.preventijplacement = ItemJoin.pl.getConfig().getStringList("prevent-itemjoin-itemplacement-worldlist");
          ItemJoin.pl.preventdrops = ItemJoin.pl.getConfig().getStringList("prevent-drops-worldlist");
      	Player player = event.getPlayer();
         ItemStack[] inventory = event.getPlayer().getInventory().getContents();
-        ItemStack[] toSet = (ItemStack[])ItemJoin.pl.items.get(event.getPlayer().getWorld().getName());
+        ItemStack[] toSet = (ItemStack[])ItemJoin.pl.items.get(ItemJoin.pl.mvplayermap.get(event.getPlayer().getDisplayName()));
        	if(ItemJoin.pl.getConfig().getBoolean("clear-on-join") == true && (ItemJoin.pl.clearonjoin.contains(player.getWorld().getName()))){
      		if(ItemJoin.pl.getConfig().getBoolean("AllowOPBypass-clear-on-join") == true && event.getPlayer().isOp()) {
          		}
@@ -134,10 +139,10 @@ public class Listeners implements Listener{
        	{
             if (ItemJoin.pl.getConfig().getBoolean("First-Join-Only") == true && (ItemJoin.pl.worlds.contains(event.getPlayer().getWorld().getName()) && ItemJoin.pl.getSpecialConfig("FirstJoin.yml").getString(event.getPlayer().getWorld().getName() + "." + event.getPlayer().getName().toString()) == null))
             {
-                ItemStack[] itemz = (ItemStack[])ItemJoin.pl.items.get(event.getPlayer().getWorld().getName().trim());
+                ItemStack[] itemz = (ItemStack[])ItemJoin.pl.items.get(ItemJoin.pl.mvplayermap.get(event.getPlayer().getPlayerListName().trim()));
                 event.getPlayer().getInventory().clear();
                 for (int i = 0; i < event.getPlayer().getInventory().getSize(); i++) {
-                    if (!event.getPlayer().hasPermission("itemjoin." + event.getPlayer().getWorld().getName() + "." + i) && !event.getPlayer().hasPermission("itemjoin." + event.getPlayer().getWorld().getName() + ".*") || itemz[i] == null) continue;
+                    if (!event.getPlayer().hasPermission("itemjoin." + ItemJoin.pl.mvplayermap.get(event.getPlayer().getPlayerListName()) + "." + i) && !event.getPlayer().hasPermission("itemjoin." + ItemJoin.pl.mvplayermap.get(event.getPlayer().getPlayerListName()) + ".*") || itemz[i] == null) continue;
                     event.getPlayer().getInventory().setItem(i, itemz[i]);
                     ArmorSetup(event.getPlayer());
                 }
@@ -152,12 +157,12 @@ public class Listeners implements Listener{
                 }
             }
     	 else if(ItemJoin.pl.getConfig().getBoolean("First-Join-Only") == false) {
-       if (ItemJoin.pl.worlds.contains(event.getPlayer().getWorld().getName()))
+       if (ItemJoin.pl.worlds.contains(ItemJoin.pl.mvplayermap.get(event.getPlayer().getPlayerListName())))
        {
          boolean setItem = false;
          int count = 0;
          for (int i = 0; i < inventory.length; i++) {
-             if (toSet[i] == null || !event.getPlayer().hasPermission("itemjoin." + event.getPlayer().getWorld().getName() + "." + i) && !event.getPlayer().hasPermission("itemjoin." + event.getPlayer().getWorld().getName() + ".*")) continue;
+             if (toSet[i] == null || !event.getPlayer().hasPermission("itemjoin." + ItemJoin.pl.mvplayermap.get(event.getPlayer().getPlayerListName()) + "." + i) && !event.getPlayer().hasPermission("itemjoin." + ItemJoin.pl.mvplayermap.get(event.getPlayer().getPlayerListName()) + ".*")) continue;
              {
              setItem = true;
              for (int j = 0; j < inventory.length; j++) {
@@ -240,7 +245,7 @@ public class Listeners implements Listener{
 	public void ArmorSetup(Player player)
 	{
 		EntityEquipment Equipment = player.getEquipment();
-        ItemStack[] toSet = (ItemStack[])ItemJoin.pl.items.get(player.getWorld().getName());
+        ItemStack[] toSet = (ItemStack[])ItemJoin.pl.items.get(ItemJoin.pl.mvplayermap.get(player.getDisplayName()));
         if (toSet[103 - 1] != null && Equipment.getHelmet() != null && !Equipment.getHelmet().isSimilar(toSet[103 - 1])) {
            	Equipment.setHelmet(toSet[103 - 1]);
           }
@@ -270,6 +275,32 @@ public class Listeners implements Listener{
         	 Equipment.setBoots(toSet[100 - 1]);
          }
 	}
+	
+    @SuppressWarnings("deprecation")
+	@EventHandler(priority=EventPriority.HIGHEST)
+	public void onPreventPlayerPlace(PlayerInteractEvent event)
+	{
+		if (event.getAction() == Action.RIGHT_CLICK_BLOCK){
+	         if(ItemJoin.pl.getConfig().getBoolean("prevent-itemjoin-itemplacement") == true && (ItemJoin.pl.preventijplacement.contains(event.getPlayer().getWorld().getName()))){
+	        	 if(ItemJoin.pl.getConfig().getBoolean("AllowOPBypass-prevent-itemjoin-itemplacement") == true && event.getPlayer().isOp()) {
+         		}
+                else {
+                	ItemStack[] toSet = (ItemStack[])ItemJoin.pl.items.get(ItemJoin.pl.mvplayermap.get(event.getPlayer().getDisplayName()));
+    				ItemStack[] inventory = event.getPlayer().getInventory().getContents();
+    		         for (int i = 0; i < inventory.length; i++) {
+    		            	 for (int j = 0; j < inventory.length; j++) {
+    		            	 if ((inventory[j] != null) && (toSet[i] != null) && (inventory[j].isSimilar(toSet[i])) && event.getPlayer().getInventory().getItemInHand().isSimilar(inventory[j]) || event.getPlayer().getItemInHand().getType() == Material.SKULL_ITEM && ((SkullMeta) event.getPlayer().getItemInHand().getItemMeta()).hasOwner() && ((SkullMeta) event.getPlayer().getItemInHand().getItemMeta()).getOwner().equalsIgnoreCase(ItemJoin.pl.isSkullOwner)) {
+    		                     		event.setCancelled(true);
+    		                     		event.getPlayer().updateInventory();
+    		                        	 }
+    		                    else {
+    		            	 }
+    		             }
+    		         }
+               }
+	      }
+	}
+}
 	
      @EventHandler(priority=EventPriority.HIGHEST)
      public void onPreventPlayerDropping(PlayerDropItemEvent event)
@@ -318,32 +349,6 @@ public class Listeners implements Listener{
                      event.getDrops().clear();
  	  }
     }
-}
-
-	@SuppressWarnings("deprecation")
-	@EventHandler(priority=EventPriority.HIGHEST)
- 	public void onPreventPlayerPlace(PlayerInteractEvent event)
- 	{
- 		if (event.getAction() == Action.RIGHT_CLICK_BLOCK){
- 	         if(ItemJoin.pl.getConfig().getBoolean("prevent-itemjoin-itemplacement") == true && (ItemJoin.pl.preventijplacement.contains(event.getPlayer().getWorld().getName()))){
- 	        	 if(ItemJoin.pl.getConfig().getBoolean("AllowOPBypass-prevent-itemjoin-itemplacement") == true && event.getPlayer().isOp()) {
-          		}
-                 else {
-                	 ItemStack[] toSet = (ItemStack[])ItemJoin.pl.items.get(event.getPlayer().getWorld().getName());
-     				ItemStack[] inventory = event.getPlayer().getInventory().getContents();
-     		         for (int i = 0; i < inventory.length; i++) {
-     		            	 for (int j = 0; j < inventory.length; j++) {
-        		            	 if ((inventory[j] != null) && (toSet[i] != null) && (inventory[j].isSimilar(toSet[i])) && event.getPlayer().getInventory().getItemInHand().isSimilar(inventory[j]) || event.getPlayer().getItemInHand().getType() == Material.SKULL_ITEM && ((SkullMeta) event.getPlayer().getItemInHand().getItemMeta()).hasOwner() && ((SkullMeta) event.getPlayer().getItemInHand().getItemMeta()).getOwner().equalsIgnoreCase(ItemJoin.pl.isSkullOwner)) {
- 		                     		event.setCancelled(true);
- 		                     		event.getPlayer().updateInventory();
- 		                        	 }
- 		                    else {
- 		            	 }
- 		             }
- 		         }
-            }
-	      }
-	}
 }
      
  // Bind Commands //

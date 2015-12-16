@@ -1,6 +1,6 @@
 name: ItemJoin
 main: me.xsilverslayerx.itemjoin.ItemJoin
-version: 2.0
+version: 2.2
 author: XSilverSlayerX
 commands:
    itemjoin:
@@ -46,3 +46,12 @@ permissions:
    itemjoin.updates:
       description: Use of the /itemjoin update command.
       default: op
+   itemjoin.*:
+      description: Allows use of all commands.
+      default: false
+   itemjoin.WorldName.#:
+      description: Replace # with slot number and WorldName with name of world to recieve that item.
+      default: false
+   itemjoin.WorldName.*:
+      description: Gives permission to get all items from specified world.
+      default: false

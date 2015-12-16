@@ -1,48 +1,150 @@
 #// <>==<>==<> ItemJoin's Join Items <>==<>==<> //#
 #// <>==<>==<> By XSilverSlayerX <>==<>==<> //#
+#// See a list of variables for ItemJoin here: http://dev.bukkit.org/bukkit-plugins/itemjoin/pages/documentation //#
+#// See https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html for item names! //#
+#// See this enchantments page for the correct enchant name. https://hub.spigotmc.org/javadocs/spigot/org/bukkit/enchantments/Enchantment.html#PROTECTION_ENVIRONMENTAL //#
+#// Need some more help with item slots? See the Documentations page for a more indepth tutorial. http://dev.bukkit.org/bukkit-plugins/itemjoin/pages/documentation //#
 #// For per-world support this best works with Multiverse-Inventories! http://dev.bukkit.org/bukkit-plugins/multiverse-inventories //#
 #// Otherwise you will need to set clear-on-world-change to true if you want to get the new items when you change worlds. //#
 #// Then you will need to set give-on-world-change to true to recieve the new items. //#
 
-worldlist: #// This is the list of worlds that have custom join items. //#
+worldlist: #// This is the list of worlds that have custom items on join. //#
   - world
   - world_nether
 
 #// For every world listed in the worldlist, you need to make a section for it. //#
 world:
   items:
-    1: #// This is the slot, 1 is first slot in hot bar, 36 is bottom right in inventory. //#
-      id: WOOD_SWORD #// This is a wooden sword. See https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html for item names! //#
+    1: #// This is the slot, 1 is first slot in hot bar, 36 is bottom right in inventory, 100-103 are the armor slots. //#
+      id: WOOD_SWORD
       data-value: 0
-      name: '&3Junk Sword' #// Colors are shown with & and then it's code.  Use two &s to denote an actual &. //#
+      name: '&3Junk Sword'
       lore:
         - '&7This is a pretty junk sword'
         - '&7You will probably want to get'
         - '&7A &bDiamond &7one'
       commands:
-        - 'say this is item slot 1' #// This is a command! //#
-        - 'say how is your day?' #// You can even execute more than one command! //#
-    3:
-      id: WOOD_PICKAXE #Wood pick
-      name: '&aJunk pick' #Leave off options that are unused.
+        - 'say how is your day?'
+      commands-cooldown: 5
+      cooldown-message: '&7[&eItemJoin&7] &a[%item%&a] &cis on cooldown for &a%timeleft% &cseconds..'
+    2:
+      id: WOOD_AXE
+      data-value: 0
+      name: '&5Mr.Axe'
+      lore:
+        - '&7'
+        - '&7All lines in this items.yml are'
+        - '&7removeable, so if you dont use &alore:'
+        - '&7or &aname: &7for example you can just'
+        - '&7remove the line. The only required'
+        - '&7line for each item is &aid: &bITEM_NAME&7.'
+        - '&7'
+        - '&7This is a &aWooden Axe'
+        - '&7See the link above or the'
+        - '&bDocumentations page &7for a list of &bItem Names.'
+        - '&7'
+        - '&aColors &7are shown with a &'
+        - '&7and then its code.'
+        - '&7Such as & + 4 is &4RED.'
+        - '&7'
+        - '&7You can add &aenchantments &7to your items!'
+        - '&7See this enchantments page'
+        - '&7for the correct enchant name.'
+        - '&7Link is above or in the Documentations page.'
+        - '&7'
+        - '&7The correct setup for an enchantment'
+        - '&7is ENCHANTMENT_NAME:LEVELofENCHANT'
+        - '&7ItemJoin supports unsafe enchants,'
+        - '&7meaning you can do higher levels of enchant then normal.'
+        - '&7Such as FIRE_ASPECT:12 for level 12.'
+        - '&7'
+        - '&7Cooldown time for the items command,'
+        - '&7(commands-cooldown) is not required!'
+        - '&7If removed there will be no cooldown!'
+        - '&a% timeleft % &7variable is for the time left'
+        - '&7until the countdown is over'
+        - '&a% item % &7is the name of the item'
+        - '&7that is on cooldown.' 
+      enchantment:
+        - 'KNOCKBACK:2'
+        - 'FIRE_ASPECT:12'
       commands:
-        - 'gamemode 1 %player%' #// Also supports the variable %player%. The end result would be /gamemode 1 XSilverSlayerX. Only if I was the one to click the item though. //#
-        - 'say this is item 3'
+        - 'say this is a command!'
+        - 'say You can even execute more than one command!'
+        - 'say this is item slot 2'
+      commands-cooldown: 5
+      cooldown-message: '&7[&eItemJoin&7] &a[%item%&a] &cis on cooldown for &a%timeleft% &cseconds..'
+    3:
+      id: WOOD_PICKAXE
+      name: '&bThat Pickaxe'
+      lore:
+        - '&7Dont want a cooldown message?'
+        - '&7Remove the &acooldown-message: &7line!'
+        - '&7'
+        - '&7You can also remove the'
+        - '&acommands-cooldown: &7line so you dont'
+        - '&7have a cooldown for that item!'
+        - '&7'
+        - '&7Commands also support &a% player % &7variable.'
+        - '&7The end result would be;'
+        - '&7/gamemode 1 XSilverSlayerX'
+        - '&7If &aI &7was the one who clicked.'
+      commands:
+        - 'gamemode 1 %player%'
+      commands-cooldown: 8
+      cooldown-message: '&7[&eItemJoin&7] &a[%item%&a] &cis on cooldown for &a%timeleft% &cseconds..'
     4:
-      id: WOOD_SPADE #// Remember to use the right names!  This is a shovel! //#
-      commands: #// Remove this line if you do not want commands for this item. //#
-        - 'say i am a command' #// Same for this line. Remove it. //#
+      id: WOOD_SPADE
     5:
       id: STAINED_GLASS
-      data-value: 12 #// Support for data-values. This is the ending number of the item ID. Since brown stained glass is 95:12 we would put 12. So you would get STAINED_GLASS:12. //#
-      count: 32 #// How many of this item you would like to recieve. Since this item stacks, you would get 32 brown stained glass. //#
-      commands:
-        - 'server survival' #// Supports BungeeCord too! (Since its in instance of the player). //#
-    9:
-      id: COMPASS
-      data-value: 0 #// Default data value for an item is 0. So since this is a compass you can just remove the data-value line. //#
+      data-value: 12
+      count: 32
       lore:
-        - '&l&1BOLD'
+        - '&7You can add any enchant to any item if you want!'
+        - '&7Such as &aFireAspect 3'
+        - '&7'
+        - '&aThis is a &bBungeeCord &aitem.'
+        - '&7the command server survival, will send a'
+        - '&7player to the survival server.'
+        - '&7(Since its in &binstance &7of the &bplayer&7)'
+        - '&7'
+        - '&7Added support for &adata-values&7 too!'
+        - '&7The data-value is the ending number'
+        - '&7of an item ID. Since brown stained'
+        - '&7glass is 95:12 we would put 12.'
+        - '&7So you would get STAINED_GLASS:12'
+        - '&7'
+        - '&aCount &7is the amount of the item you would'
+        - '&7like to recieve in each slot.'
+        - '&7Since count is 32, you get 32 brown stained glass!'
+      enchantment:
+        - 'FIRE_ASPECT:3'
+      commands:
+        - 'server survival'
+    9:
+      id: SKULL_ITEM
+      name: '&a%player%'
+      skull-owner: '%player%'
+      data-value: 3
+      lore:
+        - '&7If the item is a &bskull.'
+        - '&7You can set it to show a players skin.'
+        - '&7The &bdata-value &7must be set to &b3.'
+        - '&7The &bskull-owner &7is set to &a% player %&7.'
+        - '&7So who ever joins will get their own head!'
+        - '&7See the documentations page for'
+        - '&7a full list of the variables!'
+    103:
+      id: DIAMOND_HELMET
+      name: '&5ItemJoins Legendary Helmet!'
+      lore:
+        - '&7'
+        - '&7This is an armor slot, Helmet slot to be exact.'
+        - '&7Armor slots are 100-103'
+        - '&7See the documentations page for indepth tutorial on this.'
+      enchantment:
+        - 'PROTECTION_ENVIRONMENTAL:3'
+        - 'PROTECTION_EXPLOSIONS:2'
 world_nether:
   items:
     1:
