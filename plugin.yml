@@ -19,6 +19,10 @@ commands:
       description: Checks for updates
       usage: |
           /itemjoin updates
+   itemjoin loaded:
+      description: Checks what worlds are loaded
+      usage: |
+          /itemjoin loaded
    ij:
       description: Displays some options
       usage: |
@@ -35,6 +39,10 @@ commands:
       description: Checks for updates
       usage: |
           /ij updates
+   ij loaded:
+      description: Checks what worlds are loaded
+      usage: |
+          /ij loaded
           
 permissions:
    itemjoin.use:
