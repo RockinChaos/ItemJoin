@@ -1,21 +1,31 @@
-#// <>==<>==<> ItemJoin's Join Items <>==<>==<> //#
-#// <>==<>==<> By XSilverSlayerX <>==<>==<> //#
+#// <>==<>==<> ItemJoin's Custom Items On Join, by RockinChaos <>==<>==<> //#
 #// See a list of variables for ItemJoin here: http://dev.bukkit.org/bukkit-plugins/itemjoin/pages/documentation //#
 #// See https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html for item names! //#
 #// See this enchantments page for the correct enchant name. https://hub.spigotmc.org/javadocs/spigot/org/bukkit/enchantments/Enchantment.html#PROTECTION_ENVIRONMENTAL //#
-#// Need some more help with item slots? See the Documentations page for a more indepth tutorial. http://dev.bukkit.org/bukkit-plugins/itemjoin/pages/documentation //#
+#// Need some more help with item slots? See the Documentations page for a more in-depth tutorial. http://dev.bukkit.org/bukkit-plugins/itemjoin/pages/documentation //#
 #// For per-world support this best works with Multiverse-Inventories! http://dev.bukkit.org/bukkit-plugins/multiverse-inventories //#
-#// Otherwise you will need to set clear-on-world-change to true if you want to get the new items when you change worlds. //#
-#// Then you will need to set give-on-world-change to true to recieve the new items. //#
+#// Otherwise you will need to set clear-on-world-changed to true if you want to get the new items when you change worlds. //#
+#// Then you will need to add give-on-modifiers (world-changed) to each item to receive the new items. //#
+Global-Settings: #// Global Settings, for each world listed under world-list. These will take effect in them. //#
+  Prevention:
+    prevent-pickups: false #// Prevents picking up of any item //#
+    AllowOPBypass: false #// Ignores these settings under Prevention if you are OP //#
+    CreativeBypass: false #// Ignores these settings under Prevention if you are in creative mode. //#
+  Clear-On:
+    clear-on-join: false #// Clears the players inventory upon entering the server. (Before items are given). //#
+    clear-on-world-change: false #// Clears the players inventory upon changing worlds. (Before items are given). //#
+    AllowOPBypass: false #// Ignores these settings under Clear-On if you are OP //#
+  First-Join:
+    FirstJoin-Mode-Enabled: false #// Set to true if you wish to use First-Join-Item: true per item! (This allows the use of the First Join options).//#
 
-worldlist: #// This is the list of worlds that have custom items on join. //#
+world-list: #// This is the list of worlds that have custom items on join. //#
   - world
   - world_nether
 
-#// For every world listed in the worldlist, you need to make a section for it. //#
+#// For every world listed in the world-list, you need to make a section for it. //#
 world:
   items:
-    1: #// This is the slot, 1 is first slot in hot bar, 36 is bottom right in inventory, 100-103 are the armor slots. //#
+    1: #// This is the slot, 1 is first slot in hot bar, 36 is bottom right in inventory, 100-103 are the armor slots, 100 being the boots and 103 being the helmet. //#
       id: WOOD_SWORD
       data-value: 0
       name: '&3Junk Sword'
@@ -24,7 +34,8 @@ world:
         - '&7You will probably want to get'
         - '&7A &bDiamond &7one'
       commands:
-        - 'say how is your day?'
+        - 'console: say how is your day?'
+      commands-action: RIGHT_CLICK_AIR, RIGHT_CLICK_BLOCK
       commands-cooldown: 5
       cooldown-message: '&7[&eItemJoin&7] &a[%item%&a] &cis on cooldown for &a%timeleft% &cseconds..'
     2:
@@ -32,6 +43,12 @@ world:
       data-value: 0
       name: '&5Mr.Axe'
       lore:
+        - '&7'
+        - '&7This item is a &aFirst Join Only Item.'
+        - '&7You will only get this item &aONCE!'
+        - '&7On first join or world changed.'
+        - '&7Meaning the first time you enter the world'
+        - '&7with this item, you will get it.'
         - '&7'
         - '&7All lines in this items.yml are'
         - '&7removeable, so if you dont use &alore:'
@@ -65,15 +82,25 @@ world:
         - '&7until the countdown is over'
         - '&a% item % &7is the name of the item'
         - '&7that is on cooldown.' 
+        - '&7'
+        - '&acommands-action &7are not required,'
+        - '&7but if you want a certain action to'
+        - '&7execute the command you can set that.'
+        - '&7Such as if a player RIGHT_CLICK_AIR'
+        - '&7(Right clicks air) it will execute.'
+        - '&7You can set any or all of the 5 executors, seperated by (,) commas.'
+        - '&7See the &aDocumentations &7page for a list of actions.'
       enchantment:
         - 'KNOCKBACK:2'
         - 'FIRE_ASPECT:12'
       commands:
-        - 'say this is a command!'
-        - 'say You can even execute more than one command!'
-        - 'say this is item slot 2'
+        - 'console: say this is a command!'
+        - 'console: say You can even execute more than one command!'
+        - 'console: say this is item slot 2'
+      commands-action: RIGHT_CLICK_AIR, RIGHT_CLICK_BLOCK, LEFT_CLICK_AIR, LEFT_CLICK_BLOCK
       commands-cooldown: 5
       cooldown-message: '&7[&eItemJoin&7] &a[%item%&a] &cis on cooldown for &a%timeleft% &cseconds..'
+      First-Join-Item: true
     3:
       id: WOOD_PICKAXE
       name: '&bThat Pickaxe'
@@ -87,14 +114,35 @@ world:
         - '&7'
         - '&7Commands also support &a% player % &7variable.'
         - '&7The end result would be;'
-        - '&7/gamemode 1 XSilverSlayerX'
+        - '&7/gamemode 1 RockinChaos'
         - '&7If &aI &7was the one who clicked.'
+        - '&7'
+        - '&7In the items.yml on this item,'
+        - '&7are a list of modifiers, the full list.'
+        - '&7They do exactly as they sound.'
+        - '&7for an in-depth explaination see the &aDocumentations &7 page.'
       commands:
         - 'gamemode 1 %player%'
+        - 'console: say this is a console command.'
+        - 'player: say this is a player command.'
+        - 'say this command will be executed by the player since an executor is not defined.'
       commands-cooldown: 8
       cooldown-message: '&7[&eItemJoin&7] &a[%item%&a] &cis on cooldown for &a%timeleft% &cseconds..'
+      prevent-modifiers:
+        - 'placement'
+        - 'inventory-modify'
+        - 'death-drops'
+        - 'self-drops'
+        - 'other-pickups'
+        - 'AllowOpBypass'
+        - 'CreativeBypass'
+      give-on-modifiers:
+        - 'respawn'
+        - 'world-changed'
+        - 'AllowOpBypass'
     4:
       id: WOOD_SPADE
+      First-Join-Item: true
     5:
       id: STAINED_GLASS
       data-value: 12
@@ -120,7 +168,15 @@ world:
       enchantment:
         - 'FIRE_ASPECT:3'
       commands:
-        - 'server survival'
+        - 'player: server survival'
+      prevent-modifiers:
+        - 'placement'
+        - 'inventory-modify'
+        - 'self-drops'
+        - 'CreativeBypass'
+      give-on-modifiers:
+        - 'respawn'
+        - 'world-changed'
     9:
       id: SKULL_ITEM
       name: '&a%player%'
@@ -141,6 +197,7 @@ world:
         - '&7'
         - '&7This is an armor slot, Helmet slot to be exact.'
         - '&7Armor slots are 100-103'
+        - '&7100 being the boots and 103 being the helmet.'
         - '&7See the documentations page for indepth tutorial on this.'
       enchantment:
         - 'PROTECTION_ENVIRONMENTAL:3'
@@ -155,7 +212,7 @@ world_nether:
     3:
       id: WHEAT
       commands:
-        - 'say i enjoy life!'
+        - 'player: say i enjoy life!'
     4:
       id: MINECART
       data-value: 0

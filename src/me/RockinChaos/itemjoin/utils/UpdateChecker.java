@@ -1,4 +1,4 @@
-package me.xsilverslayerx.itemjoin.utils;
+package me.RockinChaos.itemjoin.utils;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -31,8 +31,8 @@ public class UpdateChecker {
             }
     }
     
-    public boolean updateNeeded(){
-            try{
+    public boolean updateNeeded() {
+            try {
                     InputStream input = this.filesFeed.openConnection().getInputStream();
                     Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(input);
                     
@@ -60,25 +60,25 @@ public class UpdateChecker {
                     reader.close();
                     input.close();
                     
-                    if (!plugin.getDescription().getVersion().equals(this.version)){
+                    if (!plugin.getDescription().getVersion().equals(this.version)) {
                             return true;
                     }
-            }catch (Exception e){
+            }catch (Exception e) {
                     e.printStackTrace();
             }
             
             return false;
     }
     
-    public String getVersion(){
+    public String getVersion() {
             return this.version;
     }
     
-    public String getLink(){
+    public String getLink() {
             return this.link;
     }
     
-    public String getJarLink(){
+    public String getJarLink() {
             return this.jarLink;
     }
     

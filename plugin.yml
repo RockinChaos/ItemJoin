@@ -1,34 +1,46 @@
 name: ItemJoin
-main: me.xsilverslayerx.itemjoin.ItemJoin
-version: 2.2
-author: XSilverSlayerX
+main: me.RockinChaos.itemjoin.ItemJoin
+version: 2.3
+author: RockinChaos
 commands:
    itemjoin:
-      description: Displays some options
+      description: Displays some options.
       usage: |
           /itemjoin
    itemjoin help:
-      description: Displays some options
+      description: Displays some options.
       usage: |
           /itemjoin help
    itemjoin reload:
-      description: Reloads the ItemJoin config.yml
+      description: Reloads the ItemJoin config.yml.
       usage: |
           /itemjoin reload
    itemjoin updates:
-      description: Checks for updates
+      description: Checks for updates.
       usage: |
           /itemjoin updates
    itemjoin loaded:
-      description: Checks what worlds are loaded
+      description: Checks what worlds are loaded.
       usage: |
           /itemjoin loaded
+   itemjoin permissions:
+      description: Checks what permissions you have.
+      usage: |
+          /itemjoin permissions
+   itemjoin get:
+      description: Gives you an itemjoin item.
+      usage: |
+          /itemjoin get
+   itemjoin world:
+      description: Checks what world you are in. For (debugging).
+      usage: |
+          /itemjoin world
    ij:
-      description: Displays some options
+      description: Displays some options.
       usage: |
           /ij
    ij help:
-      description: Displays help options
+      description: Displays help options.
       usage: |
           /ij help
    ij reload:
@@ -36,27 +48,48 @@ commands:
       usage: |
           /ij reload
    ij updates:
-      description: Checks for updates
+      description: Checks for updates.
       usage: |
           /ij updates
    ij loaded:
-      description: Checks what worlds are loaded
+      description: Checks what worlds are loaded.
       usage: |
           /ij loaded
+   ij permissions:
+      description: Checks what permissions you have.
+      usage: |
+          /ij permissions
+   ij get:
+      description: Gives you an itemjoin item.
+      usage: |
+          /ij get
+   ij world:
+      description: Checks what world you are in. For (debugging).
+      usage: |
+          /ij world
           
 permissions:
+   itemjoin.*:
+      description: Allows use of all commands.
+      default: false
+   itemjoin.permissions:
+      description: Use of the /itemjoin prermissions commands.
+      default: true
    itemjoin.use:
-      description: Currently allows use of base commands
+      description: Currently allows use of basic commands.
       default: op
    itemjoin.reload:
-      description: Allows use of reload command. You need itemjoin.use with this permission to use reload command.
+      description: Allows use of reload command.
       default: op
    itemjoin.updates:
       description: Use of the /itemjoin update command.
       default: op
-   itemjoin.*:
-      description: Allows use of all commands.
-      default: false
+   itemjoin.get:
+      description: Use of the /itemjoin get command.
+      default: op
+   itemjoin.get.others:
+      description: Use of the /itemjoin get for player command.
+      default: op
    itemjoin.WorldName.#:
       description: Replace # with slot number and WorldName with name of world to recieve that item.
       default: false
