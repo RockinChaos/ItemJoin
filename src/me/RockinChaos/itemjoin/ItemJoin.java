@@ -34,9 +34,9 @@ import org.bukkit.plugin.java.JavaPlugin;
     public List<String> worlds;
     public Map<String, ItemStack[]> items = new HashMap<String, ItemStack[]>();
     protected Logger log;
-    public boolean hasMultiverse = false;
-    public boolean hasInventories = false;
-    public boolean hasPlaceholderAPI = false;
+    public static boolean hasMultiverse;
+    public static boolean hasInventories;
+    public static boolean hasPlaceholderAPI;
     public Player PlayerJoin;
     public String PlayerJoin2;
     public static String secretMsg = "ItemJoin";
@@ -66,17 +66,20 @@ import org.bukkit.plugin.java.JavaPlugin;
     	  hasPlaceholderAPI = true;
 		 } else if (ItemJoin.pl.getConfig().getBoolean("PlaceholderAPI") == true) {
 		 getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.RED + "Could not find PlaceholderAPI.");
-	    }
+		 hasPlaceholderAPI = false;
+		 }
 	  if (this.getServer().getPluginManager().getPlugin("Multiverse-Core") != null && ItemJoin.pl.getConfig().getBoolean("Multiverse-Core") == true) {
     	  getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.GREEN + "Hooked into Multiverse-Core!");
     	  hasMultiverse = true;
       } else if (ItemJoin.pl.getConfig().getBoolean("Multiverse-Core") == true) {
     	  getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.RED + "Could not find Multiverse-Core.");
+    	  hasMultiverse = false;
       }
 	  if (this.getServer().getPluginManager().getPlugin("Multiverse-Inventories") != null && ItemJoin.pl.getConfig().getBoolean("Multiverse-Inventories") == true) {
     	  getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.GREEN + "Hooked into Multiverse-Inventories!");
     	  hasInventories = true;
       } else if (ItemJoin.pl.getConfig().getBoolean("Multiverse-Inventories") == true) {
+    	  hasInventories = false;
     	  getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.RED + "Could not find Multiverse-Inventories.");
       }
 	     for (int i = 0; i < this.worlds.size(); i++)
@@ -259,15 +262,15 @@ import org.bukkit.plugin.java.JavaPlugin;
 	    return true;
 	}
    
-// translateCodes //
+ // translateCodes //
     
     public String translateCodes(String name)
        {
 	     name = name.replace("%player%", PlayerJoin2);
          name = ChatColor.translateAlternateColorCodes('&', name).toString();
-		     if (hasPlaceholderAPI = true) {
-		        name = PlaceholderAPI.setPlaceholders(PlayerJoin, name);
-		   }
+		 if (ItemJoin.pl.getServer().getPluginManager().getPlugin("PlaceholderAPI") != null && ItemJoin.pl.getConfig().getBoolean("PlaceholderAPI") == true) {
+		   name = PlaceholderAPI.setPlaceholders(PlayerJoin, name);
+		 }
       return name;
     }
 }

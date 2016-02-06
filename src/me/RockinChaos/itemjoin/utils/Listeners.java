@@ -68,8 +68,7 @@ public class Listeners implements Listener {
 	    	final Player player = event.getPlayer();
 	    	final String world = player.getWorld().getName().toLowerCase();
 		    ItemStack[] items = (ItemStack[])ItemJoin.pl.items.get(world + player.getName());
-		    Boolean FirstJoinMode = ItemJoin.pl.getSpecialConfig("items.yml").getBoolean("Global-Settings" + ".First-Join." + "FirstJoin-Mode-Enabled");
-		    String FirstFindPlayer = ItemJoin.pl.getSpecialConfig("FirstJoin.yml").getString(world + "." + player.getName().toString());
+			Boolean FirstJoinMode = ItemJoin.pl.getSpecialConfig("items.yml").getBoolean("Global-Settings" + ".First-Join." + "FirstJoin-Mode-Enabled");
    	      	if(ItemJoin.pl.getSpecialConfig("items.yml").getBoolean("Global-Settings" + ".Clear-On." + "clear-on-world-change") == true && (ItemJoin.pl.worlds.contains(world))){
    	    		if(ItemJoin.pl.getSpecialConfig("items.yml").getBoolean("Global-Settings" + ".Clear-On." + "AllowOPBypass") == true && player.isOp()) {
    	      		} else {
@@ -85,7 +84,9 @@ public class Listeners implements Listener {
 	    			setGArmor(player, world, "world-changed");
   	    			for (int i = 100; i < 104; i++) {
   					Boolean FirstJoin = ItemJoin.pl.getSpecialConfig("items.yml").getBoolean(world + ".items." + i + ".First-Join-Item");
-  					if (FirstFindPlayer == null && FirstJoin == true && FirstJoinMode == true) {
+  					if (FirstJoin == true && FirstJoinMode == true) {
+ 				  		 String FirstFindPlayer = ItemJoin.pl.getSpecialConfig("FirstJoin.yml").getString(world + "." + player.getName().toString());
+ 				  		if (FirstFindPlayer == null) {
   						if (player.hasPermission("itemjoin." + world) || player.hasPermission("itemjoin." + world + "." + i) || player.hasPermission("itemjoin." + world + ".*")) {
   							if (i == 100) {
   						    	player.getEquipment().setBoots(items[i - 1]);
@@ -96,6 +97,7 @@ public class Listeners implements Listener {
   						 	    } else if (i == 103) {
   						 	 	player.getEquipment().setHelmet(items[i - 1]);
   						   }
+  						 }
   						}
   					  }
   	    		    }
@@ -108,13 +110,18 @@ public class Listeners implements Listener {
   						} else if (player.hasPermission("itemjoin." + world) || player.hasPermission("itemjoin." + world + "." + i) || player.hasPermission("itemjoin." + world + ".*")) {
   						player.getInventory().setItem(i - 1, items[i - 1]);
   						}
-  					} else if (FirstFindPlayer == null && FirstJoin == true && FirstJoinMode == true) {
+  					} else if (FirstJoin == true && FirstJoinMode == true) {
+  				  		 String FirstFindPlayer = ItemJoin.pl.getSpecialConfig("FirstJoin.yml").getString(world + "." + player.getName().toString());
+  				  		if (FirstFindPlayer == null) {
   	  				    if (player.hasPermission("itemjoin." + world) || player.hasPermission("itemjoin." + world + "." + i) || player.hasPermission("itemjoin." + world + ".*")) {
   	  					  player.getInventory().setItem(i - 1, items[i - 1]);
   					}
+  				  }
   				}
   	    	}
-  	   if (FirstJoinMode == true && FirstFindPlayer == null) {
+  	   if (FirstJoinMode == true) {
+  		 String FirstFindPlayer = ItemJoin.pl.getSpecialConfig("FirstJoin.yml").getString(world + "." + player.getName().toString());
+  		if (FirstFindPlayer == null) {
   		File playerFile =  new File (ItemJoin.pl.getDataFolder(), "FirstJoin.yml");
   		FileConfiguration playerData = YamlConfiguration.loadConfiguration(playerFile);
   		playerData.set(world + "." + player.getName().toString() + "." + "UniqueId", player.getUniqueId().toString());
@@ -123,6 +130,7 @@ public class Listeners implements Listener {
   		} catch (IOException e1) {
   		ItemJoin.pl.getServer().getLogger().severe("Could not save " + player.getName() + " to the data file FirstJoin.yml!");
   		e1.printStackTrace();
+  	   }
   	   }
   	   }
    	 }
@@ -139,7 +147,6 @@ public class Listeners implements Listener {
          ItemStack[] inventory = player.getInventory().getContents();
          ItemStack[] toSet = (ItemStack[])ItemJoin.pl.items.get(world + player.getName());
          Boolean FirstJoinMode = ItemJoin.pl.getSpecialConfig("items.yml").getBoolean("Global-Settings" + ".First-Join." + "FirstJoin-Mode-Enabled");
-		 String FirstFindPlayer = ItemJoin.pl.getSpecialConfig("FirstJoin.yml").getString(world + "." + player.getName().toString());
        	if(ItemJoin.pl.getSpecialConfig("items.yml").getBoolean("Global-Settings" + ".Clear-On." + "clear-on-join") == true && (ItemJoin.pl.worlds.contains(world))){
      		if(ItemJoin.pl.getSpecialConfig("items.yml").getBoolean("Global-Settings" + ".Clear-On." + "AllowOPBypass") == true && player.isOp()) {
          		}
@@ -151,43 +158,46 @@ public class Listeners implements Listener {
                      player.getInventory().setBoots(null);
           }
        	}
-  		if(ItemJoin.pl.worlds.contains(world) && FirstJoinMode == true && FirstFindPlayer == null) {
-  			for (int i = 100; i < 104; i++) {
-				Boolean FirstJoin = ItemJoin.pl.getSpecialConfig("items.yml").getBoolean(world + ".items." + i + ".First-Join-Item");
-				if (FirstJoin == true) {
-					if (player.hasPermission("itemjoin." + world) || player.hasPermission("itemjoin." + world + "." + i) || player.hasPermission("itemjoin." + world + ".*")) {
-						if (i == 100) {
-					    	player.getEquipment().setBoots(toSet[i - 1]);
-							} else if (i == 101) {
-					 	    player.getEquipment().setLeggings(toSet[i - 1]);
-							} else if (i == 102) {
-					 	 	player.getEquipment().setChestplate(toSet[i - 1]);
-					 	    } else if (i == 103) {
-					 	 	player.getEquipment().setHelmet(toSet[i - 1]);
-					   }
+        if (FirstJoinMode == true) {
+		 String FirstFindPlayer = ItemJoin.pl.getSpecialConfig("FirstJoin.yml").getString(world + "." + player.getName().toString());
+	  		if(ItemJoin.pl.worlds.contains(world) && FirstJoinMode == true && FirstFindPlayer == null) {
+	  			for (int i = 100; i < 104; i++) {
+					Boolean FirstJoin = ItemJoin.pl.getSpecialConfig("items.yml").getBoolean(world + ".items." + i + ".First-Join-Item");
+					if (FirstJoin == true) {
+						if (player.hasPermission("itemjoin." + world) || player.hasPermission("itemjoin." + world + "." + i) || player.hasPermission("itemjoin." + world + ".*")) {
+							if (i == 100) {
+						    	player.getEquipment().setBoots(toSet[i - 1]);
+								} else if (i == 101) {
+						 	    player.getEquipment().setLeggings(toSet[i - 1]);
+								} else if (i == 102) {
+						 	 	player.getEquipment().setChestplate(toSet[i - 1]);
+						 	    } else if (i == 103) {
+						 	 	player.getEquipment().setHelmet(toSet[i - 1]);
+						   }
+						}
 					}
-				}
-  		}
-  			for (int i = 0; i < player.getInventory().getSize(); i++) {
-				Boolean FirstJoin = ItemJoin.pl.getSpecialConfig("items.yml").getBoolean(world + ".items." + (i + 1) + ".First-Join-Item");
-				if (FirstJoin == true) {
-					if (player.hasPermission("itemjoin." + world) || player.hasPermission("itemjoin." + world + "." + i) || player.hasPermission("itemjoin." + world + ".*")) {
-						player.getInventory().setItem(i, toSet[i]);
-					}
-	       }
-  			}
-  	  	   if (FirstJoinMode == true && FirstFindPlayer == null) {
-  	   		File playerFile =  new File (ItemJoin.pl.getDataFolder(), "FirstJoin.yml");
-  	   		FileConfiguration playerData = YamlConfiguration.loadConfiguration(playerFile);
-  	   		playerData.set(world + "." + player.getName().toString() + "." + "UniqueId", player.getUniqueId().toString());
-  	   		try {
-  	   		playerData.save(playerFile);
-  	   		} catch (IOException e1) {
-  	   		ItemJoin.pl.getServer().getLogger().severe("Could not save " + player.getName() + " to the data file FirstJoin.yml!");
-  	   		e1.printStackTrace();
-  	   	    }
-  	  	   }
-  		}
+	  		}
+	  			for (int i = 0; i < player.getInventory().getSize(); i++) {
+					Boolean FirstJoin = ItemJoin.pl.getSpecialConfig("items.yml").getBoolean(world + ".items." + (i + 1) + ".First-Join-Item");
+					if (FirstJoin == true) {
+						if (player.hasPermission("itemjoin." + world) || player.hasPermission("itemjoin." + world + "." + i) || player.hasPermission("itemjoin." + world + ".*")) {
+							player.getInventory().setItem(i, toSet[i]);
+						}
+		       }
+	  			}
+	  	  	   if (FirstJoinMode == true && FirstFindPlayer == null) {
+	  	   		File playerFile =  new File (ItemJoin.pl.getDataFolder(), "FirstJoin.yml");
+	  	   		FileConfiguration playerData = YamlConfiguration.loadConfiguration(playerFile);
+	  	   		playerData.set(world + "." + player.getName().toString() + "." + "UniqueId", player.getUniqueId().toString());
+	  	   		try {
+	  	   		playerData.save(playerFile);
+	  	   		} catch (IOException e1) {
+	  	   		ItemJoin.pl.getServer().getLogger().severe("Could not save " + player.getName() + " to the data file FirstJoin.yml!");
+	  	   		e1.printStackTrace();
+	  	   	    }
+	  	  	   }
+	  		}
+        }
        if (ItemJoin.pl.worlds.contains(world))
        {
          boolean setItem = false;
