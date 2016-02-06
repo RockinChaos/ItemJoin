@@ -133,13 +133,13 @@ world:
         - 'inventory-modify'
         - 'death-drops'
         - 'self-drops'
-        - 'other-pickups'
         - 'AllowOpBypass'
         - 'CreativeBypass'
       give-on-modifiers:
         - 'respawn'
         - 'world-changed'
         - 'AllowOpBypass'
+        - 'CreativeBypass'
     4:
       id: WOOD_SPADE
       First-Join-Item: true
