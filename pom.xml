@@ -40,6 +40,11 @@
 				</configuration>
 			</plugin>
 		</plugins>
+   <resources>
+     <resource>
+       <directory>/var/lib/jenkins/jobs/ItemJoin/workspace/src/me/RockinChaos/itemjoin</directory>
+     </resource>
+   </resources>
 	</build>
 	<dependencies>
 		   <!--Bukkit API-->
