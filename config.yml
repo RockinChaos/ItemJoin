@@ -1,6 +1,8 @@
 #// <>==<>==<> ItemJoin's Settings, by RockinChaos  <>==<>==<> //#
+config-Version: 1
+Language: 'English' #// English is currently the only support langauge at the moment! //#
 CheckforUpdates: true #// Disable this if you dont want to be notified if there is an update. //#
-PlaceholderAPI: false #// Only use this if placeholderapi is installed on your server. Set to false else-wise. Required plugin restart when changed. //#
+PlaceholderAPI: false #// Only use this if PlaceholderAPI is installed on your server. Set to false else-wise. Required plugin restart when changed. //#
 Multiverse-Core: false #// Using the Multiverse plugin? Enable this for complete use of all plugin features. Required plugin restart when changed. //#
 Multiverse-Inventories: false #// Only used for plugin information. Set to false if you do not use it. Required plugin restart when changed. //#
 #// Derp... Its empty in here isn't it? lawl! More to come... soon! //#

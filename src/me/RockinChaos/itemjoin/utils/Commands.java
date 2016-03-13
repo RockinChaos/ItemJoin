@@ -1,5 +1,7 @@
 package me.RockinChaos.itemjoin.utils;
 
+import java.util.List;
+
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -10,26 +12,37 @@ import me.RockinChaos.itemjoin.ItemJoin;
 public class Commands implements CommandExecutor
 {
 
-    public static String noPermMSG;
+	public static String Prefix;
+    public static String noPermission;
     public static String notPlayer;
-    
-    static {
-        Commands.noPermMSG = ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.DARK_RED + "You don't have permission to use that command!";
-        Commands.notPlayer = ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.DARK_RED + "You must be a player to use that command";
-    }
-    
-// Player Commands //
+    public static String consoleAltSyntax;
+    public static String unknownCommand;
+    public static String badGetUsage;
+    public static String givenItem;
+    public static String givenOthersItem;
+    public static String receivedOthersItem;
+    public static String badSlot1;
+    public static String badSlot2;
+    public static String slotUndefined;
+    public static String consoleReloadedConfig;
+    public static String reloadedConfig;
+    public static String cachedWorlds;
+    public static String loadedWorlds;
+    public static String loadedWorldsListed;
+    public static String worldIn;
+    public static String worldInListed;
+
+ // Player Commands //
 	
     @SuppressWarnings("deprecation")
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-    	final Player player = (Player) sender;
         if (args.length == 0) {
         	if (sender.hasPermission("itemjoin.use") || sender.hasPermission("itemjoin.*")) {
                 sender.sendMessage(ChatColor.GREEN + "ItemJoin v." + ItemJoin.pl.getDescription().getVersion() + ChatColor.YELLOW + " by RockinChaos");
                 sender.sendMessage(ChatColor.GREEN + "Type" + ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + " /ItemJoin Help " + ChatColor.GREEN + "for the help menu.");
                 return true;
             } else {
-                sender.sendMessage(noPermMSG);
+                sender.sendMessage(noPermission);
                 return true;
             }
         } else if (args.length == 1 && args[0].equalsIgnoreCase("help") || args.length == 1 && args[0].equalsIgnoreCase("h")) {
@@ -46,7 +59,7 @@ public class Commands implements CommandExecutor
                 sender.sendMessage("");
                 return true;
         } else {
-            sender.sendMessage(noPermMSG);
+            sender.sendMessage(noPermission);
             return true;
         }
         } else if (args.length == 2 && args[0].equalsIgnoreCase("help") && args[1].equalsIgnoreCase("2") || args.length == 2 && args[0].equalsIgnoreCase("h") && args[1].equalsIgnoreCase("2")) {
@@ -64,60 +77,76 @@ public class Commands implements CommandExecutor
                 sender.sendMessage("");
                 return true;
         } else {
-            sender.sendMessage(noPermMSG);
+            sender.sendMessage(noPermission);
             return true;
         }
         } else if (args[0].equalsIgnoreCase("reload") || args[0].equalsIgnoreCase("rl")) {
         	if (sender.hasPermission("itemjoin.reload") || sender.hasPermission("itemjoin.*")) {
-        		ItemJoin.pl.loadSpecialConfig("items.yml");
-        		ItemJoin.pl.getSpecialConfig("items.yml").options().copyDefaults(false);
+                ItemJoin.pl.worlds = ItemJoin.getSpecialConfig("items.yml").getStringList("world-list");
+        		ItemJoin.loadSpecialConfig("items.yml");
+        		ItemJoin.getSpecialConfig("items.yml").options().copyDefaults(false);
         	    ItemJoin.pl.saveDefaultConfig();
         	  	ItemJoin.pl.getConfig().options().copyDefaults(false);
                 ItemJoin.pl.reloadConfig();
-           	    ItemJoin.pl.PlayerJoin = player;
-        	    ItemJoin.pl.PlayerJoin2 = player.getName();
-                ItemJoin.pl.CacheItems();
-                if (ItemJoin.pl.getSpecialConfig("items.yml").getBoolean("Global-Settings" + ".First-Join." + "FirstJoin-Mode-Enabled") == true) {
-          		  ItemJoin.pl.loadSpecialConfig("firstJoin.yml");
-          		  ItemJoin.pl.getSpecialConfig("firstJoin.yml").options().copyDefaults(false);
+          	     if (ItemJoin.pl.getConfig().getString("Language").equalsIgnoreCase("English")) {
+          	       ItemJoin.loadSpecialConfig("en-lang.yml");
+          	       ItemJoin.getSpecialConfig("en-lang.yml").options().copyDefaults(false);
+          	       RegisterEnLang();
           		  }
-  		        ItemJoin.pl.getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.RED + sender.getName() + " has reloaded the Configuration files.");
-  		        sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.GREEN + "Configuration Reloaded!");
-                for (int i = 0; i < ItemJoin.pl.worlds.size(); i++)
-                {
-                  String world = (String)ItemJoin.pl.worlds.get(i).toLowerCase();
-                  sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.GREEN + "Cached " + ChatColor.YELLOW + world + ChatColor.GREEN + " from the items.yml!");
+                if(!(sender instanceof ConsoleCommandSender)) { 
+           	      ItemJoin.pl.PlayerJoin = (Player) sender;
+        	      ItemJoin.pl.PlayerJoin2 = ((Player)sender).getName();
                 }
+                ItemJoin.pl.CacheItems();
+                if (ItemJoin.getSpecialConfig("items.yml").getBoolean("Global-Settings" + ".First-Join." + "FirstJoin-Mode-Enabled") == true) {
+          		  ItemJoin.loadSpecialConfig("firstJoin.yml");
+          		  ItemJoin.getSpecialConfig("firstJoin.yml").options().copyDefaults(false);
+          		  }
+  		        ItemJoin.pl.getServer().getConsoleSender().sendMessage(consoleReloadedConfig.replace("%player_reloaded%", sender.getName()));
+  		        sender.sendMessage(reloadedConfig);
+  		         List<String> PrintWorlds = ItemJoin.getSpecialConfig("items.yml").getStringList("world-list");
+  			     for (int i = 0; i < PrintWorlds.size(); i++)
+  			     {
+  			       String world = (String)PrintWorlds.get(i);
+  			       sender.sendMessage(cachedWorlds.replace("%cache_world%", world));
+  			     }
                 return true;
             } else {
-                sender.sendMessage(noPermMSG);
+                sender.sendMessage(noPermission);
                 return true;
             }
         } else if (args[0].equalsIgnoreCase("loaded") || args[0].equalsIgnoreCase("l")) {
         	if (sender.hasPermission("itemjoin.use") || sender.hasPermission("itemjoin.*")) {
-                sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.GREEN + "Loaded worlds:");
-                for (int i = 0; i < ItemJoin.pl.worlds.size(); i++)
-                {
-                  String world = (String)ItemJoin.pl.worlds.get(i).toLowerCase();
-                  sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.GREEN + "Cached " + ChatColor.YELLOW + world + ChatColor.GREEN + " from the items.yml!");
-                }
+                sender.sendMessage(loadedWorlds);
+ 		         List<String> PrintWorlds = ItemJoin.getSpecialConfig("items.yml").getStringList("world-list");
+ 			     for (int i = 0; i < PrintWorlds.size(); i++)
+ 			     {
+ 			       String world = (String)PrintWorlds.get(i);
+ 			       sender.sendMessage(loadedWorldsListed.replace("%loaded_worlds%", world));
+ 			     }
                 return true;
             } else {
-                sender.sendMessage(noPermMSG);
+                sender.sendMessage(noPermission);
                 return true;
             }
         } else if (args[0].equalsIgnoreCase("world") || args[0].equalsIgnoreCase("worlds") || args[0].equalsIgnoreCase("w")) {
         	if (sender.hasPermission("itemjoin.use") || sender.hasPermission("itemjoin.*")) {
-                sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.GREEN + "You are in the world:");
-                sender.sendMessage(ChatColor.GREEN + "- " + player.getWorld().getName().toLowerCase());
+        		if(!(sender instanceof ConsoleCommandSender)) { 
+                sender.sendMessage(worldIn);
+                sender.sendMessage(worldInListed.replace("%in_worlds%", ((Player) sender).getWorld().getName()));
                 return true;
+        		} else if(sender instanceof ConsoleCommandSender) { 
+        			sender.sendMessage(notPlayer);
+        			return true;
+        		}
             } else {
-                sender.sendMessage(noPermMSG);
+                sender.sendMessage(noPermission);
                 return true;
             }
         } else if (args.length == 1 && args[0].equalsIgnoreCase("permissions") || args.length == 1 && args[0].equalsIgnoreCase("perm") || args.length == 1 && args[0].equalsIgnoreCase("perms")) {
         	if (sender.hasPermission("itemjoin.permissions") || sender.hasPermission("itemjoin.*")) {
-                sender.sendMessage(ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + ChatColor.STRIKETHROUGH.toString() + "]--------------" + ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "[" + ChatColor.YELLOW + " ItemJoin " + ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "]" + ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + ChatColor.STRIKETHROUGH.toString() + "--------------[");
+        		if(!(sender instanceof ConsoleCommandSender)) { 
+        		sender.sendMessage(ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + ChatColor.STRIKETHROUGH.toString() + "]--------------" + ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "[" + ChatColor.YELLOW + " ItemJoin " + ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "]" + ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + ChatColor.STRIKETHROUGH.toString() + "--------------[");
         		if (sender.hasPermission("itemjoin.*")){
                 	sender.sendMessage(ChatColor.GREEN.toString() + "[\u2714] ItemJoin.*");
                 } else {
@@ -155,7 +184,7 @@ public class Commands implements CommandExecutor
                 }
                 for (int i = 0; i < ItemJoin.pl.worlds.size(); i++)
                 {
-                  String world = (String)ItemJoin.pl.worlds.get(i).toLowerCase();
+                  String world = (String)ItemJoin.pl.worlds.get(i);
                   if (sender.hasPermission("itemjoin."+ world + ".*")){
                   	sender.sendMessage(ChatColor.GREEN.toString() + "[\u2714] ItemJoin."+ world + ".*");
                   } else {
@@ -165,17 +194,22 @@ public class Commands implements CommandExecutor
                 sender.sendMessage(ChatColor.GREEN.toString() + "Type /ItemJoin Permissions 2 for the next page.");
                 sender.sendMessage(ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + ChatColor.STRIKETHROUGH.toString() + "]------------" + ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "[" + ChatColor.YELLOW + " Permissions Menu 1/2 " + ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "]" + ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + ChatColor.STRIKETHROUGH.toString() + "------------[");
                 return true;
+    		} else if(sender instanceof ConsoleCommandSender) { 
+    			sender.sendMessage(notPlayer);
+    			return true;
+    		}
             } else {
-                sender.sendMessage(noPermMSG);
+                sender.sendMessage(noPermission);
                 return true;
             }
         } else if (args.length == 2 && args[0].equalsIgnoreCase("permissions") && args[1].equalsIgnoreCase("2") || args.length == 2 && args[0].equalsIgnoreCase("perm") && args[1].equalsIgnoreCase("2") || args.length == 2 && args[0].equalsIgnoreCase("perms") && args[1].equalsIgnoreCase("2")) {
         	if (sender.hasPermission("itemjoin.permissions") || sender.hasPermission("itemjoin.*")) {
-                sender.sendMessage(ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + ChatColor.STRIKETHROUGH.toString() + "]--------------" + ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "[" + ChatColor.YELLOW + " ItemJoin " + ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "]" + ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + ChatColor.STRIKETHROUGH.toString() + "--------------[");
+        		if(!(sender instanceof ConsoleCommandSender)) { 
+        		sender.sendMessage(ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + ChatColor.STRIKETHROUGH.toString() + "]--------------" + ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "[" + ChatColor.YELLOW + " ItemJoin " + ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "]" + ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + ChatColor.STRIKETHROUGH.toString() + "--------------[");
                 for (int i = 0; i < ItemJoin.pl.worlds.size(); i++)
                 {
-                  String world = (String)ItemJoin.pl.worlds.get(i).toLowerCase();
-                  ItemStack[] toSet = (ItemStack[])ItemJoin.pl.items.get(world + player.getName());
+                  String world = (String)ItemJoin.pl.worlds.get(i);
+                  ItemStack[] toSet = (ItemStack[])ItemJoin.pl.items.get(world + ((Player)sender).getName());
                   for (int z = 1; z < 104; z++)
                   {
                   if (sender.hasPermission("itemjoin."+ world + "." + z) && toSet[z - 1] != null) {
@@ -187,8 +221,12 @@ public class Commands implements CommandExecutor
                }
                 sender.sendMessage(ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + ChatColor.STRIKETHROUGH.toString() + "]------------" + ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "[" + ChatColor.YELLOW + " Permissions Menu 2/2 " + ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "]" + ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + ChatColor.STRIKETHROUGH.toString() + "------------[");
                 return true;
+    		} else if(sender instanceof ConsoleCommandSender) { 
+    			sender.sendMessage(notPlayer);
+    			return true;
+    		}
             } else {
-                sender.sendMessage(noPermMSG);
+                sender.sendMessage(noPermission);
                 return true;
             }
         } else if (args.length == 3 && args[0].equalsIgnoreCase("get") && ItemJoin.isInt(args[1])) {
@@ -197,13 +235,13 @@ public class Commands implements CommandExecutor
         		sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.RED + "The player " + ChatColor.AQUA + args[2] + ChatColor.RED + " could not be found!");
         		return true;
         	} else if (sender.hasPermission("itemjoin.get.others") || sender.hasPermission("itemjoin.*")) {
-        		String world = argsPlayer.getWorld().getName().toLowerCase();
+        		String world = argsPlayer.getWorld().getName();
         		ItemStack[] items = (ItemStack[])ItemJoin.pl.items.get(world + argsPlayer.getName());
         		int id = Integer.parseInt(args[1]);
         		if (id >= 1 && id <= 38 && items[id - 1] != null) {
         		argsPlayer.getInventory().setItem(id - 1, items[id - 1]);
-        		sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.GREEN + "You gave " + argsPlayer.getName() + " [" + items[id - 1].getItemMeta().getDisplayName() + ChatColor.GREEN + "].");
-				argsPlayer.sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.GREEN + sender.getName() + " gave you " + "[" + items[id - 1].getItemMeta().getDisplayName() + ChatColor.GREEN + "].");
+        		sender.sendMessage(givenOthersItem.replace("%given_item%", items[id - 1].getItemMeta().getDisplayName()).replace("%given_player%", argsPlayer.getName()));
+        		argsPlayer.sendMessage(receivedOthersItem.replace("%received_item%", items[id - 1].getItemMeta().getDisplayName()).replace("%received_player%", sender.getName()));
         		} else if (id >= 100 && id <= 103 && items[id - 1] != null) {
 					if (id == 100) {
    		        	 argsPlayer.getEquipment().setBoots(items[id - 1]);
@@ -214,47 +252,61 @@ public class Commands implements CommandExecutor
 	    		    } else if (id == 103) {
 	 	    		 argsPlayer.getEquipment().setHelmet(items[id - 1]);
 	 	    		}
-					sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.GREEN + "You gave " + argsPlayer.getName() + " [" + items[id - 1].getItemMeta().getDisplayName() + ChatColor.GREEN + "].");
-					argsPlayer.sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.GREEN + sender.getName() + " gave you " + "[" + items[id - 1].getItemMeta().getDisplayName() + ChatColor.GREEN + "].");
+	        		sender.sendMessage(givenOthersItem.replace("%given_item%", items[id - 1].getItemMeta().getDisplayName()).replace("%given_player%", argsPlayer.getName()));
+	        		argsPlayer.sendMessage(receivedOthersItem.replace("%received_item%", items[id - 1].getItemMeta().getDisplayName()).replace("%received_player%", sender.getName()));
         		} else if (id >= 1 && id <= 36 && items[id - 1] == null || id >= 100 && id <= 103 && items[id - 1] == null) {
-            		sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.RED + "There is no item defined for " + ChatColor.AQUA + "Slot " + id + "!");
+            		sender.sendMessage(slotUndefined.replace("%bad_slot%", args[1]));
         		} else {
-        			sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.AQUA + "Slot " + id + ChatColor.RED + " Is an invalid slot number!");
-        			sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.RED + "Please only use slots 1 - 36 and 100 - 103.");
+        			sender.sendMessage(badSlot1.replace("%bad_slot%", args[1]));
+        			sender.sendMessage(badSlot2.replace("%bad_slot%", args[1]));
         		}
         		return true;
             } else {
-                sender.sendMessage(noPermMSG);
+                sender.sendMessage(noPermission);
                 return true;
             }
         } else if (args.length == 2 && args[0].equalsIgnoreCase("get") && ItemJoin.isInt(args[1])) {
         	if (sender.hasPermission("itemjoin.get") || sender.hasPermission("itemjoin.*")) {
-        		String world = player.getWorld().getName().toLowerCase();
-        		ItemStack[] items = (ItemStack[])ItemJoin.pl.items.get(world + player.getName());
+    		if(!(sender instanceof ConsoleCommandSender)) { 
+        		String world = ((Player)sender).getWorld().getName();
+        		ItemStack[] items = (ItemStack[])ItemJoin.pl.items.get(world + ((Player)sender).getName());
         		int id = Integer.parseInt(args[1]);
         		if (id >= 1 && id <= 38 && items[id - 1] != null) {
-        		player.getInventory().setItem(id - 1, items[id - 1]);
-        		sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.GREEN + "You were given " + "[" + items[id - 1].getItemMeta().getDisplayName() + ChatColor.GREEN + "].");
+        			((Player)sender).getInventory().setItem(id - 1, items[id - 1]);
+        			sender.sendMessage(givenItem.replace("%given_item%", items[id - 1].getItemMeta().getDisplayName()));
         		} else if (id >= 100 && id <= 103 && items[id - 1] != null) {
 					if (id == 100) {
-   		        	 player.getEquipment().setBoots(items[id - 1]);
+						((Player)sender).getEquipment().setBoots(items[id - 1]);
 					} else if (id == 101) {
-	    		     player.getEquipment().setLeggings(items[id - 1]);
+						((Player)sender).getEquipment().setLeggings(items[id - 1]);
 					} else if (id == 102) {
-	 	    		 player.getEquipment().setChestplate(items[id - 1]);
+						((Player)sender).getEquipment().setChestplate(items[id - 1]);
 	    		    } else if (id == 103) {
-	 	    		 player.getEquipment().setHelmet(items[id - 1]);
+	    		    	((Player)sender).getEquipment().setHelmet(items[id - 1]);
 	 	    		}
-					sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.GREEN + "You were given " + "[" + items[id - 1].getItemMeta().getDisplayName() + ChatColor.GREEN + "].");
+					sender.sendMessage(givenItem.replace("%given_item%", items[id - 1].getItemMeta().getDisplayName()));
         		} else if (id >= 1 && id <= 36 && items[id - 1] == null || id >= 100 && id <= 103 && items[id - 1] == null) {
-            		sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.RED + "There is no item defined for " + ChatColor.AQUA + "Slot " + id + "!");
+            		sender.sendMessage(slotUndefined.replace("%bad_slot%", args[1]));
         		} else {
-        			sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.AQUA + "Slot " + id + ChatColor.RED + " Is an invalid slot number!");
-        			sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.RED + "Please only use slots 1 - 36 and 100 - 103.");
+        			sender.sendMessage(badSlot1.replace("%bad_slot%", args[1]));
+        			sender.sendMessage(badSlot2.replace("%bad_slot%", args[1]));
         		}
         		return true;
+    		} else if(sender instanceof ConsoleCommandSender) { 
+    			sender.sendMessage(notPlayer);
+    			sender.sendMessage(consoleAltSyntax);
+    			return true;
+    		}
             } else {
-                sender.sendMessage(noPermMSG);
+                sender.sendMessage(noPermission);
+                return true;
+            }
+        } else if (args[0].equalsIgnoreCase("get") || args[0].equalsIgnoreCase("get")) {
+        	if (sender.hasPermission("itemjoin.get") || sender.hasPermission("itemjoin.*")) {
+                  sender.sendMessage(badGetUsage);
+                return true;
+            } else {
+                sender.sendMessage(noPermission);
                 return true;
             }
         } else if (args[0].equalsIgnoreCase("updates") || args[0].equalsIgnoreCase("update")) {
@@ -275,13 +327,78 @@ public class Commands implements CommandExecutor
               	return true;
                 }
             } else {
-                sender.sendMessage(noPermMSG);
+                sender.sendMessage(noPermission);
                 return true;
             }
         } else {
-            sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.DARK_RED + ChatColor.RED + "Unknown command!");
+        	if (ItemJoin.getSpecialConfig("en-lang.yml").getString("unknownCommand") != null) {
+            sender.sendMessage(unknownCommand);
+        	}
             return true;
         }
         return false;
+    }
+    
+    public static void RegisterEnLang() {
+            if (ItemJoin.getSpecialConfig("en-lang.yml").getString("Prefix") != null) {
+        	Commands.Prefix = ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("Prefix"));
+            }
+            if (ItemJoin.getSpecialConfig("en-lang.yml").getString("Prefix") == null) {
+        	Commands.Prefix = "";
+            }
+            if (ItemJoin.getSpecialConfig("en-lang.yml").getString("noPermission") != null) {
+            Commands.noPermission = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("noPermission"));
+            }
+            if (ItemJoin.getSpecialConfig("en-lang.yml").getString("notPlayer") != null) {
+            Commands.notPlayer = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("notPlayer"));
+            }
+            if (ItemJoin.getSpecialConfig("en-lang.yml").getString("consoleAltSyntax") != null) {
+            Commands.consoleAltSyntax = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("consoleAltSyntax"));
+            }
+            if (ItemJoin.getSpecialConfig("en-lang.yml").getString("unknownCommand") != null) {
+            Commands.unknownCommand = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("unknownCommand"));
+            }
+            if (ItemJoin.getSpecialConfig("en-lang.yml").getString("badGetUsage") != null) {
+            Commands.badGetUsage = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("badGetUsage"));
+            }
+            if (ItemJoin.getSpecialConfig("en-lang.yml").getString("givenItem") != null) {
+            Commands.givenItem = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("givenItem"));
+            }
+            if (ItemJoin.getSpecialConfig("en-lang.yml").getString("givenOthersItem") != null) {
+            Commands.givenOthersItem = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("givenOthersItem"));
+            }
+            if (ItemJoin.getSpecialConfig("en-lang.yml").getString("receivedOthersItem") != null) {
+            Commands.receivedOthersItem = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("receivedOthersItem"));
+            }
+            if (ItemJoin.getSpecialConfig("en-lang.yml").getString("badSlot1") != null) {
+            Commands.badSlot1 = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("badSlot1"));
+            }
+            if (ItemJoin.getSpecialConfig("en-lang.yml").getString("badSlot2") != null) {
+            Commands.badSlot2 = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("badSlot2"));
+            }
+            if (ItemJoin.getSpecialConfig("en-lang.yml").getString("slotUndefined") != null) {
+            Commands.slotUndefined = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("slotUndefined"));
+            }
+            if (ItemJoin.getSpecialConfig("en-lang.yml").getString("consoleReloadedConfig") != null) {
+            Commands.consoleReloadedConfig = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("consoleReloadedConfig"));
+            }
+            if (ItemJoin.getSpecialConfig("en-lang.yml").getString("reloadedConfig") != null) {
+            Commands.reloadedConfig = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("reloadedConfig"));
+            }
+            if (ItemJoin.getSpecialConfig("en-lang.yml").getString("cachedWorlds") != null) {
+            Commands.cachedWorlds = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("cachedWorlds"));
+            }
+            if (ItemJoin.getSpecialConfig("en-lang.yml").getString("loadedWorlds") != null) {
+            Commands.loadedWorlds = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("loadedWorlds"));
+            }
+            if (ItemJoin.getSpecialConfig("en-lang.yml").getString("loadedWorldsListed") != null) {
+            Commands.loadedWorldsListed = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("loadedWorldsListed"));
+            }
+            if (ItemJoin.getSpecialConfig("en-lang.yml").getString("worldIn") != null) {
+            Commands.worldIn = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("worldIn"));
+            }
+            if (ItemJoin.getSpecialConfig("en-lang.yml").getString("worldInListed") != null) {
+            Commands.worldInListed = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("worldInListed"));
+        }
     }
 }

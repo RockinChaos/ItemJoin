@@ -1,0 +1,24 @@
+#// <>==<>==<> ItemJoin's English lang file, by RockinChaos  <>==<>==<> //#
+#// All messages support custom placeholders and PlaceholderAPI! //#
+#// Simply remove any message and no message will be sent! //#
+#// Example of it being removed: #unknownCommand: '&cUnknown command!' (Fully remove the unknownCommand: line) //#
+en-Version: 2
+Prefix: '&7[&eItemJoin&7] '
+unknownCommand: '&cUnknown command!'
+noPermission: '&cYou do not have permission to use that command!'
+notPlayer: '&cYou must be a player to use that command!'
+consoleAltSyntax: '&cYou could also use /ItemJoin get <slot> <player> as console.'
+badGetUsage: '&cIncorrect usage! Syntax: /itemjoin get <slot>!'
+givenItem: '&aYou were given &7[&e%given_item%&7]&a.'
+givenOthersItem: '&aYou gave %given_player% &7[&e%given_item%&7]&a.'
+receivedOthersItem: '&a%received_player% gave you &7[&e%received_item%&7]&a.'
+badSlot1: '&bSlot %bad_slot% &cIs an invalid slot number!'
+badSlot2: '&cPlease only use slots 1 - 36 and 100 - 103.'
+slotUndefined: '&cThere is no item defined for &bSlot %bad_slot%!'
+consoleReloadedConfig: '&4%player_reloaded% has reloaded the Configuration files.'
+reloadedConfig: '&aConfiguration Reloaded!'
+cachedWorlds: '&aCached &e%cache_world%'
+loadedWorlds: '&aFound the worlds:'
+loadedWorldsListed: '&e- %loaded_worlds%'
+worldIn: '&aYou are in the world:'
+worldInListed: '&e- %in_worlds%'

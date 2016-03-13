@@ -1,11 +1,12 @@
 #// <>==<>==<> ItemJoin's Custom Items On Join, by RockinChaos <>==<>==<> //#
 #// See a list of variables for ItemJoin here: http://dev.bukkit.org/bukkit-plugins/itemjoin/pages/documentation //#
 #// See https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html for item names! //#
-#// See this enchantments page for the correct enchant name. https://hub.spigotmc.org/javadocs/spigot/org/bukkit/enchantments/Enchantment.html#PROTECTION_ENVIRONMENTAL //#
+#// See this enchantments page for the correct enchant name. https://hub.spigotmc.org/javadocs/spigot/org/bukkit/enchantments/Enchantment.html //#
 #// Need some more help with item slots? See the Documentations page for a more in-depth tutorial. http://dev.bukkit.org/bukkit-plugins/itemjoin/pages/documentation //#
 #// For per-world support this best works with Multiverse-Inventories! http://dev.bukkit.org/bukkit-plugins/multiverse-inventories //#
 #// Otherwise you will need to set clear-on-world-changed to true if you want to get the new items when you change worlds. //#
 #// Then you will need to add give-on-modifiers (world-changed) to each item to receive the new items. //#
+items-Version: 1
 Global-Settings: #// Global Settings, for each world listed under world-list. These will take effect in them. //#
   Prevention:
     prevent-pickups: false #// Prevents picking up of any item //#
@@ -133,6 +134,8 @@ world:
         - 'inventory-modify'
         - 'death-drops'
         - 'self-drops'
+        - 'item-damage-living'
+        - 'item-damage-blocks'
         - 'AllowOpBypass'
         - 'CreativeBypass'
       give-on-modifiers:

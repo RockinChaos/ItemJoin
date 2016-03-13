@@ -52,3 +52,4 @@ bin/me/xsilverslayerx/utils/UpdateChecker.class
 *.class
 *.class
 bin/me/xsilverslayerx/itemjoin/utils/Commands.class
+*.prefs

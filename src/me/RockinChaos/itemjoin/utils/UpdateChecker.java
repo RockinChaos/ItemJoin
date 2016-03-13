@@ -5,8 +5,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import me.RockinChaos.itemjoin.ItemJoin;
+
+import org.bukkit.ChatColor;
 import org.bukkit.plugin.Plugin;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -59,17 +63,65 @@ public class UpdateChecker {
                     
                     reader.close();
                     input.close();
-                    
-                    if (!plugin.getDescription().getVersion().equals(this.version)) {
-                            return true;
+                        double maxValue = 0;
+                        double minValue = 0;
+             	       try {
+             	    	 maxValue = Double.parseDouble(plugin.getDescription().getVersion().replace("-SNAPSHOT", ""));
+             	    	 minValue = Double.parseDouble(this.version.replace("-SNAPSHOT", "").replace("-BETA", "").replace("-ALPHA", ""));
+            	       }
+            	       catch (NumberFormatException ex) {
+            	    	   ItemJoin.pl.getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.RED + "An error has occured when checking the plugin version!");
+            	    	   ItemJoin.pl.getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.RED + "Please contact the plugin developer!");
+            	       }
+                      if(!(minValue <= maxValue)) {
+                    	  if (ItemJoin.pl.getDescription().getVersion().contains("-SNAPSHOT") || ItemJoin.pl.getDescription().getVersion().contains("-BETA") || ItemJoin.pl.getDescription().getVersion().contains("-ALPHA")) {
+                    		  ItemJoin.pl.getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.RED + "This is an outdated SNAPSHOT!");
+                         return true;
+                    	  }
+                    	  else {
+                    		  return true;
+                    	  }
                     }
+                      if((minValue == maxValue)) {
+                	  if (ItemJoin.pl.getDescription().getVersion().contains("-SNAPSHOT") || ItemJoin.pl.getDescription().getVersion().contains("-BETA") || ItemJoin.pl.getDescription().getVersion().contains("-ALPHA")) {
+                		  ItemJoin.pl.getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.RED + "This is an outdated SNAPSHOT!");
+                     return true;
+                	  }
+                      }
+                      if(!(minValue >= maxValue)) {
+                    	  if (ItemJoin.pl.getDescription().getVersion().contains("-SNAPSHOT") || ItemJoin.pl.getDescription().getVersion().contains("-BETA") || ItemJoin.pl.getDescription().getVersion().contains("-ALPHA")) {
+                    	  ItemJoin.pl.getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.GREEN + "You are running a SNAPSHOT!");
+                    	  ItemJoin.pl.getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.GREEN + "If you find any bugs please report them!");
+                    	  } else {
+                    		  return true;
+                    	  }
+                     }
             }catch (Exception e) {
                     e.printStackTrace();
             }
             
             return false;
     }
-    
+
+    public static void updateCheck() {
+		UpdateChecker checker = new UpdateChecker(ItemJoin.pl, "http://dev.bukkit.org/server-mods/itemjoin/files.rss");
+		if(ItemJoin.pl.getConfig().getBoolean("CheckforUpdates") == true) 
+		{
+			ItemJoin.pl.getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.GREEN + "Checking for updates...");
+              if (checker.updateNeeded())
+                {
+            	  ItemJoin.pl.getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.RED + "Your current version: v" + ChatColor.RED + ItemJoin.pl.getDescription().getVersion());
+            	  ItemJoin.pl.getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.RED + "A new version of ItemJoin is available:" + ChatColor.GREEN + " v" +  checker.getVersion());
+            	  ItemJoin.pl.getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.GREEN + "Get it from: " + checker.getLink());
+            	  ItemJoin.pl.getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.GREEN + "Direct Link: " + checker.getJarLink());
+              }
+              else if(ItemJoin.pl.getConfig().getBoolean("CheckforUpdates") == true)
+              {
+            	  ItemJoin.pl.getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.GREEN + "You are up to date!");
+           }
+        }
+}
+
     public String getVersion() {
             return this.version;
     }
