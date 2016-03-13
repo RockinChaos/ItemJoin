@@ -42,7 +42,7 @@
 		</plugins>
    <resources>
      <resource>
-       <directory>/var/lib/jenkins/jobs/ItemJoin/workspace/src/me/RockinChaos/itemjoin</directory>
+       <directory>${basedir}/src/me/RockinChaos/itemjoin</directory>
      </resource>
    </resources>
 	</build>
