@@ -1,6 +1,6 @@
 name: ItemJoin
 main: me.RockinChaos.itemjoin.ItemJoin
-version: 2.5
+version: 2.7
 author: RockinChaos
 commands:
    itemjoin:
@@ -35,6 +35,10 @@ commands:
       description: Checks what world you are in. For (debugging).
       usage: |
           /itemjoin world
+   itmjoin list:
+      description: Checks what items you can get each what world.
+      usage: |
+          /itemjoin list
    ij:
       description: Displays some options.
       usage: |
@@ -67,6 +71,10 @@ commands:
       description: Checks what world you are in. For (debugging).
       usage: |
           /ij world
+   ij list:
+      description: Checks what items you can get each what world.
+      usage: |
+          /ij list
           
 permissions:
    itemjoin.*:
@@ -90,8 +98,11 @@ permissions:
    itemjoin.get.others:
       description: Use of the /itemjoin get for player command.
       default: op
-   itemjoin.WorldName.#:
-      description: Replace # with slot number and WorldName with name of world to recieve that item.
+   itemjoin.list:
+      description: Use of the /itemjoin get for player command.
+      default: op
+   itemjoin.WorldName.Name:
+      description: Replace Name with the name of the specified item and WorldName with name of world to recieve that item.
       default: false
    itemjoin.WorldName.*:
       description: Gives permission to get all items from specified world.

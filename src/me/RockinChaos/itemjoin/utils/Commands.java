@@ -3,7 +3,12 @@ package me.RockinChaos.itemjoin.utils;
 import java.util.List;
 
 import org.bukkit.command.*;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.*;
 
@@ -21,14 +26,17 @@ public class Commands implements CommandExecutor
     public static String givenItem;
     public static String givenOthersItem;
     public static String receivedOthersItem;
+    public static String itemDoesNotExist;
     public static String badSlot1;
     public static String badSlot2;
-    public static String slotUndefined;
+    public static String badID;
     public static String consoleReloadedConfig;
     public static String reloadedConfig;
     public static String cachedWorlds;
     public static String loadedWorlds;
     public static String loadedWorldsListed;
+    public static String listWorlds;
+    public static String listItems;
     public static String worldIn;
     public static String worldInListed;
 
@@ -71,6 +79,7 @@ public class Commands implements CommandExecutor
                 sender.sendMessage(ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "/ItemJoin Get <Slot>" + ChatColor.GRAY + " - " + ChatColor.YELLOW + "Gives that item.");
                 sender.sendMessage(ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "/ItemJoin Get <Slot> <Player>" + ChatColor.GRAY + " - " + ChatColor.YELLOW + "Gives to said player.");
                 sender.sendMessage(ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "/ItemJoin World" + ChatColor.GRAY + " - " + ChatColor.YELLOW + "Check what world you are in. (debugging).");
+                sender.sendMessage(ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "/ItemJoin List" + ChatColor.GRAY + " - " + ChatColor.YELLOW + "Check items you can get each what worlds.");
                 sender.sendMessage(ChatColor.GREEN + "Found a bug? Report it @");
                 sender.sendMessage(ChatColor.GREEN + "http://dev.bukkit.org/bukkit-plugins/itemjoin/");
                 sender.sendMessage(ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + ChatColor.STRIKETHROUGH.toString() + "]------------" + ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "[" + ChatColor.YELLOW + " Help Menu 2/2 " + ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "]" + ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + ChatColor.STRIKETHROUGH.toString() + "------------[");
@@ -88,21 +97,16 @@ public class Commands implements CommandExecutor
         	    ItemJoin.pl.saveDefaultConfig();
         	  	ItemJoin.pl.getConfig().options().copyDefaults(false);
                 ItemJoin.pl.reloadConfig();
+                Registers.firstJoinFile();
           	     if (ItemJoin.pl.getConfig().getString("Language").equalsIgnoreCase("English")) {
           	       ItemJoin.loadSpecialConfig("en-lang.yml");
           	       ItemJoin.getSpecialConfig("en-lang.yml").options().copyDefaults(false);
-          	       RegisterEnLang();
           		  }
-                if(!(sender instanceof ConsoleCommandSender)) { 
-           	      ItemJoin.pl.PlayerJoin = (Player) sender;
-        	      ItemJoin.pl.PlayerJoin2 = ((Player)sender).getName();
-                }
-                ItemJoin.pl.CacheItems();
-                if (ItemJoin.getSpecialConfig("items.yml").getBoolean("Global-Settings" + ".First-Join." + "FirstJoin-Mode-Enabled") == true) {
-          		  ItemJoin.loadSpecialConfig("firstJoin.yml");
-          		  ItemJoin.getSpecialConfig("firstJoin.yml").options().copyDefaults(false);
-          		  }
-  		        ItemJoin.pl.getServer().getConsoleSender().sendMessage(consoleReloadedConfig.replace("%player_reloaded%", sender.getName()));
+                RegisterEnLang(ItemJoin.pl.getServer().getPlayer("ItemJoin"), "ItemJoin");
+    			ItemJoin.pl.items.clear();
+   			    for (Player player : ItemJoin.pl.getServer().getOnlinePlayers()) {
+                ItemJoin.pl.CacheItems(player);
+  			    }
   		        sender.sendMessage(reloadedConfig);
   		         List<String> PrintWorlds = ItemJoin.getSpecialConfig("items.yml").getStringList("world-list");
   			     for (int i = 0; i < PrintWorlds.size(); i++)
@@ -110,6 +114,7 @@ public class Commands implements CommandExecutor
   			       String world = (String)PrintWorlds.get(i);
   			       sender.sendMessage(cachedWorlds.replace("%cache_world%", world));
   			     }
+   		        ItemJoin.pl.getServer().getConsoleSender().sendMessage(consoleReloadedConfig.replace("%player_reloaded%", sender.getName()));
                 return true;
             } else {
                 sender.sendMessage(noPermission);
@@ -140,6 +145,25 @@ public class Commands implements CommandExecutor
         			return true;
         		}
             } else {
+                sender.sendMessage(noPermission);
+                return true;
+            }
+        } else if (args[0].equalsIgnoreCase("list") || args[0].equalsIgnoreCase("l")) {
+        	if (sender.hasPermission("itemjoin.list") || sender.hasPermission("itemjoin.*")) {
+        		sender.sendMessage(ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + ChatColor.STRIKETHROUGH.toString() + "]----------------" + ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "[" + ChatColor.YELLOW + " ItemJoin " + ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "]" + ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + ChatColor.STRIKETHROUGH.toString() + "----------------[");
+                    for (int i = 0; i < ItemJoin.pl.worlds.size(); i++)
+                    {
+                      String world = ItemJoin.pl.worlds.get(i);
+                      sender.sendMessage(listWorlds.replace("%world%", world));
+           	       ConfigurationSection selection = ItemJoin.getSpecialConfig("items.yml").getConfigurationSection(world + ".items");
+       	           for (String item : selection.getKeys(false)) 
+       	           {
+                      sender.sendMessage(listItems.replace("%items%", item));
+                      }
+                    }
+               		sender.sendMessage(ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + ChatColor.STRIKETHROUGH.toString() + "]--------------" + ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "[" + ChatColor.YELLOW + " List Menu 1/1 " + ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "]" + ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + ChatColor.STRIKETHROUGH.toString() + "--------------[");
+                    return true;
+        } else {
                 sender.sendMessage(noPermission);
                 return true;
             }
@@ -208,14 +232,16 @@ public class Commands implements CommandExecutor
         		sender.sendMessage(ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + ChatColor.STRIKETHROUGH.toString() + "]--------------" + ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "[" + ChatColor.YELLOW + " ItemJoin " + ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "]" + ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + ChatColor.STRIKETHROUGH.toString() + "--------------[");
                 for (int i = 0; i < ItemJoin.pl.worlds.size(); i++)
                 {
-                  String world = (String)ItemJoin.pl.worlds.get(i);
-                  ItemStack[] toSet = (ItemStack[])ItemJoin.pl.items.get(world + ((Player)sender).getName());
-                  for (int z = 1; z < 104; z++)
-                  {
-                  if (sender.hasPermission("itemjoin."+ world + "." + z) && toSet[z - 1] != null) {
-                  	sender.sendMessage(ChatColor.GREEN.toString() + "[\u2714] ItemJoin."+ world + "." + z);
-                  } else if (toSet[z - 1] != null) {
-                  	sender.sendMessage(ChatColor.RED.toString() + "[\u2718] ItemJoin."+ world + "." + z);
+                  String world = ItemJoin.pl.worlds.get(i);
+       	       ConfigurationSection selection = ItemJoin.getSpecialConfig("items.yml").getConfigurationSection(world + ".items");
+   	           for (String item : selection.getKeys(false)) 
+   	           {
+   	      	      ConfigurationSection items = selection.getConfigurationSection(item);
+                  ItemStack toSet = ItemJoin.pl.items.get(world + "." + sender.getName().toString() + ".items." + item);
+                  if (toSet != null && sender.hasPermission(PermissionsHandler.customPermissions(items, item, world))) {
+                  	sender.sendMessage(ChatColor.GREEN.toString() + "[\u2714] " + PermissionsHandler.customPermissions(items, item, world));
+                  } else if (toSet != null && !sender.hasPermission(PermissionsHandler.customPermissions(items, item, world))) {
+                  	sender.sendMessage(ChatColor.RED.toString() + "[\u2718] " + PermissionsHandler.customPermissions(items, item, world));
                   }
                 }
                }
@@ -225,71 +251,101 @@ public class Commands implements CommandExecutor
     			sender.sendMessage(notPlayer);
     			return true;
     		}
-            } else {
+           } else {
                 sender.sendMessage(noPermission);
                 return true;
-            }
-        } else if (args.length == 3 && args[0].equalsIgnoreCase("get") && ItemJoin.isInt(args[1])) {
+           }
+        } else if (args.length == 3 && args[0].equalsIgnoreCase("get")) {
         	Player argsPlayer = Bukkit.getPlayerExact(args[2]);
         	if (argsPlayer == null && sender.hasPermission("itemjoin.get.others") || argsPlayer == null && sender.hasPermission("itemjoin.*")) {
         		sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.RED + "The player " + ChatColor.AQUA + args[2] + ChatColor.RED + " could not be found!");
         		return true;
         	} else if (sender.hasPermission("itemjoin.get.others") || sender.hasPermission("itemjoin.*")) {
         		String world = argsPlayer.getWorld().getName();
-        		ItemStack[] items = (ItemStack[])ItemJoin.pl.items.get(world + argsPlayer.getName());
-        		int id = Integer.parseInt(args[1]);
-        		if (id >= 1 && id <= 38 && items[id - 1] != null) {
-        		argsPlayer.getInventory().setItem(id - 1, items[id - 1]);
-        		sender.sendMessage(givenOthersItem.replace("%given_item%", items[id - 1].getItemMeta().getDisplayName()).replace("%given_player%", argsPlayer.getName()));
-        		argsPlayer.sendMessage(receivedOthersItem.replace("%received_item%", items[id - 1].getItemMeta().getDisplayName()).replace("%received_player%", sender.getName()));
-        		} else if (id >= 100 && id <= 103 && items[id - 1] != null) {
-					if (id == 100) {
-   		        	 argsPlayer.getEquipment().setBoots(items[id - 1]);
-					} else if (id == 101) {
-	    		     argsPlayer.getEquipment().setLeggings(items[id - 1]);
-					} else if (id == 102) {
-	 	    		 argsPlayer.getEquipment().setChestplate(items[id - 1]);
-	    		    } else if (id == 103) {
-	 	    		 argsPlayer.getEquipment().setHelmet(items[id - 1]);
-	 	    		}
-	        		sender.sendMessage(givenOthersItem.replace("%given_item%", items[id - 1].getItemMeta().getDisplayName()).replace("%given_player%", argsPlayer.getName()));
-	        		argsPlayer.sendMessage(receivedOthersItem.replace("%received_item%", items[id - 1].getItemMeta().getDisplayName()).replace("%received_player%", sender.getName()));
-        		} else if (id >= 1 && id <= 36 && items[id - 1] == null || id >= 100 && id <= 103 && items[id - 1] == null) {
-            		sender.sendMessage(slotUndefined.replace("%bad_slot%", args[1]));
-        		} else {
-        			sender.sendMessage(badSlot1.replace("%bad_slot%", args[1]));
-        			sender.sendMessage(badSlot2.replace("%bad_slot%", args[1]));
+        		ItemStack toSet = ItemJoin.pl.items.get(argsPlayer.getWorld().getName() + "." + argsPlayer.getName().toString() + ".items." + args[1]);
+        		String slot = ItemJoin.getSpecialConfig("items.yml").getString(world + ".items." + args[1] + ".slot");
+                Material tempmat = null;
+                if (ItemJoin.isInt(ItemJoin.getSpecialConfig("items.yml").getString(world + ".items." + args[1] + ".id"))) {
+               	 tempmat = Material.getMaterial(ItemJoin.getSpecialConfig("items.yml").getInt(world + ".items." + args[1] + ".id"));
+                } else {
+               	 tempmat = Material.getMaterial(ItemJoin.getSpecialConfig("items.yml").getString(world + ".items." + args[1] + ".id"));
+                }
+        		EntityEquipment Equip = argsPlayer.getEquipment();
+        		if (toSet != null && !CheckItem.CheckMaterial(tempmat, world, args[1])) {
+        			sender.sendMessage(badID.replace("%bad_id%", ItemJoin.getSpecialConfig("items.yml").getString(world + ".items." + args[1] + ".id")));
+        		} else if (toSet != null && !CheckItem.CheckSlot(slot, world, args[1])) {
+        			sender.sendMessage(badSlot1.replace("%bad_slot%", slot));
+        			sender.sendMessage(badSlot2.replace("%bad_slot%", slot));
+       		    }
+        		if (toSet != null && CheckItem.CheckSlot(slot, world, args[1]) && !ItemJoin.isInt(slot)) {
+       		      if (slot.equalsIgnoreCase("Helmet")) {
+     		    		Equip.setHelmet(toSet);
+       		      } else if (slot.equalsIgnoreCase("Chestplate")) {
+     		    		Equip.setChestplate(toSet);
+     		        } else if (slot.equalsIgnoreCase("Leggings")) {
+     		    		Equip.setLeggings(toSet);
+     		        } else if (slot.equalsIgnoreCase("Boots")) {
+     		    		Equip.setBoots(toSet);
+     		        } else if (slot.equalsIgnoreCase("Offhand")) {
+     		        	argsPlayer.getInventory().setItemInOffHand(toSet);
+     		          }
+	        		sender.sendMessage(givenOthersItem.replace("%given_item%", toSet.getItemMeta().getDisplayName()).replace("%given_player%", argsPlayer.getName()));
+	        		argsPlayer.sendMessage(receivedOthersItem.replace("%received_item%", toSet.getItemMeta().getDisplayName()).replace("%received_player%", sender.getName()));
+	        		argsPlayer.updateInventory();
+        		} else if (toSet != null && CheckItem.CheckSlot(slot, world, args[1])) {
+        			int Slot = Integer.parseInt(slot);
+        			argsPlayer.getInventory().setItem(Slot, toSet);
+	        		sender.sendMessage(givenOthersItem.replace("%given_item%", toSet.getItemMeta().getDisplayName()).replace("%given_player%", argsPlayer.getName()));
+	        		argsPlayer.sendMessage(receivedOthersItem.replace("%received_item%", toSet.getItemMeta().getDisplayName()).replace("%received_player%", sender.getName()));
+	        		argsPlayer.updateInventory();
+        		} else if (toSet == null) {
+        			sender.sendMessage(itemDoesNotExist.replace("%bad_item%", args[1]));
         		}
         		return true;
             } else {
                 sender.sendMessage(noPermission);
                 return true;
             }
-        } else if (args.length == 2 && args[0].equalsIgnoreCase("get") && ItemJoin.isInt(args[1])) {
+        } else if (args.length == 2 && args[0].equalsIgnoreCase("get")) {
         	if (sender.hasPermission("itemjoin.get") || sender.hasPermission("itemjoin.*")) {
     		if(!(sender instanceof ConsoleCommandSender)) { 
         		String world = ((Player)sender).getWorld().getName();
-        		ItemStack[] items = (ItemStack[])ItemJoin.pl.items.get(world + ((Player)sender).getName());
-        		int id = Integer.parseInt(args[1]);
-        		if (id >= 1 && id <= 38 && items[id - 1] != null) {
-        			((Player)sender).getInventory().setItem(id - 1, items[id - 1]);
-        			sender.sendMessage(givenItem.replace("%given_item%", items[id - 1].getItemMeta().getDisplayName()));
-        		} else if (id >= 100 && id <= 103 && items[id - 1] != null) {
-					if (id == 100) {
-						((Player)sender).getEquipment().setBoots(items[id - 1]);
-					} else if (id == 101) {
-						((Player)sender).getEquipment().setLeggings(items[id - 1]);
-					} else if (id == 102) {
-						((Player)sender).getEquipment().setChestplate(items[id - 1]);
-	    		    } else if (id == 103) {
-	    		    	((Player)sender).getEquipment().setHelmet(items[id - 1]);
-	 	    		}
-					sender.sendMessage(givenItem.replace("%given_item%", items[id - 1].getItemMeta().getDisplayName()));
-        		} else if (id >= 1 && id <= 36 && items[id - 1] == null || id >= 100 && id <= 103 && items[id - 1] == null) {
-            		sender.sendMessage(slotUndefined.replace("%bad_slot%", args[1]));
-        		} else {
-        			sender.sendMessage(badSlot1.replace("%bad_slot%", args[1]));
-        			sender.sendMessage(badSlot2.replace("%bad_slot%", args[1]));
+        		ItemStack toSet = ItemJoin.pl.items.get(((Entity) sender).getWorld().getName() + "." + sender.getName().toString() + ".items." + args[1]);
+        		String slot = ItemJoin.getSpecialConfig("items.yml").getString(world + ".items." + args[1] + ".slot");
+                Material tempmat = null;
+                if (ItemJoin.isInt(ItemJoin.getSpecialConfig("items.yml").getString(world + ".items." + args[1] + ".id"))) {
+               	 tempmat = Material.getMaterial(ItemJoin.getSpecialConfig("items.yml").getInt(world + ".items." + args[1] + ".id"));
+                } else {
+               	 tempmat = Material.getMaterial(ItemJoin.getSpecialConfig("items.yml").getString(world + ".items." + args[1] + ".id"));
+                }
+        		EntityEquipment Equip = ((LivingEntity) sender).getEquipment();
+        		if (toSet != null && !CheckItem.CheckMaterial(tempmat, world, args[1])) {
+        			sender.sendMessage(badID.replace("%bad_id%", ItemJoin.getSpecialConfig("items.yml").getString(world + ".items." + args[1] + ".id")));
+        		} else if (toSet != null && !CheckItem.CheckSlot(slot, world, args[1])) {
+        			sender.sendMessage(badSlot1.replace("%bad_slot%", slot));
+        			sender.sendMessage(badSlot2.replace("%bad_slot%", slot));
+       		    }
+        		if (toSet != null && CheckItem.CheckSlot(slot, world, args[1]) && !ItemJoin.isInt(slot)) {
+       		      if (slot.equalsIgnoreCase("Helmet")) {
+     		    		Equip.setHelmet(toSet);
+       		      } else if (slot.equalsIgnoreCase("Chestplate")) {
+     		    		Equip.setChestplate(toSet);
+     		        } else if (slot.equalsIgnoreCase("Leggings")) {
+     		    		Equip.setLeggings(toSet);
+     		        } else if (slot.equalsIgnoreCase("Boots")) {
+     		    		Equip.setBoots(toSet);
+     		        } else if (slot.equalsIgnoreCase("Offhand")) {
+     		        		((HumanEntity) sender).getInventory().setItemInOffHand(toSet);
+     		          }
+				  sender.sendMessage(givenItem.replace("%given_item%", toSet.getItemMeta().getDisplayName()));
+				  ((Player) sender).updateInventory();
+        		} else if (toSet != null && CheckItem.CheckSlot(slot, world, args[1])) {
+        			int Slot = Integer.parseInt(slot);
+        			((Player)sender).getInventory().setItem(Slot, toSet);
+					sender.sendMessage(givenItem.replace("%given_item%", toSet.getItemMeta().getDisplayName()));
+					((Player) sender).updateInventory();
+        		} else if (toSet == null) {
+        			sender.sendMessage(itemDoesNotExist.replace("%bad_item%", args[1]));
         		}
         		return true;
     		} else if(sender instanceof ConsoleCommandSender) { 
@@ -339,66 +395,75 @@ public class Commands implements CommandExecutor
         return false;
     }
     
-    public static void RegisterEnLang() {
+    public static void RegisterEnLang(Player player, String p) {
             if (ItemJoin.getSpecialConfig("en-lang.yml").getString("Prefix") != null) {
-        	Commands.Prefix = ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("Prefix"));
+        	Commands.Prefix = ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("Prefix"), player, p);
             }
             if (ItemJoin.getSpecialConfig("en-lang.yml").getString("Prefix") == null) {
         	Commands.Prefix = "";
             }
             if (ItemJoin.getSpecialConfig("en-lang.yml").getString("noPermission") != null) {
-            Commands.noPermission = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("noPermission"));
+            Commands.noPermission = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("noPermission"), player, p);
             }
             if (ItemJoin.getSpecialConfig("en-lang.yml").getString("notPlayer") != null) {
-            Commands.notPlayer = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("notPlayer"));
+            Commands.notPlayer = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("notPlayer"), player, p);
             }
             if (ItemJoin.getSpecialConfig("en-lang.yml").getString("consoleAltSyntax") != null) {
-            Commands.consoleAltSyntax = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("consoleAltSyntax"));
+            Commands.consoleAltSyntax = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("consoleAltSyntax"), player, p);
             }
             if (ItemJoin.getSpecialConfig("en-lang.yml").getString("unknownCommand") != null) {
-            Commands.unknownCommand = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("unknownCommand"));
+            Commands.unknownCommand = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("unknownCommand"), player, p);
             }
             if (ItemJoin.getSpecialConfig("en-lang.yml").getString("badGetUsage") != null) {
-            Commands.badGetUsage = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("badGetUsage"));
+            Commands.badGetUsage = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("badGetUsage"), player, p);
             }
             if (ItemJoin.getSpecialConfig("en-lang.yml").getString("givenItem") != null) {
-            Commands.givenItem = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("givenItem"));
+            Commands.givenItem = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("givenItem"), player, p);
             }
             if (ItemJoin.getSpecialConfig("en-lang.yml").getString("givenOthersItem") != null) {
-            Commands.givenOthersItem = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("givenOthersItem"));
+            Commands.givenOthersItem = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("givenOthersItem"), player, p);
             }
             if (ItemJoin.getSpecialConfig("en-lang.yml").getString("receivedOthersItem") != null) {
-            Commands.receivedOthersItem = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("receivedOthersItem"));
+            Commands.receivedOthersItem = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("receivedOthersItem"), player, p);
+            }
+            if (ItemJoin.getSpecialConfig("en-lang.yml").getString("itemDoesNotExist") != null) {
+            Commands.itemDoesNotExist = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("itemDoesNotExist"), player, p);
             }
             if (ItemJoin.getSpecialConfig("en-lang.yml").getString("badSlot1") != null) {
-            Commands.badSlot1 = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("badSlot1"));
+            Commands.badSlot1 = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("badSlot1"), player, p);
             }
             if (ItemJoin.getSpecialConfig("en-lang.yml").getString("badSlot2") != null) {
-            Commands.badSlot2 = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("badSlot2"));
+            Commands.badSlot2 = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("badSlot2"), player, p);
             }
-            if (ItemJoin.getSpecialConfig("en-lang.yml").getString("slotUndefined") != null) {
-            Commands.slotUndefined = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("slotUndefined"));
+            if (ItemJoin.getSpecialConfig("en-lang.yml").getString("badID") != null) {
+            Commands.badID = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("badID"), player, p);
             }
             if (ItemJoin.getSpecialConfig("en-lang.yml").getString("consoleReloadedConfig") != null) {
-            Commands.consoleReloadedConfig = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("consoleReloadedConfig"));
+            Commands.consoleReloadedConfig = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("consoleReloadedConfig"), player, p);
             }
             if (ItemJoin.getSpecialConfig("en-lang.yml").getString("reloadedConfig") != null) {
-            Commands.reloadedConfig = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("reloadedConfig"));
+            Commands.reloadedConfig = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("reloadedConfig"), player, p);
             }
             if (ItemJoin.getSpecialConfig("en-lang.yml").getString("cachedWorlds") != null) {
-            Commands.cachedWorlds = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("cachedWorlds"));
+            Commands.cachedWorlds = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("cachedWorlds"), player, p);
             }
             if (ItemJoin.getSpecialConfig("en-lang.yml").getString("loadedWorlds") != null) {
-            Commands.loadedWorlds = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("loadedWorlds"));
+            Commands.loadedWorlds = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("loadedWorlds"), player, p);
             }
             if (ItemJoin.getSpecialConfig("en-lang.yml").getString("loadedWorldsListed") != null) {
-            Commands.loadedWorldsListed = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("loadedWorldsListed"));
+            Commands.loadedWorldsListed = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("loadedWorldsListed"), player, p);
+            }
+            if (ItemJoin.getSpecialConfig("en-lang.yml").getString("listWorlds") != null) {
+            Commands.listWorlds = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("listWorlds"), player, p);
+            }
+            if (ItemJoin.getSpecialConfig("en-lang.yml").getString("listItems") != null) {
+            Commands.listItems = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("listItems"), player, p);
             }
             if (ItemJoin.getSpecialConfig("en-lang.yml").getString("worldIn") != null) {
-            Commands.worldIn = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("worldIn"));
+            Commands.worldIn = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("worldIn"), player, p);
             }
             if (ItemJoin.getSpecialConfig("en-lang.yml").getString("worldInListed") != null) {
-            Commands.worldInListed = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("worldInListed"));
+            Commands.worldInListed = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("worldInListed"), player, p);
         }
     }
 }

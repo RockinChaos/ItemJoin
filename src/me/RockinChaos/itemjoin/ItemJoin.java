@@ -9,18 +9,19 @@ import java.util.Map;
 import java.util.Random;
 import java.util.logging.Logger;
 
-import me.RockinChaos.itemjoin.utils.Commands;
-import me.RockinChaos.itemjoin.utils.Listeners;
+import me.RockinChaos.itemjoin.utils.CheckItem;
+import me.RockinChaos.itemjoin.utils.Registers;
 import me.RockinChaos.itemjoin.utils.UpdateChecker;
-import me.RockinChaos.itemjoin.utils.Utils;
+import me.RockinChaos.itemjoin.utils.WorldHandler;
 import me.clip.placeholderapi.PlaceholderAPI;
 
+import org.apache.commons.lang.WordUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.craftbukkit.v1_9_R1.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -36,32 +37,27 @@ import org.bukkit.plugin.java.JavaPlugin;
 	static String nmsPackage;
 	static String version;
     public List<String> worlds;
-    public Map<String, ItemStack[]> items = new HashMap<String, ItemStack[]>();
+    public Map<String, ItemStack> items = new HashMap<String, ItemStack>();
     protected Logger log;
     public static boolean hasMultiverse;
     public static boolean hasInventories;
     public static boolean hasPlaceholderAPI;
-    @SuppressWarnings("deprecation")
-	public Player PlayerJoin = getServer().getPlayer("ItemJoin");
-    public String PlayerJoin2 = "ItemJoin";
-    public static String secretMsg = "ItemJoin";
+    public static String secretMsg;
     
     public void onEnable()
     {
 	  pl = this;
-	  Utils.configFile();
-      Utils.itemsFile();
-      Utils.firstJoinFile();
-      Utils.enLangFile();
+	  Registers.configFile();
+	  Registers.itemsFile();
+	  Registers.firstJoinFile();
+	  Registers.SecretMsg();
+	  Registers.enLangFile();
+	  Registers.registerEvents();
 	  ConsoleCommandSender Console = getServer().getConsoleSender();
-      Console.sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.GREEN + "Enabled!");
-	  getCommand("itemjoin").setExecutor(new Commands());
-	  getCommand("ij").setExecutor(new Commands());
-	  Commands.RegisterEnLang();
-	  getServer().getPluginManager().registerEvents(new Listeners(),this);
-	  Utils.checkHooks();
-	  Utils.Worlds();
+	  Registers.checkHooks();
+	  WorldHandler.Worlds();
 	  UpdateChecker.updateCheck();
+      Console.sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.GREEN + "has been  Enabled!");
 }
 
     public void onDisable()
@@ -97,60 +93,63 @@ import org.bukkit.plugin.java.JavaPlugin;
      return YamlConfiguration.loadConfiguration(file);
 }
    
-   public void CacheItems()
-   {
+  @SuppressWarnings("deprecation")
+  public void CacheItems(Player player)
+    {
      for (int i = 0; i < this.worlds.size(); i++)
      {
-       String world = Listeners.getWorld((String)this.worlds.get(i));;
-       ItemStack[] tempitems = new ItemStack[103];
-       for (int j = 0; j < 103; j++) {
-         tempitems[j] = null;
-       }
-       for (int j = 1; j <= 103; j++)
+       String world = WorldHandler.getWorld((String)this.worlds.get(i));;
+       if (getSpecialConfig("items.yml").getConfigurationSection(world) != null
+    		   && getSpecialConfig("items.yml").getConfigurationSection(world + ".items") != null) {
+       ConfigurationSection selection = getSpecialConfig("items.yml").getConfigurationSection(world + ".items");
+       for (String item : selection.getKeys(false))
        {
-         int dataValue = getSpecialConfig("items.yml").getInt(world + ".items." + j + ".data-value");
-         Material tempmat = Material.getMaterial(getSpecialConfig("items.yml").getString(world + ".items." + j + ".id"));
-         if (tempmat == null)
-         {
-           tempitems[(j - 1)] = null;
+     	ConfigurationSection items = selection.getConfigurationSection(item);
+         int dataValue = items.getInt(".data-value");
+         String slot = items.getString(".slot");
+         Material tempmat = null;
+         if (isInt(items.getString(".id"))) {
+        	 tempmat = Material.getMaterial(items.getInt(".id"));
+         } else {
+        	 tempmat = Material.getMaterial(items.getString(".id"));
          }
-         else
-         {
-           tempitems[(j - 1)] = new ItemStack(tempmat, getSpecialConfig("items.yml").getInt(world + ".items." + j + ".count", 1),(short)dataValue);
-           ItemMeta tempmeta = tempitems[(j - 1)].getItemMeta();
-           if (getSpecialConfig("items.yml").getStringList(world + ".items." + j + ".lore") != null)
+         if (CheckItem.CheckMaterial(tempmat, world, item) && CheckItem.CheckSlot(slot, world, item)) 
+          {
+           ItemStack tempitem = new ItemStack(tempmat, items.getInt(".count", 1),(short)dataValue);
+           ItemMeta tempmeta = tempitem.getItemMeta();
+           if (items.getStringList(".lore") != null)
            {
-             List<String> templist = getSpecialConfig("items.yml").getStringList(world + ".items." + j + ".lore");
+             List<String> templist = items.getStringList(".lore");
              List<String> templist2 = new ArrayList<String>();
              for (int k = 0; k < templist.size(); k++)
              {
                String name = (String)templist.get(k);
-               name = translateCodes(name);
+               name = translateCodes(name, player, player.getName());
                templist2.add(name);
              }
              tempmeta.setLore(templist2);
            }
-           if (!getSpecialConfig("items.yml").getString(world + ".items." + j + ".name", "none").equalsIgnoreCase("none"))
+           if (items.getString(".name") != null)
            {
-             String name = getSpecialConfig("items.yml").getString(world + ".items." + j + ".name");
-             name = translateCodes(name);
+             String name = items.getString(".name");
+             name = translateCodes(name, player, player.getName());
              tempmeta.setDisplayName(name + encodeItemData(secretMsg));
            } else {
-        	   String lookup = getName(tempitems[(j - 1)]);
-        	   String name = translateCodes("&f" + lookup + encodeItemData(secretMsg));
+        	   String lookup = getName(tempitem);
+        	   String name = translateCodes("&f" + lookup + encodeItemData(secretMsg), player, player.getName());
         	   tempmeta.setDisplayName(name);
            }
            
-           if (getSpecialConfig("items.yml").getString(world + ".items." + j + ".skull-owner") != null  && Material.getMaterial(getSpecialConfig("items.yml").getString(world + ".items." + j + ".id")) == Material.SKULL_ITEM)
+           if (items.getString(".skull-owner") != null  && tempmat == Material.SKULL_ITEM)
            {
-               String owner = getSpecialConfig("items.yml").getString(world + ".items." + j + ".skull-owner");
-               owner = translateCodes(owner);
+               String owner = items.getString(".skull-owner");
+               owner = translateCodes(owner, player, player.getName());
               ((SkullMeta) tempmeta).setOwner(owner);
            }
-           tempitems[(j - 1)].setItemMeta(tempmeta);
-           if (getSpecialConfig("items.yml").getStringList(world + ".items." + j + ".enchantment") != null)
+           tempitem.setItemMeta(tempmeta);
+           if (items.getString(".enchantment") != null)
            {
-        	   List<String> enchantments = getSpecialConfig("items.yml").getStringList(world + ".items." + j + ".enchantment");
+        	   List<String> enchantments = items.getStringList(".enchantment");
         	   for (String enchantment: enchantments) {
         	       String[] parts = enchantment.split(":");
         	       String name = parts[0].toUpperCase();
@@ -166,7 +165,7 @@ import org.bukkit.plugin.java.JavaPlugin;
             	       }
         	       }
         	       if (Enchantment.getByName(name) != null) {
-        	       tempitems[(j - 1)].addUnsafeEnchantment(Enchantment.getByName(name), level);
+        	       tempitem.addUnsafeEnchantment(Enchantment.getByName(name), level);
         	       }
         	       if (Enchantment.getByName(name) == null) {
         	    	   getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.RED + "An error occurred in the config, " + ChatColor.GREEN + name + ChatColor.RED + " is an incorrect enchantment name!");
@@ -174,10 +173,11 @@ import org.bukkit.plugin.java.JavaPlugin;
         	       }
         	   }
            }
+ 	      this.items.put(world + "." + player.getName().toString() + ".items." + item, tempitem);
          }
-       }
-       this.items.put(world + PlayerJoin2, tempitems);
-   }
+        }
+      }
+    }
 }
    
    public static String encodeItemData(String str){
@@ -218,7 +218,7 @@ import org.bukkit.plugin.java.JavaPlugin;
    }
 
    public static String getName(ItemStack stack) {
-	   return CraftItemStack.asNMSCopy(stack).getName();
+	   return WordUtils.capitalizeFully(stack.getType().name().toLowerCase().replace('_', ' '));
 	   }
    
    public static boolean isInt(String s) {
@@ -240,13 +240,13 @@ import org.bukkit.plugin.java.JavaPlugin;
 	}
 
  // translateCodes //
-    public String translateCodes(String name)
+    public String translateCodes(String name, Player player, String p)
        {
-	     name = name.replace("%player%", PlayerJoin2);
+	     name = name.replace("%player%", p);
          name = ChatColor.translateAlternateColorCodes('&', name).toString();
 		 if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null 
 				 && getConfig().getBoolean("PlaceholderAPI") == true) {
-		   name = PlaceholderAPI.setPlaceholders(PlayerJoin, name);
+		   name = PlaceholderAPI.setPlaceholders(player, name);
 		 }
       return name;
     }

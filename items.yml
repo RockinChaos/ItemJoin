@@ -6,18 +6,7 @@
 #// For per-world support this best works with Multiverse-Inventories! http://dev.bukkit.org/bukkit-plugins/multiverse-inventories //#
 #// Otherwise you will need to set clear-on-world-changed to true if you want to get the new items when you change worlds. //#
 #// Then you will need to add give-on-modifiers (world-changed) to each item to receive the new items. //#
-items-Version: 1
-Global-Settings: #// Global Settings, for each world listed under world-list. These will take effect in them. //#
-  Prevention:
-    prevent-pickups: false #// Prevents picking up of any item //#
-    AllowOPBypass: false #// Ignores these settings under Prevention if you are OP //#
-    CreativeBypass: false #// Ignores these settings under Prevention if you are in creative mode. //#
-  Clear-On:
-    clear-on-join: false #// Clears the players inventory upon entering the server. (Before items are given). //#
-    clear-on-world-change: false #// Clears the players inventory upon changing worlds. (Before items are given). //#
-    AllowOPBypass: false #// Ignores these settings under Clear-On if you are OP //#
-  First-Join:
-    FirstJoin-Mode-Enabled: false #// Set to true if you wish to use First-Join-Item: true per item! (This allows the use of the First Join options).//#
+items-Version: 2
 
 world-list: #// This is the list of worlds that have custom items on join. //#
   - world
@@ -26,8 +15,9 @@ world-list: #// This is the list of worlds that have custom items on join. //#
 #// For every world listed in the world-list, you need to make a section for it. //#
 world:
   items:
-    1: #// This is the slot, 1 is first slot in hot bar, 36 is bottom right in inventory, 100-103 are the armor slots, 100 being the boots and 103 being the helmet. //#
+    first-item: #// This is the name of the item. This can be names to ANYTHING. Just needs to be defined. //#
       id: WOOD_SWORD
+      slot: 0 #// Slot the item goes in. 0 Being #1 on your bar and 8 being #9 on your bar. //#
       data-value: 0
       name: '&3Junk Sword'
       lore:
@@ -35,12 +25,14 @@ world:
         - '&7You will probably want to get'
         - '&7A &bDiamond &7one'
       commands:
-        - 'console: say how is your day?'
+        - 'message: &7[&cCommand&7] &aHow is your day?'
       commands-action: RIGHT_CLICK_AIR, RIGHT_CLICK_BLOCK
       commands-cooldown: 5
       cooldown-message: '&7[&eItemJoin&7] &a[%item%&a] &cis on cooldown for &a%timeleft% &cseconds..'
-    2:
-      id: WOOD_AXE
+      permission-node: 'itemjoin.custom-permission.firstitem'
+    second-item:
+      id: 271 #// Now supports item ID's! //#
+      slot: 1
       data-value: 0
       name: '&5Mr.Axe'
       lore:
@@ -95,15 +87,16 @@ world:
         - 'KNOCKBACK:2'
         - 'FIRE_ASPECT:12'
       commands:
-        - 'console: say this is a command!'
+        - 'message: &eYou can send yourself custom messages!'
         - 'console: say You can even execute more than one command!'
         - 'console: say this is item slot 2'
       commands-action: RIGHT_CLICK_AIR, RIGHT_CLICK_BLOCK, LEFT_CLICK_AIR, LEFT_CLICK_BLOCK
       commands-cooldown: 5
       cooldown-message: '&7[&eItemJoin&7] &a[%item%&a] &cis on cooldown for &a%timeleft% &cseconds..'
       First-Join-Item: true
-    3:
+    third-item:
       id: WOOD_PICKAXE
+      slot: 2
       name: '&bThat Pickaxe'
       lore:
         - '&7Dont want a cooldown message?'
@@ -126,6 +119,7 @@ world:
         - 'gamemode 1 %player%'
         - 'console: say this is a console command.'
         - 'player: say this is a player command.'
+        - 'message: &cthis is a message command.'
         - 'say this command will be executed by the player since an executor is not defined.'
       commands-cooldown: 8
       cooldown-message: '&7[&eItemJoin&7] &a[%item%&a] &cis on cooldown for &a%timeleft% &cseconds..'
@@ -134,6 +128,7 @@ world:
         - 'inventory-modify'
         - 'death-drops'
         - 'self-drops'
+        - 'cancel-events'
         - 'item-damage-living'
         - 'item-damage-blocks'
         - 'AllowOpBypass'
@@ -143,11 +138,23 @@ world:
         - 'world-changed'
         - 'AllowOpBypass'
         - 'CreativeBypass'
-    4:
+    forth-item:
       id: WOOD_SPADE
+      slot: 3
+      lore:
+        - '&7This item has a &bCustom &7permission!'
+        - '&7using &bpermission-node &7 you can set'
+        - '&7it so you can get this item with any'
+        - '&7permission you define!'
+        - '&7'
+        - '&7If a &bpermission-node &7is not defined'
+        - '&7It will default to the root permission.'
+        - '&7Default Permission: itemjoin.world.fourth-item'
       First-Join-Item: true
-    5:
+      permission-node: 'itemjoin.fourthitem'
+    fifth-item:
       id: STAINED_GLASS
+      slot: 4
       data-value: 12
       count: 32
       lore:
@@ -172,16 +179,19 @@ world:
         - 'FIRE_ASPECT:3'
       commands:
         - 'player: server survival'
+        - 'message: &eGoing to the server of magical love!'
       prevent-modifiers:
         - 'placement'
+        - 'count-lock'
         - 'inventory-modify'
         - 'self-drops'
         - 'CreativeBypass'
       give-on-modifiers:
         - 'respawn'
         - 'world-changed'
-    9:
+    sixth-item:
       id: SKULL_ITEM
+      slot: 8
       name: '&a%player%'
       skull-owner: '%player%'
       data-value: 3
@@ -193,31 +203,81 @@ world:
         - '&7So who ever joins will get their own head!'
         - '&7See the documentations page for'
         - '&7a full list of the variables!'
-    103:
+    helmet-item:
       id: DIAMOND_HELMET
+      slot: Helmet #// Sets to helmet slot. //#
       name: '&5ItemJoins Legendary Helmet!'
       lore:
         - '&7'
-        - '&7This is an armor slot, Helmet slot to be exact.'
-        - '&7Armor slots are 100-103'
-        - '&7100 being the boots and 103 being the helmet.'
-        - '&7See the documentations page for indepth tutorial on this.'
+        - '&7This is an &bHelmet &7slot!'
+        - '&7To set an item as an helmet,'
+        - '&7set the Slot to &bHelmet.'
       enchantment:
         - 'PROTECTION_ENVIRONMENTAL:3'
         - 'PROTECTION_EXPLOSIONS:2'
+    chestplate-item:
+      id: 312
+      slot: Chestplate
+      name: '&5ItemJoins Legendary Chestplate!'
+      lore:
+        - '&7'
+        - '&7This is an &bChesplate &7slot!'
+        - '&7To set an item as an chestplate,'
+        - '&7set the Slot to &bChestplate.'
+      enchantment:
+        - 'PROTECTION_ENVIRONMENTAL:3'
+        - 'PROTECTION_EXPLOSIONS:2'
+    leggings-item:
+      id: DIAMOND_LEGGINGS
+      slot: Leggings
+      name: '&5ItemJoins Legendary Leggings!'
+      lore:
+        - '&7'
+        - '&7This is an &bLeggings &7slot!'
+        - '&7To set an item as an leggings,'
+        - '&7set the Slot to &bLeggings.'
+      enchantment:
+        - 'PROTECTION_ENVIRONMENTAL:3'
+        - 'PROTECTION_EXPLOSIONS:2'
+    boots-item:
+      id: DIAMOND_BOOTS
+      slot: Boots
+      name: '&5ItemJoins Legendary Boots!'
+      lore:
+        - '&7'
+        - '&7This is an &bBoots &7slot!'
+        - '&7To set an item as an boots,'
+        - '&7set the Slot to &bBoots.'
+      enchantment:
+        - 'PROTECTION_ENVIRONMENTAL:3'
+        - 'PROTECTION_EXPLOSIONS:2'
+    offhand-item:
+      id: SHIELD
+      slot: Offhand
+      name: '&bAwesome Shield!'
+      lore:
+        - '&7This is an &bOffhand &7slot!'
+        - '&7To set an item as an offhand,'
+        - '&7set the Slot to &bOffhand.'
 world_nether:
   items:
-    1:
+    dat-hoe:
       id: WOOD_HOE
+      slot: 0
       name: 'JUNK'
-    2:
+      First-Join-Item: true
+    seedlings:
       id: SEEDS
-    3:
+      slot: 2
+      permission-node: 'itemjoin.casual.seedlings'
+    life:
       id: WHEAT
+      slot: 4
       commands:
         - 'player: say i enjoy life!'
-    4:
+    carts:
       id: MINECART
+      slot: 6
       data-value: 0
       lore:
         - '&l&1BOLD'

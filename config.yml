@@ -1,8 +1,22 @@
 #// <>==<>==<> ItemJoin's Settings, by RockinChaos  <>==<>==<> //#
-config-Version: 1
-Language: 'English' #// English is currently the only support langauge at the moment! //#
+config-Version: 2
+Language: 'English' #// English is currently the only support language at the moment! //#
 CheckforUpdates: true #// Disable this if you dont want to be notified if there is an update. //#
 PlaceholderAPI: false #// Only use this if PlaceholderAPI is installed on your server. Set to false else-wise. Required plugin restart when changed. //#
 Multiverse-Core: false #// Using the Multiverse plugin? Enable this for complete use of all plugin features. Required plugin restart when changed. //#
 Multiverse-Inventories: false #// Only used for plugin information. Set to false if you do not use it. Required plugin restart when changed. //#
-#// Derp... Its empty in here isn't it? lawl! More to come... soon! //#
+#// Global-Settings for items. //#
+Global-Settings: #// Global Settings, for each world listed under world-list. These will take effect in them. //#
+  Prevention:
+    prevent-pickups: false #// Prevents picking up of any item //#
+    AllowOPBypass: false #// Ignores these settings under Prevention if you are OP //#
+    CreativeBypass: false #// Ignores these settings under Prevention if you are in creative mode. //#
+  Clear-On:
+    clear-on-join: false #// Clears the players inventory upon entering the server. (Before items are given). //#
+    clear-on-world-change: false #// Clears the players inventory upon changing worlds. (Before items are given). //#
+    AllowOPBypass: false #// Ignores these settings under Clear-On if you are OP //#
+  First-Join:
+    FirstJoin-Mode-Enabled: false #// Set to true if you wish to use First-Join-Item: true per item! (This allows the use of the First Join options). //#
+  Get-Items:
+    ItemJoin-Specific-Items: true #// This meaning, these items are specific to ItemJoin and cannot be renamed to. Usually you would disable this if you had another plugin that hooks into ItemJoin items. //#
+    Delay: 2 #// Set to 0 to disable. Recommended is 2 especially if you use First-Join! (This is in Seconds.) //#
