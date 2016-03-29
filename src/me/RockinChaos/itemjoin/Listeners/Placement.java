@@ -42,7 +42,6 @@ public class Placement implements Listener{
 }
 	 
 	 @SuppressWarnings("deprecation")
-	@EventHandler
 	  public static void reAddItem(Player player, ItemStack item1) 
 	  {
 

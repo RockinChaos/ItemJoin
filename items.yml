@@ -216,7 +216,7 @@ world:
         - 'PROTECTION_ENVIRONMENTAL:3'
         - 'PROTECTION_EXPLOSIONS:2'
     chestplate-item:
-      id: 312
+      id: 311
       slot: Chestplate
       name: '&5ItemJoins Legendary Chestplate!'
       lore:

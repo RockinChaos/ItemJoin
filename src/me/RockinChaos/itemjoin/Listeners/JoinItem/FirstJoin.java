@@ -35,8 +35,10 @@ public class FirstJoin implements Listener {
 	        Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.pl, new Runnable()
 	        {
 			public void run()
-	         {
+			{
+		      if (WorldHandler.isWorld(player.getWorld().getName())) {
 	          setJoinItems(player);
+		      }
 	         }
 	      }, delay);
 	    }
@@ -54,7 +56,9 @@ public class FirstJoin implements Listener {
 	        {
 			public void run()
 	         {
+			  if (WorldHandler.isWorld(player.getWorld().getName())) {
 	          setWorldChangedItems(player);
+			  }
 	         }
 	      }, delay);
 	    }
@@ -116,11 +120,11 @@ public class FirstJoin implements Listener {
           Boolean FirstJoinMode = ItemJoin.getSpecialConfig("config.yml").getBoolean("Global-Settings" + ".First-Join." + "FirstJoin-Mode-Enabled");
     	  ItemStack toSet = ItemJoin.pl.items.get(player.getWorld().getName() + "." + player.getName().toString() + ".items." + item);
     	  if (toSet != null) {
-   		      if (inventory[slot] != null && !CheckItem.isSimilar(inventory[slot], toSet, items, player)) {
+   		      if (slot >= 0 && slot <= 35 && inventory[slot] != null && !CheckItem.isSimilar(inventory[slot], toSet, items, player)) {
    		    	if (FirstJoinMode == true && FirstJoin == true) {
    		         player.getInventory().setItem(slot, toSet);
    		    	 }
-   		        } else if (inventory[slot] == null) {
+   		        } else if (slot >= 0 && slot <= 35 && inventory[slot] == null) {
    		        	if (FirstJoinMode == true && FirstJoin == true) {
 				     player.getInventory().setItem(slot, toSet);
    		          }
@@ -192,21 +196,22 @@ public class FirstJoin implements Listener {
    		        		Equip.setBoots(toSet);
    		          }
    		        }
-   		      if (slot.equalsIgnoreCase("Offhand") 
+   		       String version = ItemJoin.pl.getServer().getVersion();
+   		      if (version.contains("1.9") && slot.equalsIgnoreCase("Offhand") 
    		    		  && player.getInventory().getItemInOffHand() != null 
    		    		  && !CheckItem.isSimilar(player.getInventory().getItemInOffHand(), toSet, items, player)) {
    		    	if (FirstJoinMode == true 
    		    			&& FirstJoin == true) {
    		    		player.getInventory().setItemInOffHand(toSet);
    		    	 }
-   		        } else if (slot.equalsIgnoreCase("Offhand") 
+   		        } else if (version.contains("1.9") && slot.equalsIgnoreCase("Offhand") 
    		        		&& player.getInventory().getItemInOffHand() == null) {
    		        	if (FirstJoinMode == true 
    		        			&& FirstJoin == true) {
    		        		player.getInventory().setItemInOffHand(toSet);
    		          }
-   		        }
-   	         }
+   		       }
+   	      }
     }
 	
     public static void setWorldChangedItems(Player player)
@@ -226,11 +231,11 @@ public class FirstJoin implements Listener {
          if (WorldHandler.isWorld(world)) {
        	  if (player.hasPermission(PermissionsHandler.customPermissions(items, item, world)) || player.hasPermission("itemjoin." + world + ".*") || player.hasPermission("itemjoin.*")) {
    	        if (toSet != null) {
-   		      if (inventory[slot] != null && !CheckItem.isSimilar(inventory[slot], toSet, items, player)) {
+   		      if (slot >= 0 && slot <= 35 && inventory[slot] != null && !CheckItem.isSimilar(inventory[slot], toSet, items, player)) {
    		    	if (FirstJoinMode == true && FirstJoin == true) {
    		         player.getInventory().setItem(slot, toSet);
    		    	 }
-   		        } else if (inventory[slot] == null) {
+   		        } else if (slot >= 0 && slot <= 35 && inventory[slot] == null) {
    		        	if (FirstJoinMode == true && FirstJoin == true) {
 				     player.getInventory().setItem(slot, toSet);
    		          }

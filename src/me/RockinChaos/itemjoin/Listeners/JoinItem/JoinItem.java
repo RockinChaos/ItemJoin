@@ -46,7 +46,9 @@ public class JoinItem implements Listener {
 	        {
 			public void run()
 	         {
+				if (WorldHandler.isWorld(player.getWorld().getName())) {
 	          setJoinItems(player);
+				}
 	         }
 	      }, delay);
     }
@@ -55,6 +57,7 @@ public class JoinItem implements Listener {
 	public static void setJoinItems(Player player)
     {
         ConfigurationSection selection = ItemJoin.getSpecialConfig("items.yml").getConfigurationSection(player.getWorld().getName() + ".items");
+        if (selection != null ) {
         for (String item : selection.getKeys(false)) 
         {
       	  ConfigurationSection items = selection.getConfigurationSection(item);
@@ -78,6 +81,7 @@ public class JoinItem implements Listener {
    	        }
          }
         }
+       }
     }
     
     public static void InventorySlots(Player player, ConfigurationSection items, String item)
@@ -88,11 +92,11 @@ public class JoinItem implements Listener {
           Boolean FirstJoinMode = ItemJoin.getSpecialConfig("config.yml").getBoolean("Global-Settings" + ".First-Join." + "FirstJoin-Mode-Enabled");
     	  ItemStack toSet = ItemJoin.pl.items.get(player.getWorld().getName() + "." + player.getName().toString() + ".items." + item);
     	  if (toSet != null) {
-   		      if (inventory[slot] != null && !CheckItem.isSimilar(inventory[slot], toSet, items, player)) {
+   		      if (slot >= 0 && slot <= 35 && inventory[slot] != null && !CheckItem.isSimilar(inventory[slot], toSet, items, player)) {
    		    	if (FirstJoinMode != true || FirstJoin != true) {
    		         player.getInventory().setItem(slot, toSet);
    		    	 }
-   		        } else if (inventory[slot] == null) {
+   		        } else if (slot >= 0 && slot <= 35 && inventory[slot] == null) {
    		        	if (FirstJoinMode != true || FirstJoin != true) {
 				     player.getInventory().setItem(slot, toSet);
    		          }
@@ -163,15 +167,16 @@ public class JoinItem implements Listener {
    		        			|| FirstJoin != true) {
    		        		Equip.setBoots(toSet);
    		          }
-   		        }
-   		      if (slot.equalsIgnoreCase("Offhand") 
+   		        }			    
+   		      String version = ItemJoin.pl.getServer().getVersion();
+   		      if (version.contains("1.9") && slot.equalsIgnoreCase("Offhand") 
    		    		  && player.getInventory().getItemInOffHand() != null 
    		    		  && !CheckItem.isSimilar(player.getInventory().getItemInOffHand(), toSet, items, player)) {
    		    	if (FirstJoinMode != true 
    		    			|| FirstJoin != true) {
    		    		player.getInventory().setItemInOffHand(toSet);
    		    	 }
-   		        } else if (slot.equalsIgnoreCase("Offhand") 
+   		        } else if (version.contains("1.9") && slot.equalsIgnoreCase("Offhand") 
    		        		&& player.getInventory().getItemInOffHand() == null) {
    		        	if (FirstJoinMode != true 
    		        			|| FirstJoin != true) {

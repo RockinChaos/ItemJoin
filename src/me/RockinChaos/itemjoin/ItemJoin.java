@@ -102,6 +102,12 @@ import org.bukkit.plugin.java.JavaPlugin;
        if (getSpecialConfig("items.yml").getConfigurationSection(world) != null
     		   && getSpecialConfig("items.yml").getConfigurationSection(world + ".items") != null) {
        ConfigurationSection selection = getSpecialConfig("items.yml").getConfigurationSection(world + ".items");
+       if (selection == null ) {
+    	   getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.RED + "You have defined the world " + ChatColor.YELLOW + world + ChatColor.RED + " under world-list.");
+    	   getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.RED + "Yet the section for defining items under " + ChatColor.YELLOW + world + ChatColor.RED + " does not exist!");
+    	   getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.RED + "Please consult the documentations for help.");
+    	   getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.RED + "Items for " + ChatColor.YELLOW + world + ChatColor.RED + " will not be set!");
+       } else if (selection != null ) {
        for (String item : selection.getKeys(false))
        {
      	ConfigurationSection items = selection.getConfigurationSection(item);
@@ -113,7 +119,11 @@ import org.bukkit.plugin.java.JavaPlugin;
          } else {
         	 tempmat = Material.getMaterial(items.getString(".id"));
          }
-         if (CheckItem.CheckMaterial(tempmat, world, item) && CheckItem.CheckSlot(slot, world, item)) 
+    	 String vers = ItemJoin.pl.getServer().getVersion();
+	     if (!vers.contains("1.9") && items.getString(".slot").equalsIgnoreCase("Offhand")) {  
+	        	 ItemJoin.pl.getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.RED + "Your server is running " + ChatColor.YELLOW + vers + ChatColor.RED + " and this does not have Offhand support!");
+	        	 ItemJoin.pl.getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.RED + "Because of this, the item " + ChatColor.YELLOW + item + ChatColor.RED +  " will not be set!");
+	      } else if (CheckItem.CheckMaterial(tempmat, world, item) && CheckItem.CheckSlot(slot, world, item)) 
           {
            ItemStack tempitem = new ItemStack(tempmat, items.getInt(".count", 1),(short)dataValue);
            ItemMeta tempmeta = tempitem.getItemMeta();
@@ -178,6 +188,7 @@ import org.bukkit.plugin.java.JavaPlugin;
         }
       }
     }
+  }
 }
    
    public static String encodeItemData(String str){
@@ -244,8 +255,7 @@ import org.bukkit.plugin.java.JavaPlugin;
        {
 	     name = name.replace("%player%", p);
          name = ChatColor.translateAlternateColorCodes('&', name).toString();
-		 if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null 
-				 && getConfig().getBoolean("PlaceholderAPI") == true) {
+		 if (hasPlaceholderAPI == true) {
 		   name = PlaceholderAPI.setPlaceholders(player, name);
 		 }
       return name;

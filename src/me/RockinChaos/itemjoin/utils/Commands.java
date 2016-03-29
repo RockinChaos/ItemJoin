@@ -91,9 +91,9 @@ public class Commands implements CommandExecutor
         }
         } else if (args[0].equalsIgnoreCase("reload") || args[0].equalsIgnoreCase("rl")) {
         	if (sender.hasPermission("itemjoin.reload") || sender.hasPermission("itemjoin.*")) {
-                ItemJoin.pl.worlds = ItemJoin.getSpecialConfig("items.yml").getStringList("world-list");
         		ItemJoin.loadSpecialConfig("items.yml");
         		ItemJoin.getSpecialConfig("items.yml").options().copyDefaults(false);
+        		ItemJoin.pl.worlds = ItemJoin.getSpecialConfig("items.yml").getStringList("world-list");
         	    ItemJoin.pl.saveDefaultConfig();
         	  	ItemJoin.pl.getConfig().options().copyDefaults(false);
                 ItemJoin.pl.reloadConfig();

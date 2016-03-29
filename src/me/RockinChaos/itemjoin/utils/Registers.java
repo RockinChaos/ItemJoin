@@ -114,6 +114,7 @@ public class Registers {
 					  Commands.RegisterEnLang(ItemJoin.pl.getServer().getPlayer("ItemJoin"), "ItemJoin");
 				  }
 		   }
+
 		   public static boolean SecretMsg() {
 			   boolean isSecret = false;
 				  if (ItemJoin.getSpecialConfig("config.yml").getBoolean("Global-Settings" + ".Get-Items." + "Delay") == true) {
@@ -124,6 +125,15 @@ public class Registers {
 					  isSecret = false;
 				  }
 				return isSecret;
+		   }
+		   
+		   public static boolean isPlaceholderAPI() {
+			   boolean hasPlaceholderAPI = false;
+				  if (ItemJoin.pl.getServer().getPluginManager().getPlugin("PlaceholderAPI") != null 
+						  && ItemJoin.pl.getConfig().getBoolean("PlaceholderAPI") == true) {
+			    	  hasPlaceholderAPI = true;
+					 }
+				return hasPlaceholderAPI;
 		   }
 		   
 		   public static void registerEvents() {

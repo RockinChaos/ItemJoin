@@ -3,7 +3,6 @@ package me.RockinChaos.itemjoin.Listeners.JoinItem;
 import java.util.List;
 
 import me.RockinChaos.itemjoin.ItemJoin;
-import me.RockinChaos.itemjoin.utils.CheckItem;
 import me.RockinChaos.itemjoin.utils.PermissionsHandler;
 import me.RockinChaos.itemjoin.utils.WorldHandler;
 
@@ -13,9 +12,27 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.event.player.PlayerJoinEvent;
 
 public class ChangedWorld implements Listener {
+
+	@EventHandler
+    public void clearOnWorldChanged(PlayerJoinEvent event)
+    {
+	        final Player player = event.getPlayer();
+	        final String world = WorldHandler.getWorld(player.getWorld().getName());
+	      	if(ItemJoin.getSpecialConfig("config.yml").getBoolean("Global-Settings" + ".Clear-On." + "clear-on-world-change") == true && (WorldHandler.isWorld(world))){
+	    		if(ItemJoin.getSpecialConfig("config.yml").getBoolean("Global-Settings" + ".Clear-On." + "AllowOPBypass") == true && player.isOp()) {
+	        		}
+	                else {
+	                    player.getInventory().clear();
+	                    player.getInventory().setHelmet(null);
+	                    player.getInventory().setChestplate(null);
+	                    player.getInventory().setLeggings(null);
+	                    player.getInventory().setBoots(null);
+	                }
+	      	}
+    }
 
 	@EventHandler
     public void giveOnWorldChanged(PlayerChangedWorldEvent event)
@@ -27,12 +44,15 @@ public class ChangedWorld implements Listener {
 	        {
 			public void run()
 	         {
+			  if (WorldHandler.isWorld(player.getWorld().getName())) {
 	          setWorldChangedItems(player);
+			  }
 	         }
 	      }, delay);
     }
 	
-    public static void setWorldChangedItems(Player player)
+    @SuppressWarnings("deprecation")
+	public static void setWorldChangedItems(Player player)
     {
         ConfigurationSection selection = ItemJoin.getSpecialConfig("items.yml").getConfigurationSection(player.getWorld().getName() + ".items");
         for (String item : selection.getKeys(false)) 
@@ -40,28 +60,26 @@ public class ChangedWorld implements Listener {
       	  ConfigurationSection items = selection.getConfigurationSection(item);
           String WorldChanged = ((List<?>)items.getStringList(".give-on-modifiers")).toString();
 		   if (WorldChanged.contains("world-changed")) {
-          final int slot = items.getInt(".slot");
+          final String slot = items.getString(".slot");
           final String world = WorldHandler.getWorld(player.getWorld().getName());
-    	  ItemStack[] inventory = player.getInventory().getContents();
-          Boolean FirstJoin = items.getBoolean(".First-Join-Item");
-          Boolean FirstJoinMode = ItemJoin.getSpecialConfig("config.yml").getBoolean("Global-Settings" + ".First-Join." + "FirstJoin-Mode-Enabled");
-    	  ItemStack toSet = ItemJoin.pl.items.get(player.getWorld().getName() + "." + player.getName().toString() + ".items." + item);
-         if (WorldHandler.isWorld(world)) {
-       	  if (player.hasPermission(PermissionsHandler.customPermissions(items, item, world)) || player.hasPermission("itemjoin." + world + ".*") || player.hasPermission("itemjoin.*")) {
-   	        if (toSet != null) {
-   		      if (inventory[slot] != null && !CheckItem.isSimilar(inventory[slot], toSet, items, player)) {
-   		    	if (FirstJoinMode != true || FirstJoin != true) {
-   		         player.getInventory().setItem(slot, toSet);
-   		    	 }
-   		        } else if (inventory[slot] == null) {
-   		        	if (FirstJoinMode != true || FirstJoin != true) {
-				     player.getInventory().setItem(slot, toSet);
-   		          }
-   	         }
-       	   }
-         }
-		 }
-         }
+          if (WorldHandler.isWorld(world)) {
+           	  if (player.hasPermission(PermissionsHandler.customPermissions(items, item, world)) 
+           			  || player.hasPermission("itemjoin." + world + ".*") 
+           			  || player.hasPermission("itemjoin.*")) {
+           		  if (slot.equalsIgnoreCase("Helmet") 
+           				  || slot.equalsIgnoreCase("Chestplate") 
+           				  || slot.equalsIgnoreCase("Leggings") 
+           				  || slot.equalsIgnoreCase("Boots") 
+           				  || slot.equalsIgnoreCase("Offhand")) {
+           			JoinItem.ArmorySlots(player, items, item);
+           			player.updateInventory();
+           		  } else {
+           		   JoinItem.InventorySlots(player, items, item);
+           		   player.updateInventory();
+           		  }
+           	  }
+             }
+		   }
         }
     }
 }

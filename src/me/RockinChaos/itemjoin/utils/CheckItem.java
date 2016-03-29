@@ -20,6 +20,7 @@ public class CheckItem {
 	       final String world = WorldHandler.getWorld(player.getWorld().getName());
 		   if (WorldHandler.isWorld(world) && !BadItem) {
 	       ConfigurationSection selection = ItemJoin.getSpecialConfig("items.yml").getConfigurationSection(player.getWorld().getName() + ".items");
+	       if (selection != null) {
 	        for (String item : selection.getKeys(false)) 
 	        {
 	      	ConfigurationSection items = selection.getConfigurationSection(item);
@@ -34,6 +35,7 @@ public class CheckItem {
 				}
 	        }
 		   }
+		 }
 	    return Allowed;
 	}
 
@@ -62,17 +64,25 @@ public class CheckItem {
 	   
 	   public static boolean isSimilar(ItemStack item1, ItemStack item2, ConfigurationSection items, Player player) {
 		   boolean isSimilar = false;
-		   if (item1.isSimilar(item2)) {
+		   if (item1.isSimilar(item2) && isCountSimilar(item1, item1)) {
 			   isSimilar = true;
-		  } else if(isSkullSimilar(items, item1, player)) {
+		  } else if(isSkullSimilar(items, item1, player) && isCountSimilar(item1, item2)) {
 			  isSimilar = true;
 		  }
    return isSimilar;	   
 }
 	   
+	   public static boolean isCountSimilar(ItemStack item1, ItemStack item2) {
+		   boolean isCountSimilar = false;
+		   if (item1.getAmount() == item2.getAmount()) {
+			   isCountSimilar = true;
+		   }
+   return isCountSimilar;	   
+}
+	   
 	   public static boolean CheckSlot(String slot, String world, String item) { 
 		   boolean CheckSlot = true;
-	         if (slot != null && !ItemJoin.isInt(slot)) {
+           if (slot != null && !ItemJoin.isInt(slot)) {
 	        	 if (!(slot.equalsIgnoreCase("Offhand") 
 	        			 || slot.equalsIgnoreCase("Helmet") 
 	        			 || slot.equalsIgnoreCase("Chestplate") 
@@ -82,6 +92,13 @@ public class CheckItem {
 	                 ItemJoin.pl.getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.RED + "The item " + ChatColor.YELLOW + item + ChatColor.RED +  " will not be set!");
 	                 CheckSlot = false;
 	        	 }
+	         } else if (slot != null && ItemJoin.isInt(slot)) {
+	        	 int iSlot = Integer.parseInt(slot);
+	        	 if (!(iSlot >= 0 && iSlot <= 35)) {
+                 ItemJoin.pl.getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.RED + "For the world " + ChatColor.YELLOW + world + ChatColor.RED + " the item " + ChatColor.YELLOW + item + "'s " + ChatColor.RED + "slot must be between 0 and 35!");
+                 ItemJoin.pl.getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.RED + "The item " + ChatColor.YELLOW + item + ChatColor.RED +  " will not be set!");
+                 CheckSlot = false;
+	          }
 	         }
 			return CheckSlot;
   }
@@ -102,7 +119,7 @@ public class CheckItem {
 
 	   public static boolean CheckMaterial(Material tempmat, String world, String item) {
 		   boolean CheckMaterial = true;
-	         if (tempmat == null) {
+		      if (tempmat == null) {
 	        	 ItemJoin.pl.getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.RED + "For the world " + ChatColor.YELLOW + world + ChatColor.RED + " the item " + ChatColor.YELLOW + item + "'s " + ChatColor.RED + "Material 'ID' is invalid or does not exist!");
 	        	 ItemJoin.pl.getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.RED + "The item " + ChatColor.YELLOW + item + ChatColor.RED +  " will not be set!");
 	        	 CheckMaterial = false;
