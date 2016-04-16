@@ -27,7 +27,7 @@ public class CheckItem {
 		    boolean Creative = player.getGameMode() == GameMode.CREATIVE;
 	    	  ItemStack toSet = ItemJoin.pl.items.get(player.getWorld().getName() + "." + player.getName().toString() + ".items." + item);
 				String Modifiers = ((List<?>)items.getStringList("." + modifier)).toString();
-				if (isSimilar(checking, toSet, items, player) && Modifiers.contains(mod)) {
+				if (toSet != null && isSimilar(checking, toSet, items, player) && Modifiers.contains(mod)) {
 					if (Modifiers.contains("AllowOPBypass") && player.isOp() || Modifiers.contains("CreativeBypass") && Creative) {
 					} else {
 						Allowed = false;
@@ -44,7 +44,7 @@ public class CheckItem {
 		   if (item1.getType() == Material.SKULL_ITEM 
 				   && Material.getMaterial(items.getString(".id")) == Material.SKULL_ITEM 
 				   && ((SkullMeta) item1.getItemMeta()).hasOwner() 
-				   && ((SkullMeta) item1.getItemMeta()).getOwner().equalsIgnoreCase(ItemJoin.pl.translateCodes(items.getString(".skull-owner"), player, player.getName()))) {
+				   && ((SkullMeta) item1.getItemMeta()).getOwner().equalsIgnoreCase(ItemJoin.pl.formatPlaceholders(items.getString(".skull-owner"), player))) {
 					   if (item1.hasItemMeta()
 							   && item1.getItemMeta().hasDisplayName()
 							   && Registers.SecretMsg()
@@ -53,7 +53,7 @@ public class CheckItem {
 				   } else if (item1.hasItemMeta()
 						   && item1.getItemMeta().hasDisplayName()
 						   && !Registers.SecretMsg()
-						   && ((SkullMeta) item1.getItemMeta()).getDisplayName().equalsIgnoreCase(ItemJoin.pl.translateCodes(items.getString(".name"), player, player.getName()))) {	
+						   && ((SkullMeta) item1.getItemMeta()).getDisplayName().equalsIgnoreCase(ItemJoin.pl.formatPlaceholders(items.getString(".name"), player))) {	
 					   isSimilar = true;
 				   } else if (!Registers.SecretMsg()) {	
 					   isSimilar = true;
@@ -88,15 +88,15 @@ public class CheckItem {
 	        			 || slot.equalsIgnoreCase("Chestplate") 
 	        			 || slot.equalsIgnoreCase("Leggings") 
 	        			 || slot.equalsIgnoreCase("Boots"))) {
-	                 ItemJoin.pl.getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.RED + "For the world " + ChatColor.YELLOW + world + ChatColor.RED + " the item " + ChatColor.YELLOW + item + "'s " + ChatColor.RED + "slot is invalid or does not exist!");
-	                 ItemJoin.pl.getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.RED + "The item " + ChatColor.YELLOW + item + ChatColor.RED +  " will not be set!");
+	                 ItemJoin.pl.Console.sendMessage(ItemJoin.pl.Prefix + ChatColor.RED + "For the world " + ChatColor.YELLOW + world + ChatColor.RED + " the item " + ChatColor.YELLOW + item + "'s " + ChatColor.RED + "slot is invalid or does not exist!");
+	                 ItemJoin.pl.Console.sendMessage(ItemJoin.pl.Prefix + ChatColor.RED + "The item " + ChatColor.YELLOW + item + ChatColor.RED +  " will not be set!");
 	                 CheckSlot = false;
 	        	 }
 	         } else if (slot != null && ItemJoin.isInt(slot)) {
 	        	 int iSlot = Integer.parseInt(slot);
 	        	 if (!(iSlot >= 0 && iSlot <= 35)) {
-                 ItemJoin.pl.getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.RED + "For the world " + ChatColor.YELLOW + world + ChatColor.RED + " the item " + ChatColor.YELLOW + item + "'s " + ChatColor.RED + "slot must be between 0 and 35!");
-                 ItemJoin.pl.getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.RED + "The item " + ChatColor.YELLOW + item + ChatColor.RED +  " will not be set!");
+                 ItemJoin.pl.Console.sendMessage(ItemJoin.pl.Prefix + ChatColor.RED + "For the world " + ChatColor.YELLOW + world + ChatColor.RED + " the item " + ChatColor.YELLOW + item + "'s " + ChatColor.RED + "slot must be between 0 and 35!");
+                 ItemJoin.pl.Console.sendMessage(ItemJoin.pl.Prefix + ChatColor.RED + "The item " + ChatColor.YELLOW + item + ChatColor.RED +  " will not be set!");
                  CheckSlot = false;
 	          }
 	         }
@@ -110,8 +110,8 @@ public class CheckItem {
 	        			 || slot.equalsIgnoreCase("Chestplate") 
 	        			 || slot.equalsIgnoreCase("Leggings") 
 	        			 || slot.equalsIgnoreCase("Boots")) {
-	                 ItemJoin.pl.getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.RED + "For the world " + ChatColor.YELLOW + world + ChatColor.RED + " the item " + ChatColor.YELLOW + item + "'s " + ChatColor.RED + "slot is invalid or does not exist!");
-	                 ItemJoin.pl.getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.RED + "The item " + ChatColor.YELLOW + item + ChatColor.RED +  " will not be set!");
+	                 ItemJoin.pl.Console.sendMessage(ItemJoin.pl.Prefix + ChatColor.RED + "For the world " + ChatColor.YELLOW + world + ChatColor.RED + " the item " + ChatColor.YELLOW + item + "'s " + ChatColor.RED + "slot is invalid or does not exist!");
+	                 ItemJoin.pl.Console.sendMessage(ItemJoin.pl.Prefix + ChatColor.RED + "The item " + ChatColor.YELLOW + item + ChatColor.RED +  " will not be set!");
 	                 isArmor = true;
 	         }
 			return isArmor;
@@ -120,8 +120,8 @@ public class CheckItem {
 	   public static boolean CheckMaterial(Material tempmat, String world, String item) {
 		   boolean CheckMaterial = true;
 		      if (tempmat == null) {
-	        	 ItemJoin.pl.getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.RED + "For the world " + ChatColor.YELLOW + world + ChatColor.RED + " the item " + ChatColor.YELLOW + item + "'s " + ChatColor.RED + "Material 'ID' is invalid or does not exist!");
-	        	 ItemJoin.pl.getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.RED + "The item " + ChatColor.YELLOW + item + ChatColor.RED +  " will not be set!");
+	        	 ItemJoin.pl.Console.sendMessage(ItemJoin.pl.Prefix + ChatColor.RED + "For the world " + ChatColor.YELLOW + world + ChatColor.RED + " the item " + ChatColor.YELLOW + item + "'s " + ChatColor.RED + "Material 'ID' is invalid or does not exist!");
+	        	 ItemJoin.pl.Console.sendMessage(ItemJoin.pl.Prefix + ChatColor.RED + "The item " + ChatColor.YELLOW + item + ChatColor.RED +  " will not be set!");
 	        	 CheckMaterial = false;
 	         }
 			return CheckMaterial;

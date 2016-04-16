@@ -1,6 +1,8 @@
 package me.RockinChaos.itemjoin.utils;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
 
 import me.RockinChaos.itemjoin.ItemJoin;
 
@@ -28,7 +30,15 @@ public class WorldHandler {
 		     for (int i = 0; i < ItemJoin.pl.worlds.size(); i++)
 		     {
 		       String world = (String)ItemJoin.pl.worlds.get(i);
-		       ItemJoin.pl.getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.GREEN + "Cached " + ChatColor.YELLOW + world);
+		       ItemJoin.pl.Console.sendMessage(ItemJoin.pl.Prefix + ChatColor.GREEN + "Cached " + ChatColor.YELLOW + world);
 		     }
 		}
+		
+		public static void UpdateItems() {
+		     for (Player player : Bukkit.getServer().getOnlinePlayers())
+		     {
+		       ItemJoin.pl.CacheItems(player);
+		     }
+		}
+		
 }

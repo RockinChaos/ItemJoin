@@ -102,7 +102,7 @@ public class Commands implements CommandExecutor
           	       ItemJoin.loadSpecialConfig("en-lang.yml");
           	       ItemJoin.getSpecialConfig("en-lang.yml").options().copyDefaults(false);
           		  }
-                RegisterEnLang(ItemJoin.pl.getServer().getPlayer("ItemJoin"), "ItemJoin");
+                RegisterEnLang(ItemJoin.pl.getServer().getPlayer("ItemJoin"));
     			ItemJoin.pl.items.clear();
    			    for (Player player : ItemJoin.pl.getServer().getOnlinePlayers()) {
                 ItemJoin.pl.CacheItems(player);
@@ -114,7 +114,7 @@ public class Commands implements CommandExecutor
   			       String world = (String)PrintWorlds.get(i);
   			       sender.sendMessage(cachedWorlds.replace("%cache_world%", world));
   			     }
-   		        ItemJoin.pl.getServer().getConsoleSender().sendMessage(consoleReloadedConfig.replace("%player_reloaded%", sender.getName()));
+   		        ItemJoin.pl.Console.sendMessage(consoleReloadedConfig.replace("%player_reloaded%", sender.getName()));
                 return true;
             } else {
                 sender.sendMessage(noPermission);
@@ -258,7 +258,7 @@ public class Commands implements CommandExecutor
         } else if (args.length == 3 && args[0].equalsIgnoreCase("get")) {
         	Player argsPlayer = Bukkit.getPlayerExact(args[2]);
         	if (argsPlayer == null && sender.hasPermission("itemjoin.get.others") || argsPlayer == null && sender.hasPermission("itemjoin.*")) {
-        		sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.RED + "The player " + ChatColor.AQUA + args[2] + ChatColor.RED + " could not be found!");
+        		sender.sendMessage(ItemJoin.pl.Prefix + ChatColor.RED + "The player " + ChatColor.AQUA + args[2] + ChatColor.RED + " could not be found!");
         		return true;
         	} else if (sender.hasPermission("itemjoin.get.others") || sender.hasPermission("itemjoin.*")) {
         		String world = argsPlayer.getWorld().getName();
@@ -368,18 +368,18 @@ public class Commands implements CommandExecutor
         } else if (args[0].equalsIgnoreCase("updates") || args[0].equalsIgnoreCase("update")) {
         	if (sender.hasPermission("itemjoin.updates") || sender.hasPermission("itemjoin.*")) {
         		UpdateChecker checker = new UpdateChecker(ItemJoin.pl, "http://dev.bukkit.org/server-mods/itemjoin/files.rss");
-  		        ItemJoin.pl.getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.RED + sender.getName() + " has requested to check for updates!");
-  	            sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.GREEN + "Checking for updates...");
+  		        ItemJoin.pl.Console.sendMessage(ItemJoin.pl.Prefix + ChatColor.RED + sender.getName() + " has requested to check for updates!");
+  	            sender.sendMessage(ItemJoin.pl.Prefix + ChatColor.GREEN + "Checking for updates...");
                 if (checker.updateNeeded())
                   {
-              	  sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.RED + "Your current version: v" + ChatColor.RED + ItemJoin.pl.getDescription().getVersion());
-              	  sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.RED + "A new version of ItemJoin is available: " + ChatColor.GREEN + "v" +  checker.getVersion() + ChatColor.WHITE);
-              	  sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.GREEN + "Get it from: " + checker.getLink() + ChatColor.WHITE);
-              	  sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.GREEN + "Direct Link: " + checker.getJarLink() + ChatColor.WHITE);
+              	  sender.sendMessage(ItemJoin.pl.Prefix + ChatColor.RED + "Your current version: v" + ChatColor.RED + ItemJoin.pl.getDescription().getVersion());
+              	  sender.sendMessage(ItemJoin.pl.Prefix + ChatColor.RED + "A new version of ItemJoin is available: " + ChatColor.GREEN + "v" +  checker.getVersion() + ChatColor.WHITE);
+              	  sender.sendMessage(ItemJoin.pl.Prefix + ChatColor.GREEN + "Get it from: " + checker.getLink() + ChatColor.WHITE);
+              	  sender.sendMessage(ItemJoin.pl.Prefix + ChatColor.GREEN + "Direct Link: " + checker.getJarLink() + ChatColor.WHITE);
               	return true;
                     }
                 else if(ItemJoin.pl.getConfig().getBoolean("CheckforUpdates") == true) {
-              	  sender.sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.GREEN + "You are up to date!");
+              	  sender.sendMessage(ItemJoin.pl.Prefix + ChatColor.GREEN + "You are up to date!");
               	return true;
                 }
             } else {
@@ -395,75 +395,75 @@ public class Commands implements CommandExecutor
         return false;
     }
     
-    public static void RegisterEnLang(Player player, String p) {
+    public static void RegisterEnLang(Player player) {
             if (ItemJoin.getSpecialConfig("en-lang.yml").getString("Prefix") != null) {
-        	Commands.Prefix = ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("Prefix"), player, p);
+        	Commands.Prefix = ItemJoin.pl.formatPlaceholders(ItemJoin.getSpecialConfig("en-lang.yml").getString("Prefix"), player);
             }
             if (ItemJoin.getSpecialConfig("en-lang.yml").getString("Prefix") == null) {
         	Commands.Prefix = "";
             }
             if (ItemJoin.getSpecialConfig("en-lang.yml").getString("noPermission") != null) {
-            Commands.noPermission = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("noPermission"), player, p);
+            Commands.noPermission = Prefix + ItemJoin.pl.formatPlaceholders(ItemJoin.getSpecialConfig("en-lang.yml").getString("noPermission"), player);
             }
             if (ItemJoin.getSpecialConfig("en-lang.yml").getString("notPlayer") != null) {
-            Commands.notPlayer = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("notPlayer"), player, p);
+            Commands.notPlayer = Prefix + ItemJoin.pl.formatPlaceholders(ItemJoin.getSpecialConfig("en-lang.yml").getString("notPlayer"), player);
             }
             if (ItemJoin.getSpecialConfig("en-lang.yml").getString("consoleAltSyntax") != null) {
-            Commands.consoleAltSyntax = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("consoleAltSyntax"), player, p);
+            Commands.consoleAltSyntax = Prefix + ItemJoin.pl.formatPlaceholders(ItemJoin.getSpecialConfig("en-lang.yml").getString("consoleAltSyntax"), player);
             }
             if (ItemJoin.getSpecialConfig("en-lang.yml").getString("unknownCommand") != null) {
-            Commands.unknownCommand = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("unknownCommand"), player, p);
+            Commands.unknownCommand = Prefix + ItemJoin.pl.formatPlaceholders(ItemJoin.getSpecialConfig("en-lang.yml").getString("unknownCommand"), player);
             }
             if (ItemJoin.getSpecialConfig("en-lang.yml").getString("badGetUsage") != null) {
-            Commands.badGetUsage = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("badGetUsage"), player, p);
+            Commands.badGetUsage = Prefix + ItemJoin.pl.formatPlaceholders(ItemJoin.getSpecialConfig("en-lang.yml").getString("badGetUsage"), player);
             }
             if (ItemJoin.getSpecialConfig("en-lang.yml").getString("givenItem") != null) {
-            Commands.givenItem = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("givenItem"), player, p);
+            Commands.givenItem = Prefix + ItemJoin.pl.formatPlaceholders(ItemJoin.getSpecialConfig("en-lang.yml").getString("givenItem"), player);
             }
             if (ItemJoin.getSpecialConfig("en-lang.yml").getString("givenOthersItem") != null) {
-            Commands.givenOthersItem = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("givenOthersItem"), player, p);
+            Commands.givenOthersItem = Prefix + ItemJoin.pl.formatPlaceholders(ItemJoin.getSpecialConfig("en-lang.yml").getString("givenOthersItem"), player);
             }
             if (ItemJoin.getSpecialConfig("en-lang.yml").getString("receivedOthersItem") != null) {
-            Commands.receivedOthersItem = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("receivedOthersItem"), player, p);
+            Commands.receivedOthersItem = Prefix + ItemJoin.pl.formatPlaceholders(ItemJoin.getSpecialConfig("en-lang.yml").getString("receivedOthersItem"), player);
             }
             if (ItemJoin.getSpecialConfig("en-lang.yml").getString("itemDoesNotExist") != null) {
-            Commands.itemDoesNotExist = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("itemDoesNotExist"), player, p);
+            Commands.itemDoesNotExist = Prefix + ItemJoin.pl.formatPlaceholders(ItemJoin.getSpecialConfig("en-lang.yml").getString("itemDoesNotExist"), player);
             }
             if (ItemJoin.getSpecialConfig("en-lang.yml").getString("badSlot1") != null) {
-            Commands.badSlot1 = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("badSlot1"), player, p);
+            Commands.badSlot1 = Prefix + ItemJoin.pl.formatPlaceholders(ItemJoin.getSpecialConfig("en-lang.yml").getString("badSlot1"), player);
             }
             if (ItemJoin.getSpecialConfig("en-lang.yml").getString("badSlot2") != null) {
-            Commands.badSlot2 = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("badSlot2"), player, p);
+            Commands.badSlot2 = Prefix + ItemJoin.pl.formatPlaceholders(ItemJoin.getSpecialConfig("en-lang.yml").getString("badSlot2"), player);
             }
             if (ItemJoin.getSpecialConfig("en-lang.yml").getString("badID") != null) {
-            Commands.badID = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("badID"), player, p);
+            Commands.badID = Prefix + ItemJoin.pl.formatPlaceholders(ItemJoin.getSpecialConfig("en-lang.yml").getString("badID"), player);
             }
             if (ItemJoin.getSpecialConfig("en-lang.yml").getString("consoleReloadedConfig") != null) {
-            Commands.consoleReloadedConfig = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("consoleReloadedConfig"), player, p);
+            Commands.consoleReloadedConfig = Prefix + ItemJoin.pl.formatPlaceholders(ItemJoin.getSpecialConfig("en-lang.yml").getString("consoleReloadedConfig"), player);
             }
             if (ItemJoin.getSpecialConfig("en-lang.yml").getString("reloadedConfig") != null) {
-            Commands.reloadedConfig = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("reloadedConfig"), player, p);
+            Commands.reloadedConfig = Prefix + ItemJoin.pl.formatPlaceholders(ItemJoin.getSpecialConfig("en-lang.yml").getString("reloadedConfig"), player);
             }
             if (ItemJoin.getSpecialConfig("en-lang.yml").getString("cachedWorlds") != null) {
-            Commands.cachedWorlds = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("cachedWorlds"), player, p);
+            Commands.cachedWorlds = Prefix + ItemJoin.pl.formatPlaceholders(ItemJoin.getSpecialConfig("en-lang.yml").getString("cachedWorlds"), player);
             }
             if (ItemJoin.getSpecialConfig("en-lang.yml").getString("loadedWorlds") != null) {
-            Commands.loadedWorlds = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("loadedWorlds"), player, p);
+            Commands.loadedWorlds = Prefix + ItemJoin.pl.formatPlaceholders(ItemJoin.getSpecialConfig("en-lang.yml").getString("loadedWorlds"), player);
             }
             if (ItemJoin.getSpecialConfig("en-lang.yml").getString("loadedWorldsListed") != null) {
-            Commands.loadedWorldsListed = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("loadedWorldsListed"), player, p);
+            Commands.loadedWorldsListed = Prefix + ItemJoin.pl.formatPlaceholders(ItemJoin.getSpecialConfig("en-lang.yml").getString("loadedWorldsListed"), player);
             }
             if (ItemJoin.getSpecialConfig("en-lang.yml").getString("listWorlds") != null) {
-            Commands.listWorlds = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("listWorlds"), player, p);
+            Commands.listWorlds = Prefix + ItemJoin.pl.formatPlaceholders(ItemJoin.getSpecialConfig("en-lang.yml").getString("listWorlds"), player);
             }
             if (ItemJoin.getSpecialConfig("en-lang.yml").getString("listItems") != null) {
-            Commands.listItems = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("listItems"), player, p);
+            Commands.listItems = Prefix + ItemJoin.pl.formatPlaceholders(ItemJoin.getSpecialConfig("en-lang.yml").getString("listItems"), player);
             }
             if (ItemJoin.getSpecialConfig("en-lang.yml").getString("worldIn") != null) {
-            Commands.worldIn = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("worldIn"), player, p);
+            Commands.worldIn = Prefix + ItemJoin.pl.formatPlaceholders(ItemJoin.getSpecialConfig("en-lang.yml").getString("worldIn"), player);
             }
             if (ItemJoin.getSpecialConfig("en-lang.yml").getString("worldInListed") != null) {
-            Commands.worldInListed = Prefix + ItemJoin.pl.translateCodes(ItemJoin.getSpecialConfig("en-lang.yml").getString("worldInListed"), player, p);
+            Commands.worldInListed = Prefix + ItemJoin.pl.formatPlaceholders(ItemJoin.getSpecialConfig("en-lang.yml").getString("worldInListed"), player);
         }
     }
 }

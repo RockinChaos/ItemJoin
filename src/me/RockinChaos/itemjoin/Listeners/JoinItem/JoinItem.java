@@ -9,6 +9,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.EntityEquipment;
@@ -17,7 +18,7 @@ import org.bukkit.inventory.ItemStack;
 public class JoinItem implements Listener {
 
 
-	@EventHandler
+	@EventHandler(priority=EventPriority.HIGHEST)
     public void clearOnJoin(PlayerJoinEvent event)
     {
 	        final Player player = event.getPlayer();
@@ -35,7 +36,7 @@ public class JoinItem implements Listener {
 	      	}
     }
 
-	@EventHandler
+	@EventHandler(priority=EventPriority.HIGHEST)
     public void giveOnJoin(PlayerJoinEvent event)
     {
 	      final Player player = event.getPlayer();
@@ -44,17 +45,44 @@ public class JoinItem implements Listener {
 	        ItemJoin.pl.CacheItems(player);
 	        Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.pl, new Runnable()
 	        {
+			@SuppressWarnings("deprecation")
 			public void run()
 	         {
-				if (WorldHandler.isWorld(player.getWorld().getName())) {
-	          setJoinItems(player);
+			  if (WorldHandler.isWorld(player.getWorld().getName())) {
+	            setJoinItems(player);
+      		    player.updateInventory();
 				}
 	         }
 	      }, delay);
     }
 	
-    @SuppressWarnings("deprecation")
-	public static void setJoinItems(Player player)
+	@EventHandler(priority=EventPriority.HIGHEST)
+    public void giveOnFirstJoin(PlayerJoinEvent event)
+    {
+	      final Player player = event.getPlayer();
+	      long delay = ItemJoin.getSpecialConfig("config.yml").getInt("Global-Settings" + ".Get-Items." + "Delay") * 10L;
+	      Boolean FirstJoinMode = ItemJoin.getSpecialConfig("config.yml").getBoolean("Global-Settings" + ".First-Join." + "FirstJoin-Mode-Enabled");
+	      if(FirstJoinMode == true) {
+		    String FirstFindPlayer = ItemJoin.getSpecialConfig("FirstJoin.yml").getString(player.getWorld().getName() + "." + player.getName().toString());
+	        if (FirstFindPlayer == null) {
+	        	ItemJoin.pl.items.remove(player.getWorld().getName() + "." + player.getName().toString() + ".items.");
+		        ItemJoin.pl.CacheItems(player);
+	        Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.pl, new Runnable()
+	        {
+			@SuppressWarnings("deprecation")
+			public void run()
+			{
+		      if (WorldHandler.isWorld(player.getWorld().getName())) {
+	            FirstJoin.setJoinItems(player);
+      		    player.updateInventory();
+		      }
+	         }
+	      }, delay);
+	    }
+	  }
+    }
+	
+    public static void setJoinItems(Player player)
     {
         ConfigurationSection selection = ItemJoin.getSpecialConfig("items.yml").getConfigurationSection(player.getWorld().getName() + ".items");
         if (selection != null ) {
@@ -73,10 +101,8 @@ public class JoinItem implements Listener {
        				  || slot.equalsIgnoreCase("Boots") 
        				  || slot.equalsIgnoreCase("Offhand")) {
        			ArmorySlots(player, items, item);
-       			player.updateInventory();
        		  } else {
        		   InventorySlots(player, items, item);
-       		   player.updateInventory();
        		  }
    	        }
          }

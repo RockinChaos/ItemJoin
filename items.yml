@@ -190,6 +190,44 @@ world:
         - 'respawn'
         - 'world-changed'
     sixth-item:
+      id: WRITTEN_BOOK
+      slot: 5
+      name: '&aAt Its Finest'
+      author: '&bItemJoin'
+      lore:
+        - '&7'
+        - '&7This magical book is given on join!'
+      pages:
+        - 'newpage: &bYou can get this book on join!'
+        - 'newline: &aThis book also supports &ccolorcodes!'
+        - 'newline: &0'
+        - 'newline: &cHow do custom books work?'
+        - 'newline: &0'
+        - 'newline: &0You can set an &cauthor&0'
+        - 'newline: &0as shown in the items.yml'
+        - 'newline: &0I set it to &bItemJoin.'
+        - 'newline: &0'
+        - 'newpage: &cHow do you create a new page?'
+        - 'newline: &0'
+        - 'newline: &0As displayed to the left in the items.yml'
+        - 'newline: &0Use &bnewpage&0 and &cnewline&0 to create your pages.'
+        - 'newline: &cnewpage &0will start the next page.'
+        - 'newline: &cnewline &0will create a new line for that page.'
+        - 'newpage: &bItemJoin &0by RockinChaos!'
+        - ':endthebook:'
+    seventh-item:
+      id: MAP
+      slot: 6
+      name: '&eMystery Map'
+      lore:
+        - '&7This is a &bMap &7that renders'
+        - '&7custom images onto it!'
+        - '&7'
+        - '&7All you need is the ID to equal &bMAP'
+        - '&7and to have &bcustom-map-image &7pointing to'
+        - '&7an image that is &bNO LARGER &7than &b128x128 pixels!'
+      custom-map-image: 'http://i.imgur.com/IIhHrn9.png'
+    eighth-item:
       id: SKULL_ITEM
       slot: 8
       name: '&a%player%'

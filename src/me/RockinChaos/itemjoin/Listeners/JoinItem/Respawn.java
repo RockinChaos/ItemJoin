@@ -10,32 +10,35 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerRespawnEvent;
 
 public class Respawn implements Listener {
 
-	@EventHandler
+	@EventHandler(priority=EventPriority.HIGHEST)
     public void giveOnRespawn(PlayerRespawnEvent event)
     {
 	      final Player player = event.getPlayer();
-	      long delay = ItemJoin.getSpecialConfig("config.yml").getInt("Global-Settings" + ".Get-Items." + "Delay")/1000L;
+	      long delay = ItemJoin.getSpecialConfig("config.yml").getInt("Global-Settings" + ".Get-Items." + "Delay") * 10L;
 	        ItemJoin.pl.CacheItems(player);
 	        Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.pl, new Runnable()
 	        {
+			@SuppressWarnings("deprecation")
 			public void run()
 	         {
 			  if (WorldHandler.isWorld(player.getWorld().getName())) {
 			   setRespawnItems(player);
+       		   player.updateInventory();
 		    	}
 	         }
 	      }, delay);
     }
 
-    @SuppressWarnings("deprecation")
-	public static void setRespawnItems(Player player)
+    public static void setRespawnItems(Player player)
     {
-        ConfigurationSection selection = ItemJoin.getSpecialConfig("items.yml").getConfigurationSection(player.getWorld().getName() + ".items");
+        ConfigurationSection selection = ItemJoin.getSpecialConfig("items.yml").getConfigurationSection(WorldHandler.getWorld(player.getWorld().getName()) + ".items");
+        if (selection != null) {
         for (String item : selection.getKeys(false)) 
         {
       	  ConfigurationSection items = selection.getConfigurationSection(item);
@@ -53,14 +56,13 @@ public class Respawn implements Listener {
            				  || slot.equalsIgnoreCase("Boots") 
            				  || slot.equalsIgnoreCase("Offhand")) {
            			JoinItem.ArmorySlots(player, items, item);
-           			player.updateInventory();
            		  } else {
            		   JoinItem.InventorySlots(player, items, item);
-           		   player.updateInventory();
            		  }
            	  }
              }
 		   }
         }
     }
+  }
 }

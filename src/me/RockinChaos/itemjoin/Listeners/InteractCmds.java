@@ -47,7 +47,7 @@ public class InteractCmds implements Listener {
 
    public boolean onCooldown(ConfigurationSection items, Player player, String item, ItemStack item1) {
 	     boolean onCooldown = true;
-  		 long playersCooldownList = 0;
+  		 long playersCooldownList = 0L;
   		 if (playersOnCooldown.containsKey(player.getWorld().getName() + "." + player.getName().toString() + ".items." + item)) {
 			 playersCooldownList = playersOnCooldown.get(player.getWorld().getName() + "." + player.getName().toString() + ".items." + item);
 		 }
@@ -60,7 +60,7 @@ public class InteractCmds implements Listener {
 		          	   int timeLeft = (int) (cdtime-((System.currentTimeMillis()-playersCooldownList)/1000));
 		    			 String inhand = items.getString(".name");
 		    			 String cooldownmsg = (items.getString(".cooldown-message").replace("%timeleft%", String.valueOf(timeLeft)).replace("%item%", inhand).replace("%itemraw%", ItemJoin.getName(item1)));
-		    			cooldownmsg = ItemJoin.pl.translateCodes(cooldownmsg, player, player.getName());
+		    			cooldownmsg = ItemJoin.pl.formatPlaceholders(cooldownmsg, player);
 		    			 player.sendMessage(cooldownmsg);
  		  }
 		 }
@@ -69,15 +69,17 @@ public class InteractCmds implements Listener {
 
    public void setupCommands(Player player, String world, ItemStack item1, String action) {
        ConfigurationSection selection = ItemJoin.getSpecialConfig("items.yml").getConfigurationSection(player.getWorld().getName() + ".items");
-        for (String item : selection.getKeys(false)) 
+       if (selection != null) {
+       for (String item : selection.getKeys(false)) 
         {
         	ConfigurationSection items = selection.getConfigurationSection(item);
         	ItemStack item2 = ItemJoin.pl.items.get(player.getWorld().getName() + "." + player.getName().toString() + ".items." + item);
-        	if (CheckItem.isSimilar(item1, item2, items, player) && isCommandable(action, items)) {
+        	if (item2 != null && CheckItem.isSimilar(item1, item2, items, player) && isCommandable(action, items)) {
         		if (!onCooldown(items, player, item, item1)) {
         		convertCommands(items, item, player);
         		}
         	}
+          }
         }
    }
    
@@ -99,9 +101,9 @@ public class InteractCmds implements Listener {
 	       } else if (Identify.toLowerCase().contains("player:")) {
 	    	   dispatchPlayerCommands(parts4[1], player, item);
 	       } else if (Identify.toLowerCase().contains("message: ")) {
-	    	   player.sendMessage(ItemJoin.pl.translateCodes(parts5[1], player, player.getName()));
+	    	   player.sendMessage(ItemJoin.pl.formatPlaceholders(parts5[1], player));
 	       } else if (Identify.toLowerCase().contains("message:")) {
-	    	   player.sendMessage(ItemJoin.pl.translateCodes(parts6[1], player, player.getName()));
+	    	   player.sendMessage(ItemJoin.pl.formatPlaceholders(parts6[1], player));
 	       } else if (!Identify.toLowerCase().contains("player: ") 
 	    		   && !Identify.toLowerCase().contains("console: ") 
 	    		   && !Identify.toLowerCase().contains("player:")
@@ -115,14 +117,14 @@ public class InteractCmds implements Listener {
 
    public void dispatchPlayerCommands(String parts, Player player, String item) {
        String Command = parts.replace("%player%", player.getName());
-       Command = ItemJoin.pl.translateCodes(Command, player, player.getName());
+       Command = ItemJoin.pl.formatPlaceholders(Command, player);
        player.performCommand(Command);
        playersOnCooldown.put(player.getWorld().getName() + "." + player.getName().toString() + ".items." + item, System.currentTimeMillis());
    }
    
    public void dispatchConsoleCommands(String parts, Player player, String item) {
        String Command = parts.replace("%player%", player.getName());
-       Command = ItemJoin.pl.translateCodes(Command, player, player.getName());
+       Command = ItemJoin.pl.formatPlaceholders(Command, player);
        Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), Command);
        playersOnCooldown.put(player.getWorld().getName() + "." + player.getName().toString() + ".items." + item, System.currentTimeMillis());
    }

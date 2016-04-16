@@ -9,60 +9,15 @@ import me.RockinChaos.itemjoin.utils.CheckItem;
 import me.RockinChaos.itemjoin.utils.PermissionsHandler;
 import me.RockinChaos.itemjoin.utils.WorldHandler;
 
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerChangedWorldEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 
 public class FirstJoin implements Listener {
-
-	@EventHandler
-    public void giveOnJoin(PlayerJoinEvent event)
-    {
-	      final Player player = event.getPlayer();
-	      long delay = ItemJoin.getSpecialConfig("config.yml").getInt("Global-Settings" + ".Get-Items." + "Delay")/1000L;
-	      String FirstFindPlayer = ItemJoin.getSpecialConfig("FirstJoin.yml").getString(player.getWorld().getName() + "." + player.getName().toString());
-	        ItemJoin.pl.items.clear();
-	        ItemJoin.pl.CacheItems(player);
-	        if (FirstFindPlayer == null) {
-	        Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.pl, new Runnable()
-	        {
-			public void run()
-			{
-		      if (WorldHandler.isWorld(player.getWorld().getName())) {
-	          setJoinItems(player);
-		      }
-	         }
-	      }, delay);
-	    }
-    }
-
-	@EventHandler
-    public void giveOnWorldChanged(PlayerChangedWorldEvent event)
-    {
-	        final Player player = event.getPlayer();
-	        long delay = ItemJoin.getSpecialConfig("config.yml").getInt("Global-Settings" + ".Get-Items." + "Delay")/1000L;
-	        ItemJoin.pl.CacheItems(player);
-	        String FirstFindPlayer = ItemJoin.getSpecialConfig("FirstJoin.yml").getString(player.getWorld().getName() + "." + player.getName().toString());
-	      if (FirstFindPlayer == null) {
-	        Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.pl, new Runnable()
-	        {
-			public void run()
-	         {
-			  if (WorldHandler.isWorld(player.getWorld().getName())) {
-	          setWorldChangedItems(player);
-			  }
-	         }
-	      }, delay);
-	    }
-    }
 
     public static void setFirstJoin(Player player, String world) {
     	Boolean FirstJoinMode = ItemJoin.getSpecialConfig("config.yml").getBoolean("Global-Settings" + ".First-Join." + "FirstJoin-Mode-Enabled");
@@ -82,8 +37,7 @@ public class FirstJoin implements Listener {
       }
    }
 	
-    @SuppressWarnings("deprecation")
-	public static void setJoinItems(Player player)
+    public static void setJoinItems(Player player)
     {
         ConfigurationSection selection = ItemJoin.getSpecialConfig("items.yml").getConfigurationSection(player.getWorld().getName() + ".items");
         final String world = WorldHandler.getWorld(player.getWorld().getName());
@@ -101,10 +55,8 @@ public class FirstJoin implements Listener {
        				  || slot.equalsIgnoreCase("Boots") 
        				  || slot.equalsIgnoreCase("Offhand")) {
        			ArmorySlots(player, items, item);
-       			player.updateInventory();
        		  } else {
        		   InventorySlots(player, items, item);
-       		   player.updateInventory();
        		  }
    	        }
          }

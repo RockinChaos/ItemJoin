@@ -51,7 +51,7 @@ public class Placement implements Listener{
 	      	ConfigurationSection items = selection.getConfigurationSection(item);
 	      	String slot = items.getString(".slot");
 	      	ItemStack toSet = ItemJoin.pl.items.get(player.getWorld().getName() + "." + player.getName().toString() + ".items." + item);
-	      	if (ItemJoin.isInt(slot) && CheckItem.isSimilar(item1, toSet, items, player)) {
+	      	if (toSet != null && ItemJoin.isInt(slot) && CheckItem.isSimilar(item1, toSet, items, player)) {
 	      		int isSlot = items.getInt(".slot");
 	        player.getInventory().setItem(isSlot, toSet);
 	        player.updateInventory();

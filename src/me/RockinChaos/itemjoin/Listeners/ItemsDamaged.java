@@ -19,7 +19,7 @@ public class ItemsDamaged implements Listener {
 	@EventHandler
 	public void onBlockBreak(BlockBreakEvent event){
 	    final Player player = event.getPlayer();
-	    ItemStack item = player.getItemInHand();
+	    ItemStack item = player.getInventory().getItemInMainHand();
 	    String modifier = ".prevent-modifiers";
 	    String frase = "item-damage-blocks";
 	      if (!CheckItem.isAllowedItem(player, item, modifier, frase))
@@ -36,7 +36,7 @@ public class ItemsDamaged implements Listener {
 		 ItemStack item = null;
 		 Player player = null;
 		 if (event.getDamager() instanceof Player) {
-	     item = ((Player) event.getDamager()).getItemInHand();
+	     item = ((Player) event.getDamager()).getInventory().getItemInMainHand();
 	     player = (Player) event.getDamager();
 	     WorldHandler.getWorld(player.getWorld().getName());
 		 } else if (event.getEntity() instanceof Player) {

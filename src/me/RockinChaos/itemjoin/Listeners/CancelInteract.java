@@ -13,7 +13,7 @@ public class CancelInteract implements Listener {
 
 	
 	 @SuppressWarnings("deprecation")
-	@EventHandler
+	 @EventHandler
 	  public void onCancelInteracts(PlayerInteractEvent event) 
 	  {
 	    ItemStack item = event.getItem();
@@ -25,5 +25,5 @@ public class CancelInteract implements Listener {
 	        event.setCancelled(true);
 	        player.updateInventory();
 	 }
-}
+   }
 }

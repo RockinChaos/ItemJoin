@@ -10,14 +10,14 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
 
 public class ChangedWorld implements Listener {
 
-	@EventHandler
-    public void clearOnWorldChanged(PlayerJoinEvent event)
+	@EventHandler(priority=EventPriority.HIGHEST)
+    public void clearOnWorldChanged(PlayerChangedWorldEvent event)
     {
 	        final Player player = event.getPlayer();
 	        final String world = WorldHandler.getWorld(player.getWorld().getName());
@@ -34,30 +34,54 @@ public class ChangedWorld implements Listener {
 	      	}
     }
 
-	@EventHandler
+	@EventHandler(priority=EventPriority.HIGHEST)
     public void giveOnWorldChanged(PlayerChangedWorldEvent event)
     {
 	      final Player player = event.getPlayer();
-	      long delay = ItemJoin.getSpecialConfig("config.yml").getInt("Global-Settings" + ".Get-Items." + "Delay")/1000L;
+	      long delay = ItemJoin.getSpecialConfig("config.yml").getInt("Global-Settings" + ".Get-Items." + "Delay") * 10L;
 	        ItemJoin.pl.CacheItems(player);
 	        Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.pl, new Runnable()
 	        {
+			@SuppressWarnings("deprecation")
 			public void run()
 	         {
 			  if (WorldHandler.isWorld(player.getWorld().getName())) {
-	          setWorldChangedItems(player);
+	           setWorldChangedItems(player);
+      		   player.updateInventory();
 			  }
 	         }
 	      }, delay);
     }
 	
-    @SuppressWarnings("deprecation")
-	public static void setWorldChangedItems(Player player)
+	@EventHandler(priority=EventPriority.HIGHEST)
+    public void giveFirstJoinOnWorldChanged(PlayerChangedWorldEvent event)
     {
-        ConfigurationSection selection = ItemJoin.getSpecialConfig("items.yml").getConfigurationSection(player.getWorld().getName() + ".items");
-        for (String item : selection.getKeys(false)) 
+	        final Player player = event.getPlayer();
+	        long delay = ItemJoin.getSpecialConfig("config.yml").getInt("Global-Settings" + ".Get-Items." + "Delay")/1000L;
+	        ItemJoin.pl.CacheItems(player);
+	        String FirstFindPlayer = ItemJoin.getSpecialConfig("FirstJoin.yml").getString(player.getWorld().getName() + "." + player.getName().toString());
+	      if (FirstFindPlayer == null) {
+	        Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.pl, new Runnable()
+	        {
+			@SuppressWarnings("deprecation")
+			public void run()
+	         {
+			  if (WorldHandler.isWorld(player.getWorld().getName())) {
+	           FirstJoin.setWorldChangedItems(player);
+      		   player.updateInventory();
+			  }
+	         }
+	      }, delay);
+	    }
+    }
+	
+    public static void setWorldChangedItems(Player player)
+    {
+	      ConfigurationSection selection = ItemJoin.getSpecialConfig("items.yml").getConfigurationSection(WorldHandler.getWorld(player.getWorld().getName()) + ".items");
+	      if (selection != null) {
+	      for (String item : selection.getKeys(false)) 
         {
-      	  ConfigurationSection items = selection.getConfigurationSection(item);
+  	      ConfigurationSection items = selection.getConfigurationSection(item);
           String WorldChanged = ((List<?>)items.getStringList(".give-on-modifiers")).toString();
 		   if (WorldChanged.contains("world-changed")) {
           final String slot = items.getString(".slot");
@@ -72,14 +96,13 @@ public class ChangedWorld implements Listener {
            				  || slot.equalsIgnoreCase("Boots") 
            				  || slot.equalsIgnoreCase("Offhand")) {
            			JoinItem.ArmorySlots(player, items, item);
-           			player.updateInventory();
            		  } else {
            		   JoinItem.InventorySlots(player, items, item);
-           		   player.updateInventory();
            		  }
            	  }
              }
 		   }
         }
+	   }
     }
 }

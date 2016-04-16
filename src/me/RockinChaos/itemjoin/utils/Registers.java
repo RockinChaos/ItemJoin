@@ -23,25 +23,25 @@ public class Registers {
 	
 	public static void checkHooks() {
 		  if (ItemJoin.pl.getServer().getPluginManager().getPlugin("PlaceholderAPI") != null && ItemJoin.pl.getConfig().getBoolean("PlaceholderAPI") == true) {
-			  ItemJoin.pl.getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.GREEN + "Hooked into PlaceholderAPI!");
+			  ItemJoin.pl.Console.sendMessage(ItemJoin.pl.Prefix + ChatColor.GREEN + "Hooked into PlaceholderAPI!");
 	    	  ItemJoin.hasPlaceholderAPI = true;
 			 } else if (ItemJoin.pl.getConfig().getBoolean("PlaceholderAPI") == true) {
-		     ItemJoin.pl.getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.RED + "Could not find PlaceholderAPI.");
+		     ItemJoin.pl.Console.sendMessage(ItemJoin.pl.Prefix + ChatColor.RED + "Could not find PlaceholderAPI.");
 			 ItemJoin.hasPlaceholderAPI = false;
 			 }
 		  if (ItemJoin.pl.getServer().getPluginManager().getPlugin("Multiverse-Core") != null && ItemJoin.pl.getConfig().getBoolean("Multiverse-Core") == true) {
-			  ItemJoin.pl.getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.GREEN + "Hooked into Multiverse-Core!");
+			  ItemJoin.pl.Console.sendMessage(ItemJoin.pl.Prefix + ChatColor.GREEN + "Hooked into Multiverse-Core!");
 	    	  ItemJoin.hasMultiverse = true;
 	      } else if (ItemJoin.pl.getConfig().getBoolean("Multiverse-Core") == true) {
-	    	  ItemJoin.pl.getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.RED + "Could not find Multiverse-Core.");
+	    	  ItemJoin.pl.Console.sendMessage(ItemJoin.pl.Prefix + ChatColor.RED + "Could not find Multiverse-Core.");
 	    	  ItemJoin.hasMultiverse = false;
 	      }
 		  if (ItemJoin.pl.getServer().getPluginManager().getPlugin("Multiverse-Inventories") != null && ItemJoin.pl.getConfig().getBoolean("Multiverse-Inventories") == true) {
-			  ItemJoin.pl.getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.GREEN + "Hooked into Multiverse-Inventories!");
+			  ItemJoin.pl.Console.sendMessage(ItemJoin.pl.Prefix + ChatColor.GREEN + "Hooked into Multiverse-Inventories!");
 	    	  ItemJoin.hasInventories = true;
 	      } else if (ItemJoin.pl.getConfig().getBoolean("Multiverse-Inventories") == true) {
 	    	  ItemJoin.hasInventories = false;
-	    	  ItemJoin.pl.getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.RED + "Could not find Multiverse-Inventories.");
+	    	  ItemJoin.pl.Console.sendMessage(ItemJoin.pl.Prefix + ChatColor.RED + "Could not find Multiverse-Inventories.");
 	      }
 		}
 
@@ -55,8 +55,8 @@ public class Registers {
 		        	   cFile.renameTo(newFile);
 		              File configFile = new File(ItemJoin.pl.getDataFolder(), "config.yml");
 		              configFile.delete();
-		             ItemJoin.pl.getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.GREEN + "Your config.yml is out dated!");
-		       	     ItemJoin.pl.getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.GREEN + "New options may be avaliable, Generating a new one!");
+		             ItemJoin.pl.Console.sendMessage(ItemJoin.pl.Prefix + ChatColor.GREEN + "Your config.yml is out dated!");
+		       	     ItemJoin.pl.Console.sendMessage(ItemJoin.pl.Prefix + ChatColor.GREEN + "New options may be avaliable, Generating a new one!");
 		           }
 		        }
 		      }
@@ -82,8 +82,8 @@ public class Registers {
 			        	  itemsFile.renameTo(newFile);
 			              File configFile = new File(ItemJoin.pl.getDataFolder(), "items.yml");
 			              configFile.delete();
-			             ItemJoin.pl.getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.GREEN + "Your items.yml is out dated!");
-			       	     ItemJoin.pl.getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.GREEN + "New options may be avaliable, Generating a new one!");
+			             ItemJoin.pl.Console.sendMessage(ItemJoin.pl.Prefix + ChatColor.GREEN + "Your items.yml is out dated!");
+			       	     ItemJoin.pl.Console.sendMessage(ItemJoin.pl.Prefix + ChatColor.GREEN + "New options may be avaliable, Generating a new one!");
 			           }
 			        }
 			      }
@@ -103,15 +103,15 @@ public class Registers {
 			    	      enLang.renameTo(newFile);
 			              File configFile = new File(ItemJoin.pl.getDataFolder(), "en-lang.yml");
 			              configFile.delete();
-			              ItemJoin.pl.getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.GREEN + "You are using an outdated or bad en-lang!");
-			       	   ItemJoin.pl.getServer().getConsoleSender().sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] " + ChatColor.GREEN + "New options may be avaliable, Generating a new one!");
+			              ItemJoin.pl.Console.sendMessage(ItemJoin.pl.Prefix + ChatColor.GREEN + "You are using an outdated or bad en-lang!");
+			       	   ItemJoin.pl.Console.sendMessage(ItemJoin.pl.Prefix + ChatColor.GREEN + "New options may be avaliable, Generating a new one!");
 			           }
 			        }
 			      }
 				  if (ItemJoin.pl.getConfig().getString("Language").equalsIgnoreCase("English")) {
 					  ItemJoin.loadSpecialConfig("en-lang.yml");
 					  ItemJoin.getSpecialConfig("en-lang.yml").options().copyDefaults(false);
-					  Commands.RegisterEnLang(ItemJoin.pl.getServer().getPlayer("ItemJoin"), "ItemJoin");
+					  Commands.RegisterEnLang(ItemJoin.pl.getServer().getPlayer("ItemJoin"));
 				  }
 		   }
 
@@ -140,15 +140,16 @@ public class Registers {
 			      ItemJoin.pl.getCommand("itemjoin").setExecutor(new Commands());
 				  ItemJoin.pl.getCommand("ij").setExecutor(new Commands());
 				  ItemJoin.pl.getServer().getPluginManager().registerEvents(new JoinItem(),ItemJoin.pl);
+				  ItemJoin.pl.getServer().getPluginManager().registerEvents(new ChangedWorld(),ItemJoin.pl);
+				  ItemJoin.pl.getServer().getPluginManager().registerEvents(new Respawn(),ItemJoin.pl);
 				  ItemJoin.pl.getServer().getPluginManager().registerEvents(new InventoryClick(),ItemJoin.pl);
 				  ItemJoin.pl.getServer().getPluginManager().registerEvents(new Drops(),ItemJoin.pl);
 				  ItemJoin.pl.getServer().getPluginManager().registerEvents(new Pickups(),ItemJoin.pl);
 				  ItemJoin.pl.getServer().getPluginManager().registerEvents(new Placement(),ItemJoin.pl);
-				  ItemJoin.pl.getServer().getPluginManager().registerEvents(new Respawn(),ItemJoin.pl);
-				  ItemJoin.pl.getServer().getPluginManager().registerEvents(new ChangedWorld(),ItemJoin.pl);
 				  ItemJoin.pl.getServer().getPluginManager().registerEvents(new ItemsDamaged(),ItemJoin.pl);
 				  ItemJoin.pl.getServer().getPluginManager().registerEvents(new InteractCmds(),ItemJoin.pl);
 				  ItemJoin.pl.getServer().getPluginManager().registerEvents(new CancelInteract(),ItemJoin.pl);
+				  //ItemJoin.pl.getServer().getPluginManager().registerEvents(new CustomMaps(),ItemJoin.pl);
 			    String version = ItemJoin.pl.getServer().getVersion();
 			    if (version.contains("1.9")) {
 					  ItemJoin.pl.getServer().getPluginManager().registerEvents(new Mainhand(),ItemJoin.pl);
