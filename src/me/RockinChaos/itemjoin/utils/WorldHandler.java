@@ -2,11 +2,15 @@ package me.RockinChaos.itemjoin.utils;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
 import me.RockinChaos.itemjoin.ItemJoin;
 
 public class WorldHandler {
+	
+    public static ConsoleCommandSender Console = ItemJoin.pl.getServer().getConsoleSender();
+    public static String Prefix = ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] ";
 
 	public static boolean isWorld(String world) {	
 		 boolean isWorld = false;
@@ -30,7 +34,7 @@ public class WorldHandler {
 		     for (int i = 0; i < ItemJoin.pl.worlds.size(); i++)
 		     {
 		       String world = (String)ItemJoin.pl.worlds.get(i);
-		       ItemJoin.pl.Console.sendMessage(ItemJoin.pl.Prefix + ChatColor.GREEN + "Cached " + ChatColor.YELLOW + world);
+		       Console.sendMessage(Prefix + ChatColor.GREEN + "Cached " + ChatColor.YELLOW + world);
 		     }
 		}
 		

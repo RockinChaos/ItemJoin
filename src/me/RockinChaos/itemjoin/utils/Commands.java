@@ -39,6 +39,8 @@ public class Commands implements CommandExecutor
     public static String listItems;
     public static String worldIn;
     public static String worldInListed;
+    public static ConsoleCommandSender Console = ItemJoin.pl.getServer().getConsoleSender();
+    public static String CPrefix = ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] ";
 
  // Player Commands //
 	
@@ -114,7 +116,7 @@ public class Commands implements CommandExecutor
   			       String world = (String)PrintWorlds.get(i);
   			       sender.sendMessage(cachedWorlds.replace("%cache_world%", world));
   			     }
-   		        ItemJoin.pl.Console.sendMessage(consoleReloadedConfig.replace("%player_reloaded%", sender.getName()));
+   		        Console.sendMessage(consoleReloadedConfig.replace("%player_reloaded%", sender.getName()));
                 return true;
             } else {
                 sender.sendMessage(noPermission);
@@ -258,7 +260,7 @@ public class Commands implements CommandExecutor
         } else if (args.length == 3 && args[0].equalsIgnoreCase("get")) {
         	Player argsPlayer = Bukkit.getPlayerExact(args[2]);
         	if (argsPlayer == null && sender.hasPermission("itemjoin.get.others") || argsPlayer == null && sender.hasPermission("itemjoin.*")) {
-        		sender.sendMessage(ItemJoin.pl.Prefix + ChatColor.RED + "The player " + ChatColor.AQUA + args[2] + ChatColor.RED + " could not be found!");
+        		sender.sendMessage(CPrefix + ChatColor.RED + "The player " + ChatColor.AQUA + args[2] + ChatColor.RED + " could not be found!");
         		return true;
         	} else if (sender.hasPermission("itemjoin.get.others") || sender.hasPermission("itemjoin.*")) {
         		String world = argsPlayer.getWorld().getName();
@@ -368,18 +370,18 @@ public class Commands implements CommandExecutor
         } else if (args[0].equalsIgnoreCase("updates") || args[0].equalsIgnoreCase("update")) {
         	if (sender.hasPermission("itemjoin.updates") || sender.hasPermission("itemjoin.*")) {
         		UpdateChecker checker = new UpdateChecker(ItemJoin.pl, "http://dev.bukkit.org/server-mods/itemjoin/files.rss");
-  		        ItemJoin.pl.Console.sendMessage(ItemJoin.pl.Prefix + ChatColor.RED + sender.getName() + " has requested to check for updates!");
-  	            sender.sendMessage(ItemJoin.pl.Prefix + ChatColor.GREEN + "Checking for updates...");
+  		        Console.sendMessage(CPrefix + ChatColor.RED + sender.getName() + " has requested to check for updates!");
+  	            sender.sendMessage(CPrefix + ChatColor.GREEN + "Checking for updates...");
                 if (checker.updateNeeded())
                   {
-              	  sender.sendMessage(ItemJoin.pl.Prefix + ChatColor.RED + "Your current version: v" + ChatColor.RED + ItemJoin.pl.getDescription().getVersion());
-              	  sender.sendMessage(ItemJoin.pl.Prefix + ChatColor.RED + "A new version of ItemJoin is available: " + ChatColor.GREEN + "v" +  checker.getVersion() + ChatColor.WHITE);
-              	  sender.sendMessage(ItemJoin.pl.Prefix + ChatColor.GREEN + "Get it from: " + checker.getLink() + ChatColor.WHITE);
-              	  sender.sendMessage(ItemJoin.pl.Prefix + ChatColor.GREEN + "Direct Link: " + checker.getJarLink() + ChatColor.WHITE);
+              	  sender.sendMessage(CPrefix + ChatColor.RED + "Your current version: v" + ChatColor.RED + ItemJoin.pl.getDescription().getVersion());
+              	  sender.sendMessage(CPrefix + ChatColor.RED + "A new version of ItemJoin is available: " + ChatColor.GREEN + "v" +  checker.getVersion() + ChatColor.WHITE);
+              	  sender.sendMessage(CPrefix + ChatColor.GREEN + "Get it from: " + checker.getLink() + ChatColor.WHITE);
+              	  sender.sendMessage(CPrefix + ChatColor.GREEN + "Direct Link: " + checker.getJarLink() + ChatColor.WHITE);
               	return true;
                     }
                 else if(ItemJoin.pl.getConfig().getBoolean("CheckforUpdates") == true) {
-              	  sender.sendMessage(ItemJoin.pl.Prefix + ChatColor.GREEN + "You are up to date!");
+              	  sender.sendMessage(CPrefix + ChatColor.GREEN + "You are up to date!");
               	return true;
                 }
             } else {

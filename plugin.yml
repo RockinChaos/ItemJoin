@@ -1,6 +1,6 @@
 name: ItemJoin
 main: me.RockinChaos.itemjoin.ItemJoin
-version: 2.9
+version: 3.0
 author: RockinChaos
 commands:
    itemjoin:
@@ -35,7 +35,7 @@ commands:
       description: Checks what world you are in. For (debugging).
       usage: |
           /itemjoin world
-   itmjoin list:
+   itemjoin list:
       description: Checks what items you can get each what world.
       usage: |
           /itemjoin list

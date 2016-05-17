@@ -7,6 +7,7 @@ import me.RockinChaos.itemjoin.utils.PermissionsHandler;
 import me.RockinChaos.itemjoin.utils.WorldHandler;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -16,6 +17,8 @@ import org.bukkit.event.player.PlayerChangedWorldEvent;
 
 public class ChangedWorld implements Listener {
 
+    public static String Prefix = ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] ";
+	
 	@EventHandler(priority=EventPriority.HIGHEST)
     public void clearOnWorldChanged(PlayerChangedWorldEvent event)
     {
@@ -47,6 +50,10 @@ public class ChangedWorld implements Listener {
 	         {
 			  if (WorldHandler.isWorld(player.getWorld().getName())) {
 	           setWorldChangedItems(player);
+	            if (JoinItem.failCount != 0) {
+	            	player.sendMessage(Prefix + ChatColor.RED + "Could not give you " + ChatColor.YELLOW + JoinItem.failCount + " items," + ChatColor.RED +  " your inventory is full!");
+	            	JoinItem.failCount = 0;
+	            }
       		   player.updateInventory();
 			  }
 	         }
@@ -59,6 +66,8 @@ public class ChangedWorld implements Listener {
 	        final Player player = event.getPlayer();
 	        long delay = ItemJoin.getSpecialConfig("config.yml").getInt("Global-Settings" + ".Get-Items." + "Delay")/1000L;
 	        ItemJoin.pl.CacheItems(player);
+	        Boolean FirstJoinMode = ItemJoin.getSpecialConfig("config.yml").getBoolean("Global-Settings" + ".First-Join." + "FirstJoin-Mode-Enabled");
+	        if (FirstJoinMode == true) {
 	        String FirstFindPlayer = ItemJoin.getSpecialConfig("FirstJoin.yml").getString(player.getWorld().getName() + "." + player.getName().toString());
 	      if (FirstFindPlayer == null) {
 	        Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.pl, new Runnable()
@@ -73,6 +82,7 @@ public class ChangedWorld implements Listener {
 	         }
 	      }, delay);
 	    }
+	   }
     }
 	
     public static void setWorldChangedItems(Player player)
@@ -91,11 +101,12 @@ public class ChangedWorld implements Listener {
            			  || player.hasPermission("itemjoin." + world + ".*") 
            			  || player.hasPermission("itemjoin.*")) {
            		  if (slot.equalsIgnoreCase("Helmet") 
+           				  || slot.equalsIgnoreCase("Arbitrary")
            				  || slot.equalsIgnoreCase("Chestplate") 
            				  || slot.equalsIgnoreCase("Leggings") 
            				  || slot.equalsIgnoreCase("Boots") 
            				  || slot.equalsIgnoreCase("Offhand")) {
-           			JoinItem.ArmorySlots(player, items, item);
+           			JoinItem.CustomSlots(player, items, item);
            		  } else {
            		   JoinItem.InventorySlots(player, items, item);
            		  }

@@ -9,7 +9,6 @@ import java.util.Random;
 import java.util.logging.Logger;
 
 import me.RockinChaos.itemjoin.utils.CheckItem;
-import me.RockinChaos.itemjoin.utils.RenderImageMaps;
 import me.RockinChaos.itemjoin.utils.Registers;
 import me.RockinChaos.itemjoin.utils.UpdateChecker;
 import me.RockinChaos.itemjoin.utils.WorldHandler;
@@ -28,8 +27,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
-import org.bukkit.map.MapRenderer;
-import org.bukkit.map.MapView;
 import org.bukkit.plugin.java.JavaPlugin;
 
   public class ItemJoin
@@ -191,16 +188,6 @@ import org.bukkit.plugin.java.JavaPlugin;
             		   templist2.add(pageSetup.replace("newline: ", "\n").replace("newpage: ", "").replace("newline:", "\n").replace("newpage:", ""));
             	   }
         	   }
-           }
-           if (items.getString(".custom-map-image") != null && tempmat == Material.MAP)
-           {
-           	 MapView view = ItemJoin.pl.getServer().getMap(tempitem.getDurability());
-        	 String mapUrl = items.getString(".custom-map-image");
-   			   for(MapRenderer r:view.getRenderers()) {
-   			 	 view.removeRenderer(r);
-   			   }
-   			 RenderImageMaps.setImage(mapUrl);
-   	         view.addRenderer(new RenderImageMaps());
            }
            if (items.getString(".skull-owner") != null  && tempmat == Material.SKULL_ITEM)
            {

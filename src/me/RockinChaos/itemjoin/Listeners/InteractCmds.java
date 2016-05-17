@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import me.RockinChaos.itemjoin.ItemJoin;
+import me.RockinChaos.itemjoin.utils.BungeeCord;
 import me.RockinChaos.itemjoin.utils.CheckItem;
 import me.RockinChaos.itemjoin.utils.WorldHandler;
 
@@ -92,6 +93,8 @@ public class InteractCmds implements Listener {
   	       String[] parts4 = Identify.split("player:");
   	       String[] parts5 = Identify.split("message: ");
   	       String[] parts6 = Identify.split("message:");
+  	       String[] parts7 = Identify.split("server: ");
+  	       String[] parts8 = Identify.split("server:");
    	       if (Identify.toLowerCase().contains("console: ")) {
    	    	dispatchConsoleCommands(parts[1], player, item);
    	       } else if (Identify.toLowerCase().contains("player: ")) {
@@ -104,12 +107,18 @@ public class InteractCmds implements Listener {
 	    	   player.sendMessage(ItemJoin.pl.formatPlaceholders(parts5[1], player));
 	       } else if (Identify.toLowerCase().contains("message:")) {
 	    	   player.sendMessage(ItemJoin.pl.formatPlaceholders(parts6[1], player));
+	       } else if (Identify.toLowerCase().contains("server: ")) {
+	    	   BungeeCord.SwitchServers(player, parts7[1]);
+	       } else if (Identify.toLowerCase().contains("server:")) {
+	    	   BungeeCord.SwitchServers(player, parts8[1]);
 	       } else if (!Identify.toLowerCase().contains("player: ") 
 	    		   && !Identify.toLowerCase().contains("console: ") 
 	    		   && !Identify.toLowerCase().contains("player:")
 	    		   && !Identify.toLowerCase().contains("console:")
     		       && !Identify.toLowerCase().contains("message: ")
-    		       && !Identify.toLowerCase().contains("message:")) {
+    		       && !Identify.toLowerCase().contains("message:")
+    		       && !Identify.toLowerCase().contains("server: ")
+    		       && !Identify.toLowerCase().contains("server:")) {
                dispatchPlayerCommands(Identify, player, item);
 		}
 	  }

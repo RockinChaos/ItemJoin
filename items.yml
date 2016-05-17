@@ -178,7 +178,7 @@ world:
       enchantment:
         - 'FIRE_ASPECT:3'
       commands:
-        - 'player: server survival'
+        - 'server: survival'
         - 'message: &eGoing to the server of magical love!'
       prevent-modifiers:
         - 'placement'
@@ -226,7 +226,7 @@ world:
         - '&7All you need is the ID to equal &bMAP'
         - '&7and to have &bcustom-map-image &7pointing to'
         - '&7an image that is &bNO LARGER &7than &b128x128 pixels!'
-      custom-map-image: 'http://i.imgur.com/IIhHrn9.png'
+      custom-map-image: 'defaultItemJoinIMG.png'
     eighth-item:
       id: SKULL_ITEM
       slot: 8

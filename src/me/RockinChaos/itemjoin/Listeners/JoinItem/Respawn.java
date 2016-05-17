@@ -7,6 +7,7 @@ import me.RockinChaos.itemjoin.utils.PermissionsHandler;
 import me.RockinChaos.itemjoin.utils.WorldHandler;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -16,6 +17,8 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 
 public class Respawn implements Listener {
 
+    public static String Prefix = ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] ";
+	
 	@EventHandler(priority=EventPriority.HIGHEST)
     public void giveOnRespawn(PlayerRespawnEvent event)
     {
@@ -29,6 +32,10 @@ public class Respawn implements Listener {
 	         {
 			  if (WorldHandler.isWorld(player.getWorld().getName())) {
 			   setRespawnItems(player);
+	            if (JoinItem.failCount != 0) {
+	            	player.sendMessage(Prefix + ChatColor.RED + "Could not give you " + ChatColor.YELLOW + JoinItem.failCount + " items," + ChatColor.RED +  " your inventory is full!");
+	            	JoinItem.failCount = 0;
+	            }
        		   player.updateInventory();
 		    	}
 	         }
@@ -51,11 +58,12 @@ public class Respawn implements Listener {
            			  || player.hasPermission("itemjoin." + world + ".*") 
            			  || player.hasPermission("itemjoin.*")) {
            		  if (slot.equalsIgnoreCase("Helmet") 
+           				  || slot.equalsIgnoreCase("Arbitrary")
            				  || slot.equalsIgnoreCase("Chestplate") 
            				  || slot.equalsIgnoreCase("Leggings") 
            				  || slot.equalsIgnoreCase("Boots") 
            				  || slot.equalsIgnoreCase("Offhand")) {
-           			JoinItem.ArmorySlots(player, items, item);
+           			JoinItem.CustomSlots(player, items, item);
            		  } else {
            		   JoinItem.InventorySlots(player, items, item);
            		  }
