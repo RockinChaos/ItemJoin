@@ -39,8 +39,11 @@ public class Commands implements CommandExecutor
     public static String listItems;
     public static String worldIn;
     public static String worldInListed;
+    public static String inventoryFull;
+    public static String inventoryFullOthers;
     public static ConsoleCommandSender Console = ItemJoin.pl.getServer().getConsoleSender();
     public static String CPrefix = ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] ";
+    public static boolean failedGive = false;
 
  // Player Commands //
 	
@@ -78,8 +81,8 @@ public class Commands implements CommandExecutor
                 sender.sendMessage(ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + ChatColor.STRIKETHROUGH.toString() + "]--------------" + ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "[" + ChatColor.YELLOW + " ItemJoin " + ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "]" + ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + ChatColor.STRIKETHROUGH.toString() + "--------------[");
                 sender.sendMessage(ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "/ItemJoin Permissions" + ChatColor.GRAY + " - " + ChatColor.YELLOW + "Lists the permissions you have.");
                 sender.sendMessage(ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "/ItemJoin Permissions 2" + ChatColor.GRAY + " - " + ChatColor.YELLOW + "Permissions page 2.");
-                sender.sendMessage(ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "/ItemJoin Get <Slot>" + ChatColor.GRAY + " - " + ChatColor.YELLOW + "Gives that item.");
-                sender.sendMessage(ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "/ItemJoin Get <Slot> <Player>" + ChatColor.GRAY + " - " + ChatColor.YELLOW + "Gives to said player.");
+                sender.sendMessage(ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "/ItemJoin Get <Item>" + ChatColor.GRAY + " - " + ChatColor.YELLOW + "Gives that item.");
+                sender.sendMessage(ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "/ItemJoin Get <Item> <Player>" + ChatColor.GRAY + " - " + ChatColor.YELLOW + "Gives to said player.");
                 sender.sendMessage(ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "/ItemJoin World" + ChatColor.GRAY + " - " + ChatColor.YELLOW + "Check what world you are in. (debugging).");
                 sender.sendMessage(ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "/ItemJoin List" + ChatColor.GRAY + " - " + ChatColor.YELLOW + "Check items you can get each what worlds.");
                 sender.sendMessage(ChatColor.GREEN + "Found a bug? Report it @");
@@ -280,9 +283,16 @@ public class Commands implements CommandExecutor
         			sender.sendMessage(badSlot2.replace("%bad_slot%", slot));
        		    }
         		if (toSet != null && CheckItem.CheckSlot(slot, world, args[1]) && !ItemJoin.isInt(slot)) {
-       		      if (slot.equalsIgnoreCase("Helmet")) {
+         		      if (slot.equalsIgnoreCase("Arbitrary")) {
+    		    	    	if (((Player)sender).getInventory().firstEmpty() == -1) {
+    		    	    		sender.sendMessage(inventoryFull.replace("%given_item%", toSet.getItemMeta().getDisplayName()).replace("%given_player%", argsPlayer.getName()).replace("%received_player%", sender.getName()));
+    		    	    		failedGive = true;
+    		    	    	} else {
+      		    	    	 ((Player)sender).getInventory().addItem(toSet);
+      		    	     }
+         		    } else if (slot.equalsIgnoreCase("Helmet")) {
      		    		Equip.setHelmet(toSet);
-       		      } else if (slot.equalsIgnoreCase("Chestplate")) {
+       		        } else if (slot.equalsIgnoreCase("Chestplate")) {
      		    		Equip.setChestplate(toSet);
      		        } else if (slot.equalsIgnoreCase("Leggings")) {
      		    		Equip.setLeggings(toSet);
@@ -291,17 +301,26 @@ public class Commands implements CommandExecutor
      		        } else if (slot.equalsIgnoreCase("Offhand")) {
      		        	argsPlayer.getInventory().setItemInOffHand(toSet);
      		          }
+         		      if (failedGive != true) {
 	        		sender.sendMessage(givenOthersItem.replace("%given_item%", toSet.getItemMeta().getDisplayName()).replace("%given_player%", argsPlayer.getName()));
 	        		argsPlayer.sendMessage(receivedOthersItem.replace("%received_item%", toSet.getItemMeta().getDisplayName()).replace("%received_player%", sender.getName()));
+         		      }
+         		      failedGive = false;
 	        		argsPlayer.updateInventory();
         		} else if (toSet != null && CheckItem.CheckSlot(slot, world, args[1])) {
         			int Slot = Integer.parseInt(slot);
         			argsPlayer.getInventory().setItem(Slot, toSet);
+        			if (failedGive != true) {
 	        		sender.sendMessage(givenOthersItem.replace("%given_item%", toSet.getItemMeta().getDisplayName()).replace("%given_player%", argsPlayer.getName()));
 	        		argsPlayer.sendMessage(receivedOthersItem.replace("%received_item%", toSet.getItemMeta().getDisplayName()).replace("%received_player%", sender.getName()));
+        			}
 	        		argsPlayer.updateInventory();
+	        		failedGive = false;
         		} else if (toSet == null) {
+        			if (failedGive != true) {
         			sender.sendMessage(itemDoesNotExist.replace("%bad_item%", args[1]));
+        			}
+        			failedGive = false;
         		}
         		return true;
             } else {
@@ -328,9 +347,16 @@ public class Commands implements CommandExecutor
         			sender.sendMessage(badSlot2.replace("%bad_slot%", slot));
        		    }
         		if (toSet != null && CheckItem.CheckSlot(slot, world, args[1]) && !ItemJoin.isInt(slot)) {
-       		      if (slot.equalsIgnoreCase("Helmet")) {
+       		      if (slot.equalsIgnoreCase("Arbitrary")) {
+  		    	    	if (((Player)sender).getInventory().firstEmpty() == -1) {
+  		    	    		sender.sendMessage(inventoryFull.replace("%given_item%", toSet.getItemMeta().getDisplayName()));
+  		    	    		failedGive = true;
+    		    	       } else {
+    		    	    	 ((Player)sender).getInventory().addItem(toSet);
+    		    	     }
+          		    } else if (slot.equalsIgnoreCase("Helmet")) {
      		    		Equip.setHelmet(toSet);
-       		      } else if (slot.equalsIgnoreCase("Chestplate")) {
+       		        } else if (slot.equalsIgnoreCase("Chestplate")) {
      		    		Equip.setChestplate(toSet);
      		        } else if (slot.equalsIgnoreCase("Leggings")) {
      		    		Equip.setLeggings(toSet);
@@ -339,12 +365,18 @@ public class Commands implements CommandExecutor
      		        } else if (slot.equalsIgnoreCase("Offhand")) {
      		        		((HumanEntity) sender).getInventory().setItemInOffHand(toSet);
      		          }
-				  sender.sendMessage(givenItem.replace("%given_item%", toSet.getItemMeta().getDisplayName()));
+       		       if (failedGive != true) {
+				    sender.sendMessage(givenItem.replace("%given_item%", toSet.getItemMeta().getDisplayName()));
+       		       }
+       		      failedGive = false;
 				  ((Player) sender).updateInventory();
         		} else if (toSet != null && CheckItem.CheckSlot(slot, world, args[1])) {
         			int Slot = Integer.parseInt(slot);
         			((Player)sender).getInventory().setItem(Slot, toSet);
+        			if (failedGive != true) {
 					sender.sendMessage(givenItem.replace("%given_item%", toSet.getItemMeta().getDisplayName()));
+        			}
+        			failedGive = false;
 					((Player) sender).updateInventory();
         		} else if (toSet == null) {
         			sender.sendMessage(itemDoesNotExist.replace("%bad_item%", args[1]));
@@ -463,6 +495,12 @@ public class Commands implements CommandExecutor
             }
             if (ItemJoin.getSpecialConfig("en-lang.yml").getString("worldIn") != null) {
             Commands.worldIn = Prefix + ItemJoin.pl.formatPlaceholders(ItemJoin.getSpecialConfig("en-lang.yml").getString("worldIn"), player);
+            }
+            if (ItemJoin.getSpecialConfig("en-lang.yml").getString("inventoryFull") != null) {
+            Commands.inventoryFull = Prefix + ItemJoin.pl.formatPlaceholders(ItemJoin.getSpecialConfig("en-lang.yml").getString("inventoryFull"), player);
+            }
+            if (ItemJoin.getSpecialConfig("en-lang.yml").getString("inventoryFullOthers") != null) {
+            Commands.inventoryFullOthers = Prefix + ItemJoin.pl.formatPlaceholders(ItemJoin.getSpecialConfig("en-lang.yml").getString("inventoryFullOthers"), player);
             }
             if (ItemJoin.getSpecialConfig("en-lang.yml").getString("worldInListed") != null) {
             Commands.worldInListed = Prefix + ItemJoin.pl.formatPlaceholders(ItemJoin.getSpecialConfig("en-lang.yml").getString("worldInListed"), player);

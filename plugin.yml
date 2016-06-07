@@ -1,6 +1,6 @@
 name: ItemJoin
 main: me.RockinChaos.itemjoin.ItemJoin
-version: 3.0
+version: 3.1
 author: RockinChaos
 commands:
    itemjoin:
@@ -27,10 +27,18 @@ commands:
       description: Checks what permissions you have.
       usage: |
           /itemjoin permissions
-   itemjoin get:
+   itemjoin permissions 2:
+      description: Checks what permissions you have.
+      usage: |
+          /itemjoin permissions 2
+   itemjoin get <item>:
       description: Gives you an itemjoin item.
       usage: |
-          /itemjoin get
+          /itemjoin get <item>
+   itemjoin get <item> <player>:
+      description: Gives that player an itemjoin item.
+      usage: |
+          /itemjoin get <item> <player>
    itemjoin world:
       description: Checks what world you are in. For (debugging).
       usage: |
@@ -63,10 +71,18 @@ commands:
       description: Checks what permissions you have.
       usage: |
           /ij permissions
-   ij get:
+   ij permissions 2:
+      description: Checks what permissions you have.
+      usage: |
+          /ij permissions 2
+   ij get <item>:
       description: Gives you an itemjoin item.
       usage: |
-          /ij get
+          /ij get <item>
+   ij get <item> <player>:
+      description: Gives that player an itemjoin item.
+      usage: |
+          /ij get <item> <player>
    ij world:
       description: Checks what world you are in. For (debugging).
       usage: |
@@ -81,7 +97,7 @@ permissions:
       description: Allows use of all commands.
       default: false
    itemjoin.permissions:
-      description: Use of the /itemjoin prermissions commands.
+      description: Use of the /itemjoin permissions commands.
       default: true
    itemjoin.use:
       description: Currently allows use of basic commands.
@@ -93,16 +109,16 @@ permissions:
       description: Use of the /itemjoin update command.
       default: op
    itemjoin.get:
-      description: Use of the /itemjoin get command.
+      description: Use of the /itemjoin get <item> command.
       default: op
    itemjoin.get.others:
-      description: Use of the /itemjoin get for player command.
+      description: Use of the /itemjoin get <item> <others> for player command.
       default: op
    itemjoin.list:
-      description: Use of the /itemjoin get for player command.
+      description: Use of the /itemjoin list command.
       default: op
    itemjoin.WorldName.Name:
-      description: Replace Name with the name of the specified item and WorldName with name of world to recieve that item.
+      description: Replace Name with the name of the specified item and WorldName with name of world to receive that item.
       default: false
    itemjoin.WorldName.*:
       description: Gives permission to get all items from specified world.

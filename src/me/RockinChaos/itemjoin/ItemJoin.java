@@ -10,12 +10,17 @@ import java.util.logging.Logger;
 
 import me.RockinChaos.itemjoin.utils.CheckItem;
 import me.RockinChaos.itemjoin.utils.Registers;
+import me.RockinChaos.itemjoin.utils.RenderImageMaps;
 import me.RockinChaos.itemjoin.utils.UpdateChecker;
 import me.RockinChaos.itemjoin.utils.WorldHandler;
 import me.clip.placeholderapi.PlaceholderAPI;
 
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.ChatColor;
+import org.bukkit.Color;
+import org.bukkit.DyeColor;
+import org.bukkit.FireworkEffect;
+import org.bukkit.FireworkEffect.Type;
 import org.bukkit.Material;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.ConfigurationSection;
@@ -23,10 +28,15 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
+import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.map.MapRenderer;
+import org.bukkit.map.MapView;
 import org.bukkit.plugin.java.JavaPlugin;
 
   public class ItemJoin
@@ -127,11 +137,19 @@ import org.bukkit.plugin.java.JavaPlugin;
 	      } else if (CheckItem.CheckMaterial(tempmat, world, item) && CheckItem.CheckSlot(slot, world, item)) 
           {
            ItemStack tempitem = new ItemStack(tempmat, items.getInt(".count", 1),(short)dataValue);
-           BookMeta bookmeta = null;
+           ItemMeta tempmeta = null;
            if (tempmat == Material.WRITTEN_BOOK) {
-        	   bookmeta = (BookMeta) tempitem.getItemMeta();
+        	   tempmeta = (BookMeta) tempitem.getItemMeta();
+           } else if (tempmat == Material.FIREWORK){
+        	   tempmeta = (FireworkMeta) tempitem.getItemMeta();
+           } else if (tempmat == Material.LEATHER_HELMET
+					|| tempmat == Material.LEATHER_CHESTPLATE
+					|| tempmat == Material.LEATHER_LEGGINGS
+					|| tempmat == Material.LEATHER_BOOTS) {
+        		   tempmeta = (LeatherArmorMeta) tempitem.getItemMeta();
+           } else {
+        	   tempmeta = tempitem.getItemMeta();
            }
-           ItemMeta tempmeta = tempitem.getItemMeta();
            if (items.getStringList(".lore") != null)
            {
              List<String> templist = items.getStringList(".lore");
@@ -143,29 +161,62 @@ import org.bukkit.plugin.java.JavaPlugin;
                templist2.add(name);
              }
              tempmeta.setLore(templist2);
-             if (tempmat == Material.WRITTEN_BOOK) {
-             bookmeta.setLore(templist2);
-             }
            }
+			String Modifiers = ((List<?>)items.getStringList("." + "prevent-modifiers")).toString();
+			if (Modifiers.contains("attributes") || Modifiers.contains("Attributes")) {
+		        tempmeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+			}
+			if (tempmat == Material.LEATHER_HELMET
+					|| tempmat == Material.LEATHER_CHESTPLATE
+					|| tempmat == Material.LEATHER_LEGGINGS
+					|| tempmat == Material.LEATHER_BOOTS){
+				String leathercolor = items.getString(".leather-color").toUpperCase();
+				((LeatherArmorMeta) tempmeta).setColor(DyeColor.valueOf(leathercolor).getFireworkColor());
+             }
+	        if (items.getString(".firework.type") != null && tempmat == Material.FIREWORK)
+	         {
+	        	String stringType = items.getString(".firework.type").toUpperCase();
+	        	boolean flicker = items.getBoolean(".firework.flicker");
+	        	boolean trail = items.getBoolean(".firework.trail");
+	        	int power = items.getInt(".firework.distance");
+	            Type buildType = Type.valueOf(stringType);
+	            List<String> tempcolorslist = items.getStringList(".firework.colors");
+	            List<Color> clist = new ArrayList<Color>();
+	             for (int k = 0; k < tempcolorslist.size(); k++)
+	             {
+	               String color = tempcolorslist.get(k).toUpperCase();
+	               clist.add(DyeColor.valueOf(color).getFireworkColor());
+	             }
+                FireworkEffect effect = FireworkEffect.builder().trail(trail).flicker(flicker).withColor(clist).withFade(clist).with(buildType).build();
+                ((FireworkMeta) tempmeta).clearEffects();
+                ((FireworkMeta) tempmeta).addEffect(effect);
+                ((FireworkMeta) tempmeta).setPower(power);
+	         }
            if (items.getString(".name") != null)
            {
              String name = items.getString(".name");
              name = formatPlaceholders(name, player);
              tempmeta.setDisplayName(name + encodeItemData(secretMsg));
-             if (tempmat == Material.WRITTEN_BOOK) {
-             bookmeta.setDisplayName(name + encodeItemData(secretMsg));
-             }
            } else {
         	   String lookup = getName(tempitem);
         	   String name = formatPlaceholders("&f" + lookup + encodeItemData(secretMsg), player);
         	   tempmeta.setDisplayName(name);
-        	   if (tempmat == Material.WRITTEN_BOOK) {
-               bookmeta.setDisplayName(name);
-        	   }
            }
+           if (items.getString(".custom-map-image") != null && tempmat == Material.MAP)
+           {
+            MapView view = ItemJoin.pl.getServer().getMap(tempitem.getDurability());
+        	  String mapIMG = items.getString(".custom-map-image");
+   			   for(MapRenderer r:view.getRenderers()) {
+   			 	 view.removeRenderer(r);
+   			   }
+   			if (mapIMG.equalsIgnoreCase("default.png") || new File(getDataFolder(), mapIMG).exists()) {
+   			 RenderImageMaps.setImage(mapIMG);
+   	         view.addRenderer(new RenderImageMaps());
+            }
+		   }
            if (items.getString(".author") != null && tempmat == Material.WRITTEN_BOOK)
            {
-        	   bookmeta.setAuthor(formatPlaceholders(items.getString(".author"), player));
+        	   ((BookMeta) tempmeta).setAuthor(formatPlaceholders(items.getString(".author"), player));
            }
            if (items.getString(".pages") != null && tempmat == Material.WRITTEN_BOOK)
            {
@@ -177,10 +228,10 @@ import org.bukkit.plugin.java.JavaPlugin;
             	   String pageSetup = (String)templist.get(k);
             	   if (pageSetup.contains("newpage: ") || pageSetup.contains("newline: ") || pageSetup.contains("newpage:") || pageSetup.contains("newline:") || pageSetup.contains(":endthebook:")) {
             		   if (pageSetup.contains("newpage: ") && !templist2.contains("cleanSlate") || pageSetup.contains("newpage:") && !templist2.contains("cleanSlate")) {
-                    	   bookmeta.addPage(formatPlaceholders(templist2.toString().replace("[", "").replace("]", "").replaceAll(", ", " "), player));
+            			   ((BookMeta) tempmeta).addPage(formatPlaceholders(templist2.toString().replace("[", "").replace("]", "").replaceAll(", ", " "), player));
                     	   templist2.clear();
             		   } else if (pageSetup.contains(":endthebook:")) {
-                    	   bookmeta.addPage(formatPlaceholders(templist2.toString().replace("[", "").replace("]", "").replaceAll(", ", " "), player));
+            			   ((BookMeta) tempmeta).addPage(formatPlaceholders(templist2.toString().replace("[", "").replace("]", "").replaceAll(", ", " "), player));
                     	   templist2.clear();
             		   } else if (templist2.contains("cleanSlate")) {
             			   templist2.clear();
@@ -196,9 +247,6 @@ import org.bukkit.plugin.java.JavaPlugin;
               ((SkullMeta) tempmeta).setOwner(owner);
            }
            tempitem.setItemMeta(tempmeta);
-           if (tempmat == Material.WRITTEN_BOOK) {
-           tempitem.setItemMeta(bookmeta);
-           }
            if (items.getString(".enchantment") != null)
            {
         	   List<String> enchantments = items.getStringList(".enchantment");

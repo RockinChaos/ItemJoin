@@ -24,11 +24,18 @@ world:
         - '&7This is a pretty junk sword'
         - '&7You will probably want to get'
         - '&7A &bDiamond &7one'
+        - '&7'
+        - '&7This sword does not have'
+        - '&7the +4 damage attribute!'
+        - '&7Just add attributes to prevent-modifiers'
+        - '&7to replicate this.'
       commands:
         - 'message: &7[&cCommand&7] &aHow is your day?'
       commands-action: RIGHT_CLICK_AIR, RIGHT_CLICK_BLOCK
       commands-cooldown: 5
       cooldown-message: '&7[&eItemJoin&7] &a[%item%&a] &cis on cooldown for &a%timeleft% &cseconds..'
+      prevent-modifiers:
+        - 'attributes'
       permission-node: 'itemjoin.custom-permission.firstitem'
     second-item:
       id: 271 #// Now supports item ID's! //#
@@ -226,8 +233,43 @@ world:
         - '&7All you need is the ID to equal &bMAP'
         - '&7and to have &bcustom-map-image &7pointing to'
         - '&7an image that is &bNO LARGER &7than &b128x128 pixels!'
-      custom-map-image: 'defaultItemJoinIMG.png'
+      custom-map-image: 'default.png'
     eighth-item:
+      id: FIREWORK
+      slot: 7
+      name: '&bWWhhheeeee!'
+      lore:
+        - '&7This is a custom &bFirework&7!'
+        - '&7'
+        - '&7All you need is the ID to equal &bFIREWORK'
+        - '&7As well as the type has to equal a bukkit type,'
+        - '&7such as Ball, Creepr, Star, etc.'
+        - '&7'
+        - '&7You can set any amount of colors you want!'
+        - '&7It must be a DyeColor.'
+        - '&7'
+        - '&7The power is how far the firework travels into'
+        - '&7the air. It is recommended no higher than 2,'
+        - '&7but it can go higher!'
+        - '&7'
+        - '&7Lastly, you can set the flicker,'
+        - '&7If the firework particles sparkle or not.'
+        - '&7As well as if the firework leaves a pretty'
+        - '&7trail in the sky!'
+      firework:
+        type: CREEPER
+        flicker: true
+        trail: true
+        power: 1
+        colors:
+          - 'GRAY'
+          - 'WHITE'
+          - 'PURPLE'
+          - 'SILVER'
+          - 'GREEN'
+      prevent-modifiers:
+        - 'attributes'
+    ninth-item:
       id: SKULL_ITEM
       slot: 8
       name: '&a%player%'
@@ -242,19 +284,24 @@ world:
         - '&7See the documentations page for'
         - '&7a full list of the variables!'
     helmet-item:
-      id: DIAMOND_HELMET
-      slot: Helmet #// Sets to helmet slot. //#
+      id: LEATHER_HELMET
+      leather-color: PURPLE
+      slot: Helmet
       name: '&5ItemJoins Legendary Helmet!'
       lore:
         - '&7'
         - '&7This is an &bHelmet &7slot!'
         - '&7To set an item as an helmet,'
         - '&7set the Slot to &bHelmet.'
+        - '&7'
+        - '&7You can add the leather-color option'
+        - '&7to change the leather armors (dye color).'
       enchantment:
         - 'PROTECTION_ENVIRONMENTAL:3'
         - 'PROTECTION_EXPLOSIONS:2'
     chestplate-item:
-      id: 311
+      id: 299
+      leather-color: BLUE
       slot: Chestplate
       name: '&5ItemJoins Legendary Chestplate!'
       lore:
@@ -262,11 +309,15 @@ world:
         - '&7This is an &bChesplate &7slot!'
         - '&7To set an item as an chestplate,'
         - '&7set the Slot to &bChestplate.'
+        - '&7'
+        - '&7You can add the leather-color option'
+        - '&7to change the leather armors (dye color).'
       enchantment:
         - 'PROTECTION_ENVIRONMENTAL:3'
         - 'PROTECTION_EXPLOSIONS:2'
     leggings-item:
-      id: DIAMOND_LEGGINGS
+      id: LEATHER_LEGGINGS
+      leather-color: BLUE
       slot: Leggings
       name: '&5ItemJoins Legendary Leggings!'
       lore:
@@ -274,11 +325,15 @@ world:
         - '&7This is an &bLeggings &7slot!'
         - '&7To set an item as an leggings,'
         - '&7set the Slot to &bLeggings.'
+        - '&7'
+        - '&7You can add the leather-color option'
+        - '&7to change the leather armors (dye color).'
       enchantment:
         - 'PROTECTION_ENVIRONMENTAL:3'
         - 'PROTECTION_EXPLOSIONS:2'
     boots-item:
-      id: DIAMOND_BOOTS
+      id: LEATHER_BOOTS
+      leather-color: PURPLE
       slot: Boots
       name: '&5ItemJoins Legendary Boots!'
       lore:
@@ -286,6 +341,9 @@ world:
         - '&7This is an &bBoots &7slot!'
         - '&7To set an item as an boots,'
         - '&7set the Slot to &bBoots.'
+        - '&7'
+        - '&7You can add the leather-color option'
+        - '&7to change the leather armors (dye color).'
       enchantment:
         - 'PROTECTION_ENVIRONMENTAL:3'
         - 'PROTECTION_EXPLOSIONS:2'
