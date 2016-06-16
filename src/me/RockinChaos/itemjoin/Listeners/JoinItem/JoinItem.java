@@ -1,9 +1,14 @@
 package me.RockinChaos.itemjoin.Listeners.JoinItem;
 
+import java.util.List;
+
 import me.RockinChaos.itemjoin.ItemJoin;
+import me.RockinChaos.itemjoin.CacheItems.CacheItems;
+import me.RockinChaos.itemjoin.handlers.PermissionsHandler;
+import me.RockinChaos.itemjoin.handlers.PlayerHandlers;
+import me.RockinChaos.itemjoin.handlers.WorldHandler;
 import me.RockinChaos.itemjoin.utils.CheckItem;
-import me.RockinChaos.itemjoin.utils.PermissionsHandler;
-import me.RockinChaos.itemjoin.utils.WorldHandler;
+import me.RockinChaos.itemjoin.utils.Registers;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -26,8 +31,8 @@ public class JoinItem implements Listener {
     {
 	        final Player player = event.getPlayer();
 	        final String world = WorldHandler.getWorld(player.getWorld().getName());
-	      	if(ItemJoin.getSpecialConfig("config.yml").getBoolean("Global-Settings" + ".Clear-On." + "clear-on-join") == true && (WorldHandler.isWorld(world))){
-	    		if(ItemJoin.getSpecialConfig("config.yml").getBoolean("Global-Settings" + ".Clear-On." + "AllowOPBypass") == true && player.isOp()) {
+	      	if(ItemJoin.getSpecialConfig("items.yml").getBoolean("Global-Settings" + ".Clear-On." + "clear-on-join") == true && (WorldHandler.isWorld(world))){
+	    		if(ItemJoin.getSpecialConfig("items.yml").getBoolean("Global-Settings" + ".Clear-On." + "AllowOPBypass") == true && player.isOp()) {
 	        		}
 	                else {
 	                    player.getInventory().clear();
@@ -43,12 +48,11 @@ public class JoinItem implements Listener {
     public void giveOnJoin(PlayerJoinEvent event)
     {
 	      final Player player = event.getPlayer();
-	      long delay = ItemJoin.getSpecialConfig("config.yml").getInt("Global-Settings" + ".Get-Items." + "Delay") * 10L;
+	      long delay = ItemJoin.getSpecialConfig("items.yml").getInt("Global-Settings" + ".Get-Items." + "Delay") * 10L;
 	        ItemJoin.pl.items.remove(player.getWorld().getName() + "." + player.getName().toString() + ".items.");
-	        ItemJoin.pl.CacheItems(player);
+	        CacheItems.run(player);
 	        Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.pl, new Runnable()
 	        {
-			@SuppressWarnings("deprecation")
 			public void run()
 	         {
 			  if (WorldHandler.isWorld(player.getWorld().getName())) {
@@ -57,7 +61,7 @@ public class JoinItem implements Listener {
 	            	player.sendMessage(Prefix + ChatColor.RED + "Could not give you " + ChatColor.YELLOW + failCount + " items," + ChatColor.RED +  " your inventory is full!");
 	            	failCount = 0;
 	            }
-      		    player.updateInventory();
+	            PlayerHandlers.updateInventory(player);
 				}
 	         }
 	      }, delay);
@@ -67,16 +71,15 @@ public class JoinItem implements Listener {
     public void giveOnFirstJoin(PlayerJoinEvent event)
     {
 	      final Player player = event.getPlayer();
-	      long delay = ItemJoin.getSpecialConfig("config.yml").getInt("Global-Settings" + ".Get-Items." + "Delay") * 10L;
-	      Boolean FirstJoinMode = ItemJoin.getSpecialConfig("config.yml").getBoolean("Global-Settings" + ".First-Join." + "FirstJoin-Mode-Enabled");
+	      long delay = ItemJoin.getSpecialConfig("items.yml").getInt("Global-Settings" + ".Get-Items." + "Delay") * 10L;
+	      Boolean FirstJoinMode = ItemJoin.getSpecialConfig("items.yml").getBoolean("Global-Settings" + ".First-Join." + "FirstJoin-Mode-Enabled");
 	      if(FirstJoinMode == true) {
 		    String FirstFindPlayer = ItemJoin.getSpecialConfig("FirstJoin.yml").getString(player.getWorld().getName() + "." + player.getName().toString());
 	        if (FirstFindPlayer == null) {
 	        	ItemJoin.pl.items.remove(player.getWorld().getName() + "." + player.getName().toString() + ".items.");
-		        ItemJoin.pl.CacheItems(player);
+	        	CacheItems.run(player);
 	        Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.pl, new Runnable()
 	        {
-			@SuppressWarnings("deprecation")
 			public void run()
 			{
 		      if (WorldHandler.isWorld(player.getWorld().getName())) {
@@ -85,7 +88,7 @@ public class JoinItem implements Listener {
 	            	player.sendMessage(Prefix + ChatColor.RED + "Could not give you " + ChatColor.YELLOW + FirstJoin.failCount + " items," + ChatColor.RED +  " your inventory is full!");
 	            	FirstJoin.failCount = 0;
 	            }
-      		    player.updateInventory();
+	            PlayerHandlers.updateInventory(player);
 		      }
 	         }
 	      }, delay);
@@ -126,16 +129,16 @@ public class JoinItem implements Listener {
     {
           final int slot = items.getInt(".slot");
     	  ItemStack[] inventory = player.getInventory().getContents();
-    	  Boolean FirstJoin = items.getBoolean(".First-Join-Item");
-          Boolean FirstJoinMode = ItemJoin.getSpecialConfig("config.yml").getBoolean("Global-Settings" + ".First-Join." + "FirstJoin-Mode-Enabled");
+          String WorldChanged = ((List<?>)items.getStringList(".itemflags")).toString();
+          Boolean FirstJoinMode = ItemJoin.getSpecialConfig("items.yml").getBoolean("Global-Settings" + ".First-Join." + "FirstJoin-Mode-Enabled");
     	  ItemStack toSet = ItemJoin.pl.items.get(player.getWorld().getName() + "." + player.getName().toString() + ".items." + item);
     	  if (toSet != null) {
    		      if (slot >= 0 && slot <= 35 && inventory[slot] != null && !CheckItem.isSimilar(inventory[slot], toSet, items, player)) {
-   		    	if (FirstJoinMode != true || FirstJoin != true) {
+   		    	if (FirstJoinMode != true || !WorldChanged.contains("first-join")) {
    		         player.getInventory().setItem(slot, toSet);
    		    	 }
    		        } else if (slot >= 0 && slot <= 35 && inventory[slot] == null && !CheckItem.ContainsItems(player, toSet, items)) {
-   		        	if (FirstJoinMode != true || FirstJoin != true) {
+   		        	if (FirstJoinMode != true || !WorldChanged.contains("first-join")) {
 				     player.getInventory().setItem(slot, toSet);
    		          }
    		        }
@@ -145,15 +148,15 @@ public class JoinItem implements Listener {
     public static void CustomSlots(Player player, ConfigurationSection items, String item)
     {
           final String slot = items.getString(".slot");
-          Boolean FirstJoin = items.getBoolean(".First-Join-Item");
-          Boolean FirstJoinMode = ItemJoin.getSpecialConfig("config.yml").getBoolean("Global-Settings" + ".First-Join." + "FirstJoin-Mode-Enabled");
+          String WorldChanged = ((List<?>)items.getStringList(".itemflags")).toString();
+          Boolean FirstJoinMode = ItemJoin.getSpecialConfig("items.yml").getBoolean("Global-Settings" + ".First-Join." + "FirstJoin-Mode-Enabled");
           EntityEquipment Equip = player.getEquipment();
     	  ItemStack toSet = ItemJoin.pl.items.get(player.getWorld().getName() + "." + player.getName().toString() + ".items." + item);
     	  if (toSet != null) {
    		      if (slot.equalsIgnoreCase("Arbitrary")) {
    		    	   if (!CheckItem.ContainsItems(player, toSet, items)) {
    		    	    if (FirstJoinMode != true 
-   		    			|| FirstJoin != true) {
+   		    			|| !WorldChanged.contains("first-join")) {
    		    	    	if (player.getInventory().firstEmpty() == -1) {
    		    	    		failCount = failCount + 1;
    		    	       } else {
@@ -166,13 +169,13 @@ public class JoinItem implements Listener {
    		    		  && Equip.getHelmet() != null 
    		    		  && !CheckItem.isSimilar(Equip.getHelmet(), toSet, items, player)) {
    		    	if (FirstJoinMode != true 
-   		    			|| FirstJoin != true) {
+   		    			|| !WorldChanged.contains("first-join")) {
    		    		Equip.setHelmet(toSet);
    		    	 }
    		        } else if (slot.equalsIgnoreCase("Helmet") 
    		        		&& Equip.getHelmet() == null && !CheckItem.ContainsItems(player, toSet, items)) {
    		        	if (FirstJoinMode != true 
-   		        			|| FirstJoin != true) {
+   		        			|| !WorldChanged.contains("first-join")) {
    		        		Equip.setHelmet(toSet);
    		          }
    		        }
@@ -180,13 +183,13 @@ public class JoinItem implements Listener {
    		    		  && Equip.getChestplate() != null 
    		    		  && !CheckItem.isSimilar(Equip.getChestplate(), toSet, items, player)) {
    		    	if (FirstJoinMode != true 
-   		    			|| FirstJoin != true) {
+   		    			|| !WorldChanged.contains("first-join")) {
    		    		Equip.setChestplate(toSet);
    		    	 }
    		        } else if (slot.equalsIgnoreCase("Chestplate") 
    		        		&& Equip.getChestplate() == null && !CheckItem.ContainsItems(player, toSet, items)) {
    		        	if (FirstJoinMode != true 
-   		        			|| FirstJoin != true) {
+   		        			|| !WorldChanged.contains("first-join")) {
    		        		Equip.setChestplate(toSet);
    		          }
    		        }
@@ -194,13 +197,13 @@ public class JoinItem implements Listener {
    		    		  && Equip.getLeggings() != null 
    		    		  && !CheckItem.isSimilar(Equip.getLeggings(), toSet, items, player)) {
    		    	if (FirstJoinMode != true 
-   		    			|| FirstJoin != true) {
+   		    			|| !WorldChanged.contains("first-join")) {
    		    		Equip.setLeggings(toSet);
    		    	 }
    		        } else if (slot.equalsIgnoreCase("Leggings")
    		        		&& Equip.getLeggings() == null && !CheckItem.ContainsItems(player, toSet, items)) {
    		        	if (FirstJoinMode != true 
-   		        			|| FirstJoin != true) {
+   		        			|| !WorldChanged.contains("first-join")) {
    		        		Equip.setLeggings(toSet);
    		          }
    		        }
@@ -208,28 +211,27 @@ public class JoinItem implements Listener {
    		    		  && Equip.getBoots() != null 
    		    		  && !CheckItem.isSimilar(Equip.getBoots(), toSet, items, player)) {
    		    	if (FirstJoinMode != true 
-   		    			|| FirstJoin != true) {
+   		    			|| !WorldChanged.contains("first-join")) {
    		    		Equip.setBoots(toSet);
    		    	 }
    		        } else if (slot.equalsIgnoreCase("Boots") 
    		        		&& Equip.getBoots() == null && !CheckItem.ContainsItems(player, toSet, items)) {
    		        	if (FirstJoinMode != true 
-   		        			|| FirstJoin != true) {
+   		        			|| !WorldChanged.contains("first-join")) {
    		        		Equip.setBoots(toSet);
    		          }
    		        }			    
-   		      String version = ItemJoin.pl.getServer().getVersion();
-   		      if (version.contains("1.9") && slot.equalsIgnoreCase("Offhand") 
+   		      if (Registers.hasCombatUpdate() && slot.equalsIgnoreCase("Offhand") 
    		    		  && player.getInventory().getItemInOffHand() != null 
    		    		  && !CheckItem.isSimilar(player.getInventory().getItemInOffHand(), toSet, items, player)) {
    		    	if (FirstJoinMode != true 
-   		    			|| FirstJoin != true) {
+   		    			|| !WorldChanged.contains("first-join")) {
    		    		player.getInventory().setItemInOffHand(toSet);
    		    	 }
-   		        } else if (version.contains("1.9") && slot.equalsIgnoreCase("Offhand") 
+   		        } else if (Registers.hasCombatUpdate() && slot.equalsIgnoreCase("Offhand") 
    		        		&& player.getInventory().getItemInOffHand() == null && !CheckItem.ContainsItems(player, toSet, items)) {
    		        	if (FirstJoinMode != true 
-   		        			|| FirstJoin != true) {
+   		        			|| !WorldChanged.contains("first-join")) {
    		        		player.getInventory().setItemInOffHand(toSet);
    		          }
    		        }

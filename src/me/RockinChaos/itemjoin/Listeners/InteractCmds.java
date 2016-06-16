@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.Map;
 
 import me.RockinChaos.itemjoin.ItemJoin;
+import me.RockinChaos.itemjoin.handlers.WorldHandler;
 import me.RockinChaos.itemjoin.utils.BungeeCord;
 import me.RockinChaos.itemjoin.utils.CheckItem;
-import me.RockinChaos.itemjoin.utils.WorldHandler;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;

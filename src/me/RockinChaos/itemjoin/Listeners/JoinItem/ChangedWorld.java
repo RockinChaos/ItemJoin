@@ -3,8 +3,10 @@ package me.RockinChaos.itemjoin.Listeners.JoinItem;
 import java.util.List;
 
 import me.RockinChaos.itemjoin.ItemJoin;
-import me.RockinChaos.itemjoin.utils.PermissionsHandler;
-import me.RockinChaos.itemjoin.utils.WorldHandler;
+import me.RockinChaos.itemjoin.CacheItems.CacheItems;
+import me.RockinChaos.itemjoin.handlers.PermissionsHandler;
+import me.RockinChaos.itemjoin.handlers.PlayerHandlers;
+import me.RockinChaos.itemjoin.handlers.WorldHandler;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -24,8 +26,8 @@ public class ChangedWorld implements Listener {
     {
 	        final Player player = event.getPlayer();
 	        final String world = WorldHandler.getWorld(player.getWorld().getName());
-	      	if(ItemJoin.getSpecialConfig("config.yml").getBoolean("Global-Settings" + ".Clear-On." + "clear-on-world-change") == true && (WorldHandler.isWorld(world))){
-	    		if(ItemJoin.getSpecialConfig("config.yml").getBoolean("Global-Settings" + ".Clear-On." + "AllowOPBypass") == true && player.isOp()) {
+	      	if(ItemJoin.getSpecialConfig("items.yml").getBoolean("Global-Settings" + ".Clear-On." + "clear-on-world-change") == true && (WorldHandler.isWorld(world))){
+	    		if(ItemJoin.getSpecialConfig("items.yml").getBoolean("Global-Settings" + ".Clear-On." + "AllowOPBypass") == true && player.isOp()) {
 	        		}
 	                else {
 	                    player.getInventory().clear();
@@ -41,11 +43,10 @@ public class ChangedWorld implements Listener {
     public void giveOnWorldChanged(PlayerChangedWorldEvent event)
     {
 	      final Player player = event.getPlayer();
-	      long delay = ItemJoin.getSpecialConfig("config.yml").getInt("Global-Settings" + ".Get-Items." + "Delay") * 10L;
-	        ItemJoin.pl.CacheItems(player);
+	      long delay = ItemJoin.getSpecialConfig("items.yml").getInt("Global-Settings" + ".Get-Items." + "Delay") * 10L;
+	        CacheItems.run(player);
 	        Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.pl, new Runnable()
 	        {
-			@SuppressWarnings("deprecation")
 			public void run()
 	         {
 			  if (WorldHandler.isWorld(player.getWorld().getName())) {
@@ -54,7 +55,7 @@ public class ChangedWorld implements Listener {
 	            	player.sendMessage(Prefix + ChatColor.RED + "Could not give you " + ChatColor.YELLOW + JoinItem.failCount + " items," + ChatColor.RED +  " your inventory is full!");
 	            	JoinItem.failCount = 0;
 	            }
-      		   player.updateInventory();
+	            PlayerHandlers.updateInventory(player);
 			  }
 	         }
 	      }, delay);
@@ -64,20 +65,19 @@ public class ChangedWorld implements Listener {
     public void giveFirstJoinOnWorldChanged(PlayerChangedWorldEvent event)
     {
 	        final Player player = event.getPlayer();
-	        long delay = ItemJoin.getSpecialConfig("config.yml").getInt("Global-Settings" + ".Get-Items." + "Delay")/1000L;
-	        ItemJoin.pl.CacheItems(player);
-	        Boolean FirstJoinMode = ItemJoin.getSpecialConfig("config.yml").getBoolean("Global-Settings" + ".First-Join." + "FirstJoin-Mode-Enabled");
+	        long delay = ItemJoin.getSpecialConfig("items.yml").getInt("Global-Settings" + ".Get-Items." + "Delay")/1000L;
+	        CacheItems.run(player);
+	        Boolean FirstJoinMode = ItemJoin.getSpecialConfig("items.yml").getBoolean("Global-Settings" + ".First-Join." + "FirstJoin-Mode-Enabled");
 	        if (FirstJoinMode == true) {
 	        String FirstFindPlayer = ItemJoin.getSpecialConfig("FirstJoin.yml").getString(player.getWorld().getName() + "." + player.getName().toString());
 	      if (FirstFindPlayer == null) {
 	        Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.pl, new Runnable()
 	        {
-			@SuppressWarnings("deprecation")
 			public void run()
 	         {
 			  if (WorldHandler.isWorld(player.getWorld().getName())) {
 	           FirstJoin.setWorldChangedItems(player);
-      		   player.updateInventory();
+	           PlayerHandlers.updateInventory(player);
 			  }
 	         }
 	      }, delay);
@@ -92,7 +92,7 @@ public class ChangedWorld implements Listener {
 	      for (String item : selection.getKeys(false)) 
         {
   	      ConfigurationSection items = selection.getConfigurationSection(item);
-          String WorldChanged = ((List<?>)items.getStringList(".give-on-modifiers")).toString();
+          String WorldChanged = ((List<?>)items.getStringList(".itemflags")).toString();
 		   if (WorldChanged.contains("world-changed")) {
           final String slot = items.getString(".slot");
           final String world = WorldHandler.getWorld(player.getWorld().getName());

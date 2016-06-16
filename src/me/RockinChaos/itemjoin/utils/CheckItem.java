@@ -3,6 +3,7 @@ package me.RockinChaos.itemjoin.utils;
 import java.util.List;
 
 import me.RockinChaos.itemjoin.ItemJoin;
+import me.RockinChaos.itemjoin.handlers.WorldHandler;
 
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -86,6 +87,7 @@ public class CheckItem {
 		  }
    return isSimilar;	   
 }
+
 	   
 	   public static boolean isSimilar(ItemStack item1, ItemStack item2, ConfigurationSection items, Player player) {
 		   boolean isSimilar = false;

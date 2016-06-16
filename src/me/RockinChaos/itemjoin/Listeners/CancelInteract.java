@@ -1,5 +1,6 @@
 package me.RockinChaos.itemjoin.Listeners;
 
+import me.RockinChaos.itemjoin.handlers.PlayerHandlers;
 import me.RockinChaos.itemjoin.utils.CheckItem;
 
 import org.bukkit.entity.Player;
@@ -12,18 +13,17 @@ import org.bukkit.inventory.ItemStack;
 public class CancelInteract implements Listener {
 
 	
-	 @SuppressWarnings("deprecation")
 	 @EventHandler
 	  public void onCancelInteracts(PlayerInteractEvent event) 
 	  {
 	    ItemStack item = event.getItem();
 	    final Player player = event.getPlayer();
-	    String modifier = ".prevent-modifiers";
+	    String modifier = ".itemflags";
 	    String mod = "cancel-events";
 	      if (event.getAction() != Action.PHYSICAL && !CheckItem.isAllowedItem(player, item, modifier, mod))
 	      {
 	        event.setCancelled(true);
-	        player.updateInventory();
+	        PlayerHandlers.updateInventory(player);
 	 }
    }
 }

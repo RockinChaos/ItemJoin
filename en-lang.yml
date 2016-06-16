@@ -2,7 +2,7 @@
 #// All messages support custom placeholders and PlaceholderAPI! //#
 #// Simply remove any message and no message will be sent! //#
 #// Example of it being removed: #unknownCommand: '&cUnknown command!' (Fully remove the unknownCommand: line) //#
-en-Version: 2
+en-Version: 3
 Prefix: '&7[&eItemJoin&7] '
 unknownCommand: '&cUnknown command!'
 noPermission: '&cYou do not have permission to use that command!'
@@ -15,7 +15,7 @@ receivedOthersItem: '&a%received_player% gave you &7[&e%received_item%&7]&a.'
 inventoryFull: '&cFailed to give you &7[&e%given_item%&7]&c! Your inventory is full!'
 inventoryFullOthers: '&cFailed to give %given_player% &7[&e%given_item%&7]&c! Their inventory is full!'
 itemDoesNotExist: '&cThe item &b%bad_item% &cdoes not exist!'
-badSlot1: '&bSlot %bad_slot% &cIs defined incorrectly!'
+badSlot1: '&bSlot %bad_slot% &cIs not defined correctly!'
 badSlot2: '&cPlease only use slots 0 - 36, Helmet, Chestplate, Leggings, Boots, or Offhand!'
 badID: '&b%bad_id% &cis not a correct Material or Item ID!'
 consoleReloadedConfig: '&4%player_reloaded% has reloaded the Configuration files.'

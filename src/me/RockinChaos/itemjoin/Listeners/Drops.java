@@ -4,8 +4,9 @@ import java.util.List;
 import java.util.ListIterator;
 
 import me.RockinChaos.itemjoin.ItemJoin;
+import me.RockinChaos.itemjoin.handlers.PlayerHandlers;
+import me.RockinChaos.itemjoin.handlers.WorldHandler;
 import me.RockinChaos.itemjoin.utils.CheckItem;
-import me.RockinChaos.itemjoin.utils.WorldHandler;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -22,17 +23,16 @@ public class Drops implements Listener {
 	  {
 	    ItemStack item = event.getItemDrop().getItemStack();
 	    final Player player = event.getPlayer();
-	    String modifier = ".prevent-modifiers";
+	    String modifier = ".itemflags";
 	    String mod = "self-drops";
 	      if (!CheckItem.isAllowedItem(player, item, modifier, mod))
 	      {
 	        event.setCancelled(true);
 	        Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.pl, new Runnable()
 	        {
-	        @SuppressWarnings("deprecation")
-			public void run()
+	        public void run()
 	          {
-	            player.updateInventory();
+	        	PlayerHandlers.updateInventory(player);
 	          }
 	      }, 1L);
    }
@@ -44,7 +44,7 @@ public class Drops implements Listener {
 		  ListIterator<ItemStack> litr = drops.listIterator();
 	    final Player player = event.getEntity();
 	    final String world = WorldHandler.getWorld(player.getWorld().getName());
-	    String modifier = ".prevent-modifiers";
+	    String modifier = ".itemflags";
 	    String mod = "death-drops";
 	    if (WorldHandler.isWorld(world)) {
         while(litr.hasNext()){

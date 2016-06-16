@@ -1,6 +1,7 @@
 package me.RockinChaos.itemjoin.Listeners;
 
 import me.RockinChaos.itemjoin.ItemJoin;
+import me.RockinChaos.itemjoin.handlers.PlayerHandlers;
 import me.RockinChaos.itemjoin.utils.CheckItem;
 
 import org.bukkit.configuration.ConfigurationSection;
@@ -13,18 +14,17 @@ import org.bukkit.inventory.ItemStack;
 
 public class Placement implements Listener{
 
-	 @SuppressWarnings("deprecation")
-	@EventHandler
+	 @EventHandler
 	  public void onPreventPlayerPlace(PlayerInteractEvent event) 
 	  {
 	    ItemStack item = event.getItem();
 	    final Player player = event.getPlayer();
-	    String modifier = ".prevent-modifiers";
+	    String modifier = ".itemflags";
 	    String mod = "placement";
-	      if (event.getAction() == Action.RIGHT_CLICK_BLOCK && !CheckItem.isAllowedItem(player, item, modifier, mod))
+	      if (event.getAction() == Action.RIGHT_CLICK_BLOCK && !CheckItem.isAllowedItem(player, item, modifier, mod) && item.getType().isBlock())
 	      {
 	        event.setCancelled(true);
-	        player.updateInventory();
+	        PlayerHandlers.updateInventory(player);
 	 }
 }
 
@@ -33,16 +33,15 @@ public class Placement implements Listener{
 	  {
 	    ItemStack item = event.getItem();
 	    final Player player = event.getPlayer();
-	    String modifier = ".prevent-modifiers";
+	    String modifier = ".itemflags";
 	    String mod = "count-lock";
-	      if (event.getAction() == Action.RIGHT_CLICK_BLOCK && !CheckItem.isAllowedItem(player, item, modifier, mod))
+	      if (event.getAction() == Action.RIGHT_CLICK_BLOCK && !CheckItem.isAllowedItem(player, item, modifier, mod) && item.getType().isBlock())
 	      {
 	    	  reAddItem(player, item);
 	 }
 }
 	 
-	 @SuppressWarnings("deprecation")
-	  public static void reAddItem(Player player, ItemStack item1) 
+	 public static void reAddItem(Player player, ItemStack item1) 
 	  {
 
 	       ConfigurationSection selection = ItemJoin.getSpecialConfig("items.yml").getConfigurationSection(player.getWorld().getName() + ".items");
@@ -54,7 +53,7 @@ public class Placement implements Listener{
 	      	if (toSet != null && ItemJoin.isInt(slot) && CheckItem.isSimilar(item1, toSet, items, player)) {
 	      		int isSlot = items.getInt(".slot");
 	        player.getInventory().setItem(isSlot, toSet);
-	        player.updateInventory();
+	        PlayerHandlers.updateInventory(player);
 	      	}
 	      }
 	  }

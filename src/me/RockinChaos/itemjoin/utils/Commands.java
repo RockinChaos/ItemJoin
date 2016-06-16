@@ -13,6 +13,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.*;
 
 import me.RockinChaos.itemjoin.ItemJoin;
+import me.RockinChaos.itemjoin.CacheItems.CacheItems;
+import me.RockinChaos.itemjoin.handlers.PermissionsHandler;
+import me.RockinChaos.itemjoin.handlers.PlayerHandlers;
 
 public class Commands implements CommandExecutor
 {
@@ -47,7 +50,6 @@ public class Commands implements CommandExecutor
 
  // Player Commands //
 	
-    @SuppressWarnings("deprecation")
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (args.length == 0) {
         	if (sender.hasPermission("itemjoin.use") || sender.hasPermission("itemjoin.*")) {
@@ -107,10 +109,10 @@ public class Commands implements CommandExecutor
           	       ItemJoin.loadSpecialConfig("en-lang.yml");
           	       ItemJoin.getSpecialConfig("en-lang.yml").options().copyDefaults(false);
           		  }
-                RegisterEnLang(ItemJoin.pl.getServer().getPlayer("ItemJoin"));
+                RegisterEnLang(PlayerHandlers.PlayerHolder());
     			ItemJoin.pl.items.clear();
    			    for (Player player : ItemJoin.pl.getServer().getOnlinePlayers()) {
-                ItemJoin.pl.CacheItems(player);
+   			    CacheItems.run(player);
   			    }
   		        sender.sendMessage(reloadedConfig);
   		         List<String> PrintWorlds = ItemJoin.getSpecialConfig("items.yml").getStringList("world-list");
@@ -261,7 +263,7 @@ public class Commands implements CommandExecutor
                 return true;
            }
         } else if (args.length == 3 && args[0].equalsIgnoreCase("get")) {
-        	Player argsPlayer = Bukkit.getPlayerExact(args[2]);
+        	Player argsPlayer = PlayerHandlers.StringPlayer(args[2]);
         	if (argsPlayer == null && sender.hasPermission("itemjoin.get.others") || argsPlayer == null && sender.hasPermission("itemjoin.*")) {
         		sender.sendMessage(CPrefix + ChatColor.RED + "The player " + ChatColor.AQUA + args[2] + ChatColor.RED + " could not be found!");
         		return true;
@@ -269,12 +271,7 @@ public class Commands implements CommandExecutor
         		String world = argsPlayer.getWorld().getName();
         		ItemStack toSet = ItemJoin.pl.items.get(argsPlayer.getWorld().getName() + "." + argsPlayer.getName().toString() + ".items." + args[1]);
         		String slot = ItemJoin.getSpecialConfig("items.yml").getString(world + ".items." + args[1] + ".slot");
-                Material tempmat = null;
-                if (ItemJoin.isInt(ItemJoin.getSpecialConfig("items.yml").getString(world + ".items." + args[1] + ".id"))) {
-               	 tempmat = Material.getMaterial(ItemJoin.getSpecialConfig("items.yml").getInt(world + ".items." + args[1] + ".id"));
-                } else {
-               	 tempmat = Material.getMaterial(ItemJoin.getSpecialConfig("items.yml").getString(world + ".items." + args[1] + ".id"));
-                }
+                Material tempmat = PlayerHandlers.getLocateMaterial(world, args[1]);
         		EntityEquipment Equip = argsPlayer.getEquipment();
         		if (toSet != null && !CheckItem.CheckMaterial(tempmat, world, args[1])) {
         			sender.sendMessage(badID.replace("%bad_id%", ItemJoin.getSpecialConfig("items.yml").getString(world + ".items." + args[1] + ".id")));
@@ -306,7 +303,7 @@ public class Commands implements CommandExecutor
 	        		argsPlayer.sendMessage(receivedOthersItem.replace("%received_item%", toSet.getItemMeta().getDisplayName()).replace("%received_player%", sender.getName()));
          		      }
          		      failedGive = false;
-	        		argsPlayer.updateInventory();
+	        		PlayerHandlers.updateInventory(argsPlayer);
         		} else if (toSet != null && CheckItem.CheckSlot(slot, world, args[1])) {
         			int Slot = Integer.parseInt(slot);
         			argsPlayer.getInventory().setItem(Slot, toSet);
@@ -314,7 +311,7 @@ public class Commands implements CommandExecutor
 	        		sender.sendMessage(givenOthersItem.replace("%given_item%", toSet.getItemMeta().getDisplayName()).replace("%given_player%", argsPlayer.getName()));
 	        		argsPlayer.sendMessage(receivedOthersItem.replace("%received_item%", toSet.getItemMeta().getDisplayName()).replace("%received_player%", sender.getName()));
         			}
-	        		argsPlayer.updateInventory();
+        			PlayerHandlers.updateInventory(argsPlayer);
 	        		failedGive = false;
         		} else if (toSet == null) {
         			if (failedGive != true) {
@@ -333,12 +330,7 @@ public class Commands implements CommandExecutor
         		String world = ((Player)sender).getWorld().getName();
         		ItemStack toSet = ItemJoin.pl.items.get(((Entity) sender).getWorld().getName() + "." + sender.getName().toString() + ".items." + args[1]);
         		String slot = ItemJoin.getSpecialConfig("items.yml").getString(world + ".items." + args[1] + ".slot");
-                Material tempmat = null;
-                if (ItemJoin.isInt(ItemJoin.getSpecialConfig("items.yml").getString(world + ".items." + args[1] + ".id"))) {
-               	 tempmat = Material.getMaterial(ItemJoin.getSpecialConfig("items.yml").getInt(world + ".items." + args[1] + ".id"));
-                } else {
-               	 tempmat = Material.getMaterial(ItemJoin.getSpecialConfig("items.yml").getString(world + ".items." + args[1] + ".id"));
-                }
+                Material tempmat = PlayerHandlers.getLocateMaterial(world, args[1]);
         		EntityEquipment Equip = ((LivingEntity) sender).getEquipment();
         		if (toSet != null && !CheckItem.CheckMaterial(tempmat, world, args[1])) {
         			sender.sendMessage(badID.replace("%bad_id%", ItemJoin.getSpecialConfig("items.yml").getString(world + ".items." + args[1] + ".id")));
@@ -369,7 +361,7 @@ public class Commands implements CommandExecutor
 				    sender.sendMessage(givenItem.replace("%given_item%", toSet.getItemMeta().getDisplayName()));
        		       }
        		      failedGive = false;
-				  ((Player) sender).updateInventory();
+				  PlayerHandlers.updateInventory((Player) sender);
         		} else if (toSet != null && CheckItem.CheckSlot(slot, world, args[1])) {
         			int Slot = Integer.parseInt(slot);
         			((Player)sender).getInventory().setItem(Slot, toSet);
@@ -377,7 +369,7 @@ public class Commands implements CommandExecutor
 					sender.sendMessage(givenItem.replace("%given_item%", toSet.getItemMeta().getDisplayName()));
         			}
         			failedGive = false;
-					((Player) sender).updateInventory();
+					PlayerHandlers.updateInventory((Player) sender);
         		} else if (toSet == null) {
         			sender.sendMessage(itemDoesNotExist.replace("%bad_item%", args[1]));
         		}

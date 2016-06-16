@@ -7,15 +7,13 @@ import me.RockinChaos.itemjoin.Listeners.CancelInteract;
 import me.RockinChaos.itemjoin.Listeners.Drops;
 import me.RockinChaos.itemjoin.Listeners.InteractCmds;
 import me.RockinChaos.itemjoin.Listeners.InventoryClick;
-import me.RockinChaos.itemjoin.Listeners.ItemsDamaged;
-import me.RockinChaos.itemjoin.Listeners.Mainhand;
-import me.RockinChaos.itemjoin.Listeners.Offhand;
 import me.RockinChaos.itemjoin.Listeners.Pickups;
 import me.RockinChaos.itemjoin.Listeners.Placement;
 import me.RockinChaos.itemjoin.Listeners.JoinItem.ChangedWorld;
 import me.RockinChaos.itemjoin.Listeners.JoinItem.FirstJoin;
 import me.RockinChaos.itemjoin.Listeners.JoinItem.JoinItem;
 import me.RockinChaos.itemjoin.Listeners.JoinItem.Respawn;
+import me.RockinChaos.itemjoin.handlers.PlayerHandlers;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.ConsoleCommandSender;
@@ -51,7 +49,7 @@ public class Registers {
 
 	   public static void configFile() {
 		      File cFile = new File(ItemJoin.pl.getDataFolder(), "config.yml");
-		      if (cFile.exists() && ItemJoin.getSpecialConfig("config.yml").getInt("config-Version") != 2) {
+		      if (cFile.exists() && ItemJoin.getSpecialConfig("config.yml").getInt("config-Version") != 3) {
 		      if (ItemJoin.pl.getResource("config.yml") != null) {
 		        String newGen = "config" + ItemJoin.getRandom(1500000,10000000) + ".yml";
 		        File newFile = new File(ItemJoin.pl.getDataFolder(), newGen);
@@ -69,7 +67,7 @@ public class Registers {
 		}
 
 		   public static void firstJoinFile() {
-				  if (ItemJoin.getSpecialConfig("config.yml").getBoolean("Global-Settings" + ".First-Join." + "FirstJoin-Mode-Enabled") == true) {
+				  if (ItemJoin.getSpecialConfig("items.yml").getBoolean("Global-Settings" + ".First-Join." + "FirstJoin-Mode-Enabled") == true) {
 					  ItemJoin.pl.getServer().getPluginManager().registerEvents(new FirstJoin(),ItemJoin.pl);
 					  ItemJoin.loadSpecialConfig("FirstJoin.yml");
 					  ItemJoin.getSpecialConfig("FirstJoin.yml").options().copyDefaults(false);
@@ -78,7 +76,7 @@ public class Registers {
 		   
 		   public static void itemsFile() {
 			      File itemsFile = new File(ItemJoin.pl.getDataFolder(), "items.yml");
-			      if (itemsFile.exists() && ItemJoin.getSpecialConfig("items.yml").getInt("items-Version") != 2) {
+			      if (itemsFile.exists() && ItemJoin.getSpecialConfig("items.yml").getInt("items-Version") != 3) {
 			      if (ItemJoin.pl.getResource("items.yml") != null) {
 			        String newGen = "items" + ItemJoin.getRandom(1500000,10000000) + ".yml";
 			        File newFile = new File(ItemJoin.pl.getDataFolder(), newGen);
@@ -96,10 +94,9 @@ public class Registers {
 				  ItemJoin.pl.worlds = ItemJoin.getSpecialConfig("items.yml").getStringList("world-list");
 			}
 		   
-	    @SuppressWarnings("deprecation")
 		public static void enLangFile() {
 			      File enLang = new File(ItemJoin.pl.getDataFolder(), "en-lang.yml");
-			      if (enLang.exists() && ItemJoin.pl.getConfig().getString("Language").equalsIgnoreCase("English") && ItemJoin.getSpecialConfig("en-lang.yml").getInt("en-Version") != 2) {
+			      if (enLang.exists() && ItemJoin.pl.getConfig().getString("Language").equalsIgnoreCase("English") && ItemJoin.getSpecialConfig("en-lang.yml").getInt("en-Version") != 3) {
 			      if (ItemJoin.pl.getResource("en-lang.yml") != null) {
 			        String newGen = "en-lang" + ItemJoin.getRandom(1500000,10000000) + ".yml";
 			        File newFile = new File(ItemJoin.pl.getDataFolder(), newGen);
@@ -115,13 +112,13 @@ public class Registers {
 				  if (ItemJoin.pl.getConfig().getString("Language").equalsIgnoreCase("English")) {
 					  ItemJoin.loadSpecialConfig("en-lang.yml");
 					  ItemJoin.getSpecialConfig("en-lang.yml").options().copyDefaults(false);
-					  Commands.RegisterEnLang(ItemJoin.pl.getServer().getPlayer("ItemJoin"));
+					  Commands.RegisterEnLang(PlayerHandlers.PlayerHolder());
 				  }
 		   }
 
 		   public static boolean SecretMsg() {
 			   boolean isSecret = false;
-				  if (ItemJoin.getSpecialConfig("config.yml").getBoolean("Global-Settings" + ".Get-Items." + "Delay") == true) {
+				  if (ItemJoin.getSpecialConfig("items.yml").getBoolean("Global-Settings" + ".Get-Items." + "Delay") == true) {
 					  ItemJoin.secretMsg = "ItemJoin";
 					  isSecret = true;
 				  } else {
@@ -150,13 +147,26 @@ public class Registers {
 				  ItemJoin.pl.getServer().getPluginManager().registerEvents(new Drops(),ItemJoin.pl);
 				  ItemJoin.pl.getServer().getPluginManager().registerEvents(new Pickups(),ItemJoin.pl);
 				  ItemJoin.pl.getServer().getPluginManager().registerEvents(new Placement(),ItemJoin.pl);
-				  ItemJoin.pl.getServer().getPluginManager().registerEvents(new ItemsDamaged(),ItemJoin.pl);
 				  ItemJoin.pl.getServer().getPluginManager().registerEvents(new InteractCmds(),ItemJoin.pl);
 				  ItemJoin.pl.getServer().getPluginManager().registerEvents(new CancelInteract(),ItemJoin.pl);
-			    String version = ItemJoin.pl.getServer().getVersion();
-			    if (version.contains("1.9")) {
-					  ItemJoin.pl.getServer().getPluginManager().registerEvents(new Mainhand(),ItemJoin.pl);
-					  ItemJoin.pl.getServer().getPluginManager().registerEvents(new Offhand(),ItemJoin.pl);
-				}
 	    }
+
+		   public static boolean hasCombatUpdate() { // Need better solution for this later //
+			   boolean hasCombatUpdate = false;
+			   String version = ItemJoin.pl.getServer().getVersion();
+				  if (version.contains("1.9") 
+						  || version.contains("1.10") 
+						  || version.contains("1.11") 
+						  || version.contains("1.12")
+						  || version.contains("1.13")
+						  || version.contains("1.14")
+						  || version.contains("1.15")
+						  || version.contains("1.16")
+						  || version.contains("1.17")
+						  || version.contains("1.18")
+						  || version.contains("1.19")) {
+					  hasCombatUpdate = true;
+					 }
+				return hasCombatUpdate;
+		   }
 }
