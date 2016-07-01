@@ -96,53 +96,21 @@ public class InteractCmds implements Listener {
   	       String[] parts7 = Identify.split("server: ");
   	       String[] parts8 = Identify.split("server:");
    	       if (Identify.toLowerCase().contains("console: ")) {
-	    	   try {
-	    		   dispatchConsoleCommands(parts[1], player, item);
-	        	} catch (ArrayIndexOutOfBoundsException e) {
-	        		dispatchConsoleCommands("", player, item);
-		          }
+   	    	dispatchConsoleCommands(parts[1], player, item);
    	       } else if (Identify.toLowerCase().contains("player: ")) {
-	    	   try {
-	    		   dispatchPlayerCommands(parts2[1], player, item);
-	        	} catch (ArrayIndexOutOfBoundsException e) {
-	        		dispatchPlayerCommands("", player, item);
-		          }
+   	    	dispatchPlayerCommands(parts2[1], player, item);
 	       } else if (Identify.toLowerCase().contains("console:")) {
-	    	   try {
-	    		   dispatchConsoleCommands(parts3[1], player, item);
-	        	} catch (ArrayIndexOutOfBoundsException e) {
-	        		dispatchConsoleCommands("", player, item);
-		          }
+	    	   dispatchConsoleCommands(parts3[1], player, item);
 	       } else if (Identify.toLowerCase().contains("player:")) {
-	    	   try {
-	    		   dispatchPlayerCommands(parts4[1], player, item);
-	        	} catch (ArrayIndexOutOfBoundsException e) {
-	        		dispatchPlayerCommands("", player, item);
-		          }
+	    	   dispatchPlayerCommands(parts4[1], player, item);
 	       } else if (Identify.toLowerCase().contains("message: ")) {
-	    	   try {
 	    	   player.sendMessage(ItemJoin.pl.formatPlaceholders(parts5[1], player));
-	        	} catch (ArrayIndexOutOfBoundsException e) {
-	        		player.sendMessage(ItemJoin.pl.formatPlaceholders(" ", player));
-		          }
 	       } else if (Identify.toLowerCase().contains("message:")) {
-	    	   try {
 	    	   player.sendMessage(ItemJoin.pl.formatPlaceholders(parts6[1], player));
-	        	} catch (ArrayIndexOutOfBoundsException e) {
-	        		player.sendMessage(ItemJoin.pl.formatPlaceholders(" ", player));
-		          }
 	       } else if (Identify.toLowerCase().contains("server: ")) {
-	    	   try {
-	    		   BungeeCord.SwitchServers(player, parts7[1]);
-	        	} catch (ArrayIndexOutOfBoundsException e) {
-	        		BungeeCord.SwitchServers(player, "");
-		          }
+	    	   BungeeCord.SwitchServers(player, parts7[1]);
 	       } else if (Identify.toLowerCase().contains("server:")) {
-	    	   try {
-	    		   BungeeCord.SwitchServers(player, parts8[1]);
-	        	} catch (ArrayIndexOutOfBoundsException e) {
-	        		BungeeCord.SwitchServers(player, "");
-		          }
+	    	   BungeeCord.SwitchServers(player, parts8[1]);
 	       } else if (!Identify.toLowerCase().contains("player: ") 
 	    		   && !Identify.toLowerCase().contains("console: ") 
 	    		   && !Identify.toLowerCase().contains("player:")

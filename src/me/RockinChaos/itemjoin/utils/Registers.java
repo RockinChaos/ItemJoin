@@ -9,7 +9,6 @@ import me.RockinChaos.itemjoin.Listeners.InteractCmds;
 import me.RockinChaos.itemjoin.Listeners.InventoryClick;
 import me.RockinChaos.itemjoin.Listeners.Pickups;
 import me.RockinChaos.itemjoin.Listeners.Placement;
-import me.RockinChaos.itemjoin.Listeners.SwapHands;
 import me.RockinChaos.itemjoin.Listeners.JoinItem.ChangedWorld;
 import me.RockinChaos.itemjoin.Listeners.JoinItem.FirstJoin;
 import me.RockinChaos.itemjoin.Listeners.JoinItem.JoinItem;
@@ -145,7 +144,6 @@ public class Registers {
 				  ItemJoin.pl.getServer().getPluginManager().registerEvents(new ChangedWorld(),ItemJoin.pl);
 				  ItemJoin.pl.getServer().getPluginManager().registerEvents(new Respawn(),ItemJoin.pl);
 				  ItemJoin.pl.getServer().getPluginManager().registerEvents(new InventoryClick(),ItemJoin.pl);
-				  ItemJoin.pl.getServer().getPluginManager().registerEvents(new SwapHands(),ItemJoin.pl);
 				  ItemJoin.pl.getServer().getPluginManager().registerEvents(new Drops(),ItemJoin.pl);
 				  ItemJoin.pl.getServer().getPluginManager().registerEvents(new Pickups(),ItemJoin.pl);
 				  ItemJoin.pl.getServer().getPluginManager().registerEvents(new Placement(),ItemJoin.pl);

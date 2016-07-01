@@ -28,12 +28,12 @@ world-list: #// This is the list of worlds that have custom items on join. //#
   - world_nether
 
 #// For every world listed in the world-list, you need to make a section for it. //#
-#// NOTE: It is only required to have the ID and Slot listed under each item to receive it. //#
+#// NOTE: It is only required to have the ID and Slot listed under each item to recieve it. //#
 world: #// This is the first section, This is the name of the world you want to receive the items in. //#
   items: #// This is just an identifier to list out the items. This must always be here //#
     ultra-item: #// This is the name of the first item we have created, you can name it what ever you want! Just put the NAME and then a colon. Such as New-Name: //#
       id: DIAMOND_SWORD #// This is the Material name OR item ID of the item you want to get //#
-      slot: 0 #// This is the slot number you want to receive the item in. Available slots are 0-35, Helmet, Chestplate, Leggings, Boots, Offhand, or Arbitrary. //#
+      slot: 0 #// This is the slot number you want to recieve the item in. Available slots are 0-35, Helmet, Chestplate, Leggings, Boots, Offhand, or Arbitrary. //#
       name: '&bUltra Sword' #// This is the custom name of the item. Supports color codes as well as placeholders from PlaceholderAPI! //#
       data-value: 0 #// This is the data-value that is after the items ID. Usually it is left as 0, but in cases of items like Stained Glass it would need to be set to a number. It is default 0 if a data-value is not specified. //#
       count: 1 #// This is the amount of each item that will be given. You will be given 1 Diamond Sword. //#
@@ -171,7 +171,7 @@ world: #// This is the first section, This is the name of the world you want to 
       name: '&dSparkles'
       lore:
         - '&7Right-Click me and watch me fly!'
-      firework: #// All you have to do is add the firework identifier and begin specifying it.
+      firework: #// All you have to do is add the firework identifier and begin specifing it.
         type: CREEPER #// This is the shape the firework will be when it explodes, it can either be BALL, BALL_LARGE, BURST, CREEPER, or STAR. //#
         flicker: true #// Should the particles sparkle when falling to the ground? //#
         trail: true #// Should there be a white misty trail left behind the firework? //#

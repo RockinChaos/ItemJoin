@@ -281,7 +281,7 @@ public class Commands implements CommandExecutor
        		    }
         		if (toSet != null && CheckItem.CheckSlot(slot, world, args[1]) && !ItemJoin.isInt(slot)) {
          		      if (slot.equalsIgnoreCase("Arbitrary")) {
-    		    	    	if (argsPlayer.getInventory().firstEmpty() == -1) {
+    		    	    	if (((Player)sender).getInventory().firstEmpty() == -1) {
     		    	    		sender.sendMessage(inventoryFull.replace("%given_item%", toSet.getItemMeta().getDisplayName()).replace("%given_player%", argsPlayer.getName()).replace("%received_player%", sender.getName()));
     		    	    		failedGive = true;
     		    	    	} else {
