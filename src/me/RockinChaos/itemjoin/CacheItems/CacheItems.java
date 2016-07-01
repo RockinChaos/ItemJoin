@@ -26,7 +26,6 @@ import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.SkullMeta;
-import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
 
 public class CacheItems {
@@ -52,9 +51,10 @@ public class CacheItems {
 	         String slot = items.getString(".slot");
 	         Material tempmat = PlayerHandlers.getMaterial(items);
 		     String Modifiers = ((List<?>)items.getStringList(".itemflags")).toString();
-	    	 String vers = ItemJoin.pl.getServer().getVersion();
+		     String pkgname = ItemJoin.pl.getServer().getClass().getPackage().getName();
+		     String vers = pkgname.substring(pkgname.lastIndexOf('.') + 1);
 		     if (!Registers.hasCombatUpdate() && items.getString(".slot").equalsIgnoreCase("Offhand")) {  
-		    	 ItemJoin.pl.Console.sendMessage(ItemJoin.pl.Prefix + ChatColor.RED + "Your server is running " + ChatColor.YELLOW + vers + ChatColor.RED + " and this does not have Offhand support!");
+		    	 ItemJoin.pl.Console.sendMessage(ItemJoin.pl.Prefix + ChatColor.RED + "Your server is running " + ChatColor.YELLOW + "MC " + vers + ChatColor.RED + " and this does not have Offhand support!");
 		    	 ItemJoin.pl.Console.sendMessage(ItemJoin.pl.Prefix + ChatColor.RED + "Because of this, the item " + ChatColor.YELLOW + item + ChatColor.RED +  " will not be set!");
 		      } else if (CheckItem.CheckMaterial(tempmat, world, item) && CheckItem.CheckSlot(slot, world, item)) 
 	          {
@@ -139,18 +139,15 @@ public class CacheItems {
 	           if (items.getString(".custom-map-image") != null && tempmat == Material.MAP)
 	           {
 	        	try {
-	             MapView view = PlayerHandlers.MapView(tempitem);
-	        	  String mapIMG = items.getString(".custom-map-image");
-	   			   for(MapRenderer r:view.getRenderers()) {
-	   			 	 view.removeRenderer(r);
-	   			   }
-	   			if (mapIMG.equalsIgnoreCase("default.png") || new File(ItemJoin.pl.getDataFolder(), mapIMG).exists()) {
-	   			 RenderImageMaps.setImage(mapIMG);
-	   	        view.addRenderer(new RenderImageMaps());
-	   			}
+	            MapView view = PlayerHandlers.MapView(tempitem);
+	        	String mapIMG = items.getString(".custom-map-image");
+	   			 if (mapIMG.equalsIgnoreCase("default.png") || new File(ItemJoin.pl.getDataFolder(), mapIMG).exists()) {
+	   			  RenderImageMaps.setImage(mapIMG);
+	   	          view.addRenderer(new RenderImageMaps());
+	   			 }
 	        	} catch (NullPointerException e) {
 		   			ItemJoin.pl.Console.sendMessage(ItemJoin.pl.Prefix + ChatColor.RED + "Something has gone wrong with the maps!");
-		   			ItemJoin.pl.Console.sendMessage(ItemJoin.pl.Prefix + ChatColor.RED + "This may cause critical errors such as not recieving your items!");
+		   			ItemJoin.pl.Console.sendMessage(ItemJoin.pl.Prefix + ChatColor.RED + "This means your custom map will not be rendered!");
 		   			ItemJoin.pl.Console.sendMessage(ItemJoin.pl.Prefix + ChatColor.RED + "Please contact the plugin developer immediately!");
 		          }
 			   }
