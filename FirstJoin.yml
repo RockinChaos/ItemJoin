@@ -1,1 +1,1 @@
-#// Do NOT touch anything in here. This file saves players name to it when they join for the first time so they can not get their items a second time if FirstJoinOnly == true. //#
+#// Do NOT touch anything in here. This file saves players name to it when they join for the first time so they can not get their items a second time if firstjoin itemflag is added and first join mode is enabled. //#
