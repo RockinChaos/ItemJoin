@@ -47,8 +47,6 @@ public class Commands implements CommandExecutor
     public static ConsoleCommandSender Console = ItemJoin.pl.getServer().getConsoleSender();
     public static String CPrefix = ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] ";
     public static boolean failedGive = false;
-
- // Player Commands //
 	
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (args.length == 0) {

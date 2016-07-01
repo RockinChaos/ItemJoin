@@ -42,5 +42,5 @@ public class SwapHands implements Listener {
 	      PlayerHandlers.updateInventory(player);
 	}
   }
-}
+ }
 }

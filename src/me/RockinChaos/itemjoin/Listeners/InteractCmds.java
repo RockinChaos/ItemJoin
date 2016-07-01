@@ -79,8 +79,8 @@ public class InteractCmds implements Listener {
         		if (!onCooldown(items, player, item, item1)) {
         		convertCommands(items, item, player);
         		}
-        	}
-          }
+        	  }
+           }
         }
    }
    

@@ -153,7 +153,7 @@ public class Registers {
 				  ItemJoin.pl.getServer().getPluginManager().registerEvents(new CancelInteract(),ItemJoin.pl);
 	    }
 
-		   public static boolean hasCombatUpdate() { // Need better solution for this later //
+		   public static boolean hasCombatUpdate() { // Need better solution for this later... //
 			   boolean hasCombatUpdate = false;
 			   String version = ItemJoin.pl.getServer().getVersion();
 				  if (version.contains("1.9") 

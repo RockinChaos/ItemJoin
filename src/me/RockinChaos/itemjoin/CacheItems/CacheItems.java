@@ -86,7 +86,7 @@ public class CacheItems {
 	               templist2.add(name);
 	             }
 	             tempmeta.setLore(templist2);
-	           }
+	            }
 				if (Modifiers.contains("hide-attributes") 
 						|| Modifiers.contains("hide attributes") 
 						|| Modifiers.contains("attributes") 

@@ -9,7 +9,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 public class InventoryClick implements Listener {
-
+	
 	  @EventHandler
 	  public void onInventoryModify(InventoryClickEvent event) 
 	  {

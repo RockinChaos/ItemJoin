@@ -40,7 +40,7 @@ commands:
       usage: |
           /itemjoin get <item> <player>
    itemjoin world:
-      description: Checks what world you are in. For (debugging).
+      description: Checks what world you are in, for debugging purposes.
       usage: |
           /itemjoin world
    itemjoin list:
