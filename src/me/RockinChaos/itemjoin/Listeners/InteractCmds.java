@@ -5,23 +5,29 @@ import java.util.List;
 import java.util.Map;
 
 import me.RockinChaos.itemjoin.ItemJoin;
+import me.RockinChaos.itemjoin.handlers.PlayerHandlers;
 import me.RockinChaos.itemjoin.handlers.WorldHandler;
 import me.RockinChaos.itemjoin.utils.BungeeCord;
 import me.RockinChaos.itemjoin.utils.CheckItem;
-
+import me.RockinChaos.itemjoin.utils.Commands;
+import me.RockinChaos.itemjoin.utils.Vault;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 public class InteractCmds implements Listener {
     private Map<String, Long> playersOnCooldown = new HashMap<String, Long>();
 	private int cdtime = 0;
+	public String hitplayer = "ItemJoin";
 
-	@EventHandler
+	@EventHandler(priority=EventPriority.NORMAL)
 	public void onInteractCmds(PlayerInteractEvent event)
 	 {
 	  ItemStack item = event.getItem();
@@ -34,6 +40,16 @@ public class InteractCmds implements Listener {
 	      setupCommands(player, world, item, action);
 	}
   }
+	
+	@EventHandler(priority=EventPriority.HIGHEST)
+	public void onPlayerHitPlayerEvent(EntityDamageByEntityEvent event) {
+	Entity Damager = event.getDamager(); 
+	Entity Damaged = event.getEntity(); 
+	if (Damager instanceof Player && Damaged instanceof Player) {
+	Player player = (Player) Damaged;
+	hitplayer = player.getName();
+	}
+ }
 
    public boolean isCommandable(String action, ConfigurationSection items) {
 	   boolean isCommandable = false;
@@ -69,7 +85,7 @@ public class InteractCmds implements Listener {
    }
 
    public void setupCommands(Player player, String world, ItemStack item1, String action) {
-       ConfigurationSection selection = ItemJoin.getSpecialConfig("items.yml").getConfigurationSection(player.getWorld().getName() + ".items");
+       ConfigurationSection selection = ItemJoin.getSpecialConfig("items.yml").getConfigurationSection(WorldHandler.checkWorlds(player.getWorld().getName()) + ".items");
        if (selection != null) {
        for (String item : selection.getKeys(false)) 
         {
@@ -77,13 +93,47 @@ public class InteractCmds implements Listener {
         	ItemStack item2 = ItemJoin.pl.items.get(player.getWorld().getName() + "." + player.getName().toString() + ".items." + item);
         	if (item2 != null && CheckItem.isSimilar(item1, item2, items, player) && isCommandable(action, items)) {
         		if (!onCooldown(items, player, item, item1)) {
-        		convertCommands(items, item, player);
+        		chargePlayer(items, item, player);
         		}
         	  }
            }
         }
    }
-   
+
+public boolean chargeCost(ConfigurationSection items, String item, Player player) {
+       boolean Charged = false;
+	   if (items.getString(".commands-cost") != null) {
+		   int cost = items.getInt(".commands-cost");
+	       if (PlayerHandlers.getBalance(player) >= cost) {
+	           PlayerHandlers.withdrawBalance(player, cost);
+	           player.sendMessage(Commands.itemCostSuccess.replace("%amount%", items.getString(".commands-cost")));
+	           Charged = true;
+	         } else if (!(PlayerHandlers.getBalance(player) >= cost)) {
+	            player.sendMessage(Commands.itemCostFailed.replace("%cost%", items.getString(".commands-cost")).replace("%amount%", "" + PlayerHandlers.getBalance(player)));
+	            Charged = false;
+	        }
+	   }
+	       return Charged;
+   }
+
+public boolean isChargeable(ConfigurationSection items) {
+	boolean isChargeable = false;
+	   if (items.getString(".commands-cost") != null 
+			   && Vault.isVaultAPI()) {
+		   isChargeable = true;
+	   }
+	   return isChargeable;
+}
+
+public void chargePlayer(ConfigurationSection items, String item, Player player) {
+	if (isChargeable(items) 
+			&& chargeCost(items, item, player) == true) {
+		convertCommands(items, item, player);
+	} else if (!isChargeable(items)) {
+		convertCommands(items, item, player);
+	}
+}
+
    public void convertCommands(ConfigurationSection items, String item, Player player) {
 		List<String> command = items.getStringList(".commands");
 		for (String Identify : command) {
@@ -121,15 +171,15 @@ public class InteractCmds implements Listener {
 		          }
 	       } else if (Identify.toLowerCase().contains("message: ")) {
 	    	   try {
-	    	   player.sendMessage(ItemJoin.pl.formatPlaceholders(parts5[1], player));
+	    	   player.sendMessage(ItemJoin.pl.formatPlaceholders(parts5[1], player).replace("%player%", player.getName()).replace("%hitplayer%", hitplayer));
 	        	} catch (ArrayIndexOutOfBoundsException e) {
-	        		player.sendMessage(ItemJoin.pl.formatPlaceholders(" ", player));
+	        		player.sendMessage(ItemJoin.pl.formatPlaceholders(" ", player).replace("%player%", player.getName()).replace("%hitplayer%", hitplayer));
 		          }
 	       } else if (Identify.toLowerCase().contains("message:")) {
 	    	   try {
-	    	   player.sendMessage(ItemJoin.pl.formatPlaceholders(parts6[1], player));
+	    	   player.sendMessage(ItemJoin.pl.formatPlaceholders(parts6[1], player).replace("%player%", player.getName()).replace("%hitplayer%", hitplayer));
 	        	} catch (ArrayIndexOutOfBoundsException e) {
-	        		player.sendMessage(ItemJoin.pl.formatPlaceholders(" ", player));
+	        		player.sendMessage(ItemJoin.pl.formatPlaceholders(" ", player).replace("%player%", player.getName()).replace("%hitplayer%", hitplayer));
 		          }
 	       } else if (Identify.toLowerCase().contains("server: ")) {
 	    	   try {
@@ -153,18 +203,18 @@ public class InteractCmds implements Listener {
     		       && !Identify.toLowerCase().contains("server:")) {
                dispatchPlayerCommands(Identify, player, item);
 		}
-	  }
+      }
    }
 
    public void dispatchPlayerCommands(String parts, Player player, String item) {
-       String Command = parts.replace("%player%", player.getName());
+       String Command = parts.replace("%player%", player.getName()).replace("%hitplayer%", hitplayer);
        Command = ItemJoin.pl.formatPlaceholders(Command, player);
        player.performCommand(Command);
        playersOnCooldown.put(player.getWorld().getName() + "." + player.getName().toString() + ".items." + item, System.currentTimeMillis());
    }
    
    public void dispatchConsoleCommands(String parts, Player player, String item) {
-       String Command = parts.replace("%player%", player.getName());
+       String Command = parts.replace("%player%", player.getName()).replace("%hitplayer%", hitplayer);
        Command = ItemJoin.pl.formatPlaceholders(Command, player);
        Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), Command);
        playersOnCooldown.put(player.getWorld().getName() + "." + player.getName().toString() + ".items." + item, System.currentTimeMillis());

@@ -10,8 +10,8 @@ import java.util.logging.Logger;
 import me.RockinChaos.itemjoin.handlers.WorldHandler;
 import me.RockinChaos.itemjoin.utils.Registers;
 import me.RockinChaos.itemjoin.utils.UpdateChecker;
+import me.RockinChaos.itemjoin.utils.Vault;
 import me.clip.placeholderapi.PlaceholderAPI;
-
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.command.ConsoleCommandSender;
@@ -27,7 +27,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 	public static ItemJoin pl;
     public List<String> worlds;
     public Map<String, ItemStack> items = new HashMap<String, ItemStack>();
-    protected Logger log;
+    public Logger log;
     public static boolean hasMultiverse;
     public static boolean hasInventories;
     public static boolean hasPlaceholderAPI;
@@ -47,7 +47,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 	  Registers.checkHooks();
 	  WorldHandler.Worlds();
 	  WorldHandler.UpdateItems();
-	  UpdateChecker.updateCheck();
+      UpdateChecker.checkUpdates(Console);
+	  Vault.enableEconomy();
       Console.sendMessage(Prefix + ChatColor.GREEN + "has been Enabled!");
       }
 
@@ -79,6 +80,7 @@ import org.bukkit.plugin.java.JavaPlugin;
     }
 
    public static FileConfiguration getSpecialConfig(String path) {
+	  loadSpecialConfig(path);
 	  File file = new File(pl.getDataFolder(), String.valueOf(path));
           if (!file.exists()) {
                 file.mkdir();

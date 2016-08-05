@@ -6,7 +6,7 @@
 #// For per-world support this best works with Multiverse-Inventories! http://dev.bukkit.org/bukkit-plugins/multiverse-inventories //#
 #// Otherwise you will need to set clear-on-world-changed to true if you want to get the new items when you change worlds. //#
 #// Then you will need to add itemflag world-changed to each item to receive the new items. //#
-items-Version: 3
+items-Version: 4
 
 Global-Settings: #// Global Settings, for each world listed under world-list. These will take effect in them. //#
   Prevention:
@@ -21,6 +21,7 @@ Global-Settings: #// Global Settings, for each world listed under world-list. Th
     FirstJoin-Mode-Enabled: false #// Set to true if you wish to use First-Join-Item: true per item! (This allows the use of the First Join options). //#
   Get-Items:
     ItemJoin-Specific-Items: true #// This meaning, these items are specific to ItemJoin and cannot be renamed to. Usually you would disable this if you had another plugin that hooks into ItemJoin items. //#
+    Global-Items: false #// Setting this to true will make it so you can define items to work on ALL worlds listed under world-list. This means instead of defining a world for each world listed under world-list, you would simply just use the text global in  place of world name. //#
     Delay: 2 #// Set to 0 to disable. Recommended is 2 especially if you use First-Join! (This is in Seconds.) //#
 
 world-list: #// This is the list of worlds that have custom items on join. //#
@@ -29,7 +30,7 @@ world-list: #// This is the list of worlds that have custom items on join. //#
 
 #// For every world listed in the world-list, you need to make a section for it. //#
 #// NOTE: It is only required to have the ID and Slot listed under each item to receive it. //#
-world: #// This is the first section, This is the name of the world you want to receive the items in. //#
+world: #// This is the first section, This is the name of the world you want to receive the items in. If Global-Items was enabled this would be named global. //#
   items: #// This is just an identifier to list out the items. This must always be here //#
     ultra-item: #// This is the name of the first item we have created, you can name it what ever you want! Just put the NAME and then a colon. Such as New-Name: //#
       id: DIAMOND_SWORD #// This is the Material name OR item ID of the item you want to get //#
@@ -52,6 +53,7 @@ world: #// This is the first section, This is the name of the world you want to 
         - 'player: say This is item slot 2' #// This is a command that is executed by the player. //#
         - 'say I like pancakes!' #// If no executer is defined such as message, console, or player. Then it will be executed by player by default. This is a player command. //#
       commands-action: RIGHT_CLICK_AIR, RIGHT_CLICK_BLOCK, LEFT_CLICK_AIR, LEFT_CLICK_BLOCK, PHYSICAL #// These are command actions. These are all self-explanatory. If you need more help see the documentations page. //#
+      commands-cost: 25 #// This is the amount of in game money it will cost to run all the commands. You must have vault enabled and installed to use this. //#
       commands-cooldown: 5 #// This is the amount of time in seconds that the player has to wait before executing the commands again. //#
       cooldown-message: '&7[&eItemJoin&7] &a[%item%&a] &cis on cooldown for &a%timeleft% &cseconds..' #// If a player attempts to execute the commands while they're is on cooldown, this cooldown message will be sent to the player. //#
       itemflags: #// These are custom itemflags! These allow huge modifications to the items. All itemflags with description are listed below. //#
@@ -95,6 +97,7 @@ world: #// This is the first section, This is the name of the world you want to 
         - 'message: &cthis is a custom message.'
         - 'say this command will be executed by the player since an executor is not defined.'
       commands-cooldown: 8
+      commands-cost: 25
       cooldown-message: '&7[&eItemJoin&7] &a[%item%&a] &cis on cooldown for &a%timeleft% &cseconds..'
       itemflags:
         - 'first-join'
@@ -193,6 +196,15 @@ world: #// This is the first section, This is the name of the world you want to 
       lore:
         - '&7Great for setting a'
         - '&7players profile, like hypixel!'
+    custom-arrow-item: #//This is an arrow tipped item! //#
+      id: TIPPED_ARROW #// Just set the is to tipped_arrow to begin creating and customizing your tipped arrows //#
+      slot: 9
+      name: '&dAwesome Arrow'
+      count: 16
+      arrow: #// Just add the arrow identifier //#
+          potion-effect: WITHER #// This will be the affect that is applied to the arrow. //#
+          power: 1 #// This is the power level of the affect //#
+          time: 20 #// This is the time it will last on the affected target in seconds //#
     helmet-item:
       id: DIAMOND_HELMET
       slot: Helmet #// This is the custom helmet slot, this item will be placed in the players helmet slot. //#

@@ -2,6 +2,7 @@ package me.RockinChaos.itemjoin.Listeners;
 
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.PlayerHandlers;
+import me.RockinChaos.itemjoin.handlers.WorldHandler;
 import me.RockinChaos.itemjoin.utils.CheckItem;
 
 import org.bukkit.configuration.ConfigurationSection;
@@ -44,7 +45,7 @@ public class Placement implements Listener{
 	 public static void reAddItem(Player player, ItemStack item1) 
 	  {
 
-	       ConfigurationSection selection = ItemJoin.getSpecialConfig("items.yml").getConfigurationSection(player.getWorld().getName() + ".items");
+	       ConfigurationSection selection = ItemJoin.getSpecialConfig("items.yml").getConfigurationSection(WorldHandler.checkWorlds(player.getWorld().getName()) + ".items");
 	        for (String item : selection.getKeys(false)) 
 	        {
 	      	ConfigurationSection items = selection.getConfigurationSection(item);

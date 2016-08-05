@@ -42,7 +42,7 @@ public class FirstJoin implements Listener {
 	
     public static void setJoinItems(Player player)
     {
-        ConfigurationSection selection = ItemJoin.getSpecialConfig("items.yml").getConfigurationSection(player.getWorld().getName() + ".items");
+        ConfigurationSection selection = ItemJoin.getSpecialConfig("items.yml").getConfigurationSection(WorldHandler.checkWorlds(player.getWorld().getName()) + ".items");
         final String world = WorldHandler.getWorld(player.getWorld().getName());
         for (String item : selection.getKeys(false)) 
         {
@@ -183,7 +183,7 @@ public class FirstJoin implements Listener {
 	
     public static void setWorldChangedItems(Player player)
     {
-        ConfigurationSection selection = ItemJoin.getSpecialConfig("items.yml").getConfigurationSection(player.getWorld().getName() + ".items");
+        ConfigurationSection selection = ItemJoin.getSpecialConfig("items.yml").getConfigurationSection(WorldHandler.checkWorlds(player.getWorld().getName()) + ".items");
         final String world = WorldHandler.getWorld(player.getWorld().getName());
         for (String item : selection.getKeys(false)) 
         {

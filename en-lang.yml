@@ -2,7 +2,7 @@
 #// All messages support custom placeholders and PlaceholderAPI! //#
 #// Simply remove any message and no message will be sent! //#
 #// Example of it being removed: #unknownCommand: '&cUnknown command!' (Fully remove the unknownCommand: line) //#
-en-Version: 3
+en-Version: 4
 Prefix: '&7[&eItemJoin&7] '
 unknownCommand: '&cUnknown command!'
 noPermission: '&cYou do not have permission to use that command!'
@@ -25,5 +25,8 @@ loadedWorlds: '&aFound the worlds:'
 loadedWorldsListed: '&e- %loaded_worlds%'
 listWorlds: '&a&l%world%:'
 listItems: '&a&l   &a%items%'
+nolistItems: '&c&l   &cNo items are defined for this world.'
 worldIn: '&aYou are in the world:'
 worldInListed: '&e- %in_worlds%'
+itemCostSuccess: '&aYou ran a command for $%amount%.'
+itemCostFailed: '&cYou do not have enough for this command! You have $%amount% of the required $%cost%.'

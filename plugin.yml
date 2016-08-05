@@ -1,6 +1,6 @@
 name: ItemJoin
 main: me.RockinChaos.itemjoin.ItemJoin
-version: 3.4
+version: 3.5
 author: RockinChaos
 commands:
    itemjoin:
@@ -47,6 +47,10 @@ commands:
       description: Checks what items you can get each what world.
       usage: |
           /itemjoin list
+   itemjoin autoupdate:
+      description: Force updates ItemJoin
+      usage: |
+          /itemjoin autoupdate
    ij:
       description: Displays some options.
       usage: |
@@ -91,6 +95,10 @@ commands:
       description: Checks what items you can get each what world.
       usage: |
           /ij list
+   ij autoupdate:
+      description: Force updates ItemJoin
+      usage: |
+          /ij autoupdate
           
 permissions:
    itemjoin.*:
@@ -106,7 +114,10 @@ permissions:
       description: Allows use of reload command.
       default: op
    itemjoin.updates:
-      description: Use of the /itemjoin update command.
+      description: Use of the /itemjoin updates command.
+      default: op
+   itemjoin.autoupdate:
+      description: Use of the /itemjoin autoupdate command.
       default: op
    itemjoin.get:
       description: Use of the /itemjoin get <item> command.

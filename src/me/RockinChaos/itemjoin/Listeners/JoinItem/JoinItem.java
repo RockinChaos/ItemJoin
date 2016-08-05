@@ -98,7 +98,7 @@ public class JoinItem implements Listener {
 	
     public static void setJoinItems(Player player)
     {
-        ConfigurationSection selection = ItemJoin.getSpecialConfig("items.yml").getConfigurationSection(player.getWorld().getName() + ".items");
+        ConfigurationSection selection = ItemJoin.getSpecialConfig("items.yml").getConfigurationSection(WorldHandler.checkWorlds(player.getWorld().getName()) + ".items");
         if (selection != null ) {
         for (String item : selection.getKeys(false)) 
         {

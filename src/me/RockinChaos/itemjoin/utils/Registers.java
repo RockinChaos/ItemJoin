@@ -1,7 +1,10 @@
 package me.RockinChaos.itemjoin.utils;
 
+import java.io.BufferedReader;
 import java.io.File;
-
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.Listeners.CancelInteract;
 import me.RockinChaos.itemjoin.Listeners.Drops;
@@ -138,6 +141,26 @@ public class Registers {
 				return hasPlaceholderAPI;
 		   }
 		   
+		   public static void checdkUpdates() {
+			   try {
+		            HttpURLConnection con = (HttpURLConnection) new URL(
+		                    "http://www.spigotmc.org/api/general.php").openConnection();
+		            con.setDoOutput(true);
+		            con.setRequestMethod("POST");
+		            con.getOutputStream()
+		                    .write(("key=98BE0FE67F88AB82B4C197FAF1DC3B69206EFDCC4D3B80FC83A00037510B99B4&resource=" + 12661)
+		                            .getBytes("UTF-8"));
+		            String version = new BufferedReader(new InputStreamReader(
+		                    con.getInputStream())).readLine();
+		            String cversion = ItemJoin.pl.getServer().getVersion();
+		            if (!(version.length() >= cversion.length())) {
+		            	Console.sendMessage(Prefix + ChatColor.GREEN + "Update is available.");
+		            }
+		        } catch (Exception ex) {
+		            Console.sendMessage(Prefix + ChatColor.GREEN + "Failed to check for a update on spigot.");
+		        }
+		   }
+		   
 		   public static void registerEvents() {
 			      ItemJoin.pl.getCommand("itemjoin").setExecutor(new Commands());
 				  ItemJoin.pl.getCommand("ij").setExecutor(new Commands());
@@ -145,12 +168,14 @@ public class Registers {
 				  ItemJoin.pl.getServer().getPluginManager().registerEvents(new ChangedWorld(),ItemJoin.pl);
 				  ItemJoin.pl.getServer().getPluginManager().registerEvents(new Respawn(),ItemJoin.pl);
 				  ItemJoin.pl.getServer().getPluginManager().registerEvents(new InventoryClick(),ItemJoin.pl);
-				  ItemJoin.pl.getServer().getPluginManager().registerEvents(new SwapHands(),ItemJoin.pl);
 				  ItemJoin.pl.getServer().getPluginManager().registerEvents(new Drops(),ItemJoin.pl);
 				  ItemJoin.pl.getServer().getPluginManager().registerEvents(new Pickups(),ItemJoin.pl);
 				  ItemJoin.pl.getServer().getPluginManager().registerEvents(new Placement(),ItemJoin.pl);
 				  ItemJoin.pl.getServer().getPluginManager().registerEvents(new InteractCmds(),ItemJoin.pl);
 				  ItemJoin.pl.getServer().getPluginManager().registerEvents(new CancelInteract(),ItemJoin.pl);
+				  if (hasCombatUpdate()) {
+				  ItemJoin.pl.getServer().getPluginManager().registerEvents(new SwapHands(),ItemJoin.pl);
+				  }
 	    }
 
 		   public static boolean hasCombatUpdate() { // Need better solution for this later... //

@@ -39,6 +39,28 @@ public class WorldHandler {
 		     }
 		}
 		
+		public static String checkWorld(int i) {
+			String world = WorldHandler.getWorld((String)ItemJoin.pl.worlds.get(i));
+			   if (ItemJoin.getSpecialConfig("items.yml").getConfigurationSection(world) != null) {
+				   return WorldHandler.getWorld((String)ItemJoin.pl.worlds.get(i));
+			   } else if (ItemJoin.getSpecialConfig("items.yml").getBoolean("Global-Settings" + ".Get-Items." + "Global-Items") == true 
+					   && ItemJoin.getSpecialConfig("items.yml").getConfigurationSection(getWorld("global")) != null) {
+		    	 return getWorld("global");
+			   }
+			return "DoesNotExist!"; 
+		}
+		
+		public static String checkWorlds(String worlds) {
+			String world = WorldHandler.getWorld(worlds);
+			   if (ItemJoin.getSpecialConfig("items.yml").getConfigurationSection(world) != null) {
+				   return world;
+			   } else if (ItemJoin.getSpecialConfig("items.yml").getBoolean("Global-Settings" + ".Get-Items." + "Global-Items") == true 
+					   && ItemJoin.getSpecialConfig("items.yml").getConfigurationSection(getWorld("global")) != null) {
+		    	 return getWorld("global");
+			   }
+			return "DoesNotExist!"; 
+		}
+		
 		public static void UpdateItems() {
 		     for (Player player : Bukkit.getServer().getOnlinePlayers())
 		     {

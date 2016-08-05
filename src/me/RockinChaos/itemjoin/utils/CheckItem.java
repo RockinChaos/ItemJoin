@@ -24,7 +24,7 @@ public class CheckItem {
 		   boolean BadItem = checking == null;
 	       final String world = WorldHandler.getWorld(player.getWorld().getName());
 		   if (WorldHandler.isWorld(world) && !BadItem) {
-	       ConfigurationSection selection = ItemJoin.getSpecialConfig("items.yml").getConfigurationSection(player.getWorld().getName() + ".items");
+	       ConfigurationSection selection = ItemJoin.getSpecialConfig("items.yml").getConfigurationSection(WorldHandler.checkWorlds(player.getWorld().getName()) + ".items");
 	       if (selection != null) {
 	        for (String item : selection.getKeys(false)) 
 	        {
@@ -66,7 +66,7 @@ public class CheckItem {
 		  }
    return isSimilar;	   
 }
-	   
+  
 	   public static boolean isBookSimilar(ConfigurationSection items, ItemStack item1, Player player) {
 		   boolean isSimilar = false;
 		   if (item1.getType() == Material.WRITTEN_BOOK 

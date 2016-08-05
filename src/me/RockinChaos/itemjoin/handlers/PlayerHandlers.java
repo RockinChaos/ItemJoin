@@ -2,6 +2,8 @@ package me.RockinChaos.itemjoin.handlers;
 
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.utils.Registers;
+import me.RockinChaos.itemjoin.utils.Vault;
+import net.milkbowl.vault.economy.EconomyResponse;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -74,5 +76,17 @@ public class PlayerHandlers {
 	public static Player StringPlayer(String StringPlayer) {
 		Player args = Bukkit.getPlayerExact(StringPlayer);
 		return args;
+	}
+	
+	@SuppressWarnings("deprecation")
+	public static double getBalance(Player player) {
+		double balance = Vault.econ.getBalance(player.getName());
+		return balance;
+	}
+	
+	@SuppressWarnings("deprecation")
+	public static EconomyResponse withdrawBalance(Player player, int cost) {
+		EconomyResponse balance = Vault.econ.withdrawPlayer(player.getName(), cost);;
+		return balance;
 	}
 }

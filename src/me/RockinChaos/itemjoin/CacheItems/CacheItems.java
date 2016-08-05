@@ -25,8 +25,11 @@ import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
+import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.map.MapView;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 public class CacheItems {
 
@@ -34,10 +37,11 @@ public class CacheItems {
 	    {
 	     for (int i = 0; i < ItemJoin.pl.worlds.size(); i++)
 	     {
-	       String world = WorldHandler.getWorld((String)ItemJoin.pl.worlds.get(i));;
-	       if (ItemJoin.getSpecialConfig("items.yml").getConfigurationSection(world) != null
-	    		   && ItemJoin.getSpecialConfig("items.yml").getConfigurationSection(world + ".items") != null) {
-	       ConfigurationSection selection = ItemJoin.getSpecialConfig("items.yml").getConfigurationSection(world + ".items");
+	       String world = WorldHandler.getWorld((String)ItemJoin.pl.worlds.get(i));
+	       String worldCheck = WorldHandler.checkWorld(i);
+	       if (ItemJoin.getSpecialConfig("items.yml").getConfigurationSection(worldCheck) != null
+	    		   && ItemJoin.getSpecialConfig("items.yml").getConfigurationSection(worldCheck + ".items") != null) {
+	       ConfigurationSection selection = ItemJoin.getSpecialConfig("items.yml").getConfigurationSection(worldCheck + ".items");
 	       if (selection == null ) {
 	    	   ItemJoin.pl.Console.sendMessage(ItemJoin.pl.Prefix + ChatColor.RED + "You have defined the world " + ChatColor.YELLOW + world + ChatColor.RED + " under world-list.");
 	    	   ItemJoin.pl.Console.sendMessage(ItemJoin.pl.Prefix + ChatColor.RED + "Yet the section for defining items under " + ChatColor.YELLOW + world + ChatColor.RED + " does not exist!");
@@ -56,7 +60,7 @@ public class CacheItems {
 		     if (!Registers.hasCombatUpdate() && items.getString(".slot").equalsIgnoreCase("Offhand")) {  
 		    	 ItemJoin.pl.Console.sendMessage(ItemJoin.pl.Prefix + ChatColor.RED + "Your server is running " + ChatColor.YELLOW + "MC " + vers + ChatColor.RED + " and this does not have Offhand support!");
 		    	 ItemJoin.pl.Console.sendMessage(ItemJoin.pl.Prefix + ChatColor.RED + "Because of this, the item " + ChatColor.YELLOW + item + ChatColor.RED +  " will not be set!");
-		      } else if (CheckItem.CheckMaterial(tempmat, world, item) && CheckItem.CheckSlot(slot, world, item)) 
+		      } else if (CheckItem.CheckMaterial(tempmat, worldCheck, item) && CheckItem.CheckSlot(slot, worldCheck, item)) 
 	          {
 	           ItemStack tempitem = new ItemStack(tempmat, items.getInt(".count", 1),(short)dataValue);
 	           ItemMeta tempmeta = null;
@@ -72,6 +76,8 @@ public class CacheItems {
 						|| tempmat == Material.LEATHER_LEGGINGS
 						|| tempmat == Material.LEATHER_BOOTS) {
 	        		   tempmeta = (LeatherArmorMeta) tempitem.getItemMeta();
+	           } else if (tempmat == Material.TIPPED_ARROW) {
+	        	   tempmeta = (PotionMeta) tempitem.getItemMeta();
 	           } else {
 	        	   tempmeta = tempitem.getItemMeta();
 	           }
@@ -97,6 +103,18 @@ public class CacheItems {
 			        tempmeta.addItemFlags(ItemFlag.HIDE_PLACED_ON);
 			        tempmeta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
 			        tempmeta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
+				}
+				if (items.getString(".arrow.potion-effect") != null && tempmat == Material.TIPPED_ARROW) {
+					String effectType = items.getString(".arrow.potion-effect").toUpperCase();
+					int powerLevel = items.getInt(".arrow.power");
+					int time = items.getInt(".arrow.time");
+					if (items.getString(".arrow.time") == null) {
+						time = 20;
+					}
+					if (items.getString(".arrow.power") == null) {
+						powerLevel = 1;
+					}
+					((PotionMeta) tempmeta).addCustomEffect(new PotionEffect(PotionEffectType.getByName(effectType), time*160, powerLevel), true);
 				}
 		        if (items.getString(".firework.type") != null && tempmat == Material.FIREWORK)
 		         {
@@ -146,9 +164,12 @@ public class CacheItems {
 	   	          view.addRenderer(new RenderImageMaps());
 	   			 }
 	        	} catch (NullPointerException e) {
-		   			ItemJoin.pl.Console.sendMessage(ItemJoin.pl.Prefix + ChatColor.RED + "Something has gone wrong with the maps!");
-		   			ItemJoin.pl.Console.sendMessage(ItemJoin.pl.Prefix + ChatColor.RED + "This means your custom map will not be rendered!");
-		   			ItemJoin.pl.Console.sendMessage(ItemJoin.pl.Prefix + ChatColor.RED + "Please contact the plugin developer immediately!");
+	        		// Hidden for now to "Disable" the maps //
+	        		// This error DOES still occur! //
+	        		// Waiting on a fix... //
+		   			//ItemJoin.pl.Console.sendMessage(ItemJoin.pl.Prefix + ChatColor.RED + "Something has gone wrong with the maps!");
+		   			//ItemJoin.pl.Console.sendMessage(ItemJoin.pl.Prefix + ChatColor.RED + "This means your custom map will not be rendered!");
+		   			//ItemJoin.pl.Console.sendMessage(ItemJoin.pl.Prefix + ChatColor.RED + "Please contact the plugin developer immediately!");
 		          }
 			   }
 	           if (items.getString(".author") != null && tempmat == Material.WRITTEN_BOOK)
