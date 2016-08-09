@@ -9,12 +9,11 @@ import java.util.logging.Logger;
 
 import me.RockinChaos.itemjoin.handlers.WorldHandler;
 import me.RockinChaos.itemjoin.utils.Registers;
-import me.RockinChaos.itemjoin.utils.UpdateChecker;
-import me.RockinChaos.itemjoin.utils.Vault;
+import me.RockinChaos.itemjoin.utils.UpdateChecking;
+import me.RockinChaos.itemjoin.utils.Econ;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.ChatColor;
-import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -28,12 +27,11 @@ import org.bukkit.plugin.java.JavaPlugin;
     public List<String> worlds;
     public Map<String, ItemStack> items = new HashMap<String, ItemStack>();
     public Logger log;
+    public static File file;
     public static boolean hasMultiverse;
     public static boolean hasInventories;
     public static boolean hasPlaceholderAPI;
     public static String secretMsg;
-    public ConsoleCommandSender Console = getServer().getConsoleSender();
-    public String Prefix = ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] ";
     
     public void onEnable()
     {
@@ -47,14 +45,15 @@ import org.bukkit.plugin.java.JavaPlugin;
 	  Registers.checkHooks();
 	  WorldHandler.Worlds();
 	  WorldHandler.UpdateItems();
-      UpdateChecker.checkUpdates(Console);
-	  Vault.enableEconomy();
-      Console.sendMessage(Prefix + ChatColor.GREEN + "has been Enabled!");
+      UpdateChecking.checkUpdates(UpdateChecking.Console);
+	  file = getFile();
+	  Econ.enableEconomy();
+      UpdateChecking.Console.sendMessage(UpdateChecking.Prefix + ChatColor.GREEN + "has been Enabled!");
       }
 
     public void onDisable()
     {
-      Console.sendMessage(Prefix + ChatColor.RED + "Disabled!");
+      UpdateChecking.Console.sendMessage(UpdateChecking.Prefix + ChatColor.RED + "Disabled!");
       }
 
     public static FileConfiguration loadSpecialConfig(String path)

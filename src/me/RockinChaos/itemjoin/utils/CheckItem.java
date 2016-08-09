@@ -46,24 +46,36 @@ public class CheckItem {
 
 	   public static boolean isSkullSimilar(ConfigurationSection items, ItemStack item1, Player player) {
 		   boolean isSimilar = false;
+           String name;
+           if (items.getString(".name") != null) {
+           name = ItemJoin.pl.formatPlaceholders(items.getString(".name"), player) + ItemJoin.encodeItemData(ItemJoin.secretMsg);
+           } else {
+        	   String lookup = ItemJoin.getName(item1);
+        	   name = ItemJoin.pl.formatPlaceholders("&f" + lookup + ItemJoin.encodeItemData(ItemJoin.secretMsg), player);
+           }
 		   if (item1.getType() == Material.SKULL_ITEM 
-				   && Material.getMaterial(items.getString(".id")) == Material.SKULL_ITEM 
-				   && ((SkullMeta) item1.getItemMeta()).hasOwner() 
-				   && ((SkullMeta) item1.getItemMeta()).getOwner().equalsIgnoreCase(ItemJoin.pl.formatPlaceholders(items.getString(".skull-owner"), player))) {
-					   if (item1.hasItemMeta()
-							   && item1.getItemMeta().hasDisplayName()
-							   && Registers.SecretMsg()
-							   && ((SkullMeta) item1.getItemMeta()).getDisplayName().contains(ItemJoin.encodeItemData(ItemJoin.secretMsg))) {
-						   isSimilar = true;
-				   } else if (item1.hasItemMeta()
-						   && item1.getItemMeta().hasDisplayName()
-						   && !Registers.SecretMsg()
-						   && ((SkullMeta) item1.getItemMeta()).getDisplayName().equalsIgnoreCase(ItemJoin.pl.formatPlaceholders(items.getString(".name"), player))) {	
+				   && Material.getMaterial(items.getString(".id")) == Material.SKULL_ITEM) {
+				   if (((SkullMeta) item1.getItemMeta()).hasOwner() 
+				   && ((SkullMeta) item1.getItemMeta()).getOwner().equalsIgnoreCase(ItemJoin.pl.formatPlaceholders(items.getString(".skull-owner"), player)) && item1.hasItemMeta()
+				   && item1.getItemMeta().hasDisplayName() && item1.getItemMeta().getDisplayName().equalsIgnoreCase(name)) {
 					   isSimilar = true;
-				   } else if (!Registers.SecretMsg()) {	
+				   } else if (!Registers.SecretMsg() && ((SkullMeta) item1.getItemMeta()).hasOwner() 
+						   && ((SkullMeta) item1.getItemMeta()).getOwner().equalsIgnoreCase(ItemJoin.pl.formatPlaceholders(items.getString(".skull-owner"), player))) {	
+					   isSimilar = true;
+				   } else if (!Registers.SecretMsg() && !((SkullMeta) item1.getItemMeta()).hasOwner()) {	
 					   isSimilar = true;
 				   }
 		  }
+   return isSimilar;	   
+}
+	   
+	   public static boolean isBlockSimilar(ItemStack item1) {
+		   boolean isSimilar = false;
+		   if (item1.getType().isBlock()) {
+			   isSimilar = true;
+		   } else if (item1.getType() == Material.SKULL_ITEM || item1.getType() == Material.SKULL) {
+			   isSimilar = true;
+		   }
    return isSimilar;	   
 }
   

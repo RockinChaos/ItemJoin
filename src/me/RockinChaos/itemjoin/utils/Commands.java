@@ -53,7 +53,7 @@ public class Commands implements CommandExecutor {
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if (args.length == 0) {
 			if (sender.hasPermission("itemjoin.use") || sender.hasPermission("itemjoin.*")) {
-				sender.sendMessage(ChatColor.GREEN + "ItemJoin v." + ItemJoin.pl.getDescription().getVersion()
+				sender.sendMessage(ChatColor.GREEN + "ItemJoin v" + ItemJoin.pl.getDescription().getVersion()
 						+ ChatColor.YELLOW + " by RockinChaos");
 				sender.sendMessage(ChatColor.GREEN + "Type" + ChatColor.GREEN.toString() + ChatColor.BOLD.toString()
 						+ " /ItemJoin Help " + ChatColor.GREEN + "for the help menu.");
@@ -85,7 +85,7 @@ public class Commands implements CommandExecutor {
 						+ " /ItemJoin Help 2 " + ChatColor.GREEN + "for the next page.");
 				sender.sendMessage(ChatColor.GREEN.toString() + ChatColor.BOLD.toString()
 						+ ChatColor.STRIKETHROUGH.toString() + "]------------" + ChatColor.GREEN.toString()
-						+ ChatColor.BOLD.toString() + "[" + ChatColor.YELLOW + " Help Menu 1/2 "
+						+ ChatColor.BOLD.toString() + "[" + ChatColor.YELLOW + " Help Menu 1/3 "
 						+ ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "]" + ChatColor.GREEN.toString()
 						+ ChatColor.BOLD.toString() + ChatColor.STRIKETHROUGH.toString() + "------------[");
 				sender.sendMessage("");
@@ -114,13 +114,37 @@ public class Commands implements CommandExecutor {
 								+ ChatColor.GRAY + " - " + ChatColor.YELLOW + "Gives to said player.");
 				sender.sendMessage(ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "/ItemJoin World"
 						+ ChatColor.GRAY + " - " + ChatColor.YELLOW + "Check what world you are in. (debugging).");
+				sender.sendMessage(ChatColor.GREEN + "Type" + ChatColor.GREEN.toString() + ChatColor.BOLD.toString()
+				+ " /ItemJoin Help 3 " + ChatColor.GREEN + "for the next page.");
+				sender.sendMessage(ChatColor.GREEN.toString() + ChatColor.BOLD.toString()
+						+ ChatColor.STRIKETHROUGH.toString() + "]------------" + ChatColor.GREEN.toString()
+						+ ChatColor.BOLD.toString() + "[" + ChatColor.YELLOW + " Help Menu 2/3 "
+						+ ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "]" + ChatColor.GREEN.toString()
+						+ ChatColor.BOLD.toString() + ChatColor.STRIKETHROUGH.toString() + "------------[");
+				sender.sendMessage("");
+				return true;
+			} else {
+				sender.sendMessage(noPermission);
+				return true;
+			}
+		} else if (args.length == 2 && args[0].equalsIgnoreCase("help") && args[1].equalsIgnoreCase("3")
+				|| args.length == 2 && args[0].equalsIgnoreCase("h") && args[1].equalsIgnoreCase("3")) {
+			if (sender.hasPermission("itemjoin.use") || sender.hasPermission("itemjoin.*")) {
+				sender.sendMessage("");
+				sender.sendMessage(ChatColor.GREEN.toString() + ChatColor.BOLD.toString()
+						+ ChatColor.STRIKETHROUGH.toString() + "]--------------" + ChatColor.GREEN.toString()
+						+ ChatColor.BOLD.toString() + "[" + ChatColor.YELLOW + " ItemJoin " + ChatColor.GREEN.toString()
+						+ ChatColor.BOLD.toString() + "]" + ChatColor.GREEN.toString() + ChatColor.BOLD.toString()
+						+ ChatColor.STRIKETHROUGH.toString() + "--------------[");
 				sender.sendMessage(ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "/ItemJoin List"
 						+ ChatColor.GRAY + " - " + ChatColor.YELLOW + "Check items you can get each what worlds.");
+				sender.sendMessage(ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "/ItemJoin AutoUpdate"
+						+ ChatColor.GRAY + " - " + ChatColor.YELLOW + "Update ItemJoin to the latest version.");
 				sender.sendMessage(ChatColor.GREEN + "Found a bug? Report it @");
 				sender.sendMessage(ChatColor.GREEN + "http://dev.bukkit.org/bukkit-plugins/itemjoin/");
 				sender.sendMessage(ChatColor.GREEN.toString() + ChatColor.BOLD.toString()
 						+ ChatColor.STRIKETHROUGH.toString() + "]------------" + ChatColor.GREEN.toString()
-						+ ChatColor.BOLD.toString() + "[" + ChatColor.YELLOW + " Help Menu 2/2 "
+						+ ChatColor.BOLD.toString() + "[" + ChatColor.YELLOW + " Help Menu 3/3 "
 						+ ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "]" + ChatColor.GREEN.toString()
 						+ ChatColor.BOLD.toString() + ChatColor.STRIKETHROUGH.toString() + "------------[");
 				sender.sendMessage("");
@@ -478,7 +502,7 @@ public class Commands implements CommandExecutor {
 			if (sender.hasPermission("itemjoin.updates") || sender.hasPermission("itemjoin.*")) {
 				Console.sendMessage(
 				CPrefix + ChatColor.RED + sender.getName() + " has requested to check for updates!");
-				UpdateChecker.checkUpdates(sender);
+				UpdateChecking.checkUpdates(sender);
 				return true;
 			} else {
 				sender.sendMessage(noPermission);
@@ -487,8 +511,8 @@ public class Commands implements CommandExecutor {
 		} else if (args[0].equalsIgnoreCase("AutoUpdate") || args[0].equalsIgnoreCase("AutoUpdate")) {
 			if (sender.hasPermission("itemjoin.autoupdate") || sender.hasPermission("itemjoin.*")) {
 				Console.sendMessage(
-				CPrefix + ChatColor.RED + sender.getName() + " has requested to force update the server!");
-			    UpdateChecker.forceUpdates(sender);
+				CPrefix + ChatColor.RED + sender.getName() + " has requested to force update the plugin!");
+			    UpdateChecking.forceUpdates(sender);
 				return true;
 			} else {
 				sender.sendMessage(noPermission);

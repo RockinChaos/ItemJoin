@@ -22,7 +22,7 @@ public class Placement implements Listener{
 	    final Player player = event.getPlayer();
 	    String modifier = ".itemflags";
 	    String mod = "placement";
-	      if (event.getAction() == Action.RIGHT_CLICK_BLOCK && !CheckItem.isAllowedItem(player, item, modifier, mod) && item.getType().isBlock())
+	      if (event.getAction() == Action.RIGHT_CLICK_BLOCK && !CheckItem.isAllowedItem(player, item, modifier, mod) && CheckItem.isBlockSimilar(item))
 	      {
 	        event.setCancelled(true);
 	        PlayerHandlers.updateInventory(player);
@@ -36,7 +36,7 @@ public class Placement implements Listener{
 	    final Player player = event.getPlayer();
 	    String modifier = ".itemflags";
 	    String mod = "count-lock";
-	      if (event.getAction() == Action.RIGHT_CLICK_BLOCK && !CheckItem.isAllowedItem(player, item, modifier, mod) && item.getType().isBlock())
+	      if (event.getAction() == Action.RIGHT_CLICK_BLOCK && !CheckItem.isAllowedItem(player, item, modifier, mod) && CheckItem.isBlockSimilar(item))
 	      {
 	    	  reAddItem(player, item);
 	 }

@@ -29,13 +29,14 @@ public class RenderImageMaps extends MapRenderer {
 		try {
 			if(!writeImage.equalsIgnoreCase("default.png")) {
 			    canvas.drawImage(0, 0, ImageIO.read(new File(ItemJoin.pl.getDataFolder(), String.valueOf(writeImage))));
-			} else if (writeImage.equalsIgnoreCase("default.png")) {
+			} else if (writeImage.equalsIgnoreCase("default.png") && ItemJoin.pl.getResource("default.png") != null) {
 				canvas.drawImage(0, 0, ImageIO.read(ItemJoin.pl.getResource("default.png")));
 			}
-		} catch (IOException e) {
-			Console.sendMessage(Prefix + ChatColor.RED + "[ERROR] There was a problem rending your map(s)!");
-			Console.sendMessage(Prefix + ChatColor.RED + "Please check and make sure your image size is no larger than 128x128 pixels.");
-			Console.sendMessage(Prefix + ChatColor.RED + "If you are still experiencing this error please contact the plugin developer!");	
-	}
+		  } catch (IOException e) {
+	 	     	Console.sendMessage(Prefix + ChatColor.RED + "[ERROR] There was a problem rending your map(s)!");
+			    Console.sendMessage(Prefix + ChatColor.RED + "Please check and make sure your image size is no larger than 128x128 pixels.");
+		    	Console.sendMessage(Prefix + ChatColor.RED + "If you are still experiencing this error please contact the plugin developer!");	
+     	  }  catch (IllegalArgumentException e) {
+       }
    }
 }

@@ -2,6 +2,7 @@ package me.RockinChaos.itemjoin.CacheItems;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import me.RockinChaos.itemjoin.ItemJoin;
@@ -16,6 +17,7 @@ import org.bukkit.DyeColor;
 import org.bukkit.FireworkEffect;
 import org.bukkit.Material;
 import org.bukkit.FireworkEffect.Type;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -27,11 +29,15 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 public class CacheItems {
+	
+    public static ConsoleCommandSender Console = ItemJoin.pl.getServer().getConsoleSender();
+    public static String Prefix = ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] ";
 
 	  public static void run(Player player)
 	    {
@@ -43,10 +49,10 @@ public class CacheItems {
 	    		   && ItemJoin.getSpecialConfig("items.yml").getConfigurationSection(worldCheck + ".items") != null) {
 	       ConfigurationSection selection = ItemJoin.getSpecialConfig("items.yml").getConfigurationSection(worldCheck + ".items");
 	       if (selection == null ) {
-	    	   ItemJoin.pl.Console.sendMessage(ItemJoin.pl.Prefix + ChatColor.RED + "You have defined the world " + ChatColor.YELLOW + world + ChatColor.RED + " under world-list.");
-	    	   ItemJoin.pl.Console.sendMessage(ItemJoin.pl.Prefix + ChatColor.RED + "Yet the section for defining items under " + ChatColor.YELLOW + world + ChatColor.RED + " does not exist!");
-	    	   ItemJoin.pl.Console.sendMessage(ItemJoin.pl.Prefix + ChatColor.RED + "Please consult the documentations for help.");
-	    	   ItemJoin.pl.Console.sendMessage(ItemJoin.pl.Prefix + ChatColor.RED + "Items for " + ChatColor.YELLOW + world + ChatColor.RED + " will not be set!");
+	    	   Console.sendMessage(Prefix + ChatColor.RED + "You have defined the world " + ChatColor.YELLOW + world + ChatColor.RED + " under world-list.");
+	    	   Console.sendMessage(Prefix + ChatColor.RED + "Yet the section for defining items under " + ChatColor.YELLOW + world + ChatColor.RED + " does not exist!");
+	    	   Console.sendMessage(Prefix + ChatColor.RED + "Please consult the documentations for help.");
+	    	   Console.sendMessage(Prefix + ChatColor.RED + "Items for " + ChatColor.YELLOW + world + ChatColor.RED + " will not be set!");
 	       } else if (selection != null ) {
 	       for (String item : selection.getKeys(false))
 	       {
@@ -57,10 +63,15 @@ public class CacheItems {
 		     String Modifiers = ((List<?>)items.getStringList(".itemflags")).toString();
 		     String pkgname = ItemJoin.pl.getServer().getClass().getPackage().getName();
 		     String vers = pkgname.substring(pkgname.lastIndexOf('.') + 1);
-		     if (!Registers.hasCombatUpdate() && items.getString(".slot").equalsIgnoreCase("Offhand")) {  
-		    	 ItemJoin.pl.Console.sendMessage(ItemJoin.pl.Prefix + ChatColor.RED + "Your server is running " + ChatColor.YELLOW + "MC " + vers + ChatColor.RED + " and this does not have Offhand support!");
-		    	 ItemJoin.pl.Console.sendMessage(ItemJoin.pl.Prefix + ChatColor.RED + "Because of this, the item " + ChatColor.YELLOW + item + ChatColor.RED +  " will not be set!");
-		      } else if (CheckItem.CheckMaterial(tempmat, worldCheck, item) && CheckItem.CheckSlot(slot, worldCheck, item)) 
+		    	 if (!Registers.hasCombatUpdate() && items.getString(".slot").equalsIgnoreCase("Offhand")) {
+		    	 Console.sendMessage(Prefix + ChatColor.RED + "Your server is running " + ChatColor.YELLOW + "MC " + vers + ChatColor.RED + " and this does not have Offhand support!");
+		    	 Console.sendMessage(Prefix + ChatColor.RED + "Because of this, the item " + ChatColor.YELLOW + item + ChatColor.RED +  " in the world; " + ChatColor.YELLOW + worldCheck + ChatColor.RED + " will not be set!");
+		    	 } else if (!Registers.hasCombatUpdate() && items.getString(".id").equalsIgnoreCase("TIPPED_ARROW") 
+		    			 || !Registers.hasCombatUpdate() && items.getString(".id").equalsIgnoreCase("440")
+		    			 || !Registers.hasCombatUpdate() && items.getString(".id").equalsIgnoreCase("0440")) {
+			    	 Console.sendMessage(Prefix + ChatColor.RED + "Your server is running " + ChatColor.YELLOW + "MC " + vers + ChatColor.RED + " and this does not have the item TIPPED_ARROW");
+			    	 Console.sendMessage(Prefix + ChatColor.RED + "Because of this, the item " + ChatColor.YELLOW + item + ChatColor.RED +  " in the world; " + ChatColor.YELLOW + worldCheck + ChatColor.RED + " will not be set!");
+		    	 } else if (CheckItem.CheckMaterial(tempmat, worldCheck, item) && CheckItem.CheckSlot(slot, worldCheck, item)) 
 	          {
 	           ItemStack tempitem = new ItemStack(tempmat, items.getInt(".count", 1),(short)dataValue);
 	           ItemMeta tempmeta = null;
@@ -76,7 +87,7 @@ public class CacheItems {
 						|| tempmat == Material.LEATHER_LEGGINGS
 						|| tempmat == Material.LEATHER_BOOTS) {
 	        		   tempmeta = (LeatherArmorMeta) tempitem.getItemMeta();
-	           } else if (tempmat == Material.TIPPED_ARROW) {
+	           } else if (Registers.hasCombatUpdate() && tempmat == Material.TIPPED_ARROW) {
 	        	   tempmeta = (PotionMeta) tempitem.getItemMeta();
 	           } else {
 	        	   tempmeta = tempitem.getItemMeta();
@@ -104,7 +115,7 @@ public class CacheItems {
 			        tempmeta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
 			        tempmeta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
 				}
-				if (items.getString(".arrow.potion-effect") != null && tempmat == Material.TIPPED_ARROW) {
+				if (Registers.hasCombatUpdate() && items.getString(".arrow.potion-effect") != null && tempmat == Material.TIPPED_ARROW) {
 					String effectType = items.getString(".arrow.potion-effect").toUpperCase();
 					int powerLevel = items.getInt(".arrow.power");
 					int time = items.getInt(".arrow.time");
@@ -154,23 +165,26 @@ public class CacheItems {
 					((LeatherArmorMeta) tempmeta).setColor(DyeColor.valueOf(leathercolor).getFireworkColor());
 					}
 	             }
-	           if (items.getString(".custom-map-image") != null && tempmat == Material.MAP)
-	           {
-	        	try {
-	            MapView view = PlayerHandlers.MapView(tempitem);
-	        	String mapIMG = items.getString(".custom-map-image");
-	   			 if (mapIMG.equalsIgnoreCase("default.png") || new File(ItemJoin.pl.getDataFolder(), mapIMG).exists()) {
-	   			  RenderImageMaps.setImage(mapIMG);
-	   	          view.addRenderer(new RenderImageMaps());
-	   			 }
-	        	} catch (NullPointerException e) {
-	        		// Hidden for now to "Disable" the maps //
-	        		// This error DOES still occur! //
-	        		// Waiting on a fix... //
-		   			//ItemJoin.pl.Console.sendMessage(ItemJoin.pl.Prefix + ChatColor.RED + "Something has gone wrong with the maps!");
-		   			//ItemJoin.pl.Console.sendMessage(ItemJoin.pl.Prefix + ChatColor.RED + "This means your custom map will not be rendered!");
-		   			//ItemJoin.pl.Console.sendMessage(ItemJoin.pl.Prefix + ChatColor.RED + "Please contact the plugin developer immediately!");
-		          }
+		           if (items.getString(".custom-map-image") != null && tempmat == Material.MAP)
+		           {
+		        	int therandomnumber = (short) ItemJoin.getRandom(1, 29);
+		        	tempitem.setDurability((short) therandomnumber);
+		        	try {
+					MapView view = PlayerHandlers.MapView(tempitem);;
+		        	String mapIMG = items.getString(".custom-map-image");
+		   			 if (mapIMG.equalsIgnoreCase("default.png") || new File(ItemJoin.pl.getDataFolder(), mapIMG).exists()) {
+		   			  RenderImageMaps.setImage(mapIMG);
+                      Iterator<MapRenderer> iter = view.getRenderers().iterator();
+                      while(iter.hasNext()){
+                          view.removeRenderer(iter.next());
+                      }
+		   	          view.addRenderer(new RenderImageMaps());
+		   			 }
+		        	 } catch (NullPointerException e) {
+			   			Console.sendMessage(Prefix + ChatColor.RED + "Something has gone wrong with the maps!");
+			   			Console.sendMessage(Prefix + ChatColor.RED + "This means your custom map will not be rendered!");
+			   			Console.sendMessage(Prefix + ChatColor.RED + "Please contact the plugin developer immediately!");
+			         }
 			   }
 	           if (items.getString(".author") != null && tempmat == Material.WRITTEN_BOOK)
 	           {
@@ -217,17 +231,17 @@ public class CacheItems {
 	            	           level = Integer.parseInt(parts[1]);
 	            	       }
 	            	       catch (NumberFormatException ex) {
-	            	    	   ItemJoin.pl.Console.sendMessage("An error occurred in the config, " + parts[1] + " is not a number and a number was expected!");
-	            	    	   ItemJoin.pl.Console.sendMessage(ItemJoin.pl.Prefix + ChatColor.RED + "An error occurred in the config, " + ChatColor.GREEN + parts[1] + ChatColor.RED + " is not a number and a number was expected!");
-	            	    	   ItemJoin.pl.Console.sendMessage(ItemJoin.pl.Prefix + ChatColor.RED + ChatColor.GREEN + "Enchantment: " + parts[0] + " will now be enchanted by level 1.");
+	            	    	   Console.sendMessage("An error occurred in the config, " + parts[1] + " is not a number and a number was expected!");
+	            	    	   Console.sendMessage(Prefix + ChatColor.RED + "An error occurred in the config, " + ChatColor.GREEN + parts[1] + ChatColor.RED + " is not a number and a number was expected!");
+	            	    	   Console.sendMessage(Prefix + ChatColor.RED + ChatColor.GREEN + "Enchantment: " + parts[0] + " will now be enchanted by level 1.");
 	            	       }
 	        	       }
 	        	       if (Enchantment.getByName(name) != null) {
 	        	       tempitem.addUnsafeEnchantment(Enchantment.getByName(name), level);
 	        	       }
 	        	       if (Enchantment.getByName(name) == null) {
-	        	    	   ItemJoin.pl.Console.sendMessage(ItemJoin.pl.Prefix + ChatColor.RED + "An error occurred in the config, " + ChatColor.GREEN + name + ChatColor.RED + " is an incorrect enchantment name!");
-	        	    	   ItemJoin.pl.Console.sendMessage(ItemJoin.pl.Prefix + ChatColor.RED + "Please see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/enchantments/Enchantment.html for a list of correct enchantment names!");
+	        	    	   Console.sendMessage(Prefix + ChatColor.RED + "An error occurred in the config, " + ChatColor.GREEN + name + ChatColor.RED + " is an incorrect enchantment name!");
+	        	    	   Console.sendMessage(Prefix + ChatColor.RED + "Please see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/enchantments/Enchantment.html for a list of correct enchantment names!");
 	        	       }
 	        	   }
 	           }

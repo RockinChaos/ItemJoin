@@ -10,7 +10,7 @@ import me.RockinChaos.itemjoin.handlers.WorldHandler;
 import me.RockinChaos.itemjoin.utils.BungeeCord;
 import me.RockinChaos.itemjoin.utils.CheckItem;
 import me.RockinChaos.itemjoin.utils.Commands;
-import me.RockinChaos.itemjoin.utils.Vault;
+import me.RockinChaos.itemjoin.utils.Econ;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Entity;
@@ -119,7 +119,7 @@ public boolean chargeCost(ConfigurationSection items, String item, Player player
 public boolean isChargeable(ConfigurationSection items) {
 	boolean isChargeable = false;
 	   if (items.getString(".commands-cost") != null 
-			   && Vault.isVaultAPI()) {
+			   && Econ.isVaultAPI()) {
 		   isChargeable = true;
 	   }
 	   return isChargeable;

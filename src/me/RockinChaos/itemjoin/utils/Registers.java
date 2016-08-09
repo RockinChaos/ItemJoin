@@ -53,7 +53,7 @@ public class Registers {
 
 	   public static void configFile() {
 		      File cFile = new File(ItemJoin.pl.getDataFolder(), "config.yml");
-		      if (cFile.exists() && ItemJoin.getSpecialConfig("config.yml").getInt("config-Version") != 3) {
+		      if (cFile.exists() && ItemJoin.getSpecialConfig("config.yml").getInt("config-Version") != 4) {
 		      if (ItemJoin.pl.getResource("config.yml") != null) {
 		        String newGen = "config" + ItemJoin.getRandom(1500000,10000000) + ".yml";
 		        File newFile = new File(ItemJoin.pl.getDataFolder(), newGen);
@@ -80,7 +80,7 @@ public class Registers {
 		   
 		   public static void itemsFile() {
 			      File itemsFile = new File(ItemJoin.pl.getDataFolder(), "items.yml");
-			      if (itemsFile.exists() && ItemJoin.getSpecialConfig("items.yml").getInt("items-Version") != 3) {
+			      if (itemsFile.exists() && ItemJoin.getSpecialConfig("items.yml").getInt("items-Version") != 4) {
 			      if (ItemJoin.pl.getResource("items.yml") != null) {
 			        String newGen = "items" + ItemJoin.getRandom(1500000,10000000) + ".yml";
 			        File newFile = new File(ItemJoin.pl.getDataFolder(), newGen);
@@ -100,7 +100,7 @@ public class Registers {
 		   
 		public static void enLangFile() {
 			      File enLang = new File(ItemJoin.pl.getDataFolder(), "en-lang.yml");
-			      if (enLang.exists() && ItemJoin.pl.getConfig().getString("Language").equalsIgnoreCase("English") && ItemJoin.getSpecialConfig("en-lang.yml").getInt("en-Version") != 3) {
+			      if (enLang.exists() && ItemJoin.pl.getConfig().getString("Language").equalsIgnoreCase("English") && ItemJoin.getSpecialConfig("en-lang.yml").getInt("en-Version") != 4) {
 			      if (ItemJoin.pl.getResource("en-lang.yml") != null) {
 			        String newGen = "en-lang" + ItemJoin.getRandom(1500000,10000000) + ".yml";
 			        File newFile = new File(ItemJoin.pl.getDataFolder(), newGen);
@@ -122,7 +122,7 @@ public class Registers {
 
 		   public static boolean SecretMsg() {
 			   boolean isSecret = false;
-				  if (ItemJoin.getSpecialConfig("items.yml").getBoolean("Global-Settings" + ".Get-Items." + "Delay") == true) {
+				  if (ItemJoin.getSpecialConfig("items.yml").getBoolean("Global-Settings" + ".Get-Items." + "ItemJoin-Specific-Items") == true) {
 					  ItemJoin.secretMsg = "ItemJoin";
 					  isSecret = true;
 				  } else {
@@ -178,22 +178,14 @@ public class Registers {
 				  }
 	    }
 
-		   public static boolean hasCombatUpdate() { // Need better solution for this later... //
+		   public static boolean hasCombatUpdate() {
 			   boolean hasCombatUpdate = false;
-			   String version = ItemJoin.pl.getServer().getVersion();
-				  if (version.contains("1.9") 
-						  || version.contains("1.10") 
-						  || version.contains("1.11") 
-						  || version.contains("1.12")
-						  || version.contains("1.13")
-						  || version.contains("1.14")
-						  || version.contains("1.15")
-						  || version.contains("1.16")
-						  || version.contains("1.17")
-						  || version.contains("1.18")
-						  || version.contains("1.19")) {
-					  hasCombatUpdate = true;
-					 }
-				return hasCombatUpdate;
+			   String pkgname = ItemJoin.pl.getServer().getClass().getPackage().getName();
+			   String combatVersion = "v1_9_R0".replace("_", "").replace("R0", "").replace("R1", "").replace("R2", "").replace("R3", "").replace("R4", "").replace("R5", "").replaceAll("[a-z]", "");
+			   String version = pkgname.substring(pkgname.lastIndexOf('.') + 1).replace("_", "").replace("R0", "").replace("R1", "").replace("R2", "").replace("R3", "").replace("R4", "").replace("R5", "").replaceAll("[a-z]", "");
+			   if (Integer.parseInt(version) > Integer.parseInt(combatVersion)) {
+				hasCombatUpdate = true;
+				}
+			return hasCombatUpdate;
 		   }
 }

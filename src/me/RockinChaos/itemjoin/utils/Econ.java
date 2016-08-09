@@ -5,7 +5,7 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import me.RockinChaos.itemjoin.ItemJoin;
 import net.milkbowl.vault.economy.Economy;
 
-public class Vault {
+public class Econ {
     public static Economy econ = null;
     
 	public static void enableEconomy () { 
