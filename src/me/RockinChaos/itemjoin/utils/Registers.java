@@ -17,6 +17,7 @@ import me.RockinChaos.itemjoin.Listeners.JoinItem.ChangedWorld;
 import me.RockinChaos.itemjoin.Listeners.JoinItem.FirstJoin;
 import me.RockinChaos.itemjoin.Listeners.JoinItem.JoinItem;
 import me.RockinChaos.itemjoin.Listeners.JoinItem.Respawn;
+import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandlers;
 
 import org.bukkit.ChatColor;
@@ -28,6 +29,13 @@ public class Registers {
     public static String Prefix = ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] ";
 	
 	public static void checkHooks() {
+		  if (ItemJoin.pl.getServer().getPluginManager().getPlugin("Vault") != null && ItemJoin.pl.getConfig().getBoolean("Vault") == true) {
+			  Console.sendMessage(Prefix + ChatColor.GREEN + "Hooked into Vault!");
+	    	  ItemJoin.hasVault = true;
+			 } else if (ItemJoin.pl.getConfig().getBoolean("Vault") == true) {
+		     Console.sendMessage(Prefix + ChatColor.RED + "Could not find Vault or no economy plugin is attached.");
+			 ItemJoin.hasVault = false;
+			 }
 		  if (ItemJoin.pl.getServer().getPluginManager().getPlugin("PlaceholderAPI") != null && ItemJoin.pl.getConfig().getBoolean("PlaceholderAPI") == true) {
 			  Console.sendMessage(Prefix + ChatColor.GREEN + "Hooked into PlaceholderAPI!");
 	    	  ItemJoin.hasPlaceholderAPI = true;
@@ -49,11 +57,33 @@ public class Registers {
 	    	  ItemJoin.hasInventories = false;
 	    	  Console.sendMessage(Prefix + ChatColor.RED + "Could not find Multiverse-Inventories.");
 	      }
+		  if (ItemJoin.pl.getServer().getPluginManager().getPlugin("PerWorldPlugins") != null && ItemJoin.pl.getConfig().getBoolean("PerWorldPlugins") == true) {
+			  Console.sendMessage(Prefix + ChatColor.GREEN + "Hooked into PerWorldPlugins!");
+	    	  ItemJoin.hasPerWorldPlugins = true;
+			 } else if (ItemJoin.pl.getConfig().getBoolean("PerWorldPlugins") == true) {
+		     Console.sendMessage(Prefix + ChatColor.RED + "Could not find PerWorldPlugins.");
+			 ItemJoin.hasPerWorldPlugins = false;
+			 }
+		  if (ItemJoin.pl.getServer().getPluginManager().getPlugin("PerWorldInventory") != null && ItemJoin.pl.getConfig().getBoolean("PerWorldInventory") == true) {
+			  Console.sendMessage(Prefix + ChatColor.GREEN + "Hooked into PerWorldInventory!");
+	    	  ItemJoin.hasPerWorldInventory = true;
+			 } else if (ItemJoin.pl.getConfig().getBoolean("PerWorldInventories") == true) {
+		     Console.sendMessage(Prefix + ChatColor.RED + "Could not find PerWorldInventory.");
+			 ItemJoin.hasPerWorldInventory = false;
+			 }
+		  if (ItemJoin.pl.getServer().getPluginManager().getPlugin("AuthMe") != null && ItemJoin.pl.getConfig().getBoolean("AuthMe") == true) {
+			  Console.sendMessage(Prefix + ChatColor.GREEN + "Hooked into AuthMe!");
+	    	  ItemJoin.hasAuthMe = true;
+			 } else if (ItemJoin.pl.getConfig().getBoolean("AuthMe") == true) {
+		     Console.sendMessage(Prefix + ChatColor.RED + "Could not find AuthMe.");
+			 ItemJoin.hasAuthMe = false;
+			 }
 		}
 
 	   public static void configFile() {
+		      ConfigHandler.loadConfig("config.yml");
 		      File cFile = new File(ItemJoin.pl.getDataFolder(), "config.yml");
-		      if (cFile.exists() && ItemJoin.getSpecialConfig("config.yml").getInt("config-Version") != 4) {
+		      if (cFile.exists() && ConfigHandler.getConfig("config.yml").getInt("config-Version") != 5) {
 		      if (ItemJoin.pl.getResource("config.yml") != null) {
 		        String newGen = "config" + ItemJoin.getRandom(1500000,10000000) + ".yml";
 		        File newFile = new File(ItemJoin.pl.getDataFolder(), newGen);
@@ -71,16 +101,18 @@ public class Registers {
 		}
 
 		   public static void firstJoinFile() {
-				  if (ItemJoin.getSpecialConfig("items.yml").getBoolean("Global-Settings" + ".First-Join." + "FirstJoin-Mode-Enabled") == true) {
+			      ConfigHandler.loadConfig("FirstJoin.yml");
+				  if (ConfigHandler.getConfig("items.yml").getBoolean("Global-Settings" + ".First-Join." + "FirstJoin-Mode-Enabled") == true) {
 					  ItemJoin.pl.getServer().getPluginManager().registerEvents(new FirstJoin(),ItemJoin.pl);
-					  ItemJoin.loadSpecialConfig("FirstJoin.yml");
-					  ItemJoin.getSpecialConfig("FirstJoin.yml").options().copyDefaults(false);
+					  ConfigHandler.loadConfig("FirstJoin.yml");
+					  ConfigHandler.getConfig("FirstJoin.yml").options().copyDefaults(false);
 					  }
 			}
 		   
 		   public static void itemsFile() {
+			      ConfigHandler.loadConfig("items.yml");
 			      File itemsFile = new File(ItemJoin.pl.getDataFolder(), "items.yml");
-			      if (itemsFile.exists() && ItemJoin.getSpecialConfig("items.yml").getInt("items-Version") != 4) {
+			      if (itemsFile.exists() && ConfigHandler.getConfig("items.yml").getInt("items-Version") != 5) {
 			      if (ItemJoin.pl.getResource("items.yml") != null) {
 			        String newGen = "items" + ItemJoin.getRandom(1500000,10000000) + ".yml";
 			        File newFile = new File(ItemJoin.pl.getDataFolder(), newGen);
@@ -93,14 +125,15 @@ public class Registers {
 			           }
 			        }
 			      }
-				  ItemJoin.loadSpecialConfig("items.yml");
-				  ItemJoin.getSpecialConfig("items.yml").options().copyDefaults(false);
-				  ItemJoin.pl.worlds = ItemJoin.getSpecialConfig("items.yml").getStringList("world-list");
+				  ConfigHandler.loadConfig("items.yml");
+				  ConfigHandler.getConfig("items.yml").options().copyDefaults(false);
+				  ItemJoin.pl.worlds = ConfigHandler.getConfig("items.yml").getStringList("world-list");
 			}
 		   
 		public static void enLangFile() {
+			      ConfigHandler.loadConfig("en-lang.yml");
 			      File enLang = new File(ItemJoin.pl.getDataFolder(), "en-lang.yml");
-			      if (enLang.exists() && ItemJoin.pl.getConfig().getString("Language").equalsIgnoreCase("English") && ItemJoin.getSpecialConfig("en-lang.yml").getInt("en-Version") != 4) {
+			      if (enLang.exists() && ItemJoin.pl.getConfig().getString("Language").equalsIgnoreCase("English") && ConfigHandler.getConfig("en-lang.yml").getInt("en-Version") != 5) {
 			      if (ItemJoin.pl.getResource("en-lang.yml") != null) {
 			        String newGen = "en-lang" + ItemJoin.getRandom(1500000,10000000) + ".yml";
 			        File newFile = new File(ItemJoin.pl.getDataFolder(), newGen);
@@ -114,15 +147,38 @@ public class Registers {
 			        }
 			      }
 				  if (ItemJoin.pl.getConfig().getString("Language").equalsIgnoreCase("English")) {
-					  ItemJoin.loadSpecialConfig("en-lang.yml");
-					  ItemJoin.getSpecialConfig("en-lang.yml").options().copyDefaults(false);
+					  ConfigHandler.loadConfig("en-lang.yml");
+					  ConfigHandler.getConfig("en-lang.yml").options().copyDefaults(false);
 					  Commands.RegisterEnLang(PlayerHandlers.PlayerHolder());
 				  }
 		   }
 
+		public static void delangFile() {
+			
+		      File enLang = new File(ItemJoin.pl.getDataFolder(), "de-lang.yml");
+		      if (enLang.exists() && ItemJoin.pl.getConfig().getString("Language").equalsIgnoreCase("German") && ConfigHandler.getConfig("en-lang.yml").getInt("de-Version") != 5) {
+		      if (ItemJoin.pl.getResource("de-lang.yml") != null) {
+		        String newGen = "de-lang" + ItemJoin.getRandom(1500000,10000000) + ".yml";
+		        File newFile = new File(ItemJoin.pl.getDataFolder(), newGen);
+		           if (!newFile.exists()) {
+		    	      enLang.renameTo(newFile);
+		              File configFile = new File(ItemJoin.pl.getDataFolder(), "de-lang.yml");
+		              configFile.delete();
+		              Console.sendMessage(Prefix + ChatColor.GREEN + "You are using an outdated or bad de-lang!");
+		       	      Console.sendMessage(Prefix + ChatColor.GREEN + "New options may be avaliable, Generating a new one!");
+		           }
+		        }
+		      }
+			  if (ItemJoin.pl.getConfig().getString("Language").equalsIgnoreCase("English")) {
+				  ConfigHandler.loadConfig("en-lang.yml");
+				  ConfigHandler.getConfig("en-lang.yml").options().copyDefaults(false);
+				  Commands.RegisterEnLang(PlayerHandlers.PlayerHolder());
+			  }
+	   }
+		
 		   public static boolean SecretMsg() {
 			   boolean isSecret = false;
-				  if (ItemJoin.getSpecialConfig("items.yml").getBoolean("Global-Settings" + ".Get-Items." + "ItemJoin-Specific-Items") == true) {
+				  if (ConfigHandler.getConfig("items.yml").getBoolean("Global-Settings" + ".Get-Items." + "ItemJoin-Specific-Items") == true) {
 					  ItemJoin.secretMsg = "ItemJoin";
 					  isSecret = true;
 				  } else {
@@ -176,12 +232,22 @@ public class Registers {
 				  if (hasCombatUpdate()) {
 				  ItemJoin.pl.getServer().getPluginManager().registerEvents(new SwapHands(),ItemJoin.pl);
 				  }
-	    }
+		   }
 
 		   public static boolean hasCombatUpdate() {
 			   boolean hasCombatUpdate = false;
 			   String pkgname = ItemJoin.pl.getServer().getClass().getPackage().getName();
 			   String combatVersion = "v1_9_R0".replace("_", "").replace("R0", "").replace("R1", "").replace("R2", "").replace("R3", "").replace("R4", "").replace("R5", "").replaceAll("[a-z]", "");
+			   String version = pkgname.substring(pkgname.lastIndexOf('.') + 1).replace("_", "").replace("R0", "").replace("R1", "").replace("R2", "").replace("R3", "").replace("R4", "").replace("R5", "").replaceAll("[a-z]", "");
+			   if (Integer.parseInt(version) > Integer.parseInt(combatVersion)) {
+				hasCombatUpdate = true;
+				}
+			return hasCombatUpdate;
+		   }
+		   public static boolean hasBetterVersion() {
+			   boolean hasCombatUpdate = false;
+			   String pkgname = ItemJoin.pl.getServer().getClass().getPackage().getName();
+			   String combatVersion = "v1_7_R0".replace("_", "").replace("R0", "").replace("R1", "").replace("R2", "").replace("R3", "").replace("R4", "").replace("R5", "").replaceAll("[a-z]", "");
 			   String version = pkgname.substring(pkgname.lastIndexOf('.') + 1).replace("_", "").replace("R0", "").replace("R1", "").replace("R2", "").replace("R3", "").replace("R4", "").replace("R5", "").replaceAll("[a-z]", "");
 			   if (Integer.parseInt(version) > Integer.parseInt(combatVersion)) {
 				hasCombatUpdate = true;

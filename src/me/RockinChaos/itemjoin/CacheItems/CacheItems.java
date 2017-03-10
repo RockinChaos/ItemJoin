@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import me.RockinChaos.itemjoin.ItemJoin;
+import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandlers;
 import me.RockinChaos.itemjoin.handlers.WorldHandler;
 import me.RockinChaos.itemjoin.utils.CheckItem;
@@ -21,7 +22,6 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.FireworkMeta;
@@ -43,11 +43,11 @@ public class CacheItems {
 	    {
 	     for (int i = 0; i < ItemJoin.pl.worlds.size(); i++)
 	     {
-	       String world = WorldHandler.getWorld((String)ItemJoin.pl.worlds.get(i));
+	       String world = (String)ItemJoin.pl.worlds.get(i);
 	       String worldCheck = WorldHandler.checkWorld(i);
-	       if (ItemJoin.getSpecialConfig("items.yml").getConfigurationSection(worldCheck) != null
-	    		   && ItemJoin.getSpecialConfig("items.yml").getConfigurationSection(worldCheck + ".items") != null) {
-	       ConfigurationSection selection = ItemJoin.getSpecialConfig("items.yml").getConfigurationSection(worldCheck + ".items");
+	       if (ConfigHandler.getConfig("items.yml").getConfigurationSection(worldCheck) != null
+	    		   && ConfigHandler.getConfig("items.yml").getConfigurationSection(worldCheck + ".items") != null) {
+	       ConfigurationSection selection = ConfigHandler.getConfig("items.yml").getConfigurationSection(worldCheck + ".items");
 	       if (selection == null ) {
 	    	   Console.sendMessage(Prefix + ChatColor.RED + "You have defined the world " + ChatColor.YELLOW + world + ChatColor.RED + " under world-list.");
 	    	   Console.sendMessage(Prefix + ChatColor.RED + "Yet the section for defining items under " + ChatColor.YELLOW + world + ChatColor.RED + " does not exist!");
@@ -78,6 +78,16 @@ public class CacheItems {
 	           if (Modifiers.contains("unbreakable")) {
 					tempitem = setUnbreakable.Unbreakable(tempitem);
 		       }
+				if (items.getString(".durability") != null) {
+					int durability = items.getInt(".durability");
+					tempitem.setDurability((short) durability);
+				}
+				if (Modifiers.contains("hide-durability") 
+						|| Modifiers.contains("hidedurability")
+						|| Modifiers.contains("hide durability") 
+						|| Modifiers.contains("durability")) {
+					tempitem = setUnbreakable.Unbreakable(tempitem);
+				}
 	           if (tempmat == Material.WRITTEN_BOOK) {
 	        	   tempmeta = (BookMeta) tempitem.getItemMeta();
 	           } else if (tempmat == Material.FIREWORK){
@@ -87,7 +97,7 @@ public class CacheItems {
 						|| tempmat == Material.LEATHER_LEGGINGS
 						|| tempmat == Material.LEATHER_BOOTS) {
 	        		   tempmeta = (LeatherArmorMeta) tempitem.getItemMeta();
-	           } else if (Registers.hasCombatUpdate() && tempmat == Material.TIPPED_ARROW) {
+	           } else if (Registers.hasCombatUpdate() && tempmat == Material.getMaterial("TIPPED_ARROW")) {
 	        	   tempmeta = (PotionMeta) tempitem.getItemMeta();
 	           } else {
 	        	   tempmeta = tempitem.getItemMeta();
@@ -104,18 +114,23 @@ public class CacheItems {
 	             }
 	             tempmeta.setLore(templist2);
 	            }
+				if (Modifiers.contains("hide-durability") 
+						|| Modifiers.contains("hidedurability")
+						|| Modifiers.contains("hide durability") 
+						|| Modifiers.contains("durability")) {
+					if (Registers.hasBetterVersion()) { // Temp Fix for 1.7 Bugs //
+						tempmeta = CheckItem.setItemflag(tempmeta);
+					}
+				}
 				if (Modifiers.contains("hide-attributes") 
 						|| Modifiers.contains("hide attributes") 
 						|| Modifiers.contains("attributes") 
 						|| Modifiers.contains("hideattributes")) {
-			        tempmeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-			        tempmeta.addItemFlags(ItemFlag.HIDE_DESTROYS);
-			        tempmeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-			        tempmeta.addItemFlags(ItemFlag.HIDE_PLACED_ON);
-			        tempmeta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
-			        tempmeta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
+					if (Registers.hasBetterVersion()) { // Temp Fix for 1.7 Bugs //
+						tempmeta = CheckItem.setItemflags(tempmeta);
+					}
 				}
-				if (Registers.hasCombatUpdate() && items.getString(".arrow.potion-effect") != null && tempmat == Material.TIPPED_ARROW) {
+				if (Registers.hasCombatUpdate() && items.getString(".arrow.potion-effect") != null && tempmat == Material.getMaterial("TIPPED_ARROW")) { // Temp fix for arrow throwing arrows in 1.7 //
 					String effectType = items.getString(".arrow.potion-effect").toUpperCase();
 					int powerLevel = items.getInt(".arrow.power");
 					int time = items.getInt(".arrow.time");
@@ -167,8 +182,17 @@ public class CacheItems {
 	             }
 		           if (items.getString(".custom-map-image") != null && tempmat == Material.MAP)
 		           {
-		        	int therandomnumber = (short) ItemJoin.getRandom(1, 29);
-		        	tempitem.setDurability((short) therandomnumber);
+		        	   int mapID;
+		        	if (items.getString(".map-id") != null && items.getInt(".map-id") > 0 && items.getInt(".map-id") < 30) {
+		        		mapID = items.getInt(".map-id");
+		        	} else {
+			   			Console.sendMessage(Prefix + ChatColor.RED + "Your map-id on item " + item + " is incorrect or does not exist!");
+			   			Console.sendMessage(Prefix + ChatColor.RED + "Please check and makesure your map-id is between 1 and 29.");
+			   			Console.sendMessage(Prefix + ChatColor.RED + "Your map-id has been set to 1 by default until you fix your config.");
+			   			Console.sendMessage(Prefix + ChatColor.RED + "If you believe for this to be an error please contact the plugin developer.");
+		        		mapID = 1;
+		        	}
+		        	tempitem.setDurability((short) mapID);
 		        	try {
 					MapView view = PlayerHandlers.MapView(tempitem);;
 		        	String mapIMG = items.getString(".custom-map-image");
@@ -181,9 +205,9 @@ public class CacheItems {
 		   	          view.addRenderer(new RenderImageMaps());
 		   			 }
 		        	 } catch (NullPointerException e) {
-			   			Console.sendMessage(Prefix + ChatColor.RED + "Something has gone wrong with the maps!");
-			   			Console.sendMessage(Prefix + ChatColor.RED + "This means your custom map will not be rendered!");
-			   			Console.sendMessage(Prefix + ChatColor.RED + "Please contact the plugin developer immediately!");
+			   			//Console.sendMessage(Prefix + ChatColor.RED + "Something has gone wrong with the maps!"); // Temp removed until v4.0 //
+			   			//Console.sendMessage(Prefix + ChatColor.RED + "This means your custom map will not be rendered!"); // Temp removed until v4.0 //
+			   			//Console.sendMessage(Prefix + ChatColor.RED + "Please contact the plugin developer immediately!"); // Temp removed until v4.0 //
 			         }
 			   }
 	           if (items.getString(".author") != null && tempmat == Material.WRITTEN_BOOK)
@@ -200,10 +224,10 @@ public class CacheItems {
 	            	   String pageSetup = (String)templist.get(k);
 	            	   if (pageSetup.contains("newpage: ") || pageSetup.contains("newline: ") || pageSetup.contains("newpage:") || pageSetup.contains("newline:") || pageSetup.contains(":endthebook:")) {
 	            		   if (pageSetup.contains("newpage: ") && !templist2.contains("cleanSlate") || pageSetup.contains("newpage:") && !templist2.contains("cleanSlate")) {
-	            			   ((BookMeta) tempmeta).addPage(ItemJoin.pl.formatPlaceholders(templist2.toString().replace("[", "").replace("]", "").replaceAll(", ", " "), player));
+	            			   ((BookMeta) tempmeta).addPage(ItemJoin.pl.formatPlaceholders(templist2.toString().replace("[", "").replace("]", ""), player));
 	                    	   templist2.clear();
 	            		   } else if (pageSetup.contains(":endthebook:")) {
-	            			   ((BookMeta) tempmeta).addPage(ItemJoin.pl.formatPlaceholders(templist2.toString().replace("[", "").replace("]", "").replaceAll(", ", " "), player));
+	            			   ((BookMeta) tempmeta).addPage(ItemJoin.pl.formatPlaceholders(templist2.toString().replace("[", "").replace("]", ""), player));
 	                    	   templist2.clear();
 	            		   } else if (templist2.contains("cleanSlate")) {
 	            			   templist2.clear();

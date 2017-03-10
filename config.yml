@@ -1,8 +1,17 @@
 #// <>==<>==<> ItemJoin's Settings, by RockinChaos  <>==<>==<> //#
-config-Version: 4
-Language: 'English' #// English is currently the only support language at the moment! //#
-CheckforUpdates: true #// Disable this if you don't want to be notified if there is an update. //#
-Vault: false #// Only use this if Vault is installed on your server. Set to false else-wise. Required plugin restart when changed! //#
-PlaceholderAPI: false #// Only use this if PlaceholderAPI is installed on your server. Set to false else-wise. Required plugin restart when changed! //#
-Multiverse-Core: false #// Using the Multiverse plugin? Enable this for complete use of all plugin features. Required plugin restart when changed! //#
-Multiverse-Inventories: false #// Only used for plugin information. Set to false if you do not use it. Required plugin restart when changed! //#
+#// See the Documentations page for a more in-depth tutorial; https://www.spigotmc.org/wiki/itemjoin/ //#
+#// For per-world support this best works with Multiverse-Inventories! http://dev.bukkit.org/bukkit-plugins/multiverse-inventories //#
+config-Version: 5
+
+ #// English is currently the only support language at the moment! //#
+Language: 'English'
+CheckforUpdates: true
+
+#// These are optional dependencies, changing the values will require a server restart. //#
+Vault: false
+PlaceholderAPI: false
+Multiverse-Core: false
+Multiverse-Inventories: false
+PerWorldInventory: false
+PerWorldPlugins: false
+AuthMe: false

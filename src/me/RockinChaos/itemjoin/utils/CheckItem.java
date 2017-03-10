@@ -3,6 +3,7 @@ package me.RockinChaos.itemjoin.utils;
 import java.util.List;
 
 import me.RockinChaos.itemjoin.ItemJoin;
+import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.WorldHandler;
 
 import org.bukkit.ChatColor;
@@ -11,7 +12,10 @@ import org.bukkit.Material;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EntityEquipment;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
 public class CheckItem {
@@ -19,12 +23,11 @@ public class CheckItem {
     public static ConsoleCommandSender Console = ItemJoin.pl.getServer().getConsoleSender();
     public static String Prefix = ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] ";
 
-	   public static boolean isAllowedItem(Player player, ItemStack checking, String modifier, String mod) {
+	   public static boolean isAllowedItem(Player player, String world, ItemStack checking, String modifier, String mod) {
 		   Boolean Allowed = true;
 		   boolean BadItem = checking == null;
-	       final String world = WorldHandler.getWorld(player.getWorld().getName());
 		   if (WorldHandler.isWorld(world) && !BadItem) {
-	       ConfigurationSection selection = ItemJoin.getSpecialConfig("items.yml").getConfigurationSection(WorldHandler.checkWorlds(player.getWorld().getName()) + ".items");
+	       ConfigurationSection selection = ConfigHandler.getConfig("items.yml").getConfigurationSection(WorldHandler.checkWorlds(player.getWorld().getName()) + ".items");
 	       if (selection != null) {
 	        for (String item : selection.getKeys(false)) 
 	        {
@@ -73,7 +76,10 @@ public class CheckItem {
 		   boolean isSimilar = false;
 		   if (item1.getType().isBlock()) {
 			   isSimilar = true;
-		   } else if (item1.getType() == Material.SKULL_ITEM || item1.getType() == Material.SKULL) {
+		   } else if (item1.getType() == Material.SKULL_ITEM 
+				   || item1.getType() == Material.SKULL 
+				   || item1.getType() == Material.TRIPWIRE
+				   || item1.getType() == Material.TRIPWIRE_HOOK) {
 			   isSimilar = true;
 		   }
    return isSimilar;	   
@@ -100,6 +106,20 @@ public class CheckItem {
    return isSimilar;	   
 }
 
+	   public static ItemMeta setItemflags(ItemMeta tempmeta) {
+	        tempmeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+	        tempmeta.addItemFlags(ItemFlag.HIDE_DESTROYS);
+	        tempmeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+	        tempmeta.addItemFlags(ItemFlag.HIDE_PLACED_ON);
+	        tempmeta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
+	        tempmeta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
+	        return tempmeta;
+	   }
+	   
+	   public static ItemMeta setItemflag(ItemMeta tempmeta) {
+	        tempmeta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
+	        return tempmeta;
+	   }
 	   
 	   public static boolean isSimilar(ItemStack item1, ItemStack item2, ConfigurationSection items, Player player) {
 		   boolean isSimilar = false;
@@ -110,6 +130,20 @@ public class CheckItem {
 			  isSimilar = true;
 		  } else if(isBookSimilar(items, item1, player) && isCountSimilar(item1, item2)) {
 			  isSimilar = true;
+		  }
+		 }
+   return isSimilar;	   
+}
+	   
+	   public static boolean isRawSimilar(ItemStack item1, ItemStack item2, ConfigurationSection items, Player player) {
+		   boolean isSimilar = false;
+		   if (item1 != null && item2 != null) {
+		   if (item1.isSimilar(item2)) {
+			   isSimilar = true;
+		   } else if(isSkullSimilar(items, item1, player)) {
+			   isSimilar = true;
+		   } else if(isBookSimilar(items, item1, player)) {
+			   isSimilar = true;
 		  }
 		 }
    return isSimilar;	   
@@ -163,12 +197,38 @@ public class CheckItem {
 			return isArmor;
   }
 	   
+	   public static void setArmor(Player player, ItemStack compare, ConfigurationSection items, ItemStack toSetHelm, ItemStack toSetChest, ItemStack toSetLeggings, ItemStack toSetBoots) { 
+	      	EntityEquipment inv = player.getEquipment();
+	   		    	  if (CheckItem.isRawSimilar(inv.getHelmet(), compare, items, player)) {
+	   		    		  inv.setHelmet(toSetHelm);
+	   		    	  } else if (CheckItem.isRawSimilar(inv.getChestplate(), compare, items, player)) {
+	   		    		  inv.setChestplate(toSetChest);
+	   		    	  } else if (CheckItem.isRawSimilar(inv.getLeggings(), compare, items, player)) {
+	   		    		  inv.setLeggings(toSetLeggings);
+	   		    	  } else if (CheckItem.isRawSimilar(inv.getBoots(), compare, items, player)) {
+	   		    		  inv.setBoots(toSetBoots);
+	   		    	  }
+  }
+	   public static void setOffhand(Player player, ItemStack compare, ConfigurationSection items, ItemStack toSetOffhand) { 
+		   if (Registers.hasCombatUpdate()) {
+    	   ItemStack offhand = player.getInventory().getItemInOffHand();
+	   	   if (CheckItem.isRawSimilar(offhand, compare, items, player)) {
+    	        player.getInventory().setItemInOffHand(toSetOffhand);
+	   	   }
+	  }
+ }
+	   
 	   public static boolean ContainsItems(Player player, ItemStack toSet, ConfigurationSection items) { 
 		   boolean hasItem = false;
 		    	for (ItemStack contents : player.getInventory().getContents()){
 	   		    	  if (CheckItem.isSimilar(contents, toSet, items, player)) {
 	   		    		  hasItem = true;
 	   		    	  }
+		    	}
+	  		    	for (ItemStack equipcontents : player.getEquipment().getArmorContents()){
+		   		    	  if (CheckItem.isSimilar(equipcontents, toSet, items, player)) {
+		   		             hasItem = true;
+		   		    	  }
 	   		    	  }
 			return hasItem;
   }

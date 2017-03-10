@@ -14,8 +14,6 @@ import me.RockinChaos.itemjoin.utils.Econ;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.ChatColor;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -27,10 +25,14 @@ import org.bukkit.plugin.java.JavaPlugin;
     public List<String> worlds;
     public Map<String, ItemStack> items = new HashMap<String, ItemStack>();
     public Logger log;
-    public static File file;
+    public static File fileAa;
+    public static boolean hasVault;
     public static boolean hasMultiverse;
     public static boolean hasInventories;
     public static boolean hasPlaceholderAPI;
+    public static boolean hasPerWorldPlugins;
+    public static boolean hasPerWorldInventory;
+    public static boolean hasAuthMe;
     public static String secretMsg;
     
     public void onEnable()
@@ -39,15 +41,20 @@ import org.bukkit.plugin.java.JavaPlugin;
 	  Registers.configFile();
 	  Registers.itemsFile();
 	  Registers.firstJoinFile();
-	  Registers.SecretMsg();
 	  Registers.enLangFile();
+	  Registers.SecretMsg();
 	  Registers.registerEvents();
 	  Registers.checkHooks();
 	  WorldHandler.Worlds();
 	  WorldHandler.UpdateItems();
       UpdateChecking.checkUpdates(UpdateChecking.Console);
-	  file = getFile();
+	  fileAa = getFile();
 	  Econ.enableEconomy();
+	  if(!Registers.hasBetterVersion()) {
+	  UpdateChecking.Console.sendMessage(UpdateChecking.Prefix + ChatColor.RED + "You are using an outdated version of Minecraft.");
+	  UpdateChecking.Console.sendMessage(UpdateChecking.Prefix + ChatColor.RED + "DISABLED: %hitplayer% variable.");
+	  UpdateChecking.Console.sendMessage(UpdateChecking.Prefix + ChatColor.RED + "DISABLED: hide-attributes itemflag.");
+	  }
       UpdateChecking.Console.sendMessage(UpdateChecking.Prefix + ChatColor.GREEN + "has been Enabled!");
       }
 
@@ -55,37 +62,6 @@ import org.bukkit.plugin.java.JavaPlugin;
     {
       UpdateChecking.Console.sendMessage(UpdateChecking.Prefix + ChatColor.RED + "Disabled!");
       }
-
-    public static FileConfiguration loadSpecialConfig(String path)
-    {
-      if (!path.endsWith(".yml")) {
-        path = String.valueOf(path) + ".yml";
-      }
-      File file;
-      if (!(file = new File(pl.getDataFolder(), path)).exists()) {
-        try
-        {
-          pl.saveResource(path, false);
-        }
-        catch (Exception e)
-        {
-          e.printStackTrace();
-          pl.getLogger().warning("Cannot save " + path + " to disk!");
-          return null;
-        }
-      }
-      YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
-      return config;
-    }
-
-   public static FileConfiguration getSpecialConfig(String path) {
-	  loadSpecialConfig(path);
-	  File file = new File(pl.getDataFolder(), String.valueOf(path));
-          if (!file.exists()) {
-                file.mkdir();
-      }
-     return YamlConfiguration.loadConfiguration(file);
-     }
 
    public static String encodeItemData(String str){
    try {

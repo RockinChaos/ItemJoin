@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.CacheItems.CacheItems;
+import me.RockinChaos.itemjoin.utils.Registers;
 
 public class WorldHandler {
 	
@@ -22,15 +23,18 @@ public class WorldHandler {
 	    }
 		return isWorld; 
 	}
-		public static String getWorld(String world) {	
+		public static String getWorld(String world) {	// Throwing errors here //
 		 String value = world;
-		 for (String key : ItemJoin.getSpecialConfig("items.yml").getKeys(false)) {
-		    if (key.equalsIgnoreCase(value)) {
-		      value = key;
+		 for (String key : ConfigHandler.getConfig("items.yml").getKeys(false)) {
+		   if (key != null && key.equalsIgnoreCase(value)) {
+		     value = key;
+		    } else if(ConfigHandler.getConfig("items.yml").getBoolean("Global-Settings" + ".Get-Items." + "Global-Items") == true) {
+		    	value = "global";
 		    }
 	     }
 	    return value;
 	}
+
 		public static void Worlds() {
 		     for (int i = 0; i < ItemJoin.pl.worlds.size(); i++)
 		     {
@@ -41,10 +45,10 @@ public class WorldHandler {
 		
 		public static String checkWorld(int i) {
 			String world = WorldHandler.getWorld((String)ItemJoin.pl.worlds.get(i));
-			   if (ItemJoin.getSpecialConfig("items.yml").getConfigurationSection(world) != null) {
+			   if (ConfigHandler.getConfig("items.yml").getConfigurationSection(world) != null) {
 				   return WorldHandler.getWorld((String)ItemJoin.pl.worlds.get(i));
-			   } else if (ItemJoin.getSpecialConfig("items.yml").getBoolean("Global-Settings" + ".Get-Items." + "Global-Items") == true 
-					   && ItemJoin.getSpecialConfig("items.yml").getConfigurationSection(getWorld("global")) != null) {
+			   } else if (ConfigHandler.getConfig("items.yml").getBoolean("Global-Settings" + ".Get-Items." + "Global-Items") == true 
+					   && ConfigHandler.getConfig("items.yml").getConfigurationSection(getWorld("global")) != null) {
 		    	 return getWorld("global");
 			   }
 			return "DoesNotExist!"; 
@@ -52,20 +56,22 @@ public class WorldHandler {
 		
 		public static String checkWorlds(String worlds) {
 			String world = WorldHandler.getWorld(worlds);
-			   if (ItemJoin.getSpecialConfig("items.yml").getConfigurationSection(world) != null) {
+			   if (ConfigHandler.getConfig("items.yml").getConfigurationSection(world) != null) {
 				   return world;
-			   } else if (ItemJoin.getSpecialConfig("items.yml").getBoolean("Global-Settings" + ".Get-Items." + "Global-Items") == true 
-					   && ItemJoin.getSpecialConfig("items.yml").getConfigurationSection(getWorld("global")) != null) {
+			   } else if (ConfigHandler.getConfig("items.yml").getBoolean("Global-Settings" + ".Get-Items." + "Global-Items") == true 
+					   && ConfigHandler.getConfig("items.yml").getConfigurationSection(getWorld("global")) != null) {
 		    	 return getWorld("global");
 			   }
 			return "DoesNotExist!"; 
 		}
 		
 		public static void UpdateItems() {
+			if(Registers.hasBetterVersion()) {
 		     for (Player player : Bukkit.getServer().getOnlinePlayers())
 		     {
 		    	CacheItems.run(player);
 		     }
+		}
 		}
 		
 }

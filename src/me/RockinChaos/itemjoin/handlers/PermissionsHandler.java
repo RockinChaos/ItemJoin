@@ -1,6 +1,7 @@
 package me.RockinChaos.itemjoin.handlers;
 
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Player;
 
 public class PermissionsHandler {
 
@@ -10,5 +11,15 @@ public class PermissionsHandler {
 	        	customPermission = "itemjoin." + world + "." + item;
 	        }
 			  return customPermission;
+		}
+	   
+	   public static boolean checkPermissions(ConfigurationSection items, String item, String world, Player player) {
+	        boolean checkPermission = false;
+	        if (player.hasPermission(PermissionsHandler.customPermissions(items, item, world)) 
+         			  || player.hasPermission("itemjoin." + world + ".*") 
+         			  || player.hasPermission("itemjoin.*")) {
+	        	checkPermission = true;
+	        }
+			  return checkPermission;
 		}
 }

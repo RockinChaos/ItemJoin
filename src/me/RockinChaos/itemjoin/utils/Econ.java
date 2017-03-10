@@ -3,13 +3,14 @@ package me.RockinChaos.itemjoin.utils;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
 import me.RockinChaos.itemjoin.ItemJoin;
+import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import net.milkbowl.vault.economy.Economy;
 
 public class Econ {
     public static Economy econ = null;
     
 	public static void enableEconomy () { 
-		if (ItemJoin.getSpecialConfig("config.yml").getBoolean("Vault") == true) {
+		if (ConfigHandler.getConfig("config.yml").getBoolean("Vault") == true && ItemJoin.pl.getServer().getPluginManager().getPlugin("Vault") != null) {
 	      if (!setupEconomy() ) {
 	          ItemJoin.pl.log.info(String.format("[%s] - Disabled due to no Vault dependency found!", ItemJoin.pl.getDescription().getName()));
 	          ItemJoin.pl.getServer().getPluginManager().disablePlugin(ItemJoin.pl);

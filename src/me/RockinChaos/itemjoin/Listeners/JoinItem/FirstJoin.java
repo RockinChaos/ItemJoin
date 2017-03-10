@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.util.List;
 
 import me.RockinChaos.itemjoin.ItemJoin;
+import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.PermissionsHandler;
+import me.RockinChaos.itemjoin.handlers.PlayerHandlers;
 import me.RockinChaos.itemjoin.handlers.WorldHandler;
 import me.RockinChaos.itemjoin.utils.CheckItem;
 import me.RockinChaos.itemjoin.utils.Registers;
@@ -23,9 +25,9 @@ public class FirstJoin implements Listener {
 	public static int failCount = 0;
 
     public static void setFirstJoin(Player player, String world) {
-    	Boolean FirstJoinMode = ItemJoin.getSpecialConfig("items.yml").getBoolean("Global-Settings" + ".First-Join." + "FirstJoin-Mode-Enabled");
+    	Boolean FirstJoinMode = ConfigHandler.getConfig("items.yml").getBoolean("Global-Settings" + ".First-Join." + "FirstJoin-Mode-Enabled");
    	   if (FirstJoinMode == true) {
-    		 String FirstFindPlayer = ItemJoin.getSpecialConfig("FirstJoin.yml").getString(world + "." + player.getName().toString());
+    		 String FirstFindPlayer = ConfigHandler.getConfig("FirstJoin.yml").getString(world + "." + player.getName().toString());
     		if (FirstFindPlayer == null) {
     		File playerFile =  new File (ItemJoin.pl.getDataFolder(), "FirstJoin.yml");
     		FileConfiguration playerData = YamlConfiguration.loadConfiguration(playerFile);
@@ -39,11 +41,12 @@ public class FirstJoin implements Listener {
      	  }
       }
    }
+    
 	
     public static void setJoinItems(Player player)
     {
-        ConfigurationSection selection = ItemJoin.getSpecialConfig("items.yml").getConfigurationSection(WorldHandler.checkWorlds(player.getWorld().getName()) + ".items");
-        final String world = WorldHandler.getWorld(player.getWorld().getName());
+        ConfigurationSection selection = ConfigHandler.getConfig("items.yml").getConfigurationSection(WorldHandler.checkWorlds(player.getWorld().getName()) + ".items");
+        final String world = player.getWorld().getName();
         for (String item : selection.getKeys(false)) 
         {
       	  ConfigurationSection items = selection.getConfigurationSection(item);
@@ -73,7 +76,7 @@ public class FirstJoin implements Listener {
           final int slot = items.getInt(".slot");
     	  ItemStack[] inventory = player.getInventory().getContents();
           String WorldChanged = ((List<?>)items.getStringList(".itemflags")).toString();
-          Boolean FirstJoinMode = ItemJoin.getSpecialConfig("items.yml").getBoolean("Global-Settings" + ".First-Join." + "FirstJoin-Mode-Enabled");
+          Boolean FirstJoinMode = ConfigHandler.getConfig("items.yml").getBoolean("Global-Settings" + ".First-Join." + "FirstJoin-Mode-Enabled");
     	  ItemStack toSet = ItemJoin.pl.items.get(player.getWorld().getName() + "." + player.getName().toString() + ".items." + item);
     	  if (toSet != null) {
    		      if (slot >= 0 && slot <= 35 && inventory[slot] != null && !CheckItem.isSimilar(inventory[slot], toSet, items, player)) {
@@ -91,7 +94,7 @@ public class FirstJoin implements Listener {
     public static void CustomSlots(Player player, ConfigurationSection items, String item)
     {
           final String slot = items.getString(".slot");
-          Boolean FirstJoinMode = ItemJoin.getSpecialConfig("items.yml").getBoolean("Global-Settings" + ".First-Join." + "FirstJoin-Mode-Enabled");
+          Boolean FirstJoinMode = ConfigHandler.getConfig("items.yml").getBoolean("Global-Settings" + ".First-Join." + "FirstJoin-Mode-Enabled");
           EntityEquipment Equip = player.getEquipment();
           String WorldChanged = ((List<?>)items.getStringList(".itemflags")).toString();
     	  ItemStack toSet = ItemJoin.pl.items.get(player.getWorld().getName() + "." + player.getName().toString() + ".items." + item);
@@ -165,17 +168,17 @@ public class FirstJoin implements Listener {
    		          }
    		        }
    		       if (Registers.hasCombatUpdate() && slot.equalsIgnoreCase("Offhand") 
-   		    		  && player.getInventory().getItemInOffHand() != null 
-   		    		  && !CheckItem.isSimilar(player.getInventory().getItemInOffHand(), toSet, items, player)) {
+   		    		  && PlayerHandlers.getOffhandItem(player) != null 
+   		    		  && !CheckItem.isSimilar(PlayerHandlers.getOffhandItem(player), toSet, items, player)) {
    		    	if (FirstJoinMode == true 
    		    			&& WorldChanged.contains("first-join")) {
-   		    		player.getInventory().setItemInOffHand(toSet);
+   		    		PlayerHandlers.setOffhandItem(player, toSet);
    		    	 }
    		        } else if (Registers.hasCombatUpdate() && slot.equalsIgnoreCase("Offhand") 
-   		        		&& player.getInventory().getItemInOffHand() == null && !CheckItem.ContainsItems(player, toSet, items)) {
+   		        		&& PlayerHandlers.getOffhandItem(player) == null && !CheckItem.ContainsItems(player, toSet, items)) {
    		        	if (FirstJoinMode == true 
    		        			&& WorldChanged.contains("first-join")) {
-   		        		player.getInventory().setItemInOffHand(toSet);
+   		        		PlayerHandlers.setOffhandItem(player, toSet);
    		          }
    		       }
    	      }
@@ -183,8 +186,8 @@ public class FirstJoin implements Listener {
 	
     public static void setWorldChangedItems(Player player)
     {
-        ConfigurationSection selection = ItemJoin.getSpecialConfig("items.yml").getConfigurationSection(WorldHandler.checkWorlds(player.getWorld().getName()) + ".items");
-        final String world = WorldHandler.getWorld(player.getWorld().getName());
+        ConfigurationSection selection = ConfigHandler.getConfig("items.yml").getConfigurationSection(WorldHandler.checkWorlds(player.getWorld().getName()) + ".items");
+        final String world = player.getWorld().getName();
         for (String item : selection.getKeys(false)) 
         {
       	  ConfigurationSection items = selection.getConfigurationSection(item);
@@ -192,7 +195,7 @@ public class FirstJoin implements Listener {
 		   if (WorldChanged.contains("world-changed")) {
           final int slot = items.getInt(".slot");
     	  ItemStack[] inventory = player.getInventory().getContents();
-          Boolean FirstJoinMode = ItemJoin.getSpecialConfig("items.yml").getBoolean("Global-Settings" + ".First-Join." + "FirstJoin-Mode-Enabled");
+          Boolean FirstJoinMode = ConfigHandler.getConfig("items.yml").getBoolean("Global-Settings" + ".First-Join." + "FirstJoin-Mode-Enabled");
     	  ItemStack toSet = ItemJoin.pl.items.get(player.getWorld().getName() + "." + player.getName().toString() + ".items." + item);
          if (WorldHandler.isWorld(world)) {
        	  if (player.hasPermission(PermissionsHandler.customPermissions(items, item, world)) || player.hasPermission("itemjoin." + world + ".*") || player.hasPermission("itemjoin.*")) {

@@ -18,14 +18,15 @@ import org.bukkit.inventory.ItemStack;
 
 public class Drops implements Listener {
 
-	  @EventHandler(ignoreCancelled=true)
+	@EventHandler
 	  public void onDrop(PlayerDropItemEvent event) 
 	  {
 	    ItemStack item = event.getItemDrop().getItemStack();
 	    final Player player = event.getPlayer();
+	    final String world = player.getWorld().getName();
 	    String modifier = ".itemflags";
 	    String mod = "self-drops";
-	      if (!CheckItem.isAllowedItem(player, item, modifier, mod))
+	      if (!CheckItem.isAllowedItem(player, world, item, modifier, mod))
 	      {
 	        event.setCancelled(true);
 	        Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.pl, new Runnable()
@@ -37,19 +38,19 @@ public class Drops implements Listener {
 	      }, 1L);
    }
   }
-	  @EventHandler(ignoreCancelled=true)
+	  @EventHandler
 	  public void onDeathDrops(PlayerDeathEvent event) 
 	  {
 		  List<ItemStack> drops = event.getDrops();
 		  ListIterator<ItemStack> litr = drops.listIterator();
 	    final Player player = event.getEntity();
-	    final String world = WorldHandler.getWorld(player.getWorld().getName());
+	    final String world = player.getWorld().getName();
 	    String modifier = ".itemflags";
 	    String mod = "death-drops";
 	    if (WorldHandler.isWorld(world)) {
         while(litr.hasNext()){
             ItemStack stack = litr.next();
-	      if (!CheckItem.isAllowedItem(player, stack, modifier, mod))
+	      if (!CheckItem.isAllowedItem(player, world, stack, modifier, mod))
 	      {
 	    	  litr.remove();
 	    }

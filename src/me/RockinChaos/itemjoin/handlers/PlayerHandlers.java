@@ -47,17 +47,35 @@ public class PlayerHandlers {
 	@SuppressWarnings("deprecation")
 	public static Material getLocateMaterial(String world, String args) {
 		Material material = null;
-        if (ItemJoin.isInt(ItemJoin.getSpecialConfig("items.yml").getString(world + ".items." + args + ".id"))) {
-        	material = Material.getMaterial(ItemJoin.getSpecialConfig("items.yml").getInt(world + ".items." + args + ".id"));
+        if (ItemJoin.isInt(ConfigHandler.getConfig("items.yml").getString(world + ".items." + args + ".id"))) {
+        	material = Material.getMaterial(ConfigHandler.getConfig("items.yml").getInt(world + ".items." + args + ".id"));
            } else {
-        	material = Material.getMaterial(ItemJoin.getSpecialConfig("items.yml").getString(world + ".items." + args + ".id"));
+        	material = Material.getMaterial(ConfigHandler.getConfig("items.yml").getString(world + ".items." + args + ".id"));
            }
 			return material;
 	}
 	
 	@SuppressWarnings("deprecation")
+	public static Player getOfflinePlayer(String player) {
+		return (Player) ItemJoin.pl.getServer().getOfflinePlayer(player);
+	}
+	
+	@SuppressWarnings("deprecation")
 	public static void updateInventory(Player player) {
 		player.updateInventory();
+	}
+	
+	@SuppressWarnings("deprecation")
+	public static void setItemInHand(Player player, Material mat) {
+		player.setItemInHand(new ItemStack(mat));
+	}
+	
+	public static void setOffhandItem(Player player, ItemStack toSet) {
+		player.getInventory().setItemInOffHand(toSet);
+	}
+	
+	public static ItemStack getOffhandItem(Player player) {
+		return player.getInventory().getItemInOffHand();
 	}
 	
 	@SuppressWarnings("deprecation")

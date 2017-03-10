@@ -1,6 +1,6 @@
 name: ItemJoin
 main: me.RockinChaos.itemjoin.ItemJoin
-version: 3.6
+version: 3.9.2
 author: RockinChaos
 commands:
    itemjoin:
@@ -39,6 +39,14 @@ commands:
       description: Gives that player an itemjoin item.
       usage: |
           /itemjoin get <item> <player>
+   itemjoin remove <item>:
+      description: Removes that itemjoin item from your inventory.
+      usage: |
+          /itemjoin remove <item>
+   itemjoin remove <item> <player>:
+      description: Removes that itemjoin item from the players inventory.
+      usage: |
+          /itemjoin remove <item> <player>
    itemjoin world:
       description: Checks what world you are in, for debugging purposes.
       usage: |
@@ -87,6 +95,14 @@ commands:
       description: Gives that player an itemjoin item.
       usage: |
           /ij get <item> <player>
+   ij remove <item>:
+      description: Removes that ij item from your inventory.
+      usage: |
+          /ij remove <item>
+   ij remove <item> <player>:
+      description: Removes that ij item from the players inventory.
+      usage: |
+          /ij remove <item> <player>
    ij world:
       description: Checks what world you are in. For (debugging).
       usage: |
@@ -124,6 +140,12 @@ permissions:
       default: op
    itemjoin.get.others:
       description: Use of the /itemjoin get <item> <others> for player command.
+      default: op
+   itemjoin.remove:
+      description: Use of the /itemjoin remove <item> command.
+      default: op
+   itemjoin.remove.others:
+      description: Use of the /itemjoin remove <item> <others> for player command.
       default: op
    itemjoin.list:
       description: Use of the /itemjoin list command.

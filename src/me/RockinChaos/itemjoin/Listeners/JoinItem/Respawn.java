@@ -3,7 +3,7 @@ package me.RockinChaos.itemjoin.Listeners.JoinItem;
 import java.util.List;
 
 import me.RockinChaos.itemjoin.ItemJoin;
-import me.RockinChaos.itemjoin.CacheItems.CacheItems;
+import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.PermissionsHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandlers;
 import me.RockinChaos.itemjoin.handlers.WorldHandler;
@@ -13,7 +13,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerRespawnEvent;
 
@@ -21,12 +20,11 @@ public class Respawn implements Listener {
 
     public static String Prefix = ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] ";
 	
-	@EventHandler(priority=EventPriority.HIGHEST)
+    @EventHandler
     public void giveOnRespawn(PlayerRespawnEvent event)
     {
 	      final Player player = event.getPlayer();
-	      long delay = ItemJoin.getSpecialConfig("items.yml").getInt("Global-Settings" + ".Get-Items." + "Delay") * 10L;
-	      CacheItems.run(player);
+	      long delay = ConfigHandler.getConfig("items.yml").getInt("Global-Settings" + ".Get-Items." + "Delay") * 10L;
 	        Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.pl, new Runnable()
 	        {
 			public void run()
@@ -45,7 +43,7 @@ public class Respawn implements Listener {
 
     public static void setRespawnItems(Player player)
     {
-        ConfigurationSection selection = ItemJoin.getSpecialConfig("items.yml").getConfigurationSection(WorldHandler.getWorld(player.getWorld().getName()) + ".items");
+        ConfigurationSection selection = ConfigHandler.getConfig("items.yml").getConfigurationSection(WorldHandler.getWorld(player.getWorld().getName()) + ".items");
         if (selection != null) {
         for (String item : selection.getKeys(false)) 
         {
@@ -53,7 +51,7 @@ public class Respawn implements Listener {
           String Respawn = ((List<?>)items.getStringList(".itemflags")).toString();
 		   if (Respawn.contains("respawn")) {
           final String slot = items.getString(".slot");
-          final String world = WorldHandler.getWorld(player.getWorld().getName());
+          final String world = player.getWorld().getName();
           if (WorldHandler.isWorld(world)) {
            	  if (player.hasPermission(PermissionsHandler.customPermissions(items, item, world)) 
            			  || player.hasPermission("itemjoin." + world + ".*") 

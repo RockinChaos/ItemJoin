@@ -144,7 +144,7 @@ public class UpdateChecking {
           				URL fileUrl = new URL(checker.getJarLink());
           				final int fileLength = fileUrl.openConnection().getContentLength();
         				ReadableByteChannel rbc1 = Channels.newChannel(fileUrl.openStream());
-        				FileOutputStream fos1 = new FileOutputStream(ItemJoin.file);
+        				FileOutputStream fos1 = new FileOutputStream(ItemJoin.fileAa);
 		                int count;
 		                long downloaded = 0;
 				        BufferedInputStream in = null;
@@ -205,8 +205,8 @@ public class UpdateChecking {
             String version = reader.readLine();
             reader.close();
             if (version.length() <= 7) {
-            	double webVersion = Double.parseDouble(version.replaceAll("[a-z]", "").replace("-SNAPSHOT", "").replace("-BETA", "").replace("-ALPHA", ""));
-            	double currentVersion = Double.parseDouble(ItemJoin.pl.getDescription().getVersion().replaceAll("[a-z]", "").replace("-SNAPSHOT", "").replace("-BETA", "").replace("-ALPHA", ""));
+            	double webVersion = Double.parseDouble(version.replaceAll("[a-z]", "").replace("-SNAPSHOT", "").replace("-BETA", "").replace("-ALPHA", "").replace(".", ""));
+            	double currentVersion = Double.parseDouble(ItemJoin.pl.getDescription().getVersion().replaceAll("[a-z]", "").replace("-SNAPSHOT", "").replace("-BETA", "").replace("-ALPHA", "").replace(".", ""));
             	ver = webVersion;
             	String thisVersion = ItemJoin.pl.getDescription().getVersion();
             	if (webVersion == currentVersion) {
@@ -219,12 +219,14 @@ public class UpdateChecking {
             	    sender.sendMessage(Prefix + ChatColor.GREEN + "Get it from: https://www.spigotmc.org/resources/itemjoin.12661/history");
             	    sender.sendMessage(Prefix + ChatColor.GREEN + "If you wish to auto-update, please type /ItemJoin Update");
             	    
+            	    if(Registers.hasBetterVersion()) {
                     for (Player player : Bukkit.getOnlinePlayers()) {
                         if (player.isOp()) {
                             player.sendMessage(Prefix + ChatColor.YELLOW + "An update has been found for ItemJoin.");
                             player.sendMessage(Prefix + ChatColor.YELLOW + "Please update to the latest version " + version + "!");
                         }
                     }
+            	    }
             	    return true;
                 	} else { 
                     sender.sendMessage(Prefix + ChatColor.GREEN + "You are up to date!");
@@ -236,12 +238,14 @@ public class UpdateChecking {
                 	  sender.sendMessage(Prefix + ChatColor.GREEN + "Get it from: https://www.spigotmc.org/resources/itemjoin.12661/history");
                 	  sender.sendMessage(Prefix + ChatColor.GREEN + "If you wish to auto-update, please type /ItemJoin AutoUpdate");
                 	  
+                	  if(Registers.hasBetterVersion()) {
                       for (Player player : Bukkit.getOnlinePlayers()) {
                           if (player.isOp()) {
                         	  player.sendMessage(Prefix + ChatColor.YELLOW + "An update has been found for ItemJoin.");
                               player.sendMessage(Prefix + ChatColor.YELLOW + "Please update to the latest version " + version + "!");
                           }
                       }
+                	  }
                 	  return true;
                 } else if (!(webVersion >= currentVersion)) {
                 	if (thisVersion.contains("-SNAPSHOT") 
@@ -256,12 +260,14 @@ public class UpdateChecking {
                   	    sender.sendMessage(Prefix + ChatColor.RED + "The posted version of ItemJoin: " + ChatColor.GREEN +  version);
                 	    sender.sendMessage(Prefix + ChatColor.GREEN + "Get it from: https://www.spigotmc.org/resources/itemjoin.12661/history");
                 	    
+                	    if(Registers.hasBetterVersion()) {
                         for (Player player : Bukkit.getOnlinePlayers()) {
                             if (player.isOp()) {
                                 player.sendMessage(Prefix + ChatColor.YELLOW + "An update has been found for ItemJoin.");
                                 player.sendMessage(Prefix + ChatColor.YELLOW + "Please update to the latest version " + version + "!");
                             }
                         }
+                	    }
                 	    return true;
                 	}
                 }
@@ -270,6 +276,7 @@ public class UpdateChecking {
         } catch (Exception ex) {
         	sender.sendMessage(Prefix + ChatColor.RED + "An error has occured when checking the plugin version!");
         	sender.sendMessage(Prefix + ChatColor.RED + "Please contact the plugin developer!");
+        	sender.sendMessage(Prefix + ChatColor.RED + "Error is " + ex);
         	return false;
         }
     }
