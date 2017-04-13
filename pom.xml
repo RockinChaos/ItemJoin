@@ -22,6 +22,8 @@
 					<include>de-lang.yml</include>
 					<include>FirstJoin.yml</include>
 					<include>default.png</include>
+					<include>LICENSE_MIT.txt</include>
+					<include>LICENSE_GPL3.txt</include>
 				</includes>
 			</resource>
 		</resources>
