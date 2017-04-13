@@ -1,3 +1,6 @@
+<!-- ItemJoin build file -->
+<!-- Maven clean install package -->
+
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
@@ -19,8 +22,6 @@
 					<include>de-lang.yml</include>
 					<include>FirstJoin.yml</include>
 					<include>default.png</include>
-					<include>LICENSE_GPL3.txt</include>
-					<include>LICENSE_MIT.txt</include>
 				</includes>
 			</resource>
 		</resources>
@@ -77,8 +78,8 @@
 	</build>
 	<repositories>
 		<repository>
-			<id>spigot-repo</id>
-			<url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+       		<id>spigot-repo</id>
+        	<url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
 		</repository>
 		<repository>
 			<id>sk89q-repo</id>
@@ -98,30 +99,35 @@
         </repository>
 	</repositories>
 	<dependencies>
+    <!--Spigot API-->
+		<dependency>
+			<groupId>org.spigotmc</groupId>
+			<artifactId>spigot-api</artifactId>
+			<version>LATEST</version>
+         <scope>provided</scope>
+		</dependency>
+    <!--Bukkit API-->
 		<dependency>
 			<groupId>org.bukkit</groupId>
-			<artifactId>bukkit</artifactId>
-			<version>LATEST</version>
-			<scope>provided</scope>
+            <artifactId>bukkit</artifactId>
+            <version>LATEST</version>
+         <scope>provided</scope>
 		</dependency>
-		<dependency>
-			<groupId>com.sk89q.worldguard</groupId>
-			<artifactId>worldguard-legacy</artifactId>
-			<version>LATEST</version>
-			<scope>provided</scope>
-		</dependency>
+    <!--Vault API-->
 		<dependency>
 			<groupId>net.milkbowl.vault</groupId>
 			<artifactId>Vault</artifactId>
 			<version>LATEST</version>
-			<scope>provided</scope>
+         <scope>provided</scope>
 		</dependency>
+    <!--PlaceholderAPI API-->
         <dependency>
-         <groupId>me.clip</groupId>
-          <artifactId>placeholderapi</artifactId>
-          <version>LATEST</version>
+	        <groupId>me.clip</groupId>
+	        <artifactId>placeholderapi</artifactId>
+	        <version>LATEST</version>
          <scope>provided</scope>
         </dependency>
+    <!--AuthMe API-->
         <dependency>
 	        <groupId>fr.xephi</groupId>
 	        <artifactId>authme</artifactId>
@@ -129,6 +135,11 @@
          <scope>provided</scope>
         </dependency>
 	</dependencies>
+	<scm>
+		<url>https://github.com/RockinChaos/ItemJoin</url>
+		<connection>scm:git:ssh://git@github.com/RockinChaos/ItemJoin</connection>
+		<developerConnection>scm:git:ssh://git@github.com/RockinChaos/ItemJoin.git</developerConnection>
+	</scm>
 	<organization>
 		<name>ItemJoin</name>
 		<url>https://github.com/RockinChaos/ItemJoin</url>
