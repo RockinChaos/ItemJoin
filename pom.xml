@@ -82,6 +82,14 @@
 			<id>vault-repo</id>
 			<url>http://nexus.hc.to/content/repositories/pub_releases</url>
 		</repository>
+        <repository>
+            <id>placeholderapi</id>
+            <url>http://repo.extendedclip.com/content/repositories/placeholderapi/</url>
+        </repository>
+        <repository>
+            <id>authme</id>
+            <url>http://ci.xephi.fr/plugin/repository/everything/</url>
+        </repository>
 	</repositories>
 	<dependencies>
 		<dependency>
@@ -102,6 +110,18 @@
 			<version>LATEST</version>
 			<scope>provided</scope>
 		</dependency>
+        <dependency>
+         <groupId>me.clip</groupId>
+          <artifactId>placeholderapi</artifactId>
+          <version>LATEST</version>
+         <scope>provided</scope>
+        </dependency>
+        <dependency>
+         <groupId>ci.xephi.fr</groupId>
+          <artifactId>authme</artifactId>
+          <version>LATEST</version>
+         <scope>provided</scope>
+        </dependency>  
 	</dependencies>
 	<organization>
 		<name>ItemJoin</name>
