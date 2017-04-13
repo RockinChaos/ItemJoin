@@ -43,9 +43,6 @@
    <resources>
      <resource>
        <directory>${basedir}/src/me/RockinChaos/itemjoin</directory>
-         <includes>
-            <include>plugin.yml</include>
-         </includes>
      </resource>
    </resources>
 	</build>
