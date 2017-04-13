@@ -41,12 +41,12 @@
 			</plugin>
 		</plugins>
    <resources>
-   <resource>
-      <directory>${basedir}/src/me/RockinChaos/itemjoin</directory>
+     <resource>
+       <directory>${basedir}/src/me/RockinChaos/itemjoin</directory>
          <includes>
             <include>plugin.yml</include>
          </includes>
-      </resource>
+     </resource>
    </resources>
 	</build>
 	<dependencies>
