@@ -1,59 +1,110 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>me.RockinChaos.itemjoin</groupId>
 	<artifactId>ItemJoin</artifactId>
-	<version>SNAPSHOT</version>
-	<name>ItemJoin</name>
-	<url>http://maven.apache.org</url>
-	
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	</properties>
-	
-	<repositories>
-   <repository>
-       <id>spigot-repo</id>
-       <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
-   </repository>
-        <repository>
-            <id>placeholderapi</id>
-            <url>http://repo.extendedclip.com/content/repositories/placeholderapi/</url>
-        </repository>
-		<repository>
-      		<id>comphenix-rep</id>
-      		<name>Comphenix Maven Releases</name>
-      		<url>http://repo.comphenix.net/content/groups/public</url>
-   		</repository>
-	</repositories>
-	
-	
+	<version>4.1-SNAPSHOT</version>
 	<build>
+		<sourceDirectory>${project.basedir}</sourceDirectory>
+		<resources>
+			<resource>
+				<targetPath>.</targetPath>
+				<filtering>true</filtering>
+				<directory>.</directory>
+				<includes>
+					<include>plugin.yml</include>
+					<include>LICENSE_GPL3.txt</include>
+					<include>LICENSE_MIT.txt</include>
+				</includes>
+			</resource>
+		</resources>
 		<plugins>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.3.2</version>
+				<version>3.1</version>
 				<configuration>
+					<encoding>UTF-8</encoding>
 					<source>1.6</source>
 					<target>1.6</target>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>1.5</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<artifactSet>
+								<includes>
+									<include>tv.mineinthebox.simpleserver:SimpleHttpServer:jar:</include>
+									<include>com.googlecode.json-simple:json-simple*:jar:*</include>
+								</includes>
+							</artifactSet>
+							<relocations>
+								<relocation>
+									<pattern>tv.mineinthebox.simpleserver</pattern>
+									<shadedPattern>tv.mineinthebox.simpleserver</shadedPattern>
+									<pattern>com.googlecode.json-simple</pattern>
+									<shadedPattern>com.googlecode.json-simple</shadedPattern>
+								</relocation>
+							</relocations>
+							<filters>
+								<filter>
+									<artifact>*</artifact>
+									<excludes>
+										<exclude>META-INF/*.SF</exclude>
+										<exclude>META-INF/*.RSA</exclude>
+										<exclude>META-INF/*.INF</exclude>
+									</excludes>
+								</filter>
+							</filters>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
-   <resources>
-     <resource>
-       <directory>src/</directory>
-     </resource>
-   </resources>
 	</build>
+	<repositories>
+		<repository>
+			<id>spigot-repo</id>
+			<url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+		</repository>
+		<repository>
+			<id>sk89q-repo</id>
+			<url>https://maven.sk89q.com/repo/</url>
+		</repository>
+		<repository>
+			<id>vault-repo</id>
+			<url>http://nexus.hc.to/content/repositories/pub_releases</url>
+		</repository>
+	</repositories>
 	<dependencies>
-		   <!--Bukkit API-->
 		<dependency>
-			<groupId>me.clip</groupId>
-			<artifactId>placeholderapi</artifactId>
-			<version>2.0.8</version>
+			<groupId>org.bukkit</groupId>
+			<artifactId>bukkit</artifactId>
+			<version>LATEST</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.sk89q.worldguard</groupId>
+			<artifactId>worldguard-legacy</artifactId>
+			<version>LATEST</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.milkbowl.vault</groupId>
+			<artifactId>Vault</artifactId>
+			<version>LATEST</version>
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
-	<description>This pom.xml is for compiling snapshot purposes only and will rarely be changed, dont worry about it saying SNAPSHOT its for downloading on jenkins..</description>
+	<organization>
+		<name>ItemJoin</name>
+		<url>https://github.com/RockinChaos/ItemJoin</url>
+	</organization>
 </project>
