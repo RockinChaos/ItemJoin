@@ -24,6 +24,7 @@
 					<include>default.png</include>
 					<include>LICENSE_MIT.txt</include>
 					<include>LICENSE_GPL3.txt</include>
+					<include>LICENSE.md</include>
 				</includes>
 			</resource>
 		</resources>
@@ -79,22 +80,27 @@
 		</plugins>
 	</build>
 	<repositories>
+    <!--Spigot/CraftBukkit Repo-->
 		<repository>
        		<id>spigot-repo</id>
         	<url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
 		</repository>
+    <!--Maven Repo-->
 		<repository>
 			<id>sk89q-repo</id>
 			<url>https://maven.sk89q.com/repo/</url>
 		</repository>
+    <!--Vault Repo-->
 		<repository>
 			<id>vault-repo</id>
 			<url>http://nexus.hc.to/content/repositories/pub_releases</url>
 		</repository>
+    <!--PlaceholderAPI Repo-->
         <repository>
             <id>placeholderapi</id>
             <url>http://repo.extendedclip.com/content/repositories/placeholderapi/</url>
         </repository>
+    <!--AuthMe Repo-->
         <repository>
         	<id>xephi-repo</id>
 	        <url>http://ci.xephi.fr/plugin/repository/everything/</url>
@@ -108,7 +114,7 @@
 			<version>1.11.2-R0.1-SNAPSHOT</version>
          <scope>provided</scope>
 		</dependency>
-    <!--Bukkit API-->
+    <!--CraftBukkit API-->
 		<dependency>
 			<groupId>org.bukkit</groupId>
             <artifactId>bukkit</artifactId>
