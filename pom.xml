@@ -42,15 +42,9 @@
 		</plugins>
    <resources>
    <resource>
-      <directory>src/me/RockinChaos/itemjoin</directory>
+      <directory>${basedir}/src/me/RockinChaos/itemjoin</directory>
          <includes>
             <include>plugin.yml</include>
-            <include>items.yml</include>
-            <include>en-lang.yml</include>
-            <include>FirstJoin.yml</include>
-            <include>de-lang.yml</include>
-            <include>config.yml</include>
-            <include>default.png</include>
          </includes>
       </resource>
    </resources>
