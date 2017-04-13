@@ -42,7 +42,7 @@
 		</plugins>
    <resources>
      <resource>
-       <directory>${basedir}/src/me/RockinChaos/itemjoin</directory>
+       <directory>src/</directory>
      </resource>
    </resources>
 	</build>
