@@ -34,6 +34,8 @@ public class FirstJoin implements Listener {
     		playerData.set(world + "." + player.getName().toString() + "." + "UniqueId", player.getUniqueId().toString());
     		try {
     		playerData.save(playerFile);
+  		    ConfigHandler.loadConfig("FirstJoin.yml");
+  		    ConfigHandler.getConfig("FirstJoin.yml").options().copyDefaults(false);
     		} catch (IOException e1) {
     		ItemJoin.pl.getServer().getLogger().severe("Could not save " + player.getName() + " to the data file FirstJoin.yml!");
     		e1.printStackTrace();
@@ -101,8 +103,8 @@ public class FirstJoin implements Listener {
     	  if (toSet != null) {
    		      if (slot.equalsIgnoreCase("Arbitrary")) {
   		    	   if (!CheckItem.ContainsItems(player, toSet, items)) {
-   		    	    if (FirstJoinMode != true 
-   		    			|| !WorldChanged.contains("first-join")) {
+   		    	    if (FirstJoinMode == true 
+   		    			|| WorldChanged.contains("first-join")) {
    		    	    	if (player.getInventory().firstEmpty() == -1) {
    		    	    		failCount = failCount + 1;
    		    	       } else {
@@ -146,8 +148,8 @@ public class FirstJoin implements Listener {
    		    			&& WorldChanged.contains("first-join")) {
    		    		Equip.setLeggings(toSet);
    		    	 }
-   		        } else if (slot.equalsIgnoreCase("Leggings")
-   		        		&& Equip.getHelmet() == null && !CheckItem.ContainsItems(player, toSet, items)) {
+   		        } else if (slot.equalsIgnoreCase("Leggings") 
+   		        		&& Equip.getLeggings() == null && !CheckItem.ContainsItems(player, toSet, items)) {
    		        	if (FirstJoinMode == true 
    		        			&& WorldChanged.contains("first-join")) {
    		        		Equip.setLeggings(toSet);

@@ -124,7 +124,7 @@ public class CheckItem {
 	   public static boolean isSimilar(ItemStack item1, ItemStack item2, ConfigurationSection items, Player player) {
 		   boolean isSimilar = false;
 		   if (item1 != null && item2 != null) {
-		   if (item1.isSimilar(item2) && isCountSimilar(item1, item1)) {
+		   if (item1.isSimilar(item2) && isCountSimilar(item1, item2)) {
 			   isSimilar = true;
 		  } else if(isSkullSimilar(items, item1, player) && isCountSimilar(item1, item2)) {
 			  isSimilar = true;
@@ -132,6 +132,30 @@ public class CheckItem {
 			  isSimilar = true;
 		  }
 		 }
+   return isSimilar;	   
+}
+	   
+	   public static boolean isSimilar2(ItemStack item1, ItemStack item2, ConfigurationSection items, Player player) {
+		   boolean isSimilar = false;
+		   if (item1 != null && item2 != null) {
+		   if (item1.isSimilar(item2)) {
+			   isSimilar = true;
+		  } else if(isSkullSimilar(items, item1, player) ) {
+			  isSimilar = true;
+		  } else if(isBookSimilar(items, item1, player)) {
+			  isSimilar = true;
+		  }
+		 }
+   return isSimilar;	   
+}
+	   
+	   public static boolean isSimilar3(ItemStack item1, ItemStack item2, Player player) {
+		   boolean isSimilar = false;
+		   if (item1 != null && item2 != null) {
+		   if (item1.isSimilar(item2)) {
+			   isSimilar = true;
+		 }
+		   }
    return isSimilar;	   
 }
 	   

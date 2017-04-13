@@ -101,7 +101,6 @@ public class Registers {
 		}
 
 		   public static void firstJoinFile() {
-			      ConfigHandler.loadConfig("FirstJoin.yml");
 				  if (ConfigHandler.getConfig("items.yml").getBoolean("Global-Settings" + ".First-Join." + "FirstJoin-Mode-Enabled") == true) {
 					  ItemJoin.pl.getServer().getPluginManager().registerEvents(new FirstJoin(),ItemJoin.pl);
 					  ConfigHandler.loadConfig("FirstJoin.yml");

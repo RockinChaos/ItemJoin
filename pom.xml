@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>me.RockinChaos.itemjoin</groupId>
+	<groupId></groupId>
 	<artifactId>ItemJoin</artifactId>
-	<version>3.9.2</version>
+	<version>SNAPSHOT</version>
 	<name>ItemJoin</name>
 	<url>http://maven.apache.org</url>
 	
@@ -48,12 +48,6 @@
 	</build>
 	<dependencies>
 		   <!--Bukkit API-->
-   <dependency>
-           <groupId>org.bukkit</groupId>
-           <artifactId>bukkit</artifactId>
-           <version>1.9-R0.1-SNAPSHOT</version>
-           <scope>provided</scope>
-   </dependency>
 		<dependency>
 			<groupId>me.clip</groupId>
 			<artifactId>placeholderapi</artifactId>
@@ -61,4 +55,5 @@
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
+	<description>This pom.xml is for compiling snapshot purposes only and will rarely be changed, dont worry about it saying SNAPSHOT its for downloading on jenkins..</description>
 </project>
