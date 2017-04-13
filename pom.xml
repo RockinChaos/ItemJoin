@@ -87,8 +87,8 @@
             <url>http://repo.extendedclip.com/content/repositories/placeholderapi/</url>
         </repository>
         <repository>
-            <id>authme</id>
-            <url>http://ci.xephi.fr/plugin/repository/everything/</url>
+        	<id>xephi-repo</id>
+	        <url>http://ci.xephi.fr/plugin/repository/everything/</url>
         </repository>
 	</repositories>
 	<dependencies>
@@ -117,11 +117,11 @@
          <scope>provided</scope>
         </dependency>
         <dependency>
-         <groupId>ci.xephi.fr</groupId>
-          <artifactId>authme</artifactId>
-          <version>LATEST</version>
+	        <groupId>fr.xephi</groupId>
+	        <artifactId>authme</artifactId>
+	        <version>LATEST</version>
          <scope>provided</scope>
-        </dependency>  
+        </dependency>
 	</dependencies>
 	<organization>
 		<name>ItemJoin</name>
