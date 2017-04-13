@@ -42,7 +42,7 @@
 		</plugins>
    <resources>
    <resource>
-      <directory>src/</directory>
+      <directory>src/me/RockinChaos/itemjoin</directory>
          <includes>
             <include>plugin.yml</include>
             <include>items.yml</include>
