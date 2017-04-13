@@ -13,6 +13,12 @@
 				<directory>.</directory>
 				<includes>
 					<include>plugin.yml</include>
+					<include>items.yml</include>
+					<include>config.yml</include>
+					<include>en-lang.yml</include>
+					<include>de-lang.yml</include>
+					<include>FirstJoin.yml</include>
+					<include>default.png</include>
 					<include>LICENSE_GPL3.txt</include>
 					<include>LICENSE_MIT.txt</include>
 				</includes>
