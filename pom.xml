@@ -119,7 +119,7 @@
         <dependency>
 	        <groupId>fr.xephi</groupId>
 	        <artifactId>authme</artifactId>
-	        <version>LATEST</version>
+	        <version>5.2</version>
          <scope>provided</scope>
         </dependency>
 	</dependencies>
