@@ -255,7 +255,7 @@ public void chargePlayer(ConfigurationSection items, String item, Player player)
    public void dispatchPlayerCommands(String parts, Player player, String hitPlayerName, String item) {
        String Command = parts.replace("%player%", player.getName()).replace("%hitplayer%", hitPlayerName);
        Command = ItemJoin.pl.formatPlaceholders(Command, player);
-       player.performCommand(Command);
+       player.chat("/" + Command);
        playersOnCooldown.put(player.getWorld().getName() + "." + player.getName().toString() + ".items." + item, System.currentTimeMillis());
    }
    
