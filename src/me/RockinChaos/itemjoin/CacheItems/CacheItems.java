@@ -224,10 +224,10 @@ public class CacheItems {
 	            	   String pageSetup = (String)templist.get(k);
 	            	   if (pageSetup.contains("newpage: ") || pageSetup.contains("newline: ") || pageSetup.contains("newpage:") || pageSetup.contains("newline:") || pageSetup.contains(":endthebook:")) {
 	            		   if (pageSetup.contains("newpage: ") && !templist2.contains("cleanSlate") || pageSetup.contains("newpage:") && !templist2.contains("cleanSlate")) {
-	            			   ((BookMeta) tempmeta).addPage(ItemJoin.pl.formatPlaceholders(templist2.toString().replace("[", "").replace("]", ""), player));
+	            			   ((BookMeta) tempmeta).addPage(ItemJoin.pl.formatPlaceholders(templist2.toString().replace("[", "").replace("]", ""), player).replace(",", ""));
 	                    	   templist2.clear();
 	            		   } else if (pageSetup.contains(":endthebook:")) {
-	            			   ((BookMeta) tempmeta).addPage(ItemJoin.pl.formatPlaceholders(templist2.toString().replace("[", "").replace("]", ""), player));
+	            			   ((BookMeta) tempmeta).addPage(ItemJoin.pl.formatPlaceholders(templist2.toString().replace("[", "").replace("]", ""), player).replace(",", ""));
 	                    	   templist2.clear();
 	            		   } else if (templist2.contains("cleanSlate")) {
 	            			   templist2.clear();
