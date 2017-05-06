@@ -164,11 +164,11 @@ public class CacheItems {
 	           if (items.getString(".name") != null)
 	           {
 	             String name = items.getString(".name");
-	             name = ItemJoin.pl.formatPlaceholders(name, player);
+	             name = ItemJoin.pl.formatPlaceholders("&r" + name, player);
 	             tempmeta.setDisplayName(name + ItemJoin.encodeItemData(ItemJoin.secretMsg));
 	           } else {
 	        	   String lookup = ItemJoin.getName(tempitem);
-	        	   String name = ItemJoin.pl.formatPlaceholders("&f" + lookup + ItemJoin.encodeItemData(ItemJoin.secretMsg), player);
+	        	   String name = ItemJoin.pl.formatPlaceholders("&r" + lookup + ItemJoin.encodeItemData(ItemJoin.secretMsg), player);
 	        	   tempmeta.setDisplayName(name);
 	           }
 				if (tempmat == Material.LEATHER_HELMET
