@@ -217,22 +217,22 @@ public class CacheItems {
 	           if (items.getString(".pages") != null && tempmat == Material.WRITTEN_BOOK)
 	           {
 	               List<String> templist = items.getStringList(".pages");
-	               List<String> templist2 = new ArrayList<String>();
-	               templist2.add("cleanSlate");
+	   			   String templist2 = "";
+				   templist2 = templist2 + "cleanSlate";
 	               for (int k = 0; k < templist.size(); k++)
 	               {
 	            	   String pageSetup = (String)templist.get(k);
 	            	   if (pageSetup.contains("newpage: ") || pageSetup.contains("newline: ") || pageSetup.contains("newpage:") || pageSetup.contains("newline:") || pageSetup.contains(":endthebook:")) {
 	            		   if (pageSetup.contains("newpage: ") && !templist2.contains("cleanSlate") || pageSetup.contains("newpage:") && !templist2.contains("cleanSlate")) {
-	            			   ((BookMeta) tempmeta).addPage(ItemJoin.pl.formatPlaceholders(templist2.toString().replace("[", "").replace("]", ""), player).replace(",", ""));
-	                    	   templist2.clear();
+	            			   ((BookMeta) tempmeta).addPage(ItemJoin.pl.formatPlaceholders(templist2.toString().replace("[", "").replace("]", ""), player));
+	            			   templist2 = "";
 	            		   } else if (pageSetup.contains(":endthebook:")) {
-	            			   ((BookMeta) tempmeta).addPage(ItemJoin.pl.formatPlaceholders(templist2.toString().replace("[", "").replace("]", ""), player).replace(",", ""));
-	                    	   templist2.clear();
+	            			   ((BookMeta) tempmeta).addPage(ItemJoin.pl.formatPlaceholders(templist2.toString().replace("[", "").replace("]", ""), player));
+	            			   templist2 = "";
 	            		   } else if (templist2.contains("cleanSlate")) {
-	            			   templist2.clear();
+	            			   templist2 = "";
 	            		   }
-	            		   templist2.add(pageSetup.replace("newline: ", "\n").replace("newpage: ", "").replace("newline:", "\n").replace("newpage:", ""));
+	            		   templist2 = templist2 + pageSetup.replace("newline: ", "\n").replace("newpage: ", "").replace("newline:", "\n").replace("newpage:", "");
 	            	   }
 	        	   }
 	           }
