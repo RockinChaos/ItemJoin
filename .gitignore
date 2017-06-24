@@ -1,5 +1,5 @@
 
-# Windows image file caches
+# Windows image file caches 
 Thumbs.db
 ehthumbs.db
 
@@ -54,3 +54,6 @@ bin/me/xsilverslayerx/utils/UpdateChecker.class
 bin/me/xsilverslayerx/itemjoin/utils/Commands.class
 *.prefs
 /bin/
+.gitattributes
+.gitattributes
+.gitattributes
