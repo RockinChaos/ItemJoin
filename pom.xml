@@ -1,12 +1,11 @@
 <!-- ItemJoin build file -->
-<!-- Maven clean install package -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>me.RockinChaos.itemjoin</groupId>
 	<artifactId>ItemJoin</artifactId>
-	<version>3.9.4-SNAPSHOT</version>
+	<version>4.0-SNAPSHOT</version>
 	<build>
 		<sourceDirectory>${project.basedir}</sourceDirectory>
 		<resources>
@@ -19,8 +18,7 @@
 					<include>items.yml</include>
 					<include>config.yml</include>
 					<include>en-lang.yml</include>
-					<include>de-lang.yml</include>
-					<include>FirstJoin.yml</include>
+					<include>first-join.yml</include>
 					<include>default.png</include>
 					<include>LICENSE_MIT.txt</include>
 					<include>LICENSE_GPL3.txt</include>
@@ -106,18 +104,24 @@
         </repository>
 	</repositories>
 	<dependencies>
+    <!--Maven WorldUtils API-->
+    <dependency>
+        <groupId>commons-lang</groupId>
+        <artifactId>commons-lang</artifactId>
+        <version>LATEST</version>
+    </dependency>
     <!--Spigot API-->
 		<dependency>
 			<groupId>org.spigotmc</groupId>
 			<artifactId>spigot-api</artifactId>
-			<version>1.11.2-R0.1-SNAPSHOT</version>
+			<version>1.12-R0.1-SNAPSHOT</version>
          <scope>provided</scope>
 		</dependency>
     <!--CraftBukkit API-->
 		<dependency>
 			<groupId>org.bukkit</groupId>
             <artifactId>bukkit</artifactId>
-            <version>1.11.2-R0.1-SNAPSHOT</version>
+            <version>1.12-R0.1-SNAPSHOT</version>
          <scope>provided</scope>
 		</dependency>
     <!--Vault API-->
@@ -140,6 +144,12 @@
 	        <artifactId>authme</artifactId>
 	        <version>5.2</version>
          <scope>provided</scope>
+        </dependency>
+    <!--WorldGuard API-->
+        <dependency>
+        <groupId>com.sk89q</groupId>
+        <artifactId>worldguard</artifactId>
+        <version>LATEST</version>
         </dependency>
 	</dependencies>
 	<scm>

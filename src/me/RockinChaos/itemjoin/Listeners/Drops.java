@@ -1,12 +1,11 @@
-package me.RockinChaos.itemjoin.Listeners;
+package me.RockinChaos.itemjoin.listeners;
 
 import java.util.List;
 import java.util.ListIterator;
 
 import me.RockinChaos.itemjoin.ItemJoin;
-import me.RockinChaos.itemjoin.handlers.PlayerHandlers;
-import me.RockinChaos.itemjoin.handlers.WorldHandler;
-import me.RockinChaos.itemjoin.utils.CheckItem;
+import me.RockinChaos.itemjoin.handlers.ItemHandler;
+import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -23,17 +22,15 @@ public class Drops implements Listener {
 	  {
 	    ItemStack item = event.getItemDrop().getItemStack();
 	    final Player player = event.getPlayer();
-	    final String world = player.getWorld().getName();
-	    String modifier = ".itemflags";
-	    String mod = "self-drops";
-	      if (!CheckItem.isAllowedItem(player, world, item, modifier, mod))
+	    String itemflag = "self-drops";
+	      if (!ItemHandler.isAllowedItem(player, item, itemflag))
 	      {
 	        event.setCancelled(true);
 	        Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.pl, new Runnable()
 	        {
 	        public void run()
 	          {
-	        	PlayerHandlers.updateInventory(player);
+	        	PlayerHandler.updateInventory(player);
 	          }
 	      }, 1L);
    }
@@ -44,17 +41,13 @@ public class Drops implements Listener {
 		  List<ItemStack> drops = event.getDrops();
 		  ListIterator<ItemStack> litr = drops.listIterator();
 	    final Player player = event.getEntity();
-	    final String world = player.getWorld().getName();
-	    String modifier = ".itemflags";
-	    String mod = "death-drops";
-	    if (WorldHandler.isWorld(world)) {
+	    String itemflag = "death-drops";
         while(litr.hasNext()){
             ItemStack stack = litr.next();
-	      if (!CheckItem.isAllowedItem(player, world, stack, modifier, mod))
+	      if (!ItemHandler.isAllowedItem(player, stack, itemflag))
 	      {
 	    	  litr.remove();
 	    }
-    }
    }
   }
 }

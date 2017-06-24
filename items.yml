@@ -1,360 +1,239 @@
 #// <>==<>==<> ItemJoin's Custom Items On Join, by RockinChaos <>==<>==<> //#
 #// See the Documentations page for a more in-depth tutorial; https://www.spigotmc.org/wiki/itemjoin/ //#
-#// For per-world support this best works with Multiverse-Inventories! http://dev.bukkit.org/bukkit-plugins/multiverse-inventories //#
-#//
-#//
-#// E X A M P L E    I T E M //#
-#//
-#// For every world listed in the world-list, you need to make a section for it. //#
-#// NOTE: It is only required to have the ID and Slot listed under each item to receive it. //#
-#//world: #// This is the first section, This is the name of the world you want to receive the items in. If Global-Items was enabled this would be named global. //#
-#//  items: #// This is just an identifier to list out the items. This must always be here //#
-#//    example-item: #// This is the name of the first item we have created, you can name it what ever you want! Just put the NAME and then a colon. Such as New-Name: //#
-#//      id: DIAMOND_AXE #// This is the Material name OR item ID of the item you want to get //#
-#//      slot: 0 #// This is the slot number you want to receive the item in. Available slots are 0-35, Helmet, Chestplate, Leggings, Boots, Offhand, or Arbitrary. //#
-#//      name: '&bUltra Sword' #// This is the custom name of the item. Supports color codes as well as placeholders from PlaceholderAPI! //#
-#//      data-value: 0 #// This is the data-value that is after the items ID. Usually it is left as 0, but in cases of items like Stained Glass it would need to be set to a number. It is default 0 if a data-value is not specified. //#
-#//      count: 1 #// This is the amount of each item that will be given. You will be given 1 Diamond Sword. //#
-#//      durability: 5 #// This is the amount of durability the item has taken, such as if it has 32 durablity, it will now have 27 since it took 5 durability damage. //#
-#//      lore: #// This is the custom lore of the item. This is just the identifier which is required to start the lore. //#
-#//        - '&7Useless sword, cannot do much' #// This is the first line of custom lore. You can add multiple lines by copying and pasting it how it is shown below. //#
-#//        - '&7Only useful for commands...'
-#//        - '&7Maybe you should try removing the'
-#//        - '&7Left click and physical actions from the command actions.'
-#//        - '&7Maybe remove the cancel-events from itemflags as well...'
-#//      enchantment: #// This is the custom enchantments. Just an identifier again that is required to start the enchantment list. //#
-#//        - 'FIRE_ASPECT:3' #// The enchantments can be setup the exact same as the lore. Multiple lines can be added. The syntax for enchantments are the ENCHANTMENT_NAME:LEVEL. //#
-#//        - 'KNOCKBACK:8' #// This is another line of enchantment. Supports unsafe enchants! //#
-#//      commands: #// These are custom commands that can be bound to items. So once you click the item these commands will execute. These also support placeholders. //#
-#//        - 'message: &eYou can send yourself custom messages!' #// This is a custom message that can be sent to the player who right-clicked it. //#
-#//        - 'console: say You can even execute more than one command!' #// This is a command that can be executed by console. //#
-#//        - 'player: say This is item slot 2' #// This is a command that is executed by the player. //#
-#//        - 'say I like pancakes!' #// If no executer is defined such as message, console, or player. Then it will be executed by player by default. This is a player command. //#
-#//      commands-action: RIGHT_CLICK_AIR, RIGHT_CLICK_BLOCK, LEFT_CLICK_AIR, LEFT_CLICK_BLOCK, PHYSICAL #// These are command actions. These are all self-explanatory. If you need more help see the documentations page. //#
-#//      commands-cost: 25 #// This is the amount of in game money it will cost to run all the commands. You must have vault enabled and installed to use this. //#
-#//      commands-cooldown: 5 #// This is the amount of time in seconds that the player has to wait before executing the commands again. //#
-#//      cooldown-message: '&7[&eItemJoin&7] &a[%item%&a] &cis on cooldown for &a%timeleft% &cseconds..' #// If a player attempts to execute the commands while they're is on cooldown, this cooldown message will be sent to the player. //#
-#//      itemflags: #// These are custom itemflags! These allow huge modifications to the items. All itemflags with description are listed below. //#
-#//        - 'unbreakable' #// Makes this item INDESTRUCTABLE! //#
-#//        - 'hide-attributes' #// Hides ALL attributes, such as firework color, damage the item does, enchantments. (Hides everything from lore except the custom lore). //#
-#//        - 'first-join' #// If FirstJoin-Mode-Enabled is set to true then this item will ONLY be given on first-join and first-world-changed. //#
-#//        - 'placement' #// Prevents this item from being placed if it is a BLOCK, This item obviously can't be since it is a sword. //#
-#//        - 'inventory-modify' #// Prevents this item from being moved, stored, or switched to offhand in the players inventory. //#
-#//        - 'cancel-events' #// Prevents player from opening a chest while this item is in hand or any openable items. Useful for canceling the event of opening a book to set custom book items. //#
-#//        - 'count-lock' #// Prevents the player from using all of the item. If the item is set to count: 32 then each time the player places the block item the stack will be refreshed back to 32. //#
-#//        - 'death-drops' #// Clears this item if it is dropped on the ground when the player dies //#
-#//        - 'self-drops' #// Prevents the player from dropping this item, either clicking it out of inventory or using the drop key, usually (q). //#
-#//        - 'respawn' #// This item will be given on respawn if a player dies. //#
-#//        - 'disposable' #// The item if a command is bound to it will now remove x1 itself from your inventory upon running the command. //#
-#//        - 'world-changed' #// This item will be given on world changed, Meaning when you enter the world this item is allowed in it will be given. //#
-#//        - 'clear-on-join' #// Removes this item on join from your inventory before giving it back. //#
-#//        - 'clear-on-world-change' #// Removes this item when leaving the world. //#
-#//        - 'hide-durability' #// Hide the durability bar from your item. //#
-#//        - 'AllowOpBypass' #// This would allow the user IF THEIR OP to bypass most of these itemflags. It will work on ALL non item modifying flags. This would NOT work on unbreakable, hide-attributes, stuff like that. //#
-#//        - 'CreativeBypass' #// This would allow the user IF THEIR IN CREATIVE MODE to bypass most of these itemflags. It will work on ALL non item modifying flags. This would NOT work on unbreakable, hide-attributes, stuff like that. //#
-#//      permission-node: 'itemjoin.ultra' #// Each items permission node by default is itemjoin.WORLDNAME.ITEMNAME. You can change this though by putting ANY permission in the permission-node section! Permission to get this item is now itemjoin.ultra! //#
+items-Version: 6
+items-Delay: 2
+items-Overwrite: false
+items-Spamming: false
 
-items-Version: 5
-
-#// Global Settings, for each world listed under world-list. These information will take effect in them. //#
-Global-Settings:
-  Prevention:
-    prevent-pickups: false 
-    AllowOPBypass: false
-    CreativeBypass: false
-  Clear-On:
-    clear-on-join: false
-    clear-on-world-change: false
-    clear-only-itemjoin-on-join: false
-    clear-only-itemjoin-on-world-change: false
-    AllowOPBypass: false
-  First-Join:
-    FirstJoin-Mode-Enabled: false
-  Get-Items:
-    ItemJoin-Specific-Items: true
-    Global-Items: false
-    Delay: 2
-
-#// This is the list of worlds that have custom items on join. //#
-#// ItemJoin will only function in the worlds listed here //#
-world-list:
-  - world
-  - world_nether
-
-#// For every world listed in the world-list, you need to make a section for it. //#
-#// NOTE: It is only required to have the id and slot listed under each item to receive it. //#
-#// This is the first section, This is the name of the world you want to receive the items in. //#
-world:
-  items:
-    ultra-item:
-      id: DIAMOND_SWORD
-      slot: 0
-      name: '&bUltra Sword'
-      data-value: 0
-      count: 1
-      lore:
-        - '&7A god sword..'
-        - '&7This is generations old!'
-      enchantment:
-        - 'FIRE_ASPECT:3'
-        - 'DAMAGE_ALL:5'
-        - 'DAMAGE_UNDEAD:5'
-        - 'KNOCKBACK:8' 
-      commands: 
+items:
+  ultra-item:
+    id: DIAMOND_SWORD
+    slot: 0
+    name: '&bBlazefury'
+    lore:
+      - '&7A god sword..'
+      - '&7This is generations old!'
+    commands:
+      multi-click:
         - 'message: &eYou can send yourself custom messages!'
         - 'console: say You can even execute more than one command!'
         - 'player: say This is item slot 1'
         - 'say Hello world!'
-      commands-action: RIGHT_CLICK_AIR, RIGHT_CLICK_BLOCK, LEFT_CLICK_AIR, LEFT_CLICK_BLOCK
-      commands-cost: 25
-      commands-cooldown: 5
-      cooldown-message: '&7[&eItemJoin&7] &a[%item%&a] &cis on cooldown for &a%timeleft% &cseconds..'
-      itemflags:
-        - 'unbreakable'
-        - 'hide-attributes'
-        - 'first-join'
-        - 'inventory-modify'
-        - 'death-drops'
-        - 'self-drops'
-        - 'respawn'
-        - 'world-changed'
-        - 'AllowOpBypass'
-        - 'CreativeBypass'
-      permission-node: 'itemjoin.ultra' 
-    skull-breaker:
-      id: 286
-      slot: 2
-      name: '&5Skull Breaker'
-      lore:
-        - '&cSlay them ALL!'
-      enchantment:
-        - 'KNOCKBACK:4'
-        - 'FIRE_ASPECT:12'
-      itemflags:
-        - 'first-join'
-        - 'hide-attributes'
-    third-item:
-      id: 278
-      slot: Arbitrary
-      name: '&bThat Pickaxe'
-      lore:
-        - '&3Gives you powers!!!'
-        - '&7Found in the depths of the mining dimension.'
-      commands:
-        - 'gamemode 1 %player%'
-        - 'console: say this is a console command.'
-        - 'player: say this is a player command.'
-        - 'message: &cthis is a custom message.'
-        - 'say this command will be executed by the player since an executor is not defined.'
-      commands-cooldown: 8
-      commands-cost: 25
-      cooldown-message: '&7[&eItemJoin&7] &a[%item%&a] &cis on cooldown for &a%timeleft% &cseconds..'
-      itemflags:
-        - 'first-join'
-        - 'inventory-modify'
-        - 'death-drops'
-        - 'self-drops'
-        - 'hide-attributes'
-        - 'unbreakable'
-        - 'respawn'
-        - 'world-changed'
-      permission-node: 'itemjoin.thirditem'
-    forth-item:
-      id: 284
-      slot: 10
-    gamemode-item:
-      id: PAPER
-      slot: 3
-      name: '&eGamemode Token'
-      count: 6
-      lore:
-        - '&7Right-Click to use'
-        - '&7Your free creative mode token!'
-      commands:
+    enchantment: FIRE_ASPECT:3, DAMAGE_ALL:5, DAMAGE_UNDEAD:5, KNOCKBACK:8
+    commands-type: interact, inventory
+    commands-sound: BLOCK_NOTE_PLING
+    commands-cost: 25
+    commands-cooldown: 5
+    cooldown-message: '&7[&eItemJoin&7] &a[%item%&a] &cis on cooldown for &a%timeleft% &cseconds..'
+    itemflags: inventory-modify, death-drops, unbreakable, hide-attributes, self-drops, CreativeBypass
+    triggers: join, respawn, world-change
+    permission-node: 'itemjoin.ultra'
+    enabled-regions: region1, region2
+    enabled-worlds: world, world_nether, world_the_end
+  map-item:
+    id: MAP
+    slot: 2
+    name: '&eMystery Map'
+    lore:
+      - '&7Great for Server promotions!'
+    map-id: 1
+    custom-map-image: 'default.png'
+    itemflags: inventory-modify, unbreakable, hide-attributes, death-drops, self-drops, CreativeBypass
+    triggers: join, respawn, world-change
+    permission-node: 'itemjoin.ultra'
+    enabled-worlds: world, world_nether, world_the_end
+  gamemode-item:
+    id: PAPER
+    slot: 4
+    count: 6
+    name: '&aGamemode Token'
+    lore:
+      - '&7Right-Click to use'
+      - '&7Your free creative mode token!'
+      - '&7'
+      - '&7Left-Click to use'
+      - '&7Your free spectator mode token!'
+    commands:
+      right-click:
         - 'console: gamemode 1 %player%'
         - 'message: &eYou have been set to creative mode.'
-      commands-cooldown: 8
-      cooldown-message: '&7[&eItemJoin&7] &a[%item%&a] &cis on cooldown for &a%timeleft% &cseconds..'
-      itemflags:
-        - 'inventory-modify'
-        - 'death-drops'
-        - 'self-drops'
-        - 'disposable'
-        - 'respawn'
-        - 'world-changed'
-    bungeecord-blox:
-      id: STAINED_GLASS
-      slot: 4
-      name: '&eBungeeCord Blox'
-      data-value: 12
-      count: 32
-      lore:
-        - '&7Right-Click to go to the survival server!'
-      enchantment:
-        - 'FIRE_ASPECT:3'
-      commands:
+      left-click:
+        - 'console: gamemode 3 %player%'
+        - 'message: &eYou have been set to spectator mode.'
+    commands-type: interact
+    commands-sound: BLOCK_NOTE_PLING
+    commands-cost: 25
+    commands-cooldown: 5
+    cooldown-message: '&7[&eItemJoin&7] &a[%item%&a] &cis on cooldown for &a%timeleft% &cseconds..'
+    itemflags: death-drops, self-drops, disposable
+    triggers: join, respawn, world-change
+    permission-node: 'itemjoin.token'
+    enabled-worlds: world, world_nether, world_the_end
+  book-item:
+    id: WRITTEN_BOOK
+    slot: 6
+    name: '&c&nCreating a Book'
+    author: '&bItemJoin'
+    lore:
+      - '&7'
+      - '&7This magical book is given on join!'
+    pages:
+      - 'newpage: &bYou can get this book on join!'
+      - 'newline: &aThis book also supports &ccolor codes!'
+      - 'newline: &0'
+      - 'newline: &cHow do custom books work?'
+      - 'newline: &0'
+      - 'newline: &0You can set an &cauthor&0'
+      - 'newline: &0as shown in the items.yml'
+      - 'newline: &0I set it to &bItemJoin.'
+      - 'newline: &0'
+      - 'newpage: &cHow do you create a new page?'
+      - 'newline: &0'
+      - 'newline: &0As displayed to the left in the items.yml'
+      - 'newline: &0Use &bnewpage&0 and &cnewline&0 to create your pages.'
+      - 'newline: &cnewpage &0will start the next page.'
+      - 'newline: &cnewline &0will create a new line for that page.'
+      - 'newpage: &bItemJoin &0by RockinChaos!'
+      - ':endthebook:'
+    itemflags: inventory-modify, death-drops, self-drops
+    triggers: join, respawn
+    permission-node: 'itemjoin.book'
+    enabled-worlds: world
+  bungeecord-item:
+    id: STAINED_GLASS
+    slot: 8
+    name: '&eBungeeCord Blox'
+    data-value: 12
+    count: 32
+    lore:
+      - '&7Right-Click to go to the survival server!'
+    enchantment: FIRE_ASPECT:3
+    commands:
+      multi-click:
         - 'server: survival'
-        - 'message: &eGoing to the server of magical love!'
-      itemflags:
-        - 'placement'
-        - 'count-lock'
-        - 'inventory-modify'
-        - 'self-drops'
-        - 'respawn'
-        - 'world-changed'
-        - 'CreativeBypass'
-    book-item:
-      id: WRITTEN_BOOK
-      slot: 5
-      name: '&aAt Its Finest'
-      author: '&bItemJoin'
-      lore:
-        - '&7'
-        - '&7This magical book is given on join!'
-      pages:
-        - 'newpage: &bYou can get this book on join!'
-        - 'newline: &aThis book also supports &ccolor codes!'
-        - 'newline: &0'
-        - 'newline: &cHow do custom books work?'
-        - 'newline: &0'
-        - 'newline: &0You can set an &cauthor&0'
-        - 'newline: &0as shown in the items.yml'
-        - 'newline: &0I set it to &bItemJoin.'
-        - 'newline: &0'
-        - 'newpage: &cHow do you create a new page?'
-        - 'newline: &0'
-        - 'newline: &0As displayed to the left in the items.yml'
-        - 'newline: &0Use &bnewpage&0 and &cnewline&0 to create your pages.'
-        - 'newline: &cnewpage &0will start the next page.'
-        - 'newline: &cnewline &0will create a new line for that page.'
-        - 'newpage: &bItemJoin &0by RockinChaos!'
-        - ':endthebook:'
-    custom-map-item:
-      id: MAP
-      slot: 6
-      name: '&eMystery Map'
-      lore:
-        - '&7Great for Server promotions!'
-      itemflags:
-        - 'hide-attributes'
-      map-id: 1
-      custom-map-image: 'default.png'
-    custom-firework-item:
-      id: FIREWORK
-      slot: 7
-      name: '&dSparkles'
-      lore:
-        - '&7Right-Click me and watch me fly!'
-      firework:
-        type: CREEPER
-        flicker: true
-        trail: true
-        power: 1
-        colors:
-          - 'GRAY'
-          - 'WHITE'
-          - 'PURPLE'
-          - 'SILVER'
-          - 'GREEN'
-      itemflags:
-        - 'hide-attributes'
-    skull-item:
-      id: SKULL_ITEM
-      slot: 8
-      name: '&a%player%'
-      skull-owner: '%player%'
-      data-value: 3
-      lore:
-        - '&7Great for setting a'
-        - '&7players profile, like hypixel!'
-    custom-arrow-item:
-      id: TIPPED_ARROW
-      slot: 9
-      name: '&dAwesome Arrow'
-      count: 16
-      arrow:
-          potion-effect: WITHER
-          power: 1
-          time: 20
-    helmet-item:
-      id: DIAMOND_HELMET
-      slot: Helmet
-      name: '&5ItemJoins Legendary Helmet!'
-      lore:
-        - '&7Knowledge..'
-      enchantment:
-        - 'PROTECTION_ENVIRONMENTAL:3'
-        - 'PROTECTION_EXPLOSIONS:2'
-      itemflags:
-        - 'unbreakable'
-    chestplate-item:
-      id: 299
-      leather-color: BLUE
-      slot: Chestplate
-      name: '&5ItemJoins Legendary Chestplate!'
-      lore:
-        - '&5Can it protect from any hit?'
-      enchantment:
-        - 'PROTECTION_ENVIRONMENTAL:18'
-        - 'PROTECTION_EXPLOSIONS:2'
-      itemflags:
-        - 'unbreakable'
-    leggings-item:
-      id: DIAMOND_LEGGINGS
-      slot: Leggings
-      name: '&5ItemJoins Legendary Leggings!'
-      lore:
-        - '&dSpeed of a god!'
-      enchantment:
-        - 'PROTECTION_ENVIRONMENTAL:3'
-        - 'PROTECTION_EXPLOSIONS:2'
-      itemflags:
-        - 'unbreakable'
-    boots-item:
-      id: LEATHER_BOOTS
-      leather-color: PURPLE
-      slot: Boots
-      name: '&5ItemJoins Legendary Boots!'
-      lore:
-        - '&bStrong enough to jump to the moon!'
-      enchantment:
-        - 'PROTECTION_ENVIRONMENTAL:3'
-        - 'PROTECTION_EXPLOSIONS:2'
-      itemflags:
-        - 'unbreakable'
-    offhand-item:
-      id: SHIELD
-      slot: Offhand
-      name: '&bAwesome Shield!'
-      lore:
-        - '&7Supreme Protector'
-        - '&7Rewards &dAwesomeness!'
-      itemflags:
-        - 'unbreakable'
-
-
-#// This is the second world section, This is the name of the world you want to receive the next set of items in. //#
-#// You can add as many world sections as you want. //#
-world_nether:
-  items:
-    dat-hoe:
-      id: WOOD_HOE
-      slot: 0
-      name: 'JUNK'
-      itemflags:
-        - 'first-join'
-    seedlings:
-      id: SEEDS
-      slot: 2
-      permission-node: 'itemjoin.casual.seedlings'
-    life:
-      id: WHEAT
-      slot: 4
-      commands:
-        - 'player: I like wheat!'
-    carts:
-      id: MINECART
-      slot: 6
-      data-value: 0
-      lore:
-        - '&l&1BOLD'
+        - 'message: &eSending you to the survival server!'
+    commands-type: interact, inventory
+    commands-sound: BLOCK_NOTE_PLING
+    commands-cost: 25
+    commands-cooldown: 5
+    cooldown-message: '&7[&eItemJoin&7] &a[%item%&a] &cis on cooldown for &a%timeleft% &cseconds..'
+    itemflags: inventory-modify, placement, hide-attributes, death-drops, self-drops
+    triggers: join, respawn, world-change
+    permission-node: 'itemjoin.bungeetp'
+    enabled-worlds: world, world_nether, world_the_end
+  filler-pane-item:
+    id: 160
+    slot: Arbitrary, Arbitrary, Arbitrary, Arbitrary
+    name: '&f'
+    data-value: 15
+    itemflags: inventory-modify, placement, death-drops, self-drops
+    triggers: join, world-change
+    enabled-worlds: world, world_nether, world_the_end
+  arrow-item:
+    id: TIPPED_ARROW
+    slot: 27
+    name: '&fDeath Arrow'
+    count: 16
+    arrow:
+      potion-effect: WITHER
+      power: 1
+      time: 20
+    itemflags: death-drops, self-drops
+    triggers: join, respawn, world-change
+    enabled-worlds: world, world_nether, world_the_end
+  firework-item:
+    id: FIREWORK
+    slot: 29
+    name: '&dSparkles'
+    lore:
+      - '&7Right-Click me and watch me fly!'
+    firework:
+      type: CREEPER
+      flicker: true
+      trail: true
+      power: 1
+      colors:
+        - 'GRAY'
+        - 'WHITE'
+        - 'PURPLE'
+        - 'SILVER'
+        - 'GREEN'
+    itemflags: count-lock, death-drops, hide-attributes, self-drops
+    triggers: join, respawn, world-change
+    enabled-worlds: world, world_nether, world_the_end
+  potion-item:
+    id: POTION
+    slot: 31
+    name: '&4Draught of Madness'
+    potioneffects: JUMP:2:120, INCREASE_DAMAGE:3:150, REGENERATION:1:160
+    triggers: join, respawn, world-change
+    enabled-worlds: world, world_nether, world_the_end
+  golden-apple-item:
+    id: GOLDEN_APPLE
+    slot: 33
+    name: '&eApple of the Goddess'
+    lore:
+      - '&7This is not any ordinary apple.'
+    itemflags: death-drops, self-drops
+    potioneffects: JUMP:2:120, NIGHT_VISION:2:400, GLOWING:1:410, REGENERATION:1:160
+    triggers: join, respawn, world-change
+    enabled-worlds: world, world_nether, world_the_end
+  skull-item:
+    id: SKULL_ITEM
+    slot: 35
+    name: '&b%player%'
+    skull-owner: '%player%'
+    data-value: 3
+    lore:
+      - '&7Great for setting a'
+      - '&7players profile, like hypixel!'
+    itemflags: inventory-modify, death-drops, self-drops
+    triggers: join, respawn, world-change
+    enabled-worlds: world, world_nether, world_the_end
+  filler-pane-item-two:
+    id: 160
+    slot: 28, 30, 32, 34
+    name: '&f'
+    data-value: 4
+    itemflags: inventory-modify, placement, death-drops, self-drops
+    triggers: join, world-change
+    enabled-worlds: world, world_nether, world_the_end
+  helmet-item:
+    id: DIAMOND_HELMET
+    slot: helmet
+    name: '&5Helmet of Solitude'
+    enchantment: PROTECTION_ENVIRONMENTAL:5
+    itemflags: inventory-modify, death-drops, self-drops
+    triggers: join
+    enabled-worlds: world, world_nether, world_the_end
+  chestplate-item:
+    id: DIAMOND_CHESTPLATE
+    slot: chestplate
+    name: '&5Chestplate of Reckoning'
+    enchantment: PROTECTION_ENVIRONMENTAL:5
+    itemflags: inventory-modify, death-drops, self-drops
+    triggers: join
+    enabled-worlds: world, world_nether, world_the_end
+  leggings-item:
+    id: DIAMOND_LEGGINGS
+    slot: leggings
+    name: '&5Leggings of Strength'
+    enchantment: PROTECTION_ENVIRONMENTAL:3
+    itemflags: inventory-modify, death-drops, self-drops
+    triggers: join
+    enabled-worlds: world, world_nether, world_the_end
+  boots-item:
+    id: DIAMOND_BOOTS
+    slot: boots
+    name: '&5Boots of Flight'
+    enchantment: PROTECTION_ENVIRONMENTAL:3, PROTECTION_FALL:5
+    itemflags: inventory-modify, death-drops, self-drops
+    triggers: join
+    enabled-worlds: world, world_nether, world_the_end
+  offhand-item:
+    id: SHIELD
+    slot: offhand
+    name: '&bShield of the Protector'
+    itemflags: inventory-modify, death-drops, self-drops, unbreakable
+    triggers: join
+    enabled-worlds: world, world_nether, world_the_end

@@ -12,7 +12,6 @@ public class Econ {
 	public static void enableEconomy () { 
 		if (ConfigHandler.getConfig("config.yml").getBoolean("Vault") == true && ItemJoin.pl.getServer().getPluginManager().getPlugin("Vault") != null) {
 	      if (!setupEconomy() ) {
-	          ItemJoin.pl.log.info(String.format("[%s] - Disabled due to no Vault dependency found!", ItemJoin.pl.getDescription().getName()));
 	          ItemJoin.pl.getServer().getPluginManager().disablePlugin(ItemJoin.pl);
 	          return;
 	      }

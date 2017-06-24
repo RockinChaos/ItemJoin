@@ -1,739 +1,474 @@
 package me.RockinChaos.itemjoin.utils;
 
-import java.util.List;
-
+import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.command.*;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.*;
 
 import me.RockinChaos.itemjoin.ItemJoin;
-import me.RockinChaos.itemjoin.CacheItems.CacheItems;
+import me.RockinChaos.itemjoin.cacheitems.CreateItems;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
+import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PermissionsHandler;
-import me.RockinChaos.itemjoin.handlers.PlayerHandlers;
-import me.RockinChaos.itemjoin.handlers.WorldHandler;
+import me.RockinChaos.itemjoin.handlers.PlayerHandler;
+import me.RockinChaos.itemjoin.handlers.ServerHandler;
+import me.RockinChaos.itemjoin.listeners.giveitems.SetItems;
 
 public class Commands implements CommandExecutor {
-
-	public static String Prefix;
-	public static String noPermission;
-	public static String notPlayer;
-	public static String consoleAltSyntax;
-	public static String consoleAltRemoveSyntax;
-	public static String unknownCommand;
-	public static String badGetUsage;
-	public static String badRemoveUsage;
-	public static String givenItem;
-	public static String givenOthersItem;
-	public static String receivedOthersItem;
-	public static String removedOthersItem;
-	public static String takenOthersItem;
-	public static String itemDoesNotExist;
-	public static String itemDoesNotExistInInventory;
-	public static String itemDoesNotExistInOthersInventory;
-	public static String badSlot1;
-	public static String badSlot2;
-	public static String badID;
-	public static String consoleReloadedConfig;
-	public static String reloadedConfig;
-	public static String cachedWorlds;
-	public static String loadedWorlds;
-	public static String loadedWorldsListed;
-	public static String listWorlds;
-	public static String listItems;
-	public static String nolistItems;
-	public static String worldIn;
-	public static String worldInListed;
-	public static String inventoryFull;
-	public static String inventoryFullOthers;
-	public static String itemCostSuccess;
-	public static String itemCostFailed;
-	public static ConsoleCommandSender Console = ItemJoin.pl.getServer().getConsoleSender();
-	public static String CPrefix = ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] ";
-	public static boolean failedGive = false;
-
+	public static boolean ItemExists = false;
+	
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if (args.length == 0) {
 			if (sender.hasPermission("itemjoin.use") || sender.hasPermission("itemjoin.*")) {
-				sender.sendMessage(ChatColor.GREEN + "ItemJoin v" + ItemJoin.pl.getDescription().getVersion()
-						+ ChatColor.YELLOW + " by RockinChaos");
-				sender.sendMessage(ChatColor.GREEN + "Type" + ChatColor.GREEN.toString() + ChatColor.BOLD.toString()
-						+ " /ItemJoin Help " + ChatColor.GREEN + "for the help menu.");
+				ServerHandler.sendCommandsMessage(sender, "&aItemJoin v" + ItemJoin.pl.getDescription().getVersion() + "&e by RockinChaos");
+				ServerHandler.sendCommandsMessage(sender, "&aType &a&l/ItemJoin Help &afor the help menu.");
 				return true;
 			} else {
-				sender.sendMessage(noPermission);
+				Language.getSendMessage(sender, "noPermission", "");
 				return true;
 			}
-		} else if (args.length == 1 && args[0].equalsIgnoreCase("help")
-				|| args.length == 1 && args[0].equalsIgnoreCase("h")) {
+		} else if (args.length == 1 && args[0].equalsIgnoreCase("help") || args.length == 1 && args[0].equalsIgnoreCase("h")) {
 			if (sender.hasPermission("itemjoin.use") || sender.hasPermission("itemjoin.*")) {
-				sender.sendMessage("");
-				sender.sendMessage(ChatColor.GREEN.toString() + ChatColor.BOLD.toString()
-						+ ChatColor.STRIKETHROUGH.toString() + "]--------------" + ChatColor.GREEN.toString()
-						+ ChatColor.BOLD.toString() + "[" + ChatColor.YELLOW + " ItemJoin " + ChatColor.GREEN.toString()
-						+ ChatColor.BOLD.toString() + "]" + ChatColor.GREEN.toString() + ChatColor.BOLD.toString()
-						+ ChatColor.STRIKETHROUGH.toString() + "--------------[");
-				sender.sendMessage(ChatColor.GREEN + "ItemJoin v." + ItemJoin.pl.getDescription().getVersion()
-						+ ChatColor.YELLOW + " by RockinChaos");
-				sender.sendMessage(ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "/ItemJoin Help"
-						+ ChatColor.GRAY + " - " + ChatColor.YELLOW + "This help menu.");
-				sender.sendMessage(ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "/ItemJoin Reload"
-						+ ChatColor.GRAY + " - " + ChatColor.YELLOW + "Reloads the .yml files.");
-				sender.sendMessage(ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "/ItemJoin Loaded"
-						+ ChatColor.GRAY + " - " + ChatColor.YELLOW + "Lists the loaded worlds for ItemJoin.");
-				sender.sendMessage(ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "/ItemJoin Updates"
-						+ ChatColor.GRAY + " - " + ChatColor.YELLOW + "Checks for plugin updates.");
-				sender.sendMessage(ChatColor.GREEN + "Type" + ChatColor.GREEN.toString() + ChatColor.BOLD.toString()
-						+ " /ItemJoin Help 2 " + ChatColor.GREEN + "for the next page.");
-				sender.sendMessage(ChatColor.GREEN.toString() + ChatColor.BOLD.toString()
-						+ ChatColor.STRIKETHROUGH.toString() + "]------------" + ChatColor.GREEN.toString()
-						+ ChatColor.BOLD.toString() + "[" + ChatColor.YELLOW + " Help Menu 1/3 "
-						+ ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "]" + ChatColor.GREEN.toString()
-						+ ChatColor.BOLD.toString() + ChatColor.STRIKETHROUGH.toString() + "------------[");
-				sender.sendMessage("");
+				ServerHandler.sendCommandsMessage(sender, "blankmessage");
+				ServerHandler.sendCommandsMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
+				ServerHandler.sendCommandsMessage(sender, "&aItemJoin v" + ItemJoin.pl.getDescription().getVersion() + "&e by RockinChaos");
+				ServerHandler.sendCommandsMessage(sender, "&a&l/ItemJoin Help &7- &eThis help menu");
+				ServerHandler.sendCommandsMessage(sender, "&a&l/ItemJoin Reload &7- &eReloads the .yml files");
+				ServerHandler.sendCommandsMessage(sender, "&a&l/ItemJoin Updates &7- &eChecks for plugin updates");
+				ServerHandler.sendCommandsMessage(sender, "&a&l/ItemJoin AutoUpdate &7- &eUpdate ItemJoin to latest version");
+				ServerHandler.sendCommandsMessage(sender, "&aType &a&l/ItemJoin Help 2 &afor the next page");
+				ServerHandler.sendCommandsMessage(sender, "&a&l&m]----------------&a&l[&e Help Menu 1/3 &a&l]&a&l&m---------------[");
+				ServerHandler.sendCommandsMessage(sender, "blankmessage");
 				return true;
 			} else {
-				sender.sendMessage(noPermission);
+				Language.getSendMessage(sender, "noPermission", "");
 				return true;
 			}
-		} else if (args.length == 2 && args[0].equalsIgnoreCase("help") && args[1].equalsIgnoreCase("2")
-				|| args.length == 2 && args[0].equalsIgnoreCase("h") && args[1].equalsIgnoreCase("2")) {
+		} else if (args.length == 2 && args[0].equalsIgnoreCase("help") && args[1].equalsIgnoreCase("2") || args.length == 2 && args[0].equalsIgnoreCase("h") && args[1].equalsIgnoreCase("2")) {
 			if (sender.hasPermission("itemjoin.use") || sender.hasPermission("itemjoin.*")) {
-				sender.sendMessage("");
-				sender.sendMessage(ChatColor.GREEN.toString() + ChatColor.BOLD.toString()
-						+ ChatColor.STRIKETHROUGH.toString() + "]--------------" + ChatColor.GREEN.toString()
-						+ ChatColor.BOLD.toString() + "[" + ChatColor.YELLOW + " ItemJoin " + ChatColor.GREEN.toString()
-						+ ChatColor.BOLD.toString() + "]" + ChatColor.GREEN.toString() + ChatColor.BOLD.toString()
-						+ ChatColor.STRIKETHROUGH.toString() + "--------------[");
-				sender.sendMessage(ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "/ItemJoin Permissions"
-						+ ChatColor.GRAY + " - " + ChatColor.YELLOW + "Lists the permissions you have.");
-				sender.sendMessage(ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "/ItemJoin Permissions 2"
-						+ ChatColor.GRAY + " - " + ChatColor.YELLOW + "Permissions page 2.");
-				sender.sendMessage(ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "/ItemJoin Get <Item>"
-						+ ChatColor.GRAY + " - " + ChatColor.YELLOW + "Gives that item.");
-				sender.sendMessage(
-						ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "/ItemJoin Get <Item> <Player>"
-								+ ChatColor.GRAY + " - " + ChatColor.YELLOW + "Gives to said player.");
-				sender.sendMessage(ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "/ItemJoin World"
-						+ ChatColor.GRAY + " - " + ChatColor.YELLOW + "Check what world you are in. (debugging).");
-				sender.sendMessage(ChatColor.GREEN + "Type" + ChatColor.GREEN.toString() + ChatColor.BOLD.toString()
-				+ " /ItemJoin Help 3 " + ChatColor.GREEN + "for the next page.");
-				sender.sendMessage(ChatColor.GREEN.toString() + ChatColor.BOLD.toString()
-						+ ChatColor.STRIKETHROUGH.toString() + "]------------" + ChatColor.GREEN.toString()
-						+ ChatColor.BOLD.toString() + "[" + ChatColor.YELLOW + " Help Menu 2/3 "
-						+ ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "]" + ChatColor.GREEN.toString()
-						+ ChatColor.BOLD.toString() + ChatColor.STRIKETHROUGH.toString() + "------------[");
-				sender.sendMessage("");
+				ServerHandler.sendCommandsMessage(sender, "blankmessage");
+				ServerHandler.sendCommandsMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
+				ServerHandler.sendCommandsMessage(sender, "&a&l/ItemJoin List &7- &eCheck items you can get each what worlds");
+				ServerHandler.sendCommandsMessage(sender, "&a&l/ItemJoin World &7- &eCheck what world you are in, debugging");
+				ServerHandler.sendCommandsMessage(sender, "&a&l/ItemJoin Permissions &7- &eLists the permissions you have");
+				ServerHandler.sendCommandsMessage(sender, "&a&l/ItemJoin Permissions 2 &7- &ePermissions page 2");
+				ServerHandler.sendCommandsMessage(sender, "&aType &a&l/ItemJoin Help 3 &afor the next page");
+				ServerHandler.sendCommandsMessage(sender, "&a&l&m]----------------&a&l[&e Help Menu 2/3 &a&l]&a&l&m---------------[");
+				ServerHandler.sendCommandsMessage(sender, "blankmessage");
 				return true;
 			} else {
-				sender.sendMessage(noPermission);
+				Language.getSendMessage(sender, "noPermission", "");
 				return true;
 			}
-		} else if (args.length == 2 && args[0].equalsIgnoreCase("help") && args[1].equalsIgnoreCase("3")
-				|| args.length == 2 && args[0].equalsIgnoreCase("h") && args[1].equalsIgnoreCase("3")) {
+		} else if (args.length == 2 && args[0].equalsIgnoreCase("help") && args[1].equalsIgnoreCase("3") || args.length == 2 && args[0].equalsIgnoreCase("h") && args[1].equalsIgnoreCase("3")) {
 			if (sender.hasPermission("itemjoin.use") || sender.hasPermission("itemjoin.*")) {
-				sender.sendMessage("");
-				sender.sendMessage(ChatColor.GREEN.toString() + ChatColor.BOLD.toString()
-						+ ChatColor.STRIKETHROUGH.toString() + "]--------------" + ChatColor.GREEN.toString()
-						+ ChatColor.BOLD.toString() + "[" + ChatColor.YELLOW + " ItemJoin " + ChatColor.GREEN.toString()
-						+ ChatColor.BOLD.toString() + "]" + ChatColor.GREEN.toString() + ChatColor.BOLD.toString()
-						+ ChatColor.STRIKETHROUGH.toString() + "--------------[");
-				sender.sendMessage(ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "/ItemJoin Remove <Item>"
-						+ ChatColor.GRAY + " - " + ChatColor.YELLOW + "Remove that item from inventory.");
-				sender.sendMessage(
-						ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "/ItemJoin Remove <Item> <Player>"
-								+ ChatColor.GRAY + " - " + ChatColor.YELLOW + "Remove from player.");
-				sender.sendMessage(ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "/ItemJoin List"
-						+ ChatColor.GRAY + " - " + ChatColor.YELLOW + "Check items you can get each what worlds.");
-				sender.sendMessage(ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "/ItemJoin AutoUpdate"
-						+ ChatColor.GRAY + " - " + ChatColor.YELLOW + "Update ItemJoin to latest version.");
-				sender.sendMessage(ChatColor.GREEN + "Found a bug? Report it @");
-				sender.sendMessage(ChatColor.GREEN + "http://dev.bukkit.org/bukkit-plugins/itemjoin/");
-				sender.sendMessage(ChatColor.GREEN.toString() + ChatColor.BOLD.toString()
-						+ ChatColor.STRIKETHROUGH.toString() + "]------------" + ChatColor.GREEN.toString()
-						+ ChatColor.BOLD.toString() + "[" + ChatColor.YELLOW + " Help Menu 3/3 "
-						+ ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "]" + ChatColor.GREEN.toString()
-						+ ChatColor.BOLD.toString() + ChatColor.STRIKETHROUGH.toString() + "------------[");
-				sender.sendMessage("");
+				ServerHandler.sendCommandsMessage(sender, "blankmessage");
+				ServerHandler.sendCommandsMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
+				ServerHandler.sendCommandsMessage(sender, "&a&l/ItemJoin Get <Item> &7- &eGives that ItemJoin item");
+				ServerHandler.sendCommandsMessage(sender, "&a&l/ItemJoin Get <Item> <Player> &7- &eGives to said player");
+				ServerHandler.sendCommandsMessage(sender, "&a&l/ItemJoin Remove <Item> &7- &eRemoves item from inventory");
+				ServerHandler.sendCommandsMessage(sender, "&a&l/ItemJoin Remove <Item> <Player> &7- &eRemoves from player");
+				ServerHandler.sendCommandsMessage(sender, "&aFound a bug? Report it @");
+				ServerHandler.sendCommandsMessage(sender, "&ahttps://github.com/RockinChaos/ItemJoin/issues");
+				ServerHandler.sendCommandsMessage(sender, "&a&l&m]----------------&a&l[&e Help Menu 3/3 &a&l]&a&l&m---------------[");
+				ServerHandler.sendCommandsMessage(sender, "blankmessage");
 				return true;
 			} else {
-				sender.sendMessage(noPermission);
+				Language.getSendMessage(sender, "noPermission", "");
 				return true;
 			}
 		} else if (args[0].equalsIgnoreCase("reload") || args[0].equalsIgnoreCase("rl")) {
 			if (sender.hasPermission("itemjoin.reload") || sender.hasPermission("itemjoin.*")) {
-				ConfigHandler.loadConfig("items.yml");
-				ConfigHandler.getConfig("items.yml").options().copyDefaults(false);
-				ItemJoin.pl.worlds = ConfigHandler.getConfig("items.yml").getStringList("world-list");
-				ItemJoin.pl.saveDefaultConfig();
-				ItemJoin.pl.getConfig().options().copyDefaults(false);
-				ItemJoin.pl.reloadConfig();
-				Registers.firstJoinFile();
-				if (ItemJoin.pl.getConfig().getString("Language").equalsIgnoreCase("English")) {
-					ConfigHandler.loadConfig("en-lang.yml");
-					ConfigHandler.getConfig("en-lang.yml").options().copyDefaults(false);
-				}
-				RegisterEnLang(PlayerHandlers.PlayerHolder());
-				ItemJoin.pl.items.clear();
-				if(Registers.hasBetterVersion()) {
-				for (Player player : ItemJoin.pl.getServer().getOnlinePlayers()) {
-					CacheItems.run(player);
-				}
-				}
-				sender.sendMessage(reloadedConfig);
-				List<String> PrintWorlds = ConfigHandler.getConfig("items.yml").getStringList("world-list");
-				for (int i = 0; i < PrintWorlds.size(); i++) {
-					String world = (String) PrintWorlds.get(i);
-					sender.sendMessage(cachedWorlds.replace("%cache_world%", world));
-				}
-				Console.sendMessage(consoleReloadedConfig.replace("%player_reloaded%", sender.getName()));
+				CreateItems.items.clear();
+				ConfigHandler.loadConfigs();
+				CreateItems.setRun();
+				Language.getSendMessage(sender, "reloadedConfigs", "");
 				return true;
 			} else {
-				sender.sendMessage(noPermission);
+				Language.getSendMessage(sender, "noPermission", "");
 				return true;
 			}
-		} else if (args[0].equalsIgnoreCase("loaded") || args[0].equalsIgnoreCase("l")) {
-			if (sender.hasPermission("itemjoin.use") || sender.hasPermission("itemjoin.*")) {
-				sender.sendMessage(loadedWorlds);
-				List<String> PrintWorlds = ConfigHandler.getConfig("items.yml").getStringList("world-list");
-				for (int i = 0; i < PrintWorlds.size(); i++) {
-					String world = (String) PrintWorlds.get(i);
-					sender.sendMessage(loadedWorldsListed.replace("%loaded_worlds%", world));
-				}
-				return true;
-			} else {
-				sender.sendMessage(noPermission);
-				return true;
-			}
-		} else if (args[0].equalsIgnoreCase("world") || args[0].equalsIgnoreCase("worlds")
-				|| args[0].equalsIgnoreCase("w")) {
+		} else if (args[0].equalsIgnoreCase("world") || args[0].equalsIgnoreCase("worlds") || args[0].equalsIgnoreCase("w")) {
 			if (sender.hasPermission("itemjoin.use") || sender.hasPermission("itemjoin.*")) {
 				if (!(sender instanceof ConsoleCommandSender)) {
-					sender.sendMessage(worldIn);
-					sender.sendMessage(worldInListed.replace("%in_worlds%", ((Player) sender).getWorld().getName()));
+					ServerHandler.sendCommandsMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
+					ServerHandler.sendCommandsMessage(sender, "");
+					Language.getSendMessage(sender, "inWorldListHeader", "");
+					Language.getSendMessage(sender, "inWorldListed", ((Player) sender).getWorld().getName());
+					ServerHandler.sendCommandsMessage(sender, "");
+					ServerHandler.sendCommandsMessage(sender, "&a&l&m]--------------&a&l[&e Worlds In Menu 1/1 &a&l]&a&l&m-------------[");
 					return true;
 				} else if (sender instanceof ConsoleCommandSender) {
-					sender.sendMessage(notPlayer);
+					Language.getSendMessage(sender, "notPlayer", "");
 					return true;
 				}
 			} else {
-				sender.sendMessage(noPermission);
+				Language.getSendMessage(sender, "noPermission", "");
 				return true;
 			}
 		} else if (args[0].equalsIgnoreCase("list") || args[0].equalsIgnoreCase("l")) {
 			if (sender.hasPermission("itemjoin.list") || sender.hasPermission("itemjoin.*")) {
-				sender.sendMessage(ChatColor.GREEN.toString() + ChatColor.BOLD.toString()
-						+ ChatColor.STRIKETHROUGH.toString() + "]----------------" + ChatColor.GREEN.toString()
-						+ ChatColor.BOLD.toString() + "[" + ChatColor.YELLOW + " ItemJoin " + ChatColor.GREEN.toString()
-						+ ChatColor.BOLD.toString() + "]" + ChatColor.GREEN.toString() + ChatColor.BOLD.toString()
-						+ ChatColor.STRIKETHROUGH.toString() + "----------------[");
-				for (int i = 0; i < ItemJoin.pl.worlds.size(); i++) {
-					String world = ItemJoin.pl.worlds.get(i);
-					sender.sendMessage(listWorlds.replace("%world%", world));
-					ConfigurationSection selection = ConfigHandler.getConfig("items.yml")
-							.getConfigurationSection(world + ".items");
-					if (selection != null) {
-						for (String item : selection.getKeys(false)) {
-							sender.sendMessage(listItems.replace("%items%", item));
-						}
-					} else if (selection == null) {
-							sender.sendMessage(nolistItems);
-					}
-				}
-				sender.sendMessage(ChatColor.GREEN.toString() + ChatColor.BOLD.toString()
-						+ ChatColor.STRIKETHROUGH.toString() + "]--------------" + ChatColor.GREEN.toString()
-						+ ChatColor.BOLD.toString() + "[" + ChatColor.YELLOW + " List Menu 1/1 "
-						+ ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "]" + ChatColor.GREEN.toString()
-						+ ChatColor.BOLD.toString() + ChatColor.STRIKETHROUGH.toString() + "--------------[");
-				return true;
-			} else {
-				sender.sendMessage(noPermission);
-				return true;
-			}
-		} else if (args.length == 1 && args[0].equalsIgnoreCase("permissions")
-				|| args.length == 1 && args[0].equalsIgnoreCase("perm")
-				|| args.length == 1 && args[0].equalsIgnoreCase("perms")) {
-			if (sender.hasPermission("itemjoin.permissions") || sender.hasPermission("itemjoin.*")) {
 				if (!(sender instanceof ConsoleCommandSender)) {
-					sender.sendMessage(ChatColor.GREEN.toString() + ChatColor.BOLD.toString()
-							+ ChatColor.STRIKETHROUGH.toString() + "]--------------" + ChatColor.GREEN.toString()
-							+ ChatColor.BOLD.toString() + "[" + ChatColor.YELLOW + " ItemJoin "
-							+ ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "]" + ChatColor.GREEN.toString()
-							+ ChatColor.BOLD.toString() + ChatColor.STRIKETHROUGH.toString() + "--------------[");
-					if (sender.hasPermission("itemjoin.*")) {
-						sender.sendMessage(ChatColor.GREEN.toString() + "[\u2714] ItemJoin.*");
-					} else {
-						sender.sendMessage(ChatColor.RED.toString() + "[\u2718] ItemJoin.*");
-					}
-					if (sender.hasPermission("itemjoin.use")) {
-						sender.sendMessage(ChatColor.GREEN.toString() + "[\u2714] ItemJoin.Use");
-					} else {
-						sender.sendMessage(ChatColor.RED.toString() + "[\u2718] ItemJoin.Use");
-					}
-					if (sender.hasPermission("itemjoin.reload")) {
-						sender.sendMessage(ChatColor.GREEN.toString() + "[\u2714] ItemJoin.Reload");
-					} else {
-						sender.sendMessage(ChatColor.RED.toString() + "[\u2718] ItemJoin.Reload");
-					}
-					if (sender.hasPermission("itemjoin.updates")) {
-						sender.sendMessage(ChatColor.GREEN.toString() + "[\u2714] ItemJoin.Updates");
-					} else {
-						sender.sendMessage(ChatColor.RED.toString() + "[\u2718] ItemJoin.Updates");
-					}
-					if (sender.hasPermission("itemjoin.get")) {
-						sender.sendMessage(ChatColor.GREEN.toString() + "[\u2714] ItemJoin.get");
-					} else {
-						sender.sendMessage(ChatColor.RED.toString() + "[\u2718] ItemJoin.get");
-					}
-					if (sender.hasPermission("itemjoin.get.others")) {
-						sender.sendMessage(ChatColor.GREEN.toString() + "[\u2714] ItemJoin.get.others");
-					} else {
-						sender.sendMessage(ChatColor.RED.toString() + "[\u2718] ItemJoin.get.others");
-					}
-					if (sender.hasPermission("itemjoin.permissions")) {
-						sender.sendMessage(ChatColor.GREEN.toString() + "[\u2714] ItemJoin.permissions");
-					} else {
-						sender.sendMessage(ChatColor.RED.toString() + "[\u2718] ItemJoin.permissions");
-					}
-					for (int i = 0; i < ItemJoin.pl.worlds.size(); i++) {
-						String world = (String) ItemJoin.pl.worlds.get(i);
-						if (sender.hasPermission("itemjoin." + world + ".*")) {
-							sender.sendMessage(ChatColor.GREEN.toString() + "[\u2714] ItemJoin." + world + ".*");
-						} else {
-							sender.sendMessage(ChatColor.RED.toString() + "[\u2718] ItemJoin." + world + ".*");
+					ServerHandler.sendCommandsMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
+					for (World worlds: ItemJoin.pl.getServer().getWorlds()) {
+						ItemExists = false;
+						Language.getSendMessage(sender, "listWorldsHeader", worlds.getName());
+						for (String item: ConfigHandler.getConfigurationSection().getKeys(false)) {
+							ConfigurationSection items = ConfigHandler.getItemSection(item);
+							String world = worlds.getName();
+							Player player = ((Player) sender);
+							if (items.getString(".slot") != null) {
+								String slotlist = items.getString(".slot").replace(" ", "");
+								String[] slots = slotlist.split(",");
+								ItemHandler.clearItemID(player);
+								String ItemID = ItemHandler.getItemID(player, slots[0]);
+								ItemStack inStoredItems = CreateItems.items.get(world + "." + player.getName().toString() + ".items." + ItemID + item);
+								if (inStoredItems != null) {
+									Language.getSendMessage(sender, "listItems", item);
+									ItemExists = true;
+								}
+							}
+						}
+						if (ItemExists == false) {
+							Language.getSendMessage(sender, "noItemsListed", "");
 						}
 					}
-					sender.sendMessage(ChatColor.GREEN.toString() + "Type /ItemJoin Permissions 2 for the next page.");
-					sender.sendMessage(ChatColor.GREEN.toString() + ChatColor.BOLD.toString()
-							+ ChatColor.STRIKETHROUGH.toString() + "]------------" + ChatColor.GREEN.toString()
-							+ ChatColor.BOLD.toString() + "[" + ChatColor.YELLOW + " Permissions Menu 1/2 "
-							+ ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "]" + ChatColor.GREEN.toString()
-							+ ChatColor.BOLD.toString() + ChatColor.STRIKETHROUGH.toString() + "------------[");
+					ServerHandler.sendCommandsMessage(sender, "&a&l&m]----------------&a&l[&e List Menu 1/1 &a&l]&a&l&m---------------[");
 					return true;
 				} else if (sender instanceof ConsoleCommandSender) {
-					sender.sendMessage(notPlayer);
+					Language.getSendMessage(sender, "notPlayer", "");
 					return true;
 				}
 			} else {
-				sender.sendMessage(noPermission);
+				Language.getSendMessage(sender, "noPermission", "");
 				return true;
 			}
-		} else if (args.length == 2 && args[0].equalsIgnoreCase("permissions") && args[1].equalsIgnoreCase("2")
-				|| args.length == 2 && args[0].equalsIgnoreCase("perm") && args[1].equalsIgnoreCase("2")
-				|| args.length == 2 && args[0].equalsIgnoreCase("perms") && args[1].equalsIgnoreCase("2")) {
+		} else if (args.length == 1 && args[0].equalsIgnoreCase("permissions") || args.length == 1 && args[0].equalsIgnoreCase("perm") || args.length == 1 && args[0].equalsIgnoreCase("perms")) {
 			if (sender.hasPermission("itemjoin.permissions") || sender.hasPermission("itemjoin.*")) {
 				if (!(sender instanceof ConsoleCommandSender)) {
-					sender.sendMessage(ChatColor.GREEN.toString() + ChatColor.BOLD.toString()
-							+ ChatColor.STRIKETHROUGH.toString() + "]--------------" + ChatColor.GREEN.toString()
-							+ ChatColor.BOLD.toString() + "[" + ChatColor.YELLOW + " ItemJoin "
-							+ ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "]" + ChatColor.GREEN.toString()
-							+ ChatColor.BOLD.toString() + ChatColor.STRIKETHROUGH.toString() + "--------------[");
-					for (int i = 0; i < ItemJoin.pl.worlds.size(); i++) {
-						String world = ItemJoin.pl.worlds.get(i);
-						ConfigurationSection selection = ConfigHandler.getConfig("items.yml")
-								.getConfigurationSection(world + ".items");
-						for (String item : selection.getKeys(false)) {
-							ConfigurationSection items = selection.getConfigurationSection(item);
-							ItemStack toSet = ItemJoin.pl.items
-									.get(world + "." + sender.getName().toString() + ".items." + item);
-							if (toSet != null
-									&& sender.hasPermission(PermissionsHandler.customPermissions(items, item, world))) {
-								sender.sendMessage(ChatColor.GREEN.toString() + "[\u2714] "
-										+ PermissionsHandler.customPermissions(items, item, world));
-							} else if (toSet != null && !sender
-									.hasPermission(PermissionsHandler.customPermissions(items, item, world))) {
-								sender.sendMessage(ChatColor.RED.toString() + "[\u2718] "
-										+ PermissionsHandler.customPermissions(items, item, world));
+					ServerHandler.sendCommandsMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
+					if (sender.hasPermission("itemjoin.*")) {
+						ServerHandler.sendCommandsMessage(sender, "&a[\u2714] ItemJoin.*");
+					} else {
+						ServerHandler.sendCommandsMessage(sender, "&c[\u2718] ItemJoin.*");
+					}
+					if (sender.hasPermission("itemjoin.use")) {
+						ServerHandler.sendCommandsMessage(sender, "&a[\u2714] ItemJoin.Use");
+					} else {
+						ServerHandler.sendCommandsMessage(sender, "&c[\u2718] ItemJoin.Use");
+					}
+					if (sender.hasPermission("itemjoin.reload")) {
+						ServerHandler.sendCommandsMessage(sender, "&a[\u2714] ItemJoin.Reload");
+					} else {
+						ServerHandler.sendCommandsMessage(sender, "&c[\u2718] ItemJoin.Reload");
+					}
+					if (sender.hasPermission("itemjoin.updates")) {
+						ServerHandler.sendCommandsMessage(sender, "&a[\u2714] ItemJoin.Updates");
+					} else {
+						ServerHandler.sendCommandsMessage(sender, "&c[\u2718] ItemJoin.Updates");
+					}
+					if (sender.hasPermission("itemjoin.get")) {
+						ServerHandler.sendCommandsMessage(sender, "&a[\u2714] ItemJoin.get");
+					} else {
+						ServerHandler.sendCommandsMessage(sender, "&c[\u2718] ItemJoin.get");
+					}
+					if (sender.hasPermission("itemjoin.get.others")) {
+						ServerHandler.sendCommandsMessage(sender, "&a[\u2714] ItemJoin.get.others");
+					} else {
+						ServerHandler.sendCommandsMessage(sender, "&c[\u2718] ItemJoin.get.others");
+					}
+					if (sender.hasPermission("itemjoin.permissions")) {
+						ServerHandler.sendCommandsMessage(sender, "&a[\u2714] ItemJoin.permissions");
+					} else {
+						ServerHandler.sendCommandsMessage(sender, "&c[\u2718] ItemJoin.permissions");
+					}
+					for (World world: ItemJoin.pl.getServer().getWorlds()) {
+						if (sender.hasPermission("itemjoin." + world.getName() + ".*")) {
+							ServerHandler.sendCommandsMessage(sender, "&a[\u2714] ItemJoin." + world.getName() + ".*");
+						} else {
+							ServerHandler.sendCommandsMessage(sender, "&c[\u2718] ItemJoin." + world.getName() + ".*");
+						}
+					}
+					ServerHandler.sendCommandsMessage(sender, "&aType &a&l/ItemJoin Permissions 2 &afor the next page.");
+					ServerHandler.sendCommandsMessage(sender, "&a&l&m]------------&a&l[&e Permissions Menu 1/2 &a&l]&a&l&m------------[");
+					return true;
+				} else if (sender instanceof ConsoleCommandSender) {
+					Language.getSendMessage(sender, "notPlayer", "");
+					return true;
+				}
+			} else {
+				Language.getSendMessage(sender, "noPermission", "");
+				return true;
+			}
+		} else if (args.length == 2 && args[0].equalsIgnoreCase("permissions") && args[1].equalsIgnoreCase("2") || args.length == 2 && args[0].equalsIgnoreCase("perm") && args[1].equalsIgnoreCase("2") || args.length == 2 && args[0].equalsIgnoreCase("perms") && args[1].equalsIgnoreCase("2")) {
+			if (sender.hasPermission("itemjoin.permissions") || sender.hasPermission("itemjoin.*")) {
+				if (!(sender instanceof ConsoleCommandSender)) {
+					ServerHandler.sendCommandsMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
+					for (World worlds: ItemJoin.pl.getServer().getWorlds()) {
+						for (String item: ConfigHandler.getConfigurationSection().getKeys(false)) {
+							ConfigurationSection items = ConfigHandler.getItemSection(item);
+							String world = worlds.getName();
+							Player player = ((Player) sender);
+							if (items.getString(".slot") != null) {
+								String slotlist = items.getString(".slot").replace(" ", "");
+								String[] slots = slotlist.split(",");
+								ItemHandler.clearItemID(player);
+								String ItemID = ItemHandler.getItemID(player, slots[0]);
+								ItemStack inStoredItems = CreateItems.items.get(world + "." + player.getName().toString() + ".items." + ItemID + item);
+								if (inStoredItems != null && sender.hasPermission(PermissionsHandler.customPermissions(items, item, world))) {
+									ServerHandler.sendCommandsMessage(sender, "&a[\u2714] " + PermissionsHandler.customPermissions(items, item, world));
+								} else if (inStoredItems != null && !sender.hasPermission(PermissionsHandler.customPermissions(items, item, world))) {
+									ServerHandler.sendCommandsMessage(sender, "&c[\u2718] " + PermissionsHandler.customPermissions(items, item, world));
+								}
 							}
 						}
 					}
-					sender.sendMessage(ChatColor.GREEN.toString() + ChatColor.BOLD.toString()
-							+ ChatColor.STRIKETHROUGH.toString() + "]------------" + ChatColor.GREEN.toString()
-							+ ChatColor.BOLD.toString() + "[" + ChatColor.YELLOW + " Permissions Menu 2/2 "
-							+ ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "]" + ChatColor.GREEN.toString()
-							+ ChatColor.BOLD.toString() + ChatColor.STRIKETHROUGH.toString() + "------------[");
+					ServerHandler.sendCommandsMessage(sender, "&a&l&m]------------&a&l[&e Permissions Menu 2/2 &a&l]&a&l&m------------[");
 					return true;
 				} else if (sender instanceof ConsoleCommandSender) {
-					sender.sendMessage(notPlayer);
+					Language.getSendMessage(sender, "notPlayer", "");
 					return true;
 				}
 			} else {
-				sender.sendMessage(noPermission);
+				Language.getSendMessage(sender, "noPermission", "");
 				return true;
 			}
 		} else if (args.length == 3 && args[0].equalsIgnoreCase("get")) {
-			Player argsPlayer = PlayerHandlers.StringPlayer(args[2]);
-			if (argsPlayer == null && sender.hasPermission("itemjoin.get.others")
-					|| argsPlayer == null && sender.hasPermission("itemjoin.*")) {
-				sender.sendMessage(CPrefix + ChatColor.RED + "The player " + ChatColor.AQUA + args[2] + ChatColor.RED
-						+ " could not be found!");
+			Player argsPlayer = PlayerHandler.getPlayerString(args[2]);
+			if (argsPlayer == null && sender.hasPermission("itemjoin.get.others") || argsPlayer == null && sender.hasPermission("itemjoin.*")) {
+				Language.getSendMessage(sender, "playerNotFound", args[2]);
 				return true;
 			} else if (sender.hasPermission("itemjoin.get.others") || sender.hasPermission("itemjoin.*")) {
-				String world = WorldHandler.checkWorlds(argsPlayer.getWorld().getName());
-				ItemStack toSet = ItemJoin.pl.items.get(
-						argsPlayer.getWorld().getName() + "." + argsPlayer.getName().toString() + ".items." + args[1]);
-				String slot = ConfigHandler.getConfig("items.yml").getString(world + ".items." + args[1] + ".slot");
-				Material tempmat = PlayerHandlers.getLocateMaterial(world, args[1]);
-				EntityEquipment Equip = argsPlayer.getEquipment();
-				if (toSet != null && !CheckItem.CheckMaterial(tempmat, world, args[1])) {
-					sender.sendMessage(badID.replace("%bad_id%",
-							ConfigHandler.getConfig("items.yml").getString(world + ".items." + args[1] + ".id")));
-				} else if (toSet != null && !CheckItem.CheckSlot(slot, world, args[1])) {
-					sender.sendMessage(badSlot1.replace("%bad_slot%", slot));
-					sender.sendMessage(badSlot2.replace("%bad_slot%", slot));
-				}
-				if (toSet != null && CheckItem.CheckSlot(slot, world, args[1]) && !ItemJoin.isInt(slot)) {
-					if (slot.equalsIgnoreCase("Arbitrary")) {
-						if (argsPlayer.getInventory().firstEmpty() == -1) {
-							sender.sendMessage(
-									inventoryFull.replace("%given_item%", toSet.getItemMeta().getDisplayName())
-											.replace("%given_player%", argsPlayer.getName())
-											.replace("%received_player%", sender.getName()));
-							failedGive = true;
-						} else {
-							((Player) sender).getInventory().addItem(toSet);
-						}
-					} else if (slot.equalsIgnoreCase("Helmet")) {
-						Equip.setHelmet(toSet);
-					} else if (slot.equalsIgnoreCase("Chestplate")) {
-						Equip.setChestplate(toSet);
-					} else if (slot.equalsIgnoreCase("Leggings")) {
-						Equip.setLeggings(toSet);
-					} else if (slot.equalsIgnoreCase("Boots")) {
-						Equip.setBoots(toSet);
-					} else if (slot.equalsIgnoreCase("Offhand") && Registers.hasCombatUpdate()) {
-						PlayerHandlers.setOffhandItem(argsPlayer, toSet);
-					}
-					if (failedGive != true) {
-						sender.sendMessage(givenOthersItem.replace("%given_item%", toSet.getItemMeta().getDisplayName())
-								.replace("%given_player%", argsPlayer.getName()));
-						argsPlayer.sendMessage(
-								receivedOthersItem.replace("%received_item%", toSet.getItemMeta().getDisplayName())
-										.replace("%received_player%", sender.getName()));
-					}
-					failedGive = false;
-					PlayerHandlers.updateInventory(argsPlayer);
-				} else if (toSet != null && CheckItem.CheckSlot(slot, world, args[1])) {
-					int Slot = Integer.parseInt(slot);
-					argsPlayer.getInventory().setItem(Slot, toSet);
-					if (failedGive != true) {
-						sender.sendMessage(givenOthersItem.replace("%given_item%", toSet.getItemMeta().getDisplayName())
-								.replace("%given_player%", argsPlayer.getName()));
-						argsPlayer.sendMessage(
-								receivedOthersItem.replace("%received_item%", toSet.getItemMeta().getDisplayName())
-										.replace("%received_player%", sender.getName()));
-					}
-					PlayerHandlers.updateInventory(argsPlayer);
-					failedGive = false;
-				} else if (toSet == null) {
-					if (failedGive != true) {
-						sender.sendMessage(itemDoesNotExist.replace("%bad_item%", args[1]));
-					}
-					failedGive = false;
-				}
+				Language.argsplayer = sender;
+				reAddItem(argsPlayer, sender, args[1]);
 				return true;
 			} else {
-				sender.sendMessage(noPermission);
+				Language.getSendMessage(sender, "noPermission", "");
 				return true;
 			}
 		} else if (args.length == 2 && args[0].equalsIgnoreCase("get")) {
 			if (sender.hasPermission("itemjoin.get") || sender.hasPermission("itemjoin.*")) {
 				if (!(sender instanceof ConsoleCommandSender)) {
-					String world = WorldHandler.checkWorlds(((Player) sender).getWorld().getName());
-					ItemStack toSet = ItemJoin.pl.items.get(((Entity) sender).getWorld().getName() + "."
-							+ sender.getName().toString() + ".items." + args[1]);
-					String slot = ConfigHandler.getConfig("items.yml")
-							.getString(world + ".items." + args[1] + ".slot");
-					Material tempmat = PlayerHandlers.getLocateMaterial(world, args[1]);
-					EntityEquipment Equip = ((LivingEntity) sender).getEquipment();
-					if (toSet != null && !CheckItem.CheckMaterial(tempmat, world, args[1])) {
-						sender.sendMessage(badID.replace("%bad_id%", 
-								ConfigHandler.getConfig("items.yml").getString(world + ".items." + args[1] + ".id")));
-					} else if (toSet != null && !CheckItem.CheckSlot(slot, world, args[1])) {
-						sender.sendMessage(badSlot1.replace("%bad_slot%", slot));
-						sender.sendMessage(badSlot2.replace("%bad_slot%", slot));
-					}
-					if (toSet != null && CheckItem.CheckSlot(slot, world, args[1]) && !ItemJoin.isInt(slot)) {
-						if (slot.equalsIgnoreCase("Arbitrary")) {
-							if (((Player) sender).getInventory().firstEmpty() == -1) {
-								sender.sendMessage(
-										inventoryFull.replace("%given_item%", toSet.getItemMeta().getDisplayName()));
-								failedGive = true;
-							} else {
-								((Player) sender).getInventory().addItem(toSet);
-							}
-						} else if (slot.equalsIgnoreCase("Helmet")) {
-							Equip.setHelmet(toSet);
-						} else if (slot.equalsIgnoreCase("Chestplate")) {
-							Equip.setChestplate(toSet);
-						} else if (slot.equalsIgnoreCase("Leggings")) {
-							Equip.setLeggings(toSet);
-						} else if (slot.equalsIgnoreCase("Boots")) {
-							Equip.setBoots(toSet);
-						} else if (slot.equalsIgnoreCase("Offhand") && Registers.hasCombatUpdate()) {
-							PlayerHandlers.setOffhandItem((Player) sender, toSet);
-						}
-						if (failedGive != true) {
-							sender.sendMessage(givenItem.replace("%given_item%", toSet.getItemMeta().getDisplayName()));
-						}
-						failedGive = false;
-						PlayerHandlers.updateInventory((Player) sender);
-					} else if (toSet != null && CheckItem.CheckSlot(slot, world, args[1])) {
-						int Slot = Integer.parseInt(slot);
-						((Player) sender).getInventory().setItem(Slot, toSet);
-						if (failedGive != true) {
-							sender.sendMessage(givenItem.replace("%given_item%", toSet.getItemMeta().getDisplayName()));
-						}
-						failedGive = false;
-						PlayerHandlers.updateInventory((Player) sender);
-					} else if (toSet == null) {
-						sender.sendMessage(itemDoesNotExist.replace("%bad_item%", args[1]));
-					}
+					reAddItem((Player) sender, null, args[1]);
+					PlayerHandler.updateInventory((Player) sender);
 					return true;
 				} else if (sender instanceof ConsoleCommandSender) {
-					sender.sendMessage(notPlayer);
-					sender.sendMessage(consoleAltSyntax);
+					Language.getSendMessage(sender, "notPlayer", "");
+					Language.getSendMessage(sender, "correctGetSyntax", "");
 					return true;
 				}
 			} else {
-				sender.sendMessage(noPermission);
+				Language.getSendMessage(sender, "noPermission", "");
 				return true;
 			}
 		} else if (args[0].equalsIgnoreCase("get") || args[0].equalsIgnoreCase("get")) {
 			if (sender.hasPermission("itemjoin.get") || sender.hasPermission("itemjoin.*")) {
-				sender.sendMessage(badGetUsage);
+				Language.getSendMessage(sender, "invalidGetUsage", "");
 				return true;
 			} else {
-				sender.sendMessage(noPermission);
+				Language.getSendMessage(sender, "noPermission", "");
 				return true;
 			}
 		} else if (args.length == 3 && args[0].equalsIgnoreCase("remove")) {
-			Player argsPlayer = PlayerHandlers.StringPlayer(args[2]);
-			if (argsPlayer == null && sender.hasPermission("itemjoin.remove.others")
-					|| argsPlayer == null && sender.hasPermission("itemjoin.*")) {
-				sender.sendMessage(CPrefix + ChatColor.RED + "The player " + ChatColor.AQUA + args[2] + ChatColor.RED
-						+ " could not be found!");
+			Player argsPlayer = PlayerHandler.getPlayerString(args[2]);
+			if (argsPlayer == null && sender.hasPermission("itemjoin.remove.others") || argsPlayer == null && sender.hasPermission("itemjoin.*")) {
+				Language.getSendMessage(sender, "playerNotFound", args[2]);
 				return true;
 			} else if (sender.hasPermission("itemjoin.remove.others") || sender.hasPermission("itemjoin.*")) {
-				ItemStack toSet = ItemJoin.pl.items.get(argsPlayer.getWorld().getName() + "." + argsPlayer.getName().toString() + ".items." + args[1]);
-				if (toSet != null) {
-					if (argsPlayer.getInventory().contains(toSet)) {
-						argsPlayer.getInventory().removeItem(toSet);
-					PlayerHandlers.updateInventory(argsPlayer);
-					sender.sendMessage(removedOthersItem.replace("%removed_item%", args[1]).replace("%removed_player%", sender.getName()));;
-					argsPlayer.sendMessage(takenOthersItem.replace("%removed_item%", args[1]).replace("%remover_player%", argsPlayer.getName()));;
-					} else if (!((Player) sender).getInventory().contains(toSet)){
-						sender.sendMessage(itemDoesNotExistInOthersInventory.replace("%bad_item%", args[1]).replace("%argsPlayer%", argsPlayer.getName()));
-					}
-			     } else if (toSet == null) {
-			    	 sender.sendMessage(itemDoesNotExist.replace("%bad_item%", args[1]));
-			     }
+				Language.argsplayer = sender;
+				removeItem(argsPlayer, sender, args[1]);
 				return true;
 			} else {
-				sender.sendMessage(noPermission);
+				Language.getSendMessage(sender, "noPermission", "");
 				return true;
 			}
 		} else if (args.length == 2 && args[0].equalsIgnoreCase("remove")) {
 			if (sender.hasPermission("itemjoin.remove") || sender.hasPermission("itemjoin.*")) {
 				if (!(sender instanceof ConsoleCommandSender)) {
-					ItemStack toSet = ItemJoin.pl.items.get(((Player) sender).getWorld().getName() + "." + sender.getName().toString() + ".items." + args[1]);
-					if (toSet != null) {
-						if (((Player) sender).getInventory().contains(toSet)) {
-						((Player) sender).getInventory().removeItem(toSet);
-						PlayerHandlers.updateInventory(((Player) sender));
-						} else if (!((Player) sender).getInventory().contains(toSet)){
-							sender.sendMessage(itemDoesNotExistInInventory.replace("%bad_item%", args[1]));
-						}
-				     } else if (toSet == null) {
-				    	 sender.sendMessage(itemDoesNotExist.replace("%bad_item%", args[1]));
-				     }
+					removeItem((Player) sender, null, args[1]);
+					PlayerHandler.updateInventory((Player) sender);
 					return true;
 				} else if (sender instanceof ConsoleCommandSender) {
-					sender.sendMessage(notPlayer);
-					sender.sendMessage(consoleAltRemoveSyntax);
+					Language.getSendMessage(sender, "notPlayer", "");
+					Language.getSendMessage(sender, "correctRemoveSyntax", "");
 					return true;
 				}
 			} else {
-				sender.sendMessage(noPermission);
+				Language.getSendMessage(sender, "noPermission", "");
 				return true;
 			}
 		} else if (args[0].equalsIgnoreCase("remove") || args[0].equalsIgnoreCase("remove")) {
 			if (sender.hasPermission("itemjoin.remove") || sender.hasPermission("itemjoin.*")) {
-				sender.sendMessage(badRemoveUsage);
+				Language.getSendMessage(sender, "invalidRemoveSyntax", "");
 				return true;
 			} else {
-				sender.sendMessage(noPermission);
+				Language.getSendMessage(sender, "noPermission", "");
 				return true;
 			}
 		} else if (args[0].equalsIgnoreCase("updates") || args[0].equalsIgnoreCase("update")) {
 			if (sender.hasPermission("itemjoin.updates") || sender.hasPermission("itemjoin.*")) {
-				Console.sendMessage(
-				CPrefix + ChatColor.RED + sender.getName() + " has requested to check for updates!");
-				UpdateChecking.checkUpdates(sender);
+				Language.getSendMessage(sender, "updateChecking", "");
+				Updater.checkUpdates(sender);
 				return true;
 			} else {
-				sender.sendMessage(noPermission);
+				Language.getSendMessage(sender, "noPermission", "");
 				return true;
 			}
 		} else if (args[0].equalsIgnoreCase("AutoUpdate") || args[0].equalsIgnoreCase("AutoUpdate")) {
 			if (sender.hasPermission("itemjoin.autoupdate") || sender.hasPermission("itemjoin.*")) {
-				Console.sendMessage(
-				CPrefix + ChatColor.RED + sender.getName() + " has requested to force update the plugin!");
-			    UpdateChecking.forceUpdates(sender);
+				Language.getSendMessage(sender, "updateForced", "");
+				Updater.forceUpdates(sender);
 				return true;
 			} else {
-				sender.sendMessage(noPermission);
+				Language.getSendMessage(sender, "noPermission", "");
 				return true;
 			}
 		} else {
 			if (ConfigHandler.getConfig("en-lang.yml").getString("unknownCommand") != null) {
-				sender.sendMessage(unknownCommand);
+				Language.getSendMessage(sender, "unknownCommand", "");
 			}
 			return true;
 		}
 		return false;
 	}
 
-	public static void RegisterEnLang(Player player) {
-		if (ConfigHandler.getConfig("en-lang.yml").getString("Prefix") != null) {
-			Commands.Prefix = ItemJoin.pl
-					.formatPlaceholders(ConfigHandler.getConfig("en-lang.yml").getString("Prefix"), player);
+	public static void reAddItem(Player player, CommandSender OtherPlayer, String itemName) {
+		ItemExists = false;
+		if (Utils.isConfigurable()) {
+			for (String item: ConfigHandler.getConfigurationSection().getKeys(false)) {
+				ConfigurationSection items = ConfigHandler.getItemSection(item);
+				if (items.getString(".slot") != null) {
+					String slotlist = items.getString(".slot").replace(" ", "");
+					String[] slots = slotlist.split(",");
+					ItemHandler.clearItemID(player);
+					for (String slot: slots) {
+						String ItemID = ItemHandler.getItemID(player, slot);
+						ItemStack inStoredItems = CreateItems.items.get(player.getWorld().getName() + "." + player.getName().toString() + ".items." + ItemID + itemName);
+						int dataValue = items.getInt(".data-value");
+						Material tempmat = CreateItems.getMaterial(items);
+						ItemStack tempitem = null;
+						if (ServerHandler.hasViableUpdate()) {
+							tempitem = new ItemStack(tempmat, items.getInt(".count", 1), (short) dataValue);
+						} else if (!ServerHandler.hasViableUpdate()) {
+							try {
+								tempitem = new ItemStack(tempmat, items.getInt(".count", 1), (short) dataValue);
+							} catch (NullPointerException ex) {}
+						}
+						String lookup = Utils.getName(tempitem);
+						String name = Utils.format("&r" + lookup, player);
+						if (items.getString(".name") != null) {
+							name = items.getString(".name");
+							name = Utils.format("&r" + name, player);
+						}
+						if (inStoredItems != null && Utils.isCustomSlot(slot) && ItemHandler.isObtainable(player, item, slot, ItemID, inStoredItems)) {
+							SetItems.setCustomSlots(player, item, slot, ItemID);
+							Language.getSendMessage(player, "givenToYou", inStoredItems.getItemMeta().getDisplayName());
+							if (Language.argsplayer != null) {
+								Language.argsplayer = player;
+								Language.getSendMessage(OtherPlayer, "givenToPlayer", name);
+								Language.argsplayer = null;
+							}
+							ItemExists = true;
+						} else if (inStoredItems != null && Utils.isInt(slot) && ItemHandler.isObtainable(player, item, slot, ItemID, inStoredItems)) {
+							SetItems.setInvSlots(player, item, slot, ItemID);
+							Language.getSendMessage(player, "givenToYou", inStoredItems.getItemMeta().getDisplayName());
+							if (Language.argsplayer != null) {
+								Language.argsplayer = player;
+								Language.getSendMessage(OtherPlayer, "givenToPlayer", name);
+								Language.argsplayer = null;
+							}
+							ItemExists = true;
+						} else if (inStoredItems != null && !ItemHandler.isObtainable(player, item, slot, ItemID, inStoredItems)) {
+							if (Language.argsplayer != null) {
+								Language.getSendMessage(player, "playerTriedGive", name);
+								Language.argsplayer = player;
+								Language.getSendMessage(OtherPlayer, "itemExistsInOthersInventory", name);
+								Language.argsplayer = null;
+							} else {
+								Language.getSendMessage(player, "itemExistsInInventory", inStoredItems.getItemMeta().getDisplayName());
+							}
+							ItemExists = true;
+						}
+						PlayerHandler.updateInventory(player);
+					}
+				}
+			}
 		}
-		if (ConfigHandler.getConfig("en-lang.yml").getString("Prefix") == null) {
-			Commands.Prefix = "";
-		}
-		if (ConfigHandler.getConfig("en-lang.yml").getString("noPermission") != null) {
-			Commands.noPermission = Prefix + ItemJoin.pl
-					.formatPlaceholders(ConfigHandler.getConfig("en-lang.yml").getString("noPermission"), player);
-		}
-		if (ConfigHandler.getConfig("en-lang.yml").getString("notPlayer") != null) {
-			Commands.notPlayer = Prefix + ItemJoin.pl
-					.formatPlaceholders(ConfigHandler.getConfig("en-lang.yml").getString("notPlayer"), player);
-		}
-		if (ConfigHandler.getConfig("en-lang.yml").getString("consoleAltSyntax") != null) {
-			Commands.consoleAltSyntax = Prefix + ItemJoin.pl
-					.formatPlaceholders(ConfigHandler.getConfig("en-lang.yml").getString("consoleAltSyntax"), player);
-		}
-		if (ConfigHandler.getConfig("en-lang.yml").getString("consoleAltRemoveSyntax") != null) {
-			Commands.consoleAltRemoveSyntax = Prefix + ItemJoin.pl
-					.formatPlaceholders(ConfigHandler.getConfig("en-lang.yml").getString("consoleAltRemoveSyntax"), player);
-		}
-		if (ConfigHandler.getConfig("en-lang.yml").getString("unknownCommand") != null) {
-			Commands.unknownCommand = Prefix + ItemJoin.pl
-					.formatPlaceholders(ConfigHandler.getConfig("en-lang.yml").getString("unknownCommand"), player);
-		}
-		if (ConfigHandler.getConfig("en-lang.yml").getString("badGetUsage") != null) {
-			Commands.badGetUsage = Prefix + ItemJoin.pl
-					.formatPlaceholders(ConfigHandler.getConfig("en-lang.yml").getString("badGetUsage"), player);
-		}
-		if (ConfigHandler.getConfig("en-lang.yml").getString("badRemoveUsage") != null) {
-			Commands.badRemoveUsage = Prefix + ItemJoin.pl
-					.formatPlaceholders(ConfigHandler.getConfig("en-lang.yml").getString("badRemoveUsage"), player);
-		}
-		if (ConfigHandler.getConfig("en-lang.yml").getString("givenItem") != null) {
-			Commands.givenItem = Prefix + ItemJoin.pl
-					.formatPlaceholders(ConfigHandler.getConfig("en-lang.yml").getString("givenItem"), player);
-		}
-		if (ConfigHandler.getConfig("en-lang.yml").getString("givenOthersItem") != null) {
-			Commands.givenOthersItem = Prefix + ItemJoin.pl
-					.formatPlaceholders(ConfigHandler.getConfig("en-lang.yml").getString("givenOthersItem"), player);
-		}
-		if (ConfigHandler.getConfig("en-lang.yml").getString("receivedOthersItem") != null) {
-			Commands.receivedOthersItem = Prefix + ItemJoin.pl.formatPlaceholders(
-					ConfigHandler.getConfig("en-lang.yml").getString("receivedOthersItem"), player);
-		}
-		if (ConfigHandler.getConfig("en-lang.yml").getString("removedOthersItem") != null) {
-			Commands.removedOthersItem = Prefix + ItemJoin.pl
-					.formatPlaceholders(ConfigHandler.getConfig("en-lang.yml").getString("removedOthersItem"), player);
-		}
-		if (ConfigHandler.getConfig("en-lang.yml").getString("takenOthersItem") != null) {
-			Commands.takenOthersItem = Prefix + ItemJoin.pl.formatPlaceholders(
-					ConfigHandler.getConfig("en-lang.yml").getString("takenOthersItem"), player);
-		}
-		if (ConfigHandler.getConfig("en-lang.yml").getString("itemDoesNotExist") != null) {
-			Commands.itemDoesNotExist = Prefix + ItemJoin.pl
-					.formatPlaceholders(ConfigHandler.getConfig("en-lang.yml").getString("itemDoesNotExist"), player);
-		}
-		if (ConfigHandler.getConfig("en-lang.yml").getString("itemDoesNotExistInInventory") != null) {
-			Commands.itemDoesNotExistInInventory = Prefix + ItemJoin.pl
-					.formatPlaceholders(ConfigHandler.getConfig("en-lang.yml").getString("itemDoesNotExistInInventory"), player);
-		}
-		if (ConfigHandler.getConfig("en-lang.yml").getString("itemDoesNotExistInOthersInventory") != null) {
-			Commands.itemDoesNotExistInOthersInventory = Prefix + ItemJoin.pl
-					.formatPlaceholders(ConfigHandler.getConfig("en-lang.yml").getString("itemDoesNotExistInOthersInventory"), player);
-		}
-		if (ConfigHandler.getConfig("en-lang.yml").getString("badSlot1") != null) {
-			Commands.badSlot1 = Prefix + ItemJoin.pl
-					.formatPlaceholders(ConfigHandler.getConfig("en-lang.yml").getString("badSlot1"), player);
-		}
-		if (ConfigHandler.getConfig("en-lang.yml").getString("badSlot2") != null) {
-			Commands.badSlot2 = Prefix + ItemJoin.pl
-					.formatPlaceholders(ConfigHandler.getConfig("en-lang.yml").getString("badSlot2"), player);
-		}
-		if (ConfigHandler.getConfig("en-lang.yml").getString("badID") != null) {
-			Commands.badID = Prefix + ItemJoin.pl
-					.formatPlaceholders(ConfigHandler.getConfig("en-lang.yml").getString("badID"), player);
-		}
-		if (ConfigHandler.getConfig("en-lang.yml").getString("consoleReloadedConfig") != null) {
-			Commands.consoleReloadedConfig = Prefix + ItemJoin.pl.formatPlaceholders(
-					ConfigHandler.getConfig("en-lang.yml").getString("consoleReloadedConfig"), player);
-		}
-		if (ConfigHandler.getConfig("en-lang.yml").getString("reloadedConfig") != null) {
-			Commands.reloadedConfig = Prefix + ItemJoin.pl
-					.formatPlaceholders(ConfigHandler.getConfig("en-lang.yml").getString("reloadedConfig"), player);
-		}
-		if (ConfigHandler.getConfig("en-lang.yml").getString("cachedWorlds") != null) {
-			Commands.cachedWorlds = Prefix + ItemJoin.pl
-					.formatPlaceholders(ConfigHandler.getConfig("en-lang.yml").getString("cachedWorlds"), player);
-		}
-		if (ConfigHandler.getConfig("en-lang.yml").getString("loadedWorlds") != null) {
-			Commands.loadedWorlds = Prefix + ItemJoin.pl
-					.formatPlaceholders(ConfigHandler.getConfig("en-lang.yml").getString("loadedWorlds"), player);
-		}
-		if (ConfigHandler.getConfig("en-lang.yml").getString("loadedWorldsListed") != null) {
-			Commands.loadedWorldsListed = Prefix + ItemJoin.pl.formatPlaceholders(
-					ConfigHandler.getConfig("en-lang.yml").getString("loadedWorldsListed"), player);
-		}
-		if (ConfigHandler.getConfig("en-lang.yml").getString("listWorlds") != null) {
-			Commands.listWorlds = Prefix + ItemJoin.pl
-					.formatPlaceholders(ConfigHandler.getConfig("en-lang.yml").getString("listWorlds"), player);
-		}
-		if (ConfigHandler.getConfig("en-lang.yml").getString("listItems") != null) {
-			Commands.listItems = Prefix + ItemJoin.pl
-					.formatPlaceholders(ConfigHandler.getConfig("en-lang.yml").getString("listItems"), player);
-		}
-		if (ConfigHandler.getConfig("en-lang.yml").getString("nolistItems") != null) {
-			Commands.nolistItems = Prefix + ItemJoin.pl
-					.formatPlaceholders(ConfigHandler.getConfig("en-lang.yml").getString("nolistItems"), player);
-		}
-		if (ConfigHandler.getConfig("en-lang.yml").getString("worldIn") != null) {
-			Commands.worldIn = Prefix + ItemJoin.pl
-					.formatPlaceholders(ConfigHandler.getConfig("en-lang.yml").getString("worldIn"), player);
-		}
-		if (ConfigHandler.getConfig("en-lang.yml").getString("inventoryFull") != null) {
-			Commands.inventoryFull = Prefix + ItemJoin.pl
-					.formatPlaceholders(ConfigHandler.getConfig("en-lang.yml").getString("inventoryFull"), player);
-		}
-		if (ConfigHandler.getConfig("en-lang.yml").getString("inventoryFullOthers") != null) {
-			Commands.inventoryFullOthers = Prefix + ItemJoin.pl.formatPlaceholders(
-					ConfigHandler.getConfig("en-lang.yml").getString("inventoryFullOthers"), player);
-		}
-		if (ConfigHandler.getConfig("en-lang.yml").getString("itemCostSuccess") != null) {
-			Commands.itemCostSuccess = Prefix + ItemJoin.pl
-					.formatPlaceholders(ConfigHandler.getConfig("en-lang.yml").getString("itemCostSuccess"), player);
-		}
-		if (ConfigHandler.getConfig("en-lang.yml").getString("itemCostFailed") != null) {
-			Commands.itemCostFailed = Prefix + ItemJoin.pl
-					.formatPlaceholders(ConfigHandler.getConfig("en-lang.yml").getString("itemCostFailed"), player);
-		}
-		if (ConfigHandler.getConfig("en-lang.yml").getString("worldInListed") != null) {
-			Commands.worldInListed = Prefix + ItemJoin.pl
-					.formatPlaceholders(ConfigHandler.getConfig("en-lang.yml").getString("worldInListed"), player);
+		if (ItemExists == false) {
+			Language.getSendMessage(player, "itemDoesntExist", itemName);
 		}
 	}
-}
+
+	public static void removeItem(Player player, CommandSender OtherPlayer, String itemName) {
+		ItemExists = false;
+		if (Utils.isConfigurable()) {
+			for (String item: ConfigHandler.getConfigurationSection().getKeys(false)) {
+				ConfigurationSection items = ConfigHandler.getItemSection(item);
+				if (items.getString(".slot") != null) {
+					String slotlist = items.getString(".slot").replace(" ", "");
+					String[] slots = slotlist.split(",");
+					ItemHandler.clearItemID(player);
+					for (String slot: slots) {
+						String ItemID = ItemHandler.getItemID(player, slot);
+						ItemStack inStoredItems = CreateItems.items.get(player.getWorld().getName() + "." + player.getName().toString() + ".items." + ItemID + itemName);
+						int dataValue = items.getInt(".data-value");
+						Material tempmat = CreateItems.getMaterial(items);
+						ItemStack tempitem = null;
+						if (ServerHandler.hasViableUpdate()) {
+							tempitem = new ItemStack(tempmat, items.getInt(".count", 1), (short) dataValue);
+						} else if (!ServerHandler.hasViableUpdate()) {
+							try {
+								tempitem = new ItemStack(tempmat, items.getInt(".count", 1), (short) dataValue);
+							} catch (NullPointerException ex) {}
+						}
+						String lookup = Utils.getName(tempitem);
+						String name = Utils.format("&r" + lookup, player);
+						if (items.getString(".name") != null) {
+							name = items.getString(".name");
+							name = Utils.format("&r" + name, player);
+						}
+						if (inStoredItems != null && Utils.isCustomSlot(slot) && player.getInventory().contains(inStoredItems)) {
+							player.getInventory().removeItem(inStoredItems);
+							if (items.getString(".name") != null) {
+								name = items.getString(".name");
+								name = Utils.format("&r" + name, player);
+							}
+							Language.getSendMessage(player, "removedFromYou", inStoredItems.getItemMeta().getDisplayName());
+							if (Language.argsplayer != null) {
+								Language.argsplayer = player;
+								Language.getSendMessage(OtherPlayer, "removedFromPlayer", name);
+								Language.argsplayer = null;
+							}
+							ItemExists = true;
+						} else if (inStoredItems != null && Utils.isInt(slot) && player.getInventory().contains(inStoredItems)) {
+							player.getInventory().removeItem(inStoredItems);
+							Language.getSendMessage(player, "removedFromYou", name);
+							if (Language.argsplayer != null) {
+								Language.argsplayer = player;
+								Language.getSendMessage(OtherPlayer, "removedFromPlayer", name);
+								Language.argsplayer = null;
+							}
+							ItemExists = true;
+						} else if (inStoredItems != null) {
+							if (Language.argsplayer != null) {
+								Language.getSendMessage(player, "playerTriedRemove", inStoredItems.getItemMeta().getDisplayName());
+								Language.argsplayer = player;
+								Language.getSendMessage(OtherPlayer, "itemDoesntExistInOthersInventory", name);
+								Language.argsplayer = null;
+							} else {
+								Language.getSendMessage(player, "itemDoesntExistInInventory", inStoredItems.getItemMeta().getDisplayName());
+							}
+							ItemExists = true;
+						}
+						PlayerHandler.updateInventory(player);
+					}
+				}
+			}
+		}
+		if (ItemExists == false) {
+			Language.getSendMessage(player, "itemDoesntExist", itemName);
+		}
+	}
+	}

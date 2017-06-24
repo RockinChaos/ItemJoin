@@ -1,13 +1,24 @@
 #// <>==<>==<> ItemJoin's Settings, by RockinChaos  <>==<>==<> //#
 #// See the Documentations page for a more in-depth tutorial; https://www.spigotmc.org/wiki/itemjoin/ //#
 #// For per-world support this best works with Multiverse-Inventories! http://dev.bukkit.org/bukkit-plugins/multiverse-inventories //#
-config-Version: 5
+config-Version: 6
 
  #// English is currently the only support language at the moment! //#
 Language: 'English'
-CheckforUpdates: true
+CheckForUpdates: true
+Log-Coloration: true
+Items-Permissions: true
+Debugging-Mode: false
 
-#// These are optional dependencies, changing the values will require a server restart. //#
+#// Global Settings for ItemJoin. //#
+Clear-Items: All
+Clear-On-Join: false
+Clear-On-WorldChanged: false
+Prevent-Pickups: false
+AllowOPBypass: false
+CreativeBypass: false
+
+#// These are optional dependencies, only change these if you are looking to use them in conjunction with ItemJoin, changing the values will require a server restart. //#
 Vault: false
 PlaceholderAPI: false
 Multiverse-Core: false
@@ -15,3 +26,8 @@ Multiverse-Inventories: false
 PerWorldInventory: false
 PerWorldPlugins: false
 AuthMe: false
+
+#// This is for giving items once you enter a specific WorldGuard region, only list the regions you want to receive items in! //#
+#// Please note you will also have to add enabled-regions to each of your items you want to get in each region you enter, just like enabled-worlds. //#
+WorldGuard-Regions: false
+WorldGuard-RegionList: region1, region2
