@@ -380,7 +380,9 @@ public class CreateItems {
 					view.removeRenderer(view.getRenderers().get(0));
 				} catch (NullPointerException ex) {}
 			}
+			try {
 			view.addRenderer(new RenderImageMaps());
+			} catch (NullPointerException ex) {}
 		}
 		return tempitem;
 	}
