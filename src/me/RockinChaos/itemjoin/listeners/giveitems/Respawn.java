@@ -35,7 +35,7 @@ public class Respawn implements Listener {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				if (fr.xephi.authme.AuthMe.getApi().isAuthenticated(player)) {
+				if (fr.xephi.authme.api.v3.AuthMeApi.getInstance().isAuthenticated(player)) {
 					setItems(player);
 					this.cancel();
 				}
