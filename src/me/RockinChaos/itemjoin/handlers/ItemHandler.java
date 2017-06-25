@@ -2,12 +2,12 @@ package me.RockinChaos.itemjoin.handlers;
 
 import java.util.HashMap;
 
+import org.apache.commons.lang.WordUtils;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
-
 import me.RockinChaos.itemjoin.cacheitems.CreateItems;
 import me.RockinChaos.itemjoin.listeners.giveitems.SetItems;
 import me.RockinChaos.itemjoin.utils.Utils;
@@ -57,6 +57,13 @@ public class ItemHandler {
 			isObtainable = true;
 		}
 		return isObtainable;
+	}
+	
+	public static String getName(ItemStack stack) {
+		try {
+		return WordUtils.capitalizeFully(stack.getType().name().toLowerCase().replace('_', ' '));
+		} catch (NullPointerException ex) {}
+		return "Error";
 	}
 
 	public static String getItemID(Player player, String slot) {

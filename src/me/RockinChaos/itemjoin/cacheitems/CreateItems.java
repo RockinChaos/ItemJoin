@@ -141,7 +141,7 @@ public class CreateItems {
 			name = Utils.format("&r" + name, player);
 			tempmeta.setDisplayName(name + ConfigHandler.encodeSecretData(ConfigHandler.secretMsg + ItemID));
 		} else {
-			String lookup = Utils.getName(tempitem);
+			String lookup = ItemHandler.getName(tempitem);
 			String name = Utils.format("&r" + lookup + ConfigHandler.encodeSecretData(ConfigHandler.secretMsg + ItemID), player);
 			tempmeta.setDisplayName(name);
 		}
@@ -372,7 +372,7 @@ public class CreateItems {
 				mapID = 1;
 			}
 			tempitem.setDurability((short) mapID);
-			MapView view = MapView(player, mapID);
+			MapView view = RenderImageMaps.MapView(player, mapID);
 			String mapIMG = items.getString(".custom-map-image");
 			if (mapIMG.equalsIgnoreCase("default.png") || new File(ItemJoin.pl.getDataFolder(), mapIMG).exists()) {
 				RenderImageMaps.setImage(mapIMG, mapID);
@@ -489,12 +489,5 @@ public class CreateItems {
 			}
 		}
 		return isCreatable;
-	}
-
-	@SuppressWarnings("deprecation")
-	public static MapView MapView(Player player, int id) {
-		ItemJoin.pl.getServer().createMap(player.getWorld());
-		MapView view = ItemJoin.pl.getServer().getMap((short) id);
-		return view;
 	}
 }

@@ -53,6 +53,13 @@ public class ServerHandler {
 		}
 		return hasViableUpdate;
 	}
+	
+	public static String StripLogColors(CommandSender sender, String message) {
+		if(sender instanceof ConsoleCommandSender && ConfigHandler.getConfig("config.yml").getBoolean("Log-Coloration") != true) {
+			message = ChatColor.stripColor(message);
+		}
+	  return message;
+	}
 
 	public static void sendConsoleMessage(String message) {
 		String prefix = "&7[&eItemJoin&7] ";

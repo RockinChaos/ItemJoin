@@ -46,6 +46,15 @@ public class RenderImageMaps extends MapRenderer {
 			}
 		}
 	}
+	
+	
+	@SuppressWarnings("deprecation")
+	public static MapView MapView(Player player, int id) {
+		ItemJoin.pl.getServer().createMap(player.getWorld());
+		MapView view = ItemJoin.pl.getServer().getMap((short) id);
+		return view;
+	}
+	
 	public static void clearMaps(Player player) {
 		hasRendered.remove(player);
 	}

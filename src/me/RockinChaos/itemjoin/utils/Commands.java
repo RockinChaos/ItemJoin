@@ -356,7 +356,7 @@ public class Commands implements CommandExecutor {
 								tempitem = new ItemStack(tempmat, items.getInt(".count", 1), (short) dataValue);
 							} catch (NullPointerException ex) {}
 						}
-						String lookup = Utils.getName(tempitem);
+						String lookup = ItemHandler.getName(tempitem);
 						String name = Utils.format("&r" + lookup, player);
 						if (items.getString(".name") != null) {
 							name = items.getString(".name");
@@ -423,7 +423,7 @@ public class Commands implements CommandExecutor {
 								tempitem = new ItemStack(tempmat, items.getInt(".count", 1), (short) dataValue);
 							} catch (NullPointerException ex) {}
 						}
-						String lookup = Utils.getName(tempitem);
+						String lookup = ItemHandler.getName(tempitem);
 						String name = Utils.format("&r" + lookup, player);
 						if (items.getString(".name") != null) {
 							name = items.getString(".name");

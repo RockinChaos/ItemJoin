@@ -179,7 +179,7 @@ public class CommandHandler {
 					storedSpammedPlayers.put(player.getWorld().getName() + "." + player.getName().toString() + ".items." + item, System.currentTimeMillis());
 					int timeLeft = (int)(CommandHandler.cdtime - ((System.currentTimeMillis() - playersCooldownList) / 1000));
 					String inhand = items.getString(".name");
-					String cooldownmsg = (items.getString(".cooldown-message").replace("%timeleft%", String.valueOf(timeLeft)).replace("%item%", inhand).replace("%itemraw%", Utils.getName(item1)));
+					String cooldownmsg = (items.getString(".cooldown-message").replace("%timeleft%", String.valueOf(timeLeft)).replace("%item%", inhand).replace("%itemraw%", ItemHandler.getName(item1)));
 					cooldownmsg = Utils.format(cooldownmsg, player);
 					player.sendMessage(cooldownmsg);
 				}

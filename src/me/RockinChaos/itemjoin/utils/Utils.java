@@ -2,14 +2,9 @@ package me.RockinChaos.itemjoin.utils;
 
 import java.util.Random;
 
-import org.apache.commons.lang.WordUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
@@ -59,20 +54,6 @@ public class Utils {
 		return isCustom;
 	}
 
-	public static String getName(ItemStack stack) {
-		try {
-		return WordUtils.capitalizeFully(stack.getType().name().toLowerCase().replace('_', ' '));
-		} catch (NullPointerException ex) {}
-		return "Error";
-	}
-	
-	public static String StripLogColors(CommandSender sender, String message) {
-		if(sender instanceof ConsoleCommandSender && ConfigHandler.getConfig("config.yml").getBoolean("Log-Coloration") != true) {
-			message = ChatColor.stripColor(message);
-		}
-	  return message;
-	}
-
 	public static Boolean isConfigurable() {
 		Boolean isConfigurable = false;
 		if (ConfigHandler.getConfigurationSection() != null) {
@@ -89,7 +70,8 @@ public class Utils {
 	public static boolean canBypass(Player player, String ItemFlags) {
 		boolean canBypass = false;
 		boolean Creative = player.getGameMode() == GameMode.CREATIVE;
-		if (ItemHandler.containsIgnoreCase(ItemFlags, "AllowOPBypass") && player.isOp() || ItemHandler.containsIgnoreCase(ItemFlags, "CreativeByPass") && Creative) {
+		if (ItemHandler.containsIgnoreCase(ItemFlags, "AllowOPBypass") && player.isOp() 
+				|| ItemHandler.containsIgnoreCase(ItemFlags, "CreativeByPass") && Creative) {
 			canBypass = true;
 		}
 		return canBypass;
