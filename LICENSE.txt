@@ -1,8 +1,9 @@
                               LICENSE AND TERMS BY RockinChaos
 
-         APPLIES TO USAGE, DISTRIBUTION, AND MODIFICATION OF SOFTWARE AND ITS SOURCE
+         APPLIES TO USAGE, DISTRIBUTION, AND MODIFICATION OF SOFTWARE AND ITS SOURCE.
+                            THIS LICENSE APPLIES TO ItemJoin.
 
-Copyright (c) 2017 Jacob Chilson, USA
+Copyright (c) 2015-2017 Jacob Chilson, USA
 
 All rights are reserved to change, modify, or update this license without
 any prior notice or disclosure.
