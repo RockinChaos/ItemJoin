@@ -132,14 +132,14 @@ public class Hooks {
 	}
 	
 	public static void hookWorldGuard() {
-		if (ConfigHandler.getConfig("config.yml").getBoolean("WorldGuard-Regions") == true && Bukkit.getServer().getPluginManager().getPlugin("WorldGuard") != null && Bukkit.getServer().getPluginManager().getPlugin("WorldEdit") != null) {
+		if (ConfigHandler.getConfig("config.yml").getBoolean("WorldGuard") == true && Bukkit.getServer().getPluginManager().getPlugin("WorldGuard") != null && Bukkit.getServer().getPluginManager().getPlugin("WorldEdit") != null) {
 			ServerHandler.sendConsoleMessage("&aHooked into WorldGuard!");
 			hasWorldGuard = true;
-		} else if (ConfigHandler.getConfig("config.yml").getBoolean("WorldGuard-Regions") == true && Bukkit.getServer().getPluginManager().getPlugin("WorldGuard") != null && Bukkit.getServer().getPluginManager().getPlugin("WorldEdit") == null) {
+		} else if (ConfigHandler.getConfig("config.yml").getBoolean("WorldGuard") == true && Bukkit.getServer().getPluginManager().getPlugin("WorldGuard") != null && Bukkit.getServer().getPluginManager().getPlugin("WorldEdit") == null) {
 			ServerHandler.sendConsoleMessage("&4Error; Found WorldGuard but WorldEdit is not found!");
 			ServerHandler.sendConsoleMessage("&4WorldEdit is required for WorldGuard to function.");
 			hasWorldGuard = false;
-		} else if (ConfigHandler.getConfig("config.yml").getBoolean("WorldGuard-Regions") == true && Bukkit.getServer().getPluginManager().getPlugin("WorldGuard") == null) {
+		} else if (ConfigHandler.getConfig("config.yml").getBoolean("WorldGuard") == true && Bukkit.getServer().getPluginManager().getPlugin("WorldGuard") == null) {
 			ServerHandler.sendConsoleMessage("&4Could not find WorldGuard.");
 			hasWorldGuard = false;
 		}

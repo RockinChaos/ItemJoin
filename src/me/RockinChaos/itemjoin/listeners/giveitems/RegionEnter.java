@@ -1,7 +1,6 @@
 package me.RockinChaos.itemjoin.listeners.giveitems;
 
 import java.util.HashMap;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
@@ -52,7 +51,7 @@ public class RegionEnter implements Listener {
 		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.pl, new Runnable() {
 			public void run() {
 				try {
-				setJoinItems(player, region);
+				setEnterItems(player, region);
 				if (SetItems.failCount.get(player) != 0) {
 					boolean Overwrite = ConfigHandler.getConfig("items.yml").getBoolean("items-Overwrite");
 					if (Overwrite == true) {
@@ -70,13 +69,14 @@ public class RegionEnter implements Listener {
 		}, delay);
 	}
 	
-	public static void setJoinItems(Player player, String region) {
+	public static void setEnterItems(Player player, String region) {
 		if (Utils.isConfigurable()) {
 			for (String item: ConfigHandler.getConfigurationSection().getKeys(false)) {
 				ConfigurationSection items = ConfigHandler.getItemSection(item);
 				final String world = player.getWorld().getName();
 				if (WorldHandler.inWorld(items, world) && ItemHandler.containsIgnoreCase(items.getString(".enabled-regions"), region) && PermissionsHandler.hasPermission(items, item, player)) {
-					if(ItemHandler.containsIgnoreCase(items.getString(".triggers"), "join") || ItemHandler.containsIgnoreCase(items.getString(".triggers"), "on-join") || items.getString(".triggers") == null) {
+					if(ItemHandler.containsIgnoreCase(items.getString(".triggers"), "region-enter") || ItemHandler.containsIgnoreCase(items.getString(".triggers"), "region enter")
+							|| ItemHandler.containsIgnoreCase(items.getString(".triggers"), "enter-region") || ItemHandler.containsIgnoreCase(items.getString(".triggers"), "enter region")) {
 					if (items.getString(".slot") != null) {
 						String slotlist = items.getString(".slot").replace(" ", "");
 						String[] slots = slotlist.split(",");
@@ -97,19 +97,19 @@ public class RegionEnter implements Listener {
 	}
 	
 	public static boolean isInRegion(Player player) {
-		String regionlist = ConfigHandler.getConfig("config.yml").getString(".WorldGuard-RegionList").replace(" ", "");
-		String[] regions = regionlist.split(",");
-		for (String region: regions) {
-			if (CheckInRegion(player.getLocation(), region) && isInRegion.get(player) == null) {
-				isInRegion.put(player, region);
-		        setItems(player, region);
+		String[] regions = CreateItems.regions.toString().split(",");
+		for (String region : regions) {
+			String getRegion = region.replace("[", "").replace("]", "").replace(" ", "");
+			if (CheckInRegion(player.getLocation(), getRegion) && isInRegion.get(player) == null) {
+				isInRegion.put(player, getRegion);
+		        setItems(player, getRegion);
 		        return true;
-			} else if (CheckInRegion(player.getLocation(), region) && !region.equalsIgnoreCase(isInRegion.get(player))) {
+			} else if (CheckInRegion(player.getLocation(), getRegion) && !getRegion.equalsIgnoreCase(isInRegion.get(player))) {
 				isInRegion.remove(player);
-				isInRegion.put(player, region);
-				setItems(player, region);
+				isInRegion.put(player, getRegion);
+				setItems(player, getRegion);
 				return true;
-			} else if (CheckInRegion(player.getLocation(), region) && region.equalsIgnoreCase(isInRegion.get(player))) {	
+			} else if (CheckInRegion(player.getLocation(), getRegion) && getRegion.equalsIgnoreCase(isInRegion.get(player))) {	
 				return true;
 			}
 		}

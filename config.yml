@@ -25,9 +25,5 @@ Multiverse-Core: false
 Multiverse-Inventories: false
 PerWorldInventory: false
 PerWorldPlugins: false
+WorldGuard: false
 AuthMe: false
-
-#// This is for giving items once you enter a specific WorldGuard region, only list the regions you want to receive items in! //#
-#// Please note you will also have to add enabled-regions to each of your items you want to get in each region you enter, just like enabled-worlds. //#
-WorldGuard-Regions: false
-WorldGuard-RegionList: region1, region2

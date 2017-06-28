@@ -26,7 +26,7 @@ items:
     commands-cooldown: 5
     cooldown-message: '&7[&eItemJoin&7] &a[%item%&a] &cis on cooldown for &a%timeleft% &cseconds..'
     itemflags: inventory-modify, death-drops, unbreakable, hide-attributes, self-drops, CreativeBypass
-    triggers: join, respawn, world-change
+    triggers: join, respawn, world-change, region-enter
     permission-node: 'itemjoin.ultra'
     enabled-regions: region1, region2
     enabled-worlds: world, world_nether, world_the_end

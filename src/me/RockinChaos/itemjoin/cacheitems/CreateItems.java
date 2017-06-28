@@ -39,11 +39,12 @@ import me.RockinChaos.itemjoin.handlers.WorldHandler;
 import me.RockinChaos.itemjoin.utils.Utils;
 
 public class CreateItems {
-	public List < String > worlds;
+	public static List < String > regions = new ArrayList < String > ();
 	public static Map < String, ItemStack > items = new HashMap < String, ItemStack > ();
 
 	public static void run(Player player) {
 		CreateItems.items.remove(player.getWorld().getName() + "." + player.getName().toString() + ".items.");
+		CreateItems.regions.clear();
 		RenderImageMaps.clearMaps(player);
 		if (Utils.isConfigurable()) {
 			for (String item: ConfigHandler.getConfigurationSection().getKeys(false)) {
@@ -77,6 +78,7 @@ public class CreateItems {
 							tempmeta = setBookPages(items, tempmeta, tempmat, player);
 							tempmeta = hideAttributes(items, tempmeta);
 							tempitem.setItemMeta(tempmeta);
+							setRegions(items);
 							for (World world: Bukkit.getServer().getWorlds()) {
 								if (WorldHandler.inWorld(items, world.getName())) {
 									CreateItems.items.put(world.getName() + "." + player.getName().toString() + ".items." + ItemID + item, tempitem);
@@ -106,6 +108,18 @@ public class CreateItems {
 				}
 			}
 		} catch (NoSuchMethodException ex) {} catch (InvocationTargetException ex) {} catch (IllegalAccessException ex) {}
+	}
+	
+	public static void setRegions(ConfigurationSection items) {
+		if (items.getString(".enabled-regions") != null) {
+			String regionlist = items.getString(".enabled-regions").replace(" ", "");
+			String[] regions = regionlist.split(",");
+			for (String region: regions) {
+				if (CreateItems.regions != null && !CreateItems.regions.contains(region) || CreateItems.regions == null) {
+					CreateItems.regions.add(region);
+				}
+			}
+		}
 	}
 
 	public static ItemStack setUnbreaking(ConfigurationSection items, ItemStack tempitem) {
