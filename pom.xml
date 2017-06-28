@@ -20,8 +20,7 @@
 					<include>en-lang.yml</include>
 					<include>first-join.yml</include>
 					<include>default.png</include>
-					<include>LICENSE_MIT.txt</include>
-					<include>LICENSE_GPL3.txt</include>
+					<include>LICENSE.txt</include>
 				</includes>
 			</resource>
 		</resources>
@@ -161,4 +160,15 @@
 		<name>ItemJoin</name>
 		<url>https://github.com/RockinChaos/ItemJoin</url>
 	</organization>
+	<name>ItemJoin</name>
+	<url>https://www.spigotmc.org/resources/itemjoin.12661/</url>
+	<description>Get custom items on join.</description>
+	<issueManagement>
+		<url>https://github.com/RockinChaos/ItemJoin/issues</url>
+		<system>Github</system>
+	</issueManagement>
+	<ciManagement>
+		<system>Jenkins</system>
+		<url>http://jenkins.craftationgaming.com:8080/</url>
+	</ciManagement>
 </project>

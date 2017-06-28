@@ -30,7 +30,6 @@ import org.w3c.dom.NodeList;
 
 public class Updater {
 	
-	public static double ver;
     public static ConsoleCommandSender Console = ItemJoin.pl.getServer().getConsoleSender();
     public static String Prefix = ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] ";
     private Plugin plugin;
@@ -211,7 +210,6 @@ public class Updater {
             if (version.length() <= 7) {
             	double webVersion = Double.parseDouble(version.replaceAll("[a-z]", "").replace("-SNAPSHOT", "").replace("-BETA", "").replace("-ALPHA", "").replace(".", ""));
             	double currentVersion = Double.parseDouble(ItemJoin.pl.getDescription().getVersion().replaceAll("[a-z]", "").replace("-SNAPSHOT", "").replace("-BETA", "").replace("-ALPHA", "").replace(".", ""));
-            	ver = webVersion;
             	String thisVersion = ItemJoin.pl.getDescription().getVersion();
             	if (webVersion == currentVersion) {
                 	if (thisVersion.contains("-SNAPSHOT") 
