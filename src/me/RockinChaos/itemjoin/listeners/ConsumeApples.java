@@ -1,4 +1,4 @@
-package me.RockinChaos.itemjoin;
+package me.RockinChaos.itemjoin.listeners;
 
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
