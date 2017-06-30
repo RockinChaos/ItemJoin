@@ -19,12 +19,12 @@ items:
         - 'console: say You can even execute more than one command!'
         - 'player: say This is item slot 1'
         - 'say Hello world!'
-    enchantment: FIRE_ASPECT:3, DAMAGE_ALL:5, DAMAGE_UNDEAD:5, KNOCKBACK:8
     commands-type: interact, inventory
     commands-sound: BLOCK_NOTE_PLING
     commands-cost: 25
     commands-cooldown: 5
     cooldown-message: '&7[&eItemJoin&7] &a[%item%&a] &cis on cooldown for &a%timeleft% &cseconds..'
+    enchantment: FIRE_ASPECT:3, DAMAGE_ALL:5, DAMAGE_UNDEAD:5, KNOCKBACK:8
     itemflags: inventory-modify, death-drops, unbreakable, hide-attributes, self-drops, CreativeBypass
     triggers: join, respawn, world-change, region-enter
     permission-node: 'itemjoin.ultra'
@@ -112,7 +112,7 @@ items:
       multi-click:
         - 'server: survival'
         - 'message: &eSending you to the survival server!'
-    commands-type: interact, inventory
+    commands-type: interact
     commands-sound: BLOCK_NOTE_PLING
     commands-cost: 25
     commands-cooldown: 5
@@ -174,8 +174,8 @@ items:
     name: '&eApple of the Goddess'
     lore:
       - '&7This is not any ordinary apple.'
-    itemflags: death-drops, self-drops
     potioneffects: JUMP:2:120, NIGHT_VISION:2:400, GLOWING:1:410, REGENERATION:1:160
+    itemflags: death-drops, self-drops
     triggers: join, respawn, world-change
     enabled-worlds: world, world_nether, world_the_end
   skull-item:

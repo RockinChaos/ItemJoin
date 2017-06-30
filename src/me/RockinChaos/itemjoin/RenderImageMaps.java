@@ -1,4 +1,4 @@
-package me.RockinChaos.itemjoin.cacheitems;
+package me.RockinChaos.itemjoin;
 
 import java.io.File;
 import java.io.IOException;
