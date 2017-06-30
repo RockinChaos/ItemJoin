@@ -1,4 +1,4 @@
-package me.RockinChaos.itemjoin.listeners;
+package me.RockinChaos.itemjoin;
 
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import org.bukkit.GameMode;

@@ -1,4 +1,4 @@
-package me.RockinChaos.itemjoin.listeners;
+package me.RockinChaos.itemjoin;
 
 import java.util.List;
 import java.util.ListIterator;
