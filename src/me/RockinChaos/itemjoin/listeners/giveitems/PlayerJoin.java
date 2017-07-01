@@ -24,6 +24,9 @@ public class PlayerJoin implements Listener {
 	@EventHandler
 	public void giveOnJoin(PlayerJoinEvent event) {
 		final Player player = event.getPlayer();
+		if(RegionEnter.isInRegion.get(player) != null) {
+		RegionEnter.isInRegion.remove(player);
+		}
 		if (Hooks.hasAuthMe == true) {
 			runAuthMeStats(player);
 		} else {

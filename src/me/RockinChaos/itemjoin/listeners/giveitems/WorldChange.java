@@ -24,6 +24,9 @@ public class WorldChange implements Listener {
 	@EventHandler
 	public void giveOnJoin(PlayerChangedWorldEvent event) {
 		final Player player = event.getPlayer();
+		if(RegionEnter.isInRegion.get(player) != null) {
+		RegionEnter.isInRegion.remove(player);
+		}
 		if (Hooks.hasAuthMe == true) {
 			runAuthMeStats(player);
 		} else {
