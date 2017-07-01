@@ -214,7 +214,7 @@ public class CreateItems {
 							} else {
 								level = Integer.parseInt(parts[1]);
 							}
-							duritation = Integer.parseInt(parts[2]) * 20;
+							duritation = Integer.parseInt(parts[2]);
 						} catch (NumberFormatException ex) {
 							ServerHandler.sendConsoleMessage("&4An error occurred in the config, &c" + parts[1] + "&4 is not a number and a number was expected!");
 							ServerHandler.sendConsoleMessage("&4Effect: " + parts[0] + " will now be set to level 1.");

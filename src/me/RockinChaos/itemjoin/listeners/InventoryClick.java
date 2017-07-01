@@ -38,7 +38,6 @@ public class InventoryClick implements Listener {
 			if (gamemode == creative) {
 				player.closeInventory();
 				setCancelled(player, item);
-				PlayerHandler.updateInventory(player);
 			} else {
 				event.setCancelled(true);
 				PlayerHandler.updateInventory(player);
