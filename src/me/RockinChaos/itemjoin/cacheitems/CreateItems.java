@@ -198,18 +198,36 @@ public class CreateItems {
 	}
 
 	public static ItemMeta setTippedArrows(ConfigurationSection items, ItemMeta tempmeta, Material tempmat) {
-		if (ServerHandler.hasCombatUpdate() && !ItemJoin.pl.getServer().getVersion().contains("(MC: 1.9)") 
-				&& items.getString(".arrow.potion-effect") != null && tempmat == Material.getMaterial("TIPPED_ARROW")) {
-			String effectType = items.getString(".arrow.potion-effect").toUpperCase();
-			int powerLevel = items.getInt(".arrow.power");
-			int time = items.getInt(".arrow.time");
-			if (items.getString(".arrow.time") == null) {
-				time = 20;
+		if (items.getString(".potion-effect") != null) {
+			if (ServerHandler.hasCombatUpdate() && !ItemJoin.pl.getServer().getVersion().contains("(MC: 1.9)") && tempmat == Material.getMaterial("TIPPED_ARROW")) {
+				String effectlist = items.getString(".potion-effect").replace(" ", "");
+				String[] effects = effectlist.split(",");
+				for (String effect: effects) {
+					String[] parts = effect.split(":");
+					String type = parts[0].toUpperCase();
+					int duritation = 1;
+					int level = 1;
+					if (ItemHandler.containsIgnoreCase(effect, ":")) {
+						try {
+							if (Integer.parseInt(parts[1]) == 1 || Integer.parseInt(parts[1]) == 2 || Integer.parseInt(parts[1]) == 3) {
+								level = Integer.parseInt(parts[1]) - 1;
+							} else {
+								level = Integer.parseInt(parts[1]);
+							}
+							duritation = Integer.parseInt(parts[2]) * 20;
+						} catch (NumberFormatException ex) {
+							ServerHandler.sendConsoleMessage("&4An error occurred in the config, &c" + parts[1] + "&4 is not a number and a number was expected!");
+							ServerHandler.sendConsoleMessage("&4Effect: " + parts[0] + " will now be set to level 1.");
+						}
+					}
+					if (PotionEffectType.getByName(parts[0].toUpperCase()) != null) {
+						((PotionMeta) tempmeta).addCustomEffect(new PotionEffect(PotionEffectType.getByName(type), duritation * 160, level), true);
+					} else if (PotionEffectType.getByName(parts[0].toUpperCase()) == null) {
+						ServerHandler.sendConsoleMessage("&4An error occurred in the config, &a" + type + "&4 is an incorrect potion effect!");
+						ServerHandler.sendConsoleMessage("&4Please see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/potion/PotionEffectType.html for a list of correct enchantment names!");
+					}
+				}
 			}
-			if (items.getString(".arrow.power") == null) {
-				powerLevel = 1;
-			}
-			((PotionMeta) tempmeta).addCustomEffect(new PotionEffect(PotionEffectType.getByName(effectType), time * 160, powerLevel), true);
 		}
 		return tempmeta;
 	}
@@ -330,7 +348,7 @@ public class CreateItems {
 							duritation = Integer.parseInt(parts[2]) * 20;
 						} catch (NumberFormatException ex) {
 							ServerHandler.sendConsoleMessage("&4An error occurred in the config, &c" + parts[1] + "&4 is not a number and a number was expected!");
-							ServerHandler.sendConsoleMessage("&Potion: " + parts[0] + " will now be enchanted by level 1.");
+							ServerHandler.sendConsoleMessage("&4Potion: " + parts[0] + " will now be set to level 1.");
 						}
 					}
 					if (PotionEffectType.getByName(parts[0].toUpperCase()) != null) {

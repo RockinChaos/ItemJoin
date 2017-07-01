@@ -134,10 +134,7 @@ items:
     slot: 27
     name: '&fDeath Arrow'
     count: 16
-    arrow:
-      potion-effect: WITHER
-      power: 1
-      time: 20
+    potion-effect: WITHER:1:20
     itemflags: death-drops, self-drops
     triggers: join, respawn, world-change
     enabled-worlds: world, world_nether, world_the_end
