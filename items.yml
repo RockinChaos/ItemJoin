@@ -165,7 +165,7 @@ items:
     id: POTION
     slot: 31
     name: '&4Draught of Madness'
-    potioneffects: JUMP:2:120, INCREASE_DAMAGE:3:150, REGENERATION:1:160
+    potion-effect: JUMP:2:120, INCREASE_DAMAGE:3:150, REGENERATION:1:160
     triggers: join, respawn, world-change
     enabled-worlds: world, world_nether, world_the_end
   golden-apple-item:
@@ -174,7 +174,7 @@ items:
     name: '&eApple of the Goddess'
     lore:
       - '&7This is not any ordinary apple.'
-    potioneffects: JUMP:2:120, NIGHT_VISION:2:400, GLOWING:1:410, REGENERATION:1:160
+    potion-effect: JUMP:2:120, NIGHT_VISION:2:400, GLOWING:1:410, REGENERATION:1:160
     itemflags: death-drops, self-drops
     triggers: join, respawn, world-change
     enabled-worlds: world, world_nether, world_the_end

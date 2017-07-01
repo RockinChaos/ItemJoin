@@ -310,10 +310,10 @@ public class CreateItems {
 	}
 
 	public static ItemMeta setPotionEffects(ConfigurationSection items, Material tempmat, ItemMeta tempmeta) {
-		if (items.getString(".potioneffects") != null) {
+		if (items.getString(".potion-effect") != null) {
 			if (tempmat == Material.POTION || ServerHandler.hasCombatUpdate() 
 					&& tempmat == Material.SPLASH_POTION || ServerHandler.hasCombatUpdate() && tempmat == Material.LINGERING_POTION) {
-				String potionlist = items.getString(".potioneffects").replace(" ", "");
+				String potionlist = items.getString(".potion-effect").replace(" ", "");
 				String[] potions = potionlist.split(",");
 				for (String potion: potions) {
 					String[] parts = potion.split(":");

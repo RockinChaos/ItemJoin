@@ -41,10 +41,10 @@ public class ConsumeApples implements Listener {
 								ItemID = slot;
 							}
 							ItemStack inStoredItems = CreateItems.items.get(world + "." + player.getName().toString() + ".items." + ItemID + item);
-							if (items.getString(".potioneffects") != null && WorldHandler.inWorld(items, world) && ItemHandler.isSimilar(inPlayerInventory, inStoredItems)) {
+							if (items.getString(".potion-effect") != null && WorldHandler.inWorld(items, world) && ItemHandler.isSimilar(inPlayerInventory, inStoredItems)) {
 								event.setCancelled(true);
 								player.getInventory().remove(inPlayerInventory);
-								String potionlist = items.getString(".potioneffects").replace(" ", "");
+								String potionlist = items.getString(".potion-effect").replace(" ", "");
 								String[] potions = potionlist.split(",");
 								for (String potion: potions) {
 									String[] parts = potion.split(":");
