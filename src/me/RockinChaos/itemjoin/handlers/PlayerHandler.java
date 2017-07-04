@@ -31,8 +31,29 @@ public class PlayerHandler {
         }, delay);
 	}
 	
+	
+	@SuppressWarnings("deprecation")
+	public static void setPerfectHandItem(Player player, ItemStack toSet, String type) {
+		if (ServerHandler.hasCombatUpdate() && type != null && type.equalsIgnoreCase("Hand")) {
+			player.getInventory().setItemInMainHand(toSet);
+		} else if (ServerHandler.hasCombatUpdate() && type != null && type.equalsIgnoreCase("Off_Hand")) {
+			player.getInventory().setItemInOffHand(toSet);
+		} else if (!ServerHandler.hasCombatUpdate()) {
+			player.getInventory().setItemInHand(toSet);
+		}
+	}
+	
+	@SuppressWarnings("deprecation")
+	public static void setInHandItem(Player player, ItemStack toSet) {
+		player.getInventory().setItemInHand(toSet);
+	}
+	
 	public static void setOffhandItem(Player player, ItemStack toSet) {
 		player.getInventory().setItemInOffHand(toSet);
+	}
+	
+	public static void setMainHandItem(Player player, ItemStack toSet) {
+		player.getInventory().setItemInMainHand(toSet);
 	}
 	
 	@SuppressWarnings("deprecation")

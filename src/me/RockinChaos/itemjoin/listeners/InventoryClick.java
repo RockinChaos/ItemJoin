@@ -61,7 +61,7 @@ public class InventoryClick implements Listener {
 				if (ItemHandler.isSimilar(player.getInventory().getBoots(), item)) {
 					player.getInventory().setBoots(new ItemStack(Material.AIR, 1));
 				}
-				Placement.reAddItem(player, item);
+				Placement.reAddItem(player, item, null, "InvClick");
 			}
 		}, (long) 0.01);
 	}

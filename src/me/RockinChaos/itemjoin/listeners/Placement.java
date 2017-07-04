@@ -9,12 +9,14 @@ import me.RockinChaos.itemjoin.listeners.giveitems.SetItems;
 import me.RockinChaos.itemjoin.utils.Utils;
 
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
 public class Placement implements Listener{
@@ -32,42 +34,53 @@ public class Placement implements Listener{
 	 }
 }
 
-	@EventHandler
-	  public void onCountLock(PlayerInteractEvent event) 
-	  {
-	    ItemStack item = event.getItem();
-	    final Player player = event.getPlayer();
-	    String itemflag = "count-lock";
-	      if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-	    		  if(!ItemHandler.isAllowedItem(player, item, itemflag)) 
-	      {
-	    	  reAddItem(player, item);
-	 }
-   }
-}
+		@EventHandler
+		public void onCountLock(PlayerInteractEvent event) {
+			ItemStack item = event.getItem();
+			final Player player = event.getPlayer();
+			String itemflag = "count-lock";
+			GameMode gamemode = player.getGameMode();
+			GameMode creative = GameMode.CREATIVE;
+			EquipmentSlot Hand = event.getHand();
+			String handString = "";
+			if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK && gamemode != creative) {
+				if (!ItemHandler.isAllowedItem(player, item, itemflag)) {
+					if (Hand != null) {
+						handString = Hand.toString();
+					}
+					reAddItem(player, item, handString, itemflag);
+				}
+			}
+		}
 	 
-	 public static void reAddItem(final Player player, final ItemStack inPlayerInventory) 
+	 public static void reAddItem(final Player player, final ItemStack inPlayerInventory, final String handString, final String type) 
 	  {
 	       if (Utils.isConfigurable()) {
 	       for (final String item : ConfigHandler.getConfigurationSection().getKeys(false))
 	       {
 	    	   ConfigurationSection items = ConfigHandler.getItemSection(item);
-			if (items.getString(".slot") != null) {
+			if (items.getString(".slot") != null && inPlayerInventory != null) {
 				String slotlist = items.getString(".slot").replace(" ", "");
 				String[] slots = slotlist.split(",");
 				ItemHandler.clearItemID(player);
 				for (final String slot: slots) {
+		        	final String ItemID = ItemHandler.getItemID(player, slot);
+					final ItemStack inStoredItems = CreateItems.items.get(player.getWorld().getName() + "." + player.getName().toString() + ".items." + ItemID + item);
+					final ItemStack inPlayerInv = new ItemStack(inPlayerInventory);
+					inPlayerInv.setAmount(inStoredItems.getAmount());
 		        Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.pl, new Runnable()
 		        {
 		        public void run()
 		          {
-		        	String ItemID = ItemHandler.getItemID(player, slot);
-					ItemStack inStoredItems = CreateItems.items.get(player.getWorld().getName() + "." + player.getName().toString() + ".items." + ItemID + item);
-					if (Utils.isCustomSlot(slot) && inStoredItems != null && ItemHandler.isSimilar(inPlayerInventory, inStoredItems)) {
-						SetItems.setCustomSlots(player, item, slot, ItemID);
-					} else if (Utils.isInt(slot) && inStoredItems != null && ItemHandler.isSimilar(inPlayerInventory, inStoredItems)) {
-						SetItems.setInvSlots(player, item, slot, ItemID);
-					}
+						if (!type.equalsIgnoreCase("InvClick") && inStoredItems != null && ItemHandler.isSimilar(inPlayerInv, inStoredItems)) {
+					    PlayerHandler.setPerfectHandItem(player, inStoredItems, handString);
+						} else if (type.equalsIgnoreCase("InvClick")) {
+						if (Utils.isCustomSlot(slot) && inStoredItems != null && ItemHandler.isSimilar(inPlayerInventory, inStoredItems)) {
+							SetItems.setCustomSlots(player, item, slot, ItemID);
+						} else if (Utils.isInt(slot) && inStoredItems != null && ItemHandler.isSimilar(inPlayerInventory, inStoredItems)) {
+							SetItems.setInvSlots(player, item, slot, ItemID);
+						}
+						}
 			        PlayerHandler.updateInventory(player);
 		          }
 		      }, (long) 0.01);
