@@ -206,14 +206,22 @@ public class CommandHandler {
 
 	public static boolean chargeCost(ConfigurationSection items, String item, Player player) {
 		boolean Charged = false;
-		if (items.getString(".commands-cost") != null) {
+		if (items.getString(".commands-cost") != null && Utils.isInt(items.getString(".commands-cost"))) {
 			int cost = items.getInt(".commands-cost");
-			if (PlayerHandler.getBalance(player) >= cost) {
+		    double balance = 0.0;
+		    try {
+		    	balance = PlayerHandler.getBalance(player);
+		    } catch (NullPointerException ex) {
+		    	
+		    }
+			if (balance >= cost && cost != 0) {
+				try {
 				PlayerHandler.withdrawBalance(player, cost);
+				} catch (NullPointerException ex) {}
 				Language.getSendMessage(player, "itemChargeSuccess", "" + items.getString(".commands-cost"));
 				Charged = true;
-			} else if (!(PlayerHandler.getBalance(player) >= cost)) {
-				Language.getSendMessage(player, "itemChargeFailed", items.getString(".commands-cost") + ", " + PlayerHandler.getBalance(player));
+			} else if (!(balance >= cost)) {
+				Language.getSendMessage(player, "itemChargeFailed", items.getString(".commands-cost") + ", " + balance);
 				Charged = false;
 			}
 		}
