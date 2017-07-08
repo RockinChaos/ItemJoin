@@ -214,11 +214,13 @@ public class CommandHandler {
 		    } catch (NullPointerException ex) {
 		    	
 		    }
-			if (balance >= cost && cost != 0) {
+			if (balance >= cost) {
+				if (cost != 0) {
 				try {
 				PlayerHandler.withdrawBalance(player, cost);
 				} catch (NullPointerException ex) {}
 				Language.getSendMessage(player, "itemChargeSuccess", "" + items.getString(".commands-cost"));
+				}
 				Charged = true;
 			} else if (!(balance >= cost)) {
 				Language.getSendMessage(player, "itemChargeFailed", items.getString(".commands-cost") + ", " + balance);

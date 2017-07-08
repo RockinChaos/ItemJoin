@@ -36,6 +36,7 @@ import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.handlers.WorldHandler;
+import me.RockinChaos.itemjoin.listeners.InvClickCreative;
 import me.RockinChaos.itemjoin.utils.Utils;
 
 public class CreateItems {
@@ -100,11 +101,13 @@ public class CreateItems {
 				playersOnlineNew = (Collection < ? extends Player > )((Collection < ? > ) Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).invoke(null, new Object[0]));
 				for (Player player: playersOnlineNew) {
 					run(player);
+					InvClickCreative.isCreative(player, player.getGameMode());
 				}
 			} else {
 				playersOnlineOld = ((Player[]) Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).invoke(null, new Object[0]));
 				for (Player player: playersOnlineOld) {
 					run(player);
+					InvClickCreative.isCreative(player, player.getGameMode());
 				}
 			}
 		} catch (NoSuchMethodException ex) {} catch (InvocationTargetException ex) {} catch (IllegalAccessException ex) {}

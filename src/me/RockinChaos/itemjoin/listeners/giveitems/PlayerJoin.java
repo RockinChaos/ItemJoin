@@ -15,6 +15,7 @@ import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PermissionsHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.WorldHandler;
+import me.RockinChaos.itemjoin.listeners.InvClickCreative;
 import me.RockinChaos.itemjoin.utils.Hooks;
 import me.RockinChaos.itemjoin.utils.Language;
 import me.RockinChaos.itemjoin.utils.Utils;
@@ -49,6 +50,7 @@ public class PlayerJoin implements Listener {
 	public static void setItems(final Player player) {
 		final long delay = ConfigHandler.getConfig("items.yml").getInt("items-Delay") * 10L;
 		CreateItems.run(player);
+	    InvClickCreative.isCreative(player, player.getGameMode());
 		SetItems.setClearingOfItems(player, player.getWorld().getName(), "Clear-On-Join");
 		SetItems.failCount.put(player, 0);
 		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.pl, new Runnable() {
