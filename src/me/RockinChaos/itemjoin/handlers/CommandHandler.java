@@ -233,7 +233,7 @@ public class CommandHandler {
 	public static void removeDisposable(ConfigurationSection items, ItemStack item, Player player) {
 		String ItemFlags = items.getString(".itemflags");
 		if (ItemHandler.containsIgnoreCase(ItemFlags, "disposable")) {
-			if (item.getAmount() > 1) {
+			if (item.getAmount() > 1 && item.getAmount() != 1) {
 				item.setAmount(item.getAmount() - 1);
 			} else {
 				PlayerHandler.setItemInHand(player, Material.AIR);

@@ -149,12 +149,7 @@ items:
       flicker: true
       trail: true
       power: 1
-      colors:
-        - 'GRAY'
-        - 'WHITE'
-        - 'PURPLE'
-        - 'SILVER'
-        - 'GREEN'
+      colors: GRAY, WHITE, PURPLE, SILVER, GREEN
     itemflags: count-lock, death-drops, hide-attributes, self-drops
     triggers: join, respawn, world-change
     enabled-worlds: world, world_nether, world_the_end

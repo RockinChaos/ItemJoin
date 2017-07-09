@@ -242,11 +242,14 @@ public class CreateItems {
 			boolean trail = items.getBoolean(".firework.trail");
 			int power = items.getInt(".firework.distance");
 			Type buildType = Type.valueOf(stringType);
-			List < String > tempcolorslist = items.getStringList(".firework.colors");
 			List < Color > clist = new ArrayList < Color > ();
-			for (int k = 0; k < tempcolorslist.size(); k++) {
-				String color = tempcolorslist.get(k).toUpperCase();
-				clist.add(DyeColor.valueOf(color).getFireworkColor());
+			if (items.getString(".firework.colors") != null) {
+				String colorlist = items.getString(".firework.colors").replace(" ", "");
+				String[] colors = colorlist.split(",");
+				for (String color: colors) {
+					String coloring = color.toUpperCase();
+					clist.add(DyeColor.valueOf(coloring).getFireworkColor());
+				}
 			}
 			FireworkEffect effect = FireworkEffect.builder().trail(trail).flicker(flicker).withColor(clist).withFade(clist).with(buildType).build();
 			((FireworkMeta) tempmeta).clearEffects();
