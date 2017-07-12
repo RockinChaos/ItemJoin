@@ -52,6 +52,7 @@ public class WorldChange implements Listener {
 		CreateItems.run(player);
 		InvClickCreative.isCreative(player, player.getGameMode());
 		SetItems.setClearingOfItems(player, player.getWorld().getName(), "Clear-On-WorldChanged");
+		SetItems.setHeldItemSlot(player);
 		SetItems.failCount.put(player, 0);
 		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.pl, new Runnable() {
 			public void run() {

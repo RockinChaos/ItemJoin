@@ -11,6 +11,7 @@ import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
+import me.RockinChaos.itemjoin.utils.Utils;
 
 public class SetItems {
 	public static HashMap <Player, Integer> failCount = new HashMap <Player, Integer> ();
@@ -53,6 +54,14 @@ public class SetItems {
 				ServerHandler.sendDebugMessage("Given the Item; " + inStoredItems.getItemMeta().getDisplayName().replace(ConfigHandler.encodeSecretData(ConfigHandler.secretMsg + ItemID), ""));
 				ConfigHandler.saveFirstJoined(player, item);
 			}
+		}
+	}
+	
+	public static void setHeldItemSlot(Player player) {
+		if (ConfigHandler.getConfig("config.yml").getString("HeldItem-Slot") != null 
+				&& Utils.isInt(ConfigHandler.getConfig("config.yml").getString("HeldItem-Slot")) 
+				&& ConfigHandler.getConfig("config.yml").getInt("HeldItem-Slot") <= 8 && ConfigHandler.getConfig("config.yml").getInt("HeldItem-Slot") >= 0) {
+			player.getInventory().setHeldItemSlot(ConfigHandler.getConfig("config.yml").getInt("HeldItem-Slot"));
 		}
 	}
 

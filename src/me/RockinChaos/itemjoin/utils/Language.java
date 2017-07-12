@@ -25,7 +25,8 @@ public class Language {
 		} else {
 			player = (Player) sender;
 		}
-		if (ConfigHandler.getConfig("en-lang.yml").getString(MessageType) != null) {
+		if (ConfigHandler.getConfig("en-lang.yml").getString(MessageType) != null 
+				&& !ConfigHandler.getConfig("en-lang.yml").getString(MessageType).isEmpty()) {
 			String Prefix = "";
 			if (!MessageType.equalsIgnoreCase("inWorldListHeader") && !MessageType.equalsIgnoreCase("inWorldListed") 
 					&& !MessageType.equalsIgnoreCase("listWorldsHeader") && !MessageType.equalsIgnoreCase("listItems")) {

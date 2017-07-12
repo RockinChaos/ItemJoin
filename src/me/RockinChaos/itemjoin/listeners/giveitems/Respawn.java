@@ -51,6 +51,7 @@ public class Respawn implements Listener {
 		final long delay = ConfigHandler.getConfig("items.yml").getInt("items-Delay") * 10L;
 		CreateItems.run(player);
 		InvClickCreative.isCreative(player, player.getGameMode());
+		SetItems.setHeldItemSlot(player);
 		SetItems.failCount.put(player, 0);
 		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.pl, new Runnable() {
 			public void run() {

@@ -7,7 +7,7 @@ public class PermissionsHandler {
 
 	public static String customPermissions(ConfigurationSection items, String item, String world) {
 		String customPermission = items.getString(".permission-node");
-		if (customPermission == null) {
+		if (ConfigHandler.getConfig("config.yml").getBoolean("Items-Permissions") == false || customPermission == null) {
 			customPermission = "itemjoin." + world + "." + item;
 		}
 		return customPermission;
