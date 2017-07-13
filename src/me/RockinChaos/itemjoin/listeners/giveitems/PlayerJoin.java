@@ -84,6 +84,7 @@ public class PlayerJoin implements Listener {
 						ItemHandler.clearItemID(player);
 						for (String slot: slots) {
 							String ItemID = ItemHandler.getItemID(player, slot);
+							player.sendMessage("da" + ItemID);
 							if (Utils.isCustomSlot(slot)) {
 								SetItems.setCustomSlots(player, item, slot, ItemID);
 							} else if (Utils.isInt(slot)) {

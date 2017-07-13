@@ -362,7 +362,7 @@ public class Commands implements CommandExecutor {
 							name = items.getString(".name");
 							name = Utils.format("&r" + name, player);
 						}
-						if (inStoredItems != null && Utils.isCustomSlot(slot) && ItemHandler.isObtainable(player, item, slot, ItemID, inStoredItems)) {
+						if (inStoredItems != null && item.equalsIgnoreCase(itemName) && Utils.isCustomSlot(slot) && ItemHandler.isObtainable(player, item, slot, ItemID, inStoredItems)) {
 							SetItems.setCustomSlots(player, item, slot, ItemID);
 							Language.getSendMessage(player, "givenToYou", inStoredItems.getItemMeta().getDisplayName());
 							if (Language.argsplayer != null) {
@@ -371,7 +371,7 @@ public class Commands implements CommandExecutor {
 								Language.argsplayer = null;
 							}
 							ItemExists = true;
-						} else if (inStoredItems != null && Utils.isInt(slot) && ItemHandler.isObtainable(player, item, slot, ItemID, inStoredItems)) {
+						} else if (inStoredItems != null && item.equalsIgnoreCase(itemName) && Utils.isInt(slot) && ItemHandler.isObtainable(player, item, slot, ItemID, inStoredItems)) {
 							SetItems.setInvSlots(player, item, slot, ItemID);
 							Language.getSendMessage(player, "givenToYou", inStoredItems.getItemMeta().getDisplayName());
 							if (Language.argsplayer != null) {
@@ -380,7 +380,7 @@ public class Commands implements CommandExecutor {
 								Language.argsplayer = null;
 							}
 							ItemExists = true;
-						} else if (inStoredItems != null && !ItemHandler.isObtainable(player, item, slot, ItemID, inStoredItems)) {
+						} else if (inStoredItems != null && item.equalsIgnoreCase(itemName) && !ItemHandler.isObtainable(player, item, slot, ItemID, inStoredItems)) {
 							if (Language.argsplayer != null) {
 								Language.getSendMessage(player, "playerTriedGive", name);
 								Language.argsplayer = player;
@@ -429,7 +429,7 @@ public class Commands implements CommandExecutor {
 							name = items.getString(".name");
 							name = Utils.format("&r" + name, player);
 						}
-						if (inStoredItems != null && Utils.isCustomSlot(slot) && player.getInventory().contains(inStoredItems)) {
+						if (inStoredItems != null && item.equalsIgnoreCase(itemName) && Utils.isCustomSlot(slot) && player.getInventory().contains(inStoredItems)) {
 							player.getInventory().removeItem(inStoredItems);
 							if (items.getString(".name") != null) {
 								name = items.getString(".name");
@@ -442,7 +442,7 @@ public class Commands implements CommandExecutor {
 								Language.argsplayer = null;
 							}
 							ItemExists = true;
-						} else if (inStoredItems != null && Utils.isInt(slot) && player.getInventory().contains(inStoredItems)) {
+						} else if (inStoredItems != null && item.equalsIgnoreCase(itemName) && Utils.isInt(slot) && player.getInventory().contains(inStoredItems)) {
 							player.getInventory().removeItem(inStoredItems);
 							Language.getSendMessage(player, "removedFromYou", name);
 							if (Language.argsplayer != null) {
@@ -451,7 +451,7 @@ public class Commands implements CommandExecutor {
 								Language.argsplayer = null;
 							}
 							ItemExists = true;
-						} else if (inStoredItems != null) {
+						} else if (inStoredItems != null && item.equalsIgnoreCase(itemName)) {
 							if (Language.argsplayer != null) {
 								Language.getSendMessage(player, "playerTriedRemove", inStoredItems.getItemMeta().getDisplayName());
 								Language.argsplayer = player;

@@ -7,10 +7,14 @@ public class WorldHandler {
 	public static Boolean inWorld(ConfigurationSection items, String world) {
 		Boolean InWorld = false;
 		if (items.getString(".enabled-worlds") != null) {
-			if (ItemHandler.containsIgnoreCase(items.getString(".enabled-worlds"), world) 
-					|| ItemHandler.containsIgnoreCase(items.getString(".enabled-worlds"), "all") 
-					|| ItemHandler.containsIgnoreCase(items.getString(".enabled-worlds"), "global")) {
-			InWorld = true;
+			String worldlist = items.getString(".enabled-worlds").replace(" ", "");
+			String[] compareWorlds = worldlist.split(",");
+			for (String compareWorld: compareWorlds) {
+				if (compareWorld.equalsIgnoreCase(world) 
+						|| compareWorld.equalsIgnoreCase("all") 
+						|| compareWorld.equalsIgnoreCase("global")) {
+					InWorld = true;
+				}
 			}
 		} else if (items.getString(".enabled-worlds") == null) {
 			InWorld = true;
