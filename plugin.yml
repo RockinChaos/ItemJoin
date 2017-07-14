@@ -47,6 +47,22 @@ commands:
       description: Removes that itemjoin item from the players inventory.
       usage: |
           /itemjoin remove <item> <player>
+   itemjoin getall:
+      description: Gives you all itemjoin items.
+      usage: |
+          /itemjoin getall
+   itemjoin getall <player>:
+      description: Gives that player all itemjoin items.
+      usage: |
+          /itemjoin getall <player>
+   itemjoin removeall:
+      description: Removes all itemjoin items from your inventory.
+      usage: |
+          /itemjoin removeall
+   itemjoin removeall <player>:
+      description: Removes all itemjoin items from the players inventory.
+      usage: |
+          /itemjoin removeall <player>
    itemjoin world:
       description: Checks what world you are in, for debugging purposes.
       usage: |

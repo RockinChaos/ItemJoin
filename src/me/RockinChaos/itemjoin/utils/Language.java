@@ -38,7 +38,7 @@ public class Language {
 				for (String ReplaceText: TextSplits) {
 			sendMessage = sendMessage.replace("%items%", ReplaceText);
 			sendMessage = sendMessage.replace("%item%", ReplaceText);
-			if (MessageType.equalsIgnoreCase("givenToPlayer") || MessageType.equalsIgnoreCase("removedFromPlayer") 
+			if (MessageType.equalsIgnoreCase("givenToPlayer") || MessageType.equalsIgnoreCase("removedFromPlayer") || MessageType.equalsIgnoreCase("playerTriedRemove")
 					|| MessageType.equalsIgnoreCase("playerTriedGive") || MessageType.equalsIgnoreCase("itemExistsInOthersInventory") || MessageType.equalsIgnoreCase("itemDoesntExistInOthersInventory")) {
 				if (argsplayer != null) {
 				sendMessage = sendMessage.replace("%argsplayer%", argsplayer.getName());

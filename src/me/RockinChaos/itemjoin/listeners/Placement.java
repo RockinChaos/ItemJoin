@@ -5,6 +5,7 @@ import me.RockinChaos.itemjoin.cacheitems.CreateItems;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
+import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.listeners.giveitems.SetItems;
 import me.RockinChaos.itemjoin.utils.Utils;
 
@@ -16,7 +17,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
 public class Placement implements Listener{
@@ -41,12 +41,11 @@ public class Placement implements Listener{
 			String itemflag = "count-lock";
 			GameMode gamemode = player.getGameMode();
 			GameMode creative = GameMode.CREATIVE;
-			EquipmentSlot Hand = event.getHand();
 			String handString = "";
 			if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK && gamemode != creative) {
 				if (!ItemHandler.isAllowedItem(player, item, itemflag)) {
-					if (Hand != null) {
-						handString = Hand.toString();
+					if (ServerHandler.hasCombatUpdate()) {
+						handString = event.getHand().toString();
 					}
 					reAddItem(player, item, handString, itemflag);
 				}

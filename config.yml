@@ -15,9 +15,9 @@ Clear-Items: All
 Clear-On-Join: false
 Clear-On-WorldChanged: false
 Prevent-Pickups: false
+HeldItem-Slot: None
 AllowOPBypass: false
 CreativeBypass: false
-HeldItem-Slot: 0
 
 #// These are optional dependencies, only change these if you are looking to use them in conjunction with ItemJoin, changing the values will require a server restart. //#
 Vault: false

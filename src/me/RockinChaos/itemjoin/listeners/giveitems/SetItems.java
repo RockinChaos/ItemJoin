@@ -69,7 +69,9 @@ public class SetItems {
 		if (ConfigHandler.getConfig("config.yml").getBoolean(clearOn) == true && ConfigHandler.getConfig("config.yml").getString("Clear-Items").equalsIgnoreCase("All")) {
 			setClearAllItems(player);
 		} else if (ConfigHandler.getConfig("config.yml").getBoolean(clearOn) == true && ConfigHandler.getConfig("config.yml").getString("Clear-Items").equalsIgnoreCase("ItemJoin")) {
+			if (ConfigHandler.getConfig("config.yml").getBoolean("AllowOPBypass") == true && player.isOp()) {} else {
 			setClearItemJoinItems(player);
+			}
 		} else if (ConfigHandler.getConfig("config.yml").getBoolean(clearOn) == true) {
 			ServerHandler.sendConsoleMessage("&cError; C122394");
 			ServerHandler.sendConsoleMessage("&c" + ConfigHandler.getConfig("config.yml").getString("Clear-Items") + " for Clear-Items in the config.yml is not a valid option.");
@@ -90,7 +92,6 @@ public class SetItems {
 	}
 
 	public static void setClearItemJoinItems(Player player) {
-		if (ConfigHandler.getConfig("config.yml").getBoolean("AllowOPBypass") == true && player.isOp()) {} else {
 			PlayerInventory inventory = player.getInventory();
 			if (inventory.getHelmet() != null && inventory.getHelmet().hasItemMeta() && inventory.getHelmet().getItemMeta().hasDisplayName() 
 					&& ItemHandler.containsIgnoreCase(inventory.getHelmet().getItemMeta().getDisplayName(), ConfigHandler.encodeSecretData(ConfigHandler.secretMsg))) {
@@ -122,6 +123,5 @@ public class SetItems {
 				}
 			}
 			inventoryContents.clear();
-		}
 	}
 }
