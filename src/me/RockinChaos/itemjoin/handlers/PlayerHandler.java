@@ -46,11 +46,15 @@ public class PlayerHandler {
 	}
 	
 	public static void setOffhandItem(Player player, ItemStack toSet) {
+		if (ServerHandler.hasCombatUpdate()) {
 		player.getInventory().setItemInOffHand(toSet);
+		}
 	}
 	
 	public static void setMainHandItem(Player player, ItemStack toSet) {
+		if (ServerHandler.hasCombatUpdate()) {
 		player.getInventory().setItemInMainHand(toSet);
+		}
 	}
 	
 	@SuppressWarnings("deprecation")

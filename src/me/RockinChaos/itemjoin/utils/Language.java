@@ -39,6 +39,7 @@ public class Language {
 			sendMessage = sendMessage.replace("%items%", ReplaceText);
 			sendMessage = sendMessage.replace("%item%", ReplaceText);
 			if (MessageType.equalsIgnoreCase("givenToPlayer") || MessageType.equalsIgnoreCase("removedFromPlayer") || MessageType.equalsIgnoreCase("playerTriedRemove")
+					|| MessageType.equalsIgnoreCase("removedAllFromPlayer") || MessageType.equalsIgnoreCase("givenAllToPlayer")
 					|| MessageType.equalsIgnoreCase("playerTriedGive") || MessageType.equalsIgnoreCase("itemExistsInOthersInventory") || MessageType.equalsIgnoreCase("itemDoesntExistInOthersInventory")) {
 				if (argsplayer != null) {
 				sendMessage = sendMessage.replace("%argsplayer%", argsplayer.getName());

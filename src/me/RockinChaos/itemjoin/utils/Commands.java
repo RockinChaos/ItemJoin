@@ -425,23 +425,23 @@ public class Commands implements CommandExecutor {
 								if (!ItemHandler.hasItem(player, inStoredItems)) {
 								SetItems.setCustomSlots(player, item, slot, ItemID);
 								if (hasRan != true) {
-								Language.getSendMessage(player, "givenToYou", "&eAll Items");
+								Language.getSendMessage(player, "givenAllToYou", "&eAll Items");
 								hasRan = true;
 								if (Language.argsplayer != null) {
 									Language.argsplayer = player;
-									Language.getSendMessage(OtherPlayer, "givenToPlayer", "&eAll Items");
+									Language.getSendMessage(OtherPlayer, "givenAllToPlayer", "&eAll Items");
 									Language.argsplayer = null;
 								}
 								}
 								} else if (hasRan != true) {
 									hasRan = true;
 									if (Language.argsplayer != null) {
-										Language.getSendMessage(player, "playerTriedGive", "All Items");
+										Language.getSendMessage(player, "playerTriedGiveAllItems", "All Items");
 										Language.argsplayer = player;
-										Language.getSendMessage(OtherPlayer, "itemExistsInOthersInventory", "All Items");
+										Language.getSendMessage(OtherPlayer, "allItemsExistInOthersInventory", "All Items");
 										Language.argsplayer = null;
 									} else {
-										Language.getSendMessage(player, "itemExistsInInventory", "All Items");
+										Language.getSendMessage(player, "allItemsExistInInventory", "All Items");
 									}
 								}
 								ItemExists = true;
@@ -450,23 +450,23 @@ public class Commands implements CommandExecutor {
 								if (!ItemHandler.hasItem(player, inStoredItems)) {
 								SetItems.setInvSlots(player, item, slot, ItemID);
 								if (hasRan != true) {
-								Language.getSendMessage(player, "givenToYou", "&eAll Items");
+								Language.getSendMessage(player, "givenAllToYou", "&eAll Items");
 								hasRan = true;
 								if (Language.argsplayer != null) {
 									Language.argsplayer = player;
-									Language.getSendMessage(OtherPlayer, "givenToPlayer", "&eAll Items");
+									Language.getSendMessage(OtherPlayer, "givenAllToPlayer", "&eAll Items");
 									Language.argsplayer = null;
 								}
 								}
 								} else if (hasRan != true) {
 									hasRan = true;
 									if (Language.argsplayer != null) {
-										Language.getSendMessage(player, "playerTriedGive", "All Items");
+										Language.getSendMessage(player, "playerTriedGiveAllItems", "All Items");
 										Language.argsplayer = player;
-										Language.getSendMessage(OtherPlayer, "itemExistsInOthersInventory", "All Items");
+										Language.getSendMessage(OtherPlayer, "allItemsExistInOthersInventory", "All Items");
 										Language.argsplayer = null;
 									} else {
-										Language.getSendMessage(player, "itemExistsInInventory", "All Items");
+										Language.getSendMessage(player, "allItemsExistInInventory", "All Items");
 									}
 								}
 								ItemExists = true;
@@ -546,23 +546,23 @@ public class Commands implements CommandExecutor {
 							if (ItemHandler.hasItem(player, inStoredItems)) {
 							   SetItems.setClearItemJoinItems(player);
 								if (hasRan != true) {
-								Language.getSendMessage(player, "removedFromYou", "&eAll Items");
+								Language.getSendMessage(player, "removedAllFromYou", "&eAll Items");
 								hasRan = true;
 								if (Language.argsplayer != null) {
 									Language.argsplayer = player;
-									Language.getSendMessage(OtherPlayer, "removedFromPlayer", "&eAll Items");
+									Language.getSendMessage(OtherPlayer, "removedAllFromPlayer", "&eAll Items");
 									Language.argsplayer = null;
 								}
 								}
 								} else if ((hasRan != true)) {
 									hasRan = true;
 									if (Language.argsplayer != null) {
-										Language.getSendMessage(player, "playerTriedRemove", "All Items");
+										Language.getSendMessage(player, "playerTriedRemoveAll", "All Items");
 										Language.argsplayer = player;
-										Language.getSendMessage(OtherPlayer, "itemDoesntExistInOthersInventory", "Items");
+										Language.getSendMessage(OtherPlayer, "allItemsDoNotExistInOthersInventory", "Items");
 										Language.argsplayer = null;
 									} else {
-										Language.getSendMessage(player, "itemDoesntExistInInventory", "Items");
+										Language.getSendMessage(player, "allItemsDoNotExistInInventory", "Items");
 									}
 								}
 								ItemExists = true;
