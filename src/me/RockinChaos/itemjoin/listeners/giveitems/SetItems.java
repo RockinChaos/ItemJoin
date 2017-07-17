@@ -66,8 +66,10 @@ public class SetItems {
 	}
 
 	public static void setClearingOfItems(Player player, String world, String clearOn) {
-		if (ConfigHandler.getConfig("config.yml").getBoolean(clearOn) == true && ConfigHandler.getConfig("config.yml").getString("Clear-Items").equalsIgnoreCase("All")) {
+		if (ConfigHandler.getConfig("config.yml").getBoolean(clearOn) == true && ConfigHandler.getConfig("config.yml").getString("Clear-Items").equalsIgnoreCase("All")) { // error codes //
+			if (ConfigHandler.getConfig("config.yml").getBoolean("AllowOPBypass") == true && player.isOp()) {} else {
 			setClearAllItems(player);
+			}
 		} else if (ConfigHandler.getConfig("config.yml").getBoolean(clearOn) == true && ConfigHandler.getConfig("config.yml").getString("Clear-Items").equalsIgnoreCase("ItemJoin")) {
 			if (ConfigHandler.getConfig("config.yml").getBoolean("AllowOPBypass") == true && player.isOp()) {} else {
 			setClearItemJoinItems(player);
@@ -79,7 +81,6 @@ public class SetItems {
 	}
 
 	public static void setClearAllItems(Player player) {
-			if (ConfigHandler.getConfig("config.yml").getBoolean("AllowOPBypass") == true && player.isOp()) {} else {
 				player.getInventory().clear();
 				player.getInventory().setHelmet(null);
 				player.getInventory().setChestplate(null);
@@ -88,7 +89,6 @@ public class SetItems {
 				if (ServerHandler.hasCombatUpdate()) {
 				player.getInventory().setItemInOffHand(null);
 				}
-			}
 	}
 
 	public static void setClearItemJoinItems(Player player) {
