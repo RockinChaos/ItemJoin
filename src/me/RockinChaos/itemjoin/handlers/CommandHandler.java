@@ -59,6 +59,18 @@ public class CommandHandler {
 		return isCommandable;
 	}
 
+	public static void runGlobalCmds(Player player) {
+		if (ConfigHandler.getConfig("config.yml").getBoolean("enabled-global-commands") == true && WorldHandler.inGlobalWorld(player.getWorld().getName())) {
+			if (ConfigHandler.getConfig("config.yml").getStringList("global-commands") != null) {
+			List <String> commands = ConfigHandler.getConfig("config.yml").getStringList("global-commands");
+			for (String command: commands) {
+				String Command = Utils.format(command, player);
+				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), Command);
+			}
+			}
+		}
+	}
+	
 	public static boolean isInteractInv(String action, ConfigurationSection items) {
 		boolean isInteractInv = false;
 		String commandType = items.getString(".commands-type");
@@ -77,6 +89,9 @@ public class CommandHandler {
 			if (ItemHandler.containsIgnoreCase(".multi-click", getAction("interact", action, items)) 
 					|| ItemHandler.containsIgnoreCase(".left-click", getAction("interact", action, items))
 					|| ItemHandler.containsIgnoreCase(".right-click", getAction("interact", action, items)) 
+					|| ItemHandler.containsIgnoreCase(".multi-click-air", getAction("interact", action, items)) 
+					|| ItemHandler.containsIgnoreCase(".left-click-air", getAction("interact", action, items))
+					|| ItemHandler.containsIgnoreCase(".right-click-air", getAction("interact", action, items))
 					|| ItemHandler.containsIgnoreCase(".physical", getAction("interact", action, items))) {
 				isInteractPhysical = true;
 			}
@@ -111,14 +126,35 @@ public class CommandHandler {
 		}
 		actions = items.getStringList(".commands" + ".left-click");
 		if (actions != null && actions.toString() != "[]") {
-			if (ItemHandler.containsIgnoreCase(mode, "interact") && ItemHandler.containsIgnoreCase("LEFT_CLICK_AIR", action) || ItemHandler.containsIgnoreCase(mode, "interact") && ItemHandler.containsIgnoreCase("LEFT_CLICK_BLOCK", action)) {
+			if (ItemHandler.containsIgnoreCase(mode, "interact") && ItemHandler.containsIgnoreCase("LEFT_CLICK_AIR", action) 
+					|| ItemHandler.containsIgnoreCase(mode, "interact") && ItemHandler.containsIgnoreCase("LEFT_CLICK_BLOCK", action)) {
 			return ".left-click";
 		}
 		}
         actions = items.getStringList(".commands" + ".right-click");
 		if (actions != null && actions.toString() != "[]") {
-			if (ItemHandler.containsIgnoreCase(mode, "interact") && ItemHandler.containsIgnoreCase("RIGHT_CLICK_AIR", action) || ItemHandler.containsIgnoreCase(mode, "interact") && ItemHandler.containsIgnoreCase("RIGHT_CLICK_BLOCK", action)) {
+			if (ItemHandler.containsIgnoreCase(mode, "interact") && ItemHandler.containsIgnoreCase("RIGHT_CLICK_AIR", action) 
+					|| ItemHandler.containsIgnoreCase(mode, "interact") && ItemHandler.containsIgnoreCase("RIGHT_CLICK_BLOCK", action)) {
 			return ".right-click";
+		}
+		}
+		actions = items.getStringList(".commands" + ".multi-click-air");
+		if (actions != null && actions.toString() != "[]") {
+			if (ItemHandler.containsIgnoreCase(mode, "interact") && ItemHandler.containsIgnoreCase("LEFT_CLICK_AIR", action) 
+					||ItemHandler.containsIgnoreCase(mode, "interact") && ItemHandler.containsIgnoreCase("RIGHT_CLICK_AIR", action)) {
+			return ".multi-click-air";
+		}
+		}
+		actions = items.getStringList(".commands" + ".left-click-air");
+		if (actions != null && actions.toString() != "[]") {
+			if (ItemHandler.containsIgnoreCase(mode, "interact") && ItemHandler.containsIgnoreCase("LEFT_CLICK_AIR", action)) {
+			return ".left-click-air";
+		}
+		}
+        actions = items.getStringList(".commands" + ".right-click-air");
+		if (actions != null && actions.toString() != "[]") {
+			if (ItemHandler.containsIgnoreCase(mode, "interact") && ItemHandler.containsIgnoreCase("RIGHT_CLICK_AIR", action)) {
+			return ".right-click-air";
 		}
 		}
         actions = items.getStringList(".commands" + ".inventory");
@@ -236,7 +272,7 @@ public class CommandHandler {
 			if (item.getAmount() > 1 && item.getAmount() != 1) {
 				item.setAmount(item.getAmount() - 1);
 			} else {
-				PlayerHandler.setItemInHand(player, Material.AIR);
+				item.setAmount(0);
 			}
 		}
 	}

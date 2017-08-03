@@ -9,6 +9,17 @@ import me.RockinChaos.itemjoin.ItemJoin;
 
 public class ServerHandler {
 	public static ConsoleCommandSender Console = ItemJoin.pl.getServer().getConsoleSender();
+	
+	public static boolean hasWorldOfColorUpdate() {
+		boolean hasCombatUpdate = false;
+		String pkgname = ItemJoin.pl.getServer().getClass().getPackage().getName();
+		String combatVersion = "v1_12_R0".replace("_", "").replace("R0", "").replace("R1", "").replace("R2", "").replace("R3", "").replace("R4", "").replace("R5", "").replaceAll("[a-z]", "");
+		String version = pkgname.substring(pkgname.lastIndexOf('.') + 1).replace("_", "").replace("R0", "").replace("R1", "").replace("R2", "").replace("R3", "").replace("R4", "").replace("R5", "").replaceAll("[a-z]", "");
+		if (Integer.parseInt(version) >= Integer.parseInt(combatVersion)) {
+			hasCombatUpdate = true;
+		}
+		return hasCombatUpdate;
+	}
 
 	public static boolean hasExplorationUpdate() {
 		boolean hasCombatUpdate = false;

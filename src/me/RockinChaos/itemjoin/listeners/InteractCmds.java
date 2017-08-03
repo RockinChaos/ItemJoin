@@ -19,7 +19,7 @@ import me.RockinChaos.itemjoin.utils.Utils;
 public class InteractCmds implements Listener {
 
 	@EventHandler
-	public void onInteractCmds(InventoryClickEvent event) {
+	public void onInventoryCmds(InventoryClickEvent event) {
 		ItemStack item = event.getCurrentItem();
 		final Player player = (Player) event.getWhoClicked();
 		final String world = player.getWorld().getName();

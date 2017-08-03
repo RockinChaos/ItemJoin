@@ -12,6 +12,7 @@ import me.RockinChaos.itemjoin.listeners.InteractCmds;
 import me.RockinChaos.itemjoin.listeners.InvClickCreative;
 import me.RockinChaos.itemjoin.listeners.InvClickSurvival;
 import me.RockinChaos.itemjoin.listeners.Pickups;
+import me.RockinChaos.itemjoin.listeners.Deprecated_Pickups;
 import me.RockinChaos.itemjoin.listeners.Placement;
 import me.RockinChaos.itemjoin.listeners.SwapHands;
 import me.RockinChaos.itemjoin.listeners.giveitems.PlayerJoin;
@@ -27,6 +28,8 @@ public class Hooks {
 	public static boolean hasPerWorldPlugins;
 	public static boolean hasPerWorldInventory;
 	public static boolean hasAuthMe;
+	public static boolean hasMyWorlds;
+	public static boolean hasxInventories;
 	public static boolean hasWorldGuard;
 
 	public static void getHooks() {
@@ -38,6 +41,17 @@ public class Hooks {
 		hookPerWorldInventory();
 		hookAuthMe();
 		hookWorldGuard();
+		hookMyWorlds();
+		hookxInventories();
+	}
+	
+	private static Class<?> getEventClass(String name) {
+	    try {
+	    return Class.forName("org.bukkit.event." + name);
+		} catch (ClassNotFoundException e) {
+			ServerHandler.sendDebugMessage(name + " Does not exist in this version of Minecraft!");
+		}
+		return null;
 	}
 
 	public static void getRegisters() {
@@ -48,18 +62,44 @@ public class Hooks {
 		ItemJoin.pl.getServer().getPluginManager().registerEvents(new Respawn(), ItemJoin.pl);
 		ItemJoin.pl.getServer().getPluginManager().registerEvents(new InvClickSurvival(), ItemJoin.pl);
 		ItemJoin.pl.getServer().getPluginManager().registerEvents(new InvClickCreative(), ItemJoin.pl);
-		ItemJoin.pl.getServer().getPluginManager().registerEvents(new Pickups(), ItemJoin.pl);
 		ItemJoin.pl.getServer().getPluginManager().registerEvents(new Drops(), ItemJoin.pl);
 		ItemJoin.pl.getServer().getPluginManager().registerEvents(new InteractCmds(), ItemJoin.pl);
 		ItemJoin.pl.getServer().getPluginManager().registerEvents(new CancelInteract(), ItemJoin.pl);
 		ItemJoin.pl.getServer().getPluginManager().registerEvents(new Placement(), ItemJoin.pl);
 		ItemJoin.pl.getServer().getPluginManager().registerEvents(new ConsumeApples(), ItemJoin.pl);
-		
-		if (ServerHandler.hasCombatUpdate()) {
+
+		if (ServerHandler.hasWorldOfColorUpdate() && getEventClass("entity.EntityPickupItemEvent") != null) {
+			ItemJoin.pl.getServer().getPluginManager().registerEvents(new Pickups(), ItemJoin.pl);
+		} else {
+			ItemJoin.pl.getServer().getPluginManager().registerEvents(new Deprecated_Pickups(), ItemJoin.pl);
+		}
+
+		if (ServerHandler.hasCombatUpdate() && getEventClass("player.PlayerSwapHandItemsEvent") != null) {
 		ItemJoin.pl.getServer().getPluginManager().registerEvents(new SwapHands(), ItemJoin.pl);
 		}
+
 		if (hasWorldGuard == true) {
 			ItemJoin.pl.getServer().getPluginManager().registerEvents(new RegionEnter(), ItemJoin.pl);
+		}
+	}
+	
+	public static void hookMyWorlds() {
+		if (Bukkit.getServer().getPluginManager().getPlugin("My_Worlds") != null && ConfigHandler.getConfig("config.yml").getBoolean("MyWorlds") == true) {
+			ServerHandler.sendConsoleMessage("&aHooked into MyWorlds!");
+			hasMyWorlds = true;
+		} else if (ConfigHandler.getConfig("config.yml").getBoolean("MyWorlds") == true) {
+			ServerHandler.sendConsoleMessage("&4Could not find MyWorlds.");
+			hasMyWorlds = false;
+		}
+	}
+	
+	public static void hookxInventories() {
+		if (Bukkit.getServer().getPluginManager().getPlugin("xInventories") != null && ConfigHandler.getConfig("config.yml").getBoolean("xInventories") == true) {
+			ServerHandler.sendConsoleMessage("&aHooked into xInventories!");
+			hasxInventories = true;
+		} else if (ConfigHandler.getConfig("config.yml").getBoolean("xInventories") == true) {
+			ServerHandler.sendConsoleMessage("&4Could not find xInventories.");
+			hasxInventories = false;
 		}
 	}
 

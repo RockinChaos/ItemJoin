@@ -21,4 +21,22 @@ public class WorldHandler {
 		}
 		return InWorld;
 	}
+	
+	public static Boolean inGlobalWorld(String world) {
+		Boolean InWorld = false;
+		if (ConfigHandler.getConfig("config.yml").getString("enabled-worlds") != null) {
+			String worldlist = ConfigHandler.getConfig("config.yml").getString("enabled-worlds").replace(" ", "");
+			String[] compareWorlds = worldlist.split(",");
+			for (String compareWorld: compareWorlds) {
+				if (compareWorld.equalsIgnoreCase(world) 
+						|| compareWorld.equalsIgnoreCase("all") 
+						|| compareWorld.equalsIgnoreCase("global")) {
+					InWorld = true;
+				}
+			}
+		} else if (ConfigHandler.getConfig("config.yml").getString("enabled-worlds") == null) {
+			InWorld = true;
+		}
+		return InWorld;
+	}
 }

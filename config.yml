@@ -10,14 +10,27 @@ Log-Coloration: true
 Items-Permissions: true
 Debugging-Mode: false
 
+
 #// Global Settings for ItemJoin. //#
-Clear-Items: All
-Clear-On-Join: false
-Clear-On-WorldChanged: false
 Prevent-Pickups: false
 HeldItem-Slot: None
+
+
+#// Global Clear Items for ItemJoin. //#
+#// Set Clear-Items to ItemJoin or to All, ItemJoin clears only the ItemJoin items and All will clear all items. //#
+Clear-Items: ItemJoin
+Clear-On-Join: false
+Clear-On-WorldChanged: false
 AllowOPBypass: false
 CreativeBypass: false
+
+
+#// Global Commands for ItemJoin on join, these commands are executed by console. //#
+enabled-global-commands: false
+enabled-worlds: world, world_nether
+global-commands:
+  - 'itemjoin get <item> <player>'
+
 
 #// These are optional dependencies, only change these if you are looking to use them in conjunction with ItemJoin, changing the values will require a server restart. //#
 Vault: false
@@ -26,5 +39,7 @@ Multiverse-Core: false
 Multiverse-Inventories: false
 PerWorldInventory: false
 PerWorldPlugins: false
+xInventories: false
 WorldGuard: false
+MyWorlds: false
 AuthMe: false

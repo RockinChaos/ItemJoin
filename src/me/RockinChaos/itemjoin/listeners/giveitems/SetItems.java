@@ -66,12 +66,14 @@ public class SetItems {
 	}
 
 	public static void setClearingOfItems(Player player, String world, String clearOn) {
-		if (ConfigHandler.getConfig("config.yml").getBoolean(clearOn) == true && ConfigHandler.getConfig("config.yml").getString("Clear-Items").equalsIgnoreCase("All")) { // error codes //
-			if (ConfigHandler.getConfig("config.yml").getBoolean("AllowOPBypass") == true && player.isOp()) {} else {
+		if (ConfigHandler.getConfig("config.yml").getString(clearOn) != null && ConfigHandler.getConfig("config.yml").getBoolean(clearOn) == true 
+				&& ConfigHandler.getConfig("config.yml").getString("Clear-Items") != null && ConfigHandler.getConfig("config.yml").getString("Clear-Items").equalsIgnoreCase("All")) {
+			if (ConfigHandler.getConfig("config.yml").getString("AllowOPBypass") != null && ConfigHandler.getConfig("config.yml").getBoolean("AllowOPBypass") == true && player.isOp()) {} else {
 			setClearAllItems(player);
 			}
-		} else if (ConfigHandler.getConfig("config.yml").getBoolean(clearOn) == true && ConfigHandler.getConfig("config.yml").getString("Clear-Items").equalsIgnoreCase("ItemJoin")) {
-			if (ConfigHandler.getConfig("config.yml").getBoolean("AllowOPBypass") == true && player.isOp()) {} else {
+		} else if (ConfigHandler.getConfig("config.yml").getString(clearOn) != null && ConfigHandler.getConfig("config.yml").getBoolean(clearOn) == true 
+				&& ConfigHandler.getConfig("config.yml").getString("Clear-Items") != null && ConfigHandler.getConfig("config.yml").getString("Clear-Items").equalsIgnoreCase("ItemJoin")) {
+			if (ConfigHandler.getConfig("config.yml").getString("AllowOPBypass") != null && ConfigHandler.getConfig("config.yml").getBoolean("AllowOPBypass") == true && player.isOp()) {} else {
 			setClearItemJoinItems(player);
 			}
 		} else if (ConfigHandler.getConfig("config.yml").getBoolean(clearOn) == true) {

@@ -2,20 +2,18 @@ package me.RockinChaos.itemjoin.listeners;
 
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import org.bukkit.GameMode;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.player.PlayerPickupItemEvent;
 
-public class Pickups implements Listener {
+@SuppressWarnings("deprecation")
+public class Deprecated_Pickups implements Listener {
 
 	  @EventHandler
-	  public void onPickup(EntityPickupItemEvent event)
+	  public void Deprecated_onPickup(PlayerPickupItemEvent event)
 	   {
-		final Entity entity = event.getEntity();
-		if (entity instanceof Player) {
-		final Player player = (Player) event.getEntity();
+		final Player player = event.getPlayer();
 		boolean Creative = player.getGameMode() == GameMode.CREATIVE;
 	    if(ConfigHandler.getConfig("config.yml").getBoolean("Prevent-Pickups") == true) {
 	      if(ConfigHandler.getConfig("config.yml").getBoolean("AllowOPBypass") == true
@@ -26,6 +24,5 @@ public class Pickups implements Listener {
 	         event.setCancelled(true);
 	  	 }
 	 }
-	}
 }
 }
