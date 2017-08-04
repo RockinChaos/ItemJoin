@@ -11,12 +11,6 @@ import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.clip.placeholderapi.PlaceholderAPI;
 
 public class Utils {
-	public static boolean hasVault;
-	public static boolean hasMultiverse;
-	public static boolean hasInventories;
-	public static boolean hasPlaceholderAPI;
-	public static boolean hasPerWorldPlugins;
-	public static boolean hasPerWorldInventory;
 
 	public static String format(String name, Player player) {
 		String playerName = "ItemJoin";
@@ -25,8 +19,10 @@ public class Utils {
 		}
 		name = name.replace("%player%", playerName);
 		name = ChatColor.translateAlternateColorCodes('&', name).toString();
-		if (hasPlaceholderAPI == true) {
+		if (Hooks.hasPlaceholderAPI == true) {
+			try {
 			name = PlaceholderAPI.setPlaceholders(player, name);
+			} catch (NullPointerException ex) {}
 		}
 		return name;
 	}
