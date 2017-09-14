@@ -39,7 +39,7 @@ items:
       - '&7Great for Server promotions!'
     map-id: 1
     custom-map-image: 'default.png'
-    itemflags: inventory-modify, unbreakable, hide-attributes, death-drops, self-drops, CreativeBypass
+    itemflags: item-store, unbreakable, hide-attributes, death-drops, self-drops, CreativeBypass
     triggers: join, respawn, world-change
     permission-node: 'itemjoin.ultra'
     enabled-worlds: world, world_nether, world_the_end
@@ -66,7 +66,7 @@ items:
     commands-cost: 25
     commands-cooldown: 5
     cooldown-message: '&7[&eItemJoin&7] &a[%item%&a] &cis on cooldown for &a%timeleft% &cseconds..'
-    itemflags: death-drops, self-drops, disposable
+    itemflags: item-store, death-drops, self-drops, disposable
     triggers: join, respawn, world-change
     permission-node: 'itemjoin.token'
     enabled-worlds: world, world_nether, world_the_end

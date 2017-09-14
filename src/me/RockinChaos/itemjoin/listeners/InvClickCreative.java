@@ -34,10 +34,8 @@ public class InvClickCreative implements Listener {
 	public void onCreativeInventoryModify(InventoryClickEvent event) {
 		String itemflag = "inventory-modify";
 		final Player player = (Player) event.getWhoClicked();
-		GameMode gamemode = player.getGameMode();
-		GameMode creative = GameMode.CREATIVE;
 		Initialize(player);
-		if (gamemode == creative) {
+		if (PlayerHandler.isCreativeMode(player)) {
 			ItemStack item = null;
 			if (cooldown.get(player.getName()) == 1) {
 				cooldown.put(player.getName(), 1);
@@ -94,9 +92,7 @@ public class InvClickCreative implements Listener {
 	public static void setRunnable(final Player player) {
 		new BukkitRunnable() {
 			public void run() {
-				GameMode gamemode = player.getGameMode();
-				GameMode creative = GameMode.CREATIVE;
-				if (player.isOnline() && gamemode == creative && isCreative.get(player.getName()) == true) {
+				if (player.isOnline() && PlayerHandler.isCreativeMode(player) && isCreative.get(player.getName()) == true) {
 					saveInventory(player);
 				} else if (isCreative.get(player.getName()) != true) {
 					this.cancel();

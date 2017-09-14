@@ -37,8 +37,11 @@ public class ItemHandler {
 							}
 							ItemStack inStoredItems = CreateItems.items.get(world + "." + player.getName().toString() + ".items." + ItemID + item);
 							if (ItemHandler.isSimilar(inPlayerInventory, inStoredItems) && ItemHandler.containsIgnoreCase(ItemFlags, itemflag)) {
-								if (Utils.canBypass(player, ItemFlags)) {} else {
+								if (Utils.canBypass(player, ItemFlags)) {
+									break;
+								} else {
 									Allowed = false;
+									break;
 								}
 							}
 						}

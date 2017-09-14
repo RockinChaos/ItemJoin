@@ -1,6 +1,5 @@
 package me.RockinChaos.itemjoin.listeners;
 
-import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -17,9 +16,7 @@ public class InvClickSurvival implements Listener {
 	public void onSurvivalInventoryModify(InventoryClickEvent event) {
 		String itemflag = "inventory-modify";
 		final Player player = (Player) event.getWhoClicked();
-		GameMode gamemode = player.getGameMode();
-		GameMode creative = GameMode.CREATIVE;
-		if (gamemode != creative) {
+		if (!PlayerHandler.isCreativeMode(player)) {
 			ItemStack item = null;
 			if (!ServerHandler.hasViableUpdate()) {
 				PlayerHandler.updateInventory(player);

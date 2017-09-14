@@ -1,6 +1,7 @@
 package me.RockinChaos.itemjoin.handlers;
 
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -67,6 +68,16 @@ public class PlayerHandler {
 		if (ServerHandler.hasCombatUpdate()) {
 		player.getInventory().setItemInMainHand(toSet);
 		}
+	}
+	
+	public static boolean isCreativeMode(Player player) {
+		boolean isCreative = false;
+		final GameMode gamemode = player.getGameMode();
+		final GameMode creative = GameMode.CREATIVE;
+		if (gamemode == creative) {
+			isCreative = true;
+		}
+		return isCreative;
 	}
 	
 	@SuppressWarnings("deprecation")
