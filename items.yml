@@ -17,6 +17,7 @@ items:
       multi-click:
         - 'message: &eYou can send yourself custom messages!'
         - 'console: say You can even execute more than one command!'
+        - 'delay: 100'
         - 'player: say This is item slot 1'
         - 'say Hello world!'
     commands-type: interact, inventory

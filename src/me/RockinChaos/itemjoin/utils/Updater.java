@@ -90,7 +90,7 @@ public class Updater {
                  	    	 minValue = Double.parseDouble(this.version.replace("-SNAPSHOT", "").replace("-BETA", "").replace("-ALPHA", "").replace("-RELEASE", ""));
                 	       }
                 	       catch (NumberFormatException ex) {
-                	    	   sender.sendMessage(ServerHandler.StripLogColors(sender, Prefix + ChatColor.RED + "An error has occured when checking the plugin version!"));
+                	    	   sender.sendMessage(ServerHandler.StripLogColors(sender, Prefix + ChatColor.RED + "An error has occurred when checking the plugin version!"));
                 	    	   sender.sendMessage(ServerHandler.StripLogColors(sender, Prefix + ChatColor.RED + "Please contact the plugin developer!"));
                 	    	   sender.sendMessage(ServerHandler.StripLogColors(sender, Prefix + ChatColor.RED + "Error Code; C139018"));
                 	       }
@@ -166,7 +166,7 @@ public class Updater {
 						sender.sendMessage(ServerHandler.StripLogColors(sender, Prefix + ChatColor.GREEN + "has successfully been updated to v" +  checker.getVersion()));
 						sender.sendMessage(ServerHandler.StripLogColors(sender, Prefix + ChatColor.GREEN + "You must restart your server for this to take affect."));
 					} catch (IOException e) {
-						sender.sendMessage(ServerHandler.StripLogColors(sender, Prefix + ChatColor.RED + "An error has occured while trying to update the plugin ItemJoin."));
+						sender.sendMessage(ServerHandler.StripLogColors(sender, Prefix + ChatColor.RED + "An error has occurred while trying to update the plugin ItemJoin."));
 						sender.sendMessage(ServerHandler.StripLogColors(sender, Prefix + ChatColor.RED + "Please try again later, if you continue to see this please contact the plugin developer."));
 						e.printStackTrace();
 					}
@@ -200,7 +200,7 @@ public class Updater {
     	if (ItemJoin.pl.getConfig().getBoolean("CheckForUpdates") == true) {
     		sender.sendMessage(ServerHandler.StripLogColors(sender, Prefix + ChatColor.GREEN + "Checking for updates..."));
         try {
-            HttpURLConnection con = (HttpURLConnection) new URL("http://www.spigotmc.org/api/general.php").openConnection();
+            HttpURLConnection con = (HttpURLConnection) new URL("https://www.spigotmc.org/api/general.php").openConnection();
             con.setDoOutput(true);
             con.setRequestMethod("POST");
             con.getOutputStream().write(("key=98BE0FE67F88AB82B4C197FAF1DC3B69206EFDCC4D3B80FC83A00037510B99B4&resource=" + 12661).getBytes("UTF-8"));

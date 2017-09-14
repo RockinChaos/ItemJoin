@@ -14,6 +14,7 @@ import me.RockinChaos.itemjoin.listeners.InvClickSurvival;
 import me.RockinChaos.itemjoin.listeners.Pickups;
 import me.RockinChaos.itemjoin.listeners.Deprecated_Pickups;
 import me.RockinChaos.itemjoin.listeners.Placement;
+import me.RockinChaos.itemjoin.listeners.Storage;
 import me.RockinChaos.itemjoin.listeners.SwapHands;
 import me.RockinChaos.itemjoin.listeners.giveitems.PlayerJoin;
 import me.RockinChaos.itemjoin.listeners.giveitems.Respawn;
@@ -67,6 +68,7 @@ public class Hooks {
 		ItemJoin.pl.getServer().getPluginManager().registerEvents(new CancelInteract(), ItemJoin.pl);
 		ItemJoin.pl.getServer().getPluginManager().registerEvents(new Placement(), ItemJoin.pl);
 		ItemJoin.pl.getServer().getPluginManager().registerEvents(new ConsumeApples(), ItemJoin.pl);
+		ItemJoin.pl.getServer().getPluginManager().registerEvents(new Storage(), ItemJoin.pl);
 
 		if (ServerHandler.hasWorldOfColorUpdate() && getEventClass("entity.EntityPickupItemEvent") != null) {
 			ItemJoin.pl.getServer().getPluginManager().registerEvents(new Pickups(), ItemJoin.pl);

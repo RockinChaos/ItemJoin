@@ -39,9 +39,7 @@ public class setUnbreakable {
 			tag.getClass().getMethod("setInt", String.class, int.class).invoke(tag, "Unbreakable", 1);
 			nms.getClass().getMethod("setTag", tag.getClass()).invoke(nms, tag);
 			item = (ItemStack) craftItemStack.getMethod("asCraftMirror", nms.getClass()).invoke(null, nms);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		} catch (Exception e) {}
 		return item;
 	}
 }

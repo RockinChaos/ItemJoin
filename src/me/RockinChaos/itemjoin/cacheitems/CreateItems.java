@@ -128,7 +128,9 @@ public class CreateItems {
 	public static ItemStack setUnbreaking(ConfigurationSection items, ItemStack tempitem) {
 		String ItemFlags = items.getString(".itemflags");
 		if (ItemHandler.containsIgnoreCase(ItemFlags, "unbreakable")) {
+		  try {
 			tempitem = setUnbreakable.Unbreakable(tempitem);
+		  } catch (Exception e) {}
 		}
 		return tempitem;
 	}
@@ -147,7 +149,9 @@ public class CreateItems {
 		String ItemFlags = items.getString(".itemflags");
 		if (ItemHandler.containsIgnoreCase(ItemFlags, "hide-durability") || ItemHandler.containsIgnoreCase(ItemFlags, "hidedurability") 
 				|| ItemHandler.containsIgnoreCase(ItemFlags, "hide durability") || ItemHandler.containsIgnoreCase(ItemFlags, "durability")) {
-			tempitem = setUnbreakable.Unbreakable(tempitem);
+		  try {
+		 	tempitem = setUnbreakable.Unbreakable(tempitem);
+		  } catch (Exception e) {}
 		}
 		return tempitem;
 	}

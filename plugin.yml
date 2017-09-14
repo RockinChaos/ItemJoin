@@ -1,6 +1,6 @@
 name: ItemJoin
 main: me.RockinChaos.itemjoin.ItemJoin
-version: 4.4
+version: 4.5-SNAPSHOT
 author: RockinChaos
 commands:
    itemjoin:

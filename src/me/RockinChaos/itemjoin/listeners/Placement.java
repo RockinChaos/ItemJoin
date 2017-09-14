@@ -12,10 +12,12 @@ import me.RockinChaos.itemjoin.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -52,6 +54,40 @@ public class Placement implements Listener{
 			}
 		}
 	 
+		@EventHandler
+	    public void onItemFramePlace(PlayerInteractEntityEvent event) {
+	        if(event.getRightClicked() instanceof ItemFrame) {
+	    	    ItemStack item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().toString());
+	    	    final Player player = event.getPlayer();
+	    	    String itemflag = "placement";
+	    	      if (!ItemHandler.isAllowedItem(player, item, itemflag) && item.getType().isBlock())
+	    	      {
+	    	        event.setCancelled(true);
+	    	        PlayerHandler.updateInventory(player);
+	    	 }
+	        }
+	    }
+		
+		@EventHandler
+	    public void onItemFrameCountLock(PlayerInteractEntityEvent event) {
+	        if(event.getRightClicked() instanceof ItemFrame) {
+	    	    ItemStack item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().toString());
+	    	    final Player player = event.getPlayer();
+	    	    String itemflag = "count-lock";
+				GameMode gamemode = player.getGameMode();
+				GameMode creative = GameMode.CREATIVE;
+				String handString = "";
+				if (gamemode != creative) {
+					if (!ItemHandler.isAllowedItem(player, item, itemflag)) {
+						if (ServerHandler.hasCombatUpdate()) {
+							handString = event.getHand().toString();
+						}
+						reAddItem(player, item, handString, itemflag);
+					}
+				}
+	        }
+		}
+		
 	 public static void reAddItem(final Player player, final ItemStack inPlayerInventory, final String handString, final String type) 
 	  {
 	       if (Utils.isConfigurable()) {
