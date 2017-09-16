@@ -150,7 +150,7 @@
         <artifactId>worldguard</artifactId>
         <version>LATEST</version>
         </dependency>
-    <!--TokenEnchant API-->
+    <!--TokenEnchant Local API/Repo -->
         <dependency>
             <groupId>me.TokenEnchantAPI</groupId>
             <artifactId>TokenEnchantAPI</artifactId>
