@@ -14,10 +14,12 @@ public class WorldHandler {
 						|| compareWorld.equalsIgnoreCase("all") 
 						|| compareWorld.equalsIgnoreCase("global")) {
 					InWorld = true;
+					return InWorld;
 				}
 			}
 		} else if (items.getString(".enabled-worlds") == null) {
 			InWorld = true;
+			return InWorld;
 		}
 		return InWorld;
 	}
@@ -32,10 +34,12 @@ public class WorldHandler {
 						|| compareWorld.equalsIgnoreCase("all") 
 						|| compareWorld.equalsIgnoreCase("global")) {
 					InWorld = true;
+					return InWorld;
 				}
 			}
 		} else if (ConfigHandler.getConfig("config.yml").getString("enabled-worlds") == null) {
 			InWorld = true;
+			return InWorld;
 		}
 		return InWorld;
 	}

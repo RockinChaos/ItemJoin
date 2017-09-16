@@ -1,134 +1,226 @@
 name: ItemJoin
 main: me.RockinChaos.itemjoin.ItemJoin
-version: 4.5-SNAPSHOT
 author: RockinChaos
+version: 4.5-SNAPSHOT
+description: Get custom items on join.
+website: https://www.spigotmc.org/resources/itemjoin.12661/
+softdepend: [Vault, Multiverse, Multiverse-Inventories, xInventories, PlaceholderAPI, PerWorldPlugins, PerWorldInventory, AuthMe, MyWorlds, TokenEnchant, WorldGuard]
+
 commands:
    itemjoin:
-      description: Displays some options.
+      description: Displays a menu giving credit to the creator and the help menu command.
+      permission: itemjoin.use
       usage: |
           /itemjoin
    itemjoin help:
-      description: Displays some options.
+      description: Displays the first page of the available help menu.
+      permission: itemjoin.use
       usage: |
           /itemjoin help
+   itemjoin help 2:
+      description: Displays the second page of the available help menu.
+      permission: itemjoin.use
+      usage: |
+          /itemjoin help 2
+   itemjoin help 3:
+      description: Displays the third page of the available help menu.
+      permission: itemjoin.use
+      usage: |
+          /itemjoin help 3
+   itemjoin help 4:
+      description: Displays the fourth page of the available help menu.
+      permission: itemjoin.use
+      usage: |
+          /itemjoin help 4
    itemjoin reload:
-      description: Reloads the ItemJoin config.yml.
+      description: Reloads all ItemJoins configuration files and caches any new data.
+      permission: itemjoin.reload
       usage: |
           /itemjoin reload
    itemjoin updates:
-      description: Checks for updates.
+      description: Checks for updates that are available for the plugin.
+      permission: itemjoin.updates
       usage: |
           /itemjoin updates
-   itemjoin loaded:
-      description: Checks what worlds are loaded.
-      usage: |
-          /itemjoin loaded
    itemjoin permissions:
-      description: Checks what permissions you have.
+      description: Checks what permissions you have for ItemJoin.
+      permission: itemjoin.permissions
       usage: |
           /itemjoin permissions
    itemjoin permissions 2:
-      description: Checks what permissions you have.
+      description: Second page of checking what permissions you have for ItemJoin.
+      permission: itemjoin.permissions
       usage: |
           /itemjoin permissions 2
    itemjoin get <item>:
-      description: Gives you an itemjoin item.
+      description: Gives you the item you specified.
+      permission: itemjoin.get
       usage: |
           /itemjoin get <item>
+          Example: /itemjoin get Ultra - You have received the item [Ultra]!
    itemjoin get <item> <player>:
-      description: Gives that player an itemjoin item.
+      description: Gives you the item you specified to the player.
+      permission: itemjoin.get.others
       usage: |
           /itemjoin get <item> <player>
+          Example: /itemjoin get Ultra RockinChaos - You have given the item [Ultra] to RockinChaos!
    itemjoin remove <item>:
-      description: Removes that itemjoin item from your inventory.
+      description: Removes the item you specified from your inventory.
+      permission: itemjoin.remove
       usage: |
           /itemjoin remove <item>
+          Example: /itemjoin remove Ultra - You have removed the item [Ultra] from your inventory!
    itemjoin remove <item> <player>:
-      description: Removes that itemjoin item from the players inventory.
+      description: Removes the item you specified to the player.
+      permission: itemjoin.remove.others
       usage: |
           /itemjoin remove <item> <player>
+          Example: /itemjoin remove Ultra RockinChaos - You have removed the item [Ultra] to RockinChaos!
    itemjoin getall:
-      description: Gives you all itemjoin items.
+      description: Gives you all ItemJoin items.
+      permission: itemjoin.get
       usage: |
           /itemjoin getall
+           Example: /itemjoin getall - You have received all of the ItemJoin items.
    itemjoin getall <player>:
-      description: Gives that player all itemjoin items.
+      description: Gives the player all ItemJoin items.
+      permission: itemjoin.get.others
       usage: |
           /itemjoin getall <player>
+          Example: /itemjoin getall RockinChaos - You have given RockinChaos all of the ItemJoin items that are available.
    itemjoin removeall:
-      description: Removes all itemjoin items from your inventory.
+      description: Removes all ItemJoin items from your inventory.
+      permission: itemjoin.remove
       usage: |
           /itemjoin removeall
+          Example: /itemjoin removeall - You have removed all of the ItemJoin items from your inventory.
    itemjoin removeall <player>:
-      description: Removes all itemjoin items from the players inventory.
+      description: Removes all ItemJoin items from the players inventory.
+      permission: itemjoin.remove.others
       usage: |
           /itemjoin removeall <player>
+          Example: /itemjoin removeall RockinChaos - You have removed all of the ItemJoin items from RockinChaos.
    itemjoin world:
-      description: Checks what world you are in, for debugging purposes.
+      description: Checks what world you are in, useful for debugging purposes.
+      permission: itemjoin.use
       usage: |
           /itemjoin world
    itemjoin list:
-      description: Checks what items you can get each what world.
+      description: Checks what items you can get in each available world.
+      permission: itemjoin.list
       usage: |
           /itemjoin list
    itemjoin autoupdate:
-      description: Force updates ItemJoin
+      description: Force updates ItemJoin, will require a server restart.
+      permission: itemjoin.autoupdate
       usage: |
           /itemjoin autoupdate
    ij:
-      description: Displays some options.
+      description: Displays a menu giving credit to the creator and the help menu command.
+      permission: itemjoin.use
       usage: |
           /ij
    ij help:
-      description: Displays help options.
+      description: Displays the first page of the available help menu.
+      permission: itemjoin.use
       usage: |
           /ij help
+   ij help 2:
+      description: Displays the second page of the available help menu.
+      permission: itemjoin.use
+      usage: |
+          /ij help 2
+   ij help 3:
+      description: Displays the third page of the available help menu.
+      permission: itemjoin.use
+      usage: |
+          /ij help 3
+   ij help 4:
+      description: Displays the fourth page of the available help menu.
+      permission: itemjoin.use
+      usage: |
+          /ij help 4
    ij reload:
-      description: Reloads the ItemJoin config.yml
+      description: Reloads all ItemJoins configuration files and caches any new data.
+      permission: itemjoin.reload
       usage: |
           /ij reload
    ij updates:
-      description: Checks for updates.
+      description: Checks for updates that are available for the plugin.
+      permission: itemjoin.updates
       usage: |
           /ij updates
-   ij loaded:
-      description: Checks what worlds are loaded.
-      usage: |
-          /ij loaded
    ij permissions:
-      description: Checks what permissions you have.
+      description: Checks what permissions you have for ItemJoin.
+      permission: itemjoin.permissions
       usage: |
           /ij permissions
    ij permissions 2:
-      description: Checks what permissions you have.
+      description: Second page of checking what permissions you have for ItemJoin.
+      permission: itemjoin.permissions
       usage: |
           /ij permissions 2
    ij get <item>:
-      description: Gives you an itemjoin item.
+      description: Gives you the item you specified.
+      permission: itemjoin.get
       usage: |
           /ij get <item>
+          Example: /ij get Ultra - You have received the item [Ultra]!
    ij get <item> <player>:
-      description: Gives that player an itemjoin item.
+      description: Gives you the item you specified to the player.
+      permission: itemjoin.get.others
       usage: |
           /ij get <item> <player>
+          Example: /ij get Ultra RockinChaos - You have given the item [Ultra] to RockinChaos!
    ij remove <item>:
-      description: Removes that ij item from your inventory.
+      description: Removes the item you specified from your inventory.
+      permission: itemjoin.remove
       usage: |
           /ij remove <item>
+          Example: /ij remove Ultra - You have removed the item [Ultra] from your inventory!
    ij remove <item> <player>:
-      description: Removes that ij item from the players inventory.
+      description: Removes the item you specified to the player.
+      permission: itemjoin.remove.others
       usage: |
           /ij remove <item> <player>
+          Example: /ij remove Ultra RockinChaos - You have removed the item [Ultra] to RockinChaos!
+   ij getall:
+      description: Gives you all ItemJoin items.
+      permission: itemjoin.get
+      usage: |
+          /ij getall
+           Example: /ij getall - You have received all of the ItemJoin items.
+   ij getall <player>:
+      description: Gives the player all ItemJoin items.
+      permission: itemjoin.get.others
+      usage: |
+          /ij getall <player>
+          Example: /ij getall RockinChaos - You have given RockinChaos all of the ItemJoin items that are available.
+   ij removeall:
+      description: Removes all ItemJoin items from your inventory.
+      permission: itemjoin.remove
+      usage: |
+          /ij removeall
+          Example: /ij removeall - You have removed all of the ItemJoin items from your inventory.
+   ij removeall <player>:
+      description: Removes all ItemJoin items from the players inventory.
+      permission: itemjoin.remove.others
+      usage: |
+          /ij removeall <player>
+          Example: /ij removeall RockinChaos - You have removed all of the ItemJoin items from RockinChaos.
    ij world:
-      description: Checks what world you are in. For (debugging).
+      description: Checks what world you are in, useful for debugging purposes.
+      permission: itemjoin.use
       usage: |
           /ij world
    ij list:
-      description: Checks what items you can get each what world.
+      description: Checks what items you can get in each available world.
+      permission: itemjoin.list
       usage: |
           /ij list
    ij autoupdate:
-      description: Force updates ItemJoin
+      description: Force updates ItemJoin, will require a server restart.
+      permission: itemjoin.autoupdate
       usage: |
           /ij autoupdate
           
@@ -136,6 +228,24 @@ permissions:
    itemjoin.*:
       description: Allows use of all commands.
       default: false
+      children:
+          itemjoin.all: true
+   itemjoin.all:
+      description: Allows use of all commands.
+      default: false
+      children:
+          itemjoin.permissions: true
+          itemjoin.use: true
+          itemjoin.reload: true
+          itemjoin.updates: true
+          itemjoin.autoupdate: true
+          itemjoin.get: true
+          itemjoin.get.others: true
+          itemjoin.remove: true
+          itemjoin.remove.others: true
+          itemjoin.list: true
+          itemjoin.WorldName.Name: true
+          itemjoin.WorldName.*: true
    itemjoin.permissions:
       description: Use of the /itemjoin permissions commands.
       default: true

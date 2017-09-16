@@ -146,6 +146,7 @@ public class InvClickCreative implements Listener {
 		for (ItemStack inPlayerInventory: mySavedItems.get(player.getName())) {
 			if (cursorItem != null && ItemHandler.isSimilar(inPlayerInventory, cursorItem) && ItemHandler.isCountSimilar(inPlayerInventory, cursorItem)) {
 				hasItem = true;
+				return hasItem;
 			}
 		}
 		}

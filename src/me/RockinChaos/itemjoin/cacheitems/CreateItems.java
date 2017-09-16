@@ -22,6 +22,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.BookMeta.Generation;
+import org.bukkit.inventory.meta.FireworkEffectMeta;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
@@ -37,7 +38,10 @@ import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.handlers.WorldHandler;
 import me.RockinChaos.itemjoin.listeners.InvClickCreative;
+import me.RockinChaos.itemjoin.utils.Hooks;
 import me.RockinChaos.itemjoin.utils.Utils;
+
+import com.vk2gpz.tokenenchant.api.TokenEnchantAPI;
 
 public class CreateItems {
 	public static List < String > regions = new ArrayList < String > ();
@@ -63,7 +67,7 @@ public class CreateItems {
 							tempitem = setUnbreaking(items, tempitem);
 							tempitem = setDurability(items, tempitem);
 							tempitem = hideDurability(items, tempitem);
-							tempitem = setEnchantments(items, tempitem);
+							tempitem = setEnchantments(items, tempitem, player);
 							tempitem = setMapImage(tempitem, tempmat, item, player);
 							ItemMeta tempmeta = getTempMeta(items, tempitem);
 							tempmeta = setName(items, tempmeta, tempitem, player, ItemID);
@@ -72,6 +76,7 @@ public class CreateItems {
 							tempmeta = setPotionEffects(items, tempmat, tempmeta);
 							tempmeta = setTippedArrows(items, tempmeta, tempmat);
 							tempmeta = setFireworks(items, tempmeta, tempmat);
+							tempmeta = setFireChargeColor(items, tempmeta, tempmat);
 							tempmeta = setDye(items, tempmeta, tempmat);
 							tempmeta = setBookAuthor(items, tempmeta, tempmat, player);
 							tempmeta = setBookTitle(items, tempmeta, tempmat, player);
@@ -262,6 +267,14 @@ public class CreateItems {
 		}
 		return tempmeta;
 	}
+	
+	public static ItemMeta setFireChargeColor(ConfigurationSection items, ItemMeta tempmeta, Material tempmat) {
+		if (tempmat == Material.FIREWORK_CHARGE && items.getString(".charge-color") != null) {
+				String color = items.getString(".charge-color").toUpperCase();
+                ((FireworkEffectMeta) tempmeta).setEffect(FireworkEffect.builder().withColor(DyeColor.valueOf(color).getColor()).build());
+		}
+		return tempmeta;
+	}
 
 	public static ItemMeta setDye(ConfigurationSection items, ItemMeta tempmeta, Material tempmat) {
 		if (tempmat == Material.LEATHER_HELMET || tempmat == Material.LEATHER_CHESTPLATE 
@@ -373,7 +386,7 @@ public class CreateItems {
 		return tempmeta;
 	}
 
-	public static ItemStack setEnchantments(ConfigurationSection items, ItemStack tempitem) {
+	public static ItemStack setEnchantments(ConfigurationSection items, ItemStack tempitem, Player player) {
 		if (items.getString(".enchantment") != null) {
 			String enchantlist = items.getString(".enchantment").replace(" ", "");
 			String[] enchantments = enchantlist.split(",");
@@ -381,6 +394,7 @@ public class CreateItems {
 				String[] parts = enchantment.split(":");
 				String name = parts[0].toUpperCase();
 				int level = 1;
+				Enchantment enchantName = Enchantment.getByName(name);
 				if (ItemHandler.containsIgnoreCase(enchantment, ":")) {
 					try {
 						level = Integer.parseInt(parts[1]);
@@ -389,9 +403,11 @@ public class CreateItems {
 						ServerHandler.sendConsoleMessage("&aEnchantment: " + parts[0] + " will now be enchanted by level 1.");
 					}
 				}
-				if (Enchantment.getByName(name) != null) {
-					tempitem.addUnsafeEnchantment(Enchantment.getByName(name), level);
-				} else if (Enchantment.getByName(name) == null) {
+				if (enchantName == null && Hooks.hasTokenEnchant() == true && TokenEnchantAPI.getInstance().getEnchant(name) != null) {
+					TokenEnchantAPI.getInstance().enchant(player, tempitem, name, level, true, 0, true);
+				} else if (enchantName != null) {
+					tempitem.addUnsafeEnchantment(enchantName, level);
+				} else if (enchantName == null && Hooks.hasTokenEnchant() != true) {
 					ServerHandler.sendConsoleMessage("&4An error occurred in the config, &a" + name + "&4 is an incorrect enchantment name!");
 					ServerHandler.sendConsoleMessage("&4Please see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/enchantments/Enchantment.html for a list of correct enchantment names!");
 				}

@@ -234,7 +234,7 @@ public class CommandHandler {
 
 	public static boolean isChargeable(ConfigurationSection items) {
 		boolean isChargeable = false;
-		if (items.getString(".commands-cost") != null && Econ.isVaultAPI() && Hooks.hasVault == true) {
+		if (items.getString(".commands-cost") != null && Econ.isVaultAPI() && Hooks.hasVault() == true) {
 			isChargeable = true;
 		}
 		return isChargeable;

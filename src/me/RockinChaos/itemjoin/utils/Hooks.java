@@ -22,16 +22,17 @@ import me.RockinChaos.itemjoin.listeners.giveitems.RegionEnter;
 import me.RockinChaos.itemjoin.listeners.giveitems.WorldChange;
 
 public class Hooks {
-	public static boolean hasVault;
-	public static boolean hasMultiverse;
-	public static boolean hasInventories;
-	public static boolean hasPlaceholderAPI;
-	public static boolean hasPerWorldPlugins;
-	public static boolean hasPerWorldInventory;
-	public static boolean hasAuthMe;
-	public static boolean hasMyWorlds;
-	public static boolean hasxInventories;
-	public static boolean hasWorldGuard;
+	private static boolean hasVault;
+	private static boolean hasMultiverse;
+	private static boolean hasInventories;
+	private static boolean hasPlaceholderAPI;
+	private static boolean hasPerWorldPlugins;
+	private static boolean hasPerWorldInventory;
+	private static boolean hasAuthMe;
+	private static boolean hasMyWorlds;
+	private static boolean hasxInventories;
+	private static boolean hasTokenEnchant;
+	private static boolean hasWorldGuard;
 
 	public static void getHooks() {
 		hookVault();
@@ -44,6 +45,52 @@ public class Hooks {
 		hookWorldGuard();
 		hookMyWorlds();
 		hookxInventories();
+		hookTokenEnchant();
+	}
+	
+	public static boolean hasVault() {
+		return hasVault;
+	}
+	
+	public static boolean hasMultiverse() {
+		return hasMultiverse;
+	}
+	
+	public static boolean hasInventories() {
+		return hasInventories;
+	}
+	
+	public static boolean hasPlaceholderAPI() {
+		return hasPlaceholderAPI;
+	}
+	
+	
+	public static boolean hasPerWorldPlugins() {
+		return hasPerWorldPlugins;
+	}
+	
+	public static boolean hasPerWorldInventory() {
+		return hasPerWorldInventory;
+	}
+	
+	public static boolean hasAuthMe() {
+		return hasAuthMe;
+	}
+	
+	public static boolean hasMyWorlds() {
+		return hasMyWorlds;
+	}
+	
+	public static boolean hasxInventories() {
+		return hasxInventories;
+	}
+	
+	public static boolean hasTokenEnchant() {
+		return hasTokenEnchant;
+	}
+	
+	public static boolean hasWorldGuard() {
+		return hasWorldGuard;
 	}
 	
 	private static Class<?> getEventClass(String name) {
@@ -102,6 +149,16 @@ public class Hooks {
 		} else if (ConfigHandler.getConfig("config.yml").getBoolean("xInventories") == true) {
 			ServerHandler.sendConsoleMessage("&4Could not find xInventories.");
 			hasxInventories = false;
+		}
+	}
+	
+	public static void hookTokenEnchant() {
+		if (Bukkit.getServer().getPluginManager().getPlugin("TokenEnchant") != null && ConfigHandler.getConfig("config.yml").getBoolean("TokenEnchant") == true) {
+			ServerHandler.sendConsoleMessage("&aHooked into TokenEnchant!");
+			hasTokenEnchant = true;
+		} else if (ConfigHandler.getConfig("config.yml").getBoolean("TokenEnchant") == true) {
+			ServerHandler.sendConsoleMessage("&4Could not find TokenEnchant.");
+			hasTokenEnchant = false;
 		}
 	}
 

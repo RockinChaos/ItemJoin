@@ -19,7 +19,7 @@ public class Utils {
 		}
 		name = name.replace("%player%", playerName);
 		name = ChatColor.translateAlternateColorCodes('&', name).toString();
-		if (Hooks.hasPlaceholderAPI == true) {
+		if (Hooks.hasPlaceholderAPI() == true) {
 			try {
 			name = PlaceholderAPI.setPlaceholders(player, name);
 			} catch (NullPointerException ex) {}

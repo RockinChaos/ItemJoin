@@ -171,6 +171,11 @@ public class Commands implements CommandExecutor {
 					} else {
 						ServerHandler.sendCommandsMessage(sender, "&c[\u2718] ItemJoin.*");
 					}
+					if (sender.hasPermission("itemjoin.all")) {
+						ServerHandler.sendCommandsMessage(sender, "&a[\u2714] ItemJoin.All");
+					} else {
+						ServerHandler.sendCommandsMessage(sender, "&c[\u2718] ItemJoin.All");
+					}
 					if (sender.hasPermission("itemjoin.use")) {
 						ServerHandler.sendCommandsMessage(sender, "&a[\u2714] ItemJoin.Use");
 					} else {

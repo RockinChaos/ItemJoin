@@ -31,7 +31,7 @@ public class RegionEnter implements Listener {
 	@EventHandler
 	public void giveOnRegionEnter(PlayerMoveEvent event) {
 		final Player player = event.getPlayer();
-		if (Hooks.hasWorldGuard == true) {
+		if (Hooks.hasWorldGuard() == true) {
 				if (!isInRegion(player) && isInRegion.get(player) != null) {
 					isInRegion.remove(player);
 					long delay = ConfigHandler.getConfig("items.yml").getInt("items-Delay") * 10L;

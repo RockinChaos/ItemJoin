@@ -132,11 +132,13 @@ public class ItemHandler {
 		for (ItemStack inPlayerInventory: player.getInventory().getContents()) {
 			if (isSimilar(inPlayerInventory, inStoredItems) && isCountSimilar(inPlayerInventory, inStoredItems)) {
 				hasItem = true;
+				break;
 			}
 		}
 		for (ItemStack inPlayerInventory: player.getEquipment().getArmorContents()) {
 			if (isSimilar(inPlayerInventory, inStoredItems) && isCountSimilar(inPlayerInventory, inStoredItems)) {
 				hasItem = true;
+				break;
 			}
 		}
 		if (ServerHandler.hasCombatUpdate() 

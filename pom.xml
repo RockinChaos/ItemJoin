@@ -150,6 +150,14 @@
         <artifactId>worldguard</artifactId>
         <version>LATEST</version>
         </dependency>
+    <!--TokenEnchant API-->
+        <dependency>
+            <groupId>me.TokenEnchantAPI</groupId>
+            <artifactId>TokenEnchantAPI</artifactId>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/me/RockinChaos/itemjoin/extra/TokenEnchantAPI.jar</systemPath>
+            <version>LATEST</version>
+        </dependency>
 	</dependencies>
 	<scm>
 		<url>https://github.com/RockinChaos/ItemJoin</url>

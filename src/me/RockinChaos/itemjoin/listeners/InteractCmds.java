@@ -52,6 +52,7 @@ public class InteractCmds implements Listener {
 								if (!CommandHandler.onCooldown(items, player, item, item1)) {
 									CommandHandler.chargePlayer(items, item, player, action);
 									CommandHandler.removeDisposable(items, item1, player);
+									break;
 								}
 							}
 						}
