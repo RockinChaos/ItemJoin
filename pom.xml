@@ -155,7 +155,7 @@
             <groupId>me.TokenEnchantAPI</groupId>
             <artifactId>TokenEnchantAPI</artifactId>
             <scope>system</scope>
-            <systemPath>${project.basedir}/src/me/RockinChaos/itemjoin/extra/TokenEnchantAPI.jar</systemPath>
+            <systemPath>${pom.basedir}/src/me/RockinChaos/itemjoin/extra/TokenEnchantAPI.jar</systemPath>
             <version>LATEST</version>
         </dependency>
 	</dependencies>
