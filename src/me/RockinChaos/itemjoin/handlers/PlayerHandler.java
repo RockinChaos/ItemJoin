@@ -14,7 +14,7 @@ public class PlayerHandler {
 
 	@SuppressWarnings("deprecation")
 	public static void updateInventory(final Player player) {
-        Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.pl, (Runnable)new Runnable() {
+        Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), (Runnable)new Runnable() {
             public void run() {
                 player.updateInventory();
             }
@@ -23,7 +23,7 @@ public class PlayerHandler {
 	
 	@SuppressWarnings("deprecation")
 	public static void delayUpdateInventory(final Player player, final long delay) {
-        Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.pl, (Runnable)new Runnable() {
+        Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), (Runnable)new Runnable() {
             public void run() {
                 player.updateInventory();
             }

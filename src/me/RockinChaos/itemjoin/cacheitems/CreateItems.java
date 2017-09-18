@@ -2,6 +2,7 @@ package me.RockinChaos.itemjoin.cacheitems;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -38,18 +39,17 @@ import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.handlers.WorldHandler;
 import me.RockinChaos.itemjoin.listeners.InvClickCreative;
+import me.RockinChaos.itemjoin.listeners.giveitems.RegionEnter;
 import me.RockinChaos.itemjoin.utils.Hooks;
 import me.RockinChaos.itemjoin.utils.Utils;
-
 import com.vk2gpz.tokenenchant.api.TokenEnchantAPI;
 
 public class CreateItems {
-	public static List < String > regions = new ArrayList < String > ();
 	public static Map < String, ItemStack > items = new HashMap < String, ItemStack > ();
 
 	public static void run(Player player) {
 		CreateItems.items.remove(player.getWorld().getName() + "." + player.getName().toString() + ".items.");
-		CreateItems.regions.clear();
+		RegionEnter.resetRegions();
 		RenderImageMaps.clearMaps(player);
 		if (Utils.isConfigurable()) {
 			for (String item: ConfigHandler.getConfigurationSection().getKeys(false)) {
@@ -69,6 +69,11 @@ public class CreateItems {
 							tempitem = hideDurability(items, tempitem);
 							tempitem = setEnchantments(items, tempitem, player);
 							tempitem = setMapImage(tempitem, tempmat, item, player);
+							
+							// Disabled until a future update, (Testing Purposes).
+							//tempitem = setNBTData(tempitem); (Apparently is similar works and you wont need a check for getting the nbt data only need to set it.) (Fix skulls though)
+							// New method to setting data to an item to identify that its an ItemJoin item.
+							
 							ItemMeta tempmeta = getTempMeta(items, tempitem);
 							tempmeta = setName(items, tempmeta, tempitem, player, ItemID);
 							tempmeta = setLore(items, tempmeta, player);
@@ -84,6 +89,11 @@ public class CreateItems {
 							tempmeta = setBookPages(items, tempmeta, tempmat, player);
 							tempmeta = hideAttributes(items, tempmeta);
 							tempitem.setItemMeta(tempmeta);
+							
+							// Disabled until a future update, (Testing Purposes).
+							//getNBTData(tempitem); (Apparently is similar works and you wont need a check for getting the nbt data only need to set it.) (Fix skulls though)
+							// Grabs the NBTData to check if its an ItemJoin item.
+							
 							setRegions(items);
 							for (World world: Bukkit.getServer().getWorlds()) {
 								if (WorldHandler.inWorld(items, world.getName())) {
@@ -123,8 +133,8 @@ public class CreateItems {
 			String regionlist = items.getString(".enabled-regions").replace(" ", "");
 			String[] regions = regionlist.split(",");
 			for (String region: regions) {
-				if (CreateItems.regions != null && !CreateItems.regions.contains(region) || CreateItems.regions == null) {
-					CreateItems.regions.add(region);
+				if (RegionEnter.getRegions() != null && !RegionEnter.getRegions().contains(region) || RegionEnter.getRegions() == null) {
+					RegionEnter.saveRegion(region);
 				}
 			}
 		}
@@ -138,6 +148,46 @@ public class CreateItems {
 		  } catch (Exception e) {}
 		}
 		return tempitem;
+	}
+	
+	public static ItemStack setNBTData(ItemStack tempitem) {
+		try {
+		Class<?> craftItemStack = setUnbreakable.getOBC("inventory.CraftItemStack");
+		Class<?> nmsItemStackClass = setUnbreakable.getNMS("ItemStack");
+		Method getNMSI = craftItemStack.getMethod("asNMSCopy", ItemStack.class);
+		Object nms = getNMSI.invoke(null, tempitem);
+		Object tag = setUnbreakable.getNMS("NBTTagCompound").getConstructor().newInstance();
+		Object cacheTag = nmsItemStackClass.getMethod("getTag").invoke(nms);
+		if (cacheTag != null) {
+			cacheTag.getClass().getMethod("setString", String.class, String.class).invoke(cacheTag, "ItemJoin", "This is an ItemJoin item.");
+			tempitem = (ItemStack) craftItemStack.getMethod("asCraftMirror", nms.getClass()).invoke(null, nms);
+		} else {
+		tag.getClass().getMethod("setString", String.class, String.class).invoke(tag, "ItemJoin", "This is an ItemJoin item.");
+		nms.getClass().getMethod("setTag", tag.getClass()).invoke(nms, tag);
+		tempitem = (ItemStack) craftItemStack.getMethod("asCraftMirror", nms.getClass()).invoke(null, nms);
+		}
+		} catch (Exception e) { // REMOVE LATER //
+			ServerHandler.sendConsoleMessage("failure");
+			e.printStackTrace();
+		}
+		return tempitem;
+	}
+	
+	public static void getNBTData(ItemStack tempitem) {
+		try {
+		Class<?> craftItemStack = setUnbreakable.getOBC("inventory.CraftItemStack");
+		Class<?> nmsItemStackClass = setUnbreakable.getNMS("ItemStack");
+		Method getNMSI = craftItemStack.getMethod("asNMSCopy", ItemStack.class);
+		Object nms = getNMSI.invoke(null, tempitem);
+		Object cacheTag = nmsItemStackClass.getMethod("getTag").invoke(nms);
+		if (cacheTag != null && cacheTag.getClass().getMethod("getString", String.class).invoke(cacheTag, "ItemJoin") != null 
+				&& cacheTag.getClass().getMethod("getString", String.class).invoke(cacheTag, "ItemJoin").equals("This is an ItemJoin item."))  {
+			ServerHandler.sendConsoleMessage("Passed!!!");
+		} 
+		} catch (Exception e) { // REMOVE LATER //
+			ServerHandler.sendConsoleMessage("failure");
+			e.printStackTrace();
+		}
 	}
 
 	public static ItemStack setDurability(ConfigurationSection items, ItemStack tempitem) {
@@ -165,10 +215,10 @@ public class CreateItems {
 		if (items.getString(".name") != null) {
 			String name = items.getString(".name");
 			name = Utils.format("&r" + name, player);
-			tempmeta.setDisplayName(name + ConfigHandler.encodeSecretData(ConfigHandler.secretMsg + ItemID));
+			tempmeta.setDisplayName(name + ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + ItemID));
 		} else {
 			String lookup = ItemHandler.getName(tempitem);
-			String name = Utils.format("&r" + lookup + ConfigHandler.encodeSecretData(ConfigHandler.secretMsg + ItemID), player);
+			String name = Utils.format("&r" + lookup + ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + ItemID), player);
 			tempmeta.setDisplayName(name);
 		}
 		return tempmeta;
@@ -211,7 +261,7 @@ public class CreateItems {
 
 	public static ItemMeta setTippedArrows(ConfigurationSection items, ItemMeta tempmeta, Material tempmat) {
 		if (items.getString(".potion-effect") != null) {
-			if (ServerHandler.hasCombatUpdate() && !ItemJoin.pl.getServer().getVersion().contains("(MC: 1.9)") && tempmat == Material.getMaterial("TIPPED_ARROW")) {
+			if (ServerHandler.hasCombatUpdate() && !ItemJoin.getInstance().getServer().getVersion().contains("(MC: 1.9)") && tempmat == Material.getMaterial("TIPPED_ARROW")) {
 				String effectlist = items.getString(".potion-effect").replace(" ", "");
 				String[] effects = effectlist.split(",");
 				for (String effect: effects) {
@@ -432,7 +482,7 @@ public class CreateItems {
 			tempitem.setDurability((short) mapID);
 			MapView view = RenderImageMaps.MapView(player, mapID);
 			String mapIMG = items.getString(".custom-map-image");
-			if (mapIMG.equalsIgnoreCase("default.png") || new File(ItemJoin.pl.getDataFolder(), mapIMG).exists()) {
+			if (mapIMG.equalsIgnoreCase("default.png") || new File(ItemJoin.getInstance().getDataFolder(), mapIMG).exists()) {
 				RenderImageMaps.setImage(mapIMG, mapID);
 				try {
 					view.removeRenderer(view.getRenderers().get(0));
@@ -449,7 +499,7 @@ public class CreateItems {
 		Boolean isCompatible = false;
 		ConfigurationSection items = ConfigHandler.getItemSection(item);
 		String id = items.getString(".id");
-		String pkgname = ItemJoin.pl.getServer().getClass().getPackage().getName();
+		String pkgname = ItemJoin.getInstance().getServer().getClass().getPackage().getName();
 		String vers = pkgname.substring(pkgname.lastIndexOf('.') + 1);
 		if (!ServerHandler.hasCombatUpdate()) {
 			if (slot.equalsIgnoreCase("Offhand")) {
@@ -511,7 +561,7 @@ public class CreateItems {
 		} else if (isComparable(items, "LEATHER_HELMET") || isComparable(items, "LEATHER_CHESTPLATE") 
 				|| isComparable(items, "LEATHER_LEGGINGS") || isComparable(items, "LEATHER_BOOTS")) {
 			TempMeta = (LeatherArmorMeta) tempitem.getItemMeta();
-		} else if (ServerHandler.hasCombatUpdate() && !ItemJoin.pl.getServer().getVersion().contains("(MC: 1.9)") 
+		} else if (ServerHandler.hasCombatUpdate() && !ItemJoin.getInstance().getServer().getVersion().contains("(MC: 1.9)") 
 				&& isComparable(items, "TIPPED_ARROW")) {
 			TempMeta = (PotionMeta) tempitem.getItemMeta();
 		} else if (isComparable(items, "POTION") || ServerHandler.hasCombatUpdate() && isComparable(items, "SPLASH_POTION") 

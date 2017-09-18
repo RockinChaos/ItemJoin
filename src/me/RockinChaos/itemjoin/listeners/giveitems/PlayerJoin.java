@@ -26,8 +26,8 @@ public class PlayerJoin implements Listener {
 	@EventHandler
 	public void giveOnJoin(PlayerJoinEvent event) {
 		final Player player = event.getPlayer();
-		if(RegionEnter.isInRegion.get(player) != null) {
-		RegionEnter.isInRegion.remove(player);
+		if(RegionEnter.getInRegion().get(player) != null) {
+		RegionEnter.removeInRegion(player);
 		}
 		if (Hooks.hasAuthMe() == true) {
 			runAuthMeStats(player);
@@ -45,7 +45,7 @@ public class PlayerJoin implements Listener {
 					this.cancel();
 				}
 			}
-		}.runTaskTimer(ItemJoin.pl, 0, 20);
+		}.runTaskTimer(ItemJoin.getInstance(), 0, 20);
 	}
 	
 	public static void setItems(final Player player) {
@@ -55,18 +55,18 @@ public class PlayerJoin implements Listener {
 		SetItems.setClearingOfItems(player, player.getWorld().getName(), "Clear-On-Join");
 		SetItems.setHeldItemSlot(player);
 		CommandHandler.runGlobalCmds(player);
-		SetItems.failCount.put(player, 0);
-		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.pl, new Runnable() {
+		SetItems.putFailCount(player, 0);
+		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
 			public void run() {
 				setJoinItems(player);
-				if (SetItems.failCount.get(player) != 0) {
+				if (SetItems.getFailCount().get(player) != 0) {
 					boolean Overwrite = ConfigHandler.getConfig("items.yml").getBoolean("items-Overwrite");
 					if (Overwrite == true) {
-						Language.getSendMessage(player, "failedInvFull", SetItems.failCount.get(player).toString());
+						Language.getSendMessage(player, "failedInvFull", SetItems.getFailCount().get(player).toString());
 					} else if (Overwrite == false) {
-						Language.getSendMessage(player, "failedOverwrite", SetItems.failCount.get(player).toString());
+						Language.getSendMessage(player, "failedOverwrite", SetItems.getFailCount().get(player).toString());
 						}
-					SetItems.failCount.remove(player);
+					SetItems.removeFailCount(player);
 				}
 				PlayerHandler.delayUpdateInventory(player, 15L);
 			}

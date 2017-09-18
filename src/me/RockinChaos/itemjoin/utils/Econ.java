@@ -10,19 +10,19 @@ public class Econ {
     public static Economy econ = null;
     
 	public static void enableEconomy () { 
-		if (ConfigHandler.getConfig("config.yml").getBoolean("Vault") == true && ItemJoin.pl.getServer().getPluginManager().getPlugin("Vault") != null) {
+		if (ConfigHandler.getConfig("config.yml").getBoolean("Vault") == true && ItemJoin.getInstance().getServer().getPluginManager().getPlugin("Vault") != null) {
 	      if (!setupEconomy() ) {
-	          ItemJoin.pl.getServer().getPluginManager().disablePlugin(ItemJoin.pl);
+	          ItemJoin.getInstance().getServer().getPluginManager().disablePlugin(ItemJoin.getInstance());
 	          return;
 	      }
 		}
 	 }
 
     private static boolean setupEconomy() {
-        if (ItemJoin.pl.getServer().getPluginManager().getPlugin("Vault") == null) {
+        if (ItemJoin.getInstance().getServer().getPluginManager().getPlugin("Vault") == null) {
             return false;
         }
-        RegisteredServiceProvider<Economy> rsp = ItemJoin.pl.getServer().getServicesManager().getRegistration(Economy.class);
+        RegisteredServiceProvider<Economy> rsp = ItemJoin.getInstance().getServer().getServicesManager().getRegistration(Economy.class);
         if (rsp == null) {
             return false;
         }
@@ -32,8 +32,8 @@ public class Econ {
     
 	   public static boolean isVaultAPI() {
 		   boolean hasVaultAPI = false;
-			  if (ItemJoin.pl.getServer().getPluginManager().getPlugin("Vault") != null 
-					  && ItemJoin.pl.getConfig().getBoolean("Vault") == true) {
+			  if (ItemJoin.getInstance().getServer().getPluginManager().getPlugin("Vault") != null 
+					  && ItemJoin.getInstance().getConfig().getBoolean("Vault") == true) {
 				  hasVaultAPI = true;
 				 }
 			return hasVaultAPI;

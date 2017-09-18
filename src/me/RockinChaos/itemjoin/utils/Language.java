@@ -8,11 +8,11 @@ import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 
 public class Language {
-	public static CommandSender argsplayer;
+	private static CommandSender argsplayer;
 
 	public static void getSendMessage(CommandSender sender, String MessageType, String ReplacementText) {
-		if (ItemJoin.pl.getConfig().getString("Language") != null 
-				&& ItemJoin.pl.getConfig().getString("Language").equalsIgnoreCase("English")) {
+		if (ItemJoin.getInstance().getConfig().getString("Language") != null 
+				&& ItemJoin.getInstance().getConfig().getString("Language").equalsIgnoreCase("English")) {
 			sendEnglishMessage(sender, MessageType, ReplacementText);
 		}
 	}
@@ -21,7 +21,7 @@ public class Language {
 	public static void sendEnglishMessage(CommandSender sender, String MessageType, String ReplacementText) {
 		Player player;
 		if(sender.toString().contains("ConsoleSender")) {
-			player = ItemJoin.pl.getServer().getPlayer("Console");
+			player = ItemJoin.getInstance().getServer().getPlayer("Console");
 		} else {
 			player = (Player) sender;
 		}
@@ -58,5 +58,13 @@ public class Language {
 			ServerHandler.sendCommandsMessage(sender, Prefix + sendMessage);
 		}
 		}
+	}
+	
+	public static CommandSender getArgsPlayer() {
+		return argsplayer;
+	}
+	
+	public static void setArgsPlayer(CommandSender info) {
+		argsplayer = info;
 	}
 }

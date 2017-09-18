@@ -9,7 +9,7 @@ import org.bukkit.inventory.ItemStack;
 public class setUnbreakable {
 
 	public static String getServerVersion() {
-		return ItemJoin.pl.getServer().getClass().getPackage().getName().substring(23);
+		return ItemJoin.getInstance().getServer().getClass().getPackage().getName().substring(23);
 	}
 
 	public static Class<?> getOBC(String name) {

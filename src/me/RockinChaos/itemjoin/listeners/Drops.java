@@ -26,7 +26,7 @@ public class Drops implements Listener {
 	      if (!ItemHandler.isAllowedItem(player, item, itemflag))
 	      {
 	        event.setCancelled(true);
-	        Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.pl, new Runnable()
+	        Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable()
 	        {
 	        public void run()
 	          {

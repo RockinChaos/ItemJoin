@@ -50,7 +50,7 @@ public class InvClickCreative implements Listener {
 				}
 					ItemStack readd = new ItemStack(event.getCursor());
 					restoreInventory(player, readd);
-					PlayerHandler.updateInventory(player);
+					PlayerHandler.delayUpdateInventory(player, 5L);
 			} else if (cooldown.get(player.getName()) != 1) {
 				if (ItemHandler.containsIgnoreCase(event.getAction().name(), "HOTBAR")) {
 					item = event.getView().getBottomInventory().getItem(event.getHotbarButton());
@@ -83,7 +83,7 @@ public class InvClickCreative implements Listener {
 					}
 						ItemStack readd = new ItemStack(event.getCursor());
 						restoreInventory(player, readd);
-						PlayerHandler.updateInventory(player);
+						PlayerHandler.delayUpdateInventory(player, 5L);
 				}
 			}
 		}
@@ -101,7 +101,7 @@ public class InvClickCreative implements Listener {
 					this.cancel();
 				}
 			}
-		}.runTaskTimerAsynchronously(ItemJoin.pl, 20L, 20L);
+		}.runTaskTimerAsynchronously(ItemJoin.getInstance(), 20L, 20L);
 	}
 
 	public static void Initialize(Player player) {
@@ -154,7 +154,7 @@ public class InvClickCreative implements Listener {
 	}
 
 	public static void saveInventory(final Player player) {
-		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.pl, new Runnable() {
+		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
 			public void run() {
 				if (hasItems(player) && cooldown.get(player.getName()) != 1) {
 					mySavedItems.put(player.getName(), player.getInventory().getContents());
@@ -165,7 +165,7 @@ public class InvClickCreative implements Listener {
 
 	private static void restoreInventory(final Player player, final ItemStack readd) {
 		if (mySavedItems.get(player.getName()) != null) {
-			Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.pl, (Runnable) new Runnable() {
+			Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), (Runnable) new Runnable() {
 				public void run() {
 					player.closeInventory();
 					player.getInventory().setContents(mySavedItems.get(player.getName()));

@@ -103,32 +103,32 @@ public class Hooks {
 	}
 
 	public static void getRegisters() {
-	    ItemJoin.pl.getCommand("itemjoin").setExecutor(new Commands());
-		ItemJoin.pl.getCommand("ij").setExecutor(new Commands());
-		ItemJoin.pl.getServer().getPluginManager().registerEvents(new PlayerJoin(), ItemJoin.pl);
-		ItemJoin.pl.getServer().getPluginManager().registerEvents(new WorldChange(), ItemJoin.pl);
-		ItemJoin.pl.getServer().getPluginManager().registerEvents(new Respawn(), ItemJoin.pl);
-		ItemJoin.pl.getServer().getPluginManager().registerEvents(new InvClickSurvival(), ItemJoin.pl);
-		ItemJoin.pl.getServer().getPluginManager().registerEvents(new InvClickCreative(), ItemJoin.pl);
-		ItemJoin.pl.getServer().getPluginManager().registerEvents(new Drops(), ItemJoin.pl);
-		ItemJoin.pl.getServer().getPluginManager().registerEvents(new InteractCmds(), ItemJoin.pl);
-		ItemJoin.pl.getServer().getPluginManager().registerEvents(new CancelInteract(), ItemJoin.pl);
-		ItemJoin.pl.getServer().getPluginManager().registerEvents(new Placement(), ItemJoin.pl);
-		ItemJoin.pl.getServer().getPluginManager().registerEvents(new ConsumeApples(), ItemJoin.pl);
-		ItemJoin.pl.getServer().getPluginManager().registerEvents(new ItemStore(), ItemJoin.pl);
+	    ItemJoin.getInstance().getCommand("itemjoin").setExecutor(new Commands());
+		ItemJoin.getInstance().getCommand("ij").setExecutor(new Commands());
+		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerJoin(), ItemJoin.getInstance());
+		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new WorldChange(), ItemJoin.getInstance());
+		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Respawn(), ItemJoin.getInstance());
+		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new InvClickSurvival(), ItemJoin.getInstance());
+		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new InvClickCreative(), ItemJoin.getInstance());
+		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Drops(), ItemJoin.getInstance());
+		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new InteractCmds(), ItemJoin.getInstance());
+		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new CancelInteract(), ItemJoin.getInstance());
+		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Placement(), ItemJoin.getInstance());
+		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new ConsumeApples(), ItemJoin.getInstance());
+		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new ItemStore(), ItemJoin.getInstance());
 
 		if (ServerHandler.hasWorldOfColorUpdate() && getEventClass("entity.EntityPickupItemEvent") != null) {
-			ItemJoin.pl.getServer().getPluginManager().registerEvents(new Pickups(), ItemJoin.pl);
+			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Pickups(), ItemJoin.getInstance());
 		} else {
-			ItemJoin.pl.getServer().getPluginManager().registerEvents(new Deprecated_Pickups(), ItemJoin.pl);
+			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Deprecated_Pickups(), ItemJoin.getInstance());
 		}
 
 		if (ServerHandler.hasCombatUpdate() && getEventClass("player.PlayerSwapHandItemsEvent") != null) {
-		ItemJoin.pl.getServer().getPluginManager().registerEvents(new SwapHands(), ItemJoin.pl);
+		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new SwapHands(), ItemJoin.getInstance());
 		}
 
 		if (hasWorldGuard == true) {
-			ItemJoin.pl.getServer().getPluginManager().registerEvents(new RegionEnter(), ItemJoin.pl);
+			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new RegionEnter(), ItemJoin.getInstance());
 		}
 	}
 	

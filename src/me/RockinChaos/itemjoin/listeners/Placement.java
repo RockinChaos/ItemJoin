@@ -103,7 +103,7 @@ public class Placement implements Listener{
 					final ItemStack inStoredItems = CreateItems.items.get(player.getWorld().getName() + "." + player.getName().toString() + ".items." + ItemID + item);
 					final ItemStack inPlayerInv = new ItemStack(inPlayerInventory);
 					inPlayerInv.setAmount(inStoredItems.getAmount());
-		        Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.pl, new Runnable()
+		        Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable()
 		        {
 		        public void run()
 		          {

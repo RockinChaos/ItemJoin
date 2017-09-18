@@ -9,7 +9,6 @@ import javax.imageio.ImageIO;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 
-import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.map.MapCanvas;
 import org.bukkit.map.MapRenderer;
@@ -19,8 +18,8 @@ public class RenderImageMaps extends MapRenderer {
 
 	private static String writeImage;
 	private static int id;
-	public static ConsoleCommandSender Console = ItemJoin.pl.getServer().getConsoleSender();
-	public static HashMap < Player, Integer > hasRendered = new HashMap < Player, Integer > ();
+	private static HashMap < Player, Integer > hasRendered = new HashMap < Player, Integer > ();
+	
 	public static void setImage(String image, int imageID) {
 		writeImage = image;
 		id = imageID;
@@ -32,11 +31,11 @@ public class RenderImageMaps extends MapRenderer {
 			try {
 				if (!writeImage.equalsIgnoreCase("default.png")) {
 					hasRendered.put(player, id);
-					canvas.drawImage(0, 0, ImageIO.read(new File(ItemJoin.pl.getDataFolder(), String.valueOf(writeImage))));
+					canvas.drawImage(0, 0, ImageIO.read(new File(ItemJoin.getInstance().getDataFolder(), String.valueOf(writeImage))));
 					ServerHandler.sendDebugMessage("rendering map; " + writeImage);
-				} else if (writeImage.equalsIgnoreCase("default.png") && ItemJoin.pl.getResource("default.png") != null) {
+				} else if (writeImage.equalsIgnoreCase("default.png") && ItemJoin.getInstance().getResource("default.png") != null) {
 					hasRendered.put(player, id);
-					canvas.drawImage(0, 0, ImageIO.read(ItemJoin.pl.getResource("default.png")));
+					canvas.drawImage(0, 0, ImageIO.read(ItemJoin.getInstance().getResource("default.png")));
 					ServerHandler.sendDebugMessage("rendering map; default.png");
 				}
 			} catch (IOException e) {
@@ -50,8 +49,8 @@ public class RenderImageMaps extends MapRenderer {
 	
 	@SuppressWarnings("deprecation")
 	public static MapView MapView(Player player, int id) {
-		ItemJoin.pl.getServer().createMap(player.getWorld());
-		MapView view = ItemJoin.pl.getServer().getMap((short) id);
+		ItemJoin.getInstance().getServer().createMap(player.getWorld());
+		MapView view = ItemJoin.getInstance().getServer().getMap((short) id);
 		return view;
 	}
 	

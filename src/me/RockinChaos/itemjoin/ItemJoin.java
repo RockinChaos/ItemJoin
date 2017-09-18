@@ -13,18 +13,20 @@ import me.RockinChaos.itemjoin.utils.Updater;
     extends JavaPlugin
   {
 
-    public static ItemJoin pl;
+    private static ItemJoin pl;
     
     public void onEnable()
     {
     	  pl = this;
-    	  Updater.AbsoluteFile = getFile();
+    	  Updater.setAbsoluteFile(getFile());
 		  ConfigHandler.loadConfigs();
 		  Hooks.getHooks();
 		  Hooks.getRegisters();
-		  ConfigHandler.secretMsg();
+		  
+		  //ConfigHandler.secretMsg(); // Currently is no longer needed as you cannot disable the internal tags.
+		  
 		  CreateItems.setRun();
-		  Updater.checkUpdates(Updater.Console);
+		  Updater.checkUpdates(getInstance().getServer().getConsoleSender());
 		  ServerHandler.sendConsoleMessage("&ahas been Enabled!");
         }
 
@@ -32,4 +34,9 @@ import me.RockinChaos.itemjoin.utils.Updater;
     {
     	ServerHandler.sendConsoleMessage("&4Disabled!");
       }
+    
+    public static ItemJoin getInstance() {
+    	return pl;
+    }
+    
 }

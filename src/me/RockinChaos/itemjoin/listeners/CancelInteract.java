@@ -12,7 +12,6 @@ import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 
 public class CancelInteract implements Listener {
 
-	
 	 @EventHandler
 	  public void onCancelInteracts(PlayerInteractEvent event) 
 	  {

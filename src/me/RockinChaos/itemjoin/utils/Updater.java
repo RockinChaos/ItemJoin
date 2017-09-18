@@ -30,14 +30,18 @@ import org.w3c.dom.NodeList;
 
 public class Updater {
 	
-    public static ConsoleCommandSender Console = ItemJoin.pl.getServer().getConsoleSender();
-    public static String Prefix = ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] ";
+	private static ConsoleCommandSender Console = ItemJoin.getInstance().getServer().getConsoleSender();
+    private static String Prefix = ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] ";
     private Plugin plugin;
     private URL filesFeed;
     private String version;
     private String link;
     private String jarLink;
-    public static File AbsoluteFile;
+    private static File AbsoluteFile;
+    
+    public static void setAbsoluteFile(File file) {
+    	AbsoluteFile = file;
+    }
         
         public Updater(Plugin plugin, String url){
                 this.plugin = plugin;
@@ -95,7 +99,7 @@ public class Updater {
                 	    	   sender.sendMessage(ServerHandler.StripLogColors(sender, Prefix + ChatColor.RED + "Error Code; C139018"));
                 	       }
                           if(!(minValue <= maxValue)) {
-                        	  if (ItemJoin.pl.getDescription().getVersion().contains("-SNAPSHOT") || ItemJoin.pl.getDescription().getVersion().contains("-BETA") || ItemJoin.pl.getDescription().getVersion().contains("-ALPHA")) {
+                        	  if (ItemJoin.getInstance().getDescription().getVersion().contains("-SNAPSHOT") || ItemJoin.getInstance().getDescription().getVersion().contains("-BETA") || ItemJoin.getInstance().getDescription().getVersion().contains("-ALPHA")) {
                         		  sender.sendMessage(ServerHandler.StripLogColors(sender, Prefix + ChatColor.RED + "This is an outdated SNAPSHOT!"));
                              return true;
                         	  }
@@ -104,13 +108,13 @@ public class Updater {
                         	  }
                         }
                           if((minValue == maxValue)) {
-                    	  if (ItemJoin.pl.getDescription().getVersion().contains("-SNAPSHOT") || ItemJoin.pl.getDescription().getVersion().contains("-BETA") || ItemJoin.pl.getDescription().getVersion().contains("-ALPHA")) {
+                    	  if (ItemJoin.getInstance().getDescription().getVersion().contains("-SNAPSHOT") || ItemJoin.getInstance().getDescription().getVersion().contains("-BETA") || ItemJoin.getInstance().getDescription().getVersion().contains("-ALPHA")) {
                     		  sender.sendMessage(ServerHandler.StripLogColors(sender, Prefix + ChatColor.RED + "This is an outdated SNAPSHOT!"));
                          return true;
                     	  }
                           }
                           if(!(minValue >= maxValue)) {
-                        	  if (ItemJoin.pl.getDescription().getVersion().contains("-SNAPSHOT") || ItemJoin.pl.getDescription().getVersion().contains("-BETA") || ItemJoin.pl.getDescription().getVersion().contains("-ALPHA")) {
+                        	  if (ItemJoin.getInstance().getDescription().getVersion().contains("-SNAPSHOT") || ItemJoin.getInstance().getDescription().getVersion().contains("-BETA") || ItemJoin.getInstance().getDescription().getVersion().contains("-ALPHA")) {
                         	  sender.sendMessage(ServerHandler.StripLogColors(sender, Prefix + ChatColor.GREEN + "You are running a SNAPSHOT!"));
                         	  sender.sendMessage(ServerHandler.StripLogColors(sender, Prefix + ChatColor.GREEN + "If you find any bugs please report them!"));
                         	  } else {
@@ -131,18 +135,18 @@ public class Updater {
         	} else {
         		sender = manager;
         	}
-        	Updater checker = new Updater(ItemJoin.pl, "https://dev.bukkit.org/server-mods/itemjoin/files.rss");
-        	if(ItemJoin.pl.getConfig().getBoolean("CheckForUpdates") == false) {
+        	Updater checker = new Updater(ItemJoin.getInstance(), "https://dev.bukkit.org/server-mods/itemjoin/files.rss");
+        	if(ItemJoin.getInstance().getConfig().getBoolean("CheckForUpdates") == false) {
         		sender.sendMessage(ServerHandler.StripLogColors(sender, Prefix + ChatColor.RED + "Check for Updates is disabled."));
         		sender.sendMessage(ServerHandler.StripLogColors(sender, Prefix + ChatColor.RED + "You must enable Check for Updates in the config to use auto update!"));
         	}
-    		if(ItemJoin.pl.getConfig().getBoolean("CheckForUpdates") == true) 
+    		if(ItemJoin.getInstance().getConfig().getBoolean("CheckForUpdates") == true) 
     		{
     			sender.sendMessage(ServerHandler.StripLogColors(sender, Prefix + ChatColor.GREEN + "Checking for updates..."));
                   if (checker.updateNeeded(sender))
                     {
                 	  sender.sendMessage(ServerHandler.StripLogColors(sender, Prefix + ChatColor.GREEN + "An update has been found!"));
-                	  sender.sendMessage(ServerHandler.StripLogColors(sender, Prefix + ChatColor.GREEN + "Attempting to update from " + ChatColor.YELLOW + "v" + ItemJoin.pl.getDescription().getVersion() +  ChatColor.GREEN +  " to the new "  + ChatColor.YELLOW +  "v" + checker.getVersion()));
+                	  sender.sendMessage(ServerHandler.StripLogColors(sender, Prefix + ChatColor.GREEN + "Attempting to update from " + ChatColor.YELLOW + "v" + ItemJoin.getInstance().getDescription().getVersion() +  ChatColor.GREEN +  " to the new "  + ChatColor.YELLOW +  "v" + checker.getVersion()));
     				try {
           				URL fileUrl = new URL(checker.getJarLink());
           				final int fileLength = fileUrl.openConnection().getContentLength();
@@ -171,7 +175,7 @@ public class Updater {
 						e.printStackTrace();
 					}
                   }
-                  else if(ItemJoin.pl.getConfig().getBoolean("CheckForUpdates") == true)
+                  else if(ItemJoin.getInstance().getConfig().getBoolean("CheckForUpdates") == true)
                   {
                 	  sender.sendMessage(ServerHandler.StripLogColors(sender, Prefix + ChatColor.GREEN + "You are up to date!"));
                }
@@ -197,7 +201,7 @@ public class Updater {
     	} else {
     		sender = manager;
     	}
-    	if (ItemJoin.pl.getConfig().getBoolean("CheckForUpdates") == true) {
+    	if (ItemJoin.getInstance().getConfig().getBoolean("CheckForUpdates") == true) {
     		sender.sendMessage(ServerHandler.StripLogColors(sender, Prefix + ChatColor.GREEN + "Checking for updates..."));
         try {
             HttpURLConnection con = (HttpURLConnection) new URL("https://www.spigotmc.org/api/general.php").openConnection();
@@ -209,8 +213,8 @@ public class Updater {
             reader.close();
             if (version.length() <= 7) {
             	double webVersion = Double.parseDouble(version.replaceAll("[a-z]", "").replace("-SNAPSHOT", "").replace("-BETA", "").replace("-ALPHA", "").replace("-RELEASE", "").replace(".", ""));
-            	double currentVersion = Double.parseDouble(ItemJoin.pl.getDescription().getVersion().replaceAll("[a-z]", "").replace("-SNAPSHOT", "").replace("-BETA", "").replace("-ALPHA", "").replace("-RELEASE", "").replace(".", ""));
-            	String thisVersion = ItemJoin.pl.getDescription().getVersion();
+            	double currentVersion = Double.parseDouble(ItemJoin.getInstance().getDescription().getVersion().replaceAll("[a-z]", "").replace("-SNAPSHOT", "").replace("-BETA", "").replace("-ALPHA", "").replace("-RELEASE", "").replace(".", ""));
+            	String thisVersion = ItemJoin.getInstance().getDescription().getVersion();
             	if (webVersion == currentVersion) {
                 	if (thisVersion.contains("-SNAPSHOT") 
                 			|| thisVersion.contains("-BETA") 

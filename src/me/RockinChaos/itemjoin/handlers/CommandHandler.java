@@ -24,11 +24,10 @@ import me.RockinChaos.itemjoin.utils.Language;
 import me.RockinChaos.itemjoin.utils.Utils;
 
 public class CommandHandler {
-	public static Map < String, Long > playersOnCooldown = new HashMap < String, Long > ();
-	public HashMap < String, Player > storedHitPlayers = new HashMap < String, Player > ();
-	public static HashMap < String, Long > storedSpammedPlayers = new HashMap < String, Long > ();
-	public static int cdtime = 0;
-	public static int spamtime = 1;
+	private static Map < String, Long > playersOnCooldown = new HashMap < String, Long > ();
+	private static HashMap < String, Long > storedSpammedPlayers = new HashMap < String, Long > ();
+	private static int cdtime = 0;
+	private static int spamtime = 1;
 
 	public static Entity getNearestEntityInSight(Player player, int range) {
 		ArrayList < Entity > entities = (ArrayList < Entity > ) player.getNearbyEntities(range, range, range);
@@ -337,7 +336,7 @@ public class CommandHandler {
 					}
 				} catch (Exception e) {}
 			}
-			Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.pl, (Runnable) new Runnable() {
+			Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), (Runnable) new Runnable() {
 				public void run() {
 					if (ItemHandler.containsIgnoreCase(returnedIndentity, "console:")) {
 						try {
@@ -390,7 +389,7 @@ public class CommandHandler {
 	
 	public static void BlockCode(final long delay, final String Identify, 
 			final String returnedCommand, final String returnedIndentity, final String item, final Player player) {
-        Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.pl, (Runnable)new Runnable() {
+        Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), (Runnable)new Runnable() {
             public void run() {
 		if (ItemHandler.containsIgnoreCase(returnedIndentity, "console:")) {
 			try {
@@ -445,7 +444,7 @@ public class CommandHandler {
 			try {
 			player.playSound(player.getLocation(), Sound.valueOf(items.getString(".commands-sound")), 1, 1);
 			} catch (IllegalArgumentException ex) {
-				   String pkgname = ItemJoin.pl.getServer().getClass().getPackage().getName();
+				   String pkgname = ItemJoin.getInstance().getServer().getClass().getPackage().getName();
 				   String vers = pkgname.substring(pkgname.lastIndexOf('.') + 1);
 				ServerHandler.sendConsoleMessage("&cThere was an issue executing the commands-sound you defined.");
 				ServerHandler.sendConsoleMessage("&c" + items.getString(".commands-sound") + "&c is not a sound in " + vers + ".");
@@ -472,19 +471,23 @@ public class CommandHandler {
 		playersOnCooldown.put(player.getWorld().getName() + "." + player.getName().toString() + ".items." + item, System.currentTimeMillis());
 	}
 	
-	public static void dispatchOpCommands(String returnedCommand, Player player, String item) { // work on //
-		boolean isOped = false;
-		if (player.isOp()) {
-			isOped = true;
-		} else if (isOped == false) {
-			player.setOp(true);
+	public static void dispatchOpCommands(String returnedCommand, Player player, String item) {
+      boolean isOp = player.isOp();
+		try {
+		    player.setOp(true);
+			String Command = Utils.format(returnedCommand, player);
+			player.chat("/" + Command);
 		}
-		String Command = Utils.format(returnedCommand, player);
-		player.chat("/" + Command);
-		if (isOped == false) {
-			player.setOp(false);
+		catch(Exception e) {
+	        e.printStackTrace();
+	        player.setOp(false);
+	        ServerHandler.sendConsoleMessage("&cAn error has occurred while removing " + player.getName() + " from the OPs list. OP or not OP they were removed from OPs list!");
 		}
-		playersOnCooldown.put(player.getWorld().getName() + "." + player.getName().toString() + ".items." + item, System.currentTimeMillis());
+		finally {
+			player.setOp(isOp);
+			playersOnCooldown.put(player.getWorld().getName() + "." + player.getName().toString() + ".items." + item, System.currentTimeMillis());
+		}
+		
 	}
 
 	public static void dispatchConsoleCommands(String returnedCommand, Player player, String item) {

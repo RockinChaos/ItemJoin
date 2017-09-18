@@ -14,14 +14,14 @@ import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.utils.Utils;
 
 public class SetItems {
-	public static HashMap <Player, Integer> failCount = new HashMap <Player, Integer> ();
+	private static HashMap <Player, Integer> failCount = new HashMap <Player, Integer> ();
 
 	public static void setInvSlots(Player player, String item, String slot, String ItemID) {
 		ItemStack inStoredItems = CreateItems.items.get(player.getWorld().getName() + "." + player.getName().toString() + ".items." + ItemID + item);
 		if (ItemHandler.isObtainable(player, item, slot.toString(), ItemID, inStoredItems)) {
 			player.getInventory().setItem(Integer.parseInt(slot), inStoredItems);
 			ConfigHandler.saveFirstJoined(player, item);
-			ServerHandler.sendDebugMessage("Given the Item; " + inStoredItems.getItemMeta().getDisplayName().replace(ConfigHandler.encodeSecretData(ConfigHandler.secretMsg + ItemID), ""));
+			ServerHandler.sendDebugMessage("Given the Item; " + inStoredItems.getItemMeta().getDisplayName().replace(ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + ItemID), ""));
 		}
 	}
 
@@ -31,27 +31,27 @@ public class SetItems {
 		if (inStoredItems != null) {
 			if (slot.equalsIgnoreCase("Arbitrary") && ItemHandler.isObtainable(player, item, slot, ItemID, inStoredItems)) {
 				player.getInventory().addItem(inStoredItems);
-				ServerHandler.sendDebugMessage("Given the Item; " + inStoredItems.getItemMeta().getDisplayName().replace(ConfigHandler.encodeSecretData(ConfigHandler.secretMsg + ItemID), ""));
+				ServerHandler.sendDebugMessage("Given the Item; " + inStoredItems.getItemMeta().getDisplayName().replace(ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + ItemID), ""));
 				ConfigHandler.saveFirstJoined(player, item);
 			} else if (slot.equalsIgnoreCase("Helmet") && ItemHandler.isObtainable(player, item, slot, ItemID, inStoredItems)) {
 				Equip.setHelmet(inStoredItems);
-				ServerHandler.sendDebugMessage("Given the Item; " + inStoredItems.getItemMeta().getDisplayName().replace(ConfigHandler.encodeSecretData(ConfigHandler.secretMsg + ItemID), ""));
+				ServerHandler.sendDebugMessage("Given the Item; " + inStoredItems.getItemMeta().getDisplayName().replace(ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + ItemID), ""));
 				ConfigHandler.saveFirstJoined(player, item);
 			} else if (slot.equalsIgnoreCase("Chestplate") && ItemHandler.isObtainable(player, item, slot, ItemID, inStoredItems)) {
 				Equip.setChestplate(inStoredItems);
-				ServerHandler.sendDebugMessage("Given the Item; " + inStoredItems.getItemMeta().getDisplayName().replace(ConfigHandler.encodeSecretData(ConfigHandler.secretMsg + ItemID), ""));
+				ServerHandler.sendDebugMessage("Given the Item; " + inStoredItems.getItemMeta().getDisplayName().replace(ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + ItemID), ""));
 				ConfigHandler.saveFirstJoined(player, item);
 			} else if (slot.equalsIgnoreCase("Leggings") && ItemHandler.isObtainable(player, item, slot, ItemID, inStoredItems)) {
 				Equip.setLeggings(inStoredItems);
-				ServerHandler.sendDebugMessage("Given the Item; " + inStoredItems.getItemMeta().getDisplayName().replace(ConfigHandler.encodeSecretData(ConfigHandler.secretMsg + ItemID), ""));
+				ServerHandler.sendDebugMessage("Given the Item; " + inStoredItems.getItemMeta().getDisplayName().replace(ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + ItemID), ""));
 				ConfigHandler.saveFirstJoined(player, item);
 			} else if (slot.equalsIgnoreCase("Boots") && ItemHandler.isObtainable(player, item, slot, ItemID, inStoredItems)) {
 				Equip.setBoots(inStoredItems);
-				ServerHandler.sendDebugMessage("Given the Item; " + inStoredItems.getItemMeta().getDisplayName().replace(ConfigHandler.encodeSecretData(ConfigHandler.secretMsg + ItemID), ""));
+				ServerHandler.sendDebugMessage("Given the Item; " + inStoredItems.getItemMeta().getDisplayName().replace(ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + ItemID), ""));
 				ConfigHandler.saveFirstJoined(player, item);
 			} else if (ServerHandler.hasCombatUpdate() && slot.equalsIgnoreCase("Offhand") && ItemHandler.isObtainable(player, item, slot, ItemID, inStoredItems)) {
 				PlayerHandler.setOffhandItem(player, inStoredItems);
-				ServerHandler.sendDebugMessage("Given the Item; " + inStoredItems.getItemMeta().getDisplayName().replace(ConfigHandler.encodeSecretData(ConfigHandler.secretMsg + ItemID), ""));
+				ServerHandler.sendDebugMessage("Given the Item; " + inStoredItems.getItemMeta().getDisplayName().replace(ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + ItemID), ""));
 				ConfigHandler.saveFirstJoined(player, item);
 			}
 		}
@@ -96,34 +96,46 @@ public class SetItems {
 	public static void setClearItemJoinItems(Player player) {
 			PlayerInventory inventory = player.getInventory();
 			if (inventory.getHelmet() != null && inventory.getHelmet().hasItemMeta() && inventory.getHelmet().getItemMeta().hasDisplayName() 
-					&& ItemHandler.containsIgnoreCase(inventory.getHelmet().getItemMeta().getDisplayName(), ConfigHandler.encodeSecretData(ConfigHandler.secretMsg))) {
+					&& ItemHandler.containsIgnoreCase(inventory.getHelmet().getItemMeta().getDisplayName(), ConfigHandler.encodeSecretData(ConfigHandler.getNBTData()))) {
 				inventory.setHelmet(null);
 			}
 			if (inventory.getChestplate() != null && inventory.getChestplate().hasItemMeta() && inventory.getChestplate().getItemMeta().hasDisplayName() 
-					&& ItemHandler.containsIgnoreCase(inventory.getChestplate().getItemMeta().getDisplayName(), ConfigHandler.encodeSecretData(ConfigHandler.secretMsg))) {
+					&& ItemHandler.containsIgnoreCase(inventory.getChestplate().getItemMeta().getDisplayName(), ConfigHandler.encodeSecretData(ConfigHandler.getNBTData()))) {
 				inventory.setChestplate(null);
 			}
 			if (inventory.getLeggings() != null && inventory.getLeggings().hasItemMeta() && inventory.getLeggings().getItemMeta().hasDisplayName() 
-					&& ItemHandler.containsIgnoreCase(inventory.getLeggings().getItemMeta().getDisplayName(), ConfigHandler.encodeSecretData(ConfigHandler.secretMsg))) {
+					&& ItemHandler.containsIgnoreCase(inventory.getLeggings().getItemMeta().getDisplayName(), ConfigHandler.encodeSecretData(ConfigHandler.getNBTData()))) {
 				inventory.setLeggings(null);
 			}
 			if (inventory.getBoots() != null && inventory.getBoots().hasItemMeta() && inventory.getBoots().getItemMeta().hasDisplayName() 
-					&& ItemHandler.containsIgnoreCase(inventory.getBoots().getItemMeta().getDisplayName(), ConfigHandler.encodeSecretData(ConfigHandler.secretMsg))) {
+					&& ItemHandler.containsIgnoreCase(inventory.getBoots().getItemMeta().getDisplayName(), ConfigHandler.encodeSecretData(ConfigHandler.getNBTData()))) {
 				inventory.setBoots(null);
 			}
 			if (ServerHandler.hasCombatUpdate() && inventory.getItemInOffHand() != null 
 					&& inventory.getItemInOffHand().hasItemMeta() && inventory.getItemInOffHand().getItemMeta().hasDisplayName() 
-					&& ItemHandler.containsIgnoreCase(inventory.getItemInOffHand().getItemMeta().getDisplayName(), ConfigHandler.encodeSecretData(ConfigHandler.secretMsg))) {
+					&& ItemHandler.containsIgnoreCase(inventory.getItemInOffHand().getItemMeta().getDisplayName(), ConfigHandler.encodeSecretData(ConfigHandler.getNBTData()))) {
 				inventory.setItemInOffHand(null);
 			}
 			HashMap < String, ItemStack[] > inventoryContents = new HashMap < String, ItemStack[] > ();
 			inventoryContents.put(player.getName(), inventory.getContents());
 			for (ItemStack contents: inventoryContents.get(player.getName())) {
 				if (contents != null && contents.hasItemMeta() && contents.getItemMeta().hasDisplayName() 
-						&& ItemHandler.containsIgnoreCase(contents.getItemMeta().getDisplayName(), ConfigHandler.encodeSecretData(ConfigHandler.secretMsg))) {
+						&& ItemHandler.containsIgnoreCase(contents.getItemMeta().getDisplayName(), ConfigHandler.encodeSecretData(ConfigHandler.getNBTData()))) {
 					inventory.remove(contents);
 				}
 			}
 			inventoryContents.clear();
+	}
+	
+	public static HashMap<Player, Integer> getFailCount() {
+		return failCount;
+	}
+	
+	public static void putFailCount(Player player, int i) {
+		failCount.put(player, i);
+	}
+	
+	public static void removeFailCount(Player player) {
+		failCount.remove(player);
 	}
 }

@@ -1,6 +1,9 @@
 package me.RockinChaos.itemjoin.listeners.giveitems;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
@@ -26,7 +29,8 @@ import me.RockinChaos.itemjoin.utils.Language;
 import me.RockinChaos.itemjoin.utils.Utils;
 
 public class RegionEnter implements Listener {
-	public static HashMap < Player, String > isInRegion = new HashMap < Player, String > ();
+	private static HashMap < Player, String > isInRegion = new HashMap < Player, String > ();
+	private static List < String > regions = new ArrayList < String > ();
 	
 	@EventHandler
 	public void giveOnRegionEnter(PlayerMoveEvent event) {
@@ -35,7 +39,7 @@ public class RegionEnter implements Listener {
 				if (!isInRegion(player) && isInRegion.get(player) != null) {
 					isInRegion.remove(player);
 					long delay = ConfigHandler.getConfig("items.yml").getInt("items-Delay") * 10L;
-					Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.pl, new Runnable() {
+					Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
 						public void run() {
 							SetItems.setClearItemJoinItems(player);
 						}
@@ -48,18 +52,19 @@ public class RegionEnter implements Listener {
 		final long delay = ConfigHandler.getConfig("items.yml").getInt("items-Delay") * 10L;
 		CreateItems.run(player);
 		SetItems.setClearingOfItems(player, player.getWorld().getName(), "Clear-On-Join");
-		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.pl, new Runnable() {
+		SetItems.putFailCount(player, 0);
+		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
 			public void run() {
 				try {
 				setEnterItems(player, region);
-				if (SetItems.failCount.get(player) != 0) {
+				if (SetItems.getFailCount().get(player) != 0) {
 					boolean Overwrite = ConfigHandler.getConfig("items.yml").getBoolean("items-Overwrite");
 					if (Overwrite == true) {
-						Language.getSendMessage(player, "failedInvFull", SetItems.failCount.get(player).toString());
+						Language.getSendMessage(player, "failedInvFull", SetItems.getFailCount().get(player).toString());
 					} else if (Overwrite == false) {
-						Language.getSendMessage(player, "failedOverwrite", SetItems.failCount.get(player).toString());
+						Language.getSendMessage(player, "failedOverwrite", SetItems.getFailCount().get(player).toString());
 						}
-					SetItems.failCount.remove(player);
+					SetItems.removeFailCount(player);
 				}
 				PlayerHandler.delayUpdateInventory(player, 15L);
 				} catch (NullPointerException ex) {
@@ -97,7 +102,7 @@ public class RegionEnter implements Listener {
 	}
 	
 	public static boolean isInRegion(Player player) {
-		String[] regions = CreateItems.regions.toString().split(",");
+		String[] regions = getRegions().toString().split(",");
 		for (String region : regions) {
 			String getRegion = region.replace("[", "").replace("]", "").replace(" ", "");
 			if (CheckInRegion(player.getLocation(), getRegion) && isInRegion.get(player) == null) {
@@ -142,6 +147,26 @@ public class RegionEnter implements Listener {
 			return null;
  		}
  		return rm.getApplicableRegions(com.sk89q.worldguard.bukkit.BukkitUtil.toVector(loc));
+ 	}
+ 	
+ 	public static HashMap<Player, String> getInRegion() {
+ 		return isInRegion;
+ 	}
+ 	
+ 	public static void removeInRegion(Player player) {
+ 		isInRegion.remove(player);
+ 	}
+ 	
+ 	public static List<String> getRegions() {
+ 		return regions;
+ 	}
+ 	
+ 	public static void saveRegion(String region) {
+ 		regions.add(region);
+ 	}
+ 	
+ 	public static void resetRegions() {
+ 		regions.clear();
  	}
  
  	public static WorldGuardPlugin getWorldGuard() {

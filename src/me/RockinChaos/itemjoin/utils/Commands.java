@@ -17,12 +17,12 @@ import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.listeners.giveitems.SetItems;
 
 public class Commands implements CommandExecutor {
-	public static boolean ItemExists = false;
+	private static boolean ItemExists = false;
 	
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if (args.length == 0) {
 			if (sender.hasPermission("itemjoin.use") || sender.hasPermission("itemjoin.*")) {
-				ServerHandler.sendCommandsMessage(sender, "&aItemJoin v" + ItemJoin.pl.getDescription().getVersion() + "&e by RockinChaos");
+				ServerHandler.sendCommandsMessage(sender, "&aItemJoin v" + ItemJoin.getInstance().getDescription().getVersion() + "&e by RockinChaos");
 				ServerHandler.sendCommandsMessage(sender, "&aType &a&l/ItemJoin Help &afor the help menu.");
 				return true;
 			} else {
@@ -34,7 +34,7 @@ public class Commands implements CommandExecutor {
 			if (sender.hasPermission("itemjoin.use") || sender.hasPermission("itemjoin.*")) {
 				ServerHandler.sendCommandsMessage(sender, "blankmessage");
 				ServerHandler.sendCommandsMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
-				ServerHandler.sendCommandsMessage(sender, "&aItemJoin v" + ItemJoin.pl.getDescription().getVersion() + "&e by RockinChaos");
+				ServerHandler.sendCommandsMessage(sender, "&aItemJoin v" + ItemJoin.getInstance().getDescription().getVersion() + "&e by RockinChaos");
 				ServerHandler.sendCommandsMessage(sender, "&a&l/ItemJoin Help &7- &eThis help menu");
 				ServerHandler.sendCommandsMessage(sender, "&a&l/ItemJoin Reload &7- &eReloads the .yml files");
 				ServerHandler.sendCommandsMessage(sender, "&a&l/ItemJoin Updates &7- &eChecks for plugin updates");
@@ -107,6 +107,23 @@ public class Commands implements CommandExecutor {
 				Language.getSendMessage(sender, "noPermission", "");
 				return true;
 			}
+		} else if (args[0].equalsIgnoreCase("menu") || args[0].equalsIgnoreCase("creator")) {
+			// This is a currently unimplemented feature that is currently in development so it is blocked so only the DEV can work on it.
+			// This will soon be the items GUI creator that allows you to create items in game for ItemJoin!
+			if (sender.getName() == "RockinChaos") { // sender.hasPermission("itemjoin.creator") || sender.hasPermission("itemjoin.*")
+				if (!(sender instanceof ConsoleCommandSender)) {
+					ItemCreator.LaunchCreator(sender);
+					//Language.getSendMessage(sender, "creatorlaunched", "");
+					return true;
+				} else if (sender instanceof ConsoleCommandSender) {
+					Language.getSendMessage(sender, "notPlayer", "");
+					return true;
+				}
+			} else {
+				//Language.getSendMessage(sender, "noPermission", "");
+				Language.getSendMessage(sender, "unknownCommand", "");
+				return true;
+			}
 		} else if (args[0].equalsIgnoreCase("world") || args[0].equalsIgnoreCase("worlds") || args[0].equalsIgnoreCase("w")) {
 			if (sender.hasPermission("itemjoin.use") || sender.hasPermission("itemjoin.*")) {
 				if (!(sender instanceof ConsoleCommandSender)) {
@@ -129,7 +146,7 @@ public class Commands implements CommandExecutor {
 			if (sender.hasPermission("itemjoin.list") || sender.hasPermission("itemjoin.*")) {
 				if (!(sender instanceof ConsoleCommandSender)) {
 					ServerHandler.sendCommandsMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
-					for (World worlds: ItemJoin.pl.getServer().getWorlds()) {
+					for (World worlds: ItemJoin.getInstance().getServer().getWorlds()) {
 						ItemExists = false;
 						Language.getSendMessage(sender, "listWorldsHeader", worlds.getName());
 						for (String item: ConfigHandler.getConfigurationSection().getKeys(false)) {
@@ -206,7 +223,7 @@ public class Commands implements CommandExecutor {
 					} else {
 						ServerHandler.sendCommandsMessage(sender, "&c[\u2718] ItemJoin.permissions");
 					}
-					for (World world: ItemJoin.pl.getServer().getWorlds()) {
+					for (World world: ItemJoin.getInstance().getServer().getWorlds()) {
 						if (sender.hasPermission("itemjoin." + world.getName() + ".*")) {
 							ServerHandler.sendCommandsMessage(sender, "&a[\u2714] ItemJoin." + world.getName() + ".*");
 						} else {
@@ -228,7 +245,7 @@ public class Commands implements CommandExecutor {
 			if (sender.hasPermission("itemjoin.permissions") || sender.hasPermission("itemjoin.*")) {
 				if (!(sender instanceof ConsoleCommandSender)) {
 					ServerHandler.sendCommandsMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
-					for (World worlds: ItemJoin.pl.getServer().getWorlds()) {
+					for (World worlds: ItemJoin.getInstance().getServer().getWorlds()) {
 						for (String item: ConfigHandler.getConfigurationSection().getKeys(false)) {
 							ConfigurationSection items = ConfigHandler.getItemSection(item);
 							String world = worlds.getName();
@@ -263,7 +280,7 @@ public class Commands implements CommandExecutor {
 				Language.getSendMessage(sender, "playerNotFound", args[2]);
 				return true;
 			} else if (sender.hasPermission("itemjoin.get.others") || sender.hasPermission("itemjoin.*")) {
-				Language.argsplayer = sender;
+				Language.setArgsPlayer(sender);
 				reAddItem(argsPlayer, sender, args[1]);
 				return true;
 			} else {
@@ -299,7 +316,7 @@ public class Commands implements CommandExecutor {
 				Language.getSendMessage(sender, "playerNotFound", args[1]);
 				return true;
 			} else if (sender.hasPermission("itemjoin.get.others") || sender.hasPermission("itemjoin.*")) {
-				Language.argsplayer = sender;
+				Language.setArgsPlayer(sender);
 				reAddItem(argsPlayer, sender, "00a40gh392bd938d4");
 				return true;
 			} else {
@@ -327,7 +344,7 @@ public class Commands implements CommandExecutor {
 				Language.getSendMessage(sender, "playerNotFound", args[2]);
 				return true;
 			} else if (sender.hasPermission("itemjoin.remove.others") || sender.hasPermission("itemjoin.*")) {
-				Language.argsplayer = sender;
+				Language.setArgsPlayer(sender);
 				removeItem(argsPlayer, sender, args[1]);
 				return true;
 			} else {
@@ -363,7 +380,7 @@ public class Commands implements CommandExecutor {
 				Language.getSendMessage(sender, "playerNotFound", args[1]);
 				return true;
 			} else if (sender.hasPermission("itemjoin.remove.others") || sender.hasPermission("itemjoin.*")) {
-				Language.argsplayer = sender;
+				Language.setArgsPlayer(sender);
 				removeItem(argsPlayer, sender, "00a40gh392bd938d4");
 				return true;
 			} else {
@@ -432,19 +449,19 @@ public class Commands implements CommandExecutor {
 								if (hasRan != true) {
 								Language.getSendMessage(player, "givenAllToYou", "&eAll Items");
 								hasRan = true;
-								if (Language.argsplayer != null) {
-									Language.argsplayer = player;
+								if (Language.getArgsPlayer() != null) {
+									Language.setArgsPlayer(player);
 									Language.getSendMessage(OtherPlayer, "givenAllToPlayer", "&eAll Items");
-									Language.argsplayer = null;
+									Language.setArgsPlayer(null);
 								}
 								}
 								} else if (hasRan != true) {
 									hasRan = true;
-									if (Language.argsplayer != null) {
+									if (Language.getArgsPlayer() != null) {
 										Language.getSendMessage(player, "playerTriedGiveAllItems", "All Items");
-										Language.argsplayer = player;
+										Language.setArgsPlayer(player);
 										Language.getSendMessage(OtherPlayer, "allItemsExistInOthersInventory", "All Items");
-										Language.argsplayer = null;
+										Language.setArgsPlayer(null);
 									} else {
 										Language.getSendMessage(player, "allItemsExistInInventory", "All Items");
 									}
@@ -457,19 +474,19 @@ public class Commands implements CommandExecutor {
 								if (hasRan != true) {
 								Language.getSendMessage(player, "givenAllToYou", "&eAll Items");
 								hasRan = true;
-								if (Language.argsplayer != null) {
-									Language.argsplayer = player;
+								if (Language.getArgsPlayer() != null) {
+									Language.setArgsPlayer(player);
 									Language.getSendMessage(OtherPlayer, "givenAllToPlayer", "&eAll Items");
-									Language.argsplayer = null;
+									Language.setArgsPlayer(null);
 								}
 								}
 								} else if (hasRan != true) {
 									hasRan = true;
-									if (Language.argsplayer != null) {
+									if (Language.getArgsPlayer() != null) {
 										Language.getSendMessage(player, "playerTriedGiveAllItems", "All Items");
-										Language.argsplayer = player;
+										Language.setArgsPlayer(player);
 										Language.getSendMessage(OtherPlayer, "allItemsExistInOthersInventory", "All Items");
-										Language.argsplayer = null;
+										Language.setArgsPlayer(null);
 									} else {
 										Language.getSendMessage(player, "allItemsExistInInventory", "All Items");
 									}
@@ -497,27 +514,27 @@ public class Commands implements CommandExecutor {
 						if (inStoredItems != null && item.equalsIgnoreCase(itemName) && Utils.isCustomSlot(slot) && ItemHandler.isObtainable(player, item, slot, ItemID, inStoredItems)) {
 							SetItems.setCustomSlots(player, item, slot, ItemID);
 							Language.getSendMessage(player, "givenToYou", inStoredItems.getItemMeta().getDisplayName());
-							if (Language.argsplayer != null) {
-								Language.argsplayer = player;
+							if (Language.getArgsPlayer() != null) {
+								Language.setArgsPlayer(player);
 								Language.getSendMessage(OtherPlayer, "givenToPlayer", name);
-								Language.argsplayer = null;
+								Language.setArgsPlayer(null);
 							}
 							ItemExists = true;
 						} else if (inStoredItems != null && item.equalsIgnoreCase(itemName) && Utils.isInt(slot) && ItemHandler.isObtainable(player, item, slot, ItemID, inStoredItems)) {
 							SetItems.setInvSlots(player, item, slot, ItemID);
 							Language.getSendMessage(player, "givenToYou", inStoredItems.getItemMeta().getDisplayName());
-							if (Language.argsplayer != null) {
-								Language.argsplayer = player;
+							if (Language.getArgsPlayer() != null) {
+								Language.setArgsPlayer(player);
 								Language.getSendMessage(OtherPlayer, "givenToPlayer", name);
-								Language.argsplayer = null;
+								Language.setArgsPlayer(null);
 							}
 							ItemExists = true;
 						} else if (inStoredItems != null && item.equalsIgnoreCase(itemName) && !ItemHandler.isObtainable(player, item, slot, ItemID, inStoredItems)) {
-							if (Language.argsplayer != null) {
+							if (Language.getArgsPlayer() != null) {
 								Language.getSendMessage(player, "playerTriedGive", name);
-								Language.argsplayer = player;
+								Language.setArgsPlayer(player);
 								Language.getSendMessage(OtherPlayer, "itemExistsInOthersInventory", name);
-								Language.argsplayer = null;
+								Language.setArgsPlayer(null);
 							} else {
 								Language.getSendMessage(player, "itemExistsInInventory", inStoredItems.getItemMeta().getDisplayName());
 							}
@@ -553,19 +570,19 @@ public class Commands implements CommandExecutor {
 								if (hasRan != true) {
 								Language.getSendMessage(player, "removedAllFromYou", "&eAll Items");
 								hasRan = true;
-								if (Language.argsplayer != null) {
-									Language.argsplayer = player;
+								if (Language.getArgsPlayer() != null) {
+									Language.setArgsPlayer(player);
 									Language.getSendMessage(OtherPlayer, "removedAllFromPlayer", "&eAll Items");
-									Language.argsplayer = null;
+									Language.setArgsPlayer(null);
 								}
 								}
 								} else if ((hasRan != true)) {
 									hasRan = true;
-									if (Language.argsplayer != null) {
+									if (Language.getArgsPlayer() != null) {
 										Language.getSendMessage(player, "playerTriedRemoveAll", "All Items");
-										Language.argsplayer = player;
+										Language.setArgsPlayer(player);
 										Language.getSendMessage(OtherPlayer, "allItemsDoNotExistInOthersInventory", "Items");
-										Language.argsplayer = null;
+										Language.setArgsPlayer(null);
 									} else {
 										Language.getSendMessage(player, "allItemsDoNotExistInInventory", "Items");
 									}
@@ -596,27 +613,27 @@ public class Commands implements CommandExecutor {
 								name = Utils.format("&r" + name, player);
 							}
 							Language.getSendMessage(player, "removedFromYou", inStoredItems.getItemMeta().getDisplayName());
-							if (Language.argsplayer != null) {
-								Language.argsplayer = player;
+							if (Language.getArgsPlayer() != null) {
+								Language.setArgsPlayer(player);
 								Language.getSendMessage(OtherPlayer, "removedFromPlayer", name);
-								Language.argsplayer = null;
+								Language.setArgsPlayer(null);
 							}
 							ItemExists = true;
 						} else if (inStoredItems != null && item.equalsIgnoreCase(itemName) && Utils.isInt(slot) && player.getInventory().contains(inStoredItems)) {
 							player.getInventory().removeItem(inStoredItems);
 							Language.getSendMessage(player, "removedFromYou", name);
-							if (Language.argsplayer != null) {
-								Language.argsplayer = player;
+							if (Language.getArgsPlayer() != null) {
+								Language.setArgsPlayer(player);
 								Language.getSendMessage(OtherPlayer, "removedFromPlayer", name);
-								Language.argsplayer = null;
+								Language.setArgsPlayer(null);
 							}
 							ItemExists = true;
 						} else if (inStoredItems != null && item.equalsIgnoreCase(itemName)) {
-							if (Language.argsplayer != null) {
+							if (Language.getArgsPlayer() != null) {
 								Language.getSendMessage(player, "playerTriedRemove", inStoredItems.getItemMeta().getDisplayName());
-								Language.argsplayer = player;
+								Language.setArgsPlayer(player);
 								Language.getSendMessage(OtherPlayer, "itemDoesntExistInOthersInventory", name);
-								Language.argsplayer = null;
+								Language.setArgsPlayer(null);
 							} else {
 								Language.getSendMessage(player, "itemDoesntExistInInventory", inStoredItems.getItemMeta().getDisplayName());
 							}

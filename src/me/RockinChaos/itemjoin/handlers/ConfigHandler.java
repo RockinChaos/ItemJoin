@@ -12,20 +12,20 @@ import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.utils.Utils;
 
 public class ConfigHandler {
-	public static YamlConfiguration loadItems;
-	public static YamlConfiguration loadConfig;
-	public static YamlConfiguration loadEnLang;
-	public static YamlConfiguration loadFirstJoin;
-	public static String secretMsg;
+	private static YamlConfiguration loadItems;
+	private static YamlConfiguration loadConfig;
+	private static YamlConfiguration loadEnLang;
+	private static YamlConfiguration loadFirstJoin;
+	private static String NBTData = "ItemJoin";
 
 	public static FileConfiguration loadConfig(String path) {
-		File file = new File(ItemJoin.pl.getDataFolder(), path);
+		File file = new File(ItemJoin.getInstance().getDataFolder(), path);
 		if (!(file).exists()) {
 			try {
-				ItemJoin.pl.saveResource(path, false);
+				ItemJoin.getInstance().saveResource(path, false);
 			} catch (Exception e) {
 				e.printStackTrace();
-				ItemJoin.pl.getLogger().warning("Cannot save " + path + " to disk!");
+				ItemJoin.getInstance().getLogger().warning("Cannot save " + path + " to disk!");
 				return null;
 			}
 		}
@@ -33,7 +33,7 @@ public class ConfigHandler {
 	}
 
 	public static FileConfiguration getConfig(String path) {
-		File file = new File(ItemJoin.pl.getDataFolder(), path);
+		File file = new File(ItemJoin.getInstance().getDataFolder(), path);
 		if (loadConfig == null) {
 			loadConfig(path);
 		}
@@ -74,14 +74,14 @@ public class ConfigHandler {
 
 	public static void configFile() {
 		ConfigHandler.loadConfig("config.yml");
-		File File = new File(ItemJoin.pl.getDataFolder(), "config.yml");
+		File File = new File(ItemJoin.getInstance().getDataFolder(), "config.yml");
 		if (File.exists() && ConfigHandler.getConfig("config.yml").getInt("config-Version") != 6) {
-			if (ItemJoin.pl.getResource("config.yml") != null) {
+			if (ItemJoin.getInstance().getResource("config.yml") != null) {
 				String newGen = "config" + Utils.getRandom(1500000, 10000000) + ".yml";
-				File newFile = new File(ItemJoin.pl.getDataFolder(), newGen);
+				File newFile = new File(ItemJoin.getInstance().getDataFolder(), newGen);
 				if (!newFile.exists()) {
 					File.renameTo(newFile);
-					File configFile = new File(ItemJoin.pl.getDataFolder(), "config.yml");
+					File configFile = new File(ItemJoin.getInstance().getDataFolder(), "config.yml");
 					configFile.delete();
 					ConfigHandler.loadConfig("config.yml");
 					ServerHandler.sendConsoleMessage("&aYour config.yml is out of date and new options are available, generating a new one!");
@@ -93,14 +93,14 @@ public class ConfigHandler {
 
 	public static void itemsFile() {
 		ConfigHandler.loadConfig("items.yml");
-		File itemsFile = new File(ItemJoin.pl.getDataFolder(), "items.yml");
+		File itemsFile = new File(ItemJoin.getInstance().getDataFolder(), "items.yml");
 		if (itemsFile.exists() && ConfigHandler.getConfig("items.yml").getInt("items-Version") != 6) {
-			if (ItemJoin.pl.getResource("items.yml") != null) {
+			if (ItemJoin.getInstance().getResource("items.yml") != null) {
 				String newGen = "items" + Utils.getRandom(1500000, 10000000) + ".yml";
-				File newFile = new File(ItemJoin.pl.getDataFolder(), newGen);
+				File newFile = new File(ItemJoin.getInstance().getDataFolder(), newGen);
 				if (!newFile.exists()) {
 					itemsFile.renameTo(newFile);
-					File configFile = new File(ItemJoin.pl.getDataFolder(), "items.yml");
+					File configFile = new File(ItemJoin.getInstance().getDataFolder(), "items.yml");
 					configFile.delete();
 					ConfigHandler.loadConfig("items.yml");
 					ServerHandler.sendConsoleMessage("&4Your items.yml is out of date and new options are available, generating a new one!");
@@ -111,17 +111,17 @@ public class ConfigHandler {
 	}
 
 	public static void firstjoinFile() {
-		File file = new File(ItemJoin.pl.getDataFolder(), "first-join.yml");
+		File file = new File(ItemJoin.getInstance().getDataFolder(), "first-join.yml");
 		if ((file).exists()) {
 			ConfigHandler.loadConfig("first-join.yml");
-			File firstjoinFile = new File(ItemJoin.pl.getDataFolder(), "first-join.yml");
+			File firstjoinFile = new File(ItemJoin.getInstance().getDataFolder(), "first-join.yml");
 			if (firstjoinFile.exists() && ConfigHandler.getConfig("first-join.yml").getInt("first-Version") != 6) {
-				if (ItemJoin.pl.getResource("first-join.yml") != null) {
+				if (ItemJoin.getInstance().getResource("first-join.yml") != null) {
 					String newGen = "first-join" + Utils.getRandom(1500000, 10000000) + ".yml";
-					File newFile = new File(ItemJoin.pl.getDataFolder(), newGen);
+					File newFile = new File(ItemJoin.getInstance().getDataFolder(), newGen);
 					if (!newFile.exists()) {
 						firstjoinFile.renameTo(newFile);
-						File configFile = new File(ItemJoin.pl.getDataFolder(), "first-join.yml");
+						File configFile = new File(ItemJoin.getInstance().getDataFolder(), "first-join.yml");
 						configFile.delete();
 						ConfigHandler.loadConfig("first-join.yml");
 						ServerHandler.sendConsoleMessage("&4Your first-join.yml is out of date and new options are available, generating a new one!");
@@ -134,21 +134,21 @@ public class ConfigHandler {
 	
 	public static void enLangFile() {
 	      ConfigHandler.loadConfig("en-lang.yml");
-	      File enLang = new File(ItemJoin.pl.getDataFolder(), "en-lang.yml");
-	      if (enLang.exists() && ItemJoin.pl.getConfig().getString("Language").equalsIgnoreCase("English") && ConfigHandler.getConfig("en-lang.yml").getInt("en-Version") != 6) {
-	      if (ItemJoin.pl.getResource("en-lang.yml") != null) {
+	      File enLang = new File(ItemJoin.getInstance().getDataFolder(), "en-lang.yml");
+	      if (enLang.exists() && ItemJoin.getInstance().getConfig().getString("Language").equalsIgnoreCase("English") && ConfigHandler.getConfig("en-lang.yml").getInt("en-Version") != 6) {
+	      if (ItemJoin.getInstance().getResource("en-lang.yml") != null) {
 	        String newGen = "en-lang" + Utils.getRandom(1500000,10000000) + ".yml";
-	        File newFile = new File(ItemJoin.pl.getDataFolder(), newGen);
+	        File newFile = new File(ItemJoin.getInstance().getDataFolder(), newGen);
 	           if (!newFile.exists()) {
 	    	      enLang.renameTo(newFile);
-	              File configFile = new File(ItemJoin.pl.getDataFolder(), "en-lang.yml");
+	              File configFile = new File(ItemJoin.getInstance().getDataFolder(), "en-lang.yml");
 	              configFile.delete();
 				  ConfigHandler.loadConfig("en-lang.yml");
 				  ServerHandler.sendConsoleMessage("&4Your en-lang.yml is out of date and new options are available, generating a new one!");
 	           }
 	        }
 	      }
-		  if (ItemJoin.pl.getConfig().getString("Language").equalsIgnoreCase("English")) {
+		  if (ItemJoin.getInstance().getConfig().getString("Language").equalsIgnoreCase("English")) {
 			  ConfigHandler.getConfig("en-lang.yml").options().copyDefaults(false);
 		  }
  }
@@ -174,7 +174,7 @@ public class ConfigHandler {
 	public static void saveFirstJoined(Player player, String item) {
 		ConfigurationSection items = ConfigHandler.getItemSection(item);
 		if (ItemHandler.containsIgnoreCase(items.getString(".itemflags"), "first-join")) {
-			File playerFile = new File(ItemJoin.pl.getDataFolder(), "first-join.yml");
+			File playerFile = new File(ItemJoin.getInstance().getDataFolder(), "first-join.yml");
 			FileConfiguration playerData = YamlConfiguration.loadConfiguration(playerFile);
 			playerData.set(player.getWorld().getName() + "." + item + "." + player.getUniqueId().toString() + "." + "IGN", player.getName().toString());
 			try {
@@ -182,7 +182,7 @@ public class ConfigHandler {
 				ConfigHandler.loadConfig("first-join.yml");
 				ConfigHandler.getConfig("first-join.yml").options().copyDefaults(false);
 			} catch (IOException e1) {
-				ItemJoin.pl.getServer().getLogger().severe("Could not save " + player.getName() + " to the data file first-join.yml!");
+				ItemJoin.getInstance().getServer().getLogger().severe("Could not save " + player.getName() + " to the data file first-join.yml!");
 				e1.printStackTrace();
 			}
 		}
@@ -234,9 +234,7 @@ public class ConfigHandler {
 		}
 	}
 
-	public static boolean secretMsg() {
-		boolean isSecret = true;
-		secretMsg = "ItemJoin";
-		return isSecret;
+	public static String getNBTData() {
+		return NBTData;
 	}
 }

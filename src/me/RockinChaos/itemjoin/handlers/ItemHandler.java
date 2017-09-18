@@ -13,7 +13,7 @@ import me.RockinChaos.itemjoin.listeners.giveitems.SetItems;
 import me.RockinChaos.itemjoin.utils.Utils;
 
 public class ItemHandler {
-	public static HashMap < Player, Integer > ArbitraryID = new HashMap < Player, Integer > ();
+	private static HashMap < Player, Integer > ArbitraryID = new HashMap < Player, Integer > ();
 
 	public static boolean isAllowedItem(Player player, ItemStack inPlayerInventory, String itemflag) {
 		Boolean Allowed = true;
@@ -155,32 +155,32 @@ public class ItemHandler {
 		try {
 		if (Overwrite == false && Utils.isInt(slot) && player.getInventory().getItem(Integer.parseInt(slot)) != null) {
 			canOverwrite = false;
-			SetItems.failCount.put(player, SetItems.failCount.get(player) + 1);
+			SetItems.putFailCount(player, SetItems.getFailCount().get(player) + 1);
 			ServerHandler.sendDebugMessage("Failed to give; " + item);
 		} else if (Overwrite == false && Utils.isCustomSlot(slot) && slot.equalsIgnoreCase("Arbitrary") && player.getInventory().firstEmpty() == -1) {
 			canOverwrite = false;
-			SetItems.failCount.put(player, SetItems.failCount.get(player) + 1);
+			SetItems.putFailCount(player, SetItems.getFailCount().get(player) + 1);
 			ServerHandler.sendDebugMessage("Failed to give; " + item);
 		} else if (Overwrite == false && Utils.isCustomSlot(slot) && slot.equalsIgnoreCase("Helmet") && player.getInventory().getHelmet() != null) {
 			canOverwrite = false;
-			SetItems.failCount.put(player, SetItems.failCount.get(player) + 1);
+			SetItems.putFailCount(player, SetItems.getFailCount().get(player) + 1);
 			ServerHandler.sendDebugMessage("Failed to give; " + item);
 		} else if (Overwrite == false && Utils.isCustomSlot(slot) && slot.equalsIgnoreCase("Chestplate") && player.getInventory().getChestplate() != null) {
 			canOverwrite = false;
-			SetItems.failCount.put(player, SetItems.failCount.get(player) + 1);
+			SetItems.putFailCount(player, SetItems.getFailCount().get(player) + 1);
 			ServerHandler.sendDebugMessage("Failed to give; " + item);
 		} else if (Overwrite == false && Utils.isCustomSlot(slot) && slot.equalsIgnoreCase("Leggings") && player.getInventory().getLeggings() != null) {
 			canOverwrite = false;
-			SetItems.failCount.put(player, SetItems.failCount.get(player) + 1);
+			SetItems.putFailCount(player, SetItems.getFailCount().get(player) + 1);
 			ServerHandler.sendDebugMessage("Failed to give; " + item);
 		} else if (Overwrite == false && Utils.isCustomSlot(slot) && slot.equalsIgnoreCase("Boots") && player.getInventory().getBoots() != null) {
 			canOverwrite = false;
-			SetItems.failCount.put(player, SetItems.failCount.get(player) + 1);
+			SetItems.putFailCount(player, SetItems.getFailCount().get(player) + 1);
 			ServerHandler.sendDebugMessage("Failed to give; " + item);
 		} else if (Overwrite == false && Utils.isCustomSlot(slot) && ServerHandler.hasCombatUpdate() && slot.equalsIgnoreCase("Offhand")) {
 			if (player.getInventory().getItemInOffHand().getType() != Material.AIR) {
 			canOverwrite = false;
-			SetItems.failCount.put(player, SetItems.failCount.get(player) + 1);
+			SetItems.putFailCount(player, SetItems.getFailCount().get(player) + 1);
 			ServerHandler.sendDebugMessage("Failed to give; " + item);
 			}
 			}
