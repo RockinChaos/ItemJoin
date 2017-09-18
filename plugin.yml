@@ -115,6 +115,11 @@ commands:
       permission: itemjoin.autoupdate
       usage: |
           /itemjoin autoupdate
+   itemjoin creator:
+      description: Creator that will allow the user to create and configure the ItemJoin YAML files while in a in game GUI menu.
+      permission: itemjoin.creator
+      usage: |
+          /itemjoin creator
    ij:
       description: Displays a menu giving credit to the creator and the help menu command.
       permission: itemjoin.use
@@ -223,6 +228,11 @@ commands:
       permission: itemjoin.autoupdate
       usage: |
           /ij autoupdate
+   ij creator:
+      description: Creator that will allow the user to create and configure the ItemJoin YAML files while in a in game GUI menu.
+      permission: itemjoin.creator
+      usage: |
+          /ij creator
           
 permissions:
    itemjoin.*:
@@ -260,6 +270,9 @@ permissions:
       default: op
    itemjoin.autoupdate:
       description: Use of the /itemjoin autoupdate command.
+      default: op
+   itemjoin.creator:
+      description: Use of the /itemjoin creator and /itemjoin menu command. (Later, add to itemjoin.all children permissions).
       default: op
    itemjoin.get:
       description: Use of the /itemjoin get <item> command.
