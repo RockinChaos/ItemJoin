@@ -18,7 +18,8 @@ items:
         - 'message: &eYou can send yourself custom messages!'
         - 'console: say You can even execute more than one command!'
         - 'delay: 10'
-        - 'player: say This is item slot 1'
+        - 'player: say This is item slot 1.'
+        - 'op: say This command executes as if the player is op.'
         - 'say Hello world!'
     commands-type: interact, inventory
     commands-sound: BLOCK_NOTE_PLING
@@ -44,9 +45,10 @@ items:
     permission-node: 'itemjoin.ultra'
     enabled-worlds: world, world_nether, world_the_end
   gamemode-item:
-    id: PAPER
+    id: FIREWORK_CHARGE
     slot: 4
     count: 6
+    charge-color: BLUE
     name: '&aGamemode Token'
     lore:
       - '&7Right-Click to use'
@@ -66,7 +68,7 @@ items:
     commands-cost: 25
     commands-cooldown: 5
     cooldown-message: '&7[&eItemJoin&7] &a[%item%&a] &cis on cooldown for &a%timeleft% &cseconds..'
-    itemflags: item-store, death-drops, self-drops, disposable
+    itemflags: item-store, death-drops, self-drops, hide-attributes, disposable
     triggers: join, respawn, world-change
     permission-node: 'itemjoin.token'
     enabled-worlds: world, world_nether, world_the_end

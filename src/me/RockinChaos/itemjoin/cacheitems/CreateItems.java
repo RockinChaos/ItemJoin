@@ -71,7 +71,7 @@ public class CreateItems {
 							tempitem = setMapImage(tempitem, tempmat, item, player);
 							
 							// Disabled until a future update, (Testing Purposes).
-							//tempitem = setNBTData(tempitem); (Apparently is similar works and you wont need a check for getting the nbt data only need to set it.) (Fix skulls though)
+							// tempitem = setNBTData(tempitem); (Apparently is similar works and you wont need a check for getting the nbt data only need to set it.) (Fix skulls though)
 							// New method to setting data to an item to identify that its an ItemJoin item.
 							
 							ItemMeta tempmeta = getTempMeta(items, tempitem);
@@ -91,7 +91,7 @@ public class CreateItems {
 							tempitem.setItemMeta(tempmeta);
 							
 							// Disabled until a future update, (Testing Purposes).
-							//getNBTData(tempitem); (Apparently is similar works and you wont need a check for getting the nbt data only need to set it.) (Fix skulls though)
+							// getNBTData(tempitem); (Apparently is similar works and you wont need a check for getting the nbt data only need to set it.) (Fix skulls though)
 							// Grabs the NBTData to check if its an ItemJoin item.
 							
 							setRegions(items);
