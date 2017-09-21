@@ -13,11 +13,11 @@ import me.RockinChaos.itemjoin.utils.Updater;
     extends JavaPlugin
   {
 
-    private static ItemJoin pl;
+    private static ItemJoin instance;
     
     public void onEnable()
     {
-    	  pl = this;
+    	  instance = this;
     	  Updater.setAbsoluteFile(getFile());
 		  ConfigHandler.loadConfigs();
 		  Hooks.getHooks();
@@ -36,7 +36,7 @@ import me.RockinChaos.itemjoin.utils.Updater;
       }
     
     public static ItemJoin getInstance() {
-    	return pl;
+    	return instance;
     }
     
 }

@@ -1,12 +1,12 @@
 package me.RockinChaos.itemjoin.cacheitems;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 
 import javax.imageio.ImageIO;
 
 import me.RockinChaos.itemjoin.ItemJoin;
+import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 
 import org.bukkit.entity.Player;
@@ -29,19 +29,20 @@ public class RenderImageMaps extends MapRenderer {
 	public void render(MapView view, MapCanvas canvas, Player player) {
 		if (hasRendered.get(player) == null || hasRendered.get(player) != null && !hasRendered.get(player).toString().contains(id + "")) {
 			try {
-				if (!writeImage.equalsIgnoreCase("default.png")) {
+				if (writeImage != null && !writeImage.equalsIgnoreCase("default.png")) {
 					hasRendered.put(player, id);
 					canvas.drawImage(0, 0, ImageIO.read(new File(ItemJoin.getInstance().getDataFolder(), String.valueOf(writeImage))));
 					ServerHandler.sendDebugMessage("rendering map; " + writeImage);
-				} else if (writeImage.equalsIgnoreCase("default.png") && ItemJoin.getInstance().getResource("default.png") != null) {
+				} else if (writeImage != null && writeImage.equalsIgnoreCase("default.png") && ItemJoin.getInstance().getResource("default.png") != null) {
 					hasRendered.put(player, id);
 					canvas.drawImage(0, 0, ImageIO.read(ItemJoin.getInstance().getResource("default.png")));
 					ServerHandler.sendDebugMessage("rendering map; default.png");
 				}
-			} catch (IOException e) {
+			} catch (Exception e) {
 				sendErrors();
-			} catch (IllegalArgumentException e) {
-				sendErrors();
+				if (ConfigHandler.getConfig("config.yml").getBoolean("Debugging-Mode") == true) {
+				e.printStackTrace();
+				}
 			}
 		}
 	}
