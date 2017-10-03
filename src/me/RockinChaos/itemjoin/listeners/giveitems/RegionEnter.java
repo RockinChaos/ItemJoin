@@ -11,6 +11,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.Plugin;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
@@ -23,6 +25,7 @@ import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PermissionsHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
+import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.handlers.WorldHandler;
 import me.RockinChaos.itemjoin.utils.Hooks;
 import me.RockinChaos.itemjoin.utils.Language;
@@ -41,7 +44,7 @@ public class RegionEnter implements Listener {
 					long delay = ConfigHandler.getConfig("items.yml").getInt("items-Delay") * 10L;
 					Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
 						public void run() {
-							SetItems.setClearItemJoinItems(player);
+							removeEnterItems(player);
 						}
 					}, delay);
 			}
@@ -51,7 +54,6 @@ public class RegionEnter implements Listener {
 	public static void setItems(final Player player, final String region) {
 		final long delay = ConfigHandler.getConfig("items.yml").getInt("items-Delay") * 10L;
 		CreateItems.run(player);
-		SetItems.setClearingOfItems(player, player.getWorld().getName(), "Clear-On-Join");
 		SetItems.putFailCount(player, 0);
 		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
 			public void run() {
@@ -72,6 +74,55 @@ public class RegionEnter implements Listener {
 				}
 			}
 		}, delay);
+	}
+	
+	public static void removeEnterItems(Player player) {
+		if (Utils.isConfigurable()) {
+			for (String item: ConfigHandler.getConfigurationSection().getKeys(false)) {
+				ConfigurationSection items = ConfigHandler.getItemSection(item);
+					if(ItemHandler.containsIgnoreCase(items.getString(".triggers"), "region-enter") || ItemHandler.containsIgnoreCase(items.getString(".triggers"), "region enter")
+							|| ItemHandler.containsIgnoreCase(items.getString(".triggers"), "enter-region") || ItemHandler.containsIgnoreCase(items.getString(".triggers"), "enter region")) {
+					if (items.getString(".slot") != null) {
+						String slotlist = items.getString(".slot").replace(" ", "");
+						String[] slots = slotlist.split(",");
+						final String world = player.getWorld().getName();
+						ItemHandler.clearItemID(player);
+						for (String slot: slots) {
+							String ItemID = ItemHandler.getItemID(player, slot);
+							ItemStack inStoredItems = CreateItems.items.get(world + "." + player.getName().toString() + ".items." + ItemID + item);
+							if (Utils.isCustomSlot(slot)) {
+								PlayerInventory inventory = player.getInventory();
+								if (inventory.getHelmet() != null && ItemHandler.isSimilar(inventory.getHelmet(), inStoredItems)) {
+									inventory.setHelmet(null);
+								}
+								if (inventory.getChestplate() != null && ItemHandler.isSimilar(inventory.getChestplate(), inStoredItems)) {
+									inventory.setChestplate(null);
+								}
+								if (inventory.getLeggings() != null && ItemHandler.isSimilar(inventory.getLeggings(), inStoredItems)) {
+									inventory.setLeggings(null);
+								}
+								if (inventory.getBoots() != null && ItemHandler.isSimilar(inventory.getBoots(), inStoredItems)) {
+									inventory.setBoots(null);
+								}
+								if (ServerHandler.hasCombatUpdate() && inventory.getItemInOffHand() != null && ItemHandler.isSimilar(inventory.getItemInOffHand(), inStoredItems)) {
+									inventory.setItemInOffHand(null);
+								}
+							} else if (Utils.isInt(slot)) {
+								PlayerInventory inventory = player.getInventory();
+								HashMap < String, ItemStack[] > inventoryContents = new HashMap < String, ItemStack[] > ();
+								inventoryContents.put(player.getName(), inventory.getContents());
+								for (ItemStack contents: inventoryContents.get(player.getName())) {
+									if (contents != null && ItemHandler.isSimilar(contents, inStoredItems)) {
+										inventory.remove(contents);
+									}
+								}
+								inventoryContents.clear();
+							}
+						}
+					}
+			}
+		}
+	  }
 	}
 	
 	public static void setEnterItems(Player player, String region) {

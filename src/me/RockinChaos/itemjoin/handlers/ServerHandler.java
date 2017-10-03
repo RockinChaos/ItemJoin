@@ -117,4 +117,11 @@ public class ServerHandler {
 		ItemJoin.getInstance().getServer().getConsoleSender().sendMessage(message);
 		}
 	}
+	
+	public static boolean hasDebuggingMode() {
+		if (ConfigHandler.getConfig("config.yml").getBoolean("Debugging-Mode") == true) {
+			return true;
+		}
+		return false;
+	}
 }

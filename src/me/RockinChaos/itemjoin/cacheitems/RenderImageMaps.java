@@ -58,9 +58,11 @@ public class RenderImageMaps extends MapRenderer {
 	public static void clearMaps(Player player) {
 		hasRendered.remove(player);
 	}
+	
 	public static void sendErrors() {
 		ServerHandler.sendConsoleMessage("&4[ERROR; 7753c61] There was a problem rending your map(s)!");
 		ServerHandler.sendConsoleMessage("&4Please check and make sure your image size is no larger than 128x128 pixels.");
 		ServerHandler.sendConsoleMessage("&4If you are still experiencing this error please contact the plugin developer!");
 	}
-	}
+
+}

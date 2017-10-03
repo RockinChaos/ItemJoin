@@ -36,6 +36,7 @@ import org.bukkit.potion.PotionEffectType;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
+import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.handlers.WorldHandler;
 import me.RockinChaos.itemjoin.listeners.InvClickCreative;
@@ -395,7 +396,7 @@ public class CreateItems {
 		if (items.getString(".skull-owner") != null && tempmat == Material.SKULL_ITEM) {
 			String owner = items.getString(".skull-owner");
 			owner = Utils.format(owner, player);
-			((SkullMeta) tempmeta).setOwner(owner);
+			PlayerHandler.setSkullOwner(tempmeta, owner);
 		}
 		return tempmeta;
 	}

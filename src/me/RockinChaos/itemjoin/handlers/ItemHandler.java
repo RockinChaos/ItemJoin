@@ -106,7 +106,7 @@ public class ItemHandler {
 				isSimilar = true;
 			}  else if (inPlayerInventory != null && inPlayerInventory.getType().equals(Material.SKULL_ITEM) && inStoredItems.getType().equals(Material.SKULL_ITEM) && inPlayerInventory.hasItemMeta() 
 					&& inPlayerInventory.getItemMeta().hasDisplayName() && inStoredItems.hasItemMeta() && inStoredItems.getItemMeta().hasDisplayName() && inPlayerInventory.getItemMeta().getDisplayName().contains(inStoredItems.getItemMeta().getDisplayName()) 
-					&& ((SkullMeta) inPlayerInventory.getItemMeta()).hasOwner() && ((SkullMeta) inStoredItems.getItemMeta()).hasOwner() && ((SkullMeta) inPlayerInventory.getItemMeta()).getOwner().equalsIgnoreCase(((SkullMeta) inStoredItems.getItemMeta()).getOwner())) {
+					&& ((SkullMeta) inPlayerInventory.getItemMeta()).hasOwner() && ((SkullMeta) inStoredItems.getItemMeta()).hasOwner() && PlayerHandler.getSkullOwner(inPlayerInventory).equalsIgnoreCase(PlayerHandler.getSkullOwner(inStoredItems))) {
 				isSimilar = true;
 			} else if (inPlayerInventory != null && inPlayerInventory.getDurability() >= 1) {
 				ItemStack inPlayerInventoryTemp = new ItemStack(inPlayerInventory);

@@ -5,6 +5,8 @@ import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.utils.Econ;
@@ -78,6 +80,40 @@ public class PlayerHandler {
 			isCreative = true;
 		}
 		return isCreative;
+	}
+
+	
+	public static boolean getNewSkullMethod() {
+		try {
+			if (Class.forName("org.bukkit.inventory.meta.SkullMeta").getMethod("getOwningPlayer") != null) {
+			return true;
+			}
+		} catch (Exception e) {
+			if (ServerHandler.hasDebuggingMode()) {
+			e.printStackTrace();
+			}
+		}
+		return false;
+	}
+	
+	@SuppressWarnings("deprecation")
+	public static String getSkullOwner(ItemStack item) {
+		if (ServerHandler.hasWorldOfColorUpdate() && getNewSkullMethod() != false) {
+			return ((SkullMeta) item.getItemMeta()).getOwningPlayer().getName();
+		}
+		else {
+			return ((SkullMeta) item.getItemMeta()).getOwner();
+		}
+	}
+	
+	@SuppressWarnings("deprecation")
+	public static boolean setSkullOwner(ItemMeta tempmeta, String owner) {
+		if (ServerHandler.hasWorldOfColorUpdate() && getNewSkullMethod() != false) {
+			return ((SkullMeta) tempmeta).setOwningPlayer(ItemJoin.getInstance().getServer().getPlayer(owner));
+		}
+		else {
+			return ((SkullMeta) tempmeta).setOwner(owner);
+		}
 	}
 	
 	@SuppressWarnings("deprecation")
