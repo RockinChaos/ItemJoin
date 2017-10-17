@@ -141,6 +141,14 @@ items:
     itemflags: death-drops, self-drops
     triggers: join, respawn, world-change
     enabled-worlds: world, world_nether, world_the_end
+  banner-item:
+    id: BANNER
+    slot: 20
+    name: '&bCreeper Banner'
+    banner-meta: BLUE:BASE, WHITE:CREEPER
+    itemflags: hide-attributes, self-drops, CreativeBypass
+    triggers: join, respawn, world-change, region-enter
+    enabled-worlds: world, world_nether, world_the_end
   firework-item:
     id: FIREWORK
     slot: 29

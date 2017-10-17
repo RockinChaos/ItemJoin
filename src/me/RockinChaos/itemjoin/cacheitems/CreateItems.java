@@ -16,11 +16,14 @@ import org.bukkit.FireworkEffect;
 import org.bukkit.Material;
 import org.bukkit.SkullType;
 import org.bukkit.World;
+import org.bukkit.block.banner.Pattern;
+import org.bukkit.block.banner.PatternType;
 import org.bukkit.FireworkEffect.Type;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BannerMeta;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.BookMeta.Generation;
 import org.bukkit.inventory.meta.FireworkEffectMeta;
@@ -80,7 +83,8 @@ public class CreateItems {
 							tempmeta = setLore(items, tempmeta, player);
 							tempmeta = setSkull(items, player, tempmat, tempmeta);
 							tempmeta = setPotionEffects(items, tempmat, tempmeta);
-							tempmeta = setTippedArrows(items, tempmeta, tempmat);
+							tempmeta = setTippedArrows(items, tempmat, tempmeta);
+							tempmeta = setBanners(items, tempmat, tempmeta);
 							tempmeta = setFireworks(items, tempmeta, tempmat);
 							tempmeta = setFireChargeColor(items, tempmeta, tempmat);
 							tempmeta = setDye(items, tempmeta, tempmat);
@@ -260,7 +264,7 @@ public class CreateItems {
 		return tempmeta;
 	}
 
-	public static ItemMeta setTippedArrows(ConfigurationSection items, ItemMeta tempmeta, Material tempmat) {
+	public static ItemMeta setTippedArrows(ConfigurationSection items, Material tempmat, ItemMeta tempmeta) {
 		if (items.getString(".potion-effect") != null) {
 			if (ServerHandler.hasCombatUpdate() && !ItemJoin.getInstance().getServer().getVersion().contains("(MC: 1.9)") && tempmat == Material.getMaterial("TIPPED_ARROW")) {
 				String effectlist = items.getString(".potion-effect").replace(" ", "");
@@ -388,6 +392,30 @@ public class CreateItems {
 					templist2 = templist2 + pageSetup.replace("newline: ", "\n").replace("newpage: ", "").replace("newline:", "\n").replace("newpage:", "");
 				}
 			}
+		}
+		return tempmeta;
+	}
+	
+	public static ItemMeta setBanners(ConfigurationSection items, Material tempmat, ItemMeta tempmeta) {
+		if (items.getString(".banner-meta") != null && tempmat == Material.BANNER) {
+			String bannerlist = items.getString(".banner-meta").replace(" ", "");
+			String[] banners = bannerlist.split(",");
+			List<Pattern> patterns = new ArrayList<Pattern>();
+			for (String banner: banners) {
+				String[] parts = banner.split(":");
+				DyeColor Color = DyeColor.valueOf(parts[0].toUpperCase());
+				PatternType Pattern = PatternType.valueOf(parts[1].toUpperCase());
+				if (Color != null && Pattern != null) {
+					patterns.add(new Pattern(Color, Pattern));
+				} else if (Color == null) {
+					ServerHandler.sendConsoleMessage("&4An error occurred in the config, &a" + parts[0] + "&4 is an incorrect dye color!");
+					ServerHandler.sendConsoleMessage("&4Please see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/DyeColor.html for a list of correct dye colors!");
+				} else if (Pattern == null) {
+					ServerHandler.sendConsoleMessage("&4An error occurred in the config, &a" + parts[1] + "&4 is an incorrect pattern type!");
+					ServerHandler.sendConsoleMessage("&4Please see: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/block/banner/PatternType.html for a list of correct pattern types!");
+				}
+			}
+			((BannerMeta) tempmeta).setPatterns(patterns);
 		}
 		return tempmeta;
 	}
@@ -557,6 +585,8 @@ public class CreateItems {
 			TempMeta = (BookMeta) tempitem.getItemMeta();
 		} else if (isComparable(items, "FIREWORK")) {
 			TempMeta = (FireworkMeta) tempitem.getItemMeta();
+		} else if (isComparable(items, "BANNER")) {
+			TempMeta = (BannerMeta) tempitem.getItemMeta();
 		} else if (isComparable(items, "SKULL_ITEM")) {
 			TempMeta = (SkullMeta) tempitem.getItemMeta();
 		} else if (isComparable(items, "LEATHER_HELMET") || isComparable(items, "LEATHER_CHESTPLATE") 
