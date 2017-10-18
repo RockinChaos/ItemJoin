@@ -162,7 +162,12 @@
 			<artifactId>authlib</artifactId>
 			<version>1.5.21</version>
 		</dependency>
-
+    <!--Authlib API-->
+		<dependency>
+			<groupId>com.google.common.collect</groupId>
+			<artifactId>ForwardingMultimap</artifactId>
+			<version>LATEST</version>
+		</dependency>
     <!--TokenEnchant Local API/Repo -->
         <dependency>
             <groupId>me.TokenEnchantAPI</groupId>

@@ -48,8 +48,8 @@ import me.RockinChaos.itemjoin.listeners.giveitems.RegionEnter;
 import me.RockinChaos.itemjoin.utils.Hooks;
 import me.RockinChaos.itemjoin.utils.Utils;
 
-//import com.mojang.authlib.GameProfile;
-//import com.mojang.authlib.properties.Property;
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
 import com.vk2gpz.tokenenchant.api.TokenEnchantAPI;
 
 public class CreateItems {
@@ -86,7 +86,7 @@ public class CreateItems {
 							tempmeta = setName(items, tempmeta, tempitem, player, ItemID);
 							tempmeta = setLore(items, tempmeta, player);
 							tempmeta = setSkull(items, player, tempmat, tempmeta);
-							//tempmeta = setSkullTexture(items, player, tempmat, tempmeta);
+							tempmeta = setSkullTexture(items, player, tempmat, tempmeta);
 							tempmeta = setPotionEffects(items, tempmat, tempmeta);
 							tempmeta = setTippedArrows(items, tempmat, tempmeta);
 							tempmeta = setBanners(items, tempmat, tempmeta);
@@ -425,22 +425,22 @@ public class CreateItems {
 		return tempmeta;
 	}
 	
-  //  public static ItemMeta setSkullTexture(ConfigurationSection items, Player player, Material tempmat, ItemMeta tempmeta) {
-	//	if (items.getString(".skull-texture") != null && items.getString(".skull-owner") == null && tempmat == Material.SKULL_ITEM) {
-    //    String texture = items.getString(".skull-texture");
-    //    GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
-    //    gameProfile.getProperties().put("textures", new Property("textures", new String(texture)));
-   //     try {
-   //         Field declaredField = tempmeta.getClass().getDeclaredField("profile");
-   //         declaredField.setAccessible(true);
-   //         declaredField.set(tempmeta, gameProfile);
-   //     }
-   //     catch (Exception ex) {}
-	//	} else if (items.getString(".skull-owner") != null && items.getString(".skull-texture") != null && tempmat == Material.SKULL_ITEM) {
-	//		ServerHandler.sendConsoleMessage("&4You cannot define a skull owner and a skull texture at the same time, please remove one from the item.");
-	//	}
-   //     return tempmeta;
-   // }
+    public static ItemMeta setSkullTexture(ConfigurationSection items, Player player, Material tempmat, ItemMeta tempmeta) {
+		if (items.getString(".skull-texture") != null && items.getString(".skull-owner") == null && tempmat == Material.SKULL_ITEM) {
+        String texture = items.getString(".skull-texture");
+        GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
+        gameProfile.getProperties().put("textures", new Property("textures", new String(texture)));
+        try {
+            Field declaredField = tempmeta.getClass().getDeclaredField("profile");
+            declaredField.setAccessible(true);
+            declaredField.set(tempmeta, gameProfile);
+        }
+        catch (Exception ex) {}
+		} else if (items.getString(".skull-owner") != null && items.getString(".skull-texture") != null && tempmat == Material.SKULL_ITEM) {
+			ServerHandler.sendConsoleMessage("&4You cannot define a skull owner and a skull texture at the same time, please remove one from the item.");
+		}
+        return tempmeta;
+    }
 
 	public static ItemMeta setSkull(ConfigurationSection items, Player player, Material tempmat, ItemMeta tempmeta) {
 		if (items.getString(".skull-owner") != null && items.getString(".skull-texture") == null && tempmat == Material.SKULL_ITEM) {
