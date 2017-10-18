@@ -104,57 +104,57 @@
         </repository>
     <!--Authlib Repo-->
 		<repository>
-       		<id>mojang-repo</id>
-        	<url>https://repo.prok.pw/</url>
+       		<id>authlib-repo</id>
+        	<url>https://repo.prok.pw//</url>
 		</repository>
 	</repositories>
 	<dependencies>
     <!--Maven WorldUtils API-->
-        <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
-            <version>LATEST</version>
-        </dependency>
+    <dependency>
+        <groupId>commons-lang</groupId>
+        <artifactId>commons-lang</artifactId>
+        <version>LATEST</version>
+    </dependency>
     <!--Spigot API-->
 		<dependency>
 			<groupId>org.spigotmc</groupId>
 			<artifactId>spigot-api</artifactId>
-			<version>1.12.2-R0.1-SNAPSHOT</version>
-	        <scope>provided</scope>
+			<version>1.12.1-R0.1-SNAPSHOT</version>
+         <scope>provided</scope>
 		</dependency>
     <!--CraftBukkit API-->
 		<dependency>
 			<groupId>org.bukkit</groupId>
             <artifactId>bukkit</artifactId>
-            <version>1.12.2-R0.1-SNAPSHOT</version>
-	        <scope>provided</scope>
+            <version>1.12.1-R0.1-SNAPSHOT</version>
+         <scope>provided</scope>
 		</dependency>
     <!--Vault API-->
 		<dependency>
 			<groupId>net.milkbowl.vault</groupId>
 			<artifactId>Vault</artifactId>
 			<version>LATEST</version>
-	        <scope>provided</scope>
+         <scope>provided</scope>
 		</dependency>
     <!--PlaceholderAPI API-->
         <dependency>
 	        <groupId>me.clip</groupId>
 	        <artifactId>placeholderapi</artifactId>
 	        <version>LATEST</version>
-	        <scope>provided</scope>
+         <scope>provided</scope>
         </dependency>
     <!--AuthMe API-->
         <dependency>
 	        <groupId>fr.xephi</groupId>
 	        <artifactId>authme</artifactId>
 	        <version>5.3</version>
-	        <scope>provided</scope>
+         <scope>provided</scope>
         </dependency>
     <!--WorldGuard API-->
         <dependency>
-	        <groupId>com.sk89q</groupId>
-	        <artifactId>worldguard</artifactId>
-	        <version>LATEST</version>
+        <groupId>com.sk89q</groupId>
+        <artifactId>worldguard</artifactId>
+        <version>LATEST</version>
         </dependency>
     <!--Authlib API-->
         <dependency>
