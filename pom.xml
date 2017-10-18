@@ -105,11 +105,18 @@
 	</repositories>
 	<dependencies>
     <!--Maven WorldUtils API-->
-    <dependency>
-        <groupId>commons-lang</groupId>
-        <artifactId>commons-lang</artifactId>
-        <version>LATEST</version>
-    </dependency>
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>LATEST</version>
+        </dependency>
+    <!--Mojang API-->
+        <dependency>
+            <groupId>com.mojang</groupId>
+            <artifactId>authlib</artifactId>
+            <version>LATEST</version>
+            <scope>provided</scope>
+        </dependency>
     <!--Spigot API-->
 		<dependency>
 			<groupId>org.spigotmc</groupId>
