@@ -77,11 +77,6 @@
 		</plugins>
 	</build>
 	<repositories>
-    <!--Mojang Repo-->
-		<repository>
-       		<id>mojang-repo</id>
-        	<url>https://repo.prok.pw/</url>
-		</repository>
     <!--Spigot/CraftBukkit Repo-->
 		<repository>
        		<id>spigot-repo</id>
@@ -107,6 +102,11 @@
         	<id>xephi-repo</id>
 	        <url>http://ci.xephi.fr/plugin/repository/everything/</url>
         </repository>
+    <!--Authlib Repo-->
+		<repository>
+       		<id>mojang-repo</id>
+        	<url>https://repo.prok.pw/</url>
+		</repository>
 	</repositories>
 	<dependencies>
     <!--Maven WorldUtils API-->
@@ -114,13 +114,6 @@
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
             <version>LATEST</version>
-        </dependency>
-    <!--Mojang API-->
-        <dependency>
-            <groupId>com.mojang</groupId>
-            <artifactId>authlib</artifactId>
-            <version>1.5.21</version>
-            <scope>provided</scope>
         </dependency>
     <!--Spigot API-->
 		<dependency>
@@ -162,6 +155,13 @@
 	        <groupId>com.sk89q</groupId>
 	        <artifactId>worldguard</artifactId>
 	        <version>LATEST</version>
+        </dependency>
+    <!--Authlib API-->
+        <dependency>
+            <groupId>com.mojang</groupId>
+            <artifactId>authlib</artifactId>
+            <version>1.5.21</version>
+            <scope>provided</scope>
         </dependency>
     <!--TokenEnchant Local API/Repo -->
         <dependency>
