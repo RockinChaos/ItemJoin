@@ -103,8 +103,8 @@
 	        <url>http://ci.xephi.fr/plugin/repository/everything/</url>
         </repository>
                 <repository>
-            <id>authlib-repo</id>
-            <url>https://repo.prok.pw/com/mojang/authlib/1.5.21/</url>
+            <id>repo.prok.pw</id>
+            <url>https://repo.prok.pw/com/mojang/authlib/1.5.21/authlib-1.5.21.jar</url>
         </repository>
 	</repositories>
 	<dependencies>
