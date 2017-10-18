@@ -49,7 +49,6 @@
 							<artifactSet>
 								<includes>
 									<include>tv.mineinthebox.simpleserver:SimpleHttpServer:jar:</include>
-									<include>com.googlecode.json-simple:json-simple*:jar:*</include>
 								</includes>
 							</artifactSet>
 							<relocations>
@@ -162,7 +161,7 @@
 			<artifactId>authlib</artifactId>
 			<version>1.5.21</version>
 		</dependency>
-    <!--Authlib API-->
+    <!--Google API-->
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
