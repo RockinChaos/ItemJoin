@@ -103,8 +103,8 @@
 	        <url>http://ci.xephi.fr/plugin/repository/everything/</url>
         </repository>
                 <repository>
-            <id>sonatype</id>
-            <url>https://oss.sonatype.org/content/groups/public/</url>
+            <id>github</id>
+            <url>https://github.com/Techcable/Authlib/</url>
         </repository>
 	</repositories>
 	<dependencies>
@@ -125,42 +125,42 @@
 		<dependency>
 			<groupId>org.spigotmc</groupId>
 			<artifactId>spigot-api</artifactId>
-			<version>1.12.1-R0.1-SNAPSHOT</version>
-         <scope>provided</scope>
+			<version>1.12.2-R0.1-SNAPSHOT</version>
+	        <scope>provided</scope>
 		</dependency>
     <!--CraftBukkit API-->
 		<dependency>
 			<groupId>org.bukkit</groupId>
             <artifactId>bukkit</artifactId>
-            <version>1.12.1-R0.1-SNAPSHOT</version>
-         <scope>provided</scope>
+            <version>1.12.2-R0.1-SNAPSHOT</version>
+	        <scope>provided</scope>
 		</dependency>
     <!--Vault API-->
 		<dependency>
 			<groupId>net.milkbowl.vault</groupId>
 			<artifactId>Vault</artifactId>
 			<version>LATEST</version>
-         <scope>provided</scope>
+	        <scope>provided</scope>
 		</dependency>
     <!--PlaceholderAPI API-->
         <dependency>
 	        <groupId>me.clip</groupId>
 	        <artifactId>placeholderapi</artifactId>
 	        <version>LATEST</version>
-         <scope>provided</scope>
+	        <scope>provided</scope>
         </dependency>
     <!--AuthMe API-->
         <dependency>
 	        <groupId>fr.xephi</groupId>
 	        <artifactId>authme</artifactId>
 	        <version>5.3</version>
-         <scope>provided</scope>
+	        <scope>provided</scope>
         </dependency>
     <!--WorldGuard API-->
         <dependency>
-        <groupId>com.sk89q</groupId>
-        <artifactId>worldguard</artifactId>
-        <version>LATEST</version>
+	        <groupId>com.sk89q</groupId>
+	        <artifactId>worldguard</artifactId>
+	        <version>LATEST</version>
         </dependency>
     <!--TokenEnchant Local API/Repo -->
         <dependency>
