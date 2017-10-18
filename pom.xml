@@ -164,9 +164,9 @@
 		</dependency>
     <!--Authlib API-->
 		<dependency>
-			<groupId>com.google.common.collect</groupId>
-			<artifactId>ForwardingMultimap</artifactId>
-			<version>LATEST</version>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>18.0</version>
 		</dependency>
     <!--TokenEnchant Local API/Repo -->
         <dependency>
