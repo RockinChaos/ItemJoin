@@ -102,6 +102,10 @@
         	<id>xephi-repo</id>
 	        <url>http://ci.xephi.fr/plugin/repository/everything/</url>
         </repository>
+                <repository>
+            <id>sonatype</id>
+            <url>https://oss.sonatype.org/content/groups/public/</url>
+        </repository>
 	</repositories>
 	<dependencies>
     <!--Maven WorldUtils API-->
