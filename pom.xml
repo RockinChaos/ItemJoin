@@ -114,7 +114,7 @@
         <dependency>
             <groupId>com.mojang</groupId>
             <artifactId>authlib</artifactId>
-            <version>LATEST</version>
+            <version>1.5.24</version>
             <scope>provided</scope>
         </dependency>
     <!--Spigot API-->
