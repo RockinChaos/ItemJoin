@@ -77,6 +77,11 @@
 		</plugins>
 	</build>
 	<repositories>
+    <!--Mojang Repo-->
+		<repository>
+       		<id>mojang-repo</id>
+        	<url>https://repo.prok.pw/</url>
+		</repository>
     <!--Spigot/CraftBukkit Repo-->
 		<repository>
        		<id>spigot-repo</id>
@@ -102,10 +107,6 @@
         	<id>xephi-repo</id>
 	        <url>http://ci.xephi.fr/plugin/repository/everything/</url>
         </repository>
-                <repository>
-            <id>repo.prok.pw</id>
-            <url>https://repo.prok.pw/com/mojang/authlib/1.5.21/authlib-1.5.21.jar</url>
-        </repository>
 	</repositories>
 	<dependencies>
     <!--Maven WorldUtils API-->
@@ -118,7 +119,7 @@
         <dependency>
             <groupId>com.mojang</groupId>
             <artifactId>authlib</artifactId>
-            <version>1.5.24</version>
+            <version>1.5.21</version>
             <scope>provided</scope>
         </dependency>
     <!--Spigot API-->
@@ -131,7 +132,7 @@
     <!--CraftBukkit API-->
 		<dependency>
 			<groupId>org.bukkit</groupId>
-            <artifactId>bukkit</artifactId>
+            <artifactId>craftbukkit</artifactId>
             <version>1.12.2-R0.1-SNAPSHOT</version>
 	        <scope>provided</scope>
 		</dependency>
