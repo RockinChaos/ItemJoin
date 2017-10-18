@@ -102,10 +102,10 @@
         	<id>xephi-repo</id>
 	        <url>http://ci.xephi.fr/plugin/repository/everything/</url>
         </repository>
-    <!--Authlib Repo-->
 		<repository>
-       		<id>authlib-repo</id>
-        	<url>https://repo.prok.pw/com/</url>
+			<id>mojang</id>
+			<name>Mojang's Repository</name>
+			<url>https://libraries.minecraft.net/</url>
 		</repository>
 	</repositories>
 	<dependencies>
@@ -157,12 +157,12 @@
         <version>LATEST</version>
         </dependency>
     <!--Authlib API-->
-        <dependency>
-            <groupId>mojang</groupId>
-            <artifactId>authlib</artifactId>
-            <version>1.5.21</version>
-            <scope>provided</scope>
-        </dependency>
+		<dependency>
+			<groupId>com.mojang</groupId>
+			<artifactId>authlib</artifactId>
+			<version>1.5.21</version>
+		</dependency>
+
     <!--TokenEnchant Local API/Repo -->
         <dependency>
             <groupId>me.TokenEnchantAPI</groupId>
