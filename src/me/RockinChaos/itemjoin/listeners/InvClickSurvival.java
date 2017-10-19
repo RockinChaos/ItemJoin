@@ -18,7 +18,7 @@ public class InvClickSurvival implements Listener {
 		final Player player = (Player) event.getWhoClicked();
 		if (!PlayerHandler.isCreativeMode(player)) {
 			ItemStack item = null;
-			if (!ServerHandler.hasViableUpdate()) {
+			if (!ServerHandler.hasChangedTheWorldUpdate()) {
 				PlayerHandler.updateInventory(player);
 			}
 			if (ItemHandler.containsIgnoreCase(event.getAction().name(), "HOTBAR")) {

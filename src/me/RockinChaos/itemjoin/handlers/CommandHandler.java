@@ -311,7 +311,7 @@ public class CommandHandler {
 	}
 
 	public static String hitPlayer(String returnedCommand, Player player) {
-		if (ItemHandler.containsIgnoreCase(returnedCommand, "%hitplayer%") && ServerHandler.hasViableUpdate()) {
+		if (ItemHandler.containsIgnoreCase(returnedCommand, "%hitplayer%") && ServerHandler.hasChangedTheWorldUpdate()) {
 			Entity entityHit = getNearestEntityInSight(player, 4);
 			if (entityHit != null && entityHit instanceof Player) {
 				Player hitPlayer = (Player) entityHit;

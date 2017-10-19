@@ -253,7 +253,7 @@ public class CreateItems {
 
 	public static ItemMeta hideAttributes(ConfigurationSection items, ItemMeta tempmeta) {
 		String ItemFlags = items.getString(".itemflags");
-		if (ServerHandler.hasViableUpdate()) {
+		if (ServerHandler.hasChangedTheWorldUpdate()) {
 			if (ItemHandler.containsIgnoreCase(ItemFlags, "hide-attributes") || ItemHandler.containsIgnoreCase(ItemFlags, "hide attributes") 
 					|| ItemHandler.containsIgnoreCase(ItemFlags, "attributes") || ItemHandler.containsIgnoreCase(ItemFlags, "hideattributes")) {
 				tempmeta = setItemAttributes(tempmeta);

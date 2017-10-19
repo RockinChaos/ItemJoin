@@ -53,7 +53,7 @@ public class ServerHandler {
 		return hasCombatUpdate;
 	}
 
-	public static boolean hasViableUpdate() {
+	public static boolean hasChangedTheWorldUpdate() {
 		boolean hasViableUpdate = false;
 		String pkgname = ItemJoin.getInstance().getServer().getClass().getPackage().getName();
 		String combatVersion = "v1_7_R0".replace("_", "").replace("R0", "").replace("R1", "").replace("R2", "").replace("R3", "").replace("R4", "").replace("R5", "").replaceAll("[a-z]", "");

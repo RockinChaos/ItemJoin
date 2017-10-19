@@ -194,6 +194,6 @@
 	</issueManagement>
 	<ciManagement>
 		<system>Jenkins</system>
-		<url>http://jenkins.craftationgaming.com:8080/</url>
+		<url>http://ci.craftationgaming.com/job/ItemJoin/</url>
 	</ciManagement>
 </project>
