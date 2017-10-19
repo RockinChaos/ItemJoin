@@ -101,9 +101,9 @@
         	<id>xephi-repo</id>
 	        <url>http://ci.xephi.fr/plugin/repository/everything/</url>
         </repository>
+    <!--Mojang Repo-->
 		<repository>
 			<id>mojang</id>
-			<name>Mojang's Repository</name>
 			<url>https://libraries.minecraft.net/</url>
 		</repository>
 	</repositories>
@@ -155,7 +155,7 @@
         <artifactId>worldguard</artifactId>
         <version>LATEST</version>
         </dependency>
-    <!--Authlib API-->
+    <!--Mojang AuthLib API-->
 		<dependency>
 			<groupId>com.mojang</groupId>
 			<artifactId>authlib</artifactId>

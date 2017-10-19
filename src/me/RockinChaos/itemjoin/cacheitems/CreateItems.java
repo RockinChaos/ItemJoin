@@ -69,9 +69,12 @@ public class CreateItems {
 					for (String slot: slots) {
 						if (isCompatible(item, slot)) {
 							String ItemID = ItemHandler.getItemID(player, slot);
-							int dataValue = items.getInt(".data-value");
-							Material tempmat = getMaterial(items);
-							ItemStack tempitem = new ItemStack(tempmat, items.getInt(".count", 1), (short) dataValue);
+							short dataValue = ItemHandler.getDataValue(items);
+							int count = ItemHandler.getCount(items);
+							Material tempmat = ItemHandler.getMaterial(items);
+							
+							ItemStack tempitem = new ItemStack(tempmat, count, dataValue);
+							
 							tempitem = setUnbreaking(items, tempitem);
 							tempitem = setDurability(items, tempitem);
 							tempitem = hideDurability(items, tempitem);
@@ -149,7 +152,7 @@ public class CreateItems {
 			}
 		}
 	}
-
+	
 	public static ItemStack setUnbreaking(ConfigurationSection items, ItemStack tempitem) {
 		String ItemFlags = items.getString(".itemflags");
 		if (ItemHandler.containsIgnoreCase(ItemFlags, "unbreakable")) {
@@ -573,31 +576,11 @@ public class CreateItems {
 		return isCompatible;
 	}
 
-	@SuppressWarnings("deprecation")
-	public static Material getMaterial(ConfigurationSection items) {
-		Material material = null;
-		if (Utils.isInt(items.getString(".id"))) {
-			material = Material.getMaterial(items.getInt(".id"));
-		} else {
-			material = Material.getMaterial(items.getString(".id").toUpperCase());
-		}
-		return material;
-	}
-
-	public static Boolean isMaterial(String Mats) {
-		Boolean isMaterial = false;
-		Material getMaterial = Material.getMaterial(Mats);
-		if (getMaterial != null) {
-			isMaterial = true;
-		}
-		return isMaterial;
-	}
-
 	public static Boolean isComparable(ConfigurationSection items, String Mats) {
 		Boolean isMaterial = false;
 		Material getMaterial = Material.getMaterial(Mats);
-		Material tempmat = getMaterial(items);
-		if (isMaterial(Mats) && tempmat == getMaterial) {
+		Material tempmat = ItemHandler.getMaterial(items);
+		if (ItemHandler.isMaterial(Mats) && tempmat == getMaterial) {
 			isMaterial = true;
 		}
 		return isMaterial;
@@ -631,7 +614,7 @@ public class CreateItems {
 	public static boolean isCreatable(String item, String slot) {
 		boolean isCreatable = true;
 		ConfigurationSection items = ConfigHandler.getItemSection(item);
-		Material tempmat = getMaterial(items);
+		Material tempmat = ItemHandler.getMaterial(items);
 		if (tempmat == null) {
 			ServerHandler.sendConsoleMessage("&e" + item + "'s Material 'ID' is invalid or does not exist!");
 			ServerHandler.sendConsoleMessage("&e" + item + " &ewill not be set!");

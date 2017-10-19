@@ -148,6 +148,49 @@ public class ItemHandler {
 		}
 		return hasItem;
 	}
+	
+	
+	public static int getCount(ConfigurationSection items) {
+		int count = 1;
+		try {
+			if (items.getString(".count") != null && Utils.isInt(items.getString(".count"))) {
+			count = items.getInt(".count");
+			}
+		} catch (Exception e) {}
+		return count;
+	}
+	
+	public static short getDataValue(ConfigurationSection items) {
+		short dataValue = 0;
+		try {
+			if (items.getString(".data-value") != null && Utils.isInt(items.getString(".data-value"))) {
+			dataValue = (short) items.getInt(".data-value");
+			}
+		} catch (Exception e) {}
+		return dataValue;
+	}
+
+	@SuppressWarnings("deprecation")
+	public static Material getMaterial(ConfigurationSection items) {
+		Material material = null;
+		try {
+		if (Utils.isInt(items.getString(".id"))) {
+			material = Material.getMaterial(items.getInt(".id"));
+		} else {
+			material = Material.getMaterial(items.getString(".id").toUpperCase());
+		}
+		} catch (Exception e) {}
+		return material;
+	}
+
+	public static Boolean isMaterial(String Mats) {
+		Boolean isMaterial = false;
+		Material getMaterial = Material.getMaterial(Mats);
+		if (getMaterial != null) {
+			isMaterial = true;
+		}
+		return isMaterial;
+	}
 
 	public static Boolean canOverwrite(Player player, String slot, String item) {
 		Boolean canOverwrite = true;

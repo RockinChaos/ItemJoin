@@ -496,7 +496,7 @@ public class Commands implements CommandExecutor {
 						} else {
 						ItemStack inStoredItems = CreateItems.items.get(player.getWorld().getName() + "." + player.getName().toString() + ".items." + ItemID + itemName);
 						int dataValue = items.getInt(".data-value");
-						Material tempmat = CreateItems.getMaterial(items);
+						Material tempmat = ItemHandler.getMaterial(items);
 						ItemStack tempitem = null;
 						if (ServerHandler.hasViableUpdate()) {
 							tempitem = new ItemStack(tempmat, items.getInt(".count", 1), (short) dataValue);
@@ -591,7 +591,7 @@ public class Commands implements CommandExecutor {
 						} else {
 						ItemStack inStoredItems = CreateItems.items.get(player.getWorld().getName() + "." + player.getName().toString() + ".items." + ItemID + itemName);
 						int dataValue = items.getInt(".data-value");
-						Material tempmat = CreateItems.getMaterial(items);
+						Material tempmat = ItemHandler.getMaterial(items);
 						ItemStack tempitem = null;
 						if (ServerHandler.hasViableUpdate()) {
 							tempitem = new ItemStack(tempmat, items.getInt(".count", 1), (short) dataValue);
