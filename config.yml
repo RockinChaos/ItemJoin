@@ -41,6 +41,7 @@ PerWorldInventory: false
 PerWorldPlugins: false
 xInventories: false
 TokenEnchant: false
+HeadDatabase: false
 WorldGuard: false
 MyWorlds: false
 AuthMe: false

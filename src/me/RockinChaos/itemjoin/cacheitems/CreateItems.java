@@ -47,6 +47,7 @@ import me.RockinChaos.itemjoin.listeners.InvClickCreative;
 import me.RockinChaos.itemjoin.listeners.giveitems.RegionEnter;
 import me.RockinChaos.itemjoin.utils.Hooks;
 import me.RockinChaos.itemjoin.utils.Utils;
+import me.arcaniax.hdb.api.HeadDatabaseAPI;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
@@ -74,7 +75,7 @@ public class CreateItems {
 							Material tempmat = ItemHandler.getMaterial(items);
 							
 							ItemStack tempitem = new ItemStack(tempmat, count, dataValue);
-							
+							tempitem = setHeadDatabaseSkull(items, tempmat, tempitem);
 							tempitem = setUnbreaking(items, tempitem);
 							tempitem = setDurability(items, tempitem);
 							tempitem = hideDurability(items, tempitem);
@@ -84,7 +85,6 @@ public class CreateItems {
 							// Disabled until a future update, (Testing Purposes).
 							// tempitem = setNBTData(tempitem); (Apparently is similar works and you wont need a check for getting the nbt data only need to set it.) (Fix skulls though)
 							// New method to setting data to an item to identify that its an ItemJoin item.
-							
 							ItemMeta tempmeta = getTempMeta(items, tempitem);
 							tempmeta = setName(items, tempmeta, tempitem, player, ItemID);
 							tempmeta = setLore(items, tempmeta, player);
@@ -429,8 +429,8 @@ public class CreateItems {
 	}
 	
     public static ItemMeta setSkullTexture(ConfigurationSection items, Player player, Material tempmat, ItemMeta tempmeta) {
-		if (items.getString(".skull-texture") != null && items.getString(".skull-owner") == null && tempmat == Material.SKULL_ITEM) {
-        String texture = items.getString(".skull-texture");
+		if (items.getString(".skull-texture") != null && !items.getString(".skull-texture").contains("hdb-") && items.getString(".skull-owner") == null && tempmat == Material.SKULL_ITEM) {
+		String texture = items.getString(".skull-texture");
         GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
         gameProfile.getProperties().put("textures", new Property("textures", new String(texture)));
         try {
@@ -456,6 +456,24 @@ public class CreateItems {
 		return tempmeta;
 	}
 
+	public static ItemStack setHeadDatabaseSkull(ConfigurationSection items, Material tempmat, ItemStack tempitem) {
+		if (Hooks.hasHeadDatabase() && items.getString(".skull-texture") != null && items.getString(".skull-texture").contains("hdb-") 
+				&& items.getString(".skull-owner") == null && Utils.isInt(items.getString(".skull-texture").replace("hdb-", "")) && tempmat == Material.SKULL_ITEM) {
+	      HeadDatabaseAPI api = new HeadDatabaseAPI();
+	      try {
+	    	  
+	          ItemStack sk = api.getItemHead(items.getString(".skull-texture").replace("hdb-", ""));
+	          return sk != null ? sk : tempitem.clone();
+	      }
+	      catch (NullPointerException e) {
+	          ServerHandler.sendConsoleMessage("&4HeadDatabase could not find &c#" + items.getString(".skull-texture").replace("hdb-", "") + "&4, this head does not exist.");
+	      }
+		} else if (items.getString(".skull-owner") != null && items.getString(".skull-texture") != null && tempmat == Material.SKULL_ITEM) {
+			ServerHandler.sendConsoleMessage("&4You cannot define a skull owner and a skull texture at the same time, please remove one from the item.");
+		}
+		return tempitem;
+	}
+	
 	public static ItemMeta setPotionEffects(ConfigurationSection items, Material tempmat, ItemMeta tempmeta) {
 		if (items.getString(".potion-effect") != null) {
 			if (tempmat == Material.POTION || ServerHandler.hasCombatUpdate() 
@@ -587,28 +605,25 @@ public class CreateItems {
 	}
 
 	public static ItemMeta getTempMeta(ConfigurationSection items, ItemStack tempitem) {
-		ItemMeta TempMeta = null;
 		if (isComparable(items, "WRITTEN_BOOK")) {
-			TempMeta = (BookMeta) tempitem.getItemMeta();
+			return (BookMeta) tempitem.getItemMeta();
 		} else if (isComparable(items, "FIREWORK")) {
-			TempMeta = (FireworkMeta) tempitem.getItemMeta();
+			return (FireworkMeta) tempitem.getItemMeta();
 		} else if (isComparable(items, "BANNER")) {
-			TempMeta = (BannerMeta) tempitem.getItemMeta();
+			return (BannerMeta) tempitem.getItemMeta();
 		} else if (isComparable(items, "SKULL_ITEM")) {
-			TempMeta = (SkullMeta) tempitem.getItemMeta();
+			return (SkullMeta) tempitem.getItemMeta();
 		} else if (isComparable(items, "LEATHER_HELMET") || isComparable(items, "LEATHER_CHESTPLATE") 
 				|| isComparable(items, "LEATHER_LEGGINGS") || isComparable(items, "LEATHER_BOOTS")) {
-			TempMeta = (LeatherArmorMeta) tempitem.getItemMeta();
+			return (LeatherArmorMeta) tempitem.getItemMeta();
 		} else if (ServerHandler.hasCombatUpdate() && !ItemJoin.getInstance().getServer().getVersion().contains("(MC: 1.9)") 
 				&& isComparable(items, "TIPPED_ARROW")) {
-			TempMeta = (PotionMeta) tempitem.getItemMeta();
+			return (PotionMeta) tempitem.getItemMeta();
 		} else if (isComparable(items, "POTION") || ServerHandler.hasCombatUpdate() && isComparable(items, "SPLASH_POTION") 
 				|| ServerHandler.hasCombatUpdate() && isComparable(items, "LINGERING_POTION")) {
-			TempMeta = (PotionMeta) tempitem.getItemMeta();
-		} else {
-			TempMeta = tempitem.getItemMeta();
+			return (PotionMeta) tempitem.getItemMeta();
 		}
-		return TempMeta;
+		return tempitem.getItemMeta();
 	}
 
 	public static boolean isCreatable(String item, String slot) {

@@ -21,10 +21,7 @@ import me.RockinChaos.itemjoin.utils.Updater;
     	  Updater.setAbsoluteFile(getFile());
 		  ConfigHandler.loadConfigs();
 		  Hooks.getHooks();
-		  Hooks.getRegisters();
-		  
-		  //ConfigHandler.secretMsg(); // Currently is no longer needed as you cannot disable the internal tags.
-		  
+		  Hooks.registerEvents();		  
 		  CreateItems.setRun();
 		  Updater.checkUpdates(getInstance().getServer().getConsoleSender());
 		  ServerHandler.sendConsoleMessage("&ahas been Enabled!");

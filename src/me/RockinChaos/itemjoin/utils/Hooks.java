@@ -32,6 +32,7 @@ public class Hooks {
 	private static boolean hasMyWorlds;
 	private static boolean hasxInventories;
 	private static boolean hasTokenEnchant;
+	private static boolean hasHeadDatabase;
 	private static boolean hasWorldGuard;
 
 	public static void getHooks() {
@@ -46,6 +47,7 @@ public class Hooks {
 		hookMyWorlds();
 		hookxInventories();
 		hookTokenEnchant();
+		hookHeadDatabase();
 	}
 	
 	public static boolean hasVault() {
@@ -89,6 +91,10 @@ public class Hooks {
 		return hasTokenEnchant;
 	}
 	
+	public static boolean hasHeadDatabase() {
+		return hasHeadDatabase;
+	}
+	
 	public static boolean hasWorldGuard() {
 		return hasWorldGuard;
 	}
@@ -102,7 +108,7 @@ public class Hooks {
 		return null;
 	}
 
-	public static void getRegisters() {
+	public static void registerEvents() {
 	    ItemJoin.getInstance().getCommand("itemjoin").setExecutor(new Commands());
 		ItemJoin.getInstance().getCommand("ij").setExecutor(new Commands());
 		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerJoin(), ItemJoin.getInstance());
@@ -159,6 +165,16 @@ public class Hooks {
 		} else if (ConfigHandler.getConfig("config.yml").getBoolean("TokenEnchant") == true) {
 			ServerHandler.sendConsoleMessage("&4Could not find TokenEnchant.");
 			hasTokenEnchant = false;
+		}
+	}
+	
+	public static void hookHeadDatabase() {
+		if (Bukkit.getServer().getPluginManager().getPlugin("HeadDatabase") != null && ConfigHandler.getConfig("config.yml").getBoolean("HeadDatabase") == true) {
+			ServerHandler.sendConsoleMessage("&aHooked into HeadDatabase!");
+			hasHeadDatabase = true;
+		} else if (ConfigHandler.getConfig("config.yml").getBoolean("HeadDatabase") == true) {
+			ServerHandler.sendConsoleMessage("&4Could not find HeadDatabase.");
+			hasHeadDatabase = false;
 		}
 	}
 

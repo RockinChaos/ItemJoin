@@ -118,14 +118,14 @@
 		<dependency>
 			<groupId>org.spigotmc</groupId>
 			<artifactId>spigot-api</artifactId>
-			<version>1.12.1-R0.1-SNAPSHOT</version>
+			<version>1.12.2-R0.1-SNAPSHOT</version>
          <scope>provided</scope>
 		</dependency>
     <!--CraftBukkit API-->
 		<dependency>
 			<groupId>org.bukkit</groupId>
             <artifactId>bukkit</artifactId>
-            <version>1.12.1-R0.1-SNAPSHOT</version>
+            <version>1.12.2-R0.1-SNAPSHOT</version>
          <scope>provided</scope>
 		</dependency>
     <!--Vault API-->
@@ -167,6 +167,14 @@
 			<artifactId>guava</artifactId>
 			<version>18.0</version>
 		</dependency>
+    <!--HeadDatabase Local API/Repo -->
+        <dependency>
+            <groupId>me.HeadDatabaseAPI</groupId>
+            <artifactId>HeadDatabaseAPI</artifactId>
+            <scope>system</scope>
+            <systemPath>${pom.basedir}/src/me/RockinChaos/itemjoin/extra/HeadDatabaseAPI.jar</systemPath>
+            <version>LATEST</version>
+        </dependency>
     <!--TokenEnchant Local API/Repo -->
         <dependency>
             <groupId>me.TokenEnchantAPI</groupId>
