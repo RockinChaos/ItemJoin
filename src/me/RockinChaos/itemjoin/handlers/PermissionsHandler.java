@@ -17,7 +17,7 @@ public class PermissionsHandler {
 		boolean checkPermission = false;
 		if (ConfigHandler.getConfig("config.yml").getBoolean("Items-Permissions") == false 
 				|| player.hasPermission(PermissionsHandler.customPermissions(items, item, player.getWorld().getName())) 
-				|| player.hasPermission("itemjoin." + player.getWorld() + ".*") || player.hasPermission("itemjoin.*")) {
+				|| player.hasPermission("itemjoin." + player.getWorld() + ".*") || player.hasPermission("itemjoin.*") || player.hasPermission("itemjoin.all")) {
 			checkPermission = true;
 		}
 		return checkPermission;

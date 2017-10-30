@@ -36,6 +36,8 @@ public class ItemHandler {
 								ItemID = slot;
 							}
 							ItemStack inStoredItems = CreateItems.items.get(world + "." + player.getName().toString() + ".items." + ItemID + item);
+							if (ItemHandler.isSimilar(inPlayerInventory, inStoredItems)) {
+								}
 							if (ItemHandler.isSimilar(inPlayerInventory, inStoredItems) && ItemHandler.containsIgnoreCase(ItemFlags, itemflag)) {
 								if (Utils.canBypass(player, ItemFlags)) {
 									break;
@@ -100,23 +102,33 @@ public class ItemHandler {
 	}
 
 	public static boolean isSimilar(ItemStack inPlayerInventory, ItemStack inStoredItems) {
-		boolean isSimilar = false;
 		if (inPlayerInventory != null && inStoredItems != null) {
 			if (inPlayerInventory.isSimilar(inStoredItems)) {
-				isSimilar = true;
-			}  else if (inPlayerInventory != null && inPlayerInventory.getType().equals(Material.SKULL_ITEM) && inStoredItems.getType().equals(Material.SKULL_ITEM) && inPlayerInventory.hasItemMeta() 
-					&& inPlayerInventory.getItemMeta().hasDisplayName() && inStoredItems.hasItemMeta() && inStoredItems.getItemMeta().hasDisplayName() && inPlayerInventory.getItemMeta().getDisplayName().contains(inStoredItems.getItemMeta().getDisplayName()) 
+				return true;
+			} else if (!ServerHandler.hasCombatUpdate() && isStoredItem(inPlayerInventory, inStoredItems)) {
+				return true;
+			}  else if (isStoredItem(inPlayerInventory, inStoredItems) && inPlayerInventory.getType().equals(Material.SKULL_ITEM) && inStoredItems.getType().equals(Material.SKULL_ITEM) 
 					&& ((SkullMeta) inPlayerInventory.getItemMeta()).hasOwner() && ((SkullMeta) inStoredItems.getItemMeta()).hasOwner() && PlayerHandler.getSkullOwner(inPlayerInventory).equalsIgnoreCase(PlayerHandler.getSkullOwner(inStoredItems))) {
-				isSimilar = true;
-			} else if (inPlayerInventory != null && inPlayerInventory.getDurability() >= 1) {
+				return true;
+			} else if (inPlayerInventory.getDurability() >= 1) {
 				ItemStack inPlayerInventoryTemp = new ItemStack(inPlayerInventory);
 				inPlayerInventoryTemp.setDurability(inStoredItems.getDurability());
-				if (inPlayerInventoryTemp.isSimilar(inStoredItems)) {
-					isSimilar = true;
+				if (inPlayerInventoryTemp.isSimilar(inStoredItems) 
+						|| !ServerHandler.hasCombatUpdate() && isStoredItem(inPlayerInventory, inStoredItems)) {
+					return true;
 				}
-				}
+			}
 		}
-		return isSimilar;
+		return false;
+	}
+	
+	public static boolean isStoredItem(ItemStack inPlayerInventory, ItemStack inStoredItems) {
+		if (inPlayerInventory.hasItemMeta() && inStoredItems.hasItemMeta() && inPlayerInventory.getType().equals(inStoredItems.getType())
+				&& inPlayerInventory.getItemMeta().hasDisplayName() && inStoredItems.getItemMeta().hasDisplayName() 
+				&& inPlayerInventory.getItemMeta().getDisplayName().contains(inStoredItems.getItemMeta().getDisplayName())) {
+			return true;
+		}
+		return false;
 	}
 
 	public static boolean isCountSimilar(ItemStack inPlayerInventory, ItemStack inStoredItems) {

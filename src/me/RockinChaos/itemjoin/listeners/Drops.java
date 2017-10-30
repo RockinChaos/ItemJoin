@@ -6,7 +6,6 @@ import java.util.ListIterator;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
-
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -38,8 +37,8 @@ public class Drops implements Listener {
 	  @EventHandler
 	  public void onDeathDrops(PlayerDeathEvent event) 
 	  {
-		  List<ItemStack> drops = event.getDrops();
-		  ListIterator<ItemStack> litr = drops.listIterator();
+		List<ItemStack> drops = event.getDrops();
+		ListIterator<ItemStack> litr = drops.listIterator();
 	    final Player player = event.getEntity();
 	    String itemflag = "death-drops";
         while(litr.hasNext()){
