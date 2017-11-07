@@ -22,6 +22,7 @@ public class InvClickCreative implements Listener {
 	private static HashMap < String, Boolean > isCreative = new HashMap < String, Boolean > ();
 	private static HashMap < String, Boolean > isGlitchSwap = new HashMap < String, Boolean > ();
 	private static HashMap < String, Integer > cooldown = new HashMap < String, Integer > ();
+	public static HashMap < String, Boolean > dropGlitch = new HashMap < String, Boolean > ();
 
 	@EventHandler
 	public void onCreativeSwitch(final PlayerGameModeChangeEvent event) {
@@ -29,7 +30,7 @@ public class InvClickCreative implements Listener {
 		GameMode gamemode = event.getNewGameMode();
 		isCreative(player, gamemode);
 	}
-	
+
 	@EventHandler
 	public void onCreativeInventoryModify(InventoryClickEvent event) {
 		String itemflag = "inventory-modify";
@@ -70,6 +71,14 @@ public class InvClickCreative implements Listener {
 				if (cooldown.get(player.getName()) != 1 && ItemHandler.isAllowedItem(player, item, itemflag)) {
 					saveInventory(player);
 				}
+				
+				if (!ServerHandler.hasCombatUpdate()) {
+					InvClickSurvival.dropClick.put(player.getName(), true);
+					ItemStack[] Inv = player.getInventory().getContents().clone();
+					ItemStack[] Armor = player.getInventory().getArmorContents().clone();
+					InvClickSurvival.CustomDropEvent(player, Inv, Armor);
+				}
+				
 				if (!ItemHandler.isAllowedItem(player, item, itemflag) || event.getCurrentItem() != null && event.getCursor() != null && !hasItem(player, event.getCursor()) && !ItemHandler.isAllowedItem(player, event.getCurrentItem(), itemflag)) {
 					cooldown.put(player.getName(), 1);
 					event.setCancelled(true);
@@ -84,6 +93,18 @@ public class InvClickCreative implements Listener {
 						ItemStack readd = new ItemStack(event.getCursor());
 						restoreInventory(player, readd);
 						PlayerHandler.delayUpdateInventory(player, 5L);
+
+				} else if (!ServerHandler.hasCombatUpdate() && ItemHandler.isAllowedItem(player, item, itemflag)) {
+					final ItemStack itemFinal = item;
+					Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
+						public void run() {
+							if (dropGlitch.get(player.getName()) != null && dropGlitch.get(player.getName()) == true) {
+							    player.getInventory().removeItem(itemFinal);
+							    PlayerHandler.updateInventory(player);
+								dropGlitch.remove(player.getName());
+							}
+						}
+						}, 1L);
 				}
 			}
 		}

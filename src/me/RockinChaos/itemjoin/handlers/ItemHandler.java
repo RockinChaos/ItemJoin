@@ -105,16 +105,15 @@ public class ItemHandler {
 		if (inPlayerInventory != null && inStoredItems != null) {
 			if (inPlayerInventory.isSimilar(inStoredItems)) {
 				return true;
-			} else if (!ServerHandler.hasCombatUpdate() && isStoredItem(inPlayerInventory, inStoredItems)) {
+			} else if (!ServerHandler.hasCombatUpdate() && isCustomSimilar(inPlayerInventory, inStoredItems)) {
 				return true;
-			}  else if (isStoredItem(inPlayerInventory, inStoredItems) && inPlayerInventory.getType().equals(Material.SKULL_ITEM) && inStoredItems.getType().equals(Material.SKULL_ITEM) 
+			}  else if (isCustomSimilar(inPlayerInventory, inStoredItems) && inPlayerInventory.getType().equals(Material.SKULL_ITEM) && inStoredItems.getType().equals(Material.SKULL_ITEM) 
 					&& ((SkullMeta) inPlayerInventory.getItemMeta()).hasOwner() && ((SkullMeta) inStoredItems.getItemMeta()).hasOwner() && PlayerHandler.getSkullOwner(inPlayerInventory).equalsIgnoreCase(PlayerHandler.getSkullOwner(inStoredItems))) {
 				return true;
 			} else if (inPlayerInventory.getDurability() >= 1) {
 				ItemStack inPlayerInventoryTemp = new ItemStack(inPlayerInventory);
 				inPlayerInventoryTemp.setDurability(inStoredItems.getDurability());
-				if (inPlayerInventoryTemp.isSimilar(inStoredItems) 
-						|| !ServerHandler.hasCombatUpdate() && isStoredItem(inPlayerInventory, inStoredItems)) {
+				if (inPlayerInventoryTemp.isSimilar(inStoredItems)) {
 					return true;
 				}
 			}
@@ -122,11 +121,23 @@ public class ItemHandler {
 		return false;
 	}
 	
-	public static boolean isStoredItem(ItemStack inPlayerInventory, ItemStack inStoredItems) {
-		if (inPlayerInventory.hasItemMeta() && inStoredItems.hasItemMeta() && inPlayerInventory.getType().equals(inStoredItems.getType())
-				&& inPlayerInventory.getItemMeta().hasDisplayName() && inStoredItems.getItemMeta().hasDisplayName() 
-				&& inPlayerInventory.getItemMeta().getDisplayName().contains(inStoredItems.getItemMeta().getDisplayName())) {
-			return true;
+	public static boolean isCustomSimilar(ItemStack inPlayerInventory, ItemStack inStoredItems) {
+		if (inPlayerInventory.hasItemMeta() && inStoredItems.hasItemMeta() 
+				&& inPlayerInventory.getType().equals(inStoredItems.getType()) && inPlayerInventory.getItemMeta().hasDisplayName() 
+				&& inStoredItems.getItemMeta().hasDisplayName() && inPlayerInventory.getItemMeta().getDisplayName().equals(inStoredItems.getItemMeta().getDisplayName())) {
+			if (inPlayerInventory.getItemMeta().hasLore() && inStoredItems.getItemMeta().hasLore() && inPlayerInventory.getItemMeta().getLore().equals(inStoredItems.getItemMeta().getLore())) {
+				if (inPlayerInventory.getItemMeta().hasEnchants() && inStoredItems.getItemMeta().hasEnchants() && inPlayerInventory.getItemMeta().getEnchants().equals(inStoredItems.getItemMeta().getEnchants())) {
+					return true;
+				} else if (!inPlayerInventory.getItemMeta().hasEnchants() && !inStoredItems.getItemMeta().hasEnchants()) {
+					return true;
+				}
+			} else if (!inPlayerInventory.getItemMeta().hasLore() && !inStoredItems.getItemMeta().hasLore()) {
+				if (inPlayerInventory.getItemMeta().hasEnchants() && inStoredItems.getItemMeta().hasEnchants() && inPlayerInventory.getItemMeta().getEnchants().equals(inStoredItems.getItemMeta().getEnchants())) {
+					return true;
+				} else if (!inPlayerInventory.getItemMeta().hasEnchants() && !inStoredItems.getItemMeta().hasEnchants()) {
+					return true;
+				}
+			}
 		}
 		return false;
 	}
