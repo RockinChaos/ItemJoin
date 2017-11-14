@@ -1,12 +1,12 @@
 package me.RockinChaos.itemjoin.handlers;
 
 import java.util.HashMap;
-
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import me.RockinChaos.itemjoin.cacheitems.CreateItems;
 import me.RockinChaos.itemjoin.listeners.giveitems.SetItems;
@@ -36,8 +36,6 @@ public class ItemHandler {
 								ItemID = slot;
 							}
 							ItemStack inStoredItems = CreateItems.items.get(world + "." + player.getName().toString() + ".items." + ItemID + item);
-							if (ItemHandler.isSimilar(inPlayerInventory, inStoredItems)) {
-								}
 							if (ItemHandler.isSimilar(inPlayerInventory, inStoredItems) && ItemHandler.containsIgnoreCase(ItemFlags, itemflag)) {
 								if (Utils.canBypass(player, ItemFlags)) {
 									break;
@@ -107,14 +105,27 @@ public class ItemHandler {
 				return true;
 			} else if (!ServerHandler.hasCombatUpdate() && isCustomSimilar(inPlayerInventory, inStoredItems)) {
 				return true;
-			}  else if (isCustomSimilar(inPlayerInventory, inStoredItems) && inPlayerInventory.getType().equals(Material.SKULL_ITEM) && inStoredItems.getType().equals(Material.SKULL_ITEM) 
-					&& ((SkullMeta) inPlayerInventory.getItemMeta()).hasOwner() && ((SkullMeta) inStoredItems.getItemMeta()).hasOwner() && PlayerHandler.getSkullOwner(inPlayerInventory).equalsIgnoreCase(PlayerHandler.getSkullOwner(inStoredItems))) {
+			} else if (isCustomSimilar(inPlayerInventory, inStoredItems) && inPlayerInventory.getType().equals(Material.SKULL_ITEM) && inStoredItems.getType().equals(Material.SKULL_ITEM) && ((SkullMeta) inPlayerInventory.getItemMeta()).hasOwner() && ((SkullMeta) inStoredItems.getItemMeta()).hasOwner() && PlayerHandler.getSkullOwner(inPlayerInventory).equalsIgnoreCase(PlayerHandler.getSkullOwner(inStoredItems))) {
 				return true;
-			} else if (inPlayerInventory.getDurability() >= 1) {
-				ItemStack inPlayerInventoryTemp = new ItemStack(inPlayerInventory);
-				inPlayerInventoryTemp.setDurability(inStoredItems.getDurability());
-				if (inPlayerInventoryTemp.isSimilar(inStoredItems)) {
-					return true;
+			} else {
+				
+				if (inPlayerInventory.getDurability() >= 1) {
+					ItemStack inPlayerInventoryTemp = new ItemStack(inPlayerInventory);
+					inPlayerInventoryTemp.setDurability(inStoredItems.getDurability());
+					if (inPlayerInventoryTemp.isSimilar(inStoredItems)) {
+						return true;
+					}
+				}
+				
+				if (inPlayerInventory != null && inPlayerInventory.hasItemMeta() && inPlayerInventory.getItemMeta().hasDisplayName() && inPlayerInventory.getItemMeta().getDisplayName().contains(ConfigHandler.encodeSecretData(ConfigHandler.getNBTData())) && inPlayerInventory.getType().equals(inStoredItems.getType())) {
+					ItemStack inPlayerInventoryTemp = new ItemStack(inPlayerInventory);
+					ItemMeta itemMeta = CreateItems.getTempMeta(inPlayerInventoryTemp);
+					itemMeta.setDisplayName(inStoredItems.getItemMeta().getDisplayName());
+					itemMeta.setLore(inStoredItems.getItemMeta().getLore());
+					inPlayerInventoryTemp.setItemMeta(itemMeta);
+					if (inPlayerInventoryTemp.isSimilar(inStoredItems)) {
+						return true;
+					}
 				}
 			}
 		}

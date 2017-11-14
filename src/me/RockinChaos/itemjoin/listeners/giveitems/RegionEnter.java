@@ -21,6 +21,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.cacheitems.CreateItems;
+import me.RockinChaos.itemjoin.handlers.AnimationHandler;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PermissionsHandler;
@@ -69,9 +70,8 @@ public class RegionEnter implements Listener {
 					SetItems.removeFailCount(player);
 				}
 				PlayerHandler.delayUpdateInventory(player, 15L);
-				} catch (NullPointerException ex) {
-					
-				}
+				} catch (NullPointerException ex) {}
+				AnimationHandler.refreshItems(player); // New method to animate the names and lores in items.
 			}
 		}, delay);
 	}

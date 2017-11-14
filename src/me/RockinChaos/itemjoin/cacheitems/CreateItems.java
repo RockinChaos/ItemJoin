@@ -38,6 +38,7 @@ import org.bukkit.map.MapView;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import me.RockinChaos.itemjoin.ItemJoin;
+import me.RockinChaos.itemjoin.handlers.AnimationHandler;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
@@ -81,11 +82,9 @@ public class CreateItems {
 							tempitem = hideDurability(items, tempitem);
 							tempitem = setEnchantments(items, tempitem, player);
 							tempitem = setMapImage(tempitem, tempmat, item, player);
-							
-							// Disabled until a future update, (Testing Purposes).
-							// tempitem = setNBTData(tempitem); (Apparently is similar works and you wont need a check for getting the nbt data only need to set it.) (Fix skulls though)
-							// New method to setting data to an item to identify that its an ItemJoin item.
-							ItemMeta tempmeta = getTempMeta(items, tempitem);
+						    tempitem = setNBTData(tempitem); // New method to setting data to an item to identify that its an ItemJoin item.
+
+							ItemMeta tempmeta = getTempMeta(tempitem);
 							tempmeta = setName(items, tempmeta, tempitem, player, ItemID);
 							tempmeta = setLore(items, tempmeta, player);
 							tempmeta = setSkull(items, player, tempmat, tempmeta);
@@ -102,10 +101,6 @@ public class CreateItems {
 							tempmeta = setBookPages(items, tempmeta, tempmat, player);
 							tempmeta = hideAttributes(items, tempmeta);
 							tempitem.setItemMeta(tempmeta);
-							
-							// Disabled until a future update, (Testing Purposes).
-							// getNBTData(tempitem); (Apparently is similar works and you wont need a check for getting the nbt data only need to set it.) (Fix skulls though)
-							// Grabs the NBTData to check if its an ItemJoin item.
 							
 							setRegions(items);
 							for (World world: Bukkit.getServer().getWorlds()) {
@@ -130,12 +125,14 @@ public class CreateItems {
 				for (Player player: playersOnlineNew) {
 					run(player);
 					InvClickCreative.isCreative(player, player.getGameMode());
+					AnimationHandler.refreshItems(player); // New method to animate the names and lores in items.
 				}
 			} else {
 				playersOnlineOld = ((Player[]) Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).invoke(null, new Object[0]));
 				for (Player player: playersOnlineOld) {
 					run(player);
 					InvClickCreative.isCreative(player, player.getGameMode());
+					AnimationHandler.refreshItems(player); // New method to animate the names and lores in items.
 				}
 			}
 		} catch (NoSuchMethodException ex) {} catch (InvocationTargetException ex) {} catch (IllegalAccessException ex) {}
@@ -164,6 +161,7 @@ public class CreateItems {
 	}
 	
 	public static ItemStack setNBTData(ItemStack tempitem) {
+		if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true) {
 		try {
 		Class<?> craftItemStack = setUnbreakable.getOBC("inventory.CraftItemStack");
 		Class<?> nmsItemStackClass = setUnbreakable.getNMS("ItemStack");
@@ -179,14 +177,18 @@ public class CreateItems {
 		nms.getClass().getMethod("setTag", tag.getClass()).invoke(nms, tag);
 		tempitem = (ItemStack) craftItemStack.getMethod("asCraftMirror", nms.getClass()).invoke(null, nms);
 		}
-		} catch (Exception e) { // REMOVE LATER //
-			ServerHandler.sendConsoleMessage("failure");
+		} catch (Exception e) {
+			ServerHandler.sendDebugMessage("Error 133 has occured when setting NBTData to an item.");
+			if (ConfigHandler.getConfig("config.yml").getBoolean("Debugging-Mode") == true) {
 			e.printStackTrace();
+			}
+		}
 		}
 		return tempitem;
 	}
 	
-	public static void getNBTData(ItemStack tempitem) {
+	public static boolean getNBTData(ItemStack tempitem) {
+		if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true) {
 		try {
 		Class<?> craftItemStack = setUnbreakable.getOBC("inventory.CraftItemStack");
 		Class<?> nmsItemStackClass = setUnbreakable.getNMS("ItemStack");
@@ -196,11 +198,16 @@ public class CreateItems {
 		if (cacheTag != null && cacheTag.getClass().getMethod("getString", String.class).invoke(cacheTag, "ItemJoin") != null 
 				&& cacheTag.getClass().getMethod("getString", String.class).invoke(cacheTag, "ItemJoin").equals("This is an ItemJoin item."))  {
 			ServerHandler.sendConsoleMessage("Passed!!!");
+			return true;
 		} 
-		} catch (Exception e) { // REMOVE LATER //
-			ServerHandler.sendConsoleMessage("failure");
+		} catch (Exception e) {
+			ServerHandler.sendDebugMessage("Error 133 has occured when getting NBTData to an item.");
+			if (ConfigHandler.getConfig("config.yml").getBoolean("Debugging-Mode") == true) {
 			e.printStackTrace();
+			}
 		}
+		}
+		return false;
 	}
 
 	public static ItemStack setDurability(ConfigurationSection items, ItemStack tempitem) {
@@ -594,33 +601,32 @@ public class CreateItems {
 		return isCompatible;
 	}
 
-	public static Boolean isComparable(ConfigurationSection items, String Mats) {
+	public static Boolean isComparable(ItemStack tempitem, String Mats) {
 		Boolean isMaterial = false;
 		Material getMaterial = Material.getMaterial(Mats);
-		Material tempmat = ItemHandler.getMaterial(items);
-		if (ItemHandler.isMaterial(Mats) && tempmat == getMaterial) {
+		if (ItemHandler.isMaterial(Mats) && tempitem.getType() == getMaterial) {
 			isMaterial = true;
 		}
 		return isMaterial;
 	}
 
-	public static ItemMeta getTempMeta(ConfigurationSection items, ItemStack tempitem) {
-		if (isComparable(items, "WRITTEN_BOOK")) {
+	public static ItemMeta getTempMeta(ItemStack tempitem) {
+		if (isComparable(tempitem, "WRITTEN_BOOK")) {
 			return (BookMeta) tempitem.getItemMeta();
-		} else if (isComparable(items, "FIREWORK")) {
+		} else if (isComparable(tempitem, "FIREWORK")) {
 			return (FireworkMeta) tempitem.getItemMeta();
-		} else if (isComparable(items, "BANNER")) {
+		} else if (isComparable(tempitem, "BANNER")) {
 			return (BannerMeta) tempitem.getItemMeta();
-		} else if (isComparable(items, "SKULL_ITEM")) {
+		} else if (isComparable(tempitem, "SKULL_ITEM")) {
 			return (SkullMeta) tempitem.getItemMeta();
-		} else if (isComparable(items, "LEATHER_HELMET") || isComparable(items, "LEATHER_CHESTPLATE") 
-				|| isComparable(items, "LEATHER_LEGGINGS") || isComparable(items, "LEATHER_BOOTS")) {
+		} else if (isComparable(tempitem, "LEATHER_HELMET") || isComparable(tempitem, "LEATHER_CHESTPLATE") 
+				|| isComparable(tempitem, "LEATHER_LEGGINGS") || isComparable(tempitem, "LEATHER_BOOTS")) {
 			return (LeatherArmorMeta) tempitem.getItemMeta();
 		} else if (ServerHandler.hasCombatUpdate() && !ItemJoin.getInstance().getServer().getVersion().contains("(MC: 1.9)") 
-				&& isComparable(items, "TIPPED_ARROW")) {
+				&& isComparable(tempitem, "TIPPED_ARROW")) {
 			return (PotionMeta) tempitem.getItemMeta();
-		} else if (isComparable(items, "POTION") || ServerHandler.hasCombatUpdate() && isComparable(items, "SPLASH_POTION") 
-				|| ServerHandler.hasCombatUpdate() && isComparable(items, "LINGERING_POTION")) {
+		} else if (isComparable(tempitem, "POTION") || ServerHandler.hasCombatUpdate() && isComparable(tempitem, "SPLASH_POTION") 
+				|| ServerHandler.hasCombatUpdate() && isComparable(tempitem, "LINGERING_POTION")) {
 			return (PotionMeta) tempitem.getItemMeta();
 		}
 		return tempitem.getItemMeta();

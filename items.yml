@@ -4,6 +4,8 @@ items-Version: 6
 items-Delay: 2
 items-Overwrite: false
 items-Spamming: false
+items-Dynamic: false
+items-UpdateDelay: 1
 
 items:
   ultra-item:
