@@ -24,8 +24,8 @@ public class AnimationHandler {
 	}
 
 	public static void refreshItems(final Player player) {
-		if (ConfigHandler.getConfig("items.yml").getString("items-Dynamic") != null && ConfigHandler.getConfig("items.yml").getBoolean("items-Dynamic") == true) {
-			cancelRefresh(player);
+		cancelRefresh(player);
+		if (ConfigHandler.getConfig("items.yml").getBoolean("items-Dynamic") == true) {
 			if (SafeReady.get(player) != null && SafeReady.get(player) == false) {
 				new BukkitRunnable() {
 					public void run() {
@@ -47,7 +47,7 @@ public class AnimationHandler {
 
 	public static void setUpdating(final Player player) {
 		long UpdateDelay = 1;
-		if (ConfigHandler.getConfig("items.yml").getString("items-Dynamic") != null) {
+		if (ConfigHandler.getConfig("items.yml").getString("items-UpdateDelay") != null) {
 			UpdateDelay = ConfigHandler.getConfig("items.yml").getInt("items-UpdateDelay");
 		}
 		if (Utils.isConfigurable()) {
