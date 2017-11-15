@@ -3,7 +3,7 @@
          APPLIES TO USAGE, DISTRIBUTION, AND MODIFICATION OF SOFTWARE AND ITS SOURCE.
                             THIS LICENSE APPLIES TO ItemJoin.
 
-Copyright (c) 2015-2017 CraftationGaming, USA
+Copyright (c) 2015-2018 CraftationGaming, USA
 
 All rights are reserved to change, modify, or update this license without
 any prior notice or disclosure.
@@ -36,4 +36,4 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-Last revision: 09/17/2017
+Last revision: 11/17/2017
