@@ -82,7 +82,7 @@ public class CreateItems {
 							tempitem = hideDurability(items, tempitem);
 							tempitem = setEnchantments(items, tempitem, player);
 							tempitem = setMapImage(tempitem, tempmat, item, player);
-						    tempitem = setNBTData(tempitem); // New method to setting data to an item to identify that its an ItemJoin item.
+						    tempitem = setNBTData(tempitem, ItemID); // New method to setting data to an item to identify that its an ItemJoin item.
 
 							ItemMeta tempmeta = getTempMeta(tempitem);
 							tempmeta = setName(items, tempmeta, tempitem, player, ItemID);
@@ -125,14 +125,14 @@ public class CreateItems {
 				for (Player player: playersOnlineNew) {
 					run(player);
 					InvClickCreative.isCreative(player, player.getGameMode());
-					AnimationHandler.refreshItems(player); // New method to animate the names and lores in items.
+					AnimationHandler.refreshItems(player);
 				}
 			} else {
 				playersOnlineOld = ((Player[]) Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).invoke(null, new Object[0]));
 				for (Player player: playersOnlineOld) {
 					run(player);
 					InvClickCreative.isCreative(player, player.getGameMode());
-					AnimationHandler.refreshItems(player); // New method to animate the names and lores in items.
+					AnimationHandler.refreshItems(player);
 				}
 			}
 		} catch (NoSuchMethodException ex) {} catch (InvocationTargetException ex) {} catch (IllegalAccessException ex) {}
@@ -160,7 +160,7 @@ public class CreateItems {
 		return tempitem;
 	}
 	
-	public static ItemStack setNBTData(ItemStack tempitem) {
+	public static ItemStack setNBTData(ItemStack tempitem, String ItemID) {
 		if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true) {
 		try {
 		Class<?> craftItemStack = setUnbreakable.getOBC("inventory.CraftItemStack");
@@ -170,10 +170,10 @@ public class CreateItems {
 		Object tag = setUnbreakable.getNMS("NBTTagCompound").getConstructor().newInstance();
 		Object cacheTag = nmsItemStackClass.getMethod("getTag").invoke(nms);
 		if (cacheTag != null) {
-			cacheTag.getClass().getMethod("setString", String.class, String.class).invoke(cacheTag, "ItemJoin", "This is an ItemJoin item.");
+			cacheTag.getClass().getMethod("setString", String.class, String.class).invoke(cacheTag, "ItemJoin", "Slot: " + ItemID);
 			tempitem = (ItemStack) craftItemStack.getMethod("asCraftMirror", nms.getClass()).invoke(null, nms);
 		} else {
-		tag.getClass().getMethod("setString", String.class, String.class).invoke(tag, "ItemJoin", "This is an ItemJoin item.");
+		tag.getClass().getMethod("setString", String.class, String.class).invoke(tag, "ItemJoin", "Slot: " + ItemID);
 		nms.getClass().getMethod("setTag", tag.getClass()).invoke(nms, tag);
 		tempitem = (ItemStack) craftItemStack.getMethod("asCraftMirror", nms.getClass()).invoke(null, nms);
 		}
@@ -185,29 +185,6 @@ public class CreateItems {
 		}
 		}
 		return tempitem;
-	}
-	
-	public static boolean getNBTData(ItemStack tempitem) {
-		if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true) {
-		try {
-		Class<?> craftItemStack = setUnbreakable.getOBC("inventory.CraftItemStack");
-		Class<?> nmsItemStackClass = setUnbreakable.getNMS("ItemStack");
-		Method getNMSI = craftItemStack.getMethod("asNMSCopy", ItemStack.class);
-		Object nms = getNMSI.invoke(null, tempitem);
-		Object cacheTag = nmsItemStackClass.getMethod("getTag").invoke(nms);
-		if (cacheTag != null && cacheTag.getClass().getMethod("getString", String.class).invoke(cacheTag, "ItemJoin") != null 
-				&& cacheTag.getClass().getMethod("getString", String.class).invoke(cacheTag, "ItemJoin").equals("This is an ItemJoin item."))  {
-			ServerHandler.sendConsoleMessage("Passed!!!");
-			return true;
-		} 
-		} catch (Exception e) {
-			ServerHandler.sendDebugMessage("Error 133 has occured when getting NBTData to an item.");
-			if (ConfigHandler.getConfig("config.yml").getBoolean("Debugging-Mode") == true) {
-			e.printStackTrace();
-			}
-		}
-		}
-		return false;
 	}
 
 	public static ItemStack setDurability(ConfigurationSection items, ItemStack tempitem) {
@@ -235,10 +212,19 @@ public class CreateItems {
 		if (items.getString(".name") != null) {
 			String name = items.getString(".name");
 			name = Utils.format("&r" + name, player);
-			tempmeta.setDisplayName(name + ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + ItemID));
+			if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true) {
+				tempmeta.setDisplayName(name);
+			} else {
+				tempmeta.setDisplayName(name + ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + ItemID));
+			}
 		} else {
 			String lookup = ItemHandler.getName(tempitem);
-			String name = Utils.format("&r" + lookup + ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + ItemID), player);
+			String name = "";
+			if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true) {
+				name = Utils.format("&r" + lookup, player);
+			} else {
+				name = Utils.format("&r" + lookup + ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + ItemID), player);
+			}
 			tempmeta.setDisplayName(name);
 		}
 		return tempmeta;

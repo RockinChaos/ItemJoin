@@ -67,7 +67,7 @@ public class Respawn implements Listener {
 					SetItems.removeFailCount(player);
 				}
 				PlayerHandler.delayUpdateInventory(player, 15L);
-			    AnimationHandler.refreshItems(player); // New method to animate the names and lores in items.
+			    AnimationHandler.refreshItems(player);
 			}
 		}, delay);
 	}

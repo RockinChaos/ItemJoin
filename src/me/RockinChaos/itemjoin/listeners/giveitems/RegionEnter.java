@@ -71,7 +71,7 @@ public class RegionEnter implements Listener {
 				}
 				PlayerHandler.delayUpdateInventory(player, 15L);
 				} catch (NullPointerException ex) {}
-				AnimationHandler.refreshItems(player); // New method to animate the names and lores in items.
+				AnimationHandler.refreshItems(player);
 			}
 		}, delay);
 	}

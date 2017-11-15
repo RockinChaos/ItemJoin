@@ -16,8 +16,8 @@ public class AnimationHandler {
 	// This is a currently unimplemented feature that is currently in development so it is blocked so only the DEV can work on it.
 	// This will soon be the handler for animations that allows you to update your items if placeholders change or to have an animated lore or item name.
 	
-	public static HashMap < Player, Boolean > setCanceled = new HashMap < Player, Boolean > ();
-	public static HashMap < Player, Boolean > SafeReady = new HashMap < Player, Boolean > ();
+	private static HashMap < Player, Boolean > setCanceled = new HashMap < Player, Boolean > ();
+	private static HashMap < Player, Boolean > SafeReady = new HashMap < Player, Boolean > ();
 
 	public static void cancelRefresh(Player player) {
 		setCanceled.put(player, true);
