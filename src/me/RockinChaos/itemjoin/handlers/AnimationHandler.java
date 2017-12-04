@@ -13,9 +13,6 @@ import me.RockinChaos.itemjoin.utils.Utils;
 
 public class AnimationHandler {
 	
-	// This is a currently unimplemented feature that is currently in development so it is blocked so only the DEV can work on it.
-	// This will soon be the handler for animations that allows you to update your items if placeholders change or to have an animated lore or item name.
-	
 	private static HashMap < Player, Boolean > setCanceled = new HashMap < Player, Boolean > ();
 	private static HashMap < Player, Boolean > SafeReady = new HashMap < Player, Boolean > ();
 
@@ -25,11 +22,10 @@ public class AnimationHandler {
 
 	public static void refreshItems(final Player player) {
 		cancelRefresh(player);
-		if (ConfigHandler.getConfig("items.yml").getBoolean("items-Dynamic") == true) {
 			if (SafeReady.get(player) != null && SafeReady.get(player) == false) {
 				new BukkitRunnable() {
 					public void run() {
-						if (SafeReady.get(player) == true) {
+						if (SafeReady.get(player) != null && SafeReady.get(player) == true) {
 							setCanceled.put(player, false);
 							setUpdating(player);
 							SafeReady.remove(player);
@@ -42,10 +38,9 @@ public class AnimationHandler {
 				SafeReady.put(player, false);
 				setUpdating(player);
 			}
-		}
 	}
 
-	public static void setUpdating(final Player player) {
+	private static void setUpdating(final Player player) {
 		long UpdateDelay = 1;
 		if (ConfigHandler.getConfig("items.yml").getString("items-UpdateDelay") != null) {
 			UpdateDelay = ConfigHandler.getConfig("items.yml").getInt("items-UpdateDelay");
@@ -54,8 +49,10 @@ public class AnimationHandler {
 			for (final String item: ConfigHandler.getConfigurationSection().getKeys(false)) {
 				final ConfigurationSection items = ConfigHandler.getItemSection(item);
 				final String world = player.getWorld().getName();
+				final String ItemFlags = items.getString(".itemflags");
 				int Arbitrary = 0;
 				String ItemID;
+				if (ItemHandler.containsIgnoreCase(ItemFlags, "dynamic")) {
 				if (WorldHandler.inWorld(items, world) && items.getString(".slot") != null) {
 					String slotlist = items.getString(".slot").replace(" ", "");
 					String[] slots = slotlist.split(",");
@@ -93,12 +90,13 @@ public class AnimationHandler {
 							}
 						}.runTaskTimer(ItemJoin.getInstance(), 20L, 20L * UpdateDelay);
 					}
+				  }
 				}
 			}
 		}
 	}
 
-	public static void setRefresh(ConfigurationSection items, String item, String world, ItemStack inPlayerInventory, Player player, String ItemID) {
+	private static void setRefresh(ConfigurationSection items, String item, String world, ItemStack inPlayerInventory, Player player, String ItemID) {
 		ItemMeta tempmeta = inPlayerInventory.getItemMeta();
 		CreateItems.setName(items, tempmeta, inPlayerInventory, player, ItemID);
 		CreateItems.setLore(items, tempmeta, player);
