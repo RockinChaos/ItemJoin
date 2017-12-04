@@ -6,20 +6,18 @@ import org.bukkit.entity.Player;
 public class PermissionsHandler {
 
 	public static String customPermissions(ConfigurationSection items, String item, String world) {
-		String customPermission = items.getString(".permission-node");
-		if (ConfigHandler.getConfig("config.yml").getBoolean("Items-Permissions") == false || customPermission == null) {
-			customPermission = "itemjoin." + world + "." + item;
+		if (ConfigHandler.getConfig("config.yml").getBoolean("Items-Permissions") == false || items.getString(".permission-node") == null) {
+			return "itemjoin." + world + "." + item;
 		}
-		return customPermission;
+		return items.getString(".permission-node");
 	}
 
 	public static boolean hasPermission(ConfigurationSection items, String item, Player player) {
-		boolean checkPermission = false;
 		if (ConfigHandler.getConfig("config.yml").getBoolean("Items-Permissions") == false 
 				|| player.hasPermission(PermissionsHandler.customPermissions(items, item, player.getWorld().getName())) 
 				|| player.hasPermission("itemjoin." + player.getWorld() + ".*") || player.hasPermission("itemjoin.*") || player.hasPermission("itemjoin.all")) {
-			checkPermission = true;
+			return true;
 		}
-		return checkPermission;
+		return false;
 	}
 }

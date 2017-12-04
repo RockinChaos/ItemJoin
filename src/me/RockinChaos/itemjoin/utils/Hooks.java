@@ -104,6 +104,7 @@ public class Hooks {
 	    return Class.forName("org.bukkit.event." + name);
 		} catch (ClassNotFoundException e) {
 			ServerHandler.sendDebugMessage(name + " Does not exist in this version of Minecraft!");
+			if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
 		}
 		return null;
 	}

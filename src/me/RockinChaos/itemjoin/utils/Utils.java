@@ -21,8 +21,10 @@ public class Utils {
 		name = ChatColor.translateAlternateColorCodes('&', name).toString();
 		if (Hooks.hasPlaceholderAPI() == true) {
 			try {
-			name = PlaceholderAPI.setPlaceholders(player, name);
-			} catch (NullPointerException ex) {}
+			return PlaceholderAPI.setPlaceholders(player, name);
+			} catch (NullPointerException e) {
+				if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+			}
 		}
 		return name;
 	}
@@ -35,41 +37,39 @@ public class Utils {
 	public static boolean isInt(String s) {
 		try {
 			Integer.parseInt(s);
-		} catch (NumberFormatException nfe) {
+		} catch (NumberFormatException e) {
+			if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
 			return false;
 		}
 		return true;
 	}
 
 	public static boolean isCustomSlot(String slot) {
-		Boolean isCustom = false;
 		if (slot.equalsIgnoreCase("Offhand") || slot.equalsIgnoreCase("Arbitrary") || slot.equalsIgnoreCase("Helmet") 
 				|| slot.equalsIgnoreCase("Chestplate") || slot.equalsIgnoreCase("Leggings") || slot.equalsIgnoreCase("Boots")) {
-			isCustom = true;
+			return true;
 		}
-		return isCustom;
+		return false;
 	}
 
 	public static Boolean isConfigurable() {
-		Boolean isConfigurable = false;
 		if (ConfigHandler.getConfigurationSection() != null) {
-			isConfigurable = true;
+			return true;
 		} else if (ConfigHandler.getConfigurationSection() == null) {
 			ServerHandler.sendConsoleMessage("&4There are no items detected in the items.yml.");
 			ServerHandler.sendConsoleMessage("&4Try adding an item to the items section in the items.yml.");
 			ServerHandler.sendConsoleMessage("&eIf you continue to see this message contact the plugin developer!");
-			isConfigurable = false;
+			return false;
 		}
-		return isConfigurable;
+		return false;
 	}
 
 	public static boolean canBypass(Player player, String ItemFlags) {
-		boolean canBypass = false;
 		boolean Creative = player.getGameMode() == GameMode.CREATIVE;
 		if (ItemHandler.containsIgnoreCase(ItemFlags, "AllowOPBypass") && player.isOp() 
 				|| ItemHandler.containsIgnoreCase(ItemFlags, "CreativeByPass") && Creative) {
-			canBypass = true;
+			return true;
 		}
-		return canBypass;
+		return false;
 	}
 }

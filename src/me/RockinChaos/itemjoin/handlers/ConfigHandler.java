@@ -24,7 +24,7 @@ public class ConfigHandler {
 			try {
 				ItemJoin.getInstance().saveResource(path, false);
 			} catch (Exception e) {
-				e.printStackTrace();
+				if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
 				ItemJoin.getInstance().getLogger().warning("Cannot save " + path + " to disk!");
 				return null;
 			}
@@ -154,21 +154,21 @@ public class ConfigHandler {
  }
 
 	public static Boolean hasFirstJoined(Player player, String item) {
-		Boolean hasFirstJoined = false;
 		ConfigurationSection items = ConfigHandler.getItemSection(item);
 		String ItemFlags = items.getString(".itemflags");
 		if (ItemHandler.containsIgnoreCase(ItemFlags, "first-join") && hasFirstJoinedConfig(player, item) != null) {
-			hasFirstJoined = true;
+			return true;
 		}
-		return hasFirstJoined;
+		return false;
 	}
 
 	public static String hasFirstJoinedConfig(Player player, String item) {
-		String hasFJPlayer = null;
 		try {
-			hasFJPlayer = ConfigHandler.getConfig("first-join.yml").getString(player.getWorld().getName() + "." + item + "." + player.getUniqueId().toString());
-		} catch (NullPointerException ex) {}
-		return hasFJPlayer;
+			return ConfigHandler.getConfig("first-join.yml").getString(player.getWorld().getName() + "." + item + "." + player.getUniqueId().toString());
+		} catch (NullPointerException e) {
+			if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+		}
+		return null;
 	}
 
 	public static void saveFirstJoined(Player player, String item) {
@@ -181,21 +181,19 @@ public class ConfigHandler {
 				playerData.save(playerFile);
 				ConfigHandler.loadConfig("first-join.yml");
 				ConfigHandler.getConfig("first-join.yml").options().copyDefaults(false);
-			} catch (IOException e1) {
+			} catch (IOException e) {
 				ItemJoin.getInstance().getServer().getLogger().severe("Could not save " + player.getName() + " to the data file first-join.yml!");
-				e1.printStackTrace();
+				if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
 			}
 		}
 	}
 	
 	public static ConfigurationSection getConfigurationSection() {
-		ConfigurationSection section = ConfigHandler.getConfig("items.yml").getConfigurationSection("items");
-		return section;
+		return ConfigHandler.getConfig("items.yml").getConfigurationSection("items");
 	}
 	
 	public static ConfigurationSection getItemSection(String item) {
-		ConfigurationSection items = ConfigHandler.getConfigurationSection().getConfigurationSection(item);
-		return items;
+		return ConfigHandler.getConfigurationSection().getConfigurationSection(item);
 	}
 
 	public static String encodeSecretData(String str) {
@@ -206,7 +204,7 @@ public class ConfigHandler {
 			}
 			return hiddenData;
 		} catch (Exception e) {
-			e.printStackTrace();
+			if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
 			return null;
 		}
 	}
@@ -229,7 +227,7 @@ public class ConfigHandler {
 				return returnData;
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
 			return null;
 		}
 	}

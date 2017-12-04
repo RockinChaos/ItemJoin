@@ -49,13 +49,12 @@ public class CommandHandler {
 	}
 
 	public static boolean isCommandable(String action, ConfigurationSection items) {
-		boolean isCommandable = false;
 		if (isInteractPhysical(action, items)) {
-			isCommandable = true;
+			return true;
 		} else if (isInteractInv(action, items)) {
-			isCommandable = true;
+			return true;
 		}
-		return isCommandable;
+		return false;
 	}
 
 	public static void runGlobalCmds(Player player) {
@@ -71,19 +70,17 @@ public class CommandHandler {
 	}
 	
 	public static boolean isInteractInv(String action, ConfigurationSection items) {
-		boolean isInteractInv = false;
 		String commandType = items.getString(".commands-type");
 		if (commandType != null && ItemHandler.containsIgnoreCase(commandType, "inventory")) {
 			if (ItemHandler.containsIgnoreCase(".multi-click", getAction("inventory", action, items)) 
 					|| ItemHandler.containsIgnoreCase(".inventory", getAction("inventory", action, items))) {
-			isInteractInv = true;
+				return true;
 		}
 		}
-		return isInteractInv;
+		return false;
 	}
 
 	public static boolean isInteractPhysical(String action, ConfigurationSection items) {
-		boolean isInteractPhysical = false;
 		if (items.getString(".commands-type") == null || ItemHandler.containsIgnoreCase(items.getString(".commands-type"), "interact")) {
 			if (ItemHandler.containsIgnoreCase(".multi-click", getAction("interact", action, items)) 
 					|| ItemHandler.containsIgnoreCase(".left-click", getAction("interact", action, items))
@@ -92,10 +89,10 @@ public class CommandHandler {
 					|| ItemHandler.containsIgnoreCase(".left-click-air", getAction("interact", action, items))
 					|| ItemHandler.containsIgnoreCase(".right-click-air", getAction("interact", action, items))
 					|| ItemHandler.containsIgnoreCase(".physical", getAction("interact", action, items))) {
-				isInteractPhysical = true;
+				return true;
 			}
 		}
-		return isInteractPhysical;
+		return false;
 	}
 	
 	public static String getMode(String action) {
@@ -183,7 +180,6 @@ public class CommandHandler {
 
 	public static boolean spamTask(final Player player, String item) {
 		boolean itemsSpam = ConfigHandler.getConfig("items.yml").getBoolean("items-Spamming");
-		boolean spamTask = true;
 		if (itemsSpam != true) {
 			long playersCooldownList = 0L;
 			if (CommandHandler.storedSpammedPlayers.containsKey(player.getWorld().getName() + "." + player.getName().toString() + ".items." + item)) {
@@ -191,14 +187,13 @@ public class CommandHandler {
 			}
 			int cdmillis = CommandHandler.spamtime * 1000;
 			if (System.currentTimeMillis() - playersCooldownList >= cdmillis) {} else {
-				spamTask = false;
+				return false;
 			}
 		}
-		return spamTask;
+		return true;
 	}
 
 	public static boolean onCooldown(ConfigurationSection items, Player player, String item, ItemStack item1) {
-		boolean onCooldown = true;
 		long playersCooldownList = 0L;
 		if (CommandHandler.playersOnCooldown.containsKey(player.getWorld().getName() + "." + player.getName().toString() + ".items." + item)) {
 			playersCooldownList = CommandHandler.playersOnCooldown.get(player.getWorld().getName() + "." + player.getName().toString() + ".items." + item);
@@ -206,7 +201,7 @@ public class CommandHandler {
 		CommandHandler.cdtime = items.getInt(".commands-cooldown");
 		int cdmillis = CommandHandler.cdtime * 1000;
 		if (System.currentTimeMillis() - playersCooldownList >= cdmillis) {
-			onCooldown = false;
+			return false;
 		} else {
 			if (items.getString(".cooldown-message") != null) {
 				spamTask(player, item);
@@ -220,7 +215,7 @@ public class CommandHandler {
 				}
 			}
 		}
-		return onCooldown;
+		return true;
 	}
 
 	public static void chargePlayer(ConfigurationSection items, String item, Player player, String action) {
@@ -232,37 +227,37 @@ public class CommandHandler {
 	}
 
 	public static boolean isChargeable(ConfigurationSection items) {
-		boolean isChargeable = false;
 		if (items.getString(".commands-cost") != null && Econ.isVaultAPI() && Hooks.hasVault() == true) {
-			isChargeable = true;
+			return true;
 		}
-		return isChargeable;
+		return false;
 	}
 
 	public static boolean chargeCost(ConfigurationSection items, String item, Player player) {
-		boolean Charged = false;
 		if (items.getString(".commands-cost") != null && Utils.isInt(items.getString(".commands-cost"))) {
 			int cost = items.getInt(".commands-cost");
 		    double balance = 0.0;
 		    try {
 		    	balance = PlayerHandler.getBalance(player);
-		    } catch (NullPointerException ex) {
-		    	
+		    } catch (NullPointerException e) {
+		    	if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
 		    }
 			if (balance >= cost) {
 				if (cost != 0) {
 				try {
 				PlayerHandler.withdrawBalance(player, cost);
-				} catch (NullPointerException ex) {}
+				} catch (NullPointerException e) {
+					if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+				}
 				Language.getSendMessage(player, "itemChargeSuccess", "" + items.getString(".commands-cost"));
 				}
-				Charged = true;
+				return true;
 			} else if (!(balance >= cost)) {
 				Language.getSendMessage(player, "itemChargeFailed", items.getString(".commands-cost") + ", " + balance);
-				Charged = false;
+				return false;
 			}
 		}
-		return Charged;
+		return false;
 	}
 
 	public static void removeDisposable(ConfigurationSection items, ItemStack item, Player player) {
@@ -334,121 +329,83 @@ public class CommandHandler {
 					if (Utils.isInt(Command)) {
 						delay = Integer.parseInt(Command);
 					}
-				} catch (Exception e) {}
-			}
-			Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), (Runnable) new Runnable() {
-				public void run() {
-					if (ItemHandler.containsIgnoreCase(returnedIndentity, "console:")) {
-						try {
-							dispatchConsoleCommands(returnedCommand, player, item);
-						} catch (ArrayIndexOutOfBoundsException e) {
-							ServerHandler.sendConsoleMessage("&cThere was an issue executing an items command as console, if this continues please report it to the developer!");
-							ServerHandler.sendConsoleMessage("&cError Code: &c&l(CTC435)");
-						}
-					} else if (ItemHandler.containsIgnoreCase(returnedIndentity, "op:")) {
-						try {
-							dispatchOpCommands(returnedCommand, player, item);
-						} catch (ArrayIndexOutOfBoundsException e) {
-							ServerHandler.sendConsoleMessage("&cThere was an issue executing an items command as an op, if this continues please report it to the developer!");
-							ServerHandler.sendConsoleMessage("&cError Code: &c&l(CTC434)");
-						}
-					} else if (ItemHandler.containsIgnoreCase(returnedIndentity, "player:")) {
-						try {
-							dispatchPlayerCommands(returnedCommand, player, item);
-						} catch (ArrayIndexOutOfBoundsException e) {
-							ServerHandler.sendConsoleMessage("&cThere was an issue executing an items command as a player, if this continues please report it to the developer!");
-							ServerHandler.sendConsoleMessage("&cError Code: &c&l(CTC434)");
-						}
-					} else if (ItemHandler.containsIgnoreCase(returnedIndentity, "message:")) {
-						try {
-							dispatchMessageCommands(returnedCommand, player, item);
-						} catch (ArrayIndexOutOfBoundsException e) {
-							ServerHandler.sendConsoleMessage("&cThere was an issue executing an items command to send a message, if this continues please report it to the developer!");
-							ServerHandler.sendConsoleMessage("&cError Code: &c&l(CTC433)");
-						}
-					} else if (ItemHandler.containsIgnoreCase(returnedIndentity, "server:")) {
-						try {
-							dispatchBungeeCordCommands(returnedCommand, player, item);
-						} catch (ArrayIndexOutOfBoundsException e) {
-							ServerHandler.sendConsoleMessage("&cThere was an issue executing an items command to switch servers, if this continues please report it to the developer!");
-							ServerHandler.sendConsoleMessage("&cError Code: &c&l(CTC432)");
-						}
-					} else if (ItemHandler.containsIgnoreCase(returnedIndentity, "delay:")) {} else {
-						try {
-							dispatchPlayerCommands(Identify, player, item);
-						} catch (ArrayIndexOutOfBoundsException e) {
-							ServerHandler.sendConsoleMessage("&cThere was an issue executing an items command as a player, if this continues please report it to the developer!");
-							ServerHandler.sendConsoleMessage("&cError Code: &c&l(CTC431)");
-						}
-					}
+				} catch (Exception e) {
+					if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
 				}
-			}, delay);
+			}
+			BlockCode(delay, Identify, returnedCommand, returnedIndentity, item, player);
 		}
 	}
 	
 	
 	public static void BlockCode(final long delay, final String Identify, 
 			final String returnedCommand, final String returnedIndentity, final String item, final Player player) {
-        Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), (Runnable)new Runnable() {
-            public void run() {
-		if (ItemHandler.containsIgnoreCase(returnedIndentity, "console:")) {
-			try {
-				dispatchConsoleCommands(returnedCommand, player, item);
-			} catch (ArrayIndexOutOfBoundsException e) {
-				ServerHandler.sendConsoleMessage("&cThere was an issue executing an items command as console, if this continues please report it to the developer!");
-				ServerHandler.sendConsoleMessage("&cError Code: &c&l(CTC435)");
+		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), (Runnable) new Runnable() {
+			public void run() {
+				if (ItemHandler.containsIgnoreCase(returnedIndentity, "console:")) {
+					try {
+						dispatchConsoleCommands(returnedCommand, player, item);
+					} catch (ArrayIndexOutOfBoundsException e) {
+						ServerHandler.sendConsoleMessage("&cThere was an issue executing an items command as console, if this continues please report it to the developer!");
+						ServerHandler.sendConsoleMessage("&cError Code: &c&l(CTC435)");
+						if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+					}
+				} else if (ItemHandler.containsIgnoreCase(returnedIndentity, "op:")) {
+					try {
+						dispatchOpCommands(returnedCommand, player, item);
+					} catch (ArrayIndexOutOfBoundsException e) {
+						ServerHandler.sendConsoleMessage("&cThere was an issue executing an items command as an op, if this continues please report it to the developer!");
+						ServerHandler.sendConsoleMessage("&cError Code: &c&l(CTC434)");
+						if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+					}
+				} else if (ItemHandler.containsIgnoreCase(returnedIndentity, "player:")) {
+					try {
+						dispatchPlayerCommands(returnedCommand, player, item);
+					} catch (ArrayIndexOutOfBoundsException e) {
+						ServerHandler.sendConsoleMessage("&cThere was an issue executing an items command as a player, if this continues please report it to the developer!");
+						ServerHandler.sendConsoleMessage("&cError Code: &c&l(CTC434)");
+						if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+					}
+				} else if (ItemHandler.containsIgnoreCase(returnedIndentity, "message:")) {
+					try {
+						dispatchMessageCommands(returnedCommand, player, item);
+					} catch (ArrayIndexOutOfBoundsException e) {
+						ServerHandler.sendConsoleMessage("&cThere was an issue executing an items command to send a message, if this continues please report it to the developer!");
+						ServerHandler.sendConsoleMessage("&cError Code: &c&l(CTC433)");
+						if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+					}
+				} else if (ItemHandler.containsIgnoreCase(returnedIndentity, "server:")) {
+					try {
+						dispatchBungeeCordCommands(returnedCommand, player, item);
+					} catch (ArrayIndexOutOfBoundsException e) {
+						ServerHandler.sendConsoleMessage("&cThere was an issue executing an items command to switch servers, if this continues please report it to the developer!");
+						ServerHandler.sendConsoleMessage("&cError Code: &c&l(CTC432)");
+						if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+					}
+				} else if (ItemHandler.containsIgnoreCase(returnedIndentity, "delay:")) {} else {
+					try {
+						dispatchPlayerCommands(Identify, player, item);
+					} catch (ArrayIndexOutOfBoundsException e) {
+						ServerHandler.sendConsoleMessage("&cThere was an issue executing an items command as a player, if this continues please report it to the developer!");
+						ServerHandler.sendConsoleMessage("&cError Code: &c&l(CTC431)");
+						if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+					}
+				}
 			}
-		} else if (ItemHandler.containsIgnoreCase(returnedIndentity, "op:")) {
-			try {
-				dispatchOpCommands(returnedCommand, player, item);
-			} catch (ArrayIndexOutOfBoundsException e) {
-				ServerHandler.sendConsoleMessage("&cThere was an issue executing an items command as an op, if this continues please report it to the developer!");
-				ServerHandler.sendConsoleMessage("&cError Code: &c&l(CTC434)");
-			}
-		} else if (ItemHandler.containsIgnoreCase(returnedIndentity, "player:")) {
-			try {
-				dispatchPlayerCommands(returnedCommand, player, item);
-			} catch (ArrayIndexOutOfBoundsException e) {
-				ServerHandler.sendConsoleMessage("&cThere was an issue executing an items command as a player, if this continues please report it to the developer!");
-				ServerHandler.sendConsoleMessage("&cError Code: &c&l(CTC434)");
-			}
-		} else if (ItemHandler.containsIgnoreCase(returnedIndentity, "message:")) {
-			try {
-				dispatchMessageCommands(returnedCommand, player, item);
-			} catch (ArrayIndexOutOfBoundsException e) {
-				ServerHandler.sendConsoleMessage("&cThere was an issue executing an items command to send a message, if this continues please report it to the developer!");
-				ServerHandler.sendConsoleMessage("&cError Code: &c&l(CTC433)");
-			}
-		} else if (ItemHandler.containsIgnoreCase(returnedIndentity, "server:")) {
-			try {
-				dispatchBungeeCordCommands(returnedCommand, player, item);
-			} catch (ArrayIndexOutOfBoundsException e) {
-				ServerHandler.sendConsoleMessage("&cThere was an issue executing an items command to switch servers, if this continues please report it to the developer!");
-				ServerHandler.sendConsoleMessage("&cError Code: &c&l(CTC432)");
-			}
-		} else if (ItemHandler.containsIgnoreCase(returnedIndentity, "delay:")) {
-		} else {
-			try {
-				dispatchPlayerCommands(Identify, player, item);
-			} catch (ArrayIndexOutOfBoundsException e) {
-				ServerHandler.sendConsoleMessage("&cThere was an issue executing an items command as a player, if this continues please report it to the developer!");
-				ServerHandler.sendConsoleMessage("&cError Code: &c&l(CTC431)");
-			}
-		}
-	}
-        }, delay);
+		}, delay);
 	}
 
 	public static void playSound(ConfigurationSection items, Player player) {
 		if (items.getString(".commands-sound") != null) {
 			try {
 			player.playSound(player.getLocation(), Sound.valueOf(items.getString(".commands-sound")), 1, 1);
-			} catch (IllegalArgumentException ex) {
+			} catch (IllegalArgumentException e) {
 				   String pkgname = ItemJoin.getInstance().getServer().getClass().getPackage().getName();
 				   String vers = pkgname.substring(pkgname.lastIndexOf('.') + 1);
 				ServerHandler.sendConsoleMessage("&cThere was an issue executing the commands-sound you defined.");
 				ServerHandler.sendConsoleMessage("&c" + items.getString(".commands-sound") + "&c is not a sound in " + vers + ".");
 				ServerHandler.sendConsoleMessage("&cError Code: &c&l(CTC431)");
+				if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
 			}
 		}
 	}
@@ -479,7 +436,7 @@ public class CommandHandler {
 			player.chat("/" + Command);
 		}
 		catch(Exception e) {
-	        e.printStackTrace();
+			if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
 	        player.setOp(false);
 	        ServerHandler.sendConsoleMessage("&cAn error has occurred while removing " + player.getName() + " from the OPs list. OP or not OP they were removed from OPs list!");
 		}

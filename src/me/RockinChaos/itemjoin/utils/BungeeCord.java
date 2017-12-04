@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import me.RockinChaos.itemjoin.ItemJoin;
+import me.RockinChaos.itemjoin.handlers.ServerHandler;
 
 import org.bukkit.entity.Player;
 
@@ -17,7 +18,9 @@ public class BungeeCord {
 		try {
 			out.writeUTF("Connect");
 			out.writeUTF(server);
-		} catch (IOException ex) {}
+		} catch (IOException e) {
+			if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+		}
 		player.sendPluginMessage(ItemJoin.getInstance(), "BungeeCord", b.toByteArray());
 	}
 }

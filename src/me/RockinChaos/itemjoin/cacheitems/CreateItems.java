@@ -135,7 +135,11 @@ public class CreateItems {
 					AnimationHandler.refreshItems(player);
 				}
 			}
-		} catch (NoSuchMethodException ex) {} catch (InvocationTargetException ex) {} catch (IllegalAccessException ex) {}
+		} catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException ex) {
+			if (ServerHandler.hasDebuggingMode()) {
+			ex.printStackTrace();
+			}
+		} 
 	}
 	
 	public static void setRegions(ConfigurationSection items) {
@@ -155,7 +159,9 @@ public class CreateItems {
 		if (ItemHandler.containsIgnoreCase(ItemFlags, "unbreakable")) {
 		  try {
 			tempitem = setUnbreakable.Unbreakable(tempitem);
-		  } catch (Exception e) {}
+		  } catch (Exception e) {
+			  if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+		  }
 		}
 		return tempitem;
 	}
@@ -179,9 +185,7 @@ public class CreateItems {
 		}
 		} catch (Exception e) {
 			ServerHandler.sendDebugMessage("Error 133 has occured when setting NBTData to an item.");
-			if (ConfigHandler.getConfig("config.yml").getBoolean("Debugging-Mode") == true) {
-			e.printStackTrace();
-			}
+			if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
 		}
 		}
 		return tempitem;
@@ -203,7 +207,9 @@ public class CreateItems {
 				|| ItemHandler.containsIgnoreCase(ItemFlags, "hide durability") || ItemHandler.containsIgnoreCase(ItemFlags, "durability")) {
 		  try {
 		 	tempitem = setUnbreakable.Unbreakable(tempitem);
-		  } catch (Exception e) {}
+		  } catch (Exception e) {
+			  if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+		  }
 		}
 		return tempitem;
 	}
@@ -283,9 +289,10 @@ public class CreateItems {
 								level = Integer.parseInt(parts[1]);
 							}
 							duritation = Integer.parseInt(parts[2]);
-						} catch (NumberFormatException ex) {
+						} catch (NumberFormatException e) {
 							ServerHandler.sendConsoleMessage("&4An error occurred in the config, &c" + parts[1] + "&4 is not a number and a number was expected!");
 							ServerHandler.sendConsoleMessage("&4Effect: " + parts[0] + " will now be set to level 1.");
+							if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
 						}
 					}
 					if (PotionEffectType.getByName(parts[0].toUpperCase()) != null) {
@@ -431,7 +438,9 @@ public class CreateItems {
             declaredField.setAccessible(true);
             declaredField.set(tempmeta, gameProfile);
         }
-        catch (Exception ex) {}
+        catch (Exception e) {
+        	if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+        }
 		} else if (items.getString(".skull-owner") != null && items.getString(".skull-texture") != null && tempmat == Material.SKULL_ITEM) {
 			ServerHandler.sendConsoleMessage("&4You cannot define a skull owner and a skull texture at the same time, please remove one from the item.");
 		}
@@ -460,6 +469,7 @@ public class CreateItems {
 	      }
 	      catch (NullPointerException e) {
 	          ServerHandler.sendConsoleMessage("&4HeadDatabase could not find &c#" + items.getString(".skull-texture").replace("hdb-", "") + "&4, this head does not exist.");
+	          if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
 	      }
 		} else if (items.getString(".skull-owner") != null && items.getString(".skull-texture") != null && tempmat == Material.SKULL_ITEM) {
 			ServerHandler.sendConsoleMessage("&4You cannot define a skull owner and a skull texture at the same time, please remove one from the item.");
@@ -486,9 +496,10 @@ public class CreateItems {
 								amplifier = Integer.parseInt(parts[1]);
 							}
 							duritation = Integer.parseInt(parts[2]) * 20;
-						} catch (NumberFormatException ex) {
+						} catch (NumberFormatException e) {
 							ServerHandler.sendConsoleMessage("&4An error occurred in the config, &c" + parts[1] + "&4 is not a number and a number was expected!");
 							ServerHandler.sendConsoleMessage("&4Potion: " + parts[0] + " will now be set to level 1.");
+							if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
 						}
 					}
 					if (PotionEffectType.getByName(parts[0].toUpperCase()) != null) {
@@ -515,15 +526,16 @@ public class CreateItems {
 				if (ItemHandler.containsIgnoreCase(enchantment, ":")) {
 					try {
 						level = Integer.parseInt(parts[1]);
-					} catch (NumberFormatException ex) {
+					} catch (NumberFormatException e) {
 						ServerHandler.sendConsoleMessage("&4An error occurred in the config, &c" + parts[1] + "&4 is not a number and a number was expected!");
 						ServerHandler.sendConsoleMessage("&aEnchantment: " + parts[0] + " will now be enchanted by level 1.");
+						if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
 					}
 				}
-				if (enchantName == null && Hooks.hasTokenEnchant() == true && TokenEnchantAPI.getInstance().getEnchant(name) != null) {
-					TokenEnchantAPI.getInstance().enchant(player, tempitem, name, level, true, 0, true);
-				} else if (enchantName != null) {
+				if (enchantName != null) {
 					tempitem.addUnsafeEnchantment(enchantName, level);
+				} else if (enchantName == null && Hooks.hasTokenEnchant() == true && TokenEnchantAPI.getInstance().getEnchant(name) != null) {
+					TokenEnchantAPI.getInstance().enchant(player, tempitem, name, level, true, 0, true);
 				} else if (enchantName == null && Hooks.hasTokenEnchant() != true) {
 					ServerHandler.sendConsoleMessage("&4An error occurred in the config, &a" + name + "&4 is an incorrect enchantment name!");
 					ServerHandler.sendConsoleMessage("&4Please see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/enchantments/Enchantment.html for a list of correct enchantment names!");
@@ -553,17 +565,20 @@ public class CreateItems {
 				RenderImageMaps.setImage(mapIMG, mapID);
 				try {
 					view.removeRenderer(view.getRenderers().get(0));
-				} catch (NullPointerException ex) {}
+				} catch (NullPointerException e) {
+					if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+				}
 			}
 			try {
 			view.addRenderer(new RenderImageMaps());
-			} catch (NullPointerException ex) {}
+			} catch (NullPointerException e) {
+				if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+			}
 		}
 		return tempitem;
 	}
 
 	public static Boolean isCompatible(String item, String slot) {
-		Boolean isCompatible = false;
 		ConfigurationSection items = ConfigHandler.getItemSection(item);
 		String id = items.getString(".id");
 		String pkgname = ItemJoin.getInstance().getServer().getClass().getPackage().getName();
@@ -579,21 +594,20 @@ public class CreateItems {
 				ServerHandler.sendConsoleMessage("&4Your server is running &eMC " + vers + " and this does not have the item SPLASH_POTION!");
 				ServerHandler.sendConsoleMessage("&4Because of this, " + item + " will not be set!");
 			} else {
-				isCompatible = true;
+				return true;
 			}
 		} else if (isCreatable(item, slot)) {
-			isCompatible = true;
+			return true;
 		}
-		return isCompatible;
+		return false;
 	}
 
 	public static Boolean isComparable(ItemStack tempitem, String Mats) {
-		Boolean isMaterial = false;
 		Material getMaterial = Material.getMaterial(Mats);
 		if (ItemHandler.isMaterial(Mats) && tempitem.getType() == getMaterial) {
-			isMaterial = true;
+			return true;
 		}
-		return isMaterial;
+		return false;
 	}
 
 	public static ItemMeta getTempMeta(ItemStack tempitem) {
@@ -619,28 +633,27 @@ public class CreateItems {
 	}
 
 	public static boolean isCreatable(String item, String slot) {
-		boolean isCreatable = true;
 		ConfigurationSection items = ConfigHandler.getItemSection(item);
 		Material tempmat = ItemHandler.getMaterial(items);
 		if (tempmat == null) {
 			ServerHandler.sendConsoleMessage("&e" + item + "'s Material 'ID' is invalid or does not exist!");
 			ServerHandler.sendConsoleMessage("&e" + item + " &ewill not be set!");
-			isCreatable = false;
+			return false;
 		}
 		if (slot != null) {
 			if (!Utils.isInt(slot) && !Utils.isCustomSlot(slot)) {
 				ServerHandler.sendConsoleMessage("&e" + item + "'s slot is invalid or does not exist!");
 				ServerHandler.sendConsoleMessage("&e" + item + " &ewill not be set!");
-				isCreatable = false;
+				return false;
 			} else if (Utils.isInt(slot)) {
 				int iSlot = Integer.parseInt(slot);
 				if (!(iSlot >= 0 && iSlot <= 35)) {
 					ServerHandler.sendConsoleMessage("&e" + item + "'s slot must be between 1 and 36!");
 					ServerHandler.sendConsoleMessage("&e" + item + " &ewill not be set!");
-					isCreatable = false;
+					return false;
 				}
 			}
 		}
-		return isCreatable;
+		return true;
 	}
 }

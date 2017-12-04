@@ -3,6 +3,7 @@ package me.RockinChaos.itemjoin.cacheitems;
 import java.lang.reflect.Method;
 
 import me.RockinChaos.itemjoin.ItemJoin;
+import me.RockinChaos.itemjoin.handlers.ServerHandler;
 
 import org.bukkit.inventory.ItemStack;
 
@@ -16,7 +17,7 @@ public class setUnbreakable {
 		try {
 			return Class.forName("org.bukkit.craftbukkit." + getServerVersion() + '.' + name);
 		} catch (Exception e) {
-			e.printStackTrace();
+			if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
 		}
 		return null;
 	}
@@ -25,7 +26,7 @@ public class setUnbreakable {
 		try {
 			return Class.forName("net.minecraft.server." + getServerVersion() + '.' + name);
 		} catch (Exception e) {
-			e.printStackTrace();
+			if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
 		}
 		return null;
 	}
@@ -39,7 +40,9 @@ public class setUnbreakable {
 			tag.getClass().getMethod("setInt", String.class, int.class).invoke(tag, "Unbreakable", 1);
 			nms.getClass().getMethod("setTag", tag.getClass()).invoke(nms, tag);
 			item = (ItemStack) craftItemStack.getMethod("asCraftMirror", nms.getClass()).invoke(null, nms);
-		} catch (Exception e) {}
+		} catch (Exception e) {
+			if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+		}
 		return item;
 	}
 }

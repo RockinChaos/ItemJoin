@@ -49,7 +49,7 @@ public class Updater {
                 try{
                         this.filesFeed = new URL(url);
                 }catch (MalformedURLException e){
-                        e.printStackTrace();
+                	if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
                 }
         }
         
@@ -93,10 +93,11 @@ public class Updater {
                  	    	 maxValue = Double.parseDouble(plugin.getDescription().getVersion().replace("-SNAPSHOT", "").replace("-BETA", "").replace("-ALPHA", "").replace("-RELEASE", ""));
                  	    	 minValue = Double.parseDouble(this.version.replace("-SNAPSHOT", "").replace("-BETA", "").replace("-ALPHA", "").replace("-RELEASE", ""));
                 	       }
-                	       catch (NumberFormatException ex) {
+                	       catch (NumberFormatException e) {
                 	    	   sender.sendMessage(ServerHandler.StripLogColors(sender, Prefix + ChatColor.RED + "An error has occurred when checking the plugin version!"));
                 	    	   sender.sendMessage(ServerHandler.StripLogColors(sender, Prefix + ChatColor.RED + "Please contact the plugin developer!"));
                 	    	   sender.sendMessage(ServerHandler.StripLogColors(sender, Prefix + ChatColor.RED + "Error Code; C139018"));
+                	    	   if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
                 	       }
                           if(!(minValue <= maxValue)) {
                         	  if (ItemJoin.getInstance().getDescription().getVersion().contains("-SNAPSHOT") || ItemJoin.getInstance().getDescription().getVersion().contains("-BETA") || ItemJoin.getInstance().getDescription().getVersion().contains("-ALPHA")) {
@@ -122,7 +123,7 @@ public class Updater {
                         	  }
                          }
                 }catch (Exception e) {
-                        e.printStackTrace();
+                	if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
                 }
                 
                 return false;
@@ -172,7 +173,7 @@ public class Updater {
 					} catch (IOException e) {
 						sender.sendMessage(ServerHandler.StripLogColors(sender, Prefix + ChatColor.RED + "An error has occurred while trying to update the plugin ItemJoin."));
 						sender.sendMessage(ServerHandler.StripLogColors(sender, Prefix + ChatColor.RED + "Please try again later, if you continue to see this please contact the plugin developer."));
-						e.printStackTrace();
+						if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
 					}
                   }
                   else if(ItemJoin.getInstance().getConfig().getBoolean("CheckForUpdates") == true)
@@ -280,10 +281,11 @@ public class Updater {
                 }
 
             }
-        } catch (Exception ex) {
+        } catch (Exception e) {
         	sender.sendMessage(ServerHandler.StripLogColors(sender, Prefix + ChatColor.RED + "An error has occured when checking the plugin version!"));
         	sender.sendMessage(ServerHandler.StripLogColors(sender, Prefix + ChatColor.RED + "Please contact the plugin developer!"));
-        	sender.sendMessage(ServerHandler.StripLogColors(sender, Prefix + ChatColor.RED + "Error is " + ex + " C13904"));
+        	sender.sendMessage(ServerHandler.StripLogColors(sender, Prefix + ChatColor.RED + "Error is " + e + " C13904"));
+        	if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
         	return false;
         }
     }

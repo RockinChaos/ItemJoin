@@ -10,15 +10,13 @@ Log-Coloration: true
 Items-Permissions: true
 Debugging-Mode: false
 
-#// Changing this from true/false WILL make all ItemJoin items CURRENTLY in all players inventories not able to be used. //#
-#// Only newly given items after this is set to true/false will be able to be used. //#
-#// If you change this it is suggested to set Clear-On-Join to true if you change this setting so you can erase all old ItemJoin items. //#
-NewNBT-System: true
-
 
 #// Global Settings for ItemJoin. //#
 Prevent-Pickups: false
 HeldItem-Slot: None
+NewNBT-System: true
+#// Changing NewNBT-System from true/false WILL break all ItemJoin items CURRENTLY in all players inventories and will not be able to be used //#
+#// If you do change this setting, you will need to remove all old ItemJoin items. //#
 
 
 #// Global Clear Items for ItemJoin. //#

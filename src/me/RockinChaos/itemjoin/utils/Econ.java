@@ -31,11 +31,10 @@ public class Econ {
     }
     
 	   public static boolean isVaultAPI() {
-		   boolean hasVaultAPI = false;
 			  if (ItemJoin.getInstance().getServer().getPluginManager().getPlugin("Vault") != null 
 					  && ItemJoin.getInstance().getConfig().getBoolean("Vault") == true) {
-				  hasVaultAPI = true;
+				  return true;
 				 }
-			return hasVaultAPI;
+			return false;
 	   }
 }

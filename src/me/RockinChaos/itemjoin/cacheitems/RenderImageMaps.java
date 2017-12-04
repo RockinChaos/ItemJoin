@@ -6,7 +6,6 @@ import java.util.HashMap;
 import javax.imageio.ImageIO;
 
 import me.RockinChaos.itemjoin.ItemJoin;
-import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 
 import org.bukkit.entity.Player;
@@ -40,9 +39,7 @@ public class RenderImageMaps extends MapRenderer {
 				}
 			} catch (Exception e) {
 				sendErrors();
-				if (ConfigHandler.getConfig("config.yml").getBoolean("Debugging-Mode") == true) {
-				e.printStackTrace();
-				}
+				if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
 			}
 		}
 	}

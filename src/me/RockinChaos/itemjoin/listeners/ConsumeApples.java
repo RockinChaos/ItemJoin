@@ -59,9 +59,10 @@ public class ConsumeApples implements Listener {
 												amplifier = Integer.parseInt(parts[1]);
 											}
 											duritation = Integer.parseInt(parts[2]) * 20;
-										} catch (NumberFormatException ex) {
+										} catch (NumberFormatException e) {
 											ServerHandler.sendConsoleMessage("&4An error occurred in the config, &c" + parts[1] + "&4 is not a number and a number was expected!");
 											ServerHandler.sendConsoleMessage("&Potion: " + parts[0] + " will now be enchanted by level 1.");
+											if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
 										}
 									}
 									if (PotionEffectType.getByName(parts[0].toUpperCase()) != null) {

@@ -503,7 +503,9 @@ public class Commands implements CommandExecutor {
 						} else if (!ServerHandler.hasChangedTheWorldUpdate()) {
 							try {
 								tempitem = new ItemStack(tempmat, items.getInt(".count", 1), (short) dataValue);
-							} catch (NullPointerException ex) {}
+							} catch (NullPointerException e) {
+								if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+							}
 						}
 						String lookup = ItemHandler.getName(tempitem);
 						String name = Utils.format("&r" + lookup, player);
@@ -598,7 +600,9 @@ public class Commands implements CommandExecutor {
 						} else if (!ServerHandler.hasChangedTheWorldUpdate()) {
 							try {
 								tempitem = new ItemStack(tempmat, items.getInt(".count", 1), (short) dataValue);
-							} catch (NullPointerException ex) {}
+							} catch (NullPointerException e) {
+								if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+							}
 						}
 						String lookup = ItemHandler.getName(tempitem);
 						String name = Utils.format("&r" + lookup, player);

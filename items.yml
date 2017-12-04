@@ -2,10 +2,10 @@
 #// See the Documentations page for a more in-depth tutorial; https://www.spigotmc.org/wiki/itemjoin/ //#
 items-Version: 6
 items-Delay: 2
+items-UpdateDelay: 1
 items-Overwrite: false
 items-Spamming: false
-items-Dynamic: false
-items-UpdateDelay: 1
+items-RestrictCount : false
 
 items:
   ultra-item:
@@ -13,7 +13,7 @@ items:
     slot: 0
     name: '&bBlazefury'
     lore:
-      - '&7A god sword..'
+      - '&7A godly sword.'
       - '&7This is generations old!'
     commands:
       multi-click:

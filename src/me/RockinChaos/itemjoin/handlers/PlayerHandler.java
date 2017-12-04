@@ -73,13 +73,12 @@ public class PlayerHandler {
 	}
 	
 	public static boolean isCreativeMode(Player player) {
-		boolean isCreative = false;
 		final GameMode gamemode = player.getGameMode();
 		final GameMode creative = GameMode.CREATIVE;
 		if (gamemode == creative) {
-			isCreative = true;
+			return true;
 		}
-		return isCreative;
+		return false;
 	}
 
 	
@@ -89,9 +88,7 @@ public class PlayerHandler {
 			return true;
 			}
 		} catch (Exception e) {
-			if (ServerHandler.hasDebuggingMode()) {
-			e.printStackTrace();
-			}
+			if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
 		}
 		return false;
 	}

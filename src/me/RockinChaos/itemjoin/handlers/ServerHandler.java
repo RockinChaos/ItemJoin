@@ -10,63 +10,58 @@ import me.RockinChaos.itemjoin.ItemJoin;
 public class ServerHandler {
 	
 	public static boolean hasWorldOfColorUpdate() {
-		boolean hasCombatUpdate = false;
 		String pkgname = ItemJoin.getInstance().getServer().getClass().getPackage().getName();
 		String combatVersion = "v1_12_R0".replace("_", "").replace("R0", "").replace("R1", "").replace("R2", "").replace("R3", "").replace("R4", "").replace("R5", "").replaceAll("[a-z]", "");
 		String version = pkgname.substring(pkgname.lastIndexOf('.') + 1).replace("_", "").replace("R0", "").replace("R1", "").replace("R2", "").replace("R3", "").replace("R4", "").replace("R5", "").replaceAll("[a-z]", "");
 		if (Integer.parseInt(version) >= Integer.parseInt(combatVersion)) {
-			hasCombatUpdate = true;
+			return true;
 		}
-		return hasCombatUpdate;
+		return false;
 	}
 
 	public static boolean hasExplorationUpdate() {
-		boolean hasCombatUpdate = false;
 		String pkgname = ItemJoin.getInstance().getServer().getClass().getPackage().getName();
 		String combatVersion = "v1_11_R0".replace("_", "").replace("R0", "").replace("R1", "").replace("R2", "").replace("R3", "").replace("R4", "").replace("R5", "").replaceAll("[a-z]", "");
 		String version = pkgname.substring(pkgname.lastIndexOf('.') + 1).replace("_", "").replace("R0", "").replace("R1", "").replace("R2", "").replace("R3", "").replace("R4", "").replace("R5", "").replaceAll("[a-z]", "");
 		if (Integer.parseInt(version) >= Integer.parseInt(combatVersion)) {
-			hasCombatUpdate = true;
+			return true;
 		}
-		return hasCombatUpdate;
+		return false;
 	}
 	
 	public static boolean hasFrostburnUpdate() {
-		boolean hasCombatUpdate = false;
 		String pkgname = ItemJoin.getInstance().getServer().getClass().getPackage().getName();
 		String combatVersion = "v1_10_R0".replace("_", "").replace("R0", "").replace("R1", "").replace("R2", "").replace("R3", "").replace("R4", "").replace("R5", "").replaceAll("[a-z]", "");
 		String version = pkgname.substring(pkgname.lastIndexOf('.') + 1).replace("_", "").replace("R0", "").replace("R1", "").replace("R2", "").replace("R3", "").replace("R4", "").replace("R5", "").replaceAll("[a-z]", "");
 		if (Integer.parseInt(version) >= Integer.parseInt(combatVersion)) {
-			hasCombatUpdate = true;
+			return true;
 		}
-		return hasCombatUpdate;
+		return false;
 	}
 	
 	public static boolean hasCombatUpdate() {
-		boolean hasCombatUpdate = false;
 		String pkgname = ItemJoin.getInstance().getServer().getClass().getPackage().getName();
 		String combatVersion = "v1_9_R0".replace("_", "").replace("R0", "").replace("R1", "").replace("R2", "").replace("R3", "").replace("R4", "").replace("R5", "").replaceAll("[a-z]", "");
 		String version = pkgname.substring(pkgname.lastIndexOf('.') + 1).replace("_", "").replace("R0", "").replace("R1", "").replace("R2", "").replace("R3", "").replace("R4", "").replace("R5", "").replaceAll("[a-z]", "");
 		if (Integer.parseInt(version) >= Integer.parseInt(combatVersion)) {
-			hasCombatUpdate = true;
+			return true;
 		}
-		return hasCombatUpdate;
+		return false;
 	}
 
 	public static boolean hasChangedTheWorldUpdate() {
-		boolean hasViableUpdate = false;
 		String pkgname = ItemJoin.getInstance().getServer().getClass().getPackage().getName();
 		String combatVersion = "v1_7_R0".replace("_", "").replace("R0", "").replace("R1", "").replace("R2", "").replace("R3", "").replace("R4", "").replace("R5", "").replaceAll("[a-z]", "");
 		String version = pkgname.substring(pkgname.lastIndexOf('.') + 1).replace("_", "").replace("R0", "").replace("R1", "").replace("R2", "").replace("R3", "").replace("R4", "").replace("R5", "").replaceAll("[a-z]", "");
 		if (Integer.parseInt(version) > Integer.parseInt(combatVersion)) {
-			hasViableUpdate = true;
+			return true;
 		}
-		return hasViableUpdate;
+		return false;
 	}
 	
 	public static String StripLogColors(CommandSender sender, String message) {
 		if(sender instanceof ConsoleCommandSender && ConfigHandler.getConfig("config.yml").getBoolean("Log-Coloration") != true) {
-			message = ChatColor.stripColor(message);
+			return ChatColor.stripColor(message);
 		}
 	  return message;
 	}
@@ -109,7 +104,7 @@ public class ServerHandler {
 
 	public static void sendDebugMessage(String message) {
 		String prefix = "[ITEMJOIN_DEBUG] &c";
-		if (ConfigHandler.getConfig("config.yml").getBoolean("Debugging-Mode") == true) {
+		if (ServerHandler.hasDebuggingMode()) {
 		message = ChatColor.translateAlternateColorCodes('&', message).toString();
 		message = ChatColor.stripColor(message);
 		message = prefix + message;
