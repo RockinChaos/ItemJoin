@@ -50,7 +50,7 @@ public class AnimationHandler {
 			for (final String item: ConfigHandler.getConfigurationSection().getKeys(false)) {
 				final ConfigurationSection items = ConfigHandler.getItemSection(item);
 				final String world = player.getWorld().getName();
-				final String ItemFlags = items.getString(".itemflags");
+				String ItemFlags = items.getString(".itemflags");
 				int Arbitrary = 0;
 				String ItemID;
 				if (ItemHandler.containsIgnoreCase(ItemFlags, "dynamic")) {
