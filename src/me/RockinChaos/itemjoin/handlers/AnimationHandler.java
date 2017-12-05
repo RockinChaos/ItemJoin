@@ -1,6 +1,7 @@
 package me.RockinChaos.itemjoin.handlers;
 
 import java.util.HashMap;
+
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -68,15 +69,19 @@ public class AnimationHandler {
 							public void run() {
 								if (player.isOnline() && setCanceled.get(player) != null && setCanceled.get(player) != true || player.isOnline() && setCanceled.get(player) == null) {
 									ItemStack inStoredItems = CreateItems.items.get(world + "." + player.getName().toString() + ".items." + finalID + item);
-									for (final ItemStack inPlayerInventory: player.getInventory().getContents()) {
+									for (ItemStack inPlayerInventory: player.getInventory().getContents()) {
 										if (inPlayerInventory != null && inStoredItems != null && ItemHandler.isSimilar(inPlayerInventory, inStoredItems)) {
 											setRefresh(items, item, world, inPlayerInventory, player, finalID);
 										}
 									}
-									for (final ItemStack inPlayerInventory: player.getInventory().getArmorContents()) {
+									for (ItemStack inPlayerInventory: player.getInventory().getArmorContents()) {
 										if (inPlayerInventory != null && inStoredItems != null && ItemHandler.isSimilar(inPlayerInventory, inStoredItems)) {
 											setRefresh(items, item, world, inPlayerInventory, player, finalID);
 										}
+									}
+									if (player.getItemOnCursor() != null && inStoredItems != null && ItemHandler.isSimilar(player.getItemOnCursor(), inStoredItems)) {
+										  setRefresh(items, item, world, player.getItemOnCursor(), player, finalID);
+										  player.setItemOnCursor(player.getItemOnCursor());
 									}
 								} else if (!player.isOnline() || setCanceled.get(player) == true) {
 									new BukkitRunnable() {
@@ -102,6 +107,6 @@ public class AnimationHandler {
 		CreateItems.setLore(items, tempmeta, player);
 		inPlayerInventory.setItemMeta(tempmeta);
 		CreateItems.items.remove(world + "." + player.getName().toString() + ".items." + ItemID + item);
-		CreateItems.items.put(world + "." + player.getName().toString() + ".items." + ItemID + item, inPlayerInventory);
+		CreateItems.items.put(world + "." + player.getName().toString() + ".items." + ItemID + item, new ItemStack(inPlayerInventory));
 	}
 }
