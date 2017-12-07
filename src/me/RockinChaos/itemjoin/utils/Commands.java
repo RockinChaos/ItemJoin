@@ -1,9 +1,16 @@
 package me.RockinChaos.itemjoin.utils;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.command.*;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -51,6 +58,7 @@ public class Commands implements CommandExecutor {
 			if (sender.hasPermission("itemjoin.use") || sender.hasPermission("itemjoin.*")) {
 				ServerHandler.sendCommandsMessage(sender, "blankmessage");
 				ServerHandler.sendCommandsMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
+				ServerHandler.sendCommandsMessage(sender, "&a&l/ItemJoin Save <Name> &7- &eSave the held item to the config");
 				ServerHandler.sendCommandsMessage(sender, "&a&l/ItemJoin List &7- &eCheck items you can get each what worlds");
 				ServerHandler.sendCommandsMessage(sender, "&a&l/ItemJoin World &7- &eCheck what world you are in, debugging");
 				ServerHandler.sendCommandsMessage(sender, "&a&l/ItemJoin Permissions &7- &eLists the permissions you have");
@@ -110,7 +118,7 @@ public class Commands implements CommandExecutor {
 		} else if (args[0].equalsIgnoreCase("menu") || args[0].equalsIgnoreCase("creator")) {
 			// This is a currently unimplemented feature that is currently in development so it is blocked so only the DEV can work on it.
 			// This will soon be the items GUI creator that allows you to create items in game for ItemJoin!
-			if (sender.getName() == "RockinChaos") { // sender.hasPermission("itemjoin.creator") || sender.hasPermission("itemjoin.*")
+			if (sender.getName().equals("RockinChaos")) { // sender.hasPermission("itemjoin.creator") || sender.hasPermission("itemjoin.*")
 				if (!(sender instanceof ConsoleCommandSender)) {
 					ItemCreator.LaunchCreator(sender);
 					//Language.getSendMessage(sender, "creatorlaunched", "");
@@ -122,6 +130,88 @@ public class Commands implements CommandExecutor {
 			} else {
 				//Language.getSendMessage(sender, "noPermission", "");
 				Language.getSendMessage(sender, "unknownCommand", "");
+				return true;
+			}
+		} else if (args.length == 2 && args[0].equalsIgnoreCase("save")) {
+			if (sender.getName().equals("RockinChaos") && sender.hasPermission("itemjoin.save") || sender.getName().equals("RockinChaos") && sender.hasPermission("itemjoin.*")) {
+				if (!(sender instanceof ConsoleCommandSender)) {
+					ItemStack item = new ItemStack(PlayerHandler.getPerfectHandItem((Player)sender, "HAND"));
+					
+					if (item != null && item.getType() != Material.AIR) {
+					String world = ((Player)sender).getWorld().getName();
+					String type = item.getType().toString();
+					
+					File playerFile = new File(ItemJoin.getInstance().getDataFolder(), "items.yml");
+					FileConfiguration playerData = YamlConfiguration.loadConfiguration(playerFile);
+					playerData.set("items." + args[1] + "." + "id", type);
+					playerData.set("items." + args[1] + "." + "slot", 0);
+					
+					if (item.getAmount() > 1) {
+					playerData.set("items." + args[1] + "." + "count", item.getAmount());
+					}
+					
+					if (item.getType().getMaxDurability() < 30 &&  ((short)item.getDurability()) > 0) {
+					playerData.set("items." + args[1] + "." + "data-value", ((short)item.getDurability()));
+					}
+					
+					if (item.getType().getMaxDurability() > 30 && ((short)item.getDurability()) != 0 && ((short)item.getDurability()) != ((short)item.getType().getMaxDurability())) {
+					playerData.set("items." + args[1] + "." + "durability", ((short)item.getDurability()));
+					}
+
+					if (item.hasItemMeta()) {
+						
+					if (item.getItemMeta().hasDisplayName()) {
+						String name = item.getItemMeta().getDisplayName();
+						for (int i = 0; i <= 36; i++) {
+							name = name.replace(ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + i), "");
+							name = name.replace(ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + "Arbitrary" + i), "");
+						}
+					playerData.set("items." + args[1] + "." + "name", name.replace("§", "&"));
+					}
+					
+					if(item.getItemMeta().hasLore()) { // create loop to reput into a array list. with colors translated and '' added.
+						List<String> lore = item.getItemMeta().getLore();
+						List<String> lore2 = new ArrayList<String>();
+						for (String l: lore) {
+							lore2.add(l.replace("§", "&"));
+						}
+					playerData.set("items." + args[1] + "." + "lore", lore2);
+					}
+					
+					if (item.getItemMeta().hasEnchants()) {
+					List<String> enchantList = new ArrayList<String>();
+					for (Enchantment e: item.getItemMeta().getEnchants().keySet()) {
+						 int level = item.getItemMeta().getEnchants().get(e);
+				            enchantList.add(e.getName().toUpperCase() + ":" + level);
+					}
+					playerData.set("items." + args[1] + "." + "enchantment", Utils.convertStringList(enchantList));
+					}
+					}
+					
+					playerData.set("items." + args[1] + "." + "itemflags", "death-drops");
+					playerData.set("items." + args[1] + "." + "triggers", "join");
+					playerData.set("items." + args[1] + "." + "enabled-worlds", world);
+					
+					try {
+						playerData.save(playerFile);
+					} catch (IOException e) {
+						ItemJoin.getInstance().getServer().getLogger().severe("Could not save " + "item" + " to the data file items.yml!");
+						if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+					}
+					
+					ServerHandler.sendConsoleMessage("The item " + args[1] + " has been saved to the items.yml.");
+					ServerHandler.sendConsoleMessage("You will need to edit any default values created with this item and reload the config(s).");
+					return true;
+					} else {
+						ServerHandler.sendConsoleMessage("Haha your holding air xD.");
+						return true;	
+					}
+				} else if (sender instanceof ConsoleCommandSender) {
+					Language.getSendMessage(sender, "notPlayer", "");
+					return true;
+				}
+			} else {
+				Language.getSendMessage(sender, "noPermission", "");
 				return true;
 			}
 		} else if (args[0].equalsIgnoreCase("world") || args[0].equalsIgnoreCase("worlds") || args[0].equalsIgnoreCase("w")) {
@@ -158,7 +248,7 @@ public class Commands implements CommandExecutor {
 								String[] slots = slotlist.split(",");
 								ItemHandler.clearItemID(player);
 								String ItemID = ItemHandler.getItemID(player, slots[0]);
-								ItemStack inStoredItems = CreateItems.items.get(world + "." + player.getName().toString() + ".items." + ItemID + item);
+								ItemStack inStoredItems = CreateItems.items.get(world + "." + PlayerHandler.getPlayerID(player) + ".items." + ItemID + item);
 								if (inStoredItems != null) {
 									Language.getSendMessage(sender, "listItems", item);
 									ItemExists = true;
@@ -255,7 +345,7 @@ public class Commands implements CommandExecutor {
 								String[] slots = slotlist.split(",");
 								ItemHandler.clearItemID(player);
 								String ItemID = ItemHandler.getItemID(player, slots[0]);
-								ItemStack inStoredItems = CreateItems.items.get(world + "." + player.getName().toString() + ".items." + ItemID + item);
+								ItemStack inStoredItems = CreateItems.items.get(world + "." + PlayerHandler.getPlayerID(player) + ".items." + ItemID + item);
 								if (inStoredItems != null && sender.hasPermission(PermissionsHandler.customPermissions(items, item, world))) {
 									ServerHandler.sendCommandsMessage(sender, "&a[\u2714] " + PermissionsHandler.customPermissions(items, item, world));
 								} else if (inStoredItems != null && !sender.hasPermission(PermissionsHandler.customPermissions(items, item, world))) {
@@ -443,7 +533,7 @@ public class Commands implements CommandExecutor {
 						String ItemID = ItemHandler.getItemID(player, slot);
 						if (itemName.equalsIgnoreCase("00a40gh392bd938d4")) {
 							if (Utils.isCustomSlot(slot)) {
-								ItemStack inStoredItems = CreateItems.items.get(player.getWorld().getName() + "." + player.getName().toString() + ".items." + ItemID + item);
+								ItemStack inStoredItems = CreateItems.items.get(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + ItemID + item);
 								if (!ItemHandler.hasItem(player, inStoredItems)) {
 								SetItems.setCustomSlots(player, item, slot, ItemID);
 								if (hasRan != true) {
@@ -468,7 +558,7 @@ public class Commands implements CommandExecutor {
 								}
 								ItemExists = true;
 							} else if (Utils.isInt(slot)) {
-								ItemStack inStoredItems = CreateItems.items.get(player.getWorld().getName() + "." + player.getName().toString() + ".items." + ItemID + item);
+								ItemStack inStoredItems = CreateItems.items.get(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + ItemID + item);
 								if (!ItemHandler.hasItem(player, inStoredItems)) {
 								SetItems.setInvSlots(player, item, slot, ItemID);
 								if (hasRan != true) {
@@ -494,7 +584,7 @@ public class Commands implements CommandExecutor {
 								ItemExists = true;
 							}
 						} else {
-						ItemStack inStoredItems = CreateItems.items.get(player.getWorld().getName() + "." + player.getName().toString() + ".items." + ItemID + itemName);
+						ItemStack inStoredItems = CreateItems.items.get(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + ItemID + itemName);
 						int dataValue = items.getInt(".data-value");
 						Material tempmat = ItemHandler.getMaterial(items);
 						ItemStack tempitem = null;
@@ -566,7 +656,7 @@ public class Commands implements CommandExecutor {
 					for (String slot: slots) {
 						String ItemID = ItemHandler.getItemID(player, slot);
 						if (itemName.equalsIgnoreCase("00a40gh392bd938d4")) {
-							ItemStack inStoredItems = CreateItems.items.get(player.getWorld().getName() + "." + player.getName().toString() + ".items." + ItemID + item);
+							ItemStack inStoredItems = CreateItems.items.get(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + ItemID + item);
 							if (ItemHandler.hasItem(player, inStoredItems)) {
 							   SetItems.setClearItemJoinItems(player);
 								if (hasRan != true) {
@@ -591,7 +681,7 @@ public class Commands implements CommandExecutor {
 								}
 								ItemExists = true;
 						} else {
-						ItemStack inStoredItems = CreateItems.items.get(player.getWorld().getName() + "." + player.getName().toString() + ".items." + ItemID + itemName);
+						ItemStack inStoredItems = CreateItems.items.get(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + ItemID + itemName);
 						int dataValue = items.getInt(".data-value");
 						Material tempmat = ItemHandler.getMaterial(items);
 						ItemStack tempitem = null;
