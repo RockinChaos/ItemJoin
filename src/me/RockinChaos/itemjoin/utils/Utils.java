@@ -1,10 +1,14 @@
 package me.RockinChaos.itemjoin.utils;
 
+import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
+
+import de.domedd.betternick.api.nickedplayer.NickedPlayer;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
@@ -14,9 +18,18 @@ public class Utils {
 
 	public static String format(String name, Player player) {
 		String playerName = "ItemJoin";
-		if (player != null) {
+		
+		if (player != null && Hooks.hasBetterNick()) {
+			NickedPlayer np = new NickedPlayer(player);
+			if (np.isNicked()) {
+			playerName = np.getRealName();
+			} else {
+				playerName = player.getName();
+			}
+		} else if (player != null) {
 			playerName = player.getName();
 		}
+		
 		name = name.replace("%player%", playerName);
 		name = ChatColor.translateAlternateColorCodes('&', name).toString();
 		if (Hooks.hasPlaceholderAPI() == true) {
@@ -42,6 +55,14 @@ public class Utils {
 			return false;
 		}
 		return true;
+	}
+	
+	public static String convertStringList(List<String> list) {
+	    String res = "";
+	    for (Iterator<String> iterator = list.iterator(); iterator.hasNext();) {
+	        res += iterator.next() + (iterator.hasNext() ? ", " : "");
+	    }
+	    return res;
 	}
 
 	public static boolean isCustomSlot(String slot) {

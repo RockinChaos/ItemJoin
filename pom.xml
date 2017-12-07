@@ -175,6 +175,14 @@
             <systemPath>${pom.basedir}/src/me/RockinChaos/itemjoin/extra/HeadDatabaseAPI.jar</systemPath>
             <version>LATEST</version>
         </dependency>
+    <!--BetterNick Local API/Repo -->
+        <dependency>
+            <groupId>me.BetterNickAPI</groupId>
+            <artifactId>BetterNickAPI</artifactId>
+            <scope>system</scope>
+            <systemPath>${pom.basedir}/src/me/RockinChaos/itemjoin/extra/BetterNickAPI.jar</systemPath>
+            <version>LATEST</version>
+        </dependency>
     <!--TokenEnchant Local API/Repo -->
         <dependency>
             <groupId>me.TokenEnchantAPI</groupId>

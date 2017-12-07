@@ -46,5 +46,6 @@ xInventories: false
 TokenEnchant: false
 HeadDatabase: false
 WorldGuard: false
+BetterNick: false
 MyWorlds: false
 AuthMe: false

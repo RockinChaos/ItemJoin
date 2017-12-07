@@ -28,6 +28,7 @@ public class Hooks {
 	private static boolean hasPlaceholderAPI;
 	private static boolean hasPerWorldPlugins;
 	private static boolean hasPerWorldInventory;
+	private static boolean hasBetterNick;
 	private static boolean hasAuthMe;
 	private static boolean hasMyWorlds;
 	private static boolean hasxInventories;
@@ -42,6 +43,7 @@ public class Hooks {
 		hookMultiverseInv();
 		hookPerWorldPlugins();
 		hookPerWorldInventory();
+		hookBetterNick();
 		hookAuthMe();
 		hookWorldGuard();
 		hookMyWorlds();
@@ -73,6 +75,10 @@ public class Hooks {
 	
 	public static boolean hasPerWorldInventory() {
 		return hasPerWorldInventory;
+	}
+	
+	public static boolean hasBetterNick() {
+		return hasBetterNick;
 	}
 	
 	public static boolean hasAuthMe() {
@@ -246,6 +252,16 @@ public class Hooks {
 		} else if (ConfigHandler.getConfig("config.yml").getBoolean("AuthMe") == true) {
 			ServerHandler.sendConsoleMessage("&4Could not find AuthMe.");
 			hasAuthMe = false;
+		}
+	}
+	
+	public static void hookBetterNick() {
+		if (Bukkit.getServer().getPluginManager().getPlugin("BetterNick") != null && ConfigHandler.getConfig("config.yml").getBoolean("BetterNick") == true) {
+			ServerHandler.sendConsoleMessage("&aHooked into BetterNick!");
+			hasBetterNick = true;
+		} else if (ConfigHandler.getConfig("config.yml").getBoolean("BetterNick") == true) {
+			ServerHandler.sendConsoleMessage("&4Could not find BetterNick.");
+			hasBetterNick = false;
 		}
 	}
 	
