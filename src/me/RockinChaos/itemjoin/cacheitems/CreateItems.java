@@ -48,17 +48,18 @@ import me.RockinChaos.itemjoin.listeners.InvClickCreative;
 import me.RockinChaos.itemjoin.listeners.giveitems.RegionEnter;
 import me.RockinChaos.itemjoin.utils.Hooks;
 import me.RockinChaos.itemjoin.utils.Utils;
-import me.arcaniax.hdb.api.HeadDatabaseAPI;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
+
 import com.vk2gpz.tokenenchant.api.TokenEnchantAPI;
+import me.arcaniax.hdb.api.HeadDatabaseAPI;
 
 public class CreateItems {
 	public static Map < String, ItemStack > items = new HashMap < String, ItemStack > ();
 
 	public static void run(Player player) {
-		CreateItems.items.remove(player.getWorld().getName() + "." + player.getName().toString() + ".items.");
+		CreateItems.items.remove(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items.");
 		RegionEnter.resetRegions();
 		RenderImageMaps.clearMaps(player);
 		if (Utils.isConfigurable()) {
@@ -105,7 +106,7 @@ public class CreateItems {
 							setRegions(items);
 							for (World world: Bukkit.getServer().getWorlds()) {
 								if (WorldHandler.inWorld(items, world.getName())) {
-									CreateItems.items.put(world.getName() + "." + player.getName().toString() + ".items." + ItemID + item, tempitem);
+									CreateItems.items.put(world.getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + ItemID + item, tempitem);
 								}
 							}
 						}
@@ -114,7 +115,7 @@ public class CreateItems {
 			}
 		}
 	}
-
+	
 	@SuppressWarnings("unchecked")
 	public static void setRun() {
 		Collection < ? extends Player > playersOnlineNew;

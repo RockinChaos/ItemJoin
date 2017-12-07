@@ -38,7 +38,7 @@ public class InvClickSurvival implements Listener {
 				item = event.getCurrentItem();
 			}
 			if (!ServerHandler.hasCombatUpdate()) {
-				dropClick.put(player.getName(), true);
+				dropClick.put(PlayerHandler.getPlayerID(player), true);
 				ItemStack[] Inv = player.getInventory().getContents().clone();
 				ItemStack[] Armor = player.getInventory().getArmorContents().clone();
 				CustomDropEvent(player, Inv, Armor);
@@ -53,8 +53,8 @@ public class InvClickSurvival implements Listener {
 	public static void CustomDropEvent(final Player player, final ItemStack[] Inv, final ItemStack[] Armor) {
 		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
 			public void run() {
-				if (dropClick.get(player.getName()) != null && dropClick.get(player.getName()) == true 
-					&& droppedItem.get(player.getName()) != null && droppedItem.get(player.getName()) == true) {
+				if (dropClick.get(PlayerHandler.getPlayerID(player)) != null && dropClick.get(PlayerHandler.getPlayerID(player)) == true 
+					&& droppedItem.get(PlayerHandler.getPlayerID(player)) != null && droppedItem.get(PlayerHandler.getPlayerID(player)) == true) {
 					player.getInventory().clear();
 					player.getInventory().setHelmet(null);
 					player.getInventory().setChestplate(null);
@@ -66,9 +66,9 @@ public class InvClickSurvival implements Listener {
 					player.getInventory().setContents(Inv);
 					player.getInventory().setArmorContents(Armor);
 					PlayerHandler.updateInventory(player);
-					droppedItem.remove(player.getName());
+					droppedItem.remove(PlayerHandler.getPlayerID(player));
 				}
-				dropClick.remove(player.getName());
+				dropClick.remove(PlayerHandler.getPlayerID(player));
 			}
 		}, 1L);
 	}

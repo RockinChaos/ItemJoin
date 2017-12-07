@@ -38,8 +38,8 @@ public class InvClickCreative implements Listener {
 		Initialize(player);
 		if (PlayerHandler.isCreativeMode(player)) {
 			ItemStack item = null;
-			if (cooldown.get(player.getName()) == 1) {
-				cooldown.put(player.getName(), 1);
+			if (cooldown.get(PlayerHandler.getPlayerID(player)) == 1) {
+				cooldown.put(PlayerHandler.getPlayerID(player), 1);
 				event.setCancelled(true);
 				player.getInventory().clear();
 				player.getInventory().setHelmet(null);
@@ -52,7 +52,7 @@ public class InvClickCreative implements Listener {
 					ItemStack readd = new ItemStack(event.getCursor());
 					restoreInventory(player, readd);
 					PlayerHandler.delayUpdateInventory(player, 5L);
-			} else if (cooldown.get(player.getName()) != 1) {
+			} else if (cooldown.get(PlayerHandler.getPlayerID(player)) != 1) {
 				if (ItemHandler.containsIgnoreCase(event.getAction().name(), "HOTBAR")) {
 					item = event.getView().getBottomInventory().getItem(event.getHotbarButton());
 					if (item == null && event.getCursor() != null && event.getCursor().getType() != Material.AIR) {
@@ -66,21 +66,21 @@ public class InvClickCreative implements Listener {
 					item = event.getCurrentItem();
 				}
 				if (event.getCurrentItem() != null && event.getCursor() != null && event.getCursor().getType() != Material.AIR && event.getCurrentItem().getType() != Material.AIR && !hasItem(player, event.getCursor())) {
-					isGlitchSwap.put(player.getName(), true);
+					isGlitchSwap.put(PlayerHandler.getPlayerID(player), true);
 				}
-				if (cooldown.get(player.getName()) != 1 && ItemHandler.isAllowedItem(player, item, itemflag)) {
+				if (cooldown.get(PlayerHandler.getPlayerID(player)) != 1 && ItemHandler.isAllowedItem(player, item, itemflag)) {
 					saveInventory(player);
 				}
 				
 				if (!ServerHandler.hasCombatUpdate()) {
-					InvClickSurvival.dropClick.put(player.getName(), true);
+					InvClickSurvival.dropClick.put(PlayerHandler.getPlayerID(player), true);
 					ItemStack[] Inv = player.getInventory().getContents().clone();
 					ItemStack[] Armor = player.getInventory().getArmorContents().clone();
 					InvClickSurvival.CustomDropEvent(player, Inv, Armor);
 				}
 				
 				if (!ItemHandler.isAllowedItem(player, item, itemflag) || event.getCurrentItem() != null && event.getCursor() != null && !hasItem(player, event.getCursor()) && !ItemHandler.isAllowedItem(player, event.getCurrentItem(), itemflag)) {
-					cooldown.put(player.getName(), 1);
+					cooldown.put(PlayerHandler.getPlayerID(player), 1);
 					event.setCancelled(true);
 					player.getInventory().clear();
 					player.getInventory().setHelmet(null);
@@ -98,10 +98,10 @@ public class InvClickCreative implements Listener {
 					final ItemStack itemFinal = item;
 					Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
 						public void run() {
-							if (dropGlitch.get(player.getName()) != null && dropGlitch.get(player.getName()) == true) {
+							if (dropGlitch.get(PlayerHandler.getPlayerID(player)) != null && dropGlitch.get(PlayerHandler.getPlayerID(player)) == true) {
 							    player.getInventory().removeItem(itemFinal);
 							    PlayerHandler.updateInventory(player);
-								dropGlitch.remove(player.getName());
+								dropGlitch.remove(PlayerHandler.getPlayerID(player));
 							}
 						}
 						}, 1L);
@@ -113,12 +113,12 @@ public class InvClickCreative implements Listener {
 	public static void setRunnable(final Player player) {
 		new BukkitRunnable() {
 			public void run() {
-				if (player.isOnline() && PlayerHandler.isCreativeMode(player) && isCreative.get(player.getName()) == true) {
+				if (player.isOnline() && PlayerHandler.isCreativeMode(player) && isCreative.get(PlayerHandler.getPlayerID(player)) == true) {
 					saveInventory(player);
-				} else if (isCreative.get(player.getName()) != true) {
+				} else if (isCreative.get(PlayerHandler.getPlayerID(player)) != true) {
 					this.cancel();
 				} else if (!player.isOnline()) {
-					isCreative.put(player.getName(), false);
+					isCreative.put(PlayerHandler.getPlayerID(player), false);
 					this.cancel();
 				}
 			}
@@ -126,25 +126,25 @@ public class InvClickCreative implements Listener {
 	}
 
 	public static void Initialize(Player player) {
-		if (isCreative.get(player.getName()) == null) {
-			isCreative.put(player.getName(), false);
+		if (isCreative.get(PlayerHandler.getPlayerID(player)) == null) {
+			isCreative.put(PlayerHandler.getPlayerID(player), false);
 		}
-		if (isGlitchSwap.get(player.getName()) == null) {
-			isGlitchSwap.put(player.getName(), false);
+		if (isGlitchSwap.get(PlayerHandler.getPlayerID(player)) == null) {
+			isGlitchSwap.put(PlayerHandler.getPlayerID(player), false);
 		}
-		if (cooldown.get(player.getName()) == null) {
-			cooldown.put(player.getName(), 0);
+		if (cooldown.get(PlayerHandler.getPlayerID(player)) == null) {
+			cooldown.put(PlayerHandler.getPlayerID(player), 0);
 		}
 	}
 
 	public static void isCreative(Player player, GameMode gamemode) {
 		GameMode creative = GameMode.CREATIVE;
 		Initialize(player);
-		if (isCreative.get(player.getName()) == false && gamemode == creative) {
-			isCreative.put(player.getName(), true);
+		if (isCreative.get(PlayerHandler.getPlayerID(player)) == false && gamemode == creative) {
+			isCreative.put(PlayerHandler.getPlayerID(player), true);
 			setRunnable(player);
 		} else if (gamemode != creative) {
-			isCreative.put(player.getName(), false);
+			isCreative.put(PlayerHandler.getPlayerID(player), false);
 		}
 	}
 
@@ -159,11 +159,11 @@ public class InvClickCreative implements Listener {
 	}
 
 	public static boolean hasItem(Player player, ItemStack cursorItem) {
-		if (mySavedItems.get(player.getName()) == null) {
+		if (mySavedItems.get(PlayerHandler.getPlayerID(player)) == null) {
 			saveInventory(player);
 		}
-		if (mySavedItems.get(player.getName()) != null) {
-		for (ItemStack inPlayerInventory: mySavedItems.get(player.getName())) {
+		if (mySavedItems.get(PlayerHandler.getPlayerID(player)) != null) {
+		for (ItemStack inPlayerInventory: mySavedItems.get(PlayerHandler.getPlayerID(player))) {
 			if (cursorItem != null && ItemHandler.isSimilar(inPlayerInventory, cursorItem) && ItemHandler.isCountSimilar(inPlayerInventory, cursorItem)) {
 				return true;
 			}
@@ -175,22 +175,22 @@ public class InvClickCreative implements Listener {
 	public static void saveInventory(final Player player) {
 		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
 			public void run() {
-				if (hasItems(player) && cooldown.get(player.getName()) != 1) {
-					mySavedItems.put(player.getName(), player.getInventory().getContents());
+				if (hasItems(player) && cooldown.get(PlayerHandler.getPlayerID(player)) != 1) {
+					mySavedItems.put(PlayerHandler.getPlayerID(player), player.getInventory().getContents());
 				}
 			}
 		}, 1L);
 	}
 
 	private static void restoreInventory(final Player player, final ItemStack readd) {
-		if (mySavedItems.get(player.getName()) != null) {
+		if (mySavedItems.get(PlayerHandler.getPlayerID(player)) != null) {
 			Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), (Runnable) new Runnable() {
 				public void run() {
 					player.closeInventory();
-					player.getInventory().setContents(mySavedItems.get(player.getName()));
-					cooldown.put(player.getName(), 0);
-					if (isGlitchSwap.get(player.getName()) == true) {
-						isGlitchSwap.put(player.getName(), false);
+					player.getInventory().setContents(mySavedItems.get(PlayerHandler.getPlayerID(player)));
+					cooldown.put(PlayerHandler.getPlayerID(player), 0);
+					if (isGlitchSwap.get(PlayerHandler.getPlayerID(player)) == true) {
+						isGlitchSwap.put(PlayerHandler.getPlayerID(player), false);
 						player.getInventory().addItem(readd);
 						saveInventory(player);
 					}

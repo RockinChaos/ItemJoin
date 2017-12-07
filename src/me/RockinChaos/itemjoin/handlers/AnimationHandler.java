@@ -68,7 +68,7 @@ public class AnimationHandler {
 						new BukkitRunnable() {
 							public void run() {
 								if (player.isOnline() && setCanceled.get(player) != null && setCanceled.get(player) != true || player.isOnline() && setCanceled.get(player) == null) {
-									ItemStack inStoredItems = CreateItems.items.get(world + "." + player.getName().toString() + ".items." + finalID + item);
+									ItemStack inStoredItems = CreateItems.items.get(world + "." + PlayerHandler.getPlayerID(player) + ".items." + finalID + item);
 									for (ItemStack inPlayerInventory: player.getInventory().getContents()) {
 										if (inPlayerInventory != null && inStoredItems != null && ItemHandler.isSimilar(inPlayerInventory, inStoredItems)) {
 											setRefresh(items, item, world, inPlayerInventory, player, finalID);
@@ -106,7 +106,7 @@ public class AnimationHandler {
 		CreateItems.setName(items, tempmeta, inPlayerInventory, player, ItemID);
 		CreateItems.setLore(items, tempmeta, player);
 		inPlayerInventory.setItemMeta(tempmeta);
-		CreateItems.items.remove(world + "." + player.getName().toString() + ".items." + ItemID + item);
-		CreateItems.items.put(world + "." + player.getName().toString() + ".items." + ItemID + item, new ItemStack(inPlayerInventory));
+		CreateItems.items.remove(world + "." + PlayerHandler.getPlayerID(player) + ".items." + ItemID + item);
+		CreateItems.items.put(world + "." + PlayerHandler.getPlayerID(player) + ".items." + ItemID + item, new ItemStack(inPlayerInventory));
 	}
 }

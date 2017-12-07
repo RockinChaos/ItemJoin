@@ -7,12 +7,12 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
-
 import me.RockinChaos.itemjoin.cacheitems.CreateItems;
 import me.RockinChaos.itemjoin.handlers.CommandHandler;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PermissionsHandler;
+import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.WorldHandler;
 import me.RockinChaos.itemjoin.utils.Utils;
 
@@ -47,7 +47,7 @@ public class InteractCmds implements Listener {
 						ItemHandler.clearItemID(player);
 						for (String slot: slots) {
 							String ItemID = ItemHandler.getItemID(player, slot);
-							ItemStack inStoredItems = CreateItems.items.get(player.getWorld().getName() + "." + player.getName().toString() + ".items." + ItemID + item);
+							ItemStack inStoredItems = CreateItems.items.get(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + ItemID + item);
 							if (inStoredItems != null && ItemHandler.isSimilar(item1, inStoredItems) && CommandHandler.isCommandable(action, items)) {
 								if (!CommandHandler.onCooldown(items, player, item, item1)) {
 									CommandHandler.chargePlayer(items, item, player, action);

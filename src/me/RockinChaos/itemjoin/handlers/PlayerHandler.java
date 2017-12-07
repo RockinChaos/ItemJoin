@@ -8,8 +8,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
+import de.domedd.betternick.api.nickedplayer.NickedPlayer;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.utils.Econ;
+import me.RockinChaos.itemjoin.utils.Hooks;
 import net.milkbowl.vault.economy.EconomyResponse;
 
 public class PlayerHandler {
@@ -91,6 +93,22 @@ public class PlayerHandler {
 			if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
 		}
 		return false;
+	}
+	
+	public static String getPlayerID(Player player) {
+		if (player != null && player.getUniqueId() != null) {
+			return player.getUniqueId().toString();
+		} else if (player != null && Hooks.hasBetterNick()) {
+			NickedPlayer np = new NickedPlayer(player);
+			if (np.isNicked()) {
+			return np.getRealName();
+			} else {
+				return player.getDisplayName();
+			}
+		} else if (player != null) {
+			return player.getDisplayName();
+		}
+		return "NULL";
 	}
 	
 	@SuppressWarnings("deprecation")

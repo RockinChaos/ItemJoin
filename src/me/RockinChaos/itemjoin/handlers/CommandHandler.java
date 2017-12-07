@@ -182,8 +182,8 @@ public class CommandHandler {
 		boolean itemsSpam = ConfigHandler.getConfig("items.yml").getBoolean("items-Spamming");
 		if (itemsSpam != true) {
 			long playersCooldownList = 0L;
-			if (CommandHandler.storedSpammedPlayers.containsKey(player.getWorld().getName() + "." + player.getName().toString() + ".items." + item)) {
-				playersCooldownList = CommandHandler.storedSpammedPlayers.get(player.getWorld().getName() + "." + player.getName().toString() + ".items." + item);
+			if (CommandHandler.storedSpammedPlayers.containsKey(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + item)) {
+				playersCooldownList = CommandHandler.storedSpammedPlayers.get(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + item);
 			}
 			int cdmillis = CommandHandler.spamtime * 1000;
 			if (System.currentTimeMillis() - playersCooldownList >= cdmillis) {} else {
@@ -195,8 +195,8 @@ public class CommandHandler {
 
 	public static boolean onCooldown(ConfigurationSection items, Player player, String item, ItemStack item1) {
 		long playersCooldownList = 0L;
-		if (CommandHandler.playersOnCooldown.containsKey(player.getWorld().getName() + "." + player.getName().toString() + ".items." + item)) {
-			playersCooldownList = CommandHandler.playersOnCooldown.get(player.getWorld().getName() + "." + player.getName().toString() + ".items." + item);
+		if (CommandHandler.playersOnCooldown.containsKey(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + item)) {
+			playersCooldownList = CommandHandler.playersOnCooldown.get(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + item);
 		}
 		CommandHandler.cdtime = items.getInt(".commands-cooldown");
 		int cdmillis = CommandHandler.cdtime * 1000;
@@ -206,7 +206,7 @@ public class CommandHandler {
 			if (items.getString(".cooldown-message") != null) {
 				spamTask(player, item);
 				if (spamTask(player, item)) {
-					storedSpammedPlayers.put(player.getWorld().getName() + "." + player.getName().toString() + ".items." + item, System.currentTimeMillis());
+					storedSpammedPlayers.put(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + item, System.currentTimeMillis());
 					int timeLeft = (int)(CommandHandler.cdtime - ((System.currentTimeMillis() - playersCooldownList) / 1000));
 					String inhand = items.getString(".name");
 					String cooldownmsg = (items.getString(".cooldown-message").replace("%timeleft%", String.valueOf(timeLeft)).replace("%item%", inhand).replace("%itemraw%", ItemHandler.getName(item1)));
@@ -413,19 +413,19 @@ public class CommandHandler {
 	public static void dispatchMessageCommands(String returnedCommand, Player player, String item) {
 		String Command = Utils.format(returnedCommand, player);
 		player.sendMessage(Command);
-		playersOnCooldown.put(player.getWorld().getName() + "." + player.getName().toString() + ".items." + item, System.currentTimeMillis());
+		playersOnCooldown.put(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + item, System.currentTimeMillis());
 	}
 
 	public static void dispatchBungeeCordCommands(String returnedCommand, Player player, String item) {
 		String Command = Utils.format(returnedCommand, player);
 		BungeeCord.SwitchServers(player, Command);
-		playersOnCooldown.put(player.getWorld().getName() + "." + player.getName().toString() + ".items." + item, System.currentTimeMillis());
+		playersOnCooldown.put(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + item, System.currentTimeMillis());
 	}
 
 	public static void dispatchPlayerCommands(String returnedCommand, Player player, String item) {
 		String Command = Utils.format(returnedCommand, player);
 		player.chat("/" + Command);
-		playersOnCooldown.put(player.getWorld().getName() + "." + player.getName().toString() + ".items." + item, System.currentTimeMillis());
+		playersOnCooldown.put(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + item, System.currentTimeMillis());
 	}
 	
 	public static void dispatchOpCommands(String returnedCommand, Player player, String item) {
@@ -442,7 +442,7 @@ public class CommandHandler {
 		}
 		finally {
 			player.setOp(isOp);
-			playersOnCooldown.put(player.getWorld().getName() + "." + player.getName().toString() + ".items." + item, System.currentTimeMillis());
+			playersOnCooldown.put(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + item, System.currentTimeMillis());
 		}
 		
 	}
@@ -450,6 +450,6 @@ public class CommandHandler {
 	public static void dispatchConsoleCommands(String returnedCommand, Player player, String item) {
 		String Command = Utils.format(returnedCommand, player);
 		Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), Command);
-		playersOnCooldown.put(player.getWorld().getName() + "." + player.getName().toString() + ".items." + item, System.currentTimeMillis());
+		playersOnCooldown.put(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + item, System.currentTimeMillis());
 	}
 }

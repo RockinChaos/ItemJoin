@@ -17,7 +17,7 @@ public class SetItems {
 	private static HashMap <Player, Integer> failCount = new HashMap <Player, Integer> ();
 
 	public static void setInvSlots(Player player, String item, String slot, String ItemID) {
-		ItemStack inStoredItems = CreateItems.items.get(player.getWorld().getName() + "." + player.getName().toString() + ".items." + ItemID + item);
+		ItemStack inStoredItems = CreateItems.items.get(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + ItemID + item);
 		if (ItemHandler.isObtainable(player, item, slot.toString(), ItemID, inStoredItems)) {
 			player.getInventory().setItem(Integer.parseInt(slot), inStoredItems);
 			ConfigHandler.saveFirstJoined(player, item);
@@ -27,7 +27,7 @@ public class SetItems {
 
 	public static void setCustomSlots(Player player, String item, String slot, String ItemID) {
 		EntityEquipment Equip = player.getEquipment();
-		ItemStack inStoredItems = CreateItems.items.get(player.getWorld().getName() + "." + player.getName().toString() + ".items." + ItemID + item);
+		ItemStack inStoredItems = CreateItems.items.get(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + ItemID + item);
 		if (inStoredItems != null) {
 			if (slot.equalsIgnoreCase("Arbitrary") && ItemHandler.isObtainable(player, item, slot, ItemID, inStoredItems)) {
 				player.getInventory().addItem(inStoredItems);
@@ -117,8 +117,8 @@ public class SetItems {
 				inventory.setItemInOffHand(null);
 			}
 			HashMap < String, ItemStack[] > inventoryContents = new HashMap < String, ItemStack[] > ();
-			inventoryContents.put(player.getName(), inventory.getContents());
-			for (ItemStack contents: inventoryContents.get(player.getName())) {
+			inventoryContents.put(PlayerHandler.getPlayerID(player), inventory.getContents());
+			for (ItemStack contents: inventoryContents.get(PlayerHandler.getPlayerID(player))) {
 				if (contents != null && contents.hasItemMeta() && contents.getItemMeta().hasDisplayName() 
 						&& ItemHandler.containsIgnoreCase(contents.getItemMeta().getDisplayName(), ConfigHandler.encodeSecretData(ConfigHandler.getNBTData()))) {
 					inventory.remove(contents);

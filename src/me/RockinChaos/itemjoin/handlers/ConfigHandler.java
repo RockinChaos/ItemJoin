@@ -176,7 +176,7 @@ public class ConfigHandler {
 		if (ItemHandler.containsIgnoreCase(items.getString(".itemflags"), "first-join")) {
 			File playerFile = new File(ItemJoin.getInstance().getDataFolder(), "first-join.yml");
 			FileConfiguration playerData = YamlConfiguration.loadConfiguration(playerFile);
-			playerData.set(player.getWorld().getName() + "." + item + "." + player.getUniqueId().toString() + "." + "IGN", player.getName().toString());
+			playerData.set(player.getWorld().getName() + "." + item + "." + PlayerHandler.getPlayerID(player) + "." + "IGN", player.getName().toString());
 			try {
 				playerData.save(playerFile);
 				ConfigHandler.loadConfig("first-join.yml");

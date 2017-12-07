@@ -13,6 +13,7 @@ import org.bukkit.potion.PotionEffectType;
 import me.RockinChaos.itemjoin.cacheitems.CreateItems;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
+import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.handlers.WorldHandler;
 import me.RockinChaos.itemjoin.utils.Utils;
@@ -40,7 +41,7 @@ public class ConsumeApples implements Listener {
 							} else {
 								ItemID = slot;
 							}
-							ItemStack inStoredItems = CreateItems.items.get(world + "." + player.getName().toString() + ".items." + ItemID + item);
+							ItemStack inStoredItems = CreateItems.items.get(world + "." + PlayerHandler.getPlayerID(player) + ".items." + ItemID + item);
 							if (items.getString(".potion-effect") != null && WorldHandler.inWorld(items, world) && ItemHandler.isSimilar(inPlayerInventory, inStoredItems)) {
 								event.setCancelled(true);
 								player.getInventory().remove(inPlayerInventory);

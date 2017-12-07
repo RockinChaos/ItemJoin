@@ -17,7 +17,7 @@ import me.RockinChaos.itemjoin.utils.Hooks;
 import me.RockinChaos.itemjoin.utils.Utils;
 
 public class ItemHandler {
-	private static HashMap < Player, Integer > ArbitraryID = new HashMap < Player, Integer > ();
+	private static HashMap < String, Integer > ArbitraryID = new HashMap < String, Integer > ();
 
 	public static boolean isAllowedItem(Player player, ItemStack inPlayerInventory, String itemflag) {
 		if (inPlayerInventory != null) {
@@ -38,7 +38,7 @@ public class ItemHandler {
 							} else {
 								ItemID = slot;
 							}
-							ItemStack inStoredItems = CreateItems.items.get(world + "." + player.getName().toString() + ".items." + ItemID + item);
+							ItemStack inStoredItems = CreateItems.items.get(world + "." + PlayerHandler.getPlayerID(player) + ".items." + ItemID + item);
 							if (ItemHandler.isSimilar(inPlayerInventory, inStoredItems) && ItemHandler.containsIgnoreCase(ItemFlags, itemflag)) {
 								if (Utils.canBypass(player, ItemFlags)) {
 									return true;
@@ -77,17 +77,17 @@ public class ItemHandler {
 	}
 
 	public static void clearItemID(Player player) {
-		ArbitraryID.remove(player);
+		ArbitraryID.remove(PlayerHandler.getPlayerID(player));
 	}
 
 	public static String getArbitraryID(Player player, String slot) {
 		if (slot.equalsIgnoreCase("Arbitrary")) {
-			if (ArbitraryID.containsKey(player)) {
-				ArbitraryID.put(player, ArbitraryID.get(player) + 1);
-				return Integer.toString(ArbitraryID.get(player));
+			if (ArbitraryID.containsKey(PlayerHandler.getPlayerID(player))) {
+				ArbitraryID.put(PlayerHandler.getPlayerID(player), ArbitraryID.get(PlayerHandler.getPlayerID(player)) + 1);
+				return Integer.toString(ArbitraryID.get(PlayerHandler.getPlayerID(player)));
 			} else {
-				ArbitraryID.put(player, 1);
-				return Integer.toString(ArbitraryID.get(player));
+				ArbitraryID.put(PlayerHandler.getPlayerID(player), 1);
+				return Integer.toString(ArbitraryID.get(PlayerHandler.getPlayerID(player)));
 			}
 		}
 		return "";
@@ -106,7 +106,7 @@ public class ItemHandler {
 			ItemStack inStoredItemsTemp = new ItemStack(inStoredItems);
 			if (inPlayerInventoryTemp.isSimilar(inStoredItemsTemp) 
 					|| isDurability(inPlayerInventoryTemp, inStoredItemsTemp) && inPlayerInventoryTemp.isSimilar(inStoredItemsTemp) 
-					|| isDisplayNameSimilar(inPlayerInventoryTemp, inStoredItemsTemp) && inPlayerInventoryTemp.isSimilar(inStoredItemsTemp) 
+					|| isDisplayNameSimilar(inPlayerInventoryTemp, inStoredItemsTemp) && inPlayerInventoryTemp.isSimilar(inStoredItemsTemp)  // isDisplayNameSimilar(inPlayerInventoryTemp, inStoredItemsTemp) breaking items. when nbt data is off.
 					|| isEnchantsSimilar(inPlayerInventoryTemp, inStoredItemsTemp) && inPlayerInventoryTemp.isSimilar(inStoredItemsTemp)) {
 				return true;
 			} else if (!ServerHandler.hasCombatUpdate() && isCustomSimilar(inPlayerInventoryTemp, inStoredItemsTemp)) {
@@ -142,11 +142,13 @@ public class ItemHandler {
 	public static boolean isDisplayNameSimilar(ItemStack inPlayerInventory, ItemStack inStoredItems) {
 		if (inPlayerInventory.hasItemMeta() && inPlayerInventory.getItemMeta().hasDisplayName() && inStoredItems.hasItemMeta() && inStoredItems.getItemMeta().hasDisplayName() && inPlayerInventory.getItemMeta().getDisplayName().equals(inStoredItems.getItemMeta().getDisplayName())) {
 			return true;
-		} else if (isNBTDataSimilar(inPlayerInventory, inStoredItems) || ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") != true && inPlayerInventory.hasItemMeta() && inPlayerInventory.getItemMeta().hasDisplayName() && inPlayerInventory.getItemMeta().getDisplayName().contains(ConfigHandler.encodeSecretData(ConfigHandler.getNBTData()))) {
+		} else if (isNBTDataSimilar(inPlayerInventory, inStoredItems)) {
 			ItemMeta itemMeta = CreateItems.getTempMeta(inPlayerInventory);
+			if (itemMeta != null) { // maybe remove
 			itemMeta.setDisplayName(inStoredItems.getItemMeta().getDisplayName());
 			itemMeta.setLore(inStoredItems.getItemMeta().getLore());
 			inPlayerInventory.setItemMeta(itemMeta);
+			}
 			return true;
 		}
 		return false;
@@ -174,7 +176,10 @@ public class ItemHandler {
 	public static boolean isNBTDataSimilar(ItemStack inPlayerInventory, ItemStack inStoredItems) {
 		if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && getNBTData(inPlayerInventory) != null && getNBTData(inStoredItems) != null && getNBTData(inPlayerInventory).equals(getNBTData(inStoredItems))) {
 			return true;
-		} else if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") != true) {
+		} else if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") != true && inPlayerInventory.hasItemMeta() 
+				&& inPlayerInventory.getItemMeta().hasDisplayName() && inStoredItems.hasItemMeta() && inStoredItems.getItemMeta().hasDisplayName()
+				&& inPlayerInventory.getItemMeta().getDisplayName().contains(ConfigHandler.encodeSecretData(ConfigHandler.getNBTData()))
+				&& ConfigHandler.decodeSecretData(inPlayerInventory.getItemMeta().getDisplayName()).contains(ConfigHandler.decodeSecretData(inStoredItems.getItemMeta().getDisplayName()))) {
 			return true;
 		}
 		return false;

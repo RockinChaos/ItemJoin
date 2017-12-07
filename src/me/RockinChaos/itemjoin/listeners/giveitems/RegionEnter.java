@@ -111,7 +111,7 @@ public class RegionEnter implements Listener {
 			ItemHandler.clearItemID(player);
 			for (String slot: slots) {
 				String ItemID = ItemHandler.getItemID(player, slot);
-				ItemStack inStoredItems = CreateItems.items.get(world + "." + player.getName().toString() + ".items." + ItemID + item);
+				ItemStack inStoredItems = CreateItems.items.get(world + "." + PlayerHandler.getPlayerID(player) + ".items." + ItemID + item);
 				if (Utils.isCustomSlot(slot)) {
 					PlayerInventory inventory = player.getInventory();
 					if (inventory.getHelmet() != null && ItemHandler.isSimilar(inventory.getHelmet(), inStoredItems)) {
@@ -132,8 +132,8 @@ public class RegionEnter implements Listener {
 				} else if (Utils.isInt(slot)) {
 					PlayerInventory inventory = player.getInventory();
 					HashMap < String, ItemStack[] > inventoryContents = new HashMap < String, ItemStack[] > ();
-					inventoryContents.put(player.getName(), inventory.getContents());
-					for (ItemStack contents: inventoryContents.get(player.getName())) {
+					inventoryContents.put(PlayerHandler.getPlayerID(player), inventory.getContents());
+					for (ItemStack contents: inventoryContents.get(PlayerHandler.getPlayerID(player))) {
 						if (contents != null && ItemHandler.isSimilar(contents, inStoredItems)) {
 							inventory.remove(contents);
 						}

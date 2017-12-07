@@ -24,8 +24,8 @@ public class Drops implements Listener {
 		final Player player = event.getPlayer();
 		String itemflag = "self-drops";
 		if (!ItemHandler.isAllowedItem(player, item, itemflag)) {
-			if (!ServerHandler.hasCombatUpdate() && InvClickSurvival.dropClick.get(player.getName()) != null && InvClickSurvival.dropClick.get(player.getName()) == true) {
-				InvClickSurvival.droppedItem.put(player.getName(), true);
+			if (!ServerHandler.hasCombatUpdate() && InvClickSurvival.dropClick.get(PlayerHandler.getPlayerID(player)) != null && InvClickSurvival.dropClick.get(PlayerHandler.getPlayerID(player)) == true) {
+				InvClickSurvival.droppedItem.put(PlayerHandler.getPlayerID(player), true);
 				event.getItemDrop().remove();
 			} else {
 			event.setCancelled(true);
@@ -35,9 +35,9 @@ public class Drops implements Listener {
 					PlayerHandler.updateInventory(player);
 				}
 			}, 1L);
-		} else if (!ServerHandler.hasCombatUpdate() && PlayerHandler.isCreativeMode(player) && InvClickSurvival.dropClick.get(player.getName()) != null 
-				&& InvClickSurvival.dropClick.get(player.getName()) == true && ItemHandler.isAllowedItem(player, item, itemflag)) {
-			InvClickCreative.dropGlitch.put(player.getName(), true);
+		} else if (!ServerHandler.hasCombatUpdate() && PlayerHandler.isCreativeMode(player) && InvClickSurvival.dropClick.get(PlayerHandler.getPlayerID(player)) != null 
+				&& InvClickSurvival.dropClick.get(PlayerHandler.getPlayerID(player)) == true && ItemHandler.isAllowedItem(player, item, itemflag)) {
+			InvClickCreative.dropGlitch.put(PlayerHandler.getPlayerID(player), true);
 		}
 	}
 
