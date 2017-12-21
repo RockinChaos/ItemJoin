@@ -64,6 +64,12 @@ commands:
       usage: |
           /itemjoin get <item> <player>
           Example: /itemjoin get Ultra RockinChaos - You have given the item [Ultra] to RockinChaos!
+   itemjoin save <item>:
+      description: Saves the specified item to the items.yml.
+      permission: itemjoin.save
+      usage: |
+          /itemjoin save <item>
+          Example: /itemjoin save special-item - You have saved the item [special-item] to the items.yml.
    itemjoin remove <item>:
       description: Removes the item you specified from your inventory.
       permission: itemjoin.remove
@@ -177,6 +183,12 @@ commands:
       usage: |
           /ij get <item> <player>
           Example: /ij get Ultra RockinChaos - You have given the item [Ultra] to RockinChaos!
+   ij save <item>:
+      description: Saves the specified item to the items.yml.
+      permission: itemjoin.save
+      usage: |
+          /ij save <item>
+          Example: /ij save special-item - You have saved the item [special-item] to the items.yml.
    ij remove <item>:
       description: Removes the item you specified from your inventory.
       permission: itemjoin.remove
@@ -249,6 +261,7 @@ permissions:
           itemjoin.reload: true
           itemjoin.updates: true
           itemjoin.autoupdate: true
+          itemjoin.save: true
           itemjoin.get: true
           itemjoin.get.others: true
           itemjoin.remove: true
@@ -276,6 +289,9 @@ permissions:
       default: op
    itemjoin.get:
       description: Use of the /itemjoin get <item> command.
+      default: op
+   itemjoin.save:
+      description: Use of the /itemjoin save <item> command.
       default: op
    itemjoin.get.others:
       description: Use of the /itemjoin get <item> <others> for player command.

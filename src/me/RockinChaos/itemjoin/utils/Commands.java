@@ -16,6 +16,7 @@ import org.bukkit.inventory.ItemStack;
 
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.cacheitems.CreateItems;
+import me.RockinChaos.itemjoin.handlers.AnimationHandler;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PermissionsHandler;
@@ -133,78 +134,71 @@ public class Commands implements CommandExecutor {
 				return true;
 			}
 		} else if (args.length == 2 && args[0].equalsIgnoreCase("save")) {
-			if (sender.getName().equals("RockinChaos") && sender.hasPermission("itemjoin.save") || sender.getName().equals("RockinChaos") && sender.hasPermission("itemjoin.*")) {
+			if (sender.hasPermission("itemjoin.save") || sender.hasPermission("itemjoin.*")) {
 				if (!(sender instanceof ConsoleCommandSender)) {
-					ItemStack item = new ItemStack(PlayerHandler.getPerfectHandItem((Player)sender, "HAND"));
-					
+					Player player = (Player) sender;
+					ItemStack item = new ItemStack(PlayerHandler.getPerfectHandItem(player, "HAND"));
 					if (item != null && item.getType() != Material.AIR) {
-					String world = ((Player)sender).getWorld().getName();
-					String type = item.getType().toString();
-					
-					File playerFile = new File(ItemJoin.getInstance().getDataFolder(), "items.yml");
-					FileConfiguration playerData = YamlConfiguration.loadConfiguration(playerFile);
-					playerData.set("items." + args[1] + "." + "id", type);
-					playerData.set("items." + args[1] + "." + "slot", 0);
-					
-					if (item.getAmount() > 1) {
-					playerData.set("items." + args[1] + "." + "count", item.getAmount());
-					}
-					
-					if (item.getType().getMaxDurability() < 30 &&  ((short)item.getDurability()) > 0) {
-					playerData.set("items." + args[1] + "." + "data-value", ((short)item.getDurability()));
-					}
-					
-					if (item.getType().getMaxDurability() > 30 && ((short)item.getDurability()) != 0 && ((short)item.getDurability()) != ((short)item.getType().getMaxDurability())) {
-					playerData.set("items." + args[1] + "." + "durability", ((short)item.getDurability()));
-					}
-
-					if (item.hasItemMeta()) {
-						
-					if (item.getItemMeta().hasDisplayName()) {
-						String name = item.getItemMeta().getDisplayName();
-						for (int i = 0; i <= 36; i++) {
-							name = name.replace(ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + i), "");
-							name = name.replace(ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + "Arbitrary" + i), "");
+						String world = player.getWorld().getName();
+						String type = item.getType().toString();
+						File itemsFile = new File(ItemJoin.getInstance().getDataFolder(), "items.yml");
+						FileConfiguration itemData = YamlConfiguration.loadConfiguration(itemsFile);
+						itemData.set("items." + args[1] + "." + "id", type);
+						itemData.set("items." + args[1] + "." + "slot", 0);
+						if (item.getAmount() > 1) {
+							itemData.set("items." + args[1] + "." + "count", item.getAmount());
 						}
-					playerData.set("items." + args[1] + "." + "name", name.replace("§", "&"));
-					}
-					
-					if(item.getItemMeta().hasLore()) { // create loop to reput into a array list. with colors translated and '' added.
-						List<String> lore = item.getItemMeta().getLore();
-						List<String> lore2 = new ArrayList<String>();
-						for (String l: lore) {
-							lore2.add(l.replace("§", "&"));
+						if (item.getType().getMaxDurability() < 30 && ((short) item.getDurability()) > 0) {
+							itemData.set("items." + args[1] + "." + "data-value", ((short) item.getDurability()));
 						}
-					playerData.set("items." + args[1] + "." + "lore", lore2);
-					}
-					
-					if (item.getItemMeta().hasEnchants()) {
-					List<String> enchantList = new ArrayList<String>();
-					for (Enchantment e: item.getItemMeta().getEnchants().keySet()) {
-						 int level = item.getItemMeta().getEnchants().get(e);
-				            enchantList.add(e.getName().toUpperCase() + ":" + level);
-					}
-					playerData.set("items." + args[1] + "." + "enchantment", Utils.convertStringList(enchantList));
-					}
-					}
-					
-					playerData.set("items." + args[1] + "." + "itemflags", "death-drops");
-					playerData.set("items." + args[1] + "." + "triggers", "join");
-					playerData.set("items." + args[1] + "." + "enabled-worlds", world);
-					
-					try {
-						playerData.save(playerFile);
-					} catch (IOException e) {
-						ItemJoin.getInstance().getServer().getLogger().severe("Could not save " + "item" + " to the data file items.yml!");
-						if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
-					}
-					
-					ServerHandler.sendConsoleMessage("The item " + args[1] + " has been saved to the items.yml.");
-					ServerHandler.sendConsoleMessage("You will need to edit any default values created with this item and reload the config(s).");
-					return true;
+						if (item.getType().getMaxDurability() > 30 && ((short) item.getDurability()) != 0 && ((short) item.getDurability()) != ((short) item.getType().getMaxDurability())) {
+							itemData.set("items." + args[1] + "." + "durability", ((short) item.getDurability()));
+						}
+						if (item.hasItemMeta()) {
+							if (item.getItemMeta().hasDisplayName()) {
+								String name = item.getItemMeta().getDisplayName();
+								for (int i = 0; i <= 36; i++) {
+									name = name.replace(ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + i), "");
+									name = name.replace(ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + "Arbitrary" + i), "");
+								}
+								itemData.set("items." + args[1] + "." + "name", name.replace("§", "&"));
+							}
+							if (item.getItemMeta().hasLore()) {
+								List < String > oldLore = item.getItemMeta().getLore();
+								List < String > newLore = new ArrayList < String > ();
+								for (String stepLore: oldLore) {
+									newLore.add(stepLore.replace("§", "&"));
+								}
+								itemData.set("items." + args[1] + "." + "lore", newLore);
+							}
+							if (item.getItemMeta().hasEnchants()) {
+								List < String > enchantList = new ArrayList < String > ();
+								for (Enchantment e: item.getItemMeta().getEnchants().keySet()) {
+									int level = item.getItemMeta().getEnchants().get(e);
+									enchantList.add(e.getName().toUpperCase() + ":" + level);
+								}
+								itemData.set("items." + args[1] + "." + "enchantment", Utils.convertStringList(enchantList));
+							}
+						}
+						itemData.set("items." + args[1] + "." + "itemflags", "death-drops");
+						itemData.set("items." + args[1] + "." + "triggers", "join");
+						itemData.set("items." + args[1] + "." + "enabled-worlds", world);
+						try {
+							itemData.save(itemsFile);
+						} catch (IOException e) {
+							ItemJoin.getInstance().getServer().getLogger().severe("Could not save " + args[1] + " to the items.yml!");
+							if (ServerHandler.hasDebuggingMode()) {
+								e.printStackTrace();
+							}
+						}
+						ServerHandler.sendConsoleMessage("The item " + args[1] + " has been saved to the items.yml.");
+						player.sendMessage("The item " + args[1] + " has been saved to the items.yml.");
+						player.sendMessage("You will need to edit any default values created with this item and reload the config(s).");
+						ServerHandler.sendConsoleMessage("You will need to edit any default values created with this item and reload the config(s).");
+						return true;
 					} else {
 						ServerHandler.sendConsoleMessage("Haha your holding air xD.");
-						return true;	
+						return true;
 					}
 				} else if (sender instanceof ConsoleCommandSender) {
 					Language.getSendMessage(sender, "notPlayer", "");
@@ -372,6 +366,7 @@ public class Commands implements CommandExecutor {
 			} else if (sender.hasPermission("itemjoin.get.others") || sender.hasPermission("itemjoin.*")) {
 				Language.setArgsPlayer(sender);
 				reAddItem(argsPlayer, sender, args[1]);
+				AnimationHandler.refreshItems(argsPlayer, "reload");
 				return true;
 			} else {
 				Language.getSendMessage(sender, "noPermission", "");
@@ -382,6 +377,7 @@ public class Commands implements CommandExecutor {
 				if (!(sender instanceof ConsoleCommandSender)) {
 					reAddItem((Player) sender, null, args[1]);
 					PlayerHandler.updateInventory((Player) sender);
+					AnimationHandler.refreshItems((Player) sender, "reload");
 					return true;
 				} else if (sender instanceof ConsoleCommandSender) {
 					Language.getSendMessage(sender, "notPlayer", "");
@@ -408,6 +404,7 @@ public class Commands implements CommandExecutor {
 			} else if (sender.hasPermission("itemjoin.get.others") || sender.hasPermission("itemjoin.*")) {
 				Language.setArgsPlayer(sender);
 				reAddItem(argsPlayer, sender, "00a40gh392bd938d4");
+				AnimationHandler.refreshItems(argsPlayer, "reload");
 				return true;
 			} else {
 				Language.getSendMessage(sender, "noPermission", "");
@@ -418,6 +415,7 @@ public class Commands implements CommandExecutor {
 				if (!(sender instanceof ConsoleCommandSender)) {
 					reAddItem((Player) sender, null, "00a40gh392bd938d4");
 					PlayerHandler.updateInventory((Player) sender);
+					AnimationHandler.refreshItems((Player) sender, "reload");
 					return true;
 				} else if (sender instanceof ConsoleCommandSender) {
 					Language.getSendMessage(sender, "notPlayer", "");
