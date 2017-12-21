@@ -234,7 +234,7 @@ public class CreateItems {
 				}
 			  }
 			}
-			name = Utils.format(name.replace("<delay:" + Utils.returnInteger(name) + ">", ""), player); // name = Utils.format("&r" + name, player);
+			name = Utils.format("&r" + name.replace("<delay:" + Utils.returnInteger(name) + ">", ""), player); // name = Utils.format("&r" + name, player);
 			if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true) {
 				tempmeta.setDisplayName(name);
 			} else {
@@ -244,9 +244,9 @@ public class CreateItems {
 			String lookup = ItemHandler.getName(tempitem);
 			String name = "";
 			if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true) {
-				name = Utils.format(lookup, player); // name = Utils.format("&r" + lookup, player);
+				name = Utils.format("&r" + lookup, player); // name = Utils.format("&r" + lookup, player);
 			} else {
-				name = Utils.format(lookup + ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + ItemID), player); // name = Utils.format("&r" + lookup + ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + ItemID), player);
+				name = Utils.format("&r" + lookup + ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + ItemID), player); // name = Utils.format("&r" + lookup + ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + ItemID), player);
 			}
 			tempmeta.setDisplayName(name);
 		}
