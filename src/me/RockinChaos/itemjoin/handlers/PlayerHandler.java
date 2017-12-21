@@ -1,5 +1,8 @@
 package me.RockinChaos.itemjoin.handlers;
 
+import java.lang.reflect.Method;
+import java.util.UUID;
+
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -12,6 +15,7 @@ import de.domedd.betternick.api.nickedplayer.NickedPlayer;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.utils.Econ;
 import me.RockinChaos.itemjoin.utils.Hooks;
+import me.RockinChaos.itemjoin.utils.Reflection;
 import net.milkbowl.vault.economy.EconomyResponse;
 
 public class PlayerHandler {
@@ -32,6 +36,56 @@ public class PlayerHandler {
                 player.updateInventory();
             }
         }, delay);
+	}
+	
+	public static void updateActualSlot(Player player, ItemStack inPlayerInventory) {
+		 try {
+		   	for (int i = 0; i <= 39; i++) {
+		   		int index = i;
+		   		if (i < 9) { index = i + 36; }
+		   		ItemStack item = Bukkit.getPlayer(player.getUniqueId()).getInventory().getItem(i);
+		   		Class <?> craftItemStack = Reflection.getOBC("inventory.CraftItemStack");
+		   		Method getNMSI = craftItemStack.getMethod("asNMSCopy", ItemStack.class);
+		   		Object nms = getNMSI.invoke(null, item);
+		   		Object packet = null;
+		   		if (item != null && ItemHandler.isSimilar(item, inPlayerInventory)) {
+		   			if (i <= 35 && !ItemHandler.isSimilar(PlayerHandler.getPerfectHandItem(player, "HAND"), item) && !ItemHandler.isSimilar(PlayerHandler.getPerfectHandItem(player, "OFF_HAND"), item)) {
+		   				packet = Reflection.getNMS("PacketPlayOutSetSlot").getConstructor(int.class, int.class, nms.getClass()).newInstance(0, index, nms);
+		   			} else if (i >= 36 && i <= 39) {
+		   				packet = Reflection.getNMS("PacketPlayOutEntityEquipment").getConstructor(int.class, Reflection.getNMS("EnumItemSlot"), nms.getClass()).newInstance(player.getEntityId(), Reflection.getNMS("EnumItemSlot").getEnumConstants()[i - 34], nms);
+		   			}
+		   		}
+		   		Object nmsPlayer = player.getClass().getMethod("getHandle").invoke(player);
+		   		Object plrConnection = nmsPlayer.getClass().getField("playerConnection").get(nmsPlayer);
+		   		plrConnection.getClass().getMethod("sendPacket", Reflection.getNMS("Packet")).invoke(plrConnection, packet);
+		   	}
+		  } catch (Exception e) { if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+	    }
+	 }
+	
+	
+	public static void updateLocalizedSlots(Player player) { // Currently Not Utilized.. //
+		try {
+			for (int i = 0; i <= 43; i++) {
+				int index = i;
+				if (i < 9) { index = i + 36; }
+				if (i > 40) { index = i - 39; }
+				ItemStack item = Bukkit.getPlayer(player.getUniqueId()).getInventory().getItem(i);
+				Class <?> craftItemStack = Reflection.getOBC("inventory.CraftItemStack");
+				Method getNMSI = craftItemStack.getMethod("asNMSCopy", ItemStack.class);
+				Object nms = getNMSI.invoke(null, item);
+				Object packet = null;
+				if (i <= 35 || i >= 40 && i <= 43) {
+					if (item != null && !ItemHandler.isSimilar(PlayerHandler.getPerfectHandItem(player, "HAND"), item) && !ItemHandler.isSimilar(PlayerHandler.getPerfectHandItem(player, "OFF_HAND"), item)) packet = Reflection.getNMS("PacketPlayOutSetSlot").getConstructor(int.class, int.class, nms.getClass()).newInstance(0, index, nms);
+				} else if (i >= 36 && i <= 39 && item != null) {
+					packet = Reflection.getNMS("PacketPlayOutEntityEquipment").getConstructor(int.class, Reflection.getNMS("EnumItemSlot"), nms.getClass()).newInstance(player.getEntityId(), Reflection.getNMS("EnumItemSlot").getEnumConstants()[i - 34], nms);
+				}
+				Object nmsPlayer = player.getClass().getMethod("getHandle").invoke(player);
+				Object plrConnection = nmsPlayer.getClass().getField("playerConnection").get(nmsPlayer);
+				plrConnection.getClass().getMethod("sendPacket", Reflection.getNMS("Packet")).invoke(plrConnection, packet);
+			}
+		 } catch (Exception e) { if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+	   }
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -103,12 +157,12 @@ public class PlayerHandler {
 			if (np.isNicked()) {
 			return np.getRealName();
 			} else {
-				return player.getDisplayName();
+				return player.getName();
 			}
 		} else if (player != null) {
-			return player.getDisplayName();
+			return player.getName();
 		}
-		return "NULL";
+		return "";
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -133,7 +187,8 @@ public class PlayerHandler {
 	
 	@SuppressWarnings("deprecation")
 	public static Player getPlayerString(String StringPlayer) {
-		Player args = Bukkit.getPlayerExact(StringPlayer);
+		Player args = Bukkit.getPlayer(StringPlayer);
+		if (args == null) { args = Bukkit.getPlayer(UUID.fromString(StringPlayer)); }
 		return args;
 	}
 	
