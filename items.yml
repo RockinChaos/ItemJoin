@@ -2,7 +2,6 @@
 #// See the Documentations page for a more in-depth tutorial; https://www.spigotmc.org/wiki/itemjoin/ //#
 items-Version: 6
 items-Delay: 2
-items-UpdateDelay: 1
 items-Overwrite: false
 items-Spamming: false
 items-RestrictCount : false
@@ -133,6 +132,64 @@ items:
     data-value: 15
     itemflags: inventory-modify, placement, death-drops, self-drops
     triggers: join, world-change
+    enabled-worlds: world, world_nether, world_the_end
+  animated-item:
+    id: COMPASS
+    slot: 19
+    name:
+      1: '<delay:3>&f&lSearch'
+      2: '<delay:3>&b&lS&f&learch'
+      3: '<delay:3>&b&lSe&f&larch'
+      4: '<delay:3>&b&lSea&f&lrch'
+      5: '<delay:3>&b&lSear&f&lch'
+      6: '<delay:3>&b&lSearc&f&lh'
+      7: '<delay:3>&b&lSearch'
+      8: '<delay:3>&f&lS&b&learch'
+      9: '<delay:3>&f&lSe&b&larch'
+      10: '<delay:3>&f&lSea&b&lrch'
+      11: '<delay:3>&f&lSear&b&lch'
+      12: '<delay:3>&f&lSearc&b&lh'
+    lore:
+      1:
+      - '<delay:3>&f&lColors!!!'
+      2:
+      - '<delay:3>&c&lC&f&lolors!!!'
+      3:
+      - '<delay:3>&c&lC&a&lo&f&llors!!!'
+      4:
+      - '<delay:3>&c&lC&a&lo&5&ll&f&lors!!!'
+      5:
+      - '<delay:3>&c&lC&a&lo&5&ll&3&lo&f&lrs!!!'
+      6:
+      - '<delay:3>&c&lC&a&lo&5&ll&3&lo&1&lr&f&ls!!!'
+      7:
+      - '<delay:3>&c&lC&a&lo&5&ll&3&lo&1&lr&e&ls&f&l!!!'
+      8:
+      - '<delay:3>&c&lC&a&lo&5&ll&3&lo&1&lr&e&ls&d&l!&f&l!!'
+      9:
+      - '<delay:3>&c&lC&a&lo&5&ll&3&lo&1&lr&e&ls&d&l!&a&l!&f&l!'
+      10:
+      - '<delay:3>&c&lC&a&lo&5&ll&3&lo&1&lr&e&ls&d&l!&a&l!&2&l!'
+      11:
+      - '<delay:3>&f&lC&a&lo&5&ll&3&lo&1&lr&e&ls&d&l!&a&l!&2&l!'
+      12:
+      - '<delay:3>&f&lCo&5&ll&3&lo&1&lr&e&ls&d&l!&a&l!&2&l!'
+      13:
+      - '<delay:3>&f&lCol&3&lo&1&lr&e&ls&d&l!&a&l!&2&l!'
+      14:
+      - '<delay:3>&f&lColo&1&lr&e&ls&d&l!&a&l!&2&l!'
+      15:
+      - '<delay:3>&f&lColor&e&ls&d&l!&a&l!&2&l!'
+      16:
+      - '<delay:3>&f&lColors&d&l!&a&l!&2&l!'
+      17:
+      - '<delay:3>&f&lColors!&a&l!&2&l!'
+      18:
+      - '<delay:3>&f&lColors!!&2&l!'
+      19:
+      - '<delay:3>&f&lColors!!!'
+    itemflags: death-drops, animate
+    triggers: join, respawn, world-change
     enabled-worlds: world, world_nether, world_the_end
   banner-item:
     id: BANNER
