@@ -81,7 +81,7 @@ public class RegionEnter implements Listener {
 				} catch (NullPointerException e) {
 					if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
 				}
-				AnimationHandler.refreshItems(player);
+				AnimationHandler.refreshItems(player, "region");
 			}
 		}, delay);
 	}

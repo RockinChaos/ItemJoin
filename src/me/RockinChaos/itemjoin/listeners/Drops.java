@@ -7,7 +7,6 @@ import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
-
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;

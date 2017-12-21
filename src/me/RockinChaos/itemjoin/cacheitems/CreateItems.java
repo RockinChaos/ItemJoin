@@ -7,8 +7,10 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -47,6 +49,7 @@ import me.RockinChaos.itemjoin.handlers.WorldHandler;
 import me.RockinChaos.itemjoin.listeners.InvClickCreative;
 import me.RockinChaos.itemjoin.listeners.giveitems.RegionEnter;
 import me.RockinChaos.itemjoin.utils.Hooks;
+import me.RockinChaos.itemjoin.utils.Reflection;
 import me.RockinChaos.itemjoin.utils.Utils;
 
 import com.mojang.authlib.GameProfile;
@@ -86,8 +89,8 @@ public class CreateItems {
 						    tempitem = setNBTData(tempitem, ItemID); // New method to setting data to an item to identify that its an ItemJoin item.
 
 							ItemMeta tempmeta = getTempMeta(tempitem);
-							tempmeta = setName(items, tempmeta, tempitem, player, ItemID);
-							tempmeta = setLore(items, tempmeta, player);
+							tempmeta = setName(items, tempmeta, tempitem, player, ItemID, null);
+							tempmeta = setLore(items, tempmeta, player, null);
 							tempmeta = setSkull(items, player, tempmat, tempmeta);
 							tempmeta = setSkullTexture(items, player, tempmat, tempmeta);
 							tempmeta = setPotionEffects(items, tempmat, tempmeta);
@@ -126,20 +129,18 @@ public class CreateItems {
 				for (Player player: playersOnlineNew) {
 					run(player);
 					InvClickCreative.isCreative(player, player.getGameMode());
-					AnimationHandler.refreshItems(player);
+					AnimationHandler.refreshItems(player, "reload");
 				}
 			} else {
 				playersOnlineOld = ((Player[]) Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).invoke(null, new Object[0]));
 				for (Player player: playersOnlineOld) {
 					run(player);
 					InvClickCreative.isCreative(player, player.getGameMode());
-					AnimationHandler.refreshItems(player);
+					AnimationHandler.refreshItems(player, "reload");
 				}
 			}
-		} catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException ex) {
-			if (ServerHandler.hasDebuggingMode()) {
-			ex.printStackTrace();
-			}
+		} catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+			if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
 		} 
 	}
 	
@@ -170,11 +171,11 @@ public class CreateItems {
 	public static ItemStack setNBTData(ItemStack tempitem, String ItemID) {
 		if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true) {
 		try {
-		Class<?> craftItemStack = setUnbreakable.getOBC("inventory.CraftItemStack");
-		Class<?> nmsItemStackClass = setUnbreakable.getNMS("ItemStack");
+		Class<?> craftItemStack = Reflection.getOBC("inventory.CraftItemStack");
+		Class<?> nmsItemStackClass = Reflection.getNMS("ItemStack");
 		Method getNMSI = craftItemStack.getMethod("asNMSCopy", ItemStack.class);
 		Object nms = getNMSI.invoke(null, tempitem);
-		Object tag = setUnbreakable.getNMS("NBTTagCompound").getConstructor().newInstance();
+		Object tag = Reflection.getNMS("NBTTagCompound").getConstructor().newInstance();
 		Object cacheTag = nmsItemStackClass.getMethod("getTag").invoke(nms);
 		if (cacheTag != null) {
 			cacheTag.getClass().getMethod("setString", String.class, String.class).invoke(cacheTag, "ItemJoin", "Slot: " + ItemID);
@@ -215,10 +216,25 @@ public class CreateItems {
 		return tempitem;
 	}
 
-	public static ItemMeta setName(ConfigurationSection items, ItemMeta tempmeta, ItemStack tempitem, Player player, String ItemID) {
+	public static ItemMeta setName(ConfigurationSection items, ItemMeta tempmeta, ItemStack tempitem, Player player, String ItemID, String NameString) {
 		if (items.getString(".name") != null) {
 			String name = items.getString(".name");
-			name = Utils.format("&r" + name, player);
+			ConfigurationSection sting = ConfigHandler.getConfig("items.yml").getConfigurationSection(items.getCurrentPath() + ".name");
+			if (sting != null) {
+			Set<String> sting2 = sting.getKeys(false);
+			Iterator < String > it = sting2.iterator();
+			while (it.hasNext()) {
+				String nameString = it.next();
+				if (NameString != null) {
+					nameString = NameString;
+				}
+				if (items.getString(".name." + nameString) != null) {
+					name = items.getString(".name." + nameString);
+					break;
+				}
+			  }
+			}
+			name = Utils.format(name.replace("<delay:" + Utils.returnInteger(name) + ">", ""), player); // name = Utils.format("&r" + name, player);
 			if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true) {
 				tempmeta.setDisplayName(name);
 			} else {
@@ -228,21 +244,38 @@ public class CreateItems {
 			String lookup = ItemHandler.getName(tempitem);
 			String name = "";
 			if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true) {
-				name = Utils.format("&r" + lookup, player);
+				name = Utils.format(lookup, player); // name = Utils.format("&r" + lookup, player);
 			} else {
-				name = Utils.format("&r" + lookup + ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + ItemID), player);
+				name = Utils.format(lookup + ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + ItemID), player); // name = Utils.format("&r" + lookup + ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + ItemID), player);
 			}
 			tempmeta.setDisplayName(name);
 		}
 		return tempmeta;
 	}
 
-	public static ItemMeta setLore(ConfigurationSection items, ItemMeta tempmeta, Player player) {
+	public static ItemMeta setLore(ConfigurationSection items, ItemMeta tempmeta, Player player, String NameString) {
 		if (items.getStringList(".lore") != null) {
 			List < String > templist = items.getStringList(".lore");
 			List < String > templist2 = new ArrayList < String > ();
+			
+			ConfigurationSection sting = ConfigHandler.getConfig("items.yml").getConfigurationSection(items.getCurrentPath() + ".lore"); // ConfigHandler.getConfig("items.yml").getConfigurationSection("items." + item + ".lore")
+			if (sting != null) {
+			Set<String> sting2 = sting.getKeys(false);
+			Iterator < String > it = sting2.iterator();
+			while (it.hasNext()) {
+				String nameString = it.next();
+				if (NameString != null) {
+					nameString = NameString;
+				}
+				if (items.getStringList(".lore." + nameString) != null) {
+					templist = items.getStringList(".lore." + nameString);
+					break;
+				}
+			  }
+			}
+			
 			for (int k = 0; k < templist.size(); k++) {
-				String name = (String) templist.get(k);
+				String name = templist.get(k).replace("<delay:" + Utils.returnInteger(templist.get(k)) + ">", "");
 				name = Utils.format(name, player);
 				templist2.add(name);
 			}

@@ -50,11 +50,32 @@ public class Utils {
 	public static boolean isInt(String s) {
 		try {
 			Integer.parseInt(s);
-		} catch (NumberFormatException e) {
-			if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
-			return false;
-		}
+		} catch (NumberFormatException e) { return false; }
 		return true;
+	}
+	
+	public static Integer returnInteger(String s) {
+		if (s == null) return null;
+		else {
+			char[] characters = s.toCharArray();
+			Integer value = null;
+			boolean isPrevDigit = false;
+			for (int i = 0; i < characters.length; i++) {
+				if (isPrevDigit == false) {
+					if (Character.isDigit(characters[i])) {
+						isPrevDigit = true;
+						value = Character.getNumericValue(characters[i]);
+					}
+				} else {
+					if (Character.isDigit(characters[i])) {
+						value = (value * 10) + Character.getNumericValue(characters[i]);
+					} else {
+						break;
+					}
+				}
+			}
+			return value;
+		}
 	}
 	
 	public static String convertStringList(List<String> list) {

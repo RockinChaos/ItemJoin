@@ -11,9 +11,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import me.RockinChaos.itemjoin.cacheitems.CreateItems;
-import me.RockinChaos.itemjoin.cacheitems.setUnbreakable;
 import me.RockinChaos.itemjoin.listeners.giveitems.SetItems;
 import me.RockinChaos.itemjoin.utils.Hooks;
+import me.RockinChaos.itemjoin.utils.Reflection;
 import me.RockinChaos.itemjoin.utils.Utils;
 
 public class ItemHandler {
@@ -106,7 +106,8 @@ public class ItemHandler {
 			ItemStack inStoredItemsTemp = new ItemStack(inStoredItems);
 			if (inPlayerInventoryTemp.isSimilar(inStoredItemsTemp) 
 					|| isDurability(inPlayerInventoryTemp, inStoredItemsTemp) && inPlayerInventoryTemp.isSimilar(inStoredItemsTemp) 
-					|| isDisplayNameSimilar(inPlayerInventoryTemp, inStoredItemsTemp) && inPlayerInventoryTemp.isSimilar(inStoredItemsTemp)  // isDisplayNameSimilar(inPlayerInventoryTemp, inStoredItemsTemp) breaking items. when nbt data is off.
+					|| isDisplayNameSimilar(inPlayerInventoryTemp, inStoredItemsTemp) && inPlayerInventoryTemp.isSimilar(inStoredItemsTemp)
+					|| isLoreSimilar(inPlayerInventoryTemp, inStoredItemsTemp) && inPlayerInventoryTemp.isSimilar(inStoredItemsTemp)
 					|| isEnchantsSimilar(inPlayerInventoryTemp, inStoredItemsTemp) && inPlayerInventoryTemp.isSimilar(inStoredItemsTemp)) {
 				return true;
 			} else if (!ServerHandler.hasCombatUpdate() && isCustomSimilar(inPlayerInventoryTemp, inStoredItemsTemp)) {
@@ -144,16 +145,25 @@ public class ItemHandler {
 			return true;
 		} else if (isNBTDataSimilar(inPlayerInventory, inStoredItems)) {
 			ItemMeta itemMeta = CreateItems.getTempMeta(inPlayerInventory);
-			if (itemMeta != null) { // maybe remove
 			itemMeta.setDisplayName(inStoredItems.getItemMeta().getDisplayName());
-			itemMeta.setLore(inStoredItems.getItemMeta().getLore());
 			inPlayerInventory.setItemMeta(itemMeta);
-			}
 			return true;
 		}
 		return false;
 	}
 
+	public static boolean isLoreSimilar(ItemStack inPlayerInventory, ItemStack inStoredItems) {
+		if (inPlayerInventory.hasItemMeta() && inPlayerInventory.getItemMeta().hasLore() && inStoredItems.hasItemMeta() && inStoredItems.getItemMeta().hasLore() && inPlayerInventory.getItemMeta().getLore().equals(inStoredItems.getItemMeta().getLore())) {
+			return true;
+		} else if (isNBTDataSimilar(inPlayerInventory, inStoredItems)) {
+			ItemMeta itemMeta = CreateItems.getTempMeta(inPlayerInventory);
+			itemMeta.setLore(inStoredItems.getItemMeta().getLore());
+			inPlayerInventory.setItemMeta(itemMeta);
+			return true;
+		}
+		return false;
+	}
+	
 	public static boolean isEnchantsSimilar(ItemStack inPlayerInventory, ItemStack inStoredItems) {
 		if (inPlayerInventory.hasItemMeta() && inStoredItems.hasItemMeta()) {
 			if (inPlayerInventory.getItemMeta().hasEnchants() && inStoredItems.getItemMeta().hasEnchants() && inPlayerInventory.getItemMeta().getEnchants().equals(inStoredItems.getItemMeta().getEnchants())) {
@@ -216,8 +226,8 @@ public class ItemHandler {
 	public static String getNBTData(ItemStack tempitem) {
 		if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true) {
 		try {
-		Class<?> craftItemStack = setUnbreakable.getOBC("inventory.CraftItemStack");
-		Class<?> nmsItemStackClass = setUnbreakable.getNMS("ItemStack");
+		Class<?> craftItemStack = Reflection.getOBC("inventory.CraftItemStack");
+		Class<?> nmsItemStackClass = Reflection.getNMS("ItemStack");
 		Method getNMSI = craftItemStack.getMethod("asNMSCopy", ItemStack.class);
 		Object nms = getNMSI.invoke(null, tempitem);
 		Object cacheTag = nmsItemStackClass.getMethod("getTag").invoke(nms);

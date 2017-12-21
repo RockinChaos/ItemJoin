@@ -7,6 +7,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+
 import me.RockinChaos.itemjoin.cacheitems.CreateItems;
 import me.RockinChaos.itemjoin.handlers.CommandHandler;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
