@@ -167,6 +167,12 @@
 			<artifactId>guava</artifactId>
 			<version>18.0</version>
 		</dependency>
+    <!--Apache Logging API-->
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+			<version>2.3</version>
+		</dependency>
     <!--HeadDatabase Local API/Repo -->
         <dependency>
             <groupId>me.HeadDatabaseAPI</groupId>
