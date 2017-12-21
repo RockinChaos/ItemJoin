@@ -7,6 +7,7 @@ config-Version: 6
 Language: 'English'
 CheckForUpdates: true
 Log-Coloration: true
+Log-Commands: true
 Items-Permissions: true
 Debugging-Mode: false
 

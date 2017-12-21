@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -15,9 +14,12 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.Logger;
 
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.utils.BungeeCord;
+import me.RockinChaos.itemjoin.utils.CustomFilter;
 import me.RockinChaos.itemjoin.utils.Econ;
 import me.RockinChaos.itemjoin.utils.Hooks;
 import me.RockinChaos.itemjoin.utils.Language;
@@ -26,6 +28,7 @@ import me.RockinChaos.itemjoin.utils.Utils;
 public class CommandHandler {
 	private static Map < String, Long > playersOnCooldown = new HashMap < String, Long > ();
 	private static HashMap < String, Long > storedSpammedPlayers = new HashMap < String, Long > ();
+	public static HashMap < String, ArrayList<String> > filteredCommands = new HashMap < String, ArrayList<String> > ();
 	private static int cdtime = 0;
 	private static int spamtime = 1;
 
@@ -409,6 +412,16 @@ public class CommandHandler {
 			}
 		}
 	}
+	
+	public static void filterCommands(Player player, String stuff) {
+		if (ConfigHandler.getConfig("config.yml").getString("Log-Commands") != null && ConfigHandler.getConfig("config.yml").getBoolean("Log-Commands") == false) {
+			ArrayList < String > templist = new ArrayList < String > ();
+			if (filteredCommands.get("commands-list") != null && !filteredCommands.get("commands-list").contains(stuff)) { templist = filteredCommands.get("commands-list"); }
+			templist.add(stuff);
+			filteredCommands.put("commands-list", templist);
+			((Logger) LogManager.getRootLogger()).addFilter(new CustomFilter());
+		}
+	}
 
 	public static void dispatchMessageCommands(String returnedCommand, Player player, String item) {
 		String Command = Utils.format(returnedCommand, player);
@@ -424,6 +437,7 @@ public class CommandHandler {
 
 	public static void dispatchPlayerCommands(String returnedCommand, Player player, String item) {
 		String Command = Utils.format(returnedCommand, player);
+		filterCommands(player, "/" + Command);
 		player.chat("/" + Command);
 		playersOnCooldown.put(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + item, System.currentTimeMillis());
 	}
@@ -433,22 +447,21 @@ public class CommandHandler {
 		try {
 		    player.setOp(true);
 			String Command = Utils.format(returnedCommand, player);
+			filterCommands(player, "/" + Command);
 			player.chat("/" + Command);
-		}
-		catch(Exception e) {
+		} catch(Exception e) {
 			if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
-	        player.setOp(false);
+	        player.setOp(isOp);
 	        ServerHandler.sendConsoleMessage("&cAn error has occurred while removing " + player.getName() + " from the OPs list. OP or not OP they were removed from OPs list!");
-		}
-		finally {
+		} finally {
 			player.setOp(isOp);
 			playersOnCooldown.put(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + item, System.currentTimeMillis());
 		}
-		
 	}
 
 	public static void dispatchConsoleCommands(String returnedCommand, Player player, String item) {
 		String Command = Utils.format(returnedCommand, player);
+		filterCommands(player, "/" + Command);
 		Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), Command);
 		playersOnCooldown.put(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + item, System.currentTimeMillis());
 	}
