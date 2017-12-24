@@ -1,5 +1,9 @@
 package me.RockinChaos.itemjoin.utils;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+
+import org.bukkit.entity.Player;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 
@@ -27,5 +31,16 @@ public class Reflection {
 		}
 		return null;
 	}
+	
+	public static int getWindowID(Player player) {
+		 try {
+			 Field entityPlayerActiveContainerWindowId = Reflection.getNMS("EntityPlayer").getField("activeContainer").getType().getField("windowId");
+			 Method craftPlayerHandle = Reflection.getOBC("entity.CraftPlayer").getDeclaredMethod("getHandle");
+			 Field entityPlayerActiveContainer = Reflection.getNMS("EntityPlayer").getField("activeContainer");
+			 return (int) entityPlayerActiveContainerWindowId.get(entityPlayerActiveContainer.get(craftPlayerHandle.invoke(player)));
+		  } catch (Exception e) { if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+	    }
+		 return -2;
+	 }
 	
 }

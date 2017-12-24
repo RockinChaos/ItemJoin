@@ -23,7 +23,7 @@ public class AnimationHandler {
 		if (isActive.get(PlayerHandler.getPlayerID(player)) != null && isActive.get(PlayerHandler.getPlayerID(player))) { setCanceled.put(PlayerHandler.getPlayerID(player), true); }
 	}
 
-	public static void refreshItems(final Player player, final String trigger) {
+	public static void refreshItems(final Player player) {
 		cancelRefresh(player);
 			if (isWaiting.get(PlayerHandler.getPlayerID(player)) == null && isActive.get(PlayerHandler.getPlayerID(player)) != null && isActive.get(PlayerHandler.getPlayerID(player))) {
 				isWaiting.put(PlayerHandler.getPlayerID(player), true);
@@ -32,25 +32,24 @@ public class AnimationHandler {
 						final Player p = PlayerHandler.getPlayerString(PlayerHandler.getPlayerID(player));
 						if (p != null && p.isOnline() && !p.isDead() && !isActive.get(PlayerHandler.getPlayerID(player))) {
 							isWaiting.remove(PlayerHandler.getPlayerID(player));
-							setUpdating(p, trigger);
+							setUpdating(p);
+							ServerHandler.sendDebugMessage("Restarting Animations..");
 							this.cancel();
 						}
 					}
 				}.runTaskTimer(ItemJoin.getInstance(), 50L, 50L);
-			} else if (isWaiting.get(PlayerHandler.getPlayerID(player)) == null) { setUpdating(player, trigger); }
+			} else if (isWaiting.get(PlayerHandler.getPlayerID(player)) == null) { setUpdating(player); }
 	}
 
-	private static void setUpdating(Player player, String trigger) {
+	private static void setUpdating(Player player) {
 		if (Utils.isConfigurable()) {
 			for (String item: ConfigHandler.getConfigurationSection().getKeys(false)) {
 				ConfigurationSection items = ConfigHandler.getItemSection(item);
 				int Arbitrary = 0;
 				String ItemFlags = items.getString(".itemflags");
-				String Triggers = items.getString(".triggers");
 				String ItemID;
 				if (ItemHandler.containsIgnoreCase(ItemFlags, "animate") || ItemHandler.containsIgnoreCase(ItemFlags, "animated")) {
 					if (WorldHandler.inWorld(items, player.getWorld().getName()) && items.getString(".slot") != null) {
-					if (ItemHandler.containsIgnoreCase(Triggers, trigger) || trigger.equals("reload")) {
 					String slotlist = items.getString(".slot").replace(" ", "");
 					String[] slots = slotlist.split(",");
 					for (String slot: slots) {
@@ -61,10 +60,9 @@ public class AnimationHandler {
 							ItemID = slot;
 						}
 						final String finalID = ItemID;
-						if (getNameSection(items) != null || getLoreSection(items) != null) { isActive.put(PlayerHandler.getPlayerID(player), true); setCanceled.put(PlayerHandler.getPlayerID(player), false); }
-						if (getNameSection(items) != null) { setNameAnimate(items, player, finalID); }
-						if (getLoreSection(items) != null) { setLoreAnimate(items, player, finalID); }
-					}
+						isActive.put(PlayerHandler.getPlayerID(player), true); setCanceled.put(PlayerHandler.getPlayerID(player), false);
+						setNameAnimate(items, player, finalID);
+						setLoreAnimate(items, player, finalID);
 				  }
 				}
 			   }
@@ -73,79 +71,91 @@ public class AnimationHandler {
 	}
 	
 	private static void setNameAnimate(ConfigurationSection items, Player player, String ItemID) {
-		Iterator <String> it = getNameSection(items).getKeys(false).iterator();
 		long ticks = 0;
+		if (getNameSection(items) != null) {
+		Iterator <String> it = getNameSection(items).getKeys(false).iterator();
 		while (it.hasNext()) {
 			String name = it.next();
 			ticks = ticks + getAnimateTicks(items.getString(".name." + name));
 			setDelayRun(1, items, player, it.hasNext(), name, ItemID, ticks);
 		}
+		} else {
+			ticks = getAnimateTicks(items.getString(".name"));
+			setDelayRun(1, items, player, false, null, ItemID, ticks);
+		}
 	}
 	
 	private static void setLoreAnimate(ConfigurationSection items, Player player, String ItemID) {
-		Iterator <String> it = getLoreSection(items).getKeys(false).iterator();
 		long ticks = 0;
+		if (getLoreSection(items) != null) {
+		Iterator <String> it = getLoreSection(items).getKeys(false).iterator();
 		while (it.hasNext()) {
 			String name = it.next();
 			ticks = ticks + getAnimateTicks(items.getStringList(".lore." + name).get(0));
 			setDelayRun(2, items, player, it.hasNext(), name, ItemID, ticks);
 		}
+		} else {
+			ticks = getAnimateTicks(items.getStringList(".lore").get(0));
+			setDelayRun(2, items, player, false, null, ItemID, ticks);
+		}
 	}
 	
-	private static void setDelayRun(final int test, final ConfigurationSection items, final Player player, final boolean hasRestart, final String nameString, final String ItemID, final long UpdateDelay) {
+	private static void setDelayRun(final int AnimateID, final ConfigurationSection items, final Player player, final boolean hasRestart, final String nameString, final String ItemID, final long UpdateDelay) {
 		final int taskid = Utils.getRandom(1, 100000);
 		ArrayList < Integer > templist = new ArrayList < Integer > ();
-		if (runningID.get(PlayerHandler.getPlayerID(player) + test) != null) {
-			templist = runningID.get(PlayerHandler.getPlayerID(player) + test);
+		if (runningID.get(PlayerHandler.getPlayerID(player) + AnimateID) != null) {
+			templist = runningID.get(PlayerHandler.getPlayerID(player) + AnimateID);
 		}
 		templist.add(taskid);
-		runningID.put(PlayerHandler.getPlayerID(player) + test, templist);
+		runningID.put(PlayerHandler.getPlayerID(player) + AnimateID, templist);
 		new BukkitRunnable() {
 			public void run() {
-				ArrayList < Integer > templist2 = new ArrayList < Integer > (runningID.get(PlayerHandler.getPlayerID(player) + test));
+				ArrayList < Integer > templist2 = new ArrayList < Integer > (runningID.get(PlayerHandler.getPlayerID(player) + AnimateID));
 				templist2.remove((Object) taskid);
-				runningID.put(PlayerHandler.getPlayerID(player) + test, templist2);
+				runningID.put(PlayerHandler.getPlayerID(player) + AnimateID, templist2);
 				if (player.isOnline() && setCanceled.get(PlayerHandler.getPlayerID(player)) != true && !player.isDead()) {
 					boolean hasAnimated = false;
+					ItemStack animatedItem = null;
 					ItemStack inStoredItems = CreateItems.items.get(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + ItemID + items.getName());
 					for (ItemStack inPlayerInventory: player.getInventory().getContents()) {
 						if (inPlayerInventory != null && inStoredItems != null && ItemHandler.isSimilar(inPlayerInventory, inStoredItems)) {
+							if (!hasAnimated && AnimateID == 1) { setNameData(items, inPlayerInventory, player, hasRestart, nameString, ItemID); } 
+							else if (!hasAnimated && AnimateID == 2) { setLoreData(items, inPlayerInventory, player, hasRestart, nameString, ItemID); }
+							if (!hasAnimated) { animatedItem = inPlayerInventory; }
 							hasAnimated = true;
-							if (test == 1) {
-								setNameData(items, inPlayerInventory, player, hasRestart, nameString, ItemID);
-							} else if (test == 2) {
-								setLoreData(items, inPlayerInventory, player, hasRestart, nameString, ItemID);
-							}
-							PlayerHandler.updateActualSlot(player, inPlayerInventory);
+							PlayerHandler.updateActualSlot(player, animatedItem, "PlayerInventory");
 						}
 					}
 					for (ItemStack inPlayerInventory: player.getInventory().getArmorContents()) {
 						if (inPlayerInventory != null && inStoredItems != null && ItemHandler.isSimilar(inPlayerInventory, inStoredItems)) {
+							if (!hasAnimated && AnimateID == 1) { setNameData(items, inPlayerInventory, player, hasRestart, nameString, ItemID); } 
+							else if (!hasAnimated && AnimateID == 2) { setLoreData(items, inPlayerInventory, player, hasRestart, nameString, ItemID); }
+							if (!hasAnimated) { animatedItem = inPlayerInventory; }
 							hasAnimated = true;
-							if (test == 1) {
-								setNameData(items, inPlayerInventory, player, hasRestart, nameString, ItemID);
-							} else if (test == 2) {
-								setLoreData(items, inPlayerInventory, player, hasRestart, nameString, ItemID);
-							}
-							PlayerHandler.updateActualSlot(player, inPlayerInventory);
+							PlayerHandler.updateActualSlot(player, animatedItem, "PlayerArmor");
+						}
+					}
+					for (ItemStack inPlayerInventory: player.getOpenInventory().getTopInventory().getContents()) {
+						if (inPlayerInventory != null && inStoredItems != null && ItemHandler.isSimilar(inPlayerInventory, inStoredItems)) {
+							if (!hasAnimated && AnimateID == 1) { setNameData(items, inPlayerInventory, player, hasRestart, nameString, ItemID); } 
+							else if (!hasAnimated && AnimateID == 2) { setLoreData(items, inPlayerInventory, player, hasRestart, nameString, ItemID); }
+							if (!hasAnimated) { animatedItem = inPlayerInventory; }
+							hasAnimated = true;
+							PlayerHandler.updateActualSlot(player, animatedItem, "OpenInventory");
 						}
 					}
 					if (player.getItemOnCursor() != null && inStoredItems != null && ItemHandler.isSimilar(player.getItemOnCursor(), inStoredItems)) {
+						if (!hasAnimated && AnimateID == 1) { setNameData(items, player.getItemOnCursor(), player, hasRestart, nameString, ItemID); } 
+						else if (!hasAnimated && AnimateID == 2) { setLoreData(items, player.getItemOnCursor(), player, hasRestart, nameString, ItemID); }
 						hasAnimated = true;
-						if (test == 1) {
-							setNameData(items, player.getItemOnCursor(), player, hasRestart, nameString, ItemID);
-						} else if (test == 2) {
-							setLoreData(items, player.getItemOnCursor(), player, hasRestart, nameString, ItemID);
-						}
-						//player.setItemOnCursor(player.getItemOnCursor());
 					}
 					if (!hasRestart && !hasAnimated && player.isOnline() && setCanceled.get(PlayerHandler.getPlayerID(player)) != true && !player.isDead()) {
 						new BukkitRunnable() {
 							public void run() {
-						if (test == 1) {
+						if (AnimateID == 1) {
 							setNameAnimate(items, player, ItemID);
 							ServerHandler.sendDebugMessage("Failed to Animate, Restarted Name Animations... ");
-						} else if (test == 2) {
+						} else if (AnimateID == 2) {
 							setLoreAnimate(items, player, ItemID);
 							ServerHandler.sendDebugMessage("Failed to Animate, Restarted Lore Animations... ");
 						}
@@ -157,7 +167,7 @@ public class AnimationHandler {
 						runningID.remove(PlayerHandler.getPlayerID(player) + 1);
 						runningID.remove(PlayerHandler.getPlayerID(player) + 2);
 						isActive.put(PlayerHandler.getPlayerID(player), false);
-						ServerHandler.sendDebugMessage("Animation Runnables for the player " + PlayerHandler.getPlayerID(player) + " have finished, animate restart will be allowed if requested.");
+						ServerHandler.sendDebugMessage("Animation Runnables for the player " + player.getName() + " have finished, animate restart will be allowed if requested.");
 					}
 				}
 			}

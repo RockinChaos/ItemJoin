@@ -8,12 +8,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType.SlotType;
 import org.bukkit.inventory.ItemStack;
 
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
+import me.RockinChaos.itemjoin.utils.Reflection;
 
 public class InvClickSurvival implements Listener {
 
@@ -49,6 +51,30 @@ public class InvClickSurvival implements Listener {
 			}
 		}
 	}
+	
+    @EventHandler()
+    public final void onMoveAnimatedItem(InventoryClickEvent event) { // Possible perma fix for ghost items if rapid animation + rapid move spam of item.
+    	final Player player = (Player) event.getWhoClicked();
+    	if (event.getAction().toString().contains("PLACE_ALL") && !ItemHandler.isAllowedItem(player, event.getCursor(), "animated")) {
+    		final ItemStack item = new ItemStack(event.getCursor());
+    		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), (Runnable) new Runnable() {
+    			public void run() {
+    				PlayerHandler.updateActualSlot(player, item, "PlayerInventory");
+    				PlayerHandler.updateActualSlot(player, item, "OpenInventory");
+    			}
+    		}, (long) 0.001);
+    	} else if (event.getAction().toString().contains("MOVE_TO_OTHER_INVENTORY") && !ItemHandler.isAllowedItem(player, event.getCurrentItem(), "animated")) {
+    		final SlotType sl = event.getSlotType();
+    		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), (Runnable) new Runnable() {
+    			public void run() {
+    				PlayerHandler.updateLocalizedSlots(player, "PlayerInventory");
+    				if (sl == SlotType.CRAFTING || Reflection.getWindowID(player) != 0) {
+    					PlayerHandler.updateLocalizedSlots(player, "OpenInventory");
+    				}
+    			}
+    		}, (long) 0.01);
+    	}
+    }
 
 	public static void CustomDropEvent(final Player player, final ItemStack[] Inv, final ItemStack[] Armor) {
 		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
