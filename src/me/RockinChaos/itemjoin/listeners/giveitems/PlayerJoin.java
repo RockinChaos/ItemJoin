@@ -70,7 +70,7 @@ public class PlayerJoin implements Listener {
 					SetItems.removeFailCount(player);
 				}
 				PlayerHandler.delayUpdateInventory(player, 15L);
-				AnimationHandler.refreshItems(player, "join");
+				AnimationHandler.refreshItems(player);
 			}
 		}, delay);
 	}

@@ -68,7 +68,7 @@ public class WorldChange implements Listener {
 					SetItems.removeFailCount(player);
 				}
 				PlayerHandler.delayUpdateInventory(player, 15L);
-				AnimationHandler.refreshItems(player, "world-change");
+				AnimationHandler.refreshItems(player);
 			}
 		}, delay);
 	}

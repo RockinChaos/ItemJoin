@@ -129,14 +129,14 @@ public class CreateItems {
 				for (Player player: playersOnlineNew) {
 					run(player);
 					InvClickCreative.isCreative(player, player.getGameMode());
-					AnimationHandler.refreshItems(player, "reload");
+					AnimationHandler.refreshItems(player);
 				}
 			} else {
 				playersOnlineOld = ((Player[]) Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).invoke(null, new Object[0]));
 				for (Player player: playersOnlineOld) {
 					run(player);
 					InvClickCreative.isCreative(player, player.getGameMode());
-					AnimationHandler.refreshItems(player, "reload");
+					AnimationHandler.refreshItems(player);
 				}
 			}
 		} catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
