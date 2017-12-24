@@ -57,6 +57,7 @@ public class Placement implements Listener{
 		@EventHandler
 	    public void onItemFramePlace(PlayerInteractEntityEvent event) {
 	        if(event.getRightClicked() instanceof ItemFrame) {
+	        	try {
 	    	    ItemStack item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().toString());
 	    	    final Player player = event.getPlayer();
 	    	    String itemflag = "placement";
@@ -64,13 +65,15 @@ public class Placement implements Listener{
 	    	      {
 	    	        event.setCancelled(true);
 	    	        PlayerHandler.updateInventory(player);
-	    	 }
-	        }
+	    	  }
+	        } catch (Exception e) { if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }}
+		  }
 	    }
 		
 		@EventHandler
 	    public void onItemFrameCountLock(PlayerInteractEntityEvent event) {
 	        if(event.getRightClicked() instanceof ItemFrame) {
+	        	try {
 	    	    ItemStack item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().toString());
 	    	    final Player player = event.getPlayer();
 	    	    String itemflag = "count-lock";
@@ -85,6 +88,7 @@ public class Placement implements Listener{
 						reAddItem(player, item, handString, itemflag);
 					}
 				}
+	          } catch (Exception e) { if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }}
 	        }
 		}
 		
