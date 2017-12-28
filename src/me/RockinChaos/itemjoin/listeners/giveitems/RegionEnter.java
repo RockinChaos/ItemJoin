@@ -68,7 +68,7 @@ public class RegionEnter implements Listener {
 				try {
 					removeEnterItems(player, 2);
 					setEnterItems(player, region, 1);
-					if (SetItems.getFailCount().get(player) != 0) {
+					if (SetItems.getFailCount().get(player) != null && SetItems.getFailCount().get(player) != 0) {
 						boolean Overwrite = ConfigHandler.getConfig("items.yml").getBoolean("items-Overwrite");
 						if (Overwrite == true) {
 							Language.getSendMessage(player, "failedInvFull", SetItems.getFailCount().get(player).toString());

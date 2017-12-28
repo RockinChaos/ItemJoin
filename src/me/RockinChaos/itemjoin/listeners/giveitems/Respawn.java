@@ -57,7 +57,7 @@ public class Respawn implements Listener {
 		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
 			public void run() {
 				setJoinItems(player);
-				if (SetItems.getFailCount().get(player) != 0) {
+				if (SetItems.getFailCount().get(player) != null && SetItems.getFailCount().get(player) != 0) {
 					boolean Overwrite = ConfigHandler.getConfig("items.yml").getBoolean("items-Overwrite");
 					if (Overwrite == true) {
 						Language.getSendMessage(player, "failedInvFull", SetItems.getFailCount().get(player).toString());
