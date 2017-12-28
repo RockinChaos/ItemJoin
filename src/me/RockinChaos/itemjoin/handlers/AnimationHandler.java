@@ -49,7 +49,7 @@ public class AnimationHandler {
 				String ItemFlags = items.getString(".itemflags");
 				String ItemID;
 				if (ItemHandler.containsIgnoreCase(ItemFlags, "animate") || ItemHandler.containsIgnoreCase(ItemFlags, "animated")) {
-					if (WorldHandler.inWorld(items, player.getWorld().getName()) && items.getString(".slot") != null) {
+					if (WorldHandler.inWorld(items, player.getWorld().getName()) && items.getString(".slot") != null && PermissionsHandler.hasPermission(items, item, player)) {
 					String slotlist = items.getString(".slot").replace(" ", "");
 					String[] slots = slotlist.split(",");
 					for (String slot: slots) {
@@ -119,8 +119,8 @@ public class AnimationHandler {
 					ItemStack inStoredItems = CreateItems.items.get(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + ItemID + items.getName());
 					for (ItemStack inPlayerInventory: player.getInventory().getContents()) {
 						if (inPlayerInventory != null && inStoredItems != null && ItemHandler.isSimilar(inPlayerInventory, inStoredItems)) {
-							if (!hasAnimated && AnimateID == 1) { setNameData(items, inPlayerInventory, player, hasRestart, nameString, ItemID); } 
-							else if (!hasAnimated && AnimateID == 2) { setLoreData(items, inPlayerInventory, player, hasRestart, nameString, ItemID); }
+							if (AnimateID == 1) { setNameData(items, inPlayerInventory, player, hasRestart, hasAnimated, nameString, ItemID); } 
+							else if (AnimateID == 2) { setLoreData(items, inPlayerInventory, player, hasRestart, hasAnimated, nameString, ItemID); }
 							if (!hasAnimated) { animatedItem = inPlayerInventory; }
 							hasAnimated = true;
 							PlayerHandler.updateActualSlot(player, animatedItem, "PlayerInventory");
@@ -128,8 +128,8 @@ public class AnimationHandler {
 					}
 					for (ItemStack inPlayerInventory: player.getInventory().getArmorContents()) {
 						if (inPlayerInventory != null && inStoredItems != null && ItemHandler.isSimilar(inPlayerInventory, inStoredItems)) {
-							if (!hasAnimated && AnimateID == 1) { setNameData(items, inPlayerInventory, player, hasRestart, nameString, ItemID); } 
-							else if (!hasAnimated && AnimateID == 2) { setLoreData(items, inPlayerInventory, player, hasRestart, nameString, ItemID); }
+							if (AnimateID == 1) { setNameData(items, inPlayerInventory, player, hasRestart, hasAnimated, nameString, ItemID); } 
+							else if (AnimateID == 2) { setLoreData(items, inPlayerInventory, player, hasRestart, hasAnimated, nameString, ItemID); }
 							if (!hasAnimated) { animatedItem = inPlayerInventory; }
 							hasAnimated = true;
 							PlayerHandler.updateActualSlot(player, animatedItem, "PlayerArmor");
@@ -137,16 +137,16 @@ public class AnimationHandler {
 					}
 					for (ItemStack inPlayerInventory: player.getOpenInventory().getTopInventory().getContents()) {
 						if (inPlayerInventory != null && inStoredItems != null && ItemHandler.isSimilar(inPlayerInventory, inStoredItems)) {
-							if (!hasAnimated && AnimateID == 1) { setNameData(items, inPlayerInventory, player, hasRestart, nameString, ItemID); } 
-							else if (!hasAnimated && AnimateID == 2) { setLoreData(items, inPlayerInventory, player, hasRestart, nameString, ItemID); }
+							if (AnimateID == 1) { setNameData(items, inPlayerInventory, player, hasRestart, hasAnimated, nameString, ItemID); } 
+							else if (AnimateID == 2) { setLoreData(items, inPlayerInventory, player, hasRestart, hasAnimated, nameString, ItemID); }
 							if (!hasAnimated) { animatedItem = inPlayerInventory; }
 							hasAnimated = true;
 							PlayerHandler.updateActualSlot(player, animatedItem, "OpenInventory");
 						}
 					}
 					if (player.getItemOnCursor() != null && inStoredItems != null && ItemHandler.isSimilar(player.getItemOnCursor(), inStoredItems)) {
-						if (!hasAnimated && AnimateID == 1) { setNameData(items, player.getItemOnCursor(), player, hasRestart, nameString, ItemID); } 
-						else if (!hasAnimated && AnimateID == 2) { setLoreData(items, player.getItemOnCursor(), player, hasRestart, nameString, ItemID); }
+						if (AnimateID == 1) { setNameData(items, player.getItemOnCursor(), player, hasRestart, hasAnimated, nameString, ItemID); } 
+						else if (AnimateID == 2) { setLoreData(items, player.getItemOnCursor(), player, hasRestart, hasAnimated, nameString, ItemID); }
 						hasAnimated = true;
 					}
 					if (!hasRestart && !hasAnimated && player.isOnline() && setCanceled.get(PlayerHandler.getPlayerID(player)) != true && !player.isDead()) {
@@ -174,18 +174,18 @@ public class AnimationHandler {
 		}.runTaskLater(ItemJoin.getInstance(), UpdateDelay);
 	}
 	
-	private static void setNameData(ConfigurationSection items, ItemStack inPlayerInventory, Player player, boolean hasRestart, String nameString, String ItemID) {
+	private static void setNameData(ConfigurationSection items, ItemStack inPlayerInventory, Player player, boolean hasRestart, boolean hasAnimated, String nameString, String ItemID) {
 		ItemMeta tempmeta = inPlayerInventory.getItemMeta();
 		CreateItems.setName(items, tempmeta, inPlayerInventory, player, ItemID, nameString);
 		inPlayerInventory.setItemMeta(tempmeta);
-		if (!hasRestart && player.isOnline() && setCanceled.get(PlayerHandler.getPlayerID(player)) != true && !player.isDead()) { setNameAnimate(items, player, ItemID); }
+		if (!hasAnimated && !hasRestart && player.isOnline() && setCanceled.get(PlayerHandler.getPlayerID(player)) != true && !player.isDead()) { setNameAnimate(items, player, ItemID); }
 	}
 	
-	private static void setLoreData(ConfigurationSection items, ItemStack inPlayerInventory, Player player, boolean hasRestart, String nameString, String ItemID) {
+	private static void setLoreData(ConfigurationSection items, ItemStack inPlayerInventory, Player player, boolean hasRestart, boolean hasAnimated, String nameString, String ItemID) {
 		ItemMeta tempmeta = inPlayerInventory.getItemMeta();
 		CreateItems.setLore(items, tempmeta, player, nameString);
 		inPlayerInventory.setItemMeta(tempmeta);
-		if (!hasRestart && player.isOnline() && setCanceled.get(PlayerHandler.getPlayerID(player)) != true && !player.isDead()) { setLoreAnimate(items, player, ItemID); }
+		if (!hasAnimated && !hasRestart && player.isOnline() && setCanceled.get(PlayerHandler.getPlayerID(player)) != true && !player.isDead()) { setLoreAnimate(items, player, ItemID); }
 	}
 	
 	public static ConfigurationSection getNameSection(ConfigurationSection items) {

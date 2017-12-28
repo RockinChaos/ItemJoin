@@ -54,16 +54,21 @@ public class PlayerHandler {
 		   		Object packet = null;
 		   		if (item != null && ItemHandler.isSimilar(item, inPlayerInventory)) {
 		   			if (i >= 36 && i <= 39 && type == "PlayerArmor") {
-		   				packet = Reflection.getNMS("PacketPlayOutEntityEquipment").getConstructor(int.class, Reflection.getNMS("EnumItemSlot"), nms.getClass()).newInstance(player.getEntityId(), Reflection.getNMS("EnumItemSlot").getEnumConstants()[i - 34], nms);
+						if (i == 39) { player.getInventory().setHelmet(inPlayerInventory);
+						} else if (i == 38) { player.getInventory().setChestplate(inPlayerInventory);
+						} else if (i == 37) { player.getInventory().setLeggings(inPlayerInventory);
+						} else if (i == 36) { player.getInventory().setBoots(inPlayerInventory); }
 		   			} else if (type == "PlayerInventory") {
 		   				packet = Reflection.getNMS("PacketPlayOutSetSlot").getConstructor(int.class, int.class, nms.getClass()).newInstance(-2, i, nms);
 		   			} else if (type == "OpenInventory") {
 		   				packet = Reflection.getNMS("PacketPlayOutSetSlot").getConstructor(int.class, int.class, nms.getClass()).newInstance(Reflection.getWindowID(player), i, nms);
 		   			}
 		   		}
+		   		if (packet != null) {
 		   		Object nmsPlayer = player.getClass().getMethod("getHandle").invoke(player);
 		   		Object plrConnection = nmsPlayer.getClass().getField("playerConnection").get(nmsPlayer);
 		   		plrConnection.getClass().getMethod("sendPacket", Reflection.getNMS("Packet")).invoke(plrConnection, packet);
+		   		}
 		   	}
 		  } catch (Exception e) { if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
 	    }
@@ -84,14 +89,19 @@ public class PlayerHandler {
 						packet = Reflection.getNMS("PacketPlayOutSetSlot").getConstructor(int.class, int.class, nms.getClass()).newInstance(-2, i, nms);
 					}
 				} else if (i >= 36 && i <= 39 && item != null) {
-					packet = Reflection.getNMS("PacketPlayOutEntityEquipment").getConstructor(int.class, Reflection.getNMS("EnumItemSlot"), nms.getClass()).newInstance(player.getEntityId(), Reflection.getNMS("EnumItemSlot").getEnumConstants()[i - 34], nms);
+					if (i == 39) { player.getInventory().setHelmet(item); 
+					} else if (i == 38) { player.getInventory().setChestplate(item);
+					} else if (i == 37) { player.getInventory().setLeggings(item);
+					} else if (i == 36) { player.getInventory().setBoots(item); }
 				}
 				} else if (type == "OpenInventory") {
 	   				packet = Reflection.getNMS("PacketPlayOutSetSlot").getConstructor(int.class, int.class, nms.getClass()).newInstance(Reflection.getWindowID(player), i, nms);
 	   			}
+				if (packet != null) {
 				Object nmsPlayer = player.getClass().getMethod("getHandle").invoke(player);
 				Object plrConnection = nmsPlayer.getClass().getField("playerConnection").get(nmsPlayer);
 				plrConnection.getClass().getMethod("sendPacket", Reflection.getNMS("Packet")).invoke(plrConnection, packet);
+				}
 			}
 		 } catch (Exception e) { if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
 	   }
