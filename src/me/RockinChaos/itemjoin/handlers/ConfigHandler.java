@@ -16,6 +16,7 @@ public class ConfigHandler {
 	private static YamlConfiguration loadConfig;
 	private static YamlConfiguration loadEnLang;
 	private static YamlConfiguration loadFirstJoin;
+	private static YamlConfiguration loadIPLimit;
 	private static String NBTData = "ItemJoin";
 
 	public static FileConfiguration loadConfig(String path) {
@@ -61,6 +62,11 @@ public class ConfigHandler {
 				loadFirstJoin = YamlConfiguration.loadConfiguration(file);
 			}
 			return loadFirstJoin;
+		} else if (path.contains("ip-limit.yml")) {
+			if (integer == 1) {
+				loadIPLimit = YamlConfiguration.loadConfiguration(file);
+			}
+			return loadIPLimit;
 		}
 		return null;
 	}
@@ -110,6 +116,28 @@ public class ConfigHandler {
 		ConfigHandler.getConfig("items.yml").options().copyDefaults(false);
 	}
 
+	public static void ipLimitFile() {
+		File file = new File(ItemJoin.getInstance().getDataFolder(), "ip-limit.yml");
+		if ((file).exists()) {
+			ConfigHandler.loadConfig("ip-limit.yml");
+			File ipLimitFile = new File(ItemJoin.getInstance().getDataFolder(), "ip-limit.yml");
+			if (ipLimitFile.exists() && ConfigHandler.getConfig("ip-limit.yml").getInt("ip-Version") != 6) {
+				if (ItemJoin.getInstance().getResource("ip-limit.yml") != null) {
+					String newGen = "ip-limit" + Utils.getRandom(1500000, 10000000) + ".yml";
+					File newFile = new File(ItemJoin.getInstance().getDataFolder(), newGen);
+					if (!newFile.exists()) {
+						ipLimitFile.renameTo(newFile);
+						File configFile = new File(ItemJoin.getInstance().getDataFolder(), "ip-limit.yml");
+						configFile.delete();
+						ConfigHandler.loadConfig("ip-limit.yml");
+						ServerHandler.sendConsoleMessage("&4Your ip-limit.yml is out of date and new options are available, generating a new one!");
+					}
+				}
+			}
+			ConfigHandler.getConfig("ip-limit.yml").options().copyDefaults(false);
+		}
+	}
+	
 	public static void firstjoinFile() {
 		File file = new File(ItemJoin.getInstance().getDataFolder(), "first-join.yml");
 		if ((file).exists()) {
@@ -161,7 +189,7 @@ public class ConfigHandler {
 		}
 		return false;
 	}
-
+	
 	public static String hasFirstJoinedConfig(Player player, String item) {
 		try {
 			return ConfigHandler.getConfig("first-join.yml").getString(player.getWorld().getName() + "." + item + "." + player.getUniqueId().toString());
@@ -170,7 +198,7 @@ public class ConfigHandler {
 		}
 		return null;
 	}
-
+	
 	public static void saveFirstJoined(Player player, String item) {
 		ConfigurationSection items = ConfigHandler.getItemSection(item);
 		if (ItemHandler.containsIgnoreCase(items.getString(".itemflags"), "first-join")) {
@@ -185,6 +213,43 @@ public class ConfigHandler {
 				ItemJoin.getInstance().getServer().getLogger().severe("Could not save " + player.getName() + " to the data file first-join.yml!");
 				if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
 			}
+		}
+	}
+	
+	public static Boolean hasIPLimits(Player player, String item) {
+		ConfigurationSection items = ConfigHandler.getItemSection(item);
+		String ItemFlags = items.getString(".itemflags");
+		if (ItemHandler.containsIgnoreCase(ItemFlags, "ip-limit") && hasIPLimitConfig(player, item)) {
+			return true;
+		}
+		return false;
+	}
+	
+	public static boolean hasIPLimitConfig(Player player, String item) {
+		try {
+		String s = ConfigHandler.getConfig("ip-limit.yml").getString(player.getWorld().getName() + "." + item + "." + player.getAddress().getHostString().replace(".", "") + "." + "Current User");
+			if (ConfigHandler.getConfig("ip-limit.yml").getString(player.getWorld().getName() + "." + item + "." + player.getAddress().getHostString().replace(".", "")) != null 
+					&& !s.contains(PlayerHandler.getPlayerID(player))) {
+				return true;
+			}
+		} catch (Exception e) {}
+		return false;
+	}
+	
+	public static void saveIPLimits(Player player, String item) {
+		ConfigurationSection items = ConfigHandler.getItemSection(item);
+		if (ItemHandler.containsIgnoreCase(items.getString(".itemflags"), "ip-limit")) {
+			File playerFile = new File(ItemJoin.getInstance().getDataFolder(), "ip-limit.yml");
+			FileConfiguration playerData = YamlConfiguration.loadConfiguration(playerFile);
+			playerData.set(player.getWorld().getName() + "." + item + "." + player.getAddress().getHostString().replace(".", "") + "." + "Current User", PlayerHandler.getPlayerID(player));
+			try {
+				playerData.save(playerFile);
+				ConfigHandler.loadConfig("ip-limit.yml");
+				ConfigHandler.getConfig("ip-limit.yml").options().copyDefaults(false);
+			} catch (IOException e) {
+				ItemJoin.getInstance().getServer().getLogger().severe("Could not save " + player.getName() + " to the data file ip-limit.yml!");
+				if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+			}	
 		}
 	}
 	

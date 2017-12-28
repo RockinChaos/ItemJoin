@@ -21,6 +21,7 @@ public class SetItems {
 		if (ItemHandler.isObtainable(player, item, slot.toString(), ItemID, inStoredItems)) {
 			player.getInventory().setItem(Integer.parseInt(slot), inStoredItems);
 			ConfigHandler.saveFirstJoined(player, item);
+			ConfigHandler.saveIPLimits(player, item);
 			ServerHandler.sendDebugMessage("Given the Item; " + inStoredItems.getItemMeta().getDisplayName().replace(ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + ItemID), ""));
 		}
 	}
@@ -33,26 +34,32 @@ public class SetItems {
 				player.getInventory().addItem(inStoredItems);
 				ServerHandler.sendDebugMessage("Given the Item; " + inStoredItems.getItemMeta().getDisplayName().replace(ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + ItemID), ""));
 				ConfigHandler.saveFirstJoined(player, item);
+				ConfigHandler.saveIPLimits(player, item);
 			} else if (slot.equalsIgnoreCase("Helmet") && ItemHandler.isObtainable(player, item, slot, ItemID, inStoredItems)) {
 				Equip.setHelmet(inStoredItems);
 				ServerHandler.sendDebugMessage("Given the Item; " + inStoredItems.getItemMeta().getDisplayName().replace(ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + ItemID), ""));
 				ConfigHandler.saveFirstJoined(player, item);
+				ConfigHandler.saveIPLimits(player, item);
 			} else if (slot.equalsIgnoreCase("Chestplate") && ItemHandler.isObtainable(player, item, slot, ItemID, inStoredItems)) {
 				Equip.setChestplate(inStoredItems);
 				ServerHandler.sendDebugMessage("Given the Item; " + inStoredItems.getItemMeta().getDisplayName().replace(ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + ItemID), ""));
 				ConfigHandler.saveFirstJoined(player, item);
+				ConfigHandler.saveIPLimits(player, item);
 			} else if (slot.equalsIgnoreCase("Leggings") && ItemHandler.isObtainable(player, item, slot, ItemID, inStoredItems)) {
 				Equip.setLeggings(inStoredItems);
 				ServerHandler.sendDebugMessage("Given the Item; " + inStoredItems.getItemMeta().getDisplayName().replace(ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + ItemID), ""));
 				ConfigHandler.saveFirstJoined(player, item);
+				ConfigHandler.saveIPLimits(player, item);
 			} else if (slot.equalsIgnoreCase("Boots") && ItemHandler.isObtainable(player, item, slot, ItemID, inStoredItems)) {
 				Equip.setBoots(inStoredItems);
 				ServerHandler.sendDebugMessage("Given the Item; " + inStoredItems.getItemMeta().getDisplayName().replace(ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + ItemID), ""));
 				ConfigHandler.saveFirstJoined(player, item);
+				ConfigHandler.saveIPLimits(player, item);
 			} else if (ServerHandler.hasCombatUpdate() && slot.equalsIgnoreCase("Offhand") && ItemHandler.isObtainable(player, item, slot, ItemID, inStoredItems)) {
 				PlayerHandler.setOffhandItem(player, inStoredItems);
 				ServerHandler.sendDebugMessage("Given the Item; " + inStoredItems.getItemMeta().getDisplayName().replace(ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + ItemID), ""));
 				ConfigHandler.saveFirstJoined(player, item);
+				ConfigHandler.saveIPLimits(player, item);
 			}
 		}
 	}

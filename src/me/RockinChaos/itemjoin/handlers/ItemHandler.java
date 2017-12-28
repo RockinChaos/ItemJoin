@@ -55,9 +55,9 @@ public class ItemHandler {
 	}
 
 	public static Boolean isObtainable(Player player, String item, String slot, String ItemID, ItemStack inStoredItems) {
-		if (inStoredItems != null && Utils.isInt(slot) && Integer.parseInt(slot) >= 0 && Integer.parseInt(slot) <= 35 && !hasItem(player, inStoredItems) && canOverwrite(player, slot, item) && !ConfigHandler.hasFirstJoined(player, item)) {
+		if (inStoredItems != null && Utils.isInt(slot) && Integer.parseInt(slot) >= 0 && Integer.parseInt(slot) <= 35 && !hasItem(player, inStoredItems) && canOverwrite(player, slot, item) && !ConfigHandler.hasFirstJoined(player, item) && !ConfigHandler.hasIPLimits(player, item)) {
 			return true;
-		} else if (inStoredItems != null && Utils.isCustomSlot(slot) && !hasItem(player, inStoredItems) && canOverwrite(player, slot, item) && !ConfigHandler.hasFirstJoined(player, item)) {
+		} else if (inStoredItems != null && Utils.isCustomSlot(slot) && !hasItem(player, inStoredItems) && canOverwrite(player, slot, item) && !ConfigHandler.hasFirstJoined(player, item) && !ConfigHandler.hasIPLimits(player, item)) {
 			return true;
 		}
 		return false;
