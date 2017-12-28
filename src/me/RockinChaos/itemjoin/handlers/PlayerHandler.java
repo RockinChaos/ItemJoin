@@ -88,7 +88,7 @@ public class PlayerHandler {
 					if (!ItemHandler.isSimilar(PlayerHandler.getPerfectHandItem(player, "HAND"), item) && !ItemHandler.isSimilar(PlayerHandler.getPerfectHandItem(player, "OFF_HAND"), item)) {
 						packet = Reflection.getNMS("PacketPlayOutSetSlot").getConstructor(int.class, int.class, nms.getClass()).newInstance(-2, i, nms);
 					}
-				} else if (i >= 36 && i <= 39 && item != null) {
+				} else if (i >= 36 && i <= 39) {
 					if (i == 39) { player.getInventory().setHelmet(item); 
 					} else if (i == 38) { player.getInventory().setChestplate(item);
 					} else if (i == 37) { player.getInventory().setLeggings(item);
