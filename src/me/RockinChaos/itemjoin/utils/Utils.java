@@ -35,9 +35,7 @@ public class Utils {
 		if (Hooks.hasPlaceholderAPI() == true) {
 			try {
 			return PlaceholderAPI.setPlaceholders(player, name);
-			} catch (NullPointerException e) {
-				if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
-			}
+			} catch (NoSuchFieldError e) { ServerHandler.sendDebugMessage("Error has occured when setting the PlaceHolder " + e.getMessage() + ", if this issue persits contact the developer of PlaceholderAPI."); return name; }
 		}
 		return name;
 	}

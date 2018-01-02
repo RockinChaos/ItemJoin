@@ -34,9 +34,9 @@ public class Reflection {
 	
 	public static int getWindowID(Player player) {
 		 try {
-			 Field entityPlayerActiveContainerWindowId = Reflection.getNMS("EntityPlayer").getField("activeContainer").getType().getField("windowId");
-			 Method craftPlayerHandle = Reflection.getOBC("entity.CraftPlayer").getDeclaredMethod("getHandle");
-			 Field entityPlayerActiveContainer = Reflection.getNMS("EntityPlayer").getField("activeContainer");
+			 Field entityPlayerActiveContainerWindowId = getNMS("EntityPlayer").getField("activeContainer").getType().getField("windowId");
+			 Method craftPlayerHandle = getOBC("entity.CraftPlayer").getDeclaredMethod("getHandle");
+			 Field entityPlayerActiveContainer = getNMS("EntityPlayer").getField("activeContainer");
 			 return (int) entityPlayerActiveContainerWindowId.get(entityPlayerActiveContainer.get(craftPlayerHandle.invoke(player)));
 		  } catch (Exception e) { if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
 	    }

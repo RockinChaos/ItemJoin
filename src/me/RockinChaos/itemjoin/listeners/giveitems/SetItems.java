@@ -11,6 +11,7 @@ import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
+import me.RockinChaos.itemjoin.handlers.WorldHandler;
 import me.RockinChaos.itemjoin.utils.Utils;
 
 public class SetItems {
@@ -73,31 +74,31 @@ public class SetItems {
 	}
 
 	public static void setClearingOfItems(Player player, String world, String clearOn) {
-		if (ConfigHandler.getConfig("config.yml").getString(clearOn) != null && ConfigHandler.getConfig("config.yml").getBoolean(clearOn) == true 
-				&& ConfigHandler.getConfig("config.yml").getString("Clear-Items") != null && ConfigHandler.getConfig("config.yml").getString("Clear-Items").equalsIgnoreCase("All")) {
+		if (ConfigHandler.getConfig("config.yml").getString("Clear-Items") != null && ConfigHandler.getConfig("config.yml").getString("Clear-Items").equalsIgnoreCase("All")) {
+		if (ConfigHandler.getConfig("config.yml").getString(clearOn) != null && WorldHandler.inGlobalWorld(world, clearOn)  
+				|| ConfigHandler.getConfig("config.yml").getString(clearOn) != null && ConfigHandler.getConfig("config.yml").getBoolean(clearOn) == true) {
 			if (ConfigHandler.getConfig("config.yml").getString("AllowOPBypass") != null && ConfigHandler.getConfig("config.yml").getBoolean("AllowOPBypass") == true && player.isOp()) {} else {
 			setClearAllItems(player);
-			}
-		} else if (ConfigHandler.getConfig("config.yml").getString(clearOn) != null && ConfigHandler.getConfig("config.yml").getBoolean(clearOn) == true 
-				&& ConfigHandler.getConfig("config.yml").getString("Clear-Items") != null && ConfigHandler.getConfig("config.yml").getString("Clear-Items").equalsIgnoreCase("ItemJoin")) {
+			}}
+		} else if (ConfigHandler.getConfig("config.yml").getString("Clear-Items") != null && ConfigHandler.getConfig("config.yml").getString("Clear-Items").equalsIgnoreCase("ItemJoin")) {
+			if (ConfigHandler.getConfig("config.yml").getString(clearOn) != null && WorldHandler.inGlobalWorld(world, clearOn) 
+					|| ConfigHandler.getConfig("config.yml").getString(clearOn) != null && ConfigHandler.getConfig("config.yml").getBoolean(clearOn) == true) {
 			if (ConfigHandler.getConfig("config.yml").getString("AllowOPBypass") != null && ConfigHandler.getConfig("config.yml").getBoolean("AllowOPBypass") == true && player.isOp()) {} else {
 			setClearItemJoinItems(player);
-			}
-		} else if (ConfigHandler.getConfig("config.yml").getBoolean(clearOn) == true) {
+			}}
+		} else if (ConfigHandler.getConfig("config.yml").getBoolean(clearOn) == true || WorldHandler.inGlobalWorld(world, clearOn)) {
 			ServerHandler.sendConsoleMessage("&cError; C122394");
 			ServerHandler.sendConsoleMessage("&c" + ConfigHandler.getConfig("config.yml").getString("Clear-Items") + " for Clear-Items in the config.yml is not a valid option.");
 		}
 	}
 
 	public static void setClearAllItems(Player player) {
-				player.getInventory().clear();
-				player.getInventory().setHelmet(null);
-				player.getInventory().setChestplate(null);
-				player.getInventory().setLeggings(null);
-				player.getInventory().setBoots(null);
-				if (ServerHandler.hasCombatUpdate()) {
-				player.getInventory().setItemInOffHand(null);
-				}
+		player.getInventory().clear();
+		player.getInventory().setHelmet(null);
+		player.getInventory().setChestplate(null);
+		player.getInventory().setLeggings(null);
+		player.getInventory().setBoots(null);
+		if (ServerHandler.hasCombatUpdate()) { player.getInventory().setItemInOffHand(null); }
 	}
 
 	public static void setClearItemJoinItems(Player player) {

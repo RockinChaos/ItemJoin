@@ -190,13 +190,36 @@ public class ConfigHandler {
 		return false;
 	}
 	
+	public static Boolean hasFirstCommanded(Player player, String command) {
+		if (ItemHandler.containsIgnoreCase(command, "first-join:") && hasFirstJoinedConfig(player, command.replace("first-join: ", "").replace("first-join:", "")) != null) {
+			return true;
+		}
+		return false;
+	}
+	
 	public static String hasFirstJoinedConfig(Player player, String item) {
 		try {
 			return ConfigHandler.getConfig("first-join.yml").getString(player.getWorld().getName() + "." + item + "." + player.getUniqueId().toString());
 		} catch (NullPointerException e) {
-			if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+			if (ServerHandler.hasDebuggingMode()) {}
 		}
 		return null;
+	}
+	
+	public static void saveFirstCommanded(Player player, String command) {
+		if (ItemHandler.containsIgnoreCase(command, "first-join:")) {
+			File playerFile = new File(ItemJoin.getInstance().getDataFolder(), "first-join.yml");
+			FileConfiguration playerData = YamlConfiguration.loadConfiguration(playerFile);
+			playerData.set(player.getWorld().getName() + "." + command.replace("first-join: ", "").replace("first-join:", "") + "." + PlayerHandler.getPlayerID(player) + "." + "IGN", player.getName().toString());
+			try {
+				playerData.save(playerFile);
+				ConfigHandler.loadConfig("first-join.yml");
+				ConfigHandler.getConfig("first-join.yml").options().copyDefaults(false);
+			} catch (IOException e) {
+				ItemJoin.getInstance().getServer().getLogger().severe("Could not save " + player.getName() + " to the data file first-join.yml!");
+				if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+			}
+		}
 	}
 	
 	public static void saveFirstJoined(Player player, String item) {

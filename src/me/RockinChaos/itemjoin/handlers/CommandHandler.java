@@ -61,13 +61,16 @@ public class CommandHandler {
 	}
 
 	public static void runGlobalCmds(Player player) {
-		if (ConfigHandler.getConfig("config.yml").getBoolean("enabled-global-commands") == true && WorldHandler.inGlobalWorld(player.getWorld().getName())) {
+		if (ConfigHandler.getConfig("config.yml").getBoolean("enabled-global-commands") == true && WorldHandler.inGlobalWorld(player.getWorld().getName(), "enabled-worlds")) {
 			if (ConfigHandler.getConfig("config.yml").getStringList("global-commands") != null) {
 			List <String> commands = ConfigHandler.getConfig("config.yml").getStringList("global-commands");
 			for (String command: commands) {
-				String Command = Utils.format(command, player);
+				if (!ConfigHandler.hasFirstCommanded(player, command)) {
+				String Command = Utils.format(command, player).replace("first-join: ", "").replace("first-join:", "");
 				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), Command);
-			}
+				if (ItemHandler.containsIgnoreCase(command, "first-join:")) { ConfigHandler.saveFirstCommanded(player, command); }
+				}
+			  }
 			}
 		}
 	}

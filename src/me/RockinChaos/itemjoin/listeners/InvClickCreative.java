@@ -19,6 +19,7 @@ import me.RockinChaos.itemjoin.handlers.ServerHandler;
 
 public class InvClickCreative implements Listener {
 	private static HashMap < String, ItemStack[] > mySavedItems = new HashMap < String, ItemStack[] > ();
+	private static HashMap < String, ItemStack[] > mySavedArmor = new HashMap < String, ItemStack[] > ();
 	private static HashMap < String, Boolean > isCreative = new HashMap < String, Boolean > ();
 	private static HashMap < String, Boolean > isGlitchSwap = new HashMap < String, Boolean > ();
 	private static HashMap < String, Integer > cooldown = new HashMap < String, Integer > ();
@@ -35,8 +36,8 @@ public class InvClickCreative implements Listener {
 	public void onCreativeInventoryModify(InventoryClickEvent event) {
 		String itemflag = "inventory-modify";
 		final Player player = (Player) event.getWhoClicked();
-		Initialize(player);
 		if (PlayerHandler.isCreativeMode(player)) {
+			Initialize(player);
 			ItemStack item = null;
 			if (cooldown.get(PlayerHandler.getPlayerID(player)) == 1) {
 				cooldown.put(PlayerHandler.getPlayerID(player), 1);
@@ -159,15 +160,19 @@ public class InvClickCreative implements Listener {
 	}
 
 	public static boolean hasItem(Player player, ItemStack cursorItem) {
-		if (mySavedItems.get(PlayerHandler.getPlayerID(player)) == null) {
-			saveInventory(player);
-		}
+		if (mySavedItems.get(PlayerHandler.getPlayerID(player)) == null || mySavedArmor.get(PlayerHandler.getPlayerID(player)) == null) { saveInventory(player); }
 		if (mySavedItems.get(PlayerHandler.getPlayerID(player)) != null) {
 		for (ItemStack inPlayerInventory: mySavedItems.get(PlayerHandler.getPlayerID(player))) {
 			if (cursorItem != null && ItemHandler.isSimilar(inPlayerInventory, cursorItem) && ItemHandler.isCountSimilar(inPlayerInventory, cursorItem)) {
 				return true;
 			}
 		}
+		} else if (mySavedArmor.get(PlayerHandler.getPlayerID(player)) != null) {
+			for (ItemStack inPlayerArmor: mySavedArmor.get(PlayerHandler.getPlayerID(player))) {
+				if (cursorItem != null && ItemHandler.isSimilar(inPlayerArmor, cursorItem) && ItemHandler.isCountSimilar(inPlayerArmor, cursorItem)) {
+					return true;
+				}
+			}
 		}
 		return false;
 	}
@@ -177,6 +182,7 @@ public class InvClickCreative implements Listener {
 			public void run() {
 				if (hasItems(player) && cooldown.get(PlayerHandler.getPlayerID(player)) != 1) {
 					mySavedItems.put(PlayerHandler.getPlayerID(player), player.getInventory().getContents());
+					mySavedArmor.put(PlayerHandler.getPlayerID(player), player.getInventory().getArmorContents());
 				}
 			}
 		}, 1L);
@@ -188,6 +194,7 @@ public class InvClickCreative implements Listener {
 				public void run() {
 					player.closeInventory();
 					player.getInventory().setContents(mySavedItems.get(PlayerHandler.getPlayerID(player)));
+					player.getInventory().setArmorContents(mySavedArmor.get(PlayerHandler.getPlayerID(player)));
 					cooldown.put(PlayerHandler.getPlayerID(player), 0);
 					if (isGlitchSwap.get(PlayerHandler.getPlayerID(player)) == true) {
 						isGlitchSwap.put(PlayerHandler.getPlayerID(player), false);

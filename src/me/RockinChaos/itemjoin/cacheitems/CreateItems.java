@@ -54,7 +54,6 @@ import me.RockinChaos.itemjoin.utils.Utils;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
-
 import com.vk2gpz.tokenenchant.api.TokenEnchantAPI;
 import me.arcaniax.hdb.api.HeadDatabaseAPI;
 
@@ -129,14 +128,14 @@ public class CreateItems {
 				for (Player player: playersOnlineNew) {
 					run(player);
 					InvClickCreative.isCreative(player, player.getGameMode());
-					AnimationHandler.refreshItems(player);
+					AnimationHandler.setAnimations(player);
 				}
 			} else {
 				playersOnlineOld = ((Player[]) Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).invoke(null, new Object[0]));
 				for (Player player: playersOnlineOld) {
 					run(player);
 					InvClickCreative.isCreative(player, player.getGameMode());
-					AnimationHandler.refreshItems(player);
+					AnimationHandler.setAnimations(player);
 				}
 			}
 		} catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
@@ -219,11 +218,11 @@ public class CreateItems {
 	public static ItemMeta setName(ConfigurationSection items, ItemMeta tempmeta, ItemStack tempitem, Player player, String ItemID, String NameString) {
 		if (items.getString(".name") != null) {
 			String name = items.getString(".name");
-			ConfigurationSection sting = ConfigHandler.getConfig("items.yml").getConfigurationSection(items.getCurrentPath() + ".name");
-			if (sting != null) {
-			Set<String> sting2 = sting.getKeys(false);
-			Iterator < String > it = sting2.iterator();
-			while (it.hasNext()) {
+			ConfigurationSection namePath = ConfigHandler.getConfig("items.yml").getConfigurationSection(items.getCurrentPath() + ".name");
+			if (namePath != null) {
+			Set<String> nameKeys = namePath.getKeys(false);
+			Iterator < String > it = nameKeys.iterator();
+			while (it.hasNext()) { // maybe remove?
 				String nameString = it.next();
 				if (NameString != null) {
 					nameString = NameString;
@@ -234,8 +233,8 @@ public class CreateItems {
 				}
 			  }
 			}
-			name = Utils.format("&r" + name.replace("<delay:" + Utils.returnInteger(name) + ">", ""), player); // name = Utils.format("&r" + name, player);
-			if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true) {
+			name = Utils.format("&r" + name.replace("<delay:" + Utils.returnInteger(name) + ">", ""), player);
+			if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && ServerHandler.hasBountifulUpdate()) {
 				tempmeta.setDisplayName(name);
 			} else {
 				tempmeta.setDisplayName(name + ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + ItemID));
@@ -243,10 +242,10 @@ public class CreateItems {
 		} else {
 			String lookup = ItemHandler.getName(tempitem);
 			String name = "";
-			if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true) {
-				name = Utils.format("&r" + lookup, player); // name = Utils.format("&r" + lookup, player);
+			if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && ServerHandler.hasBountifulUpdate()) {
+				name = Utils.format("&r" + lookup, player);
 			} else {
-				name = Utils.format("&r" + lookup + ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + ItemID), player); // name = Utils.format("&r" + lookup + ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + ItemID), player);
+				name = Utils.format("&r" + lookup + ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + ItemID), player);
 			}
 			tempmeta.setDisplayName(name);
 		}
@@ -258,11 +257,11 @@ public class CreateItems {
 			List < String > templist = items.getStringList(".lore");
 			List < String > templist2 = new ArrayList < String > ();
 			
-			ConfigurationSection sting = ConfigHandler.getConfig("items.yml").getConfigurationSection(items.getCurrentPath() + ".lore"); // ConfigHandler.getConfig("items.yml").getConfigurationSection("items." + item + ".lore")
-			if (sting != null) {
-			Set<String> sting2 = sting.getKeys(false);
-			Iterator < String > it = sting2.iterator();
-			while (it.hasNext()) {
+			ConfigurationSection lorePath = ConfigHandler.getConfig("items.yml").getConfigurationSection(items.getCurrentPath() + ".lore");
+			if (lorePath != null) {
+			Set<String> loreKeys = lorePath.getKeys(false);
+			Iterator < String > it = loreKeys.iterator();
+			while (it.hasNext()) { // maybe remove?
 				String nameString = it.next();
 				if (NameString != null) {
 					nameString = NameString;
@@ -439,7 +438,7 @@ public class CreateItems {
 	}
 	
 	public static ItemMeta setBanners(ConfigurationSection items, Material tempmat, ItemMeta tempmeta) {
-		if (items.getString(".banner-meta") != null && tempmat == Material.BANNER) {
+		if (items.getString(".banner-meta") != null && ServerHandler.hasBountifulUpdate() && tempmat == Material.BANNER) {
 			String bannerlist = items.getString(".banner-meta").replace(" ", "");
 			String[] banners = bannerlist.split(",");
 			List<Pattern> patterns = new ArrayList<Pattern>();
@@ -463,7 +462,7 @@ public class CreateItems {
 	}
 	
     public static ItemMeta setSkullTexture(ConfigurationSection items, Player player, Material tempmat, ItemMeta tempmeta) {
-		if (items.getString(".skull-texture") != null && !items.getString(".skull-texture").contains("hdb-") && items.getString(".skull-owner") == null && tempmat == Material.SKULL_ITEM) {
+		if (ServerHandler.hasBountifulUpdate() && items.getString(".skull-texture") != null && !items.getString(".skull-texture").contains("hdb-") && items.getString(".skull-owner") == null && tempmat == Material.SKULL_ITEM) {
 		String texture = items.getString(".skull-texture");
         GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
         gameProfile.getProperties().put("textures", new Property("textures", new String(texture)));
@@ -485,7 +484,7 @@ public class CreateItems {
 		if (items.getString(".skull-owner") != null && items.getString(".skull-texture") == null && tempmat == Material.SKULL_ITEM) {
 			String owner = items.getString(".skull-owner");
 			owner = Utils.format(owner, player);
-			PlayerHandler.setSkullOwner(tempmeta, owner);
+			return PlayerHandler.setSkullOwner(tempmeta, owner);
 		} else if (items.getString(".skull-owner") != null && items.getString(".skull-texture") != null && tempmat == Material.SKULL_ITEM) {
 			ServerHandler.sendConsoleMessage("&4You cannot define a skull owner and a skull texture at the same time, please remove one from the item.");
 		}
@@ -493,7 +492,7 @@ public class CreateItems {
 	}
 
 	public static ItemStack setHeadDatabaseSkull(ConfigurationSection items, Material tempmat, ItemStack tempitem) {
-		if (Hooks.hasHeadDatabase() && items.getString(".skull-texture") != null && items.getString(".skull-texture").contains("hdb-") 
+		if (ServerHandler.hasBountifulUpdate() && Hooks.hasHeadDatabase() && items.getString(".skull-texture") != null && items.getString(".skull-texture").contains("hdb-") 
 				&& items.getString(".skull-owner") == null && Utils.isInt(items.getString(".skull-texture").replace("hdb-", "")) && tempmat == Material.SKULL_ITEM) {
 	      HeadDatabaseAPI api = new HeadDatabaseAPI();
 	      try {
@@ -626,6 +625,9 @@ public class CreateItems {
 				ServerHandler.sendConsoleMessage("&4Because of this, " + item + " will not be set!");
 			} else if (id.equalsIgnoreCase("SPLASH_POTION") || id.equalsIgnoreCase("373") || id.equalsIgnoreCase("0373")) {
 				ServerHandler.sendConsoleMessage("&4Your server is running &eMC " + vers + " and this does not have the item SPLASH_POTION!");
+				ServerHandler.sendConsoleMessage("&4Because of this, " + item + " will not be set!");
+			} else if (ItemHandler.getMaterial(items) == null) {
+				ServerHandler.sendConsoleMessage("&4Your server is running &eMC " + vers + " and this does not have the item " + id);
 				ServerHandler.sendConsoleMessage("&4Because of this, " + item + " will not be set!");
 			} else {
 				return true;

@@ -42,12 +42,12 @@ import me.RockinChaos.itemjoin.utils.Updater;
     			if (Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).getReturnType() == Collection.class) {
     				playersOnlineNew = (Collection < ? extends Player > )((Collection < ? > ) Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).invoke(null, new Object[0]));
     				for (Player player: playersOnlineNew) {
-    					AnimationHandler.cancelRefresh(player);
+    					AnimationHandler.CloseAnimations(player);
     				}
     			} else {
     				playersOnlineOld = ((Player[]) Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).invoke(null, new Object[0]));
     				for (Player player: playersOnlineOld) {
-    					AnimationHandler.cancelRefresh(player);
+    					AnimationHandler.CloseAnimations(player);
     				}
     			}
     		} catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
