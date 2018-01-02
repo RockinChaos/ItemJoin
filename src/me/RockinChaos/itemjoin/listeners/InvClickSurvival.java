@@ -4,18 +4,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryType.SlotType;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
-
 import me.RockinChaos.itemjoin.ItemJoin;
+import me.RockinChaos.itemjoin.handlers.AnimationHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
-import me.RockinChaos.itemjoin.utils.Reflection;
 
 public class InvClickSurvival implements Listener {
 
@@ -48,31 +48,38 @@ public class InvClickSurvival implements Listener {
 			if (!ItemHandler.isAllowedItem(player, item, itemflag)) {
 				event.setCancelled(true);
 				PlayerHandler.updateInventory(player);
+				
 			}
 		}
 	}
 	
     @EventHandler()
-    public final void onMoveAnimatedItem(InventoryClickEvent event) { // Possible perma fix for ghost items if rapid animation + rapid move spam of item.
-    	final Player player = (Player) event.getWhoClicked();
-    	if (event.getAction().toString().contains("PLACE_ALL") && !ItemHandler.isAllowedItem(player, event.getCursor(), "animated")) {
-    		final ItemStack item = new ItemStack(event.getCursor());
-    		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), (Runnable) new Runnable() {
-    			public void run() {
-    				PlayerHandler.updateActualSlot(player, item, "PlayerInventory");
-    				PlayerHandler.updateActualSlot(player, item, "OpenInventory");
-    			}
-    		}, (long) 0.001);
-    	} else if (event.getAction().toString().contains("MOVE_TO_OTHER_INVENTORY") && !ItemHandler.isAllowedItem(player, event.getCurrentItem(), "animated")) {
-    		final SlotType sl = event.getSlotType();
-    		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), (Runnable) new Runnable() {
-    			public void run() {
-    				PlayerHandler.updateLocalizedSlots(player, "PlayerInventory");
-    				if (sl == SlotType.CRAFTING || Reflection.getWindowID(player) != 0) {
-    					PlayerHandler.updateLocalizedSlots(player, "OpenInventory");
-    				}
-    			}
-    		}, (long) 0.01);
+    public final void onCursorAnimatedItem(InventoryClickEvent event) {
+		Player player = (Player) event.getWhoClicked();
+		String itemflag = "inventory-modify";
+    	if (event.getAction().toString().contains("PLACE_ALL") || event.getAction().toString().contains("PLACE_ONE")) {
+    		if (ItemHandler.isSimilar(event.getCursor(), AnimationHandler.cursorItem.get(PlayerHandler.getPlayerID(player)))) {
+    		final int slot = event.getSlot();
+    		event.setCancelled(true);
+    		player.setItemOnCursor(new ItemStack(Material.AIR));
+    		if (event.getRawSlot() <= 4 && event.getInventory().getType() == InventoryType.CRAFTING || event.getInventory().getType() != InventoryType.CRAFTING && player.getOpenInventory().getTopInventory().getSize() - 1 >= event.getRawSlot()) {
+    			player.getOpenInventory().getTopInventory().setItem(slot, AnimationHandler.cursorItem.get(PlayerHandler.getPlayerID(player)));
+    		} else { player.getInventory().setItem(slot, AnimationHandler.cursorItem.get(PlayerHandler.getPlayerID(player)));   }
+			AnimationHandler.cursorItem.remove(PlayerHandler.getPlayerID(player));
+			ServerHandler.sendDebugMessage("Updated Animation Item (Cursor) Code: 2565CV"); 
+    		}
+    	} else if (event.getAction().toString().contains("SWAP_WITH_CURSOR")) {
+    		if (ItemHandler.isSimilar(event.getCursor(), AnimationHandler.cursorItem.get(PlayerHandler.getPlayerID(player))) && ItemHandler.isAllowedItem(player, event.getCurrentItem(), itemflag)) {
+    		final int slot = event.getSlot();
+    		final ItemStack item = new ItemStack(event.getCurrentItem());
+    		event.setCancelled(true);
+    		player.setItemOnCursor(item);
+    		if (event.getRawSlot() <= 4 && event.getInventory().getType() == InventoryType.CRAFTING || event.getInventory().getType() != InventoryType.CRAFTING && player.getOpenInventory().getTopInventory().getSize() - 1 >= event.getRawSlot()) {
+    			player.getOpenInventory().getTopInventory().setItem(slot, AnimationHandler.cursorItem.get(PlayerHandler.getPlayerID(player)));
+    		} else { player.getInventory().setItem(slot, AnimationHandler.cursorItem.get(PlayerHandler.getPlayerID(player)));   }
+			AnimationHandler.cursorItem.remove(PlayerHandler.getPlayerID(player));
+			ServerHandler.sendDebugMessage("Updated Animation Item (Cursor) Code: 6745CV"); 
+    		}
     	}
     }
 
