@@ -21,9 +21,9 @@ public class WorldHandler {
 		return false;
 	}
 	
-	public static Boolean inGlobalWorld(String world) {
-		if (ConfigHandler.getConfig("config.yml").getString("enabled-worlds") != null) {
-			String worldlist = ConfigHandler.getConfig("config.yml").getString("enabled-worlds").replace(" ", "");
+	public static Boolean inGlobalWorld(String world, String stringLoc) {
+		if (ConfigHandler.getConfig("config.yml").getString(stringLoc) != null) {
+			String worldlist = ConfigHandler.getConfig("config.yml").getString(stringLoc).replace(" ", "");
 			String[] compareWorlds = worldlist.split(",");
 			for (String compareWorld: compareWorlds) {
 				if (compareWorld.equalsIgnoreCase(world) 
@@ -32,7 +32,7 @@ public class WorldHandler {
 					return true;
 				}
 			}
-		} else if (ConfigHandler.getConfig("config.yml").getString("enabled-worlds") == null) {
+		} else if (ConfigHandler.getConfig("config.yml").getString(stringLoc) == null) {
 			return true;
 		}
 		return false;

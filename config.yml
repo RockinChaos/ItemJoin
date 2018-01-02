@@ -22,6 +22,7 @@ NewNBT-System: true
 
 #// Global Clear Items for ItemJoin. //#
 #// Set Clear-Items to ItemJoin or to All, ItemJoin clears only the ItemJoin items and All will clear all items. //#
+#// If you want one of these functions to only clear specific worlds, replace false with the world names separated by commas.  //#
 Clear-Items: ItemJoin
 Clear-On-Join: false
 Clear-On-WorldChanged: false
@@ -34,6 +35,7 @@ enabled-global-commands: false
 enabled-worlds: world, world_nether
 global-commands:
   - 'itemjoin get <item> <player>'
+  - 'first-join: say This is a command only executed once per world!'
 
 
 #// These are optional dependencies, only change these if you are looking to use them in conjunction with ItemJoin, changing the values will require a server restart. //#
