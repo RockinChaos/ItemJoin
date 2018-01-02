@@ -9,7 +9,6 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.SkullMeta;
 import me.RockinChaos.itemjoin.cacheitems.CreateItems;
 import me.RockinChaos.itemjoin.listeners.giveitems.SetItems;
 import me.RockinChaos.itemjoin.utils.Hooks;
@@ -112,7 +111,8 @@ public class ItemHandler {
 				return true;
 			} else if (!ServerHandler.hasCombatUpdate() && isCustomSimilar(inPlayerInventoryTemp, inStoredItemsTemp)) {
 				return true;
-			} else if (inPlayerInventoryTemp.getType().equals(Material.SKULL_ITEM) && inStoredItemsTemp.getType().equals(Material.SKULL_ITEM) && ((SkullMeta) inPlayerInventoryTemp.getItemMeta()).hasOwner() && ((SkullMeta) inStoredItemsTemp.getItemMeta()).hasOwner() && PlayerHandler.getSkullOwner(inPlayerInventoryTemp).equalsIgnoreCase(PlayerHandler.getSkullOwner(inStoredItemsTemp)) && isCustomSimilar(inPlayerInventoryTemp, inStoredItemsTemp)) {
+			} else if (ItemHandler.containsIgnoreCase(PlayerHandler.getSkullOwner(inPlayerInventory), PlayerHandler.getSkullOwner(inStoredItems))
+					&& isCustomSimilar(inPlayerInventoryTemp, inStoredItemsTemp)) {
 				return true;
 			} else if (Hooks.hasTokenEnchant() && isCustomSimilar(inPlayerInventoryTemp, inStoredItemsTemp)) {
 				return true;
@@ -184,13 +184,15 @@ public class ItemHandler {
 	}
 
 	public static boolean isNBTDataSimilar(ItemStack inPlayerInventory, ItemStack inStoredItems) {
-		if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && getNBTData(inPlayerInventory) != null && getNBTData(inStoredItems) != null && getNBTData(inPlayerInventory).equals(getNBTData(inStoredItems))) {
+		if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && ServerHandler.hasBountifulUpdate() && getNBTData(inPlayerInventory) != null && getNBTData(inStoredItems) != null && getNBTData(inPlayerInventory).equals(getNBTData(inStoredItems))) {
 			return true;
-		} else if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") != true && inPlayerInventory.hasItemMeta() 
+		} else if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") != true || ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && !ServerHandler.hasBountifulUpdate()) { 
+				if (inPlayerInventory.hasItemMeta() 
 				&& inPlayerInventory.getItemMeta().hasDisplayName() && inStoredItems.hasItemMeta() && inStoredItems.getItemMeta().hasDisplayName()
 				&& inPlayerInventory.getItemMeta().getDisplayName().contains(ConfigHandler.encodeSecretData(ConfigHandler.getNBTData()))
 				&& ConfigHandler.decodeSecretData(inPlayerInventory.getItemMeta().getDisplayName()).contains(ConfigHandler.decodeSecretData(inStoredItems.getItemMeta().getDisplayName()))) {
 			return true;
+				}
 		}
 		return false;
 	}
@@ -224,7 +226,7 @@ public class ItemHandler {
 	}
 	
 	public static String getNBTData(ItemStack tempitem) {
-		if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true) {
+		if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && ServerHandler.hasBountifulUpdate()) {
 		try {
 		Class<?> craftItemStack = Reflection.getOBC("inventory.CraftItemStack");
 		Class<?> nmsItemStackClass = Reflection.getNMS("ItemStack");

@@ -1,7 +1,15 @@
 package me.RockinChaos.itemjoin.handlers;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.net.URL;
+import java.util.HashMap;
 import java.util.UUID;
+
+import javax.net.ssl.HttpsURLConnection;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -11,6 +19,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
+import com.mojang.util.UUIDTypeAdapter;
+
 import de.domedd.betternick.api.nickedplayer.NickedPlayer;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.utils.Econ;
@@ -19,6 +31,9 @@ import me.RockinChaos.itemjoin.utils.Reflection;
 import net.milkbowl.vault.economy.EconomyResponse;
 
 public class PlayerHandler {
+	
+	public static boolean cancell = false;
+	private static HashMap < String, GameProfile > gameProfiles = new HashMap < String, GameProfile > ();
 
 	@SuppressWarnings("deprecation")
 	public static void updateInventory(final Player player) {
@@ -40,78 +55,14 @@ public class PlayerHandler {
 	
 	public static int getInventorySize(Player player, String type) {
 		if (type == "OpenInventory") { return player.getOpenInventory().getTopInventory().getSize() - 1;} 
-		else {return 40;}
-	}
-	
-	public static void updateActualSlot(Player player, ItemStack inPlayerInventory, String type) {
-		 try {
-		   	for (int i = 0; i <= getInventorySize(player, type); i++) {
-		   		ItemStack item = Bukkit.getPlayer(player.getUniqueId()).getInventory().getItem(i);
-		   		if (type == "OpenInventory") { item = Bukkit.getPlayer(player.getUniqueId()).getOpenInventory().getTopInventory().getItem(i); }
-		   		Class <?> craftItemStack = Reflection.getOBC("inventory.CraftItemStack");
-		   		Method getNMSI = craftItemStack.getMethod("asNMSCopy", ItemStack.class);
-		   		Object nms = getNMSI.invoke(null, inPlayerInventory);
-		   		Object packet = null;
-		   		if (item != null && ItemHandler.isSimilar(item, inPlayerInventory)) {
-		   			if (i >= 36 && i <= 39 && type == "PlayerArmor") {
-						if (i == 39) { player.getInventory().setHelmet(inPlayerInventory);
-						} else if (i == 38) { player.getInventory().setChestplate(inPlayerInventory);
-						} else if (i == 37) { player.getInventory().setLeggings(inPlayerInventory);
-						} else if (i == 36) { player.getInventory().setBoots(inPlayerInventory); }
-		   			} else if (type == "PlayerInventory") {
-		   				packet = Reflection.getNMS("PacketPlayOutSetSlot").getConstructor(int.class, int.class, nms.getClass()).newInstance(-2, i, nms);
-		   			} else if (type == "OpenInventory") {
-		   				packet = Reflection.getNMS("PacketPlayOutSetSlot").getConstructor(int.class, int.class, nms.getClass()).newInstance(Reflection.getWindowID(player), i, nms);
-		   			}
-		   		}
-		   		if (packet != null) {
-		   		Object nmsPlayer = player.getClass().getMethod("getHandle").invoke(player);
-		   		Object plrConnection = nmsPlayer.getClass().getField("playerConnection").get(nmsPlayer);
-		   		plrConnection.getClass().getMethod("sendPacket", Reflection.getNMS("Packet")).invoke(plrConnection, packet);
-		   		}
-		   	}
-		  } catch (Exception e) { if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
-	    }
-	}
-	
-	public static void updateLocalizedSlots(Player player, String type) {
-		try {
-			for (int i = 0; i <= getInventorySize(player, type); i++) {
-				ItemStack item = Bukkit.getPlayer(player.getUniqueId()).getInventory().getItem(i);
-				if (type == "OpenInventory") { item = Bukkit.getPlayer(player.getUniqueId()).getOpenInventory().getTopInventory().getItem(i); }
-				Class <?> craftItemStack = Reflection.getOBC("inventory.CraftItemStack");
-				Method getNMSI = craftItemStack.getMethod("asNMSCopy", ItemStack.class);
-				Object nms = getNMSI.invoke(null, item);
-				Object packet = null;
-				if (type == "PlayerInventory") {
-				if (i <= 35 || i >= 40 && i <= 43) {
-					if (!ItemHandler.isSimilar(PlayerHandler.getPerfectHandItem(player, "HAND"), item) && !ItemHandler.isSimilar(PlayerHandler.getPerfectHandItem(player, "OFF_HAND"), item)) {
-						packet = Reflection.getNMS("PacketPlayOutSetSlot").getConstructor(int.class, int.class, nms.getClass()).newInstance(-2, i, nms);
-					}
-				} else if (i >= 36 && i <= 39) {
-					if (i == 39) { player.getInventory().setHelmet(item); 
-					} else if (i == 38) { player.getInventory().setChestplate(item);
-					} else if (i == 37) { player.getInventory().setLeggings(item);
-					} else if (i == 36) { player.getInventory().setBoots(item); }
-				}
-				} else if (type == "OpenInventory") {
-	   				packet = Reflection.getNMS("PacketPlayOutSetSlot").getConstructor(int.class, int.class, nms.getClass()).newInstance(Reflection.getWindowID(player), i, nms);
-	   			}
-				if (packet != null) {
-				Object nmsPlayer = player.getClass().getMethod("getHandle").invoke(player);
-				Object plrConnection = nmsPlayer.getClass().getField("playerConnection").get(nmsPlayer);
-				plrConnection.getClass().getMethod("sendPacket", Reflection.getNMS("Packet")).invoke(plrConnection, packet);
-				}
-			}
-		 } catch (Exception e) { if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
-	   }
+		else {return player.getInventory().getSize(); }
 	}
 	
 	@SuppressWarnings("deprecation")
 	public static void setPerfectHandItem(Player player, ItemStack toSet, String type) {
-		if (ServerHandler.hasCombatUpdate() && type != null && type.equalsIgnoreCase("Hand")) {
+		if (ServerHandler.hasCombatUpdate() && type != null && type.equalsIgnoreCase("HAND")) {
 			player.getInventory().setItemInMainHand(toSet);
-		} else if (ServerHandler.hasCombatUpdate() && type != null && type.equalsIgnoreCase("Off_Hand")) {
+		} else if (ServerHandler.hasCombatUpdate() && type != null && type.equalsIgnoreCase("OFF_HAND")) {
 			player.getInventory().setItemInOffHand(toSet);
 		} else if (!ServerHandler.hasCombatUpdate()) {
 			player.getInventory().setItemInHand(toSet);
@@ -155,17 +106,74 @@ public class PlayerHandler {
 		}
 		return false;
 	}
-
 	
 	public static boolean getNewSkullMethod() {
 		try {
 			if (Class.forName("org.bukkit.inventory.meta.SkullMeta").getMethod("getOwningPlayer") != null) {
 			return true;
 			}
-		} catch (Exception e) {
-			if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
-		}
+		} catch (Exception e) {}
 		return false;
+	}
+	
+	@SuppressWarnings("deprecation")
+	public static String getSkullOwner(ItemStack item) {
+		if (ServerHandler.hasWorldOfColorUpdate() && item != null && item.hasItemMeta() && item.getType().equals(Material.SKULL_ITEM) 
+				&& ((SkullMeta) item.getItemMeta()).hasOwner() && getNewSkullMethod() != false) {
+			String owner =  ((SkullMeta) item.getItemMeta()).getOwningPlayer().getName();
+			if (owner != null) { return owner; }
+		} else if (item != null && item.hasItemMeta() 
+				&& item.getType().equals(Material.SKULL_ITEM) 
+				&& ((SkullMeta) item.getItemMeta()).hasOwner()) {
+			String owner = ((SkullMeta) item.getItemMeta()).getOwner();
+			if (owner != null) { return owner; }
+		} 
+		return "NULL";
+	}
+	
+	@SuppressWarnings("deprecation")
+	public static ItemMeta setSkullOwner(ItemMeta tempmeta, String owner) {
+        try {
+		    Method fetchProfile= Reflection.getOBC("entity.CraftPlayer").getDeclaredMethod("getProfile");
+            Field declaredField = tempmeta.getClass().getDeclaredField("profile");
+            declaredField.setAccessible(true);
+            if (ItemJoin.getInstance().getServer().getPlayer(owner) != null) { declaredField.set(tempmeta, fetchProfile.invoke(ItemJoin.getInstance().getServer().getPlayer(owner))); }
+            else if (ItemJoin.getInstance().getServer().getPlayer(owner) == null) {
+            	if(gameProfiles.get(owner) == null) {
+            	GameProfile profile = new GameProfile(ItemJoin.getInstance().getServer().getOfflinePlayer(owner).getUniqueId(), owner);
+            	setSkin(profile, ItemJoin.getInstance().getServer().getOfflinePlayer(owner).getUniqueId());
+                gameProfiles.put(owner, profile);
+                ServerHandler.sendConsoleMessage("yeeet");
+            	}
+                declaredField.set(tempmeta, gameProfiles.get(owner));
+            }
+        } catch (Exception e) { if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }}
+		return tempmeta;
+	}
+	
+	public static boolean setSkin(GameProfile profile, UUID uuid) {
+	    try {
+	        HttpsURLConnection connection = (HttpsURLConnection) new URL(String.format("https://sessionserver.mojang.com/session/minecraft/profile/%s?unsigned=false", UUIDTypeAdapter.fromUUID(uuid))).openConnection();
+	        if (connection.getResponseCode() == HttpsURLConnection.HTTP_OK) {
+	            String reply = new BufferedReader(new InputStreamReader(connection.getInputStream())).readLine();
+	            String skin = reply.split("\"value\":\"")[1].split("\"")[0];
+	            String signature = reply.split("\"signature\":\"")[1].split("\"")[0];
+	            profile.getProperties().put("textures", new Property("textures", skin, signature));
+	            return true;
+	        } else {
+	            System.out.println("Connection could not be opened (Response code " + connection.getResponseCode() + ", " + connection.getResponseMessage() + ")");
+	            return false;
+	        }
+	    } catch (IOException e) { if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+	        return false;
+	    }
+	}
+	
+	@SuppressWarnings("deprecation")
+	public static Player getPlayerString(String StringPlayer) {
+		Player args = Bukkit.getPlayer(UUID.fromString(StringPlayer));
+		if (args == null) { args = Bukkit.getPlayer(StringPlayer); }
+		return args;
 	}
 	
 	public static String getPlayerID(Player player) {
@@ -185,29 +193,17 @@ public class PlayerHandler {
 	}
 	
 	@SuppressWarnings("deprecation")
-	public static String getSkullOwner(ItemStack item) {
-		if (ServerHandler.hasWorldOfColorUpdate() && getNewSkullMethod() != false) {
-			return ((SkullMeta) item.getItemMeta()).getOwningPlayer().getName();
-		}
-		else {
-			return ((SkullMeta) item.getItemMeta()).getOwner();
-		}
-	}
-	
-	@SuppressWarnings("deprecation")
-	public static boolean setSkullOwner(ItemMeta tempmeta, String owner) {
-		if (ServerHandler.hasWorldOfColorUpdate() && getNewSkullMethod() != false) {
-			return ((SkullMeta) tempmeta).setOwningPlayer(ItemJoin.getInstance().getServer().getPlayer(owner));
-		}
-		else {
-			return ((SkullMeta) tempmeta).setOwner(owner);
-		}
-	}
-	
-	@SuppressWarnings("deprecation")
-	public static Player getPlayerString(String StringPlayer) {
-		Player args = Bukkit.getPlayer(StringPlayer);
-		if (args == null) { args = Bukkit.getPlayer(UUID.fromString(StringPlayer)); }
+	public static Player getPlayer(Player player) {
+		Player args = null;
+		try { args = Bukkit.getPlayer(player.getUniqueId()); } catch (NoSuchMethodError e) {}
+		if (player != null && Hooks.hasBetterNick()) {
+			NickedPlayer np = new NickedPlayer(player);
+			if (np.isNicked()) {
+			return Bukkit.getPlayer(np.getRealName());
+			} else {
+				return Bukkit.getPlayer(player.getName());
+			}
+		} else if (args == null) { return Bukkit.getPlayer(player.getName()); }
 		return args;
 	}
 	
