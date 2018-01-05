@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 import me.RockinChaos.itemjoin.ItemJoin;
+import me.RockinChaos.itemjoin.handlers.AnimationHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
@@ -46,6 +47,7 @@ public class Drops implements Listener {
 		ListIterator < ItemStack > litr = drops.listIterator();
 		final Player player = event.getEntity();
 		String itemflag = "death-drops";
+		AnimationHandler.CloseAnimations(player);
 		while (litr.hasNext()) {
 			ItemStack stack = litr.next();
 			if (!ItemHandler.isAllowedItem(player, stack, itemflag)) {

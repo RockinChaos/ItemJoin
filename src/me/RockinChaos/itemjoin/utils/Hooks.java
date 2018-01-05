@@ -17,6 +17,7 @@ import me.RockinChaos.itemjoin.listeners.Placement;
 import me.RockinChaos.itemjoin.listeners.ItemStore;
 import me.RockinChaos.itemjoin.listeners.SwapHands;
 import me.RockinChaos.itemjoin.listeners.giveitems.PlayerJoin;
+import me.RockinChaos.itemjoin.listeners.giveitems.PlayerQuit;
 import me.RockinChaos.itemjoin.listeners.giveitems.Respawn;
 import me.RockinChaos.itemjoin.listeners.giveitems.RegionEnter;
 import me.RockinChaos.itemjoin.listeners.giveitems.WorldChange;
@@ -119,6 +120,7 @@ public class Hooks {
 	    ItemJoin.getInstance().getCommand("itemjoin").setExecutor(new Commands());
 		ItemJoin.getInstance().getCommand("ij").setExecutor(new Commands());
 		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerJoin(), ItemJoin.getInstance());
+		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerQuit(), ItemJoin.getInstance());
 		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new WorldChange(), ItemJoin.getInstance());
 		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Respawn(), ItemJoin.getInstance());
 		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new InvClickSurvival(), ItemJoin.getInstance());

@@ -7,10 +7,8 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -128,14 +126,14 @@ public class CreateItems {
 				for (Player player: playersOnlineNew) {
 					run(player);
 					InvClickCreative.isCreative(player, player.getGameMode());
-					AnimationHandler.setAnimations(player);
+					AnimationHandler.OpenAnimations(player);
 				}
 			} else {
 				playersOnlineOld = ((Player[]) Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).invoke(null, new Object[0]));
 				for (Player player: playersOnlineOld) {
 					run(player);
 					InvClickCreative.isCreative(player, player.getGameMode());
-					AnimationHandler.setAnimations(player);
+					AnimationHandler.OpenAnimations(player);
 				}
 			}
 		} catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
@@ -215,70 +213,42 @@ public class CreateItems {
 		return tempitem;
 	}
 
-	public static ItemMeta setName(ConfigurationSection items, ItemMeta tempmeta, ItemStack tempitem, Player player, String ItemID, String NameString) {
+	public static ItemMeta setName(ConfigurationSection items, ItemMeta tempmeta, ItemStack tempitem, Player player, String ItemID, String nameString) {
 		if (items.getString(".name") != null) {
-			String name = items.getString(".name");
-			ConfigurationSection namePath = ConfigHandler.getConfig("items.yml").getConfigurationSection(items.getCurrentPath() + ".name");
-			if (namePath != null) {
-			Set<String> nameKeys = namePath.getKeys(false);
-			Iterator < String > it = nameKeys.iterator();
-			while (it.hasNext()) { // maybe remove?
-				String nameString = it.next();
-				if (NameString != null) {
-					nameString = NameString;
-				}
-				if (items.getString(".name." + nameString) != null) {
-					name = items.getString(".name." + nameString);
-					break;
-				}
-			  }
-			}
-			name = Utils.format("&r" + name.replace("<delay:" + Utils.returnInteger(name) + ">", ""), player);
+			String formatName = items.getString(".name");
+			if (nameString != null && items.getString(".name." + nameString) != null) { formatName = items.getString(".name." + nameString); }
+			else if (ConfigHandler.getNameSection(items) != null) { formatName = items.getString(".name." + ConfigHandler.getNameSection(items).getKeys(false).iterator().next()); }
+			formatName = Utils.format("&r" + formatName.replace("<delay:" + Utils.returnInteger(formatName) + ">", ""), player);
 			if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && ServerHandler.hasBountifulUpdate()) {
-				tempmeta.setDisplayName(name);
+				tempmeta.setDisplayName(formatName);
 			} else {
-				tempmeta.setDisplayName(name + ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + ItemID));
+				tempmeta.setDisplayName(formatName + ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + ItemID));
 			}
 		} else {
 			String lookup = ItemHandler.getName(tempitem);
-			String name = "";
+			String formatName = "";
 			if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && ServerHandler.hasBountifulUpdate()) {
-				name = Utils.format("&r" + lookup, player);
+				formatName = Utils.format("&r" + lookup, player);
 			} else {
-				name = Utils.format("&r" + lookup + ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + ItemID), player);
+				formatName = Utils.format("&r" + lookup + ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + ItemID), player);
 			}
-			tempmeta.setDisplayName(name);
+			tempmeta.setDisplayName(formatName);
 		}
 		return tempmeta;
 	}
 
-	public static ItemMeta setLore(ConfigurationSection items, ItemMeta tempmeta, Player player, String NameString) {
+	public static ItemMeta setLore(ConfigurationSection items, ItemMeta tempmeta, Player player, String loreString) {
 		if (items.getStringList(".lore") != null) {
-			List < String > templist = items.getStringList(".lore");
-			List < String > templist2 = new ArrayList < String > ();
-			
-			ConfigurationSection lorePath = ConfigHandler.getConfig("items.yml").getConfigurationSection(items.getCurrentPath() + ".lore");
-			if (lorePath != null) {
-			Set<String> loreKeys = lorePath.getKeys(false);
-			Iterator < String > it = loreKeys.iterator();
-			while (it.hasNext()) { // maybe remove?
-				String nameString = it.next();
-				if (NameString != null) {
-					nameString = NameString;
-				}
-				if (items.getStringList(".lore." + nameString) != null) {
-					templist = items.getStringList(".lore." + nameString);
-					break;
-				}
-			  }
+			List < String > loreList = items.getStringList(".lore");
+			List < String > loreFormatList = new ArrayList < String > ();
+			if (loreString != null && items.getStringList(".lore." + loreString) != null) { loreList = items.getStringList(".lore." + loreString); }
+			else if (ConfigHandler.getLoreSection(items) != null) { loreList = items.getStringList(".lore." + ConfigHandler.getLoreSection(items).getKeys(false).iterator().next()); }
+			for (int k = 0; k < loreList.size(); k++) {
+				String formatLore = loreList.get(k).replace("<delay:" + Utils.returnInteger(loreList.get(k)) + ">", "");
+				formatLore = Utils.format(formatLore, player);
+				loreFormatList.add(formatLore);
 			}
-			
-			for (int k = 0; k < templist.size(); k++) {
-				String name = templist.get(k).replace("<delay:" + Utils.returnInteger(templist.get(k)) + ">", "");
-				name = Utils.format(name, player);
-				templist2.add(name);
-			}
-			tempmeta.setLore(templist2);
+			tempmeta.setLore(loreFormatList);
 		}
 		return tempmeta;
 	}

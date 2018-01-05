@@ -368,7 +368,7 @@ public class Commands implements CommandExecutor {
 			} else if (sender.hasPermission("itemjoin.get.others") || sender.hasPermission("itemjoin.*")) {
 				Language.setArgsPlayer(sender);
 				reAddItem(argsPlayer, sender, args[1]);
-				AnimationHandler.setAnimations(argsPlayer);
+				AnimationHandler.OpenAnimations(argsPlayer);
 				return true;
 			} else {
 				Language.getSendMessage(sender, "noPermission", "");
@@ -379,7 +379,7 @@ public class Commands implements CommandExecutor {
 				if (!(sender instanceof ConsoleCommandSender)) {
 					reAddItem((Player) sender, null, args[1]);
 					PlayerHandler.updateInventory((Player) sender);
-					AnimationHandler.setAnimations((Player) sender);
+					AnimationHandler.OpenAnimations((Player) sender);
 					return true;
 				} else if (sender instanceof ConsoleCommandSender) {
 					Language.getSendMessage(sender, "notPlayer", "");
@@ -406,7 +406,7 @@ public class Commands implements CommandExecutor {
 			} else if (sender.hasPermission("itemjoin.get.others") || sender.hasPermission("itemjoin.*")) {
 				Language.setArgsPlayer(sender);
 				reAddItem(argsPlayer, sender, "00a40gh392bd938d4");
-				AnimationHandler.setAnimations(argsPlayer);
+				AnimationHandler.OpenAnimations(argsPlayer);
 				return true;
 			} else {
 				Language.getSendMessage(sender, "noPermission", "");
@@ -417,7 +417,7 @@ public class Commands implements CommandExecutor {
 				if (!(sender instanceof ConsoleCommandSender)) {
 					reAddItem((Player) sender, null, "00a40gh392bd938d4");
 					PlayerHandler.updateInventory((Player) sender);
-					AnimationHandler.setAnimations((Player) sender);
+					AnimationHandler.OpenAnimations((Player) sender);
 					return true;
 				} else if (sender instanceof ConsoleCommandSender) {
 					Language.getSendMessage(sender, "notPlayer", "");

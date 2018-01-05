@@ -35,7 +35,7 @@ enabled-global-commands: false
 enabled-worlds: world, world_nether
 global-commands:
   - 'itemjoin get <item> <player>'
-  - 'first-join: say This is a command only executed once per world!'
+  - 'first-join: say This is a command only executed once per world, per player.'
 
 
 #// These are optional dependencies, only change these if you are looking to use them in conjunction with ItemJoin, changing the values will require a server restart. //#
