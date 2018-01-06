@@ -6,6 +6,7 @@ import java.util.Random;
 
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
+import org.bukkit.Statistic;
 import org.bukkit.entity.Player;
 
 import de.domedd.betternick.api.nickedplayer.NickedPlayer;
@@ -29,13 +30,13 @@ public class Utils {
 		} else if (player != null) {
 			playerName = player.getName();
 		}
-		
-		name = name.replace("%player%", playerName);
+		name = name.replace("%player%", playerName).replace("%mob_kills%", String.valueOf(player.getStatistic(Statistic.MOB_KILLS)))
+		.replace("%player_kills%", String.valueOf(player.getStatistic(Statistic.PLAYER_KILLS))).replace("%player_deaths%", String.valueOf(player.getStatistic(Statistic.DEATHS)))
+		.replace("%player_food%", String.valueOf(player.getFoodLevel())).replace("%player_health%", String.valueOf(player.getHealth())).replace("%player_location%", player.getLocation().getBlockX() + ", " + player.getLocation().getBlockY() + ", " + player.getLocation().getBlockZ() + "");
 		name = ChatColor.translateAlternateColorCodes('&', name).toString();
 		if (Hooks.hasPlaceholderAPI() == true) {
-			try {
-			return PlaceholderAPI.setPlaceholders(player, name);
-			} catch (NoSuchFieldError e) { ServerHandler.sendDebugMessage("Error has occured when setting the PlaceHolder " + e.getMessage() + ", if this issue persits contact the developer of PlaceholderAPI."); return name; }
+			try { return PlaceholderAPI.setPlaceholders(player, name); } 
+			catch (NoSuchFieldError e) { ServerHandler.sendDebugMessage("Error has occured when setting the PlaceHolder " + e.getMessage() + ", if this issue persits contact the developer of PlaceholderAPI."); return name; }
 		}
 		return name;
 	}
@@ -52,10 +53,10 @@ public class Utils {
 		return true;
 	}
 	
-	public static Integer returnInteger(String s) {
-		if (s == null) return null;
+	public static Integer returnInteger(String text) {
+		if (text == null) return null;
 		else {
-			char[] characters = s.toCharArray();
+			char[] characters = text.toCharArray();
 			Integer value = null;
 			boolean isPrevDigit = false;
 			for (int i = 0; i < characters.length; i++) {
