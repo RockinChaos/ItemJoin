@@ -236,6 +236,7 @@ items:
       trail: true
       power: 1
       colors: GRAY, WHITE, PURPLE, SILVER, GREEN
+    use-cooldown: 3
     itemflags: count-lock, death-drops, hide-attributes, self-drops
     triggers: join, respawn, world-change
     enabled-worlds: world, world_nether, world_the_end
