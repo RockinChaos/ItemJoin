@@ -588,9 +588,9 @@ public class Commands implements CommandExecutor {
 						int dataValue = items.getInt(".data-value");
 						Material tempmat = ItemHandler.getMaterial(items);
 						ItemStack tempitem = null;
-						if (ServerHandler.hasChangedTheWorldUpdate()) {
+						if (ServerHandler.hasAltUpdate("1_8")) {
 							tempitem = new ItemStack(tempmat, items.getInt(".count", 1), (short) dataValue);
-						} else if (!ServerHandler.hasChangedTheWorldUpdate()) {
+						} else if (!ServerHandler.hasAltUpdate("1_8")) {
 							try {
 								tempitem = new ItemStack(tempmat, items.getInt(".count", 1), (short) dataValue);
 							} catch (NullPointerException e) {
@@ -685,9 +685,9 @@ public class Commands implements CommandExecutor {
 						int dataValue = items.getInt(".data-value");
 						Material tempmat = ItemHandler.getMaterial(items);
 						ItemStack tempitem = null;
-						if (ServerHandler.hasChangedTheWorldUpdate()) {
+						if (ServerHandler.hasAltUpdate("1_8")) {
 							tempitem = new ItemStack(tempmat, items.getInt(".count", 1), (short) dataValue);
-						} else if (!ServerHandler.hasChangedTheWorldUpdate()) {
+						} else if (!ServerHandler.hasAltUpdate("1_8")) {
 							try {
 								tempitem = new ItemStack(tempmat, items.getInt(".count", 1), (short) dataValue);
 							} catch (NullPointerException e) {

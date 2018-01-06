@@ -9,36 +9,6 @@ import me.RockinChaos.itemjoin.ItemJoin;
 
 public class ServerHandler {
 	
-	public static boolean hasWorldOfColorUpdate() {
-		String pkgname = ItemJoin.getInstance().getServer().getClass().getPackage().getName();
-		String combatVersion = "v1_12_R0".replace("_", "").replace("R0", "").replace("R1", "").replace("R2", "").replace("R3", "").replace("R4", "").replace("R5", "").replaceAll("[a-z]", "");
-		String version = pkgname.substring(pkgname.lastIndexOf('.') + 1).replace("_", "").replace("R0", "").replace("R1", "").replace("R2", "").replace("R3", "").replace("R4", "").replace("R5", "").replaceAll("[a-z]", "");
-		if (Integer.parseInt(version) >= Integer.parseInt(combatVersion)) {
-			return true;
-		}
-		return false;
-	}
-
-	public static boolean hasExplorationUpdate() {
-		String pkgname = ItemJoin.getInstance().getServer().getClass().getPackage().getName();
-		String combatVersion = "v1_11_R0".replace("_", "").replace("R0", "").replace("R1", "").replace("R2", "").replace("R3", "").replace("R4", "").replace("R5", "").replaceAll("[a-z]", "");
-		String version = pkgname.substring(pkgname.lastIndexOf('.') + 1).replace("_", "").replace("R0", "").replace("R1", "").replace("R2", "").replace("R3", "").replace("R4", "").replace("R5", "").replaceAll("[a-z]", "");
-		if (Integer.parseInt(version) >= Integer.parseInt(combatVersion)) {
-			return true;
-		}
-		return false;
-	}
-	
-	public static boolean hasFrostburnUpdate() {
-		String pkgname = ItemJoin.getInstance().getServer().getClass().getPackage().getName();
-		String combatVersion = "v1_10_R0".replace("_", "").replace("R0", "").replace("R1", "").replace("R2", "").replace("R3", "").replace("R4", "").replace("R5", "").replaceAll("[a-z]", "");
-		String version = pkgname.substring(pkgname.lastIndexOf('.') + 1).replace("_", "").replace("R0", "").replace("R1", "").replace("R2", "").replace("R3", "").replace("R4", "").replace("R5", "").replaceAll("[a-z]", "");
-		if (Integer.parseInt(version) >= Integer.parseInt(combatVersion)) {
-			return true;
-		}
-		return false;
-	}
-	
 	public static boolean hasCombatUpdate() {
 		String pkgname = ItemJoin.getInstance().getServer().getClass().getPackage().getName();
 		String combatVersion = "v1_9_R0".replace("_", "").replace("R0", "").replace("R1", "").replace("R2", "").replace("R3", "").replace("R4", "").replace("R5", "").replaceAll("[a-z]", "");
@@ -49,21 +19,12 @@ public class ServerHandler {
 		return false;
 	}
 	
-	public static boolean hasBountifulUpdate() {
+	public static boolean hasAltUpdate(String versionString) {
 		String pkgname = ItemJoin.getInstance().getServer().getClass().getPackage().getName();
-		String combatVersion = "v1_8_R0".replace("_", "").replace("R0", "").replace("R1", "").replace("R2", "").replace("R3", "").replace("R4", "").replace("R5", "").replaceAll("[a-z]", "");
+		String localeVersion = "v" + versionString + "_R0";
+	    localeVersion = localeVersion.replace("_", "").replace("R0", "").replace("R1", "").replace("R2", "").replace("R3", "").replace("R4", "").replace("R5", "").replaceAll("[a-z]", "");
 		String version = pkgname.substring(pkgname.lastIndexOf('.') + 1).replace("_", "").replace("R0", "").replace("R1", "").replace("R2", "").replace("R3", "").replace("R4", "").replace("R5", "").replaceAll("[a-z]", "");
-		if (Integer.parseInt(version) >= Integer.parseInt(combatVersion)) {
-			return true;
-		}
-		return false;
-	}
-
-	public static boolean hasChangedTheWorldUpdate() {
-		String pkgname = ItemJoin.getInstance().getServer().getClass().getPackage().getName();
-		String combatVersion = "v1_7_R0".replace("_", "").replace("R0", "").replace("R1", "").replace("R2", "").replace("R3", "").replace("R4", "").replace("R5", "").replaceAll("[a-z]", "");
-		String version = pkgname.substring(pkgname.lastIndexOf('.') + 1).replace("_", "").replace("R0", "").replace("R1", "").replace("R2", "").replace("R3", "").replace("R4", "").replace("R5", "").replaceAll("[a-z]", "");
-		if (Integer.parseInt(version) > Integer.parseInt(combatVersion)) {
+		if (Integer.parseInt(version) >= Integer.parseInt(localeVersion)) {
 			return true;
 		}
 		return false;
@@ -75,6 +36,12 @@ public class ServerHandler {
 		}
 	  return message;
 	}
+	
+    public static boolean hasSpigot() {
+        String path = "org.spigotmc.Metrics";
+        try { Class.forName(path); return true; } catch(Exception e) { return false; }
+    }
+
 
 	public static void sendConsoleMessage(String message) {
 		String prefix = "&7[&eItemJoin&7] ";

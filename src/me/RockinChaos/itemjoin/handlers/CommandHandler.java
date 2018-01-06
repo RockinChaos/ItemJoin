@@ -192,9 +192,7 @@ public class CommandHandler {
 				playersCooldownList = storedSpammedPlayers.get(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + item);
 			}
 			int cdmillis = spamtime * 1000;
-			if (System.currentTimeMillis() - playersCooldownList >= cdmillis) {} else {
-				return false;
-			}
+			if (System.currentTimeMillis() - playersCooldownList >= cdmillis) {} else { return false; }
 		}
 		return true;
 	}
@@ -206,11 +204,9 @@ public class CommandHandler {
 		}
 		cdtime = items.getInt(".commands-cooldown");
 		int cdmillis = cdtime * 1000;
-		if (System.currentTimeMillis() - playersCooldownList >= cdmillis) {
-			return false;
-		} else {
+		if (System.currentTimeMillis() - playersCooldownList >= cdmillis) { return false; } 
+		else {
 			if (items.getString(".cooldown-message") != null) {
-				spamTask(player, item);
 				if (spamTask(player, item)) {
 					storedSpammedPlayers.put(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + item, System.currentTimeMillis());
 					int timeLeft = (int)(cdtime - ((System.currentTimeMillis() - playersCooldownList) / 1000));
@@ -312,7 +308,7 @@ public class CommandHandler {
 	}
 
 	public static String hitPlayer(String returnedCommand, Player player) {
-		if (ItemHandler.containsIgnoreCase(returnedCommand, "%hitplayer%") && ServerHandler.hasChangedTheWorldUpdate()) {
+		if (ItemHandler.containsIgnoreCase(returnedCommand, "%hitplayer%") && ServerHandler.hasAltUpdate("1_8")) {
 			Entity entityHit = getNearestEntityInSight(player, 4);
 			if (entityHit != null && entityHit instanceof Player) {
 				Player hitPlayer = (Player) entityHit;

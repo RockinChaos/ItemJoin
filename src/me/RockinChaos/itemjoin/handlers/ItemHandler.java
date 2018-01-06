@@ -34,16 +34,10 @@ public class ItemHandler {
 							if (slot.equalsIgnoreCase("Arbitrary")) {
 								Arbitrary = Arbitrary + 1;
 								ItemID = slot + Arbitrary;
-							} else {
-								ItemID = slot;
-							}
+							} else { ItemID = slot; }
 							ItemStack inStoredItems = CreateItems.items.get(world + "." + PlayerHandler.getPlayerID(player) + ".items." + ItemID + item);
 							if (ItemHandler.isSimilar(inPlayerInventory, inStoredItems) && ItemHandler.containsIgnoreCase(ItemFlags, itemflag)) {
-								if (Utils.canBypass(player, ItemFlags)) {
-									return true;
-								} else {
-									return false;
-								}
+								if (Utils.canBypass(player, ItemFlags)) { return true; } else { return false; }
 							}
 						}
 					}
@@ -104,7 +98,7 @@ public class ItemHandler {
 			ItemStack inPlayerInventoryTemp = new ItemStack(inPlayerInventory);
 			ItemStack inStoredItemsTemp = new ItemStack(inStoredItems);
 			if (inPlayerInventoryTemp.isSimilar(inStoredItemsTemp) 
-					|| isDurability(inPlayerInventoryTemp, inStoredItemsTemp) && inPlayerInventoryTemp.isSimilar(inStoredItemsTemp) 
+					|| isDurabilitySimilar(inPlayerInventoryTemp, inStoredItemsTemp) && inPlayerInventoryTemp.isSimilar(inStoredItemsTemp) 
 					|| isDisplayNameSimilar(inPlayerInventoryTemp, inStoredItemsTemp) && inPlayerInventoryTemp.isSimilar(inStoredItemsTemp)
 					|| isLoreSimilar(inPlayerInventoryTemp, inStoredItemsTemp) && inPlayerInventoryTemp.isSimilar(inStoredItemsTemp)
 					|| isEnchantsSimilar(inPlayerInventoryTemp, inStoredItemsTemp) && inPlayerInventoryTemp.isSimilar(inStoredItemsTemp)) {
@@ -132,7 +126,7 @@ public class ItemHandler {
 		return false;
 	}
 
-	public static boolean isDurability(ItemStack inPlayerInventory, ItemStack inStoredItems) {
+	public static boolean isDurabilitySimilar(ItemStack inPlayerInventory, ItemStack inStoredItems) {
 		if (inPlayerInventory.getDurability() >= 1) {
 			inPlayerInventory.setDurability(inStoredItems.getDurability());
 			return true;
@@ -184,9 +178,9 @@ public class ItemHandler {
 	}
 
 	public static boolean isNBTDataSimilar(ItemStack inPlayerInventory, ItemStack inStoredItems) {
-		if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && ServerHandler.hasBountifulUpdate() && getNBTData(inPlayerInventory) != null && getNBTData(inStoredItems) != null && getNBTData(inPlayerInventory).equals(getNBTData(inStoredItems))) {
+		if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && ServerHandler.hasAltUpdate("1_8") && getNBTData(inPlayerInventory) != null && getNBTData(inStoredItems) != null && getNBTData(inPlayerInventory).equals(getNBTData(inStoredItems))) {
 			return true;
-		} else if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") != true || ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && !ServerHandler.hasBountifulUpdate()) { 
+		} else if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") != true || ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && !ServerHandler.hasAltUpdate("1_8")) { 
 				if (inPlayerInventory.hasItemMeta() 
 				&& inPlayerInventory.getItemMeta().hasDisplayName() && inStoredItems.hasItemMeta() && inStoredItems.getItemMeta().hasDisplayName()
 				&& inPlayerInventory.getItemMeta().getDisplayName().contains(ConfigHandler.encodeSecretData(ConfigHandler.getNBTData()))
@@ -226,7 +220,7 @@ public class ItemHandler {
 	}
 	
 	public static String getNBTData(ItemStack tempitem) {
-		if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && ServerHandler.hasBountifulUpdate()) {
+		if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && ServerHandler.hasAltUpdate("1_8")) {
 		try {
 		Class<?> craftItemStack = Reflection.getOBC("inventory.CraftItemStack");
 		Class<?> nmsItemStackClass = Reflection.getNMS("ItemStack");
@@ -234,11 +228,11 @@ public class ItemHandler {
 		Object nms = getNMSI.invoke(null, tempitem);
 		Object cacheTag = nmsItemStackClass.getMethod("getTag").invoke(nms);
 		if (cacheTag != null && cacheTag.getClass().getMethod("getString", String.class).invoke(cacheTag, "ItemJoin") != null)  {
-			String test = (String) cacheTag.getClass().getMethod("getString", String.class).invoke(cacheTag, "ItemJoin");
-			return test;
+			String data = (String) cacheTag.getClass().getMethod("getString", String.class).invoke(cacheTag, "ItemJoin");
+			return data;
 		} 
 		} catch (Exception e) {
-			ServerHandler.sendDebugMessage("Error 133 has occured when getting NBTData to an item.");
+			ServerHandler.sendDebugMessage("Error 254 has occured when getting NBTData to an item.");
 			if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
 		}
 		}

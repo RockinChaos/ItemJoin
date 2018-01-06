@@ -53,11 +53,6 @@ public class PlayerHandler {
         }, delay);
 	}
 	
-	public static int getInventorySize(Player player, String type) {
-		if (type == "OpenInventory") { return player.getOpenInventory().getTopInventory().getSize() - 1;} 
-		else {return player.getInventory().getSize(); }
-	}
-	
 	@SuppressWarnings("deprecation")
 	public static void setPerfectHandItem(Player player, ItemStack toSet, String type) {
 		if (ServerHandler.hasCombatUpdate() && type != null && type.equalsIgnoreCase("HAND")) {
@@ -118,7 +113,7 @@ public class PlayerHandler {
 	
 	@SuppressWarnings("deprecation")
 	public static String getSkullOwner(ItemStack item) {
-		if (ServerHandler.hasWorldOfColorUpdate() && item != null && item.hasItemMeta() && item.getType().equals(Material.SKULL_ITEM) 
+		if (ServerHandler.hasAltUpdate("1_12") && item != null && item.hasItemMeta() && item.getType().equals(Material.SKULL_ITEM) 
 				&& ((SkullMeta) item.getItemMeta()).hasOwner() && getNewSkullMethod() != false) {
 			String owner =  ((SkullMeta) item.getItemMeta()).getOwningPlayer().getName();
 			if (owner != null) { return owner; }
@@ -143,7 +138,6 @@ public class PlayerHandler {
             	GameProfile profile = new GameProfile(ItemJoin.getInstance().getServer().getOfflinePlayer(owner).getUniqueId(), owner);
             	setSkin(profile, ItemJoin.getInstance().getServer().getOfflinePlayer(owner).getUniqueId());
                 gameProfiles.put(owner, profile);
-                ServerHandler.sendConsoleMessage("yeeet");
             	}
                 declaredField.set(tempmeta, gameProfiles.get(owner));
             }

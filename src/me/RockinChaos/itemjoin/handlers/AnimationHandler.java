@@ -91,10 +91,10 @@ public class AnimationHandler {
 		new BukkitRunnable() {
 			public void run() {
 				CompleteRunningTask(taskId, items, player, isName, newAnimation);
-				if (setCanceled.get(PlayerHandler.getPlayerID(player)) != true && isActive.get(PlayerHandler.getPlayerID(player)).equals(newAnimation)) { // If we don't cancel.
-					AnimateItems(player, items, isName, nameString, ItemID); // Set the Items Name/Lore/
-					if (!hasNext) { if (isName) { setNameAnimate(items, player, ItemID, newAnimation); } else { setLoreAnimate(items, player, ItemID, newAnimation); } } // If it is the last iteration, restart.
-				} else if (setCanceled.get(PlayerHandler.getPlayerID(player)) == true || !isActive.get(PlayerHandler.getPlayerID(player)).equals(newAnimation)) { // If we are canceling...
+				if (setCanceled.get(PlayerHandler.getPlayerID(player)) != true && isActive.get(PlayerHandler.getPlayerID(player)).equals(newAnimation)) {
+					AnimateItems(player, items, isName, nameString, ItemID);
+					if (!hasNext) { if (isName) { setNameAnimate(items, player, ItemID, newAnimation); } else { setLoreAnimate(items, player, ItemID, newAnimation); }}
+				} else if (setCanceled.get(PlayerHandler.getPlayerID(player)) == true || !isActive.get(PlayerHandler.getPlayerID(player)).equals(newAnimation)) {
 					if (!hasNext) {
 						if (runningID.get(PlayerHandler.getPlayerID(player) + newAnimation + items.getName() + true).isEmpty() 
 						&& runningID.get(PlayerHandler.getPlayerID(player) + newAnimation + items.getName() + false).isEmpty()) {

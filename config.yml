@@ -16,9 +16,7 @@ Debugging-Mode: false
 Prevent-Pickups: false
 HeldItem-Slot: None
 NewNBT-System: true
-#// Changing NewNBT-System from true/false WILL break all ItemJoin items CURRENTLY in all players inventories and will not be able to be used //#
-#// If you do change this setting, you will need to remove all old ItemJoin items. //#
-
+#// If you change NewNBT-System from true/false, it is recommended to clear all old ItemJoin items. //#
 
 #// Global Clear Items for ItemJoin. //#
 #// Set Clear-Items to ItemJoin or to All, ItemJoin clears only the ItemJoin items and All will clear all items. //#

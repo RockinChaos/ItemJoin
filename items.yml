@@ -133,67 +133,9 @@ items:
     itemflags: inventory-modify, placement, death-drops, self-drops
     triggers: join, world-change
     enabled-worlds: world, world_nether, world_the_end
-  animated-item:
-    id: COMPASS
-    slot: 19
-    name:
-      1: '<delay:3>&f&lSearch'
-      2: '<delay:3>&b&lS&f&learch'
-      3: '<delay:3>&b&lSe&f&larch'
-      4: '<delay:3>&b&lSea&f&lrch'
-      5: '<delay:3>&b&lSear&f&lch'
-      6: '<delay:3>&b&lSearc&f&lh'
-      7: '<delay:3>&b&lSearch'
-      8: '<delay:3>&f&lS&b&learch'
-      9: '<delay:3>&f&lSe&b&larch'
-      10: '<delay:3>&f&lSea&b&lrch'
-      11: '<delay:3>&f&lSear&b&lch'
-      12: '<delay:3>&f&lSearc&b&lh'
-    lore:
-      1:
-      - '<delay:3>&f&lColors!!!'
-      2:
-      - '<delay:3>&c&lC&f&lolors!!!'
-      3:
-      - '<delay:3>&c&lC&a&lo&f&llors!!!'
-      4:
-      - '<delay:3>&c&lC&a&lo&5&ll&f&lors!!!'
-      5:
-      - '<delay:3>&c&lC&a&lo&5&ll&3&lo&f&lrs!!!'
-      6:
-      - '<delay:3>&c&lC&a&lo&5&ll&3&lo&1&lr&f&ls!!!'
-      7:
-      - '<delay:3>&c&lC&a&lo&5&ll&3&lo&1&lr&e&ls&f&l!!!'
-      8:
-      - '<delay:3>&c&lC&a&lo&5&ll&3&lo&1&lr&e&ls&d&l!&f&l!!'
-      9:
-      - '<delay:3>&c&lC&a&lo&5&ll&3&lo&1&lr&e&ls&d&l!&a&l!&f&l!'
-      10:
-      - '<delay:3>&c&lC&a&lo&5&ll&3&lo&1&lr&e&ls&d&l!&a&l!&2&l!'
-      11:
-      - '<delay:3>&f&lC&a&lo&5&ll&3&lo&1&lr&e&ls&d&l!&a&l!&2&l!'
-      12:
-      - '<delay:3>&f&lCo&5&ll&3&lo&1&lr&e&ls&d&l!&a&l!&2&l!'
-      13:
-      - '<delay:3>&f&lCol&3&lo&1&lr&e&ls&d&l!&a&l!&2&l!'
-      14:
-      - '<delay:3>&f&lColo&1&lr&e&ls&d&l!&a&l!&2&l!'
-      15:
-      - '<delay:3>&f&lColor&e&ls&d&l!&a&l!&2&l!'
-      16:
-      - '<delay:3>&f&lColors&d&l!&a&l!&2&l!'
-      17:
-      - '<delay:3>&f&lColors!&a&l!&2&l!'
-      18:
-      - '<delay:3>&f&lColors!!&2&l!'
-      19:
-      - '<delay:3>&f&lColors!!!'
-    itemflags: death-drops, animate
-    triggers: join, respawn, world-change
-    enabled-worlds: world, world_nether, world_the_end
   banner-item:
     id: BANNER
-    slot: 21
+    slot: 20
     name: '&1Mighty Creeper'
     lore:
       - '&7The creeper is our leader!'
@@ -201,9 +143,32 @@ items:
     itemflags: hide-attributes, self-drops, CreativeBypass
     triggers: join, respawn, world-change, region-enter
     enabled-worlds: world, world_nether, world_the_end
+  animated-item:
+    id: SIGN
+    slot: 22
+    name:
+      1: '<delay:20>&f&lStatistics'
+      2: '<delay:40>&e&lS&f&lt&e&la&f&lt&e&li&f&ls&e&lt&f&li&e&lc&f&ls'
+      3: '<delay:20>&b&lS&f&lt&b&la&f&lt&b&li&f&ls&b&lt&f&li&b&lc&f&ls'
+      4: '<delay:40>&a&lS&f&lt&a&la&f&lt&a&li&f&ls&a&lt&f&li&a&lc&f&ls'
+      5: '<delay:20>&d&lS&f&lt&d&la&f&lt&d&li&f&ls&d&lt&f&li&d&lc&f&ls'
+      6: '<delay:40>&e&lS&f&lt&e&la&f&lt&e&li&f&ls&e&lt&f&li&e&lc&f&ls'
+    lore:
+      1:
+      - '<delay:60>&cMob Kills: %mob_kills%'
+      - '&cPlayer Kills: %player_kills%'
+      2:
+      - '<delay:60>&cDeaths: %player_deaths%'
+      - '&cYour Location: %player_location%'
+      3:
+      - '<delay:60>&cHealth: %player_health%'
+      - '&cFood Level: %player_food%'
+    itemflags: death-drops, animate
+    triggers: join, respawn, world-change
+    enabled-worlds: world, world_nether, world_the_end
   skulldb-item:
     id: SKULL_ITEM
-    slot: 23
+    slot: 24
     name: '&fCyclone'
     skull-texture: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMGZlMzFlYWE4YThhZDhkZDhkN2FiOTZhODQyMzI5MDUzOWQzODdkODJkNDI2ODcwMWVjNjlkNDFhMWZjIn19fQ=='
     data-value: 3
@@ -271,7 +236,7 @@ items:
     enabled-worlds: world, world_nether, world_the_end
   filler-pane-item-two:
     id: 160
-    slot: 28, 30, 32, 34
+    slot: 28, 30, 32, 34, 18, 19, 21, 23, 25, 26
     name: '&f'
     data-value: 4
     itemflags: inventory-modify, placement, death-drops, self-drops

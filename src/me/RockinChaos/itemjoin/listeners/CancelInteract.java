@@ -58,8 +58,8 @@ public class CancelInteract implements Listener {
 								  } else { ItemID = slot; }
 								  ItemStack inStoredItems = CreateItems.items.get(world + "." + PlayerHandler.getPlayerID(player) + ".items." + ItemID + item);
 								  if (ItemHandler.isSimilar(inPlayerInventory, inStoredItems)) { 
-									  if (!onCooldown(items, player, item)) { playersOnCooldown.put(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + item, System.currentTimeMillis()); } 
-									  else if (onCooldown(items, player, item)) { event.setCancelled(true); }
+									  if (!onItemCooldown(items, player, item)) { playersOnCooldown.put(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + item, System.currentTimeMillis()); } 
+									  else if (onItemCooldown(items, player, item)) { event.setCancelled(true); }
 								   }
 							  }
 						  }
@@ -69,7 +69,7 @@ public class CancelInteract implements Listener {
 		  }
 	 }
 	
-	public static boolean onCooldown(ConfigurationSection items, Player player, String item) {
+	public static boolean onItemCooldown(ConfigurationSection items, Player player, String item) {
 		long playersCooldownList = 0L;
 		if (playersOnCooldown.containsKey(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + item)) {
 			playersCooldownList = playersOnCooldown.get(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + item);
@@ -77,7 +77,7 @@ public class CancelInteract implements Listener {
 		cdtime = items.getInt(".use-cooldown");
 		int cdmillis = cdtime * 1000;
 		if (System.currentTimeMillis() - playersCooldownList >= cdmillis) { return false; } 
-		else { if (spamTask(player, item)) {
+		else { if (spamItemTask(player, item)) {
 			storedSpammedPlayers.put(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + item, System.currentTimeMillis());
 			if (ConfigHandler.getConfig("en-lang.yml").getString("itemUsageCooldown") != null 
 					&& !ConfigHandler.getConfig("en-lang.yml").getString("itemUsageCooldown").isEmpty()) {
@@ -91,7 +91,7 @@ public class CancelInteract implements Listener {
 		}
 	}
 	
-	public static boolean spamTask(Player player, String item) {
+	public static boolean spamItemTask(Player player, String item) {
 		boolean itemsSpam = ConfigHandler.getConfig("items.yml").getBoolean("items-Spamming");
 		if (itemsSpam != true) {
 			long playersCooldownList = 0L;

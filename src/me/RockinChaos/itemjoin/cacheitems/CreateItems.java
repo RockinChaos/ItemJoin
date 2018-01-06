@@ -83,7 +83,7 @@ public class CreateItems {
 							tempitem = hideDurability(items, tempitem);
 							tempitem = setEnchantments(items, tempitem, player);
 							tempitem = setMapImage(tempitem, tempmat, item, player);
-						    tempitem = setNBTData(tempitem, ItemID); // New method to setting data to an item to identify that its an ItemJoin item.
+						    tempitem = setNBTData(tempitem, ItemID);
 
 							ItemMeta tempmeta = getTempMeta(tempitem);
 							tempmeta = setName(items, tempmeta, tempitem, player, ItemID, null);
@@ -219,7 +219,7 @@ public class CreateItems {
 			if (nameString != null && items.getString(".name." + nameString) != null) { formatName = items.getString(".name." + nameString); }
 			else if (ConfigHandler.getNameSection(items) != null) { formatName = items.getString(".name." + ConfigHandler.getNameSection(items).getKeys(false).iterator().next()); }
 			formatName = Utils.format("&r" + formatName.replace("<delay:" + Utils.returnInteger(formatName) + ">", ""), player);
-			if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && ServerHandler.hasBountifulUpdate()) {
+			if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && ServerHandler.hasAltUpdate("1_8")) {
 				tempmeta.setDisplayName(formatName);
 			} else {
 				tempmeta.setDisplayName(formatName + ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + ItemID));
@@ -227,7 +227,7 @@ public class CreateItems {
 		} else {
 			String lookup = ItemHandler.getName(tempitem);
 			String formatName = "";
-			if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && ServerHandler.hasBountifulUpdate()) {
+			if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && ServerHandler.hasAltUpdate("1_8")) {
 				formatName = Utils.format("&r" + lookup, player);
 			} else {
 				formatName = Utils.format("&r" + lookup + ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + ItemID), player);
@@ -255,7 +255,7 @@ public class CreateItems {
 
 	public static ItemMeta hideAttributes(ConfigurationSection items, ItemMeta tempmeta) {
 		String ItemFlags = items.getString(".itemflags");
-		if (ServerHandler.hasChangedTheWorldUpdate()) {
+		if (ServerHandler.hasAltUpdate("1_8")) {
 			if (ItemHandler.containsIgnoreCase(ItemFlags, "hide-attributes") || ItemHandler.containsIgnoreCase(ItemFlags, "hide attributes") 
 					|| ItemHandler.containsIgnoreCase(ItemFlags, "attributes") || ItemHandler.containsIgnoreCase(ItemFlags, "hideattributes")) {
 				tempmeta = setItemAttributes(tempmeta);
@@ -372,9 +372,9 @@ public class CreateItems {
 	}
 
 	public static ItemMeta setBookGeneration(ConfigurationSection items, ItemMeta tempmeta, Material tempmat, Player player) {
-		if (items.getString(".generation") != null && ServerHandler.hasFrostburnUpdate() && tempmat == Material.WRITTEN_BOOK) {
+		if (items.getString(".generation") != null && ServerHandler.hasAltUpdate("1_10") && tempmat == Material.WRITTEN_BOOK) {
 			((BookMeta) tempmeta).setGeneration(Generation.valueOf(items.getString(".generation")));
-		} else if (tempmat == Material.WRITTEN_BOOK && ServerHandler.hasFrostburnUpdate()) {
+		} else if (tempmat == Material.WRITTEN_BOOK && ServerHandler.hasAltUpdate("1_10")) {
 			((BookMeta) tempmeta).setGeneration(Generation.ORIGINAL);
 		}
 		return tempmeta;
@@ -408,7 +408,7 @@ public class CreateItems {
 	}
 	
 	public static ItemMeta setBanners(ConfigurationSection items, Material tempmat, ItemMeta tempmeta) {
-		if (items.getString(".banner-meta") != null && ServerHandler.hasBountifulUpdate() && tempmat == Material.BANNER) {
+		if (items.getString(".banner-meta") != null && ServerHandler.hasAltUpdate("1_8") && tempmat == Material.BANNER) {
 			String bannerlist = items.getString(".banner-meta").replace(" ", "");
 			String[] banners = bannerlist.split(",");
 			List<Pattern> patterns = new ArrayList<Pattern>();
@@ -432,7 +432,7 @@ public class CreateItems {
 	}
 	
     public static ItemMeta setSkullTexture(ConfigurationSection items, Player player, Material tempmat, ItemMeta tempmeta) {
-		if (ServerHandler.hasBountifulUpdate() && items.getString(".skull-texture") != null && !items.getString(".skull-texture").contains("hdb-") && items.getString(".skull-owner") == null && tempmat == Material.SKULL_ITEM) {
+		if (ServerHandler.hasAltUpdate("1_8") && items.getString(".skull-texture") != null && !items.getString(".skull-texture").contains("hdb-") && items.getString(".skull-owner") == null && tempmat == Material.SKULL_ITEM) {
 		String texture = items.getString(".skull-texture");
         GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
         gameProfile.getProperties().put("textures", new Property("textures", new String(texture)));
@@ -462,7 +462,7 @@ public class CreateItems {
 	}
 
 	public static ItemStack setHeadDatabaseSkull(ConfigurationSection items, Material tempmat, ItemStack tempitem) {
-		if (ServerHandler.hasBountifulUpdate() && Hooks.hasHeadDatabase() && items.getString(".skull-texture") != null && items.getString(".skull-texture").contains("hdb-") 
+		if (ServerHandler.hasAltUpdate("1_8") && Hooks.hasHeadDatabase() && items.getString(".skull-texture") != null && items.getString(".skull-texture").contains("hdb-") 
 				&& items.getString(".skull-owner") == null && Utils.isInt(items.getString(".skull-texture").replace("hdb-", "")) && tempmat == Material.SKULL_ITEM) {
 	      HeadDatabaseAPI api = new HeadDatabaseAPI();
 	      try {
