@@ -184,14 +184,14 @@ public class CommandHandler {
 		return "null";
 	}
 
-	public static boolean spamTask(final Player player, String item) {
+	public static boolean spamTask(Player player, String item) {
 		boolean itemsSpam = ConfigHandler.getConfig("items.yml").getBoolean("items-Spamming");
 		if (itemsSpam != true) {
 			long playersCooldownList = 0L;
-			if (CommandHandler.storedSpammedPlayers.containsKey(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + item)) {
-				playersCooldownList = CommandHandler.storedSpammedPlayers.get(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + item);
+			if (storedSpammedPlayers.containsKey(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + item)) {
+				playersCooldownList = storedSpammedPlayers.get(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + item);
 			}
-			int cdmillis = CommandHandler.spamtime * 1000;
+			int cdmillis = spamtime * 1000;
 			if (System.currentTimeMillis() - playersCooldownList >= cdmillis) {} else {
 				return false;
 			}
@@ -201,11 +201,11 @@ public class CommandHandler {
 
 	public static boolean onCooldown(ConfigurationSection items, Player player, String item, ItemStack item1) {
 		long playersCooldownList = 0L;
-		if (CommandHandler.playersOnCooldown.containsKey(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + item)) {
-			playersCooldownList = CommandHandler.playersOnCooldown.get(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + item);
+		if (playersOnCooldown.containsKey(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + item)) {
+			playersCooldownList = playersOnCooldown.get(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + item);
 		}
-		CommandHandler.cdtime = items.getInt(".commands-cooldown");
-		int cdmillis = CommandHandler.cdtime * 1000;
+		cdtime = items.getInt(".commands-cooldown");
+		int cdmillis = cdtime * 1000;
 		if (System.currentTimeMillis() - playersCooldownList >= cdmillis) {
 			return false;
 		} else {
@@ -213,7 +213,7 @@ public class CommandHandler {
 				spamTask(player, item);
 				if (spamTask(player, item)) {
 					storedSpammedPlayers.put(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + item, System.currentTimeMillis());
-					int timeLeft = (int)(CommandHandler.cdtime - ((System.currentTimeMillis() - playersCooldownList) / 1000));
+					int timeLeft = (int)(cdtime - ((System.currentTimeMillis() - playersCooldownList) / 1000));
 					String inhand = items.getString(".name");
 					String cooldownmsg = (items.getString(".cooldown-message").replace("%timeleft%", String.valueOf(timeLeft)).replace("%item%", inhand).replace("%itemraw%", ItemHandler.getName(item1)));
 					cooldownmsg = Utils.format(cooldownmsg, player);
