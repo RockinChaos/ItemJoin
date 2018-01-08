@@ -1,7 +1,7 @@
 name: ItemJoin
 main: me.RockinChaos.itemjoin.ItemJoin
 author: RockinChaos
-version: 4.6-SNAPSHOT
+version: 4.6
 description: Get custom items on join.
 website: https://www.spigotmc.org/resources/itemjoin.12661/
 softdepend: [Vault, Multiverse, Multiverse-Inventories, xInventories, PlaceholderAPI, PerWorldPlugins, PerWorldInventory, AuthMe, MyWorlds, TokenEnchant, WorldGuard]

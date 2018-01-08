@@ -407,6 +407,12 @@ public class CreateItems {
 		return tempmeta;
 	}
 	
+	// public static void BookStuff(String textt, String url, String textcomponent) { // Adding in v4.7 JSON options for books.
+	//	 TextComponent text = new TextComponent("Click me");
+	//	 text.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "http://spigotmc.org"));
+	//	 text.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Goto the spigot website!").create()));
+	// }
+	
 	public static ItemMeta setBanners(ConfigurationSection items, Material tempmat, ItemMeta tempmeta) {
 		if (items.getString(".banner-meta") != null && ServerHandler.hasAltUpdate("1_8") && tempmat == Material.BANNER) {
 			String bannerlist = items.getString(".banner-meta").replace(" ", "");
