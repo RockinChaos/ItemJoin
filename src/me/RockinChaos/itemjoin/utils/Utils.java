@@ -7,6 +7,7 @@ import java.util.Random;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Statistic;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
 import de.domedd.betternick.api.nickedplayer.NickedPlayer;
@@ -30,9 +31,14 @@ public class Utils {
 		} else if (player != null) {
 			playerName = player.getName();
 		}
-		name = name.replace("%player%", playerName).replace("%mob_kills%", String.valueOf(player.getStatistic(Statistic.MOB_KILLS)))
-		.replace("%player_kills%", String.valueOf(player.getStatistic(Statistic.PLAYER_KILLS))).replace("%player_deaths%", String.valueOf(player.getStatistic(Statistic.DEATHS)))
-		.replace("%player_food%", String.valueOf(player.getFoodLevel())).replace("%player_health%", String.valueOf(player.getHealth())).replace("%player_location%", player.getLocation().getBlockX() + ", " + player.getLocation().getBlockY() + ", " + player.getLocation().getBlockZ() + "");
+		if (playerName != null && player != null && !(player instanceof ConsoleCommandSender)) {
+		try { name = name.replace("%player%", playerName); } catch (Exception e) { if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); } }
+		try { name = name.replace("%mob_kills%", String.valueOf(player.getStatistic(Statistic.MOB_KILLS))); } catch (Exception e) { if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); } }
+		try { name = name.replace("%player_kills%", String.valueOf(player.getStatistic(Statistic.PLAYER_KILLS))); } catch (Exception e) { if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); } }
+		try { name = name.replace("%player_deaths%", String.valueOf(player.getStatistic(Statistic.DEATHS))); } catch (Exception e) { if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); } }
+		try { name = name.replace("%player_food%", String.valueOf(player.getFoodLevel())); } catch (Exception e) { if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); } }
+		try { name = name.replace("%player_health%", String.valueOf(player.getHealth())); } catch (Exception e) { if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); } }
+		try { name = name.replace("%player_location%", player.getLocation().getBlockX() + ", " + player.getLocation().getBlockY() + ", " + player.getLocation().getBlockZ() + ""); } catch (Exception e) { if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); } } }
 		name = ChatColor.translateAlternateColorCodes('&', name).toString();
 		if (Hooks.hasPlaceholderAPI() == true) {
 			try { return PlaceholderAPI.setPlaceholders(player, name); } 
