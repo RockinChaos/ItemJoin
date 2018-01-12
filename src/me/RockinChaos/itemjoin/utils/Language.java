@@ -1,6 +1,7 @@
 package me.RockinChaos.itemjoin.utils;
 
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
 import me.RockinChaos.itemjoin.ItemJoin;
@@ -20,10 +21,12 @@ public class Language {
 	@SuppressWarnings("deprecation")
 	public static void sendEnglishMessage(CommandSender sender, String MessageType, String ReplacementText) {
 		Player player;
-		if(sender.toString().contains("ConsoleSender")) {
+		if(sender.toString().contains("ConsoleSender") || sender instanceof ConsoleCommandSender) {
 			player = ItemJoin.getInstance().getServer().getPlayer("Console");
-		} else {
+		} else if (!(sender instanceof ConsoleCommandSender)) {
 			player = (Player) sender;
+		} else {
+			player = ItemJoin.getInstance().getServer().getPlayer("NULL");
 		}
 		if (ConfigHandler.getConfig("en-lang.yml").getString(MessageType) != null 
 				&& !ConfigHandler.getConfig("en-lang.yml").getString(MessageType).isEmpty()) {

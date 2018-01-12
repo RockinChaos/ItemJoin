@@ -291,6 +291,10 @@ public class ConfigHandler {
 	public static ConfigurationSection getLoreSection(ConfigurationSection items) {
 		return getConfig("items.yml").getConfigurationSection(items.getCurrentPath() + ".lore");
 	}
+	
+	public static ConfigurationSection getPagesSection(ConfigurationSection items) {
+		return getConfig("items.yml").getConfigurationSection(items.getCurrentPath() + ".pages");
+	}
 
 	public static String encodeSecretData(String str) {
 		try {
