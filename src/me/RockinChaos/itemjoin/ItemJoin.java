@@ -33,7 +33,6 @@ import me.RockinChaos.itemjoin.utils.Updater;
 		  ServerHandler.sendConsoleMessage("&ahas been Enabled!");
         }
 
-    @SuppressWarnings("unchecked")
 	public void onDisable()
     {
     		Collection < ? extends Player > playersOnlineNew;
