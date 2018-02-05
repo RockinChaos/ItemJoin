@@ -6,6 +6,7 @@ import java.util.Map;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -24,7 +25,8 @@ public class CancelInteract implements Listener {
 	private static int cdtime = 0;
 	private static int spamtime = 1;
 	
-	 @EventHandler
+	
+	 @EventHandler(priority=EventPriority.LOWEST)
 	  public void onCancelInteracts(PlayerInteractEvent event) 
 	  {
 	    ItemStack item = event.getItem();
@@ -34,7 +36,7 @@ public class CancelInteract implements Listener {
 	        event.setCancelled(true);
 	        PlayerHandler.updateInventory(player);
 	 }
-  }
+ }
 	 
 	 @EventHandler
 	  public void onUseCooldown(PlayerInteractEvent event) {
