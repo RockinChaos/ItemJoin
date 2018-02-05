@@ -78,7 +78,10 @@ public class ItemStore implements Listener {
 	@EventHandler
 	public void onItemFramePlace(PlayerInteractEntityEvent event) {
 		if (event.getRightClicked() instanceof ItemFrame) {
-			ItemStack item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().toString());
+			ItemStack item;
+            if (ServerHandler.hasCombatUpdate()) {
+    	    item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().toString());
+            } else { item = PlayerHandler.getPerfectHandItem(event.getPlayer(), ""); }
 			final Player player = event.getPlayer();
 			String itemflag = "item-store";
 			if (!ItemHandler.isAllowedItem(player, item, itemflag) && item.getType().isBlock()) {
