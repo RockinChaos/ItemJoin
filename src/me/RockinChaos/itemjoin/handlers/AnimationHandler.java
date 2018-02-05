@@ -34,7 +34,7 @@ public class AnimationHandler {
 				String ItemFlags = items.getString(".itemflags");
 				String ItemID;
 				if (ItemHandler.containsIgnoreCase(ItemFlags, "animate") || ItemHandler.containsIgnoreCase(ItemFlags, "dynamic") || ItemHandler.containsIgnoreCase(ItemFlags, "animated")) {
-					if (WorldHandler.inWorld(items, player.getWorld().getName()) && PermissionsHandler.hasPermission(items, item, player) && items.getString(".slot") != null) {
+					if (WorldHandler.inWorld(items, player.getWorld().getName()) && PermissionsHandler.hasItemsPermission(items, item, player) && items.getString(".slot") != null) {
 						String slotlist = items.getString(".slot").replace(" ", "");
 						String[] slots = slotlist.split(",");
 						for (String slot: slots) {

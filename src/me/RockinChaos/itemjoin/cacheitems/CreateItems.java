@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
@@ -116,7 +115,6 @@ public class CreateItems {
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
 	public static void setRun() {
 		Collection < ? extends Player > playersOnlineNew;
 		Player[] playersOnlineOld;
@@ -379,7 +377,8 @@ public class CreateItems {
 		}
 		return tempmeta;
 	}
-
+	
+	
 	public static ItemMeta setBookPages(ConfigurationSection items, ItemMeta tempmeta, Material tempmat, Player player) {
 		if (items.getString(".pages") != null && tempmat == Material.WRITTEN_BOOK) {
 			List < String > templist = items.getStringList(".pages");
@@ -406,7 +405,7 @@ public class CreateItems {
 		}
 		return tempmeta;
 	}
-	
+
 	public static ItemMeta setBanners(ConfigurationSection items, Material tempmat, ItemMeta tempmeta) {
 		if (items.getString(".banner-meta") != null && ServerHandler.hasAltUpdate("1_8") && tempmat == Material.BANNER) {
 			String bannerlist = items.getString(".banner-meta").replace(" ", "");

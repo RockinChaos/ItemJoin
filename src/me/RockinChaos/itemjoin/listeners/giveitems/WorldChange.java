@@ -78,7 +78,7 @@ public class WorldChange implements Listener {
 			for (String item: ConfigHandler.getConfigurationSection().getKeys(false)) {
 				ConfigurationSection items = ConfigHandler.getItemSection(item);
 				final String world = player.getWorld().getName();
-				if (WorldHandler.inWorld(items, world) && PermissionsHandler.hasPermission(items, item, player)) {
+				if (WorldHandler.inWorld(items, world) && PermissionsHandler.hasItemsPermission(items, item, player)) {
 					if(ItemHandler.containsIgnoreCase(items.getString(".triggers"), "world-changed") || ItemHandler.containsIgnoreCase(items.getString(".triggers"), "world-change")) {
 					if (items.getString(".slot") != null) {
 						String slotlist = items.getString(".slot").replace(" ", "");

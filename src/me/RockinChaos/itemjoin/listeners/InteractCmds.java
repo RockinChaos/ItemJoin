@@ -41,7 +41,7 @@ public class InteractCmds implements Listener {
 		if (Utils.isConfigurable()) {
 			for (String item: ConfigHandler.getConfigurationSection().getKeys(false)) {
 				ConfigurationSection items = ConfigHandler.getItemSection(item);
-				if (item != null && WorldHandler.inWorld(items, world) && PermissionsHandler.hasPermission(items, item, player)) {
+				if (item != null && WorldHandler.inWorld(items, world) && PermissionsHandler.hasItemsPermission(items, item, player)) {
 					if (items.getString(".slot") != null) {
 						String slotlist = items.getString(".slot").replace(" ", "");
 						String[] slots = slotlist.split(",");

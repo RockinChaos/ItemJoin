@@ -149,7 +149,7 @@ public class RegionEnter implements Listener {
 			for (String item: ConfigHandler.getConfigurationSection().getKeys(false)) {
 				ConfigurationSection items = ConfigHandler.getItemSection(item);
 				final String world = player.getWorld().getName();
-				if (WorldHandler.inWorld(items, world) && PermissionsHandler.hasPermission(items, item, player)) {
+				if (WorldHandler.inWorld(items, world) && PermissionsHandler.hasItemsPermission(items, item, player)) {
 					if (step == 1) {
 						if (ItemHandler.containsIgnoreCase(items.getString(".triggers"), "region-enter") || ItemHandler.containsIgnoreCase(items.getString(".triggers"), "region enter") || ItemHandler.containsIgnoreCase(items.getString(".triggers"), "enter-region") || ItemHandler.containsIgnoreCase(items.getString(".triggers"), "enter region")) {
 							if (ItemHandler.containsIgnoreCase(items.getString(".enabled-regions"), region)) {
