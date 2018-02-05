@@ -58,7 +58,10 @@ public class Placement implements Listener{
 	    public void onItemFramePlace(PlayerInteractEntityEvent event) {
 	        if(event.getRightClicked() instanceof ItemFrame) {
 	        	try {
-	    	    ItemStack item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().toString());
+	        	ItemStack item = null;
+	            if (ServerHandler.hasCombatUpdate()) {
+	    	    item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().toString());
+	            } else { item = PlayerHandler.getPerfectHandItem(event.getPlayer(), ""); }
 	    	    final Player player = event.getPlayer();
 	    	    String itemflag = "placement";
 	    	      if (!ItemHandler.isAllowedItem(player, item, itemflag) && item.getType().isBlock())
@@ -74,7 +77,10 @@ public class Placement implements Listener{
 	    public void onItemFrameCountLock(PlayerInteractEntityEvent event) {
 	        if(event.getRightClicked() instanceof ItemFrame) {
 	        	try {
-	    	    ItemStack item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().toString());
+		        ItemStack item = null;
+		        if (ServerHandler.hasCombatUpdate()) {
+		    	item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().toString());
+		        } else { item = PlayerHandler.getPerfectHandItem(event.getPlayer(), ""); }
 	    	    final Player player = event.getPlayer();
 	    	    String itemflag = "count-lock";
 				GameMode gamemode = player.getGameMode();
