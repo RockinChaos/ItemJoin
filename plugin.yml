@@ -267,8 +267,6 @@ permissions:
           itemjoin.remove: true
           itemjoin.remove.others: true
           itemjoin.list: true
-          itemjoin.WorldName.Name: true
-          itemjoin.WorldName.*: true
    itemjoin.permissions:
       description: Use of the /itemjoin permissions commands.
       default: true
@@ -305,9 +303,3 @@ permissions:
    itemjoin.list:
       description: Use of the /itemjoin list command.
       default: op
-   itemjoin.WorldName.Name:
-      description: Replace Name with the name of the specified item and WorldName with name of world to receive that item.
-      default: false
-   itemjoin.WorldName.*:
-      description: Gives permission to get all items from specified world.
-      default: false
