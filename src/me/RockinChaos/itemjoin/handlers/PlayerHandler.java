@@ -164,9 +164,17 @@ public class PlayerHandler {
 	}
 	
 	@SuppressWarnings("deprecation")
-	public static Player getPlayerString(String StringPlayer) {
-		Player args = Bukkit.getPlayer(UUID.fromString(StringPlayer));
-		if (args == null) { args = Bukkit.getPlayer(StringPlayer); }
+	public static Player getPlayerString(String player) {
+		Player args = null;
+		try { args = Bukkit.getPlayer(UUID.fromString(player)); } catch (Exception e) {}
+		if (player != null && Hooks.hasBetterNick()) {
+			NickedPlayer np = new NickedPlayer(Bukkit.getPlayer(player));
+			if (np.isNicked()) {
+			return Bukkit.getPlayer(np.getRealName());
+			} else {
+				return Bukkit.getPlayer(player);
+			}
+		} else if (args == null) { return Bukkit.getPlayer(player); }
 		return args;
 	}
 	
@@ -189,7 +197,7 @@ public class PlayerHandler {
 	@SuppressWarnings("deprecation")
 	public static Player getPlayer(Player player) {
 		Player args = null;
-		try { args = Bukkit.getPlayer(player.getUniqueId()); } catch (NoSuchMethodError e) {}
+		try { args = Bukkit.getPlayer(player.getUniqueId()); } catch (Exception e) {}
 		if (player != null && Hooks.hasBetterNick()) {
 			NickedPlayer np = new NickedPlayer(player);
 			if (np.isNicked()) {

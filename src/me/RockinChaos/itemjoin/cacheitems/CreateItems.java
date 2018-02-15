@@ -406,6 +406,7 @@ public class CreateItems {
 		return tempmeta;
 	}
 
+
 	public static ItemMeta setBanners(ConfigurationSection items, Material tempmat, ItemMeta tempmeta) {
 		if (items.getString(".banner-meta") != null && ServerHandler.hasAltUpdate("1_8") && tempmat == Material.BANNER) {
 			String bannerlist = items.getString(".banner-meta").replace(" ", "");
