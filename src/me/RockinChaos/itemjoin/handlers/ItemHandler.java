@@ -178,13 +178,13 @@ public class ItemHandler {
 	}
 
 	public static boolean isNBTDataSimilar(ItemStack inPlayerInventory, ItemStack inStoredItems) {
-		if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && ServerHandler.hasAltUpdate("1_8") && getNBTData(inPlayerInventory) != null && getNBTData(inStoredItems) != null && getNBTData(inPlayerInventory).equals(getNBTData(inStoredItems))) {
+		if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && ServerHandler.hasAltUpdate("1_8") && getNBTData(inPlayerInventory) != null && getNBTData(inStoredItems) != null && getNBTData(inStoredItems).contains(getNBTData(inPlayerInventory))) {
 			return true;
 		} else if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") != true || ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && !ServerHandler.hasAltUpdate("1_8")) { 
 				if (inPlayerInventory.hasItemMeta() 
 				&& inPlayerInventory.getItemMeta().hasDisplayName() && inStoredItems.hasItemMeta() && inStoredItems.getItemMeta().hasDisplayName()
 				&& inPlayerInventory.getItemMeta().getDisplayName().contains(ConfigHandler.encodeSecretData(ConfigHandler.getNBTData()))
-				&& ConfigHandler.decodeSecretData(inPlayerInventory.getItemMeta().getDisplayName()).contains(ConfigHandler.decodeSecretData(inStoredItems.getItemMeta().getDisplayName()))) {
+				&& ConfigHandler.decodeSecretData(inStoredItems.getItemMeta().getDisplayName()).contains(ConfigHandler.decodeSecretData(inPlayerInventory.getItemMeta().getDisplayName()))) {
 			return true;
 				}
 		}
@@ -228,8 +228,14 @@ public class ItemHandler {
 		Object nms = getNMSI.invoke(null, tempitem);
 		Object cacheTag = nmsItemStackClass.getMethod("getTag").invoke(nms);
 		if (cacheTag != null && cacheTag.getClass().getMethod("getString", String.class).invoke(cacheTag, "ItemJoin") != null)  {
-			String data = (String) cacheTag.getClass().getMethod("getString", String.class).invoke(cacheTag, "ItemJoin");
-			return data;
+			String data1 = (String) cacheTag.getClass().getMethod("getString", String.class).invoke(cacheTag, "ItemJoin Name");
+			String data2 = (String) cacheTag.getClass().getMethod("getString", String.class).invoke(cacheTag, "ItemJoin Slot");
+			if (data1 != null && data2 != null) {
+				return data1 + " " + data2;
+			} else { 
+				String data = (String) cacheTag.getClass().getMethod("getString", String.class).invoke(cacheTag, "ItemJoin");
+				return data;
+			}
 		} 
 		} catch (Exception e) {
 			ServerHandler.sendDebugMessage("Error 254 has occured when getting NBTData to an item.");

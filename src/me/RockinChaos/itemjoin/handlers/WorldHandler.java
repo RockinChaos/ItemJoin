@@ -6,7 +6,7 @@ public class WorldHandler {
 	
 	public static Boolean inWorld(ConfigurationSection items, String world) {
 		if (items.getString(".enabled-worlds") != null) {
-			String worldlist = items.getString(".enabled-worlds").replace(" ", "");
+			String worldlist = items.getString(".enabled-worlds").replace(", ", ",").replace(" , ", ",").replace(" ,", ",");
 			String[] compareWorlds = worldlist.split(",");
 			for (String compareWorld: compareWorlds) {
 				if (compareWorld.equalsIgnoreCase(world) 

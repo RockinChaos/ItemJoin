@@ -82,7 +82,7 @@ public class CreateItems {
 							tempitem = hideDurability(items, tempitem);
 							tempitem = setEnchantments(items, tempitem, player);
 							tempitem = setMapImage(tempitem, tempmat, item, player);
-						    tempitem = setNBTData(tempitem, ItemID);
+						    tempitem = setNBTData(tempitem, ItemID, item);
 
 							ItemMeta tempmeta = getTempMeta(tempitem);
 							tempmeta = setName(items, tempmeta, tempitem, player, ItemID, null);
@@ -163,7 +163,7 @@ public class CreateItems {
 		return tempitem;
 	}
 	
-	public static ItemStack setNBTData(ItemStack tempitem, String ItemID) {
+	public static ItemStack setNBTData(ItemStack tempitem, String ItemID, String item) {
 		if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true) {
 		try {
 		Class<?> craftItemStack = Reflection.getOBC("inventory.CraftItemStack");
@@ -173,10 +173,12 @@ public class CreateItems {
 		Object tag = Reflection.getNMS("NBTTagCompound").getConstructor().newInstance();
 		Object cacheTag = nmsItemStackClass.getMethod("getTag").invoke(nms);
 		if (cacheTag != null) {
-			cacheTag.getClass().getMethod("setString", String.class, String.class).invoke(cacheTag, "ItemJoin", "Slot: " + ItemID);
+			cacheTag.getClass().getMethod("setString", String.class, String.class).invoke(cacheTag, "ItemJoin Name", item);
+			cacheTag.getClass().getMethod("setString", String.class, String.class).invoke(cacheTag, "ItemJoin Slot", ItemID);
 			tempitem = (ItemStack) craftItemStack.getMethod("asCraftMirror", nms.getClass()).invoke(null, nms);
 		} else {
-		tag.getClass().getMethod("setString", String.class, String.class).invoke(tag, "ItemJoin", "Slot: " + ItemID);
+		tag.getClass().getMethod("setString", String.class, String.class).invoke(tag, "ItemJoin Name", item);
+		tag.getClass().getMethod("setString", String.class, String.class).invoke(tag, "ItemJoin Slot", ItemID);
 		nms.getClass().getMethod("setTag", tag.getClass()).invoke(nms, tag);
 		tempitem = (ItemStack) craftItemStack.getMethod("asCraftMirror", nms.getClass()).invoke(null, nms);
 		}
@@ -220,7 +222,7 @@ public class CreateItems {
 			if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && ServerHandler.hasAltUpdate("1_8")) {
 				tempmeta.setDisplayName(formatName);
 			} else {
-				tempmeta.setDisplayName(formatName + ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + ItemID));
+				tempmeta.setDisplayName(formatName + ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + ItemID + items.getName()));
 			}
 		} else {
 			String lookup = ItemHandler.getName(tempitem);
@@ -228,7 +230,7 @@ public class CreateItems {
 			if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && ServerHandler.hasAltUpdate("1_8")) {
 				formatName = Utils.format("&r" + lookup, player);
 			} else {
-				formatName = Utils.format("&r" + lookup + ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + ItemID), player);
+				formatName = Utils.format("&r" + lookup + ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + ItemID + items.getName()), player);
 			}
 			tempmeta.setDisplayName(formatName);
 		}
@@ -405,7 +407,6 @@ public class CreateItems {
 		}
 		return tempmeta;
 	}
-
 
 	public static ItemMeta setBanners(ConfigurationSection items, Material tempmat, ItemMeta tempmeta) {
 		if (items.getString(".banner-meta") != null && ServerHandler.hasAltUpdate("1_8") && tempmat == Material.BANNER) {
