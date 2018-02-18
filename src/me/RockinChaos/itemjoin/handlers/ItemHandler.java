@@ -194,6 +194,18 @@ public class ItemHandler {
 		}
 		return false;
 	}
+	
+	public static boolean hasNBTData(ItemStack inPlayerInventory) {
+		if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && ServerHandler.hasAltUpdate("1_8") && inPlayerInventory != null && getNBTData(inPlayerInventory) != null) {
+			return true;
+		} else if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") != true || ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && !ServerHandler.hasAltUpdate("1_8")) { 
+				if (inPlayerInventory != null && inPlayerInventory.hasItemMeta() && inPlayerInventory.getItemMeta().hasDisplayName()
+						&& ConfigHandler.decodeSecretData(inPlayerInventory.getItemMeta().getDisplayName()).contains(ConfigHandler.decodeSecretData(ConfigHandler.encodeSecretData(ConfigHandler.getNBTData())))) {
+					return true;
+				}
+		}
+		return false;
+	}
 
 	public static boolean isCountSimilar(ItemStack inPlayerInventory, ItemStack inStoredItems) {
 		if (inPlayerInventory.getAmount() == inStoredItems.getAmount()) {

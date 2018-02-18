@@ -103,32 +103,25 @@ public class SetItems {
 
 	public static void setClearItemJoinItems(Player player) {
 			PlayerInventory inventory = player.getInventory();
-			if (inventory.getHelmet() != null && inventory.getHelmet().hasItemMeta() && inventory.getHelmet().getItemMeta().hasDisplayName() 
-					&& ItemHandler.containsIgnoreCase(inventory.getHelmet().getItemMeta().getDisplayName(), ConfigHandler.encodeSecretData(ConfigHandler.getNBTData()))) {
+			if (inventory.getHelmet() != null && ItemHandler.hasNBTData(inventory.getHelmet())) {
 				inventory.setHelmet(null);
 			}
-			if (inventory.getChestplate() != null && inventory.getChestplate().hasItemMeta() && inventory.getChestplate().getItemMeta().hasDisplayName() 
-					&& ItemHandler.containsIgnoreCase(inventory.getChestplate().getItemMeta().getDisplayName(), ConfigHandler.encodeSecretData(ConfigHandler.getNBTData()))) {
+			if (inventory.getChestplate() != null && ItemHandler.hasNBTData(inventory.getChestplate())) {
 				inventory.setChestplate(null);
 			}
-			if (inventory.getLeggings() != null && inventory.getLeggings().hasItemMeta() && inventory.getLeggings().getItemMeta().hasDisplayName() 
-					&& ItemHandler.containsIgnoreCase(inventory.getLeggings().getItemMeta().getDisplayName(), ConfigHandler.encodeSecretData(ConfigHandler.getNBTData()))) {
+			if (inventory.getLeggings() != null && ItemHandler.hasNBTData(inventory.getLeggings())) {
 				inventory.setLeggings(null);
 			}
-			if (inventory.getBoots() != null && inventory.getBoots().hasItemMeta() && inventory.getBoots().getItemMeta().hasDisplayName() 
-					&& ItemHandler.containsIgnoreCase(inventory.getBoots().getItemMeta().getDisplayName(), ConfigHandler.encodeSecretData(ConfigHandler.getNBTData()))) {
+			if (inventory.getBoots() != null &&  ItemHandler.hasNBTData(inventory.getBoots())) {
 				inventory.setBoots(null);
 			}
-			if (ServerHandler.hasCombatUpdate() && inventory.getItemInOffHand() != null 
-					&& inventory.getItemInOffHand().hasItemMeta() && inventory.getItemInOffHand().getItemMeta().hasDisplayName() 
-					&& ItemHandler.containsIgnoreCase(inventory.getItemInOffHand().getItemMeta().getDisplayName(), ConfigHandler.encodeSecretData(ConfigHandler.getNBTData()))) {
+			if (ServerHandler.hasCombatUpdate() && inventory.getItemInOffHand() != null && ItemHandler.hasNBTData(inventory.getItemInOffHand())) {
 				inventory.setItemInOffHand(null);
 			}
 			HashMap < String, ItemStack[] > inventoryContents = new HashMap < String, ItemStack[] > ();
 			inventoryContents.put(PlayerHandler.getPlayerID(player), inventory.getContents());
 			for (ItemStack contents: inventoryContents.get(PlayerHandler.getPlayerID(player))) {
-				if (contents != null && contents.hasItemMeta() && contents.getItemMeta().hasDisplayName() 
-						&& ItemHandler.containsIgnoreCase(contents.getItemMeta().getDisplayName(), ConfigHandler.encodeSecretData(ConfigHandler.getNBTData()))) {
+				if (contents != null && ItemHandler.hasNBTData(contents)) {
 					inventory.remove(contents);
 				}
 			}
