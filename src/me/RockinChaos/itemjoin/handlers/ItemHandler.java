@@ -118,6 +118,8 @@ public class ItemHandler {
 	public static boolean isCustomSimilar(ItemStack inPlayerInventory, ItemStack inStoredItems) {
 		if (inPlayerInventory.hasItemMeta() && inStoredItems.hasItemMeta() && inPlayerInventory.getType().equals(inStoredItems.getType()) && isDisplayNameSimilar(inPlayerInventory, inStoredItems)) {
 			if (inPlayerInventory.getItemMeta().hasLore() && inStoredItems.getItemMeta().hasLore() && inPlayerInventory.getItemMeta().getLore().equals(inStoredItems.getItemMeta().getLore()) && isEnchantsSimilar(inPlayerInventory, inStoredItems) && isNBTDataSimilar(inPlayerInventory, inStoredItems)) {
+				if (isNBTDataSimilar(inPlayerInventory, inStoredItems)) {
+				}
 				return true;
 			} else if (isEnchantsSimilar(inPlayerInventory, inStoredItems) && isNBTDataSimilar(inPlayerInventory, inStoredItems)) {
 				return true;
@@ -139,9 +141,11 @@ public class ItemHandler {
 			return true;
 		} else if (isNBTDataSimilar(inPlayerInventory, inStoredItems)) {
 			ItemMeta itemMeta = CreateItems.getTempMeta(inPlayerInventory);
-			itemMeta.setDisplayName(inStoredItems.getItemMeta().getDisplayName());
-			inPlayerInventory.setItemMeta(itemMeta);
+			if (itemMeta != null && inStoredItems.hasItemMeta() && inStoredItems.getItemMeta().hasDisplayName()) {
+				itemMeta.setDisplayName(inStoredItems.getItemMeta().getDisplayName());
+				inPlayerInventory.setItemMeta(itemMeta);
 			return true;
+			}
 		}
 		return false;
 	}
@@ -185,7 +189,7 @@ public class ItemHandler {
 				&& inPlayerInventory.getItemMeta().hasDisplayName() && inStoredItems.hasItemMeta() && inStoredItems.getItemMeta().hasDisplayName()
 				&& inPlayerInventory.getItemMeta().getDisplayName().contains(ConfigHandler.encodeSecretData(ConfigHandler.getNBTData()))
 				&& ConfigHandler.decodeSecretData(inStoredItems.getItemMeta().getDisplayName()).contains(ConfigHandler.decodeSecretData(inPlayerInventory.getItemMeta().getDisplayName()))) {
-			return true;
+					return true;
 				}
 		}
 		return false;
@@ -227,13 +231,15 @@ public class ItemHandler {
 		Method getNMSI = craftItemStack.getMethod("asNMSCopy", ItemStack.class);
 		Object nms = getNMSI.invoke(null, tempitem);
 		Object cacheTag = nmsItemStackClass.getMethod("getTag").invoke(nms);
-		if (cacheTag != null && cacheTag.getClass().getMethod("getString", String.class).invoke(cacheTag, "ItemJoin") != null)  {
+		if (cacheTag != null && cacheTag.getClass().getMethod("getString", String.class).invoke(cacheTag, "ItemJoin") != null 
+				|| cacheTag != null && cacheTag.getClass().getMethod("getString", String.class).invoke(cacheTag, "ItemJoin Name") != null
+				&& cacheTag != null && cacheTag.getClass().getMethod("getString", String.class).invoke(cacheTag, "ItemJoin Slot") != null) {
 			String data1 = (String) cacheTag.getClass().getMethod("getString", String.class).invoke(cacheTag, "ItemJoin Name");
 			String data2 = (String) cacheTag.getClass().getMethod("getString", String.class).invoke(cacheTag, "ItemJoin Slot");
-			if (data1 != null && data2 != null) {
+			String data = (String) cacheTag.getClass().getMethod("getString", String.class).invoke(cacheTag, "ItemJoin");
+			if (data1 != null && data2 != null && data1 != "" && data2 != "") {
 				return data1 + " " + data2;
-			} else { 
-				String data = (String) cacheTag.getClass().getMethod("getString", String.class).invoke(cacheTag, "ItemJoin");
+			} else if (data != null && data != "") { 
 				return data;
 			}
 		} 
