@@ -87,7 +87,7 @@ public class ItemHandler {
 	}
 
 	public static boolean containsIgnoreCase(String string1, String string2) {
-		if (string1 != null && string1.toLowerCase().contains(string2.toLowerCase())) {
+		if (string1 != null && string2 != null && string1.toLowerCase().contains(string2.toLowerCase())) {
 			return true;
 		}
 		return false;
@@ -188,7 +188,7 @@ public class ItemHandler {
 				if (inPlayerInventory.hasItemMeta() 
 				&& inPlayerInventory.getItemMeta().hasDisplayName() && inStoredItems.hasItemMeta() && inStoredItems.getItemMeta().hasDisplayName()
 				&& inPlayerInventory.getItemMeta().getDisplayName().contains(ConfigHandler.encodeSecretData(ConfigHandler.getNBTData()))
-				&& ConfigHandler.decodeSecretData(inStoredItems.getItemMeta().getDisplayName()).contains(ConfigHandler.decodeSecretData(inPlayerInventory.getItemMeta().getDisplayName()))) {
+				&& containsIgnoreCase(ConfigHandler.decodeSecretData(inStoredItems.getItemMeta().getDisplayName()), ConfigHandler.decodeSecretData(inPlayerInventory.getItemMeta().getDisplayName()))) {
 					return true;
 				}
 		}
