@@ -24,9 +24,6 @@ public class ItemStore implements Listener {
 		final Inventory chest = event.getView().getTopInventory();
 		final InventoryHolder holder = chest.getHolder();
 			ItemStack item = null;
-			if (!ServerHandler.hasAltUpdate("1_8")) {
-				PlayerHandler.updateInventory(player);
-			}
 			if (ItemHandler.containsIgnoreCase(event.getAction().name(), "HOTBAR")) {
 				item = event.getView().getBottomInventory().getItem(event.getHotbarButton());
 				if (item == null) {
@@ -57,9 +54,6 @@ public class ItemStore implements Listener {
 		final InventoryHolder holder = chest.getHolder();
 		final int inventorySize = event.getInventory().getSize();
 			ItemStack item = event.getOldCursor();
-			if (!ServerHandler.hasAltUpdate("1_8")) {
-				PlayerHandler.updateInventory(player);
-			}
 			for (int i: event.getRawSlots()) {
 				if (i < inventorySize) {
 					if (holder != null && holder.toString().contains("Chest") 
