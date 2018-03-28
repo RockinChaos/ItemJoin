@@ -585,47 +585,29 @@ public class Commands implements CommandExecutor {
 							}
 						} else {
 						ItemStack inStoredItems = CreateItems.items.get(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + ItemID + itemName);
-						int dataValue = items.getInt(".data-value");
-						Material tempmat = ItemHandler.getMaterial(items);
-						ItemStack tempitem = null;
-						if (ServerHandler.hasAltUpdate("1_9")) {
-							tempitem = new ItemStack(tempmat, items.getInt(".count", 1), (short) dataValue);
-						} else if (!ServerHandler.hasAltUpdate("1_9")) {
-							try {
-								tempitem = new ItemStack(tempmat, items.getInt(".count", 1), (short) dataValue);
-							} catch (NullPointerException e) {
-								if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
-							}
-						}
-						String lookup = ItemHandler.getName(tempitem);
-						String name = Utils.format("&r" + lookup, player);
-						if (items.getString(".name") != null) {
-							name = items.getString(".name");
-							name = Utils.format("&r" + name, player);
-						}
-						if (inStoredItems != null && item.equalsIgnoreCase(itemName) && Utils.isCustomSlot(slot) && ItemHandler.isObtainable(player, item, slot, ItemID, inStoredItems)) {
+						if (inStoredItems != null && item.equalsIgnoreCase(itemName) && Utils.isCustomSlot(slot) && !ItemHandler.hasItem(player, inStoredItems) && ItemHandler.canOverwrite(player, slot, item)) {
 							SetItems.setCustomSlots(player, item, slot, ItemID);
 							Language.getSendMessage(player, "givenToYou", inStoredItems.getItemMeta().getDisplayName());
 							if (Language.getArgsPlayer() != null) {
 								Language.setArgsPlayer(player);
-								Language.getSendMessage(OtherPlayer, "givenToPlayer", name);
+								Language.getSendMessage(OtherPlayer, "givenToPlayer", inStoredItems.getItemMeta().getDisplayName());
 								Language.setArgsPlayer(null);
 							}
 							ItemExists = true;
-						} else if (inStoredItems != null && item.equalsIgnoreCase(itemName) && Utils.isInt(slot) && ItemHandler.isObtainable(player, item, slot, ItemID, inStoredItems)) {
+						} else if (inStoredItems != null && item.equalsIgnoreCase(itemName) && Utils.isInt(slot) && Integer.parseInt(slot) >= 0 && Integer.parseInt(slot) <= 35 && !ItemHandler.hasItem(player, inStoredItems) && ItemHandler.canOverwrite(player, slot, item)) {
 							SetItems.setInvSlots(player, item, slot, ItemID);
 							Language.getSendMessage(player, "givenToYou", inStoredItems.getItemMeta().getDisplayName());
 							if (Language.getArgsPlayer() != null) {
 								Language.setArgsPlayer(player);
-								Language.getSendMessage(OtherPlayer, "givenToPlayer", name);
+								Language.getSendMessage(OtherPlayer, "givenToPlayer", inStoredItems.getItemMeta().getDisplayName());
 								Language.setArgsPlayer(null);
 							}
 							ItemExists = true;
-						} else if (inStoredItems != null && item.equalsIgnoreCase(itemName) && !ItemHandler.isObtainable(player, item, slot, ItemID, inStoredItems)) {
+						} else if (inStoredItems != null && item.equalsIgnoreCase(itemName) && !ItemHandler.hasItem(player, inStoredItems) && ItemHandler.canOverwrite(player, slot, item)) {
 							if (Language.getArgsPlayer() != null) {
-								Language.getSendMessage(player, "playerTriedGive", name);
+								Language.getSendMessage(player, "playerTriedGive", inStoredItems.getItemMeta().getDisplayName());
 								Language.setArgsPlayer(player);
-								Language.getSendMessage(OtherPlayer, "itemExistsInOthersInventory", name);
+								Language.getSendMessage(OtherPlayer, "itemExistsInOthersInventory", inStoredItems.getItemMeta().getDisplayName());
 								Language.setArgsPlayer(null);
 							} else {
 								Language.getSendMessage(player, "itemExistsInInventory", inStoredItems.getItemMeta().getDisplayName());
@@ -682,43 +664,21 @@ public class Commands implements CommandExecutor {
 								ItemExists = true;
 						} else {
 						ItemStack inStoredItems = CreateItems.items.get(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + ItemID + itemName);
-						int dataValue = items.getInt(".data-value");
-						Material tempmat = ItemHandler.getMaterial(items);
-						ItemStack tempitem = null;
-						if (ServerHandler.hasAltUpdate("1_9")) {
-							tempitem = new ItemStack(tempmat, items.getInt(".count", 1), (short) dataValue);
-						} else if (!ServerHandler.hasAltUpdate("1_9")) {
-							try {
-								tempitem = new ItemStack(tempmat, items.getInt(".count", 1), (short) dataValue);
-							} catch (NullPointerException e) {
-								if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
-							}
-						}
-						String lookup = ItemHandler.getName(tempitem);
-						String name = Utils.format("&r" + lookup, player);
-						if (items.getString(".name") != null) {
-							name = items.getString(".name");
-							name = Utils.format("&r" + name, player);
-						}
 						if (inStoredItems != null && item.equalsIgnoreCase(itemName) && Utils.isCustomSlot(slot) && player.getInventory().contains(inStoredItems)) {
 							player.getInventory().removeItem(inStoredItems);
-							if (items.getString(".name") != null) {
-								name = items.getString(".name");
-								name = Utils.format("&r" + name, player);
-							}
 							Language.getSendMessage(player, "removedFromYou", inStoredItems.getItemMeta().getDisplayName());
 							if (Language.getArgsPlayer() != null) {
 								Language.setArgsPlayer(player);
-								Language.getSendMessage(OtherPlayer, "removedFromPlayer", name);
+								Language.getSendMessage(OtherPlayer, "removedFromPlayer", inStoredItems.getItemMeta().getDisplayName());
 								Language.setArgsPlayer(null);
 							}
 							ItemExists = true;
 						} else if (inStoredItems != null && item.equalsIgnoreCase(itemName) && Utils.isInt(slot) && player.getInventory().contains(inStoredItems)) {
 							player.getInventory().removeItem(inStoredItems);
-							Language.getSendMessage(player, "removedFromYou", name);
+							Language.getSendMessage(player, "removedFromYou", inStoredItems.getItemMeta().getDisplayName());
 							if (Language.getArgsPlayer() != null) {
 								Language.setArgsPlayer(player);
-								Language.getSendMessage(OtherPlayer, "removedFromPlayer", name);
+								Language.getSendMessage(OtherPlayer, "removedFromPlayer", inStoredItems.getItemMeta().getDisplayName());
 								Language.setArgsPlayer(null);
 							}
 							ItemExists = true;
@@ -726,7 +686,7 @@ public class Commands implements CommandExecutor {
 							if (Language.getArgsPlayer() != null) {
 								Language.getSendMessage(player, "playerTriedRemove", inStoredItems.getItemMeta().getDisplayName());
 								Language.setArgsPlayer(player);
-								Language.getSendMessage(OtherPlayer, "itemDoesntExistInOthersInventory", name);
+								Language.getSendMessage(OtherPlayer, "itemDoesntExistInOthersInventory", inStoredItems.getItemMeta().getDisplayName());
 								Language.setArgsPlayer(null);
 							} else {
 								Language.getSendMessage(player, "itemDoesntExistInInventory", inStoredItems.getItemMeta().getDisplayName());
