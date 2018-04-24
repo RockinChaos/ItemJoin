@@ -4,8 +4,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -14,6 +16,7 @@ import javax.net.ssl.HttpsURLConnection;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -23,6 +26,7 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.mojang.util.UUIDTypeAdapter;
 
+import de.domedd.betternick.BetterNick;
 import de.domedd.betternick.api.nickedplayer.NickedPlayer;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.utils.Econ;
@@ -194,6 +198,22 @@ public class PlayerHandler {
 		return "";
 	}
 	
+	public static String getOfflinePlayerID(OfflinePlayer player) {
+		if (player != null && player.getUniqueId() != null) {
+			return player.getUniqueId().toString();
+		} else if (player != null && Hooks.hasBetterNick()) {
+			NickedPlayer np = new NickedPlayer((BetterNick) player);
+			if (np.isNicked()) {
+			return np.getRealName();
+			} else {
+				return player.getName();
+			}
+		} else if (player != null) {
+			return player.getName();
+		}
+		return "";
+	}
+	
 	@SuppressWarnings("deprecation")
 	public static Player getPlayer(Player player) {
 		Player args = null;
@@ -207,6 +227,32 @@ public class PlayerHandler {
 			}
 		} else if (args == null) { return Bukkit.getPlayer(player.getName()); }
 		return args;
+	}
+	
+	public static OfflinePlayer getOfflinePlayer(String playerName) {
+		Collection < ? extends OfflinePlayer > playersOnlineNew;
+		OfflinePlayer[] playersOnlineOld;
+		try {
+			if (Bukkit.class.getMethod("getOfflinePlayers", new Class < ? > [0]).getReturnType() == Collection.class) {
+				playersOnlineNew = (Collection < ? extends OfflinePlayer > )((Collection < ? > ) Bukkit.class.getMethod("getOfflinePlayers", new Class < ? > [0]).invoke(null, new Object[0]));
+				for (OfflinePlayer player: playersOnlineNew) {
+					if (player.getName().equalsIgnoreCase(playerName)) {
+						return player;
+					}
+				}
+			} else {
+				playersOnlineOld = ((OfflinePlayer[]) Bukkit.class.getMethod("getOfflinePlayers", new Class < ? > [0]).invoke(null, new Object[0]));
+				for (OfflinePlayer player: playersOnlineOld) {
+					if (player.getName().equalsIgnoreCase(playerName)) {
+						return player;
+					}
+				}
+			}
+		} catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+			if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+		} 
+		
+		return null;
 	}
 	
 	@SuppressWarnings("deprecation")

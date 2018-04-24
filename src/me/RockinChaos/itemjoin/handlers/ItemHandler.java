@@ -14,6 +14,7 @@ import me.RockinChaos.itemjoin.listeners.giveitems.SetItems;
 import me.RockinChaos.itemjoin.utils.Hooks;
 import me.RockinChaos.itemjoin.utils.Reflection;
 import me.RockinChaos.itemjoin.utils.Utils;
+import me.RockinChaos.itemjoin.utils.sqlite.SQLData;
 
 public class ItemHandler {
 	private static HashMap < String, Integer > ArbitraryID = new HashMap < String, Integer > ();
@@ -47,11 +48,19 @@ public class ItemHandler {
 		return true;
 	}
 
-	public static Boolean isObtainable(Player player, String item, String slot, String ItemID, ItemStack inStoredItems) {
-		if (inStoredItems != null && Utils.isInt(slot) && Integer.parseInt(slot) >= 0 && Integer.parseInt(slot) <= 35 && !hasItem(player, inStoredItems) && canOverwrite(player, slot, item) && !ConfigHandler.hasFirstJoined(player, item) && !ConfigHandler.hasIPLimits(player, item)) {
-			return true;
-		} else if (inStoredItems != null && Utils.isCustomSlot(slot) && !hasItem(player, inStoredItems) && canOverwrite(player, slot, item) && !ConfigHandler.hasFirstJoined(player, item) && !ConfigHandler.hasIPLimits(player, item)) {
-			return true;
+	public static Boolean isObtainable(Player player, ConfigurationSection items, String item, String slot, String ItemID, ItemStack inStoredItems) {
+		if (inStoredItems != null && Utils.isInt(slot) && Integer.parseInt(slot) >= 0 && Integer.parseInt(slot) <= 35) {
+			if (!hasItem(player, inStoredItems) || !hasItem(player, inStoredItems, slot) && ItemHandler.containsIgnoreCase(items.getString(".itemflags"), "vanilla")) {
+				if (!SQLData.hasFirstJoined(player, item) && !SQLData.hasIPLimited(player, item) && canOverwrite(player, slot, item)) {
+				return true;
+				}
+			}
+		} else if (inStoredItems != null && Utils.isCustomSlot(slot)) {
+			if (!hasItem(player, inStoredItems) || !hasItem(player, inStoredItems, slot) && ItemHandler.containsIgnoreCase(items.getString(".itemflags"), "vanilla")) {
+				if (!SQLData.hasFirstJoined(player, item) && !SQLData.hasIPLimited(player, item) && canOverwrite(player, slot, item)) {
+				return true;
+				}
+			}
 		}
 		return false;
 	}
@@ -94,7 +103,7 @@ public class ItemHandler {
 	}
 
 	public static boolean isSimilar(ItemStack inPlayerInventory, ItemStack inStoredItems) {
-		if (inPlayerInventory != null && inStoredItems != null) {
+		if (inPlayerInventory != null && inPlayerInventory.getType() != Material.AIR && inStoredItems != null && inStoredItems.getType() != Material.AIR) {
 			ItemStack inPlayerInventoryTemp = new ItemStack(inPlayerInventory);
 			ItemStack inStoredItemsTemp = new ItemStack(inStoredItems);
 			if (inPlayerInventoryTemp.isSimilar(inStoredItemsTemp) 
@@ -194,18 +203,6 @@ public class ItemHandler {
 		}
 		return false;
 	}
-	
-	public static boolean hasNBTData(ItemStack inPlayerInventory) {
-		if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && ServerHandler.hasAltUpdate("1_8") && inPlayerInventory != null && getNBTData(inPlayerInventory) != null) {
-			return true;
-		} else if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") != true || ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && !ServerHandler.hasAltUpdate("1_8")) { 
-				if (inPlayerInventory != null && inPlayerInventory.hasItemMeta() && inPlayerInventory.getItemMeta().hasDisplayName()
-						&& ConfigHandler.decodeSecretData(inPlayerInventory.getItemMeta().getDisplayName()).contains(ConfigHandler.decodeSecretData(ConfigHandler.encodeSecretData(ConfigHandler.getNBTData())))) {
-					return true;
-				}
-		}
-		return false;
-	}
 
 	public static boolean isCountSimilar(ItemStack inPlayerInventory, ItemStack inStoredItems) {
 		if (inPlayerInventory.getAmount() == inStoredItems.getAmount()) {
@@ -235,8 +232,37 @@ public class ItemHandler {
 		return false;
 	}
 	
+	
+	public static boolean hasItem(Player player, ItemStack inStoredItems, String slot) {
+		if (Utils.isInt(slot)) {
+			ItemStack inPlayerInventory = player.getInventory().getItem(Integer.parseInt(slot));
+			if (isSimilar(inPlayerInventory, inStoredItems) && isCountSimilar(inPlayerInventory, inStoredItems)) {
+				return true;
+			}
+		} else if (Utils.isCustomSlot(slot) && Utils.getCustomSlot(player, slot) != null) {
+			ItemStack inPlayerInventory = Utils.getCustomSlot(player, slot);
+			if (isSimilar(inPlayerInventory, inStoredItems) && isCountSimilar(inPlayerInventory, inStoredItems)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public static boolean hasNBTData(ItemStack inPlayerInventory) {
+		if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && ServerHandler.hasAltUpdate("1_8") && inPlayerInventory != null && inPlayerInventory.getType() != Material.AIR && getNBTData(inPlayerInventory) != null) {
+			return true;
+		} else if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") != true || ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && !ServerHandler.hasAltUpdate("1_8")) { 
+				if (inPlayerInventory != null && inPlayerInventory.hasItemMeta() && inPlayerInventory.getItemMeta().hasDisplayName()
+						&& ConfigHandler.decodeSecretData(inPlayerInventory.getItemMeta().getDisplayName()).contains(ConfigHandler.decodeSecretData(ConfigHandler.encodeSecretData(ConfigHandler.getNBTData())))) {
+					return true;
+				}
+		}
+		return false;
+	}
+	
 	public static String getNBTData(ItemStack tempitem) {
-		if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && ServerHandler.hasAltUpdate("1_8")) {
+		if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true 
+				&& ServerHandler.hasAltUpdate("1_8") && tempitem != null && tempitem.getType() != Material.AIR) {
 		try {
 		Class<?> craftItemStack = Reflection.getOBC("inventory.CraftItemStack");
 		Class<?> nmsItemStackClass = Reflection.getNMS("ItemStack");
@@ -306,35 +332,42 @@ public class ItemHandler {
 		}
 		return false;
 	}
+	
+	public static Boolean isOverwrite(Player player) {
+		if (ConfigHandler.getConfig("items.yml").getString("items-Overwrite") != null && WorldHandler.isOverwriteWorld(player.getWorld().getName()) 
+				|| ConfigHandler.getConfig("items.yml").getString("items-Overwrite") != null && ConfigHandler.getConfig("items.yml").getBoolean("items-Overwrite") == true) {
+			return true;
+		}
+		return false;
+	}
 
 	public static Boolean canOverwrite(Player player, String slot, String item) {
-		boolean Overwrite = ConfigHandler.getConfig("items.yml").getBoolean("items-Overwrite");
 		try {
-		if (Overwrite == false && Utils.isInt(slot) && player.getInventory().getItem(Integer.parseInt(slot)) != null) {
+		if (!isOverwrite(player) && Utils.isInt(slot) && player.getInventory().getItem(Integer.parseInt(slot)) != null) {
 			SetItems.putFailCount(player, SetItems.getFailCount().get(player) + 1);
 			ServerHandler.sendDebugMessage("Failed to give; " + item);
 			return false;
-		} else if (Overwrite == false && Utils.isCustomSlot(slot) && slot.equalsIgnoreCase("Arbitrary") && player.getInventory().firstEmpty() == -1) {
+		} else if (!isOverwrite(player) && Utils.isCustomSlot(slot) && slot.equalsIgnoreCase("Arbitrary") && player.getInventory().firstEmpty() == -1) {
 			SetItems.putFailCount(player, SetItems.getFailCount().get(player) + 1);
 			ServerHandler.sendDebugMessage("Failed to give; " + item);
 			return false;
-		} else if (Overwrite == false && Utils.isCustomSlot(slot) && slot.equalsIgnoreCase("Helmet") && player.getInventory().getHelmet() != null) {
+		} else if (!isOverwrite(player) && Utils.isCustomSlot(slot) && slot.equalsIgnoreCase("Helmet") && player.getInventory().getHelmet() != null) {
 			SetItems.putFailCount(player, SetItems.getFailCount().get(player) + 1);
 			ServerHandler.sendDebugMessage("Failed to give; " + item);
 			return false;
-		} else if (Overwrite == false && Utils.isCustomSlot(slot) && slot.equalsIgnoreCase("Chestplate") && player.getInventory().getChestplate() != null) {
+		} else if (!isOverwrite(player) && Utils.isCustomSlot(slot) && slot.equalsIgnoreCase("Chestplate") && player.getInventory().getChestplate() != null) {
 			SetItems.putFailCount(player, SetItems.getFailCount().get(player) + 1);
 			ServerHandler.sendDebugMessage("Failed to give; " + item);
 			return false;
-		} else if (Overwrite == false && Utils.isCustomSlot(slot) && slot.equalsIgnoreCase("Leggings") && player.getInventory().getLeggings() != null) {
+		} else if (!isOverwrite(player) && Utils.isCustomSlot(slot) && slot.equalsIgnoreCase("Leggings") && player.getInventory().getLeggings() != null) {
 			SetItems.putFailCount(player, SetItems.getFailCount().get(player) + 1);
 			ServerHandler.sendDebugMessage("Failed to give; " + item);
 			return false;
-		} else if (Overwrite == false && Utils.isCustomSlot(slot) && slot.equalsIgnoreCase("Boots") && player.getInventory().getBoots() != null) {
+		} else if (!isOverwrite(player) && Utils.isCustomSlot(slot) && slot.equalsIgnoreCase("Boots") && player.getInventory().getBoots() != null) {
 			SetItems.putFailCount(player, SetItems.getFailCount().get(player) + 1);
 			ServerHandler.sendDebugMessage("Failed to give; " + item);
 			return false;
-		} else if (Overwrite == false && Utils.isCustomSlot(slot) && ServerHandler.hasCombatUpdate() && slot.equalsIgnoreCase("Offhand")) {
+		} else if (!isOverwrite(player) && Utils.isCustomSlot(slot) && ServerHandler.hasCombatUpdate() && slot.equalsIgnoreCase("Offhand")) {
 			if (player.getInventory().getItemInOffHand().getType() != Material.AIR) {
 			SetItems.putFailCount(player, SetItems.getFailCount().get(player) + 1);
 			ServerHandler.sendDebugMessage("Failed to give; " + item);

@@ -24,6 +24,7 @@ import me.RockinChaos.itemjoin.utils.Econ;
 import me.RockinChaos.itemjoin.utils.Hooks;
 import me.RockinChaos.itemjoin.utils.Language;
 import me.RockinChaos.itemjoin.utils.Utils;
+import me.RockinChaos.itemjoin.utils.sqlite.SQLData;
 
 public class CommandHandler {
 	private static Map < String, Long > playersOnCooldown = new HashMap < String, Long > ();
@@ -65,10 +66,10 @@ public class CommandHandler {
 			if (ConfigHandler.getConfig("config.yml").getStringList("global-commands") != null) {
 			List <String> commands = ConfigHandler.getConfig("config.yml").getStringList("global-commands");
 			for (String command: commands) {
-				if (!ConfigHandler.hasFirstCommanded(player, command)) {
+				if (!SQLData.hasFirstCommanded(player, command)) {
 				String Command = Utils.format(command, player).replace("first-join: ", "").replace("first-join:", "");
 				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), Command);
-				if (ItemHandler.containsIgnoreCase(command, "first-join:")) { ConfigHandler.saveFirstCommanded(player, command); }
+				if (ItemHandler.containsIgnoreCase(command, "first-join:")) { SQLData.saveToDatabase(player, "NULL", command, ""); }
 				}
 			  }
 			}

@@ -7,9 +7,9 @@ import me.RockinChaos.itemjoin.utils.Reflection;
 
 import org.bukkit.inventory.ItemStack;
 
-public class setUnbreakable {
+public class Unbreakable {
 
-	public static ItemStack Unbreakable(ItemStack item) {
+	public static ItemStack setUnbreakable(ItemStack item) {
 		try {
 			Class<?> craftItemStack = Reflection.getOBC("inventory.CraftItemStack");
 			Method getNMSI = craftItemStack.getMethod("asNMSCopy", ItemStack.class);
