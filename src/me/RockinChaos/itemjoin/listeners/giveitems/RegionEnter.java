@@ -69,7 +69,7 @@ public class RegionEnter implements Listener {
 					removeEnterItems(player, 2);
 					setEnterItems(player, region, 1);
 					SetItems.itemsOverwrite(player);
-					//PlayerHandler.delayUpdateInventory(player, 15L);
+					PlayerHandler.delayUpdateInventory(player, 15L);
 				} catch (NullPointerException e) {
 					if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
 				}

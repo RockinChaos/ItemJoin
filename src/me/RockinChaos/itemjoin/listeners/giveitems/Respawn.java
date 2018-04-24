@@ -59,7 +59,7 @@ public class Respawn implements Listener {
 			public void run() {
 				setJoinItems(player);
 				SetItems.itemsOverwrite(player);
-				//PlayerHandler.delayUpdateInventory(player, 15L);
+				PlayerHandler.delayUpdateInventory(player, 15L);
 			    AnimationHandler.OpenAnimations(player);
 			}
 		}, delay);
