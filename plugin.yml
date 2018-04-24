@@ -52,6 +52,12 @@ commands:
       permission: itemjoin.permissions
       usage: |
           /itemjoin permissions 2
+   itemjoin save <item>:
+      description: Saves the specified item to the items.yml.
+      permission: itemjoin.save
+      usage: |
+          /itemjoin save <item>
+          Example: /itemjoin save special-item - You have saved the item [special-item] to the items.yml.
    itemjoin get <item>:
       description: Gives you the item you specified.
       permission: itemjoin.get
@@ -64,12 +70,6 @@ commands:
       usage: |
           /itemjoin get <item> <player>
           Example: /itemjoin get Ultra RockinChaos - You have given the item [Ultra] to RockinChaos!
-   itemjoin save <item>:
-      description: Saves the specified item to the items.yml.
-      permission: itemjoin.save
-      usage: |
-          /itemjoin save <item>
-          Example: /itemjoin save special-item - You have saved the item [special-item] to the items.yml.
    itemjoin remove <item>:
       description: Removes the item you specified from your inventory.
       permission: itemjoin.remove
@@ -82,6 +82,30 @@ commands:
       usage: |
           /itemjoin remove <item> <player>
           Example: /itemjoin remove Ultra RockinChaos - You have removed the item [Ultra] to RockinChaos!
+   itemjoin enable:
+      description: Enables the use of ItemJoin for all players globally.
+      permission: itemjoin.enable
+      usage: |
+          /itemjoin enable
+          Example: /itemjoin enable - You have globally enabled ItemJoin.
+   itemjoin enable <player>:
+      description: Enables the use of ItemJoin for the specified player.
+      permission: itemjoin.enable.others
+      usage: |
+          /itemjoin enable <player>
+          Example: /itemjoin enable RockinChaos - You have enabled ItemJoin for RockinChaos!
+   itemjoin disable:
+      description: Disables the use of ItemJoin for all players globally.
+      permission: itemjoin.disable
+      usage: |
+          /itemjoin disable
+          Example: /itemjoin disable - You have globally disabled ItemJoin.
+   itemjoin disable <player>:
+      description: Disables the use of ItemJoin for the specified player.
+      permission: itemjoin.disable.others
+      usage: |
+          /itemjoin disable <player>
+          Example: /itemjoin disable RockinChaos - You have disabled ItemJoin for RockinChaos!
    itemjoin getall:
       description: Gives you all ItemJoin items.
       permission: itemjoin.get
@@ -126,6 +150,21 @@ commands:
       permission: itemjoin.creator
       usage: |
           /itemjoin creator
+   itemjoin purge:
+      description: This will purge all data from the database file, removing all first-join players, ip-limited players, enabled/disabled players, and all other player data.
+      permission: itemjoin.purge
+      usage: |
+          /itemjoin purge
+   itemjoin purge first-join <player>:
+      description: This will purge all first-join data for said player from the database file.
+      permission: itemjoin.purge
+      usage: |
+          /itemjoin purge first-join <player>
+   itemjoin purge ip-limits <player>:
+      description: This will purge all ip-limits data for said player from the database file.
+      permission: itemjoin.purge
+      usage: |
+          /itemjoin purge ip-limits <player>
    ij:
       description: Displays a menu giving credit to the creator and the help menu command.
       permission: itemjoin.use
@@ -171,6 +210,12 @@ commands:
       permission: itemjoin.permissions
       usage: |
           /ij permissions 2
+   ij save <item>:
+      description: Saves the specified item to the items.yml.
+      permission: itemjoin.save
+      usage: |
+          /ij save <item>
+          Example: /ij save special-item - You have saved the item [special-item] to the items.yml.
    ij get <item>:
       description: Gives you the item you specified.
       permission: itemjoin.get
@@ -183,12 +228,6 @@ commands:
       usage: |
           /ij get <item> <player>
           Example: /ij get Ultra RockinChaos - You have given the item [Ultra] to RockinChaos!
-   ij save <item>:
-      description: Saves the specified item to the items.yml.
-      permission: itemjoin.save
-      usage: |
-          /ij save <item>
-          Example: /ij save special-item - You have saved the item [special-item] to the items.yml.
    ij remove <item>:
       description: Removes the item you specified from your inventory.
       permission: itemjoin.remove
@@ -201,6 +240,30 @@ commands:
       usage: |
           /ij remove <item> <player>
           Example: /ij remove Ultra RockinChaos - You have removed the item [Ultra] to RockinChaos!
+   ij enable:
+      description: Enables the use of ItemJoin for all players globally.
+      permission: itemjoin.enable
+      usage: |
+          /ij enable
+          Example: /ij enable - You have globally enabled ItemJoin.
+   ij enable <player>:
+      description: Enables the use of ItemJoin for the specified player.
+      permission: itemjoin.enable.others
+      usage: |
+          /ij enable <player>
+          Example: /ij enable RockinChaos - You have enabled ItemJoin for RockinChaos!
+   ij disable:
+      description: Disables the use of ItemJoin for all players globally.
+      permission: itemjoin.disable
+      usage: |
+          /ij disable
+          Example: /ij disable - You have globally disabled ItemJoin.
+   ij disable <player>:
+      description: Disables the use of ItemJoin for the specified player.
+      permission: itemjoin.disable.others
+      usage: |
+          /ij disable <player>
+          Example: /ij disable RockinChaos - You have disabled ItemJoin for RockinChaos!
    ij getall:
       description: Gives you all ItemJoin items.
       permission: itemjoin.get
@@ -212,7 +275,7 @@ commands:
       permission: itemjoin.get.others
       usage: |
           /ij getall <player>
-          Example: /ij getall RockinChaos - You have given RockinChaos all of the ItemJoin items that are available.
+          Example: /ij getall RockinChaos - You+ have given RockinChaos all of the ItemJoin items that are available.
    ij removeall:
       description: Removes all ItemJoin items from your inventory.
       permission: itemjoin.remove
@@ -245,6 +308,21 @@ commands:
       permission: itemjoin.creator
       usage: |
           /ij creator
+   ij purge:
+      description: This will purge all data from the database file, removing all first-join players, ip-limited players, enabled/disabled players, and all other player data.
+      permission: itemjoin.purge
+      usage: |
+          /ij purge
+   ij purge first-join <player>:
+      description: This will purge all first-join data for said player from the database file.
+      permission: itemjoin.purge
+      usage: |
+          /ij purge first-join <player>
+   ij purge ip-limits <player>:
+      description: This will purge all ip-limits data for said player from the database file.
+      permission: itemjoin.purge
+      usage: |
+          /ij purge ip-limits <player>
           
 permissions:
    itemjoin.*:
@@ -261,45 +339,66 @@ permissions:
           itemjoin.reload: true
           itemjoin.updates: true
           itemjoin.autoupdate: true
+          itemjoin.creator: true
+          itemjoin.purge: true
           itemjoin.save: true
           itemjoin.get: true
           itemjoin.get.others: true
           itemjoin.remove: true
           itemjoin.remove.others: true
+          itemjoin.enable: true
+          itemjoin.enable.others: true
+          itemjoin.disable: true
+          itemjoin.disable.others: true
           itemjoin.list: true
    itemjoin.permissions:
       description: Use of the /itemjoin permissions commands.
       default: true
    itemjoin.use:
       description: Currently allows use of basic commands.
-      default: op
+      default: true
    itemjoin.reload:
       description: Allows use of reload command.
-      default: op
+      default: false
    itemjoin.updates:
       description: Use of the /itemjoin updates command.
-      default: op
+      default: false
    itemjoin.autoupdate:
       description: Use of the /itemjoin autoupdate command.
-      default: op
+      default: false
    itemjoin.creator:
-      description: Use of the /itemjoin creator and /itemjoin menu command. (Later, add to itemjoin.all children permissions).
-      default: op
-   itemjoin.get:
-      description: Use of the /itemjoin get <item> command.
-      default: op
+      description: Use of the /itemjoin creator and /itemjoin menu command.
+      default: false
+   itemjoin.purge:
+      description: Use of the /itemjoin purge command.
+      default: false
    itemjoin.save:
       description: Use of the /itemjoin save <item> command.
-      default: op
+      default: false
+   itemjoin.get:
+      description: Use of the /itemjoin get <item> command.
+      default: false
    itemjoin.get.others:
-      description: Use of the /itemjoin get <item> <others> for player command.
-      default: op
+      description: Use of the /itemjoin get <item> <player> for player command.
+      default: false
    itemjoin.remove:
       description: Use of the /itemjoin remove <item> command.
-      default: op
+      default: false
    itemjoin.remove.others:
-      description: Use of the /itemjoin remove <item> <others> for player command.
-      default: op
+      description: Use of the /itemjoin remove <item> <player> for player command.
+      default: false
+   itemjoin.enable:
+      description: Use of the /itemjoin enable global command.
+      default: false
+   itemjoin.enable.others:
+      description: Use of the /itemjoin enable <player> for player command.
+      default: false
+   itemjoin.disable:
+      description: Use of the /itemjoin disable global command.
+      default: false
+   itemjoin.disable.others:
+      description: Use of the /itemjoin disable <player> for player command.
+      default: false
    itemjoin.list:
       description: Use of the /itemjoin list command.
-      default: op
+      default: false
