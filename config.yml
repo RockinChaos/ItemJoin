@@ -9,6 +9,8 @@ CheckForUpdates: true
 Log-Coloration: true
 Log-Commands: true
 Items-Permissions: true
+OPItems-Permissions: false
+OPCommands-Permissions: false
 Debugging-Mode: false
 
 

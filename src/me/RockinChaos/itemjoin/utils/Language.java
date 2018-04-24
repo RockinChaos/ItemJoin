@@ -9,7 +9,7 @@ import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 
 public class Language {
-	private static CommandSender argsplayer;
+	private static Player argsplayer;
 
 	public static void getSendMessage(CommandSender sender, String MessageType, String ReplacementText) {
 		if (ItemJoin.getInstance().getConfig().getString("Language") != null 
@@ -30,7 +30,7 @@ public class Language {
 			Prefix = Utils.format(ConfigHandler.getConfig("en-lang.yml").getString("Prefix"), player);
 			}
 			String sendMessage = Utils.format(ConfigHandler.getConfig("en-lang.yml").getString(MessageType), player);
-				String ReplacementTextList = ReplacementText.replace(" ", "");
+				String ReplacementTextList = ReplacementText;
 				String[] TextSplits = ReplacementTextList.split(",");
 				for (String ReplaceText: TextSplits) {
 			sendMessage = sendMessage.replace("%items%", ReplaceText);
@@ -40,14 +40,20 @@ public class Language {
 					|| MessageType.equalsIgnoreCase("playerTriedGive") || MessageType.equalsIgnoreCase("itemExistsInOthersInventory") || MessageType.equalsIgnoreCase("itemDoesntExistInOthersInventory")) {
 				if (argsplayer != null) {
 				sendMessage = sendMessage.replace("%argsplayer%", argsplayer.getName());
+				sendMessage = sendMessage.replace("%argsplayer_world%", argsplayer.getWorld().getName());
 				}
 			}
+			sendMessage = sendMessage.replace("%purgedata%", ReplaceText);
+			sendMessage = sendMessage.replace("%command%", ReplaceText);
+			sendMessage = sendMessage.replace("%database%", ReplaceText);
 			sendMessage = sendMessage.replace("%argsplayer%", ReplaceText);
+			sendMessage = sendMessage.replace("%argsplayer_world%", ReplaceText);
 			sendMessage = sendMessage.replace("%failcount%", ReplaceText);
 			sendMessage = sendMessage.replace("%failedcount%", ReplaceText);
 			sendMessage = sendMessage.replace("%cost%", ReplaceText);
 			sendMessage = sendMessage.replace("%amount%", ReplaceText);
 			sendMessage = sendMessage.replace("%world%", ReplaceText);
+			sendMessage = sendMessage.replace("main010Warn", "first-join, ip-limit, and various other data");
 				}
 		if (MessageType.equalsIgnoreCase("updateChecking")) {
 			ServerHandler.sendConsoleMessage(sendMessage);
@@ -62,6 +68,6 @@ public class Language {
 	}
 	
 	public static void setArgsPlayer(CommandSender info) {
-		argsplayer = info;
+		argsplayer = (Player)info;
 	}
 }
