@@ -37,4 +37,22 @@ public class WorldHandler {
 		}
 		return false;
 	}
+	
+	public static Boolean isOverwriteWorld(String world) {
+		if (ConfigHandler.getConfig("items.yml").getString("items-Overwrite") != null) {
+			String worldlist = ConfigHandler.getConfig("items.yml").getString("items-Overwrite").replace(" ", "");
+			String[] compareWorlds = worldlist.split(",");
+			for (String compareWorld: compareWorlds) {
+				if (compareWorld.equalsIgnoreCase(world) 
+						|| compareWorld.equalsIgnoreCase("all") 
+						|| compareWorld.equalsIgnoreCase("global")) {
+					return true;
+				}
+			}
+		} else if (ConfigHandler.getConfig("items.yml").getString("items-Overwrite") == null) {
+			return true;
+		}
+		return false;
+	}
+	
 }
