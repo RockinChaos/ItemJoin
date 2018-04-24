@@ -29,8 +29,8 @@ import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.handlers.WorldHandler;
 import me.RockinChaos.itemjoin.utils.Hooks;
-import me.RockinChaos.itemjoin.utils.Language;
 import me.RockinChaos.itemjoin.utils.Utils;
+import me.RockinChaos.itemjoin.utils.sqlite.SQLData;
 
 public class RegionEnter implements Listener {
 	private static HashMap < Player, String > isInRegion = new HashMap < Player, String > ();
@@ -39,7 +39,7 @@ public class RegionEnter implements Listener {
 	@EventHandler
 	public void giveOnRegionEnter(PlayerMoveEvent event) {
 		final Player player = event.getPlayer();
-		if (Hooks.hasWorldGuard() == true) {
+		if (Hooks.hasWorldGuard() == true && SQLData.isEnabled(player)) {
 			if (!isInRegion(player) && isInRegion.get(player) != null) {
 				isInRegion.remove(player);
 				long delay = ConfigHandler.getConfig("items.yml").getInt("items-Delay") * 10L;
@@ -68,16 +68,8 @@ public class RegionEnter implements Listener {
 				try {
 					removeEnterItems(player, 2);
 					setEnterItems(player, region, 1);
-					if (SetItems.getFailCount().get(player) != null && SetItems.getFailCount().get(player) != 0) {
-						boolean Overwrite = ConfigHandler.getConfig("items.yml").getBoolean("items-Overwrite");
-						if (Overwrite == true) {
-							Language.getSendMessage(player, "failedInvFull", SetItems.getFailCount().get(player).toString());
-						} else if (Overwrite == false) {
-							Language.getSendMessage(player, "failedOverwrite", SetItems.getFailCount().get(player).toString());
-						}
-						SetItems.removeFailCount(player);
-					}
-					PlayerHandler.delayUpdateInventory(player, 15L);
+					SetItems.itemsOverwrite(player);
+					//PlayerHandler.delayUpdateInventory(player, 15L);
 				} catch (NullPointerException e) {
 					if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
 				}
@@ -175,9 +167,10 @@ public class RegionEnter implements Listener {
 			ItemHandler.clearItemID(player);
 			for (String slot: slots) {
 				String ItemID = ItemHandler.getItemID(player, slot);
-				if (Utils.isCustomSlot(slot)) {
+				ItemStack inStoredItems = CreateItems.items.get(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + ItemID + item);
+				if (Utils.isCustomSlot(slot) && ItemHandler.isObtainable(player, items, item, slot, ItemID, inStoredItems)) {
 					SetItems.setCustomSlots(player, item, slot, ItemID);
-				} else if (Utils.isInt(slot)) {
+				} else if (Utils.isInt(slot) && ItemHandler.isObtainable(player, items, item, slot, ItemID, inStoredItems)) {
 					SetItems.setInvSlots(player, item, slot, ItemID);
 				}
 			}

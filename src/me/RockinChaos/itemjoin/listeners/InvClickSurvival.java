@@ -16,11 +16,29 @@ import me.RockinChaos.itemjoin.handlers.AnimationHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
+import me.RockinChaos.itemjoin.utils.ItemCreator;
 
 public class InvClickSurvival implements Listener {
 
 	public static Map < String, Boolean > droppedItem = new HashMap < String, Boolean > ();
 	public static Map < String, Boolean > dropClick = new HashMap < String, Boolean > ();
+	
+	@EventHandler
+	public void onItemCreatorOpen(InventoryClickEvent event) {
+		final Player player = (Player) event.getWhoClicked();
+		final ItemStack item = event.getCurrentItem();
+		if (item != null && item.hasItemMeta() 
+				&& item.getItemMeta().hasDisplayName() && item.getItemMeta().getDisplayName().equals(ItemCreator.view)) {
+			ItemCreator.LaunchViewing(player, player.getWorld().getName());
+			
+		}
+		if (player.getOpenInventory().getTopInventory() != null 
+				&& player.getOpenInventory().getTopInventory().getName() != null 
+				&& player.getOpenInventory().getTopInventory().getName().equals(ItemCreator.name)) {
+			event.setCancelled(true);
+		}
+		
+	}
 
 	@EventHandler
 	public void onSurvivalInventoryModify(InventoryClickEvent event) {
@@ -33,12 +51,8 @@ public class InvClickSurvival implements Listener {
 			}
 			if (ItemHandler.containsIgnoreCase(event.getAction().name(), "HOTBAR")) {
 				item = event.getView().getBottomInventory().getItem(event.getHotbarButton());
-				if (item == null) {
-					item = event.getCurrentItem();
-				}
-			} else {
-				item = event.getCurrentItem();
-			}
+				if (item == null) { item = event.getCurrentItem(); }
+			} else { item = event.getCurrentItem(); }
 			if (!ServerHandler.hasCombatUpdate()) {
 				dropClick.put(PlayerHandler.getPlayerID(player), true);
 				ItemStack[] Inv = player.getInventory().getContents().clone();

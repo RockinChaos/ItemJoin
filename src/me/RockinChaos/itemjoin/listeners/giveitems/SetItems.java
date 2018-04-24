@@ -12,55 +12,48 @@ import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.handlers.WorldHandler;
+import me.RockinChaos.itemjoin.utils.Language;
 import me.RockinChaos.itemjoin.utils.Utils;
+import me.RockinChaos.itemjoin.utils.sqlite.SQLData;
 
 public class SetItems {
 	private static HashMap <Player, Integer> failCount = new HashMap <Player, Integer> ();
 
 	public static void setInvSlots(Player player, String item, String slot, String ItemID) {
 		ItemStack inStoredItems = CreateItems.items.get(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + ItemID + item);
-		if (ItemHandler.isObtainable(player, item, slot.toString(), ItemID, inStoredItems)) {
 			player.getInventory().setItem(Integer.parseInt(slot), inStoredItems);
-			ConfigHandler.saveFirstJoined(player, item);
-			ConfigHandler.saveIPLimits(player, item);
-			ServerHandler.sendDebugMessage("Given the Item; " + inStoredItems.getItemMeta().getDisplayName().replace(ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + ItemID), ""));
-		}
+			SQLData.saveAllToDatabase(player, item);
+			ServerHandler.sendDebugMessage("Given the Item; " + item);
 	}
 
 	public static void setCustomSlots(Player player, String item, String slot, String ItemID) {
 		EntityEquipment Equip = player.getEquipment();
 		ItemStack inStoredItems = CreateItems.items.get(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + ItemID + item);
 		if (inStoredItems != null) {
-			if (slot.equalsIgnoreCase("Arbitrary") && ItemHandler.isObtainable(player, item, slot, ItemID, inStoredItems)) {
+			if (slot.equalsIgnoreCase("Arbitrary")) {
 				player.getInventory().addItem(inStoredItems);
-				ServerHandler.sendDebugMessage("Given the Item; " + inStoredItems.getItemMeta().getDisplayName().replace(ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + ItemID), ""));
-				ConfigHandler.saveFirstJoined(player, item);
-				ConfigHandler.saveIPLimits(player, item);
-			} else if (slot.equalsIgnoreCase("Helmet") && ItemHandler.isObtainable(player, item, slot, ItemID, inStoredItems)) {
+				ServerHandler.sendDebugMessage("Given the Item; [" + item + "]");
+				SQLData.saveAllToDatabase(player, item);
+			} else if (slot.equalsIgnoreCase("Helmet")) {
 				Equip.setHelmet(inStoredItems);
-				ServerHandler.sendDebugMessage("Given the Item; " + inStoredItems.getItemMeta().getDisplayName().replace(ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + ItemID), ""));
-				ConfigHandler.saveFirstJoined(player, item);
-				ConfigHandler.saveIPLimits(player, item);
-			} else if (slot.equalsIgnoreCase("Chestplate") && ItemHandler.isObtainable(player, item, slot, ItemID, inStoredItems)) {
+				ServerHandler.sendDebugMessage("Given the Item; [" + item + "]");
+				SQLData.saveAllToDatabase(player, item);
+			} else if (slot.equalsIgnoreCase("Chestplate")) {
 				Equip.setChestplate(inStoredItems);
-				ServerHandler.sendDebugMessage("Given the Item; " + inStoredItems.getItemMeta().getDisplayName().replace(ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + ItemID), ""));
-				ConfigHandler.saveFirstJoined(player, item);
-				ConfigHandler.saveIPLimits(player, item);
-			} else if (slot.equalsIgnoreCase("Leggings") && ItemHandler.isObtainable(player, item, slot, ItemID, inStoredItems)) {
+				ServerHandler.sendDebugMessage("Given the Item; [" + item + "]");
+				SQLData.saveAllToDatabase(player, item);
+			} else if (slot.equalsIgnoreCase("Leggings")) {
 				Equip.setLeggings(inStoredItems);
-				ServerHandler.sendDebugMessage("Given the Item; " + inStoredItems.getItemMeta().getDisplayName().replace(ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + ItemID), ""));
-				ConfigHandler.saveFirstJoined(player, item);
-				ConfigHandler.saveIPLimits(player, item);
-			} else if (slot.equalsIgnoreCase("Boots") && ItemHandler.isObtainable(player, item, slot, ItemID, inStoredItems)) {
+				ServerHandler.sendDebugMessage("Given the Item; [" + item + "]");
+				SQLData.saveAllToDatabase(player, item);
+			} else if (slot.equalsIgnoreCase("Boots")) {
 				Equip.setBoots(inStoredItems);
-				ServerHandler.sendDebugMessage("Given the Item; " + inStoredItems.getItemMeta().getDisplayName().replace(ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + ItemID), ""));
-				ConfigHandler.saveFirstJoined(player, item);
-				ConfigHandler.saveIPLimits(player, item);
-			} else if (ServerHandler.hasCombatUpdate() && slot.equalsIgnoreCase("Offhand") && ItemHandler.isObtainable(player, item, slot, ItemID, inStoredItems)) {
+				ServerHandler.sendDebugMessage("Given the Item; [" + item + "]");
+				SQLData.saveAllToDatabase(player, item);
+			} else if (ServerHandler.hasCombatUpdate() && slot.equalsIgnoreCase("Offhand")) {
 				PlayerHandler.setOffhandItem(player, inStoredItems);
-				ServerHandler.sendDebugMessage("Given the Item; " + inStoredItems.getItemMeta().getDisplayName().replace(ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + ItemID), ""));
-				ConfigHandler.saveFirstJoined(player, item);
-				ConfigHandler.saveIPLimits(player, item);
+				ServerHandler.sendDebugMessage("Given the Item; [" + item + "]");
+				SQLData.saveAllToDatabase(player, item);
 			}
 		}
 	}
@@ -126,6 +119,20 @@ public class SetItems {
 				}
 			}
 			inventoryContents.clear();
+	}
+	
+	public static void itemsOverwrite(Player player) {
+		if (SetItems.getFailCount().get(player) != null && SetItems.getFailCount().get(player) != 0) {
+			if (ConfigHandler.getConfig("items.yml").getString("items-Overwrite") != null && WorldHandler.isOverwriteWorld(player.getWorld().getName()) 
+					|| ConfigHandler.getConfig("items.yml").getString("items-Overwrite") != null && ConfigHandler.getConfig("items.yml").getBoolean("items-Overwrite") == true) {
+				Language.getSendMessage(player, "failedInvFull", SetItems.getFailCount().get(player).toString());
+			} else {
+				Language.getSendMessage(player, "failedOverwrite", SetItems.getFailCount().get(player).toString());
+				}
+			SetItems.removeFailCount(player);
+		}
+		
+		
 	}
 	
 	public static HashMap<Player, Integer> getFailCount() {

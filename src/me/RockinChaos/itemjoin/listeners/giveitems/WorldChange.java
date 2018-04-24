@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import me.RockinChaos.itemjoin.ItemJoin;
@@ -18,8 +19,8 @@ import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.WorldHandler;
 import me.RockinChaos.itemjoin.listeners.InvClickCreative;
 import me.RockinChaos.itemjoin.utils.Hooks;
-import me.RockinChaos.itemjoin.utils.Language;
 import me.RockinChaos.itemjoin.utils.Utils;
+import me.RockinChaos.itemjoin.utils.sqlite.SQLData;
 
 public class WorldChange implements Listener {
 
@@ -58,16 +59,8 @@ public class WorldChange implements Listener {
 		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
 			public void run() {
 				setJoinItems(player);
-				if (SetItems.getFailCount().get(player) != null && SetItems.getFailCount().get(player) != 0) {
-					boolean Overwrite = ConfigHandler.getConfig("items.yml").getBoolean("items-Overwrite");
-					if (Overwrite == true) {
-						Language.getSendMessage(player, "failedInvFull", SetItems.getFailCount().get(player).toString());
-					} else if (Overwrite == false) {
-						Language.getSendMessage(player, "failedOverwrite", SetItems.getFailCount().get(player).toString());
-						}
-					SetItems.removeFailCount(player);
-				}
-				PlayerHandler.delayUpdateInventory(player, 15L);
+				SetItems.itemsOverwrite(player);
+				//PlayerHandler.delayUpdateInventory(player, 15L);
 				AnimationHandler.OpenAnimations(player);
 			}
 		}, delay);
@@ -78,7 +71,7 @@ public class WorldChange implements Listener {
 			for (String item: ConfigHandler.getConfigurationSection().getKeys(false)) {
 				ConfigurationSection items = ConfigHandler.getItemSection(item);
 				final String world = player.getWorld().getName();
-				if (WorldHandler.inWorld(items, world) && PermissionsHandler.hasItemsPermission(items, item, player)) {
+				if (WorldHandler.inWorld(items, world) && PermissionsHandler.hasItemsPermission(items, item, player) && SQLData.isEnabled(player)) {
 					if(ItemHandler.containsIgnoreCase(items.getString(".triggers"), "world-changed") || ItemHandler.containsIgnoreCase(items.getString(".triggers"), "world-change")) {
 					if (items.getString(".slot") != null) {
 						String slotlist = items.getString(".slot").replace(" ", "");
@@ -86,9 +79,10 @@ public class WorldChange implements Listener {
 						ItemHandler.clearItemID(player);
 						for (String slot: slots) {
 							String ItemID = ItemHandler.getItemID(player, slot);
-							if (Utils.isCustomSlot(slot)) {
+							ItemStack inStoredItems = CreateItems.items.get(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + ItemID + item);
+							if (Utils.isCustomSlot(slot) && ItemHandler.isObtainable(player, items, item, slot, ItemID, inStoredItems)) {
 								SetItems.setCustomSlots(player, item, slot, ItemID);
-							} else if (Utils.isInt(slot)) {
+							} else if (Utils.isInt(slot) && ItemHandler.isObtainable(player, items, item, slot, ItemID, inStoredItems)) {
 								SetItems.setInvSlots(player, item, slot, ItemID);
 							}
 						}

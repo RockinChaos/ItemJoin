@@ -9,6 +9,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Statistic;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import de.domedd.betternick.api.nickedplayer.NickedPlayer;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
@@ -97,6 +98,21 @@ public class Utils {
 			return true;
 		}
 		return false;
+	}
+	
+	public static ItemStack getCustomSlot(Player player, String slot) {
+		if (slot.equalsIgnoreCase("Offhand") && ServerHandler.hasCombatUpdate()) {
+		    return player.getInventory().getItemInOffHand();
+		} else if (slot.equalsIgnoreCase("Helmet") ) {
+			return player.getInventory().getHelmet();
+		} else if (slot.equalsIgnoreCase("Chestplate") ) {
+			return player.getInventory().getChestplate();
+		} else if (slot.equalsIgnoreCase("Leggings") ) {
+			return player.getInventory().getLeggings();
+		} else if (slot.equalsIgnoreCase("Boots") ) {
+			return player.getInventory().getBoots();
+		}
+		return null;
 	}
 
 	public static Boolean isConfigurable() {
