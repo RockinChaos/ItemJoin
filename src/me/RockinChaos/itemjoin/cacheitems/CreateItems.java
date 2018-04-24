@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.regex.Matcher;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
@@ -74,33 +76,34 @@ public class CreateItems {
 							short dataValue = ItemHandler.getDataValue(items);
 							int count = ItemHandler.getCount(items);
 							Material tempmat = ItemHandler.getMaterial(items);
-							
 							ItemStack tempitem = new ItemStack(tempmat, count, dataValue);
-							tempitem = setHeadDatabaseSkull(items, tempmat, tempitem);
-							tempitem = setUnbreaking(items, tempitem);
-							tempitem = setDurability(items, tempitem);
-							tempitem = hideDurability(items, tempitem);
-							tempitem = setEnchantments(items, tempitem, player);
-							tempitem = setMapImage(tempitem, tempmat, item, player);
-						    tempitem = setNBTData(tempitem, ItemID, item);
-
-							ItemMeta tempmeta = getTempMeta(tempitem);
-							tempmeta = setName(items, tempmeta, tempitem, player, ItemID, null);
-							tempmeta = setLore(items, tempmeta, player, null);
-							tempmeta = setSkull(items, player, tempmat, tempmeta);
-							tempmeta = setSkullTexture(items, player, tempmat, tempmeta);
-							tempmeta = setPotionEffects(items, tempmat, tempmeta);
-							tempmeta = setTippedArrows(items, tempmat, tempmeta);
-							tempmeta = setBanners(items, tempmat, tempmeta);
-							tempmeta = setFireworks(items, tempmeta, tempmat);
-							tempmeta = setFireChargeColor(items, tempmeta, tempmat);
-							tempmeta = setDye(items, tempmeta, tempmat);
-							tempmeta = setBookAuthor(items, tempmeta, tempmat, player);
-							tempmeta = setBookTitle(items, tempmeta, tempmat, player);
-							tempmeta = setBookGeneration(items, tempmeta, tempmat, player);
-							tempmeta = setBookPages(items, tempmeta, tempmat, player);
-							tempmeta = hideAttributes(items, tempmeta);
-							tempitem.setItemMeta(tempmeta);
+							
+								tempitem = setHeadDatabaseSkull(items, tempmat, tempitem);
+								tempitem = setUnbreaking(items, tempitem);
+								tempitem = setDurability(items, tempitem);
+								tempitem = hideDurability(items, tempitem);
+								tempitem = setEnchantments(items, tempitem, player);
+								tempitem = setMapImage(tempitem, tempmat, item, player);
+								tempitem = setNBTData(items, tempitem, ItemID, item);
+								tempitem = setJSONBookPages(items, tempitem, tempmat, player);
+								
+								ItemMeta tempmeta = getTempMeta(tempitem);							
+								tempmeta = setName(items, tempmeta, tempitem, player, ItemID, null);
+								tempmeta = setLore(items, tempmeta, player, null);
+								tempmeta = setSkull(items, player, tempmat, tempmeta);
+								tempmeta = setSkullTexture(items, player, tempmat, tempmeta);
+								tempmeta = setPotionEffects(items, tempmat, tempmeta);
+								tempmeta = setTippedArrows(items, tempmat, tempmeta);
+								tempmeta = setBanners(items, tempmat, tempmeta);
+								tempmeta = setFireworks(items, tempmeta, tempmat);
+								tempmeta = setFireChargeColor(items, tempmeta, tempmat);
+								tempmeta = setDye(items, tempmeta, tempmat);
+								tempmeta = setBookAuthor(items, tempmeta, tempmat, player);
+								tempmeta = setBookTitle(items, tempmeta, tempmat, player);
+								tempmeta = setBookGeneration(items, tempmeta, tempmat, player);
+								tempmeta = setBookPages(items, tempmeta, tempmat, player);
+								tempmeta = hideAttributes(items, tempmeta);
+								tempitem.setItemMeta(tempmeta);
 							
 							setRegions(items);
 							for (World world: Bukkit.getServer().getWorlds()) {
@@ -155,7 +158,7 @@ public class CreateItems {
 		String ItemFlags = items.getString(".itemflags");
 		if (ItemHandler.containsIgnoreCase(ItemFlags, "unbreakable")) {
 		  try {
-			tempitem = setUnbreakable.Unbreakable(tempitem);
+			tempitem = Unbreakable.setUnbreakable(tempitem);
 		  } catch (Exception e) {
 			  if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
 		  }
@@ -163,8 +166,8 @@ public class CreateItems {
 		return tempitem;
 	}
 	
-	public static ItemStack setNBTData(ItemStack tempitem, String ItemID, String item) {
-		if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true) {
+	public static ItemStack setNBTData(ConfigurationSection items, ItemStack tempitem, String ItemID, String item) {
+		if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && !ItemHandler.containsIgnoreCase(items.getString(".itemflags"), "vanilla")) {
 		try {
 		Class<?> craftItemStack = Reflection.getOBC("inventory.CraftItemStack");
 		Class<?> nmsItemStackClass = Reflection.getNMS("ItemStack");
@@ -205,7 +208,7 @@ public class CreateItems {
 		if (ItemHandler.containsIgnoreCase(ItemFlags, "hide-durability") || ItemHandler.containsIgnoreCase(ItemFlags, "hidedurability") 
 				|| ItemHandler.containsIgnoreCase(ItemFlags, "hide durability") || ItemHandler.containsIgnoreCase(ItemFlags, "durability")) {
 		  try {
-		 	tempitem = setUnbreakable.Unbreakable(tempitem);
+		 	tempitem = Unbreakable.setUnbreakable(tempitem);
 		  } catch (Exception e) {
 			  if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
 		  }
@@ -219,20 +222,21 @@ public class CreateItems {
 			if (nameString != null && items.getString(".name." + nameString) != null) { formatName = items.getString(".name." + nameString); }
 			else if (ConfigHandler.getNameSection(items) != null) { formatName = items.getString(".name." + ConfigHandler.getNameSection(items).getKeys(false).iterator().next()); }
 			formatName = Utils.format("&r" + formatName.replace("<delay:" + Utils.returnInteger(formatName) + ">", ""), player);
-			if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && ServerHandler.hasAltUpdate("1_8")) {
+			if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && ServerHandler.hasAltUpdate("1_8") 
+					|| ItemHandler.containsIgnoreCase(items.getString(".itemflags"), "vanilla") && ServerHandler.hasAltUpdate("1_8")) {
 				tempmeta.setDisplayName(formatName);
-			} else {
+			} else if (!ItemHandler.containsIgnoreCase(items.getString(".itemflags"), "vanilla")) {
 				tempmeta.setDisplayName(formatName + ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + ItemID + items.getName()));
 			}
 		} else {
 			String lookup = ItemHandler.getName(tempitem);
 			String formatName = "";
-			if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && ServerHandler.hasAltUpdate("1_8")) {
-				formatName = Utils.format("&r" + lookup, player);
-			} else {
+			if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && ServerHandler.hasAltUpdate("1_8")
+					|| ItemHandler.containsIgnoreCase(items.getString(".itemflags"), "vanilla") && ServerHandler.hasAltUpdate("1_8")) {
+			} else if (!ItemHandler.containsIgnoreCase(items.getString(".itemflags"), "vanilla")) {
 				formatName = Utils.format("&r" + lookup + ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + ItemID + items.getName()), player);
+				tempmeta.setDisplayName(formatName);
 			}
-			tempmeta.setDisplayName(formatName);
 		}
 		return tempmeta;
 	}
@@ -381,29 +385,109 @@ public class CreateItems {
 	}
 	
 	
-	public static ItemMeta setBookPages(ConfigurationSection items, ItemMeta tempmeta, Material tempmat, Player player) {
-		if (items.getString(".pages") != null && tempmat == Material.WRITTEN_BOOK) {
-			List < String > templist = items.getStringList(".pages");
-			String templist2 = "";
-			templist2 = templist2 + "cleanSlate";
-			for (int k = 0; k < templist.size(); k++) {
-				String pageSetup = (String) templist.get(k);
-				if (ItemHandler.containsIgnoreCase(pageSetup, "newpage: ") || ItemHandler.containsIgnoreCase(pageSetup, "newline: ") 
-						|| ItemHandler.containsIgnoreCase(pageSetup, "newpage:") 
-						|| ItemHandler.containsIgnoreCase(pageSetup, "newline:") || ItemHandler.containsIgnoreCase(pageSetup, ":endthebook:")) {
-					if (ItemHandler.containsIgnoreCase(pageSetup, "newpage: ") && !ItemHandler.containsIgnoreCase(templist2.toString(), "cleanSlate") 
-							|| ItemHandler.containsIgnoreCase(pageSetup, "newpage:") && !ItemHandler.containsIgnoreCase(templist2.toString(), "cleanSlate")) {
-						((BookMeta) tempmeta).addPage(Utils.format(templist2.toString().replace("[", "").replace("]", ""), player));
-						templist2 = "";
-					} else if (ItemHandler.containsIgnoreCase(pageSetup, ":endthebook:")) {
-						((BookMeta) tempmeta).addPage(Utils.format(templist2.toString().replace("[", "").replace("]", ""), player));
-						templist2 = "";
-					} else if (ItemHandler.containsIgnoreCase(templist2.toString(), "cleanSlate")) {
-						templist2 = "";
-					}
-					templist2 = templist2 + pageSetup.replace("newline: ", "\n").replace("newpage: ", "").replace("newline:", "\n").replace("newpage:", "");
-				}
+	public static ItemStack setJSONBookPages(ConfigurationSection items, ItemStack tempitem, Material tempmat, Player player) {
+		if (tempmat == Material.WRITTEN_BOOK && items.getString(".pages") != null && ConfigHandler.getPagesSection(items) != null && ServerHandler.hasAltUpdate("1_8")) {
+
+			Class<?> craftItemStack = Reflection.getOBC("inventory.CraftItemStack");
+			Class<?> NBTBASE = Reflection.getNMS("NBTBase");
+			Method getNMS = null;
+			try { getNMS = craftItemStack.getMethod("asNMSCopy", ItemStack.class); } catch (Exception e) { }
+			Object nms = null;
+			try { nms = getNMS.invoke(null, tempitem); } catch (Exception e) { e.printStackTrace(); }
+			Object pages = null;
+			try { pages = Reflection.getNMS("NBTTagList").getConstructor().newInstance(); } catch (Exception e) { e.printStackTrace(); }
+
+			Object tag = null;
+			try { tag = Reflection.getNMS("NBTTagCompound").getConstructor().newInstance(); } catch (Exception e) { e.printStackTrace(); }
+
+			for (String pageString: ConfigHandler.getPagesSection(items).getKeys(false)) {
+				 List<String> pageList = items.getStringList(".pages." + pageString);
+				 List<String> textBuilder = new ArrayList<String>();
+				 for (int k = 0; k < pageList.size(); k++) {
+						String formatPage = pageList.get(k);
+						if (formatPage.contains("<hover type=\"text\"")) {
+							String result = null;
+							String result2 = null;
+							java.util.regex.Pattern pattern1 = java.util.regex.Pattern.compile(">\"(.*?)\"</hover>");
+							Matcher matcher1 = pattern1.matcher(formatPage);
+						    while (matcher1.find()) { result = matcher1.group(1); }
+							
+							java.util.regex.Pattern pattern2 = java.util.regex.Pattern.compile("value=\"(.*?)\">");
+							Matcher matcher2 = pattern2.matcher(formatPage);
+							while (matcher2.find()) { result2 = matcher2.group(1); }
+							
+							formatPage = formatPage.replace("<hover type=\"text\" value=\"" + result2 + "\">\"" + result + "\"</hover>", "");
+							result2 = Utils.format(result2, player);
+							
+							String hoverBuilder = new String();
+							String hoverString = result2.replace(" <n> ","<n>").replace("<n> ","<n>").replace(" <n>","<n>");
+							String[] hovers = hoverString.split("<n>");
+							for (String hover: hovers) { hoverBuilder = hoverBuilder + hover + "\n"; }
+							
+							formatPage = Utils.format(formatPage, player);
+							result = Utils.format(result, player);
+							String action = "show_text";
+							String textComp = "{\"text\":\"" + result + "\",\"hoverEvent\":{\"action\":\"" + action + "\",\"value\":\"" + hoverBuilder + "\"}}";
+							String newLine = "{\"text\":\"\\n\",\"color\":\"reset\"}";							
+							String textCompExtra = "{\"text\":\"" + formatPage + "\"}";
+
+							textBuilder.add(textComp);
+							textBuilder.add(textCompExtra);
+							textBuilder.add(newLine);
+							
+						} else {
+						formatPage = Utils.format(formatPage, player);
+						String textComp = "{\"text\":\"" + formatPage + "\"}";
+						String newLine = "{\"text\":\"\\n\",\"color\":\"reset\"}";
+						
+						textBuilder.add(textComp);
+						textBuilder.add(newLine);
+						
+						}
+				 }
+				 
+				 Object tagconvert = null;
+				 try { tagconvert = Reflection.getNMS("NBTTagString").getConstructor(String.class).newInstance(textBuilder.toString()); } catch (Exception e) { e.printStackTrace(); }
+				 
+				 try { pages.getClass().getMethod("add", NBTBASE).invoke(pages, tagconvert); } catch (Exception e) { e.printStackTrace(); }
+				 
 			}
+			
+			try { tag.getClass().getMethod("set", String.class, NBTBASE).invoke(tag, "pages", pages); } catch (Exception e) { e.printStackTrace(); }
+			
+	        try { nms.getClass().getMethod("setTag", tag.getClass()).invoke(nms, tag); } catch (Exception e) { e.printStackTrace(); }
+	        
+	        try { tempitem = (ItemStack) craftItemStack.getMethod("asCraftMirror", nms.getClass()).invoke(null, nms); } catch (Exception e) { e.printStackTrace(); }
+		}
+		return tempitem;
+	}
+
+	public static ItemMeta setBookPages(ConfigurationSection items, ItemMeta tempmeta, Material tempmat, Player player) {
+		if (tempmat == Material.WRITTEN_BOOK && items.getString(".pages") != null && ConfigHandler.getPagesSection(items) != null && !ServerHandler.hasAltUpdate("1_8")) {
+		if (items.getString(".pages") != null && tempmat == Material.WRITTEN_BOOK) {
+			for (String pageString: ConfigHandler.getPagesSection(items).getKeys(false)) {
+				 List<String> pageList = items.getStringList(".pages." + pageString);
+				 String saveList = "";
+				 for (int k = 0; k < pageList.size(); k++) {
+						String formatPage = pageList.get(k);
+						if (formatPage.contains("<hover type=\"text\"")) {
+							String result = null;
+							String result2 = null;
+							java.util.regex.Pattern pattern1 = java.util.regex.Pattern.compile(">\"(.*?)\"</hover>");
+							Matcher matcher1 = pattern1.matcher(formatPage);
+						    while (matcher1.find()) { result = matcher1.group(1); }
+							
+							java.util.regex.Pattern pattern2 = java.util.regex.Pattern.compile("value=\"(.*?)\">");
+							Matcher matcher2 = pattern2.matcher(formatPage);
+							while (matcher2.find()) { result2 = matcher2.group(1); }
+							
+							formatPage = formatPage.replace("<hover type=\"text\" value=\"" + result2 + "\">\"" + result + "\"</hover>", result);
+						}
+						saveList = saveList + Utils.format(formatPage, player) + "\n";
+				 }
+					((BookMeta) tempmeta).addPage(saveList);
+			}
+		}
 		}
 		return tempmeta;
 	}
@@ -590,19 +674,20 @@ public class CreateItems {
 		if (!ServerHandler.hasCombatUpdate()) {
 			if (slot.equalsIgnoreCase("Offhand")) {
 				ServerHandler.sendConsoleMessage("&4Your server is running &eMC " + vers + " and this does not have Offhand support!");
-				ServerHandler.sendConsoleMessage("&4Because of this, " + item + " will not be set!");
+				ServerHandler.sendConsoleMessage("&4Therefore, " + item + " will not be set!");
 			} else if (id.equalsIgnoreCase("TIPPED_ARROW") || id.equalsIgnoreCase("440") || id.equalsIgnoreCase("0440")) {
 				ServerHandler.sendConsoleMessage("&4Your server is running &eMC " + vers + " and this does not have the item TIPPED_ARROW!");
-				ServerHandler.sendConsoleMessage("&4Because of this, " + item + " will not be set!");
+				ServerHandler.sendConsoleMessage("&4Therefore, " + item + " will not be set!");
 			} else if (id.equalsIgnoreCase("SPLASH_POTION") || id.equalsIgnoreCase("373") || id.equalsIgnoreCase("0373")) {
 				ServerHandler.sendConsoleMessage("&4Your server is running &eMC " + vers + " and this does not have the item SPLASH_POTION!");
-				ServerHandler.sendConsoleMessage("&4Because of this, " + item + " will not be set!");
+				ServerHandler.sendConsoleMessage("&4Therefore, " + item + " will not be set!");
 			} else if (ItemHandler.getMaterial(items) == null) {
 				ServerHandler.sendConsoleMessage("&4Your server is running &eMC " + vers + " and this does not have the item " + id);
-				ServerHandler.sendConsoleMessage("&4Because of this, " + item + " will not be set!");
+				ServerHandler.sendConsoleMessage("&4Therefore, " + item + " will not be set!");
 			} else {
 				return true;
 			}
+			ServerHandler.sendConsoleMessage("&4You are receiving this notice because this item(s) exists in your items.yml, please remove it!");
 		} else if (isCreatable(item, slot)) {
 			return true;
 		}
