@@ -34,7 +34,7 @@ public class Commands implements CommandExecutor {
 	private static boolean ItemExists = false;
 	public static HashMap < String, Boolean > cmdConfirm = new HashMap < String, Boolean > ();
 	
-	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+	public boolean onCommand(final CommandSender sender, Command cmd, String label, String[] args) {
 		if (args.length == 0) {
 			if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.use") || PermissionsHandler.hasCommandPermission(sender, "itemjoin.*")) {
 				ServerHandler.sendCommandsMessage(sender, "&aItemJoin v" + ItemJoin.getInstance().getDescription().getVersion() + "&e by RockinChaos");
