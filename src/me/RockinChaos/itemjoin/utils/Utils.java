@@ -127,10 +127,11 @@ public class Utils {
 		return false;
 	}
 
-	public static boolean canBypass(Player player, String ItemFlags) {
+	public static boolean canBypass(Player player, String ItemFlags, String itemflag) {
 		boolean Creative = player.getGameMode() == GameMode.CREATIVE;
 		if (ItemHandler.containsIgnoreCase(ItemFlags, "AllowOPBypass") && player.isOp() 
-				|| ItemHandler.containsIgnoreCase(ItemFlags, "CreativeByPass") && Creative) {
+				|| ItemHandler.containsIgnoreCase(ItemFlags, "CreativeByPass") && Creative 
+				|| itemflag.equalsIgnoreCase("inventory-modify") && player.hasPermission("itemjoin.bypass.inventorymodify")) {
 			return true;
 		}
 		return false;

@@ -32,6 +32,21 @@ commands:
       permission: itemjoin.use
       usage: |
           /itemjoin help 4
+   itemjoin help 5:
+      description: Displays the fifth page of the available help menu.
+      permission: itemjoin.use
+      usage: |
+          /itemjoin help 5
+   itemjoin help 6:
+      description: Displays the sixth page of the available help menu.
+      permission: itemjoin.use
+      usage: |
+          /itemjoin help 6
+   itemjoin help 7:
+      description: Displays the seventh page of the available help menu.
+      permission: itemjoin.use
+      usage: |
+          /itemjoin help 7
    itemjoin reload:
       description: Reloads all ItemJoins configuration files and caches any new data.
       permission: itemjoin.reload
@@ -145,11 +160,6 @@ commands:
       permission: itemjoin.autoupdate
       usage: |
           /itemjoin autoupdate
-   itemjoin creator:
-      description: Creator that will allow the user to create and configure the ItemJoin YAML files while in a in game GUI menu.
-      permission: itemjoin.creator
-      usage: |
-          /itemjoin creator
    itemjoin purge:
       description: This will purge all data from the database file, removing all first-join players, ip-limited players, enabled/disabled players, and all other player data.
       permission: itemjoin.purge
@@ -190,6 +200,21 @@ commands:
       permission: itemjoin.use
       usage: |
           /ij help 4
+   ij help 5:
+      description: Displays the fifth page of the available help menu.
+      permission: itemjoin.use
+      usage: |
+          /ij help 5
+   ij help 6:
+      description: Displays the sixth page of the available help menu.
+      permission: itemjoin.use
+      usage: |
+          /ij help 6
+   ij help 7:
+      description: Displays the seventh page of the available help menu.
+      permission: itemjoin.use
+      usage: |
+          /ij help 7
    ij reload:
       description: Reloads all ItemJoins configuration files and caches any new data.
       permission: itemjoin.reload
@@ -303,11 +328,6 @@ commands:
       permission: itemjoin.autoupdate
       usage: |
           /ij autoupdate
-   ij creator:
-      description: Creator that will allow the user to create and configure the ItemJoin YAML files while in a in game GUI menu.
-      permission: itemjoin.creator
-      usage: |
-          /ij creator
    ij purge:
       description: This will purge all data from the database file, removing all first-join players, ip-limited players, enabled/disabled players, and all other player data.
       permission: itemjoin.purge
@@ -339,7 +359,6 @@ permissions:
           itemjoin.reload: true
           itemjoin.updates: true
           itemjoin.autoupdate: true
-          itemjoin.creator: true
           itemjoin.purge: true
           itemjoin.save: true
           itemjoin.get: true
@@ -351,6 +370,7 @@ permissions:
           itemjoin.disable: true
           itemjoin.disable.others: true
           itemjoin.list: true
+          itemjoin.bypass.inventorymodify: false
    itemjoin.permissions:
       description: Use of the /itemjoin permissions commands.
       default: true
@@ -365,9 +385,6 @@ permissions:
       default: false
    itemjoin.autoupdate:
       description: Use of the /itemjoin autoupdate command.
-      default: false
-   itemjoin.creator:
-      description: Use of the /itemjoin creator and /itemjoin menu command.
       default: false
    itemjoin.purge:
       description: Use of the /itemjoin purge command.
@@ -401,4 +418,7 @@ permissions:
       default: false
    itemjoin.list:
       description: Use of the /itemjoin list command.
+      default: false
+   itemjoin.bypass.inventorymodify:
+      description: Players will this permission will bypass any effect that the inventory modify flag has.
       default: false
