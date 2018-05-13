@@ -15,6 +15,7 @@ import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
+import me.RockinChaos.itemjoin.utils.Utils;
 
 public class SQLData {
 	
@@ -232,8 +233,14 @@ public class SQLData {
 							} 
 						}
 					}
-				}	
-				firstJoin.delete();
+				}
+		        File userfiles = new File(ItemJoin.getInstance().getDataFolder() + File.separator + "backup");
+	            if(!userfiles.exists()){
+	                userfiles.mkdirs();
+	            }
+				String newGen = "converted" + Utils.getRandom(0, 100) + "-first-join.yml";
+				File newFile = new File(userfiles, newGen);
+				firstJoin.renameTo(newFile);
 			} catch (Exception e) { ServerHandler.sendDebugMessage("[ERROR] Failed to convert the first-join.yml to the database!");
 				if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }}
 			}
@@ -254,7 +261,13 @@ public class SQLData {
 						}
 					}
 				}	
-				ipLimit.delete();
+		        File userfiles = new File(ItemJoin.getInstance().getDataFolder() + File.separator + "backup");
+	            if(!userfiles.exists()){
+	                userfiles.mkdirs();
+	            }
+				String newGen = "converted" + Utils.getRandom(0, 100) + "-ip-limit.yml";
+				File newFile = new File(userfiles, newGen);
+				ipLimit.renameTo(newFile);
 			} catch (Exception e) { ServerHandler.sendDebugMessage("[ERROR] Failed to convert the ip-limit.yml to the database!");
 				if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }}
 			}
