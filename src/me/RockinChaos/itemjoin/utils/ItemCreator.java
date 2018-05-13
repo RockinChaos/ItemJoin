@@ -24,6 +24,8 @@ public class ItemCreator {
 	public static String create = "§a§nCreate";
 	public static String modify = "§c§nModify";
 	public static String view = "§e§nView";
+	public static String returnMenu = "§c§nReturn to Menu";
+	public static String setTheItem = "§c§lSet The Item";
 	// This is a currently unimplemented feature that is currently in development so it is blocked so only the DEV can work on it.
 	// This will soon be the items GUI creator that allows you to create items in game for ItemJoin!
 	public static void LaunchCreator(CommandSender sender) {
@@ -89,9 +91,63 @@ public class ItemCreator {
 		}
 	  }
 		
+		inv.setItem(0, cMenuItem(returnMenu, "", Material.BARRIER, player)); // set item id, slot and enabled-worlds
         inv.setItem(3, cMenuItem("&c&nPrevious Page", "", Material.ARROW, player));
         inv.setItem(4, cMenuItem("&e&nInfo", worldd + ", Info Stuff, What world, Etc.", Material.BOOK, player));
         inv.setItem(5, cMenuItem("&c&nNext Page", "", Material.ARROW, player));
+        player.openInventory(inv);
+        
+	}
+	
+	
+	
+	
+	public static void LaunchCreating(CommandSender sender, String worldd) {
+		
+		Inventory inv = ItemJoin.getInstance().getServer().createInventory(null, 54, name);
+		
+		Player player = (Player) sender; // add a check to makesure it isnt console and is really a player.
+		
+		inv.setItem(0, cMenuItem(returnMenu, "", Material.BARRIER, player));
+		
+		inv.setItem(4, cMenuItem(setTheItem, "", Material.PAPER, player)); // set item id, slot and enabled-worlds
+		
+		inv.setItem(12, cMenuItem("&cSetup the Name", "", Material.NAME_TAG, player));
+		inv.setItem(13, cMenuItem("&cSetup the Lore", "", Material.BOOK_AND_QUILL, player));
+		inv.setItem(14, cMenuItem("&cSetup the Count", "", Material.DIAMOND, player));
+		inv.setItem(19, cMenuItem("&cSetup the Durability", "", Material.DIAMOND_SWORD, player));
+		inv.setItem(20, cMenuItem("&cSetup the Commands", "", Material.BOOK, player));
+		inv.setItem(21, cMenuItem("&cSetup the Enchantments", "", Material.ENCHANTED_BOOK, player));
+		inv.setItem(22, cMenuItem("&cSetup the ItemFlags", "", Material.CHEST, player));
+		inv.setItem(23, cMenuItem("&cSetup the Triggers", "", Material.REDSTONE, player));
+		inv.setItem(24, cMenuItem("&cSetup the Custom-Permission", "", Material.REDSTONE_TORCH_ON, player));
+		inv.setItem(25, cMenuItem("&cSetup the enabled-regions", "", Material.LONG_GRASS, player));
+		
+        player.openInventory(inv);
+        
+	}
+	
+	public static void LaunchSetupItem(CommandSender sender, String worldd) {
+		
+		Inventory inv = ItemJoin.getInstance().getServer().createInventory(null, 54, name);
+		
+		Player player = (Player) sender; // add a check to makesure it isnt console and is really a player.
+		
+		Material[] allMaterials = Material.values();
+		int s = 0;
+		for (Material mat: allMaterials) {
+			inv.setItem(s, cMenuItem("none", "none", mat, player));
+			if (inv.getItem(s) != null) {
+			s++;
+			}
+			if (s == 45) {
+				break;
+			}
+		}
+		
+		inv.setItem(45, cMenuItem(returnMenu, "", Material.BARRIER, player));
+		inv.setItem(48, cMenuItem("&c&nPrevious Page", "", Material.ARROW, player));
+        inv.setItem(50, cMenuItem("&c&nNext Page", "", Material.ARROW, player));
         player.openInventory(inv);
         
 	}
@@ -106,10 +162,17 @@ public class ItemCreator {
     	
         ItemStack i = new ItemStack(mat, 1);
         ItemMeta iMeta = i.getItemMeta();
+        if (!name.equals("none")) {
         name = Utils.format(name, player);
         iMeta.setDisplayName(name);
+        }
+        if (!lore.equals("none")) {
         iMeta.setLore(loreList);
+        }
+        
+        if (!name.equals("none") && !lore.equals("none")) {
         i.setItemMeta(iMeta);
+        }
         return i;
     }
 

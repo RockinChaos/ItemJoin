@@ -28,7 +28,6 @@ itemExistsInOthersInventory: '&4%argsplayer% &calready has the item &7[&b%item%&
 allItemsExistInOthersInventory: '&4%argsplayer% &calready has all the ItemJoin items!'
 invalidGetUsage: '&cIncorrect usage! Syntax: /itemjoin get <itemname>!'
 correctGetSyntax: '&cYou should use /ItemJoin get <itemname> <player> as console.'
-creatorLaunched: '&aYou have launched the items creator.'
 removedFromYou: '&7[&e%item%&7]&a was removed from your inventory.'
 removedAllFromYou: '&aAll ItemJoin items were removed from your inventory.'
 removedFromPlayer: '&aYou removed &7[&e%item%&7]&a from %argsplayer%.'

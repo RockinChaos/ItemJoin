@@ -97,9 +97,10 @@ items:
       - '&cHow do you create a new page?'
       - ''
       - '&0As displayed to the left in the items.yml'
-      - '&0Use &bnewpage&0 and &cnewline&0 to create your pages.'
-      - '&cnewpage &0will start the next page.'
-      - '&cnewline &0will create a new line for that page.'
+      - '&0Create a number to specify the new page number.'
+      - '&cMakesure you put each number in order as shown.'
+      - '&cCreating new pages should be pretty'
+      - '&cstraight forward for copying and pasting.'
       - '&bItemJoin &0by RockinChaos!'
     itemflags: inventory-modify, death-drops, self-drops
     triggers: join, respawn

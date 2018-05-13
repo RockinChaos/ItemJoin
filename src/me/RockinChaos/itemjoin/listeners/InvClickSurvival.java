@@ -22,23 +22,6 @@ public class InvClickSurvival implements Listener {
 
 	public static Map < String, Boolean > droppedItem = new HashMap < String, Boolean > ();
 	public static Map < String, Boolean > dropClick = new HashMap < String, Boolean > ();
-	
-	@EventHandler
-	public void onItemCreatorOpen(InventoryClickEvent event) {
-		final Player player = (Player) event.getWhoClicked();
-		final ItemStack item = event.getCurrentItem();
-		if (item != null && item.hasItemMeta() 
-				&& item.getItemMeta().hasDisplayName() && item.getItemMeta().getDisplayName().equals(ItemCreator.view)) {
-			ItemCreator.LaunchViewing(player, player.getWorld().getName());
-			
-		}
-		if (player.getOpenInventory().getTopInventory() != null 
-				&& player.getOpenInventory().getTopInventory().getName() != null 
-				&& player.getOpenInventory().getTopInventory().getName().equals(ItemCreator.name)) {
-			event.setCancelled(true);
-		}
-		
-	}
 
 	@EventHandler
 	public void onSurvivalInventoryModify(InventoryClickEvent event) {

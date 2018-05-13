@@ -38,7 +38,7 @@ public class ItemHandler {
 							} else { ItemID = slot; }
 							ItemStack inStoredItems = CreateItems.items.get(world + "." + PlayerHandler.getPlayerID(player) + ".items." + ItemID + item);
 							if (ItemHandler.isSimilar(inPlayerInventory, inStoredItems) && ItemHandler.containsIgnoreCase(ItemFlags, itemflag)) {
-								if (Utils.canBypass(player, ItemFlags)) { return true; } else { return false; }
+								if (Utils.canBypass(player, ItemFlags, itemflag)) { return true; } else { return false; }
 							}
 						}
 					}
