@@ -30,6 +30,7 @@ public class CommandHandler {
 	private static Map < String, Long > playersOnCooldown = new HashMap < String, Long > ();
 	private static HashMap < String, Long > storedSpammedPlayers = new HashMap < String, Long > ();
 	public static HashMap < String, ArrayList<String> > filteredCommands = new HashMap < String, ArrayList<String> > ();
+	public static HashMap < String, Boolean > isActive = new HashMap < String, Boolean > ();
 	private static int cdtime = 0;
 	private static int spamtime = 1;
 
@@ -222,10 +223,14 @@ public class CommandHandler {
 	}
 
 	public static void chargePlayer(ConfigurationSection items, String item, Player player, String action) {
+		if (isActive.get(PlayerHandler.getPlayerID(player)) != null && isActive.get(PlayerHandler.getPlayerID(player)) != true 
+				|| isActive.get(PlayerHandler.getPlayerID(player)) == null) {
+			isActive.put(PlayerHandler.getPlayerID(player), true);
 		if (isChargeable(items) && chargeCost(items, item, player)) {
 			convertCommands(items, item, player, action);
 		} else if (!isChargeable(items)) {
 			convertCommands(items, item, player, action);
+		}
 		}
 	}
 
@@ -338,6 +343,12 @@ public class CommandHandler {
 			}
 			BlockCode(delay, Identify, returnedCommand, returnedIndentity, item, player);
 		}
+		
+		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), (Runnable) new Runnable() {
+			public void run() {
+				isActive.put(PlayerHandler.getPlayerID(player), false);
+			}
+		}, 1L);
 	}
 	
 	
