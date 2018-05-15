@@ -81,6 +81,18 @@ public class PlayerHandler {
 	}
 	
 	@SuppressWarnings("deprecation")
+	public static ItemStack getHandItem(Player player) {
+		if (ServerHandler.hasCombatUpdate() && player.getInventory().getItemInMainHand().getType() != null && player.getInventory().getItemInMainHand().getType() != Material.AIR) {
+			return player.getInventory().getItemInMainHand();
+		} else if (ServerHandler.hasCombatUpdate() && player.getInventory().getItemInOffHand().getType() != null && player.getInventory().getItemInOffHand().getType() != Material.AIR) {
+			return player.getInventory().getItemInOffHand();
+		} else if (!ServerHandler.hasCombatUpdate()) {
+			return player.getInventory().getItemInHand();
+		}
+		return null;
+	}
+	
+	@SuppressWarnings("deprecation")
 	public static void setInHandItem(Player player, ItemStack toSet) {
 		player.getInventory().setItemInHand(toSet);
 	}
@@ -101,6 +113,15 @@ public class PlayerHandler {
 		final GameMode gamemode = player.getGameMode();
 		final GameMode creative = GameMode.CREATIVE;
 		if (gamemode == creative) {
+			return true;
+		}
+		return false;
+	}
+	
+	public static boolean isAdventureMode(Player player) {
+		final GameMode gamemode = player.getGameMode();
+		final GameMode adventure = GameMode.ADVENTURE;
+		if (gamemode == adventure) {
 			return true;
 		}
 		return false;

@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -34,7 +35,20 @@ public class InteractCmds implements Listener {
 		final Player player = event.getPlayer();
 		final String world = player.getWorld().getName();
 		String action = event.getAction().toString();
-		setupCommands(player, world, item, action);
+		if (PlayerHandler.isAdventureMode(player) && !action.contains("LEFT") 
+				|| !PlayerHandler.isAdventureMode(player)) {
+			setupCommands(player, world, item, action);
+		}
+	}
+	
+	@EventHandler
+	public void onAdventureInteractCmds(PlayerAnimationEvent event) {
+		final Player player = event.getPlayer();
+		final String world = player.getWorld().getName();
+		ItemStack item = PlayerHandler.getHandItem(player);
+		if (PlayerHandler.isAdventureMode(player)) {
+			setupCommands(player, world, item, "LEFT_CLICK_AIR");
+		}
 	}
 
 	public void setupCommands(Player player, String world, ItemStack item1, String action) {
