@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -328,6 +329,8 @@ public class CommandHandler {
 		List < String > command = items.getStringList(".commands" + getAction(getMode(action), action, items));
 		playSound(items, player);
 		long delay = 0;
+		String sequence = items.getString(".commands-sequence");
+		HashMap < Integer, String > sequencialCommands = new HashMap < Integer, String > ();
 		for (final String Identify: command) {
 			final String returnedIndentity = returnIdentifier(Identify);
 			final String returnedCommand = hitPlayer(returnCommand(Identify), player);
@@ -341,6 +344,21 @@ public class CommandHandler {
 					if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
 				}
 			}
+			if (sequence != null && ItemHandler.containsIgnoreCase(sequence, "RANDOM")) {
+				String saveCommands = Identify + "a<>a<>a98d<>a<>a" + returnedCommand + "b<>b<>b98d<>b<>b" + returnedIndentity;
+				sequencialCommands.put(Utils.getRandom(1, 100000), saveCommands);
+			} else if (sequence == null || ItemHandler.containsIgnoreCase(sequence, "ALL") || ItemHandler.containsIgnoreCase(sequence, "SEQUENTIAL")) {
+				BlockCode(delay, Identify, returnedCommand, returnedIndentity, item, player);
+			}
+		}
+		
+		if (sequence != null && ItemHandler.containsIgnoreCase(sequence, "RANDOM")) {
+			Entry<?, ?> dedicatedMap = Utils.randomEntry(sequencialCommands);
+			String[] IdentifySplit = dedicatedMap.getValue().toString().split("a<>a<>a98d<>a<>a");
+			String Identify = IdentifySplit[0];
+			String[] returnedCommandSplit = IdentifySplit[1].split("b<>b<>b98d<>b<>b");
+			String returnedCommand = returnedCommandSplit[0];
+			String returnedIndentity = returnedCommandSplit[1];
 			BlockCode(delay, Identify, returnedCommand, returnedIndentity, item, player);
 		}
 		

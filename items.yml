@@ -24,6 +24,7 @@ items:
         - 'say Hello world!'
     commands-type: interact, inventory
     commands-sound: BLOCK_NOTE_PLING
+    commands-sequence: SEQUENTIAL
     commands-cost: 25
     commands-cooldown: 5
     cooldown-message: '&7[&eItemJoin&7] &a[%item%&a] &cis on cooldown for &a%timeleft% &cseconds..'
@@ -142,6 +143,11 @@ items:
     name: '&1Mighty Creeper'
     lore:
       - '&7The creeper is our leader!'
+    commands:
+      multi-click:
+        - 'message: &bWhere is Herobrine?'
+        - 'message: &cWhere is your leader now...?'
+    commands-sequence: RANDOM
     banner-meta: BLUE:BASE, WHITE:CREEPER
     itemflags: hide-attributes, self-drops, CreativeBypass
     triggers: join, respawn, world-change, region-enter

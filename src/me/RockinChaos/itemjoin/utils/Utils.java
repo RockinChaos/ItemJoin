@@ -1,7 +1,10 @@
 package me.RockinChaos.itemjoin.utils;
 
+import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Random;
 
 import org.bukkit.ChatColor;
@@ -113,6 +116,22 @@ public class Utils {
 			return player.getInventory().getBoots();
 		}
 		return null;
+	}
+	
+	public static Entry<?, ?> randomEntry(HashMap<?, ?> map) {
+		try {
+			Field table = HashMap.class.getDeclaredField("table");
+			table.setAccessible(true);
+			Random rand = new Random();
+			Entry<?, ?>[] entries = (Entry[]) table.get(map);
+			int start = rand.nextInt(entries.length);
+	    	for(int i=0;i<entries.length;i++) {
+	    		int idx = (start + i) % entries.length;
+	    		Entry<?, ?> entry = entries[idx];
+	       		if (entry != null) return entry;
+	    	}
+		} catch (Exception e) {}
+	    return null;
 	}
 
 	public static Boolean isConfigurable() {
