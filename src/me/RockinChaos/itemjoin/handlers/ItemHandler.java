@@ -191,9 +191,9 @@ public class ItemHandler {
 	}
 
 	public static boolean isNBTDataSimilar(ItemStack inPlayerInventory, ItemStack inStoredItems) {
-		if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && ServerHandler.hasAltUpdate("1_8") && getNBTData(inPlayerInventory) != null && getNBTData(inStoredItems) != null && getNBTData(inStoredItems).contains(getNBTData(inPlayerInventory))) {
+		if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") != false && ServerHandler.hasAltUpdate("1_8") && getNBTData(inPlayerInventory) != null && getNBTData(inStoredItems) != null && getNBTData(inStoredItems).contains(getNBTData(inPlayerInventory))) {
 			return true;
-		} else if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") != true || ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && !ServerHandler.hasAltUpdate("1_8")) { 
+		} else if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == false || ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") != false && !ServerHandler.hasAltUpdate("1_8")) { 
 				if (inPlayerInventory.hasItemMeta() 
 				&& inPlayerInventory.getItemMeta().hasDisplayName() && inStoredItems.hasItemMeta() && inStoredItems.getItemMeta().hasDisplayName()
 				&& inPlayerInventory.getItemMeta().getDisplayName().contains(ConfigHandler.encodeSecretData(ConfigHandler.getNBTData()))
@@ -249,9 +249,9 @@ public class ItemHandler {
 	}
 	
 	public static boolean hasNBTData(ItemStack inPlayerInventory) {
-		if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && ServerHandler.hasAltUpdate("1_8") && inPlayerInventory != null && inPlayerInventory.getType() != Material.AIR && getNBTData(inPlayerInventory) != null) {
+		if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") != false && ServerHandler.hasAltUpdate("1_8") && inPlayerInventory != null && inPlayerInventory.getType() != Material.AIR && getNBTData(inPlayerInventory) != null) {
 			return true;
-		} else if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") != true || ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && !ServerHandler.hasAltUpdate("1_8")) { 
+		} else if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == false || ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") != false && !ServerHandler.hasAltUpdate("1_8")) { 
 				if (inPlayerInventory != null && inPlayerInventory.hasItemMeta() && inPlayerInventory.getItemMeta().hasDisplayName()
 						&& ConfigHandler.decodeSecretData(inPlayerInventory.getItemMeta().getDisplayName()).contains(ConfigHandler.decodeSecretData(ConfigHandler.encodeSecretData(ConfigHandler.getNBTData())))) {
 					return true;
@@ -261,7 +261,7 @@ public class ItemHandler {
 	}
 	
 	public static String getNBTData(ItemStack tempitem) {
-		if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true 
+		if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") != false 
 				&& ServerHandler.hasAltUpdate("1_8") && tempitem != null && tempitem.getType() != Material.AIR) {
 		try {
 		Class<?> craftItemStack = Reflection.getOBC("inventory.CraftItemStack");

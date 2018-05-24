@@ -167,7 +167,7 @@ public class CreateItems {
 	}
 	
 	public static ItemStack setNBTData(ConfigurationSection items, ItemStack tempitem, String ItemID, String item) {
-		if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && !ItemHandler.containsIgnoreCase(items.getString(".itemflags"), "vanilla")) {
+		if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") != false && !ItemHandler.containsIgnoreCase(items.getString(".itemflags"), "vanilla")) {
 		try {
 		Class<?> craftItemStack = Reflection.getOBC("inventory.CraftItemStack");
 		Class<?> nmsItemStackClass = Reflection.getNMS("ItemStack");
@@ -222,7 +222,7 @@ public class CreateItems {
 			if (nameString != null && items.getString(".name." + nameString) != null) { formatName = items.getString(".name." + nameString); }
 			else if (ConfigHandler.getNameSection(items) != null) { formatName = items.getString(".name." + ConfigHandler.getNameSection(items).getKeys(false).iterator().next()); }
 			formatName = Utils.format("&r" + formatName.replace("<delay:" + Utils.returnInteger(formatName) + ">", ""), player);
-			if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && ServerHandler.hasAltUpdate("1_8") 
+			if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") != false && ServerHandler.hasAltUpdate("1_8") 
 					|| ItemHandler.containsIgnoreCase(items.getString(".itemflags"), "vanilla") && ServerHandler.hasAltUpdate("1_8")) {
 				tempmeta.setDisplayName(formatName);
 			} else if (!ItemHandler.containsIgnoreCase(items.getString(".itemflags"), "vanilla")) {
@@ -231,7 +231,7 @@ public class CreateItems {
 		} else {
 			String lookup = ItemHandler.getName(tempitem);
 			String formatName = "";
-			if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && ServerHandler.hasAltUpdate("1_8")
+			if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") != false && ServerHandler.hasAltUpdate("1_8")
 					|| ItemHandler.containsIgnoreCase(items.getString(".itemflags"), "vanilla") && ServerHandler.hasAltUpdate("1_8")) {
 			} else if (!ItemHandler.containsIgnoreCase(items.getString(".itemflags"), "vanilla")) {
 				formatName = Utils.format("&r" + lookup + ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + ItemID + items.getName()), player);
