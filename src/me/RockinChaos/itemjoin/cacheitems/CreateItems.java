@@ -61,7 +61,8 @@ public class CreateItems {
 	public static Map < String, Integer > probability = new HashMap < String, Integer > ();
 
 	public static void run(Player player) {
-		CreateItems.items.remove(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items.");
+		items.remove(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items.");
+		probability.clear();
 		RegionEnter.resetRegions();
 		RenderImageMaps.clearMaps(player);
 		if (Utils.isConfigurable()) {
@@ -220,7 +221,7 @@ public class CreateItems {
 	
 	public static ItemMeta setProbability(ConfigurationSection items, ItemMeta tempmeta, String item) {
 		if (items.getString(".probability") != null) {
-			String percentageString = items.getString(".probability").replace("%", "").replace(" ", "");
+			String percentageString = items.getString(".probability").replace("%", "").replace("-", "").replace(" ", "");
 			int percentage = Integer.parseInt(percentageString);
 			probability.put(item, percentage);
 		}

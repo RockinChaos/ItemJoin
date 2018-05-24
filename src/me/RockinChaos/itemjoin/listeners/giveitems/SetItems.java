@@ -61,10 +61,13 @@ public class SetItems {
 
 	public static String setProbabilityItems(Player player) {
 		ProbabilityUtilities probabilities = new ProbabilityUtilities();
-		for (String name : CreateItems.probability.keySet()) {
-			probabilities.addChance(name, CreateItems.probability.get(name));
+		if (!CreateItems.probability.isEmpty()) {
+			for (String name : CreateItems.probability.keySet()) {
+				probabilities.addChance(name, CreateItems.probability.get(name));
+			}
+		  return (String) probabilities.getRandomElement();
 		}
-		return (String) probabilities.getRandomElement();
+		return "Disabled";
 	}
 	
 	public static void setHeldItemSlot(Player player) {
