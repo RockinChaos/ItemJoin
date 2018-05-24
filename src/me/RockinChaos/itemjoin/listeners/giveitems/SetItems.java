@@ -13,6 +13,7 @@ import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.handlers.WorldHandler;
 import me.RockinChaos.itemjoin.utils.Language;
+import me.RockinChaos.itemjoin.utils.ProbabilityUtilities;
 import me.RockinChaos.itemjoin.utils.Utils;
 import me.RockinChaos.itemjoin.utils.sqlite.SQLData;
 
@@ -56,6 +57,14 @@ public class SetItems {
 				SQLData.saveAllToDatabase(player, item);
 			}
 		}
+	}
+
+	public static String setProbabilityItems(Player player) {
+		ProbabilityUtilities probabilities = new ProbabilityUtilities();
+		for (String name : CreateItems.probability.keySet()) {
+			probabilities.addChance(name, CreateItems.probability.get(name));
+		}
+		return (String) probabilities.getRandomElement();
 	}
 	
 	public static void setHeldItemSlot(Player player) {

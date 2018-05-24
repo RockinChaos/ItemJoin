@@ -69,13 +69,15 @@ public class PlayerJoin implements Listener {
 	}
 	
 	public static void setJoinItems(Player player) {
+		String nameProbability = SetItems.setProbabilityItems(player);
 		if (Utils.isConfigurable()) {
 			for (String item: ConfigHandler.getConfigurationSection().getKeys(false)) {
 				ConfigurationSection items = ConfigHandler.getItemSection(item);
 				final String world = player.getWorld().getName();
 				if (WorldHandler.inWorld(items, world) && PermissionsHandler.hasItemsPermission(items, item, player) && SQLData.isEnabled(player)) {
 					if(ItemHandler.containsIgnoreCase(items.getString(".triggers"), "join") || ItemHandler.containsIgnoreCase(items.getString(".triggers"), "on-join") || items.getString(".triggers") == null) {
-					if (items.getString(".slot") != null) {
+					  if (items.getString(".probability") != null && item.equalsIgnoreCase(nameProbability) || items.getString(".probability") == null) {
+						if (items.getString(".slot") != null) {
 						String slotlist = items.getString(".slot").replace(" ", "");
 						String[] slots = slotlist.split(",");
 						ItemHandler.clearItemID(player);
@@ -90,6 +92,7 @@ public class PlayerJoin implements Listener {
 						}
 					}
 				}
+			  }
 			}
 		}
 	  }

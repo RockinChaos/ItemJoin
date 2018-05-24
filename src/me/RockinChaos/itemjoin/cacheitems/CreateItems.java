@@ -58,6 +58,7 @@ import me.arcaniax.hdb.api.HeadDatabaseAPI;
 
 public class CreateItems {
 	public static Map < String, ItemStack > items = new HashMap < String, ItemStack > ();
+	public static Map < String, Integer > probability = new HashMap < String, Integer > ();
 
 	public static void run(Player player) {
 		CreateItems.items.remove(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items.");
@@ -90,6 +91,7 @@ public class CreateItems {
 								ItemMeta tempmeta = getTempMeta(tempitem);							
 								tempmeta = setName(items, tempmeta, tempitem, player, ItemID, null);
 								tempmeta = setLore(items, tempmeta, player, null);
+								tempmeta = setProbability(items, tempmeta, item);
 								tempmeta = setSkull(items, player, tempmat, tempmeta);
 								tempmeta = setSkullTexture(items, player, tempmat, tempmeta);
 								tempmeta = setPotionEffects(items, tempmat, tempmeta);
@@ -214,6 +216,15 @@ public class CreateItems {
 		  }
 		}
 		return tempitem;
+	}
+	
+	public static ItemMeta setProbability(ConfigurationSection items, ItemMeta tempmeta, String item) {
+		if (items.getString(".probability") != null) {
+			String percentageString = items.getString(".probability").replace("%", "").replace(" ", "");
+			int percentage = Integer.parseInt(percentageString);
+			probability.put(item, percentage);
+		}
+		return tempmeta;
 	}
 
 	public static ItemMeta setName(ConfigurationSection items, ItemMeta tempmeta, ItemStack tempitem, Player player, String ItemID, String nameString) {

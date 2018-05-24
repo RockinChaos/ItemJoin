@@ -248,6 +248,25 @@ items:
     slot: 28, 30, 32, 34, 18, 19, 21, 23, 25, 26
     name: '&f'
     data-value: 4
+    probability: 50
+    itemflags: inventory-modify, placement, death-drops, self-drops
+    triggers: join, world-change
+    enabled-worlds: world, world_nether, world_the_end
+  filler-pane-item-three:
+    id: 160
+    slot: 28, 30, 32, 34, 18, 19, 21, 23, 25, 26
+    name: '&f'
+    data-value: 3
+    probability: 80
+    itemflags: inventory-modify, placement, death-drops, self-drops
+    triggers: join, world-change
+    enabled-worlds: world, world_nether, world_the_end
+  filler-pane-item-four:
+    id: 160
+    slot: 28, 30, 32, 34, 18, 19, 21, 23, 25, 26
+    name: '&f'
+    data-value: 6
+    probability: 10
     itemflags: inventory-modify, placement, death-drops, self-drops
     triggers: join, world-change
     enabled-worlds: world, world_nether, world_the_end

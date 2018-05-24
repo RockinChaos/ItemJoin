@@ -137,6 +137,7 @@ public class RegionEnter implements Listener {
 	}
 	
 	public static void setEnterItems(Player player, String region, int step) {
+		String nameProbability = SetItems.setProbabilityItems(player);
 		if (Utils.isConfigurable()) {
 			for (String item: ConfigHandler.getConfigurationSection().getKeys(false)) {
 				ConfigurationSection items = ConfigHandler.getItemSection(item);
@@ -145,13 +146,13 @@ public class RegionEnter implements Listener {
 					if (step == 1) {
 						if (ItemHandler.containsIgnoreCase(items.getString(".triggers"), "region-enter") || ItemHandler.containsIgnoreCase(items.getString(".triggers"), "region enter") || ItemHandler.containsIgnoreCase(items.getString(".triggers"), "enter-region") || ItemHandler.containsIgnoreCase(items.getString(".triggers"), "enter region")) {
 							if (ItemHandler.containsIgnoreCase(items.getString(".enabled-regions"), region)) {
-								toEnter(items, item, player);
+								toEnter(items, item, player, nameProbability);
 							}
 						}
 					} else if (step == 2) {
 						if (ItemHandler.containsIgnoreCase(items.getString(".triggers"), "region-remove") || ItemHandler.containsIgnoreCase(items.getString(".triggers"), "region remove") || ItemHandler.containsIgnoreCase(items.getString(".triggers"), "remove-region") || ItemHandler.containsIgnoreCase(items.getString(".triggers"), "remove region")) {
 							if (!ItemHandler.containsIgnoreCase(items.getString(".enabled-regions"), region)) {
-								toEnter(items, item, player);
+								toEnter(items, item, player, nameProbability);
 							}
 						}
 					}
@@ -160,7 +161,8 @@ public class RegionEnter implements Listener {
 		}
 	}
 	
-	public static void toEnter(ConfigurationSection items, String item, Player player) {
+	public static void toEnter(ConfigurationSection items, String item, Player player, String nameProbability) {
+	  if (items.getString(".probability") != null && item.equalsIgnoreCase(nameProbability) || items.getString(".probability") == null) {
 		if (items.getString(".slot") != null) {
 			String slotlist = items.getString(".slot").replace(" ", "");
 			String[] slots = slotlist.split(",");
@@ -175,6 +177,7 @@ public class RegionEnter implements Listener {
 				}
 			}
 		}
+	  }
 	}
 	
 	public static boolean isInRegion(Player player) {

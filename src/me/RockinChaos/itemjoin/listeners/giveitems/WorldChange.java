@@ -67,12 +67,14 @@ public class WorldChange implements Listener {
 	}
 	
 	public static void setJoinItems(Player player) {
+		String nameProbability = SetItems.setProbabilityItems(player);
 		if (Utils.isConfigurable()) {
 			for (String item: ConfigHandler.getConfigurationSection().getKeys(false)) {
 				ConfigurationSection items = ConfigHandler.getItemSection(item);
 				final String world = player.getWorld().getName();
 				if (WorldHandler.inWorld(items, world) && PermissionsHandler.hasItemsPermission(items, item, player) && SQLData.isEnabled(player)) {
 					if(ItemHandler.containsIgnoreCase(items.getString(".triggers"), "world-changed") || ItemHandler.containsIgnoreCase(items.getString(".triggers"), "world-change")) {
+				    if (items.getString(".probability") != null && item.equalsIgnoreCase(nameProbability) || items.getString(".probability") == null) {
 					if (items.getString(".slot") != null) {
 						String slotlist = items.getString(".slot").replace(" ", "");
 						String[] slots = slotlist.split(",");
@@ -88,6 +90,7 @@ public class WorldChange implements Listener {
 						}
 					}
 				}
+			  }
 			}
 		}
 	  }
