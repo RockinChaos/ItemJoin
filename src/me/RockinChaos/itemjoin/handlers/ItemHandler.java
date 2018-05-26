@@ -278,7 +278,7 @@ public class ItemHandler {
 			if (data1 != null && data2 != null && data1 != "" && data2 != "") {
 				return data1 + " " + data2;
 			} else if (data != null && data != "") { 
-				return data;
+				return data.replace("Slot: ", "");
 			}
 		} 
 		} catch (Exception e) {
