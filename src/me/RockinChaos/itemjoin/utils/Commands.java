@@ -193,8 +193,8 @@ public class Commands implements CommandExecutor {
 				Language.getSendMessage(sender, "noPermission", "");
 				return true;
 			}
-		} else if (args.length >= 2 && args[0].equalsIgnoreCase("purge") && args[1].equalsIgnoreCase("ip-limits") 
-				|| args.length >= 2 && args[0].equalsIgnoreCase("purge") && args[1].equalsIgnoreCase("first-join")) {
+		} else if (args.length >= 3 && args[0].equalsIgnoreCase("purge") && args[1].equalsIgnoreCase("ip-limits") 
+				|| args.length >= 3 && args[0].equalsIgnoreCase("purge") && args[1].equalsIgnoreCase("first-join")) {
 			if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.purge") || PermissionsHandler.hasCommandPermission(sender, "itemjoin.*")) {
 				OfflinePlayer player = PlayerHandler.getOfflinePlayer(args[2]);
 				if (player == null) {
@@ -213,7 +213,7 @@ public class Commands implements CommandExecutor {
 				} else if (cmdConfirm.get(2 + sender.getName()) == null && args[1].equalsIgnoreCase("ip-limits")) {
 					cmdConfirm.put(2 + sender.getName(), true);
 					Language.getSendMessage(sender, "databasePurgeWarn", "ip-limits data for " + args[2]);
-					Language.getSendMessage(sender, "databasePurgeConfirm", "/ij purge first-join <player>");
+					Language.getSendMessage(sender, "databasePurgeConfirm", "/ij purge ip-limits <player>");
 					new BukkitRunnable() {
 						public void run() {
 							if (cmdConfirm.get(2 + sender.getName()) != null && cmdConfirm.get(2 + sender.getName()).equals(true)) {
