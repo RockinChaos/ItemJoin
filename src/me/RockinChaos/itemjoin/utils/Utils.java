@@ -15,6 +15,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import de.domedd.betternick.api.nickedplayer.NickedPlayer;
+import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
@@ -150,7 +151,7 @@ public class Utils {
 		boolean Creative = player.getGameMode() == GameMode.CREATIVE;
 		if (ItemHandler.containsIgnoreCase(ItemFlags, "AllowOPBypass") && player.isOp() 
 				|| ItemHandler.containsIgnoreCase(ItemFlags, "CreativeByPass") && Creative 
-				|| itemflag.equalsIgnoreCase("inventory-modify") && player.hasPermission("itemjoin.bypass.inventorymodify")) {
+				|| itemflag.equalsIgnoreCase("inventory-modify") && player.hasPermission("itemjoin.bypass.inventorymodify") && ItemJoin.getInstance().getConfig().getBoolean("InventoryBypass-Permission") == true) {
 			return true;
 		}
 		return false;
