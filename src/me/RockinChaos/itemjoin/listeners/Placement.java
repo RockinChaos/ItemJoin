@@ -11,6 +11,7 @@ import me.RockinChaos.itemjoin.utils.Utils;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
@@ -24,17 +25,17 @@ import org.bukkit.inventory.ItemStack;
 public class Placement implements Listener{
 
 	 @EventHandler
-	  public void onPreventPlayerPlace(PlayerInteractEvent event) 
-	  {
-	    ItemStack item = event.getItem();
-	    final Player player = event.getPlayer();
-	    String itemflag = "placement";
-	      if (event.getAction() == Action.RIGHT_CLICK_BLOCK && !ItemHandler.isAllowedItem(player, item, itemflag) && item.getType().isBlock())
-	      {
-	        event.setCancelled(true);
-	        PlayerHandler.updateInventory(player);
-	 }
-}
+	  public void onPreventPlayerPlace(PlayerInteractEvent event) {
+		 ItemStack item = event.getItem();
+		 final Player player = event.getPlayer();
+		 String itemflag = "placement";
+		 	if (event.getAction() == Action.RIGHT_CLICK_BLOCK && !ItemHandler.isAllowedItem(player, item, itemflag)) {
+		 		if (item.getType().isBlock() || item.getType() == Material.SKULL_ITEM) {
+		 			event.setCancelled(true);
+		 			PlayerHandler.updateInventory(player);
+		 		}
+		 	}
+	 	}
 
 		@EventHandler
 		public void onCountLock(PlayerInteractEvent event) {
