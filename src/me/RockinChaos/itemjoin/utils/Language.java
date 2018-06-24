@@ -9,7 +9,7 @@ import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 
 public class Language {
-	private static Player argsplayer;
+	private static CommandSender argsplayer;
 
 	public static void getSendMessage(CommandSender sender, String MessageType, String ReplacementText) {
 		if (ItemJoin.getInstance().getConfig().getString("Language") != null 
@@ -40,7 +40,11 @@ public class Language {
 					|| MessageType.equalsIgnoreCase("playerTriedGive") || MessageType.equalsIgnoreCase("itemExistsInOthersInventory") || MessageType.equalsIgnoreCase("itemDoesntExistInOthersInventory")) {
 				if (argsplayer != null) {
 				sendMessage = sendMessage.replace("%argsplayer%", argsplayer.getName());
-				sendMessage = sendMessage.replace("%argsplayer_world%", argsplayer.getWorld().getName());
+					if (sender instanceof Player) {
+						sendMessage = sendMessage.replace("%argsplayer_world%", ((Player)argsplayer).getWorld().getName());
+					} else {
+						sendMessage = sendMessage.replace("%argsplayer_world%", "Console");
+					}
 				}
 			}
 			sendMessage = sendMessage.replace("%purgedata%", ReplaceText);
@@ -68,6 +72,6 @@ public class Language {
 	}
 	
 	public static void setArgsPlayer(CommandSender info) {
-		argsplayer = (Player)info;
+			argsplayer = info;
 	}
 }
