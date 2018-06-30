@@ -65,7 +65,7 @@ public class Placement implements Listener{
 	            } else { item = PlayerHandler.getPerfectHandItem(event.getPlayer(), ""); }
 	    	    final Player player = event.getPlayer();
 	    	    String itemflag = "placement";
-	    	      if (!ItemHandler.isAllowedItem(player, item, itemflag) && item.getType().isBlock())
+	    	      if (!ItemHandler.isAllowedItem(player, item, itemflag))
 	    	      {
 	    	        event.setCancelled(true);
 	    	        PlayerHandler.updateInventory(player);
