@@ -579,8 +579,7 @@ public class CreateItems {
 	
 	public static ItemMeta setPotionEffects(ConfigurationSection items, Material tempmat, ItemMeta tempmeta) {
 		if (items.getString(".potion-effect") != null) {
-			if (tempmat == Material.POTION || ServerHandler.hasCombatUpdate() 
-					&& tempmat == Material.SPLASH_POTION || ServerHandler.hasCombatUpdate() && tempmat == Material.LINGERING_POTION) {
+			if (tempmat == Material.POTION || tempmat == Material.SPLASH_POTION || ServerHandler.hasCombatUpdate() && tempmat == Material.LINGERING_POTION) {
 				String potionlist = items.getString(".potion-effect").replace(" ", "");
 				String[] potions = potionlist.split(",");
 				for (String potion: potions) {
@@ -690,8 +689,8 @@ public class CreateItems {
 			} else if (id.equalsIgnoreCase("TIPPED_ARROW") || id.equalsIgnoreCase("440") || id.equalsIgnoreCase("0440")) {
 				ServerHandler.sendConsoleMessage("&4Your server is running &eMC " + vers + " and this does not have the item TIPPED_ARROW!");
 				ServerHandler.sendConsoleMessage("&4Therefore, " + item + " will not be set!");
-			} else if (id.equalsIgnoreCase("SPLASH_POTION") || id.equalsIgnoreCase("373") || id.equalsIgnoreCase("0373")) {
-				ServerHandler.sendConsoleMessage("&4Your server is running &eMC " + vers + " and this does not have the item SPLASH_POTION!");
+			} else if (id.equalsIgnoreCase("LINGERING_POTION") || id.equalsIgnoreCase("441") || id.equalsIgnoreCase("0441")) {
+				ServerHandler.sendConsoleMessage("&4Your server is running &eMC " + vers + " and this does not have the item LINGERING_POTION!");
 				ServerHandler.sendConsoleMessage("&4Therefore, " + item + " will not be set!");
 			} else if (ItemHandler.getMaterial(items) == null) {
 				ServerHandler.sendConsoleMessage("&4Your server is running &eMC " + vers + " and this does not have the item " + id);
@@ -729,7 +728,7 @@ public class CreateItems {
 		} else if (ServerHandler.hasCombatUpdate() && !ItemJoin.getInstance().getServer().getVersion().contains("(MC: 1.9)") 
 				&& isComparable(tempitem, "TIPPED_ARROW")) {
 			return (PotionMeta) tempitem.getItemMeta();
-		} else if (isComparable(tempitem, "POTION") || ServerHandler.hasCombatUpdate() && isComparable(tempitem, "SPLASH_POTION") 
+		} else if (isComparable(tempitem, "POTION") || isComparable(tempitem, "SPLASH_POTION") 
 				|| ServerHandler.hasCombatUpdate() && isComparable(tempitem, "LINGERING_POTION")) {
 			return (PotionMeta) tempitem.getItemMeta();
 		}
