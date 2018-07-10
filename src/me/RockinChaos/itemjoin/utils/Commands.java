@@ -612,6 +612,7 @@ public class Commands implements CommandExecutor {
 		} else if (args.length == 2 && args[0].equalsIgnoreCase("get")) {
 			if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.get") || PermissionsHandler.hasCommandPermission(sender, "itemjoin.*")) {
 				if (!(sender instanceof ConsoleCommandSender)) {
+					Language.setArgsPlayer(null);
 					reAddItem((Player) sender, null, args[1]);
 					PlayerHandler.updateInventory((Player) sender);
 					AnimationHandler.OpenAnimations((Player) sender);
@@ -650,6 +651,7 @@ public class Commands implements CommandExecutor {
 		} else if (args[0].equalsIgnoreCase("getall")) {
 			if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.get") || PermissionsHandler.hasCommandPermission(sender, "itemjoin.*")) {
 				if (!(sender instanceof ConsoleCommandSender)) {
+					Language.setArgsPlayer(null);
 					reAddItem((Player) sender, null, "00a40gh392bd938d4");
 					PlayerHandler.updateInventory((Player) sender);
 					AnimationHandler.OpenAnimations((Player) sender);
@@ -679,6 +681,7 @@ public class Commands implements CommandExecutor {
 		} else if (args.length == 2 && args[0].equalsIgnoreCase("remove")) {
 			if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.remove") || PermissionsHandler.hasCommandPermission(sender, "itemjoin.*")) {
 				if (!(sender instanceof ConsoleCommandSender)) {
+					Language.setArgsPlayer(null);
 					removeItem((Player) sender, null, args[1]);
 					PlayerHandler.updateInventory((Player) sender);
 					return true;
@@ -714,8 +717,9 @@ public class Commands implements CommandExecutor {
 			}
 		} else if (args[0].equalsIgnoreCase("removeall")) {
 			if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.remove") || PermissionsHandler.hasCommandPermission(sender, "itemjoin.*")) {
-				if (!(sender instanceof ConsoleCommandSender)) {
-					removeItem((Player) sender, null, "00a40gh392bd938d4");
+				if (sender instanceof Player) {
+					Language.setArgsPlayer(null);
+					removeItem((Player) sender, null, "00a40gh392bd938d4noother");
 					PlayerHandler.updateInventory((Player) sender);
 					return true;
 				} else if (sender instanceof ConsoleCommandSender) {
@@ -755,7 +759,8 @@ public class Commands implements CommandExecutor {
 	}
 
 	public static void reAddItem(Player player, CommandSender OtherPlayer, String itemName) {
-		Boolean hasRan = false;
+		Boolean Success = false;
+		Boolean MissingPerms = false;
 		ItemExists = false;
 		if (Utils.isConfigurable()) {
 			for (String item: ConfigHandler.getConfigurationSection().getKeys(false)) {
@@ -770,50 +775,23 @@ public class Commands implements CommandExecutor {
 							if (Utils.isCustomSlot(slot)) {
 								ItemStack inStoredItems = CreateItems.items.get(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + ItemID + item);
 								if (!ItemHandler.hasItem(player, inStoredItems)) {
-								SetItems.setCustomSlots(player, item, slot, ItemID);
-								if (hasRan != true) {
-								Language.getSendMessage(player, "givenAllToYou", "&eAll Items");
-								hasRan = true;
-								if (Language.getArgsPlayer() != null) {
-									Language.setArgsPlayer(player);
-									Language.getSendMessage(OtherPlayer, "givenAllToPlayer", "&eAll Items");
-									Language.setArgsPlayer(null);
-								}
-								}
-								} else if (hasRan != true) {
-									hasRan = true;
-									if (Language.getArgsPlayer() != null) {
-										Language.getSendMessage(player, "playerTriedGiveAllItems", "All Items");
-										Language.setArgsPlayer(player);
-										Language.getSendMessage(OtherPlayer, "allItemsExistInOthersInventory", "All Items");
-										Language.setArgsPlayer(null);
+									if (!(ConfigHandler.getConfig("config.yml").getBoolean("GetItem-Permissions")) || PermissionsHandler.hasItemsPermission(items, item, player) && ConfigHandler.getConfig("config.yml").getBoolean("GetItem-Permissions")) {
+										SetItems.setCustomSlots(player, item, slot, ItemID);
+										Success = true;
 									} else {
-										Language.getSendMessage(player, "allItemsExistInInventory", "All Items");
+										MissingPerms = true;
 									}
+						
 								}
 								ItemExists = true;
 							} else if (Utils.isInt(slot)) {
 								ItemStack inStoredItems = CreateItems.items.get(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + ItemID + item);
 								if (!ItemHandler.hasItem(player, inStoredItems)) {
-								SetItems.setInvSlots(player, item, slot, ItemID);
-								if (hasRan != true) {
-								Language.getSendMessage(player, "givenAllToYou", "&eAll Items");
-								hasRan = true;
-								if (Language.getArgsPlayer() != null) {
-									Language.setArgsPlayer(player);
-									Language.getSendMessage(OtherPlayer, "givenAllToPlayer", "&eAll Items");
-									Language.setArgsPlayer(null);
-								}
-								}
-								} else if (hasRan != true) {
-									hasRan = true;
-									if (Language.getArgsPlayer() != null) {
-										Language.getSendMessage(player, "playerTriedGiveAllItems", "All Items");
-										Language.setArgsPlayer(player);
-										Language.getSendMessage(OtherPlayer, "allItemsExistInOthersInventory", "All Items");
-										Language.setArgsPlayer(null);
+									if (!(ConfigHandler.getConfig("config.yml").getBoolean("GetItem-Permissions")) || PermissionsHandler.hasItemsPermission(items, item, player) && ConfigHandler.getConfig("config.yml").getBoolean("GetItem-Permissions")) {
+										SetItems.setInvSlots(player, item, slot, ItemID);
+										Success = true;
 									} else {
-										Language.getSendMessage(player, "allItemsExistInInventory", "All Items");
+										MissingPerms = true;
 									}
 								}
 								ItemExists = true;
@@ -821,7 +799,17 @@ public class Commands implements CommandExecutor {
 						} else {
 						ItemStack inStoredItems = CreateItems.items.get(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + ItemID + itemName);
 						if (inStoredItems != null && item.equalsIgnoreCase(itemName) && Utils.isCustomSlot(slot) && !ItemHandler.hasItem(player, inStoredItems) && ItemHandler.canOverwrite(player, slot, item)) {
-							SetItems.setCustomSlots(player, item, slot, ItemID);
+							if (!(ConfigHandler.getConfig("config.yml").getBoolean("GetItem-Permissions")) || PermissionsHandler.hasItemsPermission(items, item, player) && ConfigHandler.getConfig("config.yml").getBoolean("GetItem-Permissions")) {
+								SetItems.setCustomSlots(player, item, slot, ItemID);
+							} else {
+								if (OtherPlayer != null) {
+									Language.setArgsPlayer(player);
+									Language.getSendMessage(OtherPlayer, "givenToPlayerNoPerms", inStoredItems.getItemMeta().getDisplayName());
+								} else {
+									Language.getSendMessage(player, "givenNoPerms", inStoredItems.getItemMeta().getDisplayName());
+								}
+								return;
+							}
 							Language.getSendMessage(player, "givenToYou", inStoredItems.getItemMeta().getDisplayName());
 							if (Language.getArgsPlayer() != null) {
 								Language.setArgsPlayer(player);
@@ -830,15 +818,26 @@ public class Commands implements CommandExecutor {
 							}
 							ItemExists = true;
 						} else if (inStoredItems != null && item.equalsIgnoreCase(itemName) && Utils.isInt(slot) && Integer.parseInt(slot) >= 0 && Integer.parseInt(slot) <= 35 && !ItemHandler.hasItem(player, inStoredItems) && ItemHandler.canOverwrite(player, slot, item)) {
-							SetItems.setInvSlots(player, item, slot, ItemID);
+							if (!(ConfigHandler.getConfig("config.yml").getBoolean("GetItem-Permissions")) || PermissionsHandler.hasItemsPermission(items, item, player) && ConfigHandler.getConfig("config.yml").getBoolean("GetItem-Permissions")) {
+								SetItems.setInvSlots(player, item, slot, ItemID);
+							} else {
+								if (OtherPlayer != null) {
+									Language.setArgsPlayer(player);
+									Language.getSendMessage(OtherPlayer, "givenToPlayerNoPerms", inStoredItems.getItemMeta().getDisplayName());
+								} else {
+									Language.getSendMessage(player, "givenNoPerms", inStoredItems.getItemMeta().getDisplayName());
+								}
+								return;
+							}
 							Language.getSendMessage(player, "givenToYou", inStoredItems.getItemMeta().getDisplayName());
-							if (Language.getArgsPlayer() != null) {
+							
+							if (OtherPlayer != null) {
 								Language.setArgsPlayer(player);
 								Language.getSendMessage(OtherPlayer, "givenToPlayer", inStoredItems.getItemMeta().getDisplayName());
 								Language.setArgsPlayer(null);
 							}
 							ItemExists = true;
-						} else if (inStoredItems != null && item.equalsIgnoreCase(itemName) && !ItemHandler.hasItem(player, inStoredItems) && ItemHandler.canOverwrite(player, slot, item)) {
+						} else if (inStoredItems != null && item.equalsIgnoreCase(itemName) && ItemHandler.hasItem(player, inStoredItems)) {
 							if (Language.getArgsPlayer() != null) {
 								Language.getSendMessage(player, "playerTriedGive", inStoredItems.getItemMeta().getDisplayName());
 								Language.setArgsPlayer(player);
@@ -853,11 +852,46 @@ public class Commands implements CommandExecutor {
 					}
 				}
 			}
-		}
+		}	
 		if (ItemExists == false) {
-			Language.getSendMessage(player, "itemDoesntExist", itemName);
+			if (OtherPlayer != null) {
+				Language.setArgsPlayer(player);
+				Language.getSendMessage(OtherPlayer, "itemDoesntExist", itemName);
+			} else {
+				Language.getSendMessage(player, "itemDoesntExist", itemName);
+			}
 		}
 		}
+		
+		if (itemName.equalsIgnoreCase("00a40gh392bd938d4")) {
+			if (Success == true) {
+			Language.getSendMessage(player, "givenAllToYou", "&eAll Items");
+			if (Language.getArgsPlayer() != null) {
+				Language.setArgsPlayer(player);
+				Language.getSendMessage(OtherPlayer, "givenAllToPlayer", "&eAll Items");
+				Language.setArgsPlayer(null);
+			}
+			
+			if (MissingPerms != false) {
+				if (OtherPlayer != null) {
+					Language.setArgsPlayer(player);
+					Language.getSendMessage(OtherPlayer, "givenAllPlayerNoPerms", "&eAll Items");
+				} else {
+					Language.getSendMessage(player, "givenAllNoPerms", "&eAll Items");
+				}
+			}
+			} else if (Success != true) {
+				if (Language.getArgsPlayer() != null) {
+					Language.getSendMessage(player, "playerTriedGiveAllItems", "All Items");
+					Language.setArgsPlayer(player);
+					Language.getSendMessage(OtherPlayer, "allItemsExistInOthersInventory", "All Items");
+					Language.setArgsPlayer(null);
+				} else {
+					Language.getSendMessage(player, "allItemsExistInInventory", "All Items");
+				}
+			}
+		}
+		
 	}
 
 	public static void removeItem(Player player, CommandSender OtherPlayer, String itemName) {
@@ -872,7 +906,7 @@ public class Commands implements CommandExecutor {
 					ItemHandler.clearItemID(player);
 					for (String slot: slots) {
 						String ItemID = ItemHandler.getItemID(player, slot);
-						if (itemName.equalsIgnoreCase("00a40gh392bd938d4")) {
+						if (itemName.equalsIgnoreCase("00a40gh392bd938d4") || itemName.equalsIgnoreCase("00a40gh392bd938d4noother")) {
 							ItemStack inStoredItems = CreateItems.items.get(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + ItemID + item);
 							if (ItemHandler.hasItem(player, inStoredItems)) {
 							   SetItems.setClearItemJoinItems(player);
@@ -881,8 +915,10 @@ public class Commands implements CommandExecutor {
 								hasRan = true;
 								if (Language.getArgsPlayer() != null) {
 									Language.setArgsPlayer(player);
+									if (!(itemName.equalsIgnoreCase("00a40gh392bd938d4noother"))) {
 									Language.getSendMessage(OtherPlayer, "removedAllFromPlayer", "&eAll Items");
 									Language.setArgsPlayer(null);
+									}
 								}
 								}
 								} else if ((hasRan != true)) {
@@ -890,8 +926,10 @@ public class Commands implements CommandExecutor {
 									if (Language.getArgsPlayer() != null) {
 										Language.getSendMessage(player, "playerTriedRemoveAll", "All Items");
 										Language.setArgsPlayer(player);
+										if (!(itemName.equalsIgnoreCase("00a40gh392bd938d4noother"))) {
 										Language.getSendMessage(OtherPlayer, "allItemsDoNotExistInOthersInventory", "Items");
 										Language.setArgsPlayer(null);
+										}
 									} else {
 										Language.getSendMessage(player, "allItemsDoNotExistInInventory", "Items");
 									}
@@ -934,7 +972,11 @@ public class Commands implements CommandExecutor {
 			}
 		}
 		if (ItemExists == false) {
-			Language.getSendMessage(player, "itemDoesntExist", itemName);
+			if (OtherPlayer != null) {
+				Language.getSendMessage(OtherPlayer, "itemDoesntExist", itemName);
+			} else {
+				Language.getSendMessage(player, "itemDoesntExist", itemName);
+			}
 		}
 		}
 	}

@@ -1,8 +1,12 @@
 package me.RockinChaos.itemjoin.handlers;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -22,6 +26,26 @@ public class AnimationHandler {
 	
 	public static void CloseAnimations(Player player) {
 		if (isActive.get(PlayerHandler.getPlayerID(player)) != null) { setCanceled.put(PlayerHandler.getPlayerID(player), true); isActive.remove(PlayerHandler.getPlayerID(player)); }
+	}
+	
+	public static void CloseAllAnimations() {
+		Collection < ? extends Player > playersOnlineNew;
+		Player[] playersOnlineOld;
+		try {
+			if (Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).getReturnType() == Collection.class) {
+				playersOnlineNew = (Collection < ? extends Player > )((Collection < ? > ) Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).invoke(null, new Object[0]));
+				for (Player player: playersOnlineNew) {
+					AnimationHandler.CloseAnimations(player);
+				}
+			} else {
+				playersOnlineOld = ((Player[]) Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).invoke(null, new Object[0]));
+				for (Player player: playersOnlineOld) {
+					AnimationHandler.CloseAnimations(player);
+				}
+			}
+		} catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+			if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+		}
 	}
 
 	public static void OpenAnimations(Player player) {
