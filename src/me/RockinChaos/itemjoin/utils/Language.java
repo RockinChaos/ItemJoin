@@ -37,10 +37,13 @@ public class Language {
 			sendMessage = sendMessage.replace("%item%", ReplaceText);
 			if (MessageType.equalsIgnoreCase("givenToPlayer") || MessageType.equalsIgnoreCase("removedFromPlayer") || MessageType.equalsIgnoreCase("playerTriedRemove")
 					|| MessageType.equalsIgnoreCase("removedAllFromPlayer") || MessageType.equalsIgnoreCase("givenAllToPlayer")
-					|| MessageType.equalsIgnoreCase("playerTriedGive") || MessageType.equalsIgnoreCase("itemExistsInOthersInventory") || MessageType.equalsIgnoreCase("itemDoesntExistInOthersInventory")) {
+					|| MessageType.equalsIgnoreCase("playerTriedGive") || MessageType.equalsIgnoreCase("itemExistsInOthersInventory") || MessageType.equalsIgnoreCase("itemDoesntExistInOthersInventory") 
+					|| MessageType.equalsIgnoreCase("allItemsDoNotExistInOthersInventory") || MessageType.equalsIgnoreCase("playerTriedRemoveAll") 
+					|| MessageType.equalsIgnoreCase("givenToPlayerNoPerms") || MessageType.equalsIgnoreCase("givenAllPlayerNoPerms")
+					|| MessageType.equalsIgnoreCase("allItemsExistInOthersInventory") || MessageType.equalsIgnoreCase("playerTriedGiveAllItems")) {
 				if (argsplayer != null) {
 				sendMessage = sendMessage.replace("%argsplayer%", argsplayer.getName());
-					if (sender instanceof Player) {
+					if (argsplayer instanceof Player) {
 						sendMessage = sendMessage.replace("%argsplayer_world%", ((Player)argsplayer).getWorld().getName());
 					} else {
 						sendMessage = sendMessage.replace("%argsplayer_world%", "Console");

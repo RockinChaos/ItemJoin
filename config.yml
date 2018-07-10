@@ -11,6 +11,7 @@ Log-Commands: true
 Items-Permissions: true
 OPItems-Permissions: false
 OPCommands-Permissions: false
+GetItem-Permissions: false
 Debugging-Mode: false
 
 
@@ -40,7 +41,6 @@ global-commands:
   
 #// Itemflag Bypass Permissions //#
 InventoryBypass-Permission: false
-
 
 #// These are optional dependencies, only change these if you are looking to use them in conjunction with ItemJoin, changing the values will require a server restart. //#
 Vault: false
