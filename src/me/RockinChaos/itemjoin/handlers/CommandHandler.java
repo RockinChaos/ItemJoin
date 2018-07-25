@@ -210,7 +210,7 @@ public class CommandHandler {
 					} else if (ActionType.MULTI_CLICK_INVENTORY.hasAction(action) && ActionType.MULTI_CLICK_INVENTORY.hasDefine(definition)) {
 						return ActionType.MULTI_CLICK_INVENTORY.definition;
 					}
-				} else if (ItemHandler.containsIgnoreCase(commandType, "interact") && CommandsType.INTERACT.hasAction(action)) {
+				} else if (ItemHandler.containsIgnoreCase(commandType, "interact") && CommandsType.INTERACT.hasAction(action) || CommandsType.INTERACT.hasAction(action)) {
 					if (ActionType.LEFT_CLICK_ALL.hasAction(action) && ActionType.LEFT_CLICK_ALL.hasDefine(definition)) {
 						return ActionType.LEFT_CLICK_ALL.definition;
 					} else if (ActionType.LEFT_CLICK_AIR.hasAction(action) && ActionType.LEFT_CLICK_AIR.hasDefine(definition)) {
@@ -401,6 +401,8 @@ public class CommandHandler {
 		if (ItemHandler.containsIgnoreCase(commandType, "inventory") && CommandsType.INVENTORY.hasAction(action)) {
 			return true;
 		} else if (ItemHandler.containsIgnoreCase(commandType, "interact") && CommandsType.INTERACT.hasAction(action)) {
+			return true;
+		} else if (CommandsType.INTERACT.hasAction(action)) {
 			return true;
 		}
 		return false;
