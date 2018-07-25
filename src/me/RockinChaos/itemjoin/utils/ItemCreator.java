@@ -35,7 +35,7 @@ public class ItemCreator {
 		
 		Player player = (Player) sender; // add a check to makesure it isnt console and is really a player.
 		
-        inv.setItem(3, cMenuItem(create, "&7Create an item", Material.BOOK_AND_QUILL, player));
+      //  inv.setItem(3, cMenuItem(create, "&7Create an item", Material.BOOK_AND_QUILL, player));
         inv.setItem(4, cMenuItem(modify, "&7Modify an Existing Item", Material.PAPER, player));
         inv.setItem(5, cMenuItem(view, "&7View Currently Defined Items", Material.BOOK, player));
         inv.setItem(8, cMenuItem("&c&nExit", "", Material.BARRIER, player));
@@ -113,15 +113,15 @@ public class ItemCreator {
 		inv.setItem(4, cMenuItem(setTheItem, "", Material.PAPER, player)); // set item id, slot and enabled-worlds
 		
 		inv.setItem(12, cMenuItem("&cSetup the Name", "", Material.NAME_TAG, player));
-		inv.setItem(13, cMenuItem("&cSetup the Lore", "", Material.BOOK_AND_QUILL, player));
+		//inv.setItem(13, cMenuItem("&cSetup the Lore", "", Material.BOOK_AND_QUILL, player));
 		inv.setItem(14, cMenuItem("&cSetup the Count", "", Material.DIAMOND, player));
 		inv.setItem(19, cMenuItem("&cSetup the Durability", "", Material.DIAMOND_SWORD, player));
 		inv.setItem(20, cMenuItem("&cSetup the Commands", "", Material.BOOK, player));
 		inv.setItem(21, cMenuItem("&cSetup the Enchantments", "", Material.ENCHANTED_BOOK, player));
 		inv.setItem(22, cMenuItem("&cSetup the ItemFlags", "", Material.CHEST, player));
 		inv.setItem(23, cMenuItem("&cSetup the Triggers", "", Material.REDSTONE, player));
-		inv.setItem(24, cMenuItem("&cSetup the Custom-Permission", "", Material.REDSTONE_TORCH_ON, player));
-		inv.setItem(25, cMenuItem("&cSetup the enabled-regions", "", Material.LONG_GRASS, player));
+	//	inv.setItem(24, cMenuItem("&cSetup the Custom-Permission", "", Material.REDSTONE_TORCH_ON, player));
+		//inv.setItem(25, cMenuItem("&cSetup the enabled-regions", "", Material.LONG_GRASS, player));
 		
         player.openInventory(inv);
         
