@@ -120,7 +120,7 @@ public class CommandHandler {
 		}, 1L);
 	}
 	
-	public static void sendDispatch(long delay, Type cmdtype, String command, String item, Player player) {
+	public static void sendDispatch(long delay, final Type cmdtype, final String command, final String item, final Player player) {
 		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), (Runnable) new Runnable() {
 			public void run() {
 				switch (cmdtype) {
