@@ -2,9 +2,10 @@ package me.RockinChaos.itemjoin.handlers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.Random;
 import java.util.Set;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -30,11 +31,143 @@ import me.RockinChaos.itemjoin.utils.sqlite.SQLData;
 public class CommandHandler {
 	private static Map < String, Long > playersOnCooldown = new HashMap < String, Long > ();
 	private static HashMap < String, Long > storedSpammedPlayers = new HashMap < String, Long > ();
-	public static HashMap < String, ArrayList<String> > filteredCommands = new HashMap < String, ArrayList<String> > ();
+	public static HashMap < String, ArrayList < String > > filteredCommands = new HashMap < String, ArrayList < String > > ();
 	public static HashMap < String, Boolean > isActive = new HashMap < String, Boolean > ();
 	private static int cdtime = 0;
 	private static int spamtime = 1;
-
+	private static Type CmdType = Type.DEFAULT;
+	
+	public static void chargePlayer(ConfigurationSection items, String item, Player player, String action) {
+		if (isActive.get(PlayerHandler.getPlayerID(player)) != null && isActive.get(PlayerHandler.getPlayerID(player)) != true 
+				|| isActive.get(PlayerHandler.getPlayerID(player)) == null) {
+			isActive.put(PlayerHandler.getPlayerID(player), true);
+			if (isChargeable(items) && chargeCost(items, item, player)) {
+				InitializeCommands(items, item, player, action);
+			} else if (!isChargeable(items)) {
+				InitializeCommands(items, item, player, action);
+			}
+		}
+	}
+	
+	public static boolean isChargeable(ConfigurationSection items) {
+		if (items.getString(".commands-cost") != null && Econ.isVaultAPI() && Hooks.hasVault() == true) { return true; }
+		return false;
+	}
+	
+	public static boolean chargeCost(ConfigurationSection items, String item, Player player) {
+		if (items.getString(".commands-cost") != null && Utils.isInt(items.getString(".commands-cost"))) {
+			int cost = items.getInt(".commands-cost");
+			double balance = 0.0;
+			try {
+				balance = PlayerHandler.getBalance(player);
+			} catch (NullPointerException e) {
+				if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+			}
+			if (balance >= cost) {
+				if (cost != 0) {
+					try {
+						PlayerHandler.withdrawBalance(player, cost);
+					} catch (NullPointerException e) {
+						if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+					}
+					Language.getSendMessage(player, "itemChargeSuccess", "" + items.getString(".commands-cost"));
+				}
+				return true;
+			} else if (!(balance >= cost)) {
+				Language.getSendMessage(player, "itemChargeFailed", items.getString(".commands-cost") + ", " + balance);
+				return false;
+			}
+		}
+		return false;
+	}
+	
+	public static void removeDisposable(ConfigurationSection items, ItemStack item, Player player) {
+		String ItemFlags = items.getString(".itemflags");
+		if (ItemHandler.containsIgnoreCase(ItemFlags, "disposable")) {
+			if (item.getAmount() > 1 && item.getAmount() != 1) { item.setAmount(item.getAmount() - 1); } 
+			else { PlayerHandler.setItemInHand(player, Material.AIR); }
+		}
+	}
+	
+	public static void InitializeCommands(ConfigurationSection items, final String item, final Player player, String action) {
+		List < String > commandList = items.getStringList(".commands" + getClickType(items, action));
+		playSound(items, player);
+		long delay = 0;
+		String sequence = items.getString(".commands-sequence");
+		ArrayList < String > sequencialCommands = new ArrayList < > ();
+		for (String command: commandList) {
+			String splicedCommand = hitPlayer(fetchCommand(command, player), player);
+			Type cmdtype = CmdType;
+			delay = fetchDelay(splicedCommand);
+			if (sequence != null && ItemHandler.containsIgnoreCase(sequence, "RANDOM")) {
+				sequencialCommands.add(command);
+			} else if (sequence == null || ItemHandler.containsIgnoreCase(sequence, "ALL") || ItemHandler.containsIgnoreCase(sequence, "SEQUENTIAL")) {
+				sendDispatch(delay, cmdtype, splicedCommand, item, player);
+			}
+		}
+		if (sequence != null && ItemHandler.containsIgnoreCase(sequence, "RANDOM")) {
+			Random randomGenerator = new Random();
+			int index = randomGenerator.nextInt(sequencialCommands.size());
+			String splicedCommand = hitPlayer(fetchCommand(sequencialCommands.get(index), player), player);
+			Type cmdtype = CmdType;
+			delay = fetchDelay(splicedCommand);
+			sendDispatch(delay, cmdtype, splicedCommand, item, player);
+		}
+		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), (Runnable) new Runnable() {
+			public void run() {
+				isActive.put(PlayerHandler.getPlayerID(player), false);
+			}
+		}, 1L);
+	}
+	
+	public static void sendDispatch(long delay, Type cmdtype, String command, String item, Player player) {
+		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), (Runnable) new Runnable() {
+			public void run() {
+				switch (cmdtype) {
+					case CONSOLE: dispatchConsoleCommands(player, command, item); break;
+					case OP: dispatchOpCommands(player, command, item); break;
+					case PLAYER: dispatchPlayerCommands(player, command, item); break;
+					case MESSAGE: dispatchMessageCommands(player, command, item); break;
+					case SERVERSWITCH: dispatchServerSwitchCommands(player, command, item); break;
+					case BUNGEE: dispatchBungeeCordCommands(player, command, item); break;
+					case DEFAULT: dispatchPlayerCommands(player, command, item); break;
+					default: dispatchPlayerCommands(player, command, item); break;
+				}
+			}
+		}, delay);
+	}
+	
+	public static String fetchCommand(String cmdline, Player player) {
+		if ((cmdline == null) || (cmdline.length() == 0)) { return ""; }
+		
+		cmdline = cmdline.trim();
+		CmdType = Type.DEFAULT;
+		
+		if (cmdline.startsWith("console:")) { cmdline = cmdline.substring(8); CmdType = Type.CONSOLE; } 
+		else if (cmdline.startsWith("op:")) { cmdline = cmdline.substring(3); CmdType = Type.OP; } 
+		else if (cmdline.startsWith("player:")) { cmdline = cmdline.substring(7); CmdType = Type.PLAYER; } 
+		else if (cmdline.startsWith("server:")) { cmdline = cmdline.substring(13); CmdType = Type.SERVERSWITCH; } 
+		else if (cmdline.startsWith("bungee:")) { cmdline = cmdline.substring(7); CmdType = Type.BUNGEE; } 
+		else if (cmdline.startsWith("message:")) { cmdline = cmdline.substring(8); CmdType = Type.MESSAGE; } 
+		else if (cmdline.startsWith("delay:")) { cmdline = cmdline.substring(6); CmdType = Type.DELAY; }
+		
+		cmdline = cmdline.trim();
+		cmdline = Utils.format(cmdline, player);
+		
+		return cmdline;
+	}
+	
+	public static int fetchDelay(String lDelay) {
+		if (CmdType == Type.DELAY) {
+			try {
+				if (Utils.isInt(lDelay)) { return Integer.parseInt(lDelay); }
+			} catch (Exception e) {
+				if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+			}
+		}
+		return 0;
+	}
+	
 	public static Entity getNearestEntityInSight(Player player, int range) {
 		ArrayList < Entity > entities = (ArrayList < Entity > ) player.getNearbyEntities(range, range, range);
 		ArrayList < Block > sightBlock = (ArrayList < Block > ) player.getLineOfSight((Set < Material > ) null, range);
@@ -53,140 +186,177 @@ public class CommandHandler {
 		}
 		return null;
 	}
-
-	public static boolean isCommandable(String action, ConfigurationSection items) {
-		if (isInteractPhysical(action, items)) {
-			return true;
-		} else if (isInteractInv(action, items)) {
-			return true;
-		}
-		return false;
-	}
-
-	public static void runGlobalCmds(Player player) {
-		if (ConfigHandler.getConfig("config.yml").getBoolean("enabled-global-commands") == true && WorldHandler.inGlobalWorld(player.getWorld().getName(), "enabled-worlds")) {
-			if (ConfigHandler.getConfig("config.yml").getStringList("global-commands") != null) {
-			List <String> commands = ConfigHandler.getConfig("config.yml").getStringList("global-commands");
-			for (String command: commands) {
-				if (!SQLData.hasFirstCommanded(player, command)) {
-				String Command = Utils.format(command, player).replace("first-join: ", "").replace("first-join:", "");
-				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), Command);
-				if (ItemHandler.containsIgnoreCase(command, "first-join:")) { SQLData.saveToDatabase(player, "NULL", command, ""); }
-				}
-			  }
+	
+	public static String hitPlayer(String returnedCommand, Player player) {
+		if (ItemHandler.containsIgnoreCase(returnedCommand, "%hitplayer%") && ServerHandler.hasAltUpdate("1_8")) {
+			Entity entityHit = getNearestEntityInSight(player, 4);
+			if (entityHit != null && entityHit instanceof Player) {
+				Player hitPlayer = (Player) entityHit;
+				return returnedCommand.replace("%hitplayer%", hitPlayer.getName());
 			}
 		}
+		return returnedCommand;
 	}
 	
-	public static boolean isInteractInv(String action, ConfigurationSection items) {
+	public static String getClickType(ConfigurationSection items, String action) {
 		String commandType = items.getString(".commands-type");
-		if (commandType != null && ItemHandler.containsIgnoreCase(commandType, "inventory")) {
-			if (ItemHandler.containsIgnoreCase(".multi-click", getAction("inventory", action, items)) 
-					|| ItemHandler.containsIgnoreCase(".inventory", getAction("inventory", action, items))) {
-				return true;
-		}
-		}
-		return false;
-	}
-
-	public static boolean isInteractPhysical(String action, ConfigurationSection items) {
-		if (items.getString(".commands-type") == null || ItemHandler.containsIgnoreCase(items.getString(".commands-type"), "interact")) {
-			if (ItemHandler.containsIgnoreCase(".multi-click", getAction("interact", action, items)) 
-					|| ItemHandler.containsIgnoreCase(".left-click", getAction("interact", action, items))
-					|| ItemHandler.containsIgnoreCase(".right-click", getAction("interact", action, items)) 
-					|| ItemHandler.containsIgnoreCase(".multi-click-air", getAction("interact", action, items)) 
-					|| ItemHandler.containsIgnoreCase(".left-click-air", getAction("interact", action, items))
-					|| ItemHandler.containsIgnoreCase(".right-click-air", getAction("interact", action, items))
-					|| ItemHandler.containsIgnoreCase(".physical", getAction("interact", action, items))) {
-				return true;
+		if (ConfigHandler.getCommandsSection(items) != null) {
+			Iterator < String > it = ConfigHandler.getCommandsSection(items).getKeys(false).iterator();
+			while (it.hasNext()) {
+				String definition = it.next();
+				if (ItemHandler.containsIgnoreCase(commandType, "inventory") && CommandsType.INVENTORY.hasAction(action)) {
+					if (ActionType.INVENTORY.hasAction(action) && ActionType.INVENTORY.hasDefine(definition)) {
+						return ActionType.INVENTORY.definition;
+					} else if (ActionType.MULTI_CLICK_INVENTORY.hasAction(action) && ActionType.MULTI_CLICK_INVENTORY.hasDefine(definition)) {
+						return ActionType.MULTI_CLICK_INVENTORY.definition;
+					}
+				} else if (ItemHandler.containsIgnoreCase(commandType, "interact") && CommandsType.INTERACT.hasAction(action)) {
+					if (ActionType.LEFT_CLICK_ALL.hasAction(action) && ActionType.LEFT_CLICK_ALL.hasDefine(definition)) {
+						return ActionType.LEFT_CLICK_ALL.definition;
+					} else if (ActionType.LEFT_CLICK_AIR.hasAction(action) && ActionType.LEFT_CLICK_AIR.hasDefine(definition)) {
+						return ActionType.LEFT_CLICK_AIR.definition;
+					} else if (ActionType.LEFT_CLICK_BLOCK.hasAction(action) && ActionType.LEFT_CLICK_BLOCK.hasDefine(definition)) {
+						return ActionType.LEFT_CLICK_BLOCK.definition;
+					} else if (ActionType.RIGHT_CLICK_ALL.hasAction(action) && ActionType.RIGHT_CLICK_ALL.hasDefine(definition)) {
+						return ActionType.RIGHT_CLICK_ALL.definition;
+					} else if (ActionType.RIGHT_CLICK_AIR.hasAction(action) && ActionType.RIGHT_CLICK_AIR.hasDefine(definition)) {
+						return ActionType.RIGHT_CLICK_AIR.definition;
+					} else if (ActionType.RIGHT_CLICK_BLOCK.hasAction(action) && ActionType.RIGHT_CLICK_BLOCK.hasDefine(definition)) {
+						return ActionType.RIGHT_CLICK_BLOCK.definition;
+					} else if (ActionType.MULTI_CLICK_ALL.hasAction(action) && ActionType.MULTI_CLICK_ALL.hasDefine(definition)) {
+						return ActionType.MULTI_CLICK_ALL.definition;
+					} else if (ActionType.MULTI_CLICK_AIR.hasAction(action) && ActionType.MULTI_CLICK_AIR.hasDefine(definition)) {
+						return ActionType.MULTI_CLICK_AIR.definition;
+					} else if (ActionType.MULTI_CLICK_BLOCK.hasAction(action) && ActionType.MULTI_CLICK_BLOCK.hasDefine(definition)) {
+						return ActionType.MULTI_CLICK_BLOCK.definition;
+					} else if (ActionType.PHYSICAL.hasAction(action) && ActionType.PHYSICAL.hasDefine(definition)) {
+						return ActionType.PHYSICAL.definition;
+					}
+				}
 			}
 		}
-		return false;
+		return "";
 	}
 	
-	public static String getMode(String action) {
-		if (ItemHandler.containsIgnoreCase("LEFT_CLICK_AIR", action) 
-				|| ItemHandler.containsIgnoreCase("LEFT_CLICK_BLOCK", action) 
-				|| ItemHandler.containsIgnoreCase("RIGHT_CLICK_AIR", action) 
-				|| ItemHandler.containsIgnoreCase("RIGHT_CLICK_BLOCK", action)
-				|| ItemHandler.containsIgnoreCase("PHYSICAL", action)) {
-			return "interact";
-		} else if (ItemHandler.containsIgnoreCase("PICKUP_ALL", action) 
-		|| ItemHandler.containsIgnoreCase("PICKUP_HALF", action) 
-		|| ItemHandler.containsIgnoreCase("PLACE_ALL", action)) {
-			return "inventory";
+	public static void filterCommands(Player player, String stuff) {
+		if (ConfigHandler.getConfig("config.yml").getString("Log-Commands") != null && ConfigHandler.getConfig("config.yml").getBoolean("Log-Commands") == false) {
+			ArrayList < String > templist = new ArrayList < String > ();
+			if (filteredCommands.get("commands-list") != null && !filteredCommands.get("commands-list").contains(stuff)) {
+				templist = filteredCommands.get("commands-list");
+			}
+			templist.add(stuff);
+			filteredCommands.put("commands-list", templist);
+			((Logger) LogManager.getRootLogger()).addFilter(new CustomFilter());
 		}
-		return action;
 	}
 	
-	public static String getAction(String mode, String action, ConfigurationSection items) {
-		List<String> actions = items.getStringList(".commands" + ".multi-click");
-		if (actions != null && actions.toString() != "[]") {
-			if (ItemHandler.containsIgnoreCase(mode, "interact") && ItemHandler.containsIgnoreCase("LEFT_CLICK_AIR", action) 
-					|| ItemHandler.containsIgnoreCase(mode, "interact") && ItemHandler.containsIgnoreCase("LEFT_CLICK_BLOCK", action) 
-					|| ItemHandler.containsIgnoreCase(mode, "interact") && ItemHandler.containsIgnoreCase("RIGHT_CLICK_AIR", action) 
-					|| ItemHandler.containsIgnoreCase(mode, "interact") && ItemHandler.containsIgnoreCase("RIGHT_CLICK_BLOCK", action)) {
-			return ".multi-click";
+	public static void dispatchConsoleCommands(Player player, String returnedCommand, String item) {
+		try {
+			String Command = Utils.format(returnedCommand, player);
+			filterCommands(player, "/" + Command);
+			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), Command);
+			playersOnCooldown.put(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + item, System.currentTimeMillis());
+		} catch (Exception e) {
+			ServerHandler.sendConsoleMessage("&cThere was an issue executing an item's command as console, if this continues please report it to the developer!");
+			ServerHandler.sendConsoleMessage("&cError Code to Report: &c&l(CTC435-CONSOLE)");
+			if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
 		}
-		}
-		actions = items.getStringList(".commands" + ".left-click");
-		if (actions != null && actions.toString() != "[]") {
-			if (ItemHandler.containsIgnoreCase(mode, "interact") && ItemHandler.containsIgnoreCase("LEFT_CLICK_AIR", action) 
-					|| ItemHandler.containsIgnoreCase(mode, "interact") && ItemHandler.containsIgnoreCase("LEFT_CLICK_BLOCK", action)) {
-			return ".left-click";
-		}
-		}
-        actions = items.getStringList(".commands" + ".right-click");
-		if (actions != null && actions.toString() != "[]") {
-			if (ItemHandler.containsIgnoreCase(mode, "interact") && ItemHandler.containsIgnoreCase("RIGHT_CLICK_AIR", action) 
-					|| ItemHandler.containsIgnoreCase(mode, "interact") && ItemHandler.containsIgnoreCase("RIGHT_CLICK_BLOCK", action)) {
-			return ".right-click";
-		}
-		}
-		actions = items.getStringList(".commands" + ".multi-click-air");
-		if (actions != null && actions.toString() != "[]") {
-			if (ItemHandler.containsIgnoreCase(mode, "interact") && ItemHandler.containsIgnoreCase("LEFT_CLICK_AIR", action) 
-					||ItemHandler.containsIgnoreCase(mode, "interact") && ItemHandler.containsIgnoreCase("RIGHT_CLICK_AIR", action)) {
-			return ".multi-click-air";
-		}
-		}
-		actions = items.getStringList(".commands" + ".left-click-air");
-		if (actions != null && actions.toString() != "[]") {
-			if (ItemHandler.containsIgnoreCase(mode, "interact") && ItemHandler.containsIgnoreCase("LEFT_CLICK_AIR", action)) {
-			return ".left-click-air";
-		}
-		}
-        actions = items.getStringList(".commands" + ".right-click-air");
-		if (actions != null && actions.toString() != "[]") {
-			if (ItemHandler.containsIgnoreCase(mode, "interact") && ItemHandler.containsIgnoreCase("RIGHT_CLICK_AIR", action)) {
-			return ".right-click-air";
-		}
-		}
-        actions = items.getStringList(".commands" + ".inventory");
-		if (actions != null && actions.toString() != "[]") {
-			if (ItemHandler.containsIgnoreCase(mode, "inventory") && ItemHandler.containsIgnoreCase("PICKUP_ALL", action) 
-					|| ItemHandler.containsIgnoreCase(mode, "inventory") && ItemHandler.containsIgnoreCase("PICKUP_HALF", action) 
-					|| ItemHandler.containsIgnoreCase(mode, "inventory") && ItemHandler.containsIgnoreCase("PLACE_ALL", action)) {
-			return ".inventory";
-		}
-		}
-        actions = items.getStringList(".commands" + ".multi-click");
-		if (actions != null && actions.toString() != "[]") {
-			if (ItemHandler.containsIgnoreCase(mode, "inventory") && ItemHandler.containsIgnoreCase("PICKUP_ALL", action) 
-					|| ItemHandler.containsIgnoreCase(mode, "inventory") && ItemHandler.containsIgnoreCase("PICKUP_HALF", action) 
-					|| ItemHandler.containsIgnoreCase(mode, "inventory") && ItemHandler.containsIgnoreCase("PLACE_ALL", action)) {
-			return ".multi-click";
-		}
-		}
-        actions = items.getStringList(".commands" + ".physical");
-		if (actions != null && actions.toString() != "[]") {
-			if (ItemHandler.containsIgnoreCase(mode, "interact") && ItemHandler.containsIgnoreCase("PHYSICAL", action)) {
-			return ".physical";
-		}
-		}
-		return "null";
 	}
-
+	
+	public static void dispatchOpCommands(Player player, String returnedCommand, String item) { // lookat
+		try {
+			boolean isOp = player.isOp();
+			try {
+				player.setOp(true);
+				String Command = Utils.format(returnedCommand, player);
+				filterCommands(player, "/" + Command);
+				player.chat("/" + Command);
+			} catch (Exception e) {
+				if (ServerHandler.hasDebuggingMode()) {
+					e.printStackTrace();
+				}
+				player.setOp(isOp);
+				ServerHandler.sendConsoleMessage("&cAn error has occurred while removing " + player.getName() + " from the OPs list. OP or not OP they were removed from OPs list!");
+			} finally {
+				player.setOp(isOp);
+				playersOnCooldown.put(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + item, System.currentTimeMillis());
+			}
+		} catch (Exception e) {
+			ServerHandler.sendConsoleMessage("&cThere was an issue executing an item's command as an op, if this continues please report it to the developer!");
+			ServerHandler.sendConsoleMessage("&cError Code: &c&l(CTC434-OP)");
+			if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+		}
+	}
+	
+	public static void dispatchPlayerCommands(Player player, String returnedCommand, String item) {
+		try {
+			String Command = Utils.format(returnedCommand, player);
+			filterCommands(player, "/" + Command);
+			player.chat("/" + Command);
+			playersOnCooldown.put(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + item, System.currentTimeMillis());
+		} catch (Exception e) {
+			ServerHandler.sendConsoleMessage("&cThere was an issue executing an item's command as a player, if this continues please report it to the developer!");
+			ServerHandler.sendConsoleMessage("&cError Code: &c&l(CTC433-PLAYER)");
+			if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+		}
+	}
+	
+	public static void dispatchMessageCommands(Player player, String returnedCommand, String item) {
+		try {
+			String Command = Utils.format(returnedCommand, player);
+			player.sendMessage(Command);
+			playersOnCooldown.put(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + item, System.currentTimeMillis());
+		} catch (Exception e) {
+			ServerHandler.sendConsoleMessage("&cThere was an issue executing an item's command to send a message, if this continues please report it to the developer!");
+			ServerHandler.sendConsoleMessage("&cError Code: &c&l(CTC432-MESSAGES)");
+			if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+		}
+	}
+	
+	public static void dispatchServerSwitchCommands(Player player, String returnedCommand, String item) {
+		try {
+			String Command = Utils.format(returnedCommand, player);
+			BungeeCord.SwitchServers(player, Command);
+			playersOnCooldown.put(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + item, System.currentTimeMillis());
+		} catch (Exception e) {
+			ServerHandler.sendConsoleMessage("&cThere was an issue executing an item's command to switch servers, if this continues please report it to the developer!");
+			ServerHandler.sendConsoleMessage("&cError Code: &c&l(CTC431-SERVERSWITCH)");
+			if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+		}
+	}
+	
+	public static void dispatchBungeeCordCommands(Player player, String returnedCommand, String item) {
+		try {
+			String Command = Utils.format(returnedCommand, player);
+			//player.sendMessage("yeet1");
+			//player.performCommand("/glist");
+			//Bukkit.getServer().dispatchCommand(player, "glist");
+			//	ItemJoin.getInstance().getPluginManager().dispatchCommand((CommandSender) player, "/glist");
+			BungeeCord.ExecuteCommand(player, Command);
+			//ProxyServer.getInstance().getPluginManager().dispatchCommand((CommandSender) player, "glist");
+			playersOnCooldown.put(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + item, System.currentTimeMillis());
+		} catch (Exception e) {
+			ServerHandler.sendConsoleMessage("&cThere was an issue executing an item's command to BungeeCord, if this continues please report it to the developer!");
+			ServerHandler.sendConsoleMessage("&cError Code: &c&l(CTC430-BUNGEECORD)");
+			if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+		}
+	}
+	
+	public static void playSound(ConfigurationSection items, Player player) {
+		if (items.getString(".commands-sound") != null) {
+			try {
+				player.playSound(player.getLocation(), Sound.valueOf(items.getString(".commands-sound")), 1, 1);
+			} catch (Exception e) {
+				String pkgname = ItemJoin.getInstance().getServer().getClass().getPackage().getName();
+				String vers = pkgname.substring(pkgname.lastIndexOf('.') + 1);
+				ServerHandler.sendConsoleMessage("&cThere was an issue executing the commands-sound you defined.");
+				ServerHandler.sendConsoleMessage("&c" + items.getString(".commands-sound") + "&c is not a sound in " + vers + ".");
+				ServerHandler.sendConsoleMessage("&cError Code: &c&l(CTC439-SOUNDS)");
+				if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+			}
+		}
+	}
+	
 	public static boolean spamTask(Player player, String item) {
 		boolean itemsSpam = ConfigHandler.getConfig("items.yml").getBoolean("items-Spamming");
 		if (itemsSpam != true) {
@@ -195,11 +365,13 @@ public class CommandHandler {
 				playersCooldownList = storedSpammedPlayers.get(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + item);
 			}
 			int cdmillis = spamtime * 1000;
-			if (System.currentTimeMillis() - playersCooldownList >= cdmillis) {} else { return false; }
+			if (System.currentTimeMillis() - playersCooldownList >= cdmillis) {} else {
+				return false;
+			}
 		}
 		return true;
 	}
-
+	
 	public static boolean onCooldown(ConfigurationSection items, Player player, String item, ItemStack item1) {
 		long playersCooldownList = 0L;
 		if (playersOnCooldown.containsKey(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + item)) {
@@ -207,8 +379,9 @@ public class CommandHandler {
 		}
 		cdtime = items.getInt(".commands-cooldown");
 		int cdmillis = cdtime * 1000;
-		if (System.currentTimeMillis() - playersCooldownList >= cdmillis) { return false; } 
-		else {
+		if (System.currentTimeMillis() - playersCooldownList >= cdmillis) {
+			return false;
+		} else {
 			if (items.getString(".cooldown-message") != null) {
 				if (spamTask(player, item)) {
 					storedSpammedPlayers.put(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + item, System.currentTimeMillis());
@@ -222,276 +395,68 @@ public class CommandHandler {
 		}
 		return true;
 	}
-
-	public static void chargePlayer(ConfigurationSection items, String item, Player player, String action) {
-		if (isActive.get(PlayerHandler.getPlayerID(player)) != null && isActive.get(PlayerHandler.getPlayerID(player)) != true 
-				|| isActive.get(PlayerHandler.getPlayerID(player)) == null) {
-			isActive.put(PlayerHandler.getPlayerID(player), true);
-		if (isChargeable(items) && chargeCost(items, item, player)) {
-			convertCommands(items, item, player, action);
-		} else if (!isChargeable(items)) {
-			convertCommands(items, item, player, action);
-		}
-		}
-	}
-
-	public static boolean isChargeable(ConfigurationSection items) {
-		if (items.getString(".commands-cost") != null && Econ.isVaultAPI() && Hooks.hasVault() == true) {
+	
+	public static boolean isCommandable(String action, ConfigurationSection items) {
+		String commandType = items.getString(".commands-type");
+		if (ItemHandler.containsIgnoreCase(commandType, "inventory") && CommandsType.INVENTORY.hasAction(action)) {
+			return true;
+		} else if (ItemHandler.containsIgnoreCase(commandType, "interact") && CommandsType.INTERACT.hasAction(action)) {
 			return true;
 		}
 		return false;
 	}
-
-	public static boolean chargeCost(ConfigurationSection items, String item, Player player) {
-		if (items.getString(".commands-cost") != null && Utils.isInt(items.getString(".commands-cost"))) {
-			int cost = items.getInt(".commands-cost");
-		    double balance = 0.0;
-		    try {
-		    	balance = PlayerHandler.getBalance(player);
-		    } catch (NullPointerException e) {
-		    	if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
-		    }
-			if (balance >= cost) {
-				if (cost != 0) {
-				try {
-				PlayerHandler.withdrawBalance(player, cost);
-				} catch (NullPointerException e) {
-					if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
-				}
-				Language.getSendMessage(player, "itemChargeSuccess", "" + items.getString(".commands-cost"));
-				}
-				return true;
-			} else if (!(balance >= cost)) {
-				Language.getSendMessage(player, "itemChargeFailed", items.getString(".commands-cost") + ", " + balance);
-				return false;
-			}
-		}
-		return false;
-	}
-
-	public static void removeDisposable(ConfigurationSection items, ItemStack item, Player player) {
-		String ItemFlags = items.getString(".itemflags");
-		if (ItemHandler.containsIgnoreCase(ItemFlags, "disposable")) {
-			if (item.getAmount() > 1 && item.getAmount() != 1) {
-				item.setAmount(item.getAmount() - 1);
-			} else {
-				PlayerHandler.setItemInHand(player, Material.AIR);
-			}
-		}
-	}
-
-	public static String returnIdentifier(String Identify) {
-		if (ItemHandler.containsIgnoreCase(Identify, "console:")) {
-			return "console:";
-		} else if (ItemHandler.containsIgnoreCase(Identify, "op:")) {
-			return "op:";
-		} else if (ItemHandler.containsIgnoreCase(Identify, "player:")) {
-			return "player:";
-		} else if (ItemHandler.containsIgnoreCase(Identify, "message:")) {
-			return "message:";
-		} else if (ItemHandler.containsIgnoreCase(Identify, "server:")) {
-			return "server:";
-		} else if (ItemHandler.containsIgnoreCase(Identify, "delay:")) {
-			return "delay:";
-		}
-		return "Error Code: (CTC4301)";
-	}
-
-	public static String returnCommand(String Identify) {
-		if (ItemHandler.containsIgnoreCase(Identify, "console:")) {
-			return Identify.replace("console: ", "").replace("console:", "");
-		} else if (ItemHandler.containsIgnoreCase(Identify, "op:")) {
-			return Identify.replace("op: ", "").replace("op:", "");
-		} else if (ItemHandler.containsIgnoreCase(Identify, "player:")) {
-			return Identify.replace("player: ", "").replace("player:", "");
-		} else if (ItemHandler.containsIgnoreCase(Identify, "message:")) {
-			return Identify.replace("message: ", "").replace("message:", "");
-		} else if (ItemHandler.containsIgnoreCase(Identify, "server:")) {
-			return Identify.replace("server: ", "").replace("server:", "");
-		} else if (ItemHandler.containsIgnoreCase(Identify, "delay:")) {
-			return Identify.replace("delay: ", "").replace("delay:", "");
-		}
-		return "Error Code: (CTC4300)";
-	}
-
-	public static String hitPlayer(String returnedCommand, Player player) {
-		if (ItemHandler.containsIgnoreCase(returnedCommand, "%hitplayer%") && ServerHandler.hasAltUpdate("1_8")) {
-			Entity entityHit = getNearestEntityInSight(player, 4);
-			if (entityHit != null && entityHit instanceof Player) {
-				Player hitPlayer = (Player) entityHit;
-				return returnedCommand.replace("%hitplayer%", hitPlayer.getName());
-			}
-		}
-		return returnedCommand;
-	}
-
-	public static void convertCommands(ConfigurationSection items, final String item, final Player player, String action) {
-		List < String > command = items.getStringList(".commands" + getAction(getMode(action), action, items));
-		playSound(items, player);
-		long delay = 0;
-		String sequence = items.getString(".commands-sequence");
-		HashMap < Integer, String > sequencialCommands = new HashMap < Integer, String > ();
-		for (final String Identify: command) {
-			final String returnedIndentity = returnIdentifier(Identify);
-			final String returnedCommand = hitPlayer(returnCommand(Identify), player);
-			if (ItemHandler.containsIgnoreCase(returnedIndentity, "delay:")) {
-				try {
-					String Command = Utils.format(returnedCommand, player);
-					if (Utils.isInt(Command)) {
-						delay = Integer.parseInt(Command);
+	
+	public static void runGlobalCmds(Player player) {
+		if (ConfigHandler.getConfig("config.yml").getBoolean("enabled-global-commands") == true && WorldHandler.inGlobalWorld(player.getWorld().getName(), "enabled-worlds")) {
+			if (ConfigHandler.getConfig("config.yml").getStringList("global-commands") != null) {
+				List < String > commands = ConfigHandler.getConfig("config.yml").getStringList("global-commands");
+				for (String command: commands) {
+					if (!SQLData.hasFirstCommanded(player, command)) {
+						String Command = Utils.format(command, player).replace("first-join: ", "").replace("first-join:", "");
+						Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), Command);
+						if (ItemHandler.containsIgnoreCase(command, "first-join:")) {
+							SQLData.saveToDatabase(player, "NULL", command, "");
+						}
 					}
-				} catch (Exception e) {
-					if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
 				}
 			}
-			if (sequence != null && ItemHandler.containsIgnoreCase(sequence, "RANDOM")) {
-				String saveCommands = Identify + "a<>a<>a98d<>a<>a" + returnedCommand + "b<>b<>b98d<>b<>b" + returnedIndentity;
-				sequencialCommands.put(Utils.getRandom(1, 100000), saveCommands);
-			} else if (sequence == null || ItemHandler.containsIgnoreCase(sequence, "ALL") || ItemHandler.containsIgnoreCase(sequence, "SEQUENTIAL")) {
-				BlockCode(delay, Identify, returnedCommand, returnedIndentity, item, player);
-			}
+		}
+	}
+	
+	public static enum Type { DEFAULT, CONSOLE, OP, PLAYER, SERVERSWITCH, MESSAGE, BUNGEE, DELAY; }
+	
+	public enum ActionType {
+		DEFAULT("", ""),
+		PHYSICAL("PHYSICAL", ".physical"),
+		INVENTORY("PICKUP_ALL, PICKUP_HALF, PLACE_ALL", ".inventory"),
+		MULTI_CLICK_INVENTORY("PICKUP_ALL, PICKUP_HALF, PLACE_ALL", ".multi-click"),
+		MULTI_CLICK_ALL("LEFT_CLICK_BLOCK, LEFT_CLICK_AIR, RIGHT_CLICK_BLOCK, RIGHT_CLICK_AIR", ".multi-click"),
+		MULTI_CLICK_AIR("LEFT_CLICK_AIR, RIGHT_CLICK_AIR", ".multi-click-air"),
+		MULTI_CLICK_BLOCK("LEFT_CLICK_BLOCK, RIGHT_CLICK_BLOCK", ".multi-click-block"),
+		LEFT_CLICK_ALL("LEFT_CLICK_AIR, LEFT_CLICK_BLOCK", ".left-click"),
+		LEFT_CLICK_AIR("LEFT_CLICK_AIR", ".left-click-air"),
+		LEFT_CLICK_BLOCK("LEFT_CLICK_BLOCK", ".left-click-block"),
+		RIGHT_CLICK_ALL("RIGHT_CLICK_AIR, RIGHT_CLICK_BLOCK", ".right-click"),
+		RIGHT_CLICK_AIR("RIGHT_CLICK_AIR", ".right-click-air"),
+		RIGHT_CLICK_BLOCK("RIGHT_CLICK_BLOCK", ".right-click-block");
+		
+		private final String name;
+		private final String definition;
+		private ActionType(String Action, String Definition) {
+			name = Action;
+			definition = Definition;
 		}
 		
-		if (sequence != null && ItemHandler.containsIgnoreCase(sequence, "RANDOM")) {
-			Entry<?, ?> dedicatedMap = Utils.randomEntry(sequencialCommands);
-			String[] IdentifySplit = dedicatedMap.getValue().toString().split("a<>a<>a98d<>a<>a");
-			String Identify = IdentifySplit[0];
-			String[] returnedCommandSplit = IdentifySplit[1].split("b<>b<>b98d<>b<>b");
-			String returnedCommand = returnedCommandSplit[0];
-			String returnedIndentity = returnedCommandSplit[1];
-			BlockCode(delay, Identify, returnedCommand, returnedIndentity, item, player);
-		}
-		
-		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), (Runnable) new Runnable() {
-			public void run() {
-				isActive.put(PlayerHandler.getPlayerID(player), false);
-			}
-		}, 1L);
+		public boolean hasAction(String Action) { return name.contains(Action); }
+		public boolean hasDefine(String Define) { return definition.contains(Define); }
 	}
 	
-	
-	public static void BlockCode(final long delay, final String Identify, 
-			final String returnedCommand, final String returnedIndentity, final String item, final Player player) {
-		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), (Runnable) new Runnable() {
-			public void run() {
-				if (ItemHandler.containsIgnoreCase(returnedIndentity, "console:")) {
-					try {
-						dispatchConsoleCommands(returnedCommand, player, item);
-					} catch (ArrayIndexOutOfBoundsException e) {
-						ServerHandler.sendConsoleMessage("&cThere was an issue executing an items command as console, if this continues please report it to the developer!");
-						ServerHandler.sendConsoleMessage("&cError Code: &c&l(CTC435)");
-						if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
-					}
-				} else if (ItemHandler.containsIgnoreCase(returnedIndentity, "op:")) {
-					try {
-						dispatchOpCommands(returnedCommand, player, item);
-					} catch (ArrayIndexOutOfBoundsException e) {
-						ServerHandler.sendConsoleMessage("&cThere was an issue executing an items command as an op, if this continues please report it to the developer!");
-						ServerHandler.sendConsoleMessage("&cError Code: &c&l(CTC434)");
-						if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
-					}
-				} else if (ItemHandler.containsIgnoreCase(returnedIndentity, "player:")) {
-					try {
-						dispatchPlayerCommands(returnedCommand, player, item);
-					} catch (ArrayIndexOutOfBoundsException e) {
-						ServerHandler.sendConsoleMessage("&cThere was an issue executing an items command as a player, if this continues please report it to the developer!");
-						ServerHandler.sendConsoleMessage("&cError Code: &c&l(CTC434)");
-						if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
-					}
-				} else if (ItemHandler.containsIgnoreCase(returnedIndentity, "message:")) {
-					try {
-						dispatchMessageCommands(returnedCommand, player, item);
-					} catch (ArrayIndexOutOfBoundsException e) {
-						ServerHandler.sendConsoleMessage("&cThere was an issue executing an items command to send a message, if this continues please report it to the developer!");
-						ServerHandler.sendConsoleMessage("&cError Code: &c&l(CTC433)");
-						if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
-					}
-				} else if (ItemHandler.containsIgnoreCase(returnedIndentity, "server:")) {
-					try {
-						dispatchBungeeCordCommands(returnedCommand, player, item);
-					} catch (ArrayIndexOutOfBoundsException e) {
-						ServerHandler.sendConsoleMessage("&cThere was an issue executing an items command to switch servers, if this continues please report it to the developer!");
-						ServerHandler.sendConsoleMessage("&cError Code: &c&l(CTC432)");
-						if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
-					}
-				} else if (ItemHandler.containsIgnoreCase(returnedIndentity, "delay:")) {} else {
-					try {
-						dispatchPlayerCommands(Identify, player, item);
-					} catch (ArrayIndexOutOfBoundsException e) {
-						ServerHandler.sendConsoleMessage("&cThere was an issue executing an items command as a player, if this continues please report it to the developer!");
-						ServerHandler.sendConsoleMessage("&cError Code: &c&l(CTC431)");
-						if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
-					}
-				}
-			}
-		}, delay);
-	}
-
-	public static void playSound(ConfigurationSection items, Player player) {
-		if (items.getString(".commands-sound") != null) {
-			try {
-			player.playSound(player.getLocation(), Sound.valueOf(items.getString(".commands-sound")), 1, 1);
-			} catch (IllegalArgumentException e) {
-				   String pkgname = ItemJoin.getInstance().getServer().getClass().getPackage().getName();
-				   String vers = pkgname.substring(pkgname.lastIndexOf('.') + 1);
-				ServerHandler.sendConsoleMessage("&cThere was an issue executing the commands-sound you defined.");
-				ServerHandler.sendConsoleMessage("&c" + items.getString(".commands-sound") + "&c is not a sound in " + vers + ".");
-				ServerHandler.sendConsoleMessage("&cError Code: &c&l(CTC431)");
-				if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
-			}
-		}
+	public enum CommandsType {
+		INTERACT("PHYSICAL, LEFT_CLICK_BLOCK, LEFT_CLICK_AIR, RIGHT_CLICK_BLOCK, RIGHT_CLICK_AIR"),
+		INVENTORY("PICKUP_ALL, PICKUP_HALF, PLACE_ALL");
+		private final String name;
+		private CommandsType(String Action) { name = Action; }
+		public boolean hasAction(String Action) { return name.contains(Action); }
 	}
 	
-	public static void filterCommands(Player player, String stuff) {
-		if (ConfigHandler.getConfig("config.yml").getString("Log-Commands") != null && ConfigHandler.getConfig("config.yml").getBoolean("Log-Commands") == false) {
-			ArrayList < String > templist = new ArrayList < String > ();
-			if (filteredCommands.get("commands-list") != null && !filteredCommands.get("commands-list").contains(stuff)) { templist = filteredCommands.get("commands-list"); }
-			templist.add(stuff);
-			filteredCommands.put("commands-list", templist);
-			((Logger) LogManager.getRootLogger()).addFilter(new CustomFilter());
-		}
-	}
-
-	public static void dispatchMessageCommands(String returnedCommand, Player player, String item) {
-		String Command = Utils.format(returnedCommand, player);
-		player.sendMessage(Command);
-		playersOnCooldown.put(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + item, System.currentTimeMillis());
-	}
-
-	public static void dispatchBungeeCordCommands(String returnedCommand, Player player, String item) {
-		String Command = Utils.format(returnedCommand, player);
-		BungeeCord.SwitchServers(player, Command);
-		playersOnCooldown.put(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + item, System.currentTimeMillis());
-	}
-
-	public static void dispatchPlayerCommands(String returnedCommand, Player player, String item) {
-		String Command = Utils.format(returnedCommand, player);
-		filterCommands(player, "/" + Command);
-		player.chat("/" + Command);
-		playersOnCooldown.put(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + item, System.currentTimeMillis());
-	}
-	
-	public static void dispatchOpCommands(String returnedCommand, Player player, String item) {
-      boolean isOp = player.isOp();
-		try {
-		    player.setOp(true);
-			String Command = Utils.format(returnedCommand, player);
-			filterCommands(player, "/" + Command);
-			player.chat("/" + Command);
-		} catch(Exception e) {
-			if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
-	        player.setOp(isOp);
-	        ServerHandler.sendConsoleMessage("&cAn error has occurred while removing " + player.getName() + " from the OPs list. OP or not OP they were removed from OPs list!");
-		} finally {
-			player.setOp(isOp);
-			playersOnCooldown.put(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + item, System.currentTimeMillis());
-		}
-	}
-
-	public static void dispatchConsoleCommands(String returnedCommand, Player player, String item) {
-		String Command = Utils.format(returnedCommand, player);
-		filterCommands(player, "/" + Command);
-		Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), Command);
-		playersOnCooldown.put(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + item, System.currentTimeMillis());
-	}
 }

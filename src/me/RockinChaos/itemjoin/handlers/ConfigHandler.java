@@ -189,6 +189,10 @@ public class ConfigHandler {
 	public static ConfigurationSection getPagesSection(ConfigurationSection items) {
 		return getConfig("items.yml").getConfigurationSection(items.getCurrentPath() + ".pages");
 	}
+	
+	public static ConfigurationSection getCommandsSection(ConfigurationSection items) {
+		return getConfig("items.yml").getConfigurationSection(items.getCurrentPath() + ".commands");
+	}
 
 	public static String getNBTData() {
 		return NBTData;
