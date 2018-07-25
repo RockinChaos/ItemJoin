@@ -38,6 +38,7 @@ public class SQLData {
 		} else if (itemflag.equalsIgnoreCase("map-id") && !SQLite.getDatabase("database").tableExists("map_ids")) {
 				SQLite.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS map_ids (`Map_IMG` varchar(32), `Map_ID` varchar(32));");
 		}
+		SQLite.getDatabase("database").closeConnection();
 	}
 	
 	public static boolean isInDatabase(String itemflag, String StatementString) {
@@ -53,7 +54,7 @@ public class SQLData {
 					ServerHandler.sendDebugMessage("[SQLite] Result set is not empty.");
 					return true;
 				}
-			} finally { result.close(); statement.close(); }
+			} finally { result.close(); statement.close(); SQLite.getDatabase("database").closeConnection();}
 		} catch (Exception e) {
 			ServerHandler.sendDebugMessage("Could not read from the database.db file, the itemflags first-join and ip-limits have been disabled!");
 			if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
@@ -94,6 +95,7 @@ public class SQLData {
 				if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
 			}
 		}
+		SQLite.getDatabase("database").closeConnection();
 	}
 	
 	public static int getMapID(Player player, String Image) {
@@ -131,6 +133,7 @@ public class SQLData {
 				if (itemflag.equalsIgnoreCase("map-id") && !isInDatabase(itemflag, "SELECT * FROM map_ids WHERE Map_IMG='" + Image + "';")
 						&& !isInDatabase(itemflag, "SELECT * FROM map_ids WHERE Map_IMG='" + Image + "' AND Map_ID='" + mapID + "';")) {
 					SQLite.getDatabase("database").executeStatement("INSERT INTO map_ids (`Map_IMG`, `Map_ID`) VALUES ('" + Image + "','" + mapID + "')");
+					SQLite.getDatabase("database").closeConnection();
 				}
 			} catch (Exception e) {
 				ItemJoin.getInstance().getServer().getLogger().severe("Could not save " + realName + " to the data file!");
@@ -143,8 +146,10 @@ public class SQLData {
 		String UUID = PlayerHandler.getOfflinePlayerID(player);
 		if (section.equalsIgnoreCase("first_join") && SQLite.getDatabase("database").tableExists("first_join")) {
 			SQLite.getDatabase("database").executeStatement("DELETE FROM " + section + " WHERE Player_UUID='" + UUID + "';");
+			SQLite.getDatabase("database").closeConnection();
 		} else if (section.equalsIgnoreCase("ip_limits") && SQLite.getDatabase("database").tableExists("ip_limits")) {
 			SQLite.getDatabase("database").executeStatement("DELETE FROM " + section + " WHERE Player_UUID='" + UUID + "';");
+			SQLite.getDatabase("database").closeConnection();
 		}
 	}
 	
@@ -194,7 +199,7 @@ public class SQLData {
 						return true;
 					} else { return false; }
 				}
-			} finally { result.close(); statement.close(); }
+			} finally { result.close(); statement.close(); SQLite.getDatabase("database").closeConnection(); }
 		} catch (Exception e) {
 			ServerHandler.sendDebugMessage("Could not read from the database.db file, map item images have been disabled!");
 			if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
@@ -215,7 +220,7 @@ public class SQLData {
 						return false;
 					} else { return true; }
 				}
-			} finally { result.close(); statement.close(); }
+			} finally { result.close(); statement.close(); SQLite.getDatabase("database").closeConnection(); }
 		} catch (Exception e) {
 			ServerHandler.sendDebugMessage("Could not read from the database.db file, ip-limit itemflag has been disabled!");
 			if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
@@ -303,6 +308,7 @@ public class SQLData {
 							OfflinePlayer player = ItemJoin.getInstance().getServer().getOfflinePlayer(UUID.fromString(uuid.getName()));
 							if (!isInDatabase("", "SELECT * FROM first_join WHERE World_Name='" + world.getName() + "' AND Player_UUID='" + uuid.getName() + "' AND Item_Name='" + item.getName() + "';")) {
 								SQLite.getDatabase("database").executeStatement("INSERT INTO first_join (`World_Name`, `Player_Name`, `Player_UUID`, `Item_Name`) VALUES ('" + world.getName() + "','" + player.getName().toString() + "','" + uuid.getName() + "','" + item.getName() + "')");
+								SQLite.getDatabase("database").closeConnection();
 							} 
 						}
 					}
@@ -330,6 +336,7 @@ public class SQLData {
 							ConfigurationSection ipaddr = item.getConfigurationSection(ipaddrsec);
 							if (!isInDatabase("", "SELECT * FROM ip_limits WHERE World_Name='" + world.getName() + "' AND IP_Address='" + ipaddr.getName() + "' AND Item_Name='" + item.getName() + "';")) {
 								SQLite.getDatabase("database").executeStatement("INSERT INTO ip_limits (`World_Name`, `IP_Address`, `Player_UUID`, `Item_Name`) VALUES ('" + world.getName() + "','" + ipaddr.getName() + "','" + ipaddr.get("Current User") + "','" + item.getName() + "')");
+								SQLite.getDatabase("database").closeConnection();
 							}
 						}
 					}
@@ -348,7 +355,6 @@ public class SQLData {
 		if (converting == true) {
 			ServerHandler.sendConsoleMessage("&aYAML to Database conversion complete!");
 		}
-		
 	}
 	
 }
