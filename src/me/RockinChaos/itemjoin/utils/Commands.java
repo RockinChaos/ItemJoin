@@ -411,7 +411,7 @@ public class Commands implements CommandExecutor {
 								List < String > enchantList = new ArrayList < String > ();
 								for (Enchantment e: item.getItemMeta().getEnchants().keySet()) {
 									int level = item.getItemMeta().getEnchants().get(e);
-									enchantList.add(e.getName().toUpperCase() + ":" + level);
+									enchantList.add(ItemHandler.getEnchantName(e).toUpperCase() + ":" + level);
 								}
 								itemData.set("items." + args[1] + "." + "enchantment", Utils.convertStringList(enchantList));
 							}

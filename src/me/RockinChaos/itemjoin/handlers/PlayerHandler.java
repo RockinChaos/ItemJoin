@@ -138,12 +138,12 @@ public class PlayerHandler {
 	
 	@SuppressWarnings("deprecation")
 	public static String getSkullOwner(ItemStack item) {
-		if (ServerHandler.hasAltUpdate("1_12") && item != null && item.hasItemMeta() && item.getType().equals(Material.SKULL_ITEM) 
+		if (ServerHandler.hasAltUpdate("1_12") && item != null && item.hasItemMeta() && ItemHandler.isSkullTyping(item.getType()) 
 				&& ((SkullMeta) item.getItemMeta()).hasOwner() && getNewSkullMethod() != false) {
 			String owner =  ((SkullMeta) item.getItemMeta()).getOwningPlayer().getName();
 			if (owner != null) { return owner; }
 		} else if (item != null && item.hasItemMeta() 
-				&& item.getType().equals(Material.SKULL_ITEM) 
+				&& ItemHandler.isSkullTyping(item.getType())
 				&& ((SkullMeta) item.getItemMeta()).hasOwner()) {
 			String owner = ((SkullMeta) item.getItemMeta()).getOwner();
 			if (owner != null) { return owner; }

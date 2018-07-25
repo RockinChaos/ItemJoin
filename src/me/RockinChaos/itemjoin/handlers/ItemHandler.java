@@ -6,12 +6,14 @@ import org.apache.commons.lang.WordUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import me.RockinChaos.itemjoin.cacheitems.CreateItems;
 import me.RockinChaos.itemjoin.listeners.giveitems.SetItems;
 import me.RockinChaos.itemjoin.utils.Hooks;
+import me.RockinChaos.itemjoin.utils.Legacy;
 import me.RockinChaos.itemjoin.utils.Reflection;
 import me.RockinChaos.itemjoin.utils.Utils;
 import me.RockinChaos.itemjoin.utils.sqlite.SQLData;
@@ -310,20 +312,41 @@ public class ItemHandler {
 		}
 		return 0;
 	}
-
+	
 	@SuppressWarnings("deprecation")
+	public static String getEnchantName(Enchantment e) {
+		if (!ServerHandler.hasAquaticUpdate()) {
+			return e.getName();
+		} else {
+			return e.getKey().getKey().toString();
+		}
+	}
+
 	public static Material getMaterial(ConfigurationSection items) {
 		try {
-		if (Utils.isInt(items.getString(".id"))) {
-			return Material.getMaterial(items.getInt(".id"));
-		} else {
+		if (Utils.isInt(items.getString(".id")) && !ServerHandler.hasAquaticUpdate()) {
+			return Legacy.getLegacyMaterial(items.getInt(".id"));
+		} else if (Utils.isInt(items.getString(".id")) && ServerHandler.hasAquaticUpdate()) {
+			ServerHandler.sendConsoleMessage("&4[WARNING] The item " + items.getName() + " is using an ItemID (Numerical Value) which is no longer supported as of Minecraft 1.13, instead use its material name.");
+			ServerHandler.sendConsoleMessage("&4This will cause issues, please see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html for a list of material names.");
+			return null;
+		} else if (!ServerHandler.hasAquaticUpdate()) {
 			return Material.getMaterial(items.getString(".id").toUpperCase());
+		} else {
+			return Material.matchMaterial(items.getString(".id").toUpperCase());
 		}
 		} catch (Exception e) {
 			if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
 		}
 		return null;
 	}
+
+	 public static boolean isSkullTyping(Material type) {
+		 if (type.toString().equalsIgnoreCase("SKULL_ITEM") || type.toString().equalsIgnoreCase("PLAYER_HEAD")) {
+			 return true;
+		 }
+		 return false;
+	 }
 
 	public static Boolean isMaterial(String Mats) {
 		Material getMaterial = Material.getMaterial(Mats);

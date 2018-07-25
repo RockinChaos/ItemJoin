@@ -9,6 +9,16 @@ import me.RockinChaos.itemjoin.ItemJoin;
 
 public class ServerHandler {
 	
+	public static boolean hasAquaticUpdate() {
+		String pkgname = ItemJoin.getInstance().getServer().getClass().getPackage().getName();
+		String combatVersion = "v1_13_R0".replace("_", "").replace("R0", "").replace("R1", "").replace("R2", "").replace("R3", "").replace("R4", "").replace("R5", "").replaceAll("[a-z]", "");
+		String version = pkgname.substring(pkgname.lastIndexOf('.') + 1).replace("_", "").replace("R0", "").replace("R1", "").replace("R2", "").replace("R3", "").replace("R4", "").replace("R5", "").replaceAll("[a-z]", "");
+		if (Integer.parseInt(version) >= Integer.parseInt(combatVersion)) {
+			return true;
+		}
+		return false;
+	}
+	
 	public static boolean hasCombatUpdate() {
 		String pkgname = ItemJoin.getInstance().getServer().getClass().getPackage().getName();
 		String combatVersion = "v1_9_R0".replace("_", "").replace("R0", "").replace("R1", "").replace("R2", "").replace("R3", "").replace("R4", "").replace("R5", "").replaceAll("[a-z]", "");

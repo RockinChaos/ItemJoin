@@ -23,7 +23,7 @@ items:
         - 'op: say This command executes as if the player is op.'
         - 'say Hello world!'
     commands-type: interact, inventory
-    commands-sound: BLOCK_NOTE_PLING
+    commands-sound: BLOCK_NOTE_BLOCK_PLING
     commands-sequence: SEQUENTIAL
     commands-cost: 25
     commands-cooldown: 5
@@ -47,7 +47,7 @@ items:
     permission-node: 'itemjoin.ultra'
     enabled-worlds: world, world_nether, world_the_end
   gamemode-item:
-    id: FIREWORK_CHARGE
+    id: FIREWORK_STAR
     slot: 4
     count: 6
     charge-color: BLUE
@@ -60,13 +60,13 @@ items:
       - '&7Your free spectator mode token!'
     commands:
       right-click:
-        - 'console: gamemode 1 %player%'
+        - 'console: gamemode creative %player%'
         - 'message: &eYou have been set to creative mode.'
       left-click:
-        - 'console: gamemode 3 %player%'
+        - 'console: gamemode spectator %player%'
         - 'message: &eYou have been set to spectator mode.'
     commands-type: interact
-    commands-sound: BLOCK_NOTE_PLING
+    commands-sound: BLOCK_NOTE_BLOCK_PLING
     commands-cost: 25
     commands-cooldown: 5
     cooldown-message: '&7[&eItemJoin&7] &a[%item%&a] &cis on cooldown for &a%timeleft% &cseconds..'
@@ -108,10 +108,9 @@ items:
     permission-node: 'itemjoin.book'
     enabled-worlds: world
   bungeecord-item:
-    id: STAINED_GLASS
+    id: PURPLE_STAINED_GLASS
     slot: 8
     name: '&eBungeeCord Blox'
-    data-value: 12
     count: 32
     lore:
       - '&7Right-Click to go to the survival server!'
@@ -121,7 +120,7 @@ items:
         - 'server: survival'
         - 'message: &eSending you to the survival server!'
     commands-type: interact
-    commands-sound: BLOCK_NOTE_PLING
+    commands-sound: BLOCK_NOTE_BLOCK_PLING
     commands-cost: 25
     commands-cooldown: 5
     cooldown-message: '&7[&eItemJoin&7] &a[%item%&a] &cis on cooldown for &a%timeleft% &cseconds..'
@@ -130,15 +129,14 @@ items:
     permission-node: 'itemjoin.bungeetp'
     enabled-worlds: world, world_nether, world_the_end
   filler-pane-item:
-    id: 160
+    id: BLACK_STAINED_GLASS_PANE
     slot: Arbitrary, Arbitrary, Arbitrary, Arbitrary
     name: '&f'
-    data-value: 15
     itemflags: inventory-modify, placement, death-drops, self-drops
     triggers: join, world-change
     enabled-worlds: world, world_nether, world_the_end
   banner-item:
-    id: BANNER
+    id: WHITE_BANNER
     slot: 20
     name: '&1Mighty Creeper'
     lore:
@@ -176,11 +174,10 @@ items:
     triggers: join, respawn, world-change
     enabled-worlds: world, world_nether, world_the_end
   skulldb-item:
-    id: SKULL_ITEM
+    id: PLAYER_HEAD
     slot: 24
     name: '&fCyclone'
     skull-texture: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMGZlMzFlYWE4YThhZDhkZDhkN2FiOTZhODQyMzI5MDUzOWQzODdkODJkNDI2ODcwMWVjNjlkNDFhMWZjIn19fQ=='
-    data-value: 3
     lore:
       - '&7This is a custom textured skull.'
       - '&7'
@@ -199,7 +196,7 @@ items:
     triggers: join, respawn, world-change
     enabled-worlds: world, world_nether, world_the_end
   firework-item:
-    id: FIREWORK
+    id: FIREWORK_ROCKET
     slot: 29
     name: '&dSparkles'
     lore:
@@ -209,7 +206,7 @@ items:
       flicker: true
       trail: true
       power: 1
-      colors: GRAY, WHITE, PURPLE, SILVER, GREEN
+      colors: GRAY, WHITE, PURPLE, LIGHT_GRAY, GREEN
     use-cooldown: 3
     itemflags: count-lock, death-drops, hide-attributes, self-drops
     triggers: join, respawn, world-change
@@ -232,11 +229,10 @@ items:
     triggers: join, respawn, world-change
     enabled-worlds: world, world_nether, world_the_end
   skull-item:
-    id: SKULL_ITEM
+    id: PLAYER_HEAD
     slot: 35
     name: '&b%player%'
     skull-owner: '%player%'
-    data-value: 3
     lore:
       - '&7Great for setting a'
       - '&7players profile, like hypixel!'
@@ -244,28 +240,25 @@ items:
     triggers: join, respawn, world-change
     enabled-worlds: world, world_nether, world_the_end
   filler-pane-item-two:
-    id: 160
+    id: YELLOW_STAINED_GLASS_PANE
     slot: 28, 30, 32, 34, 18, 19, 21, 23, 25, 26
     name: '&f'
-    data-value: 4
     probability: 50
     itemflags: inventory-modify, placement, death-drops, self-drops
     triggers: join, world-change
     enabled-worlds: world, world_nether, world_the_end
   filler-pane-item-three:
-    id: 160
+    id: BLUE_STAINED_GLASS_PANE
     slot: 28, 30, 32, 34, 18, 19, 21, 23, 25, 26
     name: '&f'
-    data-value: 3
     probability: 80
     itemflags: inventory-modify, placement, death-drops, self-drops
     triggers: join, world-change
     enabled-worlds: world, world_nether, world_the_end
   filler-pane-item-four:
-    id: 160
+    id: PINK_STAINED_GLASS_PANE
     slot: 28, 30, 32, 34, 18, 19, 21, 23, 25, 26
     name: '&f'
-    data-value: 6
     probability: 10
     itemflags: inventory-modify, placement, death-drops, self-drops
     triggers: join, world-change
