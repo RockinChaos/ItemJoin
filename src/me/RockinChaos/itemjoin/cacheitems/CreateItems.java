@@ -17,7 +17,6 @@ import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.FireworkEffect;
 import org.bukkit.Material;
-import org.bukkit.SkullType;
 import org.bukkit.World;
 import org.bukkit.block.banner.Pattern;
 import org.bukkit.block.banner.PatternType;
@@ -33,6 +32,7 @@ import org.bukkit.inventory.meta.FireworkEffectMeta;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
+import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.map.MapView;
@@ -50,6 +50,7 @@ import me.RockinChaos.itemjoin.listeners.giveitems.RegionEnter;
 import me.RockinChaos.itemjoin.utils.Hooks;
 import me.RockinChaos.itemjoin.utils.Reflection;
 import me.RockinChaos.itemjoin.utils.Utils;
+import me.RockinChaos.itemjoin.utils.sqlite.SQLData;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
@@ -198,7 +199,7 @@ public class CreateItems {
 
 	public static ItemStack setDurability(ConfigurationSection items, ItemStack tempitem) {
 		if (items.getString(".skull-owner") != null) {
-			tempitem.setDurability((short) SkullType.PLAYER.ordinal());
+			tempitem.setDurability((short) 3);
 		} else if (items.getString(".durability") != null) {
 			int durability = items.getInt(".durability");
 			tempitem.setDurability((short) durability);
@@ -327,7 +328,8 @@ public class CreateItems {
 	}
 
 	public static ItemMeta setFireworks(ConfigurationSection items, ItemMeta tempmeta, Material tempmat) {
-		if (items.getString(".firework.type") != null && tempmat == Material.FIREWORK) {
+		if (items.getString(".firework.type") != null) {
+			if (tempmat.toString().equalsIgnoreCase("FIREWORK") || tempmat.toString().equalsIgnoreCase("FIREWORK_ROCKET")) {
 			String stringType = items.getString(".firework.type").toUpperCase();
 			boolean flicker = items.getBoolean(".firework.flicker");
 			boolean trail = items.getBoolean(".firework.trail");
@@ -339,21 +341,29 @@ public class CreateItems {
 				String[] colors = colorlist.split(",");
 				for (String color: colors) {
 					String coloring = color.toUpperCase();
+					try {
 					clist.add(DyeColor.valueOf(coloring).getFireworkColor());
+					} catch (Exception e) {
+						ServerHandler.sendConsoleMessage("&4The item " + items.getName() + " has the incorrect dye color " + coloring + " and does not exist!");
+						ServerHandler.sendConsoleMessage("&4Please see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/DyeColor.html for a list of correct dye color names!");
+					}
 				}
 			}
 			FireworkEffect effect = FireworkEffect.builder().trail(trail).flicker(flicker).withColor(clist).withFade(clist).with(buildType).build();
 			((FireworkMeta) tempmeta).clearEffects();
 			((FireworkMeta) tempmeta).addEffect(effect);
 			((FireworkMeta) tempmeta).setPower(power);
+			}
 		}
 		return tempmeta;
 	}
 	
 	public static ItemMeta setFireChargeColor(ConfigurationSection items, ItemMeta tempmeta, Material tempmat) {
-		if (tempmat == Material.FIREWORK_CHARGE && items.getString(".charge-color") != null) {
+		if (items.getString(".charge-color") != null) {
+			if (ItemHandler.containsIgnoreCase(tempmat.toString(), "CHARGE") || ItemHandler.containsIgnoreCase(tempmat.toString(), "STAR")) {
 				String color = items.getString(".charge-color").toUpperCase();
                 ((FireworkEffectMeta) tempmeta).setEffect(FireworkEffect.builder().withColor(DyeColor.valueOf(color).getColor()).build());
+			}
 		}
 		return tempmeta;
 	}
@@ -505,7 +515,7 @@ public class CreateItems {
 	}
 
 	public static ItemMeta setBanners(ConfigurationSection items, Material tempmat, ItemMeta tempmeta) {
-		if (items.getString(".banner-meta") != null && ServerHandler.hasAltUpdate("1_8") && tempmat == Material.BANNER) {
+		if (items.getString(".banner-meta") != null && ServerHandler.hasAltUpdate("1_8") && ItemHandler.containsIgnoreCase(tempmat.toString(), "BANNER")) {
 			String bannerlist = items.getString(".banner-meta").replace(" ", "");
 			String[] banners = bannerlist.split(",");
 			List<Pattern> patterns = new ArrayList<Pattern>();
@@ -529,7 +539,8 @@ public class CreateItems {
 	}
 	
     public static ItemMeta setSkullTexture(ConfigurationSection items, Player player, Material tempmat, ItemMeta tempmeta) {
-		if (ServerHandler.hasAltUpdate("1_8") && items.getString(".skull-texture") != null && !items.getString(".skull-texture").contains("hdb-") && items.getString(".skull-owner") == null && tempmat == Material.SKULL_ITEM) {
+		if (ServerHandler.hasAltUpdate("1_8") && items.getString(".skull-texture") != null && !items.getString(".skull-texture").contains("hdb-") && items.getString(".skull-owner") == null) {
+			if (tempmat.toString().equalsIgnoreCase("SKULL_ITEM") || tempmat.toString().equalsIgnoreCase("PLAYER_HEAD")) {
 		String texture = items.getString(".skull-texture");
         GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
         gameProfile.getProperties().put("textures", new Property("textures", new String(texture)));
@@ -541,26 +552,34 @@ public class CreateItems {
         catch (Exception e) {
         	if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
         }
-		} else if (items.getString(".skull-owner") != null && items.getString(".skull-texture") != null && tempmat == Material.SKULL_ITEM) {
+			}
+		} else if (items.getString(".skull-owner") != null && items.getString(".skull-texture") != null) {
+			if (tempmat.toString().equalsIgnoreCase("SKULL_ITEM") || tempmat.toString().equalsIgnoreCase("PLAYER_HEAD")) {
 			ServerHandler.sendConsoleMessage("&4You cannot define a skull owner and a skull texture at the same time, please remove one from the item.");
+			}
 		}
         return tempmeta;
     }
 
 	public static ItemMeta setSkull(ConfigurationSection items, Player player, Material tempmat, ItemMeta tempmeta) {
-		if (items.getString(".skull-owner") != null && items.getString(".skull-texture") == null && tempmat == Material.SKULL_ITEM) {
+		if (items.getString(".skull-owner") != null && items.getString(".skull-texture") == null) {
+			if (tempmat.toString().equalsIgnoreCase("SKULL_ITEM") || tempmat.toString().equalsIgnoreCase("PLAYER_HEAD")) {
 			String owner = items.getString(".skull-owner");
 			owner = Utils.format(owner, player);
 			return PlayerHandler.setSkullOwner(tempmeta, owner);
-		} else if (items.getString(".skull-owner") != null && items.getString(".skull-texture") != null && tempmat == Material.SKULL_ITEM) {
+			}
+		} else if (items.getString(".skull-owner") != null && items.getString(".skull-texture") != null) {
+			if (tempmat.toString().equalsIgnoreCase("SKULL_ITEM") || tempmat.toString().equalsIgnoreCase("PLAYER_HEAD")) {
 			ServerHandler.sendConsoleMessage("&4You cannot define a skull owner and a skull texture at the same time, please remove one from the item.");
+			}
 		}
 		return tempmeta;
 	}
 
 	public static ItemStack setHeadDatabaseSkull(ConfigurationSection items, Material tempmat, ItemStack tempitem) {
 		if (ServerHandler.hasAltUpdate("1_8") && Hooks.hasHeadDatabase() && items.getString(".skull-texture") != null && items.getString(".skull-texture").contains("hdb-") 
-				&& items.getString(".skull-owner") == null && Utils.isInt(items.getString(".skull-texture").replace("hdb-", "")) && tempmat == Material.SKULL_ITEM) {
+				&& items.getString(".skull-owner") == null && Utils.isInt(items.getString(".skull-texture").replace("hdb-", ""))) {
+			if (tempmat.toString().equalsIgnoreCase("SKULL_ITEM") || tempmat.toString().equalsIgnoreCase("PLAYER_HEAD")) {
 	      HeadDatabaseAPI api = new HeadDatabaseAPI();
 	      try {
 	    	  
@@ -571,8 +590,11 @@ public class CreateItems {
 	          ServerHandler.sendConsoleMessage("&4HeadDatabase could not find &c#" + items.getString(".skull-texture").replace("hdb-", "") + "&4, this head does not exist.");
 	          if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
 	      }
-		} else if (items.getString(".skull-owner") != null && items.getString(".skull-texture") != null && tempmat == Material.SKULL_ITEM) {
+			}
+		} else if (items.getString(".skull-owner") != null && items.getString(".skull-texture") != null) {
+			if (tempmat.toString().equalsIgnoreCase("SKULL_ITEM") || tempmat.toString().equalsIgnoreCase("PLAYER_HEAD")) {
 			ServerHandler.sendConsoleMessage("&4You cannot define a skull owner and a skull texture at the same time, please remove one from the item.");
+			}
 		}
 		return tempitem;
 	}
@@ -621,7 +643,13 @@ public class CreateItems {
 				String[] parts = enchantment.split(":");
 				String name = parts[0].toUpperCase();
 				int level = 1;
+				@SuppressWarnings("deprecation")
 				Enchantment enchantName = Enchantment.getByName(name);
+				if (enchantName == null && ServerHandler.hasAquaticUpdate()) {
+					try {
+					enchantName = Enchantment.getByKey(org.bukkit.NamespacedKey.minecraft(name.toLowerCase()));
+					} catch (Exception e) { if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); } }
+				}
 				if (ItemHandler.containsIgnoreCase(enchantment, ":")) {
 					try {
 						level = Integer.parseInt(parts[1]);
@@ -643,10 +671,11 @@ public class CreateItems {
 		}
 		return tempitem;
 	}
-
+	
+	@SuppressWarnings("deprecation")
 	public static ItemStack setMapImage(ItemStack tempitem, Material tempmat, String item, Player player) {
 		ConfigurationSection items = ConfigHandler.getItemSection(item);
-		if (items.getString(".custom-map-image") != null && tempmat == Material.MAP) {
+		if (items.getString(".custom-map-image") != null && ItemHandler.containsIgnoreCase(tempmat.toString(), "MAP")) {
 			int mapID;
 			if (items.getString(".map-id") != null && items.getInt(".map-id") > 0 && items.getInt(".map-id") < 30) {
 				mapID = items.getInt(".map-id");
@@ -657,21 +686,46 @@ public class CreateItems {
 				ServerHandler.sendConsoleMessage("&4If you believe for this to be an error please contact the plugin developer.");
 				mapID = 1;
 			}
-			tempitem.setDurability((short) mapID);
-			MapView view = RenderImageMaps.MapView(player, mapID);
 			String mapIMG = items.getString(".custom-map-image");
 			if (mapIMG.equalsIgnoreCase("default.png") || new File(ItemJoin.getInstance().getDataFolder(), mapIMG).exists()) {
+				if (SQLData.hasImage(player, item, mapIMG)) {
+					mapID = SQLData.getMapID(player, mapIMG);
+					if (ServerHandler.hasAquaticUpdate()) { MapMeta mapmeta = (MapMeta) tempitem.getItemMeta(); mapmeta.setMapId(mapID); tempitem.setItemMeta(mapmeta); }
+					else { tempitem.setDurability((short) mapID); }
+					if (RenderImageMaps.hasRendered.get(player) == null || RenderImageMaps.hasRendered.get(player) != null && !RenderImageMaps.hasRendered.get(player).toString().contains(mapID + "")) {
+						MapView view = RenderImageMaps.FetchExistingView(player, mapID);
+						RenderImageMaps.setImage(mapIMG, mapID);
+						try {
+							view.removeRenderer(view.getRenderers().get(0));
+						} catch (NullPointerException e) {
+							if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+						}
+					try {
+					view.addRenderer(new RenderImageMaps());
+					} catch (NullPointerException e) {
+						if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+					}
+						}
+				} else {
+					
+				MapView view = RenderImageMaps.MapView(player, mapID);
+				mapID = view.getId();
+				
+				if (ServerHandler.hasAquaticUpdate()) { MapMeta mapmeta = (MapMeta) tempitem.getItemMeta(); mapmeta.setMapId(mapID); tempitem.setItemMeta(mapmeta); }
+				else { tempitem.setDurability((short) mapID); }
+				SQLData.saveMapImage(player, item, "map-id", mapIMG, mapID);
 				RenderImageMaps.setImage(mapIMG, mapID);
 				try {
 					view.removeRenderer(view.getRenderers().get(0));
 				} catch (NullPointerException e) {
 					if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
 				}
-			}
 			try {
 			view.addRenderer(new RenderImageMaps());
 			} catch (NullPointerException e) {
 				if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+			}
+				}
 			}
 		}
 		return tempitem;
@@ -731,6 +785,8 @@ public class CreateItems {
 		} else if (isComparable(tempitem, "POTION") || isComparable(tempitem, "SPLASH_POTION") 
 				|| ServerHandler.hasCombatUpdate() && isComparable(tempitem, "LINGERING_POTION")) {
 			return (PotionMeta) tempitem.getItemMeta();
+		} else if (isComparable(tempitem, "FILLED_MAP")) {
+			return (MapMeta) tempitem.getItemMeta();
 		}
 		return tempitem.getItemMeta();
 	}

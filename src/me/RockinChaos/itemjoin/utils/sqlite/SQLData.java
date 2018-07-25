@@ -35,6 +35,8 @@ public class SQLData {
 			if (!SQLite.getDatabase("database").tableExists("enabled_players")) {
 				SQLite.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS enabled_players (`World_Name` varchar(32), `Player_Name` varchar(32), `Player_UUID` varchar(32), `isEnabled` varchar(32));");
 			}
+		} else if (itemflag.equalsIgnoreCase("map-id") && !SQLite.getDatabase("database").tableExists("map_ids")) {
+				SQLite.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS map_ids (`Map_IMG` varchar(32), `Map_ID` varchar(32));");
 		}
 	}
 	
@@ -94,11 +96,54 @@ public class SQLData {
 		}
 	}
 	
+	public static int getMapID(Player player, String Image) {
+			try {
+				try {
+					createTables("map-id");
+					Statement stmt = SQLite.getDatabase("database").getSQLConnection().createStatement();
+					try {
+						ResultSet rset = stmt.executeQuery("SELECT * FROM map_ids WHERE Map_IMG='" + Image + "';");
+						try {
+							if (!rset.isBeforeFirst()) {} else {
+								if (rset.getString(2) != null) {
+									return Integer.parseInt(rset.getString(2));
+								} else { }
+							}
+						} finally { rset.close(); }
+					} finally { stmt.close(); }
+				} finally { SQLite.getDatabase("database").closeConnection(); }
+			} catch (Exception e) {
+				ServerHandler.sendDebugMessage("Could not read from the database.db file!");
+				if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+			}
+			return 0;
+	}
+	
+	public static void saveMapImage(Player player, String item, String itemflag, String Image, int mapID) {
+		ConfigurationSection items = ConfigHandler.getItemSection(item);
+		if (items != null) {
+			createTables(itemflag);
+			@SuppressWarnings("unused")
+			String realPlayer = "ALL";
+			String realName = "ALL";
+			if (player != null) { realPlayer = PlayerHandler.getPlayerID(player); realName = player.getName().toString(); }
+			try {
+				if (itemflag.equalsIgnoreCase("map-id") && !isInDatabase(itemflag, "SELECT * FROM map_ids WHERE Map_IMG='" + Image + "';")
+						&& !isInDatabase(itemflag, "SELECT * FROM map_ids WHERE Map_IMG='" + Image + "' AND Map_ID='" + mapID + "';")) {
+					SQLite.getDatabase("database").executeStatement("INSERT INTO map_ids (`Map_IMG`, `Map_ID`) VALUES ('" + Image + "','" + mapID + "')");
+				}
+			} catch (Exception e) {
+				ItemJoin.getInstance().getServer().getLogger().severe("Could not save " + realName + " to the data file!");
+				if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+			}
+		}
+	}
+	
 	public static void purgeDatabaseData(String section, OfflinePlayer player) {
 		String UUID = PlayerHandler.getOfflinePlayerID(player);
 		if (section.equalsIgnoreCase("first_join") && SQLite.getDatabase("database").tableExists("first_join")) {
 			SQLite.getDatabase("database").executeStatement("DELETE FROM " + section + " WHERE Player_UUID='" + UUID + "';");
-		} else if (section.equalsIgnoreCase("ip_limits")&& SQLite.getDatabase("database").tableExists("ip_limits")) {
+		} else if (section.equalsIgnoreCase("ip_limits") && SQLite.getDatabase("database").tableExists("ip_limits")) {
 			SQLite.getDatabase("database").executeStatement("DELETE FROM " + section + " WHERE Player_UUID='" + UUID + "';");
 		}
 	}
@@ -125,6 +170,34 @@ public class SQLData {
 		if (ItemHandler.containsIgnoreCase(ItemFlags, "ip-limit") && isLimited(player, item, player.getAddress().getHostString()) 
 				|| ItemHandler.containsIgnoreCase(ItemFlags, "ip-limit") && isLimited(player, item, player.getAddress().getHostString().replace(".", ""))) {
 			return true;
+		}
+		return false;
+	}
+	
+	public static Boolean hasImage(Player player, String item, String image) {
+		if (isImageSaved(player, item, image)) {
+			return true;
+		}
+		return false;
+	}
+	
+	public static boolean isImageSaved(Player player, String item, String Image) {
+		try {
+			createTables("map-id");
+			Statement statement = SQLite.getDatabase("database").getSQLConnection().createStatement();
+			ResultSet result = statement.executeQuery("SELECT * FROM map_ids WHERE Map_IMG='" + Image + "';");
+			try {
+				if (!result.isBeforeFirst()) {
+					return false;
+				} else {
+					if (result.getString(1).equalsIgnoreCase(Image)) {
+						return true;
+					} else { return false; }
+				}
+			} finally { result.close(); statement.close(); }
+		} catch (Exception e) {
+			ServerHandler.sendDebugMessage("Could not read from the database.db file, map item images have been disabled!");
+			if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
 		}
 		return false;
 	}
