@@ -200,11 +200,12 @@ public class CommandHandler {
 	
 	public static String getClickType(ConfigurationSection items, String action) {
 		String commandType = items.getString(".commands-type");
+		List < String > invExists = items.getStringList(".commands" + ActionType.INVENTORY.definition);
 		if (ConfigHandler.getCommandsSection(items) != null) {
 			Iterator < String > it = ConfigHandler.getCommandsSection(items).getKeys(false).iterator();
 			while (it.hasNext()) {
 				String definition = it.next();
-				if (ItemHandler.containsIgnoreCase(commandType, "inventory") && CommandsType.INVENTORY.hasAction(action)) {
+				if (ItemHandler.containsIgnoreCase(commandType, "inventory") && CommandsType.INVENTORY.hasAction(action) || invExists != null && CommandsType.INVENTORY.hasAction(action)) {
 					if (ActionType.INVENTORY.hasAction(action) && ActionType.INVENTORY.hasDefine(definition)) {
 						return ActionType.INVENTORY.definition;
 					} else if (ActionType.MULTI_CLICK_INVENTORY.hasAction(action) && ActionType.MULTI_CLICK_INVENTORY.hasDefine(definition)) {
@@ -328,12 +329,7 @@ public class CommandHandler {
 	public static void dispatchBungeeCordCommands(Player player, String returnedCommand, String item) {
 		try {
 			String Command = Utils.format(returnedCommand, player);
-			//player.sendMessage("yeet1");
-			//player.performCommand("/glist");
-			//Bukkit.getServer().dispatchCommand(player, "glist");
-			//	ItemJoin.getInstance().getPluginManager().dispatchCommand((CommandSender) player, "/glist");
 			BungeeCord.ExecuteCommand(player, Command);
-			//ProxyServer.getInstance().getPluginManager().dispatchCommand((CommandSender) player, "glist");
 			playersOnCooldown.put(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + item, System.currentTimeMillis());
 		} catch (Exception e) {
 			ServerHandler.sendConsoleMessage("&cThere was an issue executing an item's command to BungeeCord, if this continues please report it to the developer!");
@@ -398,11 +394,10 @@ public class CommandHandler {
 	
 	public static boolean isCommandable(String action, ConfigurationSection items) {
 		String commandType = items.getString(".commands-type");
-		if (ItemHandler.containsIgnoreCase(commandType, "inventory") && CommandsType.INVENTORY.hasAction(action)) {
+		List < String > invExists = items.getStringList(".commands" + ActionType.INVENTORY.definition);
+		if (ItemHandler.containsIgnoreCase(commandType, "inventory") && CommandsType.INVENTORY.hasAction(action) || invExists != null && CommandsType.INVENTORY.hasAction(action)) {
 			return true;
-		} else if (ItemHandler.containsIgnoreCase(commandType, "interact") && CommandsType.INTERACT.hasAction(action)) {
-			return true;
-		} else if (CommandsType.INTERACT.hasAction(action)) {
+		} else if (ItemHandler.containsIgnoreCase(commandType, "interact") && CommandsType.INTERACT.hasAction(action) || CommandsType.INTERACT.hasAction(action)) {
 			return true;
 		}
 		return false;

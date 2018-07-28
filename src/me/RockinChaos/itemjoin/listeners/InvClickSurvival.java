@@ -16,7 +16,6 @@ import me.RockinChaos.itemjoin.handlers.AnimationHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
-import me.RockinChaos.itemjoin.utils.ItemCreator;
 
 public class InvClickSurvival implements Listener {
 
