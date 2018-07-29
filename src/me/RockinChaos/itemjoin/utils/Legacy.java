@@ -14,9 +14,7 @@ public class Legacy {
 
         final Material[] foundMaterial = new Material[1];
 
-        for (Material material: EnumSet.allOf(Material.class)) {
-            // TODO: Find a way to convert extra data to a new material type.
-            // Found matching id
+        for (Material material: EnumSet.allOf(Material.class)) { // Add a way to convert data-value data to a new material type.
             if (material.getId() == typeId) {
                 foundMaterial[0] = material;
                 return material;
