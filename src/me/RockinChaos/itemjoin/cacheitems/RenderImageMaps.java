@@ -32,12 +32,12 @@ public class RenderImageMaps extends MapRenderer {
 					hasRendered.put(player, id);
 					view.setScale(MapView.Scale.NORMAL);
 					canvas.drawImage(0, 0, ImageIO.read(new File(ItemJoin.getInstance().getDataFolder(), String.valueOf(writeImage))));
-					ServerHandler.sendDebugMessage("rendering map; " + writeImage);
+					ServerHandler.sendDebugMessage("rendering map; " + writeImage + " with the id " + id);
 				} else if (writeImage != null && writeImage.equalsIgnoreCase("default.png") && ItemJoin.getInstance().getResource("default.png") != null) {
 					hasRendered.put(player, id);
 					view.setScale(MapView.Scale.NORMAL);
 					canvas.drawImage(0, 0, ImageIO.read(ItemJoin.getInstance().getResource("default.png")));
-					ServerHandler.sendDebugMessage("rendering map; default.png");
+					ServerHandler.sendDebugMessage("rendering map; default.png" + " with the id " + id);
 				}
 			} catch (Exception e) {
 				ServerHandler.sendConsoleMessage("&4[ERROR; 7753c61] There was a problem rending your map(s)!");

@@ -60,6 +60,7 @@ import me.arcaniax.hdb.api.HeadDatabaseAPI;
 public class CreateItems {
 	public static Map < String, ItemStack > items = new HashMap < String, ItemStack > ();
 	public static Map < String, Integer > probability = new HashMap < String, Integer > ();
+	private static boolean hasPreviewed = false;
 
 	public static void run(Player player) {
 		items.remove(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items.");
@@ -235,8 +236,8 @@ public class CreateItems {
 			if (nameString != null && items.getString(".name." + nameString) != null) { formatName = items.getString(".name." + nameString); }
 			else if (ConfigHandler.getNameSection(items) != null) { formatName = items.getString(".name." + ConfigHandler.getNameSection(items).getKeys(false).iterator().next()); }
 			formatName = Utils.format("&r" + formatName.replace("<delay:" + Utils.returnInteger(formatName) + ">", ""), player);
-			if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && ServerHandler.hasAltUpdate("1_8") 
-					|| ItemHandler.containsIgnoreCase(items.getString(".itemflags"), "vanilla") && ServerHandler.hasAltUpdate("1_8")) {
+			if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && ServerHandler.hasSpecificUpdate("1_8") 
+					|| ItemHandler.containsIgnoreCase(items.getString(".itemflags"), "vanilla") && ServerHandler.hasSpecificUpdate("1_8")) {
 				tempmeta.setDisplayName(formatName);
 			} else if (!ItemHandler.containsIgnoreCase(items.getString(".itemflags"), "vanilla")) {
 				tempmeta.setDisplayName(formatName + ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + ItemID + items.getName()));
@@ -244,8 +245,8 @@ public class CreateItems {
 		} else {
 			String lookup = ItemHandler.getName(tempitem);
 			String formatName = "";
-			if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && ServerHandler.hasAltUpdate("1_8")
-					|| ItemHandler.containsIgnoreCase(items.getString(".itemflags"), "vanilla") && ServerHandler.hasAltUpdate("1_8")) {
+			if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && ServerHandler.hasSpecificUpdate("1_8")
+					|| ItemHandler.containsIgnoreCase(items.getString(".itemflags"), "vanilla") && ServerHandler.hasSpecificUpdate("1_8")) {
 			} else if (!ItemHandler.containsIgnoreCase(items.getString(".itemflags"), "vanilla")) {
 				formatName = Utils.format("&r" + lookup + ConfigHandler.encodeSecretData(ConfigHandler.getNBTData() + ItemID + items.getName()), player);
 				tempmeta.setDisplayName(formatName);
@@ -272,7 +273,7 @@ public class CreateItems {
 
 	public static ItemMeta hideAttributes(ConfigurationSection items, ItemMeta tempmeta) {
 		String ItemFlags = items.getString(".itemflags");
-		if (ServerHandler.hasAltUpdate("1_8")) {
+		if (ServerHandler.hasSpecificUpdate("1_8")) {
 			if (ItemHandler.containsIgnoreCase(ItemFlags, "hide-attributes") || ItemHandler.containsIgnoreCase(ItemFlags, "hide attributes") 
 					|| ItemHandler.containsIgnoreCase(ItemFlags, "attributes") || ItemHandler.containsIgnoreCase(ItemFlags, "hideattributes")) {
 				tempmeta = setItemAttributes(tempmeta);
@@ -398,9 +399,9 @@ public class CreateItems {
 	}
 
 	public static ItemMeta setBookGeneration(ConfigurationSection items, ItemMeta tempmeta, Material tempmat, Player player) {
-		if (items.getString(".generation") != null && ServerHandler.hasAltUpdate("1_10") && tempmat == Material.WRITTEN_BOOK) {
+		if (items.getString(".generation") != null && ServerHandler.hasSpecificUpdate("1_10") && tempmat == Material.WRITTEN_BOOK) {
 			((BookMeta) tempmeta).setGeneration(Generation.valueOf(items.getString(".generation")));
-		} else if (tempmat == Material.WRITTEN_BOOK && ServerHandler.hasAltUpdate("1_10")) {
+		} else if (tempmat == Material.WRITTEN_BOOK && ServerHandler.hasSpecificUpdate("1_10")) {
 			((BookMeta) tempmeta).setGeneration(Generation.ORIGINAL);
 		}
 		return tempmeta;
@@ -408,7 +409,7 @@ public class CreateItems {
 	
 	
 	public static ItemStack setJSONBookPages(ConfigurationSection items, ItemStack tempitem, Material tempmat, Player player) {
-		if (tempmat == Material.WRITTEN_BOOK && items.getString(".pages") != null && ConfigHandler.getPagesSection(items) != null && ServerHandler.hasAltUpdate("1_8")) {
+		if (tempmat == Material.WRITTEN_BOOK && items.getString(".pages") != null && ConfigHandler.getPagesSection(items) != null && ServerHandler.hasSpecificUpdate("1_8")) {
 
 			Class<?> craftItemStack = Reflection.getOBC("inventory.CraftItemStack");
 			Class<?> NBTBASE = Reflection.getNMS("NBTBase");
@@ -485,7 +486,7 @@ public class CreateItems {
 	}
 
 	public static ItemMeta setBookPages(ConfigurationSection items, ItemMeta tempmeta, Material tempmat, Player player) {
-		if (tempmat == Material.WRITTEN_BOOK && items.getString(".pages") != null && ConfigHandler.getPagesSection(items) != null && !ServerHandler.hasAltUpdate("1_8")) {
+		if (tempmat == Material.WRITTEN_BOOK && items.getString(".pages") != null && ConfigHandler.getPagesSection(items) != null && !ServerHandler.hasSpecificUpdate("1_8")) {
 		if (items.getString(".pages") != null && tempmat == Material.WRITTEN_BOOK) {
 			for (String pageString: ConfigHandler.getPagesSection(items).getKeys(false)) {
 				 List<String> pageList = items.getStringList(".pages." + pageString);
@@ -515,7 +516,7 @@ public class CreateItems {
 	}
 
 	public static ItemMeta setBanners(ConfigurationSection items, Material tempmat, ItemMeta tempmeta) {
-		if (items.getString(".banner-meta") != null && ServerHandler.hasAltUpdate("1_8") && ItemHandler.containsIgnoreCase(tempmat.toString(), "BANNER")) {
+		if (items.getString(".banner-meta") != null && ServerHandler.hasSpecificUpdate("1_8") && ItemHandler.containsIgnoreCase(tempmat.toString(), "BANNER")) {
 			String bannerlist = items.getString(".banner-meta").replace(" ", "");
 			String[] banners = bannerlist.split(",");
 			List<Pattern> patterns = new ArrayList<Pattern>();
@@ -539,7 +540,7 @@ public class CreateItems {
 	}
 	
     public static ItemMeta setSkullTexture(ConfigurationSection items, Player player, Material tempmat, ItemMeta tempmeta) {
-		if (ServerHandler.hasAltUpdate("1_8") && items.getString(".skull-texture") != null && !items.getString(".skull-texture").contains("hdb-") && items.getString(".skull-owner") == null) {
+		if (ServerHandler.hasSpecificUpdate("1_8") && items.getString(".skull-texture") != null && !items.getString(".skull-texture").contains("hdb-") && items.getString(".skull-owner") == null) {
 			if (tempmat.toString().equalsIgnoreCase("SKULL_ITEM") || tempmat.toString().equalsIgnoreCase("PLAYER_HEAD")) {
 		String texture = items.getString(".skull-texture");
         GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
@@ -577,7 +578,7 @@ public class CreateItems {
 	}
 
 	public static ItemStack setHeadDatabaseSkull(ConfigurationSection items, Material tempmat, ItemStack tempitem) {
-		if (ServerHandler.hasAltUpdate("1_8") && Hooks.hasHeadDatabase() && items.getString(".skull-texture") != null && items.getString(".skull-texture").contains("hdb-") 
+		if (ServerHandler.hasSpecificUpdate("1_8") && Hooks.hasHeadDatabase() && items.getString(".skull-texture") != null && items.getString(".skull-texture").contains("hdb-") 
 				&& items.getString(".skull-owner") == null && Utils.isInt(items.getString(".skull-texture").replace("hdb-", ""))) {
 			if (tempmat.toString().equalsIgnoreCase("SKULL_ITEM") || tempmat.toString().equalsIgnoreCase("PLAYER_HEAD")) {
 	      HeadDatabaseAPI api = new HeadDatabaseAPI();
@@ -601,7 +602,7 @@ public class CreateItems {
 	
 	public static ItemMeta setPotionEffects(ConfigurationSection items, Material tempmat, ItemMeta tempmeta) {
 		if (items.getString(".potion-effect") != null) {
-			if (tempmat == Material.POTION || tempmat == Material.SPLASH_POTION || ServerHandler.hasCombatUpdate() && tempmat == Material.LINGERING_POTION) {
+			if (tempmat == Material.POTION || tempmat.toString().equalsIgnoreCase("SPLASH_POTION") || ServerHandler.hasCombatUpdate() && tempmat == Material.LINGERING_POTION) {
 				String potionlist = items.getString(".potion-effect").replace(" ", "");
 				String[] potions = potionlist.split(",");
 				for (String potion: potions) {
@@ -676,16 +677,7 @@ public class CreateItems {
 	public static ItemStack setMapImage(ItemStack tempitem, Material tempmat, String item, Player player) {
 		ConfigurationSection items = ConfigHandler.getItemSection(item);
 		if (items.getString(".custom-map-image") != null && ItemHandler.containsIgnoreCase(tempmat.toString(), "MAP")) {
-			int mapID;
-			if (items.getString(".map-id") != null && items.getInt(".map-id") > 0 && items.getInt(".map-id") < 30) {
-				mapID = items.getInt(".map-id");
-			} else {
-				ServerHandler.sendConsoleMessage("&4Your map-id on item " + item + " is incorrect or does not exist!");
-				ServerHandler.sendConsoleMessage("&4Please check and makesure your map-id is between 1 and 29.");
-				ServerHandler.sendConsoleMessage("&4Your map-id has been set to 1 by default until you fix your config.");
-				ServerHandler.sendConsoleMessage("&4If you believe for this to be an error please contact the plugin developer.");
-				mapID = 1;
-			}
+			int mapID = 1;
 			String mapIMG = items.getString(".custom-map-image");
 			if (mapIMG.equalsIgnoreCase("default.png") || new File(ItemJoin.getInstance().getDataFolder(), mapIMG).exists()) {
 				if (SQLData.hasImage(player, item, mapIMG)) {
@@ -695,19 +687,17 @@ public class CreateItems {
 					if (RenderImageMaps.hasRendered.get(player) == null || RenderImageMaps.hasRendered.get(player) != null && !RenderImageMaps.hasRendered.get(player).toString().contains(mapID + "")) {
 						MapView view = RenderImageMaps.FetchExistingView(player, mapID);
 						RenderImageMaps.setImage(mapIMG, mapID);
+						if (!hasPreviewed) {
 						try {
 							view.removeRenderer(view.getRenderers().get(0));
-						} catch (NullPointerException e) {
-							if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
-						}
+						} catch (NullPointerException e) { if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); } }
 					try {
 					view.addRenderer(new RenderImageMaps());
-					} catch (NullPointerException e) {
-						if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+					} catch (NullPointerException e) { if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); } }
+					hasPreviewed = true;
 					}
-						}
-				} else {
-					
+					}
+				} else if (!hasPreviewed) {
 				MapView view = RenderImageMaps.MapView(player, mapID);
 				mapID = view.getId();
 				
@@ -717,15 +707,12 @@ public class CreateItems {
 				RenderImageMaps.setImage(mapIMG, mapID);
 				try {
 					view.removeRenderer(view.getRenderers().get(0));
-				} catch (NullPointerException e) {
-					if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
-				}
+				} catch (NullPointerException e) { if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); } }
 			try {
 			view.addRenderer(new RenderImageMaps());
-			} catch (NullPointerException e) {
-				if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+			} catch (NullPointerException e) { if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); } }
+			hasPreviewed = true;
 			}
-				}
 			}
 		}
 		return tempitem;
