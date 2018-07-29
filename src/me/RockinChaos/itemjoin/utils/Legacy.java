@@ -10,10 +10,20 @@ import me.RockinChaos.itemjoin.ItemJoin;
 @SuppressWarnings("deprecation")
 public class Legacy {
 	
-	public static Material getLegacyMaterial(int id) {
-		Material[] idFromList = Material.values();
-		return idFromList[id];
-	}
+    public static org.bukkit.Material findLegacyMaterial(int typeId) {
+
+        final Material[] foundMaterial = new Material[1];
+
+        for (Material material: EnumSet.allOf(Material.class)) {
+            // TODO: Find a way to convert extra data to a new material type.
+            // Found matching id
+            if (material.getId() == typeId) {
+                foundMaterial[0] = material;
+                return material;
+            }
+        }
+		return null;
+}
 	
 	public static Material convertLegacyMaterial(int ID, byte Data) {
 	    for (Material i : EnumSet.allOf(Material.class)) { if (i.getId() == ID) { return ItemJoin.getInstance().getServer().getUnsafe().fromLegacy(new MaterialData(i, Data)); } }
