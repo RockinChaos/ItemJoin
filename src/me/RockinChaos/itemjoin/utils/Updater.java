@@ -226,7 +226,7 @@ public class Updater {
             	    sender.sendMessage(ServerHandler.StripLogColors(sender, Prefix + ChatColor.GREEN + "Get it from: https://www.spigotmc.org/resources/itemjoin.12661/history"));
             	    sender.sendMessage(ServerHandler.StripLogColors(sender, Prefix + ChatColor.GREEN + "If you wish to auto update, please type /ItemJoin AutoUpdate"));
             	    
-            	    if(ServerHandler.hasAltUpdate("1_8")) {
+            	    if(ServerHandler.hasSpecificUpdate("1_8")) {
                     for (Player player : Bukkit.getOnlinePlayers()) {
                         if (player.isOp()) {
                             player.sendMessage(Prefix + ChatColor.YELLOW + "An update has been found for ItemJoin.");
@@ -245,7 +245,7 @@ public class Updater {
                 	  sender.sendMessage(ServerHandler.StripLogColors(sender, Prefix + ChatColor.GREEN + "Get it from: https://www.spigotmc.org/resources/itemjoin.12661/history"));
                 	  sender.sendMessage(ServerHandler.StripLogColors(sender, Prefix + ChatColor.GREEN + "If you wish to auto update, please type /ItemJoin AutoUpdate"));
                 	  
-                	  if(ServerHandler.hasAltUpdate("1_8")) {
+                	  if(ServerHandler.hasSpecificUpdate("1_8")) {
                       for (Player player : Bukkit.getOnlinePlayers()) {
                           if (player.isOp()) {
                         	  player.sendMessage(Prefix + ChatColor.YELLOW + "An update has been found for ItemJoin.");
@@ -268,7 +268,7 @@ public class Updater {
                 	    sender.sendMessage(ServerHandler.StripLogColors(sender, Prefix + ChatColor.GREEN + "Get it from: https://www.spigotmc.org/resources/itemjoin.12661/history"));
                 	    sender.sendMessage(ServerHandler.StripLogColors(sender, Prefix + ChatColor.GREEN + "If you wish to auto update, please type /ItemJoin AutoUpdate"));
                 	    
-                	    if(ServerHandler.hasAltUpdate("1_8")) {
+                	    if(ServerHandler.hasSpecificUpdate("1_8")) {
                         for (Player player : Bukkit.getOnlinePlayers()) {
                             if (player.isOp()) {
                                 player.sendMessage(Prefix + ChatColor.YELLOW + "An update has been found for ItemJoin.");

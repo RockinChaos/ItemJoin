@@ -138,7 +138,7 @@ public class PlayerHandler {
 	
 	@SuppressWarnings("deprecation")
 	public static String getSkullOwner(ItemStack item) {
-		if (ServerHandler.hasAltUpdate("1_12") && item != null && item.hasItemMeta() && ItemHandler.isSkullTyping(item.getType()) 
+		if (ServerHandler.hasSpecificUpdate("1_12") && item != null && item.hasItemMeta() && ItemHandler.isSkullTyping(item.getType()) 
 				&& ((SkullMeta) item.getItemMeta()).hasOwner() && getNewSkullMethod() != false) {
 			String owner =  ((SkullMeta) item.getItemMeta()).getOwningPlayer().getName();
 			if (owner != null) { return owner; }
@@ -153,8 +153,9 @@ public class PlayerHandler {
 	
 	@SuppressWarnings("deprecation")
 	public static ItemMeta setSkullOwner(ItemMeta tempmeta, String owner) {
+		if (ServerHandler.hasSpecificUpdate("1_8")) {
         try {
-		    Method fetchProfile= Reflection.getOBC("entity.CraftPlayer").getDeclaredMethod("getProfile");
+		    Method fetchProfile = Reflection.getOBC("entity.CraftPlayer").getDeclaredMethod("getProfile");
             Field declaredField = tempmeta.getClass().getDeclaredField("profile");
             declaredField.setAccessible(true);
             if (ItemJoin.getInstance().getServer().getPlayer(owner) != null) { declaredField.set(tempmeta, fetchProfile.invoke(ItemJoin.getInstance().getServer().getPlayer(owner))); }
@@ -167,6 +168,15 @@ public class PlayerHandler {
                 declaredField.set(tempmeta, gameProfiles.get(owner));
             }
         } catch (Exception e) { if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }}
+		} else { 
+			if (ServerHandler.hasDebuggingMode()) { 
+				ServerHandler.sendDebugMessage("Minecraft does not support offline player heads below Version 1.8."); 
+				ServerHandler.sendDebugMessage("Player heads will only be given a skin if the player has previously joined the sever.");
+			}
+	        SkullMeta skullMeta = (SkullMeta)tempmeta;
+	        skullMeta.setOwner(owner);
+	        return skullMeta;
+	     }
 		return tempmeta;
 	}
 	

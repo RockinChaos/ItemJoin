@@ -132,7 +132,7 @@ public class Hooks {
 		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new ConsumeApples(), ItemJoin.getInstance());
 		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new ItemStore(), ItemJoin.getInstance());
 
-		if (ServerHandler.hasAltUpdate("1_12") && getEventClass("entity.EntityPickupItemEvent") != null) {
+		if (ServerHandler.hasSpecificUpdate("1_12") && getEventClass("entity.EntityPickupItemEvent") != null) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Pickups(), ItemJoin.getInstance());
 		} else {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Deprecated_Pickups(), ItemJoin.getInstance());

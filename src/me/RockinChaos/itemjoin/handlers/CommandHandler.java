@@ -91,10 +91,10 @@ public class CommandHandler {
 	
 	public static void InitializeCommands(ConfigurationSection items, final String item, final Player player, String action) {
 		List < String > commandList = items.getStringList(".commands" + getClickType(items, action));
-		playSound(items, player);
 		long delay = 0;
 		String sequence = items.getString(".commands-sequence");
 		ArrayList < String > sequencialCommands = new ArrayList < > ();
+		playSound(items, player);
 		for (String command: commandList) {
 			String splicedCommand = hitPlayer(fetchCommand(command, player), player);
 			Type cmdtype = CmdType;
@@ -188,7 +188,7 @@ public class CommandHandler {
 	}
 	
 	public static String hitPlayer(String returnedCommand, Player player) {
-		if (ItemHandler.containsIgnoreCase(returnedCommand, "%hitplayer%") && ServerHandler.hasAltUpdate("1_8")) {
+		if (ItemHandler.containsIgnoreCase(returnedCommand, "%hitplayer%") && ServerHandler.hasSpecificUpdate("1_8")) {
 			Entity entityHit = getNearestEntityInSight(player, 4);
 			if (entityHit != null && entityHit instanceof Player) {
 				Player hitPlayer = (Player) entityHit;
@@ -200,7 +200,7 @@ public class CommandHandler {
 	
 	public static String getClickType(ConfigurationSection items, String action) {
 		String commandType = items.getString(".commands-type");
-		List < String > invExists = items.getStringList(".commands" + ActionType.INVENTORY.definition);
+		String invExists = items.getString(".commands" + ActionType.INVENTORY.definition);
 		if (ConfigHandler.getCommandsSection(items) != null) {
 			Iterator < String > it = ConfigHandler.getCommandsSection(items).getKeys(false).iterator();
 			while (it.hasNext()) {
@@ -394,7 +394,7 @@ public class CommandHandler {
 	
 	public static boolean isCommandable(String action, ConfigurationSection items) {
 		String commandType = items.getString(".commands-type");
-		List < String > invExists = items.getStringList(".commands" + ActionType.INVENTORY.definition);
+		String invExists = items.getString(".commands" + ActionType.INVENTORY.definition);
 		if (ItemHandler.containsIgnoreCase(commandType, "inventory") && CommandsType.INVENTORY.hasAction(action) || invExists != null && CommandsType.INVENTORY.hasAction(action)) {
 			return true;
 		} else if (ItemHandler.containsIgnoreCase(commandType, "interact") && CommandsType.INTERACT.hasAction(action) || CommandsType.INTERACT.hasAction(action)) {

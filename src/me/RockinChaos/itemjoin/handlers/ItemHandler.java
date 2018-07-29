@@ -193,9 +193,9 @@ public class ItemHandler {
 	}
 
 	public static boolean isNBTDataSimilar(ItemStack inPlayerInventory, ItemStack inStoredItems) {
-		if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && ServerHandler.hasAltUpdate("1_8") && getNBTData(inPlayerInventory) != null && getNBTData(inStoredItems) != null && getNBTData(inStoredItems).contains(getNBTData(inPlayerInventory))) {
+		if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && ServerHandler.hasSpecificUpdate("1_8") && getNBTData(inPlayerInventory) != null && getNBTData(inStoredItems) != null && getNBTData(inStoredItems).contains(getNBTData(inPlayerInventory))) {
 			return true;
-		} else if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") != true || ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && !ServerHandler.hasAltUpdate("1_8")) { 
+		} else if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") != true || ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && !ServerHandler.hasSpecificUpdate("1_8")) { 
 				if (inPlayerInventory.hasItemMeta() 
 				&& inPlayerInventory.getItemMeta().hasDisplayName() && inStoredItems.hasItemMeta() && inStoredItems.getItemMeta().hasDisplayName()
 				&& inPlayerInventory.getItemMeta().getDisplayName().contains(ConfigHandler.encodeSecretData(ConfigHandler.getNBTData()))
@@ -251,9 +251,9 @@ public class ItemHandler {
 	}
 	
 	public static boolean hasNBTData(ItemStack inPlayerInventory) {
-		if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && ServerHandler.hasAltUpdate("1_8") && inPlayerInventory != null && inPlayerInventory.getType() != Material.AIR && getNBTData(inPlayerInventory) != null) {
+		if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && ServerHandler.hasSpecificUpdate("1_8") && inPlayerInventory != null && inPlayerInventory.getType() != Material.AIR && getNBTData(inPlayerInventory) != null) {
 			return true;
-		} else if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") != true || ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && !ServerHandler.hasAltUpdate("1_8")) { 
+		} else if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") != true || ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && !ServerHandler.hasSpecificUpdate("1_8")) { 
 				if (inPlayerInventory != null && inPlayerInventory.hasItemMeta() && inPlayerInventory.getItemMeta().hasDisplayName()
 						&& ConfigHandler.decodeSecretData(inPlayerInventory.getItemMeta().getDisplayName()).contains(ConfigHandler.decodeSecretData(ConfigHandler.encodeSecretData(ConfigHandler.getNBTData())))) {
 					return true;
@@ -264,7 +264,7 @@ public class ItemHandler {
 	
 	public static String getNBTData(ItemStack tempitem) {
 		if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true 
-				&& ServerHandler.hasAltUpdate("1_8") && tempitem != null && tempitem.getType() != Material.AIR) {
+				&& ServerHandler.hasSpecificUpdate("1_8") && tempitem != null && tempitem.getType() != Material.AIR) {
 		try {
 		Class<?> craftItemStack = Reflection.getOBC("inventory.CraftItemStack");
 		Class<?> nmsItemStackClass = Reflection.getNMS("ItemStack");
@@ -325,11 +325,13 @@ public class ItemHandler {
 	public static Material getMaterial(ConfigurationSection items) {
 		try {
 		if (Utils.isInt(items.getString(".id")) && !ServerHandler.hasAquaticUpdate()) {
-			return Legacy.getLegacyMaterial(items.getInt(".id"));
+			return Legacy.findLegacyMaterial(items.getInt(".id"));
 		} else if (Utils.isInt(items.getString(".id")) && ServerHandler.hasAquaticUpdate()) {
 			ServerHandler.sendConsoleMessage("&4[WARNING] The item " + items.getName() + " is using an ItemID (Numerical Value) which is no longer supported as of Minecraft 1.13, instead use its material name.");
 			ServerHandler.sendConsoleMessage("&4This will cause issues, please see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html for a list of material names.");
-			return null;
+			int dataValue;
+			if (items.getString(".data-value") != null) { dataValue = items.getInt(".data-value"); } else { dataValue = 0; }
+			return Legacy.convertLegacyMaterial(items.getInt(".id"), (byte) dataValue);
 		} else if (!ServerHandler.hasAquaticUpdate()) {
 			return Material.getMaterial(items.getString(".id").toUpperCase());
 		} else {

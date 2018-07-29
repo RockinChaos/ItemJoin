@@ -29,7 +29,7 @@ public class ServerHandler {
 		return false;
 	}
 	
-	public static boolean hasAltUpdate(String versionString) {
+	public static boolean hasSpecificUpdate(String versionString) {
 		String pkgname = ItemJoin.getInstance().getServer().getClass().getPackage().getName();
 		String localeVersion = "v" + versionString + "_R0";
 	    localeVersion = localeVersion.replace("_", "").replace("R0", "").replace("R1", "").replace("R2", "").replace("R3", "").replace("R4", "").replace("R5", "").replaceAll("[a-z]", "");
