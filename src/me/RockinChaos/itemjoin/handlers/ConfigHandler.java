@@ -27,7 +27,26 @@ public class ConfigHandler {
 		File file = new File(ItemJoin.getInstance().getDataFolder(), path);
 		if (!(file).exists()) {
 			try {
-				ItemJoin.getInstance().saveResource(path, false);
+				if (path.equalsIgnoreCase("items.yml")) {
+					if (ServerHandler.hasAquaticUpdate()) {
+						ItemJoin.getInstance().saveResource("items-v1.13.yml", false);
+						reNameFile("v1.13");
+					} else if (ServerHandler.hasCombatUpdate()) {
+						ItemJoin.getInstance().saveResource("items-v1.9.yml", false);
+						reNameFile("v1.9");
+					} else if (ServerHandler.hasSpecificUpdate("1_8")) {
+						ItemJoin.getInstance().saveResource("items-v1.8.yml", false);
+						reNameFile("v1.8");
+					} else if (ServerHandler.hasSpecificUpdate("1_7")) {
+						ItemJoin.getInstance().saveResource("items-v1.7.yml", false);
+						reNameFile("v1.7");
+					} else {
+						ItemJoin.getInstance().saveResource("items-v1.7.yml", false);
+						reNameFile("v1.7");
+					}
+				} else {
+					ItemJoin.getInstance().saveResource(path, false);
+				}
 			} catch (Exception e) {
 				if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
 				ItemJoin.getInstance().getLogger().warning("Cannot save " + path + " to disk!");
@@ -35,6 +54,19 @@ public class ConfigHandler {
 			}
 		}
 		return getPath(path, 1, file);
+	}
+	
+	public static void reNameFile(String version) {
+		File File = new File(ItemJoin.getInstance().getDataFolder(), "items-" + version + ".yml");
+		if (File.exists()) {
+			String newGen = "items.yml";
+			File newFile = new File(ItemJoin.getInstance().getDataFolder(), newGen);
+			if (!newFile.exists()) {
+				File.renameTo(newFile);
+				File configFile = new File(ItemJoin.getInstance().getDataFolder(), "items-" + version + ".yml");
+				configFile.delete();
+			}
+		}
 	}
 
 	public static FileConfiguration getConfig(String path) {
