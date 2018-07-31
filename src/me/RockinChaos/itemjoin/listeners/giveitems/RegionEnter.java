@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -14,7 +13,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.plugin.Plugin;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 import me.RockinChaos.itemjoin.ItemJoin;
@@ -27,7 +29,6 @@ import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.handlers.WorldHandler;
 import me.RockinChaos.itemjoin.utils.Hooks;
-import me.RockinChaos.itemjoin.utils.Legacy;
 import me.RockinChaos.itemjoin.utils.Utils;
 import me.RockinChaos.itemjoin.utils.sqlite.SQLData;
 
@@ -48,7 +49,7 @@ public class RegionEnter implements Listener {
 						String[] regions = getRegions().toString().split(",");
 						for (String region: regions) {
 							String getRegion = region.replace("[", "").replace("]", "").replace(" ", "");
-							if (!CheckInRegion(player.getWorld(), player.getLocation(), getRegion)) {
+							if (!CheckInRegion(player.getLocation(), getRegion)) {
 								setEnterItems(player, region, 2);
 							}
 						}
@@ -183,27 +184,27 @@ public class RegionEnter implements Listener {
 		String[] regions = getRegions().toString().split(",");
 		for (String region: regions) {
 			String getRegion = region.replace("[", "").replace("]", "").replace(" ", "");
-			if (CheckInRegion(player.getWorld(), player.getLocation(), getRegion) && isInRegion.get(player) == null) {
+			if (CheckInRegion(player.getLocation(), getRegion) && isInRegion.get(player) == null) {
 				isInRegion.put(player, getRegion);
 				setItems(player, getRegion);
 				return true;
-			} else if (CheckInRegion(player.getWorld(), player.getLocation(), getRegion) && !getRegion.equalsIgnoreCase(isInRegion.get(player))) {
+			} else if (CheckInRegion(player.getLocation(), getRegion) && !getRegion.equalsIgnoreCase(isInRegion.get(player))) {
 				isInRegion.remove(player);
 				isInRegion.put(player, getRegion);
 				setItems(player, getRegion);
 				return true;
-			} else if (CheckInRegion(player.getWorld(), player.getLocation(), getRegion) && getRegion.equalsIgnoreCase(isInRegion.get(player))) {
+			} else if (CheckInRegion(player.getLocation(), getRegion) && getRegion.equalsIgnoreCase(isInRegion.get(player))) {
 				return true;
 			}
 		}
 		return false;
 	}
 	
-	public static boolean CheckInRegion(World world, Location playerlocation, String regionname) {
+	public static boolean CheckInRegion(Location playerlocation, String regionname) {
 		if (regionname == null) {
 			return true;
 		}
-		ApplicableRegionSet set = getGuardSetRegions(world, playerlocation);
+		ApplicableRegionSet set = getWGSet(playerlocation);
 		if (set == null) {
 			return false;
 		}
@@ -214,21 +215,19 @@ public class RegionEnter implements Listener {
 		}
 		return false;
 	}
-
-	private static ApplicableRegionSet getGuardSetRegions(World world, Location loc) {
-		String fetchVersion = Bukkit.getServer().getPluginManager().getPlugin("WorldGuard").getDescription().getVersion();
-		int wgVersion = Integer.parseInt(fetchVersion.substring(0, 5).replace(".", ""));
-		if (wgVersion >= 700) {
-			com.sk89q.worldedit.world.World wgWorld = com.sk89q.worldguard.WorldGuard.getInstance().getPlatform().getWorldByName(world.getName());
-			com.sk89q.worldedit.Vector wgVector = new com.sk89q.worldedit.Vector(loc.getX(), loc.getY(), loc.getZ());
-			com.sk89q.worldguard.protection.regions.RegionContainer rm = com.sk89q.worldguard.WorldGuard.getInstance().getPlatform().getRegionContainer();
-			if (rm == null) { return null; }
-			return rm.get(wgWorld).getApplicableRegions(wgVector);
-		} else {
-			return Legacy.getLegacyRegionSet(world, loc);
+	
+	private static ApplicableRegionSet getWGSet(Location loc) {
+		WorldGuardPlugin wg = getWorldGuard();
+		if (wg == null) {
+			return null;
 		}
+		RegionManager rm = wg.getRegionManager(loc.getWorld());
+		if (rm == null) {
+			return null;
+		}
+		return rm.getApplicableRegions(com.sk89q.worldguard.bukkit.BukkitUtil.toVector(loc));
 	}
-
+	
 	public static HashMap < Player, String > getInRegion() {
 		return isInRegion;
 	}
@@ -248,5 +247,12 @@ public class RegionEnter implements Listener {
 	public static void resetRegions() {
 		regions.clear();
 	}
-
+	
+	public static WorldGuardPlugin getWorldGuard() {
+		Plugin plugin = Bukkit.getServer().getPluginManager().getPlugin("WorldGuard");
+		if (plugin == null || !(plugin instanceof WorldGuardPlugin)) {
+			return null;
+		}
+		return (WorldGuardPlugin) plugin;
+	}
 }

@@ -196,14 +196,6 @@
             <systemPath>${pom.basedir}/src/me/RockinChaos/itemjoin/extra/TokenEnchantAPI.jar</systemPath>
             <version>LATEST</version>
         </dependency>
-    <!--WorldGuard 6.2.2 Local API/Repo -->
-        <dependency>
-            <groupId>me.WorldGuard.Legacy</groupId>
-            <artifactId>WorldGuard</artifactId>
-            <scope>system</scope>
-            <systemPath>${pom.basedir}/src/me/RockinChaos/itemjoin/extra/WorldGuard-Legacy.jar</systemPath>
-            <version>Legacy</version>
-        </dependency>
 	</dependencies>
 	<scm>
 		<url>https://github.com/RockinChaos/ItemJoin</url>
