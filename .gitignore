@@ -57,5 +57,3 @@ bin/me/xsilverslayerx/itemjoin/utils/Commands.class
 .gitattributes
 .gitattributes
 .gitattributes
-src/com/sk89q/worldguard/bukkit/RegionContainer.java
-src/com/sk89q/worldguard/bukkit/WorldGuardPlugin.java
