@@ -83,24 +83,25 @@ items:
       - '&7This magical book is given on join!'
     pages:
       1:
-      - '&bYou can get this book on join!'
-      - '&aThis book also supports &ccolor codes!'
+      - '&bYou can get this book &bon join!'
+      - '&aThis book also &asupports &ccolor codes!'
       - ''
-      - '&cHow do custom books work?'
+      - '&cHow do custom books &cwork?'
       - ''
       - '&0You can set an &cauthor&0'
       - '&0as shown in the items.yml'
       - '&0I set it to &bItemJoin.'
-      - ''
-      - '<hover type="text" value="%player% of course!">"What is your name?"</hover>'
       2:
-      - '&cHow do you create a new page?'
+      - '&cHow do you identify a &cpage number?'
       - ''
       - '&0As displayed to the left in the items.yml'
       - '&0Create a number to specify the new page number.'
-      - '&cMakesure you put each number in order as shown.'
-      - '&cCreating new pages should be pretty'
-      - '&cstraight forward for copying and pasting.'
+      - '&cMakesure you put &ceach number in order &cas shown.'
+      3:
+      - '&cHow do you create a &cnew page?'
+      - ''
+      - '&cCreating new pages &cshould be pretty'
+      - '&cstraight forward for &ccopying and pasting.'
       - '&bItemJoin &0by RockinChaos!'
     itemflags: inventory-modify, death-drops, self-drops
     triggers: join, respawn

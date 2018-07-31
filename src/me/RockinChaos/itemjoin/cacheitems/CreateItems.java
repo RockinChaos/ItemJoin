@@ -426,9 +426,18 @@ public class CreateItems {
 			for (String pageString: ConfigHandler.getPagesSection(items).getKeys(false)) {
 				 List<String> pageList = items.getStringList(".pages." + pageString);
 				 List<String> textBuilder = new ArrayList<String>();
+				 textBuilder.add("\"\"");
 				 for (int k = 0; k < pageList.size(); k++) {
 						String formatPage = pageList.get(k);
-						if (formatPage.contains("<hover type=\"text\"")) {
+						if (formatPage.contains("<hover type=\"text\"") || formatPage.contains("<hover type=\"open_url\"") || formatPage.contains("<hover type=\"run_command\"")) {
+							String type = "";
+							if (formatPage.contains("<hover type=\"text\"")) {
+								type = "text";
+							} else if (formatPage.contains("<hover type=\"open_url\"")) {
+								type = "open_url";
+							} else if (formatPage.contains("<hover type=\"run_command\"")) {
+								type = "run_command";
+							}
 							String result = null;
 							String result2 = null;
 							java.util.regex.Pattern pattern1 = java.util.regex.Pattern.compile(">\"(.*?)\"</hover>");
@@ -439,39 +448,47 @@ public class CreateItems {
 							Matcher matcher2 = pattern2.matcher(formatPage);
 							while (matcher2.find()) { result2 = matcher2.group(1); }
 							
-							formatPage = formatPage.replace("<hover type=\"text\" value=\"" + result2 + "\">\"" + result + "\"</hover>", "");
+							formatPage = formatPage.replace("<hover type=\"" + type + "\" value=\"" + result2 + "\">\"" + result + "\"</hover>", "");
 							result2 = Utils.format(result2, player);
 							
+							String event = "";
+
+							String action = "";
+							if (type.equalsIgnoreCase("text")) { event = "hoverEvent"; action = "show_text";}
+							else if (type.equalsIgnoreCase("open_url")) { event = "clickEvent"; action = "open_url";}
+							else if (type.equalsIgnoreCase("run_command")) { event = "clickEvent"; action = "run_command";}
 							String hoverBuilder = new String();
 							String hoverString = result2.replace(" <n> ","<n>").replace("<n> ","<n>").replace(" <n>","<n>");
 							String[] hovers = hoverString.split("<n>");
-							for (String hover: hovers) { hoverBuilder = hoverBuilder + hover + "\n"; }
+							for (String hover: hovers) { if (hoverString.contains("<n>")) {hoverBuilder = hoverBuilder + hover + "\n"; } else { hoverBuilder = hover; } }
 							
 							formatPage = Utils.format(formatPage, player);
 							result = Utils.format(result, player);
-							String action = "show_text";
-							String textComp = "{\"text\":\"" + result + "\",\"hoverEvent\":{\"action\":\"" + action + "\",\"value\":\"" + hoverBuilder + "\"}}";
+							if (type.equalsIgnoreCase("open_url")) {
+								if (!ItemHandler.containsIgnoreCase(hoverBuilder, "https") || !ItemHandler.containsIgnoreCase(hoverBuilder, "http")) {
+									ServerHandler.sendConsoleMessage("&c[ERROR] The URL Specified for the clickable link in the book " + items.getName() + " is missing http or https and will not be clickable.");
+									ServerHandler.sendConsoleMessage("&c[ERROR] A URL designed for a clickable link should look as follows; https://www.google.com/");
+								}
+							}
+							String textComp = "{\"text\":\"" + result + "\",\"" + event + "\":{\"action\":\"" + action + "\",\"value\":\"" + hoverBuilder + "\"}}";
 							String newLine = "{\"text\":\"\\n\",\"color\":\"reset\"}";							
 							String textCompExtra = "{\"text\":\"" + formatPage + "\"}";
-
 							textBuilder.add(textComp);
 							textBuilder.add(textCompExtra);
 							textBuilder.add(newLine);
-							
+
 						} else {
-						formatPage = Utils.format(formatPage, player);
-						String textComp = "{\"text\":\"" + formatPage + "\"}";
-						String newLine = "{\"text\":\"\\n\",\"color\":\"reset\"}";
+							formatPage = Utils.format(formatPage, player);
+							String textComp = "{\"text\":\"" + formatPage + "\"}";
+							String newLine = "{\"text\":\"\\n\",\"color\":\"reset\"}";
 						
-						textBuilder.add(textComp);
-						textBuilder.add(newLine);
-						
+							textBuilder.add(textComp);
+							textBuilder.add(newLine);
 						}
 				 }
 				 
 				 Object tagconvert = null;
-				 try { tagconvert = Reflection.getNMS("NBTTagString").getConstructor(String.class).newInstance(textBuilder.toString()); } catch (Exception e) { e.printStackTrace(); }
-				 
+				 try { tagconvert = Reflection.getNMS("NBTTagString").getConstructor(String.class).newInstance(textBuilder.toString().replace("}, {", "},{")); } catch (Exception e) { e.printStackTrace(); }
 				 try { pages.getClass().getMethod("add", NBTBASE).invoke(pages, tagconvert); } catch (Exception e) { e.printStackTrace(); }
 				 
 			}
@@ -481,6 +498,7 @@ public class CreateItems {
 	        try { nms.getClass().getMethod("setTag", tag.getClass()).invoke(nms, tag); } catch (Exception e) { e.printStackTrace(); }
 	        
 	        try { tempitem = (ItemStack) craftItemStack.getMethod("asCraftMirror", nms.getClass()).invoke(null, nms); } catch (Exception e) { e.printStackTrace(); }
+	        
 		}
 		return tempitem;
 	}
@@ -493,7 +511,7 @@ public class CreateItems {
 				 String saveList = "";
 				 for (int k = 0; k < pageList.size(); k++) {
 						String formatPage = pageList.get(k);
-						if (formatPage.contains("<hover type=\"text\"")) {
+						if (formatPage.contains("<hover type=\"text\"") || formatPage.contains("<hover type=\"open_url\"") || formatPage.contains("<hover type=\"run_command\"")) {
 							String result = null;
 							String result2 = null;
 							java.util.regex.Pattern pattern1 = java.util.regex.Pattern.compile(">\"(.*?)\"</hover>");
@@ -504,7 +522,10 @@ public class CreateItems {
 							Matcher matcher2 = pattern2.matcher(formatPage);
 							while (matcher2.find()) { result2 = matcher2.group(1); }
 							
-							formatPage = formatPage.replace("<hover type=\"text\" value=\"" + result2 + "\">\"" + result + "\"</hover>", result);
+							formatPage = formatPage
+									.replace("<hover type=\"text\" value=\"" + result2 + "\">\"" + result + "\"</hover>", result)
+									.replace("<hover type=\"open_url\" value=\"" + result2 + "\">\"" + result + "\"</hover>", result)
+									.replace("<hover type=\"run_command\" value=\"" + result2 + "\">\"" + result + "\"</hover>", result);
 						}
 						saveList = saveList + Utils.format(formatPage, player) + "\n";
 				 }
