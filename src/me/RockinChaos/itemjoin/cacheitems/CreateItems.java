@@ -697,43 +697,78 @@ public class CreateItems {
 	@SuppressWarnings("deprecation")
 	public static ItemStack setMapImage(ItemStack tempitem, Material tempmat, String item, Player player) {
 		ConfigurationSection items = ConfigHandler.getItemSection(item);
+		ServerHandler.sendConsoleMessage("&aONE " + hasPreviewed);
 		if (items.getString(".custom-map-image") != null && ItemHandler.containsIgnoreCase(tempmat.toString(), "MAP")) {
 			int mapID = 1;
 			String mapIMG = items.getString(".custom-map-image");
+			ServerHandler.sendConsoleMessage("&aTWO");
 			if (mapIMG.equalsIgnoreCase("default.png") || new File(ItemJoin.getInstance().getDataFolder(), mapIMG).exists()) {
+				ServerHandler.sendConsoleMessage("&aTHREE");
 				if (SQLData.hasImage(player, item, mapIMG)) {
+					ServerHandler.sendConsoleMessage("&aFOUR");
 					mapID = SQLData.getMapID(player, mapIMG);
-					if (ServerHandler.hasAquaticUpdate()) { MapMeta mapmeta = (MapMeta) tempitem.getItemMeta(); mapmeta.setMapId(mapID); tempitem.setItemMeta(mapmeta); }
-					else { tempitem.setDurability((short) mapID); }
+					if (ServerHandler.hasAquaticUpdate()) {
+						MapMeta mapmeta = (MapMeta) tempitem.getItemMeta();
+						mapmeta.setMapId(mapID);
+						tempitem.setItemMeta(mapmeta);
+						ServerHandler.sendConsoleMessage("&aFIVE");
+					} else {
+						tempitem.setDurability((short) mapID);
+						ServerHandler.sendConsoleMessage("&aSIX");
+					}
 					if (RenderImageMaps.hasRendered.get(player) == null || RenderImageMaps.hasRendered.get(player) != null && !RenderImageMaps.hasRendered.get(player).toString().contains(mapID + "")) {
+						ServerHandler.sendConsoleMessage("&aSEVEN");
 						MapView view = RenderImageMaps.FetchExistingView(player, mapID);
 						RenderImageMaps.setImage(mapIMG, mapID);
 						if (!hasPreviewed) {
-						try {
-							view.removeRenderer(view.getRenderers().get(0));
-						} catch (NullPointerException e) { if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); } }
+							ServerHandler.sendConsoleMessage("&aEIGHT");
+							try {
+								view.removeRenderer(view.getRenderers().get(0));
+							} catch (NullPointerException e) {
+								if (ServerHandler.hasDebuggingMode()) {
+									e.printStackTrace();
+								}
+							}
+							try {
+								view.addRenderer(new RenderImageMaps());
+							} catch (NullPointerException e) {
+								if (ServerHandler.hasDebuggingMode()) {
+									e.printStackTrace();
+								}
+							}
+							hasPreviewed = true;
+							ServerHandler.sendConsoleMessage("&aNINE");
+						}
+					}
+				} else if (!SQLData.hasImage(player, item, mapIMG)) {
+					ServerHandler.sendConsoleMessage("&aTEN");
+					MapView view = RenderImageMaps.MapView(player, mapID);
+					mapID = view.getId();
+					if (ServerHandler.hasAquaticUpdate()) {
+						MapMeta mapmeta = (MapMeta) tempitem.getItemMeta();
+						mapmeta.setMapId(mapID);
+						tempitem.setItemMeta(mapmeta);
+					} else {
+						tempitem.setDurability((short) mapID);
+					}
+					SQLData.saveMapImage(player, item, "map-id", mapIMG, mapID);
+					RenderImageMaps.setImage(mapIMG, mapID);
 					try {
-					view.addRenderer(new RenderImageMaps());
-					} catch (NullPointerException e) { if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); } }
+						view.removeRenderer(view.getRenderers().get(0));
+					} catch (NullPointerException e) {
+						if (ServerHandler.hasDebuggingMode()) {
+							e.printStackTrace();
+						}
+					}
+					try {
+						view.addRenderer(new RenderImageMaps());
+					} catch (NullPointerException e) {
+						if (ServerHandler.hasDebuggingMode()) {
+							e.printStackTrace();
+						}
+					}
 					hasPreviewed = true;
-					}
-					}
-				} else if (!hasPreviewed) {
-				MapView view = RenderImageMaps.MapView(player, mapID);
-				mapID = view.getId();
-				
-				if (ServerHandler.hasAquaticUpdate()) { MapMeta mapmeta = (MapMeta) tempitem.getItemMeta(); mapmeta.setMapId(mapID); tempitem.setItemMeta(mapmeta); }
-				else { tempitem.setDurability((short) mapID); }
-				SQLData.saveMapImage(player, item, "map-id", mapIMG, mapID);
-				RenderImageMaps.setImage(mapIMG, mapID);
-				try {
-					view.removeRenderer(view.getRenderers().get(0));
-				} catch (NullPointerException e) { if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); } }
-			try {
-			view.addRenderer(new RenderImageMaps());
-			} catch (NullPointerException e) { if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); } }
-			hasPreviewed = true;
-			}
+				}
 			}
 		}
 		return tempitem;
