@@ -26,7 +26,7 @@ public class Language {
 		if (ConfigHandler.getConfig("en-lang.yml").getString(MessageType) != null && !ConfigHandler.getConfig("en-lang.yml").getString(MessageType).isEmpty()) {
 			String Prefix = "";
 			if (!MessageType.equalsIgnoreCase("inWorldListHeader") && !MessageType.equalsIgnoreCase("inWorldListed") 
-					&& !MessageType.equalsIgnoreCase("listWorldsHeader") && !MessageType.equalsIgnoreCase("listItems")) {
+					&& !MessageType.equalsIgnoreCase("listWorldsHeader") && !MessageType.equalsIgnoreCase("listItems") && !MessageType.equalsIgnoreCase("itemInfo")) {
 			Prefix = Utils.format(ConfigHandler.getConfig("en-lang.yml").getString("Prefix"), player);
 			}
 			String sendMessage = Utils.format(ConfigHandler.getConfig("en-lang.yml").getString(MessageType), player);
@@ -52,6 +52,7 @@ public class Language {
 			}
 			sendMessage = sendMessage.replace("%purgedata%", ReplaceText);
 			sendMessage = sendMessage.replace("%command%", ReplaceText);
+			sendMessage = sendMessage.replace("%item_type%", ReplaceText);
 			sendMessage = sendMessage.replace("%database%", ReplaceText);
 			sendMessage = sendMessage.replace("%argsplayer%", ReplaceText);
 			sendMessage = sendMessage.replace("%argsplayer_world%", ReplaceText);
@@ -65,7 +66,10 @@ public class Language {
 		if (MessageType.equalsIgnoreCase("updateChecking")) {
 			ServerHandler.sendConsoleMessage(sendMessage);
 		} else {
-			ServerHandler.sendCommandsMessage(sender, Prefix + sendMessage);
+			    String[] splitMessage = sendMessage.replace(" <n> ", "<n>").replace("<n> ", "<n>").replace(" <n>", "<n>").split("<n>");
+			    for (String newMessage : splitMessage) {
+			    	ServerHandler.sendCommandsMessage(sender, Prefix + newMessage);
+			    }
 		}
 		}
 	}

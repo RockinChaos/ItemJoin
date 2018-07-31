@@ -83,6 +83,7 @@ public class Commands implements CommandExecutor {
 			if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.use") || PermissionsHandler.hasCommandPermission(sender, "itemjoin.*")) {
 				ServerHandler.sendCommandsMessage(sender, "blankmessage");
 				ServerHandler.sendCommandsMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
+				ServerHandler.sendCommandsMessage(sender, "&a&l/ItemJoin Info &7- &eGets data-info of the held item.");
 				ServerHandler.sendCommandsMessage(sender, "&a&l/ItemJoin Get <Item> &7- &eGives that ItemJoin item");
 				ServerHandler.sendCommandsMessage(sender, "&a&l/ItemJoin Get <Item> <Player> &7- &eGives to said player");
 				ServerHandler.sendCommandsMessage(sender, "&a&l/ItemJoin Remove <Item> &7- &eRemoves item from inventory");
@@ -165,6 +166,29 @@ public class Commands implements CommandExecutor {
 				CreateItems.setRun();
 				Language.getSendMessage(sender, "reloadedConfigs", "");
 				return true;
+			} else {
+				Language.getSendMessage(sender, "noPermission", "");
+				return true;
+			}
+		} else if (args[0].equalsIgnoreCase("info")) {
+			if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.use") || PermissionsHandler.hasCommandPermission(sender, "itemjoin.*")) {
+				if (!(sender instanceof ConsoleCommandSender)) {
+					if (PlayerHandler.getHandItem((Player)sender) != null && PlayerHandler.getHandItem((Player)sender).getType() != Material.AIR) {
+						ServerHandler.sendCommandsMessage(sender, " ");
+						ServerHandler.sendCommandsMessage(sender, "&a&l&m]-----------------&a&l[&e Item Info &a&l]&a&l&m----------------[");
+						ServerHandler.sendCommandsMessage(sender, "");
+						Language.getSendMessage(sender, "itemInfo", PlayerHandler.getHandItem((Player)sender).getType().toString());
+						ServerHandler.sendCommandsMessage(sender, "");
+						ServerHandler.sendCommandsMessage(sender, "&a&l&m]---------------&a&l[&e Item Info Menu &a&l]&a&l&m--------------[");
+						ServerHandler.sendCommandsMessage(sender, " ");
+					} else {
+						Language.getSendMessage(sender, "noItemInHand", "");
+					}
+					return true;
+				} else if (sender instanceof ConsoleCommandSender) {
+					Language.getSendMessage(sender, "notPlayer", "");
+					return true;
+				}
 			} else {
 				Language.getSendMessage(sender, "noPermission", "");
 				return true;

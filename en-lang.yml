@@ -24,6 +24,8 @@ givenToPlayerNoPerms: '&4%argsplayer% &4does not meet the permission requirement
 givenAllNoPerms: '&4You were missing permissions for an item so not all items were given.'
 givenAllPlayerNoPerms: '&4%argsplayer% &4was missing permissions for an item so not all items were given.'
 itemDoesntExist: '&cThe item &b%item% &cdoes not exist!'
+itemInfo: '&aItem Material_TYPE; &b%item_type%'
+noItemInHand: '&cYou are not holding an item in your hand!'
 playerTriedGive: '&4%argsplayer% &ctried to give you &7[&b%item%&7]&c but it already exists in your inventory!'
 playerTriedGiveAllItems: '&4%argsplayer% &ctried to give you all ItemJoin items but they already exists in your inventory!'
 itemExistsInInventory: '&cYou already have the item &7[&b%item%&7]&c!'

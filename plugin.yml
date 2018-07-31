@@ -53,6 +53,11 @@ commands:
       permission: itemjoin.reload
       usage: |
           /itemjoin reload
+   itemjoin info:
+      description: Displays necessary held items information, such as material type.
+      permission: itemjoin.use
+      usage: |
+          /itemjoin info
    itemjoin updates:
       description: Checks for updates that are available for the plugin.
       permission: itemjoin.updates
@@ -221,6 +226,11 @@ commands:
       permission: itemjoin.reload
       usage: |
           /ij reload
+   ij info:
+      description: Displays necessary held items information, such as material type.
+      permission: itemjoin.use
+      usage: |
+          /ij info
    ij updates:
       description: Checks for updates that are available for the plugin.
       permission: itemjoin.updates
