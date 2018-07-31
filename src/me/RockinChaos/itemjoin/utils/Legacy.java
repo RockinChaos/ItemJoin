@@ -2,9 +2,13 @@ package me.RockinChaos.itemjoin.utils;
 
 import java.util.EnumSet;
 
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.material.MaterialData;
 
+import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import me.RockinChaos.itemjoin.ItemJoin;
 
 @SuppressWarnings("deprecation")
@@ -26,6 +30,13 @@ public class Legacy {
 	public static Material convertLegacyMaterial(int ID, byte Data) {
 	    for (Material i : EnumSet.allOf(Material.class)) { if (i.getId() == ID) { return ItemJoin.getInstance().getServer().getUnsafe().fromLegacy(new MaterialData(i, Data)); } }
 	    return null;
+	}
+	
+	public static ApplicableRegionSet getLegacyRegionSet(World world, Location loc) {
+        com.sk89q.worldguard.bukkit.WorldGuardPlugin wg = (com.sk89q.worldguard.bukkit.WorldGuardPlugin) Bukkit.getServer().getPluginManager().getPlugin("WorldGuard");
+        com.sk89q.worldguard.bukkit.RegionContainer rm = wg.getRegionContainer();
+        com.sk89q.worldedit.Vector wgVector = new com.sk89q.worldedit.Vector(loc.getX(), loc.getY(), loc.getZ());
+        return rm.get(world).getApplicableRegions(wgVector);
 	}
 
 }
