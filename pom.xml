@@ -16,7 +16,10 @@
 				<directory>.</directory>
 				<includes>
 					<include>plugin.yml</include>
-					<include>items.yml</include>
+					<include>items-v1.13.yml</include>
+					<include>items-v1.9.yml</include>
+					<include>items-v1.8.yml</include>
+					<include>items-v1.7.yml</include>
 					<include>config.yml</include>
 					<include>en-lang.yml</include>
 					<include>default.png</include>
