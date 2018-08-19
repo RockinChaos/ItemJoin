@@ -44,6 +44,8 @@ public class Utils {
 		try { name = name.replace("%player_food%", String.valueOf(player.getFoodLevel())); } catch (Exception e) { if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); } }
 		try { name = name.replace("%player_health%", String.valueOf(player.getHealth())); } catch (Exception e) { if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); } }
 		try { name = name.replace("%player_location%", player.getLocation().getBlockX() + ", " + player.getLocation().getBlockY() + ", " + player.getLocation().getBlockZ() + ""); } catch (Exception e) { if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); } } }
+		if (playerName != null && player != null && (player instanceof ConsoleCommandSender)) { try { name = name.replace("%player%", "CONSOLE"); } catch (Exception e) { if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); } } }
+	
 		name = ChatColor.translateAlternateColorCodes('&', name).toString();
 		if (Hooks.hasPlaceholderAPI() == true) {
 			try { return PlaceholderAPI.setPlaceholders(player, name); } 
