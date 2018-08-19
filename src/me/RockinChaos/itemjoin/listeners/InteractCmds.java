@@ -26,7 +26,7 @@ public class InteractCmds implements Listener {
 		final Player player = (Player) event.getWhoClicked();
 		final String world = player.getWorld().getName();
 		String action = event.getAction().toString();
-		setupCommands(player, world, item, action);
+		if (setupCommands(player, world, item, action)) { event.setCancelled(true); }
 	}
 
 	@EventHandler
@@ -37,7 +37,7 @@ public class InteractCmds implements Listener {
 		String action = event.getAction().toString();
 		if (PlayerHandler.isAdventureMode(player) && !action.contains("LEFT") 
 				|| !PlayerHandler.isAdventureMode(player)) {
-			setupCommands(player, world, item, action);
+			if (setupCommands(player, world, item, action)) { event.setCancelled(true); }
 		}
 	}
 	
@@ -47,11 +47,11 @@ public class InteractCmds implements Listener {
 		final String world = player.getWorld().getName();
 		ItemStack item = PlayerHandler.getHandItem(player);
 		if (PlayerHandler.isAdventureMode(player)) {
-			setupCommands(player, world, item, "LEFT_CLICK_AIR");
+			if (setupCommands(player, world, item, "LEFT_CLICK_AIR")) { event.setCancelled(true); }
 		}
 	}
 
-	public void setupCommands(Player player, String world, ItemStack item1, String action) {
+	public boolean setupCommands(Player player, String world, ItemStack item1, String action) {
 		if (Utils.isConfigurable()) {
 			for (String item: ConfigHandler.getConfigurationSection().getKeys(false)) {
 				ConfigurationSection items = ConfigHandler.getItemSection(item);
@@ -67,7 +67,7 @@ public class InteractCmds implements Listener {
 								if (!CommandHandler.onCooldown(items, player, item, item1)) {
 									CommandHandler.chargePlayer(items, item, player, action);
 									CommandHandler.removeDisposable(items, item1, player);
-									break;
+									return true;
 								}
 							}
 						}
@@ -75,6 +75,7 @@ public class InteractCmds implements Listener {
 				}
 			}
 		}
+		return false;
 	}
 	
 }

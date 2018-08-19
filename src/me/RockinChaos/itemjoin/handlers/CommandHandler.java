@@ -81,12 +81,17 @@ public class CommandHandler {
 		return false;
 	}
 	
-	public static void removeDisposable(ConfigurationSection items, ItemStack item, Player player) {
-		String ItemFlags = items.getString(".itemflags");
-		if (ItemHandler.containsIgnoreCase(ItemFlags, "disposable")) {
-			if (item.getAmount() > 1 && item.getAmount() != 1) { item.setAmount(item.getAmount() - 1); } 
-			else { PlayerHandler.setItemInHand(player, Material.AIR); }
-		}
+	public static void removeDisposable(final ConfigurationSection items, final ItemStack item, final Player player) {
+		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), (Runnable) new Runnable() {
+			public void run() {
+				String ItemFlags = items.getString(".itemflags");
+				if (ItemHandler.containsIgnoreCase(ItemFlags, "disposable")) {
+					if (item.getAmount() > 1 && item.getAmount() != 1) { item.setAmount(item.getAmount() - 1); } 
+					else if (player.getItemOnCursor() != null && player.getItemOnCursor().getType() != Material.AIR) { player.setItemOnCursor(null); } 
+					else { PlayerHandler.setItemInHand(player, Material.AIR); }
+				}
+			}
+		}, 1L);
 	}
 	
 	public static void InitializeCommands(ConfigurationSection items, final String item, final Player player, String action) {
@@ -393,11 +398,8 @@ public class CommandHandler {
 	}
 	
 	public static boolean isCommandable(String action, ConfigurationSection items) {
-		String commandType = items.getString(".commands-type");
-		String invExists = items.getString(".commands" + ActionType.INVENTORY.definition);
-		if (ItemHandler.containsIgnoreCase(commandType, "inventory") && CommandsType.INVENTORY.hasAction(action) || invExists != null && CommandsType.INVENTORY.hasAction(action)) {
-			return true;
-		} else if (ItemHandler.containsIgnoreCase(commandType, "interact") && CommandsType.INTERACT.hasAction(action) || CommandsType.INTERACT.hasAction(action)) {
+		List < String > commandList = items.getStringList(".commands" + getClickType(items, action));
+		if (commandList != null && !commandList.isEmpty()) {
 			return true;
 		}
 		return false;
