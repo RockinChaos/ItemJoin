@@ -90,7 +90,7 @@ public class AnimationHandler {
 			ticks = ticks + getAnimateTicks(items.getString(".name." + name));
 			AnimateTask(true, items, player, it.hasNext(), name, ItemID, ticks, newAnimation);
 		}
-		} else if (setCanceled.get(PlayerHandler.getPlayerID(player)) != true) {
+		} else if (items.getString(".name") != null && setCanceled.get(PlayerHandler.getPlayerID(player)) != true) {
 			AnimateTask(true, items, player, false, null, ItemID, getAnimateTicks(items.getString(".name")), newAnimation);
 		}
 	}
@@ -104,7 +104,7 @@ public class AnimationHandler {
 			ticks = ticks + getAnimateTicks(items.getStringList(".lore." + name).get(0));
 			AnimateTask(false, items, player, it.hasNext(), name, ItemID, ticks, newAnimation);
 		}
-		} else if (setCanceled.get(PlayerHandler.getPlayerID(player)) != true) {
+		} else if (items.getString(".lore") != null && items.getStringList(".lore") != null && setCanceled.get(PlayerHandler.getPlayerID(player)) != true) {
 			AnimateTask(false, items, player, false, null, ItemID, getAnimateTicks(items.getStringList(".lore").get(0)), newAnimation);
 		}
 	}
@@ -120,8 +120,7 @@ public class AnimationHandler {
 					if (!hasNext) { if (isName) { setNameAnimate(items, player, ItemID, newAnimation); } else { setLoreAnimate(items, player, ItemID, newAnimation); }}
 				} else if (setCanceled.get(PlayerHandler.getPlayerID(player)) == true || !isActive.get(PlayerHandler.getPlayerID(player)).equals(newAnimation)) {
 					if (!hasNext) {
-						if (runningID.get(PlayerHandler.getPlayerID(player) + newAnimation + items.getName() + true).isEmpty() 
-						&& runningID.get(PlayerHandler.getPlayerID(player) + newAnimation + items.getName() + false).isEmpty()) {
+						if (isEmpty(player, items, newAnimation)) {
 							runningID.remove(PlayerHandler.getPlayerID(player) + newAnimation + items.getName() + true);
 							runningID.remove(PlayerHandler.getPlayerID(player) + newAnimation + items.getName() + false);
 							ServerHandler.sendDebugMessage(player.getName() + "'s Animations have finished for the item " + items.getName() + " with the AnimateId " + newAnimation);
@@ -130,6 +129,27 @@ public class AnimationHandler {
 				}
 			}
 		}.runTaskLater(ItemJoin.getInstance(), UpdateDelay);
+	}
+	
+	private static boolean isEmpty(Player player, ConfigurationSection items, int newAnimation) {
+		if (runningID.get(PlayerHandler.getPlayerID(player) + newAnimation + items.getName() + true) != null 
+				&& runningID.get(PlayerHandler.getPlayerID(player) + newAnimation + items.getName() + false) != null) {
+			if (runningID.get(PlayerHandler.getPlayerID(player) + newAnimation + items.getName() + true).isEmpty() 
+					&& runningID.get(PlayerHandler.getPlayerID(player) + newAnimation + items.getName() + false).isEmpty()) {
+				return true;
+			}
+		} else if (runningID.get(PlayerHandler.getPlayerID(player) + newAnimation + items.getName() + true) != null 
+				&& runningID.get(PlayerHandler.getPlayerID(player) + newAnimation + items.getName() + false) == null) {
+			if (runningID.get(PlayerHandler.getPlayerID(player) + newAnimation + items.getName() + true).isEmpty()) {
+				return true;
+			}
+		} else if (runningID.get(PlayerHandler.getPlayerID(player) + newAnimation + items.getName() + true) == null 
+				&& runningID.get(PlayerHandler.getPlayerID(player) + newAnimation + items.getName() + false) != null) {
+			if (runningID.get(PlayerHandler.getPlayerID(player) + newAnimation + items.getName() + false).isEmpty()) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	private static void RunningTask(int taskId, ConfigurationSection items, Player player, boolean isName, int newAnimation) {
