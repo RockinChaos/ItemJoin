@@ -216,9 +216,7 @@ public class RegionEnter implements Listener {
 	}
 
 	private static ApplicableRegionSet getGuardSetRegions(World world, Location loc) {
-		String fetchVersion = Bukkit.getServer().getPluginManager().getPlugin("WorldGuard").getDescription().getVersion();
-		int wgVersion = Integer.parseInt(fetchVersion.substring(0, 5).replace(".", ""));
-		if (wgVersion >= 700) {
+		if (Hooks.getWorldGuardVersion() >= 700) {
 			com.sk89q.worldedit.world.World wgWorld = com.sk89q.worldguard.WorldGuard.getInstance().getPlatform().getWorldByName(world.getName());
 			com.sk89q.worldedit.Vector wgVector = new com.sk89q.worldedit.Vector(loc.getX(), loc.getY(), loc.getZ());
 			com.sk89q.worldguard.protection.regions.RegionContainer rm = com.sk89q.worldguard.WorldGuard.getInstance().getPlatform().getRegionContainer();

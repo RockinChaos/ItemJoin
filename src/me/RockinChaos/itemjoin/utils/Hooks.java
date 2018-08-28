@@ -36,6 +36,7 @@ public class Hooks {
 	private static boolean hasTokenEnchant;
 	private static boolean hasHeadDatabase;
 	private static boolean hasWorldGuard;
+	private static int WorldGuardVersion;
 
 	public static void getHooks() {
 		hookVault();
@@ -104,6 +105,10 @@ public class Hooks {
 	
 	public static boolean hasWorldGuard() {
 		return hasWorldGuard;
+	}
+	
+	public static int getWorldGuardVersion() {
+		return WorldGuardVersion;
 	}
 	
 	private static Class<?> getEventClass(String name) {
@@ -269,6 +274,9 @@ public class Hooks {
 	
 	public static void hookWorldGuard() {
 		if (ConfigHandler.getConfig("config.yml").getBoolean("WorldGuard") == true && Bukkit.getServer().getPluginManager().getPlugin("WorldGuard") != null && Bukkit.getServer().getPluginManager().getPlugin("WorldEdit") != null) {
+			String fetchVersion = Bukkit.getServer().getPluginManager().getPlugin("WorldGuard").getDescription().getVersion();
+			try { WorldGuardVersion = Integer.parseInt(fetchVersion.replace(".", "").substring(0, 3));
+			} catch (Exception e) { WorldGuardVersion = 622; }
 			ServerHandler.sendConsoleMessage("&aHooked into WorldGuard!");
 			hasWorldGuard = true;
 		} else if (ConfigHandler.getConfig("config.yml").getBoolean("WorldGuard") == true && Bukkit.getServer().getPluginManager().getPlugin("WorldGuard") != null && Bukkit.getServer().getPluginManager().getPlugin("WorldEdit") == null) {
