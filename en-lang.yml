@@ -53,7 +53,7 @@ enabledForPlayerWorld: '&aYou have &eenabled &7[&e%world%&7] items &afor &e%play
 enabledForOtherWorld: '&a%player% has &eenabled &7[&e%world%&7] items for you.'
 enabledForPlayerWorldFailed: '&4You have already &eenabled &7[&e%world%&7] items &4for &e%player%&4.'
 disabledForPlayerWorld: '&aYou have &edisabled &7[&e%world%&7] items &afor &e%player%&a.'
-disabledForOtherWorld: '&a%player% has &eenabled &7[&e%world%&7] items for you.'
+disabledForOtherWorld: '&a%player% has &edisabled &7[&e%world%&7] items for you.'
 disabledForPlayerWorldFailed: '&4You have already &edisabled &7[&e%world%&7] items &4for &e%player%&4.'
 enabledForPlayer: '&aYou have &eenabled &aall items for &e%player%&a.'
 enabledForOther: '&a%player% has &eenabled &aall items for you.'

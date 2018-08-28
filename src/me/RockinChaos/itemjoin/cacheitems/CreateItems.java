@@ -256,7 +256,7 @@ public class CreateItems {
 	}
 
 	public static ItemMeta setLore(ConfigurationSection items, ItemMeta tempmeta, Player player, String loreString) {
-		if (items.getStringList(".lore") != null) {
+		if (items.getString(".lore") != null && items.getStringList(".lore") != null) {
 			List < String > loreList = items.getStringList(".lore");
 			List < String > loreFormatList = new ArrayList < String > ();
 			if (loreString != null && items.getStringList(".lore." + loreString) != null) { loreList = items.getStringList(".lore." + loreString); }
