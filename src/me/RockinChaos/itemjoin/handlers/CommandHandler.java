@@ -151,7 +151,7 @@ public class CommandHandler {
 		if (cmdline.startsWith("console:")) { cmdline = cmdline.substring(8); CmdType = Type.CONSOLE; } 
 		else if (cmdline.startsWith("op:")) { cmdline = cmdline.substring(3); CmdType = Type.OP; } 
 		else if (cmdline.startsWith("player:")) { cmdline = cmdline.substring(7); CmdType = Type.PLAYER; } 
-		else if (cmdline.startsWith("server:")) { cmdline = cmdline.substring(13); CmdType = Type.SERVERSWITCH; } 
+		else if (cmdline.startsWith("server:")) { cmdline = cmdline.substring(7); CmdType = Type.SERVERSWITCH; } 
 		else if (cmdline.startsWith("bungee:")) { cmdline = cmdline.substring(7); CmdType = Type.BUNGEE; } 
 		else if (cmdline.startsWith("message:")) { cmdline = cmdline.substring(8); CmdType = Type.MESSAGE; } 
 		else if (cmdline.startsWith("delay:")) { cmdline = cmdline.substring(6); CmdType = Type.DELAY; }
