@@ -961,8 +961,12 @@ public class Commands implements CommandExecutor {
 								ItemExists = true;
 						} else {
 						ItemStack inStoredItems = CreateItems.items.get(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + ItemID + itemName);
-						if (inStoredItems != null && item.equalsIgnoreCase(itemName) && Utils.isCustomSlot(slot) && player.getInventory().contains(inStoredItems)) {
+						if (inStoredItems != null && item.equalsIgnoreCase(itemName) && Utils.isCustomSlot(slot) && ItemHandler.hasItem(player, inStoredItems)) {
 							player.getInventory().removeItem(inStoredItems);
+							if (ItemHandler.isSimilar(player.getInventory().getHelmet(), inStoredItems)) {player.getInventory().setHelmet(null); }
+							if (ItemHandler.isSimilar(player.getInventory().getChestplate(), inStoredItems)) {player.getInventory().setChestplate(null); }
+							if (ItemHandler.isSimilar(player.getInventory().getLeggings(), inStoredItems)) {player.getInventory().setLeggings(null); }
+							if (ItemHandler.isSimilar(player.getInventory().getBoots(), inStoredItems)) {player.getInventory().setBoots(null); }
 							Language.getSendMessage(player, "removedFromYou", inStoredItems.getItemMeta().getDisplayName());
 							if (Language.getArgsPlayer() != null) {
 								Language.setArgsPlayer(player);
@@ -970,8 +974,12 @@ public class Commands implements CommandExecutor {
 								Language.setArgsPlayer(null);
 							}
 							ItemExists = true;
-						} else if (inStoredItems != null && item.equalsIgnoreCase(itemName) && Utils.isInt(slot) && player.getInventory().contains(inStoredItems)) {
+						} else if (inStoredItems != null && item.equalsIgnoreCase(itemName) && Utils.isInt(slot) && ItemHandler.hasItem(player, inStoredItems)) {
 							player.getInventory().removeItem(inStoredItems);
+							if (ItemHandler.isSimilar(player.getInventory().getHelmet(), inStoredItems)) {player.getInventory().setHelmet(null); }
+							if (ItemHandler.isSimilar(player.getInventory().getChestplate(), inStoredItems)) {player.getInventory().setChestplate(null); }
+							if (ItemHandler.isSimilar(player.getInventory().getLeggings(), inStoredItems)) {player.getInventory().setLeggings(null); }
+							if (ItemHandler.isSimilar(player.getInventory().getBoots(), inStoredItems)) {player.getInventory().setBoots(null); }
 							Language.getSendMessage(player, "removedFromYou", inStoredItems.getItemMeta().getDisplayName());
 							if (Language.getArgsPlayer() != null) {
 								Language.setArgsPlayer(player);
