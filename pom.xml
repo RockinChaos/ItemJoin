@@ -148,7 +148,7 @@
         <dependency>
 	        <groupId>fr.xephi</groupId>
 	        <artifactId>authme</artifactId>
-	        <version>5.4.0</version>
+	        <version>5.4</version>
          <scope>provided</scope>
         </dependency>
     <!--WorldGuard API-->
