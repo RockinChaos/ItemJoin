@@ -101,7 +101,7 @@
     <!--AuthMe Repo-->
         <repository>
         	<id>xephi-repo</id>
-	        <url>https://repo.codemc.org/service/rest/repository/browse/maven-releases/</url>
+	        <url>https://repo.codemc.org/service/rest/repository/browse/maven-releases/fr/xephi/authme/</url>
         </repository>
     <!--Mojang Repo-->
 		<repository>
@@ -148,7 +148,7 @@
         <dependency>
 	        <groupId>fr.xephi</groupId>
 	        <artifactId>authme</artifactId>
-	        <version>5.4</version>
+	        <version>5.4.0</version>
          <scope>provided</scope>
         </dependency>
     <!--WorldGuard API-->
