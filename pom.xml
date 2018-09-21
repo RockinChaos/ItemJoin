@@ -101,7 +101,7 @@
     <!--AuthMe Repo-->
         <repository>
         	<id>xephi-repo</id>
-	        <url>https://ci.codemc.org/job/AuthMe/job/AuthMeReloaded</url>
+	        <url>https://ci.codemc.org/job/AuthMe/job/AuthMeReloaded/lastSuccessfulBuild/artifact/</url>
         </repository>
     <!--Mojang Repo-->
 		<repository>
@@ -147,7 +147,7 @@
     <!--AuthMe API-->
         <dependency>
 	        <groupId>fr.xephi</groupId>
-	        <artifactId>authme</artifactId>
+	        <artifactId>target</artifactId>
 	        <version>latest</version>
          <scope>provided</scope>
         </dependency>
