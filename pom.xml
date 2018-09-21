@@ -101,7 +101,7 @@
     <!--AuthMe Repo-->
         <repository>
         	<id>xephi-repo</id>
-	        <url>http://ci.xephi.fr/plugin/repository/everything/</url>
+	        <url>https://ci.codemc.org/job/AuthMe/job/AuthMeReloaded</url>
         </repository>
     <!--Mojang Repo-->
 		<repository>
@@ -148,7 +148,7 @@
         <dependency>
 	        <groupId>fr.xephi</groupId>
 	        <artifactId>authme</artifactId>
-	        <version>5.3</version>
+	        <version>latest</version>
          <scope>provided</scope>
         </dependency>
     <!--WorldGuard API-->
