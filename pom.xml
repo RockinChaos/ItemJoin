@@ -151,18 +151,6 @@
 	        <version>LATEST</version>
          <scope>provided</scope>
         </dependency>
-    <!--WorldGuard API-->
-        <dependency>
-        <groupId>com.sk89q</groupId>
-        <artifactId>worldguard</artifactId>
-        <version>LATEST</version>
-        </dependency>
-    <!--WorldEdit API-->
-        <dependency>
-        <groupId>com.sk89q</groupId>
-        <artifactId>worldedit</artifactId>
-        <version>LATEST</version>
-        </dependency>
     <!--Mojang AuthLib API-->
 		<dependency>
 			<groupId>com.mojang</groupId>
