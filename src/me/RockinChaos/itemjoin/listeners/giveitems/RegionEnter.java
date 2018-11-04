@@ -220,8 +220,8 @@ public class RegionEnter implements Listener {
 			com.sk89q.worldguard.protection.regions.RegionContainer rm = com.sk89q.worldguard.WorldGuard.getInstance().getPlatform().getRegionContainer();
 			if (rm == null) { return null; }
 			if (Legacy.hasLegacyWorldEdit()) {
-				//com.sk89q.worldedit.Vector wgVector = new com.sk89q.worldedit.Vector(loc.getX(), loc.getY(), loc.getZ());
-				return rm.get(wgWorld).getApplicableRegions(Legacy.asBlockVector(loc));
+				com.sk89q.worldedit.Vector wgVector = new com.sk89q.worldedit.Vector(loc.getX(), loc.getY(), loc.getZ());
+				return rm.get(wgWorld).getApplicableRegions(wgVector);
 			} else {
 				return rm.get(wgWorld).getApplicableRegions(Legacy.asBlockVector(loc));
 			}
