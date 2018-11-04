@@ -205,14 +205,6 @@
             <systemPath>${pom.basedir}/src/me/RockinChaos/itemjoin/extra/TokenEnchantAPI.jar</systemPath>
             <version>LATEST</version>
         </dependency>
-    <!--WorldGuard Legacy Local API/Repo -->
-        <dependency>
-            <groupId>me.WorldGuard.Legacy</groupId>
-            <artifactId>WorldGuard</artifactId>
-            <scope>system</scope>
-            <systemPath>${pom.basedir}/src/me/RockinChaos/itemjoin/extra/WorldGuard-Legacy.jar</systemPath>
-            <version>Legacy</version>
-        </dependency>
     <!--WorldGuard 7.0.0 Local API/Repo -->
         <dependency>
             <groupId>me.WorldGuard</groupId>
@@ -221,12 +213,12 @@
             <systemPath>${pom.basedir}/src/me/RockinChaos/itemjoin/extra/WorldGuard-7.0.0.jar</systemPath>
             <version>7.0.0</version>
         </dependency>
-    <!--WorldEdit Legacy Local API/Repo -->
+    <!--WorldGuard Legacy Local API/Repo -->
         <dependency>
-            <groupId>me.WorldEdit.Legacy</groupId>
-            <artifactId>WorldEdit</artifactId>
+            <groupId>me.WorldGuard.Legacy</groupId>
+            <artifactId>WorldGuard</artifactId>
             <scope>system</scope>
-            <systemPath>${pom.basedir}/src/me/RockinChaos/itemjoin/extra/WorldEdit-Legacy.jar</systemPath>
+            <systemPath>${pom.basedir}/src/me/RockinChaos/itemjoin/extra/WorldGuard-Legacy.jar</systemPath>
             <version>Legacy</version>
         </dependency>
     <!--WorldEdit 7.0.0 Local API/Repo -->
@@ -236,6 +228,14 @@
             <scope>system</scope>
             <systemPath>${pom.basedir}/src/me/RockinChaos/itemjoin/extra/WorldEdit-7.0.0.jar</systemPath>
             <version>7.0.0</version>
+        </dependency>
+    <!--WorldEdit Legacy Local API/Repo -->
+        <dependency>
+            <groupId>me.WorldEdit.Legacy</groupId>
+            <artifactId>WorldEdit</artifactId>
+            <scope>system</scope>
+            <systemPath>${pom.basedir}/src/me/RockinChaos/itemjoin/extra/WorldEdit-Legacy.jar</systemPath>
+            <version>Legacy</version>
         </dependency>
 	</dependencies>
 	<scm>
