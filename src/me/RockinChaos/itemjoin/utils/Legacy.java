@@ -1,5 +1,7 @@
 package me.RockinChaos.itemjoin.utils;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.EnumSet;
 
 import org.bukkit.Bukkit;
@@ -35,8 +37,26 @@ public class Legacy {
 	public static ApplicableRegionSet getLegacyRegionSet(World world, Location loc) {
         com.sk89q.worldguard.bukkit.WorldGuardPlugin wg = (com.sk89q.worldguard.bukkit.WorldGuardPlugin) Bukkit.getServer().getPluginManager().getPlugin("WorldGuard");
         com.sk89q.worldguard.bukkit.RegionContainer rm = wg.getRegionContainer();
-        com.sk89q.worldedit.Vector wgVector = new com.sk89q.worldedit.Vector(loc.getX(), loc.getY(), loc.getZ());
-        return rm.get(world).getApplicableRegions(wgVector);
+        if (hasLegacyWorldEdit()) {
+        	com.sk89q.worldedit.Vector wgVector = new com.sk89q.worldedit.Vector(loc.getX(), loc.getY(), loc.getZ());
+        	return rm.get(world).getApplicableRegions(wgVector);
+        } else {
+        	return rm.get(world).getApplicableRegions(loc);
+        }
 	}
-
+	
+	public static boolean hasLegacyWorldEdit() {
+		try {
+			Class<?> wEdit = Class.forName("com.sk89q.worldedit.Vector");
+			if (wEdit != null) {
+				return true;
+			}
+			return false;
+		} catch (Exception e) { return false; }
+	}
+	
+    public static com.sk89q.worldedit.math.BlockVector3 asBlockVector(org.bukkit.Location location) {
+        checkNotNull(location);
+        return com.sk89q.worldedit.math.BlockVector3.at(location.getX(), location.getY(), location.getZ());
+    }
 }

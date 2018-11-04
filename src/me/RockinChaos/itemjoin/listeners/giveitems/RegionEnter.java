@@ -3,7 +3,6 @@ package me.RockinChaos.itemjoin.listeners.giveitems;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -14,9 +13,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.cacheitems.CreateItems;
 import me.RockinChaos.itemjoin.handlers.AnimationHandler;
@@ -203,7 +202,7 @@ public class RegionEnter implements Listener {
 		if (regionname == null) {
 			return true;
 		}
-		ApplicableRegionSet set = getGuardSetRegions(world, playerlocation);
+		ApplicableRegionSet set = getGuardSetRegions(world, playerlocation, regionname);
 		if (set == null) {
 			return false;
 		}
@@ -215,18 +214,22 @@ public class RegionEnter implements Listener {
 		return false;
 	}
 
-	private static ApplicableRegionSet getGuardSetRegions(World world, Location loc) {
+	private static ApplicableRegionSet getGuardSetRegions(World world, Location loc, String id) {
 		if (Hooks.getWorldGuardVersion() >= 700) {
 			com.sk89q.worldedit.world.World wgWorld = com.sk89q.worldguard.WorldGuard.getInstance().getPlatform().getWorldByName(world.getName());
-			com.sk89q.worldedit.Vector wgVector = new com.sk89q.worldedit.Vector(loc.getX(), loc.getY(), loc.getZ());
 			com.sk89q.worldguard.protection.regions.RegionContainer rm = com.sk89q.worldguard.WorldGuard.getInstance().getPlatform().getRegionContainer();
 			if (rm == null) { return null; }
-			return rm.get(wgWorld).getApplicableRegions(wgVector);
+			if (Legacy.hasLegacyWorldEdit()) {
+				com.sk89q.worldedit.Vector wgVector = new com.sk89q.worldedit.Vector(loc.getX(), loc.getY(), loc.getZ());
+				return rm.get(wgWorld).getApplicableRegions(wgVector);
+			} else {
+				return rm.get(wgWorld).getApplicableRegions(Legacy.asBlockVector(loc));
+			}
 		} else {
 			return Legacy.getLegacyRegionSet(world, loc);
 		}
 	}
-
+    
 	public static HashMap < Player, String > getInRegion() {
 		return isInRegion;
 	}

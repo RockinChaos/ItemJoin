@@ -221,6 +221,14 @@
             <systemPath>${pom.basedir}/src/me/RockinChaos/itemjoin/extra/WorldGuard-7.0.0.jar</systemPath>
             <version>7.0.0</version>
         </dependency>
+    <!--WorldEdit Legacy Local API/Repo -->
+        <dependency>
+            <groupId>me.WorldEdit.Legacy</groupId>
+            <artifactId>WorldEdit</artifactId>
+            <scope>system</scope>
+            <systemPath>${pom.basedir}/src/me/RockinChaos/itemjoin/extra/WorldEdit-Legacy.jar</systemPath>
+            <version>Legacy</version>
+        </dependency>
     <!--WorldEdit 7.0.0 Local API/Repo -->
         <dependency>
             <groupId>me.WorldEdit</groupId>
