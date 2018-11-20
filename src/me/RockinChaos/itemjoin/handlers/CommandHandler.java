@@ -88,7 +88,8 @@ public class CommandHandler {
 				if (ItemHandler.containsIgnoreCase(ItemFlags, "disposable")) {
 					if (item.getAmount() > 1 && item.getAmount() != 1) { item.setAmount(item.getAmount() - 1); } 
 					else if (player.getItemOnCursor() != null && player.getItemOnCursor().getType() != Material.AIR) { player.setItemOnCursor(null); } 
-					else { PlayerHandler.setItemInHand(player, Material.AIR); }
+					else if (PlayerHandler.getMainHandItem(player) != null && PlayerHandler.getMainHandItem(player).getType() != Material.AIR && ItemHandler.isSimilar(PlayerHandler.getMainHandItem(player), item)) { PlayerHandler.setItemInHand(player, Material.AIR); }
+					else { PlayerHandler.setItemInOffHand(player, Material.AIR); }
 				}
 			}
 		}, 1L);

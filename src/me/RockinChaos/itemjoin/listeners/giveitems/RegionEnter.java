@@ -202,7 +202,7 @@ public class RegionEnter implements Listener {
 		if (regionname == null) {
 			return true;
 		}
-		ApplicableRegionSet set = getGuardSetRegions(world, playerlocation, regionname);
+		ApplicableRegionSet set = getGuardSetRegions(world, playerlocation);
 		if (set == null) {
 			return false;
 		}
@@ -214,7 +214,7 @@ public class RegionEnter implements Listener {
 		return false;
 	}
 
-	private static ApplicableRegionSet getGuardSetRegions(World world, Location loc, String id) {
+	private static ApplicableRegionSet getGuardSetRegions(World world, Location loc) {
 		if (Hooks.getWorldGuardVersion() >= 700) {
 			com.sk89q.worldedit.world.World wgWorld = com.sk89q.worldguard.WorldGuard.getInstance().getPlatform().getWorldByName(world.getName());
 			com.sk89q.worldguard.protection.regions.RegionContainer rm = com.sk89q.worldguard.WorldGuard.getInstance().getPlatform().getRegionContainer();

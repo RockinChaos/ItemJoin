@@ -1,5 +1,6 @@
 package me.RockinChaos.itemjoin.listeners;
 
+import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -33,6 +34,9 @@ public class InteractCmds implements Listener {
 	public void onInteractCmds(PlayerInteractEvent event) {
 		ItemStack item = event.getItem();
 		final Player player = event.getPlayer();
+		if (item == null || item.getType() == Material.AIR) {
+			item = PlayerHandler.getHandItem(player);
+		}
 		final String world = player.getWorld().getName();
 		String action = event.getAction().toString();
 		if (PlayerHandler.isAdventureMode(player) && !action.contains("LEFT") 
@@ -46,6 +50,9 @@ public class InteractCmds implements Listener {
 		final Player player = event.getPlayer();
 		final String world = player.getWorld().getName();
 		ItemStack item = PlayerHandler.getHandItem(player);
+		if (item == null || item.getType() == Material.AIR) {
+			item = PlayerHandler.getHandItem(player);
+		}
 		if (PlayerHandler.isAdventureMode(player)) {
 			if (setupCommands(player, world, item, "LEFT_CLICK_AIR")) { event.setCancelled(true); }
 		}

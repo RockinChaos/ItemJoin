@@ -93,6 +93,16 @@ public class PlayerHandler {
 	}
 	
 	@SuppressWarnings("deprecation")
+	public static ItemStack getMainHandItem(Player player) {
+		if (ServerHandler.hasCombatUpdate()) {
+			return player.getInventory().getItemInMainHand();
+		} if (!ServerHandler.hasCombatUpdate()) {
+			return player.getInventory().getItemInHand();
+		}
+		return null;
+	}
+	
+	@SuppressWarnings("deprecation")
 	public static void setInHandItem(Player player, ItemStack toSet) {
 		player.getInventory().setItemInHand(toSet);
 	}
@@ -289,6 +299,12 @@ public class PlayerHandler {
 	@SuppressWarnings("deprecation")
 	public static void setItemInHand(Player player, Material mat) {
 		player.setItemInHand(new ItemStack(mat));
+	}
+	
+	public static void setItemInOffHand(Player player, Material mat) {
+		if (ServerHandler.hasCombatUpdate()) {
+		player.getInventory().setItemInOffHand(new ItemStack(mat));
+		}
 	}
 	
 	@SuppressWarnings("deprecation")

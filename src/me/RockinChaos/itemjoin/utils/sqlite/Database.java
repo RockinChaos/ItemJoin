@@ -244,9 +244,8 @@ public abstract class Database {
 	public void closeConnection() {
 		try {
 			this.connection.close();
-		} catch (SQLException e) { 
-			ServerHandler.sendDebugMessage("[SQLITE] Failed to close database connection."); 
-		if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+		} catch (Exception e) { 
+		if (ServerHandler.hasDebuggingMode()) { ServerHandler.sendDebugMessage("[SQLITE] Failed to close database connection."); e.printStackTrace(); }
 		}
 	}
 	
