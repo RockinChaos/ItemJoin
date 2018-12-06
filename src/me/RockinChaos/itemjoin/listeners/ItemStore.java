@@ -8,8 +8,6 @@ import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
@@ -21,8 +19,7 @@ public class ItemStore implements Listener {
 	public void onInventoryStore(InventoryClickEvent event) {
 		String itemflag = "item-store";
 		final Player player = (Player) event.getWhoClicked();
-		final Inventory chest = event.getView().getTopInventory();
-		final InventoryHolder holder = chest.getHolder();
+		final String invType = event.getView().getType().toString();
 			ItemStack item = null;
 			if (ItemHandler.containsIgnoreCase(event.getAction().name(), "HOTBAR")) {
 				item = event.getView().getBottomInventory().getItem(event.getHotbarButton());
@@ -34,15 +31,15 @@ public class ItemStore implements Listener {
 			} else {
 				item = event.getCursor();
 			}
-			if (holder != null && holder.toString().contains("Chest") 
-					|| holder != null && holder.toString().contains("Furnace") || holder != null && holder.toString().contains("ShulkerBox") 
-					|| holder != null && holder.toString().contains("Hopper") || chest.toString().contains("Anvil") || event.getInventory().equals(player.getEnderChest())) {
+		 if (invType != null) { 
+			if (invType.contains("CHEST") || invType.contains("FURNACE") || invType.contains("SHULKER_BOX") || invType.contains("HOPPER") || invType.contains("ANVIL") || invType.contains("WORKBENCH")) {
 				if (event.getRawSlot() > event.getInventory().getSize() && event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY) || event.getRawSlot() < event.getInventory().getSize()) {
 					if (!ItemHandler.isAllowedItem(player, item, itemflag)) {
 					event.setCancelled(true);
 					PlayerHandler.updateInventory(player);
 				}
 			}
+		  }
 		}
 	}
 
@@ -50,21 +47,20 @@ public class ItemStore implements Listener {
 	public void onInventoryDragToStore(InventoryDragEvent event) {
 		String itemflag = "item-store";
 		final Player player = (Player) event.getWhoClicked();
-		final Inventory chest = event.getView().getTopInventory();
-		final InventoryHolder holder = chest.getHolder();
+		final String invType = event.getView().getType().toString();
 		final int inventorySize = event.getInventory().getSize();
 			ItemStack item = event.getOldCursor();
 			for (int i: event.getRawSlots()) {
 				if (i < inventorySize) {
-					if (holder != null && holder.toString().contains("Chest") 
-							|| holder != null && holder.toString().contains("Furnace") || holder != null && holder.toString().contains("ShulkerBox") 
-							|| holder != null && holder.toString().contains("Hopper") || chest.toString().contains("Anvil") || event.getInventory().equals(player.getEnderChest())) {
+					 if (invType != null) { 
+						if (invType.contains("CHEST") || invType.contains("FURNACE") || invType.contains("SHULKER_BOX") || invType.contains("HOPPER") || invType.contains("ANVIL") || invType.contains("WORKBENCH")) {
 						if (!ItemHandler.isAllowedItem(player, item, itemflag)) {
 							event.setCancelled(true);
 							PlayerHandler.updateInventory(player);
 							break;
 						}
 					}
+				  }
 				}
 			}
 	}
