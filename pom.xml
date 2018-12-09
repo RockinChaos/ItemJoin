@@ -6,7 +6,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>me.RockinChaos.itemjoin</groupId>
 	<artifactId>ItemJoin</artifactId>
-	<version>4.9.1-SNAPSHOT</version>
+	<version>5.0.0-SNAPSHOT</version>
 	<build>
 		<sourceDirectory>${project.basedir}</sourceDirectory>
 		<resources>
@@ -16,10 +16,7 @@
 				<directory>.</directory>
 				<includes>
 					<include>plugin.yml</include>
-					<include>items-v1.13.yml</include>
-					<include>items-v1.9.yml</include>
-					<include>items-v1.8.yml</include>
-					<include>items-v1.7.yml</include>
+					<include>items.yml</include>
 					<include>config.yml</include>
 					<include>en-lang.yml</include>
 					<include>default.png</include>
@@ -151,18 +148,6 @@
 	        <version>LATEST</version>
          <scope>provided</scope>
         </dependency>
-    <!--WorldGuard API-->
-        <dependency>
-        <groupId>com.sk89q</groupId>
-        <artifactId>worldguard</artifactId>
-        <version>LATEST</version>
-        </dependency>
-    <!--WorldEdit API-->
-        <dependency>
-        <groupId>com.sk89q</groupId>
-        <artifactId>worldedit</artifactId>
-        <version>LATEST</version>
-        </dependency>
     <!--Mojang AuthLib API-->
 		<dependency>
 			<groupId>com.mojang</groupId>
@@ -213,21 +198,13 @@
             <systemPath>${pom.basedir}/src/me/RockinChaos/itemjoin/extra/WorldGuard-Legacy.jar</systemPath>
             <version>Legacy</version>
         </dependency>
-    <!--WorldGuard 7.0.0 Local API/Repo -->
+    <!--WorldEdit Legacy Local API/Repo -->
         <dependency>
-            <groupId>me.WorldGuard</groupId>
-            <artifactId>WorldGuard</artifactId>
-            <scope>system</scope>
-            <systemPath>${pom.basedir}/src/me/RockinChaos/itemjoin/extra/WorldGuard-7.0.0.jar</systemPath>
-            <version>7.0.0</version>
-        </dependency>
-    <!--WorldEdit 7.0.0 Local API/Repo -->
-        <dependency>
-            <groupId>me.WorldEdit</groupId>
+            <groupId>me.WorldEdit.Legacy</groupId>
             <artifactId>WorldEdit</artifactId>
             <scope>system</scope>
-            <systemPath>${pom.basedir}/src/me/RockinChaos/itemjoin/extra/WorldEdit-7.0.0.jar</systemPath>
-            <version>7.0.0</version>
+            <systemPath>${pom.basedir}/src/me/RockinChaos/itemjoin/extra/WorldEdit-Legacy.jar</systemPath>
+            <version>Legacy</version>
         </dependency>
 	</dependencies>
 	<scm>
