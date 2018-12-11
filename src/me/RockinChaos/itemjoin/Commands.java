@@ -35,7 +35,7 @@ import me.RockinChaos.itemjoin.utils.sqlite.SQLite;
 public class Commands implements CommandExecutor {
 	public static HashMap < String, Boolean > cmdConfirm = new HashMap < String, Boolean > ();
 	
-	public boolean onCommand(CommandSender sender, Command c, String l, String[] args) {
+	public boolean onCommand(final CommandSender sender, Command c, String l, String[] args) {
 		if (args.length == 0) {
 			if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.use")) {
 				Language.informPlayer(sender, "&aItemJoin v" + ItemJoin.getInstance().getDescription().getVersion() + "&e by RockinChaos");
