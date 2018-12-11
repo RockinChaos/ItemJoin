@@ -1,5 +1,8 @@
 package me.RockinChaos.itemjoin.utils;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.core.LogEvent;
@@ -7,16 +10,17 @@ import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.filter.AbstractFilter;
 import org.apache.logging.log4j.message.Message;
 
-import me.RockinChaos.itemjoin.handlers.CommandHandler;
 
 public class CustomFilter extends AbstractFilter {
+	
+	public static HashMap < String, ArrayList < String > > clearLoggables = new HashMap < String, ArrayList < String > > ();
 	
     private Result handle(String message) {
         if(message == null) {
             return Result.NEUTRAL;
         }
 
-        for(String word : CommandHandler.filteredCommands.get("commands-list")) {
+        for(String word : clearLoggables.get("commands-list")) {
             if(message.toLowerCase().contains(word.toLowerCase())) {
                 return Result.DENY;
             }
