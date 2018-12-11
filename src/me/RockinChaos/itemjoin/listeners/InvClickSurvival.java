@@ -81,7 +81,7 @@ public class InvClickSurvival implements Listener {
     	}
     }
 
-	public static void LegacyDropEvent(Player player, ItemStack[] Inv, ItemStack[] Armor) {
+	public static void LegacyDropEvent(final Player player, final ItemStack[] Inv, final ItemStack[] Armor) {
 		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
 			public void run() {
 				if (dropClick.get(PlayerHandler.getPlayerID(player)) != null && dropClick.get(PlayerHandler.getPlayerID(player)) == true 
