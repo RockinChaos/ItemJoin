@@ -103,6 +103,16 @@ public class PlayerHandler {
 	}
 	
 	@SuppressWarnings("deprecation")
+	public static ItemStack getOffHandItem(Player player) {
+		if (ServerHandler.hasCombatUpdate()) {
+			return player.getInventory().getItemInOffHand();
+		} if (!ServerHandler.hasCombatUpdate()) {
+			return player.getInventory().getItemInHand();
+		}
+		return null;
+	}
+	
+	@SuppressWarnings("deprecation")
 	public static void setInHandItem(Player player, ItemStack toSet) {
 		player.getInventory().setItemInHand(toSet);
 	}

@@ -37,7 +37,7 @@ public class CommandHandler {
 	private static int spamtime = 1;
 	private static Type CmdType = Type.DEFAULT;
 	
-	public static void chargePlayer(ConfigurationSection items, String item, Player player, String action) {
+	public static void chargePlayer(ConfigurationSection items, String item, Player player, String action, ItemStack item1, String hand) {
 		if (isActive.get(PlayerHandler.getPlayerID(player)) != null && isActive.get(PlayerHandler.getPlayerID(player)) != true 
 				|| isActive.get(PlayerHandler.getPlayerID(player)) == null) {
 			isActive.put(PlayerHandler.getPlayerID(player), true);
@@ -46,6 +46,7 @@ public class CommandHandler {
 			} else if (!isChargeable(items)) {
 				InitializeCommands(items, item, player, action);
 			}
+			CommandHandler.removeDisposable(items, item1, player, hand);
 		}
 	}
 	
@@ -81,15 +82,15 @@ public class CommandHandler {
 		return false;
 	}
 	
-	public static void removeDisposable(final ConfigurationSection items, final ItemStack item, final Player player) {
+	public static void removeDisposable(final ConfigurationSection items, final ItemStack item, final Player player, final String hand) {
 		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), (Runnable) new Runnable() {
 			public void run() {
 				String ItemFlags = items.getString(".itemflags");
 				if (ItemHandler.containsIgnoreCase(ItemFlags, "disposable")) {
 					if (item.getAmount() > 1 && item.getAmount() != 1) { item.setAmount(item.getAmount() - 1); } 
-					else if (player.getItemOnCursor() != null && player.getItemOnCursor().getType() != Material.AIR) { player.setItemOnCursor(null); } 
-					else if (PlayerHandler.getMainHandItem(player) != null && PlayerHandler.getMainHandItem(player).getType() != Material.AIR && ItemHandler.isSimilar(PlayerHandler.getMainHandItem(player), item)) { PlayerHandler.setItemInHand(player, Material.AIR); }
-					else { PlayerHandler.setItemInOffHand(player, Material.AIR); }
+					else if (hand != null && hand.equalsIgnoreCase("INVENTORY") && player.getItemOnCursor() != null && player.getItemOnCursor().getType() != Material.AIR) { player.setItemOnCursor(null); } 
+					else if (hand != null && hand.equalsIgnoreCase("HAND") && PlayerHandler.getMainHandItem(player) != null && PlayerHandler.getMainHandItem(player).getType() != Material.AIR && ItemHandler.isSimilar(PlayerHandler.getMainHandItem(player), item)) { PlayerHandler.setItemInHand(player, Material.AIR); }
+					else if (hand != null && hand.equalsIgnoreCase("OFF_HAND")) { PlayerHandler.setItemInOffHand(player, Material.AIR); }
 				}
 			}
 		}, 1L);
