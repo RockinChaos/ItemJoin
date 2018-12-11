@@ -35,7 +35,7 @@ public class InvClickCreative implements Listener {
 	
 	@EventHandler
 	public void onCreativeInventoryModify(InventoryClickEvent event) {
-		Player player = (Player) event.getWhoClicked();
+		final Player player = (Player) event.getWhoClicked();
 		if (PlayerHandler.isCreativeMode(player)) {
 			Initialize(player);
 			ItemStack item = null;
@@ -93,7 +93,7 @@ public class InvClickCreative implements Listener {
 					restoreInventory(player, readd);
 					PlayerHandler.delayUpdateInventory(player, 5L);
 				} else if (!ServerHandler.hasCombatUpdate() && !ItemHandler.isAllowed(player, item, "inventory-modify")) {
-					ItemStack itemFinal = item;
+					final ItemStack itemFinal = item;
 					Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
 						public void run() {
 							if (dropGlitch.get(PlayerHandler.getPlayerID(player)) != null && dropGlitch.get(PlayerHandler.getPlayerID(player)) == true) {
@@ -108,7 +108,7 @@ public class InvClickCreative implements Listener {
 		}
 	}
 	
-	public static void setRunnable(Player player) {
+	public static void setRunnable(final Player player) {
 		new BukkitRunnable() {
 			public void run() {
 				if (player.isOnline() && PlayerHandler.isCreativeMode(player) && isCreative.get(PlayerHandler.getPlayerID(player)) == true) {
@@ -176,7 +176,7 @@ public class InvClickCreative implements Listener {
 		return false;
 	}
 	
-	public static void saveInventory(Player player) {
+	public static void saveInventory(final Player player) {
 		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
 			public void run() {
 				if (hasItems(player) && cooldown.get(PlayerHandler.getPlayerID(player)) != 1) {
@@ -187,7 +187,7 @@ public class InvClickCreative implements Listener {
 		}, 1L);
 	}
 	
-	private static void restoreInventory(Player player, ItemStack readd) {
+	private static void restoreInventory(final Player player, final ItemStack readd) {
 		if (mySavedItems.get(PlayerHandler.getPlayerID(player)) != null) {
 			Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), (Runnable) new Runnable() {
 				public void run() {
