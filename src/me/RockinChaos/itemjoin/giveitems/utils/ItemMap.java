@@ -139,6 +139,8 @@ public class ItemMap {
 	private boolean countLock = false;
 	private boolean cancelEvents = false;
 	private boolean itemStore = false;
+	private boolean noCrafting = false;
+	private boolean noRepairing = false;
 	private boolean animate = false;
 	private boolean dynamic = false;
 	private boolean blockPlacement = false;
@@ -257,6 +259,8 @@ public class ItemMap {
 		this.dynamic = Utils.containsIgnoreCase(this.itemflags, "dynamic");
 		this.animate = Utils.containsIgnoreCase(this.itemflags, "animate");
 		this.itemStore = Utils.containsIgnoreCase(this.itemflags, "item-store");
+		this.noCrafting = Utils.containsIgnoreCase(this.itemflags, "item-craftable");
+		this.noRepairing = Utils.containsIgnoreCase(this.itemflags, "item-repairable");
 		this.cancelEvents = Utils.containsIgnoreCase(this.itemflags, "cancel-events");
 		this.countLock = Utils.containsIgnoreCase(this.itemflags, "count-lock");
 		this.deathDroppable = Utils.containsIgnoreCase(this.itemflags, "death-drops");
@@ -435,6 +439,14 @@ public class ItemMap {
 	
 	public void setItemStore(boolean bool) {
 		this.itemStore = bool;
+	}
+	
+	public void setItemCraftable(boolean bool) {
+		this.noCrafting = bool;
+	}
+	
+	public void setItemRepairable(boolean bool) {
+		this.noRepairing = bool;
 	}
 	
 	public void setAnimate(boolean bool) {
@@ -827,6 +839,14 @@ public class ItemMap {
 		return this.itemStore;
 	}
 	
+	public boolean isItemCraftable() {
+		return this.noCrafting;
+	}
+	
+	public boolean isItemRepairable() {
+		return this.noRepairing;
+	}
+	
 	public boolean isAnimated() {
 		return this.animate;
 	}
@@ -883,6 +903,8 @@ public class ItemMap {
 			else if (findFlag.equals("death-drops")) { return deathDroppable; } 
 			else if (findFlag.equals("inventory-modify")) { return blockMovement; } 
 			else if (findFlag.equals("item-store")) { return itemStore; } 
+			else if (findFlag.equals("item-craftable")) { return noCrafting; } 
+			else if (findFlag.equals("item-repairable")) { return noRepairing; } 
 			else if (findFlag.equals("placement")) { return blockPlacement; } 
 			else if (findFlag.equals("count-lock")) { return countLock; }
 		}

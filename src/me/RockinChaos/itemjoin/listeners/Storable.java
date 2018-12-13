@@ -16,7 +16,7 @@ import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.utils.Utils;
 
-public class ItemStore implements Listener {
+public class Storable implements Listener {
 	
 	@EventHandler
 	public void onInventoryStore(InventoryClickEvent event) {

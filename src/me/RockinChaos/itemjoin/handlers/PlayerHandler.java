@@ -79,6 +79,15 @@ public class PlayerHandler {
 		}
 	}
 	
+	public static void updateExperienceLevels(final Player player) {
+        Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), (Runnable)new Runnable() {
+            public void run() {
+            	player.setExp(player.getExp());
+            	player.setLevel(player.getLevel());
+            }
+        }, 1L);
+	}
+	
 	public static void updateInventory(final Player player) {
         Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), (Runnable)new Runnable() {
             public void run() {
