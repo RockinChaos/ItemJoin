@@ -7,6 +7,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -28,7 +29,7 @@ public class ItemStore implements Listener {
 		} else if (event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY)) { item = event.getCurrentItem(); } 
 		else { item = event.getCursor(); }
 		if (invType != null) {
-			if (invType.contains("CHEST") || invType.contains("FURNACE") || invType.contains("SHULKER_BOX") || invType.contains("HOPPER") || invType.contains("ANVIL") || invType.contains("WORKBENCH")) {
+			if (invType.contains("CHEST") || invType.contains("FURNACE") || invType.contains("SHULKER_BOX") || invType.contains("HOPPER") || invType.contains("ANVIL") || invType.contains("WORKBENCH") || invType.contains("DISPENSER") || invType.contains("DROPPER")) {
 				if (event.getRawSlot() > event.getInventory().getSize() && event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY) || event.getRawSlot() < event.getInventory().getSize()) {
 					if (!ItemHandler.isAllowed(player, item, "item-store")) {
 						event.setCancelled(true);
@@ -49,7 +50,7 @@ public class ItemStore implements Listener {
 			if (i < inventorySize) {
 				if (invType != null) {
 					if (invType.contains("CHEST") || invType.contains("FURNACE") || invType.contains("SHULKER_BOX") 
-							|| invType.contains("HOPPER") || invType.contains("ANVIL") || invType.contains("WORKBENCH")) {
+							|| invType.contains("HOPPER") || invType.contains("ANVIL") || invType.contains("WORKBENCH") || invType.contains("DISPENSER") || invType.contains("DROPPER")) {
 						if (!ItemHandler.isAllowed(player, item, "item-store")) {
 							event.setCancelled(true);
 							PlayerHandler.updateInventory(player);
@@ -62,16 +63,27 @@ public class ItemStore implements Listener {
 	}
 	
 	@EventHandler
-	public void onItemFramePlace(PlayerInteractEntityEvent event) {
+	public void onInteractItemFrame(PlayerInteractEntityEvent event) {
 		if (event.getRightClicked() instanceof ItemFrame) {
 			ItemStack item;
-			if (ServerHandler.hasCombatUpdate()) {
-				item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().toString());
-			} else {
-				item = PlayerHandler.getPerfectHandItem(event.getPlayer(), "");
-			}
+			if (ServerHandler.hasCombatUpdate()) { item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().toString()); } 
+			else { item = PlayerHandler.getPerfectHandItem(event.getPlayer(), ""); }
 			Player player = event.getPlayer();
-			if (!ItemHandler.isAllowed(player, item, "item-store") && item.getType().isBlock()) {
+			if (!ItemHandler.isAllowed(player, item, "item-store")) {
+				event.setCancelled(true);
+				PlayerHandler.updateInventory(player);
+			}
+		}
+	}
+	
+	@EventHandler
+	public void onInteractArmorStand(PlayerInteractAtEntityEvent event) {
+		if (event.getRightClicked().toString().equalsIgnoreCase("CraftArmorStand")) {
+			ItemStack item;
+			if (ServerHandler.hasCombatUpdate()) { item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().toString()); } 
+			else { item = PlayerHandler.getPerfectHandItem(event.getPlayer(), ""); }
+			Player player = event.getPlayer();
+			if (!ItemHandler.isAllowed(player, item, "item-store")) {
 				event.setCancelled(true);
 				PlayerHandler.updateInventory(player);
 			}
