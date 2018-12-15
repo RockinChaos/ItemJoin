@@ -26,7 +26,7 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.mojang.util.UUIDTypeAdapter;
 
-import me.RockinChaos.itemjoin.giveitems.utils.ObtainItem;
+import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
 import me.RockinChaos.itemjoin.utils.Legacy;
 import me.RockinChaos.itemjoin.utils.Reflection;
@@ -46,7 +46,7 @@ public class ItemHandler {
 	}
 	
 	public static ItemMap getMappedItem(ItemStack lookUp, World world) {
-		for (ItemMap item : ObtainItem.getItems()) {
+		for (ItemMap item : ItemUtilities.getItems()) {
 			if (item.isSimilar(lookUp) && item.inWorld(world)) {
 				return item;
 			}
@@ -55,7 +55,7 @@ public class ItemHandler {
 	}
 	
 	public static void closeAnimations(Player player) {
-		for (ItemMap item : ObtainItem.getItems()) {
+		for (ItemMap item : ItemUtilities.getItems()) {
 			if (item.isAnimated() && item.getAnimationHandler().get(player) != null) {
 				item.getAnimationHandler().get(player).closeAnimation(player);
 				item.removeFromAnimationHandler(player);

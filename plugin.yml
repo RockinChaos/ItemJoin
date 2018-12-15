@@ -53,6 +53,11 @@ commands:
       permission: itemjoin.use
       usage: |
           /itemjoin help 7
+   itemjoin help 8:
+      description: Displays the eighth page of the available help menu.
+      permission: itemjoin.use
+      usage: |
+          /itemjoin help 8
    itemjoin reload:
       description: Reloads all ItemJoins configuration files and caches any new data.
       permission: itemjoin.reload
@@ -95,12 +100,30 @@ commands:
       usage: |
           /itemjoin get <item>
           Example: /itemjoin get Ultra - You have received the item [Ultra]!
+   itemjoin get <item> <amount>:
+      description: Gives you the item and the amount you specified.
+      permission: itemjoin.get
+      usage: |
+          /itemjoin get <item> <amount>
+          Example: /itemjoin get Ultra 12 - You have received the item [Ultra]!
    itemjoin get <item> <player>:
-      description: Gives you the item you specified to the player.
+      description: Gives the item you specified to the player.
       permission: itemjoin.get.others
       usage: |
           /itemjoin get <item> <player>
           Example: /itemjoin get Ultra RockinChaos - You have given the item [Ultra] to RockinChaos!
+   itemjoin get <item> <player> <amount>:
+      description: Gives the amount of the item you specified to the player.
+      permission: itemjoin.get.others
+      usage: |
+          /itemjoin get <item> <player> <amount>
+          Example: /itemjoin get Ultra RockinChaos 8 - You have given the item [Ultra] to RockinChaos!
+   itemjoin getOnline <item>:
+      description: Gives the item you specified to all online players of the server.
+      permission: itemjoin.get.others
+      usage: |
+          /itemjoin getOnline <item>
+          Example: /itemjoin getOnline Ultra - You have given the item [Ultra] to RockinChaos!
    itemjoin remove <item>:
       description: Removes the item you specified from your inventory.
       permission: itemjoin.remove
@@ -112,7 +135,13 @@ commands:
       permission: itemjoin.remove.others
       usage: |
           /itemjoin remove <item> <player>
-          Example: /itemjoin remove Ultra RockinChaos - You have removed the item [Ultra] to RockinChaos!
+          Example: /itemjoin remove Ultra RockinChaos - You have removed the item [Ultra] from RockinChaos!
+   itemjoin removeOnline <item>:
+      description: Removes the item you specified from all online players of the server.
+      permission: itemjoin.remove.others
+      usage: |
+          /itemjoin removeOnline <item>
+          Example: /itemjoin removeOnline Ultra - You have removed the item [Ultra] from RockinChaos!
    itemjoin enable:
       description: Enables the use of ItemJoin for all players globally.
       permission: itemjoin.enable

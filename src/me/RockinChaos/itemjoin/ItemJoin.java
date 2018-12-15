@@ -3,7 +3,7 @@ package me.RockinChaos.itemjoin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import me.RockinChaos.itemjoin.giveitems.utils.ItemDesigner;
-import me.RockinChaos.itemjoin.giveitems.utils.ObtainItem;
+import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.utils.Hooks;
@@ -21,7 +21,7 @@ public class ItemJoin extends JavaPlugin {
   		Hooks.registerEvents();
   		ItemDesigner itemDesigner = new ItemDesigner();
   		itemDesigner.generateItems();
-  		ObtainItem.updateItems();
+  		ItemUtilities.updateItems();
   		ServerHandler.sendConsoleMessage("&ahas been Enabled!");
   		Updater.setAbsoluteFile(getFile());
   		Updater.checkUpdates(getInstance().getServer().getConsoleSender());

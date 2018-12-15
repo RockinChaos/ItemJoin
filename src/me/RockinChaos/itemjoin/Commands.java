@@ -3,9 +3,11 @@ package me.RockinChaos.itemjoin;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
@@ -20,7 +22,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemDesigner;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
-import me.RockinChaos.itemjoin.giveitems.utils.ObtainItem;
+import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PermissionsHandler;
@@ -47,12 +49,12 @@ public class Commands implements CommandExecutor {
 				Language.informPlayer(sender, "");
 				Language.informPlayer(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
 				Language.informPlayer(sender, "&aItemJoin v" + ItemJoin.getInstance().getDescription().getVersion() + "&e by RockinChaos");
-				Language.informPlayer(sender, "&a&l/ItemJoin Help &7- &eThis help menu");
-				Language.informPlayer(sender, "&a&l/ItemJoin Reload &7- &eReloads the .yml files");
-				Language.informPlayer(sender, "&a&l/ItemJoin Updates &7- &eChecks for plugin updates");
-				Language.informPlayer(sender, "&a&l/ItemJoin AutoUpdate &7- &eUpdate ItemJoin to latest version");
-				Language.informPlayer(sender, "&aType &a&l/ItemJoin Help 2 &afor the next page");
-				Language.informPlayer(sender, "&a&l&m]----------------&a&l[&e Help Menu 1/7 &a&l]&a&l&m---------------[");
+				Language.informPlayer(sender, "&a&l/ItemJoin Help &7- &eThis help menu.");
+				Language.informPlayer(sender, "&a&l/ItemJoin Reload &7- &eReloads the .yml files.");
+				Language.informPlayer(sender, "&a&l/ItemJoin Updates &7- &eChecks for plugin updates.");
+				Language.informPlayer(sender, "&a&l/ItemJoin AutoUpdate &7- &eUpdate ItemJoin to latest version.");
+				Language.informPlayer(sender, "&aType &a&l/ItemJoin Help 2 &afor the next page.");
+				Language.informPlayer(sender, "&a&l&m]----------------&a&l[&e Help Menu 1/8 &a&l]&a&l&m---------------[");
 				Language.informPlayer(sender, "");
 			} else { Language.sendMessage(sender, "noPermission", ""); }
 			return true;
@@ -60,13 +62,13 @@ public class Commands implements CommandExecutor {
 			if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.use")) {
 				Language.informPlayer(sender, "");
 				Language.informPlayer(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
-				Language.informPlayer(sender, "&a&l/ItemJoin Save <Name> &7- &eSave the held item to the config");
-				Language.informPlayer(sender, "&a&l/ItemJoin List &7- &eCheck items you can get each what worlds");
-				Language.informPlayer(sender, "&a&l/ItemJoin World &7- &eCheck what world you are in, debugging");
-				Language.informPlayer(sender, "&a&l/ItemJoin Permissions &7- &eLists the permissions you have");
-				Language.informPlayer(sender, "&a&l/ItemJoin Permissions 2 &7- &ePermissions page 2");
-				Language.informPlayer(sender, "&aType &a&l/ItemJoin Help 3 &afor the next page");
-				Language.informPlayer(sender, "&a&l&m]----------------&a&l[&e Help Menu 2/7 &a&l]&a&l&m---------------[");
+				Language.informPlayer(sender, "&a&l/ItemJoin Save <Name> &7- &eSave the held item to the config.");
+				Language.informPlayer(sender, "&a&l/ItemJoin List &7- &eCheck items you can get each what worlds.");
+				Language.informPlayer(sender, "&a&l/ItemJoin World &7- &eCheck what world you are in, debugging.");
+				Language.informPlayer(sender, "&a&l/ItemJoin Permissions &7- &eLists the permissions you have.");
+				Language.informPlayer(sender, "&a&l/ItemJoin Permissions 2 &7- &ePermissions page 2.");
+				Language.informPlayer(sender, "&aType &a&l/ItemJoin Help 3 &afor the next page.");
+				Language.informPlayer(sender, "&a&l&m]----------------&a&l[&e Help Menu 2/8 &a&l]&a&l&m---------------[");
 				Language.informPlayer(sender, "");
 			} else { Language.sendMessage(sender, "noPermission", ""); }
 			return true;
@@ -75,12 +77,12 @@ public class Commands implements CommandExecutor {
 				Language.informPlayer(sender, "");
 				Language.informPlayer(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
 				Language.informPlayer(sender, "&a&l/ItemJoin Info &7- &eGets data-info of the held item.");
-				Language.informPlayer(sender, "&a&l/ItemJoin Get <Item> &7- &eGives that ItemJoin item");
-				Language.informPlayer(sender, "&a&l/ItemJoin Get <Item> <Player> &7- &eGives to said player");
-				Language.informPlayer(sender, "&a&l/ItemJoin Remove <Item> &7- &eRemoves item from inventory");
-				Language.informPlayer(sender, "&a&l/ItemJoin Remove <Item> <Player> &7- &eRemoves from player");
-				Language.informPlayer(sender, "&aType &a&l/ItemJoin Help 4 &afor the next page");
-				Language.informPlayer(sender, "&a&l&m]----------------&a&l[&e Help Menu 3/7 &a&l]&a&l&m---------------[");
+				Language.informPlayer(sender, "&a&l/ItemJoin Get <Item> &7- &eGives that ItemJoin item.");
+				Language.informPlayer(sender, "&a&l/ItemJoin Get <Item> <Qty> &7- &eGives amount of said item.");
+				Language.informPlayer(sender, "&a&l/ItemJoin Get <Item> <User> &7- &eGives to said player.");
+				Language.informPlayer(sender, "&a&l/ItemJoin Get <Item> <User> <Qty> &7- &eGives Qty to player.");
+				Language.informPlayer(sender, "&aType &a&l/ItemJoin Help 4 &afor the next page.");
+				Language.informPlayer(sender, "&a&l&m]----------------&a&l[&e Help Menu 3/8 &a&l]&a&l&m---------------[");
 				Language.informPlayer(sender, "");
 			} else { Language.sendMessage(sender, "noPermission", ""); }
 			return true;
@@ -88,12 +90,13 @@ public class Commands implements CommandExecutor {
 			if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.use")) {
 				Language.informPlayer(sender, "");
 				Language.informPlayer(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
-				Language.informPlayer(sender, "&a&l/ItemJoin GetAll &7- &eGives all ItemJoin items.");
-				Language.informPlayer(sender, "&a&l/ItemJoin GetAll <Player> &7- &eGives all items to said player.");
-				Language.informPlayer(sender, "&a&l/ItemJoin RemoveAll &7- &eRemoves all ItemJoin items.");
-				Language.informPlayer(sender, "&a&l/ItemJoin RemoveAll <Player> &7- &eRemoves from player.");
-				Language.informPlayer(sender, "&aType &a&l/ItemJoin Help 5 &afor the next page");
-				Language.informPlayer(sender, "&a&l&m]----------------&a&l[&e Help Menu 4/7 &a&l]&a&l&m---------------[");
+				Language.informPlayer(sender, "&a&l/ItemJoin GetOnline <Item> &7- &eGives to all online.");
+				Language.informPlayer(sender, "&a&l/ItemJoin GetOnline <Item> <Qty> &7- &eGives Qty to all online.");
+				Language.informPlayer(sender, "&a&l/ItemJoin Remove <Item> &7- &eRemoves item from inventory.");
+				Language.informPlayer(sender, "&a&l/ItemJoin Remove <Item> <User> &7- &eRemoves from player.");
+				Language.informPlayer(sender, "&a&l/ItemJoin RemoveOnline <Item> &7- &eRemoves from all online.");
+				Language.informPlayer(sender, "&aType &a&l/ItemJoin Help 5 &afor the next page.");
+				Language.informPlayer(sender, "&a&l&m]----------------&a&l[&e Help Menu 4/8 &a&l]&a&l&m---------------[");
 				Language.informPlayer(sender, "");
 			} else { Language.sendMessage(sender, "noPermission", ""); }
 			return true;
@@ -101,11 +104,12 @@ public class Commands implements CommandExecutor {
 			if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.use")) {
 				Language.informPlayer(sender, "");
 				Language.informPlayer(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
-				Language.informPlayer(sender, "&a&l/ItemJoin Enable &7- &eEnables ItemJoin for all players.");
-				Language.informPlayer(sender, "&a&l/ItemJoin Enable <Player> &7- &eEnables ItemJoin for player.");
-				Language.informPlayer(sender, "&a&l/ItemJoin Enable <Player> <World> &7- &eFor player/world.");
-				Language.informPlayer(sender, "&aType &a&l/ItemJoin Help 6 &afor the next page");
-				Language.informPlayer(sender, "&a&l&m]----------------&a&l[&e Help Menu 5/7 &a&l]&a&l&m---------------[");
+				Language.informPlayer(sender, "&a&l/ItemJoin GetAll &7- &eGives all ItemJoin items.");
+				Language.informPlayer(sender, "&a&l/ItemJoin GetAll <User> &7- &eGives all items to said player.");
+				Language.informPlayer(sender, "&a&l/ItemJoin RemoveAll &7- &eRemoves all ItemJoin items.");
+				Language.informPlayer(sender, "&a&l/ItemJoin RemoveAll <User> &7- &eRemoves from player.");
+				Language.informPlayer(sender, "&aType &a&l/ItemJoin Help 6 &afor the next page.");
+				Language.informPlayer(sender, "&a&l&m]----------------&a&l[&e Help Menu 5/8 &a&l]&a&l&m---------------[");
 				Language.informPlayer(sender, "");
 			} else { Language.sendMessage(sender, "noPermission", ""); }
 			return true;
@@ -113,11 +117,11 @@ public class Commands implements CommandExecutor {
 			if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.use")) {
 				Language.informPlayer(sender, "");
 				Language.informPlayer(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
-				Language.informPlayer(sender, "&a&l/ItemJoin Disable &7- &eDisables ItemJoin for all players.");
-				Language.informPlayer(sender, "&a&l/ItemJoin Disable <Player> &7- &eDisables ItemJoin for player.");
-				Language.informPlayer(sender, "&a&l/ItemJoin Disable <Player> <World> &7- &eFor player/world.");
-				Language.informPlayer(sender, "&aType &a&l/ItemJoin Help 7 &afor the next page");
-				Language.informPlayer(sender, "&a&l&m]----------------&a&l[&e Help Menu 6/7 &a&l]&a&l&m---------------[");
+				Language.informPlayer(sender, "&a&l/ItemJoin Enable &7- &eEnables ItemJoin for all players.");
+				Language.informPlayer(sender, "&a&l/ItemJoin Enable <User> &7- &eEnables ItemJoin for player.");
+				Language.informPlayer(sender, "&a&l/ItemJoin Enable <User> <World> &7- &eFor player/world.");
+				Language.informPlayer(sender, "&aType &a&l/ItemJoin Help 7 &afor the next page.");
+				Language.informPlayer(sender, "&a&l&m]----------------&a&l[&e Help Menu 6/8 &a&l]&a&l&m---------------[");
 				Language.informPlayer(sender, "");
 			} else { Language.sendMessage(sender, "noPermission", ""); }
 			return true;
@@ -125,23 +129,35 @@ public class Commands implements CommandExecutor {
 			if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.use")) {
 				Language.informPlayer(sender, "");
 				Language.informPlayer(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
+				Language.informPlayer(sender, "&a&l/ItemJoin Disable &7- &eDisables ItemJoin for all players.");
+				Language.informPlayer(sender, "&a&l/ItemJoin Disable <User> &7- &eDisables ItemJoin for player.");
+				Language.informPlayer(sender, "&a&l/ItemJoin Disable <User> <World> &7- &eFor player/world.");
+				Language.informPlayer(sender, "&aType &a&l/ItemJoin Help 8 &afor the next page.");
+				Language.informPlayer(sender, "&a&l&m]----------------&a&l[&e Help Menu 7/8 &a&l]&a&l&m---------------[");
+				Language.informPlayer(sender, "");
+			} else { Language.sendMessage(sender, "noPermission", ""); }
+			return true;
+		} else if (args.length == 2 && args[0].equalsIgnoreCase("help") && args[1].equalsIgnoreCase("8")) {
+			if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.use")) {
+				Language.informPlayer(sender, "");
+				Language.informPlayer(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
 				Language.informPlayer(sender, "&c&l[DANGER]&eThe Following Destroys Data &nPermanently!&e&c&l[DANGER]");
 				Language.informPlayer(sender, "&a&l/ItemJoin Purge &7- &eDeletes the database file!");
-				Language.informPlayer(sender, "&a&l/ItemJoin Purge first-join <Player> &7- &eFirst-Join data.");
-				Language.informPlayer(sender, "&a&l/ItemJoin Purge ip-limits <Player> &7- &eIp-Limits data.");
+				Language.informPlayer(sender, "&a&l/ItemJoin Purge first-join <User> &7- &eFirst-Join data.");
+				Language.informPlayer(sender, "&a&l/ItemJoin Purge ip-limits <User> &7- &eIp-Limits data.");
 				Language.informPlayer(sender, "&aFound a bug? Report it @");
 				Language.informPlayer(sender, "&ahttps://github.com/RockinChaos/ItemJoin/issues");
-				Language.informPlayer(sender, "&a&l&m]----------------&a&l[&e Help Menu 7/7 &a&l]&a&l&m---------------[");
+				Language.informPlayer(sender, "&a&l&m]----------------&a&l[&e Help Menu 8/8 &a&l]&a&l&m---------------[");
 				Language.informPlayer(sender, "");
 			} else { Language.sendMessage(sender, "noPermission", ""); }
 			return true;
 		} else if (args[0].equalsIgnoreCase("reload") || args[0].equalsIgnoreCase("rl")) {
 			if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.reload")) {
 				ConfigHandler.loadConfigs();
-				ObtainItem.clearItems();
+				ItemUtilities.clearItems();
 				ItemDesigner itemDesigner = new ItemDesigner();
 				itemDesigner.generateItems();
-				ObtainItem.updateItems();
+				ItemUtilities.updateItems();
 				Language.sendMessage(sender, "reloadedConfigs", "");
 			} else { Language.sendMessage(sender, "noPermission", ""); }
 			return true;
@@ -394,7 +410,7 @@ public class Commands implements CommandExecutor {
 						ItemExists = false;
 						Language.sendMessage(sender, "listWorldsHeader", world.getName());
 						List <String> inputListed = new ArrayList<String>();
-						for (ItemMap item: ObtainItem.getItems()) {
+						for (ItemMap item: ItemUtilities.getItems()) {
 							if (!inputListed.contains(item.getConfigName()) && item.getTempItem() != null && item.inWorld(world)) {
 								inputListed.add(item.getConfigName());
 								Language.sendMessage(sender, "listItems", item.getConfigName());
@@ -442,9 +458,9 @@ public class Commands implements CommandExecutor {
 					Language.informPlayer(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
 					for (World world: ItemJoin.getInstance().getServer().getWorlds()) {
 						List <String> inputListed = new ArrayList<String>();
-						String Probable = ObtainItem.getProbabilityItem(((Player) sender));
-						for (ItemMap item: ObtainItem.getItems()) {
-							if (!inputListed.contains(item.getConfigName()) && item.inWorld(world) && ObtainItem.isChosenProbability(item, Probable)) {
+						String Probable = ItemUtilities.getProbabilityItem(((Player) sender));
+						for (ItemMap item: ItemUtilities.getItems()) {
+							if (!inputListed.contains(item.getConfigName()) && item.inWorld(world) && ItemUtilities.isChosenProbability(item, Probable)) {
 								inputListed.add(item.getConfigName());
 								if (item.hasPermission(((Player) sender))) { Language.informPlayer(sender, "&a[\u2714] " + PermissionsHandler.customPermissions(item.getPermissionNode(), item.getConfigName(), world.getName())); } 
 								else { Language.informPlayer(sender, "&c[\u2718] " + PermissionsHandler.customPermissions(item.getPermissionNode(), item.getConfigName(), world.getName())); }
@@ -455,48 +471,80 @@ public class Commands implements CommandExecutor {
 				} else if (sender instanceof ConsoleCommandSender) { Language.sendMessage(sender, "notPlayer", ""); }
 			} else { Language.sendMessage(sender, "noPermission", ""); }
 			return true;
-		} else if (args.length == 3 && args[0].equalsIgnoreCase("get")) {
-			Player argsPlayer = PlayerHandler.getPlayerString(args[2]);
-			if (argsPlayer == null && PermissionsHandler.hasCommandPermission(sender, "itemjoin.get.others")) {
-				Language.sendMessage(sender, "playerNotFound", args[2]);
-			} else if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.get.others")) {
+		} else if (args.length == 2 && args[0].equalsIgnoreCase("getOnline") || args.length == 3 && args[0].equalsIgnoreCase("getOnline") && Utils.isInt(args[2])) {
+			if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.get.others")) {
+				int amount = 0;
+				if (args.length == 3) { amount = Integer.parseInt(args[2]); }
+			    Collection < ? > playersOnline = null;
+			    Player[] playersOnlineOld = null;
+			    try {
+			        if (Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).getReturnType() == Collection.class) {
+			            if (Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).getReturnType() == Collection.class) {
+			                playersOnline = ((Collection < ? > ) Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).invoke(null, new Object[0]));
+			                for (Object objPlayer: playersOnline) {
+			                    if (!getOnline(((Player) objPlayer), sender, args[1], amount)) { break; }
+			                }
+			            }
+			        } else {
+			            playersOnlineOld = ((Player[]) Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).invoke(null, new Object[0]));
+			            for (Player objPlayer: playersOnlineOld) {
+		                    if (!getOnline(objPlayer, sender, args[1], amount)) { break; }
+			            }
+			        }
+			    } catch (Exception e) { ServerHandler.sendDebugTrace(e);  }
+			} else { Language.sendMessage(sender, "noPermission", ""); }
+			return true;
+		} else if (args[0].equalsIgnoreCase("getOnline")) {
+				if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.get.others")) { Language.sendMessage(sender, "invalidGetOnlineUsage", ""); } 
+				else { Language.sendMessage(sender, "noPermission", ""); }
+				return true;
+		} else if (args.length == 4 && args[0].equalsIgnoreCase("get") && Utils.isInt(args[3]) || args.length == 3 && args[0].equalsIgnoreCase("get") && !Utils.isInt(args[2])) {
+			if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.get.others")) {
+				Player argsPlayer = PlayerHandler.getPlayerString(args[2]);
+				int amount = 0;
+				if (args.length == 4) { amount = Integer.parseInt(args[3]); } 
+				if (argsPlayer == null) { Language.sendMessage(sender, "playerNotFound", args[2]); return true; }
 				boolean itemGiven = false;
 				Language.setArgsPlayer(sender);
-				String Probable = ObtainItem.getProbabilityItem(argsPlayer);
-				for (ItemMap item: ObtainItem.getItems()) {
-					if (item.inWorld(argsPlayer.getWorld()) && item.getConfigName().equalsIgnoreCase(args[1]) && ObtainItem.isChosenProbability(item, Probable)) {
-						if (!item.hasItem(argsPlayer)) {
+				String Probable = ItemUtilities.getProbabilityItem(argsPlayer);
+				for (ItemMap item: ItemUtilities.getItems()) {
+					if (item.inWorld(argsPlayer.getWorld()) && item.getConfigName().equalsIgnoreCase(args[1]) && ItemUtilities.isChosenProbability(item, Probable)) {
+						if (!item.hasItem(argsPlayer) || amount != 0 || item.isAlwaysGive()) {
 							if (!(ConfigHandler.getItemPermissions()) || item.hasPermission(argsPlayer) && ConfigHandler.getItemPermissions()) {
-								item.giveTo(argsPlayer, true);
+								if (item.isAlwaysGive() && args.length != 4) { amount = item.getCount(); }
+								item.giveTo(argsPlayer, true, amount);
 								Language.sendMessage(argsPlayer, "givenToYou", Utils.translateLayout(item.getCustomName(), argsPlayer));
 								Language.setArgsPlayer(argsPlayer);
-								Language.sendMessage(((Player) sender), "givenToPlayer", Utils.translateLayout(item.getCustomName(), argsPlayer));
+								Language.sendMessage(sender, "givenToPlayer", Utils.translateLayout(item.getCustomName(), argsPlayer));
 							} else { 
 								Language.setArgsPlayer(argsPlayer);
-								Language.sendMessage(((Player) sender), "givenToPlayerNoPerms", Utils.translateLayout(item.getCustomName(), argsPlayer)); 
+								Language.sendMessage(sender, "givenToPlayerNoPerms", Utils.translateLayout(item.getCustomName(), argsPlayer)); 
 								}
 						} else { 
-							Language.sendMessage(argsPlayer, "playerTriedGive", Utils.translateLayout(item.getCustomName(), ((Player) sender))); 
+							Language.sendMessage(argsPlayer, "playerTriedGive", Utils.translateLayout(item.getCustomName(), argsPlayer)); 
 							Language.setArgsPlayer(argsPlayer);
-							Language.sendMessage(((Player) sender), "itemExistsInOthersInventory", Utils.translateLayout(item.getCustomName(), argsPlayer));
+							Language.sendMessage(sender, "itemExistsInOthersInventory", Utils.translateLayout(item.getCustomName(), argsPlayer));
 						}
 						itemGiven = true;
 					}
 				}
-				if (!itemGiven) { Language.sendMessage(((Player) sender), "itemDoesntExist", args[1]); }
+				if (!itemGiven) { Language.sendMessage(sender, "itemDoesntExist", args[1]); }
 			} else { Language.sendMessage(sender, "noPermission", ""); }
 			return true;
-		} else if (args.length == 2 && args[0].equalsIgnoreCase("get")) {
+		} else if (args.length == 3 && args[0].equalsIgnoreCase("get") && Utils.isInt(args[2]) || args.length == 2 && args[0].equalsIgnoreCase("get")) {
 			if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.get")) {
+				int amount = 0;
+				if (args.length == 3) { amount = Integer.parseInt(args[2]); }
 				if (!(sender instanceof ConsoleCommandSender)) {
 					boolean itemGiven = false;
 					Language.setArgsPlayer(null);
-					String Probable = ObtainItem.getProbabilityItem(((Player) sender));
-					for (ItemMap item: ObtainItem.getItems()) {
-						if (item.inWorld(((Player) sender).getWorld()) && item.getConfigName().equalsIgnoreCase(args[1]) && ObtainItem.isChosenProbability(item, Probable)) {
-							if (!item.hasItem(((Player) sender))) {
+					String Probable = ItemUtilities.getProbabilityItem(((Player) sender));
+					for (ItemMap item: ItemUtilities.getItems()) {
+						if (item.inWorld(((Player) sender).getWorld()) && item.getConfigName().equalsIgnoreCase(args[1]) && ItemUtilities.isChosenProbability(item, Probable)) {
+							if (!item.hasItem(((Player) sender)) || amount != 0 || item.isAlwaysGive()) {
 								if (!(ConfigHandler.getItemPermissions()) || item.hasPermission(((Player) sender)) && ConfigHandler.getItemPermissions()) {
-									item.giveTo(((Player) sender), true);
+									if (item.isAlwaysGive() && args.length != 4) { amount = item.getCount(); }
+									item.giveTo(((Player) sender), true, amount);
 									Language.sendMessage(((Player) sender), "givenToYou", Utils.translateLayout(item.getCustomName(), ((Player) sender)));
 								} else { Language.sendMessage(((Player) sender), "givenNoPerms", Utils.translateLayout(item.getCustomName(), ((Player) sender))); }
 							} else { Language.sendMessage(((Player) sender), "itemExistsInInventory", Utils.translateLayout(item.getCustomName(), ((Player) sender))); }
@@ -510,7 +558,7 @@ public class Commands implements CommandExecutor {
 				}
 			} else { Language.sendMessage(sender, "noPermission", ""); }
 			return true;
-		} else if (args[0].equalsIgnoreCase("get") || args[0].equalsIgnoreCase("get")) {
+		} else if (args[0].equalsIgnoreCase("get")) {
 			if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.get")) { Language.sendMessage(sender, "invalidGetUsage", ""); } 
 			else { Language.sendMessage(sender, "noPermission", ""); }
 			return true;
@@ -522,12 +570,12 @@ public class Commands implements CommandExecutor {
 				boolean itemGiven = false;
 				boolean itemPermission = false;
 				Language.setArgsPlayer(sender);
-				String Probable = ObtainItem.getProbabilityItem(argsPlayer);
-				for (ItemMap item: ObtainItem.getItems()) {
-					if (item.inWorld(argsPlayer.getWorld()) && ObtainItem.isChosenProbability(item, Probable)) {
+				String Probable = ItemUtilities.getProbabilityItem(argsPlayer);
+				for (ItemMap item: ItemUtilities.getItems()) {
+					if (item.inWorld(argsPlayer.getWorld()) && ItemUtilities.isChosenProbability(item, Probable)) {
 						if (!(ConfigHandler.getItemPermissions()) || item.hasPermission(argsPlayer) && ConfigHandler.getItemPermissions()) {
-							if (!item.hasItem(argsPlayer)) {
-								item.giveTo(argsPlayer, true);
+							if (!item.hasItem(argsPlayer) || item.isAlwaysGive()) {
+								item.giveTo(argsPlayer, !item.isAlwaysGive(), 0);
 								itemGiven = true;
 							}
 						} else { itemPermission = true; }
@@ -536,17 +584,17 @@ public class Commands implements CommandExecutor {
 				if (itemGiven) {
 					Language.sendMessage(argsPlayer, "givenAllToYou", "All Items");
 					Language.setArgsPlayer(argsPlayer);
-					Language.sendMessage(((Player) sender), "givenAllToPlayer", "All Items");
+					Language.sendMessage(sender, "givenAllToPlayer", "All Items");
 					Language.setArgsPlayer(sender);
 				} else {
 					Language.sendMessage(argsPlayer, "playerTriedGiveAllItems", "All Items");
 					Language.setArgsPlayer(argsPlayer);
-					Language.sendMessage(((Player) sender), "allItemsExistInOthersInventory", "All Items");
+					Language.sendMessage(sender, "allItemsExistInOthersInventory", "All Items");
 					Language.setArgsPlayer(sender);
 				}
 				if (itemPermission) {
 					Language.setArgsPlayer(argsPlayer);
-					Language.sendMessage(((Player) sender), "givenAllPlayerNoPerms", "All Items");
+					Language.sendMessage(sender, "givenAllPlayerNoPerms", "All Items");
 				}
 			} else { Language.sendMessage(sender, "noPermission", ""); }
 			return true;
@@ -556,12 +604,12 @@ public class Commands implements CommandExecutor {
 					boolean itemGiven = false;
 					boolean itemPermission = false;
 					Language.setArgsPlayer(null);
-					String Probable = ObtainItem.getProbabilityItem(((Player) sender));
-					for (ItemMap item: ObtainItem.getItems()) {
-						if (item.inWorld(((Player) sender).getWorld()) && ObtainItem.isChosenProbability(item, Probable)) {
+					String Probable = ItemUtilities.getProbabilityItem(((Player) sender));
+					for (ItemMap item: ItemUtilities.getItems()) {
+						if (item.inWorld(((Player) sender).getWorld()) && ItemUtilities.isChosenProbability(item, Probable)) {
 							if (!(ConfigHandler.getItemPermissions()) || item.hasPermission(((Player) sender)) && ConfigHandler.getItemPermissions()) {
-								if (!item.hasItem(((Player) sender))) {
-									item.giveTo(((Player) sender), true);
+								if (!item.hasItem(((Player) sender)) || item.isAlwaysGive()) {
+									item.giveTo(((Player) sender), !item.isAlwaysGive(), 0);
 									itemGiven = true;
 								}
 							} else { itemPermission = true; } 
@@ -576,6 +624,31 @@ public class Commands implements CommandExecutor {
 				}
 			} else { Language.sendMessage(sender, "noPermission", ""); }
 			return true;
+		} else if (args.length == 2 && args[0].equalsIgnoreCase("removeOnline")) {
+			if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.remove.others")) {
+			    Collection < ? > playersOnline = null;
+			    Player[] playersOnlineOld = null;
+			    try {
+			        if (Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).getReturnType() == Collection.class) {
+			            if (Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).getReturnType() == Collection.class) {
+			                playersOnline = ((Collection < ? > ) Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).invoke(null, new Object[0]));
+			                for (Object objPlayer: playersOnline) {
+			                    if (!removeOnline(((Player) objPlayer), sender, args[1])) { break; }
+			                }
+			            }
+			        } else {
+			            playersOnlineOld = ((Player[]) Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).invoke(null, new Object[0]));
+			            for (Player objPlayer: playersOnlineOld) {
+		                    if (!removeOnline(objPlayer, sender, args[1])) { break; }
+			            }
+			        }
+			    } catch (Exception e) { ServerHandler.sendDebugTrace(e);  }
+			} else { Language.sendMessage(sender, "noPermission", ""); }
+			return true;
+		} else if (args[0].equalsIgnoreCase("removeOnline")) {
+			if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.remove.others")) { Language.sendMessage(sender, "invalidRemoveOnlineSyntax", ""); } 
+			else { Language.sendMessage(sender, "noPermission", ""); }
+			return true;
 		} else if (args.length == 3 && args[0].equalsIgnoreCase("remove")) {
 			Player argsPlayer = PlayerHandler.getPlayerString(args[2]);
 			if (argsPlayer == null && PermissionsHandler.hasCommandPermission(sender, "itemjoin.remove.others")) {
@@ -583,22 +656,22 @@ public class Commands implements CommandExecutor {
 			} else if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.remove.others")) {
 				boolean itemRemoved = false;
 				Language.setArgsPlayer(sender);
-				for (ItemMap item: ObtainItem.getItems()) {
+				for (ItemMap item: ItemUtilities.getItems()) {
 					if (item.getConfigName().equalsIgnoreCase(args[1])) {
 						if (item.hasItem(argsPlayer)) {
 							item.removeFrom(argsPlayer);
 							Language.sendMessage(argsPlayer, "removedFromYou", Utils.translateLayout(item.getCustomName(), argsPlayer));
 							Language.setArgsPlayer(argsPlayer);
-							Language.sendMessage(((Player) sender), "removedFromPlayer", Utils.translateLayout(item.getCustomName(), argsPlayer));
+							Language.sendMessage(sender, "removedFromPlayer", Utils.translateLayout(item.getCustomName(), argsPlayer));
 						} else { 
-							Language.sendMessage(argsPlayer, "playerTriedRemove", Utils.translateLayout(item.getCustomName(), ((Player) sender))); 
+							Language.sendMessage(argsPlayer, "playerTriedRemove", Utils.translateLayout(item.getCustomName(), argsPlayer)); 
 							Language.setArgsPlayer(argsPlayer);
-							Language.sendMessage(((Player) sender), "itemDoesntExistInOthersInventory", Utils.translateLayout(item.getCustomName(), argsPlayer));
+							Language.sendMessage(sender, "itemDoesntExistInOthersInventory", Utils.translateLayout(item.getCustomName(), argsPlayer));
 						}
 						itemRemoved = true;
 					}
 				}
-				if (!itemRemoved) { Language.sendMessage(((Player) sender), "itemDoesntExist", args[1]); }
+				if (!itemRemoved) { Language.sendMessage(sender, "itemDoesntExist", args[1]); }
 			} else { Language.sendMessage(sender, "noPermission", ""); }
 			return true;
 		} else if (args.length == 2 && args[0].equalsIgnoreCase("remove")) {
@@ -606,7 +679,7 @@ public class Commands implements CommandExecutor {
 				if (!(sender instanceof ConsoleCommandSender)) {
 					boolean itemRemoved = false;
 					Language.setArgsPlayer(null);
-					for (ItemMap item: ObtainItem.getItems()) {
+					for (ItemMap item: ItemUtilities.getItems()) {
 						if (item.getConfigName().equalsIgnoreCase(args[1])) {
 							if (item.hasItem(((Player) sender))) {
 								item.removeFrom(((Player) sender));
@@ -633,7 +706,7 @@ public class Commands implements CommandExecutor {
 			} else if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.remove.others")) {
 				boolean itemRemoved = false;
 				Language.setArgsPlayer(sender);
-				for (ItemMap item: ObtainItem.getItems()) {
+				for (ItemMap item: ItemUtilities.getItems()) {
 					if (item.hasItem(argsPlayer)) {
 						item.removeFrom(argsPlayer);
 						itemRemoved = true;
@@ -642,12 +715,12 @@ public class Commands implements CommandExecutor {
 				if (itemRemoved) {
 					Language.sendMessage(argsPlayer, "removedAllFromYou", "All Items");
 					Language.setArgsPlayer(argsPlayer);
-					Language.sendMessage(((Player) sender), "removedAllFromPlayer", "All Items");
+					Language.sendMessage(sender, "removedAllFromPlayer", "All Items");
 					Language.setArgsPlayer(sender);
 				} else {
 					Language.sendMessage(argsPlayer, "playerTriedRemoveAll", "All Items");
 					Language.setArgsPlayer(argsPlayer);
-					Language.sendMessage(((Player) sender), "allItemsDoNotExistInOthersInventory", "All Items");
+					Language.sendMessage(sender, "allItemsDoNotExistInOthersInventory", "All Items");
 					Language.setArgsPlayer(sender);
 				}
 				
@@ -659,7 +732,7 @@ public class Commands implements CommandExecutor {
 					Language.setArgsPlayer(null);
 					boolean itemRemoved = false;
 					Language.setArgsPlayer(null);
-					for (ItemMap item: ObtainItem.getItems()) {
+					for (ItemMap item: ItemUtilities.getItems()) {
 						if (item.hasItem(((Player) sender))) {
 							item.removeFrom(((Player) sender));
 							itemRemoved = true;
@@ -689,5 +762,50 @@ public class Commands implements CommandExecutor {
 			if (ConfigHandler.getConfig("en-lang.yml").getString("unknownCommand") != null) { Language.sendMessage(sender, "unknownCommand", ""); }
 			return true;
 		}
+	}
+	
+	private boolean getOnline(Player argsPlayer, CommandSender sender, String args, int amount) {
+        boolean itemGiven = false;
+        Language.setArgsPlayer(sender);
+        String Probable = ItemUtilities.getProbabilityItem(argsPlayer);
+        for (ItemMap item: ItemUtilities.getItems()) {
+            if (item.inWorld(argsPlayer.getWorld()) && item.getConfigName().equalsIgnoreCase(args) && ItemUtilities.isChosenProbability(item, Probable)) {
+                if (!(ConfigHandler.getItemPermissions()) || item.hasPermission(argsPlayer) && ConfigHandler.getItemPermissions()) {
+                	if (item.isAlwaysGive() && amount == 0) { amount = item.getCount(); }
+                    item.giveTo(argsPlayer, true, amount);
+                    Language.sendMessage(argsPlayer, "givenToYou", Utils.translateLayout(item.getCustomName(), argsPlayer));
+                    Language.setArgsPlayer(argsPlayer);
+                    Language.sendMessage(sender, "givenToPlayer", Utils.translateLayout(item.getCustomName(), argsPlayer));
+                } else {
+                    Language.setArgsPlayer(argsPlayer);
+                    Language.sendMessage(sender, "givenToPlayerNoPerms", Utils.translateLayout(item.getCustomName(), argsPlayer));
+                }
+                itemGiven = true;
+            }
+        }
+        if (!itemGiven) { Language.sendMessage(sender, "itemDoesntExist", args); return false; }
+        return true;
+	}
+	
+	private boolean removeOnline(Player argsPlayer, CommandSender sender, String args) {
+        boolean itemRemoved = false;
+        Language.setArgsPlayer(sender);
+        for (ItemMap item: ItemUtilities.getItems()) {
+            if (item.getConfigName().equalsIgnoreCase(args)) {
+                if (item.hasItem(argsPlayer)) {
+                    item.removeFrom(argsPlayer);
+                    Language.sendMessage(argsPlayer, "removedFromYou", Utils.translateLayout(item.getCustomName(), argsPlayer));
+                    Language.setArgsPlayer(argsPlayer);
+                    Language.sendMessage(sender, "removedFromPlayer", Utils.translateLayout(item.getCustomName(), argsPlayer));
+                } else {
+        			Language.sendMessage(argsPlayer, "playerTriedRemove", Utils.translateLayout(item.getCustomName(), argsPlayer)); 
+        			Language.setArgsPlayer(argsPlayer);
+        			Language.sendMessage(sender, "itemDoesntExistInOthersInventory", Utils.translateLayout(item.getCustomName(), argsPlayer));
+                }
+                itemRemoved = true;
+            }
+        }
+        if (!itemRemoved) { Language.sendMessage(sender, "itemDoesntExist", args); return false; }
+        return true;
 	}
 }
