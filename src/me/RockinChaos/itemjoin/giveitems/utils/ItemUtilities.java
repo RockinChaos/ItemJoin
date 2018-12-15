@@ -23,7 +23,7 @@ import me.RockinChaos.itemjoin.utils.ProbabilityUtilities;
 import me.RockinChaos.itemjoin.utils.Utils;
 import me.RockinChaos.itemjoin.utils.sqlite.SQLData;
 
-public class ObtainItem {
+public class ItemUtilities {
 	
   	private static List < ItemMap > items = new ArrayList < ItemMap >();
 	public static Map < String, Integer > probability = new HashMap < String, Integer > ();
@@ -55,11 +55,13 @@ public class ObtainItem {
 		Player[] playersOnlineOld;
 		try {
 			if (Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).getReturnType() == Collection.class) {
-				if (Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).getReturnType() == Collection.class) playersOnlineNew = ((Collection < ? > ) Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).invoke(null, new Object[0]));
-				for (Object objPlayer: playersOnlineNew) {
-					Player player = ((Player) objPlayer);
-					updateItems(player, true);
-					InvClickCreative.isCreative(player, player.getGameMode());
+				if (Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).getReturnType() == Collection.class) {
+					playersOnlineNew = ((Collection < ? > ) Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).invoke(null, new Object[0]));
+					for (Object objPlayer: playersOnlineNew) {
+						Player player = ((Player) objPlayer);
+						updateItems(player, true);
+						InvClickCreative.isCreative(player, player.getGameMode());
+					}
 				}
 			} else {
 				playersOnlineOld = ((Player[]) Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).invoke(null, new Object[0]));
@@ -68,17 +70,19 @@ public class ObtainItem {
 					InvClickCreative.isCreative(player, player.getGameMode());
 				}
 			}
-		} catch (Exception e) { ServerHandler.sendDebugTrace(e); }
+		} catch (Exception e) {
+			ServerHandler.sendDebugTrace(e);
+		}
 	}
 	
 	public static void safeSet(Player player, String type) {
 		InvClickCreative.isCreative(player, player.getGameMode());
-		ObtainItem.setClearingOfItems(player, player.getWorld().getName(), "Clear-On-" + type);
+		ItemUtilities.setClearingOfItems(player, player.getWorld().getName(), "Clear-On-" + type);
 		if (!type.equalsIgnoreCase("Region-Enter")) {
 			PlayerHandler.setHeldItemSlot(player);
 		}
-		ObtainItem.putFailCount(player, 0);
-		ObtainItem.updateItems(player, false);
+		ItemUtilities.putFailCount(player, 0);
+		ItemUtilities.updateItems(player, false);
 	}
 	
 	public static String getProbabilityItem(Player player) {
@@ -214,7 +218,7 @@ public class ObtainItem {
 	
 	public static Boolean isObtainable(Player player, ItemMap itemMap) {
 		if (itemMap.getProbability().equals(-1) || !itemMap.getProbability().equals(-1) && probability.containsKey(itemMap.getConfigName()) && !hasProbabilityItem(player, itemMap)) {
-			if (!itemMap.hasItem(player)) {
+			if (!itemMap.hasItem(player) || itemMap.isAlwaysGive()) {
 				if (Utils.isInt(itemMap.getSlot()) && Integer.parseInt(itemMap.getSlot()) >= 0 && Integer.parseInt(itemMap.getSlot()) <= 35) {
 					if (!SQLData.hasFirstJoined(player, itemMap.getConfigName()) && !SQLData.hasIPLimited(player, itemMap.getConfigName()) 
 							&& canOverwrite(player, itemMap.getSlot(), itemMap.getConfigName())) {
@@ -265,7 +269,9 @@ public class ObtainItem {
 			if (!isOverwrite(player) && Utils.isInt(slot) && player.getInventory().getItem(Integer.parseInt(slot)) != null) {
 				return false;
 			} else if (!isOverwrite(player) && ItemHandler.isCustomSlot(slot)) {
-				if (slot.equalsIgnoreCase("Arbitrary") && player.getInventory().firstEmpty() == -1) {} else if (slot.equalsIgnoreCase("Helmet") && player.getInventory().getHelmet() != null) {
+				if (slot.equalsIgnoreCase("Arbitrary") && player.getInventory().firstEmpty() == -1) {
+					return true;
+				} else if (slot.equalsIgnoreCase("Helmet") && player.getInventory().getHelmet() != null) {
 					return false;
 				} else if (slot.equalsIgnoreCase("Chestplate") && player.getInventory().getChestplate() != null) {
 					return false;
@@ -283,40 +289,81 @@ public class ObtainItem {
 		return true;
 	}
 	
-	public static void setInvSlots(Player player, String item, int slot, ItemStack inStoredItems) {
-		player.getInventory().setItem(slot, inStoredItems);
-		SQLData.saveAllToDatabase(player, item);
-		ServerHandler.sendDebugMessage("Given the Item; " + item);
+	public static void setInvSlots(Player player, ItemMap itemMap, boolean noTriggers, ItemStack item, int amount) {
+		if (amount != 0 || itemMap.isAlwaysGive()) {
+			if (noTriggers) { item.setAmount(amount); }
+			if (itemMap.hasItem(player)) {
+				player.getInventory().addItem(item);
+			} else {
+				player.getInventory().setItem(Integer.parseInt(itemMap.getSlot()), item);
+			}
+		} else { player.getInventory().setItem(Integer.parseInt(itemMap.getSlot()), item); }
+		SQLData.saveAllToDatabase(player, itemMap.getConfigName());
+		ServerHandler.sendDebugMessage("Given the Item; " + itemMap.getConfigName());
 	}
 	
-	public static void setCustomSlots(Player player, String item, String slot, ItemStack inStoredItems) {
+	public static void setCustomSlots(Player player, ItemMap itemMap, boolean noTriggers, ItemStack item, int amount) {
 		EntityEquipment Equip = player.getEquipment();
-		if (inStoredItems != null) {
-			if (slot.equalsIgnoreCase("Arbitrary")) {
-				player.getInventory().addItem(inStoredItems);
-				ServerHandler.sendDebugMessage("Given the Item; [" + item + "]");
-				SQLData.saveAllToDatabase(player, item);
-			} else if (slot.equalsIgnoreCase("Helmet")) {
-				Equip.setHelmet(inStoredItems);
-				ServerHandler.sendDebugMessage("Given the Item; [" + item + "]");
-				SQLData.saveAllToDatabase(player, item);
-			} else if (slot.equalsIgnoreCase("Chestplate")) {
-				Equip.setChestplate(inStoredItems);
-				ServerHandler.sendDebugMessage("Given the Item; [" + item + "]");
-				SQLData.saveAllToDatabase(player, item);
-			} else if (slot.equalsIgnoreCase("Leggings")) {
-				Equip.setLeggings(inStoredItems);
-				ServerHandler.sendDebugMessage("Given the Item; [" + item + "]");
-				SQLData.saveAllToDatabase(player, item);
-			} else if (slot.equalsIgnoreCase("Boots")) {
-				Equip.setBoots(inStoredItems);
-				ServerHandler.sendDebugMessage("Given the Item; [" + item + "]");
-				SQLData.saveAllToDatabase(player, item);
-			} else if (ServerHandler.hasCombatUpdate() && slot.equalsIgnoreCase("Offhand")) {
-				PlayerHandler.setOffhandItem(player, inStoredItems);
-				ServerHandler.sendDebugMessage("Given the Item; [" + item + "]");
-				SQLData.saveAllToDatabase(player, item);
+			if (itemMap.getSlot().equalsIgnoreCase("Arbitrary")) {
+				if (amount != 0 && noTriggers) { item.setAmount(amount); }
+				player.getInventory().addItem(item);
+				ServerHandler.sendDebugMessage("Given the Item; [" + itemMap.getConfigName() + "]");
+				SQLData.saveAllToDatabase(player, itemMap.getConfigName());
+			} else if (itemMap.getSlot().equalsIgnoreCase("Helmet")) {
+				if (amount != 0 || itemMap.isAlwaysGive()) {
+					if (noTriggers) { item.setAmount(amount); }
+					if (itemMap.hasItem(player)) {
+						player.getInventory().addItem(item);
+					} else {
+						Equip.setHelmet(item);
+					}
+				} else { Equip.setHelmet(item); }
+				ServerHandler.sendDebugMessage("Given the Item; [" + itemMap.getConfigName() + "]");
+				SQLData.saveAllToDatabase(player, itemMap.getConfigName());
+			} else if (itemMap.getSlot().equalsIgnoreCase("Chestplate")) {
+				if (amount != 0 || itemMap.isAlwaysGive()) {
+					if (noTriggers) { item.setAmount(amount); }
+					if (itemMap.hasItem(player)) {
+						player.getInventory().addItem(item);
+					} else {
+						Equip.setChestplate(item);
+					}
+				} else { Equip.setChestplate(item); }
+				ServerHandler.sendDebugMessage("Given the Item; [" + itemMap.getConfigName() + "]");
+				SQLData.saveAllToDatabase(player, itemMap.getConfigName());
+			} else if (itemMap.getSlot().equalsIgnoreCase("Leggings")) {
+				if (amount != 0 || itemMap.isAlwaysGive()) {
+					if (noTriggers) { item.setAmount(amount); }
+					if (itemMap.hasItem(player)) {
+						player.getInventory().addItem(item);
+					} else {
+						Equip.setLeggings(item);
+					}
+				} else { Equip.setLeggings(item); }
+				ServerHandler.sendDebugMessage("Given the Item; [" + itemMap.getConfigName() + "]");
+				SQLData.saveAllToDatabase(player, itemMap.getConfigName());
+			} else if (itemMap.getSlot().equalsIgnoreCase("Boots")) {
+				if (amount != 0 || itemMap.isAlwaysGive()) {
+					if (noTriggers) { item.setAmount(amount); }
+					if (itemMap.hasItem(player)) {
+						player.getInventory().addItem(item);
+					} else {
+						Equip.setBoots(item);
+					}
+				} else { Equip.setBoots(item); }
+				ServerHandler.sendDebugMessage("Given the Item; [" + itemMap.getConfigName() + "]");
+				SQLData.saveAllToDatabase(player, itemMap.getConfigName());
+			} else if (ServerHandler.hasCombatUpdate() && itemMap.getSlot().equalsIgnoreCase("Offhand")) {
+				if (amount != 0 || itemMap.isAlwaysGive()) {
+					if (noTriggers) { item.setAmount(amount); }
+					if (itemMap.hasItem(player)) {
+						player.getInventory().addItem(item);
+					} else {
+						PlayerHandler.setOffhandItem(player, item);
+					}
+				} else { PlayerHandler.setOffhandItem(player, item); }
+				ServerHandler.sendDebugMessage("Given the Item; [" + itemMap.getConfigName() + "]");
+				SQLData.saveAllToDatabase(player, itemMap.getConfigName());
 			}
-		}
 	}
 }

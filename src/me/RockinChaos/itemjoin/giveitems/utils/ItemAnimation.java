@@ -131,5 +131,4 @@ public class ItemAnimation {
 			tempmeta.setLore(loreFormatList);
 		transAnimate.setItemMeta(tempmeta);
 	}
-
 }
