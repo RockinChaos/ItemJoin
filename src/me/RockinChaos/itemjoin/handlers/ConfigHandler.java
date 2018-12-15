@@ -20,6 +20,11 @@ public class ConfigHandler {
 	private static String NBTData = "ItemJoin";
 	private static long delay;
 	private static boolean getItemPermissions = false;
+	private static boolean preventInventoryModify = false;
+	private static boolean preventPickups = false;
+	private static boolean preventAllowOpBypass = false;
+	private static boolean preventAllowCreativeBypass = false;
+	private static String enabledPreventWorlds;
 	
 	public static void loadConfigs() {
 		configFile();
@@ -212,6 +217,34 @@ public class ConfigHandler {
 	
 	public static void loadGetItemPermissions() {
 		getItemPermissions = ConfigHandler.getConfig("config.yml").getBoolean("GetItem-Permissions");
+	}
+	
+	public static void loadGlobalPreventSettings() {
+		preventPickups = ConfigHandler.getConfig("config.yml").getBoolean("Prevent-Pickups");
+		preventInventoryModify = ConfigHandler.getConfig("config.yml").getBoolean("Prevent-InventoryModify");
+		preventAllowOpBypass = ConfigHandler.getConfig("config.yml").getBoolean("AllowOPBypass");
+		preventAllowCreativeBypass = ConfigHandler.getConfig("config.yml").getBoolean("CreativeBypass");
+		enabledPreventWorlds = ConfigHandler.getConfig("config.yml").getString("enabled-prevent-worlds");
+	}
+	
+	public static boolean isPreventPickups() {
+		return preventPickups;
+	}
+	
+	public static boolean isPreventInventoryModify() {
+		return preventInventoryModify;
+	}
+	
+	public static boolean isPreventAllowOpBypass() {
+		return preventAllowOpBypass;
+	}
+	
+	public static boolean isPreventAllowCreativeBypass() {
+		return preventAllowCreativeBypass;
+	}
+	
+	public static String getEnabledPreventWorlds() {
+		return enabledPreventWorlds;
 	}
 	
 	public static ConfigurationSection getConfigurationSection() {

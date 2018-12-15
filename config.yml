@@ -16,7 +16,9 @@ Debugging-Mode: false
 
 
 #// Global Settings for ItemJoin. //#
+Prevent-InventoryModify: false
 Prevent-Pickups: false
+enabled-prevent-worlds: ALL
 HeldItem-Slot: None
 NewNBT-System: true
 #// If you change NewNBT-System from true/false, it is recommended to clear all old ItemJoin items. //#
