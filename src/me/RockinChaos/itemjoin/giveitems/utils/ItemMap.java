@@ -261,7 +261,7 @@ public class ItemMap {
 		this.disposable = Utils.containsIgnoreCase(this.itemflags, "disposable");
 		this.blockPlacement = Utils.containsIgnoreCase(this.itemflags, "placement");
 		this.blockMovement = Utils.containsIgnoreCase(this.itemflags, "inventory-modify");
-		this.allowModifications = Utils.containsIgnoreCase(this.itemflags, "item-modifyable");
+		this.allowModifications = Utils.containsIgnoreCase(this.itemflags, "allow-modifications");
 		this.alwaysGive = Utils.containsIgnoreCase(this.itemflags, "always-give");
 		this.dynamic = Utils.containsIgnoreCase(this.itemflags, "dynamic");
 		this.animate = Utils.containsIgnoreCase(this.itemflags, "animate");
@@ -924,8 +924,7 @@ public class ItemMap {
 			else if (findFlag.equals("cancel-events")) { return cancelEvents; } 
 			else if (findFlag.equals("self-drops")) { return selfDroppable; } 
 			else if (findFlag.equals("death-drops")) { return deathDroppable; } 
-			else if (findFlag.equals("inventory-modify")) { return blockMovement; } 
-			else if (findFlag.equals("item-modifyable")) { return allowModifications; }
+			else if (findFlag.equals("inventory-modify")) { return blockMovement; }
 			else if (findFlag.equals("item-store")) { return itemStore; } 
 			else if (findFlag.equals("item-craftable")) { return noCrafting; } 
 			else if (findFlag.equals("item-repairable")) { return noRepairing; } 
@@ -951,11 +950,11 @@ public class ItemMap {
 						&& skullOwner != null && PlayerHandler.getSkullOwner(item).equalsIgnoreCase(skullOwner) 
 						|| this.isSkull() && this.skullTexture != null && this.skullOwner == null 
 						&& ItemHandler.getSkullSkinTexture(item.getItemMeta()).equalsIgnoreCase(this.skullTexture)) {
-					if (isEnchantSimilar(item) || !item.getItemMeta().hasEnchants() && enchants.isEmpty()) {
+					if (isEnchantSimilar(item) || !item.getItemMeta().hasEnchants() && enchants.isEmpty() || this.isModifiyable()) {
 						if (this.material.toString().toUpperCase().contains("BOOK") 
 								&& ((BookMeta) item.getItemMeta()).hasPages() 
 								&& ((BookMeta) item.getItemMeta()).getPages().equals(((BookMeta) tempItem.getItemMeta()).getPages())
-								|| !this.material.toString().toUpperCase().contains("BOOK")) {
+								|| !this.material.toString().toUpperCase().contains("BOOK") || this.isModifiyable()) {
 							return true;
 						}
 					}
@@ -980,9 +979,7 @@ public class ItemMap {
 	}
 	
 	public boolean isCountSimilar(ItemStack item) {
-		if (item.getAmount() == count) {
-			return true;
-		} else if (ConfigHandler.getConfig("items.yml").getBoolean("items-RestrictCount") == false) {
+		if (item.getAmount() == count || ConfigHandler.getConfig("items.yml").getBoolean("items-RestrictCount") == false || this.isModifiyable()) {
 			return true;
 		}
 		return false;
