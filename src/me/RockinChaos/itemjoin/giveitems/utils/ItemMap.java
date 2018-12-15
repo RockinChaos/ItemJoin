@@ -150,6 +150,8 @@ public class ItemMap {
 	private boolean selfDroppable = false;
 	private boolean deathDroppable = false;
 	private boolean disposable = false;
+	private boolean allowModifications = false;
+	private boolean alwaysGive = false;
 	private boolean CreativeBypass = false;
 	private boolean AllowOpBypass = false;
 	
@@ -197,7 +199,10 @@ public class ItemMap {
 		this.setCommands(ItemCommand.arrayFromString(this));
 		this.useCooldown = this.nodeLocation.getString("commands-cooldown") != null;
 		if (this.nodeLocation.getString("commands-cost") != null && Utils.isInt(this.nodeLocation.getString("commands-cost"))) { this.cost = this.nodeLocation.getInt("commands-cost"); }
+		
+		try {
 		if (this.nodeLocation.getString(".commands-sound") != null) { this.commandSound = Sound.valueOf(this.nodeLocation.getString(".commands-sound")); }
+		} catch (Exception e) { ServerHandler.sendDebugTrace(e); ServerHandler.sendDebugMessage("&4Your server is running &eMC " + Reflection.getServerVersion() + " and this version of Minecraft does not have the defined command-sound &e" + this.nodeLocation.getString(".commands-sound")); }
 		if (this.useCooldown) { this.cooldownSeconds = this.nodeLocation.getInt("commands-cooldown"); }
 		this.cooldownMessage = this.nodeLocation.getString("cooldown-message");
 		
@@ -256,6 +261,8 @@ public class ItemMap {
 		this.disposable = Utils.containsIgnoreCase(this.itemflags, "disposable");
 		this.blockPlacement = Utils.containsIgnoreCase(this.itemflags, "placement");
 		this.blockMovement = Utils.containsIgnoreCase(this.itemflags, "inventory-modify");
+		this.allowModifications = Utils.containsIgnoreCase(this.itemflags, "item-modifyable");
+		this.alwaysGive = Utils.containsIgnoreCase(this.itemflags, "always-give");
 		this.dynamic = Utils.containsIgnoreCase(this.itemflags, "dynamic");
 		this.animate = Utils.containsIgnoreCase(this.itemflags, "animate");
 		this.itemStore = Utils.containsIgnoreCase(this.itemflags, "item-store");
@@ -447,6 +454,14 @@ public class ItemMap {
 	
 	public void setItemRepairable(boolean bool) {
 		this.noRepairing = bool;
+	}
+	
+	public void setAllowModifications(boolean bool) {
+		this.allowModifications = bool;
+	}
+	
+	public void setAlwaysGive(boolean bool) {
+		this.alwaysGive = bool;
 	}
 	
 	public void setAnimate(boolean bool) {
@@ -847,6 +862,14 @@ public class ItemMap {
 		return this.noRepairing;
 	}
 	
+	public boolean isModifiyable() {
+		return this.allowModifications;
+	}
+	
+	public boolean isAlwaysGive() {
+		return this.alwaysGive;
+	}
+	
 	public boolean isAnimated() {
 		return this.animate;
 	}
@@ -902,6 +925,7 @@ public class ItemMap {
 			else if (findFlag.equals("self-drops")) { return selfDroppable; } 
 			else if (findFlag.equals("death-drops")) { return deathDroppable; } 
 			else if (findFlag.equals("inventory-modify")) { return blockMovement; } 
+			else if (findFlag.equals("item-modifyable")) { return allowModifications; }
 			else if (findFlag.equals("item-store")) { return itemStore; } 
 			else if (findFlag.equals("item-craftable")) { return noCrafting; } 
 			else if (findFlag.equals("item-repairable")) { return noRepairing; } 
@@ -1238,9 +1262,9 @@ public class ItemMap {
 		if (this.isSimilar(inv.getBoots())) { inv.setBoots(new ItemStack(Material.AIR)); }
 	}
 	
-	public void giveTo(Player player, boolean notifyFailure) {
-		if (CustomSlot != null) { ObtainItem.setCustomSlots(player, this.configName, this.CustomSlot, this.tempItem); } 
-		else { ObtainItem.setInvSlots(player, this.configName, this.InvSlot, this.tempItem); }
+	public void giveTo(Player player, boolean noTriggers, int amount) {
+		if (CustomSlot != null) { ItemUtilities.setCustomSlots(player, this, noTriggers, this.tempItem.clone(), amount); } 
+		else { ItemUtilities.setInvSlots(player, this, noTriggers, this.tempItem.clone(), amount); }
 		this.setAnimations(player);
 	}
 	
