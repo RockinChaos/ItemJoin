@@ -10,7 +10,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import me.RockinChaos.itemjoin.ItemJoin;
-import me.RockinChaos.itemjoin.giveitems.utils.ObtainItem;
+import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
@@ -46,19 +46,19 @@ public class PlayerJoin implements Listener {
 	
 	private void setItems(final Player player) {
 		runGlobalCmds(player);
-		ObtainItem.safeSet(player, "Join");
+		ItemUtilities.safeSet(player, "Join");
 		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
 			public void run() {
-				String Probable = ObtainItem.getProbabilityItem(player);
-				for (ItemMap item : ObtainItem.getItems()) {
+				String Probable = ItemUtilities.getProbabilityItem(player);
+				for (ItemMap item : ItemUtilities.getItems()) {
 					if (item.isGiveOnJoin() && item.inWorld(player.getWorld()) 
-							&& ObtainItem.isChosenProbability(item, Probable) && SQLData.isEnabled(player)
-							&& item.hasPermission(player) && ObtainItem.isObtainable(player, item)) {
-							item.giveTo(player, true); 
+							&& ItemUtilities.isChosenProbability(item, Probable) && SQLData.isEnabled(player)
+							&& item.hasPermission(player) && ItemUtilities.isObtainable(player, item)) {
+							item.giveTo(player, false, 0); 
 					}
 					item.setAnimations(player);
 				}
-				ObtainItem.sendFailCount(player);
+				ItemUtilities.sendFailCount(player);
 				PlayerHandler.delayUpdateInventory(player, 15L);
 			}
 		}, ConfigHandler.getItemDelay());

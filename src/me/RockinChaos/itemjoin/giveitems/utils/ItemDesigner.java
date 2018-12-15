@@ -72,7 +72,7 @@ public class ItemDesigner {
 						this.setAttributes(itemMap);
 						this.setProbability(itemMap);
 						
-						ObtainItem.addItem(itemMap);
+						ItemUtilities.addItem(itemMap);
 					}
 				}
 			}
@@ -407,7 +407,7 @@ public class ItemDesigner {
 		if (itemMap.getNodeLocation().getString(".probability") != null) {
 			String percentageString = itemMap.getNodeLocation().getString(".probability").replace("%", "").replace("-", "").replace(" ", "");
 			int percentage = Integer.parseInt(percentageString);
-			if (!ObtainItem.probability.containsKey(itemMap.getConfigName())) { ObtainItem.probability.put(itemMap.getConfigName(), percentage); }
+			if (!ItemUtilities.probability.containsKey(itemMap.getConfigName())) { ItemUtilities.probability.put(itemMap.getConfigName(), percentage); }
 			itemMap.setProbability(percentage);
 		}
 	}

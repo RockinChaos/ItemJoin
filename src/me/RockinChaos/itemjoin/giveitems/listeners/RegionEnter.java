@@ -16,7 +16,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionType;
 
 import me.RockinChaos.itemjoin.ItemJoin;
-import me.RockinChaos.itemjoin.giveitems.utils.ObtainItem;
+import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
@@ -46,13 +46,13 @@ public class RegionEnter implements Listener {
 	}
 
 	private static void setItems(final Player player, final String regionId) {
-		ObtainItem.safeSet(player, "Region-Enter");
+		ItemUtilities.safeSet(player, "Region-Enter");
 		playersInRegions.put(player, regionId);
 		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
 			public void run() {
 				removeLeaveItems(player);
 				giveItems(player, regionId, 1);
-				ObtainItem.sendFailCount(player);
+				ItemUtilities.sendFailCount(player);
 				PlayerHandler.delayUpdateInventory(player, 15L);
 			}
 		}, ConfigHandler.getItemDelay());
@@ -60,9 +60,9 @@ public class RegionEnter implements Listener {
 	
 	private static void removeItems(Player player) {
 		if (playersInRegions.get(player) != null) {
-			String Probable = ObtainItem.getProbabilityItem(player);
-			for (ItemMap item: ObtainItem.getItems()) {
-				if (item.isGiveOnRegionEnter() && SQLData.isEnabled(player) && item.inWorld(player.getWorld()) && ObtainItem.isChosenProbability(item, Probable) && item.hasPermission(player)) {
+			String Probable = ItemUtilities.getProbabilityItem(player);
+			for (ItemMap item: ItemUtilities.getItems()) {
+				if (item.isGiveOnRegionEnter() && SQLData.isEnabled(player) && item.inWorld(player.getWorld()) && ItemUtilities.isChosenProbability(item, Probable) && item.hasPermission(player)) {
 					item.removeFrom(player);
 				}
 			}
@@ -71,20 +71,20 @@ public class RegionEnter implements Listener {
 	}
 	
 	private static void removeLeaveItems(Player player) {
-		String Probable = ObtainItem.getProbabilityItem(player);
-		for (ItemMap item: ObtainItem.getItems()) {
-			if (item.isTakeOnRegionLeave() && SQLData.isEnabled(player) && item.inWorld(player.getWorld()) && ObtainItem.isChosenProbability(item, Probable) && item.hasPermission(player)) {
+		String Probable = ItemUtilities.getProbabilityItem(player);
+		for (ItemMap item: ItemUtilities.getItems()) {
+			if (item.isTakeOnRegionLeave() && SQLData.isEnabled(player) && item.inWorld(player.getWorld()) && ItemUtilities.isChosenProbability(item, Probable) && item.hasPermission(player)) {
 				item.removeFrom(player);
 			}
 		}
 	}
 	
 	private static void giveItems(Player player, String region, int step) {
-		String Probable = ObtainItem.getProbabilityItem(player);
-		for (ItemMap item: ObtainItem.getItems()) {
-			if (item.isGiveOnRegionEnter() && SQLData.isEnabled(player) && item.inWorld(player.getWorld()) && ObtainItem.isChosenProbability(item, Probable) && item.hasPermission(player) && ObtainItem.isObtainable(player, item)) {
+		String Probable = ItemUtilities.getProbabilityItem(player);
+		for (ItemMap item: ItemUtilities.getItems()) {
+			if (item.isGiveOnRegionEnter() && SQLData.isEnabled(player) && item.inWorld(player.getWorld()) && ItemUtilities.isChosenProbability(item, Probable) && item.hasPermission(player) && ItemUtilities.isObtainable(player, item)) {
 				if (Utils.containsIgnoreCase(item.getEnabledRegions(), region) || Utils.containsIgnoreCase(item.getEnabledRegions(), "UNDEFINED")) {
-					item.giveTo(player, true);
+					item.giveTo(player, false, 0);
 				}
 			}
 			item.setAnimations(player);
