@@ -13,6 +13,7 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
+import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
@@ -23,6 +24,20 @@ public class InvClickSurvival implements Listener {
 	public static Map < String, Boolean > droppedItem = new HashMap < String, Boolean > ();
 	public static Map < String, Boolean > dropClick = new HashMap < String, Boolean > ();
 	public static HashMap < String, ItemStack > cursorItem = new HashMap < String, ItemStack > ();
+	
+	@EventHandler
+	public void onGlobalInventoryModify(InventoryClickEvent event) {
+		  Player player = (Player) event.getWhoClicked();
+		  if (ConfigHandler.isPreventInventoryModify()) {
+		  	String worlds = ConfigHandler.getEnabledPreventWorlds();
+		  	if (worlds == null || worlds.isEmpty() || Utils.containsIgnoreCase(worlds, "ALL") || Utils.containsIgnoreCase(worlds, "GLOBAL") || Utils.containsIgnoreCase(worlds, player.getWorld().getName())) {
+	  			if (ConfigHandler.isPreventAllowOpBypass() && player.isOp() 
+	  					|| ConfigHandler.isPreventAllowCreativeBypass() && PlayerHandler.isCreativeMode(player)) {} else {
+		  			event.setCancelled(true);
+		  		}
+		  	}
+		  }
+	}
 
 	@EventHandler
 	public void onSurvivalInventoryModify(InventoryClickEvent event) {
