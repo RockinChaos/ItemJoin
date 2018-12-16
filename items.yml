@@ -134,10 +134,16 @@ items:
     permission-node: 'itemjoin.bungeetp'
     enabled-worlds: world, world_nether, world_the_end
   filler-pane-item:
-    id: BLACK_STAINED_GLASS_PANE
+    id:
+      1: '<delay:40>BLACK_STAINED_GLASS_PANE'
+      2: '<delay:20>BLUE_STAINED_GLASS_PANE'
+      3: '<delay:20>GREEN_STAINED_GLASS_PANE'
+      4: '<delay:20>MAGENTA_STAINED_GLASS_PANE'
+      5: '<delay:20>ORANGE_STAINED_GLASS_PANE'
+      6: '<delay:20>RED_STAINED_GLASS_PANE'
     slot: Arbitrary, Arbitrary, Arbitrary, Arbitrary
     name: '&f'
-    itemflags: inventory-modify, placement, death-drops, self-drops
+    itemflags: inventory-modify, placement, animate, death-drops, self-drops
     triggers: join, world-change
     enabled-worlds: world, world_nether, world_the_end
   banner-item:

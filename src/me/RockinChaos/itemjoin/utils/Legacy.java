@@ -74,6 +74,10 @@ public class Legacy {
 	    return null;
 	}
 	
+	public static int getLegacyMaterialID(Material mat) {
+	    return mat.getId();
+	}
+	
 	public static ItemStack setLegacyDurability(ItemStack item, short durability) {
 		item.setDurability(durability);
 		return item;

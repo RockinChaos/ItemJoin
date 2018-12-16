@@ -263,6 +263,10 @@ public class ConfigHandler {
 		return getConfig("items.yml").getConfigurationSection(items.getCurrentPath() + ".lore");
 	}
 	
+	public static ConfigurationSection getMaterialSection(ConfigurationSection items) {
+		return getConfig("items.yml").getConfigurationSection(items.getCurrentPath() + ".id");
+	}
+	
 	public static ConfigurationSection getPagesSection(ConfigurationSection items) {
 		return getConfig("items.yml").getConfigurationSection(items.getCurrentPath() + ".pages");
 	}

@@ -63,9 +63,11 @@ public class ItemMap {
 	private Short dataValue;
 	
 	private String customName;
-	private List < String > dynamicNames;
+	private List < String > dynamicNames = null;
 	private List < String > customLore;
-	private List < List < String > > dynamicLores;
+	private List < List < String > > dynamicLores = null;
+	private List < String > dynamicMaterials = null;
+	private boolean materialAnimated = false;
 	private Map < Player, ItemAnimation > localeAnimations = new HashMap < Player, ItemAnimation > ();
 	private Integer InvSlot;
 	private String CustomSlot;
@@ -175,12 +177,8 @@ public class ItemMap {
 	
 	public ItemMap(String internalName, String slot) {
         this.nodeLocation = ConfigHandler.getItemSection(internalName);
-		this.material = ItemHandler.getMaterial(this.nodeLocation);
-        this.configName = internalName;
         
-        if (this.nodeLocation.getString(".data-value") != null && Utils.isInt(this.nodeLocation.getString(".data-value"))) {
-        	 this.dataValue = (short) this.nodeLocation.getInt(".data-value");
-		}
+        this.configName = internalName;
         
 		if (this.nodeLocation.getString(".count") != null && Utils.isInt(this.nodeLocation.getString(".count"))) {
 			 this.count = this.nodeLocation.getInt(".count");
@@ -247,7 +245,9 @@ public class ItemMap {
 		} else { if (isGiveOnRegionEnter() || isTakeOnRegionLeave()) { RegionEnter.addLocaleRegion("UNDEFINED"); this.enabledRegions = "UNDEFINED"; } }
 
         setSlot(slot);
-        
+	}
+	
+	public void renderItemStack() {
         if (this.dataValue != null) {
         	this.tempItem = Legacy.newLegacyItemStack(this.material, this.count, this.dataValue);
         } else { this.tempItem = new ItemStack(this.material, this.count); }
@@ -284,6 +284,10 @@ public class ItemMap {
 		this.tempMeta = temp;
 	}
 	
+	public void setMaterial(Material mat) {
+		this.material = mat;
+	}
+	
 	public void setCustomName(String customName) {
 		if (customName == null || customName.length() == 0) {
 			this.customName = null;
@@ -311,6 +315,11 @@ public class ItemMap {
 	
 	public void setDynamicLores(List<List<String>> lores) {
 		this.dynamicLores = lores;
+	}
+	
+	public void setDynamicMaterials(List<String> mats) {
+		this.dynamicMaterials = mats;
+		this.materialAnimated = true;
 	}
 	
 	public void removeFromAnimationHandler(Player player) {
@@ -604,6 +613,10 @@ public class ItemMap {
 	
 	public List<List<String>> getDynamicLores() {
 		return this.dynamicLores;
+	}
+	
+	public List<String> getDynamicMaterials() {
+		return this.dynamicMaterials;
 	}
 	
 	public Map<Player, ItemAnimation> getAnimationHandler() {
@@ -942,7 +955,7 @@ public class ItemMap {
 	}
      
 	public boolean isSimilar(ItemStack item) {
-		if (item != null && item.getType() != Material.AIR && item.getType() == this.material) {
+		if (item != null && item.getType() != Material.AIR && item.getType() == this.material || materialAnimated && item != null && item.getType() != Material.AIR && this.isMaterial(item)) {
 			if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && ServerHandler.hasSpecificUpdate("1_8") 
 					&& ItemHandler.getNBTData(item) != null && ItemHandler.getNBTData(item).contains(this.newNBTData) || this.legacySecret != null && item.hasItemMeta() 
 					&& item.getItemMeta().hasDisplayName() && item.getItemMeta().getDisplayName().contains(this.legacySecret)) {
@@ -981,6 +994,18 @@ public class ItemMap {
 	public boolean isCountSimilar(ItemStack item) {
 		if (item.getAmount() == count || ConfigHandler.getConfig("items.yml").getBoolean("items-RestrictCount") == false || this.isModifiyable()) {
 			return true;
+		}
+		return false;
+	}
+	
+	private boolean isMaterial(ItemStack item) {
+		for (String material : this.dynamicMaterials) {
+			material = ItemHandler.purgeDelay(material);
+			String dataValue = null;
+			if (material.contains(":")) { String[] parts = material.split(":"); dataValue = parts[1]; }
+			if (item.getType() == ItemHandler.getMaterial(material, dataValue, this.getConfigName())) {
+				return true;
+			}
 		}
 		return false;
 	}
@@ -1267,7 +1292,7 @@ public class ItemMap {
 	
 	public void setAnimations(Player player) {
 		if (this.isAnimated() && this.getAnimationHandler().get(player) == null) {
-			ItemAnimation Animator = new ItemAnimation(this, dynamicNames, dynamicLores);
+			ItemAnimation Animator = new ItemAnimation(this);
 			Animator.openAnimation(player);
 			this.localeAnimations.put(player, Animator);
 		}

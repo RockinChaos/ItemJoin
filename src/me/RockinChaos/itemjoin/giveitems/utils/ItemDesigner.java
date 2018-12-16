@@ -14,6 +14,7 @@ import org.bukkit.FireworkEffect;
 import org.bukkit.block.banner.Pattern;
 import org.bukkit.block.banner.PatternType;
 import org.bukkit.FireworkEffect.Type;
+import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.meta.BookMeta.Generation;
@@ -45,6 +46,7 @@ public class ItemDesigner {
 				for (String slot: slots) {
 					if (isCreatable(internalName, slot)) {
 						ItemMap itemMap = new ItemMap(internalName, slot);
+						this.setMaterial(itemMap);
 						
 						this.setSkullDatabase(itemMap);
 						this.setUnbreaking(itemMap);
@@ -81,7 +83,13 @@ public class ItemDesigner {
 	
 	private boolean isCreatable(String internalName, String slot) {
 		ConfigurationSection itemNode = ConfigHandler.getItemSection(internalName);
-		String id = itemNode.getString(".id");
+		String id = ItemHandler.getMaterialPath(itemNode);
+		String originalID = id;
+		if (id.contains(":")) { 
+			String[] parts = id.split(":"); id = parts[0]; 
+			ServerHandler.sendConsoleMessage("&4[WARNING] The item " + internalName + " is using an ItemID (Numerical Value) which is no longer supported as of Minecraft 1.13, instead use its material name.");
+			ServerHandler.sendConsoleMessage("&4This will cause issues, please see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html for a list of material names.");
+		}
 		if (slot != null) {
 			if (!Utils.isInt(slot) && !ItemHandler.isCustomSlot(slot)) {
 				ServerHandler.sendConsoleMessage("&eThe Item " + internalName + "'s slot is invalid or does not exist!");
@@ -108,13 +116,13 @@ public class ItemDesigner {
 				ServerHandler.sendConsoleMessage("&4Your server is running &eMC " + Reflection.getServerVersion() + " and this version of Minecraft does not have the item LINGERING_POTION!");
 				ServerHandler.sendConsoleMessage("&4You are receiving this notice because the item(s) exists in your items.yml and will not be set, please remove the item(s) or update your server!");
 				return false;
-			} else if (ItemHandler.getMaterial(itemNode) == null) {
+			} else if (ItemHandler.getMaterial(originalID, null, itemNode.getName()) == null) {
 				ServerHandler.sendConsoleMessage("&4Your server is running &eMC " + Reflection.getServerVersion() + " and this version of Minecraft does not have the item " + id);
 				ServerHandler.sendConsoleMessage("&4You are receiving this notice because the item(s) exists in your items.yml and will not be set, please remove the item(s) or update your server!");
 				return false;
 			}
 		} else {
-			if (ItemHandler.getMaterial(itemNode) == null) {
+			if (ItemHandler.getMaterial(originalID, null, itemNode.getName()) == null) {
 				ServerHandler.sendConsoleMessage("&eThe Item " + internalName + "'s Material 'ID' is invalid or does not exist!");
 				ServerHandler.sendConsoleMessage("&eThe Item " + internalName + " &ewill not be set!");
 				return false;
@@ -122,6 +130,38 @@ public class ItemDesigner {
 		}
 		return true;
 	}
+	
+//  =============================================== //
+//  ~ Sets the Custom Material to the Custom Item ~ //
+//       Adds the custom material to the item.      //
+//  =============================================== //
+	
+	private Material getActualMaterial(ItemMap itemMap) {
+		String material = ItemHandler.purgeDelay(itemMap.getNodeLocation().getString(".id"));
+		if (ConfigHandler.getMaterialSection(itemMap.getNodeLocation()) != null) {
+			List<String> materials = new ArrayList<String>();
+			for (String materialKey : ConfigHandler.getMaterialSection(itemMap.getNodeLocation()).getKeys(false)) {
+				String materialList = itemMap.getNodeLocation().getString(".id." + materialKey);
+				if (materialList != null) {
+					materials.add(materialList);
+				}
+			}
+			itemMap.setDynamicMaterials(materials);
+			material = ItemHandler.purgeDelay(itemMap.getNodeLocation().getString(".id." + ConfigHandler.getMaterialSection(itemMap.getNodeLocation()).getKeys(false).iterator().next()));
+			if (material.contains(":")) { String[] parts = material.split(":"); itemMap.setDataValue((short) Integer.parseInt(parts[1])); }
+			return ItemHandler.getMaterial(material, null, itemMap.getConfigName());
+		}
+		if (material.contains(":")) { String[] parts = material.split(":"); itemMap.setDataValue((short) Integer.parseInt(parts[1])); }
+		return ItemHandler.getMaterial(material, null, itemMap.getConfigName());
+	}
+	
+	private void setMaterial(ItemMap itemMap) {
+		Material material = getActualMaterial(itemMap);
+		itemMap.setMaterial(material);
+		itemMap.renderItemStack();
+	}
+//====================================================================================================================================================================================================== //
+
 	
 // =============================================================== //
 //  ~ Sets the HeadDatabase Texture to the Custom Skull Item ~     //

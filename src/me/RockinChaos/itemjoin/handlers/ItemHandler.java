@@ -5,8 +5,10 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -113,23 +115,41 @@ public class ItemHandler {
 		return null;
 	}
 	
-	public static Material getMaterial(ConfigurationSection items) {
+	public static Material getMaterial(String material, String dataVal, String name) {
 		try {
-		if (Utils.isInt(items.getString(".id")) && !ServerHandler.hasAquaticUpdate()) {
-			return Legacy.findLegacyMaterial(items.getInt(".id"));
-		} else if (Utils.isInt(items.getString(".id")) && ServerHandler.hasAquaticUpdate()) {
-			ServerHandler.sendConsoleMessage("&4[WARNING] The item " + items.getName() + " is using an ItemID (Numerical Value) which is no longer supported as of Minecraft 1.13, instead use its material name.");
-			ServerHandler.sendConsoleMessage("&4This will cause issues, please see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html for a list of material names.");
-			int dataValue;
-			if (items.getString(".data-value") != null) { dataValue = items.getInt(".data-value"); } else { dataValue = 0; }
-			return Legacy.convertLegacyMaterial(items.getInt(".id"), (byte) dataValue);
-		} else if (!ServerHandler.hasAquaticUpdate()) {
-			return Material.getMaterial(items.getString(".id").toUpperCase());
-		} else {
-			return Material.matchMaterial(items.getString(".id").toUpperCase());
-		}
+			boolean isLegacy = false;
+			if (material.contains(":")) { String[] parts = material.split(":"); material = parts[0]; dataVal = parts[1]; isLegacy = true; }
+			if (Utils.isInt(material) && !ServerHandler.hasAquaticUpdate()) {
+				return Legacy.findLegacyMaterial(Integer.parseInt(material));
+			} else if (Utils.isInt(material) && ServerHandler.hasAquaticUpdate() || isLegacy && ServerHandler.hasAquaticUpdate()) {
+				int dataValue;
+				if (!Utils.isInt(material)) { material = "LEGACY_" + material; }
+				if (dataVal != null) { dataValue = Integer.parseInt(dataVal); } else { dataValue = 0; }
+				if (!Utils.isInt(material)) { return Legacy.convertLegacyMaterial(Legacy.getLegacyMaterialID(Material.getMaterial(material.toUpperCase())), (byte) dataValue); } 
+				else { return Legacy.convertLegacyMaterial(Integer.parseInt(material), (byte) dataValue); }
+			} else if (!ServerHandler.hasAquaticUpdate()) {
+				return Material.getMaterial(material.toUpperCase());
+			} else {
+				return Material.matchMaterial(material.toUpperCase());
+			}
 		} catch (Exception e) { ServerHandler.sendDebugTrace(e); }
 		return null;
+	}
+	
+	public static String getMaterialPath(ConfigurationSection itemNode) {
+		String material = ItemHandler.purgeDelay(itemNode.getString(".id"));
+		if (ConfigHandler.getMaterialSection(itemNode) != null) {
+			List<String> materials = new ArrayList<String>();
+			for (String materialKey : ConfigHandler.getMaterialSection(itemNode).getKeys(false)) {
+				String materialList = itemNode.getString(".id." + materialKey);
+				if (materialList != null) {
+					materials.add(materialList);
+				}
+			}
+			material = ItemHandler.purgeDelay(itemNode.getString(".id." + ConfigHandler.getMaterialSection(itemNode).getKeys(false).iterator().next()));
+			return material;
+		}
+		return material;
 	}
 	
 	public static String getDelay(String context) {
