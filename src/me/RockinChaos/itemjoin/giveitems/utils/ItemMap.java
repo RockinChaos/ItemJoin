@@ -235,6 +235,10 @@ public class ItemMap {
 			}
 		}
 		
+		if (Utils.containsIgnoreCase(this.nodeLocation.getString(".enabled-worlds"), "ALL") || Utils.containsIgnoreCase(this.nodeLocation.getString(".enabled-worlds"), "GLOBAL")) {
+			this.enabledWorlds.add("ALL");
+		}
+		
 		if (this.nodeLocation.getString(".enabled-regions") != null) {
 			this.enabledRegions = this.nodeLocation.getString(".enabled-regions");
 			String regionlist = this.nodeLocation.getString(".enabled-regions").replace(" ", "");
@@ -1137,7 +1141,7 @@ public class ItemMap {
 	}
 	
 	private void setCustomName(Player player) {
-		if (this.customName != null) {
+		if (this.customName != null && !Utils.containsIgnoreCase(this.customName, ItemHandler.getName(this.tempItem))) {
 			this.tempMeta.setDisplayName(Utils.translateLayout(ItemHandler.purgeDelay(this.customName), player));
 		}
 	}
@@ -1298,16 +1302,14 @@ public class ItemMap {
 		}
 	}
 	
-    public void executeCommands(Player player, String action) {
+    public void executeCommands(Player player, String action, String hand) {
     	if (this.commands != null && this.commands.length > 0 && !onCooldown(player)) {
     		ItemCommand[] itemCommands = this.commands;
     		if (isPlayerChargeable(player)) {
     			playSound(player);
-			removeDisposable(player, this.disposable);
-    		for (int i = 0; i < itemCommands.length; i++) {
-    			itemCommands[i].execute(player, action);
-    		}
-    		addPlayerOnCooldown(player);
+    			removeDisposable(player, this.disposable, hand);
+    			for (int i = 0; i < itemCommands.length; i++) { itemCommands[i].execute(player, action); }
+    			addPlayerOnCooldown(player);
     		}
     	}
     }
@@ -1342,14 +1344,15 @@ public class ItemMap {
 		}
 	}
 	
-	private void removeDisposable(final Player player, final boolean isDisposable) {
+	private void removeDisposable(final Player player, final boolean isDisposable, final String hand) {
 		final ItemStack item = PlayerHandler.getHandItem(player);
 		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), (Runnable) new Runnable() {
 			public void run() {
 				if (isDisposable) {
 					if (item.getAmount() > 1 && item.getAmount() != 1) { item.setAmount(item.getAmount() - 1); } 
-					else if (player.getItemOnCursor() != null && player.getItemOnCursor().getType() != Material.AIR) { player.setItemOnCursor(null); } 
-					else { PlayerHandler.setItemInHand(player, Material.AIR); }
+					else if (hand != null && hand.equalsIgnoreCase("INVENTORY") && player.getItemOnCursor() != null && player.getItemOnCursor().getType() != Material.AIR) { player.setItemOnCursor(null); } 
+					else if (hand != null && hand.equalsIgnoreCase("HAND") && PlayerHandler.getMainHandItem(player) != null && PlayerHandler.getMainHandItem(player).getType() != Material.AIR && item.isSimilar(PlayerHandler.getMainHandItem(player))) { PlayerHandler.setItemInHand(player, Material.AIR); }
+					else if (hand != null && hand.equalsIgnoreCase("OFF_HAND")) { PlayerHandler.setOffhandItem(player, new ItemStack(Material.AIR)); }
 				}
 			}
 		}, 1L);
