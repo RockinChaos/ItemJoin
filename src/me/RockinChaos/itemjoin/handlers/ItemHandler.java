@@ -14,6 +14,7 @@ import java.util.UUID;
 import javax.net.ssl.HttpsURLConnection;
 
 import org.apache.commons.lang.WordUtils;
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
@@ -283,5 +284,14 @@ public class ItemHandler {
 				}
 		}
 		return false;
+	}
+	
+	public static Color getColorFromHexColor(String hexString) {
+		int hex = Integer.decode("#" + hexString);
+		int r = ((hex & 0xFF0000) >> 16);
+		int g = ((hex & 0xFF00) >> 8);
+		int b = (hex & 0xFF);
+		Color bukkitColor = Color.fromBGR(r, g, b);
+		return bukkitColor;
 	}
 }

@@ -680,7 +680,11 @@ public class ItemDesigner {
 			if (itemMap.getMaterial().toString().equalsIgnoreCase("LEATHER_HELMET") || itemMap.getMaterial().toString().equalsIgnoreCase("LEATHER_CHESTPLATE")
 				|| itemMap.getMaterial().toString().equalsIgnoreCase("LEATHER_LEGGINGS") || itemMap.getMaterial().toString().equalsIgnoreCase("LEATHER_BOOTS")) {
 				String leatherColor = itemMap.getNodeLocation().getString(".leather-color").toUpperCase();
-				itemMap.setLeatherColor(DyeColor.valueOf(leatherColor).getFireworkColor());
+				if (ItemHandler.getColorFromHexColor(leatherColor.replaceAll("#", "")) != null) {
+					itemMap.setLeatherColor(ItemHandler.getColorFromHexColor(leatherColor.replaceAll("#", "")));
+				} else {
+					itemMap.setLeatherColor(DyeColor.valueOf(leatherColor).getFireworkColor());
+				}
 			}
 		}
 	}
