@@ -388,9 +388,7 @@ public class ItemDesigner {
 	private void setName(ItemMap itemMap) {
 		String name = getActualName(itemMap);
 		if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && ServerHandler.hasSpecificUpdate("1_8") || itemMap.isVanilla() && ServerHandler.hasSpecificUpdate("1_8")) {
-			if (!Utils.containsIgnoreCase(name, ItemHandler.getName(itemMap.getTempItem()))) {
-				itemMap.setCustomName(name);
-			}
+			itemMap.setCustomName(name);
 		} else {
 			itemMap.setCustomName(encodeName(itemMap, name));
 		}
