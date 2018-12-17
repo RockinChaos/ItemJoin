@@ -154,6 +154,13 @@
 			<artifactId>authlib</artifactId>
 			<version>1.5.21</version>
 		</dependency>
+    <!--Apache API-->
+    	<dependency>
+       	 	<artifactId>commons-io</artifactId>
+        	<groupId>commons-io</groupId>
+        	<scope>compile</scope>
+        	<version>2.5</version>
+    	</dependency>
     <!--Google API-->
 		<dependency>
 			<groupId>com.google.guava</groupId>
