@@ -30,7 +30,7 @@ public class ItemCommand {
 	}
 	
 	public void execute(final Player player, final String action) {
-		if (this.command == null || this.command.length() == 0 || !this.action.hasAction(action)) { return; }
+		if (this.command == null || this.command.length() == 0 || !CommandType.INVENTORY.hasAction(action) && !CommandType.INTERACT.hasAction(action) && !this.action.hasAction(action)) { return; }
 		sendDispatch(player, this.type);
 	}
 	
@@ -57,8 +57,7 @@ public class ItemCommand {
 			setLoggable(player, "/" + Utils.translateLayout(this.command, player));
 			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), Utils.translateLayout(this.command, player));
 		} catch (Exception e) {
-			ServerHandler.sendConsoleMessage("&cThere was an issue executing an item's command as console, if this continues please report it to the developer!");
-			ServerHandler.sendConsoleMessage("&cError Code to Report: &c&l(CTC435-CONSOLE)");
+			ServerHandler.sendErrorMessage("&cThere was an issue executing an item's command as console, if this continues please report it to the developer!");
 			ServerHandler.sendDebugTrace(e);
 		}
 	}
@@ -127,46 +126,6 @@ public class ItemCommand {
 		}
 	}
 	
-	private static ActionType getActionType(ItemMap itemMap, String action) {
-		String invExists = itemMap.getNodeLocation().getString(".commands" + ActionType.INVENTORY.definition);
-		if (ConfigHandler.getCommandsSection(itemMap.getNodeLocation()) != null) {
-			Iterator < String > it = ConfigHandler.getCommandsSection(itemMap.getNodeLocation()).getKeys(false).iterator();
-			while (it.hasNext()) {
-				String definition = it.next();
-				if (Utils.containsIgnoreCase(itemMap.getCommandType().toString(), "inventory") && CommandType.INVENTORY.hasAction(action) || invExists != null && CommandType.INVENTORY.hasAction(action)) {
-					if (ActionType.INVENTORY.hasAction(action) && ActionType.INVENTORY.hasDefine(definition)) {
-						return ActionType.INVENTORY;
-					} else if (ActionType.MULTI_CLICK_INVENTORY.hasAction(action) && ActionType.MULTI_CLICK_INVENTORY.hasDefine(definition)) {
-						return ActionType.MULTI_CLICK_INVENTORY;
-					}
-				} else if (Utils.containsIgnoreCase(itemMap.getCommandType().toString(), "interact") && CommandType.INTERACT.hasAction(action) || CommandType.INTERACT.hasAction(action)) {
-					if (ActionType.LEFT_CLICK_ALL.hasAction(action) && ActionType.LEFT_CLICK_ALL.hasDefine(definition)) {
-						return ActionType.LEFT_CLICK_ALL;
-					} else if (ActionType.LEFT_CLICK_AIR.hasAction(action) && ActionType.LEFT_CLICK_AIR.hasDefine(definition)) {
-						return ActionType.LEFT_CLICK_AIR;
-					} else if (ActionType.LEFT_CLICK_BLOCK.hasAction(action) && ActionType.LEFT_CLICK_BLOCK.hasDefine(definition)) {
-						return ActionType.LEFT_CLICK_BLOCK;
-					} else if (ActionType.RIGHT_CLICK_ALL.hasAction(action) && ActionType.RIGHT_CLICK_ALL.hasDefine(definition)) {
-						return ActionType.RIGHT_CLICK_ALL;
-					} else if (ActionType.RIGHT_CLICK_AIR.hasAction(action) && ActionType.RIGHT_CLICK_AIR.hasDefine(definition)) {
-						return ActionType.RIGHT_CLICK_AIR;
-					} else if (ActionType.RIGHT_CLICK_BLOCK.hasAction(action) && ActionType.RIGHT_CLICK_BLOCK.hasDefine(definition)) {
-						return ActionType.RIGHT_CLICK_BLOCK;
-					} else if (ActionType.MULTI_CLICK_ALL.hasAction(action) && ActionType.MULTI_CLICK_ALL.hasDefine(definition)) {
-						return ActionType.MULTI_CLICK_ALL;
-					} else if (ActionType.MULTI_CLICK_AIR.hasAction(action) && ActionType.MULTI_CLICK_AIR.hasDefine(definition)) {
-						return ActionType.MULTI_CLICK_AIR;
-					} else if (ActionType.MULTI_CLICK_BLOCK.hasAction(action) && ActionType.MULTI_CLICK_BLOCK.hasDefine(definition)) {
-						return ActionType.MULTI_CLICK_BLOCK;
-					} else if (ActionType.PHYSICAL.hasAction(action) && ActionType.PHYSICAL.hasDefine(definition)) {
-						return ActionType.PHYSICAL;
-					}
-				}
-			}
-		}
-		return ActionType.DEFAULT;
-	}
-	
 	private static ActionType getExactActionType(ItemMap itemMap, String definition) {
 		String invExists = itemMap.getNodeLocation().getString(".commands" + ActionType.INVENTORY.definition);
 				if (Utils.containsIgnoreCase(itemMap.getCommandType().toString(), "inventory") || invExists != null) {
@@ -198,6 +157,53 @@ public class ItemCommand {
 						return ActionType.PHYSICAL;
 					}
 				}
+		return ActionType.DEFAULT;
+	}
+	
+	private static ActionType getActionType(ItemMap itemMap, String action) {
+		String invExists = itemMap.getNodeLocation().getString(".commands" + ActionType.INVENTORY.definition);
+		if (ConfigHandler.getCommandsSection(itemMap.getNodeLocation()) != null) {
+			Iterator < String > it = ConfigHandler.getCommandsSection(itemMap.getNodeLocation()).getKeys(false).iterator();
+			while (it.hasNext()) {
+				String definition = it.next();
+				if (Utils.containsIgnoreCase(itemMap.getCommandType().toString(), "INVENTORY") 
+						&& CommandType.INVENTORY.hasAction(action) || Utils.containsIgnoreCase(itemMap.getCommandType().toString(), "BOTH") 
+						&& CommandType.INVENTORY.hasAction(action) || invExists != null && CommandType.INVENTORY.hasAction(action)) {
+					if (ActionType.INVENTORY.hasAction(action) && ActionType.INVENTORY.hasDefine(definition)) {
+						return ActionType.INVENTORY;
+					} else if (ActionType.MULTI_CLICK_INVENTORY.hasAction(action) && ActionType.MULTI_CLICK_INVENTORY.hasDefine(definition)) {
+						return ActionType.MULTI_CLICK_INVENTORY;
+					} else if (ActionType.LEFT_CLICK_INVENTORY.hasAction(action) && ActionType.LEFT_CLICK_INVENTORY.hasDefine(definition)) {
+						return ActionType.LEFT_CLICK_INVENTORY;
+					} else if (ActionType.RIGHT_CLICK_INVENTORY.hasAction(action) && ActionType.RIGHT_CLICK_INVENTORY.hasDefine(definition)) {
+						return ActionType.RIGHT_CLICK_INVENTORY;
+					}
+				} else if (Utils.containsIgnoreCase(itemMap.getCommandType().toString(), "INTERACT") && CommandType.INTERACT.hasAction(action) 
+						|| Utils.containsIgnoreCase(itemMap.getCommandType().toString(), "BOTH") && CommandType.INTERACT.hasAction(action)) {
+					if (ActionType.LEFT_CLICK_ALL.hasAction(action) && ActionType.LEFT_CLICK_ALL.hasDefine(definition)) {
+						return ActionType.LEFT_CLICK_ALL;
+					} else if (ActionType.LEFT_CLICK_AIR.hasAction(action) && ActionType.LEFT_CLICK_AIR.hasDefine(definition)) {
+						return ActionType.LEFT_CLICK_AIR;
+					} else if (ActionType.LEFT_CLICK_BLOCK.hasAction(action) && ActionType.LEFT_CLICK_BLOCK.hasDefine(definition)) {
+						return ActionType.LEFT_CLICK_BLOCK;
+					} else if (ActionType.RIGHT_CLICK_ALL.hasAction(action) && ActionType.RIGHT_CLICK_ALL.hasDefine(definition)) {
+						return ActionType.RIGHT_CLICK_ALL;
+					} else if (ActionType.RIGHT_CLICK_AIR.hasAction(action) && ActionType.RIGHT_CLICK_AIR.hasDefine(definition)) {
+						return ActionType.RIGHT_CLICK_AIR;
+					} else if (ActionType.RIGHT_CLICK_BLOCK.hasAction(action) && ActionType.RIGHT_CLICK_BLOCK.hasDefine(definition)) {
+						return ActionType.RIGHT_CLICK_BLOCK;
+					} else if (ActionType.MULTI_CLICK_ALL.hasAction(action) && ActionType.MULTI_CLICK_ALL.hasDefine(definition)) {
+						return ActionType.MULTI_CLICK_ALL;
+					} else if (ActionType.MULTI_CLICK_AIR.hasAction(action) && ActionType.MULTI_CLICK_AIR.hasDefine(definition)) {
+						return ActionType.MULTI_CLICK_AIR;
+					} else if (ActionType.MULTI_CLICK_BLOCK.hasAction(action) && ActionType.MULTI_CLICK_BLOCK.hasDefine(definition)) {
+						return ActionType.MULTI_CLICK_BLOCK;
+					} else if (ActionType.PHYSICAL.hasAction(action) && ActionType.PHYSICAL.hasDefine(definition)) {
+						return ActionType.PHYSICAL;
+					}
+				}
+			}
+		}
 		return ActionType.DEFAULT;
 	}
 	
@@ -273,6 +279,8 @@ public class ItemCommand {
 		PHYSICAL("PHYSICAL", ".physical"),
 		INVENTORY("PICKUP_ALL, PICKUP_HALF, PLACE_ALL", ".inventory"),
 		MULTI_CLICK_INVENTORY("PICKUP_ALL, PICKUP_HALF, PLACE_ALL", ".multi-click"),
+		LEFT_CLICK_INVENTORY("PICKUP_ALL", ".left-click"),
+		RIGHT_CLICK_INVENTORY("PICKUP_HALF", ".right-click"),
 		MULTI_CLICK_ALL("LEFT_CLICK_BLOCK, LEFT_CLICK_AIR, RIGHT_CLICK_BLOCK, RIGHT_CLICK_AIR", ".multi-click"),
 		MULTI_CLICK_AIR("LEFT_CLICK_AIR, RIGHT_CLICK_AIR", ".multi-click-air"),
 		MULTI_CLICK_BLOCK("LEFT_CLICK_BLOCK, RIGHT_CLICK_BLOCK", ".multi-click-block"),

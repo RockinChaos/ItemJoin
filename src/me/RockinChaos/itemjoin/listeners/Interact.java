@@ -59,7 +59,7 @@ public class Interact implements Listener {
 		ItemStack item = event.getCurrentItem();
 		Player player = (Player) event.getWhoClicked();
 		String action = event.getAction().toString();
-		if (setupCommands(player, item, action, "INVENTORY")) { event.setCancelled(true); }
+		if (setupCommands(player, item, action)) { event.setCancelled(true); }
 	}
 
 	@EventHandler
@@ -67,13 +67,11 @@ public class Interact implements Listener {
 		ItemStack item = event.getItem();
 		final Player player = event.getPlayer();
 		String action = event.getAction().toString();
-		String hand = "";
-		try { hand = event.getHand().toString(); } catch (Exception e) { }
 		if (PlayerHandler.isAdventureMode(player) && !action.contains("LEFT") 
 				|| !PlayerHandler.isAdventureMode(player)) {
 			ItemMap itemMap = ItemHandler.getMappedItem(PlayerHandler.getHandItem(player), player.getWorld());
 			if (itemMap != null && itemMap.isSimilar(item)) {
-				if (setupCommands(player, item, action, hand)) { event.setCancelled(true); }
+				if (setupCommands(player, item, action)) { event.setCancelled(true); }
 			}
 		}
 	}
@@ -83,14 +81,14 @@ public class Interact implements Listener {
 		Player player = event.getPlayer();
 		ItemStack item = PlayerHandler.getHandItem(player);
 		if (PlayerHandler.isAdventureMode(player)) {
-			if (setupCommands(player, item, "LEFT_CLICK_AIR", "ADVENTURE")) { event.setCancelled(true); }
+			if (setupCommands(player, item, "LEFT_CLICK_AIR")) { event.setCancelled(true); }
 		}
 	}
 	
-	private boolean setupCommands(Player player, ItemStack item, String action, String hand) {
+	private boolean setupCommands(Player player, ItemStack item, String action) {
 		  ItemMap itemMap = ItemHandler.getMappedItem(item, player.getWorld());
 			if (itemMap != null && itemMap.inWorld(player.getWorld()) && itemMap.hasPermission(player) && ItemCommand.isCommandable(itemMap, action)) {
-				itemMap.executeCommands(player, action, hand);
+				itemMap.executeCommands(player, action);
 				return true;
 			}
 		return false;
