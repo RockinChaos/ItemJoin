@@ -2,6 +2,7 @@ package me.RockinChaos.itemjoin.giveitems.utils;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -67,7 +68,10 @@ public class ItemMap {
 	private List < String > customLore;
 	private List < List < String > > dynamicLores = null;
 	private List < String > dynamicMaterials = null;
+	private List < String > dynamicOwners = null;
+	private List < String > dynamicTextures = null;
 	private boolean materialAnimated = false;
+	private boolean skullAnimated = false;
 	private Map < Player, ItemAnimation > localeAnimations = new HashMap < Player, ItemAnimation > ();
 	private Integer InvSlot;
 	private String CustomSlot;
@@ -324,6 +328,16 @@ public class ItemMap {
 	public void setDynamicMaterials(List<String> mats) {
 		this.dynamicMaterials = mats;
 		this.materialAnimated = true;
+	}
+	
+	public void setDynamicOwners(List<String> owners) {
+		this.dynamicOwners = owners;
+		this.skullAnimated = true;
+	}
+	
+	public void setDynamicTextures(List<String> textures) {
+		this.dynamicTextures = textures;
+		this.skullAnimated = true;
 	}
 	
 	public void removeFromAnimationHandler(Player player) {
@@ -621,6 +635,14 @@ public class ItemMap {
 	
 	public List<String> getDynamicMaterials() {
 		return this.dynamicMaterials;
+	}
+	
+	public List<String> getDynamicOwners() {
+		return this.dynamicOwners;
+	}
+	
+	public List<String> getDynamicTextures() {
+		return this.dynamicTextures;
 	}
 	
 	public Map<Player, ItemAnimation> getAnimationHandler() {
@@ -959,14 +981,15 @@ public class ItemMap {
 	}
      
 	public boolean isSimilar(ItemStack item) {
-		if (item != null && item.getType() != Material.AIR && item.getType() == this.material || materialAnimated && item != null && item.getType() != Material.AIR && this.isMaterial(item)) {
+		if (item != null && item.getType() != Material.AIR && item.getType() == this.material || this.materialAnimated && item != null && item.getType() != Material.AIR && this.isMaterial(item)) {
 			if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && ServerHandler.hasSpecificUpdate("1_8") 
 					&& ItemHandler.getNBTData(item) != null && ItemHandler.getNBTData(item).contains(this.newNBTData) || this.legacySecret != null && item.hasItemMeta() 
 					&& item.getItemMeta().hasDisplayName() && item.getItemMeta().getDisplayName().contains(this.legacySecret)) {
-				if (!this.isSkull() && skullOwner == null || this.isSkull() && ((SkullMeta) item.getItemMeta()).hasOwner() 
-						&& skullOwner != null && PlayerHandler.getSkullOwner(item).equalsIgnoreCase(skullOwner) 
+				if (!this.isSkull() && skullOwner == null || this.isSkull() && !this.skullAnimated && ((SkullMeta) item.getItemMeta()).hasOwner() 
+						&& this.skullOwner != null && PlayerHandler.getSkullOwner(item).equalsIgnoreCase(this.skullOwner) 
 						|| this.isSkull() && this.skullTexture != null && this.skullOwner == null 
-						&& ItemHandler.getSkullSkinTexture(item.getItemMeta()).equalsIgnoreCase(this.skullTexture)) {
+						&& ItemHandler.getSkullSkinTexture(item.getItemMeta()).equalsIgnoreCase(this.skullTexture)
+						|| this.isSkull() && this.skullAnimated && this.isSkull(item)) {
 					if (isEnchantSimilar(item) || !item.getItemMeta().hasEnchants() && enchants.isEmpty() || this.isModifiyable()) {
 						if (this.material.toString().toUpperCase().contains("BOOK") 
 								&& ((BookMeta) item.getItemMeta()).hasPages() 
@@ -1012,6 +1035,39 @@ public class ItemMap {
 			}
 		}
 		return false;
+	}
+	
+	private boolean isSkull(ItemStack item) {
+		if (this.dynamicOwners != null) {
+			for (String owners : this.dynamicOwners) {
+				owners = ItemHandler.purgeDelay(owners);
+				if (PlayerHandler.getSkullOwner(item) != null && PlayerHandler.getSkullOwner(item).equalsIgnoreCase(this.skullOwner) || ItemHandler.getGameProfiles().get(owners) != null && ItemHandler.getSkullSkinTexture(item.getItemMeta()).equalsIgnoreCase(this.getTexture(ItemHandler.getGameProfiles().get(owners)))) {
+					return true;
+				} else if (ItemHandler.getGameProfiles().get(owners) == null && !owners.equalsIgnoreCase("%player%")) {
+					ItemHandler.generateProfile(owners);
+					if (ItemHandler.getGameProfiles().get(owners) != null && ItemHandler.getSkullSkinTexture(item.getItemMeta()).equalsIgnoreCase(this.getTexture(ItemHandler.getGameProfiles().get(owners)))) {
+						return true;
+					}
+				}
+			}
+			if (this.dynamicOwners.toString().contains("%player%")) { return true; }
+		} else if (this.dynamicTextures != null) {
+			for (String textures : this.dynamicTextures) {
+				textures = ItemHandler.purgeDelay(textures);
+				if (ItemHandler.getSkullSkinTexture(item.getItemMeta()).equalsIgnoreCase(textures)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	private String getTexture(GameProfile profile) {
+		final Collection < Property > props = profile.getProperties().get("textures");
+		for (final Property property: props) {
+			if (property.getName().equals("textures")) { return property.getValue(); }
+		}
+		return "NULL";
 	}
 	
 	public boolean hasItem(Player player) {

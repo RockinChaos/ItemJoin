@@ -267,6 +267,14 @@ public class ConfigHandler {
 		return getConfig("items.yml").getConfigurationSection(items.getCurrentPath() + ".id");
 	}
 	
+	public static ConfigurationSection getOwnerSection(ConfigurationSection items) {
+		return getConfig("items.yml").getConfigurationSection(items.getCurrentPath() + ".skull-owner");
+	}
+	
+	public static ConfigurationSection getTextureSection(ConfigurationSection items) {
+		return getConfig("items.yml").getConfigurationSection(items.getCurrentPath() + ".skull-texture");
+	}
+	
 	public static ConfigurationSection getPagesSection(ConfigurationSection items) {
 		return getConfig("items.yml").getConfigurationSection(items.getCurrentPath() + ".pages");
 	}

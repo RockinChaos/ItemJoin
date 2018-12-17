@@ -135,7 +135,6 @@ public class ItemDesigner {
 //  ~ Sets the Custom Material to the Custom Item ~ //
 //       Adds the custom material to the item.      //
 //  =============================================== //
-	
 	private Material getActualMaterial(ItemMap itemMap) {
 		String material = ItemHandler.purgeDelay(itemMap.getNodeLocation().getString(".id"));
 		if (ConfigHandler.getMaterialSection(itemMap.getNodeLocation()) != null) {
@@ -167,17 +166,35 @@ public class ItemDesigner {
 //  ~ Sets the HeadDatabase Texture to the Custom Skull Item ~     //
 // Gives the item the skull texture of the exact HeadDatabase ID.  //
 // =============================================================== //
+	private String getActualTexture(ItemMap itemMap) {
+		String texture = ItemHandler.purgeDelay(itemMap.getNodeLocation().getString(".skull-texture"));
+		if (ConfigHandler.getTextureSection(itemMap.getNodeLocation()) != null) {
+			List<String> textures = new ArrayList<String>();
+			for (String textureKey : ConfigHandler.getTextureSection(itemMap.getNodeLocation()).getKeys(false)) {
+				String textureList = itemMap.getNodeLocation().getString(".skull-texture." + textureKey);
+				if (textureList != null) {
+					textures.add(textureList);
+				}
+			}
+			itemMap.setDynamicTextures(textures);
+			return ItemHandler.purgeDelay(itemMap.getNodeLocation().getString(".skull-texture." + ConfigHandler.getTextureSection(itemMap.getNodeLocation()).getKeys(false).iterator().next()));
+		}
+		return texture;
+	}
+	
 	private void setSkullDatabase(ItemMap itemMap) {
-		if (ServerHandler.hasSpecificUpdate("1_8") && Hooks.hasHeadDatabase() && itemMap.getNodeLocation().getString(".skull-texture") != null  && itemMap.getNodeLocation().getString(".skull-texture").contains("hdb-")) {
+		if (ServerHandler.hasSpecificUpdate("1_8") && Hooks.hasHeadDatabase() && itemMap.getNodeLocation().getString(".skull-texture") != null) {
 			if (itemMap.getMaterial().toString().equalsIgnoreCase("SKULL_ITEM") || itemMap.getMaterial().toString().equalsIgnoreCase("PLAYER_HEAD")) {
 				if (itemMap.getNodeLocation().getString(".skull-owner") != null) {  ServerHandler.sendErrorMessage("&4You cannot define a skull owner and a skull texture at the same time, please remove one from the item."); return;  }
-				String skullTexture = itemMap.getNodeLocation().getString(".skull-texture").replace("hdb-", "");
-				try {
-					itemMap.setSkullTexture(skullTexture);
-					itemMap.setHeadDatabase(true);
-				} catch (NullPointerException e) {
-					ServerHandler.sendErrorMessage("&4HeadDatabase could not find &c#" + skullTexture + "&4, this head does not exist.");
-					ServerHandler.sendDebugTrace(e);
+				String skullTexture = getActualTexture(itemMap).replace("hdb-", "");
+				if (skullTexture.contains("hdb-")) {
+					try {
+						itemMap.setSkullTexture(skullTexture.replace("hdb-", ""));
+						itemMap.setHeadDatabase(true);
+					} catch (NullPointerException e) {
+						ServerHandler.sendErrorMessage("&4HeadDatabase could not find &c#" + skullTexture + "&4, this head does not exist.");
+						ServerHandler.sendDebugTrace(e);
+					}
 				}
 			}
 		}
@@ -455,11 +472,27 @@ public class ItemDesigner {
 //  ~ Sets the Skull Owner of the Custom Skull Item ~ //
 //   Adds the Texture of the Skull Owner to the Item. //
 //  ================================================= //
+	private String getActualOwner(ItemMap itemMap) {
+		String owner = ItemHandler.purgeDelay(itemMap.getNodeLocation().getString(".skull-owner"));
+		if (ConfigHandler.getOwnerSection(itemMap.getNodeLocation()) != null) {
+			List<String> owners = new ArrayList<String>();
+			for (String ownerKey : ConfigHandler.getOwnerSection(itemMap.getNodeLocation()).getKeys(false)) {
+				String ownerList = itemMap.getNodeLocation().getString(".skull-owner." + ownerKey);
+				if (ownerList != null) {
+					owners.add(ownerList);
+				}
+			}
+			itemMap.setDynamicOwners(owners);
+			return ItemHandler.purgeDelay(itemMap.getNodeLocation().getString(".skull-owner." + ConfigHandler.getOwnerSection(itemMap.getNodeLocation()).getKeys(false).iterator().next()));
+		}
+		return owner;
+	}
+	
 	private void setSkull(ItemMap itemMap) {
 		if (itemMap.getNodeLocation().getString(".skull-owner") != null) {
 			if (itemMap.getMaterial().toString().equalsIgnoreCase("SKULL_ITEM") || itemMap.getMaterial().toString().equalsIgnoreCase("PLAYER_HEAD")) {
 				if (itemMap.getNodeLocation().getString(".skull-texture") != null) { ServerHandler.sendErrorMessage("&4You cannot define a skull owner and a skull texture at the same time, please remove one from the item."); return;  }
-				String owner = itemMap.getNodeLocation().getString(".skull-owner");
+				String owner = getActualOwner(itemMap);
 				itemMap.setSkull(owner);
 			}
 		}
@@ -471,15 +504,17 @@ public class ItemDesigner {
 //   Adds the Custom Skull Texture to the item.   //
 //  ============================================= //
     private void setSkullTexture(ItemMap itemMap) {
-    	if (ServerHandler.hasSpecificUpdate("1_8") && itemMap.getNodeLocation().getString(".skull-texture") != null && !itemMap.getNodeLocation().getString(".skull-texture").contains("hdb-")) {
+    	if (ServerHandler.hasSpecificUpdate("1_8") && itemMap.getNodeLocation().getString(".skull-texture") != null) {
     		if (itemMap.getMaterial().toString().equalsIgnoreCase("SKULL_ITEM") || itemMap.getMaterial().toString().equalsIgnoreCase("PLAYER_HEAD")) {
 				if (itemMap.getNodeLocation().getString(".skull-owner") != null) { ServerHandler.sendErrorMessage("&4You cannot define a skull owner and a skull texture at the same time, please remove one from the item."); return;  }
-    			String texture = itemMap.getNodeLocation().getString(".skull-texture");
-    			GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
-    			gameProfile.getProperties().put("textures", new Property("textures", new String(texture)));
-    			try {
-    				itemMap.setSkullTexture(texture);
-    			} catch (Exception e) { ServerHandler.sendDebugTrace(e); }
+    			String texture = getActualTexture(itemMap);
+    			if (!texture.contains("hdb-")) {
+    				GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
+    				gameProfile.getProperties().put("textures", new Property("textures", new String(texture)));
+    				try {
+    					itemMap.setSkullTexture(texture);
+    				} catch (Exception e) { ServerHandler.sendDebugTrace(e); }
+    			}
     		}
     	}
     }

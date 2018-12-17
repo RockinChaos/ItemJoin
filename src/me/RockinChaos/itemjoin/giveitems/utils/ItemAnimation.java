@@ -1,8 +1,10 @@
 package me.RockinChaos.itemjoin.giveitems.utils;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -10,12 +12,16 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
+
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.listeners.InvClickSurvival;
 import me.RockinChaos.itemjoin.utils.Utils;
+import me.arcaniax.hdb.api.HeadDatabaseAPI;
 import me.RockinChaos.itemjoin.utils.Legacy;
 
 public class ItemAnimation {
@@ -24,6 +30,8 @@ public class ItemAnimation {
 	private List<String> dynamicNames = null;
 	private List<List<String>> dynamicLores = null;
 	private List<String> dynamicMaterials = null;
+	private List<String> dynamicOwners = null;
+	private List<String> dynamicTextures = null;
 	private boolean stopAnimations = false;
 	
 	public ItemAnimation(ItemMap item) {
@@ -31,12 +39,16 @@ public class ItemAnimation {
 		if (item.getDynamicNames() != null) { this.dynamicNames = item.getDynamicNames(); }
 		if (item.getDynamicLores() != null) { this.dynamicLores = item.getDynamicLores(); }
 		if (item.getDynamicMaterials() != null) { this.dynamicMaterials = item.getDynamicMaterials(); }
+		if (item.getDynamicOwners() != null) { this.dynamicOwners = item.getDynamicOwners(); }
+		else if (item.getDynamicTextures() != null) { this.dynamicTextures = item.getDynamicTextures(); }
 	}
 	
 	public void openAnimation(Player player) {
-		if (dynamicNames != null) { nameTasks(player); }
-		if (dynamicLores != null) { loreTasks(player); }
-		if (dynamicMaterials != null) { materialTasks(player); }
+		if (this.dynamicNames != null) { nameTasks(player); }
+		if (this.dynamicLores != null) { loreTasks(player); }
+		if (this.dynamicMaterials != null) { materialTasks(player); }
+		if (this.dynamicOwners != null) { ownerTasks(player); }
+		else if (this.dynamicTextures != null) { textureTasks(player); }
 	}
 	
 	public void closeAnimation(Player player) {
@@ -50,7 +62,7 @@ public class ItemAnimation {
 		while (it.hasNext()) {
 			String name = it.next();
 			ticks = ticks + Utils.returnInteger(ItemHandler.getDelay(name));
-			AnimateTask(player, it.hasNext(), name, null, null, ticks);
+			AnimateTask(player, it.hasNext(), name, null, null, null, null, ticks);
 		}
 	}
 	
@@ -60,7 +72,7 @@ public class ItemAnimation {
 		while (it.hasNext()) {
 			List<String> lore = it.next();
 			ticks = ticks + Utils.returnInteger(ItemHandler.getDelay(lore.get(0)));
-			AnimateTask(player, it.hasNext(), null, lore, null, ticks);
+			AnimateTask(player, it.hasNext(), null, lore, null, null, null, ticks);
 		}
 	}
 	
@@ -70,11 +82,31 @@ public class ItemAnimation {
 		while (it.hasNext()) {
 			String mat = it.next();
 			ticks = ticks + Utils.returnInteger(ItemHandler.getDelay(mat));
-			AnimateTask(player, it.hasNext(), null, null, mat, ticks);
+			AnimateTask(player, it.hasNext(), null, null, mat, null, null, ticks);
 		}
 	}
 	
-	private void AnimateTask(final Player player, final boolean hasNext, final String nameString, final List<String> loreString, final String materialString, final long UpdateDelay) {
+	private void ownerTasks(Player player) {
+		long ticks = 0;
+		Iterator<String> it = this.dynamicOwners.iterator();
+		while (it.hasNext()) {
+			String owner = it.next();
+			ticks = ticks + Utils.returnInteger(ItemHandler.getDelay(owner));
+			AnimateTask(player, it.hasNext(), null, null, null, owner, null, ticks);
+		}
+	}
+	
+	private void textureTasks(Player player) {
+		long ticks = 0;
+		Iterator<String> it = this.dynamicTextures.iterator();
+		while (it.hasNext()) {
+			String texture = it.next();
+			ticks = ticks + Utils.returnInteger(ItemHandler.getDelay(texture));
+			AnimateTask(player, it.hasNext(), null, null, null, null, texture, ticks);
+		}
+	}
+	
+	private void AnimateTask(final Player player, final boolean hasNext, final String nameString, final List<String> loreString, final String materialString, final String ownerString, final String textureString, final long UpdateDelay) {
 		final ItemMap itemMap = this.itemMap;
 		new BukkitRunnable() {
 			public void run() {
@@ -85,6 +117,7 @@ public class ItemAnimation {
 						if (nameString != null) { setNameData(player, inPlayerInventory, nameString); } 
 						else if (loreString != null) { setLoreData(player, inPlayerInventory, loreString); }
 						else if (materialString != null) { setMaterialData(player, inPlayerInventory, materialString); }
+						else if (ownerString != null || textureString != null) { setSkull(player, inPlayerInventory, ownerString, textureString); }
 					}
 				}
 				// =============== Animate Within the Player's Armor =============== //
@@ -93,6 +126,7 @@ public class ItemAnimation {
 						if (nameString != null) { setNameData(player, inPlayerInventory, nameString); } 
 						else if (loreString != null) { setLoreData(player, inPlayerInventory, loreString); }
 						else if (materialString != null) { setMaterialData(player, inPlayerInventory, materialString); }
+						else if (ownerString != null || textureString != null) { setSkull(player, inPlayerInventory, ownerString, textureString); }
 					}
 				}
 				// ========== Animate Within the Player Crafting/Chests ============ //
@@ -101,6 +135,7 @@ public class ItemAnimation {
 						if (nameString != null) { setNameData(player, inPlayerInventory, nameString); } 
 						else if (loreString != null) { setLoreData(player, inPlayerInventory, loreString); }
 						else if (materialString != null) { setMaterialData(player, inPlayerInventory, materialString); }
+						else if (ownerString != null || textureString != null) { setSkull(player, inPlayerInventory, ownerString, textureString); }
 					}
 				}
 				// ============== Animate Within the Player's Cursor =============== //
@@ -110,6 +145,7 @@ public class ItemAnimation {
 					if (nameString != null) { setNameData(player, player.getItemOnCursor(), nameString); } 
 					else if (loreString != null) { setLoreData(player, player.getItemOnCursor(), loreString); }
 					else if (materialString != null) { setMaterialData(player, player.getItemOnCursor(), materialString); }
+					else if (ownerString != null || textureString != null) { setSkull(player, player.getItemOnCursor(), ownerString, textureString); }
 					InvClickSurvival.cursorItem.put(PlayerHandler.getPlayerID(player), item);
 				}
 				// ============== This has Concluded all Animations.. ============== //
@@ -118,6 +154,8 @@ public class ItemAnimation {
 					if (nameString != null) { nameTasks(player); }
 					else if (loreString != null) { loreTasks(player); }
 					else if (materialString != null) { materialTasks(player); }
+					else if (ownerString != null) { ownerTasks(player); }
+					else if (textureString != null) { textureTasks(player); }
 				}
 				}
 			}
@@ -162,5 +200,26 @@ public class ItemAnimation {
 			mat = ItemHandler.getMaterial(materialString, null, itemMap.getConfigName());
 			if (mat != null && mat != Material.AIR) { transAnimate.setType(mat); }
 		}
+	}
+	
+	private void setSkull(Player player, ItemStack transAnimate, String ownerString, String textureString) {
+		ItemMeta tempMeta = transAnimate.getItemMeta();
+		if (ownerString != null) {
+			ownerString = Utils.translateLayout(ItemHandler.purgeDelay(ownerString), player);
+			tempMeta = ItemHandler.setSkullOwner(tempMeta, ownerString);
+		} else if (textureString != null && textureString.contains("hdb-") && itemMap.isHeadDatabase()) {
+			HeadDatabaseAPI api = new HeadDatabaseAPI();
+			ItemStack sk = api.getItemHead(ItemHandler.purgeDelay(textureString).replace("hdb-", ""));
+			transAnimate = (sk != null ? sk : transAnimate);
+		} else if (textureString != null) {
+			try {
+				GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
+				gameProfile.getProperties().put("textures", new Property("textures", new String(ItemHandler.purgeDelay(textureString))));
+				Field declaredField = tempMeta.getClass().getDeclaredField("profile");
+				declaredField.setAccessible(true);
+				declaredField.set(tempMeta, gameProfile);
+			} catch (Exception e) { ServerHandler.sendDebugTrace(e); }
+		}
+		transAnimate.setItemMeta(tempMeta);
 	}
 }

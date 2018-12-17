@@ -188,7 +188,10 @@ items:
     id: PLAYER_HEAD
     slot: 24
     name: '&fCyclone'
-    skull-texture: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMGZlMzFlYWE4YThhZDhkZDhkN2FiOTZhODQyMzI5MDUzOWQzODdkODJkNDI2ODcwMWVjNjlkNDFhMWZjIn19fQ=='
+    skull-texture:
+      1: '<delay:100>eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMGZlMzFlYWE4YThhZDhkZDhkN2FiOTZhODQyMzI5MDUzOWQzODdkODJkNDI2ODcwMWVjNjlkNDFhMWZjIn19fQ=='
+      2: '<delay:100>eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTYxZGZkZGE3MTAyMmJmYWQ3OWVhYmJmYTU2YTE1MTE2NDdiMjAyYWQxMTM2ZmY5N2UzMWEwNmRiYWMxMGVjYiJ9fX0='
+      3: '<delay:100>eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZGFmNjJkNjJkMGE5MzZmMDdmZGZjMWM2MDcyMTY4NzVjOTkzZTViZWViY2U5NTNlOWM4NzI0YTI1ZmNiYTBiYyJ9fX0='
     lore:
       - '&7This is a custom textured skull.'
       - '&7'
