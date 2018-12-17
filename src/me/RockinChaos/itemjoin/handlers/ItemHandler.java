@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.math.BigInteger;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,6 +14,7 @@ import java.util.UUID;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -23,6 +25,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 import org.bukkit.inventory.meta.Damageable;
 
 import com.mojang.authlib.GameProfile;
@@ -204,9 +208,12 @@ public class ItemHandler {
 					declaredField.set(tempmeta, fetchProfile.invoke(PlayerHandler.getPlayerString(owner)));
 				} else if (PlayerHandler.getPlayerString(owner) == null) {
 					if (gameProfiles.get(owner) == null) {
-						GameProfile profile = new GameProfile(PlayerHandler.getOfflinePlayer(owner).getUniqueId(), owner);
-						setSkin(profile, PlayerHandler.getOfflinePlayer(owner).getUniqueId());
-						gameProfiles.put(owner, profile);
+						String uuidString = getMojangUUID(owner);
+						if (uuidString != null) {
+							GameProfile profile = new GameProfile(UUIDConversion(uuidString), owner);
+							setSkin(profile, UUIDConversion(uuidString));
+							gameProfiles.put(owner, profile);
+						}
 					}
 					declaredField.set(tempmeta, gameProfiles.get(owner));
 				}
@@ -218,6 +225,37 @@ public class ItemHandler {
 		}
 		return tempmeta;
 	}
+	
+	private static UUID UUIDConversion(String uuidString) {
+		uuidString = uuidString.replace("-", "");
+		UUID uuid = new UUID(
+		        new BigInteger(uuidString.substring(0, 16), 16).longValue(),
+		        new BigInteger(uuidString.substring(16), 16).longValue());
+		return uuid;
+	}
+	
+    private static String getMojangUUID(String name) {
+        String url = "https://api.mojang.com/users/profiles/minecraft/"+name;
+        try {
+            @SuppressWarnings("deprecation")
+            String UUIDJson = IOUtils.toString(new URL(url));           
+            if(UUIDJson.isEmpty()) return null;                       
+            JSONObject UUIDObject = (JSONObject) JSONValue.parseWithException(UUIDJson);
+            return UUIDObject.get("id").toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    
+    public static void generateProfile(String owner) {
+		String uuidString = ItemHandler.getMojangUUID(owner);
+		if (uuidString != null) {
+			GameProfile profile = new GameProfile(UUIDConversion(uuidString), owner);
+			setSkin(profile, UUIDConversion(uuidString));
+			getGameProfiles().put(owner, profile);
+		}
+    }
 	
 	private static boolean setSkin(GameProfile profile, UUID uuid) {
 		try {
@@ -293,5 +331,9 @@ public class ItemHandler {
 		int b = (hex & 0xFF);
 		Color bukkitColor = Color.fromBGR(r, g, b);
 		return bukkitColor;
+	}
+	
+	public static HashMap<String, GameProfile> getGameProfiles() {
+		return gameProfiles;
 	}
 }
