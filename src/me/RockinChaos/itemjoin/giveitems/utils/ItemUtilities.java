@@ -77,10 +77,8 @@ public class ItemUtilities {
 	
 	public static void safeSet(Player player, String type) {
 		InvClickCreative.isCreative(player, player.getGameMode());
-		ItemUtilities.setClearingOfItems(player, player.getWorld().getName(), "Clear-On-" + type);
-		if (!type.equalsIgnoreCase("Region-Enter")) {
-			PlayerHandler.setHeldItemSlot(player);
-		}
+		if (!type.equalsIgnoreCase("Limit-Modes")) { ItemUtilities.setClearingOfItems(player, player.getWorld().getName(), "Clear-On-" + type); }
+		if (!type.equalsIgnoreCase("Region-Enter") && !type.equalsIgnoreCase("Limit-Modes")) { PlayerHandler.setHeldItemSlot(player); }
 		ItemUtilities.putFailCount(player, 0);
 		ItemUtilities.updateItems(player, false);
 	}
@@ -218,25 +216,25 @@ public class ItemUtilities {
 	
 	public static Boolean isObtainable(Player player, ItemMap itemMap) {
 		if (itemMap.getProbability().equals(-1) || !itemMap.getProbability().equals(-1) && probability.containsKey(itemMap.getConfigName()) && !hasProbabilityItem(player, itemMap)) {
-			if (!itemMap.hasItem(player) || itemMap.isAlwaysGive()) {
-				if (Utils.isInt(itemMap.getSlot()) && Integer.parseInt(itemMap.getSlot()) >= 0 && Integer.parseInt(itemMap.getSlot()) <= 35) {
-					if (!SQLData.hasFirstJoined(player, itemMap.getConfigName()) && !SQLData.hasIPLimited(player, itemMap.getConfigName()) 
-							&& canOverwrite(player, itemMap.getSlot(), itemMap.getConfigName())) {
-						return true;
+			if (!itemMap.hasItem(player) || itemMap.isAlwaysGive() || !itemMap.isLimitMode(player.getGameMode())) {
+				if (itemMap.isLimitMode(player.getGameMode())) {
+					if (Utils.isInt(itemMap.getSlot()) && Integer.parseInt(itemMap.getSlot()) >= 0 && Integer.parseInt(itemMap.getSlot()) <= 35) {
+						if (!SQLData.hasFirstJoined(player, itemMap.getConfigName()) && !SQLData.hasIPLimited(player, itemMap.getConfigName()) 
+								&& canOverwrite(player, itemMap.getSlot(), itemMap.getConfigName())) {
+							return true;
+						}
+					} else if (ItemHandler.isCustomSlot(itemMap.getSlot())) {
+						if (!SQLData.hasFirstJoined(player, itemMap.getConfigName()) && !SQLData.hasIPLimited(player, itemMap.getConfigName()) 
+								&& canOverwrite(player, itemMap.getSlot(), itemMap.getConfigName())) {
+							return true;
+						}
 					}
-				} else if (ItemHandler.isCustomSlot(itemMap.getSlot())) {
-					if (!SQLData.hasFirstJoined(player, itemMap.getConfigName()) && !SQLData.hasIPLimited(player, itemMap.getConfigName()) 
-							&& canOverwrite(player, itemMap.getSlot(), itemMap.getConfigName())) {
-						return true;
-					}
-				}
-				putFailCount(player, getFailCount().get(player) + 1);
-				ServerHandler.sendDebugMessage("Failed to give; " + itemMap.getConfigName());
-				return false;
+					putFailCount(player, getFailCount().get(player) + 1);
+					ServerHandler.sendDebugMessage("Failed to give; " + itemMap.getConfigName());
+					return false;
+				} else { return false; }
 			}
-		} else {
-			return false;
-		}
+		} else { return false; }
 		ServerHandler.sendDebugMessage("Already has item; " + itemMap.getConfigName());
 		return false;
 	}

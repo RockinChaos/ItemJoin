@@ -86,6 +86,7 @@ public class RegionEnter implements Listener {
 				if (Utils.containsIgnoreCase(item.getEnabledRegions(), region) || Utils.containsIgnoreCase(item.getEnabledRegions(), "UNDEFINED")) {
 					item.giveTo(player, false, 0);
 				}
+				item.setAnimations(player);
 			}
 			item.setAnimations(player);
 		}

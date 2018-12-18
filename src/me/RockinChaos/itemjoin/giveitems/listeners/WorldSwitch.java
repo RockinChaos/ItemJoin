@@ -46,7 +46,7 @@ public class WorldSwitch implements Listener {
 					if (item.isGiveOnWorldChange() && item.inWorld(player.getWorld()) 
 							&& ItemUtilities.isChosenProbability(item, Probable) && SQLData.isEnabled(player)
 							&& item.hasPermission(player) && ItemUtilities.isObtainable(player, item)) {
-						item.giveTo(player, false, 0); 
+						item.giveTo(player, false, 0);
 					}
 					item.setAnimations(player);
 				}

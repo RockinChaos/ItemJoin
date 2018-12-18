@@ -174,6 +174,8 @@ public class ItemMap {
 	private boolean takeOnRegionLeave = false;
 	
 	private String triggers = null;
+	private String limitModes = null;
+	private boolean useOnLimitSwitch = false;
 	
 	private String enabledRegions;
 	private List < String > enabledWorlds = new ArrayList < String > ();
@@ -194,6 +196,8 @@ public class ItemMap {
 		
         this.itemflags = this.nodeLocation.getString(".itemflags");
         this.setItemFlagsBooleans();
+        
+        this.limitModes = this.nodeLocation.getString(".limit-modes");
         
 		String ItemID = ItemHandler.getItemID(slot); // <--- NEEDS MAJOR WORK.
 		this.itemValue = ItemID;
@@ -231,6 +235,7 @@ public class ItemMap {
 			setGiveOnWorldChange(Utils.containsIgnoreCase(this.triggers, "world-changed")); // needs checking
 			setGiveOnRegionEnter(Utils.containsIgnoreCase(this.triggers, "region-enter")); // needs checking
 			setTakeOnRegionLeave(Utils.containsIgnoreCase(this.triggers, "region-remove")); // needs checking
+			this.useOnLimitSwitch = Utils.containsIgnoreCase(this.triggers, "GAMEMODE-SWITCH");
 		}
         
 		for (World world: Bukkit.getServer().getWorlds()) {
@@ -867,6 +872,21 @@ public class ItemMap {
 	
 	public boolean isIpLimted() {
 		return this.ipLimited;
+	}
+	
+	public boolean isUseOnLimitSwitch() {
+		return this.useOnLimitSwitch;
+	}
+	
+	public boolean isLimitMode(GameMode newMode) {
+		if (this.limitModes != null) {
+			if (Utils.containsIgnoreCase(this.limitModes, newMode.name())) {
+				return true;
+			} else if (!Utils.containsIgnoreCase(this.limitModes, newMode.name())) {
+				return false;
+			}
+		}
+		return true;
 	}
 	
 	public boolean isPermissionNeeded() {

@@ -54,7 +54,7 @@ public class PlayerJoin implements Listener {
 					if (item.isGiveOnJoin() && item.inWorld(player.getWorld()) 
 							&& ItemUtilities.isChosenProbability(item, Probable) && SQLData.isEnabled(player)
 							&& item.hasPermission(player) && ItemUtilities.isObtainable(player, item)) {
-							item.giveTo(player, false, 0); 
+							item.giveTo(player, false, 0);
 					}
 					item.setAnimations(player);
 				}
