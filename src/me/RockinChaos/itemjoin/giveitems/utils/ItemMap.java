@@ -21,6 +21,7 @@ import org.bukkit.World;
 import org.bukkit.block.banner.Pattern;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.BookMeta.Generation;
@@ -229,12 +230,12 @@ public class ItemMap {
 		
 		if (this.nodeLocation.getString("triggers") != null) {
 			this.triggers = this.nodeLocation.getString("triggers");
-			setGiveOnDisabled(Utils.containsIgnoreCase(this.triggers, "DISABLED"));
-			setGiveOnJoin(Utils.containsIgnoreCase(this.triggers, "JOIN"));
-			setGiveOnRespawn(Utils.containsIgnoreCase(this.triggers, "RESPAWN"));
-			setGiveOnWorldChange(Utils.containsIgnoreCase(this.triggers, "world-changed")); // needs checking
-			setGiveOnRegionEnter(Utils.containsIgnoreCase(this.triggers, "region-enter")); // needs checking
-			setTakeOnRegionLeave(Utils.containsIgnoreCase(this.triggers, "region-remove")); // needs checking
+			this.giveOnDisabled = Utils.containsIgnoreCase(this.triggers, "DISABLED");
+			this.giveOnJoin = Utils.containsIgnoreCase(this.triggers, "JOIN");
+			this.giveOnRespawn = Utils.containsIgnoreCase(this.triggers, "RESPAWN");
+		    this.giveOnWorldChange = Utils.containsIgnoreCase(this.triggers, "WORLD-CHANGE");
+			this.giveOnRegionEnter =Utils.containsIgnoreCase(this.triggers, "REGION-ENTER");
+			this.takeOnRegionLeave = Utils.containsIgnoreCase(this.triggers, "REGION-REMOVE");
 			this.useOnLimitSwitch = Utils.containsIgnoreCase(this.triggers, "GAMEMODE-SWITCH");
 		}
         
@@ -1217,7 +1218,7 @@ public class ItemMap {
 	}
 	
 	private void setCustomName(Player player) {
-		if (this.customName != null && !Utils.containsIgnoreCase(this.customName, ItemHandler.getName(this.tempItem))) {
+		if (this.customName != null && !this.customName.equalsIgnoreCase(ItemHandler.getName(this.tempItem))) {
 			this.tempMeta.setDisplayName(Utils.translateLayout(ItemHandler.purgeDelay(this.customName), player));
 		}
 	}
@@ -1348,7 +1349,9 @@ public class ItemMap {
 	
 	public void removeFrom(Player player) {
 		PlayerInventory inv = player.getInventory();
+		Inventory craftView = player.getOpenInventory().getTopInventory();
 		ItemStack[] contents = inv.getContents();
+		ItemStack[] craftingContents = player.getOpenInventory().getTopInventory().getContents();
 		
 		if (this.isAnimated() && this.getAnimationHandler().get(player) != null) {
 			this.localeAnimations.get(player).closeAnimation(player);
@@ -1362,6 +1365,12 @@ public class ItemMap {
 		if (this.isSimilar(inv.getChestplate())) { inv.setChestplate(new ItemStack(Material.AIR)); }
 		if (this.isSimilar(inv.getLeggings())) { inv.setLeggings(new ItemStack(Material.AIR)); }
 		if (this.isSimilar(inv.getBoots())) { inv.setBoots(new ItemStack(Material.AIR)); }
+		
+		if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
+			for (int k = 0; k < craftingContents.length; k++) {
+				if (this.isSimilar(craftingContents[k])) { craftView.setItem(k, new ItemStack(Material.AIR)); }
+			}
+		}
 	}
 	
 	public void giveTo(Player player, boolean noTriggers, int amount) {
