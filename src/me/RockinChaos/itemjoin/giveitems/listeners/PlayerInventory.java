@@ -25,8 +25,8 @@ public class PlayerInventory implements Listener {
         final Player player = (Player) event.getPlayer();
         boolean updateInv = false;
         if (PlayerHandler.isCraftingInv(view)) {
-			String Probable = ItemUtilities.getProbabilityItem(player);
-			for (ItemMap item : ItemUtilities.getItems()) {
+			final String Probable = ItemUtilities.getProbabilityItem(player);
+			for (final ItemMap item : ItemUtilities.getItems()) {
 				if (hasCraftingItem(item, view, player) && ItemHandler.isCraftingSlot(item.getSlot())) {
 					if (ItemUtilities.isChosenProbability(item, Probable) && SQLData.isEnabled(player)
 							&& item.hasPermission(player) && ItemUtilities.isObtainable(player, item)) {
@@ -51,8 +51,8 @@ public class PlayerInventory implements Listener {
         final Item dropItem = event.getItemDrop();
         boolean updateInv = false;
         if (PlayerHandler.isCraftingInv(view)) {
-			String Probable = ItemUtilities.getProbabilityItem(player);
-			for (ItemMap item : ItemUtilities.getItems()) {
+			final String Probable = ItemUtilities.getProbabilityItem(player);
+			for (final ItemMap item : ItemUtilities.getItems()) {
 				if (item.isSimilar(dropItem.getItemStack()) && ItemHandler.isCraftingSlot(item.getSlot()) 
 						|| ItemHandler.isCraftingSlot(item.getSlot()) && item.getSlot().equalsIgnoreCase("CRAFTING[0]")) {
 					dropItem.remove();
