@@ -310,58 +310,67 @@ public class ItemUtilities {
 			} else if (itemMap.getSlot().equalsIgnoreCase("Helmet")) {
 				if (amount != 0 || itemMap.isAlwaysGive()) {
 					if (noTriggers) { item.setAmount(amount); }
-					if (itemMap.hasItem(player)) {
-						player.getInventory().addItem(item);
-					} else {
-						Equip.setHelmet(item);
-					}
+					if (itemMap.hasItem(player)) { player.getInventory().addItem(item);
+					} else { Equip.setHelmet(item); }
 				} else { Equip.setHelmet(item); }
 				ServerHandler.sendDebugMessage("Given the Item; [" + itemMap.getConfigName() + "]");
 				SQLData.saveAllToDatabase(player, itemMap.getConfigName());
 			} else if (itemMap.getSlot().equalsIgnoreCase("Chestplate")) {
 				if (amount != 0 || itemMap.isAlwaysGive()) {
 					if (noTriggers) { item.setAmount(amount); }
-					if (itemMap.hasItem(player)) {
-						player.getInventory().addItem(item);
-					} else {
-						Equip.setChestplate(item);
-					}
+					if (itemMap.hasItem(player)) { player.getInventory().addItem(item);
+					} else { Equip.setChestplate(item); }
 				} else { Equip.setChestplate(item); }
 				ServerHandler.sendDebugMessage("Given the Item; [" + itemMap.getConfigName() + "]");
 				SQLData.saveAllToDatabase(player, itemMap.getConfigName());
 			} else if (itemMap.getSlot().equalsIgnoreCase("Leggings")) {
 				if (amount != 0 || itemMap.isAlwaysGive()) {
 					if (noTriggers) { item.setAmount(amount); }
-					if (itemMap.hasItem(player)) {
-						player.getInventory().addItem(item);
-					} else {
-						Equip.setLeggings(item);
-					}
+					if (itemMap.hasItem(player)) { player.getInventory().addItem(item);
+					} else { Equip.setLeggings(item); }
 				} else { Equip.setLeggings(item); }
 				ServerHandler.sendDebugMessage("Given the Item; [" + itemMap.getConfigName() + "]");
 				SQLData.saveAllToDatabase(player, itemMap.getConfigName());
 			} else if (itemMap.getSlot().equalsIgnoreCase("Boots")) {
 				if (amount != 0 || itemMap.isAlwaysGive()) {
 					if (noTriggers) { item.setAmount(amount); }
-					if (itemMap.hasItem(player)) {
-						player.getInventory().addItem(item);
-					} else {
-						Equip.setBoots(item);
-					}
+					if (itemMap.hasItem(player)) { player.getInventory().addItem(item);
+					} else { Equip.setBoots(item); }
 				} else { Equip.setBoots(item); }
 				ServerHandler.sendDebugMessage("Given the Item; [" + itemMap.getConfigName() + "]");
 				SQLData.saveAllToDatabase(player, itemMap.getConfigName());
 			} else if (ServerHandler.hasCombatUpdate() && itemMap.getSlot().equalsIgnoreCase("Offhand")) {
 				if (amount != 0 || itemMap.isAlwaysGive()) {
 					if (noTriggers) { item.setAmount(amount); }
-					if (itemMap.hasItem(player)) {
-						player.getInventory().addItem(item);
-					} else {
-						PlayerHandler.setOffhandItem(player, item);
-					}
+					if (itemMap.hasItem(player)) { player.getInventory().addItem(item);
+					} else { PlayerHandler.setOffhandItem(player, item); }
 				} else { PlayerHandler.setOffhandItem(player, item); }
 				ServerHandler.sendDebugMessage("Given the Item; [" + itemMap.getConfigName() + "]");
 				SQLData.saveAllToDatabase(player, itemMap.getConfigName());
+			} else if (itemMap.getSlot().equalsIgnoreCase("CRAFTING[0]") || itemMap.getSlot().equalsIgnoreCase("CRAFTING[1]") 
+					|| itemMap.getSlot().equalsIgnoreCase("CRAFTING[2]") || itemMap.getSlot().equalsIgnoreCase("CRAFTING[3]") || itemMap.getSlot().equalsIgnoreCase("CRAFTING[4]")) {
+				if (amount != 0 || itemMap.isAlwaysGive()) {
+					if (noTriggers) { item.setAmount(amount); }
+					if (itemMap.hasItem(player)) { player.getInventory().addItem(item);
+					} else { player.getOpenInventory().getTopInventory ().setItem(getSlotConversion(itemMap.getSlot()), item); }
+				} else { player.getOpenInventory().getTopInventory ().setItem(getSlotConversion(itemMap.getSlot()), item); }
+				ServerHandler.sendDebugMessage("Given the Item; [" + itemMap.getConfigName() + "]");
+				SQLData.saveAllToDatabase(player, itemMap.getConfigName());
 			}
+	}
+	
+	private static int getSlotConversion(String str) {
+		if (str.equalsIgnoreCase("CRAFTING[0]")) {
+			return 0;
+		} else if (str.equalsIgnoreCase("CRAFTING[1]")) {
+			return 1;
+		} else if (str.equalsIgnoreCase("CRAFTING[2]")) {
+			return 2;
+		} else if (str.equalsIgnoreCase("CRAFTING[3]")) {
+			return 3;
+		} else if (str.equalsIgnoreCase("CRAFTING[4]")) {
+			return 4;
+		}
+		return 5;
 	}
 }

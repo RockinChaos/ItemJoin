@@ -317,3 +317,27 @@ items:
     itemflags: inventory-modify, death-drops, self-drops, unbreakable
     triggers: join
     enabled-worlds: world, world_nether, world_the_end
+  diamond-item:
+    id: DIAMOND
+    slot: CRAFTING[1]
+    itemflags: inventory-modify, death-drops, self-drops
+    triggers: join
+    enabled-worlds: world, world_nether, world_the_end
+  iron-item:
+    id: IRON_INGOT
+    slot: CRAFTING[2]
+    itemflags: inventory-modify, death-drops, self-drops
+    triggers: join
+    enabled-worlds: world, world_nether, world_the_end
+  gold-item:
+    id: GOLD_INGOT
+    slot: CRAFTING[3]
+    itemflags: inventory-modify, death-drops, self-drops
+    triggers: join
+    enabled-worlds: world, world_nether, world_the_end
+  redstone-item:
+    id: REDSTONE
+    slot: CRAFTING[4]
+    itemflags: inventory-modify, death-drops, self-drops
+    triggers: join
+    enabled-worlds: world, world_nether, world_the_end

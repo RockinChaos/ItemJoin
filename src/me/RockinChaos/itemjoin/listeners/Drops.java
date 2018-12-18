@@ -3,6 +3,7 @@ package me.RockinChaos.itemjoin.listeners;
 import java.util.List;
 import java.util.ListIterator;
 
+import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
@@ -20,11 +21,14 @@ public class Drops implements Listener {
 		ItemStack item = event.getItemDrop().getItemStack();
 		Player player = event.getPlayer();
 		if (!ItemHandler.isAllowed(player, item, "self-drops")) {
-			if (!ServerHandler.hasCombatUpdate() && InvClickSurvival.dropClick.get(PlayerHandler.getPlayerID(player)) != null && InvClickSurvival.dropClick.get(PlayerHandler.getPlayerID(player)) == true) {
-				InvClickSurvival.droppedItem.put(PlayerHandler.getPlayerID(player), true);
-				event.getItemDrop().remove();
-			} else { event.setCancelled(true); }
-			PlayerHandler.delayUpdateInventory(player, 1L);
+			ItemMap itemMap = ItemHandler.getMappedItem(item, player.getWorld());
+			if (!ItemHandler.isCraftingSlot(itemMap.getSlot())) {
+				if (!ServerHandler.hasCombatUpdate() && InvClickSurvival.dropClick.get(PlayerHandler.getPlayerID(player)) != null && InvClickSurvival.dropClick.get(PlayerHandler.getPlayerID(player)) == true) {
+					InvClickSurvival.droppedItem.put(PlayerHandler.getPlayerID(player), true);
+					event.getItemDrop().remove();
+				} else { event.setCancelled(true); }
+				PlayerHandler.delayUpdateInventory(player, 1L);
+			}
 		} else if (!ServerHandler.hasCombatUpdate() && PlayerHandler.isCreativeMode(player) && InvClickSurvival.dropClick.get(PlayerHandler.getPlayerID(player)) != null && InvClickSurvival.dropClick.get(PlayerHandler.getPlayerID(player)) == true && !ItemHandler.isAllowed(player, item, "self-drops")) {
 			InvClickCreative.dropGlitch.put(PlayerHandler.getPlayerID(player), true);
 		}

@@ -8,6 +8,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
@@ -20,6 +21,12 @@ import me.RockinChaos.itemjoin.utils.Utils;
 import net.milkbowl.vault.economy.EconomyResponse;
 
 public class PlayerHandler {
+	
+	private static final int PLAYER_CRAFT_INV_SIZE = 5;
+	
+    public static boolean isCraftingInv(InventoryView view) {
+        return view.getTopInventory().getSize() == PLAYER_CRAFT_INV_SIZE;
+    }
 	
 	public static boolean isCreativeMode(Player player) {
 		final GameMode gamemode = player.getGameMode();

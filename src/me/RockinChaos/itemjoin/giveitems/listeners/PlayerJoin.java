@@ -23,7 +23,7 @@ public class PlayerJoin implements Listener {
 	private static String enabledCommandWorlds;
 	private static List<String> globalCommands;
 	private static boolean globalCommandsEnabled = false;
-
+	
 	@EventHandler
 	private void giveOnJoin(PlayerJoinEvent event) {
 		final Player player = event.getPlayer();

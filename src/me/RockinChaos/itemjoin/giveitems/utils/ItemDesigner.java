@@ -385,7 +385,8 @@ public class ItemDesigner {
 	}
 	
 	private String getActualName(ItemMap itemMap) {
-		String name = ItemHandler.purgeDelay(itemMap.getNodeLocation().getString(".name"));
+		String name = "";
+		try { ItemHandler.purgeDelay(itemMap.getNodeLocation().getString(".name")); } catch (Exception e) { }
 		if (ConfigHandler.getNameSection(itemMap.getNodeLocation()) != null) {
 			List<String> names = new ArrayList<String>();
 			for (String nameKey : ConfigHandler.getNameSection(itemMap.getNodeLocation()).getKeys(false)) {
