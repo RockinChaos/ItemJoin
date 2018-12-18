@@ -281,6 +281,10 @@ public class ItemUtilities {
 					if (player.getInventory().getItemInOffHand().getType() != Material.AIR) {
 						return false;
 					}
+				} else if (getSlotConversion(slot) != 5 
+						&& player.getOpenInventory().getTopInventory().getItem(getSlotConversion(slot)) != null 
+						&& player.getOpenInventory().getTopInventory().getItem(getSlotConversion(slot)).getType() != Material.AIR) {
+					return false;
 				}
 			}
 		} catch (Exception e) { ServerHandler.sendDebugTrace(e); }
@@ -347,8 +351,7 @@ public class ItemUtilities {
 				} else { PlayerHandler.setOffhandItem(player, item); }
 				ServerHandler.sendDebugMessage("Given the Item; [" + itemMap.getConfigName() + "]");
 				SQLData.saveAllToDatabase(player, itemMap.getConfigName());
-			} else if (itemMap.getSlot().equalsIgnoreCase("CRAFTING[0]") || itemMap.getSlot().equalsIgnoreCase("CRAFTING[1]") 
-					|| itemMap.getSlot().equalsIgnoreCase("CRAFTING[2]") || itemMap.getSlot().equalsIgnoreCase("CRAFTING[3]") || itemMap.getSlot().equalsIgnoreCase("CRAFTING[4]")) {
+			} else if (getSlotConversion(itemMap.getSlot()) != 5) {
 				if (amount != 0 || itemMap.isAlwaysGive()) {
 					if (noTriggers) { item.setAmount(amount); }
 					if (itemMap.hasItem(player)) { player.getInventory().addItem(item);
@@ -359,16 +362,16 @@ public class ItemUtilities {
 			}
 	}
 	
-	private static int getSlotConversion(String str) {
-		if (str.equalsIgnoreCase("CRAFTING[0]")) {
+	public static int getSlotConversion(String str) {
+		if (str.equalsIgnoreCase("CRAFTING[0]") || str.equalsIgnoreCase("C[0]") || str.equalsIgnoreCase("C(0)")) {
 			return 0;
-		} else if (str.equalsIgnoreCase("CRAFTING[1]")) {
+		} else if (str.equalsIgnoreCase("CRAFTING[1]") || str.equalsIgnoreCase("C[1]") || str.equalsIgnoreCase("C(1)")) {
 			return 1;
-		} else if (str.equalsIgnoreCase("CRAFTING[2]")) {
+		} else if (str.equalsIgnoreCase("CRAFTING[2]") || str.equalsIgnoreCase("C[2]") || str.equalsIgnoreCase("C(2)")) {
 			return 2;
-		} else if (str.equalsIgnoreCase("CRAFTING[3]")) {
+		} else if (str.equalsIgnoreCase("CRAFTING[3]") || str.equalsIgnoreCase("C[3]") || str.equalsIgnoreCase("C(3)")) {
 			return 3;
-		} else if (str.equalsIgnoreCase("CRAFTING[4]")) {
+		} else if (str.equalsIgnoreCase("CRAFTING[4]") || str.equalsIgnoreCase("C[4]") || str.equalsIgnoreCase("C(4)")) {
 			return 4;
 		}
 		return 5;

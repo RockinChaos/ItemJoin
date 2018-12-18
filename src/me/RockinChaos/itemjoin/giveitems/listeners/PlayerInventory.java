@@ -54,7 +54,7 @@ public class PlayerInventory implements Listener {
 			final String Probable = ItemUtilities.getProbabilityItem(player);
 			for (final ItemMap item : ItemUtilities.getItems()) {
 				if (item.isSimilar(dropItem.getItemStack()) && ItemHandler.isCraftingSlot(item.getSlot()) 
-						|| ItemHandler.isCraftingSlot(item.getSlot()) && item.getSlot().equalsIgnoreCase("CRAFTING[0]")) {
+						|| ItemHandler.isCraftingSlot(item.getSlot()) && ItemUtilities.getSlotConversion(item.getSlot()) == 0) {
 					dropItem.remove();
 					if (ItemUtilities.isChosenProbability(item, Probable) && SQLData.isEnabled(player)
 							&& item.hasPermission(player) && ItemUtilities.isObtainable(player, item)) {
