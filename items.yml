@@ -108,6 +108,7 @@ items:
       - ''
       - '<hover type="open_url" value="https://www.spigotmc.org/resources/itemjoin.12661/">"Click to view ItemJoin."</hover>'
       - '<hover type="run_command" value="/say ItemJoin is so AMAZING!">"Click to run a Command."</hover>'
+      - 'raw: ["",{"text":"I am a hidden text!","color":"yellow","clickEvent":{"action":"open_url","value":"https://www.spigotmc.org/resources/itemjoin.12661/"},"hoverEvent":{"action":"show_text","value":{"text":"","extra":[{"text":"Click to visit the spigot page.","color":"blue"}]}}}]'
     itemflags: inventory-modify, death-drops, self-drops
     triggers: join, respawn
     permission-node: 'itemjoin.book'

@@ -44,6 +44,7 @@ public class ItemCommand {
 					case MESSAGE: dispatchMessageCommands(player); break;
 					case SERVERSWITCH: dispatchServerSwitchCommands(player); break;
 					case BUNGEE: dispatchBungeeCordCommands(player); break;
+					case SWAPITEM: dispatchSwapItem(player); break;
 					case DEFAULT: dispatchPlayerCommands(player); break;
 					case DELAY: break;
 					default: dispatchPlayerCommands(player); break;
@@ -110,6 +111,30 @@ public class ItemCommand {
 		try { BungeeCord.ExecuteCommand(player, Utils.translateLayout(this.command, player)); } 
 		catch (Exception e) {
 			ServerHandler.sendErrorMessage("&cThere was an issue executing an item's command to BungeeCord, if this continues please report it to the developer!");
+			ServerHandler.sendDebugTrace(e);
+		}
+	}
+	
+	private void dispatchSwapItem(Player player) {
+		try { 
+		//	ItemMeta itemMeta = item.getItemMeta();
+		//	item.setType(materialType);
+		//	itemMeta.setDisplayName(Utils.translateLayout(customName, player));
+		//	if (customLore != null && !customLore.isEmpty()) {
+		//		List < String > loreList = customLore;
+		//		List < String > loreFormatList = new ArrayList < String > ();
+		//		for (int k = 0; k < loreList.size(); k++) {
+		//			String formatLore = ItemHandler.purgeDelay(loreList.get(k));
+		///			formatLore = Utils.translateLayout(formatLore, player);
+		//			loreFormatList.add(formatLore);
+		//		}
+		//		itemMeta.setLore(loreFormatList);
+		//	}
+		//	
+		//	item.setItemMeta(itemMeta);
+		} 
+		catch (Exception e) {
+			ServerHandler.sendErrorMessage("&cThere was an issue executing an item's command to swap an items attributes, if this continues please report it to the developer!");
 			ServerHandler.sendDebugTrace(e);
 		}
 	}
@@ -255,6 +280,7 @@ public class ItemCommand {
 		else if (input.startsWith("server:")) { input = input.substring(7); type = Type.SERVERSWITCH; } 
 		else if (input.startsWith("bungee:")) { input = input.substring(7); type = Type.BUNGEE; } 
 		else if (input.startsWith("message:")) { input = input.substring(8); type = Type.MESSAGE; } 
+		else if (input.startsWith("swapitem:")) { input = input.substring(9); type = Type.SWAPITEM; }
 		else if (input.startsWith("delay:")) { input = input.substring(6); type = Type.DELAY; }
 		
 		input = input.trim();
@@ -270,7 +296,7 @@ public class ItemCommand {
 	
 	private enum Type {
 		DEFAULT("DEFAULT", 0), CONSOLE("CONSOLE", 1), OP("OP", 2), PLAYER("PLAYER", 3), 
-		SERVERSWITCH("SERVER", 4), MESSAGE("MESSAGE", 5), BUNGEE("BUNGEE", 6), DELAY("DELAY", 7);
+		SERVERSWITCH("SERVER", 4), MESSAGE("MESSAGE", 5), BUNGEE("BUNGEE", 6), SWAPITEM("SWAPITEM", 7), DELAY("DELAY", 8);
 		private Type(final String t, final int n) { }
 	}
 	

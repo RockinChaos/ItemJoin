@@ -27,7 +27,6 @@ import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.utils.Hooks;
 import me.RockinChaos.itemjoin.utils.ImageRenderer;
-import me.RockinChaos.itemjoin.utils.Legacy;
 import me.RockinChaos.itemjoin.utils.Reflection;
 import me.RockinChaos.itemjoin.utils.Utils;
 import me.RockinChaos.itemjoin.utils.sqlite.SQLData;
@@ -276,7 +275,7 @@ public class ItemDesigner {
 				} else if (!SQLData.hasImage(itemMap.getConfigName(), itemMap.getMapImage())) {
 					MapView view = ImageRenderer.NewMapView();
 					try { view.removeRenderer(view.getRenderers().get(0)); } catch (NullPointerException e) { ServerHandler.sendDebugTrace(e); }
-					int mapID = Legacy.getMapID(view);
+					int mapID = view.getId();
 					itemMap.setMapID(mapID);
 					try { view.addRenderer(new ImageRenderer(itemMap.getMapImage(), mapID)); } catch (NullPointerException e) { ServerHandler.sendDebugTrace(e); }
 					SQLData.saveMapImage(itemMap.getConfigName(), "map-id", itemMap.getMapImage(), mapID);
@@ -338,9 +337,8 @@ public class ItemDesigner {
 							for (String hover: hovers) { if (hoverString.contains("<n>")) { hoverBuilder = hoverBuilder + hover + "\n"; } else { hoverBuilder = hover; } }
 							textBuilder += ", " + "{\"text\":\"" + result + "\",\"" + type.event + "\":{\"action\":\"" + type.action + "\",\"value\":\"" + hoverBuilder + "\"}}" 
 							+ ", " + "{\"text\":\"" + formatPage + "\"}" + ", " +  "{\"text\":\"\\n\",\"color\":\"reset\"}";
-							
 							safteyCheckURL(type, hoverBuilder, itemMap);
-						} else { textBuilder += ", " + "{\"text\":\"" + formatPage + "\"}" + ", " + "{\"text\":\"\\n\",\"color\":\"reset\"}"; }
+						} else if (formatPage.contains("raw:")) { textBuilder += formatPage.replace("raw: ", "").replace("raw:", "").replace("[\"\"", ""); } else { textBuilder += ", " + "{\"text\":\"" + formatPage + "\"}" + ", " + "{\"text\":\"\\n\",\"color\":\"reset\"}"; }
 				 }
 				 actualPageList.add(textBuilder + "]");
 			}
@@ -385,7 +383,7 @@ public class ItemDesigner {
 	}
 	
 	private String getActualName(ItemMap itemMap) {
-		String name = "";
+		String name = itemMap.getNodeLocation().getString(".name");
 		try { ItemHandler.purgeDelay(itemMap.getNodeLocation().getString(".name")); } catch (Exception e) { }
 		if (ConfigHandler.getNameSection(itemMap.getNodeLocation()) != null) {
 			List<String> names = new ArrayList<String>();
@@ -400,7 +398,7 @@ public class ItemDesigner {
 		} else if (name == null || name.isEmpty()) {
 			return ItemHandler.getName(itemMap.getTempItem());
 		}
-		return name;
+		return ItemHandler.purgeDelay(name);
 	}
 	
 	private void setName(ItemMap itemMap) {

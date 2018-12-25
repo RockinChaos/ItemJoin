@@ -58,38 +58,25 @@ public class ItemMap {
 	
 	private String configName;
 	private ConfigurationSection nodeLocation;
+	private Integer probability = -1;
 	
-	private ItemStack tempItem;
-	private ItemMeta tempMeta;
-	private Material material;
-	private Short dataValue;
+	private ItemStack tempItem = null;
+	private ItemMeta tempMeta = null;
+	private Material material = null;
+	private Short dataValue = 0;
 	
-	private String customName;
-	private List < String > dynamicNames = null;
-	private List < String > customLore;
-	private List < List < String > > dynamicLores = null;
-	private List < String > dynamicMaterials = null;
-	private List < String > dynamicOwners = null;
-	private List < String > dynamicTextures = null;
-	private boolean materialAnimated = false;
-	private boolean skullAnimated = false;
-	private Map < Player, ItemAnimation > localeAnimations = new HashMap < Player, ItemAnimation > ();
-	private Integer InvSlot;
-	private String CustomSlot;
+	private String customName = null;
+	private List < String > customLore = null;
+
+	private Integer InvSlot = 0;
+	private String CustomSlot = null;
 	
-	private String Arbitrary;
-	private String itemValue;
+	private String Arbitrary = null;
+	private String itemValue = null;
 	
 	private Integer count = 1;
 	
-	private Short durability;
-	
-	private Integer probability = -1;
-	
-	private String permissionNode;
-	private boolean permissionNeeded;
-	
-	private Map < String, Integer > enchants = new HashMap < String, Integer > ();
+	private Short durability = null;
 	
 	private String author;
 	private String title;
@@ -97,32 +84,51 @@ public class ItemMap {
 	private List < String > bookPages = new ArrayList < String > ();
 	
 	private int mapId = 1;
-	private String customMapImage;
+	private String customMapImage = null;
     
-    private FireworkEffect firework;
-    private int power;
-    private DyeColor chargeColor;
+    private FireworkEffect firework = null;
+    private int power = 1;
+    private DyeColor chargeColor = null;
     
-    private String skullOwner;
-    private String skullTexture;
-    private boolean headDatabase;
+    private String skullOwner = null;
+    private String skullTexture = null;
+    private boolean headDatabase = false;
     
-    private List <PotionEffect> effect;
+    private List <PotionEffect> effect = null;
+    private List <Pattern> bannerPatterns = null;
     
-    private Color leatherColor;
-    private List <Pattern> bannerPatterns;
+    private Color leatherColor = null;
     
+	private int interactCooldown = 0;
+	private boolean customConsumable = false;
+	private Map < String, Integer > enchants = new HashMap < String, Integer > ();
+	
+	
+//  ============================================== //
+//         NBT Information for each item.          //
+//  ============================================== //
     private String newNBTData;
     private Object newNBTTag;
     private String legacySecret;
+//  ============================================== //
 	
-	private int interactCooldown = 0;
+//  ============================================== //
+//     ItemAnimation Information for each item.    //
+//  ============================================== //
+	private List < String > dynamicNames = null;
+	private List < List < String > > dynamicLores = null;
+	private List < String > dynamicMaterials = null;
+	private List < String > dynamicOwners = null;
+	private List < String > dynamicTextures = null;
+	private boolean materialAnimated = false;
+	private boolean skullAnimated = false;
+	private Map < Player, ItemAnimation > localeAnimations = new HashMap < Player, ItemAnimation > ();
+//  ====================================================================================================== //
 	
-	private boolean customConsumable = false;
 	
-	
-	// Command Stuff //
-	
+//  ============================================== //
+//      ItemCommand Information for each item.     //
+//  ============================================== //
 	private ItemCommand[] commands;
 	private Integer cooldownSeconds = 0;
 	private String cooldownMessage;
@@ -133,12 +139,12 @@ public class ItemMap {
 	private CommandType type = CommandType.INTERACT;
 	private Map < String, Long > playersOnCooldown = new HashMap < String, Long > ();
 	private HashMap < String, Long > playersOnCooldownTick = new HashMap < String, Long > ();
+//  ============================================================================================= //
 	
 	
-	// ============ //
-	
-	// Itemflag Stuff //
-	
+//  ============================================== //
+//            Itemflags for each item.             //
+//  ============================================== //
 	private String itemflags;
 	
 	private boolean vanillaItem = false;
@@ -164,9 +170,11 @@ public class ItemMap {
 	
 	private boolean onlyFirstJoin = false;
 	private boolean ipLimited = false;
+//  ============================================== //
 	
-// ============== //
-	
+//  ============================================== //
+//             Triggers for each item.             //
+//  ============================================== //
 	private boolean giveOnDisabled = false;
 	private boolean giveOnJoin = false;
 	private boolean giveOnRespawn = false;
@@ -177,6 +185,10 @@ public class ItemMap {
 	private String triggers = null;
 	private String limitModes = null;
 	private boolean useOnLimitSwitch = false;
+//  ============================================== //
+	
+	private String permissionNode;
+	private boolean permissionNeeded;
 	
 	private String enabledRegions;
 	private List < String > enabledWorlds = new ArrayList < String > ();
