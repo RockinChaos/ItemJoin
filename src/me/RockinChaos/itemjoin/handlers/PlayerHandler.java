@@ -89,38 +89,13 @@ public class PlayerHandler {
 		return null;
 	}
 	
-<<<<<<< HEAD
-	@SuppressWarnings("deprecation")
-	public static ItemStack getMainHandItem(Player player) {
-		if (ServerHandler.hasCombatUpdate()) {
-			return player.getInventory().getItemInMainHand();
-		} if (!ServerHandler.hasCombatUpdate()) {
-			return player.getInventory().getItemInHand();
-		}
-		return null;
-	}
-	
-	@SuppressWarnings("deprecation")
-=======
->>>>>>> dev-version
 	public static ItemStack getOffHandItem(Player player) {
 		if (ServerHandler.hasCombatUpdate()) {
 			return player.getInventory().getItemInOffHand();
 		} if (!ServerHandler.hasCombatUpdate()) {
-<<<<<<< HEAD
-			return player.getInventory().getItemInHand();
-		}
-		return null;
-	}
-	
-	@SuppressWarnings("deprecation")
-	public static void setInHandItem(Player player, ItemStack toSet) {
-		player.getInventory().setItemInHand(toSet);
-=======
 			return Legacy.getLegacyInHandItem(player);
 		}
 		return null;
->>>>>>> dev-version
 	}
 	
 	public static void setOffhandItem(Player player, ItemStack toSet) {
@@ -245,21 +220,6 @@ public class PlayerHandler {
 		return null;
 	}
 	
-<<<<<<< HEAD
-	@SuppressWarnings("deprecation")
-	public static void setItemInHand(Player player, Material mat) {
-		player.setItemInHand(new ItemStack(mat));
-	}
-	
-	public static void setItemInOffHand(Player player, Material mat) {
-		if (ServerHandler.hasCombatUpdate()) {
-		player.getInventory().setItemInOffHand(new ItemStack(mat));
-		}
-	}
-	
-	@SuppressWarnings("deprecation")
-=======
->>>>>>> dev-version
 	public static double getBalance(Player player) {
 		return Legacy.getLegacyBalance(player.getName());
 	}

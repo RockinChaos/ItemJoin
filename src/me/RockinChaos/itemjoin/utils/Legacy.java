@@ -118,38 +118,19 @@ public class Legacy {
         if (hasLegacyWorldEdit()) {
         	com.sk89q.worldedit.Vector wgVector = new com.sk89q.worldedit.Vector(loc.getX(), loc.getY(), loc.getZ());
         	return rm.get(world).getApplicableRegions(wgVector);
-<<<<<<< HEAD
-        } else {
-        	return rm.get(world).getApplicableRegions(loc);
-        }
-=======
         } else { return rm.get(world).getApplicableRegions(loc); }
->>>>>>> dev-version
 	}
 	
 	public static boolean hasLegacyWorldEdit() {
 		try {
 			Class<?> wEdit = Class.forName("com.sk89q.worldedit.Vector");
-<<<<<<< HEAD
-			if (wEdit != null) {
-				return true;
-			}
-=======
 			if (wEdit != null) { return true; }
->>>>>>> dev-version
 			return false;
 		} catch (Exception e) { return false; }
 	}
 	
     public static com.sk89q.worldedit.math.BlockVector3 asBlockVector(org.bukkit.Location location) {
-<<<<<<< HEAD
-        checkNotNull(location);
-        return com.sk89q.worldedit.math.BlockVector3.at(location.getX(), location.getY(), location.getZ());
-    }
-}
-=======
         checkNotNull(location); // Is this really needed?
         return com.sk89q.worldedit.math.BlockVector3.at(location.getX(), location.getY(), location.getZ());
     }
 }
->>>>>>> dev-version
