@@ -1,26 +1,29 @@
 package me.RockinChaos.itemjoin.utils;
 
 import org.bukkit.Bukkit;
-
+import me.RockinChaos.itemjoin.Commands;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
-import me.RockinChaos.itemjoin.listeners.CancelInteract;
-import me.RockinChaos.itemjoin.listeners.ConsumeApples;
+import me.RockinChaos.itemjoin.listeners.Consumes;
+import me.RockinChaos.itemjoin.listeners.Recipes;
+import me.RockinChaos.itemjoin.listeners.Legacy_Pickups;
+import me.RockinChaos.itemjoin.listeners.Legacy_Storable;
 import me.RockinChaos.itemjoin.listeners.Drops;
-import me.RockinChaos.itemjoin.listeners.InteractCmds;
+import me.RockinChaos.itemjoin.listeners.Interact;
 import me.RockinChaos.itemjoin.listeners.InvClickCreative;
 import me.RockinChaos.itemjoin.listeners.InvClickSurvival;
+import me.RockinChaos.itemjoin.listeners.Storable;
 import me.RockinChaos.itemjoin.listeners.Pickups;
-import me.RockinChaos.itemjoin.listeners.Deprecated_Pickups;
 import me.RockinChaos.itemjoin.listeners.Placement;
-import me.RockinChaos.itemjoin.listeners.ItemStore;
-import me.RockinChaos.itemjoin.listeners.SwapHands;
-import me.RockinChaos.itemjoin.listeners.giveitems.PlayerJoin;
-import me.RockinChaos.itemjoin.listeners.giveitems.PlayerQuit;
-import me.RockinChaos.itemjoin.listeners.giveitems.Respawn;
-import me.RockinChaos.itemjoin.listeners.giveitems.RegionEnter;
-import me.RockinChaos.itemjoin.listeners.giveitems.WorldChange;
+import me.RockinChaos.itemjoin.listeners.SwitchHands;
+import me.RockinChaos.itemjoin.giveitems.listeners.LimitSwitch;
+import me.RockinChaos.itemjoin.giveitems.listeners.Inventory;
+import me.RockinChaos.itemjoin.giveitems.listeners.PlayerJoin;
+import me.RockinChaos.itemjoin.giveitems.listeners.PlayerQuit;
+import me.RockinChaos.itemjoin.giveitems.listeners.RegionEnter;
+import me.RockinChaos.itemjoin.giveitems.listeners.Respawn;
+import me.RockinChaos.itemjoin.giveitems.listeners.WorldSwitch;
 
 public class Hooks {
 	private static boolean hasVault;
@@ -36,6 +39,8 @@ public class Hooks {
 	private static boolean hasTokenEnchant;
 	private static boolean hasHeadDatabase;
 	private static boolean hasWorldGuard;
+	private static boolean hasNewNBTSystem;
+	private static boolean loggable;
 	private static int WorldGuardVersion;
 
 	public static void getHooks() {
@@ -52,6 +57,18 @@ public class Hooks {
 		hookxInventories();
 		hookTokenEnchant();
 		hookHeadDatabase();
+		hookNewNBTSystem();
+		setLoggable();
+		ConfigHandler.loadDelay();
+		ConfigHandler.loadGetItemPermissions();
+		ServerHandler.loadDebuggingMode();
+		PlayerJoin.setRunCommands();
+	}
+	
+	public static boolean hasNewNBTSystem() {
+		if (ServerHandler.hasSpecificUpdate("1_8")) {
+			return hasNewNBTSystem;
+		} else { return false; }
 	}
 	
 	public static boolean hasVault() {
@@ -126,30 +143,47 @@ public class Hooks {
 		ItemJoin.getInstance().getCommand("ij").setExecutor(new Commands());
 		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerJoin(), ItemJoin.getInstance());
 		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerQuit(), ItemJoin.getInstance());
-		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new WorldChange(), ItemJoin.getInstance());
+		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Inventory(), ItemJoin.getInstance());
+		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new WorldSwitch(), ItemJoin.getInstance());
+		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new LimitSwitch(), ItemJoin.getInstance());
 		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Respawn(), ItemJoin.getInstance());
 		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new InvClickSurvival(), ItemJoin.getInstance());
 		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new InvClickCreative(), ItemJoin.getInstance());
 		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Drops(), ItemJoin.getInstance());
-		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new InteractCmds(), ItemJoin.getInstance());
-		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new CancelInteract(), ItemJoin.getInstance());
+		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Interact(), ItemJoin.getInstance());
 		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Placement(), ItemJoin.getInstance());
-		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new ConsumeApples(), ItemJoin.getInstance());
-		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new ItemStore(), ItemJoin.getInstance());
+		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Consumes(), ItemJoin.getInstance());
+		
+		if (!ServerHandler.hasSpecificUpdate("1_8")) {
+			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Legacy_Storable(), ItemJoin.getInstance());
+		} else { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Storable(), ItemJoin.getInstance()); }
+		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Recipes(), ItemJoin.getInstance());
 
 		if (ServerHandler.hasSpecificUpdate("1_12") && getEventClass("entity.EntityPickupItemEvent") != null) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Pickups(), ItemJoin.getInstance());
-		} else {
-			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Deprecated_Pickups(), ItemJoin.getInstance());
-		}
+		} else { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Legacy_Pickups(), ItemJoin.getInstance()); }
 
 		if (ServerHandler.hasCombatUpdate() && getEventClass("player.PlayerSwapHandItemsEvent") != null) {
-		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new SwapHands(), ItemJoin.getInstance());
+		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new SwitchHands(), ItemJoin.getInstance());
 		}
 
-		if (hasWorldGuard == true) {
-			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new RegionEnter(), ItemJoin.getInstance());
-		}
+		if (hasWorldGuard == true) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new RegionEnter(), ItemJoin.getInstance()); }
+		
+	}
+	
+	public static void hookNewNBTSystem() {
+		if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true) { hasNewNBTSystem = true; } 
+		else { hasNewNBTSystem = false; }
+	}
+	
+	public static void setLoggable() {
+		if (ConfigHandler.getConfig("config.yml").getString("Log-Commands") != null) {
+			loggable = ConfigHandler.getConfig("config.yml").getBoolean("Log-Commands");
+		} else { loggable = true; }
+	}
+	
+	public static boolean isLoggable() {
+		return loggable;
 	}
 	
 	public static void hookMyWorlds() {

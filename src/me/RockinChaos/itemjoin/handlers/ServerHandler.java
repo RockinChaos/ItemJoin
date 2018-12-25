@@ -8,10 +8,11 @@ import org.bukkit.entity.Player;
 import me.RockinChaos.itemjoin.ItemJoin;
 
 public class ServerHandler {
+	private static boolean Debugging = false;
 	
-	public static boolean hasAquaticUpdate() {
+	public static boolean hasCombatUpdate() {
 		String pkgname = ItemJoin.getInstance().getServer().getClass().getPackage().getName();
-		String combatVersion = "v1_13_R0".replace("_", "").replace("R0", "").replace("R1", "").replace("R2", "").replace("R3", "").replace("R4", "").replace("R5", "").replaceAll("[a-z]", "");
+		String combatVersion = "v1_9_R0".replace("_", "").replace("R0", "").replace("R1", "").replace("R2", "").replace("R3", "").replace("R4", "").replace("R5", "").replaceAll("[a-z]", "");
 		String version = pkgname.substring(pkgname.lastIndexOf('.') + 1).replace("_", "").replace("R0", "").replace("R1", "").replace("R2", "").replace("R3", "").replace("R4", "").replace("R5", "").replaceAll("[a-z]", "");
 		if (Integer.parseInt(version) >= Integer.parseInt(combatVersion)) {
 			return true;
@@ -19,9 +20,9 @@ public class ServerHandler {
 		return false;
 	}
 	
-	public static boolean hasCombatUpdate() {
+	public static boolean hasAquaticUpdate() {
 		String pkgname = ItemJoin.getInstance().getServer().getClass().getPackage().getName();
-		String combatVersion = "v1_9_R0".replace("_", "").replace("R0", "").replace("R1", "").replace("R2", "").replace("R3", "").replace("R4", "").replace("R5", "").replaceAll("[a-z]", "");
+		String combatVersion = "v1_13_R0".replace("_", "").replace("R0", "").replace("R1", "").replace("R2", "").replace("R3", "").replace("R4", "").replace("R5", "").replaceAll("[a-z]", "");
 		String version = pkgname.substring(pkgname.lastIndexOf('.') + 1).replace("_", "").replace("R0", "").replace("R1", "").replace("R2", "").replace("R3", "").replace("R4", "").replace("R5", "").replaceAll("[a-z]", "");
 		if (Integer.parseInt(version) >= Integer.parseInt(combatVersion)) {
 			return true;
@@ -46,12 +47,6 @@ public class ServerHandler {
 		}
 	  return message;
 	}
-	
-    public static boolean hasSpigot() {
-        String path = "org.spigotmc.Metrics";
-        try { Class.forName(path); return true; } catch(Exception e) { return false; }
-    }
-
 
 	public static void sendConsoleMessage(String message) {
 		String prefix = "&7[&eItemJoin&7] ";
@@ -62,31 +57,39 @@ public class ServerHandler {
 			message = ChatColor.stripColor(message);
 			}
 		}
-		if (ItemHandler.containsIgnoreCase(message, "blankmessage")) {
+		if (message.equalsIgnoreCase("") || message.isEmpty()) {
 			message = "";
 	}
 		ItemJoin.getInstance().getServer().getConsoleSender().sendMessage(message);
 	}
 	
-	public static void sendCommandsMessage(CommandSender sender, String message) {
+	public static void sendErrorMessage(String message) {
+		String prefix = "&e[&4ITEMJOIN_ERROR&e]&c ";
+		message = prefix + message;
 		message = ChatColor.translateAlternateColorCodes('&', message).toString();
-		if (sender instanceof ConsoleCommandSender && ConfigHandler.getConfig("config.yml").getBoolean("Log-Coloration") != true) {
+		if (ConfigHandler.getConfig("config.yml") != null) {
+			if(ConfigHandler.getConfig("config.yml").getBoolean("Log-Coloration") != true) {
 			message = ChatColor.stripColor(message);
+			}
 		}
-		if (ItemHandler.containsIgnoreCase(message, "blankmessage")) {
+		if (message.equalsIgnoreCase("") || message.isEmpty()) {
 			message = "";
 	}
-		sender.sendMessage(message);
+		ItemJoin.getInstance().getServer().getConsoleSender().sendMessage(message);
 	}
 	
 	public static void sendPlayerMessage(Player player, String message) {
 		String prefix = "&7[&eItemJoin&7] ";
 		message = prefix + message;
 		message = ChatColor.translateAlternateColorCodes('&', message).toString();
-			if (ItemHandler.containsIgnoreCase(message, "blankmessage")) {
+			if (message.contains("blankmessage")) {
 				message = "";
 		}
 		player.sendMessage(message);
+	}
+	
+	public static void sendDebugTrace(Exception e) {
+		if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
 	}
 
 	public static void sendDebugMessage(String message) {
@@ -101,9 +104,10 @@ public class ServerHandler {
 	}
 	
 	public static boolean hasDebuggingMode() {
-		if (ConfigHandler.getConfig("config.yml").getBoolean("Debugging-Mode") == true) {
-			return true;
-		}
-		return false;
+		return Debugging;
+	}
+	
+	public static void loadDebuggingMode() {
+		Debugging = ConfigHandler.getConfig("config.yml").getBoolean("Debugging-Mode");
 	}
 }

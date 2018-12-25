@@ -1,133 +1,32 @@
 package me.RockinChaos.itemjoin.handlers;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.URL;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.UUID;
-
-import javax.net.ssl.HttpsURLConnection;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
-
-import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.properties.Property;
-import com.mojang.util.UUIDTypeAdapter;
 
 import de.domedd.betternick.BetterNick;
 import de.domedd.betternick.api.nickedplayer.NickedPlayer;
 import me.RockinChaos.itemjoin.ItemJoin;
-import me.RockinChaos.itemjoin.utils.Econ;
 import me.RockinChaos.itemjoin.utils.Hooks;
-import me.RockinChaos.itemjoin.utils.Reflection;
+import me.RockinChaos.itemjoin.utils.Legacy;
+import me.RockinChaos.itemjoin.utils.Utils;
 import net.milkbowl.vault.economy.EconomyResponse;
 
 public class PlayerHandler {
 	
-	public static boolean cancell = false;
-	private static HashMap < String, GameProfile > gameProfiles = new HashMap < String, GameProfile > ();
-
-	@SuppressWarnings("deprecation")
-	public static void updateInventory(final Player player) {
-        Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), (Runnable)new Runnable() {
-            public void run() {
-                player.updateInventory();
-            }
-        }, 1L);
-	}
+	private static final int PLAYER_CRAFT_INV_SIZE = 5;
 	
-	@SuppressWarnings("deprecation")
-	public static void delayUpdateInventory(final Player player, final long delay) {
-        Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), (Runnable)new Runnable() {
-            public void run() {
-                player.updateInventory();
-            }
-        }, delay);
-	}
-	
-	@SuppressWarnings("deprecation")
-	public static void setPerfectHandItem(Player player, ItemStack toSet, String type) {
-		if (ServerHandler.hasCombatUpdate() && type != null && type.equalsIgnoreCase("HAND")) {
-			player.getInventory().setItemInMainHand(toSet);
-		} else if (ServerHandler.hasCombatUpdate() && type != null && type.equalsIgnoreCase("OFF_HAND")) {
-			player.getInventory().setItemInOffHand(toSet);
-		} else if (!ServerHandler.hasCombatUpdate()) {
-			player.getInventory().setItemInHand(toSet);
-		}
-	}
-	
-	@SuppressWarnings("deprecation")
-	public static ItemStack getPerfectHandItem(Player player, String type) {
-		if (ServerHandler.hasCombatUpdate() && type != null && type.equalsIgnoreCase("HAND")) {
-			return player.getInventory().getItemInMainHand();
-		} else if (ServerHandler.hasCombatUpdate() && type != null && type.equalsIgnoreCase("OFF_HAND")) {
-			return player.getInventory().getItemInOffHand();
-		} else if (!ServerHandler.hasCombatUpdate()) {
-			return player.getInventory().getItemInHand();
-		}
-		return null;
-	}
-	
-	@SuppressWarnings("deprecation")
-	public static ItemStack getHandItem(Player player) {
-		if (ServerHandler.hasCombatUpdate() && player.getInventory().getItemInMainHand().getType() != null && player.getInventory().getItemInMainHand().getType() != Material.AIR) {
-			return player.getInventory().getItemInMainHand();
-		} else if (ServerHandler.hasCombatUpdate() && player.getInventory().getItemInOffHand().getType() != null && player.getInventory().getItemInOffHand().getType() != Material.AIR) {
-			return player.getInventory().getItemInOffHand();
-		} else if (!ServerHandler.hasCombatUpdate()) {
-			return player.getInventory().getItemInHand();
-		}
-		return null;
-	}
-	
-	@SuppressWarnings("deprecation")
-	public static ItemStack getMainHandItem(Player player) {
-		if (ServerHandler.hasCombatUpdate()) {
-			return player.getInventory().getItemInMainHand();
-		} if (!ServerHandler.hasCombatUpdate()) {
-			return player.getInventory().getItemInHand();
-		}
-		return null;
-	}
-	
-	@SuppressWarnings("deprecation")
-	public static ItemStack getOffHandItem(Player player) {
-		if (ServerHandler.hasCombatUpdate()) {
-			return player.getInventory().getItemInOffHand();
-		} if (!ServerHandler.hasCombatUpdate()) {
-			return player.getInventory().getItemInHand();
-		}
-		return null;
-	}
-	
-	@SuppressWarnings("deprecation")
-	public static void setInHandItem(Player player, ItemStack toSet) {
-		player.getInventory().setItemInHand(toSet);
-	}
-	
-	public static void setOffhandItem(Player player, ItemStack toSet) {
-		if (ServerHandler.hasCombatUpdate()) {
-		player.getInventory().setItemInOffHand(toSet);
-		}
-	}
-	
-	public static void setMainHandItem(Player player, ItemStack toSet) {
-		if (ServerHandler.hasCombatUpdate()) {
-		player.getInventory().setItemInMainHand(toSet);
-		}
-	}
+    public static boolean isCraftingInv(InventoryView view) {
+        return view.getTopInventory().getSize() == PLAYER_CRAFT_INV_SIZE;
+    }
 	
 	public static boolean isCreativeMode(Player player) {
 		final GameMode gamemode = player.getGameMode();
@@ -147,89 +46,146 @@ public class PlayerHandler {
 		return false;
 	}
 	
-	public static boolean getNewSkullMethod() {
-		try {
-			if (Class.forName("org.bukkit.inventory.meta.SkullMeta").getMethod("getOwningPlayer") != null) {
-			return true;
-			}
-		} catch (Exception e) {}
-		return false;
+	public static void setItemInHand(Player player, Material mat) {
+		Legacy.setLegacyInHandItem(player, new ItemStack(mat));
+	}
+	
+	public static void setHeldItemSlot(Player player) {
+		if (ConfigHandler.getConfig("config.yml").getString("HeldItem-Slot") != null 
+				&& Utils.isInt(ConfigHandler.getConfig("config.yml").getString("HeldItem-Slot")) 
+				&& ConfigHandler.getConfig("config.yml").getInt("HeldItem-Slot") <= 8 && ConfigHandler.getConfig("config.yml").getInt("HeldItem-Slot") >= 0) {
+			player.getInventory().setHeldItemSlot(ConfigHandler.getConfig("config.yml").getInt("HeldItem-Slot"));
+		}
+	}
+	
+	public static ItemStack getHandItem(Player player) {
+		if (ServerHandler.hasCombatUpdate() && player.getInventory().getItemInMainHand().getType() != null && player.getInventory().getItemInMainHand().getType() != Material.AIR) {
+			return player.getInventory().getItemInMainHand();
+		} else if (ServerHandler.hasCombatUpdate() && player.getInventory().getItemInOffHand().getType() != null && player.getInventory().getItemInOffHand().getType() != Material.AIR) {
+			return player.getInventory().getItemInOffHand();
+		} else if (!ServerHandler.hasCombatUpdate()) {
+			return Legacy.getLegacyInHandItem(player);
+		}
+		return null;
+	}
+	
+	public static ItemStack getPerfectHandItem(Player player, String type) {
+		if (ServerHandler.hasCombatUpdate() && type != null && type.equalsIgnoreCase("HAND")) {
+			return player.getInventory().getItemInMainHand();
+		} else if (ServerHandler.hasCombatUpdate() && type != null && type.equalsIgnoreCase("OFF_HAND")) {
+			return player.getInventory().getItemInOffHand();
+		} else if (!ServerHandler.hasCombatUpdate()) {
+			return Legacy.getLegacyInHandItem(player);
+		}
+		return null;
+	}
+	
+	public static ItemStack getMainHandItem(Player player) {
+		if (ServerHandler.hasCombatUpdate()) {
+			return player.getInventory().getItemInMainHand();
+		} if (!ServerHandler.hasCombatUpdate()) {
+			return Legacy.getLegacyInHandItem(player);
+		}
+		return null;
+	}
+	
+<<<<<<< HEAD
+	@SuppressWarnings("deprecation")
+	public static ItemStack getMainHandItem(Player player) {
+		if (ServerHandler.hasCombatUpdate()) {
+			return player.getInventory().getItemInMainHand();
+		} if (!ServerHandler.hasCombatUpdate()) {
+			return player.getInventory().getItemInHand();
+		}
+		return null;
 	}
 	
 	@SuppressWarnings("deprecation")
+=======
+>>>>>>> dev-version
+	public static ItemStack getOffHandItem(Player player) {
+		if (ServerHandler.hasCombatUpdate()) {
+			return player.getInventory().getItemInOffHand();
+		} if (!ServerHandler.hasCombatUpdate()) {
+<<<<<<< HEAD
+			return player.getInventory().getItemInHand();
+		}
+		return null;
+	}
+	
+	@SuppressWarnings("deprecation")
+	public static void setInHandItem(Player player, ItemStack toSet) {
+		player.getInventory().setItemInHand(toSet);
+=======
+			return Legacy.getLegacyInHandItem(player);
+		}
+		return null;
+>>>>>>> dev-version
+	}
+	
+	public static void setOffhandItem(Player player, ItemStack toSet) {
+		if (ServerHandler.hasCombatUpdate()) {
+			player.getInventory().setItemInOffHand(toSet);
+		}
+	}
+	
+	public static void updateExperienceLevels(final Player player) {
+        Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), (Runnable)new Runnable() {
+            public void run() {
+            	player.setExp(player.getExp());
+            	player.setLevel(player.getLevel());
+            }
+        }, 1L);
+	}
+	
+	public static void updateInventory(final Player player) {
+        Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), (Runnable)new Runnable() {
+            public void run() {
+            	Legacy.updateLegacyInventory(player);
+            }
+        }, 1L);
+	}
+	
+	public static void delayUpdateInventory(final Player player, final long delay) {
+        Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), (Runnable)new Runnable() {
+            public void run() {
+            	Legacy.updateLegacyInventory(player);
+            }
+        }, delay);
+	}
+	
+	public static boolean getNewSkullMethod() {
+		try {
+			if (Class.forName("org.bukkit.inventory.meta.SkullMeta").getMethod("getOwningPlayer") != null) { return true; }
+		} catch (Exception e) { }
+		return false;
+	}
+	
 	public static String getSkullOwner(ItemStack item) {
-		if (ServerHandler.hasSpecificUpdate("1_12") && item != null && item.hasItemMeta() && ItemHandler.isSkullTyping(item.getType()) 
+		if (ServerHandler.hasSpecificUpdate("1_12") && item != null && item.hasItemMeta() && ItemHandler.isSkull(item.getType()) 
 				&& ((SkullMeta) item.getItemMeta()).hasOwner() && getNewSkullMethod() != false) {
 			String owner =  ((SkullMeta) item.getItemMeta()).getOwningPlayer().getName();
 			if (owner != null) { return owner; }
 		} else if (item != null && item.hasItemMeta() 
-				&& ItemHandler.isSkullTyping(item.getType())
+				&& ItemHandler.isSkull(item.getType())
 				&& ((SkullMeta) item.getItemMeta()).hasOwner()) {
-			String owner = ((SkullMeta) item.getItemMeta()).getOwner();
+			String owner = Legacy.getLegacySkullOwner(((SkullMeta) item.getItemMeta()));
 			if (owner != null) { return owner; }
 		} 
 		return "NULL";
 	}
-	
-	@SuppressWarnings("deprecation")
-	public static ItemMeta setSkullOwner(ItemMeta tempmeta, String owner) {
-		if (ServerHandler.hasSpecificUpdate("1_8")) {
-        try {
-		    Method fetchProfile = Reflection.getOBC("entity.CraftPlayer").getDeclaredMethod("getProfile");
-            Field declaredField = tempmeta.getClass().getDeclaredField("profile");
-            declaredField.setAccessible(true);
-            if (ItemJoin.getInstance().getServer().getPlayer(owner) != null) { declaredField.set(tempmeta, fetchProfile.invoke(ItemJoin.getInstance().getServer().getPlayer(owner))); }
-            else if (ItemJoin.getInstance().getServer().getPlayer(owner) == null) {
-            	if(gameProfiles.get(owner) == null) {
-            	GameProfile profile = new GameProfile(ItemJoin.getInstance().getServer().getOfflinePlayer(owner).getUniqueId(), owner);
-            	setSkin(profile, ItemJoin.getInstance().getServer().getOfflinePlayer(owner).getUniqueId());
-                gameProfiles.put(owner, profile);
-            	}
-                declaredField.set(tempmeta, gameProfiles.get(owner));
-            }
-        } catch (Exception e) { if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }}
-		} else { 
-			if (ServerHandler.hasDebuggingMode()) { 
-				ServerHandler.sendDebugMessage("Minecraft does not support offline player heads below Version 1.8."); 
-				ServerHandler.sendDebugMessage("Player heads will only be given a skin if the player has previously joined the sever.");
-			}
-	        SkullMeta skullMeta = (SkullMeta)tempmeta;
-	        skullMeta.setOwner(owner);
-	        return skullMeta;
-	     }
-		return tempmeta;
-	}
-	
-	public static boolean setSkin(GameProfile profile, UUID uuid) {
-	    try {
-	        HttpsURLConnection connection = (HttpsURLConnection) new URL(String.format("https://sessionserver.mojang.com/session/minecraft/profile/%s?unsigned=false", UUIDTypeAdapter.fromUUID(uuid))).openConnection();
-	        if (connection.getResponseCode() == HttpsURLConnection.HTTP_OK) {
-	            String reply = new BufferedReader(new InputStreamReader(connection.getInputStream())).readLine();
-	            String skin = reply.split("\"value\":\"")[1].split("\"")[0];
-	            String signature = reply.split("\"signature\":\"")[1].split("\"")[0];
-	            profile.getProperties().put("textures", new Property("textures", skin, signature));
-	            return true;
-	        } else {
-	            System.out.println("Connection could not be opened (Response code " + connection.getResponseCode() + ", " + connection.getResponseMessage() + ")");
-	            return false;
-	        }
-	    } catch (IOException e) { if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
-	        return false;
-	    }
-	}
-	
-	@SuppressWarnings("deprecation")
-	public static Player getPlayerString(String player) {
+
+	public static Player getPlayerString(String playerName) {
 		Player args = null;
-		try { args = Bukkit.getPlayer(UUID.fromString(player)); } catch (Exception e) {}
-		if (player != null && Hooks.hasBetterNick()) {
-			NickedPlayer np = new NickedPlayer(Bukkit.getPlayer(player));
+		try { args = Bukkit.getPlayer(UUID.fromString(playerName)); } catch (Exception e) {}
+		if (playerName != null && Hooks.hasBetterNick()) {
+			NickedPlayer np = new NickedPlayer(Legacy.getLegacyPlayer(playerName));
 			if (np.isNicked()) {
-			return Bukkit.getPlayer(np.getRealName());
+			return Legacy.getLegacyPlayer(np.getRealName());
 			} else {
-				return Bukkit.getPlayer(player);
+				return Legacy.getLegacyPlayer(playerName);
 			}
-		} else if (args == null) { return Bukkit.getPlayer(player); }
+		} else if (args == null) { return Legacy.getLegacyPlayer(playerName); }
 		return args;
 	}
 	
@@ -265,28 +221,14 @@ public class PlayerHandler {
 		return "";
 	}
 	
-	@SuppressWarnings("deprecation")
-	public static Player getPlayer(Player player) {
-		Player args = null;
-		try { args = Bukkit.getPlayer(player.getUniqueId()); } catch (Exception e) {}
-		if (player != null && Hooks.hasBetterNick()) {
-			NickedPlayer np = new NickedPlayer(player);
-			if (np.isNicked()) {
-			return Bukkit.getPlayer(np.getRealName());
-			} else {
-				return Bukkit.getPlayer(player.getName());
-			}
-		} else if (args == null) { return Bukkit.getPlayer(player.getName()); }
-		return args;
-	}
-	
 	public static OfflinePlayer getOfflinePlayer(String playerName) {
-		Collection < ? extends OfflinePlayer > playersOnlineNew;
+		Collection<?> playersOnlineNew;
 		OfflinePlayer[] playersOnlineOld;
 		try {
 			if (Bukkit.class.getMethod("getOfflinePlayers", new Class < ? > [0]).getReturnType() == Collection.class) {
-				playersOnlineNew = (Collection < ? extends OfflinePlayer > )((Collection < ? > ) Bukkit.class.getMethod("getOfflinePlayers", new Class < ? > [0]).invoke(null, new Object[0]));
-				for (OfflinePlayer player: playersOnlineNew) {
+				playersOnlineNew = ((Collection < ? > ) Bukkit.class.getMethod("getOfflinePlayers", new Class < ? > [0]).invoke(null, new Object[0]));
+				for (Object objPlayer: playersOnlineNew) {
+					Player player = ((Player)objPlayer);
 					if (player.getName().equalsIgnoreCase(playerName)) {
 						return player;
 					}
@@ -299,13 +241,11 @@ public class PlayerHandler {
 					}
 				}
 			}
-		} catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-			if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
-		} 
-		
+		} catch (Exception e) { ServerHandler.sendDebugTrace(e); } 
 		return null;
 	}
 	
+<<<<<<< HEAD
 	@SuppressWarnings("deprecation")
 	public static void setItemInHand(Player player, Material mat) {
 		player.setItemInHand(new ItemStack(mat));
@@ -318,14 +258,13 @@ public class PlayerHandler {
 	}
 	
 	@SuppressWarnings("deprecation")
+=======
+>>>>>>> dev-version
 	public static double getBalance(Player player) {
-		double balance = Econ.econ.getBalance(player.getName());
-		return balance;
+		return Legacy.getLegacyBalance(player.getName());
 	}
 	
-	@SuppressWarnings("deprecation")
 	public static EconomyResponse withdrawBalance(Player player, int cost) {
-		EconomyResponse balance = Econ.econ.withdrawPlayer(player.getName(), cost);;
-		return balance;
+		return Legacy.withdrawLegacyBalance(player.getName(), cost);
 	}
 }

@@ -1,5 +1,6 @@
 package me.RockinChaos.itemjoin.utils;
 
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
@@ -10,8 +11,19 @@ import me.RockinChaos.itemjoin.handlers.ServerHandler;
 
 public class Language {
 	private static CommandSender argsplayer;
+	
+	public static void informPlayer(CommandSender sender, String message) {
+		message = ChatColor.translateAlternateColorCodes('&', message).toString();
+		if (sender instanceof ConsoleCommandSender && ConfigHandler.getConfig("config.yml").getBoolean("Log-Coloration") != true) {
+			message = ChatColor.stripColor(message);
+		}
+		if (message.equalsIgnoreCase("") || message.isEmpty()) {
+			message = "";
+	}
+		sender.sendMessage(message);
+	}
 
-	public static void getSendMessage(CommandSender sender, String MessageType, String ReplacementText) {
+	public static void sendMessage(CommandSender sender, String MessageType, String ReplacementText) {
 		if (ItemJoin.getInstance().getConfig().getString("Language") != null 
 				&& ItemJoin.getInstance().getConfig().getString("Language").equalsIgnoreCase("English")) {
 			sendEnglishMessage(sender, MessageType, ReplacementText);
@@ -27,9 +39,9 @@ public class Language {
 			String Prefix = "";
 			if (!MessageType.equalsIgnoreCase("inWorldListHeader") && !MessageType.equalsIgnoreCase("inWorldListed") 
 					&& !MessageType.equalsIgnoreCase("listWorldsHeader") && !MessageType.equalsIgnoreCase("listItems") && !MessageType.equalsIgnoreCase("itemInfo")) {
-			Prefix = Utils.format(ConfigHandler.getConfig("en-lang.yml").getString("Prefix"), player);
+			Prefix = Utils.translateLayout(ConfigHandler.getConfig("en-lang.yml").getString("Prefix"), player);
 			}
-			String sendMessage = Utils.format(ConfigHandler.getConfig("en-lang.yml").getString(MessageType), player);
+			String sendMessage = Utils.translateLayout(ConfigHandler.getConfig("en-lang.yml").getString(MessageType), player);
 				String ReplacementTextList = ReplacementText;
 				String[] TextSplits = ReplacementTextList.split(",");
 				for (String ReplaceText: TextSplits) {
@@ -68,7 +80,7 @@ public class Language {
 		} else {
 			    String[] splitMessage = sendMessage.replace(" <n> ", "<n>").replace("<n> ", "<n>").replace(" <n>", "<n>").split("<n>");
 			    for (String newMessage : splitMessage) {
-			    	ServerHandler.sendCommandsMessage(sender, Prefix + newMessage);
+			    	informPlayer(sender, Prefix + newMessage);
 			    }
 		}
 		}

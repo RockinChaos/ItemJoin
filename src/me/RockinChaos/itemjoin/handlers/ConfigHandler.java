@@ -5,7 +5,9 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import me.RockinChaos.itemjoin.ItemJoin;
+import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
 import me.RockinChaos.itemjoin.utils.Utils;
+import me.RockinChaos.itemjoin.utils.YAMLGenerator;
 import me.RockinChaos.itemjoin.utils.sqlite.SQLData;
 
 public class ConfigHandler {
@@ -14,7 +16,15 @@ public class ConfigHandler {
 	private static YamlConfiguration loadEnLang;
 	private static YamlConfiguration loadFirstJoin;
 	private static YamlConfiguration loadIPLimit;
+	private static boolean generate = false;
 	private static String NBTData = "ItemJoin";
+	private static long delay;
+	private static boolean getItemPermissions = false;
+	private static boolean preventInventoryModify = false;
+	private static boolean preventPickups = false;
+	private static boolean preventAllowOpBypass = false;
+	private static boolean preventAllowCreativeBypass = false;
+	private static String enabledPreventWorlds;
 	
 	public static void loadConfigs() {
 		configFile();
@@ -22,51 +32,32 @@ public class ConfigHandler {
 		enLangFile();
 		SQLData.convertYAMLS();
 	}
-
+	
+	public static Boolean isConfigurable() {
+		if (ConfigHandler.getConfigurationSection() != null) {
+			return true;
+		} else if (ConfigHandler.getConfigurationSection() == null) {
+			ServerHandler.sendConsoleMessage("&4There are no items detected in the items.yml.");
+			ServerHandler.sendConsoleMessage("&4Try adding an item to the items section in the items.yml.");
+			ServerHandler.sendConsoleMessage("&eIf you continue to see this message contact the plugin developer!");
+			return false;
+		}
+		return false;
+	}
+	
 	public static FileConfiguration loadConfig(String path) {
 		File file = new File(ItemJoin.getInstance().getDataFolder(), path);
 		if (!(file).exists()) {
 			try {
-				if (path.equalsIgnoreCase("items.yml")) {
-					if (ServerHandler.hasAquaticUpdate()) {
-						ItemJoin.getInstance().saveResource("items-v1.13.yml", false);
-						reNameFile("v1.13");
-					} else if (ServerHandler.hasCombatUpdate()) {
-						ItemJoin.getInstance().saveResource("items-v1.9.yml", false);
-						reNameFile("v1.9");
-					} else if (ServerHandler.hasSpecificUpdate("1_8")) {
-						ItemJoin.getInstance().saveResource("items-v1.8.yml", false);
-						reNameFile("v1.8");
-					} else if (ServerHandler.hasSpecificUpdate("1_7")) {
-						ItemJoin.getInstance().saveResource("items-v1.7.yml", false);
-						reNameFile("v1.7");
-					} else {
-						ItemJoin.getInstance().saveResource("items-v1.7.yml", false);
-						reNameFile("v1.7");
-					}
-				} else {
-					ItemJoin.getInstance().saveResource(path, false);
-				}
+				ItemJoin.getInstance().saveResource(path, false);
+				generate = true;
 			} catch (Exception e) {
-				if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+				ServerHandler.sendDebugTrace(e);
 				ItemJoin.getInstance().getLogger().warning("Cannot save " + path + " to disk!");
 				return null;
 			}
 		}
 		return getPath(path, 1, file);
-	}
-	
-	public static void reNameFile(String version) {
-		File File = new File(ItemJoin.getInstance().getDataFolder(), "items-" + version + ".yml");
-		if (File.exists()) {
-			String newGen = "items.yml";
-			File newFile = new File(ItemJoin.getInstance().getDataFolder(), newGen);
-			if (!newFile.exists()) {
-				File.renameTo(newFile);
-				File configFile = new File(ItemJoin.getInstance().getDataFolder(), "items-" + version + ".yml");
-				configFile.delete();
-			}
-		}
 	}
 
 	public static FileConfiguration getConfig(String path) {
@@ -112,7 +103,7 @@ public class ConfigHandler {
 		File File = new File(ItemJoin.getInstance().getDataFolder(), "config.yml");
 		if (File.exists() && getConfig("config.yml").getInt("config-Version") != 6) {
 			if (ItemJoin.getInstance().getResource("config.yml") != null) {
-				String newGen = "config" + Utils.getRandom(1500000, 10000000) + ".yml";
+				String newGen = "config" + Utils.getRandom(1, 50000) + ".yml";
 				File newFile = new File(ItemJoin.getInstance().getDataFolder(), newGen);
 				if (!newFile.exists()) {
 					File.renameTo(newFile);
@@ -131,7 +122,7 @@ public class ConfigHandler {
 		File itemsFile = new File(ItemJoin.getInstance().getDataFolder(), "items.yml");
 		if (itemsFile.exists() && getConfig("items.yml").getInt("items-Version") != 6) {
 			if (ItemJoin.getInstance().getResource("items.yml") != null) {
-				String newGen = "items" + Utils.getRandom(1500000, 10000000) + ".yml";
+				String newGen = "items" + Utils.getRandom(1, 50000) + ".yml";
 				File newFile = new File(ItemJoin.getInstance().getDataFolder(), newGen);
 				if (!newFile.exists()) {
 					itemsFile.renameTo(newFile);
@@ -142,6 +133,10 @@ public class ConfigHandler {
 				}
 			}
 		}
+		if (generate) { 
+			YAMLGenerator.generateItemsFile();
+			loadConfig("items.yml");
+		}
 		getConfig("items.yml").options().copyDefaults(false);
 	}
 	
@@ -150,7 +145,7 @@ public class ConfigHandler {
 	      File enLang = new File(ItemJoin.getInstance().getDataFolder(), "en-lang.yml");
 	      if (enLang.exists() && ItemJoin.getInstance().getConfig().getString("Language").equalsIgnoreCase("English") && getConfig("en-lang.yml").getInt("en-Version") != 6) {
 	      if (ItemJoin.getInstance().getResource("en-lang.yml") != null) {
-	        String newGen = "en-lang" + Utils.getRandom(1500000,10000000) + ".yml";
+	        String newGen = "en-lang" + Utils.getRandom(1, 50000) + ".yml";
 	        File newFile = new File(ItemJoin.getInstance().getDataFolder(), newGen);
 	           if (!newFile.exists()) {
 	    	      enLang.renameTo(newFile);
@@ -174,7 +169,7 @@ public class ConfigHandler {
 			}
 			return hiddenData;
 		} catch (Exception e) {
-			if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+			ServerHandler.sendDebugTrace(e);
 			return null;
 		}
 	}
@@ -197,9 +192,59 @@ public class ConfigHandler {
 				return returnData;
 			}
 		} catch (Exception e) {
-			if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+			ServerHandler.sendDebugTrace(e);
 			return null;
 		}
+	}
+	
+	public static String getNBTData(ItemMap itemMap) {
+		if (itemMap != null) {
+			return NBTData + itemMap.getItemValue() + itemMap.getConfigName();
+		} else { return NBTData; }
+	}
+	
+	public static long getItemDelay() {
+		return delay;
+	}
+	
+	public static void loadDelay() {
+		delay = ConfigHandler.getConfig("items.yml").getInt("items-Delay") * 10L;
+	}
+	
+	public static boolean getItemPermissions() {
+		return getItemPermissions;
+	}
+	
+	public static void loadGetItemPermissions() {
+		getItemPermissions = ConfigHandler.getConfig("config.yml").getBoolean("GetItem-Permissions");
+	}
+	
+	public static void loadGlobalPreventSettings() {
+		preventPickups = ConfigHandler.getConfig("config.yml").getBoolean("Prevent-Pickups");
+		preventInventoryModify = ConfigHandler.getConfig("config.yml").getBoolean("Prevent-InventoryModify");
+		preventAllowOpBypass = ConfigHandler.getConfig("config.yml").getBoolean("AllowOPBypass");
+		preventAllowCreativeBypass = ConfigHandler.getConfig("config.yml").getBoolean("CreativeBypass");
+		enabledPreventWorlds = ConfigHandler.getConfig("config.yml").getString("enabled-prevent-worlds");
+	}
+	
+	public static boolean isPreventPickups() {
+		return preventPickups;
+	}
+	
+	public static boolean isPreventInventoryModify() {
+		return preventInventoryModify;
+	}
+	
+	public static boolean isPreventAllowOpBypass() {
+		return preventAllowOpBypass;
+	}
+	
+	public static boolean isPreventAllowCreativeBypass() {
+		return preventAllowCreativeBypass;
+	}
+	
+	public static String getEnabledPreventWorlds() {
+		return enabledPreventWorlds;
 	}
 	
 	public static ConfigurationSection getConfigurationSection() {
@@ -218,16 +263,23 @@ public class ConfigHandler {
 		return getConfig("items.yml").getConfigurationSection(items.getCurrentPath() + ".lore");
 	}
 	
+	public static ConfigurationSection getMaterialSection(ConfigurationSection items) {
+		return getConfig("items.yml").getConfigurationSection(items.getCurrentPath() + ".id");
+	}
+	
+	public static ConfigurationSection getOwnerSection(ConfigurationSection items) {
+		return getConfig("items.yml").getConfigurationSection(items.getCurrentPath() + ".skull-owner");
+	}
+	
+	public static ConfigurationSection getTextureSection(ConfigurationSection items) {
+		return getConfig("items.yml").getConfigurationSection(items.getCurrentPath() + ".skull-texture");
+	}
+	
 	public static ConfigurationSection getPagesSection(ConfigurationSection items) {
 		return getConfig("items.yml").getConfigurationSection(items.getCurrentPath() + ".pages");
 	}
 	
 	public static ConfigurationSection getCommandsSection(ConfigurationSection items) {
 		return getConfig("items.yml").getConfigurationSection(items.getCurrentPath() + ".commands");
-	}
-
-	public static String getNBTData() {
-		return NBTData;
-	}
-	
+	}	
 }

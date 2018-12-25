@@ -30,11 +30,9 @@ public class Econ {
         return econ != null;
     }
     
-	   public static boolean isVaultAPI() {
-			  if (ItemJoin.getInstance().getServer().getPluginManager().getPlugin("Vault") != null 
-					  && ItemJoin.getInstance().getConfig().getBoolean("Vault") == true) {
-				  return true;
-				 }
-			return false;
-	   }
+    public static boolean isVaultAPI() {
+    	if (ItemJoin.getInstance().getServer().getPluginManager().getPlugin("Vault") != null 
+					  && ItemJoin.getInstance().getConfig().getBoolean("Vault") == true) { return true; }
+    	return false;
+    }
 }

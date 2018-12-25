@@ -1,34 +1,18 @@
 package me.RockinChaos.itemjoin.handlers;
 
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.entity.Player;
 
 public class PermissionsHandler {
 
-	public static String customPermissions(ConfigurationSection items, String item, String worldName) {
-		if (items.getString(".permission-node") != null) {
-			return items.getString(".permission-node");
+	public static String customPermissions(String permissionNode, String item, String worldName) {
+		if (permissionNode != null) {
+			return permissionNode;
 		}
 		return "itemjoin." + worldName + "." + item;
 	}
-
-	public static boolean hasItemsPermission(ConfigurationSection items, String item, Player player) {
-		String worldName = player.getWorld().getName();
-		if (ConfigHandler.getConfig("config.yml").getBoolean("Items-Permissions") == false) {
-			return true;
-		} else if (ConfigHandler.getConfig("config.yml").getBoolean("OPItems-Permissions") != false && player.isOp()) {
-			if (player.isPermissionSet(PermissionsHandler.customPermissions(items, item, worldName)) || player.isPermissionSet("itemjoin." + worldName + ".*")) {
-				return true;
-			}
-		} else if (player.hasPermission(PermissionsHandler.customPermissions(items, item, worldName)) || player.hasPermission("itemjoin." + worldName + ".*")) {
-			return true;
-		}
-		return false;
-	}
 	
 	public static boolean hasCommandPermission(CommandSender sender, String permission) {
-		if (sender.hasPermission(permission)) {
+		if (sender.hasPermission(permission) || sender.hasPermission("itemjoin.*")) {
 			return true;
 		} else if (ConfigHandler.getConfig("config.yml").getBoolean("OPCommands-Permissions") != true && sender.isOp()) {
 			if (permission.equalsIgnoreCase("itemjoin.use") || permission.equalsIgnoreCase("itemjoin.reload") || permission.equalsIgnoreCase("itemjoin.updates")

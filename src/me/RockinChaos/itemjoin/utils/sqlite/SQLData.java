@@ -12,7 +12,6 @@ import org.bukkit.entity.Player;
 
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
-import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.utils.Utils;
@@ -64,7 +63,7 @@ public class SQLData {
 	
 	public static void saveToDatabase(Player player, String item, String itemflag, String world) {
 		ConfigurationSection items = ConfigHandler.getItemSection(item);
-		if (items != null && ItemHandler.containsIgnoreCase(items.getString(".itemflags"), itemflag) || ItemHandler.containsIgnoreCase(itemflag, "first-join:") || ItemHandler.containsIgnoreCase(itemflag, "enabled-players") || ItemHandler.containsIgnoreCase(itemflag, "disabled-players")) {
+		if (items != null && Utils.containsIgnoreCase(items.getString(".itemflags"), itemflag) || Utils.containsIgnoreCase(itemflag, "first-join:") || Utils.containsIgnoreCase(itemflag, "enabled-players") || Utils.containsIgnoreCase(itemflag, "disabled-players")) {
 			createTables(itemflag);
 			String realPlayer = "ALL";
 			String realName = "ALL";
@@ -98,7 +97,7 @@ public class SQLData {
 		SQLite.getDatabase("database").closeConnection();
 	}
 	
-	public static int getMapID(Player player, String Image) {
+	public static int getMapID(String Image) {
 			try {
 				try {
 					createTables("map-id");
@@ -121,14 +120,10 @@ public class SQLData {
 			return 0;
 	}
 	
-	public static void saveMapImage(Player player, String item, String itemflag, String Image, int mapID) {
+	public static void saveMapImage(String item, String itemflag, String Image, int mapID) {
 		ConfigurationSection items = ConfigHandler.getItemSection(item);
 		if (items != null) {
 			createTables(itemflag);
-			@SuppressWarnings("unused")
-			String realPlayer = "ALL";
-			String realName = "ALL";
-			if (player != null) { realPlayer = PlayerHandler.getPlayerID(player); realName = player.getName().toString(); }
 			try {
 				if (itemflag.equalsIgnoreCase("map-id") && !isInDatabase(itemflag, "SELECT * FROM map_ids WHERE Map_IMG='" + Image + "';")
 						&& !isInDatabase(itemflag, "SELECT * FROM map_ids WHERE Map_IMG='" + Image + "' AND Map_ID='" + mapID + "';")) {
@@ -136,8 +131,8 @@ public class SQLData {
 					SQLite.getDatabase("database").closeConnection();
 				}
 			} catch (Exception e) {
-				ItemJoin.getInstance().getServer().getLogger().severe("Could not save " + realName + " to the data file!");
-				if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+				ItemJoin.getInstance().getServer().getLogger().severe("Could not save the mapId; " + mapID + "with the image; " + Image  + " to the data file!");
+				ServerHandler.sendDebugTrace(e);
 			}
 		}
 	}
@@ -154,7 +149,7 @@ public class SQLData {
 	}
 	
 	public static Boolean hasFirstCommanded(Player player, String command) {
-		if (ItemHandler.containsIgnoreCase(command, "first-join:") && isInDatabase(command, "SELECT * FROM first_commands WHERE World_Name='" + player.getWorld().getName() + "' AND Player_UUID='" + PlayerHandler.getPlayerID(player) + "' AND Command_String='" + command.replace("first-join: ", "").replace("first-join:", "") + "';")) {
+		if (Utils.containsIgnoreCase(command, "first-join:") && isInDatabase(command, "SELECT * FROM first_commands WHERE World_Name='" + player.getWorld().getName() + "' AND Player_UUID='" + PlayerHandler.getPlayerID(player) + "' AND Command_String='" + command.replace("first-join: ", "").replace("first-join:", "") + "';")) {
 			return true;
 		}
 		return false;
@@ -163,7 +158,7 @@ public class SQLData {
 	public static Boolean hasFirstJoined(Player player, String item) {
 		ConfigurationSection items = ConfigHandler.getItemSection(item);
 		String ItemFlags = items.getString(".itemflags");
-		if (ItemHandler.containsIgnoreCase(ItemFlags, "first-join") && isInDatabase("first-join", "SELECT * FROM first_join WHERE World_Name='" + player.getWorld().getName() + "' AND Player_UUID='" + PlayerHandler.getPlayerID(player) + "' AND Item_Name='" + item + "';")) {
+		if (Utils.containsIgnoreCase(ItemFlags, "first-join") && isInDatabase("first-join", "SELECT * FROM first_join WHERE World_Name='" + player.getWorld().getName() + "' AND Player_UUID='" + PlayerHandler.getPlayerID(player) + "' AND Item_Name='" + item + "';")) {
 			return true;
 		}
 		return false;
@@ -172,21 +167,21 @@ public class SQLData {
 	public static Boolean hasIPLimited(Player player, String item) {
 		ConfigurationSection items = ConfigHandler.getItemSection(item);
 		String ItemFlags = items.getString(".itemflags");
-		if (ItemHandler.containsIgnoreCase(ItemFlags, "ip-limit") && isLimited(player, item, player.getAddress().getHostString()) 
-				|| ItemHandler.containsIgnoreCase(ItemFlags, "ip-limit") && isLimited(player, item, player.getAddress().getHostString().replace(".", ""))) {
+		if (Utils.containsIgnoreCase(ItemFlags, "ip-limit") && isLimited(player, item, player.getAddress().getHostString()) 
+				|| Utils.containsIgnoreCase(ItemFlags, "ip-limit") && isLimited(player, item, player.getAddress().getHostString().replace(".", ""))) {
 			return true;
 		}
 		return false;
 	}
 	
-	public static Boolean hasImage(Player player, String item, String image) {
-		if (isImageSaved(player, item, image)) {
+	public static Boolean hasImage(String item, String image) {
+		if (isImageSaved(item, image)) {
 			return true;
 		}
 		return false;
 	}
 	
-	public static boolean isImageSaved(Player player, String item, String Image) {
+	public static boolean isImageSaved(String item, String Image) {
 		try {
 			createTables("map-id");
 			Statement statement = SQLite.getDatabase("database").getSQLConnection().createStatement();
