@@ -456,14 +456,18 @@ public class Commands implements CommandExecutor {
 			if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.permissions")) {
 				if (!(sender instanceof ConsoleCommandSender)) {
 					Language.informPlayer(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
+					List<String> customPermissions = new ArrayList<String>();
 					for (World world: ItemJoin.getInstance().getServer().getWorlds()) {
 						List <String> inputListed = new ArrayList<String>();
 						String Probable = ItemUtilities.getProbabilityItem(((Player) sender));
 						for (ItemMap item: ItemUtilities.getItems()) {
-							if (!inputListed.contains(item.getConfigName()) && item.inWorld(world) && ItemUtilities.isChosenProbability(item, Probable)) {
-								inputListed.add(item.getConfigName());
-								if (item.hasPermission(((Player) sender))) { Language.informPlayer(sender, "&a[\u2714] " + PermissionsHandler.customPermissions(item.getPermissionNode(), item.getConfigName(), world.getName())); } 
-								else { Language.informPlayer(sender, "&c[\u2718] " + PermissionsHandler.customPermissions(item.getPermissionNode(), item.getConfigName(), world.getName())); }
+							if (!customPermissions.contains(item.getPermissionNode()) && !inputListed.contains(item.getConfigName()) && item.inWorld(world) && ItemUtilities.isChosenProbability(item, Probable)) {
+								if (item.getPermissionNode() != null && !customPermissions.contains(item.getPermissionNode()) || item.getPermissionNode() == null) {
+									if (item.getPermissionNode() != null) { customPermissions.add(item.getPermissionNode()); }
+									inputListed.add(item.getConfigName());
+									if (item.hasPermission(((Player) sender))) { Language.informPlayer(sender, "&a[\u2714] " + PermissionsHandler.customPermissions(item.getPermissionNode(), item.getConfigName(), world.getName())); } 
+									else { Language.informPlayer(sender, "&c[\u2718] " + PermissionsHandler.customPermissions(item.getPermissionNode(), item.getConfigName(), world.getName())); }
+								}
 							}
 						}
 					}
@@ -510,7 +514,7 @@ public class Commands implements CommandExecutor {
 				for (ItemMap item: ItemUtilities.getItems()) {
 					if (item.inWorld(argsPlayer.getWorld()) && item.getConfigName().equalsIgnoreCase(args[1]) && ItemUtilities.isChosenProbability(item, Probable)) {
 						if (!item.hasItem(argsPlayer) || amount != 0 || item.isAlwaysGive()) {
-							if (!(ConfigHandler.getItemPermissions()) || item.hasPermission(argsPlayer) && ConfigHandler.getItemPermissions()) {
+							if (!(ConfigHandler.getAllItemPermissions()) || item.hasPermission(argsPlayer) && ConfigHandler.getAllItemPermissions()) {
 								if (item.isAlwaysGive() && args.length != 4) { amount = item.getCount(); }
 								item.giveTo(argsPlayer, true, amount);
 								Language.sendMessage(argsPlayer, "givenToYou", Utils.translateLayout(item.getCustomName(), argsPlayer));
@@ -542,7 +546,7 @@ public class Commands implements CommandExecutor {
 					for (ItemMap item: ItemUtilities.getItems()) {
 						if (item.inWorld(((Player) sender).getWorld()) && item.getConfigName().equalsIgnoreCase(args[1]) && ItemUtilities.isChosenProbability(item, Probable)) {
 							if (!item.hasItem(((Player) sender)) || amount != 0 || item.isAlwaysGive()) {
-								if (!(ConfigHandler.getItemPermissions()) || item.hasPermission(((Player) sender)) && ConfigHandler.getItemPermissions()) {
+								if (!(ConfigHandler.getAllItemPermissions()) || item.hasPermission(((Player) sender)) && ConfigHandler.getAllItemPermissions()) {
 									if (item.isAlwaysGive() && args.length != 4) { amount = item.getCount(); }
 									item.giveTo(((Player) sender), true, amount);
 									Language.sendMessage(((Player) sender), "givenToYou", Utils.translateLayout(item.getCustomName(), ((Player) sender)));
@@ -573,7 +577,7 @@ public class Commands implements CommandExecutor {
 				String Probable = ItemUtilities.getProbabilityItem(argsPlayer);
 				for (ItemMap item: ItemUtilities.getItems()) {
 					if (item.inWorld(argsPlayer.getWorld()) && ItemUtilities.isChosenProbability(item, Probable)) {
-						if (!(ConfigHandler.getItemPermissions()) || item.hasPermission(argsPlayer) && ConfigHandler.getItemPermissions()) {
+						if (!(ConfigHandler.getAllItemPermissions()) || item.hasPermission(argsPlayer) && ConfigHandler.getAllItemPermissions()) {
 							if (!item.hasItem(argsPlayer) || item.isAlwaysGive()) {
 								item.giveTo(argsPlayer, !item.isAlwaysGive(), 0);
 								itemGiven = true;
@@ -607,7 +611,7 @@ public class Commands implements CommandExecutor {
 					String Probable = ItemUtilities.getProbabilityItem(((Player) sender));
 					for (ItemMap item: ItemUtilities.getItems()) {
 						if (item.inWorld(((Player) sender).getWorld()) && ItemUtilities.isChosenProbability(item, Probable)) {
-							if (!(ConfigHandler.getItemPermissions()) || item.hasPermission(((Player) sender)) && ConfigHandler.getItemPermissions()) {
+							if (!(ConfigHandler.getAllItemPermissions()) || item.hasPermission(((Player) sender)) && ConfigHandler.getAllItemPermissions()) {
 								if (!item.hasItem(((Player) sender)) || item.isAlwaysGive()) {
 									item.giveTo(((Player) sender), !item.isAlwaysGive(), 0);
 									itemGiven = true;
@@ -770,7 +774,7 @@ public class Commands implements CommandExecutor {
         String Probable = ItemUtilities.getProbabilityItem(argsPlayer);
         for (ItemMap item: ItemUtilities.getItems()) {
             if (item.inWorld(argsPlayer.getWorld()) && item.getConfigName().equalsIgnoreCase(args) && ItemUtilities.isChosenProbability(item, Probable)) {
-                if (!(ConfigHandler.getItemPermissions()) || item.hasPermission(argsPlayer) && ConfigHandler.getItemPermissions()) {
+                if (!(ConfigHandler.getAllItemPermissions()) || item.hasPermission(argsPlayer) && ConfigHandler.getAllItemPermissions()) {
                 	if (item.isAlwaysGive() && amount == 0) { amount = item.getCount(); }
                     item.giveTo(argsPlayer, true, amount);
                     Language.sendMessage(argsPlayer, "givenToYou", Utils.translateLayout(item.getCustomName(), argsPlayer));

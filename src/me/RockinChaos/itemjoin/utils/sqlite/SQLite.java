@@ -94,5 +94,4 @@ public class SQLite extends Database {
 		} catch (SQLException e) { if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); } }
 		initialize();
 	}
-	
 }

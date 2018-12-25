@@ -351,5 +351,4 @@ public class SQLData {
 			ServerHandler.sendConsoleMessage("&aYAML to Database conversion complete!");
 		}
 	}
-	
 }

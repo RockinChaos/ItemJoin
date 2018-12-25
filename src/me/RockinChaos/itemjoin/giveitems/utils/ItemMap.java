@@ -839,9 +839,9 @@ public class ItemMap {
 	
 	public boolean hasPermission(Player player) {
 		String worldName = player.getWorld().getName();
-		if (ConfigHandler.getConfig("config.yml").getBoolean("Items-Permissions") == false) {
+		if (!ConfigHandler.getItemPermissions()) {
 			return true;
-		} else if (ConfigHandler.getConfig("config.yml").getBoolean("OPItems-Permissions") != false && player.isOp()) {
+		} else if (ConfigHandler.getOPItemPermissions() && player.isOp()) {
 			if (player.isPermissionSet(PermissionsHandler.customPermissions(this.permissionNode, this.configName, worldName)) || player.isPermissionSet("itemjoin." + worldName + ".*")) {
 				return true;
 			}

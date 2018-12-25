@@ -28,7 +28,6 @@ public class ItemJoin extends JavaPlugin {
   	}
   	
   	public void onDisable() {
-  		//AnimationHandler.CloseAllAnimations();
   		ServerHandler.sendConsoleMessage("&4has been Disabled!");
   	}
   	

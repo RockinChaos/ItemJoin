@@ -116,23 +116,7 @@ public class ItemCommand {
 	}
 	
 	private void dispatchSwapItem(Player player) {
-		try { 
-		//	ItemMeta itemMeta = item.getItemMeta();
-		//	item.setType(materialType);
-		//	itemMeta.setDisplayName(Utils.translateLayout(customName, player));
-		//	if (customLore != null && !customLore.isEmpty()) {
-		//		List < String > loreList = customLore;
-		//		List < String > loreFormatList = new ArrayList < String > ();
-		//		for (int k = 0; k < loreList.size(); k++) {
-		//			String formatLore = ItemHandler.purgeDelay(loreList.get(k));
-		///			formatLore = Utils.translateLayout(formatLore, player);
-		//			loreFormatList.add(formatLore);
-		//		}
-		//		itemMeta.setLore(loreFormatList);
-		//	}
-		//	
-		//	item.setItemMeta(itemMeta);
-		} 
+		try { } 
 		catch (Exception e) {
 			ServerHandler.sendErrorMessage("&cThere was an issue executing an item's command to swap an items attributes, if this continues please report it to the developer!");
 			ServerHandler.sendDebugTrace(e);

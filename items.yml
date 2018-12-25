@@ -43,7 +43,7 @@ items:
     custom-map-image: 'default.png'
     itemflags: item-store, unbreakable, hide-attributes, death-drops, self-drops, CreativeBypass
     triggers: join, respawn, world-change
-    permission-node: 'itemjoin.ultra'
+    permission-node: 'itemjoin.map'
     enabled-worlds: world, world_nether, world_the_end
   gamemode-item:
     id: FIREWORK_STAR

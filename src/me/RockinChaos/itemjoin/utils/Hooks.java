@@ -61,6 +61,8 @@ public class Hooks {
 		setLoggable();
 		ConfigHandler.loadDelay();
 		ConfigHandler.loadGetItemPermissions();
+		ConfigHandler.loadItemPermissions();
+		ConfigHandler.loadOPItemPermissions();
 		ServerHandler.loadDebuggingMode();
 		PlayerJoin.setRunCommands();
 	}

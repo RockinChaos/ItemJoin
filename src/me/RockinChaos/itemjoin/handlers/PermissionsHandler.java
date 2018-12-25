@@ -14,7 +14,7 @@ public class PermissionsHandler {
 	public static boolean hasCommandPermission(CommandSender sender, String permission) {
 		if (sender.hasPermission(permission) || sender.hasPermission("itemjoin.*")) {
 			return true;
-		} else if (ConfigHandler.getConfig("config.yml").getBoolean("OPCommands-Permissions") != true && sender.isOp()) {
+		} else if (ConfigHandler.getOPItemPermissions() && sender.isOp()) {
 			if (permission.equalsIgnoreCase("itemjoin.use") || permission.equalsIgnoreCase("itemjoin.reload") || permission.equalsIgnoreCase("itemjoin.updates")
 					|| permission.equalsIgnoreCase("itemjoin.autoupdate") || permission.equalsIgnoreCase("itemjoin.creator") || permission.equalsIgnoreCase("itemjoin.purge") 
 							|| permission.equalsIgnoreCase("itemjoin.save") || permission.equalsIgnoreCase("itemjoin.get") || permission.equalsIgnoreCase("itemjoin.get.others")
@@ -26,5 +26,4 @@ public class PermissionsHandler {
 		}
 		return false;
 	}
-	
 }
