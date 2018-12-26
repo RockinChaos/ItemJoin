@@ -27,6 +27,7 @@ import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.utils.Hooks;
 import me.RockinChaos.itemjoin.utils.ImageRenderer;
+import me.RockinChaos.itemjoin.utils.Legacy;
 import me.RockinChaos.itemjoin.utils.Reflection;
 import me.RockinChaos.itemjoin.utils.Utils;
 import me.RockinChaos.itemjoin.utils.sqlite.SQLData;
@@ -275,7 +276,10 @@ public class ItemDesigner {
 				} else if (!SQLData.hasImage(itemMap.getConfigName(), itemMap.getMapImage())) {
 					MapView view = ImageRenderer.NewMapView();
 					try { view.removeRenderer(view.getRenderers().get(0)); } catch (NullPointerException e) { ServerHandler.sendDebugTrace(e); }
-					int mapID = view.getId();
+					int mapID;
+					try {
+						mapID = view.getId();
+					} catch (NoSuchMethodError e) { mapID = Legacy.getMapID(view); }
 					itemMap.setMapID(mapID);
 					try { view.addRenderer(new ImageRenderer(itemMap.getMapImage(), mapID)); } catch (NullPointerException e) { ServerHandler.sendDebugTrace(e); }
 					SQLData.saveMapImage(itemMap.getConfigName(), "map-id", itemMap.getMapImage(), mapID);
