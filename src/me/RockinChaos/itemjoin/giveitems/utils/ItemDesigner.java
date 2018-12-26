@@ -85,7 +85,7 @@ public class ItemDesigner {
 		ConfigurationSection itemNode = ConfigHandler.getItemSection(internalName);
 		String id = ItemHandler.getMaterialPath(itemNode);
 		String originalID = id;
-		if (id.contains(":")) { 
+		if (id.contains(":") && ServerHandler.hasAquaticUpdate()) { 
 			String[] parts = id.split(":"); id = parts[0]; 
 			ServerHandler.sendConsoleMessage("&4[WARNING] The item " + internalName + " is using an ItemID (Numerical Value) which is no longer supported as of Minecraft 1.13, instead use its material name.");
 			ServerHandler.sendConsoleMessage("&4This will cause issues, please see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html for a list of material names.");
