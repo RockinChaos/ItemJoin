@@ -85,10 +85,12 @@ public class ItemDesigner {
 		ConfigurationSection itemNode = ConfigHandler.getItemSection(internalName);
 		String id = ItemHandler.getMaterialPath(itemNode);
 		String originalID = id;
-		if (id.contains(":") && ServerHandler.hasAquaticUpdate()) { 
+		if (id.contains(":")) { 
 			String[] parts = id.split(":"); id = parts[0]; 
-			ServerHandler.sendConsoleMessage("&4[WARNING] The item " + internalName + " is using an ItemID (Numerical Value) which is no longer supported as of Minecraft 1.13, instead use its material name.");
-			ServerHandler.sendConsoleMessage("&4This will cause issues, please see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html for a list of material names.");
+			if (ServerHandler.hasAquaticUpdate()) {
+				ServerHandler.sendConsoleMessage("&4[WARNING] The item " + internalName + " is using an ItemID (Numerical Value) which is no longer supported as of Minecraft 1.13, instead use its material name.");
+				ServerHandler.sendConsoleMessage("&4This will cause issues, please see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html for a list of material names.");
+			}
 		}
 		if (slot != null) {
 			if (!Utils.isInt(slot) && !ItemHandler.isCustomSlot(slot)) {
@@ -116,15 +118,18 @@ public class ItemDesigner {
 				ServerHandler.sendConsoleMessage("&4Your server is running &eMC " + Reflection.getServerVersion() + " and this version of Minecraft does not have the item LINGERING_POTION!");
 				ServerHandler.sendConsoleMessage("&4You are receiving this notice because the item(s) exists in your items.yml and will not be set, please remove the item(s) or update your server!");
 				return false;
-			} else if (ItemHandler.getMaterial(originalID, null, itemNode.getName()) == null) {
+			} else if (ItemHandler.getMaterial(originalID, null) == null) {
 				ServerHandler.sendConsoleMessage("&4Your server is running &eMC " + Reflection.getServerVersion() + " and this version of Minecraft does not have the item " + id);
 				ServerHandler.sendConsoleMessage("&4You are receiving this notice because the item(s) exists in your items.yml and will not be set, please remove the item(s) or update your server!");
 				return false;
 			}
 		} else {
-			if (ItemHandler.getMaterial(originalID, null, itemNode.getName()) == null) {
+			if (ItemHandler.getMaterial(originalID, null) == null) {
 				ServerHandler.sendConsoleMessage("&eThe Item " + internalName + "'s Material 'ID' is invalid or does not exist!");
 				ServerHandler.sendConsoleMessage("&eThe Item " + internalName + " &ewill not be set!");
+				if (Utils.isInt(id)) {
+					ServerHandler.sendConsoleMessage("&eIf you are using a numerical id and a numberical data-value make sure you include quotations or apostrophes at the beginning and end or it will break the configuration file, it should look like '160:15' or \"160:15\".");
+				}
 				return false;
 			}
 		}
@@ -148,10 +153,10 @@ public class ItemDesigner {
 			itemMap.setDynamicMaterials(materials);
 			material = ItemHandler.purgeDelay(itemMap.getNodeLocation().getString(".id." + ConfigHandler.getMaterialSection(itemMap.getNodeLocation()).getKeys(false).iterator().next()));
 			if (material.contains(":")) { String[] parts = material.split(":"); itemMap.setDataValue((short) Integer.parseInt(parts[1])); }
-			return ItemHandler.getMaterial(material, null, itemMap.getConfigName());
+			return ItemHandler.getMaterial(material, null);
 		}
 		if (material.contains(":")) { String[] parts = material.split(":"); itemMap.setDataValue((short) Integer.parseInt(parts[1])); }
-		return ItemHandler.getMaterial(material, null, itemMap.getConfigName());
+		return ItemHandler.getMaterial(material, null);
 	}
 	
 	private void setMaterial(ItemMap itemMap) {

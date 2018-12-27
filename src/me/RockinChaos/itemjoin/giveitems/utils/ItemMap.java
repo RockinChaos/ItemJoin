@@ -1108,7 +1108,7 @@ public class ItemMap {
 			material = ItemHandler.purgeDelay(material);
 			String dataValue = null;
 			if (material.contains(":")) { String[] parts = material.split(":"); dataValue = parts[1]; }
-			if (item.getType() == ItemHandler.getMaterial(material, dataValue, this.getConfigName())) {
+			if (item.getType() == ItemHandler.getMaterial(material, dataValue)) {
 				return true;
 			}
 		}

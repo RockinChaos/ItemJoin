@@ -120,7 +120,7 @@ public class ItemHandler {
 		return null;
 	}
 	
-	public static Material getMaterial(String material, String dataVal, String name) {
+	public static Material getMaterial(String material, String dataVal) {
 		try {
 			boolean isLegacy = false;
 			if (material.contains(":")) { String[] parts = material.split(":"); material = parts[0]; dataVal = parts[1]; isLegacy = true; }

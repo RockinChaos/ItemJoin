@@ -192,12 +192,12 @@ public class ItemAnimation {
 				else { mat = Legacy.convertLegacyMaterial(Integer.parseInt(parts[0]), (byte) Integer.parseInt(parts[1])); }
 				if (mat != null && mat != Material.AIR) { transAnimate.setType(mat); }
 			} else {
-				mat = ItemHandler.getMaterial(parts[0], null, itemMap.getConfigName());
+				mat = ItemHandler.getMaterial(parts[0], null);
 				if (mat != null && mat != Material.AIR) { transAnimate.setType(mat); }	
 				Legacy.setLegacyDurability(transAnimate, (byte) Integer.parseInt(parts[1]));
 			}
 		} else {
-			mat = ItemHandler.getMaterial(materialString, null, itemMap.getConfigName());
+			mat = ItemHandler.getMaterial(materialString, null);
 			if (mat != null && mat != Material.AIR) { transAnimate.setType(mat); }
 		}
 	}
