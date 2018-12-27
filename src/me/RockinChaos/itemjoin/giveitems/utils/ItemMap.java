@@ -187,59 +187,111 @@ public class ItemMap {
 	private boolean useOnLimitSwitch = false;
 //  ============================================== //
 	
-	private String permissionNode;
-	private boolean permissionNeeded;
+	private String permissionNode = null;
+	private boolean permissionNeeded = true;
+	private boolean opPermissionNeeded = false;
 	
 	private String enabledRegions;
 	private List < String > enabledWorlds = new ArrayList < String > ();
 // ======================================================================================== //
 	
+//  ============================================== //
+//  	  		 Initialize ItemMap  		       //
+//  ============================================== //
 	public ItemMap(String internalName, String slot) {
         this.nodeLocation = ConfigHandler.getItemSection(internalName);
-        
         this.configName = internalName;
         
-		if (this.nodeLocation.getString(".count") != null && Utils.isInt(this.nodeLocation.getString(".count"))) {
-			 this.count = this.nodeLocation.getInt(".count");
-		}
-        
-        if (this.nodeLocation.getString(".permission-node") != null) {
-        	this.permissionNode = this.nodeLocation.getString(".permission-node");
-        }
-		
-        this.itemflags = this.nodeLocation.getString(".itemflags");
-        this.setItemFlagsBooleans();
-        
-        this.limitModes = this.nodeLocation.getString(".limit-modes");
-        
-		String ItemID = ItemHandler.getItemID(slot); // <--- NEEDS MAJOR WORK.
-		this.itemValue = ItemID;
-
+        this.setSlot(slot);
+        this.setCount(this.nodeLocation.getString(".count"));
 		this.setCommands(ItemCommand.arrayFromString(this));
-		this.useCooldown = this.nodeLocation.getString("commands-cooldown") != null;
+		this.setCommandCost();
+		this.setCommandSound();
+		this.setCommandCooldown();
+		this.setCommandType();
+		this.setCommandSequence();
+        this.setInteractCooldown();
+        this.setItemflags();
+        this.setLimitModes();
+        this.setTriggers();
+		this.setWorlds();
+		this.setRegions();
+        this.setPerm(this.nodeLocation.getString(".permission-node"));
+        this.setPermissionNeeded(ConfigHandler.getConfig("config.yml").getBoolean("Items-Permissions"));
+    	this.setOPPermissionNeeded(ConfigHandler.getConfig("config.yml").getBoolean("OPItems-Permissions"));
+	}
+//  ========================================================================================================= //
+	
+//  ============================================== //
+//   Setter functions for first ItemMap creation.  //
+//  ============================================== //
+	private void setCommandCost() {
 		if (this.nodeLocation.getString("commands-cost") != null && Utils.isInt(this.nodeLocation.getString("commands-cost"))) { this.cost = this.nodeLocation.getInt("commands-cost"); }
-		
-		try {
-		if (this.nodeLocation.getString(".commands-sound") != null) { this.commandSound = Sound.valueOf(this.nodeLocation.getString(".commands-sound")); }
-		} catch (Exception e) { ServerHandler.sendDebugTrace(e); ServerHandler.sendDebugMessage("&4Your server is running &eMC " + Reflection.getServerVersion() + " and this version of Minecraft does not have the defined command-sound &e" + this.nodeLocation.getString(".commands-sound")); }
+	}
+	
+	private void setCommandSound() {
+		try { if (this.nodeLocation.getString(".commands-sound") != null) { this.commandSound = Sound.valueOf(this.nodeLocation.getString(".commands-sound")); } } 
+		catch (Exception e) { ServerHandler.sendDebugTrace(e); ServerHandler.sendDebugMessage("&4Your server is running &eMC " + Reflection.getServerVersion() + 
+				" and this version of Minecraft does not have the defined command-sound &e" + this.nodeLocation.getString(".commands-sound")); }
+	    
+	}
+	
+	private void setCommandCooldown() {
+		this.useCooldown = this.nodeLocation.getString("commands-cooldown") != null;
 		if (this.useCooldown) { this.cooldownSeconds = this.nodeLocation.getInt("commands-cooldown"); }
 		this.cooldownMessage = this.nodeLocation.getString("cooldown-message");
-		
+	}
+	
+	private void setCommandType() {
 		if (this.nodeLocation.getString("commands-type") != null) { 
-			if (Utils.containsIgnoreCase(this.nodeLocation.getString("commands-type"), "INTERACT") && Utils.containsIgnoreCase(this.nodeLocation.getString("commands-type"), "INVENTORY")) { this.type = CommandType.BOTH; }
+			if (Utils.containsIgnoreCase(this.nodeLocation.getString("commands-type"), "INTERACT") 
+				&& Utils.containsIgnoreCase(this.nodeLocation.getString("commands-type"), "INVENTORY")) { this.type = CommandType.BOTH; }
 			else if (Utils.containsIgnoreCase(this.nodeLocation.getString("commands-type"), "INTERACT")) { this.type = CommandType.INTERACT; }
 			else if (Utils.containsIgnoreCase(this.nodeLocation.getString("commands-type"), "INVENTORY")) { this.type = CommandType.INVENTORY; }
 		}
-	    
+	}
+	
+	private void setCommandSequence() {
 		if (this.nodeLocation.getString("commands-sequence") != null) { 
 		    if (Utils.containsIgnoreCase(this.nodeLocation.getString("commands-sequence"), "SEQUENTIAL")) { this.sequence = CommandSequence.SEQUENTIAL; }
 			else if (Utils.containsIgnoreCase(this.nodeLocation.getString("commands-sequence"), "RANDOM")) { this.sequence = CommandSequence.RANDOM; }
 		}
-		
+	}
+
+	private void setInteractCooldown() {
         if (this.nodeLocation.getString(".use-cooldown") != null) {
         	this.interactCooldown = this.nodeLocation.getInt(".use-cooldown");
         }
-		
+	}
+	
+	private void setItemflags() {
+		if (this.nodeLocation.getString(".itemflags") != null) {
+			this.itemflags = this.nodeLocation.getString(".itemflags");
+			this.vanillaItem = Utils.containsIgnoreCase(this.itemflags, "vanilla");
+			this.disposable = Utils.containsIgnoreCase(this.itemflags, "disposable");
+			this.blockPlacement = Utils.containsIgnoreCase(this.itemflags, "placement");
+			this.blockMovement = Utils.containsIgnoreCase(this.itemflags, "inventory-modify");
+			this.allowModifications = Utils.containsIgnoreCase(this.itemflags, "allow-modifications");
+			this.alwaysGive = Utils.containsIgnoreCase(this.itemflags, "always-give");
+			this.dynamic = Utils.containsIgnoreCase(this.itemflags, "dynamic");
+			this.animate = Utils.containsIgnoreCase(this.itemflags, "animate");
+			this.itemStore = Utils.containsIgnoreCase(this.itemflags, "item-store");
+			this.noCrafting = Utils.containsIgnoreCase(this.itemflags, "item-craftable");
+			this.noRepairing = Utils.containsIgnoreCase(this.itemflags, "item-repairable");
+			this.cancelEvents = Utils.containsIgnoreCase(this.itemflags, "cancel-events");
+			this.countLock = Utils.containsIgnoreCase(this.itemflags, "count-lock");
+			this.deathDroppable = Utils.containsIgnoreCase(this.itemflags, "death-drops");
+			this.selfDroppable = Utils.containsIgnoreCase(this.itemflags, "self-drops");
+			this.AllowOpBypass = Utils.containsIgnoreCase(this.itemflags, "AllowOpBypass");
+			this.CreativeBypass = Utils.containsIgnoreCase(this.itemflags, "CreativeBypass");
+		}
+	}
+	
+	private void setLimitModes() {
+		this.limitModes = this.nodeLocation.getString(".limit-modes");
+	}
+	
+	private void setTriggers() {
 		if (this.nodeLocation.getString("triggers") != null) {
 			this.triggers = this.nodeLocation.getString("triggers");
 			this.giveOnDisabled = Utils.containsIgnoreCase(this.triggers, "DISABLED");
@@ -249,18 +301,10 @@ public class ItemMap {
 			this.giveOnRegionEnter =Utils.containsIgnoreCase(this.triggers, "REGION-ENTER");
 			this.takeOnRegionLeave = Utils.containsIgnoreCase(this.triggers, "REGION-REMOVE");
 			this.useOnLimitSwitch = Utils.containsIgnoreCase(this.triggers, "GAMEMODE-SWITCH");
-		}
-        
-		for (World world: Bukkit.getServer().getWorlds()) {
-			if (Utils.containsIgnoreCase(this.nodeLocation.getString(".enabled-worlds"), world.getName())) {
-				this.enabledWorlds.add(world.getName());
-			}
-		}
-		
-		if (Utils.containsIgnoreCase(this.nodeLocation.getString(".enabled-worlds"), "ALL") || Utils.containsIgnoreCase(this.nodeLocation.getString(".enabled-worlds"), "GLOBAL")) {
-			this.enabledWorlds.add("ALL");
-		}
-		
+		} else { this.giveOnJoin = true; }
+	}
+	
+	private void setRegions() {
 		if (this.nodeLocation.getString(".enabled-regions") != null) {
 			this.enabledRegions = this.nodeLocation.getString(".enabled-regions");
 			String regionlist = this.nodeLocation.getString(".enabled-regions").replace(" ", "");
@@ -268,9 +312,17 @@ public class ItemMap {
 			for (String region: regions) {
 				RegionEnter.addLocaleRegion(region);
 			}
-		} else { if (isGiveOnRegionEnter() || isTakeOnRegionLeave()) { RegionEnter.addLocaleRegion("UNDEFINED"); this.enabledRegions = "UNDEFINED"; } }
-
-        setSlot(slot);
+		} else if (isGiveOnRegionEnter() || isTakeOnRegionLeave()) { RegionEnter.addLocaleRegion("UNDEFINED"); this.enabledRegions = "UNDEFINED"; }
+	}
+	
+	private void setWorlds() {
+		if (Utils.containsIgnoreCase(this.nodeLocation.getString(".enabled-worlds"), "ALL") || Utils.containsIgnoreCase(this.nodeLocation.getString(".enabled-worlds"), "GLOBAL") 
+		|| this.nodeLocation.getString(".enabled-worlds") == null || this.nodeLocation.getString(".enabled-worlds").isEmpty()) { this.enabledWorlds.add("ALL"); }
+		for (World world: Bukkit.getServer().getWorlds()) {
+			if (Utils.containsIgnoreCase(this.nodeLocation.getString(".enabled-worlds"), world.getName())) {
+				this.enabledWorlds.add(world.getName());
+			}
+		}
 	}
 	
 	public void renderItemStack() {
@@ -278,30 +330,11 @@ public class ItemMap {
         	this.tempItem = Legacy.newLegacyItemStack(this.material, this.count, this.dataValue);
         } else { this.tempItem = new ItemStack(this.material, this.count); }
 	}
+//  ======================================================================================================================================================================================== //
 
 //  ===================== //
 //  ~ Setting Functions ~ //
 //  ===================== //
-	public void setItemFlagsBooleans() {
-		this.vanillaItem = Utils.containsIgnoreCase(this.itemflags, "vanilla");
-		this.disposable = Utils.containsIgnoreCase(this.itemflags, "disposable");
-		this.blockPlacement = Utils.containsIgnoreCase(this.itemflags, "placement");
-		this.blockMovement = Utils.containsIgnoreCase(this.itemflags, "inventory-modify");
-		this.allowModifications = Utils.containsIgnoreCase(this.itemflags, "allow-modifications");
-		this.alwaysGive = Utils.containsIgnoreCase(this.itemflags, "always-give");
-		this.dynamic = Utils.containsIgnoreCase(this.itemflags, "dynamic");
-		this.animate = Utils.containsIgnoreCase(this.itemflags, "animate");
-		this.itemStore = Utils.containsIgnoreCase(this.itemflags, "item-store");
-		this.noCrafting = Utils.containsIgnoreCase(this.itemflags, "item-craftable");
-		this.noRepairing = Utils.containsIgnoreCase(this.itemflags, "item-repairable");
-		this.cancelEvents = Utils.containsIgnoreCase(this.itemflags, "cancel-events");
-		this.countLock = Utils.containsIgnoreCase(this.itemflags, "count-lock");
-		this.deathDroppable = Utils.containsIgnoreCase(this.itemflags, "death-drops");
-		this.selfDroppable = Utils.containsIgnoreCase(this.itemflags, "self-drops");
-		this.AllowOpBypass = Utils.containsIgnoreCase(this.itemflags, "AllowOpBypass");
-		this.CreativeBypass = Utils.containsIgnoreCase(this.itemflags, "CreativeBypass");
-	}
-	
 	public void setTempItem(ItemStack temp) {
 		this.tempItem = temp;
 	}
@@ -365,8 +398,10 @@ public class ItemMap {
 	public void setSlot(String slot) {
 		if (ItemHandler.isCustomSlot(slot)) {
 			this.CustomSlot = slot;
+			this.itemValue = ItemHandler.getItemID(slot); // <--- NEEDS MAJOR WORK.
 		} else if (Utils.isInt(slot)) {
 			this.InvSlot = Integer.parseInt(slot);
+			this.itemValue = ItemHandler.getItemID(slot); // <--- NEEDS MAJOR WORK.
 		}
 	}
 	
@@ -390,8 +425,10 @@ public class ItemMap {
 		this.sequence = sequence;
 	}
 	
-	public void setCount(Integer count) {
-		this.count = count;
+	public void setCount(String count) {
+		if (count != null && Utils.isInt(count)) {
+			this.count = Integer.parseInt(count);
+		}
 	}
 	
 	public void setDurability(Short durability) {
@@ -471,6 +508,10 @@ public class ItemMap {
 	
 	public void setPermissionNeeded(boolean bool) {
 		this.permissionNeeded = bool;
+	}
+	
+	public void setOPPermissionNeeded(boolean bool) {
+		this.opPermissionNeeded = bool;
 	}
 	
 	public void setVanilla(boolean bool) {
@@ -839,9 +880,9 @@ public class ItemMap {
 	
 	public boolean hasPermission(Player player) {
 		String worldName = player.getWorld().getName();
-		if (!ConfigHandler.getItemPermissions()) {
+		if (!this.isPermissionNeeded()) {
 			return true;
-		} else if (ConfigHandler.getOPItemPermissions() && player.isOp()) {
+		} else if (this.isOPPermissionNeeded() && player.isOp()) {
 			if (player.isPermissionSet(PermissionsHandler.customPermissions(this.permissionNode, this.configName, worldName)) || player.isPermissionSet("itemjoin." + worldName + ".*")) {
 				return true;
 			}
@@ -904,6 +945,10 @@ public class ItemMap {
 	
 	public boolean isPermissionNeeded() {
 		return this.permissionNeeded;
+	}
+	
+	public boolean isOPPermissionNeeded() {
+		return this.opPermissionNeeded;
 	}
 	
 	public boolean isVanilla() {
