@@ -1070,9 +1070,9 @@ public class ItemMap {
 						|| this.isSkull() && this.skullAnimated && this.isSkull(item)) {
 					if (isEnchantSimilar(item) || !item.getItemMeta().hasEnchants() && enchants.isEmpty() || this.isModifiyable()) {
 						if (this.material.toString().toUpperCase().contains("BOOK") 
-								&& ((BookMeta) item.getItemMeta()).hasPages() 
+								&& this.isBookMeta(item) 
 								&& ((BookMeta) item.getItemMeta()).getPages().equals(((BookMeta) tempItem.getItemMeta()).getPages())
-								|| !this.material.toString().toUpperCase().contains("BOOK") || this.isModifiyable()) {
+								|| this.material.toString().toUpperCase().contains("BOOK") && !this.isBookMeta(item) || !this.material.toString().toUpperCase().contains("BOOK") || this.isModifiyable()) {
 							return true;
 						}
 					}
@@ -1094,6 +1094,12 @@ public class ItemMap {
 			return item.getItemMeta().getEnchants().equals(checkItem.getItemMeta().getEnchants());
 		}
 		return false;
+	}
+	
+	private boolean isBookMeta(ItemStack item) {
+		try {
+			return ((BookMeta) item.getItemMeta()).hasPages();
+		} catch (Exception e) { return false; }
 	}
 	
 	public boolean isCountSimilar(ItemStack item) {
@@ -1459,7 +1465,7 @@ public class ItemMap {
     private boolean isPlayerChargeable(Player player) {
 		if (Hooks.hasVault()) {
 			double balance = 0.0;
-			try { balance = PlayerHandler.getBalance(player); } catch (NullPointerException e) { ServerHandler.sendDebugTrace(e); }
+			try { balance = PlayerHandler.getBalance(player); } catch (NullPointerException e) {}
 			if (balance >= this.cost) {
 				if (this.cost != 0) {
 					try { PlayerHandler.withdrawBalance(player, this.cost); } catch (NullPointerException e) { ServerHandler.sendDebugTrace(e); }
