@@ -24,9 +24,8 @@ public class ConfigHandler {
 	private static boolean preventPickups = false;
 	private static boolean preventAllowOpBypass = false;
 	private static boolean preventAllowCreativeBypass = false;
+	private static boolean opCommandPermissions = false;
 	private static String enabledPreventWorlds;
-	private static boolean itemPermissions = false;
-	private static boolean opItemPermissions = false;
 	
 	public static void loadConfigs() {
 		configFile();
@@ -217,16 +216,16 @@ public class ConfigHandler {
 		return getItemPermissions;
 	}
 	
+	public static boolean getOPCommandPermissions() {
+		return opCommandPermissions;
+	}
+	
+	public static void loadOPCommandPermissions() {
+		opCommandPermissions = ConfigHandler.getConfig("config.yml").getBoolean("OPCommands-Permissions");
+	}
+	
 	public static void loadGetItemPermissions() {
 		getItemPermissions = ConfigHandler.getConfig("config.yml").getBoolean("GetItem-Permissions");
-	}
-	
-	public static void loadItemPermissions() {
-		itemPermissions = ConfigHandler.getConfig("config.yml").getBoolean("Items-Permissions");
-	}
-	
-	public static void loadOPItemPermissions() {
-		opItemPermissions = ConfigHandler.getConfig("config.yml").getBoolean("OPItems-Permissions");
 	}
 	
 	public static void loadGlobalPreventSettings() {
@@ -255,14 +254,6 @@ public class ConfigHandler {
 	
 	public static String getEnabledPreventWorlds() {
 		return enabledPreventWorlds;
-	}
-	
-	public static boolean getItemPermissions() {
-		return itemPermissions;
-	}
-	
-	public static boolean getOPItemPermissions() {
-		return opItemPermissions;
 	}
 	
 	public static ConfigurationSection getConfigurationSection() {
