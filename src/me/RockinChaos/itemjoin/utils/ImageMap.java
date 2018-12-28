@@ -64,7 +64,7 @@ public class ImageMap extends MapRenderer {
     	}
     }
     
-    private void drawGIF(MapCanvas mapCanvas) {
+    private void drawGIF(final MapCanvas mapCanvas) {
     	final int maxFrames = this.imgCacheList.size();
     	int delay = 0; int frameSize = 1;
     	for (final BufferedImage frame: imgCacheList) {
