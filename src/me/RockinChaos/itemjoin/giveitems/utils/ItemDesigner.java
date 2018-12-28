@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Matcher;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.FireworkEffect;
@@ -26,8 +27,8 @@ import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.utils.Hooks;
-import me.RockinChaos.itemjoin.utils.ImageRenderer;
 import me.RockinChaos.itemjoin.utils.Legacy;
+import me.RockinChaos.itemjoin.utils.ImageMap;
 import me.RockinChaos.itemjoin.utils.Reflection;
 import me.RockinChaos.itemjoin.utils.Utils;
 import me.RockinChaos.itemjoin.utils.sqlite.SQLData;
@@ -273,20 +274,19 @@ public class ItemDesigner {
 				if (SQLData.hasImage(itemMap.getConfigName(), itemMap.getMapImage())) {
 					int mapID = SQLData.getMapID(itemMap.getMapImage());
 					itemMap.setMapID(mapID);
-					if (ImageRenderer.hasRendered.get(itemMap.getMapImage()) == null || ImageRenderer.hasRendered.get(itemMap.getMapImage()) != null && !ImageRenderer.hasRendered.get(itemMap.getMapImage()).toString().contains(mapID + "")) {
-						MapView view = ImageRenderer.FetchExistingView(mapID);
-							try { view.removeRenderer(view.getRenderers().get(0)); } catch (NullPointerException e) { ServerHandler.sendDebugTrace(e); }
-							try { view.addRenderer(new ImageRenderer(itemMap.getMapImage(), mapID)); } catch (NullPointerException e) { ServerHandler.sendDebugTrace(e); }
-					}
-				} else if (!SQLData.hasImage(itemMap.getConfigName(), itemMap.getMapImage())) {
-					MapView view = ImageRenderer.NewMapView();
+					ImageMap imgPlatform = new ImageMap(itemMap.getMapImage(), mapID);
+					MapView view = imgPlatform.FetchExistingView(mapID);
 					try { view.removeRenderer(view.getRenderers().get(0)); } catch (NullPointerException e) { ServerHandler.sendDebugTrace(e); }
+					try { view.addRenderer(imgPlatform); } catch (NullPointerException e) { ServerHandler.sendDebugTrace(e); }
+				} else if (!SQLData.hasImage(itemMap.getConfigName(), itemMap.getMapImage())) {
 					int mapID;
-					try {
-						mapID = view.getId();
-					} catch (NoSuchMethodError e) { mapID = Legacy.getMapID(view); }
+					MapView view = ItemJoin.getInstance().getServer().createMap(Bukkit.getWorlds().get(1));
+					try { view.removeRenderer(view.getRenderers().get(0)); } catch (NullPointerException e) { ServerHandler.sendDebugTrace(e); }
+					try { mapID = view.getId(); } 
+					catch (NoSuchMethodError e) { mapID = Legacy.getMapID(view); }
 					itemMap.setMapID(mapID);
-					try { view.addRenderer(new ImageRenderer(itemMap.getMapImage(), mapID)); } catch (NullPointerException e) { ServerHandler.sendDebugTrace(e); }
+					ImageMap imgPlatform = new ImageMap(itemMap.getMapImage(), mapID);
+					try { view.addRenderer(imgPlatform); } catch (NullPointerException e) { ServerHandler.sendDebugTrace(e); }
 					SQLData.saveMapImage(itemMap.getConfigName(), "map-id", itemMap.getMapImage(), mapID);
 				}
 			}
