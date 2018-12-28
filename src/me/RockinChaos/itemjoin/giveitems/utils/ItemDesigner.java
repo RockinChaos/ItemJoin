@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Matcher;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.FireworkEffect;
@@ -279,11 +278,9 @@ public class ItemDesigner {
 					try { view.removeRenderer(view.getRenderers().get(0)); } catch (NullPointerException e) { ServerHandler.sendDebugTrace(e); }
 					try { view.addRenderer(imgPlatform); } catch (NullPointerException e) { ServerHandler.sendDebugTrace(e); }
 				} else if (!SQLData.hasImage(itemMap.getConfigName(), itemMap.getMapImage())) {
-					int mapID;
-					MapView view = ItemJoin.getInstance().getServer().createMap(Bukkit.getWorlds().get(1));
+					MapView view = Legacy.createLegacyMapView();
 					try { view.removeRenderer(view.getRenderers().get(0)); } catch (NullPointerException e) { ServerHandler.sendDebugTrace(e); }
-					try { mapID = view.getId(); } 
-					catch (NoSuchMethodError e) { mapID = Legacy.getMapID(view); }
+					int mapID = Legacy.getMapID(view);
 					itemMap.setMapID(mapID);
 					ImageMap imgPlatform = new ImageMap(itemMap.getMapImage(), mapID);
 					try { view.addRenderer(imgPlatform); } catch (NullPointerException e) { ServerHandler.sendDebugTrace(e); }

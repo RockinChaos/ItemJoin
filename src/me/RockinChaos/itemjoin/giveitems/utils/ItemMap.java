@@ -1465,7 +1465,7 @@ public class ItemMap {
     private boolean isPlayerChargeable(Player player) {
 		if (Hooks.hasVault()) {
 			double balance = 0.0;
-			try { balance = PlayerHandler.getBalance(player); } catch (NullPointerException e) {}
+			try { balance = PlayerHandler.getBalance(player); } catch (NullPointerException e) { }
 			if (balance >= this.cost) {
 				if (this.cost != 0) {
 					try { PlayerHandler.withdrawBalance(player, this.cost); } catch (NullPointerException e) { ServerHandler.sendDebugTrace(e); }

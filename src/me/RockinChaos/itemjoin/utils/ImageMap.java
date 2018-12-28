@@ -9,7 +9,6 @@ import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.map.MapCanvas;
 import org.bukkit.map.MapRenderer;
@@ -83,7 +82,7 @@ public class ImageMap extends MapRenderer {
 
 	public MapView FetchExistingView(int id) {
 		MapView view = Legacy.getMapView(id);
-		if (view == null) { view = ItemJoin.getInstance().getServer().createMap(Bukkit.getWorlds().get(1)); }
+		if (view == null) { view = Legacy.createLegacyMapView(); }
 		return view;
 	}
 }

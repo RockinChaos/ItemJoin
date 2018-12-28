@@ -58,11 +58,29 @@ public class Legacy {
 		return ItemJoin.getInstance().getServer().getMap((short) id);
     }
     
-    public static int getMapID(MapView view) {
+    public static MapView createLegacyMapView() {
+    	try {
+    		for (World world : Bukkit.getServer().getWorlds()) {
+    			if (world != null) {
+    				return ItemJoin.getInstance().getServer().createMap(world);
+    			}
+    		}
+    	} catch (Exception e) { }
+    	return null;
+    }
+    
+	public static Class<?> getMapNMS(String name) {
 		try {
-			return view.getId();
-		} catch (NoSuchMethodError e) { if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); } }
-    	return 1;
+			return Class.forName("org.bukkit.map." + name);
+		} catch (Exception e) {
+			if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+		}
+		return null;
+	}
+    
+    public static short getMapID(MapView view) {
+		try { return (short) view.getId(); } 
+		catch (NoSuchMethodError e) { return Reflection.getMapID(view); }
     }
     
     public static ItemStack newLegacyItemStack(Material material, int count, short dataValue) {

@@ -3,6 +3,7 @@ package me.RockinChaos.itemjoin.utils;
 import java.lang.reflect.Method;
 
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.map.MapView;
 
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
@@ -29,6 +30,23 @@ public class Reflection {
 			if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
 		}
 		return null;
+	}
+	
+	public static Class<?> getMapNMS(String name) {
+		try {
+			return Class.forName("org.bukkit.map." + name);
+		} catch (Exception e) {
+			if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+		}
+		return null;
+	}
+	
+	public static short getMapID(MapView view) {
+		try {
+			Class<?> MapView = getMapNMS("MapView");
+			Object mapID = MapView.getMethod("getId").invoke(view);
+			return (short)mapID; 
+		} catch (Exception ex) { return 1; }
 	}
 	
 	public static ItemStack setUnbreakable(ItemStack item) {
