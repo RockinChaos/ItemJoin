@@ -232,7 +232,7 @@ public class ItemUtilities {
 					if (!SQLData.hasFirstJoined(player, itemMap.getConfigName()) && !SQLData.hasIPLimited(player, itemMap.getConfigName())) {
 						putFailCount(player, getFailCount().get(player) + 1);
 						ServerHandler.sendDebugMessage("Failed to give; " + itemMap.getConfigName());
-					}
+					} else { ServerHandler.sendDebugMessage("Already given; " + itemMap.getConfigName()); }
 					return false;
 				} else { return false; }
 			}

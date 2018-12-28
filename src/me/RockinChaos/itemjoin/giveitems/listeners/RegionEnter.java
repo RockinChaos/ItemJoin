@@ -112,7 +112,9 @@ public class RegionEnter implements Listener {
 	
 	private static ApplicableRegionSet getRegionSets(World world, Location loc) {
 		if (Hooks.getWorldGuardVersion() >= 700) {
-			com.sk89q.worldedit.world.World wgWorld = com.sk89q.worldguard.WorldGuard.getInstance().getPlatform().getWorldByName(world.getName());
+			com.sk89q.worldedit.world.World wgWorld;
+			try { wgWorld = com.sk89q.worldguard.WorldGuard.getInstance().getPlatform().getWorldByName(world.getName()); }
+			catch (NoSuchMethodError e) { wgWorld = com.sk89q.worldguard.WorldGuard.getInstance().getPlatform().getMatcher().getWorldByName(world.getName()); }
 			com.sk89q.worldguard.protection.regions.RegionContainer rm = com.sk89q.worldguard.WorldGuard.getInstance().getPlatform().getRegionContainer();
 			if (rm == null) { return null; }
 			if (Legacy.hasLegacyWorldEdit()) {
