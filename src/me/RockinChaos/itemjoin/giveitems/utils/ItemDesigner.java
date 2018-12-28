@@ -269,7 +269,7 @@ public class ItemDesigner {
 	private void setMapImage(ItemMap itemMap) {
 		if (itemMap.getNodeLocation().getString(".custom-map-image") != null && Utils.containsIgnoreCase(itemMap.getMaterial().toString(), "MAP")) {
 			itemMap.setMapImage(itemMap.getNodeLocation().getString(".custom-map-image"));
-			if (itemMap.getMapImage().equalsIgnoreCase("default.png") || new File(ItemJoin.getInstance().getDataFolder(), itemMap.getMapImage()).exists()) {
+			if (itemMap.getMapImage().equalsIgnoreCase("default.jpg") || new File(ItemJoin.getInstance().getDataFolder(), itemMap.getMapImage()).exists()) {
 				if (SQLData.hasImage(itemMap.getConfigName(), itemMap.getMapImage())) {
 					int mapID = SQLData.getMapID(itemMap.getMapImage());
 					itemMap.setMapID(mapID);

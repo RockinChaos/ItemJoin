@@ -29,16 +29,16 @@ public class ImageRenderer extends MapRenderer {
 	public void render(MapView view, MapCanvas canvas, Player player) {
 		if (hasRendered.get(writeImage) == null || hasRendered.get(writeImage) != null && !hasRendered.get(writeImage).toString().contains(id + "")) {
 			try {
-				if (writeImage != null && !writeImage.equalsIgnoreCase("default.png")) {
+				if (writeImage != null && !writeImage.equalsIgnoreCase("default.jpg")) {
 					hasRendered.put(writeImage, id);
 					view.setScale(MapView.Scale.NORMAL);
 					canvas.drawImage(0, 0, ImageIO.read(new File(ItemJoin.getInstance().getDataFolder(), String.valueOf(writeImage))));
 					ServerHandler.sendDebugMessage("rendering map; " + writeImage + " with the id " + id);
-				} else if (writeImage != null && writeImage.equalsIgnoreCase("default.png") && ItemJoin.getInstance().getResource("default.png") != null) {
+				} else if (writeImage != null && writeImage.equalsIgnoreCase("default.jpg") && ItemJoin.getInstance().getResource("default.jpg") != null) {
 					hasRendered.put(writeImage, id);
 					view.setScale(MapView.Scale.NORMAL);
-					canvas.drawImage(0, 0, ImageIO.read(ItemJoin.getInstance().getResource("default.png")));
-					ServerHandler.sendDebugMessage("rendering map; default.png" + " with the id " + id);
+					canvas.drawImage(0, 0, ImageIO.read(ItemJoin.getInstance().getResource("default.jpg")));
+					ServerHandler.sendDebugMessage("rendering map; default.jpg" + " with the id " + id);
 				}
 			} catch (Exception e) {
 				ServerHandler.sendConsoleMessage("&4[ERROR; 7753c61] There was a problem rending your map(s)!");
