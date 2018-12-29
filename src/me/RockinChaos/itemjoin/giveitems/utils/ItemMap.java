@@ -1451,9 +1451,9 @@ public class ItemMap {
 		}
 	}
 	
-    public void executeCommands(Player player, String action) {
+    public boolean executeCommands(Player player, String action) {
+		boolean playerSuccess = false;
     	if (this.commands != null && this.commands.length > 0 && !this.onCooldown(player)) {
-    		boolean playerSuccess = false;
     		ItemCommand[] itemCommands = this.commands;
     			for (int i = 0; i < itemCommands.length; i++) { 
     				if (itemCommands[i].isCommandable(this.getNodeLocation(), action)) {
@@ -1469,6 +1469,7 @@ public class ItemMap {
     				}
     			}
     	}
+    	return playerSuccess;
     }
     
     private boolean isPlayerChargeable(Player player) {
