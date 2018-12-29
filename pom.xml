@@ -19,7 +19,7 @@
 					<include>items.yml</include>
 					<include>config.yml</include>
 					<include>en-lang.yml</include>
-					<include>default.png</include>
+					<include>default.jpg</include>
 					<include>LICENSE.txt</include>
 				</includes>
 			</resource>
