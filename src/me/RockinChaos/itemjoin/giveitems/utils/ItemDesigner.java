@@ -42,39 +42,41 @@ public class ItemDesigner {
 		if (ConfigHandler.isConfigurable()) {
 			for (String internalName: ConfigHandler.getConfigurationSection().getKeys(false)) {
 				ConfigurationSection itemNode = ConfigHandler.getItemSection(internalName);
-				String[] slots = itemNode.getString(".slot").replace(" ", "").split(",");
-				for (String slot: slots) {
-					if (isCreatable(internalName, slot)) {
-						ItemMap itemMap = new ItemMap(internalName, slot);
-						this.setMaterial(itemMap);
+				if (isSafe(itemNode, internalName)) {
+					String[] slots = itemNode.getString(".slot").replace(" ", "").split(",");
+					for (String slot: slots) {
+						if (isCreatable(internalName, slot)) {
+							ItemMap itemMap = new ItemMap(internalName, slot);
+							this.setMaterial(itemMap);
 						
-						this.setSkullDatabase(itemMap);
-						this.setUnbreaking(itemMap);
-						this.showDurability(itemMap);
-						this.setEnchantments(itemMap);
-						this.setMapImage(itemMap);
-						this.setJSONBookPages(itemMap);
-						this.setNBTData(itemMap);
-						this.setName(itemMap);
-						this.setLore(itemMap);
-						this.setDurability(itemMap);
-						this.setSkull(itemMap);
-						this.setSkullTexture(itemMap);
-						this.setConsumableEffects(itemMap);
-						this.setPotionEffects(itemMap);
-						this.setTippedArrows(itemMap);
-						this.setBanners(itemMap);
-						this.setFireworks(itemMap);
-						this.setFireChargeColor(itemMap);
-						this.setDye(itemMap);
-						this.setBookAuthor(itemMap);
-						this.setBookTitle(itemMap);
-						this.setBookGeneration(itemMap);
-						this.setLegacyBookPages(itemMap);
-						this.setAttributes(itemMap);
-						this.setProbability(itemMap);
-						
-						ItemUtilities.addItem(itemMap);
+							this.setSkullDatabase(itemMap);
+							this.setUnbreaking(itemMap);
+							this.showDurability(itemMap);
+							this.setEnchantments(itemMap);
+							this.setMapImage(itemMap);
+							this.setJSONBookPages(itemMap);
+							this.setNBTData(itemMap);
+							this.setName(itemMap);
+							this.setLore(itemMap);
+							this.setDurability(itemMap);
+							this.setSkull(itemMap);
+							this.setSkullTexture(itemMap);
+							this.setConsumableEffects(itemMap);
+							this.setPotionEffects(itemMap);
+							this.setTippedArrows(itemMap);
+							this.setBanners(itemMap);
+							this.setFireworks(itemMap);
+							this.setFireChargeColor(itemMap);
+							this.setDye(itemMap);
+							this.setBookAuthor(itemMap);
+							this.setBookTitle(itemMap);
+							this.setBookGeneration(itemMap);
+							this.setLegacyBookPages(itemMap);
+							this.setAttributes(itemMap);
+							this.setProbability(itemMap);
+							
+							ItemUtilities.addItem(itemMap);
+						}
 					}
 				}
 			}
@@ -134,6 +136,16 @@ public class ItemDesigner {
 			}
 		}
 		return true;
+	}
+	
+	private boolean isSafe(ConfigurationSection itemNode, String internalName) {
+		if (itemNode.getString(".slot") != null) {
+			return true;
+		} else {
+			ServerHandler.sendErrorMessage("&eThe Item " + internalName + "'s SLOT is invalid!");
+			ServerHandler.sendErrorMessage("&ePlease refresh your items.yml and fix the undefined slot.");
+			return false;
+		}
 	}
 	
 //  =============================================== //

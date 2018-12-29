@@ -1,6 +1,7 @@
 package me.RockinChaos.itemjoin.handlers;
 
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 
 public class PermissionsHandler {
 
@@ -12,7 +13,7 @@ public class PermissionsHandler {
 	}
 	
 	public static boolean hasCommandPermission(CommandSender sender, String permission) {
-		if (sender.hasPermission(permission) || sender.hasPermission("itemjoin.*")) {
+		if (sender.hasPermission(permission) || sender.hasPermission("itemjoin.*") || (sender instanceof ConsoleCommandSender)) {
 			return true;
 		} else if (!ConfigHandler.getOPCommandPermissions() && sender.isOp()) {
 			if (permission.equalsIgnoreCase("itemjoin.use") || permission.equalsIgnoreCase("itemjoin.reload") || permission.equalsIgnoreCase("itemjoin.updates")

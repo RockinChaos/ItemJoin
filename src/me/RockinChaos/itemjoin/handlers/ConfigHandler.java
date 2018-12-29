@@ -1,6 +1,7 @@
 package me.RockinChaos.itemjoin.handlers;
 
 import java.io.File;
+
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -51,7 +52,7 @@ public class ConfigHandler {
 		if (!(file).exists()) {
 			try {
 				ItemJoin.getInstance().saveResource(path, false);
-				generate = true;
+				setGenerating(true);
 			} catch (Exception e) {
 				ServerHandler.sendDebugTrace(e);
 				ItemJoin.getInstance().getLogger().warning("Cannot save " + path + " to disk!");
@@ -134,11 +135,24 @@ public class ConfigHandler {
 				}
 			}
 		}
-		if (generate) { 
+		YAMLSetup();
+		getConfig("items.yml").options().copyDefaults(false);
+	}
+	
+	private static void YAMLSetup() {
+		if (getGenerating()) { 
 			YAMLGenerator.generateItemsFile();
 			loadConfig("items.yml");
+			setGenerating(false);
 		}
-		getConfig("items.yml").options().copyDefaults(false);
+	}
+	
+	private static void setGenerating(boolean isGenerating) {
+		generate = isGenerating;
+	}
+	
+	private static boolean getGenerating() {
+		return generate;
 	}
 	
 	public static void enLangFile() {
