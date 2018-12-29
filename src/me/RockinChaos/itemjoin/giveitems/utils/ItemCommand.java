@@ -7,13 +7,14 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.Logger;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.utils.BungeeCord;
 import me.RockinChaos.itemjoin.utils.CustomFilter;
-import me.RockinChaos.itemjoin.utils.Hooks;
+import me.RockinChaos.itemjoin.utils.DataStorage;
 import me.RockinChaos.itemjoin.utils.Utils;
 
 public class ItemCommand {
@@ -21,16 +22,20 @@ public class ItemCommand {
 	private Type type;
 	private ActionType action;
 	private long delay = 0L;
+	private CommandType cmdType;
 	
-	private ItemCommand(final String command, final ActionType action, final Type type, final long delay) {
+	private ItemCommand(final String command, final ActionType action, final Type type, final long delay, final String commandType) {
 		this.command = command;
 		this.type = type;
 		this.action = action;
 		this.delay = delay;
+		if (commandType.equalsIgnoreCase("INTERACT")) { this.cmdType = CommandType.INTERACT; } 
+		else if (commandType.equalsIgnoreCase("INVENTORY")) { this.cmdType = CommandType.INVENTORY; } 
+		else if (commandType.equalsIgnoreCase("BOTH")) { this.cmdType = CommandType.BOTH; }
 	}
 	
 	public void execute(final Player player, final String action) {
-		if (this.command == null || this.command.length() == 0 || !CommandType.INVENTORY.hasAction(action) && !CommandType.INTERACT.hasAction(action) && !this.action.hasAction(action)) { return; }
+		if (this.command == null || this.command.length() == 0 || !this.cmdType.hasAction(action) || !this.action.hasAction(action)) { return; }
 		sendDispatch(player, this.type);
 	}
 	
@@ -124,7 +129,7 @@ public class ItemCommand {
 	}
 	
 	private void setLoggable(Player player, String logCommand) {
-		if (!Hooks.isLoggable()) {
+		if (!DataStorage.isLoggable()) {
 			ArrayList < String > templist = new ArrayList < String > ();
 			if (CustomFilter.clearLoggables.get("commands-list") != null && !CustomFilter.clearLoggables.get("commands-list").contains(logCommand)) {
 				templist = CustomFilter.clearLoggables.get("commands-list");
@@ -137,14 +142,42 @@ public class ItemCommand {
 	
 	private static ActionType getExactActionType(ItemMap itemMap, String definition) {
 		String invExists = itemMap.getNodeLocation().getString(".commands" + ActionType.INVENTORY.definition);
-				if (Utils.containsIgnoreCase(itemMap.getCommandType().toString(), "inventory") || invExists != null) {
+				if (Utils.containsIgnoreCase(itemMap.getCommandType().name(), "INVENTORY") || invExists != null) {
 					if (ActionType.INVENTORY.hasDefine(definition)) {
 						return ActionType.INVENTORY;
-					} else if (ActionType.MULTI_CLICK_INVENTORY.hasDefine(definition)) {
-						return ActionType.MULTI_CLICK_INVENTORY;
-					}
-				} else if (Utils.containsIgnoreCase(itemMap.getCommandType().toString(), "interact")) {
+					} else if (ActionType.LEFT_CLICK_ALL.hasDefine(definition)) {
+						return ActionType.LEFT_CLICK_ALL;
+					} else if (ActionType.RIGHT_CLICK_ALL.hasDefine(definition)) {
+						return ActionType.RIGHT_CLICK_ALL;
+					} else if (ActionType.MULTI_CLICK_ALL.hasDefine(definition)) {
+						return ActionType.MULTI_CLICK_ALL;
+					} 
+				} else if (Utils.containsIgnoreCase(itemMap.getCommandType().name(), "INTERACT")) {
 					if (ActionType.LEFT_CLICK_ALL.hasDefine(definition)) {
+						return ActionType.LEFT_CLICK_ALL;
+					} else if (ActionType.LEFT_CLICK_AIR.hasDefine(definition)) {
+						return ActionType.LEFT_CLICK_AIR;
+					} else if (ActionType.LEFT_CLICK_BLOCK.hasDefine(definition)) {
+						return ActionType.LEFT_CLICK_BLOCK;
+					} else if (ActionType.RIGHT_CLICK_ALL.hasDefine(definition)) {
+						return ActionType.RIGHT_CLICK_ALL;
+					} else if (ActionType.RIGHT_CLICK_AIR.hasDefine(definition)) {
+						return ActionType.RIGHT_CLICK_AIR;
+					} else if (ActionType.RIGHT_CLICK_BLOCK.hasDefine(definition)) {
+						return ActionType.RIGHT_CLICK_BLOCK;
+					} else if (ActionType.MULTI_CLICK_ALL.hasDefine(definition)) {
+						return ActionType.MULTI_CLICK_ALL;
+					} else if (ActionType.MULTI_CLICK_AIR.hasDefine(definition)) {
+						return ActionType.MULTI_CLICK_AIR;
+					} else if (ActionType.MULTI_CLICK_BLOCK.hasDefine(definition)) {
+						return ActionType.MULTI_CLICK_BLOCK;
+					} else if (ActionType.PHYSICAL.hasDefine(definition)) {
+						return ActionType.PHYSICAL;
+					}
+				} else if (Utils.containsIgnoreCase(itemMap.getCommandType().name(), "BOTH")) {
+					if (ActionType.INVENTORY.hasDefine(definition)) {
+						return ActionType.INVENTORY;
+					} if (ActionType.LEFT_CLICK_ALL.hasDefine(definition)) {
 						return ActionType.LEFT_CLICK_ALL;
 					} else if (ActionType.LEFT_CLICK_AIR.hasDefine(definition)) {
 						return ActionType.LEFT_CLICK_AIR;
@@ -169,56 +202,9 @@ public class ItemCommand {
 		return ActionType.DEFAULT;
 	}
 	
-	private static ActionType getActionType(ItemMap itemMap, String action) {
-		String invExists = itemMap.getNodeLocation().getString(".commands" + ActionType.INVENTORY.definition);
-		if (ConfigHandler.getCommandsSection(itemMap.getNodeLocation()) != null) {
-			Iterator < String > it = ConfigHandler.getCommandsSection(itemMap.getNodeLocation()).getKeys(false).iterator();
-			while (it.hasNext()) {
-				String definition = it.next();
-				if (Utils.containsIgnoreCase(itemMap.getCommandType().toString(), "INVENTORY") 
-						&& CommandType.INVENTORY.hasAction(action) || Utils.containsIgnoreCase(itemMap.getCommandType().toString(), "BOTH") 
-						&& CommandType.INVENTORY.hasAction(action) || invExists != null && CommandType.INVENTORY.hasAction(action)) {
-					if (ActionType.INVENTORY.hasAction(action) && ActionType.INVENTORY.hasDefine(definition)) {
-						return ActionType.INVENTORY;
-					} else if (ActionType.MULTI_CLICK_INVENTORY.hasAction(action) && ActionType.MULTI_CLICK_INVENTORY.hasDefine(definition)) {
-						return ActionType.MULTI_CLICK_INVENTORY;
-					} else if (ActionType.LEFT_CLICK_INVENTORY.hasAction(action) && ActionType.LEFT_CLICK_INVENTORY.hasDefine(definition)) {
-						return ActionType.LEFT_CLICK_INVENTORY;
-					} else if (ActionType.RIGHT_CLICK_INVENTORY.hasAction(action) && ActionType.RIGHT_CLICK_INVENTORY.hasDefine(definition)) {
-						return ActionType.RIGHT_CLICK_INVENTORY;
-					}
-				} else if (Utils.containsIgnoreCase(itemMap.getCommandType().toString(), "INTERACT") && CommandType.INTERACT.hasAction(action) 
-						|| Utils.containsIgnoreCase(itemMap.getCommandType().toString(), "BOTH") && CommandType.INTERACT.hasAction(action)) {
-					if (ActionType.LEFT_CLICK_ALL.hasAction(action) && ActionType.LEFT_CLICK_ALL.hasDefine(definition)) {
-						return ActionType.LEFT_CLICK_ALL;
-					} else if (ActionType.LEFT_CLICK_AIR.hasAction(action) && ActionType.LEFT_CLICK_AIR.hasDefine(definition)) {
-						return ActionType.LEFT_CLICK_AIR;
-					} else if (ActionType.LEFT_CLICK_BLOCK.hasAction(action) && ActionType.LEFT_CLICK_BLOCK.hasDefine(definition)) {
-						return ActionType.LEFT_CLICK_BLOCK;
-					} else if (ActionType.RIGHT_CLICK_ALL.hasAction(action) && ActionType.RIGHT_CLICK_ALL.hasDefine(definition)) {
-						return ActionType.RIGHT_CLICK_ALL;
-					} else if (ActionType.RIGHT_CLICK_AIR.hasAction(action) && ActionType.RIGHT_CLICK_AIR.hasDefine(definition)) {
-						return ActionType.RIGHT_CLICK_AIR;
-					} else if (ActionType.RIGHT_CLICK_BLOCK.hasAction(action) && ActionType.RIGHT_CLICK_BLOCK.hasDefine(definition)) {
-						return ActionType.RIGHT_CLICK_BLOCK;
-					} else if (ActionType.MULTI_CLICK_ALL.hasAction(action) && ActionType.MULTI_CLICK_ALL.hasDefine(definition)) {
-						return ActionType.MULTI_CLICK_ALL;
-					} else if (ActionType.MULTI_CLICK_AIR.hasAction(action) && ActionType.MULTI_CLICK_AIR.hasDefine(definition)) {
-						return ActionType.MULTI_CLICK_AIR;
-					} else if (ActionType.MULTI_CLICK_BLOCK.hasAction(action) && ActionType.MULTI_CLICK_BLOCK.hasDefine(definition)) {
-						return ActionType.MULTI_CLICK_BLOCK;
-					} else if (ActionType.PHYSICAL.hasAction(action) && ActionType.PHYSICAL.hasDefine(definition)) {
-						return ActionType.PHYSICAL;
-					}
-				}
-			}
-		}
-		return ActionType.DEFAULT;
-	}
-	
-	public static boolean isCommandable(ItemMap itemMap, String action) {
-		List < String > actionCommandList = itemMap.getNodeLocation().getStringList(".commands" + getActionType(itemMap, action).definition);
-		if (actionCommandList != null && !actionCommandList.isEmpty()) {
+	public boolean isCommandable(ConfigurationSection nodeLocation, String action) {
+		List < String > actionCommandList = nodeLocation.getStringList(".commands" + this.action.definition);
+		if (actionCommandList != null && !actionCommandList.isEmpty() && this.cmdType.hasAction(action)) {
 			return true;
 		}
 		return false;
@@ -227,7 +213,7 @@ public class ItemCommand {
 	public static ItemCommand[] arrayFromString(ItemMap itemMap) {
 		if (ConfigHandler.getCommandsSection(itemMap.getNodeLocation()) == null) {
 			return new ItemCommand[] {
-				new ItemCommand("", ActionType.DEFAULT, Type.DEFAULT, 0L)
+				new ItemCommand("", ActionType.DEFAULT, Type.DEFAULT, 0L, itemMap.getCommandType().name())
 			};
 		}
 		return fromConfigList(itemMap);
@@ -254,7 +240,7 @@ public class ItemCommand {
 	}
 	
 	private static ItemCommand fromString(String input, ActionType action, ItemMap itemMap, long delay) {
-		if (input == null || input.length() == 0) { return new ItemCommand("", ActionType.DEFAULT, Type.DEFAULT, 0L); }
+		if (input == null || input.length() == 0) { return new ItemCommand("", ActionType.DEFAULT, Type.DEFAULT, 0L, itemMap.getCommandType().name()); }
 		input = input.trim();
 		Type type = Type.DEFAULT;
 		
@@ -269,7 +255,7 @@ public class ItemCommand {
 		
 		input = input.trim();
 		input = Utils.colorFormat(input);
-		return new ItemCommand(input, action, type, delay);
+		return new ItemCommand(input, action, type, delay, itemMap.getCommandType().name());
 	}
 	
 	private static int getDelay(String lDelay) {
@@ -288,16 +274,13 @@ public class ItemCommand {
 		DEFAULT("", ""),
 		PHYSICAL("PHYSICAL", ".physical"),
 		INVENTORY("PICKUP_ALL, PICKUP_HALF, PLACE_ALL", ".inventory"),
-		MULTI_CLICK_INVENTORY("PICKUP_ALL, PICKUP_HALF, PLACE_ALL", ".multi-click"),
-		LEFT_CLICK_INVENTORY("PICKUP_ALL", ".left-click"),
-		RIGHT_CLICK_INVENTORY("PICKUP_HALF", ".right-click"),
-		MULTI_CLICK_ALL("LEFT_CLICK_BLOCK, LEFT_CLICK_AIR, RIGHT_CLICK_BLOCK, RIGHT_CLICK_AIR", ".multi-click"),
+		MULTI_CLICK_ALL("LEFT_CLICK_BLOCK, LEFT_CLICK_AIR, RIGHT_CLICK_BLOCK, RIGHT_CLICK_AIR, PICKUP_ALL, PICKUP_HALF, PLACE_ALL", ".multi-click"),
 		MULTI_CLICK_AIR("LEFT_CLICK_AIR, RIGHT_CLICK_AIR", ".multi-click-air"),
 		MULTI_CLICK_BLOCK("LEFT_CLICK_BLOCK, RIGHT_CLICK_BLOCK", ".multi-click-block"),
-		LEFT_CLICK_ALL("LEFT_CLICK_AIR, LEFT_CLICK_BLOCK", ".left-click"),
+		LEFT_CLICK_ALL("LEFT_CLICK_AIR, LEFT_CLICK_BLOCK, PICKUP_ALL", ".left-click"),
 		LEFT_CLICK_AIR("LEFT_CLICK_AIR", ".left-click-air"),
 		LEFT_CLICK_BLOCK("LEFT_CLICK_BLOCK", ".left-click-block"),
-		RIGHT_CLICK_ALL("RIGHT_CLICK_AIR, RIGHT_CLICK_BLOCK", ".right-click"),
+		RIGHT_CLICK_ALL("RIGHT_CLICK_AIR, RIGHT_CLICK_BLOCK, PICKUP_HALF", ".right-click"),
 		RIGHT_CLICK_AIR("RIGHT_CLICK_AIR", ".right-click-air"),
 		RIGHT_CLICK_BLOCK("RIGHT_CLICK_BLOCK", ".right-click-block");
 		
@@ -310,7 +293,8 @@ public class ItemCommand {
 	
 	private enum CommandType {
 		INTERACT("PHYSICAL, LEFT_CLICK_BLOCK, LEFT_CLICK_AIR, RIGHT_CLICK_BLOCK, RIGHT_CLICK_AIR"),
-		INVENTORY("PICKUP_ALL, PICKUP_HALF, PLACE_ALL");
+		INVENTORY("PICKUP_ALL, PICKUP_HALF, PLACE_ALL"),
+		BOTH("PICKUP_ALL, PICKUP_HALF, PLACE_ALL, PHYSICAL, LEFT_CLICK_BLOCK, LEFT_CLICK_AIR, RIGHT_CLICK_BLOCK, RIGHT_CLICK_AIR");
 		private final String name;
 		private CommandType(String Action) { name = Action; }
 		public boolean hasAction(String Action) { return name.contains(Action); }

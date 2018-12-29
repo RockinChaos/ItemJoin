@@ -47,7 +47,7 @@ import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PermissionsHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
-import me.RockinChaos.itemjoin.utils.Hooks;
+import me.RockinChaos.itemjoin.utils.DataStorage;
 import me.RockinChaos.itemjoin.utils.Language;
 import me.RockinChaos.itemjoin.utils.Legacy;
 import me.RockinChaos.itemjoin.utils.Reflection;
@@ -204,12 +204,12 @@ public class ItemMap {
         
         this.setSlot(slot);
         this.setCount(this.nodeLocation.getString(".count"));
-		this.setCommands(ItemCommand.arrayFromString(this));
 		this.setCommandCost();
 		this.setCommandSound();
 		this.setCommandCooldown();
 		this.setCommandType();
 		this.setCommandSequence();
+		this.setCommands(ItemCommand.arrayFromString(this));
         this.setInteractCooldown();
         this.setItemflags();
         this.setLimitModes();
@@ -248,6 +248,7 @@ public class ItemMap {
 				&& Utils.containsIgnoreCase(this.nodeLocation.getString("commands-type"), "INVENTORY")) { this.type = CommandType.BOTH; }
 			else if (Utils.containsIgnoreCase(this.nodeLocation.getString("commands-type"), "INTERACT")) { this.type = CommandType.INTERACT; }
 			else if (Utils.containsIgnoreCase(this.nodeLocation.getString("commands-type"), "INVENTORY")) { this.type = CommandType.INVENTORY; }
+			else if (Utils.containsIgnoreCase(this.nodeLocation.getString("commands-type"), "BOTH") || Utils.containsIgnoreCase(this.nodeLocation.getString("commands-type"), "ALL")) { this.type = CommandType.BOTH; }
 		}
 	}
 	
@@ -857,7 +858,7 @@ public class ItemMap {
 	}
 	
 	public String getLegacySecret() {
-		if (!Hooks.hasNewNBTSystem()) {
+		if (!DataStorage.hasNewNBTSystem()) {
 			return this.legacySecret;
 		} else { return ""; }
 	}
@@ -1086,7 +1087,7 @@ public class ItemMap {
 		if (item.getItemMeta().hasEnchants() && this.enchants != null && !this.enchants.isEmpty()) { 
 			ItemStack checkItem = new ItemStack(item.getType());
 			for (Entry<String, Integer> enchantments : this.enchants.entrySet()) {
-				if (enchantments.getKey() == null && Hooks.hasTokenEnchant() == true && TokenEnchantAPI.getInstance().getEnchant(enchantments.getKey()) != null) {
+				if (enchantments.getKey() == null && DataStorage.hasTokenEnchant() == true && TokenEnchantAPI.getInstance().getEnchant(enchantments.getKey()) != null) {
 					TokenEnchantAPI.getInstance().enchant(null, checkItem, enchantments.getKey(), enchantments.getValue(), true, 0, true);
 				} else { 
 					checkItem.addUnsafeEnchantment(ItemHandler.getEnchantByName(enchantments.getKey()), enchantments.getValue()); }
@@ -1214,7 +1215,7 @@ public class ItemMap {
 	private void setEnchantments(Player player) {
 		if (this.enchants != null && !this.enchants.isEmpty()) {
 			for (Entry<String, Integer> enchantments : this.enchants.entrySet()) {
-				if (enchantments.getKey() == null && Hooks.hasTokenEnchant() == true && TokenEnchantAPI.getInstance().getEnchant(enchantments.getKey()) != null) {
+				if (enchantments.getKey() == null && DataStorage.hasTokenEnchant() == true && TokenEnchantAPI.getInstance().getEnchant(enchantments.getKey()) != null) {
 					TokenEnchantAPI.getInstance().enchant(player, tempItem, enchantments.getKey(), enchantments.getValue(), true, 0, true);
 				} else { this.tempItem.addUnsafeEnchantment(ItemHandler.getEnchantByName(enchantments.getKey()), enchantments.getValue()); }
 			}
@@ -1264,7 +1265,7 @@ public class ItemMap {
 	}
 	
 	private void setNBTData() {
-		if (Hooks.hasNewNBTSystem() && !this.isVanilla()) {
+		if (DataStorage.hasNewNBTSystem() && !this.isVanilla()) {
 			try {
 				Object nms = Reflection.getOBC("inventory.CraftItemStack").getMethod("asNMSCopy", ItemStack.class).invoke(null, this.tempItem);
 				Object cacheTag = Reflection.getNMS("ItemStack").getMethod("getTag").invoke(nms);
@@ -1452,18 +1453,26 @@ public class ItemMap {
 	
     public void executeCommands(Player player, String action) {
     	if (this.commands != null && this.commands.length > 0 && !this.onCooldown(player)) {
+    		boolean playerSuccess = false;
     		ItemCommand[] itemCommands = this.commands;
-    		if (this.isPlayerChargeable(player)) {
-    			this.playSound(player);
-    			this.removeDisposable(player, this.disposable);
-    			for (int i = 0; i < itemCommands.length; i++) { itemCommands[i].execute(player, action); }
-    			this.addPlayerOnCooldown(player);
-    		}
+    			for (int i = 0; i < itemCommands.length; i++) { 
+    				if (itemCommands[i].isCommandable(this.getNodeLocation(), action)) {
+    					if (!playerSuccess) {
+    						if (this.isPlayerChargeable(player)) {
+    							playerSuccess = true;
+    							this.playSound(player);
+    							this.removeDisposable(player, this.disposable);
+    							itemCommands[i].execute(player, action); 
+    						} else { break; }
+    							this.addPlayerOnCooldown(player);
+    					} else if (playerSuccess) { itemCommands[i].execute(player, action); }
+    				}
+    			}
     	}
     }
     
     private boolean isPlayerChargeable(Player player) {
-		if (Hooks.hasVault()) {
+		if (DataStorage.hasVault()) {
 			double balance = 0.0;
 			try { balance = PlayerHandler.getBalance(player); } catch (NullPointerException e) { }
 			if (balance >= this.cost) {

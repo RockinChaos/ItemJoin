@@ -32,7 +32,7 @@ public class Reflection {
 		return null;
 	}
 	
-	public static Class<?> getMapNMS(String name) {
+	private static Class<?> getMapNMS(String name) {
 		try {
 			return Class.forName("org.bukkit.map." + name);
 		} catch (Exception e) {

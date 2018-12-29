@@ -15,7 +15,8 @@ import org.bukkit.inventory.meta.SkullMeta;
 import de.domedd.betternick.BetterNick;
 import de.domedd.betternick.api.nickedplayer.NickedPlayer;
 import me.RockinChaos.itemjoin.ItemJoin;
-import me.RockinChaos.itemjoin.utils.Hooks;
+import me.RockinChaos.itemjoin.utils.VaultAPI;
+import me.RockinChaos.itemjoin.utils.DataStorage;
 import me.RockinChaos.itemjoin.utils.Legacy;
 import me.RockinChaos.itemjoin.utils.Utils;
 import net.milkbowl.vault.economy.EconomyResponse;
@@ -153,7 +154,7 @@ public class PlayerHandler {
 	public static Player getPlayerString(String playerName) {
 		Player args = null;
 		try { args = Bukkit.getPlayer(UUID.fromString(playerName)); } catch (Exception e) {}
-		if (playerName != null && Hooks.hasBetterNick()) {
+		if (playerName != null && DataStorage.hasBetterNick()) {
 			NickedPlayer np = new NickedPlayer(Legacy.getLegacyPlayer(playerName));
 			if (np.isNicked()) {
 			return Legacy.getLegacyPlayer(np.getRealName());
@@ -167,7 +168,7 @@ public class PlayerHandler {
 	public static String getPlayerID(Player player) {
 		if (player != null && player.getUniqueId() != null) {
 			return player.getUniqueId().toString();
-		} else if (player != null && Hooks.hasBetterNick()) {
+		} else if (player != null && DataStorage.hasBetterNick()) {
 			NickedPlayer np = new NickedPlayer(player);
 			if (np.isNicked()) {
 			return np.getRealName();
@@ -183,7 +184,7 @@ public class PlayerHandler {
 	public static String getOfflinePlayerID(OfflinePlayer player) {
 		if (player != null && player.getUniqueId() != null) {
 			return player.getUniqueId().toString();
-		} else if (player != null && Hooks.hasBetterNick()) {
+		} else if (player != null && DataStorage.hasBetterNick()) {
 			NickedPlayer np = new NickedPlayer((BetterNick) player);
 			if (np.isNicked()) {
 			return np.getRealName();
@@ -221,10 +222,10 @@ public class PlayerHandler {
 	}
 	
 	public static double getBalance(Player player) {
-		return Legacy.getLegacyBalance(player.getName());
+		return VaultAPI.getEconomy().getBalance(player);
 	}
 	
 	public static EconomyResponse withdrawBalance(Player player, int cost) {
-		return Legacy.withdrawLegacyBalance(player.getName(), cost);
+		return VaultAPI.getEconomy().withdrawPlayer(player, cost);
 	}
 }

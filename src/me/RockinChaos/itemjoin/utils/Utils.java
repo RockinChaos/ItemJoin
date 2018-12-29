@@ -66,7 +66,7 @@ public class Utils {
 	public static String translateLayout(String name, Player player) {
 		String playerName = "EXEMPT";
 		
-		if (player != null && Hooks.hasBetterNick()) {
+		if (player != null && DataStorage.hasBetterNick()) {
 			NickedPlayer np = new NickedPlayer(player);
 			if (np.isNicked()) {
 			playerName = np.getRealName();
@@ -83,7 +83,7 @@ public class Utils {
 		if (playerName != null && player != null && (player instanceof ConsoleCommandSender)) { try { name = name.replace("%player%", "CONSOLE"); } catch (Exception e) { ServerHandler.sendDebugTrace(e); } }
 	
 		name = ChatColor.translateAlternateColorCodes('&', name).toString();
-		if (Hooks.hasPlaceholderAPI() == true) {
+		if (DataStorage.hasPlaceholderAPI() == true) {
 			try { return PlaceholderAPI.setPlaceholders(player, name); } 
 			catch (NoSuchFieldError e) { ServerHandler.sendDebugMessage("Error has occured when setting the PlaceHolder " + e.getMessage() + ", if this issue persits contact the developer of PlaceholderAPI."); return name; }
 		}

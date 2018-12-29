@@ -25,7 +25,7 @@ import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
-import me.RockinChaos.itemjoin.utils.Hooks;
+import me.RockinChaos.itemjoin.utils.DataStorage;
 import me.RockinChaos.itemjoin.utils.Legacy;
 import me.RockinChaos.itemjoin.utils.ImageMap;
 import me.RockinChaos.itemjoin.utils.Reflection;
@@ -188,7 +188,7 @@ public class ItemDesigner {
 	}
 	
 	private void setSkullDatabase(ItemMap itemMap) {
-		if (ServerHandler.hasSpecificUpdate("1_8") && Hooks.hasHeadDatabase() && itemMap.getNodeLocation().getString(".skull-texture") != null) {
+		if (ServerHandler.hasSpecificUpdate("1_8") && DataStorage.hasHeadDatabase() && itemMap.getNodeLocation().getString(".skull-texture") != null) {
 			if (itemMap.getMaterial().toString().equalsIgnoreCase("SKULL_ITEM") || itemMap.getMaterial().toString().equalsIgnoreCase("PLAYER_HEAD")) {
 				if (itemMap.getNodeLocation().getString(".skull-owner") != null) {  ServerHandler.sendErrorMessage("&4You cannot define a skull owner and a skull texture at the same time, please remove one from the item."); return;  }
 				String skullTexture = getActualTexture(itemMap).replace("hdb-", "");
@@ -250,9 +250,9 @@ public class ItemDesigner {
 				}
 				if (enchantName != null) {
 					listEnchants.put(name, level);
-				} else if (enchantName == null && Hooks.hasTokenEnchant() == true && TokenEnchantAPI.getInstance().getEnchant(name) != null) {
+				} else if (enchantName == null && DataStorage.hasTokenEnchant() == true && TokenEnchantAPI.getInstance().getEnchant(name) != null) {
 					listEnchants.put(name, level);
-				} else if (enchantName == null && Hooks.hasTokenEnchant() != true) {
+				} else if (enchantName == null && DataStorage.hasTokenEnchant() != true) {
 					ServerHandler.sendErrorMessage("&4An error occurred in the config, &a" + name + "&4 is an incorrect enchantment name!");
 					ServerHandler.sendErrorMessage("&4Please see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/enchantments/Enchantment.html for a list of correct enchantment names!");
 				}
@@ -296,7 +296,7 @@ public class ItemDesigner {
 //  This designs the item to be unique to ItemJoin. //
 //  =============================================== //
 	private void setNBTData(ItemMap itemMap) {
-		if (Hooks.hasNewNBTSystem() && !itemMap.isVanilla()) {
+		if (DataStorage.hasNewNBTSystem() && !itemMap.isVanilla()) {
 			try {
 				Object tag = Reflection.getNMS("NBTTagCompound").getConstructor().newInstance();
 				tag.getClass().getMethod("setString", String.class, String.class).invoke(tag, "ItemJoin Name", itemMap.getConfigName());

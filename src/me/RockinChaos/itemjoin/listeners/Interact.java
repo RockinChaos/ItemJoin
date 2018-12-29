@@ -13,7 +13,6 @@ import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
-import me.RockinChaos.itemjoin.giveitems.utils.ItemCommand;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
@@ -87,7 +86,7 @@ public class Interact implements Listener {
 	
 	private boolean setupCommands(Player player, ItemStack item, String action) {
 		  ItemMap itemMap = ItemHandler.getMappedItem(item, player.getWorld());
-			if (itemMap != null && itemMap.inWorld(player.getWorld()) && itemMap.hasPermission(player) && ItemCommand.isCommandable(itemMap, action)) {
+			if (itemMap != null && itemMap.inWorld(player.getWorld()) && itemMap.hasPermission(player)) {
 				itemMap.executeCommands(player, action);
 				return true;
 			}

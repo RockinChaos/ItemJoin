@@ -20,7 +20,6 @@ import com.sk89q.worldguard.protection.ApplicableRegionSet;
 
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
-import net.milkbowl.vault.economy.EconomyResponse;
 
 @SuppressWarnings("deprecation")
 public class Legacy {
@@ -118,16 +117,8 @@ public class Legacy {
 		return skullMeta;
 	}
 	
-	public static double getLegacyBalance(String name) {
-		return Econ.econ.getBalance(name);
-	}
-	
 	public static Player getLegacyPlayer(String playerName) {
 		return Bukkit.getPlayer(playerName);
-	}
-	
-	public static EconomyResponse withdrawLegacyBalance(String name, int cost) {
-		return Econ.econ.withdrawPlayer(name, cost);
 	}
 	
 	public static ApplicableRegionSet getLegacyRegionSet(World world, Location loc) {

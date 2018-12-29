@@ -25,7 +25,7 @@ import me.RockinChaos.itemjoin.giveitems.listeners.RegionEnter;
 import me.RockinChaos.itemjoin.giveitems.listeners.Respawn;
 import me.RockinChaos.itemjoin.giveitems.listeners.WorldSwitch;
 
-public class Hooks {
+public class DataStorage {
 	private static boolean hasVault;
 	private static boolean hasMultiverse;
 	private static boolean hasInventories;
@@ -43,7 +43,7 @@ public class Hooks {
 	private static boolean loggable;
 	private static int WorldGuardVersion;
 
-	public static void getHooks() {
+	public static void generateData() {
 		hookVault();
 		hookPlaceholderAPI();
 		hookMultiverseCore();

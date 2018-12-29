@@ -20,7 +20,7 @@ import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
-import me.RockinChaos.itemjoin.utils.Hooks;
+import me.RockinChaos.itemjoin.utils.DataStorage;
 import me.RockinChaos.itemjoin.utils.Legacy;
 import me.RockinChaos.itemjoin.utils.Utils;
 import me.RockinChaos.itemjoin.utils.sqlite.SQLData;
@@ -32,7 +32,7 @@ public class RegionEnter implements Listener {
 	@EventHandler
 	private void giveOnRegionEnter(PlayerMoveEvent event) {
 		final Player player = event.getPlayer();
-		if (Hooks.hasWorldGuard() == true) {
+		if (DataStorage.hasWorldGuard() == true) {
 			if (isInRegion(player) && SQLData.isEnabled(player)) {
 				String regionId = getRegion(player).getId();
 				if (Utils.containsIgnoreCase(localeRegions.toString(), regionId) || Utils.containsIgnoreCase(localeRegions.toString(), "UNDEFINED")) {
@@ -111,7 +111,7 @@ public class RegionEnter implements Listener {
 	}
 	
 	private static ApplicableRegionSet getRegionSets(World world, Location loc) {
-		if (Hooks.getWorldGuardVersion() >= 700) {
+		if (DataStorage.getWorldGuardVersion() >= 700) {
 			com.sk89q.worldedit.world.World wgWorld;
 			try { wgWorld = com.sk89q.worldguard.WorldGuard.getInstance().getPlatform().getWorldByName(world.getName()); }
 			catch (NoSuchMethodError e) { wgWorld = com.sk89q.worldguard.WorldGuard.getInstance().getPlatform().getMatcher().getWorldByName(world.getName()); }

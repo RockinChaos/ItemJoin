@@ -12,7 +12,7 @@ import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
-import me.RockinChaos.itemjoin.utils.Hooks;
+import me.RockinChaos.itemjoin.utils.DataStorage;
 import me.RockinChaos.itemjoin.utils.sqlite.SQLData;
 
 public class LimitSwitch implements Listener {
@@ -22,7 +22,7 @@ public class LimitSwitch implements Listener {
 		final Player player = event.getPlayer();
 		final GameMode newMode = event.getNewGameMode();
 		if (RegionEnter.getPlayerRegions().get(player) != null) { RegionEnter.delPlayerRegion(player); }
-		if (Hooks.hasAuthMe() == true) { setAuthenticating(player, newMode); } 
+		if (DataStorage.hasAuthMe() == true) { setAuthenticating(player, newMode); } 
 		else { setItems(player, newMode); }
 	}
 	
@@ -30,7 +30,7 @@ public class LimitSwitch implements Listener {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				if (Hooks.hasAuthMe() == true && fr.xephi.authme.api.v3.AuthMeApi.getInstance().isAuthenticated(player)) {
+				if (DataStorage.hasAuthMe() == true && fr.xephi.authme.api.v3.AuthMeApi.getInstance().isAuthenticated(player)) {
 					setItems(player, newMode);
 					this.cancel();
 				}

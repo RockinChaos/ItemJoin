@@ -8,6 +8,7 @@ import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.utils.sqlite.SQLData;
 
 public class APIUtils {
+	
 	 void setItems(Player player) {
 		String Probable = ItemUtilities.getProbabilityItem(player);
 		for (ItemMap item : ItemUtilities.getItems()) {

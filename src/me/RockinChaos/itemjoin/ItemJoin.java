@@ -6,21 +6,19 @@ import me.RockinChaos.itemjoin.giveitems.utils.ItemDesigner;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
-import me.RockinChaos.itemjoin.utils.Hooks;
+import me.RockinChaos.itemjoin.utils.DataStorage;
 import me.RockinChaos.itemjoin.utils.Updater;
 
 
 public class ItemJoin extends JavaPlugin {
-	
   	private static ItemJoin instance;
   	
   	public void onEnable() {
   		instance = this;
   		ConfigHandler.loadConfigs();
-  		Hooks.getHooks();
-  		Hooks.registerEvents();
-  		ItemDesigner itemDesigner = new ItemDesigner();
-  		itemDesigner.generateItems();
+  		DataStorage.generateData();
+  		DataStorage.registerEvents();
+  		(new ItemDesigner()).generateItems();
   		ItemUtilities.updateItems();
   		ServerHandler.sendConsoleMessage("&ahas been Enabled!");
   		Updater.setAbsoluteFile(getFile());
@@ -34,5 +32,4 @@ public class ItemJoin extends JavaPlugin {
   	public static ItemJoin getInstance() {
   		return instance;
   	}
-  	
 }

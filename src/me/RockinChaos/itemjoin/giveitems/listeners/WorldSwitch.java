@@ -12,7 +12,7 @@ import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
-import me.RockinChaos.itemjoin.utils.Hooks;
+import me.RockinChaos.itemjoin.utils.DataStorage;
 import me.RockinChaos.itemjoin.utils.sqlite.SQLData;
 
 public class WorldSwitch implements Listener {
@@ -21,7 +21,7 @@ public class WorldSwitch implements Listener {
 	private void giveOnWorldSwitch(PlayerChangedWorldEvent event) {
 		final Player player = event.getPlayer();
 		if (RegionEnter.getPlayerRegions().get(player) != null) { RegionEnter.delPlayerRegion(player); }
-		if (Hooks.hasAuthMe() == true) { setAuthenticating(player); } 
+		if (DataStorage.hasAuthMe() == true) { setAuthenticating(player); } 
 		else { setItems(player); }
 	}
 	
@@ -29,7 +29,7 @@ public class WorldSwitch implements Listener {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				if (Hooks.hasAuthMe() == true && fr.xephi.authme.api.v3.AuthMeApi.getInstance().isAuthenticated(player)) {
+				if (DataStorage.hasAuthMe() == true && fr.xephi.authme.api.v3.AuthMeApi.getInstance().isAuthenticated(player)) {
 					setItems(player);
 					this.cancel();
 				}
