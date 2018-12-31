@@ -25,6 +25,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.map.MapView;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.bukkit.inventory.meta.Damageable;
@@ -35,6 +36,7 @@ import com.mojang.util.UUIDTypeAdapter;
 
 import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
+import me.RockinChaos.itemjoin.utils.DataStorage;
 import me.RockinChaos.itemjoin.utils.Legacy;
 import me.RockinChaos.itemjoin.utils.Reflection;
 import me.RockinChaos.itemjoin.utils.Utils;
@@ -156,6 +158,13 @@ public class ItemHandler {
 		}
 		return material;
 	}
+	
+    public static short getMapID(MapView view) {
+    	if (!DataStorage.getMapMethod()) {
+    		try { return (short) view.getId(); } 
+			catch (NoSuchMethodError e) { DataStorage.setMapMethod(true); return Reflection.getMapID(view); }
+    	} else { return Reflection.getMapID(view); }
+    }
 	
 	public static String getDelay(String context) {
 		return ("<delay:" + Utils.returnInteger(context) + ">");

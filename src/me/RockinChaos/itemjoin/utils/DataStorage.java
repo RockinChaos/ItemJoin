@@ -13,12 +13,12 @@ import me.RockinChaos.itemjoin.listeners.Drops;
 import me.RockinChaos.itemjoin.listeners.Interact;
 import me.RockinChaos.itemjoin.listeners.InvClickCreative;
 import me.RockinChaos.itemjoin.listeners.InvClickSurvival;
+import me.RockinChaos.itemjoin.listeners.InventoryClose;
 import me.RockinChaos.itemjoin.listeners.Storable;
 import me.RockinChaos.itemjoin.listeners.Pickups;
 import me.RockinChaos.itemjoin.listeners.Placement;
 import me.RockinChaos.itemjoin.listeners.SwitchHands;
 import me.RockinChaos.itemjoin.giveitems.listeners.LimitSwitch;
-import me.RockinChaos.itemjoin.giveitems.listeners.Inventory;
 import me.RockinChaos.itemjoin.giveitems.listeners.PlayerJoin;
 import me.RockinChaos.itemjoin.giveitems.listeners.PlayerQuit;
 import me.RockinChaos.itemjoin.giveitems.listeners.RegionEnter;
@@ -42,6 +42,7 @@ public class DataStorage {
 	private static boolean hasNewNBTSystem;
 	private static boolean loggable;
 	private static int WorldGuardVersion;
+	private static boolean oldMapMethod = false;
 
 	public static void generateData() {
 		hookVault();
@@ -144,7 +145,7 @@ public class DataStorage {
 		ItemJoin.getInstance().getCommand("ij").setExecutor(new Commands());
 		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerJoin(), ItemJoin.getInstance());
 		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerQuit(), ItemJoin.getInstance());
-		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Inventory(), ItemJoin.getInstance());
+		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new InventoryClose(), ItemJoin.getInstance());
 		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new WorldSwitch(), ItemJoin.getInstance());
 		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new LimitSwitch(), ItemJoin.getInstance());
 		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Respawn(), ItemJoin.getInstance());
@@ -322,5 +323,13 @@ public class DataStorage {
 			ServerHandler.sendConsoleMessage("&4Could not find WorldGuard.");
 			hasWorldGuard = false;
 		}
+	}
+	
+	public static void setMapMethod(boolean bool) {
+		oldMapMethod = bool;
+	}
+	
+	public static boolean getMapMethod() {
+		return oldMapMethod;
 	}
 }

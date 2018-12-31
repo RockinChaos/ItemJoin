@@ -292,7 +292,7 @@ public class ItemDesigner {
 				} else if (!SQLData.hasImage(itemMap.getConfigName(), itemMap.getMapImage())) {
 					MapView view = Legacy.createLegacyMapView();
 					try { view.removeRenderer(view.getRenderers().get(0)); } catch (NullPointerException e) { ServerHandler.sendDebugTrace(e); }
-					int mapID = Legacy.getMapID(view);
+					int mapID = ItemHandler.getMapID(view);
 					itemMap.setMapID(mapID);
 					ImageMap imgPlatform = new ImageMap(itemMap.getMapImage(), mapID);
 					try { view.addRenderer(imgPlatform); } catch (NullPointerException e) { ServerHandler.sendDebugTrace(e); }

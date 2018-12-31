@@ -19,7 +19,6 @@ import org.bukkit.material.MaterialData;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 
 import me.RockinChaos.itemjoin.ItemJoin;
-import me.RockinChaos.itemjoin.handlers.ServerHandler;
 
 @SuppressWarnings("deprecation")
 public class Legacy {
@@ -66,20 +65,6 @@ public class Legacy {
     		}
     	} catch (Exception e) { }
     	return null;
-    }
-    
-	public static Class<?> getMapNMS(String name) {
-		try {
-			return Class.forName("org.bukkit.map." + name);
-		} catch (Exception e) {
-			if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
-		}
-		return null;
-	}
-    
-    public static short getMapID(MapView view) {
-		try { return (short) view.getId(); } 
-		catch (NoSuchMethodError e) { return Reflection.getMapID(view); }
     }
     
     public static ItemStack newLegacyItemStack(Material material, int count, short dataValue) {

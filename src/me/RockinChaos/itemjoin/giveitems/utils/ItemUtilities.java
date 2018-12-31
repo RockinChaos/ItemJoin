@@ -158,9 +158,7 @@ public class ItemUtilities {
 		player.getInventory().setChestplate(null);
 		player.getInventory().setLeggings(null);
 		player.getInventory().setBoots(null);
-		if (ServerHandler.hasCombatUpdate()) {
-			player.getInventory().setItemInOffHand(null);
-		}
+		if (ServerHandler.hasCombatUpdate()) { player.getInventory().setItemInOffHand(null); }
 	}
 	
 	public static void setClearItemJoinItems(Player player) {

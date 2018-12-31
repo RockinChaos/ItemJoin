@@ -43,8 +43,7 @@ public class Reflection {
 	
 	public static short getMapID(MapView view) {
 		try {
-			Class<?> MapView = getMapNMS("MapView");
-			Object mapID = MapView.getMethod("getId").invoke(view);
+			Object mapID = getMapNMS("MapView").getMethod("getId").invoke(view);
 			return (short)mapID; 
 		} catch (Exception ex) { return 1; }
 	}

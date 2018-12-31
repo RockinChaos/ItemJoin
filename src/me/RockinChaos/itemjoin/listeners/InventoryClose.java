@@ -1,4 +1,4 @@
-package me.RockinChaos.itemjoin.giveitems.listeners;
+package me.RockinChaos.itemjoin.listeners;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -19,7 +19,7 @@ import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.utils.sqlite.SQLData;
 
-public class Inventory implements Listener {
+public class InventoryClose implements Listener {
 	private boolean isWorldChange = false;
 	
     @EventHandler
