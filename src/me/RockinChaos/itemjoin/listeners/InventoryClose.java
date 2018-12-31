@@ -26,8 +26,8 @@ public class InventoryClose implements Listener {
     private void onInventoryClose(InventoryCloseEvent event) {
     	final InventoryView view = event.getView();
         final Player player = (Player) event.getPlayer();
-        boolean updateInv = false;
         if (PlayerHandler.isCraftingInv(view)) {
+            boolean updateInv = false;
 			final String Probable = ItemUtilities.getProbabilityItem(player);
 			for (final ItemMap item : ItemUtilities.getItems()) {
 				if (hasCraftingItem(item, view, player) && ItemHandler.isCraftingSlot(item.getSlot())) {
@@ -44,6 +44,16 @@ public class InventoryClose implements Listener {
 				}
 			}
 			if (updateInv) { PlayerHandler.delayUpdateInventory(player, 2L); }
+        } else {
+        	Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
+        		public void run() {
+        			boolean updateInv = false;
+        			for (final ItemMap item: ItemUtilities.getItems()) {
+        				if (hasCraftingItems(item, player)) { updateInv = true; }
+        			}
+        			if (updateInv) { PlayerHandler.delayUpdateInventory(player, 2L); }
+        		}
+        	}, 1L);
         }
     }
     
@@ -102,7 +112,17 @@ public class InventoryClose implements Listener {
     private boolean hasCraftingItem(ItemMap item, InventoryView view, Player player) {
     	for (ItemStack craftItem : view.getTopInventory().getContents()) {
     		if (item.isSimilar(craftItem)) {
-    			craftItem.setAmount(0);
+    			view.getTopInventory().remove(craftItem);
+    			try { craftItem.setAmount(0); } catch (Exception e) { }
+    			return true;
+    		}
+    	}
+    	return false;
+    }
+    
+    private boolean hasCraftingItems(ItemMap item, Player player) {
+    	for (ItemStack craftItem : player.getOpenInventory().getTopInventory().getContents()) {
+    		if (item.isSimilar(craftItem)) {
     			return true;
     		}
     	}
@@ -116,4 +136,5 @@ public class InventoryClose implements Listener {
     private void setWorldChange(boolean bool) {
     	isWorldChange = bool;
     }
+   
 }
