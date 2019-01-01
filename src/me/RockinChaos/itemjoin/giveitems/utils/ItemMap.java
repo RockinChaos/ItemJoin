@@ -317,8 +317,6 @@ public class ItemMap {
 	}
 	
 	private void setWorlds() {
-		if (Utils.containsIgnoreCase(this.nodeLocation.getString(".enabled-worlds"), "ALL") || Utils.containsIgnoreCase(this.nodeLocation.getString(".enabled-worlds"), "GLOBAL") 
-		|| this.nodeLocation.getString(".enabled-worlds") == null || this.nodeLocation.getString(".enabled-worlds").isEmpty()) { this.enabledWorlds.add("ALL"); }
 		if (this.nodeLocation.getString(".enabled-worlds") != null && !this.nodeLocation.getString(".enabled-worlds").isEmpty()) {
 			String[] enabledParts = this.nodeLocation.getString(".enabled-worlds").replace(" ,  ", ",").replace(" , ", ",").replace(",  ", ",").replace(", ", ",").split(",");
 			for (String enabledWorld : enabledParts) {
