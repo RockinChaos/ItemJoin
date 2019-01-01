@@ -20,12 +20,15 @@ public class SQLData {
 	
 	public static void saveAllToDatabase(Player player, String item) {
 		saveToDatabase(player, item, "first-join", "");
+		saveToDatabase(player, item, "first-world", "");
 		saveToDatabase(player, item, "ip-limit", "");
 	}
 	
 	public static void createTables(String itemflag) {
 		if (itemflag.equalsIgnoreCase("first-join") && !SQLite.getDatabase("database").tableExists("first_join")) {
 			SQLite.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS first_join (`World_Name` varchar(32), `Player_Name` varchar(32), `Player_UUID` varchar(32), `Item_Name` varchar(32));");
+		} else if (itemflag.equalsIgnoreCase("first-world") && !SQLite.getDatabase("database").tableExists("first_world")) {
+			SQLite.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS first_world (`World_Name` varchar(32), `Player_Name` varchar(32), `Player_UUID` varchar(32), `Item_Name` varchar(32));");
 		} else if (itemflag.equalsIgnoreCase("ip-limit") && !SQLite.getDatabase("database").tableExists("ip_limits")) {
 			SQLite.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS ip_limits (`World_Name` varchar(32), `IP_Address` varchar(32), `Player_UUID` varchar(32), `Item_Name` varchar(32));");
 		} else if (itemflag.contains("first-join:") && !SQLite.getDatabase("database").tableExists("first_commands")) {
@@ -74,6 +77,8 @@ public class SQLData {
 					SQLite.getDatabase("database").executeStatement("INSERT INTO ip_limits (`World_Name`, `IP_Address`, `Player_UUID`, `Item_Name`) VALUES ('" + player.getWorld().getName() + "','" + player.getAddress().getHostString() + "','" + PlayerHandler.getPlayerID(player) + "','" + item + "')");
 				} else if (itemflag.equalsIgnoreCase("first-join") && !isInDatabase(itemflag, "SELECT * FROM first_join WHERE World_Name='" + player.getWorld().getName() + "' AND Player_UUID='" + PlayerHandler.getPlayerID(player) + "' AND Item_Name='" + item + "';")) {
 					SQLite.getDatabase("database").executeStatement("INSERT INTO first_join (`World_Name`, `Player_Name`, `Player_UUID`, `Item_Name`) VALUES ('" + player.getWorld().getName() + "','" + player.getName().toString() + "','" + PlayerHandler.getPlayerID(player) + "','" + item + "')");
+				} else if (itemflag.equalsIgnoreCase("first-world") && !isInDatabase(itemflag, "SELECT * FROM first_world WHERE World_Name='" + player.getWorld().getName() + "' AND Player_UUID='" + PlayerHandler.getPlayerID(player) + "' AND Item_Name='" + item + "';")) {
+					SQLite.getDatabase("database").executeStatement("INSERT INTO first_world (`World_Name`, `Player_Name`, `Player_UUID`, `Item_Name`) VALUES ('" + player.getWorld().getName() + "','" + player.getName().toString() + "','" + PlayerHandler.getPlayerID(player) + "','" + item + "')");
 				} else if (itemflag.contains("first-join:") && !isInDatabase(itemflag, "SELECT * FROM first_commands WHERE World_Name='" + player.getWorld().getName() + "' AND Player_UUID='" + PlayerHandler.getPlayerID(player) + "' AND Command_String='" + itemflag.replace("first-join: ", "").replace("first-join:", "") + "';")) {
 					SQLite.getDatabase("database").executeStatement("INSERT INTO first_commands (`World_Name`, `Player_UUID`, `Command_String`) VALUES ('" + player.getWorld().getName() + "','" + PlayerHandler.getPlayerID(player) + "','" + itemflag.replace("first-join: ", "").replace("first-join:", "") + "')");
 				} else if (itemflag.contains("enabled-players") || itemflag.contains("disabled-players")) {
@@ -142,6 +147,9 @@ public class SQLData {
 		if (section.equalsIgnoreCase("first_join") && SQLite.getDatabase("database").tableExists("first_join")) {
 			SQLite.getDatabase("database").executeStatement("DELETE FROM " + section + " WHERE Player_UUID='" + UUID + "';");
 			SQLite.getDatabase("database").closeConnection();
+		} else if (section.equalsIgnoreCase("first_world") && SQLite.getDatabase("database").tableExists("first_world")) {
+			SQLite.getDatabase("database").executeStatement("DELETE FROM " + section + " WHERE Player_UUID='" + UUID + "';");
+			SQLite.getDatabase("database").closeConnection();
 		} else if (section.equalsIgnoreCase("ip_limits") && SQLite.getDatabase("database").tableExists("ip_limits")) {
 			SQLite.getDatabase("database").executeStatement("DELETE FROM " + section + " WHERE Player_UUID='" + UUID + "';");
 			SQLite.getDatabase("database").closeConnection();
@@ -158,7 +166,16 @@ public class SQLData {
 	public static Boolean hasFirstJoined(Player player, String item) {
 		ConfigurationSection items = ConfigHandler.getItemSection(item);
 		String ItemFlags = items.getString(".itemflags");
-		if (Utils.containsIgnoreCase(ItemFlags, "first-join") && isInDatabase("first-join", "SELECT * FROM first_join WHERE World_Name='" + player.getWorld().getName() + "' AND Player_UUID='" + PlayerHandler.getPlayerID(player) + "' AND Item_Name='" + item + "';")) {
+		if (Utils.containsIgnoreCase(ItemFlags, "first-join") && isInDatabase("first-join", "SELECT * FROM first_join WHERE Player_UUID='" + PlayerHandler.getPlayerID(player) + "' AND Item_Name='" + item + "';")) {
+			return true;
+		}
+		return false;
+	}
+	
+	public static Boolean hasFirstWorld(Player player, String item) {
+		ConfigurationSection items = ConfigHandler.getItemSection(item);
+		String ItemFlags = items.getString(".itemflags");
+		if (Utils.containsIgnoreCase(ItemFlags, "first-world") && isInDatabase("first-world", "SELECT * FROM first_world WHERE World_Name='" + player.getWorld().getName() + "' AND Player_UUID='" + PlayerHandler.getPlayerID(player) + "' AND Item_Name='" + item + "';")) {
 			return true;
 		}
 		return false;
