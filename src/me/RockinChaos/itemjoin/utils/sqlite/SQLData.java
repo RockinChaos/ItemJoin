@@ -55,7 +55,7 @@ public class SQLData {
 				}
 			} finally { result.close(); statement.close(); SQLite.getDatabase("database").closeConnection();}
 		} catch (Exception e) {
-			ServerHandler.sendDebugMessage("Could not read from the database.db file, the itemflags first-join and ip-limits have been disabled!");
+			ServerHandler.sendDebugMessage("Could not read from the database.db file, some ItemJoin features have been disabled!");
 			if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
 		}
 		return false;

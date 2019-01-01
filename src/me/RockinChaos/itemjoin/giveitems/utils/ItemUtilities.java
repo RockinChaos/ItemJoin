@@ -27,7 +27,7 @@ public class ItemUtilities {
 	
   	private static List < ItemMap > items = new ArrayList < ItemMap >();
 	public static Map < String, Integer > probability = new HashMap < String, Integer > ();
-	private static HashMap <Player, Integer> failCount = new HashMap <Player, Integer> ();
+	private static HashMap <Integer, Integer> failCount = new HashMap <Integer, Integer> ();
 	
 	public static void addItem(ItemMap itemMap) {
 		items.add(itemMap);
@@ -79,7 +79,6 @@ public class ItemUtilities {
 		InvClickCreative.isCreative(player, player.getGameMode());
 		if (!type.equalsIgnoreCase("Limit-Modes")) { ItemUtilities.setClearingOfItems(player, player.getWorld().getName(), "Clear-On-" + type); }
 		if (!type.equalsIgnoreCase("Region-Enter") && !type.equalsIgnoreCase("Limit-Modes")) { PlayerHandler.setHeldItemSlot(player); }
-		ItemUtilities.putFailCount(player, 0);
 		ItemUtilities.updateItems(player, false);
 	}
 	
@@ -188,49 +187,57 @@ public class ItemUtilities {
 		inventoryContents.clear();
 	}
 	
-	public static void sendFailCount(Player player) {
-		if (getFailCount().get(player) != null && getFailCount().get(player) != 0) {
+	public static void sendFailCount(Player player, int session) {
+		if (getFailCount().get(session) != null && getFailCount().get(session) != 0) {
 			if (ConfigHandler.getConfig("items.yml").getString("items-Overwrite") != null && isOverwriteWorld(player.getWorld().getName()) 
 					|| ConfigHandler.getConfig("items.yml").getString("items-Overwrite") != null && ConfigHandler.getConfig("items.yml").getBoolean("items-Overwrite") == true) {
-				Language.sendMessage(player, "failedInvFull", getFailCount().get(player).toString());
+				Language.sendMessage(player, "failedInvFull", getFailCount().get(session).toString());
 			} else {
-				Language.sendMessage(player, "failedOverwrite", getFailCount().get(player).toString());
+				Language.sendMessage(player, "failedOverwrite", getFailCount().get(session).toString());
 			}
-			removeFailCount(player);
+			removeFailCount(session);
 		}
 	}
 	
-	public static HashMap < Player, Integer > getFailCount() {
+	public static HashMap < Integer, Integer > getFailCount() {
 		return failCount;
 	}
 	
-	public static void putFailCount(Player player, int i) {
-		failCount.put(player, i);
+	public static void putFailCount(int session, int i) {
+		failCount.put(session, i);
 	}
 	
-	public static void removeFailCount(Player player) {
-		failCount.remove(player);
+	public static void removeFailCount(int session) {
+		failCount.remove(session);
 	}
 	
-	public static Boolean isObtainable(Player player, ItemMap itemMap) {
+	public static Boolean isObtainable(Player player, ItemMap itemMap, int session) {
 		if (itemMap.getProbability().equals(-1) || !itemMap.getProbability().equals(-1) && probability.containsKey(itemMap.getConfigName()) && !hasProbabilityItem(player, itemMap)) {
 			if (!itemMap.hasItem(player) || itemMap.isAlwaysGive() || !itemMap.isLimitMode(player.getGameMode())) {
+				boolean firstJoin = SQLData.hasFirstJoined(player, itemMap.getConfigName());
+				boolean ipLimited = SQLData.hasIPLimited(player, itemMap.getConfigName());
 				if (itemMap.isLimitMode(player.getGameMode())) {
 					if (Utils.isInt(itemMap.getSlot()) && Integer.parseInt(itemMap.getSlot()) >= 0 && Integer.parseInt(itemMap.getSlot()) <= 35) {
-						if (!SQLData.hasFirstJoined(player, itemMap.getConfigName()) && !SQLData.hasIPLimited(player, itemMap.getConfigName()) 
-								&& canOverwrite(player, itemMap.getSlot(), itemMap.getConfigName())) {
+						if (!firstJoin && !ipLimited && canOverwrite(player, itemMap.getSlot(), itemMap.getConfigName())) {
 							return true;
 						}
 					} else if (ItemHandler.isCustomSlot(itemMap.getSlot())) {
-						if (!SQLData.hasFirstJoined(player, itemMap.getConfigName()) && !SQLData.hasIPLimited(player, itemMap.getConfigName()) 
-								&& canOverwrite(player, itemMap.getSlot(), itemMap.getConfigName())) {
+						if (!firstJoin && !ipLimited && canOverwrite(player, itemMap.getSlot(), itemMap.getConfigName())) {
 							return true;
 						}
 					}
 					if (!SQLData.hasFirstJoined(player, itemMap.getConfigName()) && !SQLData.hasIPLimited(player, itemMap.getConfigName())) {
-						putFailCount(player, getFailCount().get(player) + 1);
-						ServerHandler.sendDebugMessage("Failed to give; " + itemMap.getConfigName());
-					} else { ServerHandler.sendDebugMessage("Already given; " + itemMap.getConfigName()); }
+						if (session != 0 && getFailCount().get(session) != null) {
+						putFailCount(session, getFailCount().get(session) + 1);
+						} else if (session != 0) { putFailCount(session, 1); }
+						ServerHandler.sendDebugMessage("Failed to give item; " + itemMap.getConfigName());
+					} else {
+						if (firstJoin) {
+							ServerHandler.sendDebugMessage("Already given first-join item; " + itemMap.getConfigName() + " they can no longer recieve this.");
+						} else if (ipLimited) {
+							ServerHandler.sendDebugMessage("Already given ip-limited item; " + itemMap.getConfigName() + " they will only recieve this on their dedicated ip."); 
+						}
+					}
 					return false;
 				} else { return false; }
 			}

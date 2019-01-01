@@ -13,6 +13,7 @@ import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.utils.DataStorage;
+import me.RockinChaos.itemjoin.utils.Utils;
 import me.RockinChaos.itemjoin.utils.sqlite.SQLData;
 
 public class LimitSwitch implements Listener {
@@ -43,17 +44,18 @@ public class LimitSwitch implements Listener {
 		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
 			public void run() {
 				String Probable = ItemUtilities.getProbabilityItem(player);
+				final int session = Utils.getRandom(1, 80000);
 				for (ItemMap item : ItemUtilities.getItems()) { 
 					if (item.isUseOnLimitSwitch() && item.inWorld(player.getWorld()) 
 							&& ItemUtilities.isChosenProbability(item, Probable) && SQLData.isEnabled(player)
-							&& item.hasPermission(player) && ItemUtilities.isObtainable(player, item)) {
+							&& item.hasPermission(player) && ItemUtilities.isObtainable(player, item, session)) {
 						item.giveTo(player, false, 0); 
 						item.setAnimations(player);
 					} else if (item.isUseOnLimitSwitch() && !item.isLimitMode(newMode) && item.inWorld(player.getWorld()) && item.hasItem(player)) {
 						item.removeFrom(player);
 					}
 				}
-				ItemUtilities.sendFailCount(player);
+				ItemUtilities.sendFailCount(player, session);
 				PlayerHandler.delayUpdateInventory(player, 15L);
 			}
 		}, 1L);

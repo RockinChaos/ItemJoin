@@ -50,9 +50,10 @@ public class RegionEnter implements Listener {
 		playersInRegions.put(player, regionId);
 		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
 			public void run() {
+				final int session = Utils.getRandom(1, 80000);
 				removeLeaveItems(player);
-				giveItems(player, regionId, 1);
-				ItemUtilities.sendFailCount(player);
+				giveItems(player, regionId, 1, session);
+				ItemUtilities.sendFailCount(player, session);
 				PlayerHandler.delayUpdateInventory(player, 15L);
 			}
 		}, ConfigHandler.getItemDelay());
@@ -79,10 +80,10 @@ public class RegionEnter implements Listener {
 		}
 	}
 	
-	private static void giveItems(Player player, String region, int step) {
+	private static void giveItems(Player player, String region, int step, int session) {
 		String Probable = ItemUtilities.getProbabilityItem(player);
 		for (ItemMap item: ItemUtilities.getItems()) {
-			if (item.isGiveOnRegionEnter() && SQLData.isEnabled(player) && item.inWorld(player.getWorld()) && ItemUtilities.isChosenProbability(item, Probable) && item.hasPermission(player) && ItemUtilities.isObtainable(player, item)) {
+			if (item.isGiveOnRegionEnter() && SQLData.isEnabled(player) && item.inWorld(player.getWorld()) && ItemUtilities.isChosenProbability(item, Probable) && item.hasPermission(player) && ItemUtilities.isObtainable(player, item, session)) {
 				if (Utils.containsIgnoreCase(item.getEnabledRegions(), region) || Utils.containsIgnoreCase(item.getEnabledRegions(), "UNDEFINED")) {
 					item.giveTo(player, false, 0);
 				}

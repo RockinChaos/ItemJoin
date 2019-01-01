@@ -319,11 +319,20 @@ public class ItemMap {
 	private void setWorlds() {
 		if (Utils.containsIgnoreCase(this.nodeLocation.getString(".enabled-worlds"), "ALL") || Utils.containsIgnoreCase(this.nodeLocation.getString(".enabled-worlds"), "GLOBAL") 
 		|| this.nodeLocation.getString(".enabled-worlds") == null || this.nodeLocation.getString(".enabled-worlds").isEmpty()) { this.enabledWorlds.add("ALL"); }
-		for (World world: Bukkit.getServer().getWorlds()) {
-			if (Utils.containsIgnoreCase(this.nodeLocation.getString(".enabled-worlds"), world.getName())) {
-				this.enabledWorlds.add(world.getName());
+		if (this.nodeLocation.getString(".enabled-worlds") != null && !this.nodeLocation.getString(".enabled-worlds").isEmpty()) {
+			String[] enabledParts = this.nodeLocation.getString(".enabled-worlds").replace(" ,  ", ",").replace(" , ", ",").replace(",  ", ",").replace(", ", ",").split(",");
+			for (String enabledWorld : enabledParts) {
+				if (enabledWorld.equalsIgnoreCase("ALL") || enabledWorld.equalsIgnoreCase("GLOBAL")) {
+					this.enabledWorlds.add("ALL");
+				} else {
+					for (World world: Bukkit.getServer().getWorlds()) {
+						if (enabledWorld.equalsIgnoreCase(world.getName())) {
+							this.enabledWorlds.add(world.getName());
+						}
+					}
+				}
 			}
-		}
+		} else { this.enabledWorlds.add("ALL"); }
 	}
 	
 	public void renderItemStack() {

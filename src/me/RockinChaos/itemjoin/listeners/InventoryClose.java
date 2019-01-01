@@ -32,7 +32,7 @@ public class InventoryClose implements Listener {
 			for (final ItemMap item : ItemUtilities.getItems()) {
 				if (hasCraftingItem(item, view, player) && ItemHandler.isCraftingSlot(item.getSlot())) {
 					if (ItemUtilities.isChosenProbability(item, Probable) && SQLData.isEnabled(player)
-							&& item.hasPermission(player) && ItemUtilities.isObtainable(player, item)) {
+							&& item.hasPermission(player) && ItemUtilities.isObtainable(player, item, 0)) {
 							updateInv = true;
 							Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
 								public void run() {
@@ -73,7 +73,7 @@ public class InventoryClose implements Listener {
 						|| ItemHandler.isCraftingSlot(item.getSlot()) && ItemUtilities.getSlotConversion(item.getSlot()) == 0) {
 					dropItem.remove();
 					if (ItemUtilities.isChosenProbability(item, Probable) && SQLData.isEnabled(player)
-							&& item.hasPermission(player) && ItemUtilities.isObtainable(player, item)) {
+							&& item.hasPermission(player) && ItemUtilities.isObtainable(player, item, 0)) {
 						updateInv = true;
 							Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
 								public void run() {
