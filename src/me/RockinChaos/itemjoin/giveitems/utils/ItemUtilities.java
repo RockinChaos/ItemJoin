@@ -215,18 +215,19 @@ public class ItemUtilities {
 		if (itemMap.getProbability().equals(-1) || !itemMap.getProbability().equals(-1) && probability.containsKey(itemMap.getConfigName()) && !hasProbabilityItem(player, itemMap)) {
 			if (!itemMap.hasItem(player) || itemMap.isAlwaysGive() || !itemMap.isLimitMode(player.getGameMode())) {
 				boolean firstJoin = SQLData.hasFirstJoined(player, itemMap.getConfigName());
+				boolean firstWorld = SQLData.hasFirstWorld(player, itemMap.getConfigName());
 				boolean ipLimited = SQLData.hasIPLimited(player, itemMap.getConfigName());
 				if (itemMap.isLimitMode(player.getGameMode())) {
 					if (Utils.isInt(itemMap.getSlot()) && Integer.parseInt(itemMap.getSlot()) >= 0 && Integer.parseInt(itemMap.getSlot()) <= 35) {
-						if (!firstJoin && !ipLimited && canOverwrite(player, itemMap.getSlot(), itemMap.getConfigName())) {
+						if (!firstJoin && !firstWorld && !ipLimited && canOverwrite(player, itemMap.getSlot(), itemMap.getConfigName())) {
 							return true;
 						}
 					} else if (ItemHandler.isCustomSlot(itemMap.getSlot())) {
-						if (!firstJoin && !ipLimited && canOverwrite(player, itemMap.getSlot(), itemMap.getConfigName())) {
+						if (!firstJoin && !firstWorld && !ipLimited && canOverwrite(player, itemMap.getSlot(), itemMap.getConfigName())) {
 							return true;
 						}
 					}
-					if (!SQLData.hasFirstJoined(player, itemMap.getConfigName()) && !SQLData.hasIPLimited(player, itemMap.getConfigName())) {
+					if (!firstJoin && !firstWorld && !ipLimited) {
 						if (session != 0 && getFailCount().get(session) != null) {
 						putFailCount(session, getFailCount().get(session) + 1);
 						} else if (session != 0) { putFailCount(session, 1); }
@@ -234,6 +235,8 @@ public class ItemUtilities {
 					} else {
 						if (firstJoin) {
 							ServerHandler.sendDebugMessage("Already given first-join item; " + itemMap.getConfigName() + " they can no longer recieve this.");
+						} else if (firstWorld) {
+							ServerHandler.sendDebugMessage("Already given first-world item; " + itemMap.getConfigName() + " they can no longer recieve this in the world " + player.getWorld().getName());
 						} else if (ipLimited) {
 							ServerHandler.sendDebugMessage("Already given ip-limited item; " + itemMap.getConfigName() + " they will only recieve this on their dedicated ip."); 
 						}

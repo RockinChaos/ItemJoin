@@ -144,6 +144,7 @@ public class Commands implements CommandExecutor {
 				Language.informPlayer(sender, "&c&l[DANGER]&eThe Following Destroys Data &nPermanently!&e&c&l[DANGER]");
 				Language.informPlayer(sender, "&a&l/ItemJoin Purge &7- &eDeletes the database file!");
 				Language.informPlayer(sender, "&a&l/ItemJoin Purge first-join <User> &7- &eFirst-Join data.");
+				Language.informPlayer(sender, "&a&l/ItemJoin Purge first-world <User> &7- &eFirst-World data.");
 				Language.informPlayer(sender, "&a&l/ItemJoin Purge ip-limits <User> &7- &eIp-Limits data.");
 				Language.informPlayer(sender, "&aFound a bug? Report it @");
 				Language.informPlayer(sender, "&ahttps://github.com/RockinChaos/ItemJoin/issues");
@@ -197,7 +198,9 @@ public class Commands implements CommandExecutor {
 				}
 			} else { Language.sendMessage(sender, "noPermission", ""); }
 			return true;
-		} else if (args.length >= 3 && args[0].equalsIgnoreCase("purge") && args[1].equalsIgnoreCase("ip-limits") || args.length >= 3 && args[0].equalsIgnoreCase("purge") && args[1].equalsIgnoreCase("first-join")) {
+		} else if (args.length >= 3 && args[0].equalsIgnoreCase("purge") && args[1].equalsIgnoreCase("ip-limits") 
+				|| args.length >= 3 && args[0].equalsIgnoreCase("purge") && args[1].equalsIgnoreCase("first-join")
+				|| args.length >= 3 && args[0].equalsIgnoreCase("purge") && args[1].equalsIgnoreCase("first-world")) {
 			if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.purge")) {
 				OfflinePlayer player = PlayerHandler.getOfflinePlayer(args[2]);
 				if (player == null) {
@@ -209,6 +212,10 @@ public class Commands implements CommandExecutor {
 				} else if (cmdConfirm.get(3 + sender.getName()) != null && cmdConfirm.get(3 + sender.getName()).equals(true) && args[1].equalsIgnoreCase("first-join")) {
 					SQLData.purgeDatabaseData("first_join", player);
 					Language.sendMessage(sender, "databasePurged", "first-join data for " + args[2]);
+					cmdConfirm.remove(3 + sender.getName());
+				} else if (cmdConfirm.get(3 + sender.getName()) != null && cmdConfirm.get(3 + sender.getName()).equals(true) && args[1].equalsIgnoreCase("first-world")) {
+					SQLData.purgeDatabaseData("first_world", player);
+					Language.sendMessage(sender, "databasePurged", "first-world data for " + args[2]);
 					cmdConfirm.remove(3 + sender.getName());
 				} else if (cmdConfirm.get(2 + sender.getName()) == null && args[1].equalsIgnoreCase("ip-limits")) {
 					cmdConfirm.put(2 + sender.getName(), true);
