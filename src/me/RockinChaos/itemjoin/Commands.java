@@ -344,13 +344,13 @@ public class Commands implements CommandExecutor {
 							String type = item.getType().toString();
 							File itemsFile = new File(ItemJoin.getInstance().getDataFolder(), "items.yml");
 							FileConfiguration itemData = YamlConfiguration.loadConfiguration(itemsFile);
+							if (!ServerHandler.hasAquaticUpdate() && item.getType().getMaxDurability() < 30 && ItemHandler.getDurability(item) > 0) {
+								itemData.set("items." + args[1] + "." + "id", type + ":" + ItemHandler.getDurability(item));
+							} else { itemData.set("items." + args[1] + "." + "id", type); }
 							itemData.set("items." + args[1] + "." + "id", type);
 							itemData.set("items." + args[1] + "." + "slot", 0);
 							if (item.getAmount() > 1) {
 								itemData.set("items." + args[1] + "." + "count", item.getAmount());
-							}
-							if (item.getType().getMaxDurability() < 30 && ItemHandler.getDurability(item) > 0) {
-								itemData.set("items." + args[1] + "." + "data-value", ItemHandler.getDurability(item));
 							}
 							if (item.getType().getMaxDurability() > 30 && ItemHandler.getDurability(item) != 0 && ItemHandler.getDurability(item) != ((short) item.getType().getMaxDurability())) {
 								itemData.set("items." + args[1] + "." + "durability", ItemHandler.getDurability(item));

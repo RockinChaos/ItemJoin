@@ -169,6 +169,7 @@ public class ItemMap {
 	private boolean AllowOpBypass = false;
 	
 	private boolean onlyFirstJoin = false;
+	private boolean onlyFirstWorld = false;
 	private boolean ipLimited = false;
 //  ============================================== //
 	
@@ -281,6 +282,9 @@ public class ItemMap {
 			this.noRepairing = Utils.containsIgnoreCase(this.itemflags, "item-repairable");
 			this.cancelEvents = Utils.containsIgnoreCase(this.itemflags, "cancel-events");
 			this.countLock = Utils.containsIgnoreCase(this.itemflags, "count-lock");
+			this.onlyFirstJoin = Utils.containsIgnoreCase(this.itemflags, "first-join");
+			this.onlyFirstWorld = Utils.containsIgnoreCase(this.itemflags, "first-world");
+			this.ipLimited = Utils.containsIgnoreCase(this.itemflags, "ip-limit");
 			this.deathDroppable = Utils.containsIgnoreCase(this.itemflags, "death-drops");
 			this.selfDroppable = Utils.containsIgnoreCase(this.itemflags, "self-drops");
 			this.AllowOpBypass = Utils.containsIgnoreCase(this.itemflags, "AllowOpBypass");
@@ -482,6 +486,13 @@ public class ItemMap {
 	public void setOnlyFirstJoin(boolean onlyOnFirstJoin) {
 		this.onlyFirstJoin = onlyOnFirstJoin;
 		if (onlyOnFirstJoin && this.giveOnRespawn) {
+			this.giveOnRespawn = false;
+		}
+	}
+	
+	public void setOnlyFirstWorld(boolean onlyOnFirstWorld) {
+		this.onlyFirstWorld = onlyOnFirstWorld;
+		if (onlyOnFirstWorld && this.giveOnRespawn) {
 			this.giveOnRespawn = false;
 		}
 	}
@@ -930,6 +941,10 @@ public class ItemMap {
 	
 	public boolean isOnlyFirstJoin() {
 		return this.onlyFirstJoin;
+	}
+	
+	public boolean isOnlyFirstWorld() {
+		return this.onlyFirstWorld;
 	}
 	
 	public boolean isIpLimted() {
