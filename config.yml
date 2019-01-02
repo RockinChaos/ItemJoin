@@ -29,6 +29,7 @@ NewNBT-System: true
 Clear-Items: ItemJoin
 Clear-On-Join: false
 Clear-On-WorldChanged: false
+Protect-SpecialItems: true
 AllowOPBypass: false
 CreativeBypass: false
 

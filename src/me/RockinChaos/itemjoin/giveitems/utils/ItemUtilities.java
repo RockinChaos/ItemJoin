@@ -162,29 +162,59 @@ public class ItemUtilities {
 	
 	public static void setClearItemJoinItems(Player player) {
 		PlayerInventory inventory = player.getInventory();
-		if (inventory.getHelmet() != null && ItemHandler.containsNBTData(inventory.getHelmet())) {
-			inventory.setHelmet(null);
-		}
-		if (inventory.getChestplate() != null && ItemHandler.containsNBTData(inventory.getChestplate())) {
-			inventory.setChestplate(null);
-		}
-		if (inventory.getLeggings() != null && ItemHandler.containsNBTData(inventory.getLeggings())) {
-			inventory.setLeggings(null);
-		}
-		if (inventory.getBoots() != null && ItemHandler.containsNBTData(inventory.getBoots())) {
-			inventory.setBoots(null);
-		}
-		if (ServerHandler.hasCombatUpdate() && inventory.getItemInOffHand() != null && ItemHandler.containsNBTData(inventory.getItemInOffHand())) {
-			inventory.setItemInOffHand(null);
-		}
-		HashMap < String, ItemStack[] > inventoryContents = new HashMap < String, ItemStack[] > ();
-		inventoryContents.put(PlayerHandler.getPlayerID(player), inventory.getContents());
-		for (ItemStack contents: inventoryContents.get(PlayerHandler.getPlayerID(player))) {
-			if (contents != null && ItemHandler.containsNBTData(contents)) {
-				inventory.remove(contents);
+		if (ConfigHandler.getConfig("config.yml").getBoolean("Protect-SpecialItems") == true) {
+			for (ItemMap item: ItemUtilities.getItems()) {
+				if (!item.isOnlyFirstJoin() && !item.isOnlyFirstWorld()) {
+					if (inventory.getHelmet() != null && item.isSimilar(inventory.getHelmet()) && ItemHandler.containsNBTData(inventory.getHelmet())) {
+						inventory.setHelmet(null);
+					}
+					if (inventory.getChestplate() != null && item.isSimilar(inventory.getChestplate()) && ItemHandler.containsNBTData(inventory.getChestplate())) {
+						inventory.setChestplate(null);
+					}
+					if (inventory.getLeggings() != null && item.isSimilar(inventory.getLeggings()) && ItemHandler.containsNBTData(inventory.getLeggings())) {
+						inventory.setLeggings(null);
+					}
+					if (inventory.getBoots() != null && item.isSimilar(inventory.getBoots()) && ItemHandler.containsNBTData(inventory.getBoots())) {
+						inventory.setBoots(null);
+					}
+					if (ServerHandler.hasCombatUpdate() && inventory.getItemInOffHand() != null && item.isSimilar(inventory.getItemInOffHand()) && ItemHandler.containsNBTData(inventory.getItemInOffHand())) {
+						inventory.setItemInOffHand(null);
+					}
+					HashMap < String, ItemStack[] > inventoryContents = new HashMap < String, ItemStack[] > ();
+					inventoryContents.put(PlayerHandler.getPlayerID(player), inventory.getContents());
+					for (ItemStack contents: inventoryContents.get(PlayerHandler.getPlayerID(player))) {
+						if (contents != null && item.isSimilar(contents) && ItemHandler.containsNBTData(contents)) {
+							inventory.remove(contents);
+						}
+					}
+					inventoryContents.clear();
+				}
 			}
+		} else {
+			if (inventory.getHelmet() != null && ItemHandler.containsNBTData(inventory.getHelmet())) {
+				inventory.setHelmet(null);
+			}
+			if (inventory.getChestplate() != null && ItemHandler.containsNBTData(inventory.getChestplate())) {
+				inventory.setChestplate(null);
+			}
+			if (inventory.getLeggings() != null && ItemHandler.containsNBTData(inventory.getLeggings())) {
+				inventory.setLeggings(null);
+			}
+			if (inventory.getBoots() != null && ItemHandler.containsNBTData(inventory.getBoots())) {
+				inventory.setBoots(null);
+			}
+			if (ServerHandler.hasCombatUpdate() && inventory.getItemInOffHand() != null && ItemHandler.containsNBTData(inventory.getItemInOffHand())) {
+				inventory.setItemInOffHand(null);
+			}
+			HashMap < String, ItemStack[] > inventoryContents = new HashMap < String, ItemStack[] > ();
+			inventoryContents.put(PlayerHandler.getPlayerID(player), inventory.getContents());
+			for (ItemStack contents: inventoryContents.get(PlayerHandler.getPlayerID(player))) {
+				if (contents != null && ItemHandler.containsNBTData(contents)) {
+					inventory.remove(contents);
+				}
+			}
+			inventoryContents.clear();
 		}
-		inventoryContents.clear();
 	}
 	
 	public static void sendFailCount(Player player, int session) {
