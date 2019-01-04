@@ -200,10 +200,10 @@ public class ItemDesigner {
 	}
 	
 	private void setSkullDatabase(ItemMap itemMap) {
-		if (ServerHandler.hasSpecificUpdate("1_8") && DataStorage.hasHeadDatabase() && itemMap.getNodeLocation().getString(".skull-texture") != null) {
+		if (DataStorage.hasHeadDatabase() && itemMap.getNodeLocation().getString(".skull-texture") != null) {
 			if (itemMap.getMaterial().toString().equalsIgnoreCase("SKULL_ITEM") || itemMap.getMaterial().toString().equalsIgnoreCase("PLAYER_HEAD")) {
 				if (itemMap.getNodeLocation().getString(".skull-owner") != null) {  ServerHandler.sendErrorMessage("&4You cannot define a skull owner and a skull texture at the same time, please remove one from the item."); return;  }
-				String skullTexture = getActualTexture(itemMap).replace("hdb-", "");
+				String skullTexture = getActualTexture(itemMap);
 				if (skullTexture.contains("hdb-")) {
 					try {
 						itemMap.setSkullTexture(skullTexture.replace("hdb-", ""));
