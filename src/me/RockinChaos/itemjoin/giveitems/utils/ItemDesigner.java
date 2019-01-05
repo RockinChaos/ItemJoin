@@ -42,10 +42,10 @@ public class ItemDesigner {
 		if (ConfigHandler.isConfigurable()) {
 			for (String internalName: ConfigHandler.getConfigurationSection().getKeys(false)) {
 				ConfigurationSection itemNode = ConfigHandler.getItemSection(internalName);
-				if (isSafe(itemNode, internalName)) {
+				if (isConfigurable(internalName, itemNode)) {
 					String[] slots = itemNode.getString(".slot").replace(" ", "").split(",");
 					for (String slot: slots) {
-						if (isCreatable(internalName, slot)) {
+						if (isDefinable(internalName, slot)) {
 							ItemMap itemMap = new ItemMap(internalName, slot);
 							this.setMaterial(itemMap);
 						
@@ -83,70 +83,77 @@ public class ItemDesigner {
 		}
 	}
 	
-	private boolean isCreatable(String internalName, String slot) {
-		ConfigurationSection itemNode = ConfigHandler.getItemSection(internalName);
+	
+//  =========================================================================================================================== //
+//      Determines if the specific item node has a valid Material ID defined as well as if the item node has a slot defined.    //
+//  =========================================================================================================================== //
+	private boolean isConfigurable(String internalName, ConfigurationSection itemNode) {
 		String id = ItemHandler.getMaterialPath(itemNode);
-		String originalID = id;
-		if (id.contains(":")) { 
-			String[] parts = id.split(":"); id = parts[0]; 
-			if (ServerHandler.hasAquaticUpdate()) {
-				ServerHandler.sendConsoleMessage("&4[WARNING] The item " + internalName + " is using an ItemID (Numerical Value) which is no longer supported as of Minecraft 1.13, instead use its material name.");
-				ServerHandler.sendConsoleMessage("&4This will cause issues, please see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html for a list of material names.");
-			}
-		}
-		if (slot != null) {
-			if (!Utils.isInt(slot) && !ItemHandler.isCustomSlot(slot)) {
-				ServerHandler.sendConsoleMessage("&eThe Item " + internalName + "'s slot is invalid or does not exist!");
-				ServerHandler.sendConsoleMessage("&eThe Item " + internalName + " &ewill not be set!");
-				return false;
-			} else if (Utils.isInt(slot)) {
-				int iSlot = Integer.parseInt(slot);
-				if (!(iSlot >= 0 && iSlot <= 35)) {
-					ServerHandler.sendConsoleMessage("&eThe Item " + internalName + "'s slot must be between 1 and 36!");
-					ServerHandler.sendConsoleMessage("&eThe Item " + internalName + " &ewill not be set!");
-					return false;
+		String dataValue = null;
+		if (id != null) {
+			if (id.contains(":")) {
+				String[] parts = id.split(":"); id = parts[0]; dataValue = parts[1];
+				if (ServerHandler.hasAquaticUpdate()) {
+					ServerHandler.sendErrorMessage("&4[WARNING] The item " + internalName + " is using an ItemID (Numerical Value) which is no longer supported as of Minecraft 1.13, instead use its material name.");
+					ServerHandler.sendErrorMessage("&4This will cause issues, please see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html for a list of material names.");
 				}
-			} else if (!ServerHandler.hasCombatUpdate() && slot.equalsIgnoreCase("Offhand")) {
-				ServerHandler.sendConsoleMessage("&4Your server is running &eMC " + Reflection.getServerVersion() + " and this version of Minecraft does not have Offhand support!");
-				return false;
 			}
-		}
-		if (!ServerHandler.hasCombatUpdate() && id != null) {
-			if (id.equalsIgnoreCase("TIPPED_ARROW") || id.equalsIgnoreCase("440") || id.equalsIgnoreCase("0440")) {
-				ServerHandler.sendConsoleMessage("&4Your server is running &eMC " + Reflection.getServerVersion() + " and this version of Minecraft does not have the item TIPPED_ARROW!");
-				ServerHandler.sendConsoleMessage("&4You are receiving this notice because the item(s) exists in your items.yml and will not be set, please remove the item(s) or update your server!");
+			
+			if (!ServerHandler.hasCombatUpdate() && id.equalsIgnoreCase("TIPPED_ARROW") || id.equalsIgnoreCase("440") || id.equalsIgnoreCase("0440")) {
+				ServerHandler.sendErrorMessage("&4Your server is running &eMC " + Reflection.getServerVersion() + " and this version of Minecraft does not have the item TIPPED_ARROW!");
+				ServerHandler.sendErrorMessage("&4You are receiving this notice because the item(s) exists in your items.yml and will not be set, please remove the item(s) or update your server!");
 				return false;
-			} else if (id.equalsIgnoreCase("LINGERING_POTION") || id.equalsIgnoreCase("441") || id.equalsIgnoreCase("0441")) {
-				ServerHandler.sendConsoleMessage("&4Your server is running &eMC " + Reflection.getServerVersion() + " and this version of Minecraft does not have the item LINGERING_POTION!");
-				ServerHandler.sendConsoleMessage("&4You are receiving this notice because the item(s) exists in your items.yml and will not be set, please remove the item(s) or update your server!");
+			} else if (!ServerHandler.hasCombatUpdate() && id.equalsIgnoreCase("LINGERING_POTION") || id.equalsIgnoreCase("441") || id.equalsIgnoreCase("0441")) {
+				ServerHandler.sendErrorMessage("&4Your server is running &eMC " + Reflection.getServerVersion() + " and this version of Minecraft does not have the item LINGERING_POTION!");
+				ServerHandler.sendErrorMessage("&4You are receiving this notice because the item(s) exists in your items.yml and will not be set, please remove the item(s) or update your server!");
 				return false;
-			} else if (ItemHandler.getMaterial(originalID, null) == null) {
-				ServerHandler.sendConsoleMessage("&4Your server is running &eMC " + Reflection.getServerVersion() + " and this version of Minecraft does not have the item " + id);
-				ServerHandler.sendConsoleMessage("&4You are receiving this notice because the item(s) exists in your items.yml and will not be set, please remove the item(s) or update your server!");
-				return false;
-			}
-		} else {
-			if (ItemHandler.getMaterial(originalID, null) == null) {
-				ServerHandler.sendConsoleMessage("&eThe Item " + internalName + "'s Material 'ID' is invalid or does not exist!");
-				ServerHandler.sendConsoleMessage("&eThe Item " + internalName + " &ewill not be set!");
+			} else if (ItemHandler.getMaterial(id, dataValue) == null) {
+				ServerHandler.sendErrorMessage("&eThe Item " + internalName + "'s Material 'ID' is invalid or does not exist!");
+				ServerHandler.sendErrorMessage("&eThe Item " + internalName + " &ewill not be set!");
 				if (Utils.isInt(id)) {
-					ServerHandler.sendConsoleMessage("&eIf you are using a numerical id and a numberical data-value make sure you include quotations or apostrophes at the beginning and end or it will break the configuration file, it should look like '160:15' or \"160:15\".");
+					ServerHandler.sendErrorMessage("&eIf you are using a numerical id and a numberical data-value make sure you "
+							+ "nclude quotations or apostrophes at the beginning and end or it will break the configuration file, it should look like '160:15' or \"160:15\".");
 				}
 				return false;
+			} else if (itemNode.getString(".slot") == null) {
+				ServerHandler.sendErrorMessage("&eThe Item " + internalName + "'s SLOT is invalid!");
+				ServerHandler.sendErrorMessage("&ePlease refresh your items.yml and fix the undefined slot.");
+				return false;
 			}
+		} else { 
+			ServerHandler.sendErrorMessage("&eThe Item" + internalName + " does not have a Material ID defined!"); 
+			ServerHandler.sendErrorMessage("&eThe Item " + internalName + " &ewill not be set!"); 
+			return false;
 		}
 		return true;
 	}
-	
-	private boolean isSafe(ConfigurationSection itemNode, String internalName) {
-		if (itemNode.getString(".slot") != null) {
-			return true;
-		} else {
-			ServerHandler.sendErrorMessage("&eThe Item " + internalName + "'s SLOT is invalid!");
-			ServerHandler.sendErrorMessage("&ePlease refresh your items.yml and fix the undefined slot.");
+//  =================================================================================================================================================================================================================== //
+
+
+//  =========================================================================================================================== //
+//    Determines if the specific item node has an actual ItemJoin definable slot, being a custom slot or a true integer slot.   //
+//  =========================================================================================================================== //
+	private boolean isDefinable(String internalName, String slot) {
+		if (!Utils.isInt(slot) && !ItemHandler.isCustomSlot(slot)) {
+			ServerHandler.sendErrorMessage("&eThe Item " + internalName + "'s slot is invalid or does not exist!");
+			ServerHandler.sendErrorMessage("&eThe Item " + internalName + " &ewill not be set!");
+			return false;
+		} else if (Utils.isInt(slot)) {
+			int parseSlot = Integer.parseInt(slot);
+			if (!(parseSlot >= 0 && parseSlot <= 35)) {
+				ServerHandler.sendErrorMessage("&eThe Item " + internalName + "'s slot must be between 0 and 35!");
+				ServerHandler.sendErrorMessage("&eThe Item " + internalName + " &ewill not be set!");
+				return false;
+			}
+		} else if (!ServerHandler.hasCombatUpdate() && slot.equalsIgnoreCase("Offhand")) {
+			ServerHandler.sendErrorMessage("&4Your server is running &eMC " + Reflection.getServerVersion() + " and this version of Minecraft does not have Offhand support!");
 			return false;
 		}
+		return true;
 	}
+//  ============================================================================================================================================================================ //
+//  ===================================================================================================================================================================================================================== //
+
 	
 //  =============================================== //
 //  ~ Sets the Custom Material to the Custom Item ~ //

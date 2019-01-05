@@ -1088,6 +1088,7 @@ public class ItemMap {
 					&& item.getItemMeta().hasDisplayName() && item.getItemMeta().getDisplayName().contains(this.legacySecret)) {
 				if (!this.isSkull() && skullOwner == null || this.isSkull() && !this.skullAnimated && ((SkullMeta) item.getItemMeta()).hasOwner() 
 						&& this.skullOwner != null && PlayerHandler.getSkullOwner(item).equalsIgnoreCase(this.skullOwner) 
+						|| this.skullOwner != null && Utils.containsIgnoreCase(this.skullOwner, "%player%")
 						|| this.isSkull() && this.skullTexture != null && this.skullOwner == null 
 						&& ItemHandler.getSkullSkinTexture(item.getItemMeta()).equalsIgnoreCase(this.skullTexture)
 						|| this.isSkull() && this.skullAnimated && this.isSkull(item)) {
@@ -1148,7 +1149,7 @@ public class ItemMap {
 		if (this.dynamicOwners != null) {
 			for (String owners : this.dynamicOwners) {
 				owners = ItemHandler.purgeDelay(owners);
-				if (PlayerHandler.getSkullOwner(item) != null && PlayerHandler.getSkullOwner(item).equalsIgnoreCase(this.skullOwner) || ItemHandler.getGameProfiles().get(owners) != null && ItemHandler.getSkullSkinTexture(item.getItemMeta()).equalsIgnoreCase(this.getTexture(ItemHandler.getGameProfiles().get(owners)))) {
+				if (PlayerHandler.getSkullOwner(item) != null && PlayerHandler.getSkullOwner(item).equalsIgnoreCase(this.skullOwner) || PlayerHandler.getSkullOwner(item) != null && Utils.containsIgnoreCase(this.skullOwner, "%player%") || ItemHandler.getGameProfiles().get(owners) != null && ItemHandler.getSkullSkinTexture(item.getItemMeta()).equalsIgnoreCase(this.getTexture(ItemHandler.getGameProfiles().get(owners)))) {
 					return true;
 				} else if (ItemHandler.getGameProfiles().get(owners) == null && !owners.equalsIgnoreCase("%player%")) {
 					ItemHandler.generateProfile(owners);
@@ -1334,8 +1335,7 @@ public class ItemMap {
 	
 	private void setSkull(Player player) {
 		if (this.skullOwner != null) {
-			this.skullOwner = Utils.translateLayout(this.skullOwner, player);
-			tempMeta = ItemHandler.setSkullOwner(tempMeta, this.skullOwner); // ehg
+			tempMeta = ItemHandler.setSkullOwner(tempMeta, Utils.translateLayout(this.skullOwner, player));
 		} else if (this.skullTexture != null && !headDatabase) {
 			try {
 				GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);

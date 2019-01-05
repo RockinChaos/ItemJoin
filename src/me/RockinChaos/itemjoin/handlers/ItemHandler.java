@@ -124,7 +124,7 @@ public class ItemHandler {
 	
 	public static Material getMaterial(String material, String dataVal) {
 		try {
-			boolean isLegacy = false;
+			boolean isLegacy = (dataVal != null);
 			if (material.contains(":")) { String[] parts = material.split(":"); material = parts[0]; dataVal = parts[1]; isLegacy = true; }
 			if (Utils.isInt(material) && !ServerHandler.hasAquaticUpdate()) {
 				return Legacy.findLegacyMaterial(Integer.parseInt(material));
