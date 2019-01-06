@@ -61,7 +61,8 @@ public class ItemAnimation {
 		Iterator <String> it = this.dynamicNames.iterator();
 		while (it.hasNext()) {
 			String name = it.next();
-			ticks = ticks + Utils.returnInteger(ItemHandler.getDelay(name));
+			if (Utils.returnInteger(ItemHandler.getDelay(name)) != null) { ticks = ticks + Utils.returnInteger(ItemHandler.getDelay(name)); }
+			else { ticks = ticks + 180; }
 			AnimateTask(player, it.hasNext(), name, null, null, null, null, ticks);
 		}
 	}
@@ -71,7 +72,8 @@ public class ItemAnimation {
 		Iterator<List<String>> it = this.dynamicLores.iterator();
 		while (it.hasNext()) {
 			List<String> lore = it.next();
-			ticks = ticks + Utils.returnInteger(ItemHandler.getDelay(lore.get(0)));
+			if (Utils.returnInteger(ItemHandler.getDelay(lore.get(0))) != null) { ticks = ticks + Utils.returnInteger(ItemHandler.getDelay(lore.get(0))); }
+			else { ticks = ticks + 180; }
 			AnimateTask(player, it.hasNext(), null, lore, null, null, null, ticks);
 		}
 	}
@@ -81,7 +83,8 @@ public class ItemAnimation {
 		Iterator<String> it = this.dynamicMaterials.iterator();
 		while (it.hasNext()) {
 			String mat = it.next();
-			ticks = ticks + Utils.returnInteger(ItemHandler.getDelay(mat));
+			if (Utils.returnInteger(ItemHandler.getDelay(mat)) != null) { ticks = ticks + Utils.returnInteger(ItemHandler.getDelay(mat)); }
+			else { ticks = ticks + 180; }
 			AnimateTask(player, it.hasNext(), null, null, mat, null, null, ticks);
 		}
 	}
@@ -91,7 +94,8 @@ public class ItemAnimation {
 		Iterator<String> it = this.dynamicOwners.iterator();
 		while (it.hasNext()) {
 			String owner = it.next();
-			ticks = ticks + Utils.returnInteger(ItemHandler.getDelay(owner));
+			if (Utils.returnInteger(ItemHandler.getDelay(owner)) != null) { ticks = ticks + Utils.returnInteger(ItemHandler.getDelay(owner)); }
+			else { ticks = ticks + 180; }
 			AnimateTask(player, it.hasNext(), null, null, null, owner, null, ticks);
 		}
 	}
@@ -101,7 +105,8 @@ public class ItemAnimation {
 		Iterator<String> it = this.dynamicTextures.iterator();
 		while (it.hasNext()) {
 			String texture = it.next();
-			ticks = ticks + Utils.returnInteger(ItemHandler.getDelay(texture));
+			if (Utils.returnInteger(ItemHandler.getDelay(texture)) != null) { ticks = ticks + Utils.returnInteger(ItemHandler.getDelay(texture)); }
+			else { ticks = ticks + 180; }
 			AnimateTask(player, it.hasNext(), null, null, null, null, texture, ticks);
 		}
 	}

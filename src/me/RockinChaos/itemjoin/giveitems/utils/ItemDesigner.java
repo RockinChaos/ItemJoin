@@ -203,6 +203,12 @@ public class ItemDesigner {
 			itemMap.setDynamicTextures(textures);
 			return ItemHandler.purgeDelay(itemMap.getNodeLocation().getString(".skull-texture." + ConfigHandler.getTextureSection(itemMap.getNodeLocation()).getKeys(false).iterator().next()));
 		}
+		if (texture != null && !texture.isEmpty()) {
+			if (itemMap.isDynamic() || itemMap.isAnimated()) {
+				List<String> textures = new ArrayList<String>(); textures.add(texture);
+				itemMap.setDynamicOwners(textures);
+			}
+		}
 		return texture;
 	}
 	
@@ -423,6 +429,12 @@ public class ItemDesigner {
 		} else if (name == null || name.isEmpty()) {
 			return ItemHandler.getName(itemMap.getTempItem());
 		}
+		if (name != null && !name.isEmpty()) {
+			if (itemMap.isDynamic() || itemMap.isAnimated()) {
+				List<String> names = new ArrayList<String>(); names.add(name);
+				itemMap.setDynamicNames(names);
+			}
+		}
 		return ItemHandler.purgeDelay(name);
 	}
 	
@@ -452,6 +464,12 @@ public class ItemDesigner {
 			}
 			itemMap.setDynamicLores(lores);
 			return itemMap.getNodeLocation().getStringList(".lore." + ConfigHandler.getLoreSection(itemMap.getNodeLocation()).getKeys(false).iterator().next());
+		}
+		if (lore != null && !lore.isEmpty()) {
+			if (itemMap.isDynamic() || itemMap.isAnimated()) {
+				List<List<String>> lores = new ArrayList<List<String>>(); lores.add(lore);
+				itemMap.setDynamicLores(lores);
+			}
 		}
 		return lore;
 	}
@@ -508,6 +526,12 @@ public class ItemDesigner {
 			}
 			itemMap.setDynamicOwners(owners);
 			return ItemHandler.purgeDelay(itemMap.getNodeLocation().getString(".skull-owner." + ConfigHandler.getOwnerSection(itemMap.getNodeLocation()).getKeys(false).iterator().next()));
+		}
+		if (owner != null && !owner.isEmpty()) {
+			if (itemMap.isDynamic() || itemMap.isAnimated()) {
+				List<String> owners = new ArrayList<String>(); owners.add(owner);
+				itemMap.setDynamicOwners(owners);
+			}
 		}
 		return owner;
 	}
