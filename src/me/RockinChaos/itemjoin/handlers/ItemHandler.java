@@ -65,7 +65,8 @@ public class ItemHandler {
 	
 	public static void closeAnimations(Player player) {
 		for (ItemMap item : ItemUtilities.getItems()) {
-			if (item.isAnimated() && item.getAnimationHandler().get(player) != null) {
+			if (item.isAnimated() && item.getAnimationHandler().get(player) != null
+					|| item.isDynamic() && item.getAnimationHandler().get(player) != null) {
 				item.getAnimationHandler().get(player).closeAnimation(player);
 				item.removeFromAnimationHandler(player);
 			}

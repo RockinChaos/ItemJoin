@@ -1439,7 +1439,8 @@ public class ItemMap {
 		ItemStack[] contents = inv.getContents();
 		ItemStack[] craftingContents = player.getOpenInventory().getTopInventory().getContents();
 		
-		if (this.isAnimated() && this.getAnimationHandler().get(player) != null) {
+		if (this.isAnimated() && this.getAnimationHandler().get(player) != null
+				|| this.isDynamic() && this.getAnimationHandler().get(player) != null) {
 			this.localeAnimations.get(player).closeAnimation(player);
 			this.localeAnimations.remove(player);
 		}
@@ -1466,7 +1467,8 @@ public class ItemMap {
 	}
 	
 	public void setAnimations(Player player) {
-		if (this.isAnimated() && this.getAnimationHandler().get(player) == null) {
+		if (this.isAnimated() && this.getAnimationHandler().get(player) == null
+				|| isDynamic() && this.getAnimationHandler().get(player) == null) {
 			ItemAnimation Animator = new ItemAnimation(this);
 			Animator.openAnimation(player);
 			this.localeAnimations.put(player, Animator);
