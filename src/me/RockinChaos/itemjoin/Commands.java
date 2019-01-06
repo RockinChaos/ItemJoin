@@ -170,6 +170,10 @@ public class Commands implements CommandExecutor {
 						Language.informPlayer(sender, "&a&l&m]-----------------&a&l[&e Item Info &a&l]&a&l&m----------------[");
 						Language.informPlayer(sender, "");
 						Language.sendMessage(sender, "itemInfo", PlayerHandler.getHandItem((Player) sender).getType().toString());
+						if (!ServerHandler.hasAquaticUpdate() && PlayerHandler.getHandItem((Player) sender).getType().getMaxDurability() < 30 
+								&& ItemHandler.getDurability(PlayerHandler.getHandItem((Player) sender)) > 0) {
+							((Player) sender).sendMessage(Utils.translateLayout("&aData-Value: ", (Player) sender) + ItemHandler.getDurability(PlayerHandler.getHandItem((Player) sender)));
+						}
 						Language.informPlayer(sender, "");
 						Language.informPlayer(sender, "&a&l&m]---------------&a&l[&e Item Info Menu &a&l]&a&l&m--------------[");
 						Language.informPlayer(sender, " ");
