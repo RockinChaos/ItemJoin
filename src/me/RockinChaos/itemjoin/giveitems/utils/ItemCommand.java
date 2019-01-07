@@ -7,7 +7,6 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.Logger;
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
@@ -34,9 +33,10 @@ public class ItemCommand {
 		else if (commandType.equalsIgnoreCase("BOTH")) { this.cmdType = CommandType.BOTH; }
 	}
 	
-	public void execute(final Player player, final String action) {
-		if (this.command == null || this.command.length() == 0 || !this.cmdType.hasAction(action) || !this.action.hasAction(action)) { return; }
+	public boolean execute(final Player player, final String action) {
+		if (this.command == null || this.command.length() == 0 || !this.cmdType.hasAction(action) || !this.action.hasAction(action)) { return false; }
 		sendDispatch(player, this.type);
+		return true;
 	}
 	
 	private void sendDispatch(final Player player, final Type cmdtype) {
@@ -200,14 +200,6 @@ public class ItemCommand {
 					}
 				}
 		return ActionType.DEFAULT;
-	}
-	
-	public boolean isCommandable(ConfigurationSection nodeLocation, String action) {
-		List < String > actionCommandList = nodeLocation.getStringList(".commands" + this.action.definition);
-		if (actionCommandList != null && !actionCommandList.isEmpty() && this.cmdType.hasAction(action)) {
-			return true;
-		}
-		return false;
 	}
 	
 	public static ItemCommand[] arrayFromString(ItemMap itemMap) {

@@ -1477,26 +1477,40 @@ public class ItemMap {
 	
     public boolean executeCommands(Player player, String action) {
 		boolean playerSuccess = false;
-    	if (this.commands != null && this.commands.length > 0 && !this.onCooldown(player)) {
-    		ItemCommand[] itemCommands = this.commands;
-    			for (int i = 0; i < itemCommands.length; i++) { 
-    				if (itemCommands[i].isCommandable(this.getNodeLocation(), action)) {
-    					if (!playerSuccess) {
-    						if (this.isPlayerChargeable(player)) {
-    							playerSuccess = true;
-    							this.playSound(player);
-    							this.removeDisposable(player, this.disposable);
-    							itemCommands[i].execute(player, action); 
-    						} else { break; }
-    							this.addPlayerOnCooldown(player);
-    					} else if (playerSuccess) { itemCommands[i].execute(player, action); }
-    				}
-    			}
+    	if (this.commands != null && this.commands.length > 0 && !this.onCooldown(player) && this.isPlayerChargeable(player)) {
+    		if (isExecuted(player, action)) {
+    			this.withdrawBalance(player, this.cost);
+				this.playSound(player);
+				this.removeDisposable(player, this.disposable);
+				this.addPlayerOnCooldown(player);
+    		}
     	}
     	return playerSuccess;
     }
     
+    private boolean isExecuted(final Player player, final String action) {
+    	boolean playerSuccess = false;
+    	ItemCommand[] itemCommands = this.commands;
+		for (int i = 0; i < itemCommands.length; i++) { 
+			if (!playerSuccess) { playerSuccess = itemCommands[i].execute(player, action); }
+			else { itemCommands[i].execute(player, action); }
+		}
+    	return playerSuccess;
+    }
+    
     private boolean isPlayerChargeable(Player player) {
+		if (DataStorage.hasVault()) {
+			double balance = 0.0; try { balance = PlayerHandler.getBalance(player); } catch (NullPointerException e) { }
+			if (balance >= this.cost) {
+				return true;
+			} else if (!(balance >= this.cost)) {
+				return false;
+			}
+		}
+		return true;
+	}
+    
+    private void withdrawBalance(Player player, int cost) {
 		if (DataStorage.hasVault()) {
 			double balance = 0.0;
 			try { balance = PlayerHandler.getBalance(player); } catch (NullPointerException e) { }
@@ -1505,13 +1519,8 @@ public class ItemMap {
 					try { PlayerHandler.withdrawBalance(player, this.cost); } catch (NullPointerException e) { ServerHandler.sendDebugTrace(e); }
 					Language.sendMessage(player, "itemChargeSuccess", "" + this.cost);
 				}
-				return true;
-			} else if (!(balance >= this.cost)) {
-				Language.sendMessage(player, "itemChargeFailed", this.cost + ", " + balance);
-				return false;
-			}
+			} else if (!(balance >= this.cost)) { Language.sendMessage(player, "itemChargeFailed", this.cost + ", " + balance); }
 		}
-		return true;
 	}
 	
 	private void playSound(Player player) {
@@ -1531,8 +1540,8 @@ public class ItemMap {
 		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), (Runnable) new Runnable() {
 			public void run() {
 				if (isDisposable) {
-					if (item.getAmount() > 1 && item.getAmount() != 1) { item.setAmount(item.getAmount() - 1); } 
-					else if (player.getItemOnCursor() != null && player.getItemOnCursor().getType() != Material.AIR) { player.setItemOnCursor(null); } 
+				    if (player.getItemOnCursor() != null && player.getItemOnCursor().getType() != Material.AIR) { player.setItemOnCursor(null); } 
+				    else if (item.getAmount() > 1 && item.getAmount() != 1) { item.setAmount(item.getAmount() - 1); } 
 					else if (PlayerHandler.getMainHandItem(player) != null && PlayerHandler.getMainHandItem(player).getType() != Material.AIR && item.isSimilar(PlayerHandler.getMainHandItem(player))) { PlayerHandler.setItemInHand(player, Material.AIR); }
 					else if (PlayerHandler.getOffHandItem(player) != null) { PlayerHandler.setOffhandItem(player, new ItemStack(Material.AIR)); }
 				}
