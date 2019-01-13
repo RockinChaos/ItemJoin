@@ -23,7 +23,7 @@ public class Drops implements Listener {
 	@EventHandler
 	public void onDrop(PlayerDropItemEvent event) {
 		ItemStack item = event.getItemDrop().getItemStack();
-		Player player = event.getPlayer();
+		final Player player = event.getPlayer();
 		if (!ItemHandler.isAllowed(player, item, "self-drops")) {
 			ItemMap itemMap = ItemHandler.getMappedItem(item, player.getWorld());
 			if (!ItemHandler.isCraftingSlot(itemMap.getSlot())) {
@@ -31,7 +31,7 @@ public class Drops implements Listener {
 					InvClickSurvival.droppedItem.put(PlayerHandler.getPlayerID(player), true);
 					event.getItemDrop().remove();
 				} else { if (PlayerHandler.isCreativeMode(player)) {
-					ItemStack readd = new ItemStack(item);
+					final ItemStack readd = new ItemStack(item);
 					event.getItemDrop().remove();
 					Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), (Runnable) new Runnable() {
 						public void run() {
