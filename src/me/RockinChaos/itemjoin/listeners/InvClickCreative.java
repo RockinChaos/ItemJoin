@@ -27,14 +27,14 @@ public class InvClickCreative implements Listener {
 	public static HashMap < String, Boolean > dropGlitch = new HashMap < String, Boolean > ();
 
 	@EventHandler
-	public void onCreativeSwitch(PlayerGameModeChangeEvent event) {
+	private void onCreativeSwitch(PlayerGameModeChangeEvent event) {
 		Player player = event.getPlayer();
 		GameMode gamemode = event.getNewGameMode();
 		isCreative(player, gamemode);
 	}
 	
 	@EventHandler
-	public void onCreativeInventoryModify(InventoryClickEvent event) {
+	private void onCreativeInventoryModify(InventoryClickEvent event) {
 		final Player player = (Player) event.getWhoClicked();
 		if (PlayerHandler.isCreativeMode(player)) {
 			Initialize(player);
@@ -108,7 +108,7 @@ public class InvClickCreative implements Listener {
 		}
 	}
 	
-	public static void setRunnable(final Player player) {
+	private static void setRunnable(final Player player) {
 		new BukkitRunnable() {
 			public void run() {
 				if (player.isOnline() && PlayerHandler.isCreativeMode(player) && isCreative.get(PlayerHandler.getPlayerID(player)) == true) {
@@ -123,7 +123,7 @@ public class InvClickCreative implements Listener {
 		}.runTaskTimerAsynchronously(ItemJoin.getInstance(), 20L, 20L);
 	}
 	
-	public static void Initialize(Player player) {
+	private static void Initialize(Player player) {
 		if (isCreative.get(PlayerHandler.getPlayerID(player)) == null) {
 			isCreative.put(PlayerHandler.getPlayerID(player), false);
 		}
@@ -146,7 +146,7 @@ public class InvClickCreative implements Listener {
 		}
 	}
 	
-	public static boolean hasItems(Player player) {
+	private static boolean hasItems(Player player) {
 		for (ItemStack item: player.getInventory().getContents()) {
 			if (item != null) return true;
 		}
@@ -156,7 +156,7 @@ public class InvClickCreative implements Listener {
 		return false;
 	}
 	
-	public static boolean hasItem(Player player, ItemStack cursorItem) {
+	private static boolean hasItem(Player player, ItemStack cursorItem) {
 		if (mySavedItems.get(PlayerHandler.getPlayerID(player)) == null || mySavedArmor.get(PlayerHandler.getPlayerID(player)) == null) {
 			saveInventory(player);
 		}
@@ -176,7 +176,7 @@ public class InvClickCreative implements Listener {
 		return false;
 	}
 	
-	public static void saveInventory(final Player player) {
+	private static void saveInventory(final Player player) {
 		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
 			public void run() {
 				if (hasItems(player) && cooldown.get(PlayerHandler.getPlayerID(player)) != 1) {
@@ -187,7 +187,7 @@ public class InvClickCreative implements Listener {
 		}, 1L);
 	}
 	
-	public static void restoreInventory(final Player player, final ItemStack readd) {
+	private static void restoreInventory(final Player player, final ItemStack readd) {
 		if (mySavedItems.get(PlayerHandler.getPlayerID(player)) != null) {
 			Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), (Runnable) new Runnable() {
 				public void run() {
