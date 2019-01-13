@@ -1,5 +1,6 @@
 package me.RockinChaos.itemjoin.listeners;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -15,6 +16,8 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.ItemStack;
 
 public class Drops implements Listener {
+	
+	private static HashMap < String, Integer > cooldown = new HashMap < String, Integer > ();
 
 	@EventHandler
 	public void onDrop(PlayerDropItemEvent event) {
@@ -26,7 +29,22 @@ public class Drops implements Listener {
 				if (!ServerHandler.hasCombatUpdate() && InvClickSurvival.dropClick.get(PlayerHandler.getPlayerID(player)) != null && InvClickSurvival.dropClick.get(PlayerHandler.getPlayerID(player)) == true) {
 					InvClickSurvival.droppedItem.put(PlayerHandler.getPlayerID(player), true);
 					event.getItemDrop().remove();
-				} else { event.setCancelled(true); }
+				} else { if (PlayerHandler.isCreativeMode(player)) {
+					InvClickCreative.Initialize(player);
+					InvClickCreative.saveInventory(player);
+					cooldown.put(PlayerHandler.getPlayerID(player), 1);
+					event.setCancelled(true);
+					player.getInventory().clear();
+					player.getInventory().setHelmet(null);
+					player.getInventory().setChestplate(null);
+					player.getInventory().setLeggings(null);
+					player.getInventory().setBoots(null);
+					if (ServerHandler.hasCombatUpdate()) {
+						player.getInventory().setItemInOffHand(null);
+					}
+					ItemStack readd = new ItemStack(item);
+					InvClickCreative.restoreInventory(player, readd);
+				} else { event.setCancelled(true); } }
 				PlayerHandler.delayUpdateInventory(player, 1L);
 			}
 		} else if (!ServerHandler.hasCombatUpdate() && PlayerHandler.isCreativeMode(player) && InvClickSurvival.dropClick.get(PlayerHandler.getPlayerID(player)) != null && InvClickSurvival.dropClick.get(PlayerHandler.getPlayerID(player)) == true && !ItemHandler.isAllowed(player, item, "self-drops")) {

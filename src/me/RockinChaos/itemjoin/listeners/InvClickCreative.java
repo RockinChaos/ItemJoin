@@ -187,7 +187,7 @@ public class InvClickCreative implements Listener {
 		}, 1L);
 	}
 	
-	private static void restoreInventory(final Player player, final ItemStack readd) {
+	public static void restoreInventory(final Player player, final ItemStack readd) {
 		if (mySavedItems.get(PlayerHandler.getPlayerID(player)) != null) {
 			Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), (Runnable) new Runnable() {
 				public void run() {
