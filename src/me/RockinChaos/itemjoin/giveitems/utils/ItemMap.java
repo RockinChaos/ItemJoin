@@ -52,6 +52,7 @@ import me.RockinChaos.itemjoin.utils.Language;
 import me.RockinChaos.itemjoin.utils.Legacy;
 import me.RockinChaos.itemjoin.utils.Reflection;
 import me.RockinChaos.itemjoin.utils.Utils;
+import me.RockinChaos.itemjoin.utils.VaultAPI;
 import me.arcaniax.hdb.api.HeadDatabaseAPI;
 
 public class ItemMap {
@@ -1499,11 +1500,12 @@ public class ItemMap {
     }
     
     private boolean isPlayerChargeable(Player player) {
-		if (DataStorage.hasVault()) {
+		if (VaultAPI.vaultEnabled()) {
 			double balance = 0.0; try { balance = PlayerHandler.getBalance(player); } catch (NullPointerException e) { }
 			if (balance >= this.cost) {
 				return true;
 			} else if (!(balance >= this.cost)) {
+				Language.sendMessage(player, "itemChargeFailed", this.cost + ", " + balance);
 				return false;
 			}
 		}
@@ -1511,7 +1513,7 @@ public class ItemMap {
 	}
     
     private void withdrawBalance(Player player, int cost) {
-		if (DataStorage.hasVault()) {
+		if (VaultAPI.vaultEnabled()) {
 			double balance = 0.0;
 			try { balance = PlayerHandler.getBalance(player); } catch (NullPointerException e) { }
 			if (balance >= this.cost) {
@@ -1519,7 +1521,7 @@ public class ItemMap {
 					try { PlayerHandler.withdrawBalance(player, this.cost); } catch (NullPointerException e) { ServerHandler.sendDebugTrace(e); }
 					Language.sendMessage(player, "itemChargeSuccess", "" + this.cost);
 				}
-			} else if (!(balance >= this.cost)) { Language.sendMessage(player, "itemChargeFailed", this.cost + ", " + balance); }
+			}
 		}
 	}
 	

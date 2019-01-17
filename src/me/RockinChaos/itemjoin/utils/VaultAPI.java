@@ -9,16 +9,17 @@ import net.milkbowl.vault.economy.Economy;
 
 public class VaultAPI {
     private static Economy econ = null;
+    private static boolean isEnabled = false;
     
-	public static void enableEconomy () { 
+	public static void enableEconomy() { 
 		if (ConfigHandler.getConfig("config.yml").getBoolean("Vault") == true && ItemJoin.getInstance().getServer().getPluginManager().getPlugin("Vault") != null) {
-	      if (!setupEconomy()) {
+			if (!setupEconomy()) {
 	          ServerHandler.sendErrorMessage("There was an issue setting up Vault to work with ItemJoin!");
 	          ServerHandler.sendErrorMessage("If this continues, please contact the plugin developer!");
 	          return;
-	      }
+	          }
+			}
 		}
-	 }
 
     private static boolean setupEconomy() {
         if (ItemJoin.getInstance().getServer().getPluginManager().getPlugin("Vault") == null) {  return false; }
@@ -30,5 +31,13 @@ public class VaultAPI {
     
     public static Economy getEconomy() {
         return econ;
+    }
+    
+    public static boolean vaultEnabled() {
+    	return isEnabled;
+    }
+    
+    public static void setVaultStatus(boolean bool) {
+    	isEnabled = bool;
     }
 }

@@ -47,6 +47,12 @@ public class Language {
 				for (String ReplaceText: TextSplits) {
 			sendMessage = sendMessage.replace("%items%", ReplaceText);
 			sendMessage = sendMessage.replace("%item%", ReplaceText);
+			if (MessageType.equalsIgnoreCase("itemChargeFailed")) {
+				sendMessage = sendMessage.replace("%amount%", TextSplits[1].replace(" ", ""));
+				sendMessage = sendMessage.replace("%cost%", TextSplits[0]);
+			}
+			
+			
 			if (MessageType.equalsIgnoreCase("givenToPlayer") || MessageType.equalsIgnoreCase("removedFromPlayer") || MessageType.equalsIgnoreCase("playerTriedRemove")
 					|| MessageType.equalsIgnoreCase("removedAllFromPlayer") || MessageType.equalsIgnoreCase("givenAllToPlayer")
 					|| MessageType.equalsIgnoreCase("playerTriedGive") || MessageType.equalsIgnoreCase("itemExistsInOthersInventory") || MessageType.equalsIgnoreCase("itemDoesntExistInOthersInventory") 
@@ -62,6 +68,9 @@ public class Language {
 					}
 				}
 			}
+			
+			
+			
 			sendMessage = sendMessage.replace("%purgedata%", ReplaceText);
 			sendMessage = sendMessage.replace("%command%", ReplaceText);
 			sendMessage = sendMessage.replace("%item_type%", ReplaceText);

@@ -43,7 +43,7 @@ public class WorldSwitch implements Listener {
 		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
 			public void run() {
 				String Probable = ItemUtilities.getProbabilityItem(player);
-				final int session = Utils.getRandom(1, 80000);
+				final int session = Utils.getRandom(1, 100000);
 				for (ItemMap item : ItemUtilities.getItems()) { 
 					if (item.isGiveOnWorldChange() && item.inWorld(player.getWorld()) 
 							&& ItemUtilities.isChosenProbability(item, Probable) && SQLData.isEnabled(player)

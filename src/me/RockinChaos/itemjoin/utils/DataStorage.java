@@ -26,7 +26,6 @@ import me.RockinChaos.itemjoin.giveitems.listeners.Respawn;
 import me.RockinChaos.itemjoin.giveitems.listeners.WorldSwitch;
 
 public class DataStorage {
-	private static boolean hasVault;
 	private static boolean hasMultiverse;
 	private static boolean hasInventories;
 	private static boolean hasPlaceholderAPI;
@@ -71,10 +70,6 @@ public class DataStorage {
 		if (ServerHandler.hasSpecificUpdate("1_8")) {
 			return hasNewNBTSystem;
 		} else { return false; }
-	}
-	
-	public static boolean hasVault() {
-		return hasVault;
 	}
 	
 	public static boolean hasMultiverse() {
@@ -231,10 +226,11 @@ public class DataStorage {
 	public static void hookVault() {
 		if (Bukkit.getServer().getPluginManager().getPlugin("Vault") != null && ConfigHandler.getConfig("config.yml").getBoolean("Vault") == true) {
 			ServerHandler.sendConsoleMessage("&aHooked into Vault!");
-			hasVault = true;
+			VaultAPI.enableEconomy();
+			VaultAPI.setVaultStatus(true);
 		} else if (ConfigHandler.getConfig("config.yml").getBoolean("Vault") == true) {
 			ServerHandler.sendConsoleMessage("&4Could not find Vault or no economy plugin is attached.");
-			hasVault = false;
+			VaultAPI.setVaultStatus(false);
 		}
 	}
 

@@ -50,7 +50,7 @@ public class RegionEnter implements Listener {
 		playersInRegions.put(player, regionId);
 		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
 			public void run() {
-				final int session = Utils.getRandom(1, 80000);
+				final int session = Utils.getRandom(1, 100000);
 				removeLeaveItems(player);
 				giveItems(player, regionId, 1, session);
 				ItemUtilities.sendFailCount(player, session);
