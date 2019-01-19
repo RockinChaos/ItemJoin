@@ -149,6 +149,7 @@ public class ItemMap {
 	private String itemflags;
 	
 	private boolean vanillaItem = false;
+	private boolean vanillaStatus = false;
 	private boolean unbreakable = false;
 	private boolean countLock = false;
 	private boolean cancelEvents = false;
@@ -271,6 +272,7 @@ public class ItemMap {
 		if (this.nodeLocation.getString(".itemflags") != null) {
 			this.itemflags = this.nodeLocation.getString(".itemflags");
 			this.vanillaItem = Utils.containsIgnoreCase(this.itemflags, "vanilla");
+			this.vanillaStatus = Utils.containsIgnoreCase(this.itemflags, "vanilla-status");
 			this.disposable = Utils.containsIgnoreCase(this.itemflags, "disposable");
 			this.blockPlacement = Utils.containsIgnoreCase(this.itemflags, "placement");
 			this.blockMovement = Utils.containsIgnoreCase(this.itemflags, "inventory-modify");
@@ -536,6 +538,10 @@ public class ItemMap {
 	
 	public void setVanilla(boolean bool) {
 		this.vanillaItem = bool;
+	}
+	
+	public void setVanillaStatus(boolean bool) {
+		this.vanillaStatus = bool;
 	}
 	
 	public void setUnbreakable(boolean bool) {
@@ -979,6 +985,10 @@ public class ItemMap {
 		return this.vanillaItem;
 	}
 	
+	public boolean isVanillaStatus() {
+		return this.vanillaStatus;
+	}
+	
 	public boolean isUnbreakable() {
 		return this.unbreakable;
 	}
@@ -1086,7 +1096,7 @@ public class ItemMap {
 		if (item != null && item.getType() != Material.AIR && item.getType() == this.material || this.materialAnimated && item != null && item.getType() != Material.AIR && this.isMaterial(item)) {
 			if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && ServerHandler.hasSpecificUpdate("1_8") 
 					&& ItemHandler.getNBTData(item) != null && ItemHandler.getNBTData(item).contains(this.newNBTData) || this.legacySecret != null && item.hasItemMeta() 
-					&& item.getItemMeta().hasDisplayName() && item.getItemMeta().getDisplayName().contains(this.legacySecret)) {
+					&& item.getItemMeta().hasDisplayName() && item.getItemMeta().getDisplayName().contains(this.legacySecret) || this.vanillaItem && this.vanillaStatus) {
 				if (!this.isSkull() && skullOwner == null || this.isSkull() && !this.skullAnimated && ((SkullMeta) item.getItemMeta()).hasOwner() 
 						&& this.skullOwner != null && PlayerHandler.getSkullOwner(item).equalsIgnoreCase(this.skullOwner) 
 						|| this.skullOwner != null && Utils.containsIgnoreCase(this.skullOwner, "%player%")
