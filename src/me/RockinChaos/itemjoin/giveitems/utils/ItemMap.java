@@ -1087,6 +1087,7 @@ public class ItemMap {
 			else if (findFlag.equals("self-drops")) { return selfDroppable; } 
 			else if (findFlag.equals("death-drops")) { return deathDroppable; } 
 			else if (findFlag.equals("inventory-modify")) { return blockMovement; }
+			else if (findFlag.equals("inventory-close")) { return closeInventory; }
 			else if (findFlag.equals("item-store")) { return itemStore; } 
 			else if (findFlag.equals("item-craftable")) { return noCrafting; } 
 			else if (findFlag.equals("item-repairable")) { return noRepairing; } 
