@@ -59,6 +59,7 @@ public class InvClickSurvival implements Listener {
 			}
 			if (!ItemHandler.isAllowed(player, item, "inventory-modify")) {
 				event.setCancelled(true);
+				if (!ItemHandler.isAllowed(player, item, "inventory-close")) { player.closeInventory(); }
 				PlayerHandler.updateInventory(player);
 			}
 		}

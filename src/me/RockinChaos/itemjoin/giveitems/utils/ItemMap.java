@@ -162,6 +162,7 @@ public class ItemMap {
 	private boolean hideAttributes = false;
 	private boolean hideDurability = false;
 	private boolean blockMovement = false;
+	private boolean closeInventory = false;
 	private boolean selfDroppable = false;
 	private boolean deathDroppable = false;
 	private boolean disposable = false;
@@ -276,6 +277,8 @@ public class ItemMap {
 			this.disposable = Utils.containsIgnoreCase(this.itemflags, "disposable");
 			this.blockPlacement = Utils.containsIgnoreCase(this.itemflags, "placement");
 			this.blockMovement = Utils.containsIgnoreCase(this.itemflags, "inventory-modify");
+			if (!this.blockMovement) { this.blockMovement = Utils.containsIgnoreCase(this.itemflags, "inventory-close"); }
+			this.closeInventory = Utils.containsIgnoreCase(this.itemflags, "inventory-close");
 			this.allowModifications = Utils.containsIgnoreCase(this.itemflags, "allow-modifications");
 			this.alwaysGive = Utils.containsIgnoreCase(this.itemflags, "always-give");
 			this.dynamic = Utils.containsIgnoreCase(this.itemflags, "dynamic");
@@ -598,6 +601,10 @@ public class ItemMap {
 	
 	public void setMovement(boolean bool) {
 		this.blockMovement = bool;
+	}
+	
+	public void setCloseInventory(boolean bool) {
+		this.closeInventory = bool;
 	}
 	
 	public void setDisposable(boolean bool) {
@@ -1043,6 +1050,10 @@ public class ItemMap {
 	
 	public boolean isMovement() {
 		return this.blockMovement;
+	}
+	
+	public boolean isInventoryClose() {
+		return this.closeInventory;
 	}
 	
 	public boolean isDisposable() {
