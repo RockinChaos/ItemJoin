@@ -1102,7 +1102,7 @@ public class ItemMap {
 						|| this.skullOwner != null && Utils.containsIgnoreCase(this.skullOwner, "%player%")
 						|| this.isSkull() && this.skullTexture != null && this.skullOwner == null 
 						&& ItemHandler.getSkullSkinTexture(item.getItemMeta()).equalsIgnoreCase(this.skullTexture)
-						|| this.isSkull() && this.skullAnimated && this.isSkull(item)) {
+						|| this.isSkull() && this.skullAnimated && this.isSkull(item) || this.isSkull() && this.skullTexture != null && this.skullOwner == null && this.isHeadDatabaseSimilar(item)) {
 					if (isEnchantSimilar(item) || !item.getItemMeta().hasEnchants() && enchants.isEmpty() || this.isModifiyable()) {
 						if (this.material.toString().toUpperCase().contains("BOOK") 
 								&& this.isBookMeta(item) 
@@ -1117,6 +1117,16 @@ public class ItemMap {
 		return false;
 	}
 	
+	private boolean isHeadDatabaseSimilar(ItemStack item) {
+		if (this.headDatabase) {
+			HeadDatabaseAPI api = new HeadDatabaseAPI();
+			ItemStack itemCopy = api.getItemHead(this.skullTexture);
+			if (itemCopy != null && ItemHandler.getSkullSkinTexture(item.getItemMeta()).equalsIgnoreCase(ItemHandler.getSkullSkinTexture(itemCopy.getItemMeta()))) {
+				return true;
+			}
+		}
+		return false;
+	}
 	private boolean isEnchantSimilar(ItemStack item) {
 		if (item.getItemMeta().hasEnchants() && this.enchants != null && !this.enchants.isEmpty()) { 
 			ItemStack checkItem = new ItemStack(item.getType());
