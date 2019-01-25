@@ -17,7 +17,6 @@ import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
-import me.RockinChaos.itemjoin.utils.sqlite.SQLData;
 
 public class InventoryClose implements Listener {
 	private boolean isWorldChange = false;
@@ -31,8 +30,7 @@ public class InventoryClose implements Listener {
 			final String Probable = ItemUtilities.getProbabilityItem(player);
 			for (final ItemMap item : ItemUtilities.getItems()) {
 				if (hasCraftingItem(item, view, player) && ItemHandler.isCraftingSlot(item.getSlot())) {
-					if (ItemUtilities.isChosenProbability(item, Probable) && SQLData.isEnabled(player)
-							&& item.hasPermission(player) && ItemUtilities.isObtainable(player, item, 0)) {
+					if (ItemUtilities.isChosenProbability(item, Probable) && item.hasPermission(player) && ItemUtilities.isObtainable(player, item, 0)) {
 							updateInv = true;
 							Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
 								public void run() {
@@ -72,8 +70,7 @@ public class InventoryClose implements Listener {
 				if (!returnSuccess && item.isSimilar(dropItem.getItemStack()) && ItemHandler.isCraftingSlot(item.getSlot()) 
 						|| ItemHandler.isCraftingSlot(item.getSlot()) && ItemUtilities.getSlotConversion(item.getSlot()) == 0) {
 					dropItem.remove();
-					if (ItemUtilities.isChosenProbability(item, Probable) && SQLData.isEnabled(player)
-							&& item.hasPermission(player) && ItemUtilities.isObtainable(player, item, 0)) {
+					if (ItemUtilities.isChosenProbability(item, Probable) && item.hasPermission(player) && ItemUtilities.isObtainable(player, item, 0)) {
 						updateInv = true;
 							Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
 								public void run() {

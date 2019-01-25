@@ -9,14 +9,11 @@ import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
 import me.RockinChaos.itemjoin.utils.Utils;
 import me.RockinChaos.itemjoin.utils.YAMLGenerator;
-import me.RockinChaos.itemjoin.utils.sqlite.SQLData;
 
 public class ConfigHandler {
 	private static YamlConfiguration loadItems;
 	private static YamlConfiguration loadConfig;
 	private static YamlConfiguration loadEnLang;
-	private static YamlConfiguration loadFirstJoin;
-	private static YamlConfiguration loadIPLimit;
 	private static boolean generate = false;
 	private static String NBTData = "ItemJoin";
 	private static long delay;
@@ -32,7 +29,6 @@ public class ConfigHandler {
 		configFile();
 		itemsFile();
 		enLangFile();
-		SQLData.convertYAMLS();
 	}
 	
 	public static Boolean isConfigurable() {
@@ -86,16 +82,6 @@ public class ConfigHandler {
 				loadEnLang = YamlConfiguration.loadConfiguration(file);
 			}
 			return loadEnLang;
-		} else if (path.contains("first-join.yml")) {
-			if (integer == 1) {
-				loadFirstJoin = YamlConfiguration.loadConfiguration(file);
-			}
-			return loadFirstJoin;
-		} else if (path.contains("ip-limit.yml")) {
-			if (integer == 1) {
-				loadIPLimit = YamlConfiguration.loadConfiguration(file);
-			}
-			return loadIPLimit;
 		}
 		return null;
 	}

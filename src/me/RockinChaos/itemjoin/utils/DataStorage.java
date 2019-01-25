@@ -18,6 +18,7 @@ import me.RockinChaos.itemjoin.listeners.Storable;
 import me.RockinChaos.itemjoin.listeners.Pickups;
 import me.RockinChaos.itemjoin.listeners.Placement;
 import me.RockinChaos.itemjoin.listeners.SwitchHands;
+import me.RockinChaos.itemjoin.utils.sqlite.SQLData;
 import me.RockinChaos.itemjoin.giveitems.listeners.LimitSwitch;
 import me.RockinChaos.itemjoin.giveitems.listeners.PlayerJoin;
 import me.RockinChaos.itemjoin.giveitems.listeners.PlayerQuit;
@@ -42,6 +43,7 @@ public class DataStorage {
 	private static boolean loggable;
 	private static int WorldGuardVersion;
 	private static boolean oldMapMethod = false;
+	private static SQLData sqlData;
 
 	public static void generateData() {
 		hookVault();
@@ -59,6 +61,7 @@ public class DataStorage {
 		hookHeadDatabase();
 		hookNewNBTSystem();
 		setLoggable();
+		newSQLData();
 		ConfigHandler.loadDelay();
 		ConfigHandler.loadGetItemPermissions();
 		ConfigHandler.loadOPCommandPermissions();
@@ -327,5 +330,13 @@ public class DataStorage {
 	
 	public static boolean getMapMethod() {
 		return oldMapMethod;
+	}
+	
+	public static void newSQLData() {
+		sqlData = new SQLData();
+	}
+	
+	public static SQLData getSQLData() {
+		return sqlData;
 	}
 }

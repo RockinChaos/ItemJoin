@@ -26,6 +26,7 @@ public class ItemJoin extends JavaPlugin {
   	}
   	
   	public void onDisable() {
+  		DataStorage.getSQLData().executeLaterStatements();
   		ServerHandler.sendConsoleMessage("&4has been Disabled!");
   	}
   	

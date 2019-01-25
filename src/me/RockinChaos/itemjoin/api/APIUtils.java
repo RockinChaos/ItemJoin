@@ -5,8 +5,8 @@ import org.bukkit.entity.Player;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
+import me.RockinChaos.itemjoin.utils.DataStorage;
 import me.RockinChaos.itemjoin.utils.Utils;
-import me.RockinChaos.itemjoin.utils.sqlite.SQLData;
 
 public class APIUtils {
 	
@@ -14,7 +14,7 @@ public class APIUtils {
 		String Probable = ItemUtilities.getProbabilityItem(player);
 		final int session = Utils.getRandom(1, 80000);
 		for (ItemMap item : ItemUtilities.getItems()) {
-			if (item.inWorld(player.getWorld()) && ItemUtilities.isChosenProbability(item, Probable) && SQLData.isEnabled(player)
+			if (item.inWorld(player.getWorld()) && ItemUtilities.isChosenProbability(item, Probable) && DataStorage.getSQLData().isEnabled(player)
 					&& item.hasPermission(player) && ItemUtilities.isObtainable(player, item, session)) {
 					item.giveTo(player, false, 0);
 			}

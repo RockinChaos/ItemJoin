@@ -14,7 +14,6 @@ import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.utils.DataStorage;
 import me.RockinChaos.itemjoin.utils.Utils;
-import me.RockinChaos.itemjoin.utils.sqlite.SQLData;
 
 public class WorldSwitch implements Listener {
 
@@ -46,7 +45,7 @@ public class WorldSwitch implements Listener {
 				final int session = Utils.getRandom(1, 100000);
 				for (ItemMap item : ItemUtilities.getItems()) { 
 					if (item.isGiveOnWorldChange() && item.inWorld(player.getWorld()) 
-							&& ItemUtilities.isChosenProbability(item, Probable) && SQLData.isEnabled(player)
+							&& ItemUtilities.isChosenProbability(item, Probable) && DataStorage.getSQLData().isEnabled(player)
 							&& item.hasPermission(player) && ItemUtilities.isObtainable(player, item, session)) {
 						item.giveTo(player, false, 0);
 					}

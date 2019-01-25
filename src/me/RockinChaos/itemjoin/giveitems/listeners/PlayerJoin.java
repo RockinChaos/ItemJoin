@@ -16,7 +16,6 @@ import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.utils.DataStorage;
 import me.RockinChaos.itemjoin.utils.Utils;
-import me.RockinChaos.itemjoin.utils.sqlite.SQLData;
 
 public class PlayerJoin implements Listener {
 	
@@ -53,7 +52,7 @@ public class PlayerJoin implements Listener {
 				final int session = Utils.getRandom(1, 100000);
 				for (ItemMap item : ItemUtilities.getItems()) {
 					if (item.isGiveOnJoin() && item.inWorld(player.getWorld()) 
-							&& ItemUtilities.isChosenProbability(item, Probable) && SQLData.isEnabled(player)
+							&& ItemUtilities.isChosenProbability(item, Probable) && DataStorage.getSQLData().isEnabled(player)
 							&& item.hasPermission(player) && ItemUtilities.isObtainable(player, item, session)) {
 							item.giveTo(player, false, 0);
 					}
@@ -67,12 +66,12 @@ public class PlayerJoin implements Listener {
 	
 	private void runGlobalCmds(Player player) {
 		if (globalCommandsEnabled && inCommandsWorld(player.getWorld().getName(), "enabled-worlds") && globalCommands != null) {
-			for (String command: globalCommands) {
-				if (!SQLData.hasFirstCommanded(player, command)) {
-					String Command = Utils.translateLayout(command, player).replace("first-join: ", "").replace("first-join:", "");
-					Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), Command);
-					if (Utils.containsIgnoreCase(command, "first-join:")) {
-						SQLData.saveToDatabase(player, "NULL", command, "");
+			for (String Command: globalCommands) {
+				String command = Utils.translateLayout(Command, player).replace("first-join: ", "").replace("first-join:", "");
+				if (!DataStorage.getSQLData().hasFirstCommanded(player, command)) {
+					Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command);
+					if (Utils.containsIgnoreCase(Command, "first-join:")) {
+						DataStorage.getSQLData().saveFirstCommandData(player, command);
 					}
 				}
 			}

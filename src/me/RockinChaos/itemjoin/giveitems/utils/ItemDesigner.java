@@ -30,8 +30,6 @@ import me.RockinChaos.itemjoin.utils.Legacy;
 import me.RockinChaos.itemjoin.utils.ImageMap;
 import me.RockinChaos.itemjoin.utils.Reflection;
 import me.RockinChaos.itemjoin.utils.Utils;
-import me.RockinChaos.itemjoin.utils.sqlite.SQLData;
-
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.vk2gpz.tokenenchant.api.TokenEnchantAPI;
@@ -295,21 +293,21 @@ public class ItemDesigner {
 		if (itemMap.getNodeLocation().getString(".custom-map-image") != null && Utils.containsIgnoreCase(itemMap.getMaterial().toString(), "MAP")) {
 			itemMap.setMapImage(itemMap.getNodeLocation().getString(".custom-map-image"));
 			if (itemMap.getMapImage().equalsIgnoreCase("default.jpg") || new File(ItemJoin.getInstance().getDataFolder(), itemMap.getMapImage()).exists()) {
-				if (SQLData.hasImage(itemMap.getConfigName(), itemMap.getMapImage())) {
-					int mapID = SQLData.getMapID(itemMap.getMapImage());
+				if (DataStorage.getSQLData().imageNumberExists(itemMap.getMapImage())) {
+					int mapID = DataStorage.getSQLData().getImageNumber(itemMap.getMapImage());
 					itemMap.setMapID(mapID);
 					ImageMap imgPlatform = new ImageMap(itemMap.getMapImage(), mapID);
 					MapView view = imgPlatform.FetchExistingView(mapID);
 					try { view.removeRenderer(view.getRenderers().get(0)); } catch (NullPointerException e) { ServerHandler.sendDebugTrace(e); }
 					try { view.addRenderer(imgPlatform); } catch (NullPointerException e) { ServerHandler.sendDebugTrace(e); }
-				} else if (!SQLData.hasImage(itemMap.getConfigName(), itemMap.getMapImage())) {
+				} else {
 					MapView view = Legacy.createLegacyMapView();
 					try { view.removeRenderer(view.getRenderers().get(0)); } catch (NullPointerException e) { ServerHandler.sendDebugTrace(e); }
 					int mapID = ItemHandler.getMapID(view);
 					itemMap.setMapID(mapID);
 					ImageMap imgPlatform = new ImageMap(itemMap.getMapImage(), mapID);
 					try { view.addRenderer(imgPlatform); } catch (NullPointerException e) { ServerHandler.sendDebugTrace(e); }
-					SQLData.saveMapImage(itemMap.getConfigName(), "map-id", itemMap.getMapImage(), mapID);
+					DataStorage.getSQLData().saveMapImage(itemMap);
 				}
 			}
 		}

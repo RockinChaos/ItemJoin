@@ -18,10 +18,10 @@ import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.listeners.InvClickCreative;
+import me.RockinChaos.itemjoin.utils.DataStorage;
 import me.RockinChaos.itemjoin.utils.Language;
 import me.RockinChaos.itemjoin.utils.ProbabilityUtilities;
 import me.RockinChaos.itemjoin.utils.Utils;
-import me.RockinChaos.itemjoin.utils.sqlite.SQLData;
 
 public class ItemUtilities {
 	
@@ -244,9 +244,9 @@ public class ItemUtilities {
 	public static Boolean isObtainable(Player player, ItemMap itemMap, int session) {
 		if (itemMap.getProbability().equals(-1) || !itemMap.getProbability().equals(-1) && probability.containsKey(itemMap.getConfigName()) && !hasProbabilityItem(player, itemMap)) {
 			if (!itemMap.hasItem(player) || itemMap.isAlwaysGive() || !itemMap.isLimitMode(player.getGameMode())) {
-				boolean firstJoin = SQLData.hasFirstJoined(player, itemMap.getConfigName());
-				boolean firstWorld = SQLData.hasFirstWorld(player, itemMap.getConfigName());
-				boolean ipLimited = SQLData.hasIPLimited(player, itemMap.getConfigName());
+				boolean firstJoin = DataStorage.getSQLData().hasFirstJoined(player, itemMap);
+				boolean firstWorld = DataStorage.getSQLData().hasFirstWorld(player, itemMap);
+				boolean ipLimited = DataStorage.getSQLData().isIPLimited(player, itemMap);
 				if (itemMap.isLimitMode(player.getGameMode())) {
 					if (Utils.isInt(itemMap.getSlot()) && Integer.parseInt(itemMap.getSlot()) >= 0 && Integer.parseInt(itemMap.getSlot()) <= 35) {
 						if (!firstJoin && !firstWorld && !ipLimited && canOverwrite(player, itemMap.getSlot(), itemMap.getConfigName())) {
@@ -261,21 +261,21 @@ public class ItemUtilities {
 						if (session != 0 && getFailCount().get(session) != null) {
 						putFailCount(session, getFailCount().get(session) + 1);
 						} else if (session != 0) { putFailCount(session, 1); }
-						ServerHandler.sendDebugMessage("Failed to give item; " + itemMap.getConfigName());
+						ServerHandler.sendDebugMessage(player.getName() + " has failed to receive item; " + itemMap.getConfigName());
 					} else {
 						if (firstJoin) {
-							ServerHandler.sendDebugMessage("Already given first-join item; " + itemMap.getConfigName() + " they can no longer recieve this.");
+							ServerHandler.sendDebugMessage(player.getName() + " has already received first-join " + itemMap.getConfigName() + ", they can no longer recieve this.");
 						} else if (firstWorld) {
-							ServerHandler.sendDebugMessage("Already given first-world item; " + itemMap.getConfigName() + " they can no longer recieve this in the world " + player.getWorld().getName());
+							ServerHandler.sendDebugMessage(player.getName() + " has already received first-world " + itemMap.getConfigName() + ", they can no longer recieve this in " + player.getWorld().getName());
 						} else if (ipLimited) {
-							ServerHandler.sendDebugMessage("Already given ip-limited item; " + itemMap.getConfigName() + " they will only recieve this on their dedicated ip."); 
+							ServerHandler.sendDebugMessage(player.getName() + " has already received ip-limited " + itemMap.getConfigName() + ", they will only recieve this on their dedicated ip."); 
 						}
 					}
 					return false;
 				} else { return false; }
 			}
 		} else { return false; }
-		ServerHandler.sendDebugMessage("Already has item; " + itemMap.getConfigName());
+		ServerHandler.sendDebugMessage(player.getName() + " already has item; " + itemMap.getConfigName());
 		return false;
 	}
 	
@@ -340,7 +340,7 @@ public class ItemUtilities {
 				player.getInventory().setItem(Integer.parseInt(itemMap.getSlot()), item);
 			}
 		} else { player.getInventory().setItem(Integer.parseInt(itemMap.getSlot()), item); }
-		SQLData.saveAllToDatabase(player, itemMap.getConfigName());
+		saveSQLItemData(player, itemMap);
 		ServerHandler.sendDebugMessage("Given the Item; " + itemMap.getConfigName());
 	}
 	
@@ -350,7 +350,7 @@ public class ItemUtilities {
 				if (amount != 0 && noTriggers) { item.setAmount(amount); }
 				player.getInventory().addItem(item);
 				ServerHandler.sendDebugMessage("Given the Item; [" + itemMap.getConfigName() + "]");
-				SQLData.saveAllToDatabase(player, itemMap.getConfigName());
+				saveSQLItemData(player, itemMap);
 			} else if (itemMap.getSlot().equalsIgnoreCase("Helmet")) {
 				if (amount != 0 || itemMap.isAlwaysGive()) {
 					if (noTriggers) { item.setAmount(amount); }
@@ -358,7 +358,7 @@ public class ItemUtilities {
 					} else { Equip.setHelmet(item); }
 				} else { Equip.setHelmet(item); }
 				ServerHandler.sendDebugMessage("Given the Item; [" + itemMap.getConfigName() + "]");
-				SQLData.saveAllToDatabase(player, itemMap.getConfigName());
+				saveSQLItemData(player, itemMap);
 			} else if (itemMap.getSlot().equalsIgnoreCase("Chestplate")) {
 				if (amount != 0 || itemMap.isAlwaysGive()) {
 					if (noTriggers) { item.setAmount(amount); }
@@ -366,7 +366,7 @@ public class ItemUtilities {
 					} else { Equip.setChestplate(item); }
 				} else { Equip.setChestplate(item); }
 				ServerHandler.sendDebugMessage("Given the Item; [" + itemMap.getConfigName() + "]");
-				SQLData.saveAllToDatabase(player, itemMap.getConfigName());
+				saveSQLItemData(player, itemMap);
 			} else if (itemMap.getSlot().equalsIgnoreCase("Leggings")) {
 				if (amount != 0 || itemMap.isAlwaysGive()) {
 					if (noTriggers) { item.setAmount(amount); }
@@ -374,7 +374,7 @@ public class ItemUtilities {
 					} else { Equip.setLeggings(item); }
 				} else { Equip.setLeggings(item); }
 				ServerHandler.sendDebugMessage("Given the Item; [" + itemMap.getConfigName() + "]");
-				SQLData.saveAllToDatabase(player, itemMap.getConfigName());
+				saveSQLItemData(player, itemMap);
 			} else if (itemMap.getSlot().equalsIgnoreCase("Boots")) {
 				if (amount != 0 || itemMap.isAlwaysGive()) {
 					if (noTriggers) { item.setAmount(amount); }
@@ -382,7 +382,7 @@ public class ItemUtilities {
 					} else { Equip.setBoots(item); }
 				} else { Equip.setBoots(item); }
 				ServerHandler.sendDebugMessage("Given the Item; [" + itemMap.getConfigName() + "]");
-				SQLData.saveAllToDatabase(player, itemMap.getConfigName());
+				saveSQLItemData(player, itemMap);
 			} else if (ServerHandler.hasCombatUpdate() && itemMap.getSlot().equalsIgnoreCase("Offhand")) {
 				if (amount != 0 || itemMap.isAlwaysGive()) {
 					if (noTriggers) { item.setAmount(amount); }
@@ -390,7 +390,7 @@ public class ItemUtilities {
 					} else { PlayerHandler.setOffhandItem(player, item); }
 				} else { PlayerHandler.setOffhandItem(player, item); }
 				ServerHandler.sendDebugMessage("Given the Item; [" + itemMap.getConfigName() + "]");
-				SQLData.saveAllToDatabase(player, itemMap.getConfigName());
+				saveSQLItemData(player, itemMap);
 			} else if (getSlotConversion(itemMap.getSlot()) != 5) {
 				if (amount != 0 || itemMap.isAlwaysGive()) {
 					if (noTriggers) { item.setAmount(amount); }
@@ -398,7 +398,7 @@ public class ItemUtilities {
 					} else { player.getOpenInventory().getTopInventory ().setItem(getSlotConversion(itemMap.getSlot()), item); }
 				} else { player.getOpenInventory().getTopInventory ().setItem(getSlotConversion(itemMap.getSlot()), item); }
 				ServerHandler.sendDebugMessage("Given the Item; [" + itemMap.getConfigName() + "]");
-				SQLData.saveAllToDatabase(player, itemMap.getConfigName());
+				saveSQLItemData(player, itemMap);
 			}
 	}
 	
@@ -415,5 +415,11 @@ public class ItemUtilities {
 			return 4;
 		}
 		return 5;
+	}
+	
+	private static void saveSQLItemData(Player player, ItemMap itemMap) {
+		DataStorage.getSQLData().saveFirstJoinData(player, itemMap);
+		DataStorage.getSQLData().saveFirstWorldData(player, itemMap);
+		DataStorage.getSQLData().saveIpLimitData(player, itemMap);
 	}
 }

@@ -28,10 +28,10 @@ import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PermissionsHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
+import me.RockinChaos.itemjoin.utils.DataStorage;
 import me.RockinChaos.itemjoin.utils.Language;
 import me.RockinChaos.itemjoin.utils.Updater;
 import me.RockinChaos.itemjoin.utils.Utils;
-import me.RockinChaos.itemjoin.utils.sqlite.SQLData;
 import me.RockinChaos.itemjoin.utils.sqlite.SQLite;
 
 public class Commands implements CommandExecutor {
@@ -210,15 +210,15 @@ public class Commands implements CommandExecutor {
 				if (player == null) {
 					Language.sendMessage(sender, "playerNotFound", args[2]);
 				} else if (cmdConfirm.get(2 + sender.getName()) != null && cmdConfirm.get(2 + sender.getName()).equals(true) && args[1].equalsIgnoreCase("ip-limits")) {
-					SQLData.purgeDatabaseData("ip_limits", player);
+					DataStorage.getSQLData().purgeDatabaseData("ip_limits", player);
 					Language.sendMessage(sender, "databasePurged", "ip-limits data for " + args[2]);
 					cmdConfirm.remove(2 + sender.getName());
 				} else if (cmdConfirm.get(3 + sender.getName()) != null && cmdConfirm.get(3 + sender.getName()).equals(true) && args[1].equalsIgnoreCase("first-join")) {
-					SQLData.purgeDatabaseData("first_join", player);
+					DataStorage.getSQLData().purgeDatabaseData("first_join", player);
 					Language.sendMessage(sender, "databasePurged", "first-join data for " + args[2]);
 					cmdConfirm.remove(3 + sender.getName());
 				} else if (cmdConfirm.get(3 + sender.getName()) != null && cmdConfirm.get(3 + sender.getName()).equals(true) && args[1].equalsIgnoreCase("first-world")) {
-					SQLData.purgeDatabaseData("first_world", player);
+					DataStorage.getSQLData().purgeDatabaseData("first_world", player);
 					Language.sendMessage(sender, "databasePurged", "first-world data for " + args[2]);
 					cmdConfirm.remove(3 + sender.getName());
 				} else if (cmdConfirm.get(2 + sender.getName()) == null && args[1].equalsIgnoreCase("ip-limits")) {
@@ -245,6 +245,18 @@ public class Commands implements CommandExecutor {
 							}
 						}
 					}.runTaskLater(ItemJoin.getInstance(), 100L);
+				} else if (cmdConfirm.get(3 + sender.getName()) == null && args[1].equalsIgnoreCase("first-world")) {
+					cmdConfirm.put(3 + sender.getName(), true);
+					Language.sendMessage(sender, "databasePurgeWarn", "first-world data for " + args[2]);
+					Language.sendMessage(sender, "databasePurgeConfirm", "/ij purge first-world <player>");
+					new BukkitRunnable() {
+						public void run() {
+							if (cmdConfirm.get(3 + sender.getName()) != null && cmdConfirm.get(3 + sender.getName()).equals(true)) {
+								Language.sendMessage(sender, "databasePurgeTimeOut", "");
+								cmdConfirm.remove(3 + sender.getName());
+							}
+						}
+					}.runTaskLater(ItemJoin.getInstance(), 100L);
 				}
 			} else { Language.sendMessage(sender, "noPermission", ""); }
 			return true;
@@ -260,9 +272,9 @@ public class Commands implements CommandExecutor {
 			Player argsPlayer = PlayerHandler.getPlayerString(args[1]);
 			if (argsPlayer == null && PermissionsHandler.hasCommandPermission(sender, "itemjoin.enable.others")) { Language.sendMessage(sender, "playerNotFound", args[1]); } 
 			else if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.enable.others")) {
-				if (SQLData.isWritable("Global", PlayerHandler.getPlayerID(argsPlayer))) { Language.sendMessage(argsPlayer, "enabledForPlayerFailed", ""); } 
+				if (DataStorage.getSQLData().isWritable("Global", PlayerHandler.getPlayerID(argsPlayer))) { Language.sendMessage(argsPlayer, "enabledForPlayerFailed", ""); } 
 				else {
-					SQLData.saveToDatabase(argsPlayer, "true", "enabled-players", "Global");
+					DataStorage.getSQLData().saveToDatabase(argsPlayer, "Global", "true", "enabled-players");
 					Language.sendMessage(argsPlayer, "enabledForPlayer", "");
 					if (!sender.getName().equalsIgnoreCase(argsPlayer.getName())) {
 						Language.setArgsPlayer(argsPlayer);
@@ -276,9 +288,9 @@ public class Commands implements CommandExecutor {
 			String world = args[2];
 			if (argsPlayer == null && PermissionsHandler.hasCommandPermission(sender, "itemjoin.enable.others")) { Language.sendMessage(sender, "playerNotFound", args[1]); } 
 			else if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.enable.others")) {
-				if (SQLData.isWritable(world, PlayerHandler.getPlayerID(argsPlayer))) { Language.sendMessage(argsPlayer, "enabledForPlayerWorldFailed", world); }
+				if (DataStorage.getSQLData().isWritable(world, PlayerHandler.getPlayerID(argsPlayer))) { Language.sendMessage(argsPlayer, "enabledForPlayerWorldFailed", world); }
 				else {
-					SQLData.saveToDatabase(argsPlayer, "true", "enabled-players", world);
+					DataStorage.getSQLData().saveToDatabase(argsPlayer, world, "true", "enabled-players");
 					Language.sendMessage(argsPlayer, "enabledForPlayerWorld", world);
 					if (!sender.getName().equalsIgnoreCase(argsPlayer.getName())) {
 						Language.setArgsPlayer(argsPlayer);
@@ -289,8 +301,8 @@ public class Commands implements CommandExecutor {
 			return true;
 		} else if (args[0].equalsIgnoreCase("enable")) {
 			if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.enable")) {
-				if (!SQLData.isWritable("Global", "ALL")) {
-					SQLData.saveToDatabase(null, "true", "enabled-players", "Global");
+				if (!DataStorage.getSQLData().isWritable("Global", "ALL")) {
+					DataStorage.getSQLData().saveToDatabase(null, "Global", "true", "enabled-players");
 					Language.sendMessage(sender, "enabledGlobal", "");
 				} else { Language.sendMessage(sender, "enabledGlobalFailed", ""); }
 			} else { Language.sendMessage(sender, "noPermission", ""); }
@@ -300,9 +312,9 @@ public class Commands implements CommandExecutor {
 			if (argsPlayer == null && PermissionsHandler.hasCommandPermission(sender, "itemjoin.disable.others")) {
 				Language.sendMessage(sender, "playerNotFound", args[1]);
 			} else if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.disable.others")) {
-				if (!SQLData.isWritable("Global", PlayerHandler.getPlayerID(argsPlayer))) { Language.sendMessage(argsPlayer, "disabledForPlayerFailed", ""); }
+				if (!DataStorage.getSQLData().isWritable("Global", PlayerHandler.getPlayerID(argsPlayer))) { Language.sendMessage(argsPlayer, "disabledForPlayerFailed", ""); }
 				else {
-					SQLData.saveToDatabase(argsPlayer, "false", "disabled-players", "Global");
+					DataStorage.getSQLData().saveToDatabase(argsPlayer, "Global", "false", "disabled-players");
 					Language.sendMessage(argsPlayer, "disabledForPlayer", "");
 					if (!sender.getName().equalsIgnoreCase(argsPlayer.getName())) {
 						Language.setArgsPlayer(argsPlayer);
@@ -317,10 +329,10 @@ public class Commands implements CommandExecutor {
 			if (argsPlayer == null && PermissionsHandler.hasCommandPermission(sender, "itemjoin.disable.others")) {
 				Language.sendMessage(sender, "playerNotFound", args[1]);
 			} else if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.disable.others")) {
-				if (!SQLData.isWritable(world, PlayerHandler.getPlayerID(argsPlayer))) {
+				if (!DataStorage.getSQLData().isWritable(world, PlayerHandler.getPlayerID(argsPlayer))) {
 					Language.sendMessage(argsPlayer, "disabledForPlayerWorldFailed", world);
 				} else {
-					SQLData.saveToDatabase(argsPlayer, "false", "disabled-players", world);
+					DataStorage.getSQLData().saveToDatabase(argsPlayer, world, "false", "disabled-players");
 					Language.sendMessage(argsPlayer, "disabledForPlayerWorld", world);
 					if (!sender.getName().equalsIgnoreCase(argsPlayer.getName())) {
 						Language.setArgsPlayer(argsPlayer);
@@ -331,8 +343,8 @@ public class Commands implements CommandExecutor {
 			return true;
 		} else if (args[0].equalsIgnoreCase("disable")) {
 			if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.disable")) {
-				if (SQLData.isWritable("Global", "ALL")) {
-					SQLData.saveToDatabase(null, "false", "disabled-players", "Global");
+				if (DataStorage.getSQLData().isWritable("Global", "ALL")) {
+					DataStorage.getSQLData().saveToDatabase(null, "Global", "false", "disabled-players");
 					Language.sendMessage(sender, "disabledGlobal", "");
 				} else { Language.sendMessage(sender, "disabledGlobalFailed", ""); }
 			} else { Language.sendMessage(sender, "noPermission", ""); }

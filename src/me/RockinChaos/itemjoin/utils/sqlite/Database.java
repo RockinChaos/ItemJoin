@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -150,6 +151,30 @@ public abstract class Database {
 		return null;
 	}
 	
+	public List < List < String >> queryTableData(final String statement, final String...row) {
+		try (Connection conn = this.getSQLConnection(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(statement)) {
+			final List < List < String > > existingData = new ArrayList < List < String > > ();
+			while (rs.next()) {
+				final List < String > columnData = new ArrayList < String > ();
+				for (final String singleRow: row) {
+					columnData.add(rs.getString(singleRow));
+				}
+				existingData.add(columnData);
+			}
+			try {
+				conn.close();
+				rs.close();
+			} catch (Exception e) {}
+			return existingData;
+		} catch (SQLException e) {
+			ServerHandler.sendDebugMessage("[SQLITE] Failed to execute database statement.");
+			if (ServerHandler.hasDebuggingMode()) {
+				e.printStackTrace();
+			}
+		}
+		return null;
+	}
+	
 	public Map < String, List < Object >> queryMultipleRows(final String statement, final String...row) {
 		Connection conn = null;
 		PreparedStatement ps = null;
@@ -216,6 +241,26 @@ public abstract class Database {
 		if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
 		}
 		return tExists;
+	}
+	
+	public boolean isInDatabase(String StatementString) {
+		try {
+			Statement statement = SQLite.getDatabase("database").getSQLConnection().createStatement();
+			ResultSet result = statement.executeQuery(StatementString);
+			try {
+				if (!result.isBeforeFirst()) {
+					ServerHandler.sendDebugMessage("[SQLite] Result set is empty.");
+					return false;
+				} else {
+					ServerHandler.sendDebugMessage("[SQLite] Result set is not empty.");
+					return true;
+				}
+			} finally { result.close(); statement.close(); SQLite.getDatabase("database").closeConnection();}
+		} catch (Exception e) {
+			ServerHandler.sendDebugMessage("Could not read from the database.db file, some ItemJoin features have been disabled!");
+			if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+		}
+		return false;
 	}
 	
 	public void close(final PreparedStatement ps, final ResultSet rs) {

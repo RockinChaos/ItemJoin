@@ -14,7 +14,6 @@ import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.utils.DataStorage;
 import me.RockinChaos.itemjoin.utils.Utils;
-import me.RockinChaos.itemjoin.utils.sqlite.SQLData;
 
 public class LimitSwitch implements Listener {
 
@@ -47,7 +46,7 @@ public class LimitSwitch implements Listener {
 				final int session = Utils.getRandom(1, 100000);
 				for (ItemMap item : ItemUtilities.getItems()) { 
 					if (item.isUseOnLimitSwitch() && item.inWorld(player.getWorld()) 
-							&& ItemUtilities.isChosenProbability(item, Probable) && SQLData.isEnabled(player)
+							&& ItemUtilities.isChosenProbability(item, Probable) && DataStorage.getSQLData().isEnabled(player)
 							&& item.hasPermission(player) && ItemUtilities.isObtainable(player, item, session)) {
 						item.giveTo(player, false, 0); 
 						item.setAnimations(player);
