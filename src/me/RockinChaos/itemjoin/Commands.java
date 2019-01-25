@@ -154,6 +154,8 @@ public class Commands implements CommandExecutor {
 			return true;
 		} else if (args[0].equalsIgnoreCase("reload") || args[0].equalsIgnoreCase("rl")) {
 			if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.reload")) {
+				DataStorage.getSQLData().executeLaterStatements();
+				DataStorage.newSQLData();
 				ConfigHandler.loadConfigs();
 				ItemUtilities.clearItems();
 				ItemDesigner itemDesigner = new ItemDesigner();
