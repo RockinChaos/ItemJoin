@@ -60,8 +60,12 @@ public class ItemCommand {
 	
 	private void dispatchConsoleCommands(Player player) {
 		try {
-			setLoggable(player, "/" + Utils.translateLayout(this.command, player));
-			Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), Utils.translateLayout(this.command, player));
+			if (Utils.containsIgnoreCase(this.command, "[close]")) {
+				player.closeInventory();
+			} else {
+				setLoggable(player, "/" + Utils.translateLayout(this.command, player));
+				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), Utils.translateLayout(this.command, player));
+			}
 		} catch (Exception e) {
 			ServerHandler.sendErrorMessage("&cThere was an issue executing an item's command as console, if this continues please report it to the developer!");
 			ServerHandler.sendDebugTrace(e);
@@ -70,16 +74,20 @@ public class ItemCommand {
 	
 	private void dispatchOpCommands(Player player) {
 		try {
-			boolean isOp = player.isOp();
-			try {
-				player.setOp(true);
-				setLoggable(player, "/" + Utils.translateLayout(this.command, player));
-				player.chat("/" + Utils.translateLayout(this.command, player));
-			} catch (Exception e) {
-				ServerHandler.sendDebugTrace(e);
-				player.setOp(isOp);
-				ServerHandler.sendErrorMessage("&cAn error has occurred while setting " + player.getName() + " status on the OP list, to ensure server security they have been removed as an OP.");
-			} finally { player.setOp(isOp); }
+			if (Utils.containsIgnoreCase(this.command, "[close]")) {
+				player.closeInventory();
+			} else {
+				boolean isOp = player.isOp();
+				try {
+					player.setOp(true);
+					setLoggable(player, "/" + Utils.translateLayout(this.command, player));
+					player.chat("/" + Utils.translateLayout(this.command, player));
+				} catch (Exception e) {
+					ServerHandler.sendDebugTrace(e);
+					player.setOp(isOp);
+					ServerHandler.sendErrorMessage("&cAn error has occurred while setting " + player.getName() + " status on the OP list, to ensure server security they have been removed as an OP.");
+				} finally { player.setOp(isOp); }
+			}
 		} catch (Exception e) {
 			ServerHandler.sendErrorMessage("&cThere was an issue executing an item's command as an op, if this continues please report it to the developer!");
 			ServerHandler.sendDebugTrace(e);
@@ -88,8 +96,12 @@ public class ItemCommand {
 	
 	private void dispatchPlayerCommands(Player player) {
 		try {
-			setLoggable(player, "/" + Utils.translateLayout(this.command, player));
-			player.chat("/" + Utils.translateLayout(this.command, player));
+			if (Utils.containsIgnoreCase(this.command, "[close]")) {
+				player.closeInventory();
+			} else {
+				setLoggable(player, "/" + Utils.translateLayout(this.command, player));
+				player.chat("/" + Utils.translateLayout(this.command, player));
+			}
 		} catch (Exception e) {
 			ServerHandler.sendErrorMessage("&cThere was an issue executing an item's command as a player, if this continues please report it to the developer!");
 			ServerHandler.sendDebugTrace(e);
