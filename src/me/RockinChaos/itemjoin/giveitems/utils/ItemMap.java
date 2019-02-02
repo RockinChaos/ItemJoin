@@ -907,6 +907,10 @@ public class ItemMap {
 		return this.interactCooldown;
 	}
 	
+	public String getCooldownMessage() {
+		return this.cooldownMessage;
+	}
+	
 	public boolean isCustomConsumable() {
 		return this.customConsumable;
 	}
@@ -1537,7 +1541,8 @@ public class ItemMap {
 			if (balance >= this.cost) {
 				return true;
 			} else if (!(balance >= this.cost)) {
-				Language.sendMessage(player, "itemChargeFailed", this.cost + ", " + balance);
+				String[] placeHolders = new String[12]; placeHolders[6] = this.cost.toString(); placeHolders[5] = balance + "";
+				Language.sendLangMessage("General.itemChargeFailed", player, placeHolders);
 				return false;
 			}
 		}
@@ -1551,7 +1556,8 @@ public class ItemMap {
 			if (balance >= this.cost) {
 				if (this.cost != 0) {
 					try { PlayerHandler.withdrawBalance(player, this.cost); } catch (NullPointerException e) { ServerHandler.sendDebugTrace(e); }
-					Language.sendMessage(player, "itemChargeSuccess", "" + this.cost);
+					String[] placeHolders = new String[12]; placeHolders[6] = this.cost.toString();
+					Language.sendLangMessage("General.itemChargeSuccess", player, placeHolders);
 				}
 			}
 		}

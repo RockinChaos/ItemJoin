@@ -221,9 +221,11 @@ public class ItemUtilities {
 		if (getFailCount().get(session) != null && getFailCount().get(session) != 0) {
 			if (ConfigHandler.getConfig("items.yml").getString("items-Overwrite") != null && isOverwriteWorld(player.getWorld().getName()) 
 					|| ConfigHandler.getConfig("items.yml").getString("items-Overwrite") != null && ConfigHandler.getConfig("items.yml").getBoolean("items-Overwrite") == true) {
-				Language.sendMessage(player, "failedInvFull", getFailCount().get(session).toString());
+				String[] placeHolders = new String[12]; placeHolders[7] = getFailCount().get(session).toString();
+				Language.sendLangMessage("General.failedInventory", player, placeHolders);
 			} else {
-				Language.sendMessage(player, "failedOverwrite", getFailCount().get(session).toString());
+				String[] placeHolders = new String[12]; placeHolders[7] = getFailCount().get(session).toString();
+				Language.sendLangMessage("General.failedOverwrite", player, placeHolders);
 			}
 			removeFailCount(session);
 		}

@@ -6,9 +6,11 @@ import java.util.Random;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Statistic;
+import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import de.domedd.betternick.api.nickedplayer.NickedPlayer;
+import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.clip.placeholderapi.PlaceholderAPI;
 
@@ -19,6 +21,13 @@ public class Utils {
 			return true;
 		}
 		return false;
+	}
+	
+	public static String stripLogColors(CommandSender sender, String message) {
+		if(sender instanceof ConsoleCommandSender && ConfigHandler.getConfig("config.yml").getBoolean("Log-Coloration") != true) {
+			return ChatColor.stripColor(message);
+		}
+	  return message;
 	}
 	
 	public static String convertStringList(List<String> list) {
@@ -80,7 +89,7 @@ public class Utils {
 		try { name = name.replace("%player_food%", String.valueOf(player.getFoodLevel())); } catch (Exception e) { ServerHandler.sendDebugTrace(e); }
 		try { name = name.replace("%player_health%", String.valueOf(player.getHealth())); } catch (Exception e) { ServerHandler.sendDebugTrace(e); }
 		try { name = name.replace("%player_location%", player.getLocation().getBlockX() + ", " + player.getLocation().getBlockY() + ", " + player.getLocation().getBlockZ() + ""); } catch (Exception e) { ServerHandler.sendDebugTrace(e); } }
-		if (playerName != null && player != null && (player instanceof ConsoleCommandSender)) { try { name = name.replace("%player%", "CONSOLE"); } catch (Exception e) { ServerHandler.sendDebugTrace(e); } }
+		if (player == null) { try { name = name.replace("%player%", "CONSOLE"); } catch (Exception e) { ServerHandler.sendDebugTrace(e); } }
 	
 		name = ChatColor.translateAlternateColorCodes('&', name).toString();
 		if (DataStorage.hasPlaceholderAPI() == true) {

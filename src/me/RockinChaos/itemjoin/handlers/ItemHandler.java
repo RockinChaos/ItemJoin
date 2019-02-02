@@ -63,6 +63,15 @@ public class ItemHandler {
 		return null;
 	}
 	
+	public static ItemMap getMappedItem(String lookUp) {
+		for (ItemMap item : ItemUtilities.getItems()) {
+			if (item.getConfigName().equalsIgnoreCase(lookUp)) {
+				return item;
+			}
+		}
+		return null;
+	}
+	
 	public static void closeAnimations(Player player) {
 		for (ItemMap item : ItemUtilities.getItems()) {
 			if (item.isAnimated() && item.getAnimationHandler().get(player) != null

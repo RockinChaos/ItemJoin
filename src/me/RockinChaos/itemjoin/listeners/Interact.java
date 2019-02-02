@@ -104,10 +104,10 @@ public class Interact implements Listener {
 		} else {
 			if (spamItemTask(player, itemMap.getConfigName())) {
 				storedSpammedPlayers.put(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + item, System.currentTimeMillis());
-				if (ConfigHandler.getConfig("en-lang.yml").getString("itemUsageCooldown") != null && !ConfigHandler.getConfig("en-lang.yml").getString("itemUsageCooldown").isEmpty()) {
+				if (itemMap.getCooldownMessage() != null && !itemMap.getCooldownMessage().isEmpty()) {
 					int timeLeft = (int)(cdtime - ((System.currentTimeMillis() - playersCooldownList) / 1000));
 					String inhand = itemMap.getCustomName();
-					String cooldownmsg = ConfigHandler.getConfig("en-lang.yml").getString("itemUsageCooldown").replace("%timeleft%", String.valueOf(timeLeft)).replace("%item%", inhand);;
+					String cooldownmsg = itemMap.getCooldownMessage().replace("%timeleft%", String.valueOf(timeLeft)).replace("%item%", inhand);;
 					cooldownmsg = Utils.translateLayout(cooldownmsg, player);
 					player.sendMessage(cooldownmsg);
 				}
