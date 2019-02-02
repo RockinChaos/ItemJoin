@@ -19,13 +19,13 @@ public class Language {
 	public static void sendLangMessage(String nodeLocation, CommandSender sender, String...placeHolder) {
 		Player player = null; if (sender instanceof Player) { player = (Player) sender; }
 		String langMessage = ConfigHandler.getConfig(langType.nodeLocation()).getString(nodeLocation);
-		String prefix = Utils.translateLayout(ConfigHandler.getConfig(langType.nodeLocation()).getString("Prefix"), player); if (prefix == null) { prefix = ""; }
+		String prefix = Utils.translateLayout(ConfigHandler.getConfig(langType.nodeLocation()).getString("Prefix"), player); if (prefix == null || !showPrefix(nodeLocation)) { prefix = ""; } else { prefix += " "; }
 		if (langMessage != null && !langMessage.isEmpty()) {
 			langMessage = translateLangHolders(langMessage, initializeRows(placeHolder));
 			langMessage = Utils.translateLayout(langMessage, player);
 			String[] langLines = langMessage.split(" /n ");
 			for (String langLine : langLines) {
-				String langStrip = prefix + " " + langLine;
+				String langStrip = prefix + langLine;
 				if (sender instanceof ConsoleCommandSender) { langStrip = Utils.stripLogColors(sender, langStrip); } 
 				if (isConsoleMessage(nodeLocation)) { ServerHandler.sendConsoleMessage(Utils.stripLogColors(sender, langLine)); }
 				else { sender.sendMessage(langStrip);	}
@@ -67,6 +67,16 @@ public class Language {
 				.replace("%purgedata%", langHolder[10])
 				.replace("%amount%", langHolder[11])
 				.replace("%players%", langHolder[12]);
+	}
+	
+	private static boolean showPrefix(String nodeLocation) {
+		if (nodeLocation.equalsIgnoreCase("Commands.List.itemRow") || nodeLocation.equalsIgnoreCase("Commands.List.worldHeader")
+				|| nodeLocation.equalsIgnoreCase("Commands.List.noItemsDefined") || nodeLocation.equalsIgnoreCase("Commands.Info.material")
+				 || nodeLocation.equalsIgnoreCase("Commands.Info.dataValue") || nodeLocation.equalsIgnoreCase("Commands.World.worldRow") 
+				 || nodeLocation.equalsIgnoreCase("Commands.World.worldHeader") || nodeLocation.equalsIgnoreCase("Commands.World.worldsFoundHeader")) {
+			return false;
+		}
+		return true;
 	}
 	
 	private static boolean isConsoleMessage(String nodeLocation) {

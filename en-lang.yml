@@ -5,14 +5,14 @@ en-Version: 7
 # This is the prefix that will be sent at the beginning of every single message sent in the language file.
 Prefix: '&7[&eItemJoin&7]'
 
-# These are simply general messages sent from the plugins item usages.
+# These are simply general messages sent from the plugin item usages.
 General:
   failedOverwrite: '&cFailed to give you &4%failcount% &citems, you are not allowed to overwrite items!'
   failedInventory: '&cFailed to give you &4%failcount% &citems, your inventory is full!'
   itemChargeSuccess: '&aSuccessfully ran the command for &e$%cost%&a.'
   itemChargeFailed: '&cYou do not have enough to run this command! /n &cYou have &4$%balance% &cof the required &4$%cost%.'
 
-# These messages are specific to the plugins commands.
+# These messages are specific to the plugin commands.
 Commands:
   Default:
     unknownCommand: '&cUnknown command, See &l/ItemJoin Help &cfor a list of commands.'
@@ -20,7 +20,7 @@ Commands:
     configReload: '&aConfiguration(s) Reloaded!'
     notPlayer: '&cYou must be a player to execute that command!'
     targetNotFound: '&cThe player &c%targetplayer% &ccould not be found!'
-    creatorLaunched: '&aItem creator has been opened.'
+    creatorLaunched: '&aItem creator GUI has been opened.'
   Item:
     notInHand: '&cYou are not holding an item in your hand!'
     invalidItem: '&cThe item &b%item% &cdoes not exist!'
