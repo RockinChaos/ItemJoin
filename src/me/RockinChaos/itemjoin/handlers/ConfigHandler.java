@@ -144,7 +144,7 @@ public class ConfigHandler {
 	public static void enLangFile() {
 	      loadConfig("en-lang.yml");
 	      File enLang = new File(ItemJoin.getInstance().getDataFolder(), "en-lang.yml");
-	      if (enLang.exists() && ItemJoin.getInstance().getConfig().getString("Language").equalsIgnoreCase("English") && getConfig("en-lang.yml").getInt("en-Version") != 6) {
+	      if (enLang.exists() && ItemJoin.getInstance().getConfig().getString("Language").equalsIgnoreCase("English") && getConfig("en-lang.yml").getInt("en-Version") != 7) {
 	      if (ItemJoin.getInstance().getResource("en-lang.yml") != null) {
 	        String newGen = "en-lang" + Utils.getRandom(1, 50000) + ".yml";
 	        File newFile = new File(ItemJoin.getInstance().getDataFolder(), newGen);
