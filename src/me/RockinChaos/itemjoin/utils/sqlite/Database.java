@@ -152,8 +152,8 @@ public abstract class Database {
 	}
 	
 	public List < List < String >> queryTableData(final String statement, final String...row) {
+		final List < List < String > > existingData = new ArrayList < List < String > > ();
 		try (Connection conn = this.getSQLConnection(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(statement)) {
-			final List < List < String > > existingData = new ArrayList < List < String > > ();
 			while (rs.next()) {
 				final List < String > columnData = new ArrayList < String > ();
 				for (final String singleRow: row) {
@@ -165,14 +165,13 @@ public abstract class Database {
 				conn.close();
 				rs.close();
 			} catch (Exception e) {}
-			return existingData;
 		} catch (SQLException e) {
 			ServerHandler.sendDebugMessage("[SQLITE] Failed to execute database statement.");
 			if (ServerHandler.hasDebuggingMode()) {
 				e.printStackTrace();
 			}
 		}
-		return null;
+		return existingData;
 	}
 	
 	public Map < String, List < Object >> queryMultipleRows(final String statement, final String...row) {

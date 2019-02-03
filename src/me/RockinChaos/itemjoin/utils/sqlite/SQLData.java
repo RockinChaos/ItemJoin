@@ -50,7 +50,7 @@ public class SQLData {
 		SQLite.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS first_commands (`World_Name` varchar(32), `Player_UUID` varchar(32), `Command_String` varchar(32));");
 		SQLite.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS enabled_players (`World_Name` varchar(32), `Player_Name` varchar(32), `Player_UUID` varchar(32), `isEnabled` varchar(32));");
 		SQLite.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS map_ids (`Map_IMG` varchar(32), `Map_ID` varchar(32));");
-}
+	}
 	
 	public void executeLaterStatements() {
 		if (executeStatementsLater != null && !executeStatementsLater.isEmpty()) {
@@ -74,90 +74,96 @@ public class SQLData {
 	
 	private void loadMapImages() {
 		List<List<String>> selectedMapImages = SQLite.getDatabase("database").queryTableData("SELECT * FROM map_ids", "Map_IMG", "Map_ID");
-		if (selectedMapImages != null && !selectedMapImages.isEmpty())
-		for (List<String> sl1 : selectedMapImages) {
-			if (!imageNumberExists(sl1.get(0))) {
-				mapImages.put(sl1.get(0), Utils.returnInteger(sl1.get(1)));
+		if (selectedMapImages != null && !selectedMapImages.isEmpty()) {
+			for (List<String> sl1 : selectedMapImages) {
+				if (!imageNumberExists(sl1.get(0))) {
+					mapImages.put(sl1.get(0), Utils.returnInteger(sl1.get(1)));
+				}	
 			}
 		}
 	}
 	
 	private void loadFirstJoinPlayers() {
-		List<List<String>> selectedFirstJoinPlayers = SQLite.getDatabase("database").queryTableData("SELECT * FROM first_join", "Item_Name", "Player_UUID");
-		if (selectedFirstJoinPlayers != null && !selectedFirstJoinPlayers.isEmpty())
-		for (List<String> sl1 : selectedFirstJoinPlayers) {
-			if (firstJoinPlayers.get(sl1.get(1)) != null) {
-				List <String> h1 = firstJoinPlayers.get(sl1.get(1));
-				h1.add(sl1.get(0));
-				firstJoinPlayers.put(sl1.get(1), h1);
-			} else {
-				List <String> h1 = new ArrayList<String>();
-				h1.add(sl1.get(0));
-				firstJoinPlayers.put(sl1.get(1), h1);
+		List < List < String > > selectedFirstJoinPlayers = SQLite.getDatabase("database").queryTableData("SELECT * FROM first_join", "Item_Name", "Player_UUID");
+		if (selectedFirstJoinPlayers != null && !selectedFirstJoinPlayers.isEmpty()) {
+			for (List<String> sl1 : selectedFirstJoinPlayers) {
+				if (firstJoinPlayers.get(sl1.get(1)) != null) {
+					List <String> h1 = firstJoinPlayers.get(sl1.get(1));
+					h1.add(sl1.get(0));
+					firstJoinPlayers.put(sl1.get(1), h1);
+				} else {
+					List <String> h1 = new ArrayList<String>();
+					h1.add(sl1.get(0));
+					firstJoinPlayers.put(sl1.get(1), h1);
+				}
 			}
 		}
 	}
 	
 	private void loadFirstWorldPlayers() {
 		List<List<String>> selectedFirstWorldPlayers = SQLite.getDatabase("database").queryTableData("SELECT * FROM first_world", "Item_Name", "Player_UUID", "World_Name");
-		if (selectedFirstWorldPlayers != null && !selectedFirstWorldPlayers.isEmpty())
-		for (List<String> sl1 : selectedFirstWorldPlayers) {
-			if (firstWorldPlayers.get(sl1.get(1)) != null) {
-				List <String> h1 = firstWorldPlayers.get(sl1.get(1));
-				h1.add(sl1.get(2) + "." + sl1.get(0));
-				firstWorldPlayers.put(sl1.get(1), h1);
-			} else {
-				List <String> h1 = new ArrayList<String>();
-				h1.add(sl1.get(2) + "." + sl1.get(0));
-				firstWorldPlayers.put(sl1.get(1), h1);
+		if (selectedFirstWorldPlayers != null && !selectedFirstWorldPlayers.isEmpty()) {
+			for (List<String> sl1 : selectedFirstWorldPlayers) {
+				if (firstWorldPlayers.get(sl1.get(1)) != null) {
+					List <String> h1 = firstWorldPlayers.get(sl1.get(1));
+					h1.add(sl1.get(2) + "." + sl1.get(0));
+					firstWorldPlayers.put(sl1.get(1), h1);
+				} else {
+					List <String> h1 = new ArrayList<String>();
+					h1.add(sl1.get(2) + "." + sl1.get(0));
+					firstWorldPlayers.put(sl1.get(1), h1);
+				}
 			}
 		}
 	}
 	
 	private void loadFirstCommandPlayers() {
 		List<List<String>> selectedFirstCommandPlayers = SQLite.getDatabase("database").queryTableData("SELECT * FROM first_commands", "Command_String", "Player_UUID", "World_Name");
-		if (selectedFirstCommandPlayers != null && !selectedFirstCommandPlayers.isEmpty())
-		for (List<String> sl1 : selectedFirstCommandPlayers) {
-			if (firstCommandPlayers.get(sl1.get(1)) != null) {
-				List <String> h1 = firstCommandPlayers.get(sl1.get(1));
-				h1.add(sl1.get(2) + "." + sl1.get(0));
-				firstCommandPlayers.put(sl1.get(1), h1);
-			} else {
-				List <String> h1 = new ArrayList<String>();
-				h1.add(sl1.get(2) + "." + sl1.get(0));
-				firstCommandPlayers.put(sl1.get(1), h1);
+		if (selectedFirstCommandPlayers != null && !selectedFirstCommandPlayers.isEmpty()) {
+			for (List<String> sl1 : selectedFirstCommandPlayers) {
+				if (firstCommandPlayers.get(sl1.get(1)) != null) {
+					List <String> h1 = firstCommandPlayers.get(sl1.get(1));
+					h1.add(sl1.get(2) + "." + sl1.get(0));
+					firstCommandPlayers.put(sl1.get(1), h1);
+				} else {
+					List <String> h1 = new ArrayList<String>();
+					h1.add(sl1.get(2) + "." + sl1.get(0));
+					firstCommandPlayers.put(sl1.get(1), h1);
+				}
 			}
 		}
 	}
 	
 	private void loadIPLimitAddresses() {
 		List<List<String>> selectedIPLimitAddresses = SQLite.getDatabase("database").queryTableData("SELECT * FROM ip_limits", "Item_Name", "Player_UUID", "World_Name", "IP_Address");
-		if (selectedIPLimitAddresses != null && !selectedIPLimitAddresses.isEmpty())
-		for (List<String> sl1 : selectedIPLimitAddresses) {
-			if (ipLimitAddresses.get(sl1.get(1)) != null) {
-				List <String> h1 = ipLimitAddresses.get(sl1.get(1));
-				h1.add(sl1.get(2) + "." + sl1.get(3) + "." + sl1.get(0));
-				ipLimitAddresses.put(sl1.get(1), h1);
-			} else {
-				List <String> h1 = new ArrayList<String>();
-				h1.add(sl1.get(2) + "." + sl1.get(3) + "." + sl1.get(0));
-				ipLimitAddresses.put(sl1.get(1), h1);
+		if (selectedIPLimitAddresses != null && !selectedIPLimitAddresses.isEmpty()) {
+			for (List<String> sl1 : selectedIPLimitAddresses) {
+				if (ipLimitAddresses.get(sl1.get(1)) != null) {
+					List <String> h1 = ipLimitAddresses.get(sl1.get(1));
+					h1.add(sl1.get(2) + "." + sl1.get(3) + "." + sl1.get(0));
+					ipLimitAddresses.put(sl1.get(1), h1);
+				} else {
+					List <String> h1 = new ArrayList<String>();
+					h1.add(sl1.get(2) + "." + sl1.get(3) + "." + sl1.get(0));
+					ipLimitAddresses.put(sl1.get(1), h1);
+				}
 			}
 		}
 	}
 	
 	private void loadEnabledPlayers() {
 		List<List<String>> selectedEnabledPlayers = SQLite.getDatabase("database").queryTableData("SELECT * FROM enabled_players", "Player_UUID", "World_Name", "isEnabled");
-		if (selectedEnabledPlayers != null && !selectedEnabledPlayers.isEmpty())
-		for (List<String> sl1 : selectedEnabledPlayers) {
-			if (enabledPlayers.get(sl1.get(0)) != null) {
-				List <String> h1 = enabledPlayers.get(sl1.get(0));
-				h1.add(sl1.get(1) + "." + sl1.get(2));
-				enabledPlayers.put(sl1.get(0), h1);
-			} else {
-				List <String> h1 = new ArrayList<String>();
-				h1.add(sl1.get(1) + "." + sl1.get(2));
-				enabledPlayers.put(sl1.get(0), h1);
+		if (selectedEnabledPlayers != null && !selectedEnabledPlayers.isEmpty()) {
+			for (List<String> sl1 : selectedEnabledPlayers) {
+				if (enabledPlayers.get(sl1.get(0)) != null) {
+					List <String> h1 = enabledPlayers.get(sl1.get(0));
+					h1.add(sl1.get(1) + "." + sl1.get(2));
+					enabledPlayers.put(sl1.get(0), h1);
+				} else {
+					List <String> h1 = new ArrayList<String>();
+					h1.add(sl1.get(1) + "." + sl1.get(2));
+					enabledPlayers.put(sl1.get(0), h1);
+				}
 			}
 		}
 	}
