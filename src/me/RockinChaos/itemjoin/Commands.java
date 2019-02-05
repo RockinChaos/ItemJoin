@@ -30,7 +30,6 @@ import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.utils.DataStorage;
 import me.RockinChaos.itemjoin.utils.Language;
-import me.RockinChaos.itemjoin.utils.Updater;
 import me.RockinChaos.itemjoin.utils.Utils;
 import me.RockinChaos.itemjoin.utils.sqlite.SQLite;
 
@@ -855,13 +854,13 @@ public class Commands implements CommandExecutor {
 		} else if (args[0].equalsIgnoreCase("updates") || args[0].equalsIgnoreCase("update")) {
 			if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.updates")) {
 				Language.sendLangMessage("Commands.Updates.checking", sender);
-				Updater.checkUpdates(sender);
+				DataStorage.getUpdater().checkUpdates(sender);
 			} else { Language.sendLangMessage("Commands.Default.noPermission", sender); }
 			return true;
 		} else if (args[0].equalsIgnoreCase("AutoUpdate")) {
 			if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.autoupdate")) {
 				Language.sendLangMessage("Commands.Updates.forcing", sender);
-				Updater.forceUpdates(sender);
+				DataStorage.getUpdater().forceUpdates(sender);
 			} else { Language.sendLangMessage("Commands.Default.noPermission", sender); }
 			return true;
 		} else {

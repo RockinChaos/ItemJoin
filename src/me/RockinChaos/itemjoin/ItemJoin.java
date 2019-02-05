@@ -6,8 +6,8 @@ import me.RockinChaos.itemjoin.giveitems.utils.ItemDesigner;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
+import me.RockinChaos.itemjoin.handlers.UpdateHandler;
 import me.RockinChaos.itemjoin.utils.DataStorage;
-import me.RockinChaos.itemjoin.utils.Updater;
 
 
 public class ItemJoin extends JavaPlugin {
@@ -15,19 +15,19 @@ public class ItemJoin extends JavaPlugin {
   	
   	public void onEnable() {
   		instance = this;
+  		ServerHandler.sendConsoleMessage("Warming up the oven!");
   		ConfigHandler.loadConfigs();
+  		DataStorage.setUpdater(new UpdateHandler(getFile()));
   		DataStorage.generateData();
   		DataStorage.registerEvents();
   		(new ItemDesigner()).generateItems();
   		ItemUtilities.updateItems();
-  		ServerHandler.sendConsoleMessage("&ahas been Enabled!");
-  		Updater.setAbsoluteFile(getFile());
-  		Updater.checkUpdates(getInstance().getServer().getConsoleSender());
+  		ServerHandler.sendConsoleMessage("&ahas been Enabled.");
   	}
   	
   	public void onDisable() {
   		DataStorage.getSQLData().executeLaterStatements();
-  		ServerHandler.sendConsoleMessage("&4has been Disabled!");
+  		ServerHandler.sendConsoleMessage("&4has been Disabled.");
   	}
   	
   	public static ItemJoin getInstance() {

@@ -5,6 +5,7 @@ import me.RockinChaos.itemjoin.Commands;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
+import me.RockinChaos.itemjoin.handlers.UpdateHandler;
 import me.RockinChaos.itemjoin.listeners.Consumes;
 import me.RockinChaos.itemjoin.listeners.Recipes;
 import me.RockinChaos.itemjoin.listeners.Legacy_Pickups;
@@ -44,6 +45,7 @@ public class DataStorage {
 	private static int WorldGuardVersion;
 	private static boolean oldMapMethod = false;
 	private static SQLData sqlData;
+	private static UpdateHandler updater;
 
 	public static void generateData() {
 		hookVault();
@@ -62,6 +64,7 @@ public class DataStorage {
 		hookNewNBTSystem();
 		setLoggable();
 		newSQLData();
+		ConfigHandler.loadClearDelay();
 		ConfigHandler.loadDelay();
 		ConfigHandler.loadGetItemPermissions();
 		ConfigHandler.loadOPCommandPermissions();
@@ -322,6 +325,14 @@ public class DataStorage {
 			ServerHandler.sendConsoleMessage("&4Could not find WorldGuard.");
 			hasWorldGuard = false;
 		}
+	}
+	
+	public static void setUpdater(UpdateHandler update) {
+		updater = update;
+	}
+	
+	public static UpdateHandler getUpdater() {
+		return updater;
 	}
 	
 	public static void setMapMethod(boolean bool) {
