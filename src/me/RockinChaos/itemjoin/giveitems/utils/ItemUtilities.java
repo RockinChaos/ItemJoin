@@ -76,7 +76,7 @@ public class ItemUtilities {
 		}
 	}
 	
-	public static void safeSet(Player player, String type) {
+	public static void safeSet(final Player player, final String type) {
 		InvClickCreative.isCreative(player, player.getGameMode());
 		if (type.equalsIgnoreCase("JOIN") && type.equalsIgnoreCase("WorldChanged")) { 
 			Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
