@@ -34,8 +34,8 @@ public class Language {
 	}
 	
 	private static String[] initializeRows(String...placeHolder) {
-		if (placeHolder == null || ((String[])placeHolder).length != 14) {
-			String[] langHolder = new String[14];
+		if (placeHolder == null || ((String[])placeHolder).length != newString().length) {
+			String[] langHolder = Language.newString();
 			for (int i = 0; i < langHolder.length; i++) {
 				langHolder[i] = "&lnull";
 			}
@@ -85,6 +85,10 @@ public class Language {
 			return true;
 		}
 		return false;
+	}
+	
+	public static String[] newString() {
+		return new String[14];
 	}
 	
 	private enum Lang {

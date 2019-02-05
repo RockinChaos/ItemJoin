@@ -78,13 +78,15 @@ public class ItemUtilities {
 	
 	public static void safeSet(final Player player, final String type) {
 		InvClickCreative.isCreative(player, player.getGameMode());
-		if (type.equalsIgnoreCase("JOIN") && type.equalsIgnoreCase("WorldChanged")) { 
-			Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
-				public void run() {
-					ItemUtilities.setClearingOfItems(player, player.getWorld().getName(), "Clear-On-" + type);
+		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
+			public void run() {
+				if (type.equalsIgnoreCase("JOIN")) {
+					ItemUtilities.setClearingOfItems(player, player.getWorld().getName(), "Clear-On-Join");
+				} else if (type.equalsIgnoreCase("WORLDCHANGED")) {
+					ItemUtilities.setClearingOfItems(player, player.getWorld().getName(), "Clear-On-WorldChanged");
 				}
-			}, ConfigHandler.getClearDelay());
-		}
+			}
+		}, ConfigHandler.getClearDelay());
 		if (!type.equalsIgnoreCase("Region-Enter") && !type.equalsIgnoreCase("Limit-Modes")) { PlayerHandler.setHeldItemSlot(player); }
 		ItemUtilities.updateItems(player, false);
 	}
@@ -228,10 +230,10 @@ public class ItemUtilities {
 		if (getFailCount().get(session) != null && getFailCount().get(session) != 0) {
 			if (ConfigHandler.getConfig("items.yml").getString("items-Overwrite") != null && isOverwriteWorld(player.getWorld().getName()) 
 					|| ConfigHandler.getConfig("items.yml").getString("items-Overwrite") != null && ConfigHandler.getConfig("items.yml").getBoolean("items-Overwrite") == true) {
-				String[] placeHolders = new String[12]; placeHolders[7] = getFailCount().get(session).toString();
+				String[] placeHolders = Language.newString(); placeHolders[7] = getFailCount().get(session).toString();
 				Language.sendLangMessage("General.failedInventory", player, placeHolders);
 			} else {
-				String[] placeHolders = new String[12]; placeHolders[7] = getFailCount().get(session).toString();
+				String[] placeHolders = Language.newString(); placeHolders[7] = getFailCount().get(session).toString();
 				Language.sendLangMessage("General.failedOverwrite", player, placeHolders);
 			}
 			removeFailCount(session);

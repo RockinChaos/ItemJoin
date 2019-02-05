@@ -1,9 +1,6 @@
 package me.RockinChaos.itemjoin.handlers;
 import me.RockinChaos.itemjoin.ItemJoin;
-import me.RockinChaos.itemjoin.utils.Utils;
-
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import java.io.BufferedInputStream;
@@ -12,46 +9,53 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
-import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Collection;
 
 public class UpdateHandler {
 	
-    private String Prefix = ChatColor.GRAY + "[" + ChatColor.YELLOW + "ItemJoin" + ChatColor.GRAY + "] ";
     private boolean updatesAllowed = ItemJoin.getInstance().getConfig().getBoolean("CheckForUpdates");
-    private String version = ItemJoin.getInstance().getDescription().getVersion();
     private File jarLink;
     private final String AUTOQUERY = "projects/itemjoin/files/latest";
     private final String AUTOHOST = "https://dev.bukkit.org/";
     private final String HOST = "https://www.spigotmc.org/api/general.php";
     private final int PROJECTID = 12661;
     private final String KEY = ("key=98BE0FE67F88AB82B4C197FAF1DC3B69206EFDCC4D3B80FC83A00037510B99B4&resource=" + PROJECTID);
-    private boolean betaVersion = version.contains("-SNAPSHOT") || version.contains("-BETA") || version.contains("-ALPHA");
-    private String localeVersionS = version.replaceAll("[a-z]", "").replace("-SNAPSHOT", "").replace("-BETA", "").replace("-ALPHA", "").replace("-RELEASE", "");
-    private double localeVersion = Double.parseDouble(localeVersionS.replace(".", ""));
-    private String latestVersionS;
+    private String versionExact = ItemJoin.getInstance().getDescription().getVersion();
+    private boolean betaVersion = versionExact.contains("-SNAPSHOT") || versionExact.contains("-BETA") || versionExact.contains("-ALPHA");
+    private String localeVersionRaw = versionExact.replaceAll("[a-z]", "").replace("-SNAPSHOT", "").replace("-BETA", "").replace("-ALPHA", "").replace("-RELEASE", "");
+    private String latestVersionRaw;
+    private double localeVersion = Double.parseDouble(localeVersionRaw.replace(".", ""));
     private double latestVersion;
     private int BYTE_SIZE = 2048;
         
+    /**
+     * Initializes the UpdateHandler and Checks for Updates upon initialization.
+     *
+     * @param file   The file that the plugin is running from.
+     */
     public UpdateHandler(File file){
        this.jarLink = file;
        this.checkUpdates(ItemJoin.getInstance().getServer().getConsoleSender());
     }
     
+    /**
+     * If the spigotmc host has an available update, redirects to download the jar file from dev-bukkit.
+     * Downloads and write the new data to the plugin jar file.
+     */
     public void forceUpdates(CommandSender sender) {
     	if (this.updateNeeded(sender)) {
-      	  sender.sendMessage(Utils.stripLogColors(sender, this.Prefix + ChatColor.GREEN + "An update has been found!"));
-      	  sender.sendMessage(Utils.stripLogColors(sender, this.Prefix + ChatColor.GREEN + "Attempting to update from " + ChatColor.YELLOW + "v" + localeVersionS +  ChatColor.GREEN +  " to the new "  + ChatColor.YELLOW +  "v" + latestVersionS));
+    		ServerHandler.sendMessage(sender, "&aAn update has been found!");
+    		ServerHandler.sendMessage(sender, "&aAttempting to update from " + "&ev" + localeVersionRaw + " &ato the new "  + "&ev" + latestVersionRaw);
     		try {
-    			URL downloadUrl = this.getExactURL(this.AUTOHOST + this.AUTOQUERY);
+    			URL downloadUrl = new URL(this.AUTOHOST + this.AUTOQUERY);
     			HttpURLConnection httpConnection = (HttpURLConnection) downloadUrl.openConnection();
     			httpConnection.setRequestProperty("User-Agent", "Mozilla/5.0...");
     			BufferedInputStream in = new BufferedInputStream(httpConnection.getInputStream());
     			FileOutputStream fos = new FileOutputStream(this.jarLink);
     			BufferedOutputStream bout = new BufferedOutputStream(fos, this.BYTE_SIZE);
-    			String progressBar = ChatColor.GREEN + "::::::::::::::::::::::::::::::";
+    			String progressBar = "&a::::::::::::::::::::::::::::::";
     			byte[] data = new byte[this.BYTE_SIZE];
     			long cloudFileSize = httpConnection.getContentLength();
     			long fetchedSize = 0;
@@ -61,47 +65,53 @@ public class UpdateHandler {
     				fetchedSize += bytesRead;
     				final int currentProgress = (int)(((double) fetchedSize / (double) cloudFileSize) * 30);
     				if ((((fetchedSize * 100) / cloudFileSize) % 25) == 0 && currentProgress > 10) {
-    					sender.sendMessage(Utils.stripLogColors(sender, this.Prefix + progressBar.substring(0, currentProgress + 2) + ChatColor.RED + progressBar.substring(currentProgress + 2)));
+    					ServerHandler.sendMessage(sender, progressBar.substring(0, currentProgress + 2) + "&c" + progressBar.substring(currentProgress + 2));
     				}
     			}
     			bout.close(); in.close(); fos.close();
-    			sender.sendMessage(Utils.stripLogColors(sender, this.Prefix + ChatColor.GREEN + "Successfully updated to v" + this.latestVersionS + "!"));
-    			sender.sendMessage(Utils.stripLogColors(sender, this.Prefix + ChatColor.GREEN + "You must restart your server for this to take affect."));
+    			ServerHandler.sendMessage(sender, "&aSuccessfully updated to v" + this.latestVersionRaw + "!");
+    			ServerHandler.sendMessage(sender, "&aYou must restart your server for this to take affect.");
     		} catch (Exception e) {
-    			sender.sendMessage(Utils.stripLogColors(sender, this.Prefix + ChatColor.RED + "An error has occurred while trying to update the plugin ItemJoin."));
-    			sender.sendMessage(Utils.stripLogColors(sender, this.Prefix + ChatColor.RED + "Please try again later, if you continue to see this please contact the plugin developer."));
+    			ServerHandler.sendMessage(sender, "&cAn error has occurred while trying to update the plugin ItemJoin.");
+    			ServerHandler.sendMessage(sender, "&cPlease try again later, if you continue to see this please contact the plugin developer.");
     			ServerHandler.sendDebugTrace(e);
     		}
     	} else if (!this.updatesAllowed) {
-        	sender.sendMessage(Utils.stripLogColors(sender, Prefix + ChatColor.RED + "Update checking is currently disabled in the config.yml"));
-        	sender.sendMessage(Utils.stripLogColors(sender, Prefix + ChatColor.RED + "If you wish to use the auto update feature, you will need to enable it."));
+    		ServerHandler.sendMessage(sender, "&cUpdate checking is currently disabled in the config.yml");
+    		ServerHandler.sendMessage(sender, "&cIf you wish to use the auto update feature, you will need to enable it.");
         }
     }
     
+    /**
+     * Checks to see if an update is required, notifying the console window and online op players.
+     */
     public void checkUpdates(CommandSender sender) {
     	if (this.updateNeeded(sender)) {
     		if (this.betaVersion) {
-    			sender.sendMessage(Utils.stripLogColors(sender, this.Prefix + ChatColor.RED + "Your current version: v" + ChatColor.RED + this.localeVersionS + "-SNAPSHOT"));
-    			sender.sendMessage(Utils.stripLogColors(sender, this.Prefix + ChatColor.RED + "This SNAPSHOT is outdated and a release version is now available."));
+    			ServerHandler.sendMessage(sender, "&cYour current version: &bv" + this.localeVersionRaw + "-SNAPSHOT");
+    			ServerHandler.sendMessage(sender, "&cThis &bSNAPSHOT &cis outdated and a release version is now available.");
     		} else {
-    			sender.sendMessage(Utils.stripLogColors(sender, this.Prefix + ChatColor.RED + "Your current version: v" + ChatColor.RED + this.localeVersionS));
+    			ServerHandler.sendMessage(sender, "&cYour current version: &bv" + this.localeVersionRaw);
     		}
-    		sender.sendMessage(Utils.stripLogColors(sender, this.Prefix + ChatColor.RED + "A new version is available: " + ChatColor.GREEN + "v" + this.latestVersionS));
-    		sender.sendMessage(Utils.stripLogColors(sender, this.Prefix + ChatColor.GREEN + "Get it from: https://www.spigotmc.org/resources/itemjoin.12661/history"));
-    		sender.sendMessage(Utils.stripLogColors(sender, this.Prefix + ChatColor.GREEN + "If you wish to auto update, please type /ItemJoin AutoUpdate"));
+    		ServerHandler.sendMessage(sender, "&cA new version is available: " + "&av" + this.latestVersionRaw);
+    		ServerHandler.sendMessage(sender, "&aGet it from: https://www.spigotmc.org/resources/itemjoin.12661/history");
+    		ServerHandler.sendMessage(sender, "&aIf you wish to auto update, please type /ItemJoin AutoUpdate");
     		this.sendNotifications();
     	} else {
     		if (this.betaVersion) {
-    			sender.sendMessage(Utils.stripLogColors(sender, this.Prefix + ChatColor.GREEN + "You are running a SNAPSHOT!"));
-    			sender.sendMessage(Utils.stripLogColors(sender, this.Prefix + ChatColor.GREEN + "If you find any bugs please report them!"));
+    			ServerHandler.sendMessage(sender, "&aYou are running a SNAPSHOT!");
+    			ServerHandler.sendMessage(sender, "&aIf you find any bugs please report them!");
     		}
-    		sender.sendMessage(this.Prefix + ChatColor.GREEN + "You are up to date!");
+    		ServerHandler.sendMessage(sender, "&aYou are up to date!");
     	}
     }
     
+    /**
+     * Directly checks to see if the spigotmc host has an update available.
+     */
     private Boolean updateNeeded(CommandSender sender) {
     	if (this.updatesAllowed) {
-    		sender.sendMessage(Utils.stripLogColors(sender, this.Prefix + ChatColor.GREEN + "Checking for updates..."));
+    		ServerHandler.sendMessage(sender, "&aChecking for updates...");
     		try {
     			HttpURLConnection con = (HttpURLConnection) new URL(this.HOST).openConnection();
     			con.setDoOutput(true);
@@ -111,15 +121,15 @@ public class UpdateHandler {
     			String version = reader.readLine();
     			reader.close();
     			if (version.length() <= 7) {
-    				this.latestVersionS = version.replaceAll("[a-z]", "").replace("-SNAPSHOT", "").replace("-BETA", "").replace("-ALPHA", "").replace("-RELEASE", "");
-    				this.latestVersion = Double.parseDouble(this.latestVersionS.replace(".", ""));
+    				this.latestVersionRaw = version.replaceAll("[a-z]", "").replace("-SNAPSHOT", "").replace("-BETA", "").replace("-ALPHA", "").replace("-RELEASE", "");
+    				this.latestVersion = Double.parseDouble(this.latestVersionRaw.replace(".", ""));
     				if (this.latestVersion == this.localeVersion && this.betaVersion || this.localeVersion > this.latestVersion && !this.betaVersion || this.latestVersion > this.localeVersion) {
     					return true;
     				}
     			}
     		} catch (Exception e) {
-    			sender.sendMessage(Utils.stripLogColors(sender, this.Prefix + ChatColor.RED + "An error has occured when checking the plugin version!"));
-    			sender.sendMessage(Utils.stripLogColors(sender, this.Prefix + ChatColor.RED + "Please contact the plugin developer!"));
+    			ServerHandler.sendMessage(sender, "&cAn error has occured when checking the plugin version!");
+    			ServerHandler.sendMessage(sender, "&cPlease contact the plugin developer!");
     			ServerHandler.sendDebugTrace(e);
     			return false;
     		}
@@ -127,6 +137,9 @@ public class UpdateHandler {
     	return false;
     }
     
+    /**
+     * Sends out notifications to all online op players that an update is available at the time of checking for updates.
+     */
     private void sendNotifications() {
     	try {
     		Collection < ? > playersOnline = null;
@@ -136,8 +149,8 @@ public class UpdateHandler {
     				playersOnline = ((Collection < ? > ) Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).invoke(null, new Object[0]));
     				for (Object objPlayer: playersOnline) {
     					if (((Player) objPlayer).isOp()) {
-    						((Player) objPlayer).sendMessage(this.Prefix + ChatColor.YELLOW + "An update has been found!");
-    						((Player) objPlayer).sendMessage(this.Prefix + ChatColor.YELLOW + "Please update to the latest version: v" + this.latestVersionS + "");
+    						ServerHandler.sendPlayerMessage(((Player) objPlayer), "&eAn update has been found!");
+    						ServerHandler.sendPlayerMessage(((Player) objPlayer), "&ePlease update to the latest version: v" + this.latestVersionRaw);
     					}
     				}
     			}
@@ -145,43 +158,25 @@ public class UpdateHandler {
     			playersOnlineOld = ((Player[]) Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).invoke(null, new Object[0]));
     			for (Player objPlayer: playersOnlineOld) {
     				if (objPlayer.isOp()) {
-    					objPlayer.sendMessage(this.Prefix + ChatColor.YELLOW + "An update has been found!");
-    					objPlayer.sendMessage(this.Prefix + ChatColor.YELLOW + "Please update to the latest version: v" + this.latestVersionS + "");
+						ServerHandler.sendPlayerMessage(objPlayer, "&eAn update has been found!");
+						ServerHandler.sendPlayerMessage(objPlayer, "&ePlease update to the latest version: v" + this.latestVersionRaw);
     				}
     			}
     		}
     	} catch (Exception e) { ServerHandler.sendDebugTrace(e); }
     }
     
-    private URL getExactURL(String location) throws IOException {
-    	URL resourceUrl, base, next;
-    	HttpURLConnection conn;
-    	String redLoc;
-    	while (true) {
-    		resourceUrl = new URL(location);
-    		conn = (HttpURLConnection) resourceUrl.openConnection();
-    		conn.setConnectTimeout(15000);
-    		conn.setReadTimeout(15000);
-    		conn.setInstanceFollowRedirects(false);
-    		conn.setRequestProperty("User-Agent", "Mozilla/5.0...");
-    		switch (conn.getResponseCode()) {
-    			case HttpURLConnection.HTTP_MOVED_PERM:
-    			case HttpURLConnection.HTTP_MOVED_TEMP:
-    				redLoc = conn.getHeaderField("Location");
-    				base = new URL(location);
-    				next = new URL(base, redLoc);
-    				location = next.toExternalForm();
-    				continue;
-    		}
-    		break;
-    	}
-    	return conn.getURL();
-    }
     
+    /**
+     * Gets the exact string version from the plugin yml file.
+     */
     public String getVersion() {
-    	return this.version;
+    	return this.versionExact;
     }
     
+    /**
+     * Gets the plugin jar file directly.
+     */
     public File getJarLink() {
     	return this.jarLink;
     }

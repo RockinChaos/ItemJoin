@@ -1,6 +1,7 @@
 package me.RockinChaos.itemjoin.handlers;
 
 import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import me.RockinChaos.itemjoin.ItemJoin;
@@ -77,6 +78,18 @@ public class ServerHandler {
 				message = "";
 		}
 		player.sendMessage(message);
+	}
+	
+	public static void sendMessage(CommandSender sender, String message) {
+		String prefix = "&7[&eItemJoin&7] ";
+		message = prefix + message;
+		message = ChatColor.translateAlternateColorCodes('&', message).toString();
+		if (ConfigHandler.getConfig("config.yml") != null) {
+			if(ConfigHandler.getConfig("config.yml").getBoolean("Log-Coloration") != true) {
+			message = ChatColor.stripColor(message);
+			}
+		}
+		sender.sendMessage(message);
 	}
 	
 	public static void sendDebugTrace(Exception e) {

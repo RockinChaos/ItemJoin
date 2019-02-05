@@ -1541,7 +1541,7 @@ public class ItemMap {
 			if (balance >= this.cost) {
 				return true;
 			} else if (!(balance >= this.cost)) {
-				String[] placeHolders = new String[12]; placeHolders[6] = this.cost.toString(); placeHolders[5] = balance + "";
+				String[] placeHolders = Language.newString(); placeHolders[6] = this.cost.toString(); placeHolders[5] = balance + "";
 				Language.sendLangMessage("General.itemChargeFailed", player, placeHolders);
 				return false;
 			}
@@ -1556,7 +1556,7 @@ public class ItemMap {
 			if (balance >= this.cost) {
 				if (this.cost != 0) {
 					try { PlayerHandler.withdrawBalance(player, this.cost); } catch (NullPointerException e) { ServerHandler.sendDebugTrace(e); }
-					String[] placeHolders = new String[12]; placeHolders[6] = this.cost.toString();
+					String[] placeHolders = Language.newString(); placeHolders[6] = this.cost.toString();
 					Language.sendLangMessage("General.itemChargeSuccess", player, placeHolders);
 				}
 			}
