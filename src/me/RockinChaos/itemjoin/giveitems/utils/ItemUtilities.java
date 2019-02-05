@@ -13,6 +13,7 @@ import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
+import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
@@ -77,7 +78,13 @@ public class ItemUtilities {
 	
 	public static void safeSet(Player player, String type) {
 		InvClickCreative.isCreative(player, player.getGameMode());
-		if (!type.equalsIgnoreCase("Limit-Modes")) { ItemUtilities.setClearingOfItems(player, player.getWorld().getName(), "Clear-On-" + type); }
+		if (type.equalsIgnoreCase("JOIN") && type.equalsIgnoreCase("WorldChanged")) { 
+			Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
+				public void run() {
+					ItemUtilities.setClearingOfItems(player, player.getWorld().getName(), "Clear-On-" + type);
+				}
+			}, ConfigHandler.getClearDelay());
+		}
 		if (!type.equalsIgnoreCase("Region-Enter") && !type.equalsIgnoreCase("Limit-Modes")) { PlayerHandler.setHeldItemSlot(player); }
 		ItemUtilities.updateItems(player, false);
 	}

@@ -16,7 +16,8 @@ public class ConfigHandler {
 	private static YamlConfiguration loadEnLang;
 	private static boolean generate = false;
 	private static String NBTData = "ItemJoin";
-	private static long delay;
+	private static long delay = 2;
+	private static long clearDelay = 0;
 	private static boolean getItemPermissions = false;
 	private static boolean preventInventoryModify = false;
 	private static boolean preventPickups = false;
@@ -48,7 +49,7 @@ public class ConfigHandler {
 		if (!(file).exists()) {
 			try {
 				ItemJoin.getInstance().saveResource(path, false);
-				setGenerating(true);
+				if (path.contains("items.yml")) { setGenerating(true); }
 			} catch (Exception e) {
 				ServerHandler.sendDebugTrace(e);
 				ItemJoin.getInstance().getLogger().warning("Cannot save " + path + " to disk!");
@@ -126,7 +127,7 @@ public class ConfigHandler {
 	}
 	
 	private static void YAMLSetup() {
-		if (getGenerating()) { 
+		if (isGenerating()) { 
 			YAMLGenerator.generateItemsFile();
 			loadConfig("items.yml");
 			setGenerating(false);
@@ -137,7 +138,7 @@ public class ConfigHandler {
 		generate = isGenerating;
 	}
 	
-	private static boolean getGenerating() {
+	private static boolean isGenerating() {
 		return generate;
 	}
 	
@@ -204,12 +205,22 @@ public class ConfigHandler {
 		} else { return NBTData; }
 	}
 	
+	public static long getClearDelay() {
+		return clearDelay;
+	}
+	
+	public static void loadClearDelay() {
+		//clearDelay = ConfigHandler.getConfig("config.yml").getInt("clear-Delay") * 10L;
+		clearDelay = 4;
+	}
+	
 	public static long getItemDelay() {
 		return delay;
 	}
 	
 	public static void loadDelay() {
 		delay = ConfigHandler.getConfig("items.yml").getInt("items-Delay") * 10L;
+		if (clearDelay >= delay) { delay = clearDelay + 1; }
 	}
 	
 	public static boolean getAllItemPermissions() {
