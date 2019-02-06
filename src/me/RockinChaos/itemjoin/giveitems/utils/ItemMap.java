@@ -307,8 +307,10 @@ public class ItemMap {
 			this.triggers = this.nodeLocation.getString("triggers");
 			this.giveOnDisabled = Utils.containsIgnoreCase(this.triggers, "DISABLED");
 			this.giveOnJoin = Utils.containsIgnoreCase(this.triggers, "JOIN");
+			this.onlyFirstJoin = Utils.containsIgnoreCase(this.triggers, "FIRST-JOIN");
 			this.giveOnRespawn = Utils.containsIgnoreCase(this.triggers, "RESPAWN");
-		    this.giveOnWorldChange = Utils.containsIgnoreCase(this.triggers, "WORLD-CHANGE");
+		    this.giveOnWorldChange = Utils.containsIgnoreCase(this.triggers, "WORLD-CHANGE") || Utils.containsIgnoreCase(this.triggers, "WORLD-SWITCH");
+		    this.onlyFirstWorld = Utils.containsIgnoreCase(this.triggers, "FIRST-WORLD");
 			this.giveOnRegionEnter =Utils.containsIgnoreCase(this.triggers, "REGION-ENTER");
 			this.takeOnRegionLeave = Utils.containsIgnoreCase(this.triggers, "REGION-REMOVE");
 			this.useOnLimitSwitch = Utils.containsIgnoreCase(this.triggers, "GAMEMODE-SWITCH");
@@ -491,6 +493,7 @@ public class ItemMap {
 	
 	public void setOnlyFirstJoin(boolean onlyOnFirstJoin) {
 		this.onlyFirstJoin = onlyOnFirstJoin;
+		this.giveOnJoin = true;
 		if (onlyOnFirstJoin && this.giveOnRespawn) {
 			this.giveOnRespawn = false;
 		}

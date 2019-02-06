@@ -284,7 +284,7 @@ public class DataStorage {
 		if (Bukkit.getServer().getPluginManager().getPlugin("PerWorldInventory") != null && ConfigHandler.getConfig("config.yml").getBoolean("PerWorldInventory") == true) {
 			ServerHandler.sendConsoleMessage("&aHooked into PerWorldInventory!");
 			hasPerWorldInventory = true;
-		} else if (ConfigHandler.getConfig("config.yml").getBoolean("PerWorldInventories") == true) {
+		} else if (ConfigHandler.getConfig("config.yml").getBoolean("PerWorldInventory") == true) {
 			ServerHandler.sendConsoleMessage("&4Could not find PerWorldInventory.");
 			hasPerWorldInventory = false;
 		}
