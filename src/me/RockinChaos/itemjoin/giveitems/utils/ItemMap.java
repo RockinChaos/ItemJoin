@@ -35,6 +35,7 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.map.MapView;
 import org.bukkit.potion.PotionEffect;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
@@ -85,6 +86,7 @@ public class ItemMap {
 	private List < String > bookPages = new ArrayList < String > ();
 	
 	private int mapId = 1;
+	private MapView mapView = null;
 	private String customMapImage = null;
     
     private FireworkEffect firework = null;
@@ -288,7 +290,7 @@ public class ItemMap {
 			this.noRepairing = Utils.containsIgnoreCase(this.itemflags, "item-repairable");
 			this.cancelEvents = Utils.containsIgnoreCase(this.itemflags, "cancel-events");
 			this.countLock = Utils.containsIgnoreCase(this.itemflags, "count-lock");
-			this.onlyFirstJoin = Utils.containsIgnoreCase(this.itemflags, "first-join");
+			this.setOnlyFirstJoin(Utils.containsIgnoreCase(this.itemflags, "first-join"));
 			this.onlyFirstWorld = Utils.containsIgnoreCase(this.itemflags, "first-world");
 			this.ipLimited = Utils.containsIgnoreCase(this.itemflags, "ip-limit");
 			this.deathDroppable = Utils.containsIgnoreCase(this.itemflags, "death-drops");
@@ -307,7 +309,7 @@ public class ItemMap {
 			this.triggers = this.nodeLocation.getString("triggers");
 			this.giveOnDisabled = Utils.containsIgnoreCase(this.triggers, "DISABLED");
 			this.giveOnJoin = Utils.containsIgnoreCase(this.triggers, "JOIN");
-			this.onlyFirstJoin = Utils.containsIgnoreCase(this.triggers, "FIRST-JOIN");
+			this.setOnlyFirstJoin(Utils.containsIgnoreCase(this.triggers, "FIRST-JOIN"));
 			this.giveOnRespawn = Utils.containsIgnoreCase(this.triggers, "RESPAWN");
 		    this.giveOnWorldChange = Utils.containsIgnoreCase(this.triggers, "WORLD-CHANGE") || Utils.containsIgnoreCase(this.triggers, "WORLD-SWITCH");
 		    this.onlyFirstWorld = Utils.containsIgnoreCase(this.triggers, "FIRST-WORLD");
@@ -650,6 +652,10 @@ public class ItemMap {
 		this.mapId = id;
 	}
 	
+	public void setMapView(MapView view) {
+		this.mapView = view;
+	}
+	
 	public void setMapImage(String mapIMG) {
 		this.customMapImage = mapIMG;
 	}
@@ -854,6 +860,10 @@ public class ItemMap {
 	
 	public int getMapID() {
 		return this.mapId;
+	}
+	
+	public MapView getMapView() {
+		return this.mapView;
 	}
 	
 	public String getMapImage() {
@@ -1295,7 +1305,8 @@ public class ItemMap {
 		if (this.customMapImage != null) {
 			if (ServerHandler.hasAquaticUpdate()) {
 				MapMeta mapmeta = (MapMeta) this.tempItem.getItemMeta();
-				mapmeta.setMapId(this.mapId);
+				try { mapmeta.setMapView(this.mapView); }
+				catch (NoSuchMethodError e) { mapmeta = Legacy.setMapID(mapmeta, this.mapId); }
 				this.tempItem.setItemMeta(mapmeta);
 			} else {
 				Legacy.setLegacyDurability(this.tempItem, (short) this.mapId);

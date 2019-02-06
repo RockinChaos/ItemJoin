@@ -12,6 +12,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.map.MapView;
 import org.bukkit.material.MaterialData;
@@ -52,10 +53,19 @@ public class Legacy {
     	return skullMeta.getOwner();
     }
     
-    public static MapView getMapView(int id) {
-		return ItemJoin.getInstance().getServer().getMap((short) id);
+    public static org.bukkit.inventory.meta.MapMeta setMapID(org.bukkit.inventory.meta.MapMeta meta, int mapId) {
+    	MapMeta mapmeta = meta;
+    	mapmeta.setMapId(mapId);
+    	return mapmeta; 
     }
     
+    public static MapView getMapView(int id) {
+    	//if (!DataStorage.getMapMethod()) {
+    		try { return ItemJoin.getInstance().getServer().getMap((short) id); } 
+			catch (NoSuchMethodError e) { return Reflection.getMapView(id); } // DataStorage.setMapMethod(true); 
+    	//} else { return Reflection.getMapView(id); }
+    }
+
     public static MapView createLegacyMapView() {
     	try {
     		for (World world : Bukkit.getServer().getWorlds()) {

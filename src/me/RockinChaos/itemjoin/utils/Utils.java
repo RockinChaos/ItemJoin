@@ -93,8 +93,9 @@ public class Utils {
 	
 		name = ChatColor.translateAlternateColorCodes('&', name).toString();
 		if (DataStorage.hasPlaceholderAPI() == true) {
-			try { return PlaceholderAPI.setPlaceholders(player, name); } 
+			try { try { return PlaceholderAPI.setPlaceholders(player, name); } 
 			catch (NoSuchFieldError e) { ServerHandler.sendDebugMessage("Error has occured when setting the PlaceHolder " + e.getMessage() + ", if this issue persits contact the developer of PlaceholderAPI."); return name; }
+			} catch (Exception e) { }
 		}
 		return name;
 	}

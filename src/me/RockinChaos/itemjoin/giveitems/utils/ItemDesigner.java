@@ -295,17 +295,19 @@ public class ItemDesigner {
 			if (itemMap.getMapImage().equalsIgnoreCase("default.jpg") || new File(ItemJoin.getInstance().getDataFolder(), itemMap.getMapImage()).exists()) {
 				if (DataStorage.getSQLData().imageNumberExists(itemMap.getMapImage())) {
 					int mapID = DataStorage.getSQLData().getImageNumber(itemMap.getMapImage());
-					itemMap.setMapID(mapID);
 					ImageMap imgPlatform = new ImageMap(itemMap.getMapImage(), mapID);
 					MapView view = imgPlatform.FetchExistingView(mapID);
+					itemMap.setMapID(mapID);
+					itemMap.setMapView(view);
 					try { view.removeRenderer(view.getRenderers().get(0)); } catch (NullPointerException e) { ServerHandler.sendDebugTrace(e); }
 					try { view.addRenderer(imgPlatform); } catch (NullPointerException e) { ServerHandler.sendDebugTrace(e); }
 				} else {
 					MapView view = Legacy.createLegacyMapView();
 					try { view.removeRenderer(view.getRenderers().get(0)); } catch (NullPointerException e) { ServerHandler.sendDebugTrace(e); }
 					int mapID = ItemHandler.getMapID(view);
-					itemMap.setMapID(mapID);
 					ImageMap imgPlatform = new ImageMap(itemMap.getMapImage(), mapID);
+					itemMap.setMapID(mapID);
+					itemMap.setMapView(view);
 					try { view.addRenderer(imgPlatform); } catch (NullPointerException e) { ServerHandler.sendDebugTrace(e); }
 					DataStorage.getSQLData().saveMapImage(itemMap);
 				}

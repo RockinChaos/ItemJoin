@@ -41,11 +41,27 @@ public class Reflection {
 		return null;
 	}
 	
+	public static Class<?> getMapViewNMS(String name) {
+		try {
+			return Class.forName("org.bukkit." + name);
+		} catch (Exception e) {
+			if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+		}
+		return null;
+	}
+	
 	public static short getMapID(MapView view) {
 		try {
 			Object mapID = getMapNMS("MapView").getMethod("getId").invoke(view);
 			return (short)mapID; 
 		} catch (Exception ex) { return 1; }
+	}
+
+	public static MapView getMapView(int id) {
+		try {
+			Object mapView = getMapViewNMS("Server").getMethod("getMap").invoke(id);
+			return (MapView)mapView; 
+		} catch (Exception ex) { return null; }
 	}
 	
 	public static ItemStack setUnbreakable(ItemStack item) {
