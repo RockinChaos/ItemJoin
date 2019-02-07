@@ -160,6 +160,7 @@ public class ItemMap {
 	private boolean noRepairing = false;
 	private boolean animate = false;
 	private boolean dynamic = false;
+	private boolean overwritable = false;
 	private boolean blockPlacement = false;
 	private boolean hideAttributes = false;
 	private boolean hideDurability = false;
@@ -292,6 +293,7 @@ public class ItemMap {
 			this.countLock = Utils.containsIgnoreCase(this.itemflags, "count-lock");
 			this.setOnlyFirstJoin(Utils.containsIgnoreCase(this.itemflags, "first-join"));
 			this.onlyFirstWorld = Utils.containsIgnoreCase(this.itemflags, "first-world");
+			this.overwritable = Utils.containsIgnoreCase(this.itemflags, "overwrite");
 			this.ipLimited = Utils.containsIgnoreCase(this.itemflags, "ip-limit");
 			this.deathDroppable = Utils.containsIgnoreCase(this.itemflags, "death-drops");
 			this.selfDroppable = Utils.containsIgnoreCase(this.itemflags, "self-drops");
@@ -309,10 +311,17 @@ public class ItemMap {
 			this.triggers = this.nodeLocation.getString("triggers");
 			this.giveOnDisabled = Utils.containsIgnoreCase(this.triggers, "DISABLED");
 			this.giveOnJoin = Utils.containsIgnoreCase(this.triggers, "JOIN");
-			this.setOnlyFirstJoin(Utils.containsIgnoreCase(this.triggers, "FIRST-JOIN"));
-			this.giveOnRespawn = Utils.containsIgnoreCase(this.triggers, "RESPAWN");
+			if (Utils.containsIgnoreCase(this.triggers, "FIRST-JOIN")) { 
+				this.onlyFirstJoin = true;
+				this.giveOnJoin = true;
+			}
 		    this.giveOnWorldChange = Utils.containsIgnoreCase(this.triggers, "WORLD-CHANGE") || Utils.containsIgnoreCase(this.triggers, "WORLD-SWITCH");
-		    this.onlyFirstWorld = Utils.containsIgnoreCase(this.triggers, "FIRST-WORLD");
+			if (Utils.containsIgnoreCase(this.triggers, "FIRST-WORLD")) { 
+				this.giveOnJoin = true;
+				this.onlyFirstWorld = true;
+				this.giveOnWorldChange = true;
+			}
+			this.giveOnRespawn = Utils.containsIgnoreCase(this.triggers, "RESPAWN");
 			this.giveOnRegionEnter =Utils.containsIgnoreCase(this.triggers, "REGION-ENTER");
 			this.takeOnRegionLeave = Utils.containsIgnoreCase(this.triggers, "REGION-REMOVE");
 			this.useOnLimitSwitch = Utils.containsIgnoreCase(this.triggers, "GAMEMODE-SWITCH");
@@ -590,6 +599,10 @@ public class ItemMap {
 	
 	public void setDynamic(boolean bool) {
 		this.dynamic = bool;
+	}
+	
+	public void setOverwritable(boolean bool) {
+		this.overwritable = bool;
 	}
 	
 	public void setPlacement(boolean bool) {
@@ -1051,6 +1064,10 @@ public class ItemMap {
 	
 	public boolean isDynamic() {
 		return this.dynamic;
+	}
+	
+	public boolean isOverwritable() {
+		return this.overwritable;
 	}
 	
 	public boolean isPlacement() {
