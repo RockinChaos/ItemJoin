@@ -5,6 +5,7 @@ import java.util.ListIterator;
 
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
+import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
@@ -24,8 +25,8 @@ public class Drops implements Listener {
 	public void onDrop(PlayerDropItemEvent event) {
 		ItemStack item = event.getItemDrop().getItemStack();
 		final Player player = event.getPlayer();
-		if (!ItemHandler.isAllowed(player, item, "self-drops")) {
-			ItemMap itemMap = ItemHandler.getMappedItem(item, player.getWorld());
+		if (!ItemUtilities.isAllowed(player, item, "self-drops")) {
+			ItemMap itemMap = ItemUtilities.getMappedItem(item, player.getWorld());
 			if (!ItemHandler.isCraftingSlot(itemMap.getSlot())) {
 				if (!ServerHandler.hasCombatUpdate() && InvClickSurvival.dropClick.get(PlayerHandler.getPlayerID(player)) != null && InvClickSurvival.dropClick.get(PlayerHandler.getPlayerID(player)) == true) {
 					InvClickSurvival.droppedItem.put(PlayerHandler.getPlayerID(player), true);
@@ -42,7 +43,7 @@ public class Drops implements Listener {
 					}, 1L);
 				} else { event.setCancelled(true); } }
 			}
-		} else if (!ServerHandler.hasCombatUpdate() && PlayerHandler.isCreativeMode(player) && InvClickSurvival.dropClick.get(PlayerHandler.getPlayerID(player)) != null && InvClickSurvival.dropClick.get(PlayerHandler.getPlayerID(player)) == true && !ItemHandler.isAllowed(player, item, "self-drops")) {
+		} else if (!ServerHandler.hasCombatUpdate() && PlayerHandler.isCreativeMode(player) && InvClickSurvival.dropClick.get(PlayerHandler.getPlayerID(player)) != null && InvClickSurvival.dropClick.get(PlayerHandler.getPlayerID(player)) == true && !ItemUtilities.isAllowed(player, item, "self-drops")) {
 			InvClickCreative.dropGlitch.put(PlayerHandler.getPlayerID(player), true);
 		}
 	}
@@ -52,10 +53,10 @@ public class Drops implements Listener {
 		List < ItemStack > drops = event.getDrops();
 		ListIterator < ItemStack > litr = drops.listIterator();
 		Player player = event.getEntity();
-		ItemHandler.closeAnimations(player);
+		ItemUtilities.closeAnimations(player);
 		while (litr.hasNext()) {
 			ItemStack stack = litr.next();
-			if (!ItemHandler.isAllowed(player, stack, "death-drops")) { litr.remove(); }
+			if (!ItemUtilities.isAllowed(player, stack, "death-drops")) { litr.remove(); }
 		}
 	}
 }

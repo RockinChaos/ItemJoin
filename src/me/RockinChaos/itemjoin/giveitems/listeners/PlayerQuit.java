@@ -5,13 +5,13 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import me.RockinChaos.itemjoin.handlers.ItemHandler;
+import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 
 public class PlayerQuit implements Listener {
 
 	@EventHandler
 	private void Quit(PlayerQuitEvent event) {
 		Player player = event.getPlayer();
-		ItemHandler.closeAnimations(player);
+		ItemUtilities.closeAnimations(player);
 	}
 }

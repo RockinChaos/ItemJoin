@@ -20,7 +20,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import me.RockinChaos.itemjoin.ItemJoin;
-import me.RockinChaos.itemjoin.giveitems.utils.ItemDesigner;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
@@ -154,12 +153,11 @@ public class Commands implements CommandExecutor {
 		} else if (args[0].equalsIgnoreCase("reload") || args[0].equalsIgnoreCase("rl")) {
 			if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.reload")) {
 				DataStorage.getSQLData().executeLaterStatements();
-				DataStorage.newSQLData();
-				ConfigHandler.loadConfigs();
+				ItemUtilities.closeAllAnimations();
 				ItemUtilities.clearItems();
-				ItemDesigner itemDesigner = new ItemDesigner();
-				itemDesigner.generateItems();
-				ItemUtilities.updateItems();
+		  		ConfigHandler.loadConfigs();
+		  		DataStorage.generateData();
+		  		ItemUtilities.updateItems();
 				Language.sendLangMessage("Commands.Default.configReload", sender);
 			} else { Language.sendLangMessage("Commands.Default.noPermission", sender); }
 			return true;
@@ -560,7 +558,7 @@ public class Commands implements CommandExecutor {
 			            }
 			        }
 			    } catch (Exception e) { ServerHandler.sendDebugTrace(e);  }
-			    ItemMap itemMap = ItemHandler.getMappedItem(args[1]);
+			    ItemMap itemMap = ItemUtilities.getMappedItem(args[1]);
 		    	String[] placeHolders = Language.newString(); placeHolders[12] = givenPlayers.toString().replace("]", "").replace("[", ""); placeHolders[3] = Utils.translateLayout(itemMap.getCustomName(), null);
 			    if (amount == 0) { amount = itemMap.getCount(); }
 			    placeHolders[11] = amount + "";
@@ -741,7 +739,7 @@ public class Commands implements CommandExecutor {
 			        }
 			    } catch (Exception e) { ServerHandler.sendDebugTrace(e);  }
 			    
-		    	String[] placeHolders = Language.newString(); placeHolders[12] = removedPlayers.toString().replace("]", "").replace("[", ""); placeHolders[3] = Utils.translateLayout(ItemHandler.getMappedItem(args[1]).getCustomName(), null);
+		    	String[] placeHolders = Language.newString(); placeHolders[12] = removedPlayers.toString().replace("]", "").replace("[", ""); placeHolders[3] = Utils.translateLayout(ItemUtilities.getMappedItem(args[1]).getCustomName(), null);
 			    if (!removedPlayers.isEmpty()) { Language.sendLangMessage("Commands.Remove.fromOnlinePlayers", sender, placeHolders); } 
 			    else { Language.sendLangMessage("Commands.Remove.notInOnlinePlayersInventory", sender, placeHolders); }
 			} else { Language.sendLangMessage("Commands.Default.noPermission", sender); }

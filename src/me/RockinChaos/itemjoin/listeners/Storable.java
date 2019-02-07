@@ -11,7 +11,7 @@ import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.ItemStack;
 
-import me.RockinChaos.itemjoin.handlers.ItemHandler;
+import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.utils.Utils;
@@ -31,7 +31,7 @@ public class Storable implements Listener {
 		if (invType != null) {
 			if (invType.contains("CHEST") || invType.contains("FURNACE") || invType.contains("SHULKER_BOX") || invType.contains("HOPPER") || invType.contains("ANVIL") || invType.contains("WORKBENCH") || invType.contains("DISPENSER") || invType.contains("DROPPER")) {
 				if (event.getRawSlot() > event.getInventory().getSize() && event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY) || event.getRawSlot() < event.getInventory().getSize()) {
-					if (!ItemHandler.isAllowed(player, item, "item-store")) {
+					if (!ItemUtilities.isAllowed(player, item, "item-store")) {
 						event.setCancelled(true);
 						PlayerHandler.updateInventory(player);
 					}
@@ -51,7 +51,7 @@ public class Storable implements Listener {
 				if (invType != null) {
 					if (invType.contains("CHEST") || invType.contains("FURNACE") || invType.contains("SHULKER_BOX") 
 							|| invType.contains("HOPPER") || invType.contains("ANVIL") || invType.contains("WORKBENCH") || invType.contains("DISPENSER") || invType.contains("DROPPER")) {
-						if (!ItemHandler.isAllowed(player, item, "item-store")) {
+						if (!ItemUtilities.isAllowed(player, item, "item-store")) {
 							event.setCancelled(true);
 							PlayerHandler.updateInventory(player);
 							break;
@@ -69,7 +69,7 @@ public class Storable implements Listener {
 			if (ServerHandler.hasCombatUpdate()) { item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().toString()); } 
 			else { item = PlayerHandler.getPerfectHandItem(event.getPlayer(), ""); }
 			Player player = event.getPlayer();
-			if (!ItemHandler.isAllowed(player, item, "item-store")) {
+			if (!ItemUtilities.isAllowed(player, item, "item-store")) {
 				event.setCancelled(true);
 				PlayerHandler.updateInventory(player);
 			}
@@ -83,7 +83,7 @@ public class Storable implements Listener {
 			if (ServerHandler.hasCombatUpdate()) { item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().toString()); } 
 			else { item = PlayerHandler.getPerfectHandItem(event.getPlayer(), ""); }
 			Player player = event.getPlayer();
-			if (!ItemHandler.isAllowed(player, item, "item-store")) {
+			if (!ItemUtilities.isAllowed(player, item, "item-store")) {
 				event.setCancelled(true);
 				PlayerHandler.updateInventory(player);
 			}

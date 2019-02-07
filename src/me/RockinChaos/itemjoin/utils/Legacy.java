@@ -60,10 +60,10 @@ public class Legacy {
     }
     
     public static MapView getMapView(int id) {
-    	//if (!DataStorage.getMapMethod()) {
+    	if (!DataStorage.getMapViewMethod()) {
     		try { return ItemJoin.getInstance().getServer().getMap((short) id); } 
-			catch (NoSuchMethodError e) { return Reflection.getMapView(id); } // DataStorage.setMapMethod(true); 
-    	//} else { return Reflection.getMapView(id); }
+			catch (NoSuchMethodError e) { DataStorage.setMapViewMethod(true); return Reflection.getMapView(id); }
+    	} else { return Reflection.getMapView(id); }
     }
 
     public static MapView createLegacyMapView() {

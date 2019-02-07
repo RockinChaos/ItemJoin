@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import me.RockinChaos.itemjoin.Commands;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
+import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.handlers.UpdateHandler;
 import me.RockinChaos.itemjoin.listeners.Consumes;
@@ -26,6 +27,7 @@ import me.RockinChaos.itemjoin.giveitems.listeners.PlayerQuit;
 import me.RockinChaos.itemjoin.giveitems.listeners.RegionEnter;
 import me.RockinChaos.itemjoin.giveitems.listeners.Respawn;
 import me.RockinChaos.itemjoin.giveitems.listeners.WorldSwitch;
+import me.RockinChaos.itemjoin.giveitems.utils.ItemDesigner;
 
 public class DataStorage {
 	private static boolean hasMultiverse;
@@ -44,8 +46,10 @@ public class DataStorage {
 	private static boolean loggable;
 	private static int WorldGuardVersion;
 	private static boolean oldMapMethod = false;
+	private static boolean oldMapViewMethod = false;
 	private static SQLData sqlData;
 	private static UpdateHandler updater;
+	private static ItemDesigner designer;
 
 	public static void generateData() {
 		hookVault();
@@ -64,6 +68,9 @@ public class DataStorage {
 		hookNewNBTSystem();
 		setLoggable();
 		newSQLData();
+		ItemHandler.initializeItemID();
+		designer = new ItemDesigner();
+		designer.generateItems();
 		ConfigHandler.loadClearDelay();
 		ConfigHandler.loadDelay();
 		ConfigHandler.loadGetItemPermissions();
@@ -171,7 +178,6 @@ public class DataStorage {
 		}
 
 		if (hasWorldGuard == true) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new RegionEnter(), ItemJoin.getInstance()); }
-		
 	}
 	
 	public static void hookNewNBTSystem() {
@@ -339,8 +345,16 @@ public class DataStorage {
 		oldMapMethod = bool;
 	}
 	
+	public static void setMapViewMethod(boolean bool) {
+		oldMapViewMethod = bool;
+	}
+	
 	public static boolean getMapMethod() {
 		return oldMapMethod;
+	}
+	
+	public static boolean getMapViewMethod() {
+		return oldMapViewMethod;
 	}
 	
 	public static void newSQLData() {

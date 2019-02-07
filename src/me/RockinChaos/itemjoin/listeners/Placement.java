@@ -1,6 +1,7 @@
 package me.RockinChaos.itemjoin.listeners;
 
 import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
+import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
@@ -19,7 +20,7 @@ public class Placement implements Listener{
 	 public void onPreventPlayerPlace(PlayerInteractEvent event) {
 	 	ItemStack item = event.getItem();
 	 	Player player = event.getPlayer();
-	 	if (event.getAction() == Action.RIGHT_CLICK_BLOCK && !ItemHandler.isAllowed(player, item, "placement")) {
+	 	if (event.getAction() == Action.RIGHT_CLICK_BLOCK && !ItemUtilities.isAllowed(player, item, "placement")) {
 	 		if (item.getType().isBlock() || ItemHandler.isSkull(item.getType())) {
 	 			event.setCancelled(true);
 	 			PlayerHandler.updateInventory(player);
@@ -32,8 +33,8 @@ public class Placement implements Listener{
 	 	ItemStack item = event.getItem();
 	 	Player player = event.getPlayer();
 	 	if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK && PlayerHandler.isCreativeMode(player)) {
-	 		if (!ItemHandler.isAllowed(player, item, "count-lock")) {
-	 			ItemMap itemMap = ItemHandler.getMappedItem(item, player.getWorld());
+	 		if (!ItemUtilities.isAllowed(player, item, "count-lock")) {
+	 			ItemMap itemMap = ItemUtilities.getMappedItem(item, player.getWorld());
 	 			if (itemMap != null) { item.setAmount(itemMap.getCount()); }
 	 		}
 	 	}
@@ -47,7 +48,7 @@ public class Placement implements Listener{
 	 			if (ServerHandler.hasCombatUpdate()) { item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().toString()); } 
 	 			else { item = PlayerHandler.getPerfectHandItem(event.getPlayer(), ""); }
 	 			Player player = event.getPlayer();
-	 			if (!ItemHandler.isAllowed(player, item, "placement")) {
+	 			if (!ItemUtilities.isAllowed(player, item, "placement")) {
 	 				event.setCancelled(true);
 	 				PlayerHandler.updateInventory(player);
 	 			}
@@ -64,8 +65,8 @@ public class Placement implements Listener{
 	 			else { item = PlayerHandler.getPerfectHandItem(event.getPlayer(), ""); }
 	 			Player player = event.getPlayer();
 	 			if (PlayerHandler.isCreativeMode(player)) {
-	 				if (!ItemHandler.isAllowed(player, item, "count-lock")) {
-	 					ItemMap itemMap = ItemHandler.getMappedItem(item, player.getWorld());
+	 				if (!ItemUtilities.isAllowed(player, item, "count-lock")) {
+	 					ItemMap itemMap = ItemUtilities.getMappedItem(item, player.getWorld());
 	 					if (itemMap != null) { item.setAmount(itemMap.getCount()); }
 	 				}
 	 			}

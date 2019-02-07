@@ -13,8 +13,8 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
+import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
-import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.utils.Utils;
@@ -57,9 +57,9 @@ public class InvClickSurvival implements Listener {
 				ItemStack[] Armor = player.getInventory().getArmorContents().clone();
 				LegacyDropEvent(player, Inv, Armor);
 			}
-			if (!ItemHandler.isAllowed(player, item, "inventory-modify")) {
+			if (!ItemUtilities.isAllowed(player, item, "inventory-modify")) {
 				event.setCancelled(true);
-				if (!ItemHandler.isAllowed(player, item, "inventory-close")) { player.closeInventory(); }
+				if (!ItemUtilities.isAllowed(player, item, "inventory-close")) { player.closeInventory(); }
 				PlayerHandler.updateInventory(player);
 			}
 		}
@@ -70,7 +70,7 @@ public class InvClickSurvival implements Listener {
 		Player player = (Player) event.getWhoClicked();
 		String itemflag = "inventory-modify";
     	if (event.getAction().toString().contains("PLACE_ALL") || event.getAction().toString().contains("PLACE_ONE")) {
-    		ItemMap itemMap = ItemHandler.getMappedItem(event.getCursor(), player.getWorld());
+    		ItemMap itemMap = ItemUtilities.getMappedItem(event.getCursor(), player.getWorld());
     		if (itemMap != null && itemMap.isSimilar(cursorItem.get(PlayerHandler.getPlayerID(player)))) {
     		final int slot = event.getSlot();
     		event.setCancelled(true);
@@ -82,8 +82,8 @@ public class InvClickSurvival implements Listener {
 			ServerHandler.sendDebugMessage("Updated Animation Item (Cursor) Code: 2565CV"); 
     		}
     	} else if (event.getAction().toString().contains("SWAP_WITH_CURSOR")) {
-    		ItemMap itemMap = ItemHandler.getMappedItem(event.getCursor(), player.getWorld());
-    		if (itemMap != null && itemMap.isSimilar(cursorItem.get(PlayerHandler.getPlayerID(player))) && ItemHandler.isAllowed(player, event.getCurrentItem(), itemflag)) {
+    		ItemMap itemMap = ItemUtilities.getMappedItem(event.getCursor(), player.getWorld());
+    		if (itemMap != null && itemMap.isSimilar(cursorItem.get(PlayerHandler.getPlayerID(player))) && ItemUtilities.isAllowed(player, event.getCurrentItem(), itemflag)) {
     		final int slot = event.getSlot();
     		final ItemStack item = new ItemStack(event.getCurrentItem());
     		event.setCancelled(true);

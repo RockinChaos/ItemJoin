@@ -8,7 +8,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.inventory.ItemStack;
-import me.RockinChaos.itemjoin.handlers.ItemHandler;
+
+import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.utils.Utils;
 
@@ -21,7 +22,7 @@ public class Recipes implements Listener {
                 Player player = (Player) entity;
                 for (int i = 0; i < player.getOpenInventory().getTopInventory().getSize(); i++) {
                     if (player.getOpenInventory().getTopInventory().getItem(i) != null && player.getOpenInventory().getTopInventory().getItem(i).getType() != Material.AIR) {
-                        if (!ItemHandler.isAllowed(player, player.getOpenInventory().getTopInventory().getItem(i), "item-craftable")) {
+                        if (!ItemUtilities.isAllowed(player, player.getOpenInventory().getTopInventory().getItem(i), "item-craftable")) {
                             ItemStack reAdd = player.getOpenInventory().getTopInventory().getItem(i).clone();
                             player.getOpenInventory().getTopInventory().setItem(i, null);
                             player.getInventory().addItem(reAdd);
@@ -43,7 +44,7 @@ public class Recipes implements Listener {
 	            event.getInventory().getItem(1).getType() != Material.AIR) {
 	            ItemStack item = event.getInventory().getItem(2);
 	            if (!Utils.containsIgnoreCase(event.getInventory().getItem(1).getType().toString(), "PAPER") && !Utils.containsIgnoreCase(event.getInventory().getItem(1).getType().toString(), "NAME_TAG") &&
-	                !ItemHandler.isAllowed(player, item, "item-repairable") || !ItemHandler.isAllowed(player, event.getInventory().getItem(1), "item-repairable")) {
+	                !ItemUtilities.isAllowed(player, item, "item-repairable") || !ItemUtilities.isAllowed(player, event.getInventory().getItem(1), "item-repairable")) {
 	                event.setCancelled(true);
 	                PlayerHandler.updateExperienceLevels(player);
 	                PlayerHandler.updateInventory(player);

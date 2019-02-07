@@ -14,8 +14,8 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
+import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
-import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.utils.Utils;
 
@@ -29,7 +29,7 @@ public class Interact implements Listener {
 	 public void onInteraction(PlayerInteractEvent event) {
 	 	ItemStack item = event.getItem();
 	 	Player player = event.getPlayer();
-	 	if (event.hasItem() && event.getAction() != Action.PHYSICAL && !ItemHandler.isAllowed(player, item, "cancel-events")) {
+	 	if (event.hasItem() && event.getAction() != Action.PHYSICAL && !ItemUtilities.isAllowed(player, item, "cancel-events")) {
 	 		event.setCancelled(true);
 	 		PlayerHandler.updateInventory(player);
 	 	}
@@ -41,7 +41,7 @@ public class Interact implements Listener {
 	 	ItemStack item = event.getItem();
 	 	if (event.hasItem() && event.getAction() != Action.PHYSICAL) {
 	 		if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-	 			ItemMap itemMap = ItemHandler.getMappedItem(item, player.getWorld());
+	 			ItemMap itemMap = ItemUtilities.getMappedItem(item, player.getWorld());
 	 			if (itemMap != null && itemMap.getInteractCooldown() != 0) {
 	 				if (!onItemCooldown(itemMap, player, item)) {
 	 					playersOnCooldown.put(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + itemMap.getConfigName(), System.currentTimeMillis());
@@ -68,7 +68,7 @@ public class Interact implements Listener {
 		String action = event.getAction().toString();
 		if (PlayerHandler.isAdventureMode(player) && !action.contains("LEFT") 
 				|| !PlayerHandler.isAdventureMode(player)) {
-			ItemMap itemMap = ItemHandler.getMappedItem(PlayerHandler.getHandItem(player), player.getWorld());
+			ItemMap itemMap = ItemUtilities.getMappedItem(PlayerHandler.getHandItem(player), player.getWorld());
 			if (itemMap != null && itemMap.isSimilar(item)) {
 				if (setupCommands(player, item, action)) { event.setCancelled(true); }
 			}
@@ -85,7 +85,7 @@ public class Interact implements Listener {
 	}
 	
 	private boolean setupCommands(Player player, ItemStack item, String action) {
-		  ItemMap itemMap = ItemHandler.getMappedItem(item, player.getWorld());
+		  ItemMap itemMap = ItemUtilities.getMappedItem(item, player.getWorld());
 			if (itemMap != null && itemMap.inWorld(player.getWorld()) && itemMap.hasPermission(player)) {
 				return itemMap.executeCommands(player, action);
 			}

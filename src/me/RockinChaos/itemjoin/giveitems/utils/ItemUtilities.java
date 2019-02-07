@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
@@ -30,6 +31,62 @@ public class ItemUtilities {
 	public static Map < String, Integer > probability = new HashMap < String, Integer > ();
 	private static HashMap <Integer, Integer> failCount = new HashMap <Integer, Integer> ();
 	
+	public static boolean isAllowed(Player player, ItemStack item, String itemflag) {
+		ItemMap fetched = getMappedItem(item, player.getWorld());
+		if (fetched != null && fetched.isAllowedItem(player, item, itemflag)) {
+			return false;
+		}
+		return true;
+	}
+	
+	public static ItemMap getMappedItem(ItemStack lookUp, World world) {
+		for (ItemMap item : ItemUtilities.getItems()) {
+			if (item.isSimilar(lookUp) && item.inWorld(world)) {
+				return item;
+			}
+		}
+		return null;
+	}
+	
+	public static ItemMap getMappedItem(String lookUp) {
+		for (ItemMap item : ItemUtilities.getItems()) {
+			if (item.getConfigName().equalsIgnoreCase(lookUp)) {
+				return item;
+			}
+		}
+		return null;
+	}
+	
+	public static void closeAnimations(Player player) {
+		for (ItemMap item : ItemUtilities.getItems()) {
+			if (item.isAnimated() && item.getAnimationHandler().get(player) != null
+					|| item.isDynamic() && item.getAnimationHandler().get(player) != null) {
+				item.getAnimationHandler().get(player).closeAnimation(player);
+				item.removeFromAnimationHandler(player);
+			}
+		}
+	}
+	
+	public static void closeAllAnimations() {
+		Collection < ? > playersOnlineNew = null;
+		Player[] playersOnlineOld;
+		try {
+			if (Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).getReturnType() == Collection.class) {
+				if (Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).getReturnType() == Collection.class) {
+					playersOnlineNew = ((Collection < ? > ) Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).invoke(null, new Object[0]));
+					for (Object objPlayer: playersOnlineNew) {
+						closeAnimations(((Player) objPlayer));
+					}
+				}
+			} else {
+				playersOnlineOld = ((Player[]) Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).invoke(null, new Object[0]));
+				for (Player player: playersOnlineOld) {
+					closeAnimations(player);
+				}
+			}
+		} catch (Exception e) { ServerHandler.sendDebugTrace(e); }
+	}
+	
 	public static void addItem(ItemMap itemMap) {
 		items.add(itemMap);
 	}
@@ -39,7 +96,7 @@ public class ItemUtilities {
 	}
 	
 	public static void clearItems() {
-		items.clear();
+		items = new ArrayList < ItemMap >();
 	}
 	
 	public static void updateItems(Player player, boolean newAnimation) {
@@ -260,11 +317,11 @@ public class ItemUtilities {
 				boolean ipLimited = DataStorage.getSQLData().isIPLimited(player, itemMap);
 				if (itemMap.isLimitMode(player.getGameMode())) {
 					if (Utils.isInt(itemMap.getSlot()) && Integer.parseInt(itemMap.getSlot()) >= 0 && Integer.parseInt(itemMap.getSlot()) <= 35) {
-						if (!firstJoin && !firstWorld && !ipLimited && canOverwrite(player, itemMap.getSlot(), itemMap.getConfigName())) {
+						if (!firstJoin && !firstWorld && !ipLimited && canOverwrite(player, itemMap)) {
 							return true;
 						}
 					} else if (ItemHandler.isCustomSlot(itemMap.getSlot())) {
-						if (!firstJoin && !firstWorld && !ipLimited && canOverwrite(player, itemMap.getSlot(), itemMap.getConfigName())) {
+						if (!firstJoin && !firstWorld && !ipLimited && canOverwrite(player, itemMap)) {
 							return true;
 						}
 					}
@@ -313,29 +370,34 @@ public class ItemUtilities {
 		return false;
 	}
 	
-	public static Boolean canOverwrite(Player player, String slot, String item) {
+	public static Boolean canOverwrite(Player player, ItemMap itemMap) {
 		try {
-			if (!isOverwrite(player) && Utils.isInt(slot) && player.getInventory().getItem(Integer.parseInt(slot)) != null) {
-				return false;
-			} else if (!isOverwrite(player) && ItemHandler.isCustomSlot(slot)) {
-				if (slot.equalsIgnoreCase("Arbitrary") && player.getInventory().firstEmpty() == -1) {
-					return true;
-				} else if (slot.equalsIgnoreCase("Helmet") && player.getInventory().getHelmet() != null) {
+			if (itemMap.isOverwritable()) { return true; }
+			if (Utils.isInt(itemMap.getSlot()) && player.getInventory().getItem(Integer.parseInt(itemMap.getSlot())) != null) {
+				if (!isOverwrite(player) || !itemMap.isOverwritable()) {
 					return false;
-				} else if (slot.equalsIgnoreCase("Chestplate") && player.getInventory().getChestplate() != null) {
-					return false;
-				} else if (slot.equalsIgnoreCase("Leggings") && player.getInventory().getLeggings() != null) {
-					return false;
-				} else if (slot.equalsIgnoreCase("Boots") && player.getInventory().getBoots() != null) {
-					return false;
-				} else if (ServerHandler.hasCombatUpdate() && slot.equalsIgnoreCase("Offhand")) {
-					if (player.getInventory().getItemInOffHand().getType() != Material.AIR) {
+				}
+			} else if (ItemHandler.isCustomSlot(itemMap.getSlot())) {
+				if (!isOverwrite(player) || !itemMap.isOverwritable()) {
+					if (itemMap.getSlot().equalsIgnoreCase("Arbitrary") && player.getInventory().firstEmpty() == -1) {
+						return true;
+					} else if (itemMap.getSlot().equalsIgnoreCase("Helmet") && player.getInventory().getHelmet() != null) {
 						return false;
+					} else if (itemMap.getSlot().equalsIgnoreCase("Chestplate") && player.getInventory().getChestplate() != null) {
+						return false;
+					} else if (itemMap.getSlot().equalsIgnoreCase("Leggings") && player.getInventory().getLeggings() != null) {
+						return false;
+					} else if (itemMap.getSlot().equalsIgnoreCase("Boots") && player.getInventory().getBoots() != null) {
+						return false;
+					} else if (ServerHandler.hasCombatUpdate() && itemMap.getSlot().equalsIgnoreCase("Offhand")) {
+						if (player.getInventory().getItemInOffHand().getType() != Material.AIR) {
+							return false;
+						}
+					} else if (getSlotConversion(itemMap.getSlot()) != 5 
+							&& player.getOpenInventory().getTopInventory().getItem(getSlotConversion(itemMap.getSlot())) != null 
+							&& player.getOpenInventory().getTopInventory().getItem(getSlotConversion(itemMap.getSlot())).getType() != Material.AIR) {
+							return false;
 					}
-				} else if (getSlotConversion(slot) != 5 
-						&& player.getOpenInventory().getTopInventory().getItem(getSlotConversion(slot)) != null 
-						&& player.getOpenInventory().getTopInventory().getItem(getSlotConversion(slot)).getType() != Material.AIR) {
-					return false;
 				}
 			}
 		} catch (Exception e) { ServerHandler.sendDebugTrace(e); }

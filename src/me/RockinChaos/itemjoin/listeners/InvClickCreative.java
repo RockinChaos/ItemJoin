@@ -13,6 +13,7 @@ import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import me.RockinChaos.itemjoin.ItemJoin;
+import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
@@ -69,7 +70,7 @@ public class InvClickCreative implements Listener {
 				if (event.getCurrentItem() != null && event.getCursor() != null && event.getCursor().getType() != Material.AIR && event.getCurrentItem().getType() != Material.AIR && !hasItem(player, event.getCursor())) {
 					isGlitchSwap.put(PlayerHandler.getPlayerID(player), true);
 				}
-				if (cooldown.get(PlayerHandler.getPlayerID(player)) != 1 && !ItemHandler.isAllowed(player, item, "inventory-modify")) {
+				if (cooldown.get(PlayerHandler.getPlayerID(player)) != 1 && !ItemUtilities.isAllowed(player, item, "inventory-modify")) {
 					saveInventory(player);
 				}
 				if (!ServerHandler.hasCombatUpdate()) {
@@ -78,7 +79,7 @@ public class InvClickCreative implements Listener {
 					ItemStack[] Armor = player.getInventory().getArmorContents().clone();
 					InvClickSurvival.LegacyDropEvent(player, Inv, Armor);
 				}
-				if (!ItemHandler.isAllowed(player, item, "inventory-modify") || event.getCurrentItem() != null && event.getCursor() != null && !hasItem(player, event.getCursor()) && !ItemHandler.isAllowed(player, event.getCurrentItem(), "inventory-modify")) {
+				if (!ItemUtilities.isAllowed(player, item, "inventory-modify") || event.getCurrentItem() != null && event.getCursor() != null && !hasItem(player, event.getCursor()) && !ItemUtilities.isAllowed(player, event.getCurrentItem(), "inventory-modify")) {
 					cooldown.put(PlayerHandler.getPlayerID(player), 1);
 					event.setCancelled(true);
 					player.getInventory().clear();
@@ -92,7 +93,7 @@ public class InvClickCreative implements Listener {
 					ItemStack readd = new ItemStack(event.getCursor());
 					restoreInventory(player, readd);
 					PlayerHandler.delayUpdateInventory(player, 5L);
-				} else if (!ServerHandler.hasCombatUpdate() && !ItemHandler.isAllowed(player, item, "inventory-modify")) {
+				} else if (!ServerHandler.hasCombatUpdate() && !ItemUtilities.isAllowed(player, item, "inventory-modify")) {
 					final ItemStack itemFinal = item;
 					Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
 						public void run() {

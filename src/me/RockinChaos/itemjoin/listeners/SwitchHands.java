@@ -6,7 +6,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 
-import me.RockinChaos.itemjoin.handlers.ItemHandler;
+import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 
@@ -18,10 +18,10 @@ public class SwitchHands implements Listener {
 			ItemStack offhand = event.getOffHandItem();
 			ItemStack mainhand = event.getMainHandItem();
 			Player player = event.getPlayer();
-			if (!ItemHandler.isAllowed(player, offhand, "inventory-modify")) {
+			if (!ItemUtilities.isAllowed(player, offhand, "inventory-modify")) {
 				event.setCancelled(true);
 				PlayerHandler.updateInventory(player);
-			} else if (!ItemHandler.isAllowed(player, mainhand, "inventory-modify")) {
+			} else if (!ItemUtilities.isAllowed(player, mainhand, "inventory-modify")) {
 				event.setCancelled(true);
 				PlayerHandler.updateInventory(player);
 			}

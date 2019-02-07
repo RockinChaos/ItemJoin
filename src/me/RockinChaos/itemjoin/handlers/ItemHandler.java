@@ -18,7 +18,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.Color;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -34,8 +33,6 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.mojang.util.UUIDTypeAdapter;
 
-import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
-import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
 import me.RockinChaos.itemjoin.utils.DataStorage;
 import me.RockinChaos.itemjoin.utils.Legacy;
 import me.RockinChaos.itemjoin.utils.Reflection;
@@ -46,40 +43,8 @@ public class ItemHandler {
 	private static HashMap < Integer, Integer > ArbitraryID = new HashMap < Integer, Integer > ();
 	private static HashMap < String, GameProfile > gameProfiles = new HashMap < String, GameProfile > ();
 	
-	public static boolean isAllowed(Player player, ItemStack item, String itemflag) {
-		ItemMap fetched = getMappedItem(item, player.getWorld());
-		if (fetched != null && fetched.isAllowedItem(player, item, itemflag)) {
-			return false;
-		}
-		return true;
-	}
-	
-	public static ItemMap getMappedItem(ItemStack lookUp, World world) {
-		for (ItemMap item : ItemUtilities.getItems()) {
-			if (item.isSimilar(lookUp) && item.inWorld(world)) {
-				return item;
-			}
-		}
-		return null;
-	}
-	
-	public static ItemMap getMappedItem(String lookUp) {
-		for (ItemMap item : ItemUtilities.getItems()) {
-			if (item.getConfigName().equalsIgnoreCase(lookUp)) {
-				return item;
-			}
-		}
-		return null;
-	}
-	
-	public static void closeAnimations(Player player) {
-		for (ItemMap item : ItemUtilities.getItems()) {
-			if (item.isAnimated() && item.getAnimationHandler().get(player) != null
-					|| item.isDynamic() && item.getAnimationHandler().get(player) != null) {
-				item.getAnimationHandler().get(player).closeAnimation(player);
-				item.removeFromAnimationHandler(player);
-			}
-		}
+	public static void initializeItemID() {
+		ArbitraryID.clear();
 	}
 	
 	public static String getItemID(String slot) {

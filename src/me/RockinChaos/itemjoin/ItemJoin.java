@@ -2,7 +2,6 @@ package me.RockinChaos.itemjoin;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
-import me.RockinChaos.itemjoin.giveitems.utils.ItemDesigner;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
@@ -20,7 +19,6 @@ public class ItemJoin extends JavaPlugin {
   		DataStorage.setUpdater(new UpdateHandler(getFile()));
   		DataStorage.generateData();
   		DataStorage.registerEvents();
-  		(new ItemDesigner()).generateItems();
   		ItemUtilities.updateItems();
   		ServerHandler.sendConsoleMessage("&ahas been Enabled.");
   	}
