@@ -1,6 +1,7 @@
 package me.RockinChaos.itemjoin.utils.sqlite;
 
 import java.io.File;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,12 +45,17 @@ public class SQLData {
 	}
 	
 	private void createTables() {
-		SQLite.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS first_join (`World_Name` varchar(32), `Player_Name` varchar(32), `Player_UUID` varchar(32), `Item_Name` varchar(32));");
-		SQLite.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS first_world (`World_Name` varchar(32), `Player_Name` varchar(32), `Player_UUID` varchar(32), `Item_Name` varchar(32));");
-		SQLite.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS ip_limits (`World_Name` varchar(32), `IP_Address` varchar(32), `Player_UUID` varchar(32), `Item_Name` varchar(32));");
-		SQLite.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS first_commands (`World_Name` varchar(32), `Player_UUID` varchar(32), `Command_String` varchar(32));");
+		SQLite.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS first_join (`World_Name` varchar(32), `Player_Name` varchar(32), `Player_UUID` varchar(32), `Item_Name` varchar(32), `Time_Stamp` varchar(32));");
+		SQLite.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS first_world (`World_Name` varchar(32), `Player_Name` varchar(32), `Player_UUID` varchar(32), `Item_Name` varchar(32), `Time_Stamp` varchar(32));");
+		SQLite.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS ip_limits (`World_Name` varchar(32), `IP_Address` varchar(32), `Player_UUID` varchar(32), `Item_Name` varchar(32), `Time_Stamp` varchar(32));");
+		SQLite.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS first_commands (`World_Name` varchar(32), `Player_UUID` varchar(32), `Command_String` varchar(32), `Time_Stamp` varchar(32));");
 		SQLite.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS enabled_players (`World_Name` varchar(32), `Player_Name` varchar(32), `Player_UUID` varchar(32), `isEnabled` varchar(32));");
 		SQLite.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS map_ids (`Map_IMG` varchar(32), `Map_ID` varchar(32));");
+		
+		SQLite.getDatabase("database").executeStatement("ALTER TABLE first_join ADD Time_Stamp datatype;");
+		SQLite.getDatabase("database").executeStatement("ALTER TABLE first_world ADD Time_Stamp datatype;");
+		SQLite.getDatabase("database").executeStatement("ALTER TABLE ip_limits ADD Time_Stamp datatype;");
+		SQLite.getDatabase("database").executeStatement("ALTER TABLE first_commands ADD Time_Stamp datatype;");
 	}
 	
 	public void executeLaterStatements() {
@@ -170,7 +176,7 @@ public class SQLData {
 	
 	public void saveFirstJoinData(Player player, ItemMap itemMap) {
 		if (itemMap.isOnlyFirstJoin()) {
-			executeStatementsLater.add("INSERT INTO first_join (`World_Name`, `Player_Name`, `Player_UUID`, `Item_Name`) VALUES ('" + player.getWorld().getName() + "','" + player.getName().toString() + "','" + PlayerHandler.getPlayerID(player) + "','" + itemMap.getConfigName() + "')");
+			executeStatementsLater.add("INSERT INTO first_join (`World_Name`, `Player_Name`, `Player_UUID`, `Item_Name`, `Time_Stamp`) VALUES ('" + player.getWorld().getName() + "','" + player.getName().toString() + "','" + PlayerHandler.getPlayerID(player) + "','" + itemMap.getConfigName() + "','" + new Timestamp(System.currentTimeMillis()) + "')");
 			if (firstJoinPlayers.get(PlayerHandler.getPlayerID(player)) != null) {
 				List <String> h1 = firstJoinPlayers.get(PlayerHandler.getPlayerID(player));
 				h1.add(itemMap.getConfigName());
@@ -185,7 +191,7 @@ public class SQLData {
 	
 	public void saveFirstWorldData(Player player, ItemMap itemMap) {
 		if (itemMap.isOnlyFirstWorld()) {
-			executeStatementsLater.add("INSERT INTO first_world (`World_Name`, `Player_Name`, `Player_UUID`, `Item_Name`) VALUES ('" + player.getWorld().getName() + "','" + player.getName().toString() + "','" + PlayerHandler.getPlayerID(player) + "','" + itemMap.getConfigName() + "')");
+			executeStatementsLater.add("INSERT INTO first_world (`World_Name`, `Player_Name`, `Player_UUID`, `Item_Name`, `Time_Stamp`) VALUES ('" + player.getWorld().getName() + "','" + player.getName().toString() + "','" + PlayerHandler.getPlayerID(player) + "','" + itemMap.getConfigName() + "','" + new Timestamp(System.currentTimeMillis()) + "')");
 			if (firstWorldPlayers.get(PlayerHandler.getPlayerID(player)) != null) {
 				List <String> h1 = firstWorldPlayers.get(PlayerHandler.getPlayerID(player));
 				h1.add(player.getWorld().getName() + "." + itemMap.getConfigName());
@@ -200,7 +206,7 @@ public class SQLData {
 	
 	public void saveIpLimitData(Player player, ItemMap itemMap) {
 		if (itemMap.isIpLimted()) {
-			executeStatementsLater.add("INSERT INTO ip_limits (`World_Name`, `IP_Address`, `Player_UUID`, `Item_Name`) VALUES ('" + player.getWorld().getName() + "','" + player.getAddress().getHostString() + "','" + PlayerHandler.getPlayerID(player) + "','" + itemMap.getConfigName() + "')");
+			executeStatementsLater.add("INSERT INTO ip_limits (`World_Name`, `IP_Address`, `Player_UUID`, `Item_Name`, `Time_Stamp`) VALUES ('" + player.getWorld().getName() + "','" + player.getAddress().getHostString() + "','" + PlayerHandler.getPlayerID(player) + "','" + itemMap.getConfigName() + "','" + new Timestamp(System.currentTimeMillis()) + "')");
 			if (ipLimitAddresses.get(PlayerHandler.getPlayerID(player)) != null) {
 				List <String> h1 = ipLimitAddresses.get(PlayerHandler.getPlayerID(player));
 				h1.add(player.getWorld().getName() + "." + player.getAddress().getHostString() + "." + itemMap.getConfigName());
@@ -214,7 +220,7 @@ public class SQLData {
 	}
 	
 	public void saveFirstCommandData(Player player, String command) {
-		executeStatementsLater.add("INSERT INTO first_commands (`World_Name`, `Player_UUID`, `Command_String`) VALUES ('" + player.getWorld().getName() + "','" + PlayerHandler.getPlayerID(player) + "','" + command + "')");
+		executeStatementsLater.add("INSERT INTO first_commands (`World_Name`, `Player_UUID`, `Command_String`, `Time_Stamp`) VALUES ('" + player.getWorld().getName() + "','" + PlayerHandler.getPlayerID(player) + "','" + command + "','" + new Timestamp(System.currentTimeMillis()) + "')");
 		if (firstCommandPlayers.get(PlayerHandler.getPlayerID(player)) != null) {
 			List <String> h1 = firstCommandPlayers.get(PlayerHandler.getPlayerID(player));
 			h1.add(player.getWorld().getName() + "." + command);
