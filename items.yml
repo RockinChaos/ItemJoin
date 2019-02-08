@@ -1,11 +1,15 @@
-#// <>==<>==<> ItemJoin's Custom Items On Join, by RockinChaos <>==<>==<> //#
-#// See the Documentations page for a more in-depth tutorial; https://www.spigotmc.org/wiki/itemjoin/ //#
+# --{ =-=-=-=-=-=-=-=-=-= ItemJoin's Custom Item Configurations, by RockinChaos =-=-=-=-=-=-=-=-=-= }--
+# See the tutorial page for a more in-depth explaination; https://www.spigotmc.org/wiki/itemjoin/
 items-Version: 6
+
+# General options that apply to the custom items functionality.
 items-Delay: 2
 items-Overwrite: false
 items-Spamming: false
 items-RestrictCount : false
 
+# This is the section that the custom created items will be stored.
+# All created items should be saved under the 'items' section for each 'custom-item' subsection.
 items:
   ultra-item:
     id: DIAMOND_SWORD
