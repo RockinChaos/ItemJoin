@@ -51,11 +51,16 @@ public class SQLData {
 		SQLite.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS first_commands (`World_Name` varchar(32), `Player_UUID` varchar(32), `Command_String` varchar(32), `Time_Stamp` varchar(32));");
 		SQLite.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS enabled_players (`World_Name` varchar(32), `Player_Name` varchar(32), `Player_UUID` varchar(32), `isEnabled` varchar(32));");
 		SQLite.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS map_ids (`Map_IMG` varchar(32), `Map_ID` varchar(32));");
-		
-		SQLite.getDatabase("database").executeStatement("ALTER TABLE first_join ADD Time_Stamp datatype;");
-		SQLite.getDatabase("database").executeStatement("ALTER TABLE first_world ADD Time_Stamp datatype;");
-		SQLite.getDatabase("database").executeStatement("ALTER TABLE ip_limits ADD Time_Stamp datatype;");
-		SQLite.getDatabase("database").executeStatement("ALTER TABLE first_commands ADD Time_Stamp datatype;");
+		this.alterTables();
+	}
+	
+	private void alterTables() {
+		if (!SQLite.getDatabase("database").columnExists("SELECT Time_Stamp FROM first_join")) {
+			SQLite.getDatabase("database").executeStatement("ALTER TABLE first_join ADD Time_Stamp datatype;");
+			SQLite.getDatabase("database").executeStatement("ALTER TABLE first_world ADD Time_Stamp datatype;");
+			SQLite.getDatabase("database").executeStatement("ALTER TABLE ip_limits ADD Time_Stamp datatype;");
+			SQLite.getDatabase("database").executeStatement("ALTER TABLE first_commands ADD Time_Stamp datatype;");
+		} 
 	}
 	
 	public void executeLaterStatements() {
@@ -353,18 +358,18 @@ public class SQLData {
 		boolean converting = false;
 		if (firstJoin.exists() || ipLimit.exists()) {
 			if (firstJoin.exists()) {
-				ServerHandler.sendConsoleMessage("&aThe &cfirst-join.yml&a file is &coutdated&a, all data is now stored in a database file.");
+				ServerHandler.sendErrorMessage("&aThe &cfirst-join.yml&a file is &coutdated&a, all data is now stored in a database file.");
 				convertFirstJoinData(firstJoin);
 			}
 			if (ipLimit.exists()) {
-				ServerHandler.sendConsoleMessage("&aThe &cip-limit.yml&a file is &coutdated&a, all data is now stored in a database file.");
+				ServerHandler.sendErrorMessage("&aThe &cip-limit.yml&a file is &coutdated&a, all data is now stored in a database file.");
 				convertIpLimitData(ipLimit);
 			}
-			ServerHandler.sendConsoleMessage("&aStarting YAML to Database conversion, stored data in the file(s) will not be lost...");
+			ServerHandler.sendErrorMessage("&aStarting YAML to Database conversion, stored data in the file(s) will not be lost...");
 			converting = true;
 		}
 		if (converting == true) {
-			ServerHandler.sendConsoleMessage("&aYAML to Database conversion complete!");
+			ServerHandler.sendErrorMessage("&aYAML to Database conversion complete!");
 		}
 	}
 	

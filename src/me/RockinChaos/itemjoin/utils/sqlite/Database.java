@@ -12,6 +12,7 @@ import java.util.Map;
 
 import me.RockinChaos.itemjoin.handlers.MemoryHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
+import me.RockinChaos.itemjoin.utils.Utils;
 
 public abstract class Database {
 	protected Connection connection;
@@ -223,6 +224,22 @@ public abstract class Database {
 			}
 		}
 		return null;
+	}
+
+	public boolean columnExists(final String statement) {
+		try (Connection conn = this.getSQLConnection(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(statement)) {
+			conn.close();
+			rs.close();
+			return true;
+		} catch (SQLException e) {
+			if (Utils.containsIgnoreCase(e.getMessage(), "no such column")) {
+				return false;
+			} else {
+				ServerHandler.sendDebugMessage("[SQLITE] Failed to execute database statement.");
+				ServerHandler.sendDebugTrace(e);
+			}
+		}
+		return false;
 	}
 	
 	public boolean tableExists(String tableName) {
