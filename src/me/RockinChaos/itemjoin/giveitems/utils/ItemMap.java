@@ -1141,7 +1141,10 @@ public class ItemMap {
 	public boolean isSimilar(ItemStack item) {
 		if (item != null && item.getType() != Material.AIR && item.getType() == this.material || this.materialAnimated && item != null && item.getType() != Material.AIR && this.isMaterial(item)) {
 			if (MemoryHandler.isDataTags() && ServerHandler.hasSpecificUpdate("1_8") 
-					&& ItemHandler.getNBTData(item) != null && ItemHandler.getNBTData(item).contains(this.newNBTData) || this.legacySecret != null && item.hasItemMeta() 
+					&& ItemHandler.getNBTData(item) != null 
+					&& Utils.containsIgnoreCase(ItemHandler.getNBTData(item), this.newNBTData)
+					|| this.legacySecret != null 
+					&& item.hasItemMeta() 
 					&& item.getItemMeta().hasDisplayName() && item.getItemMeta().getDisplayName().contains(this.legacySecret) || this.vanillaItem && this.vanillaStatus) {
 				if (!this.isSkull() && skullOwner == null || this.isSkull() && !this.skullAnimated && ((SkullMeta) item.getItemMeta()).hasOwner() 
 						&& this.skullOwner != null && PlayerHandler.getSkullOwner(item).equalsIgnoreCase(this.skullOwner) 
@@ -1611,10 +1614,10 @@ public class ItemMap {
 		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), (Runnable) new Runnable() {
 			public void run() {
 				if (isDisposable) {
-				    if (player.getItemOnCursor() != null && player.getItemOnCursor().getType() != Material.AIR) { player.setItemOnCursor(null); } 
-				    else if (item.getAmount() > 1 && item.getAmount() != 1) { item.setAmount(item.getAmount() - 1); } 
-					else if (PlayerHandler.getMainHandItem(player) != null && PlayerHandler.getMainHandItem(player).getType() != Material.AIR && item.isSimilar(PlayerHandler.getMainHandItem(player))) { PlayerHandler.setItemInHand(player, Material.AIR); }
-					else if (PlayerHandler.getOffHandItem(player) != null) { PlayerHandler.setOffhandItem(player, new ItemStack(Material.AIR)); }
+					item.setAmount(item.getAmount() - 1);
+				    if (player.getItemOnCursor() != null && player.getItemOnCursor().getType() != Material.AIR) { player.setItemOnCursor(item); } 
+					if (PlayerHandler.getMainHandItem(player) != null && PlayerHandler.getMainHandItem(player).getType() != Material.AIR && item.isSimilar(PlayerHandler.getMainHandItem(player))) { PlayerHandler.setMainHandItem(player, item); }
+					else if (PlayerHandler.getOffHandItem(player) != null && PlayerHandler.getOffHandItem(player).getType() != Material.AIR && item.isSimilar(PlayerHandler.getOffHandItem(player))) { PlayerHandler.setOffHandItem(player, item); } 
 				}
 			}
 		}, 1L);

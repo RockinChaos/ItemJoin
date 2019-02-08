@@ -80,16 +80,32 @@ public class PlayerHandler {
 	public static ItemStack getMainHandItem(Player player) {
 		if (ServerHandler.hasCombatUpdate()) {
 			return player.getInventory().getItemInMainHand();
-		} if (!ServerHandler.hasCombatUpdate()) {
+		} else if (!ServerHandler.hasCombatUpdate()) {
 			return Legacy.getLegacyInHandItem(player);
 		}
 		return null;
 	}
 	
+	public static void setMainHandItem(Player player, ItemStack item) {
+		if (ServerHandler.hasCombatUpdate()) {
+			player.getInventory().setItemInMainHand(item);;
+		} else if (!ServerHandler.hasCombatUpdate()) {
+			Legacy.setLegacyInHandItem(player, item);
+		}
+	}
+	
+	public static void setOffHandItem(Player player, ItemStack item) {
+		if (ServerHandler.hasCombatUpdate()) {
+			player.getInventory().setItemInOffHand(item);;
+		} else if (!ServerHandler.hasCombatUpdate()) {
+			Legacy.setLegacyInHandItem(player, item);
+		}
+	}
+	
 	public static ItemStack getOffHandItem(Player player) {
 		if (ServerHandler.hasCombatUpdate()) {
 			return player.getInventory().getItemInOffHand();
-		} if (!ServerHandler.hasCombatUpdate()) {
+		} else if (!ServerHandler.hasCombatUpdate()) {
 			return Legacy.getLegacyInHandItem(player);
 		}
 		return null;
