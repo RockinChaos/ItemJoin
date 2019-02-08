@@ -19,8 +19,8 @@ import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
+import me.RockinChaos.itemjoin.handlers.MemoryHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
-import me.RockinChaos.itemjoin.utils.DataStorage;
 import me.RockinChaos.itemjoin.utils.Legacy;
 import me.RockinChaos.itemjoin.utils.Utils;
 
@@ -31,8 +31,8 @@ public class RegionEnter implements Listener {
 	@EventHandler
 	private void giveOnRegionEnter(PlayerMoveEvent event) {
 		final Player player = event.getPlayer();
-		if (DataStorage.hasWorldGuard() == true) {
-			if (isInRegion(player) && DataStorage.getSQLData().isEnabled(player)) {
+		if (MemoryHandler.isWorldGuard() == true) {
+			if (isInRegion(player) && MemoryHandler.getSQLData().isEnabled(player)) {
 				String regionId = getRegion(player).getId();
 				if (Utils.containsIgnoreCase(localeRegions.toString(), regionId) || Utils.containsIgnoreCase(localeRegions.toString(), "UNDEFINED")) {
 					if (playersInRegions.get(player) != null && playersInRegions.get(player).equalsIgnoreCase(regionId)) {} else if (playersInRegions.get(player) != null && !playersInRegions.get(player).equalsIgnoreCase(regionId)) {
@@ -62,7 +62,7 @@ public class RegionEnter implements Listener {
 		if (playersInRegions.get(player) != null) {
 			String Probable = ItemUtilities.getProbabilityItem(player);
 			for (ItemMap item: ItemUtilities.getItems()) {
-				if (item.isGiveOnRegionEnter() && DataStorage.getSQLData().isEnabled(player) && item.inWorld(player.getWorld()) && ItemUtilities.isChosenProbability(item, Probable) && item.hasPermission(player)) {
+				if (item.isGiveOnRegionEnter() && MemoryHandler.getSQLData().isEnabled(player) && item.inWorld(player.getWorld()) && ItemUtilities.isChosenProbability(item, Probable) && item.hasPermission(player)) {
 					item.removeFrom(player);
 				}
 			}
@@ -73,7 +73,7 @@ public class RegionEnter implements Listener {
 	private static void removeLeaveItems(Player player) {
 		String Probable = ItemUtilities.getProbabilityItem(player);
 		for (ItemMap item: ItemUtilities.getItems()) {
-			if (item.isTakeOnRegionLeave() && DataStorage.getSQLData().isEnabled(player) && item.inWorld(player.getWorld()) && ItemUtilities.isChosenProbability(item, Probable) && item.hasPermission(player)) {
+			if (item.isTakeOnRegionLeave() && MemoryHandler.getSQLData().isEnabled(player) && item.inWorld(player.getWorld()) && ItemUtilities.isChosenProbability(item, Probable) && item.hasPermission(player)) {
 				item.removeFrom(player);
 			}
 		}
@@ -82,7 +82,7 @@ public class RegionEnter implements Listener {
 	private static void giveItems(Player player, String region, int step, int session) {
 		String Probable = ItemUtilities.getProbabilityItem(player);
 		for (ItemMap item: ItemUtilities.getItems()) {
-			if (item.isGiveOnRegionEnter() && DataStorage.getSQLData().isEnabled(player) && item.inWorld(player.getWorld()) && ItemUtilities.isChosenProbability(item, Probable) && item.hasPermission(player) && ItemUtilities.isObtainable(player, item, session)) {
+			if (item.isGiveOnRegionEnter() && MemoryHandler.getSQLData().isEnabled(player) && item.inWorld(player.getWorld()) && ItemUtilities.isChosenProbability(item, Probable) && item.hasPermission(player) && ItemUtilities.isObtainable(player, item, session)) {
 				if (Utils.containsIgnoreCase(item.getEnabledRegions(), region) || Utils.containsIgnoreCase(item.getEnabledRegions(), "UNDEFINED")) {
 					item.giveTo(player, false, 0);
 				}
@@ -111,7 +111,7 @@ public class RegionEnter implements Listener {
 	}
 	
 	private static ApplicableRegionSet getRegionSets(World world, Location loc) {
-		if (DataStorage.getWorldGuardVersion() >= 700) {
+		if (MemoryHandler.getWorldGuardVersion() >= 700) {
 			com.sk89q.worldedit.world.World wgWorld;
 			try { wgWorld = com.sk89q.worldguard.WorldGuard.getInstance().getPlatform().getWorldByName(world.getName()); }
 			catch (NoSuchMethodError e) { wgWorld = com.sk89q.worldguard.WorldGuard.getInstance().getPlatform().getMatcher().getWorldByName(world.getName()); }

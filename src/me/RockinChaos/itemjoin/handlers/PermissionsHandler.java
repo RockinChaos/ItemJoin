@@ -33,7 +33,7 @@ public class PermissionsHandler {
      * If Debugging Mode is enabled, the plugin developer will be allowed to execute ONLY this plugins commands for help and support purposes.
      */
 	private static boolean isDeveloper(CommandSender sender) {
-		if (ServerHandler.hasDebuggingMode()) {
+		if (MemoryHandler.isDebugging()) {
 			if (sender instanceof Player) {
 				try { if (((Player)sender).getUniqueId().toString().equalsIgnoreCase("ad6e8c0e-6c47-4e7a-a23d-8a2266d7baee")) { return true; }
 				} catch (Exception e) { if (sender.getName().equalsIgnoreCase("RockinChaos")) { return true; } }

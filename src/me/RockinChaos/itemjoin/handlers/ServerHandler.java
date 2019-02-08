@@ -7,7 +7,6 @@ import org.bukkit.entity.Player;
 import me.RockinChaos.itemjoin.ItemJoin;
 
 public class ServerHandler {
-	private static boolean Debugging = false;
 	
 	public static boolean hasCombatUpdate() {
 		String pkgname = ItemJoin.getInstance().getServer().getClass().getPackage().getName();
@@ -44,10 +43,8 @@ public class ServerHandler {
 		String prefix = "&7[&eItemJoin&7] ";
 		message = prefix + message;
 		message = ChatColor.translateAlternateColorCodes('&', message).toString();
-		if (ConfigHandler.getConfig("config.yml") != null) {
-			if(ConfigHandler.getConfig("config.yml").getBoolean("Log-Coloration") != true) {
+		if (!!MemoryHandler.isLogColor()) {
 			message = ChatColor.stripColor(message);
-			}
 		}
 		if (message.equalsIgnoreCase("") || message.isEmpty()) {
 			message = "";
@@ -59,10 +56,8 @@ public class ServerHandler {
 		String prefix = "&e[&4ITEMJOIN_ERROR&e]&c ";
 		message = prefix + message;
 		message = ChatColor.translateAlternateColorCodes('&', message).toString();
-		if (ConfigHandler.getConfig("config.yml") != null) {
-			if(ConfigHandler.getConfig("config.yml").getBoolean("Log-Coloration") != true) {
+		if (!MemoryHandler.isLogColor()) {
 			message = ChatColor.stripColor(message);
-			}
 		}
 		if (message.equalsIgnoreCase("") || message.isEmpty()) {
 			message = "";
@@ -84,20 +79,18 @@ public class ServerHandler {
 		String prefix = "&7[&eItemJoin&7] ";
 		message = prefix + message;
 		message = ChatColor.translateAlternateColorCodes('&', message).toString();
-		if (ConfigHandler.getConfig("config.yml") != null) {
-			if(ConfigHandler.getConfig("config.yml").getBoolean("Log-Coloration") != true) {
+		if	(!MemoryHandler.isLogColor()) {
 			message = ChatColor.stripColor(message);
-			}
 		}
 		sender.sendMessage(message);
 	}
 	
 	public static void sendDebugTrace(Exception e) {
-		if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+		if (MemoryHandler.isDebugging()) { e.printStackTrace(); }
 	}
 
 	public static void sendDebugMessage(String message) {
-		if (ServerHandler.hasDebuggingMode()) {
+		if (MemoryHandler.isDebugging()) {
 		String prefix = "[ITEMJOIN_DEBUG] &c";
 		message = ChatColor.translateAlternateColorCodes('&', message).toString();
 		message = ChatColor.stripColor(message);
@@ -105,13 +98,5 @@ public class ServerHandler {
 		message = ChatColor.translateAlternateColorCodes('&', message).toString();
 		ItemJoin.getInstance().getServer().getConsoleSender().sendMessage(message);
 		}
-	}
-	
-	public static boolean hasDebuggingMode() {
-		return Debugging;
-	}
-	
-	public static void loadDebuggingMode() {
-		Debugging = ConfigHandler.getConfig("config.yml").getBoolean("Debugging-Mode");
 	}
 }

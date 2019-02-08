@@ -6,6 +6,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.map.MapView;
 
 import me.RockinChaos.itemjoin.ItemJoin;
+import me.RockinChaos.itemjoin.handlers.MemoryHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 
 public class Reflection {
@@ -18,7 +19,7 @@ public class Reflection {
 		try {
 			return Class.forName("org.bukkit.craftbukkit." + getServerVersion() + '.' + name);
 		} catch (Exception e) {
-			if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+			if (MemoryHandler.isDebugging()) { e.printStackTrace(); }
 		}
 		return null;
 	}
@@ -27,7 +28,17 @@ public class Reflection {
 		try {
 			return Class.forName("net.minecraft.server." + getServerVersion() + '.' + name);
 		} catch (Exception e) {
-			if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+			if (MemoryHandler.isDebugging()) { e.printStackTrace(); }
+		}
+		return null;
+	}
+	
+	public static Class<?> getEventClass(String name) {
+	    try {
+	    return Class.forName("org.bukkit.event." + name);
+		} catch (ClassNotFoundException e) {
+			ServerHandler.sendDebugMessage(name + " Does not exist in this version of Minecraft!");
+			if (MemoryHandler.isDebugging()) { e.printStackTrace(); }
 		}
 		return null;
 	}
@@ -36,7 +47,7 @@ public class Reflection {
 		try {
 			return Class.forName("org.bukkit.map." + name);
 		} catch (Exception e) {
-			if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+			if (MemoryHandler.isDebugging()) { e.printStackTrace(); }
 		}
 		return null;
 	}
@@ -45,7 +56,7 @@ public class Reflection {
 		try {
 			return Class.forName("org.bukkit." + name);
 		} catch (Exception e) {
-			if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+			if (MemoryHandler.isDebugging()) { e.printStackTrace(); }
 		}
 		return null;
 	}
@@ -74,7 +85,7 @@ public class Reflection {
 			nms.getClass().getMethod("setTag", tag.getClass()).invoke(nms, tag);
 			item = (ItemStack) craftItemStack.getMethod("asCraftMirror", nms.getClass()).invoke(null, nms);
 		} catch (Exception e) {
-			if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+			if (MemoryHandler.isDebugging()) { e.printStackTrace(); }
 		}
 		return item;
 	}

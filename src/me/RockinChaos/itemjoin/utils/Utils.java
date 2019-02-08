@@ -11,6 +11,7 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import de.domedd.betternick.api.nickedplayer.NickedPlayer;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
+import me.RockinChaos.itemjoin.handlers.MemoryHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.clip.placeholderapi.PlaceholderAPI;
 
@@ -24,7 +25,7 @@ public class Utils {
 	}
 	
 	public static String stripLogColors(CommandSender sender, String message) {
-		if(sender instanceof ConsoleCommandSender && ConfigHandler.getConfig("config.yml").getBoolean("Log-Coloration") != true) {
+		if (sender instanceof ConsoleCommandSender && ConfigHandler.getConfig("config.yml").getBoolean("General.Log-Coloration") != true) {
 			return ChatColor.stripColor(message);
 		}
 	  return message;
@@ -75,7 +76,7 @@ public class Utils {
 	public static String translateLayout(String name, Player player) {
 		String playerName = "EXEMPT";
 		
-		if (player != null && DataStorage.hasBetterNick()) {
+		if (player != null && MemoryHandler.isBetterNick()) {
 			NickedPlayer np = new NickedPlayer(player);
 			if (np.isNicked()) {
 			playerName = np.getRealName();
@@ -92,7 +93,7 @@ public class Utils {
 		if (player == null) { try { name = name.replace("%player%", "CONSOLE"); } catch (Exception e) { ServerHandler.sendDebugTrace(e); } }
 	
 		name = ChatColor.translateAlternateColorCodes('&', name).toString();
-		if (DataStorage.hasPlaceholderAPI() == true) {
+		if (MemoryHandler.isPlaceholderAPI() == true) {
 			try { try { return PlaceholderAPI.setPlaceholders(player, name); } 
 			catch (NoSuchFieldError e) { ServerHandler.sendDebugMessage("Error has occured when setting the PlaceHolder " + e.getMessage() + ", if this issue persits contact the developer of PlaceholderAPI."); return name; }
 			} catch (Exception e) { }

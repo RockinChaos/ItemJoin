@@ -33,7 +33,6 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.mojang.util.UUIDTypeAdapter;
 
-import me.RockinChaos.itemjoin.utils.DataStorage;
 import me.RockinChaos.itemjoin.utils.Legacy;
 import me.RockinChaos.itemjoin.utils.Reflection;
 import me.RockinChaos.itemjoin.utils.Utils;
@@ -69,8 +68,7 @@ public class ItemHandler {
 	}
 
 	public static String getNBTData(ItemStack tempitem) {
-		if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true 
-				&& ServerHandler.hasSpecificUpdate("1_8") && tempitem != null && tempitem.getType() != Material.AIR) {
+		if (MemoryHandler.isDataTags() && ServerHandler.hasSpecificUpdate("1_8") && tempitem != null && tempitem.getType() != Material.AIR) {
 		try {
 		Class<?> craftItemStack = Reflection.getOBC("inventory.CraftItemStack");
 		Class<?> nmsItemStackClass = Reflection.getNMS("ItemStack");
@@ -135,9 +133,9 @@ public class ItemHandler {
 	}
 	
     public static short getMapID(MapView view) {
-    	if (!DataStorage.getMapMethod()) {
+    	if (!MemoryHandler.getMapMethod()) {
     		try { return (short) view.getId(); } 
-			catch (NoSuchMethodError e) { DataStorage.setMapMethod(true); return Reflection.getMapID(view); }
+			catch (NoSuchMethodError e) { MemoryHandler.setMapMethod(true); return Reflection.getMapID(view); }
     	} else { return Reflection.getMapID(view); }
     }
 	
@@ -305,9 +303,9 @@ public class ItemHandler {
 	}
 	
 	public static boolean containsNBTData(ItemStack inPlayerInventory) {
-		if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && ServerHandler.hasSpecificUpdate("1_8") && inPlayerInventory != null && inPlayerInventory.getType() != Material.AIR && getNBTData(inPlayerInventory) != null) {
+		if (MemoryHandler.isDataTags() && ServerHandler.hasSpecificUpdate("1_8") && inPlayerInventory != null && inPlayerInventory.getType() != Material.AIR && getNBTData(inPlayerInventory) != null) {
 			return true;
-		} else if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") != true || ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && !ServerHandler.hasSpecificUpdate("1_8")) { 
+		} else if (!MemoryHandler.isDataTags() || MemoryHandler.isDataTags() && !ServerHandler.hasSpecificUpdate("1_8")) { 
 				if (inPlayerInventory != null && inPlayerInventory.hasItemMeta() && inPlayerInventory.getItemMeta().hasDisplayName()
 						&& ConfigHandler.decodeSecretData(inPlayerInventory.getItemMeta().getDisplayName()).contains(ConfigHandler.decodeSecretData(ConfigHandler.encodeSecretData(ConfigHandler.getNBTData(null))))) {
 					return true;

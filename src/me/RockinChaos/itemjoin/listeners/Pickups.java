@@ -17,14 +17,10 @@ public class Pickups implements Listener {
 	  	Entity entity = event.getEntity();
 	  	if (entity instanceof Player) {
 	  		Player player = (Player) event.getEntity();
-	  		if (ConfigHandler.isPreventPickups()) {
-	  			String worlds = ConfigHandler.getEnabledPreventWorlds();
-	  			if (worlds == null || worlds.isEmpty() || Utils.containsIgnoreCase(worlds, "ALL") || Utils.containsIgnoreCase(worlds, "GLOBAL") || Utils.containsIgnoreCase(worlds, player.getWorld().getName())) {
-		  			if (ConfigHandler.isPreventAllowOpBypass() && player.isOp() 
-		  					|| ConfigHandler.isPreventAllowCreativeBypass() && PlayerHandler.isCreativeMode(player)) {} else {
-	  					event.setCancelled(true);
-	  				}
-	  			}
+	  		if (Utils.containsIgnoreCase(ConfigHandler.isPreventPickups(), "true") || Utils.containsIgnoreCase(ConfigHandler.isPreventPickups(), player.getWorld().getName())
+	  			|| Utils.containsIgnoreCase(ConfigHandler.isPreventPickups(), "ALL") || Utils.containsIgnoreCase(ConfigHandler.isPreventPickups(), "GLOBAL")) {
+	  			if (ConfigHandler.isPreventAllowOpBypass() && player.isOp() || ConfigHandler.isPreventAllowCreativeBypass() && PlayerHandler.isCreativeMode(player)) { } 
+	  			else { event.setCancelled(true); }
 	  		}
 	  	}
 	}

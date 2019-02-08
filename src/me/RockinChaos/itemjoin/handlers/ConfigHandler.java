@@ -19,12 +19,11 @@ public class ConfigHandler {
 	private static long delay = 2;
 	private static long clearDelay = 0;
 	private static boolean getItemPermissions = false;
-	private static boolean preventInventoryModify = false;
-	private static boolean preventPickups = false;
+	private static String preventItemMovement;
+	private static String preventPickups;
 	private static boolean preventAllowOpBypass = false;
 	private static boolean preventAllowCreativeBypass = false;
 	private static boolean opCommandPermissions = false;
-	private static String enabledPreventWorlds;
 	
 	public static void loadConfigs() {
 		configFile();
@@ -90,7 +89,7 @@ public class ConfigHandler {
 	public static void configFile() {
 		loadConfig("config.yml");
 		File File = new File(ItemJoin.getInstance().getDataFolder(), "config.yml");
-		if (File.exists() && getConfig("config.yml").getInt("config-Version") != 6) {
+		if (File.exists() && getConfig("config.yml").getInt("config-Version") != 7) {
 			if (ItemJoin.getInstance().getResource("config.yml") != null) {
 				String newGen = "config" + Utils.getRandom(1, 50000) + ".yml";
 				File newFile = new File(ItemJoin.getInstance().getDataFolder(), newGen);
@@ -210,8 +209,12 @@ public class ConfigHandler {
 	}
 	
 	public static void loadClearDelay() {
-		//clearDelay = ConfigHandler.getConfig("config.yml").getInt("clear-Delay") * 10L;
-		clearDelay = 4;
+		if (!Utils.containsIgnoreCase(ConfigHandler.getConfig("config.yml").getString("Clear-Items.Join"), "DISABLED") 
+			&& !Utils.containsIgnoreCase(ConfigHandler.getConfig("config.yml").getString("Clear-Items.Join"), "FALSE")
+			|| !Utils.containsIgnoreCase(ConfigHandler.getConfig("config.yml").getString("Clear-Items.World-Switch"), "DISABLED")
+			&& !Utils.containsIgnoreCase(ConfigHandler.getConfig("config.yml").getString("Clear-Items.World-Switch"), "FALSE")) {
+			clearDelay = ConfigHandler.getConfig("config.yml").getInt("Clear-Items.Delay-Tick") * 10L;
+		}
 	}
 	
 	public static long getItemDelay() {
@@ -232,27 +235,26 @@ public class ConfigHandler {
 	}
 	
 	public static void loadOPCommandPermissions() {
-		opCommandPermissions = ConfigHandler.getConfig("config.yml").getBoolean("OPCommands-Permissions");
+		opCommandPermissions = ConfigHandler.getConfig("config.yml").getBoolean("Permissions.Commands-OP");
 	}
 	
 	public static void loadGetItemPermissions() {
-		getItemPermissions = ConfigHandler.getConfig("config.yml").getBoolean("GetItem-Permissions");
+		getItemPermissions = ConfigHandler.getConfig("config.yml").getBoolean("Permissions.Commands-Get");
 	}
 	
 	public static void loadGlobalPreventSettings() {
-		preventPickups = ConfigHandler.getConfig("config.yml").getBoolean("Prevent-Pickups");
-		preventInventoryModify = ConfigHandler.getConfig("config.yml").getBoolean("Prevent-InventoryModify");
-		preventAllowOpBypass = ConfigHandler.getConfig("config.yml").getBoolean("AllowOPBypass");
-		preventAllowCreativeBypass = ConfigHandler.getConfig("config.yml").getBoolean("CreativeBypass");
-		enabledPreventWorlds = ConfigHandler.getConfig("config.yml").getString("enabled-prevent-worlds");
+		preventPickups = ConfigHandler.getConfig("config.yml").getString("Prevent.Pickups");
+		preventItemMovement = ConfigHandler.getConfig("config.yml").getString("Prevent.itemMovement");
+		preventAllowOpBypass = Utils.containsIgnoreCase(ConfigHandler.getConfig("config.yml").getString("Prevent.Bypass"), "OP");
+		preventAllowCreativeBypass = Utils.containsIgnoreCase(ConfigHandler.getConfig("config.yml").getString("Prevent.Bypass"), "CREATIVE");
 	}
 	
-	public static boolean isPreventPickups() {
+	public static String isPreventPickups() {
 		return preventPickups;
 	}
 	
-	public static boolean isPreventInventoryModify() {
-		return preventInventoryModify;
+	public static String isPreventItemMovement() {
+		return preventItemMovement;
 	}
 	
 	public static boolean isPreventAllowOpBypass() {
@@ -261,10 +263,6 @@ public class ConfigHandler {
 	
 	public static boolean isPreventAllowCreativeBypass() {
 		return preventAllowCreativeBypass;
-	}
-	
-	public static String getEnabledPreventWorlds() {
-		return enabledPreventWorlds;
 	}
 	
 	public static ConfigurationSection getConfigurationSection() {

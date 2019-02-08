@@ -17,10 +17,10 @@ import org.bukkit.inventory.PlayerInventory;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
+import me.RockinChaos.itemjoin.handlers.MemoryHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.listeners.InvClickCreative;
-import me.RockinChaos.itemjoin.utils.DataStorage;
 import me.RockinChaos.itemjoin.utils.Language;
 import me.RockinChaos.itemjoin.utils.ProbabilityUtilities;
 import me.RockinChaos.itemjoin.utils.Utils;
@@ -183,37 +183,37 @@ public class ItemUtilities {
 	}
 	
 	public static Boolean inClearingWorld(String world, String stringLoc) {
-		if (ConfigHandler.getConfig("config.yml").getString(stringLoc) != null) {
-			String worldlist = ConfigHandler.getConfig("config.yml").getString(stringLoc).replace(" ", "");
+		if (ConfigHandler.getConfig("config.yml").getString("Clear-Items." + stringLoc) != null) {
+			String worldlist = ConfigHandler.getConfig("config.yml").getString("Clear-Items." + stringLoc).replace(" ", "");
 			String[] compareWorlds = worldlist.split(",");
 			for (String compareWorld: compareWorlds) {
 				if (compareWorld.equalsIgnoreCase(world) || compareWorld.equalsIgnoreCase("all") || compareWorld.equalsIgnoreCase("global")) {
 					return true;
 				}
 			}
-		} else if (ConfigHandler.getConfig("config.yml").getString(stringLoc) == null) {
+		} else if (ConfigHandler.getConfig("config.yml").getString("Clear-Items." + stringLoc) == null) {
 			return true;
 		}
 		return false;
 	}
 	
-	public static void setClearingOfItems(Player player, String world, String clearOn) {
-		if (ConfigHandler.getConfig("config.yml").getString("Clear-Items") != null && ConfigHandler.getConfig("config.yml").getString("Clear-Items").equalsIgnoreCase("All")) {
-			if (ConfigHandler.getConfig("config.yml").getString(clearOn) != null && inClearingWorld(world, clearOn) 
-					|| ConfigHandler.getConfig("config.yml").getString(clearOn) != null && ConfigHandler.getConfig("config.yml").getBoolean(clearOn) == true) {
-				if (ConfigHandler.getConfig("config.yml").getString("AllowOPBypass") != null && ConfigHandler.getConfig("config.yml").getBoolean("AllowOPBypass") == true && player.isOp()) {} else {
+	public static void setClearingOfItems(Player player, String world, String stringLoc) {
+		if (ConfigHandler.getConfig("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("ALL") || ConfigHandler.getConfig("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("GLOBAL")) {
+			if (ConfigHandler.getConfig("config.yml").getString("Clear-Items." + stringLoc) != null && inClearingWorld(world, stringLoc) 
+					|| ConfigHandler.getConfig("config.yml").getString("Clear-Items." + stringLoc) != null && ConfigHandler.getConfig("config.yml").getBoolean("Clear-Items." + stringLoc) == true) {
+				if (Utils.containsIgnoreCase(ConfigHandler.getConfig("config.yml").getString("Clear-Items.Bypass"), "OP") && player.isOp()) {} else {
 					setClearAllItems(player);
 				}
 			}
-		} else if (ConfigHandler.getConfig("config.yml").getString("Clear-Items") != null && ConfigHandler.getConfig("config.yml").getString("Clear-Items").equalsIgnoreCase("ItemJoin")) {
-			if (ConfigHandler.getConfig("config.yml").getString(clearOn) != null && inClearingWorld(world, clearOn) 
-					|| ConfigHandler.getConfig("config.yml").getString(clearOn) != null && ConfigHandler.getConfig("config.yml").getBoolean(clearOn) == true) {
-				if (ConfigHandler.getConfig("config.yml").getString("AllowOPBypass") != null && ConfigHandler.getConfig("config.yml").getBoolean("AllowOPBypass") == true && player.isOp()) {} else {
+		} else if (ConfigHandler.getConfig("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("ITEMJOIN")) {
+			if (ConfigHandler.getConfig("config.yml").getString("Clear-Items." + stringLoc) != null && inClearingWorld(world, stringLoc) 
+					|| ConfigHandler.getConfig("config.yml").getString("Clear-Items." + stringLoc) != null && ConfigHandler.getConfig("config.yml").getBoolean("Clear-Items." + stringLoc) == true) {
+				if (Utils.containsIgnoreCase(ConfigHandler.getConfig("config.yml").getString("Clear-Items.Bypass"), "OP") && player.isOp()) {} else {
 					setClearItemJoinItems(player);
 				}
 			}
-		} else if (ConfigHandler.getConfig("config.yml").getBoolean(clearOn) == true || inClearingWorld(world, clearOn)) {
-			ServerHandler.sendErrorMessage("&c" + ConfigHandler.getConfig("config.yml").getString("Clear-Items") + " for Clear-Items in the config.yml is not a valid option.");
+		} else if (ConfigHandler.getConfig("config.yml").getBoolean("Clear-Items." + stringLoc) == true || inClearingWorld(world, stringLoc)) {
+			ServerHandler.sendErrorMessage("&c" + ConfigHandler.getConfig("config.yml").getString("Clear-Items.Type") + " for Clear-Items in the config.yml is not a valid option.");
 		}
 	}
 	
@@ -228,7 +228,7 @@ public class ItemUtilities {
 	
 	public static void setClearItemJoinItems(Player player) {
 		PlayerInventory inventory = player.getInventory();
-		if (ConfigHandler.getConfig("config.yml").getBoolean("Protect-SpecialItems") == true) {
+		if (Utils.containsIgnoreCase(ConfigHandler.getConfig("config.yml").getString("Clear-Items.Options"), "PROTECT")) {
 			for (ItemMap item: ItemUtilities.getItems()) {
 				if (!item.isOnlyFirstJoin() && !item.isOnlyFirstWorld()) {
 					if (inventory.getHelmet() != null && item.isSimilar(inventory.getHelmet()) && ItemHandler.containsNBTData(inventory.getHelmet())) {
@@ -312,9 +312,9 @@ public class ItemUtilities {
 	public static Boolean isObtainable(Player player, ItemMap itemMap, int session) {
 		if (itemMap.getProbability().equals(-1) || !itemMap.getProbability().equals(-1) && probability.containsKey(itemMap.getConfigName()) && !hasProbabilityItem(player, itemMap)) {
 			if (!itemMap.hasItem(player) || itemMap.isAlwaysGive() || !itemMap.isLimitMode(player.getGameMode())) {
-				boolean firstJoin = DataStorage.getSQLData().hasFirstJoined(player, itemMap);
-				boolean firstWorld = DataStorage.getSQLData().hasFirstWorld(player, itemMap);
-				boolean ipLimited = DataStorage.getSQLData().isIPLimited(player, itemMap);
+				boolean firstJoin = MemoryHandler.getSQLData().hasFirstJoined(player, itemMap);
+				boolean firstWorld = MemoryHandler.getSQLData().hasFirstWorld(player, itemMap);
+				boolean ipLimited = MemoryHandler.getSQLData().isIPLimited(player, itemMap);
 				if (itemMap.isLimitMode(player.getGameMode())) {
 					if (Utils.isInt(itemMap.getSlot()) && Integer.parseInt(itemMap.getSlot()) >= 0 && Integer.parseInt(itemMap.getSlot()) <= 35) {
 						if (!firstJoin && !firstWorld && !ipLimited && canOverwrite(player, itemMap)) {
@@ -491,8 +491,8 @@ public class ItemUtilities {
 	}
 	
 	private static void saveSQLItemData(Player player, ItemMap itemMap) {
-		DataStorage.getSQLData().saveFirstJoinData(player, itemMap);
-		DataStorage.getSQLData().saveFirstWorldData(player, itemMap);
-		DataStorage.getSQLData().saveIpLimitData(player, itemMap);
+		MemoryHandler.getSQLData().saveFirstJoinData(player, itemMap);
+		MemoryHandler.getSQLData().saveFirstWorldData(player, itemMap);
+		MemoryHandler.getSQLData().saveIpLimitData(player, itemMap);
 	}
 }

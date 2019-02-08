@@ -15,7 +15,7 @@ import java.util.Collection;
 
 public class UpdateHandler {
 	
-    private boolean updatesAllowed = ItemJoin.getInstance().getConfig().getBoolean("CheckForUpdates");
+    private boolean updatesAllowed = ConfigHandler.getConfig("config.yml").getBoolean("General.CheckforUpdates");
     private File jarLink;
     private final String AUTOQUERY = "projects/itemjoin/files/latest";
     private final String AUTOHOST = "https://dev.bukkit.org/";

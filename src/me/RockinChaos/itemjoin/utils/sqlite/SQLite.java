@@ -12,6 +12,7 @@ import java.util.logging.Level;
 
 import me.RockinChaos.itemjoin.utils.sqlite.Database;
 import me.RockinChaos.itemjoin.ItemJoin;
+import me.RockinChaos.itemjoin.handlers.MemoryHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 
 public class SQLite extends Database {
@@ -41,7 +42,7 @@ public class SQLite extends Database {
 				databases.put(databaseName, db);
 			} catch (Exception e) {
 				ServerHandler.sendDebugMessage("[SQLITE] Failed to close database connection.");
-				if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+				if (MemoryHandler.isDebugging()) { e.printStackTrace(); }
 			}
 		}
 		return getDatabases().get(databaseName);
@@ -54,7 +55,7 @@ public class SQLite extends Database {
 				dataFolder.delete();
 			} catch (Exception e) {
 				ServerHandler.sendDebugMessage("[SQLITE] Failed to close purge database " + databaseName + ".db");
-				if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); }
+				if (MemoryHandler.isDebugging()) { e.printStackTrace(); }
 			}
 		}
 	}
@@ -77,10 +78,10 @@ public class SQLite extends Database {
 			return connection;
 		} catch (SQLException ex) {
 			ItemJoin.getInstance().getLogger().log(Level.SEVERE, "SQLite exception on initialize", ex);
-			if (ServerHandler.hasDebuggingMode()) { ex.printStackTrace(); }
+			if (MemoryHandler.isDebugging()) { ex.printStackTrace(); }
 		} catch (ClassNotFoundException ex) {
 			ItemJoin.getInstance().getLogger().log(Level.SEVERE, "You need the SQLite JBDC library. Google it. Put it in /lib folder.");
-			if (ServerHandler.hasDebuggingMode()) { ex.printStackTrace(); }
+			if (MemoryHandler.isDebugging()) { ex.printStackTrace(); }
 		}
 		return null;
 	}
@@ -91,7 +92,7 @@ public class SQLite extends Database {
 			Statement s = connection.createStatement();
 			s.executeUpdate(createTable);
 			s.close();
-		} catch (SQLException e) { if (ServerHandler.hasDebuggingMode()) { e.printStackTrace(); } }
+		} catch (SQLException e) { if (MemoryHandler.isDebugging()) { e.printStackTrace(); } }
 		initialize();
 	}
 }

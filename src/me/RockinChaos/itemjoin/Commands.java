@@ -24,10 +24,10 @@ import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
+import me.RockinChaos.itemjoin.handlers.MemoryHandler;
 import me.RockinChaos.itemjoin.handlers.PermissionsHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
-import me.RockinChaos.itemjoin.utils.DataStorage;
 import me.RockinChaos.itemjoin.utils.Language;
 import me.RockinChaos.itemjoin.utils.Utils;
 import me.RockinChaos.itemjoin.utils.sqlite.SQLite;
@@ -152,11 +152,11 @@ public class Commands implements CommandExecutor {
 			return true;
 		} else if (args[0].equalsIgnoreCase("reload") || args[0].equalsIgnoreCase("rl")) {
 			if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.reload")) {
-				DataStorage.getSQLData().executeLaterStatements();
+				MemoryHandler.getSQLData().executeLaterStatements();
 				ItemUtilities.closeAllAnimations();
 				ItemUtilities.clearItems();
 		  		ConfigHandler.loadConfigs();
-		  		DataStorage.generateData();
+		  		MemoryHandler.generateData();
 		  		ItemUtilities.updateItems();
 				Language.sendLangMessage("Commands.Default.configReload", sender);
 			} else { Language.sendLangMessage("Commands.Default.noPermission", sender); }
@@ -214,17 +214,17 @@ public class Commands implements CommandExecutor {
 					String[] placeHolders = Language.newString(); placeHolders[1] = args[2];
 					Language.sendLangMessage("Commands.Default.targetNotFound", sender, placeHolders); 
 				} else if (cmdConfirm.get(2 + sender.getName()) != null && cmdConfirm.get(2 + sender.getName()).equals(true) && args[1].equalsIgnoreCase("ip-limits")) {
-					DataStorage.getSQLData().purgeDatabaseData("ip_limits", player);
+					MemoryHandler.getSQLData().purgeDatabaseData("ip_limits", player);
 					String[] placeHolders = Language.newString(); placeHolders[1] = args[2]; placeHolders[10] = "ip-limits"; placeHolders[9] = "/ij purge ip-limits <player>";
 					Language.sendLangMessage("Commands.Database.purgeSuccess", sender, placeHolders);
 					cmdConfirm.remove(2 + sender.getName());
 				} else if (cmdConfirm.get(3 + sender.getName()) != null && cmdConfirm.get(3 + sender.getName()).equals(true) && args[1].equalsIgnoreCase("first-join")) {
-					DataStorage.getSQLData().purgeDatabaseData("first_join", player);
+					MemoryHandler.getSQLData().purgeDatabaseData("first_join", player);
 					String[] placeHolders = Language.newString(); placeHolders[1] = args[2]; placeHolders[10] = "first-join"; placeHolders[9] = "/ij purge first-join <player>";
 					Language.sendLangMessage("Commands.Database.purgeSuccess", sender, placeHolders);
 					cmdConfirm.remove(3 + sender.getName());
 				} else if (cmdConfirm.get(3 + sender.getName()) != null && cmdConfirm.get(3 + sender.getName()).equals(true) && args[1].equalsIgnoreCase("first-world")) {
-					DataStorage.getSQLData().purgeDatabaseData("first_world", player);
+					MemoryHandler.getSQLData().purgeDatabaseData("first_world", player);
 					String[] placeHolders = Language.newString(); placeHolders[1] = args[2]; placeHolders[10] = "first-world"; placeHolders[9] = "/ij purge first-world <player>";
 					Language.sendLangMessage("Commands.Database.purgeSuccess", sender, placeHolders);
 					cmdConfirm.remove(3 + sender.getName());
@@ -284,11 +284,11 @@ public class Commands implements CommandExecutor {
 				String[] placeHolders = Language.newString(); placeHolders[1] = args[1];
 				Language.sendLangMessage("Commands.Default.targetNotFound", sender, placeHolders); 
 			} else if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.enable.others")) {
-				if (DataStorage.getSQLData().isWritable("Global", PlayerHandler.getPlayerID(argsPlayer))) {
+				if (MemoryHandler.getSQLData().isWritable("Global", PlayerHandler.getPlayerID(argsPlayer))) {
 					String[] placeHolders = Language.newString(); placeHolders[1] = args[1];
 					Language.sendLangMessage("Commands.Enabled.forPlayer", sender, placeHolders);
 				} else {
-					DataStorage.getSQLData().saveToDatabase(argsPlayer, "Global", "true", "enabled-players");
+					MemoryHandler.getSQLData().saveToDatabase(argsPlayer, "Global", "true", "enabled-players");
 					String[] placeHolders = Language.newString(); placeHolders[1] = argsPlayer.getName();
 					Language.sendLangMessage("Commands.Enabled.forPlayer", sender, placeHolders);
 					if (!sender.getName().equalsIgnoreCase(argsPlayer.getName())) {
@@ -305,11 +305,11 @@ public class Commands implements CommandExecutor {
 				String[] placeHolders = Language.newString(); placeHolders[1] = args[1];
 				Language.sendLangMessage("Commands.Default.targetNotFound", sender, placeHolders); 
 			} else if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.enable.others")) {
-				if (DataStorage.getSQLData().isWritable(world, PlayerHandler.getPlayerID(argsPlayer))) { 
+				if (MemoryHandler.getSQLData().isWritable(world, PlayerHandler.getPlayerID(argsPlayer))) { 
 					String[] placeHolders = Language.newString(); placeHolders[1] = args[1]; placeHolders[0] = world;
 					Language.sendLangMessage("Commands.Enabled.forPlayerWorldFailed", sender, placeHolders); 
 				} else {
-					DataStorage.getSQLData().saveToDatabase(argsPlayer, world, "true", "enabled-players");
+					MemoryHandler.getSQLData().saveToDatabase(argsPlayer, world, "true", "enabled-players");
 					String[] placeHolders = Language.newString(); placeHolders[1] = args[1]; placeHolders[0] = world;
 					Language.sendLangMessage("Commands.Enabled.forPlayerWorld", sender, placeHolders); 
 					if (!sender.getName().equalsIgnoreCase(argsPlayer.getName())) {
@@ -321,8 +321,8 @@ public class Commands implements CommandExecutor {
 			return true;
 		} else if (args[0].equalsIgnoreCase("enable")) {
 			if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.enable")) {
-				if (!DataStorage.getSQLData().isWritable("Global", "ALL")) {
-					DataStorage.getSQLData().saveToDatabase(null, "Global", "true", "enabled-players");
+				if (!MemoryHandler.getSQLData().isWritable("Global", "ALL")) {
+					MemoryHandler.getSQLData().saveToDatabase(null, "Global", "true", "enabled-players");
 					Language.sendLangMessage("Commands.Enabled.globalPlayers", sender);
 				} else { Language.sendLangMessage("Commands.Enabled.globalPlayersFailed", sender);  }
 			} else { Language.sendLangMessage("Commands.Default.noPermission", sender); }
@@ -333,11 +333,11 @@ public class Commands implements CommandExecutor {
 				String[] placeHolders = Language.newString(); placeHolders[1] = args[1];
 				Language.sendLangMessage("Commands.Default.targetNotFound", sender, placeHolders); 
 			} else if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.disable.others")) {
-				if (!DataStorage.getSQLData().isWritable("Global", PlayerHandler.getPlayerID(argsPlayer))) { 
+				if (!MemoryHandler.getSQLData().isWritable("Global", PlayerHandler.getPlayerID(argsPlayer))) { 
 					String[] placeHolders = Language.newString(); placeHolders[1] = args[1];
 					Language.sendLangMessage("Commands.Disabled.forPlayerFailed", sender, placeHolders); 
 				} else {
-					DataStorage.getSQLData().saveToDatabase(argsPlayer, "Global", "false", "disabled-players");
+					MemoryHandler.getSQLData().saveToDatabase(argsPlayer, "Global", "false", "disabled-players");
 					String[] placeHolders = Language.newString(); placeHolders[1] = args[1];
 					Language.sendLangMessage("Commands.Disabled.forPlayer", sender, placeHolders); 
 					if (!sender.getName().equalsIgnoreCase(argsPlayer.getName())) {
@@ -354,7 +354,7 @@ public class Commands implements CommandExecutor {
 				String[] placeHolders = Language.newString(); placeHolders[1] = args[1];
 				Language.sendLangMessage("Commands.Default.targetNotFound", sender, placeHolders); 
 			} else if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.disable.others")) {
-				if (!DataStorage.getSQLData().isWritable(world, PlayerHandler.getPlayerID(argsPlayer))) {
+				if (!MemoryHandler.getSQLData().isWritable(world, PlayerHandler.getPlayerID(argsPlayer))) {
 					String[] placeHolders = Language.newString(); placeHolders[1] = args[1]; placeHolders[0] = world;
 					Language.sendLangMessage("Commands.Disabled.forPlayerWorldFailed", sender, placeHolders); 
 				} else {
@@ -369,8 +369,8 @@ public class Commands implements CommandExecutor {
 			return true;
 		} else if (args[0].equalsIgnoreCase("disable")) {
 			if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.disable")) {
-				if (DataStorage.getSQLData().isWritable("Global", "ALL")) {
-					DataStorage.getSQLData().saveToDatabase(null, "Global", "false", "disabled-players");
+				if (MemoryHandler.getSQLData().isWritable("Global", "ALL")) {
+					MemoryHandler.getSQLData().saveToDatabase(null, "Global", "false", "disabled-players");
 					Language.sendLangMessage("Commands.Disabled.globalPlayers", sender); 
 				} else {Language.sendLangMessage("Commands.Disabled.globalPlayersFailed", sender);  }
 			} else { Language.sendLangMessage("Commands.Default.noPermission", sender); }
@@ -852,13 +852,13 @@ public class Commands implements CommandExecutor {
 		} else if (args[0].equalsIgnoreCase("updates") || args[0].equalsIgnoreCase("update")) {
 			if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.updates")) {
 				Language.sendLangMessage("Commands.Updates.checking", sender);
-				DataStorage.getUpdater().checkUpdates(sender);
+				MemoryHandler.getUpdater().checkUpdates(sender);
 			} else { Language.sendLangMessage("Commands.Default.noPermission", sender); }
 			return true;
 		} else if (args[0].equalsIgnoreCase("AutoUpdate")) {
 			if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.autoupdate")) {
 				Language.sendLangMessage("Commands.Updates.forcing", sender);
-				DataStorage.getUpdater().forceUpdates(sender);
+				MemoryHandler.getUpdater().forceUpdates(sender);
 			} else { Language.sendLangMessage("Commands.Default.noPermission", sender); }
 			return true;
 		} else {

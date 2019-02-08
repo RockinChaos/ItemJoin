@@ -16,9 +16,7 @@ import de.domedd.betternick.BetterNick;
 import de.domedd.betternick.api.nickedplayer.NickedPlayer;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.utils.VaultAPI;
-import me.RockinChaos.itemjoin.utils.DataStorage;
 import me.RockinChaos.itemjoin.utils.Legacy;
-import me.RockinChaos.itemjoin.utils.Utils;
 import net.milkbowl.vault.economy.EconomyResponse;
 
 public class PlayerHandler {
@@ -52,10 +50,8 @@ public class PlayerHandler {
 	}
 	
 	public static void setHeldItemSlot(Player player) {
-		if (ConfigHandler.getConfig("config.yml").getString("HeldItem-Slot") != null 
-				&& Utils.isInt(ConfigHandler.getConfig("config.yml").getString("HeldItem-Slot")) 
-				&& ConfigHandler.getConfig("config.yml").getInt("HeldItem-Slot") <= 8 && ConfigHandler.getConfig("config.yml").getInt("HeldItem-Slot") >= 0) {
-			player.getInventory().setHeldItemSlot(ConfigHandler.getConfig("config.yml").getInt("HeldItem-Slot"));
+		if (MemoryHandler.getHeldItemSlot() != -1 && MemoryHandler.getHeldItemSlot() <= 8 && MemoryHandler.getHeldItemSlot() >= 0) {
+			player.getInventory().setHeldItemSlot(MemoryHandler.getHeldItemSlot());
 		}
 	}
 	
@@ -154,7 +150,7 @@ public class PlayerHandler {
 	public static Player getPlayerString(String playerName) {
 		Player args = null;
 		try { args = Bukkit.getPlayer(UUID.fromString(playerName)); } catch (Exception e) {}
-		if (playerName != null && DataStorage.hasBetterNick()) {
+		if (playerName != null && MemoryHandler.isBetterNick()) {
 			NickedPlayer np = new NickedPlayer(Legacy.getLegacyPlayer(playerName));
 			if (np.isNicked()) {
 			return Legacy.getLegacyPlayer(np.getRealName());
@@ -168,7 +164,7 @@ public class PlayerHandler {
 	public static String getPlayerID(Player player) {
 		if (player != null && player.getUniqueId() != null) {
 			return player.getUniqueId().toString();
-		} else if (player != null && DataStorage.hasBetterNick()) {
+		} else if (player != null && MemoryHandler.isBetterNick()) {
 			NickedPlayer np = new NickedPlayer(player);
 			if (np.isNicked()) {
 			return np.getRealName();
@@ -184,7 +180,7 @@ public class PlayerHandler {
 	public static String getOfflinePlayerID(OfflinePlayer player) {
 		if (player != null && player.getUniqueId() != null) {
 			return player.getUniqueId().toString();
-		} else if (player != null && DataStorage.hasBetterNick()) {
+		} else if (player != null && MemoryHandler.isBetterNick()) {
 			NickedPlayer np = new NickedPlayer((BetterNick) player);
 			if (np.isNicked()) {
 			return np.getRealName();

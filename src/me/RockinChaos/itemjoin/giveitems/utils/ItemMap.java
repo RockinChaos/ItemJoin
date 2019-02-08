@@ -45,10 +45,10 @@ import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.giveitems.listeners.RegionEnter;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
+import me.RockinChaos.itemjoin.handlers.MemoryHandler;
 import me.RockinChaos.itemjoin.handlers.PermissionsHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
-import me.RockinChaos.itemjoin.utils.DataStorage;
 import me.RockinChaos.itemjoin.utils.Language;
 import me.RockinChaos.itemjoin.utils.Legacy;
 import me.RockinChaos.itemjoin.utils.Reflection;
@@ -224,8 +224,8 @@ public class ItemMap {
 		this.setWorlds();
 		this.setRegions();
         this.setPerm(this.nodeLocation.getString(".permission-node"));
-        this.setPermissionNeeded(ConfigHandler.getConfig("config.yml").getBoolean("Items-Permissions"));
-    	this.setOPPermissionNeeded(ConfigHandler.getConfig("config.yml").getBoolean("OPItems-Permissions"));
+        this.setPermissionNeeded(ConfigHandler.getConfig("config.yml").getBoolean("Permissions.Obtain-Items"));
+    	this.setOPPermissionNeeded(ConfigHandler.getConfig("config.yml").getBoolean("Permissions.Obtain-Items.OP"));
 	}
 //  ========================================================================================================= //
 	
@@ -916,7 +916,7 @@ public class ItemMap {
 	}
 	
 	public String getLegacySecret() {
-		if (!DataStorage.hasNewNBTSystem()) {
+		if (!MemoryHandler.isDataTags()) {
 			return this.legacySecret;
 		} else { return ""; }
 	}
@@ -1140,7 +1140,7 @@ public class ItemMap {
      
 	public boolean isSimilar(ItemStack item) {
 		if (item != null && item.getType() != Material.AIR && item.getType() == this.material || this.materialAnimated && item != null && item.getType() != Material.AIR && this.isMaterial(item)) {
-			if (ConfigHandler.getConfig("config.yml").getBoolean("NewNBT-System") == true && ServerHandler.hasSpecificUpdate("1_8") 
+			if (MemoryHandler.isDataTags() && ServerHandler.hasSpecificUpdate("1_8") 
 					&& ItemHandler.getNBTData(item) != null && ItemHandler.getNBTData(item).contains(this.newNBTData) || this.legacySecret != null && item.hasItemMeta() 
 					&& item.getItemMeta().hasDisplayName() && item.getItemMeta().getDisplayName().contains(this.legacySecret) || this.vanillaItem && this.vanillaStatus) {
 				if (!this.isSkull() && skullOwner == null || this.isSkull() && !this.skullAnimated && ((SkullMeta) item.getItemMeta()).hasOwner() 
@@ -1177,7 +1177,7 @@ public class ItemMap {
 		if (item.getItemMeta().hasEnchants() && this.enchants != null && !this.enchants.isEmpty()) { 
 			ItemStack checkItem = new ItemStack(item.getType());
 			for (Entry<String, Integer> enchantments : this.enchants.entrySet()) {
-				if (enchantments.getKey() == null && DataStorage.hasTokenEnchant() == true && TokenEnchantAPI.getInstance().getEnchant(enchantments.getKey()) != null) {
+				if (enchantments.getKey() == null && MemoryHandler.isTokenEnchant() == true && TokenEnchantAPI.getInstance().getEnchant(enchantments.getKey()) != null) {
 					TokenEnchantAPI.getInstance().enchant(null, checkItem, enchantments.getKey(), enchantments.getValue(), true, 0, true);
 				} else { 
 					checkItem.addUnsafeEnchantment(ItemHandler.getEnchantByName(enchantments.getKey()), enchantments.getValue()); }
@@ -1305,7 +1305,7 @@ public class ItemMap {
 	private void setEnchantments(Player player) {
 		if (this.enchants != null && !this.enchants.isEmpty()) {
 			for (Entry<String, Integer> enchantments : this.enchants.entrySet()) {
-				if (enchantments.getKey() == null && DataStorage.hasTokenEnchant() == true && TokenEnchantAPI.getInstance().getEnchant(enchantments.getKey()) != null) {
+				if (enchantments.getKey() == null && MemoryHandler.isTokenEnchant() == true && TokenEnchantAPI.getInstance().getEnchant(enchantments.getKey()) != null) {
 					TokenEnchantAPI.getInstance().enchant(player, tempItem, enchantments.getKey(), enchantments.getValue(), true, 0, true);
 				} else { this.tempItem.addUnsafeEnchantment(ItemHandler.getEnchantByName(enchantments.getKey()), enchantments.getValue()); }
 			}
@@ -1356,7 +1356,7 @@ public class ItemMap {
 	}
 	
 	private void setNBTData() {
-		if (DataStorage.hasNewNBTSystem() && !this.isVanilla()) {
+		if (MemoryHandler.isDataTags() && !this.isVanilla()) {
 			try {
 				Object nms = Reflection.getOBC("inventory.CraftItemStack").getMethod("asNMSCopy", ItemStack.class).invoke(null, this.tempItem);
 				Object cacheTag = Reflection.getNMS("ItemStack").getMethod("getTag").invoke(nms);

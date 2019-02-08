@@ -27,16 +27,13 @@ public class InvClickSurvival implements Listener {
 	
 	@EventHandler
 	public void onGlobalInventoryModify(InventoryClickEvent event) {
-		  Player player = (Player) event.getWhoClicked();
-		  if (ConfigHandler.isPreventInventoryModify()) {
-		  	String worlds = ConfigHandler.getEnabledPreventWorlds();
-		  	if (worlds == null || worlds.isEmpty() || Utils.containsIgnoreCase(worlds, "ALL") || Utils.containsIgnoreCase(worlds, "GLOBAL") || Utils.containsIgnoreCase(worlds, player.getWorld().getName())) {
-	  			if (ConfigHandler.isPreventAllowOpBypass() && player.isOp() 
-	  					|| ConfigHandler.isPreventAllowCreativeBypass() && PlayerHandler.isCreativeMode(player)) {} else {
-		  			event.setCancelled(true);
-		  		}
-		  	}
-		  }
+		Player player = (Player) event.getWhoClicked();
+		  
+	  	if (Utils.containsIgnoreCase(ConfigHandler.isPreventItemMovement(), "true") || Utils.containsIgnoreCase(ConfigHandler.isPreventItemMovement(), player.getWorld().getName())
+		  			|| Utils.containsIgnoreCase(ConfigHandler.isPreventItemMovement(), "ALL") || Utils.containsIgnoreCase(ConfigHandler.isPreventItemMovement(), "GLOBAL")) {
+	  		if (ConfigHandler.isPreventAllowOpBypass() && player.isOp() || ConfigHandler.isPreventAllowCreativeBypass() && PlayerHandler.isCreativeMode(player)) { } 
+	  		else { event.setCancelled(true); }
+	  	}
 	}
 
 	@EventHandler

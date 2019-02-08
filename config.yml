@@ -1,61 +1,67 @@
-#// <>==<>==<> ItemJoin's Settings, by RockinChaos  <>==<>==<> //#
-#// See the Documentations page for a more in-depth tutorial; https://www.spigotmc.org/wiki/itemjoin/ //#
-#// For per-world support this best works with Multiverse-Inventories! http://dev.bukkit.org/bukkit-plugins/multiverse-inventories //#
-config-Version: 6
+# --{ =-=-=-=-=-=-=-=-=-= ItemJoin's Configuration Settings, by RockinChaos =-=-=-=-=-=-=-=-=-= }--
+# See the tutorial page for a more in-depth explaination; https://www.spigotmc.org/wiki/itemjoin/
+config-Version: 7
 
- #// English is currently the only support language at the moment! //#
+# English is currently the only support language at the moment!
 Language: 'English'
-CheckForUpdates: true
-Log-Coloration: true
-Log-Commands: true
-Items-Permissions: true
-OPItems-Permissions: false
-OPCommands-Permissions: false
-GetItem-Permissions: false
-Debugging-Mode: false
 
+# These are typically general maintenance settings that do not affect functionality.
+General:
+  CheckforUpdates: true
+  Log-Coloration: true
+  Log-Commands: true
+  Debugging: false
 
-#// Global Settings for ItemJoin. //#
-Prevent-InventoryModify: false
-Prevent-Pickups: false
-enabled-prevent-worlds: ALL
-HeldItem-Slot: None
-NewNBT-System: true
-#// If you change NewNBT-System from true/false, it is recommended to clear all old ItemJoin items. //#
+# These settings will take effect globally throughout the plugins system.
+Settings:
+  HeldItem-Slot: DISABLED
+  DataTags: true
 
-#// Global Clear Items for ItemJoin. //#
-#// Set Clear-Items to ItemJoin or to All, ItemJoin clears only the ItemJoin items and All will clear all items. //#
-#// If you want one of these functions to only clear specific worlds, replace false with the world names separated by commas.  //#
-Clear-Items: ItemJoin
-Clear-On-Join: false
-Clear-On-WorldChanged: false
-Protect-SpecialItems: true
-AllowOPBypass: false
-CreativeBypass: false
+# These permissions if enabled, determine whether the permission(s) is/are applied to certain players.
+Permissions:
+  Obtain-Items: false
+  Obtain-Items-OP: false
+  Commands-Get: false
+  Commands-OP: false
+  Movement-Bypass: false
 
+# If enabled this will clear items from their inventory upon performing the specified action for the specified type.
+# The available types(s) are ALL for all items or ITEMJOIN for only the ItemJoin items.
+Clear-Items:
+  Type: ITEMJOIN
+  Delay-Tick: 2
+  Join: DISABLED
+  World-Switch: DISABLED
+  Options: PROTECT
+  Bypass: OP
 
-#// Global Commands for ItemJoin on join, these commands are executed by console. //#
-enabled-global-commands: false
-enabled-worlds: world, world_nether
-global-commands:
-  - 'itemjoin get <item> <player>'
-  - 'first-join: say This is a command only executed once per world, per player.'
-  
-  
-#// Itemflag Bypass Permissions //#
-InventoryBypass-Permission: false
+# This is the command(s) executed upon the player performing the defined trigger(s), for the specified world(s).
+Active-Commands:
+  commands:
+    - 'itemjoin get <item> <player>'
+    - 'first-join: say This is a command only executed once per world, per player.'
+  trigger: JOIN
+  enabled-worlds: DISABLED
 
-#// These are optional dependencies, only change these if you are looking to use them in conjunction with ItemJoin, changing the values will require a server restart. //#
-Vault: false
-PlaceholderAPI: false
-Multiverse-Core: false
-Multiverse-Inventories: false
-PerWorldInventory: false
-PerWorldPlugins: false
-xInventories: false
-TokenEnchant: false
-HeadDatabase: false
-WorldGuard: false
-BetterNick: false
-MyWorlds: false
-AuthMe: false
+# This determines if the action is allowed for all items in the specified worlds.
+# To disable an action, simply set the action to true for all worlds or list each world separated by a comma.
+Prevent:
+  Pickups: DISABLED
+  itemMovement: DISABLED
+  Bypass: CREATIVE, OP
+
+# These are optional dependencies, only enable these if you want to use them.
+softDepend:
+  AuthMe: false
+  BetterNick: false
+  HeadDatabase: false
+  Multiverse-Core: false
+  Multiverse-Inventories: false
+  MyWorlds: false
+  PerWorldInventory: false
+  PerWorldPlugins: false
+  PlaceholderAPI: false
+  TokenEnchant: false
+  Vault: false
+  WorldGuard: false
+  xInventories: false
