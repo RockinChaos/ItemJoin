@@ -66,6 +66,16 @@ public class PlayerHandler {
 		return null;
 	}
 	
+	public static void setHandItem(Player player, ItemStack item) {
+		if (ServerHandler.hasCombatUpdate() && player.getInventory().getItemInMainHand().getType() != null && player.getInventory().getItemInMainHand().getType() != Material.AIR) {
+			player.getInventory().setItemInMainHand(item);
+		} else if (ServerHandler.hasCombatUpdate() && player.getInventory().getItemInOffHand().getType() != null && player.getInventory().getItemInOffHand().getType() != Material.AIR) {
+			player.getInventory().setItemInOffHand(item);
+		} else if (!ServerHandler.hasCombatUpdate()) {
+			Legacy.setLegacyInHandItem(player, item);
+		}
+	}
+	
 	public static ItemStack getPerfectHandItem(Player player, String type) {
 		if (ServerHandler.hasCombatUpdate() && type != null && type.equalsIgnoreCase("HAND")) {
 			return player.getInventory().getItemInMainHand();

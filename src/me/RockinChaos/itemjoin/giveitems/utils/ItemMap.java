@@ -1546,13 +1546,13 @@ public class ItemMap {
 		}
 	}
 	
-    public boolean executeCommands(Player player, String action) {
+    public boolean executeCommands(Player player, ItemStack eventItem, String action) {
 		boolean playerSuccess = false;
     	if (this.commands != null && this.commands.length > 0 && !this.onCooldown(player) && this.isPlayerChargeable(player)) {
     		if (isExecuted(player, action)) {
     			this.withdrawBalance(player, this.cost);
 				this.playSound(player);
-				this.removeDisposable(player, this.disposable);
+				this.removeDisposable(player, eventItem, this.disposable);
 				this.addPlayerOnCooldown(player);
     		}
     	}
@@ -1609,15 +1609,15 @@ public class ItemMap {
 		}
 	}
 	
-	private void removeDisposable(final Player player, final boolean isDisposable) {
-		final ItemStack item = PlayerHandler.getHandItem(player);
+	private void removeDisposable(final Player player, final ItemStack eventItem, final boolean isDisposable) {
 		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), (Runnable) new Runnable() {
 			public void run() {
 				if (isDisposable) {
-					item.setAmount(item.getAmount() - 1);
+					ItemStack item = new ItemStack(eventItem);
+					if (item.getAmount() > 1 && item.getAmount() != 1) { item.setAmount(item.getAmount() - 1); } 
+					else { item = new ItemStack(Material.AIR); }
 				    if (player.getItemOnCursor() != null && player.getItemOnCursor().getType() != Material.AIR) { player.setItemOnCursor(item); } 
-					if (PlayerHandler.getMainHandItem(player) != null && PlayerHandler.getMainHandItem(player).getType() != Material.AIR && item.isSimilar(PlayerHandler.getMainHandItem(player))) { PlayerHandler.setMainHandItem(player, item); }
-					else if (PlayerHandler.getOffHandItem(player) != null && PlayerHandler.getOffHandItem(player).getType() != Material.AIR && item.isSimilar(PlayerHandler.getOffHandItem(player))) { PlayerHandler.setOffHandItem(player, item); } 
+				    else if (PlayerHandler.getHandItem(player) != null && PlayerHandler.getHandItem(player).getType() != Material.AIR) { PlayerHandler.setHandItem(player, item); }
 				}
 			}
 		}, 1L);

@@ -87,7 +87,7 @@ public class Interact implements Listener {
 	private boolean setupCommands(Player player, ItemStack item, String action) {
 		  ItemMap itemMap = ItemUtilities.getMappedItem(item, player.getWorld());
 			if (itemMap != null && itemMap.inWorld(player.getWorld()) && itemMap.hasPermission(player)) {
-				return itemMap.executeCommands(player, action);
+				return itemMap.executeCommands(player, item, action);
 			}
 		return false;
 	}

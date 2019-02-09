@@ -12,7 +12,6 @@ import java.util.logging.Level;
 
 import me.RockinChaos.itemjoin.utils.sqlite.Database;
 import me.RockinChaos.itemjoin.ItemJoin;
-import me.RockinChaos.itemjoin.handlers.MemoryHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 
 public class SQLite extends Database {
@@ -42,7 +41,7 @@ public class SQLite extends Database {
 				databases.put(databaseName, db);
 			} catch (Exception e) {
 				ServerHandler.sendDebugMessage("[SQLITE] Failed to close database connection.");
-				if (MemoryHandler.isDebugging()) { e.printStackTrace(); }
+				ServerHandler.sendDebugTrace(e);
 			}
 		}
 		return getDatabases().get(databaseName);
@@ -55,7 +54,7 @@ public class SQLite extends Database {
 				dataFolder.delete();
 			} catch (Exception e) {
 				ServerHandler.sendDebugMessage("[SQLITE] Failed to close purge database " + databaseName + ".db");
-				if (MemoryHandler.isDebugging()) { e.printStackTrace(); }
+				ServerHandler.sendDebugTrace(e);
 			}
 		}
 	}
@@ -76,12 +75,12 @@ public class SQLite extends Database {
 			Class.forName("org.sqlite.JDBC");
 			connection = DriverManager.getConnection("jdbc:sqlite:" + dataFolder);
 			return connection;
-		} catch (SQLException ex) {
-			ItemJoin.getInstance().getLogger().log(Level.SEVERE, "SQLite exception on initialize", ex);
-			if (MemoryHandler.isDebugging()) { ex.printStackTrace(); }
-		} catch (ClassNotFoundException ex) {
+		} catch (SQLException e) {
+			ItemJoin.getInstance().getLogger().log(Level.SEVERE, "SQLite exception on initialize", e);
+			ServerHandler.sendDebugTrace(e);
+		} catch (ClassNotFoundException e) {
 			ItemJoin.getInstance().getLogger().log(Level.SEVERE, "You need the SQLite JBDC library. Google it. Put it in /lib folder.");
-			if (MemoryHandler.isDebugging()) { ex.printStackTrace(); }
+			ServerHandler.sendDebugTrace(e);
 		}
 		return null;
 	}
@@ -92,7 +91,7 @@ public class SQLite extends Database {
 			Statement s = connection.createStatement();
 			s.executeUpdate(createTable);
 			s.close();
-		} catch (SQLException e) { if (MemoryHandler.isDebugging()) { e.printStackTrace(); } }
+		} catch (SQLException e) { ServerHandler.sendDebugTrace(e); }
 		initialize();
 	}
 }
