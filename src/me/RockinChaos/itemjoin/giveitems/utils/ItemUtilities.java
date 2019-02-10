@@ -20,7 +20,6 @@ import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.MemoryHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
-import me.RockinChaos.itemjoin.listeners.InvClickCreative;
 import me.RockinChaos.itemjoin.utils.Language;
 import me.RockinChaos.itemjoin.utils.ProbabilityUtilities;
 import me.RockinChaos.itemjoin.utils.Utils;
@@ -118,14 +117,12 @@ public class ItemUtilities {
 					for (Object objPlayer: playersOnlineNew) {
 						Player player = ((Player) objPlayer);
 						updateItems(player, true);
-						InvClickCreative.isCreative(player, player.getGameMode());
 					}
 				}
 			} else {
 				playersOnlineOld = ((Player[]) Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).invoke(null, new Object[0]));
 				for (Player player: playersOnlineOld) {
 					updateItems(player, true);
-					InvClickCreative.isCreative(player, player.getGameMode());
 				}
 			}
 		} catch (Exception e) {
@@ -134,7 +131,6 @@ public class ItemUtilities {
 	}
 	
 	public static void safeSet(final Player player, final String type) {
-		InvClickCreative.isCreative(player, player.getGameMode());
 		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
 			public void run() {
 				if (type.equalsIgnoreCase("JOIN")) {

@@ -43,8 +43,6 @@ public class Drops implements Listener {
 					}, 1L);
 				} else { event.setCancelled(true); } }
 			}
-		} else if (!ServerHandler.hasCombatUpdate() && PlayerHandler.isCreativeMode(player) && InvClickSurvival.dropClick.get(PlayerHandler.getPlayerID(player)) != null && InvClickSurvival.dropClick.get(PlayerHandler.getPlayerID(player)) == true && !ItemUtilities.isAllowed(player, item, "self-drops")) {
-			InvClickCreative.dropGlitch.put(PlayerHandler.getPlayerID(player), true);
 		}
 	}
 

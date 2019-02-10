@@ -39,7 +39,6 @@ public class InvClickSurvival implements Listener {
 	@EventHandler
 	public void onSurvivalInventoryModify(InventoryClickEvent event) {
 		Player player = (Player) event.getWhoClicked();
-		if (!PlayerHandler.isCreativeMode(player)) {
 			ItemStack item = null;
 			if (!ServerHandler.hasSpecificUpdate("1_8")) {
 				PlayerHandler.updateInventory(player);
@@ -56,10 +55,10 @@ public class InvClickSurvival implements Listener {
 			}
 			if (!ItemUtilities.isAllowed(player, item, "inventory-modify")) {
 				event.setCancelled(true);
-				if (!ItemUtilities.isAllowed(player, item, "inventory-close")) { player.closeInventory(); }
+				if (PlayerHandler.isCreativeMode(player)) { player.closeInventory(); }
+				else if (!ItemUtilities.isAllowed(player, item, "inventory-close")) { player.closeInventory(); }
 				PlayerHandler.updateInventory(player);
 			}
-		}
 	}
 	
     @EventHandler()

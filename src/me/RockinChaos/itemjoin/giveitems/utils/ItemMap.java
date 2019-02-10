@@ -138,6 +138,7 @@ public class ItemMap {
 	private Sound commandSound;
 	private Integer cost = 0;
 	private boolean useCooldown = false;
+	private boolean subjectRemoval = false;
 	private CommandSequence sequence = CommandSequence.SEQUENTIAL;
 	private CommandType type = CommandType.INTERACT;
 	private Map < String, Long > playersOnCooldown = new HashMap < String, Long > ();
@@ -719,6 +720,10 @@ public class ItemMap {
 		this.itemValue = val;
 	}
 	
+	private void setSubjectRemoval(boolean bool) {
+		this.subjectRemoval = bool;
+	}
+	
     public void setCommands(ItemCommand[] commands) {
         this.commands = commands;
     }
@@ -1108,6 +1113,10 @@ public class ItemMap {
 	
 	public boolean isOpBypass() {
 		return this.AllowOpBypass;
+	}
+	
+	private boolean isSubjectRemoval() {
+		return this.subjectRemoval;
 	}
 	
 	public boolean isAllowedItem(Player player, ItemStack item, String findFlag) {
@@ -1546,13 +1555,13 @@ public class ItemMap {
 		}
 	}
 	
-    public boolean executeCommands(Player player, ItemStack eventItem, String action) {
+    public boolean executeCommands(Player player, final ItemStack itemCopy, String action) {
 		boolean playerSuccess = false;
     	if (this.commands != null && this.commands.length > 0 && !this.onCooldown(player) && this.isPlayerChargeable(player)) {
     		if (isExecuted(player, action)) {
     			this.withdrawBalance(player, this.cost);
 				this.playSound(player);
-				this.removeDisposable(player, eventItem, this.disposable);
+				this.removeDisposable(player, itemCopy);
 				this.addPlayerOnCooldown(player);
     		}
     	}
@@ -1562,10 +1571,12 @@ public class ItemMap {
     private boolean isExecuted(final Player player, final String action) {
     	boolean playerSuccess = false;
     	ItemCommand[] itemCommands = this.commands;
-		for (int i = 0; i < itemCommands.length; i++) { 
-			if (!playerSuccess) { playerSuccess = itemCommands[i].execute(player, action); }
-			else { itemCommands[i].execute(player, action); }
-		}
+    	if (!this.subjectRemoval) {
+    		for (int i = 0; i < itemCommands.length; i++) { 
+				if (!playerSuccess) { playerSuccess = itemCommands[i].execute(player, action); }
+				else { itemCommands[i].execute(player, action); }
+			}
+    	}
     	return playerSuccess;
     }
     
@@ -1609,18 +1620,41 @@ public class ItemMap {
 		}
 	}
 	
-	private void removeDisposable(final Player player, final ItemStack eventItem, final boolean isDisposable) {
-		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), (Runnable) new Runnable() {
-			public void run() {
-				if (isDisposable) {
-					ItemStack item = new ItemStack(eventItem);
-					if (item.getAmount() > 1 && item.getAmount() != 1) { item.setAmount(item.getAmount() - 1); } 
-					else { item = new ItemStack(Material.AIR); }
-				    if (player.getItemOnCursor() != null && player.getItemOnCursor().getType() != Material.AIR) { player.setItemOnCursor(item); } 
-				    else if (PlayerHandler.getHandItem(player) != null && PlayerHandler.getHandItem(player).getType() != Material.AIR) { PlayerHandler.setHandItem(player, item); }
+	private void removeDisposable(final Player player, final ItemStack itemCopy) {
+		if (this.disposable) {
+			setSubjectRemoval(true);
+			Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), (Runnable) new Runnable() {
+				public void run() {
+					if (PlayerHandler.isCreativeMode(player)) {
+						player.closeInventory();
+					}
+					if (isSimilar(player.getItemOnCursor())) {
+						player.setItemOnCursor(newItem(player.getItemOnCursor()));
+						setSubjectRemoval(false);
+					} else {
+						for (int i = 0; i < player.getInventory().getSize(); i++) {
+							if (isSimilar(player.getInventory().getItem(i))) {
+								player.getInventory().setItem(i, newItem(player.getInventory().getItem(i)));
+								setSubjectRemoval(false);
+								break;
+							}
+						}
+						if (isSubjectRemoval() && PlayerHandler.isCreativeMode(player)) {
+							player.getInventory().addItem(newItem(itemCopy));
+							player.setItemOnCursor(new ItemStack(Material.AIR));
+							setSubjectRemoval(false);
+						}
+					}
 				}
-			}
-		}, 1L);
+			}, 1L);
+		}
+	}
+	
+	private ItemStack newItem(ItemStack itemCopy) {
+		ItemStack item = new ItemStack(itemCopy);
+		if (item.getAmount() > 1 && item.getAmount() != 1) { item.setAmount(item.getAmount() - 1); } 
+		else { item = new ItemStack(Material.AIR); }
+		return item;
 	}
 	
 	private boolean onCooldown(Player player) {
