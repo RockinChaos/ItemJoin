@@ -1,8 +1,6 @@
 package me.RockinChaos.itemjoin.handlers;
 
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.file.FileConfiguration;
-
 import me.RockinChaos.itemjoin.utils.Reflection;
 import me.RockinChaos.itemjoin.utils.VaultAPI;
 import me.RockinChaos.itemjoin.utils.sqlite.SQLData;
@@ -29,9 +27,7 @@ import me.RockinChaos.itemjoin.listeners.Storable;
 import me.RockinChaos.itemjoin.listeners.SwitchHands;
 
 public class MemoryHandler {
-	
-	private static FileConfiguration configYML;
-	
+
 	private static boolean multiverseCore = false;
 	private static boolean multiverseInventories = false;
 	private static boolean placeHolderAPI = false;
@@ -57,7 +53,6 @@ public class MemoryHandler {
 	private static ItemDesigner itemDesigner;
 
 	public static void generateData() {
-		configYML = ConfigHandler.getConfig("config.yml");
 		ItemHandler.initializeItemID();
 		setHeldItemSlot();
 		setDebugging();
@@ -237,15 +232,15 @@ public class MemoryHandler {
 	}
 	
 	public static void newDataTags() {
-		dataTags = configYML.getBoolean("Settings.DataTags");
+		dataTags = ConfigHandler.getConfig("config.yml").getBoolean("Settings.DataTags");
 	}
 	
 	public static void setLoggable() {
-		logCommands = configYML.getBoolean("General.Log-Commands");
+		logCommands = ConfigHandler.getConfig("config.yml").getBoolean("General.Log-Commands");
 	}
 	
 	public static void setLogColor() {
-		logColoration = configYML.getBoolean("General.Log-Coloration");
+		logColoration = ConfigHandler.getConfig("config.yml").getBoolean("General.Log-Coloration");
 	}
 	
 	public static void setDebugging() {
@@ -257,126 +252,126 @@ public class MemoryHandler {
 	}
 	
 	public static void newMyWorlds() {
-		if (Bukkit.getServer().getPluginManager().getPlugin("My_Worlds") != null && configYML.getBoolean("softDepend.MyWorlds") == true) {
+		if (Bukkit.getServer().getPluginManager().getPlugin("My_Worlds") != null && ConfigHandler.getConfig("config.yml").getBoolean("softDepend.MyWorlds") == true) {
 			ServerHandler.sendConsoleMessage("&aHooked into MyWorlds!");
 			myWorlds = true;
-		} else if (configYML.getBoolean("softDepend.MyWorlds") == true) {
+		} else if (ConfigHandler.getConfig("config.yml").getBoolean("softDepend.MyWorlds") == true) {
 			ServerHandler.sendConsoleMessage("&4Could not find MyWorlds.");
 		}
 	}
 	
 	public static void newXInventories() {
-		if (Bukkit.getServer().getPluginManager().getPlugin("xInventories") != null && configYML.getBoolean("softDepend.xInventories") == true) {
+		if (Bukkit.getServer().getPluginManager().getPlugin("xInventories") != null && ConfigHandler.getConfig("config.yml").getBoolean("softDepend.xInventories") == true) {
 			ServerHandler.sendConsoleMessage("&aHooked into xInventories!");
 			xInventories = true;
-		} else if (configYML.getBoolean("softDepend.xInventories") == true) {
+		} else if (ConfigHandler.getConfig("config.yml").getBoolean("softDepend.xInventories") == true) {
 			ServerHandler.sendConsoleMessage("&4Could not find xInventories.");
 		}
 	}
 	
 	public static void newTokenEnchant() {
-		if (Bukkit.getServer().getPluginManager().getPlugin("TokenEnchant") != null && configYML.getBoolean("softDepend.TokenEnchant") == true) {
+		if (Bukkit.getServer().getPluginManager().getPlugin("TokenEnchant") != null && ConfigHandler.getConfig("config.yml").getBoolean("softDepend.TokenEnchant") == true) {
 			ServerHandler.sendConsoleMessage("&aHooked into TokenEnchant!");
 			tokenEnchant = true;
-		} else if (configYML.getBoolean("softDepend.TokenEnchant") == true) {
+		} else if (ConfigHandler.getConfig("config.yml").getBoolean("softDepend.TokenEnchant") == true) {
 			ServerHandler.sendConsoleMessage("&4Could not find TokenEnchant.");
 		}
 	}
 	
 	public static void newHeadDatabase() {
-		if (Bukkit.getServer().getPluginManager().getPlugin("HeadDatabase") != null && configYML.getBoolean("softDepend.HeadDatabase") == true) {
+		if (Bukkit.getServer().getPluginManager().getPlugin("HeadDatabase") != null && ConfigHandler.getConfig("config.yml").getBoolean("softDepend.HeadDatabase") == true) {
 			ServerHandler.sendConsoleMessage("&aHooked into HeadDatabase!");
 			headDatabase = true;
-		} else if (configYML.getBoolean("softDepend.HeadDatabase") == true) {
+		} else if (ConfigHandler.getConfig("config.yml").getBoolean("softDepend.HeadDatabase") == true) {
 			ServerHandler.sendConsoleMessage("&4Could not find HeadDatabase.");
 		}
 	}
 
 	public static void newVault() {
-		if (Bukkit.getServer().getPluginManager().getPlugin("Vault") != null && configYML.getBoolean("softDepend.Vault") == true) {
+		if (Bukkit.getServer().getPluginManager().getPlugin("Vault") != null && ConfigHandler.getConfig("config.yml").getBoolean("softDepend.Vault") == true) {
 			ServerHandler.sendConsoleMessage("&aHooked into Vault!");
 			VaultAPI.enableEconomy();
 			VaultAPI.setVaultStatus(true);
-		} else if (configYML.getBoolean("softDepend.Vault") == true) {
+		} else if (ConfigHandler.getConfig("config.yml").getBoolean("softDepend.Vault") == true) {
 			ServerHandler.sendConsoleMessage("&4Could not find Vault or no economy plugin is attached.");
 			VaultAPI.setVaultStatus(false);
 		}
 	}
 
 	public static void newPlaceholderAPI() {
-		if (Bukkit.getServer().getPluginManager().getPlugin("PlaceholderAPI") != null && configYML.getBoolean("softDepend.PlaceholderAPI") == true) {
+		if (Bukkit.getServer().getPluginManager().getPlugin("PlaceholderAPI") != null && ConfigHandler.getConfig("config.yml").getBoolean("softDepend.PlaceholderAPI") == true) {
 			ServerHandler.sendConsoleMessage("&aHooked into PlaceholderAPI!");
 			placeHolderAPI = true;
-		} else if (configYML.getBoolean("softDepend.PlaceholderAPI") == true) {
+		} else if (ConfigHandler.getConfig("config.yml").getBoolean("softDepend.PlaceholderAPI") == true) {
 			ServerHandler.sendConsoleMessage("&4Could not find PlaceholderAPI.");
 		}
 	}
 
 	public static void newMultiverseCore() {
-		if (Bukkit.getServer().getPluginManager().getPlugin("Multiverse-Core") != null && configYML.getBoolean("softDepend.Multiverse-Core") == true) {
+		if (Bukkit.getServer().getPluginManager().getPlugin("Multiverse-Core") != null && ConfigHandler.getConfig("config.yml").getBoolean("softDepend.Multiverse-Core") == true) {
 			ServerHandler.sendConsoleMessage("&aHooked into Multiverse-Core!");
 			multiverseCore = true;
-		} else if (configYML.getBoolean("softDepend.Multiverse-Core") == true) {
+		} else if (ConfigHandler.getConfig("config.yml").getBoolean("softDepend.Multiverse-Core") == true) {
 			ServerHandler.sendConsoleMessage("&4Could not find Multiverse-Core.");
 		}
 	}
 
 	public static void newMultiverseInv() {
-		if (Bukkit.getServer().getPluginManager().getPlugin("Multiverse-Inventories") != null && configYML.getBoolean("softDepend.Multiverse-Inventories") == true) {
+		if (Bukkit.getServer().getPluginManager().getPlugin("Multiverse-Inventories") != null && ConfigHandler.getConfig("config.yml").getBoolean("softDepend.Multiverse-Inventories") == true) {
 			ServerHandler.sendConsoleMessage("&aHooked into Multiverse-Inventories!");
 			multiverseInventories = true;
-		} else if (configYML.getBoolean("softDepend.Multiverse-Inventories") == true) {
+		} else if (ConfigHandler.getConfig("config.yml").getBoolean("softDepend.Multiverse-Inventories") == true) {
 			ServerHandler.sendConsoleMessage("&4Could not find Multiverse-Inventories.");
 		}
 	}
 
 	public static void newPerWorldPlugins() {
-		if (Bukkit.getServer().getPluginManager().getPlugin("PerWorldPlugins") != null && configYML.getBoolean("softDepend.PerWorldPlugins") == true) {
+		if (Bukkit.getServer().getPluginManager().getPlugin("PerWorldPlugins") != null && ConfigHandler.getConfig("config.yml").getBoolean("softDepend.PerWorldPlugins") == true) {
 			ServerHandler.sendConsoleMessage("&aHooked into PerWorldPlugins!");
 			perWorldPlugins = true;
-		} else if (configYML.getBoolean("softDepend.PerWorldPlugins") == true) {
+		} else if (ConfigHandler.getConfig("config.yml").getBoolean("softDepend.PerWorldPlugins") == true) {
 			ServerHandler.sendConsoleMessage("&4Could not find PerWorldPlugins.");
 		}
 	}
 
 	public static void newPerWorldInventory() {
-		if (Bukkit.getServer().getPluginManager().getPlugin("PerWorldInventory") != null && configYML.getBoolean("softDepend.PerWorldInventory") == true) {
+		if (Bukkit.getServer().getPluginManager().getPlugin("PerWorldInventory") != null && ConfigHandler.getConfig("config.yml").getBoolean("softDepend.PerWorldInventory") == true) {
 			ServerHandler.sendConsoleMessage("&aHooked into PerWorldInventory!");
 			perWorldInventory = true;
-		} else if (configYML.getBoolean("softDepend.PerWorldInventory") == true) {
+		} else if (ConfigHandler.getConfig("config.yml").getBoolean("softDepend.PerWorldInventory") == true) {
 			ServerHandler.sendConsoleMessage("&4Could not find PerWorldInventory.");
 		}
 	}
 
 	public static void newAuthMe() {
-		if (Bukkit.getServer().getPluginManager().getPlugin("AuthMe") != null && configYML.getBoolean("softDepend.AuthMe") == true) {
+		if (Bukkit.getServer().getPluginManager().getPlugin("AuthMe") != null && ConfigHandler.getConfig("config.yml").getBoolean("softDepend.AuthMe") == true) {
 			ServerHandler.sendConsoleMessage("&aHooked into AuthMe!");
 			authMe = true;
-		} else if (configYML.getBoolean("softDepend.AuthMe") == true) {
+		} else if (ConfigHandler.getConfig("config.yml").getBoolean("softDepend.AuthMe") == true) {
 			ServerHandler.sendConsoleMessage("&4Could not find AuthMe.");
 		}
 	}
 	
 	public static void newBetterNick() {
-		if (Bukkit.getServer().getPluginManager().getPlugin("BetterNick") != null && configYML.getBoolean("softDepend.BetterNick") == true) {
+		if (Bukkit.getServer().getPluginManager().getPlugin("BetterNick") != null && ConfigHandler.getConfig("config.yml").getBoolean("softDepend.BetterNick") == true) {
 			ServerHandler.sendConsoleMessage("&aHooked into BetterNick!");
 			betterNick = true;
-		} else if (configYML.getBoolean("softDepend.BetterNick") == true) {
+		} else if (ConfigHandler.getConfig("config.yml").getBoolean("softDepend.BetterNick") == true) {
 			ServerHandler.sendConsoleMessage("&4Could not find BetterNick.");
 		}
 	}
 	
 	public static void newWorldGuard() {
-		if (configYML.getBoolean("softDepend.WorldGuard") == true && Bukkit.getServer().getPluginManager().getPlugin("WorldGuard") != null && Bukkit.getServer().getPluginManager().getPlugin("WorldEdit") != null) {
+		if (ConfigHandler.getConfig("config.yml").getBoolean("softDepend.WorldGuard") == true && Bukkit.getServer().getPluginManager().getPlugin("WorldGuard") != null && Bukkit.getServer().getPluginManager().getPlugin("WorldEdit") != null) {
 			String fetchVersion = Bukkit.getServer().getPluginManager().getPlugin("WorldGuard").getDescription().getVersion();
 			try { worldGuardVers = Integer.parseInt(fetchVersion.replace(".", "").substring(0, 3));
 			} catch (Exception e) { worldGuardVers = 622; }
 			ServerHandler.sendConsoleMessage("&aHooked into WorldGuard!");
 			worldGuard = true;
-		} else if (configYML.getBoolean("softDepend.WorldGuard") == true && Bukkit.getServer().getPluginManager().getPlugin("WorldGuard") != null && Bukkit.getServer().getPluginManager().getPlugin("WorldEdit") == null) {
+		} else if (ConfigHandler.getConfig("config.yml").getBoolean("softDepend.WorldGuard") == true && Bukkit.getServer().getPluginManager().getPlugin("WorldGuard") != null && Bukkit.getServer().getPluginManager().getPlugin("WorldEdit") == null) {
 			ServerHandler.sendConsoleMessage("&4Error; Found WorldGuard but WorldEdit is not found!");
 			ServerHandler.sendConsoleMessage("&4WorldEdit is required for WorldGuard to function.");
-		} else if (configYML.getBoolean("softDepend.WorldGuard") == true && Bukkit.getServer().getPluginManager().getPlugin("WorldGuard") == null) {
+		} else if (ConfigHandler.getConfig("config.yml").getBoolean("softDepend.WorldGuard") == true && Bukkit.getServer().getPluginManager().getPlugin("WorldGuard") == null) {
 			ServerHandler.sendConsoleMessage("&4Could not find WorldGuard.");
 		}
 	}

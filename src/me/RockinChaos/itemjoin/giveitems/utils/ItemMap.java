@@ -1225,7 +1225,7 @@ public class ItemMap {
 	}
 	
 	private boolean isSkull(ItemStack item) {
-		if (this.dynamicOwners != null) {
+		if (this.dynamicOwners != null && !this.dynamicOwners.isEmpty()) {
 			for (String owners : this.dynamicOwners) {
 				owners = ItemHandler.purgeDelay(owners);
 				if (PlayerHandler.getSkullOwner(item) != null && PlayerHandler.getSkullOwner(item).equalsIgnoreCase(this.skullOwner) || PlayerHandler.getSkullOwner(item) != null && Utils.containsIgnoreCase(this.skullOwner, "%player%") || ItemHandler.getGameProfiles().get(owners) != null && ItemHandler.getSkullSkinTexture(item.getItemMeta()).equalsIgnoreCase(this.getTexture(ItemHandler.getGameProfiles().get(owners)))) {
@@ -1238,7 +1238,7 @@ public class ItemMap {
 				}
 			}
 			if (this.dynamicOwners.toString().contains("%player%")) { return true; }
-		} else if (this.dynamicTextures != null) {
+		} else if (this.dynamicTextures != null && !this.dynamicTextures.isEmpty()) {
 			for (String textures : this.dynamicTextures) {
 				textures = ItemHandler.purgeDelay(textures);
 				if (ItemHandler.getSkullSkinTexture(item.getItemMeta()).equalsIgnoreCase(textures)) {
@@ -1557,7 +1557,7 @@ public class ItemMap {
 	
     public boolean executeCommands(Player player, final ItemStack itemCopy, String action) {
 		boolean playerSuccess = false;
-    	if (this.commands != null && this.commands.length > 0 && !this.onCooldown(player) && this.isPlayerChargeable(player)) {
+    	if (this.commands != null && this.commands.length > 0 && isExecutable(player, action) && !this.onCooldown(player) && this.isPlayerChargeable(player)) {
     		if (isExecuted(player, action)) {
     			this.withdrawBalance(player, this.cost);
 				this.playSound(player);
@@ -1565,6 +1565,16 @@ public class ItemMap {
 				this.addPlayerOnCooldown(player);
     		}
     	}
+    	return playerSuccess;
+    }
+    
+    private boolean isExecutable(final Player player, final String action) {
+    	boolean playerSuccess = false;
+    	ItemCommand[] itemCommands = this.commands;
+    	for (int i = 0; i < itemCommands.length; i++) {
+			if (!playerSuccess) { playerSuccess = itemCommands[i].canExecute(player, action); }
+			else { break; }
+		}
     	return playerSuccess;
     }
     

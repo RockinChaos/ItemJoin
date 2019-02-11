@@ -224,18 +224,18 @@ public class ItemHandler {
             if(UUIDJson.isEmpty()) return null;                       
             JSONObject UUIDObject = (JSONObject) JSONValue.parseWithException(UUIDJson);
             return UUIDObject.get("id").toString();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        } catch (Exception e) { }
         return null;
     }
     
     public static void generateProfile(String owner) {
-		String uuidString = ItemHandler.getMojangUUID(owner);
-		if (uuidString != null) {
-			GameProfile profile = new GameProfile(UUIDConversion(uuidString), owner);
-			setSkin(profile, UUIDConversion(uuidString));
-			getGameProfiles().put(owner, profile);
+		if (gameProfiles.get(owner) == null) {
+			String uuidString = getMojangUUID(owner);
+			if (uuidString != null) {
+				GameProfile profile = new GameProfile(UUIDConversion(uuidString), owner);
+				setSkin(profile, UUIDConversion(uuidString));
+				gameProfiles.put(owner, profile);
+			}
 		}
     }
 	

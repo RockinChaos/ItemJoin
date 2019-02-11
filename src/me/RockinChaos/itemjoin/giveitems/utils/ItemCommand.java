@@ -39,6 +39,11 @@ public class ItemCommand {
 		return true;
 	}
 	
+	public boolean canExecute(final Player player, final String action) {
+		if (this.command == null || this.command.length() == 0 || !this.cmdType.hasAction(action) || !this.action.hasAction(action)) { return false; }
+		return true;
+	}
+	
 	private void sendDispatch(final Player player, final Type cmdtype) {
 		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), (Runnable) new Runnable() {
 			public void run() {

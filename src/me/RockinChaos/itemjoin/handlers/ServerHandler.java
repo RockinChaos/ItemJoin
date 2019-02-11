@@ -43,7 +43,7 @@ public class ServerHandler {
 		String prefix = "&7[&eItemJoin&7] ";
 		message = prefix + message;
 		message = ChatColor.translateAlternateColorCodes('&', message).toString();
-		if (!!MemoryHandler.isLogColor()) {
+		if (!MemoryHandler.isLogColor()) {
 			message = ChatColor.stripColor(message);
 		}
 		if (message.equalsIgnoreCase("") || message.isEmpty()) {
