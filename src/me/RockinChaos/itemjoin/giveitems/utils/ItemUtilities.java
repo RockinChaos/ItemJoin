@@ -282,7 +282,7 @@ public class ItemUtilities {
 	public static void sendFailCount(Player player, int session) {
 		if (getFailCount().get(session) != null && getFailCount().get(session) != 0) {
 			if (ConfigHandler.getConfig("items.yml").getString("items-Overwrite") != null && isOverwriteWorld(player.getWorld().getName()) 
-					|| ConfigHandler.getConfig("items.yml").getString("items-Overwrite") != null && ConfigHandler.getConfig("items.yml").getBoolean("items-Overwrite") == true) {
+					|| ConfigHandler.getConfig("items.yml").getString("items-Overwrite") != null && ConfigHandler.getConfig("items.yml").getBoolean("items-Overwrite")) {
 				String[] placeHolders = Language.newString(); placeHolders[7] = getFailCount().get(session).toString();
 				Language.sendLangMessage("General.failedInventory", player, placeHolders);
 			} else {
@@ -360,7 +360,7 @@ public class ItemUtilities {
 	
 	public static Boolean isOverwrite(Player player) {
 		if (ConfigHandler.getConfig("items.yml").getString("items-Overwrite") != null && isOverwriteWorld(player.getWorld().getName()) 
-				|| ConfigHandler.getConfig("items.yml").getString("items-Overwrite") != null && ConfigHandler.getConfig("items.yml").getBoolean("items-Overwrite") == true) {
+				|| ConfigHandler.getConfig("items.yml").getString("items-Overwrite") != null && ConfigHandler.getConfig("items.yml").getBoolean("items-Overwrite")) {
 			return true;
 		}
 		return false;
@@ -368,7 +368,7 @@ public class ItemUtilities {
 	
 	public static Boolean canOverwrite(Player player, ItemMap itemMap) {
 		try {
-			if (itemMap.isOverwritable()) { return true; }
+			if (itemMap.isOverwritable() || isOverwrite(player)) { return true; }
 			if (Utils.isInt(itemMap.getSlot()) && player.getInventory().getItem(Integer.parseInt(itemMap.getSlot())) != null) {
 				if (!isOverwrite(player) || !itemMap.isOverwritable()) {
 					return false;

@@ -230,11 +230,21 @@ public class ItemHandler {
     
     public static void generateProfile(String owner) {
 		if (gameProfiles.get(owner) == null) {
-			String uuidString = getMojangUUID(owner);
-			if (uuidString != null) {
-				GameProfile profile = new GameProfile(UUIDConversion(uuidString), owner);
-				setSkin(profile, UUIDConversion(uuidString));
+			if (PlayerHandler.getPlayerString(owner) != null) {
+				GameProfile profile = new GameProfile(PlayerHandler.getPlayerString(owner).getUniqueId(), owner);
+				setSkin(profile, PlayerHandler.getPlayerString(owner).getUniqueId());
 				gameProfiles.put(owner, profile);
+			} else if (PlayerHandler.getOfflinePlayer(owner) != null) {
+				GameProfile profile = new GameProfile(PlayerHandler.getOfflinePlayer(owner).getUniqueId(), owner);
+				setSkin(profile, PlayerHandler.getOfflinePlayer(owner).getUniqueId());
+				gameProfiles.put(owner, profile);
+			} else {
+				String uuidString = getMojangUUID(owner);
+				if (uuidString != null) {
+					GameProfile profile = new GameProfile(UUIDConversion(uuidString), owner);
+					setSkin(profile, UUIDConversion(uuidString));
+					gameProfiles.put(owner, profile);
+				}
 			}
 		}
     }
