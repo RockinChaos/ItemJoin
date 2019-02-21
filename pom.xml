@@ -85,11 +85,6 @@
 			<id>sk89q-repo</id>
 			<url>https://maven.sk89q.com/repo/</url>
 		</repository>
-    <!--Vault Repo-->
-		<repository>
-			<id>vault-repo</id>
-			<url>http://nexus.hc.to/content/repositories/pub_releases</url>
-		</repository>
     <!--PlaceholderAPI Repo-->
         <repository>
             <id>placeholderapi</id>
@@ -125,13 +120,6 @@
 			<groupId>org.bukkit</groupId>
             <artifactId>bukkit</artifactId>
             <version>LATEST</version>
-         <scope>provided</scope>
-		</dependency>
-    <!--Vault API-->
-		<dependency>
-			<groupId>net.milkbowl.vault</groupId>
-			<artifactId>Vault</artifactId>
-			<version>LATEST</version>
          <scope>provided</scope>
 		</dependency>
     <!--PlaceholderAPI API-->
@@ -173,6 +161,14 @@
 			<artifactId>log4j-core</artifactId>
 			<version>2.3</version>
 		</dependency>
+    <!--Vault API-->
+        <dependency>
+            <groupId>net.milkbowl.vault</groupId>
+            <artifactId>Vault</artifactId>
+            <scope>system</scope>
+            <systemPath>${pom.basedir}/src/me/RockinChaos/itemjoin/extra/VaultAPI.jar</systemPath>
+            <version>LATEST</version>
+        </dependency>
     <!--HeadDatabase Local API/Repo -->
         <dependency>
             <groupId>me.HeadDatabaseAPI</groupId>
