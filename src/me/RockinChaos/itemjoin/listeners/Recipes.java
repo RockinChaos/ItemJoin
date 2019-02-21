@@ -16,7 +16,7 @@ import me.RockinChaos.itemjoin.utils.Utils;
 public class Recipes implements Listener {
 	
     @EventHandler
-    public void onPlayerCraft(PrepareItemCraftEvent event) {
+    private void onPlayerCraft(PrepareItemCraftEvent event) {
         for (HumanEntity entity: event.getViewers()) {
             if (entity instanceof Player) {
                 Player player = (Player) entity;
@@ -36,7 +36,7 @@ public class Recipes implements Listener {
     }
   
 	@EventHandler
-	public void onRepairAnvil(InventoryClickEvent event) {
+	private void onRepairAnvil(InventoryClickEvent event) {
 	    if (event.getInventory().getType().toString().contains("ANVIL")) {
 	        Player player = (Player) event.getWhoClicked();
 	        int rSlot = event.getSlot();

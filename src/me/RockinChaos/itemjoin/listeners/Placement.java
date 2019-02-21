@@ -17,7 +17,7 @@ import org.bukkit.inventory.ItemStack;
 public class Placement implements Listener{
 
 	 @EventHandler
-	 public void onPreventPlayerPlace(PlayerInteractEvent event) {
+	 private void onPreventPlayerPlace(PlayerInteractEvent event) {
 	 	ItemStack item = event.getItem();
 	 	Player player = event.getPlayer();
 	 	if (event.getAction() == Action.RIGHT_CLICK_BLOCK && !ItemUtilities.isAllowed(player, item, "placement")) {
@@ -29,7 +29,7 @@ public class Placement implements Listener{
 	 }
 	 
 	 @EventHandler
-	 public void onCountLock(PlayerInteractEvent event) {
+	 private void onCountLock(PlayerInteractEvent event) {
 	 	ItemStack item = event.getItem();
 	 	Player player = event.getPlayer();
 	 	if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK && PlayerHandler.isCreativeMode(player)) {
@@ -41,7 +41,7 @@ public class Placement implements Listener{
 	 }
 	 
 	 @EventHandler
-	 public void onItemFramePlace(PlayerInteractEntityEvent event) {
+	 private void onItemFramePlace(PlayerInteractEntityEvent event) {
 	 	if (event.getRightClicked() instanceof ItemFrame) {
 	 		try {
 	 			ItemStack item = null;
@@ -57,7 +57,7 @@ public class Placement implements Listener{
 	 }
 	 
 	 @EventHandler
-	 public void onItemFrameCountLock(PlayerInteractEntityEvent event) {
+	 private void onItemFrameCountLock(PlayerInteractEntityEvent event) {
 	 	if (event.getRightClicked() instanceof ItemFrame) {
 	 		try {
 	 			ItemStack item = null;

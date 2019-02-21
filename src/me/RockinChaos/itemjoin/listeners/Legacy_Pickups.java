@@ -13,7 +13,7 @@ import org.bukkit.event.player.PlayerPickupItemEvent;
 public class Legacy_Pickups implements Listener {
 
 	@EventHandler
-	public void Deprecated_onGlobalPickup(PlayerPickupItemEvent event) {
+	private void Deprecated_onGlobalPickup(PlayerPickupItemEvent event) {
 	  	Player player = event.getPlayer();
   		if (Utils.containsIgnoreCase(ConfigHandler.isPreventPickups(), "true") || Utils.containsIgnoreCase(ConfigHandler.isPreventPickups(), player.getWorld().getName())
 	  			|| Utils.containsIgnoreCase(ConfigHandler.isPreventPickups(), "ALL") || Utils.containsIgnoreCase(ConfigHandler.isPreventPickups(), "GLOBAL")) {

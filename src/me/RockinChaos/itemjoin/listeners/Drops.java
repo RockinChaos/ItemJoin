@@ -22,7 +22,7 @@ public class Drops implements Listener {
 	
 
 	@EventHandler
-	public void onDrop(PlayerDropItemEvent event) {
+	private void onDrop(PlayerDropItemEvent event) {
 		ItemStack item = event.getItemDrop().getItemStack();
 		final Player player = event.getPlayer();
 		if (!ItemUtilities.isAllowed(player, item, "self-drops")) {
@@ -47,7 +47,7 @@ public class Drops implements Listener {
 	}
 
 	@EventHandler
-	public void onDeathDrops(PlayerDeathEvent event) {
+	private void onDeathDrops(PlayerDeathEvent event) {
 		List < ItemStack > drops = event.getDrops();
 		ListIterator < ItemStack > litr = drops.listIterator();
 		Player player = event.getEntity();

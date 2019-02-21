@@ -29,7 +29,7 @@ public class Legacy {
 	
     public static org.bukkit.Material findLegacyMaterial(int typeId) {
         Material[] foundMaterial = new Material[1];
-        for (Material material: EnumSet.allOf(Material.class)) { // Add a way to convert data-value data to a new material type.
+        for (Material material: EnumSet.allOf(Material.class)) {
             if (material.getId() == typeId) {
                 foundMaterial[0] = material;
                 return material;
@@ -135,7 +135,7 @@ public class Legacy {
 	}
 	
     public static com.sk89q.worldedit.math.BlockVector3 asBlockVector(org.bukkit.Location location) {
-        checkNotNull(location); // Is this really needed?
+        checkNotNull(location);
         return com.sk89q.worldedit.math.BlockVector3.at(location.getX(), location.getY(), location.getZ());
     }
 }

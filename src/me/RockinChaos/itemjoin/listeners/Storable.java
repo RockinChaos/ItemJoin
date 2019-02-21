@@ -19,7 +19,7 @@ import me.RockinChaos.itemjoin.utils.Utils;
 public class Storable implements Listener {
 	
 	@EventHandler
-	public void onInventoryStore(InventoryClickEvent event) {
+	private void onInventoryStore(InventoryClickEvent event) {
 		Player player = (Player) event.getWhoClicked();
 		String invType = event.getView().getType().toString();
 		ItemStack item = null;
@@ -41,7 +41,7 @@ public class Storable implements Listener {
 	}
 	
 	@EventHandler
-	public void onInventoryDragToStore(InventoryDragEvent event) {
+	private void onInventoryDragToStore(InventoryDragEvent event) {
 		Player player = (Player) event.getWhoClicked();
 		String invType = event.getView().getType().toString();
 		int inventorySize = event.getInventory().getSize();
@@ -63,7 +63,7 @@ public class Storable implements Listener {
 	}
 	
 	@EventHandler
-	public void onInteractItemFrame(PlayerInteractEntityEvent event) {
+	private void onInteractItemFrame(PlayerInteractEntityEvent event) {
 		if (event.getRightClicked() instanceof ItemFrame) {
 			ItemStack item;
 			if (ServerHandler.hasCombatUpdate()) { item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().toString()); } 
@@ -77,7 +77,7 @@ public class Storable implements Listener {
 	}
 	
 	@EventHandler
-	public void onInteractArmorStand(PlayerInteractAtEntityEvent event) {
+	private void onInteractArmorStand(PlayerInteractAtEntityEvent event) {
 		if (event.getRightClicked().toString().equalsIgnoreCase("CraftArmorStand")) {
 			ItemStack item;
 			if (ServerHandler.hasCombatUpdate()) { item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().toString()); } 

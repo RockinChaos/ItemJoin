@@ -26,7 +26,7 @@ public class InvClickSurvival implements Listener {
 	public static HashMap < String, ItemStack > cursorItem = new HashMap < String, ItemStack > ();
 	
 	@EventHandler
-	public void onGlobalInventoryModify(InventoryClickEvent event) {
+	private void onGlobalInventoryModify(InventoryClickEvent event) {
 		Player player = (Player) event.getWhoClicked();
 		  
 	  	if (Utils.containsIgnoreCase(ConfigHandler.isPreventItemMovement(), "true") || Utils.containsIgnoreCase(ConfigHandler.isPreventItemMovement(), player.getWorld().getName())
@@ -37,7 +37,7 @@ public class InvClickSurvival implements Listener {
 	}
 
 	@EventHandler
-	public void onSurvivalInventoryModify(InventoryClickEvent event) {
+	private void onSurvivalInventoryModify(InventoryClickEvent event) {
 		Player player = (Player) event.getWhoClicked();
 			ItemStack item = null;
 			if (!ServerHandler.hasSpecificUpdate("1_8")) {
@@ -62,7 +62,7 @@ public class InvClickSurvival implements Listener {
 	}
 	
     @EventHandler()
-    public final void onCursorAnimatedItem(InventoryClickEvent event) {
+    private final void onCursorAnimatedItem(InventoryClickEvent event) {
 		Player player = (Player) event.getWhoClicked();
 		String itemflag = "inventory-modify";
     	if (event.getAction().toString().contains("PLACE_ALL") || event.getAction().toString().contains("PLACE_ONE")) {
@@ -93,7 +93,7 @@ public class InvClickSurvival implements Listener {
     	}
     }
 
-	public static void LegacyDropEvent(final Player player, final ItemStack[] Inv, final ItemStack[] Armor) {
+    private static void LegacyDropEvent(final Player player, final ItemStack[] Inv, final ItemStack[] Armor) {
 		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
 			public void run() {
 				if (dropClick.get(PlayerHandler.getPlayerID(player)) != null && dropClick.get(PlayerHandler.getPlayerID(player)) == true 

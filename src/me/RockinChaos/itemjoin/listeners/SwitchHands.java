@@ -13,7 +13,7 @@ import me.RockinChaos.itemjoin.handlers.ServerHandler;
 public class SwitchHands implements Listener {
 	
 	@EventHandler
-	public void onHandModify(PlayerSwapHandItemsEvent event) {
+	private void onHandModify(PlayerSwapHandItemsEvent event) {
 		if (ServerHandler.hasCombatUpdate()) {
 			ItemStack offhand = event.getOffHandItem();
 			ItemStack mainhand = event.getMainHandItem();

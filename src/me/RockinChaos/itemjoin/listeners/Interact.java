@@ -26,7 +26,7 @@ public class Interact implements Listener {
 	private int spamtime = 1;
 	
 	 @EventHandler(priority = EventPriority.LOWEST)
-	 public void onInteraction(PlayerInteractEvent event) {
+	 private void onInteraction(PlayerInteractEvent event) {
 	 	ItemStack item = event.getItem();
 	 	Player player = event.getPlayer();
 	 	if (event.hasItem() && event.getAction() != Action.PHYSICAL && !ItemUtilities.isAllowed(player, item, "cancel-events")) {
@@ -36,7 +36,7 @@ public class Interact implements Listener {
 	 }
 
 	 @EventHandler
-	 public void onInteractCooldown(PlayerInteractEvent event) {
+	 private void onInteractCooldown(PlayerInteractEvent event) {
 	 	Player player = event.getPlayer();
 	 	ItemStack item = event.getItem();
 	 	if (event.hasItem() && event.getAction() != Action.PHYSICAL) {
@@ -54,7 +54,7 @@ public class Interact implements Listener {
 	 }
 
 	@EventHandler
-	public void onInventoryCmds(InventoryClickEvent event) {
+	private void onInventoryCmds(InventoryClickEvent event) {
 		ItemStack item = event.getCurrentItem();
 		Player player = (Player) event.getWhoClicked();
 		String action = event.getAction().toString();
@@ -62,7 +62,7 @@ public class Interact implements Listener {
 	}
 
 	@EventHandler
-	public void onInteractCmds(PlayerInteractEvent event) {
+	private void onInteractCmds(PlayerInteractEvent event) {
 		ItemStack item = event.getItem();
 		final Player player = event.getPlayer();
 		String action = event.getAction().toString();

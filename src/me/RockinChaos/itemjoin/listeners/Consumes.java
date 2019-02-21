@@ -14,7 +14,7 @@ import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 public class Consumes implements Listener {
 
 	@EventHandler
-	public void onPlayerConsumesItem(PlayerItemConsumeEvent event) {
+	private void onPlayerConsumesItem(PlayerItemConsumeEvent event) {
 		ItemStack item = event.getItem();
 		Player player = event.getPlayer();
 		if (item.getType() == Material.GOLDEN_APPLE) {

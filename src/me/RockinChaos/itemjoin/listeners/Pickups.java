@@ -13,7 +13,7 @@ import org.bukkit.event.entity.EntityPickupItemEvent;
 public class Pickups implements Listener {
 
 	@EventHandler
-	public void onGlobalPickup(EntityPickupItemEvent event) {
+	private void onGlobalPickup(EntityPickupItemEvent event) {
 	  	Entity entity = event.getEntity();
 	  	if (entity instanceof Player) {
 	  		Player player = (Player) event.getEntity();
