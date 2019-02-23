@@ -134,9 +134,9 @@ public class ItemUtilities {
 		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
 			public void run() {
 				if (type.equalsIgnoreCase("JOIN")) {
-					ItemUtilities.setClearingOfItems(player, player.getWorld().getName(), "Clear-On-Join");
-				} else if (type.equalsIgnoreCase("WORLDCHANGED")) {
-					ItemUtilities.setClearingOfItems(player, player.getWorld().getName(), "Clear-On-WorldChanged");
+					ItemUtilities.setClearingOfItems(player, player.getWorld().getName(), "Join");
+				} else if (type.equalsIgnoreCase("WORLD-SWITCH")) {
+					ItemUtilities.setClearingOfItems(player, player.getWorld().getName(), "World-Switch");
 				}
 			}
 		}, ConfigHandler.getClearDelay());
@@ -214,12 +214,23 @@ public class ItemUtilities {
 	}
 	
 	public static void setClearAllItems(Player player) {
-		player.getInventory().clear();
-		player.getInventory().setHelmet(null);
-		player.getInventory().setChestplate(null);
-		player.getInventory().setLeggings(null);
-		player.getInventory().setBoots(null);
-		if (ServerHandler.hasCombatUpdate()) { player.getInventory().setItemInOffHand(null); }
+		List<ItemMap> items = new ArrayList<ItemMap>();
+		PlayerInventory inventory = player.getInventory();
+		if (Utils.containsIgnoreCase(ConfigHandler.getConfig("config.yml").getString("Clear-Items.Options"), "PROTECT")) {
+			for (ItemMap item: ItemUtilities.getItems()) {
+				if (item.isOnlyFirstJoin() || item.isOnlyFirstWorld()) {
+					items.add(item);
+				}
+			}
+			if (!items.isEmpty()) { inventoryAllWipe(player, items); }
+		} else {
+			inventory.clear();
+			inventory.setHelmet(null);
+			inventory.setChestplate(null);
+			inventory.setLeggings(null);
+			inventory.setBoots(null);
+			PlayerHandler.setOffHandItem(player, null);
+		}
 	}
 	
 	public static void setClearItemJoinItems(Player player) {
@@ -227,29 +238,7 @@ public class ItemUtilities {
 		if (Utils.containsIgnoreCase(ConfigHandler.getConfig("config.yml").getString("Clear-Items.Options"), "PROTECT")) {
 			for (ItemMap item: ItemUtilities.getItems()) {
 				if (!item.isOnlyFirstJoin() && !item.isOnlyFirstWorld()) {
-					if (inventory.getHelmet() != null && item.isSimilar(inventory.getHelmet()) && ItemHandler.containsNBTData(inventory.getHelmet())) {
-						inventory.setHelmet(null);
-					}
-					if (inventory.getChestplate() != null && item.isSimilar(inventory.getChestplate()) && ItemHandler.containsNBTData(inventory.getChestplate())) {
-						inventory.setChestplate(null);
-					}
-					if (inventory.getLeggings() != null && item.isSimilar(inventory.getLeggings()) && ItemHandler.containsNBTData(inventory.getLeggings())) {
-						inventory.setLeggings(null);
-					}
-					if (inventory.getBoots() != null && item.isSimilar(inventory.getBoots()) && ItemHandler.containsNBTData(inventory.getBoots())) {
-						inventory.setBoots(null);
-					}
-					if (ServerHandler.hasCombatUpdate() && inventory.getItemInOffHand() != null && item.isSimilar(inventory.getItemInOffHand()) && ItemHandler.containsNBTData(inventory.getItemInOffHand())) {
-						inventory.setItemInOffHand(null);
-					}
-					HashMap < String, ItemStack[] > inventoryContents = new HashMap < String, ItemStack[] > ();
-					inventoryContents.put(PlayerHandler.getPlayerID(player), inventory.getContents());
-					for (ItemStack contents: inventoryContents.get(PlayerHandler.getPlayerID(player))) {
-						if (contents != null && item.isSimilar(contents) && ItemHandler.containsNBTData(contents)) {
-							inventory.remove(contents);
-						}
-					}
-					inventoryContents.clear();
+					inventoryWipe(item, player);
 				}
 			}
 		} else {
@@ -277,6 +266,102 @@ public class ItemUtilities {
 			}
 			inventoryContents.clear();
 		}
+	}
+	
+	public static void inventoryAllWipe(Player player, List<ItemMap> items) {
+		PlayerInventory inventory = player.getInventory();
+		if (inventory.getHelmet() != null) {
+			for (int i = 0; i < items.size(); i++) {
+				ItemMap item = items.get(i);
+				if (!item.isSimilar(inventory.getHelmet())) {
+					if (i == (items.size() - 1)) {
+						inventory.setHelmet(null);
+					}
+				}
+			}
+		}
+		if (inventory.getChestplate() != null) {
+			for (int i = 0; i < items.size(); i++) {
+				ItemMap item = items.get(i);
+				if (!item.isSimilar(inventory.getChestplate())) {
+					if (i == (items.size() - 1)) {
+						inventory.setChestplate(null);
+					}
+				}
+			}
+		}
+		if (inventory.getLeggings() != null) {
+			for (int i = 0; i < items.size(); i++) {
+				ItemMap item = items.get(i);
+				if (!item.isSimilar(inventory.getLeggings())) {
+					if (i == (items.size() - 1)) {
+						inventory.setLeggings(null);
+					}
+				}
+			}
+		}
+		if (inventory.getBoots() != null) {
+			for (int i = 0; i < items.size(); i++) {
+				ItemMap item = items.get(i);
+				if (!item.isSimilar(inventory.getBoots())) {
+					if (i == (items.size() - 1)) {
+						inventory.setBoots(null);
+					}
+				}
+			}
+		}
+		if (ServerHandler.hasCombatUpdate() && inventory.getItemInOffHand() != null) {
+			for (int i = 0; i < items.size(); i++) {
+				ItemMap item = items.get(i);
+				if (!item.isSimilar(inventory.getItemInOffHand())) {
+					if (i == (items.size() - 1)) {
+						inventory.setItemInOffHand(null);
+					}
+				}
+			}
+		}
+		HashMap < String, ItemStack[] > inventoryContents = new HashMap < String, ItemStack[] > ();
+		inventoryContents.put(PlayerHandler.getPlayerID(player), inventory.getContents());
+		for (ItemStack contents: inventoryContents.get(PlayerHandler.getPlayerID(player))) {
+			if (contents != null) {
+				for (int i = 0; i < items.size(); i++) {
+					ItemMap item = items.get(i);
+					if (!item.isSimilar(contents)) {
+						if (i == (items.size() - 1)) {
+							inventory.remove(contents);
+						}
+					}
+				}
+			}
+		}
+		inventoryContents.clear();
+	}
+	
+	public static void inventoryWipe(ItemMap item, Player player) {
+		PlayerInventory inventory = player.getInventory();
+		if (inventory.getHelmet() != null && item.isSimilar(inventory.getHelmet()) && ItemHandler.containsNBTData(inventory.getHelmet())) {
+			inventory.setHelmet(null);
+		}
+		if (inventory.getChestplate() != null && item.isSimilar(inventory.getChestplate()) && ItemHandler.containsNBTData(inventory.getChestplate())) {
+			inventory.setChestplate(null);
+		}
+		if (inventory.getLeggings() != null && item.isSimilar(inventory.getLeggings()) && ItemHandler.containsNBTData(inventory.getLeggings())) {
+			inventory.setLeggings(null);
+		}
+		if (inventory.getBoots() != null && item.isSimilar(inventory.getBoots()) && ItemHandler.containsNBTData(inventory.getBoots())) {
+			inventory.setBoots(null);
+		}
+		if (ServerHandler.hasCombatUpdate() && inventory.getItemInOffHand() != null && item.isSimilar(inventory.getItemInOffHand()) && ItemHandler.containsNBTData(inventory.getItemInOffHand())) {
+			inventory.setItemInOffHand(null);
+		}
+		HashMap < String, ItemStack[] > inventoryContents = new HashMap < String, ItemStack[] > ();
+		inventoryContents.put(PlayerHandler.getPlayerID(player), inventory.getContents());
+		for (ItemStack contents: inventoryContents.get(PlayerHandler.getPlayerID(player))) {
+			if (contents != null && item.isSimilar(contents) && ItemHandler.containsNBTData(contents)) {
+				inventory.remove(contents);
+			}
+		}
+		inventoryContents.clear();
 	}
 	
 	public static void sendFailCount(Player player, int session) {

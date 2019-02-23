@@ -66,6 +66,7 @@ public class MemoryHandler {
 		ConfigHandler.loadDelay();
 		ConfigHandler.loadGetItemPermissions();
 		ConfigHandler.loadOPCommandPermissions();
+		ConfigHandler.loadGlobalPreventSettings();
 		PlayerJoin.setRunCommands();
 	}
 	
@@ -248,7 +249,9 @@ public class MemoryHandler {
 	}
 	
 	public static void setHeldItemSlot() {
-		heldItemSlot = ConfigHandler.getConfig("config.yml").getInt("Settings.HeldItem-Slot");
+		if (!ConfigHandler.getConfig("config.yml").getString("Settings.HeldItem-Slot").equalsIgnoreCase("DISABLED")) {
+			heldItemSlot = ConfigHandler.getConfig("config.yml").getInt("Settings.HeldItem-Slot");
+		}
 	}
 	
 	public static void newMyWorlds() {

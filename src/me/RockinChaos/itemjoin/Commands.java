@@ -183,9 +183,10 @@ public class Commands implements CommandExecutor {
 			} else { Language.sendLangMessage("Commands.Default.noPermission", sender); }
 			return true;
 		} else if (args.length == 1 && args[0].equalsIgnoreCase("purge")) {
-			if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.reload")) {
+			if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.purge")) {
 				if (cmdConfirm.get(1 + sender.getName()) != null && cmdConfirm.get(1 + sender.getName()).equals(true)) {
 					SQLite.purgeDatabase("database");
+					MemoryHandler.newSQLData();
 					String[] placeHolders = Language.newString(); placeHolders[1] = "All Players"; placeHolders[10] = "Database"; placeHolders[9] = "/ij purge";
 					Language.sendLangMessage("Commands.Database.purgeSuccess", sender, placeHolders);
 					cmdConfirm.remove(1 + sender.getName());
