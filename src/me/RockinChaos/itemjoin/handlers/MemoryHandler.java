@@ -1,8 +1,5 @@
 package me.RockinChaos.itemjoin.handlers;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.bukkit.Bukkit;
 
 import me.RockinChaos.itemjoin.utils.Language;
@@ -257,27 +254,20 @@ public class MemoryHandler {
 	        metrics.addCustomChart(new Metrics.SimplePie("items", ItemUtilities.getItems().size() + " "));
 	        metrics.addCustomChart(new Metrics.SimplePie("itemPermissions", ConfigHandler.getConfig("config.yml").getBoolean("Permissions.Obtain-Items") ? "True" : "False"));
 	        metrics.addCustomChart(new Metrics.SimplePie("language", Language.getLanguage()));
-	        metrics.addCustomChart(new Metrics.SimplePie("softDepend", getPlugins().toString()));
-	        
+	        metrics.addCustomChart(new Metrics.SimplePie("softDepend", MemoryHandler.isAuthMe() ? "AuthMe" : ""));
+	        metrics.addCustomChart(new Metrics.SimplePie("softDepend", MemoryHandler.isBetterNick() ? "BetterNick" : ""));
+	        metrics.addCustomChart(new Metrics.SimplePie("softDepend", MemoryHandler.isMultiverseCore() ? "Multiverse-Core" : ""));
+	        metrics.addCustomChart(new Metrics.SimplePie("softDepend", MemoryHandler.isMultiverseInventories() ? "Multiverse-Inventories" : ""));
+	        metrics.addCustomChart(new Metrics.SimplePie("softDepend", MemoryHandler.isMyWorlds() ? "My Worlds" : ""));
+	        metrics.addCustomChart(new Metrics.SimplePie("softDepend", MemoryHandler.isPerWorldInventory() ? "PerWorldInventory" : ""));
+	        metrics.addCustomChart(new Metrics.SimplePie("softDepend", MemoryHandler.isPerWorldPlugins() ? "PerWorldPlugins" : ""));
+	        metrics.addCustomChart(new Metrics.SimplePie("softDepend", MemoryHandler.isTokenEnchant() ? "TokenEnchant" : ""));
+	        metrics.addCustomChart(new Metrics.SimplePie("softDepend", MemoryHandler.isWorldGuard() ? "WorldGuard" : ""));
+	        metrics.addCustomChart(new Metrics.SimplePie("softDepend", MemoryHandler.isHeadDatabase() ? "HeadDatabase" : ""));
+	        metrics.addCustomChart(new Metrics.SimplePie("softDepend", MemoryHandler.isXInventories() ? "xInventories" : ""));
+	        metrics.addCustomChart(new Metrics.SimplePie("softDepend", MemoryHandler.isPlaceholderAPI() ? "PlaceholderAPI" : ""));
+	        metrics.addCustomChart(new Metrics.SimplePie("softDepend", VaultAPI.vaultEnabled() ? "Vault" : ""));
 		}
-	}
-	
-	public static Map<String, Integer> getPlugins() {
-        Map<String, Integer> map = new HashMap<>();
-        if (MemoryHandler.isAuthMe()) { map.put("AuthMe", 1); }
-        if (MemoryHandler.isBetterNick()) { map.put("BetterNick", 1); }
-        if (MemoryHandler.isMultiverseCore()) { map.put("Multiverse-Core", 1); }
-        if (MemoryHandler.isMultiverseInventories()) { map.put("Multiverse-Inventories", 1); }
-        if (MemoryHandler.isMyWorlds()) { map.put("My Worlds", 1); }
-        if (MemoryHandler.isPerWorldInventory()) { map.put("PerWorldInventory", 1); }
-        if (MemoryHandler.isPerWorldPlugins()) { map.put("PerWorldPlugins", 1); }
-        if (MemoryHandler.isTokenEnchant()) { map.put("TokenEnchant", 1); }
-        if (MemoryHandler.isWorldGuard()) { map.put("WorldGuard", 1); }
-        if (MemoryHandler.isHeadDatabase()) { map.put("HeadDatabase", 1); }
-        if (MemoryHandler.isXInventories()) { map.put("xInventories", 1); }
-        if (MemoryHandler.isPlaceholderAPI()) { map.put("PlaceholderAPI", 1); }
-        if (VaultAPI.vaultEnabled()) { map.put("Vault", 1); }
-        return map;
 	}
 	
 	public static void newDataTags() {
