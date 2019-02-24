@@ -8,7 +8,6 @@ import me.RockinChaos.itemjoin.handlers.MemoryHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.handlers.UpdateHandler;
 
-
 public class ItemJoin extends JavaPlugin {
   	private static ItemJoin instance;
   	

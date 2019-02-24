@@ -1,6 +1,8 @@
 package me.RockinChaos.itemjoin.handlers;
 
 import org.bukkit.Bukkit;
+
+import me.RockinChaos.itemjoin.utils.Metrics;
 import me.RockinChaos.itemjoin.utils.Reflection;
 import me.RockinChaos.itemjoin.utils.VaultAPI;
 import me.RockinChaos.itemjoin.utils.sqlite.SQLData;
@@ -43,6 +45,7 @@ public class MemoryHandler {
 	private static int worldGuardVers = 0;
 	private static boolean dataTags = true;
 	private static boolean logCommands = true;
+	private static boolean metricsLogging = true;
 	private static boolean logColoration = true;
 	private static boolean oldMapMethod = false;
 	private static boolean oldMapViewMethod = false;
@@ -51,6 +54,7 @@ public class MemoryHandler {
 	private static SQLData sqlData;
 	private static UpdateHandler updater;
 	private static ItemDesigner itemDesigner;
+	private static Metrics metrics;
 
 	public static void generateData() {
 		ItemHandler.initializeItemID();
@@ -58,6 +62,7 @@ public class MemoryHandler {
 		setDebugging();
 		setLoggable();
 		setLogColor();
+		setMetricsLogging();
 		newSoftDepends();
 		newDataTags();
 		newSQLData();
@@ -87,6 +92,7 @@ public class MemoryHandler {
 	}
 	
 	public static void registerEvents() {
+		newMetrics();
 	    ItemJoin.getInstance().getCommand("itemjoin").setExecutor(new Commands());
 		ItemJoin.getInstance().getCommand("ij").setExecutor(new Commands());
 		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerJoin(), ItemJoin.getInstance());
@@ -192,6 +198,10 @@ public class MemoryHandler {
 		return logColoration;
 	}
 	
+	public static boolean isMetricsLogging() {
+		return metricsLogging;
+	}
+	
 	public static int getHeldItemSlot() {
 		return heldItemSlot;
 	}
@@ -210,6 +220,10 @@ public class MemoryHandler {
 	
 	public static ItemDesigner getItemDesigner() {
 		return itemDesigner;
+	}
+	
+	public static Metrics getMetrics() {
+		return metrics;
 	}
 	
 	public static void setUpdater(UpdateHandler update) {
@@ -232,6 +246,10 @@ public class MemoryHandler {
 		itemDesigner = new ItemDesigner();
 	}
 	
+	public static void newMetrics() {
+		if (isMetricsLogging()) { metrics = new Metrics(); }
+	}
+	
 	public static void newDataTags() {
 		dataTags = ConfigHandler.getConfig("config.yml").getBoolean("Settings.DataTags");
 	}
@@ -242,6 +260,10 @@ public class MemoryHandler {
 	
 	public static void setLogColor() {
 		logColoration = ConfigHandler.getConfig("config.yml").getBoolean("General.Log-Coloration");
+	}
+	
+	public static void setMetricsLogging() {
+		metricsLogging = ConfigHandler.getConfig("config.yml").getBoolean("General.Metrics-Logging");
 	}
 	
 	public static void setDebugging() {
