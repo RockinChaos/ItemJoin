@@ -35,6 +35,7 @@ import me.RockinChaos.itemjoin.utils.sqlite.SQLite;
 public class Commands implements CommandExecutor {
 	public static HashMap < String, Boolean > cmdConfirm = new HashMap < String, Boolean > ();
 	
+	@Override
 	public boolean onCommand(final CommandSender sender, Command c, String l, String[] args) {
 		if (args.length == 0) {
 			if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.use")) {
@@ -196,6 +197,7 @@ public class Commands implements CommandExecutor {
 					Language.sendLangMessage("Commands.Database.purgeWarn", sender, placeHolders);
 					Language.sendLangMessage("Commands.Database.purgeConfirm", sender, placeHolders);
 					new BukkitRunnable() {
+						@Override
 						public void run() {
 							if (cmdConfirm.get(1 + sender.getName()) != null && cmdConfirm.get(1 + sender.getName()).equals(true)) {
 								Language.sendLangMessage("Commands.Database.purgeTimeOut", sender);
@@ -235,6 +237,7 @@ public class Commands implements CommandExecutor {
 					Language.sendLangMessage("Commands.Database.purgeWarn", sender, placeHolders);
 					Language.sendLangMessage("Commands.Database.purgeConfirm", sender, placeHolders);
 					new BukkitRunnable() {
+						@Override
 						public void run() {
 							if (cmdConfirm.get(2 + sender.getName()) != null && cmdConfirm.get(2 + sender.getName()).equals(true)) {
 								Language.sendLangMessage("Commands.Database.purgeTimeOut", sender);
@@ -248,6 +251,7 @@ public class Commands implements CommandExecutor {
 					Language.sendLangMessage("Commands.Database.purgeWarn", sender, placeHolders);
 					Language.sendLangMessage("Commands.Database.purgeConfirm", sender, placeHolders);
 					new BukkitRunnable() {
+						@Override
 						public void run() {
 							if (cmdConfirm.get(3 + sender.getName()) != null && cmdConfirm.get(3 + sender.getName()).equals(true)) {
 								Language.sendLangMessage("Commands.Database.purgeTimeOut", sender);
@@ -261,6 +265,7 @@ public class Commands implements CommandExecutor {
 					Language.sendLangMessage("Commands.Database.purgeWarn", sender, placeHolders);
 					Language.sendLangMessage("Commands.Database.purgeConfirm", sender, placeHolders);
 					new BukkitRunnable() {
+						@Override
 						public void run() {
 							if (cmdConfirm.get(3 + sender.getName()) != null && cmdConfirm.get(3 + sender.getName()).equals(true)) {
 								Language.sendLangMessage("Commands.Database.purgeTimeOut", sender);
@@ -395,7 +400,7 @@ public class Commands implements CommandExecutor {
 							if (item.getAmount() > 1) {
 								itemData.set("items." + args[1] + "." + "count", item.getAmount());
 							}
-							if (item.getType().getMaxDurability() > 30 && ItemHandler.getDurability(item) != 0 && ItemHandler.getDurability(item) != ((short) item.getType().getMaxDurability())) {
+							if (item.getType().getMaxDurability() > 30 && ItemHandler.getDurability(item) != 0 && ItemHandler.getDurability(item) != (item.getType().getMaxDurability())) {
 								itemData.set("items." + args[1] + "." + "durability", ItemHandler.getDurability(item));
 							}		
 							if (item.hasItemMeta()) {

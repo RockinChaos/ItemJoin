@@ -11,7 +11,8 @@ import me.RockinChaos.itemjoin.handlers.UpdateHandler;
 public class ItemJoin extends JavaPlugin {
   	private static ItemJoin instance;
   	
-  	public void onEnable() {
+  	@Override
+	public void onEnable() {
   		instance = this;
   		ConfigHandler.loadConfigs();
   		MemoryHandler.setUpdater(new UpdateHandler(getFile()));
@@ -21,7 +22,8 @@ public class ItemJoin extends JavaPlugin {
   		ServerHandler.sendConsoleMessage("&ahas been Enabled.");
   	}
   	
-  	public void onDisable() {
+  	@Override
+	public void onDisable() {
   		MemoryHandler.getSQLData().executeLaterStatements();
   		ServerHandler.sendConsoleMessage("&4has been Disabled.");
   	}

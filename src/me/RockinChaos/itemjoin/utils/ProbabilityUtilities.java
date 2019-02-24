@@ -20,6 +20,7 @@ public class ProbabilityUtilities {
 		public int getUpperLimit() { return this.upperLimit; }
 		public int getLowerLimit() { return this.lowerLimit; }
 		public Object getElement() { return this.element; }
+		@Override
 		public String toString() { return "[" + Integer.toString(this.lowerLimit) + "|" + Integer.toString(this.upperLimit) + "]: " + this.element.toString(); }
 	}
 	

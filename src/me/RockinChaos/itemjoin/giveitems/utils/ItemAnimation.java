@@ -114,6 +114,7 @@ public class ItemAnimation {
 	private void AnimateTask(final Player player, final boolean hasNext, final String nameString, final List<String> loreString, final String materialString, final String ownerString, final String textureString, final long UpdateDelay) {
 		final ItemMap itemMap = this.itemMap;
 		new BukkitRunnable() {
+			@Override
 			public void run() {
 				if (!stopAnimations) {
 				// ============== Animate Within the Player Inventory ============== //

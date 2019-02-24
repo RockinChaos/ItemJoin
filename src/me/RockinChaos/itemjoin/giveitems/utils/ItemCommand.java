@@ -45,7 +45,8 @@ public class ItemCommand {
 	}
 	
 	private void sendDispatch(final Player player, final Type cmdtype) {
-		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), (Runnable) new Runnable() {
+		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
+			@Override
 			public void run() {
 				switch (cmdtype) {
 					case CONSOLE: dispatchConsoleCommands(player); break;

@@ -33,6 +33,7 @@ public class InventoryClose implements Listener {
 					if (ItemUtilities.isChosenProbability(item, Probable) && item.hasPermission(player) && ItemUtilities.isObtainable(player, item, 0)) {
 							updateInv = true;
 							Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
+								@Override
 								public void run() {
 									item.giveTo(player, false, 0);
 								}
@@ -44,7 +45,8 @@ public class InventoryClose implements Listener {
 			if (updateInv) { PlayerHandler.delayUpdateInventory(player, 2L); }
         } else {
         	Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
-        		public void run() {
+        		@Override
+				public void run() {
         			boolean updateInv = false;
         			for (final ItemMap item: ItemUtilities.getItems()) {
         				if (hasCraftingItems(item, player)) { updateInv = true; }
@@ -57,7 +59,7 @@ public class InventoryClose implements Listener {
     
     @EventHandler
     private void onDropCraftingItem(PlayerDropItemEvent event) {
-        final Player player = (Player) event.getPlayer();
+        final Player player = event.getPlayer();
         final InventoryView view = player.getOpenInventory();
         final Item dropItem = event.getItemDrop();
         final ItemStack copyDropItem = event.getItemDrop().getItemStack().clone();
@@ -73,6 +75,7 @@ public class InventoryClose implements Listener {
 					if (ItemUtilities.isChosenProbability(item, Probable) && item.hasPermission(player) && ItemUtilities.isObtainable(player, item, 0)) {
 						updateInv = true;
 							Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
+								@Override
 								public void run() {
 									if (getWorldChange()) {
 										item.giveTo(player, false, 0);
@@ -100,6 +103,7 @@ public class InventoryClose implements Listener {
     private void onWorldChangeDrop(PlayerChangedWorldEvent event) {
     	setWorldChange(true);
 		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
+			@Override
 			public void run() {
 				setWorldChange(false);
 			}

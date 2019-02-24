@@ -32,7 +32,7 @@ public class ImageMap extends MapRenderer {
 			try { 
 				if (Utils.containsIgnoreCase(this.image, ".gif")) {
 					this.isGIF = true;
-				    ImageReader reader = (ImageReader)ImageIO.getImageReadersByFormatName("gif").next();
+				    ImageReader reader = ImageIO.getImageReadersByFormatName("gif").next();
 				    ImageInputStream ciis = ImageIO.createImageInputStream(new File(ItemJoin.getInstance().getDataFolder(), String.valueOf(image)));
 				    reader.setInput(ciis, false);
 				    for (int i = 0; i < reader.getNumImages(true); i++) { this.imgCacheList.add(reader.read(i)); }
@@ -69,7 +69,8 @@ public class ImageMap extends MapRenderer {
     	for (final BufferedImage frame: imgCacheList) {
     		final int frameNumber = frameSize;
     		new java.util.Timer().schedule(new java.util.TimerTask() {
-    			public void run() {
+    			@Override
+				public void run() {
     				mapCanvas.drawImage(0, 0, frame);
     				if (frameNumber == maxFrames) { drawGIF(mapCanvas); }
     				this.cancel();

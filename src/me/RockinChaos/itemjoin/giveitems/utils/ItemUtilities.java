@@ -132,6 +132,7 @@ public class ItemUtilities {
 	
 	public static void safeSet(final Player player, final String type) {
 		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
+			@Override
 			public void run() {
 				if (type.equalsIgnoreCase("JOIN")) {
 					ItemUtilities.setClearingOfItems(player, player.getWorld().getName(), "Join");

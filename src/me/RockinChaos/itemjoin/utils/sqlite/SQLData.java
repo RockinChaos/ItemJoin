@@ -75,8 +75,9 @@ public class SQLData {
 	}
 	
 	private void runTaskSaveStatements() {
-        Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), (Runnable)new Runnable() {
-            public void run() {
+        Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
+            @Override
+			public void run() {
             	executeLaterStatements();
             	runTaskSaveStatements();
             }

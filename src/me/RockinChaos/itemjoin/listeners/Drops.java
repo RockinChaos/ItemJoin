@@ -34,7 +34,8 @@ public class Drops implements Listener {
 				} else { if (PlayerHandler.isCreativeMode(player)) {
 					final ItemStack readd = new ItemStack(item);
 					event.getItemDrop().remove();
-					Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), (Runnable) new Runnable() {
+					Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
+						@Override
 						public void run() {
 							player.closeInventory();
 							player.getInventory().addItem(readd);

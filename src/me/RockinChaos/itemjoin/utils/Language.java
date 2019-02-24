@@ -34,14 +34,14 @@ public class Language {
 	}
 	
 	private static String[] initializeRows(String...placeHolder) {
-		if (placeHolder == null || ((String[])placeHolder).length != newString().length) {
+		if (placeHolder == null || placeHolder.length != newString().length) {
 			String[] langHolder = Language.newString();
 			for (int i = 0; i < langHolder.length; i++) {
 				langHolder[i] = "&lnull";
 			}
 			return langHolder;
 		} else {
-			String[] langHolder = (String[]) placeHolder;
+			String[] langHolder = placeHolder;
 			for (int i = 0; i < langHolder.length; i++) {
 				if (langHolder[i] == null) {
 					langHolder[i] = "&lnull";
@@ -89,6 +89,10 @@ public class Language {
 	
 	public static String[] newString() {
 		return new String[14];
+	}
+	
+	public static String getLanguage() {
+		return langType.name().substring(0, 1).toUpperCase() + langType.name().substring(1).toLowerCase();
 	}
 	
 	private enum Lang {

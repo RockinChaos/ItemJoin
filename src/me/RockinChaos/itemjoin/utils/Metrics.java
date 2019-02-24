@@ -10,7 +10,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import me.RockinChaos.itemjoin.ItemJoin;
-
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
@@ -27,21 +26,6 @@ import java.util.zip.GZIPOutputStream;
  * Collects some data for plugin authors.
  */
 public class Metrics {
-
-    static {
-        // You can use the property to disable the check in your test environment
-        if (System.getProperty("bstats.relocatecheck") == null || !System.getProperty("bstats.relocatecheck").equals("false")) {
-            // Maven's Relocate is clever and changes strings, too. So we have to use this little "trick" ... :D
-            final String defaultPackage = new String(
-                    new byte[]{'o', 'r', 'g', '.', 'b', 's', 't', 'a', 't', 's', '.', 'b', 'u', 'k', 'k', 'i', 't'});
-            final String examplePackage = new String(new byte[]{'y', 'o', 'u', 'r', '.', 'p', 'a', 'c', 'k', 'a', 'g', 'e'});
-            // We want to make sure nobody just copy & pastes the example and use the wrong package names
-            if (Metrics.class.getPackage().getName().equals(defaultPackage) || Metrics.class.getPackage().getName().equals(examplePackage)) {
-                throw new IllegalStateException("bStats Metrics class has not been relocated correctly!");
-            }
-        }
-    }
-
     public static final int B_STATS_VERSION = 1;
     private static final String URL = "https://bStats.org/submitData/bukkit";
     private boolean enabled;
@@ -137,8 +121,9 @@ public class Metrics {
                     timer.cancel();
                     return;
                 }
-                Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), (Runnable)new Runnable() {
-                    public void run() {
+                Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
+                    @Override
+					public void run() {
                     	submitData();
                     }
                 }, 1L);
@@ -190,8 +175,6 @@ public class Metrics {
         }
         int onlineMode = Bukkit.getOnlineMode() ? 1 : 0;
         String bukkitVersion = Bukkit.getVersion();
-
-        // OS/Java specific data
         String javaVersion = System.getProperty("java.version");
         String osName = System.getProperty("os.name");
         String osArch = System.getProperty("os.arch");
@@ -240,10 +223,8 @@ public class Metrics {
             @Override
             public void run() {
                 try {
-                    // Send the data
                     sendData(plugin, data);
                 } catch (Exception e) {
-                    // Something went wrong! :(
                     if (logFailedRequests) {
                         plugin.getLogger().log(Level.WARNING, "Could not submit plugin stats of " + plugin.getName(), e);
                     }
@@ -361,7 +342,7 @@ public class Metrics {
      */
     public static class SimplePie extends CustomChart {
 
-        private final Callable<String> callable;
+        private final String[] callable;
 
         /**
          * Class constructor.
@@ -369,7 +350,7 @@ public class Metrics {
          * @param chartId The id of the chart.
          * @param callable The callable which is used to request the chart data.
          */
-        public SimplePie(String chartId, Callable<String> callable) {
+        public SimplePie(String chartId, String...callable) {
             super(chartId);
             this.callable = callable;
         }
@@ -377,11 +358,12 @@ public class Metrics {
         @Override
         protected JSONObject getChartData() throws Exception {
             JSONObject data = new JSONObject();
-            String value = callable.call();
-            if (value == null || value.isEmpty()) {
-                return null;
+            for (String value: callable) {
+            	if (value == null || value.isEmpty()) {
+            		return null;
+            	}
+            	data.put("value", value);
             }
-            data.put("value", value);
             return data;
         }
     }
@@ -615,7 +597,7 @@ public class Metrics {
             boolean allSkipped = true;
             for (Map.Entry<String, int[]> entry : map.entrySet()) {
                 if (entry.getValue().length == 0) {
-                    continue; // Skip this invalid
+                    continue;
                 }
                 allSkipped = false;
                 JSONArray categoryValues = new JSONArray();

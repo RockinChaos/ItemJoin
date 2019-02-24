@@ -48,6 +48,7 @@ public class RegionEnter implements Listener {
 		ItemUtilities.safeSet(player, "Region-Enter");
 		playersInRegions.put(player, regionId);
 		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
+			@Override
 			public void run() {
 				final int session = Utils.getRandom(1, 100000);
 				removeLeaveItems(player);

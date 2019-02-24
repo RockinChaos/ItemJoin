@@ -1406,9 +1406,9 @@ public class ItemMap {
 	private void setDurability() {
 		if (this.durability != null) {
 			if (ServerHandler.hasAquaticUpdate()) {
-				((Damageable) this.tempMeta).setDamage((short) this.durability);
+				((Damageable) this.tempMeta).setDamage(this.durability);
 			} else {
-				Legacy.setLegacyDurability(this.tempItem, (short) this.durability);
+				Legacy.setLegacyDurability(this.tempItem, this.durability);
 			}
 		}
 	}
@@ -1633,7 +1633,8 @@ public class ItemMap {
 	private void removeDisposable(final Player player, final ItemStack itemCopy) {
 		if (this.disposable) {
 			setSubjectRemoval(true);
-			Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), (Runnable) new Runnable() {
+			Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
+				@Override
 				public void run() {
 					if (PlayerHandler.isCreativeMode(player)) {
 						player.closeInventory();

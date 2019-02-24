@@ -59,6 +59,7 @@ public class SQLite extends Database {
 		}
 	}
 	
+	@Override
 	public Connection getSQLConnection() {
 		File dataFolder = new File(ItemJoin.getInstance().getDataFolder(), dbname + ".db");
 		if (!dataFolder.exists()) {
@@ -85,6 +86,7 @@ public class SQLite extends Database {
 		return null;
 	}
 	
+	@Override
 	public void load() {
 		connection = getSQLConnection();
 		try {

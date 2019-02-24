@@ -2,6 +2,7 @@ package me.RockinChaos.itemjoin.handlers;
 
 import org.bukkit.Bukkit;
 
+import me.RockinChaos.itemjoin.utils.Language;
 import me.RockinChaos.itemjoin.utils.Metrics;
 import me.RockinChaos.itemjoin.utils.Reflection;
 import me.RockinChaos.itemjoin.utils.VaultAPI;
@@ -15,6 +16,7 @@ import me.RockinChaos.itemjoin.giveitems.listeners.RegionEnter;
 import me.RockinChaos.itemjoin.giveitems.listeners.Respawn;
 import me.RockinChaos.itemjoin.giveitems.listeners.WorldSwitch;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemDesigner;
+import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 import me.RockinChaos.itemjoin.listeners.Consumes;
 import me.RockinChaos.itemjoin.listeners.Drops;
 import me.RockinChaos.itemjoin.listeners.Interact;
@@ -92,7 +94,7 @@ public class MemoryHandler {
 	}
 	
 	public static void registerEvents() {
-		newMetrics();
+		setupMetrics();
 	    ItemJoin.getInstance().getCommand("itemjoin").setExecutor(new Commands());
 		ItemJoin.getInstance().getCommand("ij").setExecutor(new Commands());
 		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerJoin(), ItemJoin.getInstance());
@@ -246,8 +248,13 @@ public class MemoryHandler {
 		itemDesigner = new ItemDesigner();
 	}
 	
-	public static void newMetrics() {
-		if (isMetricsLogging()) { metrics = new Metrics(); }
+	private static void setupMetrics() {
+		if (isMetricsLogging()) { 
+			metrics = new Metrics();
+	        metrics.addCustomChart(new Metrics.SimplePie("items", ItemUtilities.getItems().size() + " "));
+	        metrics.addCustomChart(new Metrics.SimplePie("itemPermissions", ConfigHandler.getConfig("config.yml").getBoolean("Permissions.Obtain-Items") ? "True" : "False"));
+	        metrics.addCustomChart(new Metrics.SimplePie("language", Language.getLanguage()));
+		}
 	}
 	
 	public static void newDataTags() {

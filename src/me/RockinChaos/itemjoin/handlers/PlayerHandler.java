@@ -128,8 +128,9 @@ public class PlayerHandler {
 	}
 	
 	public static void updateExperienceLevels(final Player player) {
-        Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), (Runnable)new Runnable() {
-            public void run() {
+        Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
+            @Override
+			public void run() {
             	player.setExp(player.getExp());
             	player.setLevel(player.getLevel());
             }
@@ -137,16 +138,18 @@ public class PlayerHandler {
 	}
 	
 	public static void updateInventory(final Player player) {
-        Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), (Runnable)new Runnable() {
-            public void run() {
+        Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
+            @Override
+			public void run() {
             	Legacy.updateLegacyInventory(player);
             }
         }, 1L);
 	}
 	
 	public static void delayUpdateInventory(final Player player, final long delay) {
-        Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), (Runnable)new Runnable() {
-            public void run() {
+        Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
+            @Override
+			public void run() {
             	Legacy.updateLegacyInventory(player);
             }
         }, delay);

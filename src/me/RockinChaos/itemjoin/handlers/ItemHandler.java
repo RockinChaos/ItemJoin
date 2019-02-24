@@ -5,6 +5,7 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -252,7 +253,7 @@ public class ItemHandler {
 	private static boolean setSkin(GameProfile profile, UUID uuid) {
 		try {
 			HttpsURLConnection connection = (HttpsURLConnection) new URL(String.format("https://sessionserver.mojang.com/session/minecraft/profile/%s?unsigned=false", UUIDTypeAdapter.fromUUID(uuid))).openConnection();
-			if (connection.getResponseCode() == HttpsURLConnection.HTTP_OK) {
+			if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
 				String reply = new BufferedReader(new InputStreamReader(connection.getInputStream())).readLine();
 				String skin = reply.split("\"value\":\"")[1].split("\"")[0];
 				String signature = reply.split("\"signature\":\"")[1].split("\"")[0];
