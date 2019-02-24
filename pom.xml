@@ -108,11 +108,11 @@
 	</repositories>
 	<dependencies>
     <!--Maven WorldUtils API-->
-    <dependency>
-        <groupId>commons-lang</groupId>
-        <artifactId>commons-lang</artifactId>
-        <version>LATEST</version>
-    </dependency>
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>LATEST</version>
+		</dependency>
     <!--Spigot API-->
 		<dependency>
 			<groupId>org.spigotmc</groupId>
