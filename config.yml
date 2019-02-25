@@ -41,7 +41,7 @@ Active-Commands:
   commands:
     - 'itemjoin get <item> <player>'
     - 'first-join: say This is a command only executed once per world, per player.'
-  trigger: JOIN
+  triggers: JOIN
   enabled-worlds: DISABLED
 
 # This determines if the action is allowed for all items in the specified worlds.
