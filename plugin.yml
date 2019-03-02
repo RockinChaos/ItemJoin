@@ -2,7 +2,7 @@ name: ItemJoin
 main: me.RockinChaos.itemjoin.ItemJoin
 author: RockinChaos
 api-version: 1.13
-version: 5.0.3
+version: 5.0.4-SNAPSHOT
 description: Get custom items on join.
 website: https://www.spigotmc.org/resources/itemjoin.12661/
 softdepend: [AuthMe, BetterNick, HeadDatabase, Multiverse-Core, Multiverse-Inventories, MyWorlds, PerWorldInventory, PerWorldPlugins, PlaceholderAPI, TokenEnchant, Vault, WorldGuard, xInventories]
@@ -211,12 +211,17 @@ commands:
       usage: |
           /itemjoin purge
    itemjoin purge first-join <player>:
-      description: This will purge all first-join data for said player from the database file.
+      description: This will purge all first-join data for the said player from the database file.
       permission: itemjoin.purge
       usage: |
           /itemjoin purge first-join <player>
+   itemjoin purge first-world <player>:
+      description: This will purge all first-world data for the said player from the database file.
+      permission: itemjoin.purge
+      usage: |
+          /itemjoin purge first-world <player>
    itemjoin purge ip-limits <player>:
-      description: This will purge all ip-limits data for said player from the database file.
+      description: This will purge all ip-limits data for the said player from the database file.
       permission: itemjoin.purge
       usage: |
           /itemjoin purge ip-limits <player>
