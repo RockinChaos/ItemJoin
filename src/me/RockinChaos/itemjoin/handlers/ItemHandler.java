@@ -1,21 +1,11 @@
 package me.RockinChaos.itemjoin.handlers;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.math.BigInteger;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
-
-import javax.net.ssl.HttpsURLConnection;
-
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -26,14 +16,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.map.MapView;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 import org.bukkit.inventory.meta.Damageable;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
-import com.mojang.util.UUIDTypeAdapter;
-
 import me.RockinChaos.itemjoin.utils.Legacy;
 import me.RockinChaos.itemjoin.utils.Reflection;
 import me.RockinChaos.itemjoin.utils.Utils;
@@ -41,7 +27,6 @@ import me.RockinChaos.itemjoin.utils.Utils;
 public class ItemHandler {
 	
 	private static HashMap < Integer, Integer > ArbitraryID = new HashMap < Integer, Integer > ();
-	private static HashMap < String, GameProfile > gameProfiles = new HashMap < String, GameProfile > ();
 	
 	public static void initializeItemID() {
 		ArbitraryID.clear();
@@ -182,88 +167,7 @@ public class ItemHandler {
 	}
 	
 	public static ItemMeta setSkullOwner(ItemMeta tempmeta, String owner) {
-		if (ServerHandler.hasSpecificUpdate("1_8")) {
-			try {
-				Method fetchProfile = Reflection.getOBC("entity.CraftPlayer").getDeclaredMethod("getProfile");
-				Field declaredField = tempmeta.getClass().getDeclaredField("profile");
-				declaredField.setAccessible(true);
-				if (PlayerHandler.getPlayerString(owner) != null) {
-					declaredField.set(tempmeta, fetchProfile.invoke(PlayerHandler.getPlayerString(owner)));
-				} else if (PlayerHandler.getPlayerString(owner) == null) {
-					if (gameProfiles.get(owner) == null) {
-						String uuidString = getMojangUUID(owner);
-						if (uuidString != null) {
-							GameProfile profile = new GameProfile(UUIDConversion(uuidString), owner);
-							setSkin(profile, UUIDConversion(uuidString));
-							gameProfiles.put(owner, profile);
-						}
-					}
-					declaredField.set(tempmeta, gameProfiles.get(owner));
-				}
-			} catch (Exception e) { ServerHandler.sendDebugTrace(e); }
-		} else {
-			ServerHandler.sendDebugMessage("Minecraft does not support offline player heads below Version 1.8.");
-			ServerHandler.sendDebugMessage("Player heads will only be given a skin if the player has previously joined the sever.");
-			return Legacy.setLegacySkullOwner(((SkullMeta) tempmeta), owner);
-		}
-		return tempmeta;
-	}
-	
-	private static UUID UUIDConversion(String uuidString) {
-		uuidString = uuidString.replace("-", "");
-		UUID uuid = new UUID(
-		        new BigInteger(uuidString.substring(0, 16), 16).longValue(),
-		        new BigInteger(uuidString.substring(16), 16).longValue());
-		return uuid;
-	}
-	
-    private static String getMojangUUID(String name) {
-        String url = "https://api.mojang.com/users/profiles/minecraft/"+name;
-        try {
-            @SuppressWarnings("deprecation")
-            String UUIDJson = IOUtils.toString(new URL(url));           
-            if(UUIDJson.isEmpty()) return null;                       
-            JSONObject UUIDObject = (JSONObject) JSONValue.parseWithException(UUIDJson);
-            return UUIDObject.get("id").toString();
-        } catch (Exception e) { }
-        return null;
-    }
-    
-    public static void generateProfile(String owner) {
-		if (gameProfiles.get(owner) == null) {
-			if (PlayerHandler.getPlayerString(owner) != null) {
-				GameProfile profile = new GameProfile(PlayerHandler.getPlayerString(owner).getUniqueId(), owner);
-				setSkin(profile, PlayerHandler.getPlayerString(owner).getUniqueId());
-				gameProfiles.put(owner, profile);
-			} else if (PlayerHandler.getOfflinePlayer(owner) != null) {
-				GameProfile profile = new GameProfile(PlayerHandler.getOfflinePlayer(owner).getUniqueId(), owner);
-				setSkin(profile, PlayerHandler.getOfflinePlayer(owner).getUniqueId());
-				gameProfiles.put(owner, profile);
-			} else {
-				String uuidString = getMojangUUID(owner);
-				if (uuidString != null) {
-					GameProfile profile = new GameProfile(UUIDConversion(uuidString), owner);
-					setSkin(profile, UUIDConversion(uuidString));
-					gameProfiles.put(owner, profile);
-				}
-			}
-		}
-    }
-	
-	private static boolean setSkin(GameProfile profile, UUID uuid) {
-		try {
-			HttpsURLConnection connection = (HttpsURLConnection) new URL(String.format("https://sessionserver.mojang.com/session/minecraft/profile/%s?unsigned=false", UUIDTypeAdapter.fromUUID(uuid))).openConnection();
-			if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-				String reply = new BufferedReader(new InputStreamReader(connection.getInputStream())).readLine();
-				String skin = reply.split("\"value\":\"")[1].split("\"")[0];
-				String signature = reply.split("\"signature\":\"")[1].split("\"")[0];
-				profile.getProperties().put("textures", new Property("textures", skin, signature));
-				return true;
-			} else {
-				System.out.println("Connection could not be opened (Response code " + connection.getResponseCode() + ", " + connection.getResponseMessage() + ")");
-				return false;
-			}
-		} catch (Exception e) { ServerHandler.sendDebugTrace(e); return false; }
+		return Legacy.setLegacySkullOwner((SkullMeta) tempmeta, owner);
 	}
 	
 	public static String getSkullSkinTexture(ItemMeta meta) {
@@ -332,9 +236,5 @@ public class ItemHandler {
 		int b = (hex & 0xFF);
 		Color bukkitColor = Color.fromBGR(r, g, b);
 		return bukkitColor;
-	}
-	
-	public static HashMap<String, GameProfile> getGameProfiles() {
-		return gameProfiles;
 	}
 }

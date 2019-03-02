@@ -2,7 +2,6 @@ package me.RockinChaos.itemjoin.giveitems.utils;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -1149,14 +1148,11 @@ public class ItemMap {
      
 	public boolean isSimilar(ItemStack item) {
 		if (item != null && item.getType() != Material.AIR && item.getType() == this.material || this.materialAnimated && item != null && item.getType() != Material.AIR && this.isMaterial(item)) {
-			if (MemoryHandler.isDataTags() && ServerHandler.hasSpecificUpdate("1_8") 
-					&& ItemHandler.getNBTData(item) != null 
-					&& Utils.containsIgnoreCase(ItemHandler.getNBTData(item), this.newNBTData)
-					|| this.legacySecret != null 
-					&& item.hasItemMeta() 
-					&& item.getItemMeta().hasDisplayName() && item.getItemMeta().getDisplayName().contains(this.legacySecret) || this.vanillaItem && this.vanillaStatus) {
+			if (MemoryHandler.isDataTags() && ServerHandler.hasSpecificUpdate("1_8") && ItemHandler.getNBTData(item) != null && Utils.containsIgnoreCase(ItemHandler.getNBTData(item), this.newNBTData)
+					|| this.legacySecret != null && item.hasItemMeta() && item.getItemMeta().hasDisplayName() && item.getItemMeta().getDisplayName().contains(this.legacySecret) || this.vanillaItem && this.vanillaStatus) {
 				if (!this.isSkull() && skullOwner == null || this.isSkull() && !this.skullAnimated && ((SkullMeta) item.getItemMeta()).hasOwner() 
 						&& this.skullOwner != null && PlayerHandler.getSkullOwner(item).equalsIgnoreCase(this.skullOwner) 
+						|| this.skullOwner != null && this.isSkullOwner(item)
 						|| this.skullOwner != null && Utils.containsIgnoreCase(this.skullOwner, "%player%")
 						|| this.isSkull() && this.skullTexture != null && this.skullOwner == null 
 						&& ItemHandler.getSkullSkinTexture(item.getItemMeta()).equalsIgnoreCase(this.skullTexture)
@@ -1228,13 +1224,10 @@ public class ItemMap {
 		if (this.dynamicOwners != null && !this.dynamicOwners.isEmpty()) {
 			for (String owners : this.dynamicOwners) {
 				owners = ItemHandler.purgeDelay(owners);
-				if (PlayerHandler.getSkullOwner(item) != null && PlayerHandler.getSkullOwner(item).equalsIgnoreCase(this.skullOwner) || PlayerHandler.getSkullOwner(item) != null && Utils.containsIgnoreCase(this.skullOwner, "%player%") || ItemHandler.getGameProfiles().get(owners) != null && ItemHandler.getSkullSkinTexture(item.getItemMeta()).equalsIgnoreCase(this.getTexture(ItemHandler.getGameProfiles().get(owners)))) {
+				if (PlayerHandler.getSkullOwner(item) != null && PlayerHandler.getSkullOwner(item).equalsIgnoreCase(this.skullOwner) || PlayerHandler.getSkullOwner(item) != null && Utils.containsIgnoreCase(this.skullOwner, "%player%")) {
 					return true;
-				} else if (ItemHandler.getGameProfiles().get(owners) == null && !owners.equalsIgnoreCase("%player%")) {
-					ItemHandler.generateProfile(owners);
-					if (ItemHandler.getGameProfiles().get(owners) != null && ItemHandler.getSkullSkinTexture(item.getItemMeta()).equalsIgnoreCase(this.getTexture(ItemHandler.getGameProfiles().get(owners)))) {
-						return true;
-					}
+				} else if (this.isSkullOwner(item)){
+					return true;
 				}
 			}
 			if (this.dynamicOwners.toString().contains("%player%")) { return true; }
@@ -1249,12 +1242,15 @@ public class ItemMap {
 		return false;
 	}
 	
-	private String getTexture(GameProfile profile) {
-		final Collection < Property > props = profile.getProperties().get("textures");
-		for (final Property property: props) {
-			if (property.getName().equals("textures")) { return property.getValue(); }
+	private boolean isSkullOwner(ItemStack item) {
+		ItemStack itemCopy = this.tempItem.clone();
+		ItemMeta itemCopyMeta = itemCopy.getItemMeta();
+		itemCopyMeta = ItemHandler.setSkullOwner(itemCopyMeta, this.skullOwner);
+		itemCopy.setItemMeta(itemCopyMeta);
+		if (ItemHandler.getSkullSkinTexture(item.getItemMeta()).equalsIgnoreCase(ItemHandler.getSkullSkinTexture(itemCopy.getItemMeta()))) {
+			return true;	
 		}
-		return "NULL";
+		return false;
 	}
 	
 	public boolean hasItem(Player player) {
