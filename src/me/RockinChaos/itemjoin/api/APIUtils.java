@@ -10,6 +10,11 @@ import me.RockinChaos.itemjoin.utils.Utils;
 
 public class APIUtils {
 	
+    /**
+     * Gives all ItemJoin items to the specified player.
+     * 
+     * @param player that will recieve the items.
+     */
 	 public void setItems(Player player) {
 		String Probable = ItemUtilities.getProbabilityItem(player);
 		final int session = Utils.getRandom(1, 80000);
