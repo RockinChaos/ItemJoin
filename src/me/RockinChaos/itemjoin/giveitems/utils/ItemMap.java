@@ -1226,7 +1226,7 @@ public class ItemMap {
 				owners = ItemHandler.purgeDelay(owners);
 				if (PlayerHandler.getSkullOwner(item) != null && PlayerHandler.getSkullOwner(item).equalsIgnoreCase(this.skullOwner) || PlayerHandler.getSkullOwner(item) != null && Utils.containsIgnoreCase(this.skullOwner, "%player%")) {
 					return true;
-				} else if (this.isSkullOwner(item)){
+				} else if (this.isSkullOwner(item) && this.isSkull()){
 					return true;
 				}
 			}
@@ -1247,7 +1247,8 @@ public class ItemMap {
 		ItemMeta itemCopyMeta = itemCopy.getItemMeta();
 		itemCopyMeta = ItemHandler.setSkullOwner(itemCopyMeta, this.skullOwner);
 		itemCopy.setItemMeta(itemCopyMeta);
-		if (ItemHandler.getSkullSkinTexture(item.getItemMeta()).equalsIgnoreCase(ItemHandler.getSkullSkinTexture(itemCopy.getItemMeta()))) {
+		if (ItemHandler.getSkullSkinTexture(item.getItemMeta()) != null && ItemHandler.getSkullSkinTexture(itemCopy.getItemMeta()) != null &&
+				ItemHandler.getSkullSkinTexture(item.getItemMeta()).equalsIgnoreCase(ItemHandler.getSkullSkinTexture(itemCopy.getItemMeta()))) {
 			return true;	
 		}
 		return false;
