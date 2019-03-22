@@ -12,7 +12,7 @@ public class VaultAPI {
     private static boolean isEnabled = false;
     
 	public static void enableEconomy() { 
-		if (ConfigHandler.getConfig("config.yml").getBoolean("Vault") && ItemJoin.getInstance().getServer().getPluginManager().getPlugin("Vault") != null) {
+		if (ConfigHandler.getConfig("config.yml").getBoolean("softDepend.Vault") && ItemJoin.getInstance().getServer().getPluginManager().getPlugin("Vault") != null) {
 			if (!setupEconomy()) {
 	          ServerHandler.sendErrorMessage("There was an issue setting up Vault to work with ItemJoin!");
 	          ServerHandler.sendErrorMessage("If this continues, please contact the plugin developer!");
