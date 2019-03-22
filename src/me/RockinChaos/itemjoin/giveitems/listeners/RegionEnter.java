@@ -64,7 +64,7 @@ public class RegionEnter implements Listener {
 			String Probable = ItemUtilities.getProbabilityItem(player);
 			for (ItemMap item: ItemUtilities.getItems()) {
 				if (item.isGiveOnRegionEnter() && MemoryHandler.getSQLData().isEnabled(player) && item.inWorld(player.getWorld()) && ItemUtilities.isChosenProbability(item, Probable) && item.hasPermission(player)) {
-					item.removeFrom(player);
+					item.removeFrom(player, 0);
 				}
 			}
 			playersInRegions.remove(player);
@@ -75,7 +75,7 @@ public class RegionEnter implements Listener {
 		String Probable = ItemUtilities.getProbabilityItem(player);
 		for (ItemMap item: ItemUtilities.getItems()) {
 			if (item.isTakeOnRegionLeave() && MemoryHandler.getSQLData().isEnabled(player) && item.inWorld(player.getWorld()) && ItemUtilities.isChosenProbability(item, Probable) && item.hasPermission(player)) {
-				item.removeFrom(player);
+				item.removeFrom(player, 0);
 			}
 		}
 	}

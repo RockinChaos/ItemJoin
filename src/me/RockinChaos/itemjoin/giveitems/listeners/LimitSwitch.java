@@ -52,7 +52,7 @@ public class LimitSwitch implements Listener {
 						item.giveTo(player, false, 0); 
 						item.setAnimations(player);
 					} else if (item.isUseOnLimitSwitch() && !item.isLimitMode(newMode) && item.inWorld(player.getWorld()) && item.hasItem(player)) {
-						item.removeFrom(player);
+						item.removeFrom(player, 0);
 					}
 				}
 				ItemUtilities.sendFailCount(player, session);

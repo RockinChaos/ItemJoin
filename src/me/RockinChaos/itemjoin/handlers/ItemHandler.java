@@ -181,7 +181,7 @@ public class ItemHandler {
 			for (final Property property: props) {
 				if (property.getName().equals("textures")) { return property.getValue(); }
 			}
-		} catch (Exception e) { ServerHandler.sendDebugTrace(e); }
+		} catch (Exception e) { }
 		return "";
 	}
 	

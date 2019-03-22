@@ -53,7 +53,7 @@ public class Commands implements CommandExecutor {
 				Language.dispatchMessage(sender, "&a&l/ItemJoin Updates &7- &eChecks for plugin updates.");
 				Language.dispatchMessage(sender, "&a&l/ItemJoin AutoUpdate &7- &eUpdate ItemJoin to latest version.");
 				Language.dispatchMessage(sender, "&aType &a&l/ItemJoin Help 2 &afor the next page.");
-				Language.dispatchMessage(sender, "&a&l&m]----------------&a&l[&e Help Menu 1/8 &a&l]&a&l&m---------------[");
+				Language.dispatchMessage(sender, "&a&l&m]----------------&a&l[&e Help Menu 1/9 &a&l]&a&l&m---------------[");
 				Language.dispatchMessage(sender, "");
 			} else { Language.sendLangMessage("Commands.Default.noPermission", sender); }
 			return true;
@@ -67,7 +67,7 @@ public class Commands implements CommandExecutor {
 				Language.dispatchMessage(sender, "&a&l/ItemJoin Permissions &7- &eLists the permissions you have.");
 				Language.dispatchMessage(sender, "&a&l/ItemJoin Permissions 2 &7- &ePermissions page 2.");
 				Language.dispatchMessage(sender, "&aType &a&l/ItemJoin Help 3 &afor the next page.");
-				Language.dispatchMessage(sender, "&a&l&m]----------------&a&l[&e Help Menu 2/8 &a&l]&a&l&m---------------[");
+				Language.dispatchMessage(sender, "&a&l&m]----------------&a&l[&e Help Menu 2/9 &a&l]&a&l&m---------------[");
 				Language.dispatchMessage(sender, "");
 			} else { Language.sendLangMessage("Commands.Default.noPermission", sender); }
 			return true;
@@ -79,9 +79,9 @@ public class Commands implements CommandExecutor {
 				Language.dispatchMessage(sender, "&a&l/ItemJoin Get <Item> &7- &eGives that ItemJoin item.");
 				Language.dispatchMessage(sender, "&a&l/ItemJoin Get <Item> <Qty> &7- &eGives amount of said item.");
 				Language.dispatchMessage(sender, "&a&l/ItemJoin Get <Item> <User> &7- &eGives to said player.");
-				Language.dispatchMessage(sender, "&a&l/ItemJoin Get <Item> <User> <Qty> &7- &eGives Qty to player.");
+				Language.dispatchMessage(sender, "&a&l/ItemJoin Get <Item> <User> <Qty> &7- &eGives qty to player.");
 				Language.dispatchMessage(sender, "&aType &a&l/ItemJoin Help 4 &afor the next page.");
-				Language.dispatchMessage(sender, "&a&l&m]----------------&a&l[&e Help Menu 3/8 &a&l]&a&l&m---------------[");
+				Language.dispatchMessage(sender, "&a&l&m]----------------&a&l[&e Help Menu 3/9 &a&l]&a&l&m---------------[");
 				Language.dispatchMessage(sender, "");
 			} else { Language.sendLangMessage("Commands.Default.noPermission", sender); }
 			return true;
@@ -89,13 +89,12 @@ public class Commands implements CommandExecutor {
 			if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.use")) {
 				Language.dispatchMessage(sender, "");
 				Language.dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
-				Language.dispatchMessage(sender, "&a&l/ItemJoin GetOnline <Item> &7- &eGives to all online.");
-				Language.dispatchMessage(sender, "&a&l/ItemJoin GetOnline <Item> <Qty> &7- &eGives Qty to all online.");
 				Language.dispatchMessage(sender, "&a&l/ItemJoin Remove <Item> &7- &eRemoves item from inventory.");
+				Language.dispatchMessage(sender, "&a&l/ItemJoin Remove <Item> <Qty> &7- &eRemoves qty of item.");
 				Language.dispatchMessage(sender, "&a&l/ItemJoin Remove <Item> <User> &7- &eRemoves from player.");
-				Language.dispatchMessage(sender, "&a&l/ItemJoin RemoveOnline <Item> &7- &eRemoves from all online.");
+				Language.dispatchMessage(sender, "&a&l/ItemJoin Remove <Item> <User> <Qty> &7- &eRemoves qty.");
 				Language.dispatchMessage(sender, "&aType &a&l/ItemJoin Help 5 &afor the next page.");
-				Language.dispatchMessage(sender, "&a&l&m]----------------&a&l[&e Help Menu 4/8 &a&l]&a&l&m---------------[");
+				Language.dispatchMessage(sender, "&a&l&m]----------------&a&l[&e Help Menu 4/9 &a&l]&a&l&m---------------[");
 				Language.dispatchMessage(sender, "");
 			} else { Language.sendLangMessage("Commands.Default.noPermission", sender); }
 			return true;
@@ -103,12 +102,12 @@ public class Commands implements CommandExecutor {
 			if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.use")) {
 				Language.dispatchMessage(sender, "");
 				Language.dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
-				Language.dispatchMessage(sender, "&a&l/ItemJoin GetAll &7- &eGives all ItemJoin items.");
-				Language.dispatchMessage(sender, "&a&l/ItemJoin GetAll <User> &7- &eGives all items to said player.");
-				Language.dispatchMessage(sender, "&a&l/ItemJoin RemoveAll &7- &eRemoves all ItemJoin items.");
-				Language.dispatchMessage(sender, "&a&l/ItemJoin RemoveAll <User> &7- &eRemoves from player.");
+				Language.dispatchMessage(sender, "&a&l/ItemJoin GetOnline <Item> &7- &eGives to all online.");
+				Language.dispatchMessage(sender, "&a&l/ItemJoin GetOnline <Item> <Qty> &7- &eGives qty to all online.");
+				Language.dispatchMessage(sender, "&a&l/ItemJoin RemoveOnline <Item> &7- &eRemoves from all online.");
+				Language.dispatchMessage(sender, "&a&l/ItemJoin RemoveOnline <Item> <Qty> &7- &eRemoves qty.");
 				Language.dispatchMessage(sender, "&aType &a&l/ItemJoin Help 6 &afor the next page.");
-				Language.dispatchMessage(sender, "&a&l&m]----------------&a&l[&e Help Menu 5/8 &a&l]&a&l&m---------------[");
+				Language.dispatchMessage(sender, "&a&l&m]----------------&a&l[&e Help Menu 5/9 &a&l]&a&l&m---------------[");
 				Language.dispatchMessage(sender, "");
 			} else { Language.sendLangMessage("Commands.Default.noPermission", sender); }
 			return true;
@@ -116,11 +115,12 @@ public class Commands implements CommandExecutor {
 			if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.use")) {
 				Language.dispatchMessage(sender, "");
 				Language.dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
-				Language.dispatchMessage(sender, "&a&l/ItemJoin Enable &7- &eEnables ItemJoin for all players.");
-				Language.dispatchMessage(sender, "&a&l/ItemJoin Enable <User> &7- &eEnables ItemJoin for player.");
-				Language.dispatchMessage(sender, "&a&l/ItemJoin Enable <User> <World> &7- &eFor player/world.");
+				Language.dispatchMessage(sender, "&a&l/ItemJoin GetAll &7- &eGives all ItemJoin items.");
+				Language.dispatchMessage(sender, "&a&l/ItemJoin GetAll <User> &7- &eGives all items to said player.");
+				Language.dispatchMessage(sender, "&a&l/ItemJoin RemoveAll &7- &eRemoves all ItemJoin items.");
+				Language.dispatchMessage(sender, "&a&l/ItemJoin RemoveAll <User> &7- &eRemoves from player.");
 				Language.dispatchMessage(sender, "&aType &a&l/ItemJoin Help 7 &afor the next page.");
-				Language.dispatchMessage(sender, "&a&l&m]----------------&a&l[&e Help Menu 6/8 &a&l]&a&l&m---------------[");
+				Language.dispatchMessage(sender, "&a&l&m]----------------&a&l[&e Help Menu 6/9 &a&l]&a&l&m---------------[");
 				Language.dispatchMessage(sender, "");
 			} else { Language.sendLangMessage("Commands.Default.noPermission", sender); }
 			return true;
@@ -128,15 +128,27 @@ public class Commands implements CommandExecutor {
 			if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.use")) {
 				Language.dispatchMessage(sender, "");
 				Language.dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
-				Language.dispatchMessage(sender, "&a&l/ItemJoin Disable &7- &eDisables ItemJoin for all players.");
-				Language.dispatchMessage(sender, "&a&l/ItemJoin Disable <User> &7- &eDisables ItemJoin for player.");
-				Language.dispatchMessage(sender, "&a&l/ItemJoin Disable <User> <World> &7- &eFor player/world.");
+				Language.dispatchMessage(sender, "&a&l/ItemJoin Enable &7- &eEnables ItemJoin for all players.");
+				Language.dispatchMessage(sender, "&a&l/ItemJoin Enable <User> &7- &eEnables ItemJoin for player.");
+				Language.dispatchMessage(sender, "&a&l/ItemJoin Enable <User> <World> &7- &eFor player/world.");
 				Language.dispatchMessage(sender, "&aType &a&l/ItemJoin Help 8 &afor the next page.");
-				Language.dispatchMessage(sender, "&a&l&m]----------------&a&l[&e Help Menu 7/8 &a&l]&a&l&m---------------[");
+				Language.dispatchMessage(sender, "&a&l&m]----------------&a&l[&e Help Menu 7/9 &a&l]&a&l&m---------------[");
 				Language.dispatchMessage(sender, "");
 			} else { Language.sendLangMessage("Commands.Default.noPermission", sender); }
 			return true;
 		} else if (args.length == 2 && args[0].equalsIgnoreCase("help") && args[1].equalsIgnoreCase("8")) {
+			if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.use")) {
+				Language.dispatchMessage(sender, "");
+				Language.dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
+				Language.dispatchMessage(sender, "&a&l/ItemJoin Disable &7- &eDisables ItemJoin for all players.");
+				Language.dispatchMessage(sender, "&a&l/ItemJoin Disable <User> &7- &eDisables ItemJoin for player.");
+				Language.dispatchMessage(sender, "&a&l/ItemJoin Disable <User> <World> &7- &eFor player/world.");
+				Language.dispatchMessage(sender, "&aType &a&l/ItemJoin Help 9 &afor the next page.");
+				Language.dispatchMessage(sender, "&a&l&m]----------------&a&l[&e Help Menu 8/9 &a&l]&a&l&m---------------[");
+				Language.dispatchMessage(sender, "");
+			} else { Language.sendLangMessage("Commands.Default.noPermission", sender); }
+			return true;
+		} else if (args.length == 2 && args[0].equalsIgnoreCase("help") && args[1].equalsIgnoreCase("9")) {
 			if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.use")) {
 				Language.dispatchMessage(sender, "");
 				Language.dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
@@ -147,7 +159,7 @@ public class Commands implements CommandExecutor {
 				Language.dispatchMessage(sender, "&a&l/ItemJoin Purge ip-limits <User> &7- &eIp-Limits data.");
 				Language.dispatchMessage(sender, "&aFound a bug? Report it @");
 				Language.dispatchMessage(sender, "&ahttps://github.com/RockinChaos/ItemJoin/issues");
-				Language.dispatchMessage(sender, "&a&l&m]----------------&a&l[&e Help Menu 8/8 &a&l]&a&l&m---------------[");
+				Language.dispatchMessage(sender, "&a&l&m]----------------&a&l[&e Help Menu 9/9 &a&l]&a&l&m---------------[");
 				Language.dispatchMessage(sender, "");
 			} else { Language.sendLangMessage("Commands.Default.noPermission", sender); }
 			return true;
@@ -606,9 +618,7 @@ public class Commands implements CommandExecutor {
 							Language.sendLangMessage("Commands.Get.triedGive", argsPlayer, placeHolders);
 							placeHolders[1] = argsPlayer.getName();
 							Language.sendLangMessage("Commands.Get.targetHasItem", sender, placeHolders);
-							
 						}
-						
 						itemGiven = true;
 					}
 				}
@@ -720,17 +730,18 @@ public class Commands implements CommandExecutor {
 				}
 			} else { Language.sendLangMessage("Commands.Default.noPermission", sender); }
 			return true;
-		} else if (args.length == 2 && args[0].equalsIgnoreCase("removeOnline")) {
+		} else if (args.length == 2 && args[0].equalsIgnoreCase("removeOnline") || args.length == 3 && args[0].equalsIgnoreCase("removeOnline") && Utils.isInt(args[2])) {
 			if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.remove.others")) {
 			    Collection < ? > playersOnline = null;
 			    Player[] playersOnlineOld = null;
 			    List<String> removedPlayers = new ArrayList<String>();
+			    int amount = 0; if (args.length == 3) { amount = Integer.parseInt(args[2]); }
 			    try {
 			        if (Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).getReturnType() == Collection.class) {
 			            if (Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).getReturnType() == Collection.class) {
 			                playersOnline = ((Collection < ? > ) Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).invoke(null, new Object[0]));
 			                for (Object objPlayer: playersOnline) {
-				            	String objectivePlayer = removeOnline(((Player) objPlayer), sender, args[1]);
+				            	String objectivePlayer = removeOnline(((Player) objPlayer), sender, args[1], amount);
 			                    if (objectivePlayer == null) { break; }
 			                    else if (!objectivePlayer.isEmpty()) { removedPlayers.add(objectivePlayer); }
 			                }
@@ -738,14 +749,13 @@ public class Commands implements CommandExecutor {
 			        } else {
 			            playersOnlineOld = ((Player[]) Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).invoke(null, new Object[0]));
 			            for (Player objPlayer: playersOnlineOld) {
-			            	String objectivePlayer = removeOnline(objPlayer, sender, args[1]);
+			            	String objectivePlayer = removeOnline(objPlayer, sender, args[1], amount);
 		                    if (objectivePlayer == null) { break; }
 		                    else if (!objectivePlayer.isEmpty()) { removedPlayers.add(objectivePlayer); }
 			            }
 			        }
 			    } catch (Exception e) { ServerHandler.sendDebugTrace(e);  }
-			    
-		    	String[] placeHolders = Language.newString(); placeHolders[12] = removedPlayers.toString().replace("]", "").replace("[", ""); placeHolders[3] = Utils.translateLayout(ItemUtilities.getMappedItem(args[1]).getCustomName(), null);
+		    	String[] placeHolders = Language.newString(); placeHolders[12] = removedPlayers.toString().replace("]", "").replace("[", ""); placeHolders[3] = Utils.translateLayout(ItemUtilities.getMappedItem(args[1]).getCustomName(), null); if (amount == 0) { placeHolders[11] = "\u221e"; } else { placeHolders[11] = amount + ""; }
 			    if (!removedPlayers.isEmpty()) { Language.sendLangMessage("Commands.Remove.fromOnlinePlayers", sender, placeHolders); } 
 			    else { Language.sendLangMessage("Commands.Remove.notInOnlinePlayersInventory", sender, placeHolders); }
 			} else { Language.sendLangMessage("Commands.Default.noPermission", sender); }
@@ -754,18 +764,19 @@ public class Commands implements CommandExecutor {
 			if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.remove.others")) { Language.sendLangMessage("Commands.Remove.invalidOnlineSyntax", sender); } 
 			else { Language.sendLangMessage("Commands.Default.noPermission", sender); }
 			return true;
-		} else if (args.length == 3 && args[0].equalsIgnoreCase("remove")) {
+		} else if (args.length == 3 && args[0].equalsIgnoreCase("remove") && !Utils.isInt(args[2]) || args.length == 4 && args[0].equalsIgnoreCase("remove") && Utils.isInt(args[3])) {
 			Player argsPlayer = PlayerHandler.getPlayerString(args[2]);
 			if (argsPlayer == null && PermissionsHandler.hasCommandPermission(sender, "itemjoin.remove.others")) {
 				String[] placeHolders = Language.newString(); placeHolders[1] = args[2];
 				Language.sendLangMessage("Commands.Default.targetNotFound", sender, placeHolders); 
 			} else if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.remove.others")) {
 				boolean itemRemoved = false;
+				int amount = 0; if (args.length == 4) { amount = Integer.parseInt(args[3]); }
 				for (ItemMap item: ItemUtilities.getItems()) {
 					if (item.getConfigName().equalsIgnoreCase(args[1])) {
-						String[] placeHolders = Language.newString(); placeHolders[3] = Utils.translateLayout(item.getCustomName(), argsPlayer); placeHolders[1] = sender.getName();
+						String[] placeHolders = Language.newString(); placeHolders[3] = Utils.translateLayout(item.getCustomName(), argsPlayer); placeHolders[1] = sender.getName(); if (amount == 0) { placeHolders[11] = "\u221e"; } else { placeHolders[11] = amount + ""; }
 						if (item.hasItem(argsPlayer)) {
-							item.removeFrom(argsPlayer);
+							item.removeFrom(argsPlayer, amount);
 							Language.sendLangMessage("Commands.Remove.fromYou", argsPlayer, placeHolders);
 							placeHolders[1] = argsPlayer.getName();
 							Language.sendLangMessage("Commands.Remove.fromTarget", sender, placeHolders);
@@ -782,15 +793,16 @@ public class Commands implements CommandExecutor {
 					Language.sendLangMessage("Commands.Item.invalidItem", sender, placeHolders); }
 			} else { Language.sendLangMessage("Commands.Default.noPermission", sender); }
 			return true;
-		} else if (args.length == 2 && args[0].equalsIgnoreCase("remove")) {
+		} else if (args.length == 2 && args[0].equalsIgnoreCase("remove") || args.length == 3 && args[0].equalsIgnoreCase("remove") && Utils.isInt(args[2])) {
 			if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.remove")) {
 				if (!(sender instanceof ConsoleCommandSender)) {
 					boolean itemRemoved = false;
+					int amount = 0; if (args.length == 3) { amount = Integer.parseInt(args[2]); }
 					for (ItemMap item: ItemUtilities.getItems()) {
 						if (item.getConfigName().equalsIgnoreCase(args[1])) {
-							String[] placeHolders = Language.newString(); placeHolders[3] = Utils.translateLayout(item.getCustomName(), ((Player) sender));
+							String[] placeHolders = Language.newString(); placeHolders[3] = Utils.translateLayout(item.getCustomName(), ((Player) sender)); if (amount == 0) { placeHolders[11] = "\u221e"; } else { placeHolders[11] = amount + ""; }
 							if (item.hasItem(((Player) sender))) {
-								item.removeFrom(((Player) sender));
+								item.removeFrom(((Player) sender), amount);
 								Language.sendLangMessage("Commands.Remove.fromYou", sender, placeHolders);
 							} else { 
 								Language.sendLangMessage("Commands.Remove.notInInventory", sender, placeHolders); }
@@ -820,7 +832,7 @@ public class Commands implements CommandExecutor {
 				boolean itemRemoved = false;
 				for (ItemMap item: ItemUtilities.getItems()) {
 					if (item.hasItem(argsPlayer)) {
-						item.removeFrom(argsPlayer);
+						item.removeFrom(argsPlayer, 0);
 						itemRemoved = true;
 					}
 				}
@@ -843,7 +855,7 @@ public class Commands implements CommandExecutor {
 					boolean itemRemoved = false;
 					for (ItemMap item: ItemUtilities.getItems()) {
 						if (item.hasItem(((Player) sender))) {
-							item.removeFrom(((Player) sender));
+							item.removeFrom(((Player) sender), 0);
 							itemRemoved = true;
 						}
 					}
@@ -900,7 +912,7 @@ public class Commands implements CommandExecutor {
         return "";
 	}
 	
-	private String removeOnline(Player argsPlayer, CommandSender sender, String args) {
+	private String removeOnline(Player argsPlayer, CommandSender sender, String args, int amount) {
         boolean itemExists = false;
         boolean itemRemoved = false;
         for (ItemMap item: ItemUtilities.getItems()) {
@@ -908,7 +920,7 @@ public class Commands implements CommandExecutor {
                 itemExists = true;
 				String[] placeHolders = Language.newString(); placeHolders[3] = Utils.translateLayout(item.getCustomName(), argsPlayer); placeHolders[1] = sender.getName();
                 if (item.hasItem(argsPlayer)) {
-                    item.removeFrom(argsPlayer);
+                    item.removeFrom(argsPlayer, amount);
 					Language.sendLangMessage("Commands.Remove.fromYou", argsPlayer, placeHolders);
 					itemRemoved = true;
                 } else {

@@ -64,14 +64,14 @@ Commands:
     youHaveItems: '&cYou already have &ball items&c!'
     targetHasItems: '&4%targetplayer% &calready has &ball the items&c!'
   Remove:
-    fromYou: '&7[&e%item%&7]&c was removed from your inventory.'
-    fromTarget: '&cYou removed &7[&e%item%&7]&c from &4%targetplayer%&c.'
+    fromYou: '&b%amount%x &7[&e%item%&7]&c was removed from your inventory.'
+    fromTarget: '&cYou removed &b%amount%x &7[&e%item%&7]&c from &4%targetplayer%&c.'
     triedRemove: '&4%targetplayer% &ctried to remove &7[&b%item%&7]&c but it does not exist in your inventory!'
     invalidSyntax: '&cIncorrect usage! Syntax: /itemjoin remove <itemname>!'
     usageSyntax: '&cYou should use /ItemJoin remove <itemname> <player> as console.'
     notInInventory: '&cThe item &7[&e%item%&7] &cdoes not exist in your inventory!'
     notInTargetInventory: '&cThe item &7[&e%item%&7] &cdoes not exist in &4%targetplayer% &cinventory!'
-    fromOnlinePlayers: '&cYou have removed the item &7[&b%item%&7]&c from the players &4%players%&c.'
+    fromOnlinePlayers: '&cYou have removed the item &b%amount%x &7[&b%item%&7]&c from the players &4%players%&c.'
     notInOnlinePlayersInventory: '&cThe item &b%item% &cdoes not exist in any of the &4Online Players &cinventories.'
     invalidOnlineSyntax: '&cIncorrect usage! Syntax: /itemjoin removeOnline <itemname>!'
   RemoveAll:

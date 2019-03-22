@@ -1247,7 +1247,7 @@ public class ItemMap {
 		ItemMeta itemCopyMeta = itemCopy.getItemMeta();
 		itemCopyMeta = ItemHandler.setSkullOwner(itemCopyMeta, this.skullOwner);
 		itemCopy.setItemMeta(itemCopyMeta);
-		if (ItemHandler.getSkullSkinTexture(item.getItemMeta()) != null && ItemHandler.getSkullSkinTexture(itemCopy.getItemMeta()) != null &&
+		if (ItemHandler.isSkull(item.getType()) && ItemHandler.isSkull(itemCopy.getType()) && ItemHandler.getSkullSkinTexture(item.getItemMeta()) != null && ItemHandler.getSkullSkinTexture(itemCopy.getItemMeta()) != null &&
 				ItemHandler.getSkullSkinTexture(item.getItemMeta()).equalsIgnoreCase(ItemHandler.getSkullSkinTexture(itemCopy.getItemMeta()))) {
 			return true;	
 		}
@@ -1510,31 +1510,53 @@ public class ItemMap {
 		return false;
 	}
 	
-	public void removeFrom(Player player) {
+	public void removeFrom(Player player, int amount) {
 		PlayerInventory inv = player.getInventory();
 		Inventory craftView = player.getOpenInventory().getTopInventory();
 		ItemStack[] contents = inv.getContents();
 		ItemStack[] craftingContents = player.getOpenInventory().getTopInventory().getContents();
 		
-		if (this.isAnimated() && this.getAnimationHandler().get(player) != null
-				|| this.isDynamic() && this.getAnimationHandler().get(player) != null) {
-			this.localeAnimations.get(player).closeAnimation(player);
-			this.localeAnimations.remove(player);
-		}
-		
-		for (int k = 0; k < contents.length; k++) {
-			if (this.isSimilar(contents[k])) { inv.setItem(k, new ItemStack(Material.AIR)); }
-		}
-		if (this.isSimilar(inv.getHelmet())) { inv.setHelmet(new ItemStack(Material.AIR)); }
-		if (this.isSimilar(inv.getChestplate())) { inv.setChestplate(new ItemStack(Material.AIR)); }
-		if (this.isSimilar(inv.getLeggings())) { inv.setLeggings(new ItemStack(Material.AIR)); }
-		if (this.isSimilar(inv.getBoots())) { inv.setBoots(new ItemStack(Material.AIR)); }
-		
-		if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
-			for (int k = 0; k < craftingContents.length; k++) {
-				if (this.isSimilar(craftingContents[k])) { craftView.setItem(k, new ItemStack(Material.AIR)); }
+		if (amount == 0) {
+			if (this.isAnimated() && this.getAnimationHandler().get(player) != null
+					|| this.isDynamic() && this.getAnimationHandler().get(player) != null) {
+				this.localeAnimations.get(player).closeAnimation(player);
+				this.localeAnimations.remove(player);
+			}
+			
+			for (int k = 0; k < contents.length; k++) {
+				if (this.isSimilar(contents[k])) { inv.setItem(k, new ItemStack(Material.AIR)); }
+			}
+			if (this.isSimilar(inv.getHelmet())) { inv.setHelmet(new ItemStack(Material.AIR)); }
+			if (this.isSimilar(inv.getChestplate())) { inv.setChestplate(new ItemStack(Material.AIR)); }
+			if (this.isSimilar(inv.getLeggings())) { inv.setLeggings(new ItemStack(Material.AIR)); }
+			if (this.isSimilar(inv.getBoots())) { inv.setBoots(new ItemStack(Material.AIR)); }
+			
+			if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
+				for (int k = 0; k < craftingContents.length; k++) {
+					if (this.isSimilar(craftingContents[k])) { craftView.setItem(k, new ItemStack(Material.AIR)); }
+				}
+			}
+		} else {
+			for (int k = 0; k < contents.length; k++) {
+				if (this.isSimilar(contents[k])) { inv.setItem(k, newItem(inv.getItem(k), amount)); return; }
+			}
+			if (this.isSimilar(inv.getHelmet())) { inv.setHelmet(newItem(inv.getHelmet(), amount)); }
+			else if (this.isSimilar(inv.getChestplate())) { inv.setChestplate(newItem(inv.getHelmet(), amount)); }
+			else if (this.isSimilar(inv.getLeggings())) { inv.setLeggings(newItem(inv.getHelmet(), amount)); }
+			else if (this.isSimilar(inv.getBoots())) { inv.setBoots(newItem(inv.getHelmet(), amount)); }
+			else if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
+				for (int k = 0; k < craftingContents.length; k++) {
+					if (this.isSimilar(craftingContents[k])) { craftView.setItem(k, newItem(player.getOpenInventory().getItem(k), amount)); return; }
+				}
 			}
 		}
+	}
+	
+	private ItemStack newItem(ItemStack itemCopy, int amount) {
+		ItemStack item = new ItemStack(itemCopy);
+		if (item.getAmount() > amount && item.getAmount() != amount || item.getAmount() < amount) { item.setAmount(item.getAmount() - amount); } 
+		else if (item.getAmount() == amount) { item = new ItemStack(Material.AIR); }
+		return item;
 	}
 	
 	public void giveTo(Player player, boolean noTriggers, int amount) {
