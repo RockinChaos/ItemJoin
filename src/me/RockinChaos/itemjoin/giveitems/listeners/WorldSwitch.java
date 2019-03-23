@@ -20,7 +20,6 @@ public class WorldSwitch implements Listener {
 	@EventHandler
 	private void giveOnWorldSwitch(PlayerChangedWorldEvent event) {
 		final Player player = event.getPlayer();
-		if (RegionEnter.getPlayerRegions().get(player) != null) { RegionEnter.delPlayerRegion(player); }
 		if (MemoryHandler.isAuthMe() == true) { setAuthenticating(player); } 
 		else { setItems(player); }
 	}

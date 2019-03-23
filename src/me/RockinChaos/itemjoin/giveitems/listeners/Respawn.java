@@ -20,7 +20,6 @@ public class Respawn implements Listener {
 	@EventHandler
 	private void giveOnRespawn(PlayerRespawnEvent event) {
 		final Player player = event.getPlayer();
-		if (RegionEnter.getPlayerRegions().get(player) != null) { RegionEnter.delPlayerRegion(player); }
 		if (MemoryHandler.isAuthMe() == true) { setAuthenticating(player); } 
 		else { setItems(player); }
 	}

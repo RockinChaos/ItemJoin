@@ -21,7 +21,6 @@ public class LimitSwitch implements Listener {
 	private void giveOnGameModeSwitch(PlayerGameModeChangeEvent event) {
 		final Player player = event.getPlayer();
 		final GameMode newMode = event.getNewGameMode();
-		if (RegionEnter.getPlayerRegions().get(player) != null) { RegionEnter.delPlayerRegion(player); }
 		if (MemoryHandler.isAuthMe() == true) { setAuthenticating(player, newMode); } 
 		else { setItems(player, newMode); }
 	}
