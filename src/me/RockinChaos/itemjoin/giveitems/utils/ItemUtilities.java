@@ -142,7 +142,6 @@ public class ItemUtilities {
 			}
 		}, ConfigHandler.getClearDelay());
 		if (!type.equalsIgnoreCase("Region-Enter") && !type.equalsIgnoreCase("Limit-Modes")) { PlayerHandler.setHeldItemSlot(player); }
-		ItemUtilities.updateItems(player, false);
 	}
 	
 	public static String getProbabilityItem(Player player) {
