@@ -1014,6 +1014,16 @@ public class ItemMap {
 		return true;
 	}
 	
+	public boolean isEnabledRegion(String region) {
+		String[] regions = this.enabledRegions.replace(" ", "").split(",");
+		for (String region1: regions) {
+			if (region1.equalsIgnoreCase(region)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	public boolean isPermissionNeeded() {
 		return this.permissionNeeded;
 	}
