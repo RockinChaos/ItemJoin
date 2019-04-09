@@ -223,6 +223,14 @@ public class ItemUtilities {
 				}
 			}
 			if (!items.isEmpty()) { inventoryAllWipe(player, items); }
+			else {
+				inventory.clear();
+				inventory.setHelmet(null);
+				inventory.setChestplate(null);
+				inventory.setLeggings(null);
+				inventory.setBoots(null);
+				PlayerHandler.setOffHandItem(player, null);
+			}
 		} else {
 			inventory.clear();
 			inventory.setHelmet(null);
