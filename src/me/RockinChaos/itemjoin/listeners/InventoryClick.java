@@ -19,7 +19,7 @@ import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.utils.Utils;
 
-public class InvClickSurvival implements Listener {
+public class InventoryClick implements Listener {
 
 	public static Map < String, Boolean > droppedItem = new HashMap < String, Boolean > ();
 	public static Map < String, Boolean > dropClick = new HashMap < String, Boolean > ();
@@ -28,7 +28,6 @@ public class InvClickSurvival implements Listener {
 	@EventHandler
 	private void onGlobalInventoryModify(InventoryClickEvent event) {
 		Player player = (Player) event.getWhoClicked();
-		  
 	  	if (Utils.containsIgnoreCase(ConfigHandler.isPreventItemMovement(), "true") || Utils.containsIgnoreCase(ConfigHandler.isPreventItemMovement(), player.getWorld().getName())
 		  			|| Utils.containsIgnoreCase(ConfigHandler.isPreventItemMovement(), "ALL") || Utils.containsIgnoreCase(ConfigHandler.isPreventItemMovement(), "GLOBAL")) {
 	  		if (ConfigHandler.isPreventAllowOpBypass() && player.isOp() || ConfigHandler.isPreventAllowCreativeBypass() && PlayerHandler.isCreativeMode(player)) { } 
