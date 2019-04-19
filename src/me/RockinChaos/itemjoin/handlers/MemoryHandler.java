@@ -2,7 +2,7 @@ package me.RockinChaos.itemjoin.handlers;
 
 import org.bukkit.Bukkit;
 
-import me.RockinChaos.itemjoin.utils.ItemCreator;
+//import me.RockinChaos.itemjoin.utils.ItemCreator;
 import me.RockinChaos.itemjoin.utils.Language;
 import me.RockinChaos.itemjoin.utils.Metrics;
 import me.RockinChaos.itemjoin.utils.Reflection;
@@ -109,7 +109,7 @@ public class MemoryHandler {
 		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Interact(), ItemJoin.getInstance());
 		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Placement(), ItemJoin.getInstance());
 		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Consumes(), ItemJoin.getInstance());
-		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new ItemCreator(), ItemJoin.getInstance());
+		//ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new ItemCreator(), ItemJoin.getInstance());
 		
 		if (!ServerHandler.hasSpecificUpdate("1_8")) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Legacy_Storable(), ItemJoin.getInstance());
