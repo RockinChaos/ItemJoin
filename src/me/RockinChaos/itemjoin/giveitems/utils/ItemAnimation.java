@@ -19,7 +19,7 @@ import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
-import me.RockinChaos.itemjoin.listeners.InvClickSurvival;
+import me.RockinChaos.itemjoin.listeners.InventoryClick;
 import me.RockinChaos.itemjoin.utils.Utils;
 import me.arcaniax.hdb.api.HeadDatabaseAPI;
 import me.RockinChaos.itemjoin.utils.Legacy;
@@ -147,12 +147,12 @@ public class ItemAnimation {
 				// ============== Animate Within the Player's Cursor =============== //
 				if (player.getItemOnCursor().getType() != null && player.getItemOnCursor().getType() != Material.AIR && itemMap.getTempItem() != null && itemMap.isSimilar(player.getItemOnCursor())) {
 					ItemStack item = new ItemStack(player.getItemOnCursor());
-					if (InvClickSurvival.cursorItem.get(PlayerHandler.getPlayerID(player)) != null && itemMap.isSimilar(InvClickSurvival.cursorItem.get(PlayerHandler.getPlayerID(player)))) { item = new ItemStack(InvClickSurvival.cursorItem.get(PlayerHandler.getPlayerID(player))); }
+					if (InventoryClick.cursorItem.get(PlayerHandler.getPlayerID(player)) != null && itemMap.isSimilar(InventoryClick.cursorItem.get(PlayerHandler.getPlayerID(player)))) { item = new ItemStack(InventoryClick.cursorItem.get(PlayerHandler.getPlayerID(player))); }
 					if (nameString != null) { setNameData(player, player.getItemOnCursor(), nameString); } 
 					else if (loreString != null) { setLoreData(player, player.getItemOnCursor(), loreString); }
 					else if (materialString != null) { setMaterialData(player, player.getItemOnCursor(), materialString); }
 					else if (ownerString != null || textureString != null) { setSkull(player, player.getItemOnCursor(), ownerString, textureString); }
-					InvClickSurvival.cursorItem.put(PlayerHandler.getPlayerID(player), item);
+					InventoryClick.cursorItem.put(PlayerHandler.getPlayerID(player), item);
 				}
 				// ============== This has Concluded all Animations.. ============== //
 				

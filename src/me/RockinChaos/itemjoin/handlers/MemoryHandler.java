@@ -2,6 +2,7 @@ package me.RockinChaos.itemjoin.handlers;
 
 import org.bukkit.Bukkit;
 
+import me.RockinChaos.itemjoin.utils.ItemCreator;
 import me.RockinChaos.itemjoin.utils.Language;
 import me.RockinChaos.itemjoin.utils.Metrics;
 import me.RockinChaos.itemjoin.utils.Reflection;
@@ -20,7 +21,7 @@ import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 import me.RockinChaos.itemjoin.listeners.Consumes;
 import me.RockinChaos.itemjoin.listeners.Drops;
 import me.RockinChaos.itemjoin.listeners.Interact;
-import me.RockinChaos.itemjoin.listeners.InvClickSurvival;
+import me.RockinChaos.itemjoin.listeners.InventoryClick;
 import me.RockinChaos.itemjoin.listeners.InventoryClose;
 import me.RockinChaos.itemjoin.listeners.Legacy_Pickups;
 import me.RockinChaos.itemjoin.listeners.Legacy_Storable;
@@ -103,11 +104,12 @@ public class MemoryHandler {
 		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new WorldSwitch(), ItemJoin.getInstance());
 		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new LimitSwitch(), ItemJoin.getInstance());
 		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Respawn(), ItemJoin.getInstance());
-		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new InvClickSurvival(), ItemJoin.getInstance());
+		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new InventoryClick(), ItemJoin.getInstance());
 		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Drops(), ItemJoin.getInstance());
 		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Interact(), ItemJoin.getInstance());
 		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Placement(), ItemJoin.getInstance());
 		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Consumes(), ItemJoin.getInstance());
+		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new ItemCreator(), ItemJoin.getInstance());
 		
 		if (!ServerHandler.hasSpecificUpdate("1_8")) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Legacy_Storable(), ItemJoin.getInstance());
