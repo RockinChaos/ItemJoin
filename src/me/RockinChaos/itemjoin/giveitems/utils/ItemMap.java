@@ -1162,13 +1162,7 @@ public class ItemMap {
 		if (item != null && item.getType() != Material.AIR && item.getType() == this.material || this.materialAnimated && item != null && item.getType() != Material.AIR && this.isMaterial(item)) {
 			if (MemoryHandler.isDataTags() && ServerHandler.hasSpecificUpdate("1_8") && ItemHandler.getNBTData(item) != null && Utils.containsIgnoreCase(ItemHandler.getNBTData(item), this.newNBTData)
 					|| this.legacySecret != null && item.hasItemMeta() && item.getItemMeta().hasDisplayName() && item.getItemMeta().getDisplayName().contains(this.legacySecret) || this.vanillaItem && this.vanillaStatus) {
-				if (!this.isSkull() && skullOwner == null || this.isSkull() && !this.skullAnimated && ((SkullMeta) item.getItemMeta()).hasOwner() 
-						&& this.skullOwner != null && PlayerHandler.getSkullOwner(item).equalsIgnoreCase(this.skullOwner) 
-						|| this.skullOwner != null && this.isSkullOwner(item)
-						|| this.skullOwner != null && Utils.containsIgnoreCase(this.skullOwner, "%player%")
-						|| this.isSkull() && this.skullTexture != null && this.skullOwner == null 
-						&& ItemHandler.getSkullSkinTexture(item.getItemMeta()).equalsIgnoreCase(this.skullTexture)
-						|| this.isSkull() && this.skullAnimated && this.isSkull(item) || this.isSkull() && this.skullTexture != null && this.skullOwner == null && this.isHeadDatabaseSimilar(item)) {
+				if (this.skullCheck(item)) {
 					if (isEnchantSimilar(item) || !item.getItemMeta().hasEnchants() && enchants.isEmpty() || this.isModifiyable()) {
 						if (this.material.toString().toUpperCase().contains("BOOK") 
 								&& this.isBookMeta(item) 
@@ -1179,6 +1173,19 @@ public class ItemMap {
 					}
 				}
 			}
+		}
+		return false;
+	}
+	
+	private boolean skullCheck(ItemStack item) {
+		if (!this.isSkull() || skullOwner == null && this.skullTexture == null && PlayerHandler.getSkullOwner(item).equalsIgnoreCase("NULL") && ItemHandler.getSkullSkinTexture(item.getItemMeta()).isEmpty() 
+				|| !this.skullAnimated && ((SkullMeta) item.getItemMeta()).hasOwner() && this.skullOwner != null && PlayerHandler.getSkullOwner(item).equalsIgnoreCase(this.skullOwner) 
+				|| this.skullOwner != null && this.isSkullOwner(item)
+				|| this.skullOwner != null && Utils.containsIgnoreCase(this.skullOwner, "%player%")
+				|| this.skullTexture != null && this.skullOwner == null 
+				&& ItemHandler.getSkullSkinTexture(item.getItemMeta()).equalsIgnoreCase(this.skullTexture)
+				|| this.skullAnimated && this.isSkull(item) || this.skullTexture != null && this.skullOwner == null && this.isHeadDatabaseSimilar(item)) {
+			return true;
 		}
 		return false;
 	}
@@ -1255,12 +1262,7 @@ public class ItemMap {
 	}
 	
 	private boolean isSkullOwner(ItemStack item) {
-		ItemStack itemCopy = this.tempItem.clone();
-		ItemMeta itemCopyMeta = itemCopy.getItemMeta();
-		itemCopyMeta = ItemHandler.setSkullOwner(itemCopyMeta, this.skullOwner);
-		itemCopy.setItemMeta(itemCopyMeta);
-		if (ItemHandler.isSkull(item.getType()) && ItemHandler.isSkull(itemCopy.getType()) && ItemHandler.getSkullSkinTexture(item.getItemMeta()) != null && ItemHandler.getSkullSkinTexture(itemCopy.getItemMeta()) != null &&
-				ItemHandler.getSkullSkinTexture(item.getItemMeta()).equalsIgnoreCase(ItemHandler.getSkullSkinTexture(itemCopy.getItemMeta()))) {
+		if (ItemHandler.getSkullSkinTexture(item.getItemMeta()).equalsIgnoreCase(ItemHandler.getSkullSkinTexture(this.tempMeta))) {
 			return true;	
 		}
 		return false;

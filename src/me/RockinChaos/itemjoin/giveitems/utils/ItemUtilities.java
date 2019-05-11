@@ -40,7 +40,7 @@ public class ItemUtilities {
 	
 	public static ItemMap getMappedItem(ItemStack lookUp, World world) {
 		for (ItemMap item : ItemUtilities.getItems()) {
-			if (item.isSimilar(lookUp) && item.inWorld(world)) {
+			if (item.inWorld(world) && item.isSimilar(lookUp)) {
 				return item;
 			}
 		}
