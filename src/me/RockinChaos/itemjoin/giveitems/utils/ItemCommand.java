@@ -22,6 +22,8 @@ public class ItemCommand {
 	private ActionType action;
 	private long delay = 0L;
 	private CommandType cmdType;
+	private List < Player > setStop = new ArrayList < Player > ();
+	private List < Player > setCounting = new ArrayList < Player > ();
 	
 	private ItemCommand(final String command, final ActionType action, final Type type, final long delay, final String commandType) {
 		this.command = command;
@@ -44,22 +46,54 @@ public class ItemCommand {
 		return true;
 	}
 	
-	private void sendDispatch(final Player player, final Type cmdtype) {
+	private void setStop(final Player player, boolean bool) {
+		if (bool) { this.setStop.add(player); } else { this.setStop.remove(player); }
+	}
+	
+	private void setCounting(final Player player, boolean bool) {
+		if (bool) { this.setCounting.add(player); } else { this.setCounting.remove(player); }
+	}
+	
+	private boolean getStop(Player player) {
+		return setStop.contains(player);
+	}
+	
+	private boolean getCounting(Player player) {
+		return setCounting.contains(player);
+	}
+	
+	private void stopCycle(final Player player) {
 		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
 			@Override
 			public void run() {
-				switch (cmdtype) {
-					case CONSOLE: dispatchConsoleCommands(player); break;
-					case OP: dispatchOpCommands(player); break;
-					case PLAYER: dispatchPlayerCommands(player); break;
-					case MESSAGE: dispatchMessageCommands(player); break;
-					case SERVERSWITCH: dispatchServerSwitchCommands(player); break;
-					case BUNGEE: dispatchBungeeCordCommands(player); break;
-					case SWAPITEM: dispatchSwapItem(player); break;
-					case DEFAULT: dispatchPlayerCommands(player); break;
-					case DELAY: break;
-					default: dispatchPlayerCommands(player); break;
-				}
+				if (player.isDead() && getCounting(player)) {
+					setStop(player, true);
+					setCounting(player, false);
+				} else if (getCounting(player)) { stopCycle(player); }
+			}
+		}, 20);
+	}
+	
+	private void sendDispatch(final Player player, final Type cmdtype) {
+		this.setCounting(player, true); this.stopCycle(player);
+		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
+			@Override
+			public void run() {
+				if (!player.isDead() && !getStop(player)) {
+					setCounting(player, false);
+					switch (cmdtype) {
+						case CONSOLE: dispatchConsoleCommands(player); break;
+						case OP: dispatchOpCommands(player); break;
+						case PLAYER: dispatchPlayerCommands(player); break;
+						case MESSAGE: dispatchMessageCommands(player); break;
+						case SERVERSWITCH: dispatchServerSwitchCommands(player); break;
+						case BUNGEE: dispatchBungeeCordCommands(player); break;
+						case SWAPITEM: dispatchSwapItem(player); break;
+						case DEFAULT: dispatchPlayerCommands(player); break;
+						case DELAY: break;
+						default: dispatchPlayerCommands(player); break;
+					}
+				} else if (getStop(player)) { setStop(player, false); }
 			}
 		}, this.delay);
 	}
