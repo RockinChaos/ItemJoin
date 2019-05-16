@@ -14,7 +14,9 @@ import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.FireworkEffect;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.banner.Pattern;
@@ -135,7 +137,10 @@ public class ItemMap {
 	private Integer cooldownSeconds = 0;
 	private String cooldownMessage;
 	private Sound commandSound;
+	private Particle commandParticle;
 	private Integer cost = 0;
+	private Integer warmDelay = 0;
+	private List < Player > warmPending = new ArrayList < Player > ();
 	private boolean useCooldown = false;
 	private boolean subjectRemoval = false;
 	private CommandSequence sequence = CommandSequence.SEQUENTIAL;
@@ -212,7 +217,9 @@ public class ItemMap {
         this.setSlot(slot);
         this.setCount(this.nodeLocation.getString(".count"));
 		this.setCommandCost();
+		this.setCommandWarmDelay();
 		this.setCommandSound();
+		this.setCommandParticle();
 		this.setCommandCooldown();
 		this.setCommandType();
 		this.setCommandSequence();
@@ -236,10 +243,21 @@ public class ItemMap {
 		if (this.nodeLocation.getString("commands-cost") != null && Utils.isInt(this.nodeLocation.getString("commands-cost"))) { this.cost = this.nodeLocation.getInt("commands-cost"); }
 	}
 	
+	private void setCommandWarmDelay() {
+		if (this.nodeLocation.getString("commands-warmup") != null && Utils.isInt(this.nodeLocation.getString("commands-warmup"))) { this.warmDelay = this.nodeLocation.getInt("commands-warmup"); }
+	}
+	
 	private void setCommandSound() {
 		try { if (this.nodeLocation.getString(".commands-sound") != null) { this.commandSound = Sound.valueOf(this.nodeLocation.getString(".commands-sound")); } } 
 		catch (Exception e) { ServerHandler.sendDebugTrace(e); ServerHandler.sendDebugMessage("&4Your server is running &eMC " + Reflection.getServerVersion() + 
 				" and this version of Minecraft does not have the defined command-sound &e" + this.nodeLocation.getString(".commands-sound")); }
+	    
+	}
+	
+	private void setCommandParticle() {
+		try { if (this.nodeLocation.getString(".commands-particle") != null) { this.commandParticle = Particle.valueOf(this.nodeLocation.getString(".commands-particle")); } } 
+		catch (Exception e) { ServerHandler.sendDebugTrace(e); ServerHandler.sendDebugMessage("&4Your server is running &eMC " + Reflection.getServerVersion() + 
+				" and this version of Minecraft does not have the defined command-particle &e" + this.nodeLocation.getString(".commands-particle")); }
 	    
 	}
 	
@@ -270,6 +288,23 @@ public class ItemMap {
         if (this.nodeLocation.getString(".use-cooldown") != null) {
         	this.interactCooldown = this.nodeLocation.getInt(".use-cooldown");
         }
+	}
+	
+	private void setWarmPending(Player player) {
+        if (!this.warmPending.contains(player)) {
+        	this.warmPending.add(player);
+        }
+	}
+	
+	private void delWarmPending(Player player) {
+        if (this.warmPending.contains(player)) {
+        	this.warmPending.remove(player);
+        }
+	}
+	
+	private boolean getWarmPending(Player player) {
+        if (this.warmPending.contains(player)) { return true; }
+        return false;
 	}
 	
 	private void setItemflags() {
@@ -831,6 +866,10 @@ public class ItemMap {
 		return this.cost;
 	}
 	
+	public Integer getWarmDelay() {
+		return this.warmDelay;
+	}
+	
 	public ItemStack getTempItem() {
 		return this.tempItem;	
 	}
@@ -1286,6 +1325,10 @@ public class ItemMap {
 		}
 		return false;
 	}
+	
+	public ItemStack getItem(Player player) {
+		return updateItem(player).getTempItem();
+	}
 //  ================================================================================================================================================================================= //
 
 //  ================================================================ //
@@ -1587,19 +1630,66 @@ public class ItemMap {
 			this.localeAnimations.put(player, Animator);
 		}
 	}
-	
-    public boolean executeCommands(Player player, final ItemStack itemCopy, String action) {
+
+    public boolean executeCommands(final Player player, final ItemStack itemCopy, final String action) {
 		boolean playerSuccess = false;
-    	if (this.commands != null && this.commands.length > 0 && isExecutable(player, action) && !this.onCooldown(player) && this.isPlayerChargeable(player)) {
-    		if (isExecuted(player, action)) {
-    			this.withdrawBalance(player, this.cost);
-				this.playSound(player);
-				this.removeDisposable(player, itemCopy);
-				this.addPlayerOnCooldown(player);
-    		}
+    	if (this.commands != null && this.commands.length > 0 && !this.getWarmPending(player) && isExecutable(player, action) && !this.onCooldown(player) && this.isPlayerChargeable(player)) {
+    		this.warmCycle(player, this, this.getWarmDelay(), player.getLocation(), itemCopy, action);
     	}
     	return playerSuccess;
     }
+	
+	private void warmCycle(final Player player, final ItemMap itemMap, final int warmCount, final Location location, final ItemStack itemCopy, final String action) {
+		if (warmCount != 0) {
+			if (itemMap.warmDelay == warmCount) { 
+				String[] placeHolders = Language.newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = Utils.translateLayout(itemMap.getCustomName(), player); 
+				Language.sendLangMessage("General.itemWarmingUp", player, placeHolders); 
+				itemMap.setWarmPending(player); 
+			}
+			Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
+				@Override
+				public void run() {
+					if (itemMap.warmLocation(player, location)) {
+						String[] placeHolders = Language.newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = Utils.translateLayout(itemMap.getCustomName(), player); 
+						Language.sendLangMessage("General.itemWarming", player, placeHolders);
+						itemMap.warmCycle(player, itemMap, warmCount - 1, location, itemCopy, action);	
+					} else { 
+						itemMap.delWarmPending(player); 
+						String[] placeHolders = Language.newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = Utils.translateLayout(itemMap.getCustomName(), player); 
+						Language.sendLangMessage("General.itemWarmingHalted", player, placeHolders);
+					}
+				}
+			}, 20);
+		} else {
+			int delay = 0;
+			if (itemMap.warmDelay != 0) { delay = 20; }
+			Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
+				@Override
+				public void run() {
+					if (!player.isDead()) {
+						if (isExecuted(player, action)) { 
+							itemMap.withdrawBalance(player, itemMap.cost);
+			    			itemMap.playSound(player);
+			    			itemMap.playParticle(player);
+							itemMap.removeDisposable(player, itemCopy);
+							itemMap.addPlayerOnCooldown(player);
+						}
+					} else {
+						String[] placeHolders = Language.newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = Utils.translateLayout(itemMap.getCustomName(), player); 
+						Language.sendLangMessage("General.itemWarmingHalted", player, placeHolders);
+					}
+					if (itemMap.warmDelay != 0) { itemMap.delWarmPending(player); }
+				}
+			}, delay);
+		}
+	}
+	
+	private boolean warmLocation(final Player player, final Location location) {
+	    if (player.getLocation().distance(location) >= 1 || player.isDead()) {
+	    	return false;
+	    }
+	    return true;
+	}
     
     private boolean isExecutable(final Player player, final String action) {
     	boolean playerSuccess = false;
@@ -1658,6 +1748,19 @@ public class ItemMap {
 			} catch (Exception e) {
 				ServerHandler.sendErrorMessage("&cThere was an issue executing the commands-sound you defined.");
 				ServerHandler.sendErrorMessage("&c" + this.commandSound + "&c is not a sound in " + Reflection.getServerVersion() + ".");
+				ServerHandler.sendDebugTrace(e);
+			}
+		}
+	}
+	
+	private void playParticle(Player player) {
+		if (this.commandParticle != null) {
+			try {
+				World world = player.getWorld();
+				world.spawnParticle(this.commandParticle, player.getLocation(), 1);
+			} catch (Exception e) {
+				ServerHandler.sendErrorMessage("&cThere was an issue executing the commands-particle you defined.");
+				ServerHandler.sendErrorMessage("&c" + this.commandParticle + "&c is not a particle in " + Reflection.getServerVersion() + ".");
 				ServerHandler.sendDebugTrace(e);
 			}
 		}
