@@ -1,7 +1,5 @@
 package me.RockinChaos.itemjoin.utils;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import java.util.EnumSet;
 
 import org.bukkit.Bukkit;
@@ -135,7 +133,6 @@ public class Legacy {
 	}
 	
     public static com.sk89q.worldedit.math.BlockVector3 asBlockVector(org.bukkit.Location location) {
-        checkNotNull(location);
         return com.sk89q.worldedit.math.BlockVector3.at(location.getX(), location.getY(), location.getZ());
     }
 }

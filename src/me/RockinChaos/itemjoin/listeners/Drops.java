@@ -16,7 +16,6 @@ import org.bukkit.inventory.ItemStack;
 
 public class Drops implements Listener {
 	
-
 	@EventHandler
 	private void onDrop(PlayerDropItemEvent event) {
 		ItemStack item = event.getItemDrop().getItemStack();
