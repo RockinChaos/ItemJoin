@@ -78,7 +78,7 @@ public class ItemCommand {
 	}
 	
 	private void sendDispatch(final Player player, final Type cmdtype) {
-		World world = player.getWorld();
+		final World world = player.getWorld();
 		this.setCounting(player, true); this.stopCycle(player, world);
 		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
 			@Override
