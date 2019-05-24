@@ -1405,7 +1405,8 @@ public class ItemMap {
 				try { 
 					textComponent = Utils.translateLayout(textComponent, player);
 					Object TagString = Reflection.getNMS("NBTTagString").getConstructor(String.class).newInstance(textComponent);
-					localePages.getClass().getMethod("add", Reflection.getNMS("NBTBase")).invoke(localePages, TagString); 
+					if (ServerHandler.hasSpecificUpdate("1_14")) { localePages.getClass().getMethod("add", int.class, Reflection.getNMS("NBTBase")).invoke(localePages, 0, TagString); }
+					else { localePages.getClass().getMethod("add", Reflection.getNMS("NBTBase")).invoke(localePages, TagString); }
 				} catch (Exception e) { ServerHandler.sendDebugTrace(e); } 
 			}
 			try { this.invokePages(localePages); } catch (Exception e) { ServerHandler.sendDebugTrace(e); }

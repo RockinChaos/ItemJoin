@@ -7,6 +7,7 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.Logger;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
@@ -62,24 +63,27 @@ public class ItemCommand {
 		return setCounting.contains(player);
 	}
 	
-	private void stopCycle(final Player player) {
+	private void stopCycle(final Player player, final World world) {
 		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
 			@Override
 			public void run() {
-				if (player.isDead() && getCounting(player)) {
-					setStop(player, true);
-					setCounting(player, false);
-				} else if (getCounting(player)) { stopCycle(player); }
+				if (getCounting(player)) {
+					if (player.isDead() || !player.isOnline() || player.getWorld() != world) {
+						setStop(player, true);
+						setCounting(player, false);
+					} else { stopCycle(player, world); }
+				}
 			}
 		}, 20);
 	}
 	
 	private void sendDispatch(final Player player, final Type cmdtype) {
-		this.setCounting(player, true); this.stopCycle(player);
+		World world = player.getWorld();
+		this.setCounting(player, true); this.stopCycle(player, world);
 		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
 			@Override
 			public void run() {
-				if (!player.isDead() && !getStop(player)) {
+				if (!player.isDead() && player.isOnline() && player.getWorld() == world && !getStop(player)) {
 					setCounting(player, false);
 					switch (cmdtype) {
 						case CONSOLE: dispatchConsoleCommands(player); break;
