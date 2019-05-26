@@ -27,7 +27,6 @@ import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PermissionsHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
-import me.RockinChaos.itemjoin.utils.ItemCreator;
 import me.RockinChaos.itemjoin.utils.Language;
 import me.RockinChaos.itemjoin.utils.Utils;
 import me.RockinChaos.itemjoin.utils.sqlite.SQLData;
@@ -292,7 +291,7 @@ public class Commands implements CommandExecutor {
 		} else if (args[0].equalsIgnoreCase("menu") || args[0].equalsIgnoreCase("creator")) {
 			if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.creator")) {
 				if (!(sender instanceof ConsoleCommandSender)) {
-					ItemCreator.LaunchCreator(sender);
+					//ItemCreator.LaunchCreator(sender);
 					Language.sendLangMessage("Commands.Default.creatorLaunched", sender);
 				} else if (sender instanceof ConsoleCommandSender) { Language.sendLangMessage("Commands.Default.notPlayer", sender); }
 			} else { Language.sendLangMessage("Commands.Default.noPermission", sender); }
