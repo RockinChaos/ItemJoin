@@ -50,19 +50,3 @@ Prevent:
   Pickups: DISABLED
   itemMovement: DISABLED
   Bypass: CREATIVE, OP
-
-# These are optional dependencies, only enable these if you want to use them.
-softDepend:
-  AuthMe: false
-  BetterNick: false
-  HeadDatabase: false
-  Multiverse-Core: false
-  Multiverse-Inventories: false
-  MyWorlds: false
-  PerWorldInventory: false
-  PerWorldPlugins: false
-  PlaceholderAPI: false
-  TokenEnchant: false
-  Vault: false
-  WorldGuard: false
-  xInventories: false
