@@ -167,7 +167,7 @@ items:
     triggers: join, respawn, world-change, region-enter
     enabled-worlds: world, world_nether, world_the_end
   animated-item:
-    id: SIGN
+    id: OAK_SIGN
     slot: 22
     name:
       1: '<delay:20>&f&lStatistics'
