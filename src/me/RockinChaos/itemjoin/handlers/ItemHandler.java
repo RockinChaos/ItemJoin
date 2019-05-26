@@ -20,6 +20,8 @@ import org.bukkit.inventory.meta.Damageable;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
+
+import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 import me.RockinChaos.itemjoin.utils.Legacy;
 import me.RockinChaos.itemjoin.utils.Reflection;
 import me.RockinChaos.itemjoin.utils.Utils;
@@ -54,7 +56,7 @@ public class ItemHandler {
 	}
 
 	public static String getNBTData(ItemStack tempitem) {
-		if (MemoryHandler.isDataTags() && ServerHandler.hasSpecificUpdate("1_8") && tempitem != null && tempitem.getType() != Material.AIR) {
+		if (ItemUtilities.dataTagsEnabled() && ServerHandler.hasSpecificUpdate("1_8") && tempitem != null && tempitem.getType() != Material.AIR) {
 		try {
 		Class<?> craftItemStack = Reflection.getOBC("inventory.CraftItemStack");
 		Class<?> nmsItemStackClass = Reflection.getNMS("ItemStack");
@@ -119,9 +121,9 @@ public class ItemHandler {
 	}
 	
     public static short getMapID(MapView view) {
-    	if (!MemoryHandler.getMapMethod()) {
+    	if (!ItemUtilities.getMapMethod()) {
     		try { return (short) view.getId(); } 
-			catch (NoSuchMethodError e) { MemoryHandler.setMapMethod(true); return Reflection.getMapID(view); }
+			catch (NoSuchMethodError e) { ItemUtilities.setMapMethod(true); return Reflection.getMapID(view); }
     	} else { return Reflection.getMapID(view); }
     }
 	
@@ -218,11 +220,11 @@ public class ItemHandler {
 	}
 	
 	public static boolean containsNBTData(ItemStack inPlayerInventory) {
-		if (MemoryHandler.isDataTags() && ServerHandler.hasSpecificUpdate("1_8") && inPlayerInventory != null && inPlayerInventory.getType() != Material.AIR && getNBTData(inPlayerInventory) != null) {
+		if (ItemUtilities.dataTagsEnabled() && ServerHandler.hasSpecificUpdate("1_8") && inPlayerInventory != null && inPlayerInventory.getType() != Material.AIR && getNBTData(inPlayerInventory) != null) {
 			return true;
-		} else if (!MemoryHandler.isDataTags() || MemoryHandler.isDataTags() && !ServerHandler.hasSpecificUpdate("1_8")) { 
+		} else if (!ItemUtilities.dataTagsEnabled() || ItemUtilities.dataTagsEnabled() && !ServerHandler.hasSpecificUpdate("1_8")) { 
 				if (inPlayerInventory != null && inPlayerInventory.hasItemMeta() && inPlayerInventory.getItemMeta().hasDisplayName()
-						&& ConfigHandler.decodeSecretData(inPlayerInventory.getItemMeta().getDisplayName()).contains(ConfigHandler.decodeSecretData(ConfigHandler.encodeSecretData(ConfigHandler.getNBTData(null))))) {
+						&& ConfigHandler.decodeSecretData(inPlayerInventory.getItemMeta().getDisplayName()).contains(ConfigHandler.decodeSecretData(ConfigHandler.encodeSecretData(ItemUtilities.getNBTData(null))))) {
 					return true;
 				}
 		}

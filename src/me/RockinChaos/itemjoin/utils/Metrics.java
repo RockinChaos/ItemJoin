@@ -10,6 +10,9 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import me.RockinChaos.itemjoin.ItemJoin;
+import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
+import me.RockinChaos.itemjoin.handlers.ConfigHandler;
+
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
@@ -42,50 +45,68 @@ public class Metrics {
      * @param plugin The plugin which stats should be submitted.
      */
     public Metrics() {
-        if (ItemJoin.getInstance() == null) {
-            throw new IllegalArgumentException("Plugin cannot be null!");
-        }
-        this.plugin = ItemJoin.getInstance();
-        File bStatsFolder = new File(plugin.getDataFolder().getParentFile(), "bStats");
-        File configFile = new File(bStatsFolder, "config.yml");
-        YamlConfiguration config = YamlConfiguration.loadConfiguration(configFile);
-        if (!config.isSet("serverUuid")) {
-            config.addDefault("enabled", true);
-            config.addDefault("serverUuid", UUID.randomUUID().toString());
-            config.addDefault("logFailedRequests", false);
-            config.addDefault("logSentData", false);
-            config.addDefault("logResponseStatusText", false);
-            config.options().header(
-                    "bStats collects some data for plugin authors like how many servers are using their plugins.\n" +
-                            "To honor their work, you should not disable it.\n" +
-                            "This has nearly no effect on the server performance!\n" +
-                            "Check out https://bStats.org/ to learn more :)"
-            ).copyDefaults(true);
-            try {
-                config.save(configFile);
-            } catch (IOException ignored) { }
-        }
-
-        enabled = config.getBoolean("enabled", true);
-        serverUUID = config.getString("serverUuid");
-        logFailedRequests = config.getBoolean("logFailedRequests", false);
-        logSentData = config.getBoolean("logSentData", false);
-        logResponseStatusText = config.getBoolean("logResponseStatusText", false);
-
-        if (enabled) {
-            boolean found = false;
-            for (Class<?> service : Bukkit.getServicesManager().getKnownServices()) {
-                try {
-                    service.getField("B_STATS_VERSION");
-                    found = true;
-                    break;
-                } catch (NoSuchFieldException ignored) { }
-            }
-            Bukkit.getServicesManager().register(Metrics.class, this, plugin, ServicePriority.Normal);
-            if (!found) {
-                startSubmitting();
-            }
-        }
+	        if (ItemJoin.getInstance() == null) {
+	            throw new IllegalArgumentException("Plugin cannot be null!");
+	        }
+	        this.plugin = ItemJoin.getInstance();
+			if (ConfigHandler.getConfig("config.yml").getBoolean("General.Metrics-Logging")) { 
+	        File bStatsFolder = new File(plugin.getDataFolder().getParentFile(), "bStats");
+	        File configFile = new File(bStatsFolder, "config.yml");
+	        YamlConfiguration config = YamlConfiguration.loadConfiguration(configFile);
+	        if (!config.isSet("serverUuid")) {
+	            config.addDefault("enabled", true);
+	            config.addDefault("serverUuid", UUID.randomUUID().toString());
+	            config.addDefault("logFailedRequests", false);
+	            config.addDefault("logSentData", false);
+	            config.addDefault("logResponseStatusText", false);
+	            config.options().header(
+	                    "bStats collects some data for plugin authors like how many servers are using their plugins.\n" +
+	                            "To honor their work, you should not disable it.\n" +
+	                            "This has nearly no effect on the server performance!\n" +
+	                            "Check out https://bStats.org/ to learn more :)"
+	            ).copyDefaults(true);
+	            try {
+	                config.save(configFile);
+	            } catch (IOException ignored) { }
+	        }
+	
+	        enabled = config.getBoolean("enabled", true);
+	        serverUUID = config.getString("serverUuid");
+	        logFailedRequests = config.getBoolean("logFailedRequests", false);
+	        logSentData = config.getBoolean("logSentData", false);
+	        logResponseStatusText = config.getBoolean("logResponseStatusText", false);
+	
+	        if (enabled) {
+	            boolean found = false;
+	            for (Class<?> service : Bukkit.getServicesManager().getKnownServices()) {
+	                try {
+	                    service.getField("B_STATS_VERSION");
+	                    found = true;
+	                    break;
+	                } catch (NoSuchFieldException ignored) { }
+	            }
+	            Bukkit.getServicesManager().register(Metrics.class, this, plugin, ServicePriority.Normal);
+	            if (!found) {
+	                startSubmitting();
+	            }
+	        }
+		        this.addCustomChart(new Metrics.SimplePie("items", ItemUtilities.getItems().size() + " "));
+		        this.addCustomChart(new Metrics.SimplePie("itemPermissions", ConfigHandler.getConfig("config.yml").getBoolean("Permissions.Obtain-Items") ? "True" : "False"));
+		        this.addCustomChart(new Metrics.SimplePie("language", Language.getLanguage()));
+		        this.addCustomChart(new Metrics.SimplePie("softDepend", ConfigHandler.getDepends().authMeEnabled() ? "AuthMe" : ""));
+		        this.addCustomChart(new Metrics.SimplePie("softDepend", ConfigHandler.getDepends().nickEnabled() ? "BetterNick" : ""));
+		        this.addCustomChart(new Metrics.SimplePie("softDepend", ConfigHandler.getDepends().mCoreEnabled() ? "Multiverse-Core" : ""));
+		        this.addCustomChart(new Metrics.SimplePie("softDepend", ConfigHandler.getDepends().mInventoryEnabled() ? "Multiverse-Inventories" : ""));
+		        this.addCustomChart(new Metrics.SimplePie("softDepend", ConfigHandler.getDepends().myWorldsEnabled() ? "My Worlds" : ""));
+		        this.addCustomChart(new Metrics.SimplePie("softDepend", ConfigHandler.getDepends().perInventoryEnabled() ? "PerWorldInventory" : ""));
+		        this.addCustomChart(new Metrics.SimplePie("softDepend", ConfigHandler.getDepends().perPluginsEnabled() ? "PerWorldPlugins" : ""));
+		        this.addCustomChart(new Metrics.SimplePie("softDepend", ConfigHandler.getDepends().tokenEnchantEnabled() ? "TokenEnchant" : ""));
+		        this.addCustomChart(new Metrics.SimplePie("softDepend", ConfigHandler.getDepends().getGuard().guardEnabled() ? "WorldGuard" : ""));
+		        this.addCustomChart(new Metrics.SimplePie("softDepend", ConfigHandler.getDepends().databaseEnabled() ? "HeadDatabase" : ""));
+		        this.addCustomChart(new Metrics.SimplePie("softDepend", ConfigHandler.getDepends().xInventoryEnabled() ? "xInventories" : ""));
+		        this.addCustomChart(new Metrics.SimplePie("softDepend", ConfigHandler.getDepends().placeHolderEnabled() ? "PlaceholderAPI" : ""));
+		        this.addCustomChart(new Metrics.SimplePie("softDepend", ConfigHandler.getDepends().getVault().vaultEnabled() ? "Vault" : ""));
+		}
     }
 
     /**

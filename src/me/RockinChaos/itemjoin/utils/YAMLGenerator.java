@@ -15,7 +15,7 @@ public class YAMLGenerator {
 		File itemsFile = new File(ItemJoin.getInstance().getDataFolder(), "items.yml");
         FileConfiguration itemsData = YamlConfiguration.loadConfiguration(itemsFile);
         
-		if (ServerHandler.hasAquaticUpdate()) {
+        if (ServerHandler.hasSpecificUpdate("1_14")) {
 			itemsData.set("items.ultra-item.commands-sound", "BLOCK_NOTE_BLOCK_PLING");
 			itemsData.set("items.map-item.id", "FILLED_MAP");
 			itemsData.set("items.gamemode-item.id", "FIREWORK_STAR");
@@ -29,6 +29,33 @@ public class YAMLGenerator {
 			itemsData.set("items.filler-pane-item.id.5", "<delay:20>ORANGE_STAINED_GLASS_PANE");
 			itemsData.set("items.filler-pane-item.id.6", "<delay:20>RED_STAINED_GLASS_PANE");
 			itemsData.set("items.banner-item.id", "WHITE_BANNER");
+			itemsData.set("items.animated-item.id", "OAK_SIGN");
+			itemsData.set("items.skulldb-item.id", "PLAYER_HEAD");
+			itemsData.set("items.arrow-item.id", "TIPPED_ARROW");
+			itemsData.set("items.arrow-item.name", "&fDeath Arrow");
+			itemsData.set("items.arrow-item.potion-effect", "WITHER:1:20");
+			itemsData.set("items.firework-item.id", "FIREWORK_ROCKET");
+			itemsData.set("items.firework-item.firework.colors", "GRAY, WHITE, PURPLE, LIGHT_GRAY, GREEN");
+			itemsData.set("items.golden-apple-item.potion-effect", "JUMP:2:120, NIGHT_VISION:2:400, GLOWING:1:410, REGENERATION:1:160");
+			itemsData.set("items.skull-item.id", "PLAYER_HEAD");
+			itemsData.set("items.filler-pane-item-two.id", "YELLOW_STAINED_GLASS_PANE");
+			itemsData.set("items.filler-pane-item-three.id", "BLUE_STAINED_GLASS_PANE");
+			itemsData.set("items.filler-pane-item-four.id", "PINK_STAINED_GLASS_PANE");
+        } else if (ServerHandler.hasAquaticUpdate()) {
+			itemsData.set("items.ultra-item.commands-sound", "BLOCK_NOTE_BLOCK_PLING");
+			itemsData.set("items.map-item.id", "FILLED_MAP");
+			itemsData.set("items.gamemode-item.id", "FIREWORK_STAR");
+			itemsData.set("items.gamemode-item.commands-sound", "BLOCK_NOTE_BLOCK_PLING");
+			itemsData.set("items.bungeecord-item.id", "PURPLE_STAINED_GLASS");
+			itemsData.set("items.bungeecord-item.commands-sound", "BLOCK_NOTE_BLOCK_PLING");
+			itemsData.set("items.filler-pane-item.id.1", "<delay:40>BLACK_STAINED_GLASS_PANE");
+			itemsData.set("items.filler-pane-item.id.2", "<delay:20>BLUE_STAINED_GLASS_PANE");
+			itemsData.set("items.filler-pane-item.id.3", "<delay:20>GREEN_STAINED_GLASS_PANE");
+			itemsData.set("items.filler-pane-item.id.4", "<delay:20>MAGENTA_STAINED_GLASS_PANE");
+			itemsData.set("items.filler-pane-item.id.5", "<delay:20>ORANGE_STAINED_GLASS_PANE");
+			itemsData.set("items.filler-pane-item.id.6", "<delay:20>RED_STAINED_GLASS_PANE");
+			itemsData.set("items.banner-item.id", "WHITE_BANNER");
+			itemsData.set("items.animated-item.id", "SIGN");
 			itemsData.set("items.skulldb-item.id", "PLAYER_HEAD");
 			itemsData.set("items.arrow-item.id", "TIPPED_ARROW");
 			itemsData.set("items.arrow-item.name", "&fDeath Arrow");
@@ -54,6 +81,7 @@ public class YAMLGenerator {
 			itemsData.set("items.filler-pane-item.id.5", "<delay:20>STAINED_GLASS_PANE:1");
 			itemsData.set("items.filler-pane-item.id.6", "<delay:20>STAINED_GLASS_PANE:14");
 			itemsData.set("items.banner-item.id", "BANNER");
+			itemsData.set("items.animated-item.id", "SIGN");
 			itemsData.set("items.skulldb-item.id", "SKULL_ITEM:3");
 			itemsData.set("items.arrow-item.id", "TIPPED_ARROW");
 			itemsData.set("items.arrow-item.name", "&fDeath Arrow");
@@ -79,6 +107,7 @@ public class YAMLGenerator {
 			itemsData.set("items.filler-pane-item.id.5", "<delay:20>STAINED_GLASS_PANE:1");
 			itemsData.set("items.filler-pane-item.id.6", "<delay:20>STAINED_GLASS_PANE:14");
 			itemsData.set("items.banner-item.id", "BANNER");
+			itemsData.set("items.animated-item.id", "SIGN");
 			itemsData.set("items.skulldb-item.id", "SKULL_ITEM:3");
 			itemsData.set("items.arrow-item.id", "ARROW");
 			itemsData.set("items.arrow-item.name", "&fArrow");
@@ -113,6 +142,7 @@ public class YAMLGenerator {
 			itemsData.set("items.melooooon-item.itemflags", "hide-attributes, self-drops, CreativeBypass");
 			itemsData.set("items.melooooon-item.triggers", "join, respawn, world-change, region-enter");
 			itemsData.set("items.melooooon-item.enabled-worlds", "world, world_nether, world_the_end");
+			itemsData.set("items.animated-item.id", "SIGN");
 			itemsData.set("items.skulldb-item.id", "SKULL_ITEM:3");
 			itemsData.set("items.arrow-item.id", "ARROW");
 			itemsData.set("items.arrow-item.name", "&fArrow");
@@ -129,7 +159,7 @@ public class YAMLGenerator {
 
 		try {
 			itemsData.save(itemsFile);
-			ConfigHandler.loadConfig("items.yml");
+			ConfigHandler.getConfigData("items.yml");
 			ConfigHandler.getConfig("items.yml").options().copyDefaults(false);
 		} catch (Exception e) {
 			ItemJoin.getInstance().getServer().getLogger().severe("Could not save important data changes to the data file items.yml!");

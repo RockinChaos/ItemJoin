@@ -18,7 +18,7 @@ import org.bukkit.material.MaterialData;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 
 import me.RockinChaos.itemjoin.ItemJoin;
-import me.RockinChaos.itemjoin.handlers.MemoryHandler;
+import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 
 @SuppressWarnings("deprecation")
 public class Legacy {
@@ -59,9 +59,9 @@ public class Legacy {
     }
     
     public static MapView getMapView(int id) {
-    	if (!MemoryHandler.getMapViewMethod()) {
+    	if (!ItemUtilities.getMapViewMethod()) {
     		try { return ItemJoin.getInstance().getServer().getMap((short) id); } 
-			catch (NoSuchMethodError e) { MemoryHandler.setMapViewMethod(true); return Reflection.getMapView(id); }
+			catch (NoSuchMethodError e) { ItemUtilities.setMapViewMethod(true); return Reflection.getMapView(id); }
     	} else { return Reflection.getMapView(id); }
     }
 

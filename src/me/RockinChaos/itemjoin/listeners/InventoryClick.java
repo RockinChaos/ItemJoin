@@ -28,9 +28,9 @@ public class InventoryClick implements Listener {
 	@EventHandler
 	private void onGlobalInventoryModify(InventoryClickEvent event) {
 		Player player = (Player) event.getWhoClicked();
-	  	if (Utils.containsIgnoreCase(ConfigHandler.isPreventItemMovement(), "true") || Utils.containsIgnoreCase(ConfigHandler.isPreventItemMovement(), player.getWorld().getName())
-		  			|| Utils.containsIgnoreCase(ConfigHandler.isPreventItemMovement(), "ALL") || Utils.containsIgnoreCase(ConfigHandler.isPreventItemMovement(), "GLOBAL")) {
-	  		if (ConfigHandler.isPreventAllowOpBypass() && player.isOp() || ConfigHandler.isPreventAllowCreativeBypass() && PlayerHandler.isCreativeMode(player)) { } 
+	  	if (Utils.containsIgnoreCase(ConfigHandler.isPreventModify(), "true") || Utils.containsIgnoreCase(ConfigHandler.isPreventModify(), player.getWorld().getName())
+		  			|| Utils.containsIgnoreCase(ConfigHandler.isPreventModify(), "ALL") || Utils.containsIgnoreCase(ConfigHandler.isPreventModify(), "GLOBAL")) {
+	  		if (ConfigHandler.isPreventOBypass() && player.isOp() || ConfigHandler.isPreventCBypass() && PlayerHandler.isCreativeMode(player)) { } 
 	  		else { event.setCancelled(true); }
 	  	}
 	}

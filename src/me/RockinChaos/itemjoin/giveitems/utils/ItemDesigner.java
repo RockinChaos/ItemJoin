@@ -24,7 +24,6 @@ import org.bukkit.potion.PotionEffectType;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
-import me.RockinChaos.itemjoin.handlers.MemoryHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.utils.Legacy;
 import me.RockinChaos.itemjoin.utils.ImageMap;
@@ -211,7 +210,7 @@ public class ItemDesigner {
 	}
 	
 	private void setSkullDatabase(ItemMap itemMap) {
-		if (MemoryHandler.isHeadDatabase() && itemMap.getNodeLocation().getString(".skull-texture") != null) {
+		if (ConfigHandler.getDepends().databaseEnabled() && itemMap.getNodeLocation().getString(".skull-texture") != null) {
 			if (itemMap.getMaterial().toString().equalsIgnoreCase("SKULL_ITEM") || itemMap.getMaterial().toString().equalsIgnoreCase("PLAYER_HEAD")) {
 				if (itemMap.getNodeLocation().getString(".skull-owner") != null) {  ServerHandler.sendErrorMessage("&4You cannot define a skull owner and a skull texture at the same time, please remove one from the item."); return;  }
 				String skullTexture = getActualTexture(itemMap);
@@ -273,9 +272,9 @@ public class ItemDesigner {
 				}
 				if (enchantName != null) {
 					listEnchants.put(name, level);
-				} else if (enchantName == null && MemoryHandler.isTokenEnchant() == true && TokenEnchantAPI.getInstance().getEnchant(name) != null) {
+				} else if (enchantName == null && ConfigHandler.getDepends().tokenEnchantEnabled() && TokenEnchantAPI.getInstance().getEnchant(name) != null) {
 					listEnchants.put(name, level);
-				} else if (enchantName == null && MemoryHandler.isTokenEnchant() != true) {
+				} else if (enchantName == null && !ConfigHandler.getDepends().tokenEnchantEnabled()) {
 					ServerHandler.sendErrorMessage("&4An error occurred in the config, &a" + name + "&4 is an incorrect enchantment name!");
 					ServerHandler.sendErrorMessage("&4Please see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/enchantments/Enchantment.html for a list of correct enchantment names!");
 				}
@@ -293,8 +292,8 @@ public class ItemDesigner {
 		if (itemMap.getNodeLocation().getString(".custom-map-image") != null && Utils.containsIgnoreCase(itemMap.getMaterial().toString(), "MAP")) {
 			itemMap.setMapImage(itemMap.getNodeLocation().getString(".custom-map-image"));
 			if (itemMap.getMapImage().equalsIgnoreCase("default.jpg") || new File(ItemJoin.getInstance().getDataFolder(), itemMap.getMapImage()).exists()) {
-				if (MemoryHandler.getSQLData().imageNumberExists(itemMap.getMapImage())) {
-					int mapID = MemoryHandler.getSQLData().getImageNumber(itemMap.getMapImage());
+				if (ConfigHandler.getSQLData().imageNumberExists(itemMap.getMapImage())) {
+					int mapID = ConfigHandler.getSQLData().getImageNumber(itemMap.getMapImage());
 					ImageMap imgPlatform = new ImageMap(itemMap.getMapImage(), mapID);
 					MapView view = imgPlatform.FetchExistingView(mapID);
 					itemMap.setMapID(mapID);
@@ -309,7 +308,7 @@ public class ItemDesigner {
 					itemMap.setMapID(mapID);
 					itemMap.setMapView(view);
 					try { view.addRenderer(imgPlatform); } catch (NullPointerException e) { ServerHandler.sendDebugTrace(e); }
-					MemoryHandler.getSQLData().saveMapImage(itemMap);
+					ConfigHandler.getSQLData().saveMapImage(itemMap);
 				}
 			}
 		}
@@ -321,7 +320,7 @@ public class ItemDesigner {
 //  This designs the item to be unique to ItemJoin. //
 //  =============================================== //
 	private void setNBTData(ItemMap itemMap) {
-		if (MemoryHandler.isDataTags() && !itemMap.isVanilla()) {
+		if (ItemUtilities.dataTagsEnabled() && !itemMap.isVanilla()) {
 			try {
 				Object tag = Reflection.getNMS("NBTTagCompound").getConstructor().newInstance();
 				tag.getClass().getMethod("setString", String.class, String.class).invoke(tag, "ItemJoin Name", itemMap.getConfigName());
@@ -331,7 +330,7 @@ public class ItemDesigner {
 				ServerHandler.sendDebugMessage("Error 133 has occured when setting NBTData to an item.");
 				ServerHandler.sendDebugTrace(e);
 			}
-		} else { itemMap.setLegacySecret(ConfigHandler.encodeSecretData(ConfigHandler.getNBTData(itemMap))); }
+		} else { itemMap.setLegacySecret(ConfigHandler.encodeSecretData(ItemUtilities.getNBTData(itemMap))); }
 	}
 //  =========================================================================================================================================================== //
 	
@@ -440,7 +439,7 @@ public class ItemDesigner {
 	
 	private void setName(ItemMap itemMap) {
 		String name = getActualName(itemMap);
-		if (MemoryHandler.isDataTags() && ServerHandler.hasSpecificUpdate("1_8") || itemMap.isVanilla() && ServerHandler.hasSpecificUpdate("1_8")) {
+		if (ItemUtilities.dataTagsEnabled() && ServerHandler.hasSpecificUpdate("1_8") || itemMap.isVanilla() && ServerHandler.hasSpecificUpdate("1_8")) {
 			itemMap.setCustomName(name);
 		} else {
 			itemMap.setCustomName(encodeName(itemMap, name));

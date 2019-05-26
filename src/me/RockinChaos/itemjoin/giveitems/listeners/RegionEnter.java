@@ -16,7 +16,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
-import me.RockinChaos.itemjoin.handlers.MemoryHandler;
+import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.utils.Legacy;
 import me.RockinChaos.itemjoin.utils.Utils;
 
@@ -27,8 +27,8 @@ public class RegionEnter implements Listener {
 	@EventHandler
 	private void RegionListener(PlayerMoveEvent event) {
 		final Player player = event.getPlayer();
-		if (MemoryHandler.isWorldGuard() == true) {
-			if (MemoryHandler.getSQLData().isEnabled(player)) {
+		if (ConfigHandler.getDepends().getGuard().guardEnabled()) {
+			if (ConfigHandler.getSQLData().isEnabled(player)) {
 				updateRegionItems(player);
 			}
 		}
@@ -107,7 +107,7 @@ public class RegionEnter implements Listener {
 	}
 	
 	private static ApplicableRegionSet getApplicableRegionSet(World world, Location loc) {
-		if (MemoryHandler.getWorldGuardVersion() >= 700) {
+		if (ConfigHandler.getDepends().getGuard().guardVersion() >= 700) {
 			com.sk89q.worldedit.world.World wgWorld;
 			try { wgWorld = com.sk89q.worldguard.WorldGuard.getInstance().getPlatform().getWorldByName(world.getName()); }
 			catch (NoSuchMethodError e) { wgWorld = com.sk89q.worldguard.WorldGuard.getInstance().getPlatform().getMatcher().getWorldByName(world.getName()); }

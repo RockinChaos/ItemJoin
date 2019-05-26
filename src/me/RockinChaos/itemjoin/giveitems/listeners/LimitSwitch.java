@@ -11,7 +11,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
-import me.RockinChaos.itemjoin.handlers.MemoryHandler;
+import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.utils.Utils;
 
@@ -21,7 +21,7 @@ public class LimitSwitch implements Listener {
 	private void giveOnGameModeSwitch(PlayerGameModeChangeEvent event) {
 		final Player player = event.getPlayer();
 		final GameMode newMode = event.getNewGameMode();
-		if (MemoryHandler.isAuthMe() == true) { setAuthenticating(player, newMode); } 
+		if (ConfigHandler.getDepends().authMeEnabled()) { setAuthenticating(player, newMode); } 
 		else { setItems(player, newMode); }
 	}
 	
@@ -29,7 +29,7 @@ public class LimitSwitch implements Listener {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				if (MemoryHandler.isAuthMe() == true && fr.xephi.authme.api.v3.AuthMeApi.getInstance().isAuthenticated(player)) {
+				if (ConfigHandler.getDepends().authMeEnabled() && fr.xephi.authme.api.v3.AuthMeApi.getInstance().isAuthenticated(player)) {
 					setItems(player, newMode);
 					this.cancel();
 				}
@@ -47,7 +47,7 @@ public class LimitSwitch implements Listener {
 				final int session = Utils.getRandom(1, 100000);
 				for (ItemMap item : ItemUtilities.getItems()) { 
 					if (item.isUseOnLimitSwitch() && item.inWorld(player.getWorld()) 
-							&& ItemUtilities.isChosenProbability(item, Probable) && MemoryHandler.getSQLData().isEnabled(player)
+							&& ItemUtilities.isChosenProbability(item, Probable) && ConfigHandler.getSQLData().isEnabled(player)
 							&& item.hasPermission(player) && ItemUtilities.isObtainable(player, item, session)) {
 						item.giveTo(player, false, 0); 
 						item.setAnimations(player);

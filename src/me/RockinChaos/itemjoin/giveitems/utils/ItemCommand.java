@@ -11,7 +11,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
-import me.RockinChaos.itemjoin.handlers.MemoryHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.utils.BungeeCord;
 import me.RockinChaos.itemjoin.utils.CustomFilter;
@@ -185,7 +184,7 @@ public class ItemCommand {
 	}
 	
 	private void setLoggable(Player player, String logCommand) {
-		if (!MemoryHandler.isLoggable()) {
+		if (!ConfigHandler.isLoggable()) {
 			ArrayList < String > templist = new ArrayList < String > ();
 			if (CustomFilter.clearLoggables.get("commands-list") != null && !CustomFilter.clearLoggables.get("commands-list").contains(logCommand)) {
 				templist = CustomFilter.clearLoggables.get("commands-list");

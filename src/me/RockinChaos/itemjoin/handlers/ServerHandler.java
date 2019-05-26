@@ -43,7 +43,7 @@ public class ServerHandler {
 		String prefix = "&7[&eItemJoin&7] ";
 		message = prefix + message;
 		message = ChatColor.translateAlternateColorCodes('&', message).toString();
-		if (!MemoryHandler.isLogColor()) {
+		if (!ConfigHandler.isLogColor()) {
 			message = ChatColor.stripColor(message);
 		}
 		if (message.equalsIgnoreCase("") || message.isEmpty()) {
@@ -56,7 +56,7 @@ public class ServerHandler {
 		String prefix = "&e[&4ITEMJOIN_ERROR&e]&c ";
 		message = prefix + message;
 		message = ChatColor.translateAlternateColorCodes('&', message).toString();
-		if (!MemoryHandler.isLogColor()) {
+		if (!ConfigHandler.isLogColor()) {
 			message = ChatColor.stripColor(message);
 		}
 		if (message.equalsIgnoreCase("") || message.isEmpty()) {
@@ -79,18 +79,18 @@ public class ServerHandler {
 		String prefix = "&7[&eItemJoin&7] ";
 		message = prefix + message;
 		message = ChatColor.translateAlternateColorCodes('&', message).toString();
-		if	(!MemoryHandler.isLogColor()) {
+		if	(!ConfigHandler.isLogColor()) {
 			message = ChatColor.stripColor(message);
 		}
 		sender.sendMessage(message);
 	}
 	
 	public static void sendDebugTrace(Exception e) {
-		if (MemoryHandler.isDebugging()) { e.printStackTrace(); }
+		if (ConfigHandler.isDebugging()) { e.printStackTrace(); }
 	}
 
 	public static void sendDebugMessage(String message) {
-		if (MemoryHandler.isDebugging()) {
+		if (ConfigHandler.isDebugging()) {
 		String prefix = "[ITEMJOIN_DEBUG] &c";
 		message = ChatColor.translateAlternateColorCodes('&', message).toString();
 		message = ChatColor.stripColor(message);
