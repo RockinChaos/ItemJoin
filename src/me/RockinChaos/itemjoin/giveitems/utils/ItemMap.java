@@ -46,7 +46,6 @@ import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.giveitems.listeners.RegionEnter;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
-import me.RockinChaos.itemjoin.handlers.MemoryHandler;
 import me.RockinChaos.itemjoin.handlers.PermissionsHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
@@ -54,7 +53,6 @@ import me.RockinChaos.itemjoin.utils.Language;
 import me.RockinChaos.itemjoin.utils.Legacy;
 import me.RockinChaos.itemjoin.utils.Reflection;
 import me.RockinChaos.itemjoin.utils.Utils;
-import me.RockinChaos.itemjoin.utils.VaultAPI;
 import me.arcaniax.hdb.api.HeadDatabaseAPI;
 
 public class ItemMap {
@@ -959,7 +957,7 @@ public class ItemMap {
 	}
 	
 	public String getLegacySecret() {
-		if (!MemoryHandler.isDataTags()) {
+		if (!ItemUtilities.dataTagsEnabled()) {
 			return this.legacySecret;
 		} else { return ""; }
 	}
@@ -1199,7 +1197,7 @@ public class ItemMap {
      
 	public boolean isSimilar(ItemStack item) {
 		if (item != null && item.getType() != Material.AIR && item.getType() == this.material || this.materialAnimated && item != null && item.getType() != Material.AIR && this.isMaterial(item)) {
-			if (MemoryHandler.isDataTags() && ServerHandler.hasSpecificUpdate("1_8") && ItemHandler.getNBTData(item) != null && Utils.containsIgnoreCase(ItemHandler.getNBTData(item), this.newNBTData)
+			if (ItemUtilities.dataTagsEnabled() && ServerHandler.hasSpecificUpdate("1_8") && ItemHandler.getNBTData(item) != null && Utils.containsIgnoreCase(ItemHandler.getNBTData(item), this.newNBTData)
 					|| this.legacySecret != null && item.hasItemMeta() && item.getItemMeta().hasDisplayName() && item.getItemMeta().getDisplayName().contains(this.legacySecret) || this.vanillaItem && this.vanillaStatus) {
 				if (this.skullCheck(item)) {
 					if (isEnchantSimilar(item) || !item.getItemMeta().hasEnchants() && enchants.isEmpty() || this.isModifiyable()) {
@@ -1243,7 +1241,7 @@ public class ItemMap {
 		if (item.getItemMeta().hasEnchants() && this.enchants != null && !this.enchants.isEmpty()) { 
 			ItemStack checkItem = new ItemStack(item.getType());
 			for (Entry<String, Integer> enchantments : this.enchants.entrySet()) {
-				if (enchantments.getKey() == null && MemoryHandler.isTokenEnchant() == true && TokenEnchantAPI.getInstance().getEnchant(enchantments.getKey()) != null) {
+				if (enchantments.getKey() == null && ConfigHandler.getDepends().tokenEnchantEnabled() && TokenEnchantAPI.getInstance().getEnchant(enchantments.getKey()) != null) {
 					TokenEnchantAPI.getInstance().enchant(null, checkItem, enchantments.getKey(), enchantments.getValue(), true, 0, true);
 				} else { 
 					checkItem.addUnsafeEnchantment(ItemHandler.getEnchantByName(enchantments.getKey()), enchantments.getValue()); }
@@ -1371,7 +1369,7 @@ public class ItemMap {
 	private void setEnchantments(Player player) {
 		if (this.enchants != null && !this.enchants.isEmpty()) {
 			for (Entry<String, Integer> enchantments : this.enchants.entrySet()) {
-				if (enchantments.getKey() == null && MemoryHandler.isTokenEnchant() == true && TokenEnchantAPI.getInstance().getEnchant(enchantments.getKey()) != null) {
+				if (enchantments.getKey() == null && ConfigHandler.getDepends().tokenEnchantEnabled() && TokenEnchantAPI.getInstance().getEnchant(enchantments.getKey()) != null) {
 					TokenEnchantAPI.getInstance().enchant(player, tempItem, enchantments.getKey(), enchantments.getValue(), true, 0, true);
 				} else { this.tempItem.addUnsafeEnchantment(ItemHandler.getEnchantByName(enchantments.getKey()), enchantments.getValue()); }
 			}
@@ -1423,7 +1421,7 @@ public class ItemMap {
 	}
 	
 	private void setNBTData() {
-		if (MemoryHandler.isDataTags() && !this.isVanilla()) {
+		if (ItemUtilities.dataTagsEnabled() && !this.isVanilla()) {
 			try {
 				Object nms = Reflection.getOBC("inventory.CraftItemStack").getMethod("asNMSCopy", ItemStack.class).invoke(null, this.tempItem);
 				Object cacheTag = Reflection.getNMS("ItemStack").getMethod("getTag").invoke(nms);
@@ -1545,7 +1543,7 @@ public class ItemMap {
 	}
 	
 	private void setAttributes() {
-		if (ServerHandler.hasSpecificUpdate("1_8") && this.hideAttributes == true) {
+		if (ServerHandler.hasSpecificUpdate("1_8") && this.hideAttributes) {
 			this.tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ATTRIBUTES);
 			this.tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_DESTROYS);
 			this.tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ENCHANTS);
@@ -1715,7 +1713,7 @@ public class ItemMap {
     }
     
     private boolean isPlayerChargeable(Player player) {
-		if (VaultAPI.vaultEnabled()) {
+		if (ConfigHandler.getDepends().getVault().vaultEnabled()) {
 			double balance = 0.0; try { balance = PlayerHandler.getBalance(player); } catch (NullPointerException e) { }
 			if (balance >= this.cost) {
 				return true;
@@ -1729,7 +1727,7 @@ public class ItemMap {
 	}
     
     private void withdrawBalance(Player player, int cost) {
-		if (VaultAPI.vaultEnabled()) {
+		if (ConfigHandler.getDepends().getVault().vaultEnabled()) {
 			double balance = 0.0;
 			try { balance = PlayerHandler.getBalance(player); } catch (NullPointerException e) { }
 			if (balance >= this.cost) {
@@ -1823,7 +1821,7 @@ public class ItemMap {
 	}
 	
 	private boolean onCooldownTick(Player player) {
-		if (ConfigHandler.getConfig("items.yml").getBoolean("items-Spamming") != true) {
+		if (!ConfigHandler.getConfig("items.yml").getBoolean("items-Spamming")) {
 			long playersCooldownList = 0L;
 			if (playersOnCooldownTick.containsKey(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player))) {
 				playersCooldownList = playersOnCooldownTick.get(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player));

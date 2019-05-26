@@ -17,7 +17,6 @@ import org.bukkit.inventory.PlayerInventory;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
-import me.RockinChaos.itemjoin.handlers.MemoryHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.utils.Language;
@@ -29,6 +28,11 @@ public class ItemUtilities {
   	private static List < ItemMap > items = new ArrayList < ItemMap >();
 	public static Map < String, Integer > probability = new HashMap < String, Integer > ();
 	private static HashMap <Integer, Integer> failCount = new HashMap <Integer, Integer> ();
+	
+	private static String NBTData = "ItemJoin";
+	
+	private static boolean oldMapMethod = false;
+	private static boolean oldMapViewMethod = false;
 	
 	public static boolean isAllowed(Player player, ItemStack item, String itemflag) {
 		ItemMap fetched = getMappedItem(item, player.getWorld());
@@ -401,9 +405,9 @@ public class ItemUtilities {
 	public static Boolean isObtainable(Player player, ItemMap itemMap, int session) {
 		if (itemMap.getProbability().equals(-1) || !itemMap.getProbability().equals(-1) && probability.containsKey(itemMap.getConfigName()) && !hasProbabilityItem(player, itemMap)) {
 			if (!itemMap.hasItem(player) || itemMap.isAlwaysGive() || !itemMap.isLimitMode(player.getGameMode())) {
-				boolean firstJoin = MemoryHandler.getSQLData().hasFirstJoined(player, itemMap);
-				boolean firstWorld = MemoryHandler.getSQLData().hasFirstWorld(player, itemMap);
-				boolean ipLimited = MemoryHandler.getSQLData().isIPLimited(player, itemMap);
+				boolean firstJoin = ConfigHandler.getSQLData().hasFirstJoined(player, itemMap);
+				boolean firstWorld = ConfigHandler.getSQLData().hasFirstWorld(player, itemMap);
+				boolean ipLimited = ConfigHandler.getSQLData().isIPLimited(player, itemMap);
 				if (itemMap.isLimitMode(player.getGameMode())) {
 					if (Utils.isInt(itemMap.getSlot()) && Integer.parseInt(itemMap.getSlot()) >= 0 && Integer.parseInt(itemMap.getSlot()) <= 35) {
 						if (!firstJoin && !firstWorld && !ipLimited && canOverwrite(player, itemMap)) {
@@ -580,8 +584,44 @@ public class ItemUtilities {
 	}
 	
 	private static void saveSQLItemData(Player player, ItemMap itemMap) {
-		MemoryHandler.getSQLData().saveFirstJoinData(player, itemMap);
-		MemoryHandler.getSQLData().saveFirstWorldData(player, itemMap);
-		MemoryHandler.getSQLData().saveIpLimitData(player, itemMap);
+		ConfigHandler.getSQLData().saveFirstJoinData(player, itemMap);
+		ConfigHandler.getSQLData().saveFirstWorldData(player, itemMap);
+		ConfigHandler.getSQLData().saveIpLimitData(player, itemMap);
+	}
+	
+	public static void setMapMethod(boolean bool) {
+		oldMapMethod = bool;
+	}
+	
+	public static void setMapViewMethod(boolean bool) {
+		oldMapViewMethod = bool;
+	}
+	
+	public static boolean getMapMethod() {
+		return oldMapMethod;
+	}
+	
+	public static boolean getMapViewMethod() {
+		return oldMapViewMethod;
+	}
+	
+	public static int getHeldSlot() {
+		if (!ConfigHandler.getConfig("config.yml").getString("Settings.HeldItem-Slot").equalsIgnoreCase("DISABLED")) {
+			return ConfigHandler.getConfig("config.yml").getInt("Settings.HeldItem-Slot");
+		}
+		return -1;
+	}
+	
+	public static String getNBTData(ItemMap itemMap) {
+		if (itemMap != null) {
+			return NBTData + itemMap.getItemValue() + itemMap.getConfigName();
+		} else { return NBTData; }
+	}
+	
+	public static boolean dataTagsEnabled() {
+		if (ServerHandler.hasSpecificUpdate("1_8")) {
+			return ConfigHandler.getConfig("config.yml").getBoolean("Settings.DataTags");
+		}
+		return false;
 	}
 }
