@@ -37,6 +37,7 @@ public class ItemDesigner {
 
 	public ItemDesigner() {
 		if (ConfigHandler.isConfigurable()) {
+			ItemHandler.initializeItemID();
 			for (String internalName: ConfigHandler.getConfigurationSection().getKeys(false)) {
 				ConfigurationSection itemNode = ConfigHandler.getItemSection(internalName);
 				if (isConfigurable(internalName, itemNode)) {
@@ -44,8 +45,8 @@ public class ItemDesigner {
 					for (String slot: slots) {
 						if (isDefinable(internalName, slot)) {
 							ItemMap itemMap = new ItemMap(internalName, slot);
+							
 							this.setMaterial(itemMap);
-						
 							this.setSkullDatabase(itemMap);
 							this.setUnbreaking(itemMap);
 							this.showDurability(itemMap);
@@ -77,6 +78,7 @@ public class ItemDesigner {
 					}
 				}
 			}
+			ItemUtilities.updateItems();
 		}
 	}
 	
@@ -109,7 +111,7 @@ public class ItemDesigner {
 				ServerHandler.sendErrorMessage("&eThe Item " + internalName + " &ewill not be set!");
 				if (Utils.isInt(id)) {
 					ServerHandler.sendErrorMessage("&eIf you are using a numerical id and a numberical data-value make sure you "
-							+ "nclude quotations or apostrophes at the beginning and end or it will break the configuration file, it should look like '160:15' or \"160:15\".");
+					+ "include quotations or apostrophes at the beginning and end or it will break the configuration file, it should look like '160:15' or \"160:15\".");
 				}
 				return false;
 			} else if (itemNode.getString(".slot") == null) {

@@ -47,19 +47,14 @@ public class ConfigHandler {
 	private static Metrics metrics;
 	private static DependAPI depends;
 	
-	public static void getConfigs() {
-		configFile();
-		itemsFile();
-		enLangFile();
-	}
-	
-	public static void generateData() {
-		ItemHandler.initializeItemID();
+	public static void generateData(File file) {
+		configFile(); itemsFile(); enLangFile();
 		setDepends(new DependAPI());
 		setSQLData(new SQLData());
 		setItemDesigner(new ItemDesigner());
 		setMetrics(new Metrics());
 		sendUtilityDepends();
+		if (file != null) { setUpdater(new UpdateHandler(file)); }
 	}
 	
 	public static void registerEvents() {

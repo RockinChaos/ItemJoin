@@ -168,9 +168,7 @@ public class Commands implements CommandExecutor {
 				ConfigHandler.getSQLData().executeLaterStatements();
 				ItemUtilities.closeAllAnimations();
 				ItemUtilities.clearItems();
-		  		ConfigHandler.getConfigs();
-		  		ConfigHandler.generateData();
-		  		ItemUtilities.updateItems();
+		  		ConfigHandler.generateData(null);
 				Language.sendLangMessage("Commands.Default.configReload", sender);
 			} else { Language.sendLangMessage("Commands.Default.noPermission", sender); }
 			return true;
