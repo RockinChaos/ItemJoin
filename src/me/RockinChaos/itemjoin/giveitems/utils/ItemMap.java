@@ -16,7 +16,6 @@ import org.bukkit.FireworkEffect;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.banner.Pattern;
@@ -49,6 +48,7 @@ import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PermissionsHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
+import me.RockinChaos.itemjoin.utils.EffectAPI;
 import me.RockinChaos.itemjoin.utils.Language;
 import me.RockinChaos.itemjoin.utils.Legacy;
 import me.RockinChaos.itemjoin.utils.Reflection;
@@ -135,7 +135,7 @@ public class ItemMap {
 	private Integer cooldownSeconds = 0;
 	private String cooldownMessage;
 	private Sound commandSound;
-	private Particle commandParticle;
+	private String commandParticle;
 	private Integer cost = 0;
 	private Integer warmDelay = 0;
 	private List < Player > warmPending = new ArrayList < Player > ();
@@ -253,10 +253,7 @@ public class ItemMap {
 	}
 	
 	private void setCommandParticle() {
-		try { if (this.nodeLocation.getString(".commands-particle") != null) { this.commandParticle = Particle.valueOf(this.nodeLocation.getString(".commands-particle")); } } 
-		catch (Exception e) { ServerHandler.sendDebugTrace(e); ServerHandler.sendDebugMessage("&4Your server is running &eMC " + Reflection.getServerVersion() + 
-				" and this version of Minecraft does not have the defined command-particle &e" + this.nodeLocation.getString(".commands-particle")); }
-	    
+		if (this.nodeLocation.getString(".commands-particle") != null) { this.commandParticle = this.nodeLocation.getString(".commands-particle"); }
 	}
 	
 	private void setCommandCooldown() {
@@ -1754,14 +1751,7 @@ public class ItemMap {
 	
 	private void playParticle(Player player) {
 		if (this.commandParticle != null) {
-			try {
-				World world = player.getWorld();
-				world.spawnParticle(this.commandParticle, player.getLocation(), 1);
-			} catch (Exception e) {
-				ServerHandler.sendErrorMessage("&cThere was an issue executing the commands-particle you defined.");
-				ServerHandler.sendErrorMessage("&c" + this.commandParticle + "&c is not a particle in " + Reflection.getServerVersion() + ".");
-				ServerHandler.sendDebugTrace(e);
-			}
+			EffectAPI.spawnParticle(player, this.commandParticle);
 		}
 	}
 	

@@ -28,6 +28,7 @@ items:
         - 'say Hello world!'
     commands-type: interact, inventory
     commands-sound: BLOCK_NOTE_BLOCK_PLING
+    commands-particle: FIREWORK:BLACK:RED:BURST:10
     commands-sequence: SEQUENTIAL
     commands-cost: 25
     commands-cooldown: 5
