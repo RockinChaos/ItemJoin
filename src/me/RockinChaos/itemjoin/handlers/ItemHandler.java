@@ -128,11 +128,20 @@ public class ItemHandler {
     }
 	
 	public static String getDelay(String context) {
-		return ("<delay:" + Utils.returnInteger(context) + ">");
+		if (Utils.containsIgnoreCase(context, "<delay:" + Utils.returnInteger(context) + ">") 
+				|| Utils.containsIgnoreCase(context, "delay:" + Utils.returnInteger(context) + "") 
+				|| Utils.containsIgnoreCase(context, "<delay: " + Utils.returnInteger(context) + ">")
+				|| Utils.containsIgnoreCase(context, "delay: " + Utils.returnInteger(context) + "")) {
+			return ("<delay:" + Utils.returnInteger(context) + ">");
+		}
+		return null;
 	}
 	
 	public static String purgeDelay(String context) {
-		return context.replace(getDelay(context), "");
+		if (getDelay(context) != null) {
+			return context.replace(getDelay(context), "");
+		} 
+		return context;
 	}
 	
 	public static String getName(ItemStack stack) {

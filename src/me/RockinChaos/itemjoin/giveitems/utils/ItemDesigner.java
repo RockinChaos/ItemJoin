@@ -205,7 +205,7 @@ public class ItemDesigner {
 		if (texture != null && !texture.isEmpty()) {
 			if (itemMap.isDynamic() || itemMap.isAnimated()) {
 				List<String> textures = new ArrayList<String>(); textures.add(texture);
-				itemMap.setDynamicOwners(textures);
+				itemMap.setDynamicTextures(textures);
 			}
 		}
 		return texture;
