@@ -7,24 +7,24 @@ public class GuardAPI {
 	private int guardVersion = 0;
 	
 	public GuardAPI() {
-		this.setGuardStatus(Bukkit.getServer().getPluginManager().getPlugin("WorldEdit") == null && Bukkit.getServer().getPluginManager().getPlugin("WorldGuard") != null);
+		this.setGuardStatus(Bukkit.getServer().getPluginManager().getPlugin("WorldEdit") != null && Bukkit.getServer().getPluginManager().getPlugin("WorldGuard") != null);
 	}
 	
 	private void enableGuard() {
-		try { guardVersion = Integer.parseInt(Bukkit.getServer().getPluginManager().getPlugin("WorldGuard").getDescription().getVersion().replace(".", "").substring(0, 3));
-		} catch (Exception e) { guardVersion = 622; }
+		try { this.guardVersion = Integer.parseInt(Bukkit.getServer().getPluginManager().getPlugin("WorldGuard").getDescription().getVersion().replace(".", "").substring(0, 3));
+		} catch (Exception e) { this.guardVersion = 622; }
 	}
 
     public boolean guardEnabled() {
-    	return isEnabled;
+    	return this.isEnabled;
     }
     
     public int guardVersion() {
-    	return guardVersion;
+    	return this.guardVersion;
     }
 	
     private void setGuardStatus(boolean bool) {
-    	if (bool) { enableGuard(); }
-    	isEnabled = bool;
+    	if (bool) { this.enableGuard(); }
+    	this.isEnabled = bool;
     }
 }
