@@ -34,106 +34,106 @@ public class DependAPI {
 	}
 
     public boolean mCoreEnabled() {
-    	return multiverseCore;
+    	return this.multiverseCore;
     }
     
     public boolean mInventoryEnabled() {
-    	return multiverseInventories;
+    	return this.multiverseInventories;
     }
     
     public boolean placeHolderEnabled() {
-    	return placeHolderAPI;
+    	return this.placeHolderAPI;
     }
     
     public boolean perPluginsEnabled() {
-    	return perWorldPlugins;
+    	return this.perWorldPlugins;
     }
     
     public boolean perInventoryEnabled() {
-    	return perWorldInventory;
+    	return this.perWorldInventory;
     }
     
     public boolean nickEnabled() {
-    	return betterNick;
+    	return this.betterNick;
     }
     
     public boolean authMeEnabled() {
-    	return authMe;
+    	return this.authMe;
     }
     
     public boolean myWorldsEnabled() {
-    	return myWorlds;
+    	return this.myWorlds;
     }
     
     public boolean xInventoryEnabled() {
-    	return xInventories;
+    	return this.xInventories;
     }
     
     public boolean tokenEnchantEnabled() {
-    	return tokenEnchant;
+    	return this.tokenEnchant;
     }
     
     public boolean databaseEnabled() {
-    	return headDatabase;
+    	return this.headDatabase;
     }
 
     public void setMCoreStatus(boolean bool) {
-    	multiverseCore = bool;
+    	this.multiverseCore = bool;
     }
     
     public void setMInventoryStatus(boolean bool) {
-    	multiverseInventories = bool;
+    	this.multiverseInventories = bool;
     }
     
     public void setPlaceHolderStatus(boolean bool) {
-    	placeHolderAPI = bool;
+    	this.placeHolderAPI = bool;
     }
     
     public void setPerPluginsStatus(boolean bool) {
-    	perWorldPlugins = bool;
+    	this.perWorldPlugins = bool;
     }
     
     public void setPerInventoryStatus(boolean bool) {
-    	perWorldInventory = bool;
+    	this.perWorldInventory = bool;
     }
     
     public void setNickStatus(boolean bool) {
-    	betterNick = bool;
+    	this.betterNick = bool;
     }
     
     public void setAuthMeStatus(boolean bool) {
-    	authMe = bool;
+    	this.authMe = bool;
     }
     
     public void setMyWorldsStatus(boolean bool) {
-    	myWorlds = bool;
+    	this.myWorlds = bool;
     }
     
     public void setXInventoryStatus(boolean bool) {
-    	xInventories = bool;
+    	this.xInventories = bool;
     }
     
     public void setTokenEnchantStatus(boolean bool) {
-    	tokenEnchant = bool;
+    	this.tokenEnchant = bool;
     }
     
     public void setDatabaseStatus(boolean bool) {
-    	headDatabase = bool;
+    	this.headDatabase = bool;
     }
     
 	public GuardAPI getGuard() {
-		return worldGuard;
+		return this.worldGuard;
 	}
 	
 	private void setGuard() {
-		worldGuard = new GuardAPI();
+		this.worldGuard = new GuardAPI();
 	}
 	
 	public VaultAPI getVault() {
-		return vault;
+		return this.vault;
 	}
 	
 	private void setVault() {
-		vault = new VaultAPI();
+		this.vault = new VaultAPI();
 	}
 }

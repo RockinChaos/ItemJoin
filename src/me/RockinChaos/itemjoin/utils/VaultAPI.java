@@ -18,10 +18,9 @@ public class VaultAPI {
     
 	private void enableEconomy() { 
 		if (ConfigHandler.getConfig("config.yml").getBoolean("softDepend.Vault") && ItemJoin.getInstance().getServer().getPluginManager().getPlugin("Vault") != null) {
-			if (!setupEconomy()) {
+			if (!this.setupEconomy()) {
 				ServerHandler.sendErrorMessage("There was an issue setting up Vault to work with ItemJoin!");
 				ServerHandler.sendErrorMessage("If this continues, please contact the plugin developer!");
-				return;
 			}
 		}
 	}
@@ -30,20 +29,20 @@ public class VaultAPI {
         if (ItemJoin.getInstance().getServer().getPluginManager().getPlugin("Vault") == null) {  return false; }
         RegisteredServiceProvider<Economy> rsp = ItemJoin.getInstance().getServer().getServicesManager().getRegistration(Economy.class);
         if (rsp == null) {  return false; }
-        econ = rsp.getProvider();
-        return econ != null;
+        this.econ = rsp.getProvider();
+        return this.econ != null;
     }
     
     public Economy getEconomy() {
-        return econ;
+        return this.econ;
     }
     
     public boolean vaultEnabled() {
-    	return isEnabled;
+    	return this.isEnabled;
     }
     
     private void setVaultStatus(boolean bool) {
-    	if (bool) { enableEconomy(); }
-    	isEnabled = bool;
+    	if (bool) { this.enableEconomy(); }
+    	this.isEnabled = bool;
     }
 }
