@@ -1396,16 +1396,32 @@ public class ItemMap {
 		if (this.getMaterial().toString().equalsIgnoreCase("WRITTEN_BOOK") && this.bookPages != null && ServerHandler.hasSpecificUpdate("1_8")) {
 			Object localePages = null;
 			try { localePages = Reflection.getNMS("NBTTagList").getConstructor().newInstance(); } catch (Exception e) { ServerHandler.sendDebugTrace(e); }
-			for (String textComponent: this.bookPages) {
-				try { 
-					textComponent = Utils.translateLayout(textComponent, player);
-					Object TagString = Reflection.getNMS("NBTTagString").getConstructor(String.class).newInstance(textComponent);
-					if (ServerHandler.hasSpecificUpdate("1_14")) { localePages.getClass().getMethod("add", int.class, Reflection.getNMS("NBTBase")).invoke(localePages, 0, TagString); }
-					else { localePages.getClass().getMethod("add", Reflection.getNMS("NBTBase")).invoke(localePages, TagString); }
-				} catch (Exception e) { ServerHandler.sendDebugTrace(e); } 
-			}
-			try { this.invokePages(localePages); } catch (Exception e) { ServerHandler.sendDebugTrace(e); }
+			if (ServerHandler.hasSpecificUpdate("1_14")) { this.set1_14JSONPages(player, localePages); } 
+			else { this.set1_13JSONPages(player, localePages); }
 		}
+	}
+	
+	private void set1_13JSONPages(Player player, Object localePages) {
+		for (String textComponent: this.bookPages) {
+			try { 
+				textComponent = Utils.translateLayout(textComponent, player);
+				Object TagString = Reflection.getNMS("NBTTagString").getConstructor(String.class).newInstance(textComponent);
+				localePages.getClass().getMethod("add", Reflection.getNMS("NBTBase")).invoke(localePages, TagString);
+			} catch (Exception e) { ServerHandler.sendDebugTrace(e); } 
+		}
+		try { this.invokePages(localePages); } catch (Exception e) { ServerHandler.sendDebugTrace(e); }
+	}
+	
+	private void set1_14JSONPages(Player player, Object localePages) {
+		for (int i = this.bookPages.size() - 1; i >= 0; i--) {
+			String textComponent = this.bookPages.get(i);
+			try { 
+				textComponent = Utils.translateLayout(textComponent, player);
+				Object TagString = Reflection.getNMS("NBTTagString").getConstructor(String.class).newInstance(textComponent);
+				localePages.getClass().getMethod("add", int.class, Reflection.getNMS("NBTBase")).invoke(localePages, 0, TagString);
+			} catch (Exception e) { ServerHandler.sendDebugTrace(e); } 
+		}
+		try { this.invokePages(localePages); } catch (Exception e) { ServerHandler.sendDebugTrace(e); }
 	}
 	
 	private void invokePages(Object pages) throws Exception {
