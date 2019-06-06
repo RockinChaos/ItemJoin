@@ -53,7 +53,20 @@ public class ServerHandler {
 	}
 	
 	public static void sendErrorMessage(String message) {
-		String prefix = "&e[&4ITEMJOIN_ERROR&e]&c ";
+		String prefix = "&e[&4ItemJoin_ERROR&e]&c ";
+		message = prefix + message;
+		message = ChatColor.translateAlternateColorCodes('&', message).toString();
+		if (!ConfigHandler.isLogColor()) {
+			message = ChatColor.stripColor(message);
+		}
+		if (message.equalsIgnoreCase("") || message.isEmpty()) {
+			message = "";
+	}
+		ItemJoin.getInstance().getServer().getConsoleSender().sendMessage(message);
+	}
+	
+	public static void sendWarnMessage(String message) {
+		String prefix = "&e[&cItemJoin_WARN&e]&c ";
 		message = prefix + message;
 		message = ChatColor.translateAlternateColorCodes('&', message).toString();
 		if (!ConfigHandler.isLogColor()) {
@@ -91,7 +104,7 @@ public class ServerHandler {
 
 	public static void sendDebugMessage(String message) {
 		if (ConfigHandler.isDebugging()) {
-		String prefix = "[ITEMJOIN_DEBUG] &c";
+		String prefix = "[ItemJoin_DEBUG] &c";
 		message = ChatColor.translateAlternateColorCodes('&', message).toString();
 		message = ChatColor.stripColor(message);
 		message = prefix + message;

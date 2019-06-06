@@ -93,8 +93,8 @@ public class ItemHandler {
 				int dataValue;
 				if (!Utils.isInt(material)) { material = "LEGACY_" + material; }
 				if (dataVal != null) { dataValue = Integer.parseInt(dataVal); } else { dataValue = 0; }
-				if (!Utils.isInt(material)) { return Legacy.convertLegacyMaterial(Legacy.getLegacyMaterialID(Material.getMaterial(material.toUpperCase())), (byte) dataValue); } 
-				else { return Legacy.convertLegacyMaterial(Integer.parseInt(material), (byte) dataValue); }
+				if (!Utils.isInt(material)) { return Legacy.getLegacyMaterial(Material.getMaterial(material.toUpperCase()), (byte) dataValue); } 
+				else { return Legacy.getLegacyMaterial(Integer.parseInt(material), (byte) dataValue); }
 			} else if (!ServerHandler.hasAquaticUpdate()) {
 				return Material.getMaterial(material.toUpperCase());
 			} else {

@@ -194,8 +194,8 @@ public class ItemAnimation {
 			String[] parts = materialString.split(":");
 			if (ServerHandler.hasAquaticUpdate()) {
 				if (!Utils.isInt(parts[0])) { parts[0] = "LEGACY_" + parts[0]; }
-				if (!Utils.isInt(parts[0])) { mat = Legacy.convertLegacyMaterial(Legacy.getLegacyMaterialID(Material.getMaterial(parts[0].toUpperCase())), (byte) Integer.parseInt(parts[1])); } 
-				else { mat = Legacy.convertLegacyMaterial(Integer.parseInt(parts[0]), (byte) Integer.parseInt(parts[1])); }
+				if (!Utils.isInt(parts[0])) { mat = Legacy.getLegacyMaterial(Material.getMaterial(parts[0].toUpperCase()), (byte) Integer.parseInt(parts[1])); } 
+				else { mat = Legacy.getLegacyMaterial(Integer.parseInt(parts[0]), (byte) Integer.parseInt(parts[1])); }
 				if (mat != null && mat != Material.AIR) { transAnimate.setType(mat); }
 			} else {
 				mat = ItemHandler.getMaterial(parts[0], null);

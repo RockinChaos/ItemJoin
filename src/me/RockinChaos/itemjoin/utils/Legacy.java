@@ -1,7 +1,6 @@
 package me.RockinChaos.itemjoin.utils;
 
 import java.util.EnumSet;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -24,17 +23,6 @@ import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 public class Legacy {
 	
 	// WELCOME TO THE LAND OF MAKE-BELIEVE! //
-	
-    public static org.bukkit.Material findLegacyMaterial(int typeId) {
-        Material[] foundMaterial = new Material[1];
-        for (Material material: EnumSet.allOf(Material.class)) {
-            if (material.getId() == typeId) {
-                foundMaterial[0] = material;
-                return material;
-            }
-        }
-		return null;
-    }
     
     public static void updateLegacyInventory(Player player) {
     	player.updateInventory();
@@ -79,12 +67,21 @@ public class Legacy {
     public static ItemStack newLegacyItemStack(Material material, int count, short dataValue) {
     	return new ItemStack(material, count, dataValue);
     }
-	
-	public static Material convertLegacyMaterial(int ID, byte Data) {
-	    for (Material i : EnumSet.allOf(Material.class)) { if (i.getId() == ID) { return ItemJoin.getInstance().getServer().getUnsafe().fromLegacy(new MaterialData(i, Data)); } }
-	    return null;
-	}
-	
+    
+    public static org.bukkit.Material getLegacyMaterial(int typeID, byte dataValue) {
+		return ItemJoin.getInstance().getServer().getUnsafe().fromLegacy(new MaterialData(findLegacyMaterial(typeID), dataValue));
+    }
+    
+    public static org.bukkit.Material getLegacyMaterial(Material typeID, byte dataValue) {
+  		return ItemJoin.getInstance().getServer().getUnsafe().fromLegacy(new MaterialData(typeID, dataValue));
+      }
+    
+    public static org.bukkit.Material findLegacyMaterial(int typeID) {
+        final Material[] foundMaterial = new Material[1];
+        EnumSet.allOf(Material.class).forEach(material -> { try { if (Utils.containsIgnoreCase(material.toString(), "LEGACY_") && material.getId() == typeID) { foundMaterial[0] = material; } } catch (Exception e) { }});
+        return foundMaterial[0];
+    }
+
 	public static int getLegacyMaterialID(Material mat) {
 	    return mat.getId();
 	}

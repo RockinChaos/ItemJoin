@@ -93,8 +93,8 @@ public class ItemDesigner {
 			if (id.contains(":")) {
 				String[] parts = id.split(":"); id = parts[0]; dataValue = parts[1];
 				if (ServerHandler.hasAquaticUpdate()) {
-					ServerHandler.sendErrorMessage("&4[WARNING] The item " + internalName + " is using an ItemID (Numerical Value) which is no longer supported as of Minecraft 1.13, instead use its material name.");
-					ServerHandler.sendErrorMessage("&4This will cause issues, please see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html for a list of material names.");
+					ServerHandler.sendWarnMessage("&cThe item &e" + internalName + "&c is using a &eLegacy Material&c which is no longer supported as of Minecraft 1.13.");
+					ServerHandler.sendWarnMessage("&cThis will cause issues, please see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html for a list of material names.");
 				}
 			}
 			
@@ -110,8 +110,7 @@ public class ItemDesigner {
 				ServerHandler.sendErrorMessage("&eThe Item " + internalName + "'s Material 'ID' is invalid or does not exist!");
 				ServerHandler.sendErrorMessage("&eThe Item " + internalName + " &ewill not be set!");
 				if (Utils.isInt(id)) {
-					ServerHandler.sendErrorMessage("&eIf you are using a numerical id and a numberical data-value make sure you "
-					+ "include quotations or apostrophes at the beginning and end or it will break the configuration file, it should look like '160:15' or \"160:15\".");
+					ServerHandler.sendErrorMessage("&eIf you are using a numerical id and a numerical dataValue, include quotations or apostrophes at the beginning and the end or this error will persist, the id should look like '160:15' or \"160:15\".");
 				}
 				return false;
 			} else if (itemNode.getString(".slot") == null) {
