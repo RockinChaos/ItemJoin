@@ -1777,18 +1777,20 @@ public class ItemMap {
 			Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
 				@Override
 				public void run() {
-					if (PlayerHandler.isCreativeMode(player)) {
-						player.closeInventory();
-					}
+					if (PlayerHandler.isCreativeMode(player)) { player.closeInventory(); }
 					if (isSimilar(player.getItemOnCursor())) {
 						player.setItemOnCursor(newItem(player.getItemOnCursor()));
 						setSubjectRemoval(false);
 					} else {
-						for (int i = 0; i < player.getInventory().getSize(); i++) {
-							if (isSimilar(player.getInventory().getItem(i))) {
-								player.getInventory().setItem(i, newItem(player.getInventory().getItem(i)));
-								setSubjectRemoval(false);
-								break;
+						int itemSlot = player.getInventory().getHeldItemSlot();
+						if (isSimilar(player.getInventory().getItem(itemSlot))) { player.getInventory().setItem(itemSlot, newItem(player.getInventory().getItem(itemSlot))); setSubjectRemoval(false);}
+						else { 
+							for (int i = 0; i < player.getInventory().getSize(); i++) {
+								if (isSimilar(player.getInventory().getItem(i))) {
+									player.getInventory().setItem(i, newItem(player.getInventory().getItem(i)));
+									setSubjectRemoval(false);
+									break;
+								}
 							}
 						}
 						if (isSubjectRemoval() && PlayerHandler.isCreativeMode(player)) {
