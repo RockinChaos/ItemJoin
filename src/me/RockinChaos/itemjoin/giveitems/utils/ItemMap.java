@@ -1224,11 +1224,11 @@ public class ItemMap {
 			if (item.getItemMeta().getDisplayName().equalsIgnoreCase(this.tempMeta.getDisplayName()) && item.getItemMeta().getLore().toString().equalsIgnoreCase(this.tempMeta.getLore().toString())) {
 				return true;
 			}
-		} else if (item.hasItemMeta() && item.getItemMeta().hasDisplayName() && this.tempMeta.hasDisplayName()) {
+		} else if (item.hasItemMeta() && item.getItemMeta().hasDisplayName() && this.tempMeta.hasDisplayName() && !item.getItemMeta().hasLore() && !this.tempMeta.hasLore()) {
 			if (item.getItemMeta().getDisplayName().equalsIgnoreCase(this.tempMeta.getDisplayName())) {
 				return true;
 			}
-		} else if (item.getItemMeta().hasLore() && this.tempMeta.hasLore()) {
+		} else if (item.hasItemMeta() && !item.getItemMeta().hasDisplayName() && !this.tempMeta.hasDisplayName() && item.getItemMeta().hasLore() && this.tempMeta.hasLore()) {
 			if (item.getItemMeta().getLore().toString().equalsIgnoreCase(this.tempMeta.getLore().toString())) {
 				return true;
 			}
