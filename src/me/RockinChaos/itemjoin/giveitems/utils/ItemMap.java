@@ -1168,7 +1168,7 @@ public class ItemMap {
 		if (this.isSimilar(item)) {
 			if (this.AllowOpBypass && player.isOp() || this.CreativeBypass && player.getGameMode() == GameMode.CREATIVE 
 					|| findFlag.equalsIgnoreCase("inventory-modify") && player.hasPermission("itemjoin.bypass.inventorymodify") 
-					&& ItemJoin.getInstance().getConfig().getBoolean("InventoryBypass-Permission") == true) {
+					&& ItemJoin.getInstance().getConfig().getBoolean("Permissions.Movement-Bypass")) {
 				return false;
 			} 
 			else if (findFlag.equals("cancel-events")) { return cancelEvents; } 
