@@ -321,7 +321,7 @@ public class ItemDesigner {
 //  This designs the item to be unique to ItemJoin. //
 //  =============================================== //
 	private void setNBTData(ItemMap itemMap) {
-		if (ItemUtilities.dataTagsEnabled() && !itemMap.isVanilla()) {
+		if (ItemUtilities.dataTagsEnabled() && !itemMap.isVanilla() && !itemMap.isVanillaControl() && !itemMap.isVanillaStatus()) {
 			try {
 				Object tag = Reflection.getNMS("NBTTagCompound").getConstructor().newInstance();
 				tag.getClass().getMethod("setString", String.class, String.class).invoke(tag, "ItemJoin Name", itemMap.getConfigName());

@@ -155,6 +155,7 @@ public class ItemMap {
 	
 	private boolean vanillaItem = false;
 	private boolean vanillaStatus = false;
+	private boolean vanillaControl = false;
 	private boolean unbreakable = false;
 	private boolean countLock = false;
 	private boolean cancelEvents = false;
@@ -305,8 +306,9 @@ public class ItemMap {
 	private void setItemflags() {
 		if (this.nodeLocation.getString(".itemflags") != null) {
 			this.itemflags = this.nodeLocation.getString(".itemflags");
-			this.vanillaItem = Utils.containsIgnoreCase(this.itemflags, "vanilla");
+			this.vanillaItem = Utils.containsIgnoreCase(this.itemflags, "vanilla ");
 			this.vanillaStatus = Utils.containsIgnoreCase(this.itemflags, "vanilla-status");
+			this.vanillaControl = Utils.containsIgnoreCase(this.itemflags, "vanilla-control");
 			this.disposable = Utils.containsIgnoreCase(this.itemflags, "disposable");
 			this.blockPlacement = Utils.containsIgnoreCase(this.itemflags, "placement");
 			this.blockMovement = Utils.containsIgnoreCase(this.itemflags, "inventory-modify");
@@ -1076,6 +1078,10 @@ public class ItemMap {
 		return this.vanillaStatus;
 	}
 	
+	public boolean isVanillaControl() {
+		return this.vanillaControl;
+	}
+	
 	public boolean isUnbreakable() {
 		return this.unbreakable;
 	}
@@ -1194,18 +1200,37 @@ public class ItemMap {
      
 	public boolean isSimilar(ItemStack item) {
 		if (item != null && item.getType() != Material.AIR && item.getType() == this.material || this.materialAnimated && item != null && item.getType() != Material.AIR && this.isMaterial(item)) {
-			if (ItemUtilities.dataTagsEnabled() && ServerHandler.hasSpecificUpdate("1_8") && ItemHandler.getNBTData(item) != null && Utils.containsIgnoreCase(ItemHandler.getNBTData(item), this.newNBTData)
-					|| this.legacySecret != null && item.hasItemMeta() && item.getItemMeta().hasDisplayName() && item.getItemMeta().getDisplayName().contains(this.legacySecret) || this.vanillaItem && this.vanillaStatus) {
+			if (this.vanillaControl || ItemUtilities.dataTagsEnabled() && ServerHandler.hasSpecificUpdate("1_8") && ItemHandler.getNBTData(item) != null && Utils.containsIgnoreCase(ItemHandler.getNBTData(item), this.newNBTData)
+					|| this.legacySecret != null && item.hasItemMeta() && item.getItemMeta().hasDisplayName() && item.getItemMeta().getDisplayName().contains(this.legacySecret) || this.vanillaStatus) {
 				if (this.skullCheck(item)) {
 					if (isEnchantSimilar(item) || !item.getItemMeta().hasEnchants() && enchants.isEmpty() || this.isModifiyable()) {
 						if (this.material.toString().toUpperCase().contains("BOOK") 
 								&& this.isBookMeta(item) 
 								&& ((BookMeta) item.getItemMeta()).getPages().equals(((BookMeta) tempItem.getItemMeta()).getPages())
 								|| this.material.toString().toUpperCase().contains("BOOK") && !this.isBookMeta(item) || !this.material.toString().toUpperCase().contains("BOOK") || this.isModifiyable()) {
-							return true;
+							if (!this.vanillaControl || this.vanillaControl && statsCheck(item)) {
+								return true;
+							}
 						}
 					}
 				}
+			}
+		}
+		return false;
+	}
+	
+	private boolean statsCheck(ItemStack item) {
+		if (item.hasItemMeta() && item.getItemMeta().hasDisplayName() && this.tempMeta.hasDisplayName() && item.getItemMeta().hasLore() && this.tempMeta.hasLore()) {
+			if (item.getItemMeta().getDisplayName().equalsIgnoreCase(this.tempMeta.getDisplayName()) && item.getItemMeta().getLore().toString().equalsIgnoreCase(this.tempMeta.getLore().toString())) {
+				return true;
+			}
+		} else if (item.hasItemMeta() && item.getItemMeta().hasDisplayName() && this.tempMeta.hasDisplayName()) {
+			if (item.getItemMeta().getDisplayName().equalsIgnoreCase(this.tempMeta.getDisplayName())) {
+				return true;
+			}
+		} else if (item.getItemMeta().hasLore() && this.tempMeta.hasLore()) {
+			if (item.getItemMeta().getLore().toString().equalsIgnoreCase(this.tempMeta.getLore().toString())) {
+				return true;
 			}
 		}
 		return false;
@@ -1434,7 +1459,7 @@ public class ItemMap {
 	}
 	
 	private void setNBTData() {
-		if (ItemUtilities.dataTagsEnabled() && !this.isVanilla()) {
+		if (ItemUtilities.dataTagsEnabled() && !this.isVanilla() && !this.isVanillaControl() && !this.isVanillaStatus()) {
 			try {
 				Object nms = Reflection.getOBC("inventory.CraftItemStack").getMethod("asNMSCopy", ItemStack.class).invoke(null, this.tempItem);
 				Object cacheTag = Reflection.getNMS("ItemStack").getMethod("getTag").invoke(nms);
