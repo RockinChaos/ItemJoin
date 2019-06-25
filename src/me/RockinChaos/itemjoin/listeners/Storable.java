@@ -29,12 +29,13 @@ public class Storable implements Listener {
 		} else if (event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY)) { item = event.getCurrentItem(); } 
 		else { item = event.getCursor(); }
 		if (invType != null) {
-			if (invType.contains("CHEST") || invType.contains("FURNACE") || invType.contains("SHULKER_BOX") || invType.contains("HOPPER") || invType.contains("ANVIL") || invType.contains("WORKBENCH") || invType.contains("DISPENSER") || invType.contains("DROPPER")) {
-				if (event.getRawSlot() > event.getInventory().getSize() && event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY) || event.getRawSlot() < event.getInventory().getSize()) {
-					if (!ItemUtilities.isAllowed(player, item, "item-store")) {
-						event.setCancelled(true);
-						PlayerHandler.updateInventory(player);
-					}
+			if (event.getRawSlot() > event.getInventory().getSize() && event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY) || event.getRawSlot() < event.getInventory().getSize()) {
+				if ((invType.contains("CHEST") || invType.contains("FURNACE") || invType.contains("SHULKER_BOX") || invType.contains("HOPPER") || invType.contains("ANVIL") || invType.contains("WORKBENCH") || invType.contains("DISPENSER") || invType.contains("DROPPER")) && !ItemUtilities.isAllowed(player, item, "item-store")) {
+					event.setCancelled(true);
+					PlayerHandler.updateInventory(player);
+				} else if ((invType.contains("ENCHANTING") || invType.contains("ANVIL")) && !ItemUtilities.isAllowed(player, item, "item-modifiable")) {
+					event.setCancelled(true);
+					PlayerHandler.updateInventory(player);
 				}
 			}
 		}
@@ -49,13 +50,15 @@ public class Storable implements Listener {
 		for (int i: event.getRawSlots()) {
 			if (i < inventorySize) {
 				if (invType != null) {
-					if (invType.contains("CHEST") || invType.contains("FURNACE") || invType.contains("SHULKER_BOX") 
-							|| invType.contains("HOPPER") || invType.contains("ANVIL") || invType.contains("WORKBENCH") || invType.contains("DISPENSER") || invType.contains("DROPPER")) {
-						if (!ItemUtilities.isAllowed(player, item, "item-store")) {
-							event.setCancelled(true);
-							PlayerHandler.updateInventory(player);
-							break;
-						}
+					if ((invType.contains("CHEST") || invType.contains("FURNACE") || invType.contains("SHULKER_BOX") 
+						|| invType.contains("HOPPER") || invType.contains("ANVIL") || invType.contains("WORKBENCH") || invType.contains("DISPENSER") || invType.contains("DROPPER")) && !ItemUtilities.isAllowed(player, item, "item-store")) {
+						event.setCancelled(true);
+						PlayerHandler.updateInventory(player);
+						break;
+					} else if ((invType.contains("ENCHANTING") || invType.contains("ANVIL")) && !ItemUtilities.isAllowed(player, item, "item-modifiable")) {
+						event.setCancelled(true);
+						PlayerHandler.updateInventory(player);
+						break;
 					}
 				}
 			}

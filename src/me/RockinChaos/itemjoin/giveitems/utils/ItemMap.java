@@ -160,6 +160,7 @@ public class ItemMap {
 	private boolean countLock = false;
 	private boolean cancelEvents = false;
 	private boolean itemStore = false;
+	private boolean itemModify = false;
 	private boolean noCrafting = false;
 	private boolean noRepairing = false;
 	private boolean animate = false;
@@ -320,6 +321,7 @@ public class ItemMap {
 			this.dynamic = Utils.containsIgnoreCase(this.itemflags, "dynamic");
 			this.animate = Utils.containsIgnoreCase(this.itemflags, "animate");
 			this.itemStore = Utils.containsIgnoreCase(this.itemflags, "item-store");
+			this.itemModify = Utils.containsIgnoreCase(this.itemflags, "item-modifiable");
 			this.noCrafting = Utils.containsIgnoreCase(this.itemflags, "item-craftable");
 			this.noRepairing = Utils.containsIgnoreCase(this.itemflags, "item-repairable");
 			this.cancelEvents = Utils.containsIgnoreCase(this.itemflags, "cancel-events");
@@ -608,6 +610,10 @@ public class ItemMap {
 	
 	public void setItemStore(boolean bool) {
 		this.itemStore = bool;
+	}
+	
+	public void setItemModify(boolean bool) {
+		this.itemModify = bool;
 	}
 	
 	public void setItemCraftable(boolean bool) {
@@ -1103,6 +1109,10 @@ public class ItemMap {
 		return this.itemStore;
 	}
 	
+	public boolean isItemModify() {
+		return this.itemModify;
+	}
+	
 	public boolean isItemCraftable() {
 		return this.noCrafting;
 	}
@@ -1188,6 +1198,7 @@ public class ItemMap {
 			else if (findFlag.equals("inventory-modify")) { return blockMovement; }
 			else if (findFlag.equals("inventory-close")) { return closeInventory; }
 			else if (findFlag.equals("item-store")) { return itemStore; } 
+			else if (findFlag.equals("item-modifiable")) { return itemModify; } 
 			else if (findFlag.equals("item-craftable")) { return noCrafting; } 
 			else if (findFlag.equals("item-repairable")) { return noRepairing; } 
 			else if (findFlag.equals("placement")) { return blockPlacement; } 
