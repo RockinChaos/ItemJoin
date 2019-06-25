@@ -8,25 +8,9 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import me.RockinChaos.itemjoin.Commands;
 import me.RockinChaos.itemjoin.ItemJoin;
-import me.RockinChaos.itemjoin.giveitems.listeners.LimitSwitch;
-import me.RockinChaos.itemjoin.giveitems.listeners.PlayerJoin;
-import me.RockinChaos.itemjoin.giveitems.listeners.PlayerQuit;
-import me.RockinChaos.itemjoin.giveitems.listeners.RegionEnter;
-import me.RockinChaos.itemjoin.giveitems.listeners.Respawn;
-import me.RockinChaos.itemjoin.giveitems.listeners.WorldSwitch;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemDesigner;
-import me.RockinChaos.itemjoin.listeners.Consumes;
-import me.RockinChaos.itemjoin.listeners.Drops;
-import me.RockinChaos.itemjoin.listeners.Interact;
-import me.RockinChaos.itemjoin.listeners.InventoryClick;
-import me.RockinChaos.itemjoin.listeners.InventoryClose;
 import me.RockinChaos.itemjoin.listeners.Legacy_Pickups;
-import me.RockinChaos.itemjoin.listeners.Legacy_Storable;
 import me.RockinChaos.itemjoin.listeners.Pickups;
-import me.RockinChaos.itemjoin.listeners.Placement;
-import me.RockinChaos.itemjoin.listeners.Recipes;
-import me.RockinChaos.itemjoin.listeners.Storable;
-import me.RockinChaos.itemjoin.listeners.SwitchHands;
 import me.RockinChaos.itemjoin.utils.DependAPI;
 import me.RockinChaos.itemjoin.utils.Metrics;
 import me.RockinChaos.itemjoin.utils.Reflection;
@@ -60,24 +44,10 @@ public class ConfigHandler {
 	public static void registerEvents() {
 	    ItemJoin.getInstance().getCommand("itemjoin").setExecutor(new Commands());
 		ItemJoin.getInstance().getCommand("ij").setExecutor(new Commands());
-		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerJoin(), ItemJoin.getInstance());
-		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerQuit(), ItemJoin.getInstance());
-		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new InventoryClose(), ItemJoin.getInstance());
-		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new WorldSwitch(), ItemJoin.getInstance());
-		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new LimitSwitch(), ItemJoin.getInstance());
-		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Respawn(), ItemJoin.getInstance());
-		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new InventoryClick(), ItemJoin.getInstance());
-		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Drops(), ItemJoin.getInstance());
-		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Interact(), ItemJoin.getInstance());
-		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Placement(), ItemJoin.getInstance());
-		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Consumes(), ItemJoin.getInstance());
-		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Recipes(), ItemJoin.getInstance());
-		if (!ServerHandler.hasSpecificUpdate("1_8")) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Legacy_Storable(), ItemJoin.getInstance());} 
-		else { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Storable(), ItemJoin.getInstance()); }
-		if (ServerHandler.hasSpecificUpdate("1_12") && Reflection.getEventClass("entity.EntityPickupItemEvent") != null) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Pickups(), ItemJoin.getInstance()); } 
-		else { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Legacy_Pickups(), ItemJoin.getInstance()); }
-		if (ServerHandler.hasCombatUpdate() && Reflection.getEventClass("player.PlayerSwapHandItemsEvent") != null) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new SwitchHands(), ItemJoin.getInstance()); }
-		if (getDepends().getGuard().guardEnabled()) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new RegionEnter(), ItemJoin.getInstance()); }
+		if ((!Utils.containsIgnoreCase(ConfigHandler.isPreventPickups(), "FALSE") || !Utils.containsIgnoreCase(ConfigHandler.isPreventPickups(), "DISABLED"))) {
+			if (ServerHandler.hasSpecificUpdate("1_12") && Reflection.getEventClass("entity.EntityPickupItemEvent") != null) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Pickups(), ItemJoin.getInstance()); } 
+			else { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Legacy_Pickups(), ItemJoin.getInstance()); }
+		}
 	}
 	
 	public static Boolean isConfigurable() {

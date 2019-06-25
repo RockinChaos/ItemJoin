@@ -192,10 +192,10 @@ public class ItemMap {
 	private boolean giveOnWorldChange = false;
 	private boolean giveOnRegionEnter = false;
 	private boolean takeOnRegionLeave = false;
+	private boolean useOnLimitSwitch = false;
 	
 	private String triggers = null;
 	private String limitModes = null;
-	private boolean useOnLimitSwitch = false;
 //  ============================================== //
 	
 	private String permissionNode = null;
@@ -232,6 +232,7 @@ public class ItemMap {
         this.setPerm(this.nodeLocation.getString(".permission-node"));
         this.setPermissionNeeded(ConfigHandler.getConfig("config.yml").getBoolean("Permissions.Obtain-Items"));
     	this.setOPPermissionNeeded(ConfigHandler.getConfig("config.yml").getBoolean("Permissions.Obtain-Items.OP"));
+    	ItemUtilities.setListenerRestrictions(this);
 	}
 //  ========================================================================================================= //
 	
@@ -354,7 +355,7 @@ public class ItemMap {
 				this.giveOnWorldChange = true;
 			}
 			this.giveOnRespawn = Utils.containsIgnoreCase(this.triggers, "RESPAWN");
-			this.giveOnRegionEnter =Utils.containsIgnoreCase(this.triggers, "REGION-ENTER");
+			this.giveOnRegionEnter = Utils.containsIgnoreCase(this.triggers, "REGION-ENTER");
 			this.takeOnRegionLeave = Utils.containsIgnoreCase(this.triggers, "REGION-REMOVE");
 			this.useOnLimitSwitch = Utils.containsIgnoreCase(this.triggers, "GAMEMODE-SWITCH");
 		} else { this.giveOnJoin = true; }
@@ -885,6 +886,10 @@ public class ItemMap {
 	
 	public ConfigurationSection getNodeLocation() {
 		return this.nodeLocation;	
+	}
+	
+	public ItemCommand[] getCommands() {
+		return this.commands;
 	}
 	
 	public CommandType getCommandType() {

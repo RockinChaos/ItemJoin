@@ -10,17 +10,36 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.plugin.RegisteredListener;
 
 import me.RockinChaos.itemjoin.ItemJoin;
+import me.RockinChaos.itemjoin.giveitems.listeners.LimitSwitch;
+import me.RockinChaos.itemjoin.giveitems.listeners.PlayerJoin;
+import me.RockinChaos.itemjoin.giveitems.listeners.PlayerQuit;
+import me.RockinChaos.itemjoin.giveitems.listeners.RegionEnter;
+import me.RockinChaos.itemjoin.giveitems.listeners.Respawn;
+import me.RockinChaos.itemjoin.giveitems.listeners.WorldSwitch;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
+import me.RockinChaos.itemjoin.listeners.Consumes;
+import me.RockinChaos.itemjoin.listeners.Drops;
+import me.RockinChaos.itemjoin.listeners.Interact;
+import me.RockinChaos.itemjoin.listeners.InventoryClick;
+import me.RockinChaos.itemjoin.listeners.InventoryClose;
+import me.RockinChaos.itemjoin.listeners.Legacy_Storable;
+import me.RockinChaos.itemjoin.listeners.Placement;
+import me.RockinChaos.itemjoin.listeners.Recipes;
+import me.RockinChaos.itemjoin.listeners.Storable;
+import me.RockinChaos.itemjoin.listeners.SwitchHands;
 import me.RockinChaos.itemjoin.utils.Language;
 import me.RockinChaos.itemjoin.utils.ProbabilityUtilities;
+import me.RockinChaos.itemjoin.utils.Reflection;
 import me.RockinChaos.itemjoin.utils.Utils;
 
 public class ItemUtilities {
@@ -33,7 +52,7 @@ public class ItemUtilities {
 	
 	private static boolean oldMapMethod = false;
 	private static boolean oldMapViewMethod = false;
-	
+
 	public static boolean isAllowed(Player player, ItemStack item, String itemflag) {
 		ItemMap fetched = getMappedItem(item, player.getWorld());
 		if (fetched != null && fetched.isAllowedItem(player, item, itemflag)) {
@@ -581,6 +600,40 @@ public class ItemUtilities {
 			return 4;
 		}
 		return 5;
+	}
+
+	public static void setListenerRestrictions(ItemMap itemMap) {
+		if (((!itemMap.isGiveOnDisabled() && itemMap.isGiveOnJoin()) || (!ConfigHandler.getConfig("config.yml").getString("Active-Commands.enabled-worlds").equalsIgnoreCase("DISABLED") 
+		|| !ConfigHandler.getConfig("config.yml").getString("Active-Commands.enabled-worlds").equalsIgnoreCase("FALSE"))) && !isListenerEnabled(PlayerJoin.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerJoin(), ItemJoin.getInstance()); }
+		if (!itemMap.isGiveOnDisabled() && itemMap.isGiveOnRespawn() && !isListenerEnabled(Respawn.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Respawn(), ItemJoin.getInstance()); }
+		if (!itemMap.isGiveOnDisabled() && itemMap.isGiveOnWorldChange() && !isListenerEnabled(WorldSwitch.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new WorldSwitch(), ItemJoin.getInstance()); }
+		if (!itemMap.isGiveOnDisabled() && (itemMap.isGiveOnRegionEnter() || itemMap.isTakeOnRegionLeave()) && !isListenerEnabled(RegionEnter.class.getSimpleName()) && ConfigHandler.getDepends().getGuard().guardEnabled()) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new RegionEnter(), ItemJoin.getInstance()); }
+		if (!itemMap.isGiveOnDisabled() && itemMap.isUseOnLimitSwitch() && !isListenerEnabled(LimitSwitch.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new LimitSwitch(), ItemJoin.getInstance()); }
+		
+		if ((itemMap.isAnimated() || itemMap.isDynamic()) && !isListenerEnabled(PlayerQuit.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerQuit(), ItemJoin.getInstance()); }
+		if (itemMap.isInventoryClose() && !isListenerEnabled(InventoryClose.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new InventoryClose(), ItemJoin.getInstance()); }
+		if ((itemMap.isMovement() || itemMap.isInventoryClose()) && !isListenerEnabled(InventoryClick.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new InventoryClick(), ItemJoin.getInstance()); }
+		if ((itemMap.isDeathDroppable() || itemMap.isSelfDroppable()) && !isListenerEnabled(Drops.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Drops(), ItemJoin.getInstance()); }
+		if ((itemMap.isCancelEvents() || (itemMap.getCommands() != null && itemMap.getCommands().length != 0)) && !isListenerEnabled(Interact.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Interact(), ItemJoin.getInstance()); }
+		if ((itemMap.isPlacement() || itemMap.isCountLock()) && !isListenerEnabled(Placement.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Placement(), ItemJoin.getInstance()); }
+		if (itemMap.isCustomConsumable() && !isListenerEnabled(Consumes.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Consumes(), ItemJoin.getInstance()); }
+		if ((itemMap.isItemRepairable() || itemMap.isItemCraftable()) && !isListenerEnabled(Recipes.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Recipes(), ItemJoin.getInstance()); }
+		if (itemMap.isItemStore()) {
+			if (!ServerHandler.hasSpecificUpdate("1_8") && !isListenerEnabled(Legacy_Storable.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Legacy_Storable(), ItemJoin.getInstance());} 
+			else if (!isListenerEnabled(Storable.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Storable(), ItemJoin.getInstance()); }
+		}
+		if (itemMap.isMovement() && !isListenerEnabled(SwitchHands.class.getSimpleName()) && ServerHandler.hasCombatUpdate() && Reflection.getEventClass("player.PlayerSwapHandItemsEvent") != null) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new SwitchHands(), ItemJoin.getInstance()); }
+	}
+	
+	public static boolean isListenerEnabled(String compare) {
+		boolean returnValue = false;
+        ArrayList<RegisteredListener> rls = HandlerList.getRegisteredListeners(ItemJoin.getInstance());
+        for(RegisteredListener rl: rls) {
+        	if (rl.getListener().getClass().getSimpleName().equalsIgnoreCase(compare)) {
+        		returnValue = true; break;
+        	}
+        }
+		return returnValue;
 	}
 	
 	private static void saveSQLItemData(Player player, ItemMap itemMap) {
