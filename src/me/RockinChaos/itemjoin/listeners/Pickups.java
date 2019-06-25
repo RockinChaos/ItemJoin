@@ -17,7 +17,7 @@ public class Pickups implements Listener {
 	  	Entity entity = event.getEntity();
 	  	if (entity instanceof Player) {
 	  		Player player = (Player) event.getEntity();
-	  		if (Utils.containsIgnoreCase(ConfigHandler.isPreventPickups(), "true") || Utils.containsIgnoreCase(ConfigHandler.isPreventPickups(), player.getWorld().getName())
+	  		if (Utils.containsIgnoreCase(ConfigHandler.isPreventPickups(), "TRUE") || Utils.containsIgnoreCase(ConfigHandler.isPreventPickups(), player.getWorld().getName())
 	  			|| Utils.containsIgnoreCase(ConfigHandler.isPreventPickups(), "ALL") || Utils.containsIgnoreCase(ConfigHandler.isPreventPickups(), "GLOBAL")) {
 	  			if (ConfigHandler.isPreventOBypass() && player.isOp() || ConfigHandler.isPreventCBypass() && PlayerHandler.isCreativeMode(player)) { } 
 	  			else { event.setCancelled(true); }

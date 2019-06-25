@@ -15,7 +15,7 @@ import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.utils.Utils;
 
 public class PlayerJoin implements Listener {
-	
+
 	@EventHandler
 	private void giveOnJoin(PlayerJoinEvent event) {
 		final Player player = event.getPlayer();

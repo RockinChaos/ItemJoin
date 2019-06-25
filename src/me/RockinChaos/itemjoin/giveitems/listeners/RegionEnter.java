@@ -27,10 +27,8 @@ public class RegionEnter implements Listener {
 	@EventHandler
 	private void RegionListener(PlayerMoveEvent event) {
 		final Player player = event.getPlayer();
-		if (ConfigHandler.getDepends().getGuard().guardEnabled()) {
-			if (ConfigHandler.getSQLData().isEnabled(player)) {
-				updateRegionItems(player);
-			}
+		if (ConfigHandler.getSQLData().isEnabled(player)) {
+			updateRegionItems(player);
 		}
 	}
 

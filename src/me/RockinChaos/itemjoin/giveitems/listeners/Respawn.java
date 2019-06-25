@@ -15,7 +15,7 @@ import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.utils.Utils;
 
 public class Respawn implements Listener {
-
+	
 	@EventHandler
 	private void giveOnRespawn(PlayerRespawnEvent event) {
 		final Player player = event.getPlayer();

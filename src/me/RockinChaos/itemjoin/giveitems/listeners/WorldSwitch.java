@@ -15,7 +15,7 @@ import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.utils.Utils;
 
 public class WorldSwitch implements Listener {
-
+	
 	@EventHandler
 	private void giveOnWorldSwitch(PlayerChangedWorldEvent event) {
 		final Player player = event.getPlayer();

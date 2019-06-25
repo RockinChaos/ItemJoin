@@ -1,21 +1,19 @@
-name: ItemJoin
 main: me.RockinChaos.itemjoin.ItemJoin
-author: RockinChaos
-api-version: 1.13
 version: 5.0.4-SNAPSHOT
+name: ItemJoin
+author: RockinChaos
+api-version: 1.14
+load: POSTWORLD
 description: Get custom items on join.
 website: https://www.spigotmc.org/resources/itemjoin.12661/
 softdepend: [AuthMe, BetterNick, HeadDatabase, Multiverse-Core, Multiverse-Inventories, MyWorlds, PerWorldInventory, PerWorldPlugins, PlaceholderAPI, TokenEnchant, Vault, WorldGuard, xInventories]
 
 commands:
-   ij:
-      description: Displays a menu giving credit to the creator and the help menu command.
-      permission: itemjoin.use
-      usage: |
-          /ij
    itemjoin:
       description: Displays a menu giving credit to the creator and the help menu command.
       permission: itemjoin.use
+      aliases:
+      - ij
       usage: |
           /itemjoin
    itemjoin help:
@@ -255,10 +253,10 @@ permissions:
           itemjoin.list: true
           itemjoin.bypass.inventorymodify: false
    itemjoin.permissions:
-      description: Use of the /itemjoin permissions commands.
+      description: Allows use of the /itemjoin permissions commands.
       default: true
    itemjoin.use:
-      description: Currently allows use of basic commands.
+      description: Allows use of basic commands.
       default: true
    itemjoin.reload:
       description: Allows use of /itemjoin reload command.
@@ -267,44 +265,44 @@ permissions:
       description: Allows use of /itemjoin creator command.
       default: false
    itemjoin.updates:
-      description: Use of the /itemjoin updates command.
+      description: Allows use of the /itemjoin updates command.
       default: false
    itemjoin.autoupdate:
-      description: Use of the /itemjoin autoupdate command.
+      description: Allows use of the /itemjoin autoupdate command.
       default: false
    itemjoin.purge:
-      description: Use of the /itemjoin purge command.
+      description: Allows use of the /itemjoin purge command.
       default: false
    itemjoin.save:
-      description: Use of the /itemjoin save <item> command.
+      description: Allows use of the /itemjoin save <item> command.
       default: false
    itemjoin.get:
-      description: Use of the /itemjoin get <item> command.
+      description: Allows use of the /itemjoin get <item> command.
       default: false
    itemjoin.get.others:
-      description: Use of the /itemjoin get <item> <player> for player command.
+      description: Allows use of the /itemjoin get <item> <player> for player command.
       default: false
    itemjoin.remove:
-      description: Use of the /itemjoin remove <item> command.
+      description: Allows use of the /itemjoin remove <item> command.
       default: false
    itemjoin.remove.others:
-      description: Use of the /itemjoin remove <item> <player> for player command.
+      description: Allows use of the /itemjoin remove <item> <player> for player command.
       default: false
    itemjoin.enable:
-      description: Use of the /itemjoin enable global command.
+      description: Allows use of the /itemjoin enable global command.
       default: false
    itemjoin.enable.others:
-      description: Use of the /itemjoin enable <player> for player command.
+      description: Allows use of the /itemjoin enable <player> for player command.
       default: false
    itemjoin.disable:
-      description: Use of the /itemjoin disable global command.
+      description: Allows use of the /itemjoin disable global command.
       default: false
    itemjoin.disable.others:
-      description: Use of the /itemjoin disable <player> for player command.
+      description: Allows use of the /itemjoin disable <player> for player command.
       default: false
    itemjoin.list:
-      description: Use of the /itemjoin list command.
+      description: Allows use of the /itemjoin list command.
       default: false
    itemjoin.bypass.inventorymodify:
-      description: Players will this permission will bypass any effect that the inventory modify flag has.
+      description: Players with this permission will bypass the inventory-modify restrictions.
       default: false
