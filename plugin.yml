@@ -2,7 +2,7 @@ main: me.RockinChaos.itemjoin.ItemJoin
 version: 5.0.4-SNAPSHOT
 name: ItemJoin
 author: RockinChaos
-api-version: 1.14
+api-version: 1.13
 load: POSTWORLD
 description: Get custom items on join.
 website: https://www.spigotmc.org/resources/itemjoin.12661/
