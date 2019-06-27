@@ -34,7 +34,6 @@ public class RegionEnter implements Listener {
 
 	private static void removeItems(Player player, String region) {
 		ItemUtilities.safeSet(player, "Region-Enter");
-		ItemUtilities.updateItems(player, false);
 		for (ItemMap item: ItemUtilities.getItems()) {
 			if (item.isTakeOnRegionLeave() || item.isGiveOnRegionEnter()) {
 				if (item.isEnabledRegion(region) && item.inWorld(player.getWorld()) && item.hasPermission(player)) {
@@ -47,7 +46,6 @@ public class RegionEnter implements Listener {
 	private static void getItems(Player player, String region) {
 		final int session = Utils.getRandom(1, 100000);
 		ItemUtilities.safeSet(player, "Region-Enter");
-		ItemUtilities.updateItems(player, false);
 		String Probable = ItemUtilities.getProbabilityItem(player);
 		for (ItemMap item: ItemUtilities.getItems()) {
 			if (item.isGiveOnRegionEnter() && item.isEnabledRegion(region) && item.inWorld(player.getWorld())

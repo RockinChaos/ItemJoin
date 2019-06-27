@@ -41,7 +41,6 @@ public class PlayerJoin implements Listener {
 		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
 			@Override
 			public void run() {
-				ItemUtilities.updateItems(player, false);
 				String Probable = ItemUtilities.getProbabilityItem(player);
 				final int session = Utils.getRandom(1, 100000);
 				for (ItemMap item : ItemUtilities.getItems()) {

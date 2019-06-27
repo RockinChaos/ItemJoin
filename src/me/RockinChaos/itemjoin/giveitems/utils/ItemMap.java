@@ -1625,7 +1625,7 @@ public class ItemMap {
 		Inventory craftView = player.getOpenInventory().getTopInventory();
 		ItemStack[] contents = inv.getContents();
 		ItemStack[] craftingContents = player.getOpenInventory().getTopInventory().getContents();
-		
+		this.updateItem(player);
 		if (amount == 0) {
 			if (this.isAnimated() && this.getAnimationHandler().get(player) != null
 					|| this.isDynamic() && this.getAnimationHandler().get(player) != null) {
@@ -1670,6 +1670,7 @@ public class ItemMap {
 	}
 	
 	public void giveTo(Player player, boolean noTriggers, int amount) {
+		this.updateItem(player);
 		if (CustomSlot != null) { ItemUtilities.setCustomSlots(player, this, noTriggers, this.tempItem.clone(), amount); } 
 		else { ItemUtilities.setInvSlots(player, this, noTriggers, this.tempItem.clone(), amount); }
 		this.setAnimations(player);
