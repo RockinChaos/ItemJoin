@@ -45,7 +45,7 @@ public class EffectAPI {
 		if (projectileParts[2] != null && !projectileParts[2].isEmpty()) { endColor = DyeColor.valueOf(projectileParts[2].toUpperCase()).getFireworkColor(); }
 		if (projectileParts[3] != null && !projectileParts[3].isEmpty()) { effectType = FireworkEffect.Type.valueOf(projectileParts[3]); }
 		if (projectileParts[4] != null && !projectileParts[4].isEmpty() && Utils.isInt(projectileParts[4])) { detonationDelay = Integer.parseInt(projectileParts[4]); }
-		FireworkEffect effect = FireworkEffect.builder().withColor(startColor).withFade(endColor).with(effectType).trail(false).flicker(true).build();
+		FireworkEffect effect = FireworkEffect.builder().withColor(startColor).withFade(endColor).with(effectType).trail(true).flicker(true).build();
         final Firework fw = (Firework)player.getWorld().spawnEntity(player.getLocation(), EntityType.FIREWORK);
         FireworkMeta meta = fw.getFireworkMeta();
         meta.addEffect(effect);

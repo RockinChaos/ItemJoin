@@ -369,7 +369,7 @@ public class ItemDesigner {
 							textBuilder += ", " + "{\"text\":\"" + result + "\",\"" + type.event + "\":{\"action\":\"" + type.action + "\",\"value\":\"" + hoverBuilder + "\"}}" 
 							+ ", " + "{\"text\":\"" + formatPage + "\"}" + ", " +  "{\"text\":\"\\n\",\"color\":\"reset\"}";
 							safteyCheckURL(type, hoverBuilder, itemMap);
-						} else if (formatPage.contains("raw:")) { textBuilder += formatPage.replace("raw: ", "").replace("raw:", "").replace("[\"\"", ""); } else { textBuilder += ", " + "{\"text\":\"" + formatPage + "\"}" + ", " + "{\"text\":\"\\n\",\"color\":\"reset\"}"; }
+						} else if (formatPage.contains("raw:")) { textBuilder += formatPage.replace("raw: ", "").replace("raw:", "").replace("[\"\"", "").replace("\"bold\":false}]", "\"bold\":false}").replace("\"bold\":true}]", "\"bold\":true}"); textBuilder += ", " + "{\"text\":\"\\n\",\"color\":\"reset\"}"; } else { textBuilder += ", " + "{\"text\":\"" + formatPage + "\"}" + ", " + "{\"text\":\"\\n\",\"color\":\"reset\"}"; }
 				 }
 				 actualPageList.add(textBuilder + "]");
 			}
