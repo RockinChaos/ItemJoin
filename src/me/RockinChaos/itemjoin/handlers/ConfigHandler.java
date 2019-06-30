@@ -12,6 +12,7 @@ import me.RockinChaos.itemjoin.giveitems.utils.ItemDesigner;
 import me.RockinChaos.itemjoin.listeners.Legacy_Pickups;
 import me.RockinChaos.itemjoin.listeners.Pickups;
 import me.RockinChaos.itemjoin.utils.DependAPI;
+import me.RockinChaos.itemjoin.utils.Language;
 import me.RockinChaos.itemjoin.utils.Metrics;
 import me.RockinChaos.itemjoin.utils.Reflection;
 import me.RockinChaos.itemjoin.utils.Utils;
@@ -22,7 +23,7 @@ public class ConfigHandler {
 	
 	private static YamlConfiguration itemsYAML;
 	private static YamlConfiguration configYAML;
-	private static YamlConfiguration enLangYAML;
+	private static YamlConfiguration langYAML;
 	private static boolean yamlGenerating = false;
 	
 	private static SQLData sqlData;
@@ -32,7 +33,7 @@ public class ConfigHandler {
 	private static DependAPI depends;
 	
 	public static void generateData(File file) {
-		configFile(); itemsFile(); enLangFile();
+		configFile(); itemsFile(); langFile();
 		setDepends(new DependAPI());
 		setSQLData(new SQLData());
 		setItemDesigner(new ItemDesigner());
@@ -90,9 +91,9 @@ public class ConfigHandler {
 		} else if (path.contains("config.yml")) {
 			if (saveData) { configYAML = YamlConfiguration.loadConfiguration(file); }
 			return configYAML;
-		} else if (path.contains("en-lang.yml")) {
-			if (saveData) { enLangYAML = YamlConfiguration.loadConfiguration(file); }
-			return enLangYAML;
+		} else if (path.contains("lang.yml")) {
+			if (saveData) { langYAML = YamlConfiguration.loadConfiguration(file); }
+			return langYAML;
 		}
 		return null;
 	}
@@ -144,25 +145,30 @@ public class ConfigHandler {
 		}
 	}
 	
-	public static void enLangFile() {
-		getConfigData("en-lang.yml");
-	      File enLang = new File(ItemJoin.getInstance().getDataFolder(), "en-lang.yml");
-	      if (enLang.exists() && ItemJoin.getInstance().getConfig().getString("Language").equalsIgnoreCase("English") && getConfig("en-lang.yml").getInt("en-Version") != 7) {
-	      if (ItemJoin.getInstance().getResource("en-lang.yml") != null) {
-	        String newGen = "en-lang" + Utils.getRandom(1, 50000) + ".yml";
-	        File newFile = new File(ItemJoin.getInstance().getDataFolder(), newGen);
-	           if (!newFile.exists()) {
-	    	      enLang.renameTo(newFile);
-	              File configFile = new File(ItemJoin.getInstance().getDataFolder(), "en-lang.yml");
-	              configFile.delete();
-	              getConfigData("en-lang.yml");
-				  ServerHandler.sendConsoleMessage("&4Your en-lang.yml is out of date and new options are available, generating a new one!");
-	           }
-	        }
-	      }
-		  if (ItemJoin.getInstance().getConfig().getString("Language").equalsIgnoreCase("English")) {
-			  getConfig("en-lang.yml").options().copyDefaults(false);
-		  }
+	public static void langFile() {
+		if (getConfig("config.yml").getString("Language").replace(" ", "").equalsIgnoreCase("TraditionalChinese") || getConfig("config.yml").getString("Language").equalsIgnoreCase("Chinese")) { affixLang("tw"); } 
+		else if (getConfig("config.yml").getString("Language").replace(" ", "").equalsIgnoreCase("SimplifiedChinese")) { affixLang("cn"); } 
+		else { affixLang("en"); }
+	}
+	
+	public static void affixLang(String affix) {
+		getConfigData(affix + "-lang.yml");
+		Language.setLanguage(affix);
+		File affixLang = new File(ItemJoin.getInstance().getDataFolder(), affix + "-lang.yml");
+		if (affixLang.exists() && getConfig(affix + "-lang.yml").getInt(affix + "-Version") != 7) {
+			if (ItemJoin.getInstance().getResource(affix + "-lang.yml") != null) {
+				String newGen = affix + "-lang" + Utils.getRandom(1, 50000) + ".yml";
+				File newFile = new File(ItemJoin.getInstance().getDataFolder(), newGen);
+				if (!newFile.exists()) {
+					affixLang.renameTo(newFile);
+					File configFile = new File(ItemJoin.getInstance().getDataFolder(), affix + "-lang.yml");
+					configFile.delete();
+					getConfigData(affix + "-lang.yml");
+					ServerHandler.sendConsoleMessage("&4Your " + affix + "-lang.yml is out of date and new options are available, generating a new one!");
+				}
+			}
+		}
+		getConfig(affix + "-lang.yml").options().copyDefaults(false);
 	}
 
 	public static String encodeSecretData(String str) {

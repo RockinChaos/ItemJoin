@@ -19,6 +19,8 @@
 					<include>items.yml</include>
 					<include>config.yml</include>
 					<include>en-lang.yml</include>
+					<include>tw-lang.yml</include>
+					<include>cn-lang.yml</include>
 					<include>default.jpg</include>
 					<include>LICENSE.txt</include>
 				</includes>

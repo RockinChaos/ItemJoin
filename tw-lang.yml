@@ -1,0 +1,108 @@
+# --{ =-=-=-=-=-=-=-=-=-= ItemJoin's Traditional Chinese Language file, by Momocraft =-=-=-=-=-=-=-=-=-= }--
+# If you don't want a message to be sent, fully remove it from below or make it blank.
+tw-Version: 7
+ 
+# This is the prefix that will be sent at the beginning of every single message sent in the language file.
+Prefix: '&7[&eItemJoin&7]'
+ 
+# These are simply general messages sent from the plugin item usages.
+General:
+  failedOverwrite: '&c當前背包位置有物品， 無法獲得 &e%failcount%個 &c物品'
+  failedInventory: '&c背包已滿， 無法獲得 &e%failcount%個 &c物品'
+  itemChargeSuccess: '&a成功使用， 花費了 &e$%cost%元'
+  itemChargeFailed: '&c遊戲幣不足， 你需要 &4$%balance%元'
+  itemWarmingUp: '&e%item% &f正在準備中...'
+  itemWarming: '&e%item% &a將在 &e%timeleft%秒 &a後執行動作！'
+  itemWarmingHalted: '&e%item% &c動作已取消...'
+ 
+# These messages are specific to the plugin commands.
+Commands:
+  Default:
+    unknownCommand: '&c無效的指令， 請輸入 /ItemJoin Help'
+    noPermission: '&c權限不足'
+    configReload: '&a插件已重新讀取！'
+    notPlayer: '&c這是玩家的指令'
+    targetNotFound: '&c找不到玩家 %targetplayer%'
+    creatorLaunched: '&a已打開物品編輯器'
+  Item:
+    notInHand: '&c手上沒有物品'
+    invalidItem: '&c物品 &e%item% &c不存在'
+  Info:
+    material: '&a物品ID (材質): &e%item%'
+    dataValue: '&a物品副ID (編號): &e%item%'
+  Save:
+    playerSavedItem: '&a成功建立物品 &e%item% /n &a請重新讀取插件'
+    playerFailedSavedItem: '&c手上沒有物品， 建立物品 &e%item% &c失敗'
+    invalidSyntax: '&c請輸入: /itemjoin save <物品名稱>!'
+  List:
+    worldHeader: '&a&l%world%:'
+    itemRow: '&a&l   &a%item%'
+    noItemsDefined: '&c&l   &c沒有為這個世界定義任何項目'
+  World:
+    worldHeader: '&a你現在位於世界：'
+    worldRow: '&e- %world%'
+    worldsFoundHeader: '&a找到世界:'
+  Updates:
+    checking: '&4%player% 已請求檢查更新！'
+    forcing: '&4%player% 請求強制更新插件！'
+  Get:
+    toYou: '&6&l得到了&c✤ &f%item% &7x%amount%'
+    toTarget: '&6&l得到了&c✤ &e你給予 %targetplayer% &f%item% &7x%amount%'
+    youHaveItem: '&c你已經有那個物品 &e%item%'
+    triedGive: '&e%targetplayer% &c給予你物品 &e%item% &c失敗， &c該物品已存在背包中'
+    targetHasItem: '&e%targetplayer% &c已擁有 &e%item%'
+    noPermission: '&c你沒有權限得到 &e%item%'
+    targetNoPermission: '&e%targetplayer% &c沒有權限得到 &e%item%'
+    invalidSyntax: '&c請輸入: /itemjoin get <物品> &l或者 &c/itemjoin get <物品> <數量>！'
+    usageSyntax: '&c請在控制台輸入: /ItemJoin get <物品> <玩家>'
+    toOnlinePlayers: '&a你給予所有在線玩家 &f%item% &7x%amount% &8- &e%players%'
+    onlinePlayersHaveItem: '&c所有玩家已擁有 &e%item%'
+    invalidOnlineSyntax: '&c請輸入: /itemjoin getOnline <物品> &l或者 &c/itemjoin getOnline <物品> <數量>！'
+  GetAll:
+    toYou: '&a你得到了所有物品'
+    toTarget: '&a你給予 &e%targetplayer% &a所有特殊物品'
+    noPermission: '&c有物品沒有權限， 部分物品給予失敗'
+    targetNoPermission: '&e%targetplayer% &c有物品沒有權限， &c部分物品給予失敗'
+    triedGive: '&e%targetplayer% &c給予你所有特殊物品失敗， &c所有物品已存在背包中'
+    youHaveItems: '&6你已擁有所有特殊物品！'
+    targetHasItems: '&e%targetplayer% &6已擁有所有特殊物品！'
+  Remove:
+    fromYou: '&e%item% &c已從背包中移除'
+    fromTarget: '&c你移除了 &e%targetplayer% &c背包中的 &e%item%'
+    triedRemove: '&e%targetplayer% &c想要刪除物品 &e%item% &c但它不存在你背包中'
+    invalidSyntax: '&c請輸入: /itemjoin remove <物品>'
+    usageSyntax: '&c請在控制台輸入: /ItemJoin remove <物品> <玩家>'
+    notInInventory: '&c背包中不存在物品 &e%item%'
+    notInTargetInventory: '&e%targetplayer% &c的背包中沒有 &e%item%'
+    fromOnlinePlayers: '&c你移除了所有玩家的 &e%item% &8- &e%players%'
+    notInOnlinePlayersInventory: '&e%item% &c不存在任何上線玩家的背包中'
+    invalidOnlineSyntax: '&c請輸入: /itemjoin removeOnline <物品>'
+  RemoveAll:
+    fromYou: '&a已移除背包中所有特殊物品'
+    fromTarget: '&a你移除了 &e%targetplayer% &a背包中的所有特殊物品'
+    triedRemove: '&e%targetplayer% &c想要移除你身上所有特殊物品， &c但這是假的， &c業障重'
+    noItemsInInventory: '&c身上沒有任何特殊物品'
+    noItemsInTargetInventory: '&e%targetplayer% &c身上沒有任何特殊物品'
+  Database:
+    purgeWarn: '&c將移除 &e%targetplayer% &c所有的檔案 &8- &e%purgedata%'
+    purgeSuccess: '&e你已移除 &a%targetplayer% &e所有的檔案 &8- &a%purgedata%'
+    purgeConfirm: '&a確認刪除資料， &a請在五秒內輸入: &e%command%'
+    purgeTimeOut: '&c指令已失效...'
+  Enabled:
+    forPlayer: '&a你已為 &e%targetplayer% &a啟用所有特殊物品'
+    forTarget: '&e%player% &a已幫你啟用所有特殊物品'
+    forPlayerFailed: '&6所有物品已為 &e%player% &6啟用過'
+    forPlayerWorld: '&a你已為 &e%targetplayer% &a啟用 &e%world% &a的所有特殊物品'
+    forTargetWorld: '&e%player% &a已幫你啟用世界 &e%world% &a的所有特殊物品'
+    forPlayerWorldFailed: '&6你已為 &e%targetplayer% &6啟用過 &e%world% &6的所有特殊物品'
+    globalPlayers: '&a你已為所有玩家啟用特殊物品'
+    globalPlayersFailed: '&6所有玩家已啟用過所有特殊物品'
+  Disabled:
+    forPlayer: '&c你已取消 &e%player% &c的所有特殊物品'
+    forTarget: '&e%player% &c取消了你的所有特殊物品'
+    forPlayerFailed: '&6你已取消過 &e%player% &6的所有特殊物品'
+    forPlayerWorld: '&c你已取消 &e%player% &c在 &e%world% &c的所有特殊物品'
+    forTargetWorld: '&e%player% &c已取消你在世界 &e%world% &c的所有特殊物品'
+    forPlayerWorldFailed: '&6你已為 &e%targetplayer% &6取消過 &e%world% &6的所有特殊物品'
+    globalPlayers: '&c你已為所有玩家取消特殊物品'
+    globalPlayersFailed: '&6所有玩家已取消過所有特殊物品'

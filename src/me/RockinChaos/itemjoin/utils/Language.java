@@ -96,8 +96,18 @@ public class Language {
 		return langType.name().substring(0, 1).toUpperCase() + langType.name().substring(1).toLowerCase();
 	}
 	
+	public static void setLanguage(String lang) {
+		if (lang.equalsIgnoreCase("tw")) {
+			langType = Lang.TWCHINESE;
+		} else if (lang.equalsIgnoreCase("cn")) {
+			langType = Lang.CNCHINESE;
+		} else if (lang.equalsIgnoreCase("en")) {
+			langType = Lang.ENGLISH;
+		}
+	}
+	
 	private enum Lang {
-		DEFAULT("en-lang.yml", 0), ENGLISH("en-lang.yml", 1);
+		DEFAULT("en-lang.yml", 0), ENGLISH("en-lang.yml", 1), TWCHINESE("tw-lang.yml", 1), CNCHINESE("cn-lang.yml", 1);
 		private Lang(final String nodeLocation, final int i) { this.nodeLocation = nodeLocation; }
 		private final String nodeLocation;
 		private String nodeLocation() { return nodeLocation; }

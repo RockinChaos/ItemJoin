@@ -2,7 +2,6 @@
 # See the tutorial page for a more in-depth explaination; https://www.spigotmc.org/wiki/itemjoin/
 config-Version: 7
 
-# English is currently the only support language at the moment!
 Language: 'English'
 
 # These are typically general maintenance settings that do not affect functionality.
