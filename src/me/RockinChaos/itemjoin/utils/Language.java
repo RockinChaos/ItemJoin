@@ -103,11 +103,13 @@ public class Language {
 			langType = Lang.CNCHINESE;
 		} else if (lang.equalsIgnoreCase("en")) {
 			langType = Lang.ENGLISH;
+		} else if (lang.equalsIgnoreCase("es")) {
+			langType = Lang.SPANISH;
 		}
 	}
 	
 	private enum Lang {
-		DEFAULT("en-lang.yml", 0), ENGLISH("en-lang.yml", 1), TWCHINESE("tw-lang.yml", 1), CNCHINESE("cn-lang.yml", 1);
+		DEFAULT("en-lang.yml", 0), ENGLISH("en-lang.yml", 1), SPANISH("es-lang.yml", 2), TWCHINESE("tw-lang.yml", 3), CNCHINESE("cn-lang.yml", 4);
 		private Lang(final String nodeLocation, final int i) { this.nodeLocation = nodeLocation; }
 		private final String nodeLocation;
 		private String nodeLocation() { return nodeLocation; }

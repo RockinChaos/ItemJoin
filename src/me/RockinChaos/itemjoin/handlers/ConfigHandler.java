@@ -148,6 +148,7 @@ public class ConfigHandler {
 	public static void langFile() {
 		if (getConfig("config.yml").getString("Language").replace(" ", "").equalsIgnoreCase("TraditionalChinese") || getConfig("config.yml").getString("Language").equalsIgnoreCase("Chinese")) { affixLang("tw"); } 
 		else if (getConfig("config.yml").getString("Language").replace(" ", "").equalsIgnoreCase("SimplifiedChinese")) { affixLang("cn"); } 
+		else if (getConfig("config.yml").getString("Language").replace(" ", "").equalsIgnoreCase("Spanish")) { affixLang("es"); } 
 		else { affixLang("en"); }
 	}
 	
