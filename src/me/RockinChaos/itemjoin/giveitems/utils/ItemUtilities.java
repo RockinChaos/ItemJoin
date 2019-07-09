@@ -486,30 +486,27 @@ public class ItemUtilities {
 		try {
 			if (itemMap.isOverwritable() || isOverwrite(player)) { return true; }
 			if (Utils.isInt(itemMap.getSlot()) && player.getInventory().getItem(Integer.parseInt(itemMap.getSlot())) != null) {
-				if (!isOverwrite(player) || !itemMap.isOverwritable()) {
-					return false;
-				}
+				if (itemMap.isGiveNext() && player.getInventory().firstEmpty() == -1) { return false; }
+				else if (!itemMap.isGiveNext()) { return false; }
 			} else if (ItemHandler.isCustomSlot(itemMap.getSlot())) {
-				if (!isOverwrite(player) || !itemMap.isOverwritable()) {
-					if (itemMap.getSlot().equalsIgnoreCase("Arbitrary") && player.getInventory().firstEmpty() == -1) {
-						return true;
-					} else if (itemMap.getSlot().equalsIgnoreCase("Helmet") && player.getInventory().getHelmet() != null) {
+				if (itemMap.getSlot().equalsIgnoreCase("Arbitrary") && player.getInventory().firstEmpty() == -1) {
+					return false;
+				} else if (itemMap.getSlot().equalsIgnoreCase("Helmet") && player.getInventory().getHelmet() != null) {
+					return false;
+				} else if (itemMap.getSlot().equalsIgnoreCase("Chestplate") && player.getInventory().getChestplate() != null) {
+					return false;
+				} else if (itemMap.getSlot().equalsIgnoreCase("Leggings") && player.getInventory().getLeggings() != null) {
+					return false;
+				} else if (itemMap.getSlot().equalsIgnoreCase("Boots") && player.getInventory().getBoots() != null) {
+					return false;
+				} else if (ServerHandler.hasCombatUpdate() && itemMap.getSlot().equalsIgnoreCase("Offhand")) {
+					if (player.getInventory().getItemInOffHand().getType() != Material.AIR) {
 						return false;
-					} else if (itemMap.getSlot().equalsIgnoreCase("Chestplate") && player.getInventory().getChestplate() != null) {
-						return false;
-					} else if (itemMap.getSlot().equalsIgnoreCase("Leggings") && player.getInventory().getLeggings() != null) {
-						return false;
-					} else if (itemMap.getSlot().equalsIgnoreCase("Boots") && player.getInventory().getBoots() != null) {
-						return false;
-					} else if (ServerHandler.hasCombatUpdate() && itemMap.getSlot().equalsIgnoreCase("Offhand")) {
-						if (player.getInventory().getItemInOffHand().getType() != Material.AIR) {
-							return false;
-						}
-					} else if (getSlotConversion(itemMap.getSlot()) != 5 
-							&& player.getOpenInventory().getTopInventory().getItem(getSlotConversion(itemMap.getSlot())) != null 
-							&& player.getOpenInventory().getTopInventory().getItem(getSlotConversion(itemMap.getSlot())).getType() != Material.AIR) {
-							return false;
 					}
+				} else if (getSlotConversion(itemMap.getSlot()) != 5 
+						&& player.getOpenInventory().getTopInventory().getItem(getSlotConversion(itemMap.getSlot())) != null 
+						&& player.getOpenInventory().getTopInventory().getItem(getSlotConversion(itemMap.getSlot())).getType() != Material.AIR) {
+						return false;
 				}
 			}
 		} catch (Exception e) { ServerHandler.sendDebugTrace(e); }
@@ -519,14 +516,25 @@ public class ItemUtilities {
 	public static void setInvSlots(Player player, ItemMap itemMap, boolean noTriggers, ItemStack item, int amount) {
 		if (amount != 0 || itemMap.isAlwaysGive()) {
 			if (noTriggers) { item.setAmount(amount); }
-			if (itemMap.hasItem(player)) {
-				player.getInventory().addItem(item);
-			} else {
-				player.getInventory().setItem(Integer.parseInt(itemMap.getSlot()), item);
-			}
-		} else { player.getInventory().setItem(Integer.parseInt(itemMap.getSlot()), item); }
+			if (itemMap.hasItem(player)) { setDirectSlots(player, itemMap, item, true);
+			} else { setDirectSlots(player, itemMap, item, false); }
+		} else { setDirectSlots(player, itemMap, item, false); }
 		saveSQLItemData(player, itemMap);
 		ServerHandler.sendDebugMessage("Given the Item; " + itemMap.getConfigName());
+	}
+	
+	private static void setDirectSlots(Player player, ItemMap itemMap, ItemStack item, boolean addItem) {
+		if (itemMap.isGiveNext() && player.getInventory().getItem(Integer.parseInt(itemMap.getSlot())) != null) {
+			for (int i = Integer.parseInt(itemMap.getSlot()); i <= 35; i++) {
+				if (player.getInventory().getItem(i) == null) { player.getInventory().setItem(i, item); break; }
+				else if (i == 35) {
+					for (int k = Integer.parseInt(itemMap.getSlot()); k >= 0; k--) {
+						if (player.getInventory().getItem(k) == null) { player.getInventory().setItem(k, item); break; }
+					}
+				}
+			}
+		} else if (addItem) { player.getInventory().addItem(item); } 
+		else { player.getInventory().setItem(Integer.parseInt(itemMap.getSlot()), item); }
 	}
 	
 	public static void setCustomSlots(Player player, ItemMap itemMap, boolean noTriggers, ItemStack item, int amount) {

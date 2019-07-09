@@ -72,6 +72,8 @@ public class ItemMap {
 	private Integer InvSlot = 0;
 	private String CustomSlot = null;
 	
+	private boolean giveNext = false;
+	
 	private String Arbitrary = null;
 	private String itemValue = null;
 	
@@ -320,6 +322,7 @@ public class ItemMap {
 			this.alwaysGive = Utils.containsIgnoreCase(this.itemflags, "always-give");
 			this.dynamic = Utils.containsIgnoreCase(this.itemflags, "dynamic");
 			this.animate = Utils.containsIgnoreCase(this.itemflags, "animate");
+			this.giveNext = Utils.containsIgnoreCase(this.itemflags, "give-next");
 			this.itemStore = Utils.containsIgnoreCase(this.itemflags, "item-store");
 			this.itemModify = Utils.containsIgnoreCase(this.itemflags, "item-modifiable");
 			this.noCrafting = Utils.containsIgnoreCase(this.itemflags, "item-craftable");
@@ -1008,6 +1011,10 @@ public class ItemMap {
 	
 	public boolean isHeadDatabase() {
 		return this.headDatabase;
+	}
+	
+	public boolean isGiveNext() {
+		return this.giveNext;
 	}
 	
 	public boolean isGiveOnJoin() {
