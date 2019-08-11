@@ -13,15 +13,15 @@
 			<resource>
 				<targetPath>.</targetPath>
 				<filtering>true</filtering>
-				<directory>${project.basedir}</directory>
+				<directory>.</directory>
 				<includes>
 					<include>*.yml</include>
 				</includes>
 			</resource>
 			<resource>
-				<targetPath>.</targetPath>
+				<targetPath>./files</targetPath>
 				<filtering>true</filtering>
-				<directory>${project.basedir}/files</directory>
+				<directory>./files</directory>
 				<includes>
 					<include>*.yml</include>
 					<include>*.txt</include>
