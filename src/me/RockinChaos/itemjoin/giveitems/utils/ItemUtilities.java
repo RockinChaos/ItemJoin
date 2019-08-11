@@ -23,6 +23,7 @@ import me.RockinChaos.itemjoin.giveitems.listeners.PlayerQuit;
 import me.RockinChaos.itemjoin.giveitems.listeners.RegionEnter;
 import me.RockinChaos.itemjoin.giveitems.listeners.Respawn;
 import me.RockinChaos.itemjoin.giveitems.listeners.WorldSwitch;
+import me.RockinChaos.itemjoin.guicreator.ItemCreator;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
@@ -55,7 +56,7 @@ public class ItemUtilities {
 
 	public static boolean isAllowed(Player player, ItemStack item, String itemflag) {
 		ItemMap fetched = getMappedItem(item, player.getWorld());
-		if (fetched != null && fetched.isAllowedItem(player, item, itemflag)) {
+		if (fetched != null && !ItemCreator.isOpen(player) && fetched.isAllowedItem(player, item, itemflag)) {
 			return false;
 		}
 		return true;
@@ -486,10 +487,12 @@ public class ItemUtilities {
 		try {
 			if (itemMap.isOverwritable() || isOverwrite(player)) { return true; }
 			if (Utils.isInt(itemMap.getSlot()) && player.getInventory().getItem(Integer.parseInt(itemMap.getSlot())) != null) {
-				if (itemMap.isGiveNext() && player.getInventory().firstEmpty() == -1) { return false; }
-				else if (!itemMap.isGiveNext()) { return false; }
+				if (itemMap.isDropFull() && player.getInventory().firstEmpty() == -1)  { return true; }
+				else if (itemMap.isGiveNext() && player.getInventory().firstEmpty() == -1) { return false; }
+				else if ((!itemMap.isGiveNext() || !itemMap.isDropFull())) { return false; }
 			} else if (ItemHandler.isCustomSlot(itemMap.getSlot())) {
-				if (itemMap.getSlot().equalsIgnoreCase("Arbitrary") && player.getInventory().firstEmpty() == -1) {
+				if (itemMap.isDropFull() && player.getInventory().firstEmpty() == -1)  { return true; }
+				else if (itemMap.getSlot().equalsIgnoreCase("Arbitrary") && player.getInventory().firstEmpty() == -1) {
 					return false;
 				} else if (itemMap.getSlot().equalsIgnoreCase("Helmet") && player.getInventory().getHelmet() != null) {
 					return false;
@@ -524,7 +527,8 @@ public class ItemUtilities {
 	}
 	
 	private static void setDirectSlots(Player player, ItemMap itemMap, ItemStack item, boolean addItem) {
-		if (itemMap.isGiveNext() && player.getInventory().getItem(Integer.parseInt(itemMap.getSlot())) != null) {
+		if (addItem) { player.getInventory().addItem(item); } 
+		else if (itemMap.isGiveNext() && player.getInventory().getItem(Integer.parseInt(itemMap.getSlot())) != null) {
 			for (int i = Integer.parseInt(itemMap.getSlot()); i <= 35; i++) {
 				if (player.getInventory().getItem(i) == null) { player.getInventory().setItem(i, item); break; }
 				else if (i == 35) {
@@ -533,7 +537,8 @@ public class ItemUtilities {
 					}
 				}
 			}
-		} else if (addItem) { player.getInventory().addItem(item); } 
+		} 
+		else if (itemMap.isDropFull() && player.getInventory().firstEmpty() == -1) { player.getWorld().dropItem(player.getLocation(), item); } 
 		else { player.getInventory().setItem(Integer.parseInt(itemMap.getSlot()), item); }
 	}
 	
@@ -541,47 +546,48 @@ public class ItemUtilities {
 		EntityEquipment Equip = player.getEquipment();
 			if (itemMap.getSlot().equalsIgnoreCase("Arbitrary")) {
 				if (amount != 0 && noTriggers) { item.setAmount(amount); }
-				player.getInventory().addItem(item);
+				if (player.getInventory().firstEmpty() != -1) { player.getInventory().addItem(item); }
+				else if (itemMap.isDropFull()) { player.getWorld().dropItem(player.getLocation(), item); }
 				ServerHandler.sendDebugMessage("Given the Item; [" + itemMap.getConfigName() + "]");
 				saveSQLItemData(player, itemMap);
 			} else if (itemMap.getSlot().equalsIgnoreCase("Helmet")) {
 				if (amount != 0 || itemMap.isAlwaysGive()) {
 					if (noTriggers) { item.setAmount(amount); }
-					if (itemMap.hasItem(player)) { player.getInventory().addItem(item);
-					} else { Equip.setHelmet(item); }
-				} else { Equip.setHelmet(item); }
+					if (itemMap.hasItem(player)) { player.getInventory().addItem(item); } else if (itemMap.isDropFull()) { player.getWorld().dropItem(player.getLocation(), item); }
+					else { if (Equip.getHelmet() == null) { Equip.setHelmet(item); } else if (itemMap.isDropFull()) { player.getWorld().dropItem(player.getLocation(), item); } }
+				    } else { if (Equip.getHelmet() == null) { Equip.setHelmet(item); } else if (itemMap.isDropFull()) { player.getWorld().dropItem(player.getLocation(), item); } }
 				ServerHandler.sendDebugMessage("Given the Item; [" + itemMap.getConfigName() + "]");
 				saveSQLItemData(player, itemMap);
 			} else if (itemMap.getSlot().equalsIgnoreCase("Chestplate")) {
 				if (amount != 0 || itemMap.isAlwaysGive()) {
 					if (noTriggers) { item.setAmount(amount); }
-					if (itemMap.hasItem(player)) { player.getInventory().addItem(item);
-					} else { Equip.setChestplate(item); }
-				} else { Equip.setChestplate(item); }
+					if (itemMap.hasItem(player)) { player.getInventory().addItem(item); } else if (itemMap.isDropFull()) { player.getWorld().dropItem(player.getLocation(), item); }
+					else { if (Equip.getChestplate() == null) { Equip.setChestplate(item); } else if (itemMap.isDropFull()) { player.getWorld().dropItem(player.getLocation(), item); } }
+				    } else { if (Equip.getChestplate() == null) { Equip.setChestplate(item); } else if (itemMap.isDropFull()) { player.getWorld().dropItem(player.getLocation(), item); } }
 				ServerHandler.sendDebugMessage("Given the Item; [" + itemMap.getConfigName() + "]");
 				saveSQLItemData(player, itemMap);
 			} else if (itemMap.getSlot().equalsIgnoreCase("Leggings")) {
 				if (amount != 0 || itemMap.isAlwaysGive()) {
 					if (noTriggers) { item.setAmount(amount); }
-					if (itemMap.hasItem(player)) { player.getInventory().addItem(item);
-					} else { Equip.setLeggings(item); }
-				} else { Equip.setLeggings(item); }
+					if (itemMap.hasItem(player)) { player.getInventory().addItem(item); } else if (itemMap.isDropFull()) { player.getWorld().dropItem(player.getLocation(), item); }
+					else { if (Equip.getLeggings() == null) { Equip.setLeggings(item); } else if (itemMap.isDropFull()) { player.getWorld().dropItem(player.getLocation(), item); } }
+				    } else { if (Equip.getLeggings() == null) { Equip.setLeggings(item); } else if (itemMap.isDropFull()) { player.getWorld().dropItem(player.getLocation(), item); } }
 				ServerHandler.sendDebugMessage("Given the Item; [" + itemMap.getConfigName() + "]");
 				saveSQLItemData(player, itemMap);
 			} else if (itemMap.getSlot().equalsIgnoreCase("Boots")) {
 				if (amount != 0 || itemMap.isAlwaysGive()) {
 					if (noTriggers) { item.setAmount(amount); }
-					if (itemMap.hasItem(player)) { player.getInventory().addItem(item);
-					} else { Equip.setBoots(item); }
-				} else { Equip.setBoots(item); }
+					if (itemMap.hasItem(player)) { player.getInventory().addItem(item); } else if (itemMap.isDropFull()) { player.getWorld().dropItem(player.getLocation(), item); }
+					else { if (Equip.getBoots() == null) { Equip.setBoots(item); } else if (itemMap.isDropFull()) { player.getWorld().dropItem(player.getLocation(), item); } }
+				    } else { if (Equip.getBoots() == null) { Equip.setBoots(item); } else if (itemMap.isDropFull()) { player.getWorld().dropItem(player.getLocation(), item); } }
 				ServerHandler.sendDebugMessage("Given the Item; [" + itemMap.getConfigName() + "]");
 				saveSQLItemData(player, itemMap);
 			} else if (ServerHandler.hasCombatUpdate() && itemMap.getSlot().equalsIgnoreCase("Offhand")) {
 				if (amount != 0 || itemMap.isAlwaysGive()) {
 					if (noTriggers) { item.setAmount(amount); }
-					if (itemMap.hasItem(player)) { player.getInventory().addItem(item);
-					} else { PlayerHandler.setOffhandItem(player, item); }
-				} else { PlayerHandler.setOffhandItem(player, item); }
+				if (itemMap.hasItem(player)) { player.getInventory().addItem(item); } else if (itemMap.isDropFull()) { player.getWorld().dropItem(player.getLocation(), item); }
+				else { if (PlayerHandler.getOffHandItem(player) == null) { PlayerHandler.setOffhandItem(player, item); } else if (itemMap.isDropFull()) { player.getWorld().dropItem(player.getLocation(), item); } }
+			    } else { if (PlayerHandler.getOffHandItem(player) == null) { PlayerHandler.setOffhandItem(player, item); } else if (itemMap.isDropFull()) { player.getWorld().dropItem(player.getLocation(), item); } }
 				ServerHandler.sendDebugMessage("Given the Item; [" + itemMap.getConfigName() + "]");
 				saveSQLItemData(player, itemMap);
 			} else if (getSlotConversion(itemMap.getSlot()) != 5) {

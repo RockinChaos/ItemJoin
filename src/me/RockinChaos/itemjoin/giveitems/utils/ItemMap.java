@@ -43,6 +43,7 @@ import com.vk2gpz.tokenenchant.api.TokenEnchantAPI;
 
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.giveitems.listeners.RegionEnter;
+import me.RockinChaos.itemjoin.guicreator.ItemCreator;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PermissionsHandler;
@@ -73,6 +74,7 @@ public class ItemMap {
 	private String CustomSlot = null;
 	
 	private boolean giveNext = false;
+	private boolean dropFull = false;
 	
 	private String Arbitrary = null;
 	private String itemValue = null;
@@ -215,27 +217,29 @@ public class ItemMap {
 	public ItemMap(String internalName, String slot) {
         this.nodeLocation = ConfigHandler.getItemSection(internalName);
         this.configName = internalName;
-        
         this.setSlot(slot);
-        this.setCount(this.nodeLocation.getString(".count"));
-		this.setCommandCost();
-		this.setCommandWarmDelay();
-		this.setCommandSound();
-		this.setCommandParticle();
-		this.setCommandCooldown();
-		this.setCommandType();
-		this.setCommandSequence();
-		this.setCommands(ItemCommand.arrayFromString(this));
-        this.setInteractCooldown();
-        this.setItemflags();
-        this.setLimitModes();
-        this.setTriggers();
-		this.setWorlds();
-		this.setRegions();
-        this.setPerm(this.nodeLocation.getString(".permission-node"));
-        this.setPermissionNeeded(ConfigHandler.getConfig("config.yml").getBoolean("Permissions.Obtain-Items"));
-    	this.setOPPermissionNeeded(ConfigHandler.getConfig("config.yml").getBoolean("Permissions.Obtain-Items.OP"));
-    	ItemUtilities.setListenerRestrictions(this);
+        
+        if (this.nodeLocation != null) {
+	        this.setCount(this.nodeLocation.getString(".count"));
+			this.setCommandCost();
+			this.setCommandWarmDelay();
+			this.setCommandSound();
+			this.setCommandParticle();
+			this.setCommandCooldown();
+			this.setCommandType();
+			this.setCommandSequence();
+			this.setCommands(ItemCommand.arrayFromString(this));
+	        this.setInteractCooldown();
+	        this.setItemflags();
+	        this.setLimitModes();
+	        this.setTriggers();
+			this.setWorlds();
+			this.setRegions();
+	        this.setPerm(this.nodeLocation.getString(".permission-node"));
+	        this.setPermissionNeeded(ConfigHandler.getConfig("config.yml").getBoolean("Permissions.Obtain-Items"));
+	    	this.setOPPermissionNeeded(ConfigHandler.getConfig("config.yml").getBoolean("Permissions.Obtain-Items.OP"));
+	    	ItemUtilities.setListenerRestrictions(this);
+        }
 	}
 //  ========================================================================================================= //
 	
@@ -323,6 +327,7 @@ public class ItemMap {
 			this.dynamic = Utils.containsIgnoreCase(this.itemflags, "dynamic");
 			this.animate = Utils.containsIgnoreCase(this.itemflags, "animate");
 			this.giveNext = Utils.containsIgnoreCase(this.itemflags, "give-next");
+			this.dropFull = Utils.containsIgnoreCase(this.itemflags, "drop-full");
 			this.itemStore = Utils.containsIgnoreCase(this.itemflags, "item-store");
 			this.itemModify = Utils.containsIgnoreCase(this.itemflags, "item-modifiable");
 			this.noCrafting = Utils.containsIgnoreCase(this.itemflags, "item-craftable");
@@ -467,9 +472,11 @@ public class ItemMap {
 	public void setSlot(String slot) {
 		if (ItemHandler.isCustomSlot(slot)) {
 			this.CustomSlot = slot;
+			this.InvSlot = null;
 			this.itemValue = ItemHandler.getItemID(slot); // <--- NEEDS MAJOR WORK.
 		} else if (Utils.isInt(slot)) {
 			this.InvSlot = Integer.parseInt(slot);
+			this.CustomSlot = null;
 			this.itemValue = ItemHandler.getItemID(slot); // <--- NEEDS MAJOR WORK.
 		}
 	}
@@ -810,12 +817,8 @@ public class ItemMap {
 	}
 	
 	public String getSlot() {
-		if (this.CustomSlot != null) {
-			return this.CustomSlot;
-		} else if (this.InvSlot != null) {
-			return this.InvSlot.toString();
-		}
-		
+		if (this.CustomSlot != null) { return this.CustomSlot; } 
+		else if (this.InvSlot != null) { return this.InvSlot.toString(); }
 		return null;
 	}
 	
@@ -837,6 +840,10 @@ public class ItemMap {
 	
 	public String getItemFlags() {
 		return this.itemflags;
+	}
+	
+	public String getTriggers() {
+		return this.triggers;
 	}
 	
 	public String getPermissionNode() {
@@ -1015,6 +1022,10 @@ public class ItemMap {
 	
 	public boolean isGiveNext() {
 		return this.giveNext;
+	}
+	
+	public boolean isDropFull() {
+		return this.dropFull;
 	}
 	
 	public boolean isGiveOnJoin() {
@@ -1694,7 +1705,7 @@ public class ItemMap {
 
     public boolean executeCommands(final Player player, final ItemStack itemCopy, final String action) {
 		boolean playerSuccess = false;
-    	if (this.commands != null && this.commands.length > 0 && !this.getWarmPending(player) && isExecutable(player, action) && !this.onCooldown(player) && this.isPlayerChargeable(player)) {
+    	if (this.commands != null && this.commands.length > 0 && !ItemCreator.isOpen(player) && !this.getWarmPending(player) && isExecutable(player, action) && !this.onCooldown(player) && this.isPlayerChargeable(player)) {
     		this.warmCycle(player, this, this.getWarmDelay(), player.getLocation(), itemCopy, action);
     	}
     	return playerSuccess;
@@ -1895,6 +1906,10 @@ public class ItemMap {
 	
 	private void addPlayerOnCooldown(Player player) {
 		this.playersOnCooldown.put(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player), System.currentTimeMillis());
+	}
+	
+	public void saveToConfig() {
+		
 	}
 	
 	public enum CommandType { BOTH, INTERACT, INVENTORY; }
