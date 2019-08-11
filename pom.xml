@@ -15,7 +15,17 @@
 				<filtering>true</filtering>
 				<directory>${project.basedir}</directory>
 				<includes>
-					<include>**/*.yml</include>
+					<include>*.yml</include>
+				</includes>
+			</resource>
+			<resource>
+				<targetPath>.</targetPath>
+				<filtering>true</filtering>
+				<directory>${project.basedir}/files</directory>
+				<includes>
+					<include>*.yml</include>
+					<include>*.txt</include>
+					<include>*.jpg</include>
 				</includes>
 			</resource>
 		</resources>
