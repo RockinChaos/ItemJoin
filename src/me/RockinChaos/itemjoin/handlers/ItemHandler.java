@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
+
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -83,6 +85,21 @@ public class ItemHandler {
 		return null;
 	}
 	
+    public static ItemStack getItem(String mat, int count, String name, String... lore) {
+        ItemStack tempItem; if (!ServerHandler.hasSpecificUpdate("1_8") && mat.equals("BARRIER")) { mat = "WOOL:14"; }
+        if (ServerHandler.hasAquaticUpdate()) { tempItem = new ItemStack(getMaterial(mat, null), count); } 
+        else { short dataValue = 0; if (mat.contains(":")) { String[] parts = mat.split(":"); mat = parts[0]; dataValue = (short) Integer.parseInt(parts[1]); } tempItem = Legacy.newLegacyItemStack(getMaterial(mat, null), count, dataValue); }
+        ItemMeta tempMeta = tempItem.getItemMeta();
+        if (name != null && mat != "AIR") { name = Utils.colorFormat(name); tempMeta.setDisplayName(name); }
+        if (lore != null && lore.length != 0 && mat != "AIR") {
+        	ArrayList<String> loreList = new ArrayList<String>();
+        	for (String loreString: lore) { loreList.add(Utils.colorFormat(loreString)); }
+        	tempMeta.setLore(loreList);
+        }
+        tempItem.setItemMeta(tempMeta);
+        return tempItem;
+    }
+	
 	public static Material getMaterial(String material, String dataVal) {
 		try {
 			boolean isLegacy = (dataVal != null);
@@ -143,6 +160,19 @@ public class ItemHandler {
 		} 
 		return context;
 	}
+	
+    public static ItemStack setSkullTexture(ItemStack item, String skullTexture) {
+    	try {
+	        ItemMeta itemMeta = item.getItemMeta();
+			GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
+			gameProfile.getProperties().put("textures", new Property("textures", new String(skullTexture)));
+			Field declaredField = itemMeta.getClass().getDeclaredField("profile");
+			declaredField.setAccessible(true);
+			declaredField.set(itemMeta, gameProfile);
+			item.setItemMeta(itemMeta);
+    	} catch (Exception e) { }
+    	return item;
+    }
 	
 	public static String getName(ItemStack stack) {
 		try {
