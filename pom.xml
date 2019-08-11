@@ -16,10 +16,7 @@
 				<directory>.</directory>
 				<includes>
 					<include>*.yml</include>
-					<include>/files/locales/*.yml</include>
-					<include>/files/configs/*.yml</include>
-					<include>/files/generated/*.txt</include>
-					<include>/files/generated/*.jpg</include>
+					<include>**/*.files</include>
 				</includes>
 			</resource>
 		</resources>
