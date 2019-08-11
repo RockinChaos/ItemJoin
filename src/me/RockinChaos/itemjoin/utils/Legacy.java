@@ -18,6 +18,7 @@ import com.sk89q.worldguard.protection.ApplicableRegionSet;
 
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
+import me.RockinChaos.itemjoin.handlers.ServerHandler;
 
 @SuppressWarnings("deprecation")
 public class Legacy {
@@ -55,11 +56,7 @@ public class Legacy {
 
     public static MapView createLegacyMapView() {
     	try {
-    		for (World world : Bukkit.getServer().getWorlds()) {
-    			if (world != null) {
-    				return ItemJoin.getInstance().getServer().createMap(world);
-    			}
-    		}
+    		return ItemJoin.getInstance().getServer().createMap(ItemJoin.getInstance().getServer().getWorlds().get(0));
     	} catch (Exception e) { }
     	return null;
     }
@@ -74,11 +71,11 @@ public class Legacy {
     
     public static org.bukkit.Material getLegacyMaterial(Material typeID, byte dataValue) {
   		return ItemJoin.getInstance().getServer().getUnsafe().fromLegacy(new MaterialData(typeID, dataValue));
-      }
+    }
     
     public static org.bukkit.Material findLegacyMaterial(int typeID) {
         final Material[] foundMaterial = new Material[1];
-        EnumSet.allOf(Material.class).forEach(material -> { try { if (Utils.containsIgnoreCase(material.toString(), "LEGACY_") && material.getId() == typeID) { foundMaterial[0] = material; } } catch (Exception e) { }});
+        EnumSet.allOf(Material.class).forEach(material -> { try { if (Utils.containsIgnoreCase(material.toString(), "LEGACY_") && material.getId() == typeID || !ServerHandler.hasAquaticUpdate() && material.getId() == typeID) { foundMaterial[0] = material; } } catch (Exception e) { }});
         return foundMaterial[0];
     }
 
