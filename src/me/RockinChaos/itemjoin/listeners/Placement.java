@@ -2,7 +2,6 @@ package me.RockinChaos.itemjoin.listeners;
 
 import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
-import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import org.bukkit.entity.ItemFrame;
@@ -21,10 +20,8 @@ public class Placement implements Listener{
 	 	ItemStack item = event.getItem();
 	 	Player player = event.getPlayer();
 	 	if (event.getAction() == Action.RIGHT_CLICK_BLOCK && !ItemUtilities.isAllowed(player, item, "placement")) {
-	 		if (item.getType().isBlock() || ItemHandler.isSkull(item.getType())) {
-	 			event.setCancelled(true);
-	 			PlayerHandler.updateInventory(player);
-	 		}
+	 		event.setCancelled(true);
+	 		PlayerHandler.updateInventory(player);
 	 	}
 	 }
 	 
