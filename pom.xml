@@ -15,8 +15,9 @@
 				<filtering>true</filtering>
 				<directory>.</directory>
 				<includes>
-					<include>plugin.yml</include>
-					<include>files</include>
+					<include>*.yml</include>
+					<include>*.txt</include>
+					<include>*.jpg</include>
 				</includes>
 			</resource>
 		</resources>
