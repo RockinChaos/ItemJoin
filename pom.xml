@@ -18,14 +18,16 @@
 					<include>*.yml</include>
 				</includes>
 			</resource>
-      <resource>
-        <directory>files</directory>
-        <includes>
+			<resource>
+				<targetPath>./files</targetPath>
+				<filtering>true</filtering>
+				<directory>./files</directory>
+				<includes>
 					<include>**/*.yml</include>
 					<include>**/*.txt</include>
 					<include>**/*.jpg</include>
-        </includes>
-        </resource>
+				</includes>
+			</resource>
 		</resources>
 		<plugins>
 			<plugin>
