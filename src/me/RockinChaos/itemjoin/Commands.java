@@ -289,8 +289,9 @@ public class Commands implements CommandExecutor {
 		} else if (args[0].equalsIgnoreCase("menu") || args[0].equalsIgnoreCase("creator")) {
 			if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.creator")) {
 				if (!(sender instanceof ConsoleCommandSender)) {
-					//ItemCreator.LaunchCreator(sender);
-					Language.sendLangMessage("Commands.Default.creatorLaunched", sender);
+					sender.sendMessage(Utils.colorFormat("&c&lITEMJOIN_ERROR: COMMAND NOT YET IMPLEMENTED, PENDING NEXT FEW SNAPSHOTS!"));
+					//ConfigHandler.getItemCreator().LaunchCreator(sender);
+					//Language.sendLangMessage("Commands.Default.creatorLaunched", sender);
 				} else if (sender instanceof ConsoleCommandSender) { Language.sendLangMessage("Commands.Default.notPlayer", sender); }
 			} else { Language.sendLangMessage("Commands.Default.noPermission", sender); }
 			return true;
