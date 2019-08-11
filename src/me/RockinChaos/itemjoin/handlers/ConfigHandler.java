@@ -1,14 +1,17 @@
 package me.RockinChaos.itemjoin.handlers;
 
 import java.io.File;
-
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.CopyOption;
+import java.nio.file.Files;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-
 import me.RockinChaos.itemjoin.Commands;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemDesigner;
+import me.RockinChaos.itemjoin.guicreator.ItemCreator;
 import me.RockinChaos.itemjoin.listeners.Legacy_Pickups;
 import me.RockinChaos.itemjoin.listeners.Pickups;
 import me.RockinChaos.itemjoin.utils.DependAPI;
@@ -29,6 +32,7 @@ public class ConfigHandler {
 	private static SQLData sqlData;
 	private static UpdateHandler updater;
 	private static ItemDesigner itemDesigner;
+	private static ItemCreator itemCreator;
 	private static Metrics metrics;
 	private static DependAPI depends;
 	
@@ -37,6 +41,7 @@ public class ConfigHandler {
 		setDepends(new DependAPI());
 		setSQLData(new SQLData());
 		setItemDesigner(new ItemDesigner());
+		setItemCreator(new ItemCreator());
 		setMetrics(new Metrics());
 		sendUtilityDepends();
 		if (file != null) { setUpdater(new UpdateHandler(file)); }
@@ -45,6 +50,7 @@ public class ConfigHandler {
 	public static void registerEvents() {
 	    ItemJoin.getInstance().getCommand("itemjoin").setExecutor(new Commands());
 		ItemJoin.getInstance().getCommand("ij").setExecutor(new Commands());
+		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new ItemCreator(), ItemJoin.getInstance());
 		if ((!Utils.containsIgnoreCase(ConfigHandler.isPreventPickups(), "FALSE") || !Utils.containsIgnoreCase(ConfigHandler.isPreventPickups(), "DISABLED"))) {
 			if (ServerHandler.hasSpecificUpdate("1_12") && Reflection.getEventClass("entity.EntityPickupItemEvent") != null) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Pickups(), ItemJoin.getInstance()); } 
 			else { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Legacy_Pickups(), ItemJoin.getInstance()); }
@@ -69,11 +75,21 @@ public class ConfigHandler {
 		return getPath(path, file, false);
 	}
 	
+    public static void saveDefaultData(String path) throws IOException {
+        InputStream source;
+        File dataDir = ItemJoin.getInstance().getDataFolder();
+        if (!dataDir.exists()) { dataDir.mkdir(); }
+        if (!path.contains("lang.yml")) { source = ItemJoin.getInstance().getResource("files/configs/" + path); } 
+        else { source = ItemJoin.getInstance().getResource("files/locales/" + path); }
+        File file = new File(ItemJoin.getInstance().getDataFolder(), path);
+        if (!file.exists()) { Files.copy(source, file.toPath(), new CopyOption[0]); }
+    }
+	
 	public static FileConfiguration getConfigData(String path) {
 		File file = new File(ItemJoin.getInstance().getDataFolder(), path);
 		if (!(file).exists()) {
 			try {
-				ItemJoin.getInstance().saveResource(path, false);
+				saveDefaultData(path);
 				if (path.contains("items.yml")) { setGenerating(true); }
 			} catch (Exception e) {
 				ServerHandler.sendDebugTrace(e);
@@ -209,13 +225,13 @@ public class ConfigHandler {
 	}
 	
 	private static void sendUtilityDepends() {
-		ServerHandler.sendConsoleMessage("&aUtilizing [ &e" + (getDepends().authMeEnabled() ? "AuthMe, " : "") + (getDepends().nickEnabled() ? "BetterNick, " : "") 
+		ServerHandler.sendConsoleMessage("&aFetched [{ &e" + (getDepends().authMeEnabled() ? "AuthMe, " : "") + (getDepends().nickEnabled() ? "BetterNick, " : "") 
 		+ (getDepends().mCoreEnabled() ? "Multiverse-Core, " : "") + (getDepends().mInventoryEnabled() ? "Multiverse-Inventories, " : "") 
 		+ (getDepends().myWorldsEnabled() ? "My Worlds, " : "") + (getDepends().perInventoryEnabled() ? "PerWorldInventory, " : "") 
 		+ (getDepends().perPluginsEnabled() ? "PerWorldPlugins, " : "") + (getDepends().tokenEnchantEnabled() ? "TokenEnchant, " : "") 
 		+ (getDepends().getGuard().guardEnabled() ? "WorldGuard, " : "") + (getDepends().databaseEnabled() ? "HeadDatabase, " : "") 
 		+ (getDepends().xInventoryEnabled() ? "xInventories, " : "") + (getDepends().placeHolderEnabled() ? "PlaceholderAPI, " : "") 
-		+ (getDepends().getVault().vaultEnabled() ? "Vault " : "") + "&a]");
+		+ (getDepends().getVault().vaultEnabled() ? "Vault " : "") + "&a}]");
 	}
 	
 	private static boolean isGenerating() {
@@ -272,6 +288,14 @@ public class ConfigHandler {
 	
 	private static void setItemDesigner(ItemDesigner designer) {
 		itemDesigner = designer;
+	}
+	
+	public static ItemCreator getItemCreator() {
+		return itemCreator;
+	}
+	
+	private static void setItemCreator(ItemCreator creator) {
+		itemCreator = creator;
 	}
 	
 	public static DependAPI getDepends() {
