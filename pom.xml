@@ -16,9 +16,7 @@
 				<directory>.</directory>
 				<includes>
 					<include>plugin.yml</include>
-					<include>configs</include>
-					<include>locales</include>
-					<include>generated</include>
+					<include>files</include>
 				</includes>
 			</resource>
 		</resources>
