@@ -13,9 +13,9 @@
 			<resource>
 				<targetPath>.</targetPath>
 				<filtering>true</filtering>
-				<directory>.</directory>
+				<directory>${project.basedir}</directory>
 				<includes>
-					<include>files/*.yml</include>
+					<include>**/*.yml</include>
 				</includes>
 			</resource>
 		</resources>
