@@ -322,6 +322,13 @@ public class SQLData {
 		}
 	}
 	
+	public void purgeMapImage(ItemMap itemMap) {
+		if (imageNumberExists(itemMap.getMapImage()) && mapImages.values() != null && !mapImages.isEmpty()) {
+			executeStatementsLater.add("DELETE FROM map_ids WHERE Map_IMG='" + itemMap.getMapImage() + "';");
+			mapImages.remove(itemMap.getMapImage());
+		}
+	}
+	
 	public Boolean imageNumberExists(String image) {
 		if (mapImages.get(image) != null) {
 			return true;

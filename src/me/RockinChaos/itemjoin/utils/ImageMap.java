@@ -39,8 +39,8 @@ public class ImageMap extends MapRenderer {
 				    ciis.close();
 				} else { this.imgCache = ImageIO.read(new File(ItemJoin.getInstance().getDataFolder(), String.valueOf(image))); }
 			} catch (IOException e) { ServerHandler.sendDebugTrace(e); }
-		} else if (image != null && image.equalsIgnoreCase("default.jpg") && ItemJoin.getInstance().getResource("default.jpg") != null) {
-			try { this.imgCache = ImageIO.read(ItemJoin.getInstance().getResource("default.jpg"));
+		} else if (image != null && image.equalsIgnoreCase("default.jpg") && ItemJoin.getInstance().getResource("files/generated/default.jpg") != null) {
+			try { this.imgCache = ImageIO.read(ItemJoin.getInstance().getResource("files/generated/default.jpg"));
 			} catch (IOException e) { ServerHandler.sendDebugTrace(e); }
 		}
 	}

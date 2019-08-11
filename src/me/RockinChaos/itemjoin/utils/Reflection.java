@@ -69,7 +69,7 @@ public class Reflection {
 
 	public static MapView getMapView(int id) {
 		try {
-			Object mapView = getMapViewNMS("Server").getMethod("getMap").invoke(id);
+			Object mapView = getMapViewNMS("Bukkit").getMethod("getMap", short.class).invoke(getMapNMS("MapView"), (short)id);
 			return (MapView)mapView; 
 		} catch (Exception ex) { return null; }
 	}
