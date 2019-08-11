@@ -15,8 +15,7 @@
 				<filtering>true</filtering>
 				<directory>.</directory>
 				<includes>
-					<include>*.yml</include>
-					<include>**/*.files</include>
+					<include>**/*.yml</include>
 				</includes>
 			</resource>
 		</resources>
