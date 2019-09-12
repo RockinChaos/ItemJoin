@@ -67,7 +67,10 @@ public class Language {
 				.replace("%purgedata%", langHolder[10])
 				.replace("%amount%", langHolder[11])
 				.replace("%players%", langHolder[12])
-				.replace("%timeleft%", langHolder[13]);
+				.replace("%timeleft%", langHolder[13])
+				.replace("%type%", langHolder[14])
+				.replace("%example%", langHolder[15])
+				.replace("%input%", langHolder[16]);
 	}
 	
 	private static boolean showPrefix(String nodeLocation) {
@@ -89,7 +92,7 @@ public class Language {
 	}
 	
 	public static String[] newString() {
-		return new String[14];
+		return new String[18];
 	}
 	
 	public static String getLanguage() {

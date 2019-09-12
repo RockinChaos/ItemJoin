@@ -23,7 +23,14 @@ Commands:
     configReload: '&aConfiguration(s) Reloaded!'
     notPlayer: '&cYou must be a player to execute that command!'
     targetNotFound: '&cThe player &c%targetplayer% &ccould not be found!'
-    creatorLaunched: '&aItem creator GUI has been opened.'
+  UI:
+    creatorLaunched: '&aItem creator has been opened.'
+    itemSaved: '&e%item% &ahas been successfully saved.'
+    notInteger: '&c&l&nERROR:&c The input value &4%input% &cis not an integer value!'
+    noMatch: '&c&l&nERROR:&c The input value &4%input% &cis not an proper material!'
+    inputType: '&aType the &e%type% &athat you want to have on your item.'
+    inputSet: '&aThe items &e%type% &ahas been successfully set!'
+    normalExample: '&aExample: %example%'
   Item:
     notInHand: '&cYou are not holding an item in your hand!'
     invalidItem: '&cThe item &b%item% &cdoes not exist!'

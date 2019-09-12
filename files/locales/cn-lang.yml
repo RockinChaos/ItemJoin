@@ -23,7 +23,14 @@ Commands:
     configReload: '&a插件已重新读取！'
     notPlayer: '&c这是玩家的指令'
     targetNotFound: '&c找不到玩家 %targetplayer%'
+  UI:
     creatorLaunched: '&a已打开物品编辑器'
+    itemSaved: '&e%item% &ahas been successfully saved.' #Pending translation
+    notInteger: '&c&l&nERROR:&c The input value &4%input% &cis not an integer value!' #Pending translation
+    noMatch: '&c&l&nERROR:&c The input value &4%input% &cis not an proper material!' #Pending translation
+    inputType: '&aType the &e%type% &athat you want to have on your item.' #Pending translation
+    inputSet: '&aThe items &e%type% &ahas been successfully set!' #Pending translation
+    normalExample: '&aExample: %example%.' #Pending translation
   Item:
     notInHand: '&c手上没有物品'
     invalidItem: '&c物品 &e%item% &c不存在'
