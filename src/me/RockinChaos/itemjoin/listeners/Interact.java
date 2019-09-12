@@ -10,13 +10,15 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerAnimationEvent;
+import org.bukkit.event.player.PlayerInteractAtEntityEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
-
 import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
+import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.utils.Utils;
 
 public class Interact implements Listener {
@@ -59,6 +61,36 @@ public class Interact implements Listener {
 		Player player = (Player) event.getWhoClicked();
 		String action = event.getAction().toString();
 		if (setupCommands(player, item, action)) { event.setCancelled(true); }
+	}
+	
+	@EventHandler
+	private void onEntityCmds(PlayerInteractEntityEvent event) {
+		if (event.getRightClicked() instanceof org.bukkit.entity.ItemFrame) {
+			ItemStack item;
+			if (ServerHandler.hasCombatUpdate()) { item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().toString()); } 
+			else { item = PlayerHandler.getPerfectHandItem(event.getPlayer(), ""); }
+			Player player = event.getPlayer();
+			String action = Action.RIGHT_CLICK_BLOCK.name();
+			ItemMap itemMap = ItemUtilities.getMappedItem(PlayerHandler.getHandItem(player), player.getWorld());
+			if (itemMap != null && itemMap.isSimilar(item)) {
+				if (setupCommands(player, item, action)) { event.setCancelled(true); }
+			}
+		}
+	}
+	
+	@EventHandler
+	private void onAtEntityCmds(PlayerInteractAtEntityEvent event) {
+		if (event.getRightClicked().toString().equalsIgnoreCase("CraftArmorStand")) {
+			ItemStack item;
+			if (ServerHandler.hasCombatUpdate()) { item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().toString()); } 
+			else { item = PlayerHandler.getPerfectHandItem(event.getPlayer(), ""); }
+			Player player = event.getPlayer();
+			String action = Action.RIGHT_CLICK_BLOCK.name();
+			ItemMap itemMap = ItemUtilities.getMappedItem(PlayerHandler.getHandItem(player), player.getWorld());
+			if (itemMap != null && itemMap.isSimilar(item)) {
+				if (setupCommands(player, item, action)) { event.setCancelled(true); }
+			}
+		}
 	}
 
 	@EventHandler
