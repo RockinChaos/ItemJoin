@@ -46,6 +46,23 @@ public class ItemCommand {
 		return true;
 	}
 	
+	public boolean matchAction(ActionType action) {
+		if (this.action.equals(action)) {
+			return true;
+		}
+		return false;
+	}
+	
+	public String getCommand() {
+		return this.type.getName() + this.command;
+	}
+	
+	public void setCommand(String input) {
+		input = input.trim();
+		input = Utils.colorFormat(input);
+		this.command = input;
+	}
+	
 	private void setStop(final Player player, boolean bool) {
 		if (bool) { this.setStop.add(player); } else { this.setStop.remove(player); }
 	}
@@ -89,7 +106,7 @@ public class ItemCommand {
 						case OP: dispatchOpCommands(player); break;
 						case PLAYER: dispatchPlayerCommands(player); break;
 						case MESSAGE: dispatchMessageCommands(player); break;
-						case SERVERSWITCH: dispatchServerSwitchCommands(player); break;
+						case SERVERSWITCH: dispatchServerCommands(player); break;
 						case BUNGEE: dispatchBungeeCordCommands(player); break;
 						case SWAPITEM: dispatchSwapItem(player); break;
 						case DEFAULT: dispatchPlayerCommands(player); break;
@@ -159,7 +176,7 @@ public class ItemCommand {
 		}
 	}
 	
-	private void dispatchServerSwitchCommands(Player player) {
+	private void dispatchServerCommands(Player player) {
 		try { BungeeCord.SwitchServers(player, Utils.translateLayout(this.command, player)); } 
 		catch (Exception e) {
 			ServerHandler.sendErrorMessage("&cThere was an issue executing an item's command to switch servers, if this continues please report it to the developer!");
@@ -197,7 +214,8 @@ public class ItemCommand {
 	
 	private static ActionType getExactActionType(ItemMap itemMap, String definition) {
 		String invExists = itemMap.getNodeLocation().getString(".commands" + ActionType.INVENTORY.definition);
-				if (Utils.containsIgnoreCase(itemMap.getCommandType().name(), "INVENTORY") || invExists != null) {
+		String type; if (itemMap.getCommandType() == null) { type = "INTERACT"; } else { type = itemMap.getCommandType().name(); }
+				if (Utils.containsIgnoreCase(type, "INVENTORY") || invExists != null) {
 					if (ActionType.INVENTORY.hasDefine(definition)) {
 						return ActionType.INVENTORY;
 					} else if (ActionType.LEFT_CLICK_ALL.hasDefine(definition)) {
@@ -207,7 +225,7 @@ public class ItemCommand {
 					} else if (ActionType.MULTI_CLICK_ALL.hasDefine(definition)) {
 						return ActionType.MULTI_CLICK_ALL;
 					} 
-				} else if (Utils.containsIgnoreCase(itemMap.getCommandType().name(), "INTERACT")) {
+				} else if (Utils.containsIgnoreCase(type, "INTERACT")) {
 					if (ActionType.LEFT_CLICK_ALL.hasDefine(definition)) {
 						return ActionType.LEFT_CLICK_ALL;
 					} else if (ActionType.LEFT_CLICK_AIR.hasDefine(definition)) {
@@ -229,7 +247,7 @@ public class ItemCommand {
 					} else if (ActionType.PHYSICAL.hasDefine(definition)) {
 						return ActionType.PHYSICAL;
 					}
-				} else if (Utils.containsIgnoreCase(itemMap.getCommandType().name(), "BOTH")) {
+				} else if (Utils.containsIgnoreCase(type, "BOTH")) {
 					if (ActionType.INVENTORY.hasDefine(definition)) {
 						return ActionType.INVENTORY;
 					} if (ActionType.LEFT_CLICK_ALL.hasDefine(definition)) {
@@ -260,7 +278,7 @@ public class ItemCommand {
 	public static ItemCommand[] arrayFromString(ItemMap itemMap) {
 		if (ConfigHandler.getCommandsSection(itemMap.getNodeLocation()) == null) {
 			return new ItemCommand[] {
-				new ItemCommand("", ActionType.DEFAULT, Type.DEFAULT, 0L, itemMap.getCommandType().name())
+				new ItemCommand("", ActionType.DEFAULT, Type.DEFAULT, 0L, itemMap.getCommandType() != null ? itemMap.getCommandType().name() : "INTERACT")
 			};
 		}
 		return fromConfigList(itemMap);
@@ -276,7 +294,7 @@ public class ItemCommand {
 				List < String > commandsList = itemMap.getNodeLocation().getStringList("commands." + definition);
 				for (int i = 0; i < commandsList.size(); ++i) {
 					if (commandsList.get(i).trim().startsWith("delay:")) { delay = delay + getDelay(commandsList.get(i).trim());}
-					arrayCommands.add(fromString(commandsList.get(i).trim(), getExactActionType(itemMap, definition), itemMap, delay));
+					arrayCommands.add(fromString(commandsList.get(i).trim(), getExactActionType(itemMap, definition), itemMap.getCommandType(), delay));
 				}
 			}
 			final ItemCommand[] commands = new ItemCommand[arrayCommands.size()];
@@ -286,8 +304,8 @@ public class ItemCommand {
 		return null;
 	}
 	
-	private static ItemCommand fromString(String input, ActionType action, ItemMap itemMap, long delay) {
-		if (input == null || input.length() == 0) { return new ItemCommand("", ActionType.DEFAULT, Type.DEFAULT, 0L, itemMap.getCommandType().name()); }
+	public static ItemCommand fromString(String input, ActionType action, ItemMap.CommandType commandType, long delay) {
+		if (input == null || input.length() == 0) { return new ItemCommand("", ActionType.DEFAULT, Type.DEFAULT, 0L, commandType != null ? commandType.name() : "INTERACT"); }
 		input = input.trim();
 		Type type = Type.DEFAULT;
 		
@@ -302,7 +320,7 @@ public class ItemCommand {
 		
 		input = input.trim();
 		input = Utils.colorFormat(input);
-		return new ItemCommand(input, action, type, delay, itemMap.getCommandType().name());
+		return new ItemCommand(input, action, type, delay, commandType != null ? commandType.name() : "INTERACT");
 	}
 	
 	private static int getDelay(String lDelay) {
@@ -312,12 +330,15 @@ public class ItemCommand {
 	}
 	
 	private enum Type {
-		DEFAULT("DEFAULT", 0), CONSOLE("CONSOLE", 1), OP("OP", 2), PLAYER("PLAYER", 3), 
-		SERVERSWITCH("SERVER", 4), MESSAGE("MESSAGE", 5), BUNGEE("BUNGEE", 6), SWAPITEM("SWAPITEM", 7), DELAY("DELAY", 8);
-		private Type(final String t, final int n) { }
+		DEFAULT("default: ", 0), CONSOLE("console: ", 1), OP("op: ", 2), PLAYER("player: ", 3), 
+		SERVERSWITCH("server: ", 4), MESSAGE("message: ", 5), BUNGEE("bungee: ", 6), SWAPITEM("swapitem: ", 7), DELAY("delay: ", 8);
+		
+		private final String name;
+		private Type(final String name, final int intType) { this.name = name; }
+		private String getName() { return name; }
 	}
 	
-	private enum ActionType {
+	public enum ActionType {
 		DEFAULT("", ""),
 		PHYSICAL("PHYSICAL", ".physical"),
 		INVENTORY("PICKUP_ALL, PICKUP_HALF, PLACE_ALL", ".inventory"),

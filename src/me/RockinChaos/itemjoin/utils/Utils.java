@@ -1,12 +1,16 @@
 package me.RockinChaos.itemjoin.utils;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Statistic;
@@ -29,6 +33,12 @@ public class Utils {
 		return false;
 	}
 	
+	public static boolean containsValue(List<?> list, String s) {
+		boolean bool = false;
+		for (Object l : list) { if (l.toString().equalsIgnoreCase(s)) { bool = true; break; } }
+		return bool;
+	}
+	
 	public static String stripLogColors(CommandSender sender, String message) {
 		if (sender instanceof ConsoleCommandSender && ConfigHandler.getConfig("config.yml").getBoolean("General.Log-Coloration") != true) {
 			return ChatColor.stripColor(message);
@@ -44,9 +54,70 @@ public class Utils {
 	    return res;
 	}
 	
+	public static String[] softSplit(String str) {
+		if (str.split(", ").length < 3) { return str.split("` "); }
+		String splitTest = ""; int index = 1;
+	    for (String sd : str.split(", ")) { if (index == 3) { splitTest += sd + "` "; index = 1; } else { splitTest += sd + ", "; index++; } }
+	    if (splitTest.endsWith(", ")) { splitTest = splitTest.substring(0, splitTest.length() - 2); }
+	    return splitTest.split("` ");
+	}
+	
+	public static List<String> split(String s) {
+		List<String> splitList = new ArrayList<String>();
+		for (String split : s.split(", ")) {
+			splitList.add(split);
+		}
+		return splitList;
+	}
+	
+	public static int getPath(final int i) {
+		if (ConfigHandler.getConfig("items.yml").getString("items.item_" + i) != null) {
+			return getPath(i + 1);
+		}
+		return i;
+	}
+	
+	public static String nullCheck(String input) {
+		if (input == null || input.equalsIgnoreCase("NULL") || input.contains("[]") || input.contains("{}") || input.equals("0&7") || input.equals("-1&a%") || input.equals("") || input.equals(" ")) {
+			return "NONE";
+		}
+		if (input.startsWith("[") && input.endsWith("]")) {
+			input = input.substring(0, input.length() - 1).substring(1);
+		}
+		if (input.startsWith("{") && input.endsWith("}")) {
+			input = input.replace("{", "").replace("}", "").replace("=", ":");
+		}
+		return input;
+	}
+	
 	public static int getRandom(int lower, int upper) {
 		Random random = new Random();
 		return random.nextInt((upper - lower) + 1) + lower;
+	}
+	
+	public static Color getColorFromHexColor(String hexString) {
+		int hex = Integer.decode("#" + hexString.replace("#", ""));
+		int r = ((hex & 0xFF0000) >> 16);
+		int g = ((hex & 0xFF00) >> 8);
+		int b = (hex & 0xFF);
+		Color bukkitColor = Color.fromBGR(r, g, b);
+		return bukkitColor;
+	}
+	
+	public static Entry<?, ?> randomEntry(HashMap<?, ?> map) {
+		try {
+			Field table = HashMap.class.getDeclaredField("table");
+			table.setAccessible(true);
+			Random rand = new Random();
+			Entry<?, ?>[] entries = (Entry[]) table.get(map);
+			int start = rand.nextInt(entries.length);
+	    	for(int i=0;i<entries.length;i++) {
+	    		int idx = (start + i) % entries.length;
+	    		Entry<?, ?> entry = entries[idx];
+	       		if (entry != null) return entry;
+	    	}
+		} catch (Exception e) {}
+	    return null;
 	}
 	
 	public static boolean isInt(String s) {

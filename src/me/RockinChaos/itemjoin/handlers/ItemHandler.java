@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.lang.WordUtils;
-import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
@@ -23,6 +22,7 @@ import org.bukkit.inventory.meta.Damageable;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 
+import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 import me.RockinChaos.itemjoin.utils.Legacy;
 import me.RockinChaos.itemjoin.utils.Reflection;
@@ -85,18 +85,49 @@ public class ItemHandler {
 		return null;
 	}
 	
-    public static ItemStack getItem(String mat, int count, String name, String... lore) {
+	public static ItemStack addLore(ItemStack item, String... lores) {
+		ItemMeta meta = item.getItemMeta();
+		List<String> newLore = new ArrayList<String>();
+		if (meta.hasLore()) { newLore = meta.getLore(); }
+		for (String lore : lores) { newLore.add(Utils.colorFormat(lore)); }
+		meta.setLore(newLore);
+		item.setItemMeta(meta);
+		return item;
+	}
+	
+	public static ItemMap getItemMap(final String slot, final List < ItemMap > items) {
+		ItemMap itemMap = null;
+		for (final ItemMap item: items) {
+			if (item.getSlot().equalsIgnoreCase(slot)) {
+				itemMap = item;
+				break;
+			}
+		}
+		return itemMap;
+	}
+	
+    public static ItemStack getItem(String mat, int count, boolean glowing, String name, String... lore) {
         ItemStack tempItem; if (!ServerHandler.hasSpecificUpdate("1_8") && mat.equals("BARRIER")) { mat = "WOOL:14"; }
+        if (getMaterial(mat, null) == null) { mat = "STONE"; } 
         if (ServerHandler.hasAquaticUpdate()) { tempItem = new ItemStack(getMaterial(mat, null), count); } 
         else { short dataValue = 0; if (mat.contains(":")) { String[] parts = mat.split(":"); mat = parts[0]; dataValue = (short) Integer.parseInt(parts[1]); } tempItem = Legacy.newLegacyItemStack(getMaterial(mat, null), count, dataValue); }
+        if (glowing && mat != "AIR") { tempItem.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 1); }
         ItemMeta tempMeta = tempItem.getItemMeta();
+        if (ServerHandler.hasSpecificUpdate("1_8") && mat != "AIR") { tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ENCHANTS); }
         if (name != null && mat != "AIR") { name = Utils.colorFormat(name); tempMeta.setDisplayName(name); }
         if (lore != null && lore.length != 0 && mat != "AIR") {
         	ArrayList<String> loreList = new ArrayList<String>();
-        	for (String loreString: lore) { loreList.add(Utils.colorFormat(loreString)); }
+        	for (String loreString: lore) { 
+        		if (!loreString.isEmpty()) {
+        			if (loreString.contains("/n")) {
+        				String[] loreSplit = loreString.split(" /n ");
+        				for (String loreStringSplit : loreSplit) { loreList.add(Utils.colorFormat(loreStringSplit)); }
+        			} else { loreList.add(Utils.colorFormat(loreString)); }
+        		} 
+        	}
         	tempMeta.setLore(loreList);
         }
-        tempItem.setItemMeta(tempMeta);
+        tempItem.setItemMeta(tempMeta); 
         return tempItem;
     }
 	
@@ -159,6 +190,14 @@ public class ItemHandler {
 			return context.replace(getDelay(context), "");
 		} 
 		return context;
+	}
+	
+	public static List<String> purgeDelay(List <String> context) {
+		List<String> newContext = new ArrayList<String>();
+		for (String minorContext : context) {
+			newContext.add(purgeDelay(minorContext));
+		}
+		return newContext;
 	}
 	
     public static ItemStack setSkullTexture(ItemStack item, String skullTexture) {
@@ -268,14 +307,5 @@ public class ItemHandler {
 				}
 		}
 		return false;
-	}
-	
-	public static Color getColorFromHexColor(String hexString) {
-		int hex = Integer.decode("#" + hexString);
-		int r = ((hex & 0xFF0000) >> 16);
-		int g = ((hex & 0xFF00) >> 8);
-		int b = (hex & 0xFF);
-		Color bukkitColor = Color.fromBGR(r, g, b);
-		return bukkitColor;
 	}
 }

@@ -36,7 +36,7 @@ public class PlayerJoin implements Listener {
 	}
 	
 	private void setItems(final Player player) {
-		runGlobalCmds(player);
+		this.runGlobalCmds(player);
 		ItemUtilities.safeSet(player, "Join");
 		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
 			@Override

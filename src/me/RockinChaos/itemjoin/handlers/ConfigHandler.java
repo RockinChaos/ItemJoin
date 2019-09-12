@@ -11,10 +11,11 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import me.RockinChaos.itemjoin.Commands;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemDesigner;
-import me.RockinChaos.itemjoin.guicreator.ItemCreator;
 import me.RockinChaos.itemjoin.listeners.Legacy_Pickups;
+import me.RockinChaos.itemjoin.listeners.Misc;
 import me.RockinChaos.itemjoin.listeners.Pickups;
 import me.RockinChaos.itemjoin.utils.DependAPI;
+import me.RockinChaos.itemjoin.utils.UI;
 import me.RockinChaos.itemjoin.utils.Language;
 import me.RockinChaos.itemjoin.utils.Metrics;
 import me.RockinChaos.itemjoin.utils.Reflection;
@@ -32,7 +33,7 @@ public class ConfigHandler {
 	private static SQLData sqlData;
 	private static UpdateHandler updater;
 	private static ItemDesigner itemDesigner;
-	private static ItemCreator itemCreator;
+	private static UI itemCreator;
 	private static Metrics metrics;
 	private static DependAPI depends;
 	
@@ -41,16 +42,15 @@ public class ConfigHandler {
 		setDepends(new DependAPI());
 		setSQLData(new SQLData());
 		setItemDesigner(new ItemDesigner());
-		setItemCreator(new ItemCreator());
+		setItemCreator(new UI());
 		setMetrics(new Metrics());
-		sendUtilityDepends();
-		if (file != null) { setUpdater(new UpdateHandler(file)); }
+		if (file != null) { sendUtilityDepends(); setUpdater(new UpdateHandler(file)); }
 	}
 	
 	public static void registerEvents() {
 	    ItemJoin.getInstance().getCommand("itemjoin").setExecutor(new Commands());
 		ItemJoin.getInstance().getCommand("ij").setExecutor(new Commands());
-		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new ItemCreator(), ItemJoin.getInstance());
+		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Misc(), ItemJoin.getInstance());
 		if ((!Utils.containsIgnoreCase(ConfigHandler.isPreventPickups(), "FALSE") || !Utils.containsIgnoreCase(ConfigHandler.isPreventPickups(), "DISABLED"))) {
 			if (ServerHandler.hasSpecificUpdate("1_12") && Reflection.getEventClass("entity.EntityPickupItemEvent") != null) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Pickups(), ItemJoin.getInstance()); } 
 			else { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Legacy_Pickups(), ItemJoin.getInstance()); }
@@ -290,11 +290,11 @@ public class ConfigHandler {
 		itemDesigner = designer;
 	}
 	
-	public static ItemCreator getItemCreator() {
+	public static UI getItemCreator() {
 		return itemCreator;
 	}
 	
-	private static void setItemCreator(ItemCreator creator) {
+	private static void setItemCreator(UI creator) {
 		itemCreator = creator;
 	}
 	
@@ -325,11 +325,11 @@ public class ConfigHandler {
 				&& !Utils.containsIgnoreCase(ConfigHandler.getConfig("config.yml").getString("Clear-Items.World-Switch"), "FALSE")) {
 				return ConfigHandler.getConfig("config.yml").getInt("Clear-Items.Delay-Tick") * 10L;
 		}
-		return 0;
+		return -1;
 	}
 	
 	public static long getItemDelay() {
-		if (getClearDelay() >= ConfigHandler.getConfig("items.yml").getInt("items-Delay") * 10L) { return getClearDelay() + 1; }
+		if (getClearDelay() >= ConfigHandler.getConfig("items.yml").getInt("items-Delay") * 10L && getClearDelay() != -1) { return getClearDelay() + 1; }
 		return ConfigHandler.getConfig("items.yml").getInt("items-Delay") * 10L;
 	}
 	

@@ -49,7 +49,7 @@ public class ItemDesigner {
 							this.setMaterial(itemMap);
 							this.setSkullDatabase(itemMap);
 							this.setUnbreaking(itemMap);
-							this.showDurability(itemMap);
+							this.durabilityBar(itemMap);
 							this.setEnchantments(itemMap);
 							this.setMapImage(itemMap);
 							this.setJSONBookPages(itemMap);
@@ -241,10 +241,10 @@ public class ItemDesigner {
 	}
 //  ===================================================================================== //
 
-	private void showDurability(ItemMap itemMap) {
+	private void durabilityBar(ItemMap itemMap) {
 		if (Utils.containsIgnoreCase(itemMap.getItemFlags(), "hide-durability")) {
 			try {
-				itemMap.setHideDurability(true);
+				itemMap.setDurabilityBar(true);
 			} catch (Exception e) { ServerHandler.sendDebugTrace(e); } }
 	}
 	
@@ -343,8 +343,10 @@ public class ItemDesigner {
 		if (itemMap.getMaterial().toString().equalsIgnoreCase("WRITTEN_BOOK") && itemMap.getNodeLocation().getString(".pages") != null 
 				&& ConfigHandler.getPagesSection(itemMap.getNodeLocation()) != null && ServerHandler.hasSpecificUpdate("1_8")) {
 			List<String> actualPageList = new ArrayList<String>();
+			List<List <String> > listPages = new ArrayList<List <String> >();
 			for (String pageString: ConfigHandler.getPagesSection(itemMap.getNodeLocation()).getKeys(false)) {
 				 List<String> pageList = itemMap.getNodeLocation().getStringList(".pages." + pageString);
+				 listPages.add(pageList);
 				 String textBuilder = "[\"\"";
 				 for (int k = 0; k < pageList.size(); k++) {
 						String formatPage = pageList.get(k);
@@ -374,6 +376,7 @@ public class ItemDesigner {
 				 actualPageList.add(textBuilder + "]");
 			}
 			itemMap.setPages(actualPageList);
+			itemMap.setListPages(listPages);
 		}
 	}
 	
@@ -405,7 +408,7 @@ public class ItemDesigner {
 	}
 //  =========================================================================================================================================================================================================================== //
 	
-//  =============================================== //
+//  =============================================== //1
 //    ~ Sets the Custom Name to the Custom Item ~   //
 //  Adds the custom name to the items display name. //
 //  =============================================== //
@@ -718,9 +721,9 @@ public class ItemDesigner {
 				String stringType = itemMap.getNodeLocation().getString(".firework.type").toUpperCase();
 				boolean flicker = itemMap.getNodeLocation().getBoolean(".firework.flicker");
 				boolean trail = itemMap.getNodeLocation().getBoolean(".firework.trail");
-				int power = itemMap.getNodeLocation().getInt(".firework.distance");
+				int power = itemMap.getNodeLocation().getInt(".firework.power"); if (power == 0) { power = 1; }
 				Type buildType = Type.valueOf(stringType);
-				List <Color> colors = new ArrayList <Color> ();
+				List <Color> colors = new ArrayList <Color> (); List <DyeColor> saveColors = new ArrayList <DyeColor> ();
 				if (itemMap.getNodeLocation().getString(".firework.colors") != null) {
 					String colorlist = itemMap.getNodeLocation().getString(".firework.colors").replace(" ", "");
 					for (String color: colorlist.split(",")) {
@@ -732,7 +735,7 @@ public class ItemDesigner {
 					}
 				}
 				FireworkEffect effect = FireworkEffect.builder().trail(trail).flicker(flicker).withColor(colors).withFade(colors).with(buildType).build();
-				itemMap.setFirework(effect, power);
+				itemMap.setFirework(effect); itemMap.setFireworkType(buildType); itemMap.setFireworkPower(power); itemMap.setFireworkColor(saveColors); itemMap.setFireworkTrail(trail); itemMap.setFireworkFlicker(flicker);
 			}
 		}
 	}
@@ -761,12 +764,10 @@ public class ItemDesigner {
 			if (itemMap.getMaterial().toString().equalsIgnoreCase("LEATHER_HELMET") || itemMap.getMaterial().toString().equalsIgnoreCase("LEATHER_CHESTPLATE")
 				|| itemMap.getMaterial().toString().equalsIgnoreCase("LEATHER_LEGGINGS") || itemMap.getMaterial().toString().equalsIgnoreCase("LEATHER_BOOTS")) {
 				String leatherColor = itemMap.getNodeLocation().getString(".leather-color").toUpperCase();
-				try { itemMap.setLeatherColor(ItemHandler.getColorFromHexColor(leatherColor.replaceAll("#", ""))); } 
-				catch (Exception e) { try { itemMap.setLeatherColor(DyeColor.valueOf(leatherColor).getFireworkColor()); } 
+				try { if (leatherColor.startsWith("#")) { itemMap.setLeatherHex(leatherColor); } else { itemMap.setLeatherColor(leatherColor); } }
 				catch (Exception ex) { 
 					ServerHandler.sendErrorMessage("&4The leather-color: " + leatherColor + " is not a valid color for the item " + itemMap.getConfigName() + "!"); 
 					ServerHandler.sendErrorMessage("&4Use hexcolor or see valid bukkit colors here; https://hub.spigotmc.org/javadocs/spigot/org/bukkit/DyeColor.html"); 
-				}
 				}
 			}
 		}
@@ -825,8 +826,10 @@ public class ItemDesigner {
 	private void setLegacyBookPages(ItemMap itemMap) {
 		if (!ServerHandler.hasSpecificUpdate("1_8") && itemMap.getMaterial().toString().equalsIgnoreCase("WRITTEN_BOOK") && itemMap.getNodeLocation().getString(".pages") != null && ConfigHandler.getPagesSection(itemMap.getNodeLocation()) != null) {
 			List < String > pages = new ArrayList < String > ();
+			List<List <String> > listPages = new ArrayList<List <String> >();
 			for (String pageString: ConfigHandler.getPagesSection(itemMap.getNodeLocation()).getKeys(false)) {
 				List < String > pageList = itemMap.getNodeLocation().getStringList(".pages." + pageString);
+				listPages.add(pageList);
 				String saveList = "";
 				for (int k = 0; k < pageList.size(); k++) {
 					String formatPage = pageList.get(k);
@@ -846,6 +849,7 @@ public class ItemDesigner {
 				pages.add(saveList);
 			}
 			itemMap.setPages(pages);
+			itemMap.setListPages(listPages);
 		}
 	}
 //  =========================================================================================================================================================================================================================================================================================================================================================== //
@@ -856,7 +860,7 @@ public class ItemDesigner {
 //  =============================================== //
 	private void setAttributes(ItemMap itemMap) {
 		if (ServerHandler.hasSpecificUpdate("1_8") && Utils.containsIgnoreCase(itemMap.getItemFlags(), "hide-attributes")) {
-			itemMap.setAttributes(true);
+			itemMap.setAttributesInfo(true);
 		}
 	}
 //  ===================================================================================================================================== //

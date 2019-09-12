@@ -1,5 +1,6 @@
 package me.RockinChaos.itemjoin.giveitems.utils;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,9 +11,9 @@ import java.util.Map.Entry;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.FireworkEffect;
+import org.bukkit.FireworkEffect.Type;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -20,6 +21,8 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.banner.Pattern;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -42,8 +45,7 @@ import com.mojang.authlib.properties.Property;
 import com.vk2gpz.tokenenchant.api.TokenEnchantAPI;
 
 import me.RockinChaos.itemjoin.ItemJoin;
-import me.RockinChaos.itemjoin.giveitems.listeners.RegionEnter;
-import me.RockinChaos.itemjoin.guicreator.ItemCreator;
+import me.RockinChaos.itemjoin.giveitems.listeners.PlayerGuard;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PermissionsHandler;
@@ -68,8 +70,9 @@ public class ItemMap {
 	private Short dataValue = 0;
 	
 	private String customName = null;
-	private List < String > customLore = null;
+	private List < String > customLore = new ArrayList < String > ();
 
+	private List<String> AllSlots = new ArrayList<String>();
 	private Integer InvSlot = 0;
 	private String CustomSlot = null;
 	
@@ -87,25 +90,31 @@ public class ItemMap {
 	private String title;
 	private Generation generation;
 	private List < String > bookPages = new ArrayList < String > ();
+	private List < List <String> > listPages = new ArrayList < List <String> > ();
 	
-	private int mapId = 1;
+	private short mapId = 1;
 	private MapView mapView = null;
 	private String customMapImage = null;
     
     private FireworkEffect firework = null;
-    private int power = 1;
+    private Type fireworkType = null;
+    private boolean fireworkFlicker = false;
+    private boolean fireworkTrail = false;
+    private Integer power = 0;
+    private List<DyeColor> fireworkColor = new ArrayList<DyeColor>();
     private DyeColor chargeColor = null;
     
     private String skullOwner = null;
     private String skullTexture = null;
     private boolean headDatabase = false;
     
-    private List <PotionEffect> effect = null;
-    private List <Pattern> bannerPatterns = null;
+    private List <PotionEffect> effect = new ArrayList<PotionEffect>();
+    private List <Pattern> bannerPatterns = new ArrayList<Pattern>();
     
-    private Color leatherColor = null;
+    private String leatherColor;
+    private String leatherHex;
     
-	private int interactCooldown = 0;
+	private Integer interactCooldown = 0;
 	private boolean customConsumable = false;
 	private Map < String, Integer > enchants = new HashMap < String, Integer > ();
 	
@@ -121,11 +130,11 @@ public class ItemMap {
 //  ============================================== //
 //     ItemAnimation Information for each item.    //
 //  ============================================== //
-	private List < String > dynamicNames = null;
-	private List < List < String > > dynamicLores = null;
-	private List < String > dynamicMaterials = null;
-	private List < String > dynamicOwners = null;
-	private List < String > dynamicTextures = null;
+	private List < String > dynamicNames = new ArrayList < String > ();
+	private List < List < String > > dynamicLores = new ArrayList < List <String> > ();
+	private List < String > dynamicMaterials = new ArrayList < String > ();
+	private List < String > dynamicOwners = new ArrayList < String > ();
+	private List < String > dynamicTextures = new ArrayList < String > ();
 	private boolean materialAnimated = false;
 	private boolean skullAnimated = false;
 	private Map < Player, ItemAnimation > localeAnimations = new HashMap < Player, ItemAnimation > ();
@@ -135,7 +144,7 @@ public class ItemMap {
 //  ============================================== //
 //      ItemCommand Information for each item.     //
 //  ============================================== //
-	private ItemCommand[] commands;
+	private ItemCommand[] commands = new ItemCommand[0];
 	private Integer cooldownSeconds = 0;
 	private String cooldownMessage;
 	private Sound commandSound;
@@ -145,8 +154,8 @@ public class ItemMap {
 	private List < Player > warmPending = new ArrayList < Player > ();
 	private boolean useCooldown = false;
 	private boolean subjectRemoval = false;
-	private CommandSequence sequence = CommandSequence.SEQUENTIAL;
-	private CommandType type = CommandType.INTERACT;
+	private CommandSequence sequence;
+	private CommandType type;
 	private Map < String, Long > playersOnCooldown = new HashMap < String, Long > ();
 	private HashMap < String, Long > playersOnCooldownTick = new HashMap < String, Long > ();
 //  ============================================================================================= //
@@ -178,7 +187,7 @@ public class ItemMap {
 	private boolean selfDroppable = false;
 	private boolean deathDroppable = false;
 	private boolean disposable = false;
-	private boolean allowModifications = false;
+	private boolean itemChangable = false;
 	private boolean alwaysGive = false;
 	private boolean CreativeBypass = false;
 	private boolean AllowOpBypass = false;
@@ -207,7 +216,7 @@ public class ItemMap {
 	private boolean permissionNeeded = true;
 	private boolean opPermissionNeeded = false;
 	
-	private String enabledRegions;
+	private List < String > enabledRegions = new ArrayList < String > ();
 	private List < String > enabledWorlds = new ArrayList < String > ();
 // ======================================================================================== //
 	
@@ -219,7 +228,9 @@ public class ItemMap {
         this.configName = internalName;
         this.setSlot(slot);
         
+        
         if (this.nodeLocation != null) {
+        	this.setMultipleSlots();
 	        this.setCount(this.nodeLocation.getString(".count"));
 			this.setCommandCost();
 			this.setCommandWarmDelay();
@@ -246,6 +257,13 @@ public class ItemMap {
 //  ============================================== //
 //   Setter functions for first ItemMap creation.  //
 //  ============================================== //
+	private void setMultipleSlots() {
+        if (this.nodeLocation.getString(".slot").contains(",")) {
+        	String[] slots = this.nodeLocation.getString(".slot").replace(" ", "").split(",");
+			for (String s: slots) { this.AllSlots.add(s); }
+        }
+	}
+	
 	private void setCommandCost() {
 		if (this.nodeLocation.getString("commands-cost") != null && Utils.isInt(this.nodeLocation.getString("commands-cost"))) { this.cost = this.nodeLocation.getInt("commands-cost"); }
 	}
@@ -269,6 +287,10 @@ public class ItemMap {
 		this.useCooldown = this.nodeLocation.getString("commands-cooldown") != null;
 		if (this.useCooldown) { this.cooldownSeconds = this.nodeLocation.getInt("commands-cooldown"); }
 		this.cooldownMessage = this.nodeLocation.getString("cooldown-message");
+	}
+	
+	public void setCommandCooldown(int i) {
+		this.cooldownSeconds = i;
 	}
 	
 	private void setCommandType() {
@@ -322,7 +344,7 @@ public class ItemMap {
 			this.blockMovement = Utils.containsIgnoreCase(this.itemflags, "inventory-modify");
 			if (!this.blockMovement) { this.blockMovement = Utils.containsIgnoreCase(this.itemflags, "inventory-close"); }
 			this.closeInventory = Utils.containsIgnoreCase(this.itemflags, "inventory-close");
-			this.allowModifications = Utils.containsIgnoreCase(this.itemflags, "allow-modifications");
+			this.itemChangable = Utils.containsIgnoreCase(this.itemflags, "allow-modifications") || Utils.containsIgnoreCase(this.itemflags, "item-changable");
 			this.alwaysGive = Utils.containsIgnoreCase(this.itemflags, "always-give");
 			this.dynamic = Utils.containsIgnoreCase(this.itemflags, "dynamic");
 			this.animate = Utils.containsIgnoreCase(this.itemflags, "animate");
@@ -372,14 +394,12 @@ public class ItemMap {
 	}
 	
 	private void setRegions() {
-		if (this.nodeLocation.getString(".enabled-regions") != null) {
-			this.enabledRegions = this.nodeLocation.getString(".enabled-regions");
-			String regionlist = this.nodeLocation.getString(".enabled-regions").replace(" ", "");
-			String[] regions = regionlist.split(",");
-			for (String region: regions) {
-				RegionEnter.addLocaleRegion(region);
+		if (this.nodeLocation.getString(".enabled-regions") != null && !this.nodeLocation.getString(".enabled-regions").isEmpty()) {
+			String[] enabledParts = this.nodeLocation.getString(".enabled-regions").replace(" ,  ", ",").replace(" , ", ",").replace(",  ", ",").replace(", ", ",").split(",");
+			for (String region: enabledParts) {
+				this.enabledRegions.add(region); PlayerGuard.addLocaleRegion(region);
 			}
-		} else if (isGiveOnRegionEnter() || isTakeOnRegionLeave()) { RegionEnter.addLocaleRegion("UNDEFINED"); this.enabledRegions = "UNDEFINED"; }
+		} else if (isGiveOnRegionEnter() || isTakeOnRegionLeave()) { PlayerGuard.addLocaleRegion("UNDEFINED"); this.enabledRegions.add("UNDEFINED"); }
 	}
 	
 	private void setWorlds() {
@@ -435,7 +455,7 @@ public class ItemMap {
 	
 	public void setCustomLore(List < String > customLore) {
 		if (customLore == null || customLore.size() == 0) {
-			this.customLore = null;
+			this.customLore = new ArrayList< String > ();
 			return;
 		}
 		this.customLore = new ArrayList < String > ();
@@ -469,6 +489,10 @@ public class ItemMap {
 		this.localeAnimations.remove(player);
 	}
 	
+	public void setLimitModes(String str) {
+		this.limitModes = str;
+	}
+	
 	public void setSlot(String slot) {
 		if (ItemHandler.isCustomSlot(slot)) {
 			this.CustomSlot = slot;
@@ -481,11 +505,15 @@ public class ItemMap {
 		}
 	}
 	
+	public void setMultipleSlots(List<String> slots) {
+		this.AllSlots = slots;
+	}
+	
 	public void setEnabledWorlds(List<String> worlds) {
 		this.enabledWorlds = worlds;
 	}
 	
-	public void setEnabledRegions(String regions) {
+	public void setEnabledRegions(List<String> regions) {
 		this.enabledRegions = regions;
 	}
 	
@@ -493,12 +521,28 @@ public class ItemMap {
 		this.enchants = enchantments;
 	}
 	
+	public void setItemFlags(String itemflags) {
+		this.itemflags = itemflags;
+	}
+	
+	public void setTriggers(String triggers) {
+		this.triggers = triggers;
+	}
+	
 	public void setCommandType(CommandType type) {
 		this.type = type;
 	}
 	
-	public void setCommandsSequence(CommandSequence sequence) {
+	public void setCommandSequence(CommandSequence sequence) {
 		this.sequence = sequence;
+	}
+	
+	public void setCommandParticle(String s) {
+		this.commandParticle = s;
+	}
+	
+	public void setCooldownMessage(String s) {
+		this.cooldownMessage = s;
 	}
 	
 	public void setCount(String count) {
@@ -519,8 +563,12 @@ public class ItemMap {
 		this.commandSound = sound;
 	}
 	
-	public void setCost(Integer cost) {
+	public void setCommandCost(Integer cost) {
 		this.cost = cost;
+	}
+	
+	public void setWarmDelay(Integer delay) {
+		this.warmDelay = delay;
 	}
 	
 	public void setConfigName(String name) {
@@ -547,17 +595,18 @@ public class ItemMap {
 		this.permissionNode = permission == null || permission.length() == 0 ? null : permission;
 	}
 	
-	public void setOnlyFirstJoin(boolean onlyOnFirstJoin) {
-		this.onlyFirstJoin = onlyOnFirstJoin;
-		this.giveOnJoin = true;
-		if (onlyOnFirstJoin && this.giveOnRespawn) {
+	public void setOnlyFirstJoin(boolean bool) {
+		this.onlyFirstJoin = bool;
+		if (bool) { this.giveOnJoin = true; }
+		if (bool && this.giveOnRespawn) {
 			this.giveOnRespawn = false;
 		}
 	}
 	
-	public void setOnlyFirstWorld(boolean onlyOnFirstWorld) {
-		this.onlyFirstWorld = onlyOnFirstWorld;
-		if (onlyOnFirstWorld && this.giveOnRespawn) {
+	public void setOnlyFirstWorld(boolean bool) {
+		this.onlyFirstWorld = bool;
+		if (bool) { this.giveOnJoin = true; }
+		if (bool && this.giveOnRespawn) {
 			this.giveOnRespawn = false;
 		}
 	}
@@ -586,8 +635,16 @@ public class ItemMap {
 		this.giveOnDisabled = bool;
 	}
 	
-	public void setIpLimted(boolean bool) {
+	public void setUseOnLimitSwitch(boolean bool) {
+		this.useOnLimitSwitch = bool;
+	}
+	
+	public void setIpLimited(boolean bool) {
 		this.ipLimited = bool;
+	}
+	
+	public void setInteractCooldown(int cooldown) {
+        this.interactCooldown = cooldown;
 	}
 	
 	public void setPermissionNeeded(boolean bool) {
@@ -604,6 +661,18 @@ public class ItemMap {
 	
 	public void setVanillaStatus(boolean bool) {
 		this.vanillaStatus = bool;
+	}
+	
+	public void setVanillaControl(boolean bool) {
+		this.vanillaControl = bool;
+	}
+	
+	public void setGiveNext(boolean bool) {
+		this.giveNext = bool;
+	}
+	
+	public void setDropFull(boolean bool) {
+		this.dropFull = bool;
 	}
 	
 	public void setUnbreakable(boolean bool) {
@@ -634,8 +703,8 @@ public class ItemMap {
 		this.noRepairing = bool;
 	}
 	
-	public void setAllowModifications(boolean bool) {
-		this.allowModifications = bool;
+	public void setItemChangable(boolean bool) {
+		this.itemChangable = bool;
 	}
 	
 	public void setAlwaysGive(boolean bool) {
@@ -654,15 +723,15 @@ public class ItemMap {
 		this.overwritable = bool;
 	}
 	
-	public void setPlacement(boolean bool) {
+	public void setPlaceable(boolean bool) {
 		this.blockPlacement = bool;
 	}
 	
-	public void setAttributes(boolean bool) {
+	public void setAttributesInfo(boolean bool) {
 		this.hideAttributes = bool;
 	}
 	
-	public void setHideDurability(boolean bool) {
+	public void setDurabilityBar(boolean bool) {
 		this.hideDurability = bool;
 	}
 	
@@ -710,8 +779,12 @@ public class ItemMap {
 		this.bookPages = pages;
 	}
 	
+	public void setListPages(List <List <String> > pages) {
+		this.listPages = pages;
+	}
+	
 	public void setMapID(int id) {
-		this.mapId = id;
+		this.mapId = (short) id;
 	}
 	
 	public void setMapView(MapView view) {
@@ -722,9 +795,28 @@ public class ItemMap {
 		this.customMapImage = mapIMG;
 	}
 	
-	public void setFirework(FireworkEffect fire, int power) {
+	public void setFirework(FireworkEffect fire) {
 		this.firework = fire;
+	}
+	
+	public void setFireworkType(Type buildType) {
+		this.fireworkType = buildType;
+	}
+	
+	public void setFireworkColor(List<DyeColor> colors) {
+		this.fireworkColor = colors;
+	}
+	
+	public void setFireworkPower(int power) {
 		this.power = power;
+	}
+	
+	public void setFireworkTrail(boolean bool) {
+		this.fireworkTrail = bool;
+	}
+	
+	public void setFireworkFlicker(boolean bool) {
+		this.fireworkFlicker = bool;
 	}
 	
 	public void setChargeColor(DyeColor dyeColor) {
@@ -747,8 +839,12 @@ public class ItemMap {
 		this.effect = potion;
 	}
 	
-	public void setLeatherColor(Color lColor) {
+	public void setLeatherColor(String lColor) {
 		this.leatherColor = lColor;
+	}
+	
+	public void setLeatherHex(String hex) {
+		this.leatherHex = hex;
 	}
 	
 	public void setNewNBTData(String nbt, Object tag) {
@@ -822,11 +918,15 @@ public class ItemMap {
 		return null;
 	}
 	
+	public List<String> getMultipleSlots() {
+		return this.AllSlots;
+	}
+	
 	public List<String> getEnabledWorlds() {
 		return this.enabledWorlds;
 	}
 	
-	public String getEnabledRegions() {
+	public List<String> getEnabledRegions() {
 		return this.enabledRegions;
 	}
 	
@@ -876,10 +976,6 @@ public class ItemMap {
 		return this.commandSound;	
 	}
 	
-	public Integer getCost() {
-		return this.cost;
-	}
-	
 	public Integer getWarmDelay() {
 		return this.warmDelay;
 	}
@@ -904,6 +1000,13 @@ public class ItemMap {
 		return this.nodeLocation;	
 	}
 	
+	public String getLimitModes() {
+		if (this.limitModes != null) {
+			return this.limitModes;
+		}
+		return "NONE";
+	}
+	
 	public ItemCommand[] getCommands() {
 		return this.commands;
 	}
@@ -912,7 +1015,19 @@ public class ItemMap {
 		return this.type;
 	}
 	
-	public CommandSequence getCommandsSequence() {
+	public Integer getCommandCooldown() {
+		return this.cooldownSeconds;
+	}
+	
+	public Integer getCommandCost() {
+		return this.cost;
+	}
+	
+	public String getCommandParticle() {
+		return this.commandParticle;
+	}
+	
+	public CommandSequence getCommandSequence() {
 		return this.sequence;
 	}
 	
@@ -932,6 +1047,10 @@ public class ItemMap {
 		return this.bookPages;
 	}
 	
+	public List <List <String> > getListPages() {
+		return this.listPages;
+	}
+	
 	public int getMapID() {
 		return this.mapId;
 	}
@@ -948,8 +1067,24 @@ public class ItemMap {
 		return this.firework;
 	}
 	
+	public Type getFireworkType() {
+		return this.fireworkType;
+	}
+	
 	public int getFireworkPower() {
 		return this.power;
+	}
+	
+	public List<DyeColor> getFireworkColor() {
+		return this.fireworkColor;
+	}
+	
+	public boolean getFireworkTrail() {
+		return this.fireworkTrail;
+	}
+	
+	public boolean getFireworkFlicker() {
+		return this.fireworkFlicker;
 	}
 	
 	public DyeColor getChargeColor() {
@@ -968,8 +1103,12 @@ public class ItemMap {
 		return this.effect;
 	}
 	
-	public Color getLeatherColor() {
+	public String getLeatherColor() {
 		return this.leatherColor;
+	}
+	
+	public String getLeatherHex() {
+		return this.leatherHex;
 	}
 	
 	public String getNewNBTData() {
@@ -1079,15 +1218,13 @@ public class ItemMap {
 		return true;
 	}
 	
-	public boolean isEnabledRegion(String region) {
-		if (enabledRegions != null && !enabledRegions.isEmpty()) {
-			String[] regions = this.enabledRegions.replace(" ", "").split(",");
-			for (String region1: regions) {
-				if (region1.equalsIgnoreCase(region)) {
+	public Boolean inRegion(String region) {
+		if (this.enabledRegions == null) { return false; }
+			for (String compareRegion: this.enabledRegions) {
+				if (compareRegion.equalsIgnoreCase(region) || compareRegion.equalsIgnoreCase("UNDEFINED")) {
 					return true;
 				}
 			}
-		}
 		return false;
 	}
 	
@@ -1139,8 +1276,8 @@ public class ItemMap {
 		return this.noRepairing;
 	}
 	
-	public boolean isModifiyable() {
-		return this.allowModifications;
+	public boolean isItemChangable() {
+		return this.itemChangable;
 	}
 	
 	public boolean isAlwaysGive() {
@@ -1159,15 +1296,15 @@ public class ItemMap {
 		return this.overwritable;
 	}
 	
-	public boolean isPlacement() {
+	public boolean isPlaceable() {
 		return this.blockPlacement;
 	}
 	
-	public boolean isAttributes() {
+	public boolean isAttributesInfo() {
 		return this.hideAttributes;
 	}
 	
-	public boolean isDurability() {
+	public boolean isDurabilityBar() {
 		return this.hideDurability;
 	}
 	
@@ -1237,11 +1374,11 @@ public class ItemMap {
 			if (this.vanillaControl || ItemUtilities.dataTagsEnabled() && ServerHandler.hasSpecificUpdate("1_8") && ItemHandler.getNBTData(item) != null && Utils.containsIgnoreCase(ItemHandler.getNBTData(item), this.newNBTData)
 					|| this.legacySecret != null && item.hasItemMeta() && item.getItemMeta().hasDisplayName() && item.getItemMeta().getDisplayName().contains(this.legacySecret) || this.vanillaStatus) {
 				if (this.skullCheck(item)) {
-					if (isEnchantSimilar(item) || !item.getItemMeta().hasEnchants() && enchants.isEmpty() || this.isModifiyable()) {
+					if (isEnchantSimilar(item) || !item.getItemMeta().hasEnchants() && enchants.isEmpty() || this.isItemChangable()) {
 						if (this.material.toString().toUpperCase().contains("BOOK") 
 								&& this.isBookMeta(item) 
 								&& ((BookMeta) item.getItemMeta()).getPages().equals(((BookMeta) tempItem.getItemMeta()).getPages())
-								|| this.material.toString().toUpperCase().contains("BOOK") && !this.isBookMeta(item) || !this.material.toString().toUpperCase().contains("BOOK") || this.isModifiyable()) {
+								|| this.material.toString().toUpperCase().contains("BOOK") && !this.isBookMeta(item) || !this.material.toString().toUpperCase().contains("BOOK") || this.isItemChangable()) {
 							if (!this.vanillaControl || this.vanillaControl && statsCheck(item)) {
 								return true;
 							}
@@ -1293,6 +1430,7 @@ public class ItemMap {
 		}
 		return false;
 	}
+	
 	private boolean isEnchantSimilar(ItemStack item) {
 		if (item.getItemMeta().hasEnchants() && this.enchants != null && !this.enchants.isEmpty()) { 
 			ItemStack checkItem = new ItemStack(item.getType());
@@ -1314,7 +1452,7 @@ public class ItemMap {
 	}
 	
 	public boolean isCountSimilar(ItemStack item) {
-		if (item.getAmount() == count || ConfigHandler.getConfig("items.yml").getBoolean("items-RestrictCount") == false || this.isModifiyable()) {
+		if (item.getAmount() == count || ConfigHandler.getConfig("items.yml").getBoolean("items-RestrictCount") == false || this.isItemChangable()) {
 			return true;
 		}
 		return false;
@@ -1446,7 +1584,7 @@ public class ItemMap {
 				catch (NoSuchMethodError e) { mapmeta = Legacy.setMapID(mapmeta, this.mapId); }
 				this.tempItem.setItemMeta(mapmeta);
 			} else {
-				Legacy.setLegacyDurability(this.tempItem, (short) this.mapId);
+				Legacy.setLegacyDurability(this.tempItem, this.mapId);
 			}
 		}
 	}
@@ -1583,7 +1721,9 @@ public class ItemMap {
 	
 	private void setDye() {
 		if (this.leatherColor != null) {
-			((LeatherArmorMeta) this.tempMeta).setColor(this.leatherColor);
+			((LeatherArmorMeta) this.tempMeta).setColor(DyeColor.valueOf(this.leatherColor).getFireworkColor());
+		} else if (this.leatherHex != null) {
+			((LeatherArmorMeta) this.tempMeta).setColor(Utils.getColorFromHexColor(this.leatherHex));
 		}
 	}
 	
@@ -1705,7 +1845,7 @@ public class ItemMap {
 
     public boolean executeCommands(final Player player, final ItemStack itemCopy, final String action) {
 		boolean playerSuccess = false;
-    	if (this.commands != null && this.commands.length > 0 && !ItemCreator.isOpen(player) && !this.getWarmPending(player) && isExecutable(player, action) && !this.onCooldown(player) && this.isPlayerChargeable(player)) {
+    	if (this.commands != null && this.commands.length > 0 && !ConfigHandler.getItemCreator().isOpen(player) && !this.getWarmPending(player) && isExecutable(player, action) && !this.onCooldown(player) && this.isPlayerChargeable(player)) {
     		this.warmCycle(player, this, this.getWarmDelay(), player.getLocation(), itemCopy, action);
     	}
     	return playerSuccess;
@@ -1767,21 +1907,33 @@ public class ItemMap {
     	boolean playerSuccess = false;
     	ItemCommand[] itemCommands = this.commands;
     	for (int i = 0; i < itemCommands.length; i++) {
-			if (!playerSuccess) { playerSuccess = itemCommands[i].canExecute(player, action); }
+    		if (!playerSuccess) { playerSuccess = itemCommands[i].canExecute(player, action); }
 			else { break; }
 		}
     	return playerSuccess;
     }
     
+    private boolean getRandomMap(final HashMap < Integer, ItemCommand > randomCommands, ItemCommand[] itemCommands, final Player player, final String action) {
+    	Entry<?, ?> dedicatedMap = Utils.randomEntry(randomCommands);
+    	if (!((ItemCommand)dedicatedMap.getValue()).execute(player, action)) { 
+    		this.getRandomMap(randomCommands, itemCommands, player, action);
+    		return false;
+    	}
+    	return true;
+    }
+    
     private boolean isExecuted(final Player player, final String action) {
     	boolean playerSuccess = false;
     	ItemCommand[] itemCommands = this.commands;
+    	HashMap < Integer, ItemCommand > randomCommands = new HashMap < Integer, ItemCommand > ();
     	if (!this.subjectRemoval) {
     		for (int i = 0; i < itemCommands.length; i++) { 
-				if (!playerSuccess) { playerSuccess = itemCommands[i].execute(player, action); }
+        		if (this.sequence == CommandSequence.RANDOM) { randomCommands.put(Utils.getRandom(1, 100000), itemCommands[i]); }
+        		else if (!playerSuccess) { playerSuccess = itemCommands[i].execute(player, action); }
 				else { itemCommands[i].execute(player, action); }
 			}
     	}
+    	if (this.sequence == CommandSequence.RANDOM) { playerSuccess = this.getRandomMap(randomCommands, itemCommands, player, action); }
     	return playerSuccess;
     }
     
@@ -1909,7 +2061,145 @@ public class ItemMap {
 	}
 	
 	public void saveToConfig() {
-		
+		File itemFile =  new File (ItemJoin.getInstance().getDataFolder(), "items.yml");
+		FileConfiguration itemData = YamlConfiguration.loadConfiguration(itemFile);
+		if (ConfigHandler.getConfig("items.yml").getString("items." + this.configName) != null) { itemData.set("items." + this.configName, null); } 
+		if (!(this.dynamicMaterials != null && !this.dynamicMaterials.isEmpty())) { itemData.set("items." + this.configName + ".id", this.material.toString().toUpperCase()); }
+		else if (this.dynamicMaterials != null && !this.dynamicMaterials.isEmpty()) { 
+			for (int i = 0; i < this.dynamicMaterials.size(); i++) {
+				itemData.set("items." + this.configName + ".id." + (i + 1), this.dynamicMaterials.get(i)); 	
+			}
+		}
+		if (this.AllSlots != null && !this.AllSlots.isEmpty()) { 
+			String saveSlots = "";
+			for (String slot : this.AllSlots) { saveSlots += slot + ", "; }
+			itemData.set("items." + this.configName + ".slot", saveSlots.substring(0, saveSlots.length() - 2)); 
+		}
+		else if (this.CustomSlot == null) { itemData.set("items." + this.configName + ".slot", this.InvSlot); }
+		else { itemData.set("items." + this.configName + ".slot", this.CustomSlot); }
+		if (this.count > 1) { itemData.set("items." + this.configName + ".count", this.count); }
+		if (this.durability != null && this.durability > 0) { itemData.set("items." + this.configName + ".durability", this.durability); }
+		if (this.author != null && !this.author.isEmpty()) { itemData.set("items." + this.configName + ".author", this.author.replace("§", "&")); }
+		if (this.customName != null && !this.customName.isEmpty() && (this.dynamicNames == null || this.dynamicNames.isEmpty())) { itemData.set("items." + this.configName + ".name", this.customName.replace("§", "&")); }
+		else if (this.dynamicNames != null && !this.dynamicNames.isEmpty()) { 
+			for (int i = 0; i < this.dynamicNames.size(); i++) {
+				itemData.set("items." + this.configName + ".name." + (i + 1), this.dynamicNames.get(i)); 	
+			}
+		}
+		if (this.customLore != null && !this.customLore.isEmpty() && (this.dynamicLores == null || this.dynamicLores.isEmpty())) { itemData.set("items." + this.configName + ".lore", this.customLore); }
+		else if (this.dynamicLores != null && !this.dynamicLores.isEmpty()) { 
+			for (int i = 0; i < this.dynamicLores.size(); i++) {
+				itemData.set("items." + this.configName + ".lore." + (i + 1), this.dynamicLores.get(i)); 	
+			}
+		}
+		if (this.listPages != null && !this.listPages.isEmpty()) { 
+			for (int i = 0; i < this.listPages.size(); i++) {
+				itemData.set("items." + this.configName + ".pages." + (i + 1), this.listPages.get(i)); 	
+			}
+		}
+		if (this.probability != null && this.probability != -1 && this.probability != 0) { itemData.set("items." + this.configName + ".probability", this.probability); }
+		if (this.commands != null && this.commands.length > 0) {
+			List<String> multiClickAll = new ArrayList<String>();
+			List<String> leftClickAll = new ArrayList<String>();
+			List<String> rightClickAll = new ArrayList<String>();
+			List<String> multiClickAir = new ArrayList<String>();
+			List<String> multiClickBlock = new ArrayList<String>();
+			List<String> leftClickAir = new ArrayList<String>();
+			List<String> leftClickBlock = new ArrayList<String>();
+			List<String> rightClickAir = new ArrayList<String>();
+			List<String> rightClickBlock = new ArrayList<String>();
+			List<String> physical = new ArrayList<String>();
+			List<String> inventory = new ArrayList<String>();
+			for(ItemCommand command : this.commands) {
+				if (command.matchAction(ItemCommand.ActionType.MULTI_CLICK_ALL)) { multiClickAll.add(command.getCommand()); }
+				else if (command.matchAction(ItemCommand.ActionType.MULTI_CLICK_AIR)) { multiClickAir.add(command.getCommand()); }
+				else if (command.matchAction(ItemCommand.ActionType.MULTI_CLICK_BLOCK)) { multiClickBlock.add(command.getCommand()); }
+				else if (command.matchAction(ItemCommand.ActionType.RIGHT_CLICK_ALL)) { rightClickAll.add(command.getCommand()); }
+				else if (command.matchAction(ItemCommand.ActionType.RIGHT_CLICK_AIR)) { rightClickAir.add(command.getCommand()); }
+				else if (command.matchAction(ItemCommand.ActionType.RIGHT_CLICK_BLOCK)) { rightClickBlock.add(command.getCommand()); }
+				else if (command.matchAction(ItemCommand.ActionType.LEFT_CLICK_ALL)) { leftClickAll.add(command.getCommand()); }
+				else if (command.matchAction(ItemCommand.ActionType.LEFT_CLICK_AIR)) { leftClickAir.add(command.getCommand()); }
+				else if (command.matchAction(ItemCommand.ActionType.LEFT_CLICK_BLOCK)) { leftClickBlock.add(command.getCommand()); }
+				else if (command.matchAction(ItemCommand.ActionType.PHYSICAL)) { physical.add(command.getCommand()); }
+				else if (command.matchAction(ItemCommand.ActionType.INVENTORY)) { inventory.add(command.getCommand()); }
+			}
+			if (!multiClickAll.isEmpty()) { itemData.set("items." + this.configName + ".commands.multi-click", multiClickAll); }
+			if (!multiClickAir.isEmpty()) { itemData.set("items." + this.configName + ".commands.multi-click-air", multiClickAir); }
+			if (!multiClickBlock.isEmpty()) { itemData.set("items." + this.configName + ".commands.multi-click-block", multiClickBlock); }
+			if (!rightClickAll.isEmpty()) { itemData.set("items." + this.configName + ".commands.right-click", rightClickAll); }
+			if (!rightClickAir.isEmpty()) { itemData.set("items." + this.configName + ".commands.right-click-air", rightClickAir); }
+			if (!rightClickBlock.isEmpty()) { itemData.set("items." + this.configName + ".commands.right-click-block", rightClickBlock); }
+			if (!leftClickAll.isEmpty()) { itemData.set("items." + this.configName + ".commands.left-click", leftClickAll); }
+			if (!leftClickAir.isEmpty()) { itemData.set("items." + this.configName + ".commands.left-click-air", leftClickAir); }
+			if (!leftClickBlock.isEmpty()) { itemData.set("items." + this.configName + ".commands.left-click-block", leftClickBlock); }
+			if (!physical.isEmpty()) { itemData.set("items." + this.configName + ".commands.physical", physical); }
+			if (!inventory.isEmpty()) { itemData.set("items." + this.configName + ".commands.inventory", inventory); }
+		}
+		if (this.type != null) { itemData.set("items." + this.configName + ".commands-type", this.type.name()); }
+		if (this.commandSound != null) { itemData.set("items." + this.configName + ".commands-sound", this.commandSound.name()); }
+		if (this.commandParticle != null && !this.commandParticle.isEmpty()) { itemData.set("items." + this.configName + ".commands-particle", this.commandParticle); }
+		if (this.sequence != null && this.sequence != CommandSequence.SEQUENTIAL) { itemData.set("items." + this.configName + ".commands-sequence", this.sequence.name()); }
+		if (this.cost != null && this.cost != 0) { itemData.set("items." + this.configName + ".commands-cost", this.cost); }
+		if (this.warmDelay != null && this.warmDelay != 0) { itemData.set("items." + this.configName + ".commands-warmup", this.warmDelay); }
+		if (this.cooldownSeconds != null && this.cooldownSeconds != 0) { itemData.set("items." + this.configName + ".commands-cooldown", this.cooldownSeconds); }
+		if (this.cooldownMessage != null && !this.cooldownMessage.isEmpty()) { itemData.set("items." + this.configName + ".cooldown-message", this.cooldownMessage); }
+		if (this.enchants != null && !this.enchants.isEmpty()) { 
+			String enchantList = "";
+			for (Entry<String, Integer> enchantments : this.enchants.entrySet()) { enchantList += enchantments.getKey() + ":" + enchantments.getValue() + ", "; }
+			itemData.set("items." + this.configName + ".enchantments", enchantList.substring(0, enchantList.length() - 2)); 
+		}
+		if (this.fireworkType != null) { itemData.set("items." + this.configName + ".firework.type", this.fireworkType.name()); }
+		if (this.power != null && this.power != 0) { itemData.set("items." + this.configName + ".firework.power", this.power); }
+		if (this.fireworkFlicker) { itemData.set("items." + this.configName + ".firework.flicker", this.fireworkFlicker); }
+		if (this.fireworkTrail) { itemData.set("items." + this.configName + ".firework.trail", this.fireworkTrail); }
+		if (this.fireworkColor != null && !this.fireworkColor.isEmpty()) { 
+			String colorList = "";
+			for (DyeColor color : this.fireworkColor) { colorList += color.name() + ", "; }
+			itemData.set("items." + this.configName + ".firework.colors", colorList.substring(0, colorList.length() - 2)); 
+		}
+		if (this.interactCooldown != null && this.interactCooldown != 0) { itemData.set("items." + this.configName + ".use-cooldown", this.interactCooldown); }
+		if (this.itemflags != null && !this.itemflags.isEmpty()) { itemData.set("items." + this.configName + ".itemflags", this.itemflags); }
+		if (this.triggers != null && !this.triggers.isEmpty()) { itemData.set("items." + this.configName + ".triggers", this.triggers); }
+		if (this.limitModes != null && !this.limitModes.isEmpty()) { itemData.set("items." + this.configName + ".limit-modes", this.limitModes); }
+		if (this.permissionNode != null && !this.permissionNode.isEmpty()) { itemData.set("items." + this.configName + ".permission-node", this.permissionNode); }
+		if (this.leatherColor != null && !this.leatherColor.isEmpty()) { itemData.set("items." + this.configName + ".leather-color", this.leatherColor); }
+		else if (this.leatherHex != null && !this.leatherHex.isEmpty()) { itemData.set("items." + this.configName + ".leather-color", this.leatherHex); }
+		if (this.customMapImage != null && !this.customMapImage.isEmpty()) { itemData.set("items." + this.configName + ".custom-map-image", this.customMapImage); }
+		if (this.skullTexture != null && !this.skullTexture.isEmpty()&& (this.skullTexture == null || this.skullTexture.isEmpty())) { itemData.set("items." + this.configName + ".skull-texture", this.skullTexture); }
+		else if (this.dynamicTextures != null && !this.dynamicTextures.isEmpty()) { 
+			for (int i = 0; i < this.dynamicTextures.size(); i++) {
+				itemData.set("items." + this.configName + ".skull-texture." + (i + 1), this.dynamicTextures.get(i)); 	
+			}
+		}
+		if (this.skullOwner != null && !this.skullOwner.isEmpty()&& (this.dynamicOwners == null || this.dynamicOwners.isEmpty())) { itemData.set("items." + this.configName + ".skull-owner", this.skullOwner); }
+		else if (this.dynamicOwners != null && !this.dynamicOwners.isEmpty()) { 
+			for (int i = 0; i < this.dynamicOwners.size(); i++) {
+				itemData.set("items." + this.configName + ".skull-owner." + (i + 1), this.dynamicOwners.get(i)); 	
+			}
+		}
+		if (this.chargeColor != null) { itemData.set("items." + this.configName + ".charge-color", this.chargeColor.name()); }
+		if (this.bannerPatterns != null && !this.bannerPatterns.isEmpty()) { 
+			String bannerList = "";
+			for (Pattern pattern : this.bannerPatterns) { bannerList += pattern.getColor().name() + pattern.getPattern().name() + ", "; }
+			itemData.set("items." + this.configName + ".banner-meta", bannerList.substring(0, bannerList.length() - 2)); 
+		}
+		if (this.effect != null && !this.effect.isEmpty()) { 
+			String effectList = "";
+			for (PotionEffect effects : this.effect) { effectList += effects.getType().getName() + ":" + effects.getAmplifier() + ":" + effects.getDuration() + ", "; }
+			itemData.set("items." + this.configName + ".potion-effect", effectList.substring(0, effectList.length() - 2)); 
+		}
+		if (this.enabledRegions != null && !this.enabledRegions.isEmpty()) { 
+			String regionList = "";
+			for (String region : this.enabledRegions) { regionList += region + ", "; }
+			itemData.set("items." + this.configName + ".enabled-regions", regionList.substring(0, regionList.length() - 2)); 
+		}
+		if (this.enabledWorlds != null && !this.enabledWorlds.isEmpty()) { 
+			String worldList = "";
+			for (String world : this.enabledWorlds) { worldList += world + ", "; }
+			itemData.set("items." + this.configName + ".enabled-worlds", worldList.substring(0, worldList.length() - 2)); 
+		}
+		try { itemData.save(itemFile); ConfigHandler.getConfigData("items.yml"); ConfigHandler.getConfig("items.yml").options().copyDefaults(false); } 
+		catch (Exception e) { ItemJoin.getInstance().getServer().getLogger().severe("Could not save the new custom item " + this.configName + " to the items.yml data file!"); ServerHandler.sendDebugTrace(e); }	
 	}
 	
 	public enum CommandType { BOTH, INTERACT, INVENTORY; }

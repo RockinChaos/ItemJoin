@@ -1,7 +1,5 @@
 package me.RockinChaos.itemjoin;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -12,11 +10,7 @@ import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.command.*;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import me.RockinChaos.itemjoin.ItemJoin;
@@ -61,7 +55,6 @@ public class Commands implements CommandExecutor {
 			if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.use")) {
 				Language.dispatchMessage(sender, "");
 				Language.dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
-				Language.dispatchMessage(sender, "&a&l/ItemJoin Save <Name> &7- &eSave the held item to the config.");
 				Language.dispatchMessage(sender, "&a&l/ItemJoin List &7- &eCheck items you can get each what worlds.");
 				Language.dispatchMessage(sender, "&a&l/ItemJoin World &7- &eCheck what world you are in, debugging.");
 				Language.dispatchMessage(sender, "&a&l/ItemJoin Permissions &7- &eLists the permissions you have.");
@@ -289,9 +282,8 @@ public class Commands implements CommandExecutor {
 		} else if (args[0].equalsIgnoreCase("menu") || args[0].equalsIgnoreCase("creator")) {
 			if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.creator")) {
 				if (!(sender instanceof ConsoleCommandSender)) {
-					sender.sendMessage(Utils.colorFormat("&c&lITEMJOIN_ERROR: COMMAND NOT YET IMPLEMENTED, PENDING NEXT FEW SNAPSHOTS!"));
-					//ConfigHandler.getItemCreator().LaunchCreator(sender);
-					//Language.sendLangMessage("Commands.Default.creatorLaunched", sender);
+					ConfigHandler.getItemCreator().startMenu(sender);
+					Language.sendLangMessage("Commands.UI.creatorLaunched", sender);
 				} else if (sender instanceof ConsoleCommandSender) { Language.sendLangMessage("Commands.Default.notPlayer", sender); }
 			} else { Language.sendLangMessage("Commands.Default.noPermission", sender); }
 			return true;
@@ -391,75 +383,6 @@ public class Commands implements CommandExecutor {
 					Language.sendLangMessage("Commands.Disabled.globalPlayers", sender); 
 				} else {Language.sendLangMessage("Commands.Disabled.globalPlayersFailed", sender);  }
 			} else { Language.sendLangMessage("Commands.Default.noPermission", sender); }
-			return true;
-		} else if (args[0].equalsIgnoreCase("save")) {
-			if (args.length == 2) {
-				if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.save")) {
-					if (!(sender instanceof ConsoleCommandSender)) {
-						Player player = (Player) sender;
-						ItemStack item = new ItemStack(PlayerHandler.getPerfectHandItem(player, "HAND"));
-						if (item != null && item.getType() != Material.AIR) {
-							String world = player.getWorld().getName();
-							String type = item.getType().toString();
-							File itemsFile = new File(ItemJoin.getInstance().getDataFolder(), "items.yml");
-							FileConfiguration itemData = YamlConfiguration.loadConfiguration(itemsFile);
-							if (!ServerHandler.hasAquaticUpdate() && item.getType().getMaxDurability() < 30 && ItemHandler.getDurability(item) > 0) {
-								itemData.set("items." + args[1] + "." + "id", type + ":" + ItemHandler.getDurability(item));
-							} else { itemData.set("items." + args[1] + "." + "id", type); }
-							itemData.set("items." + args[1] + "." + "id", type);
-							itemData.set("items." + args[1] + "." + "slot", 0);
-							if (item.getAmount() > 1) {
-								itemData.set("items." + args[1] + "." + "count", item.getAmount());
-							}
-							if (item.getType().getMaxDurability() > 30 && ItemHandler.getDurability(item) != 0 && ItemHandler.getDurability(item) != (item.getType().getMaxDurability())) {
-								itemData.set("items." + args[1] + "." + "durability", ItemHandler.getDurability(item));
-							}		
-							if (item.hasItemMeta()) {
-								if (item.getItemMeta().hasDisplayName()) {
-									String name = item.getItemMeta().getDisplayName();
-									for (int i = 0; i <= 36; i++) {
-										name = name.replace(ConfigHandler.encodeSecretData(ItemUtilities.getNBTData(null) + i), "");
-										name = name.replace(ConfigHandler.encodeSecretData(ItemUtilities.getNBTData(null) + "Arbitrary" + i), "");
-									}
-									itemData.set("items." + args[1] + "." + "name", name.replace("§", "&"));
-								}
-								if (item.getItemMeta().hasLore()) {
-									List < String > oldLore = item.getItemMeta().getLore();
-									List < String > newLore = new ArrayList < String > ();
-									for (String stepLore: oldLore) {
-										newLore.add(stepLore.replace("§", "&"));
-									}
-									itemData.set("items." + args[1] + "." + "lore", newLore);
-								}
-								if (item.getItemMeta().hasEnchants()) {
-									List < String > enchantList = new ArrayList < String > ();
-									for (Enchantment e: item.getItemMeta().getEnchants().keySet()) {
-										int level = item.getItemMeta().getEnchants().get(e);
-										enchantList.add(ItemHandler.getEnchantName(e).toUpperCase() + ":" + level);
-									}
-									itemData.set("items." + args[1] + "." + "enchantment", Utils.convertStringList(enchantList));
-								}
-							}
-							itemData.set("items." + args[1] + "." + "itemflags", "death-drops");
-							itemData.set("items." + args[1] + "." + "triggers", "join");
-							itemData.set("items." + args[1] + "." + "enabled-worlds", world);
-							try { 
-								itemData.save(itemsFile);
-							} catch (IOException e) {
-								ItemJoin.getInstance().getServer().getLogger().severe("Could not save " + args[1] + " to the items.yml!");
-								ServerHandler.sendDebugTrace(e);
-							}
-							String[] placeHolders = Language.newString(); placeHolders[3] = args[1]; placeHolders[0] = world;
-							Language.sendLangMessage("Commands.Save.playerSavedItem", sender, placeHolders); 
-						} else { 
-							String[] placeHolders = Language.newString(); placeHolders[3] = args[1];
-							Language.sendLangMessage("Commands.Save.playerFailedSavedItem", sender, placeHolders); 
-						}
-					} else if (sender instanceof ConsoleCommandSender) { Language.sendLangMessage("Commands.Default.notPlayer", sender); }
-				} else { Language.sendLangMessage("Commands.Default.noPermission", sender); }
-			} else { if (sender instanceof ConsoleCommandSender) { Language.sendLangMessage("Commands.Default.notPlayer", sender); }
-				else {Language.sendLangMessage("Commands.Save.invalidSyntax", sender); }  
-			}
 			return true;
 		} else if (args[0].equalsIgnoreCase("world") || args[0].equalsIgnoreCase("worlds")) {
 			if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.use")) {

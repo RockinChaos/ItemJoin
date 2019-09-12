@@ -20,10 +20,9 @@ import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.giveitems.listeners.LimitSwitch;
 import me.RockinChaos.itemjoin.giveitems.listeners.PlayerJoin;
 import me.RockinChaos.itemjoin.giveitems.listeners.PlayerQuit;
-import me.RockinChaos.itemjoin.giveitems.listeners.RegionEnter;
+import me.RockinChaos.itemjoin.giveitems.listeners.PlayerGuard;
 import me.RockinChaos.itemjoin.giveitems.listeners.Respawn;
 import me.RockinChaos.itemjoin.giveitems.listeners.WorldSwitch;
-import me.RockinChaos.itemjoin.guicreator.ItemCreator;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
@@ -56,7 +55,7 @@ public class ItemUtilities {
 
 	public static boolean isAllowed(Player player, ItemStack item, String itemflag) {
 		ItemMap fetched = getMappedItem(item, player.getWorld());
-		if (fetched != null && !ItemCreator.isOpen(player) && fetched.isAllowedItem(player, item, itemflag)) {
+		if (fetched != null && !ConfigHandler.getItemCreator().isOpen(player) && fetched.isAllowedItem(player, item, itemflag)) {
 			return false;
 		}
 		return true;
@@ -120,6 +119,24 @@ public class ItemUtilities {
 	
 	public static void clearItems() {
 		items = new ArrayList < ItemMap >();
+	}
+	
+	public static boolean containsWorld(final String world, final ItemMap itemMap) {
+		for (String enabledWorld: itemMap.getEnabledWorlds()) {
+			if (enabledWorld.equalsIgnoreCase(world) || enabledWorld.equalsIgnoreCase("ALL") || enabledWorld.equalsIgnoreCase("GLOBAL")) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public static boolean containsRegion(final String region, final ItemMap itemMap) {
+		for (String enabledRegion: itemMap.getEnabledRegions()) {
+			if (enabledRegion.equalsIgnoreCase(region) || enabledRegion.equalsIgnoreCase("UNDEFINED")) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	public static void updateItems(Player player, boolean newAnimation) {
@@ -621,14 +638,14 @@ public class ItemUtilities {
 		|| !ConfigHandler.getConfig("config.yml").getString("Active-Commands.enabled-worlds").equalsIgnoreCase("FALSE"))) && !isListenerEnabled(PlayerJoin.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerJoin(), ItemJoin.getInstance()); }
 		if (!itemMap.isGiveOnDisabled() && itemMap.isGiveOnRespawn() && !isListenerEnabled(Respawn.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Respawn(), ItemJoin.getInstance()); }
 		if (!itemMap.isGiveOnDisabled() && itemMap.isGiveOnWorldChange() && !isListenerEnabled(WorldSwitch.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new WorldSwitch(), ItemJoin.getInstance()); }
-		if (!itemMap.isGiveOnDisabled() && (itemMap.isGiveOnRegionEnter() || itemMap.isTakeOnRegionLeave()) && !isListenerEnabled(RegionEnter.class.getSimpleName()) && ConfigHandler.getDepends().getGuard().guardEnabled()) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new RegionEnter(), ItemJoin.getInstance()); }
+		if (!itemMap.isGiveOnDisabled() && (itemMap.isGiveOnRegionEnter() || itemMap.isTakeOnRegionLeave()) && !isListenerEnabled(PlayerGuard.class.getSimpleName()) && ConfigHandler.getDepends().getGuard().guardEnabled()) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerGuard(), ItemJoin.getInstance()); }
 		if (!itemMap.isGiveOnDisabled() && itemMap.isUseOnLimitSwitch() && !isListenerEnabled(LimitSwitch.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new LimitSwitch(), ItemJoin.getInstance()); }
 		if ((itemMap.isAnimated() || itemMap.isDynamic()) && !isListenerEnabled(PlayerQuit.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerQuit(), ItemJoin.getInstance()); }
 		if (itemMap.isInventoryClose() && !isListenerEnabled(InventoryClose.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new InventoryClose(), ItemJoin.getInstance()); }
 		if ((itemMap.isMovement() || itemMap.isInventoryClose()) && !isListenerEnabled(InventoryClick.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new InventoryClick(), ItemJoin.getInstance()); }
 		if ((itemMap.isDeathDroppable() || itemMap.isSelfDroppable()) && !isListenerEnabled(Drops.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Drops(), ItemJoin.getInstance()); }
 		if ((itemMap.isCancelEvents() || (itemMap.getCommands() != null && itemMap.getCommands().length != 0)) && !isListenerEnabled(Interact.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Interact(), ItemJoin.getInstance()); }
-		if ((itemMap.isPlacement() || itemMap.isCountLock()) && !isListenerEnabled(Placement.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Placement(), ItemJoin.getInstance()); }
+		if ((itemMap.isPlaceable() || itemMap.isCountLock()) && !isListenerEnabled(Placement.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Placement(), ItemJoin.getInstance()); }
 		if (itemMap.isCustomConsumable() && !isListenerEnabled(Consumes.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Consumes(), ItemJoin.getInstance()); }
 		if ((itemMap.isItemRepairable() || itemMap.isItemCraftable()) && !isListenerEnabled(Recipes.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Recipes(), ItemJoin.getInstance()); }
 		if (itemMap.isItemStore() || itemMap.isItemModify()) {
