@@ -31,6 +31,7 @@ public class InventoryClick implements Listener {
 	  	if (Utils.containsIgnoreCase(ConfigHandler.isPreventModify(), "true") || Utils.containsIgnoreCase(ConfigHandler.isPreventModify(), player.getWorld().getName())
 		  			|| Utils.containsIgnoreCase(ConfigHandler.isPreventModify(), "ALL") || Utils.containsIgnoreCase(ConfigHandler.isPreventModify(), "GLOBAL")) {
 	  		if (ConfigHandler.isPreventOBypass() && player.isOp() || ConfigHandler.isPreventCBypass() && PlayerHandler.isCreativeMode(player)) { } 
+	  		else if (player.getOpenInventory().getTitle().contains("§") || player.getOpenInventory().getTitle().contains("&")) { }
 	  		else { event.setCancelled(true); }
 	  	}
 	}
