@@ -1,6 +1,8 @@
 package me.RockinChaos.itemjoin.utils;
 
 import java.util.EnumSet;
+import java.util.Map;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -15,6 +17,7 @@ import org.bukkit.map.MapView;
 import org.bukkit.material.MaterialData;
 
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
@@ -116,6 +119,14 @@ public class Legacy {
         	com.sk89q.worldedit.Vector wgVector = new com.sk89q.worldedit.Vector(loc.getX(), loc.getY(), loc.getZ());
         	return rm.get(world).getApplicableRegions(wgVector);
         } else { return rm.get(world).getApplicableRegions(loc); }
+	}
+	
+	public static Map<String, ProtectedRegion> getLegacyRegions(World world) {
+        com.sk89q.worldguard.bukkit.WorldGuardPlugin wg = (com.sk89q.worldguard.bukkit.WorldGuardPlugin) Bukkit.getServer().getPluginManager().getPlugin("WorldGuard");
+        com.sk89q.worldguard.bukkit.RegionContainer rm = wg.getRegionContainer();
+        if (hasLegacyWorldEdit()) {
+        	return rm.get(world).getRegions();
+        } else { return rm.get(world).getRegions(); }
 	}
 	
 	public static boolean hasLegacyWorldEdit() {

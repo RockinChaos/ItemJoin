@@ -20,7 +20,7 @@ import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.utils.Legacy;
 import me.RockinChaos.itemjoin.utils.Utils;
 
-public class RegionEnter implements Listener {
+public class PlayerGuard implements Listener {
 	private static HashMap < Player, String > playersInRegions = new HashMap < Player, String > ();
 	private static List < String > localeRegions = new ArrayList < String > ();
 
@@ -36,7 +36,7 @@ public class RegionEnter implements Listener {
 		ItemUtilities.safeSet(player, "Region-Enter");
 		for (ItemMap item: ItemUtilities.getItems()) {
 			if (item.isTakeOnRegionLeave() || item.isGiveOnRegionEnter()) {
-				if (item.isEnabledRegion(region) && item.inWorld(player.getWorld()) && item.hasPermission(player)) {
+				if (item.inRegion(region) && item.inWorld(player.getWorld()) && item.hasPermission(player)) {
 					item.removeFrom(player, 0);
 				}
 			}
@@ -48,7 +48,7 @@ public class RegionEnter implements Listener {
 		ItemUtilities.safeSet(player, "Region-Enter");
 		String Probable = ItemUtilities.getProbabilityItem(player);
 		for (ItemMap item: ItemUtilities.getItems()) {
-			if (item.isGiveOnRegionEnter() && item.isEnabledRegion(region) && item.inWorld(player.getWorld())
+			if (item.isGiveOnRegionEnter() && item.inRegion(region) && item.inWorld(player.getWorld())
 					&& ItemUtilities.isChosenProbability(item, Probable) && item.hasPermission(player) && ItemUtilities.isObtainable(player, item, session)) {
 					item.giveTo(player, false, 0);
 				}
