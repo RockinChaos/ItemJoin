@@ -611,8 +611,8 @@ public class ItemUtilities {
 				if (amount != 0 || itemMap.isAlwaysGive()) {
 					if (noTriggers) { item.setAmount(amount); }
 					if (itemMap.hasItem(player)) { player.getInventory().addItem(item);
-					} else { player.getOpenInventory().getTopInventory ().setItem(getSlotConversion(itemMap.getSlot()), item); }
-				} else { player.getOpenInventory().getTopInventory ().setItem(getSlotConversion(itemMap.getSlot()), item); }
+					} else { player.getOpenInventory().getTopInventory().setItem(getSlotConversion(itemMap.getSlot()), item); }
+				} else { player.getOpenInventory().getTopInventory().setItem(getSlotConversion(itemMap.getSlot()), item); }
 				ServerHandler.sendDebugMessage("Given the Item; [" + itemMap.getConfigName() + "]");
 				saveSQLItemData(player, itemMap);
 			}

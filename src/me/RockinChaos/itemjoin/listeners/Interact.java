@@ -62,7 +62,9 @@ public class Interact implements Listener {
 		ItemStack item = event.getCurrentItem();
 		Player player = (Player) event.getWhoClicked();
 		String action = event.getAction().toString();
-		if (setupCommands(player, item, action)) { event.setCancelled(true); }
+		String slot = event.getSlot() + "";
+		if (event.getClickedInventory().getType().name().equalsIgnoreCase("CRAFTING")) { slot = "CRAFTING[" + slot + "]"; }
+		if (setupCommands(player, item, action, slot)) { event.setCancelled(true); }
 	}
 	
 	@EventHandler
@@ -75,7 +77,7 @@ public class Interact implements Listener {
 			String action = Action.RIGHT_CLICK_BLOCK.name();
 			ItemMap itemMap = ItemUtilities.getMappedItem(PlayerHandler.getHandItem(player), player.getWorld());
 			if (itemMap != null && itemMap.isSimilar(item)) {
-				if (setupCommands(player, item, action)) { event.setCancelled(true); }
+				if (setupCommands(player, item, action, player.getInventory().getHeldItemSlot() + "")) { event.setCancelled(true); }
 			}
 		}
 	}
@@ -90,7 +92,7 @@ public class Interact implements Listener {
 			String action = Action.RIGHT_CLICK_BLOCK.name();
 			ItemMap itemMap = ItemUtilities.getMappedItem(PlayerHandler.getHandItem(player), player.getWorld());
 			if (itemMap != null && itemMap.isSimilar(item)) {
-				if (setupCommands(player, item, action)) { event.setCancelled(true); }
+				if (setupCommands(player, item, action, player.getInventory().getHeldItemSlot() + "")) { event.setCancelled(true); }
 			}
 		}
 	}
@@ -104,7 +106,7 @@ public class Interact implements Listener {
 				|| !PlayerHandler.isAdventureMode(player)) {
 			ItemMap itemMap = ItemUtilities.getMappedItem(PlayerHandler.getHandItem(player), player.getWorld());
 			if (itemMap != null && itemMap.isSimilar(item)) {
-				if (setupCommands(player, item, action)) { event.setCancelled(true); }
+				if (setupCommands(player, item, action, player.getInventory().getHeldItemSlot() + "")) { event.setCancelled(true); }
 			}
 		}
 	}
@@ -114,14 +116,14 @@ public class Interact implements Listener {
 		Player player = event.getPlayer();
 		ItemStack item = PlayerHandler.getHandItem(player);
 		if (PlayerHandler.isAdventureMode(player)) {
-			if (setupCommands(player, item, "LEFT_CLICK_AIR")) { event.setCancelled(true); }
+			if (setupCommands(player, item, "LEFT_CLICK_AIR", player.getInventory().getHeldItemSlot() + "")) { event.setCancelled(true); }
 		}
 	}
 	
-	private boolean setupCommands(Player player, ItemStack item, String action) {
+	private boolean setupCommands(Player player, ItemStack item, String action, String slot) {
 		ItemMap itemMap = ItemUtilities.getMappedItem(item, player.getWorld());
 		if (itemMap != null && itemMap.inWorld(player.getWorld()) && itemMap.hasPermission(player)) {
-			return itemMap.executeCommands(player, item, action);
+			return itemMap.executeCommands(player, item, action, slot);
 		}
 		return false;
 	}

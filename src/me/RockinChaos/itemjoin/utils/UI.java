@@ -1344,7 +1344,7 @@ public class UI {
 	
 	private void executorPane(final Player player, final ItemMap itemMap, final ActionType action) {
 		Interface executorPane = new Interface(false, 2, this.GUIName);
-		executorPane.addButton(new Button(this.fillerPaneGItem));
+		executorPane.addButton(new Button(ItemHandler.getItem("289", 1, false, "&f")));
 		executorPane.addButton(new Button(ItemHandler.getItem("BOOK", 1, false, "&e&lPlayer", "&7", "&7*Executes the command", "&7as the player."), event -> {
 			player.closeInventory();
 			String[] placeHolders = Language.newString();
@@ -1428,12 +1428,39 @@ public class UI {
 			Language.sendLangMessage("Commands.UI.inputSet", player, placeHolders);
 			this.commandListPane(event.getPlayer(), itemMap, action);
 		}));
+		executorPane.addButton(new Button(ItemHandler.getItem((ServerHandler.hasAquaticUpdate() ? "REPEATER" : "356"), 1, false, "&e&lSwap-Item", "&7", "&7*Swaps the item to another defined item."), event -> this.swapPane(player, itemMap, action)));
 		executorPane.addButton(new Button(ItemHandler.getItem("CLOCK", 1, false, "&e&lDelay", "&7", "&7*Adds a delay between command lines."), event -> this.delayPane(player, itemMap, action)));
-		executorPane.addButton(new Button(this.fillerPaneGItem));
 		executorPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the command lines menu."), event -> this.commandListPane(player, itemMap, action)));
 		executorPane.addButton(new Button(this.fillerPaneBItem), 7);
 		executorPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the command lines menu."), event -> this.commandListPane(player, itemMap, action)));
 		executorPane.open(player);
+	}
+	
+	private void swapPane(final Player player, final ItemMap itemMap, final ActionType action) {
+		Interface swapPane = new Interface(true, 6, this.GUIName);
+		List < ItemMap > items = new ArrayList < ItemMap > ();
+		items.addAll(ItemUtilities.getItems());
+		swapPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the executors menu."), event -> {
+			this.executorPane(player, itemMap, action);
+		}));
+		for (ItemMap item : items) {
+			if (item.isAnimated() && item.getDynamicLores() != null || item.isDynamic() && item.getDynamicLores() != null) {
+				List < List < String >> dynamicLores = new ArrayList < List < String >> ();
+				for (List < String > dynamicLore: item.getDynamicLores()) {
+					dynamicLore.add("&7");
+					dynamicLore.add("&6---------------------------");
+					dynamicLore.add("&7*Click to set as a swap-item.");
+					dynamicLore.add("&9&lNode: &a" + item.getConfigName());
+					dynamicLore.add("&7");
+					dynamicLores.add(dynamicLore);
+				}
+				item.setDynamicLores(dynamicLores);
+			}
+			swapPane.addButton(new Button(ItemHandler.addLore(item.getTempItem(), "&7", "&6---------------------------", "&7*Click to set as a swap-item.", "&9&lNode: &a" + item.getConfigName(), "&7"), event -> { 
+			this.modifyCommands(itemMap, ItemCommand.fromString("swap-item: " + item.getConfigName(), action, CommandType.BOTH, 0L), true);
+			this.commandListPane(player, itemMap, action); }));
+		}
+		swapPane.open(player);
 	}
 	
 	private void delayPane(final Player player, final ItemMap itemMap, final ActionType action) {

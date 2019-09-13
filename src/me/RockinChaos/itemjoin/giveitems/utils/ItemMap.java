@@ -1834,6 +1834,15 @@ public class ItemMap {
 		this.setAnimations(player);
 	}
 	
+	public void giveTo(Player player, int amount, String slot) {
+		this.updateItem(player);
+		ItemStack item = this.tempItem.clone();
+		if (amount > 0) { item.setAmount(amount); }
+		if (Utils.containsIgnoreCase(slot, "CRAFTING")) { player.getOpenInventory().getTopInventory().setItem(ItemUtilities.getSlotConversion(slot), item);} 
+		else { player.getInventory().setItem(Integer.parseInt(slot), item); }
+		this.setAnimations(player);
+	}
+	
 	public void setAnimations(Player player) {
 		if (this.isAnimated() && this.getAnimationHandler().get(player) == null
 				|| isDynamic() && this.getAnimationHandler().get(player) == null) {
@@ -1843,15 +1852,15 @@ public class ItemMap {
 		}
 	}
 
-    public boolean executeCommands(final Player player, final ItemStack itemCopy, final String action) {
+    public boolean executeCommands(final Player player, final ItemStack itemCopy, final String action, final String slot) {
 		boolean playerSuccess = false;
     	if (this.commands != null && this.commands.length > 0 && !ConfigHandler.getItemCreator().isOpen(player) && !this.getWarmPending(player) && isExecutable(player, action) && !this.onCooldown(player) && this.isPlayerChargeable(player)) {
-    		this.warmCycle(player, this, this.getWarmDelay(), player.getLocation(), itemCopy, action);
+    		this.warmCycle(player, this, this.getWarmDelay(), player.getLocation(), itemCopy, action, slot);
     	}
     	return playerSuccess;
     }
 	
-	private void warmCycle(final Player player, final ItemMap itemMap, final int warmCount, final Location location, final ItemStack itemCopy, final String action) {
+	private void warmCycle(final Player player, final ItemMap itemMap, final int warmCount, final Location location, final ItemStack itemCopy, final String action, final String slot) {
 		if (warmCount != 0) {
 			if (itemMap.warmDelay == warmCount) { 
 				String[] placeHolders = Language.newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = Utils.translateLayout(itemMap.getCustomName(), player); 
@@ -1864,7 +1873,7 @@ public class ItemMap {
 					if (itemMap.warmLocation(player, location)) {
 						String[] placeHolders = Language.newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = Utils.translateLayout(itemMap.getCustomName(), player); 
 						Language.sendLangMessage("General.itemWarming", player, placeHolders);
-						itemMap.warmCycle(player, itemMap, warmCount - 1, location, itemCopy, action);	
+						itemMap.warmCycle(player, itemMap, warmCount - 1, location, itemCopy, action, slot);	
 					} else { 
 						itemMap.delWarmPending(player); 
 						String[] placeHolders = Language.newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = Utils.translateLayout(itemMap.getCustomName(), player); 
@@ -1879,11 +1888,11 @@ public class ItemMap {
 				@Override
 				public void run() {
 					if (!player.isDead()) {
-						if (isExecuted(player, action)) { 
+						if (isExecuted(player, action, slot, itemCopy)) { 
 							itemMap.withdrawBalance(player, itemMap.cost);
 			    			itemMap.playSound(player);
 			    			itemMap.playParticle(player);
-							itemMap.removeDisposable(player, itemCopy);
+							itemMap.removeDisposable(player, itemCopy, false);
 							itemMap.addPlayerOnCooldown(player);
 						}
 					} else {
@@ -1913,27 +1922,30 @@ public class ItemMap {
     	return playerSuccess;
     }
     
-    private boolean getRandomMap(final HashMap < Integer, ItemCommand > randomCommands, ItemCommand[] itemCommands, final Player player, final String action) {
+    private boolean getRandomMap(final HashMap < Integer, ItemCommand > randomCommands, ItemCommand[] itemCommands, final Player player, final String action, final String slot) {
     	Entry<?, ?> dedicatedMap = Utils.randomEntry(randomCommands);
-    	if (!((ItemCommand)dedicatedMap.getValue()).execute(player, action)) { 
-    		this.getRandomMap(randomCommands, itemCommands, player, action);
+    	if (!((ItemCommand)dedicatedMap.getValue()).execute(player, action, slot)) { 
+    		this.getRandomMap(randomCommands, itemCommands, player, action, slot);
     		return false;
     	}
     	return true;
     }
     
-    private boolean isExecuted(final Player player, final String action) {
+    private boolean isExecuted(final Player player, final String action, final String slot, final ItemStack itemCopy) {
     	boolean playerSuccess = false;
     	ItemCommand[] itemCommands = this.commands;
     	HashMap < Integer, ItemCommand > randomCommands = new HashMap < Integer, ItemCommand > ();
     	if (!this.subjectRemoval) {
+    		boolean isSwap = false;
     		for (int i = 0; i < itemCommands.length; i++) { 
         		if (this.sequence == CommandSequence.RANDOM) { randomCommands.put(Utils.getRandom(1, 100000), itemCommands[i]); }
-        		else if (!playerSuccess) { playerSuccess = itemCommands[i].execute(player, action); }
-				else { itemCommands[i].execute(player, action); }
+        		else if (!playerSuccess) { playerSuccess = itemCommands[i].execute(player, action, slot); }
+				else { itemCommands[i].execute(player, action, slot); }
+        		if (Utils.containsIgnoreCase(itemCommands[i].getCommand(), "swap-item")) { isSwap = true; }
 			}
+    		if (isSwap) { this.removeDisposable(player, itemCopy, true); }
     	}
-    	if (this.sequence == CommandSequence.RANDOM) { playerSuccess = this.getRandomMap(randomCommands, itemCommands, player, action); }
+    	if (this.sequence == CommandSequence.RANDOM) { playerSuccess = this.getRandomMap(randomCommands, itemCommands, player, action, slot); }
     	return playerSuccess;
     }
     
@@ -1983,32 +1995,32 @@ public class ItemMap {
 		}
 	}
 	
-	private void removeDisposable(final Player player, final ItemStack itemCopy) {
-		if (this.disposable) {
-			setSubjectRemoval(true);
+	private void removeDisposable(final Player player, final ItemStack itemCopy, final boolean allItems) {
+		if (this.disposable || allItems) {
+			if (!allItems) { setSubjectRemoval(true); }
 			Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
 				@Override
 				public void run() {
 					if (PlayerHandler.isCreativeMode(player)) { player.closeInventory(); }
 					if (isSimilar(player.getItemOnCursor())) {
-						player.setItemOnCursor(newItem(player.getItemOnCursor()));
-						setSubjectRemoval(false);
+						player.setItemOnCursor(newItem(player.getItemOnCursor(), allItems));
+						if (!allItems) { setSubjectRemoval(false); }
 					} else {
 						int itemSlot = player.getInventory().getHeldItemSlot();
-						if (isSimilar(player.getInventory().getItem(itemSlot))) { player.getInventory().setItem(itemSlot, newItem(player.getInventory().getItem(itemSlot))); setSubjectRemoval(false);}
+						if (isSimilar(player.getInventory().getItem(itemSlot))) { player.getInventory().setItem(itemSlot, newItem(player.getInventory().getItem(itemSlot), allItems)); if (!allItems) { setSubjectRemoval(false); }}
 						else { 
 							for (int i = 0; i < player.getInventory().getSize(); i++) {
 								if (isSimilar(player.getInventory().getItem(i))) {
-									player.getInventory().setItem(i, newItem(player.getInventory().getItem(i)));
-									setSubjectRemoval(false);
+									player.getInventory().setItem(i, newItem(player.getInventory().getItem(i), allItems));
+									if (!allItems) { setSubjectRemoval(false); }
 									break;
 								}
 							}
 						}
 						if (isSubjectRemoval() && PlayerHandler.isCreativeMode(player)) {
-							player.getInventory().addItem(newItem(itemCopy));
+							player.getInventory().addItem(newItem(itemCopy, allItems));
 							player.setItemOnCursor(new ItemStack(Material.AIR));
-							setSubjectRemoval(false);
+							if (!allItems) { setSubjectRemoval(false); }
 						}
 					}
 				}
@@ -2016,9 +2028,9 @@ public class ItemMap {
 		}
 	}
 	
-	private ItemStack newItem(ItemStack itemCopy) {
+	private ItemStack newItem(ItemStack itemCopy, final boolean allItems) {
 		ItemStack item = new ItemStack(itemCopy);
-		if (item.getAmount() > 1 && item.getAmount() != 1) { item.setAmount(item.getAmount() - 1); } 
+		if (item.getAmount() > 1 && item.getAmount() != 1 && !allItems) { item.setAmount(item.getAmount() - 1); } 
 		else { item = new ItemStack(Material.AIR); }
 		return item;
 	}

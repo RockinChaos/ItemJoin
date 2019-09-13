@@ -35,9 +35,9 @@ public class ItemCommand {
 		else if (commandType.equalsIgnoreCase("BOTH")) { this.cmdType = CommandType.BOTH; }
 	}
 	
-	public boolean execute(final Player player, final String action) {
+	public boolean execute(final Player player, final String action, final String slot) {
 		if (this.command == null || this.command.length() == 0 || !this.cmdType.hasAction(action) || !this.action.hasAction(action)) { return false; }
-		sendDispatch(player, this.type);
+		sendDispatch(player, this.type, slot);
 		return true;
 	}
 	
@@ -93,7 +93,7 @@ public class ItemCommand {
 		}, 20);
 	}
 	
-	private void sendDispatch(final Player player, final Type cmdtype) {
+	private void sendDispatch(final Player player, final Type cmdtype, final String slot) {
 		final World world = player.getWorld();
 		this.setCounting(player, true); this.stopCycle(player, world);
 		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
@@ -108,7 +108,7 @@ public class ItemCommand {
 						case MESSAGE: dispatchMessageCommands(player); break;
 						case SERVERSWITCH: dispatchServerCommands(player); break;
 						case BUNGEE: dispatchBungeeCordCommands(player); break;
-						case SWAPITEM: dispatchSwapItem(player); break;
+						case SWAPITEM: dispatchSwapItem(player, slot); break;
 						case DEFAULT: dispatchPlayerCommands(player); break;
 						case DELAY: break;
 						default: dispatchPlayerCommands(player); break;
@@ -192,8 +192,15 @@ public class ItemCommand {
 		}
 	}
 	
-	private void dispatchSwapItem(Player player) {
-		try { } 
+	private void dispatchSwapItem(Player player, String slot) {
+		try {
+			for (ItemMap item : ItemUtilities.getItems()) {
+				if (item.getConfigName().equalsIgnoreCase(this.command)) {
+					item.giveTo(player, 0, slot);
+					break;
+				}
+			}
+		} 
 		catch (Exception e) {
 			ServerHandler.sendErrorMessage("&cThere was an issue executing an item's command to swap an items attributes, if this continues please report it to the developer!");
 			ServerHandler.sendDebugTrace(e);
@@ -315,7 +322,7 @@ public class ItemCommand {
 		else if (input.startsWith("server:")) { input = input.substring(7); type = Type.SERVERSWITCH; } 
 		else if (input.startsWith("bungee:")) { input = input.substring(7); type = Type.BUNGEE; } 
 		else if (input.startsWith("message:")) { input = input.substring(8); type = Type.MESSAGE; } 
-		else if (input.startsWith("swapitem:")) { input = input.substring(9); type = Type.SWAPITEM; }
+		else if (input.startsWith("swap-item:")) { input = input.substring(10); type = Type.SWAPITEM; }
 		else if (input.startsWith("delay:")) { input = input.substring(6); type = Type.DELAY; }
 		
 		input = input.trim();
@@ -331,7 +338,7 @@ public class ItemCommand {
 	
 	private enum Type {
 		DEFAULT("default: ", 0), CONSOLE("console: ", 1), OP("op: ", 2), PLAYER("player: ", 3), 
-		SERVERSWITCH("server: ", 4), MESSAGE("message: ", 5), BUNGEE("bungee: ", 6), SWAPITEM("swapitem: ", 7), DELAY("delay: ", 8);
+		SERVERSWITCH("server: ", 4), MESSAGE("message: ", 5), BUNGEE("bungee: ", 6), SWAPITEM("swap-item: ", 7), DELAY("delay: ", 8);
 		
 		private final String name;
 		private Type(final String name, final int intType) { this.name = name; }
