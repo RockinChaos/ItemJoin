@@ -1,6 +1,5 @@
 package me.RockinChaos.itemjoin.giveitems.listeners;
 
-import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -39,24 +38,19 @@ public class LimitSwitch implements Listener {
 	
 	private void setItems(final Player player, final GameMode newMode) {
 		ItemUtilities.safeSet(player, "Limit-Modes");
-		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
-			@Override
-			public void run() {
-				String Probable = ItemUtilities.getProbabilityItem(player);
-				final int session = Utils.getRandom(1, 100000);
-				for (ItemMap item : ItemUtilities.getItems()) { 
-					if (item.isUseOnLimitSwitch() && item.inWorld(player.getWorld()) 
-							&& ItemUtilities.isChosenProbability(item, Probable) && ConfigHandler.getSQLData().isEnabled(player)
-							&& item.hasPermission(player) && ItemUtilities.isObtainable(player, item, session)) {
-						item.giveTo(player, false, 0); 
-						item.setAnimations(player);
-					} else if (item.isUseOnLimitSwitch() && !item.isLimitMode(newMode) && item.inWorld(player.getWorld()) && item.hasItem(player)) {
-						item.removeFrom(player, 0);
-					}
+		String Probable = ItemUtilities.getProbabilityItem(player);
+		final int session = Utils.getRandom(1, 100000);
+			for (ItemMap item : ItemUtilities.getItems()) { 
+				if (item.isUseOnLimitSwitch() && item.inWorld(player.getWorld()) 
+						&& ItemUtilities.isChosenProbability(item, Probable) && ConfigHandler.getSQLData().isEnabled(player)
+						&& item.hasPermission(player) && ItemUtilities.isObtainable(player, item, session)) {
+					item.giveTo(player, false, 0); 
+					item.setAnimations(player);
+				} else if (item.isUseOnLimitSwitch() && !item.isLimitMode(newMode) && item.inWorld(player.getWorld()) && item.hasItem(player)) {
+					item.removeFrom(player, 0);
 				}
-				ItemUtilities.sendFailCount(player, session);
-				PlayerHandler.delayUpdateInventory(player, 15L);
 			}
-		}, 1L);
+		ItemUtilities.sendFailCount(player, session);
+		PlayerHandler.delayUpdateInventory(player, 15L);
 	}
 }

@@ -37,22 +37,28 @@ public class Respawn implements Listener {
 	
 	private void setItems(final Player player) {
 		ItemUtilities.safeSet(player, "Respawn");
-		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
-			@Override
-			public void run() {
-				String Probable = ItemUtilities.getProbabilityItem(player);
-				final int session = Utils.getRandom(1, 100000);
-				for (ItemMap item : ItemUtilities.getItems()) { 
-					if (item.isGiveOnRespawn() && item.inWorld(player.getWorld()) 
-							&& ItemUtilities.isChosenProbability(item, Probable) && ConfigHandler.getSQLData().isEnabled(player)
-							&& item.hasPermission(player) && ItemUtilities.isObtainable(player, item, session)) {
-						item.giveTo(player, false, 0); 
-					}
-					item.setAnimations(player);
+		if (ConfigHandler.getItemDelay() != 0) { 
+			Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
+				@Override
+				public void run() { 
+					runTask(player); 
 				}
-				ItemUtilities.sendFailCount(player, session);
-				PlayerHandler.delayUpdateInventory(player, 15L);
+			}, ConfigHandler.getItemDelay());
+		} else { this.runTask(player); }
+	}
+	
+	private void runTask(final Player player) {
+		String Probable = ItemUtilities.getProbabilityItem(player);
+		final int session = Utils.getRandom(1, 100000);
+		for (ItemMap item : ItemUtilities.getItems()) { 
+			if (item.isGiveOnRespawn() && item.inWorld(player.getWorld()) 
+					&& ItemUtilities.isChosenProbability(item, Probable) && ConfigHandler.getSQLData().isEnabled(player)
+					&& item.hasPermission(player) && ItemUtilities.isObtainable(player, item, session)) {
+				item.giveTo(player, false, 0); 
 			}
-		}, ConfigHandler.getItemDelay());
+			item.setAnimations(player);
+		}
+		ItemUtilities.sendFailCount(player, session);
+		PlayerHandler.delayUpdateInventory(player, 15L);
 	}
 }
