@@ -31,7 +31,9 @@ public class Interact implements Listener {
 	 private void onInteraction(PlayerInteractEvent event) {
 	 	ItemStack item = event.getItem();
 	 	Player player = event.getPlayer();
-	 	if (event.hasItem() && event.getAction() != Action.PHYSICAL && !ItemUtilities.isAllowed(player, item, "cancel-events")) {
+	 	if (event.hasItem() && event.getAction() != Action.PHYSICAL && !ItemUtilities.isAllowed(player, item, "cancel-events") 
+	 			|| ServerHandler.hasCombatUpdate() && event.getHand().equals(org.bukkit.inventory.EquipmentSlot.OFF_HAND) 
+	 			&& event.getAction() != Action.PHYSICAL && !ItemUtilities.isAllowed(player, PlayerHandler.getMainHandItem(event.getPlayer()), "cancel-events")) {
 	 		event.setCancelled(true);
 	 		PlayerHandler.updateInventory(player);
 	 	}
