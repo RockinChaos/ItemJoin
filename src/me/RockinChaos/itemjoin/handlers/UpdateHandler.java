@@ -24,7 +24,7 @@ public class UpdateHandler {
     private final String KEY = ("key=98BE0FE67F88AB82B4C197FAF1DC3B69206EFDCC4D3B80FC83A00037510B99B4&resource=" + PROJECTID);
     private String versionExact = ItemJoin.getInstance().getDescription().getVersion();
     private boolean betaVersion = versionExact.contains("-SNAPSHOT") || versionExact.contains("-BETA") || versionExact.contains("-ALPHA");
-    private String localeVersionRaw = versionExact.replaceAll("[a-z]", "").replace("-SNAPSHOT", "").replace("-BETA", "").replace("-ALPHA", "").replace("-RELEASE", "");
+    private String localeVersionRaw = versionExact.split("-")[0];
     private String latestVersionRaw;
     private double localeVersion = Double.parseDouble(localeVersionRaw.replace(".", ""));
     private double latestVersion;
@@ -47,7 +47,7 @@ public class UpdateHandler {
     public void forceUpdates(CommandSender sender) {
     	if (this.updateNeeded(sender)) {
     		ServerHandler.sendMessage(sender, "&aAn update has been found!");
-    		ServerHandler.sendMessage(sender, "&aAttempting to update from " + "&ev" + localeVersionRaw + " &ato the new "  + "&ev" + latestVersionRaw);
+    		ServerHandler.sendMessage(sender, "&aAttempting to update from " + "&ev" + this.localeVersionRaw + " &ato the new "  + "&ev" + this.latestVersionRaw);
     		try {
     			URL downloadUrl = new URL(this.AUTOHOST + this.AUTOQUERY);
     			HttpURLConnection httpConnection = (HttpURLConnection) downloadUrl.openConnection();

@@ -146,28 +146,30 @@ public class Utils {
 	}
 	
     public static String getNearbyPlayer(Player player, int range) {
-    	ArrayList < Location > sight = new ArrayList < Location > ();
-    	ArrayList < Entity > entities = (ArrayList < Entity > ) player.getNearbyEntities(range, range, range);
-    	Location origin = player.getEyeLocation();
-    	sight.add(origin.clone().add(origin.getDirection()));
-    	sight.add(origin.clone().add(origin.getDirection().multiply(range)));
-    	sight.add(origin.clone().add(origin.getDirection().multiply(range + 3)));
-    	for (int i = 0; i < sight.size(); i++) {
-    		for (int k = 0; k < entities.size(); k++) {
-    			if (Math.abs(entities.get(k).getLocation().getX() - sight.get(i).getX()) < 1.3) {
-    				if (Math.abs(entities.get(k).getLocation().getY() - sight.get(i).getY()) < 1.5) {
-    					if (Math.abs(entities.get(k).getLocation().getZ() - sight.get(i).getZ()) < 1.3) {
-    						if (entities.get(k) instanceof Player) {
-    							if (ServerHandler.hasSpecificUpdate("1_8")) {
-    								return entities.get(k).getName();
-    							} else {
-    								return ((Player) entities.get(k)).getName();
-    							}
-    						}
-    					}
-    				}
-    			}
-    		}
+    	if (player != null) {
+	    	ArrayList < Location > sight = new ArrayList < Location > ();
+	    	ArrayList < Entity > entities = (ArrayList < Entity > ) player.getNearbyEntities(range, range, range);
+	    	Location origin = player.getEyeLocation();
+	    	sight.add(origin.clone().add(origin.getDirection()));
+	    	sight.add(origin.clone().add(origin.getDirection().multiply(range)));
+	    	sight.add(origin.clone().add(origin.getDirection().multiply(range + 3)));
+	    	for (int i = 0; i < sight.size(); i++) {
+	    		for (int k = 0; k < entities.size(); k++) {
+	    			if (Math.abs(entities.get(k).getLocation().getX() - sight.get(i).getX()) < 1.3) {
+	    				if (Math.abs(entities.get(k).getLocation().getY() - sight.get(i).getY()) < 1.5) {
+	    					if (Math.abs(entities.get(k).getLocation().getZ() - sight.get(i).getZ()) < 1.3) {
+	    						if (entities.get(k) instanceof Player) {
+	    							if (ServerHandler.hasSpecificUpdate("1_8")) {
+	    								return entities.get(k).getName();
+	    							} else {
+	    								return ((Player) entities.get(k)).getName();
+	    							}
+	    						}
+	    					}
+	    				}
+	    			}
+	    		}
+	    	}
     	}
     	return "INVALID";
     }
