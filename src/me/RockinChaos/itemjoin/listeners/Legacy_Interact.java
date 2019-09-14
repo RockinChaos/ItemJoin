@@ -7,16 +7,16 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerAnimationEvent;
-import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+
 import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 
-public class Interact implements Listener {
+public class Legacy_Interact implements Listener {
 	
 	 @EventHandler(priority = EventPriority.LOWEST)
 	 private void onInteractCancel(PlayerInteractEvent event) {
@@ -70,21 +70,6 @@ public class Interact implements Listener {
 			}
 		}
 	}
-	
-	@EventHandler
-	private void onTargetEntityCommands(PlayerInteractAtEntityEvent event) {
-		if (event.getRightClicked().toString().equalsIgnoreCase("CraftArmorStand")) {
-			ItemStack item;
-			if (ServerHandler.hasCombatUpdate()) { item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().toString()); } 
-			else { item = PlayerHandler.getPerfectHandItem(event.getPlayer(), ""); }
-			Player player = event.getPlayer();
-			String action = Action.RIGHT_CLICK_BLOCK.name();
-			ItemMap itemMap = ItemUtilities.getMappedItem(PlayerHandler.getHandItem(player), player.getWorld());
-			if (itemMap != null && itemMap.isSimilar(item)) {
-				if (this.setupCommands(player, item, action, String.valueOf(player.getInventory().getHeldItemSlot()))) { event.setCancelled(true); }
-			}
-		}
-	}
 
 	@EventHandler
 	private void onInteractCommands(PlayerInteractEvent event) {
@@ -95,7 +80,7 @@ public class Interact implements Listener {
 				|| !PlayerHandler.isAdventureMode(player)) {
 			ItemMap itemMap = ItemUtilities.getMappedItem(PlayerHandler.getHandItem(player), player.getWorld());
 			if (itemMap != null && itemMap.isSimilar(item)) {
-				if (this.setupCommands(player, item, action, String.valueOf(player.getInventory().getHeldItemSlot()))) { event.setCancelled(true); }
+				if (this.setupCommands(player, item, action, "")) { event.setCancelled(true); }
 			}
 		}
 	}

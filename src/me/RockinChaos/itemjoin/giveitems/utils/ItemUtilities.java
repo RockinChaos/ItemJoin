@@ -32,6 +32,7 @@ import me.RockinChaos.itemjoin.listeners.Drops;
 import me.RockinChaos.itemjoin.listeners.Interact;
 import me.RockinChaos.itemjoin.listeners.InventoryClick;
 import me.RockinChaos.itemjoin.listeners.InventoryClose;
+import me.RockinChaos.itemjoin.listeners.Legacy_Interact;
 import me.RockinChaos.itemjoin.listeners.Legacy_Storable;
 import me.RockinChaos.itemjoin.listeners.Placement;
 import me.RockinChaos.itemjoin.listeners.Recipes;
@@ -644,13 +645,16 @@ public class ItemUtilities {
 		if (itemMap.isInventoryClose() && !isListenerEnabled(InventoryClose.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new InventoryClose(), ItemJoin.getInstance()); }
 		if ((itemMap.isMovement() || itemMap.isInventoryClose()) && !isListenerEnabled(InventoryClick.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new InventoryClick(), ItemJoin.getInstance()); }
 		if ((itemMap.isDeathDroppable() || itemMap.isSelfDroppable()) && !isListenerEnabled(Drops.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Drops(), ItemJoin.getInstance()); }
-		if ((itemMap.isCancelEvents() || (itemMap.getCommands() != null && itemMap.getCommands().length != 0)) && !isListenerEnabled(Interact.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Interact(), ItemJoin.getInstance()); }
+		if ((itemMap.isCancelEvents() || (itemMap.getCommands() != null && itemMap.getCommands().length != 0))) { 
+			if (!ServerHandler.hasSpecificUpdate("1_8") && !isListenerEnabled(Legacy_Interact.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Legacy_Interact(), ItemJoin.getInstance()); }
+			else if (ServerHandler.hasSpecificUpdate("1_8") && !isListenerEnabled(Interact.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Interact(), ItemJoin.getInstance()); }
+		}
 		if ((itemMap.isPlaceable() || itemMap.isCountLock()) && !isListenerEnabled(Placement.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Placement(), ItemJoin.getInstance()); }
 		if (itemMap.isCustomConsumable() && !isListenerEnabled(Consumes.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Consumes(), ItemJoin.getInstance()); }
 		if ((itemMap.isItemRepairable() || itemMap.isItemCraftable()) && !isListenerEnabled(Recipes.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Recipes(), ItemJoin.getInstance()); }
 		if (itemMap.isItemStore() || itemMap.isItemModify()) {
 			if (!ServerHandler.hasSpecificUpdate("1_8") && !isListenerEnabled(Legacy_Storable.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Legacy_Storable(), ItemJoin.getInstance());} 
-			else if (!isListenerEnabled(Storable.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Storable(), ItemJoin.getInstance()); }
+			else if (ServerHandler.hasSpecificUpdate("1_8") && !isListenerEnabled(Storable.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Storable(), ItemJoin.getInstance()); }
 		}
 		if (itemMap.isMovement() && !isListenerEnabled(SwitchHands.class.getSimpleName()) && ServerHandler.hasCombatUpdate() && Reflection.getEventClass("player.PlayerSwapHandItemsEvent") != null) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new SwitchHands(), ItemJoin.getInstance()); }
 	}

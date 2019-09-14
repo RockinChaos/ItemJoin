@@ -7,14 +7,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
-import java.util.Set;
-
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.Statistic;
-import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Entity;
@@ -150,30 +146,30 @@ public class Utils {
 	}
 	
     public static String getNearbyPlayer(Player player, int range) {
-    	if (ServerHandler.hasSpecificUpdate("1_8")) {
-	    	try {
-		        ArrayList<Entity> entities = (ArrayList<Entity>) player.getNearbyEntities(range, range, range);
-		        ArrayList<Block> sightBlock = (ArrayList<Block>) player.getLineOfSight((Set<Material>) null, range);
-		        ArrayList<Location> sight = new ArrayList<Location>();
-		        for (int i = 0;i<sightBlock.size();i++)
-		            sight.add(sightBlock.get(i).getLocation());
-		        for (int i = 0;i<sight.size();i++) {
-		            for (int k = 0;k<entities.size();k++) {
-		                if (Math.abs(entities.get(k).getLocation().getX()-sight.get(i).getX())<1.3) {
-		                    if (Math.abs(entities.get(k).getLocation().getY()-sight.get(i).getY())<1.5) {
-		                        if (Math.abs(entities.get(k).getLocation().getZ()-sight.get(i).getZ())<1.3) {
-		                        	if (entities.get(k) instanceof Player) {
-		                        	   return entities.get(k).getName();
-		                        	}
-		                        }
-		                    }
-		                }
-		            }
-		        }
-		        return "INVALID";
-	    	} catch (NullPointerException e) { return "INVALID"; }
+    	ArrayList < Location > sight = new ArrayList < Location > ();
+    	ArrayList < Entity > entities = (ArrayList < Entity > ) player.getNearbyEntities(range, range, range);
+    	Location origin = player.getEyeLocation();
+    	sight.add(origin.clone().add(origin.getDirection()));
+    	sight.add(origin.clone().add(origin.getDirection().multiply(range)));
+    	sight.add(origin.clone().add(origin.getDirection().multiply(range + 3)));
+    	for (int i = 0; i < sight.size(); i++) {
+    		for (int k = 0; k < entities.size(); k++) {
+    			if (Math.abs(entities.get(k).getLocation().getX() - sight.get(i).getX()) < 1.3) {
+    				if (Math.abs(entities.get(k).getLocation().getY() - sight.get(i).getY()) < 1.5) {
+    					if (Math.abs(entities.get(k).getLocation().getZ() - sight.get(i).getZ()) < 1.3) {
+    						if (entities.get(k) instanceof Player) {
+    							if (ServerHandler.hasSpecificUpdate("1_8")) {
+    								return entities.get(k).getName();
+    							} else {
+    								return ((Player) entities.get(k)).getName();
+    							}
+    						}
+    					}
+    				}
+    			}
+    		}
     	}
-    	 return "INVALID";
+    	return "INVALID";
     }
 	
 	public static String translateLayout(String name, Player player, String...placeHolder) {

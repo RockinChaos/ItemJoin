@@ -118,6 +118,10 @@ public class ItemMap {
 	private boolean customConsumable = false;
 	private Map < String, Integer > enchants = new HashMap < String, Integer > ();
 	
+	private Map < String, Long > playersOnInteractCooldown = new HashMap < String, Long > ();
+	private HashMap < String, Long > storedSpammedPlayers = new HashMap < String, Long > ();
+	private int spamtime = 1;
+	
 	
 //  ============================================== //
 //         NBT Information for each item.          //
@@ -2035,19 +2039,51 @@ public class ItemMap {
 		return item;
 	}
 	
-	private boolean onCooldown(Player player) {
-		int cdmillis = this.cooldownSeconds * 1000;
+	public boolean onInteractCooldown(Player player) {
 		long playersCooldownList = 0L;
-		if (playersOnCooldown.containsKey(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player))) {
-			playersCooldownList = playersOnCooldown.get(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player));
+		if (this.playersOnInteractCooldown.containsKey(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + this.configName)) {
+			playersCooldownList = this.playersOnInteractCooldown.get(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + this.configName);
+		}
+		if (System.currentTimeMillis() - playersCooldownList >= this.interactCooldown * 1000) {
+			this.playersOnInteractCooldown.put(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + this.configName, System.currentTimeMillis());
+			return false;
+		} else {
+			if (this.onSpamCooldown(player)) {
+				this.storedSpammedPlayers.put(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + this.configName, System.currentTimeMillis());
+				if (this.cooldownMessage != null && !this.cooldownMessage.isEmpty()) {
+					int timeLeft = (int)(this.interactCooldown - ((System.currentTimeMillis() - playersCooldownList) / 1000));
+					player.sendMessage(Utils.translateLayout(this.cooldownMessage.replace("%timeleft%", String.valueOf(timeLeft)).replace("%item%", this.customName), player));
+				}
+			}
+			return true;
+		}
+	}
+	
+	private boolean onSpamCooldown(Player player) {
+		boolean interactSpam = ConfigHandler.getConfig("items.yml").getBoolean("items-Spamming");
+		if (interactSpam != true) {
+			long playersCooldownList = 0L;
+			if (this.storedSpammedPlayers.containsKey(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + this.configName)) {
+				playersCooldownList = this.storedSpammedPlayers.get(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + this.configName);
+			}
+			if (System.currentTimeMillis() - playersCooldownList >= this.spamtime * 1000) { } 
+			else { return false; }
+		}
+		return true;
+	}
+	
+	private boolean onCooldown(Player player) {
+		long playersCooldownList = 0L;
+		if (this.playersOnCooldown.containsKey(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player))) {
+			playersCooldownList = this.playersOnCooldown.get(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player));
 		}
 		
-		if (System.currentTimeMillis() - playersCooldownList >= cdmillis) { return false; } 
-			if (this.cooldownMessage != null && onCooldownTick(player)) {
+		if (System.currentTimeMillis() - playersCooldownList >= this.cooldownSeconds * 1000) { return false; } 
+		else if (this.cooldownMessage != null && onCooldownTick(player)) {
 				String cooldownmsg = (this.cooldownMessage.replace("%timeleft%", String.valueOf((this.cooldownSeconds - ((System.currentTimeMillis() - playersCooldownList) / 1000)))).replace("%item%", this.customName).replace("%itemraw%", ItemHandler.getName(this.tempItem)));
 				cooldownmsg = Utils.translateLayout(cooldownmsg, player);
 				player.sendMessage(cooldownmsg);
-				addPlayerOnCooldownTick(player);
+				this.addPlayerOnCooldownTick(player);
 			}
 		return true;
 	}

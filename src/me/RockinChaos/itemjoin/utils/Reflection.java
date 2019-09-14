@@ -1,7 +1,6 @@
 package me.RockinChaos.itemjoin.utils;
 
 import java.lang.reflect.Method;
-
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.map.MapView;
 
@@ -51,7 +50,7 @@ public class Reflection {
 		return null;
 	}
 	
-	public static Class<?> getMapViewNMS(String name) {
+	private static Class<?> getBukkitNMS(String name) {
 		try {
 			return Class.forName("org.bukkit." + name);
 		} catch (Exception e) {
@@ -62,14 +61,14 @@ public class Reflection {
 	
 	public static short getMapID(MapView view) {
 		try {
-			Object mapID = getMapNMS("MapView").getMethod("getId").invoke(view);
+			Object mapID = getMapNMS("MapView").getMethod("getId").invoke(view); // check this
 			return (short)mapID; 
 		} catch (Exception ex) { return 1; }
 	}
 
 	public static MapView getMapView(int id) {
 		try {
-			Object mapView = getMapViewNMS("Bukkit").getMethod("getMap", short.class).invoke(getMapNMS("MapView"), (short)id);
+			Object mapView = getBukkitNMS("Bukkit").getMethod("getMap", short.class).invoke(getMapNMS("MapView"), (short)id);
 			return (MapView)mapView; 
 		} catch (Exception ex) { return null; }
 	}
