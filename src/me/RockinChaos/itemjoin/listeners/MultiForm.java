@@ -8,7 +8,7 @@ import org.bukkit.inventory.InventoryHolder;
 
 import me.RockinChaos.itemjoin.utils.interfaces.Interface;
 
-public class Misc implements Listener {
+public class MultiForm implements Listener {
   	
 //  ============================================== //
 //          Handlers for virtualInventory          //

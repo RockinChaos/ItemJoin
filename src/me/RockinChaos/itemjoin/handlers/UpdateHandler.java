@@ -37,7 +37,7 @@ public class UpdateHandler {
      */
     public UpdateHandler(File file){
        this.jarLink = file;
-       this.checkUpdates(ItemJoin.getInstance().getServer().getConsoleSender());
+       this.checkUpdates(ItemJoin.getInstance().getServer().getConsoleSender(), true);
     }
     
     /**
@@ -45,7 +45,7 @@ public class UpdateHandler {
      * Downloads and write the new data to the plugin jar file.
      */
     public void forceUpdates(CommandSender sender) {
-    	if (this.updateNeeded(sender)) {
+    	if (this.updateNeeded(sender, false)) {
     		ServerHandler.sendMessage(sender, "&aAn update has been found!");
     		ServerHandler.sendMessage(sender, "&aAttempting to update from " + "&ev" + this.localeVersionRaw + " &ato the new "  + "&ev" + this.latestVersionRaw);
     		try {
@@ -76,17 +76,14 @@ public class UpdateHandler {
     			ServerHandler.sendMessage(sender, "&cPlease try again later, if you continue to see this please contact the plugin developer.");
     			ServerHandler.sendDebugTrace(e);
     		}
-    	} else if (!this.updatesAllowed) {
-    		ServerHandler.sendMessage(sender, "&cUpdate checking is currently disabled in the config.yml");
-    		ServerHandler.sendMessage(sender, "&cIf you wish to use the auto update feature, you will need to enable it.");
-        }
+    	}
     }
     
     /**
      * Checks to see if an update is required, notifying the console window and online op players.
      */
-    public void checkUpdates(CommandSender sender) {
-    	if (this.updateNeeded(sender)) {
+    public void checkUpdates(CommandSender sender, boolean onStart) {
+    	if (this.updateNeeded(sender, onStart) && this.updatesAllowed) {
     		if (this.betaVersion) {
     			ServerHandler.sendMessage(sender, "&cYour current version: &bv" + this.localeVersionRaw + "-SNAPSHOT");
     			ServerHandler.sendMessage(sender, "&cThis &bSNAPSHOT &cis outdated and a release version is now available.");
@@ -97,7 +94,7 @@ public class UpdateHandler {
     		ServerHandler.sendMessage(sender, "&aGet it from: https://www.spigotmc.org/resources/itemjoin.12661/history");
     		ServerHandler.sendMessage(sender, "&aIf you wish to auto update, please type /ItemJoin AutoUpdate");
     		this.sendNotifications();
-    	} else {
+    	} else if (this.updatesAllowed) {
     		if (this.betaVersion) {
     			ServerHandler.sendMessage(sender, "&aYou are running a SNAPSHOT!");
     			ServerHandler.sendMessage(sender, "&aIf you find any bugs please report them!");
@@ -109,7 +106,7 @@ public class UpdateHandler {
     /**
      * Directly checks to see if the spigotmc host has an update available.
      */
-    private Boolean updateNeeded(CommandSender sender) {
+    private Boolean updateNeeded(CommandSender sender, boolean onStart) {
     	if (this.updatesAllowed) {
     		ServerHandler.sendMessage(sender, "&aChecking for updates...");
     		try {
@@ -133,7 +130,10 @@ public class UpdateHandler {
     			ServerHandler.sendDebugTrace(e);
     			return false;
     		}
-    	}
+    	} else if (!onStart) {
+    		ServerHandler.sendMessage(sender, "&cUpdate checking is currently disabled in the config.yml");
+    		ServerHandler.sendMessage(sender, "&cIf you wish to use the auto update feature, you will need to enable it.");
+        }
     	return false;
     }
     
