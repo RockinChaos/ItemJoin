@@ -1,5 +1,5 @@
 main: me.RockinChaos.itemjoin.ItemJoin
-version: 5.0.4-SNAPSHOT
+version: 5.0.4-SNAPSHOT-b${project.version}
 name: ItemJoin
 author: RockinChaos
 api-version: 1.13
