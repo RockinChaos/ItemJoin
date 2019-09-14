@@ -792,7 +792,7 @@ public class Commands implements CommandExecutor {
 		} else if (args[0].equalsIgnoreCase("updates") || args[0].equalsIgnoreCase("update")) {
 			if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.updates")) {
 				Language.sendLangMessage("Commands.Updates.checking", sender);
-				ConfigHandler.getUpdater().checkUpdates(sender);
+				ConfigHandler.getUpdater().checkUpdates(sender, false);
 			} else { Language.sendLangMessage("Commands.Default.noPermission", sender); }
 			return true;
 		} else if (args[0].equalsIgnoreCase("AutoUpdate")) {
