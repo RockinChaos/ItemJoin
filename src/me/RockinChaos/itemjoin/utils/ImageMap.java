@@ -25,6 +25,11 @@ public class ImageMap extends MapRenderer {
 	private boolean isGIF = false;
 	private List<Integer> Rendered = new ArrayList<Integer> ();
 	
+	
+	/*
+	 * Catch Exception for gif reader (line 42) is temporary.
+	 * Resolves issues with the KNOWN java bug; java.lang.ArrayIndexOutOfBoundsException: 4096
+	 */
 	public ImageMap(String image, int imageID) {
 		this.id = imageID;
 		this.image = image;
@@ -35,7 +40,7 @@ public class ImageMap extends MapRenderer {
 				    ImageReader reader = ImageIO.getImageReadersByFormatName("gif").next();
 				    ImageInputStream ciis = ImageIO.createImageInputStream(new File(ItemJoin.getInstance().getDataFolder(), String.valueOf(image)));
 				    reader.setInput(ciis, false);
-				    for (int i = 0; i < reader.getNumImages(true); i++) { this.imgCacheList.add(reader.read(i)); }
+				    for (int i = 0; i < reader.getNumImages(true); i++) { try { this.imgCacheList.add(reader.read(i)); } catch (Exception e) {} }
 				    ciis.close();
 				} else { this.imgCache = ImageIO.read(new File(ItemJoin.getInstance().getDataFolder(), String.valueOf(image))); }
 			} catch (IOException e) { ServerHandler.sendDebugTrace(e); }
