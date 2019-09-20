@@ -3,9 +3,7 @@ package me.RockinChaos.itemjoin.listeners;
 import java.util.List;
 import java.util.ListIterator;
 
-import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
-import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -21,11 +19,8 @@ public class Drops implements Listener {
 		ItemStack item = event.getItemDrop().getItemStack();
 		final Player player = event.getPlayer();
 		if (!ItemUtilities.isAllowed(player, item, "self-drops")) {
-			ItemMap itemMap = ItemUtilities.getMappedItem(item, player.getWorld());
-			if (!ItemHandler.isCraftingSlot(itemMap.getSlot())) {
-				if (PlayerHandler.isCreativeMode(player)) { player.closeInventory(); } 
-				event.setCancelled(true);
-			}
+			if (PlayerHandler.isCreativeMode(player)) { player.closeInventory(); } 
+			event.setCancelled(true);
 		}
 	}
 

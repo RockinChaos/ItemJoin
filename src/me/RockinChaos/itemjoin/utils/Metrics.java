@@ -162,8 +162,7 @@ public class Metrics {
         JSONObject data = new JSONObject();
 
         String pluginName = plugin.getDescription().getName();
-        String pluginVersion = plugin.getDescription().getVersion();
-
+        String pluginVersion = plugin.getDescription().getVersion().replace("-b${env.BUILD_NUMBER}", "").split("-R")[0];
         data.put("pluginName", pluginName);
         data.put("pluginVersion", pluginVersion);
         JSONArray customCharts = new JSONArray();

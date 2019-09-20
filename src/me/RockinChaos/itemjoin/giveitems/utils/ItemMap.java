@@ -75,6 +75,7 @@ public class ItemMap {
 	private List<String> AllSlots = new ArrayList<String>();
 	private Integer InvSlot = 0;
 	private String CustomSlot = null;
+	private boolean craftingItem = false;
 	
 	private boolean giveNext = false;
 	private boolean dropFull = false;
@@ -231,6 +232,7 @@ public class ItemMap {
         this.nodeLocation = ConfigHandler.getItemSection(internalName);
         this.configName = internalName;
         this.setSlot(slot);
+        if (ItemHandler.isCraftingSlot(slot)) { this.craftingItem = true; }
         
         
         if (this.nodeLocation != null) {
@@ -1157,6 +1159,10 @@ public class ItemMap {
 			return true;
 		}
 		return false;
+	}
+	
+	public boolean isCraftingItem() {
+		return this.craftingItem;
 	}
 	
 	public boolean isHeadDatabase() {
