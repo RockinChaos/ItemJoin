@@ -18,58 +18,18 @@ commands:
           /itemjoin
           Example: /itemjoin
    itemjoin help:
-      description: Displays the first page of the available help menu.
+      description: Displays the a page of the available help menu.
       permission: itemjoin.use
       usage: |
           /itemjoin help
           Example: /itemjoin help
-   itemjoin help 2:
-      description: Displays the second page of the available help menu.
-      permission: itemjoin.use
-      usage: |
-          /itemjoin help 2
           Example: /itemjoin help 2
-   itemjoin help 3:
-      description: Displays the third page of the available help menu.
-      permission: itemjoin.use
-      usage: |
-          /itemjoin help 3
           Example: /itemjoin help 3
-   itemjoin help 4:
-      description: Displays the fourth page of the available help menu.
-      permission: itemjoin.use
-      usage: |
-          /itemjoin help 4
           Example: /itemjoin help 4
-   itemjoin help 5:
-      description: Displays the fifth page of the available help menu.
-      permission: itemjoin.use
-      usage: |
-          /itemjoin help 5
           Example: /itemjoin help 5
-   itemjoin help 6:
-      description: Displays the sixth page of the available help menu.
-      permission: itemjoin.use
-      usage: |
-          /itemjoin help 6
           Example: /itemjoin help 6
-   itemjoin help 7:
-      description: Displays the seventh page of the available help menu.
-      permission: itemjoin.use
-      usage: |
-          /itemjoin help 7
           Example: /itemjoin help 7
-   itemjoin help 8:
-      description: Displays the eighth page of the available help menu.
-      permission: itemjoin.use
-      usage: |
-          /itemjoin help 8
           Example: /itemjoin help 8
-   itemjoin help 9:
-      description: Displays the ninth page of the available help menu.
-      permission: itemjoin.use
-      usage: |
-          /itemjoin help 9
           Example: /itemjoin help 9
    itemjoin reload:
       description: Reloads all plugin configuration files and caches any new data.
@@ -82,7 +42,7 @@ commands:
       permission: itemjoin.menu
       usage: |
           /itemjoin menu
-			Example: /itemjoin menu - The creator menu has been launched!
+          Example: /itemjoin menu - The creator menu has been launched!
    itemjoin info:
       description: Displays necessary held item information, such as material type.
       permission: itemjoin.use
@@ -124,7 +84,7 @@ commands:
       permission: itemjoin.permissions
       usage: |
           /itemjoin permissions 2
-			Example: /itemjoin permissions 2 - You have the permissions ultra-item.
+          Example: /itemjoin permissions 2 - You have the permissions ultra-item.
    itemjoin get:
       description: Gives the item and amount you specified from the players inventory.
       permission: itemjoin.get
@@ -178,8 +138,8 @@ commands:
       permission: itemjoin.get
       usage: |
           /itemjoin getall
-           Example: /itemjoin getall - You have received all of the ItemJoin items.
-           Example: /itemjoin getall RockinChaos - You have given RockinChaos all of the ItemJoin items that are available.
+          Example: /itemjoin getall - You have received all of the ItemJoin items.
+          Example: /itemjoin getall RockinChaos - You have given RockinChaos all of the ItemJoin items that are available.
    itemjoin removeall:
       description: Removes all custom items from the players inventory.
       permission: itemjoin.remove
