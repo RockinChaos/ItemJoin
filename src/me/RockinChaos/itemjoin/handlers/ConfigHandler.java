@@ -19,6 +19,7 @@ import me.RockinChaos.itemjoin.utils.UI;
 import me.RockinChaos.itemjoin.utils.Language;
 import me.RockinChaos.itemjoin.utils.Metrics;
 import me.RockinChaos.itemjoin.utils.Reflection;
+import me.RockinChaos.itemjoin.utils.TabComplete;
 import me.RockinChaos.itemjoin.utils.Utils;
 import me.RockinChaos.itemjoin.utils.YAMLGenerator;
 import me.RockinChaos.itemjoin.utils.sqlite.SQLData;
@@ -48,8 +49,8 @@ public class ConfigHandler {
 	}
 	
 	public static void registerEvents() {
-	    ItemJoin.getInstance().getCommand("itemjoin").setExecutor(new Commands());
-		ItemJoin.getInstance().getCommand("ij").setExecutor(new Commands());
+	    ItemJoin.getInstance().getCommand("itemjoin").setExecutor(new Commands()); ItemJoin.getInstance().getCommand("itemjoin").setTabCompleter(new TabComplete());
+		ItemJoin.getInstance().getCommand("ij").setExecutor(new Commands()); ItemJoin.getInstance().getCommand("ij").setTabCompleter(new TabComplete());
 		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new MultiForm(), ItemJoin.getInstance());
 		if ((!Utils.containsIgnoreCase(ConfigHandler.isPreventPickups(), "FALSE") || !Utils.containsIgnoreCase(ConfigHandler.isPreventPickups(), "DISABLED"))) {
 			if (ServerHandler.hasSpecificUpdate("1_12") && Reflection.getEventClass("entity.EntityPickupItemEvent") != null) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Pickups(), ItemJoin.getInstance()); } 

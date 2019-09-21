@@ -301,6 +301,18 @@ public class SQLData {
 		return false;
 	}
 	
+	public Map<String, List<String>> getFirstPlayers() {
+		return firstJoinPlayers;
+	}
+	
+	public Map<String, List<String>> getFirstWorlds() {
+		return firstWorldPlayers;
+	}
+	
+	public Map<String, List<String>> getLimitPlayers() {
+		return ipLimitAddresses;
+	}
+	
 	public Boolean isIPLimited(Player player, ItemMap itemMap) {
 		if (itemMap.isIpLimted()) {
 			for (String playerValue : ipLimitAddresses.keySet()) {
