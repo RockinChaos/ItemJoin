@@ -16,213 +16,201 @@ commands:
       - ij
       usage: |
           /itemjoin
+          Example: /itemjoin
    itemjoin help:
       description: Displays the first page of the available help menu.
       permission: itemjoin.use
       usage: |
           /itemjoin help
+          Example: /itemjoin help
    itemjoin help 2:
       description: Displays the second page of the available help menu.
       permission: itemjoin.use
       usage: |
           /itemjoin help 2
+          Example: /itemjoin help 2
    itemjoin help 3:
       description: Displays the third page of the available help menu.
       permission: itemjoin.use
       usage: |
           /itemjoin help 3
+          Example: /itemjoin help 3
    itemjoin help 4:
       description: Displays the fourth page of the available help menu.
       permission: itemjoin.use
       usage: |
           /itemjoin help 4
+          Example: /itemjoin help 4
    itemjoin help 5:
       description: Displays the fifth page of the available help menu.
       permission: itemjoin.use
       usage: |
           /itemjoin help 5
+          Example: /itemjoin help 5
    itemjoin help 6:
       description: Displays the sixth page of the available help menu.
       permission: itemjoin.use
       usage: |
           /itemjoin help 6
+          Example: /itemjoin help 6
    itemjoin help 7:
       description: Displays the seventh page of the available help menu.
       permission: itemjoin.use
       usage: |
           /itemjoin help 7
+          Example: /itemjoin help 7
    itemjoin help 8:
       description: Displays the eighth page of the available help menu.
       permission: itemjoin.use
       usage: |
           /itemjoin help 8
+          Example: /itemjoin help 8
+   itemjoin help 9:
+      description: Displays the ninth page of the available help menu.
+      permission: itemjoin.use
+      usage: |
+          /itemjoin help 9
+          Example: /itemjoin help 9
    itemjoin reload:
-      description: Reloads all ItemJoins configuration files and caches any new data.
+      description: Reloads all plugin configuration files and caches any new data.
       permission: itemjoin.reload
       usage: |
           /itemjoin reload
-   itemjoin creator:
-      description: Opens a GUI Menu to allow the view, modification, and creation of all ItemJoin items.
-      permission: itemjoin.creator
+          Example: /itemjoin reload - Configuration(s) Reloaded!
+   itemjoin menu:
+      description: Opens a GUI Menu to allow the view, modification, and creation of all custom items.
+      permission: itemjoin.menu
       usage: |
-          /itemjoin creator
+          /itemjoin menu
+			Example: /itemjoin menu - The creator menu has been launched!
    itemjoin info:
-      description: Displays necessary held items information, such as material type.
+      description: Displays necessary held item information, such as material type.
       permission: itemjoin.use
       usage: |
           /itemjoin info
-   itemjoin updates:
-      description: Checks for updates that are available for the plugin.
-      permission: itemjoin.updates
-      usage: |
-          /itemjoin updates
-   itemjoin permissions:
-      description: Checks what permissions you have for ItemJoin.
-      permission: itemjoin.permissions
-      usage: |
-          /itemjoin permissions
-   itemjoin permissions 2:
-      description: Second page of checking what permissions you have for ItemJoin.
-      permission: itemjoin.permissions
-      usage: |
-          /itemjoin permissions 2
-   itemjoin save <item>:
-      description: Saves the specified item to the items.yml.
-      permission: itemjoin.save
-      usage: |
-          /itemjoin save <item>
-          Example: /itemjoin save special-item - You have saved the item [special-item] to the items.yml.
-   itemjoin get <item>:
-      description: Gives you the item you specified.
-      permission: itemjoin.get
-      usage: |
-          /itemjoin get <item>
-          Example: /itemjoin get Ultra - You have received the item [Ultra]!
-   itemjoin get <item> <amount>:
-      description: Gives you the item and the amount you specified.
-      permission: itemjoin.get
-      usage: |
-          /itemjoin get <item> <amount>
-          Example: /itemjoin get Ultra 12 - You have received the item [Ultra]!
-   itemjoin get <item> <player>:
-      description: Gives the item you specified to the player.
-      permission: itemjoin.get.others
-      usage: |
-          /itemjoin get <item> <player>
-          Example: /itemjoin get Ultra RockinChaos - You have given the item [Ultra] to RockinChaos!
-   itemjoin get <item> <player> <amount>:
-      description: Gives the amount of the item you specified to the player.
-      permission: itemjoin.get.others
-      usage: |
-          /itemjoin get <item> <player> <amount>
-          Example: /itemjoin get Ultra RockinChaos 8 - You have given the item [Ultra] to RockinChaos!
-   itemjoin getOnline <item>:
-      description: Gives the item you specified to all online players of the server.
-      permission: itemjoin.get.others
-      usage: |
-          /itemjoin getOnline <item>
-          Example: /itemjoin getOnline Ultra - You have given the item [Ultra] to RockinChaos!
-   itemjoin remove <item>:
-      description: Removes the item you specified from your inventory.
-      permission: itemjoin.remove
-      usage: |
-          /itemjoin remove <item>
-          Example: /itemjoin remove Ultra - You have removed the item [Ultra] from your inventory!
-   itemjoin remove <item> <player>:
-      description: Removes the item you specified to the player.
-      permission: itemjoin.remove.others
-      usage: |
-          /itemjoin remove <item> <player>
-          Example: /itemjoin remove Ultra RockinChaos - You have removed the item [Ultra] from RockinChaos!
-   itemjoin removeOnline <item>:
-      description: Removes the item you specified from all online players of the server.
-      permission: itemjoin.remove.others
-      usage: |
-          /itemjoin removeOnline <item>
-          Example: /itemjoin removeOnline Ultra - You have removed the item [Ultra] from RockinChaos!
-   itemjoin enable:
-      description: Enables the use of ItemJoin for all players globally.
-      permission: itemjoin.enable
-      usage: |
-          /itemjoin enable
-          Example: /itemjoin enable - You have globally enabled ItemJoin.
-   itemjoin enable <player>:
-      description: Enables the use of ItemJoin for the specified player.
-      permission: itemjoin.enable.others
-      usage: |
-          /itemjoin enable <player>
-          Example: /itemjoin enable RockinChaos - You have enabled ItemJoin for RockinChaos!
-   itemjoin disable:
-      description: Disables the use of ItemJoin for all players globally.
-      permission: itemjoin.disable
-      usage: |
-          /itemjoin disable
-          Example: /itemjoin disable - You have globally disabled ItemJoin.
-   itemjoin disable <player>:
-      description: Disables the use of ItemJoin for the specified player.
-      permission: itemjoin.disable.others
-      usage: |
-          /itemjoin disable <player>
-          Example: /itemjoin disable RockinChaos - You have disabled ItemJoin for RockinChaos!
-   itemjoin getall:
-      description: Gives you all ItemJoin items.
-      permission: itemjoin.get
-      usage: |
-          /itemjoin getall
-           Example: /itemjoin getall - You have received all of the ItemJoin items.
-   itemjoin getall <player>:
-      description: Gives the player all ItemJoin items.
-      permission: itemjoin.get.others
-      usage: |
-          /itemjoin getall <player>
-          Example: /itemjoin getall RockinChaos - You have given RockinChaos all of the ItemJoin items that are available.
-   itemjoin removeall:
-      description: Removes all ItemJoin items from your inventory.
-      permission: itemjoin.remove
-      usage: |
-          /itemjoin removeall
-          Example: /itemjoin removeall - You have removed all of the ItemJoin items from your inventory.
-   itemjoin removeall <player>:
-      description: Removes all ItemJoin items from the players inventory.
-      permission: itemjoin.remove.others
-      usage: |
-          /itemjoin removeall <player>
-          Example: /itemjoin removeall RockinChaos - You have removed all of the ItemJoin items from RockinChaos.
+          Example: /itemjoin info - The item type is WOODEN_SWORD.
    itemjoin world:
       description: Checks what world you are in, useful for debugging purposes.
       permission: itemjoin.use
       usage: |
           /itemjoin world
+          Example: /itemjoin world - You are in the world Pandora_the_end.
    itemjoin list:
-      description: Checks what items you can get in each available world.
+      description: Checks what items are defined and their respective enabled worlds.
       permission: itemjoin.list
       usage: |
           /itemjoin list
+          Example: /itemjoin list - Current defines items are map-item, ultra-item.
+   itemjoin updates:
+      description: Checks for updates that are available for the plugin.
+      permission: itemjoin.updates
+      usage: |
+          /itemjoin updates
+          Example: /itemjoin updates - You have requested to check for available plugin updates!
    itemjoin autoupdate:
-      description: Force updates ItemJoin, will require a server restart.
+      description: Force updates the plugin, a server restart will be required for changes to take affect.
       permission: itemjoin.autoupdate
       usage: |
           /itemjoin autoupdate
+          Example: /itemjoin autoupdate - You have requested to force update the plugin.
+   itemjoin permissions:
+      description: Checks what permissions you have for the plugin.
+      permission: itemjoin.permissions
+      usage: |
+          /itemjoin permissions
+          Example: /itemjoin permissions - You have the permissions itemjoin.reload.
+   itemjoin permissions 2:
+      description: The permission page that shows each custom items own permission node.
+      permission: itemjoin.permissions
+      usage: |
+          /itemjoin permissions 2
+			Example: /itemjoin permissions 2 - You have the permissions ultra-item.
+   itemjoin get:
+      description: Gives the item and amount you specified from the players inventory.
+      permission: itemjoin.get
+      usage: |
+          /itemjoin get
+          Example: /itemjoin get Ultra - You have received the item [Ultra]!
+          Example: /itemjoin get Ultra 12 - You have received 12x of the item [Ultra]!
+          Example: /itemjoin get Ultra RockinChaos - You have given the item [Ultra] to RockinChaos!
+          Example: /itemjoin get Ultra RockinChaos 8 - You have given 8x of the item [Ultra] to RockinChaos!
+   itemjoin getOnline:
+      description: Gives the item and amount you specified from all online players.
+      permission: itemjoin.get.others
+      usage: |
+          /itemjoin getOnline 
+          Example: /itemjoin getOnline Ultra - You have given the item [Ultra] to RockinChaos!
+          Example: /itemjoin getOnline Ultra 8 - You have given 8x of the item [Ultra] to RockinChaos!
+   itemjoin remove:
+      description: Removes the item and amount you specified from the players inventory.
+      permission: itemjoin.remove
+      usage: |
+          /itemjoin remove
+          Example: /itemjoin remove Ultra - You have removed the item [Ultra]!
+          Example: /itemjoin remove Ultra 12 - You have removed 12x of the item [Ultra]!
+          Example: /itemjoin remove Ultra RockinChaos - You have removed the item [Ultra] to RockinChaos!
+          Example: /itemjoin remove Ultra RockinChaos 8 - You have removed 8x of the item [Ultra] to RockinChaos!
+   itemjoin removeOnline:
+      description: Removes the item and amount you specified from all online players.
+      permission: itemjoin.remove.others
+      usage: |
+          /itemjoin removeOnline
+          Example: /itemjoin removeOnline Ultra - You have removed the item [Ultra] from RockinChaos!
+          Example: /itemjoin removeOnline Ultra 8 - You have removed 8x of the item [Ultra] from RockinChaos!
+   itemjoin enable:
+      description: Enables the use of ItemJoin for all players or specified player globally.
+      permission: itemjoin.enable
+      usage: |
+          /itemjoin enable
+          Example: /itemjoin enable - You have globally enabled custom items.
+          Example: /itemjoin enable RockinChaos - You have enabled custom items for RockinChaos!
+          Example: /itemjoin enable RockinChaos world_the_end - You have enabled custom items for RockinChaos in the world world_the_end!
+   itemjoin disable:
+      description: Disables the use of ItemJoin for all players or specified player globally.
+      permission: itemjoin.disable
+      usage: |
+          /itemjoin disable
+          Example: /itemjoin disable - You have globally disabled custom items.
+          Example: /itemjoin disable RockinChaos - You have disabled custom items for RockinChaos!
+          Example: /itemjoin disable RockinChaos world_the_end - You have disabled custom items for RockinChaos in the world world_the_end!
+   itemjoin getall:
+      description: Gives the player all custom items.
+      permission: itemjoin.get
+      usage: |
+          /itemjoin getall
+           Example: /itemjoin getall - You have received all of the ItemJoin items.
+           Example: /itemjoin getall RockinChaos - You have given RockinChaos all of the ItemJoin items that are available.
+   itemjoin removeall:
+      description: Removes all custom items from the players inventory.
+      permission: itemjoin.remove
+      usage: |
+          /itemjoin removeall
+          Example: /itemjoin removeall - You have removed all of the ItemJoin items from your inventory.
+          Example: /itemjoin removeall RockinChaos - You have removed all of the ItemJoin items from RockinChaos.
    itemjoin purge:
-      description: This will purge all data from the database file, removing all first-join players, ip-limited players, enabled/disabled players, and all other player data.
+      description: This will purge all data from the database file, removing ALL DATA stored in the database.
       permission: itemjoin.purge
       usage: |
           /itemjoin purge
-   itemjoin purge first-join <player>:
-      description: This will purge all first-join data for the said player from the database file.
+          Example: /itemjoin purge - You have purged ALL data from the database file!
+   itemjoin purge first-join:
+      description: This will purge all first-join data for the specified player from the database file.
       permission: itemjoin.purge
       usage: |
-          /itemjoin purge first-join <player>
-   itemjoin purge first-world <player>:
-      description: This will purge all first-world data for the said player from the database file.
+          /itemjoin purge first-join
+          Example: /itemjoin purge first-join RockinChaos - You have purged ALL first-join data of RockinChaos from the database file!
+   itemjoin purge first-world:
+      description: This will purge all first-world data for the specified player from the database file.
       permission: itemjoin.purge
       usage: |
-          /itemjoin purge first-world <player>
-   itemjoin purge ip-limits <player>:
-      description: This will purge all ip-limits data for the said player from the database file.
+          /itemjoin purge first-world
+          Example: /itemjoin purge first-world RockinChaos - You have purged ALL first-world data of RockinChaos from the database file!
+   itemjoin purge ip-limits:
+      description: This will purge all ip-limits data for the specified player from the database file.
       permission: itemjoin.purge
       usage: |
-          /itemjoin purge ip-limits <player>
+          /itemjoin purge ip-limits
+          Example: /itemjoin purge ip-limits RockinChaos - You have purged ALL ip-limit data of RockinChaos from the database file!
           
 permissions:
    itemjoin.*:
@@ -237,6 +225,7 @@ permissions:
           itemjoin.permissions: true
           itemjoin.use: true
           itemjoin.reload: true
+          itemjoin.menu: true
           itemjoin.creator: true
           itemjoin.updates: true
           itemjoin.autoupdate: true
@@ -261,8 +250,11 @@ permissions:
    itemjoin.reload:
       description: Allows use of /itemjoin reload command.
       default: false
+   itemjoin.menu:
+      description: Allows use of /itemjoin menu command.
+      default: false
    itemjoin.creator:
-      description: Allows use of /itemjoin creator command.
+      description: Allows use of /itemjoin menu command.
       default: false
    itemjoin.updates:
       description: Allows use of the /itemjoin updates command.

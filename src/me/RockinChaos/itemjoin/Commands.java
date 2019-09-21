@@ -280,7 +280,7 @@ public class Commands implements CommandExecutor {
 			} else { Language.sendLangMessage("Commands.Default.noPermission", sender); }
 			return true;
 		} else if (args[0].equalsIgnoreCase("menu") || args[0].equalsIgnoreCase("creator")) {
-			if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.creator")) {
+			if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.creator") || PermissionsHandler.hasCommandPermission(sender, "itemjoin.menu")) {
 				if (!(sender instanceof ConsoleCommandSender)) {
 					ConfigHandler.getItemCreator().startMenu(sender);
 					Language.sendLangMessage("Commands.UI.creatorLaunched", sender);
