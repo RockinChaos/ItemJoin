@@ -12,6 +12,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.EntityEquipment;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.RegisteredListener;
@@ -183,7 +184,7 @@ public class ItemUtilities {
 				}
 			}
 		}, ConfigHandler.getClearDelay());
-		if (!type.equalsIgnoreCase("Region-Enter") && !type.equalsIgnoreCase("Limit-Modes")) { PlayerHandler.setHeldItemSlot(player); }
+		if (!type.equalsIgnoreCase("LIMIT-MODES")) { PlayerHandler.setHeldItemSlot(player); }
 	}
 	
 	public static String getProbabilityItem(Player player) {
@@ -235,19 +236,34 @@ public class ItemUtilities {
 		return false;
 	}
 	
+	public static Boolean inClearingRegion(String region) {
+		if (ConfigHandler.getConfig("config.yml").getString("Clear-Items.Region-Enter") != null) {
+			String regionList = ConfigHandler.getConfig("config.yml").getString("Clear-Items.Region-Enter").replace(" ", "");
+			String[] compareRegions = regionList.split(",");
+			for (String compareRegion: compareRegions) {
+				if (compareRegion.equalsIgnoreCase(region) || compareRegion.equalsIgnoreCase("all") || compareRegion.equalsIgnoreCase("global")) {
+					return true;
+				}
+			}
+		} else if (ConfigHandler.getConfig("config.yml").getString("Clear-Items.Region-Enter") == null) {
+			return true;
+		}
+		return false;
+	}
+	
 	public static void setClearingOfItems(Player player, String world, String stringLoc) {
 		if (ConfigHandler.getConfig("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("ALL") || ConfigHandler.getConfig("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("GLOBAL")) {
 			if (ConfigHandler.getConfig("config.yml").getString("Clear-Items." + stringLoc) != null && inClearingWorld(world, stringLoc) 
 					|| ConfigHandler.getConfig("config.yml").getString("Clear-Items." + stringLoc) != null && ConfigHandler.getConfig("config.yml").getBoolean("Clear-Items." + stringLoc) == true) {
 				if (Utils.containsIgnoreCase(ConfigHandler.getConfig("config.yml").getString("Clear-Items.Bypass"), "OP") && player.isOp()) {} else {
-					setClearAllItems(player);
+					setClearAllItems(player, "", stringLoc);
 				}
 			}
 		} else if (ConfigHandler.getConfig("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("ITEMJOIN")) {
 			if (ConfigHandler.getConfig("config.yml").getString("Clear-Items." + stringLoc) != null && inClearingWorld(world, stringLoc) 
 					|| ConfigHandler.getConfig("config.yml").getString("Clear-Items." + stringLoc) != null && ConfigHandler.getConfig("config.yml").getBoolean("Clear-Items." + stringLoc) == true) {
 				if (Utils.containsIgnoreCase(ConfigHandler.getConfig("config.yml").getString("Clear-Items.Bypass"), "OP") && player.isOp()) {} else {
-					setClearItemJoinItems(player);
+					setClearItemJoinItems(player, "", stringLoc);
 				}
 			}
 		} else if (ConfigHandler.getConfig("config.yml").getBoolean("Clear-Items." + stringLoc) == true || inClearingWorld(world, stringLoc)) {
@@ -255,9 +271,38 @@ public class ItemUtilities {
 		}
 	}
 	
-	public static void setClearAllItems(Player player) {
+	public static void setClearingOfRegionItems(Player player, String region) {
+		if (ConfigHandler.getConfig("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("ALL") || ConfigHandler.getConfig("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("GLOBAL")) {
+			if (ConfigHandler.getConfig("config.yml").getString("Clear-Items.Region-Enter") != null && inClearingRegion(region) 
+					|| ConfigHandler.getConfig("config.yml").getString("Clear-Items.Region-Enter") != null && ConfigHandler.getConfig("config.yml").getBoolean("Clear-Items.Region-Enter") == true) {
+				if (Utils.containsIgnoreCase(ConfigHandler.getConfig("config.yml").getString("Clear-Items.Bypass"), "OP") && player.isOp()) {} else {
+					setClearAllItems(player, region, "Region-Enter");
+				}
+			}
+		} else if (ConfigHandler.getConfig("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("ITEMJOIN")) {
+			if (ConfigHandler.getConfig("config.yml").getString("Clear-Items.Region-Enter") != null && inClearingRegion(region) 
+					|| ConfigHandler.getConfig("config.yml").getString("Clear-Items.Region-Enter") != null && ConfigHandler.getConfig("config.yml").getBoolean("Clear-Items.Region-Enter") == true) {
+				if (Utils.containsIgnoreCase(ConfigHandler.getConfig("config.yml").getString("Clear-Items.Bypass"), "OP") && player.isOp()) {} else {
+					setClearItemJoinItems(player, region, "Region-Enter");
+				}
+			}
+		} else if (ConfigHandler.getConfig("config.yml").getBoolean("Clear-Items.Region-Enter") == true || inClearingRegion(region)) {
+			ServerHandler.sendErrorMessage("&c" + ConfigHandler.getConfig("config.yml").getString("Clear-Items.Type") + " for Clear-Items in the config.yml is not a valid option.");
+		}
+	}
+	
+	public static void setClearAllItems(Player player, String region, String type) {
 		List<ItemMap> items = new ArrayList<ItemMap>();
 		PlayerInventory inventory = player.getInventory();
+		Inventory craftView = player.getOpenInventory().getTopInventory();
+		if (region != null && !region.isEmpty() && type.equalsIgnoreCase("REGION-ENTER") && Utils.containsIgnoreCase(ConfigHandler.getConfig("config.yml").getString("Clear-Items.Options"), "RETURN")) {
+			Inventory saveInventory = Bukkit.createInventory(null, 54);
+			for (int i = 0; i <= 47; i++) {
+				if (inventory.getItem(i) != null && inventory.getItem(i).getType() != Material.AIR && i <= 41) { saveInventory.setItem(i, inventory.getItem(i).clone()); }
+				else if (i >= 42 && craftView.getItem(i - 42) != null && craftView.getItem(i - 42).getType() != Material.AIR && PlayerHandler.isCraftingInv(player.getOpenInventory())) { saveInventory.setItem(i, craftView.getItem(i - 42).clone()); }
+			}
+			ConfigHandler.getSQLData().saveReturnItems(player, player.getWorld().getName(), region, saveInventory);		
+		}
 		if (Utils.containsIgnoreCase(ConfigHandler.getConfig("config.yml").getString("Clear-Items.Options"), "PROTECT")) {
 			for (ItemMap item: ItemUtilities.getItems()) {
 				if (item.isOnlyFirstJoin() || item.isOnlyFirstWorld()) {
@@ -281,10 +326,34 @@ public class ItemUtilities {
 			inventory.setBoots(null);
 			PlayerHandler.setOffHandItem(player, null);
 		}
+		ItemStack[] craftingContents = player.getOpenInventory().getTopInventory().getContents();
+		if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
+			for (int k = 0; k < craftingContents.length; k++) {
+				craftView.setItem(k, new ItemStack(Material.AIR));
+			}
+		}
 	}
 	
-	public static void setClearItemJoinItems(Player player) {
+	public static void setClearItemJoinItems(Player player, String region, String type) {
 		PlayerInventory inventory = player.getInventory();
+		Inventory craftView = player.getOpenInventory().getTopInventory();
+		if (region != null && !region.isEmpty() && type.equalsIgnoreCase("REGION-ENTER") && Utils.containsIgnoreCase(ConfigHandler.getConfig("config.yml").getString("Clear-Items.Options"), "RETURN")) {
+			Inventory saveInventory = Bukkit.createInventory(null, 54);
+			for (int i = 0; i <= 47; i++) {
+				if (Utils.containsIgnoreCase(ConfigHandler.getConfig("config.yml").getString("Clear-Items.Options"), "PROTECT")) {
+					for (ItemMap item: ItemUtilities.getItems()) {
+						if (!item.isOnlyFirstJoin() && !item.isOnlyFirstWorld()) {
+							if (inventory.getItem(i) != null && inventory.getItem(i).getType() != Material.AIR && item.isSimilar(inventory.getItem(i)) && i <= 41) { saveInventory.setItem(i, inventory.getItem(i).clone()); }
+							else if (i >= 42 && craftView.getItem(i - 42) != null && craftView.getItem(i - 42).getType() != Material.AIR && item.isSimilar(craftView.getItem(i - 42)) && PlayerHandler.isCraftingInv(player.getOpenInventory())) { saveInventory.setItem(i, craftView.getItem(i - 42).clone()); }
+						}
+					}
+				} else {
+					if (inventory.getItem(i) != null && inventory.getItem(i).getType() != Material.AIR && ItemHandler.containsNBTData(inventory.getItem(i)) && i <= 41) { saveInventory.setItem(i, inventory.getItem(i).clone()); }
+					else if (i >= 42 && craftView.getItem(i - 42) != null && craftView.getItem(i - 42).getType() != Material.AIR && ItemHandler.containsNBTData(craftView.getItem(i - 42)) && PlayerHandler.isCraftingInv(player.getOpenInventory())) { saveInventory.setItem(i, craftView.getItem(i - 42).clone()); }
+				}
+			}
+			ConfigHandler.getSQLData().saveReturnItems(player, player.getWorld().getName(), region, saveInventory);		
+		}
 		if (Utils.containsIgnoreCase(ConfigHandler.getConfig("config.yml").getString("Clear-Items.Options"), "PROTECT")) {
 			for (ItemMap item: ItemUtilities.getItems()) {
 				if (!item.isOnlyFirstJoin() && !item.isOnlyFirstWorld()) {
@@ -315,6 +384,29 @@ public class ItemUtilities {
 				}
 			}
 			inventoryContents.clear();
+			ItemStack[] craftingContents = player.getOpenInventory().getTopInventory().getContents();
+			if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
+				for (int k = 0; k < craftingContents.length; k++) {
+					if (craftView.getItem(k) != null && craftView.getItem(k).getType() != Material.AIR &&ItemHandler.containsNBTData(craftView.getItem(k))) {
+						craftView.setItem(k, new ItemStack(Material.AIR));
+					}
+				}
+			}
+		}
+	}
+	
+	public static void setReturningOfItems(Player player, String world, String region) {
+		if (region != null && !region.isEmpty() && Utils.containsIgnoreCase(ConfigHandler.getConfig("config.yml").getString("Clear-Items.Options"), "RETURN")) {
+			Inventory inventory = ConfigHandler.getSQLData().getReturnItems(player, world, region);
+			if (inventory != null) {
+				for (int i = 47; i >= 0; i--) { 
+					if (inventory.getItem(i) != null && inventory.getItem(i).getType() != Material.AIR) {
+						if (i <= 41) { player.getInventory().setItem(i, inventory.getItem(i).clone()); }
+						else if (i >= 42 && PlayerHandler.isCraftingInv(player.getOpenInventory())) { player.getOpenInventory().getTopInventory().setItem(i - 42, inventory.getItem(i).clone()); PlayerHandler.updateInventory(player); }
+					}
+				}
+				ConfigHandler.getSQLData().removeReturnItems(player, world, region);
+			}
 		}
 	}
 	
@@ -389,6 +481,7 @@ public class ItemUtilities {
 	
 	public static void inventoryWipe(ItemMap item, Player player) {
 		PlayerInventory inventory = player.getInventory();
+		Inventory craftView = player.getOpenInventory().getTopInventory();
 		if (inventory.getHelmet() != null && item.isSimilar(inventory.getHelmet()) && ItemHandler.containsNBTData(inventory.getHelmet())) {
 			inventory.setHelmet(null);
 		}
@@ -407,11 +500,19 @@ public class ItemUtilities {
 		HashMap < String, ItemStack[] > inventoryContents = new HashMap < String, ItemStack[] > ();
 		inventoryContents.put(PlayerHandler.getPlayerID(player), inventory.getContents());
 		for (ItemStack contents: inventoryContents.get(PlayerHandler.getPlayerID(player))) {
-			if (contents != null && item.isSimilar(contents) && ItemHandler.containsNBTData(contents)) {
+			if (contents != null && item.isSimilar(contents)) {
 				inventory.remove(contents);
 			}
 		}
 		inventoryContents.clear();
+		ItemStack[] craftingContents = player.getOpenInventory().getTopInventory().getContents();
+		if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
+			for (int k = 0; k < craftingContents.length; k++) {
+				if (craftView.getItem(k) != null && craftView.getItem(k).getType() != Material.AIR && item.isSimilar(craftView.getItem(k))) {
+					craftView.setItem(k, new ItemStack(Material.AIR));
+				}
+			}
+		}
 	}
 	
 	public static void sendFailCount(Player player, int session) {
@@ -548,10 +649,10 @@ public class ItemUtilities {
 		if (addItem) { player.getInventory().addItem(item); } 
 		else if (itemMap.isGiveNext() && player.getInventory().getItem(Integer.parseInt(itemMap.getSlot())) != null) {
 			for (int i = Integer.parseInt(itemMap.getSlot()); i <= 35; i++) {
-				if (player.getInventory().getItem(i) == null) { player.getInventory().setItem(i, item); break; }
+				if (player.getInventory().getItem(i) == null || player.getInventory().getItem(i).getType() == Material.AIR) { player.getInventory().setItem(i, item); break; }
 				else if (i == 35) {
 					for (int k = Integer.parseInt(itemMap.getSlot()); k >= 0; k--) {
-						if (player.getInventory().getItem(k) == null) { player.getInventory().setItem(k, item); break; }
+						if (player.getInventory().getItem(k) == null || player.getInventory().getItem(k).getType() == Material.AIR) { player.getInventory().setItem(k, item); break; }
 					}
 				}
 			}
@@ -572,40 +673,40 @@ public class ItemUtilities {
 				if (amount != 0 || itemMap.isAlwaysGive()) {
 					if (noTriggers) { item.setAmount(amount); }
 					if (itemMap.hasItem(player)) { player.getInventory().addItem(item); } else if (itemMap.isDropFull()) { player.getWorld().dropItem(player.getLocation(), item); }
-					else { if (Equip.getHelmet() == null) { Equip.setHelmet(item); } else if (itemMap.isDropFull()) { player.getWorld().dropItem(player.getLocation(), item); } }
-				    } else { if (Equip.getHelmet() == null) { Equip.setHelmet(item); } else if (itemMap.isDropFull()) { player.getWorld().dropItem(player.getLocation(), item); } }
+					else { if (Equip.getHelmet() == null || Equip.getHelmet().getType() == Material.AIR) { Equip.setHelmet(item); } else if (itemMap.isDropFull()) { player.getWorld().dropItem(player.getLocation(), item); } }
+				    } else { if (Equip.getHelmet() == null || Equip.getHelmet().getType() == Material.AIR) { Equip.setHelmet(item); } else if (itemMap.isDropFull()) { player.getWorld().dropItem(player.getLocation(), item); } }
 				ServerHandler.sendDebugMessage("Given the Item; [" + itemMap.getConfigName() + "]");
 				saveSQLItemData(player, itemMap);
 			} else if (itemMap.getSlot().equalsIgnoreCase("Chestplate")) {
 				if (amount != 0 || itemMap.isAlwaysGive()) {
 					if (noTriggers) { item.setAmount(amount); }
 					if (itemMap.hasItem(player)) { player.getInventory().addItem(item); } else if (itemMap.isDropFull()) { player.getWorld().dropItem(player.getLocation(), item); }
-					else { if (Equip.getChestplate() == null) { Equip.setChestplate(item); } else if (itemMap.isDropFull()) { player.getWorld().dropItem(player.getLocation(), item); } }
-				    } else { if (Equip.getChestplate() == null) { Equip.setChestplate(item); } else if (itemMap.isDropFull()) { player.getWorld().dropItem(player.getLocation(), item); } }
+					else { if (Equip.getChestplate() == null || Equip.getChestplate().getType() == Material.AIR) { Equip.setChestplate(item); } else if (itemMap.isDropFull()) { player.getWorld().dropItem(player.getLocation(), item); } }
+				    } else { if (Equip.getChestplate() == null || Equip.getChestplate().getType() == Material.AIR) { Equip.setChestplate(item); } else if (itemMap.isDropFull()) { player.getWorld().dropItem(player.getLocation(), item); } }
 				ServerHandler.sendDebugMessage("Given the Item; [" + itemMap.getConfigName() + "]");
 				saveSQLItemData(player, itemMap);
 			} else if (itemMap.getSlot().equalsIgnoreCase("Leggings")) {
 				if (amount != 0 || itemMap.isAlwaysGive()) {
 					if (noTriggers) { item.setAmount(amount); }
 					if (itemMap.hasItem(player)) { player.getInventory().addItem(item); } else if (itemMap.isDropFull()) { player.getWorld().dropItem(player.getLocation(), item); }
-					else { if (Equip.getLeggings() == null) { Equip.setLeggings(item); } else if (itemMap.isDropFull()) { player.getWorld().dropItem(player.getLocation(), item); } }
-				    } else { if (Equip.getLeggings() == null) { Equip.setLeggings(item); } else if (itemMap.isDropFull()) { player.getWorld().dropItem(player.getLocation(), item); } }
+					else { if (Equip.getLeggings() == null || Equip.getLeggings().getType() == Material.AIR) { Equip.setLeggings(item); } else if (itemMap.isDropFull()) { player.getWorld().dropItem(player.getLocation(), item); } }
+				    } else { if (Equip.getLeggings() == null || Equip.getLeggings().getType() == Material.AIR) { Equip.setLeggings(item); } else if (itemMap.isDropFull()) { player.getWorld().dropItem(player.getLocation(), item); } }
 				ServerHandler.sendDebugMessage("Given the Item; [" + itemMap.getConfigName() + "]");
 				saveSQLItemData(player, itemMap);
 			} else if (itemMap.getSlot().equalsIgnoreCase("Boots")) {
 				if (amount != 0 || itemMap.isAlwaysGive()) {
 					if (noTriggers) { item.setAmount(amount); }
 					if (itemMap.hasItem(player)) { player.getInventory().addItem(item); } else if (itemMap.isDropFull()) { player.getWorld().dropItem(player.getLocation(), item); }
-					else { if (Equip.getBoots() == null) { Equip.setBoots(item); } else if (itemMap.isDropFull()) { player.getWorld().dropItem(player.getLocation(), item); } }
-				    } else { if (Equip.getBoots() == null) { Equip.setBoots(item); } else if (itemMap.isDropFull()) { player.getWorld().dropItem(player.getLocation(), item); } }
+					else { if (Equip.getBoots() == null || Equip.getBoots().getType() == Material.AIR) { Equip.setBoots(item); } else if (itemMap.isDropFull()) { player.getWorld().dropItem(player.getLocation(), item); } }
+				    } else { if (Equip.getBoots() == null || Equip.getBoots().getType() == Material.AIR) { Equip.setBoots(item); } else if (itemMap.isDropFull()) { player.getWorld().dropItem(player.getLocation(), item); } }
 				ServerHandler.sendDebugMessage("Given the Item; [" + itemMap.getConfigName() + "]");
 				saveSQLItemData(player, itemMap);
 			} else if (ServerHandler.hasCombatUpdate() && itemMap.getSlot().equalsIgnoreCase("Offhand")) {
 				if (amount != 0 || itemMap.isAlwaysGive()) {
 					if (noTriggers) { item.setAmount(amount); }
 				if (itemMap.hasItem(player)) { player.getInventory().addItem(item); } else if (itemMap.isDropFull()) { player.getWorld().dropItem(player.getLocation(), item); }
-				else { if (PlayerHandler.getOffHandItem(player) == null) { PlayerHandler.setOffhandItem(player, item); } else if (itemMap.isDropFull()) { player.getWorld().dropItem(player.getLocation(), item); } }
-			    } else { if (PlayerHandler.getOffHandItem(player) == null) { PlayerHandler.setOffhandItem(player, item); } else if (itemMap.isDropFull()) { player.getWorld().dropItem(player.getLocation(), item); } }
+				else { if (PlayerHandler.getOffHandItem(player) == null || PlayerHandler.getOffHandItem(player).getType() == Material.AIR) { PlayerHandler.setOffhandItem(player, item); } else if (itemMap.isDropFull()) { player.getWorld().dropItem(player.getLocation(), item); } }
+			    } else { if (PlayerHandler.getOffHandItem(player) == null || PlayerHandler.getOffHandItem(player).getType() == Material.AIR) { PlayerHandler.setOffhandItem(player, item); } else if (itemMap.isDropFull()) { player.getWorld().dropItem(player.getLocation(), item); } }
 				ServerHandler.sendDebugMessage("Given the Item; [" + itemMap.getConfigName() + "]");
 				saveSQLItemData(player, itemMap);
 			} else if (getSlotConversion(itemMap.getSlot()) != 5) {
