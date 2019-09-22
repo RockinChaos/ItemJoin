@@ -13,9 +13,10 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-
+import org.bukkit.inventory.Inventory;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
+import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.utils.Utils;
@@ -28,6 +29,7 @@ public class SQLData {
 	private Map < String, List <String> > firstCommandPlayers = new HashMap < String, List <String> >();
 	private Map < String, List <String> > firstWorldPlayers = new HashMap < String, List <String> >();
 	private Map < String, List <String> > enabledPlayers = new HashMap < String, List <String> >();
+	private Map < String, List <String> > returnItems = new HashMap < String, List <String> >();
 	private List <String> executeStatementsLater = new ArrayList<String>();
 	
 	public SQLData() {
@@ -39,6 +41,7 @@ public class SQLData {
 		this.loadFirstCommandPlayers();
 		this.loadIPLimitAddresses();
 		this.loadEnabledPlayers();
+		this.loadReturnItems();
 	
 		try { SQLite.getDatabase("database").closeConnection(); } catch (Exception e) { } 
 		this.runTaskSaveStatements();
@@ -49,7 +52,8 @@ public class SQLData {
 		SQLite.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS first_world (`World_Name` varchar(32), `Player_Name` varchar(32), `Player_UUID` varchar(32), `Item_Name` varchar(32), `Time_Stamp` varchar(32));");
 		SQLite.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS ip_limits (`World_Name` varchar(32), `IP_Address` varchar(32), `Player_UUID` varchar(32), `Item_Name` varchar(32), `Time_Stamp` varchar(32));");
 		SQLite.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS first_commands (`World_Name` varchar(32), `Player_UUID` varchar(32), `Command_String` varchar(32), `Time_Stamp` varchar(32));");
-		SQLite.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS enabled_players (`World_Name` varchar(32), `Player_Name` varchar(32), `Player_UUID` varchar(32), `isEnabled` varchar(32));");
+		SQLite.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS enabled_players (`World_Name` varchar(32), `Player_Name` varchar(32), `Player_UUID` varchar(32), `isEnabled` varchar(32), `Time_Stamp` varchar(32));");
+		SQLite.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS return_items (`World_Name` varchar(32), `Region_Name` varchar(32), `Player_UUID` varchar(32), `Inventory64` varchar(32), `Time_Stamp` varchar(32));");
 		SQLite.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS map_ids (`Map_IMG` varchar(32), `Map_ID` varchar(32));");
 		this.alterTables();
 	}
@@ -60,6 +64,7 @@ public class SQLData {
 			SQLite.getDatabase("database").executeStatement("ALTER TABLE first_world ADD Time_Stamp datatype;");
 			SQLite.getDatabase("database").executeStatement("ALTER TABLE ip_limits ADD Time_Stamp datatype;");
 			SQLite.getDatabase("database").executeStatement("ALTER TABLE first_commands ADD Time_Stamp datatype;");
+			SQLite.getDatabase("database").executeStatement("ALTER TABLE enabled_players ADD Time_Stamp datatype;");
 		} 
 	}
 	
@@ -180,6 +185,23 @@ public class SQLData {
 		}
 	}
 	
+	private void loadReturnItems() {
+		List<List<String>> selectedReturnItems = SQLite.getDatabase("database").queryTableData("SELECT * FROM return_items", "Player_UUID", "World_Name", "Region_Name", "Inventory64");
+		if (selectedReturnItems != null && !selectedReturnItems.isEmpty()) {
+			for (List<String> sl1 : selectedReturnItems) {
+				if (returnItems.get(sl1.get(0)) != null) {
+					List <String> h1 = returnItems.get(sl1.get(0));
+					h1.add(sl1.get(1) + "." + sl1.get(2) + "." + sl1.get(3));
+					returnItems.put(sl1.get(0), h1);
+				} else {
+					List <String> h1 = new ArrayList<String>();
+					h1.add(sl1.get(1) + "." + sl1.get(2) + "." + sl1.get(3));
+					returnItems.put(sl1.get(0), h1);
+				}
+			}
+		}
+	}
+	
 	public void saveFirstJoinData(Player player, ItemMap itemMap) {
 		if (itemMap.isOnlyFirstJoin()) {
 			executeStatementsLater.add("INSERT INTO first_join (`World_Name`, `Player_Name`, `Player_UUID`, `Item_Name`, `Time_Stamp`) VALUES ('" + player.getWorld().getName() + "','" + player.getName().toString() + "','" + PlayerHandler.getPlayerID(player) + "','" + itemMap.getConfigName() + "','" + new Timestamp(System.currentTimeMillis()) + "')");
@@ -238,6 +260,22 @@ public class SQLData {
 		}
 	}
 	
+	public void saveReturnItems(Player player, String world, String region, Inventory inventory) {
+		String inventory64 = world + "." + region + "." + ItemHandler.sterilizeInventory(inventory);
+		executeStatementsLater.add("INSERT INTO return_items (`World_Name`, `Region_Name`, `Player_UUID`, `Inventory64`, `Time_Stamp`) VALUES ('" + world + "','" + region + "','" + PlayerHandler.getPlayerID(player) + "','" + ItemHandler.sterilizeInventory(inventory) + "','" + new Timestamp(System.currentTimeMillis()) + "')");
+		if (returnItems.get(PlayerHandler.getPlayerID(player)) != null && Utils.containsIgnoreCase(returnItems.get(PlayerHandler.getPlayerID(player)).toString(), world + "." + region)) {
+			return;
+	    } else if (returnItems.get(PlayerHandler.getPlayerID(player)) != null) {
+			List <String> h1 = returnItems.get(PlayerHandler.getPlayerID(player));
+			h1.add(inventory64);
+			returnItems.put(PlayerHandler.getPlayerID(player), h1);
+		} else {
+			List <String> h1 = new ArrayList<String>();
+			h1.add(inventory64);
+			returnItems.put(PlayerHandler.getPlayerID(player), h1);
+		}
+	}
+	
 	public void saveToDatabase(Player player, String worldName, String boolValue, String type) {
 			String realPlayer = "ALL"; String realName = "ALL";
 			if (player != null) { realPlayer = PlayerHandler.getPlayerID(player); realName = player.getName().toString(); }
@@ -258,7 +296,7 @@ public class SQLData {
 					List <String> h1 = new ArrayList<String>();
 					h1.add(worldName + "." + boolValue);
 					enabledPlayers.put(realPlayer, h1);
-					executeStatementsLater.add("INSERT INTO enabled_players (`World_Name`, `Player_Name`, `Player_UUID`, `isEnabled`) VALUES ('" + worldName + "','" + realName + "','" + realPlayer + "','" + boolValue + "')");
+					executeStatementsLater.add("INSERT INTO enabled_players (`World_Name`, `Player_Name`, `Player_UUID`, `isEnabled`, `Time_Stamp`) VALUES ('" + worldName + "','" + realName + "','" + realPlayer + "','" + boolValue + "','" + new Timestamp(System.currentTimeMillis()) + "')");
 				}
 			}
 	}
@@ -274,6 +312,20 @@ public class SQLData {
 		} else if (section.equalsIgnoreCase("ip_limits") && ipLimitAddresses.values() != null && !ipLimitAddresses.isEmpty()) {
 			executeStatementsLater.add("DELETE FROM " + section + " WHERE Player_UUID='" + UUID + "';");
 			ipLimitAddresses.remove(UUID);
+		}
+	}
+	
+	public void removeReturnItems(Player player, String world, String region) {
+		List <String> h1 = returnItems.get(PlayerHandler.getPlayerID(player));
+		if (returnItems.values() != null && !returnItems.isEmpty() && h1 != null && !h1.isEmpty()) {
+			executeStatementsLater.add("DELETE FROM return_Items WHERE Player_UUID='" + PlayerHandler.getPlayerID(player) + "' AND World_Name='" + world + "' AND Region_Name='" + region + "';");
+			for (String inventory : h1) {
+				if (Utils.containsIgnoreCase(inventory, world + "." + region + ".")) {
+					h1.remove(inventory);
+					break;
+				}
+			}
+			returnItems.put(PlayerHandler.getPlayerID(player), h1);
 		}
 	}
 	
@@ -299,6 +351,17 @@ public class SQLData {
 			return true;
 		}
 		return false;
+	}
+	
+	public Inventory getReturnItems(Player player, String world, String region) {
+		if (returnItems.get(PlayerHandler.getPlayerID(player)) != null) {
+			for (String inventory : returnItems.get(PlayerHandler.getPlayerID(player))) {
+				if (Utils.containsIgnoreCase(inventory, world) && Utils.containsIgnoreCase(inventory, region)) {
+					return ItemHandler.deserializeInventory(inventory.replace(world + "." + region + ".", ""));
+				}
+			}
+		}
+		return null;
 	}
 	
 	public Map<String, List<String>> getFirstPlayers() {

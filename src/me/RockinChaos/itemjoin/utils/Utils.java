@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;

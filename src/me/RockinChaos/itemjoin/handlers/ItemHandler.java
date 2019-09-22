@@ -3,16 +3,19 @@ package me.RockinChaos.itemjoin.handlers;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.lang.WordUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
@@ -212,6 +215,38 @@ public class ItemHandler {
     	} catch (Exception e) { }
     	return item;
     }
+    
+	public static String sterilizeInventory(Inventory inventory) {
+	    try {
+	    	java.io.ByteArrayOutputStream str = new java.io.ByteArrayOutputStream();
+	        org.bukkit.util.io.BukkitObjectOutputStream data = new org.bukkit.util.io.BukkitObjectOutputStream(str);
+	        data.writeInt(inventory.getSize());
+	        for (int i = 0; i < inventory.getSize(); i++) {
+	            data.writeObject(inventory.getItem(i));
+	        }
+	        data.close();
+	        return Base64.getEncoder().encodeToString(str.toByteArray());
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return "";
+	}
+
+	public static Inventory deserializeInventory(String inventoryData) {
+	    try {
+	    	java.io.ByteArrayInputStream stream = new java.io.ByteArrayInputStream(Base64.getDecoder().decode(inventoryData));
+	        org.bukkit.util.io.BukkitObjectInputStream data = new org.bukkit.util.io.BukkitObjectInputStream(stream);
+	        Inventory inventory = Bukkit.createInventory(null, data.readInt());
+	        for (int i = 0; i < inventory.getSize(); i++) {
+	            inventory.setItem(i, (ItemStack) data.readObject());
+	        }
+	        data.close();
+	        return inventory;
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return null;
+	}
 	
 	public static String getName(ItemStack stack) {
 		try {

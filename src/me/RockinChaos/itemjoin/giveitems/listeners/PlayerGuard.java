@@ -33,27 +33,31 @@ public class PlayerGuard implements Listener {
 	}
 
 	private static void removeItems(Player player, String region) {
-		ItemUtilities.safeSet(player, "Region-Enter");
-		for (ItemMap item: ItemUtilities.getItems()) {
-			if (item.isTakeOnRegionLeave() || item.isGiveOnRegionEnter()) {
-				if (item.inRegion(region) && item.inWorld(player.getWorld()) && item.hasPermission(player)) {
-					item.removeFrom(player, 0);
+		if (region != null && !region.isEmpty()) {
+			ItemUtilities.setReturningOfItems(player, player.getWorld().getName(), region);
+			for (ItemMap item: ItemUtilities.getItems()) {
+				if (item.isTakeOnRegionLeave() || item.isGiveOnRegionEnter()) {
+					if (item.inRegion(region) && item.inWorld(player.getWorld()) && item.hasPermission(player)) {
+						item.removeFrom(player, 0);
+					}
 				}
 			}
 		}
 	}
 	
 	private static void getItems(Player player, String region) {
-		final int session = Utils.getRandom(1, 100000);
-		ItemUtilities.safeSet(player, "Region-Enter");
-		String Probable = ItemUtilities.getProbabilityItem(player);
-		for (ItemMap item: ItemUtilities.getItems()) {
-			if (item.isGiveOnRegionEnter() && item.inRegion(region) && item.inWorld(player.getWorld())
-					&& ItemUtilities.isChosenProbability(item, Probable) && item.hasPermission(player) && ItemUtilities.isObtainable(player, item, session)) {
-					item.giveTo(player, false, 0);
+		if (region != null && !region.isEmpty()) {
+			ItemUtilities.setClearingOfRegionItems(player, region);
+			final int session = Utils.getRandom(1, 100000);
+			String Probable = ItemUtilities.getProbabilityItem(player);
+			for (ItemMap item: ItemUtilities.getItems()) {
+				if (item.isGiveOnRegionEnter() && item.inRegion(region) && item.inWorld(player.getWorld())
+						&& ItemUtilities.isChosenProbability(item, Probable) && item.hasPermission(player) && ItemUtilities.isObtainable(player, item, session)) {
+						item.giveTo(player, false, 0);
+					}
+					item.setAnimations(player);
 				}
-				item.setAnimations(player);
-			}
+		}
 	}
 	
 	private static void updateRegionItems(Player player) {

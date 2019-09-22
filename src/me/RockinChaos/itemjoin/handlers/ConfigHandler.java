@@ -49,8 +49,8 @@ public class ConfigHandler {
 	}
 	
 	public static void registerEvents() {
-	    ItemJoin.getInstance().getCommand("itemjoin").setExecutor(new Commands()); ItemJoin.getInstance().getCommand("itemjoin").setTabCompleter(new TabComplete());
-		ItemJoin.getInstance().getCommand("ij").setExecutor(new Commands()); ItemJoin.getInstance().getCommand("ij").setTabCompleter(new TabComplete());
+	    ItemJoin.getInstance().getCommand("itemjoin").setExecutor(new Commands()); 
+	    ItemJoin.getInstance().getCommand("itemjoin").setTabCompleter(new TabComplete());
 		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new MultiForm(), ItemJoin.getInstance());
 		if ((!Utils.containsIgnoreCase(ConfigHandler.isPreventPickups(), "FALSE") || !Utils.containsIgnoreCase(ConfigHandler.isPreventPickups(), "DISABLED"))) {
 			if (ServerHandler.hasSpecificUpdate("1_12") && Reflection.getEventClass("entity.EntityPickupItemEvent") != null) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Pickups(), ItemJoin.getInstance()); } 
@@ -323,7 +323,9 @@ public class ConfigHandler {
 		if (!Utils.containsIgnoreCase(ConfigHandler.getConfig("config.yml").getString("Clear-Items.Join"), "DISABLED") 
 				&& !Utils.containsIgnoreCase(ConfigHandler.getConfig("config.yml").getString("Clear-Items.Join"), "FALSE")
 				|| !Utils.containsIgnoreCase(ConfigHandler.getConfig("config.yml").getString("Clear-Items.World-Switch"), "DISABLED")
-				&& !Utils.containsIgnoreCase(ConfigHandler.getConfig("config.yml").getString("Clear-Items.World-Switch"), "FALSE")) {
+				&& !Utils.containsIgnoreCase(ConfigHandler.getConfig("config.yml").getString("Clear-Items.World-Switch"), "FALSE")
+				|| !Utils.containsIgnoreCase(ConfigHandler.getConfig("config.yml").getString("Clear-Items.Region-Enter"), "DISABLED")
+				&& !Utils.containsIgnoreCase(ConfigHandler.getConfig("config.yml").getString("Clear-Items.Region-Enter"), "FALSE")) {
 				return ConfigHandler.getConfig("config.yml").getInt("Clear-Items.Delay-Tick") * 10L;
 		}
 		return -1;

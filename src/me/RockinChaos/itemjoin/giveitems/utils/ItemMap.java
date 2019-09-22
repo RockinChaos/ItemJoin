@@ -394,7 +394,7 @@ public class ItemMap {
 			}
 			this.giveOnRespawn = Utils.containsIgnoreCase(this.triggers, "RESPAWN");
 			this.giveOnRegionEnter = Utils.containsIgnoreCase(this.triggers, "REGION-ENTER");
-			this.takeOnRegionLeave = Utils.containsIgnoreCase(this.triggers, "REGION-REMOVE");
+			this.takeOnRegionLeave = Utils.containsIgnoreCase(this.triggers, "REGION-REMOVE") || Utils.containsIgnoreCase(this.triggers, "REGION-EXIT") || Utils.containsIgnoreCase(this.triggers, "REGION-LEAVE");
 			this.useOnLimitSwitch = Utils.containsIgnoreCase(this.triggers, "GAMEMODE-SWITCH");
 		} else { this.giveOnJoin = true; }
 	}

@@ -32,6 +32,7 @@ Clear-Items:
   Delay-Tick: 2
   Join: DISABLED
   World-Switch: DISABLED
+  Region-Enter: DISABLED
   Options: PROTECT
   Bypass: OP
 

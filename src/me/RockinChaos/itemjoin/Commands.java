@@ -433,6 +433,8 @@ public class Commands implements CommandExecutor {
 					else { Language.dispatchMessage(sender, "&c[\u2718] ItemJoin.Reload"); }
 					if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.updates")) { Language.dispatchMessage(sender, "&a[\u2714] ItemJoin.Updates"); }
 					else { Language.dispatchMessage(sender, "&c[\u2718] ItemJoin.Updates"); }
+					if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.autoupdate")) { Language.dispatchMessage(sender, "&a[\u2714] ItemJoin.AutoUpdate"); }
+					else { Language.dispatchMessage(sender, "&c[\u2718] ItemJoin.AutoUpdate"); }
 					if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.get")) { Language.dispatchMessage(sender, "&a[\u2714] ItemJoin.get"); } 
 					else { Language.dispatchMessage(sender, "&c[\u2718] ItemJoin.get"); }
 					if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.get.others")) { Language.dispatchMessage(sender, "&a[\u2714] ItemJoin.get.others"); }
