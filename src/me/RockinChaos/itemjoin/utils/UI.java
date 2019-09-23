@@ -460,8 +460,8 @@ public class UI {
 		(Utils.nullCheck(itemMap.getItemFlags()) != "NONE" ? "&a" + itemflagsList : "NONE")), event -> this.flagPane(player, itemMap)));
 		creatingPane.addButton(new Button(ItemHandler.getItem("REDSTONE", 1, false, "&b&lTriggers", "&7", "&7*When the players act upon these", "&7events, the item will be given.", "&9&lTRIGGERS: &a" +
 		(Utils.nullCheck(itemMap.getTriggers()) != "NONE" ? "&a" + triggersList : "NONE")), event -> this.triggerPane(player, itemMap)));
-		creatingPane.addButton(new Button(ItemHandler.getItem("76", 1, false, "&b&lPermission Node", "&7", "&7*Custom permission node that", "&7will be required by a permission", "&7plugin to receive the item.", 
-				"&9&lPERMISSION-NODE: &a" + Utils.nullCheck(itemMap.getPermissionNode())), event -> {
+		creatingPane.addButton(new Button(ItemHandler.getItem("76", 1, false, "&b&lPermission Node", "&7", "&7*Custom permission node that", "&7will be required by a permission", "&7plugin to receive the item.", "&7&lNote: &7Do NOT include", 
+				"&7any spaces or special characters", "&9&lPERMISSION-NODE: &a" + Utils.nullCheck(itemMap.getPermissionNode())), event -> {
 			if (Utils.nullCheck(itemMap.getPermissionNode()) != "NONE") {
 				itemMap.setPerm(null);
 				this.creatingPane(player, itemMap);
@@ -493,8 +493,7 @@ public class UI {
 				"&7items name, lore, and material type"), event -> this.animationPane(player, itemMap)));
 		creatingPane.addButton(new Button(ItemHandler.getItem((ServerHandler.hasAquaticUpdate() ? "OAK_FENCE" : "FENCE"), 1, false, "&b&lLimit-Modes", "&7", "&7*Define the gamemode(s) that the", "&7item will be limited to.", "&9&lLIMIT-MODES: &a" + 
 				Utils.nullCheck(itemMap.getLimitModes())), event -> this.limitPane(player, itemMap)));
-		creatingPane.addButton(new Button(ItemHandler.getItem("NETHER_STAR", 1, false, "&b&lProbability", "&7", "&7*Define the chance that the", "&7item will be given to the player.", "&7", "&7&lNote: &7Do NOT include", 
-				"&7any spaces or special characters", "&9&lPROBABILITY: &a" + Utils.nullCheck(itemMap.getProbability() + "&a%")), event -> {
+		creatingPane.addButton(new Button(ItemHandler.getItem("NETHER_STAR", 1, false, "&b&lProbability", "&7", "&7*Define the chance that the", "&7item will be given to the player.", "&7", "&9&lPROBABILITY: &a" + Utils.nullCheck(itemMap.getProbability() + "&a%")), event -> {
 			if (Utils.nullCheck(itemMap.getProbability() + "&a%") != "NONE") {
 				itemMap.setProbability(-1);
 				this.creatingPane(player, itemMap);
@@ -512,7 +511,7 @@ public class UI {
 			}
 		}));
 		if (itemMap.getMaterial().toString().contains("MAP")) {
-			creatingPane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, false, "&c&lMap Image", "&7", "&7*Adds a custom map image that", "&7will be displayed when held.", "&7", "&7Place the custom map image", 
+			creatingPane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, false, "&e&lMap Image", "&7", "&7*Adds a custom map image that", "&7will be displayed when held.", "&7", "&7Place the custom map image", 
 					"&7in the MAIN ItemJoin folder.", "&7", "&7The map CAN be a GIF but", "&7must be a 128x128 pixel image.", "&9&lImage: &a" + Utils.nullCheck(itemMap.getMapImage())), event -> {
 				if (Utils.nullCheck(itemMap.getMapImage()) != "NONE") {
 					itemMap.setMapImage(null);
@@ -533,7 +532,7 @@ public class UI {
 				this.creatingPane(event.getPlayer(), itemMap);
 			}));
 		} else if (itemMap.getMaterial().toString().contains("TIPPED_ARROW")) {
-			creatingPane.addButton(new Button(ItemHandler.getItem("BLAZE_POWDER", 1, false, "&c&lEffects", "&7", "&7*Add custom effects", "&7to the arrow tip.", "&9&lTipped-Effect: &a" + Utils.nullCheck(potionList)),
+			creatingPane.addButton(new Button(ItemHandler.getItem("BLAZE_POWDER", 1, false, "&e&lEffects", "&7", "&7*Add custom effects", "&7to the arrow tip.", "&9&lTipped-Effect: &a" + Utils.nullCheck(potionList)),
 					event -> this.potionPane(player, itemMap)));
 		} else if (itemMap.getMaterial().toString().contains("CHARGE") || itemMap.getMaterial().toString().equalsIgnoreCase("FIREWORK_STAR")) {
 			Interface colorPane = new Interface(true, 6, this.GUIName);
@@ -544,7 +543,7 @@ public class UI {
 					this.creatingPane(player, itemMap);
 				}));
 			}
-			creatingPane.addButton(new Button(ItemHandler.getItem((ServerHandler.hasAquaticUpdate() ? "PINK_DYE" : "351:9"), 1, false, "&c&lCharge Color", "&7", "&7*Set the color of", "&7the firework star.", "&9&lColor: &a" +
+			creatingPane.addButton(new Button(ItemHandler.getItem((ServerHandler.hasAquaticUpdate() ? "PINK_DYE" : "351:9"), 1, false, "&e&lCharge Color", "&7", "&7*Set the color of", "&7the firework star.", "&9&lColor: &a" +
 			Utils.nullCheck(itemMap.getChargeColor() + "")), event -> {
 				if (Utils.nullCheck(itemMap.getChargeColor() + "") != "NONE") {
 					itemMap.setChargeColor(null);
@@ -554,13 +553,13 @@ public class UI {
 				}
 			}));
 		} else if (itemMap.getMaterial().toString().contains("GOLDEN_APPLE")) {
-			creatingPane.addButton(new Button(ItemHandler.getItem("POTION", 1, false, "&c&lEffects", "&7", "&7*Add custom effects after", "&7consuming the apple item.", "&9&lNotch-Effects: &a" + Utils.nullCheck(potionList)),
+			creatingPane.addButton(new Button(ItemHandler.getItem("POTION", 1, false, "&e&lEffects", "&7", "&7*Add custom effects after", "&7consuming the apple item.", "&9&lNotch-Effects: &a" + Utils.nullCheck(potionList)),
 					event -> this.potionPane(player, itemMap)));
 		} else if (itemMap.getMaterial().toString().equalsIgnoreCase("POTION")) {
-			creatingPane.addButton(new Button(ItemHandler.getItem("POTION", 1, false, "&c&lEffects", "&7", "&7*Add custom effects after", "&7consuming the potion item.", "&9&lPotion-Effects: &a" + Utils.nullCheck(potionList)),
+			creatingPane.addButton(new Button(ItemHandler.getItem("POTION", 1, false, "&e&lEffects", "&7", "&7*Add custom effects after", "&7consuming the potion item.", "&9&lPotion-Effects: &a" + Utils.nullCheck(potionList)),
 					event -> this.potionPane(player, itemMap)));
 		} else if (itemMap.getMaterial().toString().contains("BANNER")) {
-			creatingPane.addButton(new Button(ItemHandler.getItem("CLAY_BALL", 1, false, "&c&lBanner Patterns", "&7", "&7*Set custom patterns that", "&7will appear on the item.", "&9&lBanner-Meta: &a" + Utils.nullCheck(patternList)),
+			creatingPane.addButton(new Button(ItemHandler.getItem("CLAY_BALL", 1, false, "&e&lBanner Patterns", "&7", "&7*Set custom patterns that", "&7will appear on the item.", "&9&lBanner-Meta: &a" + Utils.nullCheck(patternList)),
 					event -> this.bannerPane(player, itemMap)));
 		} else {
 			creatingPane.addButton(new Button(ItemHandler.getItem("MAGMA_CREAM", 1, false, "&e&lOther Settings", "&7", "&7*Settings that are specific", "&7to the item's material type.", (this.specialItem(itemMap) ? "" : "&7"),
@@ -675,9 +674,9 @@ public class UI {
 			slotPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> this.creatingPane(player, itemMap)));
 		}
 		slotPane.addButton(new Button(this.fillerPaneBItem), 2);
-		slotPane.addButton(new Button(ItemHandler.getItem("GLASS", 1, false, "&9&lSingle Slot", "&7", "&7*Define a single dedicated", "&7 slot for the item."), event -> this.slotPane(player, itemMap, stage, 0)));
+		slotPane.addButton(new Button(ItemHandler.getItem("GLASS", 1, false, "&a&lSingle Slot", "&7", "&7*Define a single dedicated", "&7 slot for the item."), event -> this.slotPane(player, itemMap, stage, 0)));
 		slotPane.addButton(new Button(this.fillerPaneBItem), 1);
-		slotPane.addButton(new Button(ItemHandler.getItem("23", 1, false, "&9&lMultiple Slots", "&7", "&7*Define multiple slots for the item."), event -> this.slotPane(player, itemMap, stage, 1)));
+		slotPane.addButton(new Button(ItemHandler.getItem("23", 1, false, "&b&lMultiple Slots", "&7", "&7*Define multiple slots for the item."), event -> this.slotPane(player, itemMap, stage, 1)));
 		slotPane.addButton(new Button(this.fillerPaneBItem), 2);
 		if (stage == 0) {
 			if (ServerHandler.hasSpecificUpdate("1_8")) {
@@ -1078,7 +1077,7 @@ public class UI {
 	
 	private void commandPane(final Player player, final ItemMap itemMap) {
 		Interface commandPane = new Interface(false, 2, this.GUIName);
-		commandPane.addButton(new Button(ItemHandler.getItem((ServerHandler.hasAquaticUpdate() ? "WRITABLE_BOOK" : "386"), 1, false, "&e&l&nCommands", "&7", "&7*Click to define the custom command lines", "&7for the item and click type.", 
+		commandPane.addButton(new Button(ItemHandler.getItem((ServerHandler.hasAquaticUpdate() ? "WRITABLE_BOOK" : "386"), 1, false, "&e&lCommands", "&7", "&7*Click to define the custom command lines", "&7for the item and click type.", 
 				"&7", "&9&lCommands: &a" + (itemMap.getCommands().length != 0 ? "YES" : "NONE")), event -> this.actionPane(player, itemMap)));
 		commandPane.addButton(new Button(ItemHandler.getItem("STICK", 1, false, "&a&lType", "&7", "&7*The event type that will", "&7trigger command execution.", "&9&lCOMMANDS-TYPE: &a" + Utils.nullCheck(itemMap.getCommandType() + "")), 
 				event -> this.typePane(player, itemMap)));
@@ -2938,14 +2937,14 @@ public class UI {
 		}
 		animationPane.addButton(new Button(ItemHandler.getItem(itemMap.getMaterial().toString(), 1, false, "&c&l&nMaterial", "&7", "&7*Add additional material types", "&7to have the item change between.", "&9&lAnimated Materials: &a" + 
 		(Utils.nullCheck(itemMap.getDynamicMaterials() + "") != "NONE" ? "YES" : "NONE")), event -> this.animateMaterialPane(player, itemMap)));
-		animationPane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, false, "&c&l&nName", "&7", "&7*Add additional custom names", "&7to have the item change between.", "&9&lAnimated Names: &a" + 
+		animationPane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, false, "&a&l&nName", "&7", "&7*Add additional custom names", "&7to have the item change between.", "&9&lAnimated Names: &a" + 
 		(Utils.nullCheck(itemMap.getDynamicNames() + "") != "NONE" ? "YES" : "NONE")), event -> this.animatedNamePane(player, itemMap)));
-		animationPane.addButton(new Button(ItemHandler.getItem("386", 1, false, "&c&l&nLore", "&7", "&7*Add additional custom lores", "&7to have the item change between.", "&9&lAnimated Lores: &a" + 
+		animationPane.addButton(new Button(ItemHandler.getItem("386", 1, false, "&b&l&nLore", "&7", "&7*Add additional custom lores", "&7to have the item change between.", "&9&lAnimated Lores: &a" + 
 		(Utils.nullCheck(itemMap.getDynamicLores() + "") != "NONE" ? "YES" : "NONE")), event -> this.animatedLorePane(player, itemMap)));
 		if (itemMap.getMaterial().toString().contains("PLAYER_HEAD") || itemMap.getMaterial().toString().contains("SKULL_ITEM")) {
-			animationPane.addButton(new Button(ItemHandler.getItem("GOLDEN_HELMET", 1, false, "&c&lSkull Owner", "&7", "&7*Add additional skull owners", "&7to have the item change between.", "&7", "&7You can only define skull owner", 
+			animationPane.addButton(new Button(ItemHandler.getItem("GOLDEN_HELMET", 1, false, "&a&lSkull Owner", "&7", "&7*Add additional skull owners", "&7to have the item change between.", "&7", "&7You can only define skull owner", 
 					"&7or skull texture, this will", "&7remove any skull textures.", "&9&lAnimated Owners: &a" + (Utils.nullCheck(itemMap.getDynamicOwners() + "") != "NONE" ? "YES" : "NONE")), event -> this.animatedSkullPane(player, itemMap, true)));
-			animationPane.addButton(new Button(ItemHandler.getItem("STRING", 1, false, "&c&lSkull Texture", "&7", "&7*Add additional skull textures", "&7to have the item change between.", "&7", "&7You can only define skull texture", 
+			animationPane.addButton(new Button(ItemHandler.getItem("STRING", 1, false, "&b&lSkull Texture", "&7", "&7*Add additional skull textures", "&7to have the item change between.", "&7", "&7You can only define skull texture", 
 					"&7or skull owner, this will", "&7remove any skull owners.", "&7", "&7Skull textures can be found", "&7at websites like &aminecraft-heads.com", "&7and the value is listed under", "&7the OTHER section.", 
 					"&9&lAnimated Textures: &a" + (Utils.nullCheck(itemMap.getDynamicTextures() + "") != "NONE" ? "YES" : "NONE")), event -> this.animatedSkullPane(player, itemMap, false)));
 			animationPane.addButton(new Button(this.fillerPaneGItem), 2);
@@ -2973,7 +2972,7 @@ public class UI {
 			limitModes.add("CREATIVE");
 		}
 		limitPane.addButton(new Button(this.fillerPaneGItem), 3);
-		limitPane.addButton(new Button(ItemHandler.getItem((ServerHandler.hasAquaticUpdate() ? "FILLED_MAP" : "MAP"), 1, limitModes.contains("ADVENTURE"), "&c&l&nADVENTURE", "&7", "&7*Limits the item to", "&7ADVENTURE mode.", "&9&lENABLED: &a" + 
+		limitPane.addButton(new Button(ItemHandler.getItem((ServerHandler.hasAquaticUpdate() ? "FILLED_MAP" : "MAP"), 1, limitModes.contains("ADVENTURE"), "&a&l&nADVENTURE", "&7", "&7*Limits the item to ADVENTURE mode.", "&9&lENABLED: &a" + 
 		(limitModes.contains("ADVENTURE") + "").toUpperCase()), event -> {
 			if (limitModes.contains("ADVENTURE")) {
 				limitModes.remove("ADVENTURE");
@@ -2982,7 +2981,7 @@ public class UI {
 			}
 			itemMap.setLimitModes(limitModes.toString().substring(0, limitModes.toString().length() - 1).substring(1));this.limitPane(player, itemMap);
 		}));
-		limitPane.addButton(new Button(ItemHandler.getItem("STONE_SWORD", 1, limitModes.contains("SURVIVAL"), "&c&l&nSURVIVAL", "&7", "&7*Limits the item to", "&7SURVIVAL mode.", "&9&lENABLED: &a" + (limitModes.contains("SURVIVAL") + "").toUpperCase()), 
+		limitPane.addButton(new Button(ItemHandler.getItem("STONE_SWORD", 1, limitModes.contains("SURVIVAL"), "&b&l&nSURVIVAL", "&7", "&7*Limits the item to SURVIVAL mode.", "&9&lENABLED: &a" + (limitModes.contains("SURVIVAL") + "").toUpperCase()), 
 				event -> {
 			if (limitModes.contains("SURVIVAL")) {
 				limitModes.remove("SURVIVAL");
@@ -2991,7 +2990,7 @@ public class UI {
 			}
 			itemMap.setLimitModes(limitModes.toString().substring(0, limitModes.toString().length() - 1).substring(1));this.limitPane(player, itemMap);
 		}));
-		limitPane.addButton(new Button(ItemHandler.getItem(limitModes.contains("CREATIVE") ? "ENCHANTED_GOLDEN_APPLE" : "GOLDEN_APPLE", 1, false, "&c&l&nCREATIVE", "&7", "&7*Limits the item to", "&7CREATIVE mode.", "&9&lENABLED: &a" + 
+		limitPane.addButton(new Button(ItemHandler.getItem(limitModes.contains("CREATIVE") ? "ENCHANTED_GOLDEN_APPLE" : "GOLDEN_APPLE", 1, false, "&6&l&nCREATIVE", "&7", "&7*Limits the item to CREATIVE mode.", "&9&lENABLED: &a" + 
 		(limitModes.contains("CREATIVE") + "").toUpperCase()), event -> {
 			if (limitModes.contains("CREATIVE")) {
 				limitModes.remove("CREATIVE");
@@ -3387,10 +3386,10 @@ public class UI {
 		otherPane.addButton(new Button(this.fillerPaneGItem), 4);
 		if (itemMap.getMaterial().toString().contains("WRITTEN_BOOK")) {
 			otherPane.addButton(new Button(this.fillerPaneGItem), 3);
-			otherPane.addButton(new Button(ItemHandler.getItem((ServerHandler.hasAquaticUpdate() ? "WRITABLE_BOOK" : "386"), 1, false, "&c&lPages", "&7", "&7*Define custom pages for the book.", 
+			otherPane.addButton(new Button(ItemHandler.getItem((ServerHandler.hasAquaticUpdate() ? "WRITABLE_BOOK" : "386"), 1, false, "&e&lPages", "&7", "&7*Define custom pages for the book.", 
 					"&9&lPages: &a" + (Utils.nullCheck(itemMap.getPages() + "") != "NONE" ? "YES" : "NONE")), event -> this.pagePane(player, itemMap)));
 			otherPane.addButton(new Button(this.fillerPaneGItem));
-			otherPane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, false, "&c&lAuthor", "&7", "&7*Define the author of the book.", "&9&lAuthor: &a" + Utils.nullCheck(itemMap.getAuthor())), event -> {
+			otherPane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, false, "&a&lAuthor", "&7", "&7*Define the author of the book.", "&9&lAuthor: &a" + Utils.nullCheck(itemMap.getAuthor())), event -> {
 				if (Utils.nullCheck(itemMap.getAuthor()) != "NONE") {
 					itemMap.setAuthor(null);
 					this.otherPane(player, itemMap);
@@ -3412,7 +3411,7 @@ public class UI {
 			otherPane.addButton(new Button(this.fillerPaneGItem), 3);
 		} else if (itemMap.getMaterial().toString().contains("PLAYER_HEAD") || itemMap.getMaterial().toString().contains("SKULL_ITEM")) {
 			otherPane.addButton(new Button(this.fillerPaneGItem), 3);
-			otherPane.addButton(new Button(ItemHandler.getItem("GOLDEN_HELMET", 1, false, "&c&lSkull Owner", "&7", "&7*Define a skull owner for the", "&7head adding that persons skin.", "&7", "&7You can only define skull owner", 
+			otherPane.addButton(new Button(ItemHandler.getItem("GOLDEN_HELMET", 1, false, "&b&lSkull Owner", "&7", "&7*Define a skull owner for the", "&7head adding that persons skin.", "&7", "&7You can only define skull owner", 
 					"&7or skull texture, this will", "&7remove any skull textures.", "&9&lSkull-Owner: &a" + Utils.nullCheck(itemMap.getSkull())), event -> {
 				if (Utils.nullCheck(itemMap.getSkull()) != "NONE") {
 					itemMap.setSkull(null);
@@ -3434,7 +3433,7 @@ public class UI {
 				this.otherPane(event.getPlayer(), itemMap);
 			}));
 			otherPane.addButton(new Button(this.fillerPaneGItem));
-			otherPane.addButton(new Button(ItemHandler.getItem("STRING", 1, false, "&c&lSkull Texture", "&7", "&7*Add a skull texture for the", "&7head as a custom skin.", "&7", "&7You can only define skull texture", 
+			otherPane.addButton(new Button(ItemHandler.getItem("STRING", 1, false, "&a&lSkull Texture", "&7", "&7*Add a skull texture for the", "&7head as a custom skin.", "&7", "&7You can only define skull texture", 
 					"&7or skull owner, this will", "&7remove any skull owners.", "&7", "&7Skull textures can be found", "&7at websites like &aminecraft-heads.com", "&7and the value is listed under", "&7the OTHER section.", "&9&lSkull-Texture: &a" + 
 			Utils.nullCheck(itemMap.getSkullTexture())), event -> {
 				if (Utils.nullCheck(itemMap.getSkullTexture()) != "NONE") {
@@ -3465,7 +3464,7 @@ public class UI {
 				}
 			}
 			otherPane.addButton(new Button(this.fillerPaneGItem), 2);
-			otherPane.addButton(new Button(ItemHandler.getItem("EGG", 1, false, "&c&lType", "&7", "&7*Set the style of the explosion.", "&9&lType: &a" + Utils.nullCheck(itemMap.getFireworkType() + "")), event -> {
+			otherPane.addButton(new Button(ItemHandler.getItem("EGG", 1, false, "&a&lType", "&7", "&7*Set the style of the explosion.", "&9&lType: &a" + Utils.nullCheck(itemMap.getFireworkType() + "")), event -> {
 				if (Utils.nullCheck(itemMap.getFireworkType() + "") != "NONE") {
 					itemMap.setFireworkType(null);
 					this.otherPane(player, itemMap);
@@ -3473,7 +3472,7 @@ public class UI {
 					this.designPane(player, itemMap);
 				}
 			}));
-			otherPane.addButton(new Button(ItemHandler.getItem("DIAMOND", 1, itemMap.getFireworkFlicker(), "&c&lFlicker", "&7", "&7*Show the flicker effect as", "&7the firework particles dissipate", "&7after the explosion.", 
+			otherPane.addButton(new Button(ItemHandler.getItem("DIAMOND", 1, itemMap.getFireworkFlicker(), "&a&lFlicker", "&7", "&7*Show the flicker effect as", "&7the firework particles dissipate", "&7after the explosion.", 
 					"&9&lENABLED: &a" + itemMap.getFireworkFlicker()), event -> {
 				if (itemMap.getFireworkFlicker()) {
 					itemMap.setFireworkFlicker(false);
@@ -3482,7 +3481,7 @@ public class UI {
 				}
 				this.otherPane(player, itemMap);
 			}));
-			otherPane.addButton(new Button(ItemHandler.getItem("EMERALD", 1, itemMap.getFireworkTrail(), "&c&lTrail", "&7", "&7*Show the trail (smoke) of", "&7the firework when launched.", "&9&lENABLED: &a" + itemMap.getFireworkTrail()), event -> {
+			otherPane.addButton(new Button(ItemHandler.getItem("EMERALD", 1, itemMap.getFireworkTrail(), "&a&lTrail", "&7", "&7*Show the trail (smoke) of", "&7the firework when launched.", "&9&lENABLED: &a" + itemMap.getFireworkTrail()), event -> {
 				if (itemMap.getFireworkTrail()) {
 					itemMap.setFireworkTrail(false);
 				} else {
@@ -3490,7 +3489,7 @@ public class UI {
 				}
 				this.otherPane(player, itemMap);
 			}));
-			otherPane.addButton(new Button(ItemHandler.getItem("SUGAR", 1, false, "&c&lPower", "&7", "&7*Set the power (distance)", "&7that the firework travels.", "&9&lPower: &a" + Utils.nullCheck(itemMap.getFireworkPower() + "&7")), event -> {
+			otherPane.addButton(new Button(ItemHandler.getItem("SUGAR", 1, false, "&a&lPower", "&7", "&7*Set the power (distance)", "&7that the firework travels.", "&9&lPower: &a" + Utils.nullCheck(itemMap.getFireworkPower() + "&7")), event -> {
 				if (Utils.nullCheck(itemMap.getFireworkPower() + "&7") != "NONE") {
 					itemMap.setFireworkPower(0);
 					this.otherPane(player, itemMap);
@@ -3498,7 +3497,7 @@ public class UI {
 					this.powerPane(player, itemMap);
 				}
 			}));
-			otherPane.addButton(new Button(ItemHandler.getItem((ServerHandler.hasAquaticUpdate() ? "LIME_DYE" : "351:10"), 1, false, "&c&lColor(s)", "&7", "&7*Define the individual colors of the", "&7firework effect type.", 
+			otherPane.addButton(new Button(ItemHandler.getItem((ServerHandler.hasAquaticUpdate() ? "LIME_DYE" : "351:10"), 1, false, "&a&lColor(s)", "&7", "&7*Define the individual colors of the", "&7firework effect type.", 
 					"&9&lColor(s): &a" + (Utils.nullCheck(colorList) != "NONE" ? colorList : "NONE")), event -> this.colorPane(player, itemMap)));
 			otherPane.addButton(new Button(this.fillerPaneGItem), 2);
 		} else if (itemMap.getMaterial().toString().contains("LEATHER_")) {
@@ -3510,7 +3509,7 @@ public class UI {
 				}));
 			}
 			otherPane.addButton(new Button(this.fillerPaneGItem), 3);
-			otherPane.addButton(new Button(ItemHandler.getItem((ServerHandler.hasAquaticUpdate() ? "YELLOW_DYE" : "351:11"), 1, false, "&c&lDye", "&7", "&7*Add a custom color to", "&7your leather armor.", "&9&lLeather-Color: &a" +
+			otherPane.addButton(new Button(ItemHandler.getItem((ServerHandler.hasAquaticUpdate() ? "YELLOW_DYE" : "351:11"), 1, false, "&a&lDye", "&7", "&7*Add a custom color to", "&7your leather armor.", "&9&lLeather-Color: &a" +
 			(Utils.nullCheck(itemMap.getLeatherColor()) != "NONE" ? Utils.nullCheck(itemMap.getLeatherColor()) : Utils.nullCheck(itemMap.getLeatherHex()))), event -> {
 				if (itemMap.getLeatherColor() != null) {
 					itemMap.setLeatherColor(null);
@@ -3520,7 +3519,7 @@ public class UI {
 				}
 			}));
 			otherPane.addButton(new Button(this.fillerPaneGItem));
-			otherPane.addButton(new Button(ItemHandler.getItem((ServerHandler.hasAquaticUpdate() ? "WRITABLE_BOOK" : "386"), 1, false, "&c&lHex Color", "&7", "&7*Add a custom hex color", "&7to your leather armor.", "&9&lLeather-Color: &a" + 
+			otherPane.addButton(new Button(ItemHandler.getItem((ServerHandler.hasAquaticUpdate() ? "WRITABLE_BOOK" : "386"), 1, false, "&a&lHex Color", "&7", "&7*Add a custom hex color", "&7to your leather armor.", "&9&lLeather-Color: &a" + 
 			(Utils.nullCheck(itemMap.getLeatherHex()) != "NONE" ? Utils.nullCheck(itemMap.getLeatherHex()) : Utils.nullCheck(itemMap.getLeatherColor()))), event -> {
 				if (itemMap.getLeatherHex() != null) {
 					itemMap.setLeatherHex(null);

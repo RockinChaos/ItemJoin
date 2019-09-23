@@ -57,6 +57,7 @@ public class Commands implements CommandExecutor {
 				Language.dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
 				Language.dispatchMessage(sender, "&a&l/ItemJoin List &7- &eCheck items you can get each what worlds.");
 				Language.dispatchMessage(sender, "&a&l/ItemJoin World &7- &eCheck what world you are in, debugging.");
+				Language.dispatchMessage(sender, "&a&l/ItemJoin Menu &7- &eOpens the GUI Creator for custom items.");
 				Language.dispatchMessage(sender, "&a&l/ItemJoin Permissions &7- &eLists the permissions you have.");
 				Language.dispatchMessage(sender, "&a&l/ItemJoin Permissions 2 &7- &ePermissions page 2.");
 				Language.dispatchMessage(sender, "&aType &a&l/ItemJoin Help 3 &afor the next page.");
