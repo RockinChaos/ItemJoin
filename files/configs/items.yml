@@ -1,5 +1,5 @@
 # --{ =-=-=-=-=-=-=-=-=-= ItemJoin's Custom Item Configurations, by RockinChaos =-=-=-=-=-=-=-=-=-= }--
-# See the tutorial page for a more in-depth explaination; https://www.spigotmc.org/wiki/itemjoin/
+# See the tutorial page for a more in-depth explaination; https://github.com/RockinChaos/ItemJoin/wiki
 items-Version: 6
 
 # General options that apply to the custom items functionality.

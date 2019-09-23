@@ -1,5 +1,5 @@
 # --{ =-=-=-=-=-=-=-=-=-= ItemJoin's Configuration Settings, by RockinChaos =-=-=-=-=-=-=-=-=-= }--
-# See the tutorial page for a more in-depth explaination; https://www.spigotmc.org/wiki/itemjoin/
+# See the tutorial page for a more in-depth explaination; https://github.com/RockinChaos/ItemJoin/wiki
 config-Version: 7
 
 Language: 'English'
