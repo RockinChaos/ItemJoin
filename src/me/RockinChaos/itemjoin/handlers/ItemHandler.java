@@ -112,8 +112,8 @@ public class ItemHandler {
     public static ItemStack getItem(String mat, int count, boolean glowing, String name, String... lore) {
         ItemStack tempItem; if (!ServerHandler.hasSpecificUpdate("1_8") && mat.equals("BARRIER")) { mat = "WOOL:14"; }
         if (getMaterial(mat, null) == null) { mat = "STONE"; } 
-        if (!mat.contains(":")) { tempItem = new ItemStack(getMaterial(mat, null), count); } 
-        else { short dataValue = 0; String[] parts = mat.split(":"); mat = parts[0]; dataValue = (short) Integer.parseInt(parts[1]); tempItem = Legacy.newLegacyItemStack(getMaterial(mat, null), count, dataValue); }
+        if (ServerHandler.hasAquaticUpdate()) { tempItem = new ItemStack(getMaterial(mat, null), count); } 
+        else { short dataValue = 0; if (mat.contains(":")) { String[] parts = mat.split(":"); mat = parts[0]; dataValue = (short) Integer.parseInt(parts[1]); } tempItem = Legacy.newLegacyItemStack(getMaterial(mat, null), count, dataValue); }
         if (glowing && mat != "AIR") { tempItem.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 1); }
         ItemMeta tempMeta = tempItem.getItemMeta();
         if (ServerHandler.hasSpecificUpdate("1_8") && mat != "AIR") { tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ENCHANTS); }
