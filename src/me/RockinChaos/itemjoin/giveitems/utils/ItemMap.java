@@ -2118,7 +2118,7 @@ public class ItemMap {
 		File itemFile =  new File (ItemJoin.getInstance().getDataFolder(), "items.yml");
 		FileConfiguration itemData = YamlConfiguration.loadConfiguration(itemFile);
 		if (ConfigHandler.getConfig("items.yml").getString("items." + this.configName) != null) { itemData.set("items." + this.configName, null); } 
-		if (!(this.dynamicMaterials != null && !this.dynamicMaterials.isEmpty())) { itemData.set("items." + this.configName + ".id", this.material.toString().toUpperCase()); }
+		if (!(this.dynamicMaterials != null && !this.dynamicMaterials.isEmpty())) { itemData.set("items." + this.configName + ".id", this.material.toString().toUpperCase() + (this.dataValue != 0 ? ":" + this.dataValue : "")); }
 		else if (this.dynamicMaterials != null && !this.dynamicMaterials.isEmpty()) { 
 			for (int i = 0; i < this.dynamicMaterials.size(); i++) {
 				itemData.set("items." + this.configName + ".id." + (i + 1), this.dynamicMaterials.get(i)); 	

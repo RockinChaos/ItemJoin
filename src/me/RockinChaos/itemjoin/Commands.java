@@ -17,11 +17,11 @@ import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
-import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PermissionsHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.utils.Language;
+import me.RockinChaos.itemjoin.utils.Legacy;
 import me.RockinChaos.itemjoin.utils.Utils;
 import me.RockinChaos.itemjoin.utils.sqlite.SQLData;
 import me.RockinChaos.itemjoin.utils.sqlite.SQLite;
@@ -175,9 +175,8 @@ public class Commands implements CommandExecutor {
 						Language.dispatchMessage(sender, "");
 						String[] placeHolders = Language.newString(); placeHolders[3] = PlayerHandler.getHandItem((Player) sender).getType().toString();
 						Language.sendLangMessage("Commands.Info.material", sender, placeHolders);
-						if (!ServerHandler.hasAquaticUpdate() && PlayerHandler.getHandItem((Player) sender).getType().getMaxDurability() < 30 
-								&& ItemHandler.getDurability(PlayerHandler.getHandItem((Player) sender)) > 0) {
-							placeHolders[3] = ItemHandler.getDurability(PlayerHandler.getHandItem((Player) sender)) + "";
+						if (!ServerHandler.hasAquaticUpdate()) {
+							placeHolders[3] = Legacy.getDataValue(PlayerHandler.getHandItem((Player) sender)) + "";
 							Language.sendLangMessage("Commands.Info.dataValue", sender, placeHolders);
 						}
 						Language.dispatchMessage(sender, "");

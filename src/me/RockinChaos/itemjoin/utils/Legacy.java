@@ -50,6 +50,10 @@ public class Legacy {
     	return mapmeta; 
     }
     
+    public static int getDataValue(ItemStack item) {
+    	return item.getData().getData();
+    }
+    
     public static MapView getMapView(int id) {
     	if (!ItemUtilities.getMapViewMethod()) {
     		try { return ItemJoin.getInstance().getServer().getMap((short) id); } 
