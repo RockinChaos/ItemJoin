@@ -25,12 +25,12 @@ Commands:
     targetNotFound: '&c找不到玩家 %targetplayer%'
   UI:
     creatorLaunched: '&a已打開物品編輯器'
-    itemSaved: '&e%item% &a已成功保存.'
-    notInteger: '&c&l&n錯誤:&c 輸入值 &4%input% &c不是整數值!'
-    noMatch: '&c&l&n錯誤:&c 輸入值 &4%input% &c不是適當的材料!'
-    inputType: '&a輸入 &e%type% &a您想要在商品上擁有的.'
-    inputSet: '&a這幾項 &e%type% &a已成功設置!'
-    normalExample: '&a例: %example%.'
+    itemSaved: '&e%item% &a成功儲存！'
+    notInteger: '&c&l&n錯誤:&c 輸入的內容 &4%input% &c不是數字'
+    noMatch: '&c&l&n錯誤:&c 輸入的內容 &4%input% &c不是物品ID'
+    inputType: '&a輸入 &e%type% &a在你想要的物品上'
+    inputSet: '&a物品 &e%type% &a成功設置'
+    normalExample: '&a範例: %example%.'
   Item:
     notInHand: '&c手上沒有物品'
     invalidItem: '&c物品 &e%item% &c不存在'
