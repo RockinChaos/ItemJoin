@@ -62,7 +62,7 @@ public class UI {
 		pagedPane.addButton(new Button(this.exitItem, event -> player.closeInventory()));
 		pagedPane.addButton(new Button(this.fillerPaneBItem), 2);
 		pagedPane.addButton(new Button(ItemHandler.getItem((ServerHandler.hasAquaticUpdate() ? "WRITABLE_BOOK" : "386"), 1, false, "&a&l&nCreate", "&7", "&7*Create a new item from scratch."),
-				event -> this.materialPane(player, new ItemMap("items.item_" + Utils.getPath(1), "ARBITRARY"), 0)));
+				event -> this.materialPane(player, new ItemMap("item_" + Utils.getPath(1), "ARBITRARY"), 0)));
 		pagedPane.addButton(new Button(ItemHandler.getItem("HOPPER", 1, false, "&e&l&nSave", "&7", "&7*Save an existing item as a custom item."), event -> this.startHopper(player)));
 		pagedPane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, false, "&c&l&nModify", "&7", "&7*Modify an existing custom item"), event -> this.startModify(player)));
 		pagedPane.addButton(new Button(this.fillerPaneBItem), 2);
@@ -261,8 +261,7 @@ public class UI {
 	}
 	
 	private void convertStack(Player player, ItemStack item) {
-		ItemMap itemMap = new ItemMap("items.item_" + Utils.getPath(1), "ARBITRARY");
-		player.sendMessage("You are SAVING: " + item.getType());
+		ItemMap itemMap = new ItemMap("item_" + Utils.getPath(1), "ARBITRARY");
 		itemMap.setMaterial(item.getType());
 		itemMap.setCount(item.getAmount() + "");
 		if (item.getType().getMaxDurability() > 30 && ItemHandler.getDurability(item) != 0 && ItemHandler.getDurability(item) != (item.getType().getMaxDurability())) {
