@@ -50,7 +50,7 @@ public class Interface implements InventoryHolder {
 	}
 	
 	public void onClick(InventoryClickEvent event) {
-		if (!(this.pendingClick && event.getClickedInventory() == event.getWhoClicked().getInventory())) {
+		if (!(this.pendingClick && this.clickInventory(event))) {
 			if (this.isPaged && event.getSlot() == this.inventory.getSize() - 8 && this.getCurrentPage() > 1) {
 				if (this.controlBack != null) {
 					this.controlBack.onClick(event);
@@ -191,7 +191,7 @@ public class Interface implements InventoryHolder {
 			inventory.setItem(inventory.getSize() - 5, ItemHandler.getItem("BOOK", 1, false, "&3&lPage &a&l" + this.getCurrentPage() + "&7 / &c&l" + this.getPageAmount(), "&7You are on page &a&l" + this.getCurrentPage() + "&7 / &c&l" + this.getPageAmount()));
 			ItemStack exitItem = ItemHandler.getItem("BARRIER", 1, false, "&c&l&nMain Menu", "&7", "&7*Returns you to the main menu.");
 			if (this.controlExit == null) {
-				this.controlExit = new Button(exitItem, event -> ConfigHandler.getItemCreator().startMenu(event.getWhoClicked()));
+				this.controlExit = new Button(exitItem, event -> ConfigHandler.getItemCreator().startMenu(((Player)event.getWhoClicked())));
 			} else {
 				exitItem = controlExit.getItemStack();
 			}
@@ -225,6 +225,16 @@ public class Interface implements InventoryHolder {
 		}
 		this.currentIndex = index;
 		this.renderPage();
+	}
+	
+	public boolean clickInventory(InventoryClickEvent event) {
+		if (ServerHandler.hasSpecificUpdate("1_14")) {
+			return (event.getClickedInventory() == event.getWhoClicked().getInventory());
+		} else {
+			final ItemStack clickItem = event.getCurrentItem();
+			final int slot = event.getSlot();
+			return clickItem.equals(event.getWhoClicked().getInventory().getItem(slot)) || clickItem.getType() == org.bukkit.Material.AIR;
+		}
 	}
 	
 	public boolean chatPending() {

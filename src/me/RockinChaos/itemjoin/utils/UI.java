@@ -46,9 +46,7 @@ public class UI {
 	private ItemStack fillerPaneBItem = ItemHandler.getItem("STAINED_GLASS_PANE:15", 1, false, "&7", "");
 	private ItemStack fillerPaneGItem = ItemHandler.getItem("STAINED_GLASS_PANE:7", 1, false, "&7", "");
 	private ItemStack exitItem = ItemHandler.getItem("BARRIER", 1, false, "&c&l&nExit", "&7", "&7*Returns you to the game");
-	
-	// check dataValue materials when saving.. (1.8/1.9)
-	
+
 //  ============================================== //
 //  			   Selection Menus      	       //
 //	============================================== //
@@ -81,9 +79,9 @@ public class UI {
 	private void startHopper(Player player) {
 		Interface dragDrop = new Interface(false, 1, this.GUIName);
 		dragDrop.allowClick(true);
-		dragDrop.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nMain Menu", "&7", "&7*Returns you to the main menu."), event -> this.startMenu(player)));
+		dragDrop.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nMain Menu", "&7", "&7*Returns you to the main menu&a&c&b&9&0&a&c&b&7."), event -> this.startMenu(player)));
 		dragDrop.addButton(new Button(this.fillerPaneGItem), 3);
-		dragDrop.addButton(new Button(ItemHandler.getItem("HOPPER", 1, false, "&a&lDrop Item", "&7", "&7*Click an item from your inventory", "&7to save and drop it in this", "&7friendly little hopper!"), event -> {
+		dragDrop.addButton(new Button(ItemHandler.getItem("HOPPER", 1, false, "&a&lDrop Item", "&7", "&7*Click an item from your inventory", "&7to save and drop it in this", "&7friendly little hopper&a&c&b&9&0&a&c&b&7!"), event -> {
 			if (event.getCursor().getType() != Material.AIR) {
 				ItemStack item = event.getCursor().clone();
 				event.getWhoClicked().setItemOnCursor(null);
@@ -92,8 +90,8 @@ public class UI {
 				dragDrop.allowClick(false);
 			}
 		}));
-		dragDrop.addButton(new Button(this.fillerPaneGItem), 3);
-		dragDrop.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nMain Menu", "&7", "&7*Returns you to the main menu."), event -> this.startMenu(player)));
+		dragDrop.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:7", 1, false, "&a&c&b&9&0&a&c&b&7", "")), 3);
+		dragDrop.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nMain Menu", "&7", "&7*Returns you to the main menu&a&c&b&9&0&a&c&b&7."), event -> this.startMenu(player)));
 		dragDrop.open(player);
 	}
 	
@@ -263,6 +261,7 @@ public class UI {
 	private void convertStack(Player player, ItemStack item) {
 		ItemMap itemMap = new ItemMap("item_" + Utils.getPath(1), "ARBITRARY");
 		itemMap.setMaterial(item.getType());
+		if (!ServerHandler.hasAquaticUpdate()) { itemMap.setDataValue((short)Legacy.getDataValue(item)); }
 		itemMap.setCount(item.getAmount() + "");
 		if (item.getType().getMaxDurability() > 30 && ItemHandler.getDurability(item) != 0 && ItemHandler.getDurability(item) != (item.getType().getMaxDurability())) {
 			itemMap.setDurability(ItemHandler.getDurability(item));
@@ -399,8 +398,8 @@ public class UI {
 		creatingPane.addButton(new Button(this.fillerPaneGItem), 4);
 		creatingPane.addButton(new Button(this.headerStack(itemMap)));
 		creatingPane.addButton(new Button(this.fillerPaneGItem), 4);
-		creatingPane.addButton(new Button(ItemHandler.getItem(itemMap.getMaterial().toString(), 1, false, "&c&lMaterial", "&7", "&7*Set the material of the item.", "&9&lMATERIAL: &a" + 
-		itemMap.getMaterial().toString()), event -> this.materialPane(player, itemMap, 1)));
+		creatingPane.addButton(new Button(ItemHandler.getItem(itemMap.getMaterial().toString() + ":" + itemMap.getDataValue(), 1, false, "&c&lMaterial", "&7", "&7*Set the material of the item.", "&9&lMATERIAL: &a" + 
+		itemMap.getMaterial().toString() + (itemMap.getDataValue() != 0 ? ":" + itemMap.getDataValue() : "")), event -> this.materialPane(player, itemMap, 1)));
 		creatingPane.addButton(new Button(ItemHandler.getItem("GLASS", 1, false, "&c&lSlot", "&7", "&7*Set the slot that the", "&7item will be given in.", (itemMap.getMultipleSlots() != null && 
 				!itemMap.getMultipleSlots().isEmpty() ? "&9&lSlot(s): &a" + slotList : "&9&lSlot: &a" + itemMap.getSlot())), event -> this.switchPane(player, itemMap, 1)));
 		creatingPane.addButton(new Button(ItemHandler.getItem("DIAMOND", itemMap.getCount(), false, "&b&lCount", "&7", "&7*Set the amount of the", "&7item to be given.", "&9&lCOUNT: &a" + 
@@ -632,6 +631,12 @@ public class UI {
 		}, event -> {
 			if (ItemHandler.getMaterial(event.getMessage(), null) != null) {
 				itemMap.setMaterial(ItemHandler.getMaterial(event.getMessage(), null));
+				if (!ServerHandler.hasAquaticUpdate() && event.getMessage().contains(":")) {
+					String[] dataValue = event.getMessage().split(":");
+					if (Utils.isInt(dataValue[1])) {
+						itemMap.setDataValue((short)Integer.parseInt(dataValue[1]));
+					}	
+				}
 				String[] placeHolders = Language.newString();
 				placeHolders[14] = "BUKKIT MATERIAL";
 				Language.sendLangMessage("Commands.UI.inputSet", player, placeHolders);
@@ -648,10 +653,13 @@ public class UI {
 			if (!material.name().contains("LEGACY") && material.name() != "AIR" && this.safeMaterial(ItemHandler.getItem(material.toString(), 1, false, "", ""), inventoryCheck)) {
 				materialPane.addButton(new Button(ItemHandler.getItem(material.toString(), 1, false, "", "&7", "&7*Click to set the", "&7material of the item."), event -> {
 					itemMap.setMaterial(material);
+					if (!ServerHandler.hasAquaticUpdate() && material.getMaxDurability() < 30 && material.getMaxDurability() != 0) {
+						itemMap.setDataValue((short)material.getMaxDurability());
+					}
 					if (stage == 0) {
-						switchPane(player, itemMap, 0);
+						this.switchPane(player, itemMap, 0);
 					} else {
-						creatingPane(player, itemMap);
+						this.creatingPane(player, itemMap);
 					}
 				}));
 			}
@@ -2242,10 +2250,10 @@ public class UI {
 	}
 	
 	private void worldPane(final Player player, final ItemMap itemMap) {
-		Interface materialPane = new Interface(false, 6, this.GUIName);
+		Interface worldPane = new Interface(false, 6, this.GUIName);
 		List < String > enabledWorlds = itemMap.getEnabledWorlds();
 		int i = 44;
-		materialPane.addButton(new Button(ItemHandler.getItem("OBSIDIAN", 1, ItemUtilities.containsWorld("ALL", itemMap), "&a&l&nGLOBAL", "&7", "&7*Click to enable the", "&7custom item in &lALL WORLDS.", "&9&lENABLED: &a" + 
+		worldPane.addButton(new Button(ItemHandler.getItem("OBSIDIAN", 1, ItemUtilities.containsWorld("ALL", itemMap), "&a&l&nGLOBAL", "&7", "&7*Click to enable the", "&7custom item in &lALL WORLDS.", "&9&lENABLED: &a" + 
 		(ItemUtilities.containsWorld("ALL", itemMap) + "").toUpperCase()), event -> {
 			if (ItemUtilities.containsWorld("ALL", itemMap)) {
 				enabledWorlds.remove("GLOBAL");
@@ -2263,7 +2271,7 @@ public class UI {
 			} else if (world.getEnvironment().equals(Environment.THE_END)) {
 				worldMaterial = (ServerHandler.hasAquaticUpdate() ? "END_STONE" : "121");
 			}
-			materialPane.addButton(new Button(ItemHandler.getItem(worldMaterial, 1, ItemUtilities.containsWorld(world.getName(), itemMap), "&f&l" + world.getName(), "&7", "&7*Click to enable the", "&7custom item in this world.", 
+			worldPane.addButton(new Button(ItemHandler.getItem(worldMaterial, 1, ItemUtilities.containsWorld(world.getName(), itemMap), "&f&l" + world.getName(), "&7", "&7*Click to enable the", "&7custom item in this world.", 
 					"&9&lENABLED: &a" + (ItemUtilities.containsWorld(world.getName(), itemMap) + "").toUpperCase()), event -> {
 				if (ItemUtilities.containsWorld(world.getName(), itemMap)) {
 					enabledWorlds.remove(world.getName());
@@ -2273,11 +2281,11 @@ public class UI {
 				itemMap.setEnabledWorlds(enabledWorlds);this.worldPane(player, itemMap);
 			}));
 		}
-		materialPane.addButton(new Button(ItemHandler.getItem("AIR", 1, false, "")), i);
-		materialPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> this.creatingPane(player, itemMap)));
-		materialPane.addButton(new Button(this.fillerPaneBItem), 7);
-		materialPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> this.creatingPane(player, itemMap)));
-		materialPane.open(player);
+		worldPane.addButton(new Button(ItemHandler.getItem("AIR", 1, false, "")), i);
+		worldPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> this.creatingPane(player, itemMap)));
+		worldPane.addButton(new Button(this.fillerPaneBItem), 7);
+		worldPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> this.creatingPane(player, itemMap)));
+		worldPane.open(player);
 	}
 	
 	private void regionPane(final Player player, final ItemMap itemMap) {
@@ -2297,13 +2305,13 @@ public class UI {
 		}));
 		for (World world: ItemJoin.getInstance().getServer().getWorlds()) {
 			for (String region: ConfigHandler.getDepends().getGuard().getRegions(world).keySet()) {
-				String worldMaterial = (ServerHandler.hasAquaticUpdate() ? "GRASS_BLOCK" : "2");
+				String regionMaterial = (ServerHandler.hasAquaticUpdate() ? "GRASS_BLOCK" : "2");
 				if (world.getEnvironment().equals(Environment.NETHER)) {
-					worldMaterial = "NETHERRACK";
+					regionMaterial = "NETHERRACK";
 				} else if (world.getEnvironment().equals(Environment.THE_END)) {
-					worldMaterial = (ServerHandler.hasAquaticUpdate() ? "END_STONE" : "121");
+					regionMaterial = (ServerHandler.hasAquaticUpdate() ? "END_STONE" : "121");
 				}
-				regionPane.addButton(new Button(ItemHandler.getItem(worldMaterial, 1, ItemUtilities.containsRegion(region, itemMap), "&f&l" + region, "&7", "&a&lWORLD: &f" + world.getName(), "&7", "&7*Click to enable the", 
+				regionPane.addButton(new Button(ItemHandler.getItem(regionMaterial, 1, ItemUtilities.containsRegion(region, itemMap), "&f&l" + region, "&7", "&a&lWORLD: &f" + world.getName(), "&7", "&7*Click to enable the", 
 						"&7custom item in this region.", "&9&lENABLED: &a" + (ItemUtilities.containsRegion(region, itemMap) + "").toUpperCase()), event -> {
 					if (ItemUtilities.containsRegion(region, itemMap)) {
 						enabledRegions.remove(region);
@@ -2326,7 +2334,13 @@ public class UI {
 		animateMaterialPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the animation menu."), event -> {
 			if (!itemMap.getDynamicMaterials().isEmpty()) {
 				itemMap.setAnimate(true);
-				itemMap.setMaterial(ItemHandler.getMaterial(ItemHandler.purgeDelay(itemMap.getDynamicMaterials().get(0)), null));
+				if (itemMap.getDynamicMaterials().get(0).contains(":")) {
+					String[] material = itemMap.getDynamicMaterials().get(0).split(":");
+					itemMap.setMaterial(ItemHandler.getMaterial(material[0], null));
+					itemMap.setDataValue((short)Integer.parseInt(material[1]));
+				} else {
+					itemMap.setMaterial(ItemHandler.getMaterial(ItemHandler.purgeDelay(itemMap.getDynamicMaterials().get(0)), null));
+				}
 			}
 			this.animationPane(player, itemMap);
 		}));
@@ -2354,10 +2368,10 @@ public class UI {
 		}, event -> {
 			if (ItemHandler.getMaterial(event.getMessage(), null) != null) {
 				if (isNew) {
-					this.durationMaterialPane(player, itemMap, position, isNew, ItemHandler.getMaterial(event.getMessage(), null).name());
+					this.durationMaterialPane(player, itemMap, position, isNew, event.getMessage().toUpperCase());
 				} else {
 					List < String > mats = itemMap.getDynamicMaterials();
-					mats.set(position, "<delay:" + Utils.returnInteger(ItemHandler.getDelay(mats.get(position))) + ">" + ItemHandler.getMaterial(event.getMessage(), null).name());
+					mats.set(position, "<delay:" + Utils.returnInteger(ItemHandler.getDelay(mats.get(position))) + ">" + event.getMessage().toUpperCase());
 					itemMap.setDynamicMaterials(mats);
 					this.modifyMaterialPane(player, itemMap, position);
 				}
@@ -2376,10 +2390,18 @@ public class UI {
 			if (!material.name().contains("LEGACY") && material.name() != "AIR" && this.safeMaterial(ItemHandler.getItem(material.toString(), 1, false, "", ""), inventoryCheck)) {
 				selectMaterialPane.addButton(new Button(ItemHandler.getItem(material.toString(), 1, false, "", "&7", "&7*Click to set the", "&7material of the item."), event -> {
 					if (isNew) {
-						this.durationMaterialPane(player, itemMap, position, isNew, material.name());
+						if (!ServerHandler.hasAquaticUpdate() && material.getMaxDurability() < 30 && material.getMaxDurability() != 0) {
+							this.durationMaterialPane(player, itemMap, position, isNew, material.name() + ":" + material.getMaxDurability());
+						} else {
+							this.durationMaterialPane(player, itemMap, position, isNew, material.name());
+						}
 					} else {
 						List < String > mats = itemMap.getDynamicMaterials();
-						mats.set(position, "<delay:" + Utils.returnInteger(ItemHandler.getDelay(mats.get(position))) + ">" + material.name());
+						if (!ServerHandler.hasAquaticUpdate() && material.getMaxDurability() < 30 && material.getMaxDurability() != 0) {
+							mats.set(position, "<delay:" + Utils.returnInteger(ItemHandler.getDelay(mats.get(position))) + ">" + material.name() + ":" + material.getMaxDurability());
+						} else {
+							mats.set(position, "<delay:" + Utils.returnInteger(ItemHandler.getDelay(mats.get(position))) + ">" + material.name());
+						}
 						itemMap.setDynamicMaterials(mats);
 						this.modifyMaterialPane(player, itemMap, position);
 					}
@@ -3616,7 +3638,7 @@ public class UI {
 				colorList += "&a" + split + " /n ";
 			}
 		}
-		return ItemHandler.getItem(itemMap.getMaterial().toString(), 1, false, "&7*&6&l&nItem Information", "&7", "&9&lNode: &a" + itemMap.getConfigName(), "&9&lMaterial: &a" + itemMap.getMaterial().toString(), 
+		return ItemHandler.getItem(itemMap.getMaterial().toString(), 1, false, "&7*&6&l&nItem Information", "&7", "&9&lNode: &a" + itemMap.getConfigName(), "&9&lMaterial: &a" + itemMap.getMaterial().toString() + (itemMap.getDataValue() != 0 ? ":" + itemMap.getDataValue() : ""), 
 				(itemMap.getMultipleSlots() != null && !itemMap.getMultipleSlots().isEmpty() ? "&9&lSlot(s): &a" + slotList : "&9&lSlot: &a" + itemMap.getSlot()), "&9&lCount: &a" + itemMap.getCount(), 
 				(Utils.nullCheck(itemMap.getCustomName()) != "NONE" ? "&9&lName: &a" + itemMap.getCustomName() : ""), (Utils.nullCheck(itemMap.getCustomLore().toString()) != "NONE" ? "&9&lLore: &a" + Utils.nullCheck(itemMap.getCustomLore().toString()) : ""), 
 				(Utils.nullCheck(itemMap.getDurability() + "&7") != "NONE" ? "&9&lDurability: &a" + itemMap.getDurability() : ""), (itemMap.getCommands().length != 0 ? "&9&lCommands: &aYES" : ""), 
