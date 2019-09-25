@@ -10,23 +10,22 @@ softdepend: [AuthMe, BetterNick, HeadDatabase, Multiverse-Core, Multiverse-Inven
           
 permissions:
    itemjoin.*:
-      description: Allows use of all commands.
+      description: Grants access to all aspects of the plugin, including every permission node.
       default: false
       children:
           itemjoin.all: true
    itemjoin.all:
-      description: Allows use of all commands.
+      description: Grants access to all aspects of the plugin, including every permission node.
       default: false
       children:
-          itemjoin.permissions: true
           itemjoin.use: true
           itemjoin.reload: true
           itemjoin.menu: true
-          itemjoin.creator: true
           itemjoin.updates: true
           itemjoin.autoupdate: true
+          itemjoin.permissions: true
+          itemjoin.list: true
           itemjoin.purge: true
-          itemjoin.save: true
           itemjoin.get: true
           itemjoin.get.others: true
           itemjoin.remove: true
@@ -35,69 +34,62 @@ permissions:
           itemjoin.enable.others: true
           itemjoin.disable: true
           itemjoin.disable.others: true
-          itemjoin.list: true
           itemjoin.bypass.inventorymodify: false
-   itemjoin.permissions:
-      description: Allows use of the /itemjoin permissions commands.
-      default: true
    itemjoin.use:
-      description: Allows use of basic commands.
+      description: Grants access to basic plugin commands.
       default: true
-   itemjoin.reload:
-      description: Allows use of /itemjoin reload command.
-      default: false
    itemjoin.menu:
-      description: Allows use of /itemjoin menu command.
+      description: Grants access to the menu command.
       default: false
-   itemjoin.creator:
-      description: Allows use of /itemjoin menu command.
+   itemjoin.reload:
+      description: Grants access to the reload command.
       default: false
    itemjoin.updates:
-      description: Allows use of the /itemjoin updates command.
+      description: Grants access to the updates command.
       default: false
    itemjoin.autoupdate:
-      description: Allows use of the /itemjoin autoupdate command.
+      description: Grants access to the autoupdate command.
+      default: false
+   itemjoin.permissions:
+      description: Grants access to the permissions command
+      default: true
+   itemjoin.list:
+      description: Grants access to the list command.
       default: false
    itemjoin.purge:
-      description: Allows use of the /itemjoin purge command.
-      default: false
-   itemjoin.save:
-      description: Allows use of the /itemjoin save <item> command.
+      description: Grants access to the purge command.
       default: false
    itemjoin.get:
-      description: Allows use of the /itemjoin get <item> command.
+      description: Grants access to the basic get commands.
       default: false
    itemjoin.get.others:
-      description: Allows use of the /itemjoin get <item> <player> for player command.
+      description: Grants access to all get commands that could affect other players.
       default: false
    itemjoin.remove:
-      description: Allows use of the /itemjoin remove <item> command.
+      description: Grants access to the basic remove commands.
       default: false
    itemjoin.remove.others:
-      description: Allows use of the /itemjoin remove <item> <player> for player command.
+      description: Grants access to all remove commands that could affect other players.
       default: false
    itemjoin.enable:
-      description: Allows use of the /itemjoin enable global command.
+      description: Grants access to the basic enable command.
       default: false
    itemjoin.enable.others:
-      description: Allows use of the /itemjoin enable <player> for player command.
+      description: Grants access to all enable commands that could affect other players individually.
       default: false
    itemjoin.disable:
-      description: Allows use of the /itemjoin disable global command.
+      description: Grants access to the basic disable command.
       default: false
    itemjoin.disable.others:
-      description: Allows use of the /itemjoin disable <player> for player command.
-      default: false
-   itemjoin.list:
-      description: Allows use of the /itemjoin list command.
+      description: Grants access to all disable commands that could affect other players individually.
       default: false
    itemjoin.bypass.inventorymodify:
-      description: Players with this permission will bypass the inventory-modify restrictions.
+      description: Players with this permission will bypass any item movement restrictions.
       default: false
       
 commands:
    itemjoin:
-      description: Displays a menu giving credit to the creator and the help menu command.
+      description: Displays a menu giving credit to the author and the help menu command.
       permission: itemjoin.use
       aliases: [ij]
       usage: |
