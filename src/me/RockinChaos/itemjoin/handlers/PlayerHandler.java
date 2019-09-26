@@ -17,7 +17,6 @@ import de.domedd.betternick.api.nickedplayer.NickedPlayer;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 import me.RockinChaos.itemjoin.utils.Legacy;
-import net.milkbowl.vault.economy.EconomyResponse;
 
 public class PlayerHandler {
 	
@@ -244,13 +243,5 @@ public class PlayerHandler {
 			}
 		} catch (Exception e) { ServerHandler.sendDebugTrace(e); } 
 		return null;
-	}
-	
-	public static double getBalance(Player player) {
-		return ConfigHandler.getDepends().getVault().getEconomy().getBalance(player);
-	}
-	
-	public static EconomyResponse withdrawBalance(Player player, int cost) {
-		return ConfigHandler.getDepends().getVault().getEconomy().withdrawPlayer(player, cost);
 	}
 }

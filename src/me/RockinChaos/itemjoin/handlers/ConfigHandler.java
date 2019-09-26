@@ -57,18 +57,6 @@ public class ConfigHandler {
 			else { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Legacy_Pickups(), ItemJoin.getInstance()); }
 		}
 	}
-	
-	public static Boolean isConfigurable() {
-		if (ConfigHandler.getConfigurationSection() != null) {
-			return true;
-		} else if (ConfigHandler.getConfigurationSection() == null) {
-			ServerHandler.sendConsoleMessage("&4There are no items detected in the items.yml.");
-			ServerHandler.sendConsoleMessage("&4Try adding an item to the items section in the items.yml.");
-			ServerHandler.sendConsoleMessage("&eIf you continue to see this message contact the plugin developer!");
-			return false;
-		}
-		return false;
-	}
 
 	public static FileConfiguration getConfig(String path) {
 		File file = new File(ItemJoin.getInstance().getDataFolder(), path);
@@ -237,6 +225,18 @@ public class ConfigHandler {
 	
 	private static boolean isGenerating() {
 		return yamlGenerating;
+	}
+	
+	public static Boolean isConfigurable() {
+		if (ConfigHandler.getConfigurationSection() != null) {
+			return true;
+		} else if (ConfigHandler.getConfigurationSection() == null) {
+			ServerHandler.sendConsoleMessage("&4There are no items detected in the items.yml.");
+			ServerHandler.sendConsoleMessage("&4Try adding an item to the items section in the items.yml.");
+			ServerHandler.sendConsoleMessage("&eIf you continue to see this message contact the plugin developer!");
+			return false;
+		}
+		return false;
 	}
 	
 	public static boolean isDebugging() {

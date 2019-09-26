@@ -61,7 +61,7 @@ public class ServerHandler {
 		}
 		if (message.equalsIgnoreCase("") || message.isEmpty()) {
 			message = "";
-	}
+		}
 		ItemJoin.getInstance().getServer().getConsoleSender().sendMessage(message);
 	}
 	
@@ -74,7 +74,7 @@ public class ServerHandler {
 		}
 		if (message.equalsIgnoreCase("") || message.isEmpty()) {
 			message = "";
-	}
+		}
 		ItemJoin.getInstance().getServer().getConsoleSender().sendMessage(message);
 	}
 	
@@ -97,10 +97,6 @@ public class ServerHandler {
 		}
 		sender.sendMessage(message);
 	}
-	
-	public static void sendDebugTrace(Exception e) {
-		if (ConfigHandler.isDebugging()) { e.printStackTrace(); }
-	}
 
 	public static void sendDebugMessage(String message) {
 		if (ConfigHandler.isDebugging()) {
@@ -111,5 +107,9 @@ public class ServerHandler {
 		message = ChatColor.translateAlternateColorCodes('&', message).toString();
 		ItemJoin.getInstance().getServer().getConsoleSender().sendMessage(message);
 		}
+	}
+	
+	public static void sendDebugTrace(Exception e) {
+		if (ConfigHandler.isDebugging()) { e.printStackTrace(); }
 	}
 }

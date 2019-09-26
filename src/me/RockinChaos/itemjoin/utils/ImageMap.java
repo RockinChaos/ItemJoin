@@ -25,7 +25,6 @@ public class ImageMap extends MapRenderer {
 	private boolean isGIF = false;
 	private List<Integer> Rendered = new ArrayList<Integer> ();
 	
-	
 	/*
 	 * Catch Exception for gif reader (line 42) is temporary.
 	 * Resolves issues with the KNOWN java bug; java.lang.ArrayIndexOutOfBoundsException: 4096

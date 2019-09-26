@@ -151,7 +151,7 @@ public class TabComplete implements TabCompleter {
     		if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.remove")) { commands.add("remove"); commands.add("removeAll"); }
     		if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.remove.others")) { commands.add("removeOnline"); }
     		if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.reload")) { commands.add("reload"); }
-    		if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.creator") || PermissionsHandler.hasCommandPermission(sender, "itemjoin.menu")) { commands.add("menu"); }
+    		if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.menu")) { commands.add("menu"); }
     		if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.list")) { commands.add("list"); }
     		if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.updates")) { commands.add("updates"); }
     		if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.autoupdate")) { commands.add("autoupdate"); }

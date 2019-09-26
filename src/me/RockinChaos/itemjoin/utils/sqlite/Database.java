@@ -256,7 +256,7 @@ public abstract class Database {
 		return tExists;
 	}
 	
-	public boolean isInDatabase(String StatementString) {
+	public boolean dataExists(String StatementString) {
 		try {
 			Statement statement = SQLite.getDatabase("database").getSQLConnection().createStatement();
 			ResultSet result = statement.executeQuery(StatementString);

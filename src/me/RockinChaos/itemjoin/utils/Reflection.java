@@ -61,16 +61,16 @@ public class Reflection {
 	
 	public static short getMapID(MapView view) {
 		try {
-			Object mapID = getMapNMS("MapView").getMethod("getId").invoke(view); // check this
+			Object mapID = getMapNMS("MapView").getMethod("getId").invoke(view);
 			return (short)mapID; 
-		} catch (Exception ex) { return 1; }
+		} catch (Exception e) { return 1; }
 	}
 
 	public static MapView getMapView(int id) {
 		try {
 			Object mapView = getBukkitNMS("Bukkit").getMethod("getMap", short.class).invoke(getMapNMS("MapView"), (short)id);
 			return (MapView)mapView; 
-		} catch (Exception ex) { return null; }
+		} catch (Exception e) { return null; }
 	}
 	
 	public static ItemStack setUnbreakable(ItemStack item) {

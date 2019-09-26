@@ -1,12 +1,14 @@
 package me.RockinChaos.itemjoin.utils;
 
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import net.milkbowl.vault.economy.Economy;
+import net.milkbowl.vault.economy.EconomyResponse;
 
 public class VaultAPI {
     private Economy econ = null;
@@ -45,4 +47,12 @@ public class VaultAPI {
     	if (bool) { this.enableEconomy(); }
     	this.isEnabled = bool;
     }
+    
+	public double getBalance(Player player) {
+		return this.econ.getBalance(player);
+	}
+	
+	public EconomyResponse withdrawBalance(Player player, int cost) {
+		return this.econ.withdrawPlayer(player, cost);
+	}
 }

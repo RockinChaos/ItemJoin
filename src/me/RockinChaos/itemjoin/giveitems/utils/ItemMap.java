@@ -1961,7 +1961,7 @@ public class ItemMap {
     
     private boolean isPlayerChargeable(Player player) {
 		if (ConfigHandler.getDepends().getVault().vaultEnabled()) {
-			double balance = 0.0; try { balance = PlayerHandler.getBalance(player); } catch (NullPointerException e) { }
+			double balance = 0.0; try { balance = ConfigHandler.getDepends().getVault().getBalance(player); } catch (NullPointerException e) { }
 			if (balance >= this.cost) {
 				return true;
 			} else if (!(balance >= this.cost)) {
@@ -1976,10 +1976,10 @@ public class ItemMap {
     private void withdrawBalance(Player player, int cost) {
 		if (ConfigHandler.getDepends().getVault().vaultEnabled()) {
 			double balance = 0.0;
-			try { balance = PlayerHandler.getBalance(player); } catch (NullPointerException e) { }
+			try { balance = ConfigHandler.getDepends().getVault().getBalance(player); } catch (NullPointerException e) { }
 			if (balance >= this.cost) {
 				if (this.cost != 0) {
-					try { PlayerHandler.withdrawBalance(player, this.cost); } catch (NullPointerException e) { ServerHandler.sendDebugTrace(e); }
+					try { ConfigHandler.getDepends().getVault().withdrawBalance(player, this.cost); } catch (NullPointerException e) { ServerHandler.sendDebugTrace(e); }
 					String[] placeHolders = Language.newString(); placeHolders[6] = this.cost.toString();
 					Language.sendLangMessage("General.itemChargeSuccess", player, placeHolders);
 				}

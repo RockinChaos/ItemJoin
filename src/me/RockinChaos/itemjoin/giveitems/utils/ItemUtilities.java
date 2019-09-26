@@ -49,7 +49,6 @@ public class ItemUtilities {
   	private static List < ItemMap > items = new ArrayList < ItemMap >();
 	public static Map < String, Integer > probability = new HashMap < String, Integer > ();
 	private static HashMap <Integer, Integer> failCount = new HashMap <Integer, Integer> ();
-	
 	private static String NBTData = "ItemJoin";
 	
 	private static boolean oldMapMethod = false;

@@ -466,7 +466,7 @@ public class SQLData {
 					for (String uuidsec: item.getKeys(false)) {
 						ConfigurationSection uuid = item.getConfigurationSection(uuidsec);
 						OfflinePlayer player = ItemJoin.getInstance().getServer().getOfflinePlayer(UUID.fromString(uuid.getName()));
-						if (!SQLite.getDatabase("database").isInDatabase("SELECT * FROM first_join WHERE World_Name='" + world.getName() + "' AND Player_UUID='" + uuid.getName() + "' AND Item_Name='" + item.getName() + "';")) {
+						if (!SQLite.getDatabase("database").dataExists("SELECT * FROM first_join WHERE World_Name='" + world.getName() + "' AND Player_UUID='" + uuid.getName() + "' AND Item_Name='" + item.getName() + "';")) {
 							SQLite.getDatabase("database").executeStatement("INSERT INTO first_join (`World_Name`, `Player_Name`, `Player_UUID`, `Item_Name`) VALUES ('" + world.getName() + "','" + player.getName().toString() + "','" + uuid.getName() + "','" + item.getName() + "')");
 							SQLite.getDatabase("database").closeConnection();
 						}
@@ -495,7 +495,7 @@ public class SQLData {
 					ConfigurationSection item = world.getConfigurationSection(itemsec);
 					for (String ipaddrsec: item.getKeys(false)) {
 						ConfigurationSection ipaddr = item.getConfigurationSection(ipaddrsec);
-						if (!SQLite.getDatabase("database").isInDatabase("SELECT * FROM ip_limits WHERE World_Name='" + world.getName() + "' AND IP_Address='" + ipaddr.getName() + "' AND Item_Name='" + item.getName() + "';")) {
+						if (!SQLite.getDatabase("database").dataExists("SELECT * FROM ip_limits WHERE World_Name='" + world.getName() + "' AND IP_Address='" + ipaddr.getName() + "' AND Item_Name='" + item.getName() + "';")) {
 							SQLite.getDatabase("database").executeStatement("INSERT INTO ip_limits (`World_Name`, `IP_Address`, `Player_UUID`, `Item_Name`) VALUES ('" + world.getName() + "','" + ipaddr.getName() + "','" + ipaddr.get("Current User") + "','" + item.getName() + "')");
 							SQLite.getDatabase("database").closeConnection();
 						}

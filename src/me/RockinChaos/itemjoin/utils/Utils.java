@@ -142,10 +142,6 @@ public class Utils {
 		}
 	}
 	
-	public static String colorFormat(String s) {
-		return ChatColor.translateAlternateColorCodes('&', s).toString();
-	}
-	
     public static String getNearbyPlayer(Player player, int range) {
 	    ArrayList < Location > sight = new ArrayList < Location > ();
 	    ArrayList < Entity > entities = (ArrayList < Entity > ) player.getNearbyEntities(range, range, range);
@@ -172,6 +168,10 @@ public class Utils {
 	    }
     	return "INVALID";
     }
+	
+	public static String colorFormat(String s) {
+		return ChatColor.translateAlternateColorCodes('&', s).toString();
+	}
 	
 	public static String translateLayout(String name, Player player, String...placeHolder) {
 		String playerName = "EXEMPT";
