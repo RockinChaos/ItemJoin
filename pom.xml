@@ -252,7 +252,4 @@
 		<system>Jenkins</system>
 		<url>http://ci.craftationgaming.com/job/ItemJoin/</url>
 	</ciManagement>
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
 </project>
