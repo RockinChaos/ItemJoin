@@ -18,6 +18,16 @@
 					<include>*.yml</include>
 				</includes>
 			</resource>
+			<resource>
+				<targetPath>./files</targetPath>
+				<filtering>true</filtering>
+				<directory>./files</directory>
+				<includes>
+					<include>**/*.yml</include>
+					<include>**/*.txt</include>
+					<include>**/*.jpg</include>
+				</includes>
+			</resource>
 		</resources>
 		<plugins>
 			<plugin>
@@ -26,19 +36,7 @@
 				<configuration>
 					<source>1.8</source>
 					<target>1.8</target>
-					<encoding>UTF-8</encoding>
-					<resources>
-						<resource>
-							<targetPath>./files</targetPath>
-							<filtering>true</filtering>
-							<directory>./files</directory>
-							<includes>
-								<include>**/*.yml</include>
-								<include>**/*.txt</include>
-								<include>**/*.jpg</include>
-							</includes>
-						</resource>
-					</resources>
+					<encoding>Cp1252</encoding>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -258,6 +256,6 @@
     <properties>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
-		<project.build.sourceEncoding>Cp1252</project.build.sourceEncoding>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 </project>
