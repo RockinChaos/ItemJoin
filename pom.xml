@@ -37,7 +37,7 @@
 					<encoding>Cp1252</encoding>
 					<source>1.8</source>
 					<target>1.8</target>
-                    <encoding>Cp1252</encoding>
+                    <encoding>UTF-8</encoding>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -254,4 +254,7 @@
 		<system>Jenkins</system>
 		<url>http://ci.craftationgaming.com/job/ItemJoin/</url>
 	</ciManagement>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 </project>
