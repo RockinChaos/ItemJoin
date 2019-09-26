@@ -36,19 +36,19 @@ public class ItemAnimation {
 	
 	public ItemAnimation(ItemMap item) {
 		this.itemMap = item;
-		if (item.getDynamicNames() != null) { this.dynamicNames = item.getDynamicNames(); }
-		if (item.getDynamicLores() != null) { this.dynamicLores = item.getDynamicLores(); }
-		if (item.getDynamicMaterials() != null) { this.dynamicMaterials = item.getDynamicMaterials(); }
-		if (item.getDynamicOwners() != null) { this.dynamicOwners = item.getDynamicOwners(); }
-		else if (item.getDynamicTextures() != null) { this.dynamicTextures = item.getDynamicTextures(); }
+		if (item.getDynamicNames() != null && !item.getDynamicNames().isEmpty()) { this.dynamicNames = item.getDynamicNames(); }
+		if (item.getDynamicLores() != null && !item.getDynamicLores().isEmpty()) { this.dynamicLores = item.getDynamicLores(); }
+		if (item.getDynamicMaterials() != null && !item.getDynamicMaterials().isEmpty()) { this.dynamicMaterials = item.getDynamicMaterials(); }
+		if (item.getDynamicOwners() != null && !item.getDynamicOwners().isEmpty()) { this.dynamicOwners = item.getDynamicOwners(); }
+		else if (item.getDynamicTextures() != null && !item.getDynamicTextures().isEmpty()) { this.dynamicTextures = item.getDynamicTextures(); }
 	}
 	
 	public void openAnimation(Player player) {
-		if (this.dynamicNames != null) { nameTasks(player); }
-		if (this.dynamicLores != null) { loreTasks(player); }
-		if (this.dynamicMaterials != null) { materialTasks(player); }
-		if (this.dynamicOwners != null) { ownerTasks(player); }
-		else if (this.dynamicTextures != null) { textureTasks(player); }
+		if (this.dynamicNames != null) { this.nameTasks(player); }
+		if (this.dynamicLores != null) { this.loreTasks(player); }
+		if (this.dynamicMaterials != null) { this.materialTasks(player); }
+		if (this.dynamicOwners != null) { this.ownerTasks(player); }
+		else if (this.dynamicTextures != null) { this.textureTasks(player); }
 	}
 	
 	public void closeAnimation(Player player) {
