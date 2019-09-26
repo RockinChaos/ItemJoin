@@ -42,7 +42,7 @@ import me.RockinChaos.itemjoin.utils.interfaces.Button;
 import me.RockinChaos.itemjoin.utils.interfaces.Interface;
 
 public class UI {
-	private String GUIName = Utils.colorFormat("&a[BETA]   &0&n ItemJoin Menu&7   &a[BETA]");
+	private String GUIName = Utils.colorFormat("&7           &0&n ItemJoin Menu");
 	private ItemStack fillerPaneBItem = ItemHandler.getItem("STAINED_GLASS_PANE:15", 1, false, "&7", "");
 	private ItemStack fillerPaneGItem = ItemHandler.getItem("STAINED_GLASS_PANE:7", 1, false, "&7", "");
 	private ItemStack exitItem = ItemHandler.getItem("BARRIER", 1, false, "&c&l&nExit", "&7", "&7*Returns you to the game");
@@ -54,7 +54,7 @@ public class UI {
 	public void startMenu(final CommandSender sender) {
 		final Player player = (Player) sender;
 		if (!ServerHandler.hasCombatUpdate()) {
-			this.GUIName = Utils.colorFormat("&a[BETA]   &0&n ItemJoin Menu");
+			this.GUIName = Utils.colorFormat("&7           &0&n ItemJoin Menu");
 		}
 		Interface pagedPane = new Interface(false, 1, this.GUIName);
 		pagedPane.addButton(new Button(this.exitItem, event -> player.closeInventory()));
@@ -651,17 +651,31 @@ public class UI {
 		Inventory inventoryCheck = ItemJoin.getInstance().getServer().createInventory(null, 9, this.GUIName);
 		for (Material material: Material.values()) {
 			if (!material.name().contains("LEGACY") && material.name() != "AIR" && this.safeMaterial(ItemHandler.getItem(material.toString(), 1, false, "", ""), inventoryCheck)) {
+				if (!ServerHandler.hasAquaticUpdate() && Legacy.getDataValue(material) != 0) {
+					for (int i = 0; i <= Legacy.getDataValue(material); i++) {
+						if (!material.toString().equalsIgnoreCase("STEP") || material.toString().equalsIgnoreCase("STEP") && i != 2) {
+							final int dataValue = i;
+							materialPane.addButton(new Button(ItemHandler.getItem(material.toString() + ":" + dataValue, 1, false, "", "&7", "&7*Click to set the", "&7material of the item."), event -> {
+								itemMap.setMaterial(material);
+								if (dataValue != 0) { itemMap.setDataValue((short)dataValue); }
+								if (stage == 0) {
+									this.switchPane(player, itemMap, 0);
+								} else {
+									this.creatingPane(player, itemMap);
+								}
+							}));
+						}
+					}
+				} else {
 				materialPane.addButton(new Button(ItemHandler.getItem(material.toString(), 1, false, "", "&7", "&7*Click to set the", "&7material of the item."), event -> {
 					itemMap.setMaterial(material);
-					if (!ServerHandler.hasAquaticUpdate() && material.getMaxDurability() < 30 && material.getMaxDurability() != 0) {
-						itemMap.setDataValue((short)material.getMaxDurability());
-					}
 					if (stage == 0) {
 						this.switchPane(player, itemMap, 0);
 					} else {
 						this.creatingPane(player, itemMap);
 					}
 				}));
+				}
 			}
 		}
 		inventoryCheck.clear();
@@ -2388,24 +2402,37 @@ public class UI {
 		Inventory inventoryCheck = ItemJoin.getInstance().getServer().createInventory(null, 9, this.GUIName);
 		for (Material material: Material.values()) {
 			if (!material.name().contains("LEGACY") && material.name() != "AIR" && this.safeMaterial(ItemHandler.getItem(material.toString(), 1, false, "", ""), inventoryCheck)) {
-				selectMaterialPane.addButton(new Button(ItemHandler.getItem(material.toString(), 1, false, "", "&7", "&7*Click to set the", "&7material of the item."), event -> {
-					if (isNew) {
-						if (!ServerHandler.hasAquaticUpdate() && material.getMaxDurability() < 30 && material.getMaxDurability() != 0) {
-							this.durationMaterialPane(player, itemMap, position, isNew, material.name() + ":" + material.getMaxDurability());
-						} else {
-							this.durationMaterialPane(player, itemMap, position, isNew, material.name());
+				
+				if (!ServerHandler.hasAquaticUpdate() && Legacy.getDataValue(material) != 0) {
+					for (int i = 0; i <= Legacy.getDataValue(material); i++) {
+						if (!material.toString().equalsIgnoreCase("STEP") || material.toString().equalsIgnoreCase("STEP") && i != 2) {
+							final int dataValue = i;
+							selectMaterialPane.addButton(new Button(ItemHandler.getItem(material.toString() + ":" + dataValue, 1, false, "", "&7", "&7*Click to set the", "&7material of the item."), event -> {
+								if (isNew) {
+									if (dataValue != 0) { this.durationMaterialPane(player, itemMap, position, isNew, material.name() + ":" + dataValue); }
+									else { this.durationMaterialPane(player, itemMap, position, isNew, material.name()); }
+								} else {
+									List < String > mats = itemMap.getDynamicMaterials();
+									if (dataValue != 0) { mats.set(position, "<delay:" + Utils.returnInteger(ItemHandler.getDelay(mats.get(position))) + ">" + material.name() + ":" + dataValue); }
+									else { mats.set(position, "<delay:" + Utils.returnInteger(ItemHandler.getDelay(mats.get(position))) + ">" + material.name()); }
+									itemMap.setDynamicMaterials(mats);
+									this.modifyMaterialPane(player, itemMap, position);
+								}
+							}));
 						}
-					} else {
-						List < String > mats = itemMap.getDynamicMaterials();
-						if (!ServerHandler.hasAquaticUpdate() && material.getMaxDurability() < 30 && material.getMaxDurability() != 0) {
-							mats.set(position, "<delay:" + Utils.returnInteger(ItemHandler.getDelay(mats.get(position))) + ">" + material.name() + ":" + material.getMaxDurability());
-						} else {
-							mats.set(position, "<delay:" + Utils.returnInteger(ItemHandler.getDelay(mats.get(position))) + ">" + material.name());
-						}
-						itemMap.setDynamicMaterials(mats);
-						this.modifyMaterialPane(player, itemMap, position);
 					}
-				}));
+				} else {
+					selectMaterialPane.addButton(new Button(ItemHandler.getItem(material.toString(), 1, false, "", "&7", "&7*Click to set the", "&7material of the item."), event -> {
+						if (isNew) {
+							this.durationMaterialPane(player, itemMap, position, isNew, material.name());
+						} else {
+							List < String > mats = itemMap.getDynamicMaterials();
+							mats.set(position, "<delay:" + Utils.returnInteger(ItemHandler.getDelay(mats.get(position))) + ">" + material.name());
+							itemMap.setDynamicMaterials(mats);
+							this.modifyMaterialPane(player, itemMap, position);
+						}
+					}));
+				}
 			}
 		}
 		inventoryCheck.clear();

@@ -54,6 +54,43 @@ public class Legacy {
     	return item.getData().getData();
     }
     
+	public static int getDataValue(Material material) {
+		if (material == Material.STONE) { return 6; }
+		else if (Utils.containsIgnoreCase(material.toString(), "DIRT")) { return 2; }
+		else if (material.toString().equalsIgnoreCase("WOOD")) { return 5; }
+		else if (material.toString().equalsIgnoreCase("LOG")) { return 3; }
+		else if (Utils.containsIgnoreCase(material.toString(), "SAPLING")) { return 5; }
+		else if (material.toString().equalsIgnoreCase("SAND")) { return 1; }
+		else if (material.toString().equalsIgnoreCase("LEAVES")) { return 3; }
+		else if (Utils.containsIgnoreCase(material.toString(), "SPONGE")) { return 1; }
+		else if (Utils.containsIgnoreCase(material.toString(), "SANDSTONE") && !Utils.containsIgnoreCase(material.toString(), "STAIRS")) { return 2; }
+		else if (Utils.containsIgnoreCase(material.toString(), "LONG_GRASS")) { return 2; }
+		else if (Utils.containsIgnoreCase(material.toString(), "RED_ROSE")) { return 8; }
+		else if (Utils.containsIgnoreCase(material.toString(), "WOOD_STEP")) { return 5; }
+		else if (Utils.containsIgnoreCase(material.toString(), "STEP")) { return 7; }
+		else if (Utils.containsIgnoreCase(material.toString(), "STAINED_GLASS")) { return 15; }
+		else if (Utils.containsIgnoreCase(material.toString(), "MONSTER_EGGS")) { return 5; }
+		else if (Utils.containsIgnoreCase(material.toString(), "SMOOTH_BRICK")) { return 3; }
+		else if (Utils.containsIgnoreCase(material.toString(), "COBBLE_WALL")) { return 1; }
+		else if (Utils.containsIgnoreCase(material.toString(), "QUARTZ_BLOCK")) { return 2; }
+		else if (Utils.containsIgnoreCase(material.toString(), "STAINED_CLAY")) { return 15; }
+		else if (Utils.containsIgnoreCase(material.toString(), "LOG_2")) { return 1; }
+		else if (Utils.containsIgnoreCase(material.toString(), "LEAVES_2")) { return 1; }
+		else if (material.toString().equalsIgnoreCase("PRISMARINE")) { return 2; }
+		else if (Utils.containsIgnoreCase(material.toString(), "CARPET")) { return 15; }
+		else if (Utils.containsIgnoreCase(material.toString(), "DOUBLE_PLANT")) { return 5; }
+		else if (Utils.containsIgnoreCase(material.toString(), "RED_SANDSTONE")) { return 2; }
+		else if (Utils.containsIgnoreCase(material.toString(), "GOLDEN_APPLE")) { return 1; }
+		else if (Utils.containsIgnoreCase(material.toString(), "RAW_FISH")) { return 3; }
+		else if (Utils.containsIgnoreCase(material.toString(), "COOKED_FISHED")) { return 1; }
+		else if (Utils.containsIgnoreCase(material.toString(), "INK_SAC")) { return 15; }
+		else if (Utils.containsIgnoreCase(material.toString(), "SKULL_ITEM") && ServerHandler.hasCombatUpdate()) { return 5; }
+		else if (Utils.containsIgnoreCase(material.toString(), "SKULL_ITEM")) { return 4; }
+		else if (Utils.containsIgnoreCase(material.toString(), "CONCRETE")) { return 15; }
+		else if (Utils.containsIgnoreCase(material.toString(), "WOOL")) { return 15; }
+		return 0;
+	}
+    
     public static MapView getMapView(int id) {
     	if (!ItemUtilities.getMapViewMethod()) {
     		try { return ItemJoin.getInstance().getServer().getMap((short) id); } 
