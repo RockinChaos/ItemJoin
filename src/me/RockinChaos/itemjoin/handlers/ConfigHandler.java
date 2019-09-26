@@ -231,9 +231,9 @@ public class ConfigHandler {
 		if (ConfigHandler.getConfigurationSection() != null) {
 			return true;
 		} else if (ConfigHandler.getConfigurationSection() == null) {
-			ServerHandler.sendConsoleMessage("&4There are no items detected in the items.yml.");
-			ServerHandler.sendConsoleMessage("&4Try adding an item to the items section in the items.yml.");
-			ServerHandler.sendConsoleMessage("&eIf you continue to see this message contact the plugin developer!");
+			ServerHandler.sendErrorMessage("&4There are no items detected in the items.yml.");
+			ServerHandler.sendErrorMessage("&4Try adding an item to the items section in the items.yml.");
+			ServerHandler.sendErrorMessage("&eIf you continue to see this message contact the plugin developer!");
 			return false;
 		}
 		return false;
