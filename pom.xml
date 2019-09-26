@@ -18,16 +18,6 @@
 					<include>*.yml</include>
 				</includes>
 			</resource>
-			<resource>
-				<targetPath>./files</targetPath>
-				<filtering>true</filtering>
-				<directory>./files</directory>
-				<includes>
-					<include>**/*.yml</include>
-					<include>**/*.txt</include>
-					<include>**/*.jpg</include>
-				</includes>
-			</resource>
 		</resources>
 		<plugins>
 			<plugin>
@@ -36,6 +26,19 @@
 				<configuration>
 					<source>1.8</source>
 					<target>1.8</target>
+					<encoding>UTF-8</encoding>
+					<resources>
+						<resource>
+							<targetPath>./files</targetPath>
+							<filtering>true</filtering>
+							<directory>./files</directory>
+							<includes>
+								<include>**/*.yml</include>
+								<include>**/*.txt</include>
+								<include>**/*.jpg</include>
+							</includes>
+						</resource>
+					</resources>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -252,4 +255,9 @@
 		<system>Jenkins</system>
 		<url>http://ci.craftationgaming.com/job/ItemJoin/</url>
 	</ciManagement>
+    <properties>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+		<project.build.sourceEncoding>Cp1252</project.build.sourceEncoding>
+    </properties>
 </project>
