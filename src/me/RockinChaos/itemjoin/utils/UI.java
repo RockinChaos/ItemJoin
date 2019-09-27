@@ -102,19 +102,7 @@ public class UI {
 //  ============================================== //
 	
 	private void setButton(Player player, final ItemMap itemMap, final Interface pagedPane) {
-		if (itemMap.isAnimated() && itemMap.getDynamicLores() != null || itemMap.isDynamic() && itemMap.getDynamicLores() != null) {
-			List < List < String >> dynamicLores = new ArrayList < List < String >> ();
-			for (List < String > dynamicLore: itemMap.getDynamicLores()) {
-				dynamicLore.add("&7");
-				dynamicLore.add("&6---------------------------");
-				dynamicLore.add("&7*Click to modify this custom item.");
-				dynamicLore.add("&9&lNode: &a" + itemMap.getConfigName());
-				dynamicLore.add("&7");
-				dynamicLores.add(dynamicLore);
-			}
-			itemMap.setDynamicLores(dynamicLores);
-		}
-		pagedPane.addButton(new Button(ItemHandler.addLore(itemMap.getTempItem(), "&7", "&6---------------------------", "&7*Click to modify this custom item.", "&9&lNode: &a" + itemMap.getConfigName(), "&7"), event -> this.creatingPane(player, itemMap)));
+		pagedPane.addButton(new Button(ItemHandler.addLore(itemMap.getTempItem(), "&7", "&6---------------------------", "&7*Click to modify this custom item.", "&9&lNode: &a" + itemMap.getConfigName(), "&7"), event ->  this.creatingPane(player, itemMap)));
 	}
 	
 	private void setPage(final Player player, final Interface modifyPane, final List < ItemMap > items) {

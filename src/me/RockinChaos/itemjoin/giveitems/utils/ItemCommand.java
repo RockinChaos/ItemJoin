@@ -316,7 +316,8 @@ public class ItemCommand {
 		input = input.trim();
 		Type type = Type.DEFAULT;
 		
-		if (input.startsWith("console:")) { input = input.substring(8); type = Type.CONSOLE; } 
+		if (input.startsWith("default:")) { input = input.substring(8); type = Type.DEFAULT; } 
+		else if (input.startsWith("console:")) { input = input.substring(8); type = Type.CONSOLE; } 
 		else if (input.startsWith("op:")) { input = input.substring(3); type = Type.OP; } 
 		else if (input.startsWith("player:")) { input = input.substring(7); type = Type.PLAYER; } 
 		else if (input.startsWith("server:")) { input = input.substring(7); type = Type.SERVERSWITCH; } 
