@@ -102,7 +102,7 @@ public class UI {
 //  ============================================== //
 	
 	private void setButton(Player player, final ItemMap itemMap, final Interface pagedPane) {
-		pagedPane.addButton(new Button(ItemHandler.addLore(itemMap.getTempItem(), "&7", "&6---------------------------", "&7*Click to modify this custom item.", "&9&lNode: &a" + itemMap.getConfigName(), "&7"), event ->  this.creatingPane(player, itemMap)));
+		pagedPane.addButton(new Button(ItemHandler.addLore(new ItemStack(itemMap.getTempItem()), "&7", "&6---------------------------", "&7*Click to modify this custom item.", "&9&lNode: &a" + itemMap.getConfigName(), "&7"), event ->  this.creatingPane(player, itemMap)));
 	}
 	
 	private void setPage(final Player player, final Interface modifyPane, final List < ItemMap > items) {
@@ -2817,7 +2817,7 @@ public class UI {
 			for (int i = 1; i <= itemMap.getDynamicTextures().size(); i++) {
 				final int k = i;
 				animatedSkullPane.addButton(new Button(ItemHandler.getItem("STRING", 1, false, "&fSkull Texture " + k, "&7", "&7*Click modify this animated skull texture.", "&9&lSkull Texture: &a" + 
-				ItemHandler.purgeDelay(itemMap.getDynamicTextures().get(k - 1)), "&9&lAnimation Ticks: &a" + Utils.returnInteger(ItemHandler.getDelay(itemMap.getDynamicTextures().get(k - 1)))), event -> this.modifySkullPane(player, itemMap, k - 1, owner)));
+				ItemHandler.purgeDelay(itemMap.getDynamicTextures().get(k - 1)).substring(0, 40), "&9&lAnimation Ticks: &a" + Utils.returnInteger(ItemHandler.getDelay(itemMap.getDynamicTextures().get(k - 1)))), event -> this.modifySkullPane(player, itemMap, k - 1, owner)));
 			}
 		}
 		animatedSkullPane.open(player);
@@ -3471,7 +3471,7 @@ public class UI {
 			otherPane.addButton(new Button(this.fillerPaneGItem));
 			otherPane.addButton(new Button(ItemHandler.getItem("STRING", 1, false, "&a&lSkull Texture", "&7", "&7*Add a skull texture for the", "&7head as a custom skin.", "&7", "&7You can only define skull texture", 
 					"&7or skull owner, this will", "&7remove any skull owners.", "&7", "&7Skull textures can be found", "&7at websites like &aminecraft-heads.com", "&7and the value is listed under", "&7the OTHER section.", "&9&lSkull-Texture: &a" + 
-			Utils.nullCheck(itemMap.getSkullTexture())), event -> {
+			(Utils.nullCheck(itemMap.getSkullTexture()) != "NONE" ? itemMap.getSkullTexture().substring(0, 40) : "")), event -> {
 				if (Utils.nullCheck(itemMap.getSkullTexture()) != "NONE") {
 					itemMap.setSkullTexture(null);
 					this.otherPane(player, itemMap);
@@ -3674,7 +3674,7 @@ public class UI {
 				(Utils.nullCheck(patternList) != "NONE" ? "&9&lBanner Meta: &a" + patternList : ""), (Utils.nullCheck(potionList) != "NONE" ? "&9&lPotion-Effects: &a" + potionList : ""), 
 				(Utils.nullCheck(itemMap.getPages() + "") != "NONE" ? "&9&lBook Pages: &aYES" : ""),
 				(Utils.nullCheck(itemMap.getAuthor()) != "NONE" ? "&9&lBook Author: &a" + itemMap.getAuthor() : ""), (Utils.nullCheck(itemMap.getSkull()) != "NONE" ? "&9&lSkull-Owner: &a" + itemMap.getSkull() : ""), 
-				(Utils.nullCheck(itemMap.getSkullTexture()) != "NONE" ? "&9&lSkull-Texture: &a" + itemMap.getSkullTexture() : ""), (Utils.nullCheck(itemMap.getFireworkType() + "") != "NONE" ? "&9&lFirework Type: &a" + itemMap.getFireworkType().name() : ""), 
+				(Utils.nullCheck(itemMap.getSkullTexture()) != "NONE" ? "&9&lSkull-Texture: &a" + itemMap.getSkullTexture().substring(0, 40) : ""), (Utils.nullCheck(itemMap.getFireworkType() + "") != "NONE" ? "&9&lFirework Type: &a" + itemMap.getFireworkType().name() : ""), 
 				(Utils.nullCheck(itemMap.getFireworkPower() + "&7") != "NONE" ? "&9&lFirework Power: &a" + itemMap.getFireworkPower() : ""), (Utils.nullCheck(colorList) != "NONE" ? "&9&lFirework Color(s): &a" + colorList : ""), 
 				(itemMap.getFireworkTrail() ? "&9&lFirework Trail: &aENABLED" : ""), (itemMap.getFireworkFlicker() ? "&9&lFirework Flicker: &aENABLED" : ""));
 	}
