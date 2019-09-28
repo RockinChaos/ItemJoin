@@ -33,6 +33,8 @@ public class ItemAnimation {
 	private List<String> dynamicOwners = null;
 	private List<String> dynamicTextures = null;
 	private boolean stopAnimations = false;
+	private boolean menu = false;
+	private List<List<String>> menuLores = null;
 	
 	public ItemAnimation(ItemMap item) {
 		this.itemMap = item;
@@ -63,18 +65,20 @@ public class ItemAnimation {
 			String name = it.next();
 			if (Utils.returnInteger(ItemHandler.getDelay(name)) != null) { ticks = ticks + Utils.returnInteger(ItemHandler.getDelay(name)); }
 			else { ticks = ticks + 180; }
-			AnimateTask(player, it.hasNext(), name, null, null, null, null, ticks);
+			AnimateTask(player, it.hasNext(), name, null, null, null, null, ticks, 0);
 		}
 	}
 	
 	private void loreTasks(Player player) {
 		long ticks = 0;
+		int position = 0;
 		Iterator<List<String>> it = this.dynamicLores.iterator();
 		while (it.hasNext()) {
 			List<String> lore = it.next();
 			if (Utils.returnInteger(ItemHandler.getDelay(lore.get(0))) != null) { ticks = ticks + Utils.returnInteger(ItemHandler.getDelay(lore.get(0))); }
 			else { ticks = ticks + 180; }
-			AnimateTask(player, it.hasNext(), null, lore, null, null, null, ticks);
+			AnimateTask(player, it.hasNext(), null, lore, null, null, null, ticks, position);
+			position++;
 		}
 	}
 	
@@ -85,7 +89,7 @@ public class ItemAnimation {
 			String mat = it.next();
 			if (Utils.returnInteger(ItemHandler.getDelay(mat)) != null) { ticks = ticks + Utils.returnInteger(ItemHandler.getDelay(mat)); }
 			else { ticks = ticks + 180; }
-			AnimateTask(player, it.hasNext(), null, null, mat, null, null, ticks);
+			AnimateTask(player, it.hasNext(), null, null, mat, null, null, ticks, 0);
 		}
 	}
 	
@@ -96,7 +100,7 @@ public class ItemAnimation {
 			String owner = it.next();
 			if (Utils.returnInteger(ItemHandler.getDelay(owner)) != null) { ticks = ticks + Utils.returnInteger(ItemHandler.getDelay(owner)); }
 			else { ticks = ticks + 180; }
-			AnimateTask(player, it.hasNext(), null, null, null, owner, null, ticks);
+			AnimateTask(player, it.hasNext(), null, null, null, owner, null, ticks, 0);
 		}
 	}
 	
@@ -107,11 +111,11 @@ public class ItemAnimation {
 			String texture = it.next();
 			if (Utils.returnInteger(ItemHandler.getDelay(texture)) != null) { ticks = ticks + Utils.returnInteger(ItemHandler.getDelay(texture)); }
 			else { ticks = ticks + 180; }
-			AnimateTask(player, it.hasNext(), null, null, null, null, texture, ticks);
+			AnimateTask(player, it.hasNext(), null, null, null, null, texture, ticks, 0);
 		}
 	}
 	
-	private void AnimateTask(final Player player, final boolean hasNext, final String nameString, final List<String> loreString, final String materialString, final String ownerString, final String textureString, final long UpdateDelay) {
+	private void AnimateTask(final Player player, final boolean hasNext, final String nameString, final List<String> loreString, final String materialString, final String ownerString, final String textureString, final long UpdateDelay, final int position) {
 		final ItemMap itemMap = this.itemMap;
 		new BukkitRunnable() {
 			@Override
@@ -139,7 +143,7 @@ public class ItemAnimation {
 				for (ItemStack inPlayerInventory: player.getOpenInventory().getTopInventory().getContents()) {
 					if (inPlayerInventory != null && itemMap.getTempItem() != null && itemMap.isSimilar(inPlayerInventory)) {
 						if (nameString != null) { setNameData(player, inPlayerInventory, nameString); } 
-						else if (loreString != null) { setLoreData(player, inPlayerInventory, loreString); }
+						else if (loreString != null) { if (menu) { setLoreData(player, inPlayerInventory, menuLores.get(position)); } else { setLoreData(player, inPlayerInventory, loreString); } }
 						else if (materialString != null) { setMaterialData(player, inPlayerInventory, materialString); }
 						else if (ownerString != null || textureString != null) { setSkull(player, inPlayerInventory, ownerString, textureString); }
 					}
@@ -227,5 +231,22 @@ public class ItemAnimation {
 			} catch (Exception e) { ServerHandler.sendDebugTrace(e); }
 		}
 		transAnimate.setItemMeta(tempMeta);
+	}
+	
+	public void setMenu(boolean bool) {
+		this.menu = bool;
+		if (bool && this.dynamicLores != null) {
+			this.menuLores = new ArrayList<List<String>>();
+			for (List<String> lores : this.dynamicLores) {
+				List<String> tempLores = new ArrayList<String>();
+				for (String lore : lores) { tempLores.add(lore); }
+				tempLores.add("&7");
+				tempLores.add("&6---------------------------");
+				tempLores.add("&7*Click to modify this custom item.");
+				tempLores.add("&9&lNode: &a" + itemMap.getConfigName());
+				tempLores.add("&7");
+				this.menuLores.add(tempLores);
+			}
+		}
 	}
 }

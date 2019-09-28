@@ -26,7 +26,6 @@ import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemCommand;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemCommand.ActionType;
@@ -46,6 +45,7 @@ public class UI {
 	private ItemStack fillerPaneBItem = ItemHandler.getItem("STAINED_GLASS_PANE:15", 1, false, "&7", "");
 	private ItemStack fillerPaneGItem = ItemHandler.getItem("STAINED_GLASS_PANE:7", 1, false, "&7", "");
 	private ItemStack exitItem = ItemHandler.getItem("BARRIER", 1, false, "&c&l&nExit", "&7", "&7*Returns you to the game");
+	private List<Player> modifyMenu = new ArrayList<Player>();
 
 //  ============================================== //
 //  			   Selection Menus      	       //
@@ -101,8 +101,10 @@ public class UI {
 //  			   Menu Utilities        	       //
 //  ============================================== //
 	
-	private void setButton(Player player, final ItemMap itemMap, final Interface pagedPane) {
-		pagedPane.addButton(new Button(ItemHandler.addLore(new ItemStack(itemMap.getTempItem()), "&7", "&6---------------------------", "&7*Click to modify this custom item.", "&9&lNode: &a" + itemMap.getConfigName(), "&7"), event ->  this.creatingPane(player, itemMap)));
+	private void setButton(final Player player, final ItemMap itemMap, final Interface pagedPane) {
+		final ItemStack item = itemMap.getTempItem().clone();
+		if (itemMap.isAnimated() || itemMap.isDynamic()) { this.setModifyMenu(true, player); itemMap.getAnimationHandler().get(player).setMenu(true); }
+		pagedPane.addButton(new Button(ItemHandler.addLore(item, "&7", "&6---------------------------", "&7*Click to modify this custom item.", "&9&lNode: &a" + itemMap.getConfigName(), "&7"), event ->  this.creatingPane(player, itemMap)));
 	}
 	
 	private void setPage(final Player player, final Interface modifyPane, final List < ItemMap > items) {
@@ -387,22 +389,32 @@ public class UI {
 		creatingPane.addButton(new Button(this.headerStack(itemMap)));
 		creatingPane.addButton(new Button(this.fillerPaneGItem), 4);
 		creatingPane.addButton(new Button(ItemHandler.getItem(itemMap.getMaterial().toString() + ":" + itemMap.getDataValue(), 1, false, "&c&lMaterial", "&7", "&7*Set the material of the item.", "&9&lMATERIAL: &a" + 
-		itemMap.getMaterial().toString() + (itemMap.getDataValue() != 0 ? ":" + itemMap.getDataValue() : "")), event -> this.materialPane(player, itemMap, 1)));
+		itemMap.getMaterial().toString() + (itemMap.getDataValue() != 0 ? ":" + itemMap.getDataValue() : "")), event -> { 
+			if (itemMap.getDynamicMaterials() != null && !itemMap.getDynamicMaterials().isEmpty()) {
+				this.animateMaterialPane(player, itemMap);
+			} else {
+				this.materialPane(player, itemMap, 1);
+			}
+			}));
 		creatingPane.addButton(new Button(ItemHandler.getItem("GLASS", 1, false, "&c&lSlot", "&7", "&7*Set the slot that the", "&7item will be given in.", (itemMap.getMultipleSlots() != null && 
 				!itemMap.getMultipleSlots().isEmpty() ? "&9&lSlot(s): &a" + slotList : "&9&lSlot: &a" + itemMap.getSlot())), event -> this.switchPane(player, itemMap, 1)));
 		creatingPane.addButton(new Button(ItemHandler.getItem("DIAMOND", itemMap.getCount(), false, "&b&lCount", "&7", "&7*Set the amount of the", "&7item to be given.", "&9&lCOUNT: &a" + 
 				itemMap.getCount()), event -> this.countPane(player, itemMap)));
 		creatingPane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, false, "&b&lName", "&7", "&7*Set the name of the item.", "&9&lNAME: &f" + Utils.nullCheck(itemMap.getCustomName())), event -> {
-			if (Utils.nullCheck(itemMap.getCustomName()) != "NONE") {
-				itemMap.setCustomName(null);
-				this.creatingPane(player, itemMap);
+			if (itemMap.getDynamicNames() != null && !itemMap.getDynamicNames().isEmpty()) {
+				this.animatedNamePane(player, itemMap);
 			} else {
-				player.closeInventory();
-				String[] placeHolders = Language.newString();
-				placeHolders[14] = "NAME";
-				placeHolders[15] = "&bUltimate Sword";
-				Language.sendLangMessage("Commands.UI.inputType", player, placeHolders);
-				Language.sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+				if (Utils.nullCheck(itemMap.getCustomName()) != "NONE") {
+					itemMap.setCustomName(null);
+					this.creatingPane(player, itemMap);
+				} else {
+					player.closeInventory();
+					String[] placeHolders = Language.newString();
+					placeHolders[14] = "NAME";
+					placeHolders[15] = "&bUltimate Sword";
+					Language.sendLangMessage("Commands.UI.inputType", player, placeHolders);
+					Language.sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+				}
 			}
 		}, event -> {
 			itemMap.setCustomName(event.getMessage());
@@ -412,16 +424,20 @@ public class UI {
 			this.creatingPane(event.getPlayer(), itemMap);
 		}));
 		creatingPane.addButton(new Button(ItemHandler.getItem("386", 1, false, "&b&lLore", "&7", "&7*Set the lore of the item.", "&9&lLORE: &f" + Utils.nullCheck(itemMap.getCustomLore().toString())), event -> {
-			if (Utils.nullCheck(itemMap.getCustomLore().toString()) != "NONE") {
-				itemMap.setCustomLore(new ArrayList < String > ());
-				this.creatingPane(player, itemMap);
+			if (itemMap.getDynamicLores() != null && !itemMap.getDynamicLores().isEmpty()) {
+				this.animatedLorePane(player, itemMap);
 			} else {
-				player.closeInventory();
-				String[] placeHolders = Language.newString();
-				placeHolders[14] = "LORE";
-				placeHolders[15] = "&bThis is line 1, &cThis is line 2, &6This is line 3";
-				Language.sendLangMessage("Commands.UI.inputType", player, placeHolders);
-				Language.sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+				if (Utils.nullCheck(itemMap.getCustomLore().toString()) != "NONE") {
+					itemMap.setCustomLore(new ArrayList < String > ());
+					this.creatingPane(player, itemMap);
+				} else {
+					player.closeInventory();
+					String[] placeHolders = Language.newString();
+					placeHolders[14] = "LORE";
+					placeHolders[15] = "&bThis is line 1, &cThis is line 2, &6This is line 3";
+					Language.sendLangMessage("Commands.UI.inputType", player, placeHolders);
+					Language.sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+				}
 			}
 		}, event -> {
 			itemMap.setCustomLore(Utils.split(event.getMessage()));
@@ -479,7 +495,8 @@ public class UI {
 				"&7items name, lore, and material type"), event -> this.animationPane(player, itemMap)));
 		creatingPane.addButton(new Button(ItemHandler.getItem((ServerHandler.hasAquaticUpdate() ? "OAK_FENCE" : "FENCE"), 1, false, "&b&lLimit-Modes", "&7", "&7*Define the gamemode(s) that the", "&7item will be limited to.", "&9&lLIMIT-MODES: &a" + 
 				Utils.nullCheck(itemMap.getLimitModes())), event -> this.limitPane(player, itemMap)));
-		creatingPane.addButton(new Button(ItemHandler.getItem("NETHER_STAR", 1, false, "&b&lProbability", "&7", "&7*Define the chance that the", "&7item will be given to the player.", "&7", "&9&lPROBABILITY: &a" + Utils.nullCheck(itemMap.getProbability() + "&a%")), event -> {
+		creatingPane.addButton(new Button(ItemHandler.getItem("NETHER_STAR", 1, false, "&b&lProbability", "&7", "&7*Define the chance that the", "&7item will be given to the player.", "&7", "&9&lPROBABILITY: &a" +
+				Utils.nullCheck(itemMap.getProbability() + "&a%")), event -> {
 			if (Utils.nullCheck(itemMap.getProbability() + "&a%") != "NONE") {
 				itemMap.setProbability(-1);
 				this.creatingPane(player, itemMap);
@@ -2817,7 +2834,8 @@ public class UI {
 			for (int i = 1; i <= itemMap.getDynamicTextures().size(); i++) {
 				final int k = i;
 				animatedSkullPane.addButton(new Button(ItemHandler.getItem("STRING", 1, false, "&fSkull Texture " + k, "&7", "&7*Click modify this animated skull texture.", "&9&lSkull Texture: &a" + 
-				ItemHandler.purgeDelay(itemMap.getDynamicTextures().get(k - 1)).substring(0, 40), "&9&lAnimation Ticks: &a" + Utils.returnInteger(ItemHandler.getDelay(itemMap.getDynamicTextures().get(k - 1)))), event -> this.modifySkullPane(player, itemMap, k - 1, owner)));
+				(ItemHandler.purgeDelay(itemMap.getDynamicTextures().get(k - 1)).length() > 40 ? ItemHandler.purgeDelay(itemMap.getDynamicTextures().get(k - 1)).substring(0, 40) : ItemHandler.purgeDelay(itemMap.getDynamicTextures().get(k - 1))),
+				"&9&lAnimation Ticks: &a" + Utils.returnInteger(ItemHandler.getDelay(itemMap.getDynamicTextures().get(k - 1)))), event -> this.modifySkullPane(player, itemMap, k - 1, owner)));
 			}
 		}
 		animatedSkullPane.open(player);
@@ -3449,16 +3467,20 @@ public class UI {
 			otherPane.addButton(new Button(this.fillerPaneGItem), 3);
 			otherPane.addButton(new Button(ItemHandler.getItem("GOLDEN_HELMET", 1, false, "&b&lSkull Owner", "&7", "&7*Define a skull owner for the", "&7head adding that persons skin.", "&7", "&7You can only define skull owner", 
 					"&7or skull texture, this will", "&7remove any skull textures.", "&9&lSkull-Owner: &a" + Utils.nullCheck(itemMap.getSkull())), event -> {
-				if (Utils.nullCheck(itemMap.getSkull()) != "NONE") {
-					itemMap.setSkull(null);
-					this.otherPane(player, itemMap);
+				if (itemMap.getDynamicOwners() != null && !itemMap.getDynamicOwners().isEmpty()) {
+					this.animatedSkullPane(player, itemMap, true);
 				} else {
-					player.closeInventory();
-					String[] placeHolders = Language.newString();
-					placeHolders[14] = "SKULL OWNER";
-					placeHolders[15] = "RockinChaos";
-					Language.sendLangMessage("Commands.UI.inputType", player, placeHolders);
-					Language.sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+					if (Utils.nullCheck(itemMap.getSkull()) != "NONE") {
+						itemMap.setSkull(null);
+						this.otherPane(player, itemMap);
+					} else {
+						player.closeInventory();
+						String[] placeHolders = Language.newString();
+						placeHolders[14] = "SKULL OWNER";
+						placeHolders[15] = "RockinChaos";
+						Language.sendLangMessage("Commands.UI.inputType", player, placeHolders);
+						Language.sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+					}
 				}
 			}, event -> {
 				itemMap.setSkull(event.getMessage());
@@ -3471,17 +3493,21 @@ public class UI {
 			otherPane.addButton(new Button(this.fillerPaneGItem));
 			otherPane.addButton(new Button(ItemHandler.getItem("STRING", 1, false, "&a&lSkull Texture", "&7", "&7*Add a skull texture for the", "&7head as a custom skin.", "&7", "&7You can only define skull texture", 
 					"&7or skull owner, this will", "&7remove any skull owners.", "&7", "&7Skull textures can be found", "&7at websites like &aminecraft-heads.com", "&7and the value is listed under", "&7the OTHER section.", "&9&lSkull-Texture: &a" + 
-			(Utils.nullCheck(itemMap.getSkullTexture()) != "NONE" ? itemMap.getSkullTexture().substring(0, 40) : "")), event -> {
-				if (Utils.nullCheck(itemMap.getSkullTexture()) != "NONE") {
-					itemMap.setSkullTexture(null);
-					this.otherPane(player, itemMap);
-				} else {
-					player.closeInventory();
-					String[] placeHolders = Language.newString();
-					placeHolders[14] = "SKULL TEXTURE";
-					placeHolders[15] = "eyJ0ZXh0dYMGQVlN2FjZmU3OSJ9fX0=";
-					Language.sendLangMessage("Commands.UI.inputType", player, placeHolders);
-					Language.sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+			(Utils.nullCheck(itemMap.getSkullTexture()) != "NONE" ? (itemMap.getSkullTexture().length() > 40 ? itemMap.getSkullTexture().substring(0, 40) : itemMap.getSkullTexture()) : "")), event -> {
+				if (itemMap.getDynamicTextures() != null && !itemMap.getDynamicTextures().isEmpty()) {
+					this.animatedSkullPane(player, itemMap, false);
+					} else {
+					if (Utils.nullCheck(itemMap.getSkullTexture()) != "NONE") {
+						itemMap.setSkullTexture(null);
+						this.otherPane(player, itemMap);
+					} else {
+						player.closeInventory();
+						String[] placeHolders = Language.newString();
+						placeHolders[14] = "SKULL TEXTURE";
+						placeHolders[15] = "eyJ0ZXh0dYMGQVlN2FjZmU3OSJ9fX0=";
+						Language.sendLangMessage("Commands.UI.inputType", player, placeHolders);
+						Language.sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+					}
 				}
 			}, event -> {
 				itemMap.setSkullTexture(event.getMessage());
@@ -3653,7 +3679,8 @@ public class UI {
 				colorList += "&a" + split + " /n ";
 			}
 		}
-		return ItemHandler.getItem(itemMap.getMaterial().toString(), 1, false, "&7*&6&l&nItem Information", "&7", "&9&lNode: &a" + itemMap.getConfigName(), "&9&lMaterial: &a" + itemMap.getMaterial().toString() + (itemMap.getDataValue() != 0 ? ":" + itemMap.getDataValue() : ""), 
+		return ItemHandler.getItem(itemMap.getMaterial().toString(), 1, false, "&7*&6&l&nItem Information", "&7", "&9&lNode: &a" + itemMap.getConfigName(), "&9&lMaterial: &a" 
+		+ itemMap.getMaterial().toString() + (itemMap.getDataValue() != 0 ? ":" + itemMap.getDataValue() : ""), 
 				(itemMap.getMultipleSlots() != null && !itemMap.getMultipleSlots().isEmpty() ? "&9&lSlot(s): &a" + slotList : "&9&lSlot: &a" + itemMap.getSlot()), "&9&lCount: &a" + itemMap.getCount(), 
 				(Utils.nullCheck(itemMap.getCustomName()) != "NONE" ? "&9&lName: &a" + itemMap.getCustomName() : ""), (Utils.nullCheck(itemMap.getCustomLore().toString()) != "NONE" ? "&9&lLore: &a" + Utils.nullCheck(itemMap.getCustomLore().toString()) : ""), 
 				(Utils.nullCheck(itemMap.getDurability() + "&7") != "NONE" ? "&9&lDurability: &a" + itemMap.getDurability() : ""), (itemMap.getCommands().length != 0 ? "&9&lCommands: &aYES" : ""), 
@@ -3674,7 +3701,8 @@ public class UI {
 				(Utils.nullCheck(patternList) != "NONE" ? "&9&lBanner Meta: &a" + patternList : ""), (Utils.nullCheck(potionList) != "NONE" ? "&9&lPotion-Effects: &a" + potionList : ""), 
 				(Utils.nullCheck(itemMap.getPages() + "") != "NONE" ? "&9&lBook Pages: &aYES" : ""),
 				(Utils.nullCheck(itemMap.getAuthor()) != "NONE" ? "&9&lBook Author: &a" + itemMap.getAuthor() : ""), (Utils.nullCheck(itemMap.getSkull()) != "NONE" ? "&9&lSkull-Owner: &a" + itemMap.getSkull() : ""), 
-				(Utils.nullCheck(itemMap.getSkullTexture()) != "NONE" ? "&9&lSkull-Texture: &a" + itemMap.getSkullTexture().substring(0, 40) : ""), (Utils.nullCheck(itemMap.getFireworkType() + "") != "NONE" ? "&9&lFirework Type: &a" + itemMap.getFireworkType().name() : ""), 
+				(Utils.nullCheck(itemMap.getSkullTexture()) != "NONE" ? "&9&lSkull-Texture: &a" + (itemMap.getSkullTexture().length() > 40 ? itemMap.getSkullTexture().substring(0, 40) : itemMap.getSkullTexture()) : ""), 
+				(Utils.nullCheck(itemMap.getFireworkType() + "") != "NONE" ? "&9&lFirework Type: &a" + itemMap.getFireworkType().name() : ""), 
 				(Utils.nullCheck(itemMap.getFireworkPower() + "&7") != "NONE" ? "&9&lFirework Power: &a" + itemMap.getFireworkPower() : ""), (Utils.nullCheck(colorList) != "NONE" ? "&9&lFirework Color(s): &a" + colorList : ""), 
 				(itemMap.getFireworkTrail() ? "&9&lFirework Trail: &aENABLED" : ""), (itemMap.getFireworkFlicker() ? "&9&lFirework Flicker: &aENABLED" : ""));
 	}
@@ -3689,8 +3717,17 @@ public class UI {
 	
 //  ==============================================================================================================================================================================================================================================================
 	
+	public void setModifyMenu(boolean bool, Player player) {
+		if (bool) { this.modifyMenu.add(player); } 
+		else { this.modifyMenu.remove(player); }
+	}
+	
+	public boolean modifyMenu(Player player) {
+		return this.modifyMenu.contains(player);
+	}
+	
 	public boolean isOpen(Player player) {
-		if (player.getOpenInventory().getTitle().toString().equalsIgnoreCase(this.GUIName)) {
+		if (player.getOpenInventory().getTitle().toString().equalsIgnoreCase(Utils.colorFormat(this.GUIName))) {
 			return true;
 		}
 		return false;
