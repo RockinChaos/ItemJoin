@@ -64,14 +64,14 @@ public class PlayerJoin implements Listener {
 	}
 	
 	private void runGlobalCmds(Player player) {
-		if (!ConfigHandler.getConfig("config.yml").getString("Active-Commands.enabled-worlds").equalsIgnoreCase("DISABLED") || !ConfigHandler.getConfig("config.yml").getString("Active-Commands.enabled-worlds").equalsIgnoreCase("FALSE")) {
-			if (inCommandsWorld(player.getWorld().getName(), "enabled-worlds") && ConfigHandler.getConfig("config.yml").getStringList("Active-Commands.commands") != null) {
-				for (String Command: ConfigHandler.getConfig("config.yml").getStringList("Active-Commands.commands")) {
-					String command = Utils.translateLayout(Command, player).replace("first-join: ", "").replace("first-join:", "");
-					if (!ConfigHandler.getSQLData().hasFirstCommanded(player, command)) {
-						Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command);
-						if (Utils.containsIgnoreCase(Command, "first-join:")) {
-							ConfigHandler.getSQLData().saveFirstCommandData(player, command);
+		if (ConfigHandler.getConfig("config.yml").getString("Active-Commands.enabled-worlds") != null && ConfigHandler.getConfig("config.yml").getStringList("Active-Commands.commands") != null && (!ConfigHandler.getConfig("config.yml").getString("Active-Commands.enabled-worlds").equalsIgnoreCase("DISABLED") || !ConfigHandler.getConfig("config.yml").getString("Active-Commands.enabled-worlds").equalsIgnoreCase("FALSE"))) {
+			if (this.inCommandsWorld(player.getWorld().getName(), "enabled-worlds")) {
+				for (String commands: ConfigHandler.getConfig("config.yml").getStringList("Active-Commands.commands")) {
+					String formatCommand = Utils.translateLayout(commands, player).replace("first-join: ", "").replace("first-join:", "");
+					if (!ConfigHandler.getSQLData().hasFirstCommanded(player, formatCommand)) {
+						Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), formatCommand);
+						if (Utils.containsIgnoreCase(commands, "first-join:")) {
+							ConfigHandler.getSQLData().saveFirstCommandData(player, formatCommand);
 						}
 					}
 				}
