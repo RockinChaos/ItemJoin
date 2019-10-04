@@ -138,8 +138,12 @@ public class InventoryCrafting implements Listener {
     							if (((Player) objPlayer).isOnline()) {
     								ItemStack[] tempContents = ((Player) objPlayer).getOpenInventory().getTopInventory().getContents();
     								ItemStack[] contents = new ItemStack[5];
-    								for (int i = 0; i <= 4; i++) {
-    									contents[i] = tempContents[i].clone();
+    								if (contents != null && tempContents != null) {
+	    								for (int i = 0; i <= 4; i++) {
+	    									if (contents[i] != null) {
+	    										contents[i] = tempContents[i].clone();
+	    									}
+	    								}
     								}
     								craftingItems.put(PlayerHandler.getPlayerID(((Player) objPlayer)), contents);
     							} else {
