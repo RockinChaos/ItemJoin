@@ -312,6 +312,7 @@ public class ItemMap {
 	private void setCommandSequence() {
 		if (this.nodeLocation.getString("commands-sequence") != null) { 
 		    if (Utils.containsIgnoreCase(this.nodeLocation.getString("commands-sequence"), "SEQUENTIAL")) { this.sequence = CommandSequence.SEQUENTIAL; }
+		    else if (Utils.containsIgnoreCase(this.nodeLocation.getString("commands-sequence"), "RANDOM_SINGLE")) { this.sequence = CommandSequence.RANDOM_SINGLE; }
 			else if (Utils.containsIgnoreCase(this.nodeLocation.getString("commands-sequence"), "RANDOM")) { this.sequence = CommandSequence.RANDOM; }
 		}
 	}
@@ -1941,6 +1942,20 @@ public class ItemMap {
     	return true;
     }
     
+    private boolean getRandomAll(final HashMap < Integer, ItemCommand > randomCommands, ItemCommand[] itemCommands, final Player player, final String action, final String slot) {
+    	Entry<?, ?> dedicatedMap = Utils.randomEntry(randomCommands);
+    	if (!((ItemCommand)dedicatedMap.getValue()).execute(player, action, slot)) { 
+    		randomCommands.remove(dedicatedMap.getKey());
+    		this.getRandomAll(randomCommands, itemCommands, player, action, slot);
+    		return false;
+    	}
+    	randomCommands.remove(dedicatedMap.getKey());
+    	if (!randomCommands.isEmpty()) {
+    		this.getRandomAll(randomCommands, itemCommands, player, action, slot);
+    	}
+    	return true;
+    }
+    
     private boolean isExecuted(final Player player, final String action, final String slot, final ItemStack itemCopy) {
     	boolean playerSuccess = false;
     	ItemCommand[] itemCommands = this.commands;
@@ -1949,13 +1964,15 @@ public class ItemMap {
     		boolean isSwap = false;
     		for (int i = 0; i < itemCommands.length; i++) { 
         		if (this.sequence == CommandSequence.RANDOM) { randomCommands.put(Utils.getRandom(1, 100000), itemCommands[i]); }
+        		else if (this.sequence == CommandSequence.RANDOM_SINGLE) { randomCommands.put(Utils.getRandom(1, 100000), itemCommands[i]); }
         		else if (!playerSuccess) { playerSuccess = itemCommands[i].execute(player, action, slot); }
 				else { itemCommands[i].execute(player, action, slot); }
         		if (Utils.containsIgnoreCase(itemCommands[i].getCommand(), "swap-item")) { isSwap = true; }
 			}
     		if (isSwap) { this.removeDisposable(player, itemCopy, true); }
     	}
-    	if (this.sequence == CommandSequence.RANDOM) { playerSuccess = this.getRandomMap(randomCommands, itemCommands, player, action, slot); }
+    	if (this.sequence == CommandSequence.RANDOM) { playerSuccess = this.getRandomAll(randomCommands, itemCommands, player, action, slot); }
+    	else if (this.sequence == CommandSequence.RANDOM_SINGLE) { playerSuccess = this.getRandomMap(randomCommands, itemCommands, player, action, slot); }
     	return playerSuccess;
     }
     
@@ -2257,5 +2274,5 @@ public class ItemMap {
 	}
 	
 	public enum CommandType { BOTH, INTERACT, INVENTORY; }
-	public enum CommandSequence { RANDOM, SEQUENTIAL, ALL; }
+	public enum CommandSequence { RANDOM, RANDOM_SINGLE, SEQUENTIAL, ALL; }
 }
