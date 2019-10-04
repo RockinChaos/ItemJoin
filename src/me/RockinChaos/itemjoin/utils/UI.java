@@ -426,18 +426,8 @@ public class UI {
 		creatingPane.addButton(new Button(ItemHandler.getItem("386", 1, false, "&b&lLore", "&7", "&7*Set the lore of the item.", "&9&lLORE: &f" + Utils.nullCheck(itemMap.getCustomLore().toString())), event -> {
 			if (itemMap.getDynamicLores() != null && !itemMap.getDynamicLores().isEmpty()) {
 				this.animatedLorePane(player, itemMap);
-			} else {
-				if (Utils.nullCheck(itemMap.getCustomLore().toString()) != "NONE") {
-					itemMap.setCustomLore(new ArrayList < String > ());
-					this.creatingPane(player, itemMap);
-				} else {
-					player.closeInventory();
-					String[] placeHolders = Language.newString();
-					placeHolders[14] = "LORE";
-					placeHolders[15] = "&bThis is line 1, &cThis is line 2, &6This is line 3";
-					Language.sendLangMessage("Commands.UI.inputType", player, placeHolders);
-					Language.sendLangMessage("Commands.UI.normalExample", player, placeHolders);
-				}
+			} else { 
+				this.lorePane(player, itemMap);
 			}
 		}, event -> {
 			itemMap.setCustomLore(Utils.split(event.getMessage()));
@@ -1634,8 +1624,10 @@ public class UI {
 		sequencePane.addButton(new Button(ItemHandler.getItem((ServerHandler.hasAquaticUpdate() ? "CLOCK" : "347"), 1, false, "&a&lSequential", "&7", "&7*Executes the command lines", "&7in order from top to bottom."), event -> {
 			itemMap.setCommandSequence(CommandSequence.SEQUENTIAL);this.commandPane(player, itemMap);
 		}));
-		sequencePane.addButton(new Button(this.fillerPaneGItem), 1);
-		sequencePane.addButton(new Button(ItemHandler.getItem("EMERALD", 1, false, "&a&lRandom", "&7", "&7*Executes one of the command lines", "&7randomly with equal values."), event -> {
+		sequencePane.addButton(new Button(ItemHandler.getItem("DIAMOND", 1, false, "&a&lRandom Single", "&7", "&7*Executes one of the command lines", "&7randomly with equal values."), event -> {
+			itemMap.setCommandSequence(CommandSequence.RANDOM_SINGLE); this.commandPane(player, itemMap);
+		}));
+		sequencePane.addButton(new Button(ItemHandler.getItem("EMERALD", 1, false, "&a&lRandom", "&7", "&7*Executes each command line in a", "&7random order with equal values."), event -> {
 			itemMap.setCommandSequence(CommandSequence.RANDOM);this.commandPane(player, itemMap);
 		}));
 		sequencePane.addButton(new Button(this.fillerPaneGItem), 3);
@@ -2342,6 +2334,73 @@ public class UI {
 			}
 		}
 		regionPane.open(player);
+	}
+	
+	private void lorePane(final Player player, final ItemMap itemMap) {
+		Interface lorePane = new Interface(true, 2, this.GUIName);
+		lorePane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> this.creatingPane(player, itemMap)));
+		lorePane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, true, "&eNew Lore Line", "&7", "&7*Add a new lore line", "&7to the item lore."), event -> {
+			player.closeInventory();
+			String[] placeHolders = Language.newString();
+			placeHolders[14] = "LORE LINE";
+			placeHolders[15] = "&bThis is a new lore line.";
+			Language.sendLangMessage("Commands.UI.inputType", player, placeHolders);
+			Language.sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+		}, event -> {
+			String[] placeHolders = Language.newString();
+			placeHolders[14] = "LORE LINE";
+			Language.sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+			List<String> lore = new ArrayList<String>(); 
+			if (itemMap.getCustomLore() != null) {
+				lore = itemMap.getCustomLore(); 
+				lore.add(event.getMessage()); 
+				itemMap.setCustomLore(lore); 
+			} else { 
+				lore.add(event.getMessage()); 
+				itemMap.setCustomLore(lore);
+			}
+			this.lorePane(player, itemMap);
+		}));
+		if (itemMap.getCustomLore() != null && !itemMap.getCustomLore().isEmpty()) {
+			for (int i = 1; i <= itemMap.getCustomLore().size(); i++) {
+				final int k = i;
+				lorePane.addButton(new Button(ItemHandler.getItem("WRITABLE_BOOK", 1, false, "&fLore " + k, "&7", "&7*Click modify this lore line.", "&9&lLore: &a" + itemMap.getCustomLore().get(k - 1)), event -> this.modifyLoreLinePane(player, itemMap, k - 1)));
+			}
+		}
+		lorePane.open(player);
+	}
+	
+	private void modifyLoreLinePane(final Player player, final ItemMap itemMap, final int position) {
+		Interface modifyLorePane = new Interface(false, 2, this.GUIName);
+		modifyLorePane.addButton(new Button(this.fillerPaneGItem), 3);
+		modifyLorePane.addButton(new Button(ItemHandler.getItem("WRITABLE_BOOK", 1, false, "&e&l&nModify", "&7", "&7*Change the lore line.", "&9&lLore: &a" + itemMap.getCustomLore().get(position)), event -> {
+			player.closeInventory();
+			String[] placeHolders = Language.newString();
+			placeHolders[14] = "LORE LINE";
+			placeHolders[15] = "&bThis is a new lore line.";
+			Language.sendLangMessage("Commands.UI.inputType", player, placeHolders);
+			Language.sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+		}, event -> {
+			List <  String> lore = itemMap.getCustomLore();
+			lore.set(position, event.getMessage());
+			itemMap.setCustomLore(lore);
+			String[] placeHolders = Language.newString();
+			placeHolders[14] = "LORE LINE";
+			Language.sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+			this.modifyLoreLinePane(event.getPlayer(), itemMap, position);
+		}));
+		modifyLorePane.addButton(new Button(this.fillerPaneGItem));
+		modifyLorePane.addButton(new Button(ItemHandler.getItem("REDSTONE", 1, false, "&c&l&nDelete", "&7", "&7*Delete this lore line."), event -> {
+			List < String > lore = itemMap.getCustomLore();
+			lore.remove(position);
+			itemMap.setCustomLore(lore);
+			this.lorePane(player, itemMap);
+		}));
+		modifyLorePane.addButton(new Button(this.fillerPaneGItem), 3);
+		modifyLorePane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> this.lorePane(player, itemMap)));
+		modifyLorePane.addButton(new Button(this.fillerPaneBItem), 7);
+		modifyLorePane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> this.lorePane(player, itemMap)));
+		modifyLorePane.open(player);
 	}
 	
 //  ============================================== //
