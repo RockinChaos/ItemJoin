@@ -100,12 +100,12 @@ public class ServerHandler {
 
 	public static void sendDebugMessage(String message) {
 		if (ConfigHandler.isDebugging()) {
-		String prefix = "[ItemJoin_DEBUG] &c";
-		message = ChatColor.translateAlternateColorCodes('&', message).toString();
-		message = ChatColor.stripColor(message);
-		message = prefix + message;
-		message = ChatColor.translateAlternateColorCodes('&', message).toString();
-		ItemJoin.getInstance().getServer().getConsoleSender().sendMessage(message);
+			String prefix = "[ItemJoin_DEBUG] &c";
+			message = ChatColor.translateAlternateColorCodes('&', message).toString();
+			message = ChatColor.stripColor(message);
+			message = prefix + message;
+			message = ChatColor.translateAlternateColorCodes('&', message).toString();
+			ItemJoin.getInstance().getServer().getConsoleSender().sendMessage(message);
 		}
 	}
 	
