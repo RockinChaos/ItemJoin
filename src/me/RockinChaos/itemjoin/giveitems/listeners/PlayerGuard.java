@@ -17,22 +17,23 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
+import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.utils.Legacy;
 import me.RockinChaos.itemjoin.utils.Utils;
 
 public class PlayerGuard implements Listener {
-	private static HashMap < Player, String > playersInRegions = new HashMap < Player, String > ();
+	private HashMap < Player, String > playersInRegions = new HashMap < Player, String > ();
 	private static List < String > localeRegions = new ArrayList < String > ();
 
 	@EventHandler
-	private void RegionListener(PlayerMoveEvent event) {
+	private void regionEvent(PlayerMoveEvent event) {
 		final Player player = event.getPlayer();
 		if (ConfigHandler.getSQLData().isEnabled(player)) {
-			updateRegionItems(player);
+			this.regionItems(player);
 		}
 	}
 
-	private static void removeItems(Player player, String region) {
+	private void removeItems(Player player, String region) {
 		if (region != null && !region.isEmpty()) {
 			ItemUtilities.setReturningOfItems(player, player.getWorld().getName(), region);
 			for (ItemMap item: ItemUtilities.getItems()) {
@@ -45,7 +46,7 @@ public class PlayerGuard implements Listener {
 		}
 	}
 	
-	private static void getItems(Player player, String region) {
+	private void getItems(Player player, String region) {
 		if (region != null && !region.isEmpty()) {
 			ItemUtilities.setClearingOfRegionItems(player, region);
 			final int session = Utils.getRandom(1, 100000);
@@ -60,8 +61,8 @@ public class PlayerGuard implements Listener {
 		}
 	}
 	
-	private static void updateRegionItems(Player player) {
-		String regions = getLocationRegions(player);
+	private void regionItems(Player player) {
+		String regions = this.getLocationRegions(player);
 		if (playersInRegions.get(player) != null) {
 			List < String > regionSet = Arrays.asList(regions.replace(" ", "").split(","));
 			List < String > playerSet = Arrays.asList(playersInRegions.get(player).replace(" ", "").split(","));
@@ -71,25 +72,27 @@ public class PlayerGuard implements Listener {
 			playerSetAdditional.removeAll(regionSet);
 			if (!playerSetAdditional.isEmpty()) {
 				for (String region: playerSetAdditional) {
-					removeItems(player, region);
+					this.removeItems(player, region);
 				}
 			}
 			if (!regionSetAdditional.isEmpty()) {
 				for (String region: regionSetAdditional) {
-					getItems(player, region);
+					this.getItems(player, region);
 				}
 			}
 		} else {
 			List < String > regionSet = Arrays.asList(regions.replace(" ", "").split(","));
 			for (String region: regionSet) {
-				getItems(player, region);
+				this.getItems(player, region);
 			}
 		}
-		playersInRegions.put(player, regions);
+		this.playersInRegions.put(player, regions);
 	}
 	
-	private static String getLocationRegions(Player player) {
-		ApplicableRegionSet set = getApplicableRegionSet(player.getWorld(), player.getLocation()); if (set == null) { return ""; }
+	private String getLocationRegions(Player player) {
+		ApplicableRegionSet set = null;
+		try { set = this.getApplicableRegionSet(player.getWorld(), player.getLocation()); } catch (Exception e) { ServerHandler.sendDebugTrace(e); } 
+		if (set == null) { return ""; }
 		String regionSet = "";
 		for (ProtectedRegion r: set) {
 			if (regionSet.isEmpty()) { regionSet += r.getId(); } else { regionSet +=  ", " + r.getId(); }
@@ -106,7 +109,7 @@ public class PlayerGuard implements Listener {
 		return false;
 	}
 	
-	private static ApplicableRegionSet getApplicableRegionSet(World world, Location loc) {
+	private ApplicableRegionSet getApplicableRegionSet(World world, Location loc) throws Exception {
 		if (ConfigHandler.getDepends().getGuard().guardVersion() >= 700) {
 			com.sk89q.worldedit.world.World wgWorld;
 			try { wgWorld = com.sk89q.worldguard.WorldGuard.getInstance().getPlatform().getWorldByName(world.getName()); }
