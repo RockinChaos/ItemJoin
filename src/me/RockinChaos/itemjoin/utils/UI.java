@@ -2399,8 +2399,8 @@ public class UI {
 		animateMaterialPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the animation menu."), event -> {
 			if (!itemMap.getDynamicMaterials().isEmpty()) {
 				itemMap.setAnimate(true);
-				if (itemMap.getDynamicMaterials().get(0).contains(":")) {
-					String[] material = itemMap.getDynamicMaterials().get(0).split(":");
+				if (ItemHandler.purgeDelay(itemMap.getDynamicMaterials().get(0)).contains(":")) {
+					String[] material = ItemHandler.purgeDelay(itemMap.getDynamicMaterials().get(0)).split(":");
 					itemMap.setMaterial(ItemHandler.getMaterial(material[0], null));
 					itemMap.setDataValue((short)Integer.parseInt(material[1]));
 				} else {
