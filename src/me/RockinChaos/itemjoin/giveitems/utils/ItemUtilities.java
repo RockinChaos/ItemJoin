@@ -118,6 +118,14 @@ public class ItemUtilities {
 		return items;
 	}
 	
+	public static List < ItemMap > copyItems() {
+		List < ItemMap > itemsCopy = new ArrayList < ItemMap > ();
+		for (ItemMap itemMap : items) { 
+			itemsCopy.add(itemMap.clone());
+		}
+		return itemsCopy;
+	}
+	
 	public static void clearItems() {
 		items = new ArrayList < ItemMap >();
 	}

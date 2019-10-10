@@ -233,7 +233,7 @@ public class ItemAnimation {
 		transAnimate.setItemMeta(tempMeta);
 	}
 	
-	public void setMenu(boolean bool) {
+	public void setMenu(boolean bool, int stage) {
 		this.menu = bool;
 		if (bool && this.dynamicLores != null) {
 			this.menuLores = new ArrayList<List<String>>();
@@ -242,7 +242,8 @@ public class ItemAnimation {
 				for (String lore : lores) { tempLores.add(lore); }
 				tempLores.add("&7");
 				tempLores.add("&6---------------------------");
-				tempLores.add("&7*Click to modify this custom item.");
+				if (stage == 1) { tempLores.add("&7*Click to set as a swap-item."); } 
+				else { tempLores.add("&7*Click to modify this custom item."); }
 				tempLores.add("&9&lNode: &a" + itemMap.getConfigName());
 				tempLores.add("&7");
 				this.menuLores.add(tempLores);

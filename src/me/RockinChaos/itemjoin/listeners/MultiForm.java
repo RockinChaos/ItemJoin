@@ -48,7 +48,7 @@ public class MultiForm implements Listener {
 						ConfigHandler.getItemCreator().setModifyMenu(false, (Player)event.getPlayer());
 						for (ItemMap itemMap : ItemUtilities.getItems()) {
 							if (itemMap.getAnimationHandler() != null && itemMap.getAnimationHandler().get(event.getPlayer()) != null) {
-								itemMap.getAnimationHandler().get(event.getPlayer()).setMenu(false);
+								itemMap.getAnimationHandler().get(event.getPlayer()).setMenu(false, 0);
 							}
 						}
 					}

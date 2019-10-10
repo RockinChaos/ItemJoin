@@ -66,7 +66,7 @@ public class ItemMap {
 	
 	private ItemStack tempItem = null;
 	private ItemMeta tempMeta = null;
-	private Material material = null;
+	private Material material = Material.AIR;
 	private Short dataValue = 0;
 	
 	private String customName = null;
@@ -228,6 +228,8 @@ public class ItemMap {
 //  ============================================== //
 //  	  		 Initialize ItemMap  		       //
 //  ============================================== //
+	public ItemMap() { }
+	
 	public ItemMap(String internalName, String slot) {
         this.nodeLocation = ConfigHandler.getItemSection(internalName);
         this.configName = internalName;
@@ -2275,4 +2277,15 @@ public class ItemMap {
 	
 	public enum CommandType { BOTH, INTERACT, INVENTORY; }
 	public enum CommandSequence { RANDOM, RANDOM_SINGLE, SEQUENTIAL, ALL; }
+	
+	public ItemMap clone() {
+        try {
+            Object clone = this.getClass().newInstance();
+            for (Field field : this.getClass().getDeclaredFields()) {
+                field.setAccessible(true);
+                field.set(clone, field.get(this));
+            }
+            return (ItemMap)clone;
+        } catch(Exception e) { ServerHandler.sendDebugTrace(e); return this; }
+    }
 }

@@ -70,9 +70,7 @@ public class UI {
 	
 	private void startModify(final Player player) {
 		Interface modifyPane = new Interface(true, 6, this.GUIName);
-		List < ItemMap > items = new ArrayList < ItemMap > ();
-		items.addAll(ItemUtilities.getItems());
-		this.setPage(player, modifyPane, items);
+		this.setPage(player, modifyPane, ItemUtilities.copyItems());
 		modifyPane.open(player);
 	}
 	
@@ -103,7 +101,7 @@ public class UI {
 	
 	private void setButton(final Player player, final ItemMap itemMap, final Interface pagedPane) {
 		final ItemStack item = itemMap.getTempItem().clone();
-		if (itemMap.isAnimated() || itemMap.isDynamic()) { this.setModifyMenu(true, player); itemMap.getAnimationHandler().get(player).setMenu(true); }
+		if (itemMap.isAnimated() || itemMap.isDynamic()) { this.setModifyMenu(true, player); itemMap.getAnimationHandler().get(player).setMenu(true, 0); }
 		pagedPane.addButton(new Button(ItemHandler.addLore(item, "&7", "&6---------------------------", "&7*Click to modify this custom item.", "&9&lNode: &a" + itemMap.getConfigName(), "&7"), event ->  this.creatingPane(player, itemMap)));
 	}
 	
@@ -1453,27 +1451,16 @@ public class UI {
 	
 	private void swapPane(final Player player, final ItemMap itemMap, final ActionType action) {
 		Interface swapPane = new Interface(true, 6, this.GUIName);
-		List < ItemMap > items = new ArrayList < ItemMap > ();
-		items.addAll(ItemUtilities.getItems());
 		swapPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the executors menu."), event -> {
 			this.executorPane(player, itemMap, action);
 		}));
-		for (ItemMap item : items) {
-			if (item.isAnimated() && item.getDynamicLores() != null || item.isDynamic() && item.getDynamicLores() != null) {
-				List < List < String >> dynamicLores = new ArrayList < List < String >> ();
-				for (List < String > dynamicLore: item.getDynamicLores()) {
-					dynamicLore.add("&7");
-					dynamicLore.add("&6---------------------------");
-					dynamicLore.add("&7*Click to set as a swap-item.");
-					dynamicLore.add("&9&lNode: &a" + item.getConfigName());
-					dynamicLore.add("&7");
-					dynamicLores.add(dynamicLore);
-				}
-				item.setDynamicLores(dynamicLores);
+		for (ItemMap item : ItemUtilities.copyItems()) {
+			if (item.getNodeLocation() != itemMap.getNodeLocation()) {
+				if (itemMap.isAnimated() || itemMap.isDynamic()) { this.setModifyMenu(true, player); itemMap.getAnimationHandler().get(player).setMenu(true, 1); }
+				swapPane.addButton(new Button(ItemHandler.addLore(item.getTempItem(), "&7", "&6---------------------------", "&7*Click to set as a swap-item.", "&9&lNode: &a" + item.getConfigName(), "&7"), event -> { 
+				this.modifyCommands(itemMap, ItemCommand.fromString("swap-item: " + item.getConfigName(), action, CommandType.BOTH, 0L), true);
+				this.commandListPane(player, itemMap, action); }));
 			}
-			swapPane.addButton(new Button(ItemHandler.addLore(item.getTempItem(), "&7", "&6---------------------------", "&7*Click to set as a swap-item.", "&9&lNode: &a" + item.getConfigName(), "&7"), event -> { 
-			this.modifyCommands(itemMap, ItemCommand.fromString("swap-item: " + item.getConfigName(), action, CommandType.BOTH, 0L), true);
-			this.commandListPane(player, itemMap, action); }));
 		}
 		swapPane.open(player);
 	}
