@@ -259,14 +259,14 @@ public class ItemUtilities {
 	}
 	
 	public static void setClearingOfItems(Player player, String world, String stringLoc) {
-		if (ConfigHandler.getConfig("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("ALL") || ConfigHandler.getConfig("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("GLOBAL")) {
+		if (ConfigHandler.getConfig("config.yml").getString("Clear-Items.Type") != null && (ConfigHandler.getConfig("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("ALL") || ConfigHandler.getConfig("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("GLOBAL"))) {
 			if (ConfigHandler.getConfig("config.yml").getString("Clear-Items." + stringLoc) != null && inClearingWorld(world, stringLoc) 
 					|| ConfigHandler.getConfig("config.yml").getString("Clear-Items." + stringLoc) != null && ConfigHandler.getConfig("config.yml").getBoolean("Clear-Items." + stringLoc) == true) {
 				if (Utils.containsIgnoreCase(ConfigHandler.getConfig("config.yml").getString("Clear-Items.Bypass"), "OP") && player.isOp()) {} else {
 					setClearAllItems(player, "", stringLoc);
 				}
 			}
-		} else if (ConfigHandler.getConfig("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("ITEMJOIN")) {
+		} else if (ConfigHandler.getConfig("config.yml").getString("Clear-Items.Type") != null &&ConfigHandler.getConfig("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("ITEMJOIN")) {
 			if (ConfigHandler.getConfig("config.yml").getString("Clear-Items." + stringLoc) != null && inClearingWorld(world, stringLoc) 
 					|| ConfigHandler.getConfig("config.yml").getString("Clear-Items." + stringLoc) != null && ConfigHandler.getConfig("config.yml").getBoolean("Clear-Items." + stringLoc) == true) {
 				if (Utils.containsIgnoreCase(ConfigHandler.getConfig("config.yml").getString("Clear-Items.Bypass"), "OP") && player.isOp()) {} else {
@@ -279,14 +279,14 @@ public class ItemUtilities {
 	}
 	
 	public static void setClearingOfRegionItems(Player player, String region) {
-		if (ConfigHandler.getConfig("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("ALL") || ConfigHandler.getConfig("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("GLOBAL")) {
+		if (ConfigHandler.getConfig("config.yml").getString("Clear-Items.Type") != null && (ConfigHandler.getConfig("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("ALL") || ConfigHandler.getConfig("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("GLOBAL"))) {
 			if (ConfigHandler.getConfig("config.yml").getString("Clear-Items.Region-Enter") != null && inClearingRegion(region) 
 					|| ConfigHandler.getConfig("config.yml").getString("Clear-Items.Region-Enter") != null && ConfigHandler.getConfig("config.yml").getBoolean("Clear-Items.Region-Enter") == true) {
 				if (Utils.containsIgnoreCase(ConfigHandler.getConfig("config.yml").getString("Clear-Items.Bypass"), "OP") && player.isOp()) {} else {
 					setClearAllItems(player, region, "Region-Enter");
 				}
 			}
-		} else if (ConfigHandler.getConfig("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("ITEMJOIN")) {
+		} else if (ConfigHandler.getConfig("config.yml").getString("Clear-Items.Type") != null && ConfigHandler.getConfig("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("ITEMJOIN")) {
 			if (ConfigHandler.getConfig("config.yml").getString("Clear-Items.Region-Enter") != null && inClearingRegion(region) 
 					|| ConfigHandler.getConfig("config.yml").getString("Clear-Items.Region-Enter") != null && ConfigHandler.getConfig("config.yml").getBoolean("Clear-Items.Region-Enter") == true) {
 				if (Utils.containsIgnoreCase(ConfigHandler.getConfig("config.yml").getString("Clear-Items.Bypass"), "OP") && player.isOp()) {} else {
@@ -743,8 +743,8 @@ public class ItemUtilities {
 	}
 
 	public static void setListenerRestrictions(ItemMap itemMap) {
-		if (((!itemMap.isGiveOnDisabled() && itemMap.isGiveOnJoin()) || (!ConfigHandler.getConfig("config.yml").getString("Active-Commands.enabled-worlds").equalsIgnoreCase("DISABLED") 
-		|| !ConfigHandler.getConfig("config.yml").getString("Active-Commands.enabled-worlds").equalsIgnoreCase("FALSE"))) && !isListenerEnabled(PlayerJoin.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerJoin(), ItemJoin.getInstance()); }
+		if (((!itemMap.isGiveOnDisabled() && itemMap.isGiveOnJoin()) || (ConfigHandler.getConfig("config.yml").getString("Active-Commands.enabled-worlds") != null && (!ConfigHandler.getConfig("config.yml").getString("Active-Commands.enabled-worlds").equalsIgnoreCase("DISABLED") 
+		|| !ConfigHandler.getConfig("config.yml").getString("Active-Commands.enabled-worlds").equalsIgnoreCase("FALSE")))) && !isListenerEnabled(PlayerJoin.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerJoin(), ItemJoin.getInstance()); }
 		if (!itemMap.isGiveOnDisabled() && itemMap.isGiveOnRespawn() && !isListenerEnabled(Respawn.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Respawn(), ItemJoin.getInstance()); }
 		if (!itemMap.isGiveOnDisabled() && itemMap.isGiveOnWorldChange() && !isListenerEnabled(WorldSwitch.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new WorldSwitch(), ItemJoin.getInstance()); }
 		if (!itemMap.isGiveOnDisabled() && (itemMap.isGiveOnRegionEnter() || itemMap.isTakeOnRegionLeave() || (ConfigHandler.getConfig("config.yml").getString("Clear-Items.Region-Enter") != null && !ConfigHandler.getConfig("config.yml").getString("Clear-Items.Region-Enter").equalsIgnoreCase("DISABLED") && !ConfigHandler.getConfig("config.yml").getString("Clear-Items.Region-Enter").equalsIgnoreCase("FALSE"))) && !isListenerEnabled(PlayerGuard.class.getSimpleName()) && ConfigHandler.getDepends().getGuard().guardEnabled()) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerGuard(), ItemJoin.getInstance()); }
@@ -801,7 +801,9 @@ public class ItemUtilities {
 	}
 	
 	public static int getHeldSlot() {
-		if (!ConfigHandler.getConfig("config.yml").getString("Settings.HeldItem-Slot").equalsIgnoreCase("DISABLED")) {
+		if (ConfigHandler.getConfig("config.yml").getString("Settings.HeldItem-Slot") != null 
+				&& !ConfigHandler.getConfig("config.yml").getString("Settings.HeldItem-Slot").equalsIgnoreCase("DISABLED") 
+				&& Utils.isInt(ConfigHandler.getConfig("config.yml").getString("Settings.HeldItem-Slot"))) {
 			return ConfigHandler.getConfig("config.yml").getInt("Settings.HeldItem-Slot");
 		}
 		return -1;
