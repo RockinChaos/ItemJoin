@@ -19,7 +19,6 @@ import org.apache.commons.lang.WordUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.craftbukkit.libs.org.apache.commons.io.IOUtils;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -331,8 +330,7 @@ public class ItemHandler {
     private static String getMojangUUID(String name) {
         String url = "https://api.mojang.com/users/profiles/minecraft/"+name;
         try {
-            @SuppressWarnings("deprecation")
-            String UUIDJson = IOUtils.toString(new URL(url));           
+            String UUIDJson = new URL(url).toString();           
             if(UUIDJson.isEmpty()) return null;                       
             JSONObject UUIDObject = (JSONObject) JSONValue.parseWithException(UUIDJson);
             return UUIDObject.get("id").toString();
