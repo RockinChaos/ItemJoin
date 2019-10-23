@@ -1692,7 +1692,7 @@ public class ItemMap {
 	private void setSkull(Player player) {
 		if (this.skullOwner != null) {
 			tempMeta = ItemHandler.setSkullOwner(tempMeta, Utils.translateLayout(this.skullOwner, player));
-		} else if (this.skullTexture != null && !headDatabase) {
+		} else if (this.skullTexture != null && !this.headDatabase) {
 			try {
 				GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
 				gameProfile.getProperties().put("textures", new Property("textures", new String(this.skullTexture)));
