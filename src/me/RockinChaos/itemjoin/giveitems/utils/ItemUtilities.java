@@ -613,11 +613,12 @@ public class ItemUtilities {
 		try {
 			if (itemMap.isOverwritable() || isOverwrite(player)) { return true; }
 			if (Utils.isInt(itemMap.getSlot()) && player.getInventory().getItem(Integer.parseInt(itemMap.getSlot())) != null) {
-				if (itemMap.isDropFull() && player.getInventory().firstEmpty() == -1)  { return true; }
-				else if (itemMap.isGiveNext() && player.getInventory().firstEmpty() == -1) { return false; }
+				if (itemMap.isDropFull()) { return true; }
+				else if (itemMap.isGiveNext() && player.getInventory().firstEmpty() != -1) { return true; }
 				else if ((!itemMap.isGiveNext() || !itemMap.isDropFull())) { return false; }
 			} else if (ItemHandler.isCustomSlot(itemMap.getSlot())) {
-				if (itemMap.isDropFull() && player.getInventory().firstEmpty() == -1)  { return true; }
+				if (itemMap.isDropFull())  { return true; }
+				else if (itemMap.isGiveNext() && player.getInventory().firstEmpty() != -1) { return false; }
 				else if (itemMap.getSlot().equalsIgnoreCase("Arbitrary") && player.getInventory().firstEmpty() == -1) {
 					return false;
 				} else if (itemMap.getSlot().equalsIgnoreCase("Helmet") && player.getInventory().getHelmet() != null) {
@@ -654,7 +655,7 @@ public class ItemUtilities {
 	
 	private static void setDirectSlots(Player player, ItemMap itemMap, ItemStack item, boolean addItem) {
 		if (addItem) { player.getInventory().addItem(item); } 
-		else if (itemMap.isGiveNext() && player.getInventory().getItem(Integer.parseInt(itemMap.getSlot())) != null) {
+		else if (((itemMap.isGiveNext() && player.getInventory().firstEmpty() != -1) || (itemMap.isDropFull() && player.getInventory().firstEmpty() != -1)) && player.getInventory().getItem(Integer.parseInt(itemMap.getSlot())) != null) {
 			for (int i = Integer.parseInt(itemMap.getSlot()); i <= 35; i++) {
 				if (player.getInventory().getItem(i) == null || player.getInventory().getItem(i).getType() == Material.AIR) { player.getInventory().setItem(i, item); break; }
 				else if (i == 35) {

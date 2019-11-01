@@ -236,7 +236,6 @@ public class ItemMap {
         this.setSlot(slot);
         if (ItemHandler.isCraftingSlot(slot)) { this.craftingItem = true; }
         
-        
         if (this.nodeLocation != null) {
         	this.setMultipleSlots();
 	        this.setCount(this.nodeLocation.getString(".count"));
@@ -284,7 +283,6 @@ public class ItemMap {
 		try { if (this.nodeLocation.getString(".commands-sound") != null) { this.commandSound = Sound.valueOf(this.nodeLocation.getString(".commands-sound")); } } 
 		catch (Exception e) { ServerHandler.sendDebugTrace(e); ServerHandler.sendDebugMessage("&4Your server is running &eMC " + Reflection.getServerVersion() + 
 				" and this version of Minecraft does not have the defined command-sound &e" + this.nodeLocation.getString(".commands-sound")); }
-	    
 	}
 	
 	private void setCommandParticle() {
