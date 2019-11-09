@@ -80,38 +80,45 @@
 		</plugins>
 	</build>
 	<repositories>
-    <!--Spigot/CraftBukkit Repo-->
+    <!--Spigot/CraftBukkit Repository-->
 		<repository>
        		<id>spigot-repo</id>
         	<url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
 		</repository>
-    <!--Maven Repo-->
+    <!--Maven Repository-->
 		<repository>
 			<id>sk89q-repo</id>
 			<url>https://maven.sk89q.com/repo/</url>
 		</repository>
-    <!--PlaceholderAPI Repo-->
+    <!--PlaceholderAPI Repository-->
         <repository>
             <id>placeholderapi</id>
             <url>http://repo.extendedclip.com/content/repositories/placeholderapi/</url>
         </repository>
-    <!--AuthMe Repo-->
+    <!--AuthMe Repository-->
         <repository>
         	<id>codemc-repo</id>
 	        <url>http://repo.codemc.org/repository/maven-public/</url>
         </repository>
-    <!--Mojang Repo-->
+    <!--Mojang Repository-->
 		<repository>
 			<id>mojang</id>
 			<url>https://libraries.minecraft.net/</url>
 		</repository>
-    <!--bStats Repo-->
+    <!--bStats Repository-->
 		<repository>
 			<id>CodeMC</id>
 			<url>https://repo.codemc.org/repository/maven-public</url>
 		</repository>
 	</repositories>
 	<dependencies>
+    <!--SQLite Library-->
+		<dependency>
+			<groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+            <version>LATEST</version>
+         <scope>provided</scope>
+		</dependency>
     <!--Maven WorldUtils API-->
 		<dependency>
 			<groupId>commons-lang</groupId>
@@ -152,7 +159,7 @@
 			<artifactId>authlib</artifactId>
 			<version>1.5.21</version>
 		</dependency>
-    <!-- bStats -->
+    <!--bStats API-->
     	<dependency>
 			<groupId>org.bstats</groupId>
 			<artifactId>bstats-bukkit</artifactId>
@@ -166,6 +173,11 @@
         	<scope>compile</scope>
         	<version>2.5</version>
     	</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+			<version>2.3</version>
+		</dependency>
     <!--Google API-->
 	    <dependency>
 	        <groupId>com.googlecode.json-simple</groupId>
@@ -178,13 +190,7 @@
 			<artifactId>guava</artifactId>
 			<version>18.0</version>
 		</dependency>
-    <!--Apache Logging API-->
-		<dependency>
-			<groupId>org.apache.logging.log4j</groupId>
-			<artifactId>log4j-core</artifactId>
-			<version>2.3</version>
-		</dependency>
-    <!--Vault API-->
+    <!--Vault Local-->
         <dependency>
             <groupId>net.milkbowl.vault</groupId>
             <artifactId>Vault</artifactId>
@@ -192,7 +198,7 @@
             <systemPath>${pom.basedir}/src/me/RockinChaos/itemjoin/extra/VaultAPI.jar</systemPath>
             <version>LATEST</version>
         </dependency>
-    <!--HeadDatabase Local API/Repo -->
+    <!--HeadDatabase Local-->
         <dependency>
             <groupId>me.HeadDatabaseAPI</groupId>
             <artifactId>HeadDatabaseAPI</artifactId>
@@ -200,7 +206,7 @@
             <systemPath>${pom.basedir}/src/me/RockinChaos/itemjoin/extra/HeadDatabaseAPI.jar</systemPath>
             <version>LATEST</version>
         </dependency>
-    <!--BetterNick Local API/Repo -->
+    <!--BetterNick Local-->
         <dependency>
             <groupId>me.BetterNickAPI</groupId>
             <artifactId>BetterNickAPI</artifactId>
@@ -208,7 +214,7 @@
             <systemPath>${pom.basedir}/src/me/RockinChaos/itemjoin/extra/BetterNickAPI.jar</systemPath>
             <version>LATEST</version>
         </dependency>
-    <!--TokenEnchant Local API/Repo -->
+    <!--TokenEnchant Local-->
         <dependency>
             <groupId>me.TokenEnchantAPI</groupId>
             <artifactId>TokenEnchantAPI</artifactId>
@@ -216,7 +222,7 @@
             <systemPath>${pom.basedir}/src/me/RockinChaos/itemjoin/extra/TokenEnchantAPI.jar</systemPath>
             <version>LATEST</version>
         </dependency>
-    <!--WorldGuard Legacy Local API/Repo -->
+    <!--WorldGuard Legacy Local-->
         <dependency>
             <groupId>me.WorldGuard.Legacy</groupId>
             <artifactId>WorldGuard</artifactId>
@@ -224,7 +230,7 @@
             <systemPath>${pom.basedir}/src/me/RockinChaos/itemjoin/extra/WorldGuard-Legacy.jar</systemPath>
             <version>Legacy</version>
         </dependency>
-    <!--WorldEdit Legacy Local API/Repo -->
+    <!--WorldEdit Legacy Local-->
         <dependency>
             <groupId>me.WorldEdit.Legacy</groupId>
             <artifactId>WorldEdit</artifactId>
