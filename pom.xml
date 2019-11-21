@@ -112,13 +112,6 @@
 		</repository>
 	</repositories>
 	<dependencies>
-    <!--SQLite Library-->
-		<dependency>
-			<groupId>org.xerial</groupId>
-            <artifactId>sqlite-jdbc</artifactId>
-            <version>LATEST</version>
-         <scope>provided</scope>
-		</dependency>
     <!--Maven WorldUtils API-->
 		<dependency>
 			<groupId>commons-lang</groupId>
@@ -196,7 +189,7 @@
             <artifactId>Vault</artifactId>
             <scope>system</scope>
             <systemPath>${pom.basedir}/src/me/RockinChaos/itemjoin/extra/VaultAPI.jar</systemPath>
-            <version>LATEST</version>
+            <version>LEGACY</version>
         </dependency>
     <!--HeadDatabase Local-->
         <dependency>
@@ -204,7 +197,7 @@
             <artifactId>HeadDatabaseAPI</artifactId>
             <scope>system</scope>
             <systemPath>${pom.basedir}/src/me/RockinChaos/itemjoin/extra/HeadDatabaseAPI.jar</systemPath>
-            <version>LATEST</version>
+            <version>LEGACY</version>
         </dependency>
     <!--BetterNick Local-->
         <dependency>
@@ -212,7 +205,7 @@
             <artifactId>BetterNickAPI</artifactId>
             <scope>system</scope>
             <systemPath>${pom.basedir}/src/me/RockinChaos/itemjoin/extra/BetterNickAPI.jar</systemPath>
-            <version>LATEST</version>
+            <version>LEGACY</version>
         </dependency>
     <!--TokenEnchant Local-->
         <dependency>
@@ -220,7 +213,7 @@
             <artifactId>TokenEnchantAPI</artifactId>
             <scope>system</scope>
             <systemPath>${pom.basedir}/src/me/RockinChaos/itemjoin/extra/TokenEnchantAPI.jar</systemPath>
-            <version>LATEST</version>
+            <version>LEGACY</version>
         </dependency>
     <!--WorldGuard Legacy Local-->
         <dependency>
@@ -228,7 +221,7 @@
             <artifactId>WorldGuard</artifactId>
             <scope>system</scope>
             <systemPath>${pom.basedir}/src/me/RockinChaos/itemjoin/extra/WorldGuard-Legacy.jar</systemPath>
-            <version>Legacy</version>
+            <version>LEGACY</version>
         </dependency>
     <!--WorldEdit Legacy Local-->
         <dependency>
@@ -236,7 +229,7 @@
             <artifactId>WorldEdit</artifactId>
             <scope>system</scope>
             <systemPath>${pom.basedir}/src/me/RockinChaos/itemjoin/extra/WorldEdit-Legacy.jar</systemPath>
-            <version>Legacy</version>
+            <version>LEGACY</version>
         </dependency>
 	</dependencies>
 	<scm>
