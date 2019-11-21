@@ -37,10 +37,6 @@ Commands:
   Info:
     material: '&aItem ID (Material Type): &e&l%item%'
     dataValue: '&aItem Value (Data Type): &e&l%item%'
-  Save:
-    playerSavedItem: '&aThe item &b%item% &ahas been saved to the items.yml. /n &aPlease change any default values created with this item and reload the config(s).'
-    playerFailedSavedItem: '&cThe item &b%item% &ccould not be saved, you are not &bholding &can item!'
-    invalidSyntax: '&cIncorrect usage! Syntax: /itemjoin save <custom-name>!'
   List:
     worldHeader: '&a&l%world%:'
     itemRow: '&a&l   &a%item%'

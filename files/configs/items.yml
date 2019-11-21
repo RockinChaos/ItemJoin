@@ -323,6 +323,12 @@ items:
     itemflags: inventory-modify, death-drops, self-drops, unbreakable
     triggers: join
     enabled-worlds: world, world_nether, world_the_end
+  emerald-item:
+    id: EMERALD
+    slot: CRAFTING[0]
+    itemflags: inventory-modify, death-drops, self-drops
+    triggers: join
+    enabled-worlds: world, world_nether, world_the_end
   diamond-item:
     id: DIAMOND
     slot: CRAFTING[1]

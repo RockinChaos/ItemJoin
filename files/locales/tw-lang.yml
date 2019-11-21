@@ -37,10 +37,6 @@ Commands:
   Info:
     material: '&a物品ID (材質): &e%item%'
     dataValue: '&a物品副ID (編號): &e%item%'
-  Save:
-    playerSavedItem: '&a成功建立物品 &e%item% /n &a請重新讀取插件'
-    playerFailedSavedItem: '&c手上沒有物品， 建立物品 &e%item% &c失敗'
-    invalidSyntax: '&c請輸入: /itemjoin save <物品名稱>!'
   List:
     worldHeader: '&a&l%world%:'
     itemRow: '&a&l   &a%item%'
