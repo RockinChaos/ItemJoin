@@ -36,7 +36,7 @@ public class Interact implements Listener {
 	 	ItemStack item = event.getItem();
 	 	if (event.hasItem() && event.getAction() != Action.PHYSICAL) {
 	 		if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-	 			ItemMap itemMap = ItemUtilities.getMappedItem(item, player.getWorld());
+	 			ItemMap itemMap = ItemUtilities.getItemMap(item, null, player.getWorld());
 	 			if (itemMap != null && itemMap.getInteractCooldown() != 0) {
 	 				if (itemMap.onInteractCooldown(player)) {
 	 					event.setCancelled(true);
@@ -64,7 +64,7 @@ public class Interact implements Listener {
 			else { item = PlayerHandler.getPerfectHandItem(event.getPlayer(), ""); }
 			Player player = event.getPlayer();
 			String action = Action.RIGHT_CLICK_BLOCK.name();
-			ItemMap itemMap = ItemUtilities.getMappedItem(PlayerHandler.getHandItem(player), player.getWorld());
+			ItemMap itemMap = ItemUtilities.getItemMap(PlayerHandler.getHandItem(player), null, player.getWorld());
 			if (itemMap != null && itemMap.isSimilar(item)) {
 				if (this.setupCommands(player, item, action, String.valueOf(player.getInventory().getHeldItemSlot()))) { event.setCancelled(true); }
 			}
@@ -79,7 +79,7 @@ public class Interact implements Listener {
 			else { item = PlayerHandler.getPerfectHandItem(event.getPlayer(), ""); }
 			Player player = event.getPlayer();
 			String action = Action.RIGHT_CLICK_BLOCK.name();
-			ItemMap itemMap = ItemUtilities.getMappedItem(PlayerHandler.getHandItem(player), player.getWorld());
+			ItemMap itemMap = ItemUtilities.getItemMap(PlayerHandler.getHandItem(player), null, player.getWorld());
 			if (itemMap != null && itemMap.isSimilar(item)) {
 				if (this.setupCommands(player, item, action, String.valueOf(player.getInventory().getHeldItemSlot()))) { event.setCancelled(true); }
 			}
@@ -93,7 +93,7 @@ public class Interact implements Listener {
 		String action = event.getAction().toString();
 		if (PlayerHandler.isAdventureMode(player) && !action.contains("LEFT") 
 				|| !PlayerHandler.isAdventureMode(player)) {
-			ItemMap itemMap = ItemUtilities.getMappedItem(PlayerHandler.getHandItem(player), player.getWorld());
+			ItemMap itemMap = ItemUtilities.getItemMap(PlayerHandler.getHandItem(player), null, player.getWorld());
 			if (itemMap != null && itemMap.isSimilar(item)) {
 				if (this.setupCommands(player, item, action, String.valueOf(player.getInventory().getHeldItemSlot()))) { event.setCancelled(true); }
 			}
@@ -110,7 +110,7 @@ public class Interact implements Listener {
 	}
 	
 	private boolean setupCommands(Player player, ItemStack item, String action, String slot) {
-		ItemMap itemMap = ItemUtilities.getMappedItem(item, player.getWorld());
+		ItemMap itemMap = ItemUtilities.getItemMap(item, null, player.getWorld());
 		if (itemMap != null && itemMap.inWorld(player.getWorld()) && itemMap.hasPermission(player)) {
 			return itemMap.executeCommands(player, item, action, slot);
 		}

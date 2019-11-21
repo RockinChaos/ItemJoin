@@ -26,6 +26,7 @@ import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.utils.Legacy;
+import me.RockinChaos.itemjoin.utils.Chances;
 import me.RockinChaos.itemjoin.utils.ImageMap;
 import me.RockinChaos.itemjoin.utils.Reflection;
 import me.RockinChaos.itemjoin.utils.Utils;
@@ -304,7 +305,7 @@ public class ItemDesigner {
 				} else {
 					MapView view = Legacy.createLegacyMapView();
 					try { view.removeRenderer(view.getRenderers().get(0)); } catch (NullPointerException e) { ServerHandler.sendDebugTrace(e); }
-					int mapID = ItemHandler.getMapID(view);
+					int mapID = Legacy.getMapID(view);
 					ImageMap imgPlatform = new ImageMap(itemMap.getMapImage(), mapID);
 					itemMap.setMapID(mapID);
 					itemMap.setMapView(view);
@@ -321,7 +322,7 @@ public class ItemDesigner {
 //  This designs the item to be unique to ItemJoin. //
 //  =============================================== //
 	private void setNBTData(ItemMap itemMap) {
-		if (ItemUtilities.dataTagsEnabled() && !itemMap.isVanilla() && !itemMap.isVanillaControl() && !itemMap.isVanillaStatus()) {
+		if (ConfigHandler.dataTagsEnabled() && !itemMap.isVanilla() && !itemMap.isVanillaControl() && !itemMap.isVanillaStatus()) {
 			try {
 				Object tag = Reflection.getNMS("NBTTagCompound").getConstructor().newInstance();
 				tag.getClass().getMethod("setString", String.class, String.class).invoke(tag, "ItemJoin Name", itemMap.getConfigName());
@@ -331,7 +332,7 @@ public class ItemDesigner {
 				ServerHandler.sendDebugMessage("Error 133 has occured when setting NBTData to an item.");
 				ServerHandler.sendDebugTrace(e);
 			}
-		} else { itemMap.setLegacySecret(ConfigHandler.encodeSecretData(ItemUtilities.getNBTData(itemMap))); }
+		} else { itemMap.setLegacySecret(ConfigHandler.encodeSecretData(ConfigHandler.getNBTData(itemMap))); }
 	}
 //  =========================================================================================================================================================== //
 	
@@ -443,7 +444,7 @@ public class ItemDesigner {
 	
 	private void setName(ItemMap itemMap) {
 		String name = getActualName(itemMap);
-		if (ItemUtilities.dataTagsEnabled() && ServerHandler.hasSpecificUpdate("1_8") || itemMap.isVanilla() && ServerHandler.hasSpecificUpdate("1_8")) {
+		if (ConfigHandler.dataTagsEnabled() && ServerHandler.hasSpecificUpdate("1_8") || itemMap.isVanilla() && ServerHandler.hasSpecificUpdate("1_8")) {
 			itemMap.setCustomName(name);
 		} else {
 			itemMap.setCustomName(encodeName(itemMap, name));
@@ -507,7 +508,7 @@ public class ItemDesigner {
 		if (itemMap.getNodeLocation().getString(".probability") != null) {
 			String percentageString = itemMap.getNodeLocation().getString(".probability").replace("%", "").replace("-", "").replace(" ", "");
 			int percentage = Integer.parseInt(percentageString);
-			if (!ItemUtilities.probability.containsKey(itemMap.getConfigName())) { ItemUtilities.probability.put(itemMap.getConfigName(), percentage); }
+			if (!Chances.probabilityItems.containsKey(itemMap)) { Chances.probabilityItems.put(itemMap, percentage); }
 			itemMap.setProbability(percentage);
 		}
 	}

@@ -25,7 +25,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
-import org.bukkit.map.MapView;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.bukkit.inventory.meta.Damageable;
@@ -35,7 +34,6 @@ import com.mojang.authlib.properties.Property;
 import com.mojang.util.UUIDTypeAdapter;
 
 import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
-import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 import me.RockinChaos.itemjoin.utils.Legacy;
 import me.RockinChaos.itemjoin.utils.Reflection;
 import me.RockinChaos.itemjoin.utils.Utils;
@@ -71,7 +69,7 @@ public class ItemHandler {
 	}
 
 	public static String getNBTData(ItemStack tempitem) {
-		if (ItemUtilities.dataTagsEnabled() && ServerHandler.hasSpecificUpdate("1_8") && tempitem != null && tempitem.getType() != Material.AIR) {
+		if (ConfigHandler.dataTagsEnabled() && ServerHandler.hasSpecificUpdate("1_8") && tempitem != null && tempitem.getType() != Material.AIR) {
 		try {
 		Class<?> craftItemStack = Reflection.getOBC("inventory.CraftItemStack");
 		Class<?> nmsItemStackClass = Reflection.getNMS("ItemStack");
@@ -180,13 +178,6 @@ public class ItemHandler {
 		}
 		return material;
 	}
-	
-    public static short getMapID(MapView view) {
-    	if (!ItemUtilities.getMapMethod()) {
-    		try { return (short) view.getId(); } 
-			catch (NoSuchMethodError e) { ItemUtilities.setMapMethod(true); return Reflection.getMapID(view); }
-    	} else { return Reflection.getMapID(view); }
-    }
 	
 	public static String getDelay(String context) {
 		if (Utils.containsIgnoreCase(context, "<delay:" + Utils.returnInteger(context) + ">") 
@@ -402,11 +393,11 @@ public class ItemHandler {
 	}
 	
 	public static boolean containsNBTData(ItemStack inPlayerInventory) {
-		if (ItemUtilities.dataTagsEnabled() && ServerHandler.hasSpecificUpdate("1_8") && inPlayerInventory != null && inPlayerInventory.getType() != Material.AIR && getNBTData(inPlayerInventory) != null) {
+		if (ConfigHandler.dataTagsEnabled() && ServerHandler.hasSpecificUpdate("1_8") && inPlayerInventory != null && inPlayerInventory.getType() != Material.AIR && getNBTData(inPlayerInventory) != null) {
 			return true;
-		} else if (!ItemUtilities.dataTagsEnabled() || ItemUtilities.dataTagsEnabled() && !ServerHandler.hasSpecificUpdate("1_8")) { 
+		} else if (!ConfigHandler.dataTagsEnabled() || (ConfigHandler.dataTagsEnabled() && !ServerHandler.hasSpecificUpdate("1_8"))) { 
 				if (inPlayerInventory != null && inPlayerInventory.hasItemMeta() && inPlayerInventory.getItemMeta().hasDisplayName()
-						&& ConfigHandler.decodeSecretData(inPlayerInventory.getItemMeta().getDisplayName()).contains(ConfigHandler.decodeSecretData(ConfigHandler.encodeSecretData(ItemUtilities.getNBTData(null))))) {
+						&& ConfigHandler.decodeSecretData(inPlayerInventory.getItemMeta().getDisplayName()).contains(ConfigHandler.decodeSecretData(ConfigHandler.encodeSecretData("ItemJoin")))) {
 					return true;
 				}
 		}

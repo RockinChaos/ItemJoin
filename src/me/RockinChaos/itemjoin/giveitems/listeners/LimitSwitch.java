@@ -12,6 +12,7 @@ import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
+import me.RockinChaos.itemjoin.utils.Chances;
 import me.RockinChaos.itemjoin.utils.Utils;
 
 public class LimitSwitch implements Listener {
@@ -38,11 +39,12 @@ public class LimitSwitch implements Listener {
 	
 	private void setItems(final Player player, final GameMode newMode) {
 		ItemUtilities.safeSet(player, "Limit-Modes");
-		String Probable = ItemUtilities.getProbabilityItem(player);
+		final Chances probability = new Chances();
+		final ItemMap probable = probability.getRandom(player);
 		final int session = Utils.getRandom(1, 100000);
 			for (ItemMap item : ItemUtilities.getItems()) { 
 				if (item.isUseOnLimitSwitch() && item.inWorld(player.getWorld()) 
-						&& ItemUtilities.isChosenProbability(item, Probable) && ConfigHandler.getSQLData().isEnabled(player)
+						&& probability.isProbability(item, probable) && ConfigHandler.getSQLData().isEnabled(player)
 						&& item.hasPermission(player) && ItemUtilities.isObtainable(player, item, session)) {
 					item.giveTo(player, false, 0); 
 					item.setAnimations(player);

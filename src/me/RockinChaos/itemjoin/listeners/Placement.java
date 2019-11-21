@@ -31,7 +31,7 @@ public class Placement implements Listener{
 	 	Player player = event.getPlayer();
 	 	if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK && PlayerHandler.isCreativeMode(player)) {
 	 		if (!ItemUtilities.isAllowed(player, item, "count-lock")) {
-	 			ItemMap itemMap = ItemUtilities.getMappedItem(item, player.getWorld());
+	 			ItemMap itemMap = ItemUtilities.getItemMap(item, null, player.getWorld());
 	 			if (itemMap != null) { item.setAmount(itemMap.getCount()); }
 	 		}
 	 	}
@@ -63,7 +63,7 @@ public class Placement implements Listener{
 	 			Player player = event.getPlayer();
 	 			if (PlayerHandler.isCreativeMode(player)) {
 	 				if (!ItemUtilities.isAllowed(player, item, "count-lock")) {
-	 					ItemMap itemMap = ItemUtilities.getMappedItem(item, player.getWorld());
+	 					ItemMap itemMap = ItemUtilities.getItemMap(item, null, player.getWorld());
 	 					if (itemMap != null) { item.setAmount(itemMap.getCount()); }
 	 				}
 	 			}

@@ -1,10 +1,17 @@
 package me.RockinChaos.itemjoin.utils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
-public class ProbabilityUtilities {
+import org.bukkit.entity.Player;
+
+import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
+
+public class Chances {
+	public static Map < ItemMap, Integer > probabilityItems = new HashMap < ItemMap, Integer > ();
 	
 	private class Chance {
 		private int upperLimit;
@@ -28,13 +35,13 @@ public class ProbabilityUtilities {
 	private int sum;
 	private Random random;
 	
-	public ProbabilityUtilities() {
+	public Chances() {
 		this.random = new Random();
 		this.chances = new ArrayList < > ();
 		this.sum = 0;
 	}
 	
-	public ProbabilityUtilities(long seed) {
+	public Chances(long seed) {
 		this.random = new Random(seed);
 		this.chances = new ArrayList < > ();
 		this.sum = 0;
@@ -63,5 +70,25 @@ public class ProbabilityUtilities {
 	
 	public int getChoices() {
 		return this.chances.size();
+	}
+	
+	public boolean isProbability(ItemMap itemMap, ItemMap probable) {
+		if ((probable != null && itemMap.getConfigName().equals(probable.getConfigName())) || itemMap.getProbability().equals(-1)) {
+			return true;
+		}
+		return false;
+	}
+	
+	public ItemMap getRandom(Player player) {
+		if (!probabilityItems.isEmpty()) {
+			for (ItemMap itemMap: probabilityItems.keySet()) {
+				if (itemMap.hasItem(player)) { 
+					return itemMap; 
+				}
+				this.addChance(itemMap, probabilityItems.get(itemMap));
+			}
+			return ((ItemMap) this.getRandomElement());
+		}
+		return null;
 	}
 }

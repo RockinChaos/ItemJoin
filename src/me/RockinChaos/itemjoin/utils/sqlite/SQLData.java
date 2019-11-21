@@ -16,9 +16,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
+import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
-import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.utils.Utils;
 
 public class SQLData {
@@ -73,7 +73,7 @@ public class SQLData {
 			for (String statement : executeStatementsLater) {
 				SQLite.getDatabase("database").executeStatement(statement);
 			}
-			ServerHandler.sendDebugMessage("[SQLITE] Saving newly generated data to the database.");
+			ConfigHandler.getLogger().sqLiteSaving();
 			executeStatementsLater.clear();
 			try { SQLite.getDatabase("database").closeConnection(); } catch (Exception e) { }
 		}
@@ -301,6 +301,12 @@ public class SQLData {
 			}
 	}
 	
+	public void saveItemData(Player player, ItemMap itemMap) {
+		this.saveFirstJoinData(player, itemMap);
+		this.saveFirstWorldData(player, itemMap);
+		this.saveIpLimitData(player, itemMap);
+	}
+	
 	public void purgeDatabaseData(String section, OfflinePlayer player) {
 		String UUID = PlayerHandler.getOfflinePlayerID(player);
 		if (section.equalsIgnoreCase("first_join") && firstJoinPlayers.values() != null && !firstJoinPlayers.isEmpty()) {
@@ -441,19 +447,17 @@ public class SQLData {
 		boolean converting = false;
 		if (firstJoin.exists() || ipLimit.exists()) {
 			if (firstJoin.exists()) {
-				ServerHandler.sendErrorMessage("&aThe &cfirst-join.yml&a file is &coutdated&a, all data is now stored in a database file.");
 				convertFirstJoinData(firstJoin);
+				ConfigHandler.getLogger().sqLiteConverting("first-join");
 			}
 			if (ipLimit.exists()) {
-				ServerHandler.sendErrorMessage("&aThe &cip-limit.yml&a file is &coutdated&a, all data is now stored in a database file.");
 				convertIpLimitData(ipLimit);
+				ConfigHandler.getLogger().sqLiteConverting("ip-limit");
 			}
-			ServerHandler.sendErrorMessage("&aStarting YAML to Database conversion, stored data in the file(s) will not be lost...");
 			converting = true;
+			ConfigHandler.getLogger().sqLiteConversion();
 		}
-		if (converting == true) {
-			ServerHandler.sendErrorMessage("&aYAML to Database conversion complete!");
-		}
+		if (converting == true) { ConfigHandler.getLogger().sqLiteComplete(); }
 	}
 	
 	private void convertFirstJoinData(File firstJoin) {
@@ -480,10 +484,7 @@ public class SQLData {
 			String newGen = "converted" + Utils.getRandom(0, 100) + "-first-join.yml";
 			File newFile = new File(userfiles, newGen);
 			firstJoin.renameTo(newFile);
-		} catch (Exception e) {
-			ServerHandler.sendDebugMessage("[ERROR] Failed to convert the first-join.yml to the database!");
-			ServerHandler.sendDebugTrace(e);
-		}
+		} catch (Exception e) { ConfigHandler.getLogger().sqLiteConvertFailed(e, "first-join"); }
 	}
 	
 	private void convertIpLimitData(File ipLimit) {
@@ -509,9 +510,6 @@ public class SQLData {
 			String newGen = "converted" + Utils.getRandom(0, 100) + "-ip-limit.yml";
 			File newFile = new File(userfiles, newGen);
 			ipLimit.renameTo(newFile);
-		} catch (Exception e) {
-			ServerHandler.sendDebugMessage("[ERROR] Failed to convert the ip-limit.yml to the database!");
-			ServerHandler.sendDebugTrace(e);
-		}
+		} catch (Exception e) { ConfigHandler.getLogger().sqLiteConvertFailed(e, "ip-limit"); }
 	}
 }

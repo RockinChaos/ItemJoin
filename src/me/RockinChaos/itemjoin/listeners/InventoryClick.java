@@ -66,7 +66,7 @@ public class InventoryClick implements Listener {
 		Player player = (Player) event.getWhoClicked();
 		String itemflag = "inventory-modify";
     	if (event.getAction().toString().contains("PLACE_ALL") || event.getAction().toString().contains("PLACE_ONE")) {
-    		ItemMap itemMap = ItemUtilities.getMappedItem(event.getCursor(), player.getWorld());
+    		ItemMap itemMap = ItemUtilities.getItemMap(event.getCursor(), null, player.getWorld());
     		if (itemMap != null && itemMap.isSimilar(cursorItem.get(PlayerHandler.getPlayerID(player)))) {
     		final int slot = event.getSlot();
     		event.setCancelled(true);
@@ -78,7 +78,7 @@ public class InventoryClick implements Listener {
 			ServerHandler.sendDebugMessage("Updated Animation Item (Cursor) Code: 2565CV"); 
     		}
     	} else if (event.getAction().toString().contains("SWAP_WITH_CURSOR")) {
-    		ItemMap itemMap = ItemUtilities.getMappedItem(event.getCursor(), player.getWorld());
+    		ItemMap itemMap = ItemUtilities.getItemMap(event.getCursor(), null, player.getWorld());
     		if (itemMap != null && itemMap.isSimilar(cursorItem.get(PlayerHandler.getPlayerID(player))) && ItemUtilities.isAllowed(player, event.getCurrentItem(), itemflag)) {
     		final int slot = event.getSlot();
     		final ItemStack item = new ItemStack(event.getCurrentItem());

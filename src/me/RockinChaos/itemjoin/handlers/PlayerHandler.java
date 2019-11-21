@@ -15,7 +15,6 @@ import org.bukkit.inventory.meta.SkullMeta;
 import de.domedd.betternick.BetterNick;
 import de.domedd.betternick.api.nickedplayer.NickedPlayer;
 import me.RockinChaos.itemjoin.ItemJoin;
-import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 import me.RockinChaos.itemjoin.utils.Legacy;
 
 public class PlayerHandler {
@@ -48,9 +47,9 @@ public class PlayerHandler {
 		Legacy.setLegacyInHandItem(player, new ItemStack(mat));
 	}
 	
-	public static void setHeldItemSlot(Player player) {
-		if (ItemUtilities.getHeldSlot() != -1 && ItemUtilities.getHeldSlot() <= 8 && ItemUtilities.getHeldSlot() >= 0) {
-			player.getInventory().setHeldItemSlot(ItemUtilities.getHeldSlot());
+	public static void setHotbarSlot(Player player) {
+		if (ConfigHandler.getHotbarSlot() != -1 && ConfigHandler.getHotbarSlot() <= 8 && ConfigHandler.getHotbarSlot() >= 0) {
+			player.getInventory().setHeldItemSlot(ConfigHandler.getHotbarSlot());
 		}
 	}
 	

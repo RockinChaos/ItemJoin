@@ -20,13 +20,15 @@ import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 import me.RockinChaos.itemjoin.ItemJoin;
-import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 
 @SuppressWarnings("deprecation")
 public class Legacy {
 	
 	// WELCOME TO THE LAND OF MAKE-BELIEVE! //
+	
+	private static boolean oldMapMethod = false;
+	private static boolean oldMapViewMethod = false;
     
     public static void updateLegacyInventory(Player player) {
     	player.updateInventory();
@@ -90,11 +92,18 @@ public class Legacy {
 		else if (Utils.containsIgnoreCase(material.toString(), "WOOL")) { return 15; }
 		return 0;
 	}
+	
+    public static short getMapID(MapView view) {
+    	if (!oldMapMethod) {
+    		try { return (short) view.getId(); } 
+			catch (NoSuchMethodError e) { oldMapMethod = true; return Reflection.getMapID(view); }
+    	} else { return Reflection.getMapID(view); }
+    }
     
     public static MapView getMapView(int id) {
-    	if (!ItemUtilities.getMapViewMethod()) {
+    	if (!oldMapViewMethod) {
     		try { return ItemJoin.getInstance().getServer().getMap((short) id); } 
-			catch (NoSuchMethodError e) { ItemUtilities.setMapViewMethod(true); return Reflection.getMapView(id); }
+			catch (NoSuchMethodError e) { oldMapViewMethod = true; return Reflection.getMapView(id); }
     	} else { return Reflection.getMapView(id); }
     }
 

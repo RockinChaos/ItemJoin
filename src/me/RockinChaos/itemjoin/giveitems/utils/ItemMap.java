@@ -256,7 +256,7 @@ public class ItemMap {
 	        this.setPerm(this.nodeLocation.getString(".permission-node"));
 	        this.setPermissionNeeded(ConfigHandler.getConfig("config.yml").getBoolean("Permissions.Obtain-Items"));
 	    	this.setOPPermissionNeeded(ConfigHandler.getConfig("config.yml").getBoolean("Permissions.Obtain-Items.OP"));
-	    	ItemUtilities.setListenerRestrictions(this);
+	    	ConfigHandler.setListenerRestrictions(this);
         }
 	}
 //  ========================================================================================================= //
@@ -1123,7 +1123,7 @@ public class ItemMap {
 	}
 	
 	public String getLegacySecret() {
-		if (!ItemUtilities.dataTagsEnabled()) {
+		if (!ConfigHandler.dataTagsEnabled()) {
 			return this.legacySecret;
 		} else { return ""; }
 	}
@@ -1351,8 +1351,26 @@ public class ItemMap {
 		return this.subjectRemoval;
 	}
 	
+	public boolean containsWorld(final String world, final ItemMap itemMap) {
+		for (String enabledWorld: itemMap.getEnabledWorlds()) {
+			if (enabledWorld.equalsIgnoreCase(world) || enabledWorld.equalsIgnoreCase("ALL") || enabledWorld.equalsIgnoreCase("GLOBAL")) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public boolean containsRegion(final String region, final ItemMap itemMap) {
+		for (String enabledRegion: itemMap.getEnabledRegions()) {
+			if (enabledRegion.equalsIgnoreCase(region) || enabledRegion.equalsIgnoreCase("UNDEFINED")) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	public boolean isAllowedItem(Player player, ItemStack item, String findFlag) {
-		if (this.isSimilar(item)) {
+		if (!ConfigHandler.getItemCreator().isOpen(player) && this.isSimilar(item)) {
 			if (this.AllowOpBypass && player.isOp() || this.CreativeBypass && player.getGameMode() == GameMode.CREATIVE 
 					|| findFlag.equalsIgnoreCase("inventory-modify") && player.hasPermission("itemjoin.bypass.inventorymodify") 
 					&& ItemJoin.getInstance().getConfig().getBoolean("Permissions.Movement-Bypass")) {
@@ -1382,7 +1400,7 @@ public class ItemMap {
      
 	public boolean isSimilar(ItemStack item) {
 		if (item != null && item.getType() != Material.AIR && item.getType() == this.material || this.materialAnimated && item != null && item.getType() != Material.AIR && this.isMaterial(item)) {
-			if (this.vanillaControl || ItemUtilities.dataTagsEnabled() && ServerHandler.hasSpecificUpdate("1_8") && ItemHandler.getNBTData(item) != null && Utils.containsIgnoreCase(ItemHandler.getNBTData(item), this.newNBTData)
+			if (this.vanillaControl || ConfigHandler.dataTagsEnabled() && ServerHandler.hasSpecificUpdate("1_8") && ItemHandler.getNBTData(item) != null && Utils.containsIgnoreCase(ItemHandler.getNBTData(item), this.newNBTData)
 					|| this.legacySecret != null && item.hasItemMeta() && item.getItemMeta().hasDisplayName() && item.getItemMeta().getDisplayName().contains(this.legacySecret) || this.vanillaStatus) {
 				if (this.skullCheck(item)) {
 					if (isEnchantSimilar(item) || !item.getItemMeta().hasEnchants() && enchants.isEmpty() || this.isItemChangable()) {
@@ -1516,8 +1534,8 @@ public class ItemMap {
 				return true;
 			}
 		}
-		for (ItemStack inPlayerInventory: player.getEquipment().getArmorContents()) {
-			if (this.isSimilar(inPlayerInventory) && this.isCountSimilar(inPlayerInventory)) {
+		for (ItemStack equipInventory: player.getEquipment().getArmorContents()) {
+			if (this.isSimilar(equipInventory) && this.isCountSimilar(equipInventory)) {
 				return true;
 			}
 		}
@@ -1525,6 +1543,13 @@ public class ItemMap {
 				&& this.isSimilar(player.getInventory().getItemInOffHand())
 				&& this.isCountSimilar(player.getInventory().getItemInOffHand())) {
 			return true;
+		}
+		if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
+			for (ItemStack craftInventory: player.getOpenInventory().getTopInventory()) {
+				if (this.isSimilar(craftInventory) && this.isCountSimilar(craftInventory)) {
+					return true;
+				}
+			}
 		}
 		return false;
 	}
@@ -1642,7 +1667,7 @@ public class ItemMap {
 	}
 	
 	private void setNBTData() {
-		if (ItemUtilities.dataTagsEnabled() && !this.isVanilla() && !this.isVanillaControl() && !this.isVanillaStatus()) {
+		if (ConfigHandler.dataTagsEnabled() && !this.isVanilla() && !this.isVanillaControl() && !this.isVanillaStatus()) {
 			try {
 				Object nms = Reflection.getOBC("inventory.CraftItemStack").getMethod("asNMSCopy", ItemStack.class).invoke(null, this.tempItem);
 				Object cacheTag = Reflection.getNMS("ItemStack").getMethod("getTag").invoke(nms);
@@ -1838,10 +1863,10 @@ public class ItemMap {
 		return item;
 	}
 	
-	public void giveTo(Player player, boolean noTriggers, int amount) {
+	public void giveTo(Player player, boolean command, int amount) {
 		this.updateItem(player);
-		if (CustomSlot != null) { ItemUtilities.setCustomSlots(player, this, noTriggers, this.tempItem.clone(), amount); } 
-		else { ItemUtilities.setInvSlots(player, this, noTriggers, this.tempItem.clone(), amount); }
+		if (CustomSlot != null) { ItemUtilities.setCustomSlots(player, this, this.tempItem.clone(), command, amount); } 
+		else { ItemUtilities.setInvSlots(player, this, this.tempItem.clone(), command, amount); }
 		this.setAnimations(player);
 	}
 	
@@ -1849,7 +1874,7 @@ public class ItemMap {
 		this.updateItem(player);
 		ItemStack item = this.tempItem.clone();
 		if (amount > 0) { item.setAmount(amount); }
-		if (Utils.containsIgnoreCase(slot, "CRAFTING")) { player.getOpenInventory().getTopInventory().setItem(ItemUtilities.getSlotConversion(slot), item);} 
+		if (Utils.containsIgnoreCase(slot, "CRAFTING")) { player.getOpenInventory().getTopInventory().setItem(Utils.getSlotConversion(slot), item);} 
 		else { player.getInventory().setItem(Integer.parseInt(slot), item); }
 		this.setAnimations(player);
 	}

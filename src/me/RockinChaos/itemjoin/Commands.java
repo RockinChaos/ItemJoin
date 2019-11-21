@@ -22,6 +22,7 @@ import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.utils.Language;
 import me.RockinChaos.itemjoin.utils.Legacy;
+import me.RockinChaos.itemjoin.utils.Chances;
 import me.RockinChaos.itemjoin.utils.Utils;
 import me.RockinChaos.itemjoin.utils.sqlite.SQLData;
 import me.RockinChaos.itemjoin.utils.sqlite.SQLite;
@@ -160,7 +161,7 @@ public class Commands implements CommandExecutor {
 		} else if (args[0].equalsIgnoreCase("reload") || args[0].equalsIgnoreCase("rl")) {
 			if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.reload")) {
 				ConfigHandler.getSQLData().executeLaterStatements();
-				ItemUtilities.closeAllAnimations();
+				ItemUtilities.closeAnimations();
 				ItemUtilities.clearItems();
 		  		ConfigHandler.generateData(null);
 				Language.sendLangMessage("Commands.Default.configReload", sender);
@@ -457,9 +458,10 @@ public class Commands implements CommandExecutor {
 					List<String> customPermissions = new ArrayList<String>();
 					for (World world: ItemJoin.getInstance().getServer().getWorlds()) {
 						List <String> inputListed = new ArrayList<String>();
-						String Probable = ItemUtilities.getProbabilityItem(((Player) sender));
+						final Chances probability = new Chances();
+						final ItemMap probable = probability.getRandom(((Player) sender));
 						for (ItemMap item: ItemUtilities.getItems()) {
-							if (!customPermissions.contains(item.getPermissionNode()) && !inputListed.contains(item.getConfigName()) && item.inWorld(world) && ItemUtilities.isChosenProbability(item, Probable)) {
+							if (!customPermissions.contains(item.getPermissionNode()) && !inputListed.contains(item.getConfigName()) && item.inWorld(world) && probability.isProbability(item, probable)) {
 								if (item.getPermissionNode() != null && !customPermissions.contains(item.getPermissionNode()) || item.getPermissionNode() == null) {
 									if (item.getPermissionNode() != null) { customPermissions.add(item.getPermissionNode()); }
 									inputListed.add(item.getConfigName());
@@ -500,7 +502,7 @@ public class Commands implements CommandExecutor {
 			            }
 			        }
 			    } catch (Exception e) { ServerHandler.sendDebugTrace(e);  }
-			    ItemMap itemMap = ItemUtilities.getMappedItem(args[1]);
+			    ItemMap itemMap = ItemUtilities.getItemMap(null, args[1], null);
 		    	String[] placeHolders = Language.newString(); placeHolders[12] = givenPlayers.toString().replace("]", "").replace("[", ""); placeHolders[3] = Utils.translateLayout(itemMap.getCustomName(), null);
 			    if (amount == 0) { amount = itemMap.getCount(); }
 			    placeHolders[11] = amount + "";
@@ -520,9 +522,10 @@ public class Commands implements CommandExecutor {
 				if (argsPlayer == null) { String[] placeHolders = Language.newString(); placeHolders[1] = args[2];
 				Language.sendLangMessage("Commands.Default.targetNotFound", sender, placeHolders);  return true; }
 				boolean itemGiven = false;
-				String Probable = ItemUtilities.getProbabilityItem(argsPlayer);
+				final Chances probability = new Chances();
+				final ItemMap probable = probability.getRandom(argsPlayer);
 				for (ItemMap item: ItemUtilities.getItems()) {
-					if (item.inWorld(argsPlayer.getWorld()) && item.getConfigName().equalsIgnoreCase(args[1]) && ItemUtilities.isChosenProbability(item, Probable)) {
+					if (item.inWorld(argsPlayer.getWorld()) && item.getConfigName().equalsIgnoreCase(args[1]) && probability.isProbability(item, probable)) {
 						String customName = Utils.translateLayout(item.getCustomName(), null);
 						if (sender instanceof Player) { customName = Utils.translateLayout(item.getCustomName(), ((Player) sender)); }
 						if (!item.hasItem(argsPlayer) || amount != 0 || item.isAlwaysGive()) {
@@ -556,9 +559,10 @@ public class Commands implements CommandExecutor {
 				if (args.length == 3) { amount = Integer.parseInt(args[2]); }
 				if (!(sender instanceof ConsoleCommandSender)) {
 					boolean itemGiven = false;
-					String Probable = ItemUtilities.getProbabilityItem(((Player) sender));
+					final Chances probability = new Chances();
+					final ItemMap probable = probability.getRandom(((Player) sender));
 					for (ItemMap item: ItemUtilities.getItems()) {
-						if (item.inWorld(((Player) sender).getWorld()) && item.getConfigName().equalsIgnoreCase(args[1]) && ItemUtilities.isChosenProbability(item, Probable)) {
+						if (item.inWorld(((Player) sender).getWorld()) && item.getConfigName().equalsIgnoreCase(args[1]) && probability.isProbability(item, probable)) {
 							String customName = Utils.translateLayout(item.getCustomName(), ((Player) sender));
 							if (!item.hasItem(((Player) sender)) || amount != 0 || item.isAlwaysGive()) {
 								if (!(ConfigHandler.getItemPermissions()) || item.hasPermission(((Player) sender)) && ConfigHandler.getItemPermissions()) {
@@ -597,9 +601,10 @@ public class Commands implements CommandExecutor {
 			} else if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.get.others")) {
 				boolean itemGiven = false;
 				boolean itemPermission = false;
-				String Probable = ItemUtilities.getProbabilityItem(argsPlayer);
+				final Chances probability = new Chances();
+				final ItemMap probable = probability.getRandom(argsPlayer);
 				for (ItemMap item: ItemUtilities.getItems()) {
-					if (item.inWorld(argsPlayer.getWorld()) && ItemUtilities.isChosenProbability(item, Probable) && !ItemUtilities.hasProbabilityItem(argsPlayer, item)) {
+					if (item.inWorld(argsPlayer.getWorld()) && probability.isProbability(item, probable)) {
 						if (!(ConfigHandler.getItemPermissions()) || item.hasPermission(argsPlayer) && ConfigHandler.getItemPermissions()) {
 							if (!item.hasItem(argsPlayer) || item.isAlwaysGive()) {
 								item.giveTo(argsPlayer, !item.isAlwaysGive(), 0);
@@ -630,9 +635,10 @@ public class Commands implements CommandExecutor {
 				if (!(sender instanceof ConsoleCommandSender)) {
 					boolean itemGiven = false;
 					boolean itemPermission = false;
-					String Probable = ItemUtilities.getProbabilityItem(((Player) sender));
+					final Chances probability = new Chances();
+					final ItemMap probable = probability.getRandom(((Player) sender));
 					for (ItemMap item: ItemUtilities.getItems()) {
-						if (item.inWorld(((Player) sender).getWorld()) && ItemUtilities.isChosenProbability(item, Probable) && !ItemUtilities.hasProbabilityItem(((Player) sender), item)) {
+						if (item.inWorld(((Player) sender).getWorld()) && probability.isProbability(item, probable)) {
 							if (!(ConfigHandler.getItemPermissions()) || item.hasPermission(((Player) sender)) && ConfigHandler.getItemPermissions()) {
 								if (!item.hasItem(((Player) sender)) || item.isAlwaysGive()) {
 									item.giveTo(((Player) sender), !item.isAlwaysGive(), 0);
@@ -679,7 +685,7 @@ public class Commands implements CommandExecutor {
 			            }
 			        }
 			    } catch (Exception e) { ServerHandler.sendDebugTrace(e);  }
-		    	String[] placeHolders = Language.newString(); placeHolders[12] = removedPlayers.toString().replace("]", "").replace("[", ""); placeHolders[3] = Utils.translateLayout(ItemUtilities.getMappedItem(args[1]).getCustomName(), null); if (amount == 0) { placeHolders[11] = "\u221e"; } else { placeHolders[11] = amount + ""; }
+		    	String[] placeHolders = Language.newString(); placeHolders[12] = removedPlayers.toString().replace("]", "").replace("[", ""); placeHolders[3] = Utils.translateLayout(ItemUtilities.getItemMap(null, args[1], null).getCustomName(), null); if (amount == 0) { placeHolders[11] = "\u221e"; } else { placeHolders[11] = amount + ""; }
 			    if (!removedPlayers.isEmpty()) { Language.sendLangMessage("Commands.Remove.fromOnlinePlayers", sender, placeHolders); } 
 			    else { Language.sendLangMessage("Commands.Remove.notInOnlinePlayersInventory", sender, placeHolders); }
 			} else { Language.sendLangMessage("Commands.Default.noPermission", sender); }
@@ -812,9 +818,10 @@ public class Commands implements CommandExecutor {
 	private String getOnline(Player argsPlayer, CommandSender sender, String args, int amount) {
         boolean itemExists = false;
         boolean itemGiven = false;
-        String Probable = ItemUtilities.getProbabilityItem(argsPlayer);
+        final Chances probability = new Chances();
+		final ItemMap probable = probability.getRandom(argsPlayer);
         for (ItemMap item: ItemUtilities.getItems()) {
-            if (item.inWorld(argsPlayer.getWorld()) && item.getConfigName().equalsIgnoreCase(args) && ItemUtilities.isChosenProbability(item, Probable)) {
+            if (item.inWorld(argsPlayer.getWorld()) && item.getConfigName().equalsIgnoreCase(args) && probability.isProbability(item, probable)) {
                 itemExists = true;
                 if (!(ConfigHandler.getItemPermissions()) || item.hasPermission(argsPlayer) && ConfigHandler.getItemPermissions()) {
                 	if (!item.hasItem(argsPlayer) || amount != 0 || item.isAlwaysGive()) {

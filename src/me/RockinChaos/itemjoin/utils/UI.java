@@ -570,7 +570,7 @@ public class UI {
 				placeHolders[3] = itemMap.getConfigName();
 				Language.sendLangMessage("Commands.UI.itemSaved", player, placeHolders);
 				ConfigHandler.getSQLData().executeLaterStatements();
-				ItemUtilities.closeAllAnimations();
+				ItemUtilities.closeAnimations();
 				ItemUtilities.clearItems();
 				ConfigHandler.generateData(null);
 				player.closeInventory();
@@ -582,7 +582,7 @@ public class UI {
 				placeHolders[3] = itemMap.getConfigName();
 				Language.sendLangMessage("Commands.UI.itemSaved", player, placeHolders);
 				ConfigHandler.getSQLData().executeLaterStatements();
-				ItemUtilities.closeAllAnimations();
+				ItemUtilities.closeAnimations();
 				ItemUtilities.clearItems();
 				ConfigHandler.generateData(null);
 				player.closeInventory();
@@ -2251,9 +2251,9 @@ public class UI {
 		Interface worldPane = new Interface(false, 6, this.GUIName);
 		List < String > enabledWorlds = itemMap.getEnabledWorlds();
 		int i = 44;
-		worldPane.addButton(new Button(ItemHandler.getItem("OBSIDIAN", 1, ItemUtilities.containsWorld("ALL", itemMap), "&a&l&nGLOBAL", "&7", "&7*Click to enable the", "&7custom item in &lALL WORLDS.", "&9&lENABLED: &a" + 
-		(ItemUtilities.containsWorld("ALL", itemMap) + "").toUpperCase()), event -> {
-			if (ItemUtilities.containsWorld("ALL", itemMap)) {
+		worldPane.addButton(new Button(ItemHandler.getItem("OBSIDIAN", 1, itemMap.containsWorld("ALL", itemMap), "&a&l&nGLOBAL", "&7", "&7*Click to enable the", "&7custom item in &lALL WORLDS.", "&9&lENABLED: &a" + 
+		(itemMap.containsWorld("ALL", itemMap) + "").toUpperCase()), event -> {
+			if (itemMap.containsWorld("ALL", itemMap)) {
 				enabledWorlds.remove("GLOBAL");
 				enabledWorlds.remove("ALL");
 			} else {
@@ -2269,9 +2269,9 @@ public class UI {
 			} else if (world.getEnvironment().equals(Environment.THE_END)) {
 				worldMaterial = (ServerHandler.hasAquaticUpdate() ? "END_STONE" : "121");
 			}
-			worldPane.addButton(new Button(ItemHandler.getItem(worldMaterial, 1, ItemUtilities.containsWorld(world.getName(), itemMap), "&f&l" + world.getName(), "&7", "&7*Click to enable the", "&7custom item in this world.", 
-					"&9&lENABLED: &a" + (ItemUtilities.containsWorld(world.getName(), itemMap) + "").toUpperCase()), event -> {
-				if (ItemUtilities.containsWorld(world.getName(), itemMap)) {
+			worldPane.addButton(new Button(ItemHandler.getItem(worldMaterial, 1, itemMap.containsWorld(world.getName(), itemMap), "&f&l" + world.getName(), "&7", "&7*Click to enable the", "&7custom item in this world.", 
+					"&9&lENABLED: &a" + (itemMap.containsWorld(world.getName(), itemMap) + "").toUpperCase()), event -> {
+				if (itemMap.containsWorld(world.getName(), itemMap)) {
 					enabledWorlds.remove(world.getName());
 				} else {
 					enabledWorlds.add(world.getName());
@@ -2292,9 +2292,9 @@ public class UI {
 		regionPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> {
 			this.creatingPane(player, itemMap);
 		}));
-		regionPane.addButton(new Button(ItemHandler.getItem("OBSIDIAN", 1, ItemUtilities.containsRegion("UNDEFINED", itemMap), "&c&l&nUNDEFINED", "&7", "&7*Click to enable the", "&7custom item in &lALL REGIONS.", "&9&lENABLED: &a" + 
-		(ItemUtilities.containsRegion("UNDEFINED", itemMap) + "").toUpperCase()), event -> {
-			if (ItemUtilities.containsRegion("UNDEFINED", itemMap)) {
+		regionPane.addButton(new Button(ItemHandler.getItem("OBSIDIAN", 1, itemMap.containsRegion("UNDEFINED", itemMap), "&c&l&nUNDEFINED", "&7", "&7*Click to enable the", "&7custom item in &lALL REGIONS.", "&9&lENABLED: &a" + 
+		(itemMap.containsRegion("UNDEFINED", itemMap) + "").toUpperCase()), event -> {
+			if (itemMap.containsRegion("UNDEFINED", itemMap)) {
 				enabledRegions.remove("UNDEFINED");
 			} else {
 				enabledRegions.add("UNDEFINED");
@@ -2309,9 +2309,9 @@ public class UI {
 				} else if (world.getEnvironment().equals(Environment.THE_END)) {
 					regionMaterial = (ServerHandler.hasAquaticUpdate() ? "END_STONE" : "121");
 				}
-				regionPane.addButton(new Button(ItemHandler.getItem(regionMaterial, 1, ItemUtilities.containsRegion(region, itemMap), "&f&l" + region, "&7", "&a&lWORLD: &f" + world.getName(), "&7", "&7*Click to enable the", 
-						"&7custom item in this region.", "&9&lENABLED: &a" + (ItemUtilities.containsRegion(region, itemMap) + "").toUpperCase()), event -> {
-					if (ItemUtilities.containsRegion(region, itemMap)) {
+				regionPane.addButton(new Button(ItemHandler.getItem(regionMaterial, 1, itemMap.containsRegion(region, itemMap), "&f&l" + region, "&7", "&a&lWORLD: &f" + world.getName(), "&7", "&7*Click to enable the", 
+						"&7custom item in this region.", "&9&lENABLED: &a" + (itemMap.containsRegion(region, itemMap) + "").toUpperCase()), event -> {
+					if (itemMap.containsRegion(region, itemMap)) {
 						enabledRegions.remove(region);
 					} else {
 						enabledRegions.add(region);

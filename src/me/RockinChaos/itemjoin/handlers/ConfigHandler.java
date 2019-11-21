@@ -5,18 +5,42 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.CopyOption;
 import java.nio.file.Files;
+import java.util.ArrayList;
+
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.event.HandlerList;
+import org.bukkit.plugin.RegisteredListener;
+
 import me.RockinChaos.itemjoin.Commands;
 import me.RockinChaos.itemjoin.ItemJoin;
+import me.RockinChaos.itemjoin.giveitems.listeners.LimitSwitch;
+import me.RockinChaos.itemjoin.giveitems.listeners.PlayerGuard;
+import me.RockinChaos.itemjoin.giveitems.listeners.PlayerJoin;
+import me.RockinChaos.itemjoin.giveitems.listeners.PlayerQuit;
+import me.RockinChaos.itemjoin.giveitems.listeners.Respawn;
+import me.RockinChaos.itemjoin.giveitems.listeners.WorldSwitch;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemDesigner;
+import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
+import me.RockinChaos.itemjoin.listeners.Consumes;
+import me.RockinChaos.itemjoin.listeners.Drops;
+import me.RockinChaos.itemjoin.listeners.Interact;
+import me.RockinChaos.itemjoin.listeners.InventoryClick;
+import me.RockinChaos.itemjoin.listeners.InventoryCrafting;
+import me.RockinChaos.itemjoin.listeners.Legacy_Interact;
 import me.RockinChaos.itemjoin.listeners.Legacy_Pickups;
+import me.RockinChaos.itemjoin.listeners.Legacy_Storable;
 import me.RockinChaos.itemjoin.listeners.MultiForm;
 import me.RockinChaos.itemjoin.listeners.Pickups;
+import me.RockinChaos.itemjoin.listeners.Placement;
+import me.RockinChaos.itemjoin.listeners.Recipes;
+import me.RockinChaos.itemjoin.listeners.Storable;
+import me.RockinChaos.itemjoin.listeners.SwitchHands;
 import me.RockinChaos.itemjoin.utils.DependAPI;
 import me.RockinChaos.itemjoin.utils.UI;
 import me.RockinChaos.itemjoin.utils.Language;
+import me.RockinChaos.itemjoin.utils.Logger;
 import me.RockinChaos.itemjoin.utils.Metrics;
 import me.RockinChaos.itemjoin.utils.Reflection;
 import me.RockinChaos.itemjoin.utils.TabComplete;
@@ -37,6 +61,7 @@ public class ConfigHandler {
 	private static UI itemCreator;
 	private static Metrics metrics;
 	private static DependAPI depends;
+	private static Logger logger;
 	
 	public static void generateData(File file) {
 		configFile(); itemsFile(); langFile();
@@ -45,6 +70,7 @@ public class ConfigHandler {
 		setItemDesigner(new ItemDesigner());
 		setItemCreator(new UI());
 		setMetrics(new Metrics());
+		setLogger(new Logger());
 		if (file != null) { sendUtilityDepends(); setUpdater(new UpdateHandler(file)); }
 	}
 	
@@ -115,7 +141,7 @@ public class ConfigHandler {
 					File configFile = new File(ItemJoin.getInstance().getDataFolder(), "config.yml");
 					configFile.delete();
 					getConfigData("config.yml");
-					ServerHandler.sendConsoleMessage("&aYour config.yml is out of date and new options are available, generating a new one!");
+					ServerHandler.sendErrorMessage("&aYour config.yml is out of date and new options are available, generating a new one!");
 				}
 			}
 		}
@@ -134,7 +160,7 @@ public class ConfigHandler {
 					File configFile = new File(ItemJoin.getInstance().getDataFolder(), "items.yml");
 					configFile.delete();
 					getConfigData("items.yml");
-					ServerHandler.sendConsoleMessage("&4Your items.yml is out of date and new options are available, generating a new one!");
+					ServerHandler.sendErrorMessage("&4Your items.yml is out of date and new options are available, generating a new one!");
 				}
 			}
 		}
@@ -171,7 +197,7 @@ public class ConfigHandler {
 					File configFile = new File(ItemJoin.getInstance().getDataFolder(), affix + "-lang.yml");
 					configFile.delete();
 					getConfigData(affix + "-lang.yml");
-					ServerHandler.sendConsoleMessage("&4Your " + affix + "-lang.yml is out of date and new options are available, generating a new one!");
+					ServerHandler.sendErrorMessage("&4Your " + affix + "-lang.yml is out of date and new options are available, generating a new one!");
 				}
 			}
 		}
@@ -316,8 +342,74 @@ public class ConfigHandler {
 		metrics = metric;
 	}
 	
+	public static Logger getLogger() {
+		return logger;
+	}
+	
+	private static void setLogger(Logger log) {
+		logger = log;
+	}
+	
 	private static void setGenerating(boolean isGenerating) {
 		yamlGenerating = isGenerating;
+	}
+	
+	public static int getHotbarSlot() { 
+		if (ConfigHandler.getConfig("config.yml").getString("Settings.HeldItem-Slot") != null 
+				&& !ConfigHandler.getConfig("config.yml").getString("Settings.HeldItem-Slot").equalsIgnoreCase("DISABLED") 
+				&& Utils.isInt(ConfigHandler.getConfig("config.yml").getString("Settings.HeldItem-Slot"))) {
+			return ConfigHandler.getConfig("config.yml").getInt("Settings.HeldItem-Slot");
+		}
+		return -1;
+	}
+	
+	public static String getNBTData(ItemMap itemMap) {
+		if (itemMap != null) {
+			return "ItemJoin" + itemMap.getItemValue() + itemMap.getConfigName();
+		} else { return "ItemJoin"; }
+	}
+	
+	public static boolean dataTagsEnabled() {
+		if (ServerHandler.hasSpecificUpdate("1_8")) {
+			return ConfigHandler.getConfig("config.yml").getBoolean("Settings.DataTags");
+		}
+		return false;
+	}
+	
+	public static void setListenerRestrictions(ItemMap itemMap) {
+		if (((!itemMap.isGiveOnDisabled() && itemMap.isGiveOnJoin()) || (ConfigHandler.getConfig("config.yml").getString("Active-Commands.enabled-worlds") != null && (!ConfigHandler.getConfig("config.yml").getString("Active-Commands.enabled-worlds").equalsIgnoreCase("DISABLED") 
+		|| !ConfigHandler.getConfig("config.yml").getString("Active-Commands.enabled-worlds").equalsIgnoreCase("FALSE")))) && !isListenerEnabled(PlayerJoin.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerJoin(), ItemJoin.getInstance()); }
+		if (!itemMap.isGiveOnDisabled() && itemMap.isGiveOnRespawn() && !isListenerEnabled(Respawn.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Respawn(), ItemJoin.getInstance()); }
+		if (!itemMap.isGiveOnDisabled() && itemMap.isGiveOnWorldChange() && !isListenerEnabled(WorldSwitch.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new WorldSwitch(), ItemJoin.getInstance()); }
+		if (!itemMap.isGiveOnDisabled() && (itemMap.isGiveOnRegionEnter() || itemMap.isTakeOnRegionLeave() || (ConfigHandler.getConfig("config.yml").getString("Clear-Items.Region-Enter") != null && !ConfigHandler.getConfig("config.yml").getString("Clear-Items.Region-Enter").equalsIgnoreCase("DISABLED") && !ConfigHandler.getConfig("config.yml").getString("Clear-Items.Region-Enter").equalsIgnoreCase("FALSE"))) && !isListenerEnabled(PlayerGuard.class.getSimpleName()) && ConfigHandler.getDepends().getGuard().guardEnabled()) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerGuard(), ItemJoin.getInstance()); }
+		if (!itemMap.isGiveOnDisabled() && itemMap.isUseOnLimitSwitch() && !isListenerEnabled(LimitSwitch.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new LimitSwitch(), ItemJoin.getInstance()); }
+		if ((itemMap.isAnimated() || itemMap.isDynamic()) && !isListenerEnabled(PlayerQuit.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerQuit(), ItemJoin.getInstance()); }
+		if (itemMap.isCraftingItem() && !isListenerEnabled(InventoryCrafting.class.getSimpleName())) { InventoryCrafting.cycleTask(); ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new InventoryCrafting(), ItemJoin.getInstance()); }
+		if ((itemMap.isMovement() || itemMap.isInventoryClose()) && !isListenerEnabled(InventoryClick.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new InventoryClick(), ItemJoin.getInstance()); }
+		if ((itemMap.isDeathDroppable() || itemMap.isSelfDroppable()) && !isListenerEnabled(Drops.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Drops(), ItemJoin.getInstance()); }
+		if ((itemMap.isCancelEvents() || (itemMap.getCommands() != null && itemMap.getCommands().length != 0))) { 
+			if (!ServerHandler.hasSpecificUpdate("1_8") && !isListenerEnabled(Legacy_Interact.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Legacy_Interact(), ItemJoin.getInstance()); }
+			else if (ServerHandler.hasSpecificUpdate("1_8") && !isListenerEnabled(Interact.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Interact(), ItemJoin.getInstance()); }
+		}
+		if ((itemMap.isPlaceable() || itemMap.isCountLock()) && !isListenerEnabled(Placement.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Placement(), ItemJoin.getInstance()); }
+		if (itemMap.isCustomConsumable() && !isListenerEnabled(Consumes.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Consumes(), ItemJoin.getInstance()); }
+		if ((itemMap.isItemRepairable() || itemMap.isItemCraftable()) && !isListenerEnabled(Recipes.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Recipes(), ItemJoin.getInstance()); }
+		if (itemMap.isItemStore() || itemMap.isItemModify()) {
+			if (!ServerHandler.hasSpecificUpdate("1_8") && !isListenerEnabled(Legacy_Storable.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Legacy_Storable(), ItemJoin.getInstance());} 
+			else if (ServerHandler.hasSpecificUpdate("1_8") && !isListenerEnabled(Storable.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Storable(), ItemJoin.getInstance()); }
+		}
+		if (itemMap.isMovement() && !isListenerEnabled(SwitchHands.class.getSimpleName()) && ServerHandler.hasCombatUpdate() && Reflection.getEventClass("player.PlayerSwapHandItemsEvent") != null) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new SwitchHands(), ItemJoin.getInstance()); }
+	}
+
+	private static boolean isListenerEnabled(String compare) {
+		boolean returnValue = false;
+        ArrayList<RegisteredListener> rls = HandlerList.getRegisteredListeners(ItemJoin.getInstance());
+        for(RegisteredListener rl: rls) {
+        	if (rl.getListener().getClass().getSimpleName().equalsIgnoreCase(compare)) {
+        		returnValue = true; break;
+        	}
+        }
+		return returnValue;
 	}
 	
 	public static long getClearDelay() {
