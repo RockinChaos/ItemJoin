@@ -86,6 +86,7 @@ public class ItemMap {
 	private Integer count = 1;
 	
 	private Short durability = null;
+	private Short data = null;
 	
 	private String author;
 	private String title;
@@ -562,6 +563,10 @@ public class ItemMap {
 		this.durability = durability;
 	}
 	
+	public void setData(Short data) {
+		this.data = data;
+	}
+	
 	public void setProbability(Integer probability) {
 		this.probability = probability;
 	}
@@ -968,6 +973,13 @@ public class ItemMap {
 	public Short getDurability() {
 		if (this.durability != null) {
 			return this.durability;	
+		}
+		return 0;
+	}
+	
+	public Short getData() {
+		if (this.data != null) {
+			return this.data;	
 		}
 		return 0;
 	}
@@ -1576,6 +1588,7 @@ public class ItemMap {
 		this.setCustomLore(player);
 		this.setSkull(player);
 		this.setDurability();
+		this.setData();
 		this.setPotionEffects();
 		this.setBanners();
 		this.setFireworks();
@@ -1703,11 +1716,21 @@ public class ItemMap {
 	}
 	
 	private void setDurability() {
-		if (this.durability != null) {
+		if (this.durability != null && (this.data == null || this.data == 0)) {
 			if (ServerHandler.hasAquaticUpdate()) {
 				((Damageable) this.tempMeta).setDamage(this.durability);
 			} else {
 				Legacy.setLegacyDurability(this.tempItem, this.durability);
+			}
+		}
+	}
+	
+	private void setData() {
+		if (this.data != null) {
+			if (ServerHandler.hasAquaticUpdate()) {
+				((Damageable) this.tempMeta).setDamage(this.data);
+			} else {
+				Legacy.setLegacyDurability(this.tempItem, this.data);
 			}
 		}
 	}

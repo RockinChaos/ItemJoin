@@ -58,6 +58,7 @@ public class ItemDesigner {
 							this.setName(itemMap);
 							this.setLore(itemMap);
 							this.setDurability(itemMap);
+							this.setData(itemMap);
 							this.setSkull(itemMap);
 							this.setSkullTexture(itemMap);
 							this.setConsumableEffects(itemMap);
@@ -491,11 +492,22 @@ public class ItemDesigner {
 //    Changes the items durability to the specified durability.     //
 //  =============================================================== //
 	private void setDurability(ItemMap itemMap) {
-		if (itemMap.getNodeLocation().getString(".skull-owner") != null) {
-			itemMap.setDurability((short) 3);
-		} else if (itemMap.getNodeLocation().getString(".durability") != null) {
-			int durability = itemMap.getNodeLocation().getInt(".durability");
-			itemMap.setDurability((short) durability);
+		if (itemMap.getNodeLocation().getString(".data") == null || itemMap.getNodeLocation().getInt(".data") == 0) {
+			if (itemMap.getNodeLocation().getString(".skull-owner") != null) {
+				itemMap.setDurability((short) 3);
+			} else if (itemMap.getNodeLocation().getString(".durability") != null) {
+				int durability = itemMap.getNodeLocation().getInt(".durability");
+				itemMap.setDurability((short) durability);
+			}
+		}
+	}
+	
+	private void setData(ItemMap itemMap) {
+		if (itemMap.getNodeLocation().getString(".data") != null) {
+			int data = itemMap.getNodeLocation().getInt(".data");
+			itemMap.setData((short) data);
+			itemMap.setAttributesInfo(true);
+			itemMap.setUnbreakable(true);
 		}
 	}
 //  ================================================================================ //
