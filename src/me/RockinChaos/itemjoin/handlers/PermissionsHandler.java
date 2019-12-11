@@ -14,7 +14,7 @@ public class PermissionsHandler {
 	}
 	
 	public static boolean hasCommandPermission(CommandSender sender, String permission) {
-		if (sender.hasPermission(permission) || sender.hasPermission("itemjoin.*") || isDeveloper(sender) || (sender instanceof ConsoleCommandSender)) {
+		if (sender.hasPermission(permission) || sender.hasPermission("itemjoin.*") || sender.hasPermission("itemjoin.all") || isDeveloper(sender) || (sender instanceof ConsoleCommandSender)) {
 			return true;
 		} else if (!ConfigHandler.getCommandPermissions() && sender.isOp()) {
 			if (permission.equalsIgnoreCase("itemjoin.use") || permission.equalsIgnoreCase("itemjoin.reload") || permission.equalsIgnoreCase("itemjoin.updates")
@@ -22,7 +22,7 @@ public class PermissionsHandler {
 					|| permission.equalsIgnoreCase("itemjoin.purge") || permission.equalsIgnoreCase("itemjoin.get") || permission.equalsIgnoreCase("itemjoin.get.others")
 							|| permission.equalsIgnoreCase("itemjoin.remove") || permission.equalsIgnoreCase("itemjoin.remove.others") || permission.equalsIgnoreCase("itemjoin.disable") 
 							|| permission.equalsIgnoreCase("itemjoin.disable.others") || permission.equalsIgnoreCase("itemjoin.enable") || permission.equalsIgnoreCase("itemjoin.enable.others")
-							|| permission.equalsIgnoreCase("itemjoin.list") || isDeveloper(sender)) {
+							|| permission.equalsIgnoreCase("itemjoin.list")) {
 				return true;
 			}
 		}
