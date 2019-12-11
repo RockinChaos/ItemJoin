@@ -777,8 +777,21 @@ public class ItemDesigner {
 			if (itemMap.getMaterial().toString().equalsIgnoreCase("LEATHER_HELMET") || itemMap.getMaterial().toString().equalsIgnoreCase("LEATHER_CHESTPLATE")
 				|| itemMap.getMaterial().toString().equalsIgnoreCase("LEATHER_LEGGINGS") || itemMap.getMaterial().toString().equalsIgnoreCase("LEATHER_BOOTS")) {
 				String leatherColor = itemMap.getNodeLocation().getString(".leather-color").toUpperCase();
-				try { if (leatherColor.startsWith("#")) { itemMap.setLeatherHex(leatherColor); } else { itemMap.setLeatherColor(leatherColor); } }
-				catch (Exception ex) { 
+				try { 
+					if (leatherColor.startsWith("#")) { 
+						itemMap.setLeatherHex(leatherColor); 
+					} else { 
+						boolean hexValue = true;
+						for (DyeColor color: DyeColor.values()) {
+							if (color.name().replace(" ", "").equalsIgnoreCase(leatherColor)) {
+								itemMap.setLeatherColor(leatherColor); 
+								hexValue = false;
+								break;
+							}
+						}
+						if (hexValue) { itemMap.setLeatherHex(leatherColor); }
+					} 
+				} catch (Exception ex) { 
 					ServerHandler.sendErrorMessage("&4The leather-color: " + leatherColor + " is not a valid color for the item " + itemMap.getConfigName() + "!"); 
 					ServerHandler.sendErrorMessage("&4Use hexcolor or see valid bukkit colors here; https://hub.spigotmc.org/javadocs/spigot/org/bukkit/DyeColor.html"); 
 				}
