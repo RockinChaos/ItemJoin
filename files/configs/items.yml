@@ -11,22 +11,22 @@ items-RestrictCount : false
 # This is the section that the custom created items will be stored.
 # All created items should be saved under the 'items' section for each 'custom-item' subsection.
 items:
-  ultra-item:
+  devine-item:
     id: DIAMOND_SWORD
     slot: 0
     name: '&bBlazefury'
     lore:
-      - '&7A godly sword.'
-      - '&7This is generations old!'
+    - '&7A devine sword.'
+    - '&7This sword is many millennium old...'
     commands:
       multi-click:
-        - 'message: &eYou can send yourself custom messages!'
-        - 'console: say You can even execute more than one command!'
-        - 'delay: 10'
-        - 'player: say This is item slot 1.'
-        - 'op: say This command executes as if the player is op.'
-        - 'say Hello world!'
-    commands-type: interact, inventory
+      - 'message: &eYou can send yourself custom messages!'
+      - 'console: say You can even execute more than one command!'
+      - 'delay: 10'
+      - 'player: say This is item slot 1.'
+      - 'op: say This command executes as if the player is op.'
+      - 'say Hello world!'
+    commands-type: interact
     commands-sound: BLOCK_NOTE_BLOCK_PLING
     commands-particle: FIREWORK:BLACK:RED:BURST:10
     commands-sequence: SEQUENTIAL
@@ -34,60 +34,59 @@ items:
     commands-cooldown: 5
     cooldown-message: '&7[&eItemJoin&7] &a[%item%&a] &cis on cooldown for &a%timeleft% &cseconds..'
     enchantment: FIRE_ASPECT:3, DAMAGE_ALL:5, DAMAGE_UNDEAD:5, KNOCKBACK:8
-    itemflags: inventory-modify, death-drops, unbreakable, hide-attributes, self-drops, CreativeBypass
+    itemflags: unbreakable, hide-attributes, self-drops, death-drops, CreativeBypass
     triggers: join, respawn, world-change, region-enter
-    permission-node: 'itemjoin.ultra'
+    permission-node: itemjoin.ultra
     enabled-regions: region1, region2
     enabled-worlds: world, world_nether, world_the_end
   map-item:
     id: FILLED_MAP
-    slot: 2
-    name: '&eMystery Map'
-    lore:
-      - '&7Great for Server promotions!'
     custom-map-image: 'default.jpg'
+    slot: 2
+    name: '&eMagical Cloth'
+    lore:
+    - '&7Server promotions'
+    - '&7Directions or custom maps.'
     itemflags: item-store, unbreakable, hide-attributes, death-drops, self-drops, CreativeBypass
     triggers: join, respawn, world-change
-    permission-node: 'itemjoin.map'
+    permission-node: itemjoin.map
     enabled-worlds: world, world_nether, world_the_end
-  gamemode-item:
+  gamemode-token:
     id: FIREWORK_STAR
+    charge-color: RED
     slot: 4
     count: 6
-    charge-color: BLUE
     name: '&aGamemode Token'
     lore:
-      - '&7Right-Click to use'
-      - '&7Your free creative mode token!'
-      - '&7'
-      - '&7Left-Click to use'
-      - '&7Your free spectator mode token!'
+    - '&7Right-Click use creative token.'
+    - '&7'
+    - '&7Left-Click use spectator token.'
     commands:
       right-click:
-        - 'console: gamemode creative %player%'
-        - 'message: &eYou have been set to creative mode.'
+      - 'console: gamemode creative %player%'
+      - 'message: &eYou have been set to creative mode.'
       left-click:
-        - 'console: gamemode spectator %player%'
-        - 'message: &eYou have been set to spectator mode.'
+      - 'console: gamemode spectator %player%'
+      - 'message: &eYou have been set to spectator mode.'
     commands-type: interact
     commands-sound: BLOCK_NOTE_BLOCK_PLING
-    commands-cost: 25
-    commands-cooldown: 5
-    cooldown-message: '&7[&eItemJoin&7] &a[%item%&a] &cis on cooldown for &a%timeleft% &cseconds..'
+    commands-cost: 8
+    commands-cooldown: 2
     itemflags: item-store, death-drops, self-drops, hide-attributes, disposable
     triggers: join, respawn, world-change
-    permission-node: 'itemjoin.token'
+    permission-node: itemjoin.token
     enabled-worlds: world, world_nether, world_the_end
   book-item:
     id: WRITTEN_BOOK
+    author: '&bItemJoin'
     slot: 6
     name: '&c&nCreating a Book'
-    author: '&bItemJoin'
     lore:
-      - '&7'
-      - '&7This magical book is given on join!'
+    - '&7'
+    - '&7Useful for server rules'
+    - '&7and other server information.'
     pages:
-      1:
+      '1':
       - '&bYou can get this book &bon join!'
       - '&aThis book also &asupports &ccolor codes!'
       - ''
@@ -97,121 +96,114 @@ items:
       - '&0as shown in the items.yml'
       - '&0I set it to &bItemJoin.'
       - ''
-      - '<hover type="text" value="%player% of course!">"Hover Mouse Here!"</hover>'
-      2:
+      - <hover type="text" value="%player% of course!">"Hover Mouse Here!"</hover>
+      '2':
       - '&cHow do you identify a &cpage number?'
       - ''
       - '&0As displayed to the left in the items.yml'
       - '&0Create a number to specify the new page number.'
       - '&cMakesure you put &ceach number in order &cas shown.'
-      3:
+      '3':
       - '&cHow do you create a &cnew page?'
       - ''
       - '&cCreating new pages &cshould be pretty'
       - '&cstraight forward for &ccopying and pasting.'
       - '&bItemJoin &0by RockinChaos!'
       - ''
-      - '<hover type="open_url" value="https://www.spigotmc.org/resources/itemjoin.12661/">"Click to view ItemJoin."</hover>'
-      - '<hover type="run_command" value="/say ItemJoin is so AMAZING!">"Click to run a Command."</hover>'
+      - <hover type="open_url" value="https://www.spigotmc.org/resources/itemjoin.12661/">"Click to view ItemJoin."</hover>
+      - <hover type="run_command" value="/say ItemJoin is so AMAZING!">"Click to run a Command."</hover>
       - 'raw: ["",{"text":"I am a hidden text!","color":"yellow","clickEvent":{"action":"open_url","value":"https://www.spigotmc.org/resources/itemjoin.12661/"},"hoverEvent":{"action":"show_text","value":{"text":"","extra":[{"text":"Click to visit the spigot page.","color":"blue"}]}}}]'
-    itemflags: inventory-modify, death-drops, self-drops
+    itemflags: death-drops, self-drops
     triggers: join, respawn
-    permission-node: 'itemjoin.book'
+    permission-node: itemjoin.book
     enabled-worlds: world
-  bungeecord-item:
-    id: PURPLE_STAINED_GLASS
+  profile-item:
+    id: PLAYER_HEAD
+    skull-owner: '%player%'
     slot: 8
-    name: '&eBungeeCord Blox'
-    count: 32
+    name: '&b%player%'
     lore:
-      - '&7Right-Click to go to the survival server!'
-    enchantment: FIRE_ASPECT:3
-    commands:
-      multi-click:
-        - 'server: survival'
-        - 'message: &eSending you to the survival server!'
-    commands-type: interact
-    commands-sound: BLOCK_NOTE_BLOCK_PLING
-    commands-cost: 25
-    commands-cooldown: 5
-    cooldown-message: '&7[&eItemJoin&7] &a[%item%&a] &cis on cooldown for &a%timeleft% &cseconds..'
-    itemflags: inventory-modify, placement, hide-attributes, death-drops, self-drops
+    - '&7Great for setting a players profile,'
+    - '&7as seen in mini-game servers.'
+    itemflags: death-drops, self-drops
     triggers: join, respawn, world-change
-    permission-node: 'itemjoin.bungeetp'
     enabled-worlds: world, world_nether, world_the_end
-  filler-pane-item:
+  animated-panes:
     id:
-      1: '<delay:40>BLACK_STAINED_GLASS_PANE'
-      2: '<delay:20>BLUE_STAINED_GLASS_PANE'
-      3: '<delay:20>GREEN_STAINED_GLASS_PANE'
-      4: '<delay:20>MAGENTA_STAINED_GLASS_PANE'
-      5: '<delay:20>ORANGE_STAINED_GLASS_PANE'
-      6: '<delay:20>RED_STAINED_GLASS_PANE'
+      '1': <delay:40>BLACK_STAINED_GLASS_PANE
+      '2': <delay:20>BLUE_STAINED_GLASS_PANE
+      '3': <delay:20>GREEN_STAINED_GLASS_PANE
+      '4': <delay:20>MAGENTA_STAINED_GLASS_PANE
+      '5': <delay:20>ORANGE_STAINED_GLASS_PANE
+      '6': <delay:20>RED_STAINED_GLASS_PANE
     slot: Arbitrary, Arbitrary, Arbitrary, Arbitrary
     name: '&f'
-    itemflags: inventory-modify, placement, animate, death-drops, self-drops
+    itemflags: animate, inventory-modify, placement, death-drops, self-drops
     triggers: join, world-change
     enabled-worlds: world, world_nether, world_the_end
   banner-item:
     id: WHITE_BANNER
+    banner-meta: BLUE:BASE, WHITE:CREEPER
     slot: 20
-    name: '&1Mighty Creeper'
+    name: '&9Mighty Creeper'
     lore:
-      - '&7The creeper is our leader!'
+    - '&7The creeper is our leader!'
     commands:
       multi-click:
-        - 'message: &bWhere is Herobrine?'
-        - 'message: &cWhere is your leader now...?'
+      - 'message: &bWhere is Herobrine?'
+      - 'message: &cWhere is your leader now...?'
     commands-sequence: RANDOM
-    banner-meta: BLUE:BASE, WHITE:CREEPER
-    itemflags: hide-attributes, self-drops, CreativeBypass
+    itemflags: inventory-modify, hide-attributes, self-drops, CreativeBypass
     triggers: join, respawn, world-change, region-enter
     enabled-worlds: world, world_nether, world_the_end
-  animated-item:
+  animated-sign:
     id: OAK_SIGN
     slot: 22
     name:
-      1: '<delay:20>&f&lStatistics'
-      2: '<delay:40>&e&lS&f&lt&e&la&f&lt&e&li&f&ls&e&lt&f&li&e&lc&f&ls'
-      3: '<delay:20>&b&lS&f&lt&b&la&f&lt&b&li&f&ls&b&lt&f&li&b&lc&f&ls'
-      4: '<delay:40>&a&lS&f&lt&a&la&f&lt&a&li&f&ls&a&lt&f&li&a&lc&f&ls'
-      5: '<delay:20>&d&lS&f&lt&d&la&f&lt&d&li&f&ls&d&lt&f&li&d&lc&f&ls'
-      6: '<delay:40>&e&lS&f&lt&e&la&f&lt&e&li&f&ls&e&lt&f&li&e&lc&f&ls'
+      '1': <delay:20>&f&lStatistics
+      '2': <delay:40>&e&lS&f&lt&e&la&f&lt&e&li&f&ls&e&lt&f&li&e&lc&f&ls
+      '3': <delay:20>&b&lS&f&lt&b&la&f&lt&b&li&f&ls&b&lt&f&li&b&lc&f&ls
+      '4': <delay:40>&a&lS&f&lt&a&la&f&lt&a&li&f&ls&a&lt&f&li&a&lc&f&ls
+      '5': <delay:20>&d&lS&f&lt&d&la&f&lt&d&li&f&ls&d&lt&f&li&d&lc&f&ls
+      '6': <delay:40>&e&lS&f&lt&e&la&f&lt&e&li&f&ls&e&lt&f&li&e&lc&f&ls
     lore:
-      1:
+      '1':
       - '<delay:60>&cMob Kills: %mob_kills%'
       - '&cPlayer Kills: %player_kills%'
-      2:
+      '2':
       - '<delay:60>&cDeaths: %player_deaths%'
       - '&cYour Location: %player_location%'
-      3:
+      '3':
       - '<delay:60>&cHealth: %player_health%'
       - '&cFood Level: %player_food%'
-    itemflags: death-drops, animate
+    itemflags: animate, inventory-modify, self-drops, death-drops
     triggers: join, respawn, world-change
     enabled-worlds: world, world_nether, world_the_end
-  skulldb-item:
-    id: PLAYER_HEAD
+  bungeecord-item:
+    id: PURPLE_STAINED_GLASS
     slot: 24
-    name: '&fCyclone'
-    skull-texture:
-      1: '<delay:100>eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMGZlMzFlYWE4YThhZDhkZDhkN2FiOTZhODQyMzI5MDUzOWQzODdkODJkNDI2ODcwMWVjNjlkNDFhMWZjIn19fQ=='
-      2: '<delay:100>eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTYxZGZkZGE3MTAyMmJmYWQ3OWVhYmJmYTU2YTE1MTE2NDdiMjAyYWQxMTM2ZmY5N2UzMWEwNmRiYWMxMGVjYiJ9fX0='
-      3: '<delay:100>eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZGFmNjJkNjJkMGE5MzZmMDdmZGZjMWM2MDcyMTY4NzVjOTkzZTViZWViY2U5NTNlOWM4NzI0YTI1ZmNiYTBiYyJ9fX0='
+    name: '&eSurvival Server'
     lore:
-      - '&7This is a custom textured skull.'
-      - '&7'
-      - '&7You can create your own skull texture'
-      - '&7and apply it to a skull item!'
-    itemflags: inventory-modify, animate, death-drops, self-drops
+    - '&7Click to go to the survival server!'
+    commands:
+      multi-click:
+      - 'server: survival'
+      - 'message: &eSending you to the survival server!'
+    commands-type: interact, inventory
+    commands-sound: BLOCK_NOTE_BLOCK_PLING
+    commands-cost: 10
+    commands-cooldown: 2
+    enchantment: FIRE_ASPECT:3
+    itemflags: inventory-modify, hide-attributes, death-drops, self-drops
     triggers: join, respawn, world-change
+    permission-node: itemjoin.bungee
     enabled-worlds: world, world_nether, world_the_end
-  arrow-item:
+  potion-arrow:
     id: TIPPED_ARROW
-    slot: 27
-    name: '&fDeath Arrow'
-    count: 16
     potion-effect: WITHER:1:20
+    slot: 27
+    count: 16
+    name: '&6Death Arrow'
     itemflags: death-drops, self-drops
     limit-modes: SURVIVAL, ADVENTURE
     triggers: join, respawn, world-change
@@ -221,7 +213,7 @@ items:
     slot: 29
     name: '&dSparkles'
     lore:
-      - '&7Right-Click me and watch me fly!'
+    - '&7Right-Click me and watch me fly!'
     firework:
       type: CREEPER
       flicker: true
@@ -235,16 +227,16 @@ items:
   potion-item:
     id: POTION
     slot: 31
-    name: '&4Draught of Madness'
+    name: '&c&nDraught of Madness'
     potion-effect: JUMP:2:120, INCREASE_DAMAGE:3:150, REGENERATION:1:160
     triggers: join, respawn, world-change
     enabled-worlds: world, world_nether, world_the_end
-  golden-apple-item:
+  potion-apple:
     id: GOLDEN_APPLE
     slot: 33
-    name: '&eApple of the Goddess'
+    name: '&dAn Apple'
     lore:
-      - '&7This is not any ordinary apple.'
+    - '&7This is not any ordinary apple.'
     potion-effect: JUMP:2:120, NIGHT_VISION:2:400, GLOWING:1:410, REGENERATION:1:160
     itemflags: death-drops, self-drops
     triggers: join, respawn, world-change
@@ -252,15 +244,20 @@ items:
   skull-item:
     id: PLAYER_HEAD
     slot: 35
-    name: '&b%player%'
-    skull-owner: '%player%'
+    name: '&fCyclone'
+    skull-texture:
+      '1': <delay:100>eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMGZlMzFlYWE4YThhZDhkZDhkN2FiOTZhODQyMzI5MDUzOWQzODdkODJkNDI2ODcwMWVjNjlkNDFhMWZjIn19fQ==
+      '2': <delay:100>eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTYxZGZkZGE3MTAyMmJmYWQ3OWVhYmJmYTU2YTE1MTE2NDdiMjAyYWQxMTM2ZmY5N2UzMWEwNmRiYWMxMGVjYiJ9fX0=
+      '3': <delay:100>eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZGFmNjJkNjJkMGE5MzZmMDdmZGZjMWM2MDcyMTY4NzVjOTkzZTViZWViY2U5NTNlOWM4NzI0YTI1ZmNiYTBiYyJ9fX0=
     lore:
-      - '&7Great for setting a'
-      - '&7players profile, like hypixel!'
-    itemflags: inventory-modify, death-drops, self-drops
+    - '&7This is a custom textured skull.'
+    - '&7'
+    - '&7You can create your own skull texture'
+    - '&7and apply it to a skull item!'
+    itemflags: inventory-modify, animate, death-drops, self-drops
     triggers: join, respawn, world-change
     enabled-worlds: world, world_nether, world_the_end
-  filler-pane-item-two:
+  random-pane-1:
     id: YELLOW_STAINED_GLASS_PANE
     slot: 28, 30, 32, 34, 18, 19, 21, 23, 25, 26
     name: '&f'
@@ -268,7 +265,7 @@ items:
     itemflags: inventory-modify, placement, death-drops, self-drops
     triggers: join, world-change
     enabled-worlds: world, world_nether, world_the_end
-  filler-pane-item-three:
+  random-pane-2:
     id: BLUE_STAINED_GLASS_PANE
     slot: 28, 30, 32, 34, 18, 19, 21, 23, 25, 26
     name: '&f'
@@ -276,7 +273,7 @@ items:
     itemflags: inventory-modify, placement, death-drops, self-drops
     triggers: join, world-change
     enabled-worlds: world, world_nether, world_the_end
-  filler-pane-item-four:
+  random-pane-3:
     id: PINK_STAINED_GLASS_PANE
     slot: 28, 30, 32, 34, 18, 19, 21, 23, 25, 26
     name: '&f'
@@ -287,31 +284,31 @@ items:
   helmet-item:
     id: DIAMOND_HELMET
     slot: helmet
-    name: '&5Helmet of Solitude'
+    name: '&aSolace'
     enchantment: PROTECTION_ENVIRONMENTAL:5
     itemflags: inventory-modify, death-drops, self-drops
     triggers: join
     enabled-worlds: world, world_nether, world_the_end
   chestplate-item:
-    id: DIAMOND_CHESTPLATE
+    id: IRON_CHESTPLATE
     slot: chestplate
-    name: '&5Chestplate of Reckoning'
+    name: '&aProtection Shell'
     enchantment: PROTECTION_ENVIRONMENTAL:5
     itemflags: inventory-modify, death-drops, self-drops
     triggers: join
     enabled-worlds: world, world_nether, world_the_end
   leggings-item:
-    id: DIAMOND_LEGGINGS
+    id: IRON_LEGGINGS
     slot: leggings
-    name: '&5Leggings of Strength'
+    name: '&aChains of Desire'
     enchantment: PROTECTION_ENVIRONMENTAL:3
     itemflags: inventory-modify, death-drops, self-drops
     triggers: join
     enabled-worlds: world, world_nether, world_the_end
   boots-item:
-    id: DIAMOND_BOOTS
+    id: IRON_BOOTS
     slot: boots
-    name: '&5Boots of Flight'
+    name: '&aSafety Slippers'
     enchantment: PROTECTION_ENVIRONMENTAL:3, PROTECTION_FALL:5
     itemflags: inventory-modify, death-drops, self-drops
     triggers: join
@@ -319,37 +316,7 @@ items:
   offhand-item:
     id: SHIELD
     slot: offhand
-    name: '&bShield of the Protector'
+    name: '&b&nThe Protector'
     itemflags: inventory-modify, death-drops, self-drops, unbreakable
-    triggers: join
-    enabled-worlds: world, world_nether, world_the_end
-  emerald-item:
-    id: EMERALD
-    slot: CRAFTING[0]
-    itemflags: inventory-modify, death-drops, self-drops
-    triggers: join
-    enabled-worlds: world, world_nether, world_the_end
-  diamond-item:
-    id: DIAMOND
-    slot: CRAFTING[1]
-    itemflags: inventory-modify, death-drops, self-drops
-    triggers: join
-    enabled-worlds: world, world_nether, world_the_end
-  iron-item:
-    id: IRON_INGOT
-    slot: CRAFTING[2]
-    itemflags: inventory-modify, death-drops, self-drops
-    triggers: join
-    enabled-worlds: world, world_nether, world_the_end
-  gold-item:
-    id: GOLD_INGOT
-    slot: CRAFTING[3]
-    itemflags: inventory-modify, death-drops, self-drops
-    triggers: join
-    enabled-worlds: world, world_nether, world_the_end
-  redstone-item:
-    id: REDSTONE
-    slot: CRAFTING[4]
-    itemflags: inventory-modify, death-drops, self-drops
     triggers: join
     enabled-worlds: world, world_nether, world_the_end
