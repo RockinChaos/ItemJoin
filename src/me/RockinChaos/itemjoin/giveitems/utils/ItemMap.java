@@ -1642,7 +1642,8 @@ public class ItemMap {
 		if (this.getMaterial().toString().equalsIgnoreCase("WRITTEN_BOOK") && this.bookPages != null && ServerHandler.hasSpecificUpdate("1_8")) {
 			Object localePages = null;
 			try { localePages = Reflection.getNMS("NBTTagList").getConstructor().newInstance(); } catch (Exception e) { ServerHandler.sendDebugTrace(e); }
-			if (ServerHandler.hasSpecificUpdate("1_14")) { this.set1_14JSONPages(player, localePages); } 
+			if (ServerHandler.hasSpecificUpdate("1_15")) { this.set1_15JSONPages(player, localePages); } 
+			else if (ServerHandler.hasSpecificUpdate("1_14")) { this.set1_14JSONPages(player, localePages); }
 			else { this.set1_13JSONPages(player, localePages); }
 		}
 	}
@@ -1664,6 +1665,18 @@ public class ItemMap {
 			try { 
 				textComponent = Utils.translateLayout(textComponent, player);
 				Object TagString = Reflection.getNMS("NBTTagString").getConstructor(String.class).newInstance(textComponent);
+				localePages.getClass().getMethod("add", int.class, Reflection.getNMS("NBTBase")).invoke(localePages, 0, TagString);
+			} catch (Exception e) { ServerHandler.sendDebugTrace(e); } 
+		}
+		try { this.invokePages(localePages); } catch (Exception e) { ServerHandler.sendDebugTrace(e); }
+	}
+	
+	private void set1_15JSONPages(Player player, Object localePages) {
+		for (int i = this.bookPages.size() - 1; i >= 0; i--) {
+			String textComponent = this.bookPages.get(i);
+			try { 
+				textComponent = Utils.translateLayout(textComponent, player);
+				Object TagString = Reflection.getNMS("NBTTagString").getMethod("a", String.class).invoke(null, textComponent);
 				localePages.getClass().getMethod("add", int.class, Reflection.getNMS("NBTBase")).invoke(localePages, 0, TagString);
 			} catch (Exception e) { ServerHandler.sendDebugTrace(e); } 
 		}
