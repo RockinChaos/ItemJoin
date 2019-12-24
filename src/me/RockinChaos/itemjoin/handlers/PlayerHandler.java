@@ -13,7 +13,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import de.domedd.betternick.BetterNick;
-import de.domedd.betternick.api.nickedplayer.NickedPlayer;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.utils.Legacy;
 
@@ -178,11 +177,13 @@ public class PlayerHandler {
 		Player args = null;
 		try { args = Bukkit.getPlayer(UUID.fromString(playerName)); } catch (Exception e) {}
 		if (playerName != null && ConfigHandler.getDepends().nickEnabled()) {
-			NickedPlayer np = new NickedPlayer(Legacy.getLegacyPlayer(playerName));
-			if (np.isNicked()) {
-			return Legacy.getLegacyPlayer(np.getRealName());
-			} else {
-				return Legacy.getLegacyPlayer(playerName);
+			try { 
+				de.domedd.betternick.api.nickedplayer.NickedPlayer np = new de.domedd.betternick.api.nickedplayer.NickedPlayer(Legacy.getLegacyPlayer(playerName));
+				if (np.isNicked()) { return Legacy.getLegacyPlayer(np.getRealName()); }
+				else { return Legacy.getLegacyPlayer(playerName); }
+			} catch (NoClassDefFoundError e) {
+				if (BetterNick.getApi().isPlayerNicked(Legacy.getLegacyPlayer(playerName))) { return Legacy.getLegacyPlayer(BetterNick.getApi().getRealName(Legacy.getLegacyPlayer(playerName))); }
+				else { return Legacy.getLegacyPlayer(playerName); }
 			}
 		} else if (args == null) { return Legacy.getLegacyPlayer(playerName); }
 		return args;
@@ -192,11 +193,13 @@ public class PlayerHandler {
 		if (player != null && player.getUniqueId() != null) {
 			return player.getUniqueId().toString();
 		} else if (player != null && ConfigHandler.getDepends().nickEnabled()) {
-			NickedPlayer np = new NickedPlayer(player);
-			if (np.isNicked()) {
-			return np.getRealName();
-			} else {
-				return player.getName();
+			try {
+				de.domedd.betternick.api.nickedplayer.NickedPlayer np = new de.domedd.betternick.api.nickedplayer.NickedPlayer(player);
+				if (np.isNicked()) { return np.getRealName();
+				} else { return player.getName(); }
+			} catch (NoClassDefFoundError e) {
+				if (BetterNick.getApi().isPlayerNicked(player)) { return BetterNick.getApi().getRealName(player);
+				} else { return player.getName(); }
 			}
 		} else if (player != null) {
 			return player.getName();
@@ -208,11 +211,13 @@ public class PlayerHandler {
 		if (player != null && player.getUniqueId() != null) {
 			return player.getUniqueId().toString();
 		} else if (player != null && ConfigHandler.getDepends().nickEnabled()) {
-			NickedPlayer np = new NickedPlayer((BetterNick) player);
-			if (np.isNicked()) {
-			return np.getRealName();
-			} else {
-				return player.getName();
+			try {
+				de.domedd.betternick.api.nickedplayer.NickedPlayer np = new de.domedd.betternick.api.nickedplayer.NickedPlayer((BetterNick) player);
+				if (np.isNicked()) { return np.getRealName();
+				} else { return player.getName(); }
+			} catch (NoClassDefFoundError e) {
+				if (BetterNick.getApi().isPlayerNicked((Player) player)) { return BetterNick.getApi().getRealName((Player) player);
+				} else { return player.getName(); }
 			}
 		} else if (player != null) {
 			return player.getName();
