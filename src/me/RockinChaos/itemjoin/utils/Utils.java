@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -16,7 +17,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import de.domedd.betternick.api.nickedplayer.NickedPlayer;
+
+import de.domedd.betternick.BetterNick;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.clip.placeholderapi.PlaceholderAPI;
@@ -157,6 +159,38 @@ public class Utils {
 		return -1;
 	}
 	
+	private static boolean commandWorld(String world, String stringLoc) {
+		String enabledCommandWorlds = ConfigHandler.getConfig("config.yml").getString("Active-Commands.enabled-worlds").replace(" ", "");
+		if (enabledCommandWorlds != null) {
+			String[] compareWorlds = enabledCommandWorlds.split(",");
+			for (String compareWorld: compareWorlds) {
+				if (compareWorld.equalsIgnoreCase(world) || compareWorld.equalsIgnoreCase("ALL") || compareWorld.equalsIgnoreCase("GLOBAL")) {
+					return true;
+				}
+			}
+		} else if (enabledCommandWorlds == null) {
+			return true;
+		}
+		return false;
+	}
+	
+	public static void triggerCommands(Player player) {
+		if ((ConfigHandler.getConfig("config.yml").getString("Active-Commands.enabled-worlds") != null && ConfigHandler.getConfig("config.yml").getStringList("Active-Commands.commands") != null) 
+				&& (!ConfigHandler.getConfig("config.yml").getString("Active-Commands.enabled-worlds").equalsIgnoreCase("DISABLED") || !ConfigHandler.getConfig("config.yml").getString("Active-Commands.enabled-worlds").equalsIgnoreCase("FALSE"))) {
+			if (commandWorld(player.getWorld().getName(), "enabled-worlds")) {
+				for (String commands: ConfigHandler.getConfig("config.yml").getStringList("Active-Commands.commands")) {
+					String formatCommand = Utils.translateLayout(commands, player).replace("first-join: ", "").replace("first-join:", "");
+					if (!ConfigHandler.getSQLData().hasFirstCommanded(player, formatCommand)) {
+						Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), formatCommand);
+						if (Utils.containsIgnoreCase(commands, "first-join:")) {
+							ConfigHandler.getSQLData().saveFirstCommandData(player, formatCommand);
+						}
+					}
+				}
+			}
+		}
+	}
+	
     public static String getNearbyPlayer(Player player, int range) {
 	    ArrayList < Location > sight = new ArrayList < Location > ();
 	    ArrayList < Entity > entities = (ArrayList < Entity > ) player.getNearbyEntities(range, range, range);
@@ -192,10 +226,16 @@ public class Utils {
 		String playerName = "EXEMPT";
 		
 		if (player != null && ConfigHandler.getDepends().nickEnabled()) {
-			NickedPlayer np = new NickedPlayer(player);
-			if (np.isNicked()) {
-			playerName = np.getRealName();
-			} else { playerName = player.getName(); }
+			try {
+				de.domedd.betternick.api.nickedplayer.NickedPlayer np = new de.domedd.betternick.api.nickedplayer.NickedPlayer(player);
+				if (np.isNicked()) {
+					playerName = np.getRealName();
+				} else { playerName = player.getName(); }
+			} catch (NoClassDefFoundError e) {
+				if (BetterNick.getApi().isPlayerNicked(player)) {
+					playerName = BetterNick.getApi().getRealName(player);
+				} else { playerName = player.getName(); }	
+			}
 		} else if (player != null) { playerName = player.getName(); }
 		
 		if (playerName != null && player != null && !(player instanceof ConsoleCommandSender)) {
