@@ -27,7 +27,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-import org.bukkit.inventory.meta.Damageable;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
@@ -279,7 +278,7 @@ public class ItemHandler {
 	public static short getDurability(ItemStack item) {
 		if (!ServerHandler.hasAquaticUpdate()) {
 			return Legacy.getLegacyDurability(item);
-		} else { return ((short) ((Damageable) item.getItemMeta()).getDamage()); }
+		} else { return ((short) ((org.bukkit.inventory.meta.Damageable) item.getItemMeta()).getDamage()); }
 	}
 	
 	public static ItemMeta setSkullOwner(ItemMeta tempmeta, String owner) {

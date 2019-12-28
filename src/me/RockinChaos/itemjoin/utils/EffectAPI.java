@@ -5,7 +5,6 @@ import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.FireworkEffect;
 import org.bukkit.FireworkEffect.Type;
-import org.bukkit.Particle;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
@@ -22,9 +21,9 @@ public class EffectAPI {
 		} else {
 			try {
 				String[] particleParts = commandParticle.split(":");
-				Particle particle;
+				org.bukkit.Particle particle;
 				int particleLife = 1;
-				particle = Particle.valueOf(particleParts[0]);
+				particle = org.bukkit.Particle.valueOf(particleParts[0]);
 				if (particleParts[1] != null && !particleParts[1].isEmpty() && Utils.isInt(particleParts[1])) { particleLife = Integer.parseInt(particleParts[1]); }
 				player.getWorld().spawnParticle(particle, player.getLocation(), particleLife);
 			} catch (Exception e) {

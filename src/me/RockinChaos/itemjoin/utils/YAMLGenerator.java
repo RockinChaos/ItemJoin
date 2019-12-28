@@ -29,7 +29,7 @@ public class YAMLGenerator {
 			itemsData.set("items.animated-panes.id.5", "<delay:20>ORANGE_STAINED_GLASS_PANE");
 			itemsData.set("items.animated-panes.id.6", "<delay:20>RED_STAINED_GLASS_PANE");
 			itemsData.set("items.banner-item.id", "WHITE_BANNER");
-			itemsData.set("items.animated-item.id", "OAK_SIGN");
+			itemsData.set("items.animated-sign.id", "OAK_SIGN");
 			itemsData.set("items.skull-item.id", "PLAYER_HEAD");
 			itemsData.set("items.potion-arrow.id", "TIPPED_ARROW");
 			itemsData.set("items.potion-arrow.name", "&fDeath Arrow");
@@ -55,7 +55,7 @@ public class YAMLGenerator {
 			itemsData.set("items.animated-panes.id.5", "<delay:20>ORANGE_STAINED_GLASS_PANE");
 			itemsData.set("items.animated-panes.id.6", "<delay:20>RED_STAINED_GLASS_PANE");
 			itemsData.set("items.banner-item.id", "WHITE_BANNER");
-			itemsData.set("items.animated-item.id", "SIGN");
+			itemsData.set("items.animated-sign.id", "SIGN");
 			itemsData.set("items.skull-item.id", "PLAYER_HEAD");
 			itemsData.set("items.potion-arrow.id", "TIPPED_ARROW");
 			itemsData.set("items.potion-arrow.name", "&fDeath Arrow");
@@ -81,7 +81,7 @@ public class YAMLGenerator {
 			itemsData.set("items.animated-panes.id.5", "<delay:20>STAINED_GLASS_PANE:1");
 			itemsData.set("items.animated-panes.id.6", "<delay:20>STAINED_GLASS_PANE:14");
 			itemsData.set("items.banner-item.id", "BANNER");
-			itemsData.set("items.animated-item.id", "SIGN");
+			itemsData.set("items.animated-sign.id", "SIGN");
 			itemsData.set("items.skull-item.id", "SKULL_ITEM:3");
 			itemsData.set("items.potion-arrow.id", "TIPPED_ARROW");
 			itemsData.set("items.potion-arrow.name", "&fDeath Arrow");
@@ -107,7 +107,7 @@ public class YAMLGenerator {
 			itemsData.set("items.animated-panes.id.5", "<delay:20>STAINED_GLASS_PANE:1");
 			itemsData.set("items.animated-panes.id.6", "<delay:20>STAINED_GLASS_PANE:14");
 			itemsData.set("items.banner-item.id", "BANNER");
-			itemsData.set("items.animated-item.id", "SIGN");
+			itemsData.set("items.animated-sign.id", "SIGN");
 			itemsData.set("items.skull-item.id", "SKULL_ITEM:3");
 			itemsData.set("items.potion-arrow.id", "ARROW");
 			itemsData.set("items.potion-arrow.name", "&fArrow");
@@ -142,7 +142,7 @@ public class YAMLGenerator {
 			itemsData.set("items.melooooon-item.itemflags", "hide-attributes, self-drops, CreativeBypass");
 			itemsData.set("items.melooooon-item.triggers", "join, respawn, world-change, region-enter");
 			itemsData.set("items.melooooon-item.enabled-worlds", "world, world_nether, world_the_end");
-			itemsData.set("items.animated-item.id", "SIGN");
+			itemsData.set("items.animated-sign.id", "SIGN");
 			itemsData.set("items.skull-item.id", "SKULL_ITEM:3");
 			itemsData.set("items.potion-arrow.id", "ARROW");
 			itemsData.set("items.potion-arrow.name", "&fArrow");
