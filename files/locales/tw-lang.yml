@@ -26,6 +26,7 @@ Commands:
   UI:
     creatorLaunched: '&a已打開物品編輯器'
     itemSaved: '&e%item% &a成功儲存！'
+    itemRemoved: '&e%item% &c已成功刪除！'
     notInteger: '&c&l&n錯誤:&c 輸入的內容 &4%input% &c不是數字'
     noMatch: '&c&l&n錯誤:&c 輸入的內容 &4%input% &c不是物品ID'
     inputType: '&a輸入 &e%type% &a在你想要的物品上'

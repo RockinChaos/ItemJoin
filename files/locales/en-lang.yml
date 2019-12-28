@@ -26,6 +26,7 @@ Commands:
   UI:
     creatorLaunched: '&aItem creator has been opened.'
     itemSaved: '&e%item% &ahas been successfully saved.'
+    itemRemoved: '&e%item% &chas been successfully removed.'
     notInteger: '&c&l&nERROR:&c The input value &4%input% &cis not an integer value!'
     noMatch: '&c&l&nERROR:&c The input value &4%input% &cis not an proper material!'
     inputType: '&aType the &e%type% &athat you want to have on your item.'

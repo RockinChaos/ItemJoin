@@ -26,6 +26,7 @@ Commands:
   UI:
     creatorLaunched: '&aEl creador de items ha sido abierto.'
     itemSaved: '&e%item% &afue guardado correctamente.'
+    itemRemoved: '&e%item% &cfue eliminado correctamente.'
     notInteger: '&c&l&nERROR: &c¡El valor de entrada &4%input%&c, no es un número entero!'
     noMatch: '&c¡&l&nERROR: &c¡El valor de entrada &4%input% &cno es un material admisible!'
     inputType: '&aEscribe el &e%type% &aque quieres tener en tu item.'

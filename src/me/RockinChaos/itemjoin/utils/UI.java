@@ -110,14 +110,14 @@ public class UI {
 	private void setButton(final Player player, final ItemMap itemMap, final Interface pagedPane) {
 		final ItemStack item = itemMap.getTempItem().clone();
 		if (itemMap.isAnimated() || itemMap.isDynamic()) { this.setModifyMenu(true, player); itemMap.getAnimationHandler().get(player).setMenu(true, 0); }
-		pagedPane.addButton(new Button(ItemHandler.addLore(item, "&7", "&6---------------------------", "&7*Click to modify this custom item.", "&9&lNode: &a" + itemMap.getConfigName(), "&7"), event ->  this.creatingPane(player, itemMap)));
+		pagedPane.addButton(new Button(ItemHandler.addLore(item, "&7", "&6---------------------------", "&7*Click to modify this custom item.", "&9&lNode: &a" + itemMap.getConfigName(), "&7"), event ->  this.choicePane(player, itemMap, item)));
 	}
 	
 	private void setPage(final Player player, final Interface modifyPane, final List < ItemMap > items) {
 		ItemMap currentItem = null;
 		boolean crafting = false;
 		boolean arbitrary = false;
-		Interface craftingPane = new Interface(false, 3, this.GUIName);
+		Interface craftingPane = new Interface(false, 4, this.GUIName);
 		craftingPane.addButton(new Button(this.fillerPaneGItem), 3);
 		currentItem = ItemHandler.getItemMap("CRAFTING[1]", items);
 		if (currentItem != null) {
@@ -136,7 +136,16 @@ public class UI {
 		} else {
 			craftingPane.addButton(new Button(this.fillerPaneGItem));
 		}
-		craftingPane.addButton(new Button(this.fillerPaneGItem), 6);
+		craftingPane.addButton(new Button(this.fillerPaneGItem), 10);
+		currentItem = ItemHandler.getItemMap("CRAFTING[0]", items);
+		if (currentItem != null) {
+			crafting = true;
+			this.setButton(player, currentItem, craftingPane);
+			items.remove(currentItem);
+		} else {
+			craftingPane.addButton(new Button(this.fillerPaneGItem));
+		}
+		craftingPane.addButton(new Button(this.fillerPaneGItem), 4);
 		currentItem = ItemHandler.getItemMap("CRAFTING[3]", items);
 		if (currentItem != null) {
 			crafting = true;
@@ -329,6 +338,34 @@ public class UI {
 			itemMap.setListPages(savePages);
 		}
 		this.switchPane(player, itemMap, 0);
+	}
+	
+	private void choicePane(final Player player, final ItemMap itemMap, final ItemStack item) {
+		Interface choicePane = new Interface(false, 3, this.GUIName);
+		choicePane.addButton(new Button(this.fillerPaneBItem), 4);
+		choicePane.addButton(new Button(item));
+		choicePane.addButton(new Button(this.fillerPaneBItem), 4);
+		choicePane.addButton(new Button(this.fillerPaneBItem), 3);
+		choicePane.addButton(new Button(ItemHandler.getItem("SUGAR", 1, true, "&b&lModify", "&7", "&7*Modify this item.", "&7Make changes to the item name, lore,", "&7permissions, enabled-worlds, and more."), event -> {
+			this.creatingPane(player, itemMap);
+		}));
+		choicePane.addButton(new Button(this.fillerPaneBItem));
+		choicePane.addButton(new Button(ItemHandler.getItem("REDSTONE", 1, true, "&c&lDelete", "&7", "&7*Delete this item.", "&7This will remove the item from the", "&7items.yml and will no longer be useable.", "&c&lWARNING: &7This &lCANNOT &7be undone!"), event -> {
+			itemMap.removeFromConfig();
+			String[] placeHolders = Language.newString();
+			placeHolders[3] = itemMap.getConfigName();
+			Language.sendLangMessage("Commands.UI.itemRemoved", player, placeHolders);
+			ConfigHandler.getSQLData().executeLaterStatements();
+			ItemUtilities.closeAnimations();
+			ItemUtilities.clearItems();
+			ConfigHandler.generateData(null);
+			player.closeInventory();
+		}));
+		choicePane.addButton(new Button(this.fillerPaneBItem), 3);
+		choicePane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the modify menu"), event -> this.startModify(player)));
+		choicePane.addButton(new Button(this.fillerPaneBItem), 7);
+		choicePane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the modify menu"), event -> this.startModify(player)));
+		choicePane.open(player);
 	}
 	
 	private void creatingPane(final Player player, final ItemMap itemMap) {
