@@ -1,9 +1,11 @@
 package me.RockinChaos.itemjoin.utils;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
@@ -23,9 +25,14 @@ import org.bukkit.inventory.meta.BannerMeta;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.FireworkEffectMeta;
 import org.bukkit.inventory.meta.FireworkMeta;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
+
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemCommand;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemCommand.ActionType;
@@ -39,6 +46,7 @@ import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.utils.interfaces.Button;
 import me.RockinChaos.itemjoin.utils.interfaces.Interface;
+import me.arcaniax.hdb.api.HeadDatabaseAPI;
 
 public class UI {
 	private String GUIName = Utils.colorFormat("&7           &0&n ItemJoin Menu");
@@ -302,7 +310,9 @@ public class UI {
 		} else if (itemMap.getMaterial() == Material.WRITTEN_BOOK) {
 			itemMap.setAuthor(((BookMeta) item.getItemMeta()).getAuthor().replace("§", "&"));
 			itemMap.setTitle(((BookMeta) item.getItemMeta()).getTitle().replace("§", "&"));
-			itemMap.setGeneration(((BookMeta) item.getItemMeta()).getGeneration());
+			if (ServerHandler.hasSpecificUpdate("1_10")) {
+				itemMap.setGeneration(((BookMeta) item.getItemMeta()).getGeneration());
+			}
 			List < String > newPages = new ArrayList < String > ();
 			for (String page: ((BookMeta) item.getItemMeta()).getPages()) {
 				newPages.add(page.replace("§", "&"));
@@ -384,7 +394,7 @@ public class UI {
 			}
 		}
 		creatingPane.addButton(new Button(this.fillerPaneGItem), 4);
-		creatingPane.addButton(new Button(this.headerStack(itemMap)));
+		creatingPane.addButton(new Button(this.headerStack(player, itemMap)));
 		creatingPane.addButton(new Button(this.fillerPaneGItem), 4);
 		creatingPane.addButton(new Button(ItemHandler.getItem(itemMap.getMaterial().toString() + ":" + itemMap.getDataValue(), 1, false, "&c&lMaterial", "&7", "&7*Set the material of the item.", "&9&lMATERIAL: &a" + 
 		itemMap.getMaterial().toString() + (itemMap.getDataValue() != 0 ? ":" + itemMap.getDataValue() : "")), event -> { 
@@ -395,7 +405,7 @@ public class UI {
 			}
 			}));
 		creatingPane.addButton(new Button(ItemHandler.getItem("GLASS", 1, false, "&c&lSlot", "&7", "&7*Set the slot that the", "&7item will be given in.", (itemMap.getMultipleSlots() != null && 
-				!itemMap.getMultipleSlots().isEmpty() ? "&9&lSlot(s): &a" + slotList : "&9&lSlot: &a" + itemMap.getSlot())), event -> this.switchPane(player, itemMap, 1)));
+				!itemMap.getMultipleSlots().isEmpty() ? "&9&lSlot(s): &a" + slotList : "&9&lSlot: &a" + itemMap.getSlot().toUpperCase())), event -> this.switchPane(player, itemMap, 1)));
 		creatingPane.addButton(new Button(ItemHandler.getItem("DIAMOND", itemMap.getCount(), false, "&b&lCount", "&7", "&7*Set the amount of the", "&7item to be given.", "&9&lCOUNT: &a" + 
 				itemMap.getCount()), event -> this.countPane(player, itemMap)));
 		creatingPane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, false, "&b&lName", "&7", "&7*Set the name of the item.", "&9&lNAME: &f" + Utils.nullCheck(itemMap.getCustomName())), event -> {
@@ -450,7 +460,7 @@ public class UI {
 		(Utils.nullCheck(itemMap.getItemFlags()) != "NONE" ? "&a" + itemflagsList : "NONE")), event -> this.flagPane(player, itemMap)));
 		creatingPane.addButton(new Button(ItemHandler.getItem("REDSTONE", 1, false, "&b&lTriggers", "&7", "&7*When the players act upon these", "&7events, the item will be given.", "&9&lTRIGGERS: &a" +
 		(Utils.nullCheck(itemMap.getTriggers()) != "NONE" ? "&a" + triggersList : "NONE")), event -> this.triggerPane(player, itemMap)));
-		creatingPane.addButton(new Button(ItemHandler.getItem("76", 1, false, "&b&lPermission Node", "&7", "&7*Custom permission node that", "&7will be required by a permission", "&7plugin to receive the item.", "&7&lNote: &7Do NOT include", 
+		creatingPane.addButton(new Button(ItemHandler.getItem((ServerHandler.hasSpecificUpdate("1_15") ? "REDSTONE_TORCH" : "76"), 1, false, "&b&lPermission Node", "&7", "&7*Custom permission node that", "&7will be required by a permission", "&7plugin to receive the item.", "&7&lNote: &7Do NOT include", 
 				"&7any spaces or special characters", "&9&lPERMISSION-NODE: &a" + Utils.nullCheck(itemMap.getPermissionNode())), event -> {
 			if (Utils.nullCheck(itemMap.getPermissionNode()) != "NONE") {
 				itemMap.setPerm(null);
@@ -1188,11 +1198,11 @@ public class UI {
 		this.listCommands(itemMap, ActionType.MULTI_CLICK_AIR)), event -> {
 			this.commandListPane(player, itemMap, ActionType.MULTI_CLICK_AIR);
 		}));
-		clickPane.addButton(new Button(ItemHandler.getItem("OAK_DOOR", 1, false, "&e&lMulti-Click-Block", "&7", "&7*Commands that will execute only", "&7when left and right", "&7clicking a block.", "&7", "&9&lCommands: &a" + 
+		clickPane.addButton(new Button(ItemHandler.getItem((ServerHandler.hasAquaticUpdate() ? "OAK_DOOR" : (ServerHandler.hasSpecificUpdate("1_8") ? "324" : "64")), 1, false, "&e&lMulti-Click-Block", "&7", "&7*Commands that will execute only", "&7when left and right", "&7clicking a block.", "&7", "&9&lCommands: &a" + 
 		this.listCommands(itemMap, ActionType.MULTI_CLICK_BLOCK)), event -> {
 			this.commandListPane(player, itemMap, ActionType.MULTI_CLICK_BLOCK);
 		}));
-		clickPane.addButton(new Button(ItemHandler.getItem("GOLDEN_SWORD", 1, false, "&e&lLeft-Click", "&7", "&7*Commands that will execute only", "&7when left clicking.", "&7", "&9&lCommands: &a" + 
+		clickPane.addButton(new Button(ItemHandler.getItem((ServerHandler.hasAquaticUpdate() ? "GOLDEN_SWORD" : "GOLD_SWORD"), 1, false, "&e&lLeft-Click", "&7", "&7*Commands that will execute only", "&7when left clicking.", "&7", "&9&lCommands: &a" + 
 		this.listCommands(itemMap, ActionType.LEFT_CLICK_ALL)), event -> {
 			this.commandListPane(player, itemMap, ActionType.LEFT_CLICK_ALL);
 		}));
@@ -1200,11 +1210,11 @@ public class UI {
 		this.listCommands(itemMap, ActionType.LEFT_CLICK_AIR)), event -> {
 			this.commandListPane(player, itemMap, ActionType.LEFT_CLICK_AIR);
 		}));
-		clickPane.addButton(new Button(ItemHandler.getItem("OAK_DOOR", 1, false, "&e&lLeft-Click-Block", "&7", "&7*Commands that will execute only", "&7when left clicking a block.", "&7", "&9&lCommands: &a" + 
+		clickPane.addButton(new Button(ItemHandler.getItem((ServerHandler.hasAquaticUpdate() ? "OAK_DOOR" : (ServerHandler.hasSpecificUpdate("1_8") ? "324" : "64")), 1, false, "&e&lLeft-Click-Block", "&7", "&7*Commands that will execute only", "&7when left clicking a block.", "&7", "&9&lCommands: &a" + 
 		this.listCommands(itemMap, ActionType.LEFT_CLICK_BLOCK)), event -> {
 			this.commandListPane(player, itemMap, ActionType.LEFT_CLICK_BLOCK);
 		}));
-		clickPane.addButton(new Button(ItemHandler.getItem("GOLDEN_SWORD", 1, false, "&e&lRight-Click", "&7", "&7*Commands that will execute only", "&7when right clicking.", "&7", "&9&lCommands: &a" + 
+		clickPane.addButton(new Button(ItemHandler.getItem((ServerHandler.hasAquaticUpdate() ? "GOLDEN_SWORD" : "GOLD_SWORD"), 1, false, "&e&lRight-Click", "&7", "&7*Commands that will execute only", "&7when right clicking.", "&7", "&9&lCommands: &a" + 
 		this.listCommands(itemMap, ActionType.RIGHT_CLICK_ALL)), event -> {
 			this.commandListPane(player, itemMap, ActionType.RIGHT_CLICK_ALL);
 		}));
@@ -1212,11 +1222,11 @@ public class UI {
 		this.listCommands(itemMap, ActionType.RIGHT_CLICK_AIR)), event -> {
 			this.commandListPane(player, itemMap, ActionType.RIGHT_CLICK_AIR);
 		}));
-		clickPane.addButton(new Button(ItemHandler.getItem("OAK_DOOR", 1, false, "&e&lRight-Click-Block", "&7", "&7*Commands that will execute only", "&7when right clicking a block.", "&7", "&9&lCommands: &a" + 
+		clickPane.addButton(new Button(ItemHandler.getItem((ServerHandler.hasAquaticUpdate() ? "OAK_DOOR" : (ServerHandler.hasSpecificUpdate("1_8") ? "324" : "64")), 1, false, "&e&lRight-Click-Block", "&7", "&7*Commands that will execute only", "&7when right clicking a block.", "&7", "&9&lCommands: &a" + 
 		this.listCommands(itemMap, ActionType.RIGHT_CLICK_BLOCK)), event -> {
 			this.commandListPane(player, itemMap, ActionType.RIGHT_CLICK_BLOCK);
 		}));
-		clickPane.addButton(new Button(ItemHandler.getItem("PISTON", 1, false, "&e&lPhysical", "&7", "&7*Commands that will execute", "&7when held in the player hand", "&7and they interact with a object", "&7such as a pressure plate.", "&7", 
+		clickPane.addButton(new Button(ItemHandler.getItem((ServerHandler.hasAquaticUpdate() ? "PISTON" : "PISTON_BASE"), 1, false, "&e&lPhysical", "&7", "&7*Commands that will execute", "&7when held in the player hand", "&7and they interact with a object", "&7such as a pressure plate.", "&7", 
 				"&9&lCommands: &a" + this.listCommands(itemMap, ActionType.PHYSICAL)), event -> {
 			this.commandListPane(player, itemMap, ActionType.PHYSICAL);
 		}));
@@ -1643,14 +1653,14 @@ public class UI {
 		particlePane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item commands menu."), event -> {
 			this.commandPane(player, itemMap);
 		}));
-		particlePane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:11", 1, false, "&fFIREWORK_FAKE", "&7", "&7*Click to set the lifetime", "&7commands-particle of the item."), event -> this.lifePane(player, itemMap, "FIREWORK", 1)));
+		particlePane.addButton(new Button(ItemHandler.getItem("SUGAR", 1, false, "&fFIREWORK_FAKE", "&7", "&7*Click to set the lifetime", "&7commands-particle of the item."), event -> this.lifePane(player, itemMap, "FIREWORK", 1)));
 		if (ServerHandler.hasCombatUpdate()) {
 			for (org.bukkit.Particle particle: org.bukkit.Particle.values()) {
-				particlePane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:11", 1, false, "&f" + particle.name(), "&7", "&7*Click to set the", "&7commands-particle of the item."), event -> this.lifePane(player, itemMap, particle.name(), 0)));
+				particlePane.addButton(new Button(ItemHandler.getItem("SUGAR", 1, false, "&f" + particle.name(), "&7", "&7*Click to set the", "&7commands-particle of the item."), event -> this.lifePane(player, itemMap, particle.name(), 0)));
 			}
 		} else {
 			for (org.bukkit.Effect effect: org.bukkit.Effect.values()) {
-				particlePane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:11", 1, false, "&f" + effect.name(), "&7", "&7*Click to set the", "&7commands-particle of the item."), event -> this.lifePane(player, itemMap, effect.name(), 0)));
+				particlePane.addButton(new Button(ItemHandler.getItem("SUGAR", 1, false, "&f" + effect.name(), "&7", "&7*Click to set the", "&7commands-particle of the item."), event -> this.lifePane(player, itemMap, effect.name(), 0)));
 			}
 		}
 		particlePane.open(player);
@@ -1978,7 +1988,7 @@ public class UI {
 			}
 			this.flagPane(player, itemMap);
 		}));
-		flagPane.addButton(new Button(ItemHandler.getItem((ServerHandler.hasAquaticUpdate() ? "OAK_DOOR" : (ServerHandler.hasCombatUpdate() ? "324" : "64")), 1, itemMap.isCountLock(), "&a&l&nCount Lock", "&7", "&7*Locks the items count which", 
+		flagPane.addButton(new Button(ItemHandler.getItem((ServerHandler.hasAquaticUpdate() ? "OAK_DOOR" : (ServerHandler.hasSpecificUpdate("1_8") ? "324" : "64")), 1, itemMap.isCountLock(), "&a&l&nCount Lock", "&7", "&7*Locks the items count which", 
 				"&7allows infinite consumption of the item.", "&9&lENABLED: &a" + (itemMap.isCountLock() + "").toUpperCase()), event -> {
 			if (itemMap.isCountLock()) {
 				itemMap.setCountLock(false);
@@ -3482,7 +3492,7 @@ public class UI {
 	private void otherPane(final Player player, final ItemMap itemMap) {
 		Interface otherPane = new Interface(false, 3, this.GUIName);
 		otherPane.addButton(new Button(this.fillerPaneGItem), 4);
-		otherPane.addButton(new Button(this.headerStack(itemMap)));
+		otherPane.addButton(new Button(this.headerStack(player, itemMap)));
 		otherPane.addButton(new Button(this.fillerPaneGItem), 4);
 		if (itemMap.getMaterial().toString().contains("WRITTEN_BOOK")) {
 			otherPane.addButton(new Button(this.fillerPaneGItem), 3);
@@ -3658,7 +3668,7 @@ public class UI {
 		otherPane.open(player);
 	}
 	
-	private ItemStack headerStack(final ItemMap itemMap) {
+	private ItemStack headerStack(final Player player, final ItemMap itemMap) {
 		String slotList = "";
 		String slotString = "";
 		if (Utils.nullCheck(itemMap.getMultipleSlots().toString()) != "NONE") {
@@ -3725,10 +3735,11 @@ public class UI {
 				colorList += "&a" + split + " /n ";
 			}
 		}
-		return ItemHandler.getItem(itemMap.getMaterial().toString(), 1, false, "&7*&6&l&nItem Information", "&7", "&9&lNode: &a" + itemMap.getConfigName(), "&9&lMaterial: &a" 
+		
+		ItemStack item = ItemHandler.getItem(itemMap.getMaterial().toString() + ":" + itemMap.getDataValue(), 1, false, "&7*&6&l&nItem Information", "&7", "&9&lNode: &a" + itemMap.getConfigName(), "&9&lMaterial: &a" 
 		+ itemMap.getMaterial().toString() + (itemMap.getDataValue() != 0 ? ":" + itemMap.getDataValue() : ""), 
-				(itemMap.getMultipleSlots() != null && !itemMap.getMultipleSlots().isEmpty() ? "&9&lSlot(s): &a" + slotList : "&9&lSlot: &a" + itemMap.getSlot()), "&9&lCount: &a" + itemMap.getCount(), 
-				(Utils.nullCheck(itemMap.getCustomName()) != "NONE" ? "&9&lName: &a" + itemMap.getCustomName() : ""), (Utils.nullCheck(itemMap.getCustomLore().toString()) != "NONE" ? "&9&lLore: &a" + Utils.nullCheck(itemMap.getCustomLore().toString()) : ""), 
+				(itemMap.getMultipleSlots() != null && !itemMap.getMultipleSlots().isEmpty() ? "&9&lSlot(s): &a" + slotList : "&9&lSlot: &a" + itemMap.getSlot().toUpperCase()), "&9&lCount: &a" + itemMap.getCount(), 
+				(Utils.nullCheck(itemMap.getCustomName()) != "NONE" ? "&9&lName: &a" + itemMap.getCustomName() : ""), (Utils.nullCheck(itemMap.getCustomLore().toString()) != "NONE" ? "&9&lLore: &a" + Utils.nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",").substring(0, 40) : ""), 
 				(Utils.nullCheck(itemMap.getDurability() + "&7") != "NONE" ? "&9&lDurability: &a" + itemMap.getDurability() : ""), (itemMap.getCommands().length != 0 ? "&9&lCommands: &aYES" : ""), 
 				(Utils.nullCheck(itemMap.getCommandCost() + "&7") != "NONE" ? "&9&lCommands-Cost: &a" + itemMap.getCommandCost() : ""), (Utils.nullCheck(itemMap.getCommandType() + "") != "NONE" ? "&9&lCommands-Type: &a" + itemMap.getCommandType() : ""), 
 				(Utils.nullCheck(itemMap.getCommandSequence() + "") != "NONE" ? "&9&lCommands-Sequence: &a" + itemMap.getCommandSequence() : ""), 
@@ -3751,6 +3762,26 @@ public class UI {
 				(Utils.nullCheck(itemMap.getFireworkType() + "") != "NONE" ? "&9&lFirework Type: &a" + itemMap.getFireworkType().name() : ""), 
 				(Utils.nullCheck(itemMap.getFireworkPower() + "&7") != "NONE" ? "&9&lFirework Power: &a" + itemMap.getFireworkPower() : ""), (Utils.nullCheck(colorList) != "NONE" ? "&9&lFirework Color(s): &a" + colorList : ""), 
 				(itemMap.getFireworkTrail() ? "&9&lFirework Trail: &aENABLED" : ""), (itemMap.getFireworkFlicker() ? "&9&lFirework Flicker: &aENABLED" : ""));
+		if (ItemHandler.isSkull(itemMap.getMaterial())) {
+			ItemMeta itemMeta = item.getItemMeta();
+			if (itemMap.getSkull() != null) {
+				itemMeta = ItemHandler.setSkullOwner(itemMeta, Utils.translateLayout(itemMap.getSkull(), player));
+			} else if (itemMap.getSkullTexture() != null && !itemMap.isHeadDatabase()) {
+				try {
+					GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
+					gameProfile.getProperties().put("textures", new Property("textures", new String(itemMap.getSkullTexture())));
+					Field declaredField = itemMeta.getClass().getDeclaredField("profile");
+					declaredField.setAccessible(true);
+					declaredField.set(itemMeta, gameProfile);
+				} catch (Exception e) { ServerHandler.sendDebugTrace(e); }
+			} else if (itemMap.isHeadDatabase() && itemMap.getSkullTexture() != null) {
+				HeadDatabaseAPI api = new HeadDatabaseAPI();
+				ItemStack sk = api.getItemHead(itemMap.getSkullTexture());
+				item = (sk != null ? sk : item.clone());
+			}
+			item.setItemMeta(itemMeta);
+		}
+		return item;
 	}
 	
 	private boolean specialItem(final ItemMap itemMap) {

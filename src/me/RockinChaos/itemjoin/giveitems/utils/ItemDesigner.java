@@ -17,7 +17,6 @@ import org.bukkit.FireworkEffect.Type;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.inventory.meta.BookMeta.Generation;
 import org.bukkit.map.MapView;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -837,9 +836,9 @@ public class ItemDesigner {
 	private void setBookGeneration(ItemMap itemMap) {
 		if (ServerHandler.hasSpecificUpdate("1_10") && itemMap.getMaterial().toString().equalsIgnoreCase("WRITTEN_BOOK")) {
 			if (itemMap.getNodeLocation().getString(".generation") != null) {
-				itemMap.setGeneration(Generation.valueOf(itemMap.getNodeLocation().getString(".generation")));
+				itemMap.setGeneration(org.bukkit.inventory.meta.BookMeta.Generation.valueOf(itemMap.getNodeLocation().getString(".generation")));
 			} else {
-				itemMap.setGeneration(Generation.ORIGINAL);
+				itemMap.setGeneration(org.bukkit.inventory.meta.BookMeta.Generation.ORIGINAL);
 			}
 		}
 	}

@@ -27,10 +27,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.inventory.meta.BookMeta.Generation;
 import org.bukkit.inventory.meta.BannerMeta;
 import org.bukkit.inventory.meta.BookMeta;
-import org.bukkit.inventory.meta.Damageable;
+import org.bukkit.inventory.meta.BookMeta.Generation;
 import org.bukkit.inventory.meta.FireworkEffectMeta;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -90,7 +89,7 @@ public class ItemMap {
 	
 	private String author;
 	private String title;
-	private Generation generation;
+	private Object generation;
 	private List < String > bookPages = new ArrayList < String > ();
 	private List < List <String> > listPages = new ArrayList < List <String> > ();
 	
@@ -783,7 +782,7 @@ public class ItemMap {
 		this.title = title;
 	}
 	
-	public void setGeneration(Generation gen) {
+	public void setGeneration(org.bukkit.inventory.meta.BookMeta.Generation gen) {
 		this.generation = gen;
 	}
 	
@@ -1058,8 +1057,8 @@ public class ItemMap {
 		return this.title;
 	}
 	
-	public Generation getGeneration() {
-		return this.generation;
+	public org.bukkit.inventory.meta.BookMeta.Generation getGeneration() {
+		return (Generation) this.generation;
 	}
 	
 	public List <String> getPages() {
@@ -1731,7 +1730,7 @@ public class ItemMap {
 	private void setDurability() {
 		if (this.durability != null && (this.data == null || this.data == 0)) {
 			if (ServerHandler.hasAquaticUpdate()) {
-				((Damageable) this.tempMeta).setDamage(this.durability);
+				((org.bukkit.inventory.meta.Damageable) this.tempMeta).setDamage(this.durability);
 			} else {
 				Legacy.setLegacyDurability(this.tempItem, this.durability);
 			}
@@ -1741,7 +1740,7 @@ public class ItemMap {
 	private void setData() {
 		if (this.data != null) {
 			if (ServerHandler.hasAquaticUpdate()) {
-				((Damageable) this.tempMeta).setDamage(this.data);
+				((org.bukkit.inventory.meta.Damageable) this.tempMeta).setDamage(this.data);
 			} else {
 				Legacy.setLegacyDurability(this.tempItem, this.data);
 			}
@@ -1810,8 +1809,8 @@ public class ItemMap {
 			((BookMeta) this.tempMeta).setTitle(this.title);
 		}
 		
-		if (this.generation != null) {
-			((BookMeta) this.tempMeta).setGeneration(this.generation);
+		if (this.generation != null && ServerHandler.hasSpecificUpdate("1_10")) {
+			((BookMeta) this.tempMeta).setGeneration((Generation) this.generation);
 		}
 	}
 	
@@ -2340,10 +2339,10 @@ public class ItemMap {
 	public ItemMap clone() {
         try {
             Object clone = this.getClass().newInstance();
-            for (Field field : this.getClass().getDeclaredFields()) {
-                field.setAccessible(true);
-                field.set(clone, field.get(this));
-            }
+	            for (Field field : this.getClass().getDeclaredFields()) {
+	                field.setAccessible(true);
+	                field.set(clone, field.get(this));
+	            }
             return (ItemMap)clone;
         } catch(Exception e) { ServerHandler.sendDebugTrace(e); return this; }
     }
