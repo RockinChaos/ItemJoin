@@ -414,7 +414,7 @@ public class ItemDesigner {
 //  Adds the custom name to the items display name. //
 //  =============================================== //
 	private String encodeName(ItemMap itemMap, String text) {
-		return (text + itemMap.getLegacySecret());
+		return ("&f" + text + itemMap.getLegacySecret());
 	}
 	
 	private String getActualName(ItemMap itemMap) {

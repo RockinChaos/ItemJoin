@@ -2191,6 +2191,14 @@ public class ItemMap {
 		this.playersOnCooldown.put(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player), System.currentTimeMillis());
 	}
 	
+	public void removeFromConfig() {
+		File itemFile =  new File (ItemJoin.getInstance().getDataFolder(), "items.yml");
+		FileConfiguration itemData = YamlConfiguration.loadConfiguration(itemFile);
+		if (ConfigHandler.getConfig("items.yml").getString("items." + this.configName) != null) { itemData.set("items." + this.configName, null); } 
+		try { itemData.save(itemFile); ConfigHandler.getConfigData("items.yml"); ConfigHandler.getConfig("items.yml").options().copyDefaults(false); } 
+		catch (Exception e) { ItemJoin.getInstance().getServer().getLogger().severe("Could not remove the custom item " + this.configName + " from the items.yml data file!"); ServerHandler.sendDebugTrace(e); }	
+	}
+	
 	public void saveToConfig() {
 		File itemFile =  new File (ItemJoin.getInstance().getDataFolder(), "items.yml");
 		FileConfiguration itemData = YamlConfiguration.loadConfiguration(itemFile);
@@ -2211,7 +2219,12 @@ public class ItemMap {
 		if (this.count > 1) { itemData.set("items." + this.configName + ".count", this.count); }
 		if (this.durability != null && this.durability > 0) { itemData.set("items." + this.configName + ".durability", this.durability); }
 		if (this.author != null && !this.author.isEmpty()) { itemData.set("items." + this.configName + ".author", this.author.replace("§", "&")); }
-		if (this.customName != null && !this.customName.isEmpty() && (this.dynamicNames == null || this.dynamicNames.isEmpty())) { itemData.set("items." + this.configName + ".name", this.customName.replace("§", "&")); }
+		if (this.customName != null && !this.customName.isEmpty() && (this.dynamicNames == null || this.dynamicNames.isEmpty())) { 
+			String setName = this.customName.replace(this.getLegacySecret(), "").replace("§", "&");
+			ServerHandler.sendConsoleMessage("1");
+			if (setName.startsWith("&f") && (!ConfigHandler.dataTagsEnabled() || !ServerHandler.hasSpecificUpdate("1_8"))) { ServerHandler.sendConsoleMessage("yes"); setName = setName.substring(2, setName.length()); }
+			itemData.set("items." + this.configName + ".name", setName); 
+			}
 		else if (this.dynamicNames != null && !this.dynamicNames.isEmpty()) { 
 			for (int i = 0; i < this.dynamicNames.size(); i++) {
 				itemData.set("items." + this.configName + ".name." + (i + 1), this.dynamicNames.get(i)); 	
