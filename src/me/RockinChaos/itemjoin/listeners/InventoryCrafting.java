@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashMap;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -15,9 +16,9 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType.SlotType;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
-
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
@@ -46,14 +47,13 @@ public class InventoryCrafting implements Listener {
     				if (player.getInventory().firstEmpty() != -1) {
     					player.getInventory().addItem(craftingContents[i].clone());
     				} else {
-    					Item dropped = player.getWorld().dropItem(player.getLocation(), craftingContents[i].clone());
-    					dropped.setVelocity(player.getLocation().getDirection().normalize());
+    					this.dropItem(player, craftingContents[i].clone());
     				}
     				craftingContents[i] = new ItemStack(Material.AIR);
     			}
     		}
     		for (int i = 0; i <= 4; i++) { view.setItem(i, new ItemStack(Material.AIR)); }
-    		for (int i = 4; i >= 0; i--) { this.delayReturnItem(player, i, craftingContents[i]); }
+    		for (int i = 0; i <= 4; i++) { this.delayReturnItem(player, i, craftingContents[i], 1L); }
     	}
     }
     
@@ -65,13 +65,13 @@ public class InventoryCrafting implements Listener {
     	if (PlayerHandler.isCraftingInv(view) && event.getSlot() <= 4) {
     		if (event.getSlot() != 0 && event.getSlotType() == SlotType.CRAFTING) {
     			if (craftingContents[0] != null && craftingContents[0].getType() != Material.AIR) {
-    				this.delayReturnItem(player, 0, craftingContents[0]);
+    				this.delayReturnItem(player, 0, craftingContents[0], 1L);
     			}
     		} else if (event.getSlot() == 0 && event.getSlotType() == SlotType.RESULT) {
     			if (craftingContents[0] != null && craftingContents[0].getType() != Material.AIR) {
     				for (ItemMap itemMap: ItemUtilities.getItems()) {
     					if (itemMap.isCraftingItem() && !itemMap.isMovement() && itemMap.isSimilar(craftingContents[0])) {
-    						for (int i = 1; i <= 4; i++) { this.delayReturnItem(player, i, craftingContents[i].clone()); }
+    						for (int i = 1; i <= 4; i++) { this.delayReturnItem(player, i, craftingContents[i].clone(), 1L); }
     						break;
     					}
     				}
@@ -80,7 +80,7 @@ public class InventoryCrafting implements Listener {
     					if (itemMap.isCraftingItem() && !itemMap.isMovement() && itemMap.isSimilar(event.getCursor())) {
     						ItemStack cursor = event.getCursor().clone();
     						player.setItemOnCursor(new ItemStack(Material.AIR));
-    						this.delayReturnItem(player, 0, cursor);
+    						this.delayReturnItem(player, 0, cursor, 1L);
     						break;
     					}
     				}
@@ -93,16 +93,24 @@ public class InventoryCrafting implements Listener {
     private void onCraftingDrop(PlayerDropItemEvent event) {
     	final Player player = (Player) event.getPlayer();
     	final ItemStack item = event.getItemDrop().getItemStack().clone();
+    	event.getItemDrop().getItemStack().setItemMeta(null);
+    	event.getItemDrop().remove();
     	Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
     		@Override
     		public void run() {
+    			boolean isCrafting = false;
     			if (worldSwitch.containsKey(PlayerHandler.getPlayerID(player)) && worldSwitch.get(PlayerHandler.getPlayerID(player))) {
     				for (ItemMap itemMap: ItemUtilities.getItems()) {
     					if (itemMap.isCraftingItem() && itemMap.isSimilar(item)) {
-    						event.getItemDrop().remove();
+    						isCrafting = true;
     						break;
     					}
     				}
+    				if (!isCrafting) {
+    					dropItem(player, item);
+    				}
+    			} else {
+    				dropItem(player, item);
     			}
     		}
     	}, 2L);
@@ -116,13 +124,19 @@ public class InventoryCrafting implements Listener {
     		@Override
     		public void run() {
     			if (craftingItems.containsKey(PlayerHandler.getPlayerID(player))) {
-    				for (int i = 4; i >= 0; i--) {
-    					delayReturnItem(player, i, craftingItems.get(PlayerHandler.getPlayerID(player))[i]);
+    	    		for (int i = 0; i <= 4; i++) {
+    					delayReturnItem(player, i, craftingItems.get(PlayerHandler.getPlayerID(player))[i], 1L);
     				}
     			}
     			worldSwitch.remove(PlayerHandler.getPlayerID(player));
     		}
     	}, 4L);
+    }
+    
+    @EventHandler
+    private void onSwitchGamemode(PlayerGameModeChangeEvent event) {
+    	final Player player = (Player) event.getPlayer();
+    	PlayerHandler.updateInventory(player);
     }
     
     public static void cycleTask() {
@@ -135,14 +149,12 @@ public class InventoryCrafting implements Listener {
     					if (Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).getReturnType() == Collection.class) {
     						playersOnlineNew = ((Collection < ? > ) Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).invoke(null, new Object[0]));
     						for (Object objPlayer: playersOnlineNew) {
-    							if (((Player) objPlayer).isOnline()) {
+    							if (((Player) objPlayer).isOnline() && PlayerHandler.isCraftingInv(((Player) objPlayer).getOpenInventory())) {
     								ItemStack[] tempContents = ((Player) objPlayer).getOpenInventory().getTopInventory().getContents();
     								ItemStack[] contents = new ItemStack[5];
     								if (contents != null && tempContents != null) {
 	    								for (int i = 0; i <= 4; i++) {
-	    									if (contents[i] != null) {
-	    										contents[i] = tempContents[i].clone();
-	    									}
+	    									contents[i] = tempContents[i].clone();
 	    								}
     								}
     								craftingItems.put(PlayerHandler.getPlayerID(((Player) objPlayer)), contents);
@@ -154,11 +166,13 @@ public class InventoryCrafting implements Listener {
     				} else {
     					playersOnlineOld = ((Player[]) Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).invoke(null, new Object[0]));
     					for (Player player: playersOnlineOld) {
-    						if (player.isOnline()) {
+    						if (player.isOnline() && PlayerHandler.isCraftingInv(player.getOpenInventory())) {
     							ItemStack[] tempContents = player.getOpenInventory().getTopInventory().getContents();
     							ItemStack[] contents = new ItemStack[5];
-    							for (int i = 0; i <= 4; i++) {
-    								contents[i] = tempContents[i].clone();
+    							if (contents != null && tempContents != null) {
+    								for (int i = 0; i <= 4; i++) {
+    									contents[i] = tempContents[i].clone();
+    								}
     							}
     							craftingItems.put(PlayerHandler.getPlayerID(player), contents);
     						} else {
@@ -173,13 +187,25 @@ public class InventoryCrafting implements Listener {
     	}, 0L, 100L);
     }
     
-    private void delayReturnItem(final Player player, final int slot, final ItemStack item) {
+    private void delayReturnItem(final Player player, final int slot, final ItemStack item, long delay) {
+    	if (slot == 0) { delay = 3L; }
     	Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
     		@Override
     		public void run() {
-    			player.getOpenInventory().getTopInventory().setItem(slot, item);
-    			PlayerHandler.updateInventory(player);
+    			if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
+    	    		player.getOpenInventory().getTopInventory().setItem(slot, item);	
+    	    		PlayerHandler.updateInventory(player);
+    			} else {
+    				delayReturnItem(player, slot, item, 10L);
+    			}
     		}
-    	}, 1L);
+    	}, delay);
+    }
+    
+    private void dropItem(final Player player, final ItemStack item) { 
+    	Location location = player.getLocation();
+    	location.setY(location.getY() + 1);
+    	Item dropped = player.getWorld().dropItem(location, item);
+		dropped.setVelocity(location.getDirection().multiply(.30));
     }
 }

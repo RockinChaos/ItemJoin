@@ -1909,7 +1909,21 @@ public class ItemMap {
 		this.updateItem(player);
 		ItemStack item = this.tempItem.clone();
 		if (amount > 0) { item.setAmount(amount); }
-		if (Utils.containsIgnoreCase(slot, "CRAFTING")) { player.getOpenInventory().getTopInventory().setItem(Utils.getSlotConversion(slot), item);} 
+		if (Utils.containsIgnoreCase(slot, "CRAFTING")) { 
+			if (Utils.getSlotConversion(slot) == 0) {
+		    	Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
+		    		@Override
+		    		public void run() {
+		    			if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
+		    				player.getOpenInventory().getTopInventory().setItem(Utils.getSlotConversion(slot), item);
+		    				PlayerHandler.updateInventory(player);
+		    			}
+		    		}
+		    	}, 4L);
+			} else {
+				player.getOpenInventory().getTopInventory().setItem(Utils.getSlotConversion(slot), item);
+			}
+		} 
 		else { player.getInventory().setItem(Integer.parseInt(slot), item); }
 		this.setAnimations(player);
 	}

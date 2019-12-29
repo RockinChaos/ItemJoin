@@ -420,7 +420,20 @@ public class ItemUtilities {
 			}
 		} else if (craftSlot != -1) {
 			if (topInventory.getItem(craftSlot) == null || topInventory.getItem(craftSlot).getType() == Material.AIR) {
-				topInventory.setItem(craftSlot, item); givenItem = true;
+				if (craftSlot == 0) {
+			    	Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
+			    		@Override
+			    		public void run() {
+			    			if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
+			    				topInventory.setItem(craftSlot, item);
+			    				PlayerHandler.updateInventory(player);
+			    			}
+			    		}
+			    	}, 4L);
+				} else {
+					topInventory.setItem(craftSlot, item);
+				}
+				givenItem = true;
 			}
 		}
 		if (!givenItem && itemMap.isDropFull()) { player.getWorld().dropItem(player.getLocation(), item); }
