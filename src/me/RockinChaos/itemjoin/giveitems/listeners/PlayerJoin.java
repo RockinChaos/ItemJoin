@@ -37,7 +37,6 @@ public class PlayerJoin implements Listener {
 	}
 	
 	private void setItems(final Player player) {
-		Utils.triggerCommands(player);
 		ItemUtilities.safeSet(player, "Join");
 		if (ConfigHandler.getItemDelay() != 0) { 
 			Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {

@@ -2241,18 +2241,26 @@ public class ItemMap {
 			}
 		else if (this.dynamicNames != null && !this.dynamicNames.isEmpty()) { 
 			for (int i = 0; i < this.dynamicNames.size(); i++) {
-				itemData.set("items." + this.configName + ".name." + (i + 1), this.dynamicNames.get(i)); 	
+				itemData.set("items." + this.configName + ".name." + (i + 1), this.dynamicNames.get(i).replace("§", "&")); 	
 			}
 		}
 		if (this.customLore != null && !this.customLore.isEmpty() && (this.dynamicLores == null || this.dynamicLores.isEmpty())) { itemData.set("items." + this.configName + ".lore", this.customLore); }
 		else if (this.dynamicLores != null && !this.dynamicLores.isEmpty()) { 
 			for (int i = 0; i < this.dynamicLores.size(); i++) {
-				itemData.set("items." + this.configName + ".lore." + (i + 1), this.dynamicLores.get(i)); 	
+				List <String> lores = this.dynamicLores.get(i);
+				for (int k = 0; k < lores.size(); k++) {
+					lores.get(k).replace("§", "&");
+				}
+				itemData.set("items." + this.configName + ".lore." + (i + 1), lores); 	
 			}
 		}
 		if (this.listPages != null && !this.listPages.isEmpty()) { 
 			for (int i = 0; i < this.listPages.size(); i++) {
-				itemData.set("items." + this.configName + ".pages." + (i + 1), this.listPages.get(i)); 	
+				List <String> pages = this.listPages.get(i);
+				for (int k = 0; k < pages.size(); k++) {
+					pages.get(k).replace("§", "&");
+				}
+				itemData.set("items." + this.configName + ".pages." + (i + 1), pages); 	
 			}
 		}
 		if (this.probability != null && this.probability != -1 && this.probability != 0) { itemData.set("items." + this.configName + ".probability", this.probability); }

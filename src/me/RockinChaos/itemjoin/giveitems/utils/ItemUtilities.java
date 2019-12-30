@@ -112,6 +112,7 @@ public class ItemUtilities {
 			public void run() {
 				if (type.equalsIgnoreCase("JOIN")) {
 					ItemUtilities.clearEventItems(player, player.getWorld().getName(), "Join", "");
+					Utils.triggerCommands(player);
 				} else if (type.equalsIgnoreCase("WORLD-SWITCH")) {
 					ItemUtilities.clearEventItems(player, player.getWorld().getName(), "World-Switch", "");
 				}
