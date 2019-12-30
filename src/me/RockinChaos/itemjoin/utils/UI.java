@@ -346,7 +346,7 @@ public class UI {
 		choicePane.addButton(new Button(item));
 		choicePane.addButton(new Button(this.fillerPaneBItem), 4);
 		choicePane.addButton(new Button(this.fillerPaneBItem), 3);
-		choicePane.addButton(new Button(ItemHandler.getItem("SUGAR", 1, true, "&b&lModify", "&7", "&7*Modify this item.", "&7Make changes to the item name, lore,", "&7permissions, enabled-worlds, and more."), event -> {
+		choicePane.addButton(new Button(ItemHandler.getItem("SUGAR", 1, true, "&b&lSettings", "&7", "&7*Change the settings for this item.", "&7Make changes to the item name, lore,", "&7permissions, enabled-worlds, and more."), event -> {
 			this.creatingPane(player, itemMap);
 		}));
 		choicePane.addButton(new Button(this.fillerPaneBItem));
@@ -3776,7 +3776,7 @@ public class UI {
 		ItemStack item = ItemHandler.getItem(itemMap.getMaterial().toString() + ":" + itemMap.getDataValue(), 1, false, "&7*&6&l&nItem Information", "&7", "&9&lNode: &a" + itemMap.getConfigName(), "&9&lMaterial: &a" 
 		+ itemMap.getMaterial().toString() + (itemMap.getDataValue() != 0 ? ":" + itemMap.getDataValue() : ""), 
 				(itemMap.getMultipleSlots() != null && !itemMap.getMultipleSlots().isEmpty() ? "&9&lSlot(s): &a" + slotList : "&9&lSlot: &a" + itemMap.getSlot().toUpperCase()), "&9&lCount: &a" + itemMap.getCount(), 
-				(Utils.nullCheck(itemMap.getCustomName()) != "NONE" ? "&9&lName: &a" + itemMap.getCustomName() : ""), (Utils.nullCheck(itemMap.getCustomLore().toString()) != "NONE" ? "&9&lLore: &a" + Utils.nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",").substring(0, 40) : ""), 
+				(Utils.nullCheck(itemMap.getCustomName()) != "NONE" ? "&9&lName: &a" + itemMap.getCustomName() : ""), (Utils.nullCheck(itemMap.getCustomLore().toString()) != "NONE" ? "&9&lLore: &a" + (Utils.nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",").length() > 40 ? Utils.nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",").substring(0, 40) : Utils.nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",")) : ""), 
 				(Utils.nullCheck(itemMap.getDurability() + "&7") != "NONE" ? "&9&lDurability: &a" + itemMap.getDurability() : ""), (itemMap.getCommands().length != 0 ? "&9&lCommands: &aYES" : ""), 
 				(Utils.nullCheck(itemMap.getCommandCost() + "&7") != "NONE" ? "&9&lCommands-Cost: &a" + itemMap.getCommandCost() : ""), (Utils.nullCheck(itemMap.getCommandType() + "") != "NONE" ? "&9&lCommands-Type: &a" + itemMap.getCommandType() : ""), 
 				(Utils.nullCheck(itemMap.getCommandSequence() + "") != "NONE" ? "&9&lCommands-Sequence: &a" + itemMap.getCommandSequence() : ""), 
