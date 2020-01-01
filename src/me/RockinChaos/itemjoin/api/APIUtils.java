@@ -1,7 +1,13 @@
 package me.RockinChaos.itemjoin.api;
 
-import org.bukkit.entity.Player;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.bukkit.World;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+
+import me.RockinChaos.itemjoin.giveitems.utils.ItemCommand;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
@@ -29,5 +35,131 @@ public class APIUtils {
 		}
 		ItemUtilities.sendFailCount(player, session);
 		PlayerHandler.delayUpdateInventory(player, 15L);
-	}
+	 }
+	 
+	/**
+	 * Checks if the itemstack in the said world is a custom item.
+	 * 
+	 * @param player that will recieve the items.
+	 * @param world that the item is said to be in.
+	 */
+	 public boolean isCustom(ItemStack item, World world) {
+		 ItemMap itemMap = this.getMap(item, world, null);
+		 if (itemMap != null) {
+			 return true;
+		 }
+		 return false;
+	 }
+
+	/**
+	 * Fetches the config node name of the custom item.
+     * 
+     * @param item that will be checked.
+	 * @param world that the item is said to be in.
+	 */
+	 public String getNode(ItemStack item, World world) {
+		 ItemMap itemMap = this.getMap(item, world, null);
+		 if (itemMap != null) {
+			 return itemMap.getConfigName();
+		 }
+		 return null;
+	 }
+	 
+	/**
+	 * Fetches the itemflags that are defined for the custom item. 
+	 * 
+	 * @param itemNode that is the custom items config node.
+	 */
+	 public List <String> getItemflags(String itemNode) {
+		 ItemMap itemMap = this.getMap(null, null, itemNode);
+		 List <String> itemflags = new ArrayList<String>();
+		 if (itemMap != null && itemMap.getItemFlags() != null && !itemMap.getItemFlags().isEmpty()) {
+			for (String itemflag : itemMap.getItemFlags().replace(" ", "").split(",")) {
+				itemflags.add(itemflag);
+			}
+			return itemflags;
+		 }
+		 return null;
+	 }
+	 
+	/**
+	 * Fetches commands that are defined for the custom item.
+     * 
+	 * @param itemNode that is the custom items config node.
+	 */
+	 public List <String> getCommands(String itemNode) {
+		 ItemMap itemMap = this.getMap(null, null, itemNode);
+		 List <String> commands = new ArrayList<String>();
+		 if (itemMap != null && itemMap.getCommands() != null && itemMap.getCommands().length > 0) {
+			for (ItemCommand command : itemMap.getCommands()) {
+				commands.add(command.getCommand());
+			}
+			return commands;
+		 }
+		 return null;
+	 }
+	 
+   /**
+	 * Fetches triggers that are defined for the custom item.
+     * 
+	 * @param itemNode that is the custom items config node.
+	 */
+	 public List <String> getTriggers(String itemNode) {
+		 ItemMap itemMap = this.getMap(null, null, itemNode);
+		 List <String> triggers = new ArrayList<String>();
+		 if (itemMap != null && itemMap.getTriggers() != null && !itemMap.getTriggers().isEmpty()) {
+			for (String trigger : itemMap.getTriggers().replace(" ", "").split(",")) {
+				triggers.add(trigger);
+			}
+			return triggers;
+		 }
+		 return null;
+	 }
+	 
+	/**
+	 * Fetches the slot that the custom item is defined to be set to.
+	 * 
+	 * @param itemNode that is the custom items config node.
+	 */
+	 public String getSlot(String itemNode) {
+		 ItemMap itemMap = this.getMap(null, null, itemNode);
+		 if (itemMap != null) {
+			 return itemMap.getSlot();
+		 }
+		 return null;
+	 }
+	 
+	/**
+	 * Fetches all slots that the custom item is defined to be set to.
+	 * In the instance that the custom item is a MultiSlot item.
+	 * 
+	 * @param itemNode that is the custom items config node.
+     */
+	 public List<String> getMultipleSlots(String itemNode) {
+		 ItemMap itemMap = this.getMap(null, null, itemNode);
+		 if (itemMap != null) {
+			 return itemMap.getMultipleSlots();
+		 }
+		 return null;
+	 }
+	 
+	/**
+	 * Fetches the mapping of the custom item.
+     * 
+	 * @param item that will be checked.
+	 * @param world that the custom item is said to be in.
+	 * @param itemNode that is the custom items config node.
+	 */
+	 private ItemMap getMap(ItemStack item, World world, String itemNode) {
+		for (ItemMap itemMap: ItemUtilities.getItems()) {
+			if (world != null && itemMap.inWorld(world) && itemMap.isSimilar(item)) {
+			    return itemMap;
+			} else if (world == null && itemMap.isSimilar(item)) {
+			 	return itemMap;
+			} else if (itemNode != null && world == null && item == null && itemMap.getConfigName().equalsIgnoreCase(itemNode)) {
+			 	return itemMap;
+			}
+		}
+	    return null;
+	 }
 }
