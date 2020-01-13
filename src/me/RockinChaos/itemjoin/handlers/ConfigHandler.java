@@ -419,13 +419,13 @@ public class ConfigHandler {
 				&& !Utils.containsIgnoreCase(ConfigHandler.getConfig("config.yml").getString("Clear-Items.World-Switch"), "FALSE")
 				|| !Utils.containsIgnoreCase(ConfigHandler.getConfig("config.yml").getString("Clear-Items.Region-Enter"), "DISABLED")
 				&& !Utils.containsIgnoreCase(ConfigHandler.getConfig("config.yml").getString("Clear-Items.Region-Enter"), "FALSE")) {
-				return ConfigHandler.getConfig("config.yml").getInt("Clear-Items.Delay-Tick") * 10L;
+				return ConfigHandler.getConfig("config.yml").getInt("Clear-Items.Delay-Tick");
 		}
 		return -1;
 	}
 	
 	public static long getItemDelay() {
-		if (getClearDelay() >= ConfigHandler.getConfig("items.yml").getInt("items-Delay") * 10L && getClearDelay() != -1) { return getClearDelay() + 1; }
+		if ((getClearDelay() / 20) >= (ConfigHandler.getConfig("items.yml").getInt("items-Delay") / 2) && getClearDelay() != -1) { return getClearDelay() + 1; }
 		return ConfigHandler.getConfig("items.yml").getInt("items-Delay") * 10L;
 	}
 	
