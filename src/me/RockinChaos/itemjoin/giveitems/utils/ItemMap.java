@@ -2312,7 +2312,7 @@ public class ItemMap {
 		if (this.enchants != null && !this.enchants.isEmpty()) { 
 			String enchantList = "";
 			for (Entry<String, Integer> enchantments : this.enchants.entrySet()) { enchantList += enchantments.getKey() + ":" + enchantments.getValue() + ", "; }
-			itemData.set("items." + this.configName + ".enchantments", enchantList.substring(0, enchantList.length() - 2)); 
+			itemData.set("items." + this.configName + ".enchantment", enchantList.substring(0, enchantList.length() - 2)); 
 		}
 		if (this.fireworkType != null) { itemData.set("items." + this.configName + ".firework.type", this.fireworkType.name()); }
 		if (this.power != null && this.power != 0) { itemData.set("items." + this.configName + ".firework.power", this.power); }
