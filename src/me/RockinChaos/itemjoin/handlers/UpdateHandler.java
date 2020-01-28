@@ -8,6 +8,7 @@ import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -19,9 +20,8 @@ public class UpdateHandler {
     private File jarLink;
     private final String AUTOQUERY = "projects/itemjoin/files/latest";
     private final String AUTOHOST = "https://dev.bukkit.org/";
-    private final String HOST = "https://www.spigotmc.org/api/general.php";
     private final int PROJECTID = 12661;
-    private final String KEY = ("key=98BE0FE67F88AB82B4C197FAF1DC3B69206EFDCC4D3B80FC83A00037510B99B4&resource=" + PROJECTID);
+    private final String HOST = "https://api.spigotmc.org/legacy/update.php?resource=" + PROJECTID;
     private String versionExact = ItemJoin.getInstance().getDescription().getVersion();
     private boolean betaVersion = versionExact.contains("-SNAPSHOT") || versionExact.contains("-BETA") || versionExact.contains("-ALPHA");
     private String localeVersionRaw = versionExact.split("-")[0];
@@ -110,11 +110,8 @@ public class UpdateHandler {
     	if (this.updatesAllowed) {
     		ServerHandler.sendMessage(sender, "&aChecking for updates...");
     		try {
-    			HttpURLConnection con = (HttpURLConnection) new URL(this.HOST).openConnection();
-    			con.setDoOutput(true);
-    			con.setRequestMethod("POST");
-    			con.getOutputStream().write(this.KEY.getBytes("UTF-8"));
-    			BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
+    			InputStream input = (InputStream) new URL(this.HOST).openStream();
+    			BufferedReader reader = new BufferedReader(new InputStreamReader(input));
     			String version = reader.readLine();
     			reader.close();
     			if (version.length() <= 7) {
