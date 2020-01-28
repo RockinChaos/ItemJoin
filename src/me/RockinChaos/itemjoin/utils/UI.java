@@ -376,7 +376,7 @@ public class UI {
 			for (String slot: itemMap.getMultipleSlots()) {
 				slotString += slot + ", ";
 			}
-			for (String split: Utils.softSplit(Utils.nullCheck(slotString.substring(0, slotString.length() - 2)))) {
+			for (String split: Utils.softSplit(Utils.nullCheck(slotString.substring(0, slotString.length())))) {
 				slotList += "&a" + split + " /n ";
 			}
 		}
@@ -416,7 +416,7 @@ public class UI {
 			for (PotionEffect potions: itemMap.getPotionEffect()) {
 				potionString += potions.getType().getName().toUpperCase() + ":" + potions.getAmplifier() + ":" + potions.getDuration() / 160 + ", ";
 			}
-			for (String split: Utils.softSplit(Utils.nullCheck(potionString.substring(0, potionString.length() - 2)))) {
+			for (String split: Utils.softSplit(Utils.nullCheck(potionString.substring(0, potionString.length())))) {
 				potionList += "&a" + split + " /n ";
 			}
 		}
@@ -426,7 +426,7 @@ public class UI {
 			for (Pattern patterns: itemMap.getBannerPatterns()) {
 				patternString += patterns.getColor() + ":" + patterns.getPattern().name().toUpperCase() + ", ";
 			}
-			for (String split: Utils.softSplit(Utils.nullCheck(patternString.substring(0, patternString.length() - 2)))) {
+			for (String split: Utils.softSplit(Utils.nullCheck(patternString.substring(0, patternString.length())))) {
 				patternList += "&a" + split + " /n ";
 			}
 		}
