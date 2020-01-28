@@ -28,7 +28,7 @@ public class TabComplete implements TabCompleter {
     	final List < String > commands = new ArrayList < > ();
     	Collection < ? > playersOnlineNew = null;
     	Player[] playersOnlineOld;
-    	if (args.length == 2 && args[0].equalsIgnoreCase("help") && PermissionsHandler.hasCommandPermission(sender, "itemjoin.use")) {
+    	if (args.length == 2 && args[0].equalsIgnoreCase("help") && PermissionsHandler.hasPermission(sender, "itemjoin.use")) {
     		commands.add("2");
     		commands.add("3");
     		commands.add("4");
@@ -37,9 +37,9 @@ public class TabComplete implements TabCompleter {
     		commands.add("7");
     		commands.add("8");
     		commands.add("9");
-    	} else if (args.length == 2 && args[0].equalsIgnoreCase("permissions") && PermissionsHandler.hasCommandPermission(sender, "itemjoin.permissions")) {
+    	} else if (args.length == 2 && args[0].equalsIgnoreCase("permissions") && PermissionsHandler.hasPermission(sender, "itemjoin.permissions")) {
     		commands.add("2");
-    	} else if ((args.length == 2 || args.length == 3) && args[0].equalsIgnoreCase("purge") && PermissionsHandler.hasCommandPermission(sender, "itemjoin.purge")) {
+    	} else if ((args.length == 2 || args.length == 3) && args[0].equalsIgnoreCase("purge") && PermissionsHandler.hasPermission(sender, "itemjoin.purge")) {
     		if (args.length == 2) {
     			commands.add("first-world");
     			commands.add("first-join");
@@ -60,7 +60,7 @@ public class TabComplete implements TabCompleter {
     			}
     		}
     	} else if ((args.length == 2 || args.length == 3) && (args[0].equalsIgnoreCase("disable") || args[0].equalsIgnoreCase("enable"))) {
-    		if (args.length == 2 && ((PermissionsHandler.hasCommandPermission(sender, "itemjoin.enable.others") && args[0].equalsIgnoreCase("enable")) || (PermissionsHandler.hasCommandPermission(sender, "itemjoin.disable.others") && args[0].equalsIgnoreCase("disable")))) {
+    		if (args.length == 2 && ((PermissionsHandler.hasPermission(sender, "itemjoin.enable.others") && args[0].equalsIgnoreCase("enable")) || (PermissionsHandler.hasPermission(sender, "itemjoin.disable.others") && args[0].equalsIgnoreCase("disable")))) {
     			try {
     				if (Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).getReturnType() == Collection.class) {
     					if (Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).getReturnType() == Collection.class) {
@@ -88,7 +88,7 @@ public class TabComplete implements TabCompleter {
     			for (ItemMap itemMap: ItemUtilities.getItems()) {
     				commands.add(itemMap.getConfigName());
     			}
-    		} else if (args.length == 3 && ((PermissionsHandler.hasCommandPermission(sender, "itemjoin.get.others") && (args[0].equalsIgnoreCase("get") || args[0].equalsIgnoreCase("getOnline"))) || (PermissionsHandler.hasCommandPermission(sender, "itemjoin.remove.others") && (args[0].equalsIgnoreCase("remove") || args[0].equalsIgnoreCase("removeOnline"))))) {
+    		} else if (args.length == 3 && ((PermissionsHandler.hasPermission(sender, "itemjoin.get.others") && (args[0].equalsIgnoreCase("get") || args[0].equalsIgnoreCase("getOnline"))) || (PermissionsHandler.hasPermission(sender, "itemjoin.remove.others") && (args[0].equalsIgnoreCase("remove") || args[0].equalsIgnoreCase("removeOnline"))))) {
     			commands.add("2");
     			commands.add("4");
     			commands.add("8");
@@ -112,7 +112,7 @@ public class TabComplete implements TabCompleter {
     					ServerHandler.sendDebugTrace(e);
     				}
     			}
-    		} else if (args.length == 4 && !Utils.isInt(args[2]) && !args[0].equalsIgnoreCase("getOnline") && !args[0].equalsIgnoreCase("removeOnline")  && ((PermissionsHandler.hasCommandPermission(sender, "itemjoin.get.others") && args[0].equalsIgnoreCase("get")) || (PermissionsHandler.hasCommandPermission(sender, "itemjoin.remove.others") && args[0].equalsIgnoreCase("remove")))) {
+    		} else if (args.length == 4 && !Utils.isInt(args[2]) && !args[0].equalsIgnoreCase("getOnline") && !args[0].equalsIgnoreCase("removeOnline")  && ((PermissionsHandler.hasPermission(sender, "itemjoin.get.others") && args[0].equalsIgnoreCase("get")) || (PermissionsHandler.hasPermission(sender, "itemjoin.remove.others") && args[0].equalsIgnoreCase("remove")))) {
     			commands.add("2");
     			commands.add("3");
     			commands.add("4");
@@ -122,7 +122,7 @@ public class TabComplete implements TabCompleter {
     			commands.add("32");
     			commands.add("64");
     		}
-    	} else if (args.length == 2 && (args[0].equalsIgnoreCase("getAll") && PermissionsHandler.hasCommandPermission(sender, "itemjoin.get.others") || args[0].equalsIgnoreCase("removeAll") && PermissionsHandler.hasCommandPermission(sender, "itemjoin.remove.others"))) {
+    	} else if (args.length == 2 && (args[0].equalsIgnoreCase("getAll") && PermissionsHandler.hasPermission(sender, "itemjoin.get.others") || args[0].equalsIgnoreCase("removeAll") && PermissionsHandler.hasPermission(sender, "itemjoin.remove.others"))) {
     		try {
     			if (Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).getReturnType() == Collection.class) {
     				if (Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).getReturnType() == Collection.class) {
@@ -141,20 +141,20 @@ public class TabComplete implements TabCompleter {
     			ServerHandler.sendDebugTrace(e);
     		}
     	} else if (args.length == 1) {
-    		if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.use")) { commands.add("help"); commands.add("info"); commands.add("world");}
-    		if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.permissions")) { commands.add("permissions"); }
-    		if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.purge")) { commands.add("purge"); }
-    		if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.enable")) { commands.add("enable"); }
-    		if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.disable")) { commands.add("disable"); }
-    		if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.get")) { commands.add("get"); commands.add("getAll"); }
-    		if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.get.others")) { commands.add("getOnline"); }
-    		if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.remove")) { commands.add("remove"); commands.add("removeAll"); }
-    		if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.remove.others")) { commands.add("removeOnline"); }
-    		if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.reload")) { commands.add("reload"); }
-    		if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.menu")) { commands.add("menu"); }
-    		if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.list")) { commands.add("list"); }
-    		if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.updates")) { commands.add("updates"); }
-    		if (PermissionsHandler.hasCommandPermission(sender, "itemjoin.autoupdate")) { commands.add("autoupdate"); }
+    		if (PermissionsHandler.hasPermission(sender, "itemjoin.use")) { commands.add("help"); commands.add("info"); commands.add("world");}
+    		if (PermissionsHandler.hasPermission(sender, "itemjoin.permissions")) { commands.add("permissions"); }
+    		if (PermissionsHandler.hasPermission(sender, "itemjoin.purge")) { commands.add("purge"); }
+    		if (PermissionsHandler.hasPermission(sender, "itemjoin.enable")) { commands.add("enable"); }
+    		if (PermissionsHandler.hasPermission(sender, "itemjoin.disable")) { commands.add("disable"); }
+    		if (PermissionsHandler.hasPermission(sender, "itemjoin.get")) { commands.add("get"); commands.add("getAll"); }
+    		if (PermissionsHandler.hasPermission(sender, "itemjoin.get.others")) { commands.add("getOnline"); }
+    		if (PermissionsHandler.hasPermission(sender, "itemjoin.remove")) { commands.add("remove"); commands.add("removeAll"); }
+    		if (PermissionsHandler.hasPermission(sender, "itemjoin.remove.others")) { commands.add("removeOnline"); }
+    		if (PermissionsHandler.hasPermission(sender, "itemjoin.reload")) { commands.add("reload"); }
+    		if (PermissionsHandler.hasPermission(sender, "itemjoin.menu")) { commands.add("menu"); }
+    		if (PermissionsHandler.hasPermission(sender, "itemjoin.list")) { commands.add("list"); }
+    		if (PermissionsHandler.hasPermission(sender, "itemjoin.updates")) { commands.add("updates"); }
+    		if (PermissionsHandler.hasPermission(sender, "itemjoin.autoupdate")) { commands.add("autoupdate"); }
     	}
     	StringUtil.copyPartialMatches(args[(args.length - 1)], commands, completions);
     	Collections.sort(completions);

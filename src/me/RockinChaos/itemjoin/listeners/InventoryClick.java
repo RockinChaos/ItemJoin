@@ -26,7 +26,7 @@ public class InventoryClick implements Listener {
 	public static HashMap < String, ItemStack > cursorItem = new HashMap < String, ItemStack > ();
 	
 	@EventHandler
-	private void onGlobalInventoryModify(InventoryClickEvent event) {
+	private void onGlobalModify(InventoryClickEvent event) {
 		Player player = (Player) event.getWhoClicked();
 	  	if (Utils.containsIgnoreCase(ConfigHandler.isPreventModify(), "true") || Utils.containsIgnoreCase(ConfigHandler.isPreventModify(), player.getWorld().getName())
 		  			|| Utils.containsIgnoreCase(ConfigHandler.isPreventModify(), "ALL") || Utils.containsIgnoreCase(ConfigHandler.isPreventModify(), "GLOBAL")) {
@@ -37,7 +37,7 @@ public class InventoryClick implements Listener {
 	}
 
 	@EventHandler
-	private void onSurvivalInventoryModify(InventoryClickEvent event) {
+	private void onModify(InventoryClickEvent event) {
 		Player player = (Player) event.getWhoClicked();
 			ItemStack item = null;
 			if (!ServerHandler.hasSpecificUpdate("1_8")) {
@@ -45,8 +45,10 @@ public class InventoryClick implements Listener {
 			}
 			if (Utils.containsIgnoreCase(event.getAction().name(), "HOTBAR")) {
 				item = event.getView().getBottomInventory().getItem(event.getHotbarButton());
-				if (item == null) { item = event.getCurrentItem(); }
-			} else { item = event.getCurrentItem(); }
+				if (item == null) { item = event.getCurrentItem(); } } 
+			else if (PlayerHandler.isCreativeMode(player) && event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR) { item = event.getCurrentItem(); }
+			else if (PlayerHandler.isCreativeMode(player) && event.getCursor() != null && event.getCursor().getType() != Material.AIR) { item = event.getCursor(); }
+			else { item = event.getCurrentItem(); }
 			if (!ServerHandler.hasCombatUpdate()) {
 				dropClick.put(PlayerHandler.getPlayerID(player), true);
 				ItemStack[] Inv = player.getInventory().getContents().clone();

@@ -13,7 +13,7 @@ public class PermissionsHandler {
 		return "itemjoin." + worldName + "." + item;
 	}
 	
-	public static boolean hasCommandPermission(CommandSender sender, String permission) {
+	public static boolean hasPermission(CommandSender sender, String permission) {
 		if (sender.hasPermission(permission) || sender.hasPermission("itemjoin.*") || sender.hasPermission("itemjoin.all") || isDeveloper(sender) || (sender instanceof ConsoleCommandSender)) {
 			return true;
 		} else if (!ConfigHandler.getCommandPermissions() && sender.isOp()) {
