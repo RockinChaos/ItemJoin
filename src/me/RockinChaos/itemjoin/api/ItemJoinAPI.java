@@ -37,6 +37,15 @@ public class ItemJoinAPI {
 		return this.apiUtils.isCustom(item, world);
 	}
 	
+	/**
+	* Fetches the ItemStack defined for the provided itemNode.
+	* 
+	* @param itemNode that is the custom items config node.
+	*/
+	public ItemStack getItemStack(Player player, String itemNode) {
+		return this.apiUtils.getItemStack(player, itemNode);
+	}
+	
    /**
 	* Fetches the config node name of the custom item.
     * 

@@ -50,6 +50,19 @@ public class APIUtils {
 		 }
 		 return false;
 	 }
+	 
+	/**
+	 * Fetches the ItemStack defined for the provided itemNode.
+	 * 
+     * @param itemNode that is the custom items config node.
+	 */
+	public ItemStack getItemStack(Player player, String itemNode) {
+		ItemMap itemMap = this.getMap(null, null, itemNode);
+	    if (itemMap != null) {
+	    	return itemMap.getItemStack(player);
+		}
+	    return null;
+	}
 
 	/**
 	 * Fetches the config node name of the custom item.

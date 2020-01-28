@@ -998,6 +998,11 @@ public class ItemMap {
 		return this.warmDelay;
 	}
 	
+	public ItemStack getItemStack(Player player) {
+		this.updateItem(player);
+		return this.tempItem.clone();
+	}
+	
 	public ItemStack getTempItem() {
 		return this.tempItem;	
 	}
