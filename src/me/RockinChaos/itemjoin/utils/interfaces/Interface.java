@@ -50,7 +50,7 @@ public class Interface implements InventoryHolder {
 	}
 	
 	public void onClick(InventoryClickEvent event) {
-		if (!(this.pendingClick && this.clickInventory(event))) {
+		if (!(this.pendingClick && event.getSlot() <= this.inventory.getSize() && event.getSlot() >= 0 && this.clickInventory(event))) {
 			if (this.isPaged && event.getSlot() == this.inventory.getSize() - 8 && this.getCurrentPage() > 1) {
 				if (this.controlBack != null) {
 					this.controlBack.onClick(event);

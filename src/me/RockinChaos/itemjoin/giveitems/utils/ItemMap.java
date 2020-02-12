@@ -2240,8 +2240,7 @@ public class ItemMap {
 		if (this.author != null && !this.author.isEmpty()) { itemData.set("items." + this.configName + ".author", this.author.replace("§", "&")); }
 		if (this.customName != null && !this.customName.isEmpty() && (this.dynamicNames == null || this.dynamicNames.isEmpty())) { 
 			String setName = this.customName.replace(this.getLegacySecret(), "").replace("§", "&");
-			ServerHandler.sendConsoleMessage("1");
-			if (setName.startsWith("&f") && (!ConfigHandler.dataTagsEnabled() || !ServerHandler.hasSpecificUpdate("1_8"))) { ServerHandler.sendConsoleMessage("yes"); setName = setName.substring(2, setName.length()); }
+			if (setName.startsWith("&f") && (!ConfigHandler.dataTagsEnabled() || !ServerHandler.hasSpecificUpdate("1_8"))) { setName = setName.substring(2, setName.length()); }
 			itemData.set("items." + this.configName + ".name", setName); 
 			}
 		else if (this.dynamicNames != null && !this.dynamicNames.isEmpty()) { 
