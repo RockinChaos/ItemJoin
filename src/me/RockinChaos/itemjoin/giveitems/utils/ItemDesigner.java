@@ -728,26 +728,32 @@ public class ItemDesigner {
 //    Adds the Custom Firework Effects to the item.  //
 //  ================================================ //
 	private void setFireworks(ItemMap itemMap) {
-		if (itemMap.getNodeLocation().getString(".firework.type") != null) {
+		if (itemMap.getNodeLocation().getString(".firework") != null) {
 			if (itemMap.getMaterial().toString().equalsIgnoreCase("FIREWORK") || itemMap.getMaterial().toString().equalsIgnoreCase("FIREWORK_ROCKET")) {
-				String stringType = itemMap.getNodeLocation().getString(".firework.type").toUpperCase();
-				boolean flicker = itemMap.getNodeLocation().getBoolean(".firework.flicker");
-				boolean trail = itemMap.getNodeLocation().getBoolean(".firework.trail");
-				int power = itemMap.getNodeLocation().getInt(".firework.power"); if (power == 0) { power = 1; }
-				Type buildType = Type.valueOf(stringType);
-				List <Color> colors = new ArrayList <Color> (); List <DyeColor> saveColors = new ArrayList <DyeColor> ();
-				if (itemMap.getNodeLocation().getString(".firework.colors") != null) {
-					String colorlist = itemMap.getNodeLocation().getString(".firework.colors").replace(" ", "");
-					for (String color: colorlist.split(",")) {
-						try { colors.add(DyeColor.valueOf(color.toUpperCase()).getFireworkColor()); } 
-						catch (Exception e) {
-							ServerHandler.sendErrorMessage("&4The item " + itemMap.getConfigName() + " has the incorrect dye color " + color.toUpperCase() + " and does not exist!");
-							ServerHandler.sendErrorMessage("&4Please see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/DyeColor.html for a list of correct dye color names!");
+				if (itemMap.getNodeLocation().getString(".firework.type") != null) {
+					String stringType = itemMap.getNodeLocation().getString(".firework.type").toUpperCase();
+					boolean flicker = itemMap.getNodeLocation().getBoolean(".firework.flicker");
+					boolean trail = itemMap.getNodeLocation().getBoolean(".firework.trail");
+					Type buildType = Type.valueOf(stringType);
+					List <Color> colors = new ArrayList <Color> (); List <DyeColor> saveColors = new ArrayList <DyeColor> ();
+					if (itemMap.getNodeLocation().getString(".firework.colors") != null) {
+						String colorlist = itemMap.getNodeLocation().getString(".firework.colors").replace(" ", "");
+						for (String color: colorlist.split(",")) {
+							try { colors.add(DyeColor.valueOf(color.toUpperCase()).getFireworkColor()); saveColors.add(DyeColor.valueOf(color.toUpperCase())); } 
+							catch (Exception e) {
+								ServerHandler.sendErrorMessage("&4The item " + itemMap.getConfigName() + " has the incorrect dye color " + color.toUpperCase() + " and does not exist!");
+								ServerHandler.sendErrorMessage("&4Please see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/DyeColor.html for a list of correct dye color names!");
+							}
 						}
+					} else if (itemMap.getNodeLocation().getString(".firework.colors") == null) {
+						colors.add(DyeColor.valueOf("WHITE").getFireworkColor());
+						saveColors.add(DyeColor.valueOf("WHITE"));
 					}
+					FireworkEffect effect = FireworkEffect.builder().trail(trail).flicker(flicker).withColor(colors).withFade(colors).with(buildType).build();
+					itemMap.setFirework(effect); itemMap.setFireworkType(buildType); itemMap.setFireworkColor(saveColors); itemMap.setFireworkTrail(trail); itemMap.setFireworkFlicker(flicker);
 				}
-				FireworkEffect effect = FireworkEffect.builder().trail(trail).flicker(flicker).withColor(colors).withFade(colors).with(buildType).build();
-				itemMap.setFirework(effect); itemMap.setFireworkType(buildType); itemMap.setFireworkPower(power); itemMap.setFireworkColor(saveColors); itemMap.setFireworkTrail(trail); itemMap.setFireworkFlicker(flicker);
+				int power = itemMap.getNodeLocation().getInt(".firework.power"); if (power == 0) { power = 1; }
+				itemMap.setFireworkPower(power);
 			}
 		}
 	}
