@@ -18,9 +18,11 @@ public class Drops implements Listener {
 	private void onDrop(PlayerDropItemEvent event) {
 		ItemStack item = event.getItemDrop().getItemStack();
 		final Player player = event.getPlayer();
-		if (!ItemUtilities.isAllowed(player, item, "self-drops")) {
+		if (!player.isDead() && !ItemUtilities.isAllowed(player, item, "self-drops")) {
 			if (PlayerHandler.isCreativeMode(player)) { player.closeInventory(); } 
 			event.setCancelled(true);
+		} else if (player.isDead() && !ItemUtilities.isAllowed(player, item, "self-drops")) {
+			event.getItemDrop().remove();
 		}
 	}
 

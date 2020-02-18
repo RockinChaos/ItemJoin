@@ -481,15 +481,7 @@ public class UI {
 			Language.sendLangMessage("Commands.UI.inputSet", player, placeHolders);
 			this.creatingPane(event.getPlayer(), itemMap);
 		}));
-		creatingPane.addButton(new Button(ItemHandler.getItem("BOW", 1, false, "&b&lDamage", "&7", "&7*Set the damage of the item.", (itemMap.getMaterial().getMaxDurability() != 0 ? "&9&lDURABILITY: &a" + 
-		Utils.nullCheck(itemMap.getDurability() + "&7") : "&c&lERROR: &7This item is NOT damagable.")), event -> {
-			if (Utils.nullCheck(itemMap.getDurability() + "&7") != "NONE") {
-				itemMap.setDurability(null);
-				this.creatingPane(player, itemMap);
-			} else if (itemMap.getMaterial().getMaxDurability() != 0) {
-				this.damagePane(player, itemMap);
-			}
-		}));
+		creatingPane.addButton(new Button(ItemHandler.getItem("PAPER", 1, false, "&b&lData", "&7", "&7*Set the damage or the", "&7custom texture of the item."), event -> { this.dataPane(player, itemMap); }));
 		creatingPane.addButton(new Button(ItemHandler.getItem("BOOK", 1, false, "&e&lCommand Settings", "&7", "&7*Define commands for the item", "&7which execute upon being", "&7interacted with."), event -> this.commandPane(player, itemMap)));
 		creatingPane.addButton(new Button(ItemHandler.getItem("ENCHANTED_BOOK", 1, false, "&b&lEnchantments", "&7", "&7*Add enchants to make the", "&7item sparkle and powerful.", "&9&lENCHANTMENTS: &a" + 
 		(Utils.nullCheck(itemMap.getEnchantments().toString()) != "NONE" ? "&a" + enchantList : "NONE")), event -> this.enchantPane(player, itemMap)));
@@ -1098,6 +1090,72 @@ public class UI {
 		countPane.open(player);
 	}
 	
+	private void dataPane(final Player player, final ItemMap itemMap) {
+		Interface dataPane = new Interface(false, 2, this.GUIName);
+		dataPane.addButton(new Button(this.fillerPaneBItem), 3);
+		dataPane.addButton(new Button(ItemHandler.getItem("BOW", 1, false, "&b&lDamage", "&7", "&7*Set the damage of the item.", (itemMap.getMaterial().getMaxDurability() != 0 ? "&9&lDURABILITY: &a" + 
+		Utils.nullCheck(itemMap.getDurability() + "&7") : "&c&lERROR: &7This item is NOT damagable.")), event -> {
+			if (Utils.nullCheck(itemMap.getDurability() + "&7") != "NONE") {
+				itemMap.setDurability(null);
+				this.dataPane(player, itemMap);
+			} else if (itemMap.getMaterial().getMaxDurability() != 0) {
+				this.damagePane(player, itemMap);
+			}
+		}));
+		dataPane.addButton(new Button(this.fillerPaneBItem), 1);
+		dataPane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, false, "&b&lCustom Texture", "&7", "&7*Set the custom data of the item.", "&9&lTEXTURE DATA: &a" + Utils.nullCheck(itemMap.getData() + "&7")), event -> {
+			if (Utils.nullCheck(itemMap.getData() + "&7") != "NONE") {
+				itemMap.setData(null);
+				this.dataPane(player, itemMap);
+			} else {
+				this.texturePane(player, itemMap);
+			}
+		}));
+		dataPane.addButton(new Button(this.fillerPaneBItem), 3);
+		dataPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu"), event -> {
+			this.setTriggers(itemMap);this.creatingPane(player, itemMap);
+		}));
+		dataPane.addButton(new Button(this.fillerPaneBItem), 7);
+		dataPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu"), event -> {
+			this.setTriggers(itemMap);this.creatingPane(player, itemMap);
+		}));
+		dataPane.open(player);
+	}
+	
+	private void texturePane(final Player player, final ItemMap itemMap) {
+		Interface texturePane = new Interface(true, 6, this.GUIName);
+		texturePane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> {
+			this.creatingPane(player, itemMap);
+		}));
+		texturePane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:4", 1, false, "&e&lCustom Texture", "&7", "&7*Click to set a custom texture", "&7value for the item."), event -> {
+			player.closeInventory();
+			String[] placeHolders = Language.newString();
+			placeHolders[14] = "TEXTURE DATA";
+			placeHolders[15] = "1193";
+			Language.sendLangMessage("Commands.UI.inputType", player, placeHolders);
+			Language.sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+		}, event -> {
+			if (Utils.isInt(event.getMessage())) {
+				itemMap.setData((short) Integer.parseInt(event.getMessage()));
+				String[] placeHolders = Language.newString();
+				placeHolders[14] = "TEXTURE DATA";
+				Language.sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+			} else {
+				String[] placeHolders = Language.newString();
+				placeHolders[16] = event.getMessage();
+				Language.sendLangMessage("Commands.UI.notInteger", player, placeHolders);
+			}
+			this.dataPane(event.getPlayer(), itemMap);
+		}));
+		for (int i = 1; i <= 2000; i++) {
+			final int k = i;
+			texturePane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:6", 1, false, "&9&lData: &a&l" + k, "&7", "&7*Click to set the", "&7texture data of the item."), event -> {
+				itemMap.setData((short) k); this.dataPane(player, itemMap);
+			}));
+		}
+		texturePane.open(player);
+	}
+	
 	private void damagePane(final Player player, final ItemMap itemMap) {
 		Interface damagePane = new Interface(true, 6, this.GUIName);
 		damagePane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> {
@@ -1121,12 +1179,12 @@ public class UI {
 				placeHolders[16] = event.getMessage();
 				Language.sendLangMessage("Commands.UI.notInteger", player, placeHolders);
 			}
-			this.creatingPane(event.getPlayer(), itemMap);
+			this.dataPane(event.getPlayer(), itemMap);
 		}));
 		for (int i = 1; i <= itemMap.getMaterial().getMaxDurability(); i++) {
 			final int k = i;
 			damagePane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:6", 1, false, "&9&lDamage: &a&l" + k, "&7", "&7*Click to set the", "&7damage of the item."), event -> {
-				itemMap.setDurability((short) k);this.creatingPane(player, itemMap);
+				itemMap.setDurability((short) k); this.dataPane(player, itemMap);
 			}));
 		}
 		damagePane.open(player);
@@ -3777,7 +3835,7 @@ public class UI {
 		+ itemMap.getMaterial().toString() + (itemMap.getDataValue() != 0 ? ":" + itemMap.getDataValue() : ""), 
 				(itemMap.getMultipleSlots() != null && !itemMap.getMultipleSlots().isEmpty() ? "&9&lSlot(s): &a" + slotList : "&9&lSlot: &a" + itemMap.getSlot().toUpperCase()), "&9&lCount: &a" + itemMap.getCount(), 
 				(Utils.nullCheck(itemMap.getCustomName()) != "NONE" ? "&9&lName: &a" + itemMap.getCustomName() : ""), (Utils.nullCheck(itemMap.getCustomLore().toString()) != "NONE" ? "&9&lLore: &a" + (Utils.nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",").length() > 40 ? Utils.nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",").substring(0, 40) : Utils.nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",")) : ""), 
-				(Utils.nullCheck(itemMap.getDurability() + "&7") != "NONE" ? "&9&lDurability: &a" + itemMap.getDurability() : ""), (itemMap.getCommands().length != 0 ? "&9&lCommands: &aYES" : ""), 
+				(Utils.nullCheck(itemMap.getDurability() + "&7") != "NONE" ? "&9&lDurability: &a" + itemMap.getDurability() : ""), (Utils.nullCheck(itemMap.getData() + "&7") != "NONE" ? "&9&lTexture Data: &a" + itemMap.getData() : ""), (itemMap.getCommands().length != 0 ? "&9&lCommands: &aYES" : ""), 
 				(Utils.nullCheck(itemMap.getCommandCost() + "&7") != "NONE" ? "&9&lCommands-Cost: &a" + itemMap.getCommandCost() : ""), (Utils.nullCheck(itemMap.getCommandType() + "") != "NONE" ? "&9&lCommands-Type: &a" + itemMap.getCommandType() : ""), 
 				(Utils.nullCheck(itemMap.getCommandSequence() + "") != "NONE" ? "&9&lCommands-Sequence: &a" + itemMap.getCommandSequence() : ""), 
 				(Utils.nullCheck(itemMap.getCommandCooldown() + "&7") != "NONE" ? "&9&lCommands-Cooldown: &a" + itemMap.getCommandCooldown() + " second(s)" : ""), 
