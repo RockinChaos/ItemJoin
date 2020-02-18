@@ -1784,8 +1784,10 @@ public class ItemMap {
 		if (this.firework != null) {
 			((FireworkMeta) this.tempMeta).clearEffects();
 			((FireworkMeta) this.tempMeta).addEffect(this.firework);
+		}
+		
+		if (this.power != null && this.power != 0) {
 			((FireworkMeta) this.tempMeta).setPower(this.power);
-			
 		}
 	}
 	
@@ -2237,6 +2239,7 @@ public class ItemMap {
 		else { itemData.set("items." + this.configName + ".slot", this.CustomSlot); }
 		if (this.count > 1) { itemData.set("items." + this.configName + ".count", this.count); }
 		if (this.durability != null && this.durability > 0) { itemData.set("items." + this.configName + ".durability", this.durability); }
+		if (this.data != null && this.data > 0) { itemData.set("items." + this.configName + ".data", this.data); }
 		if (this.author != null && !this.author.isEmpty()) { itemData.set("items." + this.configName + ".author", this.author.replace("§", "&")); }
 		if (this.customName != null && !this.customName.isEmpty() && (this.dynamicNames == null || this.dynamicNames.isEmpty())) { 
 			String setName = this.customName.replace(this.getLegacySecret(), "").replace("§", "&");
@@ -2335,7 +2338,7 @@ public class ItemMap {
 		if (this.leatherColor != null && !this.leatherColor.isEmpty()) { itemData.set("items." + this.configName + ".leather-color", this.leatherColor); }
 		else if (this.leatherHex != null && !this.leatherHex.isEmpty()) { itemData.set("items." + this.configName + ".leather-color", this.leatherHex); }
 		if (this.customMapImage != null && !this.customMapImage.isEmpty()) { itemData.set("items." + this.configName + ".custom-map-image", this.customMapImage); }
-		if (this.skullTexture != null && !this.skullTexture.isEmpty()&& (this.skullTexture == null || this.skullTexture.isEmpty())) { itemData.set("items." + this.configName + ".skull-texture", this.skullTexture); }
+		if (this.skullTexture != null && !this.skullTexture.isEmpty() && (this.dynamicTextures == null || this.dynamicTextures.isEmpty())) { itemData.set("items." + this.configName + ".skull-texture", this.skullTexture); }
 		else if (this.dynamicTextures != null && !this.dynamicTextures.isEmpty()) { 
 			for (int i = 0; i < this.dynamicTextures.size(); i++) {
 				itemData.set("items." + this.configName + ".skull-texture." + (i + 1), this.dynamicTextures.get(i)); 	
