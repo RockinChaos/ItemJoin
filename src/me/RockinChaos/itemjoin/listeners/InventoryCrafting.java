@@ -93,27 +93,29 @@ public class InventoryCrafting implements Listener {
     private void onCraftingDrop(PlayerDropItemEvent event) {
     	final Player player = (Player) event.getPlayer();
     	final ItemStack item = event.getItemDrop().getItemStack().clone();
-    	event.getItemDrop().getItemStack().setItemMeta(null);
-    	event.getItemDrop().remove();
-    	Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
-    		@Override
-    		public void run() {
-    			boolean isCrafting = false;
-    			if (worldSwitch.containsKey(PlayerHandler.getPlayerID(player)) && worldSwitch.get(PlayerHandler.getPlayerID(player))) {
-    				for (ItemMap itemMap: ItemUtilities.getItems()) {
-    					if (itemMap.isCraftingItem() && itemMap.isSimilar(item)) {
-    						isCrafting = true;
-    						break;
-    					}
-    				}
-    				if (!isCrafting) {
-    					dropItem(player, item);
-    				}
-    			} else {
-    				dropItem(player, item);
-    			}
-    		}
-    	}, 2L);
+    	if (!player.isDead()) {
+	    	event.getItemDrop().getItemStack().setItemMeta(null);
+	    	event.getItemDrop().remove();
+	    	Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
+	    		@Override
+	    		public void run() {
+	    			boolean isCrafting = false;
+	    			if (worldSwitch.containsKey(PlayerHandler.getPlayerID(player)) && worldSwitch.get(PlayerHandler.getPlayerID(player))) {
+	    				for (ItemMap itemMap: ItemUtilities.getItems()) {
+	    					if (itemMap.isCraftingItem() && itemMap.isSimilar(item)) {
+	    						isCrafting = true;
+	    						break;
+	    					}
+	    				}
+	    				if (!isCrafting) {
+	    					dropItem(player, item);
+	    				}
+	    			} else {
+	    				dropItem(player, item);
+	    			}
+	    		}
+	    	}, 2L);
+    	}
     }
     
     @EventHandler
