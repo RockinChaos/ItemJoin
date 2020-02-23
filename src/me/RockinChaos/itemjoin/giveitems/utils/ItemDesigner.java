@@ -75,6 +75,7 @@ public class ItemDesigner {
 							this.setProbability(itemMap);
 							
 							ItemUtilities.addItem(itemMap);
+					    	ConfigHandler.setListenerRestrictions(itemMap);
 						}
 					}
 				}

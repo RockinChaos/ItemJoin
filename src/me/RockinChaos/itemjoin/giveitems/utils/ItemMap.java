@@ -77,6 +77,7 @@ public class ItemMap {
 	private boolean craftingItem = false;
 	
 	private boolean giveNext = false;
+	private boolean moveNext = false;
 	private boolean dropFull = false;
 	
 	private String Arbitrary = null;
@@ -256,7 +257,6 @@ public class ItemMap {
 	        this.setPerm(this.nodeLocation.getString(".permission-node"));
 	        this.setPermissionNeeded(ConfigHandler.getConfig("config.yml").getBoolean("Permissions.Obtain-Items"));
 	    	this.setOPPermissionNeeded(ConfigHandler.getConfig("config.yml").getBoolean("Permissions.Obtain-Items.OP"));
-	    	ConfigHandler.setListenerRestrictions(this);
         }
 	}
 //  ========================================================================================================= //
@@ -356,6 +356,7 @@ public class ItemMap {
 			this.dynamic = Utils.containsIgnoreCase(this.itemflags, "dynamic");
 			this.animate = Utils.containsIgnoreCase(this.itemflags, "animate");
 			this.giveNext = Utils.containsIgnoreCase(this.itemflags, "give-next");
+			this.moveNext = Utils.containsIgnoreCase(this.itemflags, "move-next");
 			this.dropFull = Utils.containsIgnoreCase(this.itemflags, "drop-full");
 			this.itemStore = Utils.containsIgnoreCase(this.itemflags, "item-store");
 			this.itemModify = Utils.containsIgnoreCase(this.itemflags, "item-modifiable");
@@ -680,6 +681,10 @@ public class ItemMap {
 	
 	public void setGiveNext(boolean bool) {
 		this.giveNext = bool;
+	}
+	
+	public void setMoveNext(boolean bool) {
+		this.moveNext = bool;
 	}
 	
 	public void setDropFull(boolean bool) {
@@ -1188,6 +1193,10 @@ public class ItemMap {
 	
 	public boolean isGiveNext() {
 		return this.giveNext;
+	}
+	
+	public boolean isMoveNext() {
+		return this.moveNext;
 	}
 	
 	public boolean isDropFull() {
