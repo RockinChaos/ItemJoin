@@ -28,6 +28,7 @@ import me.RockinChaos.itemjoin.listeners.Drops;
 import me.RockinChaos.itemjoin.listeners.Interact;
 import me.RockinChaos.itemjoin.listeners.InventoryClick;
 import me.RockinChaos.itemjoin.listeners.InventoryCrafting;
+import me.RockinChaos.itemjoin.listeners.Legacy_Consumes;
 import me.RockinChaos.itemjoin.listeners.Legacy_Interact;
 import me.RockinChaos.itemjoin.listeners.Legacy_Pickups;
 import me.RockinChaos.itemjoin.listeners.Legacy_Storable;
@@ -392,7 +393,10 @@ public class ConfigHandler {
 			else if (ServerHandler.hasSpecificUpdate("1_8") && !isListenerEnabled(Interact.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Interact(), ItemJoin.getInstance()); }
 		}
 		if ((itemMap.isPlaceable() || itemMap.isCountLock()) && !isListenerEnabled(Placement.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Placement(), ItemJoin.getInstance()); }
-		if (itemMap.isCustomConsumable() && !isListenerEnabled(Consumes.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Consumes(), ItemJoin.getInstance()); }
+		if (((Utils.containsIgnoreCase(itemMap.getMaterial().name(), "TOTEM") && itemMap.isCountLock()) || itemMap.isCustomConsumable())) { 
+			if (!ServerHandler.hasSpecificUpdate("1_11") && !isListenerEnabled(Legacy_Consumes.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Legacy_Consumes(), ItemJoin.getInstance());} 
+			else if (ServerHandler.hasSpecificUpdate("1_11") && !isListenerEnabled(Consumes.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Consumes(), ItemJoin.getInstance()); }			
+		}
 		if ((itemMap.isItemRepairable() || itemMap.isItemCraftable()) && !isListenerEnabled(Recipes.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Recipes(), ItemJoin.getInstance()); }
 		if (itemMap.isItemStore() || itemMap.isItemModify()) {
 			if (!ServerHandler.hasSpecificUpdate("1_8") && !isListenerEnabled(Legacy_Storable.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Legacy_Storable(), ItemJoin.getInstance());} 
