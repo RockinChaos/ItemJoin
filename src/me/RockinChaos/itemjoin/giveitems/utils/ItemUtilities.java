@@ -121,7 +121,8 @@ public class ItemUtilities {
 	}
 	
 	public static boolean containsObject(String world, String clearEvent) {
-		if (clearEvent.replace(" ", "").equalsIgnoreCase("ALL") || clearEvent.replace(" ", "").equalsIgnoreCase("GLOBAL")) {
+		if (clearEvent.replace(" ", "").equalsIgnoreCase("ALL") || clearEvent.replace(" ", "").equalsIgnoreCase("GLOBAL") 
+				|| clearEvent.replace(" ", "").equalsIgnoreCase("ENABLED") || clearEvent.replace(" ", "").equalsIgnoreCase("TRUE")) {
 			return true;
 		} else {
 			for (String eventWorld: clearEvent.replace(" ", "").split(",")) {
@@ -135,7 +136,7 @@ public class ItemUtilities {
 	
 	public static void clearEventItems(Player player, String world, String event, String region) {
 		String clearEvent = ConfigHandler.getConfig("config.yml").getString("Clear-Items." + event);
-		if (clearEvent != null && (ConfigHandler.getConfig("config.yml").getBoolean("Clear-Items." + event) == true || (region != null && !region.isEmpty() && containsObject(region, clearEvent)) || containsObject(world, clearEvent))) {
+		if (clearEvent != null && ((region != null && !region.isEmpty() && containsObject(region, clearEvent)) || containsObject(world, clearEvent))) {
 			if (Utils.containsIgnoreCase(ConfigHandler.getConfig("config.yml").getString("Clear-Items.Bypass"), "OP") && player.isOp()) {} else {
 				String clearType = ConfigHandler.getConfig("config.yml").getString("Clear-Items.Type");
 				if (clearType != null && (clearType.equalsIgnoreCase("ALL") || clearType.equalsIgnoreCase("GLOBAL") || clearType.equalsIgnoreCase("TRUE") || clearType.equalsIgnoreCase("ENABLE"))) {
@@ -307,7 +308,7 @@ public class ItemUtilities {
 	
 	public static boolean canOverwrite(Player player, ItemMap itemMap) {
 		try {
-			if (isOverwrite(player, itemMap) || (itemMap.isDropFull() || (itemMap.isGiveNext() && player.getInventory().firstEmpty() != -1))) { return true; }
+			if (isOverwrite(player, itemMap) || (itemMap.isDropFull() || ((itemMap.isGiveNext() || itemMap.isMoveNext()) && player.getInventory().firstEmpty() != -1))) { return true; }
 		} catch (Exception e) { ServerHandler.sendDebugTrace(e); }
 		return false;
 	}
@@ -372,12 +373,15 @@ public class ItemUtilities {
 		ItemStack getItem = player.getInventory().getItem(Integer.parseInt(itemMap.getSlot()));
 		if (amount != 0 && command) { item.setAmount(amount); }
 		if (amount != 0 || itemMap.isAlwaysGive()) { player.getInventory().addItem(item); }
-		else if (((itemMap.isGiveNext() && player.getInventory().firstEmpty() != -1) || (itemMap.isDropFull() && player.getInventory().firstEmpty() != -1)) && getItem != null) {
+		else if ((((itemMap.isGiveNext() || itemMap.isMoveNext()) && player.getInventory().firstEmpty() != -1) || (itemMap.isDropFull() && player.getInventory().firstEmpty() != -1)) && getItem != null) {
+			if (itemMap.isMoveNext()) { player.getInventory().setItem(Integer.parseInt(itemMap.getSlot()), item); }
 			for (int i = Integer.parseInt(itemMap.getSlot()); i <= 35; i++) {
-				if (player.getInventory().getItem(i) == null || player.getInventory().getItem(i).getType() == Material.AIR) { givenItem = true; player.getInventory().setItem(i, item); break; }
+				if (itemMap.isMoveNext() && (player.getInventory().getItem(i) == null || player.getInventory().getItem(i).getType() == Material.AIR)) { givenItem = true; player.getInventory().setItem(i, getItem); break; }
+				else if (player.getInventory().getItem(i) == null || player.getInventory().getItem(i).getType() == Material.AIR) { givenItem = true; player.getInventory().setItem(i, item); break; }
 				else if (i == 35) {
 					for (int k = Integer.parseInt(itemMap.getSlot()); k >= 0; k--) {
-						if (player.getInventory().getItem(k) == null || player.getInventory().getItem(k).getType() == Material.AIR) { givenItem = true; player.getInventory().setItem(k, item); break; }
+						if (itemMap.isMoveNext() && (player.getInventory().getItem(k) == null || player.getInventory().getItem(k).getType() == Material.AIR)) { givenItem = true; player.getInventory().setItem(k, getItem); break; }
+						else if (player.getInventory().getItem(k) == null || player.getInventory().getItem(k).getType() == Material.AIR) { givenItem = true; player.getInventory().setItem(k, item); break; }
 					}
 				}
 			}
