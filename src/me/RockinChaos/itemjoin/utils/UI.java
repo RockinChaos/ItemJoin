@@ -1920,8 +1920,8 @@ public class UI {
 	private void flagPane(final Player player, final ItemMap itemMap) {
 		Interface flagPane = new Interface(false, 5, this.GUIName);
 		flagPane.addButton(new Button(this.fillerPaneGItem), 2);
-		flagPane.addButton(new Button(ItemHandler.getItem("DIAMOND", 1, itemMap.isOpBypass(), "&a&l&nAllowOpBypass", "&7", "&7*Allows the player to bypass any", "&7itemflags that add restrictions", "&7ONLY if they are OP.", 
-				"&9&lENABLED: &a" + (itemMap.isOpBypass() + "").toUpperCase()), event -> {
+		flagPane.addButton(new Button(ItemHandler.getItem("DIAMOND", 1, itemMap.isOpBypass(), "&a&l&nAllowOpBypass", "&7", "&a&lT: &7Allows the player to bypass any", "&7itemflags that add restrictions", "&7ONLY if they are OP.", "&7",
+				"&c&lF: &7Itemflags that add restrictions", "&7will limit all players.", "&7", "&9&lENABLED: &a" + (itemMap.isOpBypass() + "").toUpperCase()), event -> {
 			if (itemMap.isOpBypass()) {
 				itemMap.setOpBypass(false);
 			} else {
@@ -1930,7 +1930,8 @@ public class UI {
 			this.flagPane(player, itemMap);
 		}));
 		flagPane.addButton(new Button(this.fillerPaneGItem));
-		flagPane.addButton(new Button(ItemHandler.getItem("38", 1, itemMap.isInventoryClose(), "&a&l&nInventory Close", "&7", "&7*Closes the players inventory", "&7when clicking an item.", "&9&lENABLED: &a" +
+		flagPane.addButton(new Button(ItemHandler.getItem("38", 1, itemMap.isInventoryClose(), "&a&l&nInventory Close", "&7", "&a&lT: &7Closes the players inventory", "&7when clicking an item.", "&7",
+				"&c&lF: &7Keeps the current inventory", "&7status when clicking an item.", "&7", "&9&lENABLED: &a" +
 		(itemMap.isInventoryClose() + "").toUpperCase()), event -> {
 			if (itemMap.isInventoryClose()) {
 				itemMap.setCloseInventory(false);
@@ -1940,8 +1941,9 @@ public class UI {
 			this.flagPane(player, itemMap);
 		}));
 		flagPane.addButton(new Button(this.fillerPaneGItem));
-		flagPane.addButton(new Button(ItemHandler.getItem(itemMap.isCreativeBypass() ? "ENCHANTED_GOLDEN_APPLE" : "GOLDEN_APPLE", 1, itemMap.isCreativeBypass(), "&a&l&nCreativeBypass", "&7", "&7*Allows the player to bypass any", 
-				"&7itemflags that add restrictions", "&7ONLY if they are in creative mode.", "&9&lENABLED: &a" + (itemMap.isCreativeBypass() + "").toUpperCase()), event -> {
+		flagPane.addButton(new Button(ItemHandler.getItem(itemMap.isCreativeBypass() ? "ENCHANTED_GOLDEN_APPLE" : "GOLDEN_APPLE", 1, itemMap.isCreativeBypass(), "&a&l&nCreativeBypass", "&7", "&a&lT: &7Allows the player to bypass any", 
+				"&7itemflags that add restrictions", "&7ONLY if they are in creative mode.", "&7",
+				"&c&lF: &7Itemflags that add restrictions", "&7will limit all players.", "&7", "&9&lENABLED: &a" + (itemMap.isCreativeBypass() + "").toUpperCase()), event -> {
 			if (itemMap.isCreativeBypass()) {
 				itemMap.setCreativeBypass(false);
 			} else {
@@ -1950,8 +1952,9 @@ public class UI {
 			this.flagPane(player, itemMap);
 		}));
 		flagPane.addButton(new Button(this.fillerPaneGItem), 2);
-		flagPane.addButton(new Button(ItemHandler.getItem((ServerHandler.hasAquaticUpdate() ? "WOODEN_SWORD" : "268"), 1, itemMap.isVanilla(), "&a&l&nVanilla", "&7", "&7*Sets the item to be given", "&7as a default no-name item.", 
-				"&7&lNOTE: &7Itemflags and commands", "&7will NOT work unless the vanilla-status", "&7or vanilla-control itemflags are defined", "&9&lENABLED: &a" + (itemMap.isVanilla() + "").toUpperCase()), event -> {
+		flagPane.addButton(new Button(ItemHandler.getItem((ServerHandler.hasAquaticUpdate() ? "WOODEN_SWORD" : "268"), 1, itemMap.isVanilla(), "&a&l&nVanilla", "&7", "&a&lT: &7Sets the item to be given", "&7as a default no-name item.", 
+				"&7&lNOTE: &7Itemflags and commands", "&7will NOT work unless the vanilla-status", "&7or vanilla-control itemflags are defined", "&7",
+				"&c&lF: &7Item will be given as a", "&7ItemJoin only item with NBTTags.", "&7", "&9&lENABLED: &a" + (itemMap.isVanilla() + "").toUpperCase()), event -> {
 			if (itemMap.isVanilla()) {
 				itemMap.setVanilla(false);
 			} else {
@@ -1959,8 +1962,8 @@ public class UI {
 			}
 			this.flagPane(player, itemMap);
 		}));
-		flagPane.addButton(new Button(ItemHandler.getItem("LEATHER_HELMET", 1, itemMap.isVanillaStatus(), "&a&l&nVanilla Status", "&7", "&7*Allows the Vanilla itemflag to retain", "&7the properties functionality without.", 
-				"&7making it only a plugin specific item", "&9&lENABLED: &a" + (itemMap.isVanillaStatus() + "").toUpperCase()), event -> {
+		flagPane.addButton(new Button(ItemHandler.getItem("LEATHER_HELMET", 1, itemMap.isVanillaStatus(), "&a&l&nVanilla Status", "&7", "&a&lT: &7Allows the Vanilla itemflag to retain", "&7the properties functionality without.", 
+				"&7making it only a plugin specific item", "&7", "&c&lF: &7Item will be given as a", "&7ItemJoin only item with NBTTags.", "&7", "&9&lENABLED: &a" + (itemMap.isVanillaStatus() + "").toUpperCase()), event -> {
 			if (itemMap.isVanillaStatus()) {
 				itemMap.setVanillaStatus(false);
 			} else {
@@ -1968,8 +1971,8 @@ public class UI {
 			}
 			this.flagPane(player, itemMap);
 		}));
-		flagPane.addButton(new Button(ItemHandler.getItem((ServerHandler.hasAquaticUpdate() ? "WOODEN_PICKAXE" : "270"), 1, itemMap.isVanillaControl(), "&a&l&nVanilla Control", "&7", "&7*Allows the Vanilla itemflag to retain",
-				"&7the use of commands and itemflags.", "&9&lENABLED: &a" + (itemMap.isVanillaControl() + "").toUpperCase()), event -> {
+		flagPane.addButton(new Button(ItemHandler.getItem((ServerHandler.hasAquaticUpdate() ? "WOODEN_PICKAXE" : "270"), 1, itemMap.isVanillaControl(), "&a&l&nVanilla Control", "&7", "&a&lT: &7Allows the Vanilla itemflag to retain",
+				"&7the use of commands and itemflags.", "&7", "&c&lF: &7Item will be given as a", "&7ItemJoin only item with NBTTags.", "&7", "&9&lENABLED: &a" + (itemMap.isVanillaControl() + "").toUpperCase()), event -> {
 			if (itemMap.isVanillaControl()) {
 				itemMap.setVanillaControl(false);
 			} else {
@@ -1977,8 +1980,8 @@ public class UI {
 			}
 			this.flagPane(player, itemMap);
 		}));
-		flagPane.addButton(new Button(ItemHandler.getItem((ServerHandler.hasAquaticUpdate() ? "FILLED_MAP" : "MAP"), 1, itemMap.isOnlyFirstJoin(), "&a&l&nFirst Join", "&7", "&7*Gives the item only ONCE.", 
-				"&9&lENABLED: &a" + (itemMap.isOnlyFirstJoin() + "").toUpperCase()), event -> {
+		flagPane.addButton(new Button(ItemHandler.getItem((ServerHandler.hasAquaticUpdate() ? "FILLED_MAP" : "MAP"), 1, itemMap.isOnlyFirstJoin(), "&a&l&nFirst Join", "&7", "&a&lT: &7Gives the item only ONCE.", "&7",
+				"&c&lF: &7No restriction to giving", "&7the item only once.", "&7", "&9&lENABLED: &a" + (itemMap.isOnlyFirstJoin() + "").toUpperCase()), event -> {
 			if (itemMap.isOnlyFirstJoin()) {
 				itemMap.setOnlyFirstJoin(false);
 			} else {
@@ -1986,7 +1989,8 @@ public class UI {
 			}
 			this.flagPane(player, itemMap);
 		}));
-		flagPane.addButton(new Button(ItemHandler.getItem("STONE_SWORD", 1, itemMap.isOnlyFirstWorld(), "&a&l&nFirst World", "&7", "&7*Gives the item only ONCE per world.", "&9&lENABLED: &a" + (itemMap.isOnlyFirstWorld() + "").toUpperCase()), event -> {
+		flagPane.addButton(new Button(ItemHandler.getItem("STONE_SWORD", 1, itemMap.isOnlyFirstWorld(), "&a&l&nFirst World", "&7", "&a&lT: &7Gives the item only ONCE per world.", "&7",
+				"&c&lF: &7No restriction to giving", "&7the item only once.", "&7", "&9&lENABLED: &a" + (itemMap.isOnlyFirstWorld() + "").toUpperCase()), event -> {
 			if (itemMap.isOnlyFirstWorld()) {
 				itemMap.setOnlyFirstWorld(false);
 			} else {
@@ -1994,8 +1998,8 @@ public class UI {
 			}
 			this.flagPane(player, itemMap);
 		}));
-		flagPane.addButton(new Button(ItemHandler.getItem("PAPER", 1, itemMap.isIpLimted(), "&a&l&nIP Limit", "&7", "&7*Limits the item to the specific ip", "&7of the player, prevents alt", "&7accounts from receiving items.",
-				"&7Useful to prevent item duplication", "&9&lENABLED: &a" + (itemMap.isIpLimted() + "").toUpperCase()), event -> {
+		flagPane.addButton(new Button(ItemHandler.getItem("PAPER", 1, itemMap.isIpLimted(), "&a&l&nIP Limit", "&7", "&a&lT: &7Limits the item to the specific ip", "&7of the player, prevents alt", "&7accounts from receiving items.",
+				"&7Useful to prevent item duplication", "&7", "&c&lF: &7All players despite their ip", "&7will recieve the item.", "&7", "&9&lENABLED: &a" + (itemMap.isIpLimted() + "").toUpperCase()), event -> {
 			if (itemMap.isIpLimted()) {
 				itemMap.setIpLimited(false);
 			} else {
@@ -2003,8 +2007,8 @@ public class UI {
 			}
 			this.flagPane(player, itemMap);
 		}));
-		flagPane.addButton(new Button(ItemHandler.getItem(itemMap.isUnbreakable() ? "ENCHANTED_BOOK" : "BOOK", 1, itemMap.isUnbreakable(), "&a&l&nUnbreakable", "&7", "&7*Allows the item to be INDESTRUCTIBLE!", 
-				"&9&lENABLED: &a" + (itemMap.isUnbreakable() + "").toUpperCase()), event -> {
+		flagPane.addButton(new Button(ItemHandler.getItem(itemMap.isUnbreakable() ? "ENCHANTED_BOOK" : "BOOK", 1, itemMap.isUnbreakable(), "&a&l&nUnbreakable", "&7", "&a&lT: &7Allows the item to be INDESTRUCTIBLE!", "&7",
+				"&c&lF: &7The item will be able", "&7to take damage.", "&7", "&9&lENABLED: &a" + (itemMap.isUnbreakable() + "").toUpperCase()), event -> {
 			if (itemMap.isUnbreakable()) {
 				itemMap.setUnbreakable(false);
 			} else {
@@ -2012,8 +2016,8 @@ public class UI {
 			}
 			this.flagPane(player, itemMap);
 		}));
-		flagPane.addButton(new Button(ItemHandler.getItem((ServerHandler.hasAquaticUpdate() ? "ENDER_EYE" : "381"), 1, itemMap.isAttributesInfo(), "&a&l&nHide Attributes", "&7", "&7*Hides all item info",
-				"&7Firework Color, Damage Values, Enchants, etc.", "&9&lENABLED: &a" + (itemMap.isAttributesInfo() + "").toUpperCase()), event -> {
+		flagPane.addButton(new Button(ItemHandler.getItem((ServerHandler.hasAquaticUpdate() ? "ENDER_EYE" : "381"), 1, itemMap.isAttributesInfo(), "&a&l&nHide Attributes", "&7", "&a&lT: &7Hides all item info",
+				"&7Firework Color, Damage Values, Enchants, etc.", "&7", "&c&lF: &7Shows all item info.", "&7", "&9&lENABLED: &a" + (itemMap.isAttributesInfo() + "").toUpperCase()), event -> {
 			if (itemMap.isAttributesInfo()) {
 				itemMap.setAttributesInfo(false);
 			} else {
@@ -2021,7 +2025,8 @@ public class UI {
 			}
 			this.flagPane(player, itemMap);
 		}));
-		flagPane.addButton(new Button(ItemHandler.getItem("IRON_SWORD", 1, itemMap.isDurabilityBar(), "&a&l&nHide Durability", "&7", "&7*Hides the durability bar.", "&9&lENABLED: &a" + (itemMap.isDurabilityBar() + "").toUpperCase()), event -> {
+		flagPane.addButton(new Button(ItemHandler.getItem("IRON_SWORD", 1, itemMap.isDurabilityBar(), "&a&l&nHide Durability", "&7", "&a&lT: &7Hides the durability bar.", "&7",
+				"&c&lF: &7Shows the durability bar.", "&7", "&9&lENABLED: &a" + (itemMap.isDurabilityBar() + "").toUpperCase()), event -> {
 			if (itemMap.isDurabilityBar()) {
 				itemMap.setDurabilityBar(false);
 			} else {
@@ -2029,8 +2034,8 @@ public class UI {
 			}
 			this.flagPane(player, itemMap);
 		}));
-		flagPane.addButton(new Button(ItemHandler.getItem("COBBLESTONE", 1, itemMap.isPlaceable(), "&a&l&nPlacement", "&7", "&7*Prevents the item from being", "&7placed on the ground and", "&7in any item-frames.", 
-				"&9&lENABLED: &a" + (itemMap.isPlaceable() + "").toUpperCase()), event -> {
+		flagPane.addButton(new Button(ItemHandler.getItem("COBBLESTONE", 1, itemMap.isPlaceable(), "&a&l&nPlacement", "&7", "&a&lT: &7Prevents the item from being", "&7placed on the ground and", "&7in any item-frames.", "&7",
+				"&c&lF: &7Item will be able to be placed.", "&7", "&9&lENABLED: &a" + (itemMap.isPlaceable() + "").toUpperCase()), event -> {
 			if (itemMap.isPlaceable()) {
 				itemMap.setPlaceable(false);
 			} else {
@@ -2038,8 +2043,8 @@ public class UI {
 			}
 			this.flagPane(player, itemMap);
 		}));
-		flagPane.addButton(new Button(ItemHandler.getItem("MINECART", 1, itemMap.isMovement(), "&a&l&nInventory Modify", "&7", "&7*Prevents the item from being", "&7moved or switched to other slots",
-				"&7and blocks placement in item-frames.", "&9&lENABLED: &a" + (itemMap.isMovement() + "").toUpperCase()), event -> {
+		flagPane.addButton(new Button(ItemHandler.getItem("MINECART", 1, itemMap.isMovement(), "&a&l&nInventory Modify", "&7", "&a&lT: &7Prevents the item from being", "&7moved or switched to other slots",
+				"&7and blocks placement in item-frames.", "&7",	"&c&lF: &7Allows the item to", "&7be moved freely.", "&7", "&9&lENABLED: &a" + (itemMap.isMovement() + "").toUpperCase()), event -> {
 			if (itemMap.isMovement()) {
 				itemMap.setMovement(false);
 			} else {
@@ -2047,8 +2052,8 @@ public class UI {
 			}
 			this.flagPane(player, itemMap);
 		}));
-		flagPane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, itemMap.isDynamic(), "&a&l&nDynamic", "&7", "&7*Allows the item to dynamically", "&7update every 100 ticks", "&7Useful for updating placeholders.", 
-				"&9&lENABLED: &a" + (itemMap.isDynamic() + "").toUpperCase()), event -> {
+		flagPane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, itemMap.isDynamic(), "&a&l&nDynamic", "&7", "&a&lT: &7Allows the item to dynamically", "&7update every 100 ticks", "&7Useful for updating placeholders.", "&7",
+				"&c&lF: &7Item will not update its lore.", "&7", "&9&lENABLED: &a" + (itemMap.isDynamic() + "").toUpperCase()), event -> {
 			if (itemMap.isDynamic()) {
 				itemMap.setDynamic(false);
 			} else {
@@ -2056,8 +2061,8 @@ public class UI {
 			}
 			this.flagPane(player, itemMap);
 		}));
-		flagPane.addButton(new Button(ItemHandler.getItem("EGG", 1, itemMap.isAnimated(), "&a&l&nAnimate", "&7", "&7*Allows the item to animate between", "&7its different iterations defined", "&7under the animations tab.", 
-				"&9&lENABLED: &a" + (itemMap.isAnimated() + "").toUpperCase()), event -> {
+		flagPane.addButton(new Button(ItemHandler.getItem("EGG", 1, itemMap.isAnimated(), "&a&l&nAnimate", "&7", "&a&lT: &7Allows the item to animate between", "&7its different iterations defined", "&7under the animations tab.", "&7",
+				"&c&lF: &7Item will not animate.", "&7", "&9&lENABLED: &a" + (itemMap.isAnimated() + "").toUpperCase()), event -> {
 			if (itemMap.isAnimated()) {
 				itemMap.setAnimate(false);
 			} else {
@@ -2065,8 +2070,9 @@ public class UI {
 			}
 			this.flagPane(player, itemMap);
 		}));
-		flagPane.addButton(new Button(ItemHandler.getItem((ServerHandler.hasAquaticUpdate() ? "CHEST_MINECART" : "342"), 1, itemMap.isItemStore(), "&a&l&nItem Store", "&7", "&7*Prevents the storage of the item", 
-				"&7in any object which can house an item.", "&9&lENABLED: &a" + (itemMap.isItemStore() + "").toUpperCase()), event -> {
+		flagPane.addButton(new Button(ItemHandler.getItem((ServerHandler.hasAquaticUpdate() ? "CHEST_MINECART" : "342"), 1, itemMap.isItemStore(), "&a&l&nItem Store", "&7", "&a&lT: &7Prevents the storage of the item", 
+				"&7in any object which can house an item.", "&7",
+				"&c&lF: &7Allows the storage of the item.", "&7", "&9&lENABLED: &a" + (itemMap.isItemStore() + "").toUpperCase()), event -> {
 			if (itemMap.isItemStore()) {
 				itemMap.setItemStore(false);
 			} else {
@@ -2074,7 +2080,8 @@ public class UI {
 			}
 			this.flagPane(player, itemMap);
 		}));
-		flagPane.addButton(new Button(ItemHandler.getItem("BOW", 1, itemMap.isCancelEvents(), "&a&l&nCancel Events", "&7", "&7*Prevents almost any event from executing", "&7when right-clicking the item.", "&9&lENABLED: &a" +
+		flagPane.addButton(new Button(ItemHandler.getItem("BOW", 1, itemMap.isCancelEvents(), "&a&l&nCancel Events", "&7", "&a&lT: &7Prevents almost any event from executing", "&7when right-clicking the item.", "&7",
+				"&c&lF: &7Allows item events to", "&7be executed freely.", "&7", "&9&lENABLED: &a" +
 		(itemMap.isCancelEvents() + "").toUpperCase()), event -> {
 			if (itemMap.isCancelEvents()) {
 				itemMap.setCancelEvents(false);
@@ -2083,8 +2090,9 @@ public class UI {
 			}
 			this.flagPane(player, itemMap);
 		}));
-		flagPane.addButton(new Button(ItemHandler.getItem((ServerHandler.hasAquaticUpdate() ? "OAK_DOOR" : (ServerHandler.hasSpecificUpdate("1_8") ? "324" : "64")), 1, itemMap.isCountLock(), "&a&l&nCount Lock", "&7", "&7*Locks the items count which", 
-				"&7allows infinite consumption of the item.", "&9&lENABLED: &a" + (itemMap.isCountLock() + "").toUpperCase()), event -> {
+		flagPane.addButton(new Button(ItemHandler.getItem((ServerHandler.hasAquaticUpdate() ? "OAK_DOOR" : (ServerHandler.hasSpecificUpdate("1_8") ? "324" : "64")), 1, itemMap.isCountLock(), "&a&l&nCount Lock", "&7", "&a&lT: &7Locks the items count which", 
+				"&7allows infinite consumption of the item.", "&7",
+				"&c&lF: &7Items will not be stacked infinitely.", "&7", "&9&lENABLED: &a" + (itemMap.isCountLock() + "").toUpperCase()), event -> {
 			if (itemMap.isCountLock()) {
 				itemMap.setCountLock(false);
 			} else {
@@ -2092,7 +2100,8 @@ public class UI {
 			}
 			this.flagPane(player, itemMap);
 		}));
-		flagPane.addButton(new Button(ItemHandler.getItem("BONE", 1, itemMap.isDeathDroppable(), "&a&l&nDeath Drops", "&7", "&7*Prevents the item from being dropped", "&7upon death, this removes the item.", "&9&lENABLED: &a" + 
+		flagPane.addButton(new Button(ItemHandler.getItem("BONE", 1, itemMap.isDeathDroppable(), "&a&l&nDeath Drops", "&7", "&a&lT: &7Prevents the item from being dropped", "&7upon death, this removes the item.", "&7",
+				"&c&lF: &7Allows the item to", "&7be dropped on death.", "&7", "&9&lENABLED: &a" + 
 		(itemMap.isDeathDroppable() + "").toUpperCase()), event -> {
 			if (itemMap.isDeathDroppable()) {
 				itemMap.setDeathDroppable(false);
@@ -2101,7 +2110,8 @@ public class UI {
 			}
 			this.flagPane(player, itemMap);
 		}));
-		flagPane.addButton(new Button(ItemHandler.getItem("HOPPER", 1, itemMap.isSelfDroppable(), "&a&l&nSelf Drops", "&7", "&7*Prevents the item from being dropped", "&7by the player, returns back to their inventory.", 
+		flagPane.addButton(new Button(ItemHandler.getItem("HOPPER", 1, itemMap.isSelfDroppable(), "&a&l&nSelf Drops", "&7", "&a&lT: &7Prevents the item from being dropped", "&7by the player, returns back to their inventory.", "&7",
+				"&c&lF: &7Allows the item to be dropped.", "&7", 
 				"&9&lENABLED: &a" + (itemMap.isSelfDroppable() + "").toUpperCase()), event -> {
 			if (itemMap.isSelfDroppable()) {
 				itemMap.setSelfDroppable(false);
@@ -2110,7 +2120,8 @@ public class UI {
 			}
 			this.flagPane(player, itemMap);
 		}));
-		flagPane.addButton(new Button(ItemHandler.getItem("CACTUS", 1, itemMap.isDisposable(), "&a&l&nDisposable", "&7", "&7*When the item command is run,", "&7x1 of the item will be removed.", "&9&lENABLED: &a" + 
+		flagPane.addButton(new Button(ItemHandler.getItem("CACTUS", 1, itemMap.isDisposable(), "&a&l&nDisposable", "&7", "&a&lT: &7When the item command is run,", "&7x1 of the item will be removed.", "&7",
+				"&c&lF: &7Item will not be removed", "&7when executing a command.", "&7", "&9&lENABLED: &a" + 
 		(itemMap.isDisposable() + "").toUpperCase()), event -> {
 			if (itemMap.isDisposable()) {
 				itemMap.setDisposable(false);
@@ -2119,7 +2130,8 @@ public class UI {
 			}
 			this.flagPane(player, itemMap);
 		}));
-		flagPane.addButton(new Button(ItemHandler.getItem("FURNACE", 1, itemMap.isItemModify(), "&a&l&nItem Modifiable", "&7", "&7*Blocks the item from being", "&7repaired or enchanted in-game.", "&9&lENABLED: &a" + 
+		flagPane.addButton(new Button(ItemHandler.getItem("FURNACE", 1, itemMap.isItemModify(), "&a&l&nItem Modifiable", "&7", "&a&lT: &7Blocks the item from being", "&7repaired or enchanted in-game.", "&7",
+				"&c&lF: &7Allows items to", "&7be repaired and enchanted.", "&7", "&9&lENABLED: &a" + 
 		(itemMap.isItemModify() + "").toUpperCase()), event -> {
 			if (itemMap.isItemModify()) {
 				itemMap.setItemModify(false);
@@ -2128,7 +2140,8 @@ public class UI {
 			}
 			this.flagPane(player, itemMap);
 		}));
-		flagPane.addButton(new Button(ItemHandler.getItem("ANVIL", 1, itemMap.isItemRepairable(), "&a&l&nItem Repairable", "&7", "&7*Blocks the item from being", "&7used in an anvil or repaired.", "&9&lENABLED: &a" +
+		flagPane.addButton(new Button(ItemHandler.getItem("ANVIL", 1, itemMap.isItemRepairable(), "&a&l&nItem Repairable", "&7", "&a&lT: &7Blocks the item from being", "&7used in an anvil or repaired.", "&7",
+				"&c&lF: &7Allows the item to be repaired.", "&7", "&9&lENABLED: &a" +
 		(itemMap.isItemRepairable() + "").toUpperCase()), event -> {
 			if (itemMap.isItemRepairable()) {
 				itemMap.setItemRepairable(false);
@@ -2137,8 +2150,9 @@ public class UI {
 			}
 			this.flagPane(player, itemMap);
 		}));
-		flagPane.addButton(new Button(ItemHandler.getItem((ServerHandler.hasAquaticUpdate() ? "CRAFTING_TABLE" : "58"), 1, itemMap.isItemCraftable(), "&a&l&nItem Craftable", "&7", "&7*Blocks the item from being", 
-				"&7used in a crafting recipe.", "&9&lENABLED: &a" + (itemMap.isItemCraftable() + "").toUpperCase()), event -> {
+		flagPane.addButton(new Button(ItemHandler.getItem((ServerHandler.hasAquaticUpdate() ? "CRAFTING_TABLE" : "58"), 1, itemMap.isItemCraftable(), "&a&l&nItem Craftable", "&7", "&a&lT: &7Blocks the item from being", 
+				"&7used in a crafting recipe.", "&7",
+				"&c&lF: &7Item will be usable in", "&7a crafting recipe.", "&7", "&9&lENABLED: &a" + (itemMap.isItemCraftable() + "").toUpperCase()), event -> {
 			if (itemMap.isItemCraftable()) {
 				itemMap.setItemCraftable(false);
 			} else {
@@ -2146,8 +2160,9 @@ public class UI {
 			}
 			this.flagPane(player, itemMap);
 		}));
-		flagPane.addButton(new Button(ItemHandler.getItem((ServerHandler.hasAquaticUpdate() ? "WHEAT_SEEDS" : "295"), 1, itemMap.isAlwaysGive(), "&a&l&nAlways Give", "&7", "&7*Gives the item every time the player", 
-				"&7performs one of the triggers actions.", "&7regardless of already having the item", "&9&lENABLED: &a" + (itemMap.isAlwaysGive() + "").toUpperCase()), event -> {
+		flagPane.addButton(new Button(ItemHandler.getItem((ServerHandler.hasAquaticUpdate() ? "WHEAT_SEEDS" : "295"), 1, itemMap.isAlwaysGive(), "&a&l&nAlways Give", "&7", "&a&lT: &7Gives the item every time the player", 
+				"&7performs one of the triggers actions.", "&7regardless of already having the item", "&7",
+				"&c&lF: &7Normal item restrictions will apply.", "&7", "&9&lENABLED: &a" + (itemMap.isAlwaysGive() + "").toUpperCase()), event -> {
 			if (itemMap.isAlwaysGive()) {
 				itemMap.setAlwaysGive(false);
 			} else {
@@ -2155,8 +2170,8 @@ public class UI {
 			}
 			this.flagPane(player, itemMap);
 		}));
-		flagPane.addButton(new Button(ItemHandler.getItem("DIAMOND_HELMET", 1, itemMap.isItemChangable(), "&a&l&nAllow Modifications", "&7", "&7*Allows the players to modify the item", "&7while retaining all properties.", 
-				"&9&lENABLED: &a" + (itemMap.isItemChangable() + "").toUpperCase()), event -> {
+		flagPane.addButton(new Button(ItemHandler.getItem("DIAMOND_HELMET", 1, itemMap.isItemChangable(), "&a&l&nAllow Modifications", "&7", "&a&lT: &7Allows the players to modify the item", "&7while retaining all properties.", "&7",
+				"&c&lF: &7Item will not be modifiable.", "&7", "&9&lENABLED: &a" + (itemMap.isItemChangable() + "").toUpperCase()), event -> {
 			if (itemMap.isItemChangable()) {
 				itemMap.setItemChangable(false);
 			} else {
@@ -2164,7 +2179,8 @@ public class UI {
 			}
 			this.flagPane(player, itemMap);
 		}));
-		flagPane.addButton(new Button(ItemHandler.getItem("ITEM_FRAME", 1, itemMap.isGiveNext(), "&a&l&nGive Next", "&7", "&7*Gives the item to the next available slot", "&7only if the defined slot is full.", "&9&lENABLED: &a" +
+		flagPane.addButton(new Button(ItemHandler.getItem("ITEM_FRAME", 1, itemMap.isGiveNext(), "&a&l&nGive Next", "&7", "&a&lT: &7Gives the item to the next available slot", "&7only if the defined slot is full.", "&7",
+				"&c&lF: &7Gives the item in its dedicated slot.", "&7", "&9&lENABLED: &a" +
 		(itemMap.isGiveNext() + "").toUpperCase()), event -> {
 			if (itemMap.isGiveNext()) {
 				itemMap.setGiveNext(false);
@@ -2173,7 +2189,8 @@ public class UI {
 			}
 			this.flagPane(player, itemMap);
 		}));
-		flagPane.addButton(new Button(ItemHandler.getItem("DIAMOND_SWORD", 1, itemMap.isDropFull(), "&a&l&nDrop Full", "&7", "&7*Drops the item on the ground if", "&7the players inventory is full.", "&9&lENABLED: &a" + 
+		flagPane.addButton(new Button(ItemHandler.getItem("DIAMOND_SWORD", 1, itemMap.isDropFull(), "&a&l&nDrop Full", "&7", "&a&lT: &7Drops the item on the ground if", "&7the players inventory is full.", "&7",
+				"&c&lF: &7Fails to give the item.", "&7", "&9&lENABLED: &a" + 
 		(itemMap.isDropFull() + "").toUpperCase()), event -> {
 			if (itemMap.isDropFull()) {
 				itemMap.setDropFull(false);
@@ -2182,8 +2199,8 @@ public class UI {
 			}
 			this.flagPane(player, itemMap);
 		}));
-		flagPane.addButton(new Button(ItemHandler.getItem((ServerHandler.hasAquaticUpdate() ? "WRITABLE_BOOK" : "386"), 1, itemMap.isOverwritable(), "&a&l&nOverwrite", "&7", "&7*Allows the item to overwrite", 
-				"&7any existing items in the defined slot.", "&9&lENABLED: &a" + (itemMap.isOverwritable() + "").toUpperCase()), event -> {
+		flagPane.addButton(new Button(ItemHandler.getItem((ServerHandler.hasAquaticUpdate() ? "WRITABLE_BOOK" : "386"), 1, itemMap.isOverwritable(), "&a&l&nOverwrite", "&7", "&a&lT: &7Allows the item to overwrite", 
+				"&7any existing items in the defined slot.", "&7", "&c&lF: &7Prevents the item from overwriting.", "&7", "&9&lENABLED: &a" + (itemMap.isOverwritable() + "").toUpperCase()), event -> {
 			if (itemMap.isOverwritable()) {
 				itemMap.setOverwritable(false);
 			} else {
@@ -3770,8 +3787,10 @@ public class UI {
 			for (String slot: itemMap.getMultipleSlots()) {
 				slotString += slot + ", ";
 			}
-			for (String split: Utils.softSplit(Utils.nullCheck(slotString.substring(0, slotString.length() - 2)))) {
-				slotList += "&a" + split + " /n ";
+			if (slotString.length() >= 2) {
+				for (String split: Utils.softSplit(Utils.nullCheck(slotString.substring(0, slotString.length() - 2)))) {
+					slotList += "&a" + split + " /n ";
+				}
 			}
 		}
 		String itemflagsList = "";
@@ -3810,8 +3829,10 @@ public class UI {
 			for (PotionEffect potions: itemMap.getPotionEffect()) {
 				potionString += potions.getType().getName().toUpperCase() + ":" + potions.getAmplifier() + ":" + potions.getDuration() / 160 + ", ";
 			}
-			for (String split: Utils.softSplit(Utils.nullCheck(potionString.substring(0, potionString.length() - 2)))) {
-				potionList += "&a" + split + " /n ";
+			if (potionString.length() >= 2) {
+				for (String split: Utils.softSplit(Utils.nullCheck(potionString.substring(0, potionString.length() - 2)))) {
+					potionList += "&a" + split + " /n ";
+				}
 			}
 		}
 		String patternList = "";
@@ -3820,8 +3841,10 @@ public class UI {
 			for (Pattern patterns: itemMap.getBannerPatterns()) {
 				patternString += patterns.getColor() + ":" + patterns.getPattern().name().toUpperCase() + ", ";
 			}
-			for (String split: Utils.softSplit(Utils.nullCheck(patternString.substring(0, patternString.length() - 2)))) {
-				patternList += "&a" + split + " /n ";
+			if (patternString.length() >= 2) {
+				for (String split: Utils.softSplit(Utils.nullCheck(patternString.substring(0, patternString.length() - 2)))) {
+					patternList += "&a" + split + " /n ";
+				}
 			}
 		}
 		String colorList = "";
