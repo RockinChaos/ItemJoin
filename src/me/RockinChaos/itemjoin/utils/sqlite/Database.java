@@ -163,7 +163,6 @@ public abstract class Database {
 				}
 				existingData.add(columnData);
 			}
-			conn.close();
 			rs.close();
 		} catch (SQLException e) {
 			ServerHandler.sendDebugMessage("[SQLITE] Failed to execute database statement.");
@@ -223,7 +222,6 @@ public abstract class Database {
 
 	public boolean columnExists(final String statement) {
 		try (Connection conn = this.getSQLConnection(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(statement)) {
-			conn.close();
 			rs.close();
 			return true;
 		} catch (SQLException e) {

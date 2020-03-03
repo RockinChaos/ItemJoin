@@ -76,7 +76,7 @@ public class ConfigHandler {
 	}
 	
 	public static void registerEvents() {
-	    ItemJoin.getInstance().getCommand("itemjoin").setExecutor(new Commands()); 
+	    ItemJoin.getInstance().getCommand("itemjoin").setExecutor(new Commands());
 	    ItemJoin.getInstance().getCommand("itemjoin").setTabCompleter(new TabComplete());
 		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new MultiForm(), ItemJoin.getInstance());
 		if ((!Utils.containsIgnoreCase(ConfigHandler.isPreventPickups(), "FALSE") || !Utils.containsIgnoreCase(ConfigHandler.isPreventPickups(), "DISABLED"))) {
