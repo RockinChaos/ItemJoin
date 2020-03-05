@@ -14,6 +14,8 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.scheduler.BukkitRunnable;
+
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
@@ -33,28 +35,34 @@ public class SQLData {
 	private List <String> executeStatementsLater = new ArrayList<String>();
 	
 	public SQLData() {
-		this.createTables();
-		this.convertYAMLS();
-		this.loadMapImages();
-		this.loadFirstJoinPlayers();
-		this.loadFirstWorldPlayers();
-		this.loadFirstCommandPlayers();
-		this.loadIPLimitAddresses();
-		this.loadEnabledPlayers();
-		this.loadReturnItems();
-	
-		try { SQLite.getDatabase("database").closeConnection(); } catch (Exception e) { } 
-		this.runTaskSaveStatements();
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+				SQLite.loadSQLDatabase();
+				createTables();
+				convertYAMLS();
+				loadMapImages();
+				loadFirstJoinPlayers();
+				loadFirstWorldPlayers();
+				loadFirstCommandPlayers();
+				loadIPLimitAddresses();
+				loadEnabledPlayers();
+				loadReturnItems();
+			
+				try { SQLite.getDatabase("database").closeConnection(); } catch (Exception e) { } 
+				runTaskSaveStatements();
+            }
+        }.runTaskAsynchronously(ItemJoin.getInstance());
 	}
 	
 	private void createTables() {
-		SQLite.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS first_join (`World_Name` varchar(32), `Player_Name` varchar(32), `Player_UUID` varchar(32), `Item_Name` varchar(32), `Time_Stamp` varchar(32));");
-		SQLite.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS first_world (`World_Name` varchar(32), `Player_Name` varchar(32), `Player_UUID` varchar(32), `Item_Name` varchar(32), `Time_Stamp` varchar(32));");
-		SQLite.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS ip_limits (`World_Name` varchar(32), `IP_Address` varchar(32), `Player_UUID` varchar(32), `Item_Name` varchar(32), `Time_Stamp` varchar(32));");
-		SQLite.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS first_commands (`World_Name` varchar(32), `Player_UUID` varchar(32), `Command_String` varchar(32), `Time_Stamp` varchar(32));");
-		SQLite.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS enabled_players (`World_Name` varchar(32), `Player_Name` varchar(32), `Player_UUID` varchar(32), `isEnabled` varchar(32), `Time_Stamp` varchar(32));");
-		SQLite.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS return_items (`World_Name` varchar(32), `Region_Name` varchar(32), `Player_UUID` varchar(32), `Inventory64` varchar(32), `Time_Stamp` varchar(32));");
-		SQLite.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS map_ids (`Map_IMG` varchar(32), `Map_ID` varchar(32));");
+        SQLite.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS first_join (`World_Name` varchar(32), `Player_Name` varchar(32), `Player_UUID` varchar(32), `Item_Name` varchar(32), `Time_Stamp` varchar(32));");
+        SQLite.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS first_world (`World_Name` varchar(32), `Player_Name` varchar(32), `Player_UUID` varchar(32), `Item_Name` varchar(32), `Time_Stamp` varchar(32));");
+        SQLite.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS ip_limits (`World_Name` varchar(32), `IP_Address` varchar(32), `Player_UUID` varchar(32), `Item_Name` varchar(32), `Time_Stamp` varchar(32));");
+        SQLite.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS first_commands (`World_Name` varchar(32), `Player_UUID` varchar(32), `Command_String` varchar(32), `Time_Stamp` varchar(32));");
+        SQLite.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS enabled_players (`World_Name` varchar(32), `Player_Name` varchar(32), `Player_UUID` varchar(32), `isEnabled` varchar(32), `Time_Stamp` varchar(32));");
+        SQLite.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS return_items (`World_Name` varchar(32), `Region_Name` varchar(32), `Player_UUID` varchar(32), `Inventory64` varchar(32), `Time_Stamp` varchar(32));");
+        SQLite.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS map_ids (`Map_IMG` varchar(32), `Map_ID` varchar(32));");
 		this.alterTables();
 	}
 	
@@ -484,7 +492,9 @@ public class SQLData {
 			String newGen = "converted" + Utils.getRandom(0, 100) + "-first-join.yml";
 			File newFile = new File(userfiles, newGen);
 			firstJoin.renameTo(newFile);
-		} catch (Exception e) { ConfigHandler.getLogger().sqLiteConvertFailed(e, "first-join"); }
+		} catch (Exception e) {
+			ConfigHandler.getLogger().sqLiteConvertFailed(e, "first-join");
+		}
 	}
 	
 	private void convertIpLimitData(File ipLimit) {
@@ -510,6 +520,8 @@ public class SQLData {
 			String newGen = "converted" + Utils.getRandom(0, 100) + "-ip-limit.yml";
 			File newFile = new File(userfiles, newGen);
 			ipLimit.renameTo(newFile);
-		} catch (Exception e) { ConfigHandler.getLogger().sqLiteConvertFailed(e, "ip-limit"); }
+		} catch (Exception e) {
+			ConfigHandler.getLogger().sqLiteConvertFailed(e, "ip-limit");
+		}
 	}
 }

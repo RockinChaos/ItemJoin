@@ -8,6 +8,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
+
+import me.RockinChaos.itemjoin.utils.Utils;
 import me.RockinChaos.itemjoin.utils.sqlite.Database;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
@@ -16,7 +18,14 @@ import me.RockinChaos.itemjoin.handlers.ServerHandler;
 public class SQLite extends Database {
 	private String dbname;
 	private String createTable;
+	private static boolean isMySQL = false;
+	private static int port = 3306;
+	private static String host = "localhost";
+	private static String table = "database";
+	private static String user = "root";
+	private static String pass = "password";
 	private static Map < String, Database > databases = new HashMap < String, Database > ();
+
 	
 	public SQLite(String databaseName, String createStatement) {
 		dbname = databaseName;
@@ -51,29 +60,58 @@ public class SQLite extends Database {
 		}
 	}
 	
+	public static void loadSQLDatabase() {
+		if (ConfigHandler.getConfig("config.yml").getString("Database.port") != null) { port = ConfigHandler.getConfig("config.yml").getInt("Database.port"); }
+		if (ConfigHandler.getConfig("config.yml").getString("Database.host") != null) { host = ConfigHandler.getConfig("config.yml").getString("Database.host"); }
+		if (ConfigHandler.getConfig("config.yml").getString("Database.table") != null) { table = ConfigHandler.getConfig("config.yml").getString("Database.table"); }
+		if (ConfigHandler.getConfig("config.yml").getString("Database.user") != null) { user = Utils.encrypt(ConfigHandler.getConfig("config.yml").getString("Database.user")); }
+		if (ConfigHandler.getConfig("config.yml").getString("Database.pass") != null) { pass = Utils.encrypt(ConfigHandler.getConfig("config.yml").getString("Database.pass")); }
+	}	
+	
 	@Override
 	public Connection getSQLConnection() {
-		File dataFolder = new File(ItemJoin.getInstance().getDataFolder(), dbname + ".db");
-		if (!dataFolder.exists()) {
-			try { dataFolder.createNewFile(); } 
-			catch (IOException e) { ConfigHandler.getLogger().sqLiteError(e, dbname); }
-		} try {
-			if ((connection != null) && (!connection.isClosed())) { return connection; }
-			Class.forName("org.sqlite.JDBC");
-			connection = DriverManager.getConnection("jdbc:sqlite:" + dataFolder);
-			return connection;
-		} catch (SQLException e) { ConfigHandler.getLogger().sqLiteException(e); } catch (ClassNotFoundException e) { ConfigHandler.getLogger().sqLiteMissing(e); }
-		return null;
+		if (ConfigHandler.getConfig("config.yml").getString("Database.MySQL") != null && ConfigHandler.getConfig("config.yml").getBoolean("Database.MySQL")) {
+			isMySQL = true;
+			try { 
+				if (connection != null && !connection.isClosed()) { 
+			    	return connection; 
+			    } else {
+			    	Class.forName("com.mysql.jdbc.Driver");
+			        connection = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + table + "?useSSL=false", Utils.decrypt(user), Utils.decrypt(pass));
+			        return connection;
+			    }
+			} catch (Exception e) { 
+					ServerHandler.sendDebugMessage("&c&lERROR: &cUnable to get the defined MySQL database, check your settings.");
+					ServerHandler.sendDebugTrace(e); 
+			}
+			return null;
+		} else {
+			File dataFolder = new File(ItemJoin.getInstance().getDataFolder(), dbname + ".db");
+			if (!dataFolder.exists()) {
+				try { dataFolder.createNewFile(); } 
+				catch (IOException e) { ConfigHandler.getLogger().sqLiteError(e, dbname); }
+			} try {
+				if ((connection != null) && (!connection.isClosed())) { return connection; }
+				Class.forName("org.sqlite.JDBC");
+				connection = DriverManager.getConnection("jdbc:sqlite:" + dataFolder);
+				return connection;
+			} catch (SQLException e) { ConfigHandler.getLogger().sqLiteException(e); } catch (ClassNotFoundException e) { ConfigHandler.getLogger().sqLiteMissing(e); }
+			return null;
+		}
 	}
 	
 	@Override
 	public void load() {
 		connection = getSQLConnection();
 		try {
-			Statement s = connection.createStatement();
-			s.executeUpdate(createTable);
+			Statement s = this.connection.createStatement();
+			s.executeUpdate(this.createTable);
 			s.close();
 			initialize();
 		} catch (SQLException e) { ServerHandler.sendDebugTrace(e); }
+	}
+	
+	public static boolean MySQLEnabled() {
+		return isMySQL;
 	}
 }

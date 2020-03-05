@@ -2,6 +2,7 @@ package me.RockinChaos.itemjoin.utils;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -87,6 +88,26 @@ public class Utils {
 			input = input.replace("{", "").replace("}", "").replace("=", ":");
 		}
 		return input;
+	}
+	
+	public static String encrypt(String text) {
+		try {
+			return Base64.getEncoder().encodeToString(text.getBytes());
+		} catch (Exception e) {
+			ServerHandler.sendDebugMessage("&c&lERROR: &cFailure to encrypt sensitive text!");
+			ServerHandler.sendDebugTrace(e);
+		}
+		return null;
+	}
+	
+	public static String decrypt(String text) {
+		try {
+			return new String(Base64.getDecoder().decode(text));
+		} catch (Exception e) {
+			ServerHandler.sendDebugMessage("&c&lERROR: &cFailure to decrypt sensitive text!");
+			ServerHandler.sendDebugTrace(e);
+		}
+		return null;
 	}
 	
 	public static int getRandom(int lower, int upper) {

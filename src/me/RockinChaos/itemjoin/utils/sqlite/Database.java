@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -46,7 +45,7 @@ public abstract class Database {
 				if (ps != null) {
 					ps.close();
 				}
-				if (conn != null) {
+				if (conn != null && !SQLite.MySQLEnabled()) {
 					conn.close();
 				}
 			} catch (SQLException e) {
@@ -75,7 +74,7 @@ public abstract class Database {
 				if (ps != null) {
 					ps.close();
 				}
-				if (conn != null) {
+				if (conn != null && !SQLite.MySQLEnabled()) {
 					conn.close();
 				}
 			} catch (SQLException e2) { 
@@ -88,7 +87,7 @@ public abstract class Database {
 				if (ps != null) {
 					ps.close();
 				}
-				if (conn != null) {
+				if (conn != null && !SQLite.MySQLEnabled()) {
 					conn.close();
 				}
 			} catch (SQLException e) { 
@@ -100,7 +99,7 @@ public abstract class Database {
 			if (ps != null) {
 				ps.close();
 			}
-			if (conn != null) {
+			if (conn != null && !SQLite.MySQLEnabled()) {
 				conn.close();
 			}
 		} catch (SQLException e) { 
@@ -130,7 +129,7 @@ public abstract class Database {
 				if (ps != null) {
 					ps.close();
 				}
-				if (conn != null) {
+				if (conn != null && !SQLite.MySQLEnabled()) {
 					conn.close();
 				}
 			} catch (SQLException e2) { 
@@ -142,7 +141,7 @@ public abstract class Database {
 				if (ps != null) {
 					ps.close();
 				}
-				if (conn != null) {
+				if (conn != null && !SQLite.MySQLEnabled()) {
 					conn.close();
 				}
 			} catch (SQLException e) { 
@@ -155,7 +154,7 @@ public abstract class Database {
 	
 	public List < List < String >> queryTableData(final String statement, final String...row) {
 		final List < List < String > > existingData = new ArrayList < List < String > > ();
-		try (Connection conn = this.getSQLConnection(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(statement)) {
+		try (ResultSet rs = this.getSQLConnection().prepareStatement(statement).executeQuery()) {
 			while (rs.next()) {
 				final List < String > columnData = new ArrayList < String > ();
 				for (final String singleRow: row) {
@@ -197,7 +196,7 @@ public abstract class Database {
 				if (ps != null) {
 					ps.close();
 				}
-				if (conn != null) {
+				if (conn != null && !SQLite.MySQLEnabled()) {
 					conn.close();
 				}
 			} catch (SQLException e2) { 
@@ -209,7 +208,7 @@ public abstract class Database {
 				if (ps != null) {
 					ps.close();
 				}
-				if (conn != null) {
+				if (conn != null && !SQLite.MySQLEnabled()) {
 					conn.close();
 				}
 			} catch (SQLException e) { 
@@ -221,7 +220,7 @@ public abstract class Database {
 	}
 
 	public boolean columnExists(final String statement) {
-		try (Connection conn = this.getSQLConnection(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(statement)) {
+		try (ResultSet rs = this.getSQLConnection().prepareStatement(statement).executeQuery()) {
 			rs.close();
 			return true;
 		} catch (SQLException e) {
@@ -254,10 +253,9 @@ public abstract class Database {
 		return tExists;
 	}
 	
-	public boolean dataExists(String StatementString) {
+	public boolean dataExists(String statement) {
 		try {
-			Statement statement = SQLite.getDatabase("database").getSQLConnection().createStatement();
-			ResultSet result = statement.executeQuery(StatementString);
+			ResultSet result = this.getSQLConnection().prepareStatement(statement).executeQuery();
 			try {
 				if (!result.isBeforeFirst()) {
 					ServerHandler.sendDebugMessage("[SQLite] Result set is empty.");
@@ -266,7 +264,7 @@ public abstract class Database {
 					ServerHandler.sendDebugMessage("[SQLite] Result set is not empty.");
 					return true;
 				}
-			} finally { result.close(); statement.close(); SQLite.getDatabase("database").closeConnection();}
+			} finally { result.close(); SQLite.getDatabase("database").closeConnection(); }
 		} catch (Exception e) {
 			ServerHandler.sendDebugMessage("Could not read from the database.db file, some ItemJoin features have been disabled!");
 			ServerHandler.sendDebugTrace(e);
@@ -299,7 +297,9 @@ public abstract class Database {
 	
 	public void closeConnection() {
 		try {
-			this.connection.close();
+			if (!SQLite.MySQLEnabled()) {
+				this.connection.close();
+			}
 		} catch (SQLException | NullPointerException e) { 
 			if (e.getCause() != null) {
 				ServerHandler.sendDebugMessage("[SQLITE] Failed to close database connection."); 
