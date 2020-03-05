@@ -15,7 +15,7 @@ import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.utils.interfaces.Interface;
 
-public class MultiForm implements Listener {
+public class Menu implements Listener {
   	
 //  ============================================== //
 //          Handlers for virtualInventory          //
