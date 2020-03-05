@@ -49,7 +49,7 @@ import me.RockinChaos.itemjoin.utils.interfaces.Interface;
 import me.arcaniax.hdb.api.HeadDatabaseAPI;
 
 public class UI {
-	private String GUIName = Utils.colorFormat("&7           &0&n ItemJoin Menu");
+	private String GUIName = ServerHandler.hasCombatUpdate() ? Utils.colorFormat("&7           &0&n ItemJoin Menu") : Utils.colorFormat("&7           &0&n ItemJoin Menu");
 	private ItemStack fillerPaneBItem = ItemHandler.getItem("STAINED_GLASS_PANE:15", 1, false, "&7", "");
 	private ItemStack fillerPaneGItem = ItemHandler.getItem("STAINED_GLASS_PANE:7", 1, false, "&7", "");
 	private ItemStack exitItem = ItemHandler.getItem("BARRIER", 1, false, "&c&l&nExit", "&7", "&7*Returns you to the game");
@@ -61,9 +61,6 @@ public class UI {
 	
 	public void startMenu(final CommandSender sender) {
 		final Player player = (Player) sender;
-		if (!ServerHandler.hasCombatUpdate()) {
-			this.GUIName = Utils.colorFormat("&7           &0&n ItemJoin Menu");
-		}
 		Interface pagedPane = new Interface(false, 1, this.GUIName);
 		pagedPane.addButton(new Button(this.exitItem, event -> player.closeInventory()));
 		pagedPane.addButton(new Button(this.fillerPaneBItem), 2);
@@ -648,21 +645,31 @@ public class UI {
 	
 	private void materialPane(final Player player, final ItemMap itemMap, final int stage) {
 		Interface materialPane = new Interface(true, 6, this.GUIName);
-		if (stage != 0) {
+		if (stage != 0 && stage != 2) {
 			materialPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> {
 				this.creatingPane(player, itemMap);
+			}));
+		} else if (stage == 2) {
+			materialPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the commands menu."), event -> {
+				this.commandPane(player, itemMap);
 			}));
 		}
 		materialPane.addButton(new Button(ItemHandler.getItem("STICK", 1, true, "&b&lBukkit Material", "&7", "&7*If you know the name", "&7of the BUKKIT material type", "&7simply click and type it."), event -> {
 			player.closeInventory();
 			String[] placeHolders = Language.newString();
-			placeHolders[14] = "BUKKIT MATERIAL";
+			if (stage == 2) {
+				placeHolders[14] = "ITEM COST";
+			} else {
+				placeHolders[14] = "BUKKIT MATERIAL";
+			}
 			placeHolders[15] = "IRON_SWORD";
 			Language.sendLangMessage("Commands.UI.inputType", player, placeHolders);
 			Language.sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 		}, event -> {
 			if (ItemHandler.getMaterial(event.getMessage(), null) != null) {
-				itemMap.setMaterial(ItemHandler.getMaterial(event.getMessage(), null));
+				if (stage == 2) {
+					itemMap.setItemCost(event.getMessage().toUpperCase());
+				} else { itemMap.setMaterial(ItemHandler.getMaterial(event.getMessage(), null)); }
 				if (!ServerHandler.hasAquaticUpdate() && event.getMessage().contains(":")) {
 					String[] dataValue = event.getMessage().split(":");
 					if (Utils.isInt(dataValue[1])) {
@@ -670,9 +677,17 @@ public class UI {
 					}	
 				}
 				String[] placeHolders = Language.newString();
-				placeHolders[14] = "BUKKIT MATERIAL";
+				if (stage == 2) {
+					placeHolders[14] = "ITEM COST";
+				} else {
+					placeHolders[14] = "BUKKIT MATERIAL";
+				}
 				Language.sendLangMessage("Commands.UI.inputSet", player, placeHolders);
-				this.creatingPane(event.getPlayer(), itemMap);
+				if (stage == 2) {
+					this.commandPane(event.getPlayer(), itemMap);
+				} else {
+					this.creatingPane(event.getPlayer(), itemMap);
+				}
 			} else {
 				String[] placeHolders = Language.newString();
 				placeHolders[16] = event.getMessage();
@@ -688,10 +703,14 @@ public class UI {
 						if (!material.toString().equalsIgnoreCase("STEP") || material.toString().equalsIgnoreCase("STEP") && i != 2) {
 							final int dataValue = i;
 							materialPane.addButton(new Button(ItemHandler.getItem(material.toString() + ":" + dataValue, 1, false, "", "&7", "&7*Click to set the", "&7material of the item."), event -> {
-								itemMap.setMaterial(material);
+								if (stage == 2) {
+									itemMap.setItemCost(material.toString());
+								} else { itemMap.setMaterial(material); }
 								if (dataValue != 0) { itemMap.setDataValue((short)dataValue); }
 								if (stage == 0) {
 									this.switchPane(player, itemMap, 0);
+								} else if (stage == 2) {
+									this.commandPane(player, itemMap);
 								} else {
 									this.creatingPane(player, itemMap);
 								}
@@ -700,9 +719,13 @@ public class UI {
 					}
 				} else {
 				materialPane.addButton(new Button(ItemHandler.getItem(material.toString(), 1, false, "", "&7", "&7*Click to set the", "&7material of the item."), event -> {
-					itemMap.setMaterial(material);
+					if (stage == 2) {
+						itemMap.setItemCost(material.toString());
+					} else { itemMap.setMaterial(material); }
 					if (stage == 0) {
 						this.switchPane(player, itemMap, 0);
+					} else if (stage == 2) { 
+						this.commandPane(player, itemMap);
 					} else {
 						this.creatingPane(player, itemMap);
 					}
@@ -1195,9 +1218,11 @@ public class UI {
 //  ============================================== //
 	
 	private void commandPane(final Player player, final ItemMap itemMap) {
-		Interface commandPane = new Interface(false, 2, this.GUIName);
+		Interface commandPane = new Interface(false, 3, this.GUIName);
+		commandPane.addButton(new Button(this.fillerPaneGItem), 4);
 		commandPane.addButton(new Button(ItemHandler.getItem((ServerHandler.hasAquaticUpdate() ? "WRITABLE_BOOK" : "386"), 1, false, "&e&lCommands", "&7", "&7*Click to define the custom command lines", "&7for the item and click type.", 
 				"&7", "&9&lCommands: &a" + (itemMap.getCommands().length != 0 ? "YES" : "NONE")), event -> this.actionPane(player, itemMap)));
+		commandPane.addButton(new Button(this.fillerPaneGItem), 4);
 		commandPane.addButton(new Button(ItemHandler.getItem("STICK", 1, false, "&a&lType", "&7", "&7*The event type that will", "&7trigger command execution.", "&9&lCOMMANDS-TYPE: &a" + Utils.nullCheck(itemMap.getCommandType() + "")), 
 				event -> this.typePane(player, itemMap)));
 		commandPane.addButton(new Button(ItemHandler.getItem("REDSTONE", 1, false, "&a&lParticle", "&7", "&7*Custom particle(s) that will be", "&7displayed when the commands", "&7are successfully executed.", "&9&lCOMMANDS-PARTICLE: &a" +
@@ -1209,8 +1234,17 @@ public class UI {
 				this.particlePane(player, itemMap);
 			}
 		}));
+		commandPane.addButton(new Button(ItemHandler.getItem("EMERALD", 1, false, "&a&lItem Cost", "&7", "&7*Material that will", "&7be charged upon successfully", "&7executing the commands.", "&9&lCOMMANDS-ITEM: &a" + 
+		(Utils.nullCheck(itemMap.getItemCost()))), event -> {
+			if (Utils.nullCheck(itemMap.getItemCost()) != "NONE") {
+				itemMap.setItemCost(null);
+				this.commandPane(player, itemMap);
+			} else {
+				this.materialPane(player, itemMap, 2);
+			}
+		}));
 		commandPane.addButton(new Button(ItemHandler.getItem("DIAMOND", 1, false, "&a&lCost", "&7", "&7*Amount that the player will", "&7be charged upon successfully", "&7executing the commands.", "&9&lCOMMANDS-COST: &a" + 
-		(Utils.nullCheck(itemMap.getCommandCost() + "&7") != "NONE" ? "$" : "") + Utils.nullCheck(itemMap.getCommandCost() + "&7")), event -> {
+		(Utils.nullCheck(itemMap.getCommandCost() + "&7"))), event -> {
 			if (Utils.nullCheck(itemMap.getCommandCost() + "&7") != "NONE") {
 				itemMap.setCommandCost(0);
 				this.commandPane(player, itemMap);
@@ -3859,8 +3893,8 @@ public class UI {
 				(itemMap.getMultipleSlots() != null && !itemMap.getMultipleSlots().isEmpty() ? "&9&lSlot(s): &a" + slotList : "&9&lSlot: &a" + itemMap.getSlot().toUpperCase()), "&9&lCount: &a" + itemMap.getCount(), 
 				(Utils.nullCheck(itemMap.getCustomName()) != "NONE" ? "&9&lName: &a" + itemMap.getCustomName() : ""), (Utils.nullCheck(itemMap.getCustomLore().toString()) != "NONE" ? "&9&lLore: &a" + (Utils.nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",").length() > 40 ? Utils.nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",").substring(0, 40) : Utils.nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",")) : ""), 
 				(Utils.nullCheck(itemMap.getDurability() + "&7") != "NONE" ? "&9&lDurability: &a" + itemMap.getDurability() : ""), (Utils.nullCheck(itemMap.getData() + "&7") != "NONE" ? "&9&lTexture Data: &a" + itemMap.getData() : ""), (itemMap.getCommands().length != 0 ? "&9&lCommands: &aYES" : ""), 
-				(Utils.nullCheck(itemMap.getCommandCost() + "&7") != "NONE" ? "&9&lCommands-Cost: &a" + itemMap.getCommandCost() : ""), (Utils.nullCheck(itemMap.getCommandType() + "") != "NONE" ? "&9&lCommands-Type: &a" + itemMap.getCommandType() : ""), 
-				(Utils.nullCheck(itemMap.getCommandSequence() + "") != "NONE" ? "&9&lCommands-Sequence: &a" + itemMap.getCommandSequence() : ""), 
+				(Utils.nullCheck(itemMap.getItemCost() + "&7") != "NONE" ? "&9&lCommands-Item: &a" + itemMap.getItemCost() : ""), (Utils.nullCheck(itemMap.getCommandCost() + "&7") != "NONE" ? "&9&lCommands-Cost: &a" + itemMap.getCommandCost() : ""), 
+				(Utils.nullCheck(itemMap.getCommandType() + "") != "NONE" ? "&9&lCommands-Type: &a" + itemMap.getCommandType() : ""), (Utils.nullCheck(itemMap.getCommandSequence() + "") != "NONE" ? "&9&lCommands-Sequence: &a" + itemMap.getCommandSequence() : ""), 
 				(Utils.nullCheck(itemMap.getCommandCooldown() + "&7") != "NONE" ? "&9&lCommands-Cooldown: &a" + itemMap.getCommandCooldown() + " second(s)" : ""), 
 				(Utils.nullCheck(itemMap.getCooldownMessage()) != "NONE" ? "&9&lCooldown-Message: &a" + itemMap.getCooldownMessage() : ""), (Utils.nullCheck(itemMap.getCommandSound() + "") != "NONE" ? "&9&lCommands-Sound: &a" + itemMap.getCommandSound() : ""), 
 				(Utils.nullCheck(itemMap.getCommandParticle() + "") != "NONE" ? "&9&lCommands-Particle: &a" + itemMap.getCommandParticle() : ""), (Utils.nullCheck(itemMap.getEnchantments().toString()) != "NONE" ? "&9&lEnchantments: &a" + enchantList : ""), 

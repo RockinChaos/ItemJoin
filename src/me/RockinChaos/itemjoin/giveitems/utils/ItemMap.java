@@ -155,6 +155,7 @@ public class ItemMap {
 	private String cooldownMessage;
 	private Sound commandSound;
 	private String commandParticle;
+	private String itemCost;
 	private Integer cost = 0;
 	private Integer warmDelay = 0;
 	private List < Player > warmPending = new ArrayList < Player > ();
@@ -272,6 +273,7 @@ public class ItemMap {
 	}
 	
 	private void setCommandCost() {
+		if (this.nodeLocation.getString("commands-item") != null && !this.nodeLocation.getString("commands-item").isEmpty()) { this.itemCost = this.nodeLocation.getString("commands-item"); }
 		if (this.nodeLocation.getString("commands-cost") != null && Utils.isInt(this.nodeLocation.getString("commands-cost"))) { this.cost = this.nodeLocation.getInt("commands-cost"); }
 	}
 	
@@ -577,6 +579,10 @@ public class ItemMap {
 	
 	public void setCommandCost(Integer cost) {
 		this.cost = cost;
+	}
+	
+	public void setItemCost(String itemCost) {
+		this.itemCost = itemCost;
 	}
 	
 	public void setWarmDelay(Integer delay) {
@@ -1049,6 +1055,10 @@ public class ItemMap {
 	
 	public Integer getCommandCost() {
 		return this.cost;
+	}
+	
+	public String getItemCost() {
+		return this.itemCost;
 	}
 	
 	public String getCommandParticle() {
@@ -1955,7 +1965,7 @@ public class ItemMap {
 
     public boolean executeCommands(final Player player, final ItemStack itemCopy, final String action, final String slot) {
 		boolean playerSuccess = false;
-    	if (this.commands != null && this.commands.length > 0 && !ConfigHandler.getItemCreator().isOpen(player) && !this.getWarmPending(player) && isExecutable(player, action) && !this.onCooldown(player) && this.isPlayerChargeable(player)) {
+    	if (this.commands != null && this.commands.length > 0 && !ConfigHandler.getItemCreator().isOpen(player) && !this.getWarmPending(player) && isExecutable(player, action) && !this.onCooldown(player) && this.isPlayerChargeable(player, this.itemCost != null && !this.itemCost.isEmpty())) {
     		this.warmCycle(player, this, this.getWarmDelay(), player.getLocation(), itemCopy, action, slot);
     	}
     	return playerSuccess;
@@ -1990,7 +2000,8 @@ public class ItemMap {
 				public void run() {
 					if (!player.isDead()) {
 						if (isExecuted(player, action, slot, itemCopy)) { 
-							itemMap.withdrawBalance(player, itemMap.cost);
+							if (itemMap.itemCost == null || itemMap.itemCost.isEmpty()) { itemMap.withdrawBalance(player); } 
+							else { itemMap.withdrawItemCost(player); }
 			    			itemMap.playSound(player);
 			    			itemMap.playParticle(player);
 							itemMap.removeDisposable(player, itemCopy, false);
@@ -2066,8 +2077,8 @@ public class ItemMap {
     	return playerSuccess;
     }
     
-    private boolean isPlayerChargeable(Player player) {
-		if (ConfigHandler.getDepends().getVault().vaultEnabled()) {
+    private boolean isPlayerChargeable(Player player, boolean materialCost) {
+		if (ConfigHandler.getDepends().getVault().vaultEnabled() && !materialCost) {
 			double balance = 0.0; try { balance = ConfigHandler.getDepends().getVault().getBalance(player); } catch (NullPointerException e) { }
 			if (balance >= this.cost) {
 				return true;
@@ -2076,17 +2087,104 @@ public class ItemMap {
 				Language.sendLangMessage("General.itemChargeFailed", player, placeHolders);
 				return false;
 			}
+		} else if (materialCost) {
+			Material mat = ItemHandler.getMaterial(this.itemCost, null);
+			int foundAmount = 0;
+			for (ItemStack playerInventory: player.getInventory().getContents()) {
+				if (playerInventory != null && playerInventory.getType() == mat) {
+					if (playerInventory.getAmount() >= this.cost) {
+						return true;
+					} else { 
+						foundAmount += playerInventory.getAmount();
+						if (foundAmount >= this.cost) {
+							return true;
+						}
+					}
+				}
+			}
+			for (ItemStack equipInventory: player.getEquipment().getArmorContents()) {
+				if (equipInventory != null && equipInventory.getType() == mat) {
+					if (equipInventory.getAmount() >= this.cost) {
+						return true;
+					} else { 
+						foundAmount += equipInventory.getAmount();
+						if (foundAmount >= this.cost) {
+							return true;
+						}
+					}
+				}
+			}
+			if (ServerHandler.hasCombatUpdate() && player.getInventory().getItemInOffHand() != null && player.getInventory().getItemInOffHand().getType() == mat) {
+				if (player.getInventory().getItemInOffHand().getAmount() >= this.cost) {
+					return true;
+				} else { 
+					foundAmount += player.getInventory().getItemInOffHand().getAmount();
+					if (foundAmount >= this.cost) {
+						return true;
+					}
+				}
+			}
+			if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
+				for (ItemStack craftInventory: player.getOpenInventory().getTopInventory()) {
+					if (craftInventory != null && craftInventory.getType() == mat && craftInventory.getAmount() >= this.cost) {
+						if (craftInventory.getAmount() >= this.cost) {
+							return true;
+						} else { 
+							foundAmount += craftInventory.getAmount();
+							if (foundAmount >= this.cost) {
+								return true;
+							}
+						}
+					}
+				}
+			}
+			String[] placeHolders = Language.newString(); placeHolders[6] = this.cost == 0 ? "1" : this.cost.toString(); placeHolders[5] = foundAmount + "";
+			Language.sendLangMessage("General.itemChargeFailed", player, placeHolders);
+			return false;
 		}
 		return true;
 	}
     
-    private void withdrawBalance(Player player, int cost) {
+    private void withdrawItemCost(Player player) {
+		Material mat = ItemHandler.getMaterial(this.itemCost, null);
+		Integer removeAmount = this.cost; if (this.cost == 0) { removeAmount = 1; }
+		for (int i = 0; i < player.getInventory().getSize(); i++) {
+			if (player.getInventory().getItem(i) != null && player.getInventory().getItem(i).getType() == mat) {
+				if (player.getInventory().getItem(i).getAmount() < removeAmount) {
+					removeAmount -= player.getInventory().getItem(i).getAmount();
+					player.getInventory().setItem(i, newItem(player.getInventory().getItem(i), false, player.getInventory().getItem(i).getAmount()));
+				} else { player.getInventory().setItem(i, newItem(player.getInventory().getItem(i), false, removeAmount)); break; } 
+			}
+		}
+		if (ServerHandler.hasCombatUpdate() && player.getInventory().getItemInOffHand() != null && player.getInventory().getItemInOffHand().getType() == mat) {
+			if (player.getInventory().getItemInOffHand().getAmount() < removeAmount) {
+				removeAmount -= player.getInventory().getItemInOffHand().getAmount();
+				PlayerHandler.setOffHandItem(player, newItem(player.getInventory().getItemInOffHand(), false, player.getInventory().getItemInOffHand().getAmount()));
+			} else { PlayerHandler.setOffHandItem(player, newItem(player.getInventory().getItemInOffHand(), false, removeAmount));} 
+			PlayerHandler.setOffHandItem(player, newItem(player.getInventory().getItemInOffHand(), false, removeAmount));
+		}
+		if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
+			for (int i = 0; i < player.getOpenInventory().getTopInventory().getSize(); i++) {
+				if (player.getOpenInventory().getTopInventory().getItem(i) != null && player.getOpenInventory().getTopInventory().getItem(i).getType() == mat) {
+					if (player.getOpenInventory().getTopInventory().getItem(i).getAmount() < removeAmount) {
+						removeAmount -= player.getOpenInventory().getTopInventory().getItem(i).getAmount();
+						player.getOpenInventory().getTopInventory().setItem(i, newItem(player.getOpenInventory().getTopInventory().getItem(i), false, player.getOpenInventory().getTopInventory().getItem(i).getAmount()));
+					} else { player.getOpenInventory().getTopInventory().setItem(i, newItem(player.getOpenInventory().getTopInventory().getItem(i), false, removeAmount)); break; } 
+				}
+			}
+		}
+		String[] placeHolders = Language.newString(); placeHolders[6] = this.cost.toString();
+		Language.sendLangMessage("General.itemChargeSuccess", player, placeHolders);
+    }
+    
+    private void withdrawBalance(Player player) {
 		if (ConfigHandler.getDepends().getVault().vaultEnabled()) {
 			double balance = 0.0;
 			try { balance = ConfigHandler.getDepends().getVault().getBalance(player); } catch (NullPointerException e) { }
-			if (balance >= this.cost) {
-				if (this.cost != 0) {
-					try { ConfigHandler.getDepends().getVault().withdrawBalance(player, this.cost); } catch (NullPointerException e) { ServerHandler.sendDebugTrace(e); }
+			int parseCost = this.cost;
+			if (balance >= parseCost) {
+				if (parseCost != 0) {
+					try { ConfigHandler.getDepends().getVault().withdrawBalance(player, parseCost); } catch (NullPointerException e) { ServerHandler.sendDebugTrace(e); }
 					String[] placeHolders = Language.newString(); placeHolders[6] = this.cost.toString();
 					Language.sendLangMessage("General.itemChargeSuccess", player, placeHolders);
 				}
@@ -2120,22 +2218,22 @@ public class ItemMap {
 				public void run() {
 					if (PlayerHandler.isCreativeMode(player)) { player.closeInventory(); }
 					if (isSimilar(player.getItemOnCursor())) {
-						player.setItemOnCursor(newItem(player.getItemOnCursor(), allItems));
+						player.setItemOnCursor(newItem(player.getItemOnCursor(), allItems, 1));
 						if (!allItems) { setSubjectRemoval(false); }
 					} else {
 						int itemSlot = player.getInventory().getHeldItemSlot();
-						if (isSimilar(player.getInventory().getItem(itemSlot))) { player.getInventory().setItem(itemSlot, newItem(player.getInventory().getItem(itemSlot), allItems)); if (!allItems) { setSubjectRemoval(false); }}
+						if (isSimilar(player.getInventory().getItem(itemSlot))) { player.getInventory().setItem(itemSlot, newItem(player.getInventory().getItem(itemSlot), allItems, 1)); if (!allItems) { setSubjectRemoval(false); }}
 						else { 
 							for (int i = 0; i < player.getInventory().getSize(); i++) {
 								if (isSimilar(player.getInventory().getItem(i))) {
-									player.getInventory().setItem(i, newItem(player.getInventory().getItem(i), allItems));
+									player.getInventory().setItem(i, newItem(player.getInventory().getItem(i), allItems, 1));
 									if (!allItems) { setSubjectRemoval(false); }
 									break;
 								}
 							}
 						}
 						if (isSubjectRemoval() && PlayerHandler.isCreativeMode(player)) {
-							player.getInventory().addItem(newItem(itemCopy, allItems));
+							player.getInventory().addItem(newItem(itemCopy, allItems, 1));
 							player.setItemOnCursor(new ItemStack(Material.AIR));
 							if (!allItems) { setSubjectRemoval(false); }
 						}
@@ -2145,9 +2243,9 @@ public class ItemMap {
 		}
 	}
 	
-	private ItemStack newItem(ItemStack itemCopy, final boolean allItems) {
+	private ItemStack newItem(ItemStack itemCopy, final boolean allItems, final int amount) {
 		ItemStack item = new ItemStack(itemCopy);
-		if (item.getAmount() > 1 && item.getAmount() != 1 && !allItems) { item.setAmount(item.getAmount() - 1); } 
+		if (item.getAmount() > amount && item.getAmount() != amount && !allItems) { item.setAmount(item.getAmount() - amount); } 
 		else { item = new ItemStack(Material.AIR); }
 		return item;
 	}
@@ -2321,6 +2419,7 @@ public class ItemMap {
 		if (this.commandSound != null) { itemData.set("items." + this.configName + ".commands-sound", this.commandSound.name()); }
 		if (this.commandParticle != null && !this.commandParticle.isEmpty()) { itemData.set("items." + this.configName + ".commands-particle", this.commandParticle); }
 		if (this.sequence != null && this.sequence != CommandSequence.SEQUENTIAL) { itemData.set("items." + this.configName + ".commands-sequence", this.sequence.name()); }
+		if (this.itemCost != null && !this.itemCost.isEmpty()) { itemData.set("items." + this.configName + ".commands-item", this.itemCost); }
 		if (this.cost != null && this.cost != 0) { itemData.set("items." + this.configName + ".commands-cost", this.cost); }
 		if (this.warmDelay != null && this.warmDelay != 0) { itemData.set("items." + this.configName + ".commands-warmup", this.warmDelay); }
 		if (this.cooldownSeconds != null && this.cooldownSeconds != 0) { itemData.set("items." + this.configName + ".commands-cooldown", this.cooldownSeconds); }

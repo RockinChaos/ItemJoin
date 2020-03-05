@@ -30,7 +30,8 @@ items:
     commands-sound: BLOCK_NOTE_BLOCK_PLING
     commands-particle: FIREWORK:BLACK:RED:BURST:10
     commands-sequence: SEQUENTIAL
-    commands-cost: 25
+    commands-item: EMERALD
+    commands-cost: 3
     commands-cooldown: 5
     cooldown-message: '&7[&eItemJoin&7] &a[%item%&a] &cis on cooldown for &a%timeleft% &cseconds..'
     enchantment: FIRE_ASPECT:3, DAMAGE_ALL:5, DAMAGE_UNDEAD:5, KNOCKBACK:8
