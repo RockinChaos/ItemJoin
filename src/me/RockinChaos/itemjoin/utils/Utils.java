@@ -184,7 +184,7 @@ public class Utils {
 		if ((ConfigHandler.getConfig("config.yml").getString("Active-Commands.enabled-worlds") != null && ConfigHandler.getConfig("config.yml").getStringList("Active-Commands.commands") != null) 
 				&& (!ConfigHandler.getConfig("config.yml").getString("Active-Commands.enabled-worlds").equalsIgnoreCase("DISABLED") || !ConfigHandler.getConfig("config.yml").getString("Active-Commands.enabled-worlds").equalsIgnoreCase("FALSE"))) {
 			String commandsWorlds = ConfigHandler.getConfig("config.yml").getString("Active-Commands.enabled-worlds").replace(" ", "");
-			if (commandsWorlds == null) { ServerHandler.sendConsoleMessage("FAIL"); commandsWorlds = "DISABLED"; }
+			if (commandsWorlds == null) { commandsWorlds = "DISABLED"; }
 			String[] compareWorlds = commandsWorlds.split(",");
 			for (String compareWorld: compareWorlds) {
 				if (compareWorld.equalsIgnoreCase(player.getWorld().getName()) || compareWorld.equalsIgnoreCase("ALL") || compareWorld.equalsIgnoreCase("GLOBAL")) {

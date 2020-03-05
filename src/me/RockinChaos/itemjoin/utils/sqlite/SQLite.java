@@ -9,6 +9,8 @@ import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bukkit.scheduler.BukkitRunnable;
+
 import me.RockinChaos.itemjoin.utils.Utils;
 import me.RockinChaos.itemjoin.utils.sqlite.Database;
 import me.RockinChaos.itemjoin.ItemJoin;
@@ -102,13 +104,18 @@ public class SQLite extends Database {
 	
 	@Override
 	public void load() {
-		connection = getSQLConnection();
-		try {
-			Statement s = this.connection.createStatement();
-			s.executeUpdate(this.createTable);
-			s.close();
-			initialize();
-		} catch (SQLException e) { ServerHandler.sendDebugTrace(e); }
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+				connection = getSQLConnection();
+				try {
+					Statement s = connection.createStatement();
+					s.executeUpdate(createTable);
+					s.close();
+					initialize();
+				} catch (SQLException e) { ServerHandler.sendDebugTrace(e); }
+            }
+        }.runTaskAsynchronously(ItemJoin.getInstance());
 	}
 	
 	public static boolean MySQLEnabled() {
