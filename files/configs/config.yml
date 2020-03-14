@@ -58,4 +58,6 @@ Active-Commands:
 Prevent:
   Pickups: DISABLED
   itemMovement: DISABLED
+  Self-Drops: DISABLED
+  Death-Drops: DISABLED
   Bypass: CREATIVE, OP

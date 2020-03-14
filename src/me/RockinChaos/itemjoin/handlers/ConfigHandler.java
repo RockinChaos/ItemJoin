@@ -80,8 +80,16 @@ public class ConfigHandler {
 	    ItemJoin.getInstance().getCommand("itemjoin").setTabCompleter(new TabComplete());
 		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Menu(), ItemJoin.getInstance());
 		if ((!Utils.containsIgnoreCase(ConfigHandler.isPreventPickups(), "FALSE") || !Utils.containsIgnoreCase(ConfigHandler.isPreventPickups(), "DISABLED"))) {
-			if (ServerHandler.hasSpecificUpdate("1_12") && Reflection.getEventClass("entity.EntityPickupItemEvent") != null) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Pickups(), ItemJoin.getInstance()); } 
-			else { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Legacy_Pickups(), ItemJoin.getInstance()); }
+			if (ServerHandler.hasSpecificUpdate("1_12") && Reflection.getEventClass("entity.EntityPickupItemEvent") != null && !isListenerEnabled(Pickups.class.getSimpleName())) { 
+				ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Pickups(), ItemJoin.getInstance()); 
+			} else if (!isListenerEnabled(Legacy_Pickups.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Legacy_Pickups(), ItemJoin.getInstance()); }
+		}
+		if ((!Utils.containsIgnoreCase(ConfigHandler.isPreventPickups(), "FALSE") || !Utils.containsIgnoreCase(ConfigHandler.isPreventPickups(), "DISABLED"))) {
+			if (!isListenerEnabled(Drops.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new InventoryClick(), ItemJoin.getInstance()); }
+		}
+		if ((!Utils.containsIgnoreCase(ConfigHandler.isPreventDrops(), "FALSE") || !Utils.containsIgnoreCase(ConfigHandler.isPreventDrops(), "DISABLED"))
+		|| (!Utils.containsIgnoreCase(ConfigHandler.isPreventDeathDrops(), "FALSE") || !Utils.containsIgnoreCase(ConfigHandler.isPreventDeathDrops(), "DISABLED"))) {
+			if (!isListenerEnabled(Drops.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Drops(), ItemJoin.getInstance()); }
 		}
 	}
 
@@ -285,6 +293,14 @@ public class ConfigHandler {
 	
 	public static String isPreventModify() {
 		return ConfigHandler.getConfig("config.yml").getString("Prevent.itemMovement");
+	}
+	
+	public static String isPreventDrops() {
+		return ConfigHandler.getConfig("config.yml").getString("Prevent.Self-Drops");
+	}
+	
+	public static String isPreventDeathDrops() {
+		return ConfigHandler.getConfig("config.yml").getString("Prevent.Death-Drops");
 	}
 	
 	public static boolean isPreventOBypass() {
