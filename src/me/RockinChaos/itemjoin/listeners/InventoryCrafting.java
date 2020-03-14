@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashMap;
 
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Item;
@@ -17,6 +18,7 @@ import org.bukkit.event.inventory.InventoryType.SlotType;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import me.RockinChaos.itemjoin.ItemJoin;
@@ -27,6 +29,7 @@ import me.RockinChaos.itemjoin.handlers.ServerHandler;
 
 public class InventoryCrafting implements Listener {
 	private static HashMap<String, ItemStack[]> craftingItems = new HashMap<String, ItemStack[]>();
+	private static HashMap<String, ItemStack[]> creativeCraftingItems = new HashMap<String, ItemStack[]>();
 	private HashMap<String, Boolean> worldSwitch = new HashMap<String, Boolean>();
 	
 	@EventHandler(priority = EventPriority.HIGHEST)
@@ -138,6 +141,19 @@ public class InventoryCrafting implements Listener {
     @EventHandler
     private void onSwitchGamemode(PlayerGameModeChangeEvent event) {
     	final Player player = (Player) event.getPlayer();
+    	if (event.getNewGameMode() == GameMode.CREATIVE) {
+    		creativeCraftingItems.put(PlayerHandler.getPlayerID(player), craftingItems.get(PlayerHandler.getPlayerID(player)));
+    		ItemStack[] craftingContents = player.getOpenInventory().getTopInventory().getContents();
+    		Inventory craftView = player.getOpenInventory().getTopInventory();
+    		for (int k = 0; k < craftingContents.length; k++) {
+				craftView.setItem(k, new ItemStack(Material.AIR));
+			}
+    	} else if (event.getNewGameMode() != GameMode.CREATIVE && creativeCraftingItems.containsKey(PlayerHandler.getPlayerID(player))) {
+    		ItemStack[] craftingContents = creativeCraftingItems.get(PlayerHandler.getPlayerID(player));
+    		for (int i = 0; i <= 4; i++) { this.delayReturnItem(player, i, craftingContents[i], 1L); }
+    		craftingItems.put(PlayerHandler.getPlayerID(player), creativeCraftingItems.get(PlayerHandler.getPlayerID(player)));
+    		creativeCraftingItems.remove(PlayerHandler.getPlayerID(player));
+    	}
     	PlayerHandler.updateInventory(player);
     }
     
