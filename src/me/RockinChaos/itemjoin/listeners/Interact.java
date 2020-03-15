@@ -1,20 +1,27 @@
 package me.RockinChaos.itemjoin.listeners;
 
+import java.util.Set;
+
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.inventory.InventoryType.SlotType;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+
 import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
+import me.RockinChaos.itemjoin.utils.Utils;
 
 public class Interact implements Listener {
 	
@@ -54,6 +61,52 @@ public class Interact implements Listener {
 		String slot = String.valueOf(event.getSlot());
 		if (event.getSlotType().name().equalsIgnoreCase("CRAFTING")) { slot = "CRAFTING[" + slot + "]"; }
 		if (this.setupCommands(player, item, action, slot)) { event.setCancelled(true); }
+	}
+	
+	@EventHandler
+	public void onEquipCommand(InventoryClickEvent event) {
+		Player player = (Player) event.getWhoClicked();
+		if (Utils.containsIgnoreCase(event.getAction().name(), "HOTBAR") && event.getView().getBottomInventory().getItem(event.getHotbarButton()) != null && event.getView().getBottomInventory().getItem(event.getHotbarButton()).getType() != Material.AIR) {
+			if (!this.equipSetup(player, event.getView().getBottomInventory().getItem(event.getHotbarButton()), "ON_EQUIP", String.valueOf(event.getSlot()), event.getSlotType())) { event.setCancelled(true); }
+		}
+		if (event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR) {
+			if (!this.equipSetup(player, event.getCurrentItem(), "UN_EQUIP", String.valueOf(event.getSlot()), event.getSlotType())) { event.setCancelled(true); }
+		}
+		if (event.getCursor() != null && event.getCursor().getType() != Material.AIR) { 
+			if (!this.equipSetup(player, event.getCursor(), "ON_EQUIP", String.valueOf(event.getSlot()), event.getSlotType())) { event.setCancelled(true); } 
+		}
+	}
+	
+	@EventHandler
+	public void onEquipCommand(InventoryDragEvent event) {
+		Player player = (Player) event.getWhoClicked();
+		Set<Integer> slideSlots = event.getInventorySlots();
+		int slot = 0; for (int actualSlot: slideSlots) { slot = actualSlot; break; }
+		if (event.getOldCursor() != null && event.getOldCursor().getType() != Material.AIR) {
+			if (!this.equipSetup(player, event.getOldCursor(), "ON_EQUIP", String.valueOf(slot), SlotType.ARMOR)) { event.setCancelled(true); }
+		}
+	}
+	
+	@EventHandler
+	public void onEquipCommand(PlayerInteractEvent event) {
+		Player player = event.getPlayer();
+		ItemStack item = event.getItem();
+		if (item != null && item.getType() != Material.AIR) {
+			String[] itemType = item.getType().name().split("_");
+			if (itemType[1] != null && !itemType[1].isEmpty() && Utils.isInt(Utils.getArmorSlot(itemType[1], true)) 
+				&& player.getInventory().getItem(Integer.parseInt(Utils.getArmorSlot(itemType[1], true))) == null && !this.equipSetup(player, event.getItem(), "ON_EQUIP", Utils.getArmorSlot(itemType[1], true), SlotType.ARMOR)) { event.setCancelled(true); }
+		}
+	}
+	
+	public boolean equipSetup(Player player, ItemStack item, String action, String slot, SlotType slotType) {
+		try {
+			String[] itemType = item.getType().name().split("_");
+			if (slotType == SlotType.ARMOR && itemType[1] != null && !itemType[1].isEmpty() && !itemType[1].equalsIgnoreCase("HEAD") && (itemType[1].equalsIgnoreCase(Utils.getArmorSlot(slot, false)) 
+					|| (itemType[1].equalsIgnoreCase("HEAD") && Utils.getArmorSlot(slot, false).equalsIgnoreCase("HELMET")))) {
+				if (this.setupCommands(player, item, action, slot)) { return false; }
+			}
+		} catch (Exception e) { }
+		return true;
 	}
 	
 	@EventHandler

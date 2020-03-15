@@ -231,7 +231,11 @@ public class ItemCommand {
 						return ActionType.RIGHT_CLICK_ALL;
 					} else if (ActionType.MULTI_CLICK_ALL.hasDefine(definition)) {
 						return ActionType.MULTI_CLICK_ALL;
-					} 
+					} else if (ActionType.ON_EQUIP.hasDefine(definition)) {
+						return ActionType.ON_EQUIP;
+					} else if (ActionType.UN_EQUIP.hasDefine(definition)) {
+						return ActionType.UN_EQUIP;
+					}
 				} else if (Utils.containsIgnoreCase(type, "INTERACT")) {
 					if (ActionType.LEFT_CLICK_ALL.hasDefine(definition)) {
 						return ActionType.LEFT_CLICK_ALL;
@@ -253,6 +257,10 @@ public class ItemCommand {
 						return ActionType.MULTI_CLICK_BLOCK;
 					} else if (ActionType.PHYSICAL.hasDefine(definition)) {
 						return ActionType.PHYSICAL;
+					} else if (ActionType.ON_EQUIP.hasDefine(definition)) {
+						return ActionType.ON_EQUIP;
+					} else if (ActionType.UN_EQUIP.hasDefine(definition)) {
+						return ActionType.UN_EQUIP;
 					}
 				} else if (Utils.containsIgnoreCase(type, "BOTH")) {
 					if (ActionType.INVENTORY.hasDefine(definition)) {
@@ -277,6 +285,10 @@ public class ItemCommand {
 						return ActionType.MULTI_CLICK_BLOCK;
 					} else if (ActionType.PHYSICAL.hasDefine(definition)) {
 						return ActionType.PHYSICAL;
+					} else if (ActionType.ON_EQUIP.hasDefine(definition)) {
+						return ActionType.ON_EQUIP;
+					} else if (ActionType.UN_EQUIP.hasDefine(definition)) {
+						return ActionType.UN_EQUIP;
 					}
 				}
 		return ActionType.DEFAULT;
@@ -358,7 +370,9 @@ public class ItemCommand {
 		LEFT_CLICK_BLOCK("LEFT_CLICK_BLOCK", ".left-click-block"),
 		RIGHT_CLICK_ALL("RIGHT_CLICK_AIR, RIGHT_CLICK_BLOCK, PICKUP_HALF", ".right-click"),
 		RIGHT_CLICK_AIR("RIGHT_CLICK_AIR", ".right-click-air"),
-		RIGHT_CLICK_BLOCK("RIGHT_CLICK_BLOCK", ".right-click-block");
+		RIGHT_CLICK_BLOCK("RIGHT_CLICK_BLOCK", ".right-click-block"),
+		ON_EQUIP("ON_EQUIP", ".on-equip"),
+	    UN_EQUIP("UN_EQUIP", ".un-equip");
 		
 		private final String name;
 		private final String definition;
@@ -368,9 +382,9 @@ public class ItemCommand {
 	}
 	
 	private enum CommandType {
-		INTERACT("PHYSICAL, LEFT_CLICK_BLOCK, LEFT_CLICK_AIR, RIGHT_CLICK_BLOCK, RIGHT_CLICK_AIR"),
-		INVENTORY("PICKUP_ALL, PICKUP_HALF, PLACE_ALL"),
-		BOTH("PICKUP_ALL, PICKUP_HALF, PLACE_ALL, PHYSICAL, LEFT_CLICK_BLOCK, LEFT_CLICK_AIR, RIGHT_CLICK_BLOCK, RIGHT_CLICK_AIR");
+		INTERACT("PHYSICAL, LEFT_CLICK_BLOCK, LEFT_CLICK_AIR, RIGHT_CLICK_BLOCK, RIGHT_CLICK_AIR, ON_EQUIP, UN_EQUIP"),
+		INVENTORY("PICKUP_ALL, PICKUP_HALF, PLACE_ALL, ON_EQUIP, UN_EQUIP"),
+		BOTH("PICKUP_ALL, PICKUP_HALF, PLACE_ALL, PHYSICAL, LEFT_CLICK_BLOCK, LEFT_CLICK_AIR, RIGHT_CLICK_BLOCK, RIGHT_CLICK_AIR, ON_EQUIP, UN_EQUIP");
 		private final String name;
 		private CommandType(String Action) { name = Action; }
 		public boolean hasAction(String Action) { return name.contains(Action); }

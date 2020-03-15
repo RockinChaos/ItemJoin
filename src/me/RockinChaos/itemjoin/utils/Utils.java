@@ -180,6 +180,22 @@ public class Utils {
 		return -1;
 	}
 	
+	public static String getArmorSlot(String slot, boolean integer) {
+		if (!integer) {
+			if (slot.equalsIgnoreCase("39")) { return "HELMET"; }
+			else if (slot.equalsIgnoreCase("38")) { return "CHESTPLATE"; }
+			else if (slot.equalsIgnoreCase("37")) { return "LEGGINGS"; }
+			else if (slot.equalsIgnoreCase("36")) { return "BOOTS"; }
+			return slot;
+		} else {
+			if (slot.equalsIgnoreCase("HELMET") || slot.equalsIgnoreCase("HEAD")) { return "39"; }
+			else if (slot.equalsIgnoreCase("CHESTPLATE")) { return "38"; }
+			else if (slot.equalsIgnoreCase("LEGGINGS")) { return "37"; }
+			else if (slot.equalsIgnoreCase("BOOTS")) { return "36"; }
+			return slot;
+		}
+	}
+	
 	public static void triggerCommands(Player player) {
 		if ((ConfigHandler.getConfig("config.yml").getString("Active-Commands.enabled-worlds") != null && ConfigHandler.getConfig("config.yml").getStringList("Active-Commands.commands") != null) 
 				&& (!ConfigHandler.getConfig("config.yml").getString("Active-Commands.enabled-worlds").equalsIgnoreCase("DISABLED") || !ConfigHandler.getConfig("config.yml").getString("Active-Commands.enabled-worlds").equalsIgnoreCase("FALSE"))) {
