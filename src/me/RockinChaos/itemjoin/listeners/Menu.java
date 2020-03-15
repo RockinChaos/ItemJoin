@@ -56,7 +56,6 @@ public class Menu implements Listener {
 			}.runTaskLater(ItemJoin.getInstance(), 40L);
 		}
 	}
-
 //  ===============================================================================
 
 }
