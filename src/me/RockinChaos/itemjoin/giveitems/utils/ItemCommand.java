@@ -11,12 +11,14 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
+import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.utils.BungeeCord;
 import me.RockinChaos.itemjoin.utils.CustomFilter;
 import me.RockinChaos.itemjoin.utils.Utils;
 
 public class ItemCommand {
+	private int holdTask = 0;
 	private String command;
 	private Type type;
 	private ActionType action;
@@ -35,10 +37,32 @@ public class ItemCommand {
 		else if (commandType.equalsIgnoreCase("BOTH")) { this.cmdType = CommandType.BOTH; }
 	}
 	
-	public boolean execute(final Player player, final String action, final String slot) {
+	public boolean execute(final Player player, final String action, final String slot, final ItemMap itemMap) {
 		if (this.command == null || this.command.length() == 0 || !this.cmdType.hasAction(action) || !this.action.hasAction(action)) { return false; }
-		sendDispatch(player, this.type, slot);
+		if (this.action.equals(ActionType.ON_HOLD)) {
+			int cooldown = itemMap.getCommandCooldown() * 20;
+			if (cooldown == 0) { cooldown += 1 * 20; }
+			this.cycleHoldCommands(player, slot, cooldown, itemMap);
+		} else { this.sendDispatch(player, this.type, slot); }
 		return true;
+	}
+
+	public void cycleHoldCommands(final Player player, final String slot, final int cooldown, final ItemMap itemMap) {
+    	this.holdTask = Bukkit.getScheduler().scheduleSyncRepeatingTask(ItemJoin.getInstance(), new Runnable() {
+    		public void run() {
+    			if (itemMap.isSimilar(PlayerHandler.getMainHandItem(player))) {
+    				sendDispatch(player, type, slot);
+    			} else if (itemMap.isSimilar(PlayerHandler.getOffHandItem(player))) {
+    				sendDispatch(player, type, slot);
+    			} else {
+    				cancelCycleHold();
+    			}
+    		}
+    	}, 0L, cooldown);
+    }
+	
+	public void cancelCycleHold() {
+		Bukkit.getServer().getScheduler().cancelTask(holdTask);
 	}
 	
 	public boolean canExecute(final Player player, final String action) {
@@ -257,6 +281,8 @@ public class ItemCommand {
 						return ActionType.MULTI_CLICK_BLOCK;
 					} else if (ActionType.PHYSICAL.hasDefine(definition)) {
 						return ActionType.PHYSICAL;
+					}  else if (ActionType.ON_HOLD.hasDefine(definition)) {
+						return ActionType.ON_HOLD;
 					} else if (ActionType.ON_EQUIP.hasDefine(definition)) {
 						return ActionType.ON_EQUIP;
 					} else if (ActionType.UN_EQUIP.hasDefine(definition)) {
@@ -285,6 +311,8 @@ public class ItemCommand {
 						return ActionType.MULTI_CLICK_BLOCK;
 					} else if (ActionType.PHYSICAL.hasDefine(definition)) {
 						return ActionType.PHYSICAL;
+					} else if (ActionType.ON_HOLD.hasDefine(definition)) {
+						return ActionType.ON_HOLD;
 					} else if (ActionType.ON_EQUIP.hasDefine(definition)) {
 						return ActionType.ON_EQUIP;
 					} else if (ActionType.UN_EQUIP.hasDefine(definition)) {
@@ -371,6 +399,7 @@ public class ItemCommand {
 		RIGHT_CLICK_ALL("RIGHT_CLICK_AIR, RIGHT_CLICK_BLOCK, PICKUP_HALF", ".right-click"),
 		RIGHT_CLICK_AIR("RIGHT_CLICK_AIR", ".right-click-air"),
 		RIGHT_CLICK_BLOCK("RIGHT_CLICK_BLOCK", ".right-click-block"),
+		ON_HOLD("ON_HOLD", ".on-hold"),
 		ON_EQUIP("ON_EQUIP", ".on-equip"),
 	    UN_EQUIP("UN_EQUIP", ".un-equip");
 		
@@ -382,9 +411,9 @@ public class ItemCommand {
 	}
 	
 	private enum CommandType {
-		INTERACT("PHYSICAL, LEFT_CLICK_BLOCK, LEFT_CLICK_AIR, RIGHT_CLICK_BLOCK, RIGHT_CLICK_AIR, ON_EQUIP, UN_EQUIP"),
+		INTERACT("PHYSICAL, LEFT_CLICK_BLOCK, LEFT_CLICK_AIR, RIGHT_CLICK_BLOCK, RIGHT_CLICK_AIR, ON_HOLD, ON_EQUIP, UN_EQUIP"),
 		INVENTORY("PICKUP_ALL, PICKUP_HALF, PLACE_ALL, ON_EQUIP, UN_EQUIP"),
-		BOTH("PICKUP_ALL, PICKUP_HALF, PLACE_ALL, PHYSICAL, LEFT_CLICK_BLOCK, LEFT_CLICK_AIR, RIGHT_CLICK_BLOCK, RIGHT_CLICK_AIR, ON_EQUIP, UN_EQUIP");
+		BOTH("PICKUP_ALL, PICKUP_HALF, PLACE_ALL, PHYSICAL, LEFT_CLICK_BLOCK, LEFT_CLICK_AIR, RIGHT_CLICK_BLOCK, RIGHT_CLICK_AIR, ON_HOLD, ON_EQUIP, UN_EQUIP");
 		private final String name;
 		private CommandType(String Action) { name = Action; }
 		public boolean hasAction(String Action) { return name.contains(Action); }

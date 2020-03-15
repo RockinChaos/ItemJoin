@@ -15,6 +15,7 @@ import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.inventory.ItemStack;
 
 import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
@@ -61,6 +62,14 @@ public class Interact implements Listener {
 		String slot = String.valueOf(event.getSlot());
 		if (event.getSlotType().name().equalsIgnoreCase("CRAFTING")) { slot = "CRAFTING[" + slot + "]"; }
 		if (this.setupCommands(player, item, action, slot)) { event.setCancelled(true); }
+	}
+
+	@EventHandler
+	public void onHoldCommand(PlayerItemHeldEvent event) {
+		Player player = event.getPlayer();
+		ItemStack item = player.getInventory().getItem(event.getNewSlot());
+		String slot = String.valueOf(event.getNewSlot());
+		if (this.setupCommands(player, item, "ON_HOLD", slot)) { event.setCancelled(true); }
 	}
 	
 	@EventHandler

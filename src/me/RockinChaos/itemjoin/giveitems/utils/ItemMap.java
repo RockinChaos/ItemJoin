@@ -2036,7 +2036,7 @@ public class ItemMap {
     
     private boolean getRandomMap(final HashMap < Integer, ItemCommand > randomCommands, ItemCommand[] itemCommands, final Player player, final String action, final String slot) {
     	Entry<?, ?> dedicatedMap = Utils.randomEntry(randomCommands);
-    	if (!((ItemCommand)dedicatedMap.getValue()).execute(player, action, slot)) { 
+    	if (!((ItemCommand)dedicatedMap.getValue()).execute(player, action, slot, this)) { 
     		this.getRandomMap(randomCommands, itemCommands, player, action, slot);
     		return false;
     	}
@@ -2045,7 +2045,7 @@ public class ItemMap {
     
     private boolean getRandomAll(final HashMap < Integer, ItemCommand > randomCommands, ItemCommand[] itemCommands, final Player player, final String action, final String slot) {
     	Entry<?, ?> dedicatedMap = Utils.randomEntry(randomCommands);
-    	if (!((ItemCommand)dedicatedMap.getValue()).execute(player, action, slot)) { 
+    	if (!((ItemCommand)dedicatedMap.getValue()).execute(player, action, slot, this)) { 
     		randomCommands.remove(dedicatedMap.getKey());
     		this.getRandomAll(randomCommands, itemCommands, player, action, slot);
     		return false;
@@ -2066,8 +2066,8 @@ public class ItemMap {
     		for (int i = 0; i < itemCommands.length; i++) { 
         		if (this.sequence == CommandSequence.RANDOM) { randomCommands.put(Utils.getRandom(1, 100000), itemCommands[i]); }
         		else if (this.sequence == CommandSequence.RANDOM_SINGLE) { randomCommands.put(Utils.getRandom(1, 100000), itemCommands[i]); }
-        		else if (!playerSuccess) { playerSuccess = itemCommands[i].execute(player, action, slot); }
-				else { itemCommands[i].execute(player, action, slot); }
+        		else if (!playerSuccess) { playerSuccess = itemCommands[i].execute(player, action, slot, this); }
+				else { itemCommands[i].execute(player, action, slot, this); }
         		if (Utils.containsIgnoreCase(itemCommands[i].getCommand(), "swap-item")) { isSwap = true; }
 			}
     		if (isSwap) { this.removeDisposable(player, itemCopy, true); }
