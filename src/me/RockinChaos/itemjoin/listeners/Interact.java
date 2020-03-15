@@ -102,7 +102,7 @@ public class Interact implements Listener {
 		ItemStack item = event.getItem();
 		if (item != null && item.getType() != Material.AIR) {
 			String[] itemType = item.getType().name().split("_");
-			if (itemType[1] != null && !itemType[1].isEmpty() && Utils.isInt(Utils.getArmorSlot(itemType[1], true)) 
+			if (itemType.length >= 2 && itemType[1] != null && !itemType[1].isEmpty() && Utils.isInt(Utils.getArmorSlot(itemType[1], true)) 
 				&& player.getInventory().getItem(Integer.parseInt(Utils.getArmorSlot(itemType[1], true))) == null && !this.equipSetup(player, event.getItem(), "ON_EQUIP", Utils.getArmorSlot(itemType[1], true), SlotType.ARMOR)) { event.setCancelled(true); }
 		}
 	}
@@ -110,7 +110,7 @@ public class Interact implements Listener {
 	public boolean equipSetup(Player player, ItemStack item, String action, String slot, SlotType slotType) {
 		try {
 			String[] itemType = item.getType().name().split("_");
-			if (slotType == SlotType.ARMOR && itemType[1] != null && !itemType[1].isEmpty() && !itemType[1].equalsIgnoreCase("HEAD") && (itemType[1].equalsIgnoreCase(Utils.getArmorSlot(slot, false)) 
+			if (slotType == SlotType.ARMOR && itemType.length >= 2 && itemType[1] != null && !itemType[1].isEmpty() && !itemType[1].equalsIgnoreCase("HEAD") && (itemType[1].equalsIgnoreCase(Utils.getArmorSlot(slot, false)) 
 					|| (itemType[1].equalsIgnoreCase("HEAD") && Utils.getArmorSlot(slot, false).equalsIgnoreCase("HELMET")))) {
 				if (this.setupCommands(player, item, action, slot)) { return false; }
 			}

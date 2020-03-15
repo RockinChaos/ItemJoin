@@ -39,26 +39,28 @@ public class InventoryClick implements Listener {
 	@EventHandler
 	private void onModify(InventoryClickEvent event) {
 		Player player = (Player) event.getWhoClicked();
-			ItemStack item = null;
+			ItemStack item1 = null;
+			ItemStack item2 = null;
 			if (!ServerHandler.hasSpecificUpdate("1_8")) {
 				PlayerHandler.updateInventory(player);
 			}
 			if (Utils.containsIgnoreCase(event.getAction().name(), "HOTBAR")) {
-				item = event.getView().getBottomInventory().getItem(event.getHotbarButton());
-				if (item == null) { item = event.getCurrentItem(); } } 
-			else if (PlayerHandler.isCreativeMode(player) && event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR) { item = event.getCurrentItem(); }
-			else if (PlayerHandler.isCreativeMode(player) && event.getCursor() != null && event.getCursor().getType() != Material.AIR) { item = event.getCursor(); }
-			else { item = event.getCurrentItem(); }
+				item1 = event.getView().getBottomInventory().getItem(event.getHotbarButton());
+				if (item1 == null) { item1 = event.getCurrentItem(); } }
+				if (item1 != null && event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR) { item2 = event.getCurrentItem(); }
+			else if (PlayerHandler.isCreativeMode(player) && event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR) { item1 = event.getCurrentItem(); }
+			else if (PlayerHandler.isCreativeMode(player) && event.getCursor() != null && event.getCursor().getType() != Material.AIR) { item1 = event.getCursor(); }
+			else { item1 = event.getCurrentItem(); }
 			if (!ServerHandler.hasCombatUpdate()) {
 				dropClick.put(PlayerHandler.getPlayerID(player), true);
 				ItemStack[] Inv = player.getInventory().getContents().clone();
 				ItemStack[] Armor = player.getInventory().getArmorContents().clone();
 				LegacyDropEvent(player, Inv, Armor);
 			}
-			if (!ItemUtilities.isAllowed(player, item, "inventory-modify")) {
+			if (!ItemUtilities.isAllowed(player, item1, "inventory-modify") || !ItemUtilities.isAllowed(player, item2, "inventory-modify")) {
 				event.setCancelled(true);
 				if (PlayerHandler.isCreativeMode(player)) { player.closeInventory(); }
-				else if (!ItemUtilities.isAllowed(player, item, "inventory-close")) { player.closeInventory(); }
+				else if (!ItemUtilities.isAllowed(player, item1, "inventory-close")) { player.closeInventory(); }
 				PlayerHandler.updateInventory(player);
 			}
 	}
