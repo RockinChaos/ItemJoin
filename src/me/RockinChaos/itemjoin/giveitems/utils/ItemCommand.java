@@ -18,7 +18,7 @@ import me.RockinChaos.itemjoin.utils.CustomFilter;
 import me.RockinChaos.itemjoin.utils.Utils;
 
 public class ItemCommand {
-	private int holdTask = 0;
+	private int cycleTask = 0;
 	private String command;
 	private Type type;
 	private ActionType action;
@@ -43,26 +43,43 @@ public class ItemCommand {
 			int cooldown = itemMap.getCommandCooldown() * 20;
 			if (cooldown == 0) { cooldown += 1 * 20; }
 			this.cycleHoldCommands(player, slot, cooldown, itemMap);
+		} else if (this.action.equals(ActionType.ON_RECEIVE)) {
+			int cooldown = itemMap.getCommandCooldown() * 20;
+			if (cooldown == 0) { cooldown += 1 * 20; }
+			int receive = itemMap.getCommandReceive();
+			this.sendDispatch(player, type, slot);
+			if (receive >= 2) { this.cycleReceiveCommands(player, slot, cooldown, (receive - 1), itemMap); }
 		} else { this.sendDispatch(player, this.type, slot); }
 		return true;
 	}
 
 	public void cycleHoldCommands(final Player player, final String slot, final int cooldown, final ItemMap itemMap) {
-    	this.holdTask = Bukkit.getScheduler().scheduleSyncRepeatingTask(ItemJoin.getInstance(), new Runnable() {
+    	this.cycleTask = Bukkit.getScheduler().scheduleSyncRepeatingTask(ItemJoin.getInstance(), new Runnable() {
     		public void run() {
     			if (itemMap.isSimilar(PlayerHandler.getMainHandItem(player))) {
     				sendDispatch(player, type, slot);
     			} else if (itemMap.isSimilar(PlayerHandler.getOffHandItem(player))) {
     				sendDispatch(player, type, slot);
     			} else {
-    				cancelCycleHold();
+    				cancelCycleTask();
     			}
     		}
     	}, 0L, cooldown);
     }
 	
-	public void cancelCycleHold() {
-		Bukkit.getServer().getScheduler().cancelTask(holdTask);
+	public void cycleReceiveCommands(final Player player, final String slot, final int cooldown, final int receive, final ItemMap itemMap) {
+    	Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
+    		public void run() {
+    			if (receive != 0) {
+    				sendDispatch(player, type, slot); 
+    				cycleReceiveCommands(player, slot, cooldown, (receive - 1), itemMap);
+    			} 
+    		}
+    	}, cooldown);
+    }
+	
+	public void cancelCycleTask() {
+		Bukkit.getServer().getScheduler().cancelTask(cycleTask);
 	}
 	
 	public boolean canExecute(final Player player, final String action) {
@@ -255,6 +272,8 @@ public class ItemCommand {
 						return ActionType.RIGHT_CLICK_ALL;
 					} else if (ActionType.MULTI_CLICK_ALL.hasDefine(definition)) {
 						return ActionType.MULTI_CLICK_ALL;
+					} else if (ActionType.ON_RECEIVE.hasDefine(definition)) {
+						return ActionType.ON_RECEIVE;
 					} else if (ActionType.ON_EQUIP.hasDefine(definition)) {
 						return ActionType.ON_EQUIP;
 					} else if (ActionType.UN_EQUIP.hasDefine(definition)) {
@@ -281,7 +300,9 @@ public class ItemCommand {
 						return ActionType.MULTI_CLICK_BLOCK;
 					} else if (ActionType.PHYSICAL.hasDefine(definition)) {
 						return ActionType.PHYSICAL;
-					}  else if (ActionType.ON_HOLD.hasDefine(definition)) {
+					} else if (ActionType.ON_RECEIVE.hasDefine(definition)) {
+						return ActionType.ON_RECEIVE;
+					} else if (ActionType.ON_HOLD.hasDefine(definition)) {
 						return ActionType.ON_HOLD;
 					} else if (ActionType.ON_EQUIP.hasDefine(definition)) {
 						return ActionType.ON_EQUIP;
@@ -311,6 +332,8 @@ public class ItemCommand {
 						return ActionType.MULTI_CLICK_BLOCK;
 					} else if (ActionType.PHYSICAL.hasDefine(definition)) {
 						return ActionType.PHYSICAL;
+					} else if (ActionType.ON_RECEIVE.hasDefine(definition)) {
+						return ActionType.ON_RECEIVE;
 					} else if (ActionType.ON_HOLD.hasDefine(definition)) {
 						return ActionType.ON_HOLD;
 					} else if (ActionType.ON_EQUIP.hasDefine(definition)) {
@@ -399,6 +422,7 @@ public class ItemCommand {
 		RIGHT_CLICK_ALL("RIGHT_CLICK_AIR, RIGHT_CLICK_BLOCK, PICKUP_HALF", ".right-click"),
 		RIGHT_CLICK_AIR("RIGHT_CLICK_AIR", ".right-click-air"),
 		RIGHT_CLICK_BLOCK("RIGHT_CLICK_BLOCK", ".right-click-block"),
+		ON_RECEIVE("ON_RECEIVE", ".on-receive"),
 		ON_HOLD("ON_HOLD", ".on-hold"),
 		ON_EQUIP("ON_EQUIP", ".on-equip"),
 	    UN_EQUIP("UN_EQUIP", ".un-equip");
@@ -411,9 +435,9 @@ public class ItemCommand {
 	}
 	
 	private enum CommandType {
-		INTERACT("PHYSICAL, LEFT_CLICK_BLOCK, LEFT_CLICK_AIR, RIGHT_CLICK_BLOCK, RIGHT_CLICK_AIR, ON_HOLD, ON_EQUIP, UN_EQUIP"),
-		INVENTORY("PICKUP_ALL, PICKUP_HALF, PLACE_ALL, ON_EQUIP, UN_EQUIP"),
-		BOTH("PICKUP_ALL, PICKUP_HALF, PLACE_ALL, PHYSICAL, LEFT_CLICK_BLOCK, LEFT_CLICK_AIR, RIGHT_CLICK_BLOCK, RIGHT_CLICK_AIR, ON_HOLD, ON_EQUIP, UN_EQUIP");
+		INTERACT("PHYSICAL, LEFT_CLICK_BLOCK, LEFT_CLICK_AIR, RIGHT_CLICK_BLOCK, RIGHT_CLICK_AIR, ON_RECEIVE, ON_HOLD, ON_EQUIP, UN_EQUIP"),
+		INVENTORY("PICKUP_ALL, PICKUP_HALF, PLACE_ALL, ON_RECEIVE, ON_EQUIP, UN_EQUIP"),
+		BOTH("PICKUP_ALL, PICKUP_HALF, PLACE_ALL, PHYSICAL, LEFT_CLICK_BLOCK, LEFT_CLICK_AIR, RIGHT_CLICK_BLOCK, RIGHT_CLICK_AIR, ON_RECEIVE, ON_HOLD, ON_EQUIP, UN_EQUIP");
 		private final String name;
 		private CommandType(String Action) { name = Action; }
 		public boolean hasAction(String Action) { return name.contains(Action); }

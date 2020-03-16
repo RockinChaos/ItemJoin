@@ -1219,12 +1219,13 @@ public class UI {
 	
 	private void commandPane(final Player player, final ItemMap itemMap) {
 		Interface commandPane = new Interface(false, 3, this.GUIName);
-		commandPane.addButton(new Button(this.fillerPaneGItem), 4);
+		commandPane.addButton(new Button(this.fillerPaneGItem), 3);
 		commandPane.addButton(new Button(ItemHandler.getItem((ServerHandler.hasAquaticUpdate() ? "WRITABLE_BOOK" : "386"), 1, false, "&e&lCommands", "&7", "&7*Click to define the custom command lines", "&7for the item and click type.", 
 				"&7", "&9&lCommands: &a" + (itemMap.getCommands().length != 0 ? "YES" : "NONE")), event -> this.actionPane(player, itemMap)));
-		commandPane.addButton(new Button(this.fillerPaneGItem), 4);
+		commandPane.addButton(new Button(this.fillerPaneGItem));
 		commandPane.addButton(new Button(ItemHandler.getItem("STICK", 1, false, "&a&lType", "&7", "&7*The event type that will", "&7trigger command execution.", "&9&lCOMMANDS-TYPE: &a" + Utils.nullCheck(itemMap.getCommandType() + "")), 
 				event -> this.typePane(player, itemMap)));
+		commandPane.addButton(new Button(this.fillerPaneGItem), 3);
 		commandPane.addButton(new Button(ItemHandler.getItem("REDSTONE", 1, false, "&a&lParticle", "&7", "&7*Custom particle(s) that will be", "&7displayed when the commands", "&7are successfully executed.", "&9&lCOMMANDS-PARTICLE: &a" +
 				Utils.nullCheck(itemMap.getCommandParticle() + "")), event -> {
 			if (Utils.nullCheck(itemMap.getCommandParticle() + "") != "NONE") {
@@ -1250,6 +1251,15 @@ public class UI {
 				this.commandPane(player, itemMap);
 			} else {
 				this.costPane(player, itemMap);
+			}
+		}));
+		commandPane.addButton(new Button(ItemHandler.getItem("STONE_BUTTON", 1, false, "&a&lReceive", "&7", "&7*The number of times the", "&7commands will execute when", "&7receiving the custom item.", 
+				"&cNOTE: &7Only functions with", "&7the on-receive command type.", "&9&lCOMMANDS-COST: &a" + (Utils.nullCheck(itemMap.getCommandReceive() + "&7"))), event -> {
+			if (Utils.nullCheck(itemMap.getCommandReceive() + "&7") != "NONE") {
+				itemMap.setCommandReceive(0);
+				this.commandPane(player, itemMap);
+			} else {
+				this.receivePane(player, itemMap);
 			}
 		}));
 		commandPane.addButton(new Button(ItemHandler.getItem("ICE", 1, false, "&a&lCooldown", "&7", "&7*The time that the commands will", "&7be on cooldown for.", "&7", "&9&lCOMMANDS-COOLDOWN: &a" + Utils.nullCheck(itemMap.getCommandCooldown() + "&7") + 
@@ -1311,7 +1321,7 @@ public class UI {
 	}
 	
 	private void actionPane(final Player player, final ItemMap itemMap) {
-		Interface clickPane = new Interface(false, 3, this.GUIName);
+		Interface clickPane = new Interface(false, 4, this.GUIName);
 		clickPane.addButton(new Button(this.fillerPaneGItem), 3);
 		clickPane.addButton(new Button(ItemHandler.getItem("DIAMOND_SWORD", 1, false, "&e&lMulti-Click", "&7", "&7*Commands that will execute only", "&7when left and right clicking.", "&7", "&9&lCommands: &a" + 
 		this.listCommands(itemMap, ActionType.MULTI_CLICK_ALL)), event -> {
@@ -1323,6 +1333,27 @@ public class UI {
 			this.commandListPane(player, itemMap, ActionType.INVENTORY);
 		}));
 		clickPane.addButton(new Button(this.fillerPaneGItem), 3);
+		clickPane.addButton(new Button(this.fillerPaneGItem));
+		clickPane.addButton(new Button(ItemHandler.getItem("DIAMOND_HELMET", 1, false, "&e&lOn-Equip", "&7", "&7*Commands that will execute only", "&7when the item is placed", "&7in an armor slot.", "&7", "&9&lCommands: &a" + 
+		this.listCommands(itemMap, ActionType.ON_EQUIP)), event -> {
+			this.commandListPane(player, itemMap, ActionType.ON_EQUIP);
+		}));
+		clickPane.addButton(new Button(this.fillerPaneGItem));
+		clickPane.addButton(new Button(ItemHandler.getItem("IRON_HELMET", 1, false, "&e&lUn-Equip", "&7", "&7*Commands that will execute only", "&7when the item is removed", "&7from an armor slot.", "&7", "&9&lCommands: &a" + 
+		this.listCommands(itemMap, ActionType.UN_EQUIP)), event -> {
+			this.commandListPane(player, itemMap, ActionType.UN_EQUIP);
+		}));
+		clickPane.addButton(new Button(this.fillerPaneGItem));
+		clickPane.addButton(new Button(ItemHandler.getItem("IRON_SWORD", 1, false, "&e&lOn-Hold", "&7", "&7*Commands that will execute only", "&7when holding the item.", "&7", "&9&lCommands: &a" + 
+		this.listCommands(itemMap, ActionType.ON_HOLD)), event -> {
+			this.commandListPane(player, itemMap, ActionType.ON_HOLD);
+		}));
+		clickPane.addButton(new Button(this.fillerPaneGItem));
+		clickPane.addButton(new Button(ItemHandler.getItem("EMERALD", 1, false, "&e&lOn-Receive", "&7", "&7*Commands that will execute only", "&7when you are given the item.", "&7", "&9&lCommands: &a" + 
+		this.listCommands(itemMap, ActionType.ON_RECEIVE)), event -> {
+			this.commandListPane(player, itemMap, ActionType.ON_RECEIVE);
+		}));
+		clickPane.addButton(new Button(this.fillerPaneGItem));
 		clickPane.addButton(new Button(ItemHandler.getItem("37", 1, false, "&e&lMulti-Click-Air", "&7", "&7*Commands that will execute only", "&7when left and right", "&7clicking the air.", "&7", "&9&lCommands: &a" + 
 		this.listCommands(itemMap, ActionType.MULTI_CLICK_AIR)), event -> {
 			this.commandListPane(player, itemMap, ActionType.MULTI_CLICK_AIR);
@@ -1742,6 +1773,41 @@ public class UI {
 			}));
 		}
 		costPane.open(player);
+	}
+	
+	private void receivePane(final Player player, final ItemMap itemMap) {
+		Interface receivePane = new Interface(true, 6, this.GUIName);
+		receivePane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item commands menu."), event -> {
+			this.commandPane(player, itemMap);
+		}));
+		receivePane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:4", 1, false, "&e&lCustom Receive", "&7", "&7*Click to set a custom commands-receive", "&7value for the item."), event -> {
+			player.closeInventory();
+			String[] placeHolders = Language.newString();
+			placeHolders[14] = "COMMAND RECEIVE";
+			placeHolders[15] = "10";
+			Language.sendLangMessage("Commands.UI.inputType", player, placeHolders);
+			Language.sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+		}, event -> {
+			if (Utils.isInt(event.getMessage())) {
+				itemMap.setCommandReceive(Integer.parseInt(event.getMessage()));
+				String[] placeHolders = Language.newString();
+				placeHolders[14] = "COMMAND RECEIVE";
+				Language.sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+			} else {
+				String[] placeHolders = Language.newString();
+				placeHolders[16] = event.getMessage();
+				Language.sendLangMessage("Commands.UI.notInteger", player, placeHolders);
+			}
+			this.commandPane(event.getPlayer(), itemMap);
+		}));
+		for (int i = 0; i <= 64; i++) {
+			final int k = i;
+			receivePane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:11", (k == 0 ? 1 : k), false, "&9&lReceive: &a$&l" + k, "&7", "&7*Click to set the", "&7commands-receive of the item."), event -> {
+				itemMap.setCommandReceive(k);
+				this.commandPane(player, itemMap);
+			}));
+		}
+		receivePane.open(player);
 	}
 	
 	private void sequencePane(final Player player, final ItemMap itemMap) {
@@ -3942,6 +4008,7 @@ public class UI {
 				(Utils.nullCheck(itemMap.getCustomName()) != "NONE" ? "&9&lName: &a" + itemMap.getCustomName() : ""), (Utils.nullCheck(itemMap.getCustomLore().toString()) != "NONE" ? "&9&lLore: &a" + (Utils.nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",").length() > 40 ? Utils.nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",").substring(0, 40) : Utils.nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",")) : ""), 
 				(Utils.nullCheck(itemMap.getDurability() + "&7") != "NONE" ? "&9&lDurability: &a" + itemMap.getDurability() : ""), (Utils.nullCheck(itemMap.getData() + "&7") != "NONE" ? "&9&lTexture Data: &a" + itemMap.getData() : ""), (itemMap.getCommands().length != 0 ? "&9&lCommands: &aYES" : ""), 
 				(Utils.nullCheck(itemMap.getItemCost() + "&7") != "NONE" ? "&9&lCommands-Item: &a" + itemMap.getItemCost() : ""), (Utils.nullCheck(itemMap.getCommandCost() + "&7") != "NONE" ? "&9&lCommands-Cost: &a" + itemMap.getCommandCost() : ""), 
+				(Utils.nullCheck(itemMap.getCommandReceive() + "&7") != "NONE" ? "&9&lCommands-Receive: &a" + itemMap.getCommandReceive() : ""),
 				(Utils.nullCheck(itemMap.getCommandType() + "") != "NONE" ? "&9&lCommands-Type: &a" + itemMap.getCommandType() : ""), (Utils.nullCheck(itemMap.getCommandSequence() + "") != "NONE" ? "&9&lCommands-Sequence: &a" + itemMap.getCommandSequence() : ""), 
 				(Utils.nullCheck(itemMap.getCommandCooldown() + "&7") != "NONE" ? "&9&lCommands-Cooldown: &a" + itemMap.getCommandCooldown() + " second(s)" : ""), 
 				(Utils.nullCheck(itemMap.getCooldownMessage()) != "NONE" ? "&9&lCooldown-Message: &a" + itemMap.getCooldownMessage() : ""), (Utils.nullCheck(itemMap.getCommandSound() + "") != "NONE" ? "&9&lCommands-Sound: &a" + itemMap.getCommandSound() : ""), 

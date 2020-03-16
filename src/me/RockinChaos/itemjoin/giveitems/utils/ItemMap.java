@@ -152,6 +152,7 @@ public class ItemMap {
 //  ============================================== //
 	private ItemCommand[] commands = new ItemCommand[0];
 	private Integer cooldownSeconds = 0;
+	private Integer commandsReceive = 0;
 	private String cooldownMessage;
 	private Sound commandSound;
 	private String commandParticle;
@@ -242,6 +243,7 @@ public class ItemMap {
         	this.setMultipleSlots();
 	        this.setCount(this.nodeLocation.getString(".count"));
 			this.setCommandCost();
+			this.setCommandReceive();
 			this.setCommandWarmDelay();
 			this.setCommandSound();
 			this.setCommandParticle();
@@ -275,6 +277,10 @@ public class ItemMap {
 	private void setCommandCost() {
 		if (this.nodeLocation.getString("commands-item") != null && !this.nodeLocation.getString("commands-item").isEmpty()) { this.itemCost = this.nodeLocation.getString("commands-item"); }
 		if (this.nodeLocation.getString("commands-cost") != null && Utils.isInt(this.nodeLocation.getString("commands-cost"))) { this.cost = this.nodeLocation.getInt("commands-cost"); }
+	}
+	
+	private void setCommandReceive() {
+		if (this.nodeLocation.getString("commands-receive") != null && Utils.isInt(this.nodeLocation.getString("commands-receive"))) { this.commandsReceive = this.nodeLocation.getInt("commands-receive"); }
 	}
 	
 	private void setCommandWarmDelay() {
@@ -897,6 +903,11 @@ public class ItemMap {
     public void setCustomConsumable(boolean bool) {
     	customConsumable = bool;
     }
+    
+	public void setCommandReceive(Integer val) {
+		this.commandsReceive = val;
+	}
+    
 //  ================================================================================================================================================================================= //
 	
 //  ====================== //
@@ -1055,6 +1066,10 @@ public class ItemMap {
 	
 	public Integer getCommandCost() {
 		return this.cost;
+	}
+	
+	public Integer getCommandReceive() {
+		return this.commandsReceive;
 	}
 	
 	public String getItemCost() {
@@ -1929,6 +1944,7 @@ public class ItemMap {
 		if (CustomSlot != null) { ItemUtilities.setCustomSlots(player, this, this.tempItem.clone(), command, amount); } 
 		else { ItemUtilities.setInvSlots(player, this, this.tempItem.clone(), command, amount); }
 		this.setAnimations(player);
+		this.executeCommands(player, this.tempItem, "ON_RECEIVE", this.getSlot());
 	}
 	
 	public void giveTo(Player player, int amount, String slot) {
@@ -1952,6 +1968,7 @@ public class ItemMap {
 		} 
 		else { player.getInventory().setItem(Integer.parseInt(slot), item); }
 		this.setAnimations(player);
+		this.executeCommands(player, this.tempItem, "ON_RECEIVE", this.getSlot());
 	}
 	
 	public void setAnimations(Player player) {
@@ -2388,6 +2405,10 @@ public class ItemMap {
 			List<String> leftClickBlock = new ArrayList<String>();
 			List<String> rightClickAir = new ArrayList<String>();
 			List<String> rightClickBlock = new ArrayList<String>();
+			List<String> onEquip = new ArrayList<String>();
+			List<String> unEquip = new ArrayList<String>();
+			List<String> onHold = new ArrayList<String>();
+			List<String> onReceive = new ArrayList<String>();
 			List<String> physical = new ArrayList<String>();
 			List<String> inventory = new ArrayList<String>();
 			for(ItemCommand command : this.commands) {
@@ -2400,6 +2421,10 @@ public class ItemMap {
 				else if (command.matchAction(ItemCommand.ActionType.LEFT_CLICK_ALL)) { leftClickAll.add(command.getCommand()); }
 				else if (command.matchAction(ItemCommand.ActionType.LEFT_CLICK_AIR)) { leftClickAir.add(command.getCommand()); }
 				else if (command.matchAction(ItemCommand.ActionType.LEFT_CLICK_BLOCK)) { leftClickBlock.add(command.getCommand()); }
+				else if (command.matchAction(ItemCommand.ActionType.ON_EQUIP)) { onEquip.add(command.getCommand()); }
+				else if (command.matchAction(ItemCommand.ActionType.UN_EQUIP)) { unEquip.add(command.getCommand()); }
+				else if (command.matchAction(ItemCommand.ActionType.ON_HOLD)) { onHold.add(command.getCommand()); }
+				else if (command.matchAction(ItemCommand.ActionType.ON_RECEIVE)) { onReceive.add(command.getCommand()); }
 				else if (command.matchAction(ItemCommand.ActionType.PHYSICAL)) { physical.add(command.getCommand()); }
 				else if (command.matchAction(ItemCommand.ActionType.INVENTORY)) { inventory.add(command.getCommand()); }
 			}
@@ -2412,6 +2437,10 @@ public class ItemMap {
 			if (!leftClickAll.isEmpty()) { itemData.set("items." + this.configName + ".commands.left-click", leftClickAll); }
 			if (!leftClickAir.isEmpty()) { itemData.set("items." + this.configName + ".commands.left-click-air", leftClickAir); }
 			if (!leftClickBlock.isEmpty()) { itemData.set("items." + this.configName + ".commands.left-click-block", leftClickBlock); }
+			if (!onEquip.isEmpty()) { itemData.set("items." + this.configName + ".commands.on-equip", onEquip); }
+			if (!unEquip.isEmpty()) { itemData.set("items." + this.configName + ".commands.un-equip", unEquip); }
+			if (!onHold.isEmpty()) { itemData.set("items." + this.configName + ".commands.on-hold", onHold); }
+			if (!onReceive.isEmpty()) { itemData.set("items." + this.configName + ".commands.on-receive", onReceive); }
 			if (!physical.isEmpty()) { itemData.set("items." + this.configName + ".commands.physical", physical); }
 			if (!inventory.isEmpty()) { itemData.set("items." + this.configName + ".commands.inventory", inventory); }
 		}
@@ -2421,6 +2450,7 @@ public class ItemMap {
 		if (this.sequence != null && this.sequence != CommandSequence.SEQUENTIAL) { itemData.set("items." + this.configName + ".commands-sequence", this.sequence.name()); }
 		if (this.itemCost != null && !this.itemCost.isEmpty()) { itemData.set("items." + this.configName + ".commands-item", this.itemCost); }
 		if (this.cost != null && this.cost != 0) { itemData.set("items." + this.configName + ".commands-cost", this.cost); }
+		if (this.commandsReceive != null && this.commandsReceive != 0) { itemData.set("items." + this.configName + ".commands-receive", this.commandsReceive); }
 		if (this.warmDelay != null && this.warmDelay != 0) { itemData.set("items." + this.configName + ".commands-warmup", this.warmDelay); }
 		if (this.cooldownSeconds != null && this.cooldownSeconds != 0) { itemData.set("items." + this.configName + ".commands-cooldown", this.cooldownSeconds); }
 		if (this.cooldownMessage != null && !this.cooldownMessage.isEmpty()) { itemData.set("items." + this.configName + ".cooldown-message", this.cooldownMessage); }
