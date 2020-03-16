@@ -64,12 +64,14 @@ public class Drops implements Listener {
 		ListIterator < ItemStack > litr = drops.listIterator();
 		Player player = event.getEntity();
 		ItemUtilities.closeAnimations(player);
-		while (litr.hasNext()) {
-			if (Utils.containsIgnoreCase(ConfigHandler.isPreventDeathDrops(), "TRUE") || Utils.containsIgnoreCase(ConfigHandler.isPreventDeathDrops(), player.getWorld().getName())
+		if (Utils.containsIgnoreCase(ConfigHandler.isPreventDeathDrops(), "TRUE") || Utils.containsIgnoreCase(ConfigHandler.isPreventDeathDrops(), player.getWorld().getName())
 		  		|| Utils.containsIgnoreCase(ConfigHandler.isPreventDeathDrops(), "ALL") || Utils.containsIgnoreCase(ConfigHandler.isPreventDeathDrops(), "GLOBAL")) {
-		  		if (ConfigHandler.isPreventOBypass() && player.isOp() || ConfigHandler.isPreventCBypass() && PlayerHandler.isCreativeMode(player)) { } 
-		  		else { litr.remove(); }
-		  	}
+	  		if (ConfigHandler.isPreventOBypass() && player.isOp() || ConfigHandler.isPreventCBypass() && PlayerHandler.isCreativeMode(player)) { }
+	  		else {
+	  			while (litr.hasNext()) {
+	  				litr.next(); litr.remove();
+				}
+	  		}
 		}
 	}
 }
