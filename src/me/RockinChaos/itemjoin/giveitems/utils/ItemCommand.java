@@ -20,6 +20,7 @@ import me.RockinChaos.itemjoin.utils.Utils;
 public class ItemCommand {
 	private int cycleTask = 0;
 	private String command;
+	private String listSection;
 	private Type type;
 	private ActionType action;
 	private long delay = 0L;
@@ -27,11 +28,12 @@ public class ItemCommand {
 	private List < Player > setStop = new ArrayList < Player > ();
 	private List < Player > setCounting = new ArrayList < Player > ();
 	
-	private ItemCommand(final String command, final ActionType action, final Type type, final long delay, final String commandType) {
+	private ItemCommand(final String command, final ActionType action, final Type type, final long delay, final String commandType, final String listSection) {
 		this.command = command;
 		this.type = type;
 		this.action = action;
 		this.delay = delay;
+		this.listSection = listSection;
 		if (commandType.equalsIgnoreCase("INTERACT")) { this.cmdType = CommandType.INTERACT; } 
 		else if (commandType.equalsIgnoreCase("INVENTORY")) { this.cmdType = CommandType.INVENTORY; } 
 		else if (commandType.equalsIgnoreCase("BOTH")) { this.cmdType = CommandType.BOTH; }
@@ -92,6 +94,14 @@ public class ItemCommand {
 			return true;
 		}
 		return false;
+	}
+
+	public String getSection() {
+		return this.listSection;
+	}
+	
+	public void setSection(String section) {
+		this.listSection = section;
 	}
 	
 	public String getCommand() {
@@ -345,26 +355,51 @@ public class ItemCommand {
 		return ActionType.DEFAULT;
 	}
 	
-	public static ItemCommand[] arrayFromString(ItemMap itemMap) {
+	public static ItemCommand[] arrayFromString(ItemMap itemMap, boolean isList) {
 		if (ConfigHandler.getCommandsSection(itemMap.getNodeLocation()) == null) {
 			return new ItemCommand[] {
-				new ItemCommand("", ActionType.DEFAULT, Type.DEFAULT, 0L, itemMap.getCommandType() != null ? itemMap.getCommandType().name() : "INTERACT")
+				new ItemCommand("", ActionType.DEFAULT, Type.DEFAULT, 0L, itemMap.getCommandType() != null ? itemMap.getCommandType().name() : "INTERACT", null)
 			};
 		}
-		return fromConfigList(itemMap);
+		return fromConfigList(itemMap, isList);
 	}
 	
-	private static ItemCommand[] fromConfigList(ItemMap itemMap) {
+	private static ItemCommand[] fromConfigList(ItemMap itemMap, boolean isList) {
+		if (isList && ConfigHandler.getCommandsSection(itemMap.getNodeLocation()) != null) {
+			final List < ItemCommand > arrayCommands = new ArrayList < ItemCommand > ();
+			Iterator < String > it = ConfigHandler.getCommandsSection(itemMap.getNodeLocation()).getKeys(false).iterator();
+			while (it.hasNext()) {
+				String definition = it.next();
+				if (ConfigHandler.getCommandsListSection(itemMap.getNodeLocation(), definition) != null) {
+					for (String internalCommands: ConfigHandler.getCommandsListSection(itemMap.getNodeLocation(), definition).getKeys(false)) {
+						long delay = 0L;
+						List < String > commandsList = itemMap.getNodeLocation().getStringList("commands." + definition + "." + internalCommands);
+						for (int i = 0; i < commandsList.size(); ++i) {
+							if (commandsList.get(i).trim().startsWith("delay:")) { delay = delay + getDelay(commandsList.get(i).trim()); }
+							arrayCommands.add(fromString(commandsList.get(i).trim(), getExactActionType(itemMap, definition), itemMap.getCommandType(), delay, internalCommands));
+						}
+					}
+				} else { return fromConfig(itemMap); }
+			}
+			final ItemCommand[] commands = new ItemCommand[arrayCommands.size()];
+			for (int i = 0; i < arrayCommands.size(); ++i) { commands[i] = arrayCommands.get(i);}
+			return commands;
+		} else {
+			return fromConfig(itemMap);
+		}
+	}
+	
+	private static ItemCommand[] fromConfig(ItemMap itemMap) {
 		if (ConfigHandler.getCommandsSection(itemMap.getNodeLocation()) != null) {
 			final List < ItemCommand > arrayCommands = new ArrayList < ItemCommand > ();
 			Iterator < String > it = ConfigHandler.getCommandsSection(itemMap.getNodeLocation()).getKeys(false).iterator();
-			long delay = 0L;
 			while (it.hasNext()) {
 				String definition = it.next();
+				long delay = 0L;
 				List < String > commandsList = itemMap.getNodeLocation().getStringList("commands." + definition);
 				for (int i = 0; i < commandsList.size(); ++i) {
-					if (commandsList.get(i).trim().startsWith("delay:")) { delay = delay + getDelay(commandsList.get(i).trim());}
-					arrayCommands.add(fromString(commandsList.get(i).trim(), getExactActionType(itemMap, definition), itemMap.getCommandType(), delay));
+					if (commandsList.get(i).trim().startsWith("delay:")) { delay = delay + getDelay(commandsList.get(i).trim()); }
+					arrayCommands.add(fromString(commandsList.get(i).trim(), getExactActionType(itemMap, definition), itemMap.getCommandType(), delay, null));
 				}
 			}
 			final ItemCommand[] commands = new ItemCommand[arrayCommands.size()];
@@ -374,8 +409,8 @@ public class ItemCommand {
 		return null;
 	}
 	
-	public static ItemCommand fromString(String input, ActionType action, ItemMap.CommandType commandType, long delay) {
-		if (input == null || input.length() == 0) { return new ItemCommand("", ActionType.DEFAULT, Type.DEFAULT, 0L, commandType != null ? commandType.name() : "INTERACT"); }
+	public static ItemCommand fromString(String input, ActionType action, ItemMap.CommandType commandType, long delay, String listSection) {
+		if (input == null || input.length() == 0) { return new ItemCommand("", ActionType.DEFAULT, Type.DEFAULT, 0L, commandType != null ? commandType.name() : "INTERACT", null); }
 		input = input.trim();
 		Type type = Type.DEFAULT;
 		
@@ -391,7 +426,7 @@ public class ItemCommand {
 		
 		input = input.trim();
 		input = Utils.colorFormat(input);
-		return new ItemCommand(input, action, type, delay, commandType != null ? commandType.name() : "INTERACT");
+		return new ItemCommand(input, action, type, delay, commandType != null ? commandType.name() : "INTERACT", listSection);
 	}
 	
 	private static int getDelay(String lDelay) {
