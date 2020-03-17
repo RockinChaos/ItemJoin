@@ -1,6 +1,8 @@
 package me.RockinChaos.itemjoin.listeners;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
@@ -11,6 +13,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
+
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
@@ -21,8 +24,8 @@ import me.RockinChaos.itemjoin.utils.Utils;
 
 public class InventoryClick implements Listener {
 
-	public static Map < String, Boolean > droppedItem = new HashMap < String, Boolean > ();
-	public static Map < String, Boolean > dropClick = new HashMap < String, Boolean > ();
+	private Map < String, Boolean > droppedItem = new HashMap < String, Boolean > ();
+	private Map < String, Boolean > dropClick = new HashMap < String, Boolean > ();
 	public static HashMap < String, ItemStack > cursorItem = new HashMap < String, ItemStack > ();
 	
 	@EventHandler
@@ -39,30 +42,19 @@ public class InventoryClick implements Listener {
 	@EventHandler
 	private void onModify(InventoryClickEvent event) {
 		Player player = (Player) event.getWhoClicked();
-			ItemStack item1 = null;
-			ItemStack item2 = null;
-			if (!ServerHandler.hasSpecificUpdate("1_8")) {
-				PlayerHandler.updateInventory(player);
-			}
-			if (Utils.containsIgnoreCase(event.getAction().name(), "HOTBAR")) {
-				item1 = event.getView().getBottomInventory().getItem(event.getHotbarButton());
-				if (item1 == null) { item1 = event.getCurrentItem(); } }
-				if (item1 != null && event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR) { item2 = event.getCurrentItem(); }
-			else if (PlayerHandler.isCreativeMode(player) && event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR) { item1 = event.getCurrentItem(); }
-			else if (PlayerHandler.isCreativeMode(player) && event.getCursor() != null && event.getCursor().getType() != Material.AIR) { item1 = event.getCursor(); }
-			else { item1 = event.getCurrentItem(); }
-			if (!ServerHandler.hasCombatUpdate()) {
-				dropClick.put(PlayerHandler.getPlayerID(player), true);
-				ItemStack[] Inv = player.getInventory().getContents().clone();
-				ItemStack[] Armor = player.getInventory().getArmorContents().clone();
-				LegacyDropEvent(player, Inv, Armor);
-			}
-			if (!ItemUtilities.isAllowed(player, item1, "inventory-modify") || !ItemUtilities.isAllowed(player, item2, "inventory-modify")) {
+		List<ItemStack> items = new ArrayList<ItemStack>();
+		items.add(event.getCurrentItem()); items.add(event.getCursor());
+		if (Utils.containsIgnoreCase(event.getAction().name(), "HOTBAR")) { items.add(event.getView().getBottomInventory().getItem(event.getHotbarButton())); }
+		if (!ServerHandler.hasSpecificUpdate("1_8")) { PlayerHandler.updateInventory(player); }
+		this.LegacyDropEvent(player);
+		for (ItemStack item : items) {
+			if (!ItemUtilities.isAllowed(player, item, "inventory-modify")) {
 				event.setCancelled(true);
 				if (PlayerHandler.isCreativeMode(player)) { player.closeInventory(); }
-				else if (!ItemUtilities.isAllowed(player, item1, "inventory-close")) { player.closeInventory(); }
+				else if (!ItemUtilities.isAllowed(player, item, "inventory-close")) { player.closeInventory(); }
 				PlayerHandler.updateInventory(player);
 			}
+		}
 	}
 	
     @EventHandler()
@@ -97,25 +89,30 @@ public class InventoryClick implements Listener {
     	}
     }
 
-    private static void LegacyDropEvent(final Player player, final ItemStack[] Inv, final ItemStack[] Armor) {
-		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
-			@Override
-			public void run() {
-				if (dropClick.get(PlayerHandler.getPlayerID(player)) != null && dropClick.get(PlayerHandler.getPlayerID(player)) == true 
-					&& droppedItem.get(PlayerHandler.getPlayerID(player)) != null && droppedItem.get(PlayerHandler.getPlayerID(player)) == true) {
-					player.getInventory().clear();
-					player.getInventory().setHelmet(null);
-					player.getInventory().setChestplate(null);
-					player.getInventory().setLeggings(null);
-					player.getInventory().setBoots(null);
-					if (ServerHandler.hasCombatUpdate()) { player.getInventory().setItemInOffHand(null); }
-					player.getInventory().setContents(Inv);
-					player.getInventory().setArmorContents(Armor);
-					PlayerHandler.updateInventory(player);
-					droppedItem.remove(PlayerHandler.getPlayerID(player));
+    private void LegacyDropEvent(final Player player) {
+    	if (!ServerHandler.hasCombatUpdate()) {
+			dropClick.put(PlayerHandler.getPlayerID(player), true);
+			final ItemStack[] Inv = player.getInventory().getContents().clone();
+			final ItemStack[] Armor = player.getInventory().getArmorContents().clone();
+			Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
+				@Override
+				public void run() {
+					if (dropClick.get(PlayerHandler.getPlayerID(player)) != null && dropClick.get(PlayerHandler.getPlayerID(player)) == true 
+						&& droppedItem.get(PlayerHandler.getPlayerID(player)) != null && droppedItem.get(PlayerHandler.getPlayerID(player)) == true) {
+						player.getInventory().clear();
+						player.getInventory().setHelmet(null);
+						player.getInventory().setChestplate(null);
+						player.getInventory().setLeggings(null);
+						player.getInventory().setBoots(null);
+						if (ServerHandler.hasCombatUpdate()) { player.getInventory().setItemInOffHand(null); }
+						player.getInventory().setContents(Inv);
+						player.getInventory().setArmorContents(Armor);
+						PlayerHandler.updateInventory(player);
+						droppedItem.remove(PlayerHandler.getPlayerID(player));
+					}
+					dropClick.remove(PlayerHandler.getPlayerID(player));
 				}
-				dropClick.remove(PlayerHandler.getPlayerID(player));
-			}
-		}, 1L);
+			}, 1L);
+    	}
 	}
 }
