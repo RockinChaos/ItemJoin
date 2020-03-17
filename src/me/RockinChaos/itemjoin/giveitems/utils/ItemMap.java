@@ -250,7 +250,7 @@ public class ItemMap {
 			this.setCommandCooldown();
 			this.setCommandType();
 			this.setCommandSequence();
-			this.setCommands(ItemCommand.arrayFromString(this));
+			this.setCommands(ItemCommand.arrayFromString(this, this.sequence == CommandSequence.RANDOM_LIST));
 	        this.setInteractCooldown();
 	        this.setItemflags();
 	        this.setLimitModes();
@@ -321,6 +321,7 @@ public class ItemMap {
 		if (this.nodeLocation.getString("commands-sequence") != null) { 
 		    if (Utils.containsIgnoreCase(this.nodeLocation.getString("commands-sequence"), "SEQUENTIAL")) { this.sequence = CommandSequence.SEQUENTIAL; }
 		    else if (Utils.containsIgnoreCase(this.nodeLocation.getString("commands-sequence"), "RANDOM_SINGLE")) { this.sequence = CommandSequence.RANDOM_SINGLE; }
+		    else if (Utils.containsIgnoreCase(this.nodeLocation.getString("commands-sequence"), "RANDOM_LIST")) { this.sequence = CommandSequence.RANDOM_LIST; }
 			else if (Utils.containsIgnoreCase(this.nodeLocation.getString("commands-sequence"), "RANDOM")) { this.sequence = CommandSequence.RANDOM; }
 		}
 	}
@@ -2074,15 +2075,38 @@ public class ItemMap {
     	return true;
     }
     
+    private String getRandomList(ItemCommand[] itemCommands) {
+    	if (this.sequence == CommandSequence.RANDOM_LIST) {
+    		List < String > listIdent = new ArrayList < String > ();
+    		for (int i = 0; i < itemCommands.length; i++) {
+    			if (!listIdent.contains("+" + itemCommands[i].getSection() + "+")) {
+    				listIdent.add("+" + itemCommands[i].getSection() + "+");
+    			}
+    		}
+    		HashMap < Integer, String > randomIdent = new HashMap < Integer, String > ();
+    		for (String ident: listIdent) {
+    			randomIdent.put(Utils.getRandom(1, 100000), ident);
+    		}
+    		return (String) Utils.randomEntry(randomIdent).getValue();
+    	}
+    	return null;
+    }
+    
     private boolean isExecuted(final Player player, final String action, final String slot, final ItemStack itemCopy) {
     	boolean playerSuccess = false;
     	ItemCommand[] itemCommands = this.commands;
+    	String chosenIdent = this.getRandomList(itemCommands);
     	HashMap < Integer, ItemCommand > randomCommands = new HashMap < Integer, ItemCommand > ();
     	if (!this.subjectRemoval) {
     		boolean isSwap = false;
     		for (int i = 0; i < itemCommands.length; i++) { 
-        		if (this.sequence == CommandSequence.RANDOM) { randomCommands.put(Utils.getRandom(1, 100000), itemCommands[i]); }
-        		else if (this.sequence == CommandSequence.RANDOM_SINGLE) { randomCommands.put(Utils.getRandom(1, 100000), itemCommands[i]); }
+        		if (this.sequence == CommandSequence.RANDOM || this.sequence == CommandSequence.RANDOM_SINGLE) { randomCommands.put(Utils.getRandom(1, 100000), itemCommands[i]); }
+        		else if (this.sequence == CommandSequence.RANDOM_LIST) {
+        			if (itemCommands[i].getSection() != null && itemCommands[i].getSection().equalsIgnoreCase(chosenIdent.replace("+", ""))) {
+	        			if (!playerSuccess) { playerSuccess = itemCommands[i].execute(player, action, slot, this); } 
+	        			else { itemCommands[i].execute(player, action, slot, this); } 
+	        		}
+        		}
         		else if (!playerSuccess) { playerSuccess = itemCommands[i].execute(player, action, slot, this); }
 				else { itemCommands[i].execute(player, action, slot, this); }
         		if (Utils.containsIgnoreCase(itemCommands[i].getCommand(), "swap-item")) { isSwap = true; }
@@ -2344,6 +2368,29 @@ public class ItemMap {
 		catch (Exception e) { ItemJoin.getInstance().getServer().getLogger().severe("Could not remove the custom item " + this.configName + " from the items.yml data file!"); ServerHandler.sendDebugTrace(e); }	
 	}
 	
+	public Map<String, List<String>> addMapCommand(Map<String, List<String>> map, ItemCommand command) {
+		String commandSection = (command.getSection() != null ? command.getSection() : "DEFAULT");
+		if (map.get(commandSection) != null) { 
+			List <String> s1 = map.get(commandSection); s1.add(command.getCommand());
+			map.put(commandSection, s1);  
+		} 
+		else {
+			List <String> s1 = new ArrayList<String>(); s1.add(command.getCommand());
+			map.put(commandSection, s1);  
+		}
+		return map;
+	}
+	
+	public void setMapCommand( FileConfiguration itemData, Map<String, List<String>> map, String section) {
+		Iterator<Entry<String, List<String>>> iterate = map.entrySet().iterator(); 
+		while (iterate.hasNext()) { 
+			Entry<String, List<String>> mapElement = (Entry<String, List<String>>)iterate.next(); 
+			String mapKey = mapElement.getKey(); 
+			if (mapKey.equalsIgnoreCase("DEFAULT") && map.size() <= 1) { mapKey = ""; } else { mapKey = "." + mapKey; }
+			itemData.set("items." + this.configName + ".commands." + section + mapKey, mapElement.getValue()); 
+		}
+	}
+	
 	public void saveToConfig() {
 		File itemFile =  new File (ItemJoin.getInstance().getDataFolder(), "items.yml");
 		FileConfiguration itemData = YamlConfiguration.loadConfiguration(itemFile);
@@ -2396,53 +2443,53 @@ public class ItemMap {
 		}
 		if (this.probability != null && this.probability != -1 && this.probability != 0) { itemData.set("items." + this.configName + ".probability", this.probability); }
 		if (this.commands != null && this.commands.length > 0) {
-			List<String> multiClickAll = new ArrayList<String>();
-			List<String> leftClickAll = new ArrayList<String>();
-			List<String> rightClickAll = new ArrayList<String>();
-			List<String> multiClickAir = new ArrayList<String>();
-			List<String> multiClickBlock = new ArrayList<String>();
-			List<String> leftClickAir = new ArrayList<String>();
-			List<String> leftClickBlock = new ArrayList<String>();
-			List<String> rightClickAir = new ArrayList<String>();
-			List<String> rightClickBlock = new ArrayList<String>();
-			List<String> onEquip = new ArrayList<String>();
-			List<String> unEquip = new ArrayList<String>();
-			List<String> onHold = new ArrayList<String>();
-			List<String> onReceive = new ArrayList<String>();
-			List<String> physical = new ArrayList<String>();
-			List<String> inventory = new ArrayList<String>();
+			Map<String, List<String>> multiClickAll = new HashMap<String, List<String>>();
+			Map<String, List<String>> leftClickAll = new HashMap<String, List<String>>();
+			Map<String, List<String>> rightClickAll = new HashMap<String, List<String>>();
+			Map<String, List<String>> multiClickAir = new HashMap<String, List<String>>();
+			Map<String, List<String>> multiClickBlock = new HashMap<String, List<String>>();
+			Map<String, List<String>> leftClickAir = new HashMap<String, List<String>>();
+			Map<String, List<String>> leftClickBlock = new HashMap<String, List<String>>();
+			Map<String, List<String>> rightClickAir = new HashMap<String, List<String>>();
+			Map<String, List<String>> rightClickBlock = new HashMap<String, List<String>>();
+			Map<String, List<String>> onEquip = new HashMap<String, List<String>>();
+			Map<String, List<String>> unEquip = new HashMap<String, List<String>>();
+			Map<String, List<String>> onHold = new HashMap<String, List<String>>();
+			Map<String, List<String>> onReceive = new HashMap<String, List<String>>();
+			Map<String, List<String>> physical = new HashMap<String, List<String>>();
+			Map<String, List<String>> inventory = new HashMap<String, List<String>>();
 			for(ItemCommand command : this.commands) {
-				if (command.matchAction(ItemCommand.ActionType.MULTI_CLICK_ALL)) { multiClickAll.add(command.getCommand()); }
-				else if (command.matchAction(ItemCommand.ActionType.MULTI_CLICK_AIR)) { multiClickAir.add(command.getCommand()); }
-				else if (command.matchAction(ItemCommand.ActionType.MULTI_CLICK_BLOCK)) { multiClickBlock.add(command.getCommand()); }
-				else if (command.matchAction(ItemCommand.ActionType.RIGHT_CLICK_ALL)) { rightClickAll.add(command.getCommand()); }
-				else if (command.matchAction(ItemCommand.ActionType.RIGHT_CLICK_AIR)) { rightClickAir.add(command.getCommand()); }
-				else if (command.matchAction(ItemCommand.ActionType.RIGHT_CLICK_BLOCK)) { rightClickBlock.add(command.getCommand()); }
-				else if (command.matchAction(ItemCommand.ActionType.LEFT_CLICK_ALL)) { leftClickAll.add(command.getCommand()); }
-				else if (command.matchAction(ItemCommand.ActionType.LEFT_CLICK_AIR)) { leftClickAir.add(command.getCommand()); }
-				else if (command.matchAction(ItemCommand.ActionType.LEFT_CLICK_BLOCK)) { leftClickBlock.add(command.getCommand()); }
-				else if (command.matchAction(ItemCommand.ActionType.ON_EQUIP)) { onEquip.add(command.getCommand()); }
-				else if (command.matchAction(ItemCommand.ActionType.UN_EQUIP)) { unEquip.add(command.getCommand()); }
-				else if (command.matchAction(ItemCommand.ActionType.ON_HOLD)) { onHold.add(command.getCommand()); }
-				else if (command.matchAction(ItemCommand.ActionType.ON_RECEIVE)) { onReceive.add(command.getCommand()); }
-				else if (command.matchAction(ItemCommand.ActionType.PHYSICAL)) { physical.add(command.getCommand()); }
-				else if (command.matchAction(ItemCommand.ActionType.INVENTORY)) { inventory.add(command.getCommand()); }
+				if (command.matchAction(ItemCommand.ActionType.MULTI_CLICK_ALL)) { multiClickAll = this.addMapCommand(multiClickAll, command); }
+				else if (command.matchAction(ItemCommand.ActionType.MULTI_CLICK_AIR)) { multiClickAir = this.addMapCommand(multiClickAir, command); }
+				else if (command.matchAction(ItemCommand.ActionType.MULTI_CLICK_BLOCK)) { multiClickBlock = this.addMapCommand(multiClickBlock, command); }
+				else if (command.matchAction(ItemCommand.ActionType.RIGHT_CLICK_ALL)) { rightClickAll = this.addMapCommand(rightClickAll, command); }
+				else if (command.matchAction(ItemCommand.ActionType.RIGHT_CLICK_AIR)) { rightClickAir = this.addMapCommand(rightClickAir, command);}
+				else if (command.matchAction(ItemCommand.ActionType.RIGHT_CLICK_BLOCK)) { rightClickBlock = this.addMapCommand(rightClickBlock, command); }
+				else if (command.matchAction(ItemCommand.ActionType.LEFT_CLICK_ALL)) { leftClickAll = this.addMapCommand(leftClickAll, command); }
+				else if (command.matchAction(ItemCommand.ActionType.LEFT_CLICK_AIR)) { leftClickAir = this.addMapCommand(leftClickAir, command); }
+				else if (command.matchAction(ItemCommand.ActionType.LEFT_CLICK_BLOCK)) { leftClickBlock = this.addMapCommand(leftClickBlock, command); }
+				else if (command.matchAction(ItemCommand.ActionType.ON_EQUIP)) { onEquip = this.addMapCommand(onEquip, command); }
+				else if (command.matchAction(ItemCommand.ActionType.UN_EQUIP)) { unEquip = this.addMapCommand(unEquip, command); }
+				else if (command.matchAction(ItemCommand.ActionType.ON_HOLD)) { onHold = this.addMapCommand(onHold, command); }
+				else if (command.matchAction(ItemCommand.ActionType.ON_RECEIVE)) { onReceive = this.addMapCommand(onReceive, command); }
+				else if (command.matchAction(ItemCommand.ActionType.PHYSICAL)) { physical = this.addMapCommand(physical, command); }
+				else if (command.matchAction(ItemCommand.ActionType.INVENTORY)) { inventory = this.addMapCommand(inventory, command); }
 			}
-			if (!multiClickAll.isEmpty()) { itemData.set("items." + this.configName + ".commands.multi-click", multiClickAll); }
-			if (!multiClickAir.isEmpty()) { itemData.set("items." + this.configName + ".commands.multi-click-air", multiClickAir); }
-			if (!multiClickBlock.isEmpty()) { itemData.set("items." + this.configName + ".commands.multi-click-block", multiClickBlock); }
-			if (!rightClickAll.isEmpty()) { itemData.set("items." + this.configName + ".commands.right-click", rightClickAll); }
-			if (!rightClickAir.isEmpty()) { itemData.set("items." + this.configName + ".commands.right-click-air", rightClickAir); }
-			if (!rightClickBlock.isEmpty()) { itemData.set("items." + this.configName + ".commands.right-click-block", rightClickBlock); }
-			if (!leftClickAll.isEmpty()) { itemData.set("items." + this.configName + ".commands.left-click", leftClickAll); }
-			if (!leftClickAir.isEmpty()) { itemData.set("items." + this.configName + ".commands.left-click-air", leftClickAir); }
-			if (!leftClickBlock.isEmpty()) { itemData.set("items." + this.configName + ".commands.left-click-block", leftClickBlock); }
-			if (!onEquip.isEmpty()) { itemData.set("items." + this.configName + ".commands.on-equip", onEquip); }
-			if (!unEquip.isEmpty()) { itemData.set("items." + this.configName + ".commands.un-equip", unEquip); }
-			if (!onHold.isEmpty()) { itemData.set("items." + this.configName + ".commands.on-hold", onHold); }
-			if (!onReceive.isEmpty()) { itemData.set("items." + this.configName + ".commands.on-receive", onReceive); }
-			if (!physical.isEmpty()) { itemData.set("items." + this.configName + ".commands.physical", physical); }
-			if (!inventory.isEmpty()) { itemData.set("items." + this.configName + ".commands.inventory", inventory); }
+			if (!multiClickAll.isEmpty()) { this.setMapCommand(itemData, multiClickAll, "multi-click"); }
+			if (!multiClickAir.isEmpty()) { this.setMapCommand(itemData, multiClickAir, "multi-click-air"); }
+			if (!multiClickBlock.isEmpty()) { this.setMapCommand(itemData, multiClickBlock, "multi-click-block"); }
+			if (!rightClickAll.isEmpty()) { this.setMapCommand(itemData, rightClickAll, "right-click"); }
+			if (!rightClickAir.isEmpty()) { this.setMapCommand(itemData, rightClickAir, "right-click-air"); }
+			if (!rightClickBlock.isEmpty()) { this.setMapCommand(itemData, rightClickBlock, "right-click-block"); }
+			if (!leftClickAll.isEmpty()) { this.setMapCommand(itemData, leftClickAll, "left-click"); }
+			if (!leftClickAir.isEmpty()) { this.setMapCommand(itemData, leftClickAir, "left-click-air"); }
+			if (!leftClickBlock.isEmpty()) { this.setMapCommand(itemData, leftClickBlock, "left-click-block"); }
+			if (!onEquip.isEmpty()) { this.setMapCommand(itemData, onEquip, "on-equip"); }
+			if (!unEquip.isEmpty()) { this.setMapCommand(itemData, unEquip, "un-equip"); }
+			if (!onHold.isEmpty()) { this.setMapCommand(itemData, onHold, "on-hold"); }
+			if (!onReceive.isEmpty()) { this.setMapCommand(itemData, onReceive, "on-receive"); }
+			if (!physical.isEmpty()) { this.setMapCommand(itemData, physical, "physical"); }
+			if (!inventory.isEmpty()) { this.setMapCommand(itemData, inventory, "inventory"); }
 		}
 		if (this.type != null) { itemData.set("items." + this.configName + ".commands-type", this.type.name()); }
 		if (this.commandSound != null) { itemData.set("items." + this.configName + ".commands-sound", this.commandSound.name()); }
@@ -2514,7 +2561,7 @@ public class ItemMap {
 	}
 	
 	public enum CommandType { BOTH, INTERACT, INVENTORY; }
-	public enum CommandSequence { RANDOM, RANDOM_SINGLE, SEQUENTIAL, ALL; }
+	public enum CommandSequence { RANDOM, RANDOM_SINGLE, RANDOM_LIST, SEQUENTIAL, ALL; }
 	
 	public ItemMap clone() {
         try {

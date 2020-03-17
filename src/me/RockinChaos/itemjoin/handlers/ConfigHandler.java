@@ -498,5 +498,9 @@ public class ConfigHandler {
 	
 	public static ConfigurationSection getCommandsSection(ConfigurationSection items) {
 		return getConfig("items.yml").getConfigurationSection(items.getCurrentPath() + ".commands");
-	}	
+	}
+	
+	public static ConfigurationSection getCommandsListSection(ConfigurationSection items, String action) {
+		return getConfig("items.yml").getConfigurationSection(items.getCurrentPath() + ".commands." + action);
+	}
 }

@@ -1489,7 +1489,41 @@ public class UI {
 		modPane.addButton(new Button(this.fillerPaneGItem), 4);
 		modPane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, true, "&f" + command.getCommand(), "&7", "&7*You are modifying this command.", "&9&lOrder Number: &a" + orderNumber)));
 		modPane.addButton(new Button(this.fillerPaneGItem), 4);
-		modPane.addButton(new Button(this.fillerPaneGItem), 3);
+		modPane.addButton(new Button(this.fillerPaneGItem));
+		modPane.addButton(new Button(ItemHandler.getItem((ServerHandler.hasAquaticUpdate() ? "REPEATER" : "356"), 1, false, "&fIdentifier", "&7", "&7*Set a custom identifier", "&7for this command line.", "&7", "&cNOTE: &7This is in order to set", "&7a random command list sequence.", 
+				"&7Only use this if", "&7the commands sequence is", "&7set to &aRANDOM_LIST&7.", "&7", "&9&lIDENTIFIER: &a" + Utils.nullCheck(command.getSection())), event -> {
+					if (Utils.nullCheck(command.getSection()) != "NONE") {
+						ItemCommand[] commands = itemMap.getCommands();
+						for (ItemCommand Command: commands) {
+							if (Command.equals(command)) {
+								Command.setSection(null);
+							}
+						}
+						itemMap.setCommands(commands);
+						command.setSection(null);
+						this.modifyCommandsPane(player, itemMap, action, command, orderNumber);
+					} else {
+						player.closeInventory();
+						String[] placeHolders = Language.newString();
+						placeHolders[14] = "COMMAND IDENTIFIER";
+						placeHolders[15] = "winner";
+						Language.sendLangMessage("Commands.UI.inputType", player, placeHolders);
+						Language.sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+					}
+				}, event -> {
+					ItemCommand[] commands = itemMap.getCommands();
+					for (ItemCommand Command: commands) {
+						if (Command.equals(command)) {
+							Command.setSection(event.getMessage());
+						}
+					}
+					itemMap.setCommands(commands);
+					String[] placeHolders = Language.newString();
+					placeHolders[14] = "COMMAND IDENTIFIER";
+					Language.sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+					this.commandListPane(event.getPlayer(), itemMap, action);
+				}));
+		modPane.addButton(new Button(this.fillerPaneGItem));
 		modPane.addButton(new Button(ItemHandler.getItem("PAPER", 1, false, "&fModify", "&7", "&7*Sets the command to", "&7another text entry."), event -> {
 			player.closeInventory();
 			String[] placeHolders = Language.newString();
@@ -1510,15 +1544,17 @@ public class UI {
 			Language.sendLangMessage("Commands.UI.inputSet", player, placeHolders);
 			this.commandListPane(event.getPlayer(), itemMap, action);
 		}));
+		modPane.addButton(new Button(this.fillerPaneGItem));
 		modPane.addButton(new Button(ItemHandler.getItem("STICK", 1, false, "&fOrder", "&7", "&7*Changes the order of execution", "&7for this command line.", "&7", "&7This will simply set the order", "&7number and push the", 
 				"&7other commands down by one."), event -> {
 			this.orderPane(player, itemMap, action, command, orderNumber);
 		}));
+		modPane.addButton(new Button(this.fillerPaneGItem));
 		modPane.addButton(new Button(ItemHandler.getItem("REDSTONE", 1, false, "&fDelete", "&7", "&7*Click to &cdelete &7this command."), event -> {
 			this.modifyCommands(itemMap, command, false);
 			this.commandListPane(player, itemMap, action);
 		}));
-		modPane.addButton(new Button(this.fillerPaneGItem), 3);
+		modPane.addButton(new Button(this.fillerPaneGItem));
 		modPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the command lines menu."), event -> this.commandListPane(player, itemMap, action)));
 		modPane.addButton(new Button(this.fillerPaneBItem), 7);
 		modPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the command lines menu."), event -> this.commandListPane(player, itemMap, action)));
@@ -1535,7 +1571,7 @@ public class UI {
 			Language.sendLangMessage("Commands.UI.inputType", player, placeHolders);
 			Language.sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 		}, event -> {
-			this.modifyCommands(itemMap, ItemCommand.fromString("player: " + event.getMessage(), action, CommandType.BOTH, 0L), true);
+			this.modifyCommands(itemMap, ItemCommand.fromString("player: " + event.getMessage(), action, CommandType.BOTH, 0L, null), true);
 			String[] placeHolders = Language.newString();
 			placeHolders[14] = "PLAYER COMMAND";
 			Language.sendLangMessage("Commands.UI.inputSet", player, placeHolders);
@@ -1549,7 +1585,7 @@ public class UI {
 			Language.sendLangMessage("Commands.UI.inputType", player, placeHolders);
 			Language.sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 		}, event -> {
-			this.modifyCommands(itemMap, ItemCommand.fromString("op: " + event.getMessage(), action, CommandType.BOTH, 0L), true);
+			this.modifyCommands(itemMap, ItemCommand.fromString("op: " + event.getMessage(), action, CommandType.BOTH, 0L, null), true);
 			String[] placeHolders = Language.newString();
 			placeHolders[14] = "COMMAND LINE";
 			Language.sendLangMessage("Commands.UI.inputSet", player, placeHolders);
@@ -1563,7 +1599,7 @@ public class UI {
 			Language.sendLangMessage("Commands.UI.inputType", player, placeHolders);
 			Language.sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 		}, event -> {
-			this.modifyCommands(itemMap, ItemCommand.fromString("console: " + event.getMessage(), action, CommandType.BOTH, 0L), true);
+			this.modifyCommands(itemMap, ItemCommand.fromString("console: " + event.getMessage(), action, CommandType.BOTH, 0L, null), true);
 			String[] placeHolders = Language.newString();
 			placeHolders[14] = "OP COMMAND";
 			Language.sendLangMessage("Commands.UI.inputSet", player, placeHolders);
@@ -1578,7 +1614,7 @@ public class UI {
 			Language.sendLangMessage("Commands.UI.inputType", player, placeHolders);
 			Language.sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 		}, event -> {
-			this.modifyCommands(itemMap, ItemCommand.fromString("server: " + event.getMessage(), action, CommandType.BOTH, 0L), true);
+			this.modifyCommands(itemMap, ItemCommand.fromString("server: " + event.getMessage(), action, CommandType.BOTH, 0L, null), true);
 			String[] placeHolders = Language.newString();placeHolders[14] = "SERVER SWITCH";
 			Language.sendLangMessage("Commands.UI.inputSet", player, placeHolders);
 			this.commandListPane(event.getPlayer(), itemMap, action);
@@ -1591,7 +1627,7 @@ public class UI {
 			Language.sendLangMessage("Commands.UI.inputType", player, placeHolders);
 			Language.sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 		}, event -> {
-			this.modifyCommands(itemMap, ItemCommand.fromString("bungee: " + event.getMessage(), action, CommandType.BOTH, 0L), true);
+			this.modifyCommands(itemMap, ItemCommand.fromString("bungee: " + event.getMessage(), action, CommandType.BOTH, 0L, null), true);
 			String[] placeHolders = Language.newString();
 			placeHolders[14] = "BUNGEE COMMAND";
 			Language.sendLangMessage("Commands.UI.inputSet", player, placeHolders);
@@ -1605,7 +1641,7 @@ public class UI {
 			Language.sendLangMessage("Commands.UI.inputType", player, placeHolders);
 			Language.sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 		}, event -> {
-			this.modifyCommands(itemMap, ItemCommand.fromString("message: " + event.getMessage(), action, CommandType.BOTH, 0L), true);
+			this.modifyCommands(itemMap, ItemCommand.fromString("message: " + event.getMessage(), action, CommandType.BOTH, 0L, null), true);
 			String[] placeHolders = Language.newString();
 			placeHolders[14] = "MESSAGE";
 			Language.sendLangMessage("Commands.UI.inputSet", player, placeHolders);
@@ -1628,7 +1664,7 @@ public class UI {
 			if (item.getNodeLocation() != itemMap.getNodeLocation()) {
 				if (itemMap.isAnimated() || itemMap.isDynamic()) { this.setModifyMenu(true, player); itemMap.getAnimationHandler().get(player).setMenu(true, 1); }
 				swapPane.addButton(new Button(ItemHandler.addLore(item.getTempItem(), "&7", "&6---------------------------", "&7*Click to set as a swap-item.", "&9&lNode: &a" + item.getConfigName(), "&7"), event -> { 
-				this.modifyCommands(itemMap, ItemCommand.fromString("swap-item: " + item.getConfigName(), action, CommandType.BOTH, 0L), true);
+				this.modifyCommands(itemMap, ItemCommand.fromString("swap-item: " + item.getConfigName(), action, CommandType.BOTH, 0L, null), true);
 				this.commandListPane(player, itemMap, action); }));
 			}
 		}
@@ -1649,7 +1685,7 @@ public class UI {
 			Language.sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 		}, event -> {
 			if (Utils.isInt(event.getMessage())) {
-				this.modifyCommands(itemMap, ItemCommand.fromString("delay: " + Integer.parseInt(event.getMessage()), action, CommandType.BOTH, Integer.parseInt(event.getMessage())), true);
+				this.modifyCommands(itemMap, ItemCommand.fromString("delay: " + Integer.parseInt(event.getMessage()), action, CommandType.BOTH, Integer.parseInt(event.getMessage()), null), true);
 				String[] placeHolders = Language.newString();
 				placeHolders[14] = "DELAY";
 				Language.sendLangMessage("Commands.UI.inputSet", player, placeHolders);
@@ -1663,7 +1699,7 @@ public class UI {
 		for (int i = 1; i <= 64; i++) {
 			final int k = i;
 			delayPane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:8", k, false, "&9&lDelay: &a&l" + k + " Tick(s)", "&7", "&7*Click to set the", "&7delay of the next command."), event -> {
-				this.modifyCommands(itemMap, ItemCommand.fromString("delay: " + k, action, CommandType.BOTH, k), true);
+				this.modifyCommands(itemMap, ItemCommand.fromString("delay: " + k, action, CommandType.BOTH, k, null), true);
 				this.commandListPane(player, itemMap, action);
 			}));
 		}
@@ -1812,17 +1848,23 @@ public class UI {
 	
 	private void sequencePane(final Player player, final ItemMap itemMap) {
 		Interface sequencePane = new Interface(false, 2, this.GUIName);
-		sequencePane.addButton(new Button(this.fillerPaneGItem), 3);
+		sequencePane.addButton(new Button(this.fillerPaneGItem));
 		sequencePane.addButton(new Button(ItemHandler.getItem((ServerHandler.hasAquaticUpdate() ? "CLOCK" : "347"), 1, false, "&a&lSequential", "&7", "&7*Executes the command lines", "&7in order from top to bottom."), event -> {
 			itemMap.setCommandSequence(CommandSequence.SEQUENTIAL);this.commandPane(player, itemMap);
 		}));
+		sequencePane.addButton(new Button(this.fillerPaneGItem));
 		sequencePane.addButton(new Button(ItemHandler.getItem("DIAMOND", 1, false, "&a&lRandom Single", "&7", "&7*Executes one of the command lines", "&7randomly with equal values."), event -> {
 			itemMap.setCommandSequence(CommandSequence.RANDOM_SINGLE); this.commandPane(player, itemMap);
 		}));
+		sequencePane.addButton(new Button(this.fillerPaneGItem));
+		sequencePane.addButton(new Button(ItemHandler.getItem("PAPER", 1, false, "&a&lRandom List", "&7", "&7*Randomly selects from a list", "&7of commands to execute."), event -> {
+			itemMap.setCommandSequence(CommandSequence.RANDOM_LIST); this.commandPane(player, itemMap);
+		}));
+		sequencePane.addButton(new Button(this.fillerPaneGItem));
 		sequencePane.addButton(new Button(ItemHandler.getItem("EMERALD", 1, false, "&a&lRandom", "&7", "&7*Executes each command line in a", "&7random order with equal values."), event -> {
 			itemMap.setCommandSequence(CommandSequence.RANDOM);this.commandPane(player, itemMap);
 		}));
-		sequencePane.addButton(new Button(this.fillerPaneGItem), 3);
+		sequencePane.addButton(new Button(this.fillerPaneGItem));
 		sequencePane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item commands menu."), event -> this.commandPane(player, itemMap)));
 		sequencePane.addButton(new Button(this.fillerPaneBItem), 7);
 		sequencePane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item commands menu."), event -> this.commandPane(player, itemMap)));
