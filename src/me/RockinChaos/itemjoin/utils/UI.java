@@ -2061,7 +2061,7 @@ public class UI {
 	
 	private void flagPane(final Player player, final ItemMap itemMap) {
 		Interface flagPane = new Interface(false, 5, this.GUIName);
-		flagPane.addButton(new Button(this.fillerPaneGItem), 2);
+		flagPane.addButton(new Button(this.fillerPaneGItem));
 		flagPane.addButton(new Button(ItemHandler.getItem("DIAMOND", 1, itemMap.isOpBypass(), "&a&l&nAllowOpBypass", "&7", 
 				"&a&lTrue&f:&7 Allows players who are OP to", "&7bypass any itemflags that add", "&7restrictions for this item.", "&7",
 				"&c&lFalse&f:&7 Players who are OP will be", "&7restricted by itemflags that add", "&7restrictions for this item.", "&7", 
@@ -2070,6 +2070,18 @@ public class UI {
 				itemMap.setOpBypass(false);
 			} else {
 				itemMap.setOpBypass(true);
+			}
+			this.flagPane(player, itemMap);
+		}));
+		flagPane.addButton(new Button(this.fillerPaneGItem));
+		flagPane.addButton(new Button(ItemHandler.getItem(itemMap.isCreativeBypass() ? "ENCHANTED_GOLDEN_APPLE" : "GOLDEN_APPLE", 1, itemMap.isCreativeBypass(), "&a&l&nCreativeBypass", "&7", 
+				"&a&lTrue&f:&7 Allows players who are in Creative", "&7to bypass any itemflags that add", "&7restrictions for this item.", "&7",
+				"&c&lFalse&f:&7 Players who are in Creative will", "&7be restricted by itemflags that add", "&7restrictions for this item.", "&7", 
+				"&9&lENABLED: &a" + (itemMap.isCreativeBypass() + "").toUpperCase()), event -> {
+			if (itemMap.isCreativeBypass()) {
+				itemMap.setCreativeBypass(false);
+			} else {
+				itemMap.setCreativeBypass(true);
 			}
 			this.flagPane(player, itemMap);
 		}));
@@ -2086,18 +2098,18 @@ public class UI {
 			this.flagPane(player, itemMap);
 		}));
 		flagPane.addButton(new Button(this.fillerPaneGItem));
-		flagPane.addButton(new Button(ItemHandler.getItem(itemMap.isCreativeBypass() ? "ENCHANTED_GOLDEN_APPLE" : "GOLDEN_APPLE", 1, itemMap.isCreativeBypass(), "&a&l&nCreativeBypass", "&7", 
-				"&a&lTrue&f:&7 Allows players who are in Creative", "&7to bypass any itemflags that add", "&7restrictions for this item.", "&7",
-				"&c&lFalse&f:&7 Players who are in Creative will", "&7be restricted by itemflags that add", "&7restrictions for this item.", "&7", 
-				"&9&lENABLED: &a" + (itemMap.isCreativeBypass() + "").toUpperCase()), event -> {
-			if (itemMap.isCreativeBypass()) {
-				itemMap.setCreativeBypass(false);
+		flagPane.addButton(new Button(ItemHandler.getItem("REDSTONE", 1, itemMap.isAutoRemove(), "&a&l&nAuto Remove", "&7", 
+				"&a&lTrue&f:&7 Automatically removes the", "&7item from the players inventory", "&7when entering or joining a", "&7world that is not defined", "&7under the enabled-worlds.", "&7",
+				"&c&lFalse&f:&7 The player will keep the", "&7item when entering or joining", "&7an undefined world.", "&7", 
+				"&9&lENABLED: &a" + (itemMap.isAutoRemove() + "").toUpperCase()), event -> {
+			if (itemMap.isAutoRemove()) {
+				itemMap.setAutoRemove(false);
 			} else {
-				itemMap.setCreativeBypass(true);
+				itemMap.setAutoRemove(true);
 			}
 			this.flagPane(player, itemMap);
 		}));
-		flagPane.addButton(new Button(this.fillerPaneGItem), 2);
+		flagPane.addButton(new Button(this.fillerPaneGItem));
 		flagPane.addButton(new Button(ItemHandler.getItem((ServerHandler.hasAquaticUpdate() ? "WOODEN_SWORD" : "268"), 1, itemMap.isVanilla(), "&a&l&nVanilla", "&7", 
 				"&a&lTrue&f:&7 The item will be given as a default no-name item.", 
 				"&cNOTE: &7Itemflags and commands will NOT work", "&7unless the vanilla-status or vanilla-control", "&7itemflags are defined.", "&7",

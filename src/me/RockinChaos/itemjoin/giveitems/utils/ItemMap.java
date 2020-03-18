@@ -197,6 +197,7 @@ public class ItemMap {
 	private boolean disposable = false;
 	private boolean itemChangable = false;
 	private boolean alwaysGive = false;
+	private boolean autoRemove = false;
 	private boolean CreativeBypass = false;
 	private boolean AllowOpBypass = false;
 	
@@ -362,6 +363,7 @@ public class ItemMap {
 			this.closeInventory = Utils.containsIgnoreCase(this.itemflags, "inventory-close");
 			this.itemChangable = Utils.containsIgnoreCase(this.itemflags, "allow-modifications") || Utils.containsIgnoreCase(this.itemflags, "item-changable");
 			this.alwaysGive = Utils.containsIgnoreCase(this.itemflags, "always-give");
+			this.autoRemove = Utils.containsIgnoreCase(this.itemflags, "auto-remove");
 			this.dynamic = Utils.containsIgnoreCase(this.itemflags, "dynamic");
 			this.animate = Utils.containsIgnoreCase(this.itemflags, "animate");
 			this.giveNext = Utils.containsIgnoreCase(this.itemflags, "give-next");
@@ -738,6 +740,10 @@ public class ItemMap {
 	
 	public void setAlwaysGive(boolean bool) {
 		this.alwaysGive = bool;
+	}
+	
+	public void setAutoRemove(boolean bool) {
+		this.autoRemove = bool;
 	}
 	
 	public void setAnimate(boolean bool) {
@@ -1344,6 +1350,10 @@ public class ItemMap {
 	
 	public boolean isAlwaysGive() {
 		return this.alwaysGive;
+	}
+	
+	public boolean isAutoRemove() {
+		return this.autoRemove;
 	}
 	
 	public boolean isAnimated() {

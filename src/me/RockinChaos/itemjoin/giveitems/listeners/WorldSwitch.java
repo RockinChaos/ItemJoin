@@ -53,12 +53,14 @@ public class WorldSwitch implements Listener {
 		final ItemMap probable = probability.getRandom(player);
 		final int session = Utils.getRandom(1, 100000);
 		for (ItemMap item : ItemUtilities.getItems()) { 
+			item.setAnimations(player);
 			if (item.isGiveOnWorldChange() && item.inWorld(player.getWorld()) 
 					&& probability.isProbability(item, probable) && ConfigHandler.getSQLData().isEnabled(player)
 					&& item.hasPermission(player) && ItemUtilities.isObtainable(player, item, session)) {
 				item.giveTo(player, false, 0);
+			} else if (item.isAutoRemove() && !item.inWorld(player.getWorld()) && item.hasItem(player)) {
+				item.removeFrom(player, 0);
 			}
-			item.setAnimations(player);
 		}
 		ItemUtilities.sendFailCount(player, session);
 		PlayerHandler.delayUpdateInventory(player, 15L);
