@@ -2433,6 +2433,7 @@ public class UI {
 		if (itemMap.isDurabilityBar()) { itemflags += "HIDE-DURABILITY, "; }
 		if (itemMap.isPlaceable()) { itemflags += "PLACEMENT, "; }
 		if (itemMap.isMovement()) { itemflags += "INVENTORY-MODIFY, "; }
+		if (itemMap.isInventoryClose()) { itemflags += "INVENTORY-CLOSE, "; }
 		if (itemMap.isDynamic()) { itemflags += "DYNAMIC, "; }
 		if (itemMap.isAnimated()) { itemflags += "ANIMATE, "; }
 		if (itemMap.isItemStore()) { itemflags += "ITEM-STORE, "; }
@@ -2450,6 +2451,7 @@ public class UI {
 		if (itemMap.isDropFull()) { itemflags += "DROP-FULL, "; }
 		if (itemMap.isOverwritable()) { itemflags += "OVERWRITE, "; }
 		if (itemMap.isOpBypass()) { itemflags += "ALLOWOPBYPASS, "; }
+		if (itemMap.isAutoRemove()) { itemflags += "AUTO-REMOVE, "; }
 		if (itemMap.isCreativeBypass()) { itemflags += "ALLOWCREATIVEBYPASS, "; }
 		if (itemflags.endsWith(", ")) { itemflags = itemflags.substring(0, itemflags.length() - 2); }
 		itemMap.setItemFlags(itemflags);
