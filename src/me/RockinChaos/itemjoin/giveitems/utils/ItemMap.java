@@ -86,7 +86,8 @@ public class ItemMap {
 	private Integer count = 1;
 	
 	private Short durability = null;
-	private Short data = null;
+	private Integer data = null;
+	private Integer modelData = null;
 	
 	private String author;
 	private String title;
@@ -574,8 +575,12 @@ public class ItemMap {
 		this.durability = durability;
 	}
 	
-	public void setData(Short data) {
+	public void setData(Integer data) {
 		this.data = data;
+	}
+	
+	public void setModelData(Integer data) {
+		this.modelData = data;
 	}
 	
 	public void setProbability(Integer probability) {
@@ -1005,9 +1010,16 @@ public class ItemMap {
 		return 0;
 	}
 	
-	public Short getData() {
+	public Integer getData() {
 		if (this.data != null) {
 			return this.data;	
+		}
+		return 0;
+	}
+	
+	public Integer getModelData() {
+		if (this.modelData != null) {
+			return this.modelData;	
 		}
 		return 0;
 	}
@@ -1638,6 +1650,7 @@ public class ItemMap {
 		this.setSkull(player);
 		this.setDurability();
 		this.setData();
+		this.setModelData();
 		this.setPotionEffects();
 		this.setBanners();
 		this.setFireworks();
@@ -1646,7 +1659,7 @@ public class ItemMap {
 		this.setBookInfo(player);
 		this.setLegacyBookPages(player);
 		this.setAttributes();
-		this.tempItem.setItemMeta(tempMeta);
+		this.tempItem.setItemMeta(this.tempMeta);
 		return this;
 	}
 	
@@ -1792,8 +1805,16 @@ public class ItemMap {
 			if (ServerHandler.hasAquaticUpdate()) {
 				((org.bukkit.inventory.meta.Damageable) this.tempMeta).setDamage(this.data);
 			} else {
-				Legacy.setLegacyDurability(this.tempItem, this.data);
+				Legacy.setLegacyDurability(this.tempItem, Short.parseShort(this.data + ""));
 			}
+		}
+	}
+	
+	private void setModelData() {
+		if (this.modelData != null && this.modelData != 0) {
+			if (ServerHandler.hasSpecificUpdate("1_14")) {
+				this.tempMeta.setCustomModelData(this.modelData);
+			} else { ServerHandler.sendWarnMessage("&cThe item &e" + this.getConfigName() + "&c is using &eCustom Model Data&c which is not supported until Minecraft 1.14+."); }
 		}
 	}
 	
@@ -2421,6 +2442,7 @@ public class ItemMap {
 		if (this.count > 1) { itemData.set("items." + this.configName + ".count", this.count); }
 		if (this.durability != null && this.durability > 0) { itemData.set("items." + this.configName + ".durability", this.durability); }
 		if (this.data != null && this.data > 0) { itemData.set("items." + this.configName + ".data", this.data); }
+		if (this.modelData != null && this.modelData > 0) { itemData.set("items." + this.configName + ".model-data", this.modelData); }
 		if (this.author != null && !this.author.isEmpty()) { itemData.set("items." + this.configName + ".author", this.author.replace("§", "&")); }
 		if (this.customName != null && !this.customName.isEmpty() && (this.dynamicNames == null || this.dynamicNames.isEmpty())) { 
 			String setName = this.customName.replace(this.getLegacySecret(), "").replace("§", "&");

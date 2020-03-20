@@ -596,10 +596,10 @@ public class UI {
 				}
 			}));
 		}
-		creatingPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nMain Menu", "&7", "&7*Cancel and return to the main menu", "&7", "&c&lWARNING: &7This item has NOT been saved!"), event -> this.startMenu(player)));
+		creatingPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nMain Menu", "&7", "&7*Cancel and return to the main menu.", "&7", "&c&lWARNING: &7This item has NOT been saved!"), event -> this.returnConfirm(player, itemMap)));
 		creatingPane.addButton(new Button(this.fillerPaneBItem), 3);
 		if (ServerHandler.hasSpecificUpdate("1_8")) {
-			creatingPane.addButton(new Button(ItemHandler.setSkullTexture(ItemHandler.getItem("SKULL_ITEM:3", 1, false, "&a&l&nSave to Config", "&7", "&7*Saves this custom item", "&7settings to the items.yml file."), 
+			creatingPane.addButton(new Button(ItemHandler.setSkullTexture(ItemHandler.getItem("SKULL_ITEM:3", 1, false, "&a&l&nSave to Config", "&7", "&7*Saves the custom item", "&7settings to the items.yml file."), 
 					"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzdiNjJkMjc1ZDg3YzA5Y2UxMGFjYmNjZjM0YzRiYTBiNWYxMzVkNjQzZGM1MzdkYTFmMWRmMzU1YTIyNWU4MiJ9fX0"), event -> {
 				itemMap.saveToConfig();
 				String[] placeHolders = Language.newString();
@@ -612,7 +612,7 @@ public class UI {
 				player.closeInventory();
 			}));
 		} else {
-			creatingPane.addButton(new Button(ItemHandler.getItem("WOOL:5", 1, false, "&a&l&nSave to Config", "&7", "&7*Saves this custom item", "&7to the items.yml file"), event -> {
+			creatingPane.addButton(new Button(ItemHandler.getItem("WOOL:5", 1, false, "&a&l&nSave to Config", "&7", "&7*Saves the custom item", "&7settings to the items.yml file."), event -> {
 				itemMap.saveToConfig();
 				String[] placeHolders = Language.newString();
 				placeHolders[3] = itemMap.getConfigName();
@@ -625,8 +625,47 @@ public class UI {
 			}));
 		}
 		creatingPane.addButton(new Button(this.fillerPaneBItem), 3);
-		creatingPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nMain Menu", "&7", "&7*Cancel and return you to the main menu", "&7", "&c&lWARNING: &7This item has NOT been saved!"), event -> this.startMenu(player)));
+		creatingPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nMain Menu", "&7", "&7*Cancel and return you to the main menu.", "&7", "&c&lWARNING: &7This item has NOT been saved!"), event -> this.returnConfirm(player, itemMap)));
 		creatingPane.open(player);
+	}
+	
+	private void returnConfirm(final Player player, final ItemMap itemMap) {
+		Interface returnPane = new Interface(false, 1, this.GUIName);
+		returnPane.addButton(new Button(this.fillerPaneBItem));
+		returnPane.addButton(new Button(ItemHandler.getItem("WOOL:14", 1, false, "&c&l&nMain Menu", "&7", "&7*Cancel and return to the", "&7main menu, all modified", "&7settings will be lost.", "&7", "&c&lWARNING: &cThis item has &lNOT&c been saved!"), event -> this.startMenu(player)));
+		returnPane.addButton(new Button(this.fillerPaneBItem), 2);
+		
+		if (ServerHandler.hasSpecificUpdate("1_8")) {
+			returnPane.addButton(new Button(ItemHandler.setSkullTexture(ItemHandler.getItem("SKULL_ITEM:3", 1, false, "&a&l&nSave to Config", "&7", "&7*Saves the custom item", "&7settings to the items.yml file."), 
+					"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzdiNjJkMjc1ZDg3YzA5Y2UxMGFjYmNjZjM0YzRiYTBiNWYxMzVkNjQzZGM1MzdkYTFmMWRmMzU1YTIyNWU4MiJ9fX0"), event -> {
+				itemMap.saveToConfig();
+				String[] placeHolders = Language.newString();
+				placeHolders[3] = itemMap.getConfigName();
+				Language.sendLangMessage("Commands.UI.itemSaved", player, placeHolders);
+				ConfigHandler.getSQLData().executeLaterStatements();
+				ItemUtilities.closeAnimations();
+				ItemUtilities.clearItems();
+				ConfigHandler.generateData(null);
+				this.startMenu(player);
+			}));
+		} else {
+			returnPane.addButton(new Button(ItemHandler.getItem("WOOL:5", 1, false, "&a&l&nSave to Config", "&7", "&7*Saves the custom item", "&7settings to the items.yml file."), event -> {
+				itemMap.saveToConfig();
+				String[] placeHolders = Language.newString();
+				placeHolders[3] = itemMap.getConfigName();
+				Language.sendLangMessage("Commands.UI.itemSaved", player, placeHolders);
+				ConfigHandler.getSQLData().executeLaterStatements();
+				ItemUtilities.closeAnimations();
+				ItemUtilities.clearItems();
+				ConfigHandler.generateData(null);
+				this.startMenu(player);
+			}));
+		}
+		
+		returnPane.addButton(new Button(this.fillerPaneBItem), 2);
+		returnPane.addButton(new Button(ItemHandler.getItem("WOOL:4", 1, false, "&e&l&nModify Settings", "&7", "&7*Continue modifying the", "&7custom item settings."), event -> this.creatingPane(player, itemMap)));
+		returnPane.addButton(new Button(this.fillerPaneBItem));
+		returnPane.open(player);
 	}
 	
 // =======================================================================================================================================================================================================================================
@@ -1115,7 +1154,7 @@ public class UI {
 	
 	private void dataPane(final Player player, final ItemMap itemMap) {
 		Interface dataPane = new Interface(false, 2, this.GUIName);
-		dataPane.addButton(new Button(this.fillerPaneBItem), 3);
+		dataPane.addButton(new Button(this.fillerPaneBItem));
 		dataPane.addButton(new Button(ItemHandler.getItem("BOW", 1, false, "&b&lDamage", "&7", "&7*Set the damage of the item.", (itemMap.getMaterial().getMaxDurability() != 0 ? "&9&lDURABILITY: &a" + 
 		Utils.nullCheck(itemMap.getDurability() + "&7") : "&c&lERROR: &7This item is NOT damagable.")), event -> {
 			if (Utils.nullCheck(itemMap.getDurability() + "&7") != "NONE") {
@@ -1125,16 +1164,27 @@ public class UI {
 				this.damagePane(player, itemMap);
 			}
 		}));
-		dataPane.addButton(new Button(this.fillerPaneBItem), 1);
-		dataPane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, false, "&b&lCustom Texture", "&7", "&7*Set the custom data of the item.", "&9&lTEXTURE DATA: &a" + Utils.nullCheck(itemMap.getData() + "&7")), event -> {
+		dataPane.addButton(new Button(this.fillerPaneBItem), 2);
+		dataPane.addButton(new Button(ItemHandler.getItem("STICK", 1, false, "&a&lCustom Texture", "&7", "&7*Set the custom data of the item.", "&7This is the damage value assigned", "&7to the custom resource texture.", "&9&lDURABILITY DATA: &a" + Utils.nullCheck(itemMap.getData() + "&7")), event -> {
 			if (Utils.nullCheck(itemMap.getData() + "&7") != "NONE") {
 				itemMap.setData(null);
 				this.dataPane(player, itemMap);
 			} else {
-				this.texturePane(player, itemMap);
+				this.durabilityDataPane(player, itemMap);
 			}
 		}));
-		dataPane.addButton(new Button(this.fillerPaneBItem), 3);
+		dataPane.addButton(new Button(this.fillerPaneBItem), 2);
+		dataPane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, false, "&e&lCustom Model Data", "&7", "&7*Set the custom model data of the item.", 
+				!ServerHandler.hasSpecificUpdate("1_14") ? "&c&l[ERROR] &7This version of Minecraft does" : "", !ServerHandler.hasSpecificUpdate("1_14") ? "&7not support custom model data." : "", 
+				!ServerHandler.hasSpecificUpdate("1_14") ? "&7This was implemented in 1.14+." : "", "&9&lTEXTURE DATA: &a" + Utils.nullCheck(itemMap.getModelData() + "&7")), event -> {
+			if (Utils.nullCheck(itemMap.getModelData() + "&7") != "NONE" && ServerHandler.hasSpecificUpdate("1_14")) {
+				itemMap.setModelData(null);
+				this.dataPane(player, itemMap);
+			} else if (ServerHandler.hasSpecificUpdate("1_14")){
+				this.modelDataPane(player, itemMap);
+			}
+		}));
+		dataPane.addButton(new Button(this.fillerPaneBItem));
 		dataPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu"), event -> {
 			this.setTriggers(itemMap);this.creatingPane(player, itemMap);
 		}));
@@ -1145,23 +1195,23 @@ public class UI {
 		dataPane.open(player);
 	}
 	
-	private void texturePane(final Player player, final ItemMap itemMap) {
+	private void durabilityDataPane(final Player player, final ItemMap itemMap) {
 		Interface texturePane = new Interface(true, 6, this.GUIName);
 		texturePane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> {
-			this.creatingPane(player, itemMap);
+			this.dataPane(player, itemMap);
 		}));
 		texturePane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:4", 1, false, "&e&lCustom Texture", "&7", "&7*Click to set a custom texture", "&7value for the item."), event -> {
 			player.closeInventory();
 			String[] placeHolders = Language.newString();
-			placeHolders[14] = "TEXTURE DATA";
+			placeHolders[14] = "DURABILITY DATA";
 			placeHolders[15] = "1193";
 			Language.sendLangMessage("Commands.UI.inputType", player, placeHolders);
 			Language.sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 		}, event -> {
 			if (Utils.isInt(event.getMessage())) {
-				itemMap.setData((short) Integer.parseInt(event.getMessage()));
+				itemMap.setData(Integer.parseInt(event.getMessage()));
 				String[] placeHolders = Language.newString();
-				placeHolders[14] = "TEXTURE DATA";
+				placeHolders[14] = "DURABILITY DATA";
 				Language.sendLangMessage("Commands.UI.inputSet", player, placeHolders);
 			} else {
 				String[] placeHolders = Language.newString();
@@ -1172,8 +1222,42 @@ public class UI {
 		}));
 		for (int i = 1; i <= 2000; i++) {
 			final int k = i;
-			texturePane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:6", 1, false, "&9&lData: &a&l" + k, "&7", "&7*Click to set the", "&7texture data of the item."), event -> {
-				itemMap.setData((short) k); this.dataPane(player, itemMap);
+			texturePane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:6", 1, false, "&9&lData: &a&l" + k, "&7", "&7*Click to set the", "&7durability data of the item."), event -> {
+				itemMap.setData(k); this.dataPane(player, itemMap);
+			}));
+		}
+		texturePane.open(player);
+	}
+	
+	private void modelDataPane(final Player player, final ItemMap itemMap) {
+		Interface texturePane = new Interface(true, 6, this.GUIName);
+		texturePane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> {
+			this.dataPane(player, itemMap);
+		}));
+		texturePane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:4", 1, false, "&e&lCustom Model Data", "&7", "&7*Click to set the custom mode data", "&7value for the item."), event -> {
+			player.closeInventory();
+			String[] placeHolders = Language.newString();
+			placeHolders[14] = "MODEL DATA";
+			placeHolders[15] = "1193";
+			Language.sendLangMessage("Commands.UI.inputType", player, placeHolders);
+			Language.sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+		}, event -> {
+			if (Utils.isInt(event.getMessage())) {
+				itemMap.setModelData(Integer.parseInt(event.getMessage()));
+				String[] placeHolders = Language.newString();
+				placeHolders[14] = "MODEL DATA";
+				Language.sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+			} else {
+				String[] placeHolders = Language.newString();
+				placeHolders[16] = event.getMessage();
+				Language.sendLangMessage("Commands.UI.notInteger", player, placeHolders);
+			}
+			this.dataPane(event.getPlayer(), itemMap);
+		}));
+		for (int i = 1; i <= 2000; i++) {
+			final int k = i;
+			texturePane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:6", 1, false, "&9&lModel Data: &a&l" + k, "&7", "&7*Click to set the", "&7custom model data for the item."), event -> {
+				itemMap.setModelData(k); this.dataPane(player, itemMap);
 			}));
 		}
 		texturePane.open(player);
@@ -1182,7 +1266,7 @@ public class UI {
 	private void damagePane(final Player player, final ItemMap itemMap) {
 		Interface damagePane = new Interface(true, 6, this.GUIName);
 		damagePane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> {
-			this.creatingPane(player, itemMap);
+			this.dataPane(player, itemMap);
 		}));
 		damagePane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:4", 1, false, "&e&lCustom Damage", "&7", "&7*Click to set a custom damage", "&7value for the item."), event -> {
 			player.closeInventory();

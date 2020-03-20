@@ -58,6 +58,7 @@ public class ItemDesigner {
 							this.setLore(itemMap);
 							this.setDurability(itemMap);
 							this.setData(itemMap);
+							this.setModelData(itemMap);
 							this.setSkull(itemMap);
 							this.setSkullTexture(itemMap);
 							this.setConsumableEffects(itemMap);
@@ -504,13 +505,25 @@ public class ItemDesigner {
 	
 	private void setData(ItemMap itemMap) {
 		if (itemMap.getNodeLocation().getString(".data") != null) {
-			int data = itemMap.getNodeLocation().getInt(".data");
-			itemMap.setData((short) data);
+			itemMap.setData(itemMap.getNodeLocation().getInt(".data"));
 			itemMap.setAttributesInfo(true);
 			itemMap.setUnbreakable(true);
 		}
 	}
-//  ================================================================================ //
+//  ================================================================================================================== //
+	
+//  ========================================================================================== //
+//                         ~ Sets the Model Data for the Custom Item ~                         //
+//    Adds an NBTTag to the item containing the numerical value for the Custom Model Data.     //
+//  ========================================================================================== //
+	
+	private void setModelData(ItemMap itemMap) {
+		if (ServerHandler.hasSpecificUpdate("1_14") && itemMap.getNodeLocation().getString(".model-data") != null) {
+			itemMap.setModelData(itemMap.getNodeLocation().getInt(".model-data"));
+		}
+	}
+	
+//  ================================================================================================================ //
 	
 //  ================================================ //
 //   ~ Sets the Probability of the Custom Item ~     //
