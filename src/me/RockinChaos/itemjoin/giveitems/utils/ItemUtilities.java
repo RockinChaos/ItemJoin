@@ -408,42 +408,40 @@ public class ItemUtilities {
 				player.getInventory().addItem(item); givenItem = true;
 			}
 		} else if (itemMap.getSlot().equalsIgnoreCase("Helmet")) {
-			if (Equip.getHelmet() == null || Equip.getHelmet().getType() == Material.AIR) {
+			if (!itemMap.isDropFull()) {
 				Equip.setHelmet(item); givenItem = true;
 			}
 		} else if (itemMap.getSlot().equalsIgnoreCase("Chestplate")) {
-			if (Equip.getChestplate() == null || Equip.getChestplate().getType() == Material.AIR) {
+			if (!itemMap.isDropFull()) {
 				Equip.setChestplate(item); givenItem = true;
 			}
 		} else if (itemMap.getSlot().equalsIgnoreCase("Leggings")) {
-			if (Equip.getLeggings() == null || Equip.getLeggings().getType() == Material.AIR) {
+			if (!itemMap.isDropFull()) {
 				Equip.setLeggings(item); givenItem = true;
 			}
 		} else if (itemMap.getSlot().equalsIgnoreCase("Boots")) {
-			if (Equip.getBoots() == null || Equip.getBoots().getType() == Material.AIR) {
+			if (!itemMap.isDropFull()) {
 				Equip.setBoots(item); givenItem = true;
 			}
 		} else if (ServerHandler.hasCombatUpdate() && itemMap.getSlot().equalsIgnoreCase("Offhand")) {
-			if (PlayerHandler.getOffHandItem(player) == null || PlayerHandler.getOffHandItem(player).getType() == Material.AIR) {
+			if (!itemMap.isDropFull()) {
 				PlayerHandler.setOffhandItem(player, item); givenItem = true;
 			}
-		} else if (craftSlot != -1) {
-			if (topInventory.getItem(craftSlot) == null || topInventory.getItem(craftSlot).getType() == Material.AIR) {
-				if (craftSlot == 0) {
-			    	Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
-			    		@Override
-			    		public void run() {
-			    			if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
-			    				topInventory.setItem(craftSlot, item);
-			    				PlayerHandler.updateInventory(player);
-			    			}
+		} else if (craftSlot != -1 && !itemMap.isDropFull()) {
+			if (craftSlot == 0) {
+			    Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
+			    	@Override
+			    	public void run() {
+			    		if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
+			    			topInventory.setItem(craftSlot, item);
+			    			PlayerHandler.updateInventory(player);
 			    		}
-			    	}, 4L);
-				} else {
-					topInventory.setItem(craftSlot, item);
-				}
-				givenItem = true;
+			    	}
+			    }, 4L);
+			} else {
+				topInventory.setItem(craftSlot, item);
 			}
+			givenItem = true;
 		}
 		if (!givenItem && itemMap.isDropFull()) { player.getWorld().dropItem(player.getLocation(), item); }
 		ConfigHandler.getLogger().givenDebug(itemMap);
