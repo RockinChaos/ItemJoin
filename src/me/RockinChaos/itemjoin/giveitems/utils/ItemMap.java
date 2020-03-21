@@ -1973,7 +1973,7 @@ public class ItemMap {
 	
 	public void giveTo(Player player, boolean command, int amount) {
 		this.updateItem(player);
-		if (CustomSlot != null) { ItemUtilities.setCustomSlots(player, this, this.tempItem.clone(), command, amount); } 
+		if (this.CustomSlot != null) { ItemUtilities.setCustomSlots(player, this, this.tempItem.clone(), command, amount); } 
 		else { ItemUtilities.setInvSlots(player, this, this.tempItem.clone(), command, amount); }
 		this.setAnimations(player);
 		this.executeCommands(player, this.tempItem, "ON_RECEIVE", this.getSlot());

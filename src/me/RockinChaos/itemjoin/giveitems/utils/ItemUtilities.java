@@ -316,7 +316,7 @@ public class ItemUtilities {
 	public static boolean isOverwrite(Player player, ItemMap itemMap) {
 		try {
 			if (itemMap.isOverwritable() || (ConfigHandler.getConfig("items.yml").getString("items-Overwrite") != null && isOverwriteWorld(player.getWorld().getName()) 
-					|| ConfigHandler.getConfig("items.yml").getString("items-Overwrite") != null && ConfigHandler.getConfig("items.yml").getBoolean("items-Overwrite"))) { 
+					|| ConfigHandler.getConfig("items.yml").getString("items-Overwrite") != null && ConfigHandler.getConfig("items.yml").getBoolean("items-Overwrite"))) {
 				return true; 
 			} else if (itemMap.getSlot().equalsIgnoreCase("ARBITRARY") && player.getInventory().firstEmpty() == -1) {
 				return false;
@@ -372,7 +372,7 @@ public class ItemUtilities {
 		boolean givenItem = false;
 		ItemStack getItem = player.getInventory().getItem(Integer.parseInt(itemMap.getSlot()));
 		if (amount != 0 && command) { item.setAmount(amount); }
-		if (amount != 0 || itemMap.isAlwaysGive()) { player.getInventory().addItem(item); }
+		if (amount != 0 || itemMap.isAlwaysGive()) { givenItem = true; player.getInventory().addItem(item); }
 		else if ((((itemMap.isGiveNext() || itemMap.isMoveNext()) && player.getInventory().firstEmpty() != -1) || (itemMap.isDropFull() && player.getInventory().firstEmpty() != -1)) && getItem != null) {
 			if (itemMap.isMoveNext()) { player.getInventory().setItem(Integer.parseInt(itemMap.getSlot()), item); }
 			for (int i = Integer.parseInt(itemMap.getSlot()); i <= 35; i++) {
@@ -380,12 +380,16 @@ public class ItemUtilities {
 				else if (player.getInventory().getItem(i) == null || player.getInventory().getItem(i).getType() == Material.AIR) { givenItem = true; player.getInventory().setItem(i, item); break; }
 				else if (i == 35) {
 					for (int k = Integer.parseInt(itemMap.getSlot()); k >= 0; k--) {
-						if (itemMap.isMoveNext() && (player.getInventory().getItem(k) == null || player.getInventory().getItem(k).getType() == Material.AIR)) { givenItem = true; player.getInventory().setItem(k, getItem); break; }
-						else if (player.getInventory().getItem(k) == null || player.getInventory().getItem(k).getType() == Material.AIR) { givenItem = true; player.getInventory().setItem(k, item); break; }
+						if (itemMap.isMoveNext() && (player.getInventory().getItem(k) == null || player.getInventory().getItem(k).getType() == Material.AIR)) {
+							givenItem = true; player.getInventory().setItem(k, getItem); break; 
+						}
+						else if (player.getInventory().getItem(k) == null || player.getInventory().getItem(k).getType() == Material.AIR) {
+							givenItem = true; player.getInventory().setItem(k, item); break; 
+						}
 					}
 				}
 			}
-		} else if (getItem == null || getItem.getType() == Material.AIR) { givenItem = true; player.getInventory().setItem(Integer.parseInt(itemMap.getSlot()), item); }
+		} else if (!givenItem && !itemMap.isDropFull()) { givenItem = true; player.getInventory().setItem(Integer.parseInt(itemMap.getSlot()), item); }
 		if (!givenItem && itemMap.isDropFull()) { player.getWorld().dropItem(player.getLocation(), item); } 
 		ConfigHandler.getSQLData().saveItemData(player, itemMap);
 		ConfigHandler.getLogger().givenDebug(itemMap);
