@@ -1478,8 +1478,8 @@ public class ItemMap {
 				if (this.skullCheck(item)) {
 					if (isEnchantSimilar(item) || !item.getItemMeta().hasEnchants() && enchants.isEmpty() || this.isItemChangable()) {
 						if (this.material.toString().toUpperCase().contains("BOOK") 
-								&& this.isBookMeta(item) 
-								&& ((BookMeta) item.getItemMeta()).getPages().equals(((BookMeta) tempItem.getItemMeta()).getPages())
+								&& (this.isBookMeta(item) 
+								&& ((BookMeta) item.getItemMeta()).getPages().equals(((BookMeta) tempItem.getItemMeta()).getPages()) || this.isDynamic())
 								|| this.material.toString().toUpperCase().contains("BOOK") && !this.isBookMeta(item) || !this.material.toString().toUpperCase().contains("BOOK") || this.isItemChangable()) {
 							if (!this.vanillaControl || this.vanillaControl && statsCheck(item)) {
 								return true;
@@ -1641,7 +1641,7 @@ public class ItemMap {
 		this.setUnbreaking();
 		this.setEnchantments(player);
 		this.setMapImage();
-		this.setJSONBookPages(player);
+		this.tempItem = this.setJSONBookPages(player, this.tempItem, this.bookPages);
 		this.setNBTData();
 		this.tempMeta = this.tempItem.getItemMeta();
 		
@@ -1657,7 +1657,7 @@ public class ItemMap {
 		this.setFireChargeColor();
 		this.setDye();
 		this.setBookInfo(player);
-		this.setLegacyBookPages(player);
+		this.setLegacyBookPages(player, this.tempMeta, this.bookPages);
 		this.setAttributes();
 		this.tempItem.setItemMeta(this.tempMeta);
 		return this;
@@ -1700,60 +1700,67 @@ public class ItemMap {
 		}
 	}
 	
-	private void setJSONBookPages(Player player) {
-		if (this.getMaterial().toString().equalsIgnoreCase("WRITTEN_BOOK") && this.bookPages != null && ServerHandler.hasSpecificUpdate("1_8")) {
+	public ItemStack setJSONBookPages(Player player, ItemStack item, List<String> pages) {
+		List<String> copyPages = new ArrayList<String>();
+		for (String page: pages) { copyPages.add(page); }
+		copyPages.set(0, ItemHandler.purgeDelay(copyPages.get(0)));
+		if (item.getType().toString().equalsIgnoreCase("WRITTEN_BOOK") && copyPages != null && ServerHandler.hasSpecificUpdate("1_8")) {
 			Object localePages = null;
 			try { localePages = Reflection.getNMS("NBTTagList").getConstructor().newInstance(); } catch (Exception e) { ServerHandler.sendDebugTrace(e); }
-			if (ServerHandler.hasSpecificUpdate("1_15")) { this.set1_15JSONPages(player, localePages); } 
-			else if (ServerHandler.hasSpecificUpdate("1_14")) { this.set1_14JSONPages(player, localePages); }
-			else { this.set1_13JSONPages(player, localePages); }
+			if (ServerHandler.hasSpecificUpdate("1_15")) { return this.set1_15JSONPages(player, item, localePages, copyPages); } 
+			else if (ServerHandler.hasSpecificUpdate("1_14")) { return this.set1_14JSONPages(player, item, localePages, copyPages); }
+			else { return this.set1_13JSONPages(player, item, localePages, copyPages); }
 		}
+		return item;
 	}
 	
-	private void set1_13JSONPages(Player player, Object localePages) {
-		for (String textComponent: this.bookPages) {
+	private ItemStack set1_13JSONPages(Player player, ItemStack item, Object localePages, List<String> pages) {
+		for (String textComponent: pages) {
 			try { 
 				textComponent = Utils.translateLayout(textComponent, player);
 				Object TagString = Reflection.getNMS("NBTTagString").getConstructor(String.class).newInstance(textComponent);
 				localePages.getClass().getMethod("add", Reflection.getNMS("NBTBase")).invoke(localePages, TagString);
 			} catch (Exception e) { ServerHandler.sendDebugTrace(e); } 
 		}
-		try { this.invokePages(localePages); } catch (Exception e) { ServerHandler.sendDebugTrace(e); }
+		try { return this.invokePages(item, localePages); } catch (Exception e) { ServerHandler.sendDebugTrace(e); }
+		return item;
 	}
 	
-	private void set1_14JSONPages(Player player, Object localePages) {
-		for (int i = this.bookPages.size() - 1; i >= 0; i--) {
-			String textComponent = this.bookPages.get(i);
+	private ItemStack set1_14JSONPages(Player player, ItemStack item, Object localePages, List<String> pages) {
+		for (int i = pages.size() - 1; i >= 0; i--) {
+			String textComponent = pages.get(i);
 			try { 
 				textComponent = Utils.translateLayout(textComponent, player);
 				Object TagString = Reflection.getNMS("NBTTagString").getConstructor(String.class).newInstance(textComponent);
 				localePages.getClass().getMethod("add", int.class, Reflection.getNMS("NBTBase")).invoke(localePages, 0, TagString);
 			} catch (Exception e) { ServerHandler.sendDebugTrace(e); } 
 		}
-		try { this.invokePages(localePages); } catch (Exception e) { ServerHandler.sendDebugTrace(e); }
+		try { return this.invokePages(item, localePages); } catch (Exception e) { ServerHandler.sendDebugTrace(e); }
+		return item;
 	}
 	
-	private void set1_15JSONPages(Player player, Object localePages) {
-		for (int i = this.bookPages.size() - 1; i >= 0; i--) {
-			String textComponent = this.bookPages.get(i);
+	private ItemStack set1_15JSONPages(Player player, ItemStack item, Object localePages, List<String> pages) {
+		for (int i = pages.size() - 1; i >= 0; i--) {
+			String textComponent = pages.get(i);
 			try { 
 				textComponent = Utils.translateLayout(textComponent, player);
 				Object TagString = Reflection.getNMS("NBTTagString").getMethod("a", String.class).invoke(null, textComponent);
 				localePages.getClass().getMethod("add", int.class, Reflection.getNMS("NBTBase")).invoke(localePages, 0, TagString);
 			} catch (Exception e) { ServerHandler.sendDebugTrace(e); } 
 		}
-		try { this.invokePages(localePages); } catch (Exception e) { ServerHandler.sendDebugTrace(e); }
+		try { return this.invokePages(item, localePages); } catch (Exception e) { ServerHandler.sendDebugTrace(e); }
+		return item;
 	}
 	
-	private void invokePages(Object pages) throws Exception {
+	private ItemStack invokePages(ItemStack item, Object pages) throws Exception {
 		Class<?> craftItemStack = Reflection.getOBC("inventory.CraftItemStack");
-		Object nms = craftItemStack.getMethod("asNMSCopy", ItemStack.class).invoke(null, this.getTempItem());
+		Object nms = craftItemStack.getMethod("asNMSCopy", ItemStack.class).invoke(null, item);
 		Object tag = Reflection.getNMS("NBTTagCompound").getConstructor().newInstance();
 		tag.getClass().getMethod("set", String.class, Reflection.getNMS("NBTBase")).invoke(tag, "pages", pages); 
 		nms.getClass().getMethod("setTag", tag.getClass()).invoke(nms, tag);
-		this.tempItem = ((ItemStack)craftItemStack.getMethod("asCraftMirror", nms.getClass()).invoke(null, nms));
+		return ((ItemStack)craftItemStack.getMethod("asCraftMirror", nms.getClass()).invoke(null, nms));
 	}
-	
+
 	private void setNBTData() {
 		if (ConfigHandler.dataTagsEnabled() && !this.isVanilla() && !this.isVanillaControl() && !this.isVanillaStatus()) {
 			try {
@@ -1887,15 +1894,20 @@ public class ItemMap {
 		}
 	}
 	
-	private void setLegacyBookPages(Player player) {
-		if (!ServerHandler.hasSpecificUpdate("1_8") && this.bookPages != null && !this.bookPages.isEmpty()) {
+	public ItemMeta setLegacyBookPages(Player player, ItemMeta meta, List<String> pages) {
+		if (!ServerHandler.hasSpecificUpdate("1_8") && pages != null && !pages.isEmpty()) {
+			List<String> copyPages = new ArrayList<String>();
+			for (String page: pages) { copyPages.add(page); }
+			copyPages.set(0, ItemHandler.purgeDelay(copyPages.get(0)));
 			List < String > bookList = new ArrayList < String > ();
-			for (int k = 0; k < this.bookPages.size(); k++) {
-				bookList.add(Utils.translateLayout(this.bookPages.get(k), player));
+			for (int k = 0; k < pages.size(); k++) {
+				bookList.add(Utils.translateLayout(pages.get(k), player));
 			}
-			((BookMeta) tempMeta).setPages(bookList);
+			((BookMeta) meta).setPages(bookList);
 			this.bookPages = bookList;
+			return meta;
 		}
+		return meta;
 	}
 	
 	private void setAttributes() {

@@ -9,6 +9,7 @@ import java.util.UUID;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -32,6 +33,7 @@ public class ItemAnimation {
 	private List<String> dynamicMaterials = null;
 	private List<String> dynamicOwners = null;
 	private List<String> dynamicTextures = null;
+	private List<String> dynamicPages = null;
 	private boolean stopAnimations = false;
 	private boolean menu = false;
 	private List<List<String>> menuLores = null;
@@ -41,6 +43,7 @@ public class ItemAnimation {
 		if (item.getDynamicNames() != null && !item.getDynamicNames().isEmpty()) { this.dynamicNames = item.getDynamicNames(); }
 		if (item.getDynamicLores() != null && !item.getDynamicLores().isEmpty()) { this.dynamicLores = item.getDynamicLores(); }
 		if (item.getDynamicMaterials() != null && !item.getDynamicMaterials().isEmpty()) { this.dynamicMaterials = item.getDynamicMaterials(); }
+		if (itemMap.getMaterial().toString().equalsIgnoreCase("WRITTEN_BOOK") && item.getPages() != null && !item.getPages().isEmpty()) { this.dynamicPages = item.getPages(); }
 		if (item.getDynamicOwners() != null && !item.getDynamicOwners().isEmpty()) { this.dynamicOwners = item.getDynamicOwners(); }
 		else if (item.getDynamicTextures() != null && !item.getDynamicTextures().isEmpty()) { this.dynamicTextures = item.getDynamicTextures(); }
 	}
@@ -49,6 +52,7 @@ public class ItemAnimation {
 		if (this.dynamicNames != null) { this.nameTasks(player); }
 		if (this.dynamicLores != null) { this.loreTasks(player); }
 		if (this.dynamicMaterials != null) { this.materialTasks(player); }
+		if (this.dynamicPages != null) { this.pagesTasks(player); }
 		if (this.dynamicOwners != null) { this.ownerTasks(player); }
 		else if (this.dynamicTextures != null) { this.textureTasks(player); }
 	}
@@ -65,7 +69,7 @@ public class ItemAnimation {
 			String name = it.next();
 			if (Utils.returnInteger(ItemHandler.getDelay(name)) != null) { ticks = ticks + Utils.returnInteger(ItemHandler.getDelay(name)); }
 			else { ticks = ticks + 180; }
-			AnimateTask(player, it.hasNext(), name, null, null, null, null, ticks, 0);
+			AnimateTask(player, it.hasNext(), name, null, null, null, null, null, ticks, 0);
 		}
 	}
 	
@@ -77,7 +81,7 @@ public class ItemAnimation {
 			List<String> lore = it.next();
 			if (Utils.returnInteger(ItemHandler.getDelay(lore.get(0))) != null) { ticks = ticks + Utils.returnInteger(ItemHandler.getDelay(lore.get(0))); }
 			else { ticks = ticks + 180; }
-			AnimateTask(player, it.hasNext(), null, lore, null, null, null, ticks, position);
+			AnimateTask(player, it.hasNext(), null, lore, null, null, null, null, ticks, position);
 			position++;
 		}
 	}
@@ -89,8 +93,15 @@ public class ItemAnimation {
 			String mat = it.next();
 			if (Utils.returnInteger(ItemHandler.getDelay(mat)) != null) { ticks = ticks + Utils.returnInteger(ItemHandler.getDelay(mat)); }
 			else { ticks = ticks + 180; }
-			AnimateTask(player, it.hasNext(), null, null, mat, null, null, ticks, 0);
+			AnimateTask(player, it.hasNext(), null, null, mat, null, null, null, ticks, 0);
 		}
+	}
+	
+	private void pagesTasks(Player player) {
+		long ticks = 0;
+		if (Utils.returnInteger(ItemHandler.getDelay(this.dynamicPages.get(0))) != null) { ticks = ticks + Utils.returnInteger(ItemHandler.getDelay(this.dynamicPages.get(0))); }
+		else { ticks = ticks + 180; }
+		AnimateTask(player, false, null, null, null, null, null, this.dynamicPages, ticks, 0);
 	}
 	
 	private void ownerTasks(Player player) {
@@ -100,7 +111,7 @@ public class ItemAnimation {
 			String owner = it.next();
 			if (Utils.returnInteger(ItemHandler.getDelay(owner)) != null) { ticks = ticks + Utils.returnInteger(ItemHandler.getDelay(owner)); }
 			else { ticks = ticks + 180; }
-			AnimateTask(player, it.hasNext(), null, null, null, owner, null, ticks, 0);
+			AnimateTask(player, it.hasNext(), null, null, null, owner, null, null, ticks, 0);
 		}
 	}
 	
@@ -111,11 +122,11 @@ public class ItemAnimation {
 			String texture = it.next();
 			if (Utils.returnInteger(ItemHandler.getDelay(texture)) != null) { ticks = ticks + Utils.returnInteger(ItemHandler.getDelay(texture)); }
 			else { ticks = ticks + 180; }
-			AnimateTask(player, it.hasNext(), null, null, null, null, texture, ticks, 0);
+			AnimateTask(player, it.hasNext(), null, null, null, null, texture, null, ticks, 0);
 		}
 	}
 	
-	private void AnimateTask(final Player player, final boolean hasNext, final String nameString, final List<String> loreString, final String materialString, final String ownerString, final String textureString, final long UpdateDelay, final int position) {
+	private void AnimateTask(final Player player, final boolean hasNext, final String nameString, final List<String> loreString, final String materialString, final String ownerString, final String textureString, final List<String> pagesString, final long UpdateDelay, final int position) {
 		final ItemMap itemMap = this.itemMap;
 		new BukkitRunnable() {
 			@Override
@@ -127,6 +138,7 @@ public class ItemAnimation {
 						if (nameString != null) { setNameData(player, inPlayerInventory, nameString); } 
 						else if (loreString != null) { setLoreData(player, inPlayerInventory, loreString); }
 						else if (materialString != null) { setMaterialData(player, inPlayerInventory, materialString); }
+						else if (pagesString != null) { setPagesData(player, inPlayerInventory, pagesString); }
 						else if (ownerString != null || textureString != null) { setSkull(player, inPlayerInventory, ownerString, textureString); }
 					}
 				}
@@ -136,6 +148,7 @@ public class ItemAnimation {
 						if (nameString != null) { setNameData(player, inPlayerInventory, nameString); } 
 						else if (loreString != null) { setLoreData(player, inPlayerInventory, loreString); }
 						else if (materialString != null) { setMaterialData(player, inPlayerInventory, materialString); }
+						else if (pagesString != null) { setPagesData(player, inPlayerInventory, pagesString); }
 						else if (ownerString != null || textureString != null) { setSkull(player, inPlayerInventory, ownerString, textureString); }
 					}
 				}
@@ -145,6 +158,7 @@ public class ItemAnimation {
 						if (nameString != null) { setNameData(player, inPlayerInventory, nameString); } 
 						else if (loreString != null) { if (menu) { setLoreData(player, inPlayerInventory, menuLores.get(position)); } else { setLoreData(player, inPlayerInventory, loreString); } }
 						else if (materialString != null) { setMaterialData(player, inPlayerInventory, materialString); }
+						else if (pagesString != null) { setPagesData(player, inPlayerInventory, pagesString); }
 						else if (ownerString != null || textureString != null) { setSkull(player, inPlayerInventory, ownerString, textureString); }
 					}
 				}
@@ -155,6 +169,7 @@ public class ItemAnimation {
 					if (nameString != null) { setNameData(player, player.getItemOnCursor(), nameString); } 
 					else if (loreString != null) { setLoreData(player, player.getItemOnCursor(), loreString); }
 					else if (materialString != null) { setMaterialData(player, player.getItemOnCursor(), materialString); }
+					else if (pagesString != null) { setPagesData(player, player.getItemOnCursor(), pagesString); }
 					else if (ownerString != null || textureString != null) { setSkull(player, player.getItemOnCursor(), ownerString, textureString); }
 					InventoryClick.cursorItem.put(PlayerHandler.getPlayerID(player), item);
 				}
@@ -164,6 +179,7 @@ public class ItemAnimation {
 					if (nameString != null) { nameTasks(player); }
 					else if (loreString != null) { loreTasks(player); }
 					else if (materialString != null) { materialTasks(player); }
+					else if (pagesString != null) { pagesTasks(player); }
 					else if (ownerString != null) { ownerTasks(player); }
 					else if (textureString != null) { textureTasks(player); }
 				}
@@ -212,6 +228,18 @@ public class ItemAnimation {
 		}
 	}
 	
+	private void setPagesData(Player player, ItemStack transAnimate, List<String> pagesString) {
+		if (ServerHandler.hasSpecificUpdate("1_8")) {
+			BookMeta tempMeta = (BookMeta) transAnimate.getItemMeta();
+			tempMeta.setPages(((BookMeta) this.itemMap.setJSONBookPages(player, transAnimate, pagesString).getItemMeta()).getPages());
+			transAnimate.setItemMeta(tempMeta);
+		} else {
+			ItemMeta itemMeta = transAnimate.getItemMeta();
+			itemMeta = this.itemMap.setLegacyBookPages(player, itemMeta, pagesString);
+			transAnimate.setItemMeta(itemMeta);
+		}
+	}
+	   
 	private void setSkull(Player player, ItemStack transAnimate, String ownerString, String textureString) {
 		ItemMeta tempMeta = transAnimate.getItemMeta();
 		if (ownerString != null) {
