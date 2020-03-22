@@ -281,6 +281,20 @@ public class ItemHandler {
 		} else { return ((short) ((org.bukkit.inventory.meta.Damageable) item.getItemMeta()).getDamage()); }
 	}
 	
+	public static ItemStack setDurability(ItemStack item, int durability) {
+		if (item.getType().getMaxDurability() != 0 && durability != 0) {
+			if (ServerHandler.hasAquaticUpdate()) {
+				ItemMeta tempMeta = item.getItemMeta();
+				((org.bukkit.inventory.meta.Damageable) tempMeta).setDamage(durability);
+				item.setItemMeta(tempMeta);
+				return item;
+			} else {
+				return Legacy.setLegacyDurability(item, (short)durability);
+			}
+		}
+		return item;
+	}
+	
 	public static ItemMeta setSkullOwner(ItemMeta tempmeta, String owner) {
 		if (ServerHandler.hasSpecificUpdate("1_8")) {
 			try {

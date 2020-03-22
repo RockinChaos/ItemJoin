@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Matcher;
 
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.FireworkEffect;
@@ -342,72 +343,95 @@ public class ItemDesigner {
 //         ~ Sets the Book Pages to the Custom Item ~          //
 //  Adds the custom book pages to the item in JSON Formatting. //
 //  ========================================================== //
-	private void setJSONBookPages(ItemMap itemMap) { 
-		if (itemMap.getMaterial().toString().equalsIgnoreCase("WRITTEN_BOOK") && itemMap.getNodeLocation().getString(".pages") != null 
-				&& ConfigHandler.getPagesSection(itemMap.getNodeLocation()) != null && ServerHandler.hasSpecificUpdate("1_8")) {
-			List<String> actualPageList = new ArrayList<String>();
-			List<List <String> > listPages = new ArrayList<List <String> >();
+	private void setJSONBookPages(ItemMap itemMap) {
+		if (itemMap.getMaterial().toString().equalsIgnoreCase("WRITTEN_BOOK") && itemMap.getNodeLocation().getString(".pages") != null && ConfigHandler.getPagesSection(itemMap.getNodeLocation()) != null && ServerHandler.hasSpecificUpdate("1_8")) {
+			List < String > JSONPages = new ArrayList < String > ();
+			List < List < String > > rawPages = new ArrayList < List < String > > ();
 			for (String pageString: ConfigHandler.getPagesSection(itemMap.getNodeLocation()).getKeys(false)) {
-				 List<String> pageList = itemMap.getNodeLocation().getStringList(".pages." + pageString);
-				 listPages.add(pageList);
-				 String textBuilder = "[\"\"";
-				 for (int k = 0; k < pageList.size(); k++) {
-						String formatPage = pageList.get(k);
-						if (formatPage.contains("<hover type=\"text\"") || formatPage.contains("<hover type=\"open_url\"") || formatPage.contains("<hover type=\"run_command\"")) {
-							HoverType type = getHoverType(formatPage);
-							String result = null;
-							String result2 = null;
-							java.util.regex.Pattern pattern1 = java.util.regex.Pattern.compile(">\"(.*?)\"</hover>");
-							Matcher matcher1 = pattern1.matcher(formatPage);
-						    while (matcher1.find()) { result = matcher1.group(1); }
-							
-							java.util.regex.Pattern pattern2 = java.util.regex.Pattern.compile("value=\"(.*?)\">");
-							Matcher matcher2 = pattern2.matcher(formatPage);
-							while (matcher2.find()) { result2 = matcher2.group(1); }
-							
-							formatPage = formatPage.replace("<hover type=\"" + type.toString().toLowerCase() + "\" value=\"" + result2 + "\">\"" + result + "\"</hover>", "");
-							
-							String hoverBuilder = new String();
-							String hoverString = result2.replace(" <n> ","<n>").replace("<n> ","<n>").replace(" <n>","<n>");
-							String[] hovers = hoverString.split("<n>");
-							for (String hover: hovers) { if (hoverString.contains("<n>")) { hoverBuilder = hoverBuilder + hover + "\n"; } else { hoverBuilder = hover; } }
-							textBuilder += ", " + "{\"text\":\"" + result + "\",\"" + type.event + "\":{\"action\":\"" + type.action + "\",\"value\":\"" + hoverBuilder + "\"}}" 
-							+ ", " + "{\"text\":\"" + formatPage + "\"}" + ", " +  "{\"text\":\"\\n\",\"color\":\"reset\"}";
-							safteyCheckURL(type, hoverBuilder, itemMap);
-						} else if (formatPage.contains("raw:")) { textBuilder += formatPage.replace("raw: ", "").replace("raw:", "").replace("[\"\"", "").replace("\"bold\":false}]", "\"bold\":false}").replace("\"bold\":true}]", "\"bold\":true}"); textBuilder += ", " + "{\"text\":\"\\n\",\"color\":\"reset\"}"; } else { textBuilder += ", " + "{\"text\":\"" + formatPage + "\"}" + ", " + "{\"text\":\"\\n\",\"color\":\"reset\"}"; }
-				 }
-				 actualPageList.add(textBuilder + "]");
+				List < String > pageList = itemMap.getNodeLocation().getStringList(".pages." + pageString);
+				rawPages.add(pageList);
+				String textBuilder = "[\"\"";
+				for (int k = 0; k < pageList.size(); k++) {
+					Map < Integer, String > JSONBuilder = new HashMap < Integer, String > ();
+					String formatLine = pageList.get(k);
+					if (this.containsJSONEvent(formatLine)) {
+						while (this.containsJSONEvent(formatLine)) {
+							for (JSONEvent jsonType: JSONEvent.values()) {
+								Matcher matchPattern = java.util.regex.Pattern.compile(jsonType.matchType + "(.*?)>").matcher(formatLine);
+								if (matchPattern.find()) {
+									String inputResult = matchPattern.group(1);
+									JSONBuilder.put(JSONBuilder.size(), ((jsonType != JSONEvent.TEXT) 
+										? (",\"" + jsonType.event + "\":{\"action\":\"" + jsonType.action + "\",\"value\":\"" + inputResult + "\"}") 
+										: ("," + "{\"" + jsonType.action + "\":\"" + inputResult + "\"")));
+									formatLine = formatLine.replace(jsonType.matchType + inputResult + ">", "<JSONEvent>");
+									this.safteyCheckURL(itemMap, jsonType, inputResult);
+								}
+							}
+						}
+						if (!formatLine.isEmpty() && formatLine.length() != 0 && !formatLine.trim().isEmpty()) {
+							boolean definingText = false;
+							String[] JSONEvents = formatLine.split("<JSONEvent>");
+							if (!(StringUtils.countMatches(formatLine,"<JSONEvent>") <= JSONEvents.length)) { 
+								String adjustLine = new String(); 
+								for (String s : formatLine.split("JSONEvent>"))  { adjustLine += s + "JSONEvent> "; } 
+								JSONEvents = adjustLine.split("<JSONEvent>"); 
+							}
+							for (int i = 0; i < JSONEvents.length; i++) {
+								if (!JSONEvents[i].isEmpty() && JSONEvents[i].length() != 0 && !JSONEvents[i].trim().isEmpty()) {
+									textBuilder += ((i == 0) ? "," : "},") + "{\"" + "text" + "\":\"" + JSONEvents[i] + ((JSONBuilder.get(i) != null && JSONBuilder.get(i).contains("\"text\"")) 
+										? "\"}" : "\"") + (JSONBuilder.get(i) != null ? JSONBuilder.get(i) : "");
+								} else if (JSONBuilder.get(i) != null) {
+									if (JSONBuilder.get(i).contains("\"text\"") && !definingText) {
+										textBuilder += JSONBuilder.get(i); definingText = true;
+									} else if (JSONBuilder.get(i).contains("\"text\"") && definingText) {
+										textBuilder += "}" + JSONBuilder.get(i); definingText = false;
+									} else {
+									textBuilder += JSONBuilder.get(i);
+									}
+								}
+							}
+							textBuilder += "}," + "{\"text\":\"\\n\",\"color\":\"reset\"}";
+						}
+					} else if (formatLine.contains("raw:")) {
+						textBuilder += formatLine.replace("raw: ", "").replace("raw:", "").replace("[\"\"", "").replace("\"bold\":false}]", "\"bold\":false}").replace("\"bold\":true}]", "\"bold\":true}") + "," + "{\"text\":\"\\n\",\"color\":\"reset\"}";
+					} else { textBuilder += "," + "{\"text\":\"" + formatLine + "\"}" + "," + "{\"text\":\"\\n\",\"color\":\"reset\"}"; }
+				}
+				JSONPages.add(textBuilder + "]");
 			}
-			itemMap.setPages(actualPageList);
-			itemMap.setListPages(listPages);
+			itemMap.setPages(JSONPages);
+			itemMap.setListPages(rawPages);
 		}
 	}
 	
-	private HoverType getHoverType(String formatPage) {
-		if (formatPage.contains("<hover type=\"text\"")) { return HoverType.TEXT; } 
-		else if (formatPage.contains("<hover type=\"open_url\"")) { return HoverType.OPEN_URL; }
-		else if (formatPage.contains("<hover type=\"run_command\"")) { return HoverType.RUN_COMMAND; }
-		return HoverType.EXEMPT;
+	private boolean containsJSONEvent(String formatPage) {
+		if (formatPage.contains(JSONEvent.TEXT.matchType) || formatPage.contains(JSONEvent.SHOW_TEXT.matchType) || formatPage.contains(JSONEvent.OPEN_URL.matchType) || formatPage.contains(JSONEvent.RUN_COMMAND.matchType)) {
+			return true;
+		}
+		return false;
 	}
 	
-	private void safteyCheckURL(HoverType type, String hoverBuilder, ItemMap itemMap) {
-		if (type.equals(HoverType.OPEN_URL)) {
-			if (!Utils.containsIgnoreCase(hoverBuilder, "https") || !Utils.containsIgnoreCase(hoverBuilder, "http")) {
-				ServerHandler.sendErrorMessage("&c[ERROR] The URL Specified for the clickable link in the book " + itemMap.getConfigName() + " is missing http or https and will not be clickable.");
-				ServerHandler.sendErrorMessage("&c[ERROR] A URL designed for a clickable link should look as follows; https://www.google.com/");
+	private void safteyCheckURL(ItemMap itemMap, JSONEvent type, String inputResult) {
+		if (type.equals(JSONEvent.OPEN_URL)) {
+			if (!Utils.containsIgnoreCase(inputResult, "https") && !Utils.containsIgnoreCase(inputResult, "http")) {
+				ServerHandler.sendErrorMessage("&c[ERROR] The URL Specified for the clickable link in the book &b" + itemMap.getConfigName() + "&c is missing http or https and will not be clickable.");
+				ServerHandler.sendErrorMessage("&c[ERROR] A URL designed for a clickable link should look as follows; &bhttps://&cwww.google.com/");
 			}
 		}
 	}
 	
-	private enum HoverType { 
-		TEXT("hoverEvent","show_text"), 
-		OPEN_URL("clickEvent","open_url"), 
-		RUN_COMMAND("clickEvent","run_command"), 
-		EXEMPT("",""); 
-		
+	private enum JSONEvent {
+		TEXT("nullEvent", "text", "<text:"),
+		SHOW_TEXT("hoverEvent", "show_text", "<show_text:"),
+		OPEN_URL("clickEvent", "open_url", "<open_url:"),
+		RUN_COMMAND("clickEvent", "run_command", "<run_command:");
 		private final String event;
 		private final String action;
-		private HoverType(String Event, String Action) { event = Event; action = Action; }
+		private final String matchType;
+		private JSONEvent(String Event, String Action, String MatchType) {
+			this.event = Event;
+			this.action = Action;
+			this.matchType = MatchType;
+		}
 	}
 //  =========================================================================================================================================================================================================================== //
 	
@@ -869,32 +893,31 @@ public class ItemDesigner {
 //  Adds the custom book pages to the item without any JSON Formatting. //
 //  =================================================================== //
 	private void setLegacyBookPages(ItemMap itemMap) {
-		if (!ServerHandler.hasSpecificUpdate("1_8") && itemMap.getMaterial().toString().equalsIgnoreCase("WRITTEN_BOOK") && itemMap.getNodeLocation().getString(".pages") != null && ConfigHandler.getPagesSection(itemMap.getNodeLocation()) != null) {
-			List < String > pages = new ArrayList < String > ();
-			List<List <String> > listPages = new ArrayList<List <String> >();
+		if (!ServerHandler.hasSpecificUpdate("1_8") && itemMap.getMaterial().toString().equalsIgnoreCase("WRITTEN_BOOK") 
+			&& itemMap.getNodeLocation().getString(".pages") != null && ConfigHandler.getPagesSection(itemMap.getNodeLocation()) != null) {
+			List < String > formattedPages = new ArrayList < String > ();
+			List<List <String> > rawPages = new ArrayList<List <String> >();
 			for (String pageString: ConfigHandler.getPagesSection(itemMap.getNodeLocation()).getKeys(false)) {
 				List < String > pageList = itemMap.getNodeLocation().getStringList(".pages." + pageString);
-				listPages.add(pageList);
+				rawPages.add(pageList);
 				String saveList = "";
 				for (int k = 0; k < pageList.size(); k++) {
-					String formatPage = pageList.get(k);
-					if (formatPage.contains("<hover type=\"text\"") || formatPage.contains("<hover type=\"open_url\"") || formatPage.contains("<hover type=\"run_command\"")) {
-						String result = "%failure%";
-						String result2 = "%failure%";
-						java.util.regex.Pattern pattern1 = java.util.regex.Pattern.compile(">\"(.*?)\"</hover>");
-						Matcher matcher1 = pattern1.matcher(formatPage);
-						while (matcher1.find()) { result = matcher1.group(1); }
-						java.util.regex.Pattern pattern2 = java.util.regex.Pattern.compile("value=\"(.*?)\">");
-						Matcher matcher2 = pattern2.matcher(formatPage);
-						while (matcher2.find()) { result2 = matcher2.group(1); }
-						formatPage = formatPage.replace("<hover type=\"text\" value=\"" + result2 + "\">\"" + result + "\"</hover>", result).replace("<hover type=\"open_url\" value=\"" + result2 + "\">\"" + result + "\"</hover>", result).replace("<hover type=\"run_command\" value=\"" + result2 + "\">\"" + result + "\"</hover>", result);
-					}
-					saveList = saveList + formatPage + "\n";
+					String formatLine = pageList.get(k);
+					if (this.containsJSONEvent(formatLine)) {
+						for (JSONEvent jsonType: JSONEvent.values()) {
+							Matcher matchPattern = java.util.regex.Pattern.compile(jsonType.matchType + "(.*?)>").matcher(pageList.get(k));
+							while (matchPattern.find()) {
+								String inputResult = matchPattern.group(1);
+								formatLine = formatLine.replace(jsonType.matchType + inputResult + ">", ((jsonType == JSONEvent.TEXT) ? inputResult : ""));
+							}
+						}
+					} else if (formatLine.contains("raw:")) { formatLine = new String(); }
+					saveList = saveList + formatLine + "\n";
 				}
-				pages.add(saveList);
+				formattedPages.add(saveList);
 			}
-			itemMap.setPages(pages);
-			itemMap.setListPages(listPages);
+			itemMap.setPages(formattedPages);
+			itemMap.setListPages(rawPages);
 		}
 	}
 //  =========================================================================================================================================================================================================================================================================================================================================================== //

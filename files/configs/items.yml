@@ -79,7 +79,7 @@ items:
     enabled-worlds: world, world_nether, world_the_end
   book-item:
     id: WRITTEN_BOOK
-    author: '&bItemJoin'
+    author: '&bRockinChaos'
     slot: 6
     name: '&c&nCreating a Book'
     lore:
@@ -88,32 +88,47 @@ items:
     - '&7and other server information.'
     pages:
       '1':
-      - '&bYou can get this book &bon join!'
-      - '&aThis book also &asupports &ccolor codes!'
+      - '&aThanks for checking'
+      - '&aout &bItemJoin &aby'
+      - '<text:&b@RockinChaos#6746><open_url:https://discord.gg/D5FnJ7C><show_text:Click to visit the discord.>'
       - ''
-      - '&cHow do custom books &cwork?'
+      - '&0This is an example of'
+      - '    a &9custom book&0.'
+      - '&0-=-=-=-=-=-=-=-=-=-'
       - ''
-      - '&0You can set an &cauthor&0'
-      - '&0as shown in the items.yml'
-      - '&0I set it to &bItemJoin.'
-      - ''
-      - <hover type="text" value="%player% of course!">"Hover Mouse Here!"</hover>
+      - '&0You can set an &cauthor&r'
+      - '&0and you can add text'
+      - '&0components using the'
+      - '&0format <<text:TYPE><show_text:Replace TYPE with the component type. \nExample: run_command, show_text, open_url.>:<text:VALUE><show_text:Replace VALUE with the text, url or command.>>.'
       '2':
-      - '&cHow do you identify a &cpage number?'
+      - '&cHow do you specify a'
+      - '&cnew page number?'
       - ''
-      - '&0As displayed to the left in the items.yml'
-      - '&0Create a number to specify the new page number.'
-      - '&cMakesure you put &ceach number in order &cas shown.'
+      - '&0As displayed to the'
+      - '&0left in the items.yml.'
+      - '&0Create a number to'
+      - '&0specify the new page.'
+      - '&cMakesure you put'
+      - '&ceach number in order.'
+      - ''
+      - '&aNote:&0 that you can'
+      - '&0only have &b14&0 lines '
+      - '&0per page.'
       '3':
-      - '&cHow do you create a &cnew page?'
+      - '&0I still &nneed&r help&r!'
       - ''
-      - '&cCreating new pages &cshould be pretty'
-      - '&cstraight forward for &ccopying and pasting.'
-      - '&bItemJoin &0by RockinChaos!'
+      - '&0RockinChaos is always'
+      - '&0happy to help so feel'
+      - '&0free to reach out'
+      - '&0on <text:&adiscord.><open_url:https://discord.gg/D5FnJ7C><show_text:Click to visit the discord.>'
       - ''
-      - <hover type="open_url" value="https://www.spigotmc.org/resources/itemjoin.12661/">"Click to view ItemJoin."</hover>
-      - <hover type="run_command" value="/say ItemJoin is so AMAZING!">"Click to run a Command."</hover>
-      - 'raw: ["",{"text":"I am a hidden text!","color":"yellow","clickEvent":{"action":"open_url","value":"https://www.spigotmc.org/resources/itemjoin.12661/"},"hoverEvent":{"action":"show_text","value":{"text":"","extra":[{"text":"Click to visit the spigot page.","color":"blue"}]}}}]'
+      - '&0You can also visit'
+      - '&0the <text:&9wiki page><open_url:https://github.com/RockinChaos/ItemJoin/wiki><show_text:Click to view the wiki.> &rfor'
+      - '&0additional help on'
+      - '&0the plugin including'
+      - '<text:&9custom books.><open_url:https://github.com/RockinChaos/ItemJoin/wiki/Creating-Items#creating-a-custom-book><show_text:Click for additional \nhelp with creating books.>'
+      - ''
+      - 'raw: ["",{"text":"Visit Plugin Page!","color":"gold","clickEvent":{"action":"open_url","value":"https://www.spigotmc.org/resources/itemjoin.12661/"},"hoverEvent":{"action":"show_text","value":{"text":"","extra":[{"text":"Click to visit the spigot page.","color":"green"}]}}}]'
     itemflags: death-drops, self-drops
     triggers: join, respawn
     permission-node: itemjoin.book

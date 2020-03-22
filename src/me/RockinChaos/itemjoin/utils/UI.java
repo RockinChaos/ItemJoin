@@ -478,7 +478,7 @@ public class UI {
 			Language.sendLangMessage("Commands.UI.inputSet", player, placeHolders);
 			this.creatingPane(event.getPlayer(), itemMap);
 		}));
-		creatingPane.addButton(new Button(ItemHandler.getItem("PAPER", 1, false, "&b&lData", "&7", "&7*Set the damage or the", "&7custom texture of the item."), event -> { this.dataPane(player, itemMap); }));
+		creatingPane.addButton(new Button(ItemHandler.setDurability(ItemHandler.getItem("DIAMOND_BOOTS", 1, false, "&b&lData", "&7", "&7*Set the damage or the", "&7custom texture of the item."), 160), event -> { this.dataPane(player, itemMap); }));
 		creatingPane.addButton(new Button(ItemHandler.getItem("BOOK", 1, false, "&e&lCommand Settings", "&7", "&7*Define commands for the item", "&7which execute upon being", "&7interacted with."), event -> this.commandPane(player, itemMap)));
 		creatingPane.addButton(new Button(ItemHandler.getItem("ENCHANTED_BOOK", 1, false, "&b&lEnchantments", "&7", "&7*Add enchants to make the", "&7item sparkle and powerful.", "&9&lENCHANTMENTS: &a" + 
 		(Utils.nullCheck(itemMap.getEnchantments().toString()) != "NONE" ? "&a" + enchantList : "NONE")), event -> this.enchantPane(player, itemMap)));
@@ -1155,8 +1155,8 @@ public class UI {
 	private void dataPane(final Player player, final ItemMap itemMap) {
 		Interface dataPane = new Interface(false, 2, this.GUIName);
 		dataPane.addButton(new Button(this.fillerPaneBItem));
-		dataPane.addButton(new Button(ItemHandler.getItem("BOW", 1, false, "&b&lDamage", "&7", "&7*Set the damage of the item.", (itemMap.getMaterial().getMaxDurability() != 0 ? "&9&lDURABILITY: &a" + 
-		Utils.nullCheck(itemMap.getDurability() + "&7") : "&c&lERROR: &7This item is NOT damagable.")), event -> {
+		dataPane.addButton(new Button(ItemHandler.setDurability(ItemHandler.getItem("BOW", 1, false, "&b&lDamage", "&7", "&7*Set the damage of the item.", (itemMap.getMaterial().getMaxDurability() != 0 ? "&9&lDURABILITY: &a" + 
+		Utils.nullCheck(itemMap.getDurability() + "&7") : "&c&lERROR: &7This item is NOT damagable.")), 50), event -> {
 			if (Utils.nullCheck(itemMap.getDurability() + "&7") != "NONE") {
 				itemMap.setDurability(null);
 				this.dataPane(player, itemMap);
