@@ -18,6 +18,8 @@ public class ItemJoin extends JavaPlugin {
   	
   	@Override
 	public void onDisable() {
+  		ServerHandler.purgeCraftItems(true);
+  		ConfigHandler.getProtocolManager().closeProtocol();
   		ConfigHandler.getSQLData().executeLaterStatements();
   		ServerHandler.sendConsoleMessage("&4has been Disabled.");
   	}

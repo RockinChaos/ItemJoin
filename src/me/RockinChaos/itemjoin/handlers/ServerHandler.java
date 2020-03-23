@@ -1,9 +1,11 @@
 package me.RockinChaos.itemjoin.handlers;
 
+import java.util.Collection;
+
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
 import me.RockinChaos.itemjoin.ItemJoin;
 
 public class ServerHandler {
@@ -111,5 +113,30 @@ public class ServerHandler {
 	
 	public static void sendDebugTrace(Exception e) {
 		if (ConfigHandler.isDebugging()) { e.printStackTrace(); }
+	}
+
+	public static void purgeCraftItems(boolean sqlCrafting) {
+		Collection < ? > playersOnlineNew = null;
+		Player[] playersOnlineOld;
+		try {
+			if (Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).getReturnType() == Collection.class) {
+				if (Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).getReturnType() == Collection.class) {
+					playersOnlineNew = ((Collection < ? > ) Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).invoke(null, new Object[0]));
+					for (Object objPlayer: playersOnlineNew) {
+						Player player = ((Player) objPlayer);
+						if (sqlCrafting) { ItemHandler.saveCraftItems(player); }
+						ItemHandler.removeCraftItems(player);
+					}
+				}
+			} else {
+				playersOnlineOld = ((Player[]) Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).invoke(null, new Object[0]));
+				for (Player player: playersOnlineOld) {
+					if (sqlCrafting) { ItemHandler.saveCraftItems(player); }
+					ItemHandler.removeCraftItems(player);
+				}
+			}
+		} catch (Exception e) {
+			ServerHandler.sendDebugTrace(e);
+		}
 	}
 }

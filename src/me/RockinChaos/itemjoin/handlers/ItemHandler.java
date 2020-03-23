@@ -33,6 +33,7 @@ import com.mojang.authlib.properties.Property;
 import com.mojang.util.UUIDTypeAdapter;
 
 import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
+import me.RockinChaos.itemjoin.listeners.InventoryCrafting;
 import me.RockinChaos.itemjoin.utils.Legacy;
 import me.RockinChaos.itemjoin.utils.Reflection;
 import me.RockinChaos.itemjoin.utils.Utils;
@@ -139,6 +140,75 @@ public class ItemHandler {
         }
         tempItem.setItemMeta(tempMeta); 
         return tempItem;
+    }
+    
+    public static void saveCraftItems(Player player) {
+		if (InventoryCrafting.getCraftItems().containsKey(PlayerHandler.getPlayerID(player))) {
+			Inventory inv = Bukkit.createInventory(null, 9);
+			boolean notNull = false;
+			for (ItemStack item: InventoryCrafting.getCraftItems().get(PlayerHandler.getPlayerID(player))) { 
+				if (item != null && item.getType() != Material.AIR) {
+					inv.addItem(item); 
+					notNull = true;
+				}
+			}
+			if (notNull) {
+			ConfigHandler.getSQLData().saveReturnCraftItems(player, inv);
+			}
+		} 
+		if (InventoryCrafting.getCreativeCraftItems().containsKey(PlayerHandler.getPlayerID(player))) {
+			Inventory inv = Bukkit.createInventory(null, 9);
+			for (ItemStack item: InventoryCrafting.getCreativeCraftItems().get(PlayerHandler.getPlayerID(player))) { inv.addItem(item); }
+			ConfigHandler.getSQLData().saveReturnCraftItems(player, inv);
+		}
+    }
+    
+    public static void restoreCraftItems(Player player) {
+    	Inventory inventory = ConfigHandler.getSQLData().getReturnCraftItems(player);
+		Inventory craftView = player.getOpenInventory().getTopInventory();
+		if (inventory != null) {
+			for (int k = 4; k >= 0; k--) {
+				if (inventory.getItem(k) != null && inventory.getItem(k).getType() != Material.AIR) {
+					craftView.setItem(k, inventory.getItem(k));
+				}
+			}
+			PlayerHandler.updateInventory(player);
+			ConfigHandler.getSQLData().removeReturnCraftItems(player);
+		}
+    }
+    
+    public static void restoreCraftItems() {
+    	Collection < ? > playersOnlineNew = null;
+		Player[] playersOnlineOld;
+		try {
+			if (Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).getReturnType() == Collection.class) {
+				if (Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).getReturnType() == Collection.class) {
+					playersOnlineNew = ((Collection < ? > ) Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).invoke(null, new Object[0]));
+					for (Object objPlayer: playersOnlineNew) {
+						if (((Player) objPlayer).isOnline() && PlayerHandler.isCraftingInv(((Player) objPlayer).getOpenInventory())) {
+							restoreCraftItems((Player) objPlayer);
+						}
+					}
+				}
+			} else {
+				playersOnlineOld = ((Player[]) Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).invoke(null, new Object[0]));
+				for (Player player: playersOnlineOld) {
+					if (player.isOnline() && PlayerHandler.isCraftingInv(player.getOpenInventory())) {
+						restoreCraftItems(player);
+					}
+				}
+			}
+		} catch (Exception e) {
+			ServerHandler.sendDebugTrace(e);
+		}
+    }
+    
+    public static void removeCraftItems(Player player) {
+		ItemStack[] craftingContents = player.getOpenInventory().getTopInventory().getContents();
+		Inventory craftView = player.getOpenInventory().getTopInventory();
+		for (int k = 0; k < craftingContents.length; k++) {
+			craftView.setItem(k, new ItemStack(Material.AIR));
+		}
     }
 	
 	public static Material getMaterial(String material, String dataVal) {

@@ -7,12 +7,12 @@ import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.util.ArrayList;
 
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.RegisteredListener;
-
 import me.RockinChaos.itemjoin.Commands;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.giveitems.listeners.LimitSwitch;
@@ -47,6 +47,7 @@ import me.RockinChaos.itemjoin.utils.Reflection;
 import me.RockinChaos.itemjoin.utils.TabComplete;
 import me.RockinChaos.itemjoin.utils.Utils;
 import me.RockinChaos.itemjoin.utils.YAMLGenerator;
+import me.RockinChaos.itemjoin.utils.protocol.ProtocolManager;
 import me.RockinChaos.itemjoin.utils.sqlite.SQLData;
 
 public class ConfigHandler {
@@ -59,6 +60,7 @@ public class ConfigHandler {
 	private static SQLData sqlData;
 	private static UpdateHandler updater;
 	private static ItemDesigner itemDesigner;
+	private static ProtocolManager protocolManager;
 	private static UI itemCreator;
 	private static Metrics metrics;
 	private static DependAPI depends;
@@ -68,6 +70,7 @@ public class ConfigHandler {
 		configFile(); itemsFile(); langFile(); registerPrevents();
 		setDepends(new DependAPI());
 		setSQLData(new SQLData());
+		setProtolcolManager(new ProtocolManager());
 		setItemDesigner(new ItemDesigner());
 		setItemCreator(new UI());
 		setMetrics(new Metrics());
@@ -346,6 +349,14 @@ public class ConfigHandler {
 		itemCreator = creator;
 	}
 	
+	public static ProtocolManager getProtocolManager() {
+		return protocolManager;
+	}
+	
+	private static void setProtolcolManager(ProtocolManager protocol) {
+		protocolManager = protocol;
+	}
+	
 	public static DependAPI getDepends() {
 		return depends;
 	}
@@ -425,6 +436,14 @@ public class ConfigHandler {
 		}
 		if (itemMap.isCraftingItem() && !isListenerEnabled(InventoryCrafting.class.getSimpleName())) {
 			InventoryCrafting.cycleTask();
+	        Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
+	            @Override
+	            public void run() {
+	            	ItemHandler.restoreCraftItems();
+	            	if (ServerHandler.hasSpecificUpdate("1_12")) { getProtocolManager().handleProtocols(); }
+	            }
+	        }, 80L);
+			if (!isListenerEnabled(PlayerQuit.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerQuit(), ItemJoin.getInstance()); }
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new InventoryCrafting(), ItemJoin.getInstance());
 		}
 		if ((itemMap.isMovement() || itemMap.isInventoryClose()) && !isListenerEnabled(InventoryClick.class.getSimpleName())) {

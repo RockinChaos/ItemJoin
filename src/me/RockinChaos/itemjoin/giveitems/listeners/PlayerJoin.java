@@ -11,6 +11,7 @@ import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
+import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.utils.Chances;
 import me.RockinChaos.itemjoin.utils.Utils;
@@ -52,6 +53,7 @@ public class PlayerJoin implements Listener {
 		final Chances probability = new Chances();
 		final ItemMap probable = probability.getRandom(player);
 		final int session = Utils.getRandom(1, 100000);
+		ItemHandler.restoreCraftItems(player);
 		for (ItemMap item : ItemUtilities.getItems()) {
 			item.setAnimations(player);
 			if (item.isGiveOnJoin() && item.inWorld(player.getWorld()) 
