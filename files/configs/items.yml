@@ -36,7 +36,7 @@ items:
     cooldown-message: '&7[&eItemJoin&7] &a[%item%&a] &cis on cooldown for &a%timeleft% &cseconds..'
     enchantment: FIRE_ASPECT:3, DAMAGE_ALL:5, DAMAGE_UNDEAD:5, KNOCKBACK:8
     itemflags: unbreakable, hide-attributes, self-drops, death-drops, CreativeBypass
-    triggers: join, respawn, world-change, region-enter
+    triggers: join, respawn, world-switch, region-enter
     permission-node: itemjoin.ultra
     enabled-regions: region1, region2
     enabled-worlds: world, world_nether, world_the_end
@@ -49,7 +49,7 @@ items:
     - '&7Server promotions'
     - '&7Directions or custom maps.'
     itemflags: item-store, unbreakable, hide-attributes, death-drops, self-drops, CreativeBypass
-    triggers: join, respawn, world-change
+    triggers: join, respawn, world-switch
     permission-node: itemjoin.map
     enabled-worlds: world, world_nether, world_the_end
   gamemode-token:
@@ -74,7 +74,7 @@ items:
     commands-cost: 8
     commands-cooldown: 2
     itemflags: item-store, death-drops, self-drops, hide-attributes, disposable
-    triggers: join, respawn, world-change
+    triggers: join, respawn, world-switch
     permission-node: itemjoin.token
     enabled-worlds: world, world_nether, world_the_end
   book-item:
@@ -142,7 +142,7 @@ items:
     - '&7Great for setting a players profile,'
     - '&7as seen in mini-game servers.'
     itemflags: death-drops, self-drops
-    triggers: join, respawn, world-change
+    triggers: join, respawn, world-switch
     enabled-worlds: world, world_nether, world_the_end
   animated-panes:
     id:
@@ -155,7 +155,7 @@ items:
     slot: Arbitrary, Arbitrary, Arbitrary, Arbitrary
     name: '&f'
     itemflags: animate, inventory-modify, placement, death-drops, self-drops
-    triggers: join, world-change
+    triggers: join, world-switch
     enabled-worlds: world, world_nether, world_the_end
   banner-item:
     id: WHITE_BANNER
@@ -170,7 +170,7 @@ items:
       - 'message: &cWhere is your leader now...?'
     commands-sequence: RANDOM
     itemflags: inventory-modify, hide-attributes, self-drops, CreativeBypass
-    triggers: join, respawn, world-change, region-enter
+    triggers: join, respawn, world-switch, region-enter
     enabled-worlds: world, world_nether, world_the_end
   animated-sign:
     id: OAK_SIGN
@@ -193,7 +193,7 @@ items:
       - '<delay:60>&cHealth: %player_health%'
       - '&cFood Level: %player_food%'
     itemflags: animate, inventory-modify, self-drops, death-drops
-    triggers: join, respawn, world-change
+    triggers: join, respawn, world-switch
     enabled-worlds: world, world_nether, world_the_end
   bungeecord-item:
     id: PURPLE_STAINED_GLASS
@@ -211,7 +211,7 @@ items:
     commands-cooldown: 2
     enchantment: FIRE_ASPECT:3
     itemflags: inventory-modify, hide-attributes, death-drops, self-drops
-    triggers: join, respawn, world-change
+    triggers: join, respawn, world-switch
     permission-node: itemjoin.bungee
     enabled-worlds: world, world_nether, world_the_end
   potion-arrow:
@@ -222,7 +222,7 @@ items:
     name: '&6Death Arrow'
     itemflags: death-drops, self-drops
     limit-modes: SURVIVAL, ADVENTURE
-    triggers: join, respawn, world-change
+    triggers: join, respawn, world-switch
     enabled-worlds: world, world_nether, world_the_end
   firework-item:
     id: FIREWORK_ROCKET
@@ -238,14 +238,14 @@ items:
       colors: GRAY, WHITE, PURPLE, LIGHT_GRAY, GREEN
     use-cooldown: 3
     itemflags: count-lock, death-drops, hide-attributes, self-drops
-    triggers: join, respawn, world-change
+    triggers: join, respawn, world-switch
     enabled-worlds: world, world_nether, world_the_end
   potion-item:
     id: POTION
     slot: 31
     name: '&c&nDraught of Madness'
     potion-effect: JUMP:2:120, INCREASE_DAMAGE:3:150, REGENERATION:1:160
-    triggers: join, respawn, world-change
+    triggers: join, respawn, world-switch
     enabled-worlds: world, world_nether, world_the_end
   potion-apple:
     id: GOLDEN_APPLE
@@ -255,7 +255,7 @@ items:
     - '&7This is not any ordinary apple.'
     potion-effect: JUMP:2:120, NIGHT_VISION:2:400, GLOWING:1:410, REGENERATION:1:160
     itemflags: death-drops, self-drops
-    triggers: join, respawn, world-change
+    triggers: join, respawn, world-switch
     enabled-worlds: world, world_nether, world_the_end
   skull-item:
     id: PLAYER_HEAD
@@ -271,7 +271,7 @@ items:
     - '&7You can create your own skull texture'
     - '&7and apply it to a skull item!'
     itemflags: inventory-modify, animate, death-drops, self-drops
-    triggers: join, respawn, world-change
+    triggers: join, respawn, world-switch
     enabled-worlds: world, world_nether, world_the_end
   random-pane-1:
     id: YELLOW_STAINED_GLASS_PANE
@@ -279,7 +279,7 @@ items:
     name: '&f'
     probability: 50
     itemflags: inventory-modify, placement, death-drops, self-drops
-    triggers: join, world-change
+    triggers: join, world-switch
     enabled-worlds: world, world_nether, world_the_end
   random-pane-2:
     id: BLUE_STAINED_GLASS_PANE
@@ -287,7 +287,7 @@ items:
     name: '&f'
     probability: 80
     itemflags: inventory-modify, placement, death-drops, self-drops
-    triggers: join, world-change
+    triggers: join, world-switch
     enabled-worlds: world, world_nether, world_the_end
   random-pane-3:
     id: PINK_STAINED_GLASS_PANE
@@ -295,7 +295,7 @@ items:
     name: '&f'
     probability: 10
     itemflags: inventory-modify, placement, death-drops, self-drops
-    triggers: join, world-change
+    triggers: join, world-switch
     enabled-worlds: world, world_nether, world_the_end
   helmet-item:
     id: DIAMOND_HELMET

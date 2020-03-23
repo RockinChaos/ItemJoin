@@ -226,20 +226,20 @@ public class PlayerHandler {
 	}
 	
 	public static OfflinePlayer getOfflinePlayer(String playerName) {
-		Collection<?> playersOnlineNew;
-		OfflinePlayer[] playersOnlineOld;
+		Collection<?> playersOfflineNew;
+		OfflinePlayer[] playersOfflineOld;
 		try {
 			if (Bukkit.class.getMethod("getOfflinePlayers", new Class < ? > [0]).getReturnType() == Collection.class) {
-				playersOnlineNew = ((Collection < ? > ) Bukkit.class.getMethod("getOfflinePlayers", new Class < ? > [0]).invoke(null, new Object[0]));
-				for (Object objPlayer: playersOnlineNew) {
+				playersOfflineNew = ((Collection < ? > ) Bukkit.class.getMethod("getOfflinePlayers", new Class < ? > [0]).invoke(null, new Object[0]));
+				for (Object objPlayer: playersOfflineNew) {
 					Player player = ((Player)objPlayer);
 					if (player.getName().equalsIgnoreCase(playerName)) {
 						return player;
 					}
 				}
 			} else {
-				playersOnlineOld = ((OfflinePlayer[]) Bukkit.class.getMethod("getOfflinePlayers", new Class < ? > [0]).invoke(null, new Object[0]));
-				for (OfflinePlayer player: playersOnlineOld) {
+				playersOfflineOld = ((OfflinePlayer[]) Bukkit.class.getMethod("getOfflinePlayers", new Class < ? > [0]).invoke(null, new Object[0]));
+				for (OfflinePlayer player: playersOfflineOld) {
 					if (player.getName().equalsIgnoreCase(playerName)) {
 						return player;
 					}
