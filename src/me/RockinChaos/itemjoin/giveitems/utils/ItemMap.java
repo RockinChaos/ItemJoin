@@ -1701,10 +1701,10 @@ public class ItemMap {
 	}
 	
 	public ItemStack setJSONBookPages(Player player, ItemStack item, List<String> pages) {
-		List<String> copyPages = new ArrayList<String>();
-		for (String page: pages) { copyPages.add(page); }
-		copyPages.set(0, ItemHandler.purgeDelay(copyPages.get(0)));
-		if (item.getType().toString().equalsIgnoreCase("WRITTEN_BOOK") && copyPages != null && ServerHandler.hasSpecificUpdate("1_8")) {
+		if (item.getType().toString().equalsIgnoreCase("WRITTEN_BOOK") && pages != null && !pages.isEmpty() && ServerHandler.hasSpecificUpdate("1_8")) {
+			List<String> copyPages = new ArrayList<String>();
+			for (String page: pages) { copyPages.add(page); }
+			copyPages.set(0, ItemHandler.purgeDelay(copyPages.get(0)));
 			Object localePages = null;
 			try { localePages = Reflection.getNMS("NBTTagList").getConstructor().newInstance(); } catch (Exception e) { ServerHandler.sendDebugTrace(e); }
 			if (ServerHandler.hasSpecificUpdate("1_15")) { return this.set1_15JSONPages(player, item, localePages, copyPages); } 
