@@ -18,12 +18,13 @@ import org.bukkit.event.inventory.InventoryType.SlotType;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
+
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
+import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 
@@ -143,14 +144,10 @@ public class InventoryCrafting implements Listener {
     	final Player player = (Player) event.getPlayer();
     	if (event.getNewGameMode() == GameMode.CREATIVE) {
     		creativeCraftingItems.put(PlayerHandler.getPlayerID(player), craftingItems.get(PlayerHandler.getPlayerID(player)));
-    		ItemStack[] craftingContents = player.getOpenInventory().getTopInventory().getContents();
-    		Inventory craftView = player.getOpenInventory().getTopInventory();
-    		for (int k = 0; k < craftingContents.length; k++) {
-				craftView.setItem(k, new ItemStack(Material.AIR));
-			}
+    		ItemHandler.removeCraftItems(player);
     	} else if (event.getNewGameMode() != GameMode.CREATIVE && creativeCraftingItems.containsKey(PlayerHandler.getPlayerID(player))) {
     		ItemStack[] craftingContents = creativeCraftingItems.get(PlayerHandler.getPlayerID(player));
-    		for (int i = 0; i <= 4; i++) { this.delayReturnItem(player, i, craftingContents[i], 1L); }
+    		for (int i = 4; i >= 0; i--) { this.delayReturnItem(player, i, craftingContents[i], 1L); }
     		craftingItems.put(PlayerHandler.getPlayerID(player), creativeCraftingItems.get(PlayerHandler.getPlayerID(player)));
     		creativeCraftingItems.remove(PlayerHandler.getPlayerID(player));
     	}
@@ -225,5 +222,13 @@ public class InventoryCrafting implements Listener {
     	location.setY(location.getY() + 1);
     	Item dropped = player.getWorld().dropItem(location, item);
 		dropped.setVelocity(location.getDirection().multiply(.30));
+    }
+    
+    public static HashMap<String, ItemStack[]> getCraftItems() {
+    	return craftingItems;
+    }
+    
+    public static HashMap<String, ItemStack[]> getCreativeCraftItems() {
+    	return creativeCraftingItems;
     }
 }
