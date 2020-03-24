@@ -26,9 +26,6 @@ import me.RockinChaos.itemjoin.handlers.ServerHandler;
 public class Legacy {
 	
 	// WELCOME TO THE LAND OF MAKE-BELIEVE! //
-	
-	private static boolean oldMapMethod = false;
-	private static boolean oldMapViewMethod = false;
     
     public static void updateLegacyInventory(Player player) {
     	player.updateInventory();
@@ -94,17 +91,23 @@ public class Legacy {
 	}
 	
     public static short getMapID(MapView view) {
-    	if (!oldMapMethod) {
-    		try { return (short) view.getId(); } 
-			catch (NoSuchMethodError e) { oldMapMethod = true; return Reflection.getMapID(view); }
-    	} else { return Reflection.getMapID(view); }
+    	try { return (short) view.getId(); } 
+		catch (NoSuchMethodError e1) { 
+	    	try {
+	    		Object mapID = Reflection.getMinecraftClass("MapView").getMethod("getId").invoke(view);
+	    		return (short)mapID; 
+	    	} catch (Exception e2) { return 1; }
+		}	
     }
     
     public static MapView getMapView(int id) {
-    	if (!oldMapViewMethod) {
-    		try { return ItemJoin.getInstance().getServer().getMap((short) id); } 
-			catch (NoSuchMethodError e) { oldMapViewMethod = true; return Reflection.getMapView(id); }
-    	} else { return Reflection.getMapView(id); }
+    	try { return ItemJoin.getInstance().getServer().getMap((short) id); } 
+		catch (NoSuchMethodError e1) { 
+			try {
+				Object mapView = Reflection.getBukkitClass("Bukkit").getMethod("getMap", short.class).invoke(Reflection.getBukkitClass("map.MapView"), (short)id);
+				return (MapView)mapView; 
+			} catch (Exception e2) { return null; }
+		}
     }
 
     public static MapView createLegacyMapView() {
