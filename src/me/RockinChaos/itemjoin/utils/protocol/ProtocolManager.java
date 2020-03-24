@@ -1,12 +1,16 @@
 package me.RockinChaos.itemjoin.utils.protocol;
 
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
+import java.util.logging.Level;
 
+import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
+import org.bukkit.event.HandlerList;
+import org.bukkit.plugin.AuthorNagException;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.RegisteredListener;
 import io.netty.channel.Channel;
 import me.RockinChaos.itemjoin.ItemJoin;
-import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
-import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
+import me.RockinChaos.itemjoin.utils.PlayerAutoCraftEvent;
 
 public class ProtocolManager {
 	private TinyProtocol protocol;
@@ -16,32 +20,47 @@ public class ProtocolManager {
   		this.protocol = new TinyProtocol(ItemJoin.getInstance()) {
   			@Override
   			public Object onPacketInAsync(Player player, Channel channel, Object packet) {
-  				if (packet.getClass().getSimpleName().equalsIgnoreCase("PacketPlayInAutoRecipe")) {
-  					if (hasCraftingItem(player)) {
-  						return null;
-  					}
-  				}
+  				if (eventInResult(player, channel, packet)) { return null; }
   				return super.onPacketInAsync(player, channel, packet);
   			}
+  			
   			@Override
-  			public Object onPacketOutAsync(Player reciever, Channel channel, Object packet) {
+  			public Object onPacketOutAsync(Player player, Channel channel, Object packet) {
   				return packet;
   			}
   		};
   	}
   	
-  	private boolean hasCraftingItem(Player player) {
-  		for (int i = 0; i <= 4; i++) {
-  			final ItemStack[] craftingContents = player.getOpenInventory().getTopInventory().getContents().clone();
-  			for (ItemMap itemMap: ItemUtilities.getItems()) {
-  				if (itemMap.isCraftingItem() && itemMap.isSimilar(craftingContents[i])) {
-  					return true;
-  				}
-  			}
+  	private boolean eventInResult(Player player, Channel channel, Object packet) {
+  		if (packet.getClass().getSimpleName().equalsIgnoreCase("PacketPlayInAutoRecipe")) {
+  			PlayerAutoCraftEvent AutoCraft = new PlayerAutoCraftEvent(player, player.getOpenInventory().getTopInventory());
+  			this.callEvent(AutoCraft);
+		  	return AutoCraft.isCancelled();
   		}
   		return false;
   	}
   	
+    private void callEvent(Event event) {
+        HandlerList handlers = event.getHandlers();
+        RegisteredListener[] listeners = handlers.getRegisteredListeners();
+        for (RegisteredListener registration : listeners) {
+            if (!registration.getPlugin().isEnabled()) { continue; }
+            try {
+                registration.callEvent(event);
+            } catch (AuthorNagException e) {
+                Plugin plugin = registration.getPlugin();
+                if (plugin.isNaggable()) {
+                    plugin.setNaggable(false);
+                    ItemJoin.getInstance().getLogger().log(Level.SEVERE, String.format(
+                    		"Nag author(s): '%s' of '%s' about the following: %s",
+                            plugin.getDescription().getAuthors(), plugin.getDescription().getFullName(), e.getMessage()));
+                }
+            } catch (Throwable e) {
+            	 ItemJoin.getInstance().getLogger().log(Level.SEVERE, "Could not pass event " + event.getEventName() + " to " + registration.getPlugin().getDescription().getFullName(), e);
+            }
+        }
+    }
+    
   	public void closeProtocol() {
   		if (this.protocol != null) {
   			this.protocol.close();

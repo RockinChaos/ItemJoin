@@ -143,29 +143,41 @@ public class ItemHandler {
     }
     
     public static void saveCraftItems(Player player) {
-		if (InventoryCrafting.getCraftItems().containsKey(PlayerHandler.getPlayerID(player))) {
-			Inventory inv = Bukkit.createInventory(null, 9);
-			boolean notNull = false;
-			for (ItemStack item: InventoryCrafting.getCraftItems().get(PlayerHandler.getPlayerID(player))) {
-				inv.addItem(item); 
-				if (item != null && item.getType() != Material.AIR) { notNull = true; }
-			}
-			if (notNull) {
-				ConfigHandler.getSQLData().saveReturnCraftItems(player, inv);
-			}
-		} 
 		if (InventoryCrafting.getCreativeCraftItems().containsKey(PlayerHandler.getPlayerID(player))) {
 			Inventory inv = Bukkit.createInventory(null, 9);
-			for (ItemStack item: InventoryCrafting.getCreativeCraftItems().get(PlayerHandler.getPlayerID(player))) { inv.addItem(item); }
-			ConfigHandler.getSQLData().saveReturnCraftItems(player, inv);
-		}
+			boolean notNull = false;
+			ItemStack[] craftingContents = InventoryCrafting.getCreativeCraftItems().get(PlayerHandler.getPlayerID(player));
+			for (int k = 0; k <= 4; k++) {
+				inv.setItem(k, craftingContents[k]); 
+				if (craftingContents[k] != null && craftingContents[k].getType() != Material.AIR) { notNull = true; }
+			}
+			if (notNull) { ConfigHandler.getSQLData().saveReturnCraftItems(player, inv); }
+		} else if (InventoryCrafting.getOpenCraftItems().containsKey(PlayerHandler.getPlayerID(player))) {
+			Inventory inv = Bukkit.createInventory(null, 9);
+			boolean notNull = false;
+			ItemStack[] craftingContents = InventoryCrafting.getOpenCraftItems().get(PlayerHandler.getPlayerID(player));
+			for (int k = 0; k <= 4; k++) {
+				inv.setItem(k, craftingContents[k]); 
+				if (craftingContents[k] != null && craftingContents[k].getType() != Material.AIR) { notNull = true; }
+			}
+			if (notNull) { ConfigHandler.getSQLData().saveReturnCraftItems(player, inv); }
+		} else if (InventoryCrafting.getCraftItems().containsKey(PlayerHandler.getPlayerID(player))) {
+			Inventory inv = Bukkit.createInventory(null, 9);
+			boolean notNull = false;
+			ItemStack[] craftingContents = InventoryCrafting.getCraftItems().get(PlayerHandler.getPlayerID(player));
+			for (int k = 0; k <= 4; k++) {
+				inv.setItem(k, craftingContents[k]); 
+				if (craftingContents[k] != null && craftingContents[k].getType() != Material.AIR) { notNull = true; }
+			}
+			if (notNull) { ConfigHandler.getSQLData().saveReturnCraftItems(player, inv); }
+		} 
     }
     
     public static void restoreCraftItems(Player player) {
     	Inventory inventory = ConfigHandler.getSQLData().getReturnCraftItems(player);
 		Inventory craftView = player.getOpenInventory().getTopInventory();
 		if (inventory != null) {
-			for (int k = 0; k <= 4; k++) {
+			for (int k = 4; k >= 0; k--) {
 				if (inventory.getItem(k) != null && inventory.getItem(k).getType() != Material.AIR) {
 					craftView.setItem(k, inventory.getItem(k));
 				}

@@ -14,12 +14,14 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.InventoryType.SlotType;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
@@ -27,11 +29,36 @@ import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
+import me.RockinChaos.itemjoin.utils.PlayerAutoCraftEvent;
 
 public class InventoryCrafting implements Listener {
 	private static HashMap<String, ItemStack[]> craftingItems = new HashMap<String, ItemStack[]>();
+	private static HashMap<String, ItemStack[]> craftingOpenItems = new HashMap<String, ItemStack[]>();
 	private static HashMap<String, ItemStack[]> creativeCraftingItems = new HashMap<String, ItemStack[]>();
 	private HashMap<String, Boolean> worldSwitch = new HashMap<String, Boolean>();
+	
+	@EventHandler(priority = EventPriority.HIGHEST)
+	private void onAutoCraft(PlayerAutoCraftEvent event) {
+		for (int i = 0; i <= 4; i++) {
+  			final ItemStack[] craftingContents = event.getContents().clone();
+  			if (event.isCancelled()) { return; }
+  			for (ItemMap itemMap: ItemUtilities.getItems()) {
+  				if (!event.isCancelled() && itemMap.isCraftingItem() && itemMap.isSimilar(craftingContents[i])) {
+  					event.setCancelled(true);
+  				} else if (event.isCancelled()) { return; }
+  			}
+  		}
+	}
+	
+	@EventHandler(priority = EventPriority.HIGHEST)
+    private void onCraftingOpen(InventoryOpenEvent event) {
+    	final Player player = (Player) event.getPlayer();
+    	if (!craftingOpenItems.containsKey(PlayerHandler.getPlayerID(player))) {
+	    	craftingOpenItems.put(PlayerHandler.getPlayerID(player), craftingItems.get(PlayerHandler.getPlayerID(player)));
+			ItemHandler.removeCraftItems(player);
+	    	PlayerHandler.updateInventory(player);
+    	}
+    }
 	
 	@EventHandler(priority = EventPriority.HIGHEST)
     private void onCraftingClose(InventoryCloseEvent event) {
@@ -58,6 +85,18 @@ public class InventoryCrafting implements Listener {
     		}
     		for (int i = 0; i <= 4; i++) { view.setItem(i, new ItemStack(Material.AIR)); }
     		for (int i = 0; i <= 4; i++) { this.delayReturnItem(player, i, craftingContents[i], 1L); }
+    	}else {
+    		new BukkitRunnable() {
+                @Override
+                public void run() {
+            		if (PlayerHandler.isCraftingInv(player.getOpenInventory()) && craftingOpenItems.containsKey(PlayerHandler.getPlayerID(player))) {
+                    	ItemStack[] craftingContents = craftingOpenItems.get(PlayerHandler.getPlayerID(player));
+            			for (int i = 4; i >= 0; i--) { delayReturnItem(player, i, craftingContents[i], 1L); }
+            			creativeCraftingItems.remove(PlayerHandler.getPlayerID(player));
+            		}
+                	
+                }
+            }.runTaskAsynchronously(ItemJoin.getInstance());
     	}
     }
     
@@ -155,7 +194,7 @@ public class InventoryCrafting implements Listener {
     }
     
     public static void cycleTask() {
-    	Bukkit.getScheduler().scheduleSyncRepeatingTask(ItemJoin.getInstance(), new Runnable() {
+    	Bukkit.getScheduler().runTaskTimerAsynchronously(ItemJoin.getInstance(), new Runnable() {
     		public void run() {
     			Collection < ? > playersOnlineNew = null;
     			Player[] playersOnlineOld;
@@ -199,7 +238,7 @@ public class InventoryCrafting implements Listener {
     				ServerHandler.sendDebugTrace(e);
     			}
     		}
-    	}, 0L, 100L);
+    	}, 0L, 40L);
     }
     
     private void delayReturnItem(final Player player, final int slot, final ItemStack item, long delay) {
@@ -230,5 +269,9 @@ public class InventoryCrafting implements Listener {
     
     public static HashMap<String, ItemStack[]> getCreativeCraftItems() {
     	return creativeCraftingItems;
+    }
+    
+    public static HashMap<String, ItemStack[]> getOpenCraftItems() {
+    	return craftingOpenItems;
     }
 }
