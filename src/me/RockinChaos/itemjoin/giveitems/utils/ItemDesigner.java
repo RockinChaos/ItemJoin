@@ -26,10 +26,11 @@ import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.utils.Legacy;
+import me.RockinChaos.itemjoin.utils.Reflection;
 import me.RockinChaos.itemjoin.utils.Chances;
 import me.RockinChaos.itemjoin.utils.ImageMap;
-import me.RockinChaos.itemjoin.utils.Reflection;
 import me.RockinChaos.itemjoin.utils.Utils;
+
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.vk2gpz.tokenenchant.api.TokenEnchantAPI;
@@ -327,7 +328,7 @@ public class ItemDesigner {
 	private void setNBTData(ItemMap itemMap) {
 		if (ConfigHandler.dataTagsEnabled() && !itemMap.isVanilla() && !itemMap.isVanillaControl() && !itemMap.isVanillaStatus()) {
 			try {
-				Object tag = Reflection.getNMS("NBTTagCompound").getConstructor().newInstance();
+				Object tag = Reflection.getMinecraftClass("NBTTagCompound").getConstructor().newInstance();
 				tag.getClass().getMethod("setString", String.class, String.class).invoke(tag, "ItemJoin Name", itemMap.getConfigName());
 				tag.getClass().getMethod("setString", String.class, String.class).invoke(tag, "ItemJoin Slot", itemMap.getItemValue());
 				itemMap.setNewNBTData(itemMap.getConfigName() + " " + itemMap.getItemValue(), tag);

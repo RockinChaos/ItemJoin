@@ -71,8 +71,8 @@ public class ItemHandler {
 	public static String getNBTData(ItemStack tempitem) {
 		if (ConfigHandler.dataTagsEnabled() && ServerHandler.hasSpecificUpdate("1_8") && tempitem != null && tempitem.getType() != Material.AIR) {
 		try {
-		Class<?> craftItemStack = Reflection.getOBC("inventory.CraftItemStack");
-		Class<?> nmsItemStackClass = Reflection.getNMS("ItemStack");
+		Class<?> craftItemStack = Reflection.getCraftBukkitClass("inventory.CraftItemStack");
+		Class<?> nmsItemStackClass = Reflection.getMinecraftClass("ItemStack");
 		Method getNMSI = craftItemStack.getMethod("asNMSCopy", ItemStack.class);
 		Object nms = getNMSI.invoke(null, tempitem);
 		Object cacheTag = nmsItemStackClass.getMethod("getTag").invoke(nms);
@@ -368,7 +368,7 @@ public class ItemHandler {
 	public static ItemMeta setSkullOwner(ItemMeta tempmeta, String owner) {
 		if (ServerHandler.hasSpecificUpdate("1_8")) {
 			try {
-				Method fetchProfile = Reflection.getOBC("entity.CraftPlayer").getDeclaredMethod("getProfile");
+				Method fetchProfile = Reflection.getCraftBukkitClass("entity.CraftPlayer").getDeclaredMethod("getProfile");
 				Field declaredField = tempmeta.getClass().getDeclaredField("profile");
 				declaredField.setAccessible(true);
 				if (PlayerHandler.getPlayerString(owner) != null) {
@@ -430,7 +430,7 @@ public class ItemHandler {
 	
 	public static String getSkullSkinTexture(ItemMeta meta) {
 		try {
-			final Class < ? > cls = Reflection.getOBC("inventory.CraftMetaSkull");
+			final Class < ? > cls = Reflection.getCraftBukkitClass("inventory.CraftMetaSkull");
 			final Object real = cls.cast(meta);
 			final Field field = real.getClass().getDeclaredField("profile");
 			field.setAccessible(true);

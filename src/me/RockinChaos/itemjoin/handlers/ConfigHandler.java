@@ -43,8 +43,8 @@ import me.RockinChaos.itemjoin.utils.UI;
 import me.RockinChaos.itemjoin.utils.Language;
 import me.RockinChaos.itemjoin.utils.Logger;
 import me.RockinChaos.itemjoin.utils.Metrics;
-import me.RockinChaos.itemjoin.utils.Reflection;
 import me.RockinChaos.itemjoin.utils.TabComplete;
+import me.RockinChaos.itemjoin.utils.Reflection;
 import me.RockinChaos.itemjoin.utils.Utils;
 import me.RockinChaos.itemjoin.utils.YAMLGenerator;
 import me.RockinChaos.itemjoin.utils.protocol.ProtocolManager;
@@ -86,7 +86,7 @@ public class ConfigHandler {
 	
 	public static void registerPrevents() {
 		if ((!Utils.containsIgnoreCase(ConfigHandler.isPreventPickups(), "FALSE") && !Utils.containsIgnoreCase(ConfigHandler.isPreventPickups(), "DISABLED"))) {
-			if (ServerHandler.hasSpecificUpdate("1_12") && Reflection.getEventClass("entity.EntityPickupItemEvent") != null && !isListenerEnabled(Pickups.class.getSimpleName())) { 
+			if (ServerHandler.hasSpecificUpdate("1_12") && Reflection.getBukkitClass("event.entity.EntityPickupItemEvent") != null && !isListenerEnabled(Pickups.class.getSimpleName())) { 
 				ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Pickups(), ItemJoin.getInstance()); 
 			} else if (!isListenerEnabled(Legacy_Pickups.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Legacy_Pickups(), ItemJoin.getInstance()); }
 		}
@@ -479,7 +479,7 @@ public class ConfigHandler {
 				ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Storable(), ItemJoin.getInstance());
 			}
 		}
-		if (itemMap.isMovement() && ServerHandler.hasCombatUpdate() && Reflection.getEventClass("player.PlayerSwapHandItemsEvent") != null && !isListenerEnabled(SwitchHands.class.getSimpleName())) {
+		if (itemMap.isMovement() && ServerHandler.hasCombatUpdate() && Reflection.getBukkitClass("event.player.PlayerSwapHandItemsEvent") != null && !isListenerEnabled(SwitchHands.class.getSimpleName())) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new SwitchHands(), ItemJoin.getInstance());
 		}
 	}

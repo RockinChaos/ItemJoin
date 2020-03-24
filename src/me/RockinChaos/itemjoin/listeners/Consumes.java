@@ -26,7 +26,7 @@ public class Consumes implements Listener {
 			ItemMap itemMap = ItemUtilities.getItemMap(item, null, player.getWorld());
 			if (itemMap != null && itemMap.getMaterial() == Material.GOLDEN_APPLE && itemMap.isCustomConsumable()) {
 				if (itemMap.getPotionEffect() != null && !itemMap.getPotionEffect().isEmpty()) {
-					for (PotionEffect potion: itemMap.getPotionEffect()) { player.addPotionEffect(potion, true); }
+					for (PotionEffect potion: itemMap.getPotionEffect()) { player.addPotionEffect(potion); }
 				}
 				event.setCancelled(true);
 				player.getInventory().remove(item);

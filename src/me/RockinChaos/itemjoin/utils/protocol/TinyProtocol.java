@@ -9,9 +9,10 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.ChannelPromise;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
+import me.RockinChaos.itemjoin.utils.Reflection;
 import me.RockinChaos.itemjoin.utils.Utils;
-import me.RockinChaos.itemjoin.utils.protocol.TinyReflection.FieldAccessor;
-import me.RockinChaos.itemjoin.utils.protocol.TinyReflection.MethodInvoker;
+import me.RockinChaos.itemjoin.utils.Reflection.FieldAccessor;
+import me.RockinChaos.itemjoin.utils.Reflection.MethodInvoker;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -47,19 +48,19 @@ import com.mojang.authlib.GameProfile;
 public abstract class TinyProtocol {
 	private final AtomicInteger ID = new AtomicInteger(0);
 
-	private final MethodInvoker getPlayerHandle = TinyReflection.getMethod("{obc}.entity.CraftPlayer", "getHandle");
-	private final FieldAccessor<Object> getConnection = TinyReflection.getField("{nms}.EntityPlayer", "playerConnection", Object.class);
-	private final FieldAccessor<Object> getManager = TinyReflection.getField("{nms}.PlayerConnection", "networkManager", Object.class);
-	private final FieldAccessor<Channel> getChannel = TinyReflection.getField("{nms}.NetworkManager", Channel.class, 0);
+	private final MethodInvoker getPlayerHandle = Reflection.getMethod("{obc}.entity.CraftPlayer", "getHandle");
+	private final FieldAccessor<Object> getConnection = Reflection.getField("{nms}.EntityPlayer", "playerConnection", Object.class);
+	private final FieldAccessor<Object> getManager = Reflection.getField("{nms}.PlayerConnection", "networkManager", Object.class);
+	private final FieldAccessor<Channel> getChannel = Reflection.getField("{nms}.NetworkManager", Channel.class, 0);
 
-	private final Class<Object> minecraftServerClass = TinyReflection.getUntypedClass("{nms}.MinecraftServer");
-	private final Class<Object> serverConnectionClass = TinyReflection.getUntypedClass("{nms}.ServerConnection");
-	private final FieldAccessor<Object> getMinecraftServer = TinyReflection.getField("{obc}.CraftServer", minecraftServerClass, 0);
-	private final FieldAccessor<Object> getServerConnection = TinyReflection.getField(minecraftServerClass, serverConnectionClass, 0);
-	private final MethodInvoker getNetworkMarkers = TinyReflection.getTypedMethod(serverConnectionClass, null, List.class, serverConnectionClass);
+	private final Class<Object> minecraftServerClass = Reflection.getUntypedClass("{nms}.MinecraftServer");
+	private final Class<Object> serverConnectionClass = Reflection.getUntypedClass("{nms}.ServerConnection");
+	private final FieldAccessor<Object> getMinecraftServer = Reflection.getField("{obc}.CraftServer", minecraftServerClass, 0);
+	private final FieldAccessor<Object> getServerConnection = Reflection.getField(minecraftServerClass, serverConnectionClass, 0);
+	private final MethodInvoker getNetworkMarkers = Reflection.getTypedMethod(serverConnectionClass, null, List.class, serverConnectionClass);
 
-	private final Class<?> PACKET_LOGIN_IN_START = TinyReflection.getMinecraftClass("PacketLoginInStart");
-	private final FieldAccessor<GameProfile> getGameProfile = TinyReflection.getField(PACKET_LOGIN_IN_START, GameProfile.class, 0);
+	private final Class<?> PACKET_LOGIN_IN_START = Reflection.getMinecraftClass("PacketLoginInStart");
+	private final FieldAccessor<GameProfile> getGameProfile = Reflection.getField(PACKET_LOGIN_IN_START, GameProfile.class, 0);
 
 	private Map<String, Channel> channelLookup = new MapMaker().weakValues().makeMap();
 	private Listener listener;
@@ -169,7 +170,7 @@ public abstract class TinyProtocol {
 		this.networkManagers = (List<Object>) this.getNetworkMarkers.invoke(null, serverConnection);
 		this.createServerChannelHandler();
 		for (int i = 0; looking; i++) {
-			List<Object> list = TinyReflection.getField(serverConnection.getClass(), List.class, i).get(serverConnection);
+			List<Object> list = Reflection.getField(serverConnection.getClass(), List.class, i).get(serverConnection);
 			for (Object item : list) {
 				if (!ChannelFuture.class.isInstance(item))
 					break;
