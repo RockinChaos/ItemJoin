@@ -443,7 +443,7 @@ public class ConfigHandler {
 	            	ItemHandler.restoreCraftItems();
 	            	if (ServerHandler.hasSpecificUpdate("1_12")) { getProtocolManager().handleProtocols(); }
 	            }
-	        }, 80L);
+	        }, 40L);
 			if (!isListenerEnabled(PlayerQuit.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerQuit(), ItemJoin.getInstance()); }
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new InventoryCrafting(), ItemJoin.getInstance());
 		}

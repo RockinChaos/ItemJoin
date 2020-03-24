@@ -10,7 +10,6 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.channel.ChannelPromise;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.utils.Reflection;
-import me.RockinChaos.itemjoin.utils.Utils;
 import me.RockinChaos.itemjoin.utils.Reflection.FieldAccessor;
 import me.RockinChaos.itemjoin.utils.Reflection.MethodInvoker;
 
@@ -350,19 +349,8 @@ public abstract class TinyProtocol {
 		} catch (IllegalArgumentException e) {
 			return (PacketInterceptor) channel.pipeline().get(this.handlerName);
 		} catch (ClassCastException e) {
-			return this.resolveClassException(channel);
-		}
-	}
-	
-	private PacketInterceptor resolveClassException(Channel channel) {
-		try {
-			this.handlerName += Utils.getRandom(0, 5);
-			PacketInterceptor interceptor = new PacketInterceptor();
-			channel.pipeline().addBefore("packet_handler", this.handlerName, interceptor);
-			this.uninjectedChannels.remove(channel);
-			return interceptor;
-		} catch (ClassCastException e) {
-			return this.resolveClassException(channel);
+			channel.pipeline().remove(this.handlerName);
+			return this.injectChannelInternal(channel);
 		}
 	}
 
@@ -449,7 +437,6 @@ public abstract class TinyProtocol {
 	/**
 	 * Channel handler that is inserted into the player's channel pipeline, allowing us to intercept sent and received packets.
 	 * 
-	 * @author Kristian
 	 */
 	private final class PacketInterceptor extends ChannelDuplexHandler {
 		public volatile Player player;
