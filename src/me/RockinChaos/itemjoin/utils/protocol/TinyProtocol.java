@@ -57,7 +57,7 @@ public abstract class TinyProtocol {
 	private final Class<Object> serverConnectionClass = Reflection.getUntypedClass("{nms}.ServerConnection");
 	private final FieldAccessor<Object> getMinecraftServer = Reflection.getField("{obc}.CraftServer", minecraftServerClass, 0);
 	private final FieldAccessor<Object> getServerConnection = Reflection.getField(minecraftServerClass, serverConnectionClass, 0);
-	private final MethodInvoker getNetworkMarkers = Reflection.getTypedMethod(serverConnectionClass, null, List.class, serverConnectionClass);
+	private final FieldAccessor<?> getNetworkMarkers = Reflection.getField(serverConnectionClass, (Class<?>)List.class, 1);
 
 	private final Class<?> PACKET_LOGIN_IN_START = Reflection.getMinecraftClass("PacketLoginInStart");
 	private final FieldAccessor<GameProfile> getGameProfile = Reflection.getField(PACKET_LOGIN_IN_START, GameProfile.class, 0);
@@ -145,13 +145,15 @@ public abstract class TinyProtocol {
 	private void registerBukkitEvents() {
 		this.listener = new Listener() {
 			@EventHandler(priority = EventPriority.LOWEST)
-			public final void onPlayerLogin(PlayerLoginEvent e) {
+			public final void onPlayerLogin(PlayerLoginEvent event) {
 				if (closed)
 					return;
-				Channel channel = getChannel(e.getPlayer());
-				if (!uninjectedChannels.contains(channel)) {
-					injectPlayer(e.getPlayer());
-				}
+				try {
+					Channel channel = getChannel(event.getPlayer());
+					if (!uninjectedChannels.contains(channel)) {
+						injectPlayer(event.getPlayer());
+					}
+				} catch (NullPointerException e) { }
 			}
 			@EventHandler
 			public final void onPluginDisable(PluginDisableEvent e) {
@@ -167,7 +169,7 @@ public abstract class TinyProtocol {
 		Object mcServer = this.getMinecraftServer.get(Bukkit.getServer());
 		Object serverConnection = this.getServerConnection.get(mcServer);
 		boolean looking = true;
-		this.networkManagers = (List<Object>) this.getNetworkMarkers.invoke(null, serverConnection);
+		this.networkManagers = (List<Object>) this.getNetworkMarkers.get(serverConnection);
 		this.createServerChannelHandler();
 		for (int i = 0; looking; i++) {
 			List<Object> list = Reflection.getField(serverConnection.getClass(), List.class, i).get(serverConnection);

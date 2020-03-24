@@ -192,10 +192,11 @@ public class ConfigHandler {
 	}
 	
 	public static void langFile() {
-		if (getConfig("config.yml").getString("Language").replace(" ", "").equalsIgnoreCase("TraditionalChinese") || getConfig("config.yml").getString("Language").equalsIgnoreCase("Chinese")) { affixLang("tw"); } 
-		else if (getConfig("config.yml").getString("Language").replace(" ", "").equalsIgnoreCase("SimplifiedChinese")) { affixLang("cn"); } 
-		else if (Utils.containsIgnoreCase(getConfig("config.yml").getString("Language").replace(" ", ""), "Chinese")) { affixLang("tw"); } 
-		else if (getConfig("config.yml").getString("Language").replace(" ", "").equalsIgnoreCase("Spanish")) { affixLang("es"); } 
+		String lang = getConfig("config.yml").getString("Language").replace(" ", "");
+		if (lang.equalsIgnoreCase("TraditionalChinese") || lang.equalsIgnoreCase("TwChinese") || getConfig("config.yml").getString("Language").equalsIgnoreCase("Chinese")) { affixLang("tw"); } 
+		else if (lang.equalsIgnoreCase("SimplifiedChinese") || lang.equalsIgnoreCase("CnChinese")) { affixLang("cn"); } 
+		else if (Utils.containsIgnoreCase(lang, "Chinese")) { affixLang("tw"); } 
+		else if (lang.replace(" ", "").equalsIgnoreCase("Spanish")) { affixLang("es"); } 
 		else { affixLang("en"); }
 	}
 	

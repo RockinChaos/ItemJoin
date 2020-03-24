@@ -269,8 +269,7 @@ public final class Reflection {
 	 * @return The class.
 	 */
 	public static Class<Object> getUntypedClass(String lookupName) {
-		@SuppressWarnings({ "rawtypes" })
-		Class<Object> clazz = (Class) getClass(lookupName);
+		Class<Object> clazz = (Class<Object>) getClass(lookupName);
 		return clazz;
 	}
 	
