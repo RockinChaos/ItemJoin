@@ -503,11 +503,13 @@ public class Commands implements CommandExecutor {
 			        }
 			    } catch (Exception e) { ServerHandler.sendDebugTrace(e);  }
 			    ItemMap itemMap = ItemUtilities.getItemMap(null, args[1], null);
+		    	if (itemMap != null) { 
 		    	String[] placeHolders = Language.newString(); placeHolders[12] = givenPlayers.toString().replace("]", "").replace("[", ""); placeHolders[3] = Utils.translateLayout(itemMap.getCustomName(), null);
 			    if (amount == 0) { amount = itemMap.getCount(); }
-			    placeHolders[11] = amount + "";
-		    	if (!givenPlayers.isEmpty()) { Language.sendLangMessage("Commands.Get.toOnlinePlayers", sender, placeHolders); } 
-			    else { Language.sendLangMessage("Commands.Get.onlinePlayersHaveItem", sender, placeHolders); }
+				    placeHolders[11] = amount + "";
+			    	if (!givenPlayers.isEmpty()) { Language.sendLangMessage("Commands.Get.toOnlinePlayers", sender, placeHolders); } 
+				    else { Language.sendLangMessage("Commands.Get.onlinePlayersHaveItem", sender, placeHolders); }
+		    	}
 			} else { Language.sendLangMessage("Commands.Default.noPermission", sender); }
 			return true;
 		} else if (args[0].equalsIgnoreCase("getOnline")) {
@@ -566,9 +568,9 @@ public class Commands implements CommandExecutor {
 							String customName = Utils.translateLayout(item.getCustomName(), ((Player) sender));
 							if (!item.hasItem(((Player) sender)) || amount != 0 || item.isAlwaysGive()) {
 								if (!(ConfigHandler.getItemPermissions()) || item.hasPermission(((Player) sender)) && ConfigHandler.getItemPermissions()) {
-									if (item.isAlwaysGive() && args.length != 4) { amount = item.getCount(); }
 									item.giveTo(((Player) sender), true, amount);
-									String[] placeHolders = Language.newString(); placeHolders[3] = customName; if (amount == 0) { amount += 1; } placeHolders[11] = amount + "";
+									String[] placeHolders = Language.newString(); placeHolders[3] = customName; 
+									if (amount == 0) { amount += 1; } placeHolders[11] = amount + "";
 									Language.sendLangMessage("Commands.Get.toYou", sender, placeHolders);
 								} else {
 									String[] placeHolders = Language.newString(); placeHolders[3] = customName;
@@ -685,9 +687,15 @@ public class Commands implements CommandExecutor {
 			            }
 			        }
 			    } catch (Exception e) { ServerHandler.sendDebugTrace(e);  }
-		    	String[] placeHolders = Language.newString(); placeHolders[12] = removedPlayers.toString().replace("]", "").replace("[", ""); placeHolders[3] = Utils.translateLayout(ItemUtilities.getItemMap(null, args[1], null).getCustomName(), null); if (amount == 0) { placeHolders[11] = "\u221e"; } else { placeHolders[11] = amount + ""; }
-			    if (!removedPlayers.isEmpty()) { Language.sendLangMessage("Commands.Remove.fromOnlinePlayers", sender, placeHolders); } 
-			    else { Language.sendLangMessage("Commands.Remove.notInOnlinePlayersInventory", sender, placeHolders); }
+		    	String[] placeHolders = Language.newString(); 
+		    	placeHolders[12] = removedPlayers.toString().replace("]", "").replace("[", ""); 
+			    ItemMap itemMap = ItemUtilities.getItemMap(null, args[1], null);
+		    	if (itemMap != null) {
+			    	placeHolders[3] = Utils.translateLayout(itemMap.getCustomName(), null);
+			    	if (amount == 0) { placeHolders[11] = "\u221e"; } else { placeHolders[11] = amount + ""; }
+				    if (!removedPlayers.isEmpty()) { Language.sendLangMessage("Commands.Remove.fromOnlinePlayers", sender, placeHolders); } 
+				    else { Language.sendLangMessage("Commands.Remove.notInOnlinePlayersInventory", sender, placeHolders); }
+		    	}
 			} else { Language.sendLangMessage("Commands.Default.noPermission", sender); }
 			return true;
 		} else if (args[0].equalsIgnoreCase("removeOnline")) {
@@ -704,7 +712,8 @@ public class Commands implements CommandExecutor {
 				int amount = 0; if (args.length == 4) { amount = Integer.parseInt(args[3]); }
 				for (ItemMap item: ItemUtilities.getItems()) {
 					if (item.getConfigName().equalsIgnoreCase(args[1])) {
-						String[] placeHolders = Language.newString(); placeHolders[3] = Utils.translateLayout(item.getCustomName(), argsPlayer); placeHolders[1] = sender.getName(); if (amount == 0) { placeHolders[11] = "\u221e"; } else { placeHolders[11] = amount + ""; }
+						String[] placeHolders = Language.newString(); placeHolders[3] = Utils.translateLayout(item.getCustomName(), argsPlayer); 
+						placeHolders[1] = sender.getName(); if (amount == 0) { placeHolders[11] = "\u221e"; } else { placeHolders[11] = amount + ""; }
 						if (item.hasItem(argsPlayer)) {
 							item.removeFrom(argsPlayer, amount);
 							Language.sendLangMessage("Commands.Remove.fromYou", argsPlayer, placeHolders);
@@ -827,7 +836,9 @@ public class Commands implements CommandExecutor {
                 	if (!item.hasItem(argsPlayer) || amount != 0 || item.isAlwaysGive()) {
                 		if (item.isAlwaysGive() && amount == 0) { amount = item.getCount(); }
                 		item.giveTo(argsPlayer, true, amount);
-						String[] placeHolders = Language.newString(); placeHolders[3] = Utils.translateLayout(item.getCustomName(), argsPlayer); placeHolders[1] = sender.getName(); if (amount == 0) { amount += 1; } placeHolders[11] = amount + "";
+						String[] placeHolders = Language.newString(); 
+						placeHolders[3] = Utils.translateLayout(item.getCustomName(), argsPlayer); 
+						placeHolders[1] = sender.getName(); if (amount == 0) { amount += 1; } placeHolders[11] = amount + "";
 						Language.sendLangMessage("Commands.Get.toYou", argsPlayer, placeHolders);
 						itemGiven = true;
                 	} else {
@@ -849,7 +860,9 @@ public class Commands implements CommandExecutor {
         for (ItemMap item: ItemUtilities.getItems()) {
             if (item.getConfigName().equalsIgnoreCase(args)) {
                 itemExists = true;
-				String[] placeHolders = Language.newString(); placeHolders[3] = Utils.translateLayout(item.getCustomName(), argsPlayer); placeHolders[1] = sender.getName();
+				String[] placeHolders = Language.newString(); 
+				placeHolders[3] = Utils.translateLayout(item.getCustomName(), argsPlayer); placeHolders[1] = sender.getName(); 
+				if (amount == 0) { placeHolders[11] = "\u221e"; } else { placeHolders[11] = amount + ""; }
                 if (item.hasItem(argsPlayer)) {
                     item.removeFrom(argsPlayer, amount);
 					Language.sendLangMessage("Commands.Remove.fromYou", argsPlayer, placeHolders);
