@@ -54,7 +54,7 @@ public class InventoryCrafting implements Listener {
     private void onCraftingOpen(InventoryOpenEvent event) {
     	final Player player = (Player) event.getPlayer();
     	if (!craftingOpenItems.containsKey(PlayerHandler.getPlayerID(player))) {
-	    	craftingOpenItems.put(PlayerHandler.getPlayerID(player), craftingItems.get(PlayerHandler.getPlayerID(player)));
+	    	craftingOpenItems.put(PlayerHandler.getPlayerID(player), this.getContents(player));
 			ItemHandler.removeCraftItems(player);
 	    	PlayerHandler.updateInventory(player);
     	}
@@ -90,11 +90,13 @@ public class InventoryCrafting implements Listener {
                 @Override
                 public void run() {
             		if (PlayerHandler.isCraftingInv(player.getOpenInventory()) && craftingOpenItems.containsKey(PlayerHandler.getPlayerID(player))) {
-                    	ItemStack[] craftingContents = craftingOpenItems.get(PlayerHandler.getPlayerID(player));
-            			for (int i = 4; i >= 0; i--) { delayReturnItem(player, i, craftingContents[i], 1L); }
-            			creativeCraftingItems.remove(PlayerHandler.getPlayerID(player));
+                    	ItemStack[] openCraftContents = craftingOpenItems.get(PlayerHandler.getPlayerID(player));
+            			if (openCraftContents != null && openCraftContents.length != 0) { 
+                    	for (int i = 4; i >= 0; i--) { delayReturnItem(player, i, openCraftContents[i], 1L); }
+                    	craftingItems.put(PlayerHandler.getPlayerID(player), craftingOpenItems.get(PlayerHandler.getPlayerID(player)));
+            			craftingOpenItems.remove(PlayerHandler.getPlayerID(player));
+            			}
             		}
-                	
                 }
             }.runTaskAsynchronously(ItemJoin.getInstance());
     	}
@@ -242,7 +244,7 @@ public class InventoryCrafting implements Listener {
     }
     
     private void delayReturnItem(final Player player, final int slot, final ItemStack item, long delay) {
-    	if (slot == 0) { delay = 3L; }
+    	if (item == null) { return; } if (slot == 0) { delay = 3L; }
     	Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
     		@Override
     		public void run() {
@@ -261,6 +263,18 @@ public class InventoryCrafting implements Listener {
     	location.setY(location.getY() + 1);
     	Item dropped = player.getWorld().dropItem(location, item);
 		dropped.setVelocity(location.getDirection().multiply(.30));
+    }
+    
+    private ItemStack[] getContents(Player player) {
+		ItemStack[] tempContents = player.getOpenInventory().getTopInventory().getContents();
+		ItemStack[] contents = new ItemStack[5];
+		if (contents != null && tempContents != null) { 
+			for (int i = 0; i <= 4; i++) { 
+				contents[i] = tempContents[i].clone(); 
+			} 
+			return contents;
+		}
+		return tempContents;
     }
     
     public static HashMap<String, ItemStack[]> getCraftItems() {
