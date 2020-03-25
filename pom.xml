@@ -6,7 +6,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>me.RockinChaos.itemjoin</groupId>
 	<artifactId>ItemJoin</artifactId>
-	<version>5.0.6-SNAPSHOT-b${env.BUILD_NUMBER}</version>
+	<version>5.0.6-RELEASE-b${env.BUILD_NUMBER}</version>
 	<build>
 		<sourceDirectory>${project.basedir}</sourceDirectory>
 		<resources>
