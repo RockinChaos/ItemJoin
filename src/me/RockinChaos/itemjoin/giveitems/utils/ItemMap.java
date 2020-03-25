@@ -1472,7 +1472,7 @@ public class ItemMap {
 	}
      
 	public boolean isSimilar(ItemStack item) {
-		if (item != null && item.getType() != Material.AIR && item.getType() == this.material || this.materialAnimated && item != null && item.getType() != Material.AIR && this.isMaterial(item)) {
+		if ((item != null && item.getType() != Material.AIR && item.getType() == this.material) || (this.materialAnimated && item != null && item.getType() != Material.AIR && this.isMaterial(item))) {
 			if (this.vanillaControl || ConfigHandler.dataTagsEnabled() && ServerHandler.hasSpecificUpdate("1_8") && ItemHandler.getNBTData(item) != null && Utils.containsIgnoreCase(ItemHandler.getNBTData(item), this.newNBTData)
 					|| this.legacySecret != null && item.hasItemMeta() && item.getItemMeta().hasDisplayName() && item.getItemMeta().getDisplayName().contains(this.legacySecret) || this.vanillaStatus) {
 				if (this.skullCheck(item)) {
@@ -1493,19 +1493,19 @@ public class ItemMap {
 	}
 	
 	private boolean statsCheck(ItemStack item) {
-		if (item.hasItemMeta() && item.getItemMeta().hasDisplayName() && this.tempMeta.hasDisplayName() && item.getItemMeta().hasLore() && this.tempMeta.hasLore()) {
+		if (item.hasItemMeta() && item.getItemMeta().hasDisplayName() && this.tempMeta != null && this.tempMeta.hasDisplayName() && item.getItemMeta().hasLore() && this.tempMeta.hasLore()) {
 			if (item.getItemMeta().getDisplayName().equalsIgnoreCase(this.tempMeta.getDisplayName()) && item.getItemMeta().getLore().toString().equalsIgnoreCase(this.tempMeta.getLore().toString())) {
 				return true;
 			}
-		} else if (item.hasItemMeta() && item.getItemMeta().hasDisplayName() && this.tempMeta.hasDisplayName() && !item.getItemMeta().hasLore() && !this.tempMeta.hasLore()) {
+		} else if (item.hasItemMeta() && item.getItemMeta().hasDisplayName() && this.tempMeta != null && this.tempMeta.hasDisplayName() && !item.getItemMeta().hasLore() && !this.tempMeta.hasLore()) {
 			if (item.getItemMeta().getDisplayName().equalsIgnoreCase(this.tempMeta.getDisplayName())) {
 				return true;
 			}
-		} else if (item.hasItemMeta() && !item.getItemMeta().hasDisplayName() && !this.tempMeta.hasDisplayName() && item.getItemMeta().hasLore() && this.tempMeta.hasLore()) {
+		} else if (item.hasItemMeta() && !item.getItemMeta().hasDisplayName() && this.tempMeta != null && !this.tempMeta.hasDisplayName() && item.getItemMeta().hasLore() && this.tempMeta.hasLore()) {
 			if (item.getItemMeta().getLore().toString().equalsIgnoreCase(this.tempMeta.getLore().toString())) {
 				return true;
 			}
-		}
+		} else if (this.tempMeta == null) { return true; }
 		return false;
 	}
 	
