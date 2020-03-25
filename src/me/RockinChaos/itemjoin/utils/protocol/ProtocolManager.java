@@ -10,7 +10,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredListener;
 import io.netty.channel.Channel;
 import me.RockinChaos.itemjoin.ItemJoin;
-import me.RockinChaos.itemjoin.utils.PlayerAutoCraftEvent;
+import me.RockinChaos.itemjoin.handlers.events.PlayerAutoCraftEvent;
 
 public class ProtocolManager {
 	private TinyProtocol protocol;

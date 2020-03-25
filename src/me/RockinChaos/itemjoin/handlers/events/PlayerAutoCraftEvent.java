@@ -1,4 +1,4 @@
-package me.RockinChaos.itemjoin.utils;
+package me.RockinChaos.itemjoin.handlers.events;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;

@@ -71,7 +71,6 @@ items:
       - 'message: &eYou have been set to spectator mode.'
     commands-type: interact
     commands-sound: BLOCK_NOTE_BLOCK_PLING
-    commands-cost: 8
     commands-cooldown: 2
     itemflags: item-store, death-drops, self-drops, hide-attributes, disposable
     triggers: join, respawn, world-switch

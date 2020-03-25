@@ -29,7 +29,7 @@ import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
-import me.RockinChaos.itemjoin.utils.PlayerAutoCraftEvent;
+import me.RockinChaos.itemjoin.handlers.events.PlayerAutoCraftEvent;
 
 public class InventoryCrafting implements Listener {
 	private static HashMap<String, ItemStack[]> craftingItems = new HashMap<String, ItemStack[]>();
