@@ -6,7 +6,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>me.RockinChaos.itemjoin</groupId>
 	<artifactId>ItemJoin</artifactId>
-	<version>5.0.6-RELEASE-b${env.BUILD_NUMBER}</version>
+	<version>5.0.7-SNAPSHOT-b${env.BUILD_NUMBER}</version>
 	<build>
 		<sourceDirectory>${project.basedir}</sourceDirectory>
 		<resources>
@@ -34,9 +34,9 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.8.1</version>
 				<configuration>
+					<encoding>Cp1252</encoding>
 					<source>1.8</source>
 					<target>1.8</target>
-					<encoding>Cp1252</encoding>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -178,7 +178,7 @@
 			<artifactId>log4j-core</artifactId>
 			<version>2.3</version>
 		</dependency>
-    <!--Google API-->
+    <!--GoogleCode API-->
 	    <dependency>
 	        <groupId>com.googlecode.json-simple</groupId>
 	        <artifactId>json-simple</artifactId>
