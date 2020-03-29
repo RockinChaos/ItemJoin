@@ -1,5 +1,6 @@
 package me.RockinChaos.itemjoin;
 
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
@@ -19,6 +20,7 @@ public class ItemJoin extends JavaPlugin {
   	@Override
 	public void onDisable() {
   		ServerHandler.purgeCraftItems(true);
+  		Bukkit.getScheduler().cancelTasks(this);
   		ConfigHandler.getProtocolManager().closeProtocol();
   		ConfigHandler.getSQLData().executeLaterStatements();
   		ServerHandler.sendConsoleMessage("&4has been Disabled.");

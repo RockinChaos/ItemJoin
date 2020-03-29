@@ -260,9 +260,11 @@ public class Utils {
 					playerName = np.getRealName();
 				} else { playerName = player.getName(); }
 			} catch (NoClassDefFoundError e) {
-				if (BetterNick.getApi().isPlayerNicked(player)) {
-					playerName = BetterNick.getApi().getRealName(player);
-				} else { playerName = player.getName(); }	
+				try {
+					if (BetterNick.getApi().isPlayerNicked(player)) {
+						playerName = BetterNick.getApi().getRealName(player);
+					} else { playerName = player.getName(); }	
+				} catch (NullPointerException e2) { playerName = player.getName(); }
 			}
 		} else if (player != null) { playerName = player.getName(); }
 		
