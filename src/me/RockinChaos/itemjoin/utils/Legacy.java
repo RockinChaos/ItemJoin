@@ -22,11 +22,15 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 
+/**
+ * Welcome to the magical land of make-believe.
+ * These are Deprecated Legacy Methods and/or non-functioning methods
+ * that exist to support legacy versions of Minecraft.
+ * 
+ */
 @SuppressWarnings("deprecation")
 public class Legacy {
-	
-	// WELCOME TO THE LAND OF MAKE-BELIEVE! //
-    
+
     public static void updateLegacyInventory(Player player) {
     	player.updateInventory();
     }
@@ -91,21 +95,21 @@ public class Legacy {
 	}
 	
     public static short getMapID(MapView view) {
-    	try { return (short) view.getId(); } 
-		catch (NoSuchMethodError e1) { 
-	    	try {
-	    		Object mapID = Reflection.getMinecraftClass("MapView").getMethod("getId").invoke(view);
-	    		return (short)mapID; 
-	    	} catch (Exception e2) { return 1; }
-		}	
+    	try { 
+    		return (short) view.getId(); 
+    	} catch (NoSuchMethodError e) { 			
+			try { 
+				return (short)Reflection.getBukkitClass("map.MapView").getMethod("getId").invoke(view); 
+			} catch (Exception e2) { return 1; }
+		}
     }
     
     public static MapView getMapView(int id) {
-    	try { return ItemJoin.getInstance().getServer().getMap((short) id); } 
-		catch (NoSuchMethodError e1) { 
+    	try { 
+    		return ItemJoin.getInstance().getServer().getMap((short) id); 
+    	} catch (NoSuchMethodError e) { 
 			try {
-				Object mapView = Reflection.getBukkitClass("Bukkit").getMethod("getMap", short.class).invoke(Reflection.getBukkitClass("map.MapView"), (short)id);
-				return (MapView)mapView; 
+				return (MapView)Reflection.getBukkitClass("Bukkit").getMethod("getMap", short.class).invoke(Reflection.getBukkitClass("map.MapView"), (short)id);
 			} catch (Exception e2) { return null; }
 		}
     }
@@ -113,10 +117,9 @@ public class Legacy {
     public static MapView createLegacyMapView() {
     	try {
     		return ItemJoin.getInstance().getServer().createMap(ItemJoin.getInstance().getServer().getWorlds().get(0));
-    	} catch (Exception e) { }
-    	return null;
+    	} catch (Exception e) { return null; }
     }
-    
+	
     public static ItemStack newLegacyItemStack(Material material, int count, short dataValue) {
     	return new ItemStack(material, count, dataValue);
     }

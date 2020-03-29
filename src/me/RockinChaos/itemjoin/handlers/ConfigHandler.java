@@ -13,6 +13,8 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.RegisteredListener;
+import org.bukkit.scheduler.BukkitRunnable;
+
 import me.RockinChaos.itemjoin.Commands;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.giveitems.listeners.LimitSwitch;
@@ -71,11 +73,16 @@ public class ConfigHandler {
 		setDepends(new DependAPI());
 		setSQLData(new SQLData());
 		setProtolcolManager(new ProtocolManager());
-		setItemDesigner(new ItemDesigner());
 		setItemCreator(new UI());
-		setMetrics(new Metrics());
 		setLogger(new Logger());
-		if (file != null) { sendUtilityDepends(); setUpdater(new UpdateHandler(file)); }
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+				setItemDesigner(new ItemDesigner());
+				setMetrics(new Metrics());
+				if (file != null) { sendUtilityDepends(); setUpdater(new UpdateHandler(file)); }
+		    }
+		}.runTaskAsynchronously(ItemJoin.getInstance());
 	}
 	
 	public static void registerEvents() {
