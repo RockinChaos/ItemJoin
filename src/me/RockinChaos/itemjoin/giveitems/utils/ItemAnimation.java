@@ -9,7 +9,6 @@ import java.util.UUID;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -230,9 +229,7 @@ public class ItemAnimation {
 	
 	private void setPagesData(Player player, ItemStack transAnimate, List<String> pagesString) {
 		if (ServerHandler.hasSpecificUpdate("1_8")) {
-			BookMeta tempMeta = (BookMeta) transAnimate.getItemMeta();
-			tempMeta.setPages(((BookMeta) this.itemMap.setJSONBookPages(player, transAnimate, pagesString).getItemMeta()).getPages());
-			transAnimate.setItemMeta(tempMeta);
+			transAnimate.setItemMeta(this.itemMap.setJSONBookPages(player, transAnimate, pagesString).getItemMeta());
 		} else {
 			ItemMeta itemMeta = transAnimate.getItemMeta();
 			itemMeta = this.itemMap.setLegacyBookPages(player, itemMeta, pagesString);

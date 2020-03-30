@@ -55,7 +55,6 @@ public class ItemDesigner {
 							this.setEnchantments(itemMap);
 							this.setMapImage(itemMap);
 							this.setJSONBookPages(itemMap);
-							this.setNBTData(itemMap);
 							this.setName(itemMap);
 							this.setLore(itemMap);
 							this.setDurability(itemMap);
@@ -320,25 +319,6 @@ public class ItemDesigner {
 		}
 	}
 //  =========================================================================================================================================================================================================================== //
-	
-//  =============================================== //
-//      ~ Sets the NBTData to the Custom Item ~     //
-//  This designs the item to be unique to ItemJoin. //
-//  =============================================== //
-	private void setNBTData(ItemMap itemMap) {
-		if (ConfigHandler.dataTagsEnabled() && !itemMap.isVanilla() && !itemMap.isVanillaControl() && !itemMap.isVanillaStatus()) {
-			try {
-				Object tag = Reflection.getMinecraftClass("NBTTagCompound").getConstructor().newInstance();
-				tag.getClass().getMethod("setString", String.class, String.class).invoke(tag, "ItemJoin Name", itemMap.getConfigName());
-				tag.getClass().getMethod("setString", String.class, String.class).invoke(tag, "ItemJoin Slot", itemMap.getItemValue());
-				itemMap.setNewNBTData(itemMap.getConfigName() + " " + itemMap.getItemValue(), tag);
-			} catch (Exception e) {
-				ServerHandler.sendDebugMessage("Error 133 has occured when setting NBTData to an item.");
-				ServerHandler.sendDebugTrace(e);
-			}
-		} else { itemMap.setLegacySecret(ConfigHandler.encodeSecretData(ConfigHandler.getNBTData(itemMap))); }
-	}
-//  =========================================================================================================================================================== //
 	
 //  ========================================================== //
 //         ~ Sets the Book Pages to the Custom Item ~          //

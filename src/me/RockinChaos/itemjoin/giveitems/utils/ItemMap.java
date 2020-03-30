@@ -130,7 +130,6 @@ public class ItemMap {
 //         NBT Information for each item.          //
 //  ============================================== //
     private String newNBTData;
-    private Object newNBTTag;
     private String legacySecret;
 //  ============================================== //
 	
@@ -262,6 +261,7 @@ public class ItemMap {
 	        this.setPerm(this.nodeLocation.getString(".permission-node"));
 	        this.setPermissionNeeded(ConfigHandler.getConfig("config.yml").getBoolean("Permissions.Obtain-Items"));
 	    	this.setOPPermissionNeeded(ConfigHandler.getConfig("config.yml").getBoolean("Permissions.Obtain-Items.OP"));
+	    	this.setSecretData();
         }
 	}
 //  ========================================================================================================= //
@@ -269,6 +269,12 @@ public class ItemMap {
 //  ============================================== //
 //   Setter functions for first ItemMap creation.  //
 //  ============================================== //
+	private void setSecretData() {
+		if (ConfigHandler.dataTagsEnabled() && !this.isVanilla() && !this.isVanillaControl() && !this.isVanillaStatus()) {
+			this.setNewNBTData(this.getConfigName() + " " + this.getItemValue());
+		} else { this.setLegacySecret(ConfigHandler.encodeSecretData(ConfigHandler.getNBTData(this))); }
+	}
+	
 	private void setMultipleSlots() {
         if (this.nodeLocation.getString(".slot").contains(",")) {
         	String[] slots = this.nodeLocation.getString(".slot").replace(" ", "").split(",");
@@ -887,9 +893,8 @@ public class ItemMap {
 		this.leatherHex = hex;
 	}
 	
-	public void setNewNBTData(String nbt, Object tag) {
+	public void setNewNBTData(String nbt) {
 		this.newNBTData = nbt;
-		this.newNBTTag = tag;
 	}
 	
 	public void setLegacySecret(String nbt) {
@@ -1686,7 +1691,8 @@ public class ItemMap {
 			try {
 				Class<?> craftItemStack = Reflection.getCraftBukkitClass("inventory.CraftItemStack");
 				Object nms = craftItemStack.getMethod("asNMSCopy", ItemStack.class).invoke(null, this.tempItem);
-				Object tag = Reflection.getMinecraftClass("NBTTagCompound").getConstructor().newInstance();
+				Object tag = Reflection.getMinecraftClass("ItemStack").getMethod("getTag").invoke(nms);
+				if (tag == null) { tag = Reflection.getMinecraftClass("NBTTagCompound").getConstructor().newInstance(); }
 				tag.getClass().getMethod("setInt", String.class, int.class).invoke(tag, "Unbreakable", 1);
 				nms.getClass().getMethod("setTag", tag.getClass()).invoke(nms, tag);
 				this.tempItem = (ItemStack) craftItemStack.getMethod("asCraftMirror", nms.getClass()).invoke(null, nms);
@@ -1762,7 +1768,8 @@ public class ItemMap {
 	private ItemStack invokePages(ItemStack item, Object pages) throws Exception {
 		Class<?> craftItemStack = Reflection.getCraftBukkitClass("inventory.CraftItemStack");
 		Object nms = craftItemStack.getMethod("asNMSCopy", ItemStack.class).invoke(null, item);
-		Object tag = Reflection.getMinecraftClass("NBTTagCompound").getConstructor().newInstance();
+		Object tag = Reflection.getMinecraftClass("ItemStack").getMethod("getTag").invoke(nms);
+		if (tag == null) { tag = Reflection.getMinecraftClass("NBTTagCompound").getConstructor().newInstance(); }
 		tag.getClass().getMethod("set", String.class, Reflection.getMinecraftClass("NBTBase")).invoke(tag, "pages", pages); 
 		nms.getClass().getMethod("setTag", tag.getClass()).invoke(nms, tag);
 		return ((ItemStack)craftItemStack.getMethod("asCraftMirror", nms.getClass()).invoke(null, nms));
@@ -1773,10 +1780,9 @@ public class ItemMap {
 			try {
 				Object nms = Reflection.getCraftBukkitClass("inventory.CraftItemStack").getMethod("asNMSCopy", ItemStack.class).invoke(null, this.tempItem);
 				Object cacheTag = Reflection.getMinecraftClass("ItemStack").getMethod("getTag").invoke(nms);
-				if (cacheTag != null) {
+				if (cacheTag == null) { cacheTag = Reflection.getMinecraftClass("NBTTagCompound").getConstructor().newInstance(); }
 					cacheTag.getClass().getMethod("setString", String.class, String.class).invoke(cacheTag, "ItemJoin Name", this.getConfigName());
 					cacheTag.getClass().getMethod("setString", String.class, String.class).invoke(cacheTag, "ItemJoin Slot", this.getItemValue());
-				} else { nms.getClass().getMethod("setTag", this.newNBTTag.getClass()).invoke(nms, this.newNBTTag); }
 				this.tempItem = (ItemStack) Reflection.getCraftBukkitClass("inventory.CraftItemStack").getMethod("asCraftMirror", nms.getClass()).invoke(null, nms);
 			} catch (Exception e) {
 				ServerHandler.sendDebugMessage("Error 15443 has occured when setting NBTData to an item.");
