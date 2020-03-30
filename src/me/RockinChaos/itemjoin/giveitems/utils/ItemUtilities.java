@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -19,6 +20,7 @@ import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.utils.Language;
 import me.RockinChaos.itemjoin.utils.Utils;
+import net.md_5.bungee.api.ChatColor;
 
 public class ItemUtilities {
   	private static List < ItemMap > items = new ArrayList < ItemMap >();
@@ -137,7 +139,8 @@ public class ItemUtilities {
 	public static void clearEventItems(Player player, String world, String event, String region) {
 		String clearEvent = ConfigHandler.getConfig("config.yml").getString("Clear-Items." + event);
 		if (clearEvent != null && ((region != null && !region.isEmpty() && containsObject(region, clearEvent)) || containsObject(world, clearEvent))) {
-			if (Utils.containsIgnoreCase(ConfigHandler.getConfig("config.yml").getString("Clear-Items.Bypass"), "OP") && player.isOp()) {} else {
+			if ((Utils.containsIgnoreCase(ConfigHandler.getConfig("config.yml").getString("Clear-Items.Options"), "PROTECT_OP") && player.isOp())
+					|| (Utils.containsIgnoreCase(ConfigHandler.getConfig("config.yml").getString("Clear-Items.Options"), "PROTECT_CREATIVE") && PlayerHandler.isCreativeMode(player))) {} else {
 				String clearType = ConfigHandler.getConfig("config.yml").getString("Clear-Items.Type");
 				if (clearType != null && (clearType.equalsIgnoreCase("ALL") || clearType.equalsIgnoreCase("GLOBAL") || clearType.equalsIgnoreCase("TRUE") || clearType.equalsIgnoreCase("ENABLE"))) {
 					clearAllItems(player, region, event);
@@ -149,34 +152,64 @@ public class ItemUtilities {
 			}
 		}
 	}
+	
+	public static boolean isBlacklisted(String slot, ItemStack item) {
+		String[] blacklist = null;
+		if (ConfigHandler.getConfig("config.yml").getString("Clear-Items.Blacklist") != null 
+			&& ConfigHandler.getConfig("config.yml").getString("Clear-Items.Blacklist").contains("{") 
+			&& ConfigHandler.getConfig("config.yml").getString("Clear-Items.Blacklist").contains("}")) {
+			blacklist = ConfigHandler.getConfig("config.yml").getString("Clear-Items.Blacklist").split(",");
+		}
+		
+		if (ConfigHandler.getConfig("config.yml").getString("Clear-Items.Blacklist") != null) {
+			for (String value : blacklist) {
+				String valType = (Utils.containsIgnoreCase(value, "{id") ? "id" : (Utils.containsIgnoreCase(value, "{slot") ? "slot" : (Utils.containsIgnoreCase(value, "{name") ? "name" : "")));
+					String inputResult = StringUtils.substringBetween(value, "{" + valType + ":", "}");
+					if (valType.equalsIgnoreCase("id") && item.getType() == ItemHandler.getMaterial(inputResult.trim(), null)) {
+						return true;
+					} else if (valType.equalsIgnoreCase("slot") && slot.trim().equalsIgnoreCase(inputResult.trim())) {
+						return true;
+					} else if (valType.equalsIgnoreCase("name") && item.hasItemMeta() && item.getItemMeta().hasDisplayName()) {
+						String displayName = item.getItemMeta().getDisplayName();
+						if (ChatColor.stripColor(displayName).trim().equalsIgnoreCase(inputResult.trim())) {
+							return true;
+						}
+					}
+			}
+		}
+		return false;
+	}
 
 	public static void clearAllItems(Player player, String region, String type) {
 		List < ItemMap > protectItems = getProtectItems();
 		PlayerInventory inventory = player.getInventory();
 		Inventory craftView = player.getOpenInventory().getTopInventory();
 		saveReturnItems(player, region, type, craftView, inventory, true);
-		if (!protectItems.isEmpty()) {
-			for (int i = 0; i < protectItems.size(); i++) {
-				ItemMap item = protectItems.get(i);
-				if (inventory.getHelmet() != null && !item.isSimilar(inventory.getHelmet()) && i == (protectItems.size() - 1)) {
+		if (!protectItems.isEmpty() || (ConfigHandler.getConfig("config.yml").getString("Clear-Items.Blacklist") != null && ConfigHandler.getConfig("config.yml").getString("Clear-Items.Blacklist").contains("{"))) {
+			for (int i = 0; i < (!protectItems.isEmpty() ? protectItems.size() : 1); i++) {
+				ItemMap item = null;
+				if (!protectItems.isEmpty()) { item = protectItems.get(i); }
+				if (inventory.getHelmet() != null && !isBlacklisted("Helmet", inventory.getHelmet()) && (protectItems.isEmpty() || (!item.isSimilar(inventory.getHelmet()) && i == (protectItems.size() - 1)))) {
 					inventory.setHelmet(new ItemStack(Material.AIR));
-				} if (inventory.getChestplate() != null && !item.isSimilar(inventory.getChestplate()) && i == (protectItems.size() - 1)) {
+				} if (inventory.getChestplate() != null && !isBlacklisted("Chestplate", inventory.getChestplate()) && (protectItems.isEmpty() || (!item.isSimilar(inventory.getChestplate()) && i == (protectItems.size() - 1)))) {
 					inventory.setChestplate(new ItemStack(Material.AIR));
-				} if (inventory.getLeggings() != null && !item.isSimilar(inventory.getLeggings()) && i == (protectItems.size() - 1)) {
+				} if (inventory.getLeggings() != null && !isBlacklisted("Leggings", inventory.getLeggings()) && (protectItems.isEmpty() || (!item.isSimilar(inventory.getLeggings()) && i == (protectItems.size() - 1)))) {
 					inventory.setLeggings(new ItemStack(Material.AIR));
-				} if (inventory.getBoots() != null && !item.isSimilar(inventory.getBoots()) && i == (protectItems.size() - 1)) {
+				} if (inventory.getBoots() != null && !isBlacklisted("Boots", inventory.getBoots()) && (protectItems.isEmpty() || (!item.isSimilar(inventory.getBoots()) && i == (protectItems.size() - 1)))) {
 					inventory.setBoots(new ItemStack(Material.AIR));
-				} if (ServerHandler.hasCombatUpdate() && inventory.getItemInOffHand() != null && !item.isSimilar(inventory.getBoots()) && i == (protectItems.size() - 1)) {
+				} if (ServerHandler.hasCombatUpdate() && inventory.getItemInOffHand() != null && !isBlacklisted("Offhand", inventory.getItemInOffHand()) && (protectItems.isEmpty() || (!item.isSimilar(inventory.getBoots()) && i == (protectItems.size() - 1)))) {
 					PlayerHandler.setOffHandItem(player, new ItemStack(Material.AIR));
 				} if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
 					for (int k = 0; k < player.getOpenInventory().getTopInventory().getContents().length; k++) {
-						if (!item.isSimilar(player.getOpenInventory().getTopInventory().getItem(k)) && i == (protectItems.size() - 1)) {
+						if (player.getOpenInventory().getTopInventory().getItem(k) != null && !isBlacklisted("CRAFTING[" + k + "]", player.getOpenInventory().getTopInventory().getItem(k)) && (protectItems.isEmpty() || (!item.isSimilar(player.getOpenInventory().getTopInventory().getItem(k)) && i == (protectItems.size() - 1)))) {
+							ServerHandler.sendConsoleMessage("craft   " + k);
 							craftView.setItem(k, new ItemStack(Material.AIR));
 						}
 					}
-				} for (ItemStack contents: inventory.getContents()) {
-					if (contents != null && !item.isSimilar(contents) && i == (protectItems.size() - 1)) {
-						inventory.remove(contents);
+				} for (int f = 0; f < inventory.getSize(); f++) {
+					if (inventory.getItem(f) != null && !isBlacklisted(Integer.toString(f), inventory.getItem(f)) && (protectItems.isEmpty() || (!item.isSimilar(inventory.getItem(f)) && i == (protectItems.size() - 1)))) {
+						ServerHandler.sendConsoleMessage("slot   " + f);
+						inventory.setItem(f, new ItemStack(Material.AIR));
 					}
 				}
 			}
@@ -201,27 +234,31 @@ public class ItemUtilities {
 		Inventory craftView = player.getOpenInventory().getTopInventory();
 		saveReturnItems(player, region, type, craftView, inventory, false);
 		for (ItemMap item: ItemUtilities.getItems()) {
-			if (inventory.getHelmet() != null && ((protectItems.isEmpty() && ItemHandler.containsNBTData(inventory.getHelmet())) || (!protectItems.contains(item) && item.isSimilar(inventory.getHelmet())))) {
+			if (inventory.getHelmet() != null && !isBlacklisted("Helmet", inventory.getHelmet()) && ((protectItems.isEmpty() && ItemHandler.containsNBTData(inventory.getHelmet())) || (!protectItems.contains(item) && item.isSimilar(inventory.getHelmet())))) {
 				inventory.setHelmet(new ItemStack(Material.AIR));
-			} if (inventory.getChestplate() != null && ((protectItems.isEmpty() && ItemHandler.containsNBTData(inventory.getChestplate())) || (!protectItems.contains(item) && item.isSimilar(inventory.getChestplate())))) {
+			} if (inventory.getChestplate() != null && !isBlacklisted("Chestplate", inventory.getChestplate()) 
+				&& ((protectItems.isEmpty() && ItemHandler.containsNBTData(inventory.getChestplate())) || (!protectItems.contains(item) && item.isSimilar(inventory.getChestplate())))) {
 				inventory.setChestplate(new ItemStack(Material.AIR));
-			} if (inventory.getLeggings() != null && ((protectItems.isEmpty() && ItemHandler.containsNBTData(inventory.getLeggings())) || (!protectItems.contains(item) && item.isSimilar(inventory.getLeggings())))) {
+			} if (inventory.getLeggings() != null && !isBlacklisted("Leggings", inventory.getLeggings()) 
+				&& ((protectItems.isEmpty() && ItemHandler.containsNBTData(inventory.getLeggings())) || (!protectItems.contains(item) && item.isSimilar(inventory.getLeggings())))) {
 				inventory.setLeggings(new ItemStack(Material.AIR));
-			} if (inventory.getBoots() != null && ((protectItems.isEmpty() && ItemHandler.containsNBTData(inventory.getBoots())) || (!protectItems.contains(item) && item.isSimilar(inventory.getBoots())))) {
+			} if (inventory.getBoots() != null && !isBlacklisted("Boots", inventory.getBoots()) && ((protectItems.isEmpty() && ItemHandler.containsNBTData(inventory.getBoots())) || (!protectItems.contains(item) && item.isSimilar(inventory.getBoots())))) {
 				inventory.setBoots(new ItemStack(Material.AIR));
-			} if (ServerHandler.hasCombatUpdate() && inventory.getItemInOffHand() != null && ((protectItems.isEmpty() && ItemHandler.containsNBTData(inventory.getItemInOffHand())) 
+			} if (ServerHandler.hasCombatUpdate() && inventory.getItemInOffHand() != null && !isBlacklisted("Offhand", inventory.getItemInOffHand()) && ((protectItems.isEmpty() && ItemHandler.containsNBTData(inventory.getItemInOffHand())) 
 					|| (!protectItems.contains(item) && item.isSimilar(inventory.getItemInOffHand())))) {
 				inventory.setItemInOffHand(new ItemStack(Material.AIR));
 			} if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
 				for (int k = 0; k < player.getOpenInventory().getTopInventory().getContents().length; k++) {
-					if (craftView.getItem(k) != null && craftView.getItem(k).getType() != Material.AIR && ((protectItems.isEmpty() && ItemHandler.containsNBTData(craftView.getItem(k))) 
+					if (craftView.getItem(k) != null && !isBlacklisted("CRAFTING[" + k + "]", player.getOpenInventory().getTopInventory().getItem(k)) 
+						&& craftView.getItem(k).getType() != Material.AIR && ((protectItems.isEmpty() && ItemHandler.containsNBTData(craftView.getItem(k))) 
 							|| (!protectItems.contains(item) && item.isSimilar(craftView.getItem(k))))) {
 						craftView.setItem(k, new ItemStack(Material.AIR));
 					}
 				}
-			} for (ItemStack contents: inventory.getContents()) {
-				if (contents != null && ((protectItems.isEmpty() && ItemHandler.containsNBTData(contents)) || (!protectItems.contains(item) && item.isSimilar(contents)))) {
-					inventory.remove(contents);
+			} for (int f = 0; f <= 36; f++) {
+				if (inventory.getItem(f) != null && !isBlacklisted(Integer.toString(f), inventory.getItem(f)) 
+					&& ((protectItems.isEmpty() && ItemHandler.containsNBTData(inventory.getItem(f))) || (!protectItems.contains(item) && item.isSimilar(inventory.getItem(f))))) {
+					inventory.setItem(f, new ItemStack(Material.AIR));
 				}
 			}
 		}

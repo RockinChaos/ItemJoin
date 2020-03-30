@@ -42,8 +42,8 @@ Clear-Items:
   Join: DISABLED
   World-Switch: DISABLED
   Region-Enter: DISABLED
-  Options: PROTECT
-  Bypass: OP
+  Options: PROTECT, PROTECT_OP, PROTECT_CREATIVE
+  Blacklist: '{id:BEDROCK}, {slot:4}, {name:Blazefury}'
 
 # This is the command(s) executed upon the player performing the defined trigger(s), for the specified world(s).
 Active-Commands:
