@@ -80,9 +80,9 @@ public class ConfigHandler {
         		setItemDesigner(new ItemDesigner());
         		setProtolcolManager(new ProtocolManager());
         		setItemCreator(new UI());
-        		setMetrics(new Metrics());
 		    }
 		}.runTaskAsynchronously(ItemJoin.getInstance());
+		Bukkit.getServer().getScheduler().runTaskLater(ItemJoin.getInstance(), () -> { setMetrics(new Metrics()); }, 100L);
 	}
 	
 	public static void registerEvents() {
