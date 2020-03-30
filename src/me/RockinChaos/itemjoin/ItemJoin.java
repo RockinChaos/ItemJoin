@@ -2,7 +2,6 @@ package me.RockinChaos.itemjoin;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
-
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 
@@ -13,8 +12,8 @@ public class ItemJoin extends JavaPlugin {
 	public void onEnable() {
   		instance = this;
   		ConfigHandler.generateData(getFile());
-  		ConfigHandler.registerEvents();
-  		ServerHandler.sendConsoleMessage("&ahas been Enabled.");
+        ConfigHandler.registerEvents();
+        ServerHandler.sendConsoleMessage("&ahas been Enabled.");
   	}
   	
   	@Override

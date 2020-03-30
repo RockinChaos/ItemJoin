@@ -51,7 +51,7 @@ items:
     itemflags: item-store, unbreakable, hide-attributes, death-drops, self-drops, CreativeBypass
     triggers: join, respawn, world-switch
     permission-node: itemjoin.map
-    enabled-worlds: world, world_nether, world_the_end
+    enabled-worlds: ALL
   gamemode-token:
     id: FIREWORK_STAR
     charge-color: RED
@@ -212,7 +212,7 @@ items:
     itemflags: inventory-modify, hide-attributes, death-drops, self-drops
     triggers: join, respawn, world-switch
     permission-node: itemjoin.bungee
-    enabled-worlds: world, world_nether, world_the_end
+    enabled-worlds: ALL
   potion-arrow:
     id: TIPPED_ARROW
     potion-effect: WITHER:1:20

@@ -50,11 +50,10 @@ public class SQLData {
 				loadEnabledPlayers();
 				loadReturnItems();
 				loadReturnCraftItems();
-			
 				try { SQLite.getDatabase("database").closeConnection(); } catch (Exception e) { } 
 				runTaskSaveStatements();
-            }
-        }.runTaskAsynchronously(ItemJoin.getInstance());
+		    }
+		}.runTaskAsynchronously(ItemJoin.getInstance());
 	}
 	
 	private void createTables() {

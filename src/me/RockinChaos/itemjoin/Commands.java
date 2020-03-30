@@ -191,7 +191,7 @@ public class Commands implements CommandExecutor {
 			if (PermissionsHandler.hasPermission(sender, "itemjoin.purge")) {
 				if (cmdConfirm.get(1 + sender.getName()) != null && cmdConfirm.get(1 + sender.getName()).equals(true)) {
 					SQLite.purgeDatabase("database");
-					ConfigHandler.setSQLData(new SQLData());
+			        ConfigHandler.setSQLData(new SQLData());
 					String[] placeHolders = Language.newString(); placeHolders[1] = "All Players"; placeHolders[10] = "Database"; placeHolders[9] = "/ij purge";
 					Language.sendLangMessage("Commands.Database.purgeSuccess", sender, placeHolders);
 					cmdConfirm.remove(1 + sender.getName());

@@ -21,8 +21,8 @@ public class LimitSwitch implements Listener {
 	private void giveOnGameModeSwitch(PlayerGameModeChangeEvent event) {
 		final Player player = event.getPlayer();
 		final GameMode newMode = event.getNewGameMode();
-		if (ConfigHandler.getDepends().authMeEnabled()) { setAuthenticating(player, newMode); } 
-		else { setItems(player, newMode); }
+		if (ConfigHandler.getDepends().authMeEnabled()) { this.setAuthenticating(player, newMode); } 
+		else { this.setItems(player, newMode); }
 	}
 	
 	private void setAuthenticating(final Player player, final GameMode newMode) {
@@ -30,7 +30,7 @@ public class LimitSwitch implements Listener {
 			@Override
 			public void run() {
 				if (ConfigHandler.getDepends().authMeEnabled() && fr.xephi.authme.api.v3.AuthMeApi.getInstance().isAuthenticated(player)) {
-					setItems(player, newMode);
+			    	setItems(player, newMode);
 					this.cancel();
 				}
 			}
@@ -39,6 +39,10 @@ public class LimitSwitch implements Listener {
 	
 	private void setItems(final Player player, final GameMode newMode) {
 		ItemUtilities.safeSet(player, "Limit-Modes");
+		this.runTask(player, newMode);
+	}
+	
+	private void runTask(final Player player, final GameMode newMode) {
 		final Chances probability = new Chances();
 		final ItemMap probable = probability.getRandom(player);
 		final int session = Utils.getRandom(1, 100000);

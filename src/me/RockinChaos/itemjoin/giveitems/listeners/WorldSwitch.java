@@ -20,8 +20,8 @@ public class WorldSwitch implements Listener {
 	@EventHandler
 	private void giveOnWorldSwitch(PlayerChangedWorldEvent event) {
 		final Player player = event.getPlayer();
-		if (ConfigHandler.getDepends().authMeEnabled()) { setAuthenticating(player); } 
-		else { setItems(player); }
+		if (ConfigHandler.getDepends().authMeEnabled()) { this.setAuthenticating(player); } 
+		else { this.setItems(player); }
 	}
 	
 	private void setAuthenticating(final Player player) {
@@ -38,13 +38,14 @@ public class WorldSwitch implements Listener {
 	
 	private void setItems(final Player player) {
 		ItemUtilities.safeSet(player, "World-Switch");
-		if (ConfigHandler.getItemDelay() != 0) { 
+		long delay = ConfigHandler.getItemDelay();
+		if (delay != 0) { 
 			Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
 				@Override
 				public void run() { 
 					runTask(player); 
 				}
-			}, ConfigHandler.getItemDelay());
+			}, delay);
 		} else { this.runTask(player); }
 	}
 	
