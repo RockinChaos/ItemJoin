@@ -202,13 +202,11 @@ public class ItemUtilities {
 				} if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
 					for (int k = 0; k < player.getOpenInventory().getTopInventory().getContents().length; k++) {
 						if (player.getOpenInventory().getTopInventory().getItem(k) != null && !isBlacklisted("CRAFTING[" + k + "]", player.getOpenInventory().getTopInventory().getItem(k)) && (protectItems.isEmpty() || (!item.isSimilar(player.getOpenInventory().getTopInventory().getItem(k)) && i == (protectItems.size() - 1)))) {
-							ServerHandler.sendConsoleMessage("craft   " + k);
 							craftView.setItem(k, new ItemStack(Material.AIR));
 						}
 					}
 				} for (int f = 0; f < inventory.getSize(); f++) {
 					if (inventory.getItem(f) != null && !isBlacklisted(Integer.toString(f), inventory.getItem(f)) && (protectItems.isEmpty() || (!item.isSimilar(inventory.getItem(f)) && i == (protectItems.size() - 1)))) {
-						ServerHandler.sendConsoleMessage("slot   " + f);
 						inventory.setItem(f, new ItemStack(Material.AIR));
 					}
 				}
