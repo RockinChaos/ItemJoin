@@ -40,7 +40,7 @@ public class Menu implements Listener {
 	
 	@EventHandler
 	public void onClose(InventoryCloseEvent event) {
-		if (ConfigHandler.getItemCreator().modifyMenu((Player)event.getPlayer())) {
+		if (ConfigHandler.getItemCreator() != null && ConfigHandler.getItemCreator().modifyMenu((Player)event.getPlayer())) {
 			new BukkitRunnable() {
 				@Override
 				public void run() {

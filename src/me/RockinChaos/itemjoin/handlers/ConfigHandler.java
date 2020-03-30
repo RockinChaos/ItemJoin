@@ -72,15 +72,15 @@ public class ConfigHandler {
 		configFile(); itemsFile(); langFile(); registerPrevents();
 		setDepends(new DependAPI());
 		setSQLData(new SQLData());
-		setProtolcolManager(new ProtocolManager());
-		setItemCreator(new UI());
-		setLogger(new Logger());
+		if (file != null) { sendUtilityDepends(); setUpdater(new UpdateHandler(file)); }
         new BukkitRunnable() {
             @Override
             public void run() {
-				setItemDesigner(new ItemDesigner());
-				setMetrics(new Metrics());
-				if (file != null) { sendUtilityDepends(); setUpdater(new UpdateHandler(file)); }
+        		setLogger(new Logger());
+        		setItemDesigner(new ItemDesigner());
+        		setProtolcolManager(new ProtocolManager());
+        		setItemCreator(new UI());
+        		setMetrics(new Metrics());
 		    }
 		}.runTaskAsynchronously(ItemJoin.getInstance());
 	}
