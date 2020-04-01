@@ -8,7 +8,6 @@ Language: 'English'
 General:
   CheckforUpdates: true
   Metrics-Logging: true
-  Log-Coloration: true
   Log-Commands: true
   Debugging: false
 
