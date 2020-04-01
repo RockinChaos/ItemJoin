@@ -14,7 +14,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Statistic;
-import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -37,13 +36,6 @@ public class Utils {
 		boolean bool = false;
 		for (Object l : list) { if (l.toString().equalsIgnoreCase(s)) { bool = true; break; } }
 		return bool;
-	}
-	
-	public static String stripLogColors(CommandSender sender, String message) {
-		if (sender instanceof ConsoleCommandSender && ConfigHandler.getConfig("config.yml").getBoolean("General.Log-Coloration") != true) {
-			return ChatColor.stripColor(message);
-		}
-	  return message;
 	}
 	
 	public static String convertStringList(List<String> list) {
@@ -94,7 +86,7 @@ public class Utils {
 		try {
 			return Base64.getEncoder().encodeToString(text.getBytes());
 		} catch (Exception e) {
-			ServerHandler.sendDebugMessage("&c&lERROR: &cFailure to encrypt sensitive text!");
+			ServerHandler.logDebug("{Utils} Failure to encrypt sensitive text!");
 			ServerHandler.sendDebugTrace(e);
 		}
 		return null;
@@ -104,7 +96,7 @@ public class Utils {
 		try {
 			return new String(Base64.getDecoder().decode(text));
 		} catch (Exception e) {
-			ServerHandler.sendDebugMessage("&c&lERROR: &cFailure to decrypt sensitive text!");
+			ServerHandler.logDebug("{Utils} Failure to decrypt sensitive text!");
 			ServerHandler.sendDebugTrace(e);
 		}
 		return null;
@@ -282,7 +274,7 @@ public class Utils {
 		name = ChatColor.translateAlternateColorCodes('&', name).toString();
 		if (ConfigHandler.getDepends().placeHolderEnabled()) {
 			try { try { return PlaceholderAPI.setPlaceholders(player, name); } 
-			catch (NoSuchFieldError e) { ServerHandler.sendDebugMessage("Error has occured when setting the PlaceHolder " + e.getMessage() + ", if this issue persits contact the developer of PlaceholderAPI."); return name; }
+			catch (NoSuchFieldError e) { ServerHandler.logWarn("An error has occured when setting the PlaceHolder " + e.getMessage() + ", if this issue persits contact the developer of PlaceholderAPI."); return name; }
 			} catch (Exception e) { }
 		}
 		return name;

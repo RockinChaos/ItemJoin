@@ -87,7 +87,7 @@ public class Legacy {
 		else if (Utils.containsIgnoreCase(material.toString(), "RAW_FISH")) { return 3; }
 		else if (Utils.containsIgnoreCase(material.toString(), "COOKED_FISHED")) { return 1; }
 		else if (Utils.containsIgnoreCase(material.toString(), "INK_SAC")) { return 15; }
-		else if (Utils.containsIgnoreCase(material.toString(), "SKULL_ITEM") && ServerHandler.hasCombatUpdate()) { return 5; }
+		else if (Utils.containsIgnoreCase(material.toString(), "SKULL_ITEM") && ServerHandler.hasSpecificUpdate("1_9")) { return 5; }
 		else if (Utils.containsIgnoreCase(material.toString(), "SKULL_ITEM")) { return 4; }
 		else if (Utils.containsIgnoreCase(material.toString(), "CONCRETE")) { return 15; }
 		else if (Utils.containsIgnoreCase(material.toString(), "WOOL")) { return 15; }
@@ -134,7 +134,7 @@ public class Legacy {
     
     public static org.bukkit.Material findLegacyMaterial(int typeID) {
         final Material[] foundMaterial = new Material[1];
-        EnumSet.allOf(Material.class).forEach(material -> { try { if (Utils.containsIgnoreCase(material.toString(), "LEGACY_") && material.getId() == typeID || !ServerHandler.hasAquaticUpdate() && material.getId() == typeID) { foundMaterial[0] = material; } } catch (Exception e) { }});
+        EnumSet.allOf(Material.class).forEach(material -> { try { if (Utils.containsIgnoreCase(material.toString(), "LEGACY_") && material.getId() == typeID || !ServerHandler.hasSpecificUpdate("1_13") && material.getId() == typeID) { foundMaterial[0] = material; } } catch (Exception e) { }});
         return foundMaterial[0];
     }
 

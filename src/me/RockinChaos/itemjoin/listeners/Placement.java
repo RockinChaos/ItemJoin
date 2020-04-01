@@ -51,7 +51,7 @@ public class Placement implements Listener {
 	 	if (event.getRightClicked() instanceof ItemFrame) {
 	 		try {
 	 			ItemStack item = null;
-	 			if (ServerHandler.hasCombatUpdate()) { item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().toString()); } 
+	 			if (ServerHandler.hasSpecificUpdate("1_9")) { item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().toString()); } 
 	 			else { item = PlayerHandler.getPerfectHandItem(event.getPlayer(), ""); }
 	 			Player player = event.getPlayer();
 	 			if (!ItemUtilities.isAllowed(player, item, "placement")) {
@@ -67,7 +67,7 @@ public class Placement implements Listener {
 	 	if (event.getRightClicked() instanceof ItemFrame) {
 	 		try {
 	 			ItemStack item = null;
-	 			if (ServerHandler.hasCombatUpdate()) { item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().toString()); } 
+	 			if (ServerHandler.hasSpecificUpdate("1_9")) { item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().toString()); } 
 	 			else { item = PlayerHandler.getPerfectHandItem(event.getPlayer(), ""); }
 	 			Player player = event.getPlayer();
 	 			if (PlayerHandler.isCreativeMode(player)) {

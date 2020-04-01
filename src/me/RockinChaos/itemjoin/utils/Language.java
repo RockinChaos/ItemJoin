@@ -1,5 +1,6 @@
 package me.RockinChaos.itemjoin.utils;
 
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
@@ -13,7 +14,8 @@ public class Language {
 	public static void dispatchMessage(CommandSender sender, String langMessage) { 
 		Player player = null; if (sender instanceof Player) { player = (Player) sender; }
 		langMessage = Utils.translateLayout(langMessage, player);
-		sender.sendMessage(Utils.stripLogColors(sender, langMessage));
+		if (sender instanceof ConsoleCommandSender) { langMessage = ChatColor.stripColor(langMessage); } 
+		sender.sendMessage(langMessage);
 	}
 	
 	public static void sendLangMessage(String nodeLocation, CommandSender sender, String...placeHolder) {
@@ -26,8 +28,8 @@ public class Language {
 			String[] langLines = langMessage.split(" /n ");
 			for (String langLine : langLines) {
 				String langStrip = prefix + langLine;
-				if (sender instanceof ConsoleCommandSender) { langStrip = Utils.stripLogColors(sender, langStrip); } 
-				if (isConsoleMessage(nodeLocation)) { ServerHandler.sendConsoleMessage(Utils.stripLogColors(sender, langLine)); }
+				if (sender instanceof ConsoleCommandSender) { langStrip = ChatColor.stripColor(langStrip); } 
+				if (isConsoleMessage(nodeLocation)) { ServerHandler.logInfo(ChatColor.stripColor(langLine)); }
 				else { sender.sendMessage(langStrip);	}
 			}
 		}

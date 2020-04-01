@@ -53,73 +53,73 @@ public class PlayerHandler {
 	}
 	
 	public static ItemStack getHandItem(Player player) {
-		if (ServerHandler.hasCombatUpdate() && player.getInventory().getItemInMainHand().getType() != null && player.getInventory().getItemInMainHand().getType() != Material.AIR) {
+		if (ServerHandler.hasSpecificUpdate("1_9") && player.getInventory().getItemInMainHand().getType() != null && player.getInventory().getItemInMainHand().getType() != Material.AIR) {
 			return player.getInventory().getItemInMainHand();
-		} else if (ServerHandler.hasCombatUpdate() && player.getInventory().getItemInOffHand().getType() != null && player.getInventory().getItemInOffHand().getType() != Material.AIR) {
+		} else if (ServerHandler.hasSpecificUpdate("1_9") && player.getInventory().getItemInOffHand().getType() != null && player.getInventory().getItemInOffHand().getType() != Material.AIR) {
 			return player.getInventory().getItemInOffHand();
-		} else if (!ServerHandler.hasCombatUpdate()) {
+		} else if (!ServerHandler.hasSpecificUpdate("1_9")) {
 			return Legacy.getLegacyInHandItem(player);
 		}
 		return null;
 	}
 	
 	public static void setHandItem(Player player, ItemStack item) {
-		if (ServerHandler.hasCombatUpdate() && player.getInventory().getItemInMainHand().getType() != null && player.getInventory().getItemInMainHand().getType() != Material.AIR) {
+		if (ServerHandler.hasSpecificUpdate("1_9") && player.getInventory().getItemInMainHand().getType() != null && player.getInventory().getItemInMainHand().getType() != Material.AIR) {
 			player.getInventory().setItemInMainHand(item);
-		} else if (ServerHandler.hasCombatUpdate() && player.getInventory().getItemInOffHand().getType() != null && player.getInventory().getItemInOffHand().getType() != Material.AIR) {
+		} else if (ServerHandler.hasSpecificUpdate("1_9") && player.getInventory().getItemInOffHand().getType() != null && player.getInventory().getItemInOffHand().getType() != Material.AIR) {
 			player.getInventory().setItemInOffHand(item);
-		} else if (!ServerHandler.hasCombatUpdate()) {
+		} else if (!ServerHandler.hasSpecificUpdate("1_9")) {
 			Legacy.setLegacyInHandItem(player, item);
 		}
 	}
 	
 	public static ItemStack getPerfectHandItem(Player player, String type) {
-		if (ServerHandler.hasCombatUpdate() && type != null && type.equalsIgnoreCase("HAND")) {
+		if (ServerHandler.hasSpecificUpdate("1_9") && type != null && type.equalsIgnoreCase("HAND")) {
 			return player.getInventory().getItemInMainHand();
-		} else if (ServerHandler.hasCombatUpdate() && type != null && type.equalsIgnoreCase("OFF_HAND")) {
+		} else if (ServerHandler.hasSpecificUpdate("1_9") && type != null && type.equalsIgnoreCase("OFF_HAND")) {
 			return player.getInventory().getItemInOffHand();
-		} else if (!ServerHandler.hasCombatUpdate()) {
+		} else if (!ServerHandler.hasSpecificUpdate("1_9")) {
 			return Legacy.getLegacyInHandItem(player);
 		}
 		return null;
 	}
 	
 	public static ItemStack getMainHandItem(Player player) {
-		if (ServerHandler.hasCombatUpdate()) {
+		if (ServerHandler.hasSpecificUpdate("1_9")) {
 			return player.getInventory().getItemInMainHand();
-		} else if (!ServerHandler.hasCombatUpdate()) {
+		} else if (!ServerHandler.hasSpecificUpdate("1_9")) {
 			return Legacy.getLegacyInHandItem(player);
 		}
 		return null;
 	}
 	
 	public static void setMainHandItem(Player player, ItemStack item) {
-		if (ServerHandler.hasCombatUpdate()) {
+		if (ServerHandler.hasSpecificUpdate("1_9")) {
 			player.getInventory().setItemInMainHand(item);;
-		} else if (!ServerHandler.hasCombatUpdate()) {
+		} else if (!ServerHandler.hasSpecificUpdate("1_9")) {
 			Legacy.setLegacyInHandItem(player, item);
 		}
 	}
 	
 	public static void setOffHandItem(Player player, ItemStack item) {
-		if (ServerHandler.hasCombatUpdate()) {
+		if (ServerHandler.hasSpecificUpdate("1_9")) {
 			player.getInventory().setItemInOffHand(item);;
-		} else if (!ServerHandler.hasCombatUpdate()) {
+		} else if (!ServerHandler.hasSpecificUpdate("1_9")) {
 			Legacy.setLegacyInHandItem(player, item);
 		}
 	}
 	
 	public static ItemStack getOffHandItem(Player player) {
-		if (ServerHandler.hasCombatUpdate()) {
+		if (ServerHandler.hasSpecificUpdate("1_9")) {
 			return player.getInventory().getItemInOffHand();
-		} else if (!ServerHandler.hasCombatUpdate()) {
+		} else if (!ServerHandler.hasSpecificUpdate("1_9")) {
 			return Legacy.getLegacyInHandItem(player);
 		}
 		return null;
 	}
 	
 	public static void setOffhandItem(Player player, ItemStack toSet) {
-		if (ServerHandler.hasCombatUpdate()) {
+		if (ServerHandler.hasSpecificUpdate("1_9")) {
 			player.getInventory().setItemInOffHand(toSet);
 		}
 	}

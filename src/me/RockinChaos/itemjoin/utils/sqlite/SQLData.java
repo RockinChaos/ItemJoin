@@ -18,9 +18,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
-import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
+import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.utils.Utils;
 
 public class SQLData {
@@ -83,7 +83,7 @@ public class SQLData {
 			for (String statement : this.executeStatementsLater) {
 				SQLite.getDatabase("database").executeStatement(statement);
 			}
-			ConfigHandler.getLogger().sqLiteSaving();
+			ServerHandler.logDebug("{SQLite} Saving newly generated data to the database.");
 			this.executeStatementsLater.clear();
 			try { SQLite.getDatabase("database").closeConnection(); } catch (Exception e) { }
 		}
@@ -488,16 +488,17 @@ public class SQLData {
 		if (firstJoin.exists() || ipLimit.exists()) {
 			if (firstJoin.exists()) {
 				this.convertFirstJoinData(firstJoin);
-				ConfigHandler.getLogger().sqLiteConverting("first-join");
+				ServerHandler.logWarn(("The first-join.yml file is outdated, all data is now stored in a database file."));
 			}
 			if (ipLimit.exists()) {
 				this.convertIpLimitData(ipLimit);
-				ConfigHandler.getLogger().sqLiteConverting("ip-limit");
+				ServerHandler.logWarn(("The ip-limit.yml file is outdated, all data is now stored in a database file."));
 			}
 			converting = true;
-			ConfigHandler.getLogger().sqLiteConversion();
+			ServerHandler.logWarn("Starting YAML to Database conversion, stored data in the file(s) will not be lost...");
+			
 		}
-		if (converting == true) { ConfigHandler.getLogger().sqLiteComplete(); }
+		if (converting == true) { ServerHandler.logWarn("YAML to Database conversion complete!"); }
 	}
 	
 	private void convertFirstJoinData(File firstJoin) {
@@ -525,7 +526,8 @@ public class SQLData {
 			File newFile = new File(userfiles, newGen);
 			firstJoin.renameTo(newFile);
 		} catch (Exception e) {
-			ConfigHandler.getLogger().sqLiteConvertFailed(e, "first-join");
+			ServerHandler.logSevere("{SQLite} Failed to convert the first-join.yml to the database!");
+			ServerHandler.sendDebugTrace(e);
 		}
 	}
 	
@@ -553,7 +555,8 @@ public class SQLData {
 			File newFile = new File(userfiles, newGen);
 			ipLimit.renameTo(newFile);
 		} catch (Exception e) {
-			ConfigHandler.getLogger().sqLiteConvertFailed(e, "ip-limit");
+			ServerHandler.logSevere("{SQLite} Failed to convert the ip-limit.yml to the database!");
+			ServerHandler.sendDebugTrace(e);
 		}
 	}
 }

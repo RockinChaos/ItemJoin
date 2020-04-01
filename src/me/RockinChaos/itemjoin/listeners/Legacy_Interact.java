@@ -23,7 +23,7 @@ public class Legacy_Interact implements Listener {
 	 	ItemStack item = event.getItem();
 	 	Player player = event.getPlayer();
 	 	if (event.hasItem() && event.getAction() != Action.PHYSICAL && !ItemUtilities.isAllowed(player, item, "cancel-events") 
-	 			|| event.hasItem() && event.getAction() != Action.PHYSICAL && ServerHandler.hasCombatUpdate() && event.getHand() != null 
+	 			|| event.hasItem() && event.getAction() != Action.PHYSICAL && ServerHandler.hasSpecificUpdate("1_9") && event.getHand() != null 
 	 			&& event.getHand().toString().equalsIgnoreCase("OFF_HAND") && !ItemUtilities.isAllowed(player, PlayerHandler.getMainHandItem(event.getPlayer()), "cancel-events")) {
 	 		event.setCancelled(true);
 	 		PlayerHandler.updateInventory(player);
@@ -60,7 +60,7 @@ public class Legacy_Interact implements Listener {
 	private void onEntityCommands(PlayerInteractEntityEvent event) {
 		if (event.getRightClicked() instanceof org.bukkit.entity.ItemFrame) {
 			ItemStack item;
-			if (ServerHandler.hasCombatUpdate()) { item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().toString()); } 
+			if (ServerHandler.hasSpecificUpdate("1_9")) { item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().toString()); } 
 			else { item = PlayerHandler.getPerfectHandItem(event.getPlayer(), ""); }
 			Player player = event.getPlayer();
 			String action = Action.RIGHT_CLICK_BLOCK.name();

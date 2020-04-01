@@ -21,8 +21,7 @@ public class VaultAPI {
 	private void enableEconomy() { 
 		if (ConfigHandler.getConfig("config.yml").getBoolean("softDepend.Vault") && ItemJoin.getInstance().getServer().getPluginManager().getPlugin("Vault") != null) {
 			if (!this.setupEconomy()) {
-				ServerHandler.sendErrorMessage("There was an issue setting up Vault to work with ItemJoin!");
-				ServerHandler.sendErrorMessage("If this continues, please contact the plugin developer!");
+				ServerHandler.logSevere("{VaultAPI} An error has occured while setting up enabling Vault-ItemJoin support!");
 			}
 		}
 	}

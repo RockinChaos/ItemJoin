@@ -58,7 +58,7 @@ public class ItemAnimation {
 	
 	public void closeAnimation(Player player) {
 		stopAnimations = true;
-		ServerHandler.sendDebugMessage("[ANIMATIONS] Successfully closed all animations for the item [" + itemMap.getConfigName()+ "] with the instanced player " + player.getName() + ".");
+		ServerHandler.logDebug("{Animation} Successfully closed all animations for the item " + itemMap.getConfigName() + " with the instanced player " + player.getName() + ".");
 	}
 	
 	private void nameTasks(Player player) {
@@ -211,7 +211,7 @@ public class ItemAnimation {
 		materialString = ItemHandler.purgeDelay(materialString);
 		if (materialString.contains(":")) { 
 			String[] parts = materialString.split(":");
-			if (ServerHandler.hasAquaticUpdate()) {
+			if (ServerHandler.hasSpecificUpdate("1_13")) {
 				if (!Utils.isInt(parts[0])) { parts[0] = "LEGACY_" + parts[0]; }
 				if (!Utils.isInt(parts[0])) { mat = Legacy.getLegacyMaterial(Material.getMaterial(parts[0].toUpperCase()), (byte) Integer.parseInt(parts[1])); } 
 				else { mat = Legacy.getLegacyMaterial(Integer.parseInt(parts[0]), (byte) Integer.parseInt(parts[1])); }

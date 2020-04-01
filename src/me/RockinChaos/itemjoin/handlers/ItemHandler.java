@@ -89,7 +89,7 @@ public class ItemHandler {
 			}
 		} 
 		} catch (Exception e) {
-			ServerHandler.sendDebugMessage("Error 254 has occured when getting NBTData to an item.");
+			ServerHandler.logSevere("{ItemMap} An error has occured when getting NBTData to an item.");
 			ServerHandler.sendDebugTrace(e);
 		}
 		}
@@ -120,7 +120,7 @@ public class ItemHandler {
     public static ItemStack getItem(String mat, int count, boolean glowing, String name, String... lore) {
         ItemStack tempItem; if (!ServerHandler.hasSpecificUpdate("1_8") && mat.equals("BARRIER")) { mat = "WOOL:14"; }
         if (getMaterial(mat, null) == null) { mat = "STONE"; } 
-        if (ServerHandler.hasAquaticUpdate()) { tempItem = new ItemStack(getMaterial(mat, null), count); } 
+        if (ServerHandler.hasSpecificUpdate("1_13")) { tempItem = new ItemStack(getMaterial(mat, null), count); } 
         else { short dataValue = 0; if (mat.contains(":")) { String[] parts = mat.split(":"); mat = parts[0]; dataValue = (short) Integer.parseInt(parts[1]); } tempItem = Legacy.newLegacyItemStack(getMaterial(mat, null), count, dataValue); }
         if (glowing && mat != "AIR") { tempItem.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 1); }
         ItemMeta tempMeta = tempItem.getItemMeta();
@@ -225,15 +225,15 @@ public class ItemHandler {
 		try {
 			boolean isLegacy = (dataVal != null);
 			if (material.contains(":")) { String[] parts = material.split(":"); material = parts[0]; if (!parts[1].equalsIgnoreCase("0")) { dataVal = parts[1]; isLegacy = true; } }
-			if (Utils.isInt(material) && !ServerHandler.hasAquaticUpdate()) {
+			if (Utils.isInt(material) && !ServerHandler.hasSpecificUpdate("1_13")) {
 				return Legacy.findLegacyMaterial(Integer.parseInt(material));
-			} else if (Utils.isInt(material) && ServerHandler.hasAquaticUpdate() || isLegacy && ServerHandler.hasAquaticUpdate()) {
+			} else if (Utils.isInt(material) && ServerHandler.hasSpecificUpdate("1_13") || isLegacy && ServerHandler.hasSpecificUpdate("1_13")) {
 				int dataValue;
 				if (!Utils.isInt(material)) { material = "LEGACY_" + material; }
 				if (dataVal != null) { dataValue = Integer.parseInt(dataVal); } else { dataValue = 0; }
 				if (!Utils.isInt(material)) { return Legacy.getLegacyMaterial(Material.getMaterial(material.toUpperCase()), (byte) dataValue); } 
 				else { return Legacy.getLegacyMaterial(Integer.parseInt(material), (byte) dataValue); }
-			} else if (!ServerHandler.hasAquaticUpdate()) {
+			} else if (!ServerHandler.hasSpecificUpdate("1_13")) {
 				return Material.getMaterial(material.toUpperCase());
 			} else {
 				return Material.matchMaterial(material.toUpperCase());
@@ -336,12 +336,12 @@ public class ItemHandler {
 	}
 	
 	public static String getEnchantName(Enchantment e) {
-		if (!ServerHandler.hasAquaticUpdate()) { return Legacy.getLegacyEnchantName(e); } 
+		if (!ServerHandler.hasSpecificUpdate("1_13")) { return Legacy.getLegacyEnchantName(e); } 
 		else { return e.getKey().getKey().toString(); }
 	}
 	
 	public static Enchantment getEnchantByName(String name) {
-		if (!ServerHandler.hasAquaticUpdate()) {
+		if (!ServerHandler.hasSpecificUpdate("1_13")) {
 			Enchantment enchantName = Legacy.getLegacyEnchantByName(name);
 			if (enchantName != null) { return enchantName; }
 		} else {
@@ -356,14 +356,14 @@ public class ItemHandler {
 	}
 	
 	public static short getDurability(ItemStack item) {
-		if (!ServerHandler.hasAquaticUpdate()) {
+		if (!ServerHandler.hasSpecificUpdate("1_13")) {
 			return Legacy.getLegacyDurability(item);
 		} else { return ((short) ((org.bukkit.inventory.meta.Damageable) item.getItemMeta()).getDamage()); }
 	}
 	
 	public static ItemStack setDurability(ItemStack item, int durability) {
 		if (item.getType().getMaxDurability() != 0 && durability != 0) {
-			if (ServerHandler.hasAquaticUpdate()) {
+			if (ServerHandler.hasSpecificUpdate("1_13")) {
 				ItemMeta tempMeta = item.getItemMeta();
 				((org.bukkit.inventory.meta.Damageable) tempMeta).setDamage(durability);
 				item.setItemMeta(tempMeta);
@@ -396,8 +396,8 @@ public class ItemHandler {
 				}
 			} catch (Exception e) { ServerHandler.sendDebugTrace(e); Legacy.setLegacySkullOwner(((SkullMeta) tempmeta), owner); }
 		} else {
-			ServerHandler.sendDebugMessage("Minecraft does not support offline player heads below Version 1.8.");
-			ServerHandler.sendDebugMessage("Player heads will only be given a skin if the player has previously joined the sever.");
+			ServerHandler.logDebug("{ItemMap} Minecraft does not support offline player heads below Version 1.8.");
+			ServerHandler.logDebug("{ItemMap} Player heads will only be given a skin if the player has previously joined the sever.");
 			return Legacy.setLegacySkullOwner(((SkullMeta) tempmeta), owner);
 		}
 		return tempmeta;

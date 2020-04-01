@@ -41,7 +41,7 @@ public class YAMLGenerator {
 			itemsData.set("items.random-pane-1.id", "YELLOW_STAINED_GLASS_PANE");
 			itemsData.set("items.random-pane-2.id", "BLUE_STAINED_GLASS_PANE");
 			itemsData.set("items.random-pane-3.id", "PINK_STAINED_GLASS_PANE");
-        } else if (ServerHandler.hasAquaticUpdate()) {
+        } else if (ServerHandler.hasSpecificUpdate("1_13")) {
 			itemsData.set("items.devine-item.commands-sound", "BLOCK_NOTE_BLOCK_PLING");
 			itemsData.set("items.map-item.id", "FILLED_MAP");
 			itemsData.set("items.gamemode-token.id", "FIREWORK_STAR");
@@ -67,7 +67,7 @@ public class YAMLGenerator {
 			itemsData.set("items.random-pane-1.id", "YELLOW_STAINED_GLASS_PANE");
 			itemsData.set("items.random-pane-2.id", "BLUE_STAINED_GLASS_PANE");
 			itemsData.set("items.random-pane-3.id", "PINK_STAINED_GLASS_PANE");
-		} else if (ServerHandler.hasCombatUpdate()) {
+		} else if (ServerHandler.hasSpecificUpdate("1_9")) {
 			itemsData.set("items.devine-item.commands-sound", "BLOCK_NOTE_PLING");
 			itemsData.set("items.map-item.id", "MAP");
 			itemsData.set("items.gamemode-token.id", "FIREWORK_CHARGE");

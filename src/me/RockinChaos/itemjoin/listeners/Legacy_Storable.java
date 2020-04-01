@@ -68,7 +68,7 @@ public class Legacy_Storable implements Listener {
 	private void onInteractItemFrame(PlayerInteractEntityEvent event) {
 		if (event.getRightClicked() instanceof ItemFrame) {
 			ItemStack item;
-			if (ServerHandler.hasCombatUpdate()) { item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().toString()); } 
+			if (ServerHandler.hasSpecificUpdate("1_9")) { item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().toString()); } 
 			else { item = PlayerHandler.getPerfectHandItem(event.getPlayer(), ""); }
 			Player player = event.getPlayer();
 			if (!ItemUtilities.isAllowed(player, item, "item-store")) {

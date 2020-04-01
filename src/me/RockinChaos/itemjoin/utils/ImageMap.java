@@ -53,11 +53,10 @@ public class ImageMap extends MapRenderer {
 				mapView.setScale(MapView.Scale.NORMAL);
 				if (this.isGIF) { this.drawGIF(mapCanvas);} 
 				else { mapCanvas.drawImage(0, 0, this.imgCache); }
-				ServerHandler.sendDebugMessage("rendering map; " + this.image + " with the id " + this.id);
+				ServerHandler.logDebug("{ImageMap} Rendering custom-map-image; " + this.image + " with the id " + this.id);
 			} catch (Exception e) {
-				ServerHandler.sendErrorMessage("&4There was a problem rending your map(s)!");
-				ServerHandler.sendErrorMessage("&4Please check and make sure your image size is no larger than 128x128 pixels.");
-				ServerHandler.sendErrorMessage("&4If you are still experiencing this error please contact the plugin developer!");
+				ServerHandler.logSevere("{ImageMap} There was a problem rending your map(s)!");
+				ServerHandler.logWarn("{ImageMap} Please check and make sure your image size is no larger than 128x128 pixels.");
 				ServerHandler.sendDebugTrace(e);
 			}
     	}

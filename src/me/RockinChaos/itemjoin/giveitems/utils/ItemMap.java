@@ -291,8 +291,10 @@ public class ItemMap {
 	
 	private void setCommandSound() {
 		try { if (this.nodeLocation.getString(".commands-sound") != null) { this.commandSound = Sound.valueOf(this.nodeLocation.getString(".commands-sound")); } } 
-		catch (Exception e) { ServerHandler.sendDebugTrace(e); ServerHandler.sendDebugMessage("&4Your server is running &eMC " + Reflection.getServerVersion() + 
-				" and this version of Minecraft does not have the defined command-sound &e" + this.nodeLocation.getString(".commands-sound")); }
+		catch (Exception e) { 
+			ServerHandler.logSevere("{ItemMap} Your server is running MC " + Reflection.getServerVersion() + " and this version of Minecraft does not have the defined command-sound " + this.nodeLocation.getString(".commands-sound") + "."); 
+			ServerHandler.sendDebugTrace(e);
+		}
 	}
 	
 	private void setCommandParticle() {
@@ -1612,7 +1614,7 @@ public class ItemMap {
 				return true;
 			}
 		}
-		if (ServerHandler.hasCombatUpdate() 
+		if (ServerHandler.hasSpecificUpdate("1_9") 
 				&& this.isSimilar(player.getInventory().getItemInOffHand())
 				&& this.isCountSimilar(player.getInventory().getItemInOffHand())) {
 			return true;
@@ -1697,7 +1699,7 @@ public class ItemMap {
 	
 	private void setMapImage() {
 		if (this.customMapImage != null) {
-			if (ServerHandler.hasAquaticUpdate()) {
+			if (ServerHandler.hasSpecificUpdate("1_13")) {
 				MapMeta mapmeta = (MapMeta) this.tempItem.getItemMeta();
 				try { mapmeta.setMapView(this.mapView); }
 				catch (NoSuchMethodError e) { mapmeta = Legacy.setMapID(mapmeta, this.mapId); }
@@ -1781,7 +1783,7 @@ public class ItemMap {
 				} else { nms.getClass().getMethod("setTag", this.newNBTTag.getClass()).invoke(nms, this.newNBTTag); }
 				this.tempItem = (ItemStack) Reflection.getCraftBukkitClass("inventory.CraftItemStack").getMethod("asCraftMirror", nms.getClass()).invoke(null, nms);
 			} catch (Exception e) {
-				ServerHandler.sendDebugMessage("Error 15443 has occured when setting NBTData to an item.");
+				ServerHandler.logSevere("{ItemMap} An error has occured when setting NBTData to an item.");
 				ServerHandler.sendDebugTrace(e);
 			}
 		}
@@ -1808,7 +1810,7 @@ public class ItemMap {
 	
 	private void setDurability() {
 		if (this.durability != null && (this.data == null || this.data == 0)) {
-			if (ServerHandler.hasAquaticUpdate()) {
+			if (ServerHandler.hasSpecificUpdate("1_13")) {
 				((org.bukkit.inventory.meta.Damageable) this.tempMeta).setDamage(this.durability);
 			} else {
 				Legacy.setLegacyDurability(this.tempItem, this.durability);
@@ -1818,7 +1820,7 @@ public class ItemMap {
 	
 	private void setData() {
 		if (this.data != null) {
-			if (ServerHandler.hasAquaticUpdate()) {
+			if (ServerHandler.hasSpecificUpdate("1_13")) {
 				((org.bukkit.inventory.meta.Damageable) this.tempMeta).setDamage(this.data);
 			} else {
 				Legacy.setLegacyDurability(this.tempItem, Short.parseShort(this.data + ""));
@@ -1830,7 +1832,7 @@ public class ItemMap {
 		if (this.modelData != null && this.modelData != 0) {
 			if (ServerHandler.hasSpecificUpdate("1_14")) {
 				this.tempMeta.setCustomModelData(this.modelData);
-			} else { ServerHandler.sendWarnMessage("&cThe item &e" + this.getConfigName() + "&c is using &eCustom Model Data&c which is not supported until Minecraft 1.14+."); }
+			} else { ServerHandler.logWarn("{ItemMap} The item " + this.getConfigName() + " is using Custom Model Data which is not supported until Minecraft 1.14+."); }
 		}
 	}
 	
@@ -2207,7 +2209,7 @@ public class ItemMap {
 					}
 				}
 			}
-			if (ServerHandler.hasCombatUpdate() && player.getInventory().getItemInOffHand() != null && player.getInventory().getItemInOffHand().getType() == mat) {
+			if (ServerHandler.hasSpecificUpdate("1_9") && player.getInventory().getItemInOffHand() != null && player.getInventory().getItemInOffHand().getType() == mat) {
 				if (player.getInventory().getItemInOffHand().getAmount() >= this.cost) {
 					return true;
 				} else { 
@@ -2249,7 +2251,7 @@ public class ItemMap {
 				} else { player.getInventory().setItem(i, newItem(player.getInventory().getItem(i), false, removeAmount)); break; } 
 			}
 		}
-		if (ServerHandler.hasCombatUpdate() && player.getInventory().getItemInOffHand() != null && player.getInventory().getItemInOffHand().getType() == mat) {
+		if (ServerHandler.hasSpecificUpdate("1_9") && player.getInventory().getItemInOffHand() != null && player.getInventory().getItemInOffHand().getType() == mat) {
 			if (player.getInventory().getItemInOffHand().getAmount() < removeAmount) {
 				removeAmount -= player.getInventory().getItemInOffHand().getAmount();
 				PlayerHandler.setOffHandItem(player, newItem(player.getInventory().getItemInOffHand(), false, player.getInventory().getItemInOffHand().getAmount()));
@@ -2290,8 +2292,8 @@ public class ItemMap {
 			try {
 				player.playSound(player.getLocation(), this.commandSound, 1, 1);
 			} catch (Exception e) {
-				ServerHandler.sendErrorMessage("&cThere was an issue executing the commands-sound you defined.");
-				ServerHandler.sendErrorMessage("&c" + this.commandSound + "&c is not a sound in " + Reflection.getServerVersion() + ".");
+				ServerHandler.logSevere("{ItemMap} There was an issue executing the commands-sound you defined.");
+				ServerHandler.logWarn("{ItemMap} " + this.commandSound + " is not a sound in " + Reflection.getServerVersion() + ".");
 				ServerHandler.sendDebugTrace(e);
 			}
 		}

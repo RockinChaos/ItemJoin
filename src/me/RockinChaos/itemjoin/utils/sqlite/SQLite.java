@@ -49,7 +49,10 @@ public class SQLite extends Database {
 			try {
 				final Database db = new SQLite(dbname, "");
 				databases.put(dbname, db);
-			} catch (Exception e) { ConfigHandler.getLogger().sqLiteClose(e, dbname); }
+			} catch (Exception e) { 
+				ServerHandler.logSevere("{SQLite} Failed to close database " + dbname + ".db connection.");
+				ServerHandler.sendDebugTrace(e); 
+			}
 		}
 		return getDatabases().get(dbname);
 	}
@@ -58,7 +61,10 @@ public class SQLite extends Database {
 		File dataFolder = new File(ItemJoin.getInstance().getDataFolder(), dbname + ".db");
 		if (dataFolder.exists()) {
 			try { dataFolder.delete(); } 
-			catch (Exception e) { ConfigHandler.getLogger().sqLitePurge(e, dbname); }
+			catch (Exception e) {
+				ServerHandler.logSevere("{SQLite} Failed to close database " + dbname + ".db after purging.");
+				ServerHandler.sendDebugTrace(e); 
+			}
 		}
 	}
 	
@@ -75,29 +81,38 @@ public class SQLite extends Database {
 		if (ConfigHandler.getConfig("config.yml").getString("Database.MySQL") != null && ConfigHandler.getConfig("config.yml").getBoolean("Database.MySQL")) {
 			isMySQL = true;
 			try { 
-				if (connection != null && !connection.isClosed()) { 
-			    	return connection; 
+				if (this.connection != null && !this.connection.isClosed()) { 
+			    	return this.connection; 
 			    } else {
 			    	Class.forName("com.mysql.jdbc.Driver");
-			        connection = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + table + "?useSSL=false", Utils.decrypt(user), Utils.decrypt(pass));
-			        return connection;
+			    	this.connection = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + table + "?useSSL=false", Utils.decrypt(user), Utils.decrypt(pass));
+			        return this.connection;
 			    }
 			} catch (Exception e) { 
-					ServerHandler.sendDebugMessage("&c&lERROR: &cUnable to get the defined MySQL database, check your settings.");
+					ServerHandler.logSevere("{MySQL} Unable to connect to the defined MySQL database, check your settings.");
 					ServerHandler.sendDebugTrace(e); 
 			}
 			return null;
 		} else {
-			File dataFolder = new File(ItemJoin.getInstance().getDataFolder(), dbname + ".db");
+			File dataFolder = new File(ItemJoin.getInstance().getDataFolder(), this.dbname + ".db");
 			if (!dataFolder.exists()) {
 				try { dataFolder.createNewFile(); } 
-				catch (IOException e) { ConfigHandler.getLogger().sqLiteError(e, dbname); }
+				catch (IOException e) { 
+					ServerHandler.logSevere("{SQLite} File write error: " + this.dbname + ".db.");
+					ServerHandler.sendDebugTrace(e);
+				}
 			} try {
-				if ((connection != null) && (!connection.isClosed())) { return connection; }
+				if ((connection != null) && (!connection.isClosed())) { return this.connection; }
 				Class.forName("org.sqlite.JDBC");
-				connection = DriverManager.getConnection("jdbc:sqlite:" + dataFolder);
-				return connection;
-			} catch (SQLException e) { ConfigHandler.getLogger().sqLiteException(e); } catch (ClassNotFoundException e) { ConfigHandler.getLogger().sqLiteMissing(e); }
+				this.connection = DriverManager.getConnection("jdbc:sqlite:" + dataFolder);
+				return this.connection;
+			} catch (SQLException e) { 
+				ServerHandler.logSevere("{SQLite} SQLite exception on initialize.");
+				ServerHandler.sendDebugTrace(e);
+			} catch (ClassNotFoundException e) { 
+				ServerHandler.logSevere("{SQLite} You need the SQLite JBDC library, see: &ahttps://bitbucket.org/xerial/sqlite-jdbc/downloads/ &rand put it in /lib folder.");
+				ServerHandler.sendDebugTrace(e);
+			}
 			return null;
 		}
 	}

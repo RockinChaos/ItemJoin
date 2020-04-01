@@ -13,7 +13,7 @@ public class ItemJoin extends JavaPlugin {
   		instance = this;
   		ConfigHandler.generateData(getFile());
         ConfigHandler.registerEvents();
-        ServerHandler.sendConsoleMessage("&ahas been Enabled.");
+        ServerHandler.logInfo("has been Enabled.");
   	}
   	
   	@Override
@@ -22,7 +22,7 @@ public class ItemJoin extends JavaPlugin {
   		Bukkit.getScheduler().cancelTasks(this);
   		ConfigHandler.getProtocolManager().closeProtocol();
   		ConfigHandler.getSQLData().executeLaterStatements();
-  		ServerHandler.sendConsoleMessage("&4has been Disabled.");
+  		ServerHandler.logInfo("has been Disabled.");
   	}
   	
   	public static ItemJoin getInstance() {

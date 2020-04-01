@@ -71,7 +71,7 @@ public class InventoryClick implements Listener {
     			player.getOpenInventory().getTopInventory().setItem(slot, cursorItem.get(PlayerHandler.getPlayerID(player)));
     		} else { player.getInventory().setItem(slot, cursorItem.get(PlayerHandler.getPlayerID(player)));   }
 			cursorItem.remove(PlayerHandler.getPlayerID(player));
-			ServerHandler.sendDebugMessage("Updated Animation Item (Cursor) Code: 2565CV"); 
+			ServerHandler.logDebug("{ItemMap} (Cursor_Place): Updated Animation Item."); 
     		}
     	} else if (event.getAction().toString().contains("SWAP_WITH_CURSOR")) {
     		ItemMap itemMap = ItemUtilities.getItemMap(event.getCursor(), null, player.getWorld());
@@ -84,13 +84,13 @@ public class InventoryClick implements Listener {
     			player.getOpenInventory().getTopInventory().setItem(slot, cursorItem.get(PlayerHandler.getPlayerID(player)));
     		} else { player.getInventory().setItem(slot, cursorItem.get(PlayerHandler.getPlayerID(player)));   }
 			cursorItem.remove(PlayerHandler.getPlayerID(player));
-			ServerHandler.sendDebugMessage("Updated Animation Item (Cursor) Code: 6745CV"); 
+			ServerHandler.logDebug("{ItemMap} (Cursor_Swap): Updated Animation Item."); 
     		}
     	}
     }
 
     private void LegacyDropEvent(final Player player) {
-    	if (!ServerHandler.hasCombatUpdate()) {
+    	if (!ServerHandler.hasSpecificUpdate("1_9")) {
 			dropClick.put(PlayerHandler.getPlayerID(player), true);
 			final ItemStack[] Inv = player.getInventory().getContents().clone();
 			final ItemStack[] Armor = player.getInventory().getArmorContents().clone();
@@ -104,7 +104,7 @@ public class InventoryClick implements Listener {
 						player.getInventory().setChestplate(null);
 						player.getInventory().setLeggings(null);
 						player.getInventory().setBoots(null);
-						if (ServerHandler.hasCombatUpdate()) { player.getInventory().setItemInOffHand(null); }
+						if (ServerHandler.hasSpecificUpdate("1_9")) { player.getInventory().setItemInOffHand(null); }
 						player.getInventory().setContents(Inv);
 						player.getInventory().setArmorContents(Armor);
 						PlayerHandler.updateInventory(player);

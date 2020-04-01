@@ -178,7 +178,7 @@ public class ItemCommand {
 				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), Utils.translateLayout(this.command, player));
 			}
 		} catch (Exception e) {
-			ServerHandler.sendErrorMessage("&cThere was an issue executing an item's command as console, if this continues please report it to the developer!");
+			ServerHandler.logSevere("{ItemCommand} There was an error executing an item's command as console, if this continues report it to the developer.");
 			ServerHandler.sendDebugTrace(e);
 		}
 	}
@@ -196,11 +196,11 @@ public class ItemCommand {
 				} catch (Exception e) {
 					ServerHandler.sendDebugTrace(e);
 					player.setOp(isOp);
-					ServerHandler.sendErrorMessage("&cAn error has occurred while setting " + player.getName() + " status on the OP list, to ensure server security they have been removed as an OP.");
+					ServerHandler.logSevere("{ItemCommand} An critical error has occurred while setting " + player.getName() + " status on the OP list, to maintain server security they have been removed as an OP.");
 				} finally { player.setOp(isOp); }
 			}
 		} catch (Exception e) {
-			ServerHandler.sendErrorMessage("&cThere was an issue executing an item's command as an op, if this continues please report it to the developer!");
+			ServerHandler.logSevere("{ItemCommand} There was an error executing an item's command as an op, if this continues report it to the developer.");
 			ServerHandler.sendDebugTrace(e);
 		}
 	}
@@ -214,7 +214,7 @@ public class ItemCommand {
 				player.chat("/" + Utils.translateLayout(this.command, player));
 			}
 		} catch (Exception e) {
-			ServerHandler.sendErrorMessage("&cThere was an issue executing an item's command as a player, if this continues please report it to the developer!");
+			ServerHandler.logSevere("{ItemCommand} There was an error executing an item's command as a player, if this continues report it to the developer.");
 			ServerHandler.sendDebugTrace(e);
 		}
 	}
@@ -222,7 +222,7 @@ public class ItemCommand {
 	private void dispatchMessageCommands(Player player) {
 		try { player.sendMessage(Utils.translateLayout(this.command, player)); } 
 		catch (Exception e) {
-			ServerHandler.sendErrorMessage("&cThere was an issue executing an item's command to send a message, if this continues please report it to the developer!");
+			ServerHandler.logSevere("{ItemCommand} There was an error executing an item's command to send a message, if this continues report it to the developer.");
 			ServerHandler.sendDebugTrace(e);
 		}
 	}
@@ -230,7 +230,7 @@ public class ItemCommand {
 	private void dispatchServerCommands(Player player) {
 		try { BungeeCord.SwitchServers(player, Utils.translateLayout(this.command, player)); } 
 		catch (Exception e) {
-			ServerHandler.sendErrorMessage("&cThere was an issue executing an item's command to switch servers, if this continues please report it to the developer!");
+			ServerHandler.logSevere("{ItemCommand} There was an error executing an item's command to switch servers, if this continues report it to the developer.");
 			ServerHandler.sendDebugTrace(e);
 		}
 	}
@@ -238,7 +238,7 @@ public class ItemCommand {
 	private void dispatchBungeeCordCommands(Player player) {
 		try { BungeeCord.ExecuteCommand(player, Utils.translateLayout(this.command, player)); } 
 		catch (Exception e) {
-			ServerHandler.sendErrorMessage("&cThere was an issue executing an item's command to BungeeCord, if this continues please report it to the developer!");
+			ServerHandler.logSevere("{ItemCommand} There was an error executing an item's command to BungeeCord, if this continues report it to the developer.");
 			ServerHandler.sendDebugTrace(e);
 		}
 	}
@@ -253,7 +253,7 @@ public class ItemCommand {
 			}
 		} 
 		catch (Exception e) {
-			ServerHandler.sendErrorMessage("&cThere was an issue executing an item's command to swap an items attributes, if this continues please report it to the developer!");
+			ServerHandler.logSevere("{ItemCommand} There was an error executing an item's command to swap an items attributes, if this continues report it to the developer.");
 			ServerHandler.sendDebugTrace(e);
 		}
 	}

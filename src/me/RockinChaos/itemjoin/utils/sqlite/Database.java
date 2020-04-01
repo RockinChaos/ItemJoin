@@ -24,7 +24,7 @@ public abstract class Database {
 			final ResultSet rs = ps.executeQuery();
 			this.close(ps, rs);
 		} catch (SQLException e) { 
-			ServerHandler.sendDebugMessage("[SQLITE] Unable to connect to database!");
+			ServerHandler.logSevere("{SQLite} Unable to connect to database!");
 			ServerHandler.sendDebugTrace(e);
 		}
 	}
@@ -37,7 +37,7 @@ public abstract class Database {
 			ps = conn.prepareStatement(statement);
 			return !ps.execute();
 		} catch (SQLException e) {
-			ServerHandler.sendDebugMessage("[SQLITE] Failed to execute database statement.");
+			ServerHandler.logSevere("{SQLite} Failed to execute database statement.");
 			ServerHandler.sendDebugTrace(e);
 			return false;
 		} finally {
@@ -49,7 +49,7 @@ public abstract class Database {
 					conn.close();
 				}
 			} catch (SQLException e) {
-				ServerHandler.sendDebugMessage("[SQLITE] Failed to close database connection (3ZA5DB654).");
+				ServerHandler.logSevere("{SQLite} Failed to close database connection.");
 				ServerHandler.sendDebugTrace(e);
 				return false;
 			}
@@ -68,7 +68,7 @@ public abstract class Database {
 				return rs.getObject(row);
 			}
 		} catch (SQLException e) {
-			ServerHandler.sendDebugMessage("[SQLITE] Failed to execute database statement.");
+			ServerHandler.logSevere("{SQLite} Failed to execute database statement.");
 			ServerHandler.sendDebugTrace(e);
 			try {
 				if (ps != null) {
@@ -78,7 +78,7 @@ public abstract class Database {
 					conn.close();
 				}
 			} catch (SQLException e2) { 
-				ServerHandler.sendDebugMessage("[SQLITE] Failed to close database connection (3ZA5DB654)."); 
+				ServerHandler.logSevere("{SQLite} Failed to close database connection."); 
 				ServerHandler.sendDebugTrace(e2);
 			}
 			return null;
@@ -91,7 +91,7 @@ public abstract class Database {
 					conn.close();
 				}
 			} catch (SQLException e) { 
-				ServerHandler.sendDebugMessage("[SQLITE] Failed to close database connection (3ZA5DB654)."); 
+				ServerHandler.logSevere("{SQLite} Failed to close database connection."); 
 				ServerHandler.sendDebugTrace(e); 
 			}
 		}
@@ -103,7 +103,7 @@ public abstract class Database {
 				conn.close();
 			}
 		} catch (SQLException e) { 
-			ServerHandler.sendDebugMessage("[SQLITE] Failed to close database connection (3ZA5DB654)."); 
+			ServerHandler.logSevere("{SQLite} Failed to close database connection."); 
 			ServerHandler.sendDebugTrace(e); 
 		}
 		return null;
@@ -123,7 +123,7 @@ public abstract class Database {
 			}
 			return objects;
 		} catch (SQLException e) {
-			ServerHandler.sendDebugMessage("[SQLITE] Failed to execute database statement.");
+			ServerHandler.logSevere("{SQLite} Failed to execute database statement.");
 			ServerHandler.sendDebugTrace(e);
 			try {
 				if (ps != null) {
@@ -133,7 +133,7 @@ public abstract class Database {
 					conn.close();
 				}
 			} catch (SQLException e2) { 
-				ServerHandler.sendDebugMessage("[SQLITE] Failed to close database connection (3ZA5DB654)."); 
+				ServerHandler.logSevere("{SQLite} Failed to close database connection."); 
 				ServerHandler.sendDebugTrace(e2);
 			}
 		} finally {
@@ -145,7 +145,7 @@ public abstract class Database {
 					conn.close();
 				}
 			} catch (SQLException e) { 
-				ServerHandler.sendDebugMessage("[SQLITE] Failed to close database connection (3ZA5DB654)."); 
+				ServerHandler.logSevere("{SQLite} Failed to close database connection."); 
 				ServerHandler.sendDebugTrace(e);
 			}
 		}
@@ -164,7 +164,7 @@ public abstract class Database {
 			}
 			rs.close();
 		} catch (SQLException e) {
-			ServerHandler.sendDebugMessage("[SQLITE] Failed to execute database statement.");
+			ServerHandler.logSevere("{SQLite} Failed to execute database statement.");
 			ServerHandler.sendDebugTrace(e);
 		}
 		return existingData;
@@ -190,7 +190,7 @@ public abstract class Database {
 			}
 			return map;
 		} catch (SQLException e) {
-				ServerHandler.sendDebugMessage("[SQLITE] Failed to execute database statement.");
+				ServerHandler.logSevere("{SQLite} Failed to execute database statement.");
 				ServerHandler.sendDebugTrace(e);
 			try {
 				if (ps != null) {
@@ -200,7 +200,7 @@ public abstract class Database {
 					conn.close();
 				}
 			} catch (SQLException e2) { 
-				ServerHandler.sendDebugMessage("[SQLITE] Failed to close database connection (3ZA5DB654)."); 
+				ServerHandler.logSevere("{SQLite} Failed to close database connection."); 
 				ServerHandler.sendDebugTrace(e2);
 			}
 		} finally {
@@ -212,7 +212,7 @@ public abstract class Database {
 					conn.close();
 				}
 			} catch (SQLException e) { 
-				ServerHandler.sendDebugMessage("[SQLITE] Failed to close database connection (3ZA5DB654)."); 
+				ServerHandler.logSevere("{SQLite} Failed to close database connection."); 
 				ServerHandler.sendDebugTrace(e);
 			}
 		}
@@ -227,7 +227,7 @@ public abstract class Database {
 			if (Utils.containsIgnoreCase(e.getMessage(), "no such column")) {
 				return false;
 			} else {
-				ServerHandler.sendDebugMessage("[SQLITE] Failed to execute database statement.");
+				ServerHandler.logSevere("{SQLite} Failed to execute database statement.");
 				ServerHandler.sendDebugTrace(e);
 			}
 		}
@@ -247,7 +247,7 @@ public abstract class Database {
 				}
 			}
 		} catch (SQLException e) {
-			ServerHandler.sendDebugMessage("[SQLITE] Failed to check if a table exists..");
+			ServerHandler.logSevere("{SQLite} Failed to check if a table exists.");
 			ServerHandler.sendDebugTrace(e);
 		}
 		return tExists;
@@ -258,15 +258,15 @@ public abstract class Database {
 			ResultSet result = this.getSQLConnection().prepareStatement(statement).executeQuery();
 			try {
 				if (!result.isBeforeFirst()) {
-					ServerHandler.sendDebugMessage("[SQLite] Result set is empty.");
+					ServerHandler.logDebug("{SQLite} Result set is empty.");
 					return false;
 				} else {
-					ServerHandler.sendDebugMessage("[SQLite] Result set is not empty.");
+					ServerHandler.logDebug("{SQLite} Result set is not empty.");
 					return true;
 				}
 			} finally { result.close(); SQLite.getDatabase("database").closeConnection(); }
 		} catch (Exception e) {
-			ServerHandler.sendDebugMessage("Could not read from the database.db file, some ItemJoin features have been disabled!");
+			ServerHandler.logSevere("{SQLite} Could not read from the database.db file, some ItemJoin features have been disabled!");
 			ServerHandler.sendDebugTrace(e);
 		}
 		return false;
@@ -281,7 +281,7 @@ public abstract class Database {
 				rs.close();
 			}
 		} catch (SQLException e) { 
-			ServerHandler.sendDebugMessage("[SQLITE] Failed to close database connection."); 
+			ServerHandler.logSevere("{SQLite} Failed to close database connection."); 
 			ServerHandler.sendDebugTrace(e);
 		}
 	}
@@ -290,7 +290,7 @@ public abstract class Database {
 		try {
 			this.getSQLConnection();
 		} catch (Exception e) {
-			ServerHandler.sendDebugMessage("[SQLITE] Failed to close database connection."); 
+			ServerHandler.logSevere("{SQLite} Failed to close database connection."); 
 			ServerHandler.sendDebugTrace(e);
 		}
 	}
@@ -302,7 +302,7 @@ public abstract class Database {
 			}
 		} catch (SQLException | NullPointerException e) { 
 			if (e.getCause() != null) {
-				ServerHandler.sendDebugMessage("[SQLITE] Failed to close database connection."); 
+				ServerHandler.logSevere("{SQLite} Failed to close database connection."); 
 				ServerHandler.sendDebugTrace(e);
 			}
 		}

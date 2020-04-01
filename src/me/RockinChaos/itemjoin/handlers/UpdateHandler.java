@@ -46,8 +46,8 @@ public class UpdateHandler {
      */
     public void forceUpdates(CommandSender sender) {
     	if (this.updateNeeded(sender, false)) {
-    		ServerHandler.sendMessage(sender, "&aAn update has been found!");
-    		ServerHandler.sendMessage(sender, "&aAttempting to update from " + "&ev" + this.localeVersionRaw + " &ato the new "  + "&ev" + this.latestVersionRaw);
+    		ServerHandler.messageSender(sender, "&aAn update has been found!");
+    		ServerHandler.messageSender(sender, "&aAttempting to update from " + "&ev" + this.localeVersionRaw + " &ato the new "  + "&ev" + this.latestVersionRaw);
     		try {
     			URL downloadUrl = new URL(this.AUTOHOST + this.AUTOQUERY);
     			HttpURLConnection httpConnection = (HttpURLConnection) downloadUrl.openConnection();
@@ -65,15 +65,15 @@ public class UpdateHandler {
     				fetchedSize += bytesRead;
     				final int currentProgress = (int)(((double) fetchedSize / (double) cloudFileSize) * 30);
     				if ((((fetchedSize * 100) / cloudFileSize) % 25) == 0 && currentProgress > 10) {
-    					ServerHandler.sendMessage(sender, progressBar.substring(0, currentProgress + 2) + "&c" + progressBar.substring(currentProgress + 2));
+    					ServerHandler.messageSender(sender, progressBar.substring(0, currentProgress + 2) + "&c" + progressBar.substring(currentProgress + 2));
     				}
     			}
     			bout.close(); in.close(); fos.close();
-    			ServerHandler.sendMessage(sender, "&aSuccessfully updated to v" + this.latestVersionRaw + "!");
-    			ServerHandler.sendMessage(sender, "&aYou must restart your server for this to take affect.");
+    			ServerHandler.messageSender(sender, "&aSuccessfully updated to v" + this.latestVersionRaw + "!");
+    			ServerHandler.messageSender(sender, "&aYou must restart your server for this to take affect.");
     		} catch (Exception e) {
-    			ServerHandler.sendMessage(sender, "&cAn error has occurred while trying to update the plugin ItemJoin.");
-    			ServerHandler.sendMessage(sender, "&cPlease try again later, if you continue to see this please contact the plugin developer.");
+    			ServerHandler.messageSender(sender, "&cAn error has occurred while trying to update the plugin ItemJoin.");
+    			ServerHandler.messageSender(sender, "&cPlease try again later, if you continue to see this please contact the plugin developer.");
     			ServerHandler.sendDebugTrace(e);
     		}
     	}
@@ -85,21 +85,21 @@ public class UpdateHandler {
     public void checkUpdates(CommandSender sender, boolean onStart) {
     	if (this.updateNeeded(sender, onStart) && this.updatesAllowed) {
     		if (this.betaVersion) {
-    			ServerHandler.sendMessage(sender, "&cYour current version: &bv" + this.localeVersionRaw + "-SNAPSHOT");
-    			ServerHandler.sendMessage(sender, "&cThis &bSNAPSHOT &cis outdated and a release version is now available.");
+    			ServerHandler.messageSender(sender, "&cYour current version: &bv" + this.localeVersionRaw + "-SNAPSHOT");
+    			ServerHandler.messageSender(sender, "&cThis &bSNAPSHOT &cis outdated and a release version is now available.");
     		} else {
-    			ServerHandler.sendMessage(sender, "&cYour current version: &bv" + this.localeVersionRaw);
+    			ServerHandler.messageSender(sender, "&cYour current version: &bv" + this.localeVersionRaw);
     		}
-    		ServerHandler.sendMessage(sender, "&cA new version is available: " + "&av" + this.latestVersionRaw);
-    		ServerHandler.sendMessage(sender, "&aGet it from: https://www.spigotmc.org/resources/itemjoin.12661/history");
-    		ServerHandler.sendMessage(sender, "&aIf you wish to auto update, please type /ItemJoin AutoUpdate");
+    		ServerHandler.messageSender(sender, "&cA new version is available: " + "&av" + this.latestVersionRaw);
+    		ServerHandler.messageSender(sender, "&aGet it from: https://www.spigotmc.org/resources/itemjoin.12661/history");
+    		ServerHandler.messageSender(sender, "&aIf you wish to auto update, please type /ItemJoin AutoUpdate");
     		this.sendNotifications();
     	} else if (this.updatesAllowed) {
     		if (this.betaVersion) {
-    			ServerHandler.sendMessage(sender, "&aYou are running a SNAPSHOT!");
-    			ServerHandler.sendMessage(sender, "&aIf you find any bugs please report them!");
+    			ServerHandler.messageSender(sender, "&aYou are running a SNAPSHOT!");
+    			ServerHandler.messageSender(sender, "&aIf you find any bugs please report them!");
     		}
-    		ServerHandler.sendMessage(sender, "&aYou are up to date!");
+    		ServerHandler.messageSender(sender, "&aYou are up to date!");
     	}
     }
     
@@ -108,7 +108,7 @@ public class UpdateHandler {
      */
     private Boolean updateNeeded(CommandSender sender, boolean onStart) {
     	if (this.updatesAllowed) {
-    		ServerHandler.sendMessage(sender, "&aChecking for updates...");
+    		ServerHandler.messageSender(sender, "&aChecking for updates...");
     		try {
     			InputStream input = (InputStream) new URL(this.HOST).openStream();
     			BufferedReader reader = new BufferedReader(new InputStreamReader(input));
@@ -122,14 +122,14 @@ public class UpdateHandler {
     				}
     			}
     		} catch (Exception e) {
-    			ServerHandler.sendMessage(sender, "&cAn error has occured when checking the plugin version!");
-    			ServerHandler.sendMessage(sender, "&cPlease contact the plugin developer!");
+    			ServerHandler.messageSender(sender, "&cAn error has occured when checking the plugin version!");
+    			ServerHandler.messageSender(sender, "&cPlease contact the plugin developer!");
     			ServerHandler.sendDebugTrace(e);
     			return false;
     		}
     	} else if (!onStart) {
-    		ServerHandler.sendMessage(sender, "&cUpdate checking is currently disabled in the config.yml");
-    		ServerHandler.sendMessage(sender, "&cIf you wish to use the auto update feature, you will need to enable it.");
+    		ServerHandler.messageSender(sender, "&cUpdate checking is currently disabled in the config.yml");
+    		ServerHandler.messageSender(sender, "&cIf you wish to use the auto update feature, you will need to enable it.");
         }
     	return false;
     }
@@ -146,8 +146,8 @@ public class UpdateHandler {
     				playersOnline = ((Collection < ? > ) Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).invoke(null, new Object[0]));
     				for (Object objPlayer: playersOnline) {
     					if (((Player) objPlayer).isOp()) {
-    						ServerHandler.sendPlayerMessage(((Player) objPlayer), "&eAn update has been found!");
-    						ServerHandler.sendPlayerMessage(((Player) objPlayer), "&ePlease update to the latest version: v" + this.latestVersionRaw);
+    						ServerHandler.messageSender(((Player) objPlayer), "&eAn update has been found!");
+    						ServerHandler.messageSender(((Player) objPlayer), "&ePlease update to the latest version: v" + this.latestVersionRaw);
     					}
     				}
     			}
@@ -155,8 +155,8 @@ public class UpdateHandler {
     			playersOnlineOld = ((Player[]) Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).invoke(null, new Object[0]));
     			for (Player objPlayer: playersOnlineOld) {
     				if (objPlayer.isOp()) {
-						ServerHandler.sendPlayerMessage(objPlayer, "&eAn update has been found!");
-						ServerHandler.sendPlayerMessage(objPlayer, "&ePlease update to the latest version: v" + this.latestVersionRaw);
+						ServerHandler.messageSender(objPlayer, "&eAn update has been found!");
+						ServerHandler.messageSender(objPlayer, "&ePlease update to the latest version: v" + this.latestVersionRaw);
     				}
     			}
     		}

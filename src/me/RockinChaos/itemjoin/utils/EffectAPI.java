@@ -27,8 +27,8 @@ public class EffectAPI {
 				if (particleParts[1] != null && !particleParts[1].isEmpty() && Utils.isInt(particleParts[1])) { particleLife = Integer.parseInt(particleParts[1]); }
 				player.getWorld().spawnParticle(particle, player.getLocation(), particleLife);
 			} catch (Exception e) {
-				ServerHandler.sendErrorMessage("&cThere was an issue executing the commands-particle you defined.");
-				ServerHandler.sendErrorMessage("&c" + commandParticle + "&c is not a particle in " + Reflection.getServerVersion() + ".");
+				ServerHandler.logSevere("{EffectAPI} There was an issue executing the commands-particle you defined.");
+				ServerHandler.logWarn("{EffectAPI} " + commandParticle + " is not a particle in " + Reflection.getServerVersion() + ".");
 				ServerHandler.sendDebugTrace(e);
 			}
 		}

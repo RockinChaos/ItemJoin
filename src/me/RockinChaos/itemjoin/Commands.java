@@ -176,7 +176,7 @@ public class Commands implements CommandExecutor {
 						Language.dispatchMessage(sender, "");
 						String[] placeHolders = Language.newString(); placeHolders[3] = PlayerHandler.getHandItem((Player) sender).getType().toString();
 						Language.sendLangMessage("Commands.Info.material", sender, placeHolders);
-						if (!ServerHandler.hasAquaticUpdate()) {
+						if (!ServerHandler.hasSpecificUpdate("1_13")) {
 							placeHolders[3] = Legacy.getDataValue(PlayerHandler.getHandItem((Player) sender)) + "";
 							Language.sendLangMessage("Commands.Info.dataValue", sender, placeHolders);
 						}

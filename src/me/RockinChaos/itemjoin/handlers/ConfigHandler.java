@@ -13,8 +13,6 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.RegisteredListener;
-import org.bukkit.scheduler.BukkitRunnable;
-
 import me.RockinChaos.itemjoin.Commands;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.giveitems.listeners.LimitSwitch;
@@ -43,7 +41,6 @@ import me.RockinChaos.itemjoin.listeners.SwitchHands;
 import me.RockinChaos.itemjoin.utils.DependAPI;
 import me.RockinChaos.itemjoin.utils.UI;
 import me.RockinChaos.itemjoin.utils.Language;
-import me.RockinChaos.itemjoin.utils.Logger;
 import me.RockinChaos.itemjoin.utils.Metrics;
 import me.RockinChaos.itemjoin.utils.TabComplete;
 import me.RockinChaos.itemjoin.utils.Reflection;
@@ -66,22 +63,13 @@ public class ConfigHandler {
 	private static UI itemCreator;
 	private static Metrics metrics;
 	private static DependAPI depends;
-	private static Logger logger;
 	
 	public static void generateData(File file) {
 		configFile(); itemsFile(); langFile(); registerPrevents();
 		setDepends(new DependAPI());
 		setSQLData(new SQLData());
 		if (file != null) { sendUtilityDepends(); setUpdater(new UpdateHandler(file)); }
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-        		setLogger(new Logger());
-        		setItemDesigner(new ItemDesigner());
-        		setProtolcolManager(new ProtocolManager());
-        		setItemCreator(new UI());
-		    }
-		}.runTaskAsynchronously(ItemJoin.getInstance());
+		Bukkit.getServer().getScheduler().runTaskAsynchronously(ItemJoin.getInstance(), () -> { setItemDesigner(new ItemDesigner()); setProtolcolManager(new ProtocolManager()); setItemCreator(new UI()); });
 		Bukkit.getServer().getScheduler().runTaskLater(ItemJoin.getInstance(), () -> { setMetrics(new Metrics()); }, 100L);
 	}
 	
@@ -163,7 +151,7 @@ public class ConfigHandler {
 					File configFile = new File(ItemJoin.getInstance().getDataFolder(), "config.yml");
 					configFile.delete();
 					getConfigData("config.yml");
-					ServerHandler.sendErrorMessage("&aYour config.yml is out of date and new options are available, generating a new one!");
+					ServerHandler.logWarn("Your config.yml is out of date and new options are available, generating a new one!");
 				}
 			}
 		}
@@ -182,7 +170,7 @@ public class ConfigHandler {
 					File configFile = new File(ItemJoin.getInstance().getDataFolder(), "items.yml");
 					configFile.delete();
 					getConfigData("items.yml");
-					ServerHandler.sendErrorMessage("&4Your items.yml is out of date and new options are available, generating a new one!");
+					ServerHandler.logWarn("Your items.yml is out of date and new options are available, generating a new one!");
 				}
 			}
 		}
@@ -220,7 +208,7 @@ public class ConfigHandler {
 					File configFile = new File(ItemJoin.getInstance().getDataFolder(), affix + "-lang.yml");
 					configFile.delete();
 					getConfigData(affix + "-lang.yml");
-					ServerHandler.sendErrorMessage("&4Your " + affix + "-lang.yml is out of date and new options are available, generating a new one!");
+					ServerHandler.logWarn("Your " + affix + "-lang.yml is out of date and new options are available, generating a new one!");
 				}
 			}
 		}
@@ -264,13 +252,13 @@ public class ConfigHandler {
 	}
 	
 	private static void sendUtilityDepends() {
-		ServerHandler.sendConsoleMessage("&aFetched [{ &e" + (getDepends().authMeEnabled() ? "AuthMe, " : "") + (getDepends().nickEnabled() ? "BetterNick, " : "") 
-		+ (getDepends().mCoreEnabled() ? "Multiverse-Core, " : "") + (getDepends().mInventoryEnabled() ? "Multiverse-Inventories, " : "") 
-		+ (getDepends().myWorldsEnabled() ? "My Worlds, " : "") + (getDepends().perInventoryEnabled() ? "PerWorldInventory, " : "") 
-		+ (getDepends().perPluginsEnabled() ? "PerWorldPlugins, " : "") + (getDepends().tokenEnchantEnabled() ? "TokenEnchant, " : "") 
-		+ (getDepends().getGuard().guardEnabled() ? "WorldGuard, " : "") + (getDepends().databaseEnabled() ? "HeadDatabase, " : "") 
-		+ (getDepends().xInventoryEnabled() ? "xInventories, " : "") + (getDepends().placeHolderEnabled() ? "PlaceholderAPI, " : "") 
-		+ (getDepends().getVault().vaultEnabled() ? "Vault " : "") + "&a}]");
+		ServerHandler.logInfo("softDepend(s) { " + (getDepends().authMeEnabled() ? "AuthMe, " : "") + (getDepends().nickEnabled() ? "BetterNick, " : "") 
+				+ (getDepends().mCoreEnabled() ? "Multiverse-Core, " : "") + (getDepends().mInventoryEnabled() ? "Multiverse-Inventories, " : "") 
+				+ (getDepends().myWorldsEnabled() ? "My Worlds, " : "") + (getDepends().perInventoryEnabled() ? "PerWorldInventory, " : "") 
+				+ (getDepends().perPluginsEnabled() ? "PerWorldPlugins, " : "") + (getDepends().tokenEnchantEnabled() ? "TokenEnchant, " : "") 
+				+ (getDepends().getGuard().guardEnabled() ? "WorldGuard, " : "") + (getDepends().databaseEnabled() ? "HeadDatabase, " : "") 
+				+ (getDepends().xInventoryEnabled() ? "xInventories, " : "") + (getDepends().placeHolderEnabled() ? "PlaceholderAPI, " : "") 
+				+ (getDepends().getVault().vaultEnabled() ? "Vault " : "") + "}");
 	}
 	
 	private static boolean isGenerating() {
@@ -281,9 +269,8 @@ public class ConfigHandler {
 		if (ConfigHandler.getConfigurationSection() != null) {
 			return true;
 		} else if (ConfigHandler.getConfigurationSection() == null) {
-			ServerHandler.sendErrorMessage("&4There are no items detected in the items.yml.");
-			ServerHandler.sendErrorMessage("&4Try adding an item to the items section in the items.yml.");
-			ServerHandler.sendErrorMessage("&eIf you continue to see this message contact the plugin developer!");
+			ServerHandler.logSevere("{Config} There are no items detected in the items.yml.");
+			ServerHandler.logWarn("{Config} Try adding an item to the items section in the items.yml.");
 			return false;
 		}
 		return false;
@@ -295,10 +282,6 @@ public class ConfigHandler {
 	
 	public static boolean isLoggable() {
 		return ConfigHandler.getConfig("config.yml").getBoolean("General.Log-Commands");
-	}
-	
-	public static boolean isLogColor() {
-		return ConfigHandler.getConfig("config.yml").getBoolean("General.Log-Coloration");
 	}
 
 	public static String isPreventPickups() {
@@ -379,14 +362,6 @@ public class ConfigHandler {
 	
 	private static void setMetrics(Metrics metric) {
 		metrics = metric;
-	}
-	
-	public static Logger getLogger() {
-		return logger;
-	}
-	
-	private static void setLogger(Logger log) {
-		logger = log;
 	}
 	
 	private static void setGenerating(boolean isGenerating) {
@@ -487,7 +462,7 @@ public class ConfigHandler {
 				ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Storable(), ItemJoin.getInstance());
 			}
 		}
-		if (itemMap.isMovement() && ServerHandler.hasCombatUpdate() && Reflection.getBukkitClass("event.player.PlayerSwapHandItemsEvent") != null && !isListenerEnabled(SwitchHands.class.getSimpleName())) {
+		if (itemMap.isMovement() && ServerHandler.hasSpecificUpdate("1_9") && Reflection.getBukkitClass("event.player.PlayerSwapHandItemsEvent") != null && !isListenerEnabled(SwitchHands.class.getSimpleName())) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new SwitchHands(), ItemJoin.getInstance());
 		}
 	}

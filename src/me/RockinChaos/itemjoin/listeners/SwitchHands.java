@@ -14,7 +14,7 @@ public class SwitchHands implements Listener {
 	
 	@EventHandler
 	private void onHandModify(PlayerSwapHandItemsEvent event) {
-		if (ServerHandler.hasCombatUpdate()) {
+		if (ServerHandler.hasSpecificUpdate("1_9")) {
 			ItemStack offhand = event.getOffHandItem();
 			ItemStack mainhand = event.getMainHandItem();
 			Player player = event.getPlayer();
