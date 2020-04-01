@@ -96,35 +96,35 @@ public class ItemDesigner {
 		if (id != null) {
 			if (id.contains(":")) {
 				String[] parts = id.split(":"); id = parts[0]; dataValue = parts[1];
-				if (ServerHandler.hasAquaticUpdate()) {
-					ServerHandler.sendWarnMessage("&cThe item &e" + internalName + "&c is using a &eLegacy Material&c which is no longer supported as of Minecraft 1.13.");
-					ServerHandler.sendWarnMessage("&cThis will cause issues, please see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html for a list of material names.");
+				if (ServerHandler.hasSpecificUpdate("1_13")) {
+					ServerHandler.logWarn("{ItemMap} The item " + internalName + " is using a Legacy Material which is no longer supported as of Minecraft 1.13.");
+					ServerHandler.logWarn("{ItemMap} This will cause issues, please see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html for a list of material names.");
 				}
 			}
-			
-			if (!ServerHandler.hasCombatUpdate() && id.equalsIgnoreCase("TIPPED_ARROW") || id.equalsIgnoreCase("440") || id.equalsIgnoreCase("0440")) {
-				ServerHandler.sendErrorMessage("&4Your server is running &eMC " + Reflection.getServerVersion() + " and this version of Minecraft does not have the item TIPPED_ARROW!");
-				ServerHandler.sendErrorMessage("&4You are receiving this notice because the item(s) exists in your items.yml and will not be set, please remove the item(s) or update your server!");
+			if (!ServerHandler.hasSpecificUpdate("1_9") && id.equalsIgnoreCase("TIPPED_ARROW") || id.equalsIgnoreCase("440") || id.equalsIgnoreCase("0440")) {
+				ServerHandler.logWarn("{ItemMap} Your server is running MC " + Reflection.getServerVersion() + " and this version of Minecraft does not have the item TIPPED_ARROW.");
+				ServerHandler.logWarn("{ItemMap} You are receiving this notice because the item(s) exists in your items.yml and will not be set, please remove the item(s) or update your server.");
 				return false;
-			} else if (!ServerHandler.hasCombatUpdate() && id.equalsIgnoreCase("LINGERING_POTION") || id.equalsIgnoreCase("441") || id.equalsIgnoreCase("0441")) {
-				ServerHandler.sendErrorMessage("&4Your server is running &eMC " + Reflection.getServerVersion() + " and this version of Minecraft does not have the item LINGERING_POTION!");
-				ServerHandler.sendErrorMessage("&4You are receiving this notice because the item(s) exists in your items.yml and will not be set, please remove the item(s) or update your server!");
+			} else if (!ServerHandler.hasSpecificUpdate("1_9") && id.equalsIgnoreCase("LINGERING_POTION") || id.equalsIgnoreCase("441") || id.equalsIgnoreCase("0441")) {
+				ServerHandler.logWarn("{ItemMap} Your server is running MC " + Reflection.getServerVersion() + " and this version of Minecraft does not have the item LINGERING_POTION.");
+				ServerHandler.logWarn("{ItemMap} You are receiving this notice because the item(s) exists in your items.yml and will not be set, please remove the item(s) or update your server.");
 				return false;
 			} else if (ItemHandler.getMaterial(id, dataValue) == null) {
-				ServerHandler.sendErrorMessage("&eThe Item " + internalName + "'s Material 'ID' is invalid or does not exist!");
-				ServerHandler.sendErrorMessage("&eThe Item " + internalName + " &ewill not be set!");
+				ServerHandler.logSevere("{ItemMap} The Item " + internalName + "'s Material 'ID' is invalid or does not exist.");
+				ServerHandler.logWarn("{ItemMap} The Item " + internalName + " will not be set!");
 				if (Utils.isInt(id)) {
-					ServerHandler.sendErrorMessage("&eIf you are using a numerical id and a numerical dataValue, include quotations or apostrophes at the beginning and the end or this error will persist, the id should look like '160:15' or \"160:15\".");
+					ServerHandler.logSevere("{ItemMap} If you are using a numerical id and a numerical dataValue.");
+					ServerHandler.logSevere("{ItemMap} Include quotations or apostrophes at the beginning and the end or this error will persist, the id should look like '160:15' or \"160:15\".");
 				}
 				return false;
 			} else if (itemNode.getString(".slot") == null) {
-				ServerHandler.sendErrorMessage("&eThe Item " + internalName + "'s SLOT is invalid!");
-				ServerHandler.sendErrorMessage("&ePlease refresh your items.yml and fix the undefined slot.");
+				ServerHandler.logSevere("{ItemMap} The Item " + internalName + "'s SLOT is invalid.");
+				ServerHandler.logWarn("{ItemMap} Please refresh your items.yml and fix the undefined slot.");
 				return false;
 			}
 		} else { 
-			ServerHandler.sendErrorMessage("&eThe Item" + internalName + " does not have a Material ID defined!"); 
-			ServerHandler.sendErrorMessage("&eThe Item " + internalName + " &ewill not be set!"); 
+			ServerHandler.logSevere("{ItemMap} The Item" + internalName + " does not have a Material ID defined."); 
+			ServerHandler.logWarn("{ItemMap} The Item " + internalName + " will not be set!"); 
 			return false;
 		}
 		return true;
@@ -137,18 +137,18 @@ public class ItemDesigner {
 //  =========================================================================================================================== //
 	private boolean isDefinable(String internalName, String slot) {
 		if (!Utils.isInt(slot) && !ItemHandler.isCustomSlot(slot)) {
-			ServerHandler.sendErrorMessage("&eThe Item " + internalName + "'s slot is invalid or does not exist!");
-			ServerHandler.sendErrorMessage("&eThe Item " + internalName + " &ewill not be set!");
+			ServerHandler.logSevere("{ItemMap} The Item " + internalName + "'s slot is invalid or does not exist.");
+			ServerHandler.logWarn("{ItemMap} The Item " + internalName + " will not be set!");
 			return false;
 		} else if (Utils.isInt(slot)) {
 			int parseSlot = Integer.parseInt(slot);
 			if (!(parseSlot >= 0 && parseSlot <= 35)) {
-				ServerHandler.sendErrorMessage("&eThe Item " + internalName + "'s slot must be between 0 and 35!");
-				ServerHandler.sendErrorMessage("&eThe Item " + internalName + " &ewill not be set!");
+				ServerHandler.logSevere("{ItemMap} The Item " + internalName + "'s slot must be between 0 and 35.");
+				ServerHandler.logWarn("{ItemMap} The Item " + internalName + " will not be set!");
 				return false;
 			}
-		} else if (!ServerHandler.hasCombatUpdate() && slot.equalsIgnoreCase("Offhand")) {
-			ServerHandler.sendErrorMessage("&4Your server is running &eMC " + Reflection.getServerVersion() + " and this version of Minecraft does not have Offhand support!");
+		} else if (!ServerHandler.hasSpecificUpdate("1_9") && slot.equalsIgnoreCase("Offhand")) {
+			ServerHandler.logWarn("{ItemMap} Your server is running MC " + Reflection.getServerVersion() + " and this version of Minecraft does not have OFFHAND support!");
 			return false;
 		}
 		return true;
@@ -217,14 +217,14 @@ public class ItemDesigner {
 	private void setSkullDatabase(ItemMap itemMap) {
 		if (ConfigHandler.getDepends().databaseEnabled() && itemMap.getNodeLocation().getString(".skull-texture") != null) {
 			if (itemMap.getMaterial().toString().equalsIgnoreCase("SKULL_ITEM") || itemMap.getMaterial().toString().equalsIgnoreCase("PLAYER_HEAD")) {
-				if (itemMap.getNodeLocation().getString(".skull-owner") != null) {  ServerHandler.sendErrorMessage("&4You cannot define a skull owner and a skull texture at the same time, please remove one from the item."); return;  }
+				if (itemMap.getNodeLocation().getString(".skull-owner") != null) {  ServerHandler.logWarn("{ItemMap} You cannot define a skull owner and a skull texture at the same time, remove one from the item."); return;  }
 				String skullTexture = getActualTexture(itemMap);
 				if (skullTexture.contains("hdb-")) {
 					try {
 						itemMap.setSkullTexture(skullTexture.replace("hdb-", ""));
 						itemMap.setHeadDatabase(true);
 					} catch (NullPointerException e) {
-						ServerHandler.sendErrorMessage("&4HeadDatabase could not find &c#" + skullTexture + "&4, this head does not exist.");
+						ServerHandler.logSevere("{ItemMap} HeadDatabaseAPI could not find #" + skullTexture + ", this head does not exist.");
 						ServerHandler.sendDebugTrace(e);
 					}
 				}
@@ -270,8 +270,8 @@ public class ItemDesigner {
 					try {
 						level = Integer.parseInt(parts[1]);
 					} catch (NumberFormatException e) {
-						ServerHandler.sendErrorMessage("&4An error occurred in the config, &c" + parts[1] + "&4 is not a number and a number was expected!");
-						ServerHandler.sendErrorMessage("&aEnchantment: " + parts[0] + " will now be enchanted by level 1.");
+						ServerHandler.logSevere("{ItemMap} An error occurred in the config, " + parts[1] + " is not a number and a number was expected!");
+						ServerHandler.logWarn("{ItemMap} Enchantment: " + parts[0] + " will now be enchanted by level 1.");
 						ServerHandler.sendDebugTrace(e);
 					}
 				}
@@ -280,8 +280,8 @@ public class ItemDesigner {
 				} else if (enchantName == null && ConfigHandler.getDepends().tokenEnchantEnabled() && TokenEnchantAPI.getInstance().getEnchant(name) != null) {
 					listEnchants.put(name, level);
 				} else if (enchantName == null && !ConfigHandler.getDepends().tokenEnchantEnabled()) {
-					ServerHandler.sendErrorMessage("&4An error occurred in the config, &a" + name + "&4 is an incorrect enchantment name!");
-					ServerHandler.sendErrorMessage("&4Please see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/enchantments/Enchantment.html for a list of correct enchantment names!");
+					ServerHandler.logSevere("{ItemMap} An error occurred in the config, " + name + " is not a proper enchant name!");
+					ServerHandler.logWarn("{ItemMap} Please see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/enchantments/Enchantment.html for a list of correct enchantment names.");
 				}
 			}
 			itemMap.setEnchantments(listEnchants);
@@ -332,7 +332,7 @@ public class ItemDesigner {
 				tag.getClass().getMethod("setString", String.class, String.class).invoke(tag, "ItemJoin Slot", itemMap.getItemValue());
 				itemMap.setNewNBTData(itemMap.getConfigName() + " " + itemMap.getItemValue(), tag);
 			} catch (Exception e) {
-				ServerHandler.sendDebugMessage("Error 133 has occured when setting NBTData to an item.");
+				ServerHandler.logSevere("{ItemMap} An error has occured when setting NBTData to an item.");
 				ServerHandler.sendDebugTrace(e);
 			}
 		} else { itemMap.setLegacySecret(ConfigHandler.encodeSecretData(ConfigHandler.getNBTData(itemMap))); }
@@ -413,8 +413,8 @@ public class ItemDesigner {
 	private void safteyCheckURL(ItemMap itemMap, JSONEvent type, String inputResult) {
 		if (type.equals(JSONEvent.OPEN_URL)) {
 			if (!Utils.containsIgnoreCase(inputResult, "https") && !Utils.containsIgnoreCase(inputResult, "http")) {
-				ServerHandler.sendErrorMessage("&c[ERROR] The URL Specified for the clickable link in the book &b" + itemMap.getConfigName() + "&c is missing http or https and will not be clickable.");
-				ServerHandler.sendErrorMessage("&c[ERROR] A URL designed for a clickable link should look as follows; &bhttps://&cwww.google.com/");
+				ServerHandler.logSevere("{ItemMap} The URL Specified for the clickable link in the book " + itemMap.getConfigName() + " is missing http or https and will not be clickable.");
+				ServerHandler.logWarn("{ItemMap} A URL designed for a clickable link should resemble this link structure: https://www.google.com/");
 			}
 		}
 	}
@@ -423,7 +423,8 @@ public class ItemDesigner {
 		TEXT("nullEvent", "text", "<text:"),
 		SHOW_TEXT("hoverEvent", "show_text", "<show_text:"),
 		OPEN_URL("clickEvent", "open_url", "<open_url:"),
-		RUN_COMMAND("clickEvent", "run_command", "<run_command:");
+		RUN_COMMAND("clickEvent", "run_command", "<run_command:"),
+		CHANGE_PAGE("clickEvent", "change_page", "<change_page:");
 		private final String event;
 		private final String action;
 		private final String matchType;
@@ -592,7 +593,7 @@ public class ItemDesigner {
 	private void setSkull(ItemMap itemMap) {
 		if (itemMap.getNodeLocation().getString(".skull-owner") != null) {
 			if (itemMap.getMaterial().toString().equalsIgnoreCase("SKULL_ITEM") || itemMap.getMaterial().toString().equalsIgnoreCase("PLAYER_HEAD")) {
-				if (itemMap.getNodeLocation().getString(".skull-texture") != null) { ServerHandler.sendErrorMessage("&4You cannot define a skull owner and a skull texture at the same time, please remove one from the item."); return;  }
+				if (itemMap.getNodeLocation().getString(".skull-texture") != null) { ServerHandler.logWarn("{ItemMap} You cannot define a skull owner and a skull texture at the same time, remove one from the item."); return;  }
 				String owner = getActualOwner(itemMap);
 				itemMap.setSkull(owner);
 			}
@@ -607,7 +608,7 @@ public class ItemDesigner {
     private void setSkullTexture(ItemMap itemMap) {
     	if (ServerHandler.hasSpecificUpdate("1_8") && itemMap.getNodeLocation().getString(".skull-texture") != null) {
     		if (itemMap.getMaterial().toString().equalsIgnoreCase("SKULL_ITEM") || itemMap.getMaterial().toString().equalsIgnoreCase("PLAYER_HEAD")) {
-				if (itemMap.getNodeLocation().getString(".skull-owner") != null) { ServerHandler.sendErrorMessage("&4You cannot define a skull owner and a skull texture at the same time, please remove one from the item."); return;  }
+				if (itemMap.getNodeLocation().getString(".skull-owner") != null) { ServerHandler.logWarn("{ItemMap} You cannot define a skull owner and a skull texture at the same time, remove one from the item."); return;  }
     			String texture = getActualTexture(itemMap);
     			if (!texture.contains("hdb-")) {
     				GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
@@ -644,13 +645,13 @@ public class ItemDesigner {
 						duritation = Integer.parseInt(potionSection[2]) * 20;
 						potionEffectList.add(new PotionEffect(type, duritation, amplifier));
 					} catch (NumberFormatException e) {
-						ServerHandler.sendErrorMessage("&4An error occurred in the config, &c" + potionSection[1] + "&4 is not a number and a number was expected!");
-						ServerHandler.sendErrorMessage("&4Potion: " + potionSection[0] + " will now be set to level 1.");
+						ServerHandler.logSevere("{ItemMap} An error occurred in the config, " + potionSection[1] + " is not a number and a number was expected.");
+						ServerHandler.logWarn("{ItemMap} Consumable Potion: " + potionSection[0] + " will now be set to level 1.");
 						ServerHandler.sendDebugTrace(e);
 					}
 				} else {
-					ServerHandler.sendErrorMessage("&4[153] An error occurred in the config, &a" + potionSection[0] + "&4 is an incorrect potion effect!");
-					ServerHandler.sendErrorMessage("&4Please see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/potion/PotionEffectType.html for a list of correct potion effects!");
+					ServerHandler.logSevere("{ItemMap} An error occurred in the config, " + potionSection[0] + " is an incorrect potion effect for the consumable.");
+					ServerHandler.logWarn("{ItemMap} Please see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/potion/PotionEffectType.html for a list of correct potion effects.");
 				}
 			}
 			itemMap.setCustomConsumable(true);
@@ -666,7 +667,7 @@ public class ItemDesigner {
 	private void setPotionEffects(ItemMap itemMap) {
 		if (itemMap.getNodeLocation().getString(".potion-effect") != null) {
 			if (itemMap.getMaterial().toString().equalsIgnoreCase("POTION") || itemMap.getMaterial().toString().equalsIgnoreCase("SPLASH_POTION")
-				|| ServerHandler.hasCombatUpdate() && itemMap.getMaterial().toString().equalsIgnoreCase("LINGERING_POTION")) {
+				|| ServerHandler.hasSpecificUpdate("1_9") && itemMap.getMaterial().toString().equalsIgnoreCase("LINGERING_POTION")) {
 				String potionList = itemMap.getNodeLocation().getString(".potion-effect").replace(" ", "");
 				List <PotionEffect> potionEffectList = new ArrayList<PotionEffect>();
 				for (String potion: potionList.split(",")) {
@@ -682,13 +683,13 @@ public class ItemDesigner {
 							duritation = Integer.parseInt(potionSection[2]) * 20;
 							potionEffectList.add(new PotionEffect(type, duritation, amplifier));
 						} catch (NumberFormatException e) {
-							ServerHandler.sendErrorMessage("&4An error occurred in the config, &c" + potionSection[1] + "&4 is not a number and a number was expected!");
-							ServerHandler.sendErrorMessage("&4Potion: " + potionSection[0] + " will now be set to level 1.");
+							ServerHandler.logSevere("{ItemMap} An error occurred in the config, " + potionSection[1] + " is not a number and a number was expected.");
+							ServerHandler.logWarn("{ItemMap} Custom Potion: " + potionSection[0] + " will now be set to level 1.");
 							ServerHandler.sendDebugTrace(e);
 						}
 					} else {
-						ServerHandler.sendErrorMessage("&4[152] An error occurred in the config, &a" + potionSection[0] + "&4 is an incorrect potion effect!");
-						ServerHandler.sendErrorMessage("&4Please see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/potion/PotionEffectType.html for a list of correct potion effects!");
+						ServerHandler.logSevere("{ItemMap} An error occurred in the config, " + potionSection[0] + " is an incorrect potion effect for the custom potion.");
+						ServerHandler.logWarn("{ItemMap} Please see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/potion/PotionEffectType.html for a list of correct potion effects.");
 					}
 				}
 				itemMap.setPotionEffect(potionEffectList);
@@ -703,7 +704,7 @@ public class ItemDesigner {
 //  ==================================================== //
 	private void setTippedArrows(ItemMap itemMap) {
 		if (itemMap.getNodeLocation().getString(".potion-effect") != null) {
-			if (ServerHandler.hasCombatUpdate() && !ItemJoin.getInstance().getServer().getVersion().contains("(MC: 1.9)") && itemMap.getMaterial().toString().equalsIgnoreCase("TIPPED_ARROW")) {
+			if (ServerHandler.hasSpecificUpdate("1_9") && !ItemJoin.getInstance().getServer().getVersion().contains("(MC: 1.9)") && itemMap.getMaterial().toString().equalsIgnoreCase("TIPPED_ARROW")) {
 				String effectList = itemMap.getNodeLocation().getString(".potion-effect").replace(" ", "");
 				List <PotionEffect> potionEffectList = new ArrayList<PotionEffect>();
 				for (String effect: effectList.split(",")) {
@@ -719,13 +720,13 @@ public class ItemDesigner {
 							duration = Integer.parseInt(tippedSection[2]);
 							potionEffectList.add(new PotionEffect(type, duration * 160, level));
 						} catch (NumberFormatException e) {
-							ServerHandler.sendErrorMessage("&4An error occurred in the config, &c" + tippedSection[1] + "&4 is not a number and a number was expected!");
-							ServerHandler.sendErrorMessage("&4Effect: " + tippedSection[0] + " will now be set to level 1.");
+							ServerHandler.logSevere("{ItemMap} An error occurred in the config, " + tippedSection[1] + " is not a number and a number was expected.");
+							ServerHandler.logWarn("{ItemMap} Tipped Effect: " + tippedSection[0] + " will now be set to level 1.");
 							ServerHandler.sendDebugTrace(e);
 						}
 					} else {
-						ServerHandler.sendErrorMessage("&4[151] An error occurred in the config, &a" + tippedSection[0] + "&4 is an incorrect potion effect!");
-						ServerHandler.sendErrorMessage("&4Please see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/potion/PotionEffectType.html for a list of correct potion effects!");
+						ServerHandler.logSevere("{ItemMap} An error occurred in the config, " + tippedSection[0] + " is an incorrect potion effect for the tipped arrow.");
+						ServerHandler.logWarn("{ItemMap} Please see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/potion/PotionEffectType.html for a list of correct potion effects.");
 					}
 				}
 				itemMap.setPotionEffect(potionEffectList);
@@ -749,11 +750,11 @@ public class ItemDesigner {
 				if (Color != null && Pattern != null) {
 					patterns.add(new Pattern(Color, Pattern));
 				} else if (Color == null) {
-					ServerHandler.sendErrorMessage("&4An error occurred in the config, &a" + bannerSection[0] + "&4 is an incorrect dye color!");
-					ServerHandler.sendErrorMessage("&4Please see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/DyeColor.html for a list of correct dye colors!");
+					ServerHandler.logSevere("{ItemMap} An error occurred in the config, " + bannerSection[0] + " is an incorrect dye color.");
+					ServerHandler.logWarn("{ItemMap} Please see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/DyeColor.html for a list of correct dye colors.");
 				} else if (Pattern == null) {
-					ServerHandler.sendErrorMessage("&4An error occurred in the config, &a" + bannerSection[1] + "&4 is an incorrect pattern type!");
-					ServerHandler.sendErrorMessage("&4Please see: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/block/banner/PatternType.html for a list of correct pattern types!");
+					ServerHandler.logSevere("{ItemMap} An error occurred in the config, " + bannerSection[1] + " is an incorrect pattern type.");
+					ServerHandler.logWarn("{ItemMap} Please see: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/block/banner/PatternType.html for a list of correct pattern types.");
 				}
 			}
 			itemMap.setBannerPatterns(patterns);
@@ -779,8 +780,8 @@ public class ItemDesigner {
 						for (String color: colorlist.split(",")) {
 							try { colors.add(DyeColor.valueOf(color.toUpperCase()).getFireworkColor()); saveColors.add(DyeColor.valueOf(color.toUpperCase())); } 
 							catch (Exception e) {
-								ServerHandler.sendErrorMessage("&4The item " + itemMap.getConfigName() + " has the incorrect dye color " + color.toUpperCase() + " and does not exist!");
-								ServerHandler.sendErrorMessage("&4Please see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/DyeColor.html for a list of correct dye color names!");
+								ServerHandler.logSevere("{ItemMap} The item " + itemMap.getConfigName() + " has the incorrect dye color " + color.toUpperCase() + " and does not exist.");
+								ServerHandler.logWarn("{ItemMap} Please see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/DyeColor.html for a list of correct dye color names.");
 							}
 						}
 					} else if (itemMap.getNodeLocation().getString(".firework.colors") == null) {
@@ -835,8 +836,8 @@ public class ItemDesigner {
 						if (hexValue) { itemMap.setLeatherHex(leatherColor); }
 					} 
 				} catch (Exception ex) { 
-					ServerHandler.sendErrorMessage("&4The leather-color: " + leatherColor + " is not a valid color for the item " + itemMap.getConfigName() + "!"); 
-					ServerHandler.sendErrorMessage("&4Use hexcolor or see valid bukkit colors here; https://hub.spigotmc.org/javadocs/spigot/org/bukkit/DyeColor.html"); 
+					ServerHandler.logSevere("{ItemMap} The leather-color: " + leatherColor + " is not a valid color for the item " + itemMap.getConfigName() + "."); 
+					ServerHandler.logWarn("{ItemMap} Use hexcolor or see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/DyeColor.html for valid bukkit colors."); 
 				}
 			}
 		}
