@@ -147,7 +147,7 @@ public class ItemUtilities {
 				} else if (clearType != null && clearType.equalsIgnoreCase("ITEMJOIN")) {
 					setClearItemJoinItems(player, region, event);
 				} else if (clearType != null) {
-					ServerHandler.sendErrorMessage("&c" + clearType + " for Clear-Items in the config.yml is not a valid option.");
+					ServerHandler.logSevere("{ItemMap} " + clearType + " for Clear-Items in the config.yml is not a valid option.");
 				}
 			}
 		}
@@ -162,19 +162,25 @@ public class ItemUtilities {
 		}
 		
 		if (ConfigHandler.getConfig("config.yml").getString("Clear-Items.Blacklist") != null) {
-			for (String value : blacklist) {
-				String valType = (Utils.containsIgnoreCase(value, "{id") ? "id" : (Utils.containsIgnoreCase(value, "{slot") ? "slot" : (Utils.containsIgnoreCase(value, "{name") ? "name" : "")));
-					String inputResult = StringUtils.substringBetween(value, "{" + valType + ":", "}");
-					if (valType.equalsIgnoreCase("id") && item.getType() == ItemHandler.getMaterial(inputResult.trim(), null)) {
-						return true;
-					} else if (valType.equalsIgnoreCase("slot") && slot.trim().equalsIgnoreCase(inputResult.trim())) {
-						return true;
-					} else if (valType.equalsIgnoreCase("name") && item.hasItemMeta() && item.getItemMeta().hasDisplayName()) {
-						String displayName = item.getItemMeta().getDisplayName();
-						if (ChatColor.stripColor(displayName).trim().equalsIgnoreCase(inputResult.trim())) {
+			try {
+				for (String value : blacklist) {
+					String valType = (Utils.containsIgnoreCase(value, "{id") ? "id" : (Utils.containsIgnoreCase(value, "{slot") ? "slot" : (Utils.containsIgnoreCase(value, "{name") ? "name" : "")));
+						String inputResult = StringUtils.substringBetween(value, "{" + valType + ":", "}");
+						if (valType.equalsIgnoreCase("id") && item.getType() == ItemHandler.getMaterial(inputResult.trim(), null)) {
 							return true;
+						} else if (valType.equalsIgnoreCase("slot") && slot.trim().equalsIgnoreCase(inputResult.trim())) {
+							return true;
+						} else if (valType.equalsIgnoreCase("name") && item.hasItemMeta() && item.getItemMeta().hasDisplayName()) {
+							String displayName = item.getItemMeta().getDisplayName();
+							if (ChatColor.stripColor(displayName).trim().equalsIgnoreCase(inputResult.trim())) {
+								return true;
+							}
 						}
-					}
+				}
+			} catch (Exception e) { 
+				ServerHandler.logSevere("{ItemMap} It looks like the Blacklist section is missing quotations or apostrohes.");
+				ServerHandler.logSevere("{ItemMap} Include quotations or apostrophes at the beginning and the end or this error will persist.");
+				ServerHandler.logSevere("{ItemMap} The blacklist should look like '{id:DIAMOND}, {slot:0}' or \"{id:DIAMOND}, {slot:0}\".");
 			}
 		}
 		return false;
@@ -197,7 +203,7 @@ public class ItemUtilities {
 					inventory.setLeggings(new ItemStack(Material.AIR));
 				} if (inventory.getBoots() != null && !isBlacklisted("Boots", inventory.getBoots()) && (protectItems.isEmpty() || (!item.isSimilar(inventory.getBoots()) && i == (protectItems.size() - 1)))) {
 					inventory.setBoots(new ItemStack(Material.AIR));
-				} if (ServerHandler.hasCombatUpdate() && inventory.getItemInOffHand() != null && !isBlacklisted("Offhand", inventory.getItemInOffHand()) && (protectItems.isEmpty() || (!item.isSimilar(inventory.getBoots()) && i == (protectItems.size() - 1)))) {
+				} if (ServerHandler.hasSpecificUpdate("1_9") && inventory.getItemInOffHand() != null && !isBlacklisted("Offhand", inventory.getItemInOffHand()) && (protectItems.isEmpty() || (!item.isSimilar(inventory.getBoots()) && i == (protectItems.size() - 1)))) {
 					PlayerHandler.setOffHandItem(player, new ItemStack(Material.AIR));
 				} if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
 					for (int k = 0; k < player.getOpenInventory().getTopInventory().getContents().length; k++) {
@@ -242,7 +248,7 @@ public class ItemUtilities {
 				inventory.setLeggings(new ItemStack(Material.AIR));
 			} if (inventory.getBoots() != null && !isBlacklisted("Boots", inventory.getBoots()) && ((protectItems.isEmpty() && ItemHandler.containsNBTData(inventory.getBoots())) || (!protectItems.contains(item) && item.isSimilar(inventory.getBoots())))) {
 				inventory.setBoots(new ItemStack(Material.AIR));
-			} if (ServerHandler.hasCombatUpdate() && inventory.getItemInOffHand() != null && !isBlacklisted("Offhand", inventory.getItemInOffHand()) && ((protectItems.isEmpty() && ItemHandler.containsNBTData(inventory.getItemInOffHand())) 
+			} if (ServerHandler.hasSpecificUpdate("1_9") && inventory.getItemInOffHand() != null && !isBlacklisted("Offhand", inventory.getItemInOffHand()) && ((protectItems.isEmpty() && ItemHandler.containsNBTData(inventory.getItemInOffHand())) 
 					|| (!protectItems.contains(item) && item.isSimilar(inventory.getItemInOffHand())))) {
 				inventory.setItemInOffHand(new ItemStack(Material.AIR));
 			} if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
@@ -332,12 +338,20 @@ public class ItemUtilities {
 					if (session != 0 && failCount.get(session) != null) {
 						failCount.put(session, failCount.get(session) + 1);
 					} else if (session != 0) { failCount.put(session, 1); }
-					ConfigHandler.getLogger().receiveDebug(player, itemMap);
-				} else { ConfigHandler.getLogger().obtainDebug(player, itemMap, firstJoin, firstWorld, ipLimit); }
+					ServerHandler.logDebug("{ItemMap} " + player.getName() + " has failed to receive item: " + itemMap.getConfigName() + ".");
+				} else { 
+					if (firstJoin) { 
+						ServerHandler.logDebug("{ItemMap} " + player.getName() + " has already received first-join " + itemMap.getConfigName() + ", they can no longer recieve this."); 
+					} else if (firstWorld) { 
+						ServerHandler.logDebug("{ItemMap} " + player.getName() + " has already received first-world " + itemMap.getConfigName() + ", they can no longer recieve this in " + player.getWorld().getName() + "."); 
+					} else if (ipLimit) { 
+						ServerHandler.logDebug("{ItemMap} " + player.getName() + " has already received ip-limited " + itemMap.getConfigName() + ", they will only recieve this on their dedicated ip.");  
+					}
+				}
 				return false;
 			} else { return false; }
 		}
-		ConfigHandler.getLogger().existsDebug(player, itemMap);
+		ServerHandler.logDebug("{ItemMap} " + player.getName() + " already has item: " + itemMap.getConfigName() + ".");
 		return false;
 	}
 	
@@ -365,7 +379,7 @@ public class ItemUtilities {
 				return false;
 			} else if (Utils.isInt(itemMap.getSlot()) && player.getInventory().getItem(Integer.parseInt(itemMap.getSlot())) != null) {
 				return false;
-			} else if (ServerHandler.hasCombatUpdate() && itemMap.getSlot().equalsIgnoreCase("OFFHAND")) {
+			} else if (ServerHandler.hasSpecificUpdate("1_9") && itemMap.getSlot().equalsIgnoreCase("OFFHAND")) {
 				if (player.getInventory().getItemInOffHand().getType() != Material.AIR) {
 					return false;
 				}
@@ -427,7 +441,7 @@ public class ItemUtilities {
 		} else if (!givenItem && !itemMap.isDropFull()) { givenItem = true; player.getInventory().setItem(Integer.parseInt(itemMap.getSlot()), item); }
 		if (!givenItem && itemMap.isDropFull()) { player.getWorld().dropItem(player.getLocation(), item); } 
 		ConfigHandler.getSQLData().saveItemData(player, itemMap);
-		ConfigHandler.getLogger().givenDebug(itemMap);
+		ServerHandler.logDebug("{ItemMap} Given the Item: " + itemMap.getConfigName() + ".");
 	}
 	
 	public static void setCustomSlots(Player player, ItemMap itemMap, ItemStack item, boolean command, int amount) {
@@ -458,7 +472,7 @@ public class ItemUtilities {
 			if (!itemMap.isDropFull()) {
 				Equip.setBoots(item); givenItem = true;
 			}
-		} else if (ServerHandler.hasCombatUpdate() && itemMap.getSlot().equalsIgnoreCase("Offhand")) {
+		} else if (ServerHandler.hasSpecificUpdate("1_9") && itemMap.getSlot().equalsIgnoreCase("Offhand")) {
 			if (!itemMap.isDropFull()) {
 				PlayerHandler.setOffhandItem(player, item); givenItem = true;
 			}
@@ -479,7 +493,7 @@ public class ItemUtilities {
 			givenItem = true;
 		}
 		if (!givenItem && itemMap.isDropFull()) { player.getWorld().dropItem(player.getLocation(), item); }
-		ConfigHandler.getLogger().givenDebug(itemMap);
+		ServerHandler.logDebug("{ItemMap} Given the Item: " + itemMap.getConfigName() + ".");
 		ConfigHandler.getSQLData().saveItemData(player, itemMap);
 	}
 	
