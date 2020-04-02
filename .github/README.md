@@ -13,7 +13,7 @@
 ItemJoin is a feature-packed custom items plugin allowing you and your players to get custom items upon performing 
 certain triggers such as on join, world-switch, respawn, region-enter, region-leave and more. ItemJoin is very 
 versatile allowing you to only enable features as you need them as most features are not shown by default you will 
-need to add them to the items.yml as they are needed. These features can be found in the wiki and the config.yml 
+need to add them to the items.yml when you need them. These features can be found in the wiki and the config.yml 
 has all additional features disabled by default. The goal of this plugin is to provide a seamless transition from 
 any previous custom items plugin and to give you the power to add features as you want them so that you do not 
 have any unnecessary features cluttering your configurations. The number of features that ItemJoin support is 
