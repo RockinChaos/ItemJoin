@@ -1,6 +1,10 @@
 ![](https://i.imgur.com/zXs2ka8.png)
 
-## ItemJoin - Get custom items on join
+<p align="center">
+ See <a href="https://github.com/RockinChaos/ItemJoin/wiki">ItemJoin's Wiki</a> for the full detailed documentation on the plugin.<br>
+</p>
+
+## ItemJoin - Get Custom Items on Join!
 -----
 
 ### Description
@@ -33,7 +37,7 @@ This plugin has taken up many countless hours and has had continued support for 
 
 Required Libraries when compiling (there are no required dependencies, only softDepends):
 ```
-* Bukkit/Spigot 1.7-1.15.x
+* Bukkit/Spigot (Latest Official)
 * AuthMe (Latest Official)
 * WorldEdit (Latest Official)
 * WorldGuard (Latest Official)
