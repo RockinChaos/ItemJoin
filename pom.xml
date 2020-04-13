@@ -24,7 +24,7 @@
 				<directory>./files</directory>
 				<includes>
 					<include>**/*.yml</include>
-					<include>**/*.txt</include>
+					<include>LICENSE</include>
 					<include>**/*.jpg</include>
 				</includes>
 			</resource>
