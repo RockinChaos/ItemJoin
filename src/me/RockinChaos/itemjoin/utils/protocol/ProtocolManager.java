@@ -1,3 +1,20 @@
+/*
+ * ItemJoin
+ * Copyright (C) CraftationGaming <https://www.craftationgaming.com/>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package me.RockinChaos.itemjoin.utils.protocol;
 
 import java.util.logging.Level;
@@ -20,7 +37,11 @@ public class ProtocolManager {
   		this.protocol = new TinyProtocol(ItemJoin.getInstance()) {
   			@Override
   			public Object onPacketInAsync(Player player, Channel channel, Object packet) {
-  				if (eventInResult(player, channel, packet)) { return null; }
+  				try {
+	  				if (manageEvents(player, channel, packet)) { 
+	  					return null; 
+	  				}
+  				} catch (Exception e) { }
   				return super.onPacketInAsync(player, channel, packet);
   			}
   			
@@ -31,12 +52,14 @@ public class ProtocolManager {
   		};
   	}
   	
-  	private boolean eventInResult(Player player, Channel channel, Object packet) {
-  		if (packet.getClass().getSimpleName().equalsIgnoreCase("PacketPlayInAutoRecipe")) {
-  			PlayerAutoCraftEvent AutoCraft = new PlayerAutoCraftEvent(player, player.getOpenInventory().getTopInventory());
-  			this.callEvent(AutoCraft);
-		  	return AutoCraft.isCancelled();
-  		}
+  	private boolean manageEvents(Player player, Channel channel, Object packet) {
+  		try {
+	  		if (packet != null && packet.getClass().getSimpleName().equalsIgnoreCase("PacketPlayInAutoRecipe")) {
+	  			PlayerAutoCraftEvent AutoCraft = new PlayerAutoCraftEvent(player, player.getOpenInventory().getTopInventory());
+	  			this.callEvent(AutoCraft);
+			  	return AutoCraft.isCancelled();
+	  		}
+  		} catch (Exception e) { }
   		return false;
   	}
   	
