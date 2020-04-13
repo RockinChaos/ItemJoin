@@ -1,3 +1,20 @@
+/*
+ * ItemJoin
+ * Copyright (C) CraftationGaming <https://www.craftationgaming.com/>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package me.RockinChaos.itemjoin.giveitems.listeners;
 
 import java.util.ArrayList;
@@ -14,126 +31,107 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
-import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.utils.Legacy;
-import me.RockinChaos.itemjoin.utils.Chances;
-import me.RockinChaos.itemjoin.utils.Utils;
 
 public class PlayerGuard implements Listener {
-	private HashMap < Player, String > playersInRegions = new HashMap < Player, String > ();
-	private static List < String > localeRegions = new ArrayList < String > ();
+	
+	private HashMap < Player, String > playerRegions = new HashMap < Player, String > ();
 
+   /**
+	* Called on player movement.
+	* Gives and removes any available 
+	* custom items upon entering or exiting a region.
+	* 
+	* @param event - PlayerMoveEvent
+	*/
 	@EventHandler
-	private void regionEvent(PlayerMoveEvent event) {
+	private void setRegionItems(PlayerMoveEvent event) {
 		final Player player = event.getPlayer();
 		if (ConfigHandler.getSQLData().isEnabled(player)) {
-			this.regionItems(player);
-		}
-	}
-
-	private void removeItems(Player player, String region) {
-		if (region != null && !region.isEmpty()) {
-			ItemUtilities.pasteReturnItems(player, player.getWorld().getName(), region);
-			for (ItemMap item: ItemUtilities.getItems()) {
-				if (item.isTakeOnRegionLeave() || item.isGiveOnRegionEnter()) {
-					if (item.inRegion(region) && item.inWorld(player.getWorld()) && item.hasPermission(player)) {
-						item.removeFrom(player, 0);
-					}
-				}
-			}
+			this.handleRegions(player);
 		}
 	}
 	
-	private void getItems(Player player, String region) {
-		if (region != null && !region.isEmpty()) {
-			ItemUtilities.clearEventItems(player, "", "Region-Enter", region);
-			final int session = Utils.getRandom(1, 100000);
-			final Chances probability = new Chances();
-			final ItemMap probable = probability.getRandom(player);
-			for (ItemMap item: ItemUtilities.getItems()) {
-				if (item.isGiveOnRegionEnter() && item.inRegion(region) && item.inWorld(player.getWorld())
-						&& probability.isProbability(item, probable) && item.hasPermission(player) && ItemUtilities.isObtainable(player, item, session)) {
-						item.giveTo(player, false, 0);
-					}
-					item.setAnimations(player);
-				}
-		}
-	}
-	
-	private void regionItems(Player player) {
-		String regions = this.getLocationRegions(player);
-		if (playersInRegions.get(player) != null) {
+   /**
+	* Handles the checking of WorldGuard regions, 
+	* proceeding if the player has entered or exited a new region.
+	* 
+	* @param player - The player that has entered or exited a region.
+	*/
+	private void handleRegions(final Player player) {
+		String regions = this.getRegionsAtLocation(player);
+		if (this.playerRegions.get(player) != null) {
 			List < String > regionSet = Arrays.asList(regions.replace(" ", "").split(","));
-			List < String > playerSet = Arrays.asList(playersInRegions.get(player).replace(" ", "").split(","));
-			List < String > regionSetAdditional = new ArrayList < String > (regionSet);
-			List < String > playerSetAdditional = new ArrayList < String > (playerSet);
-			regionSetAdditional.removeAll(playerSet);
-			playerSetAdditional.removeAll(regionSet);
-			if (!playerSetAdditional.isEmpty()) {
-				for (String region: playerSetAdditional) {
-					this.removeItems(player, region);
+			List < String > playerSet = Arrays.asList(this.playerRegions.get(player).replace(" ", "").split(","));
+			List < String > regionSetList = new ArrayList < String > (regionSet);
+			List < String > playerSetList = new ArrayList < String > (playerSet);
+			regionSetList.removeAll(playerSet);
+			playerSetList.removeAll(regionSet);
+			if (!playerSetList.isEmpty()) {
+				for (String region: playerSetList) {
+					if (region != null && !region.isEmpty()) {
+						ItemUtilities.setItems(player, ItemUtilities.TriggerType.REGIONLEAVE, org.bukkit.GameMode.ADVENTURE, region);
+					}
 				}
 			}
-			if (!regionSetAdditional.isEmpty()) {
-				for (String region: regionSetAdditional) {
-					this.getItems(player, region);
+			if (!regionSetList.isEmpty()) {
+				for (String region: regionSetList) {
+					if (region != null && !region.isEmpty()) {
+						ItemUtilities.setItems(player, ItemUtilities.TriggerType.REGIONENTER, org.bukkit.GameMode.ADVENTURE, region);
+					}
 				}
 			}
 		} else {
 			List < String > regionSet = Arrays.asList(regions.replace(" ", "").split(","));
 			for (String region: regionSet) {
-				this.getItems(player, region);
+				if (region != null && !region.isEmpty()) {
+					ItemUtilities.setItems(player, ItemUtilities.TriggerType.REGIONENTER, org.bukkit.GameMode.ADVENTURE, region);
+				}
 			}
 		}
-		this.playersInRegions.put(player, regions);
+		this.playerRegions.put(player, regions);
 	}
 	
-	private String getLocationRegions(Player player) {
+   /**
+	* Gets the current region(s) the player is currently in.
+	* 
+	* @param player - The player that has entered or exited a region.
+	* @return regionSet The applicable regions at the players location.
+	*/
+	private String getRegionsAtLocation(final Player player) {
 		ApplicableRegionSet set = null;
-		try { set = this.getApplicableRegionSet(player.getWorld(), player.getLocation()); } catch (Exception e) { ServerHandler.sendDebugTrace(e); } 
-		if (set == null) { return ""; }
 		String regionSet = "";
+		try { set = this.getApplicableRegionSet(player.getWorld(), player.getLocation()); } 
+		catch (Exception e) { ServerHandler.sendDebugTrace(e); }
+		if (set == null) { return regionSet; }
 		for (ProtectedRegion r: set) {
-			if (regionSet.isEmpty()) { regionSet += r.getId(); } else { regionSet +=  ", " + r.getId(); }
+			if (regionSet.isEmpty()) { regionSet += r.getId(); }
+			else { regionSet += ", " + r.getId(); }
 		}
 		return regionSet;
 	}
 	
-	private static boolean isLocaleRegion(String compareRegion) {
-		for(String region : localeRegions) {
-			if (region.equalsIgnoreCase(compareRegion) || region.equalsIgnoreCase("UNDEFINED")) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	private ApplicableRegionSet getApplicableRegionSet(World world, Location loc) throws Exception {
+   /**
+	* Gets the applicable region(s) set at the players location.
+	* 
+	* @param world - The world that the player is currently in.
+	* @param location - The exact location of the player.
+	* @return ApplicableRegionSet The WorldGuard RegionSet.
+	*/
+	private ApplicableRegionSet getApplicableRegionSet(final World world, final Location location) throws Exception {
 		if (ConfigHandler.getDepends().getGuard().guardVersion() >= 700) {
 			com.sk89q.worldedit.world.World wgWorld;
-			try { wgWorld = com.sk89q.worldguard.WorldGuard.getInstance().getPlatform().getWorldByName(world.getName()); }
+			try { wgWorld = com.sk89q.worldguard.WorldGuard.getInstance().getPlatform().getWorldByName(world.getName()); } 
 			catch (NoSuchMethodError e) { wgWorld = com.sk89q.worldguard.WorldGuard.getInstance().getPlatform().getMatcher().getWorldByName(world.getName()); }
 			com.sk89q.worldguard.protection.regions.RegionContainer rm = com.sk89q.worldguard.WorldGuard.getInstance().getPlatform().getRegionContainer();
 			if (rm == null) { return null; }
 			if (Legacy.hasLegacyWorldEdit()) {
-				com.sk89q.worldedit.Vector wgVector = new com.sk89q.worldedit.Vector(loc.getX(), loc.getY(), loc.getZ());
+				final com.sk89q.worldedit.Vector wgVector = new com.sk89q.worldedit.Vector(location.getX(), location.getY(), location.getZ());
 				return rm.get(wgWorld).getApplicableRegions(wgVector);
-			} else { return rm.get(wgWorld).getApplicableRegions(Legacy.asBlockVector(loc)); }
-		} else { return Legacy.getLegacyRegionSet(world, loc); }
-	}
-	
-	public static List < String > getLocaleRegions() {
-		return localeRegions;
-	}
-	
-	public static void addLocaleRegion(String region) {
-		if (!isLocaleRegion(region)) { localeRegions.add(region); }
-	}
-	
-	public static void clearLocaleRegions() {
-		localeRegions.clear();
+			} else { return rm.get(wgWorld).getApplicableRegions(Legacy.asBlockVector(location)); }
+		} else { return Legacy.getLegacyRegionSet(world, location); }
 	}
 }
