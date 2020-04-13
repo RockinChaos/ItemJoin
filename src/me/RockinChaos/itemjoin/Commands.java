@@ -1,3 +1,20 @@
+/*
+ * ItemJoin
+ * Copyright (C) CraftationGaming <https://www.craftationgaming.com/>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package me.RockinChaos.itemjoin;
 
 import java.util.ArrayList;
@@ -28,10 +45,19 @@ import me.RockinChaos.itemjoin.utils.sqlite.SQLData;
 import me.RockinChaos.itemjoin.utils.sqlite.SQLite;
 
 public class Commands implements CommandExecutor {
-	public static HashMap < String, Boolean > cmdConfirm = new HashMap < String, Boolean > ();
 	
+	private HashMap < String, Boolean > confirmationRequests = new HashMap < String, Boolean > ();
+	
+   /**
+	* Called when the CommandSender executes a command.
+    * @param sender - Source of the command.
+    * @param command - Command which was executed.
+    * @param label - Alias of the command which was used.
+    * @param args - Passed command arguments.
+    * @return true if the command is valid.
+	*/
 	@Override
-	public boolean onCommand(final CommandSender sender, Command c, String l, String[] args) {
+	public boolean onCommand(final CommandSender sender, Command command, String label, String[] args) {
 		if (args.length == 0) {
 			if (PermissionsHandler.hasPermission(sender, "itemjoin.use")) {
 				Language.dispatchMessage(sender, "&aItemJoin v" + ItemJoin.getInstance().getDescription().getVersion() + "&e by RockinChaos");
@@ -189,23 +215,23 @@ public class Commands implements CommandExecutor {
 			return true;
 		} else if (args.length == 1 && args[0].equalsIgnoreCase("purge")) {
 			if (PermissionsHandler.hasPermission(sender, "itemjoin.purge")) {
-				if (cmdConfirm.get(1 + sender.getName()) != null && cmdConfirm.get(1 + sender.getName()).equals(true)) {
+				if (this.confirmationRequests.get(1 + sender.getName()) != null && this.confirmationRequests.get(1 + sender.getName()).equals(true)) {
 					SQLite.purgeDatabase("database");
 			        ConfigHandler.setSQLData(new SQLData());
 					String[] placeHolders = Language.newString(); placeHolders[1] = "All Players"; placeHolders[10] = "Database"; placeHolders[9] = "/ij purge";
 					Language.sendLangMessage("Commands.Database.purgeSuccess", sender, placeHolders);
-					cmdConfirm.remove(1 + sender.getName());
+					this.confirmationRequests.remove(1 + sender.getName());
 				} else {
-					cmdConfirm.put(1 + sender.getName(), true);
+					this.confirmationRequests.put(1 + sender.getName(), true);
 					String[] placeHolders = Language.newString(); placeHolders[1] = "All Players"; placeHolders[10] = "Database"; placeHolders[9] = "/ij purge";
 					Language.sendLangMessage("Commands.Database.purgeWarn", sender, placeHolders);
 					Language.sendLangMessage("Commands.Database.purgeConfirm", sender, placeHolders);
 					new BukkitRunnable() {
 						@Override
 						public void run() {
-							if (cmdConfirm.get(1 + sender.getName()) != null && cmdConfirm.get(1 + sender.getName()).equals(true)) {
+							if (confirmationRequests.get(1 + sender.getName()) != null && confirmationRequests.get(1 + sender.getName()).equals(true)) {
 								Language.sendLangMessage("Commands.Database.purgeTimeOut", sender);
-								cmdConfirm.remove(1 + sender.getName());
+								confirmationRequests.remove(1 + sender.getName());
 							}
 						}
 					}.runTaskLater(ItemJoin.getInstance(), 100L);
@@ -220,60 +246,60 @@ public class Commands implements CommandExecutor {
 				if (player == null) {
 					String[] placeHolders = Language.newString(); placeHolders[1] = args[2];
 					Language.sendLangMessage("Commands.Default.targetNotFound", sender, placeHolders); 
-				} else if (cmdConfirm.get(2 + sender.getName()) != null && cmdConfirm.get(2 + sender.getName()).equals(true) && args[1].equalsIgnoreCase("ip-limits")) {
+				} else if (this.confirmationRequests.get(2 + sender.getName()) != null && this.confirmationRequests.get(2 + sender.getName()).equals(true) && args[1].equalsIgnoreCase("ip-limits")) {
 					ConfigHandler.getSQLData().purgeDatabaseData("ip_limits", player);
 					String[] placeHolders = Language.newString(); placeHolders[1] = args[2]; placeHolders[10] = "ip-limits"; placeHolders[9] = "/ij purge ip-limits <player>";
 					Language.sendLangMessage("Commands.Database.purgeSuccess", sender, placeHolders);
-					cmdConfirm.remove(2 + sender.getName());
-				} else if (cmdConfirm.get(3 + sender.getName()) != null && cmdConfirm.get(3 + sender.getName()).equals(true) && args[1].equalsIgnoreCase("first-join")) {
+					this.confirmationRequests.remove(2 + sender.getName());
+				} else if (this.confirmationRequests.get(3 + sender.getName()) != null && this.confirmationRequests.get(3 + sender.getName()).equals(true) && args[1].equalsIgnoreCase("first-join")) {
 					ConfigHandler.getSQLData().purgeDatabaseData("first_join", player);
 					String[] placeHolders = Language.newString(); placeHolders[1] = args[2]; placeHolders[10] = "first-join"; placeHolders[9] = "/ij purge first-join <player>";
 					Language.sendLangMessage("Commands.Database.purgeSuccess", sender, placeHolders);
-					cmdConfirm.remove(3 + sender.getName());
-				} else if (cmdConfirm.get(3 + sender.getName()) != null && cmdConfirm.get(3 + sender.getName()).equals(true) && args[1].equalsIgnoreCase("first-world")) {
+					this.confirmationRequests.remove(3 + sender.getName());
+				} else if (this.confirmationRequests.get(3 + sender.getName()) != null && this.confirmationRequests.get(3 + sender.getName()).equals(true) && args[1].equalsIgnoreCase("first-world")) {
 					ConfigHandler.getSQLData().purgeDatabaseData("first_world", player);
 					String[] placeHolders = Language.newString(); placeHolders[1] = args[2]; placeHolders[10] = "first-world"; placeHolders[9] = "/ij purge first-world <player>";
 					Language.sendLangMessage("Commands.Database.purgeSuccess", sender, placeHolders);
-					cmdConfirm.remove(3 + sender.getName());
-				} else if (cmdConfirm.get(2 + sender.getName()) == null && args[1].equalsIgnoreCase("ip-limits")) {
-					cmdConfirm.put(2 + sender.getName(), true);
+					this.confirmationRequests.remove(3 + sender.getName());
+				} else if (this.confirmationRequests.get(2 + sender.getName()) == null && args[1].equalsIgnoreCase("ip-limits")) {
+					this.confirmationRequests.put(2 + sender.getName(), true);
 					String[] placeHolders = Language.newString(); placeHolders[1] = args[2]; placeHolders[10] = "ip-limits"; placeHolders[9] = "/ij purge ip-limits <player>";
 					Language.sendLangMessage("Commands.Database.purgeWarn", sender, placeHolders);
 					Language.sendLangMessage("Commands.Database.purgeConfirm", sender, placeHolders);
 					new BukkitRunnable() {
 						@Override
 						public void run() {
-							if (cmdConfirm.get(2 + sender.getName()) != null && cmdConfirm.get(2 + sender.getName()).equals(true)) {
+							if (confirmationRequests.get(2 + sender.getName()) != null && confirmationRequests.get(2 + sender.getName()).equals(true)) {
 								Language.sendLangMessage("Commands.Database.purgeTimeOut", sender);
-								cmdConfirm.remove(2 + sender.getName());
+								confirmationRequests.remove(2 + sender.getName());
 							}
 						}
 					}.runTaskLater(ItemJoin.getInstance(), 100L);
-				} else if (cmdConfirm.get(3 + sender.getName()) == null && args[1].equalsIgnoreCase("first-join")) {
-					cmdConfirm.put(3 + sender.getName(), true);
+				} else if (this.confirmationRequests.get(3 + sender.getName()) == null && args[1].equalsIgnoreCase("first-join")) {
+					this.confirmationRequests.put(3 + sender.getName(), true);
 					String[] placeHolders = Language.newString(); placeHolders[1] = args[2]; placeHolders[10] = "first-join"; placeHolders[9] = "/ij purge first-join <player>";
 					Language.sendLangMessage("Commands.Database.purgeWarn", sender, placeHolders);
 					Language.sendLangMessage("Commands.Database.purgeConfirm", sender, placeHolders);
 					new BukkitRunnable() {
 						@Override
 						public void run() {
-							if (cmdConfirm.get(3 + sender.getName()) != null && cmdConfirm.get(3 + sender.getName()).equals(true)) {
+							if (confirmationRequests.get(3 + sender.getName()) != null && confirmationRequests.get(3 + sender.getName()).equals(true)) {
 								Language.sendLangMessage("Commands.Database.purgeTimeOut", sender);
-								cmdConfirm.remove(3 + sender.getName());
+								confirmationRequests.remove(3 + sender.getName());
 							}
 						}
 					}.runTaskLater(ItemJoin.getInstance(), 100L);
-				} else if (cmdConfirm.get(3 + sender.getName()) == null && args[1].equalsIgnoreCase("first-world")) {
-					cmdConfirm.put(3 + sender.getName(), true);
+				} else if (this.confirmationRequests.get(3 + sender.getName()) == null && args[1].equalsIgnoreCase("first-world")) {
+					this.confirmationRequests.put(3 + sender.getName(), true);
 					String[] placeHolders = Language.newString(); placeHolders[1] = args[2]; placeHolders[10] = "first-world"; placeHolders[9] = "/ij purge first-world <player>";
 					Language.sendLangMessage("Commands.Database.purgeWarn", sender, placeHolders);
 					Language.sendLangMessage("Commands.Database.purgeConfirm", sender, placeHolders);
 					new BukkitRunnable() {
 						@Override
 						public void run() {
-							if (cmdConfirm.get(3 + sender.getName()) != null && cmdConfirm.get(3 + sender.getName()).equals(true)) {
+							if (confirmationRequests.get(3 + sender.getName()) != null && confirmationRequests.get(3 + sender.getName()).equals(true)) {
 								Language.sendLangMessage("Commands.Database.purgeTimeOut", sender);
-								cmdConfirm.remove(3 + sender.getName());
+								confirmationRequests.remove(3 + sender.getName());
 							}
 						}
 					}.runTaskLater(ItemJoin.getInstance(), 100L);
@@ -824,6 +850,14 @@ public class Commands implements CommandExecutor {
 		}
 	}
 	
+   /**
+	* Called when the CommandSender executes the getOnline command.
+	* @param argsPlayer - The specified player recieving the item.
+	* @param sender - Source of the command. 
+	* @param args - Passed command arguments.
+	* @param amount - Number of items to be given.
+	* @return true if the item was successfully given.
+	*/
 	private String getOnline(Player argsPlayer, CommandSender sender, String args, int amount) {
         boolean itemExists = false;
         boolean itemGiven = false;
@@ -854,6 +888,14 @@ public class Commands implements CommandExecutor {
         return "";
 	}
 	
+   /**
+	* Called when the CommandSender executes the removeOnline  command.
+	* @param argsPlayer - The specified player losing the item.
+	* @param sender - Source of the command. 
+	* @param args - Passed command arguments.
+	* @param amount - Number of items to be removed.
+	* @return true if the item was successfully removed.
+	*/
 	private String removeOnline(Player argsPlayer, CommandSender sender, String args, int amount) {
         boolean itemExists = false;
         boolean itemRemoved = false;

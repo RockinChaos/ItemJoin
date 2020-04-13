@@ -1,3 +1,20 @@
+/*
+ * ItemJoin
+ * Copyright (C) CraftationGaming <https://www.craftationgaming.com/>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package me.RockinChaos.itemjoin.giveitems.utils;
 
 import java.lang.reflect.Field;
@@ -37,17 +54,27 @@ public class ItemAnimation {
 	private boolean menu = false;
 	private List<List<String>> menuLores = null;
 	
-	public ItemAnimation(ItemMap item) {
+   /**
+    * Called on new ItemAnimation.
+    * 
+    * @param item - The ItemMap that handles item creation.
+    */
+	public ItemAnimation(final ItemMap item) {
 		this.itemMap = item;
 		if (item.getDynamicNames() != null && !item.getDynamicNames().isEmpty()) { this.dynamicNames = item.getDynamicNames(); }
 		if (item.getDynamicLores() != null && !item.getDynamicLores().isEmpty()) { this.dynamicLores = item.getDynamicLores(); }
 		if (item.getDynamicMaterials() != null && !item.getDynamicMaterials().isEmpty()) { this.dynamicMaterials = item.getDynamicMaterials(); }
-		if (itemMap.getMaterial().toString().equalsIgnoreCase("WRITTEN_BOOK") && item.getPages() != null && !item.getPages().isEmpty()) { this.dynamicPages = item.getPages(); }
+		if (this.itemMap.getMaterial().toString().equalsIgnoreCase("WRITTEN_BOOK") && item.getPages() != null && !item.getPages().isEmpty()) { this.dynamicPages = item.getPages(); }
 		if (item.getDynamicOwners() != null && !item.getDynamicOwners().isEmpty()) { this.dynamicOwners = item.getDynamicOwners(); }
 		else if (item.getDynamicTextures() != null && !item.getDynamicTextures().isEmpty()) { this.dynamicTextures = item.getDynamicTextures(); }
 	}
 	
-	public void openAnimation(Player player) {
+   /**
+	* Starts the animations for the specified player.
+	* 
+	* @param player - The player which will have animations started.
+	*/
+	public void openAnimation(final Player player) {
 		if (this.dynamicNames != null) { this.nameTasks(player); }
 		if (this.dynamicLores != null) { this.loreTasks(player); }
 		if (this.dynamicMaterials != null) { this.materialTasks(player); }
@@ -56,75 +83,124 @@ public class ItemAnimation {
 		else if (this.dynamicTextures != null) { this.textureTasks(player); }
 	}
 	
-	public void closeAnimation(Player player) {
-		stopAnimations = true;
-		ServerHandler.logDebug("{Animation} Successfully closed all animations for the item " + itemMap.getConfigName() + " with the instanced player " + player.getName() + ".");
+  /**
+   * Stops the animations for the specified player.
+   * 
+   * @param player - The player which will have animations stopped.
+   */
+	public void closeAnimation(final Player player) {
+		this.stopAnimations = true;
+		ServerHandler.logDebug("{Animation} Successfully closed all animations for the item " + this.itemMap.getConfigName() + " with the instanced player " + player.getName() + ".");
 	}
 	
-	private void nameTasks(Player player) {
+   /**
+	* Handles animations for the display name of a custom item.
+	* 
+	* @param player - The player which will have animations handled.
+	*/
+	private void nameTasks(final Player player) {
 		long ticks = 0;
-		Iterator <String> it = this.dynamicNames.iterator();
+		final Iterator <String> it = this.dynamicNames.iterator();
 		while (it.hasNext()) {
-			String name = it.next();
+			final String name = it.next();
 			if (Utils.returnInteger(ItemHandler.getDelay(name)) != null) { ticks = ticks + Utils.returnInteger(ItemHandler.getDelay(name)); }
 			else { ticks = ticks + 180; }
-			AnimateTask(player, it.hasNext(), name, null, null, null, null, null, ticks, 0);
+			this.AnimateTask(player, it.hasNext(), name, null, null, null, null, null, ticks, 0);
 		}
 	}
 	
-	private void loreTasks(Player player) {
+   /**
+	* Handles animations for the displayed lore of a custom item.
+	* 
+    * @param player - The player which will have animations handled.
+    */
+	private void loreTasks(final Player player) {
 		long ticks = 0;
 		int position = 0;
-		Iterator<List<String>> it = this.dynamicLores.iterator();
+		final Iterator<List<String>> it = this.dynamicLores.iterator();
 		while (it.hasNext()) {
-			List<String> lore = it.next();
+			final List<String> lore = it.next();
 			if (Utils.returnInteger(ItemHandler.getDelay(lore.get(0))) != null) { ticks = ticks + Utils.returnInteger(ItemHandler.getDelay(lore.get(0))); }
 			else { ticks = ticks + 180; }
-			AnimateTask(player, it.hasNext(), null, lore, null, null, null, null, ticks, position);
+			this.AnimateTask(player, it.hasNext(), null, lore, null, null, null, null, ticks, position);
 			position++;
 		}
 	}
 	
-	private void materialTasks(Player player) {
+   /**
+	* Handles animations for the material of a custom item.
+	* 
+	* @param player - The player which will have animations handled.
+	*/
+	private void materialTasks(final Player player) {
 		long ticks = 0;
-		Iterator<String> it = this.dynamicMaterials.iterator();
+		final Iterator<String> it = this.dynamicMaterials.iterator();
 		while (it.hasNext()) {
-			String mat = it.next();
+			final String mat = it.next();
 			if (Utils.returnInteger(ItemHandler.getDelay(mat)) != null) { ticks = ticks + Utils.returnInteger(ItemHandler.getDelay(mat)); }
 			else { ticks = ticks + 180; }
-			AnimateTask(player, it.hasNext(), null, null, mat, null, null, null, ticks, 0);
+			this.AnimateTask(player, it.hasNext(), null, null, mat, null, null, null, ticks, 0);
 		}
 	}
 	
-	private void pagesTasks(Player player) {
+   /**
+	* Handles animations for the book pages of a custom book item.
+	* 
+	* @param player - The player which will have animations handled.
+	*/
+	private void pagesTasks(final Player player) {
 		long ticks = 0;
 		if (Utils.returnInteger(ItemHandler.getDelay(this.dynamicPages.get(0))) != null) { ticks = ticks + Utils.returnInteger(ItemHandler.getDelay(this.dynamicPages.get(0))); }
 		else { ticks = ticks + 180; }
-		AnimateTask(player, false, null, null, null, null, null, this.dynamicPages, ticks, 0);
+		this.AnimateTask(player, false, null, null, null, null, null, this.dynamicPages, ticks, 0);
 	}
 	
-	private void ownerTasks(Player player) {
+   /**
+	* Handles animations for the skull owner of a custom item.
+    * 
+    * @param player - The player which will have animations handled.
+    */
+	private void ownerTasks(final Player player) {
 		long ticks = 0;
-		Iterator<String> it = this.dynamicOwners.iterator();
+		final Iterator<String> it = this.dynamicOwners.iterator();
 		while (it.hasNext()) {
-			String owner = it.next();
+			final String owner = it.next();
 			if (Utils.returnInteger(ItemHandler.getDelay(owner)) != null) { ticks = ticks + Utils.returnInteger(ItemHandler.getDelay(owner)); }
 			else { ticks = ticks + 180; }
-			AnimateTask(player, it.hasNext(), null, null, null, owner, null, null, ticks, 0);
+			this.AnimateTask(player, it.hasNext(), null, null, null, owner, null, null, ticks, 0);
 		}
 	}
 	
-	private void textureTasks(Player player) {
+   /**
+	* Handles animations for the skull texture of a custom item.
+	* 
+	* @param player - The player which will have animations handled.
+	*/
+	private void textureTasks(final Player player) {
 		long ticks = 0;
-		Iterator<String> it = this.dynamicTextures.iterator();
+		final Iterator<String> it = this.dynamicTextures.iterator();
 		while (it.hasNext()) {
-			String texture = it.next();
+			final String texture = it.next();
 			if (Utils.returnInteger(ItemHandler.getDelay(texture)) != null) { ticks = ticks + Utils.returnInteger(ItemHandler.getDelay(texture)); }
 			else { ticks = ticks + 180; }
-			AnimateTask(player, it.hasNext(), null, null, null, null, texture, null, ticks, 0);
+			this.AnimateTask(player, it.hasNext(), null, null, null, null, texture, null, ticks, 0);
 		}
 	}
 	
+   /**
+	* Runs the animation task of a custom item.
+	* 
+	* @param player - The player which will have animations handled.
+	* @param hasNext - The AnimationTask has another iteration.
+	* @param nameString - The display name to be set to the custom item.
+	* @param loreString - The displayed lore to be set to the custom item.
+	* @param materialString - The material to be set to the custom item.
+	* @param ownerString - The skull owner to be set to the custom item.
+	* @param textureString - The skull texture to be set to the custom item.
+	* @param pagesString - The book pages to be set to the custom item.
+	* @param UpdateDelay - The delay to wait before starting the single animation.
+	* @param position - The position in only the lore iteration.
+    */
 	private void AnimateTask(final Player player, final boolean hasNext, final String nameString, final List<String> loreString, final String materialString, final String ownerString, final String textureString, final List<String> pagesString, final long UpdateDelay, final int position) {
 		final ItemMap itemMap = this.itemMap;
 		new BukkitRunnable() {
@@ -173,7 +249,6 @@ public class ItemAnimation {
 					InventoryClick.cursorItem.put(PlayerHandler.getPlayerID(player), item);
 				}
 				// ============== This has Concluded all Animations.. ============== //
-				
 				if (!hasNext) { 
 					if (nameString != null) { nameTasks(player); }
 					else if (loreString != null) { loreTasks(player); }
@@ -187,89 +262,129 @@ public class ItemAnimation {
 		}.runTaskLater(ItemJoin.getInstance(), UpdateDelay);
 	}
 	
-	private void setNameData(Player player, ItemStack transAnimate, String nameString) {
-		ItemMeta tempmeta = transAnimate.getItemMeta();
+   /**
+	* Sets the specified display name to the specified item.
+	* 
+	* @param player - The player which will have animations handled.
+	* @param reviseItem - The item to have its display name animated.
+	* @param nameString - The name to set to the item.
+	*/
+	private void setNameData(final Player player, final ItemStack reviseItem, final String nameString) {
+		final ItemMeta tempmeta = reviseItem.getItemMeta();
 		tempmeta.setDisplayName(Utils.translateLayout(ItemHandler.purgeDelay(nameString) + this.itemMap.getLegacySecret(), player));
-		transAnimate.setItemMeta(tempmeta);
+		reviseItem.setItemMeta(tempmeta);
 	}
 	
-	private void setLoreData(Player player, ItemStack transAnimate, List<String> loreString) {
-		ItemMeta tempmeta = transAnimate.getItemMeta();
-			List < String > loreList = loreString;
-			List < String > loreFormatList = new ArrayList < String > ();
-			for (int k = 0; k < loreList.size(); k++) {
-				String formatLore = ItemHandler.purgeDelay(loreList.get(k));
-				formatLore = Utils.translateLayout(formatLore, player);
-				loreFormatList.add(formatLore);
-			}
-			tempmeta.setLore(loreFormatList);
-		transAnimate.setItemMeta(tempmeta);
+   /**
+	* Sets the specified displayed lore to the specified item.
+	* 
+	* @param player - The player which will have animations handled.
+	* @param reviseItem - The item to have its displayed lore animated.
+	* @param loreString - The lore to set to the item.
+	*/
+	private void setLoreData(final Player player, final ItemStack reviseItem, final List<String> loreString) {
+		final ItemMeta tempmeta = reviseItem.getItemMeta();
+		final List < String > loreList = loreString;
+		final List < String > loreFormatList = new ArrayList < String > ();
+		for (int k = 0; k < loreList.size(); k++) {
+			String formatLore = ItemHandler.purgeDelay(loreList.get(k));
+			formatLore = Utils.translateLayout(formatLore, player);
+			loreFormatList.add(formatLore);
+		}
+		tempmeta.setLore(loreFormatList);
+		reviseItem.setItemMeta(tempmeta);
 	}
 	
-	private void setMaterialData(Player player, ItemStack transAnimate, String materialString) {
+   /**
+	* Sets the specified bukkit material to the specified item.
+	* 
+	* @param player - The player which will have animations handled.
+	* @param reviseItem - The item to have its material animated.
+	* @param materialString - The material to set to the item.
+	*/
+	private void setMaterialData(final Player player, final ItemStack reviseItem, String materialString) {
 		Material mat = null;
 		materialString = ItemHandler.purgeDelay(materialString);
 		if (materialString.contains(":")) { 
-			String[] parts = materialString.split(":");
+			final String[] parts = materialString.split(":");
 			if (ServerHandler.hasSpecificUpdate("1_13")) {
 				if (!Utils.isInt(parts[0])) { parts[0] = "LEGACY_" + parts[0]; }
 				if (!Utils.isInt(parts[0])) { mat = Legacy.getLegacyMaterial(Material.getMaterial(parts[0].toUpperCase()), (byte) Integer.parseInt(parts[1])); } 
 				else { mat = Legacy.getLegacyMaterial(Integer.parseInt(parts[0]), (byte) Integer.parseInt(parts[1])); }
-				if (mat != null && mat != Material.AIR) { transAnimate.setType(mat); }
+				if (mat != null && mat != Material.AIR) { reviseItem.setType(mat); }
 			} else {
 				mat = ItemHandler.getMaterial(parts[0], null);
-				if (mat != null && mat != Material.AIR) { transAnimate.setType(mat); }	
-				Legacy.setLegacyDurability(transAnimate, (byte) Integer.parseInt(parts[1]));
+				if (mat != null && mat != Material.AIR) { reviseItem.setType(mat); }	
+				Legacy.setLegacyDurability(reviseItem, (byte) Integer.parseInt(parts[1]));
 			}
 		} else {
 			mat = ItemHandler.getMaterial(materialString, null);
-			if (mat != null && mat != Material.AIR) { transAnimate.setType(mat); }
+			if (mat != null && mat != Material.AIR) { reviseItem.setType(mat); }
 		}
 	}
 	
-	private void setPagesData(Player player, ItemStack transAnimate, List<String> pagesString) {
+   /**
+	* Sets the specified book pages to the specified item.
+	* 
+	* @param player - The player which will have animations handled.
+	* @param reviseItem - The item to have its book pages animated.
+	* @param pagesString - The book pages to set to the item.
+	*/
+	private void setPagesData(final Player player, final ItemStack reviseItem, final List<String> pagesString) {
 		if (ServerHandler.hasSpecificUpdate("1_8")) {
-			transAnimate.setItemMeta(this.itemMap.setJSONBookPages(player, transAnimate, pagesString).getItemMeta());
+			reviseItem.setItemMeta(this.itemMap.setJSONBookPages(player, reviseItem, pagesString).getItemMeta());
 		} else {
-			ItemMeta itemMeta = transAnimate.getItemMeta();
-			itemMeta = this.itemMap.setLegacyBookPages(player, itemMeta, pagesString);
-			transAnimate.setItemMeta(itemMeta);
+			final ItemMeta itemMeta = this.itemMap.setLegacyBookPages(player, reviseItem.getItemMeta(), pagesString);
+			reviseItem.setItemMeta(itemMeta);
 		}
 	}
-	   
-	private void setSkull(Player player, ItemStack transAnimate, String ownerString, String textureString) {
-		ItemMeta tempMeta = transAnimate.getItemMeta();
+
+   /**
+	* Sets the specified skull owner and texture to the specified item.
+	* 
+	* @param player - The player which will have animations handled.
+	* @param reviseItem - The item to have its skull owner and skull texture animated.
+	* @param ownerString - The skull owner to set to the item.
+	* @param textureString - The skull texture to set to the item.
+	*/
+	private void setSkull(final Player player, ItemStack reviseItem, final String ownerString, final String textureString) {
+		ItemMeta tempMeta = reviseItem.getItemMeta();
 		if (ownerString != null) {
-			ownerString = Utils.translateLayout(ItemHandler.purgeDelay(ownerString), player);
-			tempMeta = ItemHandler.setSkullOwner(tempMeta, ownerString);
-		} else if (textureString != null && textureString.contains("hdb-") && itemMap.isHeadDatabase()) {
-			HeadDatabaseAPI api = new HeadDatabaseAPI();
-			ItemStack sk = api.getItemHead(ItemHandler.purgeDelay(textureString).replace("hdb-", ""));
-			transAnimate = (sk != null ? sk : transAnimate);
+			tempMeta = ItemHandler.setSkullOwner(tempMeta, Utils.translateLayout(ItemHandler.purgeDelay(ownerString), player));
+		} else if (textureString != null && textureString.contains("hdb-") && this.itemMap.isHeadDatabase()) {
+			final HeadDatabaseAPI api = new HeadDatabaseAPI();
+			final ItemStack sk = api.getItemHead(ItemHandler.purgeDelay(textureString).replace("hdb-", ""));
+			reviseItem = (sk != null ? sk : reviseItem);
 		} else if (textureString != null) {
 			try {
-				GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
+				final GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
 				gameProfile.getProperties().put("textures", new Property("textures", new String(ItemHandler.purgeDelay(textureString))));
-				Field declaredField = tempMeta.getClass().getDeclaredField("profile");
+				final Field declaredField = tempMeta.getClass().getDeclaredField("profile");
 				declaredField.setAccessible(true);
 				declaredField.set(tempMeta, gameProfile);
 			} catch (Exception e) { ServerHandler.sendDebugTrace(e); }
 		}
-		transAnimate.setItemMeta(tempMeta);
+		reviseItem.setItemMeta(tempMeta);
 	}
 	
-	public void setMenu(boolean bool, int stage) {
+   /**
+	* Sets the `/itemjoin menu` as being open for a player.
+	* 
+	* @param bool - Specifies if the menu is open or closed.
+	* @param stage - The stage of the menu as being 0) click to modify or 1) a swap-item.
+	*/
+	public void setMenu(final boolean bool, final int stage) {
 		this.menu = bool;
 		if (bool && this.dynamicLores != null) {
 			this.menuLores = new ArrayList<List<String>>();
 			for (List<String> lores : this.dynamicLores) {
-				List<String> tempLores = new ArrayList<String>();
+				final List<String> tempLores = new ArrayList<String>();
 				for (String lore : lores) { tempLores.add(lore); }
 				tempLores.add("&7");
 				tempLores.add("&6---------------------------");
 				if (stage == 1) { tempLores.add("&7*Click to set as a swap-item."); } 
 				else { tempLores.add("&7*Click to modify this custom item."); }
-				tempLores.add("&9&lNode: &a" + itemMap.getConfigName());
+				tempLores.add("&9&lNode: &a" + this.itemMap.getConfigName());
 				tempLores.add("&7");
 				this.menuLores.add(tempLores);
 			}

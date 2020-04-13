@@ -1,3 +1,20 @@
+/*
+ * ItemJoin
+ * Copyright (C) CraftationGaming <https://www.craftationgaming.com/>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package me.RockinChaos.itemjoin.utils;
 
 import java.util.ArrayList;
@@ -13,14 +30,14 @@ import org.apache.logging.log4j.message.Message;
 
 public class CustomFilter extends AbstractFilter {
 	
-	public static HashMap < String, ArrayList < String > > clearLoggables = new HashMap < String, ArrayList < String > > ();
+	private HashMap < String, ArrayList < String > > hideLogging = new HashMap < String, ArrayList < String > > ();
 	
     private Result handle(String message) {
         if(message == null) {
             return Result.NEUTRAL;
         }
 
-        for(String word : clearLoggables.get("commands-list")) {
+        for(String word : hideLogging.get("commands-list")) {
             if(message.toLowerCase().contains(word.toLowerCase())) {
                 return Result.DENY;
             }
@@ -46,5 +63,13 @@ public class CustomFilter extends AbstractFilter {
     @Override
     public Result filter(Logger logger, Level level, Marker marker, String msg, Object... params) {
         return handle(msg);
+    }
+    
+    public void setHideLogging(String log, ArrayList < String > logList) {
+    	hideLogging.put(log, logList);
+    }
+    
+    public HashMap<String, ArrayList<String>> getHideLogging() {
+    	return hideLogging;
     }
 }

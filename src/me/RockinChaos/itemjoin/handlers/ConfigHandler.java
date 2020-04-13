@@ -1,3 +1,20 @@
+/*
+ * ItemJoin
+ * Copyright (C) CraftationGaming <https://www.craftationgaming.com/>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package me.RockinChaos.itemjoin.handlers;
 
 import java.io.File;
@@ -7,6 +24,8 @@ import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.util.ArrayList;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -38,6 +57,7 @@ import me.RockinChaos.itemjoin.listeners.Placement;
 import me.RockinChaos.itemjoin.listeners.Recipes;
 import me.RockinChaos.itemjoin.listeners.Storable;
 import me.RockinChaos.itemjoin.listeners.SwitchHands;
+import me.RockinChaos.itemjoin.utils.CustomFilter;
 import me.RockinChaos.itemjoin.utils.DependAPI;
 import me.RockinChaos.itemjoin.utils.UI;
 import me.RockinChaos.itemjoin.utils.Language;
@@ -61,11 +81,12 @@ public class ConfigHandler {
 	private static ItemDesigner itemDesigner;
 	private static ProtocolManager protocolManager;
 	private static UI itemCreator;
+	private static CustomFilter customFilter;
 	private static Metrics metrics;
 	private static DependAPI depends;
 	
 	public static void generateData(File file) {
-		configFile(); itemsFile(); langFile(); registerPrevents();
+		configFile(); itemsFile(); langFile(); registerPrevents(); setCustomFilter();
 		setDepends(new DependAPI());
 		setSQLData(new SQLData());
 		if (file != null) { sendUtilityDepends(); setUpdater(new UpdateHandler(file)); }
@@ -279,10 +300,6 @@ public class ConfigHandler {
 	public static boolean isDebugging() {
 		return ConfigHandler.getConfig("config.yml").getBoolean("General.Debugging");
 	}
-	
-	public static boolean isLoggable() {
-		return ConfigHandler.getConfig("config.yml").getBoolean("General.Log-Commands");
-	}
 
 	public static String isPreventPickups() {
 		return ConfigHandler.getConfig("config.yml").getString("Prevent.Pickups");
@@ -334,6 +351,17 @@ public class ConfigHandler {
 	
 	public static UI getItemCreator() {
 		return itemCreator;
+	}
+	
+	private static void setCustomFilter() {
+		if (!ConfigHandler.getConfig("config.yml").getBoolean("General.Log-Commands")) {
+			customFilter = new CustomFilter();
+			((Logger) LogManager.getRootLogger()).addFilter(ConfigHandler.getCustomFilter());
+		}
+	}
+	
+	public static CustomFilter getCustomFilter() {
+		return customFilter;
 	}
 	
 	private static void setItemCreator(UI creator) {
@@ -401,7 +429,7 @@ public class ConfigHandler {
 		if (((!itemMap.isGiveOnDisabled() && itemMap.isGiveOnRespawn()) || itemMap.isAutoRemove()) && !isListenerEnabled(Respawn.class.getSimpleName())) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Respawn(), ItemJoin.getInstance());
 		}
-		if (((!itemMap.isGiveOnDisabled() && itemMap.isGiveOnWorldChange()) || itemMap.isAutoRemove()) && !isListenerEnabled(WorldSwitch.class.getSimpleName())) {
+		if (((!itemMap.isGiveOnDisabled() && itemMap.isGiveOnWorldSwitch()) || itemMap.isAutoRemove()) && !isListenerEnabled(WorldSwitch.class.getSimpleName())) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new WorldSwitch(), ItemJoin.getInstance());
 		}
 		if (!itemMap.isGiveOnDisabled() && (itemMap.isGiveOnRegionEnter() || itemMap.isTakeOnRegionLeave() 

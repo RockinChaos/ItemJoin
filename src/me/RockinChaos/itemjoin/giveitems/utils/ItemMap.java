@@ -1,3 +1,20 @@
+/*
+ * ItemJoin
+ * Copyright (C) CraftationGaming <https://www.craftationgaming.com/>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package me.RockinChaos.itemjoin.giveitems.utils;
 
 import java.io.File;
@@ -44,7 +61,8 @@ import com.mojang.authlib.properties.Property;
 import com.vk2gpz.tokenenchant.api.TokenEnchantAPI;
 
 import me.RockinChaos.itemjoin.ItemJoin;
-import me.RockinChaos.itemjoin.giveitems.listeners.PlayerGuard;
+import me.RockinChaos.itemjoin.giveitems.utils.ItemCommand.CommandSequence;
+import me.RockinChaos.itemjoin.giveitems.utils.ItemCommand.CommandType;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PermissionsHandler;
@@ -213,7 +231,7 @@ public class ItemMap {
 	private boolean giveOnDisabled = false;
 	private boolean giveOnJoin = false;
 	private boolean giveOnRespawn = false;
-	private boolean giveOnWorldChange = false;
+	private boolean giveOnWorldSwitch = false;
 	private boolean giveOnRegionEnter = false;
 	private boolean takeOnRegionLeave = false;
 	private boolean useOnLimitSwitch = false;
@@ -402,11 +420,11 @@ public class ItemMap {
 				this.onlyFirstJoin = true;
 				this.giveOnJoin = true;
 			}
-		    this.giveOnWorldChange = Utils.containsIgnoreCase(this.triggers, "WORLD-CHANGE") || Utils.containsIgnoreCase(this.triggers, "WORLD-SWITCH");
+		    this.giveOnWorldSwitch = Utils.containsIgnoreCase(this.triggers, "WORLD-CHANGE") || Utils.containsIgnoreCase(this.triggers, "WORLD-SWITCH");
 			if (Utils.containsIgnoreCase(this.triggers, "FIRST-WORLD")) { 
 				this.giveOnJoin = true;
 				this.onlyFirstWorld = true;
-				this.giveOnWorldChange = true;
+				this.giveOnWorldSwitch = true;
 			}
 			this.giveOnRespawn = Utils.containsIgnoreCase(this.triggers, "RESPAWN");
 			this.giveOnRegionEnter = Utils.containsIgnoreCase(this.triggers, "REGION-ENTER");
@@ -419,9 +437,12 @@ public class ItemMap {
 		if (this.nodeLocation.getString(".enabled-regions") != null && !this.nodeLocation.getString(".enabled-regions").isEmpty()) {
 			String[] enabledParts = this.nodeLocation.getString(".enabled-regions").replace(" ,  ", ",").replace(" , ", ",").replace(",  ", ",").replace(", ", ",").split(",");
 			for (String region: enabledParts) {
-				this.enabledRegions.add(region); PlayerGuard.addLocaleRegion(region);
+				this.enabledRegions.add(region); 
+				ConfigHandler.getDepends().addLocaleRegion(region);
 			}
-		} else if (isGiveOnRegionEnter() || isTakeOnRegionLeave()) { PlayerGuard.addLocaleRegion("UNDEFINED"); this.enabledRegions.add("UNDEFINED"); }
+		} else if (isGiveOnRegionEnter() || isTakeOnRegionLeave()) { 
+			ConfigHandler.getDepends().addLocaleRegion("UNDEFINED"); 
+			this.enabledRegions.add("UNDEFINED"); }
 	}
 	
 	private void setWorlds() {
@@ -649,8 +670,8 @@ public class ItemMap {
 		this.giveOnJoin = bool;
 	}
 	
-	public void setGiveOnWorldChange(boolean bool) {
-		this.giveOnWorldChange = bool;
+	public void setGiveOnWorldSwitch(boolean bool) {
+		this.giveOnWorldSwitch = bool;
 	}
 	
 	public void setGiveOnRespawn(boolean bool) {
@@ -1253,8 +1274,8 @@ public class ItemMap {
 		return this.giveOnJoin;
 	}
 	
-	public boolean isGiveOnWorldChange() {
-		return this.giveOnWorldChange;
+	public boolean isGiveOnWorldSwitch() {
+		return this.giveOnWorldSwitch;
 	}
 	
 	public boolean isGiveOnRespawn() {
@@ -2163,7 +2184,7 @@ public class ItemMap {
         		}
         		else if (!playerSuccess) { playerSuccess = itemCommands[i].execute(player, action, slot, this); }
 				else { itemCommands[i].execute(player, action, slot, this); }
-        		if (Utils.containsIgnoreCase(itemCommands[i].getCommand(), "swap-item")) { isSwap = true; }
+        		if (Utils.containsIgnoreCase(itemCommands[i].getRawCommand(), "swap-item")) { isSwap = true; }
 			}
     		if (isSwap) { this.removeDisposable(player, itemCopy, true); }
     	}
@@ -2425,11 +2446,11 @@ public class ItemMap {
 	public Map<String, List<String>> addMapCommand(Map<String, List<String>> map, ItemCommand command) {
 		String commandSection = (command.getSection() != null ? command.getSection() : "DEFAULT");
 		if (map.get(commandSection) != null) { 
-			List <String> s1 = map.get(commandSection); s1.add(command.getCommand());
+			List <String> s1 = map.get(commandSection); s1.add(command.getRawCommand());
 			map.put(commandSection, s1);  
 		} 
 		else {
-			List <String> s1 = new ArrayList<String>(); s1.add(command.getCommand());
+			List <String> s1 = new ArrayList<String>(); s1.add(command.getRawCommand());
 			map.put(commandSection, s1);  
 		}
 		return map;
@@ -2614,9 +2635,6 @@ public class ItemMap {
 		try { itemData.save(itemFile); ConfigHandler.getConfigData("items.yml"); ConfigHandler.getConfig("items.yml").options().copyDefaults(false); } 
 		catch (Exception e) { ItemJoin.getInstance().getServer().getLogger().severe("Could not save the new custom item " + this.configName + " to the items.yml data file!"); ServerHandler.sendDebugTrace(e); }	
 	}
-	
-	public enum CommandType { BOTH, INTERACT, INVENTORY; }
-	public enum CommandSequence { RANDOM, RANDOM_SINGLE, RANDOM_LIST, SEQUENTIAL, ALL; }
 	
 	public ItemMap clone() {
         try {

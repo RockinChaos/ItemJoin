@@ -1,3 +1,20 @@
+/*
+ * ItemJoin
+ * Copyright (C) CraftationGaming <https://www.craftationgaming.com/>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package me.RockinChaos.itemjoin.giveitems.utils;
 
 import java.util.ArrayList;
@@ -6,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -13,11 +31,14 @@ import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.scheduler.BukkitRunnable;
+
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
+import me.RockinChaos.itemjoin.utils.Chances;
 import me.RockinChaos.itemjoin.utils.Language;
 import me.RockinChaos.itemjoin.utils.Utils;
 import net.md_5.bungee.api.ChatColor;
@@ -35,7 +56,7 @@ public class ItemUtilities {
 	}
 	
 	public static ItemMap getItemMap(ItemStack itemStack, String configName, World world) {
-		for (ItemMap itemMap : ItemUtilities.getItems()) {
+		for (ItemMap itemMap : getItems()) {
 			if (world != null && configName == null && itemMap.inWorld(world) && itemMap.isSimilar(itemStack)) {
 				return itemMap;
 			} else if (configName != null && itemMap.getConfigName().equalsIgnoreCase(configName)) {
@@ -46,7 +67,7 @@ public class ItemUtilities {
 	}
 	
 	public static void closeAnimations(Player player) {
-		for (ItemMap item : ItemUtilities.getItems()) {
+		for (ItemMap item : getItems()) {
 			if (item.isAnimated() && item.getAnimationHandler().get(player) != null
 					|| item.isDynamic() && item.getAnimationHandler().get(player) != null) {
 				item.getAnimationHandler().get(player).closeAnimation(player);
@@ -107,16 +128,71 @@ public class ItemUtilities {
 		}
 	}
 	
+	public static void setAuthenticating(final Player player, TriggerType type, final GameMode newMode, final String region) {
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				if (ConfigHandler.getDepends().authMeEnabled() && fr.xephi.authme.api.v3.AuthMeApi.getInstance().isAuthenticated(player)) {
+					setItems(player, type, newMode, region);
+					this.cancel();
+				}
+			}
+		}.runTaskTimer(ItemJoin.getInstance(), 0, 20);
+	}
+	
+	public static void setItems(final Player player, final TriggerType type, final GameMode newMode, final String region) {
+		if (type == TriggerType.REGIONENTER) { clearEventItems(player, "", type.name, region); }
+		if (type == TriggerType.REGIONLEAVE) { pasteReturnItems(player, player.getWorld().getName(), region); }
+		else { safeSet(player, type.name); }
+		if (ConfigHandler.getItemDelay() != 0 && type != TriggerType.LIMITSWITCH && type != TriggerType.REGIONENTER && type != TriggerType.REGIONLEAVE) { 
+			Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
+				@Override
+				public void run() { 
+					runTask(player, type, newMode, region); 
+				}
+			}, ConfigHandler.getItemDelay());
+		} else { runTask(player, type, newMode, region); }
+	}
+	
+	private static void runTask(final Player player, TriggerType type, final GameMode newMode, final String region) {
+		final Chances probability = new Chances();
+		final ItemMap probable = probability.getRandom(player);
+		final int session = Utils.getRandom(1, 100000);
+		for (ItemMap item : getItems()) { 
+			item.setAnimations(player);
+			if (((type.equals(TriggerType.JOIN) && item.isGiveOnJoin()) 
+			  || (type.equals(TriggerType.RESPAWN) && item.isGiveOnRespawn())
+			  || (type.equals(TriggerType.WORLDSWITCH) && item.isGiveOnWorldSwitch())
+			  || (type.equals(TriggerType.LIMITSWITCH) && item.isUseOnLimitSwitch())
+			  || ((((type.equals(TriggerType.REGIONENTER) && item.isGiveOnRegionEnter()) 
+			  || (type.equals(TriggerType.REGIONLEAVE) && item.isTakeOnRegionLeave())) && item.inRegion(region))))
+					 && item.inWorld(player.getWorld()) && probability.isProbability(item, probable) 
+					 && ConfigHandler.getSQLData().isEnabled(player) && item.hasPermission(player) 
+					 && isObtainable(player, item, session, (newMode != null ? newMode : player.getGameMode()))) {
+				item.giveTo(player, false, 0); 
+			} else if (((type.equals(TriggerType.LIMITSWITCH) && item.isUseOnLimitSwitch() && !item.isLimitMode(newMode))
+					|| (((type.equals(TriggerType.REGIONENTER) && item.isTakeOnRegionLeave()) 
+					|| (type.equals(TriggerType.REGIONLEAVE) && item.isGiveOnRegionEnter())) && item.inRegion(region))) 
+					&& item.inWorld(player.getWorld()) && item.hasItem(player)) {
+				item.removeFrom(player, 0);
+			} else if (item.isAutoRemove() && !item.inWorld(player.getWorld()) && item.hasItem(player)) {
+				item.removeFrom(player, 0);
+			}
+		}
+		sendFailCount(player, session);
+		PlayerHandler.delayUpdateInventory(player, 15L);
+	}
+	
 	public static void safeSet(final Player player, final String type) {
 		if (!type.equalsIgnoreCase("LIMIT-MODES")) { PlayerHandler.setHotbarSlot(player); }
 		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
 			@Override
 			public void run() {
 				if (type.equalsIgnoreCase("JOIN")) {
-					ItemUtilities.clearEventItems(player, player.getWorld().getName(), "Join", "");
+					clearEventItems(player, player.getWorld().getName(), "Join", "");
 					Utils.triggerCommands(player);
 				} else if (type.equalsIgnoreCase("WORLD-SWITCH")) {
-					ItemUtilities.clearEventItems(player, player.getWorld().getName(), "World-Switch", "");
+					clearEventItems(player, player.getWorld().getName(), "World-Switch", "");
 				}
 			}
 		}, ConfigHandler.getClearDelay());
@@ -237,7 +313,7 @@ public class ItemUtilities {
 		PlayerInventory inventory = player.getInventory();
 		Inventory craftView = player.getOpenInventory().getTopInventory();
 		saveReturnItems(player, region, type, craftView, inventory, false);
-		for (ItemMap item: ItemUtilities.getItems()) {
+		for (ItemMap item: getItems()) {
 			if (inventory.getHelmet() != null && !isBlacklisted("Helmet", inventory.getHelmet()) && ((protectItems.isEmpty() && ItemHandler.containsNBTData(inventory.getHelmet())) || (!protectItems.contains(item) && item.isSimilar(inventory.getHelmet())))) {
 				inventory.setHelmet(new ItemStack(Material.AIR));
 			} if (inventory.getChestplate() != null && !isBlacklisted("Chestplate", inventory.getChestplate()) 
@@ -271,7 +347,7 @@ public class ItemUtilities {
 	public static List<ItemMap> getProtectItems() {
 		List<ItemMap> protectItems = new ArrayList<ItemMap>();
 		if (Utils.containsIgnoreCase(ConfigHandler.getConfig("config.yml").getString("Clear-Items.Options"), "PROTECT")) {
-			for (ItemMap item: ItemUtilities.getItems()) {
+			for (ItemMap item: getItems()) {
 				if (item.isOnlyFirstJoin() || item.isOnlyFirstWorld()) {
 					protectItems.add(item);
 				}
@@ -286,7 +362,7 @@ public class ItemUtilities {
 			Inventory saveInventory = Bukkit.createInventory(null, 54);
 			for (int i = 0; i <= 47; i++) {
 				if (doReturn) {
-					for (ItemMap itemMap: ItemUtilities.getItems()) {
+					for (ItemMap itemMap: getItems()) {
 						if (!itemMap.isOnlyFirstJoin() && !itemMap.isOnlyFirstWorld()) {
 							if (inventory.getItem(i) != null && inventory.getItem(i).getType() != Material.AIR && itemMap.isSimilar(inventory.getItem(i)) && i <= 41) {
 								saveInventory.setItem(i, inventory.getItem(i).clone());
@@ -326,12 +402,12 @@ public class ItemUtilities {
 		}
 	}
 
-	public static boolean isObtainable(Player player, ItemMap itemMap, int session) {
-		if (!itemMap.hasItem(player) || itemMap.isAlwaysGive() || !itemMap.isLimitMode(player.getGameMode())) {
+	public static boolean isObtainable(Player player, ItemMap itemMap, int session, GameMode gamemode) {
+		if (!itemMap.hasItem(player) || itemMap.isAlwaysGive() || !itemMap.isLimitMode(gamemode)) {
 			boolean firstJoin = ConfigHandler.getSQLData().hasFirstJoined(player, itemMap);
 			boolean firstWorld = ConfigHandler.getSQLData().hasFirstWorld(player, itemMap);
 			boolean ipLimit = ConfigHandler.getSQLData().isIPLimited(player, itemMap);
-			if (itemMap.isLimitMode(player.getGameMode())) {
+			if (itemMap.isLimitMode(gamemode)) {
 				if (!firstJoin && !firstWorld && !ipLimit && canOverwrite(player, itemMap)) {
 					return true;
 				} else if (!firstJoin && !firstWorld && !ipLimit) {
@@ -516,4 +592,16 @@ public class ItemUtilities {
 	public static void clearItems() {
 		items = new ArrayList < ItemMap >();
 	}
+	
+	public enum TriggerType {
+		JOIN("Join"),
+		RESPAWN("Respawn"),
+		WORLDSWITCH("World-Switch"),
+		LIMITSWITCH("Limit-Modes"),
+		REGIONENTER("Region-Enter"),
+		REGIONLEAVE("Region-Leave");
+		private final String name;
+		private TriggerType(String name) { this.name = name; }
+	}	
+	
 }

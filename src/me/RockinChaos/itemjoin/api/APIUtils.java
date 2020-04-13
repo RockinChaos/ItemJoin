@@ -1,3 +1,20 @@
+/*
+ * ItemJoin
+ * Copyright (C) CraftationGaming <https://www.craftationgaming.com/>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package me.RockinChaos.itemjoin.api;
 
 import java.util.ArrayList;
@@ -20,7 +37,7 @@ public class APIUtils {
     /**
      * Gives all ItemJoin items to the specified player.
      * 
-     * @param player that will recieve the items.
+     * @param player - that will recieve the items.
      */
 	 public void setItems(Player player) {
 		final Chances probability = new Chances();
@@ -28,7 +45,7 @@ public class APIUtils {
 		final int session = Utils.getRandom(1, 80000);
 		for (ItemMap item : ItemUtilities.getItems()) {
 			if (item.inWorld(player.getWorld()) && probability.isProbability(item, probable) && ConfigHandler.getSQLData().isEnabled(player)
-					&& item.hasPermission(player) && ItemUtilities.isObtainable(player, item, session)) {
+					&& item.hasPermission(player) && ItemUtilities.isObtainable(player, item, session, player.getGameMode())) {
 					item.giveTo(player, false, 0);
 			}
 			item.setAnimations(player);
@@ -40,8 +57,8 @@ public class APIUtils {
 	/**
 	 * Checks if the itemstack in the said world is a custom item.
 	 * 
-	 * @param player that will recieve the items.
-	 * @param world that the item is said to be in.
+	 * @param item - that is being checked.
+	 * @param world - that the item is said to be in.
 	 * @return Boolean is a custom item.
 	 */
 	 public boolean isCustom(ItemStack item, World world) {
@@ -55,7 +72,8 @@ public class APIUtils {
 	/**
 	 * Fetches the ItemStack defined for the provided itemNode.
 	 * 
-     * @param itemNode that is the custom items config node.
+     * @param player - the player to find the specific custom item.
+     * @param itemNode - that is the custom items config node.
 	 * @return ItemStack found custom item.
 	 */
 	public ItemStack getItemStack(Player player, String itemNode) {
@@ -69,8 +87,8 @@ public class APIUtils {
 	/**
 	 * Fetches the config node name of the custom item.
      * 
-     * @param item that will be checked.
-	 * @param world that the item is said to be in.
+     * @param item - that will be checked.
+	 * @param world - that the item is said to be in.
 	 * @return String node of the custom item.
 	 */
 	 public String getNode(ItemStack item, World world) {
@@ -84,7 +102,7 @@ public class APIUtils {
 	/**
 	 * Fetches the itemflags that are defined for the custom item. 
 	 * 
-	 * @param itemNode that is the custom items config node.
+	 * @param itemNode - that is the custom items config node.
 	 * @return List of itemflags for the custom item.
 	 */
 	 public List <String> getItemflags(String itemNode) {
@@ -102,7 +120,7 @@ public class APIUtils {
 	/**
 	 * Fetches commands that are defined for the custom item.
      * 
-	 * @param itemNode that is the custom items config node.
+	 * @param itemNode - that is the custom items config node.
      * @return List of commands for the custom item.
 	 */
 	 public List <String> getCommands(String itemNode) {
@@ -110,7 +128,7 @@ public class APIUtils {
 		 List <String> commands = new ArrayList<String>();
 		 if (itemMap != null && itemMap.getCommands() != null && itemMap.getCommands().length > 0) {
 			for (ItemCommand command : itemMap.getCommands()) {
-				commands.add(command.getCommand());
+				commands.add(command.getRawCommand());
 			}
 			return commands;
 		 }
@@ -120,7 +138,7 @@ public class APIUtils {
    /**
 	 * Fetches triggers that are defined for the custom item.
      * 
-	 * @param itemNode that is the custom items config node.
+	 * @param itemNode - that is the custom items config node.
 	 * @return List of triggers for the custom item.
 	 */
 	 public List <String> getTriggers(String itemNode) {
@@ -138,7 +156,7 @@ public class APIUtils {
 	/**
 	 * Fetches the slot that the custom item is defined to be set to.
 	 * 
-	 * @param itemNode that is the custom items config node.
+	 * @param itemNode - that is the custom items config node.
 	 * @return String of integer or custom slot for the custom item.
 	 */
 	 public String getSlot(String itemNode) {
@@ -153,7 +171,7 @@ public class APIUtils {
 	 * Fetches all slots that the custom item is defined to be set to.
 	 * In the instance that the custom item is a MultiSlot item.
 	 * 
-	 * @param itemNode that is the custom items config node.
+	 * @param itemNode - that is the custom items config node.
   	 * @return List of slots for the custom item.
      */
 	 public List<String> getMultipleSlots(String itemNode) {
@@ -167,9 +185,9 @@ public class APIUtils {
 	/**
 	 * Fetches the mapping of the custom item.
      * 
-	 * @param item that will be checked.
-	 * @param world that the custom item is said to be in.
-	 * @param itemNode that is the custom items config node.
+	 * @param item - that will be checked.
+	 * @param world - that the custom item is said to be in.
+	 * @param itemNode - that is the custom items config node.
 	 * @return ItemMap that is the located custom item.
 	 */
 	 private ItemMap getMap(ItemStack item, World world, String itemNode) {

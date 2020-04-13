@@ -1,8 +1,29 @@
+/*
+ * ItemJoin
+ * Copyright (C) CraftationGaming <https://www.craftationgaming.com/>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package me.RockinChaos.itemjoin.utils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.bukkit.Bukkit;
 
 public class DependAPI {
+	
 	private boolean multiverseCore = false;
 	private boolean multiverseInventories = false;
 	private boolean placeHolderAPI = false;
@@ -16,6 +37,8 @@ public class DependAPI {
 	private boolean headDatabase = false;
 	private GuardAPI worldGuard;
 	private VaultAPI vault;
+	
+	private List < String > localeRegions = new ArrayList < String > ();
 	
 	public DependAPI() {
 		this.setMCoreStatus(Bukkit.getServer().getPluginManager().getPlugin("Multiverse-Core") != null);
@@ -135,5 +158,31 @@ public class DependAPI {
 	
 	private void setVault() {
 		this.vault = new VaultAPI();
+	}
+	
+   /**
+	* Checks if the player has entered or exited 
+	* any region(s) defined for any custom items.
+	* 
+	* @param region - The region that the player entered or exited.
+	*/
+	private boolean isLocaleRegion(final String checkRegion) {
+		for (final String region : this.localeRegions) {
+			if (region.equalsIgnoreCase(checkRegion) || region.equalsIgnoreCase("UNDEFINED")) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+   /**
+	* Adds a region to be compared against.
+	* 
+	* @param region - The region that the custom item has defined.
+	*/
+	public void addLocaleRegion(final String region) {
+		if (!this.isLocaleRegion(region)) { 
+			this.localeRegions.add(region); 
+		}
 	}
 }

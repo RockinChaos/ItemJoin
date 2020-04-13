@@ -1,3 +1,20 @@
+/*
+ * ItemJoin
+ * Copyright (C) CraftationGaming <https://www.craftationgaming.com/>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package me.RockinChaos.itemjoin.utils;
 
 import java.lang.reflect.Field;
@@ -37,8 +54,8 @@ import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemCommand;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemCommand.ActionType;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
-import me.RockinChaos.itemjoin.giveitems.utils.ItemMap.CommandSequence;
-import me.RockinChaos.itemjoin.giveitems.utils.ItemMap.CommandType;
+import me.RockinChaos.itemjoin.giveitems.utils.ItemCommand.CommandSequence;
+import me.RockinChaos.itemjoin.giveitems.utils.ItemCommand.CommandType;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
@@ -1485,7 +1502,7 @@ public class UI {
 		String commandReturn = "NONE";
 		for (ItemCommand command: itemMap.getCommands()) {
 			if (command.matchAction(action)) {
-				commands += command.getCommand() + " /n ";
+				commands += command.getRawCommand() + " /n ";
 			}
 		}
 		if (Utils.nullCheck(commands) != "NONE") {
@@ -1527,7 +1544,7 @@ public class UI {
 		for (ItemCommand command: commandList) {
 			if (command.matchAction(action)) {
 				final int k = l;
-				commandListPane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, false, "&f" + command.getCommand(), "&7", "&7*Click to &lmodify &7this command.", "&9&lOrder Number: &a" + k), event -> {
+				commandListPane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, false, "&f" + command.getRawCommand(), "&7", "&7*Click to &lmodify &7this command.", "&9&lOrder Number: &a" + k), event -> {
 					this.modifyCommandsPane(player, itemMap, action, command, k);
 				}));
 				l++;
@@ -1571,7 +1588,7 @@ public class UI {
 	private void modifyCommandsPane(final Player player, final ItemMap itemMap, final ActionType action, final ItemCommand command, final int orderNumber) {
 		Interface modPane = new Interface(false, 3, this.GUIName);
 		modPane.addButton(new Button(this.fillerPaneGItem), 4);
-		modPane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, true, "&f" + command.getCommand(), "&7", "&7*You are modifying this command.", "&9&lOrder Number: &a" + orderNumber)));
+		modPane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, true, "&f" + command.getRawCommand(), "&7", "&7*You are modifying this command.", "&9&lOrder Number: &a" + orderNumber)));
 		modPane.addButton(new Button(this.fillerPaneGItem), 4);
 		modPane.addButton(new Button(this.fillerPaneGItem));
 		modPane.addButton(new Button(ItemHandler.getItem((ServerHandler.hasSpecificUpdate("1_13") ? "REPEATER" : "356"), 1, false, "&fIdentifier", "&7", "&7*Set a custom identifier", "&7for this command line.", "&7", "&cNOTE: &7This is in order to set", "&7a random command list sequence.", 
@@ -2552,7 +2569,7 @@ public class UI {
 				itemMap.setOnlyFirstJoin(false);
 				itemMap.setOnlyFirstWorld(false);
 				itemMap.setGiveOnRespawn(false);
-				itemMap.setGiveOnWorldChange(false);
+				itemMap.setGiveOnWorldSwitch(false);
 				itemMap.setUseOnLimitSwitch(false);
 				itemMap.setGiveOnRegionEnter(false);
 				itemMap.setTakeOnRegionLeave(false);
@@ -2596,12 +2613,12 @@ public class UI {
 			}
 			this.triggerPane(player, itemMap);
 		}));
-		triggerPane.addButton(new Button(ItemHandler.getItem("STONE_BUTTON", 1, itemMap.isGiveOnWorldChange(), "&e&l&nWorld Switch", "&7", "&7*Gives the item when the", "&7player teleports to one", "&7of the specified worlds.", 
-				"&9&lENABLED: &a" + (itemMap.isGiveOnWorldChange() + "").toUpperCase()), event -> {
-			if (itemMap.isGiveOnWorldChange()) {
-				itemMap.setGiveOnWorldChange(false);
+		triggerPane.addButton(new Button(ItemHandler.getItem("STONE_BUTTON", 1, itemMap.isGiveOnWorldSwitch(), "&e&l&nWorld Switch", "&7", "&7*Gives the item when the", "&7player teleports to one", "&7of the specified worlds.", 
+				"&9&lENABLED: &a" + (itemMap.isGiveOnWorldSwitch() + "").toUpperCase()), event -> {
+			if (itemMap.isGiveOnWorldSwitch()) {
+				itemMap.setGiveOnWorldSwitch(false);
 			} else {
-				itemMap.setGiveOnWorldChange(true);
+				itemMap.setGiveOnWorldSwitch(true);
 			}
 			this.triggerPane(player, itemMap);
 		}));
@@ -2649,7 +2666,7 @@ public class UI {
 		if (itemMap.isOnlyFirstJoin()) { triggers += "FIRST-JOIN, "; }
 		if (itemMap.isOnlyFirstWorld()) { triggers += "FIRST-WORLD, "; }
 		if (itemMap.isGiveOnRespawn()) { triggers += "RESPAWN, "; }
-		if (itemMap.isGiveOnWorldChange()) { triggers += "WORLD-SWITCH, "; }
+		if (itemMap.isGiveOnWorldSwitch()) { triggers += "WORLD-SWITCH, "; }
 		if (itemMap.isUseOnLimitSwitch()) { triggers += "GAMEMODE-SWITCH, "; }
 		if (itemMap.isGiveOnRegionEnter()) { triggers += "REGION-ENTER, "; }
 		if (itemMap.isTakeOnRegionLeave()) { triggers += "REGION-REMOVE, "; }
