@@ -3017,9 +3017,11 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void worldPane(final Player player, final ItemMap itemMap) {
-		Interface worldPane = new Interface(false, 6, this.GUIName);
+		Interface worldPane = new Interface(true, 6, this.GUIName);
+		worldPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> {
+			this.creatingPane(player, itemMap);
+		}));
 		List < String > enabledWorlds = itemMap.getEnabledWorlds();
-		int i = 44;
 		worldPane.addButton(new Button(ItemHandler.getItem().getItem("OBSIDIAN", 1, itemMap.containsWorld("ALL"), "&a&l&nGLOBAL", "&7", "&7*Click to enable the", "&7custom item in &lALL WORLDS.", "&9&lENABLED: &a" + 
 		(itemMap.containsWorld("ALL") + "").toUpperCase()), event -> {
 			if (itemMap.containsWorld("ALL")) {
@@ -3032,7 +3034,6 @@ public class UI {
 		}));
 		for (World world: ItemJoin.getInstance().getServer().getWorlds()) {
 			String worldMaterial = (ServerHandler.getServer().hasSpecificUpdate("1_13") ? "GRASS_BLOCK" : "2");
-			i--;
 			if (world.getEnvironment().equals(Environment.NETHER)) {
 				worldMaterial = "NETHERRACK";
 			} else if (world.getEnvironment().equals(Environment.THE_END)) {
@@ -3048,10 +3049,6 @@ public class UI {
 				itemMap.setEnabledWorlds(enabledWorlds);this.worldPane(player, itemMap);
 			}));
 		}
-		worldPane.addButton(new Button(ItemHandler.getItem().getItem("AIR", 1, false, "")), i);
-		worldPane.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> this.creatingPane(player, itemMap)));
-		worldPane.addButton(new Button(this.fillerPaneBItem), 7);
-		worldPane.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> this.creatingPane(player, itemMap)));
 		worldPane.open(player);
 	}
 	
@@ -3064,10 +3061,10 @@ public class UI {
     */
 	private void regionPane(final Player player, final ItemMap itemMap) {
 		Interface regionPane = new Interface(true, 6, this.GUIName);
-		List < String > enabledRegions = itemMap.getEnabledRegions();
 		regionPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> {
 			this.creatingPane(player, itemMap);
 		}));
+		List < String > enabledRegions = itemMap.getEnabledRegions();
 		regionPane.addButton(new Button(ItemHandler.getItem().getItem("OBSIDIAN", 1, itemMap.containsRegion("UNDEFINED"), "&c&l&nUNDEFINED", "&7", "&7*Click to enable the", "&7custom item in &lALL REGIONS.", "&9&lENABLED: &a" + 
 		(itemMap.containsRegion("UNDEFINED") + "").toUpperCase()), event -> {
 			if (itemMap.containsRegion("UNDEFINED")) {
