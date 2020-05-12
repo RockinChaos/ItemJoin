@@ -57,10 +57,14 @@ public class ItemJoin extends JavaPlugin {
     */
   	@Override
 	public void onDisable() {
-  		ItemHandler.getItem().purgeCraftItems(true);
-  		Bukkit.getScheduler().cancelTasks(this);
-  		ProtocolManager.getManager().closeProtocol();
-  		SQLite.getLite(false).executeLaterStatements();
+  		try {
+	  		ItemHandler.getItem().purgeCraftItems(true);
+	  		Bukkit.getScheduler().cancelTasks(this);
+	  		SQLite.getLite(false).executeLaterStatements();
+	  		ProtocolManager.getManager().closeProtocol();
+  		} catch (Exception e) { 
+  			if (!e.getClass().getName().equals("ClassNotFoundException")) { e.printStackTrace(); } 
+  		}
   		ServerHandler.getServer().logInfo("has been Disabled.");
   	}
   	
