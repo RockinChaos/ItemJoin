@@ -16,6 +16,7 @@
 				<directory>.</directory>
 				<includes>
 					<include>*.yml</include>
+					<include>LICENSE.*</include>
 				</includes>
 			</resource>
 			<resource>
