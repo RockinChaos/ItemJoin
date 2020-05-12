@@ -42,18 +42,10 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
-bin/me/xsilverslayerx/utils/Listeners.class
-bin/me/xsilverslayerx/itemjoin/ItemJoin.class
-bin/me/xsilverslayerx/utils/Commands.class
-bin/me/xsilverslayerx/utils/UpdateChecker.class
 .classpath
 .project
 .settings/org.eclipse.jdt.core.prefs
 *.class
-*.class
-bin/me/xsilverslayerx/itemjoin/utils/Commands.class
 *.prefs
 /bin/
-.gitattributes
-.gitattributes
 .gitattributes
