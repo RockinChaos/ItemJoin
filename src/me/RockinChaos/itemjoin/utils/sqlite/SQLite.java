@@ -84,15 +84,15 @@ public class SQLite {
     * 
     */
 	private void createTables() {
-        SQDrivers.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS first_join (`World_Name` varchar(32), `Player_Name` varchar(32), `Player_UUID` varchar(32), `Item_Name` varchar(32), `Time_Stamp` varchar(32));");
-        SQDrivers.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS first_world (`World_Name` varchar(32), `Player_Name` varchar(32), `Player_UUID` varchar(32), `Item_Name` varchar(32), `Time_Stamp` varchar(32));");
-        SQDrivers.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS ip_limits (`World_Name` varchar(32), `IP_Address` varchar(32), `Player_UUID` varchar(32), `Item_Name` varchar(32), `Time_Stamp` varchar(32));");
-        SQDrivers.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS first_commands (`World_Name` varchar(32), `Player_UUID` varchar(32), `Command_String` varchar(32), `Time_Stamp` varchar(32));");
-        SQDrivers.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS enabled_players (`World_Name` varchar(32), `Player_Name` varchar(32), `Player_UUID` varchar(32), `isEnabled` varchar(32), `Time_Stamp` varchar(32));");
-        SQDrivers.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS return_items (`World_Name` varchar(32), `Region_Name` varchar(32), `Player_UUID` varchar(32), `Inventory64` varchar(32), `Time_Stamp` varchar(32));");
-        SQDrivers.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS return_craftitems (`Player_UUID` varchar(32), `Inventory64` varchar(32), `Time_Stamp` varchar(32));");
-        SQDrivers.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS map_ids (`Map_IMG` varchar(32), `Map_ID` varchar(32));");
 		this.alterTables();
+        SQDrivers.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS ij_first_join (`World_Name` varchar(32), `Player_Name` varchar(32), `Player_UUID` varchar(32), `Item_Name` varchar(32), `Time_Stamp` varchar(32));");
+        SQDrivers.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS ij_first_world (`World_Name` varchar(32), `Player_Name` varchar(32), `Player_UUID` varchar(32), `Item_Name` varchar(32), `Time_Stamp` varchar(32));");
+        SQDrivers.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS ij_ip_limits (`World_Name` varchar(32), `IP_Address` varchar(32), `Player_UUID` varchar(32), `Item_Name` varchar(32), `Time_Stamp` varchar(32));");
+        SQDrivers.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS ij_first_commands (`World_Name` varchar(32), `Player_UUID` varchar(32), `Command_String` varchar(32), `Time_Stamp` varchar(32));");
+        SQDrivers.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS ij_enabled_players (`World_Name` varchar(32), `Player_Name` varchar(32), `Player_UUID` varchar(32), `isEnabled` varchar(32), `Time_Stamp` varchar(32));");
+        SQDrivers.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS ij_return_items (`World_Name` varchar(32), `Region_Name` varchar(32), `Player_UUID` varchar(32), `Inventory64` varchar(32), `Time_Stamp` varchar(32));");
+        SQDrivers.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS ij_return_craftitems (`Player_UUID` varchar(32), `Inventory64` varchar(32), `Time_Stamp` varchar(32));");
+        SQDrivers.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS ij_map_ids (`Map_IMG` varchar(32), `Map_ID` varchar(32), `Time_Stamp` varchar(32));");
 	}
 	
    /**
@@ -100,13 +100,25 @@ public class SQLite {
     * 
     */
 	private void alterTables() {
-		if (!SQDrivers.getDatabase("database").columnExists("SELECT Time_Stamp FROM first_join")) {
+		if (SQDrivers.getDatabase("database").tableExists("first_join") && !SQDrivers.getDatabase("database").columnExists("SELECT Time_Stamp FROM first_join")) {
 			SQDrivers.getDatabase("database").executeStatement("ALTER TABLE first_join ADD Time_Stamp datatype;");
 			SQDrivers.getDatabase("database").executeStatement("ALTER TABLE first_world ADD Time_Stamp datatype;");
 			SQDrivers.getDatabase("database").executeStatement("ALTER TABLE ip_limits ADD Time_Stamp datatype;");
 			SQDrivers.getDatabase("database").executeStatement("ALTER TABLE first_commands ADD Time_Stamp datatype;");
 			SQDrivers.getDatabase("database").executeStatement("ALTER TABLE enabled_players ADD Time_Stamp datatype;");
+			SQDrivers.getDatabase("database").executeStatement("ALTER TABLE map_ids ADD Time_Stamp datatype;");
 		} 
+		
+		if (!SQDrivers.getDatabase("database").tableExists("ij_first_join") && SQDrivers.getDatabase("database").tableExists("ij_first_join")) {
+			SQDrivers.getDatabase("database").executeStatement("ALTER TABLE first_join RENAME TO ij_first_join;");
+			SQDrivers.getDatabase("database").executeStatement("ALTER TABLE first_world RENAME TO ij_first_world;");
+			SQDrivers.getDatabase("database").executeStatement("ALTER TABLE ip_limits RENAME TO ij_ip_limits;");
+			SQDrivers.getDatabase("database").executeStatement("ALTER TABLE first_commands RENAME TO ij_first_commands;");
+			SQDrivers.getDatabase("database").executeStatement("ALTER TABLE enabled_players RENAME TO ij_enabled_players;");
+			SQDrivers.getDatabase("database").executeStatement("ALTER TABLE return_items RENAME TO ij_return_items;");
+			SQDrivers.getDatabase("database").executeStatement("ALTER TABLE return_craftitems RENAME TO ij_return_craftitems;");
+			SQDrivers.getDatabase("database").executeStatement("ALTER TABLE map_ids RENAME TO ij_map_ids;");
+		}
 	}
 	
    /**
@@ -143,7 +155,7 @@ public class SQLite {
     * 
     */
 	private void loadMapImages() {
-		List<List<String>> selectedMapImages = SQDrivers.getDatabase("database").queryTableData("SELECT * FROM map_ids", "Map_IMG", "Map_ID");
+		List<List<String>> selectedMapImages = SQDrivers.getDatabase("database").queryTableData("SELECT * FROM ij_map_ids", "Map_IMG", "Map_ID");
 		if (selectedMapImages != null && !selectedMapImages.isEmpty()) {
 			for (List<String> sl1 : selectedMapImages) {
 				if (!this.imageNumberExists(sl1.get(0))) {
@@ -158,7 +170,7 @@ public class SQLite {
     * 
     */
 	private void loadFirstJoinPlayers() {
-		List < List < String > > selectedFirstJoinPlayers = SQDrivers.getDatabase("database").queryTableData("SELECT * FROM first_join", "Item_Name", "Player_UUID");
+		List < List < String > > selectedFirstJoinPlayers = SQDrivers.getDatabase("database").queryTableData("SELECT * FROM ij_first_join", "Item_Name", "Player_UUID");
 		if (selectedFirstJoinPlayers != null && !selectedFirstJoinPlayers.isEmpty()) {
 			for (List<String> sl1 : selectedFirstJoinPlayers) {
 				if (this.firstJoinPlayers.get(sl1.get(1)) != null) {
@@ -179,7 +191,7 @@ public class SQLite {
     *
     */
 	private void loadFirstWorldPlayers() {
-		List<List<String>> selectedFirstWorldPlayers = SQDrivers.getDatabase("database").queryTableData("SELECT * FROM first_world", "Item_Name", "Player_UUID", "World_Name");
+		List<List<String>> selectedFirstWorldPlayers = SQDrivers.getDatabase("database").queryTableData("SELECT * FROM ij_first_world", "Item_Name", "Player_UUID", "World_Name");
 		if (selectedFirstWorldPlayers != null && !selectedFirstWorldPlayers.isEmpty()) {
 			for (List<String> sl1 : selectedFirstWorldPlayers) {
 				if (this.firstWorldPlayers.get(sl1.get(1)) != null) {
@@ -200,7 +212,7 @@ public class SQLite {
     * 
     */
 	private void loadFirstCommandPlayers() {
-		List<List<String>> selectedFirstCommandPlayers = SQDrivers.getDatabase("database").queryTableData("SELECT * FROM first_commands", "Command_String", "Player_UUID", "World_Name");
+		List<List<String>> selectedFirstCommandPlayers = SQDrivers.getDatabase("database").queryTableData("SELECT * FROM ij_first_commands", "Command_String", "Player_UUID", "World_Name");
 		if (selectedFirstCommandPlayers != null && !selectedFirstCommandPlayers.isEmpty()) {
 			for (List<String> sl1 : selectedFirstCommandPlayers) {
 				if (this.firstCommandPlayers.get(sl1.get(1)) != null) {
@@ -221,7 +233,7 @@ public class SQLite {
     * 
     */
 	private void loadIPLimitAddresses() {
-		List<List<String>> selectedIPLimitAddresses = SQDrivers.getDatabase("database").queryTableData("SELECT * FROM ip_limits", "Item_Name", "Player_UUID", "World_Name", "IP_Address");
+		List<List<String>> selectedIPLimitAddresses = SQDrivers.getDatabase("database").queryTableData("SELECT * FROM ij_ip_limits", "Item_Name", "Player_UUID", "World_Name", "IP_Address");
 		if (selectedIPLimitAddresses != null && !selectedIPLimitAddresses.isEmpty()) {
 			for (List<String> sl1 : selectedIPLimitAddresses) {
 				if (this.ipLimitAddresses.get(sl1.get(1)) != null) {
@@ -242,7 +254,7 @@ public class SQLite {
     * 
     */
 	private void loadEnabledPlayers() {
-		List<List<String>> selectedEnabledPlayers = SQDrivers.getDatabase("database").queryTableData("SELECT * FROM enabled_players", "Player_UUID", "World_Name", "isEnabled");
+		List<List<String>> selectedEnabledPlayers = SQDrivers.getDatabase("database").queryTableData("SELECT * FROM ij_enabled_players", "Player_UUID", "World_Name", "isEnabled");
 		if (selectedEnabledPlayers != null && !selectedEnabledPlayers.isEmpty()) {
 			for (List<String> sl1 : selectedEnabledPlayers) {
 				if (this.enabledPlayers.get(sl1.get(0)) != null) {
@@ -263,7 +275,7 @@ public class SQLite {
     * 
     */
 	private void loadReturnRegionItems() {
-		List<List<String>> selectedReturnItems = SQDrivers.getDatabase("database").queryTableData("SELECT * FROM return_items", "Player_UUID", "World_Name", "Region_Name", "Inventory64");
+		List<List<String>> selectedReturnItems = SQDrivers.getDatabase("database").queryTableData("SELECT * FROM ij_return_items", "Player_UUID", "World_Name", "Region_Name", "Inventory64");
 		if (selectedReturnItems != null && !selectedReturnItems.isEmpty()) {
 			for (List<String> sl1 : selectedReturnItems) {
 				if (this.returnItems.get(sl1.get(0)) != null) {
@@ -283,7 +295,7 @@ public class SQLite {
     * Loads the return crafting related data.
     */
 	private void loadReturnCraftItems() {
-		List<List<String>> selectedReturnCraftItems = SQDrivers.getDatabase("database").queryTableData("SELECT * FROM return_craftitems", "Player_UUID", "Inventory64");
+		List<List<String>> selectedReturnCraftItems = SQDrivers.getDatabase("database").queryTableData("SELECT * FROM ij_return_craftitems", "Player_UUID", "Inventory64");
 		if (selectedReturnCraftItems != null && !selectedReturnCraftItems.isEmpty()) {
 			for (List<String> sl1 : selectedReturnCraftItems) {
 				this.returnCraftItems.put(sl1.get(0), sl1.get(1));
@@ -299,7 +311,7 @@ public class SQLite {
     */
 	public void saveFirstJoinData(Player player, ItemMap itemMap) {
 		if (itemMap.isOnlyFirstJoin()) {
-			this.executeStatementsLater.add("INSERT INTO first_join (`World_Name`, `Player_Name`, `Player_UUID`, `Item_Name`, `Time_Stamp`) VALUES ('" + player.getWorld().getName() + "','" + player.getName().toString() + "','" + PlayerHandler.getPlayer().getPlayerID(player) + "','" + itemMap.getConfigName() + "','" + new Timestamp(System.currentTimeMillis()) + "')");
+			this.executeStatementsLater.add("INSERT INTO ij_first_join (`World_Name`, `Player_Name`, `Player_UUID`, `Item_Name`, `Time_Stamp`) VALUES ('" + player.getWorld().getName() + "','" + player.getName().toString() + "','" + PlayerHandler.getPlayer().getPlayerID(player) + "','" + itemMap.getConfigName() + "','" + new Timestamp(System.currentTimeMillis()) + "')");
 			if (this.firstJoinPlayers.get(PlayerHandler.getPlayer().getPlayerID(player)) != null) {
 				List <String> h1 = this.firstJoinPlayers.get(PlayerHandler.getPlayer().getPlayerID(player));
 				h1.add(itemMap.getConfigName());
@@ -320,7 +332,7 @@ public class SQLite {
     */
 	public void saveFirstWorldData(Player player, ItemMap itemMap) {
 		if (itemMap.isOnlyFirstWorld()) {
-			this.executeStatementsLater.add("INSERT INTO first_world (`World_Name`, `Player_Name`, `Player_UUID`, `Item_Name`, `Time_Stamp`) VALUES ('" + player.getWorld().getName() + "','" + player.getName().toString() + "','" + PlayerHandler.getPlayer().getPlayerID(player) + "','" + itemMap.getConfigName() + "','" + new Timestamp(System.currentTimeMillis()) + "')");
+			this.executeStatementsLater.add("INSERT INTO ij_first_world (`World_Name`, `Player_Name`, `Player_UUID`, `Item_Name`, `Time_Stamp`) VALUES ('" + player.getWorld().getName() + "','" + player.getName().toString() + "','" + PlayerHandler.getPlayer().getPlayerID(player) + "','" + itemMap.getConfigName() + "','" + new Timestamp(System.currentTimeMillis()) + "')");
 			if (this.firstWorldPlayers.get(PlayerHandler.getPlayer().getPlayerID(player)) != null) {
 				List <String> h1 = this.firstWorldPlayers.get(PlayerHandler.getPlayer().getPlayerID(player));
 				h1.add(player.getWorld().getName() + "." + itemMap.getConfigName());
@@ -341,7 +353,7 @@ public class SQLite {
     */
 	public void saveIpLimitData(Player player, ItemMap itemMap) {
 		if (itemMap.isIpLimted()) {
-			this.executeStatementsLater.add("INSERT INTO ip_limits (`World_Name`, `IP_Address`, `Player_UUID`, `Item_Name`, `Time_Stamp`) VALUES ('" + player.getWorld().getName() + "','" + player.getAddress().getHostString() + "','" + PlayerHandler.getPlayer().getPlayerID(player) + "','" + itemMap.getConfigName() + "','" + new Timestamp(System.currentTimeMillis()) + "')");
+			this.executeStatementsLater.add("INSERT INTO ij_ip_limits (`World_Name`, `IP_Address`, `Player_UUID`, `Item_Name`, `Time_Stamp`) VALUES ('" + player.getWorld().getName() + "','" + player.getAddress().getHostString() + "','" + PlayerHandler.getPlayer().getPlayerID(player) + "','" + itemMap.getConfigName() + "','" + new Timestamp(System.currentTimeMillis()) + "')");
 			if (this.ipLimitAddresses.get(PlayerHandler.getPlayer().getPlayerID(player)) != null) {
 				List <String> h1 = this.ipLimitAddresses.get(PlayerHandler.getPlayer().getPlayerID(player));
 				h1.add(player.getWorld().getName() + "." + player.getAddress().getHostString() + "." + itemMap.getConfigName());
@@ -361,7 +373,7 @@ public class SQLite {
     * @param command - The command being saved.
     */
 	public void saveFirstCommandData(Player player, String command) {
-		this.executeStatementsLater.add("INSERT INTO first_commands (`World_Name`, `Player_UUID`, `Command_String`, `Time_Stamp`) VALUES ('" + player.getWorld().getName() + "','" + PlayerHandler.getPlayer().getPlayerID(player) + "','" + command + "','" + new Timestamp(System.currentTimeMillis()) + "')");
+		this.executeStatementsLater.add("INSERT INTO ij_first_commands (`World_Name`, `Player_UUID`, `Command_String`, `Time_Stamp`) VALUES ('" + player.getWorld().getName() + "','" + PlayerHandler.getPlayer().getPlayerID(player) + "','" + command + "','" + new Timestamp(System.currentTimeMillis()) + "')");
 		if (this.firstCommandPlayers.get(PlayerHandler.getPlayer().getPlayerID(player)) != null) {
 			List <String> h1 = this.firstCommandPlayers.get(PlayerHandler.getPlayer().getPlayerID(player));
 			h1.add(player.getWorld().getName() + "." + command);
@@ -383,7 +395,7 @@ public class SQLite {
     */
 	public void saveReturnRegionItems(Player player, String world, String region, Inventory inventory) {
 		String inventory64 = world + "." + region + "." + ItemHandler.getItem().serializeInventory(inventory);
-		this.executeStatementsLater.add("INSERT INTO return_items (`World_Name`, `Region_Name`, `Player_UUID`, `Inventory64`, `Time_Stamp`) VALUES ('" + world + "','" + region + "','" + PlayerHandler.getPlayer().getPlayerID(player) + "','" + ItemHandler.getItem().serializeInventory(inventory) + "','" + new Timestamp(System.currentTimeMillis()) + "')");
+		this.executeStatementsLater.add("INSERT INTO ij_return_items (`World_Name`, `Region_Name`, `Player_UUID`, `Inventory64`, `Time_Stamp`) VALUES ('" + world + "','" + region + "','" + PlayerHandler.getPlayer().getPlayerID(player) + "','" + ItemHandler.getItem().serializeInventory(inventory) + "','" + new Timestamp(System.currentTimeMillis()) + "')");
 		if (this.returnItems.get(PlayerHandler.getPlayer().getPlayerID(player)) != null && Utils.getUtils().containsIgnoreCase(this.returnItems.get(PlayerHandler.getPlayer().getPlayerID(player)).toString(), world + "." + region)) {
 			return;
 	    } else if (this.returnItems.get(PlayerHandler.getPlayer().getPlayerID(player)) != null) {
@@ -405,7 +417,7 @@ public class SQLite {
     */
 	public void saveReturnCraftItems(Player player, Inventory inventory) {
 		String inventory64 = ItemHandler.getItem().serializeInventory(inventory);
-		this.executeStatementsLater.add("INSERT INTO return_craftitems (`Player_UUID`, `Inventory64`, `Time_Stamp`) VALUES ('" + PlayerHandler.getPlayer().getPlayerID(player) + "','" + ItemHandler.getItem().serializeInventory(inventory) + "','" + new Timestamp(System.currentTimeMillis()) + "')");
+		this.executeStatementsLater.add("INSERT INTO ij_return_craftitems (`Player_UUID`, `Inventory64`, `Time_Stamp`) VALUES ('" + PlayerHandler.getPlayer().getPlayerID(player) + "','" + ItemHandler.getItem().serializeInventory(inventory) + "','" + new Timestamp(System.currentTimeMillis()) + "')");
 		this.returnCraftItems.put(PlayerHandler.getPlayer().getPlayerID(player), inventory64);
 	}
 	
@@ -432,12 +444,12 @@ public class SQLite {
 					}
 					h1.add(world + "." + boolValue);
 					this.enabledPlayers.put(realPlayer, h1);
-					this.executeStatementsLater.add("UPDATE enabled_players SET IsEnabled='" + boolValue + "' WHERE World_Name='" + world + "' AND Player_UUID='" + realPlayer + "'");
+					this.executeStatementsLater.add("UPDATE ij_enabled_players SET IsEnabled='" + boolValue + "' WHERE World_Name='" + world + "' AND Player_UUID='" + realPlayer + "'");
 				} else {
 					List <String> h1 = new ArrayList<String>();
 					h1.add(world + "." + boolValue);
 					this.enabledPlayers.put(realPlayer, h1);
-					this.executeStatementsLater.add("INSERT INTO enabled_players (`World_Name`, `Player_Name`, `Player_UUID`, `isEnabled`, `Time_Stamp`) VALUES ('" + world + "','" + realName + "','" + realPlayer + "','" + boolValue + "','" + new Timestamp(System.currentTimeMillis()) + "')");
+					this.executeStatementsLater.add("INSERT INTO ij_enabled_players (`World_Name`, `Player_Name`, `Player_UUID`, `isEnabled`, `Time_Stamp`) VALUES ('" + world + "','" + realName + "','" + realPlayer + "','" + boolValue + "','" + new Timestamp(System.currentTimeMillis()) + "')");
 				}
 			}
 	}
@@ -463,13 +475,13 @@ public class SQLite {
 	public void purgeDatabaseData(OfflinePlayer player, String section) {
 		String UUID = PlayerHandler.getPlayer().getOfflinePlayerID(player);
 		if (section.equalsIgnoreCase("first_join") && this.firstJoinPlayers.values() != null && !this.firstJoinPlayers.isEmpty()) {
-			this.executeStatementsLater.add("DELETE FROM " + section + " WHERE Player_UUID='" + UUID + "';");
+			this.executeStatementsLater.add("DELETE FROM ij_" + section + " WHERE Player_UUID='" + UUID + "';");
 			this.firstJoinPlayers.remove(UUID);
 		} else if (section.equalsIgnoreCase("first_world") && this.firstWorldPlayers.values() != null && !this.firstWorldPlayers.isEmpty()) {
-			this.executeStatementsLater.add("DELETE FROM " + section + " WHERE Player_UUID='" + UUID + "';");
+			this.executeStatementsLater.add("DELETE FROM ij_" + section + " WHERE Player_UUID='" + UUID + "';");
 			this.firstWorldPlayers.remove(UUID);
 		} else if (section.equalsIgnoreCase("ip_limits") && this.ipLimitAddresses.values() != null && !this.ipLimitAddresses.isEmpty()) {
-			this.executeStatementsLater.add("DELETE FROM " + section + " WHERE Player_UUID='" + UUID + "';");
+			this.executeStatementsLater.add("DELETE FROM ij_" + section + " WHERE Player_UUID='" + UUID + "';");
 			this.ipLimitAddresses.remove(UUID);
 		}
 	}
@@ -484,7 +496,7 @@ public class SQLite {
 	public void removeReturnRegionItems(Player player, String world, String region) {
 		List <String> h1 = this.returnItems.get(PlayerHandler.getPlayer().getPlayerID(player));
 		if (this.returnItems.values() != null && !this.returnItems.isEmpty() && h1 != null && !h1.isEmpty()) {
-			this.executeStatementsLater.add("DELETE FROM return_Items WHERE Player_UUID='" + PlayerHandler.getPlayer().getPlayerID(player) + "' AND World_Name='" + world + "' AND Region_Name='" + region + "';");
+			this.executeStatementsLater.add("DELETE FROM ij_return_Items WHERE Player_UUID='" + PlayerHandler.getPlayer().getPlayerID(player) + "' AND World_Name='" + world + "' AND Region_Name='" + region + "';");
 			for (String inventory : h1) {
 				if (Utils.getUtils().containsIgnoreCase(inventory, world + "." + region + ".")) {
 					h1.remove(inventory);
@@ -503,7 +515,7 @@ public class SQLite {
 	public void removeReturnCraftItems(Player player) {
 		String h1 = this.returnCraftItems.get(PlayerHandler.getPlayer().getPlayerID(player));
 		if (this.returnCraftItems.values() != null && !this.returnCraftItems.isEmpty() && h1 != null && !h1.isEmpty()) {
-			this.executeStatementsLater.add("DELETE FROM return_craftitems WHERE Player_UUID='" + PlayerHandler.getPlayer().getPlayerID(player) + "';");
+			this.executeStatementsLater.add("DELETE FROM ij_return_craftitems WHERE Player_UUID='" + PlayerHandler.getPlayer().getPlayerID(player) + "';");
 			this.returnCraftItems.remove(PlayerHandler.getPlayer().getPlayerID(player));
 		}
 	}
@@ -640,7 +652,7 @@ public class SQLite {
     */
 	public void saveMapImage(ItemMap itemMap) {
 		if (!this.imageNumberExists(itemMap.getMapImage())) {
-			this.executeStatementsLater.add("INSERT INTO map_ids (`Map_IMG`, `Map_ID`) VALUES ('" + itemMap.getMapImage() + "','" + itemMap.getMapID() + "')");
+			this.executeStatementsLater.add("INSERT INTO ij_map_ids (`Map_IMG`, `Map_ID`, `Time_Stamp`) VALUES ('" + itemMap.getMapImage() + "','" + itemMap.getMapID() + "','" + new Timestamp(System.currentTimeMillis()) + "')");
 			this.mapImages.put(itemMap.getMapImage(), itemMap.getMapID());
 		}
 	}
@@ -652,7 +664,7 @@ public class SQLite {
     */
 	public void purgeMapImage(ItemMap itemMap) {
 		if (this.imageNumberExists(itemMap.getMapImage()) && mapImages.values() != null && !this.mapImages.isEmpty()) {
-			this.executeStatementsLater.add("DELETE FROM map_ids WHERE Map_IMG='" + itemMap.getMapImage() + "';");
+			this.executeStatementsLater.add("DELETE FROM ij_map_ids WHERE Map_IMG='" + itemMap.getMapImage() + "';");
 			this.mapImages.remove(itemMap.getMapImage());
 		}
 	}
@@ -751,8 +763,8 @@ public class SQLite {
 					for (String uuidsec: item.getKeys(false)) {
 						ConfigurationSection uuid = item.getConfigurationSection(uuidsec);
 						OfflinePlayer player = ItemJoin.getInstance().getServer().getOfflinePlayer(UUID.fromString(uuid.getName()));
-						if (!SQDrivers.getDatabase("database").dataExists("SELECT * FROM first_join WHERE World_Name='" + world.getName() + "' AND Player_UUID='" + uuid.getName() + "' AND Item_Name='" + item.getName() + "';")) {
-							SQDrivers.getDatabase("database").executeStatement("INSERT INTO first_join (`World_Name`, `Player_Name`, `Player_UUID`, `Item_Name`) VALUES ('" + world.getName() + "','" + player.getName().toString() + "','" + uuid.getName() + "','" + item.getName() + "')");
+						if (!SQDrivers.getDatabase("database").dataExists("SELECT * FROM ij_first_join WHERE World_Name='" + world.getName() + "' AND Player_UUID='" + uuid.getName() + "' AND Item_Name='" + item.getName() + "';")) {
+							SQDrivers.getDatabase("database").executeStatement("INSERT INTO ij_first_join (`World_Name`, `Player_Name`, `Player_UUID`, `Item_Name`) VALUES ('" + world.getName() + "','" + player.getName().toString() + "','" + uuid.getName() + "','" + item.getName() + "')");
 							SQDrivers.getDatabase("database").closeConnection();
 						}
 					}
@@ -785,8 +797,8 @@ public class SQLite {
 					ConfigurationSection item = world.getConfigurationSection(itemsec);
 					for (String ipaddrsec: item.getKeys(false)) {
 						ConfigurationSection ipaddr = item.getConfigurationSection(ipaddrsec);
-						if (!SQDrivers.getDatabase("database").dataExists("SELECT * FROM ip_limits WHERE World_Name='" + world.getName() + "' AND IP_Address='" + ipaddr.getName() + "' AND Item_Name='" + item.getName() + "';")) {
-							SQDrivers.getDatabase("database").executeStatement("INSERT INTO ip_limits (`World_Name`, `IP_Address`, `Player_UUID`, `Item_Name`) VALUES ('" + world.getName() + "','" + ipaddr.getName() + "','" + ipaddr.get("Current User") + "','" + item.getName() + "')");
+						if (!SQDrivers.getDatabase("database").dataExists("SELECT * FROM ij_ip_limits WHERE World_Name='" + world.getName() + "' AND IP_Address='" + ipaddr.getName() + "' AND Item_Name='" + item.getName() + "';")) {
+							SQDrivers.getDatabase("database").executeStatement("INSERT INTO ij_ip_limits (`World_Name`, `IP_Address`, `Player_UUID`, `Item_Name`) VALUES ('" + world.getName() + "','" + ipaddr.getName() + "','" + ipaddr.get("Current User") + "','" + item.getName() + "')");
 							SQDrivers.getDatabase("database").closeConnection();
 						}
 					}
