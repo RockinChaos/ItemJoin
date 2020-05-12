@@ -23,7 +23,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
-import me.RockinChaos.itemjoin.handlers.ConfigHandler;
+import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities.TriggerType;
 
 public class LimitSwitch implements Listener {
 
@@ -38,11 +38,6 @@ public class LimitSwitch implements Listener {
 	private void setGameModeItems(PlayerGameModeChangeEvent event) {
 		final Player player = event.getPlayer();
 		final GameMode newMode = event.getNewGameMode();
-		final ItemUtilities.TriggerType type = ItemUtilities.TriggerType.LIMITSWITCH;
-		if (ConfigHandler.getDepends().authMeEnabled()) { 
-			ItemUtilities.setAuthenticating(player, type, newMode, "GLOBAL"); 
-	    } else { 
-			ItemUtilities.setItems(player, type, newMode, "GLOBAL"); 
-		}
+		ItemUtilities.getUtilities().setAuthenticating(player, TriggerType.LIMITSWITCH, newMode, "GLOBAL"); 
 	}
 }

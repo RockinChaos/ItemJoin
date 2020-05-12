@@ -17,10 +17,9 @@
  */
 package me.RockinChaos.itemjoin.utils;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.bukkit.Bukkit;
+
+import me.RockinChaos.itemjoin.handlers.ServerHandler;
 
 public class DependAPI {
 	
@@ -35,14 +34,16 @@ public class DependAPI {
 	private boolean xInventories = false;
 	private boolean tokenEnchant = false;
 	private boolean headDatabase = false;
-	private GuardAPI worldGuard;
-	private VaultAPI vault;
 	
-	private List < String > localeRegions = new ArrayList < String > ();
+	private static DependAPI depends;
 	
+   /**
+    * Creates a new DependAPI instance.
+    * 
+    */
 	public DependAPI() {
-		this.setMCoreStatus(Bukkit.getServer().getPluginManager().getPlugin("Multiverse-Core") != null);
-		this.setMInventoryStatus(Bukkit.getServer().getPluginManager().getPlugin("Multiverse-Inventories") != null);
+		this.setCoreStatus(Bukkit.getServer().getPluginManager().getPlugin("Multiverse-Core") != null);
+		this.setInventoryStatus(Bukkit.getServer().getPluginManager().getPlugin("Multiverse-Inventories") != null);
 		this.setPlaceHolderStatus(Bukkit.getServer().getPluginManager().getPlugin("PlaceholderAPI") != null);
 		this.setPerPluginsStatus(Bukkit.getServer().getPluginManager().getPlugin("PerWorldPlugins") != null);
 		this.setPerInventoryStatus(Bukkit.getServer().getPluginManager().getPlugin("PerWorldInventory") != null);
@@ -52,137 +53,250 @@ public class DependAPI {
 		this.setXInventoryStatus(Bukkit.getServer().getPluginManager().getPlugin("xInventories") != null);
 		this.setTokenEnchantStatus(Bukkit.getServer().getPluginManager().getPlugin("TokenEnchant") != null);
 		this.setDatabaseStatus(Bukkit.getServer().getPluginManager().getPlugin("HeadDatabase") != null);
-		this.setGuard();
-		this.setVault();
+		GuardAPI.getGuard(true);
+		VaultAPI.getVault(true);
+		
+		this.sendUtilityDepends();
 	}
 
-    public boolean mCoreEnabled() {
+   /**
+    * Checks if Multiverse Core is Enabled.
+    * 
+    * @return If Multiverse Core is Enabled.
+    */
+    public boolean coreEnabled() {
     	return this.multiverseCore;
     }
     
-    public boolean mInventoryEnabled() {
+   /**
+    * Checks if Multiverse Inventory is Enabled.
+    * 
+    * @return If Multiverse Inventory is Enabled.
+    */
+    public boolean inventoryEnabled() {
     	return this.multiverseInventories;
     }
     
+   /**
+    * Checks if PlaceHolderAPI is Enabled.
+    * 
+    * @return If PlaceHolderAPI is Enabled.
+    */
     public boolean placeHolderEnabled() {
     	return this.placeHolderAPI;
     }
     
+   /**
+    * Checks if PerWorldPlugins is Enabled.
+    * 
+    * @return If PerWorldPlugins is Enabled.
+    */
     public boolean perPluginsEnabled() {
     	return this.perWorldPlugins;
     }
     
+   /**
+    * Checks if PerWorldInventory is Enabled.
+    * 
+    * @return If PerWorldInventory is Enabled.
+    */
     public boolean perInventoryEnabled() {
     	return this.perWorldInventory;
     }
     
+   /**
+    * Checks if BetterNick is Enabled.
+    * 
+    * @return If BetterNick is Enabled.
+    */
     public boolean nickEnabled() {
     	return this.betterNick;
     }
     
+   /**
+    * Checks if AuthMe is Enabled.
+    * 
+    * @return If AuthMe is Enabled.
+    */
     public boolean authMeEnabled() {
     	return this.authMe;
     }
     
+   /**
+    * Checks if My Worlds is Enabled.
+    * 
+    * @return If My Worlds is Enabled.
+    */
     public boolean myWorldsEnabled() {
     	return this.myWorlds;
     }
     
+   /**
+    * Checks if xInventories is Enabled.
+    * 
+    * @return If xInventories is Enabled.
+    */
     public boolean xInventoryEnabled() {
     	return this.xInventories;
     }
     
+   /**
+    * Checks if TokenEnchant is Enabled.
+    * 
+    * @return If TokenEnchant is Enabled.
+    */
     public boolean tokenEnchantEnabled() {
     	return this.tokenEnchant;
     }
     
+   /**
+    * Checks if HeadDatabase is Enabled.
+    * 
+    * @return If HeadDatabase is Enabled.
+    */
     public boolean databaseEnabled() {
     	return this.headDatabase;
     }
 
-    public void setMCoreStatus(boolean bool) {
+   /**
+    * Sets the status of Multiverse Core.
+    * 
+    * @param bool - If Multiverse Core is enabled.
+    */
+    public void setCoreStatus(final boolean bool) {
     	this.multiverseCore = bool;
     }
     
-    public void setMInventoryStatus(boolean bool) {
+   /**
+    * Sets the status of Multiverse Inventory.
+    * 
+    * @param bool - If Multiverse Inventory is enabled.
+    */
+    public void setInventoryStatus(final boolean bool) {
     	this.multiverseInventories = bool;
     }
     
-    public void setPlaceHolderStatus(boolean bool) {
+   /**
+    * Sets the status of PlaceHolderAPI.
+    * 
+    * @param bool - If PlaceHolderAPI is enabled.
+    */
+    public void setPlaceHolderStatus(final boolean bool) {
     	this.placeHolderAPI = bool;
     }
     
-    public void setPerPluginsStatus(boolean bool) {
+   /**
+    * Sets the status of PerWorldPlugins.
+    * 
+    * @param bool - If PerWorldPlugins is enabled.
+    */
+    public void setPerPluginsStatus(final boolean bool) {
     	this.perWorldPlugins = bool;
     }
     
-    public void setPerInventoryStatus(boolean bool) {
+   /**
+    * Sets the status of PerWorldInventory.
+    * 
+    * @param bool - If PerWorldInventory is enabled.
+    */
+    public void setPerInventoryStatus(final boolean bool) {
     	this.perWorldInventory = bool;
     }
     
-    public void setNickStatus(boolean bool) {
+   /**
+    * Sets the status of BetterNick.
+    * 
+    * @param bool - If BetterNick is enabled.
+    */
+    public void setNickStatus(final boolean bool) {
     	this.betterNick = bool;
     }
     
+   /**
+    * Sets the status of AuthMe.
+    * 
+    * @param bool - If AuthMe is enabled.
+    */
     public void setAuthMeStatus(boolean bool) {
     	this.authMe = bool;
     }
     
-    public void setMyWorldsStatus(boolean bool) {
+   /**
+    * Sets the status of My Worlds.
+    * 
+    * @param bool - If My Worlds is enabled.
+    */
+    public void setMyWorldsStatus(final boolean bool) {
     	this.myWorlds = bool;
     }
     
-    public void setXInventoryStatus(boolean bool) {
+   /**
+    * Sets the status of xInventory.
+    * 
+    * @param bool - If xInventory is enabled.
+    */
+    public void setXInventoryStatus(final boolean bool) {
     	this.xInventories = bool;
     }
     
-    public void setTokenEnchantStatus(boolean bool) {
+   /**
+    * Sets the status of TokenEnchant.
+    * 
+    * @param bool - If TokenEnchant is enabled.
+    */
+    public void setTokenEnchantStatus(final boolean bool) {
     	this.tokenEnchant = bool;
     }
     
-    public void setDatabaseStatus(boolean bool) {
+   /**
+    * Sets the status of HeadDatabase.
+    * 
+    * @param bool - If HeadDatabase is enabled.
+    */
+    public void setDatabaseStatus(final boolean bool) {
     	this.headDatabase = bool;
     }
     
+   /**
+    * Gets the GuardAPI instance.
+    * 
+    * @return The current GuardAPI instance.
+    */
 	public GuardAPI getGuard() {
-		return this.worldGuard;
+		return GuardAPI.getGuard(false);
 	}
 	
-	private void setGuard() {
-		this.worldGuard = new GuardAPI();
-	}
-	
+   /**
+    * Gets the VaultAPI instance.
+    * 
+    * @return The current VaultAPI instance.
+    */
 	public VaultAPI getVault() {
-		return this.vault;
-	}
-	
-	private void setVault() {
-		this.vault = new VaultAPI();
+		return VaultAPI.getVault(false);
 	}
 	
    /**
-	* Checks if the player has entered or exited 
-	* any region(s) defined for any custom items.
-	* 
-	* @param region - The region that the player entered or exited.
-	*/
-	private boolean isLocaleRegion(final String checkRegion) {
-		for (final String region : this.localeRegions) {
-			if (region.equalsIgnoreCase(checkRegion) || region.equalsIgnoreCase("UNDEFINED")) {
-				return true;
-			}
-		}
-		return false;
+    * Sends a logging message of the found and enabled soft dependencies.
+    * 
+    */
+	private void sendUtilityDepends() {
+		ServerHandler.getServer().logInfo("softDepend(s) { " + (this.authMeEnabled() ? "AuthMe, " : "") + (this.nickEnabled() ? "BetterNick, " : "") 
+				+ (this.coreEnabled() ? "Multiverse-Core, " : "") + (this.inventoryEnabled() ? "Multiverse-Inventories, " : "") 
+				+ (this.myWorldsEnabled() ? "My Worlds, " : "") + (this.perInventoryEnabled() ? "PerWorldInventory, " : "") 
+				+ (this.perPluginsEnabled() ? "PerWorldPlugins, " : "") + (this.tokenEnchantEnabled() ? "TokenEnchant, " : "") 
+				+ (this.getGuard().guardEnabled() ? "WorldGuard, " : "") + (this.databaseEnabled() ? "HeadDatabase, " : "") 
+				+ (this.xInventoryEnabled() ? "xInventories, " : "") + (this.placeHolderEnabled() ? "PlaceholderAPI, " : "") 
+				+ (this.getVault().vaultEnabled() ? "Vault " : "") + "}");
 	}
-
+	
    /**
-	* Adds a region to be compared against.
-	* 
-	* @param region - The region that the custom item has defined.
-	*/
-	public void addLocaleRegion(final String region) {
-		if (!this.isLocaleRegion(region)) { 
-			this.localeRegions.add(region); 
-		}
-	}
+    * Gets the instance of the DependAPI.
+    * 
+    * @param regen - If the DependAPI should have a new instance created.
+    * @return The DependAPI instance.
+    */
+    public static DependAPI getDepends(final boolean regen) { 
+        if (depends == null || regen) { depends = new DependAPI(); }
+        return depends; 
+    } 
 }

@@ -43,93 +43,133 @@ public class InventoryClick implements Listener {
 
 	private Map < String, Boolean > droppedItem = new HashMap < String, Boolean > ();
 	private Map < String, Boolean > dropClick = new HashMap < String, Boolean > ();
-	public static HashMap < String, ItemStack > cursorItem = new HashMap < String, ItemStack > ();
+	private static HashMap < String, ItemStack > cursorItem = new HashMap < String, ItemStack > ();
 	
+   /**
+	* Prevents the player from moving all items in their inventory.
+	* 
+	* @param event - InventoryClickEvent
+	*/
 	@EventHandler
 	private void onGlobalModify(InventoryClickEvent event) {
 		Player player = (Player) event.getWhoClicked();
-	  	if (Utils.containsIgnoreCase(ConfigHandler.isPreventModify(), "true") || Utils.containsIgnoreCase(ConfigHandler.isPreventModify(), player.getWorld().getName())
-		  			|| Utils.containsIgnoreCase(ConfigHandler.isPreventModify(), "ALL") || Utils.containsIgnoreCase(ConfigHandler.isPreventModify(), "GLOBAL")) {
-	  		if (ConfigHandler.isPreventOBypass() && player.isOp() || ConfigHandler.isPreventCBypass() && PlayerHandler.isCreativeMode(player)) { } 
+	  	if (Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getPrevent("itemMovement"), "TRUE") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getPrevent("itemMovement"), player.getWorld().getName())
+		  			|| Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getPrevent("itemMovement"), "ALL") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getPrevent("itemMovement"), "GLOBAL")) {
+	  		if (ConfigHandler.getConfig(false).isPreventOP() && player.isOp() || ConfigHandler.getConfig(false).isPreventCreative() && PlayerHandler.getPlayer().isCreativeMode(player)) { } 
 	  		else if (player.getOpenInventory().getTitle().contains("§") || player.getOpenInventory().getTitle().contains("&")) { }
 	  		else { event.setCancelled(true); }
 	  	}
 	}
 
+   /**
+	* Prevents the player from moving the custom item in their inventory.
+	* 
+	* @param event - InventoryClickEvent
+	*/
 	@EventHandler
 	private void onModify(InventoryClickEvent event) {
 		Player player = (Player) event.getWhoClicked();
 		List<ItemStack> items = new ArrayList<ItemStack>();
 		items.add(event.getCurrentItem()); items.add(event.getCursor());
-		if (Utils.containsIgnoreCase(event.getAction().name(), "HOTBAR")) { items.add(event.getView().getBottomInventory().getItem(event.getHotbarButton())); }
-		if (!ServerHandler.hasSpecificUpdate("1_8")) { PlayerHandler.updateInventory(player); }
+		if (Utils.getUtils().containsIgnoreCase(event.getAction().name(), "HOTBAR")) { items.add(event.getView().getBottomInventory().getItem(event.getHotbarButton())); }
+		if (!ServerHandler.getServer().hasSpecificUpdate("1_8")) { PlayerHandler.getPlayer().updateInventory(player, 1L); }
 		this.LegacyDropEvent(player);
 		for (ItemStack item : items) {
-			if (!ItemUtilities.isAllowed(player, item, "inventory-modify")) {
+			if (!ItemUtilities.getUtilities().isAllowed(player, item, "inventory-modify")) {
 				event.setCancelled(true);
-				if (PlayerHandler.isCreativeMode(player)) { player.closeInventory(); }
-				else if (!ItemUtilities.isAllowed(player, item, "inventory-close")) { player.closeInventory(); }
-				PlayerHandler.updateInventory(player);
+				if (PlayerHandler.getPlayer().isCreativeMode(player)) { player.closeInventory(); }
+				else if (!ItemUtilities.getUtilities().isAllowed(player, item, "inventory-close")) { player.closeInventory(); }
+				PlayerHandler.getPlayer().updateInventory(player, 1L);
 			}
 		}
 	}
 	
-    @EventHandler()
+   /**
+	* Automatically updates any animated or dynamic items that reside on the players cursor.
+	* 
+	* @param event - InventoryClickEvent
+	*/
+    @EventHandler
     private final void onCursorAnimatedItem(InventoryClickEvent event) {
 		Player player = (Player) event.getWhoClicked();
 		String itemflag = "inventory-modify";
     	if (event.getAction().toString().contains("PLACE_ALL") || event.getAction().toString().contains("PLACE_ONE")) {
-    		ItemMap itemMap = ItemUtilities.getItemMap(event.getCursor(), null, player.getWorld());
-    		if (itemMap != null && itemMap.isSimilar(cursorItem.get(PlayerHandler.getPlayerID(player)))) {
+    		ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(event.getCursor(), null, player.getWorld());
+    		if (itemMap != null && itemMap.isSimilar(cursorItem.get(PlayerHandler.getPlayer().getPlayerID(player)))) {
     		final int slot = event.getSlot();
     		event.setCancelled(true);
     		player.setItemOnCursor(new ItemStack(Material.AIR));
     		if (event.getRawSlot() <= 4 && event.getInventory().getType() == InventoryType.CRAFTING || event.getInventory().getType() != InventoryType.CRAFTING && player.getOpenInventory().getTopInventory().getSize() - 1 >= event.getRawSlot()) {
-    			player.getOpenInventory().getTopInventory().setItem(slot, cursorItem.get(PlayerHandler.getPlayerID(player)));
-    		} else { player.getInventory().setItem(slot, cursorItem.get(PlayerHandler.getPlayerID(player)));   }
-			cursorItem.remove(PlayerHandler.getPlayerID(player));
-			ServerHandler.logDebug("{ItemMap} (Cursor_Place): Updated Animation Item."); 
+    			player.getOpenInventory().getTopInventory().setItem(slot, cursorItem.get(PlayerHandler.getPlayer().getPlayerID(player)));
+    		} else { player.getInventory().setItem(slot, cursorItem.get(PlayerHandler.getPlayer().getPlayerID(player)));   }
+			cursorItem.remove(PlayerHandler.getPlayer().getPlayerID(player));
+			ServerHandler.getServer().logDebug("{ItemMap} (Cursor_Place): Updated Animation Item."); 
     		}
     	} else if (event.getAction().toString().contains("SWAP_WITH_CURSOR")) {
-    		ItemMap itemMap = ItemUtilities.getItemMap(event.getCursor(), null, player.getWorld());
-    		if (itemMap != null && itemMap.isSimilar(cursorItem.get(PlayerHandler.getPlayerID(player))) && ItemUtilities.isAllowed(player, event.getCurrentItem(), itemflag)) {
+    		ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(event.getCursor(), null, player.getWorld());
+    		if (itemMap != null && itemMap.isSimilar(cursorItem.get(PlayerHandler.getPlayer().getPlayerID(player))) && ItemUtilities.getUtilities().isAllowed(player, event.getCurrentItem(), itemflag)) {
     		final int slot = event.getSlot();
     		final ItemStack item = new ItemStack(event.getCurrentItem());
     		event.setCancelled(true);
     		player.setItemOnCursor(item);
     		if (event.getRawSlot() <= 4 && event.getInventory().getType() == InventoryType.CRAFTING || event.getInventory().getType() != InventoryType.CRAFTING && player.getOpenInventory().getTopInventory().getSize() - 1 >= event.getRawSlot()) {
-    			player.getOpenInventory().getTopInventory().setItem(slot, cursorItem.get(PlayerHandler.getPlayerID(player)));
-    		} else { player.getInventory().setItem(slot, cursorItem.get(PlayerHandler.getPlayerID(player)));   }
-			cursorItem.remove(PlayerHandler.getPlayerID(player));
-			ServerHandler.logDebug("{ItemMap} (Cursor_Swap): Updated Animation Item."); 
+    			player.getOpenInventory().getTopInventory().setItem(slot, cursorItem.get(PlayerHandler.getPlayer().getPlayerID(player)));
+    		} else { player.getInventory().setItem(slot, cursorItem.get(PlayerHandler.getPlayer().getPlayerID(player)));   }
+			cursorItem.remove(PlayerHandler.getPlayer().getPlayerID(player));
+			ServerHandler.getServer().logDebug("{ItemMap} (Cursor_Swap): Updated Animation Item."); 
     		}
     	}
     }
 
+   /**
+    * Resolves bugs with older versions of Bukkit, removes all iutems and resets them to prevent duplicating.
+    * 
+    * @param player - that is dropping the item.
+    */
     private void LegacyDropEvent(final Player player) {
-    	if (!ServerHandler.hasSpecificUpdate("1_9")) {
-			dropClick.put(PlayerHandler.getPlayerID(player), true);
+    	if (!ServerHandler.getServer().hasSpecificUpdate("1_9")) {
+			dropClick.put(PlayerHandler.getPlayer().getPlayerID(player), true);
 			final ItemStack[] Inv = player.getInventory().getContents().clone();
 			final ItemStack[] Armor = player.getInventory().getArmorContents().clone();
 			Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
 				@Override
 				public void run() {
-					if (dropClick.get(PlayerHandler.getPlayerID(player)) != null && dropClick.get(PlayerHandler.getPlayerID(player)) == true 
-						&& droppedItem.get(PlayerHandler.getPlayerID(player)) != null && droppedItem.get(PlayerHandler.getPlayerID(player)) == true) {
+					if (dropClick.get(PlayerHandler.getPlayer().getPlayerID(player)) != null && dropClick.get(PlayerHandler.getPlayer().getPlayerID(player)) == true 
+						&& droppedItem.get(PlayerHandler.getPlayer().getPlayerID(player)) != null && droppedItem.get(PlayerHandler.getPlayer().getPlayerID(player)) == true) {
 						player.getInventory().clear();
 						player.getInventory().setHelmet(null);
 						player.getInventory().setChestplate(null);
 						player.getInventory().setLeggings(null);
 						player.getInventory().setBoots(null);
-						if (ServerHandler.hasSpecificUpdate("1_9")) { player.getInventory().setItemInOffHand(null); }
+						if (ServerHandler.getServer().hasSpecificUpdate("1_9")) { player.getInventory().setItemInOffHand(null); }
 						player.getInventory().setContents(Inv);
 						player.getInventory().setArmorContents(Armor);
-						PlayerHandler.updateInventory(player);
-						droppedItem.remove(PlayerHandler.getPlayerID(player));
+						PlayerHandler.getPlayer().updateInventory(player, 1L);
+						droppedItem.remove(PlayerHandler.getPlayer().getPlayerID(player));
 					}
-					dropClick.remove(PlayerHandler.getPlayerID(player));
+					dropClick.remove(PlayerHandler.getPlayer().getPlayerID(player));
 				}
 			}, 1L);
     	}
 	}
+    
+   /**
+    * Gets the current HashMap of players and their cursor items.
+    * 
+    * @param player - that will have their item updated.
+    * @return The HashMap containing the players and their current cursor items.
+    */
+    public static ItemStack getCursor(String player) {
+    	return cursorItem.get(player);
+    }
+    
+    /**
+     * Puts the player into the cursor HashMap with their current cursor item.
+     * 
+     * @param player - that is having their item updated.
+     * @param item - that is being updated.
+     */
+     public static void putCursor(String player, ItemStack item) {
+     	cursorItem.put(player, item);
+     }
 }

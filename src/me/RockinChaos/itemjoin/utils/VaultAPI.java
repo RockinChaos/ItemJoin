@@ -31,18 +31,33 @@ public class VaultAPI {
     private Economy econ = null;
     private boolean isEnabled = false;
     
+    private static VaultAPI vault;
+    
+   /**
+	* Creates a new VaultAPI instance.
+	* 
+	*/
     public VaultAPI() {
     	this.setVaultStatus(Bukkit.getServer().getPluginManager().getPlugin("Vault") != null);
     }
     
+   /**
+	* Attempts to enable the economy.
+	* 
+	*/
 	private void enableEconomy() { 
-		if (ConfigHandler.getConfig("config.yml").getBoolean("softDepend.Vault") && ItemJoin.getInstance().getServer().getPluginManager().getPlugin("Vault") != null) {
+		if (ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("softDepend.Vault") && ItemJoin.getInstance().getServer().getPluginManager().getPlugin("Vault") != null) {
 			if (!this.setupEconomy()) {
-				ServerHandler.logSevere("{VaultAPI} An error has occured while setting up enabling Vault-ItemJoin support!");
+				ServerHandler.getServer().logSevere("{VaultAPI} An error has occured while setting up enabling Vault-ItemJoin support!");
 			}
 		}
 	}
 
+   /**
+	* Sets the Economy instance.
+	* 
+	* @return If the Economy instance was successfully enabled.
+	*/
     private boolean setupEconomy() {
         if (ItemJoin.getInstance().getServer().getPluginManager().getPlugin("Vault") == null) {  return false; }
         RegisteredServiceProvider<Economy> rsp = ItemJoin.getInstance().getServer().getServicesManager().getRegistration(Economy.class);
@@ -51,24 +66,63 @@ public class VaultAPI {
         return this.econ != null;
     }
     
+   /**
+	* Gets the Vault Economy instance.
+	* 
+	* @return Gets the current economy instance.
+	*/
     public Economy getEconomy() {
         return this.econ;
     }
     
+   /**
+	* Checks if Vault is enabled.
+	* 
+	* @return If Vault is enabled.
+	*/
     public boolean vaultEnabled() {
     	return this.isEnabled;
     }
     
-    private void setVaultStatus(boolean bool) {
+   /**
+	* Sets the status of the VaultAPI.
+	* 
+	* @param bool - If Vault is enabled.
+	*/
+    private void setVaultStatus(final boolean bool) {
     	if (bool) { this.enableEconomy(); }
     	this.isEnabled = bool;
     }
     
-	public double getBalance(Player player) {
+   /**
+	* Gets the balance of the Player.
+	* 
+	* @param player - The Player having their balance found.
+	* @return The balance of the Player.
+	*/
+	public double getBalance(final Player player) {
 		return this.econ.getBalance(player);
 	}
 	
-	public EconomyResponse withdrawBalance(Player player, int cost) {
+   /**
+	* Withdrawls the specified cost from the Players balance.
+	* 
+	* @param player - The Player being transacted.
+	* @param cost - The cost to be charged to the Player.
+	* @return If the transaction was successful.
+	*/
+	public EconomyResponse withdrawBalance(final Player player, final int cost) {
 		return this.econ.withdrawPlayer(player, cost);
 	}
+	
+   /**
+    * Gets the instance of the VaultAPI.
+    * 
+    * @param regen - If the VaultAPI should have a new instance created.
+    * @return The VaultAPI instance.
+    */
+    public static VaultAPI getVault(final boolean regen) { 
+        if (vault == null || regen) { vault = new VaultAPI(); }
+        return vault; 
+    } 
 }

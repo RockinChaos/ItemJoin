@@ -22,7 +22,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
-import me.RockinChaos.itemjoin.handlers.ConfigHandler;
+import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities.TriggerType;
 
 public class Respawn implements Listener {
 	
@@ -35,11 +35,6 @@ public class Respawn implements Listener {
 	@EventHandler
 	private void setRespawnItems(PlayerRespawnEvent event) {
 		final Player player = event.getPlayer();
-		final ItemUtilities.TriggerType type = ItemUtilities.TriggerType.RESPAWN;
-		if (ConfigHandler.getDepends().authMeEnabled()) { 
-			ItemUtilities.setAuthenticating(player, type, org.bukkit.GameMode.ADVENTURE, "GLOBAL"); 
-		} else { 
-			ItemUtilities.setItems(player, type, org.bukkit.GameMode.ADVENTURE, "GLOBAL"); 
-		}
+		ItemUtilities.getUtilities().setAuthenticating(player, TriggerType.RESPAWN, org.bukkit.GameMode.ADVENTURE, "GLOBAL"); 
 	}
 }

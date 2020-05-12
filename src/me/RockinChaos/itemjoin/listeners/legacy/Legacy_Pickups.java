@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package me.RockinChaos.itemjoin.listeners;
+package me.RockinChaos.itemjoin.listeners.legacy;
 
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
@@ -24,17 +24,26 @@ import me.RockinChaos.itemjoin.utils.Utils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerPickupItemEvent;
 
-@SuppressWarnings("deprecation")
+/**
+* Handles the Pickup events for custom items.
+* 
+* @deprecated This is a LEGACY listener, only use on Minecraft versions below 1.12.
+*/
 public class Legacy_Pickups implements Listener {
 
+   /**
+	* Prevents the player from picking up all items.
+	* 
+	* @param event - EntityPickupItemEvent
+	* @deprecated This is a LEGACY event, only use on Minecraft versions below 1.12.
+	*/
 	@EventHandler
-	private void Deprecated_onGlobalPickup(PlayerPickupItemEvent event) {
+	private void Deprecated_onGlobalPickup(org.bukkit.event.player.PlayerPickupItemEvent event) {
 	  	Player player = event.getPlayer();
-  		if (Utils.containsIgnoreCase(ConfigHandler.isPreventPickups(), "true") || Utils.containsIgnoreCase(ConfigHandler.isPreventPickups(), player.getWorld().getName())
-	  			|| Utils.containsIgnoreCase(ConfigHandler.isPreventPickups(), "ALL") || Utils.containsIgnoreCase(ConfigHandler.isPreventPickups(), "GLOBAL")) {
-  			if (ConfigHandler.isPreventOBypass() && player.isOp() || ConfigHandler.isPreventCBypass() && PlayerHandler.isCreativeMode(player)) { } 
+  		if (Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getPrevent("Pickups"), "TRUE") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getPrevent("Pickups"), player.getWorld().getName())
+	  			|| Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getPrevent("Pickups"), "ALL") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getPrevent("Pickups"), "GLOBAL")) {
+  			if (ConfigHandler.getConfig(false).isPreventOP() && player.isOp() || ConfigHandler.getConfig(false).isPreventCreative() && PlayerHandler.getPlayer().isCreativeMode(player)) { } 
   			else { event.setCancelled(true); }
 	  	}
 	}

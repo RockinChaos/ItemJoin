@@ -29,14 +29,19 @@ import org.bukkit.event.entity.EntityPickupItemEvent;
 
 public class Pickups implements Listener {
 
+   /**
+	* Prevents the player from picking up all items.
+	* 
+	* @param event - EntityPickupItemEvent
+	*/
 	@EventHandler
 	private void onGlobalPickup(EntityPickupItemEvent event) {
 	  	Entity entity = event.getEntity();
 	  	if (entity instanceof Player) {
 	  		Player player = (Player) event.getEntity();
-	  		if (Utils.containsIgnoreCase(ConfigHandler.isPreventPickups(), "TRUE") || Utils.containsIgnoreCase(ConfigHandler.isPreventPickups(), player.getWorld().getName())
-	  			|| Utils.containsIgnoreCase(ConfigHandler.isPreventPickups(), "ALL") || Utils.containsIgnoreCase(ConfigHandler.isPreventPickups(), "GLOBAL")) {
-	  			if (ConfigHandler.isPreventOBypass() && player.isOp() || ConfigHandler.isPreventCBypass() && PlayerHandler.isCreativeMode(player)) { } 
+	  		if (Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getPrevent("Pickups"), "TRUE") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getPrevent("Pickups"), player.getWorld().getName())
+	  			|| Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getPrevent("Pickups"), "ALL") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getPrevent("Pickups"), "GLOBAL")) {
+	  			if (ConfigHandler.getConfig(false).isPreventOP() && player.isOp() || ConfigHandler.getConfig(false).isPreventCreative() && PlayerHandler.getPlayer().isCreativeMode(player)) { } 
 	  			else { event.setCancelled(true); }
 	  		}
 	  	}

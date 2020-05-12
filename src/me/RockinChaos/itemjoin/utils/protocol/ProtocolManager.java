@@ -30,11 +30,25 @@ import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.events.PlayerAutoCraftEvent;
 
 public class ProtocolManager {
-	private TinyProtocol protocol;
 	
+	private TinyProtocol protocol;
+	private static ProtocolManager manager;
+	
+   /**
+    * Handles both server side and client side protocol packets.
+    * 
+    */
   	public void handleProtocols() {
   		if (this.protocol != null) { this.closeProtocol(); }
   		this.protocol = new TinyProtocol(ItemJoin.getInstance()) {
+  			
+  		   /**
+  		    * Handles all incmming client packets.
+  		    * 
+            * @param player - the player tied to the packet.
+            * @param channel - the channel the packet was called on.
+            * @param packet - the packet object.
+  		    */
   			@Override
   			public Object onPacketInAsync(Player player, Channel channel, Object packet) {
   				try {
@@ -44,7 +58,14 @@ public class ProtocolManager {
   				} catch (Exception e) { }
   				return super.onPacketInAsync(player, channel, packet);
   			}
-  			
+  		
+  		   /**
+  		    * Handles all outgoing server packets.
+  		    * 
+            * @param player - the player tied to the packet.
+            * @param channel - the channel the packet was called on.
+            * @param packet - the packet object.
+  		    */
   			@Override
   			public Object onPacketOutAsync(Player player, Channel channel, Object packet) {
   				return packet;
@@ -52,6 +73,13 @@ public class ProtocolManager {
   		};
   	}
   	
+   /**
+    * Handles the custom plugin events corresponding to their packet names.
+    * 
+    * @param player - the player tied to the packet.
+    * @param channel - the channel the packet was called on.
+    * @param packet - the packet object.
+    */
   	private boolean manageEvents(Player player, Channel channel, Object packet) {
   		try {
 	  		if (packet != null && packet.getClass().getSimpleName().equalsIgnoreCase("PacketPlayInAutoRecipe")) {
@@ -63,6 +91,12 @@ public class ProtocolManager {
   		return false;
   	}
   	
+   /**
+    * Allows an event to be called on a different Async Thread.
+    * Functions the same as PluginManager.callEvent(event);
+    * 
+    * @param event - The event to be triggered.
+    */
     private void callEvent(Event event) {
         HandlerList handlers = event.getHandlers();
         RegisteredListener[] listeners = handlers.getRegisteredListeners();
@@ -84,9 +118,24 @@ public class ProtocolManager {
         }
     }
     
+   /**
+    * Closes the currently open protocol handler(s).
+    * 
+    */
   	public void closeProtocol() {
   		if (this.protocol != null) {
   			this.protocol.close();
   		}
   	}
+  	
+   /**
+    * Gets the instance of the ProtocolManager.
+    * 
+    * @param regen - If the ProtocolManager should have a new instance created.
+    * @return The ProtocolManager instance.
+    */
+    public static ProtocolManager getManager() { 
+        if (manager == null) { manager = new ProtocolManager(); }
+        return manager; 
+    } 
 }

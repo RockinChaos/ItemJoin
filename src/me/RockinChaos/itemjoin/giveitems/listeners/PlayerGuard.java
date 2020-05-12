@@ -32,9 +32,11 @@ import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
-import me.RockinChaos.itemjoin.handlers.ConfigHandler;
+import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities.TriggerType;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
-import me.RockinChaos.itemjoin.utils.Legacy;
+import me.RockinChaos.itemjoin.utils.DependAPI;
+import me.RockinChaos.itemjoin.utils.LegacyAPI;
+import me.RockinChaos.itemjoin.utils.sqlite.SQLite;
 
 public class PlayerGuard implements Listener {
 	
@@ -50,7 +52,7 @@ public class PlayerGuard implements Listener {
 	@EventHandler
 	private void setRegionItems(PlayerMoveEvent event) {
 		final Player player = event.getPlayer();
-		if (ConfigHandler.getSQLData().isEnabled(player)) {
+		if (SQLite.getLite(false).isEnabled(player)) {
 			this.handleRegions(player);
 		}
 	}
@@ -73,14 +75,14 @@ public class PlayerGuard implements Listener {
 			if (!playerSetList.isEmpty()) {
 				for (String region: playerSetList) {
 					if (region != null && !region.isEmpty()) {
-						ItemUtilities.setItems(player, ItemUtilities.TriggerType.REGIONLEAVE, org.bukkit.GameMode.ADVENTURE, region);
+						ItemUtilities.getUtilities().setItems(player, TriggerType.REGIONLEAVE, org.bukkit.GameMode.ADVENTURE, region);
 					}
 				}
 			}
 			if (!regionSetList.isEmpty()) {
 				for (String region: regionSetList) {
 					if (region != null && !region.isEmpty()) {
-						ItemUtilities.setItems(player, ItemUtilities.TriggerType.REGIONENTER, org.bukkit.GameMode.ADVENTURE, region);
+						ItemUtilities.getUtilities().setItems(player, TriggerType.REGIONENTER, org.bukkit.GameMode.ADVENTURE, region);
 					}
 				}
 			}
@@ -88,7 +90,7 @@ public class PlayerGuard implements Listener {
 			List < String > regionSet = Arrays.asList(regions.replace(" ", "").split(","));
 			for (String region: regionSet) {
 				if (region != null && !region.isEmpty()) {
-					ItemUtilities.setItems(player, ItemUtilities.TriggerType.REGIONENTER, org.bukkit.GameMode.ADVENTURE, region);
+					ItemUtilities.getUtilities().setItems(player, TriggerType.REGIONENTER, org.bukkit.GameMode.ADVENTURE, region);
 				}
 			}
 		}
@@ -105,7 +107,7 @@ public class PlayerGuard implements Listener {
 		ApplicableRegionSet set = null;
 		String regionSet = "";
 		try { set = this.getApplicableRegionSet(player.getWorld(), player.getLocation()); } 
-		catch (Exception e) { ServerHandler.sendDebugTrace(e); }
+		catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
 		if (set == null) { return regionSet; }
 		for (ProtectedRegion r: set) {
 			if (regionSet.isEmpty()) { regionSet += r.getId(); }
@@ -122,16 +124,16 @@ public class PlayerGuard implements Listener {
 	* @return ApplicableRegionSet The WorldGuard RegionSet.
 	*/
 	private ApplicableRegionSet getApplicableRegionSet(final World world, final Location location) throws Exception {
-		if (ConfigHandler.getDepends().getGuard().guardVersion() >= 700) {
+		if (DependAPI.getDepends(false).getGuard().guardVersion() >= 700) {
 			com.sk89q.worldedit.world.World wgWorld;
 			try { wgWorld = com.sk89q.worldguard.WorldGuard.getInstance().getPlatform().getWorldByName(world.getName()); } 
 			catch (NoSuchMethodError e) { wgWorld = com.sk89q.worldguard.WorldGuard.getInstance().getPlatform().getMatcher().getWorldByName(world.getName()); }
 			com.sk89q.worldguard.protection.regions.RegionContainer rm = com.sk89q.worldguard.WorldGuard.getInstance().getPlatform().getRegionContainer();
 			if (rm == null) { return null; }
-			if (Legacy.hasLegacyWorldEdit()) {
+			if (LegacyAPI.getLegacy().legacySk89q()) {
 				final com.sk89q.worldedit.Vector wgVector = new com.sk89q.worldedit.Vector(location.getX(), location.getY(), location.getZ());
 				return rm.get(wgWorld).getApplicableRegions(wgVector);
-			} else { return rm.get(wgWorld).getApplicableRegions(Legacy.asBlockVector(location)); }
-		} else { return Legacy.getLegacyRegionSet(world, location); }
+			} else { return rm.get(wgWorld).getApplicableRegions(LegacyAPI.getLegacy().asBlockVector(location)); }
+		} else { return LegacyAPI.getLegacy().getRegionSet(world, location); }
 	}
 }

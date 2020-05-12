@@ -29,30 +29,34 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
-import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
+import me.RockinChaos.itemjoin.utils.UI;
 import me.RockinChaos.itemjoin.utils.Utils;
 
 public class Interface implements InventoryHolder {
+	
 	private Inventory inventory;
-	private boolean isPaged;
-	private boolean pendingChat = false;
-	private boolean pendingClick = false;
 	private int activeButton = -1;
 	private int currentIndex;
 	private int pageSize;
 	private SortedMap < Integer, Page > pages = new TreeMap < > ();
 	
+	private boolean isPaged;
+	private boolean pendingChat = false;
+	private boolean pendingClick = false;
+	
 	private Button controlBack;
 	private Button controlNext;
 	private Button controlExit;
 	
-	@Override
-	public Inventory getInventory() {
-		return this.inventory;
-	}
-	
+   /**
+    * Creates a new interface instance.
+    * 
+    * @param isPaged - If the inventory has multiple pages.
+    * @param rows - Number of rows for the inventory.
+    * @param title - Title to be displayed on the inventory.
+    */
 	public Interface(boolean isPaged, int rows, String title) {
 		this.isPaged = isPaged;
 		if (this.isPaged) {
@@ -60,12 +64,18 @@ public class Interface implements InventoryHolder {
 		} else {
 			this.pageSize = rows * 9;
 		}
-		this.inventory = Bukkit.createInventory(this, rows * 9, Utils.colorFormat(title));
+		this.inventory = Bukkit.createInventory(this, rows * 9, Utils.getUtils().colorFormat(title));
 		this.inventory.setMaxStackSize(128);
 		this.pages.put(0, new Page(this.pageSize));
 		this.createControls(this.inventory);
 	}
 	
+   /**
+    * Called on player inventory click.
+    * Handles the player click event for the button method execution.
+    * 
+    * @param event - InventoryClickEvent
+    */
 	public void onClick(InventoryClickEvent event) {
 		if (!(this.pendingClick && event.getSlot() <= this.inventory.getSize() && event.getSlot() >= 0 && this.clickInventory(event))) {
 			if (this.isPaged && event.getSlot() == this.inventory.getSize() - 8 && this.getCurrentPage() > 1) {
@@ -91,6 +101,12 @@ public class Interface implements InventoryHolder {
 		}
 	}
 	
+   /**
+    * Called on player chat.
+    * Handles the player chat event for the button clicked.
+    * 
+    * @param event - AsyncPlayerChatEvent
+    */
 	public void onChat(AsyncPlayerChatEvent event) {
 		if (this.activeButton != -1) {
 			this.pages.get(this.currentIndex).handleChat(event, this.activeButton);
@@ -99,10 +115,20 @@ public class Interface implements InventoryHolder {
 		}
 	}
 	
+   /**
+    * Allows the button to be clicked.
+    * 
+    * @param bool - Allows the button to be clicked.
+    */
 	public void allowClick(boolean bool) {
 		this.pendingClick = bool;
 	}
 	
+   /**
+    * Adds a button to the current page.
+    * 
+    * @param button - The button to be added.
+    */
 	public void addButton(Button button) {
 		for (Entry < Integer, Page > entry: this.pages.entrySet()) {
 			if (entry.getValue().addButton(button)) {
@@ -118,6 +144,12 @@ public class Interface implements InventoryHolder {
 		this.renderPage();
 	}
 	
+   /**
+    * Adds a button to the current page.
+    * 
+    * @param button - The button to be added.
+    * @param amount - The number of buttons to be added.
+    */
 	public void addButton(Button button, int amount) {
 		for (Entry < Integer, Page > entry: this.pages.entrySet()) {
 			for (int i = amount; i >= 1; i--) {
@@ -139,6 +171,11 @@ public class Interface implements InventoryHolder {
 		this.renderPage();
 	}
 	
+   /**
+    * Removes a button from the current page.
+    * 
+    * @param button - The button to be removed.
+    */
 	public void removeButton(Button button) {
 		for (Iterator < Entry < Integer, Page >> iterator = pages.entrySet().iterator(); iterator.hasNext();) {
 			Entry < Integer, Page > entry = iterator.next();
@@ -159,6 +196,11 @@ public class Interface implements InventoryHolder {
 		}
 	}
 	
+   /**
+    * Sets a custom return button.
+    * 
+    * @param button - The button to be set as the return button.
+    */
 	public void setReturnButton(Button button) {
 		if (this.isPaged) {
 			this.controlExit = button;
@@ -167,54 +209,59 @@ public class Interface implements InventoryHolder {
 		}
 	}
 	
+   /**
+    * Creates the controls for the existing inventory page.
+    * 
+    * @param inventory - The inventory to have the controls added.
+    */
 	private void createControls(Inventory inventory) {
 		if (this.isPaged) {
 			if (this.getCurrentPage() > 1) {
 				ItemStack backItem;
-				if (ServerHandler.hasSpecificUpdate("1_8")) {
-					backItem = ItemHandler.setSkullTexture(ItemHandler.getItem("SKULL_ITEM:3", 1, false, "&3&n&lPrevious Page", "&7", "&7*Previous page &a&l" + (this.getCurrentPage() - 1) + "&7 / &c&l" + this.getPageAmount()), "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2RjOWU0ZGNmYTQyMjFhMWZhZGMxYjViMmIxMWQ4YmVlYjU3ODc5YWYxYzQyMzYyMTQyYmFlMWVkZDUifX19");
+				if (ServerHandler.getServer().hasSpecificUpdate("1_8")) {
+					backItem = ItemHandler.getItem().setSkullTexture(ItemHandler.getItem().getItem("SKULL_ITEM:3", 1, false, "&3&n&lPrevious Page", "&7", "&7*Previous page &a&l" + (this.getCurrentPage() - 1) + "&7 / &c&l" + this.getPageAmount()), "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2RjOWU0ZGNmYTQyMjFhMWZhZGMxYjViMmIxMWQ4YmVlYjU3ODc5YWYxYzQyMzYyMTQyYmFlMWVkZDUifX19");
 				} else {
-					backItem = ItemHandler.getItem("ARROW", 1, false, "&3&n&lPrevious Page", "&7", "&7*Previous page &a&l" + (this.getCurrentPage() - 1) + "&7 / &c&l" + this.getPageAmount());
+					backItem = ItemHandler.getItem().getItem("ARROW", 1, false, "&3&n&lPrevious Page", "&7", "&7*Previous page &a&l" + (this.getCurrentPage() - 1) + "&7 / &c&l" + this.getPageAmount());
 				}
 				this.controlBack = new Button(backItem, event -> this.selectPage(this.currentIndex - 1));
 				inventory.setItem(inventory.getSize() - 8, backItem);
 			} else {
 				ItemStack backItem;
-				if (ServerHandler.hasSpecificUpdate("1_8")) {
-					backItem = ItemHandler.setSkullTexture(ItemHandler.getItem("SKULL_ITEM:3", 1, false, "&c&n&lPrevious Page", "&7", "&7*You are already at the first page."), "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTdjMjE0NGZkY2I1NWMzZmMxYmYxZGU1MWNhYmRmNTJjMzg4M2JjYjU3ODkyMzIyNmJlYjBkODVjYjJkOTgwIn19fQ==");
+				if (ServerHandler.getServer().hasSpecificUpdate("1_8")) {
+					backItem = ItemHandler.getItem().setSkullTexture(ItemHandler.getItem().getItem("SKULL_ITEM:3", 1, false, "&c&n&lPrevious Page", "&7", "&7*You are already at the first page."), "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTdjMjE0NGZkY2I1NWMzZmMxYmYxZGU1MWNhYmRmNTJjMzg4M2JjYjU3ODkyMzIyNmJlYjBkODVjYjJkOTgwIn19fQ==");
 				} else {
-					backItem = ItemHandler.getItem("LEVER", 1, false, "&c&n&lPrevious Page", "&7", "&7*You are already at the first page.");
+					backItem = ItemHandler.getItem().getItem("LEVER", 1, false, "&c&n&lPrevious Page", "&7", "&7*You are already at the first page.");
 				}
 				inventory.setItem(inventory.getSize() - 8, backItem);
 			}
 			if (this.getCurrentPage() < this.getPageAmount()) {
 				ItemStack nextItem;
-				if (ServerHandler.hasSpecificUpdate("1_8")) {
-					nextItem = ItemHandler.setSkullTexture(ItemHandler.getItem("SKULL_ITEM:3", 1, false, "&3&n&lNext Page", "&7", "&7*Next page &a&l" + (this.getCurrentPage() + 1) + "&7 / &c&l" + this.getPageAmount()), "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTU2YTM2MTg0NTllNDNiMjg3YjIyYjdlMjM1ZWM2OTk1OTQ1NDZjNmZjZDZkYzg0YmZjYTRjZjMwYWI5MzExIn19fQ");
+				if (ServerHandler.getServer().hasSpecificUpdate("1_8")) {
+					nextItem = ItemHandler.getItem().setSkullTexture(ItemHandler.getItem().getItem("SKULL_ITEM:3", 1, false, "&3&n&lNext Page", "&7", "&7*Next page &a&l" + (this.getCurrentPage() + 1) + "&7 / &c&l" + this.getPageAmount()), "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTU2YTM2MTg0NTllNDNiMjg3YjIyYjdlMjM1ZWM2OTk1OTQ1NDZjNmZjZDZkYzg0YmZjYTRjZjMwYWI5MzExIn19fQ");
 				} else {
-					nextItem = ItemHandler.getItem("ARROW", 1, false, "&3&n&lNext Page", "&7", "&7*Next page &a&l" + (this.getCurrentPage() + 1) + "&7 / &c&l" + this.getPageAmount());
+					nextItem = ItemHandler.getItem().getItem("ARROW", 1, false, "&3&n&lNext Page", "&7", "&7*Next page &a&l" + (this.getCurrentPage() + 1) + "&7 / &c&l" + this.getPageAmount());
 				}
 				this.controlNext = new Button(nextItem, event -> this.selectPage(this.getCurrentPage()));
 				inventory.setItem(inventory.getSize() - 2, nextItem);
 			} else {
 				ItemStack nextItem;
-				if (ServerHandler.hasSpecificUpdate("1_8")) {
-					nextItem = ItemHandler.setSkullTexture(ItemHandler.getItem("SKULL_ITEM:3", 1, false, "&c&n&lNext Page", "&7", "&7*You are already at the last page."), "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTdjMjE0NGZkY2I1NWMzZmMxYmYxZGU1MWNhYmRmNTJjMzg4M2JjYjU3ODkyMzIyNmJlYjBkODVjYjJkOTgwIn19fQ==");
+				if (ServerHandler.getServer().hasSpecificUpdate("1_8")) {
+					nextItem = ItemHandler.getItem().setSkullTexture(ItemHandler.getItem().getItem("SKULL_ITEM:3", 1, false, "&c&n&lNext Page", "&7", "&7*You are already at the last page."), "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTdjMjE0NGZkY2I1NWMzZmMxYmYxZGU1MWNhYmRmNTJjMzg4M2JjYjU3ODkyMzIyNmJlYjBkODVjYjJkOTgwIn19fQ==");
 				} else {
-					nextItem = ItemHandler.getItem("LEVER", 1, false, "&c&n&lNext Page", "&7", "&7*You are already at the last page.");
+					nextItem = ItemHandler.getItem().getItem("LEVER", 1, false, "&c&n&lNext Page", "&7", "&7*You are already at the last page.");
 				}
 				inventory.setItem(inventory.getSize() - 2, nextItem);
 			}
-			inventory.setItem(inventory.getSize() - 5, ItemHandler.getItem("BOOK", 1, false, "&3&lPage &a&l" + this.getCurrentPage() + "&7 / &c&l" + this.getPageAmount(), "&7You are on page &a&l" + this.getCurrentPage() + "&7 / &c&l" + this.getPageAmount()));
-			ItemStack exitItem = ItemHandler.getItem("BARRIER", 1, false, "&c&l&nMain Menu", "&7", "&7*Returns you to the main menu.");
+			inventory.setItem(inventory.getSize() - 5, ItemHandler.getItem().getItem("BOOK", 1, false, "&3&lPage &a&l" + this.getCurrentPage() + "&7 / &c&l" + this.getPageAmount(), "&7You are on page &a&l" + this.getCurrentPage() + "&7 / &c&l" + this.getPageAmount()));
+			ItemStack exitItem = ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nMain Menu", "&7", "&7*Returns you to the main menu.");
 			if (this.controlExit == null) {
-				this.controlExit = new Button(exitItem, event -> ConfigHandler.getItemCreator().startMenu(((Player)event.getWhoClicked())));
+				this.controlExit = new Button(exitItem, event -> UI.getCreator().startMenu(((Player)event.getWhoClicked())));
 			} else {
 				exitItem = controlExit.getItemStack();
 			}
 			inventory.setItem(inventory.getSize() - 9, exitItem);
 			inventory.setItem(inventory.getSize() - 1, exitItem);
-			ItemStack blackPane = ItemHandler.getItem("STAINED_GLASS_PANE:15", 1, false, "&f", "");
+			ItemStack blackPane = ItemHandler.getItem().getItem("STAINED_GLASS_PANE:15", 1, false, "&f", "");
 			inventory.setItem(inventory.getSize() - 3, blackPane);
 			inventory.setItem(inventory.getSize() - 4, blackPane);
 			inventory.setItem(inventory.getSize() - 6, blackPane);
@@ -222,20 +269,39 @@ public class Interface implements InventoryHolder {
 		}
 	}
 	
+   /**
+    * Renders the current page.
+    * 
+    */
 	private void renderPage() {
 		this.inventory.clear();
 		this.pages.get(this.currentIndex).render(this.inventory);
 		this.createControls(this.inventory);
 	}
 	
+   /**
+    * Gets the total number of existing pages.
+    * 
+    * @return The current number of pages.
+    */
 	private int getPageAmount() {
 		return this.pages.size();
 	}
 	
+   /**
+    * Gets the current inventory page.
+    * 
+    * @return The current inventory page number.
+    */
 	private int getCurrentPage() {
 		return (this.currentIndex + 1);
 	}
 	
+   /**
+    * Changes the current inventory page to the specified page number
+    * 
+    * @param index - The page to become the current page.
+    */
 	private void selectPage(int index) {
 		if (index == this.currentIndex) {
 			return;
@@ -244,8 +310,15 @@ public class Interface implements InventoryHolder {
 		this.renderPage();
 	}
 	
+   /**
+    * This is not called, rather it handles the onClick event to check
+    * if the clicked inventory and button is valid.
+    * 
+    * @param event - InventoryClickEvent
+    * @return If the inventory clicked is the same as the current inventory page.
+    */
 	public boolean clickInventory(InventoryClickEvent event) {
-		if (ServerHandler.hasSpecificUpdate("1_14")) {
+		if (ServerHandler.getServer().hasSpecificUpdate("1_14")) {
 			return (event.getClickedInventory() == event.getWhoClicked().getInventory());
 		} else {
 			final ItemStack clickItem = event.getCurrentItem();
@@ -254,12 +327,32 @@ public class Interface implements InventoryHolder {
 		}
 	}
 	
+   /**
+    * Checks if the current page is expecting a player chat event before continuing.
+    * 
+    * @return If there is a pending chat event.
+    */
 	public boolean chatPending() {
 		return this.pendingChat;
 	}
 	
+   /**
+    * Opens the current inventory page for the player to view.
+    * 
+    * @param player - The player to have the current inventory page opened.
+    */
 	public void open(Player player) {
 		this.renderPage();
 		player.openInventory(getInventory());
+	}
+	
+   /**
+    * Gets the inventory.
+    * 
+    * @return The inventory for the interface.
+    */
+	@Override
+	public Inventory getInventory() {
+		return this.inventory;
 	}
 }

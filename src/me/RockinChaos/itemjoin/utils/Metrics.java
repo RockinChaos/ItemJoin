@@ -42,9 +42,9 @@ import java.util.logging.Level;
 import java.util.zip.GZIPOutputStream;
 
 /**
- * bStats Metrics Collection
- * Collects some data for plugin authors.
- */
+* bStats Metrics Collection
+* Collects some data for plugin authors.
+*/
 public class Metrics {
     public static final int B_STATS_VERSION = 1;
     private static final String URL = "https://bStats.org/submitData/bukkit";
@@ -55,18 +55,20 @@ public class Metrics {
     private static String serverUUID;
     private final Plugin plugin;
     private final List<CustomChart> charts = new ArrayList<>();
+    
+    private static Metrics metrics;
 
-    /**
-     * Class constructor.
-     *
-     * @param plugin The plugin which stats should be submitted.
-     */
+   /**
+    * Class constructor.
+    *
+    * @param plugin The plugin which stats should be submitted.
+    */
     public Metrics() {
 	        if (ItemJoin.getInstance() == null) {
 	            throw new IllegalArgumentException("Plugin cannot be null!");
 	        }
 	        this.plugin = ItemJoin.getInstance();
-			if (ConfigHandler.getConfig("config.yml").getBoolean("General.Metrics-Logging")) { 
+			if (ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("General.Metrics-Logging")) { 
 	        File bStatsFolder = new File(plugin.getDataFolder().getParentFile(), "bStats");
 	        File configFile = new File(bStatsFolder, "config.yml");
 	        YamlConfiguration config = YamlConfiguration.loadConfiguration(configFile);
@@ -107,22 +109,22 @@ public class Metrics {
 	                startSubmitting();
 	            }
 	        }
-		        this.addCustomChart(new Metrics.SimplePie("items", ItemUtilities.getItems().size() + " "));
-		        this.addCustomChart(new Metrics.SimplePie("itemPermissions", ConfigHandler.getConfig("config.yml").getBoolean("Permissions.Obtain-Items") ? "True" : "False"));
-		        this.addCustomChart(new Metrics.SimplePie("language", Language.getLanguage()));
-		        this.addCustomChart(new Metrics.SimplePie("softDepend", ConfigHandler.getDepends().authMeEnabled() ? "AuthMe" : ""));
-		        this.addCustomChart(new Metrics.SimplePie("softDepend", ConfigHandler.getDepends().nickEnabled() ? "BetterNick" : ""));
-		        this.addCustomChart(new Metrics.SimplePie("softDepend", ConfigHandler.getDepends().mCoreEnabled() ? "Multiverse-Core" : ""));
-		        this.addCustomChart(new Metrics.SimplePie("softDepend", ConfigHandler.getDepends().mInventoryEnabled() ? "Multiverse-Inventories" : ""));
-		        this.addCustomChart(new Metrics.SimplePie("softDepend", ConfigHandler.getDepends().myWorldsEnabled() ? "My Worlds" : ""));
-		        this.addCustomChart(new Metrics.SimplePie("softDepend", ConfigHandler.getDepends().perInventoryEnabled() ? "PerWorldInventory" : ""));
-		        this.addCustomChart(new Metrics.SimplePie("softDepend", ConfigHandler.getDepends().perPluginsEnabled() ? "PerWorldPlugins" : ""));
-		        this.addCustomChart(new Metrics.SimplePie("softDepend", ConfigHandler.getDepends().tokenEnchantEnabled() ? "TokenEnchant" : ""));
-		        this.addCustomChart(new Metrics.SimplePie("softDepend", ConfigHandler.getDepends().getGuard().guardEnabled() ? "WorldGuard" : ""));
-		        this.addCustomChart(new Metrics.SimplePie("softDepend", ConfigHandler.getDepends().databaseEnabled() ? "HeadDatabase" : ""));
-		        this.addCustomChart(new Metrics.SimplePie("softDepend", ConfigHandler.getDepends().xInventoryEnabled() ? "xInventories" : ""));
-		        this.addCustomChart(new Metrics.SimplePie("softDepend", ConfigHandler.getDepends().placeHolderEnabled() ? "PlaceholderAPI" : ""));
-		        this.addCustomChart(new Metrics.SimplePie("softDepend", ConfigHandler.getDepends().getVault().vaultEnabled() ? "Vault" : ""));
+		        this.addCustomChart(new Metrics.SimplePie("items", ItemUtilities.getUtilities().getItems().size() + " "));
+		        this.addCustomChart(new Metrics.SimplePie("itemPermissions", ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Permissions.Obtain-Items") ? "True" : "False"));
+		        this.addCustomChart(new Metrics.SimplePie("language", LanguageAPI.getLang(false).getLanguage()));
+		        this.addCustomChart(new Metrics.SimplePie("softDepend", DependAPI.getDepends(false).authMeEnabled() ? "AuthMe" : ""));
+		        this.addCustomChart(new Metrics.SimplePie("softDepend", DependAPI.getDepends(false).nickEnabled() ? "BetterNick" : ""));
+		        this.addCustomChart(new Metrics.SimplePie("softDepend", DependAPI.getDepends(false).coreEnabled() ? "Multiverse-Core" : ""));
+		        this.addCustomChart(new Metrics.SimplePie("softDepend", DependAPI.getDepends(false).inventoryEnabled() ? "Multiverse-Inventories" : ""));
+		        this.addCustomChart(new Metrics.SimplePie("softDepend", DependAPI.getDepends(false).myWorldsEnabled() ? "My Worlds" : ""));
+		        this.addCustomChart(new Metrics.SimplePie("softDepend", DependAPI.getDepends(false).perInventoryEnabled() ? "PerWorldInventory" : ""));
+		        this.addCustomChart(new Metrics.SimplePie("softDepend", DependAPI.getDepends(false).perPluginsEnabled() ? "PerWorldPlugins" : ""));
+		        this.addCustomChart(new Metrics.SimplePie("softDepend", DependAPI.getDepends(false).tokenEnchantEnabled() ? "TokenEnchant" : ""));
+		        this.addCustomChart(new Metrics.SimplePie("softDepend", DependAPI.getDepends(false).getGuard().guardEnabled() ? "WorldGuard" : ""));
+		        this.addCustomChart(new Metrics.SimplePie("softDepend", DependAPI.getDepends(false).databaseEnabled() ? "HeadDatabase" : ""));
+		        this.addCustomChart(new Metrics.SimplePie("softDepend", DependAPI.getDepends(false).xInventoryEnabled() ? "xInventories" : ""));
+		        this.addCustomChart(new Metrics.SimplePie("softDepend", DependAPI.getDepends(false).placeHolderEnabled() ? "PlaceholderAPI" : ""));
+		        this.addCustomChart(new Metrics.SimplePie("softDepend", DependAPI.getDepends(false).getVault().vaultEnabled() ? "Vault" : ""));
 		}
     }
 
@@ -277,7 +279,7 @@ public class Metrics {
      * @param data The data to send.
      * @throws Exception If the request failed.
      */
-    private static void sendData(Plugin plugin, JSONObject data) throws Exception {
+    private static void sendData(final Plugin plugin, final JSONObject data) throws Exception {
         if (data == null) {
             throw new IllegalArgumentException("Data cannot be null!");
         }
@@ -345,7 +347,7 @@ public class Metrics {
          *
          * @param chartId The id of the chart.
          */
-        CustomChart(String chartId) {
+        CustomChart(final String chartId) {
             if (chartId == null || chartId.isEmpty()) {
                 throw new IllegalArgumentException("ChartId cannot be null or empty!");
             }
@@ -387,7 +389,7 @@ public class Metrics {
          * @param chartId The id of the chart.
          * @param callable The callable which is used to request the chart data.
          */
-        public SimplePie(String chartId, String...callable) {
+        public SimplePie(final String chartId, final String...callable) {
             super(chartId);
             this.callable = callable;
         }
@@ -418,7 +420,7 @@ public class Metrics {
          * @param chartId The id of the chart.
          * @param callable The callable which is used to request the chart data.
          */
-        public AdvancedPie(String chartId, Callable<Map<String, Integer>> callable) {
+        public AdvancedPie(final String chartId, final Callable<Map<String, Integer>> callable) {
             super(chartId);
             this.callable = callable;
         }
@@ -460,7 +462,7 @@ public class Metrics {
          * @param chartId The id of the chart.
          * @param callable The callable which is used to request the chart data.
          */
-        public DrilldownPie(String chartId, Callable<Map<String, Map<String, Integer>>> callable) {
+        public DrilldownPie(final String chartId, final Callable<Map<String, Map<String, Integer>>> callable) {
             super(chartId);
             this.callable = callable;
         }
@@ -507,7 +509,7 @@ public class Metrics {
          * @param chartId The id of the chart.
          * @param callable The callable which is used to request the chart data.
          */
-        public SingleLineChart(String chartId, Callable<Integer> callable) {
+        public SingleLineChart(final String chartId, final Callable<Integer> callable) {
             super(chartId);
             this.callable = callable;
         }
@@ -538,7 +540,7 @@ public class Metrics {
          * @param chartId The id of the chart.
          * @param callable The callable which is used to request the chart data.
          */
-        public MultiLineChart(String chartId, Callable<Map<String, Integer>> callable) {
+        public MultiLineChart(final String chartId, final Callable<Map<String, Integer>> callable) {
             super(chartId);
             this.callable = callable;
         }
@@ -581,7 +583,7 @@ public class Metrics {
          * @param chartId The id of the chart.
          * @param callable The callable which is used to request the chart data.
          */
-        public SimpleBarChart(String chartId, Callable<Map<String, Integer>> callable) {
+        public SimpleBarChart(final String chartId, final Callable<Map<String, Integer>> callable) {
             super(chartId);
             this.callable = callable;
         }
@@ -618,7 +620,7 @@ public class Metrics {
          * @param chartId The id of the chart.
          * @param callable The callable which is used to request the chart data.
          */
-        public AdvancedBarChart(String chartId, Callable<Map<String, int[]>> callable) {
+        public AdvancedBarChart(final String chartId, final Callable<Map<String, int[]>> callable) {
             super(chartId);
             this.callable = callable;
         }
@@ -650,4 +652,15 @@ public class Metrics {
             return data;
         }
     }
+	
+   /**
+    * Gets the instance of the Metrics.
+    * 
+    * @param regen - If the Metrics should have a new instance created.
+    * @return The Metrics instance.
+    */
+    public static Metrics getMetrics(final boolean regen) { 
+        if (metrics == null || regen) { metrics = new Metrics(); }
+        return metrics; 
+    } 
 }

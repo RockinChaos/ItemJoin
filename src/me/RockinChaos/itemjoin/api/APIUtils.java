@@ -27,10 +27,10 @@ import org.bukkit.inventory.ItemStack;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemCommand;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
-import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.utils.Chances;
 import me.RockinChaos.itemjoin.utils.Utils;
+import me.RockinChaos.itemjoin.utils.sqlite.SQLite;
 
 public class APIUtils {
 	
@@ -40,18 +40,17 @@ public class APIUtils {
      * @param player - that will recieve the items.
      */
 	 public void setItems(Player player) {
-		final Chances probability = new Chances();
-		final ItemMap probable = probability.getRandom(player);
-		final int session = Utils.getRandom(1, 80000);
-		for (ItemMap item : ItemUtilities.getItems()) {
-			if (item.inWorld(player.getWorld()) && probability.isProbability(item, probable) && ConfigHandler.getSQLData().isEnabled(player)
-					&& item.hasPermission(player) && ItemUtilities.isObtainable(player, item, session, player.getGameMode())) {
-					item.giveTo(player, false, 0);
+		final ItemMap probable = Chances.getChances().getRandom(player);
+		final int session = Utils.getUtils().getRandom(1, 80000);
+		for (ItemMap item : ItemUtilities.getUtilities().getItems()) {
+			if (item.inWorld(player.getWorld()) && Chances.getChances().isProbability(item, probable) && SQLite.getLite(false).isEnabled(player)
+					&& item.hasPermission(player) && ItemUtilities.getUtilities().isObtainable(player, item, session, player.getGameMode())) {
+					item.giveTo(player);
 			}
 			item.setAnimations(player);
 		}
-		ItemUtilities.sendFailCount(player, session);
-		PlayerHandler.delayUpdateInventory(player, 15L);
+		ItemUtilities.getUtilities().sendFailCount(player, session);
+		PlayerHandler.getPlayer().updateInventory(player, 15L);
 	 }
 	 
 	/**
@@ -191,7 +190,7 @@ public class APIUtils {
 	 * @return ItemMap that is the located custom item.
 	 */
 	 private ItemMap getMap(ItemStack item, World world, String itemNode) {
-		for (ItemMap itemMap: ItemUtilities.getItems()) {
+		for (ItemMap itemMap: ItemUtilities.getUtilities().getItems()) {
 			if (world != null && itemMap.inWorld(world) && itemMap.isSimilar(item)) {
 			    return itemMap;
 			} else if (world == null && itemMap.isSimilar(item)) {

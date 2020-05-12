@@ -26,13 +26,20 @@ import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 
-public class YAMLGenerator {
+public class FileData {
 	
-	public static void generateItemsFile() {
+	private static FileData data;
+	
+   /**
+    * Generates the Data for the FileConfiguration that is specific
+    * to the current Server version.
+    * 
+    */
+	public void generateItemsFile() {
 		File itemsFile = new File(ItemJoin.getInstance().getDataFolder(), "items.yml");
         FileConfiguration itemsData = YamlConfiguration.loadConfiguration(itemsFile);
         
-        if (ServerHandler.hasSpecificUpdate("1_14")) {
+        if (ServerHandler.getServer().hasSpecificUpdate("1_14")) {
 			itemsData.set("items.devine-item.commands-sound", "BLOCK_NOTE_BLOCK_PLING");
 			itemsData.set("items.map-item.id", "FILLED_MAP");
 			itemsData.set("items.gamemode-token.id", "FIREWORK_STAR");
@@ -58,7 +65,7 @@ public class YAMLGenerator {
 			itemsData.set("items.random-pane-1.id", "YELLOW_STAINED_GLASS_PANE");
 			itemsData.set("items.random-pane-2.id", "BLUE_STAINED_GLASS_PANE");
 			itemsData.set("items.random-pane-3.id", "PINK_STAINED_GLASS_PANE");
-        } else if (ServerHandler.hasSpecificUpdate("1_13")) {
+        } else if (ServerHandler.getServer().hasSpecificUpdate("1_13")) {
 			itemsData.set("items.devine-item.commands-sound", "BLOCK_NOTE_BLOCK_PLING");
 			itemsData.set("items.map-item.id", "FILLED_MAP");
 			itemsData.set("items.gamemode-token.id", "FIREWORK_STAR");
@@ -84,7 +91,7 @@ public class YAMLGenerator {
 			itemsData.set("items.random-pane-1.id", "YELLOW_STAINED_GLASS_PANE");
 			itemsData.set("items.random-pane-2.id", "BLUE_STAINED_GLASS_PANE");
 			itemsData.set("items.random-pane-3.id", "PINK_STAINED_GLASS_PANE");
-		} else if (ServerHandler.hasSpecificUpdate("1_9")) {
+		} else if (ServerHandler.getServer().hasSpecificUpdate("1_9")) {
 			itemsData.set("items.devine-item.commands-sound", "BLOCK_NOTE_PLING");
 			itemsData.set("items.map-item.id", "MAP");
 			itemsData.set("items.gamemode-token.id", "FIREWORK_CHARGE");
@@ -110,7 +117,7 @@ public class YAMLGenerator {
 			itemsData.set("items.random-pane-1.id", "STAINED_GLASS_PANE:4");
 			itemsData.set("items.random-pane-2.id", "STAINED_GLASS_PANE:4");
 			itemsData.set("items.random-pane-3.id", "STAINED_GLASS_PANE:6");
-		} else if (ServerHandler.hasSpecificUpdate("1_8")) {
+		} else if (ServerHandler.getServer().hasSpecificUpdate("1_8")) {
 			itemsData.set("items.devine-item.commands-sound", "NOTE_PLING");
 			itemsData.set("items.map-item.id", "MAP");
 			itemsData.set("items.gamemode-token.id", "FIREWORK_CHARGE");
@@ -137,7 +144,7 @@ public class YAMLGenerator {
 			itemsData.set("items.random-pane-2.id", "STAINED_GLASS_PANE:3");
 			itemsData.set("items.random-pane-3.id", "STAINED_GLASS_PANE:6");
 			itemsData.set("items.offhand-item", null);
-		} else if (ServerHandler.hasSpecificUpdate("1_7")) {
+		} else if (ServerHandler.getServer().hasSpecificUpdate("1_7")) {
 			itemsData.set("items.devine-item.commands-sound", "NOTE_PLING");
 			itemsData.set("items.map-item.id", "MAP");
 			itemsData.set("items.gamemode-token.id", "FIREWORK_CHARGE");
@@ -176,11 +183,21 @@ public class YAMLGenerator {
 
 		try {
 			itemsData.save(itemsFile);
-			ConfigHandler.getConfigData("items.yml");
-			ConfigHandler.getConfig("items.yml").options().copyDefaults(false);
+			ConfigHandler.getConfig(false).getSource("items.yml");
+			ConfigHandler.getConfig(false).getFile("items.yml").options().copyDefaults(false);
 		} catch (Exception e) {
 			ItemJoin.getInstance().getServer().getLogger().severe("Could not save important data changes to the data file items.yml!");
 			e.printStackTrace();
 		}
 	}
+	
+   /**
+    * Gets the instance of the YAMLGenerator.
+    * 
+    * @return The YAMLGenerator instance.
+    */
+    public static FileData getData() { 
+        if (data == null) { data = new FileData(); }
+        return data; 
+    } 
 }

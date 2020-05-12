@@ -18,7 +18,6 @@
 package me.RockinChaos.itemjoin.giveitems.utils;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import org.apache.commons.lang.StringUtils;
@@ -27,7 +26,6 @@ import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -39,24 +37,44 @@ import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.utils.Chances;
-import me.RockinChaos.itemjoin.utils.Language;
+import me.RockinChaos.itemjoin.utils.DependAPI;
+import me.RockinChaos.itemjoin.utils.LanguageAPI;
 import me.RockinChaos.itemjoin.utils.Utils;
+import me.RockinChaos.itemjoin.utils.sqlite.SQLite;
 import net.md_5.bungee.api.ChatColor;
 
 public class ItemUtilities {
-  	private static List < ItemMap > items = new ArrayList < ItemMap >();
-	private static HashMap <Integer, Integer> failCount = new HashMap <Integer, Integer> ();
+  	private List < ItemMap > items = new ArrayList < ItemMap >();
+  	private List < ItemMap > protectItems = new ArrayList < ItemMap >();
+	private HashMap <Integer, Integer> failCount = new HashMap <Integer, Integer> ();
+	
+	private static ItemUtilities utilities;
 
-	public static boolean isAllowed(Player player, ItemStack item, String itemflag) {
-		ItemMap itemMap = getItemMap(item, null, player.getWorld());
+   /**
+    * Checks if the specified itemflag and ItemStack is allowed.
+    * 
+    * @param player - The Player that is being allowed.
+    * @param item - The ItemStack to check if it is allowed to perform the itemflag.
+    * @param itemflag - The itemflag to be checked if it is allowed.
+    */
+	public boolean isAllowed(final Player player, final ItemStack item, final String itemflag) {
+		ItemMap itemMap = this.getItemMap(item, null, player.getWorld());
 		if (itemMap != null && itemMap.isAllowedItem(player, item, itemflag)) {
 			return false;
 		}
 		return true;
 	}
 	
-	public static ItemMap getItemMap(ItemStack itemStack, String configName, World world) {
-		for (ItemMap itemMap : getItems()) {
+   /**
+    * Finds the matching ItemMap from the list of provided ItemMaps,
+    * that has the exact same ItemStack and world or config node name defined.
+    * 
+    * @param itemStack - The ItemStack to have its ItemMap located.
+    * @param configName - The config node name of the ItemMap.
+    * @param world - The world of the ItemMap.
+    */
+	public ItemMap getItemMap(final ItemStack itemStack, final String configName, final World world) {
+		for (ItemMap itemMap : this.getItems()) {
 			if (world != null && configName == null && itemMap.inWorld(world) && itemMap.isSimilar(itemStack)) {
 				return itemMap;
 			} else if (configName != null && itemMap.getConfigName().equalsIgnoreCase(configName)) {
@@ -66,8 +84,40 @@ public class ItemUtilities {
 		return null;
 	}
 	
-	public static void closeAnimations(Player player) {
-		for (ItemMap item : getItems()) {
+   /**
+    * Finds the matching ItemMap from the list of provided ItemMaps,
+    * that has the exact same slot defined.
+    * 
+    * @param slot - The slot that the ItemMap should have defined.
+    * @param items - The list of ItemMap to be checked.
+    * @return The ItemMap matching the specified slot.
+    */
+	public ItemMap getItemMap(final String slot, final List < ItemMap > items) {
+		ItemMap itemMap = null;
+		for (final ItemMap item: items) {
+			if (item.getSlot().equalsIgnoreCase(slot)) {
+				itemMap = item;
+				break;
+			}
+		}
+		return itemMap;
+	}
+	
+   /**
+    * Closes the ItemAnimations for ALL Online Players.
+    * 
+    */
+	public void closeAnimations() {
+		PlayerHandler.getPlayer().forOnlinePlayers(player -> { this.closeAnimations(player); });
+	}
+	
+   /**
+    * Closes the ItemAnimations for the specified Player.
+    * 
+    * @param player - The Player that is having their item animations closed.
+    */
+	public void closeAnimations(final Player player) {
+		for (ItemMap item : this.getItems()) {
 			if (item.isAnimated() && item.getAnimationHandler().get(player) != null
 					|| item.isDynamic() && item.getAnimationHandler().get(player) != null) {
 				item.getAnimationHandler().get(player).closeAnimation(player);
@@ -76,89 +126,86 @@ public class ItemUtilities {
 		}
 	}
 	
-	public static void closeAnimations() {
-		Collection < ? > playersOnlineNew = null;
-		Player[] playersOnlineOld;
-		try {
-			if (Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).getReturnType() == Collection.class) {
-				if (Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).getReturnType() == Collection.class) {
-					playersOnlineNew = ((Collection < ? > ) Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).invoke(null, new Object[0]));
-					for (Object objPlayer: playersOnlineNew) {
-						closeAnimations(((Player) objPlayer));
-					}
-				}
-			} else {
-				playersOnlineOld = ((Player[]) Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).invoke(null, new Object[0]));
-				for (Player player: playersOnlineOld) {
-					closeAnimations(player);
-				}
-			}
-		} catch (Exception e) { ServerHandler.sendDebugTrace(e); }
+   /**
+    * Updates the ItemMap List to fill the Player placeholders for ALL Online Players.
+    * 
+    */
+	public void updateItems() {
+		PlayerHandler.getPlayer().forOnlinePlayers(player -> { this.updateItems(player, true); });
 	}
 	
-	public static void updateItems(Player player, boolean newAnimation) {
-		for (ItemMap item: getItems()) {
+   /**
+    * Updates the ItemMap List to fill the Player placeholders.
+    * 
+    * @param player - The Player that is having their items updated.
+    * @param refresh - If the ItemAnimation should be restarted.
+    */
+	private void updateItems(final Player player, final boolean refresh) {
+		for (ItemMap item: this.getItems()) {
 			item.updateItem(player);
-			if (newAnimation) {
+			if (refresh) {
 				item.setAnimations(player);
 			}
 		}
 	}
 	
-	public static void updateItems() {
-		Collection < ? > playersOnlineNew = null;
-		Player[] playersOnlineOld;
-		try {
-			if (Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).getReturnType() == Collection.class) {
-				if (Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).getReturnType() == Collection.class) {
-					playersOnlineNew = ((Collection < ? > ) Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).invoke(null, new Object[0]));
-					for (Object objPlayer: playersOnlineNew) {
-						Player player = ((Player) objPlayer);
-						updateItems(player, true);
+   /**
+    * Checks if the Player is waiting Authentication from a plugin such as AuthMe. 
+    * Then sets the item after Authentication is complete.
+    * 
+    * @param player - The Player that is being authenticated.
+    * @param type - The TriggerType that is being performed.
+    * @param newMode - The GameMode of the Player.
+    * @param region - The region the Player is in.
+    */
+	public void setAuthenticating(final Player player, TriggerType type, final GameMode newMode, final String region) {
+		if (DependAPI.getDepends(false).authMeEnabled()) {
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					if (fr.xephi.authme.api.v3.AuthMeApi.getInstance().isAuthenticated(player)) {
+						setItems(player, type, newMode, region);
+						this.cancel();
 					}
 				}
-			} else {
-				playersOnlineOld = ((Player[]) Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).invoke(null, new Object[0]));
-				for (Player player: playersOnlineOld) {
-					updateItems(player, true);
-				}
-			}
-		} catch (Exception e) {
-			ServerHandler.sendDebugTrace(e);
+			}.runTaskTimer(ItemJoin.getInstance(), 0, 20);
+		} else { 
+			this.setItems(player, type, newMode, region);
 		}
 	}
 	
-	public static void setAuthenticating(final Player player, TriggerType type, final GameMode newMode, final String region) {
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				if (ConfigHandler.getDepends().authMeEnabled() && fr.xephi.authme.api.v3.AuthMeApi.getInstance().isAuthenticated(player)) {
-					setItems(player, type, newMode, region);
-					this.cancel();
-				}
-			}
-		}.runTaskTimer(ItemJoin.getInstance(), 0, 20);
-	}
-	
-	public static void setItems(final Player player, final TriggerType type, final GameMode newMode, final String region) {
-		if (type == TriggerType.REGIONENTER) { clearEventItems(player, "", type.name, region); }
-		if (type == TriggerType.REGIONLEAVE) { pasteReturnItems(player, player.getWorld().getName(), region); }
-		else { safeSet(player, type.name); }
-		if (ConfigHandler.getItemDelay() != 0 && type != TriggerType.LIMITSWITCH && type != TriggerType.REGIONENTER && type != TriggerType.REGIONLEAVE) { 
+   /**
+    * Sets the items to be given.
+    * 
+    * @param player - The Player that is having their items set.
+    * @param type - The TriggerType that is being performed.
+    * @param newMode - The GameMode of the Player.
+    * @param region - The region the Player is in.
+    */
+	public void setItems(final Player player, final TriggerType type, final GameMode newMode, final String region) {
+		this.safeSet(player, type, region);
+		if (this.getItemDelay() != 0 && type != TriggerType.LIMITSWITCH && type != TriggerType.REGIONENTER && type != TriggerType.REGIONLEAVE) { 
 			Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
 				@Override
 				public void run() { 
-					runTask(player, type, newMode, region); 
+					handleItems(player, type, newMode, region); 
 				}
-			}, ConfigHandler.getItemDelay());
-		} else { runTask(player, type, newMode, region); }
+			}, this.getItemDelay());
+		} else { handleItems(player, type, newMode, region); }
 	}
 	
-	private static void runTask(final Player player, TriggerType type, final GameMode newMode, final String region) {
-		final Chances probability = new Chances();
-		final ItemMap probable = probability.getRandom(player);
-		final int session = Utils.getRandom(1, 100000);
-		for (ItemMap item : getItems()) { 
+   /**
+    * Handles the item give and removal provided the trigger type.
+    * 
+    * @param player - The Player that is having their items handled.
+    * @param type - The TriggerType that is being performed.
+    * @param newMode - The GameMode of the Player.
+    * @param region - The region the Player is in.
+    */
+	private void handleItems(final Player player, TriggerType type, final GameMode newMode, final String region) {
+		final ItemMap randomMap = Chances.getChances().getRandom(player);
+		final int session = Utils.getUtils().getRandom(1, 100000);
+		for (ItemMap item : this.getItems()) { 
 			item.setAnimations(player);
 			if (((type.equals(TriggerType.JOIN) && item.isGiveOnJoin()) 
 			  || (type.equals(TriggerType.RESPAWN) && item.isGiveOnRespawn())
@@ -166,188 +213,479 @@ public class ItemUtilities {
 			  || (type.equals(TriggerType.LIMITSWITCH) && item.isUseOnLimitSwitch())
 			  || ((((type.equals(TriggerType.REGIONENTER) && item.isGiveOnRegionEnter()) 
 			  || (type.equals(TriggerType.REGIONLEAVE) && item.isTakeOnRegionLeave())) && item.inRegion(region))))
-					 && item.inWorld(player.getWorld()) && probability.isProbability(item, probable) 
-					 && ConfigHandler.getSQLData().isEnabled(player) && item.hasPermission(player) 
-					 && isObtainable(player, item, session, (newMode != null ? newMode : player.getGameMode()))) {
-				item.giveTo(player, false, 0); 
+					 && item.inWorld(player.getWorld()) && Chances.getChances().isProbability(item, randomMap) 
+					 && SQLite.getLite(false).isEnabled(player) && item.hasPermission(player) 
+					 && this.isObtainable(player, item, session, (newMode != null ? newMode : player.getGameMode()))) {
+				item.giveTo(player); 
 			} else if (((type.equals(TriggerType.LIMITSWITCH) && item.isUseOnLimitSwitch() && !item.isLimitMode(newMode))
 					|| (((type.equals(TriggerType.REGIONENTER) && item.isTakeOnRegionLeave()) 
 					|| (type.equals(TriggerType.REGIONLEAVE) && item.isGiveOnRegionEnter())) && item.inRegion(region))) 
 					&& item.inWorld(player.getWorld()) && item.hasItem(player)) {
-				item.removeFrom(player, 0);
+				item.removeFrom(player);
 			} else if (item.isAutoRemove() && !item.inWorld(player.getWorld()) && item.hasItem(player)) {
-				item.removeFrom(player, 0);
+				item.removeFrom(player);
 			}
 		}
-		sendFailCount(player, session);
-		PlayerHandler.delayUpdateInventory(player, 15L);
+		this.sendFailCount(player, session);
+		PlayerHandler.getPlayer().updateInventory(player, 15L);
 	}
 	
-	public static void safeSet(final Player player, final String type) {
-		if (!type.equalsIgnoreCase("LIMIT-MODES")) { PlayerHandler.setHotbarSlot(player); }
-		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
-			@Override
-			public void run() {
-				if (type.equalsIgnoreCase("JOIN")) {
-					clearEventItems(player, player.getWorld().getName(), "Join", "");
-					Utils.triggerCommands(player);
-				} else if (type.equalsIgnoreCase("WORLD-SWITCH")) {
-					clearEventItems(player, player.getWorld().getName(), "World-Switch", "");
-				}
-			}
-		}, ConfigHandler.getClearDelay());
-	}
-	
-	public static boolean containsObject(String world, String clearEvent) {
-		if (clearEvent.replace(" ", "").equalsIgnoreCase("ALL") || clearEvent.replace(" ", "").equalsIgnoreCase("GLOBAL") 
-				|| clearEvent.replace(" ", "").equalsIgnoreCase("ENABLED") || clearEvent.replace(" ", "").equalsIgnoreCase("TRUE")) {
-			return true;
+   /**
+    * Safely checks and sets the items for their corresponding TriggerType.
+    * 
+    * @param player - The Player that is having their items set.
+    * @param type - The TriggerType that is being performed.
+    */
+	private void safeSet(final Player player, final TriggerType type, final String region) {
+		if (!type.equals(TriggerType.LIMITSWITCH)) { PlayerHandler.getPlayer().setHotbarSlot(player); }
+		if (type.equals(TriggerType.REGIONLEAVE)) { DependAPI.getDepends(false).getGuard().pasteReturnItems(player, player.getWorld().getName(), region); }
+		if (type.equals(TriggerType.REGIONENTER)) { this.clearEvent(player, "", type.name, region); }
+		if (this.getClearDelay() != 0) {
+			Bukkit.getServer().getScheduler().runTaskLaterAsynchronously(ItemJoin.getInstance(), () -> { 
+				if (type.equals(TriggerType.JOIN)) {
+							clearEvent(player, player.getWorld().getName(), type.name, "");
+							this.triggerCommands(player);
+						} else if (type.equals(TriggerType.WORLDSWITCH)) {
+							clearEvent(player, player.getWorld().getName(), type.name, "");
+						}
+			}, this.getClearDelay());
 		} else {
-			for (String eventWorld: clearEvent.replace(" ", "").split(",")) {
-				if (eventWorld.equalsIgnoreCase(world)) {
-					return true;
-				}
+			if (type.equals(TriggerType.JOIN)) {
+				this.clearEvent(player, player.getWorld().getName(), type.name, "");
+				this.triggerCommands(player);
+			} else if (type.equals(TriggerType.WORLDSWITCH)) {
+				this.clearEvent(player, player.getWorld().getName(), type.name, "");
 			}
 		}
-		return false;
 	}
 	
-	public static void clearEventItems(Player player, String world, String event, String region) {
-		String clearEvent = ConfigHandler.getConfig("config.yml").getString("Clear-Items." + event);
-		if (clearEvent != null && ((region != null && !region.isEmpty() && containsObject(region, clearEvent)) || containsObject(world, clearEvent))) {
-			if ((Utils.containsIgnoreCase(ConfigHandler.getConfig("config.yml").getString("Clear-Items.Options"), "PROTECT_OP") && player.isOp())
-					|| (Utils.containsIgnoreCase(ConfigHandler.getConfig("config.yml").getString("Clear-Items.Options"), "PROTECT_CREATIVE") && PlayerHandler.isCreativeMode(player))) {} else {
-				String clearType = ConfigHandler.getConfig("config.yml").getString("Clear-Items.Type");
-				if (clearType != null && (clearType.equalsIgnoreCase("ALL") || clearType.equalsIgnoreCase("GLOBAL") || clearType.equalsIgnoreCase("TRUE") || clearType.equalsIgnoreCase("ENABLE"))) {
-					clearAllItems(player, region, event);
+   /**
+    * Sets the Players items to be cleared upon performing the specified event.
+    * 
+    * @param player - The Player performing the event.
+    * @param world - The world the Player is in.
+    * @param event - The event/trigger being performed.
+    * @param region - The region the Player is in (if any).
+    */
+	private void clearEvent(Player player, String world, String event, String region) {
+		String clearEvent = ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items." + event);
+		if (clearEvent != null && ((region != null && !region.isEmpty() && Utils.getUtils().containsLocation(region, clearEvent.replace(" ", ""))) || Utils.getUtils().containsLocation(world, clearEvent.replace(" ", "")))) {
+			if ((Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Options"), "PROTECT_OP") && player.isOp())
+				|| (Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Options"), "PROTECT_CREATIVE") && PlayerHandler.getPlayer().isCreativeMode(player))) {
+			} else {
+				String clearType = ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Type");
+				if (clearType != null && (clearType.equalsIgnoreCase("ALL") || clearType.equalsIgnoreCase("GLOBAL"))) {
+					this.clearItems(player, region, event, true);
 				} else if (clearType != null && clearType.equalsIgnoreCase("ITEMJOIN")) {
-					setClearItemJoinItems(player, region, event);
+					this.clearItems(player, region, event, false);
 				} else if (clearType != null) {
-					ServerHandler.logSevere("{ItemMap} " + clearType + " for Clear-Items in the config.yml is not a valid option.");
+					ServerHandler.getServer().logSevere("{ItemMap} " + clearType + " for Clear-Items in the config.yml is not a valid option.");
 				}
 			}
 		}
 	}
 	
-	public static boolean isBlacklisted(String slot, ItemStack item) {
-		String[] blacklist = null;
-		if (ConfigHandler.getConfig("config.yml").getString("Clear-Items.Blacklist") != null 
-			&& ConfigHandler.getConfig("config.yml").getString("Clear-Items.Blacklist").contains("{") 
-			&& ConfigHandler.getConfig("config.yml").getString("Clear-Items.Blacklist").contains("}")) {
-			blacklist = ConfigHandler.getConfig("config.yml").getString("Clear-Items.Blacklist").split(",");
-		}
-		
-		if (ConfigHandler.getConfig("config.yml").getString("Clear-Items.Blacklist") != null) {
-			try {
-				for (String value : blacklist) {
-					String valType = (Utils.containsIgnoreCase(value, "{id") ? "id" : (Utils.containsIgnoreCase(value, "{slot") ? "slot" : (Utils.containsIgnoreCase(value, "{name") ? "name" : "")));
-						String inputResult = StringUtils.substringBetween(value, "{" + valType + ":", "}");
-						if (valType.equalsIgnoreCase("id") && item.getType() == ItemHandler.getMaterial(inputResult.trim(), null)) {
-							return true;
-						} else if (valType.equalsIgnoreCase("slot") && slot.trim().equalsIgnoreCase(inputResult.trim())) {
-							return true;
-						} else if (valType.equalsIgnoreCase("name") && item.hasItemMeta() && item.getItemMeta().hasDisplayName()) {
-							String displayName = item.getItemMeta().getDisplayName();
-							if (ChatColor.stripColor(displayName).trim().equalsIgnoreCase(inputResult.trim())) {
-								return true;
-							}
-						}
-				}
-			} catch (Exception e) { 
-				ServerHandler.logSevere("{ItemMap} It looks like the Blacklist section is missing quotations or apostrohes.");
-				ServerHandler.logSevere("{ItemMap} Include quotations or apostrophes at the beginning and the end or this error will persist.");
-				ServerHandler.logSevere("{ItemMap} The blacklist should look like '{id:DIAMOND}, {slot:0}' or \"{id:DIAMOND}, {slot:0}\".");
-			}
-		}
-		return false;
-	}
-
-	public static void clearAllItems(Player player, String region, String type) {
-		List < ItemMap > protectItems = getProtectItems();
+   /**
+    * Clears the items from the Player Inventory.
+    * 
+    * @param player - The Player performing the event.
+    * @param event - The event/trigger being performed.
+    * @param region - The region the Player is in (if any).
+    * @param clearAll - If ALL items are expected to be cleared from the Player Inventory.
+    */
+	private void clearItems(final Player player, final String event, final String region, final boolean clearAll) {
+		this.protectItems = this.getProtectItems();
 		PlayerInventory inventory = player.getInventory();
 		Inventory craftView = player.getOpenInventory().getTopInventory();
-		saveReturnItems(player, region, type, craftView, inventory, true);
-		if (!protectItems.isEmpty() || (ConfigHandler.getConfig("config.yml").getString("Clear-Items.Blacklist") != null && ConfigHandler.getConfig("config.yml").getString("Clear-Items.Blacklist").contains("{"))) {
-			for (int i = 0; i < (!protectItems.isEmpty() ? protectItems.size() : 1); i++) {
-				ItemMap item = null;
-				if (!protectItems.isEmpty()) { item = protectItems.get(i); }
-				if (inventory.getHelmet() != null && !isBlacklisted("Helmet", inventory.getHelmet()) && (protectItems.isEmpty() || (!item.isSimilar(inventory.getHelmet()) && i == (protectItems.size() - 1)))) {
-					inventory.setHelmet(new ItemStack(Material.AIR));
-				} if (inventory.getChestplate() != null && !isBlacklisted("Chestplate", inventory.getChestplate()) && (protectItems.isEmpty() || (!item.isSimilar(inventory.getChestplate()) && i == (protectItems.size() - 1)))) {
-					inventory.setChestplate(new ItemStack(Material.AIR));
-				} if (inventory.getLeggings() != null && !isBlacklisted("Leggings", inventory.getLeggings()) && (protectItems.isEmpty() || (!item.isSimilar(inventory.getLeggings()) && i == (protectItems.size() - 1)))) {
-					inventory.setLeggings(new ItemStack(Material.AIR));
-				} if (inventory.getBoots() != null && !isBlacklisted("Boots", inventory.getBoots()) && (protectItems.isEmpty() || (!item.isSimilar(inventory.getBoots()) && i == (protectItems.size() - 1)))) {
-					inventory.setBoots(new ItemStack(Material.AIR));
-				} if (ServerHandler.hasSpecificUpdate("1_9") && inventory.getItemInOffHand() != null && !isBlacklisted("Offhand", inventory.getItemInOffHand()) && (protectItems.isEmpty() || (!item.isSimilar(inventory.getBoots()) && i == (protectItems.size() - 1)))) {
-					PlayerHandler.setOffHandItem(player, new ItemStack(Material.AIR));
-				} if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
-					for (int k = 0; k < player.getOpenInventory().getTopInventory().getContents().length; k++) {
-						if (player.getOpenInventory().getTopInventory().getItem(k) != null && !isBlacklisted("CRAFTING[" + k + "]", player.getOpenInventory().getTopInventory().getItem(k)) && (protectItems.isEmpty() || (!item.isSimilar(player.getOpenInventory().getTopInventory().getItem(k)) && i == (protectItems.size() - 1)))) {
-							craftView.setItem(k, new ItemStack(Material.AIR));
-						}
-					}
-				} for (int f = 0; f < inventory.getSize(); f++) {
-					if (inventory.getItem(f) != null && !isBlacklisted(Integer.toString(f), inventory.getItem(f)) && (protectItems.isEmpty() || (!item.isSimilar(inventory.getItem(f)) && i == (protectItems.size() - 1)))) {
-						inventory.setItem(f, new ItemStack(Material.AIR));
-					}
-				}
-			}
-		} else {
-			inventory.clear();
-			inventory.setHelmet(new ItemStack(Material.AIR));
-			inventory.setChestplate(new ItemStack(Material.AIR));
-			inventory.setLeggings(new ItemStack(Material.AIR));
-			inventory.setBoots(new ItemStack(Material.AIR));
-			PlayerHandler.setOffHandItem(player, new ItemStack(Material.AIR));
-			if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
-				for (int k = 0; k < player.getOpenInventory().getTopInventory().getContents().length; k++) {
-					craftView.setItem(k, new ItemStack(Material.AIR));
-				}
-			}
-		}
-	}
-	
-	public static void setClearItemJoinItems(Player player, String region, String type) {
-		List < ItemMap > protectItems = getProtectItems();
-		PlayerInventory inventory = player.getInventory();
-		Inventory craftView = player.getOpenInventory().getTopInventory();
-		saveReturnItems(player, region, type, craftView, inventory, false);
-		for (ItemMap item: getItems()) {
-			if (inventory.getHelmet() != null && !isBlacklisted("Helmet", inventory.getHelmet()) && ((protectItems.isEmpty() && ItemHandler.containsNBTData(inventory.getHelmet())) || (!protectItems.contains(item) && item.isSimilar(inventory.getHelmet())))) {
+		DependAPI.getDepends(false).getGuard().saveReturnItems(player, event, region, craftView, inventory, true);
+		for (int i = 0; i < (!this.protectItems.isEmpty() ? this.protectItems.size() : 1); i++) {
+			if (this.canClear(inventory.getHelmet(), "Helmet", i, clearAll)) {
 				inventory.setHelmet(new ItemStack(Material.AIR));
-			} if (inventory.getChestplate() != null && !isBlacklisted("Chestplate", inventory.getChestplate()) 
-				&& ((protectItems.isEmpty() && ItemHandler.containsNBTData(inventory.getChestplate())) || (!protectItems.contains(item) && item.isSimilar(inventory.getChestplate())))) {
+			} if (this.canClear(inventory.getChestplate(), "Chestplate", i, clearAll)) {
 				inventory.setChestplate(new ItemStack(Material.AIR));
-			} if (inventory.getLeggings() != null && !isBlacklisted("Leggings", inventory.getLeggings()) 
-				&& ((protectItems.isEmpty() && ItemHandler.containsNBTData(inventory.getLeggings())) || (!protectItems.contains(item) && item.isSimilar(inventory.getLeggings())))) {
+			} if (this.canClear(inventory.getLeggings(), "Leggings", i, clearAll)) {
 				inventory.setLeggings(new ItemStack(Material.AIR));
-			} if (inventory.getBoots() != null && !isBlacklisted("Boots", inventory.getBoots()) && ((protectItems.isEmpty() && ItemHandler.containsNBTData(inventory.getBoots())) || (!protectItems.contains(item) && item.isSimilar(inventory.getBoots())))) {
+			} if (this.canClear(inventory.getBoots(), "Boots", i, clearAll)) {
 				inventory.setBoots(new ItemStack(Material.AIR));
-			} if (ServerHandler.hasSpecificUpdate("1_9") && inventory.getItemInOffHand() != null && !isBlacklisted("Offhand", inventory.getItemInOffHand()) && ((protectItems.isEmpty() && ItemHandler.containsNBTData(inventory.getItemInOffHand())) 
-					|| (!protectItems.contains(item) && item.isSimilar(inventory.getItemInOffHand())))) {
-				inventory.setItemInOffHand(new ItemStack(Material.AIR));
-			} if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
+			} if (ServerHandler.getServer().hasSpecificUpdate("1_9") && this.canClear(inventory.getItemInOffHand(), "OffHand", i, clearAll)) {
+				PlayerHandler.getPlayer().setOffHandItem(player, new ItemStack(Material.AIR));
+			} if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
 				for (int k = 0; k < player.getOpenInventory().getTopInventory().getContents().length; k++) {
-					if (craftView.getItem(k) != null && !isBlacklisted("CRAFTING[" + k + "]", player.getOpenInventory().getTopInventory().getItem(k)) 
-						&& craftView.getItem(k).getType() != Material.AIR && ((protectItems.isEmpty() && ItemHandler.containsNBTData(craftView.getItem(k))) 
-							|| (!protectItems.contains(item) && item.isSimilar(craftView.getItem(k))))) {
+					if (this.canClear(player.getOpenInventory().getTopInventory().getItem(k), "CRAFTING[" + k + "]", i, clearAll)) {
 						craftView.setItem(k, new ItemStack(Material.AIR));
 					}
 				}
-			} for (int f = 0; f <= 36; f++) {
-				if (inventory.getItem(f) != null && !isBlacklisted(Integer.toString(f), inventory.getItem(f)) 
-					&& ((protectItems.isEmpty() && ItemHandler.containsNBTData(inventory.getItem(f))) || (!protectItems.contains(item) && item.isSimilar(inventory.getItem(f))))) {
+			}
+			for (int f = 0; f < inventory.getSize(); f++) {
+				if (this.canClear(inventory.getItem(f), Integer.toString(f), i, clearAll)) {
 					inventory.setItem(f, new ItemStack(Material.AIR));
 				}
 			}
 		}
 	}
 	
-	public static List<ItemMap> getProtectItems() {
+   /**
+    * Checks if the ItemStack is allowed to be cleared.
+    * 
+    * @param item - The ItemStack being checked.
+    * @param slot - The slot the ItemStack is in.
+    * @param i - The position in the cycle for protected items.
+    * @param clearAll - If ALL items are expected to be cleared from the Player Inventory.
+    * @return If the ItemStack is allowed.
+    */
+	private boolean canClear(final ItemStack item, final String slot, final int i, final boolean clearAll) {
+		return item != null && !this.isBlacklisted(slot, item) && !this.isProtected(i, item) && (clearAll ? true : ItemHandler.getItem().containsNBTData(item));
+	}
+	
+   /**
+    * Checks if the ItemStack is blacklisted from being cleared.
+    * 
+    * @param item - The ItemStack being checked.
+    * @param slot - The slot the ItemStack is in.
+    * @return If the ItemStack is blacklisted.
+    */
+	private boolean isBlacklisted(String slot, ItemStack item) {
+		String[] blacklist = null;
+		String list = ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Blacklist");
+		if (list != null && list.contains("{") && list.contains("}")) { blacklist = list.split(","); }
+		try {
+			if (blacklist != null) {
+				for (String value: blacklist) {
+					String valType = (Utils.getUtils().containsIgnoreCase(value, "{id") ? "id" : (Utils.getUtils().containsIgnoreCase(value, "{slot") ? "slot" : (Utils.getUtils().containsIgnoreCase(value, "{name") ? "name" : "")));
+					String inputResult = StringUtils.substringBetween(value, "{" + valType + ":", "}");
+					if (valType.equalsIgnoreCase("id") && item.getType() == ItemHandler.getItem().getMaterial(inputResult.trim(), null)) {
+						return true;
+					} else if (valType.equalsIgnoreCase("slot") && slot.trim().equalsIgnoreCase(inputResult.trim())) {
+						return true;
+					} else if (valType.equalsIgnoreCase("name") && item.hasItemMeta() && item.getItemMeta().hasDisplayName()
+						&& ChatColor.stripColor(item.getItemMeta().getDisplayName()).trim().equalsIgnoreCase(inputResult.trim())) {
+						return true;
+					}
+				}
+			}
+		} catch (Exception e) {
+			ServerHandler.getServer().logSevere("{ItemMap} It looks like the Blacklist section is missing quotations or apostrohes.");
+			ServerHandler.getServer().logSevere("{ItemMap} Include quotations or apostrophes at the beginning and the end or this error will persist.");
+			ServerHandler.getServer().logSevere("{ItemMap} The blacklist should look like '{id:DIAMOND}, {slot:0}' or \"{id:DIAMOND}, {slot:0}\".");
+		}
+		return false;
+	}
+	
+   /**
+    * Checks if the ItemMap is obtainable by the Player.
+    * 
+    * @param player - The Player that is trying to obtain the ItemMap.
+    * @param itemMap - The ItemMap being checked.
+    * @param session - The current set items session.
+    * @param gamemode - The current GameMode of the Player.
+    * @return If the ItemMap is Obtainable.
+    */
+	public boolean isObtainable(final Player player, final ItemMap itemMap, final int session, final GameMode gamemode) {
+		if (!itemMap.hasItem(player) || itemMap.isAlwaysGive()) {
+			boolean firstJoin = SQLite.getLite(false).hasFirstJoined(player, itemMap);
+			boolean firstWorld = SQLite.getLite(false).hasFirstWorld(player, itemMap);
+			boolean ipLimit = SQLite.getLite(false).isIPLimited(player, itemMap);
+			if (itemMap.isLimitMode(gamemode)) {
+				if (!firstJoin && !firstWorld && !ipLimit && this.canOverwrite(player, itemMap)) {
+					return true;
+				} else if (!firstJoin && !firstWorld && !ipLimit) {
+					if (session != 0 && this.failCount.get(session) != null) {
+						this.failCount.put(session, this.failCount.get(session) + 1);
+					} else if (session != 0) { this.failCount.put(session, 1); }
+					ServerHandler.getServer().logDebug("{ItemMap} " + player.getName() + " has failed to receive item: " + itemMap.getConfigName() + ".");
+				} else { 
+					if (firstJoin) { 
+						ServerHandler.getServer().logDebug("{ItemMap} " + player.getName() + " has already received first-join " + itemMap.getConfigName() + ", they can no longer recieve this."); 
+					} else if (firstWorld) { 
+						ServerHandler.getServer().logDebug("{ItemMap} " + player.getName() + " has already received first-world " + itemMap.getConfigName() + ", they can no longer recieve this in " + player.getWorld().getName() + "."); 
+					} else if (ipLimit) { 
+						ServerHandler.getServer().logDebug("{ItemMap} " + player.getName() + " has already received ip-limited " + itemMap.getConfigName() + ", they will only recieve this on their dedicated ip.");  
+					}
+				}
+			}
+		}
+		ServerHandler.getServer().logDebug("{ItemMap} " + player.getName() + " already has item: " + itemMap.getConfigName() + ".");
+		return false;
+	}
+	
+   /**
+    * Checks if the ItemMap can overwrite itself.
+    * 
+    * @param player - The Player that is trying to overwrite the ItemMap.
+    * @param itemMap - The ItemMap being checked.
+    * @return If the ItemMap is Overwritable.
+    */
+	private boolean canOverwrite(final Player player, final ItemMap itemMap) {
+		try {
+			if (this.isOverwritable(player, itemMap) || (itemMap.isDropFull() || ((itemMap.isGiveNext() || itemMap.isMoveNext()) && player.getInventory().firstEmpty() != -1))) { return true; }
+		} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
+		return false;
+	}
+	
+   /**
+    * Gets if the ItemMap can overwrite itself.
+    * 
+    * @param player - The Player that is trying to overwrite the ItemMap.
+    * @param itemMap - The ItemMap being checked.
+    * @return If the ItemMap is Overwritable.
+    */
+	private boolean isOverwritable(final Player player, final ItemMap itemMap) {
+		try {
+			String overWrite = ConfigHandler.getConfig(false).getFile("items.yml").getString("items-Overwrite");
+			if (itemMap.isOverwritable() || (((overWrite == null || (overWrite != null && Utils.getUtils().containsLocation(player.getWorld().getName(), overWrite.replace(" ", ""))))) 
+					|| (ConfigHandler.getConfig(false).getFile("items.yml").getString("items-Overwrite") != null && ConfigHandler.getConfig(false).getFile("items.yml").getBoolean("items-Overwrite")))) {
+				return true; 
+			} else if (CustomSlot.ARBITRARY.isSlot(itemMap.getSlot()) && player.getInventory().firstEmpty() == -1) {
+				return false;
+			} else if (CustomSlot.HELMET.isSlot(itemMap.getSlot()) && player.getInventory().getHelmet() != null) {
+				return false;
+			} else if (CustomSlot.CHESTPLATE.isSlot(itemMap.getSlot()) && player.getInventory().getChestplate() != null) {
+				return false;
+			} else if (CustomSlot.LEGGINGS.isSlot(itemMap.getSlot()) && player.getInventory().getLeggings() != null) {
+				return false;
+			} else if (CustomSlot.BOOTS.isSlot(itemMap.getSlot()) && player.getInventory().getBoots() != null) {
+				return false;
+			} else if (ServerHandler.getServer().hasSpecificUpdate("1_9") && CustomSlot.OFFHAND.isSlot(itemMap.getSlot())) {
+				if (player.getInventory().getItemInOffHand().getType() != Material.AIR) {
+					return false;
+				}
+			} else if (Utils.getUtils().isInt(itemMap.getSlot()) && player.getInventory().getItem(Integer.parseInt(itemMap.getSlot())) != null) {
+				return false;
+			}
+		} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
+		return true;
+	}
+	
+   /**
+    * Sends the number of items that the Player failed to Obtain.
+    * 
+    * @param player - The Player that has failed to be given some items.
+    * @param session - The current set items session.
+    */
+	public void sendFailCount(final Player player, final int session) {
+		if (this.failCount.get(session) != null && this.failCount.get(session) != 0) {
+			String overWrite = ConfigHandler.getConfig(false).getFile("items.yml").getString("items-Overwrite");
+			if ((overWrite != null && Utils.getUtils().containsLocation(player.getWorld().getName(), overWrite.replace(" ", "")))) {
+				String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[7] = this.failCount.get(session).toString();
+				LanguageAPI.getLang(false).sendLangMessage("General.failedInventory", player, placeHolders);
+			} else {
+				String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[7] = this.failCount.get(session).toString();
+				LanguageAPI.getLang(false).sendLangMessage("General.failedOverwrite", player, placeHolders);
+			}
+			this.failCount.remove(session);
+		}
+	}
+	
+   /**
+    * Sets the ItemMap to the Player Inventory Slots.
+    * 
+    * @param player - The Player to have the ItemMap set to their Inventory slot(s).
+    * @param itemMap - The ItemMap to be given to the Player.
+    * @param size - The expected stack size of the item.
+    */
+	public void setInvSlots(final Player player, final ItemMap itemMap, final int size) {
+		ItemStack existingItem = ItemHandler.getItem().getItem(player, itemMap);
+		ItemStack item = itemMap.getItem(player);
+		this.shiftItem(player, itemMap);
+		int nextSlot = this.nextItem(player, itemMap);
+		if (size > 1) { item.setAmount(size); }
+		if ((size > 1 || itemMap.isAlwaysGive()) && existingItem != null) {
+			player.getInventory().addItem(item);
+		} else if (nextSlot != 0) {
+			player.getInventory().setItem(nextSlot, item);
+		} else if (player.getInventory().firstEmpty() != -1) {
+			player.getInventory().setItem(Integer.parseInt(itemMap.getSlot()), item);
+		} else if (itemMap.isDropFull()) { 
+			player.getWorld().dropItem(player.getLocation(), item);
+		}
+		SQLite.getLite(false).saveItemData(player, itemMap);
+		ServerHandler.getServer().logDebug("{ItemMap} Given the Item: " + itemMap.getConfigName() + ".");
+	}
+	
+   /**
+    * Sets the ItemMap to the Player Inventory Custom Slots.
+    * 
+    * @param player - The Player to have the ItemMap set to their Inventory slot(s).
+    * @param itemMap - The ItemMap to be given to the Player.
+    * @param size - The expected stack size of the item.
+    */
+	public void setCustomSlots(final Player player, final ItemMap itemMap, final int size) {
+		int craftSlot = Utils.getUtils().getSlotConversion(itemMap.getSlot());
+		ItemStack existingItem = ItemHandler.getItem().getItem(player, itemMap);
+		ItemStack item = itemMap.getItem(player);
+		this.shiftItem(player, itemMap);
+		int nextSlot = this.nextItem(player, itemMap);
+		if (size > 1) { item.setAmount(size); }
+		if ((size > 1 || itemMap.isAlwaysGive()) && existingItem != null) {
+			player.getInventory().addItem(item);
+		} else if (nextSlot != 0) {
+			player.getInventory().setItem(nextSlot, item);
+		} else if (CustomSlot.ARBITRARY.isSlot(itemMap.getSlot()) && player.getInventory().firstEmpty() != -1) {
+			player.getInventory().addItem(item);
+		} else if (CustomSlot.HELMET.isSlot(itemMap.getSlot())) {
+			player.getEquipment().setHelmet(item);
+		} else if (CustomSlot.CHESTPLATE.isSlot(itemMap.getSlot())) {
+			player.getEquipment().setChestplate(item);
+		} else if (CustomSlot.LEGGINGS.isSlot(itemMap.getSlot())) {
+			player.getEquipment().setLeggings(item);
+		} else if (CustomSlot.BOOTS.isSlot(itemMap.getSlot())) {
+			player.getEquipment().setBoots(item);
+		} else if (ServerHandler.getServer().hasSpecificUpdate("1_9") && CustomSlot.OFFHAND.isSlot(itemMap.getSlot())) {
+			PlayerHandler.getPlayer().setOffHandItem(player, item);
+		} else if (craftSlot != -1) {
+			if (craftSlot == 0) {
+				Bukkit.getServer().getScheduler().runTaskLaterAsynchronously(ItemJoin.getInstance(), () -> { 
+					if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
+			    			player.getOpenInventory().getTopInventory().setItem(craftSlot, item);
+			    			PlayerHandler.getPlayer().updateInventory(player, 1L);
+			    		}
+					}, 2L);
+			} else {
+				player.getOpenInventory().getTopInventory().setItem(craftSlot, item);
+			}
+		} else if (itemMap.isDropFull()) {
+			player.getWorld().dropItem(player.getLocation(), item);
+		}
+		ServerHandler.getServer().logDebug("{ItemMap} Given the Item: " + itemMap.getConfigName() + ".");
+		SQLite.getLite(false).saveItemData(player, itemMap);
+	}
+	
+   /**
+    * Moves any pre-exiting items in the players defined ItemMap slot to the next available slot.
+    * 
+    * @param player - The Player to have the ItemMap set to their Inventory slot(s).
+    * @param itemMap - The ItemMap to be given to the Player.
+    */
+	public void shiftItem(final Player player, final ItemMap itemMap) {
+		int i = 0; int k = 0;
+		if (Utils.getUtils().isInt(itemMap.getSlot())) { i = Integer.parseInt(itemMap.getSlot()); k = i; }
+		ItemStack existingItem = ItemHandler.getItem().getItem(player, itemMap);
+		if (itemMap.isMoveNext() && existingItem != null && player.getInventory().firstEmpty() != -1) {
+			for (i = 0; i <= 35; i++) {
+				if (player.getInventory().getItem(i) == null || player.getInventory().getItem(i).getType() == Material.AIR) {
+					player.getInventory().setItem(i, existingItem);
+					existingItem.setAmount(0);
+					existingItem.setType(Material.AIR);
+					existingItem.setData(new ItemStack(Material.AIR).getData());
+					return;
+				} else if (i == 35) {
+					for (k = 0; k >= 0; k--) {
+						if (player.getInventory().getItem(k) == null || player.getInventory().getItem(k).getType() == Material.AIR) {
+							player.getInventory().setItem(k, existingItem);
+							existingItem.setAmount(0);
+							existingItem.setType(Material.AIR);
+							existingItem.setData(new ItemStack(Material.AIR).getData());
+							return;
+						}
+					}
+				}
+			}
+		}
+	}
+	
+   /**
+    * Gets the next available inventory slot from the defined ItemMap slot,
+    * only if the give-next itemflag is defined.
+    * 
+    * @param player - The Player to have the ItemMap set to their Inventory slot(s).
+    * @param itemMap - The ItemMap to be given to the Player.
+    * @return The next available inventory slot.
+    */
+	public int nextItem(final Player player, final ItemMap itemMap) {
+		int i = 0; int k = 0;
+		if (Utils.getUtils().isInt(itemMap.getSlot())) { i = Integer.parseInt(itemMap.getSlot()); k = i; }
+		ItemStack existingItem = ItemHandler.getItem().getItem(player, itemMap);
+		if (itemMap.isGiveNext() && existingItem != null && player.getInventory().firstEmpty() != -1) {
+			for (i = 0; i <= 35; i++) {
+				if (player.getInventory().getItem(i) == null || player.getInventory().getItem(i).getType() == Material.AIR) {
+					return i;
+				} else if (i == 35) {
+					for (k = 0; k >= 0; k--) {
+						if (player.getInventory().getItem(k) == null || player.getInventory().getItem(k).getType() == Material.AIR) {
+							return k;
+						}
+					}
+				}
+			}
+		}
+		return 0;
+	}
+	
+   /**
+    * Executes the Global Commands defined in the config.
+    * 
+    * @param player - The Player having the commands executed.
+    */
+	public void triggerCommands(final Player player) {
+		if ((ConfigHandler.getConfig(false).getFile("config.yml").getString("Active-Commands.enabled-worlds") != null && ConfigHandler.getConfig(false).getFile("config.yml").getStringList("Active-Commands.commands") != null) 
+				&& (!ConfigHandler.getConfig(false).getFile("config.yml").getString("Active-Commands.enabled-worlds").equalsIgnoreCase("DISABLED") || !ConfigHandler.getConfig(false).getFile("config.yml").getString("Active-Commands.enabled-worlds").equalsIgnoreCase("FALSE"))) {
+			String commandsWorlds = ConfigHandler.getConfig(false).getFile("config.yml").getString("Active-Commands.enabled-worlds").replace(" ", "");
+			if (commandsWorlds == null) { commandsWorlds = "DISABLED"; }
+			String[] compareWorlds = commandsWorlds.split(",");
+			for (String compareWorld: compareWorlds) {
+				if (compareWorld.equalsIgnoreCase(player.getWorld().getName()) || compareWorld.equalsIgnoreCase("ALL") || compareWorld.equalsIgnoreCase("GLOBAL")) {
+					for (String commands: ConfigHandler.getConfig(false).getFile("config.yml").getStringList("Active-Commands.commands")) {
+						String formatCommand = Utils.getUtils().translateLayout(commands, player).replace("first-join: ", "").replace("first-join:", "");
+						if (!SQLite.getLite(false).hasFirstCommanded(player, formatCommand)) {
+							Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), formatCommand);
+							if (Utils.getUtils().containsIgnoreCase(commands, "first-join:")) {
+								SQLite.getLite(false).saveFirstCommandData(player, formatCommand);
+							}
+						}
+					}
+				}
+				break;
+			}
+		}
+	}
+	
+   /**
+    * Gets the ItemDelay.
+    * 
+    * @return The items-Delay that is to be expected before the items are given.
+    */
+	private long getItemDelay() {
+		if ((this.getClearDelay() / 20) >= (ConfigHandler.getConfig(false).getFile("items.yml").getInt("items-Delay") / 2) && this.getClearDelay() != -1) { return this.getClearDelay() + 1; }
+		return ConfigHandler.getConfig(false).getFile("items.yml").getInt("items-Delay") * 10L;
+	}
+	
+   /**
+    * Gets the Delay before clearing the items.
+    * 
+    * @return The clear-Delay before the items are cleared.
+    */
+	private long getClearDelay() {
+		if (!Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Join"), "DISABLED") 
+				&& !Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Join"), "FALSE")
+				|| !Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.World-Switch"), "DISABLED")
+				&& !Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.World-Switch"), "FALSE")
+				|| !Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Region-Enter"), "DISABLED")
+				&& !Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Region-Enter"), "FALSE")) {
+				return ConfigHandler.getConfig(false).getFile("config.yml").getInt("Clear-Items.Delay-Tick");
+		}
+		return -1;
+	}
+	
+   /**
+    * Checks the ItemStack to see if it is a protected item.
+    * 
+    * @param i - The position in the protectItems List when cycling.
+    * @param item - The ItemStack being checked.
+    * @return If the ItemStack is a protected ItemMap.
+    */
+	private boolean isProtected(final int i, final ItemStack item) {
+			return !this.protectItems.isEmpty() && this.protectItems.get(i).isSimilar(item) && i == (this.protectItems.size() - 1);
+	}
+	
+   /**
+    * Gets the list of ItemMaps that should be protected from clearing.
+    * 
+    * @return The list of protected ItemMaps.
+    */
+	private List<ItemMap> getProtectItems() {
 		List<ItemMap> protectItems = new ArrayList<ItemMap>();
-		if (Utils.containsIgnoreCase(ConfigHandler.getConfig("config.yml").getString("Clear-Items.Options"), "PROTECT")) {
-			for (ItemMap item: getItems()) {
+		if (Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Options"), "PROTECT")) {
+			for (ItemMap item: this.getItems()) {
 				if (item.isOnlyFirstJoin() || item.isOnlyFirstWorld()) {
 					protectItems.add(item);
 				}
@@ -356,243 +694,66 @@ public class ItemUtilities {
 		return protectItems;
 	}
 	
-	public static void saveReturnItems(Player player, String region, String type, Inventory craftView, PlayerInventory inventory, boolean clearAll) {
-		boolean doReturn = Utils.containsIgnoreCase(ConfigHandler.getConfig("config.yml").getString("Clear-Items.Options"), "RETURN");
-		if (region != null && !region.isEmpty() && type.equalsIgnoreCase("REGION-ENTER") && doReturn) {
-			Inventory saveInventory = Bukkit.createInventory(null, 54);
-			for (int i = 0; i <= 47; i++) {
-				if (doReturn) {
-					for (ItemMap itemMap: getItems()) {
-						if (!itemMap.isOnlyFirstJoin() && !itemMap.isOnlyFirstWorld()) {
-							if (inventory.getItem(i) != null && inventory.getItem(i).getType() != Material.AIR && itemMap.isSimilar(inventory.getItem(i)) && i <= 41) {
-								saveInventory.setItem(i, inventory.getItem(i).clone());
-							} else if (i >= 42 && craftView.getItem(i - 42) != null && craftView.getItem(i - 42).getType() != Material.AIR 
-									&& itemMap.isSimilar(craftView.getItem(i - 42)) && PlayerHandler.isCraftingInv(player.getOpenInventory())) {
-								saveInventory.setItem(i, craftView.getItem(i - 42).clone());
-							}
-						}
-					}
-				} else {
-					if (inventory.getItem(i) != null && inventory.getItem(i).getType() != Material.AIR && ((!clearAll && ItemHandler.containsNBTData(inventory.getItem(i))) || clearAll) && i <= 41) {
-						saveInventory.setItem(i, inventory.getItem(i).clone());
-					} else if (i >= 42 && craftView.getItem(i - 42) != null && craftView.getItem(i - 42).getType() != Material.AIR 
-							&& ((!clearAll && ItemHandler.containsNBTData(craftView.getItem(i - 42))) || clearAll) && PlayerHandler.isCraftingInv(player.getOpenInventory())) {
-						saveInventory.setItem(i, craftView.getItem(i - 42).clone());
-					}
-				}
-			}
-			ConfigHandler.getSQLData().saveReturnItems(player, player.getWorld().getName(), region, saveInventory);
-		}
-	}
-	
-	public static void pasteReturnItems(Player player, String world, String region) {
-		if (region != null && !region.isEmpty() && Utils.containsIgnoreCase(ConfigHandler.getConfig("config.yml").getString("Clear-Items.Options"), "RETURN")) {
-			Inventory inventory = ConfigHandler.getSQLData().getReturnItems(player, world, region);
-			for (int i = 47; i >= 0; i--) {
-				if (inventory != null && inventory.getItem(i) != null && inventory.getItem(i).getType() != Material.AIR) {
-					if (i <= 41) {
-						player.getInventory().setItem(i, inventory.getItem(i).clone());
-					} else if (i >= 42 && PlayerHandler.isCraftingInv(player.getOpenInventory())) {
-						player.getOpenInventory().getTopInventory().setItem(i - 42, inventory.getItem(i).clone());
-						PlayerHandler.updateInventory(player);
-					}
-				}
-				ConfigHandler.getSQLData().removeReturnItems(player, world, region);
-			}
-		}
-	}
-
-	public static boolean isObtainable(Player player, ItemMap itemMap, int session, GameMode gamemode) {
-		if (!itemMap.hasItem(player) || itemMap.isAlwaysGive() || !itemMap.isLimitMode(gamemode)) {
-			boolean firstJoin = ConfigHandler.getSQLData().hasFirstJoined(player, itemMap);
-			boolean firstWorld = ConfigHandler.getSQLData().hasFirstWorld(player, itemMap);
-			boolean ipLimit = ConfigHandler.getSQLData().isIPLimited(player, itemMap);
-			if (itemMap.isLimitMode(gamemode)) {
-				if (!firstJoin && !firstWorld && !ipLimit && canOverwrite(player, itemMap)) {
-					return true;
-				} else if (!firstJoin && !firstWorld && !ipLimit) {
-					if (session != 0 && failCount.get(session) != null) {
-						failCount.put(session, failCount.get(session) + 1);
-					} else if (session != 0) { failCount.put(session, 1); }
-					ServerHandler.logDebug("{ItemMap} " + player.getName() + " has failed to receive item: " + itemMap.getConfigName() + ".");
-				} else { 
-					if (firstJoin) { 
-						ServerHandler.logDebug("{ItemMap} " + player.getName() + " has already received first-join " + itemMap.getConfigName() + ", they can no longer recieve this."); 
-					} else if (firstWorld) { 
-						ServerHandler.logDebug("{ItemMap} " + player.getName() + " has already received first-world " + itemMap.getConfigName() + ", they can no longer recieve this in " + player.getWorld().getName() + "."); 
-					} else if (ipLimit) { 
-						ServerHandler.logDebug("{ItemMap} " + player.getName() + " has already received ip-limited " + itemMap.getConfigName() + ", they will only recieve this on their dedicated ip.");  
-					}
-				}
-				return false;
-			} else { return false; }
-		}
-		ServerHandler.logDebug("{ItemMap} " + player.getName() + " already has item: " + itemMap.getConfigName() + ".");
-		return false;
-	}
-	
-	public static boolean canOverwrite(Player player, ItemMap itemMap) {
-		try {
-			if (isOverwrite(player, itemMap) || (itemMap.isDropFull() || ((itemMap.isGiveNext() || itemMap.isMoveNext()) && player.getInventory().firstEmpty() != -1))) { return true; }
-		} catch (Exception e) { ServerHandler.sendDebugTrace(e); }
-		return false;
-	}
-	
-	public static boolean isOverwrite(Player player, ItemMap itemMap) {
-		try {
-			if (itemMap.isOverwritable() || (ConfigHandler.getConfig("items.yml").getString("items-Overwrite") != null && isOverwriteWorld(player.getWorld().getName()) 
-					|| ConfigHandler.getConfig("items.yml").getString("items-Overwrite") != null && ConfigHandler.getConfig("items.yml").getBoolean("items-Overwrite"))) {
-				return true; 
-			} else if (itemMap.getSlot().equalsIgnoreCase("ARBITRARY") && player.getInventory().firstEmpty() == -1) {
-				return false;
-			} else if (itemMap.getSlot().equalsIgnoreCase("HELMET") && player.getInventory().getHelmet() != null) {
-				return false;
-			} else if (itemMap.getSlot().equalsIgnoreCase("CHESTPLATE") && player.getInventory().getChestplate() != null) {
-				return false;
-			} else if (itemMap.getSlot().equalsIgnoreCase("LEGGINGS") && player.getInventory().getLeggings() != null) {
-				return false;
-			} else if (itemMap.getSlot().equalsIgnoreCase("BOOTS") && player.getInventory().getBoots() != null) {
-				return false;
-			} else if (Utils.isInt(itemMap.getSlot()) && player.getInventory().getItem(Integer.parseInt(itemMap.getSlot())) != null) {
-				return false;
-			} else if (ServerHandler.hasSpecificUpdate("1_9") && itemMap.getSlot().equalsIgnoreCase("OFFHAND")) {
-				if (player.getInventory().getItemInOffHand().getType() != Material.AIR) {
-					return false;
-				}
-			}
-		} catch (Exception e) { ServerHandler.sendDebugTrace(e); }
-		return true;
-	}
-	
-	public static boolean isOverwriteWorld(String world) {
-		if (ConfigHandler.getConfig("items.yml").getString("items-Overwrite") != null) {
-			String worldlist = ConfigHandler.getConfig("items.yml").getString("items-Overwrite").replace(" ", "");
-			String[] compareWorlds = worldlist.split(",");
-			for (String compareWorld: compareWorlds) {
-				if (compareWorld.equalsIgnoreCase(world) || compareWorld.equalsIgnoreCase("all") || compareWorld.equalsIgnoreCase("global")) {
-					return true;
-				}
-			}
-		} else if (ConfigHandler.getConfig("items.yml").getString("items-Overwrite") == null) {
-			return true;
-		}
-		return false;
-	}
-	
-	public static void sendFailCount(Player player, int session) {
-		if (failCount.get(session) != null && failCount.get(session) != 0) {
-			if (ConfigHandler.getConfig("items.yml").getString("items-Overwrite") != null && isOverwriteWorld(player.getWorld().getName()) 
-					|| ConfigHandler.getConfig("items.yml").getString("items-Overwrite") != null && ConfigHandler.getConfig("items.yml").getBoolean("items-Overwrite")) {
-				String[] placeHolders = Language.newString(); placeHolders[7] = failCount.get(session).toString();
-				Language.sendLangMessage("General.failedInventory", player, placeHolders);
-			} else {
-				String[] placeHolders = Language.newString(); placeHolders[7] = failCount.get(session).toString();
-				Language.sendLangMessage("General.failedOverwrite", player, placeHolders);
-			}
-			failCount.remove(session);
-		}
-	}
-	
-	public static void setInvSlots(Player player, ItemMap itemMap, ItemStack item, boolean command, int amount) {
-		boolean givenItem = false;
-		ItemStack getItem = player.getInventory().getItem(Integer.parseInt(itemMap.getSlot()));
-		if (amount != 0 && command) { item.setAmount(amount); }
-		if (amount != 0 || itemMap.isAlwaysGive()) { givenItem = true; player.getInventory().addItem(item); }
-		else if ((((itemMap.isGiveNext() || itemMap.isMoveNext()) && player.getInventory().firstEmpty() != -1) || (itemMap.isDropFull() && player.getInventory().firstEmpty() != -1)) && getItem != null) {
-			if (itemMap.isMoveNext()) { player.getInventory().setItem(Integer.parseInt(itemMap.getSlot()), item); }
-			for (int i = Integer.parseInt(itemMap.getSlot()); i <= 35; i++) {
-				if (itemMap.isMoveNext() && (player.getInventory().getItem(i) == null || player.getInventory().getItem(i).getType() == Material.AIR)) { givenItem = true; player.getInventory().setItem(i, getItem); break; }
-				else if (player.getInventory().getItem(i) == null || player.getInventory().getItem(i).getType() == Material.AIR) { givenItem = true; player.getInventory().setItem(i, item); break; }
-				else if (i == 35) {
-					for (int k = Integer.parseInt(itemMap.getSlot()); k >= 0; k--) {
-						if (itemMap.isMoveNext() && (player.getInventory().getItem(k) == null || player.getInventory().getItem(k).getType() == Material.AIR)) {
-							givenItem = true; player.getInventory().setItem(k, getItem); break; 
-						}
-						else if (player.getInventory().getItem(k) == null || player.getInventory().getItem(k).getType() == Material.AIR) {
-							givenItem = true; player.getInventory().setItem(k, item); break; 
-						}
-					}
-				}
-			}
-		} else if (!givenItem && !itemMap.isDropFull()) { givenItem = true; player.getInventory().setItem(Integer.parseInt(itemMap.getSlot()), item); }
-		if (!givenItem && itemMap.isDropFull()) { player.getWorld().dropItem(player.getLocation(), item); } 
-		ConfigHandler.getSQLData().saveItemData(player, itemMap);
-		ServerHandler.logDebug("{ItemMap} Given the Item: " + itemMap.getConfigName() + ".");
-	}
-	
-	public static void setCustomSlots(Player player, ItemMap itemMap, ItemStack item, boolean command, int amount) {
-		EntityEquipment Equip = player.getEquipment();
-		Inventory topInventory = player.getOpenInventory().getTopInventory();
-		int craftSlot = Utils.getSlotConversion(itemMap.getSlot());
-		boolean givenItem = false;
-		if (amount != 0 && command) { item.setAmount(amount); }
-		if ((amount != 0 || itemMap.isAlwaysGive()) && itemMap.hasItem(player)) {
-			player.getInventory().addItem(item); givenItem = true;
-		} else if (itemMap.getSlot().equalsIgnoreCase("Arbitrary")) {
-			if (player.getInventory().firstEmpty() != -1) {
-				player.getInventory().addItem(item); givenItem = true;
-			}
-		} else if (itemMap.getSlot().equalsIgnoreCase("Helmet")) {
-			if (!itemMap.isDropFull()) {
-				Equip.setHelmet(item); givenItem = true;
-			}
-		} else if (itemMap.getSlot().equalsIgnoreCase("Chestplate")) {
-			if (!itemMap.isDropFull()) {
-				Equip.setChestplate(item); givenItem = true;
-			}
-		} else if (itemMap.getSlot().equalsIgnoreCase("Leggings")) {
-			if (!itemMap.isDropFull()) {
-				Equip.setLeggings(item); givenItem = true;
-			}
-		} else if (itemMap.getSlot().equalsIgnoreCase("Boots")) {
-			if (!itemMap.isDropFull()) {
-				Equip.setBoots(item); givenItem = true;
-			}
-		} else if (ServerHandler.hasSpecificUpdate("1_9") && itemMap.getSlot().equalsIgnoreCase("Offhand")) {
-			if (!itemMap.isDropFull()) {
-				PlayerHandler.setOffhandItem(player, item); givenItem = true;
-			}
-		} else if (craftSlot != -1 && !itemMap.isDropFull()) {
-			if (craftSlot == 0) {
-			    Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
-			    	@Override
-			    	public void run() {
-			    		if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
-			    			topInventory.setItem(craftSlot, item);
-			    			PlayerHandler.updateInventory(player);
-			    		}
-			    	}
-			    }, 4L);
-			} else {
-				topInventory.setItem(craftSlot, item);
-			}
-			givenItem = true;
-		}
-		if (!givenItem && itemMap.isDropFull()) { player.getWorld().dropItem(player.getLocation(), item); }
-		ServerHandler.logDebug("{ItemMap} Given the Item: " + itemMap.getConfigName() + ".");
-		ConfigHandler.getSQLData().saveItemData(player, itemMap);
-	}
-	
-	public static void addItem(ItemMap itemMap) {
-		items.add(itemMap);
-	}
-	
-	public static List < ItemMap > getItems() {
-		return items;
-	}
-	
-	public static List < ItemMap > copyItems() {
+   /**
+    * Creates a duplicate items HashMap.
+    * 
+    * @return The duplicated items HashMap.
+    */
+	public List < ItemMap > copyItems() {
 		List < ItemMap > itemsCopy = new ArrayList < ItemMap > ();
-		for (ItemMap itemMap : items) { 
+		for (ItemMap itemMap : this.items) { 
 			itemsCopy.add(itemMap.clone());
 		}
 		return itemsCopy;
 	}
 	
-	public static void clearItems() {
-		items = new ArrayList < ItemMap >();
+   /**
+    * Adds a new item to the items List.
+    * 
+    * @param itemMap - The ItemMap to be added to the items List.
+    */
+	public void addItem(final ItemMap itemMap) {
+		this.items.add(itemMap);
 	}
 	
+   /**
+    * Gets the current ItemMap List.
+    * 
+    * @return The current ItemMap list.
+    */
+	public List < ItemMap > getItems() {
+		return this.items;
+	}
+
+   /**
+    * Clears the existing ItemMaps for the items List.
+    * 
+    */
+	public void clearItems() {
+		this.items = new ArrayList < ItemMap >();
+	}
+	
+   /**
+    * Trigger types.
+    * 
+    */
+	public enum CustomSlot {
+		HELMET("Helmet"),
+		CHESTPLATE("Chestplate"),
+		LEGGINGS("Leggings"),
+		BOOTS("Boots"),
+		OFFHAND("Offhand"),
+		CRAFTING("Crafting"),
+		ARBITRARY("Arbitrary");
+		private final String name;
+		public boolean isSlot(String slot) { return this.name.equalsIgnoreCase(slot); }
+		private CustomSlot(String name) { this.name = name; }
+	}	
+	
+   /**
+    * Trigger types.
+    * 
+    */
 	public enum TriggerType {
 		JOIN("Join"),
 		RESPAWN("Respawn"),
@@ -604,4 +765,13 @@ public class ItemUtilities {
 		private TriggerType(String name) { this.name = name; }
 	}	
 	
+   /**
+    * Gets the instance of the ItemUtilities.
+    * 
+    * @return The ItemUtilities instance.
+    */
+    public static ItemUtilities getUtilities() { 
+        if (utilities == null) { utilities = new ItemUtilities(); }
+        return utilities; 
+    } 
 }

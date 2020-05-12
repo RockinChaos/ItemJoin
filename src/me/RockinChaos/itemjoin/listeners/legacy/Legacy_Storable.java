@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package me.RockinChaos.itemjoin.listeners;
+package me.RockinChaos.itemjoin.listeners.legacy;
 
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
@@ -32,31 +32,48 @@ import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.utils.Utils;
 
+/**
+* Handles the Storage events for custom items.
+* 
+* @deprecated This is a LEGACY listener, only use on Minecraft versions below 1.8.
+*/
 public class Legacy_Storable implements Listener {
 	
+   /**
+	* Prevents the player from clicking to store the custom item.
+	* 
+	* @param event - InventoryClickEvent
+	* @deprecated This is a LEGACY event, only use on Minecraft versions below 1.8.
+	*/
 	@EventHandler
 	private void onInventoryStore(InventoryClickEvent event) {
 		Player player = (Player) event.getWhoClicked();
 		String invType = event.getView().getType().toString();
 		ItemStack item = null;
-		if (Utils.containsIgnoreCase(event.getAction().name(), "HOTBAR")) {
+		if (Utils.getUtils().containsIgnoreCase(event.getAction().name(), "HOTBAR")) {
 			item = event.getView().getBottomInventory().getItem(event.getHotbarButton());
 			if (item == null) { item = event.getCurrentItem(); }
 		} else if (event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY)) { item = event.getCurrentItem(); } 
 		else { item = event.getCursor(); }
 		if (invType != null) {
 			if (event.getRawSlot() > event.getInventory().getSize() && event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY) || event.getRawSlot() < event.getInventory().getSize()) {
-				if ((invType.contains("CHEST") || invType.contains("FURNACE") || invType.contains("SHULKER_BOX") || invType.contains("HOPPER") || invType.contains("ANVIL") || invType.contains("WORKBENCH") || invType.contains("DISPENSER") || invType.contains("DROPPER")) && !ItemUtilities.isAllowed(player, item, "item-store")) {
+				if ((invType.contains("CHEST") || invType.contains("FURNACE") || invType.contains("SHULKER_BOX") || invType.contains("HOPPER") || invType.contains("ANVIL") || invType.contains("WORKBENCH") || invType.contains("DISPENSER") || invType.contains("DROPPER")) && !ItemUtilities.getUtilities().isAllowed(player, item, "item-store")) {
 					event.setCancelled(true);
-					PlayerHandler.updateInventory(player);
-				} else if ((invType.contains("ENCHANTING") || invType.contains("ANVIL")) && !ItemUtilities.isAllowed(player, item, "item-modifiable")) {
+					PlayerHandler.getPlayer().updateInventory(player, 1L);
+				} else if ((invType.contains("ENCHANTING") || invType.contains("ANVIL")) && !ItemUtilities.getUtilities().isAllowed(player, item, "item-modifiable")) {
 					event.setCancelled(true);
-					PlayerHandler.updateInventory(player);
+					PlayerHandler.getPlayer().updateInventory(player, 1L);
 				}
 			}
 		}
 	}
 	
+   /**
+	* Prevents the player from click dragging to store the custom item.
+	* 
+	* @param event - InventoryDragEvent
+	* @deprecated This is a LEGACY event, only use on Minecraft versions below 1.8.
+    */
 	@EventHandler
 	private void onInventoryDragToStore(InventoryDragEvent event) {
 		Player player = (Player) event.getWhoClicked();
@@ -67,13 +84,13 @@ public class Legacy_Storable implements Listener {
 			if (i < inventorySize) {
 				if (invType != null) {
 					if ((invType.contains("CHEST") || invType.contains("FURNACE") || invType.contains("SHULKER_BOX") 
-						|| invType.contains("HOPPER") || invType.contains("ANVIL") || invType.contains("WORKBENCH") || invType.contains("DISPENSER") || invType.contains("DROPPER")) && !ItemUtilities.isAllowed(player, item, "item-store")) {
+						|| invType.contains("HOPPER") || invType.contains("ANVIL") || invType.contains("WORKBENCH") || invType.contains("DISPENSER") || invType.contains("DROPPER")) && !ItemUtilities.getUtilities().isAllowed(player, item, "item-store")) {
 						event.setCancelled(true);
-						PlayerHandler.updateInventory(player);
+						PlayerHandler.getPlayer().updateInventory(player, 1L);
 						break;
-					} else if ((invType.contains("ENCHANTING") || invType.contains("ANVIL")) && !ItemUtilities.isAllowed(player, item, "item-modifiable")) {
+					} else if ((invType.contains("ENCHANTING") || invType.contains("ANVIL")) && !ItemUtilities.getUtilities().isAllowed(player, item, "item-modifiable")) {
 						event.setCancelled(true);
-						PlayerHandler.updateInventory(player);
+						PlayerHandler.getPlayer().updateInventory(player, 1L);
 						break;
 					}
 				}
@@ -81,16 +98,22 @@ public class Legacy_Storable implements Listener {
 		}
 	}
 	
+   /**
+	* Prevents the player from storing the custom item in an itemframe.
+	* 
+	* @param event - PlayerInteractEntityEvent
+	* @deprecated This is a LEGACY event, only use on Minecraft versions below 1.8.
+	*/
 	@EventHandler
 	private void onInteractItemFrame(PlayerInteractEntityEvent event) {
 		if (event.getRightClicked() instanceof ItemFrame) {
 			ItemStack item;
-			if (ServerHandler.hasSpecificUpdate("1_9")) { item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().toString()); } 
-			else { item = PlayerHandler.getPerfectHandItem(event.getPlayer(), ""); }
+			if (ServerHandler.getServer().hasSpecificUpdate("1_9")) { item = PlayerHandler.getPlayer().getPerfectHandItem(event.getPlayer(), event.getHand().toString()); } 
+			else { item = PlayerHandler.getPlayer().getPerfectHandItem(event.getPlayer(), ""); }
 			Player player = event.getPlayer();
-			if (!ItemUtilities.isAllowed(player, item, "item-store")) {
+			if (!ItemUtilities.getUtilities().isAllowed(player, item, "item-store")) {
 				event.setCancelled(true);
-				PlayerHandler.updateInventory(player);
+				PlayerHandler.getPlayer().updateInventory(player, 1L);
 			}
 		}
 	}

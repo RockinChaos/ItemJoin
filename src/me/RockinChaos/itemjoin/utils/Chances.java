@@ -28,49 +28,59 @@ import org.bukkit.entity.Player;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
 
 public class Chances {
-	public static Map < ItemMap, Integer > probabilityItems = new HashMap < ItemMap, Integer > ();
-	
-	private class Chance {
-		private int upperLimit;
-		private int lowerLimit;
-		private Object element;
-		
-		public Chance(Object element, int lowerLimit, int upperLimit) {
-			this.element = element;
-			this.upperLimit = upperLimit;
-			this.lowerLimit = lowerLimit;
-		}
-		
-		public int getUpperLimit() { return this.upperLimit; }
-		public int getLowerLimit() { return this.lowerLimit; }
-		public Object getElement() { return this.element; }
-		@Override
-		public String toString() { return "[" + Integer.toString(this.lowerLimit) + "|" + Integer.toString(this.upperLimit) + "]: " + this.element.toString(); }
-	}
-	
 	private List < Chance > chances;
 	private int sum;
 	private Random random;
 	
-	public Chances() {
+	private Map < ItemMap, Integer > probabilityItems = new HashMap < ItemMap, Integer > ();
+	
+	private static Chances chance;
+	
+   /**
+    * Creates a new Chances instance.
+    * 
+    */
+	public Chances() { }
+	
+   /**
+    * Initializes the Chances instance.
+    * 
+    */
+	public void newChance() {
 		this.random = new Random();
 		this.chances = new ArrayList < > ();
 		this.sum = 0;
 	}
 	
-	public Chances(long seed) {
+   /**
+    * Initializes the Chances instance.
+    * 
+    * @param seed - The random seed.
+    */
+	public void newChance(final long seed) {
 		this.random = new Random(seed);
 		this.chances = new ArrayList < > ();
 		this.sum = 0;
 	}
 	
-	public void addChance(Object element, int chance) {
+   /**
+    * Adds an Object and its Chance to the pool of Objects to be randomly selected.
+    * 
+    * @param element - The Object to be selected.
+    * @param chance - The Integer chance the Object has to be selected.
+    */
+	public void addChance(final Object element, final int chance) {
 		if (!this.chances.contains(element)) {
 			this.chances.add(new Chance(element, this.sum, this.sum + chance));
 			this.sum = this.sum + chance;
 		}
 	}
 	
+   /**
+    * Gets a randomly selected Object.
+    * 
+    * @return The randomly selected Object.
+    */
 	public Object getRandomElement() {
 		int index = this.random.nextInt(this.sum);
 		for (Chance chance: this.chances) {
@@ -81,22 +91,55 @@ public class Chances {
 		return null;
 	}
 	
+   /**
+    * Gets the sum.
+    * 
+    * @return The options of the sum.
+    */
 	public int getOptions() {
 		return this.sum;
 	}
 	
-	public int getChoices() {
-		return this.chances.size();
+   /**
+    * Gets the ItemMap and the Probability HashMap.
+    * 
+    * @return The ItemMaps and their Probabilities as a HashMap.
+    */
+	public Map<ItemMap, Integer> getItems() {
+		return this.probabilityItems;
 	}
 	
-	public boolean isProbability(ItemMap itemMap, ItemMap probable) {
-		if ((probable != null && itemMap.getConfigName().equals(probable.getConfigName())) || itemMap.getProbability().equals(-1)) {
+   /**
+    * Adds an ItemMap and its Probability to the HashMap pool.
+    * 
+    * @param itemMap - The ItemMap to be selected.
+    * @param i - The chance the ItemMap has to be selected.
+    */
+	public void putItem(final ItemMap itemMap, final int i) {
+		this.probabilityItems.put(itemMap, i);
+	}
+	
+   /**
+    * Checks if the ItemMap is a probability item.
+    * 
+    * @param itemMap - The ItemMap being checked.
+    * @param probability - The Probability ItemMap being compared.
+    * @return If the ItemMap is a probability item.
+    */
+	public boolean isProbability(final ItemMap itemMap, final ItemMap probability) {
+		if ((probability != null && itemMap.getConfigName().equals(probability.getConfigName())) || itemMap.getProbability().equals(-1)) {
 			return true;
 		}
 		return false;
 	}
 	
-	public ItemMap getRandom(Player player) {
+   /**
+    * Selects a Random ItemMap from the list of Probability items.
+    * 
+    * @param player - The Player to have its Probability Item chosen.
+    */
+	public ItemMap getRandom(final Player player) {
+		this.newChance();
 		if (!probabilityItems.isEmpty()) {
 			for (ItemMap itemMap: probabilityItems.keySet()) {
 				if (itemMap.hasItem(player)) { 
@@ -107,5 +150,69 @@ public class Chances {
 			return ((ItemMap) this.getRandomElement());
 		}
 		return null;
+	}
+	
+   /**
+    * Gets the instance of the Chances.
+    * 
+    * @return The Chances instance.
+    */
+    public static Chances getChances() { 
+        if (chance == null) {
+        	chance = new Chances(); 
+        }
+        return chance; 
+    } 
+	
+   /**
+    * The Chances class.
+    * 
+    */
+	private class Chance {
+		private int upperLimit;
+		private int lowerLimit;
+		private Object element;
+		
+	   /**
+    	* Creates a new Chance instance.
+    	* 
+    	* @param element - The Object to be chosen.
+    	* @param lowerLimit - The lowest probability. 
+    	* @param upperLimit - The highest probability.
+    	*/
+		private Chance(final Object element, final int lowerLimit, final int upperLimit) {
+			this.element = element;
+			this.upperLimit = upperLimit;
+			this.lowerLimit = lowerLimit;
+		}
+		
+	   /**
+    	* Gets the highest probability.
+    	* 
+    	* @return The highest probability.
+    	*/
+		private int getUpperLimit() { return this.upperLimit; }
+		
+	   /**
+    	* Gets the lowest probability.
+    	* 
+    	* @return The lowest probability.
+    	*/
+		private int getLowerLimit() { return this.lowerLimit; }
+		
+	   /**
+    	* Gets the Object to be chosen.
+    	* 
+    	* @return The Object to be chosen.
+    	*/
+		private Object getElement() { return this.element; }
+		
+	   /**
+    	* Handles the toString of a Map Element.
+    	* 
+    	* @return The newly formatted Map Element as a String instance.
+    	*/
+		@Override
+		public String toString() { return "[" + Integer.toString(this.lowerLimit) + "|" + Integer.toString(this.upperLimit) + "]: " + this.element.toString(); }
 	}
 }

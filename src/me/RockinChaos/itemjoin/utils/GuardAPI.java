@@ -17,51 +17,196 @@
  */
 package me.RockinChaos.itemjoin.utils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.PlayerInventory;
 
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
+import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
+import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
+import me.RockinChaos.itemjoin.handlers.ItemHandler;
+import me.RockinChaos.itemjoin.handlers.PlayerHandler;
+import me.RockinChaos.itemjoin.utils.sqlite.SQLite;
 
 public class GuardAPI {
+	
 	private boolean isEnabled = false;
 	private int guardVersion = 0;
+	private List < String > localeRegions = new ArrayList < String > ();
 	
+	private static GuardAPI guard;
+	
+   /**
+	* Creates a new WorldGuard instance.
+	* 
+	*/
 	public GuardAPI() {
 		this.setGuardStatus(Bukkit.getServer().getPluginManager().getPlugin("WorldEdit") != null && Bukkit.getServer().getPluginManager().getPlugin("WorldGuard") != null);
 	}
 	
+   /**
+	* Enables WorldGuard if it is found.
+	* 
+	*/
 	private void enableGuard() {
 		try { this.guardVersion = Integer.parseInt(Bukkit.getServer().getPluginManager().getPlugin("WorldGuard").getDescription().getVersion().replace(".", "").substring(0, 3));
 		} catch (Exception e) { this.guardVersion = 622; }
 	}
 
+   /**
+	* Checks if WorldGuard is enabled.
+	* 
+	* @return If WorldGuard is enabled.
+	*/
     public boolean guardEnabled() {
     	return this.isEnabled;
     }
     
+   /**
+	* Gets the current WorldGuard version.
+	* 
+	* @return The current WorldGuard version.
+	*/
     public int guardVersion() {
     	return this.guardVersion;
     }
     
-	public Map<String, ProtectedRegion> getRegions(World world) {
-		if (ConfigHandler.getDepends().getGuard().guardVersion() >= 700) {
+   /**
+	* Gets the WorldGuard regions in the specified world.
+	* 
+	* @param world - The world to get the regions from.
+	* @return The List of Regions for the specified world.
+	*/
+	public Map<String, ProtectedRegion> getRegions(final World world) {
+		if (this.guardVersion() >= 700) {
 			com.sk89q.worldedit.world.World wgWorld;
 			try { wgWorld = com.sk89q.worldguard.WorldGuard.getInstance().getPlatform().getWorldByName(world.getName()); }
 			catch (NoSuchMethodError e) { wgWorld = com.sk89q.worldguard.WorldGuard.getInstance().getPlatform().getMatcher().getWorldByName(world.getName()); }
 			com.sk89q.worldguard.protection.regions.RegionContainer rm = com.sk89q.worldguard.WorldGuard.getInstance().getPlatform().getRegionContainer();
 			if (rm == null) { return null; }
-			if (Legacy.hasLegacyWorldEdit()) {
+			if (LegacyAPI.getLegacy().legacySk89q()) {
 				return rm.get(wgWorld).getRegions();
 			} else { return rm.get(wgWorld).getRegions(); }
-		} else { return Legacy.getLegacyRegions(world); }
+		} else { return LegacyAPI.getLegacy().getRegions(world); }
 	}
 	
-    private void setGuardStatus(boolean bool) {
+   /**
+	* Sets the status of WorldGuard.
+	* 
+	* @param bool - If WorldGuard is enabled.
+	*/
+    private void setGuardStatus(final boolean bool) {
     	if (bool) { this.enableGuard(); }
     	this.isEnabled = bool;
     }
+    
+   /**
+	* Checks if the player has entered or exited 
+	* any region(s) defined for any custom items.
+	* 
+	* @param region - The region that the player entered or exited.
+	* @return If the region is defined.
+	*/
+	private boolean isLocaleRegion(final String checkRegion) {
+		for (final String region : this.localeRegions) {
+			if (region.equalsIgnoreCase(checkRegion) || region.equalsIgnoreCase("UNDEFINED")) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+   /**
+	* Adds a region to be compared against.
+	* 
+	* @param region - The region that the custom item has defined.
+	*/
+	public void addLocaleRegion(final String region) {
+		if (!this.isLocaleRegion(region)) { 
+			this.localeRegions.add(region); 
+		}
+	}
+	
+   /**
+    * Saves the current items in the Player Inventory to be returned later.
+    * 
+    * @param player - The Player that had their items saved.
+    * @param region - The region that the items are being saved from.
+    * @param type - The clear type that is being executed.
+    * @param craftView - The players current CraftView.
+    * @param inventory - The players current Inventory.
+    * @param clearAll - If ALL items are being cleared.
+    */
+	public void saveReturnItems(final Player player, final String region, final String type, final Inventory craftView, final PlayerInventory inventory, final boolean clearAll) {
+		boolean doReturn = Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Options"), "RETURN");
+		if (region != null && !region.isEmpty() && type.equalsIgnoreCase("REGION-ENTER") && doReturn) {
+			Inventory saveInventory = Bukkit.createInventory(null, 54);
+			for (int i = 0; i <= 47; i++) {
+				if (doReturn) {
+					for (ItemMap itemMap: ItemUtilities.getUtilities().getItems()) {
+						if (!itemMap.isOnlyFirstJoin() && !itemMap.isOnlyFirstWorld()) {
+							if (inventory.getItem(i) != null && inventory.getItem(i).getType() != Material.AIR && itemMap.isSimilar(inventory.getItem(i)) && i <= 41) {
+								saveInventory.setItem(i, inventory.getItem(i).clone());
+							} else if (i >= 42 && craftView.getItem(i - 42) != null && craftView.getItem(i - 42).getType() != Material.AIR 
+									&& itemMap.isSimilar(craftView.getItem(i - 42)) && PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
+								saveInventory.setItem(i, craftView.getItem(i - 42).clone());
+							}
+						}
+					}
+				} else {
+					if (inventory.getItem(i) != null && inventory.getItem(i).getType() != Material.AIR && ((!clearAll && ItemHandler.getItem().containsNBTData(inventory.getItem(i))) || clearAll) && i <= 41) {
+						saveInventory.setItem(i, inventory.getItem(i).clone());
+					} else if (i >= 42 && craftView.getItem(i - 42) != null && craftView.getItem(i - 42).getType() != Material.AIR 
+							&& ((!clearAll && ItemHandler.getItem().containsNBTData(craftView.getItem(i - 42))) || clearAll) && PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
+						saveInventory.setItem(i, craftView.getItem(i - 42).clone());
+					}
+				}
+			}
+			SQLite.getLite(false).saveReturnRegionItems(player, player.getWorld().getName(), region, saveInventory);
+		}
+	}
+	
+   /**
+    * Returns the previously removed Region Items to the Player.
+    * 
+    * @param player - The Player that had their items returned.
+    * @param world - The world to be checked.
+    * @param region - The region the items were removed from.
+    */
+	public void pasteReturnItems(final Player player, final String world, final String region) {
+		if (region != null && !region.isEmpty() && Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Options"), "RETURN")) {
+			Inventory inventory = SQLite.getLite(false).getReturnRegionItems(player, world, region);
+			for (int i = 47; i >= 0; i--) {
+				if (inventory != null && inventory.getItem(i) != null && inventory.getItem(i).getType() != Material.AIR) {
+					if (i <= 41) {
+						player.getInventory().setItem(i, inventory.getItem(i).clone());
+					} else if (i >= 42 && PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
+						player.getOpenInventory().getTopInventory().setItem(i - 42, inventory.getItem(i).clone());
+						PlayerHandler.getPlayer().updateInventory(player, 1L);
+					}
+				}
+				SQLite.getLite(false).removeReturnRegionItems(player, world, region);
+			}
+		}
+	}
+	
+   /**
+    * Gets the instance of the GuardAPI.
+    * 
+    * @param regen - If the GuardAPI should have a new instance created.
+    * @return The GuardAPI instance.
+    */
+    public static GuardAPI getGuard(final boolean regen) { 
+        if (guard == null || regen) { guard = new GuardAPI(); }
+        return guard; 
+    } 
 }

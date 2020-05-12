@@ -18,139 +18,801 @@
 package me.RockinChaos.itemjoin.utils.sqlite;
 
 import java.io.File;
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import me.RockinChaos.itemjoin.utils.Utils;
-import me.RockinChaos.itemjoin.utils.sqlite.Database;
 import me.RockinChaos.itemjoin.ItemJoin;
-import me.RockinChaos.itemjoin.handlers.ConfigHandler;
+import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
+import me.RockinChaos.itemjoin.handlers.ItemHandler;
+import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
+import me.RockinChaos.itemjoin.utils.Utils;
 
-public class SQLite extends Database {
-	private String dbname;
-	private String createTable;
-	private static boolean isMySQL = false;
-	private static int port = 3306;
-	private static String host = "localhost";
-	private static String table = "database";
-	private static String user = "root";
-	private static String pass = "password";
-	private static Map < String, Database > databases = new HashMap < String, Database > ();
-
+public class SQLite {
 	
-	public SQLite(String databaseName, String createStatement) {
-		dbname = databaseName;
-		createTable = createStatement;
-	}
+	private Map < String, Integer > mapImages = new HashMap < String, Integer >();
+	private Map < String, List <String> > ipLimitAddresses = new HashMap < String, List <String> >();
+	private Map < String, List <String> > firstJoinPlayers = new HashMap < String, List <String> >();
+	private Map < String, List <String> > firstCommandPlayers = new HashMap < String, List <String> >();
+	private Map < String, List <String> > firstWorldPlayers = new HashMap < String, List <String> >();
+	private Map < String, List <String> > enabledPlayers = new HashMap < String, List <String> >();
+	private Map < String, String > returnCraftItems = new HashMap < String, String >();
+	private Map < String, List <String> > returnItems = new HashMap < String, List <String> >();
+	private List <String> executeStatementsLater = new ArrayList<String>();
 	
-	public void initializeDatabase(final String databaseName, final String createStatement) {
-		final Database db = new SQLite(databaseName, createStatement);
-		db.load();
-		databases.put(databaseName, db);
-	}
+	private static SQLite lite;
 	
-	public static Map < String, Database > getDatabases() {
-		return databases;
-	}
-	
-	public static Database getDatabase(final String dbname) {
-		if (getDatabases().get(dbname) == null) {
-			try {
-				final Database db = new SQLite(dbname, "");
-				databases.put(dbname, db);
-			} catch (Exception e) { 
-				ServerHandler.logSevere("{SQLite} Failed to close database " + dbname + ".db connection.");
-				ServerHandler.sendDebugTrace(e); 
-			}
-		}
-		return getDatabases().get(dbname);
-	}
-	
-	public static void purgeDatabase(final String dbname) {
-		File dataFolder = new File(ItemJoin.getInstance().getDataFolder(), dbname + ".db");
-		if (dataFolder.exists()) {
-			try { dataFolder.delete(); } 
-			catch (Exception e) {
-				ServerHandler.logSevere("{SQLite} Failed to close database " + dbname + ".db after purging.");
-				ServerHandler.sendDebugTrace(e); 
-			}
-		}
-	}
-	
-	public static void loadSQLDatabase() {
-		if (ConfigHandler.getConfig("config.yml").getString("Database.port") != null) { port = ConfigHandler.getConfig("config.yml").getInt("Database.port"); }
-		if (ConfigHandler.getConfig("config.yml").getString("Database.host") != null) { host = ConfigHandler.getConfig("config.yml").getString("Database.host"); }
-		if (ConfigHandler.getConfig("config.yml").getString("Database.table") != null) { table = ConfigHandler.getConfig("config.yml").getString("Database.table"); }
-		if (ConfigHandler.getConfig("config.yml").getString("Database.user") != null) { user = Utils.encrypt(ConfigHandler.getConfig("config.yml").getString("Database.user")); }
-		if (ConfigHandler.getConfig("config.yml").getString("Database.pass") != null) { pass = Utils.encrypt(ConfigHandler.getConfig("config.yml").getString("Database.pass")); }
-	}	
-	
-	@Override
-	public Connection getSQLConnection() {
-		if (ConfigHandler.getConfig("config.yml").getString("Database.MySQL") != null && ConfigHandler.getConfig("config.yml").getBoolean("Database.MySQL")) {
-			isMySQL = true;
-			try { 
-				if (this.connection != null && !this.connection.isClosed()) { 
-			    	return this.connection; 
-			    } else {
-			    	Class.forName("com.mysql.jdbc.Driver");
-			    	this.connection = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + table + "?useSSL=false", Utils.decrypt(user), Utils.decrypt(pass));
-			        return this.connection;
-			    }
-			} catch (Exception e) { 
-					ServerHandler.logSevere("{MySQL} Unable to connect to the defined MySQL database, check your settings.");
-					ServerHandler.sendDebugTrace(e); 
-			}
-			return null;
-		} else {
-			File dataFolder = new File(ItemJoin.getInstance().getDataFolder(), this.dbname + ".db");
-			if (!dataFolder.exists()) {
-				try { dataFolder.createNewFile(); } 
-				catch (IOException e) { 
-					ServerHandler.logSevere("{SQLite} File write error: " + this.dbname + ".db.");
-					ServerHandler.sendDebugTrace(e);
-				}
-			} try {
-				if ((connection != null) && (!connection.isClosed())) { return this.connection; }
-				Class.forName("org.sqlite.JDBC");
-				this.connection = DriverManager.getConnection("jdbc:sqlite:" + dataFolder);
-				return this.connection;
-			} catch (SQLException e) { 
-				ServerHandler.logSevere("{SQLite} SQLite exception on initialize.");
-				ServerHandler.sendDebugTrace(e);
-			} catch (ClassNotFoundException e) { 
-				ServerHandler.logSevere("{SQLite} You need the SQLite JBDC library, see: &ahttps://bitbucket.org/xerial/sqlite-jdbc/downloads/ &rand put it in /lib folder.");
-				ServerHandler.sendDebugTrace(e);
-			}
-			return null;
-		}
-	}
-	
-	@Override
-	public void load() {
+   /**
+    * Creates a new SQLData instance.
+    * 
+    */
+	public SQLite() {
         new BukkitRunnable() {
             @Override
             public void run() {
-				connection = getSQLConnection();
-				try {
-					Statement s = connection.createStatement();
-					s.executeUpdate(createTable);
-					s.close();
-					initialize();
-				} catch (SQLException e) { ServerHandler.sendDebugTrace(e); }
-            }
-        }.runTaskAsynchronously(ItemJoin.getInstance());
+				SQDrivers.getDatabase("database").loadSQLDatabase();
+				createTables();
+				convertYAMLS();
+				loadMapImages();
+				loadFirstJoinPlayers();
+				loadFirstWorldPlayers();
+				loadFirstCommandPlayers();
+				loadIPLimitAddresses();
+				loadEnabledPlayers();
+				loadReturnRegionItems();
+				loadReturnCraftItems();
+				try { SQDrivers.getDatabase("database").closeConnection(); } catch (Exception e) { } 
+				executeSaveStatements();
+		    }
+		}.runTaskAsynchronously(ItemJoin.getInstance());
 	}
 	
-	public static boolean MySQLEnabled() {
-		return isMySQL;
+   /**
+    * Creates the missing database tables.
+    * 
+    */
+	private void createTables() {
+        SQDrivers.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS first_join (`World_Name` varchar(32), `Player_Name` varchar(32), `Player_UUID` varchar(32), `Item_Name` varchar(32), `Time_Stamp` varchar(32));");
+        SQDrivers.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS first_world (`World_Name` varchar(32), `Player_Name` varchar(32), `Player_UUID` varchar(32), `Item_Name` varchar(32), `Time_Stamp` varchar(32));");
+        SQDrivers.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS ip_limits (`World_Name` varchar(32), `IP_Address` varchar(32), `Player_UUID` varchar(32), `Item_Name` varchar(32), `Time_Stamp` varchar(32));");
+        SQDrivers.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS first_commands (`World_Name` varchar(32), `Player_UUID` varchar(32), `Command_String` varchar(32), `Time_Stamp` varchar(32));");
+        SQDrivers.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS enabled_players (`World_Name` varchar(32), `Player_Name` varchar(32), `Player_UUID` varchar(32), `isEnabled` varchar(32), `Time_Stamp` varchar(32));");
+        SQDrivers.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS return_items (`World_Name` varchar(32), `Region_Name` varchar(32), `Player_UUID` varchar(32), `Inventory64` varchar(32), `Time_Stamp` varchar(32));");
+        SQDrivers.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS return_craftitems (`Player_UUID` varchar(32), `Inventory64` varchar(32), `Time_Stamp` varchar(32));");
+        SQDrivers.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS map_ids (`Map_IMG` varchar(32), `Map_ID` varchar(32));");
+		this.alterTables();
 	}
+	
+   /**
+    * Alters any existing tables to fit the new TIME_STAMP datatype.
+    * 
+    */
+	private void alterTables() {
+		if (!SQDrivers.getDatabase("database").columnExists("SELECT Time_Stamp FROM first_join")) {
+			SQDrivers.getDatabase("database").executeStatement("ALTER TABLE first_join ADD Time_Stamp datatype;");
+			SQDrivers.getDatabase("database").executeStatement("ALTER TABLE first_world ADD Time_Stamp datatype;");
+			SQDrivers.getDatabase("database").executeStatement("ALTER TABLE ip_limits ADD Time_Stamp datatype;");
+			SQDrivers.getDatabase("database").executeStatement("ALTER TABLE first_commands ADD Time_Stamp datatype;");
+			SQDrivers.getDatabase("database").executeStatement("ALTER TABLE enabled_players ADD Time_Stamp datatype;");
+		} 
+	}
+	
+   /**
+    * Executes pending datatypes to be saved to the SQL database.
+    * 
+    */
+	public void executeLaterStatements() {
+		if (this.executeStatementsLater != null && !this.executeStatementsLater.isEmpty()) {
+			for (String statement : this.executeStatementsLater) {
+				SQDrivers.getDatabase("database").executeStatement(statement);
+			}
+			ServerHandler.getServer().logDebug("{SQLite} Saving newly generated data to the database.");
+			this.executeStatementsLater.clear();
+			try { SQDrivers.getDatabase("database").closeConnection(); } catch (Exception e) { }
+		}
+	}
+	
+   /**
+    * Saves the pending data to the database data file.
+    * 
+    */
+	private void executeSaveStatements() {
+        Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
+            @Override
+			public void run() {
+            	executeLaterStatements();
+            	executeSaveStatements();
+            }
+        }, 36000L);
+	}
+	
+   /**
+    * Loads the map related data.
+    * 
+    */
+	private void loadMapImages() {
+		List<List<String>> selectedMapImages = SQDrivers.getDatabase("database").queryTableData("SELECT * FROM map_ids", "Map_IMG", "Map_ID");
+		if (selectedMapImages != null && !selectedMapImages.isEmpty()) {
+			for (List<String> sl1 : selectedMapImages) {
+				if (!this.imageNumberExists(sl1.get(0))) {
+					this.mapImages.put(sl1.get(0), Utils.getUtils().returnInteger(sl1.get(1)));
+				}	
+			}
+		}
+	}
+	
+   /**
+    * Loads the first join related data.
+    * 
+    */
+	private void loadFirstJoinPlayers() {
+		List < List < String > > selectedFirstJoinPlayers = SQDrivers.getDatabase("database").queryTableData("SELECT * FROM first_join", "Item_Name", "Player_UUID");
+		if (selectedFirstJoinPlayers != null && !selectedFirstJoinPlayers.isEmpty()) {
+			for (List<String> sl1 : selectedFirstJoinPlayers) {
+				if (this.firstJoinPlayers.get(sl1.get(1)) != null) {
+					List <String> h1 = this.firstJoinPlayers.get(sl1.get(1));
+					h1.add(sl1.get(0));
+					this.firstJoinPlayers.put(sl1.get(1), h1);
+				} else {
+					List <String> h1 = new ArrayList<String>();
+					h1.add(sl1.get(0));
+					this.firstJoinPlayers.put(sl1.get(1), h1);
+				}
+			}
+		}
+	}
+	
+   /**
+    * Loads the first world related data.
+    *
+    */
+	private void loadFirstWorldPlayers() {
+		List<List<String>> selectedFirstWorldPlayers = SQDrivers.getDatabase("database").queryTableData("SELECT * FROM first_world", "Item_Name", "Player_UUID", "World_Name");
+		if (selectedFirstWorldPlayers != null && !selectedFirstWorldPlayers.isEmpty()) {
+			for (List<String> sl1 : selectedFirstWorldPlayers) {
+				if (this.firstWorldPlayers.get(sl1.get(1)) != null) {
+					List <String> h1 = this.firstWorldPlayers.get(sl1.get(1));
+					h1.add(sl1.get(2) + "." + sl1.get(0));
+					this.firstWorldPlayers.put(sl1.get(1), h1);
+				} else {
+					List <String> h1 = new ArrayList<String>();
+					h1.add(sl1.get(2) + "." + sl1.get(0));
+					this.firstWorldPlayers.put(sl1.get(1), h1);
+				}
+			}
+		}
+	}
+	
+   /**
+    * Loads the first command related data.
+    * 
+    */
+	private void loadFirstCommandPlayers() {
+		List<List<String>> selectedFirstCommandPlayers = SQDrivers.getDatabase("database").queryTableData("SELECT * FROM first_commands", "Command_String", "Player_UUID", "World_Name");
+		if (selectedFirstCommandPlayers != null && !selectedFirstCommandPlayers.isEmpty()) {
+			for (List<String> sl1 : selectedFirstCommandPlayers) {
+				if (this.firstCommandPlayers.get(sl1.get(1)) != null) {
+					List <String> h1 = this.firstCommandPlayers.get(sl1.get(1));
+					h1.add(sl1.get(2) + "." + sl1.get(0));
+					this.firstCommandPlayers.put(sl1.get(1), h1);
+				} else {
+					List <String> h1 = new ArrayList<String>();
+					h1.add(sl1.get(2) + "." + sl1.get(0));
+					this.firstCommandPlayers.put(sl1.get(1), h1);
+				}
+			}
+		}
+	}
+	
+   /**
+    * Loads the ip limit related data.
+    * 
+    */
+	private void loadIPLimitAddresses() {
+		List<List<String>> selectedIPLimitAddresses = SQDrivers.getDatabase("database").queryTableData("SELECT * FROM ip_limits", "Item_Name", "Player_UUID", "World_Name", "IP_Address");
+		if (selectedIPLimitAddresses != null && !selectedIPLimitAddresses.isEmpty()) {
+			for (List<String> sl1 : selectedIPLimitAddresses) {
+				if (this.ipLimitAddresses.get(sl1.get(1)) != null) {
+					List <String> h1 = this.ipLimitAddresses.get(sl1.get(1));
+					h1.add(sl1.get(2) + "." + sl1.get(3) + "." + sl1.get(0));
+					this.ipLimitAddresses.put(sl1.get(1), h1);
+				} else {
+					List <String> h1 = new ArrayList<String>();
+					h1.add(sl1.get(2) + "." + sl1.get(3) + "." + sl1.get(0));
+					this.ipLimitAddresses.put(sl1.get(1), h1);
+				}
+			}
+		}
+	}
+	
+   /**
+    * Loads the enabled related data.
+    * 
+    */
+	private void loadEnabledPlayers() {
+		List<List<String>> selectedEnabledPlayers = SQDrivers.getDatabase("database").queryTableData("SELECT * FROM enabled_players", "Player_UUID", "World_Name", "isEnabled");
+		if (selectedEnabledPlayers != null && !selectedEnabledPlayers.isEmpty()) {
+			for (List<String> sl1 : selectedEnabledPlayers) {
+				if (this.enabledPlayers.get(sl1.get(0)) != null) {
+					List <String> h1 = this.enabledPlayers.get(sl1.get(0));
+					h1.add(sl1.get(1) + "." + sl1.get(2));
+					this.enabledPlayers.put(sl1.get(0), h1);
+				} else {
+					List <String> h1 = new ArrayList<String>();
+					h1.add(sl1.get(1) + "." + sl1.get(2));
+					this.enabledPlayers.put(sl1.get(0), h1);
+				}
+			}
+		}
+	}
+	
+   /**
+    * Loads the return region related data.
+    * 
+    */
+	private void loadReturnRegionItems() {
+		List<List<String>> selectedReturnItems = SQDrivers.getDatabase("database").queryTableData("SELECT * FROM return_items", "Player_UUID", "World_Name", "Region_Name", "Inventory64");
+		if (selectedReturnItems != null && !selectedReturnItems.isEmpty()) {
+			for (List<String> sl1 : selectedReturnItems) {
+				if (this.returnItems.get(sl1.get(0)) != null) {
+					List <String> h1 = this.returnItems.get(sl1.get(0));
+					h1.add(sl1.get(1) + "." + sl1.get(2) + "." + sl1.get(3));
+					this.returnItems.put(sl1.get(0), h1);
+				} else {
+					List <String> h1 = new ArrayList<String>();
+					h1.add(sl1.get(1) + "." + sl1.get(2) + "." + sl1.get(3));
+					this.returnItems.put(sl1.get(0), h1);
+				}
+			}
+		}
+	}
+	
+   /**
+    * Loads the return crafting related data.
+    */
+	private void loadReturnCraftItems() {
+		List<List<String>> selectedReturnCraftItems = SQDrivers.getDatabase("database").queryTableData("SELECT * FROM return_craftitems", "Player_UUID", "Inventory64");
+		if (selectedReturnCraftItems != null && !selectedReturnCraftItems.isEmpty()) {
+			for (List<String> sl1 : selectedReturnCraftItems) {
+				this.returnCraftItems.put(sl1.get(0), sl1.get(1));
+			}
+		}
+	}
+	
+   /**
+    * Saves the first join related data.
+    * 
+    * @param player - The player being saved.
+    * @param itemMap - The ItemMap being saved.
+    */
+	public void saveFirstJoinData(Player player, ItemMap itemMap) {
+		if (itemMap.isOnlyFirstJoin()) {
+			this.executeStatementsLater.add("INSERT INTO first_join (`World_Name`, `Player_Name`, `Player_UUID`, `Item_Name`, `Time_Stamp`) VALUES ('" + player.getWorld().getName() + "','" + player.getName().toString() + "','" + PlayerHandler.getPlayer().getPlayerID(player) + "','" + itemMap.getConfigName() + "','" + new Timestamp(System.currentTimeMillis()) + "')");
+			if (this.firstJoinPlayers.get(PlayerHandler.getPlayer().getPlayerID(player)) != null) {
+				List <String> h1 = this.firstJoinPlayers.get(PlayerHandler.getPlayer().getPlayerID(player));
+				h1.add(itemMap.getConfigName());
+				this.firstJoinPlayers.put(PlayerHandler.getPlayer().getPlayerID(player), h1);
+			} else {
+				List <String> h1 = new ArrayList<String>();
+				h1.add(itemMap.getConfigName());
+				this.firstJoinPlayers.put(PlayerHandler.getPlayer().getPlayerID(player), h1);
+			}
+		}
+	}
+	
+   /**
+    * Saves the first world related data.
+    * 
+    * @param player - The player being saved.
+    * @param itemMap - The ItemMap being saved.
+    */
+	public void saveFirstWorldData(Player player, ItemMap itemMap) {
+		if (itemMap.isOnlyFirstWorld()) {
+			this.executeStatementsLater.add("INSERT INTO first_world (`World_Name`, `Player_Name`, `Player_UUID`, `Item_Name`, `Time_Stamp`) VALUES ('" + player.getWorld().getName() + "','" + player.getName().toString() + "','" + PlayerHandler.getPlayer().getPlayerID(player) + "','" + itemMap.getConfigName() + "','" + new Timestamp(System.currentTimeMillis()) + "')");
+			if (this.firstWorldPlayers.get(PlayerHandler.getPlayer().getPlayerID(player)) != null) {
+				List <String> h1 = this.firstWorldPlayers.get(PlayerHandler.getPlayer().getPlayerID(player));
+				h1.add(player.getWorld().getName() + "." + itemMap.getConfigName());
+				this.firstWorldPlayers.put(PlayerHandler.getPlayer().getPlayerID(player), h1);
+			} else {
+				List <String> h1 = new ArrayList<String>();
+				h1.add(player.getWorld().getName() + "." + itemMap.getConfigName());
+				this.firstWorldPlayers.put(PlayerHandler.getPlayer().getPlayerID(player), h1);
+			}
+		}
+	}
+	
+   /**
+    * Saves the ip limit related data.
+    * 
+    * @param player - The player being saved.
+    * @param itemMap - The ItemMap being saved.
+    */
+	public void saveIpLimitData(Player player, ItemMap itemMap) {
+		if (itemMap.isIpLimted()) {
+			this.executeStatementsLater.add("INSERT INTO ip_limits (`World_Name`, `IP_Address`, `Player_UUID`, `Item_Name`, `Time_Stamp`) VALUES ('" + player.getWorld().getName() + "','" + player.getAddress().getHostString() + "','" + PlayerHandler.getPlayer().getPlayerID(player) + "','" + itemMap.getConfigName() + "','" + new Timestamp(System.currentTimeMillis()) + "')");
+			if (this.ipLimitAddresses.get(PlayerHandler.getPlayer().getPlayerID(player)) != null) {
+				List <String> h1 = this.ipLimitAddresses.get(PlayerHandler.getPlayer().getPlayerID(player));
+				h1.add(player.getWorld().getName() + "." + player.getAddress().getHostString() + "." + itemMap.getConfigName());
+				this.ipLimitAddresses.put(PlayerHandler.getPlayer().getPlayerID(player), h1);
+			} else {
+				List <String> h1 = new ArrayList<String>();
+				h1.add(player.getWorld().getName() + "." + player.getAddress().getHostString() + "." + itemMap.getConfigName());
+				this.ipLimitAddresses.put(PlayerHandler.getPlayer().getPlayerID(player), h1);
+			}
+		}
+	}
+	
+   /**
+    * Saves the first command related data.
+    * 
+    * @param player - The player being saved.
+    * @param command - The command being saved.
+    */
+	public void saveFirstCommandData(Player player, String command) {
+		this.executeStatementsLater.add("INSERT INTO first_commands (`World_Name`, `Player_UUID`, `Command_String`, `Time_Stamp`) VALUES ('" + player.getWorld().getName() + "','" + PlayerHandler.getPlayer().getPlayerID(player) + "','" + command + "','" + new Timestamp(System.currentTimeMillis()) + "')");
+		if (this.firstCommandPlayers.get(PlayerHandler.getPlayer().getPlayerID(player)) != null) {
+			List <String> h1 = this.firstCommandPlayers.get(PlayerHandler.getPlayer().getPlayerID(player));
+			h1.add(player.getWorld().getName() + "." + command);
+			this.firstCommandPlayers.put(PlayerHandler.getPlayer().getPlayerID(player), h1);
+		} else {
+			List <String> h1 = new ArrayList<String>();
+			h1.add(player.getWorld().getName() + "." + command);
+			this.firstCommandPlayers.put(PlayerHandler.getPlayer().getPlayerID(player), h1);
+		}
+	}
+	
+   /**
+    * Saves the return region related data.
+    * 
+    * @param player - The player being saved.
+    * @param world - The world being saved.
+    * @param region - The region being saved.
+    * @param inventory - The inventory items being saved.
+    */
+	public void saveReturnRegionItems(Player player, String world, String region, Inventory inventory) {
+		String inventory64 = world + "." + region + "." + ItemHandler.getItem().serializeInventory(inventory);
+		this.executeStatementsLater.add("INSERT INTO return_items (`World_Name`, `Region_Name`, `Player_UUID`, `Inventory64`, `Time_Stamp`) VALUES ('" + world + "','" + region + "','" + PlayerHandler.getPlayer().getPlayerID(player) + "','" + ItemHandler.getItem().serializeInventory(inventory) + "','" + new Timestamp(System.currentTimeMillis()) + "')");
+		if (this.returnItems.get(PlayerHandler.getPlayer().getPlayerID(player)) != null && Utils.getUtils().containsIgnoreCase(this.returnItems.get(PlayerHandler.getPlayer().getPlayerID(player)).toString(), world + "." + region)) {
+			return;
+	    } else if (this.returnItems.get(PlayerHandler.getPlayer().getPlayerID(player)) != null) {
+			List <String> h1 = this.returnItems.get(PlayerHandler.getPlayer().getPlayerID(player));
+			h1.add(inventory64);
+			this.returnItems.put(PlayerHandler.getPlayer().getPlayerID(player), h1);
+		} else {
+			List <String> h1 = new ArrayList<String>();
+			h1.add(inventory64);
+			this.returnItems.put(PlayerHandler.getPlayer().getPlayerID(player), h1);
+		}
+	}
+	
+   /**
+    * Saves the return crafting related data.
+    * 
+    * @param player - The player being saved.
+    * @param inventory - The inventory items being saved.
+    */
+	public void saveReturnCraftItems(Player player, Inventory inventory) {
+		String inventory64 = ItemHandler.getItem().serializeInventory(inventory);
+		this.executeStatementsLater.add("INSERT INTO return_craftitems (`Player_UUID`, `Inventory64`, `Time_Stamp`) VALUES ('" + PlayerHandler.getPlayer().getPlayerID(player) + "','" + ItemHandler.getItem().serializeInventory(inventory) + "','" + new Timestamp(System.currentTimeMillis()) + "')");
+		this.returnCraftItems.put(PlayerHandler.getPlayer().getPlayerID(player), inventory64);
+	}
+	
+   /**
+    * Saves the enabled and/or disabled players related data.
+    * 
+    * @param player - The player being saved.
+    * @param world - The world being saved.
+    * @param boolValue - The boolean value being saved.
+    * @param type - Saving as enabled or disabled type.
+    */
+	public void saveToDatabase(Player player, String world, String boolValue, String type) {
+			String realPlayer = "ALL"; String realName = "ALL";
+			if (player != null) { realPlayer = PlayerHandler.getPlayer().getPlayerID(player); realName = player.getName().toString(); }
+			if (type.contains("enabled-players") || type.contains("disabled-players")) {
+				if (this.enabledPlayers.get(realPlayer) != null) {
+					List <String> h1 = this.enabledPlayers.get(realPlayer);
+					if (Utils.getUtils().containsIgnoreCase(h1.toString(), world + ".")) {
+						for (int i = 0; i <= h1.size(); i++) {
+							if (Utils.getUtils().containsIgnoreCase(h1.get(i), world + ".")) {
+								h1.remove(i);
+							}
+						}
+					}
+					h1.add(world + "." + boolValue);
+					this.enabledPlayers.put(realPlayer, h1);
+					this.executeStatementsLater.add("UPDATE enabled_players SET IsEnabled='" + boolValue + "' WHERE World_Name='" + world + "' AND Player_UUID='" + realPlayer + "'");
+				} else {
+					List <String> h1 = new ArrayList<String>();
+					h1.add(world + "." + boolValue);
+					this.enabledPlayers.put(realPlayer, h1);
+					this.executeStatementsLater.add("INSERT INTO enabled_players (`World_Name`, `Player_Name`, `Player_UUID`, `isEnabled`, `Time_Stamp`) VALUES ('" + world + "','" + realName + "','" + realPlayer + "','" + boolValue + "','" + new Timestamp(System.currentTimeMillis()) + "')");
+				}
+			}
+	}
+	
+   /**
+    * Saves the item data related data.
+    * 
+    * @param player - The player being saved.
+    * @param itemMap - The ItemMap being saved.
+    */
+	public void saveItemData(Player player, ItemMap itemMap) {
+		this.saveFirstJoinData(player, itemMap);
+		this.saveFirstWorldData(player, itemMap);
+		this.saveIpLimitData(player, itemMap);
+	}
+	
+   /**
+    * Removed limited items from the database data.
+    * 
+    * @param player - The player being removed.
+    * @param section - The datatype being removed.
+    */
+	public void purgeDatabaseData(OfflinePlayer player, String section) {
+		String UUID = PlayerHandler.getPlayer().getOfflinePlayerID(player);
+		if (section.equalsIgnoreCase("first_join") && this.firstJoinPlayers.values() != null && !this.firstJoinPlayers.isEmpty()) {
+			this.executeStatementsLater.add("DELETE FROM " + section + " WHERE Player_UUID='" + UUID + "';");
+			this.firstJoinPlayers.remove(UUID);
+		} else if (section.equalsIgnoreCase("first_world") && this.firstWorldPlayers.values() != null && !this.firstWorldPlayers.isEmpty()) {
+			this.executeStatementsLater.add("DELETE FROM " + section + " WHERE Player_UUID='" + UUID + "';");
+			this.firstWorldPlayers.remove(UUID);
+		} else if (section.equalsIgnoreCase("ip_limits") && this.ipLimitAddresses.values() != null && !this.ipLimitAddresses.isEmpty()) {
+			this.executeStatementsLater.add("DELETE FROM " + section + " WHERE Player_UUID='" + UUID + "';");
+			this.ipLimitAddresses.remove(UUID);
+		}
+	}
+	
+   /**
+    * Removes the return region related data.
+    * 
+    * @param player - The player being removed.
+    * @param world - The world being saved.
+    * @param region - The region being saved.
+    */
+	public void removeReturnRegionItems(Player player, String world, String region) {
+		List <String> h1 = this.returnItems.get(PlayerHandler.getPlayer().getPlayerID(player));
+		if (this.returnItems.values() != null && !this.returnItems.isEmpty() && h1 != null && !h1.isEmpty()) {
+			this.executeStatementsLater.add("DELETE FROM return_Items WHERE Player_UUID='" + PlayerHandler.getPlayer().getPlayerID(player) + "' AND World_Name='" + world + "' AND Region_Name='" + region + "';");
+			for (String inventory : h1) {
+				if (Utils.getUtils().containsIgnoreCase(inventory, world + "." + region + ".")) {
+					h1.remove(inventory);
+					break;
+				}
+			}
+			this.returnItems.put(PlayerHandler.getPlayer().getPlayerID(player), h1);
+		}
+	}
+	
+   /**
+    * Removes the return crafting related data.
+    * 
+    * @param player - The player being removed.
+    */
+	public void removeReturnCraftItems(Player player) {
+		String h1 = this.returnCraftItems.get(PlayerHandler.getPlayer().getPlayerID(player));
+		if (this.returnCraftItems.values() != null && !this.returnCraftItems.isEmpty() && h1 != null && !h1.isEmpty()) {
+			this.executeStatementsLater.add("DELETE FROM return_craftitems WHERE Player_UUID='" + PlayerHandler.getPlayer().getPlayerID(player) + "';");
+			this.returnCraftItems.remove(PlayerHandler.getPlayer().getPlayerID(player));
+		}
+	}
+	
+   /**
+    * Checks if the player has executed the first time execute command.
+    * 
+    * @param player - The player being checked.
+    * @param command - The command being checked.
+    * @return If the player has first time executed the command.
+    */
+	public Boolean hasFirstCommanded(Player player, String command) {
+		if (this.firstCommandPlayers.get(PlayerHandler.getPlayer().getPlayerID(player)) != null
+				&& Utils.getUtils().containsIgnoreCase(this.firstCommandPlayers.get(PlayerHandler.getPlayer().getPlayerID(player)).toString(), player.getWorld().getName() + "." + command.replace("first-join: ", "").replace("first-join:", ""))) {
+			return true;
+		}
+		return false;
+	}
+	
+   /**
+    * Checks if the player has executed the first join ItemMap.
+    * 
+    * @param player - The player being checked.
+    * @param itemMap - The ItemMap being checked.
+    * @return If the player has first joined.
+    */
+	public Boolean hasFirstJoined(Player player, ItemMap itemMap) {
+		if (itemMap.isOnlyFirstJoin() && this.firstJoinPlayers.get(PlayerHandler.getPlayer().getPlayerID(player)) != null 
+				&& Utils.getUtils().containsIgnoreCase(this.firstJoinPlayers.get(PlayerHandler.getPlayer().getPlayerID(player)).toString(), itemMap.getConfigName())) {
+			return true;
+		}
+		return false;
+	}
+	
+   /**
+    * Checks if the player has executed the first world ItemMap.
+    * 
+    * @param player - The player being checked.
+    * @param itemMap - The ItemMap being checked.
+    * @return If the player has first world.
+    */
+	public Boolean hasFirstWorld(Player player, ItemMap itemMap) {
+		if (itemMap.isOnlyFirstWorld() && this.firstWorldPlayers.get(PlayerHandler.getPlayer().getPlayerID(player)) != null 
+			&& Utils.getUtils().containsIgnoreCase(this.firstWorldPlayers.get(PlayerHandler.getPlayer().getPlayerID(player)).toString(), player.getWorld().getName() + "." + itemMap.getConfigName())) {
+			return true;
+		}
+		return false;
+	}
+	
+   /**
+    * Gets the return region items.
+    * 
+    * @param player - The player being fetched.
+    * @param world - The world being fetched.
+    * @param region - The region to be fetched.
+    * @return The inventory to be returned.
+    */
+	public Inventory getReturnRegionItems(Player player, String world, String region) {
+		if (this.returnItems.get(PlayerHandler.getPlayer().getPlayerID(player)) != null) {
+			for (String inventory : this.returnItems.get(PlayerHandler.getPlayer().getPlayerID(player))) {
+				if (Utils.getUtils().containsIgnoreCase(inventory, world) && Utils.getUtils().containsIgnoreCase(inventory, region)) {
+					return ItemHandler.getItem().deserializeInventory(inventory.replace(world + "." + region + ".", ""));
+				}
+			}
+		}
+		return null;
+	}
+	
+   /**
+    * Gets the return crafting items.
+    * 
+    * @param player - The player being fetched.
+    * @return The inventory to be returned.
+    */
+	public Inventory getReturnCraftItems(Player player) {
+		if (this.returnCraftItems.get(PlayerHandler.getPlayer().getPlayerID(player)) != null) {
+			return ItemHandler.getItem().deserializeInventory(this.returnCraftItems.get(PlayerHandler.getPlayer().getPlayerID(player)));
+		}
+		return null;
+	}
+	
+   /**
+    * Gets the first join player items.
+    * 
+    * @return The HashMap of players and their first join items.
+    */
+	public Map<String, List<String>> getFirstPlayers() {
+		return this.firstJoinPlayers;
+	}
+	
+   /**
+    * Gets the first join player items.
+    * 
+    * @return The HashMap of players and their first join items.
+    */
+	public Map<String, List<String>> getFirstWorlds() {
+		return this.firstWorldPlayers;
+	}
+	
+   /**
+    * Gets the ip limited player items.
+    * 
+    * @return The HashMap of players and their ip limited items.
+    */
+	public Map<String, List<String>> getLimitPlayers() {
+		return this.ipLimitAddresses;
+	}
+	
+   /**
+    * Checks if the players ItemMap is ip limited.
+    * 
+    * @param player - The player being checked.
+    * @param itemMap - The ItemMap being checked.
+    * @return If the players ItemMap is ip limited.
+    */
+	public Boolean isIPLimited(Player player, ItemMap itemMap) {
+		if (itemMap.isIpLimted()) {
+			for (String playerValue : this.ipLimitAddresses.keySet()) {
+				if (Utils.getUtils().containsIgnoreCase(this.ipLimitAddresses.get(playerValue).toString(), player.getWorld().getName() + "." + player.getAddress().getHostString() + "." + itemMap.getConfigName())
+						|| Utils.getUtils().containsIgnoreCase(this.ipLimitAddresses.get(playerValue).toString(), player.getWorld().getName() + "." + player.getAddress().getHostString().replace(".", "") + "." + itemMap.getConfigName())) {
+					if (PlayerHandler.getPlayer().getPlayerID(player).equalsIgnoreCase(playerValue)) {
+						return false;
+					} else { return true; }
+				}
+			}
+		}
+		return false;
+	}
+	
+   /**
+    * Saves the specified ItemMap and its image id to the database.
+    * 
+    * @param itemMap - The itemMap being saved.
+    */
+	public void saveMapImage(ItemMap itemMap) {
+		if (!this.imageNumberExists(itemMap.getMapImage())) {
+			this.executeStatementsLater.add("INSERT INTO map_ids (`Map_IMG`, `Map_ID`) VALUES ('" + itemMap.getMapImage() + "','" + itemMap.getMapID() + "')");
+			this.mapImages.put(itemMap.getMapImage(), itemMap.getMapID());
+		}
+	}
+	
+   /**
+    * Removes the specified ItemMap from the database.
+    * 
+    * @param itemMap - The itemMap being removed.
+    */
+	public void purgeMapImage(ItemMap itemMap) {
+		if (this.imageNumberExists(itemMap.getMapImage()) && mapImages.values() != null && !this.mapImages.isEmpty()) {
+			this.executeStatementsLater.add("DELETE FROM map_ids WHERE Map_IMG='" + itemMap.getMapImage() + "';");
+			this.mapImages.remove(itemMap.getMapImage());
+		}
+	}
+	
+   /**
+    * Checks if the specified map image is already rendered.
+    * 
+    * @param image - The image being checked.
+    * @return If the image is already rendered.
+    */
+	public Boolean imageNumberExists(String image) {
+		if (this.mapImages.get(image) != null) {
+			return true;
+		}
+		return false;
+	}
+	
+   /**
+    * Gets the current image number for the already rendered image.
+    * 
+    * @param player - that will recieve the items.
+    */
+	public int getImageNumber(String image) {
+		if (this.mapImages.get(image) != null) {
+			return this.mapImages.get(image);
+		}
+		return 0;
+	}
+	
+   /**
+    * Checks if the player has their items enabled.
+    * 
+    * @param player - The player being checked.
+    * @return If the player is enabled.
+    */
+	public boolean isEnabled(final Player player) {
+		if (this.enabledPlayers.get(PlayerHandler.getPlayer().getPlayerID(player)) != null) {
+			if (Utils.getUtils().containsIgnoreCase(this.enabledPlayers.get(PlayerHandler.getPlayer().getPlayerID(player)).toString(), player.getWorld().getName() + "." + "false")
+					|| Utils.getUtils().containsIgnoreCase(this.enabledPlayers.get(PlayerHandler.getPlayer().getPlayerID(player)).toString(), "Global" + "." + "false") || this.enabledPlayers.get("ALL") != null && Utils.getUtils().containsIgnoreCase(this.enabledPlayers.get("ALL").toString(), "Global" + "." + "false")) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+   /**
+    * Checks if the player is writable or not.
+    * 
+    * @param world - The name of the world being checked.
+    * @param playerString - The UUID of the player being checked.
+    * @return If the player has their items enabled.
+    */
+	public boolean isWritable(final String world, final String playerString) {
+		if (this.enabledPlayers.get(playerString) != null && Utils.getUtils().containsIgnoreCase(this.enabledPlayers.get(playerString).toString(), world + "." + "false")) {
+				return false;
+		}
+		return true;
+	}
+
+   /**
+    * Converts the old .YML data files to the new SQL Database.
+    * 
+    */
+	public void convertYAMLS() {
+		File firstJoin = new File(ItemJoin.getInstance().getDataFolder(), "first-join.yml");
+		File ipLimit = new File(ItemJoin.getInstance().getDataFolder(), "ip-limit.yml");
+		boolean converting = false;
+		if (firstJoin.exists() || ipLimit.exists()) {
+			if (firstJoin.exists()) {
+				this.convertFirstJoinData(firstJoin);
+				ServerHandler.getServer().logWarn(("The first-join.yml file is outdated, all data is now stored in a database file."));
+			}
+			if (ipLimit.exists()) {
+				this.convertIpLimitData(ipLimit);
+				ServerHandler.getServer().logWarn(("The ip-limit.yml file is outdated, all data is now stored in a database file."));
+			}
+			converting = true;
+			ServerHandler.getServer().logWarn("Starting YAML to Database conversion, stored data in the file(s) will not be lost...");
+			
+		}
+		if (converting == true) { ServerHandler.getServer().logWarn("YAML to Database conversion complete!"); }
+	}
+	
+   /**
+    * Converts the first join data to the new SQL Database.
+    * 
+    * @param firstJoin - The file being converted.
+    */
+	private void convertFirstJoinData(File firstJoin) {
+		try {
+			YamlConfiguration configSection = YamlConfiguration.loadConfiguration(firstJoin);
+			for (String worldsec: configSection.getKeys(false)) {
+				ConfigurationSection world = configSection.getConfigurationSection(worldsec);
+				for (String itemsec: world.getKeys(false)) {
+					ConfigurationSection item = world.getConfigurationSection(itemsec);
+					for (String uuidsec: item.getKeys(false)) {
+						ConfigurationSection uuid = item.getConfigurationSection(uuidsec);
+						OfflinePlayer player = ItemJoin.getInstance().getServer().getOfflinePlayer(UUID.fromString(uuid.getName()));
+						if (!SQDrivers.getDatabase("database").dataExists("SELECT * FROM first_join WHERE World_Name='" + world.getName() + "' AND Player_UUID='" + uuid.getName() + "' AND Item_Name='" + item.getName() + "';")) {
+							SQDrivers.getDatabase("database").executeStatement("INSERT INTO first_join (`World_Name`, `Player_Name`, `Player_UUID`, `Item_Name`) VALUES ('" + world.getName() + "','" + player.getName().toString() + "','" + uuid.getName() + "','" + item.getName() + "')");
+							SQDrivers.getDatabase("database").closeConnection();
+						}
+					}
+				}
+			}
+			File userfiles = new File(ItemJoin.getInstance().getDataFolder() + File.separator + "backup");
+			if (!userfiles.exists()) {
+				userfiles.mkdirs();
+			}
+			String newGen = "converted" + Utils.getUtils().getRandom(0, 100) + "-first-join.yml";
+			File newFile = new File(userfiles, newGen);
+			firstJoin.renameTo(newFile);
+		} catch (Exception e) {
+			ServerHandler.getServer().logSevere("{SQLite} Failed to convert the first-join.yml to the database!");
+			ServerHandler.getServer().sendDebugTrace(e);
+		}
+	}
+	
+   /**
+    * Converts the ip limited data to the new SQL Database.
+    * 
+    * @param ipLimit - The file being converted.
+    */
+	private void convertIpLimitData(File ipLimit) {
+		try {
+			YamlConfiguration configSection = YamlConfiguration.loadConfiguration(ipLimit);
+			for (String worldsec: configSection.getKeys(false)) {
+				ConfigurationSection world = configSection.getConfigurationSection(worldsec);
+				for (String itemsec: world.getKeys(false)) {
+					ConfigurationSection item = world.getConfigurationSection(itemsec);
+					for (String ipaddrsec: item.getKeys(false)) {
+						ConfigurationSection ipaddr = item.getConfigurationSection(ipaddrsec);
+						if (!SQDrivers.getDatabase("database").dataExists("SELECT * FROM ip_limits WHERE World_Name='" + world.getName() + "' AND IP_Address='" + ipaddr.getName() + "' AND Item_Name='" + item.getName() + "';")) {
+							SQDrivers.getDatabase("database").executeStatement("INSERT INTO ip_limits (`World_Name`, `IP_Address`, `Player_UUID`, `Item_Name`) VALUES ('" + world.getName() + "','" + ipaddr.getName() + "','" + ipaddr.get("Current User") + "','" + item.getName() + "')");
+							SQDrivers.getDatabase("database").closeConnection();
+						}
+					}
+				}
+			}
+			File userfiles = new File(ItemJoin.getInstance().getDataFolder() + File.separator + "backup");
+			if (!userfiles.exists()) {
+				userfiles.mkdirs();
+			}
+			String newGen = "converted" + Utils.getUtils().getRandom(0, 100) + "-ip-limit.yml";
+			File newFile = new File(userfiles, newGen);
+			ipLimit.renameTo(newFile);
+		} catch (Exception e) {
+			ServerHandler.getServer().logSevere("{SQLite} Failed to convert the ip-limit.yml to the database!");
+			ServerHandler.getServer().sendDebugTrace(e);
+		}
+	}
+	
+   /**
+    * Gets the instance of the SQLite.
+    * 
+    * @param regen - If the SQLite should have a new instance created.
+    * @return The SQLite instance.
+    */
+    public static SQLite getLite(boolean regen) { 
+        if (lite == null || regen) { lite = new SQLite(); }
+        return lite; 
+    } 
 }

@@ -30,22 +30,35 @@ import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.utils.Utils;
 
 public abstract class Database {
-	protected Connection connection;
-	public abstract Connection getSQLConnection();
-	public abstract void load();
 	
-	public void initialize() {
+	public abstract void load();
+	public abstract Connection getSQLConnection();
+	protected Connection connection;
+	protected boolean remoteEnabled = false;
+	
+   /**
+	* Initializes the SQLite or MySQL connection.
+	* 
+	*/
+	public void initialize(final boolean isRemote) {
 		this.connection = this.getSQLConnection();
+		this.remoteEnabled = isRemote;
 		try {
 			final PreparedStatement ps = this.connection.prepareStatement("SELECT * FROM EMPTY_TABLE");
 			final ResultSet rs = ps.executeQuery();
 			this.close(ps, rs);
 		} catch (SQLException e) { 
-			ServerHandler.logSevere("{SQLite} Unable to connect to database!");
-			ServerHandler.sendDebugTrace(e);
+			ServerHandler.getServer().logSevere("{SQLite} Unable to connect to database!");
+			ServerHandler.getServer().sendDebugTrace(e);
 		}
 	}
 	
+   /**
+	* Executes a specified SQL statement.
+	* 
+	* @param statement - the statement to be executed.
+	* @return The statement was successfully executed.
+	*/
 	public Boolean executeStatement(final String statement) {
 		Connection conn = null;
 		PreparedStatement ps = null;
@@ -54,25 +67,32 @@ public abstract class Database {
 			ps = conn.prepareStatement(statement);
 			return !ps.execute();
 		} catch (SQLException e) {
-			ServerHandler.logSevere("{SQLite} Failed to execute database statement.");
-			ServerHandler.sendDebugTrace(e);
+			ServerHandler.getServer().logSevere("{SQLite} Failed to execute database statement.");
+			ServerHandler.getServer().sendDebugTrace(e);
 			return false;
 		} finally {
 			try {
 				if (ps != null) {
 					ps.close();
 				}
-				if (conn != null && !SQLite.MySQLEnabled()) {
+				if (conn != null && !this.remoteEnabled) {
 					conn.close();
 				}
 			} catch (SQLException e) {
-				ServerHandler.logSevere("{SQLite} Failed to close database connection.");
-				ServerHandler.sendDebugTrace(e);
+				ServerHandler.getServer().logSevere("{SQLite} Failed to close database connection.");
+				ServerHandler.getServer().sendDebugTrace(e);
 				return false;
 			}
 		}
 	}
 	
+   /**
+	* Queries the specified row and the specified statement for a specific value.
+    * 
+	* @param statement - the statement to be executed.
+	* @param row - the row being queried.
+	* @return The result in as an object.
+	*/
 	public Object queryValue(final String statement, final String row) {
 		Connection conn = null;
 		PreparedStatement ps = null;
@@ -85,18 +105,18 @@ public abstract class Database {
 				return rs.getObject(row);
 			}
 		} catch (SQLException e) {
-			ServerHandler.logSevere("{SQLite} Failed to execute database statement.");
-			ServerHandler.sendDebugTrace(e);
+			ServerHandler.getServer().logSevere("{SQLite} Failed to execute database statement.");
+			ServerHandler.getServer().sendDebugTrace(e);
 			try {
 				if (ps != null) {
 					ps.close();
 				}
-				if (conn != null && !SQLite.MySQLEnabled()) {
+				if (conn != null && !this.remoteEnabled) {
 					conn.close();
 				}
 			} catch (SQLException e2) { 
-				ServerHandler.logSevere("{SQLite} Failed to close database connection."); 
-				ServerHandler.sendDebugTrace(e2);
+				ServerHandler.getServer().logSevere("{SQLite} Failed to close database connection."); 
+				ServerHandler.getServer().sendDebugTrace(e2);
 			}
 			return null;
 		} finally {
@@ -104,28 +124,35 @@ public abstract class Database {
 				if (ps != null) {
 					ps.close();
 				}
-				if (conn != null && !SQLite.MySQLEnabled()) {
+				if (conn != null && !this.remoteEnabled) {
 					conn.close();
 				}
 			} catch (SQLException e) { 
-				ServerHandler.logSevere("{SQLite} Failed to close database connection."); 
-				ServerHandler.sendDebugTrace(e); 
+				ServerHandler.getServer().logSevere("{SQLite} Failed to close database connection."); 
+				ServerHandler.getServer().sendDebugTrace(e); 
 			}
 		}
 		try {
 			if (ps != null) {
 				ps.close();
 			}
-			if (conn != null && !SQLite.MySQLEnabled()) {
+			if (conn != null && !this.remoteEnabled) {
 				conn.close();
 			}
 		} catch (SQLException e) { 
-			ServerHandler.logSevere("{SQLite} Failed to close database connection."); 
-			ServerHandler.sendDebugTrace(e); 
+			ServerHandler.getServer().logSevere("{SQLite} Failed to close database connection."); 
+			ServerHandler.getServer().sendDebugTrace(e); 
 		}
 		return null;
 	}
 	
+	/**
+	* Queries a row for a specified list of values.
+	* 
+	* @param statement - the statement to be executed.
+	* @param row - the row being queried.
+	* @return The result in as a listed object.
+	*/
 	public List < Object > queryRow(final String statement, final String row) {
 		Connection conn = null;
 		PreparedStatement ps = null;
@@ -140,35 +167,42 @@ public abstract class Database {
 			}
 			return objects;
 		} catch (SQLException e) {
-			ServerHandler.logSevere("{SQLite} Failed to execute database statement.");
-			ServerHandler.sendDebugTrace(e);
+			ServerHandler.getServer().logSevere("{SQLite} Failed to execute database statement.");
+			ServerHandler.getServer().sendDebugTrace(e);
 			try {
 				if (ps != null) {
 					ps.close();
 				}
-				if (conn != null && !SQLite.MySQLEnabled()) {
+				if (conn != null && !this.remoteEnabled) {
 					conn.close();
 				}
 			} catch (SQLException e2) { 
-				ServerHandler.logSevere("{SQLite} Failed to close database connection."); 
-				ServerHandler.sendDebugTrace(e2);
+				ServerHandler.getServer().logSevere("{SQLite} Failed to close database connection."); 
+				ServerHandler.getServer().sendDebugTrace(e2);
 			}
 		} finally {
 			try {
 				if (ps != null) {
 					ps.close();
 				}
-				if (conn != null && !SQLite.MySQLEnabled()) {
+				if (conn != null && !this.remoteEnabled) {
 					conn.close();
 				}
 			} catch (SQLException e) { 
-				ServerHandler.logSevere("{SQLite} Failed to close database connection."); 
-				ServerHandler.sendDebugTrace(e);
+				ServerHandler.getServer().logSevere("{SQLite} Failed to close database connection."); 
+				ServerHandler.getServer().sendDebugTrace(e);
 			}
 		}
 		return null;
 	}
 	
+   /**
+	* Queries a list of rows for their specified statements for a specific list of multiple values.
+	* 
+	* @param statement - the statement to be executed.
+	* @param row - the list of rows being queried.
+	* @return The result in as a listed list of strings.
+	*/
 	public List < List < String >> queryTableData(final String statement, final String...row) {
 		final List < List < String > > existingData = new ArrayList < List < String > > ();
 		try (ResultSet rs = this.getSQLConnection().prepareStatement(statement).executeQuery()) {
@@ -181,12 +215,19 @@ public abstract class Database {
 			}
 			rs.close();
 		} catch (SQLException e) {
-			ServerHandler.logSevere("{SQLite} Failed to execute database statement.");
-			ServerHandler.sendDebugTrace(e);
+			ServerHandler.getServer().logSevere("{SQLite} Failed to execute database statement.");
+			ServerHandler.getServer().sendDebugTrace(e);
 		}
 		return existingData;
 	}
 	
+   /**
+	* Qeuries multiple rows for a specific value.
+	* 
+	* @param statement - the statement to be executed.
+	* @param row - the list of rows being queried.
+	* @return The result in as a HashMap.
+	*/
 	public Map < String, List < Object >> queryMultipleRows(final String statement, final String...row) {
 		Connection conn = null;
 		PreparedStatement ps = null;
@@ -207,50 +248,62 @@ public abstract class Database {
 			}
 			return map;
 		} catch (SQLException e) {
-				ServerHandler.logSevere("{SQLite} Failed to execute database statement.");
-				ServerHandler.sendDebugTrace(e);
+				ServerHandler.getServer().logSevere("{SQLite} Failed to execute database statement.");
+				ServerHandler.getServer().sendDebugTrace(e);
 			try {
 				if (ps != null) {
 					ps.close();
 				}
-				if (conn != null && !SQLite.MySQLEnabled()) {
+				if (conn != null && !this.remoteEnabled) {
 					conn.close();
 				}
 			} catch (SQLException e2) { 
-				ServerHandler.logSevere("{SQLite} Failed to close database connection."); 
-				ServerHandler.sendDebugTrace(e2);
+				ServerHandler.getServer().logSevere("{SQLite} Failed to close database connection."); 
+				ServerHandler.getServer().sendDebugTrace(e2);
 			}
 		} finally {
 			try {
 				if (ps != null) {
 					ps.close();
 				}
-				if (conn != null && !SQLite.MySQLEnabled()) {
+				if (conn != null && !this.remoteEnabled) {
 					conn.close();
 				}
 			} catch (SQLException e) { 
-				ServerHandler.logSevere("{SQLite} Failed to close database connection."); 
-				ServerHandler.sendDebugTrace(e);
+				ServerHandler.getServer().logSevere("{SQLite} Failed to close database connection."); 
+				ServerHandler.getServer().sendDebugTrace(e);
 			}
 		}
 		return null;
 	}
 
+   /**
+	* Checks if the column exists in the database.
+	* 
+	* @param statement - the statement to be executed.
+	* @return If the column exists.
+	*/
 	public boolean columnExists(final String statement) {
 		try (ResultSet rs = this.getSQLConnection().prepareStatement(statement).executeQuery()) {
 			rs.close();
 			return true;
 		} catch (SQLException e) {
-			if (Utils.containsIgnoreCase(e.getMessage(), "no such column")) {
+			if (Utils.getUtils().containsIgnoreCase(e.getMessage(), "no such column")) {
 				return false;
 			} else {
-				ServerHandler.logSevere("{SQLite} Failed to execute database statement.");
-				ServerHandler.sendDebugTrace(e);
+				ServerHandler.getServer().logSevere("{SQLite} Failed to execute database statement.");
+				ServerHandler.getServer().sendDebugTrace(e);
 			}
 		}
 		return false;
 	}
 	
+   /**
+	* Checks if the table exists in the database.
+	* 
+	* @param tableName - the name of the table.
+	* @return If the table exists.
+	*/
 	public boolean tableExists(String tableName) {
 		boolean tExists = false;
 		try {
@@ -264,31 +317,43 @@ public abstract class Database {
 				}
 			}
 		} catch (SQLException e) {
-			ServerHandler.logSevere("{SQLite} Failed to check if a table exists.");
-			ServerHandler.sendDebugTrace(e);
+			ServerHandler.getServer().logSevere("{SQLite} Failed to check if a table exists.");
+			ServerHandler.getServer().sendDebugTrace(e);
 		}
 		return tExists;
 	}
 	
+   /**
+	* Checks if the specific data set exists in the database.
+	* 
+	* @param statement - the statement to be executed.
+	* @return If the data exists.
+	*/
 	public boolean dataExists(String statement) {
 		try {
 			ResultSet result = this.getSQLConnection().prepareStatement(statement).executeQuery();
 			try {
 				if (!result.isBeforeFirst()) {
-					ServerHandler.logDebug("{SQLite} Result set is empty.");
+					ServerHandler.getServer().logDebug("{SQLite} Result set is empty.");
 					return false;
 				} else {
-					ServerHandler.logDebug("{SQLite} Result set is not empty.");
+					ServerHandler.getServer().logDebug("{SQLite} Result set is not empty.");
 					return true;
 				}
-			} finally { result.close(); SQLite.getDatabase("database").closeConnection(); }
+			} finally { result.close(); SQDrivers.getDatabase("database").closeConnection(); }
 		} catch (Exception e) {
-			ServerHandler.logSevere("{SQLite} Could not read from the database.db file, some ItemJoin features have been disabled!");
-			ServerHandler.sendDebugTrace(e);
+			ServerHandler.getServer().logSevere("{SQLite} Could not read from the database.db file, some ItemJoin features have been disabled!");
+			ServerHandler.getServer().sendDebugTrace(e);
 		}
 		return false;
 	}
 	
+   /**
+	* Closes the specific PreparedStatement and ResultSet.
+	* 
+	* @param ps - the PreparedStatement being closed.
+	* @param rs - the ResultSet being closed.
+	*/
 	public void close(final PreparedStatement ps, final ResultSet rs) {
 		try {
 			if (ps != null) {
@@ -298,29 +363,37 @@ public abstract class Database {
 				rs.close();
 			}
 		} catch (SQLException e) { 
-			ServerHandler.logSevere("{SQLite} Failed to close database connection."); 
-			ServerHandler.sendDebugTrace(e);
+			ServerHandler.getServer().logSevere("{SQLite} Failed to close database connection."); 
+			ServerHandler.getServer().sendDebugTrace(e);
 		}
 	}
 	
+   /**
+	* Opens a new database connection.
+	*
+	*/
 	public void openConnection() {
 		try {
 			this.getSQLConnection();
 		} catch (Exception e) {
-			ServerHandler.logSevere("{SQLite} Failed to close database connection."); 
-			ServerHandler.sendDebugTrace(e);
+			ServerHandler.getServer().logSevere("{SQLite} Failed to close database connection."); 
+			ServerHandler.getServer().sendDebugTrace(e);
 		}
 	}
 	
+   /**
+	* Closes the active database connection.
+	* 
+	*/
 	public void closeConnection() {
 		try {
-			if (!SQLite.MySQLEnabled()) {
+			if (!this.remoteEnabled) {
 				this.connection.close();
 			}
 		} catch (SQLException | NullPointerException e) { 
 			if (e.getCause() != null) {
-				ServerHandler.logSevere("{SQLite} Failed to close database connection."); 
-				ServerHandler.sendDebugTrace(e);
+				ServerHandler.getServer().logSevere("{SQLite} Failed to close database connection."); 
+				ServerHandler.getServer().sendDebugTrace(e);
 			}
 		}
 	}

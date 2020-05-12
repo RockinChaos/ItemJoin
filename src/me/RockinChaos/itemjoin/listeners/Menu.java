@@ -29,18 +29,20 @@ import org.bukkit.scheduler.BukkitRunnable;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
-import me.RockinChaos.itemjoin.handlers.ConfigHandler;
+import me.RockinChaos.itemjoin.utils.UI;
 import me.RockinChaos.itemjoin.utils.interfaces.Interface;
 
 public class Menu implements Listener {
-  	
-//  ============================================== //
-//          Handlers for virtualInventory          //
-//  ============================================== //
+
   	private Interface expiredInventory;
 
+   /**
+    * Handles the click action for the virtualInventory.
+    * 
+    * @param event - InventoryClickEvent
+    */
 	@EventHandler
-	public void onClick(InventoryClickEvent event) {
+	private void onClick(InventoryClickEvent event) {
 		InventoryHolder holder = event.getInventory().getHolder();
 		if (holder instanceof Interface) {
 			((Interface) holder).onClick(event);
@@ -48,22 +50,32 @@ public class Menu implements Listener {
 		}
 	}
 
+   /**
+	* Handles the chat action for the virtualInventory.
+	* 
+	* @param event - AsyncPlayerChatEvent
+	*/
 	@EventHandler
-	public void onChat(AsyncPlayerChatEvent event) {
+	private void onChat(AsyncPlayerChatEvent event) {
 		if (this.expiredInventory != null && this.expiredInventory.chatPending()) {
 			this.expiredInventory.onChat(event);
 		}
 	}
 	
+   /**
+	* Handles the inventory close action for the virtualInventory.
+	* 
+	* @param event - InventoryCloseEvent
+	*/
 	@EventHandler
-	public void onClose(InventoryCloseEvent event) {
-		if (ConfigHandler.getItemCreator() != null && ConfigHandler.getItemCreator().modifyMenu((Player)event.getPlayer())) {
+	private void onClose(InventoryCloseEvent event) {
+		if (UI.getCreator() != null && UI.getCreator().modifyMenu((Player)event.getPlayer())) {
 			new BukkitRunnable() {
 				@Override
 				public void run() {
-					if (!ConfigHandler.getItemCreator().isOpen((Player)event.getPlayer())) {
-						ConfigHandler.getItemCreator().setModifyMenu(false, (Player)event.getPlayer());
-						for (ItemMap itemMap : ItemUtilities.getItems()) {
+					if (!UI.getCreator().isOpen((Player)event.getPlayer())) {
+						UI.getCreator().setModifyMenu(false, (Player)event.getPlayer());
+						for (ItemMap itemMap : ItemUtilities.getUtilities().getItems()) {
 							if (itemMap.getAnimationHandler() != null && itemMap.getAnimationHandler().get(event.getPlayer()) != null) {
 								itemMap.getAnimationHandler().get(event.getPlayer()).setMenu(false, 0);
 							}
@@ -73,6 +85,4 @@ public class Menu implements Listener {
 			}.runTaskLater(ItemJoin.getInstance(), 40L);
 		}
 	}
-//  ===============================================================================
-
 }

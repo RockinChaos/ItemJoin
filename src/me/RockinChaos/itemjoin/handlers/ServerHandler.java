@@ -17,18 +17,36 @@
  */
 package me.RockinChaos.itemjoin.handlers;
 
-import java.util.Collection;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.UUID;
+import java.util.function.Consumer;
+
+import javax.net.ssl.HttpsURLConnection;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.entity.Player;
+
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
+import com.mojang.util.UUIDTypeAdapter;
+
 import me.RockinChaos.itemjoin.ItemJoin;
 
 public class ServerHandler {
+	
+	private static ServerHandler server;
 
-	public static boolean hasSpecificUpdate(String versionString) {
+   /**
+    * Checks if the server is running the specified version.
+    * 
+    * @param versionString - The version to compare against the server version, example: '1_13'.
+    * @return If the server version is greater than or equal to the specified version.
+    */
+	public boolean hasSpecificUpdate(final String versionString) {
 		String pkgname = ItemJoin.getInstance().getServer().getClass().getPackage().getName();
 		String localeVersion = "v" + versionString + "_R0";
 	    localeVersion = localeVersion.replace("_", "").replace("R0", "").replace("R1", "").replace("R2", "").replace("R3", "").replace("R4", "").replace("R5", "").replaceAll("[a-z]", "");
@@ -39,29 +57,62 @@ public class ServerHandler {
 		return false;
 	}
 	
-	public static void logInfo(String message) {
+   /**
+    * Runs the methods Async on the main thread.
+    * 
+    * @param input - The methods to be executed Async on the main thread.
+    */
+	public void runAsyncThread(final Consumer<String> input) {
+		Bukkit.getServer().getScheduler().runTaskAsynchronously(ItemJoin.getInstance(), () -> { 
+			Bukkit.getServer().getScheduler().runTask(ItemJoin.getInstance(), () -> {
+				input.accept("MAIN");
+			}); 
+		});
+	}
+	
+   /**
+    * Sends a low priority log message as the plugin header.
+    * 
+    * @param message - The unformatted message text to be sent.
+    */
+	public void logInfo(String message) {
 		String prefix = "[ItemJoin] ";
 		message = prefix + message;
 		if (message.equalsIgnoreCase("") || message.isEmpty()) { message = ""; }
 		Bukkit.getServer().getLogger().info(message);
 	}
 	
-	public static void logWarn(String message) {
+   /**
+    * Sends a warning message as the plugin header.
+    * 
+    * @param message - The unformatted message text to be sent.
+    */
+	public void logWarn(String message) {
 		String prefix = "[ItemJoin_WARN] ";
 		message = prefix + message;
 		if (message.equalsIgnoreCase("") || message.isEmpty()) { message = ""; }
 		Bukkit.getServer().getLogger().warning(message);
 	}
 	
-	public static void logSevere(String message) {
+   /**
+    * Sends a error message as the plugin header.
+    * 
+    * @param message - The unformatted message text to be sent.
+    */
+	public void logSevere(String message) {
 		String prefix = "[ItemJoin_ERROR] ";
 		message = prefix + message;
 		if (message.equalsIgnoreCase("") || message.isEmpty()) { message = ""; }
 		Bukkit.getServer().getLogger().severe(message);
 	}
 	
-	public static void logDebug(String message) {
-		if (ConfigHandler.isDebugging()) {
+   /**
+    * Sends a debug message as a loggable warning as the plugin header.
+    * 
+    * @param message - The unformatted message text to be sent.
+    */
+	public void logDebug(String message) {
+		if (ConfigHandler.getConfig(false).debugEnabled()) {
 			String prefix = "[ItemJoin_DEBUG] ";
 			message = prefix + message;
 			if (message.equalsIgnoreCase("") || message.isEmpty()) { message = ""; }
@@ -69,11 +120,22 @@ public class ServerHandler {
 		}
 	}
 
-	public static void sendDebugTrace(Exception e) {
-		if (ConfigHandler.isDebugging()) { e.printStackTrace(); }
+   /**
+    * Sends the StackTrace of an Exception if debugging is enabled.
+    * 
+    * @param e - The exception to be sent.
+    */
+	public void sendDebugTrace(final Exception e) {
+		if (ConfigHandler.getConfig(false).debugEnabled()) { e.printStackTrace(); }
 	}
 	
-	public static void messageSender(CommandSender sender, String message) {
+   /**
+    * Sends a chat message to the specified sender.
+    * 
+    * @param sender - The entity to have the message sent.
+    * @param message - The unformatted message text to be sent.
+    */
+	public void messageSender(CommandSender sender, String message) {
 		String prefix = "&7[&eItemJoin&7] ";
 		message = prefix + message;
 		message = ChatColor.translateAlternateColorCodes('&', message).toString();
@@ -81,29 +143,38 @@ public class ServerHandler {
 		if	(sender instanceof ConsoleCommandSender) { message = ChatColor.stripColor(message); }
 		sender.sendMessage(message);
 	}
-
-	public static void purgeCraftItems(boolean sqlCrafting) {
-		Collection < ? > playersOnlineNew = null;
-		Player[] playersOnlineOld;
+	
+   /**
+    * Tries to find the UUID on Mojangs official profile servers,
+    * then apply the found players skin to the specified GameProfile.
+    * 
+    * @param profile - The GameProfile to have its skin set.
+    * @param uuid - The UUID of the player to have their skin fetched and set to the GameProfile.
+    * @return If the skin was successfully found and set to the specified GameProfile.
+    */
+	public boolean setSkin(final GameProfile profile, final UUID uuid) {
 		try {
-			if (Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).getReturnType() == Collection.class) {
-				if (Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).getReturnType() == Collection.class) {
-					playersOnlineNew = ((Collection < ? > ) Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).invoke(null, new Object[0]));
-					for (Object objPlayer: playersOnlineNew) {
-						Player player = ((Player) objPlayer);
-						if (sqlCrafting) { ItemHandler.saveCraftItems(player); }
-						ItemHandler.removeCraftItems(player);
-					}
-				}
+			HttpsURLConnection connection = (HttpsURLConnection) new URL(String.format("https://sessionserver.mojang.com/session/minecraft/profile/%s?unsigned=false", UUIDTypeAdapter.fromUUID(uuid))).openConnection();
+			if (connection.getResponseCode() == HttpsURLConnection.HTTP_OK) {
+				String reply = new BufferedReader(new InputStreamReader(connection.getInputStream())).readLine();
+				String skin = reply.split("\"value\":\"")[1].split("\"")[0];
+				String signature = reply.split("\"signature\":\"")[1].split("\"")[0];
+				profile.getProperties().put("textures", new Property("textures", skin, signature));
+				return true;
 			} else {
-				playersOnlineOld = ((Player[]) Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).invoke(null, new Object[0]));
-				for (Player player: playersOnlineOld) {
-					if (sqlCrafting) { ItemHandler.saveCraftItems(player); }
-					ItemHandler.removeCraftItems(player);
-				}
+				ServerHandler.getServer().logWarn("Connection could not be opened (Response code " + connection.getResponseCode() + ", " + connection.getResponseMessage() + ")");
+				return false;
 			}
-		} catch (Exception e) {
-			ServerHandler.sendDebugTrace(e);
-		}
+		} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); return false; }
 	}
+    
+   /**
+    * Gets the instance of the ServerHandler.
+    * 
+    * @return The ServerHandler instance.
+    */
+    public static ServerHandler getServer() { 
+        if (server == null) { server = new ServerHandler(); }
+        return server; 
+    } 
 }

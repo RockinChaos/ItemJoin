@@ -42,32 +42,35 @@ import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
-import me.RockinChaos.itemjoin.utils.Legacy;
+import me.RockinChaos.itemjoin.utils.LegacyAPI;
 import me.RockinChaos.itemjoin.utils.Reflection;
 import me.RockinChaos.itemjoin.utils.Chances;
+import me.RockinChaos.itemjoin.utils.DependAPI;
 import me.RockinChaos.itemjoin.utils.ImageMap;
 import me.RockinChaos.itemjoin.utils.Utils;
+import me.RockinChaos.itemjoin.utils.sqlite.SQLite;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.vk2gpz.tokenenchant.api.TokenEnchantAPI;
 
 public class ItemDesigner {
-
+	
+	private static ItemDesigner designer;
+	
    /**
 	* Creates a new ItemDesigner instance.
 	* 
 	*/
 	public ItemDesigner() {
-		if (ConfigHandler.isConfigurable()) {
-			ItemHandler.initializeItemID();
-			for (String internalName: ConfigHandler.getConfigurationSection().getKeys(false)) {
-				ConfigurationSection itemNode = ConfigHandler.getItemSection(internalName);
+		if (ConfigHandler.getConfig(false).itemsExist()) {
+			for (String internalName: ConfigHandler.getConfig(false).getConfigurationSection().getKeys(false)) {
+				ConfigurationSection itemNode = ConfigHandler.getConfig(false).getItemSection(internalName);
 				if (isConfigurable(internalName, itemNode)) {
 					String[] slots = itemNode.getString(".slot").replace(" ", "").split(",");
 					for (String slot: slots) {
-						if (isDefinable(internalName, slot)) {
-							ItemMap itemMap = new ItemMap(internalName, slot);
+						if (this.isDefinable(internalName, slot)) {
+							ItemMap itemMap = new ItemMap(this, internalName, slot);
 							
 							this.setMaterial(itemMap);
 							this.setSkullDatabase(itemMap);
@@ -98,133 +101,157 @@ public class ItemDesigner {
 							this.setAttributes(itemMap);
 							this.setProbability(itemMap);
 							
-							ItemUtilities.addItem(itemMap);
-					    	ConfigHandler.setListenerRestrictions(itemMap);
+							ItemUtilities.getUtilities().addItem(itemMap);
+					    	ConfigHandler.getConfig(false).registerListeners(itemMap);
 						}
 					}
 				}
 			}
-			ItemUtilities.updateItems();
+			ItemUtilities.getUtilities().updateItems();
 		}
 	}
 	
-//  =========================================================================================================================== //
-//      Determines if the specific item node has a valid Material ID defined as well as if the item node has a slot defined.    //
-//  =========================================================================================================================== //
-	private boolean isConfigurable(String internalName, ConfigurationSection itemNode) {
-		String id = ItemHandler.getMaterialPath(itemNode);
+   /**
+	* Determines if the specific item node has a valid Material ID 
+	* defined as well as if the item node has a slot defined.
+	* @return If the material is valid.
+	*/
+	private boolean isConfigurable(final String internalName, final ConfigurationSection itemNode) {
+		String id = ItemHandler.getItem().getMaterial(itemNode);
 		String dataValue = null;
 		if (id != null) {
 			if (id.contains(":")) {
 				String[] parts = id.split(":"); id = parts[0]; dataValue = parts[1];
-				if (ServerHandler.hasSpecificUpdate("1_13")) {
-					ServerHandler.logWarn("{ItemMap} The item " + internalName + " is using a Legacy Material which is no longer supported as of Minecraft 1.13.");
-					ServerHandler.logWarn("{ItemMap} This will cause issues, please see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html for a list of material names.");
+				if (ServerHandler.getServer().hasSpecificUpdate("1_13")) {
+					ServerHandler.getServer().logWarn("{ItemMap} The item " + internalName + " is using a Legacy Material which is no longer supported as of Minecraft 1.13.");
+					ServerHandler.getServer().logWarn("{ItemMap} This will cause issues, please see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html for a list of material names.");
 				}
 			}
-			if (!ServerHandler.hasSpecificUpdate("1_9") && id.equalsIgnoreCase("TIPPED_ARROW") || id.equalsIgnoreCase("440") || id.equalsIgnoreCase("0440")) {
-				ServerHandler.logWarn("{ItemMap} Your server is running MC " + Reflection.getServerVersion() + " and this version of Minecraft does not have the item TIPPED_ARROW.");
-				ServerHandler.logWarn("{ItemMap} You are receiving this notice because the item(s) exists in your items.yml and will not be set, please remove the item(s) or update your server.");
+			if (!ServerHandler.getServer().hasSpecificUpdate("1_9") && id.equalsIgnoreCase("TIPPED_ARROW") || id.equalsIgnoreCase("440") || id.equalsIgnoreCase("0440")) {
+				ServerHandler.getServer().logWarn("{ItemMap} Your server is running MC " + Reflection.getServerVersion() + " and this version of Minecraft does not have the item TIPPED_ARROW.");
+				ServerHandler.getServer().logWarn("{ItemMap} You are receiving this notice because the item(s) exists in your items.yml and will not be set, please remove the item(s) or update your server.");
 				return false;
-			} else if (!ServerHandler.hasSpecificUpdate("1_9") && id.equalsIgnoreCase("LINGERING_POTION") || id.equalsIgnoreCase("441") || id.equalsIgnoreCase("0441")) {
-				ServerHandler.logWarn("{ItemMap} Your server is running MC " + Reflection.getServerVersion() + " and this version of Minecraft does not have the item LINGERING_POTION.");
-				ServerHandler.logWarn("{ItemMap} You are receiving this notice because the item(s) exists in your items.yml and will not be set, please remove the item(s) or update your server.");
+			} else if (!ServerHandler.getServer().hasSpecificUpdate("1_9") && id.equalsIgnoreCase("LINGERING_POTION") || id.equalsIgnoreCase("441") || id.equalsIgnoreCase("0441")) {
+				ServerHandler.getServer().logWarn("{ItemMap} Your server is running MC " + Reflection.getServerVersion() + " and this version of Minecraft does not have the item LINGERING_POTION.");
+				ServerHandler.getServer().logWarn("{ItemMap} You are receiving this notice because the item(s) exists in your items.yml and will not be set, please remove the item(s) or update your server.");
 				return false;
-			} else if (ItemHandler.getMaterial(id, dataValue) == null) {
-				ServerHandler.logSevere("{ItemMap} The Item " + internalName + "'s Material 'ID' is invalid or does not exist.");
-				ServerHandler.logWarn("{ItemMap} The Item " + internalName + " will not be set!");
-				if (Utils.isInt(id)) {
-					ServerHandler.logSevere("{ItemMap} If you are using a numerical id and a numerical dataValue.");
-					ServerHandler.logSevere("{ItemMap} Include quotations or apostrophes at the beginning and the end or this error will persist, the id should look like '160:15' or \"160:15\".");
+			} else if (ItemHandler.getItem().getMaterial(id, dataValue) == null) {
+				ServerHandler.getServer().logSevere("{ItemMap} The Item " + internalName + "'s Material 'ID' is invalid or does not exist.");
+				ServerHandler.getServer().logWarn("{ItemMap} The Item " + internalName + " will not be set!");
+				if (Utils.getUtils().isInt(id)) {
+					ServerHandler.getServer().logSevere("{ItemMap} If you are using a numerical id and a numerical dataValue.");
+					ServerHandler.getServer().logSevere("{ItemMap} Include quotations or apostrophes at the beginning and the end or this error will persist, the id should look like '160:15' or \"160:15\".");
 				}
 				return false;
 			} else if (itemNode.getString(".slot") == null) {
-				ServerHandler.logSevere("{ItemMap} The Item " + internalName + "'s SLOT is invalid.");
-				ServerHandler.logWarn("{ItemMap} Please refresh your items.yml and fix the undefined slot.");
+				ServerHandler.getServer().logSevere("{ItemMap} The Item " + internalName + "'s SLOT is invalid.");
+				ServerHandler.getServer().logWarn("{ItemMap} Please refresh your items.yml and fix the undefined slot.");
 				return false;
 			}
 		} else { 
-			ServerHandler.logSevere("{ItemMap} The Item" + internalName + " does not have a Material ID defined."); 
-			ServerHandler.logWarn("{ItemMap} The Item " + internalName + " will not be set!"); 
+			ServerHandler.getServer().logSevere("{ItemMap} The Item" + internalName + " does not have a Material ID defined."); 
+			ServerHandler.getServer().logWarn("{ItemMap} The Item " + internalName + " will not be set!"); 
 			return false;
 		}
 		return true;
 	}
-//  =================================================================================================================================================================================================================== //
 
-
-//  =========================================================================================================================== //
-//    Determines if the specific item node has an actual ItemJoin definable slot, being a custom slot or a true integer slot.   //
-//  =========================================================================================================================== //
-	private boolean isDefinable(String internalName, String slot) {
-		if (!Utils.isInt(slot) && !ItemHandler.isCustomSlot(slot)) {
-			ServerHandler.logSevere("{ItemMap} The Item " + internalName + "'s slot is invalid or does not exist.");
-			ServerHandler.logWarn("{ItemMap} The Item " + internalName + " will not be set!");
+   /**
+	* Determines if the specific item node has an actual ItemJoin 
+	* definable slot, being a custom slot or a true integer slot.
+	* @return If the slot is valid.
+	*/
+	private boolean isDefinable(final String internalName, final String slot) {
+		if (!Utils.getUtils().isInt(slot) && !ItemHandler.getItem().isCustomSlot(slot)) {
+			ServerHandler.getServer().logSevere("{ItemMap} The Item " + internalName + "'s slot is invalid or does not exist.");
+			ServerHandler.getServer().logWarn("{ItemMap} The Item " + internalName + " will not be set!");
 			return false;
-		} else if (Utils.isInt(slot)) {
+		} else if (Utils.getUtils().isInt(slot)) {
 			int parseSlot = Integer.parseInt(slot);
 			if (!(parseSlot >= 0 && parseSlot <= 35)) {
-				ServerHandler.logSevere("{ItemMap} The Item " + internalName + "'s slot must be between 0 and 35.");
-				ServerHandler.logWarn("{ItemMap} The Item " + internalName + " will not be set!");
+				ServerHandler.getServer().logSevere("{ItemMap} The Item " + internalName + "'s slot must be between 0 and 35.");
+				ServerHandler.getServer().logWarn("{ItemMap} The Item " + internalName + " will not be set!");
 				return false;
 			}
-		} else if (!ServerHandler.hasSpecificUpdate("1_9") && slot.equalsIgnoreCase("Offhand")) {
-			ServerHandler.logWarn("{ItemMap} Your server is running MC " + Reflection.getServerVersion() + " and this version of Minecraft does not have OFFHAND support!");
+		} else if (!ServerHandler.getServer().hasSpecificUpdate("1_9") && slot.equalsIgnoreCase("Offhand")) {
+			ServerHandler.getServer().logWarn("{ItemMap} Your server is running MC " + Reflection.getServerVersion() + " and this version of Minecraft does not have OFFHAND support!");
 			return false;
 		}
 		return true;
 	}
-//  ============================================================================================================================================================================ //
-//  ===================================================================================================================================================================================================================== //
-
 	
-//  =============================================== //
-//  ~ Sets the Custom Material to the Custom Item ~ //
-//       Adds the custom material to the item.      //
-//  =============================================== //
-	private Material getActualMaterial(ItemMap itemMap) {
-		String material = ItemHandler.purgeDelay(itemMap.getNodeLocation().getString(".id"));
-		if (ConfigHandler.getMaterialSection(itemMap.getNodeLocation()) != null) {
+   /**
+	* Sets the Custom Material to the Custom Item.
+	*
+	*/
+	private void setMaterial(final ItemMap itemMap) {
+		Material material = getActualMaterial(itemMap);
+		itemMap.setMaterial(material);
+		itemMap.renderItemStack();
+	}
+	
+   /**
+	* Fetches the correct Bukkit material.
+	* @return The found Bukkit material.
+	*/
+	private Material getActualMaterial(final ItemMap itemMap) {
+		String material = ItemHandler.getItem().cutDelay(itemMap.getNodeLocation().getString(".id"));
+		if (ConfigHandler.getConfig(false).getMaterialSection(itemMap.getNodeLocation()) != null) {
 			List<String> materials = new ArrayList<String>();
-			for (String materialKey : ConfigHandler.getMaterialSection(itemMap.getNodeLocation()).getKeys(false)) {
+			for (String materialKey : ConfigHandler.getConfig(false).getMaterialSection(itemMap.getNodeLocation()).getKeys(false)) {
 				String materialList = itemMap.getNodeLocation().getString(".id." + materialKey);
 				if (materialList != null) {
 					materials.add(materialList);
 				}
 			}
 			itemMap.setDynamicMaterials(materials);
-			material = ItemHandler.purgeDelay(itemMap.getNodeLocation().getString(".id." + ConfigHandler.getMaterialSection(itemMap.getNodeLocation()).getKeys(false).iterator().next()));
+			material = ItemHandler.getItem().cutDelay(itemMap.getNodeLocation().getString(".id." + ConfigHandler.getConfig(false).getMaterialSection(itemMap.getNodeLocation()).getKeys(false).iterator().next()));
 			if (material.contains(":")) { String[] parts = material.split(":"); itemMap.setDataValue((short) Integer.parseInt(parts[1])); }
-			return ItemHandler.getMaterial(material, null);
+			return ItemHandler.getItem().getMaterial(material, null);
 		}
 		if (material.contains(":")) { String[] parts = material.split(":"); itemMap.setDataValue((short) Integer.parseInt(parts[1])); }
-		return ItemHandler.getMaterial(material, null);
+		return ItemHandler.getItem().getMaterial(material, null);
 	}
 	
-	private void setMaterial(ItemMap itemMap) {
-		Material material = getActualMaterial(itemMap);
-		itemMap.setMaterial(material);
-		itemMap.renderItemStack();
+   /**
+	* Sets the HeadDatabase Texture to the Custom Skull Item.
+	*
+	*/
+	private void setSkullDatabase(final ItemMap itemMap) {
+		if (DependAPI.getDepends(false).databaseEnabled() && itemMap.getNodeLocation().getString(".skull-texture") != null) {
+			if (itemMap.getMaterial().toString().equalsIgnoreCase("SKULL_ITEM") || itemMap.getMaterial().toString().equalsIgnoreCase("PLAYER_HEAD")) {
+				if (itemMap.getNodeLocation().getString(".skull-owner") != null) {  ServerHandler.getServer().logWarn("{ItemMap} You cannot define a skull owner and a skull texture at the same time, remove one from the item."); return;  }
+				String skullTexture = getActualTexture(itemMap);
+				if (skullTexture.contains("hdb-")) {
+					try {
+						itemMap.setSkullTexture(skullTexture.replace("hdb-", ""));
+						itemMap.setHeadDatabase(true);
+					} catch (NullPointerException e) {
+						ServerHandler.getServer().logSevere("{ItemMap} HeadDatabaseAPI could not find #" + skullTexture + ", this head does not exist.");
+						ServerHandler.getServer().sendDebugTrace(e);
+					}
+				}
+			}
+		}
 	}
-//====================================================================================================================================================================================================== //
-
 	
-// =============================================================== //
-//  ~ Sets the HeadDatabase Texture to the Custom Skull Item ~     //
-// Gives the item the skull texture of the exact HeadDatabase ID.  //
-// =============================================================== //
-	private String getActualTexture(ItemMap itemMap) {
-		String texture = ItemHandler.purgeDelay(itemMap.getNodeLocation().getString(".skull-texture"));
-		if (ConfigHandler.getTextureSection(itemMap.getNodeLocation()) != null) {
+   /**
+	* Fetches the correct Skull Texture.
+	* @return The found skull texture.
+	*/
+	private String getActualTexture(final ItemMap itemMap) {
+		ConfigurationSection textureSection = ConfigHandler.getConfig(false).getFile("items.yml").getConfigurationSection(itemMap.getNodeLocation().getCurrentPath() + ".skull-texture");
+		String texture = ItemHandler.getItem().cutDelay(itemMap.getNodeLocation().getString(".skull-texture"));
+		if (textureSection != null) {
 			List<String> textures = new ArrayList<String>();
-			for (String textureKey : ConfigHandler.getTextureSection(itemMap.getNodeLocation()).getKeys(false)) {
+			for (String textureKey : textureSection.getKeys(false)) {
 				String textureList = itemMap.getNodeLocation().getString(".skull-texture." + textureKey);
 				if (textureList != null) {
 					textures.add(textureList);
 				}
 			}
 			itemMap.setDynamicTextures(textures);
-			return ItemHandler.purgeDelay(itemMap.getNodeLocation().getString(".skull-texture." + ConfigHandler.getTextureSection(itemMap.getNodeLocation()).getKeys(false).iterator().next()));
+			return ItemHandler.getItem().cutDelay(itemMap.getNodeLocation().getString(".skull-texture." + textureSection.getKeys(false).iterator().next()));
 		}
 		if (texture != null && !texture.isEmpty()) {
 			if (itemMap.isDynamic() || itemMap.isAnimated()) {
@@ -234,50 +261,36 @@ public class ItemDesigner {
 		}
 		return texture;
 	}
-	
-	private void setSkullDatabase(ItemMap itemMap) {
-		if (ConfigHandler.getDepends().databaseEnabled() && itemMap.getNodeLocation().getString(".skull-texture") != null) {
-			if (itemMap.getMaterial().toString().equalsIgnoreCase("SKULL_ITEM") || itemMap.getMaterial().toString().equalsIgnoreCase("PLAYER_HEAD")) {
-				if (itemMap.getNodeLocation().getString(".skull-owner") != null) {  ServerHandler.logWarn("{ItemMap} You cannot define a skull owner and a skull texture at the same time, remove one from the item."); return;  }
-				String skullTexture = getActualTexture(itemMap);
-				if (skullTexture.contains("hdb-")) {
-					try {
-						itemMap.setSkullTexture(skullTexture.replace("hdb-", ""));
-						itemMap.setHeadDatabase(true);
-					} catch (NullPointerException e) {
-						ServerHandler.logSevere("{ItemMap} HeadDatabaseAPI could not find #" + skullTexture + ", this head does not exist.");
-						ServerHandler.sendDebugTrace(e);
-					}
-				}
-			}
-		}
-	}
-//  ================================================================================================================================================================================================================================================= //
-	
-//  ======================================================== //
-//   ~ Sets the Unbreakable Boolean to the Custom Item ~     //
-//  Prevents any item with a durability from being damaged.  //
-//  ======================================================== //
-	private void setUnbreaking(ItemMap itemMap) {
-		if (Utils.containsIgnoreCase(itemMap.getItemFlags(), "unbreakable")) {
+
+   /**
+	* Sets the Unbreakable Boolean to the Custom Item, 
+	* preventing any item with a durability from being damaged
+	* 
+	*/
+	private void setUnbreaking(final ItemMap itemMap) {
+		if (Utils.getUtils().containsIgnoreCase(itemMap.getItemFlags(), "unbreakable")) {
 			try {
 				itemMap.setUnbreakable(true);
-			} catch (Exception e) { ServerHandler.sendDebugTrace(e); } }
+			} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); } }
 	}
-//  ===================================================================================== //
 
-	private void durabilityBar(ItemMap itemMap) {
-		if (Utils.containsIgnoreCase(itemMap.getItemFlags(), "hide-durability")) {
+   /**
+	* Hides the Durability Bar of the Custom Item.
+	* 
+	*/
+	private void durabilityBar(final ItemMap itemMap) {
+		if (Utils.getUtils().containsIgnoreCase(itemMap.getItemFlags(), "hide-durability")) {
 			try {
 				itemMap.setDurabilityBar(true);
-			} catch (Exception e) { ServerHandler.sendDebugTrace(e); } }
+			} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); } }
 	}
 	
-//  =================================================== //
-//  ~ Sets the Custom Enchants to the Custom Item ~     //
-//    Adds the specified enchantments to the item.      //
-//  =================================================== //
-	private void setEnchantments(ItemMap itemMap) {
+   /**
+	* Sets the Custom Enchants to the Custom Item, 
+	* adding the specified enchantments to the item.
+	* 
+	*/
+	private void setEnchantments(final ItemMap itemMap) {
 		if (itemMap.getNodeLocation().getString(".enchantment") != null) {
 			String enchantlist = itemMap.getNodeLocation().getString(".enchantment").replace(" ", "");
 			String[] enchantments = enchantlist.split(",");
@@ -286,89 +299,90 @@ public class ItemDesigner {
 				String[] parts = enchantment.split(":");
 				String name = parts[0].toUpperCase();
 				int level = 1;
-				Enchantment enchantName = ItemHandler.getEnchantByName(name);
-				if (Utils.containsIgnoreCase(enchantment, ":")) {
+				Enchantment enchantName = ItemHandler.getItem().getEnchantByName(name);
+				if (Utils.getUtils().containsIgnoreCase(enchantment, ":")) {
 					try {
 						level = Integer.parseInt(parts[1]);
 					} catch (NumberFormatException e) {
-						ServerHandler.logSevere("{ItemMap} An error occurred in the config, " + parts[1] + " is not a number and a number was expected!");
-						ServerHandler.logWarn("{ItemMap} Enchantment: " + parts[0] + " will now be enchanted by level 1.");
-						ServerHandler.sendDebugTrace(e);
+						ServerHandler.getServer().logSevere("{ItemMap} An error occurred in the config, " + parts[1] + " is not a number and a number was expected!");
+						ServerHandler.getServer().logWarn("{ItemMap} Enchantment: " + parts[0] + " will now be enchanted by level 1.");
+						ServerHandler.getServer().sendDebugTrace(e);
 					}
 				}
 				if (enchantName != null) {
 					listEnchants.put(name, level);
-				} else if (enchantName == null && ConfigHandler.getDepends().tokenEnchantEnabled() && TokenEnchantAPI.getInstance().getEnchant(name) != null) {
+				} else if (enchantName == null && DependAPI.getDepends(false).tokenEnchantEnabled() && TokenEnchantAPI.getInstance().getEnchant(name) != null) {
 					listEnchants.put(name, level);
-				} else if (enchantName == null && !ConfigHandler.getDepends().tokenEnchantEnabled()) {
-					ServerHandler.logSevere("{ItemMap} An error occurred in the config, " + name + " is not a proper enchant name!");
-					ServerHandler.logWarn("{ItemMap} Please see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/enchantments/Enchantment.html for a list of correct enchantment names.");
+				} else if (enchantName == null && !DependAPI.getDepends(false).tokenEnchantEnabled()) {
+					ServerHandler.getServer().logSevere("{ItemMap} An error occurred in the config, " + name + " is not a proper enchant name!");
+					ServerHandler.getServer().logWarn("{ItemMap} Please see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/enchantments/Enchantment.html for a list of correct enchantment names.");
 				}
 			}
 			itemMap.setEnchantments(listEnchants);
 		}
 	}
-//  ============================================================================================================================================================================================== //
-
-//  ======================================================= //
-//     ~ Sets the Custom Map Image to the Custom Item ~     //
-//   Displays the specified map image on the items canvas.  //
-//  ======================================================= //
-	private void setMapImage(ItemMap itemMap) {
-		if (itemMap.getNodeLocation().getString(".custom-map-image") != null && Utils.containsIgnoreCase(itemMap.getMaterial().toString(), "MAP")) {
+	
+   /**
+	* Sets the Custom Map Image to the Custom Item, 
+	* draws the specified map image on the items canvas.
+	* 
+	*/
+	private void setMapImage(final ItemMap itemMap) {
+		if (itemMap.getNodeLocation().getString(".custom-map-image") != null && Utils.getUtils().containsIgnoreCase(itemMap.getMaterial().toString(), "MAP")) {
 			itemMap.setMapImage(itemMap.getNodeLocation().getString(".custom-map-image"));
 			if (itemMap.getMapImage().equalsIgnoreCase("default.jpg") || new File(ItemJoin.getInstance().getDataFolder(), itemMap.getMapImage()).exists()) {
-				if (ConfigHandler.getSQLData().imageNumberExists(itemMap.getMapImage())) {
-					int mapID = ConfigHandler.getSQLData().getImageNumber(itemMap.getMapImage());
+				if (SQLite.getLite(false).imageNumberExists(itemMap.getMapImage())) {
+					int mapID = SQLite.getLite(false).getImageNumber(itemMap.getMapImage());
 					ImageMap imgPlatform = new ImageMap(itemMap.getMapImage(), mapID);
-					MapView view = imgPlatform.FetchExistingView(mapID);
+					MapView view = imgPlatform.existingView(mapID);
 					itemMap.setMapID(mapID);
 					itemMap.setMapView(view);
-					try { view.removeRenderer(view.getRenderers().get(0)); } catch (NullPointerException e) { ServerHandler.sendDebugTrace(e); }
-					try { view.addRenderer(imgPlatform); } catch (NullPointerException e) { ServerHandler.sendDebugTrace(e); }
+					try { view.removeRenderer(view.getRenderers().get(0)); } catch (NullPointerException e) { ServerHandler.getServer().sendDebugTrace(e); }
+					try { view.addRenderer(imgPlatform); } catch (NullPointerException e) { ServerHandler.getServer().sendDebugTrace(e); }
 				} else {
-					MapView view = Legacy.createLegacyMapView();
-					try { view.removeRenderer(view.getRenderers().get(0)); } catch (NullPointerException e) { ServerHandler.sendDebugTrace(e); }
-					int mapID = Legacy.getMapID(view);
+					MapView view = LegacyAPI.getLegacy().createMapView();
+					try { view.removeRenderer(view.getRenderers().get(0)); } catch (NullPointerException e) { ServerHandler.getServer().sendDebugTrace(e); }
+					int mapID = LegacyAPI.getLegacy().getMapID(view);
 					ImageMap imgPlatform = new ImageMap(itemMap.getMapImage(), mapID);
 					itemMap.setMapID(mapID);
 					itemMap.setMapView(view);
-					try { view.addRenderer(imgPlatform); } catch (NullPointerException e) { ServerHandler.sendDebugTrace(e); }
-					ConfigHandler.getSQLData().saveMapImage(itemMap);
+					try { view.addRenderer(imgPlatform); } catch (NullPointerException e) { ServerHandler.getServer().sendDebugTrace(e); }
+					SQLite.getLite(false).saveMapImage(itemMap);
 				}
 			}
 		}
 	}
-//  =========================================================================================================================================================================================================================== //
 	
-//  =============================================== //
-//  ~ Sets the NBTData to the Custom Item ~     //
-//  This designs the item to be unique to ItemJoin. //
-//  =============================================== //
-	private void setNBTData(ItemMap itemMap) {
-		if (ConfigHandler.dataTagsEnabled() && !itemMap.isVanilla() && !itemMap.isVanillaControl() && !itemMap.isVanillaStatus()) {
+   /**
+	* Sets the NBTData to the Custom Item, 
+	* designing the item to be unique to ItemJoin.
+	* 
+	*/
+	private void setNBTData(final ItemMap itemMap) {
+		if (ItemHandler.getItem().dataTagsEnabled() && !itemMap.isVanilla() && !itemMap.isVanillaControl() && !itemMap.isVanillaStatus()) {
 			try {
 				Object tag = Reflection.getMinecraftClass("NBTTagCompound").getConstructor().newInstance();
 				tag.getClass().getMethod("setString", String.class, String.class).invoke(tag, "ItemJoin Name", itemMap.getConfigName());
 				tag.getClass().getMethod("setString", String.class, String.class).invoke(tag, "ItemJoin Slot", itemMap.getItemValue());
 				itemMap.setNewNBTData(itemMap.getConfigName() + " " + itemMap.getItemValue(), tag);
 			} catch (Exception e) {
-				ServerHandler.logSevere("{ItemMap} An error has occured when setting NBTData to an item.");
-				ServerHandler.sendDebugTrace(e);
+				ServerHandler.getServer().logSevere("{ItemMap} An error has occured when setting NBTData to an item.");
+				ServerHandler.getServer().sendDebugTrace(e);
 			}
-		} else { itemMap.setLegacySecret(ConfigHandler.encodeSecretData(ConfigHandler.getNBTData(itemMap))); }
+		} else { itemMap.setLegacySecret(Utils.getUtils().colorEncode(itemMap.getNBTFormat())); }
 	}
-//  =========================================================================================================================================================== //
-
-//  ========================================================== //
-//         ~ Sets the Book Pages to the Custom Item ~          //
-//  Adds the custom book pages to the item in JSON Formatting. //
-//  ========================================================== //
-	private void setJSONBookPages(ItemMap itemMap) {
-		if (itemMap.getMaterial().toString().equalsIgnoreCase("WRITTEN_BOOK") && itemMap.getNodeLocation().getString(".pages") != null && ConfigHandler.getPagesSection(itemMap.getNodeLocation()) != null && ServerHandler.hasSpecificUpdate("1_8")) {
+	
+   /**
+	* Sets the Book Pages to the Custom Item, 
+	* adding the custom book pages to the item in JSON Formatting.
+	* 
+	*/
+	private void setJSONBookPages(final ItemMap itemMap) {
+		ConfigurationSection pagesSection = ConfigHandler.getConfig(false).getFile("items.yml").getConfigurationSection(itemMap.getNodeLocation().getCurrentPath() + ".pages");
+		if (itemMap.getMaterial().toString().equalsIgnoreCase("WRITTEN_BOOK") && itemMap.getNodeLocation().getString(".pages") != null && pagesSection != null && ServerHandler.getServer().hasSpecificUpdate("1_8")) {
 			List < String > JSONPages = new ArrayList < String > ();
 			List < List < String > > rawPages = new ArrayList < List < String > > ();
-			for (String pageString: ConfigHandler.getPagesSection(itemMap.getNodeLocation()).getKeys(false)) {
+			for (String pageString: pagesSection.getKeys(false)) {
 				List < String > pageList = itemMap.getNodeLocation().getStringList(".pages." + pageString);
 				rawPages.add(pageList);
 				String textBuilder = "[\"\"";
@@ -424,62 +438,72 @@ public class ItemDesigner {
 		}
 	}
 	
-	private boolean containsJSONEvent(String formatPage) {
+   /**
+	* Checks if the book pages contains a JSONEvent.
+	* @return If the book page contains a JSONEvent.
+	*/
+	private boolean containsJSONEvent(final String formatPage) {
 		if (formatPage.contains(JSONEvent.TEXT.matchType) || formatPage.contains(JSONEvent.SHOW_TEXT.matchType) || formatPage.contains(JSONEvent.OPEN_URL.matchType) || formatPage.contains(JSONEvent.RUN_COMMAND.matchType)) {
 			return true;
 		}
 		return false;
 	}
 	
-	private void safteyCheckURL(ItemMap itemMap, JSONEvent type, String inputResult) {
+   /**
+	* Checks to see if the open_url is correctly defined with https or http.
+	* 
+	*/
+	private void safteyCheckURL(final ItemMap itemMap, final JSONEvent type, final String inputResult) {
 		if (type.equals(JSONEvent.OPEN_URL)) {
-			if (!Utils.containsIgnoreCase(inputResult, "https") && !Utils.containsIgnoreCase(inputResult, "http")) {
-				ServerHandler.logSevere("{ItemMap} The URL Specified for the clickable link in the book " + itemMap.getConfigName() + " is missing http or https and will not be clickable.");
-				ServerHandler.logWarn("{ItemMap} A URL designed for a clickable link should resemble this link structure: https://www.google.com/");
+			if (!Utils.getUtils().containsIgnoreCase(inputResult, "https") && !Utils.getUtils().containsIgnoreCase(inputResult, "http")) {
+				ServerHandler.getServer().logSevere("{ItemMap} The URL Specified for the clickable link in the book " + itemMap.getConfigName() + " is missing http or https and will not be clickable.");
+				ServerHandler.getServer().logWarn("{ItemMap} A URL designed for a clickable link should resemble this link structure: https://www.google.com/");
 			}
 		}
 	}
 	
-	private enum JSONEvent {
-		TEXT("nullEvent", "text", "<text:"),
-		SHOW_TEXT("hoverEvent", "show_text", "<show_text:"),
-		OPEN_URL("clickEvent", "open_url", "<open_url:"),
-		RUN_COMMAND("clickEvent", "run_command", "<run_command:"),
-		CHANGE_PAGE("clickEvent", "change_page", "<change_page:");
-		private final String event;
-		private final String action;
-		private final String matchType;
-		private JSONEvent(String Event, String Action, String MatchType) {
-			this.event = Event;
-			this.action = Action;
-			this.matchType = MatchType;
+   /**
+	* Sets the Custom Name to the Custom Item, 
+	* adding the custom name to the items display name.
+	* 
+	*/
+	private void setName(final ItemMap itemMap) {
+		String name = getActualName(itemMap);
+		if (ItemHandler.getItem().dataTagsEnabled() && ServerHandler.getServer().hasSpecificUpdate("1_8") || itemMap.isVanilla() && ServerHandler.getServer().hasSpecificUpdate("1_8")) {
+			itemMap.setCustomName(name);
+		} else {
+			itemMap.setCustomName(encodeName(itemMap, name));
 		}
 	}
-//  =========================================================================================================================================================================================================================== //
 	
-//  =============================================== //1
-//    ~ Sets the Custom Name to the Custom Item ~   //
-//  Adds the custom name to the items display name. //
-//  =============================================== //
-	private String encodeName(ItemMap itemMap, String text) {
+   /**
+	* Encodes the LegacySecret into the Custom Items name.
+	* @return The correctly encoded display name containing the plugin secret.
+	*/
+	private String encodeName(final ItemMap itemMap, final String text) {
 		return ("&f" + text + itemMap.getLegacySecret());
 	}
 	
-	private String getActualName(ItemMap itemMap) {
+   /**
+	* Gets the exact name to be set to the Custom Item.
+	* @return The correctly formatted display name.
+	*/
+	private String getActualName(final ItemMap itemMap) {
+		ConfigurationSection nameSection = ConfigHandler.getConfig(false).getFile("items.yml").getConfigurationSection(itemMap.getNodeLocation().getCurrentPath() + ".name");
 		String name = itemMap.getNodeLocation().getString(".name");
-		try { ItemHandler.purgeDelay(itemMap.getNodeLocation().getString(".name")); } catch (Exception e) { }
-		if (ConfigHandler.getNameSection(itemMap.getNodeLocation()) != null) {
+		try { ItemHandler.getItem().cutDelay(itemMap.getNodeLocation().getString(".name")); } catch (Exception e) { }
+		if (nameSection != null) {
 			List<String> names = new ArrayList<String>();
-			for (String nameKey : ConfigHandler.getNameSection(itemMap.getNodeLocation()).getKeys(false)) {
+			for (String nameKey : nameSection.getKeys(false)) {
 				String nameList = itemMap.getNodeLocation().getString(".name." + nameKey);
 				if (nameList != null) {
 					names.add(nameList);
 				}
 			}
 			itemMap.setDynamicNames(names);
-			return ItemHandler.purgeDelay(itemMap.getNodeLocation().getString(".name." + ConfigHandler.getNameSection(itemMap.getNodeLocation()).getKeys(false).iterator().next()));
+			return ItemHandler.getItem().cutDelay(itemMap.getNodeLocation().getString(".name." + nameSection.getKeys(false).iterator().next()));
 		} else if (name == null || name.isEmpty()) {
-			return ItemHandler.getName(itemMap.getTempItem());
+			return ItemHandler.getItem().getMaterialName(itemMap.getTempItem());
 		}
 		if (name != null && !name.isEmpty()) {
 			if (itemMap.isDynamic() || itemMap.isAnimated()) {
@@ -487,35 +511,38 @@ public class ItemDesigner {
 				itemMap.setDynamicNames(names);
 			}
 		}
-		return ItemHandler.purgeDelay(name);
+		return ItemHandler.getItem().cutDelay(name);
 	}
-	
-	private void setName(ItemMap itemMap) {
-		String name = getActualName(itemMap);
-		if (ConfigHandler.dataTagsEnabled() && ServerHandler.hasSpecificUpdate("1_8") || itemMap.isVanilla() && ServerHandler.hasSpecificUpdate("1_8")) {
-			itemMap.setCustomName(name);
-		} else {
-			itemMap.setCustomName(encodeName(itemMap, name));
+
+   /**
+	* Sets the Custom Lore to the Custom Item,
+	* adding the custom lore to the items lore.
+	* 
+	*/
+	private void setLore(final ItemMap itemMap) {
+		if (itemMap.getNodeLocation().getString(".lore") != null) {
+			List <String> lore = getActualLore(itemMap);
+			itemMap.setCustomLore(lore);
 		}
 	}
-//  ====================================================================================================================================================================================================== //
-
-//  ============================================= //
-//  ~ Sets the Custom Lore to the Custom Item ~   //
-//    Adds the custom lore to the items lore.     //
-//  ============================================= //
-	private List < String > getActualLore(ItemMap itemMap) {
+	
+   /**
+	* Gets the exact lore to be set to the Custom Item.
+	* @return The correctly formatted list of displayed lores.
+	*/
+	private List < String > getActualLore(final ItemMap itemMap) {
+		ConfigurationSection loreSection = ConfigHandler.getConfig(false).getFile("items.yml").getConfigurationSection(itemMap.getNodeLocation().getCurrentPath() + ".lore");
 		List <String> lore = itemMap.getNodeLocation().getStringList(".lore");
-		if (ConfigHandler.getLoreSection(itemMap.getNodeLocation()) != null) {
+		if (loreSection != null) {
 			List<List<String>> lores = new ArrayList<List<String>>();
-			for (String loreKey : ConfigHandler.getLoreSection(itemMap.getNodeLocation()).getKeys(false)) {
+			for (String loreKey : loreSection.getKeys(false)) {
 				List<String> loreList = itemMap.getNodeLocation().getStringList(".lore." + loreKey);
 				if (loreList != null) {
 					lores.add(loreList);
 				}
 			}
 			itemMap.setDynamicLores(lores);
-			return itemMap.getNodeLocation().getStringList(".lore." + ConfigHandler.getLoreSection(itemMap.getNodeLocation()).getKeys(false).iterator().next());
+			return itemMap.getNodeLocation().getStringList(".lore." + loreSection.getKeys(false).iterator().next());
 		}
 		if (lore != null && !lore.isEmpty()) {
 			if (itemMap.isDynamic() || itemMap.isAnimated()) {
@@ -525,20 +552,13 @@ public class ItemDesigner {
 		}
 		return lore;
 	}
-	
-	private void setLore(ItemMap itemMap) {
-		if (itemMap.getNodeLocation().getString(".lore") != null) {
-			List <String> lore = getActualLore(itemMap);
-			itemMap.setCustomLore(lore);
-		}
-	}
-//  ====================================================================================================================================================================================================================================================== //
-	
-//  =============================================================== //
-//          ~ Sets the Durability to the Custom Item ~              //
-//    Changes the items durability to the specified durability.     //
-//  =============================================================== //
-	private void setDurability(ItemMap itemMap) {
+
+   /**
+	* Sets the Durability to the Custom Item,
+	* changes the items durability to the specified durability.
+	* 
+	*/
+	private void setDurability(final ItemMap itemMap) {
 		if (itemMap.getNodeLocation().getString(".data") == null || itemMap.getNodeLocation().getInt(".data") == 0) {
 			if (itemMap.getNodeLocation().getString(".skull-owner") != null) {
 				itemMap.setDurability((short) 3);
@@ -549,58 +569,76 @@ public class ItemDesigner {
 		}
 	}
 	
-	private void setData(ItemMap itemMap) {
+   /**
+	* Sets the durability model data to the Custom Item.
+	* 
+	*/
+	private void setData(final ItemMap itemMap) {
 		if (itemMap.getNodeLocation().getString(".data") != null) {
 			itemMap.setData(itemMap.getNodeLocation().getInt(".data"));
 			itemMap.setAttributesInfo(true);
 			itemMap.setUnbreakable(true);
 		}
 	}
-//  ================================================================================================================== //
+
 	
-//  ========================================================================================== //
-//                         ~ Sets the Model Data for the Custom Item ~                         //
-//    Adds an NBTTag to the item containing the numerical value for the Custom Model Data.     //
-//  ========================================================================================== //
-	
-	private void setModelData(ItemMap itemMap) {
-		if (ServerHandler.hasSpecificUpdate("1_14") && itemMap.getNodeLocation().getString(".model-data") != null) {
+   /**
+	* Sets the Model Data for the Custom Item,
+	* adding an NBTTag to the item containing the numerical value for the Custom Model Data.
+	* 
+	*/
+	private void setModelData(final ItemMap itemMap) {
+		if (ServerHandler.getServer().hasSpecificUpdate("1_14") && itemMap.getNodeLocation().getString(".model-data") != null) {
 			itemMap.setModelData(itemMap.getNodeLocation().getInt(".model-data"));
 		}
 	}
 	
-//  ================================================================================================================ //
-	
-//  ================================================ //
-//   ~ Sets the Probability of the Custom Item ~     //
-//  Defines the probability percentage of the item.  //
-//  ================================================ //
-	private void setProbability(ItemMap itemMap) {
+   /**
+	* Sets the Probability of the Custom Item,
+	* defining the probability percentage of the item.
+	* 
+	*/
+	private void setProbability(final ItemMap itemMap) {
 		if (itemMap.getNodeLocation().getString(".probability") != null) {
 			String percentageString = itemMap.getNodeLocation().getString(".probability").replace("%", "").replace("-", "").replace(" ", "");
 			int percentage = Integer.parseInt(percentageString);
-			if (!Chances.probabilityItems.containsKey(itemMap)) { Chances.probabilityItems.put(itemMap, percentage); }
+			if (!Chances.getChances().getItems().containsKey(itemMap)) { Chances.getChances().putItem(itemMap, percentage); }
 			itemMap.setProbability(percentage);
 		}
 	}
-//  =================================================================================================================================================== //
+
+   /**
+	* Sets the Skull Owner of the Custom Skull Item,
+	* adding the Texture of the Skull Owner to the item.
+	* 
+	*/
+	private void setSkull(final ItemMap itemMap) {
+		if (itemMap.getNodeLocation().getString(".skull-owner") != null) {
+			if (itemMap.getMaterial().toString().equalsIgnoreCase("SKULL_ITEM") || itemMap.getMaterial().toString().equalsIgnoreCase("PLAYER_HEAD")) {
+				if (itemMap.getNodeLocation().getString(".skull-texture") != null) { ServerHandler.getServer().logWarn("{ItemMap} You cannot define a skull owner and a skull texture at the same time, remove one from the item."); return;  }
+				String owner = getActualOwner(itemMap);
+				itemMap.setSkull(owner);
+			}
+		}
+	}
 	
-//  ================================================= //
-//  ~ Sets the Skull Owner of the Custom Skull Item ~ //
-//   Adds the Texture of the Skull Owner to the Item. //
-//  ================================================= //
-	private String getActualOwner(ItemMap itemMap) {
-		String owner = ItemHandler.purgeDelay(itemMap.getNodeLocation().getString(".skull-owner"));
-		if (ConfigHandler.getOwnerSection(itemMap.getNodeLocation()) != null) {
+   /**
+	* Gets the exact skull owner value to be added to the ItemMap.
+	* @return The found skull owner.
+	*/
+	private String getActualOwner(final ItemMap itemMap) {
+		ConfigurationSection ownerSection = ConfigHandler.getConfig(false).getFile("items.yml").getConfigurationSection(itemMap.getNodeLocation().getCurrentPath() + ".skull-owner");
+		String owner = ItemHandler.getItem().cutDelay(itemMap.getNodeLocation().getString(".skull-owner"));
+		if (ownerSection != null) {
 			List<String> owners = new ArrayList<String>();
-			for (String ownerKey : ConfigHandler.getOwnerSection(itemMap.getNodeLocation()).getKeys(false)) {
+			for (String ownerKey : ownerSection.getKeys(false)) {
 				String ownerList = itemMap.getNodeLocation().getString(".skull-owner." + ownerKey);
 				if (ownerList != null) {
 					owners.add(ownerList);
 				}
 			}
 			itemMap.setDynamicOwners(owners);
-			return ItemHandler.purgeDelay(itemMap.getNodeLocation().getString(".skull-owner." + ConfigHandler.getOwnerSection(itemMap.getNodeLocation()).getKeys(false).iterator().next()));
+			return ItemHandler.getItem().cutDelay(itemMap.getNodeLocation().getString(".skull-owner." + ownerSection.getKeys(false).iterator().next()));
 		}
 		if (owner != null && !owner.isEmpty()) {
 			if (itemMap.isDynamic() || itemMap.isAnimated()) {
@@ -610,44 +648,34 @@ public class ItemDesigner {
 		}
 		return owner;
 	}
-	
-	private void setSkull(ItemMap itemMap) {
-		if (itemMap.getNodeLocation().getString(".skull-owner") != null) {
-			if (itemMap.getMaterial().toString().equalsIgnoreCase("SKULL_ITEM") || itemMap.getMaterial().toString().equalsIgnoreCase("PLAYER_HEAD")) {
-				if (itemMap.getNodeLocation().getString(".skull-texture") != null) { ServerHandler.logWarn("{ItemMap} You cannot define a skull owner and a skull texture at the same time, remove one from the item."); return;  }
-				String owner = getActualOwner(itemMap);
-				itemMap.setSkull(owner);
-			}
-		}
-	}
-//  ============================================================================================================================================================================================================================================ //
-	
-//  ============================================= //
-//  ~ Sets the Skull Texture of the Custom Item ~ //
-//   Adds the Custom Skull Texture to the item.   //
-//  ============================================= //
-    private void setSkullTexture(ItemMap itemMap) {
-    	if (ServerHandler.hasSpecificUpdate("1_8") && itemMap.getNodeLocation().getString(".skull-texture") != null) {
+
+   /**
+	* Sets the Skull Texture of the Custom Item,
+	* adding the Custom Skull Texture to the item.
+	* 
+	*/
+    private void setSkullTexture(final ItemMap itemMap) {
+    	if (ServerHandler.getServer().hasSpecificUpdate("1_8") && itemMap.getNodeLocation().getString(".skull-texture") != null) {
     		if (itemMap.getMaterial().toString().equalsIgnoreCase("SKULL_ITEM") || itemMap.getMaterial().toString().equalsIgnoreCase("PLAYER_HEAD")) {
-				if (itemMap.getNodeLocation().getString(".skull-owner") != null) { ServerHandler.logWarn("{ItemMap} You cannot define a skull owner and a skull texture at the same time, remove one from the item."); return;  }
+				if (itemMap.getNodeLocation().getString(".skull-owner") != null) { ServerHandler.getServer().logWarn("{ItemMap} You cannot define a skull owner and a skull texture at the same time, remove one from the item."); return;  }
     			String texture = getActualTexture(itemMap);
     			if (!texture.contains("hdb-")) {
     				GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
     				gameProfile.getProperties().put("textures", new Property("textures", new String(texture)));
     				try {
     					itemMap.setSkullTexture(texture);
-    				} catch (Exception e) { ServerHandler.sendDebugTrace(e); }
+    				} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
     			}
     		}
     	}
     }
-//  ============================================================================================================================================================================================================================================ //
-    
-//  ============================================== //
-//  ~ Sets the Potion Effects of the Custom Item ~ //
-//    Adds the Custom Potion Effects to the item.  //
-//  ============================================== //
-	private void setConsumableEffects(ItemMap itemMap) {
+ 
+    /**
+ 	* Sets the Consumable Potion Effects of the Custom Item,
+ 	* adding the Custom Consumable Potion Effects to the item.
+ 	* 
+ 	*/
+	private void setConsumableEffects(final ItemMap itemMap) {
 		if (itemMap.getNodeLocation().getString(".potion-effect") != null && itemMap.getMaterial().toString().equalsIgnoreCase("GOLDEN_APPLE")) {
 			String potionList = itemMap.getNodeLocation().getString(".potion-effect").replace(" ", "");
 			List < PotionEffect > potionEffectList = new ArrayList < PotionEffect > ();
@@ -658,7 +686,7 @@ public class ItemDesigner {
 					try {
 						int duritation = 1;
 						int amplifier = 1;
-						if (Utils.containsIgnoreCase(potion, ":")) {
+						if (Utils.getUtils().containsIgnoreCase(potion, ":")) {
 							if (Integer.parseInt(potionSection[1]) == 1 || Integer.parseInt(potionSection[1]) == 2 || Integer.parseInt(potionSection[1]) == 3) {
 								amplifier = Integer.parseInt(potionSection[1]) - 1;
 							} else { amplifier = Integer.parseInt(potionSection[1]); }
@@ -666,29 +694,29 @@ public class ItemDesigner {
 						duritation = Integer.parseInt(potionSection[2]) * 20;
 						potionEffectList.add(new PotionEffect(type, duritation, amplifier));
 					} catch (NumberFormatException e) {
-						ServerHandler.logSevere("{ItemMap} An error occurred in the config, " + potionSection[1] + " is not a number and a number was expected.");
-						ServerHandler.logWarn("{ItemMap} Consumable Potion: " + potionSection[0] + " will now be set to level 1.");
-						ServerHandler.sendDebugTrace(e);
+						ServerHandler.getServer().logSevere("{ItemMap} An error occurred in the config, " + potionSection[1] + " is not a number and a number was expected.");
+						ServerHandler.getServer().logWarn("{ItemMap} Consumable Potion: " + potionSection[0] + " will now be set to level 1.");
+						ServerHandler.getServer().sendDebugTrace(e);
 					}
 				} else {
-					ServerHandler.logSevere("{ItemMap} An error occurred in the config, " + potionSection[0] + " is an incorrect potion effect for the consumable.");
-					ServerHandler.logWarn("{ItemMap} Please see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/potion/PotionEffectType.html for a list of correct potion effects.");
+					ServerHandler.getServer().logSevere("{ItemMap} An error occurred in the config, " + potionSection[0] + " is an incorrect potion effect for the consumable.");
+					ServerHandler.getServer().logWarn("{ItemMap} Please see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/potion/PotionEffectType.html for a list of correct potion effects.");
 				}
 			}
 			itemMap.setCustomConsumable(true);
 			itemMap.setPotionEffect(potionEffectList);
 		}
 	}
-//  =========================================================================================================================================================================================================================== //
-    
-//  ============================================== //
-//  ~ Sets the Potion Effects of the Custom Item ~ //
-//    Adds the Custom Potion Effects to the item.  //
-//  ============================================== //
-	private void setPotionEffects(ItemMap itemMap) {
+
+    /**
+ 	* Sets the Potion Effects of the Custom Item,
+ 	* adding the Custom Potion Effects to the item.
+ 	* 
+ 	*/
+	private void setPotionEffects(final ItemMap itemMap) {
 		if (itemMap.getNodeLocation().getString(".potion-effect") != null) {
 			if (itemMap.getMaterial().toString().equalsIgnoreCase("POTION") || itemMap.getMaterial().toString().equalsIgnoreCase("SPLASH_POTION")
-				|| ServerHandler.hasSpecificUpdate("1_9") && itemMap.getMaterial().toString().equalsIgnoreCase("LINGERING_POTION")) {
+				|| ServerHandler.getServer().hasSpecificUpdate("1_9") && itemMap.getMaterial().toString().equalsIgnoreCase("LINGERING_POTION")) {
 				String potionList = itemMap.getNodeLocation().getString(".potion-effect").replace(" ", "");
 				List <PotionEffect> potionEffectList = new ArrayList<PotionEffect>();
 				for (String potion: potionList.split(",")) {
@@ -697,35 +725,35 @@ public class ItemDesigner {
 					if (PotionEffectType.getByName(potionSection[0].toUpperCase()) != null) {
 						try {
 							int duritation = 1; int amplifier = 1;
-							if (Utils.containsIgnoreCase(potion, ":")) {
+							if (Utils.getUtils().containsIgnoreCase(potion, ":")) {
 								if (Integer.parseInt(potionSection[1]) == 1 || Integer.parseInt(potionSection[1]) == 2 || Integer.parseInt(potionSection[1]) == 3) { amplifier = Integer.parseInt(potionSection[1]) - 1; } 
 								else { amplifier = Integer.parseInt(potionSection[1]); }
 							}
 							duritation = Integer.parseInt(potionSection[2]) * 20;
 							potionEffectList.add(new PotionEffect(type, duritation, amplifier));
 						} catch (NumberFormatException e) {
-							ServerHandler.logSevere("{ItemMap} An error occurred in the config, " + potionSection[1] + " is not a number and a number was expected.");
-							ServerHandler.logWarn("{ItemMap} Custom Potion: " + potionSection[0] + " will now be set to level 1.");
-							ServerHandler.sendDebugTrace(e);
+							ServerHandler.getServer().logSevere("{ItemMap} An error occurred in the config, " + potionSection[1] + " is not a number and a number was expected.");
+							ServerHandler.getServer().logWarn("{ItemMap} Custom Potion: " + potionSection[0] + " will now be set to level 1.");
+							ServerHandler.getServer().sendDebugTrace(e);
 						}
 					} else {
-						ServerHandler.logSevere("{ItemMap} An error occurred in the config, " + potionSection[0] + " is an incorrect potion effect for the custom potion.");
-						ServerHandler.logWarn("{ItemMap} Please see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/potion/PotionEffectType.html for a list of correct potion effects.");
+						ServerHandler.getServer().logSevere("{ItemMap} An error occurred in the config, " + potionSection[0] + " is an incorrect potion effect for the custom potion.");
+						ServerHandler.getServer().logWarn("{ItemMap} Please see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/potion/PotionEffectType.html for a list of correct potion effects.");
 					}
 				}
 				itemMap.setPotionEffect(potionEffectList);
 			}
 		}
 	}
-//  =========================================================================================================================================================================================================================== //
-    
-//  ==================================================== //
-//  ~ Sets the Tipped Arrow Effects of the Custom Item ~ //
-//    Adds the Custom Tipped Arrow Effects to the item.  //
-//  ==================================================== //
-	private void setTippedArrows(ItemMap itemMap) {
+ 
+    /**
+ 	* Sets the Tipped Arrow Effects of the Custom Item,
+ 	* adding the Custom Tipped Arrow Effects to the item.
+ 	* 
+ 	*/
+	private void setTippedArrows(final ItemMap itemMap) {
 		if (itemMap.getNodeLocation().getString(".potion-effect") != null) {
-			if (ServerHandler.hasSpecificUpdate("1_9") && !ItemJoin.getInstance().getServer().getVersion().contains("(MC: 1.9)") && itemMap.getMaterial().toString().equalsIgnoreCase("TIPPED_ARROW")) {
+			if (ServerHandler.getServer().hasSpecificUpdate("1_9") && !ItemJoin.getInstance().getServer().getVersion().contains("(MC: 1.9)") && itemMap.getMaterial().toString().equalsIgnoreCase("TIPPED_ARROW")) {
 				String effectList = itemMap.getNodeLocation().getString(".potion-effect").replace(" ", "");
 				List <PotionEffect> potionEffectList = new ArrayList<PotionEffect>();
 				for (String effect: effectList.split(",")) {
@@ -734,34 +762,34 @@ public class ItemDesigner {
 					if (PotionEffectType.getByName(tippedSection[0].toUpperCase()) != null) {
 						try {
 							int level = 1; int duration;
-							if (Utils.containsIgnoreCase(effect, ":")) {
+							if (Utils.getUtils().containsIgnoreCase(effect, ":")) {
 								if (Integer.parseInt(tippedSection[1]) == 1 || Integer.parseInt(tippedSection[1]) == 2 || Integer.parseInt(tippedSection[1]) == 3) { level = Integer.parseInt(tippedSection[1]) - 1; } 
 								else { level = Integer.parseInt(tippedSection[1]); }
 							}
 							duration = Integer.parseInt(tippedSection[2]);
 							potionEffectList.add(new PotionEffect(type, duration * 160, level));
 						} catch (NumberFormatException e) {
-							ServerHandler.logSevere("{ItemMap} An error occurred in the config, " + tippedSection[1] + " is not a number and a number was expected.");
-							ServerHandler.logWarn("{ItemMap} Tipped Effect: " + tippedSection[0] + " will now be set to level 1.");
-							ServerHandler.sendDebugTrace(e);
+							ServerHandler.getServer().logSevere("{ItemMap} An error occurred in the config, " + tippedSection[1] + " is not a number and a number was expected.");
+							ServerHandler.getServer().logWarn("{ItemMap} Tipped Effect: " + tippedSection[0] + " will now be set to level 1.");
+							ServerHandler.getServer().sendDebugTrace(e);
 						}
 					} else {
-						ServerHandler.logSevere("{ItemMap} An error occurred in the config, " + tippedSection[0] + " is an incorrect potion effect for the tipped arrow.");
-						ServerHandler.logWarn("{ItemMap} Please see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/potion/PotionEffectType.html for a list of correct potion effects.");
+						ServerHandler.getServer().logSevere("{ItemMap} An error occurred in the config, " + tippedSection[0] + " is an incorrect potion effect for the tipped arrow.");
+						ServerHandler.getServer().logWarn("{ItemMap} Please see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/potion/PotionEffectType.html for a list of correct potion effects.");
 					}
 				}
 				itemMap.setPotionEffect(potionEffectList);
 			}
 		}
 	}
-//  =========================================================================================================================================================================================================================== //
-    
-//  =============================================== //
-//  ~ Sets the Banner Patterns of the Custom Item ~ //
-//    Adds the Custom Banner Patterns to the item.  //
-//  =============================================== //
-	private void setBanners(ItemMap itemMap) {
-		if (itemMap.getNodeLocation().getString(".banner-meta") != null && ServerHandler.hasSpecificUpdate("1_8") && Utils.containsIgnoreCase(itemMap.getMaterial().toString(), "BANNER")) {
+
+    /**
+ 	* Sets the Banner Patterns of the Custom Item,
+ 	* adding the Custom Banner Patterns to the item.
+ 	* 
+ 	*/
+	private void setBanners(final ItemMap itemMap) {
+		if (itemMap.getNodeLocation().getString(".banner-meta") != null && ServerHandler.getServer().hasSpecificUpdate("1_8") && Utils.getUtils().containsIgnoreCase(itemMap.getMaterial().toString(), "BANNER")) {
 			String bannerList = itemMap.getNodeLocation().getString(".banner-meta").replace(" ", "");
 			List <Pattern> patterns = new ArrayList <Pattern> ();
 			for (String banner: bannerList.split(",")) {
@@ -771,23 +799,23 @@ public class ItemDesigner {
 				if (Color != null && Pattern != null) {
 					patterns.add(new Pattern(Color, Pattern));
 				} else if (Color == null) {
-					ServerHandler.logSevere("{ItemMap} An error occurred in the config, " + bannerSection[0] + " is an incorrect dye color.");
-					ServerHandler.logWarn("{ItemMap} Please see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/DyeColor.html for a list of correct dye colors.");
+					ServerHandler.getServer().logSevere("{ItemMap} An error occurred in the config, " + bannerSection[0] + " is an incorrect dye color.");
+					ServerHandler.getServer().logWarn("{ItemMap} Please see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/DyeColor.html for a list of correct dye colors.");
 				} else if (Pattern == null) {
-					ServerHandler.logSevere("{ItemMap} An error occurred in the config, " + bannerSection[1] + " is an incorrect pattern type.");
-					ServerHandler.logWarn("{ItemMap} Please see: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/block/banner/PatternType.html for a list of correct pattern types.");
+					ServerHandler.getServer().logSevere("{ItemMap} An error occurred in the config, " + bannerSection[1] + " is an incorrect pattern type.");
+					ServerHandler.getServer().logWarn("{ItemMap} Please see: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/block/banner/PatternType.html for a list of correct pattern types.");
 				}
 			}
 			itemMap.setBannerPatterns(patterns);
 		}
 	}
-//  ===================================================================================================================================================================================================== //
-    
-//  ================================================ //
-//  ~ Sets the Firework Effects of the Custom Item ~ //
-//    Adds the Custom Firework Effects to the item.  //
-//  ================================================ //
-	private void setFireworks(ItemMap itemMap) {
+
+    /**
+ 	* Sets the Firework Effects of the Custom Item,
+ 	* adding the Custom Firework Effects to the item.
+ 	* 
+ 	*/
+	private void setFireworks(final ItemMap itemMap) {
 		if (itemMap.getNodeLocation().getString(".firework") != null) {
 			if (itemMap.getMaterial().toString().equalsIgnoreCase("FIREWORK") || itemMap.getMaterial().toString().equalsIgnoreCase("FIREWORK_ROCKET")) {
 				if (itemMap.getNodeLocation().getString(".firework.type") != null) {
@@ -801,8 +829,8 @@ public class ItemDesigner {
 						for (String color: colorlist.split(",")) {
 							try { colors.add(DyeColor.valueOf(color.toUpperCase()).getFireworkColor()); saveColors.add(DyeColor.valueOf(color.toUpperCase())); } 
 							catch (Exception e) {
-								ServerHandler.logSevere("{ItemMap} The item " + itemMap.getConfigName() + " has the incorrect dye color " + color.toUpperCase() + " and does not exist.");
-								ServerHandler.logWarn("{ItemMap} Please see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/DyeColor.html for a list of correct dye color names.");
+								ServerHandler.getServer().logSevere("{ItemMap} The item " + itemMap.getConfigName() + " has the incorrect dye color " + color.toUpperCase() + " and does not exist.");
+								ServerHandler.getServer().logWarn("{ItemMap} Please see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/DyeColor.html for a list of correct dye color names.");
 							}
 						}
 					} else if (itemMap.getNodeLocation().getString(".firework.colors") == null) {
@@ -817,27 +845,27 @@ public class ItemDesigner {
 			}
 		}
 	}
-//  ======================================================================================================================================================================================= //
-    
-//  ===================================================== //
-//  ~ Sets the Firework Charge Color of the Custom Item ~ //
-//    Adds the Custom Firework Charge Color to the item.  //
-//  ===================================================== //
-	private void setFireChargeColor(ItemMap itemMap) {
+
+    /**
+ 	* Sets the Firework Charge Color of the Custom Item,
+ 	* adding the Custom Firework Charge Color to the item.
+ 	* 
+ 	*/
+	private void setFireChargeColor(final ItemMap itemMap) {
 		if (itemMap.getNodeLocation().getString(".charge-color") != null) {
-			if (Utils.containsIgnoreCase(itemMap.getMaterial().toString(), "CHARGE") || Utils.containsIgnoreCase(itemMap.getMaterial().toString(), "STAR")) {
+			if (Utils.getUtils().containsIgnoreCase(itemMap.getMaterial().toString(), "CHARGE") || Utils.getUtils().containsIgnoreCase(itemMap.getMaterial().toString(), "STAR")) {
 				String color = itemMap.getNodeLocation().getString(".charge-color").toUpperCase();
 				itemMap.setChargeColor(DyeColor.valueOf(color));
 			}
 		}
 	}
-//  ======================================================================================================================================================================== //
-    
-//  ========================================= //
-//  ~ Sets the Dye Color of the Custom Item ~ //
-//  Changes the Custom Dye Color of the item. //
-//  ========================================= //
-	private void setDye(ItemMap itemMap) {
+
+    /**
+ 	* Sets the Dye Color of the Custom Item,
+ 	* changing the Custom Dye Color of the item.
+ 	* 
+ 	*/
+	private void setDye(final ItemMap itemMap) {
 		if (itemMap.getNodeLocation().getString(".leather-color") != null) {
 			if (itemMap.getMaterial().toString().equalsIgnoreCase("LEATHER_HELMET") || itemMap.getMaterial().toString().equalsIgnoreCase("LEATHER_CHESTPLATE")
 				|| itemMap.getMaterial().toString().equalsIgnoreCase("LEATHER_LEGGINGS") || itemMap.getMaterial().toString().equalsIgnoreCase("LEATHER_BOOTS")) {
@@ -857,19 +885,19 @@ public class ItemDesigner {
 						if (hexValue) { itemMap.setLeatherHex(leatherColor); }
 					} 
 				} catch (Exception ex) { 
-					ServerHandler.logSevere("{ItemMap} The leather-color: " + leatherColor + " is not a valid color for the item " + itemMap.getConfigName() + "."); 
-					ServerHandler.logWarn("{ItemMap} Use hexcolor or see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/DyeColor.html for valid bukkit colors."); 
+					ServerHandler.getServer().logSevere("{ItemMap} The leather-color: " + leatherColor + " is not a valid color for the item " + itemMap.getConfigName() + "."); 
+					ServerHandler.getServer().logWarn("{ItemMap} Use hexcolor or see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/DyeColor.html for valid bukkit colors."); 
 				}
 			}
 		}
 	}
-//  =========================================================================================================================== //
-    
-//  =========================================== //
-//  ~ Sets the Author of the Custom Book Item ~ //
-//      Defines the author of the book item.    //
-//  =========================================== //
-	private void setBookAuthor(ItemMap itemMap) {
+
+    /**
+ 	* Sets the Author of the Custom Book Item,
+ 	* defining the author of the book item.
+ 	* 
+ 	*/
+	private void setBookAuthor(final ItemMap itemMap) {
 		if (itemMap.getMaterial().toString().equalsIgnoreCase("WRITTEN_BOOK")) {
 			if (itemMap.getNodeLocation().getString(".author") != null) {
 				itemMap.setAuthor(itemMap.getNodeLocation().getString(".author"));
@@ -878,13 +906,13 @@ public class ItemDesigner {
 			}
 		}
 	}
-//  ================================================================================= //
 	
-//  =========================================== //
-//   ~ Sets the Title of the Custom Book Item ~ //
-//   Defines the custom title of the book item. //
-//  =========================================== //
-	private void setBookTitle(ItemMap itemMap) {
+    /**
+ 	* Sets the Title of the Custom Book Item,
+ 	* defining the custom title of the book item.
+ 	* 
+ 	*/
+	private void setBookTitle(final ItemMap itemMap) {
 		if (itemMap.getMaterial().toString().equalsIgnoreCase("WRITTEN_BOOK")) {
 			if (itemMap.getNodeLocation().getString(".title") != null) {
 				itemMap.setTitle(itemMap.getNodeLocation().getString(".title"));
@@ -893,14 +921,14 @@ public class ItemDesigner {
 			}
 		}
 	}
-//  ============================================================================== //
-	
-//  =============================================== //
-//  ~ Sets the Generation of the Custom Book Item ~ //
-//  Defines the custom generation of the book item. //
-//  =============================================== //
-	private void setBookGeneration(ItemMap itemMap) {
-		if (ServerHandler.hasSpecificUpdate("1_10") && itemMap.getMaterial().toString().equalsIgnoreCase("WRITTEN_BOOK")) {
+
+    /**
+ 	* Sets the Generation of the Custom Book Item,
+ 	* defining the custom generation of the book item.
+ 	* 
+ 	*/
+	private void setBookGeneration(final ItemMap itemMap) {
+		if (ServerHandler.getServer().hasSpecificUpdate("1_10") && itemMap.getMaterial().toString().equalsIgnoreCase("WRITTEN_BOOK")) {
 			if (itemMap.getNodeLocation().getString(".generation") != null) {
 				itemMap.setGeneration(org.bukkit.inventory.meta.BookMeta.Generation.valueOf(itemMap.getNodeLocation().getString(".generation")));
 			} else {
@@ -908,18 +936,19 @@ public class ItemDesigner {
 			}
 		}
 	}
-//  ========================================================================================================================== //
-	
-//  =================================================================== //
-//        ~ Sets the Legacy Book Pages of the Custom Book Item ~        //
-//  Adds the custom book pages to the item without any JSON Formatting. //
-//  =================================================================== //
-	private void setLegacyBookPages(ItemMap itemMap) {
-		if (!ServerHandler.hasSpecificUpdate("1_8") && itemMap.getMaterial().toString().equalsIgnoreCase("WRITTEN_BOOK") 
-			&& itemMap.getNodeLocation().getString(".pages") != null && ConfigHandler.getPagesSection(itemMap.getNodeLocation()) != null) {
+
+    /**
+ 	* Sets the Legacy Book Pages of the Custom Book Item,
+ 	* adding the custom book pages to the item without any JSON Formatting.
+ 	* 
+ 	*/
+	private void setLegacyBookPages(final ItemMap itemMap) {
+		ConfigurationSection pagesSection = ConfigHandler.getConfig(false).getFile("items.yml").getConfigurationSection(itemMap.getNodeLocation().getCurrentPath() + ".pages");
+		if (!ServerHandler.getServer().hasSpecificUpdate("1_8") && itemMap.getMaterial().toString().equalsIgnoreCase("WRITTEN_BOOK") 
+			&& itemMap.getNodeLocation().getString(".pages") != null && pagesSection != null) {
 			List < String > formattedPages = new ArrayList < String > ();
 			List<List <String> > rawPages = new ArrayList<List <String> >();
-			for (String pageString: ConfigHandler.getPagesSection(itemMap.getNodeLocation()).getKeys(false)) {
+			for (String pageString: pagesSection.getKeys(false)) {
 				List < String > pageList = itemMap.getNodeLocation().getStringList(".pages." + pageString);
 				rawPages.add(pageList);
 				String saveList = "";
@@ -942,16 +971,62 @@ public class ItemDesigner {
 			itemMap.setListPages(rawPages);
 		}
 	}
-//  =========================================================================================================================================================================================================================================================================================================================================================== //
-	
-//  =============================================== //
-//  ~ Sets the Attributes of the Custom Book Item ~ //
-//     Shows or Hides the Attributes of the item.   //
-//  =============================================== //
-	private void setAttributes(ItemMap itemMap) {
-		if (ServerHandler.hasSpecificUpdate("1_8") && Utils.containsIgnoreCase(itemMap.getItemFlags(), "hide-attributes")) {
+
+    /**
+ 	* Sets the Attributes of the Custom Book Item,
+ 	* shows or hides the Attributes of the item.
+ 	* 
+ 	*/
+	private void setAttributes(final ItemMap itemMap) {
+		if (ServerHandler.getServer().hasSpecificUpdate("1_8") && Utils.getUtils().containsIgnoreCase(itemMap.getItemFlags(), "hide-attributes")) {
 			itemMap.setAttributesInfo(true);
 		}
 	}
-//  ===================================================================================================================================== //
+	
+   /**
+    * Calculates the exact numer of arbitrary slots,
+    * assigning numbers to each slot to uniquely identify each item.
+    * 
+    * @param slot - The numerical or custom slot value.
+    * @return The exact slot ID to be set to the item.
+    */
+	private int ArbitraryID = 0;
+	public String getItemID(String slot) {
+		if (slot.equalsIgnoreCase("Arbitrary")) {
+			this.ArbitraryID += 1;
+			slot += this.ArbitraryID;
+		}
+		return slot;
+	}
+	
+   /**
+	* Defines the JSONEvents for their action, event, and matchType.
+	* 
+	*/
+	private enum JSONEvent {
+		TEXT("nullEvent", "text", "<text:"),
+		SHOW_TEXT("hoverEvent", "show_text", "<show_text:"),
+		OPEN_URL("clickEvent", "open_url", "<open_url:"),
+		RUN_COMMAND("clickEvent", "run_command", "<run_command:"),
+		CHANGE_PAGE("clickEvent", "change_page", "<change_page:");
+		private final String event;
+		private final String action;
+		private final String matchType;
+		private JSONEvent(String Event, String Action, String MatchType) {
+			this.event = Event;
+			this.action = Action;
+			this.matchType = MatchType;
+		}
+	}
+	
+   /**
+    * Gets the instance of the ItemDesigner.
+    * 
+    * @param regen - If a new instance is expected.
+    * @return The ItemDesigner instance.
+    */
+    public static ItemDesigner getDesigner(final boolean regen) { 
+        if (designer == null || regen == true) { designer = new ItemDesigner(); }
+        return designer; 
+    } 
 }

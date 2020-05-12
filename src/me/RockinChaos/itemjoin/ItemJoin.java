@@ -17,10 +17,17 @@
  */
 package me.RockinChaos.itemjoin;
 
+import java.io.File;
+
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
+
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
+import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
+import me.RockinChaos.itemjoin.handlers.UpdateHandler;
+import me.RockinChaos.itemjoin.utils.protocol.ProtocolManager;
+import me.RockinChaos.itemjoin.utils.sqlite.SQLite;
 
 public class ItemJoin extends JavaPlugin {
 	
@@ -31,7 +38,7 @@ public class ItemJoin extends JavaPlugin {
     */
     @Override
     public void onLoad() {
-      instance = this;
+    	instance = this;
     }
     
    /**
@@ -39,9 +46,10 @@ public class ItemJoin extends JavaPlugin {
     */
   	@Override
 	public void onEnable() {
-  		ConfigHandler.generateData(getFile()); // possibly call on load?
-        ConfigHandler.registerEvents();
-        ServerHandler.logInfo("has been Enabled.");
+        ConfigHandler.getConfig(true);
+        ConfigHandler.getConfig(false).registerEvents();
+        UpdateHandler.getUpdater(true);
+        ServerHandler.getServer().logInfo("has been Enabled.");
   	}
   	
    /**
@@ -49,11 +57,20 @@ public class ItemJoin extends JavaPlugin {
     */
   	@Override
 	public void onDisable() {
-  		ServerHandler.purgeCraftItems(true);
+  		ItemHandler.getItem().purgeCraftItems(true);
   		Bukkit.getScheduler().cancelTasks(this);
-  		ConfigHandler.getProtocolManager().closeProtocol();
-  		ConfigHandler.getSQLData().executeLaterStatements();
-  		ServerHandler.logInfo("has been Disabled.");
+  		ProtocolManager.getManager().closeProtocol();
+  		SQLite.getLite(false).executeLaterStatements();
+  		ServerHandler.getServer().logInfo("has been Disabled.");
+  	}
+  	
+   /**
+    * Gets the Plugin File.
+    * 
+    * @return The Plugin File.
+    */
+  	public File getPlugin() {
+  		return this.getFile();
   	}
 
    /**

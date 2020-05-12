@@ -25,13 +25,25 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.inventory.Inventory;
 
 public class Page {
+	
 	private List < Button > buttons = new ArrayList < > ();
 	private int maxSize;
 	
-	Page(int maxSize) {
+   /**
+    * Creates a new page instance.
+    * 
+    * @param maxSize - The size of the inventory page.
+    */
+	public Page(int maxSize) {
 		this.maxSize = maxSize;
 	}
 	
+   /**
+    * Called on player inventory click.
+    * Handles the click event for the inventory page.
+    * 
+    * @param event - InventoryClickEvent
+    */
 	public void handleClick(InventoryClickEvent event) {
 		if (event.getRawSlot() > event.getInventory().getSize()) {
 			return;
@@ -43,11 +55,24 @@ public class Page {
 		button.onClick(event);
 	}
 	
+   /**
+    * Called on player chat.
+    * Handles the chat event for the inventory page.
+    * 
+    * @param event - AsyncPlayerChatEvent
+    * @param slot - The slot that relates to the button that was clicked for the page.
+    */
 	public void handleChat(AsyncPlayerChatEvent event, int slot) {
 		Button button = this.buttons.get(slot);
 		button.onChat(event);
 	}
 	
+   /**
+    * Adds a new button to the page.
+    * 
+    * @param button - The button to be added.
+    * @return The button was successfully added.
+    */
 	public boolean addButton(Button button) {
 		if (!this.hasSpace()) {
 			return false;
@@ -56,10 +81,21 @@ public class Page {
 		return true;
 	}
 	
+   /**
+    * Removes the button from the page.
+    * 
+    * @param button - The button to be removed.
+    * @return The button was successfully removed.
+    */
 	public boolean removeButton(Button button) {
 		return this.buttons.remove(button);
 	}
 	
+   /**
+    * Renders the page to the specified inventory.
+    * 
+    * @param inventory - The inventory to have the page rendered.
+    */
 	public void render(Inventory inventory) {
 		for (int i = 0; i < this.buttons.size(); i++) {
 			Button button = this.buttons.get(i);
@@ -67,14 +103,30 @@ public class Page {
 		}
 	}
 	
+   /**
+    * Checks if the page has any empty slots.
+    * 
+    * @return If the page has space to add another button.
+    */
 	private boolean hasSpace() {
 		return this.buttons.size() < (this.maxSize * 9);
 	}
 	
+   /**
+    * Checks if there are any buttons defined for the page.
+    * 
+    * @return There are no buttons defined for the page.
+    */
 	public boolean isEmpty() {
 		return this.buttons.isEmpty();
 	}
 	
+   /**
+    * Executes the chat event method for the specified slots button.
+    * 
+    * @param slot - The slot of the clicked button.
+    * @return The chat event was successfully passed through to the button.
+    */
 	public boolean chatEvent(int slot) {
 		if (slot <= this.buttons.size()) {
 			return this.buttons.get(slot).chatEvent();

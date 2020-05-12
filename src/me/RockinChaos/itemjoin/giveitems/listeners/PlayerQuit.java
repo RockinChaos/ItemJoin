@@ -35,8 +35,8 @@ public class PlayerQuit implements Listener {
 	@EventHandler
 	private void Quit(PlayerQuitEvent event) {
 		Player player = event.getPlayer();
-		ItemHandler.saveCraftItems(player);
-		ItemHandler.removeCraftItems(player);
-		ItemUtilities.closeAnimations(player);
+		ItemHandler.getItem().saveCraftItems(player);
+		ItemHandler.getItem().removeCraftItems(player);
+		ItemUtilities.getUtilities().closeAnimations(player);
 	}
 }

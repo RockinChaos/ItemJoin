@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package me.RockinChaos.itemjoin.listeners;
+package me.RockinChaos.itemjoin.listeners.legacy;
 
 import java.util.Set;
 
@@ -29,7 +29,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryType.SlotType;
 import org.bukkit.event.player.PlayerAnimationEvent;
-import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
@@ -41,12 +40,18 @@ import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.utils.Utils;
 
-public class Interact implements Listener {
+/**
+* Handles the Interaction events for custom items.
+* 
+* @deprecated This is a LEGACY listener, only use on Minecraft versions below 1.8.
+*/
+public class Legacy_Interact implements Listener {
 	
 	/**
 	 * Cancels any event that is triggered when interacting with the custom item.
 	 * 
 	 * @param event - PlayerInteractEvent
+	 * @deprecated This is a LEGACY event, only use on Minecraft versions below 1.8.
 	 */
 	 @EventHandler(priority = EventPriority.LOWEST)
 	 private void onInteractCancel(PlayerInteractEvent event) {
@@ -64,6 +69,7 @@ public class Interact implements Listener {
 	 * Sets the custom item on cooldown upon interaction.
 	 * 
 	 * @param event - PlayerInteractEvent
+	 * @deprecated This is a LEGACY event, only use on Minecraft versions below 1.8.
 	 */
 	 @EventHandler
 	 private void onInteractCooldown(PlayerInteractEvent event) {
@@ -85,6 +91,7 @@ public class Interact implements Listener {
 	* Runs the inventory commands for the custom item upon clicking it.
 	* 
 	* @param event - InventoryClickEvent
+	* @deprecated This is a LEGACY event, only use on Minecraft versions below 1.8.
 	*/
 	@EventHandler
 	private void onInventoryCommands(InventoryClickEvent event) {
@@ -100,6 +107,7 @@ public class Interact implements Listener {
 	* Runs the on_hold commands for the custom item upon holding it.
 	* 
 	* @param event - PlayerItemHeldEvent
+	* @deprecated This is a LEGACY event, only use on Minecraft versions below 1.8.
 	*/
 	@EventHandler
 	private void onHoldCommand(PlayerItemHeldEvent event) {
@@ -113,6 +121,7 @@ public class Interact implements Listener {
 	* Runs the on_equip and un_equip commands for the custom item upon clicking and moving it to the armor slots.
 	* 
 	* @param event - InventoryClickEvent
+	* @deprecated This is a LEGACY event, only use on Minecraft versions below 1.8.
 	*/
 	@EventHandler
 	private void onEquipClickCommand(InventoryClickEvent event) {
@@ -132,6 +141,7 @@ public class Interact implements Listener {
 	* Runs the on_equip and un_equip commands for the custom item upon clicking and dragging it to the armor slots.
 	* 
 	* @param event - InventoryDragEvent
+	* @deprecated This is a LEGACY event, only use on Minecraft versions below 1.8.
 	*/
 	@EventHandler
 	private void onEquipDragCommand(InventoryDragEvent event) {
@@ -147,6 +157,7 @@ public class Interact implements Listener {
 	* Runs the on_equip and un_equip commands for the custom item upon right clicking it from their hand to the armor slots.
 	* 
 	* @param event - PlayerInteractEvent
+	* @deprecated This is a LEGACY event, only use on Minecraft versions below 1.8.
 	*/
 	@EventHandler
 	private void onEquipInteractCommand(PlayerInteractEvent event) {
@@ -163,6 +174,7 @@ public class Interact implements Listener {
 	* Runs the commands upon right or left clicking the custom item on an entity.
 	* 
 	* @param event - PlayerInteractEntityEvent
+	* @deprecated This is a LEGACY event, only use on Minecraft versions below 1.8.
 	*/
 	@EventHandler
 	private void onEntityCommands(PlayerInteractEntityEvent event) {
@@ -180,29 +192,10 @@ public class Interact implements Listener {
 	}
 	
    /**
-	* Runs the commands upon right or left clicking the custom item towards an entity.
-	* 
-	* @param event - PlayerInteractAtEntityEvent
-	*/
-	@EventHandler
-	private void onTargetEntityCommands(PlayerInteractAtEntityEvent event) {
-		if (event.getRightClicked().toString().equalsIgnoreCase("CraftArmorStand")) {
-			ItemStack item;
-			if (ServerHandler.getServer().hasSpecificUpdate("1_9")) { item = PlayerHandler.getPlayer().getPerfectHandItem(event.getPlayer(), event.getHand().toString()); } 
-			else { item = PlayerHandler.getPlayer().getPerfectHandItem(event.getPlayer(), ""); }
-			Player player = event.getPlayer();
-			String action = Action.RIGHT_CLICK_BLOCK.name();
-			ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(PlayerHandler.getPlayer().getHandItem(player), null, player.getWorld());
-			if (itemMap != null && itemMap.isSimilar(item)) {
-				if (this.setupCommands(player, item, action, String.valueOf(player.getInventory().getHeldItemSlot()))) { event.setCancelled(true); }
-			}
-		}
-	}
-
-   /**
 	* Runs the commands upon physically interacting with the custom item.
 	* 
 	* @param event - PlayerInteractEvent
+	* @deprecated This is a LEGACY event, only use on Minecraft versions below 1.8.
 	*/
 	@EventHandler
 	private void onInteractCommands(PlayerInteractEvent event) {
@@ -222,6 +215,7 @@ public class Interact implements Listener {
 	* Runs the commands upon left clicking with the custom item in adventure mode.
 	* 
 	* @param event - PlayerAnimationEvent
+	* @deprecated This is a LEGACY event, only use on Minecraft versions below 1.8.
 	*/
 	@EventHandler
 	private void onSwingHandCommands(PlayerAnimationEvent event) {
@@ -240,6 +234,7 @@ public class Interact implements Listener {
 	* @param action - the action that is being performed.
 	* @param slot - the slot the item originally resided in.
 	* @param slotType - the SlotType the item originated in.
+	* @deprecated This is a LEGACY event, only use on Minecraft versions below 1.8.
 	*/
 	private boolean equipSetup(Player player, ItemStack item, String action, String slot, SlotType slotType) {
 		try {
@@ -259,6 +254,7 @@ public class Interact implements Listener {
 	* @param item - the item the player is trying to use to execute a command.
 	* @param action - the action that is being performed.
 	* @param slot - the slot the item originally resided in.
+	* @deprecated This is a LEGACY event, only use on Minecraft versions below 1.8.
 	*/
 	private boolean setupCommands(Player player, ItemStack item, String action, String slot) {
 		ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item, null, player.getWorld());

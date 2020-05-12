@@ -34,38 +34,44 @@ import java.util.Collection;
 
 public class UpdateHandler {
 	
-    private boolean updatesAllowed = ConfigHandler.getConfig("config.yml").getBoolean("General.CheckforUpdates");
-    private File jarLink;
     private final String AUTOQUERY = "projects/itemjoin/files/latest";
     private final String AUTOHOST = "https://dev.bukkit.org/";
     private final int PROJECTID = 12661;
     private final String HOST = "https://api.spigotmc.org/legacy/update.php?resource=" + PROJECTID;
+    
     private String versionExact = ItemJoin.getInstance().getDescription().getVersion();
     private boolean betaVersion = versionExact.contains("-SNAPSHOT") || versionExact.contains("-BETA") || versionExact.contains("-ALPHA");
     private String localeVersionRaw = versionExact.split("-")[0];
     private String latestVersionRaw;
     private double localeVersion = Double.parseDouble(localeVersionRaw.replace(".", ""));
     private double latestVersion;
+    
+    private File jarLink;
     private int BYTE_SIZE = 2048;
+    
+    private boolean updatesAllowed = ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("General.CheckforUpdates");
+    
+    private static UpdateHandler updater;
         
-    /**
-     * Initializes the UpdateHandler and Checks for Updates upon initialization.
-     *
-     * @param file   The file that the plugin is running from.
-     */
-    public UpdateHandler(File file){
-       this.jarLink = file;
+   /**
+    * Initializes the UpdateHandler and Checks for Updates upon initialization.
+    *
+    */
+    public UpdateHandler() {
+       this.jarLink = ItemJoin.getInstance().getPlugin();
        this.checkUpdates(ItemJoin.getInstance().getServer().getConsoleSender(), true);
     }
     
-    /**
-     * If the spigotmc host has an available update, redirects to download the jar file from dev-bukkit.
-     * Downloads and write the new data to the plugin jar file.
-     */
-    public void forceUpdates(CommandSender sender) {
+   /**
+    * If the spigotmc host has an available update, redirects to download the jar file from devbukkit.
+    * Downloads and write the new data to the plugin jar file.
+    * 
+    * @param sender - The executor of the update checking.
+    */
+    public void forceUpdates(final CommandSender sender) {
     	if (this.updateNeeded(sender, false)) {
-    		ServerHandler.messageSender(sender, "&aAn update has been found!");
-    		ServerHandler.messageSender(sender, "&aAttempting to update from " + "&ev" + this.localeVersionRaw + " &ato the new "  + "&ev" + this.latestVersionRaw);
+    		ServerHandler.getServer().messageSender(sender, "&aAn update has been found!");
+    		ServerHandler.getServer().messageSender(sender, "&aAttempting to update from " + "&ev" + this.localeVersionRaw + " &ato the new "  + "&ev" + this.latestVersionRaw);
     		try {
     			URL downloadUrl = new URL(this.AUTOHOST + this.AUTOQUERY);
     			HttpURLConnection httpConnection = (HttpURLConnection) downloadUrl.openConnection();
@@ -83,50 +89,57 @@ public class UpdateHandler {
     				fetchedSize += bytesRead;
     				final int currentProgress = (int)(((double) fetchedSize / (double) cloudFileSize) * 30);
     				if ((((fetchedSize * 100) / cloudFileSize) % 25) == 0 && currentProgress > 10) {
-    					ServerHandler.messageSender(sender, progressBar.substring(0, currentProgress + 2) + "&c" + progressBar.substring(currentProgress + 2));
+    					ServerHandler.getServer().messageSender(sender, progressBar.substring(0, currentProgress + 2) + "&c" + progressBar.substring(currentProgress + 2));
     				}
     			}
     			bout.close(); in.close(); fos.close();
-    			ServerHandler.messageSender(sender, "&aSuccessfully updated to v" + this.latestVersionRaw + "!");
-    			ServerHandler.messageSender(sender, "&aYou must restart your server for this to take affect.");
+    			ServerHandler.getServer().messageSender(sender, "&aSuccessfully updated to v" + this.latestVersionRaw + "!");
+    			ServerHandler.getServer().messageSender(sender, "&aYou must restart your server for this to take affect.");
     		} catch (Exception e) {
-    			ServerHandler.messageSender(sender, "&cAn error has occurred while trying to update the plugin ItemJoin.");
-    			ServerHandler.messageSender(sender, "&cPlease try again later, if you continue to see this please contact the plugin developer.");
-    			ServerHandler.sendDebugTrace(e);
+    			ServerHandler.getServer().messageSender(sender, "&cAn error has occurred while trying to update the plugin ItemJoin.");
+    			ServerHandler.getServer().messageSender(sender, "&cPlease try again later, if you continue to see this please contact the plugin developer.");
+    			ServerHandler.getServer().sendDebugTrace(e);
     		}
     	}
     }
     
-    /**
-     * Checks to see if an update is required, notifying the console window and online op players.
-     */
-    public void checkUpdates(CommandSender sender, boolean onStart) {
+   /**
+    * Checks to see if an update is required, notifying the console window and online op players.
+    * 
+    * @param sender - The executor of the update checking.
+    * @param onStart - If it is checking for updates on start.
+    */
+    public void checkUpdates(final CommandSender sender, final boolean onStart) {
     	if (this.updateNeeded(sender, onStart) && this.updatesAllowed) {
     		if (this.betaVersion) {
-    			ServerHandler.messageSender(sender, "&cYour current version: &bv" + this.localeVersionRaw + "-SNAPSHOT");
-    			ServerHandler.messageSender(sender, "&cThis &bSNAPSHOT &cis outdated and a release version is now available.");
+    			ServerHandler.getServer().messageSender(sender, "&cYour current version: &bv" + this.localeVersionRaw + "-SNAPSHOT");
+    			ServerHandler.getServer().messageSender(sender, "&cThis &bSNAPSHOT &cis outdated and a release version is now available.");
     		} else {
-    			ServerHandler.messageSender(sender, "&cYour current version: &bv" + this.localeVersionRaw);
+    			ServerHandler.getServer().messageSender(sender, "&cYour current version: &bv" + this.localeVersionRaw);
     		}
-    		ServerHandler.messageSender(sender, "&cA new version is available: " + "&av" + this.latestVersionRaw);
-    		ServerHandler.messageSender(sender, "&aGet it from: https://www.spigotmc.org/resources/itemjoin.12661/history");
-    		ServerHandler.messageSender(sender, "&aIf you wish to auto update, please type /ItemJoin AutoUpdate");
+    		ServerHandler.getServer().messageSender(sender, "&cA new version is available: " + "&av" + this.latestVersionRaw);
+    		ServerHandler.getServer().messageSender(sender, "&aGet it from: https://www.spigotmc.org/resources/itemjoin.12661/history");
+    		ServerHandler.getServer().messageSender(sender, "&aIf you wish to auto update, please type /ItemJoin AutoUpdate");
     		this.sendNotifications();
     	} else if (this.updatesAllowed) {
     		if (this.betaVersion) {
-    			ServerHandler.messageSender(sender, "&aYou are running a SNAPSHOT!");
-    			ServerHandler.messageSender(sender, "&aIf you find any bugs please report them!");
+    			ServerHandler.getServer().messageSender(sender, "&aYou are running a SNAPSHOT!");
+    			ServerHandler.getServer().messageSender(sender, "&aIf you find any bugs please report them!");
     		}
-    		ServerHandler.messageSender(sender, "&aYou are up to date!");
+    		ServerHandler.getServer().messageSender(sender, "&aYou are up to date!");
     	}
     }
     
-    /**
-     * Directly checks to see if the spigotmc host has an update available.
-     */
-    private Boolean updateNeeded(CommandSender sender, boolean onStart) {
+   /**
+    * Directly checks to see if the spigotmc host has an update available.
+    * 
+    * @param sender - The executor of the update checking.
+    * @param onStart - If it is checking for updates on start.
+    * @return If an update is needed.
+    */
+    private Boolean updateNeeded(final CommandSender sender, final boolean onStart) {
     	if (this.updatesAllowed) {
-    		ServerHandler.messageSender(sender, "&aChecking for updates...");
+    		ServerHandler.getServer().messageSender(sender, "&aChecking for updates...");
     		try {
     			InputStream input = (InputStream) new URL(this.HOST).openStream();
     			BufferedReader reader = new BufferedReader(new InputStreamReader(input));
@@ -140,21 +153,23 @@ public class UpdateHandler {
     				}
     			}
     		} catch (Exception e) {
-    			ServerHandler.messageSender(sender, "&cAn error has occured when checking the plugin version!");
-    			ServerHandler.messageSender(sender, "&cPlease contact the plugin developer!");
-    			ServerHandler.sendDebugTrace(e);
+    			ServerHandler.getServer().messageSender(sender, "&cAn error has occured when checking the plugin version!");
+    			ServerHandler.getServer().messageSender(sender, "&cPlease contact the plugin developer!");
+    			ServerHandler.getServer().sendDebugTrace(e);
     			return false;
     		}
     	} else if (!onStart) {
-    		ServerHandler.messageSender(sender, "&cUpdate checking is currently disabled in the config.yml");
-    		ServerHandler.messageSender(sender, "&cIf you wish to use the auto update feature, you will need to enable it.");
+    		ServerHandler.getServer().messageSender(sender, "&cUpdate checking is currently disabled in the config.yml");
+    		ServerHandler.getServer().messageSender(sender, "&cIf you wish to use the auto update feature, you will need to enable it.");
         }
     	return false;
     }
     
-    /**
-     * Sends out notifications to all online op players that an update is available at the time of checking for updates.
-     */
+   /**
+    * Sends out notifications to all online op players that 
+    * an update is available at the time of checking for updates.
+    * 
+    */
     private void sendNotifications() {
     	try {
     		Collection < ? > playersOnline = null;
@@ -164,8 +179,8 @@ public class UpdateHandler {
     				playersOnline = ((Collection < ? > ) Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).invoke(null, new Object[0]));
     				for (Object objPlayer: playersOnline) {
     					if (((Player) objPlayer).isOp()) {
-    						ServerHandler.messageSender(((Player) objPlayer), "&eAn update has been found!");
-    						ServerHandler.messageSender(((Player) objPlayer), "&ePlease update to the latest version: v" + this.latestVersionRaw);
+    						ServerHandler.getServer().messageSender(((Player) objPlayer), "&eAn update has been found!");
+    						ServerHandler.getServer().messageSender(((Player) objPlayer), "&ePlease update to the latest version: v" + this.latestVersionRaw);
     					}
     				}
     			}
@@ -173,26 +188,41 @@ public class UpdateHandler {
     			playersOnlineOld = ((Player[]) Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).invoke(null, new Object[0]));
     			for (Player objPlayer: playersOnlineOld) {
     				if (objPlayer.isOp()) {
-						ServerHandler.messageSender(objPlayer, "&eAn update has been found!");
-						ServerHandler.messageSender(objPlayer, "&ePlease update to the latest version: v" + this.latestVersionRaw);
+						ServerHandler.getServer().messageSender(objPlayer, "&eAn update has been found!");
+						ServerHandler.getServer().messageSender(objPlayer, "&ePlease update to the latest version: v" + this.latestVersionRaw);
     				}
     			}
     		}
-    	} catch (Exception e) { ServerHandler.sendDebugTrace(e); }
+    	} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
     }
     
     
-    /**
-     * Gets the exact string version from the plugin yml file.
-     */
+   /**
+    * Gets the exact string version from the plugin yml file.
+    * 
+    * @return The exact server version.
+    */
     public String getVersion() {
     	return this.versionExact;
     }
     
-    /**
-     * Gets the plugin jar file directly.
-     */
+   /**
+    * Gets the plugin jar file directly.
+    * 
+    * @return The plugins jar file.
+    */
     public File getJarLink() {
     	return this.jarLink;
     }
+    
+   /**
+    * Gets the instance of the UpdateHandler.
+    * 
+    * @param regen - If the instance should be regenerated.
+    * @return The UpdateHandler instance.
+    */
+    public static UpdateHandler getUpdater(boolean regen) { 
+        if (updater == null || regen) { updater = new UpdateHandler(); }
+        return updater; 
+    } 
 }

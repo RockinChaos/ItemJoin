@@ -29,8 +29,16 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 
 public class BungeeCord implements PluginMessageListener {
+	
+private static BungeeCord bungee;
 
-	public static void SwitchServers(Player player, String server) {
+   /**
+    * Sends the specified Player to the specified Server.
+    * 
+    * @param player - The Player switching servers.
+    * @param server - The String name of the server that the Player is connecting to.
+    */
+	public void SwitchServers(final Player player, final String server) {
 		Messenger messenger = ItemJoin.getInstance().getServer().getMessenger();
 		if (!messenger.isOutgoingChannelRegistered(ItemJoin.getInstance(), "BungeeCord")) {
 			messenger.registerOutgoingPluginChannel(ItemJoin.getInstance(), "BungeeCord");
@@ -39,11 +47,17 @@ public class BungeeCord implements PluginMessageListener {
 		try {
 			out.writeUTF("Connect");
 			out.writeUTF(server);
-		} catch (Exception e) { ServerHandler.sendDebugTrace(e); }
+		} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
 		player.sendPluginMessage(ItemJoin.getInstance(), "BungeeCord", out.toByteArray());
 	}
 	
-	public static void ExecuteCommand(Player player, String cmd) {
+   /**
+    * Executes the BungeeCord Command as the Player instance.
+    * 
+    * @param player - The Player executing the Bungee Command.
+    * @param command - The Bungee Command the Player is executing.
+    */
+	public void ExecuteCommand(final Player player, final String command) {
 		Messenger messenger = ItemJoin.getInstance().getServer().getMessenger();
 		if (!messenger.isOutgoingChannelRegistered(ItemJoin.getInstance(), "BungeeCord")) {
 			messenger.registerOutgoingPluginChannel(ItemJoin.getInstance(), "BungeeCord");
@@ -52,13 +66,20 @@ public class BungeeCord implements PluginMessageListener {
 		try {
 			out.writeUTF("Subchannel");
 			out.writeUTF("Argument");
-			out.writeUTF(cmd);
-		} catch (Exception e) { ServerHandler.sendDebugTrace(e); }
+			out.writeUTF(command);
+		} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
 		player.sendPluginMessage(ItemJoin.getInstance(), "BungeeCord", out.toByteArray());
 	}
 	
+   /**
+    * Sends the Server Switch message when attempting to switch servers.
+    * 
+    * @param channel - The channel recieving the message.
+    * @param player - The Player switching servers.
+    * @param message - The message being sent to the Player..
+    */
 	@Override
-	public void onPluginMessageReceived(String channel, Player player, byte[] message) {
+	public void onPluginMessageReceived(final String channel, final Player player, final byte[] message) {
 		if (!channel.equals("BungeeCord")) { return; }
 		ByteArrayDataInput in = ByteStreams.newDataInput(message);
 		String subchannel = in .readUTF();
@@ -66,4 +87,16 @@ public class BungeeCord implements PluginMessageListener {
 			player.sendMessage(subchannel + " " + in .readByte());
 		}
 	} 
+	
+   /**
+    * Gets the instance of the BungeeCord.
+    * 
+    * @return The BungeeCord instance.
+    */
+    public static BungeeCord getBungee() { 
+        if (bungee == null) {
+        	bungee = new BungeeCord();
+        }
+        return bungee; 
+    } 
 }

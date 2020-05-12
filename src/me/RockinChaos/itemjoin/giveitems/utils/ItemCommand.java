@@ -23,13 +23,16 @@ import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.utils.BungeeCord;
+import me.RockinChaos.itemjoin.utils.LogFilter;
 import me.RockinChaos.itemjoin.utils.Utils;
 
 public class ItemCommand {
@@ -101,9 +104,9 @@ public class ItemCommand {
 	private void taskOnHold(final Player player, final String slot, final int cooldown, final ItemMap itemMap) {
     	this.cycleTask = Bukkit.getScheduler().scheduleSyncRepeatingTask(ItemJoin.getInstance(), new Runnable() {
     		public void run() {
-    			if (itemMap.isSimilar(PlayerHandler.getMainHandItem(player))) {
+    			if (itemMap.isSimilar(PlayerHandler.getPlayer().getMainHandItem(player))) {
     				sendDispatch(player, executorType, slot);
-    			} else if (itemMap.isSimilar(PlayerHandler.getOffHandItem(player))) {
+    			} else if (itemMap.isSimilar(PlayerHandler.getPlayer().getOffHandItem(player))) {
     				sendDispatch(player, executorType, slot);
     			} else { cancelTask(); }
     		}
@@ -156,7 +159,7 @@ public class ItemCommand {
 	* @param action - the action that triggered the command execution.
 	* @return If the action matches the defined action.
 	*/
-	public boolean matchAction(ActionType action) {
+	public boolean matchAction(final ActionType action) {
 		if (this.actionType.equals(action)) {
 			return true;
 		}
@@ -177,7 +180,7 @@ public class ItemCommand {
 	* 
 	* @param section - sets the list section identifier.
 	*/
-	public void setSection(String section) {
+	public void setSection(final String section) {
 		this.listSection = section;
 	}
 	
@@ -197,7 +200,7 @@ public class ItemCommand {
 	*/
 	public void setCommand(String input) {
 		input = input.trim();
-		input = Utils.colorFormat(input);
+		input = Utils.getUtils().colorFormat(input);
 		this.command = input;
 	}
 	
@@ -208,7 +211,7 @@ public class ItemCommand {
 	* @param player - player that is interacting with the custom items command.
 	* @return if the player is able to succesfully execute.
 	*/
-	private boolean getExecute(Player player) {
+	private boolean getExecute(final Player player) {
 		return this.setStop.contains(player);
 	}
 	
@@ -219,7 +222,7 @@ public class ItemCommand {
 	* @param player - player that is interacting with the custom items command.
 	* @param bool - if the player is able to succesfully execute.
 	*/
-	private void setExecute(final Player player, boolean bool) {
+	private void setExecute(final Player player, final boolean bool) {
 		if (bool) { 
 			this.setStop.add(player);
 		} else { 
@@ -234,11 +237,11 @@ public class ItemCommand {
 	* @param player - player that is interacting with the custom items command.
 	* @return if the player is pending execution.
 	*/
-	private boolean getPending(Player player) {
+	private boolean getPending(final Player player) {
 		return this.setCounting.contains(player);
 	}
 	
-	private void setPending(final Player player, boolean bool) {
+	private void setPending(final Player player, final boolean bool) {
 		if (bool) {
 			this.setCounting.add(player); 
 		} else { 
@@ -307,15 +310,15 @@ public class ItemCommand {
 	*/
 	private void dispatchConsoleCommands(final Player player) {
 		try {
-			if (Utils.containsIgnoreCase(this.command, "[close]")) {
+			if (Utils.getUtils().containsIgnoreCase(this.command, "[close]")) {
 				player.closeInventory();
 			} else {
-				this.setLoggable(player, "/" + Utils.translateLayout(this.command, player));
-				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), Utils.translateLayout(this.command, player));
+				this.setLoggable(player, "/" + Utils.getUtils().translateLayout(this.command, player));
+				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), Utils.getUtils().translateLayout(this.command, player));
 			}
 		} catch (Exception e) {
-			ServerHandler.logSevere("{ItemCommand} There was an error executing an item's command as console, if this continues report it to the developer.");
-			ServerHandler.sendDebugTrace(e);
+			ServerHandler.getServer().logSevere("{ItemCommand} There was an error executing an item's command as console, if this continues report it to the developer.");
+			ServerHandler.getServer().sendDebugTrace(e);
 		}
 	}
 	
@@ -326,23 +329,23 @@ public class ItemCommand {
 	*/
 	private void dispatchOpCommands(final Player player) {
 		try {
-			if (Utils.containsIgnoreCase(this.command, "[close]")) {
+			if (Utils.getUtils().containsIgnoreCase(this.command, "[close]")) {
 				player.closeInventory();
 			} else {
 				boolean isOp = player.isOp();
 				try {
 					player.setOp(true);
-					this.setLoggable(player, "/" + Utils.translateLayout(this.command, player));
-					player.chat("/" + Utils.translateLayout(this.command, player));
+					this.setLoggable(player, "/" + Utils.getUtils().translateLayout(this.command, player));
+					player.chat("/" + Utils.getUtils().translateLayout(this.command, player));
 				} catch (Exception e) {
-					ServerHandler.sendDebugTrace(e);
+					ServerHandler.getServer().sendDebugTrace(e);
 					player.setOp(isOp);
-					ServerHandler.logSevere("{ItemCommand} An critical error has occurred while setting " + player.getName() + " status on the OP list, to maintain server security they have been removed as an OP.");
+					ServerHandler.getServer().logSevere("{ItemCommand} An critical error has occurred while setting " + player.getName() + " status on the OP list, to maintain server security they have been removed as an OP.");
 				} finally { player.setOp(isOp); }
 			}
 		} catch (Exception e) {
-			ServerHandler.logSevere("{ItemCommand} There was an error executing an item's command as an op, if this continues report it to the developer.");
-			ServerHandler.sendDebugTrace(e);
+			ServerHandler.getServer().logSevere("{ItemCommand} There was an error executing an item's command as an op, if this continues report it to the developer.");
+			ServerHandler.getServer().sendDebugTrace(e);
 		}
 	}
 	
@@ -353,15 +356,15 @@ public class ItemCommand {
 	*/
 	private void dispatchPlayerCommands(final Player player) {
 		try {
-			if (Utils.containsIgnoreCase(this.command, "[close]")) {
+			if (Utils.getUtils().containsIgnoreCase(this.command, "[close]")) {
 				player.closeInventory();
 			} else {
-				this.setLoggable(player, "/" + Utils.translateLayout(this.command, player));
-				player.chat("/" + Utils.translateLayout(this.command, player));
+				this.setLoggable(player, "/" + Utils.getUtils().translateLayout(this.command, player));
+				player.chat("/" + Utils.getUtils().translateLayout(this.command, player));
 			}
 		} catch (Exception e) {
-			ServerHandler.logSevere("{ItemCommand} There was an error executing an item's command as a player, if this continues report it to the developer.");
-			ServerHandler.sendDebugTrace(e);
+			ServerHandler.getServer().logSevere("{ItemCommand} There was an error executing an item's command as a player, if this continues report it to the developer.");
+			ServerHandler.getServer().sendDebugTrace(e);
 		}
 	}
 	
@@ -371,10 +374,10 @@ public class ItemCommand {
 	* @param player - player that is interacting with the custom items command.
 	*/
 	private void dispatchMessageCommands(final Player player) {
-		try { player.sendMessage(Utils.translateLayout(this.command, player)); } 
+		try { player.sendMessage(Utils.getUtils().translateLayout(this.command, player)); } 
 		catch (Exception e) {
-			ServerHandler.logSevere("{ItemCommand} There was an error executing an item's command to send a message, if this continues report it to the developer.");
-			ServerHandler.sendDebugTrace(e);
+			ServerHandler.getServer().logSevere("{ItemCommand} There was an error executing an item's command to send a message, if this continues report it to the developer.");
+			ServerHandler.getServer().sendDebugTrace(e);
 		}
 	}
 	
@@ -384,10 +387,10 @@ public class ItemCommand {
 	* @param player - player that is interacting with the custom items command.
 	*/
 	private void dispatchServerCommands(final Player player) {
-		try { BungeeCord.SwitchServers(player, Utils.translateLayout(this.command, player)); } 
+		try { BungeeCord.getBungee().SwitchServers(player, Utils.getUtils().translateLayout(this.command, player)); } 
 		catch (Exception e) {
-			ServerHandler.logSevere("{ItemCommand} There was an error executing an item's command to switch servers, if this continues report it to the developer.");
-			ServerHandler.sendDebugTrace(e);
+			ServerHandler.getServer().logSevere("{ItemCommand} There was an error executing an item's command to switch servers, if this continues report it to the developer.");
+			ServerHandler.getServer().sendDebugTrace(e);
 		}
 	}
 	
@@ -397,10 +400,10 @@ public class ItemCommand {
 	* @param player - player that is interacting with the custom items command.
 	*/
 	private void dispatchBungeeCordCommands(final Player player) {
-		try { BungeeCord.ExecuteCommand(player, Utils.translateLayout(this.command, player)); } 
+		try { BungeeCord.getBungee().ExecuteCommand(player, Utils.getUtils().translateLayout(this.command, player)); } 
 		catch (Exception e) {
-			ServerHandler.logSevere("{ItemCommand} There was an error executing an item's command to BungeeCord, if this continues report it to the developer.");
-			ServerHandler.sendDebugTrace(e);
+			ServerHandler.getServer().logSevere("{ItemCommand} There was an error executing an item's command to BungeeCord, if this continues report it to the developer.");
+			ServerHandler.getServer().sendDebugTrace(e);
 		}
 	}
 	
@@ -411,7 +414,7 @@ public class ItemCommand {
 	*/
 	private void dispatchSwapItem(final Player player, final String slot) {
 		try {
-			for (ItemMap item : ItemUtilities.getItems()) {
+			for (ItemMap item : ItemUtilities.getUtilities().getItems()) {
 				if (item.getConfigName().equalsIgnoreCase(this.command)) {
 					item.giveTo(player, 0, slot);
 					break;
@@ -419,8 +422,8 @@ public class ItemCommand {
 			}
 		} 
 		catch (Exception e) {
-			ServerHandler.logSevere("{ItemCommand} There was an error executing an item's command to swap an items attributes, if this continues report it to the developer.");
-			ServerHandler.sendDebugTrace(e);
+			ServerHandler.getServer().logSevere("{ItemCommand} There was an error executing an item's command to swap an items attributes, if this continues report it to the developer.");
+			ServerHandler.getServer().sendDebugTrace(e);
 		}
 	}
 	
@@ -430,14 +433,14 @@ public class ItemCommand {
 	* @param player - player that is interacting with the custom items command.
 	* @param logCommand - the command that wont be logged.
 	*/
-	private void setLoggable(Player player, String logCommand) {
-		if (!ConfigHandler.getConfig("config.yml").getBoolean("General.Log-Commands")) {
+	private void setLoggable(final Player player, final String logCommand) {
+		if (!ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("General.Log-Commands")) {
 			ArrayList < String > templist = new ArrayList < String > ();
-			if (ConfigHandler.getCustomFilter().getHideLogging().get("commands-list") != null && !ConfigHandler.getCustomFilter().getHideLogging().get("commands-list").contains(logCommand)) {
-				templist = ConfigHandler.getCustomFilter().getHideLogging().get("commands-list");
+			if (LogFilter.getFilter(false).getHidden().get("commands-list") != null && !LogFilter.getFilter(false).getHidden().get("commands-list").contains(logCommand)) {
+				templist = LogFilter.getFilter(false).getHidden().get("commands-list");
 			}
 			templist.add(logCommand);
-			ConfigHandler.getCustomFilter().setHideLogging("commands-list", templist);
+			LogFilter.getFilter(false).addHidden("commands-list", templist);
 		}
 	}
 	
@@ -448,7 +451,7 @@ public class ItemCommand {
 	* @param definition - the config definition.
 	* @return The ActionType when executing the command.
 	*/
-	private static ActionType getExactActionType(ItemMap itemMap, String definition) {
+	private static ActionType getExactActionType(final ItemMap itemMap, final String definition) {
 		String invExists = itemMap.getNodeLocation().getString(".commands" + ActionType.INVENTORY.definition);
 		CommandType type = CommandType.INTERACT; if (itemMap.getCommandType() != null) { type = itemMap.getCommandType(); } 
 		if ((type.equals(CommandType.INVENTORY) || invExists != null || type.equals(CommandType.BOTH)) && ActionType.INVENTORY.hasDefine(definition)) {
@@ -495,7 +498,7 @@ public class ItemCommand {
 	* @param listSection - the listed section identifier.
 	* @return The new ItemCommand instance.
 	*/
-	public static ItemCommand fromString(String input, ActionType action, CommandType commandType, long delay, String listSection) {
+	public static ItemCommand fromString(String input, final ActionType action, final CommandType commandType, final long delay, final String listSection) {
 		if (input == null || input.length() == 0) { return new ItemCommand("", ActionType.DEFAULT, ExecutorType.DEFAULT, 0L, commandType != null ? commandType.name() : "INTERACT", null); }
 		input = input.trim();
 		ExecutorType type = ExecutorType.DEFAULT;
@@ -511,7 +514,7 @@ public class ItemCommand {
 		else if (input.startsWith("delay:")) { input = input.substring(6); type = ExecutorType.DELAY; }
 			
 		input = input.trim();
-		input = Utils.colorFormat(input);
+		input = Utils.getUtils().colorFormat(input);
 		return new ItemCommand(input, action, type, delay, commandType != null ? commandType.name() : "INTERACT", listSection);
 	}
 	
@@ -522,8 +525,8 @@ public class ItemCommand {
 	* @param isList - are the commands multiple lists or a single list in an identifier.
 	* @return The list of ItemCommands relating to the specified ItemMap.
 	*/
-	public static ItemCommand[] arrayFromString(ItemMap itemMap, boolean isList) {
-		if (ConfigHandler.getCommandsSection(itemMap.getNodeLocation()) == null) {
+	public static ItemCommand[] arrayFromString(final ItemMap itemMap, final boolean isList) {
+		if (ConfigHandler.getConfig(false).getCommandsSection(itemMap.getNodeLocation()) == null) {
 			return new ItemCommand[] {
 				new ItemCommand("", ActionType.DEFAULT, ExecutorType.DEFAULT, 0L, itemMap.getCommandType() != null ? itemMap.getCommandType().name() : "INTERACT", null)
 			};
@@ -538,14 +541,15 @@ public class ItemCommand {
 	* @param isList - are the commands multiple lists or a single list in an identifier.
 	* @return The list of ItemCommands relating to the specified ItemMap.
 	*/
-	private static ItemCommand[] fromConfig(ItemMap itemMap, boolean isList) {
-		if (ConfigHandler.getCommandsSection(itemMap.getNodeLocation()) != null) {
+	private static ItemCommand[] fromConfig(final ItemMap itemMap, final boolean isList) {
+		if (ConfigHandler.getConfig(false).getCommandsSection(itemMap.getNodeLocation()) != null) {
 			final List < ItemCommand > arrayCommands = new ArrayList < ItemCommand > ();
-			Iterator < String > it = ConfigHandler.getCommandsSection(itemMap.getNodeLocation()).getKeys(false).iterator();
+			Iterator < String > it = ConfigHandler.getConfig(false).getCommandsSection(itemMap.getNodeLocation()).getKeys(false).iterator();
 			while (it.hasNext()) {
 				String definition = it.next();
-				if (isList && ConfigHandler.getCommandsListSection(itemMap.getNodeLocation(), definition) != null) {
-					for (String internalCommands: ConfigHandler.getCommandsListSection(itemMap.getNodeLocation(), definition).getKeys(false)) {
+				ConfigurationSection commandSection = ConfigHandler.getConfig(false).getFile("items.yml").getConfigurationSection(itemMap.getNodeLocation().getCurrentPath() + ".commands." + definition);
+				if (isList && commandSection != null) {
+					for (String internalCommands: commandSection.getKeys(false)) {
 						arrayCommands.addAll(arrayFromConfig(itemMap, definition, internalCommands));
 					}
 				} else { arrayCommands.addAll(arrayFromConfig(itemMap, definition, null)); }
@@ -565,12 +569,12 @@ public class ItemCommand {
 	* @param internalCommands - the commands list defined for a random sequence.
 	* @return The list of ItemCommands relating to the specified ItemMap.
 	*/
-	private static List < ItemCommand > arrayFromConfig(ItemMap itemMap, String definition, String internalCommands) {
+	private static List < ItemCommand > arrayFromConfig(final ItemMap itemMap, final String definition, final String internalCommands) {
 		long delay = 0L;
 		List < String > commandsList = itemMap.getNodeLocation().getStringList("commands." + definition + (internalCommands != null ?  ("." + internalCommands) : ""));
 		final List < ItemCommand > arrayCommands = new ArrayList < ItemCommand > ();
 		for (int i = 0; i < commandsList.size(); i++) {
-			if (commandsList.get(i).trim().startsWith("delay:")) { delay = delay + ItemHandler.getDelayVal(commandsList.get(i).trim()); }
+			if (commandsList.get(i).trim().startsWith("delay:")) { delay = delay + ItemHandler.getItem().getDelay(commandsList.get(i).trim()); }
 			arrayCommands.add(fromString(commandsList.get(i).trim(), getExactActionType(itemMap, definition), itemMap.getCommandType(), delay, internalCommands));
 		}
 		return arrayCommands;	

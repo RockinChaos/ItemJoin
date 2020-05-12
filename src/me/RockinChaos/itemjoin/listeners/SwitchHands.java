@@ -29,18 +29,23 @@ import me.RockinChaos.itemjoin.handlers.ServerHandler;
 
 public class SwitchHands implements Listener {
 	
+   /**
+	* Prevents the player from moving the custom item from their mainhand to offhand slot or from their offhand to mainhand slot.
+	* 
+	* @param event - PlayerSwapHandItemsEvent
+	*/
 	@EventHandler
 	private void onHandModify(PlayerSwapHandItemsEvent event) {
-		if (ServerHandler.hasSpecificUpdate("1_9")) {
+		if (ServerHandler.getServer().hasSpecificUpdate("1_9")) {
 			ItemStack offhand = event.getOffHandItem();
 			ItemStack mainhand = event.getMainHandItem();
 			Player player = event.getPlayer();
-			if (!ItemUtilities.isAllowed(player, offhand, "inventory-modify")) {
+			if (!ItemUtilities.getUtilities().isAllowed(player, offhand, "inventory-modify")) {
 				event.setCancelled(true);
-				PlayerHandler.updateInventory(player);
-			} else if (!ItemUtilities.isAllowed(player, mainhand, "inventory-modify")) {
+				PlayerHandler.getPlayer().updateInventory(player, 1L);
+			} else if (!ItemUtilities.getUtilities().isAllowed(player, mainhand, "inventory-modify")) {
 				event.setCancelled(true);
-				PlayerHandler.updateInventory(player);
+				PlayerHandler.getPlayer().updateInventory(player, 1L);
 			}
 		}
 	}

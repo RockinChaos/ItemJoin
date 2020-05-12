@@ -18,52 +18,71 @@
 package me.RockinChaos.itemjoin.utils;
 
 import java.lang.reflect.Field;
+import java.math.BigInteger;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
+import java.util.UUID;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
-import org.bukkit.Location;
 import org.bukkit.Statistic;
 import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.HandlerList;
+import org.bukkit.plugin.RegisteredListener;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 
 import de.domedd.betternick.BetterNick;
+import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
+import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.clip.placeholderapi.PlaceholderAPI;
 
 public class Utils {
 	
-	public static boolean containsIgnoreCase(String string1, String string2) {
+    private static Utils util;
+	
+   /**
+    * Checks if string1 contains string2.
+    * 
+    * @param string1 - The String to be checked if it contains string2.
+    * @param string2- The String that should be inside string1.
+    * @return If string1 contains string2.
+    */
+	public boolean containsIgnoreCase(final String string1, final String string2) {
 		if (string1 != null && string2 != null && string1.toLowerCase().contains(string2.toLowerCase())) {
 			return true;
 		}
 		return false;
 	}
 	
-	public static boolean containsValue(List<?> list, String s) {
+   /**
+    * Checks if the List contains the String.
+    * 
+    * @param list - The List to be checked if it contains the String.
+    * @param str - The String that should be inside the List.
+    * @return If the List contained the String.
+    */
+	public boolean containsValue(final List<?> list, final String str) {
 		boolean bool = false;
-		for (Object l : list) { if (l.toString().equalsIgnoreCase(s)) { bool = true; break; } }
+		for (Object l : list) { if (l.toString().equalsIgnoreCase(str)) { bool = true; break; } }
 		return bool;
 	}
 	
-	public static String convertStringList(List<String> list) {
-	    String res = "";
-	    for (Iterator<String> iterator = list.iterator(); iterator.hasNext();) {
-	        res += iterator.next() + (iterator.hasNext() ? ", " : "");
-	    }
-	    return res;
-	}
-	
-	public static String[] softSplit(String str) {
+   /**
+    * Splits the String with proper formatting and ordering.
+    * 
+    * @param str - The String to be Split.
+    * @return The newly formatted String[].
+    */
+	public String[] softSplit(final String str) {
 		if (str.split(", ").length < 3) { return str.split("` "); }
 		String splitTest = ""; int index = 1;
 	    for (String sd : str.split(", ")) { if (index == 3) { splitTest += sd + "` "; index = 1; } else { splitTest += sd + ", "; index++; } }
@@ -71,60 +90,100 @@ public class Utils {
 	    return splitTest.split("` ");
 	}
 	
-	public static List<String> split(String s) {
+   /**
+    * Splits the String to a List.
+    * 
+    * @param str - The String to be Split.
+    * @return The split String as a List.
+    */
+	public List<String> split(final String str) {
 		List<String> splitList = new ArrayList<String>();
-		for (String split : s.split(", ")) {
+		for (String split : str.split(", ")) {
 			splitList.add(split);
 		}
 		return splitList;
 	}
 	
-	public static int getPath(final int i) {
-		if (ConfigHandler.getConfig("items.yml").getString("items.item_" + i) != null) {
-			return getPath(i + 1);
+   /**
+    * Gets the items.yml path for the auto generated item and its corresponding Integer.
+    * 
+    * @param i - The Integer to be set as the item path.
+    * @return The Integer to be set as the auto generated item path.
+    */
+	public int getPath(final int i) {
+		if (ConfigHandler.getConfig(false).getFile("items.yml").getString("items.item_" + i) != null) {
+			return this.getPath(i + 1);
 		}
 		return i;
 	}
 	
-	public static String nullCheck(String input) {
-		if (input == null || input.equalsIgnoreCase("NULL") || input.contains("[]") || input.contains("{}") || input.equals("0&7") || input.equals("-1&a%") || input.equals("") || input.equals(" ")) {
-			return "NONE";
-		}
-		if (input.startsWith("[") && input.endsWith("]")) {
-			input = input.substring(0, input.length() - 1).substring(1);
-		}
-		if (input.startsWith("{") && input.endsWith("}")) {
-			input = input.replace("{", "").replace("}", "").replace("=", ":");
-		}
-		return input;
+   /**
+    * Formats any color codes found in the String to Bukkit Colors so the
+    * text will be colorfully formatted.
+    * 
+    * @param str - The String to have its Color Codes properly Converted to Bukkit Colors.
+    * @return The newly formatted String.
+    */
+	public String colorFormat(final String str) {
+		return ChatColor.translateAlternateColorCodes('&', str).toString();
 	}
 	
-	public static String encrypt(String text) {
+   /**
+    * Color Encodes a String so that it is completely hidden in color codes,
+    * this will be invisible to a normal eye and will not display any text.
+    * 
+    * @param str - The String to be Color Encoded.
+    * @return The Color Encoded String.
+    */
+	public String colorEncode(final String str) {
 		try {
-			return Base64.getEncoder().encodeToString(text.getBytes());
+			String hiddenData = "";
+			for (char c: str.toCharArray()) {
+				hiddenData += "§" + c;
+			}
+			return hiddenData;
 		} catch (Exception e) {
-			ServerHandler.logDebug("{Utils} Failure to encrypt sensitive text!");
-			ServerHandler.sendDebugTrace(e);
+			ServerHandler.getServer().sendDebugTrace(e);
+			return null;
 		}
-		return null;
 	}
-	
-	public static String decrypt(String text) {
+
+   /**
+    * Decodes a Color Encoded String.
+    * 
+    * @param str - The String to be Color Decoded.
+    * @return The Color Decoded String.
+    */
+	public String colorDecode(final String str) {
 		try {
-			return new String(Base64.getDecoder().decode(text));
+			String[] hiddenData = str.split("(?:\\w{2,}|\\d[0-9A-Fa-f])+");
+			String returnData = "";
+			if (hiddenData == null) {
+				hiddenData = str.split("§");
+				for (int i = 0; i < hiddenData.length; i++) {
+					returnData += hiddenData[i];
+				}
+				return returnData;
+			} else {
+				String[] d = hiddenData[hiddenData.length - 1].split("§");
+				for (int i = 1; i < d.length; i++) {
+					returnData += d[i];
+				}
+				return returnData;
+			}
 		} catch (Exception e) {
-			ServerHandler.logDebug("{Utils} Failure to decrypt sensitive text!");
-			ServerHandler.sendDebugTrace(e);
+			ServerHandler.getServer().sendDebugTrace(e);
+			return null;
 		}
-		return null;
 	}
 	
-	public static int getRandom(int lower, int upper) {
-		Random random = new Random();
-		return random.nextInt((upper - lower) + 1) + lower;
-	}
-	
-	public static Color getColorFromHexColor(String hexString) {
+   /**
+    * Gets the Color from the provided HexColor.
+    * 
+    * @param hexString - The HexColor to be converted to Color.
+    * @return The Color found from the HexColor.
+    */
+	public Color getColorFromHexColor(final String hexString) {
 		int hex = Integer.decode("#" + hexString.replace("#", ""));
 		int r = ((hex & 0xFF0000) >> 16);
 		int g = ((hex & 0xFF00) >> 8);
@@ -133,7 +192,123 @@ public class Utils {
 		return bukkitColor;
 	}
 	
-	public static Entry<?, ?> randomEntry(HashMap<?, ?> map) {
+   /**
+    * Checks if the specified String is an Integer Value.
+    * 
+    * @param str - The String to be checked.
+    * @return If the String is an Integer Value.
+    */
+	public boolean isInt(final String str) {
+		try {
+			Integer.parseInt(str);
+		} catch (NumberFormatException e) { return false; }
+		return true;
+	}
+	
+   /**
+    * Gets the first found Integer from the specified String.
+    * 
+    * @param str - The String to be checked.
+    * @return The first found Integer.
+    */
+	public Integer returnInteger(final String str) {
+		if (str == null) { return null; }
+		else {
+			char[] characters = str.toCharArray();
+			Integer value = null;
+			boolean isPrevDigit = false;
+			for (int i = 0; i < characters.length; i++) {
+				if (isPrevDigit == false) {
+					if (Character.isDigit(characters[i])) {
+						isPrevDigit = true;
+						value = Character.getNumericValue(characters[i]);
+					}
+				} else { if (Character.isDigit(characters[i])) { value = (value * 10) + Character.getNumericValue(characters[i]); } else { break; } }
+			}
+			return value;
+		}
+	}
+	
+   /**
+    * Gives all custom items to the specified player.sadsadasds
+    * 
+    * @param player - that will recieve the items.
+    */
+	public UUID UUIDConversion(String uuidString) {
+		uuidString = uuidString.replace("-", "");
+		UUID uuid = new UUID(
+		        new BigInteger(uuidString.substring(0, 16), 16).longValue(),
+		        new BigInteger(uuidString.substring(16), 16).longValue());
+		return uuid;
+	}
+	
+   /**
+    * Gives all custom items to the specified player.sadsadsadsa
+    * 
+    * @param player - that will recieve the items.
+    */
+    public String getMojangUUID(final String name) {
+        String url = "https://api.mojang.com/users/profiles/minecraft/"+name;
+        try {
+            String UUIDJson = new URL(url).toString();           
+            if(UUIDJson.isEmpty()) return null;                       
+            JSONObject UUIDObject = (JSONObject) JSONValue.parseWithException(UUIDJson);
+            return UUIDObject.get("id").toString();
+        } catch (Exception e) { }
+        return null;
+    }
+	
+   /**
+    * Encrypts the String to Base64.
+    * 
+    * @param str - The String to be encrypted.
+    * @return The Base64 encoded String.
+    */
+	public String encrypt(final String str) {
+		try {
+			return Base64.getEncoder().encodeToString(str.getBytes());
+		} catch (Exception e) {
+			ServerHandler.getServer().logDebug("{Utils} Failure to encrypt sensitive text!");
+			ServerHandler.getServer().sendDebugTrace(e);
+		}
+		return null;
+	}
+	
+   /**
+    * Decrypts the encoded Base64 String.
+    * 
+    * @param str - The String to be decrypted.
+    * @return The decrypted String.
+    */
+	public String decrypt(final String str) {
+		try {
+			return new String(Base64.getDecoder().decode(str));
+		} catch (Exception e) {
+			ServerHandler.getServer().logDebug("{Utils} Failure to decrypt sensitive text!");
+			ServerHandler.getServer().sendDebugTrace(e);
+		}
+		return null;
+	}
+	
+   /**
+    * Gets a random Integer between the upper and lower limits.
+    * 
+    * @param lower - The lower limit.
+    * @param upper - The upper limit.
+    * @return The randomly selected Integer between the limits.
+    */
+	public int getRandom(final int lower, final int upper) {
+		Random random = new Random();
+		return random.nextInt((upper - lower) + 1) + lower;
+	}
+	
+   /**
+    * Randomly selects an Entry from a HashMap.
+    * 
+    * @param map - The HashMap to have a entry selected.
+    * @return The randomly selected entry.
+    */
+	public Entry<?, ?> randomEntry(final HashMap<?, ?> map) {
 		try {
 			Field table = HashMap.class.getDeclaredField("table");
 			table.setAccessible(true);
@@ -149,32 +324,34 @@ public class Utils {
 	    return null;
 	}
 	
-	public static boolean isInt(String s) {
-		try {
-			Integer.parseInt(s);
-		} catch (NumberFormatException e) { return false; }
-		return true;
-	}
-	
-	public static Integer returnInteger(String text) {
-		if (text == null) { return null; }
-		else {
-			char[] characters = text.toCharArray();
-			Integer value = null;
-			boolean isPrevDigit = false;
-			for (int i = 0; i < characters.length; i++) {
-				if (isPrevDigit == false) {
-					if (Character.isDigit(characters[i])) {
-						isPrevDigit = true;
-						value = Character.getNumericValue(characters[i]);
-					}
-				} else { if (Character.isDigit(characters[i])) { value = (value * 10) + Character.getNumericValue(characters[i]); } else { break; } }
+   /**
+    * Checks if the String contains the location.
+    * 
+    * @param location - The location that the String should contain.
+    * @param str - The String to be checked.
+    * @return 
+    */
+	public boolean containsLocation(final String location, final String str) {
+		if (str.equalsIgnoreCase("ALL") || str.equalsIgnoreCase("GLOBAL") 
+			|| str.equalsIgnoreCase("ENABLED") || str.equalsIgnoreCase("TRUE")) {
+			return true;
+		} else {
+			for (String eventLoc: str.split(",")) {
+				if (eventLoc.equalsIgnoreCase(location)) {
+					return true;
+				}
 			}
-			return value;
 		}
+		return false;
 	}
 	
-	public static int getSlotConversion(String str) {
+   /**
+    * Gets the Crafting Slot ID Value.
+    * 
+    * @param str - The String to be checked.
+    * @return The Crafting Slot Value.
+    */
+	public int getSlotConversion(final String str) {
 		if (str.equalsIgnoreCase("CRAFTING[0]") || str.equalsIgnoreCase("C[0]") || str.equalsIgnoreCase("C(0)")) {
 			return 0;
 		} else if (str.equalsIgnoreCase("CRAFTING[1]") || str.equalsIgnoreCase("C[1]") || str.equalsIgnoreCase("C(1)")) {
@@ -189,7 +366,14 @@ public class Utils {
 		return -1;
 	}
 	
-	public static String getArmorSlot(String slot, boolean integer) {
+   /**
+    * Gets the Armor Slot ID.
+    * 
+    * @param slot - The slot to be checked.
+    * @param integer - If the return value should be a String or Integer value.
+    * @return The Armor Slot ID.
+    */
+	public String getArmorSlot(final String slot, final boolean integer) {
 		if (!integer) {
 			if (slot.equalsIgnoreCase("39")) { return "HELMET"; }
 			else if (slot.equalsIgnoreCase("38")) { return "CHESTPLATE"; }
@@ -204,65 +388,56 @@ public class Utils {
 			return slot;
 		}
 	}
+   
+   /**
+    * Checks if the specified Listener is Registered.
+    * 
+    * @param listener - The name of the Listener to be checked.
+    * @return If the Listener is Registered.
+    */
+	public boolean isRegistered(final String listener) {
+		boolean returnValue = false;
+        ArrayList<RegisteredListener> rls = HandlerList.getRegisteredListeners(ItemJoin.getInstance());
+        for(RegisteredListener rl: rls) {
+        	if (rl.getListener().getClass().getSimpleName().equalsIgnoreCase(listener)) {
+        		returnValue = true; break;
+        	}
+        }
+		return returnValue;
+	}
 	
-	public static void triggerCommands(Player player) {
-		if ((ConfigHandler.getConfig("config.yml").getString("Active-Commands.enabled-worlds") != null && ConfigHandler.getConfig("config.yml").getStringList("Active-Commands.commands") != null) 
-				&& (!ConfigHandler.getConfig("config.yml").getString("Active-Commands.enabled-worlds").equalsIgnoreCase("DISABLED") || !ConfigHandler.getConfig("config.yml").getString("Active-Commands.enabled-worlds").equalsIgnoreCase("FALSE"))) {
-			String commandsWorlds = ConfigHandler.getConfig("config.yml").getString("Active-Commands.enabled-worlds").replace(" ", "");
-			if (commandsWorlds == null) { commandsWorlds = "DISABLED"; }
-			String[] compareWorlds = commandsWorlds.split(",");
-			for (String compareWorld: compareWorlds) {
-				if (compareWorld.equalsIgnoreCase(player.getWorld().getName()) || compareWorld.equalsIgnoreCase("ALL") || compareWorld.equalsIgnoreCase("GLOBAL")) {
-					for (String commands: ConfigHandler.getConfig("config.yml").getStringList("Active-Commands.commands")) {
-						String formatCommand = Utils.translateLayout(commands, player).replace("first-join: ", "").replace("first-join:", "");
-						if (!ConfigHandler.getSQLData().hasFirstCommanded(player, formatCommand)) {
-							Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), formatCommand);
-							if (Utils.containsIgnoreCase(commands, "first-join:")) {
-								ConfigHandler.getSQLData().saveFirstCommandData(player, formatCommand);
-							}
-						}
-					}
-				}
-				break;
-			}
+   /**
+    * Checks if the input is NULL, and returns either NONE for NULL / EMPTY,
+    * or the properly formatted list as a String.
+    * 
+    * @param input - The String to be checked.
+    * @return The newly formatted String.
+    */
+	public String nullCheck(String input) {
+		if (input == null || input.equalsIgnoreCase("NULL") || input.contains("[]") || input.contains("{}") || input.equals("0&7") || input.equals("-1&a%") || input.equals("") || input.equals(" ")) {
+			return "NONE";
 		}
+		if (input.startsWith("[") && input.endsWith("]")) {
+			input = input.substring(0, input.length() - 1).substring(1);
+		}
+		if (input.startsWith("{") && input.endsWith("}")) {
+			input = input.replace("{", "").replace("}", "").replace("=", ":");
+		}
+		return input;
 	}
 	
-    public static String getNearbyPlayer(Player player, int range) {
-	    ArrayList < Location > sight = new ArrayList < Location > ();
-	    ArrayList < Entity > entities = (ArrayList < Entity > ) player.getNearbyEntities(range, range, range);
-	    Location origin = player.getEyeLocation();
-	    sight.add(origin.clone().add(origin.getDirection()));
-	    sight.add(origin.clone().add(origin.getDirection().multiply(range)));
-	    sight.add(origin.clone().add(origin.getDirection().multiply(range + 3)));
-	   	for (int i = 0; i < sight.size(); i++) {
-	    	for (int k = 0; k < entities.size(); k++) {
-	    		if (Math.abs(entities.get(k).getLocation().getX() - sight.get(i).getX()) < 1.3) {
-	    			if (Math.abs(entities.get(k).getLocation().getY() - sight.get(i).getY()) < 1.5) {
-	    				if (Math.abs(entities.get(k).getLocation().getZ() - sight.get(i).getZ()) < 1.3) {
-	    					if (entities.get(k) instanceof Player) {
-	    						if (ServerHandler.hasSpecificUpdate("1_8")) {
-	    							return entities.get(k).getName();
-	    						} else {
-	    							return ((Player) entities.get(k)).getName();
-	    						}
-	    					}
-	    				}
-	    			}
-	    		}
-	    	}
-	    }
-    	return "INVALID";
-    }
-	
-	public static String colorFormat(String s) {
-		return ChatColor.translateAlternateColorCodes('&', s).toString();
-	}
-	
-	public static String translateLayout(String name, Player player, String...placeHolder) {
+   /**
+    * Translates the specified String by foramtting its color codes and replacing placeholders.
+    * 
+    * @param str - The String being translated.
+    * @param player - The Player having their String translated.
+    * @param placeHolder - The placeholders to be replaced into the String.
+    * @return The newly translated String.
+    */
+	public String translateLayout(String str, final Player player, final String...placeHolder) {
 		String playerName = "EXEMPT";
 		
-		if (player != null && ConfigHandler.getDepends().nickEnabled()) {
+		if (player != null && DependAPI.getDepends(false).nickEnabled()) {
 			try {
 				de.domedd.betternick.api.nickedplayer.NickedPlayer np = new de.domedd.betternick.api.nickedplayer.NickedPlayer(player);
 				if (np.isNicked()) {
@@ -278,22 +453,32 @@ public class Utils {
 		} else if (player != null) { playerName = player.getName(); }
 		
 		if (playerName != null && player != null && !(player instanceof ConsoleCommandSender)) {
-			try { name = name.replace("%player%", playerName); } catch (Exception e) { ServerHandler.sendDebugTrace(e); }
-			try { name = name.replace("%mob_kills%", String.valueOf(player.getStatistic(Statistic.MOB_KILLS))); } catch (Exception e) { ServerHandler.sendDebugTrace(e); }
-			try { name = name.replace("%player_kills%", String.valueOf(player.getStatistic(Statistic.PLAYER_KILLS))); } catch (Exception e) { ServerHandler.sendDebugTrace(e); }
-			try { name = name.replace("%player_deaths%", String.valueOf(player.getStatistic(Statistic.DEATHS))); } catch (Exception e) { ServerHandler.sendDebugTrace(e); }
-			try { name = name.replace("%player_food%", String.valueOf(player.getFoodLevel())); } catch (Exception e) { ServerHandler.sendDebugTrace(e); }
-			try { name = name.replace("%player_health%", String.valueOf(player.getHealth())); } catch (Exception e) { ServerHandler.sendDebugTrace(e); }
-			try { name = name.replace("%player_location%", player.getLocation().getBlockX() + ", " + player.getLocation().getBlockY() + ", " + player.getLocation().getBlockZ() + ""); } catch (Exception e) { ServerHandler.sendDebugTrace(e); }
-			try { name = name.replace("%player_interact%", getNearbyPlayer(player, 3)); } catch (Exception e) { ServerHandler.sendDebugTrace(e); } }
-		if (player == null) { try { name = name.replace("%player%", "CONSOLE"); } catch (Exception e) { ServerHandler.sendDebugTrace(e); } }
+			try { str = str.replace("%player%", playerName); } catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
+			try { str = str.replace("%mob_kills%", String.valueOf(player.getStatistic(Statistic.MOB_KILLS))); } catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
+			try { str = str.replace("%player_kills%", String.valueOf(player.getStatistic(Statistic.PLAYER_KILLS))); } catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
+			try { str = str.replace("%player_deaths%", String.valueOf(player.getStatistic(Statistic.DEATHS))); } catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
+			try { str = str.replace("%player_food%", String.valueOf(player.getFoodLevel())); } catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
+			try { str = str.replace("%player_health%", String.valueOf(player.getHealth())); } catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
+			try { str = str.replace("%player_location%", player.getLocation().getBlockX() + ", " + player.getLocation().getBlockY() + ", " + player.getLocation().getBlockZ() + ""); } catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
+			try { str = str.replace("%player_interact%", PlayerHandler.getPlayer().getNearbyPlayer(player, 3)); } catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); } }
+		if (player == null) { try { str = str.replace("%player%", "CONSOLE"); } catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); } }
 	
-		name = ChatColor.translateAlternateColorCodes('&', name).toString();
-		if (ConfigHandler.getDepends().placeHolderEnabled()) {
-			try { try { return PlaceholderAPI.setPlaceholders(player, name); } 
-			catch (NoSuchFieldError e) { ServerHandler.logWarn("An error has occured when setting the PlaceHolder " + e.getMessage() + ", if this issue persits contact the developer of PlaceholderAPI."); return name; }
+		str = ChatColor.translateAlternateColorCodes('&', str).toString();
+		if (DependAPI.getDepends(false).placeHolderEnabled()) {
+			try { try { return PlaceholderAPI.setPlaceholders(player, str); } 
+			catch (NoSuchFieldError e) { ServerHandler.getServer().logWarn("An error has occured when setting the PlaceHolder " + e.getMessage() + ", if this issue persits contact the developer of PlaceholderAPI."); return str; }
 			} catch (Exception e) { }
 		}
-		return name;
+		return str;
 	}
+	
+   /**
+    * Gets the instance of the Utils.
+    * 
+    * @return The Utils instance.
+    */
+    public static Utils getUtils() { 
+        if (util == null) { util = new Utils(); }
+        return util; 
+    } 
 }

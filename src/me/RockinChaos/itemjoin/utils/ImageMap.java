@@ -42,47 +42,65 @@ public class ImageMap extends MapRenderer {
 	private boolean isGIF = false;
 	private List<Integer> Rendered = new ArrayList<Integer> ();
 	
-	public ImageMap(String image, int imageID) {
+   /**
+    * Creates a new ImageMap instance.
+    * 
+    * @param image - The image to be rendered, ex: 'default.jpg'.
+    * @param imageID - The id of the MapView.
+    */
+	public ImageMap(final String image, final int imageID) {
 		this.id = imageID;
 		this.image = image;
 		if (image != null && !image.equalsIgnoreCase("default.jpg")) {
 			try { 
-				if (Utils.containsIgnoreCase(this.image, ".gif")) {
-					this.isGIF = true;
+				this.isGIF = Utils.getUtils().containsIgnoreCase(this.image, ".gif");
+				if (this.isGIF) {
 				    ImageReader reader = ImageIO.getImageReadersByFormatName("gif").next();
 				    ImageInputStream ciis = ImageIO.createImageInputStream(new File(ItemJoin.getInstance().getDataFolder(), String.valueOf(image)));
 				    reader.setInput(ciis, false);
 				    for (int i = 0; i < reader.getNumImages(true); i++) { try { this.imgCacheList.add(reader.read(i)); } catch (Exception e) {} }
 				    ciis.close();
 				} else { this.imgCache = ImageIO.read(new File(ItemJoin.getInstance().getDataFolder(), String.valueOf(image))); }
-			} catch (IOException e) { ServerHandler.sendDebugTrace(e); }
+			} catch (IOException e) { ServerHandler.getServer().sendDebugTrace(e); }
 		} else if (image != null && image.equalsIgnoreCase("default.jpg") && ItemJoin.getInstance().getResource("files/generated/default.jpg") != null) {
 			try { this.imgCache = ImageIO.read(ItemJoin.getInstance().getResource("files/generated/default.jpg"));
-			} catch (IOException e) { ServerHandler.sendDebugTrace(e); }
+			} catch (IOException e) { ServerHandler.getServer().sendDebugTrace(e); }
 		}
 	}
     
+   /**
+    * Renders the MapView to the MapCanvas.
+    * 
+    * @param mapView - The MapView being rendered.
+    * @param mapCanvas - The canvas to be drawn to.
+    * @param player - The Player having their map rendered.
+    */
     @Override
-    public void render(MapView mapView, MapCanvas mapCanvas, Player player) {
-    	if (Rendered.isEmpty() || !Rendered.contains(this.id)) {
+    public void render(final MapView mapView, final MapCanvas mapCanvas, final Player player) {
+    	if (this.Rendered.isEmpty() || !this.Rendered.contains(this.id)) {
     		try {
-    			Rendered.add(this.id);
+    			this.Rendered.add(this.id);
 				mapView.setScale(MapView.Scale.NORMAL);
 				if (this.isGIF) { this.drawGIF(mapCanvas);} 
 				else { mapCanvas.drawImage(0, 0, this.imgCache); }
-				ServerHandler.logDebug("{ImageMap} Rendering custom-map-image; " + this.image + " with the id " + this.id);
+				ServerHandler.getServer().logDebug("{ImageMap} Rendering custom-map-image; " + this.image + " with the id " + this.id);
 			} catch (Exception e) {
-				ServerHandler.logSevere("{ImageMap} There was a problem rending your map(s)!");
-				ServerHandler.logWarn("{ImageMap} Please check and make sure your image size is no larger than 128x128 pixels.");
-				ServerHandler.sendDebugTrace(e);
+				ServerHandler.getServer().logSevere("{ImageMap} There was a problem rending your map(s)!");
+				ServerHandler.getServer().logWarn("{ImageMap} Please check and make sure your image size is no larger than 128x128 pixels.");
+				ServerHandler.getServer().sendDebugTrace(e);
 			}
     	}
     }
     
+   /**
+    * Draws the GIF to the MapCanvas.
+    * 
+    * @param mapCanvas - The canvas to be drawn to.
+    */
     private void drawGIF(final MapCanvas mapCanvas) {
     	final int maxFrames = this.imgCacheList.size();
     	int delay = 0; int frameSize = 1;
-    	for (final BufferedImage frame: imgCacheList) {
+    	for (final BufferedImage frame: this.imgCacheList) {
     		final int frameNumber = frameSize;
     		new java.util.Timer().schedule(new java.util.TimerTask() {
     			@Override
@@ -97,9 +115,15 @@ public class ImageMap extends MapRenderer {
     	}
     }
 
-	public MapView FetchExistingView(int id) {
-		MapView view = Legacy.getMapView(id);
-		if (view == null) { view = Legacy.createLegacyMapView(); }
+   /**
+    * Gets the existing MapView for the image id.
+    * 
+    * @param id - that will recieve the items.
+    * @retrn The existing MapView.
+    */
+	public MapView existingView(final int id) {
+		MapView view = LegacyAPI.getLegacy().getMapView(id);
+		if (view == null) { view = LegacyAPI.getLegacy().createMapView(); }
 		return view;
 	}
 }

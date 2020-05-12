@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package me.RockinChaos.itemjoin.listeners;
+package me.RockinChaos.itemjoin.listeners.legacy;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -27,14 +27,25 @@ import org.bukkit.potion.PotionEffect;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 
+/**
+* Handles the Consumption events for custom items.
+* 
+* @deprecated This is a LEGACY listener, only use on Minecraft versions below 1.11.
+*/
 public class Legacy_Consumes implements Listener {
 
+   /**
+	* Gives the players the defined custom items potion effects upon consumption.
+	* 
+	* @param event - PlayerItemConsumeEvent.
+	* @deprecated This is a LEGACY event, only use on Minecraft versions below 1.11.
+	*/
 	@EventHandler
 	private void onPlayerConsumesItem(PlayerItemConsumeEvent event) {
 		ItemStack item = event.getItem();
 		Player player = event.getPlayer();
 		if (item.getType() == Material.GOLDEN_APPLE) {
-			ItemMap itemMap = ItemUtilities.getItemMap(item, null, player.getWorld());
+			ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item, null, player.getWorld());
 			if (itemMap != null && itemMap.getMaterial() == Material.GOLDEN_APPLE && itemMap.isCustomConsumable()) {
 				if (itemMap.getPotionEffect() != null && !itemMap.getPotionEffect().isEmpty()) {
 					for (PotionEffect potion: itemMap.getPotionEffect()) { player.addPotionEffect(potion); }

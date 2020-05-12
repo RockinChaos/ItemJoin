@@ -68,10 +68,12 @@ import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PermissionsHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
+import me.RockinChaos.itemjoin.utils.DependAPI;
 import me.RockinChaos.itemjoin.utils.EffectAPI;
-import me.RockinChaos.itemjoin.utils.Language;
-import me.RockinChaos.itemjoin.utils.Legacy;
+import me.RockinChaos.itemjoin.utils.LanguageAPI;
+import me.RockinChaos.itemjoin.utils.LegacyAPI;
 import me.RockinChaos.itemjoin.utils.Reflection;
+import me.RockinChaos.itemjoin.utils.UI;
 import me.RockinChaos.itemjoin.utils.Utils;
 import me.arcaniax.hdb.api.HeadDatabaseAPI;
 
@@ -248,16 +250,20 @@ public class ItemMap {
 	private List < String > enabledWorlds = new ArrayList < String > ();
 // ======================================================================================== //
 	
-//  ============================================== //
-//  	  		 Initialize ItemMap  		       //
-//  ============================================== //
-	public ItemMap() { }
-	
-	public ItemMap(String internalName, String slot) {
-        this.nodeLocation = ConfigHandler.getItemSection(internalName);
+   /**
+    * Creates a new ItemMap instance.
+    * Typically used in the creation of items.
+    * 
+    * @param designer - The ItemDesigner instance that is creating the ItemMap.
+    * @param internalName - The node name of the ItemMap.
+    * @param slot - The slot of the ItemMap.
+    */
+	public ItemMap(final ItemDesigner designer, final String internalName, final String slot) {
+        this.nodeLocation = ConfigHandler.getConfig(false).getItemSection(internalName);
         this.configName = internalName;
+        this.setItemValue(designer.getItemID(slot));
         this.setSlot(slot);
-        if (ItemHandler.isCraftingSlot(slot)) { this.craftingItem = true; }
+        if (ItemHandler.getItem().isCraftingSlot(slot)) { this.craftingItem = true; }
         
         if (this.nodeLocation != null) {
         	this.setMultipleSlots();
@@ -278,15 +284,29 @@ public class ItemMap {
 			this.setWorlds();
 			this.setRegions();
 	        this.setPerm(this.nodeLocation.getString(".permission-node"));
-	        this.setPermissionNeeded(ConfigHandler.getConfig("config.yml").getBoolean("Permissions.Obtain-Items"));
-	    	this.setOPPermissionNeeded(ConfigHandler.getConfig("config.yml").getBoolean("Permissions.Obtain-Items.OP"));
+	        this.setPermissionNeeded(ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Permissions.Obtain-Items"));
+	    	this.setOPPermissionNeeded(ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Permissions.Obtain-Items.OP"));
         }
+	}
+	
+   /**
+    * Creates a new ItemMap instance.
+    * Called when copying an ItemMap, sadly this has to exist.
+    * 
+    * Welcome to nothing!
+    * 
+    */
+	public ItemMap() { 
 	}
 //  ========================================================================================================= //
 	
 //  ============================================== //
 //   Setter functions for first ItemMap creation.  //
 //  ============================================== //
+   /**
+    * Sets the ItemMaps Multiple Slots.
+    * 
+    */
 	private void setMultipleSlots() {
         if (this.nodeLocation.getString(".slot").contains(",")) {
         	String[] slots = this.nodeLocation.getString(".slot").replace(" ", "").split(",");
@@ -294,157 +314,192 @@ public class ItemMap {
         }
 	}
 	
+   /**
+    * Sets the ItemMaps Commands Cost.
+    * 
+    */
 	private void setCommandCost() {
 		if (this.nodeLocation.getString("commands-item") != null && !this.nodeLocation.getString("commands-item").isEmpty()) { this.itemCost = this.nodeLocation.getString("commands-item"); }
-		if (this.nodeLocation.getString("commands-cost") != null && Utils.isInt(this.nodeLocation.getString("commands-cost"))) { this.cost = this.nodeLocation.getInt("commands-cost"); }
+		if (this.nodeLocation.getString("commands-cost") != null && Utils.getUtils().isInt(this.nodeLocation.getString("commands-cost"))) { this.cost = this.nodeLocation.getInt("commands-cost"); }
 	}
 	
+   /**
+    * Sets the ItemMaps Commands Receive.
+    * 
+    */
 	private void setCommandReceive() {
-		if (this.nodeLocation.getString("commands-receive") != null && Utils.isInt(this.nodeLocation.getString("commands-receive"))) { this.commandsReceive = this.nodeLocation.getInt("commands-receive"); }
+		if (this.nodeLocation.getString("commands-receive") != null && Utils.getUtils().isInt(this.nodeLocation.getString("commands-receive"))) { this.commandsReceive = this.nodeLocation.getInt("commands-receive"); }
 	}
 	
+   /**
+    * Sets the ItemMaps Commands Warmup Delay.
+    * 
+    */
 	private void setCommandWarmDelay() {
-		if (this.nodeLocation.getString("commands-warmup") != null && Utils.isInt(this.nodeLocation.getString("commands-warmup"))) { this.warmDelay = this.nodeLocation.getInt("commands-warmup"); }
+		if (this.nodeLocation.getString("commands-warmup") != null && Utils.getUtils().isInt(this.nodeLocation.getString("commands-warmup"))) { this.warmDelay = this.nodeLocation.getInt("commands-warmup"); }
 	}
 	
+   /**
+    * Sets the ItemMaps Commands Sound.
+    * 
+    */
 	private void setCommandSound() {
 		try { if (this.nodeLocation.getString(".commands-sound") != null) { this.commandSound = Sound.valueOf(this.nodeLocation.getString(".commands-sound")); } } 
 		catch (Exception e) { 
-			ServerHandler.logSevere("{ItemMap} Your server is running MC " + Reflection.getServerVersion() + " and this version of Minecraft does not have the defined command-sound " + this.nodeLocation.getString(".commands-sound") + "."); 
-			ServerHandler.sendDebugTrace(e);
+			ServerHandler.getServer().logSevere("{ItemMap} Your server is running MC " + Reflection.getServerVersion() + " and this version of Minecraft does not have the defined command-sound " + this.nodeLocation.getString(".commands-sound") + "."); 
+			ServerHandler.getServer().sendDebugTrace(e);
 		}
 	}
 	
+   /**
+    * Sets the ItemMaps Commands Particle.
+    * 
+    */
 	private void setCommandParticle() {
 		if (this.nodeLocation.getString(".commands-particle") != null) { this.commandParticle = this.nodeLocation.getString(".commands-particle"); }
 	}
 	
+   /**
+    * Sets the ItemMaps Commands Cooldown.
+    * 
+    */
 	private void setCommandCooldown() {
 		this.useCooldown = this.nodeLocation.getString("commands-cooldown") != null;
 		if (this.useCooldown) { this.cooldownSeconds = this.nodeLocation.getInt("commands-cooldown"); }
 		this.cooldownMessage = this.nodeLocation.getString("cooldown-message");
 	}
 	
-	public void setCommandCooldown(int i) {
-		this.cooldownSeconds = i;
-	}
-	
+   /**
+    * Sets the ItemMaps Commands Type.
+    * 
+    */
 	private void setCommandType() {
 		if (this.nodeLocation.getString("commands-type") != null) { 
-			if (Utils.containsIgnoreCase(this.nodeLocation.getString("commands-type"), "INTERACT") 
-				&& Utils.containsIgnoreCase(this.nodeLocation.getString("commands-type"), "INVENTORY")) { this.type = CommandType.BOTH; }
-			else if (Utils.containsIgnoreCase(this.nodeLocation.getString("commands-type"), "INTERACT")) { this.type = CommandType.INTERACT; }
-			else if (Utils.containsIgnoreCase(this.nodeLocation.getString("commands-type"), "INVENTORY")) { this.type = CommandType.INVENTORY; }
-			else if (Utils.containsIgnoreCase(this.nodeLocation.getString("commands-type"), "BOTH") || Utils.containsIgnoreCase(this.nodeLocation.getString("commands-type"), "ALL")) { this.type = CommandType.BOTH; }
+			if (Utils.getUtils().containsIgnoreCase(this.nodeLocation.getString("commands-type"), "INTERACT") 
+				&& Utils.getUtils().containsIgnoreCase(this.nodeLocation.getString("commands-type"), "INVENTORY")) { this.type = CommandType.BOTH; }
+			else if (Utils.getUtils().containsIgnoreCase(this.nodeLocation.getString("commands-type"), "INTERACT")) { this.type = CommandType.INTERACT; }
+			else if (Utils.getUtils().containsIgnoreCase(this.nodeLocation.getString("commands-type"), "INVENTORY")) { this.type = CommandType.INVENTORY; }
+			else if (Utils.getUtils().containsIgnoreCase(this.nodeLocation.getString("commands-type"), "BOTH") || Utils.getUtils().containsIgnoreCase(this.nodeLocation.getString("commands-type"), "ALL")) { this.type = CommandType.BOTH; }
 		}
 	}
 	
+   /**
+    * Sets the ItemMaps Commands Sequence.
+    * 
+    */
 	private void setCommandSequence() {
 		if (this.nodeLocation.getString("commands-sequence") != null) { 
-		    if (Utils.containsIgnoreCase(this.nodeLocation.getString("commands-sequence"), "SEQUENTIAL")) { this.sequence = CommandSequence.SEQUENTIAL; }
-		    else if (Utils.containsIgnoreCase(this.nodeLocation.getString("commands-sequence"), "RANDOM_SINGLE")) { this.sequence = CommandSequence.RANDOM_SINGLE; }
-		    else if (Utils.containsIgnoreCase(this.nodeLocation.getString("commands-sequence"), "RANDOM_LIST")) { this.sequence = CommandSequence.RANDOM_LIST; }
-			else if (Utils.containsIgnoreCase(this.nodeLocation.getString("commands-sequence"), "RANDOM")) { this.sequence = CommandSequence.RANDOM; }
+		    if (Utils.getUtils().containsIgnoreCase(this.nodeLocation.getString("commands-sequence"), "SEQUENTIAL")) { this.sequence = CommandSequence.SEQUENTIAL; }
+		    else if (Utils.getUtils().containsIgnoreCase(this.nodeLocation.getString("commands-sequence"), "RANDOM_SINGLE")) { this.sequence = CommandSequence.RANDOM_SINGLE; }
+		    else if (Utils.getUtils().containsIgnoreCase(this.nodeLocation.getString("commands-sequence"), "RANDOM_LIST")) { this.sequence = CommandSequence.RANDOM_LIST; }
+			else if (Utils.getUtils().containsIgnoreCase(this.nodeLocation.getString("commands-sequence"), "RANDOM")) { this.sequence = CommandSequence.RANDOM; }
 		}
 	}
-
+	
+   /**
+    * Sets the ItemMaps Interact Cooldown.
+    * 
+    */
 	private void setInteractCooldown() {
         if (this.nodeLocation.getString(".use-cooldown") != null) {
         	this.interactCooldown = this.nodeLocation.getInt(".use-cooldown");
         }
 	}
 	
-	private void setWarmPending(Player player) {
-        if (!this.warmPending.contains(player)) {
-        	this.warmPending.add(player);
-        }
-	}
-	
-	private void delWarmPending(Player player) {
-        if (this.warmPending.contains(player)) {
-        	this.warmPending.remove(player);
-        }
-	}
-	
-	private boolean getWarmPending(Player player) {
-        if (this.warmPending.contains(player)) { return true; }
-        return false;
-	}
-	
+   /**
+    * Sets the ItemMaps ItemFlags.
+    * 
+    */
 	private void setItemflags() {
 		if (this.nodeLocation.getString(".itemflags") != null) {
 			this.itemflags = this.nodeLocation.getString(".itemflags");
-			this.vanillaItem = Utils.containsIgnoreCase(this.itemflags, "vanilla ");
-			this.vanillaStatus = Utils.containsIgnoreCase(this.itemflags, "vanilla-status");
-			this.vanillaControl = Utils.containsIgnoreCase(this.itemflags, "vanilla-control");
-			this.disposable = Utils.containsIgnoreCase(this.itemflags, "disposable");
-			this.blockPlacement = Utils.containsIgnoreCase(this.itemflags, "placement");
-			this.blockMovement = Utils.containsIgnoreCase(this.itemflags, "inventory-modify");
-			if (!this.blockMovement) { this.blockMovement = Utils.containsIgnoreCase(this.itemflags, "inventory-close"); }
-			this.closeInventory = Utils.containsIgnoreCase(this.itemflags, "inventory-close");
-			this.itemChangable = Utils.containsIgnoreCase(this.itemflags, "allow-modifications") || Utils.containsIgnoreCase(this.itemflags, "item-changable");
-			this.alwaysGive = Utils.containsIgnoreCase(this.itemflags, "always-give");
-			this.autoRemove = Utils.containsIgnoreCase(this.itemflags, "auto-remove");
-			this.dynamic = Utils.containsIgnoreCase(this.itemflags, "dynamic");
-			this.animate = Utils.containsIgnoreCase(this.itemflags, "animate");
-			this.giveNext = Utils.containsIgnoreCase(this.itemflags, "give-next");
-			this.moveNext = Utils.containsIgnoreCase(this.itemflags, "move-next");
-			this.dropFull = Utils.containsIgnoreCase(this.itemflags, "drop-full");
-			this.itemStore = Utils.containsIgnoreCase(this.itemflags, "item-store");
-			this.itemModify = Utils.containsIgnoreCase(this.itemflags, "item-modifiable");
-			this.noCrafting = Utils.containsIgnoreCase(this.itemflags, "item-craftable");
-			this.noRepairing = Utils.containsIgnoreCase(this.itemflags, "item-repairable");
-			this.cancelEvents = Utils.containsIgnoreCase(this.itemflags, "cancel-events");
-			this.countLock = Utils.containsIgnoreCase(this.itemflags, "count-lock");
-			this.setOnlyFirstJoin(Utils.containsIgnoreCase(this.itemflags, "first-join"));
-			this.onlyFirstWorld = Utils.containsIgnoreCase(this.itemflags, "first-world");
-			this.overwritable = Utils.containsIgnoreCase(this.itemflags, "overwrite");
-			this.ipLimited = Utils.containsIgnoreCase(this.itemflags, "ip-limit");
-			this.deathDroppable = Utils.containsIgnoreCase(this.itemflags, "death-drops");
-			this.selfDroppable = Utils.containsIgnoreCase(this.itemflags, "self-drops");
-			this.AllowOpBypass = Utils.containsIgnoreCase(this.itemflags, "AllowOpBypass");
-			this.CreativeBypass = Utils.containsIgnoreCase(this.itemflags, "CreativeBypass");
+			this.vanillaItem = Utils.getUtils().containsIgnoreCase(this.itemflags, "vanilla ");
+			this.vanillaStatus = Utils.getUtils().containsIgnoreCase(this.itemflags, "vanilla-status");
+			this.vanillaControl = Utils.getUtils().containsIgnoreCase(this.itemflags, "vanilla-control");
+			this.disposable = Utils.getUtils().containsIgnoreCase(this.itemflags, "disposable");
+			this.blockPlacement = Utils.getUtils().containsIgnoreCase(this.itemflags, "placement");
+			this.blockMovement = Utils.getUtils().containsIgnoreCase(this.itemflags, "inventory-modify");
+			if (!this.blockMovement) { this.blockMovement = Utils.getUtils().containsIgnoreCase(this.itemflags, "inventory-close"); }
+			this.closeInventory = Utils.getUtils().containsIgnoreCase(this.itemflags, "inventory-close");
+			this.itemChangable = Utils.getUtils().containsIgnoreCase(this.itemflags, "allow-modifications") || Utils.getUtils().containsIgnoreCase(this.itemflags, "item-changable");
+			this.alwaysGive = Utils.getUtils().containsIgnoreCase(this.itemflags, "always-give");
+			this.autoRemove = Utils.getUtils().containsIgnoreCase(this.itemflags, "auto-remove");
+			this.dynamic = Utils.getUtils().containsIgnoreCase(this.itemflags, "dynamic");
+			this.animate = Utils.getUtils().containsIgnoreCase(this.itemflags, "animate");
+			this.giveNext = Utils.getUtils().containsIgnoreCase(this.itemflags, "give-next");
+			this.moveNext = Utils.getUtils().containsIgnoreCase(this.itemflags, "move-next");
+			this.dropFull = Utils.getUtils().containsIgnoreCase(this.itemflags, "drop-full");
+			this.itemStore = Utils.getUtils().containsIgnoreCase(this.itemflags, "item-store");
+			this.itemModify = Utils.getUtils().containsIgnoreCase(this.itemflags, "item-modifiable");
+			this.noCrafting = Utils.getUtils().containsIgnoreCase(this.itemflags, "item-craftable");
+			this.noRepairing = Utils.getUtils().containsIgnoreCase(this.itemflags, "item-repairable");
+			this.cancelEvents = Utils.getUtils().containsIgnoreCase(this.itemflags, "cancel-events");
+			this.countLock = Utils.getUtils().containsIgnoreCase(this.itemflags, "count-lock");
+			this.setOnlyFirstJoin(Utils.getUtils().containsIgnoreCase(this.itemflags, "first-join"));
+			this.onlyFirstWorld = Utils.getUtils().containsIgnoreCase(this.itemflags, "first-world");
+			this.overwritable = Utils.getUtils().containsIgnoreCase(this.itemflags, "overwrite");
+			this.ipLimited = Utils.getUtils().containsIgnoreCase(this.itemflags, "ip-limit");
+			this.deathDroppable = Utils.getUtils().containsIgnoreCase(this.itemflags, "death-drops");
+			this.selfDroppable = Utils.getUtils().containsIgnoreCase(this.itemflags, "self-drops");
+			this.AllowOpBypass = Utils.getUtils().containsIgnoreCase(this.itemflags, "AllowOpBypass");
+			this.CreativeBypass = Utils.getUtils().containsIgnoreCase(this.itemflags, "CreativeBypass");
 		}
 	}
 	
+   /**
+    * Sets the ItemMaps Limit Modes.
+    * 
+    */
 	private void setLimitModes() {
 		this.limitModes = this.nodeLocation.getString(".limit-modes");
 	}
 	
+   /**
+    * Sets the ItemMaps Triggers.
+    * 
+    */
 	private void setTriggers() {
 		if (this.nodeLocation.getString("triggers") != null) {
 			this.triggers = this.nodeLocation.getString("triggers");
-			this.giveOnDisabled = Utils.containsIgnoreCase(this.triggers, "DISABLED");
-			this.giveOnJoin = Utils.containsIgnoreCase(this.triggers, "JOIN");
-			if (Utils.containsIgnoreCase(this.triggers, "FIRST-JOIN")) { 
+			this.giveOnDisabled = Utils.getUtils().containsIgnoreCase(this.triggers, "DISABLED");
+			this.giveOnJoin = Utils.getUtils().containsIgnoreCase(this.triggers, "JOIN");
+			if (Utils.getUtils().containsIgnoreCase(this.triggers, "FIRST-JOIN")) { 
 				this.onlyFirstJoin = true;
 				this.giveOnJoin = true;
 			}
-		    this.giveOnWorldSwitch = Utils.containsIgnoreCase(this.triggers, "WORLD-CHANGE") || Utils.containsIgnoreCase(this.triggers, "WORLD-SWITCH");
-			if (Utils.containsIgnoreCase(this.triggers, "FIRST-WORLD")) { 
+		    this.giveOnWorldSwitch = Utils.getUtils().containsIgnoreCase(this.triggers, "WORLD-CHANGE") || Utils.getUtils().containsIgnoreCase(this.triggers, "WORLD-SWITCH");
+			if (Utils.getUtils().containsIgnoreCase(this.triggers, "FIRST-WORLD")) { 
 				this.giveOnJoin = true;
 				this.onlyFirstWorld = true;
 				this.giveOnWorldSwitch = true;
 			}
-			this.giveOnRespawn = Utils.containsIgnoreCase(this.triggers, "RESPAWN");
-			this.giveOnRegionEnter = Utils.containsIgnoreCase(this.triggers, "REGION-ENTER");
-			this.takeOnRegionLeave = Utils.containsIgnoreCase(this.triggers, "REGION-REMOVE") || Utils.containsIgnoreCase(this.triggers, "REGION-EXIT") || Utils.containsIgnoreCase(this.triggers, "REGION-LEAVE");
-			this.useOnLimitSwitch = Utils.containsIgnoreCase(this.triggers, "GAMEMODE-SWITCH");
+			this.giveOnRespawn = Utils.getUtils().containsIgnoreCase(this.triggers, "RESPAWN");
+			this.giveOnRegionEnter = Utils.getUtils().containsIgnoreCase(this.triggers, "REGION-ENTER");
+			this.takeOnRegionLeave = Utils.getUtils().containsIgnoreCase(this.triggers, "REGION-REMOVE") || Utils.getUtils().containsIgnoreCase(this.triggers, "REGION-EXIT") || Utils.getUtils().containsIgnoreCase(this.triggers, "REGION-LEAVE");
+			this.useOnLimitSwitch = Utils.getUtils().containsIgnoreCase(this.triggers, "GAMEMODE-SWITCH");
 		} else { this.giveOnJoin = true; }
 	}
 	
+   /**
+    * Sets the ItemMaps Enabled Regions.
+    * 
+    */
 	private void setRegions() {
 		if (this.nodeLocation.getString(".enabled-regions") != null && !this.nodeLocation.getString(".enabled-regions").isEmpty()) {
 			String[] enabledParts = this.nodeLocation.getString(".enabled-regions").replace(" ,  ", ",").replace(" , ", ",").replace(",  ", ",").replace(", ", ",").split(",");
 			for (String region: enabledParts) {
 				this.enabledRegions.add(region); 
-				ConfigHandler.getDepends().addLocaleRegion(region);
+				DependAPI.getDepends(false).getGuard().addLocaleRegion(region);
 			}
 		} else if (isGiveOnRegionEnter() || isTakeOnRegionLeave()) { 
-			ConfigHandler.getDepends().addLocaleRegion("UNDEFINED"); 
+			DependAPI.getDepends(false).getGuard().addLocaleRegion("UNDEFINED"); 
 			this.enabledRegions.add("UNDEFINED"); }
 	}
 	
+   /**
+    * Sets the ItemMaps Enabled Worlds.
+    * 
+    */
 	private void setWorlds() {
 		if (this.nodeLocation.getString(".enabled-worlds") != null && !this.nodeLocation.getString(".enabled-worlds").isEmpty()) {
 			String[] enabledParts = this.nodeLocation.getString(".enabled-worlds").replace(" ,  ", ",").replace(" , ", ",").replace(",  ", ",").replace(", ", ",").split(",");
@@ -462,9 +517,13 @@ public class ItemMap {
 		} else { this.enabledWorlds.add("ALL"); }
 	}
 	
+   /**
+    * Sets the ItemMaps Temporary ItemStack.
+    * 
+    */
 	public void renderItemStack() {
         if (this.dataValue != null) {
-        	this.tempItem = Legacy.newLegacyItemStack(this.material, this.count, this.dataValue);
+        	this.tempItem = LegacyAPI.getLegacy().newItemStack(this.material, this.count, this.dataValue);
         } else { this.tempItem = new ItemStack(this.material, this.count); }
 	}
 //  ======================================================================================================================================================================================== //
@@ -472,35 +531,57 @@ public class ItemMap {
 //  ===================== //
 //  ~ Setting Functions ~ //
 //  ===================== //
-	public void setTempItem(ItemStack temp) {
+   /**
+    * Sets the Temporary ItemStack.
+    * 
+    * @param temp - The ItemStack to be set.
+    */
+	public void setTempItem(final ItemStack temp) {
 		this.tempItem = temp;
 	}
 	
-	public void setTempMeta(ItemMeta temp) {
+   /**
+    * Sets the Temporary ItemMeta.
+    * 
+    * @param temp - The ItemMeta to be set.
+    */
+	public void setTempMeta(final ItemMeta temp) {
 		this.tempMeta = temp;
 	}
 	
-	public void setMaterial(Material mat) {
+   /**
+    * Sets the Material.
+    * 
+    * @param mat - The Material to be set.
+    */
+	public void setMaterial(final Material mat) {
 		this.material = mat;
 	}
 	
-	public void setCustomName(String customName) {
-		if (customName == null || customName.length() == 0) {
-			this.customName = null;
-			return;
-		}
+   /**
+    * Sets the Custom Display Name.
+    * 
+    * @param customName - The Display Name to be set.
+    */
+	public void setCustomName(final String customName) {
 		this.customName = customName;
 	}
 	
-	public void setDynamicNames(List<String> names) {
+   /**
+    * Sets the Dynamic Display Names.
+    * 
+    * @param names - The Dynamic Display Names to be set.
+    */
+	public void setDynamicNames(final List<String> names) {
 		this.dynamicNames = names;
 	}
 	
-	public void setCustomLore(List < String > customLore) {
-		if (customLore == null || customLore.size() == 0) {
-			this.customLore = new ArrayList< String > ();
-			return;
-		}
+   /**
+    * Sets the Custom Display Lore.
+    * 
+    * @param customLore - The Display Lore to be set.
+    */
+	public void setCustomLore(final List < String > customLore) {
 		this.customLore = new ArrayList < String > ();
 		Iterator < String > iterator = customLore.iterator();
 		while (iterator.hasNext()) {
@@ -509,136 +590,315 @@ public class ItemMap {
 		}
 	}
 	
-	public void setDynamicLores(List<List<String>> lores) {
+   /**
+    * Sets the Dynamic Display Lore.
+    * 
+    * @param lores - The Dynamic Display Lore to be set.
+    */
+	public void setDynamicLores(final List<List<String>> lores) {
 		this.dynamicLores = lores;
 	}
 	
-	public void setDynamicMaterials(List<String> mats) {
+   /**
+    * Sets the Dynamic Materials.
+    * 
+    * @param mats - The Dynamic Materials to be set.
+    */
+	public void setDynamicMaterials(final List<String> mats) {
 		this.dynamicMaterials = mats;
 		this.materialAnimated = true;
 	}
 	
-	public void setDynamicOwners(List<String> owners) {
+   /**
+    * Sets the Dynamic Skull Owners.
+    * 
+    * @param owners - The Dynamic Skull Owners to be set.
+    */
+	public void setDynamicOwners(final List<String> owners) {
 		this.dynamicOwners = owners;
 		this.skullAnimated = true;
 	}
 	
-	public void setDynamicTextures(List<String> textures) {
+   /**
+    * Sets the Dynamic Skull Textures.
+    * 
+    * @param textures - The Dynamic Skull Textures to be set.
+    */
+	public void setDynamicTextures(final List<String> textures) {
 		this.dynamicTextures = textures;
 		this.skullAnimated = true;
 	}
 	
-	public void removeFromAnimationHandler(Player player) {
+   /**
+    * Removes the Player from the AnimationHandler.
+    * 
+    * @param player - The Player to be removed.
+    */
+	public void removeFromAnimationHandler(final Player player) {
 		this.localeAnimations.remove(player);
 	}
 	
-	public void setLimitModes(String str) {
+   /**
+    * Sets the Limit Modes.
+    * 
+    * @param str - The Limit Modes to be set.
+    */
+	public void setLimitModes(final String str) {
 		this.limitModes = str;
 	}
 	
-	public void setSlot(String slot) {
-		if (ItemHandler.isCustomSlot(slot)) {
+   /**
+    * Sets the Slot.
+    * 
+    * @param slot - The Slot to be set.
+    */
+	public void setSlot(final String slot) {
+		if (ItemHandler.getItem().isCustomSlot(slot)) {
 			this.CustomSlot = slot;
 			this.InvSlot = null;
-			this.itemValue = ItemHandler.getItemID(slot); // <--- NEEDS MAJOR WORK.
-		} else if (Utils.isInt(slot)) {
+		} else if (Utils.getUtils().isInt(slot)) {
 			this.InvSlot = Integer.parseInt(slot);
 			this.CustomSlot = null;
-			this.itemValue = ItemHandler.getItemID(slot); // <--- NEEDS MAJOR WORK.
 		}
 	}
 	
-	public void setMultipleSlots(List<String> slots) {
+   /**
+    * Sets the Multiple Slots.
+    * 
+    * @param slots - The Multiple Slots to be set.
+    */
+	public void setMultipleSlots(final List<String> slots) {
 		this.AllSlots = slots;
 	}
 	
-	public void setEnabledWorlds(List<String> worlds) {
+   /**
+    * Sets the Enabled Worlds.
+    * 
+    * @param worlds - The Enabled Worlds to be set.
+    */
+	public void setEnabledWorlds(final List<String> worlds) {
 		this.enabledWorlds = worlds;
 	}
 	
-	public void setEnabledRegions(List<String> regions) {
+   /**
+    * Sets the Enabled Regions.
+    * 
+    * @param regions - The Enabled Regions to be set.
+    */
+	public void setEnabledRegions(final List<String> regions) {
 		this.enabledRegions = regions;
 	}
 	
-	public void setEnchantments(Map<String, Integer> enchantments) {
+   /**
+    * Sets the Enchantments.
+    * 
+    * @param enchantments - The Enchantments to be set.
+    */
+	public void setEnchantments(final Map<String, Integer> enchantments) {
 		this.enchants = enchantments;
 	}
 	
-	public void setItemFlags(String itemflags) {
+   /**
+    * Sets the ItemFlags.
+    * 
+    * @param itemflags - The ItemFlags to be set.
+    */
+	public void setItemFlags(final String itemflags) {
 		this.itemflags = itemflags;
 	}
 	
-	public void setTriggers(String triggers) {
+   /**
+    * Sets the Triggers.
+    * 
+    * @param triggers - The Triggers to be set.
+    */
+	public void setTriggers(final String triggers) {
 		this.triggers = triggers;
 	}
 	
-	public void setCommandType(CommandType type) {
+   /**
+    * Sets the CommandType.
+    * 
+    * @param type - The CommandType to be set.
+    */
+	public void setCommandType(final CommandType type) {
 		this.type = type;
 	}
 	
-	public void setCommandSequence(CommandSequence sequence) {
+   /**
+    * Sets the CommandSequence.
+    * 
+    * @param sequence - The CommandSequence to be set.
+    */
+	public void setCommandSequence(final CommandSequence sequence) {
 		this.sequence = sequence;
 	}
 	
-	public void setCommandParticle(String s) {
+   /**
+    * Sets the Commands Particle.
+    * 
+    * @param s - The Commands Particle to be set.
+    */
+	public void setCommandParticle(final String s) {
 		this.commandParticle = s;
 	}
 	
-	public void setCooldownMessage(String s) {
+   /**
+    * Sets the Commands Cooldown.
+    * 
+    * @param i - The Commands Cooldown Seconds.
+    */
+	public void setCommandCooldown(final int i) {
+		this.cooldownSeconds = i;
+	}
+	
+   /**
+    * Sets the Commands Cooldown Message.
+    * 
+    * @param s - The Commands Cooldown Message to be set.
+    */
+	public void setCooldownMessage(final String s) {
 		this.cooldownMessage = s;
 	}
 	
-	public void setCount(String count) {
-		if (count != null && Utils.isInt(count)) {
+   /**
+    * Sets the stack size.
+    * 
+    * @param count - The stack size to be set.
+    */
+	public void setCount(final String count) {
+		if (count != null && Utils.getUtils().isInt(count)) {
 			this.count = Integer.parseInt(count);
 		}
 	}
 	
-	public void setDurability(Short durability) {
+   /**
+    * Sets the ItemStack Durability.
+    * 
+    * @param durability - The ItemStack Durability to be set.
+    */
+	public void setDurability(final Short durability) {
 		this.durability = durability;
 	}
 	
-	public void setData(Integer data) {
+   /**
+    * Sets the ItemStack Data.
+    * 
+    * @param data - The ItemStack Data to be set.
+    */
+	public void setData(final Integer data) {
 		this.data = data;
 	}
 	
-	public void setModelData(Integer data) {
+   /**
+    * Sets the ItemStack Model Data.
+    * 
+    * @param data - The ItemStack Model Data to be set.
+    */
+	public void setModelData(final Integer data) {
 		this.modelData = data;
 	}
 	
-	public void setProbability(Integer probability) {
+   /**
+    * Sets the Probability.
+    * 
+    * @param probability - The Probability to be set.
+    */
+	public void setProbability(final Integer probability) {
 		this.probability = probability;
 	}
 	
-	public void setCommandSound(Sound sound) {
+   /**
+    * Sets the Commands Sound.
+    * 
+    * @param sound - The Commands Sound to be set.
+    */
+	public void setCommandSound(final Sound sound) {
 		this.commandSound = sound;
 	}
 	
-	public void setCommandCost(Integer cost) {
+   /**
+    * Sets the Commands Cost.
+    * 
+    * @param cost - The Commands Cost to be set.
+    */
+	public void setCommandCost(final Integer cost) {
 		this.cost = cost;
 	}
 	
-	public void setItemCost(String itemCost) {
+   /**
+    * Sets the Commands Item Cost.
+    * 
+    * @param itemCost - The Commands Item Cost to be set.
+    */
+	public void setItemCost(final String itemCost) {
 		this.itemCost = itemCost;
 	}
 	
-	public void setWarmDelay(Integer delay) {
+   /**
+    * Sets the Commands Warmup Delay.
+    * 
+    * @param delay - The Commands Warmup Delay to be set.
+    */
+	public void setWarmDelay(final Integer delay) {
 		this.warmDelay = delay;
 	}
 	
-	public void setConfigName(String name) {
+   /**
+    * Adds the Player as Warmup Pending.
+    * 
+    * @param player - The Player to be set as Warmup pending.
+    */
+	private void addWarmPending(final Player player) {
+        if (!this.warmPending.contains(player)) {
+        	this.warmPending.add(player);
+        }
+	}
+	
+   /**
+    * Removes the Player from pending Warmup.
+    * 
+    * @param player - The Player to be removed from Warmup pending.
+    */
+	private void delWarmPending(final Player player) {
+        if (this.warmPending.contains(player)) {
+        	this.warmPending.remove(player);
+        }
+	}
+	
+   /**
+    * Sets the Config Name.
+    * 
+    * @param name - The Config Name to be set.
+    */
+	public void setConfigName(final String name) {
 		this.configName = name;
 	}
 	
-	public void setBannerPatterns(List <Pattern> patterns) {
+   /**
+    * Sets the Banner Patterns.
+    * 
+    * @param patterns - The Banner Patterns to be set.
+    */
+	public void setBannerPatterns(final List <Pattern> patterns) {
 		this.bannerPatterns = patterns;
 	}
 	
-	public void setNodeLocation(ConfigurationSection node) {
+   /**
+    * Sets the Node Location.
+    * 
+    * @param node - The Node Location to be set.
+    */
+	public void setNodeLocation(final ConfigurationSection node) {
 		this.nodeLocation = node;
 	}
 	
-	public void setDataValue(Short dataValue) {
+   /**
+    * Sets the ItemStacks Data Value.
+    * 
+    * @param dataValue - The ItemStacks Data Value to be set.
+    */
+	public void setDataValue(final Short dataValue) {
 		if (dataValue == null || dataValue == 0) {
 			this.dataValue = null;
 			return;
@@ -646,11 +906,21 @@ public class ItemMap {
 		this.dataValue = dataValue;
 	}
 	
-	public void setPerm(String permission) {
+   /**
+    * Sets the Permission.
+    * 
+    * @param permission - The Permission to be set.
+    */
+	public void setPerm(final String permission) {
 		this.permissionNode = permission == null || permission.length() == 0 ? null : permission;
 	}
 	
-	public void setOnlyFirstJoin(boolean bool) {
+   /**
+    * Sets the ItemStack to be given only on First Join.
+    * 
+    * @param bool - The value to be set.
+    */
+	public void setOnlyFirstJoin(final boolean bool) {
 		this.onlyFirstJoin = bool;
 		if (bool) { this.giveOnJoin = true; }
 		if (bool && this.giveOnRespawn) {
@@ -658,7 +928,12 @@ public class ItemMap {
 		}
 	}
 	
-	public void setOnlyFirstWorld(boolean bool) {
+   /**
+    * Sets the ItemStack to be given only on First World.
+    * 
+    * @param bool - The value to be set.
+    */
+	public void setOnlyFirstWorld(final boolean bool) {
 		this.onlyFirstWorld = bool;
 		if (bool) { this.giveOnJoin = true; }
 		if (bool && this.giveOnRespawn) {
@@ -666,280 +941,626 @@ public class ItemMap {
 		}
 	}
 	
-	public void setGiveOnJoin(boolean bool) {
+   /**
+    * Sets the ItemStack to be given only on Join.
+    * 
+    * @param bool - The value to be set.
+    */
+	public void setGiveOnJoin(final boolean bool) {
 		this.giveOnJoin = bool;
 	}
 	
-	public void setGiveOnWorldSwitch(boolean bool) {
+   /**
+    * Sets the ItemStack to be given only on World Switch.
+    * 
+    * @param bool - The value to be set.
+    */
+	public void setGiveOnWorldSwitch(final boolean bool) {
 		this.giveOnWorldSwitch = bool;
 	}
 	
-	public void setGiveOnRespawn(boolean bool) {
+   /**
+    * Sets the ItemStack to be given only on Respawn.
+    * 
+    * @param bool - The value to be set.
+    */
+	public void setGiveOnRespawn(final boolean bool) {
 		this.giveOnRespawn = bool;
 	}
 	
-	public void setGiveOnRegionEnter(boolean bool) {
+   /**
+    * Sets the ItemStack to be given only on Region Enter.
+    * 
+    * @param bool - The value to be set.
+    */
+	public void setGiveOnRegionEnter(final boolean bool) {
 		this.giveOnRegionEnter = bool;
 	}
 	
-	public void setTakeOnRegionLeave(boolean bool) {
+   /**
+    * Sets the ItemStack to be given only on Region Leave.
+    * 
+    * @param bool - The value to be set.
+    */
+	public void setTakeOnRegionLeave(final boolean bool) {
 		this.takeOnRegionLeave = bool;
 	}
 	
-	public void setGiveOnDisabled(boolean bool) {
+   /**
+    * Sets the ItemStack to not be given.
+    * 
+    * @param bool - The value to be set.
+    */
+	public void setGiveOnDisabled(final boolean bool) {
 		this.giveOnDisabled = bool;
 	}
 	
-	public void setUseOnLimitSwitch(boolean bool) {
+   /**
+    * Sets the Use on Limit Switch.
+    * 
+    * @param bool - The value to be set.
+    */
+	public void setUseOnLimitSwitch(final boolean bool) {
 		this.useOnLimitSwitch = bool;
 	}
 	
-	public void setIpLimited(boolean bool) {
+   /**
+    * Sets the IP Limits.
+    * 
+    * @param bool - The value to be set.
+    */
+	public void setIpLimited(final boolean bool) {
 		this.ipLimited = bool;
 	}
 	
-	public void setInteractCooldown(int cooldown) {
+   /**
+    * Sets the Interact cooldown.
+    * 
+    * @param cooldown - The value to be set.
+    */
+	public void setInteractCooldown(final int cooldown) {
         this.interactCooldown = cooldown;
 	}
 	
-	public void setPermissionNeeded(boolean bool) {
+   /**
+    * Sets the Permissions to be Required.
+    * 
+    * @param bool - The value to be set.
+    */
+	public void setPermissionNeeded(final boolean bool) {
 		this.permissionNeeded = bool;
 	}
 	
-	public void setOPPermissionNeeded(boolean bool) {
+   /**
+    * Sets the OP Permissions to be Required.
+    * 
+    * @param bool - The value to be set.
+    */
+	public void setOPPermissionNeeded(final boolean bool) {
 		this.opPermissionNeeded = bool;
 	}
 	
-	public void setVanilla(boolean bool) {
+   /**
+    * Sets the Vanilla Flag.
+    * 
+    * @param bool - The value to be set.
+    */
+	public void setVanilla(final boolean bool) {
 		this.vanillaItem = bool;
 	}
 	
-	public void setVanillaStatus(boolean bool) {
+   /**
+    * Sets the Vanilla Status Flag.
+    * 
+    * @param bool - The value to be set.
+    */
+	public void setVanillaStatus(final boolean bool) {
 		this.vanillaStatus = bool;
 	}
 	
-	public void setVanillaControl(boolean bool) {
+   /**
+    * Sets the Vanilla Control Flag.
+    * 
+    * @param bool - The value to be set.
+    */
+	public void setVanillaControl(final boolean bool) {
 		this.vanillaControl = bool;
 	}
 	
-	public void setGiveNext(boolean bool) {
+   /**
+    * Sets the Give Next Flag.
+    * 
+    * @param bool - The value to be set.
+    */
+	public void setGiveNext(final boolean bool) {
 		this.giveNext = bool;
 	}
 	
-	public void setMoveNext(boolean bool) {
+   /**
+    * Sets the Move Next Flag.
+    * 
+    * @param bool - The value to be set.
+    */
+	public void setMoveNext(final boolean bool) {
 		this.moveNext = bool;
 	}
 	
-	public void setDropFull(boolean bool) {
+   /**
+    * Sets the Drop Full Flag.
+    * 
+    * @param bool - The value to be set.
+    */
+	public void setDropFull(final boolean bool) {
 		this.dropFull = bool;
 	}
 	
-	public void setUnbreakable(boolean bool) {
+   /**
+    * Sets the Unbreakable Flag.
+    * 
+    * @param bool - The value to be set.
+    */
+	public void setUnbreakable(final boolean bool) {
 		this.unbreakable = bool;
 	}
 	
-	public void setCountLock(boolean bool) {
+   /**
+    * Sets the Count Lock Flag.
+    * 
+    * @param bool - The value to be set.
+    */
+	public void setCountLock(final boolean bool) {
 		this.countLock = bool;
 	}
 	
-	public void setCancelEvents(boolean bool) {
+   /**
+    * Sets the Cancel Events Flag.
+    * 
+    * @param bool - The value to be set.
+    */
+	public void setCancelEvents(final boolean bool) {
 		this.cancelEvents = bool;
 	}
 	
-	public void setItemStore(boolean bool) {
+   /**
+    * Sets the Item Store Flag.
+    * 
+    * @param bool - The value to be set.
+    */
+	public void setItemStore(final boolean bool) {
 		this.itemStore = bool;
 	}
 	
-	public void setItemModify(boolean bool) {
+   /**
+    * Sets the Item Modify Flag.
+    * 
+    * @param bool - The value to be set.
+    */
+	public void setItemModify(final boolean bool) {
 		this.itemModify = bool;
 	}
 	
-	public void setItemCraftable(boolean bool) {
+   /**
+    * Sets the Item Craftable Flag.
+    * 
+    * @param bool - The value to be set.
+    */
+	public void setItemCraftable(final boolean bool) {
 		this.noCrafting = bool;
 	}
 	
-	public void setItemRepairable(boolean bool) {
+   /**
+    * Sets the Item Repairable Flag.
+    * 
+    * @param bool - The value to be set.
+    */
+	public void setItemRepairable(final boolean bool) {
 		this.noRepairing = bool;
 	}
 	
-	public void setItemChangable(boolean bool) {
+   /**
+    * Sets the Item Changable Flag.
+    * 
+    * @param bool - The value to be set.
+    */
+	public void setItemChangable(final boolean bool) {
 		this.itemChangable = bool;
 	}
 	
-	public void setAlwaysGive(boolean bool) {
+   /**
+    * Sets the Always Give Flag.
+    * 
+    * @param bool - The value to be set.
+    */
+	public void setAlwaysGive(final boolean bool) {
 		this.alwaysGive = bool;
 	}
 	
-	public void setAutoRemove(boolean bool) {
+   /**
+    * Sets the Auto Remove Flag.
+    * 
+    * @param bool - The value to be set.
+    */
+	public void setAutoRemove(final boolean bool) {
 		this.autoRemove = bool;
 	}
 	
-	public void setAnimate(boolean bool) {
+   /**
+    * Sets the Animate Flag.
+    * 
+    * @param bool - The value to be set.
+    */
+	public void setAnimate(final boolean bool) {
 		this.animate = bool;
 	}
 	
-	public void setDynamic(boolean bool) {
+   /**
+    * Sets the Dynamic Flag.
+    * 
+    * @param bool - The value to be set.
+    */
+	public void setDynamic(final boolean bool) {
 		this.dynamic = bool;
 	}
 	
-	public void setOverwritable(boolean bool) {
+   /**
+    * Sets the Overwritable Flag.
+    * 
+    * @param bool - The value to be set.
+    */
+	public void setOverwritable(final boolean bool) {
 		this.overwritable = bool;
 	}
 	
-	public void setPlaceable(boolean bool) {
+   /**
+    * Sets the Placeable Flag.
+    * 
+    * @param bool - The value to be set.
+    */
+	public void setPlaceable(final boolean bool) {
 		this.blockPlacement = bool;
 	}
 	
-	public void setAttributesInfo(boolean bool) {
+   /**
+    * Sets the Attributes Flag.
+    * 
+    * @param bool - The value to be set.
+    */
+	public void setAttributesInfo(final boolean bool) {
 		this.hideAttributes = bool;
 	}
 	
-	public void setDurabilityBar(boolean bool) {
+   /**
+    * Sets the Durability Bar Flag.
+    * 
+    * @param bool - The value to be set.
+    */
+	public void setDurabilityBar(final boolean bool) {
 		this.hideDurability = bool;
 	}
 	
-	public void setMovement(boolean bool) {
+   /**
+    * Sets the Movement Flag.
+    * 
+    * @param bool - The value to be set.
+    */
+	public void setMovement(final boolean bool) {
 		this.blockMovement = bool;
 	}
 	
-	public void setCloseInventory(boolean bool) {
+   /**
+    * Sets the Inventory Close Flag.
+    * 
+    * @param bool - The value to be set.
+    */
+	public void setCloseInventory(final boolean bool) {
 		this.closeInventory = bool;
 	}
 	
-	public void setDisposable(boolean bool) {
+   /**
+    * Sets the Dispoable Flag.
+    * 
+    * @param bool - The value to be set.
+    */
+	public void setDisposable(final boolean bool) {
 		this.disposable = bool;
 	}
 	
-	public void setSelfDroppable(boolean bool) {
+   /**
+    * Sets the Self Droppable Flag.
+    * 
+    * @param bool - The value to be set.
+    */
+	public void setSelfDroppable(final boolean bool) {
 		this.selfDroppable = bool;
 	}
 	
-	public void setDeathDroppable(boolean bool) {
+   /**
+    * Sets the Death Droppable Flag.
+    * 
+    * @param bool - The value to be set.
+    */
+	public void setDeathDroppable(final boolean bool) {
 		this.deathDroppable = bool;
 	}
 	
-	public void setCreativeBypass(boolean bool) {
+   /**
+    * Sets the CreativeBypass Flag.
+    * 
+    * @param bool - The value to be set.
+    */
+	public void setCreativeBypass(final boolean bool) {
 		this.CreativeBypass = bool;
 	}
 	
-	public void setOpBypass(boolean bool) {
+   /**
+    * Sets the OPBypass Flag.
+    * 
+    * @param bool - The value to be set.
+    */
+	public void setOpBypass(final boolean bool) {
 		this.AllowOpBypass = bool;
 	}
 	
-	public void setAuthor(String auth) {
+   /**
+    * Sets the Book Author.
+    * 
+    * @param auth - The Book Author to be set.
+    */
+	public void setAuthor(final String auth) {
 		this.author = auth;
 	}
 	
-	public void setTitle(String title) {
+   /**
+    * Sets the Book Title.
+    * 
+    * @param title - The Book Title to be set.
+    */
+	public void setTitle(final String title) {
 		this.title = title;
 	}
 	
-	public void setGeneration(org.bukkit.inventory.meta.BookMeta.Generation gen) {
+   /**
+    * Sets the Book Generation.
+    * 
+    * @param gen - The Book Generation to be set.
+    */
+	public void setGeneration(final org.bukkit.inventory.meta.BookMeta.Generation gen) {
 		this.generation = gen;
 	}
 	
-	public void setPages(List <String> pages) {
+   /**
+    * Sets the Book Pages.
+    * 
+    * @param pages - The Book Pages to be set.
+    */
+	public void setPages(final List <String> pages) {
 		this.bookPages = pages;
 	}
 	
-	public void setListPages(List <List <String> > pages) {
+   /**
+    * Sets the Book List Pages.
+    * 
+    * @param pages - The Book List Pages to be set.
+    */
+	public void setListPages(final List <List <String> > pages) {
 		this.listPages = pages;
 	}
 	
-	public void setMapID(int id) {
+   /**
+    * Sets the Map ID.
+    * 
+    * @param id - The Map ID to be set.
+    */
+	public void setMapID(final int id) {
 		this.mapId = (short) id;
 	}
 	
-	public void setMapView(MapView view) {
+   /**
+    * Sets the MapView.
+    * 
+    * @param view - The MapView to be set.
+    */
+	public void setMapView(final MapView view) {
 		this.mapView = view;
 	}
 	
-	public void setMapImage(String mapIMG) {
+   /**
+    * Sets the Map Image.
+    * 
+    * @param mapIMG - The Map Image to be set.
+    */
+	public void setMapImage(final String mapIMG) {
 		this.customMapImage = mapIMG;
 	}
 	
-	public void setFirework(FireworkEffect fire) {
+   /**
+    * Sets the FireworkEffect.
+    * 
+    * @param fire - The FireworkEffeect to be set.
+    */
+	public void setFirework(final FireworkEffect fire) {
 		this.firework = fire;
 	}
 	
-	public void setFireworkType(Type buildType) {
+   /**
+    * Sets the Firework Type.
+    * 
+    * @param buildType - The Firework Type to be set.
+    */
+	public void setFireworkType(final Type buildType) {
 		this.fireworkType = buildType;
 	}
 	
-	public void setFireworkColor(List<DyeColor> colors) {
+   /**
+    * Sets the Firework Colors.
+    * 
+    * @param colors - The Firework Colors to be set.
+    */
+	public void setFireworkColor(final List<DyeColor> colors) {
 		this.fireworkColor = colors;
 	}
 	
-	public void setFireworkPower(int power) {
+   /**
+    * Sets the Firework Power.
+    * 
+    * @param power - The Firework Power to be set.
+    */
+	public void setFireworkPower(final int power) {
 		this.power = power;
 	}
 	
-	public void setFireworkTrail(boolean bool) {
+   /**
+    * Sets the Firework Trail.
+    * 
+    * @param bool - The value to be set.
+    */
+	public void setFireworkTrail(final boolean bool) {
 		this.fireworkTrail = bool;
 	}
 	
-	public void setFireworkFlicker(boolean bool) {
+   /**
+    * Sets the Firework Flicker.
+    * 
+    * @param bool - The value to be set.
+    */
+	public void setFireworkFlicker(final boolean bool) {
 		this.fireworkFlicker = bool;
 	}
 	
-	public void setChargeColor(DyeColor dyeColor) {
+   /**
+    * Sets the Firework Charge Color.
+    * 
+    * @param dyeColor - The Firework Charge Color to be set.
+    */
+	public void setChargeColor(final DyeColor dyeColor) {
 		this.chargeColor = dyeColor;
 	}
 	
-	public void setSkull(String skull) {
+   /**
+    * Sets the Skull Owner.
+    * 
+    * @param skull - The Skull Owner to be set.
+    */
+	public void setSkull(final String skull) {
 		this.skullOwner = skull;
 	}
 	
-	public void setSkullTexture(String skull) {
+   /**
+    * Sets the Skull Texture.
+    * 
+    * @param skull - The Skull Texture to be set.
+    */
+	public void setSkullTexture(final String skull) {
 		this.skullTexture = skull;
 	}
 	
-	public void setHeadDatabase(boolean head) {
+   /**
+    * Sets the HeadDatabase Head.
+    * 
+    * @param head - The value to be set.
+    */
+	public void setHeadDatabase(final boolean head) {
 		this.headDatabase = head;
 	}
 	
-	public void setPotionEffect(List <PotionEffect> potion) {
+   /**
+    * Sets the PotionEffect.
+    * 
+    * @param pootion - The PortionEffect to be set.
+    */
+	public void setPotionEffect(final List <PotionEffect> potion) {
 		this.effect = potion;
 	}
 	
-	public void setLeatherColor(String lColor) {
-		this.leatherColor = lColor;
+   /**
+    * Sets the Leather Color.
+    * 
+    * @param color - The Leather Color to be set.
+    */
+	public void setLeatherColor(final String color) {
+		this.leatherColor = color;
 	}
 	
-	public void setLeatherHex(String hex) {
+   /**
+    * Sets the Leather HexColor.
+    * 
+    * @param hex - The Leather HexColor to be set.
+    */
+	public void setLeatherHex(final String hex) {
 		this.leatherHex = hex;
 	}
 	
-	public void setNewNBTData(String nbt, Object tag) {
+   /**
+    * Sets the NBTData.
+    * 
+    * @param nbt - The NBT Data to be set.
+    * @oaram tag - The Object Tag to be set.
+    */
+	public void setNewNBTData(final String nbt, final Object tag) {
 		this.newNBTData = nbt;
 		this.newNBTTag = tag;
 	}
 	
-	public void setLegacySecret(String nbt) {
+   /**
+    * Sets the Legacy NBTData (Secret).
+    * 
+    * @param nbt - The NBT Data to be set.
+    */
+	public void setLegacySecret(final String nbt) {
 		this.legacySecret = nbt;
 	}
 	
-	public void setArbitrary(String arb) {
+   /**
+    * Sets the Arbitrary.
+    * 
+    * @param arb - The Arbitrary to be set.
+    */
+	public void setArbitrary(final String arb) {
 		this.Arbitrary = arb;
 	}
 	
-	public void setItemValue(String val) {
-		this.itemValue = val;
+   /**
+    * Sets the Item Value (Arbitrary ID).
+    * 
+    * @param str - The Item Value to be set.
+    */
+	public void setItemValue(final String str) {
+		this.itemValue = str;
 	}
 	
-	private void setSubjectRemoval(boolean bool) {
+   /**
+    * Sets the ItemStack as Subject to Removal.
+    * 
+    * @param bool - The value to be set.
+    */
+	private void setSubjectRemoval(final boolean bool) {
 		this.subjectRemoval = bool;
 	}
 	
-    public void setCommands(ItemCommand[] commands) {
+   /**
+    * Sets the ItemCommands.
+    * 
+    * @param commands - The ItemCommands to be set.
+    */
+    public void setCommands(final ItemCommand[] commands) {
         this.commands = commands;
     }
-    
-    public void setCustomConsumable(boolean bool) {
+	
+   /**
+    * Sets the Custom Consumable.
+    * 
+    * @param bool - The value to be set.
+    */
+    public void setCustomConsumable(final boolean bool) {
     	customConsumable = bool;
     }
-    
-	public void setCommandReceive(Integer val) {
+	
+   /**
+    * Sets the Commands Receive.
+    * 
+    * @param val - The Commands Recieve to be set.
+    */
+	public void setCommandReceive(final Integer val) {
 		this.commandsReceive = val;
 	}
     
@@ -948,84 +1569,184 @@ public class ItemMap {
 //  ====================== //
 //  ~ Accessor Functions ~ //
 //  ====================== //
+   /**
+    * Gets the Custom Display Name.
+    * 
+    * @return The Custom Display Name.
+    */
 	public String getCustomName() {
 		return this.customName;
 	}
 	
+   /**
+    * Gets the Dynamic Display Names.
+    * 
+    * @return The Dynamic Display Names.
+    */
 	public List<String> getDynamicNames() {
 		return this.dynamicNames;
 	}
 	
+   /**
+    * Gets the Custom Display Lore.
+    * 
+    * @return The Custom Display Lore.
+    */
 	public List<String> getCustomLore() {
 		return this.customLore;
 	}
 	
+   /**
+    * Gets the Dynamic Display Lores.
+    * 
+    * @return The Dynamic Display Lores.
+    */
 	public List<List<String>> getDynamicLores() {
 		return this.dynamicLores;
 	}
 	
+   /**
+    * Gets the Dynamic Materials.
+    * 
+    * @return The Dynamic Materials.
+    */
 	public List<String> getDynamicMaterials() {
 		return this.dynamicMaterials;
 	}
 	
+   /**
+    * Gets the Dynamic Skull Owners.
+    * 
+    * @return The Dynamic Skull Owners.
+    */
 	public List<String> getDynamicOwners() {
 		return this.dynamicOwners;
 	}
 	
+   /**
+    * Gets the Dynamic Skull Textures.
+    * 
+    * @return The Dynamic Skull Textures.
+    */
 	public List<String> getDynamicTextures() {
 		return this.dynamicTextures;
 	}
 	
+   /**
+    * Gets the AnimationHandlers.
+    * 
+    * @return The AnimationsHandlers.
+    */
 	public Map<Player, ItemAnimation> getAnimationHandler() {
 		return this.localeAnimations;
 	}
 	
+   /**
+    * Gets the Slot.
+    * 
+    * @return The Slot.
+    */
 	public String getSlot() {
 		if (this.CustomSlot != null) { return this.CustomSlot; } 
 		else if (this.InvSlot != null) { return this.InvSlot.toString(); }
 		return null;
 	}
 	
+   /**
+    * Gets the Multiple Slots.
+    * 
+    * @return The Multiple Slots.
+    */
 	public List<String> getMultipleSlots() {
 		return this.AllSlots;
 	}
 	
+   /**
+    * Gets the Enabled Worlds.
+    * 
+    * @return The Enabled Worlds.
+    */
 	public List<String> getEnabledWorlds() {
 		return this.enabledWorlds;
 	}
 	
+   /**
+    * Gets the Enabled Regions.
+    * 
+    * @return The Enabled Regions.
+    */
 	public List<String> getEnabledRegions() {
 		return this.enabledRegions;
 	}
 	
+   /**
+    * Gets the Enchantments.
+    * 
+    * @return The Enchantments.
+    */
 	public Map<String, Integer> getEnchantments() {
 		return this.enchants;
 	}
 	
+   /**
+    * Gets the stack size.
+    * 
+    * @return The stack size.
+    */
 	public Integer getCount() {
 		return this.count;
 	}
 	
+   /**
+    * Gets the ItemFlags.
+    * 
+    * @return The ItemFlags.
+    */
 	public String getItemFlags() {
 		return this.itemflags;
 	}
 	
+   /**
+    * Gets the Triggers.
+    * 
+    * @return The Triggers.
+    */
 	public String getTriggers() {
 		return this.triggers;
 	}
 	
+   /**
+    * Gets the Permission.
+    * 
+    * @return The Permission.
+    */
 	public String getPermissionNode() {
 		return permissionNode;
 	}
 	
+   /**
+    * Gets the ItemStacks Data Value.
+    * 
+    * @return The ItemStacks Data Value.
+    */
 	public Short getDataValue() {
 		return this.dataValue;
 	}
 	
+   /**
+    * Gets the Material.
+    * 
+    * @return The Material.
+    */
 	public Material getMaterial() {
 		return this.material;
 	}
 	
+   /**
+    * Gets the ItemStacks Durability.
+    * 
+    * @return The ItemStacks Durability.
+    */
 	public Short getDurability() {
 		if (this.durability != null) {
 			return this.durability;	
@@ -1033,6 +1754,11 @@ public class ItemMap {
 		return 0;
 	}
 	
+   /**
+    * Gets the ItemStack Data.
+    * 
+    * @return The ItemStack Data.
+    */
 	public Integer getData() {
 		if (this.data != null) {
 			return this.data;	
@@ -1040,6 +1766,11 @@ public class ItemMap {
 		return 0;
 	}
 	
+   /**
+    * Gets the ItemStack Model Data.
+    * 
+    * @return The ItemStack Model Data.
+    */
 	public Integer getModelData() {
 		if (this.modelData != null) {
 			return this.modelData;	
@@ -1047,6 +1778,11 @@ public class ItemMap {
 		return 0;
 	}
 	
+   /**
+    * Gets the Probability.
+    * 
+    * @return The Probability.
+    */
 	public Integer getProbability() {
 		if (this.probability != null) {
 			return this.probability;	
@@ -1054,39 +1790,95 @@ public class ItemMap {
 		return 0;
 	}
 	
+   /**
+    * Gets the Commands Sound.
+    * 
+    * @return The Commands Sound.
+    */
 	public Sound getCommandSound() {
 		return this.commandSound;	
 	}
 	
+   /**
+    * Gets the Commands Warmup Delay.
+    * 
+    * @return The Commands Warmup Delay.
+    */
 	public Integer getWarmDelay() {
 		return this.warmDelay;
 	}
 	
-	public ItemStack getItemStack(Player player) {
+   /**
+    * Checks if the Player is Pending Warmup.
+    * 
+    * @param player - The Player to be checked.
+    */
+	private boolean getWarmPending(final Player player) {
+        if (this.warmPending.contains(player)) { return true; }
+        return false;
+	}
+	
+   /**
+    * Gets the ItemStack.
+    * 
+    * @param player - The Player to have their ItemStack generated.
+    * @return The Player Specific ItemStack.
+    */
+	public ItemStack getItemStack(final Player player) {
 		this.updateItem(player);
 		return this.tempItem.clone();
 	}
 	
+   /**
+    * Gets the Temporary ItemStack.
+    * 
+    * @return The Temporary ItemStack.
+    */
 	public ItemStack getTempItem() {
 		return this.tempItem;	
 	}
 	
+   /**
+    * Gets the Temporary ItemMeta.
+    * 
+    * @return The Temporary ItemMeta.
+    */
 	public ItemMeta getTempMeta() {
 		return this.tempMeta;	
 	}
 	
+   /**
+    * Gets the Config Name.
+    * 
+    * @return The Config Name.
+    */
 	public String getConfigName() {
 		return this.configName;	
 	}
 	
+   /**
+    * Gets the Banner Patterns.
+    * 
+    * @return The Banner Patterns.
+    */
 	public List <Pattern> getBannerPatterns() {
 		return this.bannerPatterns;
 	}
 	
+   /**
+    * Gets the Node Location.
+    * 
+    * @return The Node Location.
+    */
 	public ConfigurationSection getNodeLocation() {
 		return this.nodeLocation;	
 	}
 	
+   /**
+    * Gets the Limit Modes.
+    * 
+    * @return The Limit Modes.
+    */
 	public String getLimitModes() {
 		if (this.limitModes != null) {
 			return this.limitModes;
@@ -1094,234 +1886,483 @@ public class ItemMap {
 		return "NONE";
 	}
 	
+   /**
+    * Gets the ItemCommands.
+    * 
+    * @return The ItemCommands.
+    */
 	public ItemCommand[] getCommands() {
 		return this.commands;
 	}
 	
+   /**
+    * Gets the Commands Type.
+    * 
+    * @return The Commands Type.
+    */
 	public CommandType getCommandType() {
 		return this.type;
 	}
 	
+   /**
+    * Gets the Commands Cooldown.
+    * 
+    * @return The Commands Cooldown.
+    */
 	public Integer getCommandCooldown() {
 		return this.cooldownSeconds;
 	}
 	
+   /**
+    * Gets the Commands Cost.
+    * 
+    * @return The Commands Cost.
+    */
 	public Integer getCommandCost() {
 		return this.cost;
 	}
 	
+   /**
+    * Gets the Commands Receive.
+    * 
+    * @return The Commands Receive.
+    */
 	public Integer getCommandReceive() {
 		return this.commandsReceive;
 	}
 	
+   /**
+    * Gets the Commands Item Cost.
+    * 
+    * @return The Commands Item Cost.
+    */
 	public String getItemCost() {
 		return this.itemCost;
 	}
 	
+   /**
+    * Gets the Commands Particle.
+    * 
+    * @return The Commands Particle.
+    */
 	public String getCommandParticle() {
 		return this.commandParticle;
 	}
 	
+   /**
+    * Gets the Commands Sequence.
+    * 
+    * @return The Commands Sequence.
+    */
 	public CommandSequence getCommandSequence() {
 		return this.sequence;
 	}
 	
+   /**
+    * Gets the Book Author.
+    * 
+    * @return The Book Author.
+    */
 	public String getAuthor() {
 		return this.author;
 	}
 	
+   /**
+    * Gets the Book Title.
+    * 
+    * @return The Book Title.
+    */
 	public String getTitle() {
 		return this.title;
 	}
 	
+   /**
+    * Gets the Book Generation.
+    * 
+    * @return The Book Generation.
+    */
 	public org.bukkit.inventory.meta.BookMeta.Generation getGeneration() {
 		return (Generation) this.generation;
 	}
 	
+   /**
+    * Gets the Book Pages.
+    * 
+    * @return The Book Pages.
+    */
 	public List <String> getPages() {
 		return this.bookPages;
 	}
 	
+   /**
+    * Gets the Book List Pages.
+    * 
+    * @return The Book List Pages.
+    */
 	public List <List <String> > getListPages() {
 		return this.listPages;
 	}
 	
+   /**
+    * Gets the Map ID.
+    * 
+    * @return The Map ID.
+    */
 	public int getMapID() {
 		return this.mapId;
 	}
 	
+   /**
+    * Gets the MapView.
+    * 
+    * @return The MapView.
+    */
 	public MapView getMapView() {
 		return this.mapView;
 	}
 	
+   /**
+    * Gets the Map Image.
+    * 
+    * @return The Map Image.
+    */
 	public String getMapImage() {
 		return this.customMapImage;
 	}
 	
+   /**
+    * Gets the FireworkEffect.
+    * 
+    * @return The FireworkEffect.
+    */
 	public FireworkEffect getFirework() {
 		return this.firework;
 	}
 	
+   /**
+    * Gets the Firework Type.
+    * 
+    * @return The Firework Type.
+    */
 	public Type getFireworkType() {
 		return this.fireworkType;
 	}
 	
+   /**
+    * Gets the Firework Power.
+    * 
+    * @return The Firework Power.
+    */
 	public int getFireworkPower() {
 		return this.power;
 	}
 	
+   /**
+    * Gets the Firework Colors.
+    * 
+    * @return The Firework Colors.
+    */
 	public List<DyeColor> getFireworkColor() {
 		return this.fireworkColor;
 	}
 	
+   /**
+    * Gets the Firework Trail.
+    * 
+    * @return The Firework Trail.
+    */
 	public boolean getFireworkTrail() {
 		return this.fireworkTrail;
 	}
 	
+   /**
+    * Gets the Firework Flicker.
+    * 
+    * @return The Firework Flicker.
+    */
 	public boolean getFireworkFlicker() {
 		return this.fireworkFlicker;
 	}
 	
+   /**
+    * Gets the Firework Charge Color.
+    * 
+    * @return The Firework Charge Color.
+    */
 	public DyeColor getChargeColor() {
 		return this.chargeColor;
 	}
 	
+   /**
+    * Gets the Skull Owner.
+    * 
+    * @return The Skull Owner.
+    */
 	public String getSkull() {
 		return this.skullOwner;
 	}
 	
+   /**
+    * Gets the Skull Texture.
+    * 
+    * @return The Skull Texture.
+    */
 	public String getSkullTexture() {
 		return this.skullTexture;
 	}
 	
+   /**
+    * Gets the PotionEffects.
+    * 
+    * @return The PotionEffects.
+    */
 	public List <PotionEffect> getPotionEffect() {
 		return this.effect;
 	}
 	
+   /**
+    * Gets the Leather Color.
+    * 
+    * @return The Leather Color.
+    */
 	public String getLeatherColor() {
 		return this.leatherColor;
 	}
 	
+   /**
+    * Gets the Leather HexColor.
+    * 
+    * @return The Leather HexColor.
+    */
 	public String getLeatherHex() {
 		return this.leatherHex;
 	}
 	
+   /**
+    * Gets the NBTData.
+    * 
+    * @return The NBTData.
+    */
 	public String getNewNBTData() {
 		return this.newNBTData;
 	}
 	
+   /**
+    * Gets the NBTData (Secret).
+    * 
+    * @return The NBTData (Secret).
+    */
 	public String getLegacySecret() {
-		if (!ConfigHandler.dataTagsEnabled()) {
+		if (!ItemHandler.getItem().dataTagsEnabled()) {
 			return this.legacySecret;
 		} else { return ""; }
 	}
 	
+   /**
+    * Gets the Arbitrary.
+    * 
+    * @return The Arbitrary.
+    */
 	public String getArbitrary() {
 		return this.Arbitrary;
 	}
 	
+   /**
+    * Gets the Item Value (Arbitrary ID).
+    * 
+    * @return The Item Value (Arbitrary ID).
+    */
 	public String getItemValue() {
 		return this.itemValue;
 	}
 	
+   /**
+    * Gets the Interact Cooldown.
+    * 
+    * @return The Interact Cooldown.
+    */
 	public int getInteractCooldown() {
 		return this.interactCooldown;
 	}
 	
+   /**
+    * Gets the Commands Cooldown Message.
+    * 
+    * @return The Commands Cooldown Message.
+    */
 	public String getCooldownMessage() {
 		return this.cooldownMessage;
 	}
 	
+   /**
+    * Gets the NBTData that should be set to be set to the custom item.
+    * 
+    * @param itemMap - The ItemMap to have its NBTData defined.
+    * @return The NBTData format to be set to an item.
+    */
+	public String getNBTFormat() {
+		return "ItemJoin" + this.getItemValue() + this.getConfigName();
+	}
+	
+   /**
+    * Gets the Custom Consumable.
+    * 
+    * @return The Custom Consumable.
+    */
 	public boolean isCustomConsumable() {
 		return this.customConsumable;
 	}
 	
-	public boolean hasPermission(Player player) {
+   /**
+    * Checks if the Player has Permission.
+    * 
+    * @param player - The Player that should have Permission.
+    * @return If the Player has Permission.
+    */
+	public boolean hasPermission(final Player player) {
 		String worldName = player.getWorld().getName();
 		if (!this.isPermissionNeeded()) {
 			return true;
 		} else if (this.isOPPermissionNeeded() && player.isOp()) {
-			if (player.isPermissionSet(PermissionsHandler.customPermissions(this.permissionNode, this.configName, worldName)) || player.isPermissionSet("itemjoin." + worldName + ".*")) {
+			if (player.isPermissionSet(PermissionsHandler.getPermissions().customPermissions(this.permissionNode, this.configName, worldName)) || player.isPermissionSet("itemjoin." + worldName + ".*")) {
 				return true;
 			}
-		} else if (player.hasPermission(PermissionsHandler.customPermissions(this.permissionNode, this.configName, worldName)) || player.hasPermission("itemjoin." + worldName + ".*")) {
+		} else if (player.hasPermission(PermissionsHandler.getPermissions().customPermissions(this.permissionNode, this.configName, worldName)) || player.hasPermission("itemjoin." + worldName + ".*")) {
 			return true;
 		}
 		return false;
 	}
 	
+   /**
+    * Checks if the item is a Crafting Item.
+    * 
+    * @return If it is enabled.
+    */
 	public boolean isCraftingItem() {
 		return this.craftingItem;
 	}
 	
+   /**
+    * Checks if the item is a HeadDatabase Item.
+    * 
+    * @return If it is enabled.
+    */
 	public boolean isHeadDatabase() {
 		return this.headDatabase;
 	}
 	
-	public boolean isGiveNext() {
-		return this.giveNext;
-	}
-	
-	public boolean isMoveNext() {
-		return this.moveNext;
-	}
-	
-	public boolean isDropFull() {
-		return this.dropFull;
-	}
-	
+   /**
+    * Checks if give on join is enabled.
+    * 
+    * @return If it is enabled.
+    */
 	public boolean isGiveOnJoin() {
 		return this.giveOnJoin;
 	}
 	
+   /**
+    * Checks if give on world switch is enabled.
+    * 
+    * @return If it is enabled.
+    */
 	public boolean isGiveOnWorldSwitch() {
 		return this.giveOnWorldSwitch;
 	}
 	
+   /**
+    * Checks if give on respawn is enabled.
+    * 
+    * @return If it is enabled.
+    */
 	public boolean isGiveOnRespawn() {
 		return this.giveOnRespawn;
 	}
 	
+   /**
+    * Checks if give on region enter is enabled.
+    * 
+    * @return If it is enabled.
+    */
 	public boolean isGiveOnRegionEnter() {
 		return this.giveOnRegionEnter;
 	}
 	
+   /**
+    * Checks if take on region leave is enabled.
+    * 
+    * @return If it is enabled.
+    */
 	public boolean isTakeOnRegionLeave() {
 		return this.takeOnRegionLeave;
 	}
 	
+   /**
+    * Checks if item giving is disabled.
+    * 
+    * @return If it is disabled.
+    */
 	public boolean isGiveOnDisabled() {
 		return this.giveOnDisabled;
 	}
 	
+   /**
+    * Checks if give on first join is enabled.
+    * 
+    * @return If it is enabled.
+    */
 	public boolean isOnlyFirstJoin() {
 		return this.onlyFirstJoin;
 	}
 	
+   /**
+    * Checks if give on first world is enabled.
+    * 
+    * @return If it is enabled.
+    */
 	public boolean isOnlyFirstWorld() {
 		return this.onlyFirstWorld;
 	}
 	
+   /**
+    * Checks if ip limit is enabled.
+    * 
+    * @return If it is enabled.
+    */
 	public boolean isIpLimted() {
 		return this.ipLimited;
 	}
 	
+   /**
+    * Checks if use on limit switch is enabled.
+    * 
+    * @return If it is enabled.
+    */
 	public boolean isUseOnLimitSwitch() {
 		return this.useOnLimitSwitch;
 	}
 	
-	public boolean isLimitMode(GameMode newMode) {
+   /**
+    * Checks if the GameMode is a limit mode.
+    * 
+    * @return If the GameMode is a limit mode.
+    */
+	public boolean isLimitMode(final GameMode newMode) {
 		if (this.limitModes != null) {
-			if (Utils.containsIgnoreCase(this.limitModes, newMode.name())) {
+			if (Utils.getUtils().containsIgnoreCase(this.limitModes, newMode.name())) {
 				return true;
-			} else if (!Utils.containsIgnoreCase(this.limitModes, newMode.name())) {
+			} else if (!Utils.getUtils().containsIgnoreCase(this.limitModes, newMode.name())) {
 				return false;
 			}
 		}
 		return true;
 	}
 	
-	public Boolean inRegion(String region) {
+   /**
+    * Checks if the region is an enabled region.
+    * 
+    * @return If the region is a enabled region.
+    */
+	public Boolean inRegion(final String region) {
 		if (this.enabledRegions == null) { return false; }
 			for (String compareRegion: this.enabledRegions) {
 				if (compareRegion.equalsIgnoreCase(region) || compareRegion.equalsIgnoreCase("UNDEFINED")) {
@@ -1331,124 +2372,303 @@ public class ItemMap {
 		return false;
 	}
 	
+   /**
+    * Checks if Permissions are Required.
+    * 
+    * @return If Permissions are Required.
+    */
 	public boolean isPermissionNeeded() {
 		return this.permissionNeeded;
 	}
 	
+   /**
+    * Checks if OP Permissions are Required.
+    * 
+    * @return If OP Permissions are Required.
+    */
 	public boolean isOPPermissionNeeded() {
 		return this.opPermissionNeeded;
 	}
 	
+   /**
+    * Checks if the Vanilla Flag is enabled.
+    * 
+    * @return If it is enabled.
+    */
 	public boolean isVanilla() {
 		return this.vanillaItem;
 	}
 	
+   /**
+    * Checks if the Vanilla Status Flag is enabled.
+    * 
+    * @return If it is enabled.
+    */
 	public boolean isVanillaStatus() {
 		return this.vanillaStatus;
 	}
 	
+   /**
+    * Checks if the Vanilla Control Flag is enabled.
+    * 
+    * @return If it is enabled.
+    */
 	public boolean isVanillaControl() {
 		return this.vanillaControl;
 	}
 	
+   /**
+    * Checks if the Give Next Flag is enabled.
+    * 
+    * @return If it is enabled.
+    */
+	public boolean isGiveNext() {
+		return this.giveNext;
+	}
+	
+   /**
+    * Checks if the Move Next Flag is enabled.
+    * 
+    * @return If it is enabled.
+    */
+	public boolean isMoveNext() {
+		return this.moveNext;
+	}
+	
+   /**
+    * Checks if the Drop Full Flag is enabled.
+    * 
+    * @return If it is enabled.
+    */
+	public boolean isDropFull() {
+		return this.dropFull;
+	}
+	
+   /**
+    * Checks if the Unbreakable Flag is enabled.
+    * 
+    * @return If it is enabled.
+    */
 	public boolean isUnbreakable() {
 		return this.unbreakable;
 	}
 	
+   /**
+    * Checks if the Count Lock Flag is enabled.
+    * 
+    * @return If it is enabled.
+    */
 	public boolean isCountLock() {
 		return this.countLock;
 	}
 	
+   /**
+    * Checks if the Cancel Events Flag is enabled.
+    * 
+    * @return If it is enabled.
+    */
 	public boolean isCancelEvents() {
 		return this.cancelEvents;
 	}
 	
+   /**
+    * Checks if the Item Store Flag is enabled.
+    * 
+    * @return If it is enabled.
+    */
 	public boolean isItemStore() {
 		return this.itemStore;
 	}
 	
+   /**
+    * Checks if the Item Modify Flag is enabled.
+    * 
+    * @return If it is enabled.
+    */
 	public boolean isItemModify() {
 		return this.itemModify;
 	}
 	
+   /**
+    * Checks if the Item Craftable Flag is enabled.
+    * 
+    * @return If it is enabled.
+    */
 	public boolean isItemCraftable() {
 		return this.noCrafting;
 	}
 	
+   /**
+    * Checks if the Item Repairable Flag is enabled.
+    * 
+    * @return If it is enabled.
+    */
 	public boolean isItemRepairable() {
 		return this.noRepairing;
 	}
 	
+   /**
+    * Checks if the Item Changable Flag is enabled.
+    * 
+    * @return If it is enabled.
+    */
 	public boolean isItemChangable() {
 		return this.itemChangable;
 	}
 	
+   /**
+    * Checks if the Always Give Flag is enabled.
+    * 
+    * @return If it is enabled.
+    */
 	public boolean isAlwaysGive() {
 		return this.alwaysGive;
 	}
 	
+   /**
+    * Checks if the Auto Remove Flag is enabled.
+    * 
+    * @return If it is enabled.
+    */
 	public boolean isAutoRemove() {
 		return this.autoRemove;
 	}
 	
+   /**
+    * Checks if the Animate Flag is enabled.
+    * 
+    * @return If it is enabled.
+    */
 	public boolean isAnimated() {
 		return this.animate;
 	}
 	
+   /**
+    * Checks if the Dynamic Flag is enabled.
+    * 
+    * @return If it is enabled.
+    */
 	public boolean isDynamic() {
 		return this.dynamic;
 	}
 	
+   /**
+    * Checks if the Overwritable Flag is enabled.
+    * 
+    * @return If it is enabled.
+    */
 	public boolean isOverwritable() {
 		return this.overwritable;
 	}
 	
+   /**
+    * Checks if the Placement Flag is enabled.
+    * 
+    * @return If it is enabled.
+    */
 	public boolean isPlaceable() {
 		return this.blockPlacement;
 	}
 	
+   /**
+    * Checks if the Attributes Flag is enabled.
+    * 
+    * @return If it is enabled.
+    */
 	public boolean isAttributesInfo() {
 		return this.hideAttributes;
 	}
 	
+   /**
+    * Checks if the Durability Bar Flag is enabled.
+    * 
+    * @return If it is enabled.
+    */
 	public boolean isDurabilityBar() {
 		return this.hideDurability;
 	}
 	
+   /**
+    * Checks if the Movement Flag is enabled.
+    * 
+    * @return If it is enabled.
+    */
 	public boolean isMovement() {
 		return this.blockMovement;
 	}
 	
+   /**
+    * Checks if the Inventory Close Flag is enabled.
+    * 
+    * @return If it is enabled.
+    */
 	public boolean isInventoryClose() {
 		return this.closeInventory;
 	}
 	
+   /**
+    * Checks if the Disposable Flag is enabled.
+    * 
+    * @return If it is enabled.
+    */
 	public boolean isDisposable() {
 		return this.disposable;
 	}
-
+	
+   /**
+    * Checks if the Self Droppable Flag is enabled.
+    * 
+    * @return If it is enabled.
+    */
 	public boolean isSelfDroppable() {
 		return this.selfDroppable;
 	}
 	
+   /**
+    * Checks if the Death Droppable Flag is enabled.
+    * 
+    * @return If it is enabled.
+    */
 	public boolean isDeathDroppable() {
 		return this.deathDroppable;
 	}
 	
+   /**
+    * Checks if the CeativeBypass Flag is enabled.
+    * 
+    * @return If it is enabled.
+    */
 	public boolean isCreativeBypass() {
 		return this.CreativeBypass;
 	}
 	
+   /**
+    * Checks if the OPBypass Flag is enabled.
+    * 
+    * @return If it is enabled.
+    */
 	public boolean isOpBypass() {
 		return this.AllowOpBypass;
 	}
 	
+   /**
+    * Checks if the ItemStack is subject to removal. 
+    * Prevents Duplication.
+    * 
+    * @return If the ItemStack is pending removal.
+    */
 	private boolean isSubjectRemoval() {
 		return this.subjectRemoval;
 	}
 	
-	public boolean containsWorld(final String world, final ItemMap itemMap) {
-		for (String enabledWorld: itemMap.getEnabledWorlds()) {
+   /**
+    * Checks if the String World Name is an Enabled World.
+    * 
+    * @param world - The name of the World being checked.
+    * @return If the World is an Enabled World.
+    */
+	public boolean containsWorld(final String world) {
+		for (String enabledWorld: this.getEnabledWorlds()) {
 			if (enabledWorld.equalsIgnoreCase(world) || enabledWorld.equalsIgnoreCase("ALL") || enabledWorld.equalsIgnoreCase("GLOBAL")) {
 				return true;
 			}
@@ -1456,8 +2676,14 @@ public class ItemMap {
 		return false;
 	}
 	
-	public boolean containsRegion(final String region, final ItemMap itemMap) {
-		for (String enabledRegion: itemMap.getEnabledRegions()) {
+   /**
+    * Checks if the String Region Name is an Enabled Region.
+    * 
+    * @param region - The name of the Reegion being checked.
+    * @return If the Region is an Enabled Region.
+    */
+	public boolean containsRegion(final String region) {
+		for (String enabledRegion: this.getEnabledRegions()) {
 			if (enabledRegion.equalsIgnoreCase(region) || enabledRegion.equalsIgnoreCase("UNDEFINED")) {
 				return true;
 			}
@@ -1465,8 +2691,16 @@ public class ItemMap {
 		return false;
 	}
 	
-	public boolean isAllowedItem(Player player, ItemStack item, String findFlag) {
-		if (!ConfigHandler.getItemCreator().isOpen(player) && this.isSimilar(item)) {
+   /**
+    * Checks if the ItemFlag should be allowed.
+    * 
+    * @param player - The Player being Checked.
+    * @param item - The ItemStack being checked.
+    * @param findFlag - The ItemFlag being found.
+    * @return If the ItemFlag is to be prevented.
+    */
+	public boolean isAllowedItem(final Player player, final ItemStack item, final String findFlag) {
+		if (!UI.getCreator().isOpen(player) && this.isSimilar(item)) {
 			if (this.AllowOpBypass && player.isOp() || this.CreativeBypass && player.getGameMode() == GameMode.CREATIVE 
 					|| findFlag.equalsIgnoreCase("inventory-modify") && player.hasPermission("itemjoin.bypass.inventorymodify") 
 					&& ItemJoin.getInstance().getConfig().getBoolean("Permissions.Movement-Bypass")) {
@@ -1487,24 +2721,23 @@ public class ItemMap {
 		return false;
 	}
 	
-	public boolean isSkull() {
-		if (this.material.toString().equalsIgnoreCase("PLAYER_HEAD") || this.material.toString().equalsIgnoreCase("SKULL_ITEM")) {
-			return true;
-		}
-		return false;
-	}
-     
-	public boolean isSimilar(ItemStack item) {
+   /**
+    * 
+    * 
+    * @param 
+    * @return 
+    */
+	public boolean isSimilar(final ItemStack item) {
 		if ((item != null && item.getType() != Material.AIR && item.getType() == this.material) || (this.materialAnimated && item != null && item.getType() != Material.AIR && this.isMaterial(item))) {
-			if (this.vanillaControl || ConfigHandler.dataTagsEnabled() && ServerHandler.hasSpecificUpdate("1_8") && ItemHandler.getNBTData(item) != null && Utils.containsIgnoreCase(ItemHandler.getNBTData(item), this.newNBTData)
+			if (this.vanillaControl || ItemHandler.getItem().dataTagsEnabled() && ServerHandler.getServer().hasSpecificUpdate("1_8") && ItemHandler.getItem().getNBTData(item) != null && Utils.getUtils().containsIgnoreCase(ItemHandler.getItem().getNBTData(item), this.newNBTData)
 					|| this.legacySecret != null && item.hasItemMeta() && item.getItemMeta().hasDisplayName() && item.getItemMeta().getDisplayName().contains(this.legacySecret) || this.vanillaStatus) {
-				if (this.skullCheck(item)) {
+				if (this.skullMeta(item)) {
 					if (isEnchantSimilar(item) || !item.getItemMeta().hasEnchants() && enchants.isEmpty() || this.isItemChangable()) {
 						if (this.material.toString().toUpperCase().contains("BOOK") 
 								&& (this.isBookMeta(item) 
 								&& ((BookMeta) item.getItemMeta()).getPages().equals(((BookMeta) tempItem.getItemMeta()).getPages()) || this.isDynamic())
 								|| this.material.toString().toUpperCase().contains("BOOK") && !this.isBookMeta(item) || !this.material.toString().toUpperCase().contains("BOOK") || this.isItemChangable()) {
-							if (!this.vanillaControl || this.vanillaControl && statsCheck(item)) {
+							if (!this.vanillaControl || this.vanillaControl && this.displayMeta(item)) {
 								return true;
 							}
 						}
@@ -1515,7 +2748,25 @@ public class ItemMap {
 		return false;
 	}
 	
-	private boolean statsCheck(ItemStack item) {
+   /**
+    * Checks if the Material is a Skull.
+    * 
+    * @return If the Material is a Skull.
+    */
+	public boolean isSkull() {
+		if (this.material.toString().equalsIgnoreCase("PLAYER_HEAD") || this.material.toString().equalsIgnoreCase("SKULL_ITEM")) {
+			return true;
+		}
+		return false;
+	}
+	
+   /**
+    * Checks if the diplay meta is similar.
+    * 
+    * @param item - The ItemStack being checked.
+    * @return If the display meta is similar.
+    */
+	private boolean displayMeta(final ItemStack item) {
 		if (item.hasItemMeta() && item.getItemMeta().hasDisplayName() && this.tempMeta != null && this.tempMeta.hasDisplayName() && item.getItemMeta().hasLore() && this.tempMeta.hasLore()) {
 			if (item.getItemMeta().getDisplayName().equalsIgnoreCase(this.tempMeta.getDisplayName()) && item.getItemMeta().getLore().toString().equalsIgnoreCase(this.tempMeta.getLore().toString())) {
 				return true;
@@ -1532,84 +2783,126 @@ public class ItemMap {
 		return false;
 	}
 	
-	private boolean skullCheck(ItemStack item) {
-		if (!this.isSkull() || skullOwner == null && this.skullTexture == null && PlayerHandler.getSkullOwner(item).equalsIgnoreCase("NULL") && ItemHandler.getSkullSkinTexture(item.getItemMeta()).isEmpty() 
-				|| !this.skullAnimated && ((SkullMeta) item.getItemMeta()).hasOwner() && this.skullOwner != null && PlayerHandler.getSkullOwner(item).equalsIgnoreCase(this.skullOwner) 
-				|| this.skullOwner != null && this.isSkullOwner(item)
-				|| this.skullOwner != null && Utils.containsIgnoreCase(this.skullOwner, "%player%")
+   /**
+    * Checks if the Skull Meta is similar.
+    * 
+    * @param item - The ItemStack being checked.
+    * @return If the skull meta is similar.
+    */
+	private boolean skullMeta(final ItemStack item) {
+		if (!this.isSkull() || skullOwner == null && this.skullTexture == null && PlayerHandler.getPlayer().getSkullOwner(item).equalsIgnoreCase("NULL") && ItemHandler.getItem().getSkullTexture(item.getItemMeta()).isEmpty() 
+				|| !this.skullAnimated && ((SkullMeta) item.getItemMeta()).hasOwner() && this.skullOwner != null && PlayerHandler.getPlayer().getSkullOwner(item).equalsIgnoreCase(this.skullOwner) 
+				|| this.skullOwner != null && this.isSkullData(item)
+				|| this.skullOwner != null && Utils.getUtils().containsIgnoreCase(this.skullOwner, "%player%")
 				|| this.skullTexture != null && this.skullOwner == null 
-				&& ItemHandler.getSkullSkinTexture(item.getItemMeta()).equalsIgnoreCase(this.skullTexture)
-				|| this.skullAnimated && this.isSkull(item) || this.skullTexture != null && this.skullOwner == null && this.isHeadDatabaseSimilar(item)) {
+				&& ItemHandler.getItem().getSkullTexture(item.getItemMeta()).equalsIgnoreCase(this.skullTexture)
+				|| this.skullAnimated && this.isSkull(item) || this.skullTexture != null && this.skullOwner == null && this.isHeadSimilar(item)) {
 			return true;
 		}
 		return false;
 	}
 	
-	private boolean isHeadDatabaseSimilar(ItemStack item) {
+   /**
+    * Checks if the HeadDatabase Skull is Similar.
+    * 
+    * @param item - The ItemStack being checked.
+    * @return If the HeadDatabase Skull is similar.
+    */
+	private boolean isHeadSimilar(final ItemStack item) {
 		if (this.headDatabase) {
 			HeadDatabaseAPI api = new HeadDatabaseAPI();
 			ItemStack itemCopy = api.getItemHead(this.skullTexture);
-			if (itemCopy != null && ItemHandler.getSkullSkinTexture(item.getItemMeta()).equalsIgnoreCase(ItemHandler.getSkullSkinTexture(itemCopy.getItemMeta()))) {
+			if (itemCopy != null && ItemHandler.getItem().getSkullTexture(item.getItemMeta()).equalsIgnoreCase(ItemHandler.getItem().getSkullTexture(itemCopy.getItemMeta()))) {
 				return true;
 			}
 		}
 		return false;
 	}
 	
-	private boolean isEnchantSimilar(ItemStack item) {
+   /**
+    * Checks if the ItemStack Enchantments are similar.
+    * 
+    * @param item - The ItemStack being checked.
+    * @return If the ItemStack Enchantments are similar.
+    */
+	private boolean isEnchantSimilar(final ItemStack item) {
 		if (item.getItemMeta().hasEnchants() && this.enchants != null && !this.enchants.isEmpty()) { 
 			ItemStack checkItem = new ItemStack(item.getType());
 			for (Entry<String, Integer> enchantments : this.enchants.entrySet()) {
-				if (enchantments.getKey() == null && ConfigHandler.getDepends().tokenEnchantEnabled() && TokenEnchantAPI.getInstance().getEnchant(enchantments.getKey()) != null) {
+				if (enchantments.getKey() == null && DependAPI.getDepends(false).tokenEnchantEnabled() && TokenEnchantAPI.getInstance().getEnchant(enchantments.getKey()) != null) {
 					TokenEnchantAPI.getInstance().enchant(null, checkItem, enchantments.getKey(), enchantments.getValue(), true, 0, true);
 				} else { 
-					checkItem.addUnsafeEnchantment(ItemHandler.getEnchantByName(enchantments.getKey()), enchantments.getValue()); }
+					checkItem.addUnsafeEnchantment(ItemHandler.getItem().getEnchantByName(enchantments.getKey()), enchantments.getValue()); }
 			}
 			return item.getItemMeta().getEnchants().equals(checkItem.getItemMeta().getEnchants());
 		}
 		return false;
 	}
 	
-	private boolean isBookMeta(ItemStack item) {
+   /**
+    * Checks if the Book Meta is similar.
+    * 
+    * @param item - The ItemStack being checked.
+    * @return If the Book Meta is similar.
+    */
+	private boolean isBookMeta(final ItemStack item) {
 		try {
 			return ((BookMeta) item.getItemMeta()).hasPages();
 		} catch (Exception e) { return false; }
 	}
 	
-	public boolean isCountSimilar(ItemStack item) {
-		if (item.getAmount() == count || ConfigHandler.getConfig("items.yml").getBoolean("items-RestrictCount") == false || this.isItemChangable()) {
+   /**
+    * Checks if the stack size is similar.
+    * 
+    * @param item - The ItemStack being checked.
+    * @return If the stack size is similar.
+    */
+	public boolean isCountSimilar(final ItemStack item) {
+		if (item.getAmount() == count || ConfigHandler.getConfig(false).getFile("items.yml").getBoolean("items-RestrictCount") == false || this.isItemChangable()) {
 			return true;
 		}
 		return false;
 	}
 	
-	private boolean isMaterial(ItemStack item) {
+   /**
+    * Checks if the Material is a Dynamic Material.
+    * 
+    * @param item - The ItemStack being checked.
+    * @return If the Material is a Dynamic Material.
+    */
+	private boolean isMaterial(final ItemStack item) {
 		for (String material : this.dynamicMaterials) {
-			material = ItemHandler.purgeDelay(material);
+			material = ItemHandler.getItem().cutDelay(material);
 			String dataValue = null;
 			if (material.contains(":")) { String[] parts = material.split(":"); dataValue = parts[1]; }
-			if (item.getType() == ItemHandler.getMaterial(material, dataValue)) {
+			if (item.getType() == ItemHandler.getItem().getMaterial(material, dataValue)) {
 				return true;
 			}
 		}
 		return false;
 	}
 	
-	private boolean isSkull(ItemStack item) {
+   /**
+    * Checks if the Skull Owners or Textures are similar.
+    * 
+    * @param item - The ItemStack being checked.
+    * @return If the Skull Owwners or Skull Textures are similar.
+    */
+	private boolean isSkull(final ItemStack item) {
 		if (this.dynamicOwners != null && !this.dynamicOwners.isEmpty()) {
 			for (String owners : this.dynamicOwners) {
-				owners = ItemHandler.purgeDelay(owners);
-				if (PlayerHandler.getSkullOwner(item) != null && PlayerHandler.getSkullOwner(item).equalsIgnoreCase(this.skullOwner) || PlayerHandler.getSkullOwner(item) != null && Utils.containsIgnoreCase(this.skullOwner, "%player%")) {
+				owners = ItemHandler.getItem().cutDelay(owners);
+				if (PlayerHandler.getPlayer().getSkullOwner(item) != null && PlayerHandler.getPlayer().getSkullOwner(item).equalsIgnoreCase(this.skullOwner) || PlayerHandler.getPlayer().getSkullOwner(item) != null && Utils.getUtils().containsIgnoreCase(this.skullOwner, "%player%")) {
 					return true;
-				} else if (this.isSkullOwner(item) && this.isSkull()){
+				} else if (this.isSkullData(item) && this.isSkull()){
 					return true;
 				}
 			}
 			if (this.dynamicOwners.toString().contains("%player%")) { return true; }
 		} else if (this.dynamicTextures != null && !this.dynamicTextures.isEmpty()) {
 			for (String textures : this.dynamicTextures) {
-				textures = ItemHandler.purgeDelay(textures);
-				if (ItemHandler.getSkullSkinTexture(item.getItemMeta()).equalsIgnoreCase(textures)) {
+				textures = ItemHandler.getItem().cutDelay(textures);
+				if (ItemHandler.getItem().getSkullTexture(item.getItemMeta()).equalsIgnoreCase(textures)) {
 					return true;
 				}
 			}
@@ -1617,14 +2910,26 @@ public class ItemMap {
 		return false;
 	}
 	
-	private boolean isSkullOwner(ItemStack item) {
-		if (ItemHandler.getSkullSkinTexture(item.getItemMeta()).equalsIgnoreCase(ItemHandler.getSkullSkinTexture(this.tempMeta))) {
+   /**
+    * Checks if the Skull Data is Similar.
+    * 
+    * @param item - The ItemStack being checked.
+    * @return If the Skull Data is similar.
+    */
+	private boolean isSkullData(final ItemStack item) {
+		if (ItemHandler.getItem().getSkullTexture(item.getItemMeta()).equalsIgnoreCase(ItemHandler.getItem().getSkullTexture(this.tempMeta))) {
 			return true;	
 		}
 		return false;
 	}
 	
-	public boolean hasItem(Player player) {
+   /**
+    * Checks the Players inventory for the ItemMap.
+    * 
+    * @param player - The Player being checked.
+    * @return If the Player already has the ItemMap.
+    */
+	public boolean hasItem(final Player player) {
 		for (ItemStack inPlayerInventory: player.getInventory().getContents()) {
 			if (this.isSimilar(inPlayerInventory) && this.isCountSimilar(inPlayerInventory)) {
 				return true;
@@ -1635,12 +2940,12 @@ public class ItemMap {
 				return true;
 			}
 		}
-		if (ServerHandler.hasSpecificUpdate("1_9") 
+		if (ServerHandler.getServer().hasSpecificUpdate("1_9") 
 				&& this.isSimilar(player.getInventory().getItemInOffHand())
 				&& this.isCountSimilar(player.getInventory().getItemInOffHand())) {
 			return true;
 		}
-		if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
+		if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
 			for (ItemStack craftInventory: player.getOpenInventory().getTopInventory()) {
 				if (this.isSimilar(craftInventory) && this.isCountSimilar(craftInventory)) {
 					return true;
@@ -1650,7 +2955,13 @@ public class ItemMap {
 		return false;
 	}
 	
-	public ItemStack getItem(Player player) {
+   /**
+    * Gets the ItemStack that is specific to the Player.
+    * 
+    * @param player - The Player to have their ItemStack generated.
+    * @return The Player specific ItemStack.
+    */
+	public ItemStack getItem(final Player player) {
 		return updateItem(player).getTempItem();
 	}
 //  ================================================================================================================================================================================= //
@@ -1659,7 +2970,13 @@ public class ItemMap {
 //                      ~ Player Item Updater ~                      //
 //  Method(s) update the ItemMap item for player specific variables. //
 //  ================================================================ //
-	public ItemMap updateItem(Player player) {
+   /**
+    * Updates the ItemStack to be specific to the Player.
+    * 
+    * @param player - The Player to have their ItemStack generated.
+    * @return The Player specific ItemStack.
+    */
+	public ItemMap updateItem(final Player player) {
 		this.setSkullDatabase();
 		this.setUnbreaking();
 		this.setEnchantments(player);
@@ -1680,12 +2997,16 @@ public class ItemMap {
 		this.setFireChargeColor();
 		this.setDye();
 		this.setBookInfo(player);
-		this.setLegacyBookPages(player, this.tempMeta, this.bookPages);
+		LegacyAPI.getLegacy().setBookPages(player, this.tempMeta, this.bookPages, this);
 		this.setAttributes();
 		this.tempItem.setItemMeta(this.tempMeta);
 		return this;
 	}
 	
+   /**
+    * Sets the Skull Database Textures.
+    * 
+    */
 	private void setSkullDatabase() {
 		if (this.headDatabase && this.skullTexture != null) {
 			HeadDatabaseAPI api = new HeadDatabaseAPI();
@@ -1694,16 +3015,25 @@ public class ItemMap {
 		}
 	}
 	
-	private void setEnchantments(Player player) {
+   /**
+    * Sets the ItemStack Enchantments.
+    * 
+    * @param player - The Player to have their TokenEnchant instance fetched.
+    */
+	private void setEnchantments(final Player player) {
 		if (this.enchants != null && !this.enchants.isEmpty()) {
 			for (Entry<String, Integer> enchantments : this.enchants.entrySet()) {
-				if (enchantments.getKey() == null && ConfigHandler.getDepends().tokenEnchantEnabled() && TokenEnchantAPI.getInstance().getEnchant(enchantments.getKey()) != null) {
+				if (enchantments.getKey() == null && DependAPI.getDepends(false).tokenEnchantEnabled() && TokenEnchantAPI.getInstance().getEnchant(enchantments.getKey()) != null) {
 					TokenEnchantAPI.getInstance().enchant(player, tempItem, enchantments.getKey(), enchantments.getValue(), true, 0, true);
-				} else { this.tempItem.addUnsafeEnchantment(ItemHandler.getEnchantByName(enchantments.getKey()), enchantments.getValue()); }
+				} else { this.tempItem.addUnsafeEnchantment(ItemHandler.getItem().getEnchantByName(enchantments.getKey()), enchantments.getValue()); }
 			}
 		}
 	}
 	
+   /**
+    * Sets the ItemStack as Unbreakable.
+    * 
+    */
 	private void setUnbreaking() {
 		if (this.isUnbreakable() || this.hideDurability) {
 			try {
@@ -1714,76 +3044,126 @@ public class ItemMap {
 				tag.getClass().getMethod("setInt", String.class, int.class).invoke(tag, "Unbreakable", 1);
 				nms.getClass().getMethod("setTag", tag.getClass()).invoke(nms, tag);
 				this.tempItem = (ItemStack) craftItemStack.getMethod("asCraftMirror", nms.getClass()).invoke(null, nms);
-			} catch (Exception e) { ServerHandler.sendDebugTrace(e); }
+			} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
 		}
 	}
 	
+   /**
+    * Sets the Map Image to be displayed.
+    * 
+    */
 	private void setMapImage() {
 		if (this.customMapImage != null) {
-			if (ServerHandler.hasSpecificUpdate("1_13")) {
+			if (ServerHandler.getServer().hasSpecificUpdate("1_13")) {
 				MapMeta mapmeta = (MapMeta) this.tempItem.getItemMeta();
 				try { mapmeta.setMapView(this.mapView); }
-				catch (NoSuchMethodError e) { mapmeta = Legacy.setMapID(mapmeta, this.mapId); }
+				catch (NoSuchMethodError e) { mapmeta = LegacyAPI.getLegacy().setMapID(mapmeta, this.mapId); }
 				this.tempItem.setItemMeta(mapmeta);
 			} else {
-				Legacy.setLegacyDurability(this.tempItem, this.mapId);
+				LegacyAPI.getLegacy().setDurability(this.tempItem, this.mapId);
 			}
 		}
 	}
 	
-	public ItemStack setJSONBookPages(Player player, ItemStack item, List<String> pages) {
-		if (item.getType().toString().equalsIgnoreCase("WRITTEN_BOOK") && pages != null && !pages.isEmpty() && ServerHandler.hasSpecificUpdate("1_8")) {
+   /**
+    * Sets the JSON Book Pages to the ItemStack.
+    * 
+    * @param player - The Player being used for placeholders.
+    * @param item - The ItemStack to be updated.
+    * @param pages - The book pages to be set.
+    * @return The updated ItemStack.
+    */
+	public ItemStack setJSONBookPages(final Player player, final ItemStack item, final List<String> pages) {
+		if (item.getType().toString().equalsIgnoreCase("WRITTEN_BOOK") && pages != null && !pages.isEmpty() && ServerHandler.getServer().hasSpecificUpdate("1_8")) {
 			List<String> copyPages = new ArrayList<String>();
 			for (String page: pages) { copyPages.add(page); }
-			copyPages.set(0, ItemHandler.purgeDelay(copyPages.get(0)));
+			copyPages.set(0, ItemHandler.getItem().cutDelay(copyPages.get(0)));
 			Object localePages = null;
-			try { localePages = Reflection.getMinecraftClass("NBTTagList").getConstructor().newInstance(); } catch (Exception e) { ServerHandler.sendDebugTrace(e); }
-			if (ServerHandler.hasSpecificUpdate("1_15")) { return this.set1_15JSONPages(player, item, localePages, copyPages); } 
-			else if (ServerHandler.hasSpecificUpdate("1_14")) { return this.set1_14JSONPages(player, item, localePages, copyPages); }
+			try { localePages = Reflection.getMinecraftClass("NBTTagList").getConstructor().newInstance(); } catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
+			if (ServerHandler.getServer().hasSpecificUpdate("1_15")) { return this.set1_15JSONPages(player, item, localePages, copyPages); } 
+			else if (ServerHandler.getServer().hasSpecificUpdate("1_14")) { return this.set1_14JSONPages(player, item, localePages, copyPages); }
 			else { return this.set1_13JSONPages(player, item, localePages, copyPages); }
 		}
 		return item;
 	}
 	
-	private ItemStack set1_13JSONPages(Player player, ItemStack item, Object localePages, List<String> pages) {
+   /**
+    * Sets the JSON Book Pages to the ItemStack.
+    * @warn Method ONLY USED for Server Version 1.13
+    * 
+    * @param player - The Player being used for placeholders.
+    * @param item - The ItemStack to be updated.
+    * @param localePages - The NBTTagList of Pages.
+    * @param pages - The book pages to be set.
+    * @return The updated ItemStack.
+    */
+	private ItemStack set1_13JSONPages(final Player player, final ItemStack item, final Object localePages, final List<String> pages) {
 		for (String textComponent: pages) {
 			try { 
-				textComponent = Utils.translateLayout(textComponent, player);
+				textComponent = Utils.getUtils().translateLayout(textComponent, player);
 				Object TagString = Reflection.getMinecraftClass("NBTTagString").getConstructor(String.class).newInstance(textComponent);
 				localePages.getClass().getMethod("add", Reflection.getMinecraftClass("NBTBase")).invoke(localePages, TagString);
-			} catch (Exception e) { ServerHandler.sendDebugTrace(e); } 
+			} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); } 
 		}
-		try { return this.invokePages(item, localePages); } catch (Exception e) { ServerHandler.sendDebugTrace(e); }
+		try { return this.invokePages(item, localePages); } catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
 		return item;
 	}
 	
-	private ItemStack set1_14JSONPages(Player player, ItemStack item, Object localePages, List<String> pages) {
+   /**
+    * Sets the JSON Book Pages to the ItemStack.
+    * @warn Method ONLY USED for Server Version 1.14
+    * 
+    * @param player - The Player being used for placeholders.
+    * @param item - The ItemStack to be updated.
+    * @param localePages - The NBTTagList of Pages.
+    * @param pages - The book pages to be set.
+    * @return The updated ItemStack.
+    */
+	private ItemStack set1_14JSONPages(final Player player, final ItemStack item, final Object localePages, final List<String> pages) {
 		for (int i = pages.size() - 1; i >= 0; i--) {
 			String textComponent = pages.get(i);
 			try { 
-				textComponent = Utils.translateLayout(textComponent, player);
+				textComponent = Utils.getUtils().translateLayout(textComponent, player);
 				Object TagString = Reflection.getMinecraftClass("NBTTagString").getConstructor(String.class).newInstance(textComponent);
 				localePages.getClass().getMethod("add", int.class, Reflection.getMinecraftClass("NBTBase")).invoke(localePages, 0, TagString);
-			} catch (Exception e) { ServerHandler.sendDebugTrace(e); } 
+			} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); } 
 		}
-		try { return this.invokePages(item, localePages); } catch (Exception e) { ServerHandler.sendDebugTrace(e); }
+		try { return this.invokePages(item, localePages); } catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
 		return item;
 	}
 	
-	private ItemStack set1_15JSONPages(Player player, ItemStack item, Object localePages, List<String> pages) {
+   /**
+    * Sets the JSON Book Pages to the ItemStack.
+    * @warn Method ONLY USED for Server Version 1.15
+    * 
+    * @param player - The Player being used for placeholders.
+    * @param item - The ItemStack to be updated.
+    * @param localePages - The NBTTagList of Pages.
+    * @param pages - The book pages to be set.
+    * @return The updated ItemStack.
+    */
+	private ItemStack set1_15JSONPages(final Player player, final ItemStack item, final Object localePages, final List<String> pages) {
 		for (int i = pages.size() - 1; i >= 0; i--) {
 			String textComponent = pages.get(i);
 			try { 
-				textComponent = Utils.translateLayout(textComponent, player);
+				textComponent = Utils.getUtils().translateLayout(textComponent, player);
 				Object TagString = Reflection.getMinecraftClass("NBTTagString").getMethod("a", String.class).invoke(null, textComponent);
 				localePages.getClass().getMethod("add", int.class, Reflection.getMinecraftClass("NBTBase")).invoke(localePages, 0, TagString);
-			} catch (Exception e) { ServerHandler.sendDebugTrace(e); } 
+			} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); } 
 		}
-		try { return this.invokePages(item, localePages); } catch (Exception e) { ServerHandler.sendDebugTrace(e); }
+		try { return this.invokePages(item, localePages); } catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
 		return item;
 	}
 	
-	private ItemStack invokePages(ItemStack item, Object pages) throws Exception {
+   /**
+    * Sets the JSON Book Pages to the ItemStack.
+    * 
+    * @param item - The ItemStack to be updated.
+    * @param pages - The book pages to be set.
+    * @throws Exception An exception.
+    * @return The updated ItemStack.
+    */
+	private ItemStack invokePages(final ItemStack item, final Object pages) throws Exception {
 		Class<?> craftItemStack = Reflection.getCraftBukkitClass("inventory.CraftItemStack");
 		Object nms = craftItemStack.getMethod("asNMSCopy", ItemStack.class).invoke(null, item);
 		Object tag = Reflection.getMinecraftClass("ItemStack").getMethod("getTag").invoke(nms);
@@ -1792,9 +3172,13 @@ public class ItemMap {
 		nms.getClass().getMethod("setTag", tag.getClass()).invoke(nms, tag);
 		return ((ItemStack)craftItemStack.getMethod("asCraftMirror", nms.getClass()).invoke(null, nms));
 	}
-
+	
+   /**
+    * Sets the NBTData, making the ItemStack plugin specific.
+    * 
+    */
 	private void setNBTData() {
-		if (ConfigHandler.dataTagsEnabled() && !this.isVanilla() && !this.isVanillaControl() && !this.isVanillaStatus()) {
+		if (ItemHandler.getItem().dataTagsEnabled() && !this.isVanilla() && !this.isVanillaControl() && !this.isVanillaStatus()) {
 			try {
 				Object nms = Reflection.getCraftBukkitClass("inventory.CraftItemStack").getMethod("asNMSCopy", ItemStack.class).invoke(null, this.tempItem);
 				Object cacheTag = Reflection.getMinecraftClass("ItemStack").getMethod("getTag").invoke(nms);
@@ -1804,62 +3188,89 @@ public class ItemMap {
 				} else { nms.getClass().getMethod("setTag", this.newNBTTag.getClass()).invoke(nms, this.newNBTTag); }
 				this.tempItem = (ItemStack) Reflection.getCraftBukkitClass("inventory.CraftItemStack").getMethod("asCraftMirror", nms.getClass()).invoke(null, nms);
 			} catch (Exception e) {
-				ServerHandler.logSevere("{ItemMap} An error has occured when setting NBTData to an item.");
-				ServerHandler.sendDebugTrace(e);
+				ServerHandler.getServer().logSevere("{ItemMap} An error has occured when setting NBTData to an item.");
+				ServerHandler.getServer().sendDebugTrace(e);
 			}
 		}
 	}
 	
-	private void setCustomName(Player player) {
-		if (this.customName != null && !this.customName.equalsIgnoreCase(ItemHandler.getName(this.tempItem))) {
-			this.tempMeta.setDisplayName(Utils.translateLayout(ItemHandler.purgeDelay(this.customName), player));
+   /**
+    * Sets the Custom Display Name.
+    * 
+    * @param player - The Player to be used for placeholders.
+    */
+	private void setCustomName(final Player player) {
+		if (this.customName != null && !this.customName.equalsIgnoreCase(ItemHandler.getItem().getMaterialName(this.tempItem))) {
+			this.tempMeta.setDisplayName(Utils.getUtils().translateLayout(ItemHandler.getItem().cutDelay(this.customName), player));
 		}
 	}
 	
-	private void setCustomLore(Player player) {
+   /**
+    * Sets the Custom Display Lore.
+    * 
+    * @param player - The Player to be used for placeholders.
+    */
+	private void setCustomLore(final Player player) {
 		if (this.customLore != null && !this.customLore.isEmpty()) {
 			List < String > loreList = this.customLore;
 			List < String > loreFormatList = new ArrayList < String > ();
 			for (int k = 0; k < loreList.size(); k++) {
-				String formatLore = ItemHandler.purgeDelay(loreList.get(k));
-				formatLore = Utils.translateLayout(formatLore, player);
+				String formatLore = ItemHandler.getItem().cutDelay(loreList.get(k));
+				formatLore = Utils.getUtils().translateLayout(formatLore, player);
 				loreFormatList.add(formatLore);
 			}
 			this.tempMeta.setLore(loreFormatList);
 		}
 	}
 	
+   /**
+    * Sets the ItemStack Durability.
+    * 
+    */
 	private void setDurability() {
 		if (this.durability != null && (this.data == null || this.data == 0)) {
-			if (ServerHandler.hasSpecificUpdate("1_13")) {
+			if (ServerHandler.getServer().hasSpecificUpdate("1_13")) {
 				((org.bukkit.inventory.meta.Damageable) this.tempMeta).setDamage(this.durability);
 			} else {
-				Legacy.setLegacyDurability(this.tempItem, this.durability);
+				LegacyAPI.getLegacy().setDurability(this.tempItem, this.durability);
 			}
 		}
 	}
 	
+   /**
+    * Sets the ItemStack Data.
+    * 
+    */
 	private void setData() {
 		if (this.data != null) {
-			if (ServerHandler.hasSpecificUpdate("1_13")) {
+			if (ServerHandler.getServer().hasSpecificUpdate("1_13")) {
 				((org.bukkit.inventory.meta.Damageable) this.tempMeta).setDamage(this.data);
 			} else {
-				Legacy.setLegacyDurability(this.tempItem, Short.parseShort(this.data + ""));
+				LegacyAPI.getLegacy().setDurability(this.tempItem, Short.parseShort(this.data + ""));
 			}
 		}
 	}
 	
+   /**
+    * Sets the ItemStack Model Data.
+    * 
+    */
 	private void setModelData() {
 		if (this.modelData != null && this.modelData != 0) {
-			if (ServerHandler.hasSpecificUpdate("1_14")) {
+			if (ServerHandler.getServer().hasSpecificUpdate("1_14")) {
 				this.tempMeta.setCustomModelData(this.modelData);
-			} else { ServerHandler.logWarn("{ItemMap} The item " + this.getConfigName() + " is using Custom Model Data which is not supported until Minecraft 1.14+."); }
+			} else { ServerHandler.getServer().logWarn("{ItemMap} The item " + this.getConfigName() + " is using Custom Model Data which is not supported until Minecraft 1.14+."); }
 		}
 	}
 	
-	private void setSkull(Player player) {
+   /**
+    * Sets the Skull Owner.
+    * 
+    * @param player - The Player to be used for placeholders.
+    */
+	private void setSkull(final Player player) {
 		if (this.skullOwner != null) {
-			tempMeta = ItemHandler.setSkullOwner(tempMeta, Utils.translateLayout(this.skullOwner, player));
+			tempMeta = ItemHandler.getItem().setSkullOwner(tempMeta, Utils.getUtils().translateLayout(this.skullOwner, player));
 		} else if (this.skullTexture != null && !this.headDatabase) {
 			try {
 				GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
@@ -1867,10 +3278,14 @@ public class ItemMap {
 				Field declaredField = this.tempMeta.getClass().getDeclaredField("profile");
 				declaredField.setAccessible(true);
 				declaredField.set(this.tempMeta, gameProfile);
-			} catch (Exception e) { ServerHandler.sendDebugTrace(e); }
+			} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
 		}
 	}
 	
+   /**
+    * Sets the ItemStack PotionEffects
+    * 
+    */
 	private void setPotionEffects() {
 		if (this.effect != null && !this.effect.isEmpty() && !this.customConsumable) {
 			for (PotionEffect potion: this.effect) {
@@ -1879,12 +3294,20 @@ public class ItemMap {
 		}
 	}
 	
+   /**
+    * Sets the ItemStack Banner Patterns
+    * 
+    */
 	private void setBanners() {
 		if (this.bannerPatterns != null && !this.bannerPatterns.isEmpty()) {
 			((BannerMeta) this.tempMeta).setPatterns(this.bannerPatterns);
 		}
 	}
 	
+   /**
+    * Sets the itemStack FireworkMeta.
+    * 
+    */
 	private void setFireworks() {
 		if (this.firework != null) {
 			((FireworkMeta) this.tempMeta).clearEffects();
@@ -1896,54 +3319,55 @@ public class ItemMap {
 		}
 	}
 	
+   /**
+    * Sets the Firework Charge Color.
+    * 
+    */
 	private void setFireChargeColor() {
 		if (this.chargeColor != null) {
 			((FireworkEffectMeta) this.tempMeta).setEffect(FireworkEffect.builder().withColor(this.chargeColor.getColor()).build());
 		}
 	}
 	
+   /**
+    * Sets the ItemStack DyeColor.
+    * 
+    */
 	private void setDye() {
 		if (this.leatherColor != null) {
 			((LeatherArmorMeta) this.tempMeta).setColor(DyeColor.valueOf(this.leatherColor).getFireworkColor());
 		} else if (this.leatherHex != null) {
-			((LeatherArmorMeta) this.tempMeta).setColor(Utils.getColorFromHexColor(this.leatherHex));
+			((LeatherArmorMeta) this.tempMeta).setColor(Utils.getUtils().getColorFromHexColor(this.leatherHex));
 		}
 	}
 	
-	private void setBookInfo(Player player) {
+   /**
+    * Sets the ItemStack Book Information.
+    * 
+    * @param player - The Player to be used for placeholders.
+    */
+	private void setBookInfo(final Player player) {
 		if (this.author != null) {
-			this.author = Utils.translateLayout(this.author, player);
+			this.author = Utils.getUtils().translateLayout(this.author, player);
 			((BookMeta) this.tempMeta).setAuthor(this.author);
 		}
 		
 		if (this.title != null) {
-			this.title = Utils.translateLayout(this.title, player);
+			this.title = Utils.getUtils().translateLayout(this.title, player);
 			((BookMeta) this.tempMeta).setTitle(this.title);
 		}
 		
-		if (this.generation != null && ServerHandler.hasSpecificUpdate("1_10")) {
+		if (this.generation != null && ServerHandler.getServer().hasSpecificUpdate("1_10")) {
 			((BookMeta) this.tempMeta).setGeneration((Generation) this.generation);
 		}
 	}
 	
-	public ItemMeta setLegacyBookPages(Player player, ItemMeta meta, List<String> pages) {
-		if (!ServerHandler.hasSpecificUpdate("1_8") && pages != null && !pages.isEmpty()) {
-			List<String> copyPages = new ArrayList<String>();
-			for (String page: pages) { copyPages.add(page); }
-			copyPages.set(0, ItemHandler.purgeDelay(copyPages.get(0)));
-			List < String > bookList = new ArrayList < String > ();
-			for (int k = 0; k < pages.size(); k++) {
-				bookList.add(Utils.translateLayout(pages.get(k), player));
-			}
-			((BookMeta) meta).setPages(bookList);
-			this.bookPages = bookList;
-			return meta;
-		}
-		return meta;
-	}
-	
+   /**
+    * Sets the Attributes to the Temporary ItemMeta.
+    * 
+    */
 	private void setAttributes() {
-		if (ServerHandler.hasSpecificUpdate("1_8") && this.hideAttributes) {
+		if (ServerHandler.getServer().hasSpecificUpdate("1_8") && this.hideAttributes) {
 			this.tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ATTRIBUTES);
 			this.tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_DESTROYS);
 			this.tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ENCHANTS);
@@ -1953,8 +3377,14 @@ public class ItemMap {
 		}
 	}
 //  =========================================================================================================================================================== //	
-
-	public Boolean inWorld(World world) {
+	
+   /**
+    * Checks if the World is an Enabled World.
+    * 
+    * @param world - The world to be checked.
+    * @return If the World is an Enabled World.
+    */
+	public boolean inWorld(final World world) {
 		if (this.enabledWorlds == null) { return true; }
 			for (String compareWorld: this.enabledWorlds) {
 				if (compareWorld.equalsIgnoreCase(world.getName()) 
@@ -1966,13 +3396,20 @@ public class ItemMap {
 		return false;
 	}
 	
-	public void removeFrom(Player player, int amount) {
+   /**
+    * Removes the ItemMap from the Player.
+    * 
+    * @param player - The Player to have the item removed.
+    * @param amount - The stack size of the item.
+    */
+	public void removeFrom(final Player player, int...amount) {
+		if (amount.length == 0) { amount = new int[]{0}; } 
 		PlayerInventory inv = player.getInventory();
 		Inventory craftView = player.getOpenInventory().getTopInventory();
 		ItemStack[] contents = inv.getContents();
 		ItemStack[] craftingContents = player.getOpenInventory().getTopInventory().getContents();
 		this.updateItem(player);
-		if (amount == 0) {
+		if (amount[0] == 0) {
 			if (this.isAnimated() && this.getAnimationHandler().get(player) != null
 					|| this.isDynamic() && this.getAnimationHandler().get(player) != null) {
 				this.localeAnimations.get(player).closeAnimation(player);
@@ -1987,59 +3424,64 @@ public class ItemMap {
 			if (this.isSimilar(inv.getLeggings())) { inv.setLeggings(new ItemStack(Material.AIR)); }
 			if (this.isSimilar(inv.getBoots())) { inv.setBoots(new ItemStack(Material.AIR)); }
 			
-			if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
+			if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
 				for (int k = 0; k < craftingContents.length; k++) {
 					if (this.isSimilar(craftingContents[k])) { craftView.setItem(k, new ItemStack(Material.AIR)); }
 				}
 			}
 		} else {
 			for (int k = 0; k < contents.length; k++) {
-				if (this.isSimilar(contents[k])) { inv.setItem(k, newItem(inv.getItem(k), amount)); return; }
+				if (this.isSimilar(contents[k])) { inv.setItem(k, ItemHandler.getItem().modifyItem(inv.getItem(k), false, amount[0])); return; }
 			}
-			if (this.isSimilar(inv.getHelmet())) { inv.setHelmet(newItem(inv.getHelmet(), amount)); }
-			else if (this.isSimilar(inv.getChestplate())) { inv.setChestplate(newItem(inv.getHelmet(), amount)); }
-			else if (this.isSimilar(inv.getLeggings())) { inv.setLeggings(newItem(inv.getHelmet(), amount)); }
-			else if (this.isSimilar(inv.getBoots())) { inv.setBoots(newItem(inv.getHelmet(), amount)); }
-			else if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
+			if (this.isSimilar(inv.getHelmet())) { inv.setHelmet(ItemHandler.getItem().modifyItem(inv.getHelmet(), false, amount[0])); }
+			else if (this.isSimilar(inv.getChestplate())) { inv.setChestplate(ItemHandler.getItem().modifyItem(inv.getHelmet(), false, amount[0])); }
+			else if (this.isSimilar(inv.getLeggings())) { inv.setLeggings(ItemHandler.getItem().modifyItem(inv.getHelmet(), false, amount[0])); }
+			else if (this.isSimilar(inv.getBoots())) { inv.setBoots(ItemHandler.getItem().modifyItem(inv.getHelmet(), false, amount[0])); }
+			else if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
 				for (int k = 0; k < craftingContents.length; k++) {
-					if (this.isSimilar(craftingContents[k])) { craftView.setItem(k, newItem(player.getOpenInventory().getItem(k), amount)); return; }
+					if (this.isSimilar(craftingContents[k])) { craftView.setItem(k, ItemHandler.getItem().modifyItem(player.getOpenInventory().getItem(k), false, amount[0])); return; }
 				}
 			}
 		}
 	}
 	
-	private ItemStack newItem(ItemStack itemCopy, int amount) {
-		ItemStack item = new ItemStack(itemCopy);
-		if (item.getAmount() > amount && item.getAmount() != amount || item.getAmount() < amount) { item.setAmount(item.getAmount() - amount); } 
-		else if (item.getAmount() == amount) { item = new ItemStack(Material.AIR); }
-		return item;
-	}
-	
-	public void giveTo(Player player, boolean command, int amount) {
-		this.updateItem(player);
-		if (this.CustomSlot != null) { ItemUtilities.setCustomSlots(player, this, this.tempItem.clone(), command, amount); } 
-		else { ItemUtilities.setInvSlots(player, this, this.tempItem.clone(), command, amount); }
+   /**
+    * Gives the Player the ItemMap.
+    * 
+    * @param player - The Player to be given the item.
+    * @param amount - The stack size of the item.
+    */
+	public void giveTo(final Player player, int...amount) {
+		if (amount.length == 0) { amount = new int[]{0}; } 
+		if (this.CustomSlot != null) { ItemUtilities.getUtilities().setCustomSlots(player, this, amount[0]); } 
+		else { ItemUtilities.getUtilities().setInvSlots(player, this, amount[0]); }
 		this.setAnimations(player);
 		this.executeCommands(player, this.tempItem, "ON_RECEIVE", this.getSlot());
 	}
 	
-	public void giveTo(Player player, int amount, String slot) {
-		this.updateItem(player);
-		ItemStack item = this.tempItem.clone();
-		if (amount > 0) { item.setAmount(amount); }
-		if (Utils.containsIgnoreCase(slot, "CRAFTING")) { 
-			if (Utils.getSlotConversion(slot) == 0) {
+   /**
+    * Gives the Player the ItemMap.
+    * 
+    * @param player - The Player to be given the item.
+    * @param amount - The stack size of the item.
+    * @param slot - The slot to be placed into.
+    */
+	public void giveTo(final Player player, final int amount, final String slot) {
+		ItemStack item = this.getItem(player);
+		if (amount > 1) { item.setAmount(amount); }
+		if (Utils.getUtils().containsIgnoreCase(slot, "CRAFTING")) { 
+			if (Utils.getUtils().getSlotConversion(slot) == 0) {
 		    	Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
 		    		@Override
 		    		public void run() {
-		    			if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
-		    				player.getOpenInventory().getTopInventory().setItem(Utils.getSlotConversion(slot), item);
-		    				PlayerHandler.updateInventory(player);
+		    			if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
+		    				player.getOpenInventory().getTopInventory().setItem(Utils.getUtils().getSlotConversion(slot), item);
+		    				PlayerHandler.getPlayer().updateInventory(player, 1L);
 		    			}
 		    		}
 		    	}, 4L);
 			} else {
-				player.getOpenInventory().getTopInventory().setItem(Utils.getSlotConversion(slot), item);
+				player.getOpenInventory().getTopInventory().setItem(Utils.getUtils().getSlotConversion(slot), item);
 			}
 		} 
 		else { player.getInventory().setItem(Integer.parseInt(slot), item); }
@@ -2047,7 +3489,12 @@ public class ItemMap {
 		this.executeCommands(player, this.tempItem, "ON_RECEIVE", this.getSlot());
 	}
 	
-	public void setAnimations(Player player) {
+   /**
+    * Sets the Animations of the Player.
+    * 
+    * @param player - The Player having their animations set.
+    */
+	public void setAnimations(final Player player) {
 		if (this.isAnimated() && this.getAnimationHandler().get(player) == null
 				|| isDynamic() && this.getAnimationHandler().get(player) == null) {
 			ItemAnimation Animator = new ItemAnimation(this);
@@ -2055,33 +3502,53 @@ public class ItemMap {
 			this.localeAnimations.put(player, Animator);
 		}
 	}
-
+	
+   /**
+    * Attempts to Execute the ItemCommands.
+    * 
+    * @param player - The Player that executed the commands.
+    * @param itemCopy - The ItemStack having their commands executed.
+    * @param action - The Action that executed the commands.
+    * @param slot - The Slot of the ItemStack.
+    * @return If the commands successfully executed.
+    */
     public boolean executeCommands(final Player player, final ItemStack itemCopy, final String action, final String slot) {
 		boolean playerSuccess = false;
-    	if (this.commands != null && this.commands.length > 0 && !ConfigHandler.getItemCreator().isOpen(player) && !this.getWarmPending(player) && isExecutable(player, action) && !this.onCooldown(player) && this.isPlayerChargeable(player, this.itemCost != null && !this.itemCost.isEmpty())) {
+    	if (this.commands != null && this.commands.length > 0 && !UI.getCreator().isOpen(player) && !this.getWarmPending(player) && isExecutable(player, action) && !this.onCooldown(player) && this.isPlayerChargeable(player, this.itemCost != null && !this.itemCost.isEmpty())) {
     		this.warmCycle(player, this, this.getWarmDelay(), player.getLocation(), itemCopy, action, slot);
     	}
     	return playerSuccess;
     }
 	
+   /**
+    * Starts the Warmup for the Player pending command execution.
+    * 
+    * @param player - The Player that executed the commands.
+    * @param itemMap - The ItemMap having their commands executed.
+    * @param warmCount - The duration of the Warmup.
+    * @param location - The Location of the Warmup.
+    * @param itemCopy - The ItemStack having their commands executed.
+    * @param action - The Action that executed the commands.
+    * @param slot - The Slot of the ItemStack.
+    */
 	private void warmCycle(final Player player, final ItemMap itemMap, final int warmCount, final Location location, final ItemStack itemCopy, final String action, final String slot) {
 		if (warmCount != 0) {
 			if (itemMap.warmDelay == warmCount) { 
-				String[] placeHolders = Language.newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = Utils.translateLayout(itemMap.getCustomName(), player); 
-				Language.sendLangMessage("General.itemWarmingUp", player, placeHolders); 
-				itemMap.setWarmPending(player); 
+				String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = Utils.getUtils().translateLayout(itemMap.getCustomName(), player); 
+				LanguageAPI.getLang(false).sendLangMessage("General.itemWarmingUp", player, placeHolders); 
+				itemMap.addWarmPending(player); 
 			}
 			Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
 				@Override
 				public void run() {
 					if (itemMap.warmLocation(player, location)) {
-						String[] placeHolders = Language.newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = Utils.translateLayout(itemMap.getCustomName(), player); 
-						Language.sendLangMessage("General.itemWarming", player, placeHolders);
+						String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = Utils.getUtils().translateLayout(itemMap.getCustomName(), player); 
+						LanguageAPI.getLang(false).sendLangMessage("General.itemWarming", player, placeHolders);
 						itemMap.warmCycle(player, itemMap, warmCount - 1, location, itemCopy, action, slot);	
 					} else { 
 						itemMap.delWarmPending(player); 
-						String[] placeHolders = Language.newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = Utils.translateLayout(itemMap.getCustomName(), player); 
-						Language.sendLangMessage("General.itemWarmingHalted", player, placeHolders);
+						String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = Utils.getUtils().translateLayout(itemMap.getCustomName(), player); 
+						LanguageAPI.getLang(false).sendLangMessage("General.itemWarmingHalted", player, placeHolders);
 					}
 				}
 			}, 20);
@@ -2101,8 +3568,8 @@ public class ItemMap {
 							itemMap.addPlayerOnCooldown(player);
 						}
 					} else {
-						String[] placeHolders = Language.newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = Utils.translateLayout(itemMap.getCustomName(), player); 
-						Language.sendLangMessage("General.itemWarmingHalted", player, placeHolders);
+						String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = Utils.getUtils().translateLayout(itemMap.getCustomName(), player); 
+						LanguageAPI.getLang(false).sendLangMessage("General.itemWarmingHalted", player, placeHolders);
 					}
 					if (itemMap.warmDelay != 0) { itemMap.delWarmPending(player); }
 				}
@@ -2110,13 +3577,27 @@ public class ItemMap {
 		}
 	}
 	
+   /**
+    * Checks if the Player is still at the original Warmup Location.
+    * 
+    * @param player - The Player Warming Up.
+    * @param Location - The Location of the Warmup.
+    * @return If the Player is still inside the Warmup Location.
+    */
 	private boolean warmLocation(final Player player, final Location location) {
 	    if (player.getLocation().distance(location) >= 1 || player.isDead()) {
 	    	return false;
 	    }
 	    return true;
 	}
-    
+	
+   /**
+    * Checks if the ItemCommands are executable.
+    * 
+    * @param player - The Player that executed the command.
+    * @param action - The Action that executed the command.
+    * @return If the ItemCommands are executable.
+    */
     private boolean isExecutable(final Player player, final String action) {
     	boolean playerSuccess = false;
     	ItemCommand[] itemCommands = this.commands;
@@ -2126,18 +3607,36 @@ public class ItemMap {
 		}
     	return playerSuccess;
     }
-    
-    private boolean getRandomMap(final HashMap < Integer, ItemCommand > randomCommands, ItemCommand[] itemCommands, final Player player, final String action, final String slot) {
-    	Entry<?, ?> dedicatedMap = Utils.randomEntry(randomCommands);
+	
+   /**
+    * Randomly Selected an ItemCommand Entry for a Single Command.
+    * 
+    * @param itemCommands - The ItemCommands to have an entry randomly selected.
+    * @param player - The Player having their commands randomly selected.
+    * @param action - The Action that executed the commands.
+    * @param slot - The Slot of the ItemStack.
+    * @return If it was successful.
+    */
+    private boolean getRandomMap(final HashMap < Integer, ItemCommand > randomCommands, final ItemCommand[] itemCommands, final Player player, final String action, final String slot) {
+    	Entry<?, ?> dedicatedMap = Utils.getUtils().randomEntry(randomCommands);
     	if (!((ItemCommand)dedicatedMap.getValue()).execute(player, action, slot, this)) { 
     		this.getRandomMap(randomCommands, itemCommands, player, action, slot);
     		return false;
     	}
     	return true;
     }
-    
-    private boolean getRandomAll(final HashMap < Integer, ItemCommand > randomCommands, ItemCommand[] itemCommands, final Player player, final String action, final String slot) {
-    	Entry<?, ?> dedicatedMap = Utils.randomEntry(randomCommands);
+	
+   /**
+    * Randomly Selected an ItemCommand Entry for All Commands.
+    * 
+    * @param itemCommands - The ItemCommands to have an entry randomly selected.
+    * @param player - The Player having their commands randomly selected.
+    * @param action - The Action that executed the commands.
+    * @param slot - The Slot of the ItemStack.
+    * @return If it was successful.
+    */
+    private boolean getRandomAll(final HashMap < Integer, ItemCommand > randomCommands, final ItemCommand[] itemCommands, final Player player, final String action, final String slot) {
+    	Entry<?, ?> dedicatedMap = Utils.getUtils().randomEntry(randomCommands);
     	if (!((ItemCommand)dedicatedMap.getValue()).execute(player, action, slot, this)) { 
     		randomCommands.remove(dedicatedMap.getKey());
     		this.getRandomAll(randomCommands, itemCommands, player, action, slot);
@@ -2149,8 +3648,14 @@ public class ItemMap {
     	}
     	return true;
     }
-    
-    private String getRandomList(ItemCommand[] itemCommands) {
+	
+   /**
+    * Randomly Selected an ItemCommand Entry.
+    * 
+    * @param itemCommands - The ItemCommands to have an entry randomly selected.
+    * @return The Randomly selected ItemCommand.
+    */
+    private String getRandomList(final ItemCommand[] itemCommands) {
     	if (this.sequence == CommandSequence.RANDOM_LIST) {
     		List < String > listIdent = new ArrayList < String > ();
     		for (int i = 0; i < itemCommands.length; i++) {
@@ -2160,13 +3665,22 @@ public class ItemMap {
     		}
     		HashMap < Integer, String > randomIdent = new HashMap < Integer, String > ();
     		for (String ident: listIdent) {
-    			randomIdent.put(Utils.getRandom(1, 100000), ident);
+    			randomIdent.put(Utils.getUtils().getRandom(1, 100000), ident);
     		}
-    		return (String) Utils.randomEntry(randomIdent).getValue();
+    		return (String) Utils.getUtils().randomEntry(randomIdent).getValue();
     	}
     	return null;
     }
-    
+	
+   /**
+    * Executes the ItemCommands.
+    * 
+    * @param player - The Player executing the commands.
+    * @param action - The Action executing the commands.
+    * @param slot - The slot of the ItemStack.
+    * @param itemCopy - The ItemStack having their commands executed.
+    * @return If the Command(s) were successfully executed.
+    */
     private boolean isExecuted(final Player player, final String action, final String slot, final ItemStack itemCopy) {
     	boolean playerSuccess = false;
     	ItemCommand[] itemCommands = this.commands;
@@ -2175,7 +3689,7 @@ public class ItemMap {
     	if (!this.subjectRemoval) {
     		boolean isSwap = false;
     		for (int i = 0; i < itemCommands.length; i++) { 
-        		if (this.sequence == CommandSequence.RANDOM || this.sequence == CommandSequence.RANDOM_SINGLE) { randomCommands.put(Utils.getRandom(1, 100000), itemCommands[i]); }
+        		if (this.sequence == CommandSequence.RANDOM || this.sequence == CommandSequence.RANDOM_SINGLE) { randomCommands.put(Utils.getUtils().getRandom(1, 100000), itemCommands[i]); }
         		else if (this.sequence == CommandSequence.RANDOM_LIST) {
         			if (itemCommands[i].getSection() != null && itemCommands[i].getSection().equalsIgnoreCase(chosenIdent.replace("+", ""))) {
 	        			if (!playerSuccess) { playerSuccess = itemCommands[i].execute(player, action, slot, this); } 
@@ -2184,7 +3698,7 @@ public class ItemMap {
         		}
         		else if (!playerSuccess) { playerSuccess = itemCommands[i].execute(player, action, slot, this); }
 				else { itemCommands[i].execute(player, action, slot, this); }
-        		if (Utils.containsIgnoreCase(itemCommands[i].getRawCommand(), "swap-item")) { isSwap = true; }
+        		if (Utils.getUtils().containsIgnoreCase(itemCommands[i].getRawCommand(), "swap-item")) { isSwap = true; }
 			}
     		if (isSwap) { this.removeDisposable(player, itemCopy, true); }
     	}
@@ -2192,19 +3706,26 @@ public class ItemMap {
     	else if (this.sequence == CommandSequence.RANDOM_SINGLE) { playerSuccess = this.getRandomMap(randomCommands, itemCommands, player, action, slot); }
     	return playerSuccess;
     }
-    
-    private boolean isPlayerChargeable(Player player, boolean materialCost) {
-		if (ConfigHandler.getDepends().getVault().vaultEnabled() && !materialCost) {
-			double balance = 0.0; try { balance = ConfigHandler.getDepends().getVault().getBalance(player); } catch (NullPointerException e) { }
+	
+   /**
+    * Checks if the Player has the proper balance/cost so they can execute the command.
+    * 
+    * @param player - The Player being charged.
+    * @param materialCost - If the cost being charged is an Item.
+    * @return If the Player has the required economy balance to execute the command.
+    */
+    private boolean isPlayerChargeable(final Player player, final boolean materialCost) {
+		if (DependAPI.getDepends(false).getVault().vaultEnabled() && !materialCost) {
+			double balance = 0.0; try { balance = DependAPI.getDepends(false).getVault().getBalance(player); } catch (NullPointerException e) { }
 			if (balance >= this.cost) {
 				return true;
 			} else if (!(balance >= this.cost)) {
-				String[] placeHolders = Language.newString(); placeHolders[6] = this.cost.toString(); placeHolders[5] = balance + "";
-				Language.sendLangMessage("General.itemChargeFailed", player, placeHolders);
+				String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[6] = this.cost.toString(); placeHolders[5] = balance + "";
+				LanguageAPI.getLang(false).sendLangMessage("General.itemChargeFailed", player, placeHolders);
 				return false;
 			}
 		} else if (materialCost) {
-			Material mat = ItemHandler.getMaterial(this.itemCost, null);
+			Material mat = ItemHandler.getItem().getMaterial(this.itemCost, null);
 			int foundAmount = 0;
 			for (ItemStack playerInventory: player.getInventory().getContents()) {
 				if (playerInventory != null && playerInventory.getType() == mat) {
@@ -2230,7 +3751,7 @@ public class ItemMap {
 					}
 				}
 			}
-			if (ServerHandler.hasSpecificUpdate("1_9") && player.getInventory().getItemInOffHand() != null && player.getInventory().getItemInOffHand().getType() == mat) {
+			if (ServerHandler.getServer().hasSpecificUpdate("1_9") && player.getInventory().getItemInOffHand() != null && player.getInventory().getItemInOffHand().getType() == mat) {
 				if (player.getInventory().getItemInOffHand().getAmount() >= this.cost) {
 					return true;
 				} else { 
@@ -2240,7 +3761,7 @@ public class ItemMap {
 					}
 				}
 			}
-			if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
+			if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
 				for (ItemStack craftInventory: player.getOpenInventory().getTopInventory()) {
 					if (craftInventory != null && craftInventory.getType() == mat && craftInventory.getAmount() >= this.cost) {
 						if (craftInventory.getAmount() >= this.cost) {
@@ -2254,102 +3775,129 @@ public class ItemMap {
 					}
 				}
 			}
-			String[] placeHolders = Language.newString(); placeHolders[6] = this.cost == 0 ? "1" : this.cost.toString(); placeHolders[5] = foundAmount + "";
-			Language.sendLangMessage("General.itemChargeFailed", player, placeHolders);
+			String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[6] = this.cost == 0 ? "1" : this.cost.toString(); placeHolders[5] = foundAmount + "";
+			LanguageAPI.getLang(false).sendLangMessage("General.itemChargeFailed", player, placeHolders);
 			return false;
 		}
 		return true;
 	}
-    
-    private void withdrawItemCost(Player player) {
-		Material mat = ItemHandler.getMaterial(this.itemCost, null);
+	
+    /**
+    * Withdraws the Commands Item Cost from the Players Inventory.
+    * 
+    * @param player - The Player to have their Item Cost changed.
+    */
+    private void withdrawItemCost(final Player player) {
+		Material mat = ItemHandler.getItem().getMaterial(this.itemCost, null);
 		Integer removeAmount = this.cost; if (this.cost == 0) { removeAmount = 1; }
 		for (int i = 0; i < player.getInventory().getSize(); i++) {
 			if (player.getInventory().getItem(i) != null && player.getInventory().getItem(i).getType() == mat) {
 				if (player.getInventory().getItem(i).getAmount() < removeAmount) {
 					removeAmount -= player.getInventory().getItem(i).getAmount();
-					player.getInventory().setItem(i, newItem(player.getInventory().getItem(i), false, player.getInventory().getItem(i).getAmount()));
-				} else { player.getInventory().setItem(i, newItem(player.getInventory().getItem(i), false, removeAmount)); break; } 
+					player.getInventory().setItem(i, ItemHandler.getItem().modifyItem(player.getInventory().getItem(i), false, player.getInventory().getItem(i).getAmount()));
+				} else { player.getInventory().setItem(i, ItemHandler.getItem().modifyItem(player.getInventory().getItem(i), false, removeAmount)); break; } 
 			}
 		}
-		if (ServerHandler.hasSpecificUpdate("1_9") && player.getInventory().getItemInOffHand() != null && player.getInventory().getItemInOffHand().getType() == mat) {
+		if (ServerHandler.getServer().hasSpecificUpdate("1_9") && player.getInventory().getItemInOffHand() != null && player.getInventory().getItemInOffHand().getType() == mat) {
 			if (player.getInventory().getItemInOffHand().getAmount() < removeAmount) {
 				removeAmount -= player.getInventory().getItemInOffHand().getAmount();
-				PlayerHandler.setOffHandItem(player, newItem(player.getInventory().getItemInOffHand(), false, player.getInventory().getItemInOffHand().getAmount()));
-			} else { PlayerHandler.setOffHandItem(player, newItem(player.getInventory().getItemInOffHand(), false, removeAmount));} 
-			PlayerHandler.setOffHandItem(player, newItem(player.getInventory().getItemInOffHand(), false, removeAmount));
+				PlayerHandler.getPlayer().setOffHandItem(player, ItemHandler.getItem().modifyItem(player.getInventory().getItemInOffHand(), false, player.getInventory().getItemInOffHand().getAmount()));
+			} else { PlayerHandler.getPlayer().setOffHandItem(player, ItemHandler.getItem().modifyItem(player.getInventory().getItemInOffHand(), false, removeAmount));} 
+			PlayerHandler.getPlayer().setOffHandItem(player, ItemHandler.getItem().modifyItem(player.getInventory().getItemInOffHand(), false, removeAmount));
 		}
-		if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
+		if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
 			for (int i = 0; i < player.getOpenInventory().getTopInventory().getSize(); i++) {
 				if (player.getOpenInventory().getTopInventory().getItem(i) != null && player.getOpenInventory().getTopInventory().getItem(i).getType() == mat) {
 					if (player.getOpenInventory().getTopInventory().getItem(i).getAmount() < removeAmount) {
 						removeAmount -= player.getOpenInventory().getTopInventory().getItem(i).getAmount();
-						player.getOpenInventory().getTopInventory().setItem(i, newItem(player.getOpenInventory().getTopInventory().getItem(i), false, player.getOpenInventory().getTopInventory().getItem(i).getAmount()));
-					} else { player.getOpenInventory().getTopInventory().setItem(i, newItem(player.getOpenInventory().getTopInventory().getItem(i), false, removeAmount)); break; } 
+						player.getOpenInventory().getTopInventory().setItem(i, ItemHandler.getItem().modifyItem(player.getOpenInventory().getTopInventory().getItem(i), false, player.getOpenInventory().getTopInventory().getItem(i).getAmount()));
+					} else { player.getOpenInventory().getTopInventory().setItem(i, ItemHandler.getItem().modifyItem(player.getOpenInventory().getTopInventory().getItem(i), false, removeAmount)); break; } 
 				}
 			}
 		}
-		String[] placeHolders = Language.newString(); placeHolders[6] = this.cost.toString();
-		Language.sendLangMessage("General.itemChargeSuccess", player, placeHolders);
+		String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[6] = this.cost.toString();
+		LanguageAPI.getLang(false).sendLangMessage("General.itemChargeSuccess", player, placeHolders);
     }
-    
-    private void withdrawBalance(Player player) {
-		if (ConfigHandler.getDepends().getVault().vaultEnabled()) {
+	
+   /**
+    * Withdraws the Commands Cost from the Vault Balance for the Player.
+    * 
+    * @param player - The Player to have their economy balance changed.
+    */
+    private void withdrawBalance(final Player player) {
+		if (DependAPI.getDepends(false).getVault().vaultEnabled()) {
 			double balance = 0.0;
-			try { balance = ConfigHandler.getDepends().getVault().getBalance(player); } catch (NullPointerException e) { }
+			try { balance = DependAPI.getDepends(false).getVault().getBalance(player); } catch (NullPointerException e) { }
 			int parseCost = this.cost;
 			if (balance >= parseCost) {
 				if (parseCost != 0) {
-					try { ConfigHandler.getDepends().getVault().withdrawBalance(player, parseCost); } catch (NullPointerException e) { ServerHandler.sendDebugTrace(e); }
-					String[] placeHolders = Language.newString(); placeHolders[6] = this.cost.toString();
-					Language.sendLangMessage("General.itemChargeSuccess", player, placeHolders);
+					try { DependAPI.getDepends(false).getVault().withdrawBalance(player, parseCost); } catch (NullPointerException e) { ServerHandler.getServer().sendDebugTrace(e); }
+					String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[6] = this.cost.toString();
+					LanguageAPI.getLang(false).sendLangMessage("General.itemChargeSuccess", player, placeHolders);
 				}
 			}
 		}
 	}
 	
-	private void playSound(Player player) {
+   /**
+    * Plays the Commands Sound for the Player.
+    * 
+    * @param player - The Player to have the Sound heard.
+    */
+	private void playSound(final Player player) {
 		if (this.commandSound != null) {
 			try {
 				player.playSound(player.getLocation(), this.commandSound, 1, 1);
 			} catch (Exception e) {
-				ServerHandler.logSevere("{ItemMap} There was an issue executing the commands-sound you defined.");
-				ServerHandler.logWarn("{ItemMap} " + this.commandSound + " is not a sound in " + Reflection.getServerVersion() + ".");
-				ServerHandler.sendDebugTrace(e);
+				ServerHandler.getServer().logSevere("{ItemMap} There was an issue executing the commands-sound you defined.");
+				ServerHandler.getServer().logWarn("{ItemMap} " + this.commandSound + " is not a sound in " + Reflection.getServerVersion() + ".");
+				ServerHandler.getServer().sendDebugTrace(e);
 			}
 		}
 	}
 	
-	private void playParticle(Player player) {
+   /**
+    * Plays the Commands Particle for the Player.
+    * 
+    * @param player - The Player to have the Particle visible.
+    */
+	private void playParticle(final Player player) {
 		if (this.commandParticle != null) {
-			EffectAPI.spawnParticle(player, this.commandParticle);
+			EffectAPI.getEffects().spawnParticle(player, this.commandParticle);
 		}
 	}
 	
+   /**
+    * Disposes of the specified ItemStack, removing x1 from the Players Inventory.
+    * 
+    * @param player - The Player disposing of the ItemStack.
+    * @param itemCopy - The ItemStack to be disposed.
+    * @param allItems - If the item should not have its amount changed.
+    */
 	private void removeDisposable(final Player player, final ItemStack itemCopy, final boolean allItems) {
 		if (this.disposable || allItems) {
 			if (!allItems) { setSubjectRemoval(true); }
 			Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
 				@Override
 				public void run() {
-					if (PlayerHandler.isCreativeMode(player)) { player.closeInventory(); }
+					if (PlayerHandler.getPlayer().isCreativeMode(player)) { player.closeInventory(); }
 					if (isSimilar(player.getItemOnCursor())) {
-						player.setItemOnCursor(newItem(player.getItemOnCursor(), allItems, 1));
+						player.setItemOnCursor(ItemHandler.getItem().modifyItem(player.getItemOnCursor(), allItems, 1));
 						if (!allItems) { setSubjectRemoval(false); }
 					} else {
 						int itemSlot = player.getInventory().getHeldItemSlot();
-						if (isSimilar(player.getInventory().getItem(itemSlot))) { player.getInventory().setItem(itemSlot, newItem(player.getInventory().getItem(itemSlot), allItems, 1)); if (!allItems) { setSubjectRemoval(false); }}
+						if (isSimilar(player.getInventory().getItem(itemSlot))) { player.getInventory().setItem(itemSlot, ItemHandler.getItem().modifyItem(player.getInventory().getItem(itemSlot), allItems, 1)); if (!allItems) { setSubjectRemoval(false); }}
 						else { 
 							for (int i = 0; i < player.getInventory().getSize(); i++) {
 								if (isSimilar(player.getInventory().getItem(i))) {
-									player.getInventory().setItem(i, newItem(player.getInventory().getItem(i), allItems, 1));
+									player.getInventory().setItem(i, ItemHandler.getItem().modifyItem(player.getInventory().getItem(i), allItems, 1));
 									if (!allItems) { setSubjectRemoval(false); }
 									break;
 								}
 							}
 						}
-						if (isSubjectRemoval() && PlayerHandler.isCreativeMode(player)) {
-							player.getInventory().addItem(newItem(itemCopy, allItems, 1));
+						if (isSubjectRemoval() && PlayerHandler.getPlayer().isCreativeMode(player)) {
+							player.getInventory().addItem(ItemHandler.getItem().modifyItem(itemCopy, allItems, 1));
 							player.setItemOnCursor(new ItemStack(Material.AIR));
 							if (!allItems) { setSubjectRemoval(false); }
 						}
@@ -2359,39 +3907,45 @@ public class ItemMap {
 		}
 	}
 	
-	private ItemStack newItem(ItemStack itemCopy, final boolean allItems, final int amount) {
-		ItemStack item = new ItemStack(itemCopy);
-		if (item.getAmount() > amount && item.getAmount() != amount && !allItems) { item.setAmount(item.getAmount() - amount); } 
-		else { item = new ItemStack(Material.AIR); }
-		return item;
-	}
-	
-	public boolean onInteractCooldown(Player player) {
+   /**
+    * Checks if the Player is on Interact Cooldown.
+    * 
+    * @param player - The Player to be checked. 
+    * @return If the Player is on Interact Cooldown.
+    */
+	public boolean onInteractCooldown(final Player player) {
 		long playersCooldownList = 0L;
-		if (this.playersOnInteractCooldown.containsKey(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + this.configName)) {
-			playersCooldownList = this.playersOnInteractCooldown.get(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + this.configName);
+		if (this.playersOnInteractCooldown.containsKey(player.getWorld().getName() + "." + PlayerHandler.getPlayer().getPlayerID(player) + ".items." + this.configName)) {
+			playersCooldownList = this.playersOnInteractCooldown.get(player.getWorld().getName() + "." + PlayerHandler.getPlayer().getPlayerID(player) + ".items." + this.configName);
 		}
 		if (System.currentTimeMillis() - playersCooldownList >= this.interactCooldown * 1000) {
-			this.playersOnInteractCooldown.put(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + this.configName, System.currentTimeMillis());
+			this.playersOnInteractCooldown.put(player.getWorld().getName() + "." + PlayerHandler.getPlayer().getPlayerID(player) + ".items." + this.configName, System.currentTimeMillis());
 			return false;
 		} else {
 			if (this.onSpamCooldown(player)) {
-				this.storedSpammedPlayers.put(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + this.configName, System.currentTimeMillis());
+				this.storedSpammedPlayers.put(player.getWorld().getName() + "." + PlayerHandler.getPlayer().getPlayerID(player) + ".items." + this.configName, System.currentTimeMillis());
 				if (this.cooldownMessage != null && !this.cooldownMessage.isEmpty()) {
 					int timeLeft = (int)(this.interactCooldown - ((System.currentTimeMillis() - playersCooldownList) / 1000));
-					player.sendMessage(Utils.translateLayout(this.cooldownMessage.replace("%timeleft%", String.valueOf(timeLeft)).replace("%item%", this.customName), player));
+					player.sendMessage(Utils.getUtils().translateLayout(this.cooldownMessage.replace("%timeleft%", String.valueOf(timeLeft)).replace("%item%", this.customName), player));
 				}
 			}
 			return true;
 		}
 	}
 	
-	private boolean onSpamCooldown(Player player) {
-		boolean interactSpam = ConfigHandler.getConfig("items.yml").getBoolean("items-Spamming");
+   /**
+    * Checks if the Player is on Cooldown.
+    * (Prevents rapid fire commands).
+    * 
+    * @param player - The Player to be checked. 
+    * @return If the Player is on Cooldown.
+    */
+	private boolean onSpamCooldown(final Player player) {
+		boolean interactSpam = ConfigHandler.getConfig(false).getFile("items.yml").getBoolean("items-Spamming");
 		if (interactSpam != true) {
 			long playersCooldownList = 0L;
-			if (this.storedSpammedPlayers.containsKey(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + this.configName)) {
-				playersCooldownList = this.storedSpammedPlayers.get(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + this.configName);
+			if (this.storedSpammedPlayers.containsKey(player.getWorld().getName() + "." + PlayerHandler.getPlayer().getPlayerID(player) + ".items." + this.configName)) {
+				playersCooldownList = this.storedSpammedPlayers.get(player.getWorld().getName() + "." + PlayerHandler.getPlayer().getPlayerID(player) + ".items." + this.configName);
 			}
 			if (System.currentTimeMillis() - playersCooldownList >= this.spamtime * 1000) { } 
 			else { return false; }
@@ -2399,27 +3953,39 @@ public class ItemMap {
 		return true;
 	}
 	
-	private boolean onCooldown(Player player) {
+   /**
+    * Checks if the Player is on Cooldown.
+    * 
+    * @param player - The Player to be checked. 
+    * @return If the Player is on Cooldown.
+    */
+	private boolean onCooldown(final Player player) {
 		long playersCooldownList = 0L;
-		if (this.playersOnCooldown.containsKey(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player))) {
-			playersCooldownList = this.playersOnCooldown.get(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player));
+		if (this.playersOnCooldown.containsKey(player.getWorld().getName() + "." + PlayerHandler.getPlayer().getPlayerID(player))) {
+			playersCooldownList = this.playersOnCooldown.get(player.getWorld().getName() + "." + PlayerHandler.getPlayer().getPlayerID(player));
 		}
 		
 		if (System.currentTimeMillis() - playersCooldownList >= this.cooldownSeconds * 1000) { return false; } 
-		else if (this.cooldownMessage != null && onCooldownTick(player)) {
-				String cooldownmsg = (this.cooldownMessage.replace("%timeleft%", String.valueOf((this.cooldownSeconds - ((System.currentTimeMillis() - playersCooldownList) / 1000)))).replace("%item%", this.customName).replace("%itemraw%", ItemHandler.getName(this.tempItem)));
-				cooldownmsg = Utils.translateLayout(cooldownmsg, player);
+		else if (this.cooldownMessage != null && this.onCooldownTick(player)) {
+				String cooldownmsg = (this.cooldownMessage.replace("%timeleft%", String.valueOf((this.cooldownSeconds - ((System.currentTimeMillis() - playersCooldownList) / 1000)))).replace("%item%", this.customName).replace("%itemraw%", ItemHandler.getItem().getMaterialName(this.tempItem)));
+				cooldownmsg = Utils.getUtils().translateLayout(cooldownmsg, player);
 				player.sendMessage(cooldownmsg);
 				this.addPlayerOnCooldownTick(player);
 			}
 		return true;
 	}
 	
-	private boolean onCooldownTick(Player player) {
-		if (!ConfigHandler.getConfig("items.yml").getBoolean("items-Spamming")) {
+   /**
+    * Checks if the Player is on Cooldown.
+    * 
+    * @param player - The Player to be checked. 
+    * @return If the Player is on Cooldown.
+    */
+	private boolean onCooldownTick(final Player player) {
+		if (!ConfigHandler.getConfig(false).getFile("items.yml").getBoolean("items-Spamming")) {
 			long playersCooldownList = 0L;
-			if (playersOnCooldownTick.containsKey(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player))) {
-				playersCooldownList = playersOnCooldownTick.get(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player));
+			if (this.playersOnCooldownTick.containsKey(player.getWorld().getName() + "." + PlayerHandler.getPlayer().getPlayerID(player))) {
+				playersCooldownList = this.playersOnCooldownTick.get(player.getWorld().getName() + "." + PlayerHandler.getPlayer().getPlayerID(player));
 			}
 			
 			if (!(System.currentTimeMillis() - playersCooldownList >= 1000)) { return false; }
@@ -2427,23 +3993,45 @@ public class ItemMap {
 		return true;
 	}
 	
-	private void addPlayerOnCooldownTick(Player player) {
-		playersOnCooldownTick.put(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player), System.currentTimeMillis());
+   /**
+    * Puts the Player on Cooldown.
+    * (Prevents rapid fire commands).
+    * 
+    * @param player - The Player to be put on Cooldown.
+    */
+	private void addPlayerOnCooldownTick(final Player player) {
+		this.playersOnCooldownTick.put(player.getWorld().getName() + "." + PlayerHandler.getPlayer().getPlayerID(player), System.currentTimeMillis());
 	}
 	
-	private void addPlayerOnCooldown(Player player) {
-		this.playersOnCooldown.put(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player), System.currentTimeMillis());
+   /**
+    * Puts the Player on Cooldown.
+    * 
+    * @param player - The Player to be put on Cooldown.
+    */
+	private void addPlayerOnCooldown(final Player player) {
+		this.playersOnCooldown.put(player.getWorld().getName() + "." + PlayerHandler.getPlayer().getPlayerID(player), System.currentTimeMillis());
 	}
 	
+   /**
+    * Removes this ItemMap instance from the items.yml.
+    * 
+    */
 	public void removeFromConfig() {
 		File itemFile =  new File (ItemJoin.getInstance().getDataFolder(), "items.yml");
 		FileConfiguration itemData = YamlConfiguration.loadConfiguration(itemFile);
-		if (ConfigHandler.getConfig("items.yml").getString("items." + this.configName) != null) { itemData.set("items." + this.configName, null); } 
-		try { itemData.save(itemFile); ConfigHandler.getConfigData("items.yml"); ConfigHandler.getConfig("items.yml").options().copyDefaults(false); } 
-		catch (Exception e) { ItemJoin.getInstance().getServer().getLogger().severe("Could not remove the custom item " + this.configName + " from the items.yml data file!"); ServerHandler.sendDebugTrace(e); }	
+		if (ConfigHandler.getConfig(false).getFile("items.yml").getString("items." + this.configName) != null) { itemData.set("items." + this.configName, null); } 
+		try { itemData.save(itemFile); ConfigHandler.getConfig(false).getSource("items.yml"); ConfigHandler.getConfig(false).getFile("items.yml").options().copyDefaults(false); } 
+		catch (Exception e) { ItemJoin.getInstance().getServer().getLogger().severe("Could not remove the custom item " + this.configName + " from the items.yml data file!"); ServerHandler.getServer().sendDebugTrace(e); }	
 	}
 	
-	public Map<String, List<String>> addMapCommand(Map<String, List<String>> map, ItemCommand command) {
+   /**
+    * Adds an ItemCommand to a Map.
+    * 
+    * @param map - The Map to have an ItemCommand addded.
+    * @param command - The ItemCommand to be added to the Map.
+    * @return The changed Map instance.
+    */
+	public Map<String, List<String>> addMapCommand(final Map<String, List<String>> map, final ItemCommand command) {
 		String commandSection = (command.getSection() != null ? command.getSection() : "DEFAULT");
 		if (map.get(commandSection) != null) { 
 			List <String> s1 = map.get(commandSection); s1.add(command.getRawCommand());
@@ -2456,7 +4044,14 @@ public class ItemMap {
 		return map;
 	}
 	
-	public void setMapCommand( FileConfiguration itemData, Map<String, List<String>> map, String section) {
+   /**
+    * Saves the ItemCommands to the items.yml.
+    * 
+    * @param itemData - The File having the data saved.
+    * @param map - The Map of entries to save.
+    * @param section - The item section being saved.
+    */
+	public void setMapCommand(final FileConfiguration itemData, final Map<String, List<String>> map, final String section) {
 		Iterator<Entry<String, List<String>>> iterate = map.entrySet().iterator(); 
 		while (iterate.hasNext()) { 
 			Entry<String, List<String>> mapElement = (Entry<String, List<String>>)iterate.next(); 
@@ -2466,10 +4061,14 @@ public class ItemMap {
 		}
 	}
 	
+   /**
+    * Saves the ItemMap to the items.yml.
+    * 
+    */
 	public void saveToConfig() {
 		File itemFile =  new File (ItemJoin.getInstance().getDataFolder(), "items.yml");
 		FileConfiguration itemData = YamlConfiguration.loadConfiguration(itemFile);
-		if (ConfigHandler.getConfig("items.yml").getString("items." + this.configName) != null) { itemData.set("items." + this.configName, null); } 
+		if (ConfigHandler.getConfig(false).getFile("items.yml").getString("items." + this.configName) != null) { itemData.set("items." + this.configName, null); } 
 		if (!(this.dynamicMaterials != null && !this.dynamicMaterials.isEmpty())) { itemData.set("items." + this.configName + ".id", this.material.toString().toUpperCase() + (this.dataValue != 0 ? ":" + this.dataValue : "")); }
 		else if (this.dynamicMaterials != null && !this.dynamicMaterials.isEmpty()) { 
 			for (int i = 0; i < this.dynamicMaterials.size(); i++) {
@@ -2490,7 +4089,7 @@ public class ItemMap {
 		if (this.author != null && !this.author.isEmpty()) { itemData.set("items." + this.configName + ".author", this.author.replace("§", "&")); }
 		if (this.customName != null && !this.customName.isEmpty() && (this.dynamicNames == null || this.dynamicNames.isEmpty())) { 
 			String setName = this.customName.replace(this.getLegacySecret(), "").replace("§", "&");
-			if (setName.startsWith("&f") && (!ConfigHandler.dataTagsEnabled() || !ServerHandler.hasSpecificUpdate("1_8"))) { setName = setName.substring(2, setName.length()); }
+			if (setName.startsWith("&f") && (!ItemHandler.getItem().dataTagsEnabled() || !ServerHandler.getServer().hasSpecificUpdate("1_8"))) { setName = setName.substring(2, setName.length()); }
 			itemData.set("items." + this.configName + ".name", setName); 
 			}
 		else if (this.dynamicNames != null && !this.dynamicNames.isEmpty()) { 
@@ -2632,10 +4231,15 @@ public class ItemMap {
 			for (String world : this.enabledWorlds) { worldList += world + ", "; }
 			itemData.set("items." + this.configName + ".enabled-worlds", worldList.substring(0, worldList.length() - 2)); 
 		}
-		try { itemData.save(itemFile); ConfigHandler.getConfigData("items.yml"); ConfigHandler.getConfig("items.yml").options().copyDefaults(false); } 
-		catch (Exception e) { ItemJoin.getInstance().getServer().getLogger().severe("Could not save the new custom item " + this.configName + " to the items.yml data file!"); ServerHandler.sendDebugTrace(e); }	
+		try { itemData.save(itemFile); ConfigHandler.getConfig(false).getSource("items.yml"); ConfigHandler.getConfig(false).getFile("items.yml").options().copyDefaults(false); } 
+		catch (Exception e) { ItemJoin.getInstance().getServer().getLogger().severe("Could not save the new custom item " + this.configName + " to the items.yml data file!"); ServerHandler.getServer().sendDebugTrace(e); }	
 	}
 	
+   /**
+    * Creates a Clone of the Current ItemMap instance.
+    * 
+    * @return The newly Cloned ItemMap instance.
+    */
 	public ItemMap clone() {
         try {
             Object clone = this.getClass().newInstance();
@@ -2644,6 +4248,6 @@ public class ItemMap {
 	                field.set(clone, field.get(this));
 	            }
             return (ItemMap)clone;
-        } catch(Exception e) { ServerHandler.sendDebugTrace(e); return this; }
+        } catch(Exception e) { ServerHandler.getServer().sendDebugTrace(e); return this; }
     }
 }
