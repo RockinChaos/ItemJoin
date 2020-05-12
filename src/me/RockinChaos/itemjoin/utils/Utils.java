@@ -266,7 +266,7 @@ public class Utils {
     */
 	public String encrypt(final String str) {
 		try {
-			return Base64.getEncoder().encodeToString(str.getBytes());
+			return Base64.getEncoder().encodeToString(str.getBytes("UTF-8"));
 		} catch (Exception e) {
 			ServerHandler.getServer().logDebug("{Utils} Failure to encrypt sensitive text!");
 			ServerHandler.getServer().sendDebugTrace(e);
@@ -282,7 +282,7 @@ public class Utils {
     */
 	public String decrypt(final String str) {
 		try {
-			return new String(Base64.getDecoder().decode(str));
+			return new String(Base64.getDecoder().decode(str), "UTF-8");
 		} catch (Exception e) {
 			ServerHandler.getServer().logDebug("{Utils} Failure to decrypt sensitive text!");
 			ServerHandler.getServer().sendDebugTrace(e);

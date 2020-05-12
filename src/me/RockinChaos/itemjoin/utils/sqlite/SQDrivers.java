@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+
 import org.bukkit.scheduler.BukkitRunnable;
 
 import me.RockinChaos.itemjoin.utils.Utils;
@@ -66,7 +67,7 @@ public class SQDrivers extends Database {
 			    	return this.connection; 
 			    } else {
 			    	Class.forName("com.mysql.jdbc.Driver");
-			    	this.connection = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + table + "?useSSL=false", Utils.getUtils().decrypt(user), Utils.getUtils().decrypt(pass));
+			    	this.connection = DriverManager.getConnection("jdbc:mysql://" + this.host + ":" + this.port + "/" + this.table + "?useSSL=false", Utils.getUtils().decrypt(this.user), Utils.getUtils().decrypt(this.pass));
 			        return this.connection;
 			    }
 			} catch (Exception e) { 
@@ -134,11 +135,11 @@ public class SQDrivers extends Database {
     * 
 	*/
 	public void loadSQLDatabase() {
-		if (ConfigHandler.getConfig(false).getFile("config.yml").getString("Database.port") != null) { port = ConfigHandler.getConfig(false).getFile("config.yml").getInt("Database.port"); }
-		if (ConfigHandler.getConfig(false).getFile("config.yml").getString("Database.host") != null) { host = ConfigHandler.getConfig(false).getFile("config.yml").getString("Database.host"); }
-		if (ConfigHandler.getConfig(false).getFile("config.yml").getString("Database.table") != null) { table = ConfigHandler.getConfig(false).getFile("config.yml").getString("Database.table"); }
-		if (ConfigHandler.getConfig(false).getFile("config.yml").getString("Database.user") != null) { user = Utils.getUtils().encrypt(ConfigHandler.getConfig(false).getFile("config.yml").getString("Database.user")); }
-		if (ConfigHandler.getConfig(false).getFile("config.yml").getString("Database.pass") != null) { pass = Utils.getUtils().encrypt(ConfigHandler.getConfig(false).getFile("config.yml").getString("Database.pass")); }
+		if (ConfigHandler.getConfig(false).getFile("config.yml").getString("Database.port") != null) { this.port = ConfigHandler.getConfig(false).getFile("config.yml").getInt("Database.port"); }
+		if (ConfigHandler.getConfig(false).getFile("config.yml").getString("Database.host") != null) { this.host = ConfigHandler.getConfig(false).getFile("config.yml").getString("Database.host"); }
+		if (ConfigHandler.getConfig(false).getFile("config.yml").getString("Database.table") != null) { this.table = ConfigHandler.getConfig(false).getFile("config.yml").getString("Database.table"); }
+		if (ConfigHandler.getConfig(false).getFile("config.yml").getString("Database.user") != null) { this.user = Utils.getUtils().encrypt(ConfigHandler.getConfig(false).getFile("config.yml").getString("Database.user")); }
+		if (ConfigHandler.getConfig(false).getFile("config.yml").getString("Database.pass") != null) { this.pass = Utils.getUtils().encrypt(ConfigHandler.getConfig(false).getFile("config.yml").getString("Database.pass")); }
 	}
 	
    /**
