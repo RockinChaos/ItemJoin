@@ -3074,7 +3074,7 @@ public class ItemMap {
     * @return The updated ItemStack.
     */
 	public ItemStack setJSONBookPages(final Player player, final ItemStack item, final List<String> pages) {
-		if (item.getType().toString().equalsIgnoreCase("WRITTEN_BOOK") && pages != null && !pages.isEmpty() && ServerHandler.getServer().hasSpecificUpdate("1_8")) {
+		if (item.getType().toString().equalsIgnoreCase("WRITTEN_BOOK") && pages != null && !pages.isEmpty() && pages.size() != 0 && ServerHandler.getServer().hasSpecificUpdate("1_8")) {
 			List<String> copyPages = new ArrayList<String>();
 			for (String page: pages) { copyPages.add(page); }
 			copyPages.set(0, ItemHandler.getItem().cutDelay(copyPages.get(0)));
