@@ -188,10 +188,14 @@ public class ItemUtilities {
 			Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
 				@Override
 				public void run() { 
+					ItemHandler.getItem().restoreCraftItems(player);
 					handleItems(player, type, newMode, region); 
 				}
 			}, this.getItemDelay());
-		} else { handleItems(player, type, newMode, region); }
+		} else { 
+			ItemHandler.getItem().restoreCraftItems(player);
+			this.handleItems(player, type, newMode, region); 
+		}
 	}
 	
    /**

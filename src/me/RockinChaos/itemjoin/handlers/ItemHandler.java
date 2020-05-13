@@ -39,6 +39,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 
+import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities.CustomSlot;
 import me.RockinChaos.itemjoin.listeners.InventoryCrafting;
@@ -404,7 +405,7 @@ public class ItemHandler {
     public void restoreCraftItems(final Player player) {
     	Inventory inventory = SQLite.getLite(false).getReturnCraftItems(player);
 		Inventory craftView = player.getOpenInventory().getTopInventory();
-		if (inventory != null) {
+		if (inventory != null && PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
 			for (int k = 4; k >= 0; k--) {
 				if (inventory.getItem(k) != null && inventory.getItem(k).getType() != Material.AIR) {
 					craftView.setItem(k, inventory.getItem(k));
@@ -412,6 +413,8 @@ public class ItemHandler {
 			}
 			PlayerHandler.getPlayer().updateInventory(player, 1L);
 			SQLite.getLite(false).removeReturnCraftItems(player);
+		} else if (!PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
+			Bukkit.getServer().getScheduler().runTaskLater(ItemJoin.getInstance(), () -> { this.restoreCraftItems(player); }, 60L);
 		}
     }
     
@@ -423,8 +426,10 @@ public class ItemHandler {
     public void removeCraftItems(final Player player) {
 		ItemStack[] craftingContents = player.getOpenInventory().getTopInventory().getContents();
 		Inventory craftView = player.getOpenInventory().getTopInventory();
-		for (int k = 0; k < craftingContents.length; k++) {
-			craftView.setItem(k, new ItemStack(Material.AIR));
+		if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
+			for (int k = 0; k < craftingContents.length; k++) {
+				craftView.setItem(k, new ItemStack(Material.AIR));
+			}
 		}
     }
     

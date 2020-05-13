@@ -110,6 +110,15 @@ public class PlayerAutoCraftEvent extends PlayerEvent implements Cancellable {
 	}
 	
    /**
+    * Gets the HandlerList for the event.
+    * 
+	* @return The HandlerList for the event.
+	*/
+	public static HandlerList getHandlerList() {
+		return handlers;
+	}
+	
+   /**
     * Gets the Handlers for the event.
     * 
 	* @return The HandlerList for the event.
