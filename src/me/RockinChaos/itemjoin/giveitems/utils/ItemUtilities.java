@@ -437,7 +437,7 @@ public class ItemUtilities {
 		try {
 			String overWrite = ConfigHandler.getConfig(false).getFile("items.yml").getString("items-Overwrite");
 			if (itemMap.isOverwritable() || (((overWrite == null || (overWrite != null && Utils.getUtils().containsLocation(player.getWorld().getName(), overWrite.replace(" ", ""))))) 
-					|| (ConfigHandler.getConfig(false).getFile("items.yml").getString("items-Overwrite") != null && ConfigHandler.getConfig(false).getFile("items.yml").getBoolean("items-Overwrite")))) {
+					|| (ConfigHandler.getConfig(false).getFile("items.yml").getBoolean("items-Overwrite")))) {
 				return true; 
 			} else if (CustomSlot.ARBITRARY.isSlot(itemMap.getSlot()) && player.getInventory().firstEmpty() == -1) {
 				return false;
@@ -492,12 +492,13 @@ public class ItemUtilities {
 		ItemStack item = itemMap.getItem(player);
 		this.shiftItem(player, itemMap);
 		int nextSlot = this.nextItem(player, itemMap);
+		boolean overWrite = itemMap.isOverwritable() || ConfigHandler.getConfig(false).getFile("items.yml").getBoolean("items-Overwrite");
 		if (size > 1) { item.setAmount(size); }
-		if ((size > 1 || itemMap.isAlwaysGive()) && existingItem != null) {
+		if ((size > 1 || itemMap.isAlwaysGive()) && !overWrite && existingItem != null) {
 			player.getInventory().addItem(item);
 		} else if (nextSlot != 0) {
 			player.getInventory().setItem(nextSlot, item);
-		} else if (player.getInventory().firstEmpty() != -1) {
+		} else if (player.getInventory().firstEmpty() != -1 || overWrite) {
 			player.getInventory().setItem(Integer.parseInt(itemMap.getSlot()), item);
 		} else if (itemMap.isDropFull()) { 
 			player.getWorld().dropItem(player.getLocation(), item);
@@ -519,24 +520,25 @@ public class ItemUtilities {
 		ItemStack item = itemMap.getItem(player);
 		this.shiftItem(player, itemMap);
 		int nextSlot = this.nextItem(player, itemMap);
+		boolean overWrite = itemMap.isOverwritable() || ConfigHandler.getConfig(false).getFile("items.yml").getBoolean("items-Overwrite");
 		if (size > 1) { item.setAmount(size); }
-		if ((size > 1 || itemMap.isAlwaysGive()) && existingItem != null) {
+		if ((size > 1 || itemMap.isAlwaysGive()) && !overWrite && existingItem != null) {
 			player.getInventory().addItem(item);
 		} else if (nextSlot != 0) {
 			player.getInventory().setItem(nextSlot, item);
 		} else if (CustomSlot.ARBITRARY.isSlot(itemMap.getSlot()) && player.getInventory().firstEmpty() != -1) {
 			player.getInventory().addItem(item);
-		} else if (CustomSlot.HELMET.isSlot(itemMap.getSlot())) {
+		} else if (CustomSlot.HELMET.isSlot(itemMap.getSlot()) && (existingItem == null || overWrite)) {
 			player.getEquipment().setHelmet(item);
-		} else if (CustomSlot.CHESTPLATE.isSlot(itemMap.getSlot())) {
+		} else if (CustomSlot.CHESTPLATE.isSlot(itemMap.getSlot()) && (existingItem == null || overWrite)) {
 			player.getEquipment().setChestplate(item);
-		} else if (CustomSlot.LEGGINGS.isSlot(itemMap.getSlot())) {
+		} else if (CustomSlot.LEGGINGS.isSlot(itemMap.getSlot()) && (existingItem == null || overWrite)) {
 			player.getEquipment().setLeggings(item);
-		} else if (CustomSlot.BOOTS.isSlot(itemMap.getSlot())) {
+		} else if (CustomSlot.BOOTS.isSlot(itemMap.getSlot()) && (existingItem == null || overWrite)) {
 			player.getEquipment().setBoots(item);
-		} else if (ServerHandler.getServer().hasSpecificUpdate("1_9") && CustomSlot.OFFHAND.isSlot(itemMap.getSlot())) {
+		} else if (ServerHandler.getServer().hasSpecificUpdate("1_9") && CustomSlot.OFFHAND.isSlot(itemMap.getSlot()) && (existingItem == null || overWrite)) {
 			PlayerHandler.getPlayer().setOffHandItem(player, item);
-		} else if (craftSlot != -1) {
+		} else if (craftSlot != -1 && (existingItem == null || overWrite)) {
 			if (craftSlot == 0) {
 				Bukkit.getServer().getScheduler().runTaskLaterAsynchronously(ItemJoin.getInstance(), () -> { 
 					if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
