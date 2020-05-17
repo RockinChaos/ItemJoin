@@ -243,7 +243,7 @@ public class ItemMap {
 //  ============================================== //
 	
 	private String permissionNode = null;
-	private boolean permissionNeeded = true;
+	private boolean permissionNeeded = false;
 	private boolean opPermissionNeeded = false;
 	
 	private List < String > enabledRegions = new ArrayList < String > ();
@@ -285,7 +285,7 @@ public class ItemMap {
 			this.setRegions();
 	        this.setPerm(this.nodeLocation.getString(".permission-node"));
 	        this.setPermissionNeeded(ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Permissions.Obtain-Items"));
-	    	this.setOPPermissionNeeded(ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Permissions.Obtain-Items.OP"));
+	    	this.setOPPermissionNeeded(ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Permissions.Obtain-Items-OP"));
         }
 	}
 	
@@ -2221,13 +2221,17 @@ public class ItemMap {
     */
 	public boolean hasPermission(final Player player) {
 		String worldName = player.getWorld().getName();
-		if (!this.isPermissionNeeded()) {
+		String customPerm = PermissionsHandler.getPermissions().customPermissions(this.permissionNode, this.configName, worldName);
+		if (!this.isPermissionNeeded() && !player.isOp() || (!this.isOPPermissionNeeded() && player.isOp())) {
 			return true;
 		} else if (this.isOPPermissionNeeded() && player.isOp()) {
-			if (player.isPermissionSet(PermissionsHandler.getPermissions().customPermissions(this.permissionNode, this.configName, worldName)) || player.isPermissionSet("itemjoin." + worldName + ".*")) {
+			if ((player.isPermissionSet(customPerm) && player.hasPermission(customPerm) && (!player.isPermissionSet("itemjoin." + worldName + ".*") 
+			|| (player.isPermissionSet("itemjoin." + worldName + ".*") && player.hasPermission("itemjoin." + worldName + ".*"))) 
+			|| (player.isPermissionSet("itemjoin." + worldName + ".*") && player.hasPermission("itemjoin." + worldName + ".*") && (!player.isPermissionSet(customPerm) || (player.isPermissionSet(customPerm) && player.hasPermission(customPerm)))))) {
 				return true;
 			}
-		} else if (player.hasPermission(PermissionsHandler.getPermissions().customPermissions(this.permissionNode, this.configName, worldName)) || player.hasPermission("itemjoin." + worldName + ".*")) {
+		} else if ((player.hasPermission(customPerm) && (!player.isPermissionSet("itemjoin." + worldName + ".*") || (player.isPermissionSet("itemjoin." + worldName + ".*") && player.hasPermission("itemjoin." + worldName + ".*"))) 
+			   || (player.hasPermission("itemjoin." + worldName + ".*") && (!player.isPermissionSet(customPerm) || (player.isPermissionSet(customPerm) && player.hasPermission(customPerm)))))) {
 			return true;
 		}
 		return false;
