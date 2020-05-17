@@ -207,6 +207,7 @@ public class ItemHandler {
     * @return The existing ItemStack from the Players Inventory.
     */
 	public ItemStack getItem(final Player player, final ItemMap itemMap) {
+		int craftSlot = Utils.getUtils().getSlotConversion(itemMap.getSlot());
 		ItemStack existingItem = null;
 		if (Utils.getUtils().isInt(itemMap.getSlot())) {
 			existingItem = player.getInventory().getItem(Integer.parseInt(itemMap.getSlot()));
@@ -220,7 +221,9 @@ public class ItemHandler {
 			existingItem = player.getEquipment().getBoots();
 		} else if (ServerHandler.getServer().hasSpecificUpdate("1_9") && CustomSlot.OFFHAND.isSlot(itemMap.getSlot())) {
 			existingItem = player.getEquipment().getItemInOffHand();
-		} 
+		} else if (craftSlot != -1) {
+			existingItem = player.getOpenInventory().getTopInventory().getItem(craftSlot);
+		}
 		return existingItem;
 	}
     

@@ -4658,6 +4658,7 @@ public class UI {
 	private ItemStack headerStack(final Player player, final ItemMap itemMap) {
 		String slotList = "";
 		String slotString = "";
+		ItemStack item = new ItemStack(Material.STONE);
 		if (Utils.getUtils().nullCheck(itemMap.getMultipleSlots().toString()) != "NONE") {
 			for (String slot: itemMap.getMultipleSlots()) {
 				slotString += slot + ", ";
@@ -4728,34 +4729,35 @@ public class UI {
 				colorList += "&a" + split + " /n ";
 			}
 		}
-		
-		ItemStack item = ItemHandler.getItem().getItem(itemMap.getMaterial().toString() + ":" + itemMap.getDataValue(), 1, false, "&7*&6&l&nItem Information", "&7", "&9&lNode: &a" + itemMap.getConfigName(), "&9&lMaterial: &a" 
-		+ itemMap.getMaterial().toString() + (itemMap.getDataValue() != 0 ? ":" + itemMap.getDataValue() : ""), 
-				(itemMap.getMultipleSlots() != null && !itemMap.getMultipleSlots().isEmpty() ? "&9&lSlot(s): &a" + slotList : "&9&lSlot: &a" + itemMap.getSlot().toUpperCase()), "&9&lCount: &a" + itemMap.getCount(), 
-				(Utils.getUtils().nullCheck(itemMap.getCustomName()) != "NONE" ? "&9&lName: &a" + itemMap.getCustomName() : ""), (Utils.getUtils().nullCheck(itemMap.getCustomLore().toString()) != "NONE" ? "&9&lLore: &a" + (Utils.getUtils().nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",").length() > 40 ? Utils.getUtils().nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",").substring(0, 40) : Utils.getUtils().nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",")) : ""), 
-				(Utils.getUtils().nullCheck(itemMap.getDurability() + "&7") != "NONE" ? "&9&lDurability: &a" + itemMap.getDurability() : ""), (Utils.getUtils().nullCheck(itemMap.getData() + "&7") != "NONE" ? "&9&lTexture Data: &a" + itemMap.getData() : ""), (itemMap.getCommands().length != 0 ? "&9&lCommands: &aYES" : ""), 
-				(Utils.getUtils().nullCheck(itemMap.getItemCost() + "&7") != "NONE" ? "&9&lCommands-Item: &a" + itemMap.getItemCost() : ""), (Utils.getUtils().nullCheck(itemMap.getCommandCost() + "&7") != "NONE" ? "&9&lCommands-Cost: &a" + itemMap.getCommandCost() : ""), 
-				(Utils.getUtils().nullCheck(itemMap.getCommandReceive() + "&7") != "NONE" ? "&9&lCommands-Receive: &a" + itemMap.getCommandReceive() : ""),
-				(Utils.getUtils().nullCheck(itemMap.getCommandType() + "") != "NONE" ? "&9&lCommands-Type: &a" + itemMap.getCommandType() : ""), (Utils.getUtils().nullCheck(itemMap.getCommandSequence() + "") != "NONE" ? "&9&lCommands-Sequence: &a" + itemMap.getCommandSequence() : ""), 
-				(Utils.getUtils().nullCheck(itemMap.getCommandCooldown() + "&7") != "NONE" ? "&9&lCommands-Cooldown: &a" + itemMap.getCommandCooldown() + " second(s)" : ""), 
-				(Utils.getUtils().nullCheck(itemMap.getCooldownMessage()) != "NONE" ? "&9&lCooldown-Message: &a" + itemMap.getCooldownMessage() : ""), (Utils.getUtils().nullCheck(itemMap.getCommandSound() + "") != "NONE" ? "&9&lCommands-Sound: &a" + itemMap.getCommandSound() : ""), 
-				(Utils.getUtils().nullCheck(itemMap.getCommandParticle() + "") != "NONE" ? "&9&lCommands-Particle: &a" + itemMap.getCommandParticle() : ""), (Utils.getUtils().nullCheck(itemMap.getEnchantments().toString()) != "NONE" ? "&9&lEnchantments: &a" + enchantList : ""), 
-				(Utils.getUtils().nullCheck(itemMap.getItemFlags()) != "NONE" ? "&9&lItemflags: &a" + itemflagsList : ""), (Utils.getUtils().nullCheck(itemMap.getTriggers()) != "NONE" ? "&9&lTriggers: &a" + triggersList : ""), 
-				(Utils.getUtils().nullCheck(itemMap.getPermissionNode()) != "NONE" ? "&9&lPermission Node: &a" + itemMap.getPermissionNode() : ""), (Utils.getUtils().nullCheck(itemMap.getEnabledWorlds().toString()) != "NONE" ? "&9&lEnabled Worlds: &a" + worldList : ""), 
-				(Utils.getUtils().nullCheck(itemMap.getEnabledRegions().toString()) != "NONE" ? "&9&lEnabled Regions: &a" + regionList : ""), (!itemMap.getDynamicMaterials().isEmpty() ? "&9&lMaterial Animations: &aYES" : ""), 
-				(!itemMap.getDynamicNames().isEmpty() ? "&9&lName Animations: &aYES" : ""), (!itemMap.getDynamicLores().isEmpty() ? "&9&lLore Animations: &aYES" : ""), 
-				(!itemMap.getDynamicOwners().isEmpty() || !itemMap.getDynamicTextures().isEmpty() ? "&9&lSkull Animations: &aYES" : ""), (Utils.getUtils().nullCheck(itemMap.getLimitModes()) != "NONE" ? "&9&lLimit-Modes: &a" + itemMap.getLimitModes() : ""), 
-				(Utils.getUtils().nullCheck(itemMap.getProbability() + "&a%") != "NONE" ? "&9&lProbability: &a" + itemMap.getProbability() + "%" : ""), 
-				(Utils.getUtils().nullCheck(itemMap.getInteractCooldown() + "&7") != "NONE" ? "&9&lUse-Cooldown: &a" + itemMap.getInteractCooldown() : ""), 
-				(Utils.getUtils().nullCheck(itemMap.getLeatherColor()) != "NONE" ? "&9&lLeather Color: &a" + itemMap.getLeatherColor() : ""), (Utils.getUtils().nullCheck(itemMap.getLeatherHex()) != "NONE" ? "&9&lLeather Color: &a" + itemMap.getLeatherHex() : ""),
-				(Utils.getUtils().nullCheck(itemMap.getMapImage()) != "NONE" ? "&9&lMap-Image: &a" + itemMap.getMapImage() : ""), (Utils.getUtils().nullCheck(itemMap.getChargeColor() + "") != "NONE" ? "&9&lCharge Color: &a" + itemMap.getChargeColor() : ""),
-				(Utils.getUtils().nullCheck(patternList) != "NONE" ? "&9&lBanner Meta: &a" + patternList : ""), (Utils.getUtils().nullCheck(potionList) != "NONE" ? "&9&lPotion-Effects: &a" + potionList : ""), 
-				(Utils.getUtils().nullCheck(itemMap.getPages() + "") != "NONE" ? "&9&lBook Pages: &aYES" : ""),
-				(Utils.getUtils().nullCheck(itemMap.getAuthor()) != "NONE" ? "&9&lBook Author: &a" + itemMap.getAuthor() : ""), (Utils.getUtils().nullCheck(itemMap.getSkull()) != "NONE" ? "&9&lSkull-Owner: &a" + itemMap.getSkull() : ""), 
-				(Utils.getUtils().nullCheck(itemMap.getSkullTexture()) != "NONE" ? "&9&lSkull-Texture: &a" + (itemMap.getSkullTexture().length() > 40 ? itemMap.getSkullTexture().substring(0, 40) : itemMap.getSkullTexture()) : ""), 
-				(Utils.getUtils().nullCheck(itemMap.getFireworkType() + "") != "NONE" ? "&9&lFirework Type: &a" + itemMap.getFireworkType().name() : ""), 
-				(Utils.getUtils().nullCheck(itemMap.getFireworkPower() + "&7") != "NONE" ? "&9&lFirework Power: &a" + itemMap.getFireworkPower() : ""), (Utils.getUtils().nullCheck(colorList) != "NONE" ? "&9&lFirework Color(s): &a" + colorList : ""), 
-				(itemMap.getFireworkTrail() ? "&9&lFirework Trail: &aENABLED" : ""), (itemMap.getFireworkFlicker() ? "&9&lFirework Flicker: &aENABLED" : ""));
+		try {
+			item = ItemHandler.getItem().getItem(itemMap.getMaterial().toString() + ":" + itemMap.getDataValue(), 1, false, "&7*&6&l&nItem Information", "&7", "&9&lNode: &a" + itemMap.getConfigName(), "&9&lMaterial: &a" 
+			+ itemMap.getMaterial().toString() + (itemMap.getDataValue() != 0 ? ":" + itemMap.getDataValue() : ""), 
+					(itemMap.getMultipleSlots() != null && !itemMap.getMultipleSlots().isEmpty() ? "&9&lSlot(s): &a" + slotList : "&9&lSlot: &a" + itemMap.getSlot().toUpperCase()), "&9&lCount: &a" + itemMap.getCount(), 
+					(Utils.getUtils().nullCheck(itemMap.getCustomName()) != "NONE" ? "&9&lName: &a" + itemMap.getCustomName() : ""), (Utils.getUtils().nullCheck(itemMap.getCustomLore().toString()) != "NONE" ? "&9&lLore: &a" + (Utils.getUtils().nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",").length() > 40 ? Utils.getUtils().nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",").substring(0, 40) : Utils.getUtils().nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",")) : ""), 
+					(Utils.getUtils().nullCheck(itemMap.getDurability() + "&7") != "NONE" ? "&9&lDurability: &a" + itemMap.getDurability() : ""), (Utils.getUtils().nullCheck(itemMap.getData() + "&7") != "NONE" ? "&9&lTexture Data: &a" + itemMap.getData() : ""), (itemMap.getCommands().length != 0 ? "&9&lCommands: &aYES" : ""), 
+					(Utils.getUtils().nullCheck(itemMap.getItemCost() + "&7") != "NONE" ? "&9&lCommands-Item: &a" + itemMap.getItemCost() : ""), (Utils.getUtils().nullCheck(itemMap.getCommandCost() + "&7") != "NONE" ? "&9&lCommands-Cost: &a" + itemMap.getCommandCost() : ""), 
+					(Utils.getUtils().nullCheck(itemMap.getCommandReceive() + "&7") != "NONE" ? "&9&lCommands-Receive: &a" + itemMap.getCommandReceive() : ""),
+					(Utils.getUtils().nullCheck(itemMap.getCommandType() + "") != "NONE" ? "&9&lCommands-Type: &a" + itemMap.getCommandType() : ""), (Utils.getUtils().nullCheck(itemMap.getCommandSequence() + "") != "NONE" ? "&9&lCommands-Sequence: &a" + itemMap.getCommandSequence() : ""), 
+					(Utils.getUtils().nullCheck(itemMap.getCommandCooldown() + "&7") != "NONE" ? "&9&lCommands-Cooldown: &a" + itemMap.getCommandCooldown() + " second(s)" : ""), 
+					(Utils.getUtils().nullCheck(itemMap.getCooldownMessage()) != "NONE" ? "&9&lCooldown-Message: &a" + itemMap.getCooldownMessage() : ""), (Utils.getUtils().nullCheck(itemMap.getCommandSound() + "") != "NONE" ? "&9&lCommands-Sound: &a" + itemMap.getCommandSound() : ""), 
+					(Utils.getUtils().nullCheck(itemMap.getCommandParticle() + "") != "NONE" ? "&9&lCommands-Particle: &a" + itemMap.getCommandParticle() : ""), (Utils.getUtils().nullCheck(itemMap.getEnchantments().toString()) != "NONE" ? "&9&lEnchantments: &a" + enchantList : ""), 
+					(Utils.getUtils().nullCheck(itemMap.getItemFlags()) != "NONE" ? "&9&lItemflags: &a" + itemflagsList : ""), (Utils.getUtils().nullCheck(itemMap.getTriggers()) != "NONE" ? "&9&lTriggers: &a" + triggersList : ""), 
+					(Utils.getUtils().nullCheck(itemMap.getPermissionNode()) != "NONE" ? "&9&lPermission Node: &a" + itemMap.getPermissionNode() : ""), (Utils.getUtils().nullCheck(itemMap.getEnabledWorlds().toString()) != "NONE" ? "&9&lEnabled Worlds: &a" + worldList : ""), 
+					(Utils.getUtils().nullCheck(itemMap.getEnabledRegions().toString()) != "NONE" ? "&9&lEnabled Regions: &a" + regionList : ""), (!itemMap.getDynamicMaterials().isEmpty() ? "&9&lMaterial Animations: &aYES" : ""), 
+					(!itemMap.getDynamicNames().isEmpty() ? "&9&lName Animations: &aYES" : ""), (!itemMap.getDynamicLores().isEmpty() ? "&9&lLore Animations: &aYES" : ""), 
+					(!itemMap.getDynamicOwners().isEmpty() || !itemMap.getDynamicTextures().isEmpty() ? "&9&lSkull Animations: &aYES" : ""), (Utils.getUtils().nullCheck(itemMap.getLimitModes()) != "NONE" ? "&9&lLimit-Modes: &a" + itemMap.getLimitModes() : ""), 
+					(Utils.getUtils().nullCheck(itemMap.getProbability() + "&a%") != "NONE" ? "&9&lProbability: &a" + itemMap.getProbability() + "%" : ""), 
+					(Utils.getUtils().nullCheck(itemMap.getInteractCooldown() + "&7") != "NONE" ? "&9&lUse-Cooldown: &a" + itemMap.getInteractCooldown() : ""), 
+					(Utils.getUtils().nullCheck(itemMap.getLeatherColor()) != "NONE" ? "&9&lLeather Color: &a" + itemMap.getLeatherColor() : ""), (Utils.getUtils().nullCheck(itemMap.getLeatherHex()) != "NONE" ? "&9&lLeather Color: &a" + itemMap.getLeatherHex() : ""),
+					(Utils.getUtils().nullCheck(itemMap.getMapImage()) != "NONE" ? "&9&lMap-Image: &a" + itemMap.getMapImage() : ""), (Utils.getUtils().nullCheck(itemMap.getChargeColor() + "") != "NONE" ? "&9&lCharge Color: &a" + itemMap.getChargeColor() : ""),
+					(Utils.getUtils().nullCheck(patternList) != "NONE" ? "&9&lBanner Meta: &a" + patternList : ""), (Utils.getUtils().nullCheck(potionList) != "NONE" ? "&9&lPotion-Effects: &a" + potionList : ""), 
+					(Utils.getUtils().nullCheck(itemMap.getPages() + "") != "NONE" ? "&9&lBook Pages: &aYES" : ""),
+					(Utils.getUtils().nullCheck(itemMap.getAuthor()) != "NONE" ? "&9&lBook Author: &a" + itemMap.getAuthor() : ""), (Utils.getUtils().nullCheck(itemMap.getSkull()) != "NONE" ? "&9&lSkull-Owner: &a" + itemMap.getSkull() : ""), 
+					(Utils.getUtils().nullCheck(itemMap.getSkullTexture()) != "NONE" ? "&9&lSkull-Texture: &a" + (itemMap.getSkullTexture().length() > 40 ? itemMap.getSkullTexture().substring(0, 40) : itemMap.getSkullTexture()) : ""), 
+					(Utils.getUtils().nullCheck(itemMap.getFireworkType() + "") != "NONE" ? "&9&lFirework Type: &a" + itemMap.getFireworkType().name() : ""), 
+					(Utils.getUtils().nullCheck(itemMap.getFireworkPower() + "&7") != "NONE" ? "&9&lFirework Power: &a" + itemMap.getFireworkPower() : ""), (Utils.getUtils().nullCheck(colorList) != "NONE" ? "&9&lFirework Color(s): &a" + colorList : ""), 
+					(itemMap.getFireworkTrail() ? "&9&lFirework Trail: &aENABLED" : ""), (itemMap.getFireworkFlicker() ? "&9&lFirework Flicker: &aENABLED" : ""));
+		} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
 		if (ItemHandler.getItem().isSkull(itemMap.getMaterial())) {
 			ItemMeta itemMeta = item.getItemMeta();
 			if (itemMap.getSkull() != null) {
