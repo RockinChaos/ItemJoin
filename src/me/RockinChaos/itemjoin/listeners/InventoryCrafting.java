@@ -108,9 +108,9 @@ public class InventoryCrafting implements Listener {
     				}
     			}
     			if (!craftingItem && craftingContents[i] != null && craftingContents[i].getType() != Material.AIR) {
-    				if (player.getInventory().firstEmpty() != -1) {
+    				if (player.getInventory().firstEmpty() != -1 && i != 0) {
     					player.getInventory().addItem(craftingContents[i].clone());
-    				} else {
+    				} else if (i != 0) {
     					this.dropItem(player, craftingContents[i].clone());
     				}
     				craftingContents[i] = new ItemStack(Material.AIR);
@@ -183,7 +183,7 @@ public class InventoryCrafting implements Listener {
     private void onCraftingDrop(PlayerDropItemEvent event) {
     	final Player player = (Player) event.getPlayer();
     	final ItemStack item = event.getItemDrop().getItemStack().clone();
-    	if (!player.isDead() && !event.isCancelled()) {
+    	if (player.getHealth() > 0 && !event.isCancelled()) {
 	    	event.getItemDrop().getItemStack().setItemMeta(null);
 	    	event.getItemDrop().remove();
 	    	Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
@@ -192,12 +192,8 @@ public class InventoryCrafting implements Listener {
 	    			ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item, null, player.getWorld());
 	    			if (itemMap != null && !event.isCancelled() && worldSwitch.containsKey(PlayerHandler.getPlayer().getPlayerID(player)) && worldSwitch.get(PlayerHandler.getPlayer().getPlayerID(player))) {
 		    			boolean isCrafting = itemMap.isCraftingItem();
-	    				if (!isCrafting) {
-	    					dropItem(player, item);
-	    				}
-	    			} else {
-	    				dropItem(player, item);
-	    			}
+	    				if (!isCrafting) { dropItem(player, item); }
+	    			} else { dropItem(player, item); }
 	    		}
 	    	}, 2L);
     	}
