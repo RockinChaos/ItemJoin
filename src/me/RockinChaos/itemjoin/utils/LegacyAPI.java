@@ -300,6 +300,41 @@ public class LegacyAPI {
 	}
 	
    /**
+    * Sets the ItemStack as glowing.
+    * 
+    * @param tempItem - The ItemStack to be updated.
+    * @param itemMap - The ItemMap having their book pages set.
+    * @return The updated ItemStack.
+    */
+	public ItemStack setGlowing(final ItemStack tempItem, final ItemMap itemMap) {
+		return this.setGlowEnchant(tempItem, itemMap);
+	}
+	
+   /**
+    * Sets the ItemStack as glowing.
+    * 
+    * @param tempItem - The ItemStack to be updated.
+    * @param itemMap - The ItemMap having their book pages set.
+    * @deprecated Only to be used on server versions below 1.8.
+    * @return The updated ItemStack.
+    */
+	private ItemStack setGlowEnchant(final ItemStack tempItem, final ItemMap itemMap) {
+		if (itemMap.isGlowing() && !ServerHandler.getServer().hasSpecificUpdate("1_11")) {
+			try {
+				Class <?> craftItemStack = Reflection.getCraftBukkitClass("inventory.CraftItemStack");
+				Object nms = craftItemStack.getMethod("asNMSCopy", ItemStack.class).invoke(null, tempItem);
+				Object tag = Reflection.getMinecraftClass("ItemStack").getMethod("getTag").invoke(nms);
+				if (tag == null) { tag = Reflection.getMinecraftClass("NBTTagCompound").getConstructor().newInstance(); }
+				Object ench = Reflection.getMinecraftClass("NBTTagList").getConstructor().newInstance();
+				tag.getClass().getMethod("set", String.class, Reflection.getMinecraftClass("NBTBase")).invoke(tag, "ench", ench);
+				nms.getClass().getMethod("setTag", tag.getClass()).invoke(nms, tag);
+				return (((ItemStack) craftItemStack.getMethod("asCraftMirror", nms.getClass()).invoke(null, nms)));
+			} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
+		}
+		return tempItem;
+	}
+	
+   /**
     * Gets the RegionSet at the specified World and Location.
     * 
     * @param world - The World having its Region Set fetched.

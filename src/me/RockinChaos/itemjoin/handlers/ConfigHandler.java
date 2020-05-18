@@ -19,12 +19,15 @@ package me.RockinChaos.itemjoin.handlers;
 
 import java.io.File;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.enchantments.Enchantment;
+
 import me.RockinChaos.itemjoin.Commands;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.ChatTab;
@@ -54,6 +57,7 @@ import me.RockinChaos.itemjoin.utils.LegacyAPI;
 import me.RockinChaos.itemjoin.utils.Metrics;
 import me.RockinChaos.itemjoin.utils.Reflection;
 import me.RockinChaos.itemjoin.utils.Utils;
+import me.RockinChaos.itemjoin.utils.enchants.Glow;
 import me.RockinChaos.itemjoin.utils.FileData;
 import me.RockinChaos.itemjoin.utils.protocol.ProtocolManager;
 import me.RockinChaos.itemjoin.utils.sqlite.SQLite;
@@ -82,6 +86,7 @@ public class ConfigHandler {
 	    ItemJoin.getInstance().getCommand("itemjoin").setExecutor(new Commands());
 	    ItemJoin.getInstance().getCommand("itemjoin").setTabCompleter(new ChatTab());
 		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Menu(), ItemJoin.getInstance());
+		this.registerGlow();
 	}
 	
    /**
@@ -118,6 +123,22 @@ public class ConfigHandler {
 			if (!Utils.getUtils().isRegistered(Drops.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Drops(), ItemJoin.getInstance()); }
 		}
 	}
+	
+   /**
+    * Registers the glow enchantment.
+    * 
+    */
+    public void registerGlow() {
+    	if (ServerHandler.getServer().hasSpecificUpdate("1_13")) {
+	    	try {
+	    		Field f = Enchantment.class.getDeclaredField("acceptingNew");
+	    		f.setAccessible(true);
+	    		f.set(null, true);
+	    		Glow glow = new Glow();
+	    		Enchantment.registerEnchantment(glow);
+	    	} catch (IllegalArgumentException e) { } catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
+    	}
+    }
 
    /**
     * Gets the file from the specified path.

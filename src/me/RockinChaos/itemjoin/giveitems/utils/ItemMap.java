@@ -40,6 +40,7 @@ import org.bukkit.block.banner.Pattern;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -75,6 +76,7 @@ import me.RockinChaos.itemjoin.utils.LegacyAPI;
 import me.RockinChaos.itemjoin.utils.Reflection;
 import me.RockinChaos.itemjoin.utils.UI;
 import me.RockinChaos.itemjoin.utils.Utils;
+import me.RockinChaos.itemjoin.utils.enchants.Glow;
 import me.arcaniax.hdb.api.HeadDatabaseAPI;
 
 public class ItemMap {
@@ -207,6 +209,7 @@ public class ItemMap {
 	private boolean noRepairing = false;
 	private boolean animate = false;
 	private boolean dynamic = false;
+	private boolean glowing = false;
 	private boolean overwritable = false;
 	private boolean blockPlacement = false;
 	private boolean hideAttributes = false;
@@ -223,6 +226,7 @@ public class ItemMap {
 	private boolean AllowOpBypass = false;
 	
 	private boolean onlyFirstJoin = false;
+    private boolean onlyFirstLife = false;
 	private boolean onlyFirstWorld = false;
 	private boolean ipLimited = false;
 //  ============================================== //
@@ -426,6 +430,7 @@ public class ItemMap {
 			this.autoRemove = Utils.getUtils().containsIgnoreCase(this.itemflags, "auto-remove");
 			this.dynamic = Utils.getUtils().containsIgnoreCase(this.itemflags, "dynamic");
 			this.animate = Utils.getUtils().containsIgnoreCase(this.itemflags, "animate");
+			this.glowing = Utils.getUtils().containsIgnoreCase(this.itemflags, "glowing") || Utils.getUtils().containsIgnoreCase(this.itemflags, "glow");
 			this.giveNext = Utils.getUtils().containsIgnoreCase(this.itemflags, "give-next");
 			this.moveNext = Utils.getUtils().containsIgnoreCase(this.itemflags, "move-next");
 			this.dropFull = Utils.getUtils().containsIgnoreCase(this.itemflags, "drop-full");
@@ -436,6 +441,7 @@ public class ItemMap {
 			this.cancelEvents = Utils.getUtils().containsIgnoreCase(this.itemflags, "cancel-events");
 			this.countLock = Utils.getUtils().containsIgnoreCase(this.itemflags, "count-lock");
 			this.setOnlyFirstJoin(Utils.getUtils().containsIgnoreCase(this.itemflags, "first-join"));
+			this.setOnlyFirstLife(Utils.getUtils().containsIgnoreCase(this.itemflags, "first-life"));
 			this.onlyFirstWorld = Utils.getUtils().containsIgnoreCase(this.itemflags, "first-world");
 			this.overwritable = Utils.getUtils().containsIgnoreCase(this.itemflags, "overwrite");
 			this.ipLimited = Utils.getUtils().containsIgnoreCase(this.itemflags, "ip-limit");
@@ -466,6 +472,11 @@ public class ItemMap {
 			if (Utils.getUtils().containsIgnoreCase(this.triggers, "FIRST-JOIN")) { 
 				this.onlyFirstJoin = true;
 				this.giveOnJoin = true;
+			}
+			if (Utils.getUtils().containsIgnoreCase(this.triggers, "FIRST-LIFE")) { 
+				this.onlyFirstLife = true;
+				this.giveOnJoin = true;
+				this.giveOnRespawn = true;
 			}
 		    this.giveOnWorldSwitch = Utils.getUtils().containsIgnoreCase(this.triggers, "WORLD-CHANGE") || Utils.getUtils().containsIgnoreCase(this.triggers, "WORLD-SWITCH");
 			if (Utils.getUtils().containsIgnoreCase(this.triggers, "FIRST-WORLD")) { 
@@ -929,6 +940,19 @@ public class ItemMap {
 	}
 	
    /**
+    * Sets the ItemStack to be given only on First Join but will always be given upon respawn.
+    * 
+    * @param bool - The value to be set.
+    */
+	public void setOnlyFirstLife(final boolean bool) {
+		this.onlyFirstLife = bool;
+		if (bool) { 
+			this.giveOnJoin = true; 
+			this.giveOnRespawn = true;
+		}
+	}
+	
+   /**
     * Sets the ItemStack to be given only on First World.
     * 
     * @param bool - The value to be set.
@@ -1200,6 +1224,15 @@ public class ItemMap {
     */
 	public void setDynamic(final boolean bool) {
 		this.dynamic = bool;
+	}
+	
+   /**
+    * Sets the Glowing Flag.
+    * 
+    * @param bool - The value to be set.
+    */
+	public void setGlowing(final boolean bool) {
+		this.glowing = bool;
 	}
 	
    /**
@@ -2319,6 +2352,15 @@ public class ItemMap {
 	}
 	
    /**
+    * Checks if give on first life is enabled.
+    * 
+    * @return If it is enabled.
+    */
+	public boolean isOnlyFirstLife() {
+		return this.onlyFirstLife;
+	}
+	
+   /**
     * Checks if give on first world is enabled.
     * 
     * @return If it is enabled.
@@ -2554,6 +2596,15 @@ public class ItemMap {
     */
 	public boolean isDynamic() {
 		return this.dynamic;
+	}
+	
+   /**
+    * Checks if the Glowing Flag is enabled.
+    * 
+    * @return If it is enabled.
+    */
+	public boolean isGlowing() {
+		return this.glowing;
 	}
 	
    /**
@@ -2988,7 +3039,6 @@ public class ItemMap {
 		this.tempItem = this.setJSONBookPages(player, this.tempItem, this.bookPages);
 		this.setNBTData();
 		this.tempMeta = this.tempItem.getItemMeta();
-		
 		this.setCustomName(player);
 		this.setCustomLore(player);
 		this.setSkull(player);
@@ -3003,8 +3053,26 @@ public class ItemMap {
 		this.setBookInfo(player);
 		LegacyAPI.getLegacy().setBookPages(player, this.tempMeta, this.bookPages, this);
 		this.setAttributes();
+		this.realGlow();
 		this.tempItem.setItemMeta(this.tempMeta);
+		this.tempItem = LegacyAPI.getLegacy().setGlowing(this.tempItem, this);
 		return this;
+	}
+	
+   /**
+    * Sets the item to glow.
+    * 
+    */
+	private void realGlow() {
+		if (this.glowing) { 
+			if (ServerHandler.getServer().hasSpecificUpdate("1_13")) {
+				Glow glow = new Glow();
+				this.tempMeta.addEnchant(glow, 1, true);
+			} else if (!ServerHandler.getServer().hasSpecificUpdate("1_13") && ServerHandler.getServer().hasSpecificUpdate("1_11")) {
+				this.tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ENCHANTS);
+				this.tempMeta.addEnchant(Enchantment.LURE, 0, true);
+			} 
+		}
 	}
 	
    /**
@@ -3028,7 +3096,7 @@ public class ItemMap {
 		if (this.enchants != null && !this.enchants.isEmpty()) {
 			for (Entry<String, Integer> enchantments : this.enchants.entrySet()) {
 				if (enchantments.getKey() == null && DependAPI.getDepends(false).tokenEnchantEnabled() && TokenEnchantAPI.getInstance().getEnchant(enchantments.getKey()) != null) {
-					TokenEnchantAPI.getInstance().enchant(player, tempItem, enchantments.getKey(), enchantments.getValue(), true, 0, true);
+					TokenEnchantAPI.getInstance().enchant(player, this.tempItem, enchantments.getKey(), enchantments.getValue(), true, 0, true);
 				} else { this.tempItem.addUnsafeEnchantment(ItemHandler.getItem().getEnchantByName(enchantments.getKey()), enchantments.getValue()); }
 			}
 		}
@@ -4094,7 +4162,9 @@ public class ItemMap {
 		if (this.customName != null && !this.customName.isEmpty() && (this.dynamicNames == null || this.dynamicNames.isEmpty())) { 
 			String setName = this.customName.replace(this.getLegacySecret(), "").replace("§", "&");
 			if (setName.startsWith("&f") && (!ItemHandler.getItem().dataTagsEnabled() || !ServerHandler.getServer().hasSpecificUpdate("1_8"))) { setName = setName.substring(2, setName.length()); }
-			itemData.set("items." + this.configName + ".name", setName); 
+				if (!ItemHandler.getItem().getMaterialName(this.tempItem).equalsIgnoreCase(setName)) { 
+					itemData.set("items." + this.configName + ".name", setName); 
+				}
 			}
 		else if (this.dynamicNames != null && !this.dynamicNames.isEmpty()) { 
 			for (int i = 0; i < this.dynamicNames.size(); i++) {
