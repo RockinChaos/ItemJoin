@@ -469,11 +469,12 @@ public class ItemMap {
 			this.triggers = this.nodeLocation.getString("triggers");
 			this.giveOnDisabled = Utils.getUtils().containsIgnoreCase(this.triggers, "DISABLED");
 			this.giveOnJoin = Utils.getUtils().containsIgnoreCase(this.triggers, "JOIN");
+			this.giveOnRespawn = Utils.getUtils().containsIgnoreCase(this.triggers, "RESPAWN");
 			if (Utils.getUtils().containsIgnoreCase(this.triggers, "FIRST-JOIN")) { 
 				this.onlyFirstJoin = true;
 				this.giveOnJoin = true;
 			}
-			if (Utils.getUtils().containsIgnoreCase(this.triggers, "FIRST-LIFE")) { 
+			if (Utils.getUtils().containsIgnoreCase(this.triggers, "FIRST-LIFE")) {
 				this.onlyFirstLife = true;
 				this.giveOnJoin = true;
 				this.giveOnRespawn = true;
@@ -484,7 +485,6 @@ public class ItemMap {
 				this.onlyFirstWorld = true;
 				this.giveOnWorldSwitch = true;
 			}
-			this.giveOnRespawn = Utils.getUtils().containsIgnoreCase(this.triggers, "RESPAWN");
 			this.giveOnRegionEnter = Utils.getUtils().containsIgnoreCase(this.triggers, "REGION-ENTER");
 			this.takeOnRegionLeave = Utils.getUtils().containsIgnoreCase(this.triggers, "REGION-REMOVE") || Utils.getUtils().containsIgnoreCase(this.triggers, "REGION-EXIT") || Utils.getUtils().containsIgnoreCase(this.triggers, "REGION-LEAVE");
 			this.useOnLimitSwitch = Utils.getUtils().containsIgnoreCase(this.triggers, "GAMEMODE-SWITCH");
@@ -3691,7 +3691,8 @@ public class ItemMap {
     */
     private boolean getRandomMap(final HashMap < Integer, ItemCommand > randomCommands, final ItemCommand[] itemCommands, final Player player, final String action, final String slot) {
     	Entry<?, ?> dedicatedMap = Utils.getUtils().randomEntry(randomCommands);
-    	if (!((ItemCommand)dedicatedMap.getValue()).execute(player, action, slot, this)) { 
+    	if (dedicatedMap != null && dedicatedMap.getValue() != null && player != null && action != null && slot != null && itemCommands != null && randomCommands != null
+        && !((ItemCommand)dedicatedMap.getValue()).execute(player, action, slot, this)) { 
     		this.getRandomMap(randomCommands, itemCommands, player, action, slot);
     		return false;
     	}
@@ -3709,13 +3710,15 @@ public class ItemMap {
     */
     private boolean getRandomAll(final HashMap < Integer, ItemCommand > randomCommands, final ItemCommand[] itemCommands, final Player player, final String action, final String slot) {
     	Entry<?, ?> dedicatedMap = Utils.getUtils().randomEntry(randomCommands);
-    	if (!((ItemCommand)dedicatedMap.getValue()).execute(player, action, slot, this)) { 
+    	if (dedicatedMap != null && dedicatedMap.getValue() != null && player != null && action != null && slot != null && itemCommands != null && randomCommands != null 
+        && !((ItemCommand)dedicatedMap.getValue()).execute(player, action, slot, this)) { 
     		randomCommands.remove(dedicatedMap.getKey());
     		this.getRandomAll(randomCommands, itemCommands, player, action, slot);
     		return false;
     	}
     	randomCommands.remove(dedicatedMap.getKey());
-    	if (!randomCommands.isEmpty()) {
+    	if (dedicatedMap != null && dedicatedMap.getValue() != null && player != null && action != null && slot != null && itemCommands != null && randomCommands != null && 
+    	   !randomCommands.isEmpty()) {
     		this.getRandomAll(randomCommands, itemCommands, player, action, slot);
     	}
     	return true;

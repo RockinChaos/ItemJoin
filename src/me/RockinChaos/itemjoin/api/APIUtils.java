@@ -27,6 +27,7 @@ import org.bukkit.inventory.ItemStack;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemCommand;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
+import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities.TriggerType;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.utils.Chances;
 import me.RockinChaos.itemjoin.utils.Utils;
@@ -44,7 +45,7 @@ public class APIUtils {
 		final int session = Utils.getUtils().getRandom(1, 80000);
 		for (ItemMap item : ItemUtilities.getUtilities().getItems()) {
 			if (item.inWorld(player.getWorld()) && Chances.getChances().isProbability(item, probable) && SQLite.getLite(false).isEnabled(player)
-					&& item.hasPermission(player) && ItemUtilities.getUtilities().isObtainable(player, item, session, player.getGameMode())) {
+					&& item.hasPermission(player) && ItemUtilities.getUtilities().isObtainable(player, item, session, TriggerType.DEFAULT, player.getGameMode())) {
 					item.giveTo(player);
 			}
 			item.setAnimations(player);

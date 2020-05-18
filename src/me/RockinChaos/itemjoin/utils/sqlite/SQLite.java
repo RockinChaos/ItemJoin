@@ -310,7 +310,7 @@ public class SQLite {
     * @param itemMap - The ItemMap being saved.
     */
 	public void saveFirstJoinData(Player player, ItemMap itemMap) {
-		if (itemMap.isOnlyFirstJoin()) {
+		if ((itemMap.isOnlyFirstJoin() || itemMap.isOnlyFirstLife()) && !this.hasFirstJoined(player, itemMap)) {
 			this.executeStatementsLater.add("INSERT INTO ij_first_join (`World_Name`, `Player_Name`, `Player_UUID`, `Item_Name`, `Time_Stamp`) VALUES ('" + player.getWorld().getName() + "','" + player.getName().toString() + "','" + PlayerHandler.getPlayer().getPlayerID(player) + "','" + itemMap.getConfigName() + "','" + new Timestamp(System.currentTimeMillis()) + "')");
 			if (this.firstJoinPlayers.get(PlayerHandler.getPlayer().getPlayerID(player)) != null) {
 				List <String> h1 = this.firstJoinPlayers.get(PlayerHandler.getPlayer().getPlayerID(player));
@@ -543,7 +543,7 @@ public class SQLite {
     * @return If the player has first joined.
     */
 	public Boolean hasFirstJoined(Player player, ItemMap itemMap) {
-		if (itemMap.isOnlyFirstJoin() && this.firstJoinPlayers.get(PlayerHandler.getPlayer().getPlayerID(player)) != null 
+		if ((itemMap.isOnlyFirstJoin() || itemMap.isOnlyFirstLife()) && this.firstJoinPlayers.get(PlayerHandler.getPlayer().getPlayerID(player)) != null 
 				&& Utils.getUtils().containsIgnoreCase(this.firstJoinPlayers.get(PlayerHandler.getPlayer().getPlayerID(player)).toString(), itemMap.getConfigName())) {
 			return true;
 		}

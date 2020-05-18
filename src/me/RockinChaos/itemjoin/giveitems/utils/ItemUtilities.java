@@ -219,7 +219,7 @@ public class ItemUtilities {
 			  || (type.equals(TriggerType.REGIONLEAVE) && item.isTakeOnRegionLeave())) && item.inRegion(region))))
 					 && item.inWorld(player.getWorld()) && Chances.getChances().isProbability(item, randomMap) 
 					 && SQLite.getLite(false).isEnabled(player) && item.hasPermission(player) 
-					 && this.isObtainable(player, item, session, (newMode != null ? newMode : player.getGameMode()))) {
+					 && this.isObtainable(player, item, session, type, (newMode != null ? newMode : player.getGameMode()))) {
 				item.giveTo(player); 
 			} else if (((type.equals(TriggerType.LIMITSWITCH) && item.isUseOnLimitSwitch() && !item.isLimitMode(newMode))
 					|| (((type.equals(TriggerType.REGIONENTER) && item.isTakeOnRegionLeave()) 
@@ -384,26 +384,30 @@ public class ItemUtilities {
     * @param gamemode - The current GameMode of the Player.
     * @return If the ItemMap is Obtainable.
     */
-	public boolean isObtainable(final Player player, final ItemMap itemMap, final int session, final GameMode gamemode) {
+	public boolean isObtainable(final Player player, final ItemMap itemMap, final int session, final TriggerType type, final GameMode gamemode) {
 		if (!itemMap.hasItem(player) || itemMap.isAlwaysGive()) {
 			boolean firstJoin = SQLite.getLite(false).hasFirstJoined(player, itemMap);
 			boolean firstWorld = SQLite.getLite(false).hasFirstWorld(player, itemMap);
 			boolean ipLimit = SQLite.getLite(false).isIPLimited(player, itemMap);
 			if (itemMap.isLimitMode(gamemode)) {
-				if (!firstJoin && !firstWorld && !ipLimit && this.canOverwrite(player, itemMap)) {
+				if ((!firstJoin || (firstJoin && itemMap.isOnlyFirstLife() && type.equals(TriggerType.RESPAWN))) && !firstWorld && !ipLimit && this.canOverwrite(player, itemMap)) {
 					return true;
 				} else if (!firstJoin && !firstWorld && !ipLimit) {
 					if (session != 0 && this.failCount.get(session) != null) {
 						this.failCount.put(session, this.failCount.get(session) + 1);
 					} else if (session != 0) { this.failCount.put(session, 1); }
 					ServerHandler.getServer().logDebug("{ItemMap} " + player.getName() + " has failed to receive item: " + itemMap.getConfigName() + ".");
+					return false;
 				} else { 
 					if (firstJoin) { 
 						ServerHandler.getServer().logDebug("{ItemMap} " + player.getName() + " has already received first-join " + itemMap.getConfigName() + ", they can no longer recieve this."); 
+						return false;
 					} else if (firstWorld) { 
 						ServerHandler.getServer().logDebug("{ItemMap} " + player.getName() + " has already received first-world " + itemMap.getConfigName() + ", they can no longer recieve this in " + player.getWorld().getName() + "."); 
+						return false;
 					} else if (ipLimit) { 
-						ServerHandler.getServer().logDebug("{ItemMap} " + player.getName() + " has already received ip-limited " + itemMap.getConfigName() + ", they will only recieve this on their dedicated ip.");  
+						ServerHandler.getServer().logDebug("{ItemMap} " + player.getName() + " has already received ip-limited " + itemMap.getConfigName() + ", they will only recieve this on their dedicated ip.");
+						return false;
 					}
 				}
 			}
@@ -503,8 +507,8 @@ public class ItemUtilities {
 		} else if (itemMap.isDropFull()) { 
 			player.getWorld().dropItem(player.getLocation(), item);
 		}
-		SQLite.getLite(false).saveItemData(player, itemMap);
 		ServerHandler.getServer().logDebug("{ItemMap} Given the Item: " + itemMap.getConfigName() + ".");
+		SQLite.getLite(false).saveItemData(player, itemMap);
 	}
 	
    /**
@@ -692,7 +696,7 @@ public class ItemUtilities {
 		List<ItemMap> protectItems = new ArrayList<ItemMap>();
 		if (Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Options"), "PROTECT")) {
 			for (ItemMap item: this.getItems()) {
-				if (item.isOnlyFirstJoin() || item.isOnlyFirstWorld()) {
+				if (item.isOnlyFirstJoin() || item.isOnlyFirstLife() || item.isOnlyFirstWorld()) {
 					protectItems.add(item);
 				}
 			}
@@ -766,7 +770,8 @@ public class ItemUtilities {
 		WORLDSWITCH("World-Switch"),
 		LIMITSWITCH("Limit-Modes"),
 		REGIONENTER("Region-Enter"),
-		REGIONLEAVE("Region-Leave");
+		REGIONLEAVE("Region-Leave"),
+		DEFAULT("DEFAULT");
 		private final String name;
 		private TriggerType(String name) { this.name = name; }
 	}	
