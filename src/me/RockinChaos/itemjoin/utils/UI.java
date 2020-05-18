@@ -2480,7 +2480,6 @@ public class UI {
     */
 	private void flagPane(final Player player, final ItemMap itemMap) {
 		Interface flagPane = new Interface(false, 5, this.GUIName);
-		flagPane.addButton(new Button(this.fillerPaneGItem));
 		flagPane.addButton(new Button(ItemHandler.getItem().getItem("DIAMOND", 1, itemMap.isOpBypass(), "&a&l&nAllowOpBypass", "&7", 
 				"&a&lTrue&f:&7 Allows players who are OP to", "&7bypass any itemflags that add", "&7restrictions for this item.", "&7",
 				"&c&lFalse&f:&7 Players who are OP will be", "&7restricted by itemflags that add", "&7restrictions for this item.", "&7", 
@@ -2529,6 +2528,17 @@ public class UI {
 			this.flagPane(player, itemMap);
 		}));
 		flagPane.addButton(new Button(this.fillerPaneGItem));
+		flagPane.addButton(new Button(ItemHandler.getItem().getItem("LAPIS_LAZULI", 1, itemMap.isGlowing(), "&a&l&nGlowing", "&7", 
+				"&a&lTrue&f:&7 The item will glow as if it was enchanted!", "&7",
+				"&c&lFalse&f:&7 The item will not glow.", "&7", 
+				"&9&lENABLED: &a" + (itemMap.isGlowing() + "").toUpperCase()), event -> {
+			if (itemMap.isGlowing()) {
+				itemMap.setGlowing(false);
+			} else {
+				itemMap.setGlowing(true);
+			}
+			this.flagPane(player, itemMap);
+		}));
 		flagPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "WOODEN_SWORD" : "268"), 1, itemMap.isVanilla(), "&a&l&nVanilla", "&7", 
 				"&a&lTrue&f:&7 The item will be given as a default no-name item.", 
 				"&cNOTE: &7Itemflags and commands will NOT work", "&7unless the vanilla-status or vanilla-control", "&7itemflags are defined.", "&7",
@@ -2860,6 +2870,7 @@ public class UI {
 		if (itemMap.isInventoryClose()) { itemflags += "INVENTORY-CLOSE, "; }
 		if (itemMap.isDynamic()) { itemflags += "DYNAMIC, "; }
 		if (itemMap.isAnimated()) { itemflags += "ANIMATE, "; }
+		if (itemMap.isGlowing()) { itemflags += "GLOWING, "; }
 		if (itemMap.isItemStore()) { itemflags += "ITEM-STORE, "; }
 		if (itemMap.isCancelEvents()) { itemflags += "CANCEL-EVENTS, "; }
 		if (itemMap.isCountLock()) { itemflags += "COUNT-LOCK, "; }
@@ -4010,7 +4021,7 @@ public class UI {
 		probabilityPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> {
 			this.creatingPane(player, itemMap);
 		}));
-		for (int i = 1; i <= 100; i++) {
+		for (int i = 1; i < 100; i++) {
 			final int k = i;
 			probabilityPane.addButton(new Button(ItemHandler.getItem().getItem("STAINED_GLASS_PANE:11", 1, false, "&9&lChance: &a&l" + k + "%", "&7", "&7*Click to set the", "&7probability of the item."), event -> {
 				itemMap.setProbability(k);this.creatingPane(player, itemMap);
@@ -4729,13 +4740,21 @@ public class UI {
 				colorList += "&a" + split + " /n ";
 			}
 		}
+		boolean useCommands = true;
+		if (itemMap.getCommands().length == 1) {
+			for (ItemCommand command : itemMap.getCommands()) {
+				if (command.getRawCommand().equalsIgnoreCase("default: ")) {
+					useCommands = false;
+				}
+			}
+		} else if (itemMap.getCommands().length == 0) { useCommands = false; }
 		try {
 			item = ItemHandler.getItem().getItem(itemMap.getMaterial().toString() + ":" + itemMap.getDataValue(), 1, false, "&7*&6&l&nItem Information", "&7", "&9&lNode: &a" + itemMap.getConfigName(), "&9&lMaterial: &a" 
 			+ itemMap.getMaterial().toString() + (itemMap.getDataValue() != 0 ? ":" + itemMap.getDataValue() : ""), 
-					(itemMap.getMultipleSlots() != null && !itemMap.getMultipleSlots().isEmpty() ? "&9&lSlot(s): &a" + slotList : "&9&lSlot: &a" + itemMap.getSlot().toUpperCase()), "&9&lCount: &a" + itemMap.getCount(), 
-					(Utils.getUtils().nullCheck(itemMap.getCustomName()) != "NONE" ? "&9&lName: &a" + itemMap.getCustomName() : ""), (Utils.getUtils().nullCheck(itemMap.getCustomLore().toString()) != "NONE" ? "&9&lLore: &a" + (Utils.getUtils().nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",").length() > 40 ? Utils.getUtils().nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",").substring(0, 40) : Utils.getUtils().nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",")) : ""), 
-					(Utils.getUtils().nullCheck(itemMap.getDurability() + "&7") != "NONE" ? "&9&lDurability: &a" + itemMap.getDurability() : ""), (Utils.getUtils().nullCheck(itemMap.getData() + "&7") != "NONE" ? "&9&lTexture Data: &a" + itemMap.getData() : ""), (itemMap.getCommands().length != 0 ? "&9&lCommands: &aYES" : ""), 
-					(Utils.getUtils().nullCheck(itemMap.getItemCost() + "&7") != "NONE" ? "&9&lCommands-Item: &a" + itemMap.getItemCost() : ""), (Utils.getUtils().nullCheck(itemMap.getCommandCost() + "&7") != "NONE" ? "&9&lCommands-Cost: &a" + itemMap.getCommandCost() : ""), 
+					(itemMap.getMultipleSlots() != null && !itemMap.getMultipleSlots().isEmpty() ? "&9&lSlot(s): &a" + slotList : "&9&lSlot: &a" + itemMap.getSlot().toUpperCase()), (itemMap.getCount() != 1 && itemMap.getCount() != 0) ? "&9&lCount: &a" + itemMap.getCount() : "", 
+					((Utils.getUtils().nullCheck(itemMap.getCustomName()) != "NONE" && !ItemHandler.getItem().getMaterialName(itemMap.getTempItem()).equalsIgnoreCase(itemMap.getCustomName())) ? "&9&lName: &a" + itemMap.getCustomName() : ""), (Utils.getUtils().nullCheck(itemMap.getCustomLore().toString()) != "NONE" ? "&9&lLore: &a" + (Utils.getUtils().nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",").length() > 40 ? Utils.getUtils().nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",").substring(0, 40) : Utils.getUtils().nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",")) : ""), 
+					(Utils.getUtils().nullCheck(itemMap.getDurability() + "&7") != "NONE" ? "&9&lDurability: &a" + itemMap.getDurability() : ""), (Utils.getUtils().nullCheck(itemMap.getData() + "&7") != "NONE" ? "&9&lTexture Data: &a" + itemMap.getData() : ""), (useCommands ? "&9&lCommands: &aYES" : ""), 
+					(Utils.getUtils().nullCheck(itemMap.getItemCost() + "") != "NONE" ? "&9&lCommands-Item: &a" + itemMap.getItemCost() : ""), (Utils.getUtils().nullCheck(itemMap.getCommandCost() + "&7") != "NONE" ? "&9&lCommands-Cost: &a" + itemMap.getCommandCost() : ""), 
 					(Utils.getUtils().nullCheck(itemMap.getCommandReceive() + "&7") != "NONE" ? "&9&lCommands-Receive: &a" + itemMap.getCommandReceive() : ""),
 					(Utils.getUtils().nullCheck(itemMap.getCommandType() + "") != "NONE" ? "&9&lCommands-Type: &a" + itemMap.getCommandType() : ""), (Utils.getUtils().nullCheck(itemMap.getCommandSequence() + "") != "NONE" ? "&9&lCommands-Sequence: &a" + itemMap.getCommandSequence() : ""), 
 					(Utils.getUtils().nullCheck(itemMap.getCommandCooldown() + "&7") != "NONE" ? "&9&lCommands-Cooldown: &a" + itemMap.getCommandCooldown() + " second(s)" : ""), 

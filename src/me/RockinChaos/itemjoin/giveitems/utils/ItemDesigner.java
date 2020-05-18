@@ -604,6 +604,10 @@ public class ItemDesigner {
 			int percentage = Integer.parseInt(percentageString);
 			if (!Chances.getChances().getItems().containsKey(itemMap)) { Chances.getChances().putItem(itemMap, percentage); }
 			itemMap.setProbability(percentage);
+			if (itemMap.getProbability() == 100) {
+				ServerHandler.getServer().logWarn("{ItemMap} An item cannot be defined with 100 percent probability, please check the wiki on this usage.");
+				ServerHandler.getServer().logWarn("{ItemMap} Please change the probability of the item, or remove it entirely, items may not function.");
+			}
 		}
 	}
 
