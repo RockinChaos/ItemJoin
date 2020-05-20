@@ -171,7 +171,7 @@ public class ConfigHandler {
 				if (path.contains("items.yml")) { this.Generating = true; }
 			} catch (Exception e) {
 				ServerHandler.getServer().sendDebugTrace(e);
-				ItemJoin.getInstance().getLogger().warning("Cannot save " + path + " to disk!");
+				ServerHandler.getServer().logWarn("Cannot save " + path + " to disk!");
 				return null;
 			}
 		}

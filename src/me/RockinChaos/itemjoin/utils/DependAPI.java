@@ -287,6 +287,9 @@ public class DependAPI {
 				+ (this.getGuard().guardEnabled() ? "WorldGuard, " : "") + (this.databaseEnabled() ? "HeadDatabase, " : "") 
 				+ (this.xInventoryEnabled() ? "xInventories, " : "") + (this.placeHolderEnabled() ? "PlaceholderAPI, " : "") 
 				+ (this.getVault().vaultEnabled() ? "Vault " : "") + "}");
+		if (ServerHandler.getServer().hasSpecificUpdate("1_13")) { 
+			ServerHandler.getServer().logInfo("Enabled legacy material support."); 
+		}
 	}
 	
    /**
