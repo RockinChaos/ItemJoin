@@ -596,7 +596,7 @@ public class UI {
 				"&7items name, lore, and material type"), event -> this.animationPane(player, itemMap)));
 		creatingPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "OAK_FENCE" : "FENCE"), 1, false, "&b&lLimit-Modes", "&7", "&7*Define the gamemode(s) that the", "&7item will be limited to.", "&9&lLIMIT-MODES: &a" + 
 				Utils.getUtils().nullCheck(itemMap.getLimitModes())), event -> this.limitPane(player, itemMap)));
-		creatingPane.addButton(new Button(ItemHandler.getItem().getItem("NETHER_STAR", 1, false, "&b&lProbability", "&7", "&7*Define the chance that the", "&7item will be given to the player.", "&7", "&9&lPROBABILITY: &a" +
+		creatingPane.addButton(new Button(ItemHandler.getItem().getItem("NETHER_STAR", 1, false, "&b&lProbability", "&7", "&7*Define the chance that the", "&7item will be given to the player.", "&7", "&c&lNOTICE:&7 Only ONE item defined with", "&7a probability value will be selected.", "&7Probability is the same as a dice roll.", "&7", "&9&lPROBABILITY: &a" +
 				Utils.getUtils().nullCheck(itemMap.getProbability() + "&a%")), event -> {
 			if (Utils.getUtils().nullCheck(itemMap.getProbability() + "&a%") != "NONE") {
 				itemMap.setProbability(-1);
@@ -833,45 +833,47 @@ public class UI {
 				this.materialPane(player, itemMap, stage);
 			}
 		}));
+		ServerHandler.getServer().runAsyncThread(main -> {
 		Inventory inventoryCheck = ItemJoin.getInstance().getServer().createInventory(null, 9, this.GUIName);
-		for (Material material: Material.values()) {
-			if (!material.name().contains("LEGACY") && material.name() != "AIR" && this.safeMaterial(ItemHandler.getItem().getItem(material.toString(), 1, false, "", ""), inventoryCheck)) {
-				if (!ServerHandler.getServer().hasSpecificUpdate("1_13") && LegacyAPI.getLegacy().getDataValue(material) != 0) {
-					for (int i = 0; i <= LegacyAPI.getLegacy().getDataValue(material); i++) {
-						if (!material.toString().equalsIgnoreCase("STEP") || material.toString().equalsIgnoreCase("STEP") && i != 2) {
-							final int dataValue = i;
-							materialPane.addButton(new Button(ItemHandler.getItem().getItem(material.toString() + ":" + dataValue, 1, false, "", "&7", "&7*Click to set the", "&7material of the item."), event -> {
-								if (stage == 2) {
-									itemMap.setItemCost(material.toString());
-								} else { itemMap.setMaterial(material); }
-								if (dataValue != 0) { itemMap.setDataValue((short)dataValue); }
-								if (stage == 0) {
-									this.switchPane(player, itemMap, 0);
-								} else if (stage == 2) {
-									this.commandPane(player, itemMap);
-								} else {
-									this.creatingPane(player, itemMap);
-								}
-							}));
+			for (Material material: Material.values()) {
+				if (!material.name().contains("LEGACY") && material.name() != "AIR" && this.safeMaterial(ItemHandler.getItem().getItem(material.toString(), 1, false, "", ""), inventoryCheck)) {
+					if (!ServerHandler.getServer().hasSpecificUpdate("1_13") && LegacyAPI.getLegacy().getDataValue(material) != 0) {
+						for (int i = 0; i <= LegacyAPI.getLegacy().getDataValue(material); i++) {
+							if (!material.toString().equalsIgnoreCase("STEP") || material.toString().equalsIgnoreCase("STEP") && i != 2) {
+								final int dataValue = i;
+								materialPane.addButton(new Button(ItemHandler.getItem().getItem(material.toString() + ":" + dataValue, 1, false, "", "&7", "&7*Click to set the", "&7material of the item."), event -> {
+									if (stage == 2) {
+										itemMap.setItemCost(material.toString());
+									} else { itemMap.setMaterial(material); }
+									if (dataValue != 0) { itemMap.setDataValue((short)dataValue); }
+									if (stage == 0) {
+										this.switchPane(player, itemMap, 0);
+									} else if (stage == 2) {
+										this.commandPane(player, itemMap);
+									} else {
+										this.creatingPane(player, itemMap);
+									}
+								}));
+							}
 						}
-					}
-				} else {
-				materialPane.addButton(new Button(ItemHandler.getItem().getItem(material.toString(), 1, false, "", "&7", "&7*Click to set the", "&7material of the item."), event -> {
-					if (stage == 2) {
-						itemMap.setItemCost(material.toString());
-					} else { itemMap.setMaterial(material); }
-					if (stage == 0) {
-						this.switchPane(player, itemMap, 0);
-					} else if (stage == 2) { 
-						this.commandPane(player, itemMap);
 					} else {
-						this.creatingPane(player, itemMap);
+					materialPane.addButton(new Button(ItemHandler.getItem().getItem(material.toString(), 1, false, "", "&7", "&7*Click to set the", "&7material of the item."), event -> {
+						if (stage == 2) {
+							itemMap.setItemCost(material.toString());
+						} else { itemMap.setMaterial(material); }
+						if (stage == 0) {
+							this.switchPane(player, itemMap, 0);
+						} else if (stage == 2) { 
+							this.commandPane(player, itemMap);
+						} else {
+							this.creatingPane(player, itemMap);
+						}
+					}));
 					}
-				}));
 				}
 			}
-		}
-		inventoryCheck.clear();
+			inventoryCheck.clear();
+		});
 		materialPane.open(player);
 	}
 	
@@ -1357,12 +1359,14 @@ public class UI {
 			}
 			this.dataPane(event.getPlayer(), itemMap);
 		}));
-		for (int i = 1; i <= 2000; i++) {
-			final int k = i;
-			texturePane.addButton(new Button(ItemHandler.getItem().getItem("STAINED_GLASS_PANE:6", 1, false, "&9&lData: &a&l" + k, "&7", "&7*Click to set the", "&7durability data of the item."), event -> {
-				itemMap.setData(k); this.dataPane(player, itemMap);
-			}));
-		}
+		ServerHandler.getServer().runAsyncThread(main -> {
+			for (int i = 1; i <= 2000; i++) {
+				final int k = i;
+				texturePane.addButton(new Button(ItemHandler.getItem().getItem("STAINED_GLASS_PANE:6", 1, false, "&9&lData: &a&l" + k, "&7", "&7*Click to set the", "&7durability data of the item."), event -> {
+					itemMap.setData(k); this.dataPane(player, itemMap);
+				}));
+			}
+		});
 		texturePane.open(player);
 	}
 	
@@ -1398,12 +1402,14 @@ public class UI {
 			}
 			this.dataPane(event.getPlayer(), itemMap);
 		}));
-		for (int i = 1; i <= 2000; i++) {
-			final int k = i;
-			texturePane.addButton(new Button(ItemHandler.getItem().getItem("STAINED_GLASS_PANE:6", 1, false, "&9&lModel Data: &a&l" + k, "&7", "&7*Click to set the", "&7custom model data for the item."), event -> {
-				itemMap.setModelData(k); this.dataPane(player, itemMap);
-			}));
-		}
+		ServerHandler.getServer().runAsyncThread(main -> {
+			for (int i = 1; i <= 2000; i++) {
+				final int k = i;
+				texturePane.addButton(new Button(ItemHandler.getItem().getItem("STAINED_GLASS_PANE:6", 1, false, "&9&lModel Data: &a&l" + k, "&7", "&7*Click to set the", "&7custom model data for the item."), event -> {
+					itemMap.setModelData(k); this.dataPane(player, itemMap);
+				}));
+			}
+		});
 		texturePane.open(player);
 	}
 	
@@ -1439,12 +1445,14 @@ public class UI {
 			}
 			this.dataPane(event.getPlayer(), itemMap);
 		}));
-		for (int i = 1; i <= itemMap.getMaterial().getMaxDurability(); i++) {
-			final int k = i;
-			damagePane.addButton(new Button(ItemHandler.getItem().getItem("STAINED_GLASS_PANE:6", 1, false, "&9&lDamage: &a&l" + k, "&7", "&7*Click to set the", "&7damage of the item."), event -> {
-				itemMap.setDurability((short) k); this.dataPane(player, itemMap);
-			}));
-		}
+		ServerHandler.getServer().runAsyncThread(main -> {
+			for (int i = 1; i <= itemMap.getMaterial().getMaxDurability(); i++) {
+				final int k = i;
+				damagePane.addButton(new Button(ItemHandler.getItem().getItem("STAINED_GLASS_PANE:6", 1, false, "&9&lDamage: &a&l" + k, "&7", "&7*Click to set the", "&7damage of the item."), event -> {
+					itemMap.setDurability((short) k); this.dataPane(player, itemMap);
+				}));
+			}
+		});
 		damagePane.open(player);
 	}
 	
@@ -2239,12 +2247,14 @@ public class UI {
 		soundPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item commands menu."), event -> {
 			this.commandPane(player, itemMap);
 		}));
-		for (Sound sound: Sound.values()) {
-			soundPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "MUSIC_DISC_MELLOHI" : "2262"), 1, false, "&f" + sound.name(), "&7", "&7*Click to set the", "&7commands-sound of the item."), event -> {
-				itemMap.setCommandSound(sound);
-				this.commandPane(player, itemMap);
-			}));
-		}
+		ServerHandler.getServer().runAsyncThread(main -> {
+			for (Sound sound: Sound.values()) {
+				soundPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "MUSIC_DISC_MELLOHI" : "2262"), 1, false, "&f" + sound.name(), "&7", "&7*Click to set the", "&7commands-sound of the item."), event -> {
+					itemMap.setCommandSound(sound);
+					this.commandPane(player, itemMap);
+				}));
+			}
+		});
 		soundPane.open(player);
 	}
 	
@@ -2262,13 +2272,17 @@ public class UI {
 		}));
 		particlePane.addButton(new Button(ItemHandler.getItem().getItem("SUGAR", 1, false, "&fFIREWORK_FAKE", "&7", "&7*Click to set the lifetime", "&7commands-particle of the item."), event -> this.lifePane(player, itemMap, "FIREWORK", 1)));
 		if (ServerHandler.getServer().hasSpecificUpdate("1_9")) {
-			for (org.bukkit.Particle particle: org.bukkit.Particle.values()) {
-				particlePane.addButton(new Button(ItemHandler.getItem().getItem("SUGAR", 1, false, "&f" + particle.name(), "&7", "&7*Click to set the", "&7commands-particle of the item."), event -> this.lifePane(player, itemMap, particle.name(), 0)));
-			}
+			ServerHandler.getServer().runAsyncThread(main -> {
+				for (org.bukkit.Particle particle: org.bukkit.Particle.values()) {
+					particlePane.addButton(new Button(ItemHandler.getItem().getItem("SUGAR", 1, false, "&f" + particle.name(), "&7", "&7*Click to set the", "&7commands-particle of the item."), event -> this.lifePane(player, itemMap, particle.name(), 0)));
+				}
+			});
 		} else {
-			for (org.bukkit.Effect effect: org.bukkit.Effect.values()) {
-				particlePane.addButton(new Button(ItemHandler.getItem().getItem("SUGAR", 1, false, "&f" + effect.name(), "&7", "&7*Click to set the", "&7commands-particle of the item."), event -> this.lifePane(player, itemMap, effect.name(), 0)));
-			}
+			ServerHandler.getServer().runAsyncThread(main -> {
+				for (org.bukkit.Effect effect: org.bukkit.Effect.values()) {
+					particlePane.addButton(new Button(ItemHandler.getItem().getItem("SUGAR", 1, false, "&f" + effect.name(), "&7", "&7*Click to set the", "&7commands-particle of the item."), event -> this.lifePane(player, itemMap, effect.name(), 0)));
+				}
+			});
 		}
 		particlePane.open(player);
 	}
@@ -2335,10 +2349,12 @@ public class UI {
 		patternPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the particle menu."), event -> {
 			this.particlePane(player, itemMap);
 		}));
-		for (Type explosion: Type.values()) {
-			patternPane.addButton(new Button(ItemHandler.getItem().getItem("PAPER", 1, false, "&f" + explosion.name(), "&7", "&7*Click to set the pattern", "&7of the firework explosion effect."), 
-					event -> this.colorParticlePane(player, itemMap, particle, lifetime, explosion, null)));
-		}
+		ServerHandler.getServer().runAsyncThread(main -> {
+			for (Type explosion: Type.values()) {
+				patternPane.addButton(new Button(ItemHandler.getItem().getItem("PAPER", 1, false, "&f" + explosion.name(), "&7", "&7*Click to set the pattern", "&7of the firework explosion effect."), 
+						event -> this.colorParticlePane(player, itemMap, particle, lifetime, explosion, null)));
+			}
+		});
 		patternPane.open(player);
 	}
 	
@@ -2354,16 +2370,18 @@ public class UI {
 		colorPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the particle menu."), event -> {
 			this.particlePane(player, itemMap);
 		}));
-		for (DyeColor color: DyeColor.values()) {
-			colorPane.addButton(new Button(ItemHandler.getItem().getItem("GRAY_DYE", 1, false, "&f" + color.name(), "&7", "&7*Click to set the " + (color1 != null ? "&c&lend color" : "&9&lstart color"), "&7of the firework explosion effect."), event -> {
-				if (color1 != null) {
-					itemMap.setCommandParticle(particle + ":" + color1.name() + ":" + color.name() + ":" + explosion.name() + ":" + lifetime);
-					this.commandPane(player, itemMap);
-				} else {
-					this.colorParticlePane(player, itemMap, particle, lifetime, explosion, color);
-				}
-			}));
-		}
+		ServerHandler.getServer().runAsyncThread(main -> {
+			for (DyeColor color: DyeColor.values()) {
+				colorPane.addButton(new Button(ItemHandler.getItem().getItem("GRAY_DYE", 1, false, "&f" + color.name(), "&7", "&7*Click to set the " + (color1 != null ? "&c&lend color" : "&9&lstart color"), "&7of the firework explosion effect."), event -> {
+					if (color1 != null) {
+						itemMap.setCommandParticle(particle + ":" + color1.name() + ":" + color.name() + ":" + explosion.name() + ":" + lifetime);
+						this.commandPane(player, itemMap);
+					} else {
+						this.colorParticlePane(player, itemMap, particle, lifetime, explosion, color);
+					}
+				}));
+			}
+		});
 		colorPane.open(player);
 	}
 	
@@ -2407,22 +2425,24 @@ public class UI {
 		enchantPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> {
 			this.creatingPane(player, itemMap);
 		}));
-		for (Enchantment enchant: Enchantment.values()) {
-			boolean containsKey = itemMap.getEnchantments().containsKey(ItemHandler.getItem().getEnchantName(enchant).toUpperCase());
-			ItemStack enchantItem = ItemHandler.getItem().getItem((containsKey ? "ENCHANTED_BOOK" : "BOOK"), 1, false, "&f" + ItemHandler.getItem().getEnchantName(enchant).toUpperCase(), "&7", 
-					"&7*Click to add this enchantment", "&7to the custom item.", "&7", "&9&lENABLED: &a" + (containsKey + "").toUpperCase(), (containsKey ? "&7" : ""), 
-					(containsKey ? "&9&lLEVEL: &a" + itemMap.getEnchantments().get(ItemHandler.getItem().getEnchantName(enchant).toUpperCase()) : ""));
-			enchantPane.addButton(new Button(enchantItem, event -> {
-				if (containsKey) {
-					Map < String, Integer > enchantments = itemMap.getEnchantments();
-					enchantments.remove(ItemHandler.getItem().getEnchantName(enchant).toUpperCase());
-					itemMap.setEnchantments(enchantments);
-					this.enchantPane(player, itemMap);
-				} else {
-					this.enchantLevelPane(player, itemMap, enchant);
-				}
-			}));
-		}
+		ServerHandler.getServer().runAsyncThread(main -> {
+			for (Enchantment enchant: Enchantment.values()) {
+				boolean containsKey = itemMap.getEnchantments().containsKey(ItemHandler.getItem().getEnchantName(enchant).toUpperCase());
+				ItemStack enchantItem = ItemHandler.getItem().getItem((containsKey ? "ENCHANTED_BOOK" : "BOOK"), 1, false, "&f" + ItemHandler.getItem().getEnchantName(enchant).toUpperCase(), "&7", 
+						"&7*Click to add this enchantment", "&7to the custom item.", "&7", "&9&lENABLED: &a" + (containsKey + "").toUpperCase(), (containsKey ? "&7" : ""), 
+						(containsKey ? "&9&lLEVEL: &a" + itemMap.getEnchantments().get(ItemHandler.getItem().getEnchantName(enchant).toUpperCase()) : ""));
+				enchantPane.addButton(new Button(enchantItem, event -> {
+					if (containsKey) {
+						Map < String, Integer > enchantments = itemMap.getEnchantments();
+						enchantments.remove(ItemHandler.getItem().getEnchantName(enchant).toUpperCase());
+						itemMap.setEnchantments(enchantments);
+						this.enchantPane(player, itemMap);
+					} else {
+						this.enchantLevelPane(player, itemMap, enchant);
+					}
+				}));
+			}
+		});
 		enchantPane.open(player);
 	}
 	
@@ -3043,23 +3063,25 @@ public class UI {
 			}
 			itemMap.setEnabledWorlds(enabledWorlds);this.worldPane(player, itemMap);
 		}));
-		for (World world: ItemJoin.getInstance().getServer().getWorlds()) {
-			String worldMaterial = (ServerHandler.getServer().hasSpecificUpdate("1_13") ? "GRASS_BLOCK" : "2");
-			if (world.getEnvironment().equals(Environment.NETHER)) {
-				worldMaterial = "NETHERRACK";
-			} else if (world.getEnvironment().equals(Environment.THE_END)) {
-				worldMaterial = (ServerHandler.getServer().hasSpecificUpdate("1_13") ? "END_STONE" : "121");
-			}
-			worldPane.addButton(new Button(ItemHandler.getItem().getItem(worldMaterial, 1, itemMap.containsWorld(world.getName()), "&f&l" + world.getName(), "&7", "&7*Click to enable the", "&7custom item in this world.", 
-					"&9&lENABLED: &a" + (itemMap.containsWorld(world.getName()) + "").toUpperCase()), event -> {
-				if (itemMap.containsWorld(world.getName())) {
-					enabledWorlds.remove(world.getName());
-				} else {
-					enabledWorlds.add(world.getName());
+		ServerHandler.getServer().runAsyncThread(main -> {
+			for (World world: ItemJoin.getInstance().getServer().getWorlds()) {
+				String worldMaterial = (ServerHandler.getServer().hasSpecificUpdate("1_13") ? "GRASS_BLOCK" : "2");
+				if (world.getEnvironment().equals(Environment.NETHER)) {
+					worldMaterial = "NETHERRACK";
+				} else if (world.getEnvironment().equals(Environment.THE_END)) {
+					worldMaterial = (ServerHandler.getServer().hasSpecificUpdate("1_13") ? "END_STONE" : "121");
 				}
-				itemMap.setEnabledWorlds(enabledWorlds);this.worldPane(player, itemMap);
-			}));
-		}
+				worldPane.addButton(new Button(ItemHandler.getItem().getItem(worldMaterial, 1, itemMap.containsWorld(world.getName()), "&f&l" + world.getName(), "&7", "&7*Click to enable the", "&7custom item in this world.", 
+						"&9&lENABLED: &a" + (itemMap.containsWorld(world.getName()) + "").toUpperCase()), event -> {
+					if (itemMap.containsWorld(world.getName())) {
+						enabledWorlds.remove(world.getName());
+					} else {
+						enabledWorlds.add(world.getName());
+					}
+					itemMap.setEnabledWorlds(enabledWorlds);this.worldPane(player, itemMap);
+				}));
+			}
+		});
 		worldPane.open(player);
 	}
 	
@@ -3085,25 +3107,27 @@ public class UI {
 			}
 			itemMap.setEnabledRegions(enabledRegions);this.regionPane(player, itemMap);
 		}));
-		for (World world: ItemJoin.getInstance().getServer().getWorlds()) {
-			for (String region: DependAPI.getDepends(false).getGuard().getRegions(world).keySet()) {
-				String regionMaterial = (ServerHandler.getServer().hasSpecificUpdate("1_13") ? "GRASS_BLOCK" : "2");
-				if (world.getEnvironment().equals(Environment.NETHER)) {
-					regionMaterial = "NETHERRACK";
-				} else if (world.getEnvironment().equals(Environment.THE_END)) {
-					regionMaterial = (ServerHandler.getServer().hasSpecificUpdate("1_13") ? "END_STONE" : "121");
-				}
-				regionPane.addButton(new Button(ItemHandler.getItem().getItem(regionMaterial, 1, itemMap.containsRegion(region), "&f&l" + region, "&7", "&a&lWORLD: &f" + world.getName(), "&7", "&7*Click to enable the", 
-						"&7custom item in this region.", "&9&lENABLED: &a" + (itemMap.containsRegion(region) + "").toUpperCase()), event -> {
-					if (itemMap.containsRegion(region)) {
-						enabledRegions.remove(region);
-					} else {
-						enabledRegions.add(region);
+		ServerHandler.getServer().runAsyncThread(main -> {
+			for (World world: ItemJoin.getInstance().getServer().getWorlds()) {
+				for (String region: DependAPI.getDepends(false).getGuard().getRegions(world).keySet()) {
+					String regionMaterial = (ServerHandler.getServer().hasSpecificUpdate("1_13") ? "GRASS_BLOCK" : "2");
+					if (world.getEnvironment().equals(Environment.NETHER)) {
+						regionMaterial = "NETHERRACK";
+					} else if (world.getEnvironment().equals(Environment.THE_END)) {
+						regionMaterial = (ServerHandler.getServer().hasSpecificUpdate("1_13") ? "END_STONE" : "121");
 					}
-					itemMap.setEnabledRegions(enabledRegions);this.regionPane(player, itemMap);
-				}));
+					regionPane.addButton(new Button(ItemHandler.getItem().getItem(regionMaterial, 1, itemMap.containsRegion(region), "&f&l" + region, "&7", "&a&lWORLD: &f" + world.getName(), "&7", "&7*Click to enable the", 
+							"&7custom item in this region.", "&9&lENABLED: &a" + (itemMap.containsRegion(region) + "").toUpperCase()), event -> {
+						if (itemMap.containsRegion(region)) {
+							enabledRegions.remove(region);
+						} else {
+							enabledRegions.add(region);
+						}
+						itemMap.setEnabledRegions(enabledRegions);this.regionPane(player, itemMap);
+					}));
+				}
 			}
-		}
+		});
 		regionPane.open(player);
 	}
 	
@@ -3262,43 +3286,45 @@ public class UI {
 				this.selectMaterialPane(player, itemMap, position, isNew);
 			}
 		}));
-		Inventory inventoryCheck = ItemJoin.getInstance().getServer().createInventory(null, 9, this.GUIName);
-		for (Material material: Material.values()) {
-			if (!material.name().contains("LEGACY") && material.name() != "AIR" && this.safeMaterial(ItemHandler.getItem().getItem(material.toString(), 1, false, "", ""), inventoryCheck)) {
-				
-				if (!ServerHandler.getServer().hasSpecificUpdate("1_13") && LegacyAPI.getLegacy().getDataValue(material) != 0) {
-					for (int i = 0; i <= LegacyAPI.getLegacy().getDataValue(material); i++) {
-						if (!material.toString().equalsIgnoreCase("STEP") || material.toString().equalsIgnoreCase("STEP") && i != 2) {
-							final int dataValue = i;
-							selectMaterialPane.addButton(new Button(ItemHandler.getItem().getItem(material.toString() + ":" + dataValue, 1, false, "", "&7", "&7*Click to set the", "&7material of the item."), event -> {
-								if (isNew) {
-									if (dataValue != 0) { this.durationMaterialPane(player, itemMap, position, isNew, material.name() + ":" + dataValue); }
-									else { this.durationMaterialPane(player, itemMap, position, isNew, material.name()); }
-								} else {
-									List < String > mats = itemMap.getDynamicMaterials();
-									if (dataValue != 0) { mats.set(position, "<delay:" + Utils.getUtils().returnInteger(ItemHandler.getItem().getDelayFormat(mats.get(position))) + ">" + material.name() + ":" + dataValue); }
-									else { mats.set(position, "<delay:" + Utils.getUtils().returnInteger(ItemHandler.getItem().getDelayFormat(mats.get(position))) + ">" + material.name()); }
-									itemMap.setDynamicMaterials(mats);
-									this.modifyMaterialPane(player, itemMap, position);
-								}
-							}));
+		ServerHandler.getServer().runAsyncThread(main -> {
+			Inventory inventoryCheck = ItemJoin.getInstance().getServer().createInventory(null, 9, this.GUIName);
+			for (Material material: Material.values()) {
+				if (!material.name().contains("LEGACY") && material.name() != "AIR" && this.safeMaterial(ItemHandler.getItem().getItem(material.toString(), 1, false, "", ""), inventoryCheck)) {
+					
+					if (!ServerHandler.getServer().hasSpecificUpdate("1_13") && LegacyAPI.getLegacy().getDataValue(material) != 0) {
+						for (int i = 0; i <= LegacyAPI.getLegacy().getDataValue(material); i++) {
+							if (!material.toString().equalsIgnoreCase("STEP") || material.toString().equalsIgnoreCase("STEP") && i != 2) {
+								final int dataValue = i;
+								selectMaterialPane.addButton(new Button(ItemHandler.getItem().getItem(material.toString() + ":" + dataValue, 1, false, "", "&7", "&7*Click to set the", "&7material of the item."), event -> {
+									if (isNew) {
+										if (dataValue != 0) { this.durationMaterialPane(player, itemMap, position, isNew, material.name() + ":" + dataValue); }
+										else { this.durationMaterialPane(player, itemMap, position, isNew, material.name()); }
+									} else {
+										List < String > mats = itemMap.getDynamicMaterials();
+										if (dataValue != 0) { mats.set(position, "<delay:" + Utils.getUtils().returnInteger(ItemHandler.getItem().getDelayFormat(mats.get(position))) + ">" + material.name() + ":" + dataValue); }
+										else { mats.set(position, "<delay:" + Utils.getUtils().returnInteger(ItemHandler.getItem().getDelayFormat(mats.get(position))) + ">" + material.name()); }
+										itemMap.setDynamicMaterials(mats);
+										this.modifyMaterialPane(player, itemMap, position);
+									}
+								}));
+							}
 						}
+					} else {
+						selectMaterialPane.addButton(new Button(ItemHandler.getItem().getItem(material.toString(), 1, false, "", "&7", "&7*Click to set the", "&7material of the item."), event -> {
+							if (isNew) {
+								this.durationMaterialPane(player, itemMap, position, isNew, material.name());
+							} else {
+								List < String > mats = itemMap.getDynamicMaterials();
+								mats.set(position, "<delay:" + Utils.getUtils().returnInteger(ItemHandler.getItem().getDelayFormat(mats.get(position))) + ">" + material.name());
+								itemMap.setDynamicMaterials(mats);
+								this.modifyMaterialPane(player, itemMap, position);
+							}
+						}));
 					}
-				} else {
-					selectMaterialPane.addButton(new Button(ItemHandler.getItem().getItem(material.toString(), 1, false, "", "&7", "&7*Click to set the", "&7material of the item."), event -> {
-						if (isNew) {
-							this.durationMaterialPane(player, itemMap, position, isNew, material.name());
-						} else {
-							List < String > mats = itemMap.getDynamicMaterials();
-							mats.set(position, "<delay:" + Utils.getUtils().returnInteger(ItemHandler.getItem().getDelayFormat(mats.get(position))) + ">" + material.name());
-							itemMap.setDynamicMaterials(mats);
-							this.modifyMaterialPane(player, itemMap, position);
-						}
-					}));
 				}
 			}
-		}
-		inventoryCheck.clear();
+			inventoryCheck.clear();
+		});
 		selectMaterialPane.open(player);
 	}
 	
@@ -4082,36 +4108,38 @@ public class UI {
 	private void bannerPane(final Player player, final ItemMap itemMap) {
 		Interface bannerPane = new Interface(true, 6, this.GUIName);
 		bannerPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> this.creatingPane(player, itemMap)));
-		for (PatternType pattern: PatternType.values()) {
-			String patternString = "NONE";
-			if (Utils.getUtils().nullCheck(itemMap.getBannerPatterns().toString()) != "NONE") {
-				for (Pattern patterns: itemMap.getBannerPatterns()) {
-					if (patterns.getPattern() == pattern) {
-						patternString = patterns.getColor() + ":" + patterns.getPattern().name().toUpperCase();
-						break;
-					}
-				}
-			}
-			final String checkPattern = patternString;
-			bannerPane.addButton(new Button(ItemHandler.getItem().getItem("PAPER", 1, (checkPattern != "NONE" ? true : false), "&f" + pattern.name(), "&7", "&7*Click to add this as", "&7a banner pattern.", (checkPattern != "NONE" ? 
-					"&9&lInformation: &a" + checkPattern : "")), event -> {
-				if (checkPattern != "NONE") {
-					List < Pattern > patternList = itemMap.getBannerPatterns();
-					if (Utils.getUtils().nullCheck(itemMap.getBannerPatterns().toString()) != "NONE") {
-						for (Pattern patterns: patternList) {
-							if (patterns.getPattern() == pattern) {
-								patternList.remove(patterns);
-								itemMap.setBannerPatterns(patternList);
-								break;
-							}
+		ServerHandler.getServer().runAsyncThread(main -> {
+			for (PatternType pattern: PatternType.values()) {
+				String patternString = "NONE";
+				if (Utils.getUtils().nullCheck(itemMap.getBannerPatterns().toString()) != "NONE") {
+					for (Pattern patterns: itemMap.getBannerPatterns()) {
+						if (patterns.getPattern() == pattern) {
+							patternString = patterns.getColor() + ":" + patterns.getPattern().name().toUpperCase();
+							break;
 						}
 					}
-					this.bannerPane(player, itemMap);
-				} else {
-					this.patternPane(player, itemMap, pattern);
 				}
-			}));
-		}
+				final String checkPattern = patternString;
+				bannerPane.addButton(new Button(ItemHandler.getItem().getItem("PAPER", 1, (checkPattern != "NONE" ? true : false), "&f" + pattern.name(), "&7", "&7*Click to add this as", "&7a banner pattern.", (checkPattern != "NONE" ? 
+						"&9&lInformation: &a" + checkPattern : "")), event -> {
+					if (checkPattern != "NONE") {
+						List < Pattern > patternList = itemMap.getBannerPatterns();
+						if (Utils.getUtils().nullCheck(itemMap.getBannerPatterns().toString()) != "NONE") {
+							for (Pattern patterns: patternList) {
+								if (patterns.getPattern() == pattern) {
+									patternList.remove(patterns);
+									itemMap.setBannerPatterns(patternList);
+									break;
+								}
+							}
+						}
+						this.bannerPane(player, itemMap);
+					} else {
+						this.patternPane(player, itemMap, pattern);
+					}
+				}));
+			}
+		});
 		bannerPane.open(player);
 	}
 	
@@ -4125,11 +4153,13 @@ public class UI {
 	private void patternPane(final Player player, final ItemMap itemMap, final PatternType pattern) {
 		Interface colorPane = new Interface(true, 6, this.GUIName);
 		colorPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the banner patterns menu."), event -> this.bannerPane(player, itemMap)));
-		for (DyeColor color: DyeColor.values()) {
-			colorPane.addButton(new Button(ItemHandler.getItem().getItem("GRAY_DYE", 1, false, "&f" + color.name(), "&7", "&7*This will be the color", "&7of your banner pattern."), event -> {
-				List < Pattern > patterns = itemMap.getBannerPatterns();patterns.add(new Pattern(color, pattern));itemMap.setBannerPatterns(patterns);this.bannerPane(player, itemMap);
-			}));
-		}
+		ServerHandler.getServer().runAsyncThread(main -> {
+			for (DyeColor color: DyeColor.values()) {
+				colorPane.addButton(new Button(ItemHandler.getItem().getItem("GRAY_DYE", 1, false, "&f" + color.name(), "&7", "&7*This will be the color", "&7of your banner pattern."), event -> {
+					List < Pattern > patterns = itemMap.getBannerPatterns();patterns.add(new Pattern(color, pattern));itemMap.setBannerPatterns(patterns);this.bannerPane(player, itemMap);
+				}));
+			}
+		});
 		colorPane.open(player);
 	}
 	
@@ -4143,38 +4173,40 @@ public class UI {
 	private void potionPane(final Player player, final ItemMap itemMap) {
 		Interface potionPane = new Interface(true, 6, this.GUIName);
 		potionPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the special settings menu."), event -> this.creatingPane(player, itemMap)));
-		for (PotionEffectType potion: PotionEffectType.values()) {
-			if (potion != null) {
-				String potionString = "NONE";
-				if (Utils.getUtils().nullCheck(itemMap.getPotionEffect().toString()) != "NONE") {
-					for (PotionEffect potions: itemMap.getPotionEffect()) {
-						if (potions.getType() == potion) {
-							potionString = potions.getType().getName().toUpperCase() + ":" + potions.getAmplifier() + ":" + potions.getDuration() / 160;
-							break;
-						}
-					}
-				}
-				final String checkPotion = potionString;
-				potionPane.addButton(new Button(ItemHandler.getItem().getItem("GLASS_BOTTLE", 1, (checkPotion != "NONE" ? true : false), "&f" + potion.getName(), "&7", "&7*Add this potion effect", "&7to the item.", 
-						(checkPotion != "NONE" ? "&9&lInformation: &a" + checkPotion : "")), event -> {
-					if (checkPotion != "NONE") {
-						List < PotionEffect > potionEffects = itemMap.getPotionEffect();
-						if (Utils.getUtils().nullCheck(itemMap.getPotionEffect().toString()) != "NONE") {
-							for (PotionEffect potions: potionEffects) {
-								if (potions.getType() == potion) {
-									potionEffects.remove(potions);
-									itemMap.setPotionEffect(potionEffects);
-									break;
-								}
+		ServerHandler.getServer().runAsyncThread(main -> {
+			for (PotionEffectType potion: PotionEffectType.values()) {
+				if (potion != null) {
+					String potionString = "NONE";
+					if (Utils.getUtils().nullCheck(itemMap.getPotionEffect().toString()) != "NONE") {
+						for (PotionEffect potions: itemMap.getPotionEffect()) {
+							if (potions.getType() == potion) {
+								potionString = potions.getType().getName().toUpperCase() + ":" + potions.getAmplifier() + ":" + potions.getDuration() / 160;
+								break;
 							}
 						}
-						this.potionPane(player, itemMap);
-					} else {
-						this.levelPane(player, itemMap, potion);
 					}
-				}));
+					final String checkPotion = potionString;
+					potionPane.addButton(new Button(ItemHandler.getItem().getItem("GLASS_BOTTLE", 1, (checkPotion != "NONE" ? true : false), "&f" + potion.getName(), "&7", "&7*Add this potion effect", "&7to the item.", 
+							(checkPotion != "NONE" ? "&9&lInformation: &a" + checkPotion : "")), event -> {
+						if (checkPotion != "NONE") {
+							List < PotionEffect > potionEffects = itemMap.getPotionEffect();
+							if (Utils.getUtils().nullCheck(itemMap.getPotionEffect().toString()) != "NONE") {
+								for (PotionEffect potions: potionEffects) {
+									if (potions.getType() == potion) {
+										potionEffects.remove(potions);
+										itemMap.setPotionEffect(potionEffects);
+										break;
+									}
+								}
+							}
+							this.potionPane(player, itemMap);
+						} else {
+							this.levelPane(player, itemMap, potion);
+						}
+					}));
+				}
 			}
-		}
+		});
 		potionPane.open(player);
 	}
 	
@@ -4308,19 +4340,21 @@ public class UI {
 	private void colorPane(final Player player, final ItemMap itemMap) {
 		Interface colorPane = new Interface(true, 6, this.GUIName);
 		colorPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the special settings menu."), event -> this.otherPane(player, itemMap)));
-		for (DyeColor color: DyeColor.values()) {
-			colorPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "GRAY_DYE" : "351:8"), 1, Utils.getUtils().containsValue(itemMap.getFireworkColor(), color.name()), "&f" + color.name(), 
-					"&7", "&7*This will be the color", "&7of your firework charge.", "&9&lENABLED: &a" + (Utils.getUtils().containsValue(itemMap.getFireworkColor(), color.name()) + "").toUpperCase()), event -> {
-				List < DyeColor > colors = itemMap.getFireworkColor();
-				if (Utils.getUtils().containsIgnoreCase(itemMap.getFireworkColor().toString(), color.name())) {
-					colors.remove(color);
-				} else {
-					colors.add(color);
-					itemMap.setFireworkColor(colors);
-				}
-				this.colorPane(player, itemMap);
-			}));
-		}
+		ServerHandler.getServer().runAsyncThread(main -> {
+			for (DyeColor color: DyeColor.values()) {
+				colorPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "GRAY_DYE" : "351:8"), 1, Utils.getUtils().containsValue(itemMap.getFireworkColor(), color.name()), "&f" + color.name(), 
+						"&7", "&7*This will be the color", "&7of your firework charge.", "&9&lENABLED: &a" + (Utils.getUtils().containsValue(itemMap.getFireworkColor(), color.name()) + "").toUpperCase()), event -> {
+					List < DyeColor > colors = itemMap.getFireworkColor();
+					if (Utils.getUtils().containsIgnoreCase(itemMap.getFireworkColor().toString(), color.name())) {
+						colors.remove(color);
+					} else {
+						colors.add(color);
+						itemMap.setFireworkColor(colors);
+					}
+					this.colorPane(player, itemMap);
+				}));
+			}
+		});
 		colorPane.open(player);
 	}
 	
@@ -4334,12 +4368,14 @@ public class UI {
 	private void designPane(final Player player, final ItemMap itemMap) {
 		Interface designPane = new Interface(true, 2, this.GUIName);
 		designPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the special settings menu."), event -> this.otherPane(player, itemMap)));
-		for (Type type: Type.values()) {
-			designPane.addButton(new Button(ItemHandler.getItem().getItem("EGG", 1, false, "&f" + type.name(), "&7", "&7*This will be the type (pattern)", "&7of your firework."), event -> {
-				itemMap.setFireworkType(type);
-				this.otherPane(player, itemMap);
-			}));
-		}
+		ServerHandler.getServer().runAsyncThread(main -> {
+			for (Type type: Type.values()) {
+				designPane.addButton(new Button(ItemHandler.getItem().getItem("EGG", 1, false, "&f" + type.name(), "&7", "&7*This will be the type (pattern)", "&7of your firework."), event -> {
+					itemMap.setFireworkType(type);
+					this.otherPane(player, itemMap);
+				}));
+			}
+		});
 		designPane.open(player);
 	}
 	
@@ -4612,11 +4648,13 @@ public class UI {
 		} else if (itemMap.getMaterial().toString().contains("LEATHER_")) {
 			Interface colorPane = new Interface(true, 6, this.GUIName);
 			colorPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the special settings menu."), event -> this.otherPane(player, itemMap)));
-			for (DyeColor color: DyeColor.values()) {
-				colorPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "GRAY_DYE" : "351:8"), 1, false, "&f" + color.name(), "&7", "&7*This will be the color", "&7of your leather armor."), event -> {
-					itemMap.setLeatherColor(color.name());itemMap.setLeatherHex(null);this.otherPane(player, itemMap);
-				}));
-			}
+			ServerHandler.getServer().runAsyncThread(main -> {
+				for (DyeColor color: DyeColor.values()) {
+					colorPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "GRAY_DYE" : "351:8"), 1, false, "&f" + color.name(), "&7", "&7*This will be the color", "&7of your leather armor."), event -> {
+						itemMap.setLeatherColor(color.name());itemMap.setLeatherHex(null);this.otherPane(player, itemMap);
+					}));
+				}
+			});
 			otherPane.addButton(new Button(this.fillerPaneGItem), 3);
 			otherPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "YELLOW_DYE" : "351:11"), 1, false, "&a&lDye", "&7", "&7*Add a custom color to", "&7your leather armor.", "&9&lLeather-Color: &a" +
 			(Utils.getUtils().nullCheck(itemMap.getLeatherColor()) != "NONE" ? Utils.getUtils().nullCheck(itemMap.getLeatherColor()) : Utils.getUtils().nullCheck(itemMap.getLeatherHex()))), event -> {
