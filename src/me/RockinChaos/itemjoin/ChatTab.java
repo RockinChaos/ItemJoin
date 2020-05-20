@@ -58,12 +58,10 @@ public class ChatTab implements TabCompleter {
 			if (args.length == 2) {
 				commands.addAll(Arrays.asList("first-join","first-world","ip-limits"));
 			} else {
-				if (args[1].equalsIgnoreCase("first-world")) {
-					for (String playerValue: (args[1].equalsIgnoreCase("first-world") ? SQLite.getLite(false).getFirstWorlds().keySet() : 
-						(args[1].equalsIgnoreCase("first-join") ? SQLite.getLite(false).getFirstPlayers().keySet() : 
-						(args[1].equalsIgnoreCase("ip-limits") ? SQLite.getLite(false).getLimitPlayers().keySet() : new ArrayList<String>())))) {
-						commands.add(PlayerHandler.getPlayer().getPlayerString(playerValue).getName());
-					}
+				for (String playerValue: (args[1].equalsIgnoreCase("first-world") ? SQLite.getLite(false).getFirstWorlds().keySet() : 
+					(args[1].equalsIgnoreCase("first-join") ? SQLite.getLite(false).getFirstPlayers().keySet() : 
+					(args[1].equalsIgnoreCase("ip-limits") ? SQLite.getLite(false).getLimitPlayers().keySet() : new ArrayList<String>())))) {
+					commands.add(PlayerHandler.getPlayer().getPlayerString(playerValue).getName());
 				}
 			}
 		} else if ((args.length == 2 || args.length == 3) && (args[0].equalsIgnoreCase("disable") || args[0].equalsIgnoreCase("enable"))) {
