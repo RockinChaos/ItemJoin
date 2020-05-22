@@ -66,7 +66,7 @@ public class ItemDesigner {
 		if (ConfigHandler.getConfig(false).itemsExist()) {
 			for (String internalName: ConfigHandler.getConfig(false).getConfigurationSection().getKeys(false)) {
 				ConfigurationSection itemNode = ConfigHandler.getConfig(false).getItemSection(internalName);
-				if (isConfigurable(internalName, itemNode)) {
+				if (this.isConfigurable(internalName, itemNode)) {
 					String[] slots = itemNode.getString(".slot").replace(" ", "").split(",");
 					for (String slot: slots) {
 						if (this.isDefinable(internalName, slot)) {
