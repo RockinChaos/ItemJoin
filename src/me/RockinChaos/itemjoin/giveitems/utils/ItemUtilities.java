@@ -337,7 +337,7 @@ public class ItemUtilities {
     * @param clearAll - If ALL items are expected to be cleared from the Player Inventory.
     * @return If the ItemStack is allowed.
     */
-	private boolean canClear(final ItemStack item, final String slot, final int i, final boolean clearAll) {
+	public boolean canClear(final ItemStack item, final String slot, final int i, final boolean clearAll) {
 		return item != null && !this.isBlacklisted(slot, item) && !this.isProtected(i, item) && (clearAll ? true : ItemHandler.getItem().containsNBTData(item));
 	}
 	
@@ -683,7 +683,7 @@ public class ItemUtilities {
     * @param item - The ItemStack being checked.
     * @return If the ItemStack is a protected ItemMap.
     */
-	private boolean isProtected(final int i, final ItemStack item) {
+	public boolean isProtected(final int i, final ItemStack item) {
 			return !this.protectItems.isEmpty() && this.protectItems.get(i).isSimilar(item) && i == (this.protectItems.size() - 1);
 	}
 	
@@ -692,7 +692,7 @@ public class ItemUtilities {
     * 
     * @return The list of protected ItemMaps.
     */
-	private List<ItemMap> getProtectItems() {
+	public List<ItemMap> getProtectItems() {
 		List<ItemMap> protectItems = new ArrayList<ItemMap>();
 		if (Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Options"), "PROTECT")) {
 			for (ItemMap item: this.getItems()) {

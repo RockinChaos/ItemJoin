@@ -29,11 +29,9 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.PlayerInventory;
 
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-
 import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
-import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.utils.sqlite.SQLite;
 
@@ -148,25 +146,14 @@ public class GuardAPI {
     */
 	public void saveReturnItems(final Player player, final String region, final String type, final Inventory craftView, final PlayerInventory inventory, final boolean clearAll) {
 		boolean doReturn = Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Options"), "RETURN");
+		List < ItemMap > protectItems = ItemUtilities.getUtilities().getProtectItems();
 		if (region != null && !region.isEmpty() && type.equalsIgnoreCase("REGION-ENTER") && doReturn) {
 			Inventory saveInventory = Bukkit.createInventory(null, 54);
 			for (int i = 0; i <= 47; i++) {
-				if (doReturn) {
-					for (ItemMap itemMap: ItemUtilities.getUtilities().getItems()) {
-						if (!itemMap.isOnlyFirstJoin() && !itemMap.isOnlyFirstWorld()) {
-							if (inventory.getItem(i) != null && inventory.getItem(i).getType() != Material.AIR && itemMap.isSimilar(inventory.getItem(i)) && i <= 41) {
-								saveInventory.setItem(i, inventory.getItem(i).clone());
-							} else if (i >= 42 && craftView.getItem(i - 42) != null && craftView.getItem(i - 42).getType() != Material.AIR 
-									&& itemMap.isSimilar(craftView.getItem(i - 42)) && PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
-								saveInventory.setItem(i, craftView.getItem(i - 42).clone());
-							}
-						}
-					}
-				} else {
-					if (inventory.getItem(i) != null && inventory.getItem(i).getType() != Material.AIR && ((!clearAll && ItemHandler.getItem().containsNBTData(inventory.getItem(i))) || clearAll) && i <= 41) {
+				for (int k = 0; k < (!protectItems.isEmpty() ? protectItems.size() : 1); k++) {
+					if (ItemUtilities.getUtilities().canClear(inventory.getItem(i), String.valueOf(i), k, clearAll) && i <= 41) {
 						saveInventory.setItem(i, inventory.getItem(i).clone());
-					} else if (i >= 42 && craftView.getItem(i - 42) != null && craftView.getItem(i - 42).getType() != Material.AIR 
-							&& ((!clearAll && ItemHandler.getItem().containsNBTData(craftView.getItem(i - 42))) || clearAll) && PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
+					} else if (i >= 42 && ItemUtilities.getUtilities().canClear(craftView.getItem(i - 42), "CRAFTING[" + (i - 42) + "]", k, clearAll) && PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
 						saveInventory.setItem(i, craftView.getItem(i - 42).clone());
 					}
 				}
