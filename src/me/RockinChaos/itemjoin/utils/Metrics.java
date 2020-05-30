@@ -114,6 +114,7 @@ public class Metrics {
 		        this.addCustomChart(new Metrics.SimplePie("language", LanguageAPI.getLang(false).getLanguage()));
 		        this.addCustomChart(new Metrics.SimplePie("softDepend", DependAPI.getDepends(false).authMeEnabled() ? "AuthMe" : ""));
 		        this.addCustomChart(new Metrics.SimplePie("softDepend", DependAPI.getDepends(false).nickEnabled() ? "BetterNick" : ""));
+		        this.addCustomChart(new Metrics.SimplePie("softDepend", DependAPI.getDepends(false).hyperVerseEnabled() ? "Hyperverse" : ""));
 		        this.addCustomChart(new Metrics.SimplePie("softDepend", DependAPI.getDepends(false).coreEnabled() ? "Multiverse-Core" : ""));
 		        this.addCustomChart(new Metrics.SimplePie("softDepend", DependAPI.getDepends(false).inventoryEnabled() ? "Multiverse-Inventories" : ""));
 		        this.addCustomChart(new Metrics.SimplePie("softDepend", DependAPI.getDepends(false).myWorldsEnabled() ? "My Worlds" : ""));

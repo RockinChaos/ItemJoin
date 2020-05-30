@@ -23,6 +23,7 @@ import me.RockinChaos.itemjoin.handlers.ServerHandler;
 
 public class DependAPI {
 	
+	private boolean hyperVerse = false;
 	private boolean multiverseCore = false;
 	private boolean multiverseInventories = false;
 	private boolean placeHolderAPI = false;
@@ -42,6 +43,7 @@ public class DependAPI {
     * 
     */
 	public DependAPI() {
+		this.setHyperverseStatus(Bukkit.getServer().getPluginManager().getPlugin("Hyperverse") != null);
 		this.setCoreStatus(Bukkit.getServer().getPluginManager().getPlugin("Multiverse-Core") != null);
 		this.setInventoryStatus(Bukkit.getServer().getPluginManager().getPlugin("Multiverse-Inventories") != null);
 		this.setPlaceHolderStatus(Bukkit.getServer().getPluginManager().getPlugin("PlaceholderAPI") != null);
@@ -57,6 +59,15 @@ public class DependAPI {
 		VaultAPI.getVault(true);
 		
 		this.sendUtilityDepends();
+	}
+	
+   /**
+    * Checks if Hyperverse is Enabled.
+    * 
+    * @return If Hyperverse is Enabled.
+    */
+	public boolean hyperVerseEnabled() {
+		return this.hyperVerse;
 	}
 
    /**
@@ -158,6 +169,15 @@ public class DependAPI {
     	return this.headDatabase;
     }
 
+   /**
+    * Sets the status of Hyperverse.
+    * 
+    * @param bool - If Hyperverse is enabled.
+    */
+    public void setHyperverseStatus(final boolean bool) {
+    	this.hyperVerse = bool;
+    }
+    
    /**
     * Sets the status of Multiverse Core.
     * 
@@ -281,7 +301,7 @@ public class DependAPI {
     */
 	private void sendUtilityDepends() {
 		ServerHandler.getServer().logInfo("softDepend(s) { " + (this.authMeEnabled() ? "AuthMe, " : "") + (this.nickEnabled() ? "BetterNick, " : "") 
-				+ (this.coreEnabled() ? "Multiverse-Core, " : "") + (this.inventoryEnabled() ? "Multiverse-Inventories, " : "") 
+				+ (this.hyperVerseEnabled() ? "Hyperverse, " : "") + (this.coreEnabled() ? "Multiverse-Core, " : "") + (this.inventoryEnabled() ? "Multiverse-Inventories, " : "") 
 				+ (this.myWorldsEnabled() ? "My Worlds, " : "") + (this.perInventoryEnabled() ? "PerWorldInventory, " : "") 
 				+ (this.perPluginsEnabled() ? "PerWorldPlugins, " : "") + (this.tokenEnchantEnabled() ? "TokenEnchant, " : "") 
 				+ (this.getGuard().guardEnabled() ? "WorldGuard, " : "") + (this.databaseEnabled() ? "HeadDatabase, " : "") 
