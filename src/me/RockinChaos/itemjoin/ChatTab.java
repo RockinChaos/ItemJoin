@@ -33,7 +33,6 @@ import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 import me.RockinChaos.itemjoin.handlers.PermissionsHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
-import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.utils.Utils;
 import me.RockinChaos.itemjoin.utils.sqlite.SQLite;
 
@@ -62,7 +61,6 @@ public class ChatTab implements TabCompleter {
 				for (String playerValue: (args[1].equalsIgnoreCase("first-world") ? SQLite.getLite(false).getFirstWorlds().keySet() : 
 					(args[1].equalsIgnoreCase("first-join") ? SQLite.getLite(false).getFirstPlayers().keySet() : 
 					(args[1].equalsIgnoreCase("ip-limits") ? SQLite.getLite(false).getLimitPlayers().keySet() : (args[1].equalsIgnoreCase("enabled-players") ? SQLite.getLite(false).getEnabledPlayers().keySet() : new ArrayList<String>()))))) {
-					ServerHandler.getServer().logSevere("" + playerValue.replace(".false", "").replace(".true", ""));
 					commands.add(playerValue.equalsIgnoreCase("ALL") ? "ALL" : PlayerHandler.getPlayer().getPlayerString(playerValue.replace(".false", "").replace(".true", "")).getName());
 				}
 			}
