@@ -493,7 +493,7 @@ public class ItemUtilities {
     */
 	public void setInvSlots(final Player player, final ItemMap itemMap, final int size) {
 		ItemStack existingItem = ItemHandler.getItem().getItem(player, itemMap);
-		ItemStack item = itemMap.getItem(player);
+		ItemStack item = itemMap.getItem(player).clone();
 		this.shiftItem(player, itemMap);
 		int nextSlot = this.nextItem(player, itemMap);
 		boolean overWrite = itemMap.isOverwritable() || ConfigHandler.getConfig(false).getFile("items.yml").getBoolean("items-Overwrite");
@@ -521,7 +521,7 @@ public class ItemUtilities {
 	public void setCustomSlots(final Player player, final ItemMap itemMap, final int size) {
 		int craftSlot = Utils.getUtils().getSlotConversion(itemMap.getSlot());
 		ItemStack existingItem = ItemHandler.getItem().getItem(player, itemMap);
-		ItemStack item = itemMap.getItem(player);
+		ItemStack item = itemMap.getItem(player).clone();
 		this.shiftItem(player, itemMap);
 		int nextSlot = this.nextItem(player, itemMap);
 		boolean overWrite = itemMap.isOverwritable() || ConfigHandler.getConfig(false).getFile("items.yml").getBoolean("items-Overwrite");
