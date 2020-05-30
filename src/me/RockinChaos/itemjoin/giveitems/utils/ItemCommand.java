@@ -416,7 +416,7 @@ public class ItemCommand {
 		try {
 			for (ItemMap item : ItemUtilities.getUtilities().getItems()) {
 				if (item.getConfigName().equalsIgnoreCase(this.command)) {
-					item.giveTo(player, 0, slot);
+					item.swapItem(player, slot);
 					break;
 				}
 			}

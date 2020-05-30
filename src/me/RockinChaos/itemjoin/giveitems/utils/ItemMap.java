@@ -3535,28 +3535,26 @@ public class ItemMap {
     * Gives the Player the ItemMap.
     * 
     * @param player - The Player to be given the item.
-    * @param amount - The stack size of the item.
     * @param slot - The slot to be placed into.
     */
-	public void giveTo(final Player player, final int amount, final String slot) {
-		ItemStack item = this.getItem(player);
-		if (amount > 1) { item.setAmount(amount); }
+	public void swapItem(final Player player, final String slot) {
+		ItemStack itemStack = this.getItem(player);
 		if (Utils.getUtils().containsIgnoreCase(slot, "CRAFTING")) { 
 			if (Utils.getUtils().getSlotConversion(slot) == 0) {
 		    	Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
 		    		@Override
 		    		public void run() {
 		    			if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
-		    				player.getOpenInventory().getTopInventory().setItem(Utils.getUtils().getSlotConversion(slot), item);
+		    				player.getOpenInventory().getTopInventory().setItem(Utils.getUtils().getSlotConversion(slot), itemStack);
 		    				PlayerHandler.getPlayer().updateInventory(player, 1L);
 		    			}
 		    		}
 		    	}, 4L);
 			} else {
-				player.getOpenInventory().getTopInventory().setItem(Utils.getUtils().getSlotConversion(slot), item);
+				player.getOpenInventory().getTopInventory().setItem(Utils.getUtils().getSlotConversion(slot), itemStack);
 			}
 		} 
-		else { player.getInventory().setItem(Integer.parseInt(slot), item); }
+		else { player.getInventory().setItem(Integer.parseInt(slot), itemStack); }
 		this.setAnimations(player);
 		this.executeCommands(player, this.tempItem, "ON_RECEIVE", this.getSlot());
 	}
