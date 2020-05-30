@@ -224,7 +224,7 @@ public class ItemHandler {
 		} else if (craftSlot != -1) {
 			existingItem = player.getOpenInventory().getTopInventory().getItem(craftSlot);
 		}
-		return existingItem;
+		return (existingItem != null && existingItem.getType() != Material.AIR ? existingItem : null);
 	}
     
    /**
@@ -370,34 +370,36 @@ public class ItemHandler {
     * @param player - The Player to have its crafting items saved.
     */
     public void saveCraftItems(final Player player) {
-		if (InventoryCrafting.getCreativeCraftItems().containsKey(PlayerHandler.getPlayer().getPlayerID(player))) {
-			Inventory inv = Bukkit.createInventory(null, 9);
-			boolean notNull = false;
-			ItemStack[] craftingContents = InventoryCrafting.getCreativeCraftItems().get(PlayerHandler.getPlayer().getPlayerID(player));
-			for (int k = 0; k <= 4; k++) {
-				inv.setItem(k, craftingContents[k]); 
-				if (craftingContents[k] != null && craftingContents[k].getType() != Material.AIR) { notNull = true; }
-			}
-			if (notNull) { SQLite.getLite(false).saveReturnCraftItems(player, inv); }
-		} else if (InventoryCrafting.getOpenCraftItems().containsKey(PlayerHandler.getPlayer().getPlayerID(player))) {
-			Inventory inv = Bukkit.createInventory(null, 9);
-			boolean notNull = false;
-			ItemStack[] craftingContents = InventoryCrafting.getOpenCraftItems().get(PlayerHandler.getPlayer().getPlayerID(player));
-			for (int k = 0; k <= 4; k++) {
-				inv.setItem(k, craftingContents[k]); 
-				if (craftingContents[k] != null && craftingContents[k].getType() != Material.AIR) { notNull = true; }
-			}
-			if (notNull) { SQLite.getLite(false).saveReturnCraftItems(player, inv); }
-		} else if (InventoryCrafting.getCraftItems().containsKey(PlayerHandler.getPlayer().getPlayerID(player))) {
-			Inventory inv = Bukkit.createInventory(null, 9);
-			boolean notNull = false;
-			ItemStack[] craftingContents = InventoryCrafting.getCraftItems().get(PlayerHandler.getPlayer().getPlayerID(player));
-			for (int k = 0; k <= 4; k++) {
-				inv.setItem(k, craftingContents[k]); 
-				if (craftingContents[k] != null && craftingContents[k].getType() != Material.AIR) { notNull = true; }
-			}
-			if (notNull) { SQLite.getLite(false).saveReturnCraftItems(player, inv); }
-		} 
+    	try {
+			if (InventoryCrafting.getCreativeCraftItems().containsKey(PlayerHandler.getPlayer().getPlayerID(player))) {
+				Inventory inv = Bukkit.createInventory(null, 9);
+				boolean notNull = false;
+				ItemStack[] craftingContents = InventoryCrafting.getCreativeCraftItems().get(PlayerHandler.getPlayer().getPlayerID(player));
+				for (int k = 0; k <= 4; k++) {
+					inv.setItem(k, craftingContents[k]); 
+					if (craftingContents[k] != null && craftingContents[k].getType() != Material.AIR) { notNull = true; }
+				}
+				if (notNull) { SQLite.getLite(false).saveReturnCraftItems(player, inv); }
+			} else if (InventoryCrafting.getOpenCraftItems().containsKey(PlayerHandler.getPlayer().getPlayerID(player))) {
+				Inventory inv = Bukkit.createInventory(null, 9);
+				boolean notNull = false;
+				ItemStack[] craftingContents = InventoryCrafting.getOpenCraftItems().get(PlayerHandler.getPlayer().getPlayerID(player));
+				for (int k = 0; k <= 4; k++) {
+					inv.setItem(k, craftingContents[k]); 
+					if (craftingContents[k] != null && craftingContents[k].getType() != Material.AIR) { notNull = true; }
+				}
+				if (notNull) { SQLite.getLite(false).saveReturnCraftItems(player, inv); }
+			} else if (InventoryCrafting.getCraftItems().containsKey(PlayerHandler.getPlayer().getPlayerID(player))) {
+				Inventory inv = Bukkit.createInventory(null, 9);
+				boolean notNull = false;
+				ItemStack[] craftingContents = InventoryCrafting.getCraftItems().get(PlayerHandler.getPlayer().getPlayerID(player));
+				for (int k = 0; k <= 4; k++) {
+					inv.setItem(k, craftingContents[k]); 
+					if (craftingContents[k] != null && craftingContents[k].getType() != Material.AIR) { notNull = true; }
+				}
+				if (notNull) { SQLite.getLite(false).saveReturnCraftItems(player, inv); }
+			} 
+    	} catch (Exception e) { }
     }
     
    /**

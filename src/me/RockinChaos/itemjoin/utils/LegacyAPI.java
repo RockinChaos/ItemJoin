@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
@@ -202,6 +203,17 @@ public class LegacyAPI {
     */
 	public Player getPlayer(final String playerName) {
 		return Bukkit.getPlayer(playerName);
+	}
+	
+   /**
+    * Gets the Bukkit OfflinePlayer from their String name.
+    * 
+    * @param playerName - The String name of the Bukkit OfflinePlayer.
+    * @return The found OfflinePlayer.
+    */
+	public OfflinePlayer getOfflinePlayer(final String playerName) {
+		OfflinePlayer player = Bukkit.getOfflinePlayer(playerName);
+		return player.hasPlayedBefore() ? Bukkit.getOfflinePlayer(playerName) : null;
 	}
 	
    /**

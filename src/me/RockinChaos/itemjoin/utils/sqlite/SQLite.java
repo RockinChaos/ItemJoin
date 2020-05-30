@@ -436,7 +436,7 @@ public class SQLite {
 				if (this.enabledPlayers.get(realPlayer) != null) {
 					List <String> h1 = this.enabledPlayers.get(realPlayer);
 					if (Utils.getUtils().containsIgnoreCase(h1.toString(), world + ".")) {
-						for (int i = 0; i <= h1.size(); i++) {
+						for (int i = 0; i < h1.size(); i++) {
 							if (Utils.getUtils().containsIgnoreCase(h1.get(i), world + ".")) {
 								h1.remove(i);
 							}
@@ -473,7 +473,7 @@ public class SQLite {
     * @param section - The datatype being removed.
     */
 	public void purgeDatabaseData(OfflinePlayer player, String section) {
-		String UUID = PlayerHandler.getPlayer().getOfflinePlayerID(player);
+		String UUID = (player == null ? "ALL" : PlayerHandler.getPlayer().getOfflinePlayerID(player));
 		if (section.equalsIgnoreCase("first_join") && this.firstJoinPlayers.values() != null && !this.firstJoinPlayers.isEmpty()) {
 			this.executeStatementsLater.add("DELETE FROM ij_" + section + " WHERE Player_UUID='" + UUID + "';");
 			this.firstJoinPlayers.remove(UUID);
@@ -483,6 +483,9 @@ public class SQLite {
 		} else if (section.equalsIgnoreCase("ip_limits") && this.ipLimitAddresses.values() != null && !this.ipLimitAddresses.isEmpty()) {
 			this.executeStatementsLater.add("DELETE FROM ij_" + section + " WHERE Player_UUID='" + UUID + "';");
 			this.ipLimitAddresses.remove(UUID);
+		} else if (section.equalsIgnoreCase("enabled_players") && this.enabledPlayers.values() != null && !this.enabledPlayers.isEmpty()) {
+			this.executeStatementsLater.add("DELETE FROM ij_" + section + " WHERE Player_UUID='" + UUID + "';");
+			this.enabledPlayers.remove(UUID);
 		}
 	}
 	
@@ -625,6 +628,15 @@ public class SQLite {
 	}
 	
    /**
+    * Gets the players who have items enabled.
+    * 
+    * @return The HashMap of players that have items enabled.
+    */
+	public Map<String, List<String>> getEnabledPlayers() {
+		return this.enabledPlayers;
+	}
+	
+   /**
     * Checks if the players ItemMap is ip limited.
     * 
     * @param player - The player being checked.
@@ -701,23 +713,24 @@ public class SQLite {
     * @return If the player is enabled.
     */
 	public boolean isEnabled(final Player player) {
-		if (this.enabledPlayers.get(PlayerHandler.getPlayer().getPlayerID(player)) != null) {
-			if (Utils.getUtils().containsIgnoreCase(this.enabledPlayers.get(PlayerHandler.getPlayer().getPlayerID(player)).toString(), player.getWorld().getName() + "." + "false")
-					|| Utils.getUtils().containsIgnoreCase(this.enabledPlayers.get(PlayerHandler.getPlayer().getPlayerID(player)).toString(), "Global" + "." + "false") || this.enabledPlayers.get("ALL") != null && Utils.getUtils().containsIgnoreCase(this.enabledPlayers.get("ALL").toString(), "Global" + "." + "false")) {
-				return false;
-			}
+		String UUID = PlayerHandler.getPlayer().getPlayerID(player);
+		if (this.enabledPlayers.get(UUID) == null) { UUID = "ALL"; }
+		if (this.enabledPlayers.get(UUID) != null && (Utils.getUtils().containsIgnoreCase(this.enabledPlayers.get(UUID).toString(), player.getWorld().getName() + "." + "false") 
+		 || Utils.getUtils().containsIgnoreCase(this.enabledPlayers.get(UUID).toString(), "Global" + "." + "false"))) {
+			return false;
 		}
 		return true;
 	}
 	
    /**
-    * Checks if the player is writable or not.
+    * Checks if the player is writable for disabling items.
     * 
     * @param world - The name of the world being checked.
     * @param playerString - The UUID of the player being checked.
     * @return If the player has their items enabled.
     */
-	public boolean isWritable(final String world, final String playerString) {
+	public boolean isWritable(String world, String playerString, boolean enabled) {
+		if (this.enabledPlayers.get(playerString) == null) { playerString = "ALL"; world = "Global"; }
 		if (this.enabledPlayers.get(playerString) != null && Utils.getUtils().containsIgnoreCase(this.enabledPlayers.get(playerString).toString(), world + "." + "false")) {
 				return false;
 		}

@@ -64,6 +64,25 @@ public class Utils {
 	}
 	
    /**
+    * Checks if string1 contains string2.
+    * 
+    * @param string1 - The String to be checked if it contains string2.
+    * @param string2- The String that should be inside string1.
+    * @return If string1 contains string2.
+    */
+	public boolean splitIgnoreCase(final String string1, final String string2) {
+		String[] parts = string1.split(",");
+		boolean splitParts = string1.contains(",");
+		for (int i = 0; i < (splitParts ? parts.length : 1); i++) {
+			if ((splitParts && parts[i] != null && string2 != null && parts[i].toLowerCase().contains(string2.toLowerCase()))
+			|| (!splitParts && string1 != null && string2 != null && string1.toLowerCase().equalsIgnoreCase(string2.toLowerCase()))) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+   /**
     * Checks if the List contains the String.
     * 
     * @param list - The List to be checked if it contains the String.

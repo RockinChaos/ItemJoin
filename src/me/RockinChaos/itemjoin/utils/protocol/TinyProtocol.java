@@ -34,7 +34,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
@@ -220,8 +219,7 @@ public abstract class TinyProtocol {
 				public void run() {
 					try {
 						pipeline.remove(serverChannelHandler);
-					} catch (NoSuchElementException e) {
-					}
+					} catch (Exception e) { }
 				}
 
 			});
@@ -418,16 +416,17 @@ public abstract class TinyProtocol {
 	* @param channel - the injected channel.
 	*/
 	public void uninjectChannel(final Channel channel) {
-		if (!this.closed) {
-			this.uninjectedChannels.add(channel);
-		}
-		channel.eventLoop().execute(new Runnable() {
-			@Override
-			public void run() {
-				channel.pipeline().remove(handlerName);
+		try {
+			if (!this.closed) {
+				this.uninjectedChannels.add(channel);
 			}
-
-		});
+			channel.eventLoop().execute(new Runnable() {
+				@Override
+				public void run() {
+					channel.pipeline().remove(handlerName);
+				}
+			});
+		} catch (NoClassDefFoundError e) { }
 	}
 
    /**

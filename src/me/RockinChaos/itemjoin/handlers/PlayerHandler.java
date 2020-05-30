@@ -403,36 +403,6 @@ public class PlayerHandler {
 			}
 		} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
 	}
-	
-   /**
-    * Gets the OfflinePlayer from their string name.
-    * 
-    * @param playerName - The name of the player to be fetched.
-    * @return The Offline instance of the player.
-    */
-	public OfflinePlayer getOfflinePlayer(final String playerName) {
-		Collection<?> playersOfflineNew;
-		OfflinePlayer[] playersOfflineOld;
-		try {
-			if (Bukkit.class.getMethod("getOfflinePlayers", new Class < ? > [0]).getReturnType() == Collection.class) {
-				playersOfflineNew = ((Collection < ? > ) Bukkit.class.getMethod("getOfflinePlayers", new Class < ? > [0]).invoke(null, new Object[0]));
-				for (Object objPlayer: playersOfflineNew) {
-					Player player = ((Player)objPlayer);
-					if (player.getName().equalsIgnoreCase(playerName)) {
-						return player;
-					}
-				}
-			} else {
-				playersOfflineOld = ((OfflinePlayer[]) Bukkit.class.getMethod("getOfflinePlayers", new Class < ? > [0]).invoke(null, new Object[0]));
-				for (OfflinePlayer player: playersOfflineOld) {
-					if (player.getName().equalsIgnoreCase(playerName)) {
-						return player;
-					}
-				}
-			}
-		} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); } 
-		return null;
-	}
 
    /**
     * Gets the instance of the PlayerHandler.
