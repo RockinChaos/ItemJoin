@@ -566,7 +566,7 @@ public class Commands implements CommandExecutor {
 		PURGE("purge", "itemjoin.purge", false),
 		ENABLE("enable", "itemjoin.enable, itemjoin.enable.others", false),
 		DISABLE("disable", "itemjoin.disable, itemjoin.disable.others", false),
-		GET("get", "itemjoin.get, itemjoin.get.others", true), // [ Perms done ]
+		GET("get", "itemjoin.get, itemjoin.get.others", true),
 		GETALL("getAll", "itemjoin.get, itemjoin.get.others", true),
 		GETONLINE("getOnline", "itemjoin.get.others", false),
 		REMOVE("remove", "itemjoin.remove, itemjoin.remove.others", true),
