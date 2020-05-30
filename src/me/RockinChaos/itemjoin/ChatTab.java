@@ -33,6 +33,7 @@ import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 import me.RockinChaos.itemjoin.handlers.PermissionsHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
+import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.utils.Utils;
 import me.RockinChaos.itemjoin.utils.sqlite.SQLite;
 
@@ -56,12 +57,13 @@ public class ChatTab implements TabCompleter {
 			commands.add("2");
 		} else if ((args.length == 2 || args.length == 3) && args[0].equalsIgnoreCase("purge") && PermissionsHandler.getPermissions().hasPermission(sender, "itemjoin.purge")) {
 			if (args.length == 2) {
-				commands.addAll(Arrays.asList("first-join","first-world","ip-limits"));
+				commands.addAll(Arrays.asList("first-join","first-world","ip-limits","enabled-players"));
 			} else {
 				for (String playerValue: (args[1].equalsIgnoreCase("first-world") ? SQLite.getLite(false).getFirstWorlds().keySet() : 
 					(args[1].equalsIgnoreCase("first-join") ? SQLite.getLite(false).getFirstPlayers().keySet() : 
-					(args[1].equalsIgnoreCase("ip-limits") ? SQLite.getLite(false).getLimitPlayers().keySet() : new ArrayList<String>())))) {
-					commands.add(PlayerHandler.getPlayer().getPlayerString(playerValue).getName());
+					(args[1].equalsIgnoreCase("ip-limits") ? SQLite.getLite(false).getLimitPlayers().keySet() : (args[1].equalsIgnoreCase("enabled-players") ? SQLite.getLite(false).getEnabledPlayers().keySet() : new ArrayList<String>()))))) {
+					ServerHandler.getServer().logSevere("" + playerValue.replace(".false", "").replace(".true", ""));
+					commands.add(playerValue.equalsIgnoreCase("ALL") ? "ALL" : PlayerHandler.getPlayer().getPlayerString(playerValue.replace(".false", "").replace(".true", "")).getName());
 				}
 			}
 		} else if ((args.length == 2 || args.length == 3) && (args[0].equalsIgnoreCase("disable") || args[0].equalsIgnoreCase("enable"))) {
