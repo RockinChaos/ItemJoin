@@ -86,6 +86,7 @@ public class ConfigHandler {
 	    ItemJoin.getInstance().getCommand("itemjoin").setExecutor(new Commands());
 	    ItemJoin.getInstance().getCommand("itemjoin").setTabCompleter(new ChatTab());
 		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Menu(), ItemJoin.getInstance());
+		DependAPI.getDepends(false).sendUtilityDepends();
 		this.registerGlow();
 	}
 	

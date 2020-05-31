@@ -100,6 +100,12 @@ public class UpdateHandler {
     			ServerHandler.getServer().messageSender(sender, "&cPlease try again later, if you continue to see this please contact the plugin developer.");
     			ServerHandler.getServer().sendDebugTrace(e);
     		}
+    	} else {
+    		if (this.betaVersion) {
+    			ServerHandler.getServer().messageSender(sender, "&aYou are running a SNAPSHOT!");
+    			ServerHandler.getServer().messageSender(sender, "&aIf you find any bugs please report them!");
+    		}
+    		ServerHandler.getServer().messageSender(sender, "&aYou are up to date!");
     	}
     }
     

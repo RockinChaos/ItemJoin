@@ -57,8 +57,6 @@ public class DependAPI {
 		this.setDatabaseStatus(Bukkit.getServer().getPluginManager().getPlugin("HeadDatabase") != null);
 		GuardAPI.getGuard(true);
 		VaultAPI.getVault(true);
-		
-		this.sendUtilityDepends();
 	}
 	
    /**
@@ -299,7 +297,7 @@ public class DependAPI {
     * Sends a logging message of the found and enabled soft dependencies.
     * 
     */
-	private void sendUtilityDepends() {
+	public void sendUtilityDepends() {
 		ServerHandler.getServer().logInfo("softDepend(s) { " + (this.authMeEnabled() ? "AuthMe, " : "") + (this.nickEnabled() ? "BetterNick, " : "") 
 				+ (this.hyperVerseEnabled() ? "Hyperverse, " : "") + (this.coreEnabled() ? "Multiverse-Core, " : "") + (this.inventoryEnabled() ? "Multiverse-Inventories, " : "") 
 				+ (this.myWorldsEnabled() ? "My Worlds, " : "") + (this.perInventoryEnabled() ? "PerWorldInventory, " : "") 

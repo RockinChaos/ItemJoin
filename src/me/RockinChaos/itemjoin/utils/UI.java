@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.FireworkEffect.Type;
@@ -49,7 +50,6 @@ import org.bukkit.potion.PotionEffectType;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
-
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemCommand;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemCommand.ActionType;
@@ -426,7 +426,7 @@ public class UI {
 			ItemUtilities.getUtilities().closeAnimations();
 			ItemUtilities.getUtilities().clearItems();
 			ConfigHandler.getConfig(true);
-			player.closeInventory();
+			Bukkit.getServer().getScheduler().runTaskLater(ItemJoin.getInstance(), () -> { this.startModify(player); }, 2L);
 		}));
 		choicePane.addButton(new Button(this.fillerPaneBItem), 3);
 		choicePane.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the modify menu"), event -> this.startModify(player)));
@@ -2420,7 +2420,7 @@ public class UI {
     * @param player - The Player to have the Pane opened.
     * @param itemMap - The ItemMap currently being modified.
     */
-	private void enchantPane(final Player player, final ItemMap itemMap) { // TokenEnchant???
+	private void enchantPane(final Player player, final ItemMap itemMap) {
 		Interface enchantPane = new Interface(true, 6, this.GUIName);
 		enchantPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> {
 			this.creatingPane(player, itemMap);
@@ -4852,6 +4852,19 @@ public class UI {
 	}
 	
 //  ==============================================================================================================================================================================================================================================================
+	
+   /**
+    * Attemps to close all online players inventories, 
+    * if they are found to have the plugin UI open.
+    * 
+    */
+	public void closeMenu() {
+		PlayerHandler.getPlayer().forOnlinePlayers(player -> { 
+			if (this.isOpen(player) || this.modifyMenu(player)) {
+				player.closeInventory();
+			}
+		});
+	}
 	
    /**
     * Sets the Player to the Modify Menu.

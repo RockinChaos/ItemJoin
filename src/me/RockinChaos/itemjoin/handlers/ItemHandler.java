@@ -370,7 +370,6 @@ public class ItemHandler {
     * @param player - The Player to have its crafting items saved.
     */
     public void saveCraftItems(final Player player) {
-    	try {
 			if (InventoryCrafting.getCreativeCraftItems().containsKey(PlayerHandler.getPlayer().getPlayerID(player))) {
 				Inventory inv = Bukkit.createInventory(null, 9);
 				boolean notNull = false;
@@ -398,8 +397,7 @@ public class ItemHandler {
 					if (craftingContents[k] != null && craftingContents[k].getType() != Material.AIR) { notNull = true; }
 				}
 				if (notNull) { SQLite.getLite(false).saveReturnCraftItems(player, inv); }
-			} 
-    	} catch (Exception e) { }
+			}
     }
     
    /**

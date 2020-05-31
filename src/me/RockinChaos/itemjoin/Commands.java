@@ -198,7 +198,7 @@ public class Commands implements CommandExecutor {
 			this.handleItems(sender, args, true);
 		} else if (Execute.REMOVEALL.accept(sender, args, 0)) {
 			this.handleAllItems(sender, args, true);
-		} else if (Execute.AUTOUPDATE.accept(sender, args, 0)) {
+		} else if (Execute.UPDATE.accept(sender, args, 0)) {
 			LanguageAPI.getLang(false).sendLangMessage("Commands.Updates.checking", sender);
 			UpdateHandler.getUpdater(false).checkUpdates(sender, false);
 		} else if (Execute.AUTOUPDATE.accept(sender, args, 0)) {
