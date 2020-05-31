@@ -26,6 +26,7 @@ import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.handlers.UpdateHandler;
+import me.RockinChaos.itemjoin.utils.UI;
 import me.RockinChaos.itemjoin.utils.protocol.ProtocolManager;
 import me.RockinChaos.itemjoin.utils.sqlite.SQLite;
 
@@ -46,8 +47,7 @@ public class ItemJoin extends JavaPlugin {
     */
   	@Override
 	public void onEnable() {
-        ConfigHandler.getConfig(true);
-        ConfigHandler.getConfig(false).registerEvents();
+        ConfigHandler.getConfig(true).registerEvents();
         UpdateHandler.getUpdater(true);
         ServerHandler.getServer().logInfo("has been Enabled.");
   	}
@@ -57,8 +57,9 @@ public class ItemJoin extends JavaPlugin {
     */
   	@Override
 	public void onDisable() {
-  		ItemHandler.getItem().purgeCraftItems(true);
   		Bukkit.getScheduler().cancelTasks(this);
+  		UI.getCreator().closeMenu();
+  		ItemHandler.getItem().purgeCraftItems(true);
 	  	SQLite.getLite(false).executeLaterStatements();
 	  	ProtocolManager.getManager().closeProtocol();
   		ServerHandler.getServer().logInfo("has been Disabled.");
