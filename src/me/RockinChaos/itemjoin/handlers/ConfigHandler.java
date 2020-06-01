@@ -326,7 +326,7 @@ public class ConfigHandler {
     * @return The list of options defined for the custom item.
     */
 	public ConfigurationSection getItemSection(final String nodeName) {
-		return this.getConfigurationSection().getConfigurationSection(nodeName);
+		return (this.getConfigurationSection() != null ? this.getConfigurationSection().getConfigurationSection(nodeName) : null);
 	}
 	
    /**
