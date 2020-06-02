@@ -151,7 +151,7 @@ items:
       '4': <delay:20>MAGENTA_STAINED_GLASS_PANE
       '5': <delay:20>ORANGE_STAINED_GLASS_PANE
       '6': <delay:20>RED_STAINED_GLASS_PANE
-    slot: Arbitrary, Arbitrary, Arbitrary, Arbitrary
+    slot: ARBITRARY, ARBITRARY, ARBITRARY, ARBITRARY
     name: '&f'
     itemflags: animate, inventory-modify, placement, death-drops, self-drops
     triggers: join, world-switch
@@ -335,3 +335,32 @@ items:
     itemflags: inventory-modify, death-drops, self-drops, unbreakable
     triggers: join
     enabled-worlds: world, world_nether, world_the_end
+  drop-item:
+    id: IRON_SWORD
+    slot: ARBITRARY
+    name: '&cStolen Sword'
+    lore:
+    - '&7Pulled from the ashes of chaos.'
+    mobs-drop:
+    - 'ZOMBIE:0.001'
+    - 'PIG:0.3'
+    blocks-drop:
+    - 'DIAMOND_ORE:0.5'
+    - 'GOLD_ORE:0.19'
+    triggers: DISABLED
+    enabled-worlds: world, world_the_end
+  recipe-item:
+    id: BEDROCK
+    slot: ARBITRARY
+    name: '&6Essence'
+    lore:
+    - '&7Shhhh don''t tell anyone...'
+    recipe:
+    - 'XGX'
+    - 'IDI'
+    - 'XGX'
+    ingredients:
+    - 'G:GOLD_INGOT'
+    - 'I:IRON_INGOT'
+    - 'D:DIAMOND'
+    triggers: DISABLED
