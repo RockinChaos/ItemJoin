@@ -184,16 +184,14 @@ public class InventoryCrafting implements Listener {
     	final Player player = (Player) event.getPlayer();
     	final ItemStack item = event.getItemDrop().getItemStack().clone();
     	if (player.getHealth() > 0 && !event.isCancelled()) {
-	    	event.getItemDrop().getItemStack().setItemMeta(null);
-	    	event.getItemDrop().remove();
+    		final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item, null, player.getWorld());
 	    	Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
 	    		@Override
 	    		public void run() {
-	    			ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item, null, player.getWorld());
 	    			if (itemMap != null && !event.isCancelled() && worldSwitch.containsKey(PlayerHandler.getPlayer().getPlayerID(player)) && worldSwitch.get(PlayerHandler.getPlayer().getPlayerID(player))) {
-		    			boolean isCrafting = itemMap.isCraftingItem();
-	    				if (!isCrafting) { dropItem(player, item); }
-	    			} else { dropItem(player, item); }
+	    				event.getItemDrop().getItemStack().setItemMeta(null);
+	    				event.getItemDrop().remove();
+	    			}
 	    		}
 	    	}, 2L);
     	}
