@@ -18,6 +18,7 @@
 package me.RockinChaos.itemjoin.utils;
 
 import java.lang.reflect.Field;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,6 +37,7 @@ import org.bukkit.block.banner.Pattern;
 import org.bukkit.block.banner.PatternType;
 import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -97,7 +99,7 @@ public class UI {
 		pagedPane.addButton(new Button(this.exitItem, event -> player.closeInventory()));
 		pagedPane.addButton(new Button(this.fillerPaneBItem), 2);
 		pagedPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "WRITABLE_BOOK" : "386"), 1, false, "&a&l&nCreate", "&7", "&7*Create a new item from scratch."),
-				event -> this.materialPane(player, new ItemMap(ItemDesigner.getDesigner(false), "item_" + Utils.getUtils().getPath(1), "ARBITRARY"), 0)));
+				event -> this.materialPane(player, new ItemMap(ItemDesigner.getDesigner(false), "item_" + Utils.getUtils().getPath(1), "ARBITRARY"), 0, 0)));
 		pagedPane.addButton(new Button(ItemHandler.getItem().getItem("HOPPER", 1, false, "&e&l&nSave", "&7", "&7*Save an existing item as a custom item."), event -> this.startHopper(player)));
 		pagedPane.addButton(new Button(ItemHandler.getItem().getItem("NAME_TAG", 1, false, "&c&l&nModify", "&7", "&7*Modify an existing custom item"), event -> this.startModify(player)));
 		pagedPane.addButton(new Button(this.fillerPaneBItem), 2);
@@ -443,7 +445,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void creatingPane(final Player player, final ItemMap itemMap) {
-		Interface creatingPane = new Interface(false, 4, this.GUIName);
+		Interface creatingPane = new Interface(false, 5, this.GUIName);
 		String slotList = "";
 		String slotString = "";
 		if (Utils.getUtils().nullCheck(itemMap.getMultipleSlots().toString()) != "NONE") {
@@ -512,7 +514,7 @@ public class UI {
 			if (itemMap.getDynamicMaterials() != null && !itemMap.getDynamicMaterials().isEmpty()) {
 				this.animateMaterialPane(player, itemMap);
 			} else {
-				this.materialPane(player, itemMap, 1);
+				this.materialPane(player, itemMap, 1, 0);
 			}
 			}));
 		creatingPane.addButton(new Button(ItemHandler.getItem().getItem("GLASS", 1, false, "&c&lSlot", "&7", "&7*Set the slot that the", "&7item will be given in.", (itemMap.getMultipleSlots() != null && 
@@ -555,7 +557,7 @@ public class UI {
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
 			this.creatingPane(event.getPlayer(), itemMap);
 		}));
-		creatingPane.addButton(new Button(ItemHandler.getItem().setDurability(ItemHandler.getItem().getItem("DIAMOND_BOOTS", 1, false, "&b&lData", "&7", "&7*Set the damage or the", "&7custom texture of the item."), 160), event -> { this.dataPane(player, itemMap); }));
+		creatingPane.addButton(new Button(ItemHandler.getItem().setDurability(ItemHandler.getItem().getItem("DIAMOND_BOOTS", 1, false, "&e&lData", "&7", "&7*Set the damage or the", "&7custom texture of the item."), 160), event -> { this.dataPane(player, itemMap); }));
 		creatingPane.addButton(new Button(ItemHandler.getItem().getItem("BOOK", 1, false, "&e&lCommand Settings", "&7", "&7*Define commands for the item", "&7which execute upon being", "&7interacted with."), event -> this.commandPane(player, itemMap)));
 		creatingPane.addButton(new Button(ItemHandler.getItem().getItem("ENCHANTED_BOOK", 1, false, "&b&lEnchantments", "&7", "&7*Add enchants to make the", "&7item sparkle and powerful.", "&9&lENCHANTMENTS: &a" + 
 		(Utils.getUtils().nullCheck(itemMap.getEnchantments().toString()) != "NONE" ? "&a" + enchantList : "NONE")), event -> this.enchantPane(player, itemMap)));
@@ -614,6 +616,14 @@ public class UI {
 				this.usePane(player, itemMap);
 			}
 		}));
+		creatingPane.addButton(new Button(ItemHandler.getItem().getItem("GOLD_INGOT", 1, false, "&e&lDrop Chances", "&7", "&7*Define the drop chance for receiving", "&7this item from mobs or breaking blocks."), event -> {
+				this.dropsPane(player, itemMap);
+		}));
+		creatingPane.addButton(new Button(this.fillerPaneGItem), 3);
+		creatingPane.addButton(new Button(ItemHandler.getItem().getItem("58", 1, false, "&b&lRecipe", "&7", "&7*Define the recipe to be", "&7able to craft this item.", "&9Enabled: &a" + (itemMap.getIngredients() != null && !itemMap.getIngredients().isEmpty() ? "YES" : "NONE")), event -> {
+				this.recipePane(player, itemMap);
+		}));
+		creatingPane.addButton(new Button(this.fillerPaneGItem), 1);
 		if (itemMap.getMaterial().toString().contains("MAP")) {
 			creatingPane.addButton(new Button(ItemHandler.getItem().getItem("FEATHER", 1, false, "&e&lMap Image", "&7", "&7*Adds a custom map image that", "&7will be displayed when held.", "&7", "&7Place the custom map image", 
 					"&7in the MAIN ItemJoin folder.", "&7", "&7The map CAN be a GIF but", "&7must be a 128x128 pixel image.", "&9&lImage: &a" + Utils.getUtils().nullCheck(itemMap.getMapImage())), event -> {
@@ -673,6 +683,7 @@ public class UI {
 				}
 			}));
 		}
+		creatingPane.addButton(new Button(this.fillerPaneGItem), 3);
 		creatingPane.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nMain Menu", "&7", "&7*Cancel and return to the main menu.", "&7", "&c&lWARNING: &7This item has NOT been saved!"), event -> this.returnConfirm(player, itemMap)));
 		creatingPane.addButton(new Button(this.fillerPaneBItem), 3);
 		if (ServerHandler.getServer().hasSpecificUpdate("1_8")) {
@@ -781,15 +792,19 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     * @param stage - The stage of the modification.
     */
-	private void materialPane(final Player player, final ItemMap itemMap, final int stage) {
+	private void materialPane(final Player player, final ItemMap itemMap, final int stage, final int position) {
 		Interface materialPane = new Interface(true, 6, this.GUIName);
-		if (stage != 0 && stage != 2) {
+		if (stage != 0 && stage != 2 && stage != 3) {
 			materialPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> {
 				this.creatingPane(player, itemMap);
 			}));
 		} else if (stage == 2) {
 			materialPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the commands menu."), event -> {
 				this.commandPane(player, itemMap);
+			}));
+		} else if (stage == 3) {
+			materialPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the recipe menu."), event -> {
+				this.recipePane(player, itemMap);
 			}));
 		}
 		materialPane.addButton(new Button(ItemHandler.getItem().getItem("STICK", 1, true, "&b&lBukkit Material", "&7", "&7*If you know the name", "&7of the BUKKIT material type", "&7simply click and type it."), event -> {
@@ -807,12 +822,14 @@ public class UI {
 			if (ItemHandler.getItem().getMaterial(event.getMessage(), null) != null) {
 				if (stage == 2) {
 					itemMap.setItemCost(event.getMessage().toUpperCase());
-				} else { itemMap.setMaterial(ItemHandler.getItem().getMaterial(event.getMessage(), null)); }
-				if (!ServerHandler.getServer().hasSpecificUpdate("1_13") && event.getMessage().contains(":")) {
-					String[] dataValue = event.getMessage().split(":");
-					if (Utils.getUtils().isInt(dataValue[1])) {
-						itemMap.setDataValue((short)Integer.parseInt(dataValue[1]));
-					}	
+				} else if (stage != 3) { 
+					itemMap.setMaterial(ItemHandler.getItem().getMaterial(event.getMessage(), null)); 
+					if (!ServerHandler.getServer().hasSpecificUpdate("1_13") && event.getMessage().contains(":")) {
+						String[] dataValue = event.getMessage().split(":");
+						if (Utils.getUtils().isInt(dataValue[1])) {
+							itemMap.setDataValue((short)Integer.parseInt(dataValue[1]));
+						}	
+					}
 				}
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				if (stage == 2) {
@@ -821,7 +838,9 @@ public class UI {
 					placeHolders[14] = "BUKKIT MATERIAL";
 				}
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
-				if (stage == 2) {
+				if (stage == 3) {
+					this.setIngredients(event.getPlayer(), itemMap, ItemHandler.getItem().getMaterial(event.getMessage(), null), position);
+				} else if (stage == 2) {
 					this.commandPane(event.getPlayer(), itemMap);
 				} else {
 					this.creatingPane(event.getPlayer(), itemMap);
@@ -830,7 +849,7 @@ public class UI {
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[16] = event.getMessage();
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.noMatch", player, placeHolders);
-				this.materialPane(player, itemMap, stage);
+				this.materialPane(player, itemMap, stage, position);
 			}
 		}));
 		ServerHandler.getServer().runAsyncThread(main -> {
@@ -841,15 +860,19 @@ public class UI {
 						for (int i = 0; i <= LegacyAPI.getLegacy().getDataValue(material); i++) {
 							if (!material.toString().equalsIgnoreCase("STEP") || material.toString().equalsIgnoreCase("STEP") && i != 2) {
 								final int dataValue = i;
-								materialPane.addButton(new Button(ItemHandler.getItem().getItem(material.toString() + ":" + dataValue, 1, false, "", "&7", "&7*Click to set the", "&7material of the item."), event -> {
+								materialPane.addButton(new Button(ItemHandler.getItem().getItem(material.toString() + ":" + dataValue, 1, false, "", "&7", "&7*Click to set the material."), event -> {
 									if (stage == 2) {
 										itemMap.setItemCost(material.toString());
-									} else { itemMap.setMaterial(material); }
-									if (dataValue != 0) { itemMap.setDataValue((short)dataValue); }
+									} else if (stage != 3) { 
+										itemMap.setMaterial(material); 
+										if (dataValue != 0) { itemMap.setDataValue((short)dataValue); }
+									}
 									if (stage == 0) {
 										this.switchPane(player, itemMap, 0);
 									} else if (stage == 2) {
 										this.commandPane(player, itemMap);
+									} else if (stage == 3) {
+										this.setIngredients(player, itemMap, material, position);
 									} else {
 										this.creatingPane(player, itemMap);
 									}
@@ -857,14 +880,16 @@ public class UI {
 							}
 						}
 					} else {
-					materialPane.addButton(new Button(ItemHandler.getItem().getItem(material.toString(), 1, false, "", "&7", "&7*Click to set the", "&7material of the item."), event -> {
+					materialPane.addButton(new Button(ItemHandler.getItem().getItem(material.toString(), 1, false, "", "&7", "&7*Click to set the material."), event -> {
 						if (stage == 2) {
 							itemMap.setItemCost(material.toString());
-						} else { itemMap.setMaterial(material); }
+						} else if (stage != 3) { itemMap.setMaterial(material); }
 						if (stage == 0) {
 							this.switchPane(player, itemMap, 0);
 						} else if (stage == 2) { 
 							this.commandPane(player, itemMap);
+						} else if (stage == 3) {
+							this.setIngredients(player, itemMap, material, position);
 						} else {
 							this.creatingPane(player, itemMap);
 						}
@@ -890,9 +915,9 @@ public class UI {
 		if (stage == 0) {
 			if (ServerHandler.getServer().hasSpecificUpdate("1_8")) {
 				slotPane.addButton(new Button(ItemHandler.getItem().setSkullTexture(ItemHandler.getItem().getItem("SKULL_ITEM:3", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", "&7the material selection menu."), 
-						"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2RjOWU0ZGNmYTQyMjFhMWZhZGMxYjViMmIxMWQ4YmVlYjU3ODc5YWYxYzQyMzYyMTQyYmFlMWVkZDUifX19"), event -> this.materialPane(player, itemMap, 0)));
+						"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2RjOWU0ZGNmYTQyMjFhMWZhZGMxYjViMmIxMWQ4YmVlYjU3ODc5YWYxYzQyMzYyMTQyYmFlMWVkZDUifX19"), event -> this.materialPane(player, itemMap, 0, 0)));
 			} else {
-				slotPane.addButton(new Button(ItemHandler.getItem().getItem("ARROW", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", "&7the material selection menu."), event -> this.materialPane(player, itemMap, 0)));
+				slotPane.addButton(new Button(ItemHandler.getItem().getItem("ARROW", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", "&7the material selection menu."), event -> this.materialPane(player, itemMap, 0, 0)));
 			}
 		} else { 
 			slotPane.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> this.creatingPane(player, itemMap)));
@@ -905,9 +930,9 @@ public class UI {
 		if (stage == 0) {
 			if (ServerHandler.getServer().hasSpecificUpdate("1_8")) {
 				slotPane.addButton(new Button(ItemHandler.getItem().setSkullTexture(ItemHandler.getItem().getItem("SKULL_ITEM:3", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", "&7the material selection menu."), 
-						"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2RjOWU0ZGNmYTQyMjFhMWZhZGMxYjViMmIxMWQ4YmVlYjU3ODc5YWYxYzQyMzYyMTQyYmFlMWVkZDUifX19"), event -> this.materialPane(player, itemMap, 0)));
+						"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2RjOWU0ZGNmYTQyMjFhMWZhZGMxYjViMmIxMWQ4YmVlYjU3ODc5YWYxYzQyMzYyMTQyYmFlMWVkZDUifX19"), event -> this.materialPane(player, itemMap, 0, 0)));
 			} else {
-				slotPane.addButton(new Button(ItemHandler.getItem().getItem("ARROW", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", "&7the material selection menu."), event -> this.materialPane(player, itemMap, 0)));
+				slotPane.addButton(new Button(ItemHandler.getItem().getItem("ARROW", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", "&7the material selection menu."), event -> this.materialPane(player, itemMap, 0, 0)));
 			}
 		} else { 
 			slotPane.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> this.creatingPane(player, itemMap)));
@@ -1491,7 +1516,7 @@ public class UI {
 				itemMap.setItemCost(null);
 				this.commandPane(player, itemMap);
 			} else {
-				this.materialPane(player, itemMap, 2);
+				this.materialPane(player, itemMap, 2, 0);
 			}
 		}));
 		commandPane.addButton(new Button(ItemHandler.getItem().getItem("DIAMOND", 1, false, "&a&lCost", "&7", "&7*Amount that the player will", "&7be charged upon successfully", "&7executing the commands.", "&9&lCOMMANDS-COST: &a" + 
@@ -2511,7 +2536,6 @@ public class UI {
 			}
 			this.flagPane(player, itemMap);
 		}));
-		flagPane.addButton(new Button(this.fillerPaneGItem));
 		flagPane.addButton(new Button(ItemHandler.getItem().getItem(itemMap.isCreativeBypass() ? "ENCHANTED_GOLDEN_APPLE" : "GOLDEN_APPLE", 1, itemMap.isCreativeBypass(), "&a&l&nCreativeBypass", "&7", 
 				"&a&lTrue&f:&7 Allows players who are in Creative", "&7to bypass any itemflags that add", "&7restrictions for this item.", "&7",
 				"&c&lFalse&f:&7 Players who are in Creative will", "&7be restricted by itemflags that add", "&7restrictions for this item.", "&7", 
@@ -2520,6 +2544,18 @@ public class UI {
 				itemMap.setCreativeBypass(false);
 			} else {
 				itemMap.setCreativeBypass(true);
+			}
+			this.flagPane(player, itemMap);
+		}));
+		flagPane.addButton(new Button(this.fillerPaneGItem));
+		flagPane.addButton(new Button(ItemHandler.getItem().getItem("LAPIS_LAZULI", 1, itemMap.isGlowing(), "&a&l&nGlowing", "&7", 
+				"&a&lTrue&f:&7 The item will glow as if it was enchanted!", "&7",
+				"&c&lFalse&f:&7 The item will not glow.", "&7", 
+				"&9&lENABLED: &a" + (itemMap.isGlowing() + "").toUpperCase()), event -> {
+			if (itemMap.isGlowing()) {
+				itemMap.setGlowing(false);
+			} else {
+				itemMap.setGlowing(true);
 			}
 			this.flagPane(player, itemMap);
 		}));
@@ -2547,15 +2583,14 @@ public class UI {
 			}
 			this.flagPane(player, itemMap);
 		}));
-		flagPane.addButton(new Button(this.fillerPaneGItem));
-		flagPane.addButton(new Button(ItemHandler.getItem().getItem("LAPIS_LAZULI", 1, itemMap.isGlowing(), "&a&l&nGlowing", "&7", 
-				"&a&lTrue&f:&7 The item will glow as if it was enchanted!", "&7",
-				"&c&lFalse&f:&7 The item will not glow.", "&7", 
-				"&9&lENABLED: &a" + (itemMap.isGlowing() + "").toUpperCase()), event -> {
-			if (itemMap.isGlowing()) {
-				itemMap.setGlowing(false);
+		flagPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "WRITABLE_BOOK" : "386"), 1, itemMap.isOverwritable(), "&a&l&nOverwrite", "&7", 
+				"&a&lTrue&f: &7Allows the item to overwrite", "&7any existing items in the defined slot.", "&7", 
+				"&c&lFalse&f:&7 The item will not overwrite other items.", "&7When the slot is full it", "&7will fail to give the item, unless", "&7the give-next or move-next flag is set to &a&lTrue&7.", "&7", 
+				"&9&lENABLED: &a" + (itemMap.isOverwritable() + "").toUpperCase()), event -> {
+			if (itemMap.isOverwritable()) {
+				itemMap.setOverwritable(false);
 			} else {
-				itemMap.setGlowing(true);
+				itemMap.setOverwritable(true);
 			}
 			this.flagPane(player, itemMap);
 		}));
@@ -2671,7 +2706,7 @@ public class UI {
 			}
 			this.flagPane(player, itemMap);
 		}));
-		flagPane.addButton(new Button(ItemHandler.getItem().getItem("MINECART", 1, itemMap.isMovement(), "&a&l&nInventory Modify", "&7", 
+		flagPane.addButton(new Button(ItemHandler.getItem().getItem("BEDROCK", 1, itemMap.isMovement(), "&a&l&nInventory Modify", "&7", 
 				"&a&lTrue&f: &7Prevents the item from being", "&7moved or switched to other slots", "&7and blocks placement in item-frames.", "&7",	
 				"&c&lFalse&f:&7 Allows the item to be moved", "&7freely inside the players inventory.", "&7", 
 				"&9&lENABLED: &a" + (itemMap.isMovement() + "").toUpperCase()), event -> {
@@ -2805,6 +2840,7 @@ public class UI {
 		}));
 		flagPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "WHEAT_SEEDS" : "295"), 1, itemMap.isAlwaysGive(), "&a&l&nAlways Give", "&7", 
 				"&a&lTrue&f: &7Gives the item every time the player", "&7performs one of the triggers actions.", "&7regardless of already having the item.", "&7",
+				"&cNOTE: &7Don't use this if you want only ONE instance of the item.", "&7",
 				"&c&lFalse&f: &7Normal item restrictions will apply.", "&7", 
 				"&9&lENABLED: &a" + (itemMap.isAlwaysGive() + "").toUpperCase()), event -> {
 			if (itemMap.isAlwaysGive()) {
@@ -2837,6 +2873,18 @@ public class UI {
 			}
 			this.flagPane(player, itemMap);
 		}));
+		flagPane.addButton(new Button(ItemHandler.getItem().getItem("MINECART", 1, itemMap.isMoveNext(), "&a&l&nMove Next", "&7", 
+				"&a&lTrue&f: &7Moves the existing item to the next available slot", "&7only if the defined slot already has an existing item.", 
+				"&cNOTE: &7The overwrite flag will not work.", "&7",
+				"&c&lFalse&f: &7The item will be only given in the defined slot.", "&7If an item is already in the slot the", "&7item wont be given, unless the overwrite", "&7flag is set to &l&aTrue&7.", "&7", 
+				"&9&lENABLED: &a" + (itemMap.isMoveNext() + "").toUpperCase()), event -> {
+			if (itemMap.isMoveNext()) {
+				itemMap.setMoveNext(false);
+			} else {
+				itemMap.setMoveNext(true);
+			}
+			this.flagPane(player, itemMap);
+		}));
 		flagPane.addButton(new Button(ItemHandler.getItem().getItem("DIAMOND_SWORD", 1, itemMap.isDropFull(), "&a&l&nDrop Full", "&7", 
 				"&a&lTrue&f: &7Drops the item on the ground if", "&7the players inventory is full.", "&7",
 				"&c&lFalse&f: &7Fails to give the item", "&7if the players inventory is full.", "&7", 
@@ -2845,17 +2893,6 @@ public class UI {
 				itemMap.setDropFull(false);
 			} else {
 				itemMap.setDropFull(true);
-			}
-			this.flagPane(player, itemMap);
-		}));
-		flagPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "WRITABLE_BOOK" : "386"), 1, itemMap.isOverwritable(), "&a&l&nOverwrite", "&7", 
-				"&a&lTrue&f: &7Allows the item to overwrite", "&7any existing items in the defined slot.", "&7", 
-				"&c&lFalse&f:&7 The item will not overwrite other items.", "&7When the slot is full it", "&7will fail to give the item, unless", "&7the give-next flag is set to &a&lTrue&7.", "&7", 
-				"&9&lENABLED: &a" + (itemMap.isOverwritable() + "").toUpperCase()), event -> {
-			if (itemMap.isOverwritable()) {
-				itemMap.setOverwritable(false);
-			} else {
-				itemMap.setOverwritable(true);
 			}
 			this.flagPane(player, itemMap);
 		}));
@@ -2903,6 +2940,7 @@ public class UI {
 		if (itemMap.isAlwaysGive()) { itemflags += "ALWAYS-GIVE, "; }
 		if (itemMap.isItemChangable()) { itemflags += "ITEM-CHANGABLE, "; }
 		if (itemMap.isGiveNext()) { itemflags += "GIVE-NEXT, "; }
+		if (itemMap.isMoveNext()) { itemflags += "MOVE-NEXT, "; }
 		if (itemMap.isDropFull()) { itemflags += "DROP-FULL, "; }
 		if (itemMap.isOverwritable()) { itemflags += "OVERWRITE, "; }
 		if (itemMap.isOpBypass()) { itemflags += "ALLOWOPBYPASS, "; }
@@ -4100,6 +4138,336 @@ public class UI {
 	
    /**
     * Opens the Pane for the Player.
+    * This Pane is for setting the drop chances.
+    * 
+    * @param player - The Player to have the Pane opened.
+    * @param itemMap - The ItemMap currently being modified.
+    */
+	private void dropsPane(final Player player, final ItemMap itemMap) {
+		Interface dropsPane = new Interface(false, 3, this.GUIName);
+		String mobs = "";
+		String blocks = "";
+		for (EntityType entity: itemMap.getMobsDrop().keySet()) { mobs += entity.name() + ", "; }
+		for (Material material: itemMap.getBlocksDrop().keySet()) { blocks += material.name() + ", "; }
+		dropsPane.addButton(new Button(this.fillerPaneBItem), 12);
+		dropsPane.addButton(new Button(ItemHandler.getItem().getItem("ZOMBIE_SPAWN_EGG", 1, false, "&b&lMobs Drop", "&7", "&7*Define mobs that are", "&7allowed to drop the item.", (!mobs.isEmpty() ? "&9&lMobs: &a" + mobs.substring(0, mobs.length() - 2) : "")), event -> {
+			this.mobsPane(player, itemMap);
+		}));
+		dropsPane.addButton(new Button(this.fillerPaneBItem));
+		dropsPane.addButton(new Button(ItemHandler.getItem().getItem("DIAMOND_ORE", 1, false, "&b&lBlocks Drop", "&7", "&7*Define blocks that are", "&7allowed to drop the item.", (!blocks.isEmpty() ? "&9&lBlocks: &a" + blocks.substring(0, mobs.length() - 2) : "")), event -> {
+			this.blocksPane(player, itemMap);
+		}));
+		dropsPane.addButton(new Button(this.fillerPaneBItem), 3);
+		dropsPane.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> this.creatingPane(player, itemMap)));
+		dropsPane.addButton(new Button(this.fillerPaneBItem), 7);
+		dropsPane.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> this.creatingPane(player, itemMap)));
+		dropsPane.open(player);
+	}
+	
+   /**
+    * Opens the Pane for the Player.
+    * This Pane is for setting the mobs drop chances.
+    * 
+    * @param player - The Player to have the Pane opened.
+    * @param itemMap - The ItemMap currently being modified.
+    */
+	private void mobsPane(final Player player, final ItemMap itemMap) {
+		Interface dropsPane = new Interface(true, 6, this.GUIName);
+		dropsPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the drop chances menu."), event -> this.dropsPane(player, itemMap)));
+		ServerHandler.getServer().runAsyncThread(main -> { 
+			for (EntityType entity: EntityType.values()) {
+				if (itemMap.getMobsDrop().containsKey(entity)) {
+					dropsPane.addButton(new Button(ItemHandler.getItem().getItem("EGG", 1, (itemMap.getMobsDrop().containsKey(entity)), "&f" + entity.name(), "&7", "&7*Click to add this as", "&7a banner pattern.", 
+							(itemMap.getMobsDrop().containsKey(entity) ? "&9&lChance: &a" + itemMap.getMobsDrop().get(entity) : "")), event -> {
+						if (itemMap.getMobsDrop().containsKey(entity)) {
+							Map<EntityType, Double> mobsDrop = itemMap.getMobsDrop();
+							mobsDrop.remove(entity);
+							itemMap.setMobsDrop(mobsDrop);
+							this.mobsPane(player, itemMap);
+						} else {
+							this.chancePane(player, itemMap, entity, null);
+						}
+					}));
+				}
+			}
+			for (EntityType entity: EntityType.values()) {
+				if (!itemMap.getMobsDrop().containsKey(entity)) {
+					dropsPane.addButton(new Button(ItemHandler.getItem().getItem("EGG", 1, (itemMap.getMobsDrop().containsKey(entity)), "&f" + entity.name(), "&7", "&7*Click to add this as", "&7a banner pattern.", 
+							(itemMap.getMobsDrop().containsKey(entity) ? "&9&lChance: &a" + itemMap.getMobsDrop().get(entity) : "")), event -> {
+						if (itemMap.getMobsDrop().containsKey(entity)) {
+							Map<EntityType, Double> mobsDrop = itemMap.getMobsDrop();
+							mobsDrop.remove(entity);
+							itemMap.setMobsDrop(mobsDrop);
+							this.mobsPane(player, itemMap);
+						} else {
+							this.chancePane(player, itemMap, entity, null);
+						}
+					}));
+				}
+			}
+		});
+		dropsPane.open(player);
+	}
+	
+   /**
+    * Opens the Pane for the Player.
+    * This Pane is for setting the blocks drop chances.
+    * 
+    * @param player - The Player to have the Pane opened.
+    * @param itemMap - The ItemMap currently being modified.
+    */
+	private void blocksPane(final Player player, final ItemMap itemMap) {
+		Interface materialPane = new Interface(true, 6, this.GUIName);
+		materialPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the drop chances menu."), event -> {
+			this.dropsPane(player, itemMap);
+		}));
+		materialPane.addButton(new Button(ItemHandler.getItem().getItem("STICK", 1, true, "&b&lBukkit Material", "&7", "&7*If you know the name", "&7of the BUKKIT material type", "&7simply click and type it."), event -> {
+			player.closeInventory();
+			String[] placeHolders = LanguageAPI.getLang(false).newString();
+			placeHolders[14] = "BUKKIT MATERIAL";
+			placeHolders[15] = "IRON_SWORD";
+			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
+			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+		}, event -> {
+			if (ItemHandler.getItem().getMaterial(event.getMessage(), null) != null) {
+				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				placeHolders[14] = "BUKKIT MATERIAL";
+				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+				this.chancePane(player, itemMap, null, ItemHandler.getItem().getMaterial(event.getMessage(), null));
+			} else {
+				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				placeHolders[16] = event.getMessage();
+				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.noMatch", player, placeHolders);
+				this.blocksPane(player, itemMap);
+			}
+		}));
+		ServerHandler.getServer().runAsyncThread(main -> {
+		Inventory inventoryCheck = ItemJoin.getInstance().getServer().createInventory(null, 9, this.GUIName);
+			for (Material material: Material.values()) {
+				if (material.isBlock() && itemMap.getBlocksDrop().containsKey(material)) {
+					if (!material.name().contains("LEGACY") && material.name() != "AIR" && this.safeMaterial(ItemHandler.getItem().getItem(material.toString(), 1, false, "", ""), inventoryCheck)) {
+						if (!ServerHandler.getServer().hasSpecificUpdate("1_13") && LegacyAPI.getLegacy().getDataValue(material) != 0) {
+							for (int i = 0; i <= LegacyAPI.getLegacy().getDataValue(material); i++) {
+								if (!material.toString().equalsIgnoreCase("STEP") || material.toString().equalsIgnoreCase("STEP") && i != 2) {
+									final int dataValue = i;
+									materialPane.addButton(new Button(ItemHandler.getItem().getItem(material.toString() + ":" + dataValue, 1, (itemMap.getBlocksDrop().containsKey(material)), "", "&7", "&7*Click to set the material.",
+											(itemMap.getBlocksDrop().containsKey(material) ? "&9&lChance: &a" + itemMap.getBlocksDrop().get(material) : "")), event -> {
+										if (itemMap.getBlocksDrop().containsKey(material)) {
+											Map<Material, Double> blocksDrop = itemMap.getBlocksDrop();
+											blocksDrop.remove(material);
+											itemMap.setBlocksDrop(blocksDrop);
+											this.blocksPane(player, itemMap);
+										} else {
+											this.chancePane(player, itemMap, null, material);
+										}
+									}));
+								}
+							}
+						} else {
+						materialPane.addButton(new Button(ItemHandler.getItem().getItem(material.toString(), 1, (itemMap.getBlocksDrop().containsKey(material)), "", "&7", "&7*Click to set the material.",
+								(itemMap.getBlocksDrop().containsKey(material) ? "&9&lChance: &a" + itemMap.getBlocksDrop().get(material) : "")), event -> {
+							if (itemMap.getBlocksDrop().containsKey(material)) {
+								Map<Material, Double> blocksDrop = itemMap.getBlocksDrop();
+								blocksDrop.remove(material);
+								itemMap.setBlocksDrop(blocksDrop);
+								this.blocksPane(player, itemMap);
+							} else {
+								this.chancePane(player, itemMap, null, material);
+							}
+						}));
+						}
+					}
+				}
+			}
+			for (Material material: Material.values()) {
+				if (material.isBlock() && !itemMap.getBlocksDrop().containsKey(material)) {
+					if (!material.name().contains("LEGACY") && material.name() != "AIR" && this.safeMaterial(ItemHandler.getItem().getItem(material.toString(), 1, false, "", ""), inventoryCheck)) {
+						if (!ServerHandler.getServer().hasSpecificUpdate("1_13") && LegacyAPI.getLegacy().getDataValue(material) != 0) {
+							for (int i = 0; i <= LegacyAPI.getLegacy().getDataValue(material); i++) {
+								if (!material.toString().equalsIgnoreCase("STEP") || material.toString().equalsIgnoreCase("STEP") && i != 2) {
+									final int dataValue = i;
+									materialPane.addButton(new Button(ItemHandler.getItem().getItem(material.toString() + ":" + dataValue, 1, (itemMap.getBlocksDrop().containsKey(material)), "", "&7", "&7*Click to set the material.",
+											(itemMap.getBlocksDrop().containsKey(material) ? "&9&lChance: &a" + itemMap.getBlocksDrop().get(material) : "")), event -> {
+										if (itemMap.getBlocksDrop().containsKey(material)) {
+											Map<Material, Double> blocksDrop = itemMap.getBlocksDrop();
+											blocksDrop.remove(material);
+											itemMap.setBlocksDrop(blocksDrop);
+											this.blocksPane(player, itemMap);
+										} else {
+											this.chancePane(player, itemMap, null, material);
+										}
+									}));
+								}
+							}
+						} else {
+						materialPane.addButton(new Button(ItemHandler.getItem().getItem(material.toString(), 1, (itemMap.getBlocksDrop().containsKey(material)), "", "&7", "&7*Click to set the material.",
+								(itemMap.getBlocksDrop().containsKey(material) ? "&9&lChance: &a" + itemMap.getBlocksDrop().get(material) : "")), event -> {
+							if (itemMap.getBlocksDrop().containsKey(material)) {
+								Map<Material, Double> blocksDrop = itemMap.getBlocksDrop();
+								blocksDrop.remove(material);
+								itemMap.setBlocksDrop(blocksDrop);
+								this.blocksPane(player, itemMap);
+							} else {
+								this.chancePane(player, itemMap, null, material);
+							}
+						}));
+						}
+					}
+				}
+			}
+			inventoryCheck.clear();
+		});
+		materialPane.open(player);
+	}
+	
+   /**
+    * Opens the Pane for the Player.
+    * This Pane is for setting an items drop chances.
+    * 
+    * @param player - The Player to have the Pane opened.
+    * @param itemMap - The ItemMap currently being modified.
+    * @param entity - The Entity selected.
+    */
+	private void chancePane(final Player player, final ItemMap itemMap, final EntityType entity, final Material material) {
+		Interface chancePane = new Interface(true, 6, this.GUIName);
+		if (entity != null) {
+			chancePane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the mobs drop menu."), event -> {
+				this.mobsPane(player, itemMap);
+			}));
+		} else {
+			chancePane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the blocks drop menu."), event -> {
+				this.blocksPane(player, itemMap);
+			}));
+		}
+		chancePane.addButton(new Button(ItemHandler.getItem().getItem("STAINED_GLASS_PANE:7", 1, false, "&e&lCustom Drop Chance", "&7", "&7*Click to set a custom drop chance", "&7value for the item."), event -> {
+			player.closeInventory();
+			String[] placeHolders = LanguageAPI.getLang(false).newString();
+			placeHolders[14] = "DROP CHANCE";
+			placeHolders[15] = "0.001";
+			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
+			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+		}, event -> {
+			if (Utils.getUtils().isDouble(event.getMessage())) {
+				if (entity != null) { 
+					Map<EntityType, Double> mobsDrop = itemMap.getMobsDrop();
+					mobsDrop.put(entity, Double.parseDouble(event.getMessage()));
+					itemMap.setMobsDrop(mobsDrop);
+				} else {
+					Map<Material, Double> blocksDrop = itemMap.getBlocksDrop();
+					blocksDrop.put(material, Double.parseDouble(event.getMessage()));
+					itemMap.setBlocksDrop(blocksDrop);
+				}
+				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				placeHolders[14] = "DROP CHANCE";
+				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+			} else {
+				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				placeHolders[16] = event.getMessage();
+				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.notInteger", player, placeHolders);
+			}
+			if (entity != null) { this.mobsPane(event.getPlayer(), itemMap); }
+			else { this.blocksPane(event.getPlayer(), itemMap); }
+		}));
+		for (double i = 0.01; i < 1; i += 0.01) {
+			final double k = Double.parseDouble(new DecimalFormat("#.##").format(i));
+			chancePane.addButton(new Button(ItemHandler.getItem().getItem("STAINED_GLASS_PANE:10", 1, false, "&9&lCost: &a$&l" + k, "&7", "&7*Click to set the", "&7drop chance of the item."), event -> {
+				if (entity != null) { 
+					Map<EntityType, Double> mobsDrop = itemMap.getMobsDrop();
+					mobsDrop.put(entity, k);
+					itemMap.setMobsDrop(mobsDrop);
+					this.mobsPane(player, itemMap);
+				} else {
+					Map<Material, Double> blocksDrop = itemMap.getBlocksDrop();
+					blocksDrop.put(material, k);
+					itemMap.setBlocksDrop(blocksDrop);
+					this.blocksPane(player, itemMap);
+				}
+			}));
+		}
+		chancePane.open(player);
+	}
+	
+   /**
+    * Opens the Pane for the Player.
+    * This Pane is for setting the custom recipe.
+    * 
+    * @param player - The Player to have the Pane opened.
+    * @param itemMap - The ItemMap currently being modified.
+    */
+	private void recipePane(final Player player, final ItemMap itemMap) {
+		Interface recipePane = new Interface(false, 4, this.GUIName);
+		recipePane.addButton(new Button(this.fillerPaneBItem), 3);
+		for (int i = 0; i < 9; i++) {
+			final int k = i;
+			recipePane.addButton(new Button(ItemHandler.getItem().getItem((itemMap.getRecipe().size() > i && itemMap.getRecipe().get(i) != 'X' ? itemMap.getIngredients().get(itemMap.getRecipe().get(i)).toString(): "CHEST"), 1, false, 
+					(itemMap.getRecipe().size() > i ? "&e&l" + itemMap.getRecipe().get(i): "&e&lX"), "&7", "&7*Create a recipe that can be used"), event -> {
+				if ((itemMap.getRecipe().size() > k && itemMap.getRecipe().get(k) != 'X')) { this.setIngredients(player, itemMap, Material.AIR, k); } 
+				else { this.materialPane(player, itemMap, 3, k);}
+			}));
+			if (i == 2) {
+				recipePane.addButton(new Button(this.fillerPaneBItem), 6);
+			} else if (i == 5) {
+				recipePane.addButton(new Button(this.fillerPaneBItem));
+				recipePane.addButton(new Button(this.headerStack(player, itemMap)));
+				recipePane.addButton(new Button(this.fillerPaneBItem), 4);
+			} else if (i == 8) {
+				recipePane.addButton(new Button(this.fillerPaneBItem), 3);
+			}
+		}
+		recipePane.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> this.creatingPane(player, itemMap)));
+		recipePane.addButton(new Button(this.fillerPaneBItem), 7);
+		recipePane.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> this.creatingPane(player, itemMap)));
+		recipePane.open(player);
+	}
+	
+   /**
+    * Sets the recipe pattern and ingredients.
+    * 
+    * @param player - The Player to have the Pane opened.
+    * @param itemMap - The ItemMap currently being modified.
+    * @param material - The material to be set.
+    * @param position - The position in the crafting table being set.
+    */
+	private void setIngredients(final Player player, final ItemMap itemMap, final Material material, final int position) {
+		Map < Character, Material > ingredients = itemMap.getIngredients();
+		List < Character > recipe = itemMap.getRecipe();
+		char character = 'A';
+		for (char alphabet = 'A'; alphabet <= 'Z'; alphabet++) {
+			if (alphabet != 'X' && !ingredients.containsKey(alphabet)) {
+				character = alphabet;
+				break;
+			}
+		}
+		for (Character characters: ingredients.keySet()) {
+			if (ingredients.get(characters).equals(material)) {
+				character = characters;
+				break;
+			}
+		}
+		if (material != Material.AIR && !ingredients.containsValue(material)) {
+			ingredients.put(character, material);
+		} else if (material == Material.AIR) {
+			int count = 0;
+			for (Character recipes: recipe) {
+				if (recipes.equals(recipe.get(position))) {
+					count++;
+				}
+			}
+			if (count == 1) {
+				ingredients.remove(recipe.get(position));
+			}
+		}
+		while (position >= recipe.size()) {
+			recipe.add('X');
+		}
+		recipe.set(position, (material != Material.AIR ? character : 'X'));
+		itemMap.setRecipe(recipe);
+		itemMap.setIngredients(ingredients);
+		this.recipePane(player, itemMap);
+	}
+	
+   /**
+    * Opens the Pane for the Player.
     * This Pane is for modifying banner items.
     * 
     * @param player - The Player to have the Pane opened.
@@ -4786,6 +5154,10 @@ public class UI {
 				}
 			}
 		} else if (itemMap.getCommands().length == 0) { useCommands = false; }
+		String mobs = "";
+		for (EntityType entity: itemMap.getMobsDrop().keySet()) { mobs += entity.name() + ", "; }
+		String blocks = "";
+		for (Material material: itemMap.getBlocksDrop().keySet()) { blocks += material.name() + ", "; }
 		try {
 			item = ItemHandler.getItem().getItem(itemMap.getMaterial().toString() + ":" + itemMap.getDataValue(), 1, false, "&7*&6&l&nItem Information", "&7", "&9&lNode: &a" + itemMap.getConfigName(), "&9&lMaterial: &a" 
 			+ itemMap.getMaterial().toString() + (itemMap.getDataValue() != 0 ? ":" + itemMap.getDataValue() : ""), 
@@ -4807,7 +5179,8 @@ public class UI {
 					(Utils.getUtils().nullCheck(itemMap.getInteractCooldown() + "&7") != "NONE" ? "&9&lUse-Cooldown: &a" + itemMap.getInteractCooldown() : ""), 
 					(Utils.getUtils().nullCheck(itemMap.getLeatherColor()) != "NONE" ? "&9&lLeather Color: &a" + itemMap.getLeatherColor() : ""), (Utils.getUtils().nullCheck(itemMap.getLeatherHex()) != "NONE" ? "&9&lLeather Color: &a" + itemMap.getLeatherHex() : ""),
 					(Utils.getUtils().nullCheck(itemMap.getMapImage()) != "NONE" ? "&9&lMap-Image: &a" + itemMap.getMapImage() : ""), (Utils.getUtils().nullCheck(itemMap.getChargeColor() + "") != "NONE" ? "&9&lCharge Color: &a" + itemMap.getChargeColor() : ""),
-					(Utils.getUtils().nullCheck(patternList) != "NONE" ? "&9&lBanner Meta: &a" + patternList : ""), (Utils.getUtils().nullCheck(potionList) != "NONE" ? "&9&lPotion-Effects: &a" + potionList : ""), 
+					(Utils.getUtils().nullCheck(patternList) != "NONE" ? "&9&lBanner Meta: &a" + patternList : ""), (Utils.getUtils().nullCheck(potionList) != "NONE" ? "&9&lPotion-Effects: &a" + potionList : ""), (itemMap.getIngredients() != null && !itemMap.getIngredients().isEmpty() ? "&9&lRecipe: &aYES" : ""),
+					(!mobs.isEmpty() ? "&9&lMobs Drop: &a" + mobs.substring(0, mobs.length() - 2) : ""), (!blocks.isEmpty() ? "&9&lBlocks Drop: &a" + blocks.substring(0, blocks.length() - 2) : ""),
 					(Utils.getUtils().nullCheck(itemMap.getPages() + "") != "NONE" ? "&9&lBook Pages: &aYES" : ""),
 					(Utils.getUtils().nullCheck(itemMap.getAuthor()) != "NONE" ? "&9&lBook Author: &a" + itemMap.getAuthor() : ""), (Utils.getUtils().nullCheck(itemMap.getSkull()) != "NONE" ? "&9&lSkull-Owner: &a" + itemMap.getSkull() : ""), 
 					(Utils.getUtils().nullCheck(itemMap.getSkullTexture()) != "NONE" ? "&9&lSkull-Texture: &a" + (itemMap.getSkullTexture().length() > 40 ? itemMap.getSkullTexture().substring(0, 40) : itemMap.getSkullTexture()) : ""), 

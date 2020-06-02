@@ -19,6 +19,7 @@ package me.RockinChaos.itemjoin.giveitems.utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
@@ -29,6 +30,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.Recipe;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import me.RockinChaos.itemjoin.ItemJoin;
@@ -705,6 +707,22 @@ public class ItemUtilities {
 	}
 	
    /**
+    * Clears any crafting recipes for the custom items.
+    * 
+    */
+  	public void clearRecipes() {
+  		Iterator < Recipe > recipes = Bukkit.getServer().recipeIterator();
+  		while (recipes.hasNext()) {
+  			Recipe result = recipes.next();
+  			for (ItemMap itemMap: this.getItems()) {
+  				if (itemMap.isSimilar(result.getResult())) {
+  					recipes.remove();
+  				}
+  			}
+  		}
+  	}
+	
+   /**
     * Creates a duplicate items HashMap.
     * 
     * @return The duplicated items HashMap.
@@ -740,6 +758,7 @@ public class ItemUtilities {
     * 
     */
 	public void clearItems() {
+		this.clearRecipes();
 		this.items = new ArrayList < ItemMap >();
 	}
 	

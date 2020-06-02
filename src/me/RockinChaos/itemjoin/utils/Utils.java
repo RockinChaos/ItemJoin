@@ -212,6 +212,21 @@ public class Utils {
 	}
 	
    /**
+    * Gets the number of characters in the String.
+    * 
+    * @param str - The String to be checked.
+    * @return The number of characters in the String..
+    */
+	public int countCharacters(final String str) {
+		int count = 0;
+		for (int i = 0; i < str.length(); i++) {
+			if (Character.isLetter(str.charAt(i)))
+				count++;
+			}
+		return count;
+	}
+	
+   /**
     * Checks if the specified String is an Integer Value.
     * 
     * @param str - The String to be checked.
@@ -220,6 +235,19 @@ public class Utils {
 	public boolean isInt(final String str) {
 		try {
 			Integer.parseInt(str);
+		} catch (NumberFormatException e) { return false; }
+		return true;
+	}
+	
+   /**
+    * Checks if the specified String is an Double Value.
+    * 
+    * @param str - The String to be checked.
+    * @return If the String is an Double Value.
+    */
+	public boolean isDouble(final String str) {
+		try {
+			Double.parseDouble(str);
 		} catch (NumberFormatException e) { return false; }
 		return true;
 	}
@@ -308,7 +336,7 @@ public class Utils {
 		}
 		return null;
 	}
-	
+ 
    /**
     * Gets a random Integer between the upper and lower limits.
     * 
@@ -317,8 +345,7 @@ public class Utils {
     * @return The randomly selected Integer between the limits.
     */
 	public int getRandom(final int lower, final int upper) {
-		Random random = new Random();
-		return random.nextInt((upper - lower) + 1) + lower;
+		return new Random().nextInt((upper - lower) + 1) + lower;
 	}
 	
    /**

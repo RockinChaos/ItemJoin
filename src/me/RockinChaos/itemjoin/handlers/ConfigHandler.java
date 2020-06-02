@@ -39,15 +39,17 @@ import me.RockinChaos.itemjoin.giveitems.listeners.Respawn;
 import me.RockinChaos.itemjoin.giveitems.listeners.WorldSwitch;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemDesigner;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
+import me.RockinChaos.itemjoin.listeners.BlocksDrop;
 import me.RockinChaos.itemjoin.listeners.Consumes;
 import me.RockinChaos.itemjoin.listeners.Drops;
 import me.RockinChaos.itemjoin.listeners.Interact;
 import me.RockinChaos.itemjoin.listeners.InventoryClick;
 import me.RockinChaos.itemjoin.listeners.InventoryCrafting;
 import me.RockinChaos.itemjoin.listeners.Menu;
+import me.RockinChaos.itemjoin.listeners.MobsDrop;
 import me.RockinChaos.itemjoin.listeners.Pickups;
 import me.RockinChaos.itemjoin.listeners.Placement;
-import me.RockinChaos.itemjoin.listeners.Recipes;
+import me.RockinChaos.itemjoin.listeners.Modify;
 import me.RockinChaos.itemjoin.listeners.Storable;
 import me.RockinChaos.itemjoin.listeners.SwitchHands;
 import me.RockinChaos.itemjoin.utils.LogFilter;
@@ -366,6 +368,12 @@ public class ConfigHandler {
 		if ((itemMap.isAnimated() || itemMap.isDynamic()) && !Utils.getUtils().isRegistered(PlayerQuit.class.getSimpleName())) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerQuit(), ItemJoin.getInstance());
 		}
+		if (itemMap.mobsDrop() && !Utils.getUtils().isRegistered(MobsDrop.class.getSimpleName())) {
+			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new MobsDrop(), ItemJoin.getInstance());
+		}
+		if (itemMap.blocksDrop() && !Utils.getUtils().isRegistered(BlocksDrop.class.getSimpleName())) {
+			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new BlocksDrop(), ItemJoin.getInstance());
+		}
 		if (itemMap.isCraftingItem() && !Utils.getUtils().isRegistered(InventoryCrafting.class.getSimpleName())) {
 			InventoryCrafting.cycleTask();
 			Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
@@ -405,8 +413,8 @@ public class ConfigHandler {
 				LegacyAPI.getLegacy().registerConsumes();
 			}
 		}
-		if ((itemMap.isItemRepairable() || itemMap.isItemCraftable()) && !Utils.getUtils().isRegistered(Recipes.class.getSimpleName())) {
-			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Recipes(), ItemJoin.getInstance());
+		if ((itemMap.isItemRepairable() || itemMap.isItemCraftable()) && !Utils.getUtils().isRegistered(Modify.class.getSimpleName())) {
+			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Modify(), ItemJoin.getInstance());
 		}
 		if (itemMap.isItemStore() || itemMap.isItemModify()) {
 			if (ServerHandler.getServer().hasSpecificUpdate("1_8") && !Utils.getUtils().isRegistered(Storable.class.getSimpleName())) {
