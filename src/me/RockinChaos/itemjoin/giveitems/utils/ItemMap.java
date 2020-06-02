@@ -20,6 +20,7 @@ package me.RockinChaos.itemjoin.giveitems.utils;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -41,6 +42,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -136,6 +138,9 @@ public class ItemMap {
     private List <PotionEffect> effect = new ArrayList<PotionEffect>();
     private List <Pattern> bannerPatterns = new ArrayList<Pattern>();
     
+    private Map < Character, Material > ingredients = new HashMap < Character, Material > ();
+    private List <Character> recipe = Arrays.asList( 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X' );
+    
     private String leatherColor;
     private String leatherHex;
     
@@ -147,6 +152,13 @@ public class ItemMap {
 	private HashMap < String, Long > storedSpammedPlayers = new HashMap < String, Long > ();
 	private int spamtime = 1;
 	
+	
+//  ============================================== //
+//         Drop Chances for each item.          //
+//  ============================================== //
+	private Map < EntityType, Double > mobsDrop = new HashMap < EntityType, Double > ();
+	private Map < Material, Double > blocksDrop = new HashMap < Material, Double > ();
+//  ============================================== //
 	
 //  ============================================== //
 //         NBT Information for each item.          //
@@ -811,6 +823,24 @@ public class ItemMap {
 	}
 	
    /**
+    * Sets the MobsDrop.
+    * 
+    * @param mobsDrop - The mobsDrop to be set.
+    */
+	public void setMobsDrop(final Map<EntityType, Double> mobsDrop) {
+		this.mobsDrop = mobsDrop;
+	}
+	
+   /**
+    * Sets the BlocksDrop.
+    * 
+    * @param blocksDrop - The blocksDrop to be set.
+    */
+	public void setBlocksDrop(final Map<Material, Double> blocksDrop) {
+		this.blocksDrop = blocksDrop;
+	}
+	
+   /**
     * Sets the Probability.
     * 
     * @param probability - The Probability to be set.
@@ -893,6 +923,24 @@ public class ItemMap {
     */
 	public void setBannerPatterns(final List <Pattern> patterns) {
 		this.bannerPatterns = patterns;
+	}
+	
+   /**
+    * Sets the recipe ingredients.
+    * 
+    * @param ingredients - The recipe ingredients to be set.
+    */
+	public void setIngredients(final Map <Character, Material> ingredients) {
+		this.ingredients = ingredients;
+	}
+	
+   /**
+    * Sets the recipe pattern.
+    * 
+    * @param recipe - The recipe pattern to be set.
+    */
+	public void setRecipe(final List <Character> recipe) {
+		this.recipe = recipe;
 	}
 	
    /**
@@ -1812,6 +1860,42 @@ public class ItemMap {
 	}
 	
    /**
+    * Gets the current mobsDrops.
+    * 
+    * @return The mobsDrop Map.
+    */
+	public Map<EntityType, Double> getMobsDrop() {
+		return this.mobsDrop;
+	}
+	
+   /**
+    * Checks if mobs drop are enabled.
+    * 
+    * @return If mobs drop are enabled.
+    */
+	public boolean mobsDrop() {
+		return (this.mobsDrop != null && !this.mobsDrop.isEmpty());
+	}
+	
+   /**
+    * Gets the current blocksDrop.
+    * 
+    * @return The blocksDrop Map.
+    */
+	public Map<Material, Double> getBlocksDrop() {
+		return this.blocksDrop;
+	}
+	
+   /**
+    * Checks if blocks drop are enabled.
+    * 
+    * @return If blocks drop are enabled.
+    */
+	public boolean blocksDrop() {
+		return (this.blocksDrop != null && !this.blocksDrop.isEmpty());
+	}
+	
+   /**
     * Gets the Probability.
     * 
     * @return The Probability.
@@ -1896,6 +1980,24 @@ public class ItemMap {
     */
 	public List <Pattern> getBannerPatterns() {
 		return this.bannerPatterns;
+	}
+	
+   /**
+    * Gets the recipe ingredients.
+    * 
+    * @return The recipe ingredients.
+    */
+	public Map<Character, Material> getIngredients() {
+		return this.ingredients;
+	}
+	
+   /**
+    * Gets the recipe pattern.
+    * 
+    * @return The recipe pattern.
+    */
+	public List<Character> getRecipe() {
+		return this.recipe;
 	}
 	
    /**
@@ -4086,18 +4188,6 @@ public class ItemMap {
 	}
 	
    /**
-    * Removes this ItemMap instance from the items.yml.
-    * 
-    */
-	public void removeFromConfig() {
-		File itemFile =  new File (ItemJoin.getInstance().getDataFolder(), "items.yml");
-		FileConfiguration itemData = YamlConfiguration.loadConfiguration(itemFile);
-		if (ConfigHandler.getConfig(false).getFile("items.yml").getString("items." + this.configName) != null) { itemData.set("items." + this.configName, null); } 
-		try { itemData.save(itemFile); ConfigHandler.getConfig(false).getSource("items.yml"); ConfigHandler.getConfig(false).getFile("items.yml").options().copyDefaults(false); } 
-		catch (Exception e) { ItemJoin.getInstance().getServer().getLogger().severe("Could not remove the custom item " + this.configName + " from the items.yml data file!"); ServerHandler.getServer().sendDebugTrace(e); }	
-	}
-	
-   /**
     * Adds an ItemCommand to a Map.
     * 
     * @param map - The Map to have an ItemCommand addded.
@@ -4132,6 +4222,60 @@ public class ItemMap {
 			if (mapKey.equalsIgnoreCase("DEFAULT") && map.size() <= 1) { mapKey = ""; } else { mapKey = "." + mapKey; }
 			itemData.set("items." + this.configName + ".commands." + section + mapKey, mapElement.getValue()); 
 		}
+	}
+	
+   /**
+	* Gets the Shape of the Recipe of the Custom Item.
+	* 
+	* @return The trimmed recipe.
+	*/
+	public String[] trimRecipe(final List<String> list) {
+		List < Character > recipe = new ArrayList < Character > ();
+		List < String > recipeList = list;
+		String[] recipeShape = { "XXX", "XXX", "XXX" };
+		String[] shape = { "", "", "" };
+		for (int i = 0; i < recipeList.size(); i++) {
+			int charSize = 0;
+			for (String character: recipeList.get(i).split("(?<!^)")) {
+				StringBuilder sb = new StringBuilder(recipeShape[i]);
+				sb.setCharAt(charSize, character.charAt(0));
+				recipeShape[i] = sb.toString();
+				charSize++;
+			}
+			for (String character: recipeShape[i].split("(?<!^)")) { 
+				recipe.add(character.charAt(0));
+			}
+			shape[i] = recipeList.get(i).replace("X", " ");
+		}
+		this.setRecipe(recipe);
+		if ((shape[2].length() == 3 && shape[2].charAt(0) == ' ' && shape[2].charAt(1) == ' ' && shape[2].charAt(2) == ' ') || shape[2].isEmpty()) {
+			if (shape[0].length() == 3 && shape[0].charAt(2) == ' ' && shape[1].length() == 3 && shape[1].charAt(2) == ' ') {
+				shape = new String[] { shape[0].substring(0, shape[0].length() - 1), shape[1].substring(0, shape[1].length() - 1) };
+			} else if ((shape[0].length() == 3 && shape[0].charAt(0) == ' ' && shape[0].charAt(1) == ' ' && shape[0].charAt(2) == ' ') || shape[0].isEmpty()) {
+				shape = new String[] { shape[1] };
+			} else if ((shape[1].length() == 3 && shape[1].charAt(0) == ' ' && shape[1].charAt(1) == ' ' && shape[1].charAt(2) == ' ') || shape[1].isEmpty()) {
+				shape = new String[] { shape[0] };
+			} else {
+				shape = new String[] { shape[0], shape[1] };
+			}
+		} else if (shape[0].length() < 3 && shape[1].length() < 3 && shape[2].length() == 3 && shape[2].charAt(0) == ' ' && shape[2].charAt(1) == ' ' && shape[2].charAt(2) == ' ') {
+			shape = new String[] { shape[0], shape[1] };
+		} else if (shape[0].length() == 3 && shape[1].length() == 3 && shape[2].length() == 3 && shape[0].charAt(2) == ' ' && shape[1].charAt(2) == ' ' && shape[2].charAt(2) == ' ') {
+			shape = new String[] { shape[0].substring(0, shape[0].length() - 1), shape[1].substring(0, shape[1].length() - 1), shape[2].substring(0, shape[2].length() - 1) };
+		}
+		return shape;
+	}
+	
+   /**
+    * Removes this ItemMap instance from the items.yml.
+    * 
+    */
+	public void removeFromConfig() {
+		File itemFile =  new File (ItemJoin.getInstance().getDataFolder(), "items.yml");
+		FileConfiguration itemData = YamlConfiguration.loadConfiguration(itemFile);
+		if (ConfigHandler.getConfig(false).getFile("items.yml").getString("items." + this.configName) != null) { itemData.set("items." + this.configName, null); } 
+		try { itemData.save(itemFile); ConfigHandler.getConfig(false).getSource("items.yml"); ConfigHandler.getConfig(false).getFile("items.yml").options().copyDefaults(false); } 
+		catch (Exception e) { ItemJoin.getInstance().getServer().getLogger().severe("Could not remove the custom item " + this.configName + " from the items.yml data file!"); ServerHandler.getServer().sendDebugTrace(e); }	
 	}
 	
    /**
@@ -4290,6 +4434,43 @@ public class ItemMap {
 			String bannerList = "";
 			for (Pattern pattern : this.bannerPatterns) { bannerList += pattern.getColor().name() + pattern.getPattern().name() + ", "; }
 			itemData.set("items." + this.configName + ".banner-meta", bannerList.substring(0, bannerList.length() - 2)); 
+		}
+		if (this.recipe != null && !this.recipe.isEmpty() && this.ingredients != null && !this.ingredients.isEmpty()) {
+			List<String> ingredientList = new ArrayList<String>();
+			List<String> recipeTempList = new ArrayList<String>();
+			List<String> recipeList = new ArrayList<String>();
+			for (Character ingredient: this.ingredients.keySet()) { 
+				ingredientList.add(ingredient + ":" + this.ingredients.get(ingredient).toString());
+			}
+			String recipeLine = "";
+			for (Character recipeCharacter: this.recipe) {
+				recipeLine += recipeCharacter;
+				if (Utils.getUtils().countCharacters(recipeLine) == 3) {
+					recipeTempList.add(recipeLine);
+					recipeLine = "";
+				}
+			}
+			if (!recipeLine.isEmpty()) { 
+				while (Utils.getUtils().countCharacters(recipeTempList.get(0)) != Utils.getUtils().countCharacters(recipeLine)) { recipeLine += "X"; }
+				recipeTempList.add(recipeLine);  
+			}
+			for (String str: this.trimRecipe(recipeTempList)) { recipeList.add(str.replace(" ", "X")); }
+			itemData.set("items." + this.configName + ".recipe", recipeList);
+			itemData.set("items." + this.configName + ".ingredients", ingredientList);
+		}
+		if (this.mobsDrop()) {
+			List<String> mobsList = new ArrayList<String>();
+			for (EntityType mobs: this.mobsDrop.keySet()) { 
+				mobsList.add(mobs.name() + ":" + this.mobsDrop.get(mobs).toString());
+			}
+			itemData.set("items." + this.configName + ".mobs-drop", mobsList);
+		}
+		if (this.blocksDrop()) {
+			List<String> blocksList = new ArrayList<String>();
+			for (Material blocks: this.blocksDrop.keySet()) { 
+				blocksList.add(blocks.name() + ":" + this.blocksDrop.get(blocks).toString());
+			}
+			itemData.set("items." + this.configName + ".blocks-drop", blocksList);
 		}
 		if (this.effect != null && !this.effect.isEmpty()) { 
 			String effectList = "";
