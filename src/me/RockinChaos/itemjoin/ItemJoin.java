@@ -18,10 +18,10 @@
 package me.RockinChaos.itemjoin;
 
 import java.io.File;
-
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
@@ -36,6 +36,7 @@ public class ItemJoin extends JavaPlugin {
   	
    /**
     * Called when the plugin is loaded.
+    * 
     */
     @Override
     public void onLoad() {
@@ -44,6 +45,7 @@ public class ItemJoin extends JavaPlugin {
     
    /**
     * Called when the plugin is enabled.
+    * 
     */
   	@Override
 	public void onEnable() {
@@ -54,6 +56,7 @@ public class ItemJoin extends JavaPlugin {
   	
    /**
     * Called when the plugin is disabled.
+    * 
     */
   	@Override
 	public void onDisable() {
@@ -62,6 +65,7 @@ public class ItemJoin extends JavaPlugin {
   		ItemHandler.getItem().purgeCraftItems(true);
 	  	SQLite.getLite(false).executeLaterStatements();
 	  	ProtocolManager.getManager().closeProtocol();
+	  	ItemUtilities.getUtilities().clearItems();
   		ServerHandler.getServer().logInfo("has been Disabled.");
   	}
   	
