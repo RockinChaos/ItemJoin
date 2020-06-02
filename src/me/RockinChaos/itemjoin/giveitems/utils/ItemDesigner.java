@@ -26,6 +26,7 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 
 import org.apache.commons.lang.StringUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.FireworkEffect;
@@ -33,8 +34,11 @@ import org.bukkit.block.banner.Pattern;
 import org.bukkit.block.banner.PatternType;
 import org.bukkit.FireworkEffect.Type;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.EntityType;
+import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.map.MapView;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -100,6 +104,9 @@ public class ItemDesigner {
 							this.setLegacyBookPages(itemMap);
 							this.setAttributes(itemMap);
 							this.setProbability(itemMap);
+							this.setMobsDrop(itemMap);
+							this.setBlocksDrop(itemMap);
+							this.setRecipe(itemMap);
 							
 							ItemUtilities.getUtilities().addItem(itemMap);
 					    	ConfigHandler.getConfig(false).registerListeners(itemMap);
@@ -185,7 +192,7 @@ public class ItemDesigner {
 	*
 	*/
 	private void setMaterial(final ItemMap itemMap) {
-		Material material = getActualMaterial(itemMap);
+		Material material = this.getActualMaterial(itemMap);
 		itemMap.setMaterial(material);
 		itemMap.renderItemStack();
 	}
@@ -608,6 +615,88 @@ public class ItemDesigner {
 				ServerHandler.getServer().logWarn("{ItemMap} An item cannot be defined with 100 percent probability, please check the wiki on this usage.");
 				ServerHandler.getServer().logWarn("{ItemMap} Please change the probability of the item, or remove it entirely, items may not function.");
 			}
+		}
+	}
+	
+   /**
+	* Sets the Mobs Drop Chances of the Custom Item,
+	* defining the drop percentage of the item.
+	* 
+	*/
+	private void setMobsDrop(final ItemMap itemMap) {
+		Map < EntityType, Double > mobsDrop = new HashMap < EntityType, Double > ();
+		if (itemMap.getNodeLocation().getString(".mobs-drop") != null) {
+			List < String > mobs = itemMap.getNodeLocation().getStringList(".mobs-drop");
+			for (String mobsLine: mobs) {
+				String[] mobsParts = mobsLine.replace(" ", "").split(":");
+				if (mobsParts[0] != null && mobsParts[1] != null && Utils.getUtils().isDouble(mobsParts[1])) {
+					EntityType mob = EntityType.valueOf(mobsParts[0].toUpperCase());
+					if (mob != null) {
+						mobsDrop.put(mob, Double.parseDouble(mobsParts[1]));
+					} else { ServerHandler.getServer().logWarn("{ItemMap} The mob " + mobsParts[0] + " is not a valid mob type, please check the wiki on this usage."); }
+				} else if (!Utils.getUtils().isDouble(mobsParts[1])) {
+					ServerHandler.getServer().logWarn("{ItemMap} The percentage value for the mob " + mobsParts[0] + " is not a valid number, please check the wiki on this usage.");
+				} else {
+					ServerHandler.getServer().logWarn("{ItemMap} An error has occured when trying to set mobs drop for " + itemMap.getConfigName() + ", please check your formatting.");
+				}
+			}
+			itemMap.setMobsDrop(mobsDrop);
+		}
+	}
+	
+   /**
+	* Sets the Blocks Drop Chances of the Custom Item,
+	* defining the drop percentage of the item.
+	* 
+	*/
+	private void setBlocksDrop(final ItemMap itemMap) {
+		Map < Material, Double > blocksDrop = new HashMap < Material, Double > ();
+		if (itemMap.getNodeLocation().getString(".blocks-drop") != null) {
+			List < String > blocks = itemMap.getNodeLocation().getStringList(".blocks-drop");
+			for (String blocksLine: blocks) {
+				String[] blocksParts = blocksLine.replace(" ", "").split(":");
+				if (blocksParts[0] != null && blocksParts[1] != null && Utils.getUtils().isDouble(blocksParts[1])) {
+					Material block = ItemHandler.getItem().getMaterial(blocksParts[0].toUpperCase(), null);
+					if (block != null && block != Material.AIR) {
+						blocksDrop.put(block, Double.parseDouble(blocksParts[1]));
+					} else { ServerHandler.getServer().logWarn("{ItemMap} The material " + blocksParts[0] + " is not a valid material type, please check the wiki on this usage."); }
+				} else if (!Utils.getUtils().isDouble(blocksParts[1])) {
+					ServerHandler.getServer().logWarn("{ItemMap} The percentage value for the material " + blocksParts[0] + " is not a valid number, please check the wiki on this usage.");
+				} else {
+					ServerHandler.getServer().logWarn("{ItemMap} An error has occured when trying to set blocks drop for " + itemMap.getConfigName() + ", please check your formatting.");
+				}
+			}
+			itemMap.setBlocksDrop(blocksDrop);
+		}
+	}
+	
+   /**
+	* Sets the Recipe of the Custom Item.
+	* 
+	*/
+	private void setRecipe(final ItemMap itemMap) {
+		if (itemMap.getNodeLocation().getString(".recipe") != null) {
+			NamespacedKey key = new NamespacedKey(ItemJoin.getInstance(), itemMap.getConfigName());
+			ShapedRecipe shapedRecipe = new ShapedRecipe(key, itemMap.getItem(null));
+			Map < Character, Material > ingredientList = new HashMap < Character, Material > ();
+			String[] shape = itemMap.trimRecipe(itemMap.getNodeLocation().getStringList(".recipe"));
+			shapedRecipe.shape(shape);
+			if (itemMap.getNodeLocation().getString(".ingredients") != null) {
+				List < String > ingredients = itemMap.getNodeLocation().getStringList(".ingredients");
+				for (String ingredient: ingredients) {
+					String[] ingredientParts = ingredient.split(":");
+					Material material = ItemHandler.getItem().getMaterial(ingredientParts[1], null);
+					if (material != null) {
+						char character = 'X';
+						try { character = ingredientParts[0].charAt(0); } 
+						catch (Exception e) { ServerHandler.getServer().logWarn("{ItemMap} The character " + ingredientParts[0] + " for the custom recipe defined for the item " + itemMap.getConfigName() + " is not a valid character!"); }
+						shapedRecipe.setIngredient(character, material);
+						ingredientList.put(character, material);
+					} else { ServerHandler.getServer().logWarn("{ItemMap} The material " + ingredientParts[1] + " for the custom recipe defined for the item " + itemMap.getConfigName() + " is not a proper material type!"); }
+				}
+				Bukkit.getServer().addRecipe(shapedRecipe);
+				itemMap.setIngredients(ingredientList);
+			} else { ServerHandler.getServer().logWarn("{ItemMap} There is a custom recipe defined for the item " + itemMap.getConfigName() + " but it still needs ingredients defined!"); }
 		}
 	}
 
