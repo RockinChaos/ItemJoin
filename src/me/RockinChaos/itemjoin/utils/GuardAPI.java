@@ -22,17 +22,21 @@ import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.PlayerInventory;
 
+import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
+import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.utils.sqlite.SQLite;
 
 public class GuardAPI {
@@ -95,6 +99,46 @@ public class GuardAPI {
 				return rm.get(wgWorld).getRegions();
 			} else { return rm.get(wgWorld).getRegions(); }
 		} else { return LegacyAPI.getLegacy().getRegions(world); }
+	}
+	
+   /**
+	* Gets the current region(s) the player is currently in.
+	* 
+	* @param player - The player that has entered or exited a region.
+	* @return regionSet The applicable regions at the players location.
+	*/
+	public String getRegionsAtLocation(final Entity entity) {
+		ApplicableRegionSet set = null;
+		String regionSet = "";
+		try { set = this.getApplicableRegionSet(entity.getWorld(), entity.getLocation()); } 
+		catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
+		if (set == null) { return regionSet; }
+		for (ProtectedRegion r: set) {
+			if (regionSet.isEmpty()) { regionSet += r.getId(); }
+			else { regionSet += ", " + r.getId(); }
+		}
+		return regionSet;
+	}
+	
+   /**
+	* Gets the applicable region(s) set at the players location.
+	* 
+	* @param world - The world that the player is currently in.
+	* @param location - The exact location of the player.
+	* @return ApplicableRegionSet The WorldGuard RegionSet.
+	*/
+	private ApplicableRegionSet getApplicableRegionSet(final World world, final Location location) throws Exception {
+		if (this.guardVersion() >= 700) {
+			com.sk89q.worldedit.world.World wgWorld;
+			try { wgWorld = com.sk89q.worldguard.WorldGuard.getInstance().getPlatform().getWorldByName(world.getName()); } 
+			catch (NoSuchMethodError e) { wgWorld = com.sk89q.worldguard.WorldGuard.getInstance().getPlatform().getMatcher().getWorldByName(world.getName()); }
+			com.sk89q.worldguard.protection.regions.RegionContainer rm = com.sk89q.worldguard.WorldGuard.getInstance().getPlatform().getRegionContainer();
+			if (rm == null) { return null; }
+			if (LegacyAPI.getLegacy().legacySk89q()) {
+				final com.sk89q.worldedit.Vector wgVector = new com.sk89q.worldedit.Vector(location.getX(), location.getY(), location.getZ());
+				return rm.get(wgWorld).getApplicableRegions(wgVector);
+			} else { return rm.get(wgWorld).getApplicableRegions(LegacyAPI.getLegacy().asBlockVector(location)); }
+		} else { return LegacyAPI.getLegacy().getRegionSet(world, location); }
 	}
 	
    /**
