@@ -278,6 +278,22 @@ public class ItemHandler {
 	}
 	
    /**
+    * Checks if the ItemStack List contains the Material.
+    * 
+    * @param itemstacks - The ItemStacks being checked.
+    * @param material - The Material expected.
+    * @return If the List contains the Material
+    */
+	public boolean containsMaterial(final Collection<ItemStack> itemstacks, final Material material) {
+		for (ItemStack item: itemstacks) {
+			if (item.getType().equals(material)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+   /**
     * Sets the Skull Texture to the ItemStack.
     * 
     * @param item - The ItemStack to have its Skull Texture changed.

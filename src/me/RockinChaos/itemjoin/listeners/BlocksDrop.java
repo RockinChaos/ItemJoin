@@ -28,6 +28,7 @@ import org.bukkit.inventory.ItemStack;
 
 import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
 import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
+import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.utils.DependAPI;
@@ -48,7 +49,7 @@ public class BlocksDrop implements Listener {
 		ServerHandler.getServer().runAsyncThread(main -> {
 			for (ItemMap itemMap: ItemUtilities.getUtilities().getItems()) {
 				if (itemMap.blocksDrop() && block != null && material != Material.AIR && itemMap.getBlocksDrop().containsKey(material) 
-				 && itemMap.inWorld(player.getWorld()) && itemMap.hasPermission(player) && this.willDrop(drops, material) && Math.random() <= itemMap.getBlocksDrop().get(material)) {
+				 && itemMap.inWorld(player.getWorld()) && itemMap.hasPermission(player) && ItemHandler.getItem().containsMaterial(drops, material) && Math.random() <= itemMap.getBlocksDrop().get(material)) {
 					for (String region : ((DependAPI.getDepends(false).getGuard().guardEnabled() && !itemMap.getEnabledRegions().isEmpty()) ? DependAPI.getDepends(false).getGuard().getRegionsAtLocation(player).split(", ") : new String[]{"FALSE"})) {
 						if (!DependAPI.getDepends(false).getGuard().guardEnabled() || itemMap.getEnabledRegions().isEmpty() || itemMap.inRegion(region)) { 
 							block.getWorld().dropItemNaturally(block.getLocation(), itemMap.getItem(player));
@@ -57,14 +58,5 @@ public class BlocksDrop implements Listener {
 				}
 			}
 		});
-	}
-	
-	private boolean willDrop(final Collection<ItemStack> drops, final Material material) {
-		for (ItemStack item: drops) {
-			if (item.getType().equals(material)) {
-				return true;
-			}
-		}
-		return false;
 	}
 }

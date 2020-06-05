@@ -4369,7 +4369,7 @@ public class UI {
 			else { this.blocksPane(event.getPlayer(), itemMap); }
 		}));
 		for (double i = 0.01; i < 1; i += 0.01) {
-			final double k = Double.parseDouble(new DecimalFormat("#.##").format(i));
+			final double k = Double.parseDouble(new DecimalFormat("#.##").format(Double.toString(i).replace(",", ".")).replace(",", "."));
 			chancePane.addButton(new Button(ItemHandler.getItem().getItem("STAINED_GLASS_PANE:10", 1, false, "&9&lCost: &a$&l" + k, "&7", "&7*Click to set the", "&7drop chance of the item."), event -> {
 				if (entity != null) { 
 					Map<EntityType, Double> mobsDrop = itemMap.getMobsDrop();
