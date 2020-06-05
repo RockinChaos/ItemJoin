@@ -49,7 +49,7 @@ import me.RockinChaos.itemjoin.listeners.Menu;
 import me.RockinChaos.itemjoin.listeners.MobsDrop;
 import me.RockinChaos.itemjoin.listeners.Pickups;
 import me.RockinChaos.itemjoin.listeners.Placement;
-import me.RockinChaos.itemjoin.listeners.Modify;
+import me.RockinChaos.itemjoin.listeners.RepairCraft;
 import me.RockinChaos.itemjoin.listeners.Storable;
 import me.RockinChaos.itemjoin.listeners.SwitchHands;
 import me.RockinChaos.itemjoin.utils.LogFilter;
@@ -413,8 +413,8 @@ public class ConfigHandler {
 				LegacyAPI.getLegacy().registerConsumes();
 			}
 		}
-		if ((itemMap.isItemRepairable() || itemMap.isItemCraftable()) && !Utils.getUtils().isRegistered(Modify.class.getSimpleName())) {
-			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Modify(), ItemJoin.getInstance());
+		if ((itemMap.isItemRepairable() || itemMap.isItemCraftable()) && !Utils.getUtils().isRegistered(RepairCraft.class.getSimpleName())) {
+			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new RepairCraft(), ItemJoin.getInstance());
 		}
 		if (itemMap.isItemStore() || itemMap.isItemModify()) {
 			if (ServerHandler.getServer().hasSpecificUpdate("1_8") && !Utils.getUtils().isRegistered(Storable.class.getSimpleName())) {
