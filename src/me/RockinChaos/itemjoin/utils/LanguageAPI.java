@@ -53,7 +53,8 @@ public class LanguageAPI {
 	public void sendLangMessage(final String nodeLocation, final CommandSender sender, final String...placeHolder) {
 		Player player = null; if (sender instanceof Player) { player = (Player) sender; }
 		String langMessage = ConfigHandler.getConfig(false).getFile(this.langType.nodeLocation()).getString(nodeLocation);
-		String prefix = Utils.getUtils().translateLayout(ConfigHandler.getConfig(false).getFile(this.langType.nodeLocation()).getString("Prefix"), player); if (prefix == null || !this.showPrefix(nodeLocation)) { prefix = ""; } else { prefix += " "; }
+		String prefix = Utils.getUtils().translateLayout(ConfigHandler.getConfig(false).getFile(this.langType.nodeLocation()).getString("Prefix"), player); 
+		if (prefix == null || prefix.isEmpty() || !this.showPrefix(nodeLocation)) { prefix = ""; } else { prefix += " "; }
 		if (langMessage != null && !langMessage.isEmpty()) {
 			langMessage = this.translateLangHolders(langMessage, this.initializeRows(placeHolder));
 			langMessage = Utils.getUtils().translateLayout(langMessage, player);
