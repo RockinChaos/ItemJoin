@@ -53,17 +53,17 @@ import org.bukkit.potion.PotionEffectType;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import me.RockinChaos.itemjoin.ItemJoin;
-import me.RockinChaos.itemjoin.giveitems.utils.ItemCommand;
-import me.RockinChaos.itemjoin.giveitems.utils.ItemCommand.ActionType;
-import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
-import me.RockinChaos.itemjoin.giveitems.utils.ItemCommand.CommandSequence;
-import me.RockinChaos.itemjoin.giveitems.utils.ItemCommand.CommandType;
-import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
-import me.RockinChaos.itemjoin.giveitems.utils.ItemDesigner;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
+import me.RockinChaos.itemjoin.item.ItemCommand;
+import me.RockinChaos.itemjoin.item.ItemDesigner;
+import me.RockinChaos.itemjoin.item.ItemMap;
+import me.RockinChaos.itemjoin.item.ItemUtilities;
+import me.RockinChaos.itemjoin.item.ItemCommand.ActionType;
+import me.RockinChaos.itemjoin.item.ItemCommand.CommandSequence;
+import me.RockinChaos.itemjoin.item.ItemCommand.CommandType;
 import me.RockinChaos.itemjoin.utils.interfaces.Button;
 import me.RockinChaos.itemjoin.utils.interfaces.Interface;
 import me.RockinChaos.itemjoin.utils.sqlite.SQLite;
@@ -4154,7 +4154,7 @@ public class UI {
 			this.mobsPane(player, itemMap);
 		}));
 		dropsPane.addButton(new Button(this.fillerPaneBItem));
-		dropsPane.addButton(new Button(ItemHandler.getItem().getItem("DIAMOND_ORE", 1, false, "&b&lBlocks Drop", "&7", "&7*Define blocks that are", "&7allowed to drop the item.", (!blocks.isEmpty() ? "&9&lBlocks: &a" + blocks.substring(0, mobs.length() - 2) : "")), event -> {
+		dropsPane.addButton(new Button(ItemHandler.getItem().getItem("DIAMOND_ORE", 1, false, "&b&lBlocks Drop", "&7", "&7*Define blocks that are", "&7allowed to drop the item.", (!blocks.isEmpty() ? "&9&lBlocks: &a" + blocks.substring(0, blocks.length() - 2) : "")), event -> {
 			this.blocksPane(player, itemMap);
 		}));
 		dropsPane.addButton(new Button(this.fillerPaneBItem), 3);
@@ -4176,7 +4176,7 @@ public class UI {
 		dropsPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the drop chances menu."), event -> this.dropsPane(player, itemMap)));
 		ServerHandler.getServer().runAsyncThread(main -> { 
 			for (EntityType entity: EntityType.values()) {
-				if (itemMap.getMobsDrop().containsKey(entity)) {
+				if (itemMap.getMobsDrop().containsKey(entity) && entity.isAlive()) {
 					dropsPane.addButton(new Button(ItemHandler.getItem().getItem("EGG", 1, (itemMap.getMobsDrop().containsKey(entity)), "&f" + entity.name(), "&7", "&7*Click to add this as", "&7a banner pattern.", 
 							(itemMap.getMobsDrop().containsKey(entity) ? "&9&lChance: &a" + itemMap.getMobsDrop().get(entity) : "")), event -> {
 						if (itemMap.getMobsDrop().containsKey(entity)) {
@@ -4191,7 +4191,7 @@ public class UI {
 				}
 			}
 			for (EntityType entity: EntityType.values()) {
-				if (!itemMap.getMobsDrop().containsKey(entity)) {
+				if (!itemMap.getMobsDrop().containsKey(entity) && entity.isAlive()) {
 					dropsPane.addButton(new Button(ItemHandler.getItem().getItem("EGG", 1, (itemMap.getMobsDrop().containsKey(entity)), "&f" + entity.name(), "&7", "&7*Click to add this as", "&7a banner pattern.", 
 							(itemMap.getMobsDrop().containsKey(entity) ? "&9&lChance: &a" + itemMap.getMobsDrop().get(entity) : "")), event -> {
 						if (itemMap.getMobsDrop().containsKey(entity)) {
