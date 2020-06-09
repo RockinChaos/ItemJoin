@@ -28,13 +28,13 @@ import org.bukkit.World;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 import me.RockinChaos.itemjoin.ItemJoin;
-import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
-import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.PermissionsHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.handlers.UpdateHandler;
+import me.RockinChaos.itemjoin.item.ItemMap;
+import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.utils.LanguageAPI;
 import me.RockinChaos.itemjoin.utils.LegacyAPI;
 import me.RockinChaos.itemjoin.utils.UI;
@@ -271,7 +271,7 @@ public class Commands implements CommandExecutor {
 	*/
 	private void list(final CommandSender sender) {
 		LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
-		for (World world: ItemJoin.getInstance().getServer().getWorlds()) {
+		for (World world: Bukkit.getWorlds()) {
 			boolean itemFound = false;
 			String[] placeHolders = LanguageAPI.getLang(false).newString();
 			placeHolders[0] = world.getName();
@@ -319,34 +319,34 @@ public class Commands implements CommandExecutor {
 			LanguageAPI.getLang(false).dispatchMessage(sender, (PermissionsHandler.getPermissions().hasPermission(sender, "itemjoin.enable.others") ? "&a[\u2714]" : "&c[\u2718]") + " ItemJoin.Enable.Others");
 			LanguageAPI.getLang(false).dispatchMessage(sender, (PermissionsHandler.getPermissions().hasPermission(sender, "itemjoin.disable.others") ? "&a[\u2714]" : "&c[\u2718]") + " ItemJoin.Disable.Others");
 			LanguageAPI.getLang(false).dispatchMessage(sender, (PermissionsHandler.getPermissions().hasPermission(sender, "itemjoin.bypass.inventorymodify") ? "&a[\u2714]" : "&c[\u2718]") + " ItemJoin.Bypass.InventoryModify");
-			for (World world: ItemJoin.getInstance().getServer().getWorlds()) { 
-				LanguageAPI.getLang(false).dispatchMessage(sender, (PermissionsHandler.getPermissions().hasPermission(sender, "itemjoin." + world.getName() + ".*") ? "&a[\u2714]" : "&c[\u2718]") + " ItemJoin." + world.getName() + ".*"); 
+			for (World world: Bukkit.getWorlds()) { 
+				ServerHandler.getServer().logSevere(sender.isPermissionSet("itemjoin." + world.getName() + ".*") + "");
+				LanguageAPI.getLang(false).dispatchMessage(sender, (PermissionsHandler.getPermissions().hasPermission(sender, "itemjoin." + world.getName()  + ".*")
+					&& ((ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Permissions.Obtain-Items-OP") && sender.isOp() 
+							? sender.isPermissionSet("itemjoin." + world.getName() + ".*") : !ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Permissions.Obtain-Items-OP"))
+					||  (ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Permissions.Obtain-Items") && !sender.isOp() 
+							? sender.isPermissionSet("itemjoin." + world.getName() + ".*") : !ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Permissions.Obtain-Items")))
+				? "&a[\u2714]" : "&c[\u2718]") + " ItemJoin." + world.getName() + ".*"); 
 			}
 		} else if (page == 2) {
 			List < String > customPermissions = new ArrayList < String > ();
-			for (World world: ItemJoin.getInstance().getServer().getWorlds()) {
+			for (World world: Bukkit.getServer().getWorlds()) {
 				List < String > inputListed = new ArrayList < String > ();
 				final ItemMap probable = Chances.getChances().getRandom(((Player) sender));
 				for (ItemMap item: ItemUtilities.getUtilities().getItems()) {
-					if (!customPermissions.contains(item.getPermissionNode()) && !inputListed.contains(item.getConfigName()) && item.inWorld(world) && Chances.getChances().isProbability(item, probable)) {
-						if (item.getPermissionNode() != null && !customPermissions.contains(item.getPermissionNode()) || item.getPermissionNode() == null) {
-							if (item.getPermissionNode() != null) {
-								customPermissions.add(item.getPermissionNode());
-							}
-							inputListed.add(item.getConfigName());
-							if (item.hasPermission(((Player) sender))) {
-								LanguageAPI.getLang(false).dispatchMessage(sender, "&a[\u2714] " + PermissionsHandler.getPermissions().customPermissions(item.getPermissionNode(), item.getConfigName(), world.getName()));
-							} else {
-								LanguageAPI.getLang(false).dispatchMessage(sender, "&c[\u2718] " + PermissionsHandler.getPermissions().customPermissions(item.getPermissionNode(), item.getConfigName(), world.getName()));
-							}
+					if ((item.getPermissionNode() != null ? !customPermissions.contains(item.getPermissionNode()) : true) && !inputListed.contains(item.getConfigName()) && item.inWorld(world) && Chances.getChances().isProbability(item, probable)) {
+						if (item.getPermissionNode() != null) { customPermissions.add(item.getPermissionNode()); }
+						inputListed.add(item.getConfigName());
+						if (item.hasPermission(((Player) sender))) {
+							LanguageAPI.getLang(false).dispatchMessage(sender, "&a[\u2714] " + PermissionsHandler.getPermissions().customPermissions(item.getPermissionNode(), item.getConfigName(), world.getName()));
+						} else {
+							LanguageAPI.getLang(false).dispatchMessage(sender, "&c[\u2718] " + PermissionsHandler.getPermissions().customPermissions(item.getPermissionNode(), item.getConfigName(), world.getName()));
 						}
 					}
 				}
 			}
 		}
-		if (page != maxPage) {
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&aType &a&l/ItemJoin Permissions " + (page + 1) + " &afor the next page.");
-		}
+		if (page != maxPage) { LanguageAPI.getLang(false).dispatchMessage(sender, "&aType &a&l/ItemJoin Permissions " + (page + 1) + " &afor the next page."); }
 		LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]-------------&a&l[&e Permissions Menu " + page + "/" + maxPage + " &a&l]&a&l&m------------[");
 	}
 	
@@ -450,7 +450,7 @@ public class Commands implements CommandExecutor {
 			if (itemMap.getConfigName().equalsIgnoreCase(args[1])) {
 				String customName = Utils.getUtils().translateLayout(itemMap.getCustomName(), argsPlayer); placeHolders[3] = customName;
 				if ((remove && itemMap.hasItem(argsPlayer)) || (!remove && (amount != 0 || itemMap.isAlwaysGive() || !itemMap.hasItem(argsPlayer)))) {
-					if (remove || (!(PermissionsHandler.getPermissions().permissionsEnabled()) || itemMap.hasPermission(argsPlayer) && PermissionsHandler.getPermissions().permissionsEnabled())) {
+					if (remove || !PermissionsHandler.getPermissions().receiveEnabled() || (itemMap.hasPermission(argsPlayer) && PermissionsHandler.getPermissions().receiveEnabled())) {
 						if (itemMap.isAlwaysGive() && (args.length < 2 || (!Utils.getUtils().isInt(args[args.length - 1])))) { amount = itemMap.getCount(); }
 						if (remove) { itemMap.removeFrom(argsPlayer, amount); } 
 						else        { itemMap.giveTo(argsPlayer, amount); }
@@ -494,16 +494,18 @@ public class Commands implements CommandExecutor {
 			placeHolders[11] = (amount == 0 ? "&lAll" : Integer.toString(amount));
 			for (ItemMap itemMap: ItemUtilities.getUtilities().getItems()) {
 				if (itemMap.getConfigName().equalsIgnoreCase(args[1])) {
-					if ((remove && itemMap.hasItem(argsPlayer)) || (!remove && (amount != 0 || itemMap.isAlwaysGive() || !itemMap.hasItem(argsPlayer)))) {
-						if (remove) { itemMap.removeFrom(argsPlayer, amount); }
-						else { itemMap.giveTo(argsPlayer, amount); }
-						if (!messageSent && !sender.getName().equalsIgnoreCase(argsPlayer.getName())) { LanguageAPI.getLang(false).sendLangMessage("Commands." + (remove ? "Remove.fromYou" : "Get.toYou"), argsPlayer, placeHolders); }
-						if (!messageSent && !handledPlayers.contains(argsPlayer.getName())) { handledPlayers.add(argsPlayer.getName()); }
-					} else if (!messageSent) { 
-						if (!sender.getName().equalsIgnoreCase(argsPlayer.getName())) { LanguageAPI.getLang(false).sendLangMessage("Commands." + (remove ? "Remove.triedRemove" : "Get.triedGive"), argsPlayer, placeHolders); }
-						if (!failedPlayers.contains(argsPlayer.getName())) { failedPlayers.add(argsPlayer.getName()); }
+					if (remove || !PermissionsHandler.getPermissions().receiveEnabled() || (itemMap.hasPermission(argsPlayer) && PermissionsHandler.getPermissions().receiveEnabled())) {
+						if ((remove && itemMap.hasItem(argsPlayer)) || (!remove && (amount != 0 || itemMap.isAlwaysGive() || !itemMap.hasItem(argsPlayer)))) {
+							if (remove) { itemMap.removeFrom(argsPlayer, amount); }
+							else { itemMap.giveTo(argsPlayer, amount); }
+							if (!messageSent && !sender.getName().equalsIgnoreCase(argsPlayer.getName())) { LanguageAPI.getLang(false).sendLangMessage("Commands." + (remove ? "Remove.fromYou" : "Get.toYou"), argsPlayer, placeHolders); }
+							if (!messageSent && !handledPlayers.contains(argsPlayer.getName())) { handledPlayers.add(argsPlayer.getName()); }
+						} else if (!messageSent) { 
+							if (!sender.getName().equalsIgnoreCase(argsPlayer.getName())) { LanguageAPI.getLang(false).sendLangMessage("Commands." + (remove ? "Remove.triedRemove" : "Get.triedGive"), argsPlayer, placeHolders); }
+							if (!failedPlayers.contains(argsPlayer.getName())) { failedPlayers.add(argsPlayer.getName()); }
+						}
+						if (!messageSent) { messageSent = true; }
 					}
-					if (!messageSent) { messageSent = true; }
 				}
 			}
 		});	
@@ -529,7 +531,8 @@ public class Commands implements CommandExecutor {
 		boolean itemGiven = false; boolean failedPermissions = false;
 		final ItemMap probable = Chances.getChances().getRandom(argsPlayer);
 		for (ItemMap itemMap: ItemUtilities.getUtilities().getItems()) {
-			if ((!remove ? (itemMap.inWorld(argsPlayer.getWorld()) && Chances.getChances().isProbability(itemMap, probable) && itemMap.hasPermission(argsPlayer)) : remove)) {
+			if ((!remove ? (itemMap.inWorld(argsPlayer.getWorld()) && Chances.getChances().isProbability(itemMap, probable) && 
+				(!PermissionsHandler.getPermissions().receiveEnabled() || (itemMap.hasPermission(argsPlayer) && PermissionsHandler.getPermissions().receiveEnabled()))) : remove)) {
 				if ((remove && itemMap.hasItem(argsPlayer)) || (!remove && !itemMap.hasItem(argsPlayer) || itemMap.isAlwaysGive())) {
 					if (remove) { itemMap.removeFrom(argsPlayer); } 
 					else { itemMap.giveTo(argsPlayer); }

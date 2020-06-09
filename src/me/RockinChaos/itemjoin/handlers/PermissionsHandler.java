@@ -83,11 +83,11 @@ public class PermissionsHandler {
 	}
 	
    /**
-    * Checks if Items have permission requirements to get or use them.
+    * Checks if custom items have permission requirements to get or use them.
     * 
-    * @return If items require certain permissions to be given or used.
+    * @return If the custom items require certain permissions to be given or used.
     */
-	public boolean permissionsEnabled() {
+	public boolean receiveEnabled() {
 		return ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Permissions.Commands-Get");
 	}
 	
