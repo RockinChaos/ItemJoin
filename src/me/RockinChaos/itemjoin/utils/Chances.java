@@ -25,7 +25,7 @@ import java.util.Random;
 
 import org.bukkit.entity.Player;
 
-import me.RockinChaos.itemjoin.giveitems.utils.ItemMap;
+import me.RockinChaos.itemjoin.item.ItemMap;
 
 public class Chances {
 	private List < Chance > chances;

@@ -15,29 +15,27 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package me.RockinChaos.itemjoin.giveitems.listeners;
+package me.RockinChaos.itemjoin.listeners.triggers;
 
-import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerGameModeChangeEvent;
-import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
-import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities.TriggerType;
+import org.bukkit.event.player.PlayerRespawnEvent;
 
-public class LimitSwitch implements Listener {
+import me.RockinChaos.itemjoin.item.ItemUtilities;
+import me.RockinChaos.itemjoin.item.ItemUtilities.TriggerType;
 
+public class Respawn implements Listener {
+	
    /**
-	* Called on player changing gamemodes.
-	* Gives any available custom items upon changing gamemodes.
-	* Removes any limited custom items upon changing gamemodes.
+	* Called on player respawn.
+	* Gives any available custom items upon respawning.
 	* 
-	* @param event - PlayerGameModeChangeEvent
+	* @param event - PlayerRespawnEvent
 	*/
 	@EventHandler
-	private void setGameModeItems(PlayerGameModeChangeEvent event) {
+	private void setRespawnItems(PlayerRespawnEvent event) {
 		final Player player = event.getPlayer();
-		final GameMode newMode = event.getNewGameMode();
-		ItemUtilities.getUtilities().setAuthenticating(player, TriggerType.LIMITSWITCH, newMode, "GLOBAL"); 
+		ItemUtilities.getUtilities().setAuthenticating(player, TriggerType.RESPAWN, org.bukkit.GameMode.ADVENTURE, "GLOBAL"); 
 	}
 }

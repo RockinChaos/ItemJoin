@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package me.RockinChaos.itemjoin.giveitems.listeners;
+package me.RockinChaos.itemjoin.listeners.triggers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,8 +26,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
-import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
-import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities.TriggerType;
+
+import me.RockinChaos.itemjoin.item.ItemUtilities;
+import me.RockinChaos.itemjoin.item.ItemUtilities.TriggerType;
 import me.RockinChaos.itemjoin.utils.DependAPI;
 import me.RockinChaos.itemjoin.utils.sqlite.SQLite;
 

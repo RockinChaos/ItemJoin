@@ -15,26 +15,27 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package me.RockinChaos.itemjoin.giveitems.listeners;
+package me.RockinChaos.itemjoin.listeners.triggers;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerRespawnEvent;
-import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
-import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities.TriggerType;
+import org.bukkit.event.player.PlayerJoinEvent;
 
-public class Respawn implements Listener {
+import me.RockinChaos.itemjoin.item.ItemUtilities;
+import me.RockinChaos.itemjoin.item.ItemUtilities.TriggerType;
+
+public class PlayerJoin implements Listener {
 	
    /**
-	* Called on player respawn.
-	* Gives any available custom items upon respawning.
+	* Called on player join.
+	* Gives any available custom items upon joining the server.
 	* 
-	* @param event - PlayerRespawnEvent
+	* @param event - PlayerJoinEvent
 	*/
 	@EventHandler
-	private void setRespawnItems(PlayerRespawnEvent event) {
+	private void setJoinItems(PlayerJoinEvent event) {
 		final Player player = event.getPlayer();
-		ItemUtilities.getUtilities().setAuthenticating(player, TriggerType.RESPAWN, org.bukkit.GameMode.ADVENTURE, "GLOBAL"); 
+		ItemUtilities.getUtilities().setAuthenticating(player, TriggerType.JOIN, org.bukkit.GameMode.ADVENTURE, "GLOBAL"); 
 	}
 }

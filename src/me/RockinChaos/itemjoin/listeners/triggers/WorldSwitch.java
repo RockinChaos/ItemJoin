@@ -15,26 +15,27 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package me.RockinChaos.itemjoin.giveitems.listeners;
+package me.RockinChaos.itemjoin.listeners.triggers;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
-import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
-import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities.TriggerType;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 
-public class PlayerJoin implements Listener {
+import me.RockinChaos.itemjoin.item.ItemUtilities;
+import me.RockinChaos.itemjoin.item.ItemUtilities.TriggerType;
+
+public class WorldSwitch implements Listener {
 	
    /**
-	* Called on player join.
-	* Gives any available custom items upon joining the server.
+	* Called on player switching worlds.
+	* Gives any available custom items upon switching worlds.
 	* 
-	* @param event - PlayerJoinEvent
+	* @param event - PlayerChangedWorldEvent
 	*/
 	@EventHandler
-	private void setJoinItems(PlayerJoinEvent event) {
+	private void setWorldSwitchItems(PlayerChangedWorldEvent event) {
 		final Player player = event.getPlayer();
-		ItemUtilities.getUtilities().setAuthenticating(player, TriggerType.JOIN, org.bukkit.GameMode.ADVENTURE, "GLOBAL"); 
+		ItemUtilities.getUtilities().setAuthenticating(player, TriggerType.WORLDSWITCH, org.bukkit.GameMode.ADVENTURE, "GLOBAL"); 
 	}
 }

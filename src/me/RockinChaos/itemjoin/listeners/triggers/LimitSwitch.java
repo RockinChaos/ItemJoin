@@ -15,28 +15,30 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package me.RockinChaos.itemjoin.giveitems.listeners;
+package me.RockinChaos.itemjoin.listeners.triggers;
 
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerGameModeChangeEvent;
 
-import me.RockinChaos.itemjoin.giveitems.utils.ItemUtilities;
-import me.RockinChaos.itemjoin.handlers.ItemHandler;
+import me.RockinChaos.itemjoin.item.ItemUtilities;
+import me.RockinChaos.itemjoin.item.ItemUtilities.TriggerType;
 
-public class PlayerQuit implements Listener {
-	
+public class LimitSwitch implements Listener {
+
    /**
-	* Called on player quit.
+	* Called on player changing gamemodes.
+	* Gives any available custom items upon changing gamemodes.
+	* Removes any limited custom items upon changing gamemodes.
 	* 
-	* @param event - PlayerQuitEvent
+	* @param event - PlayerGameModeChangeEvent
 	*/
 	@EventHandler
-	private void Quit(PlayerQuitEvent event) {
-		Player player = event.getPlayer();
-		ItemHandler.getItem().saveCraftItems(player);
-		ItemHandler.getItem().removeCraftItems(player);
-		ItemUtilities.getUtilities().closeAnimations(player);
+	private void setGameModeItems(PlayerGameModeChangeEvent event) {
+		final Player player = event.getPlayer();
+		final GameMode newMode = event.getNewGameMode();
+		ItemUtilities.getUtilities().setAuthenticating(player, TriggerType.LIMITSWITCH, newMode, "GLOBAL"); 
 	}
 }
