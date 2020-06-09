@@ -320,7 +320,6 @@ public class Commands implements CommandExecutor {
 			LanguageAPI.getLang(false).dispatchMessage(sender, (PermissionsHandler.getPermissions().hasPermission(sender, "itemjoin.disable.others") ? "&a[\u2714]" : "&c[\u2718]") + " ItemJoin.Disable.Others");
 			LanguageAPI.getLang(false).dispatchMessage(sender, (PermissionsHandler.getPermissions().hasPermission(sender, "itemjoin.bypass.inventorymodify") ? "&a[\u2714]" : "&c[\u2718]") + " ItemJoin.Bypass.InventoryModify");
 			for (World world: Bukkit.getWorlds()) { 
-				ServerHandler.getServer().logSevere(sender.isPermissionSet("itemjoin." + world.getName() + ".*") + "");
 				LanguageAPI.getLang(false).dispatchMessage(sender, (PermissionsHandler.getPermissions().hasPermission(sender, "itemjoin." + world.getName()  + ".*")
 					&& ((ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Permissions.Obtain-Items-OP") && sender.isOp() 
 							? sender.isPermissionSet("itemjoin." + world.getName() + ".*") : !ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Permissions.Obtain-Items-OP"))
