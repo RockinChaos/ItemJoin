@@ -659,6 +659,19 @@ public class ItemHandler {
 	}
 	
    /**
+    * Checks if the ItemStack is a Writable Book.
+    * 
+    * @param item - The ItemStack to be checked.
+    * @return If the ItemStack is a Writable Book.
+    */
+	public boolean isBookQuill(ItemStack item) {
+		if (item != null && item.getType() != null && (item.getType().toString().equalsIgnoreCase("WRITABLE_BOOK") || item.getType().toString().equalsIgnoreCase("BOOK_AND_QUILL"))) {
+			return true; 
+		} 
+		return false;
+	}
+	
+   /**
     * Gets the instance of the ItemHandler.
     * 
     * @return The ItemHandler instance.

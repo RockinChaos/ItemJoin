@@ -35,6 +35,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.inventory.ItemStack;
 
+import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.item.ItemMap;
@@ -55,8 +56,7 @@ public class Interact implements Listener {
 	 	if (event.hasItem() && event.getAction() != Action.PHYSICAL && !ItemUtilities.getUtilities().isAllowed(player, item, "cancel-events")
 	 			|| event.getAction() != Action.PHYSICAL && ServerHandler.getServer().hasSpecificUpdate("1_9") && event.getHand() != null 
 	 			&& event.getHand().toString().equalsIgnoreCase("OFF_HAND") && !ItemUtilities.getUtilities().isAllowed(player, PlayerHandler.getPlayer().getMainHandItem(event.getPlayer()), "cancel-events")) {
-	 		 if (item.getType().name().equalsIgnoreCase("WRITABLE_BOOK")
-	 		  || item.getType().name().equalsIgnoreCase("BOOK_AND_QUILL")) { player.closeInventory(); } 
+	 		if (ItemHandler.getItem().isBookQuill(item) || ItemHandler.getItem().isBookQuill(PlayerHandler.getPlayer().getMainHandItem(event.getPlayer()))) { player.closeInventory(); } 
 	 		event.setCancelled(true);
 	 		PlayerHandler.getPlayer().updateInventory(player, 1L);
 	 	}
