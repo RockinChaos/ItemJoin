@@ -4285,6 +4285,7 @@ public class ItemMap {
 	public void saveToConfig() {
 		File itemFile =  new File (ItemJoin.getInstance().getDataFolder(), "items.yml");
 		FileConfiguration itemData = YamlConfiguration.loadConfiguration(itemFile);
+		this.renderItemStack();
 		if (ConfigHandler.getConfig(false).getFile("items.yml").getString("items." + this.configName) != null) { itemData.set("items." + this.configName, null); } 
 		if (!(this.dynamicMaterials != null && !this.dynamicMaterials.isEmpty())) { itemData.set("items." + this.configName + ".id", this.material.toString().toUpperCase() + (this.dataValue != 0 ? ":" + this.dataValue : "")); }
 		else if (this.dynamicMaterials != null && !this.dynamicMaterials.isEmpty()) { 
