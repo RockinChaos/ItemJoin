@@ -41,7 +41,7 @@ public class Legacy_Consumes implements Listener {
 	* @param event - PlayerItemConsumeEvent.
 	* @deprecated This is a LEGACY event, only use on Minecraft versions below 1.11.
 	*/
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	private void onPlayerConsumesItem(PlayerItemConsumeEvent event) {
 		ItemStack item = event.getItem();
 		Player player = event.getPlayer();

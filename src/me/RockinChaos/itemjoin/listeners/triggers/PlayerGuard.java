@@ -43,7 +43,7 @@ public class PlayerGuard implements Listener {
 	* 
 	* @param event - PlayerMoveEvent
 	*/
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	private void setRegionItems(PlayerMoveEvent event) {
 		final Player player = event.getPlayer();
 		if (SQLite.getLite(false).isEnabled(player)) {

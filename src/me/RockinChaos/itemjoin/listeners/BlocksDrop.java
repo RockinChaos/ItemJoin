@@ -40,7 +40,7 @@ public class BlocksDrop implements Listener {
     * 
     * @param event - BlockBreakEvent
     */
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	public void onPlayerBreakBlock(BlockBreakEvent event) {
 		final Block block = event.getBlock();
 		final Material material = (block != null ? block.getType() : Material.AIR);

@@ -49,7 +49,7 @@ public class Interact implements Listener {
 	 * 
 	 * @param event - PlayerInteractEvent
 	 */
-	 @EventHandler(priority = EventPriority.LOWEST)
+	 @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	 private void onInteractCancel(PlayerInteractEvent event) {
 	 	ItemStack item = event.getItem();
 	 	Player player = event.getPlayer();
@@ -67,7 +67,7 @@ public class Interact implements Listener {
 	 * 
 	 * @param event - PlayerInteractEvent
 	 */
-	 @EventHandler
+	 @EventHandler(ignoreCancelled = true)
 	 private void onInteractCooldown(PlayerInteractEvent event) {
 	 	Player player = event.getPlayer();
 	 	ItemStack item = event.getItem();
@@ -88,7 +88,7 @@ public class Interact implements Listener {
 	* 
 	* @param event - InventoryClickEvent
 	*/
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	private void onInventoryCommands(InventoryClickEvent event) {
 		ItemStack item = event.getCurrentItem();
 		Player player = (Player) event.getWhoClicked();
@@ -103,7 +103,7 @@ public class Interact implements Listener {
 	* 
 	* @param event - PlayerItemHeldEvent
 	*/
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	private void onHoldCommand(PlayerItemHeldEvent event) {
 		Player player = event.getPlayer();
 		ItemStack item = player.getInventory().getItem(event.getNewSlot());
@@ -116,7 +116,7 @@ public class Interact implements Listener {
 	* 
 	* @param event - InventoryClickEvent
 	*/
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	private void onEquipClickCommand(InventoryClickEvent event) {
 		Player player = (Player) event.getWhoClicked();
 		if (Utils.getUtils().containsIgnoreCase(event.getAction().name(), "HOTBAR") && event.getView().getBottomInventory().getItem(event.getHotbarButton()) != null && event.getView().getBottomInventory().getItem(event.getHotbarButton()).getType() != Material.AIR) {
@@ -135,7 +135,7 @@ public class Interact implements Listener {
 	* 
 	* @param event - InventoryDragEvent
 	*/
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	private void onEquipDragCommand(InventoryDragEvent event) {
 		Player player = (Player) event.getWhoClicked();
 		Set<Integer> slideSlots = event.getInventorySlots();
@@ -150,7 +150,7 @@ public class Interact implements Listener {
 	* 
 	* @param event - PlayerInteractEvent
 	*/
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	private void onEquipInteractCommand(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
 		ItemStack item = event.getItem();
@@ -166,7 +166,7 @@ public class Interact implements Listener {
 	* 
 	* @param event - PlayerInteractEntityEvent
 	*/
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	private void onEntityCommands(PlayerInteractEntityEvent event) {
 		if (event.getRightClicked() instanceof org.bukkit.entity.ItemFrame) {
 			ItemStack item;
@@ -186,7 +186,7 @@ public class Interact implements Listener {
 	* 
 	* @param event - PlayerInteractAtEntityEvent
 	*/
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	private void onTargetEntityCommands(PlayerInteractAtEntityEvent event) {
 		if (event.getRightClicked().toString().equalsIgnoreCase("CraftArmorStand")) {
 			ItemStack item;
@@ -206,7 +206,7 @@ public class Interact implements Listener {
 	* 
 	* @param event - PlayerInteractEvent
 	*/
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	private void onInteractCommands(PlayerInteractEvent event) {
 		ItemStack item = event.getItem();
 		final Player player = event.getPlayer();
@@ -225,7 +225,7 @@ public class Interact implements Listener {
 	* 
 	* @param event - PlayerAnimationEvent
 	*/
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	private void onSwingHandCommands(PlayerAnimationEvent event) {
 		Player player = event.getPlayer();
 		ItemStack item = PlayerHandler.getPlayer().getHandItem(player);

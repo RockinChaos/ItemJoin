@@ -48,7 +48,7 @@ public class Drops implements Listener {
 	* 
 	* @param event - PlayerDropItemEvent.
 	*/
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	private void onGlobalDrop(PlayerDropItemEvent event) {
 		final Player player = event.getPlayer();
 		  if (Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getPrevent("Self-Drops"), "TRUE") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getPrevent("Self-Drops"), player.getWorld().getName())
@@ -70,7 +70,7 @@ public class Drops implements Listener {
 	* 
 	* @param event - PlayerDeathEvent.
 	*/
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	private void onGlobalDeathDrops(PlayerDeathEvent event) {
 		List < ItemStack > drops = event.getDrops();
 		ListIterator < ItemStack > litr = drops.listIterator();
@@ -92,7 +92,7 @@ public class Drops implements Listener {
 	* 
 	* @param event - PlayerDropItemEvent.
 	*/
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	private void onDrop(PlayerDropItemEvent event) {
 		ItemStack item = event.getItemDrop().getItemStack();
 		final Player player = event.getPlayer();
@@ -115,7 +115,7 @@ public class Drops implements Listener {
 	* 
 	* @param event - InventoryClickEvent.
 	*/
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	private void onCreativeDrop(InventoryClickEvent event) {
 		Player player = (Player) event.getWhoClicked();
 		if (PlayerHandler.getPlayer().isCreativeMode(player) && this.isDropping.containsKey(PlayerHandler.getPlayer().getPlayerID(player)) && this.isDropping.get(PlayerHandler.getPlayer().getPlayerID(player))) {
@@ -137,7 +137,7 @@ public class Drops implements Listener {
 	* 
 	* @param event - PlayerItemConsumeEvent.
 	*/
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	private void onDeathDrops(PlayerDeathEvent event) {
 		List < ItemStack > drops = event.getDrops();
 		ListIterator < ItemStack > litr = drops.listIterator();

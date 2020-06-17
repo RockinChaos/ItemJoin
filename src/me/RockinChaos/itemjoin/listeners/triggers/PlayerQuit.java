@@ -32,7 +32,7 @@ public class PlayerQuit implements Listener {
 	* 
 	* @param event - PlayerQuitEvent
 	*/
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	private void Quit(PlayerQuitEvent event) {
 		Player player = event.getPlayer();
 		ItemHandler.getItem().saveCraftItems(player);

@@ -60,7 +60,7 @@ public class InventoryCrafting implements Listener {
     * 
     * @param event - PlayerAutoCraftEvent
     */
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	private void onAutoCraft(PlayerAutoCraftEvent event) {
 		for (int i = 0; i <= 4; i++) {
   			final ItemStack[] craftingContents = event.getContents().clone();
@@ -78,7 +78,7 @@ public class InventoryCrafting implements Listener {
 	* 
 	* @param event - InventoryOpenEvent
 	*/
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     private void onCraftingOpen(InventoryOpenEvent event) {
     	final Player player = (Player) event.getPlayer();
     	if (!craftingOpenItems.containsKey(PlayerHandler.getPlayer().getPlayerID(player))) {
@@ -93,7 +93,7 @@ public class InventoryCrafting implements Listener {
 	* 
 	* @param event - InventoryCloseEvent
 	*/
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     private void onCraftingClose(InventoryCloseEvent event) {
     	final InventoryView view = event.getView();
     	final Player player = (Player) event.getPlayer();
@@ -141,7 +141,7 @@ public class InventoryCrafting implements Listener {
 	* 
 	* @param event - InventoryClickEvent
 	*/
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     private void onCraftingClick(InventoryClickEvent event) {
     	final InventoryView view = event.getView();
     	final Player player = (Player) event.getWhoClicked();
@@ -179,7 +179,7 @@ public class InventoryCrafting implements Listener {
 	* 
 	* @param event - PlayerDropItemEvent
 	*/
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     private void onCraftingDrop(PlayerDropItemEvent event) {
     	final Player player = (Player) event.getPlayer();
     	final ItemStack item = event.getItemDrop().getItemStack().clone();
@@ -202,7 +202,7 @@ public class InventoryCrafting implements Listener {
     * 
     * @param event - PlayerChangedWorldEvent
     */
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     private void onSwitchTrigger(PlayerChangedWorldEvent event) {
     	final Player player = (Player) event.getPlayer();
     	this.worldSwitch.put(PlayerHandler.getPlayer().getPlayerID(player), true);
@@ -224,7 +224,7 @@ public class InventoryCrafting implements Listener {
     * 
     * @param event - PlayerGameModeChangeEvent
     */
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     private void onSwitchGamemode(PlayerGameModeChangeEvent event) {
     	final Player player = (Player) event.getPlayer();
     	if (event.getNewGameMode() == GameMode.CREATIVE) {

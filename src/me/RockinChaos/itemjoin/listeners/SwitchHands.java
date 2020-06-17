@@ -34,7 +34,7 @@ public class SwitchHands implements Listener {
 	* 
 	* @param event - PlayerSwapHandItemsEvent
 	*/
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	private void onHandModify(PlayerSwapHandItemsEvent event) {
 		if (ServerHandler.getServer().hasSpecificUpdate("1_9")) {
 			ItemStack offhand = event.getOffHandItem();

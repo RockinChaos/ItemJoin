@@ -38,7 +38,7 @@ public class Legacy_Pickups implements Listener {
 	* @param event - EntityPickupItemEvent
 	* @deprecated This is a LEGACY event, only use on Minecraft versions below 1.12.
 	*/
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	private void Deprecated_onGlobalPickup(org.bukkit.event.player.PlayerPickupItemEvent event) {
 	  	Player player = event.getPlayer();
   		if (Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getPrevent("Pickups"), "TRUE") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getPrevent("Pickups"), player.getWorld().getName())

@@ -36,7 +36,7 @@ public class RepairCraft implements Listener {
     * 
     * @param event - PrepareItemCraftEvent
     */
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     private void onPlayerCraft(PrepareItemCraftEvent event) {
     	Player player = (Player) event.getInventory().getHolder();
     	for (int i = 0; i < player.getOpenInventory().getTopInventory().getSize(); i++) {
@@ -57,7 +57,7 @@ public class RepairCraft implements Listener {
     * 
     * @param event - InventoryClickEvent
     */
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	private void onRepairAnvil(InventoryClickEvent event) {
 	    if (event.getInventory().getType().toString().contains("ANVIL")) {
 	        Player player = (Player) event.getWhoClicked();

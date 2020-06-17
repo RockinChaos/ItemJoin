@@ -50,7 +50,7 @@ public class InventoryClick implements Listener {
 	* 
 	* @param event - InventoryClickEvent
 	*/
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	private void onGlobalModify(InventoryClickEvent event) {
 		Player player = (Player) event.getWhoClicked();
 	  	if (Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getPrevent("itemMovement"), "TRUE") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getPrevent("itemMovement"), player.getWorld().getName())
@@ -66,7 +66,7 @@ public class InventoryClick implements Listener {
 	* 
 	* @param event - InventoryClickEvent
 	*/
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	private void onModify(InventoryClickEvent event) {
 		Player player = (Player) event.getWhoClicked();
 		List<ItemStack> items = new ArrayList<ItemStack>();
@@ -89,7 +89,7 @@ public class InventoryClick implements Listener {
 	* 
 	* @param event - InventoryClickEvent
 	*/
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     private final void onCursorAnimatedItem(InventoryClickEvent event) {
 		Player player = (Player) event.getWhoClicked();
 		String itemflag = "inventory-modify";

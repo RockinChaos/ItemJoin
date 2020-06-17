@@ -40,7 +40,7 @@ public class Storable implements Listener {
 	* 
 	* @param event - InventoryClickEvent
 	*/
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	private void onInventoryStore(InventoryClickEvent event) {
 		Player player = (Player) event.getWhoClicked();
 		String invType = event.getView().getType().toString();
@@ -68,7 +68,7 @@ public class Storable implements Listener {
 	* 
 	* @param event - InventoryDragEvent
 	*/
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	private void onInventoryDragToStore(InventoryDragEvent event) {
 		Player player = (Player) event.getWhoClicked();
 		String invType = event.getView().getType().toString();
@@ -97,7 +97,7 @@ public class Storable implements Listener {
 	* 
 	* @param event - PlayerInteractEntityEvent
 	*/
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	private void onInteractItemFrame(PlayerInteractEntityEvent event) {
 		if (event.getRightClicked() instanceof ItemFrame) {
 			ItemStack item;
@@ -116,7 +116,7 @@ public class Storable implements Listener {
 	* 
 	* @param event - PlayerInteractAtEntityEvent
 	*/
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	private void onInteractArmorStand(PlayerInteractAtEntityEvent event) {
 		if (event.getRightClicked().toString().equalsIgnoreCase("CraftArmorStand")) {
 			ItemStack item;

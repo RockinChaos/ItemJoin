@@ -67,7 +67,7 @@ public class Menu implements Listener {
 	* 
 	* @param event - InventoryCloseEvent
 	*/
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	private void onClose(InventoryCloseEvent event) {
 		if (UI.getCreator() != null && UI.getCreator().modifyMenu((Player)event.getPlayer())) {
 			new BukkitRunnable() {

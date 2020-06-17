@@ -34,7 +34,7 @@ public class Pickups implements Listener {
 	* 
 	* @param event - EntityPickupItemEvent
 	*/
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	private void onGlobalPickup(EntityPickupItemEvent event) {
 	  	Entity entity = event.getEntity();
 	  	if (entity instanceof Player) {

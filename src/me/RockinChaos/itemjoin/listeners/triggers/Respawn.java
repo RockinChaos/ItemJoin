@@ -33,7 +33,7 @@ public class Respawn implements Listener {
 	* 
 	* @param event - PlayerRespawnEvent
 	*/
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	private void setRespawnItems(PlayerRespawnEvent event) {
 		final Player player = event.getPlayer();
 		ItemUtilities.getUtilities().setAuthenticating(player, TriggerType.RESPAWN, org.bukkit.GameMode.ADVENTURE, "GLOBAL"); 

@@ -36,7 +36,7 @@ public class MobsDrop implements Listener {
     * 
     * @param event - EntityDeathEvent
     */
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	private void onMobDeath(EntityDeathEvent event) {
 		final LivingEntity victim = event.getEntity();
 		final Entity killer = victim.getKiller();

@@ -33,7 +33,7 @@ public class WorldSwitch implements Listener {
 	* 
 	* @param event - PlayerChangedWorldEvent
 	*/
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	private void setWorldSwitchItems(PlayerChangedWorldEvent event) {
 		final Player player = event.getPlayer();
 		ItemUtilities.getUtilities().setAuthenticating(player, TriggerType.WORLDSWITCH, org.bukkit.GameMode.ADVENTURE, "GLOBAL"); 

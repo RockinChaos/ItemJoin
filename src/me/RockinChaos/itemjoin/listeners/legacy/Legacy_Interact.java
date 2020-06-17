@@ -34,6 +34,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.inventory.ItemStack;
 
+import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.item.ItemMap;
@@ -53,13 +54,14 @@ public class Legacy_Interact implements Listener {
 	 * @param event - PlayerInteractEvent
 	 * @deprecated This is a LEGACY event, only use on Minecraft versions below 1.8.
 	 */
-	 @EventHandler(priority = EventPriority.LOWEST)
+	 @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	 private void onInteractCancel(PlayerInteractEvent event) {
 	 	ItemStack item = event.getItem();
 	 	Player player = event.getPlayer();
 	 	if (event.hasItem() && event.getAction() != Action.PHYSICAL && !ItemUtilities.getUtilities().isAllowed(player, item, "cancel-events")
 	 			|| event.getAction() != Action.PHYSICAL && ServerHandler.getServer().hasSpecificUpdate("1_9") && event.getHand() != null 
 	 			&& event.getHand().toString().equalsIgnoreCase("OFF_HAND") && !ItemUtilities.getUtilities().isAllowed(player, PlayerHandler.getPlayer().getMainHandItem(event.getPlayer()), "cancel-events")) {
+	 		if (ItemHandler.getItem().isBookQuill(item) || ItemHandler.getItem().isBookQuill(PlayerHandler.getPlayer().getMainHandItem(event.getPlayer()))) { player.closeInventory(); } 
 	 		event.setCancelled(true);
 	 		PlayerHandler.getPlayer().updateInventory(player, 1L);
 	 	}
@@ -71,7 +73,7 @@ public class Legacy_Interact implements Listener {
 	 * @param event - PlayerInteractEvent
 	 * @deprecated This is a LEGACY event, only use on Minecraft versions below 1.8.
 	 */
-	 @EventHandler
+	 @EventHandler(ignoreCancelled = true)
 	 private void onInteractCooldown(PlayerInteractEvent event) {
 	 	Player player = event.getPlayer();
 	 	ItemStack item = event.getItem();
@@ -93,7 +95,7 @@ public class Legacy_Interact implements Listener {
 	* @param event - InventoryClickEvent
 	* @deprecated This is a LEGACY event, only use on Minecraft versions below 1.8.
 	*/
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	private void onInventoryCommands(InventoryClickEvent event) {
 		ItemStack item = event.getCurrentItem();
 		Player player = (Player) event.getWhoClicked();
@@ -109,7 +111,7 @@ public class Legacy_Interact implements Listener {
 	* @param event - PlayerItemHeldEvent
 	* @deprecated This is a LEGACY event, only use on Minecraft versions below 1.8.
 	*/
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	private void onHoldCommand(PlayerItemHeldEvent event) {
 		Player player = event.getPlayer();
 		ItemStack item = player.getInventory().getItem(event.getNewSlot());
@@ -123,7 +125,7 @@ public class Legacy_Interact implements Listener {
 	* @param event - InventoryClickEvent
 	* @deprecated This is a LEGACY event, only use on Minecraft versions below 1.8.
 	*/
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	private void onEquipClickCommand(InventoryClickEvent event) {
 		Player player = (Player) event.getWhoClicked();
 		if (Utils.getUtils().containsIgnoreCase(event.getAction().name(), "HOTBAR") && event.getView().getBottomInventory().getItem(event.getHotbarButton()) != null && event.getView().getBottomInventory().getItem(event.getHotbarButton()).getType() != Material.AIR) {
@@ -143,7 +145,7 @@ public class Legacy_Interact implements Listener {
 	* @param event - InventoryDragEvent
 	* @deprecated This is a LEGACY event, only use on Minecraft versions below 1.8.
 	*/
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	private void onEquipDragCommand(InventoryDragEvent event) {
 		Player player = (Player) event.getWhoClicked();
 		Set<Integer> slideSlots = event.getInventorySlots();
@@ -159,7 +161,7 @@ public class Legacy_Interact implements Listener {
 	* @param event - PlayerInteractEvent
 	* @deprecated This is a LEGACY event, only use on Minecraft versions below 1.8.
 	*/
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	private void onEquipInteractCommand(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
 		ItemStack item = event.getItem();
@@ -176,7 +178,7 @@ public class Legacy_Interact implements Listener {
 	* @param event - PlayerInteractEntityEvent
 	* @deprecated This is a LEGACY event, only use on Minecraft versions below 1.8.
 	*/
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	private void onEntityCommands(PlayerInteractEntityEvent event) {
 		if (event.getRightClicked() instanceof org.bukkit.entity.ItemFrame) {
 			ItemStack item;
@@ -197,7 +199,7 @@ public class Legacy_Interact implements Listener {
 	* @param event - PlayerInteractEvent
 	* @deprecated This is a LEGACY event, only use on Minecraft versions below 1.8.
 	*/
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	private void onInteractCommands(PlayerInteractEvent event) {
 		ItemStack item = event.getItem();
 		final Player player = event.getPlayer();
@@ -217,7 +219,7 @@ public class Legacy_Interact implements Listener {
 	* @param event - PlayerAnimationEvent
 	* @deprecated This is a LEGACY event, only use on Minecraft versions below 1.8.
 	*/
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	private void onSwingHandCommands(PlayerAnimationEvent event) {
 		Player player = event.getPlayer();
 		ItemStack item = PlayerHandler.getPlayer().getHandItem(player);

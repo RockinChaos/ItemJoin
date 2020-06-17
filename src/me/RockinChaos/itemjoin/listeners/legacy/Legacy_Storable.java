@@ -45,7 +45,7 @@ public class Legacy_Storable implements Listener {
 	* @param event - InventoryClickEvent
 	* @deprecated This is a LEGACY event, only use on Minecraft versions below 1.8.
 	*/
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	private void onInventoryStore(InventoryClickEvent event) {
 		Player player = (Player) event.getWhoClicked();
 		String invType = event.getView().getType().toString();
@@ -74,7 +74,7 @@ public class Legacy_Storable implements Listener {
 	* @param event - InventoryDragEvent
 	* @deprecated This is a LEGACY event, only use on Minecraft versions below 1.8.
     */
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	private void onInventoryDragToStore(InventoryDragEvent event) {
 		Player player = (Player) event.getWhoClicked();
 		String invType = event.getView().getType().toString();
@@ -104,7 +104,7 @@ public class Legacy_Storable implements Listener {
 	* @param event - PlayerInteractEntityEvent
 	* @deprecated This is a LEGACY event, only use on Minecraft versions below 1.8.
 	*/
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	private void onInteractItemFrame(PlayerInteractEntityEvent event) {
 		if (event.getRightClicked() instanceof ItemFrame) {
 			ItemStack item;

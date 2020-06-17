@@ -40,7 +40,7 @@ public class Consumes implements Listener {
     * 
     * @param event - PlayerItemConsumeEvent.
 	*/
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	private void onPlayerConsumesItem(PlayerItemConsumeEvent event) {
 		ItemStack item = event.getItem();
 		Player player = event.getPlayer();
@@ -61,7 +61,7 @@ public class Consumes implements Listener {
 	 * 
     * @param event - EntityResurrectEvent.
 	 */
-	 @EventHandler
+	 @EventHandler(ignoreCancelled = true)
 	 private void onRefillTotem(EntityResurrectEvent event) {
 	 	if (event.getEntity() instanceof Player) {
 	 		Player player = (Player) event.getEntity();
