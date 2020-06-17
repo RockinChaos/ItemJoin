@@ -252,7 +252,7 @@ public class ItemUtilities {
 							clearEvent(player, player.getWorld().getName(), type.name, "");
 							this.triggerCommands(player);
 						} else if (type.equals(TriggerType.WORLDSWITCH)) {
-							clearEvent(player, player.getWorld().getName(), type.name, "");
+							this.clearEvent(player, player.getWorld().getName(), type.name, "");
 						}
 			}, this.getClearDelay());
 		} else {
@@ -629,26 +629,28 @@ public class ItemUtilities {
     * @param player - The Player having the commands executed.
     */
 	public void triggerCommands(final Player player) {
-		if ((ConfigHandler.getConfig(false).getFile("config.yml").getString("Active-Commands.enabled-worlds") != null && ConfigHandler.getConfig(false).getFile("config.yml").getStringList("Active-Commands.commands") != null) 
-				&& (!ConfigHandler.getConfig(false).getFile("config.yml").getString("Active-Commands.enabled-worlds").equalsIgnoreCase("DISABLED") || !ConfigHandler.getConfig(false).getFile("config.yml").getString("Active-Commands.enabled-worlds").equalsIgnoreCase("FALSE"))) {
-			String commandsWorlds = ConfigHandler.getConfig(false).getFile("config.yml").getString("Active-Commands.enabled-worlds").replace(" ", "");
-			if (commandsWorlds == null) { commandsWorlds = "DISABLED"; }
-			String[] compareWorlds = commandsWorlds.split(",");
-			for (String compareWorld: compareWorlds) {
-				if (compareWorld.equalsIgnoreCase(player.getWorld().getName()) || compareWorld.equalsIgnoreCase("ALL") || compareWorld.equalsIgnoreCase("GLOBAL")) {
-					for (String commands: ConfigHandler.getConfig(false).getFile("config.yml").getStringList("Active-Commands.commands")) {
-						String formatCommand = Utils.getUtils().translateLayout(commands, player).replace("first-join: ", "").replace("first-join:", "");
-						if (!SQLite.getLite(false).hasFirstCommanded(player, formatCommand)) {
-							Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), formatCommand);
-							if (Utils.getUtils().containsIgnoreCase(commands, "first-join:")) {
-								SQLite.getLite(false).saveFirstCommandData(player, formatCommand);
+		Bukkit.getServer().getScheduler().runTask(ItemJoin.getInstance(), () -> { 
+			if ((ConfigHandler.getConfig(false).getFile("config.yml").getString("Active-Commands.enabled-worlds") != null && ConfigHandler.getConfig(false).getFile("config.yml").getStringList("Active-Commands.commands") != null) 
+					&& (!ConfigHandler.getConfig(false).getFile("config.yml").getString("Active-Commands.enabled-worlds").equalsIgnoreCase("DISABLED") || !ConfigHandler.getConfig(false).getFile("config.yml").getString("Active-Commands.enabled-worlds").equalsIgnoreCase("FALSE"))) {
+				String commandsWorlds = ConfigHandler.getConfig(false).getFile("config.yml").getString("Active-Commands.enabled-worlds").replace(" ", "");
+				if (commandsWorlds == null) { commandsWorlds = "DISABLED"; }
+				String[] compareWorlds = commandsWorlds.split(",");
+				for (String compareWorld: compareWorlds) {
+					if (compareWorld.equalsIgnoreCase(player.getWorld().getName()) || compareWorld.equalsIgnoreCase("ALL") || compareWorld.equalsIgnoreCase("GLOBAL")) {
+						for (String commands: ConfigHandler.getConfig(false).getFile("config.yml").getStringList("Active-Commands.commands")) {
+							String formatCommand = Utils.getUtils().translateLayout(commands, player).replace("first-join: ", "").replace("first-join:", "");
+							if (!SQLite.getLite(false).hasFirstCommanded(player, formatCommand)) {
+								Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), formatCommand);
+								if (Utils.getUtils().containsIgnoreCase(commands, "first-join:")) {
+									SQLite.getLite(false).saveFirstCommandData(player, formatCommand);
+								}
 							}
 						}
 					}
+					break;
 				}
-				break;
 			}
-		}
+		});
 	}
 	
    /**
