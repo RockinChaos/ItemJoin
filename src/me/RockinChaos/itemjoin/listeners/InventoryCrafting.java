@@ -141,7 +141,7 @@ public class InventoryCrafting implements Listener {
 	* 
 	* @param event - InventoryClickEvent
 	*/
-	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.HIGHEST)
     private void onCraftingClick(InventoryClickEvent event) {
     	final InventoryView view = event.getView();
     	final Player player = (Player) event.getWhoClicked();
