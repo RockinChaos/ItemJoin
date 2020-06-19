@@ -112,6 +112,7 @@ public class SQLite {
 			SQDrivers.getDatabase("database").executeStatement("ALTER TABLE map_ids ADD Time_Stamp datatype;");
 		} 
 		
+		if (!SQDrivers.getDatabase("database").tableExists("ij_first_join") && SQDrivers.getDatabase("database").tableExists("first_join")) {
 			SQDrivers.getDatabase("database").executeStatement("ALTER TABLE first_join RENAME TO ij_first_join;");
 			SQDrivers.getDatabase("database").executeStatement("ALTER TABLE first_world RENAME TO ij_first_world;");
 			SQDrivers.getDatabase("database").executeStatement("ALTER TABLE ip_limits RENAME TO ij_ip_limits;");
