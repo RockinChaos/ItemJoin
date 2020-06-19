@@ -41,6 +41,7 @@ import com.mojang.authlib.properties.Property;
 
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.item.ItemMap;
+import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.item.ItemUtilities.CustomSlot;
 import me.RockinChaos.itemjoin.listeners.InventoryCrafting;
 import me.RockinChaos.itemjoin.utils.LegacyAPI;
@@ -366,6 +367,21 @@ public class ItemHandler {
 			return LegacyAPI.getLegacy().setSkullOwner(((SkullMeta) meta), owner);
 		}
 		return meta;
+	}
+	
+   /**
+    * Saves any existing players that are on cooldown for each item.
+    * 
+    */
+	public void saveCooldowns() {
+		for (ItemMap itemMap: ItemUtilities.getUtilities().getItems()) {
+			for (String keys: itemMap.getPlayersOnCooldown().keySet()) {
+				String[] parts = keys.split("-.-");
+				if (System.currentTimeMillis() - itemMap.getPlayersOnCooldown().get(keys) <= itemMap.getCommandCooldown() * 1000) {
+					SQLite.getLite(false).saveCooldown(itemMap.getConfigName(), parts[1], parts[0], itemMap.getPlayersOnCooldown().get(keys), itemMap.getCommandCooldown());
+				}
+			}
+		}
 	}
 	
    /**

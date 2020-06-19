@@ -62,6 +62,7 @@ public class ItemJoin extends JavaPlugin {
 	public void onDisable() {
   		Bukkit.getScheduler().cancelTasks(this);
   		UI.getCreator().closeMenu();
+  		ItemHandler.getItem().saveCooldowns();
   		ItemHandler.getItem().purgeCraftItems(true);
 	  	SQLite.getLite(false).executeLaterStatements();
 	  	ProtocolManager.getManager().closeProtocol();

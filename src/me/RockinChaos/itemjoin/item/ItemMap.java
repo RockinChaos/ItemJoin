@@ -79,6 +79,7 @@ import me.RockinChaos.itemjoin.utils.Reflection;
 import me.RockinChaos.itemjoin.utils.UI;
 import me.RockinChaos.itemjoin.utils.Utils;
 import me.RockinChaos.itemjoin.utils.enchants.Glow;
+import me.RockinChaos.itemjoin.utils.sqlite.SQLite;
 import me.arcaniax.hdb.api.HeadDatabaseAPI;
 
 public class ItemMap {
@@ -299,6 +300,7 @@ public class ItemMap {
 	        this.setTriggers();
 			this.setWorlds();
 			this.setRegions();
+			this.setPlayersOnCooldown();
 	        this.setPerm(this.nodeLocation.getString(".permission-node"));
 	        this.setPermissionNeeded(ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Permissions.Obtain-Items"));
 	    	this.setOPPermissionNeeded(ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Permissions.Obtain-Items-OP"));
@@ -538,6 +540,16 @@ public class ItemMap {
 				}
 			}
 		} else { this.enabledWorlds.add("ALL"); }
+	}
+	
+   /**
+    * Sets the Players On Cooldown from the SQLite Database.
+    * 
+    */
+	private void setPlayersOnCooldown() {
+		if (this.cooldownSeconds > 0) {
+			this.playersOnCooldown = SQLite.getLite(false).getCooldown(this);
+		}
 	}
 	
    /**
@@ -4136,8 +4148,8 @@ public class ItemMap {
     */
 	private boolean onCooldown(final Player player) {
 		long playersCooldownList = 0L;
-		if (this.playersOnCooldown.containsKey(player.getWorld().getName() + "." + PlayerHandler.getPlayer().getPlayerID(player))) {
-			playersCooldownList = this.playersOnCooldown.get(player.getWorld().getName() + "." + PlayerHandler.getPlayer().getPlayerID(player));
+		if (this.playersOnCooldown.containsKey(player.getWorld().getName() + "-.-" + PlayerHandler.getPlayer().getPlayerID(player))) {
+			playersCooldownList = this.playersOnCooldown.get(player.getWorld().getName() + "-.-" + PlayerHandler.getPlayer().getPlayerID(player));
 		}
 		
 		if (System.currentTimeMillis() - playersCooldownList >= this.cooldownSeconds * 1000) { return false; } 
@@ -4184,8 +4196,17 @@ public class ItemMap {
     * @param player - The Player to be put on Cooldown.
     */
 	private void addPlayerOnCooldown(final Player player) {
-		this.playersOnCooldown.put(player.getWorld().getName() + "." + PlayerHandler.getPlayer().getPlayerID(player), System.currentTimeMillis());
+		this.playersOnCooldown.put(player.getWorld().getName() + "-.-" + PlayerHandler.getPlayer().getPlayerID(player), System.currentTimeMillis());
 	}
+	
+   /**
+    * Gets the Players on Cooldown.
+    * 
+    * @return The Map of Players on Cooldown.
+    */
+    public Map<String, Long> getPlayersOnCooldown() {
+    	return this.playersOnCooldown;
+    }
 	
    /**
     * Adds an ItemCommand to a Map.

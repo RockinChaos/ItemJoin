@@ -50,6 +50,7 @@ public class SQLite {
 	private Map < String, List <String> > enabledPlayers = new HashMap < String, List <String> >();
 	private Map < String, String > returnCraftItems = new HashMap < String, String >();
 	private Map < String, List <String> > returnItems = new HashMap < String, List <String> >();
+	private Map < String, Long > onCooldown = new HashMap < String, Long >();
 	private List <String> executeStatementsLater = new ArrayList<String>();
 	
 	private static SQLite lite;
@@ -65,6 +66,7 @@ public class SQLite {
 				SQDrivers.getDatabase("database").loadSQLDatabase();
 				createTables();
 				convertYAMLS();
+				loadCooldown();
 				loadMapImages();
 				loadFirstJoinPlayers();
 				loadFirstWorldPlayers();
@@ -92,6 +94,7 @@ public class SQLite {
         SQDrivers.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS ij_enabled_players (`World_Name` varchar(32), `Player_Name` varchar(32), `Player_UUID` varchar(32), `isEnabled` varchar(32), `Time_Stamp` varchar(32));");
         SQDrivers.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS ij_return_items (`World_Name` varchar(32), `Region_Name` varchar(32), `Player_UUID` varchar(32), `Inventory64` varchar(32), `Time_Stamp` varchar(32));");
         SQDrivers.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS ij_return_craftitems (`Player_UUID` varchar(32), `Inventory64` varchar(32), `Time_Stamp` varchar(32));");
+        SQDrivers.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS ij_on_cooldown (`World_Name` varchar(32), `Item_Name` varchar(32), `Player_UUID` varchar(32), `Cooldown` varchar(32), `Duration` varchar(32), `Time_Stamp` varchar(32));");
         SQDrivers.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS ij_map_ids (`Map_IMG` varchar(32), `Map_ID` varchar(32), `Time_Stamp` varchar(32));");
 	}
 	
@@ -109,7 +112,6 @@ public class SQLite {
 			SQDrivers.getDatabase("database").executeStatement("ALTER TABLE map_ids ADD Time_Stamp datatype;");
 		} 
 		
-		if (!SQDrivers.getDatabase("database").tableExists("ij_first_join") && SQDrivers.getDatabase("database").tableExists("ij_first_join")) {
 			SQDrivers.getDatabase("database").executeStatement("ALTER TABLE first_join RENAME TO ij_first_join;");
 			SQDrivers.getDatabase("database").executeStatement("ALTER TABLE first_world RENAME TO ij_first_world;");
 			SQDrivers.getDatabase("database").executeStatement("ALTER TABLE ip_limits RENAME TO ij_ip_limits;");
@@ -293,12 +295,26 @@ public class SQLite {
 	
    /**
     * Loads the return crafting related data.
+    * 
     */
 	private void loadReturnCraftItems() {
 		List<List<String>> selectedReturnCraftItems = SQDrivers.getDatabase("database").queryTableData("SELECT * FROM ij_return_craftitems", "Player_UUID", "Inventory64");
 		if (selectedReturnCraftItems != null && !selectedReturnCraftItems.isEmpty()) {
 			for (List<String> sl1 : selectedReturnCraftItems) {
 				this.returnCraftItems.put(sl1.get(0), sl1.get(1));
+			}
+		}
+	}
+	
+   /**
+    * Loads the players on cooldown and their relative items.
+    * 
+    */
+	private void loadCooldown() {
+		List<List<String>> selectedCooldownItems = SQDrivers.getDatabase("database").queryTableData("SELECT * FROM ij_on_cooldown", "Cooldown", "Item_Name", "Duration", "World_Name", "Player_UUID");
+		if (selectedCooldownItems != null && !selectedCooldownItems.isEmpty()) {
+			for (List<String> sl1 : selectedCooldownItems) {
+				this.onCooldown.put(sl1.get(1) + "._." + sl1.get(2) + ".__." + sl1.get(3) + "-.-" + sl1.get(4), Long.parseLong(sl1.get(0)));
 			}
 		}
 	}
@@ -419,6 +435,19 @@ public class SQLite {
 		String inventory64 = ItemHandler.getItem().serializeInventory(inventory);
 		this.executeStatementsLater.add("INSERT INTO ij_return_craftitems (`Player_UUID`, `Inventory64`, `Time_Stamp`) VALUES ('" + PlayerHandler.getPlayer().getPlayerID(player) + "','" + ItemHandler.getItem().serializeInventory(inventory) + "','" + new Timestamp(System.currentTimeMillis()) + "')");
 		this.returnCraftItems.put(PlayerHandler.getPlayer().getPlayerID(player), inventory64);
+	}
+	
+   /**
+    * Saves the players on cooldown related data.
+    * 
+    * @param item - The item on cooldown.
+    * @param player - The player on cooldown.
+    * @param worldName - The world name of the item on cooldown.
+    * @param cooldown - The current system time.
+    * @param duration - The duration of cooldown expected.
+    */
+	public void saveCooldown(String item, String player, String worldName, long cooldown, int duration) {
+		this.executeStatementsLater.add("INSERT INTO ij_on_cooldown (`World_Name`, `Item_Name`, `Player_UUID`, `Cooldown`, `Duration`, `Time_Stamp`) VALUES ('" + worldName + "','" + item + "','" + player + "','" + cooldown + "','" + duration + "','" + new Timestamp(System.currentTimeMillis()) + "')");
 	}
 	
    /**
@@ -598,6 +627,26 @@ public class SQLite {
 			return ItemHandler.getItem().deserializeInventory(this.returnCraftItems.get(PlayerHandler.getPlayer().getPlayerID(player)));
 		}
 		return null;
+	}
+	
+   /**
+    * Gets the players on cooldown for the item.
+    * 
+    * @param item - The item to be fetched.
+    * @return The players on cooldown for the item.
+    */
+	public Map<String, Long> getCooldown(ItemMap itemMap) {
+		Map < String, Long > playersOnCooldown = new HashMap < String, Long > ();
+		for (String keys: this.onCooldown.keySet()) {
+			String[] parts1 = keys.split(".__.");
+			String[] parts2 = parts1[0].split("._.");
+			if (parts2[0].equalsIgnoreCase(itemMap.getConfigName()) && String.valueOf(itemMap.getCommandCooldown()).equalsIgnoreCase(parts2[1])) {
+				playersOnCooldown.put(parts1[1], this.onCooldown.get(keys));
+				this.onCooldown.remove(keys);
+			}
+		}
+		this.executeStatementsLater.add("DELETE FROM ij_on_cooldown WHERE Item_Name='" + itemMap.getConfigName() + "';");
+		return playersOnCooldown;
 	}
 	
    /**
