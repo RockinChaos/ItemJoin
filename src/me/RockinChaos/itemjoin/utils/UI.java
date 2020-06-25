@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.FireworkEffect.Type;
@@ -538,7 +539,7 @@ public class UI {
 				}
 			}
 		}, event -> {
-			itemMap.setCustomName(event.getMessage());
+			itemMap.setCustomName(ChatColor.stripColor(event.getMessage()));
 			String[] placeHolders = LanguageAPI.getLang(false).newString();
 			placeHolders[14] = "NAME";
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
@@ -551,7 +552,7 @@ public class UI {
 				this.lorePane(player, itemMap);
 			}
 		}, event -> {
-			itemMap.setCustomLore(Utils.getUtils().split(event.getMessage()));
+			itemMap.setCustomLore(Utils.getUtils().split(ChatColor.stripColor(event.getMessage())));
 			String[] placeHolders = LanguageAPI.getLang(false).newString();
 			placeHolders[14] = "LORE";
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
@@ -579,7 +580,7 @@ public class UI {
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 			}
 		}, event -> {
-			itemMap.setPerm(event.getMessage());
+			itemMap.setPerm(ChatColor.stripColor(event.getMessage()));
 			String[] placeHolders = LanguageAPI.getLang(false).newString();
 			placeHolders[14] = "CUSTOM PERMISSION";
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
@@ -639,7 +640,7 @@ public class UI {
 					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 				}
 			}, event -> {
-				itemMap.setMapImage(event.getMessage());
+				itemMap.setMapImage(ChatColor.stripColor(event.getMessage()));
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[14] = "MAP IMAGE";
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
@@ -819,13 +820,13 @@ public class UI {
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 		}, event -> {
-			if (ItemHandler.getItem().getMaterial(event.getMessage(), null) != null) {
+			if (ItemHandler.getItem().getMaterial(ChatColor.stripColor(event.getMessage()), null) != null) {
 				if (stage == 2) {
-					itemMap.setItemCost(event.getMessage().toUpperCase());
+					itemMap.setItemCost(ChatColor.stripColor(event.getMessage()).toUpperCase());
 				} else if (stage != 3) { 
-					itemMap.setMaterial(ItemHandler.getItem().getMaterial(event.getMessage(), null)); 
-					if (!ServerHandler.getServer().hasSpecificUpdate("1_13") && event.getMessage().contains(":")) {
-						String[] dataValue = event.getMessage().split(":");
+					itemMap.setMaterial(ItemHandler.getItem().getMaterial(ChatColor.stripColor(event.getMessage()), null)); 
+					if (!ServerHandler.getServer().hasSpecificUpdate("1_13") && ChatColor.stripColor(event.getMessage()).contains(":")) {
+						String[] dataValue = ChatColor.stripColor(event.getMessage()).split(":");
 						if (Utils.getUtils().isInt(dataValue[1])) {
 							itemMap.setDataValue((short)Integer.parseInt(dataValue[1]));
 						}	
@@ -839,7 +840,7 @@ public class UI {
 				}
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
 				if (stage == 3) {
-					this.setIngredients(event.getPlayer(), itemMap, ItemHandler.getItem().getMaterial(event.getMessage(), null), position);
+					this.setIngredients(event.getPlayer(), itemMap, ItemHandler.getItem().getMaterial(ChatColor.stripColor(event.getMessage()), null), position);
 				} else if (stage == 2) {
 					this.commandPane(event.getPlayer(), itemMap);
 				} else {
@@ -847,7 +848,7 @@ public class UI {
 				}
 			} else {
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[16] = event.getMessage();
+				placeHolders[16] = ChatColor.stripColor(event.getMessage());
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.noMatch", player, placeHolders);
 				this.materialPane(player, itemMap, stage, position);
 			}
@@ -1372,14 +1373,14 @@ public class UI {
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 		}, event -> {
-			if (Utils.getUtils().isInt(event.getMessage())) {
-				itemMap.setData(Integer.parseInt(event.getMessage()));
+			if (Utils.getUtils().isInt(ChatColor.stripColor(event.getMessage()))) {
+				itemMap.setData(Integer.parseInt(ChatColor.stripColor(event.getMessage())));
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[14] = "DURABILITY DATA";
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
 			} else {
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[16] = event.getMessage();
+				placeHolders[16] = ChatColor.stripColor(event.getMessage());
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.notInteger", player, placeHolders);
 			}
 			this.dataPane(event.getPlayer(), itemMap);
@@ -1415,14 +1416,14 @@ public class UI {
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 		}, event -> {
-			if (Utils.getUtils().isInt(event.getMessage())) {
-				itemMap.setModelData(Integer.parseInt(event.getMessage()));
+			if (Utils.getUtils().isInt(ChatColor.stripColor(event.getMessage()))) {
+				itemMap.setModelData(Integer.parseInt(ChatColor.stripColor(event.getMessage())));
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[14] = "MODEL DATA";
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
 			} else {
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[16] = event.getMessage();
+				placeHolders[16] = ChatColor.stripColor(event.getMessage());
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.notInteger", player, placeHolders);
 			}
 			this.dataPane(event.getPlayer(), itemMap);
@@ -1458,14 +1459,14 @@ public class UI {
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 		}, event -> {
-			if (Utils.getUtils().isInt(event.getMessage())) {
-				itemMap.setDurability((short) Integer.parseInt(event.getMessage()));
+			if (Utils.getUtils().isInt(ChatColor.stripColor(event.getMessage()))) {
+				itemMap.setDurability((short) Integer.parseInt(ChatColor.stripColor(event.getMessage())));
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[14] = "DAMAGE";
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
 			} else {
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[16] = event.getMessage();
+				placeHolders[16] = ChatColor.stripColor(event.getMessage());
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.notInteger", player, placeHolders);
 			}
 			this.dataPane(event.getPlayer(), itemMap);
@@ -1560,7 +1561,7 @@ public class UI {
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 			}
 		}, event -> {
-			itemMap.setCooldownMessage(event.getMessage());String[] placeHolders = LanguageAPI.getLang(false).newString();placeHolders[14] = "COOLDOWN MESSAGE";LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);this.commandPane(event.getPlayer(), itemMap);
+			itemMap.setCooldownMessage(ChatColor.stripColor(event.getMessage()));String[] placeHolders = LanguageAPI.getLang(false).newString();placeHolders[14] = "COOLDOWN MESSAGE";LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);this.commandPane(event.getPlayer(), itemMap);
 		}));
 		commandPane.addButton(new Button(ItemHandler.getItem().getItem("JUKEBOX", 1, false, "&a&lSound", "&7", "&7*The sound that will be", "&7played after a successful", "&7command execution.", "&9&lCOMMANDS-SOUND: &a" + 
 		Utils.getUtils().nullCheck(itemMap.getCommandSound() + "")), event -> {
@@ -1844,7 +1845,7 @@ public class UI {
 					ItemCommand[] commands = itemMap.getCommands();
 					for (ItemCommand Command: commands) {
 						if (Command.equals(command)) {
-							Command.setSection(event.getMessage());
+							Command.setSection(ChatColor.stripColor(event.getMessage()));
 						}
 					}
 					itemMap.setCommands(commands);
@@ -1865,7 +1866,7 @@ public class UI {
 			ItemCommand[] commands = itemMap.getCommands();
 			for (ItemCommand Command: commands) {
 				if (Command.equals(command)) {
-					Command.setCommand(event.getMessage());
+					Command.setCommand(ChatColor.stripColor(event.getMessage()));
 				}
 			}
 			itemMap.setCommands(commands);
@@ -1909,7 +1910,7 @@ public class UI {
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 		}, event -> {
-			this.modifyCommands(itemMap, ItemCommand.fromString("player: " + event.getMessage(), action, CommandType.BOTH, 0L, null), true);
+			this.modifyCommands(itemMap, ItemCommand.fromString("player: " + ChatColor.stripColor(event.getMessage()), action, CommandType.BOTH, 0L, null), true);
 			String[] placeHolders = LanguageAPI.getLang(false).newString();
 			placeHolders[14] = "PLAYER COMMAND";
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
@@ -1923,7 +1924,7 @@ public class UI {
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 		}, event -> {
-			this.modifyCommands(itemMap, ItemCommand.fromString("op: " + event.getMessage(), action, CommandType.BOTH, 0L, null), true);
+			this.modifyCommands(itemMap, ItemCommand.fromString("op: " + ChatColor.stripColor(event.getMessage()), action, CommandType.BOTH, 0L, null), true);
 			String[] placeHolders = LanguageAPI.getLang(false).newString();
 			placeHolders[14] = "COMMAND LINE";
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
@@ -1937,7 +1938,7 @@ public class UI {
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 		}, event -> {
-			this.modifyCommands(itemMap, ItemCommand.fromString("console: " + event.getMessage(), action, CommandType.BOTH, 0L, null), true);
+			this.modifyCommands(itemMap, ItemCommand.fromString("console: " + ChatColor.stripColor(event.getMessage()), action, CommandType.BOTH, 0L, null), true);
 			String[] placeHolders = LanguageAPI.getLang(false).newString();
 			placeHolders[14] = "OP COMMAND";
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
@@ -1952,7 +1953,7 @@ public class UI {
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 		}, event -> {
-			this.modifyCommands(itemMap, ItemCommand.fromString("server: " + event.getMessage(), action, CommandType.BOTH, 0L, null), true);
+			this.modifyCommands(itemMap, ItemCommand.fromString("server: " + ChatColor.stripColor(event.getMessage()), action, CommandType.BOTH, 0L, null), true);
 			String[] placeHolders = LanguageAPI.getLang(false).newString();placeHolders[14] = "SERVER SWITCH";
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
 			this.commandListPane(event.getPlayer(), itemMap, action);
@@ -1965,7 +1966,7 @@ public class UI {
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 		}, event -> {
-			this.modifyCommands(itemMap, ItemCommand.fromString("bungee: " + event.getMessage(), action, CommandType.BOTH, 0L, null), true);
+			this.modifyCommands(itemMap, ItemCommand.fromString("bungee: " + ChatColor.stripColor(event.getMessage()), action, CommandType.BOTH, 0L, null), true);
 			String[] placeHolders = LanguageAPI.getLang(false).newString();
 			placeHolders[14] = "BUNGEE COMMAND";
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
@@ -1979,7 +1980,7 @@ public class UI {
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 		}, event -> {
-			this.modifyCommands(itemMap, ItemCommand.fromString("message: " + event.getMessage(), action, CommandType.BOTH, 0L, null), true);
+			this.modifyCommands(itemMap, ItemCommand.fromString("message: " + ChatColor.stripColor(event.getMessage()), action, CommandType.BOTH, 0L, null), true);
 			String[] placeHolders = LanguageAPI.getLang(false).newString();
 			placeHolders[14] = "MESSAGE";
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
@@ -2038,14 +2039,14 @@ public class UI {
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 		}, event -> {
-			if (Utils.getUtils().isInt(event.getMessage())) {
-				this.modifyCommands(itemMap, ItemCommand.fromString("delay: " + Integer.parseInt(event.getMessage()), action, CommandType.BOTH, Integer.parseInt(event.getMessage()), null), true);
+			if (Utils.getUtils().isInt(ChatColor.stripColor(event.getMessage()))) {
+				this.modifyCommands(itemMap, ItemCommand.fromString("delay: " + Integer.parseInt(ChatColor.stripColor(event.getMessage())), action, CommandType.BOTH, Integer.parseInt(ChatColor.stripColor(event.getMessage())), null), true);
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[14] = "DELAY";
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
 			} else {
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[16] = event.getMessage();
+				placeHolders[16] = ChatColor.stripColor(event.getMessage());
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.notInteger", player, placeHolders);
 			}
 			this.commandListPane(event.getPlayer(), itemMap, action);
@@ -2080,14 +2081,14 @@ public class UI {
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 		}, event -> {
-			if (Utils.getUtils().isInt(event.getMessage())) {
-				itemMap.setCommandCooldown(Integer.parseInt(event.getMessage()));
+			if (Utils.getUtils().isInt(ChatColor.stripColor(event.getMessage()))) {
+				itemMap.setCommandCooldown(Integer.parseInt(ChatColor.stripColor(event.getMessage())));
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[14] = "COMMAND COOLDOWN";
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
 			} else {
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[16] = event.getMessage();
+				placeHolders[16] = ChatColor.stripColor(event.getMessage());
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.notInteger", player, placeHolders);
 			}
 			this.commandPane(event.getPlayer(), itemMap);
@@ -2122,14 +2123,14 @@ public class UI {
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 		}, event -> {
-			if (Utils.getUtils().isInt(event.getMessage())) {
-				itemMap.setWarmDelay(Integer.parseInt(event.getMessage()));
+			if (Utils.getUtils().isInt(ChatColor.stripColor(event.getMessage()))) {
+				itemMap.setWarmDelay(Integer.parseInt(ChatColor.stripColor(event.getMessage())));
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[14] = "COMMAND WARMUP";
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
 			} else {
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[16] = event.getMessage();
+				placeHolders[16] = ChatColor.stripColor(event.getMessage());
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.notInteger", player, placeHolders);
 			}
 			this.commandPane(event.getPlayer(), itemMap);
@@ -2164,14 +2165,14 @@ public class UI {
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 		}, event -> {
-			if (Utils.getUtils().isInt(event.getMessage())) {
-				itemMap.setCommandCost(Integer.parseInt(event.getMessage()));
+			if (Utils.getUtils().isInt(ChatColor.stripColor(event.getMessage()))) {
+				itemMap.setCommandCost(Integer.parseInt(ChatColor.stripColor(event.getMessage())));
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[14] = "COMMAND COST";
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
 			} else {
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[16] = event.getMessage();
+				placeHolders[16] = ChatColor.stripColor(event.getMessage());
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.notInteger", player, placeHolders);
 			}
 			this.commandPane(event.getPlayer(), itemMap);
@@ -2206,14 +2207,14 @@ public class UI {
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 		}, event -> {
-			if (Utils.getUtils().isInt(event.getMessage())) {
-				itemMap.setCommandReceive(Integer.parseInt(event.getMessage()));
+			if (Utils.getUtils().isInt(ChatColor.stripColor(event.getMessage()))) {
+				itemMap.setCommandReceive(Integer.parseInt(ChatColor.stripColor(event.getMessage())));
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[14] = "COMMAND RECEIVE";
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
 			} else {
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[16] = event.getMessage();
+				placeHolders[16] = ChatColor.stripColor(event.getMessage());
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.notInteger", player, placeHolders);
 			}
 			this.commandPane(event.getPlayer(), itemMap);
@@ -2332,18 +2333,18 @@ public class UI {
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 		}, event -> {
-			if (Utils.getUtils().isInt(event.getMessage())) {
+			if (Utils.getUtils().isInt(ChatColor.stripColor(event.getMessage()))) {
 				if (stage == 0) {
-					itemMap.setCommandParticle(particle + ":" + event.getMessage());
+					itemMap.setCommandParticle(particle + ":" + ChatColor.stripColor(event.getMessage()));
 				} else {
-					this.explosionPane(player, itemMap, particle, Integer.parseInt(event.getMessage()));
+					this.explosionPane(player, itemMap, particle, Integer.parseInt(ChatColor.stripColor(event.getMessage())));
 				}
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[14] = "PARTICLE LIFETIME";
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
 			} else {
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[16] = event.getMessage();
+				placeHolders[16] = ChatColor.stripColor(event.getMessage());
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.notInteger", player, placeHolders);
 				this.particlePane(event.getPlayer(), itemMap);
 			}
@@ -2491,16 +2492,16 @@ public class UI {
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 		}, event -> {
-			if (Utils.getUtils().isInt(event.getMessage())) {
+			if (Utils.getUtils().isInt(ChatColor.stripColor(event.getMessage()))) {
 				Map < String, Integer > enchantments = itemMap.getEnchantments();
-				enchantments.put(ItemHandler.getItem().getEnchantName(enchant).toUpperCase(), Integer.parseInt(event.getMessage()));
+				enchantments.put(ItemHandler.getItem().getEnchantName(enchant).toUpperCase(), Integer.parseInt(ChatColor.stripColor(event.getMessage())));
 				itemMap.setEnchantments(enchantments);
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[14] = "ENCHANT LEVEL";
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
 			} else {
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[16] = event.getMessage();
+				placeHolders[16] = ChatColor.stripColor(event.getMessage());
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.notInteger", player, placeHolders);
 			}
 			this.enchantPane(event.getPlayer(), itemMap);
@@ -3193,10 +3194,10 @@ public class UI {
 			List<String> lore = new ArrayList<String>(); 
 			if (itemMap.getCustomLore() != null) {
 				lore = itemMap.getCustomLore(); 
-				lore.add(event.getMessage()); 
+				lore.add(ChatColor.stripColor(event.getMessage())); 
 				itemMap.setCustomLore(lore); 
 			} else { 
-				lore.add(event.getMessage()); 
+				lore.add(ChatColor.stripColor(event.getMessage())); 
 				itemMap.setCustomLore(lore);
 			}
 			this.lorePane(player, itemMap);
@@ -3229,7 +3230,7 @@ public class UI {
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 		}, event -> {
 			List <  String> lore = itemMap.getCustomLore();
-			lore.set(position, event.getMessage());
+			lore.set(position, ChatColor.stripColor(event.getMessage()));
 			itemMap.setCustomLore(lore);
 			String[] placeHolders = LanguageAPI.getLang(false).newString();
 			placeHolders[14] = "LORE LINE";
@@ -3305,12 +3306,12 @@ public class UI {
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 		}, event -> {
-			if (ItemHandler.getItem().getMaterial(event.getMessage(), null) != null) {
+			if (ItemHandler.getItem().getMaterial(ChatColor.stripColor(event.getMessage()), null) != null) {
 				if (isNew) {
-					this.durationMaterialPane(player, itemMap, position, isNew, event.getMessage().toUpperCase());
+					this.durationMaterialPane(player, itemMap, position, isNew, ChatColor.stripColor(event.getMessage()).toUpperCase());
 				} else {
 					List < String > mats = itemMap.getDynamicMaterials();
-					mats.set(position, "<delay:" + Utils.getUtils().returnInteger(ItemHandler.getItem().getDelayFormat(mats.get(position))) + ">" + event.getMessage().toUpperCase());
+					mats.set(position, "<delay:" + Utils.getUtils().returnInteger(ItemHandler.getItem().getDelayFormat(mats.get(position))) + ">" + ChatColor.stripColor(event.getMessage()).toUpperCase());
 					itemMap.setDynamicMaterials(mats);
 					this.modifyMaterialPane(player, itemMap, position);
 				}
@@ -3319,7 +3320,7 @@ public class UI {
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
 			} else {
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[16] = event.getMessage();
+				placeHolders[16] = ChatColor.stripColor(event.getMessage());
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.noMatch", player, placeHolders);
 				this.selectMaterialPane(player, itemMap, position, isNew);
 			}
@@ -3384,18 +3385,18 @@ public class UI {
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 		}, event -> {
-			if (Utils.getUtils().isInt(event.getMessage())) {
+			if (Utils.getUtils().isInt(ChatColor.stripColor(event.getMessage()))) {
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[14] = "ANIMATION DURATION";
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
 				List < String > mats = itemMap.getDynamicMaterials();
 				if (isNew) {
 					if (itemMap.getDynamicMaterials().isEmpty()) {
-						mats.add("<delay:" + Integer.parseInt(event.getMessage()) + ">" + itemMap.getMaterial());
+						mats.add("<delay:" + Integer.parseInt(ChatColor.stripColor(event.getMessage())) + ">" + itemMap.getMaterial());
 					}
-					mats.add("<delay:" + Integer.parseInt(event.getMessage()) + ">" + value);
+					mats.add("<delay:" + Integer.parseInt(ChatColor.stripColor(event.getMessage())) + ">" + value);
 				} else {
-					mats.set(position, "<delay:" + Integer.parseInt(event.getMessage()) + ">" + ItemHandler.getItem().cutDelay(mats.get(position)));
+					mats.set(position, "<delay:" + Integer.parseInt(ChatColor.stripColor(event.getMessage())) + ">" + ItemHandler.getItem().cutDelay(mats.get(position)));
 				}
 				itemMap.setDynamicMaterials(mats);
 				if (isNew) {
@@ -3405,7 +3406,7 @@ public class UI {
 				}
 			} else {
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[16] = event.getMessage();
+				placeHolders[16] = ChatColor.stripColor(event.getMessage());
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.notInteger", player, placeHolders);
 				this.durationMaterialPane(player, itemMap, position, isNew, value);
 			}
@@ -3483,7 +3484,7 @@ public class UI {
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 		}, event -> {
-			this.durationNamePane(player, itemMap, 0, true, event.getMessage());
+			this.durationNamePane(player, itemMap, 0, true, ChatColor.stripColor(event.getMessage()));
 			String[] placeHolders = LanguageAPI.getLang(false).newString();
 			placeHolders[14] = "NAME";
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
@@ -3514,18 +3515,18 @@ public class UI {
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 		}, event -> {
-			if (Utils.getUtils().isInt(event.getMessage())) {
+			if (Utils.getUtils().isInt(ChatColor.stripColor(event.getMessage()))) {
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[14] = "ANIMATION DURATION";
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
 				List < String > names = itemMap.getDynamicNames();
 				if (isNew) {
 					if (itemMap.getDynamicNames().isEmpty() && itemMap.getCustomName() != null && !itemMap.getCustomName().isEmpty()) {
-						names.add("<delay:" + Integer.parseInt(event.getMessage()) + ">" + itemMap.getCustomName());
+						names.add("<delay:" + Integer.parseInt(ChatColor.stripColor(event.getMessage())) + ">" + itemMap.getCustomName());
 					}
-					names.add("<delay:" + Integer.parseInt(event.getMessage()) + ">" + value);
+					names.add("<delay:" + Integer.parseInt(ChatColor.stripColor(event.getMessage())) + ">" + value);
 				} else {
-					names.set(position, "<delay:" + Integer.parseInt(event.getMessage()) + ">" + ItemHandler.getItem().cutDelay(names.get(position)));
+					names.set(position, "<delay:" + Integer.parseInt(ChatColor.stripColor(event.getMessage())) + ">" + ItemHandler.getItem().cutDelay(names.get(position)));
 				}
 				itemMap.setDynamicNames(names);
 				if (isNew) {
@@ -3535,7 +3536,7 @@ public class UI {
 				}
 			} else {
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[16] = event.getMessage();
+				placeHolders[16] = ChatColor.stripColor(event.getMessage());
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.notInteger", player, placeHolders);
 				this.durationNamePane(player, itemMap, position, isNew, value);
 			}
@@ -3582,7 +3583,7 @@ public class UI {
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 		}, event -> {
 			List < String > names = itemMap.getDynamicNames();
-			names.set(position, "<delay:" + Utils.getUtils().returnInteger(ItemHandler.getItem().getDelayFormat(names.get(position))) + ">" + event.getMessage());
+			names.set(position, "<delay:" + Utils.getUtils().returnInteger(ItemHandler.getItem().getDelayFormat(names.get(position))) + ">" + ChatColor.stripColor(event.getMessage()));
 			itemMap.setDynamicNames(names)
 			;String[] placeHolders = LanguageAPI.getLang(false).newString();
 			placeHolders[14] = "NAME";
@@ -3631,7 +3632,7 @@ public class UI {
 			String[] placeHolders = LanguageAPI.getLang(false).newString();
 			placeHolders[14] = "ANIMATED LORE";
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
-			this.durationLorePane(event.getPlayer(), itemMap, 0, true, event.getMessage());
+			this.durationLorePane(event.getPlayer(), itemMap, 0, true, ChatColor.stripColor(event.getMessage()));
 		}));
 		for (int i = 1; i <= itemMap.getDynamicLores().size(); i++) {
 			final int k = i;
@@ -3659,7 +3660,7 @@ public class UI {
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 		}, event -> {
-			if (Utils.getUtils().isInt(event.getMessage())) {
+			if (Utils.getUtils().isInt(ChatColor.stripColor(event.getMessage()))) {
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[14] = "ANIMATION DURATION";
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
@@ -3667,13 +3668,13 @@ public class UI {
 				if (isNew) {
 					if (itemMap.getDynamicLores().isEmpty() && itemMap.getCustomLore() != null && !itemMap.getCustomLore().isEmpty()) {
 						List < String > loreCut = itemMap.getCustomLore();
-						loreCut.set(0, "<delay:" + Integer.parseInt(event.getMessage()) + ">" + loreCut.get(0));
+						loreCut.set(0, "<delay:" + Integer.parseInt(ChatColor.stripColor(event.getMessage())) + ">" + loreCut.get(0));
 						lores.add(loreCut);
 					}
-					lores.add(Utils.getUtils().split("<delay:" + Integer.parseInt(event.getMessage()) + ">" + value));
+					lores.add(Utils.getUtils().split("<delay:" + Integer.parseInt(ChatColor.stripColor(event.getMessage())) + ">" + value));
 				} else {
 					List < String > loreCut = ItemHandler.getItem().cutDelay(lores.get(position));
-					loreCut.set(0, "<delay:" + Integer.parseInt(event.getMessage()) + ">" + loreCut.get(0));
+					loreCut.set(0, "<delay:" + Integer.parseInt(ChatColor.stripColor(event.getMessage())) + ">" + loreCut.get(0));
 					lores.set(position, loreCut);
 				}
 				itemMap.setDynamicLores(lores);
@@ -3684,7 +3685,7 @@ public class UI {
 				}
 			} else {
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[16] = event.getMessage();
+				placeHolders[16] = ChatColor.stripColor(event.getMessage());
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.notInteger", player, placeHolders);
 				this.durationLorePane(player, itemMap, position, isNew, value);
 			}
@@ -3735,7 +3736,7 @@ public class UI {
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 		}, event -> {
 			List < List < String >> lores = itemMap.getDynamicLores();
-			lores.set(position, Utils.getUtils().split("<delay:" + Utils.getUtils().returnInteger(ItemHandler.getItem().getDelayFormat(lores.get(position).get(0))) + ">" + event.getMessage()));
+			lores.set(position, Utils.getUtils().split("<delay:" + Utils.getUtils().returnInteger(ItemHandler.getItem().getDelayFormat(lores.get(position).get(0))) + ">" + ChatColor.stripColor(event.getMessage())));
 			itemMap.setDynamicLores(lores);
 			String[] placeHolders = LanguageAPI.getLang(false).newString();
 			placeHolders[14] = "ANIMATED LORE";LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
@@ -3783,7 +3784,7 @@ public class UI {
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 			}, event -> {
-				this.durationSkullPane(player, itemMap, 0, true, event.getMessage(), owner);
+				this.durationSkullPane(player, itemMap, 0, true, ChatColor.stripColor(event.getMessage()), owner);
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[14] = "SKULL OWNER";
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
@@ -3811,7 +3812,7 @@ public class UI {
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 			}, event -> {
-				this.durationSkullPane(player, itemMap, 0, true, event.getMessage(), owner);
+				this.durationSkullPane(player, itemMap, 0, true, ChatColor.stripColor(event.getMessage()), owner);
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[14] = "SKULL TEXTURE";
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
@@ -3844,7 +3845,7 @@ public class UI {
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 		}, event -> {
-			if (Utils.getUtils().isInt(event.getMessage())) {
+			if (Utils.getUtils().isInt(ChatColor.stripColor(event.getMessage()))) {
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[14] = "ANIMATION DURATION";
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
@@ -3854,13 +3855,13 @@ public class UI {
 				}
 				if (isNew) {
 					if (itemMap.getDynamicOwners().isEmpty() && owner && itemMap.getSkull() != null && !itemMap.getSkull().isEmpty()) {
-						skulls.add("<delay:" + Integer.parseInt(event.getMessage()) + ">" + itemMap.getSkull());
+						skulls.add("<delay:" + Integer.parseInt(ChatColor.stripColor(event.getMessage())) + ">" + itemMap.getSkull());
 					} else if (itemMap.getDynamicTextures().isEmpty() && !owner && itemMap.getSkullTexture() != null && !itemMap.getSkullTexture().isEmpty()) {
-						skulls.add("<delay:" + Integer.parseInt(event.getMessage()) + ">" + itemMap.getSkullTexture());
+						skulls.add("<delay:" + Integer.parseInt(ChatColor.stripColor(event.getMessage())) + ">" + itemMap.getSkullTexture());
 					}
-					skulls.add("<delay:" + Integer.parseInt(event.getMessage()) + ">" + value);
+					skulls.add("<delay:" + Integer.parseInt(ChatColor.stripColor(event.getMessage())) + ">" + value);
 				} else {
-					skulls.set(position, "<delay:" + Integer.parseInt(event.getMessage()) + ">" + ItemHandler.getItem().cutDelay(skulls.get(position)));
+					skulls.set(position, "<delay:" + Integer.parseInt(ChatColor.stripColor(event.getMessage())) + ">" + ItemHandler.getItem().cutDelay(skulls.get(position)));
 				}
 				if (owner) {
 					itemMap.setDynamicOwners(skulls);
@@ -3874,7 +3875,7 @@ public class UI {
 				}
 			} else {
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[16] = event.getMessage();
+				placeHolders[16] = ChatColor.stripColor(event.getMessage());
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.notInteger", player, placeHolders);
 				this.durationSkullPane(player, itemMap, position, isNew, value, owner);
 			}
@@ -3932,7 +3933,7 @@ public class UI {
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 			}, event -> {
 				List < String > skulls = itemMap.getDynamicOwners();
-				skulls.set(position, "<delay:" + Utils.getUtils().returnInteger(ItemHandler.getItem().getDelayFormat(skulls.get(position))) + ">" + event.getMessage());
+				skulls.set(position, "<delay:" + Utils.getUtils().returnInteger(ItemHandler.getItem().getDelayFormat(skulls.get(position))) + ">" + ChatColor.stripColor(event.getMessage()));
 				itemMap.setDynamicOwners(skulls);
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[14] = "SKULL OWNER";
@@ -3950,7 +3951,7 @@ public class UI {
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 			}, event -> {
 				List < String > skulls = itemMap.getDynamicTextures();
-				skulls.set(position, "<delay:" + Utils.getUtils().returnInteger(ItemHandler.getItem().getDelayFormat(skulls.get(position))) + ">" + event.getMessage());
+				skulls.set(position, "<delay:" + Utils.getUtils().returnInteger(ItemHandler.getItem().getDelayFormat(skulls.get(position))) + ">" + ChatColor.stripColor(event.getMessage()));
 				itemMap.setDynamicTextures(skulls);
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[14] = "SKULL TEXTURE";
@@ -4114,14 +4115,14 @@ public class UI {
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 		}, event -> {
-			if (Utils.getUtils().isInt(event.getMessage())) {
-				itemMap.setInteractCooldown(Integer.parseInt(event.getMessage()));
+			if (Utils.getUtils().isInt(ChatColor.stripColor(event.getMessage()))) {
+				itemMap.setInteractCooldown(Integer.parseInt(ChatColor.stripColor(event.getMessage())));
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[14] = "USAGE COOLDOWN";
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
 			} else {
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[16] = event.getMessage();
+				placeHolders[16] = ChatColor.stripColor(event.getMessage());
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.notInteger", player, placeHolders);
 			}
 			this.creatingPane(event.getPlayer(), itemMap);
@@ -4229,14 +4230,14 @@ public class UI {
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 		}, event -> {
-			if (ItemHandler.getItem().getMaterial(event.getMessage(), null) != null) {
+			if (ItemHandler.getItem().getMaterial(ChatColor.stripColor(event.getMessage()), null) != null) {
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[14] = "BUKKIT MATERIAL";
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
-				this.chancePane(player, itemMap, null, ItemHandler.getItem().getMaterial(event.getMessage(), null));
+				this.chancePane(player, itemMap, null, ItemHandler.getItem().getMaterial(ChatColor.stripColor(event.getMessage()), null));
 			} else {
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[16] = event.getMessage();
+				placeHolders[16] = ChatColor.stripColor(event.getMessage());
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.noMatch", player, placeHolders);
 				this.blocksPane(player, itemMap);
 			}
@@ -4347,14 +4348,14 @@ public class UI {
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 		}, event -> {
-			if (Utils.getUtils().isDouble(event.getMessage())) {
+			if (Utils.getUtils().isDouble(ChatColor.stripColor(event.getMessage()))) {
 				if (entity != null) { 
 					Map<EntityType, Double> mobsDrop = itemMap.getMobsDrop();
-					mobsDrop.put(entity, Double.parseDouble(event.getMessage()));
+					mobsDrop.put(entity, Double.parseDouble(ChatColor.stripColor(event.getMessage())));
 					itemMap.setMobsDrop(mobsDrop);
 				} else {
 					Map<Material, Double> blocksDrop = itemMap.getBlocksDrop();
-					blocksDrop.put(material, Double.parseDouble(event.getMessage()));
+					blocksDrop.put(material, Double.parseDouble(ChatColor.stripColor(event.getMessage())));
 					itemMap.setBlocksDrop(blocksDrop);
 				}
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
@@ -4362,7 +4363,7 @@ public class UI {
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
 			} else {
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[16] = event.getMessage();
+				placeHolders[16] = ChatColor.stripColor(event.getMessage());
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.notInteger", player, placeHolders);
 			}
 			if (entity != null) { this.mobsPane(event.getPlayer(), itemMap); }
@@ -4599,14 +4600,14 @@ public class UI {
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 		}, event -> {
-			if (Utils.getUtils().isInt(event.getMessage())) {
+			if (Utils.getUtils().isInt(ChatColor.stripColor(event.getMessage()))) {
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[14] = "EFFECT LEVEL";
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
-				this.durationPane(event.getPlayer(), itemMap, potion, Integer.parseInt(event.getMessage()));
+				this.durationPane(event.getPlayer(), itemMap, potion, Integer.parseInt(ChatColor.stripColor(event.getMessage())));
 			} else {
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[16] = event.getMessage();
+				placeHolders[16] = ChatColor.stripColor(event.getMessage());
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.notInteger", player, placeHolders);
 				this.levelPane(event.getPlayer(), itemMap, potion);
 			}
@@ -4638,14 +4639,14 @@ public class UI {
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 		}, event -> {
-			if (Utils.getUtils().isInt(event.getMessage())) {
+			if (Utils.getUtils().isInt(ChatColor.stripColor(event.getMessage()))) {
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[14] = "EFFECT DURATION";
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
 				this.potionPane(event.getPlayer(), itemMap);
 			} else {
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[16] = event.getMessage();
+				placeHolders[16] = ChatColor.stripColor(event.getMessage());
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.notInteger", player, placeHolders);
 				this.durationPane(event.getPlayer(), itemMap, potion, level);
 			}
@@ -4679,14 +4680,14 @@ public class UI {
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 		}, event -> {
-			if (Utils.getUtils().isInt(event.getMessage())) {
-				itemMap.setFireworkPower(Integer.parseInt(event.getMessage()));
+			if (Utils.getUtils().isInt(ChatColor.stripColor(event.getMessage()))) {
+				itemMap.setFireworkPower(Integer.parseInt(ChatColor.stripColor(event.getMessage())));
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[14] = "FIREWORK POWER";
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
 			} else {
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[16] = event.getMessage();
+				placeHolders[16] = ChatColor.stripColor(event.getMessage());
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.notInteger", player, placeHolders);
 			}
 			this.otherPane(player, itemMap);
@@ -4795,7 +4796,7 @@ public class UI {
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 			}, event -> {
 				List < String > newPage = new ArrayList < String > ();
-				newPage.add(event.getMessage());pages.add(newPage);
+				newPage.add(ChatColor.stripColor(event.getMessage()));pages.add(newPage);
 				itemMap.setListPages(pages);
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[14] = "PAGE LINE";
@@ -4818,7 +4819,7 @@ public class UI {
 					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
 					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 				}, event -> {
-					selectPage.add(event.getMessage());
+					selectPage.add(ChatColor.stripColor(event.getMessage()));
 					pages.set(page, selectPage);
 					itemMap.setListPages(pages);
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
@@ -4856,7 +4857,7 @@ public class UI {
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
 			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 		}, event -> {
-			selectPage.set(line, event.getMessage());
+			selectPage.set(line, ChatColor.stripColor(event.getMessage()));
 			pages.set(page, selectPage);
 			itemMap.setListPages(pages);
 			String[] placeHolders = LanguageAPI.getLang(false).newString();
@@ -4910,7 +4911,7 @@ public class UI {
 					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 				}
 			}, event -> {
-				itemMap.setAuthor(event.getMessage());
+				itemMap.setAuthor(ChatColor.stripColor(event.getMessage()));
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[14] = "AUTHOR";
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
@@ -4937,7 +4938,7 @@ public class UI {
 					}
 				}
 			}, event -> {
-				itemMap.setSkull(event.getMessage());
+				itemMap.setSkull(ChatColor.stripColor(event.getMessage()));
 				itemMap.setSkullTexture(null);
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[14] = "SKULL OWNER";
@@ -4964,7 +4965,7 @@ public class UI {
 					}
 				}
 			}, event -> {
-				itemMap.setSkullTexture(event.getMessage());
+				itemMap.setSkullTexture(ChatColor.stripColor(event.getMessage()));
 				itemMap.setSkull(null);
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[14] = "SKULL TEXTURE";
@@ -5052,7 +5053,7 @@ public class UI {
 				}
 			}, event -> {
 				if (itemMap.getLeatherHex() == null) {
-					itemMap.setLeatherHex(event.getMessage());
+					itemMap.setLeatherHex(ChatColor.stripColor(event.getMessage()));
 					itemMap.setLeatherColor(null);
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[14] = "HEX COLOR";
