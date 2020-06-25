@@ -17,6 +17,8 @@
  */
 package me.RockinChaos.itemjoin.utils;
 
+import java.util.regex.Pattern;
+
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -57,8 +59,8 @@ public class LanguageAPI {
 		if (prefix == null || prefix.isEmpty() || !this.showPrefix(nodeLocation)) { prefix = ""; } else { prefix += " "; }
 		if (langMessage != null && !langMessage.isEmpty()) {
 			langMessage = this.translateLangHolders(langMessage, this.initializeRows(placeHolder));
-			langMessage = Utils.getUtils().translateLayout(langMessage, player);
-			String[] langLines = langMessage.split(" /n ");
+			langMessage = Utils.getUtils().translateLayout(langMessage, player).replace(" \\n ", " \\n").replace(" /n ", " \\n").replace(" /n", " \\n");
+			String[] langLines = langMessage.split(Pattern.quote(" \\" + "n"));
 			for (String langLine : langLines) {
 				String langStrip = prefix + langLine;
 				if (sender instanceof ConsoleCommandSender) { langStrip = ChatColor.stripColor(langStrip); } 
@@ -204,8 +206,8 @@ public class LanguageAPI {
 		if (lang.equalsIgnoreCase("TraditionalChinese") || lang.equalsIgnoreCase("TwChinese") || lang.equalsIgnoreCase("Chinese")) { this.setLanguage("tw"); } 
 		else if (lang.equalsIgnoreCase("SimplifiedChinese") || lang.equalsIgnoreCase("CnChinese")) { this.setLanguage("cn"); } 
 		else if (Utils.getUtils().containsIgnoreCase(lang, "Chinese")) { this.setLanguage("tw"); } 
-		else if (lang.replace(" ", "").equalsIgnoreCase("Spanish")) { this.setLanguage("es"); } 
-		else if (lang.replace(" ", "").equalsIgnoreCase("Russian")) { this.setLanguage("ru"); } 
+		else if (lang.equalsIgnoreCase("Spanish")) { this.setLanguage("es"); } 
+		else if (lang.equalsIgnoreCase("Russian")) { this.setLanguage("ru"); } 
 		else { this.setLanguage("en"); }
 	}
 	

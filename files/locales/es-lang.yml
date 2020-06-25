@@ -10,7 +10,7 @@ General:
   failedOverwrite: '&c¡Error al darte los items &4%failcount% &c, no tienes permitido sobrescribir items!'
   failedInventory: '&c¡Error al darte los items &4%failcount% &c, tu inventario está lleno!'
   itemChargeSuccess: '&aComando ejecutado satisfactoriamente por &e$%cost%&a.'
-  itemChargeFailed: '&c¡No tienes suficiente para ejecutar este comando! /n &cSolo tienes &4$%balance% &cde &4$%cost%.'
+  itemChargeFailed: '&c¡No tienes suficiente para ejecutar este comando! \n&cSolo tienes &4$%balance% &cde &4$%cost%.'
   itemWarmingUp: '&aEl item [%item%&a] esta sobrecalentado...'
   itemWarming: '&aComenzando la ejecución del item [%item%&a] en &2%timeleft%&a segundos.'
   itemWarmingHalted: '&c¡La ejecución del item &4[&c%item%&4] &cfue cancelada!'

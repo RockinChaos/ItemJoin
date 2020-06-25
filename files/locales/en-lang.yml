@@ -10,7 +10,7 @@ General:
   failedOverwrite: '&cFailed to give you &4%failcount% &citems, you are not allowed to overwrite items!'
   failedInventory: '&cFailed to give you &4%failcount% &citems, your inventory is full!'
   itemChargeSuccess: '&aSuccessfully ran the command for &e$%cost%&a.'
-  itemChargeFailed: '&cYou do not have enough to run this command! /n &cYou have &4$%balance% &cof the required &4$%cost%.'
+  itemChargeFailed: '&cYou do not have enough to run this command! \n&cYou have &4$%balance% &cof the required &4$%cost%.'
   itemWarmingUp: '&aThe item [%item%&a] is warming up...'
   itemWarming: '&aCommencing [%item%&a] execution in &2%timeleft%&a seconds.'
   itemWarmingHalted: '&cCommence of &4[&c%item%&4] &cexecution cancelled!'

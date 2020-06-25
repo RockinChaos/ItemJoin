@@ -10,7 +10,7 @@ General:
   failedOverwrite: '&cНе удалось &fвыдать вам &b%failcount% &fпредмет(ов), потому что вы не имеете права перезаписать предметы!'
   failedInventory: '&cНе удалось &fвыдать вам &b%failcount% &fпредмет(ов), потому что ваш инвентарь полный'
   itemChargeSuccess: '&fКоманда &aуспешно &fвыполнена за &b$%cost%'
-  itemChargeFailed: '&fУ вас &cнедостаточно &fденег, чтобы выполнить эту команду! /n&fВаш баланс: &a%balance%$ &fа услуга стоит: &b$%cost%'
+  itemChargeFailed: '&fУ вас &cнедостаточно &fденег, чтобы выполнить эту команду! \n&fВаш баланс: &a%balance%$ &fа услуга стоит: &b$%cost%'
   itemWarmingUp: '&fПредмет(ы): &7[&a%item%&7] &aразогревается...'
   itemWarming: '&fИспользование: &7[&a%item%&7] &fначнется через &b%timeleft% &fсекунд'
   itemWarmingHalted: '&fИспользование: &7[&a%item%&7] &aуспешно &cотменено!'
