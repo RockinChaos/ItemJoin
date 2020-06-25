@@ -2945,7 +2945,7 @@ public class UI {
 		if (itemMap.isOverwritable()) { itemflags += "OVERWRITE, "; }
 		if (itemMap.isOpBypass()) { itemflags += "ALLOWOPBYPASS, "; }
 		if (itemMap.isAutoRemove()) { itemflags += "AUTO-REMOVE, "; }
-		if (itemMap.isCreativeBypass()) { itemflags += "ALLOWCREATIVEBYPASS, "; }
+		if (itemMap.isCreativeBypass()) { itemflags += "CREATIVEBYPASS, "; }
 		if (itemflags.endsWith(", ")) { itemflags = itemflags.substring(0, itemflags.length() - 2); }
 		itemMap.setItemFlags(itemflags);
 	}
