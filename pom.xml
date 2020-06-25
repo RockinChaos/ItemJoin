@@ -129,7 +129,7 @@
 		<dependency>
 			<groupId>org.spigotmc</groupId>
 			<artifactId>spigot-api</artifactId>
-			<version>Latest</version>
+			<version>latest</version>
          <scope>provided</scope>
 		</dependency>
     <!--PlaceholderAPI API-->
