@@ -80,7 +80,7 @@
 		</plugins>
 	</build>
 	<repositories>
-    <!--Spigot/CraftBukkit Repository-->
+    <!--Spigot Repository-->
 		<repository>
        		<id>spigot-repo</id>
         	<url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
@@ -129,14 +129,7 @@
 		<dependency>
 			<groupId>org.spigotmc</groupId>
 			<artifactId>spigot-api</artifactId>
-			<version>1.14.4-R0.1-SNAPSHOT</version>
-         <scope>provided</scope>
-		</dependency>
-    <!--CraftBukkit API-->
-		<dependency>
-			<groupId>org.bukkit</groupId>
-            <artifactId>bukkit</artifactId>
-            <version>1.14.4-R0.1-SNAPSHOT</version>
+			<version>Latest</version>
          <scope>provided</scope>
 		</dependency>
     <!--PlaceholderAPI API-->
@@ -168,8 +161,8 @@
     	</dependency>
     <!--Apache API-->
     	<dependency>
-       	 	<artifactId>commons-io</artifactId>
         	<groupId>commons-io</groupId>
+       	 	<artifactId>commons-io</artifactId>
         	<scope>compile</scope>
         	<version>2.5</version>
     	</dependency>
