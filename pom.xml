@@ -82,7 +82,7 @@
 	<repositories>
     <!--Spigot Repository-->
 		<repository>
-       		<id>spigot-repo</id>
+        	<id>spigot-repo</id>
         	<url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
 		</repository>
     <!--Maven Repository-->
@@ -129,22 +129,22 @@
 		<dependency>
 			<groupId>org.spigotmc</groupId>
 			<artifactId>spigot-api</artifactId>
-			<version>latest</version>
-         <scope>provided</scope>
+			<version>LATEST</version>
+	        <scope>provided</scope>
 		</dependency>
     <!--PlaceholderAPI API-->
         <dependency>
 	        <groupId>me.clip</groupId>
 	        <artifactId>placeholderapi</artifactId>
 	        <version>2.10.4</version>
-         <scope>provided</scope>
+	        <scope>provided</scope>
         </dependency>
     <!--AuthMe API-->
         <dependency>
 	        <groupId>fr.xephi</groupId>
 	        <artifactId>authme</artifactId>
 	        <version>5.6.0-SNAPSHOT</version>
-         <scope>provided</scope>
+	        <scope>provided</scope>
         </dependency>
     <!--Mojang AuthLib API-->
 		<dependency>
