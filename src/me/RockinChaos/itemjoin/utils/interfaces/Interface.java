@@ -40,6 +40,7 @@ public class Interface implements InventoryHolder {
 	private int activeButton = -1;
 	private int currentIndex;
 	private int pageSize;
+	private Player panePlayer;
 	private SortedMap < Integer, Page > pages = new TreeMap < > ();
 	
 	private boolean isPaged;
@@ -57,7 +58,8 @@ public class Interface implements InventoryHolder {
     * @param rows - Number of rows for the inventory.
     * @param title - Title to be displayed on the inventory.
     */
-	public Interface(boolean isPaged, int rows, String title) {
+	public Interface(boolean isPaged, int rows, String title, Player player) {
+		this.panePlayer = player;
 		this.isPaged = isPaged;
 		if (this.isPaged) {
 			this.pageSize = rows - 1;
@@ -77,7 +79,7 @@ public class Interface implements InventoryHolder {
     * @param event - InventoryClickEvent
     */
 	public void onClick(InventoryClickEvent event) {
-		if (!(this.pendingClick && event.getSlot() <=  event.getWhoClicked().getInventory().getSize() && event.getSlot() >= 0 && this.clickInventory(event))) {
+		if (this.panePlayer.equals(event.getWhoClicked()) && !(this.pendingClick && event.getSlot() <= event.getWhoClicked().getInventory().getSize() && event.getSlot() >= 0 && this.clickInventory(event))) {
 			if (this.isPaged && event.getSlot() == this.inventory.getSize() - 8 && this.getCurrentPage() > 1) {
 				if (this.controlBack != null) {
 					this.controlBack.onClick(event);
@@ -108,7 +110,7 @@ public class Interface implements InventoryHolder {
     * @param event - AsyncPlayerChatEvent
     */
 	public void onChat(AsyncPlayerChatEvent event) {
-		if (this.activeButton != -1) {
+		if (this.panePlayer.equals(event.getPlayer()) && this.activeButton != -1) {
 			this.pages.get(this.currentIndex).handleChat(event, this.activeButton);
 			this.pendingChat = false;
 			event.setCancelled(true);

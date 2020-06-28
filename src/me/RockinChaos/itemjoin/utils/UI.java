@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
@@ -96,7 +95,7 @@ public class UI {
     */
 	public void startMenu(final CommandSender sender) {
 		final Player player = (Player) sender;
-		Interface pagedPane = new Interface(false, 1, this.GUIName);
+		Interface pagedPane = new Interface(false, 1, this.GUIName, player);
 		pagedPane.addButton(new Button(this.exitItem, event -> player.closeInventory()));
 		pagedPane.addButton(new Button(this.fillerPaneBItem), 2);
 		pagedPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "WRITABLE_BOOK" : "386"), 1, false, "&a&l&nCreate", "&7", "&7*Create a new item from scratch."),
@@ -114,7 +113,7 @@ public class UI {
     * @param player - The Player to have the Pane opened.
     */
 	private void startModify(final Player player) {
-		Interface modifyPane = new Interface(true, 6, this.GUIName);
+		Interface modifyPane = new Interface(true, 6, this.GUIName, player);
 		this.setPage(player, modifyPane, ItemUtilities.getUtilities().copyItems());
 		modifyPane.open(player);
 	}
@@ -125,7 +124,7 @@ public class UI {
     * @param player - The Player to have the Pane opened.
     */
 	private void startHopper(Player player) {
-		Interface dragDrop = new Interface(false, 1, this.GUIName);
+		Interface dragDrop = new Interface(false, 1, this.GUIName, player);
 		dragDrop.allowClick(true);
 		dragDrop.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nMain Menu", "&7", "&7*Returns you to the main menu&a&c&b&9&0&a&c&b&7."), event -> this.startMenu(player)));
 		dragDrop.addButton(new Button(this.fillerPaneGItem), 3);
@@ -173,7 +172,7 @@ public class UI {
 		ItemMap currentItem = null;
 		boolean crafting = false;
 		boolean arbitrary = false;
-		Interface craftingPane = new Interface(false, 4, this.GUIName);
+		Interface craftingPane = new Interface(false, 4, this.GUIName, player);
 		craftingPane.addButton(new Button(this.fillerPaneGItem), 3);
 		currentItem = ItemUtilities.getUtilities().getItemMap("CRAFTING[1]", items);
 		if (currentItem != null) {
@@ -233,7 +232,7 @@ public class UI {
 		} else {
 			craftingPane.addButton(new Button(ItemHandler.getItem().getItem("ARROW", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", "&7the modifying selection menu"), event -> modifyPane.open(player)));
 		}
-		Interface arbitraryPane = new Interface(true, 6, this.GUIName);
+		Interface arbitraryPane = new Interface(true, 6, this.GUIName, player);
 		if (ServerHandler.getServer().hasSpecificUpdate("1_8")) {
 			arbitraryPane.setReturnButton(new Button(ItemHandler.getItem().setSkullTexture(ItemHandler.getItem().getItem("SKULL_ITEM:3", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", "&7the modifying selection menu"),
 					"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2RjOWU0ZGNmYTQyMjFhMWZhZGMxYjViMmIxMWQ4YmVlYjU3ODc5YWYxYzQyMzYyMTQyYmFlMWVkZDUifX19"), event -> modifyPane.open(player)));
@@ -411,7 +410,7 @@ public class UI {
     * @param item - The ItemStack currently being modified.
     */
 	private void choicePane(final Player player, final ItemMap itemMap, final ItemStack item) {
-		Interface choicePane = new Interface(false, 3, this.GUIName);
+		Interface choicePane = new Interface(false, 3, this.GUIName, player);
 		choicePane.addButton(new Button(this.fillerPaneBItem), 4);
 		choicePane.addButton(new Button(item));
 		choicePane.addButton(new Button(this.fillerPaneBItem), 4);
@@ -429,7 +428,7 @@ public class UI {
 			ItemUtilities.getUtilities().closeAnimations();
 			ItemUtilities.getUtilities().clearItems();
 			ConfigHandler.getConfig(true);
-			Bukkit.getServer().getScheduler().runTaskLater(ItemJoin.getInstance(), () -> { this.startModify(player); }, 2L);
+			ServerHandler.getServer().runAsyncThread(main -> { this.startModify(player); }, 2L);
 		}));
 		choicePane.addButton(new Button(this.fillerPaneBItem), 3);
 		choicePane.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the modify menu"), event -> this.startModify(player)));
@@ -446,7 +445,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void creatingPane(final Player player, final ItemMap itemMap) {
-		Interface creatingPane = new Interface(false, 5, this.GUIName);
+		Interface creatingPane = new Interface(false, 5, this.GUIName, player);
 		String slotList = "";
 		String slotString = "";
 		if (Utils.getUtils().nullCheck(itemMap.getMultipleSlots().toString()) != "NONE") {
@@ -650,7 +649,7 @@ public class UI {
 			creatingPane.addButton(new Button(ItemHandler.getItem().getItem("BLAZE_POWDER", 1, false, "&e&lEffects", "&7", "&7*Add custom effects", "&7to the arrow tip.", "&9&lTipped-Effect: &a" + Utils.getUtils().nullCheck(potionList)),
 					event -> this.potionPane(player, itemMap)));
 		} else if (itemMap.getMaterial().toString().contains("CHARGE") || itemMap.getMaterial().toString().equalsIgnoreCase("FIREWORK_STAR")) {
-			Interface colorPane = new Interface(true, 6, this.GUIName);
+			Interface colorPane = new Interface(true, 6, this.GUIName, player);
 			colorPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu"), event -> this.creatingPane(player, itemMap)));
 			for (DyeColor color: DyeColor.values()) {
 				colorPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "GRAY_DYE" : "351:8"), 1, false, "&f" + color.name(), "&7", "&7*This will be the color", "&7of your firework charge."), event -> {
@@ -726,7 +725,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void returnConfirm(final Player player, final ItemMap itemMap) {
-		Interface returnPane = new Interface(false, 1, this.GUIName);
+		Interface returnPane = new Interface(false, 1, this.GUIName, player);
 		returnPane.addButton(new Button(this.fillerPaneBItem));
 		returnPane.addButton(new Button(ItemHandler.getItem().getItem("WOOL:14", 1, false, "&c&l&nMain Menu", "&7", "&7*Cancel and return to the", "&7main menu, all modified", "&7settings will be lost.", "&7", "&c&lWARNING: &cThis item has &lNOT&c been saved!"), event -> this.startMenu(player)));
 		returnPane.addButton(new Button(this.fillerPaneBItem), 2);
@@ -794,7 +793,7 @@ public class UI {
     * @param stage - The stage of the modification.
     */
 	private void materialPane(final Player player, final ItemMap itemMap, final int stage, final int position) {
-		Interface materialPane = new Interface(true, 6, this.GUIName);
+		Interface materialPane = new Interface(true, 6, this.GUIName, player);
 		if (stage != 0 && stage != 2 && stage != 3) {
 			materialPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> {
 				this.creatingPane(player, itemMap);
@@ -912,7 +911,7 @@ public class UI {
     * @param stage - The stage in the modification.
     */
 	private void switchPane(final Player player, final ItemMap itemMap, final int stage) {
-		Interface slotPane = new Interface(false, 1, this.GUIName);
+		Interface slotPane = new Interface(false, 1, this.GUIName, player);
 		if (stage == 0) {
 			if (ServerHandler.getServer().hasSpecificUpdate("1_8")) {
 				slotPane.addButton(new Button(ItemHandler.getItem().setSkullTexture(ItemHandler.getItem().getItem("SKULL_ITEM:3", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", "&7the material selection menu."), 
@@ -951,8 +950,8 @@ public class UI {
     * @param type - The type of slot being defined, single or multiple.
     */
 	private void slotPane(final Player player, final ItemMap itemMap, final int stage, final int type) { 
-		Interface slotPane = new Interface(false, 6, this.GUIName);
-		Interface craftingPane = new Interface(false, 4, this.GUIName);
+		Interface slotPane = new Interface(false, 6, this.GUIName, player);
+		Interface craftingPane = new Interface(false, 4, this.GUIName, player);
 		craftingPane.addButton(new Button(this.fillerPaneGItem), 3);
 		craftingPane.addButton(new Button(ItemHandler.getItem().getItem("58", 1, (type > 0 ? Utils.getUtils().containsValue(itemMap.getMultipleSlots(), "CRAFTING[1]") : false), "&9&lSlot: &7&lCRAFTING&a&l[1]", "&7", "&7*Click to set the custom item", 
 				"&7to appear in the &lCRAFTING &7slot &a&l[1]&7", (type > 0 && Utils.getUtils().containsValue(itemMap.getMultipleSlots(), "CRAFTING[1]") ? "&9&lENABLED: &aTRUE" : "")), event -> {
@@ -1290,7 +1289,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void countPane(final Player player, final ItemMap itemMap) {
-		Interface countPane = new Interface(true, 6, this.GUIName);
+		Interface countPane = new Interface(true, 6, this.GUIName, player);
 		countPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> {
 			this.creatingPane(player, itemMap);
 		}));
@@ -1311,7 +1310,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void dataPane(final Player player, final ItemMap itemMap) {
-		Interface dataPane = new Interface(false, 2, this.GUIName);
+		Interface dataPane = new Interface(false, 2, this.GUIName, player);
 		dataPane.addButton(new Button(this.fillerPaneBItem));
 		dataPane.addButton(new Button(ItemHandler.getItem().setDurability(ItemHandler.getItem().getItem("BOW", 1, false, "&b&lDamage", "&7", "&7*Set the damage of the item.", (itemMap.getMaterial().getMaxDurability() != 0 ? "&9&lDURABILITY: &a" + 
 		Utils.getUtils().nullCheck(itemMap.getDurability() + "&7") : "&c&lERROR: &7This item is NOT damagable.")), 50), event -> {
@@ -1361,7 +1360,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void durabilityDataPane(final Player player, final ItemMap itemMap) {
-		Interface texturePane = new Interface(true, 6, this.GUIName);
+		Interface texturePane = new Interface(true, 6, this.GUIName, player);
 		texturePane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> {
 			this.dataPane(player, itemMap);
 		}));
@@ -1404,7 +1403,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void modelDataPane(final Player player, final ItemMap itemMap) {
-		Interface texturePane = new Interface(true, 6, this.GUIName);
+		Interface texturePane = new Interface(true, 6, this.GUIName, player);
 		texturePane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> {
 			this.dataPane(player, itemMap);
 		}));
@@ -1447,7 +1446,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void damagePane(final Player player, final ItemMap itemMap) {
-		Interface damagePane = new Interface(true, 6, this.GUIName);
+		Interface damagePane = new Interface(true, 6, this.GUIName, player);
 		damagePane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> {
 			this.dataPane(player, itemMap);
 		}));
@@ -1494,7 +1493,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void commandPane(final Player player, final ItemMap itemMap) {
-		Interface commandPane = new Interface(false, 3, this.GUIName);
+		Interface commandPane = new Interface(false, 3, this.GUIName, player);
 		commandPane.addButton(new Button(this.fillerPaneGItem), 3);
 		commandPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "WRITABLE_BOOK" : "386"), 1, false, "&e&lCommands", "&7", "&7*Click to define the custom command lines", "&7for the item and click type.", 
 				"&7", "&9&lCommands: &a" + (itemMap.getCommands().length != 0 ? "YES" : "NONE")), event -> this.actionPane(player, itemMap)));
@@ -1604,7 +1603,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void actionPane(final Player player, final ItemMap itemMap) {
-		Interface clickPane = new Interface(false, 4, this.GUIName);
+		Interface clickPane = new Interface(false, 4, this.GUIName, player);
 		clickPane.addButton(new Button(this.fillerPaneGItem), 3);
 		clickPane.addButton(new Button(ItemHandler.getItem().getItem("DIAMOND_SWORD", 1, false, "&e&lMulti-Click", "&7", "&7*Commands that will execute only", "&7when left and right clicking.", "&7", "&9&lCommands: &a" + 
 		this.listCommands(itemMap, ActionType.MULTI_CLICK_ALL)), event -> {
@@ -1742,7 +1741,7 @@ public class UI {
     * @param action - The action to be matched.
     */
 	private void commandListPane(final Player player, final ItemMap itemMap, final ActionType action) {
-		Interface commandListPane = new Interface(true, 2, this.GUIName);
+		Interface commandListPane = new Interface(true, 2, this.GUIName, player);
 		commandListPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the click type menu."), event -> {
 			this.actionPane(player, itemMap);
 		}));
@@ -1774,7 +1773,7 @@ public class UI {
     * @param orderNumber - The current number that dictates the ItemCommands "place in line".
     */
 	private void orderPane(final Player player, final ItemMap itemMap, final ActionType action, final ItemCommand command, final int orderNumber) {
-		Interface orderPane = new Interface(true, 2, this.GUIName);
+		Interface orderPane = new Interface(true, 2, this.GUIName, player);
 		orderPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the command modify menu."), event -> {
 			this.modifyCommandsPane(player, itemMap, action, command, orderNumber);
 		}));
@@ -1816,7 +1815,7 @@ public class UI {
     * @param orderNumber - The current number that dictates the ItemCommands "place in line".
     */
 	private void modifyCommandsPane(final Player player, final ItemMap itemMap, final ActionType action, final ItemCommand command, final int orderNumber) {
-		Interface modPane = new Interface(false, 3, this.GUIName);
+		Interface modPane = new Interface(false, 3, this.GUIName, player);
 		modPane.addButton(new Button(this.fillerPaneGItem), 4);
 		modPane.addButton(new Button(ItemHandler.getItem().getItem("FEATHER", 1, true, "&f" + command.getRawCommand(), "&7", "&7*You are modifying this command.", "&9&lOrder Number: &a" + orderNumber)));
 		modPane.addButton(new Button(this.fillerPaneGItem), 4);
@@ -1901,7 +1900,7 @@ public class UI {
     * @param action - THe action to be matched,
     */
 	private void executorPane(final Player player, final ItemMap itemMap, final ActionType action) {
-		Interface executorPane = new Interface(false, 2, this.GUIName);
+		Interface executorPane = new Interface(false, 2, this.GUIName, player);
 		executorPane.addButton(new Button(ItemHandler.getItem().getItem("289", 1, false, "&f")));
 		executorPane.addButton(new Button(ItemHandler.getItem().getItem("BOOK", 1, false, "&e&lPlayer", "&7", "&7*Executes the command", "&7as the player."), event -> {
 			player.closeInventory();
@@ -2003,7 +2002,7 @@ public class UI {
     * @param action - The action to be matched.
     */
 	private void swapPane(final Player player, final ItemMap itemMap, final ActionType action) {
-		Interface swapPane = new Interface(true, 6, this.GUIName);
+		Interface swapPane = new Interface(true, 6, this.GUIName, player);
 		swapPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the executors menu."), event -> {
 			this.executorPane(player, itemMap, action);
 		}));
@@ -2027,7 +2026,7 @@ public class UI {
     * @param action - The action to be matched.
     */
 	private void delayPane(final Player player, final ItemMap itemMap, final ActionType action) {
-		Interface delayPane = new Interface(true, 6, this.GUIName);
+		Interface delayPane = new Interface(true, 6, this.GUIName, player);
 		delayPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the executors menu."), event -> {
 			this.executorPane(player, itemMap, action);
 		}));
@@ -2069,7 +2068,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void cooldownPane(final Player player, final ItemMap itemMap) {
-		Interface cooldownPane = new Interface(true, 6, this.GUIName);
+		Interface cooldownPane = new Interface(true, 6, this.GUIName, player);
 		cooldownPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item commands menu."), event -> {
 			this.commandPane(player, itemMap);
 		}));
@@ -2111,7 +2110,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void warmPane(final Player player, final ItemMap itemMap) {
-		Interface warmPane = new Interface(true, 6, this.GUIName);
+		Interface warmPane = new Interface(true, 6, this.GUIName, player);
 		warmPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item commands menu."), event -> {
 			this.commandPane(player, itemMap);
 		}));
@@ -2153,7 +2152,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void costPane(final Player player, final ItemMap itemMap) {
-		Interface costPane = new Interface(true, 6, this.GUIName);
+		Interface costPane = new Interface(true, 6, this.GUIName, player);
 		costPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item commands menu."), event -> {
 			this.commandPane(player, itemMap);
 		}));
@@ -2195,7 +2194,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void receivePane(final Player player, final ItemMap itemMap) {
-		Interface receivePane = new Interface(true, 6, this.GUIName);
+		Interface receivePane = new Interface(true, 6, this.GUIName, player);
 		receivePane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item commands menu."), event -> {
 			this.commandPane(player, itemMap);
 		}));
@@ -2237,7 +2236,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void sequencePane(final Player player, final ItemMap itemMap) {
-		Interface sequencePane = new Interface(false, 2, this.GUIName);
+		Interface sequencePane = new Interface(false, 2, this.GUIName, player);
 		sequencePane.addButton(new Button(this.fillerPaneGItem));
 		sequencePane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "CLOCK" : "347"), 1, false, "&a&lSequential", "&7", "&7*Executes the command lines", "&7in order from top to bottom."), event -> {
 			itemMap.setCommandSequence(CommandSequence.SEQUENTIAL);this.commandPane(player, itemMap);
@@ -2269,7 +2268,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void soundPane(final Player player, final ItemMap itemMap) {
-		Interface soundPane = new Interface(true, 6, this.GUIName);
+		Interface soundPane = new Interface(true, 6, this.GUIName, player);
 		soundPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item commands menu."), event -> {
 			this.commandPane(player, itemMap);
 		}));
@@ -2292,7 +2291,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void particlePane(final Player player, final ItemMap itemMap) {
-		Interface particlePane = new Interface(true, 6, this.GUIName);
+		Interface particlePane = new Interface(true, 6, this.GUIName, player);
 		particlePane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item commands menu."), event -> {
 			this.commandPane(player, itemMap);
 		}));
@@ -2321,7 +2320,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void lifePane(final Player player, final ItemMap itemMap, final String particle, final int stage) {
-		Interface lifePane = new Interface(true, 6, this.GUIName);
+		Interface lifePane = new Interface(true, 6, this.GUIName, player);
 		lifePane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the particle menu."), event -> {
 			this.particlePane(player, itemMap);
 		}));
@@ -2371,7 +2370,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void explosionPane(final Player player, final ItemMap itemMap, final String particle, final int lifetime) {
-		Interface patternPane = new Interface(true, 2, this.GUIName);
+		Interface patternPane = new Interface(true, 2, this.GUIName, player);
 		patternPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the particle menu."), event -> {
 			this.particlePane(player, itemMap);
 		}));
@@ -2392,7 +2391,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void colorParticlePane(final Player player, final ItemMap itemMap, final String particle, final int lifetime, final Type explosion, final DyeColor color1) {
-		Interface colorPane = new Interface(true, 6, this.GUIName);
+		Interface colorPane = new Interface(true, 6, this.GUIName, player);
 		colorPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the particle menu."), event -> {
 			this.particlePane(player, itemMap);
 		}));
@@ -2419,7 +2418,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void typePane(final Player player, final ItemMap itemMap) {
-		Interface typePane = new Interface(false, 2, this.GUIName);
+		Interface typePane = new Interface(false, 2, this.GUIName, player);
 		typePane.addButton(new Button(this.fillerPaneGItem), 3);
 		typePane.addButton(new Button(ItemHandler.getItem().getItem("DIAMOND_PICKAXE", 1, false, "&a&lInteract", "&7", "&7*Executes the command when", "&7the player clicks the item", "&7with it in their hand", "&7either in the air or on a block."), event -> {
 			itemMap.setCommandType(CommandType.INTERACT);this.commandPane(player, itemMap);
@@ -2447,7 +2446,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void enchantPane(final Player player, final ItemMap itemMap) {
-		Interface enchantPane = new Interface(true, 6, this.GUIName);
+		Interface enchantPane = new Interface(true, 6, this.GUIName, player);
 		enchantPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> {
 			this.creatingPane(player, itemMap);
 		}));
@@ -2480,7 +2479,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void enchantLevelPane(final Player player, final ItemMap itemMap, final Enchantment enchant) {
-		Interface enchantLevelPane = new Interface(true, 6, this.GUIName);
+		Interface enchantLevelPane = new Interface(true, 6, this.GUIName, player);
 		enchantLevelPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the enchant selection menu."), event -> {
 			this.enchantPane(player, itemMap);
 		}));
@@ -2525,7 +2524,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void flagPane(final Player player, final ItemMap itemMap) {
-		Interface flagPane = new Interface(false, 5, this.GUIName);
+		Interface flagPane = new Interface(false, 5, this.GUIName, player);
 		flagPane.addButton(new Button(ItemHandler.getItem().getItem("DIAMOND", 1, itemMap.isOpBypass(), "&a&l&nAllowOpBypass", "&7", 
 				"&a&lTrue&f:&7 Allows players who are OP to", "&7bypass any itemflags that add", "&7restrictions for this item.", "&7",
 				"&c&lFalse&f:&7 Players who are OP will be", "&7restricted by itemflags that add", "&7restrictions for this item.", "&7", 
@@ -2959,7 +2958,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void triggerPane(final Player player, final ItemMap itemMap) {
-		Interface triggerPane = new Interface(false, 2, this.GUIName);
+		Interface triggerPane = new Interface(false, 2, this.GUIName, player);
 		triggerPane.addButton(new Button(ItemHandler.getItem().getItem("REDSTONE", 1, itemMap.isGiveOnDisabled(), "&c&l&nDISABLED", "&7", "&7*Prevents the item from given", "&7through the use of triggers.", "&7", "&7Useful to only get the item", 
 				"&7using &l/itemjoin get <item>", "&9&lENABLED: &a" + (itemMap.isGiveOnDisabled() + "").toUpperCase()), event -> {
 			if (itemMap.isGiveOnDisabled()) {
@@ -3087,7 +3086,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void worldPane(final Player player, final ItemMap itemMap) {
-		Interface worldPane = new Interface(true, 6, this.GUIName);
+		Interface worldPane = new Interface(true, 6, this.GUIName, player);
 		worldPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> {
 			this.creatingPane(player, itemMap);
 		}));
@@ -3132,7 +3131,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void regionPane(final Player player, final ItemMap itemMap) {
-		Interface regionPane = new Interface(true, 6, this.GUIName);
+		Interface regionPane = new Interface(true, 6, this.GUIName, player);
 		regionPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> {
 			this.creatingPane(player, itemMap);
 		}));
@@ -3178,7 +3177,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void lorePane(final Player player, final ItemMap itemMap) {
-		Interface lorePane = new Interface(true, 2, this.GUIName);
+		Interface lorePane = new Interface(true, 2, this.GUIName, player);
 		lorePane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> this.creatingPane(player, itemMap)));
 		lorePane.addButton(new Button(ItemHandler.getItem().getItem("FEATHER", 1, true, "&eNew Lore Line", "&7", "&7*Add a new lore line", "&7to the item lore."), event -> {
 			player.closeInventory();
@@ -3219,7 +3218,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void modifyLoreLinePane(final Player player, final ItemMap itemMap, final int position) {
-		Interface modifyLorePane = new Interface(false, 2, this.GUIName);
+		Interface modifyLorePane = new Interface(false, 2, this.GUIName, player);
 		modifyLorePane.addButton(new Button(this.fillerPaneGItem), 3);
 		modifyLorePane.addButton(new Button(ItemHandler.getItem().getItem("WRITABLE_BOOK", 1, false, "&e&l&nModify", "&7", "&7*Change the lore line.", "&9&lLore: &a" + itemMap.getCustomLore().get(position)), event -> {
 			player.closeInventory();
@@ -3263,7 +3262,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void animateMaterialPane(final Player player, final ItemMap itemMap) {
-		Interface animateMaterialPane = new Interface(true, 2, this.GUIName);
+		Interface animateMaterialPane = new Interface(true, 2, this.GUIName, player);
 		animateMaterialPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the animation menu."), event -> {
 			if (!itemMap.getDynamicMaterials().isEmpty()) {
 				itemMap.setAnimate(true);
@@ -3294,7 +3293,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void selectMaterialPane(final Player player, final ItemMap itemMap, final int position, final boolean isNew) {
-		Interface selectMaterialPane = new Interface(true, 6, this.GUIName);
+		Interface selectMaterialPane = new Interface(true, 6, this.GUIName, player);
 		selectMaterialPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the animated material menu."), event -> {
 			this.animateMaterialPane(player, itemMap);
 		}));
@@ -3375,7 +3374,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void durationMaterialPane(final Player player, final ItemMap itemMap, final int position, final boolean isNew, final String value) {
-		Interface durationPane = new Interface(true, 6, this.GUIName);
+		Interface durationPane = new Interface(true, 6, this.GUIName, player);
 		durationPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the animated menu."), event -> this.animateMaterialPane(player, itemMap)));
 		durationPane.addButton(new Button(ItemHandler.getItem().getItem("STAINED_GLASS_PANE:4", 1, false, "&e&lCustom Duration", "&7", "&7*Click to set a custom duration", "&7value for the animation."), event -> {
 			player.closeInventory();
@@ -3442,7 +3441,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void modifyMaterialPane(final Player player, final ItemMap itemMap, final int position) {
-		Interface modifyMaterialPane = new Interface(false, 2, this.GUIName);
+		Interface modifyMaterialPane = new Interface(false, 2, this.GUIName, player);
 		modifyMaterialPane.addButton(new Button(this.fillerPaneGItem), 3);
 		modifyMaterialPane.addButton(new Button(ItemHandler.getItem().getItem("NAME_TAG", 1, false, "&a&l&nMaterial", "&7", "&7*Change the animated material type.", "&9&lMaterial: &a" + ItemHandler.getItem().cutDelay(itemMap.getDynamicMaterials().get(position))),
 				event -> this.selectMaterialPane(player, itemMap, position, false)));
@@ -3468,7 +3467,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void animatedNamePane(final Player player, final ItemMap itemMap) {
-		Interface animatedNamePane = new Interface(true, 2, this.GUIName);
+		Interface animatedNamePane = new Interface(true, 2, this.GUIName, player);
 		animatedNamePane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the animation menu."), event -> {
 			if (!itemMap.getDynamicNames().isEmpty()) {
 				itemMap.setAnimate(true);
@@ -3505,7 +3504,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void durationNamePane(final Player player, final ItemMap itemMap, final int position, final boolean isNew, final String value) {
-		Interface durationPane = new Interface(true, 6, this.GUIName);
+		Interface durationPane = new Interface(true, 6, this.GUIName, player);
 		durationPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the animated menu."), event -> this.animatedNamePane(player, itemMap)));
 		durationPane.addButton(new Button(ItemHandler.getItem().getItem("STAINED_GLASS_PANE:4", 1, false, "&e&lCustom Duration", "&7", "&7*Click to set a custom duration", "&7value for the animation."), event -> {
 			player.closeInventory();
@@ -3572,7 +3571,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void modifyNamePane(final Player player, final ItemMap itemMap, final int position) {
-		Interface modifyNamePane = new Interface(false, 2, this.GUIName);
+		Interface modifyNamePane = new Interface(false, 2, this.GUIName, player);
 		modifyNamePane.addButton(new Button(this.fillerPaneGItem), 3);
 		modifyNamePane.addButton(new Button(ItemHandler.getItem().getItem("NAME_TAG", 1, false, "&a&l&nName", "&7", "&7*Change the animated name line.", "&9&lName: &a" + ItemHandler.getItem().cutDelay(itemMap.getDynamicNames().get(position))), event -> {
 			player.closeInventory();
@@ -3613,7 +3612,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void animatedLorePane(final Player player, final ItemMap itemMap) {
-		Interface animatedLorePane = new Interface(true, 2, this.GUIName);
+		Interface animatedLorePane = new Interface(true, 2, this.GUIName, player);
 		animatedLorePane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the animation menu."), event -> {
 			if (!itemMap.getDynamicLores().isEmpty()) {
 				itemMap.setAnimate(true);
@@ -3650,7 +3649,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void durationLorePane(final Player player, final ItemMap itemMap, final int position, final boolean isNew, final String value) {
-		Interface durationPane = new Interface(true, 6, this.GUIName);
+		Interface durationPane = new Interface(true, 6, this.GUIName, player);
 		durationPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the animated menu."), event -> this.animatedLorePane(player, itemMap)));
 		durationPane.addButton(new Button(ItemHandler.getItem().getItem("STAINED_GLASS_PANE:4", 1, false, "&e&lCustom Duration", "&7", "&7*Click to set a custom duration", "&7value for the animation."), event -> {
 			player.closeInventory();
@@ -3725,7 +3724,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void modifyLorePane(final Player player, final ItemMap itemMap, final int position) {
-		Interface modifyLorePane = new Interface(false, 2, this.GUIName);
+		Interface modifyLorePane = new Interface(false, 2, this.GUIName, player);
 		modifyLorePane.addButton(new Button(this.fillerPaneGItem), 3);
 		modifyLorePane.addButton(new Button(ItemHandler.getItem().getItem("WRITABLE_BOOK", 1, false, "&a&l&nLore", "&7", "&7*Change the animated lore line.", "&9&lLore: &a" + ItemHandler.getItem().cutDelay(itemMap.getDynamicLores().get(position))), event -> {
 			player.closeInventory();
@@ -3765,7 +3764,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void animatedSkullPane(final Player player, final ItemMap itemMap, boolean owner) {
-		Interface animatedSkullPane = new Interface(true, 2, this.GUIName);
+		Interface animatedSkullPane = new Interface(true, 2, this.GUIName, player);
 		if (owner) {
 			animatedSkullPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the animation menu."), event -> {
 				if (!itemMap.getDynamicOwners().isEmpty()) {
@@ -3835,7 +3834,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void durationSkullPane(final Player player, final ItemMap itemMap, final int position, final boolean isNew, final String value, boolean owner) {
-		Interface durationPane = new Interface(true, 6, this.GUIName);
+		Interface durationPane = new Interface(true, 6, this.GUIName, player);
 		durationPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the animated menu."), event -> this.animatedSkullPane(player, itemMap, owner)));
 		durationPane.addButton(new Button(ItemHandler.getItem().getItem("STAINED_GLASS_PANE:4", 1, false, "&e&lCustom Duration", "&7", "&7*Click to set a custom duration", "&7value for the animation."), event -> {
 			player.closeInventory();
@@ -3920,7 +3919,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void modifySkullPane(final Player player, final ItemMap itemMap, final int position, boolean owner) {
-		Interface modifySkullPane = new Interface(false, 2, this.GUIName);
+		Interface modifySkullPane = new Interface(false, 2, this.GUIName, player);
 		modifySkullPane.addButton(new Button(this.fillerPaneGItem), 3);
 		if (owner) {
 			modifySkullPane.addButton(new Button(ItemHandler.getItem().getItem("GOLDEN_HELMET", 1, false, "&a&l&nSkull Owner", "&7", "&7*Change the animated skull owner.", "&9&lSkull Owner: &a" + 
@@ -3990,7 +3989,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void animationPane(final Player player, final ItemMap itemMap) {
-		Interface animationPane = new Interface(false, 2, this.GUIName);
+		Interface animationPane = new Interface(false, 2, this.GUIName, player);
 		if (itemMap.getMaterial().toString().contains("PLAYER_HEAD") || itemMap.getMaterial().toString().contains("SKULL_ITEM")) {
 			animationPane.addButton(new Button(this.fillerPaneGItem), 2);
 		} else {
@@ -4028,7 +4027,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void limitPane(final Player player, final ItemMap itemMap) {
-		Interface limitPane = new Interface(false, 2, this.GUIName);
+		Interface limitPane = new Interface(false, 2, this.GUIName, player);
 		List < String > limitModes = new ArrayList < String > ();
 		if (Utils.getUtils().containsIgnoreCase(itemMap.getLimitModes(), "ADVENTURE")) {
 			limitModes.add("ADVENTURE");
@@ -4082,7 +4081,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void probabilityPane(final Player player, final ItemMap itemMap) {
-		Interface probabilityPane = new Interface(true, 6, this.GUIName);
+		Interface probabilityPane = new Interface(true, 6, this.GUIName, player);
 		probabilityPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> {
 			this.creatingPane(player, itemMap);
 		}));
@@ -4103,7 +4102,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void usePane(final Player player, final ItemMap itemMap) {
-		Interface usePane = new Interface(true, 6, this.GUIName);
+		Interface usePane = new Interface(true, 6, this.GUIName, player);
 		usePane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> {
 			this.creatingPane(player, itemMap);
 		}));
@@ -4145,7 +4144,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void dropsPane(final Player player, final ItemMap itemMap) {
-		Interface dropsPane = new Interface(false, 3, this.GUIName);
+		Interface dropsPane = new Interface(false, 3, this.GUIName, player);
 		String mobs = "";
 		String blocks = "";
 		for (EntityType entity: itemMap.getMobsDrop().keySet()) { mobs += entity.name() + ", "; }
@@ -4173,7 +4172,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void mobsPane(final Player player, final ItemMap itemMap) {
-		Interface dropsPane = new Interface(true, 6, this.GUIName);
+		Interface dropsPane = new Interface(true, 6, this.GUIName, player);
 		dropsPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the drop chances menu."), event -> this.dropsPane(player, itemMap)));
 		ServerHandler.getServer().runAsyncThread(main -> { 
 			for (EntityType entity: EntityType.values()) {
@@ -4218,7 +4217,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void blocksPane(final Player player, final ItemMap itemMap) {
-		Interface materialPane = new Interface(true, 6, this.GUIName);
+		Interface materialPane = new Interface(true, 6, this.GUIName, player);
 		materialPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the drop chances menu."), event -> {
 			this.dropsPane(player, itemMap);
 		}));
@@ -4330,7 +4329,7 @@ public class UI {
     * @param entity - The Entity selected.
     */
 	private void chancePane(final Player player, final ItemMap itemMap, final EntityType entity, final Material material) {
-		Interface chancePane = new Interface(true, 6, this.GUIName);
+		Interface chancePane = new Interface(true, 6, this.GUIName, player);
 		if (entity != null) {
 			chancePane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the mobs drop menu."), event -> {
 				this.mobsPane(player, itemMap);
@@ -4399,7 +4398,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void recipePane(final Player player, final ItemMap itemMap) {
-		Interface recipePane = new Interface(false, 4, this.GUIName);
+		Interface recipePane = new Interface(false, 4, this.GUIName, player);
 		recipePane.addButton(new Button(this.fillerPaneBItem), 3);
 		for (int i = 0; i < 9; i++) {
 			final int k = i;
@@ -4478,7 +4477,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void bannerPane(final Player player, final ItemMap itemMap) {
-		Interface bannerPane = new Interface(true, 6, this.GUIName);
+		Interface bannerPane = new Interface(true, 6, this.GUIName, player);
 		bannerPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> this.creatingPane(player, itemMap)));
 		ServerHandler.getServer().runAsyncThread(main -> {
 			for (PatternType pattern: PatternType.values()) {
@@ -4523,7 +4522,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void patternPane(final Player player, final ItemMap itemMap, final PatternType pattern) {
-		Interface colorPane = new Interface(true, 6, this.GUIName);
+		Interface colorPane = new Interface(true, 6, this.GUIName, player);
 		colorPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the banner patterns menu."), event -> this.bannerPane(player, itemMap)));
 		ServerHandler.getServer().runAsyncThread(main -> {
 			for (DyeColor color: DyeColor.values()) {
@@ -4543,7 +4542,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void potionPane(final Player player, final ItemMap itemMap) {
-		Interface potionPane = new Interface(true, 6, this.GUIName);
+		Interface potionPane = new Interface(true, 6, this.GUIName, player);
 		potionPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the special settings menu."), event -> this.creatingPane(player, itemMap)));
 		ServerHandler.getServer().runAsyncThread(main -> {
 			for (PotionEffectType potion: PotionEffectType.values()) {
@@ -4590,7 +4589,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void levelPane(final Player player, final ItemMap itemMap, final PotionEffectType potion) {
-		Interface levelPane = new Interface(true, 6, this.GUIName);
+		Interface levelPane = new Interface(true, 6, this.GUIName, player);
 		levelPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the potion effect menu."), event -> this.potionPane(player, itemMap)));
 		levelPane.addButton(new Button(ItemHandler.getItem().getItem("STAINED_GLASS_PANE:4", 1, false, "&e&lCustom Level", "&7", "&7*Click to set a custom level (strength)", "&7value for the potion effect."), event -> {
 			player.closeInventory();
@@ -4629,7 +4628,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void durationPane(final Player player, final ItemMap itemMap, final PotionEffectType potion, int level) {
-		Interface durationPane = new Interface(true, 6, this.GUIName);
+		Interface durationPane = new Interface(true, 6, this.GUIName, player);
 		durationPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the potion effect menu."), event -> this.potionPane(player, itemMap)));
 		durationPane.addButton(new Button(ItemHandler.getItem().getItem("STAINED_GLASS_PANE:4", 1, false, "&e&lCustom Duration", "&7", "&7*Click to set a custom duration", "&7value for the potion effect."), event -> {
 			player.closeInventory();
@@ -4670,7 +4669,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void powerPane(final Player player, final ItemMap itemMap) {
-		Interface powerPane = new Interface(true, 6, this.GUIName);
+		Interface powerPane = new Interface(true, 6, this.GUIName, player);
 		powerPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the special settings menu."), event -> this.otherPane(player, itemMap)));
 		powerPane.addButton(new Button(ItemHandler.getItem().getItem("STAINED_GLASS_PANE:4", 1, false, "&e&lCustom Power", "&7", "&7*Click to set a custom power", "&7value for the firework."), event -> {
 			player.closeInventory();
@@ -4710,7 +4709,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void colorPane(final Player player, final ItemMap itemMap) {
-		Interface colorPane = new Interface(true, 6, this.GUIName);
+		Interface colorPane = new Interface(true, 6, this.GUIName, player);
 		colorPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the special settings menu."), event -> this.otherPane(player, itemMap)));
 		ServerHandler.getServer().runAsyncThread(main -> {
 			for (DyeColor color: DyeColor.values()) {
@@ -4738,7 +4737,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void designPane(final Player player, final ItemMap itemMap) {
-		Interface designPane = new Interface(true, 2, this.GUIName);
+		Interface designPane = new Interface(true, 2, this.GUIName, player);
 		designPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the special settings menu."), event -> this.otherPane(player, itemMap)));
 		ServerHandler.getServer().runAsyncThread(main -> {
 			for (Type type: Type.values()) {
@@ -4763,7 +4762,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void pagePane(final Player player, final ItemMap itemMap) {
-		Interface pagePane = new Interface(true, 2, this.GUIName);
+		Interface pagePane = new Interface(true, 2, this.GUIName, player);
 		pagePane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the special settings menu."), event -> {
 			this.otherPane(player, itemMap);
 		}));
@@ -4783,7 +4782,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void linePane(final Player player, final ItemMap itemMap, final boolean isNew, final int page) {
-		Interface linePane = new Interface(true, 2, this.GUIName);
+		Interface linePane = new Interface(true, 2, this.GUIName, player);
 		List < List < String > > pages = itemMap.getListPages();
 		linePane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the book pages menu."), event -> this.pagePane(player, itemMap)));
 		if (isNew) {
@@ -4845,7 +4844,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void modifyPagesPane(final Player player, final ItemMap itemMap, final int line, final int page) {
-		Interface linePane = new Interface(false, 2, this.GUIName);
+		Interface linePane = new Interface(false, 2, this.GUIName, player);
 		List < List < String > > pages = itemMap.getListPages();
 		List < String > selectPage = pages.get(page);
 		linePane.addButton(new Button(this.fillerPaneGItem), 3);
@@ -4889,7 +4888,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void otherPane(final Player player, final ItemMap itemMap) {
-		Interface otherPane = new Interface(false, 3, this.GUIName);
+		Interface otherPane = new Interface(false, 3, this.GUIName, player);
 		otherPane.addButton(new Button(this.fillerPaneGItem), 4);
 		otherPane.addButton(new Button(this.headerStack(player, itemMap)));
 		otherPane.addButton(new Button(this.fillerPaneGItem), 4);
@@ -5018,7 +5017,7 @@ public class UI {
 					"&9&lColor(s): &a" + (Utils.getUtils().nullCheck(colorList) != "NONE" ? colorList : "NONE")), event -> this.colorPane(player, itemMap)));
 			otherPane.addButton(new Button(this.fillerPaneGItem), 2);
 		} else if (itemMap.getMaterial().toString().contains("LEATHER_")) {
-			Interface colorPane = new Interface(true, 6, this.GUIName);
+			Interface colorPane = new Interface(true, 6, this.GUIName, player);
 			colorPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the special settings menu."), event -> this.otherPane(player, itemMap)));
 			ServerHandler.getServer().runAsyncThread(main -> {
 				for (DyeColor color: DyeColor.values()) {
