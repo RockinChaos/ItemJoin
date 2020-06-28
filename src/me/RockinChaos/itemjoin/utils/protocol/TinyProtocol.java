@@ -47,8 +47,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitRunnable;
-
 import com.google.common.collect.Lists;
 import com.google.common.collect.MapMaker;
 import com.mojang.authlib.GameProfile;
@@ -111,14 +109,11 @@ public abstract class TinyProtocol {
 			this.registerPlayers(plugin);
 		} catch (IllegalArgumentException ex) {
 			plugin.getLogger().info("[TinyProtocol] Delaying server channel injection due to late bind.");
-			new BukkitRunnable() {
-				@Override
-				public void run() {
-					registerChannelHandler();
-					registerPlayers(plugin);
-					plugin.getLogger().info("[TinyProtocol] Late bind injection successful.");
-				}
-			}.runTask(plugin);
+			ServerHandler.getServer().runAsyncThread(main -> {
+				this.registerChannelHandler();
+				this.registerPlayers(plugin);
+				plugin.getLogger().info("[TinyProtocol] Late bind injection successful.");
+			});
 		}
 	}
 

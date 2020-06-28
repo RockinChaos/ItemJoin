@@ -31,8 +31,6 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.scheduler.BukkitRunnable;
-
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
@@ -60,25 +58,22 @@ public class SQLite {
     * 
     */
 	public SQLite() {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-				SQDrivers.getDatabase("database").loadSQLDatabase();
-				createTables();
-				convertYAMLS();
-				loadCooldown();
-				loadMapImages();
-				loadFirstJoinPlayers();
-				loadFirstWorldPlayers();
-				loadFirstCommandPlayers();
-				loadIPLimitAddresses();
-				loadEnabledPlayers();
-				loadReturnRegionItems();
-				loadReturnCraftItems();
-				try { SQDrivers.getDatabase("database").closeConnection(); } catch (Exception e) { } 
-				executeSaveStatements();
-		    }
-		}.runTaskAsynchronously(ItemJoin.getInstance());
+        ServerHandler.getServer().runAsyncThread(main -> {
+			SQDrivers.getDatabase("database").loadSQLDatabase();
+			this.createTables();
+			this.convertYAMLS();
+			this.loadCooldown();
+			this.loadMapImages();
+			this.loadFirstJoinPlayers();
+			this.loadFirstWorldPlayers();
+			this.loadFirstCommandPlayers();
+			this.loadIPLimitAddresses();
+			this.loadEnabledPlayers();
+			this.loadReturnRegionItems();
+			this.loadReturnCraftItems();
+			try { SQDrivers.getDatabase("database").closeConnection(); } catch (Exception e) { } 
+			this.executeSaveStatements();
+		});
 	}
 	
    /**

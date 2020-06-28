@@ -38,8 +38,6 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
-
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
@@ -119,19 +117,16 @@ public class InventoryCrafting implements Listener {
     		for (int i = 0; i <= 4; i++) { view.setItem(i, new ItemStack(Material.AIR)); }
     		for (int i = 0; i <= 4; i++) { this.delayReturnItem(player, i, craftingContents[i], 1L); }
     	} else {
-    		new BukkitRunnable() {
-                @Override
-                public void run() {
-            		if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory()) && craftingOpenItems.containsKey(PlayerHandler.getPlayer().getPlayerID(player))) {
-                    	ItemStack[] openCraftContents = craftingOpenItems.get(PlayerHandler.getPlayer().getPlayerID(player));
-            			if (openCraftContents != null && openCraftContents.length != 0) { 
-                    	for (int i = 4; i >= 0; i--) { delayReturnItem(player, i, openCraftContents[i], 1L); }
-                    	craftingItems.put(PlayerHandler.getPlayer().getPlayerID(player), craftingOpenItems.get(PlayerHandler.getPlayer().getPlayerID(player)));
-            			craftingOpenItems.remove(PlayerHandler.getPlayer().getPlayerID(player));
-            			}
+    		ServerHandler.getServer().runAsyncThread(main -> {
+            	if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory()) && craftingOpenItems.containsKey(PlayerHandler.getPlayer().getPlayerID(player))) {
+                    ItemStack[] openCraftContents = craftingOpenItems.get(PlayerHandler.getPlayer().getPlayerID(player));
+            		if (openCraftContents != null && openCraftContents.length != 0) { 
+                    for (int i = 4; i >= 0; i--) { delayReturnItem(player, i, openCraftContents[i], 1L); }
+                    craftingItems.put(PlayerHandler.getPlayer().getPlayerID(player), craftingOpenItems.get(PlayerHandler.getPlayer().getPlayerID(player)));
+            		craftingOpenItems.remove(PlayerHandler.getPlayer().getPlayerID(player));
             		}
-                }
-            }.runTaskAsynchronously(ItemJoin.getInstance());
+            	}
+            });
     	}
     }
     

@@ -24,9 +24,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.inventory.InventoryHolder;
-import org.bukkit.scheduler.BukkitRunnable;
-
-import me.RockinChaos.itemjoin.ItemJoin;
+import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.utils.UI;
@@ -69,20 +67,17 @@ public class Menu implements Listener {
 	*/
 	@EventHandler(ignoreCancelled = true)
 	private void onClose(InventoryCloseEvent event) {
-		if (UI.getCreator() != null && UI.getCreator().modifyMenu((Player)event.getPlayer())) {
-			new BukkitRunnable() {
-				@Override
-				public void run() {
-					if (!UI.getCreator().isOpen((Player)event.getPlayer())) {
-						UI.getCreator().setModifyMenu(false, (Player)event.getPlayer());
-						for (ItemMap itemMap : ItemUtilities.getUtilities().getItems()) {
-							if (itemMap.getAnimationHandler() != null && itemMap.getAnimationHandler().get(event.getPlayer()) != null) {
-								itemMap.getAnimationHandler().get(event.getPlayer()).setMenu(false, 0);
-							}
+		if (UI.getCreator() != null && UI.getCreator().modifyMenu((Player) event.getPlayer())) {
+			ServerHandler.getServer().runAsyncThread(main -> {
+				if (!UI.getCreator().isOpen((Player) event.getPlayer())) {
+					UI.getCreator().setModifyMenu(false, (Player) event.getPlayer());
+					for (ItemMap itemMap: ItemUtilities.getUtilities().getItems()) {
+						if (itemMap.getAnimationHandler() != null && itemMap.getAnimationHandler().get(event.getPlayer()) != null) {
+							itemMap.getAnimationHandler().get(event.getPlayer()).setMenu(false, 0);
 						}
 					}
 				}
-			}.runTaskLater(ItemJoin.getInstance(), 40L);
+			}, 40L);
 		}
 	}
 }

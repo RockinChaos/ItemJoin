@@ -23,8 +23,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-import org.bukkit.scheduler.BukkitRunnable;
-
 import me.RockinChaos.itemjoin.utils.Utils;
 import me.RockinChaos.itemjoin.utils.sqlite.Database;
 import me.RockinChaos.itemjoin.ItemJoin;
@@ -105,13 +103,10 @@ public class SQDrivers extends Database {
 	*/
 	@Override
 	public void load() {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-				connection = getSQLConnection();
-			    initialize(remoteEnabled);
-            }
-        }.runTaskAsynchronously(ItemJoin.getInstance());
+        ServerHandler.getServer().runAsyncThread(main -> {
+			connection = getSQLConnection();
+			initialize(remoteEnabled);
+        });
 	}
 	
    /**

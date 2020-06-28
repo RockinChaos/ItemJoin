@@ -2891,14 +2891,30 @@ public class ItemMap {
 	}
 	
    /**
+    * Checks if the ItemStack is similar to the defined ItemMap.
     * 
+    * @param item - The ItemStack being checked.
+    * @return If the ItemStack is similar.
+    */
+	public boolean isReal(final ItemStack item) {
+		if (item != null && item.getType() != Material.AIR
+				&& (this.vanillaControl || this.vanillaStatus
+				|| (ItemHandler.getItem().dataTagsEnabled() && ItemHandler.getItem().getNBTData(item) != null && Utils.getUtils().containsIgnoreCase(ItemHandler.getItem().getNBTData(item), this.newNBTData))
+				|| (this.legacySecret != null && item.hasItemMeta() && item.getItemMeta().hasDisplayName() && item.getItemMeta().getDisplayName().contains(this.legacySecret)))) {
+			return true;
+		}
+		return false;
+	}
+	
+   /**
+    * Checks if the ItemStack is similar to the defined ItemMap.
     * 
-    * @param 
-    * @return 
+    * @param item - The ItemStack being checked.
+    * @return If the ItemStack is similar.
     */
 	public boolean isSimilar(final ItemStack item) {
 		if ((item != null && item.getType() != Material.AIR && item.getType() == this.material) || (this.materialAnimated && item != null && item.getType() != Material.AIR && this.isMaterial(item))) {
-			if (this.vanillaControl || ItemHandler.getItem().dataTagsEnabled() && ServerHandler.getServer().hasSpecificUpdate("1_8") && ItemHandler.getItem().getNBTData(item) != null && Utils.getUtils().containsIgnoreCase(ItemHandler.getItem().getNBTData(item), this.newNBTData)
+			if (this.vanillaControl || ItemHandler.getItem().dataTagsEnabled() && ItemHandler.getItem().getNBTData(item) != null && Utils.getUtils().containsIgnoreCase(ItemHandler.getItem().getNBTData(item), this.newNBTData)
 					|| this.legacySecret != null && item.hasItemMeta() && item.getItemMeta().hasDisplayName() && item.getItemMeta().getDisplayName().contains(this.legacySecret) || this.vanillaStatus) {
 				if (this.skullMeta(item)) {
 					if (isEnchantSimilar(item) || !item.getItemMeta().hasEnchants() && enchants.isEmpty() || this.isItemChangable()) {

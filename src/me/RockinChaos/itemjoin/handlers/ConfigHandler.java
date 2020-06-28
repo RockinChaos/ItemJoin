@@ -106,7 +106,7 @@ public class ConfigHandler {
 		LogFilter.getFilter(true);
 		SQLite.getLite(true);
 		ServerHandler.getServer().runAsyncThread(main -> { ItemDesigner.getDesigner(true); });
-		Bukkit.getServer().getScheduler().runTaskLater(ItemJoin.getInstance(), () -> { Metrics.getMetrics(true); }, 100L);
+		ServerHandler.getServer().runAsyncThread(main -> { Metrics.getMetrics(true); }, 100L);
 	}
 	
    /**

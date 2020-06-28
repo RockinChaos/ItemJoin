@@ -39,6 +39,8 @@ import me.RockinChaos.itemjoin.ItemJoin;
 public class ServerHandler {
 	
 	private static ServerHandler server;
+	private String packageName = ItemJoin.getInstance().getServer().getClass().getPackage().getName();
+	private String serverVersion = this.packageName.substring(this.packageName.lastIndexOf('.') + 1).replace("_", "").replace("R0", "").replace("R1", "").replace("R2", "").replace("R3", "").replace("R4", "").replace("R5", "").replaceAll("[a-z]", "");
 
    /**
     * Checks if the server is running the specified version.
@@ -47,11 +49,7 @@ public class ServerHandler {
     * @return If the server version is greater than or equal to the specified version.
     */
 	public boolean hasSpecificUpdate(final String versionString) {
-		String pkgname = ItemJoin.getInstance().getServer().getClass().getPackage().getName();
-		String localeVersion = "v" + versionString + "_R0";
-	    localeVersion = localeVersion.replace("_", "").replace("R0", "").replace("R1", "").replace("R2", "").replace("R3", "").replace("R4", "").replace("R5", "").replaceAll("[a-z]", "");
-		String version = pkgname.substring(pkgname.lastIndexOf('.') + 1).replace("_", "").replace("R0", "").replace("R1", "").replace("R2", "").replace("R3", "").replace("R4", "").replace("R5", "").replaceAll("[a-z]", "");
-		if (Integer.parseInt(version) >= Integer.parseInt(localeVersion)) {
+		if (Integer.parseInt(serverVersion) >= Integer.parseInt(versionString.replace("_", ""))) {
 			return true;
 		}
 		return false;
@@ -68,6 +66,32 @@ public class ServerHandler {
 				input.accept("MAIN");
 			}); 
 		});
+	}
+	
+   /**
+    * Runs the methods Async on the main thread.
+    * 
+    * @param input - The methods to be executed Async on the main thread.
+    */
+	public void runAsyncThread(final Consumer<String> input, long delay) {
+		Bukkit.getServer().getScheduler().runTaskLaterAsynchronously(ItemJoin.getInstance(), () -> { 
+			Bukkit.getServer().getScheduler().runTask(ItemJoin.getInstance(), () -> {
+				input.accept("MAIN");
+			}); 
+		}, delay);
+	}
+	
+   /**
+    * Runs the methods Async on the main thread.
+    * 
+    * @param input - The methods to be executed Async on the main thread.
+    */
+	public void runAsyncThread(final Consumer<String> input, long delay, long period) {
+		Bukkit.getServer().getScheduler().runTaskTimerAsynchronously(ItemJoin.getInstance(), () -> { 
+			Bukkit.getServer().getScheduler().runTask(ItemJoin.getInstance(), () -> {
+				input.accept("MAIN");
+			}); 
+		}, delay, period);
 	}
 	
    /**

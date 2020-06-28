@@ -247,7 +247,7 @@ public class ItemUtilities {
 		if (type.equals(TriggerType.REGIONLEAVE)) { DependAPI.getDepends(false).getGuard().pasteReturnItems(player, player.getWorld().getName(), region); }
 		if (type.equals(TriggerType.REGIONENTER)) { this.clearEvent(player, "", type.name, region); }
 		if (this.getClearDelay() != 0) {
-			Bukkit.getServer().getScheduler().runTaskLaterAsynchronously(ItemJoin.getInstance(), () -> { 
+			ServerHandler.getServer().runAsyncThread(main -> {
 				if (type.equals(TriggerType.JOIN)) {
 							clearEvent(player, player.getWorld().getName(), type.name, "");
 							this.triggerCommands(player);
@@ -546,7 +546,7 @@ public class ItemUtilities {
 			PlayerHandler.getPlayer().setOffHandItem(player, item);
 		} else if (craftSlot != -1 && (existingItem == null || overWrite)) {
 			if (craftSlot == 0) {
-				Bukkit.getServer().getScheduler().runTaskLaterAsynchronously(ItemJoin.getInstance(), () -> { 
+				ServerHandler.getServer().runAsyncThread(main -> {
 					if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
 			    			player.getOpenInventory().getTopInventory().setItem(craftSlot, item);
 			    			PlayerHandler.getPlayer().updateInventory(player, 1L);
@@ -629,7 +629,7 @@ public class ItemUtilities {
     * @param player - The Player having the commands executed.
     */
 	public void triggerCommands(final Player player) {
-		Bukkit.getServer().getScheduler().runTask(ItemJoin.getInstance(), () -> { 
+		ServerHandler.getServer().runAsyncThread(main -> {
 			if ((ConfigHandler.getConfig(false).getFile("config.yml").getString("Active-Commands.enabled-worlds") != null && ConfigHandler.getConfig(false).getFile("config.yml").getStringList("Active-Commands.commands") != null) 
 					&& (!ConfigHandler.getConfig(false).getFile("config.yml").getString("Active-Commands.enabled-worlds").equalsIgnoreCase("DISABLED") || !ConfigHandler.getConfig(false).getFile("config.yml").getString("Active-Commands.enabled-worlds").equalsIgnoreCase("FALSE"))) {
 				String commandsWorlds = ConfigHandler.getConfig(false).getFile("config.yml").getString("Active-Commands.enabled-worlds").replace(" ", "");

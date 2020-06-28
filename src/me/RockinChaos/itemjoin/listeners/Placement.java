@@ -17,7 +17,6 @@
  */
 package me.RockinChaos.itemjoin.listeners;
 
-import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.item.ItemMap;
@@ -31,7 +30,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
 
 public class Placement implements Listener {
 
@@ -63,12 +61,9 @@ public class Placement implements Listener {
 	 		if (!ItemUtilities.getUtilities().isAllowed(player, item, "count-lock")) {
 	 			ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item, null, player.getWorld());
 	 			item.setAmount(itemMap.getCount());
-	 			new BukkitRunnable() {
-	 				@Override
-	 				public void run() {
-	 					if (itemMap != null) { if (itemMap.isSimilar(PlayerHandler.getPlayer().getHandItem(player))) { PlayerHandler.getPlayer().getHandItem(player).setAmount(itemMap.getCount()); } }
-	 				}
-	 			}.runTaskLater(ItemJoin.getInstance(), 2L);
+	 			ServerHandler.getServer().runAsyncThread(main -> {
+	 				if (itemMap != null) { if (itemMap.isSimilar(PlayerHandler.getPlayer().getHandItem(player))) { PlayerHandler.getPlayer().getHandItem(player).setAmount(itemMap.getCount()); } }
+	 			}, 2L);
 	 		}
 	 	}
 	 }

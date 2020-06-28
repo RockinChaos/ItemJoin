@@ -39,7 +39,6 @@ import org.bukkit.inventory.meta.SkullMeta;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 
-import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.item.ItemUtilities.CustomSlot;
@@ -449,7 +448,7 @@ public class ItemHandler {
 			PlayerHandler.getPlayer().updateInventory(player, 1L);
 			SQLite.getLite(false).removeReturnCraftItems(player);
 		} else if (!PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
-			Bukkit.getServer().getScheduler().runTaskLater(ItemJoin.getInstance(), () -> { this.restoreCraftItems(player); }, 60L);
+			ServerHandler.getServer().runAsyncThread(main -> { this.restoreCraftItems(player); }, 60L);
 		}
     }
     
@@ -521,29 +520,24 @@ public class ItemHandler {
     * @return The String of NBTData found on the ItemStack.
     */
 	public String getNBTData(final ItemStack item) {
-		if (this.dataTagsEnabled() && ServerHandler.getServer().hasSpecificUpdate("1_8") && item != null && item.getType() != Material.AIR) {
-		try {
-		Class<?> craftItemStack = Reflection.getCraftBukkitClass("inventory.CraftItemStack");
-		Class<?> nmsItemStackClass = Reflection.getMinecraftClass("ItemStack");
-		Method getNMSI = craftItemStack.getMethod("asNMSCopy", ItemStack.class);
-		Object nms = getNMSI.invoke(null, item);
-		Object cacheTag = nmsItemStackClass.getMethod("getTag").invoke(nms);
-		if (cacheTag != null && cacheTag.getClass().getMethod("getString", String.class).invoke(cacheTag, "ItemJoin") != null 
-				|| cacheTag != null && cacheTag.getClass().getMethod("getString", String.class).invoke(cacheTag, "ItemJoin Name") != null
-				&& cacheTag != null && cacheTag.getClass().getMethod("getString", String.class).invoke(cacheTag, "ItemJoin Slot") != null) {
-			String data1 = (String) cacheTag.getClass().getMethod("getString", String.class).invoke(cacheTag, "ItemJoin Name");
-			String data2 = (String) cacheTag.getClass().getMethod("getString", String.class).invoke(cacheTag, "ItemJoin Slot");
-			String data = (String) cacheTag.getClass().getMethod("getString", String.class).invoke(cacheTag, "ItemJoin");
-			if (data1 != null && data2 != null && data1 != "" && data2 != "") {
-				return data1 + " " + data2;
-			} else if (data != null && data != "") { 
-				return data.replace("Slot: ", "");
+		if (this.dataTagsEnabled() && item != null && item.getType() != Material.AIR) {
+			try {
+				Object nms = Reflection.getCraftBukkitClass("inventory.CraftItemStack").getMethod("asNMSCopy", ItemStack.class).invoke(null, item);
+				Object cacheTag = Reflection.getMinecraftClass("ItemStack").getMethod("getTag").invoke(nms);
+				if (cacheTag != null) {
+					String data = (String) cacheTag.getClass().getMethod("getString", String.class).invoke(cacheTag, "ItemJoin");
+					String data1 = (String) cacheTag.getClass().getMethod("getString", String.class).invoke(cacheTag, "ItemJoin Name");
+					String data2 = (String) cacheTag.getClass().getMethod("getString", String.class).invoke(cacheTag, "ItemJoin Slot");
+					if (data1 != null && data2 != null && !data1.isEmpty() && !data2.isEmpty()) {
+						return data1 + " " + data2;
+					} else if (data != null && !data.isEmpty()) { 
+						return data.replace("Slot: ", "");
+					}
+				}
+			} catch (Exception e) {
+				ServerHandler.getServer().logSevere("{ItemMap} An error has occured when getting NBTData to an item.");
+				ServerHandler.getServer().sendDebugTrace(e);
 			}
-		} 
-		} catch (Exception e) {
-			ServerHandler.getServer().logSevere("{ItemMap} An error has occured when getting NBTData to an item.");
-			ServerHandler.getServer().sendDebugTrace(e);
-		}
 		}
 		return null;
 	}
@@ -555,13 +549,13 @@ public class ItemHandler {
     * @return If the ItemStack has plugin specific NBTData.
     */
 	public boolean containsNBTData(final ItemStack item) {
-		if (this.dataTagsEnabled() && ServerHandler.getServer().hasSpecificUpdate("1_8") && item != null && item.getType() != Material.AIR && this.getNBTData(item) != null) {
+		if (this.dataTagsEnabled() && item != null && item.getType() != Material.AIR && this.getNBTData(item) != null) {
 			return true;
-		} else if (!this.dataTagsEnabled() || (this.dataTagsEnabled() && !ServerHandler.getServer().hasSpecificUpdate("1_8"))) { 
-				if (item != null && item.hasItemMeta() && item.getItemMeta().hasDisplayName()
-						&& Utils.getUtils().colorDecode(item.getItemMeta().getDisplayName()).contains(Utils.getUtils().colorDecode(Utils.getUtils().colorEncode("ItemJoin")))) {
-					return true;
-				}
+		} else if (!this.dataTagsEnabled()) { 
+			if (item != null && item.hasItemMeta() && item.getItemMeta().hasDisplayName()
+				&& Utils.getUtils().colorDecode(item.getItemMeta().getDisplayName()).contains(Utils.getUtils().colorDecode(Utils.getUtils().colorEncode("ItemJoin")))) {
+				return true;
+			}
 		}
 		return false;
 	}

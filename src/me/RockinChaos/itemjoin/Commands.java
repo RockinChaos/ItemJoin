@@ -377,7 +377,7 @@ public class Commands implements CommandExecutor {
 			this.confirmationRequests.put(table + sender.getName(), true);
 			LanguageAPI.getLang(false).sendLangMessage("Commands.Database.purgeWarn", sender, placeHolders);
 			LanguageAPI.getLang(false).sendLangMessage("Commands.Database.purgeConfirm", sender, placeHolders);
-			Bukkit.getServer().getScheduler().runTaskLater(ItemJoin.getInstance(), () -> {
+			ServerHandler.getServer().runAsyncThread(main -> {
 				if (this.confirmationRequests.get(table + sender.getName()) != null && this.confirmationRequests.get(table + sender.getName()).equals(true)) {
 					LanguageAPI.getLang(false).sendLangMessage("Commands.Database.purgeTimeOut", sender);
 					this.confirmationRequests.remove(table + sender.getName());

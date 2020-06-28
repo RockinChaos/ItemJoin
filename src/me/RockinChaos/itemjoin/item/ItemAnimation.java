@@ -27,12 +27,9 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.scheduler.BukkitRunnable;
-
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 
-import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
@@ -203,13 +200,11 @@ public class ItemAnimation {
     */
 	private void AnimateTask(final Player player, final boolean hasNext, final String nameString, final List<String> loreString, final String materialString, final String ownerString, final String textureString, final List<String> pagesString, final long UpdateDelay, final int position) {
 		final ItemMap itemMap = this.itemMap;
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				if (!stopAnimations) {
+		ServerHandler.getServer().runAsyncThread(main -> { 
+			if (!stopAnimations) {
 				// ============== Animate Within the Player Inventory ============== //
 				for (ItemStack inPlayerInventory: player.getInventory().getContents()) {
-					if (inPlayerInventory != null && itemMap.getTempItem() != null && itemMap.isSimilar(inPlayerInventory)) {
+					if (inPlayerInventory != null && itemMap.getTempItem() != null && itemMap.isReal(inPlayerInventory)) {
 						if (nameString != null) { setNameData(player, inPlayerInventory, nameString); } 
 						else if (loreString != null) { setLoreData(player, inPlayerInventory, loreString); }
 						else if (materialString != null) { setMaterialData(player, inPlayerInventory, materialString); }
@@ -219,7 +214,7 @@ public class ItemAnimation {
 				}
 				// =============== Animate Within the Player's Armor =============== //
 				for (ItemStack inPlayerInventory: player.getInventory().getArmorContents()) {
-					if (inPlayerInventory != null && itemMap.getTempItem() != null && itemMap.isSimilar(inPlayerInventory)) {
+					if (inPlayerInventory != null && itemMap.getTempItem() != null && itemMap.isReal(inPlayerInventory)) {
 						if (nameString != null) { setNameData(player, inPlayerInventory, nameString); } 
 						else if (loreString != null) { setLoreData(player, inPlayerInventory, loreString); }
 						else if (materialString != null) { setMaterialData(player, inPlayerInventory, materialString); }
@@ -229,7 +224,7 @@ public class ItemAnimation {
 				}
 				// ========== Animate Within the Player Crafting/Chests ============ //
 				for (ItemStack inPlayerInventory: player.getOpenInventory().getTopInventory().getContents()) {
-					if (inPlayerInventory != null && itemMap.getTempItem() != null && itemMap.isSimilar(inPlayerInventory)) {
+					if (inPlayerInventory != null && itemMap.getTempItem() != null && itemMap.isReal(inPlayerInventory)) {
 						if (nameString != null) { setNameData(player, inPlayerInventory, nameString); } 
 						else if (loreString != null) { if (menu) { setLoreData(player, inPlayerInventory, menuLores.get(position)); } else { setLoreData(player, inPlayerInventory, loreString); } }
 						else if (materialString != null) { setMaterialData(player, inPlayerInventory, materialString); }
@@ -238,9 +233,9 @@ public class ItemAnimation {
 					}
 				}
 				// ============== Animate Within the Player's Cursor =============== //
-				if (player.getItemOnCursor().getType() != null && player.getItemOnCursor().getType() != Material.AIR && itemMap.getTempItem() != null && itemMap.isSimilar(player.getItemOnCursor())) {
+				if (player.getItemOnCursor().getType() != null && player.getItemOnCursor().getType() != Material.AIR && itemMap.getTempItem() != null && itemMap.isReal(player.getItemOnCursor())) {
 					ItemStack item = new ItemStack(player.getItemOnCursor());
-					if (InventoryClick.getCursor(PlayerHandler.getPlayer().getPlayerID(player)) != null && itemMap.isSimilar(InventoryClick.getCursor(PlayerHandler.getPlayer().getPlayerID(player)))) { item = new ItemStack(InventoryClick.getCursor(PlayerHandler.getPlayer().getPlayerID(player))); }
+					if (InventoryClick.getCursor(PlayerHandler.getPlayer().getPlayerID(player)) != null && itemMap.isReal(InventoryClick.getCursor(PlayerHandler.getPlayer().getPlayerID(player)))) { item = new ItemStack(InventoryClick.getCursor(PlayerHandler.getPlayer().getPlayerID(player))); }
 					if (nameString != null) { setNameData(player, player.getItemOnCursor(), nameString); } 
 					else if (loreString != null) { setLoreData(player, player.getItemOnCursor(), loreString); }
 					else if (materialString != null) { setMaterialData(player, player.getItemOnCursor(), materialString); }
@@ -257,9 +252,8 @@ public class ItemAnimation {
 					else if (ownerString != null) { ownerTasks(player); }
 					else if (textureString != null) { textureTasks(player); }
 				}
-				}
 			}
-		}.runTaskLater(ItemJoin.getInstance(), UpdateDelay);
+		}, UpdateDelay);
 	}
 	
    /**
