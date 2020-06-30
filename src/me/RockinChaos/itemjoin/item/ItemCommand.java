@@ -25,6 +25,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
@@ -41,6 +42,7 @@ public class ItemCommand {
 	private int cycleTask = 0;
 	private String command;
 	private String listSection;
+	private ItemStack itemCopy;
 	private ExecutorType executorType;
 	private ActionType actionType;
 	private CommandType commandType;
@@ -241,12 +243,28 @@ public class ItemCommand {
 		return this.setCounting.contains(player);
 	}
 	
+   /**
+	* Sets the player as pending command execution.
+	* Prevents the command from being executed if the player is offline or dead.
+	* 
+	* @param player - player that is interacting with the custom items command.
+	* @param bool - if the player is pending execution.
+	*/
 	private void setPending(final Player player, final boolean bool) {
 		if (bool) {
 			this.setCounting.add(player); 
 		} else { 
 			this.setCounting.remove(player); 
 		}
+	}
+	
+   /**
+	* Sets the Swap Item ItemStack to be removed.
+	* 
+	* @param itemCopy - The ItemStack to be removed.
+	*/
+	public void setItem(final ItemStack itemCopy) {
+		this.itemCopy = itemCopy.clone();
 	}
 	
    /**
@@ -416,6 +434,8 @@ public class ItemCommand {
 		try {
 			for (ItemMap item : ItemUtilities.getUtilities().getItems()) {
 				if (item.getConfigName().equalsIgnoreCase(this.command)) {
+					ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(this.itemCopy, null, player.getWorld());
+					if (itemMap != null) { item.removeDisposable(player, itemMap, this.itemCopy, true); }
 					item.swapItem(player, slot);
 					break;
 				}

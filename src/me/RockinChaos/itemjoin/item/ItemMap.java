@@ -3764,7 +3764,7 @@ public class ItemMap {
 							else { itemMap.withdrawItemCost(player); }
 			    			itemMap.playSound(player);
 			    			itemMap.playParticle(player);
-							itemMap.removeDisposable(player, itemCopy, false);
+							itemMap.removeDisposable(player, itemMap, itemCopy, false);
 							itemMap.addPlayerOnCooldown(player);
 						}
 					} else {
@@ -3890,7 +3890,6 @@ public class ItemMap {
     	String chosenIdent = this.getRandomList(itemCommands);
     	HashMap < Integer, ItemCommand > randomCommands = new HashMap < Integer, ItemCommand > ();
     	if (!this.subjectRemoval) {
-    		boolean isSwap = false;
     		for (int i = 0; i < itemCommands.length; i++) { 
         		if (this.sequence == CommandSequence.RANDOM || this.sequence == CommandSequence.RANDOM_SINGLE) { randomCommands.put(Utils.getUtils().getRandom(1, 100000), itemCommands[i]); }
         		else if (this.sequence == CommandSequence.RANDOM_LIST) {
@@ -3901,9 +3900,8 @@ public class ItemMap {
         		}
         		else if (!playerSuccess) { playerSuccess = itemCommands[i].execute(player, action, slot, this); }
 				else { itemCommands[i].execute(player, action, slot, this); }
-        		if (Utils.getUtils().containsIgnoreCase(itemCommands[i].getRawCommand(), "swap-item")) { isSwap = true; }
+        		if (Utils.getUtils().containsIgnoreCase(itemCommands[i].getRawCommand(), "swap-item")) { itemCommands[i].setItem(itemCopy); }
 			}
-    		if (isSwap) { this.removeDisposable(player, itemCopy, true); }
     	}
     	if (this.sequence == CommandSequence.RANDOM) { playerSuccess = this.getRandomAll(randomCommands, itemCommands, player, action, slot); }
     	else if (this.sequence == CommandSequence.RANDOM_SINGLE) { playerSuccess = this.getRandomMap(randomCommands, itemCommands, player, action, slot); }
@@ -4077,22 +4075,22 @@ public class ItemMap {
     * @param itemCopy - The ItemStack to be disposed.
     * @param allItems - If the item should not have its amount changed.
     */
-	private void removeDisposable(final Player player, final ItemStack itemCopy, final boolean allItems) {
+	public void removeDisposable(final Player player, final ItemMap itemMap, final ItemStack itemCopy, final boolean allItems) {
 		if (this.disposable || allItems) {
 			if (!allItems) { setSubjectRemoval(true); }
 			Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
 				@Override
 				public void run() {
 					if (PlayerHandler.getPlayer().isCreativeMode(player)) { player.closeInventory(); }
-					if (isSimilar(player.getItemOnCursor())) {
+					if (itemMap.isSimilar(player.getItemOnCursor())) {
 						player.setItemOnCursor(ItemHandler.getItem().modifyItem(player.getItemOnCursor(), allItems, 1));
 						if (!allItems) { setSubjectRemoval(false); }
 					} else {
 						int itemSlot = player.getInventory().getHeldItemSlot();
-						if (isSimilar(player.getInventory().getItem(itemSlot))) { player.getInventory().setItem(itemSlot, ItemHandler.getItem().modifyItem(player.getInventory().getItem(itemSlot), allItems, 1)); if (!allItems) { setSubjectRemoval(false); }}
+						if (itemMap.isSimilar(player.getInventory().getItem(itemSlot))) { player.getInventory().setItem(itemSlot, ItemHandler.getItem().modifyItem(player.getInventory().getItem(itemSlot), allItems, 1)); if (!allItems) { setSubjectRemoval(false); }}
 						else { 
 							for (int i = 0; i < player.getInventory().getSize(); i++) {
-								if (isSimilar(player.getInventory().getItem(i))) {
+								if (itemMap.isSimilar(player.getInventory().getItem(i))) {
 									player.getInventory().setItem(i, ItemHandler.getItem().modifyItem(player.getInventory().getItem(i), allItems, 1));
 									if (!allItems) { setSubjectRemoval(false); }
 									break;
