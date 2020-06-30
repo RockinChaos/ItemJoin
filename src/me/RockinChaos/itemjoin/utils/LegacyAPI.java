@@ -236,11 +236,11 @@ public class LegacyAPI {
     */
     public short getMapID(final org.bukkit.map.MapView view) {
     	try { 
-    		return (short) view.getId(); 
-    	} catch (Exception e) { 			
+    		return (short) view.getId();
+    	} catch (Exception | NoSuchMethodError e) { 			
 			try { 
-				return (short)Reflection.getBukkitClass("map.MapView").getMethod("getId").invoke(view); 
-			} catch (Exception e2) { return 1; }
+				return (short) Reflection.getBukkitClass("map.MapView").getMethod("getId").invoke(view);
+			} catch (Exception | NoSuchMethodError e2) { return 1; }
 		}
     }
     
@@ -253,10 +253,10 @@ public class LegacyAPI {
     public org.bukkit.map.MapView getMapView(final int id) {
     	try { 
     		return ItemJoin.getInstance().getServer().getMap((short) id); 
-    	} catch (Exception e) { 
+    	} catch (Exception | NoSuchMethodError e) { 
 			try {
 				return (org.bukkit.map.MapView)Reflection.getBukkitClass("Bukkit").getMethod("getMap", short.class).invoke(Reflection.getBukkitClass("map.MapView"), (short)id);
-			} catch (Exception e2) { return null; }
+			} catch (Exception | NoSuchMethodError e2) { return null; }
 		}
     }
     
@@ -268,7 +268,7 @@ public class LegacyAPI {
     public org.bukkit.map.MapView createMapView() {
     	try {
     		return ItemJoin.getInstance().getServer().createMap(ItemJoin.getInstance().getServer().getWorlds().get(0));
-    	} catch (Exception e) { return null; }
+    	} catch (Exception | NoSuchMethodError e) { return null; }
     }
     
    /**
