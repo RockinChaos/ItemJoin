@@ -82,6 +82,7 @@ public class ImageRenderer extends MapRenderer {
         this.repeatForever = this.toRepeat < 0;
         if (this.gifImage == null) { ServerHandler.getServer().logSevere("{ImageRenderer} GIF image must not be null."); }
         if (!(startFrame >= 0 && startFrame < this.gifImage.getFrameCount())) { ServerHandler.getServer().logSevere("{ImageRenderer} Frame index out of bounds."); }
+        ServerHandler.getServer().logDebug("{ImageRenderer} Rendering custom-map-image; " + image + " with the id " + this.id);
     }
     
    /**

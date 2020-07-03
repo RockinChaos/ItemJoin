@@ -23,7 +23,7 @@ Database:
 # These settings will take effect globally throughout the plugins system.
 Settings:
   HeldItem-Slot: DISABLED
-  HeldItem-Triggers: JOIN
+  HeldItem-Triggers: JOIN, WORLD-SWITCH
   DataTags: true
 
 # These permissions if enabled, determine whether the permission(s) is/are applied to certain players.
