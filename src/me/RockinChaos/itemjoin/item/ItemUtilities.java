@@ -243,7 +243,7 @@ public class ItemUtilities {
     * @param type - The TriggerType that is being performed.
     */
 	private void safeSet(final Player player, final TriggerType type, final String region) {
-		if (!type.equals(TriggerType.LIMITSWITCH)) { PlayerHandler.getPlayer().setHotbarSlot(player); }
+		if (Utils.getUtils().splitIgnoreCase(ConfigHandler.getConfig(false).getHotbarTriggers(), type.name)) { PlayerHandler.getPlayer().setHotbarSlot(player); }
 		if (type.equals(TriggerType.REGIONLEAVE)) { DependAPI.getDepends(false).getGuard().pasteReturnItems(player, player.getWorld().getName(), region); }
 		if (type.equals(TriggerType.REGIONENTER)) { this.clearEvent(player, "", type.name, region); }
 		if (this.getClearDelay() != 0) {

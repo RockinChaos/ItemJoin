@@ -248,6 +248,19 @@ public class ConfigHandler {
 		}
 		return -1;
 	}
+	
+   /**
+    * Gets the Hotbar Triggers that is defined to be set.
+    * 
+    * @return The String list of hotbar triggers.
+    */
+	public String getHotbarTriggers() { 
+		if (this.getFile("config.yml").getString("Settings.HeldItem-Triggers") != null 
+				&& !this.getFile("config.yml").getString("Settings.HeldItem-Triggers").equalsIgnoreCase("DISABLED")) {
+			return this.getFile("config.yml").getString("Settings.HeldItem-Triggers");
+		}
+		return "";
+	}
 
    /**
     * Checks if Debugging is enabled.
