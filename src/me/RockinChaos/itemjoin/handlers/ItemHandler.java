@@ -36,6 +36,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.map.MapView;
+
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 
@@ -366,6 +368,18 @@ public class ItemHandler {
 			return LegacyAPI.getLegacy().setSkullOwner(((SkullMeta) meta), owner);
 		}
 		return meta;
+	}
+	
+   /**
+    * Gets the existing MapView for the image id.
+    * 
+    * @param id - that will recieve the items.
+    * @retrn The existing MapView.
+    */
+	public MapView existingView(final int id) {
+		MapView view = LegacyAPI.getLegacy().getMapView(id);
+		if (view == null) { view = LegacyAPI.getLegacy().createMapView(); }
+		return view;
 	}
 	
    /**

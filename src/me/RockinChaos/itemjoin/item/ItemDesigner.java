@@ -39,6 +39,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ShapedRecipe;
+import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -50,7 +51,7 @@ import me.RockinChaos.itemjoin.utils.LegacyAPI;
 import me.RockinChaos.itemjoin.utils.Reflection;
 import me.RockinChaos.itemjoin.utils.Chances;
 import me.RockinChaos.itemjoin.utils.DependAPI;
-import me.RockinChaos.itemjoin.utils.ImageMap;
+import me.RockinChaos.itemjoin.utils.ImageRenderer;
 import me.RockinChaos.itemjoin.utils.Utils;
 import me.RockinChaos.itemjoin.utils.sqlite.SQLite;
 
@@ -121,6 +122,9 @@ public class ItemDesigner {
    /**
 	* Determines if the specific item node has a valid Material ID 
 	* defined as well as if the item node has a slot defined.
+	* 
+	* @param internalName - The node name of the item.
+	* @param itemNode - The item node location.
 	* @return If the material is valid.
 	*/
 	private boolean isConfigurable(final String internalName, final ConfigurationSection itemNode) {
@@ -166,6 +170,9 @@ public class ItemDesigner {
    /**
 	* Determines if the specific item node has an actual ItemJoin 
 	* definable slot, being a custom slot or a true integer slot.
+	* 
+	* @param internalName - The node name of the item.
+	* @param slot - The slot of the item.
 	* @return If the slot is valid.
 	*/
 	private boolean isDefinable(final String internalName, final String slot) {
@@ -190,6 +197,7 @@ public class ItemDesigner {
    /**
 	* Sets the Custom Material to the Custom Item.
 	*
+	*@param itemMap - The ItemMap being modified.
 	*/
 	private void setMaterial(final ItemMap itemMap) {
 		Material material = this.getActualMaterial(itemMap);
@@ -199,6 +207,8 @@ public class ItemDesigner {
 	
    /**
 	* Fetches the correct Bukkit material.
+	* 
+	* @param itemMap - The ItemMap being modified.
 	* @return The found Bukkit material.
 	*/
 	private Material getActualMaterial(final ItemMap itemMap) {
@@ -223,6 +233,7 @@ public class ItemDesigner {
    /**
 	* Sets the HeadDatabase Texture to the Custom Skull Item.
 	*
+	*@param itemMap - The ItemMap being modified.
 	*/
 	private void setSkullDatabase(final ItemMap itemMap) {
 		if (DependAPI.getDepends(false).databaseEnabled() && itemMap.getNodeLocation().getString(".skull-texture") != null) {
@@ -244,6 +255,8 @@ public class ItemDesigner {
 	
    /**
 	* Fetches the correct Skull Texture.
+	* 
+	* @param itemMap - The ItemMap being modified.
 	* @return The found skull texture.
 	*/
 	private String getActualTexture(final ItemMap itemMap) {
@@ -273,6 +286,7 @@ public class ItemDesigner {
 	* Sets the Unbreakable Boolean to the Custom Item, 
 	* preventing any item with a durability from being damaged
 	* 
+	* @param itemMap - The ItemMap being modified.
 	*/
 	private void setUnbreaking(final ItemMap itemMap) {
 		if (Utils.getUtils().containsIgnoreCase(itemMap.getItemFlags(), "unbreakable")) {
@@ -284,6 +298,7 @@ public class ItemDesigner {
    /**
 	* Hides the Durability Bar of the Custom Item.
 	* 
+	* @param itemMap - The ItemMap being modified.
 	*/
 	private void durabilityBar(final ItemMap itemMap) {
 		if (Utils.getUtils().containsIgnoreCase(itemMap.getItemFlags(), "hide-durability")) {
@@ -296,6 +311,7 @@ public class ItemDesigner {
 	* Sets the Custom Enchants to the Custom Item, 
 	* adding the specified enchantments to the item.
 	* 
+	* @param itemMap - The ItemMap being modified.
 	*/
 	private void setEnchantments(final ItemMap itemMap) {
 		if (itemMap.getNodeLocation().getString(".enchantment") != null) {
@@ -333,6 +349,7 @@ public class ItemDesigner {
 	* Sets the Custom Map Image to the Custom Item, 
 	* draws the specified map image on the items canvas.
 	* 
+	* @param itemMap - The ItemMap being modified.
 	*/
 	private void setMapImage(final ItemMap itemMap) {
 		if (itemMap.getNodeLocation().getString(".custom-map-image") != null && Utils.getUtils().containsIgnoreCase(itemMap.getMaterial().toString(), "MAP")) {
@@ -340,8 +357,8 @@ public class ItemDesigner {
 			if (itemMap.getMapImage().equalsIgnoreCase("default.jpg") || new File(ItemJoin.getInstance().getDataFolder(), itemMap.getMapImage()).exists()) {
 				if (SQLite.getLite(false).imageNumberExists(itemMap.getMapImage())) {
 					int mapID = SQLite.getLite(false).getImageNumber(itemMap.getMapImage());
-					ImageMap imgPlatform = new ImageMap(itemMap.getMapImage(), mapID);
-					MapView view = imgPlatform.existingView(mapID);
+					MapRenderer imgPlatform = this.createRenderer(itemMap.getMapImage(), mapID);
+					MapView view = ItemHandler.getItem().existingView(mapID);
 					itemMap.setMapID(mapID);
 					itemMap.setMapView(view);
 					try { view.removeRenderer(view.getRenderers().get(0)); } catch (NullPointerException e) { ServerHandler.getServer().sendDebugTrace(e); }
@@ -350,7 +367,7 @@ public class ItemDesigner {
 					MapView view = LegacyAPI.getLegacy().createMapView();
 					try { view.removeRenderer(view.getRenderers().get(0)); } catch (NullPointerException e) { ServerHandler.getServer().sendDebugTrace(e); }
 					int mapID = LegacyAPI.getLegacy().getMapID(view);
-					ImageMap imgPlatform = new ImageMap(itemMap.getMapImage(), mapID);
+					MapRenderer imgPlatform = this.createRenderer(itemMap.getMapImage(), mapID);
 					itemMap.setMapID(mapID);
 					itemMap.setMapView(view);
 					try { view.addRenderer(imgPlatform); } catch (NullPointerException e) { ServerHandler.getServer().sendDebugTrace(e); }
@@ -361,9 +378,23 @@ public class ItemDesigner {
 	}
 	
    /**
+    * Creates a new MapRenderer.
+    * 
+    * @param image - The image to be rendered, ex: 'default.jpg'.
+    * @param imageID - The id of the MapView.
+    * @return The newly created MapRenderer instance.
+    */
+    public MapRenderer createRenderer(final String image, final int imageID) {
+    	if (Utils.getUtils().containsIgnoreCase(image, ".GIF")) { 
+    		return new ImageRenderer(image, imageID, 0, -1);
+    	} else { return new ImageRenderer(image, imageID); }
+    }
+	
+   /**
 	* Sets the NBTData to the Custom Item, 
 	* designing the item to be unique to ItemJoin.
 	* 
+	* @param itemMap - The ItemMap being modified.
 	*/
 	private void setNBTData(final ItemMap itemMap) {
 		if (ItemHandler.getItem().dataTagsEnabled() && !itemMap.isVanilla() && !itemMap.isVanillaControl() && !itemMap.isVanillaStatus()) {
@@ -383,6 +414,7 @@ public class ItemDesigner {
 	* Sets the Book Pages to the Custom Item, 
 	* adding the custom book pages to the item in JSON Formatting.
 	* 
+	* @param itemMap - The ItemMap being modified.
 	*/
 	private void setJSONBookPages(final ItemMap itemMap) {
 		ConfigurationSection pagesSection = ConfigHandler.getConfig(false).getFile("items.yml").getConfigurationSection(itemMap.getNodeLocation().getCurrentPath() + ".pages");
@@ -447,6 +479,8 @@ public class ItemDesigner {
 	
    /**
 	* Checks if the book pages contains a JSONEvent.
+	* 
+	* @param formatPage - The page to be formatted..
 	* @return If the book page contains a JSONEvent.
 	*/
 	private boolean containsJSONEvent(final String formatPage) {
@@ -459,6 +493,9 @@ public class ItemDesigner {
    /**
 	* Checks to see if the open_url is correctly defined with https or http.
 	* 
+	* @param itemMap - The ItemMap being modified.
+	* @param type - The JSONEvent type.
+	* @param inputResult - The input for the JSONEvent.
 	*/
 	private void safteyCheckURL(final ItemMap itemMap, final JSONEvent type, final String inputResult) {
 		if (type.equals(JSONEvent.OPEN_URL)) {
@@ -473,6 +510,7 @@ public class ItemDesigner {
 	* Sets the Custom Name to the Custom Item, 
 	* adding the custom name to the items display name.
 	* 
+	* @param itemMap - The ItemMap being modified.
 	*/
 	private void setName(final ItemMap itemMap) {
 		String name = getActualName(itemMap);
@@ -485,6 +523,9 @@ public class ItemDesigner {
 	
    /**
 	* Encodes the LegacySecret into the Custom Items name.
+	* 
+	* @param itemMap - The ItemMap being modified.
+	* @param text - The String to be encoded.
 	* @return The correctly encoded display name containing the plugin secret.
 	*/
 	private String encodeName(final ItemMap itemMap, final String text) {
@@ -493,6 +534,8 @@ public class ItemDesigner {
 	
    /**
 	* Gets the exact name to be set to the Custom Item.
+	* 
+	* @param itemMap - The ItemMap being modified.
 	* @return The correctly formatted display name.
 	*/
 	private String getActualName(final ItemMap itemMap) {
@@ -525,6 +568,7 @@ public class ItemDesigner {
 	* Sets the Custom Lore to the Custom Item,
 	* adding the custom lore to the items lore.
 	* 
+	* @param itemMap - The ItemMap being modified.
 	*/
 	private void setLore(final ItemMap itemMap) {
 		if (itemMap.getNodeLocation().getString(".lore") != null) {
@@ -535,6 +579,8 @@ public class ItemDesigner {
 	
    /**
 	* Gets the exact lore to be set to the Custom Item.
+	* 
+	* @param itemMap - The ItemMap being modified.
 	* @return The correctly formatted list of displayed lores.
 	*/
 	private List < String > getActualLore(final ItemMap itemMap) {
@@ -564,6 +610,7 @@ public class ItemDesigner {
 	* Sets the Durability to the Custom Item,
 	* changes the items durability to the specified durability.
 	* 
+	* @param itemMap - The ItemMap being modified.
 	*/
 	private void setDurability(final ItemMap itemMap) {
 		if (itemMap.getNodeLocation().getString(".data") == null || itemMap.getNodeLocation().getInt(".data") == 0) {
@@ -579,6 +626,7 @@ public class ItemDesigner {
    /**
 	* Sets the durability model data to the Custom Item.
 	* 
+	* @param itemMap - The ItemMap being modified.
 	*/
 	private void setData(final ItemMap itemMap) {
 		if (itemMap.getNodeLocation().getString(".data") != null) {
@@ -593,6 +641,7 @@ public class ItemDesigner {
 	* Sets the Model Data for the Custom Item,
 	* adding an NBTTag to the item containing the numerical value for the Custom Model Data.
 	* 
+	* @param itemMap - The ItemMap being modified.
 	*/
 	private void setModelData(final ItemMap itemMap) {
 		if (ServerHandler.getServer().hasSpecificUpdate("1_14") && itemMap.getNodeLocation().getString(".model-data") != null) {
@@ -604,6 +653,7 @@ public class ItemDesigner {
 	* Sets the Probability of the Custom Item,
 	* defining the probability percentage of the item.
 	* 
+	* @param itemMap - The ItemMap being modified.
 	*/
 	private void setProbability(final ItemMap itemMap) {
 		if (itemMap.getNodeLocation().getString(".probability") != null) {
@@ -622,6 +672,7 @@ public class ItemDesigner {
 	* Sets the Mobs Drop Chances of the Custom Item,
 	* defining the drop percentage of the item.
 	* 
+	* @param itemMap - The ItemMap being modified.
 	*/
 	private void setMobsDrop(final ItemMap itemMap) {
 		Map < EntityType, Double > mobsDrop = new HashMap < EntityType, Double > ();
@@ -648,6 +699,7 @@ public class ItemDesigner {
 	* Sets the Blocks Drop Chances of the Custom Item,
 	* defining the drop percentage of the item.
 	* 
+	* @param itemMap - The ItemMap being modified.
 	*/
 	private void setBlocksDrop(final ItemMap itemMap) {
 		Map < Material, Double > blocksDrop = new HashMap < Material, Double > ();
@@ -673,6 +725,7 @@ public class ItemDesigner {
    /**
 	* Sets the Recipe of the Custom Item.
 	* 
+	* @param itemMap - The ItemMap being modified.
 	*/
 	private void setRecipe(final ItemMap itemMap) {
 		if (itemMap.getNodeLocation().getString(".recipe") != null) {
@@ -704,6 +757,7 @@ public class ItemDesigner {
 	* Sets the Skull Owner of the Custom Skull Item,
 	* adding the Texture of the Skull Owner to the item.
 	* 
+	* @param itemMap - The ItemMap being modified.
 	*/
 	private void setSkull(final ItemMap itemMap) {
 		if (itemMap.getNodeLocation().getString(".skull-owner") != null) {
@@ -717,6 +771,8 @@ public class ItemDesigner {
 	
    /**
 	* Gets the exact skull owner value to be added to the ItemMap.
+	* 
+	* @param itemMap - The ItemMap being modified.
 	* @return The found skull owner.
 	*/
 	private String getActualOwner(final ItemMap itemMap) {
@@ -746,6 +802,7 @@ public class ItemDesigner {
 	* Sets the Skull Texture of the Custom Item,
 	* adding the Custom Skull Texture to the item.
 	* 
+	* @param itemMap - The ItemMap being modified.
 	*/
     private void setSkullTexture(final ItemMap itemMap) {
     	if (ServerHandler.getServer().hasSpecificUpdate("1_8") && itemMap.getNodeLocation().getString(".skull-texture") != null) {
@@ -767,6 +824,7 @@ public class ItemDesigner {
  	* Sets the Consumable Potion Effects of the Custom Item,
  	* adding the Custom Consumable Potion Effects to the item.
  	* 
+ 	* @param itemMap - The ItemMap being modified.
  	*/
 	private void setConsumableEffects(final ItemMap itemMap) {
 		if (itemMap.getNodeLocation().getString(".potion-effect") != null && itemMap.getMaterial().toString().equalsIgnoreCase("GOLDEN_APPLE")) {
@@ -805,6 +863,7 @@ public class ItemDesigner {
  	* Sets the Potion Effects of the Custom Item,
  	* adding the Custom Potion Effects to the item.
  	* 
+ 	* @param itemMap - The ItemMap being modified.
  	*/
 	private void setPotionEffects(final ItemMap itemMap) {
 		if (itemMap.getNodeLocation().getString(".potion-effect") != null) {
@@ -843,6 +902,7 @@ public class ItemDesigner {
  	* Sets the Tipped Arrow Effects of the Custom Item,
  	* adding the Custom Tipped Arrow Effects to the item.
  	* 
+ 	* @param itemMap - The ItemMap being modified.
  	*/
 	private void setTippedArrows(final ItemMap itemMap) {
 		if (itemMap.getNodeLocation().getString(".potion-effect") != null) {
@@ -880,6 +940,7 @@ public class ItemDesigner {
  	* Sets the Banner Patterns of the Custom Item,
  	* adding the Custom Banner Patterns to the item.
  	* 
+ 	* @param itemMap - The ItemMap being modified.
  	*/
 	private void setBanners(final ItemMap itemMap) {
 		if (itemMap.getNodeLocation().getString(".banner-meta") != null && ServerHandler.getServer().hasSpecificUpdate("1_8") && Utils.getUtils().containsIgnoreCase(itemMap.getMaterial().toString(), "BANNER")) {
@@ -907,6 +968,7 @@ public class ItemDesigner {
  	* Sets the Firework Effects of the Custom Item,
  	* adding the Custom Firework Effects to the item.
  	* 
+ 	* @param itemMap - The ItemMap being modified.
  	*/
 	private void setFireworks(final ItemMap itemMap) {
 		if (itemMap.getNodeLocation().getString(".firework") != null) {
@@ -943,6 +1005,7 @@ public class ItemDesigner {
  	* Sets the Firework Charge Color of the Custom Item,
  	* adding the Custom Firework Charge Color to the item.
  	* 
+ 	* @param itemMap - The ItemMap being modified.
  	*/
 	private void setFireChargeColor(final ItemMap itemMap) {
 		if (itemMap.getNodeLocation().getString(".charge-color") != null) {
@@ -957,6 +1020,7 @@ public class ItemDesigner {
  	* Sets the Dye Color of the Custom Item,
  	* changing the Custom Dye Color of the item.
  	* 
+ 	* @param itemMap - The ItemMap being modified.
  	*/
 	private void setDye(final ItemMap itemMap) {
 		if (itemMap.getNodeLocation().getString(".leather-color") != null) {
@@ -989,6 +1053,7 @@ public class ItemDesigner {
  	* Sets the Author of the Custom Book Item,
  	* defining the author of the book item.
  	* 
+ 	* @param itemMap - The ItemMap being modified.
  	*/
 	private void setBookAuthor(final ItemMap itemMap) {
 		if (itemMap.getMaterial().toString().equalsIgnoreCase("WRITTEN_BOOK")) {
@@ -1004,6 +1069,7 @@ public class ItemDesigner {
  	* Sets the Title of the Custom Book Item,
  	* defining the custom title of the book item.
  	* 
+ 	* @param itemMap - The ItemMap being modified.
  	*/
 	private void setBookTitle(final ItemMap itemMap) {
 		if (itemMap.getMaterial().toString().equalsIgnoreCase("WRITTEN_BOOK")) {
@@ -1019,6 +1085,7 @@ public class ItemDesigner {
  	* Sets the Generation of the Custom Book Item,
  	* defining the custom generation of the book item.
  	* 
+ 	* @param itemMap - The ItemMap being modified.
  	*/
 	private void setBookGeneration(final ItemMap itemMap) {
 		if (ServerHandler.getServer().hasSpecificUpdate("1_10") && itemMap.getMaterial().toString().equalsIgnoreCase("WRITTEN_BOOK")) {
@@ -1034,6 +1101,7 @@ public class ItemDesigner {
  	* Sets the Legacy Book Pages of the Custom Book Item,
  	* adding the custom book pages to the item without any JSON Formatting.
  	* 
+ 	* @param itemMap - The ItemMap being modified.
  	*/
 	private void setLegacyBookPages(final ItemMap itemMap) {
 		ConfigurationSection pagesSection = ConfigHandler.getConfig(false).getFile("items.yml").getConfigurationSection(itemMap.getNodeLocation().getCurrentPath() + ".pages");
@@ -1069,6 +1137,7 @@ public class ItemDesigner {
  	* Sets the Attributes of the Custom Book Item,
  	* shows or hides the Attributes of the item.
  	* 
+ 	* @param itemMap - The ItemMap being modified.
  	*/
 	private void setAttributes(final ItemMap itemMap) {
 		if (ServerHandler.getServer().hasSpecificUpdate("1_8") && Utils.getUtils().containsIgnoreCase(itemMap.getItemFlags(), "hide-attributes")) {
