@@ -135,10 +135,7 @@ public class LogFilter extends AbstractFilter {
     public static LogFilter getFilter(final boolean regen) { 
         if (filter == null || regen) { 
         	filter = new LogFilter();
-        	((Logger) 
-        			LogManager.getRootLogger())
-        	.addFilter(
-        			filter);
+        	((org.apache.logging.log4j.core.Logger)LogManager.getRootLogger()).addFilter(filter);
         }
         return filter; 
     } 
