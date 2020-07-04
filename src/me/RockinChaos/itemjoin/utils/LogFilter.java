@@ -21,9 +21,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.Logger;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.apache.logging.log4j.core.filter.AbstractFilter;
 import org.apache.logging.log4j.message.Message;
 
@@ -134,7 +137,9 @@ public class LogFilter extends AbstractFilter {
     public static LogFilter getFilter(final boolean regen) { 
         if (filter == null || regen) { 
         	filter = new LogFilter();
-        	((org.apache.logging.log4j.core.Logger)org.apache.logging.log4j.LogManager.getRootLogger()).addFilter(filter);
+        	LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
+        	LoggerConfig loggerConfig = ctx.getConfiguration().getLoggerConfig(((Logger)LogManager.getRootLogger()).getName()); 
+        	loggerConfig.addFilter(filter);
         }
         return filter; 
     } 
