@@ -134,7 +134,7 @@ public class LogFilter extends AbstractFilter {
     public static LogFilter getFilter(final boolean regen) { 
         if (filter == null || regen) { 
         	filter = new LogFilter();
-        	// ((org.apache.logging.log4j.core.Logger)org.apache.logging.log4j.LogManager.getRootLogger()).addFilter(filter); // Temp Disabled due to Apache breaking
+        	((org.apache.logging.log4j.core.Logger)org.apache.logging.log4j.LogManager.getRootLogger()).addFilter(filter);
         }
         return filter; 
     } 
