@@ -1,5 +1,5 @@
 main: me.RockinChaos.itemjoin.ItemJoin
-version: 5.0.7-SNAPSHOT-b${env.BUILD_NUMBER}
+version: ${version}-b${env.BUILD_NUMBER}
 name: ItemJoin
 author: RockinChaos
 load: POSTWORLD

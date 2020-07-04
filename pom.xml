@@ -44,7 +44,7 @@
 				<artifactId>maven-shade-plugin</artifactId>
 				<version>3.2.1</version>
 				<configuration>
-				    <finalName>5.0.7-SNAPSHOT-b${env.BUILD_NUMBER}</finalName>                   
+				    <finalName>ItemJoin-${version}-b${env.BUILD_NUMBER}</finalName>                   
 				</configuration>
 				<executions>
 					<execution>
