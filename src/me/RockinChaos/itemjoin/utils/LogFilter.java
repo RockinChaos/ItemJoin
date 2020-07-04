@@ -137,9 +137,8 @@ public class LogFilter extends AbstractFilter {
     public static LogFilter getFilter(final boolean regen) { 
         if (filter == null || regen) { 
         	filter = new LogFilter();
-        	LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
-        	LoggerConfig loggerConfig = ctx.getConfiguration().getLoggerConfig(((Logger)LogManager.getRootLogger()).getName()); 
-        	loggerConfig.addFilter(filter);
+        	Logger test = ((Logger)LogManager.getRootLogger());
+        	//loggerConfig.addFilter(filter);
         }
         return filter; 
     } 
