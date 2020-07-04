@@ -214,8 +214,11 @@ public class ConfigHandler {
 		this.getSource(configFile);
 		File File = new File(ItemJoin.getInstance().getDataFolder(), configFile);
 		if (File.exists() && this.getFile(configFile).getInt(version) != id) {
-			if (ItemJoin.getInstance().getResource(configFile) != null) {
-				String[] namePart = configFile.split(".");
+			InputStream source;
+			if (!configFile.contains("lang.yml")) { source = ItemJoin.getInstance().getResource("files/configs/" + configFile); } 
+			else { source = ItemJoin.getInstance().getResource("files/locales/" + configFile); }
+			if (source != null) {
+				String[] namePart = configFile.split("\\.");
 				String renameFile = namePart[0] + Utils.getUtils().getRandom(1, 50000) + namePart[1];
 				File renamedFile = new File(ItemJoin.getInstance().getDataFolder(), renameFile);
 				if (!renamedFile.exists()) {
