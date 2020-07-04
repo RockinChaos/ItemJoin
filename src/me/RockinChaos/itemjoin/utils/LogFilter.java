@@ -23,7 +23,6 @@ import java.util.HashMap;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.core.LogEvent;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.filter.AbstractFilter;
 import org.apache.logging.log4j.message.Message;
@@ -135,7 +134,7 @@ public class LogFilter extends AbstractFilter {
     public static LogFilter getFilter(final boolean regen) { 
         if (filter == null || regen) { 
         	filter = new LogFilter();
-        	// ((org.apache.logging.log4j.core.Logger)LogManager.getRootLogger()).addFilter(filter); // Temp Disabled due to Apache breaking
+        	// ((org.apache.logging.log4j.core.Logger)org.apache.logging.log4j.LogManager.getRootLogger()).addFilter(filter); // Temp Disabled due to Apache breaking
         }
         return filter; 
     } 

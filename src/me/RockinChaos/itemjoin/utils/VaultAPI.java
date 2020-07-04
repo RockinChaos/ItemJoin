@@ -47,7 +47,7 @@ public class VaultAPI {
 	private void enableEconomy() { 
 		if (ItemJoin.getInstance().getServer().getPluginManager().getPlugin("Vault") != null) {
 			if (!this.setupEconomy()) {
-				ServerHandler.getServer().logSevere("{VaultAPI} An error has occured while setting up enabling Vault-ItemJoin support!");
+				ServerHandler.getServer().logDebug("{VaultAPI} An error has occured while setting up enabling Vault-ItemJoin support!");
 			}
 		}
 	}
@@ -58,9 +58,9 @@ public class VaultAPI {
 	* @return If the Economy instance was successfully enabled.
 	*/
     private boolean setupEconomy() {
-        if (ItemJoin.getInstance().getServer().getPluginManager().getPlugin("Vault") == null) {  return false; }
+        if (ItemJoin.getInstance().getServer().getPluginManager().getPlugin("Vault") == null) { return false; }
         RegisteredServiceProvider<Economy> rsp = ItemJoin.getInstance().getServer().getServicesManager().getRegistration(Economy.class);
-        if (rsp == null) {  return false; }
+        if (rsp == null) { return false; }
         this.econ = rsp.getProvider();
         return this.econ != null;
     }
