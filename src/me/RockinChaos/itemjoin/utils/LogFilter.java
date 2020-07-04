@@ -26,7 +26,6 @@ import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
-import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.apache.logging.log4j.core.filter.AbstractFilter;
 import org.apache.logging.log4j.message.Message;
@@ -138,9 +137,11 @@ public class LogFilter extends AbstractFilter {
     public static LogFilter getFilter(final boolean regen) { 
         if (filter == null || regen) { 
         	filter = new LogFilter();
-        	LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
-        	LoggerConfig loggerConfig = ctx.getConfiguration().getLoggerConfig(((Logger)LogManager.getRootLogger()).getName()); 
-        	loggerConfig.addFilter(filter);
+        	//String d = LogManager.ROOT_LOGGER_NAME;
+            filter = new LogFilter();
+            LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
+            LoggerConfig loggerConfig = ctx.getConfiguration().getLoggerConfig(LogManager.ROOT_LOGGER_NAME); 
+            loggerConfig.addFilter(filter);
         }
         return filter; 
     } 
