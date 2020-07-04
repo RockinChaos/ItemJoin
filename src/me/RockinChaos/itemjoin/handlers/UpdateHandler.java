@@ -37,14 +37,15 @@ public class UpdateHandler {
     private final String AUTOQUERY = "projects/itemjoin/files/latest";
     private final String AUTOHOST = "https://dev.bukkit.org/";
     private final int PROJECTID = 12661;
-    private final String HOST = "https://api.spigotmc.org/legacy/update.php?resource=" + PROJECTID;
+    private final String HOST = "https://api.spigotmc.org/legacy/update.php?resource=" + this.PROJECTID;
     
     private String versionExact = ItemJoin.getInstance().getDescription().getVersion();
-    private boolean betaVersion = versionExact.contains("-SNAPSHOT") || versionExact.contains("-BETA") || versionExact.contains("-ALPHA");
-    private String localeVersionRaw = versionExact.split("-")[0];
+    private String localeVersionRaw = this.versionExact.split("-")[0];
     private String latestVersionRaw;
-    private double localeVersion = Double.parseDouble(localeVersionRaw.replace(".", ""));
+    private double localeVersion = (this.localeVersionRaw.equals("${project.version}") ? -1 : Double.parseDouble(localeVersionRaw.replace(".", "")));
     private double latestVersion;
+    private boolean betaVersion = this.versionExact.contains("-SNAPSHOT") || this.versionExact.contains("-BETA") || this.versionExact.contains("-ALPHA");
+    private boolean devVersion = this.localeVersion == -1;
     
     private File jarLink;
     private int BYTE_SIZE = 2048;
@@ -131,6 +132,10 @@ public class UpdateHandler {
     		if (this.betaVersion) {
     			ServerHandler.getServer().messageSender(sender, "&aYou are running a SNAPSHOT!");
     			ServerHandler.getServer().messageSender(sender, "&aIf you find any bugs please report them!");
+    		} else if (this.devVersion) {
+    			ServerHandler.getServer().messageSender(sender, "&aYou are running a DEVELOPER SNAPSHOT!");
+    			ServerHandler.getServer().messageSender(sender, "&aIf you find any bugs please report them!");
+    			ServerHandler.getServer().messageSender(sender, "&aYou will not receive any updates requiring you to manually update.");
     		}
     		ServerHandler.getServer().messageSender(sender, "&aYou are up to date!");
     	}
@@ -154,7 +159,9 @@ public class UpdateHandler {
     			if (version.length() <= 7) {
     				this.latestVersionRaw = version.replaceAll("[a-z]", "").replace("-SNAPSHOT", "").replace("-BETA", "").replace("-ALPHA", "").replace("-RELEASE", "");
     				this.latestVersion = Double.parseDouble(this.latestVersionRaw.replace(".", ""));
-    				if (this.latestVersion == this.localeVersion && this.betaVersion || this.localeVersion > this.latestVersion && !this.betaVersion || this.latestVersion > this.localeVersion) {
+    				if (this.devVersion) {
+    					return false;
+    				} else if (this.latestVersion == this.localeVersion && this.betaVersion || this.localeVersion > this.latestVersion && !this.betaVersion || this.latestVersion > this.localeVersion) {
     					return true;
     				}
     			}
