@@ -110,6 +110,11 @@
 			<id>CodeMC</id>
 			<url>https://repo.codemc.org/repository/maven-public</url>
 		</repository>
+    <!--SkinsRestorer Repository-->
+		<repository>
+		    <id>codemc-snapshots</id>
+		    <url>https://repo.codemc.org/repository/maven-snapshots/</url>
+		</repository>
 	</repositories>
 	<dependencies>
     <!--Netty API-->
@@ -158,6 +163,12 @@
 			<artifactId>bstats-bukkit</artifactId>
 			<version>1.4</version>
 			<scope>compile</scope>
+    	</dependency>
+    <!-- SkinsRestorer API -->
+    	<dependency>
+    	    <groupId>com</groupId>
+    	    <artifactId>skinsrestorer</artifactId>
+    	    <version>13.7.5-SNAPSHOT</version>
     	</dependency>
     <!--Apache API-->
     	<dependency>
