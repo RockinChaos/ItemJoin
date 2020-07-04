@@ -77,10 +77,11 @@ public class Glow extends EnchantWrapper {
    /**
     * Gets the name of the Glow Enchant.
     * 
+    * @deprecated Enchantments are badly named, use getKey().
     * @return The Glow name.
     *
+    *
     */
-	@Override
 	public String getName() {
 		return "Glowing";
 	}
@@ -98,10 +99,10 @@ public class Glow extends EnchantWrapper {
    /**
     * Checks if the Enchantment is cursed.
     * 
+    * @deprecated Cursed enchantments are no longer special.
     * @return If the Enchantment is cursed.
     *
     */
-	@Override
 	public boolean isCursed() {
 		return false;
 	}
