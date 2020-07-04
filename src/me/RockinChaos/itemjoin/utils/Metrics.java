@@ -125,6 +125,7 @@ public class Metrics {
 		        this.addCustomChart(new Metrics.SimplePie("softDepend", DependAPI.getDepends(false).databaseEnabled() ? "HeadDatabase" : ""));
 		        this.addCustomChart(new Metrics.SimplePie("softDepend", DependAPI.getDepends(false).xInventoryEnabled() ? "xInventories" : ""));
 		        this.addCustomChart(new Metrics.SimplePie("softDepend", DependAPI.getDepends(false).placeHolderEnabled() ? "PlaceholderAPI" : ""));
+		        this.addCustomChart(new Metrics.SimplePie("softDepend", DependAPI.getDepends(false).skinsRestorerEnabled() ? "SkinsRestorer" : ""));
 		        this.addCustomChart(new Metrics.SimplePie("softDepend", DependAPI.getDepends(false).getVault().vaultEnabled() ? "Vault" : ""));
 		}
     }

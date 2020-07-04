@@ -3471,12 +3471,12 @@ public class ItemMap {
     * @param player - The Player to be used for placeholders.
     */
 	private void setSkull(final Player player) {
-		if (this.skullOwner != null) {
-			tempMeta = ItemHandler.getItem().setSkullOwner(tempMeta, Utils.getUtils().translateLayout(this.skullOwner, player));
-		} else if (this.skullTexture != null && !this.headDatabase) {
+		if (this.skullOwner != null && !DependAPI.getDepends(false).skinsRestorerEnabled()) {
+			this.tempMeta = ItemHandler.getItem().setSkullOwner(this.tempMeta, Utils.getUtils().translateLayout(this.skullOwner, player));
+		} else if ((this.skullTexture != null && !this.headDatabase) || (this.skullOwner != null && DependAPI.getDepends(false).skinsRestorerEnabled())) {
 			try {
 				GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
-				gameProfile.getProperties().put("textures", new Property("textures", new String(this.skullTexture)));
+				gameProfile.getProperties().put("textures", new Property("textures", new String(((this.skullOwner != null && DependAPI.getDepends(false).skinsRestorerEnabled()) ? DependAPI.getDepends(false).getSkinValue(Utils.getUtils().translateLayout(this.skullOwner, player)) : this.skullTexture))));
 				Field declaredField = this.tempMeta.getClass().getDeclaredField("profile");
 				declaredField.setAccessible(true);
 				declaredField.set(this.tempMeta, gameProfile);

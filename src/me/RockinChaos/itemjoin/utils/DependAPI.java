@@ -19,7 +19,10 @@ package me.RockinChaos.itemjoin.utils;
 
 import org.bukkit.Bukkit;
 
+import com.mojang.authlib.properties.Property;
+
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
+import skinsrestorer.bukkit.SkinsRestorer;
 
 public class DependAPI {
 	
@@ -35,6 +38,7 @@ public class DependAPI {
 	private boolean xInventories = false;
 	private boolean tokenEnchant = false;
 	private boolean headDatabase = false;
+	private boolean skinsRestorer = false;
 	
 	private static DependAPI depends;
 	
@@ -55,6 +59,7 @@ public class DependAPI {
 		this.setXInventoryStatus(Bukkit.getServer().getPluginManager().getPlugin("xInventories") != null);
 		this.setTokenEnchantStatus(Bukkit.getServer().getPluginManager().getPlugin("TokenEnchant") != null);
 		this.setDatabaseStatus(Bukkit.getServer().getPluginManager().getPlugin("HeadDatabase") != null);
+		this.setSkinsRestorerStatus(Bukkit.getServer().getPluginManager().getPlugin("SkinsRestorer") != null);
 		GuardAPI.getGuard(true);
 		VaultAPI.getVault(true);
 	}
@@ -166,6 +171,15 @@ public class DependAPI {
     public boolean databaseEnabled() {
     	return this.headDatabase;
     }
+    
+   /**
+    * Checks if SkinsRestorer is Enabled.
+    * 
+    * @return If SkinsRestorer is Enabled.
+    */
+    public boolean skinsRestorerEnabled() {
+    	return this.skinsRestorer;
+    }
 
    /**
     * Sets the status of Hyperverse.
@@ -276,6 +290,25 @@ public class DependAPI {
     }
     
    /**
+    * Sets the status of SkinsRestorer.
+    * 
+    * @param bool - If SkinsRestorer is enabled.
+    */
+    public void setSkinsRestorerStatus(final boolean bool) {
+    	this.skinsRestorer = bool;
+    }
+    
+   /**
+    * Gets the set SkinsRestorer skin.
+    * 
+    * @param owner - The skull owner to have their skin fetched.
+    * @return The found Skin Texture value.
+    */
+    public String getSkinValue(final String owner) {
+    	return ((Property) SkinsRestorer.getInstance().getSkinsRestorerBukkitAPI().getSkinData(owner)).getValue();
+    }
+    
+   /**
     * Gets the GuardAPI instance.
     * 
     * @return The current GuardAPI instance.
@@ -303,7 +336,7 @@ public class DependAPI {
 				+ (this.myWorldsEnabled() ? "My Worlds, " : "") + (this.perInventoryEnabled() ? "PerWorldInventory, " : "") 
 				+ (this.perPluginsEnabled() ? "PerWorldPlugins, " : "") + (this.tokenEnchantEnabled() ? "TokenEnchant, " : "") 
 				+ (this.getGuard().guardEnabled() ? "WorldGuard, " : "") + (this.databaseEnabled() ? "HeadDatabase, " : "") 
-				+ (this.xInventoryEnabled() ? "xInventories, " : "") + (this.placeHolderEnabled() ? "PlaceholderAPI, " : "") 
+				+ (this.xInventoryEnabled() ? "xInventories, " : "") + (this.placeHolderEnabled() ? "PlaceholderAPI, " : "") + (this.skinsRestorer ? "SkinsRestorer, " : "") 
 				+ (this.getVault().vaultEnabled() ? "Vault " : "") + "}");
 	}
 	
