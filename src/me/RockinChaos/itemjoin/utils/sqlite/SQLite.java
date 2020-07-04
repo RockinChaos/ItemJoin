@@ -497,20 +497,27 @@ public class SQLite {
     * @param player - The player being removed.
     * @param section - The datatype being removed.
     */
-	public void purgeDatabaseData(OfflinePlayer player, String section) {
-		String UUID = (player == null ? "ALL" : PlayerHandler.getPlayer().getOfflinePlayerID(player));
-		if (section.equalsIgnoreCase("first_join") && this.firstJoinPlayers.values() != null && !this.firstJoinPlayers.isEmpty()) {
-			this.executeStatementsLater.add("DELETE FROM ij_" + section + " WHERE Player_UUID='" + UUID + "';");
-			this.firstJoinPlayers.remove(UUID);
-		} else if (section.equalsIgnoreCase("first_world") && this.firstWorldPlayers.values() != null && !this.firstWorldPlayers.isEmpty()) {
-			this.executeStatementsLater.add("DELETE FROM ij_" + section + " WHERE Player_UUID='" + UUID + "';");
-			this.firstWorldPlayers.remove(UUID);
-		} else if (section.equalsIgnoreCase("ip_limits") && this.ipLimitAddresses.values() != null && !this.ipLimitAddresses.isEmpty()) {
-			this.executeStatementsLater.add("DELETE FROM ij_" + section + " WHERE Player_UUID='" + UUID + "';");
-			this.ipLimitAddresses.remove(UUID);
-		} else if (section.equalsIgnoreCase("enabled_players") && this.enabledPlayers.values() != null && !this.enabledPlayers.isEmpty()) {
-			this.executeStatementsLater.add("DELETE FROM ij_" + section + " WHERE Player_UUID='" + UUID + "';");
-			this.enabledPlayers.remove(UUID);
+	public void purgeDatabaseData(OfflinePlayer player, String image, String section) {
+		if (section.equalsIgnoreCase("map_ids")) {
+			if (this.mapImages.values() != null && !this.mapImages.isEmpty()) {
+				this.executeStatementsLater.add("DELETE FROM ij_" + section + " WHERE Map_IMG='" + image + "';");
+				this.mapImages.remove(image);
+			}
+		} else { 
+			String UUID = (player == null ? "ALL" : PlayerHandler.getPlayer().getOfflinePlayerID(player));
+			if (section.equalsIgnoreCase("first_join") && this.firstJoinPlayers.values() != null && !this.firstJoinPlayers.isEmpty()) {
+				this.executeStatementsLater.add("DELETE FROM ij_" + section + " WHERE Player_UUID='" + UUID + "';");
+				this.firstJoinPlayers.remove(UUID);
+			} else if (section.equalsIgnoreCase("first_world") && this.firstWorldPlayers.values() != null && !this.firstWorldPlayers.isEmpty()) {
+				this.executeStatementsLater.add("DELETE FROM ij_" + section + " WHERE Player_UUID='" + UUID + "';");
+				this.firstWorldPlayers.remove(UUID);
+			} else if (section.equalsIgnoreCase("ip_limits") && this.ipLimitAddresses.values() != null && !this.ipLimitAddresses.isEmpty()) {
+				this.executeStatementsLater.add("DELETE FROM ij_" + section + " WHERE Player_UUID='" + UUID + "';");
+				this.ipLimitAddresses.remove(UUID);
+			} else if (section.equalsIgnoreCase("enabled_players") && this.enabledPlayers.values() != null && !this.enabledPlayers.isEmpty()) {
+				this.executeStatementsLater.add("DELETE FROM ij_" + section + " WHERE Player_UUID='" + UUID + "';");
+				this.enabledPlayers.remove(UUID);
+			}
 		}
 	}
 	
@@ -643,6 +650,15 @@ public class SQLite {
 		}
 		this.executeStatementsLater.add("DELETE FROM ij_on_cooldown WHERE Item_Name='" + itemMap.getConfigName() + "';");
 		return playersOnCooldown;
+	}
+	
+   /**
+    * Gets the currently rendered map images.
+    * 
+    * @return The HashMap of images for custom items.
+    */
+	public Map<String, Integer> getMapImages() {
+		return this.mapImages;
 	}
 	
    /**

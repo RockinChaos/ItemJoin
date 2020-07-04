@@ -144,10 +144,11 @@ public class Commands implements CommandExecutor {
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&c&l[DANGER]&eThe Following Destroys Data &nPermanently!&e&c&l[DANGER]");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Purge &7- &eDeletes the database file!");
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Purge map-id <Image> &7- &eMap-Images data.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Purge first-join <User> &7- &eFirst-Join data.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Purge first-world <User> &7- &eFirst-World data.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Purge ip-limits <User> &7- &eIp-Limits data.");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Purge enabled-players <User> &7- &eEnabled-Players data.");
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Purge enabled-players <User> &7- &eData.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&aFound a bug? Report it @");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&ahttps://github.com/RockinChaos/ItemJoin/issues");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]----------------&a&l[&e Help Menu 9/9 &a&l]&a&l&m---------------[");
@@ -179,7 +180,7 @@ public class Commands implements CommandExecutor {
 			this.permissions(sender, Integer.parseInt(args[1]));
 		} else if (Execute.PURGE.accept(sender, args, 0)) {
 			if (args.length == 1) { this.purge(sender, "Database", "All Players"); } 
-			else if (args[1].equalsIgnoreCase("ip-limits") || args[1].equalsIgnoreCase("first-join") || args[1].equalsIgnoreCase("first-world")  || args[1].equalsIgnoreCase("enabled-players")) { 
+			else if (args[1].equalsIgnoreCase("map-ids") || args[1].equalsIgnoreCase("ip-limits") || args[1].equalsIgnoreCase("first-join") || args[1].equalsIgnoreCase("first-world") || args[1].equalsIgnoreCase("enabled-players")) { 
 				this.purge(sender, args[1], args[2]); 
 			}
 		} else if (Execute.ENABLE.accept(sender, args, 0)) {
@@ -357,16 +358,16 @@ public class Commands implements CommandExecutor {
 	* 
 	*/
 	private HashMap < String, Boolean > confirmationRequests = new HashMap < String, Boolean > ();
-	private void purge(final CommandSender sender, final String table, final String player) {
-		String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[1] = player; placeHolders[10] = table; 
+	private void purge(final CommandSender sender, final String table, final String args) {
+		String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[1] = args; placeHolders[10] = table; 
 		OfflinePlayer foundPlayer = null;
 		if (!table.equalsIgnoreCase("Database")) { 
-			placeHolders[9] = "/ij purge " + table + " <player>"; 
-			foundPlayer = LegacyAPI.getLegacy().getOfflinePlayer(player);
-			if (foundPlayer == null && !player.equalsIgnoreCase("ALL")) { LanguageAPI.getLang(false).sendLangMessage("Commands.Default.targetNotFound", sender, placeHolders); return; } 
+			placeHolders[9] = "/ij purge " + table + (table.equalsIgnoreCase("map-ids") ? " <image>" : " <player>"); 
+			if (!table.equalsIgnoreCase("map-ids")) { foundPlayer = LegacyAPI.getLegacy().getOfflinePlayer(args); }
+			if (!table.equalsIgnoreCase("map-ids") && foundPlayer == null && !args.equalsIgnoreCase("ALL")) { LanguageAPI.getLang(false).sendLangMessage("Commands.Default.targetNotFound", sender, placeHolders); return; } 
 		} else { placeHolders[9] = "/ij purge"; }
 		if (this.confirmationRequests.get(table + sender.getName()) != null && this.confirmationRequests.get(table + sender.getName()).equals(true)) {
-			if (!table.equalsIgnoreCase("Database")) { SQLite.getLite(false).purgeDatabaseData(foundPlayer, table.replace("-", "_")); } 
+			if (!table.equalsIgnoreCase("Database")) { SQLite.getLite(false).purgeDatabaseData(foundPlayer, args, table.replace("-", "_")); } 
 			else {
 				SQDrivers.getDatabase("database").purgeDatabase();
 				SQLite.getLite(true);
@@ -626,7 +627,7 @@ public class Commands implements CommandExecutor {
 			return ((args.length >= 2 && (args[1].equalsIgnoreCase(String.valueOf(page)) || (!Utils.getUtils().isInt(args[1]) && !this.equals(Execute.PURGE)))) 
 				 || (args.length < 2 && (!this.equals(Execute.GET) && !this.equals(Execute.GETONLINE) && !this.equals(Execute.REMOVE) && !this.equals(Execute.REMOVEONLINE))
 				 || (this.equals(Execute.PURGE) && (args.length == 1 
-				 || (args.length >= 3 && (args[1].equalsIgnoreCase("ip-limits") || args[1].equalsIgnoreCase("first-join") || args[1].equalsIgnoreCase("first-world") || args[1].equalsIgnoreCase("enabled-players")))))));
+				 || (args.length >= 3 && (args[1].equalsIgnoreCase("map-ids") || args[1].equalsIgnoreCase("ip-limits") || args[1].equalsIgnoreCase("first-join") || args[1].equalsIgnoreCase("first-world") || args[1].equalsIgnoreCase("enabled-players")))))));
 		}
 		
        /**
