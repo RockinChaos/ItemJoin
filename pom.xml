@@ -6,7 +6,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>me.RockinChaos.itemjoin</groupId>
 	<artifactId>ItemJoin</artifactId>
-	<version>5.0.7-SNAPSHOT-b${env.BUILD_NUMBER}</version>
+	<version>5.0.7-SNAPSHOT</version>
 	<build>
 		<sourceDirectory>${project.basedir}</sourceDirectory>
 		<resources>
@@ -43,6 +43,9 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
 				<version>3.2.1</version>
+				<configuration>
+				    <finalName>5.0.7-SNAPSHOT-b${env.BUILD_NUMBER}</finalName>                   
+				</configuration>
 				<executions>
 					<execution>
 						<phase>package</phase>
@@ -164,12 +167,6 @@
 			<version>1.4</version>
 			<scope>compile</scope>
     	</dependency>
-    <!-- SkinsRestorer API -->
-    	<dependency>
-    	    <groupId>com</groupId>
-    	    <artifactId>skinsrestorer</artifactId>
-    	    <version>13.7.5-SNAPSHOT</version>
-    	</dependency>
     <!--Apache API-->
     	<dependency>
         	<groupId>commons-io</groupId>
@@ -202,6 +199,14 @@
             <systemPath>${pom.basedir}/src/me/RockinChaos/itemjoin/extra/VaultAPI.jar</systemPath>
             <version>LEGACY</version>
         </dependency>
+    <!-- SkinsRestorer Local -->
+    	<dependency>
+    	    <groupId>me.SkinsRestorerAPI</groupId>
+    	    <artifactId>SkinsRestorerAPI</artifactId>
+            <scope>system</scope>
+            <systemPath>${pom.basedir}/src/me/RockinChaos/itemjoin/extra/SkinsRestorerAPI.jar</systemPath>
+    	    <version>LEGACY</version>
+    	</dependency>
     <!--HeadDatabase Local-->
         <dependency>
             <groupId>me.HeadDatabaseAPI</groupId>
