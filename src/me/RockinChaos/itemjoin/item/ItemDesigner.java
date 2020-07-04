@@ -729,8 +729,7 @@ public class ItemDesigner {
 	*/
 	private void setRecipe(final ItemMap itemMap) {
 		if (itemMap.getNodeLocation().getString(".recipe") != null) {
-			NamespacedKey key = new NamespacedKey(ItemJoin.getInstance(), itemMap.getConfigName());
-			ShapedRecipe shapedRecipe = new ShapedRecipe(key, itemMap.getItem(null));
+			ShapedRecipe shapedRecipe = (ServerHandler.getServer().hasSpecificUpdate("1_12") ? new ShapedRecipe(new NamespacedKey(ItemJoin.getInstance(), itemMap.getConfigName()), itemMap.getItem(null)) : LegacyAPI.getLegacy().newShapedRecipe(itemMap.getItem(null)));
 			Map < Character, Material > ingredientList = new HashMap < Character, Material > ();
 			String[] shape = itemMap.trimRecipe(itemMap.getNodeLocation().getStringList(".recipe"));
 			shapedRecipe.shape(shape);

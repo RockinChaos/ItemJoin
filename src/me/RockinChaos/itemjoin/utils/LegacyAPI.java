@@ -27,6 +27,7 @@ import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -87,6 +88,16 @@ public class LegacyAPI {
     	return new ItemStack(material, count, dataValue);
     }
     
+   /**
+    * Creates a new ShapedRecipe.
+    * 
+    * @param item - The ItemStack to be crafted.
+    * @return The new ShapedRecipe.
+    */
+    public ShapedRecipe newShapedRecipe(final ItemStack item) {
+    	return new ShapedRecipe(item);
+    }
+
    /**
     * Matches the Material from its Bukkit Material and Data Value.
     * 
@@ -504,5 +515,5 @@ public class LegacyAPI {
     public static LegacyAPI getLegacy() { 
         if (legacy == null) { legacy = new LegacyAPI(); }
         return legacy; 
-    } 
+    }
 }

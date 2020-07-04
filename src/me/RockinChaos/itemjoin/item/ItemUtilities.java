@@ -713,15 +713,21 @@ public class ItemUtilities {
     * 
     */
   	public void clearRecipes() {
+  		List < Recipe > backupRecipes = new ArrayList < Recipe > ();
   		Iterator < Recipe > recipes = Bukkit.getServer().recipeIterator();
   		while (recipes.hasNext()) {
-  			Recipe result = recipes.next();
+  			Recipe recipe = recipes.next();
+  			ItemStack result = recipe.getResult();
+  			boolean backupItem = true;
   			for (ItemMap itemMap: this.getItems()) {
-  				if (itemMap.isSimilar(result.getResult())) {
-  					recipes.remove();
+  				if (itemMap.isSimilar(result) && !itemMap.getIngredients().isEmpty()) {
+  					backupItem = false;
   				}
   			}
+  			if (backupItem) { backupRecipes.add(recipe); }
   		}
+  		Bukkit.getServer().clearRecipes();
+  		for (Recipe recipe: backupRecipes) { try { Bukkit.getServer().addRecipe(recipe); } catch (IllegalStateException e) { } }
   	}
 	
    /**
