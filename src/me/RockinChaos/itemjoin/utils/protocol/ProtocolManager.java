@@ -87,7 +87,6 @@ public class ProtocolManager {
 	  		if (packet != null && packet.getClass().getSimpleName().equalsIgnoreCase("PacketPlayInAutoRecipe")) {
 	  			PlayerAutoCraftEvent AutoCraft = new PlayerAutoCraftEvent(player, player.getOpenInventory().getTopInventory());
 	  			this.callEvent(AutoCraft);
-	  			ServerHandler.getServer().logSevere("yeee " + AutoCraft.isCancelled());
 			  	return AutoCraft.isCancelled();
 	  		}
 	  		if (packet != null && packet.getClass().getSimpleName().equalsIgnoreCase("PacketPlayInCloseWindow")) {

@@ -119,6 +119,18 @@ public class ServerHandler {
 	}
 	
    /**
+    * Sends a developer warning message as the plugin header.
+    * 
+    * @param message - The unformatted message text to be sent.
+    */
+	public void logDev(String message) {
+		String prefix = "[ItemJoin_DEVELOPER] ";
+		message = prefix + message;
+		if (message.equalsIgnoreCase("") || message.isEmpty()) { message = ""; }
+		Bukkit.getServer().getLogger().warning(message);
+	}
+	
+   /**
     * Sends a error message as the plugin header.
     * 
     * @param message - The unformatted message text to be sent.
