@@ -22,15 +22,12 @@ import java.util.HashMap;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
-import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.InventoryType.SlotType;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
@@ -42,6 +39,7 @@ import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
+import me.RockinChaos.itemjoin.handlers.events.InventoryCloseEvent;
 import me.RockinChaos.itemjoin.handlers.events.PlayerAutoCraftEvent;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
@@ -94,34 +92,22 @@ public class InventoryCrafting implements Listener {
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     private void onCraftingClose(InventoryCloseEvent event) {
     	final InventoryView view = event.getView();
-    	final Player player = (Player) event.getPlayer();
-    	final ItemStack[] craftingContents = view.getTopInventory().getContents().clone();
+    	final Player player = event.getPlayer();
     	if (PlayerHandler.getPlayer().isCraftingInv(view)) {
-    		for (int i = 0; i <= 4; i++) {
-    			boolean craftingItem = false;
+    		for (int i = 0; i <= 4; i++) { 
     			for (ItemMap itemMap: ItemUtilities.getUtilities().getItems()) {
-    				if (itemMap.isCraftingItem() && itemMap.isSimilar(craftingContents[i])) {
-    					craftingItem = true;
-    					break;
+    				if (itemMap.isCraftingItem() && itemMap.isSimilar(event.getTopContents()[i])) {
+    					event.removeItem(event.getTopContents()[i], i);
+    					this.delayReturnItem(player, i, event.getPreviousContents(true)[i], 3L);
     				}
-    			}
-    			if (!craftingItem && craftingContents[i] != null && craftingContents[i].getType() != Material.AIR) {
-    				if (player.getInventory().firstEmpty() != -1 && i != 0) {
-    					player.getInventory().addItem(craftingContents[i].clone());
-    				} else if (i != 0) {
-    					this.dropItem(player, craftingContents[i].clone());
-    				}
-    				craftingContents[i] = new ItemStack(Material.AIR);
     			}
     		}
-    		for (int i = 0; i <= 4; i++) { view.setItem(i, new ItemStack(Material.AIR)); }
-    		for (int i = 0; i <= 4; i++) { this.delayReturnItem(player, i, craftingContents[i], 1L); }
     	} else {
     		ServerHandler.getServer().runAsyncThread(main -> {
             	if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory()) && craftingOpenItems.containsKey(PlayerHandler.getPlayer().getPlayerID(player))) {
                     ItemStack[] openCraftContents = craftingOpenItems.get(PlayerHandler.getPlayer().getPlayerID(player));
             		if (openCraftContents != null && openCraftContents.length != 0) { 
-                    for (int i = 4; i >= 0; i--) { delayReturnItem(player, i, openCraftContents[i], 1L); }
+                    for (int i = 4; i >= 0; i--) { this.delayReturnItem(player, i, openCraftContents[i], 1L); }
                     craftingItems.put(PlayerHandler.getPlayer().getPlayerID(player), craftingOpenItems.get(PlayerHandler.getPlayer().getPlayerID(player)));
             		craftingOpenItems.remove(PlayerHandler.getPlayer().getPlayerID(player));
             		}
@@ -305,19 +291,6 @@ public class InventoryCrafting implements Listener {
     			}
     		}
     	}, delay);
-    }
-    
-   /**
-    * Emulates the player dropping the specified item.
-    * 
-    * @param player - the Player dropping the item.
-    * @param item - the item being dropped.
-    */
-    private void dropItem(final Player player, final ItemStack item) { 
-    	Location location = player.getLocation();
-    	location.setY(location.getY() + 1);
-    	Item dropped = player.getWorld().dropItem(location, item);
-		dropped.setVelocity(location.getDirection().multiply(.30));
     }
     
    /**

@@ -27,6 +27,8 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredListener;
 import io.netty.channel.Channel;
 import me.RockinChaos.itemjoin.ItemJoin;
+import me.RockinChaos.itemjoin.handlers.ServerHandler;
+import me.RockinChaos.itemjoin.handlers.events.InventoryCloseEvent;
 import me.RockinChaos.itemjoin.handlers.events.PlayerAutoCraftEvent;
 
 public class ProtocolManager {
@@ -85,7 +87,13 @@ public class ProtocolManager {
 	  		if (packet != null && packet.getClass().getSimpleName().equalsIgnoreCase("PacketPlayInAutoRecipe")) {
 	  			PlayerAutoCraftEvent AutoCraft = new PlayerAutoCraftEvent(player, player.getOpenInventory().getTopInventory());
 	  			this.callEvent(AutoCraft);
+	  			ServerHandler.getServer().logSevere("yeee " + AutoCraft.isCancelled());
 			  	return AutoCraft.isCancelled();
+	  		}
+	  		if (packet != null && packet.getClass().getSimpleName().equalsIgnoreCase("PacketPlayInCloseWindow")) {
+	  			InventoryCloseEvent CloseInventory = new InventoryCloseEvent(player.getOpenInventory());
+	  			this.callEvent(CloseInventory);
+			  	return CloseInventory.isCancelled();
 	  		}
   		} catch (Exception e) { }
   		return false;
@@ -98,24 +106,22 @@ public class ProtocolManager {
     * @param event - The event to be triggered.
     */
     private void callEvent(Event event) {
-        HandlerList handlers = event.getHandlers();
-        RegisteredListener[] listeners = handlers.getRegisteredListeners();
-        for (RegisteredListener registration : listeners) {
-            if (!registration.getPlugin().isEnabled()) { continue; }
-            try {
-                registration.callEvent(event);
-            } catch (AuthorNagException e) {
-                Plugin plugin = registration.getPlugin();
-                if (plugin.isNaggable()) {
-                    plugin.setNaggable(false);
-                    ItemJoin.getInstance().getLogger().log(Level.SEVERE, String.format(
-                    		"Nag author(s): '%s' of '%s' about the following: %s",
-                            plugin.getDescription().getAuthors(), plugin.getDescription().getFullName(), e.getMessage()));
-                }
-            } catch (Throwable e) {
-            	 ItemJoin.getInstance().getLogger().log(Level.SEVERE, "Could not pass event " + event.getEventName() + " to " + registration.getPlugin().getDescription().getFullName(), e);
-            }
-        }
+    	HandlerList handlers = event.getHandlers();
+    	RegisteredListener[] listeners = handlers.getRegisteredListeners();
+    	for (RegisteredListener registration: listeners) {
+    		if (!registration.getPlugin().isEnabled()) { continue; }
+    		try {
+    			registration.callEvent(event);
+    		} catch (AuthorNagException e) {
+    			Plugin plugin = registration.getPlugin();
+    			if (plugin.isNaggable()) {
+    				plugin.setNaggable(false);
+    				ItemJoin.getInstance().getLogger().log(Level.SEVERE, String.format("Nag author(s): '%s' of '%s' about the following: %s", plugin.getDescription().getAuthors(), plugin.getDescription().getFullName(), e.getMessage()));
+    			}
+    		} catch (Throwable e) {
+    			ItemJoin.getInstance().getLogger().log(Level.SEVERE, "Could not pass event " + event.getEventName() + " to " + registration.getPlugin().getDescription().getFullName(), e);
+    		}
+    	}
     }
     
    /**

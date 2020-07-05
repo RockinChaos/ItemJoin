@@ -397,9 +397,7 @@ public class ConfigHandler {
 				@Override
 				public void run() {
 					PlayerHandler.getPlayer().restoreCraftItems();
-					if (ServerHandler.getServer().hasSpecificUpdate("1_12")) {
-						ProtocolManager.getManager().handleProtocols();
-					}
+					ProtocolManager.getManager().handleProtocols();
 				}
 			}, 40L);
 			if (!Utils.getUtils().isRegistered(PlayerQuit.class.getSimpleName())) {
