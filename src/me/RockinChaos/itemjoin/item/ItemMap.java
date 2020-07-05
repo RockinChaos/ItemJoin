@@ -3011,7 +3011,7 @@ public class ItemMap {
     * @return If the ItemStack Enchantments are similar.
     */
 	private boolean isEnchantSimilar(final ItemStack item) {
-		if (item.getItemMeta().hasEnchants() && this.enchants != null && !this.enchants.isEmpty()) { 
+		if (item.getItemMeta().hasEnchants() && ((this.enchants != null && !this.enchants.isEmpty()) || this.glowing)) { 
 			ItemStack checkItem = new ItemStack(item.getType());
 			for (Entry<String, Integer> enchantments : this.enchants.entrySet()) {
 				if (enchantments.getKey() == null && DependAPI.getDepends(false).tokenEnchantEnabled() && TokenEnchantAPI.getInstance().getEnchant(enchantments.getKey()) != null) {
@@ -3019,7 +3019,7 @@ public class ItemMap {
 				} else { 
 					checkItem.addUnsafeEnchantment(ItemHandler.getItem().getEnchantByName(enchantments.getKey()), enchantments.getValue()); }
 			}
-			return item.getItemMeta().getEnchants().equals(checkItem.getItemMeta().getEnchants());
+			return (this.glowing ? true : item.getItemMeta().getEnchants().equals(checkItem.getItemMeta().getEnchants()));
 		}
 		return false;
 	}
