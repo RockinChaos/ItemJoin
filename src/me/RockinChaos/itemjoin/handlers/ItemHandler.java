@@ -29,6 +29,7 @@ import java.util.UUID;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -45,6 +46,7 @@ import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.item.ItemUtilities.CustomSlot;
 import me.RockinChaos.itemjoin.listeners.InventoryCrafting;
+import me.RockinChaos.itemjoin.utils.DependAPI;
 import me.RockinChaos.itemjoin.utils.LegacyAPI;
 import me.RockinChaos.itemjoin.utils.Reflection;
 import me.RockinChaos.itemjoin.utils.Utils;
@@ -322,7 +324,7 @@ public class ItemHandler {
     */
 	public String getSkullTexture(final ItemMeta meta) {
 		try {
-			final Class < ? > cls = Reflection.getCraftBukkitClass("inventory.CraftMetaSkull");
+			final Class < ? > cls = Reflection.getReflection().getCraftBukkitClass("inventory.CraftMetaSkull");
 			final Object real = cls.cast(meta);
 			final Field field = real.getClass().getDeclaredField("profile");
 			field.setAccessible(true);
@@ -331,7 +333,7 @@ public class ItemHandler {
 			for (final Property property: props) {
 				if (property.getName().equals("textures")) { return property.getValue(); }
 			}
-		} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
+		} catch (Exception e) { }
 		return "";
 	}
 	
@@ -343,9 +345,9 @@ public class ItemHandler {
     * @return The ItemMeta with the new Skull Owner.
     */
 	public ItemMeta setSkullOwner(final ItemMeta meta, final String owner) {
-		if (ServerHandler.getServer().hasSpecificUpdate("1_8")) {
+		if (ServerHandler.getServer().hasSpecificUpdate("1_8") && !DependAPI.getDepends(false).skinsRestorerEnabled()) {
 			try {
-				Method fetchProfile = Reflection.getCraftBukkitClass("entity.CraftPlayer").getDeclaredMethod("getProfile");
+				Method fetchProfile = Reflection.getReflection().getCraftBukkitClass("entity.CraftPlayer").getDeclaredMethod("getProfile");
 				Field declaredField = meta.getClass().getDeclaredField("profile");
 				declaredField.setAccessible(true);
 				if (PlayerHandler.getPlayer().getPlayerString(owner) != null) {
@@ -362,10 +364,16 @@ public class ItemHandler {
 					declaredField.set(meta, this.gameProfiles.get(owner));
 				}
 			} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); LegacyAPI.getLegacy().setSkullOwner(((SkullMeta) meta), owner); }
-		} else {
+		} else if (!DependAPI.getDepends(false).skinsRestorerEnabled()) {
 			ServerHandler.getServer().logDebug("{ItemMap} Minecraft does not support offline player heads below Version 1.8.");
 			ServerHandler.getServer().logDebug("{ItemMap} Player heads will only be given a skin if the player has previously joined the sever.");
 			return LegacyAPI.getLegacy().setSkullOwner(((SkullMeta) meta), owner);
+		} else {
+			OfflinePlayer player;
+			String uuidString = Utils.getUtils().getMojangUUID(owner);
+			try { player = Bukkit.getOfflinePlayer(UUID.fromString(uuidString)); }
+			catch (Exception e) { player = LegacyAPI.getLegacy().getOfflinePlayer(owner); }
+			((SkullMeta) meta).setOwningPlayer(player);
 		}
 		return meta;
 	}
@@ -536,8 +544,8 @@ public class ItemHandler {
 	public String getNBTData(final ItemStack item) {
 		if (this.dataTagsEnabled() && item != null && item.getType() != Material.AIR) {
 			try {
-				Object nms = Reflection.getCraftBukkitClass("inventory.CraftItemStack").getMethod("asNMSCopy", ItemStack.class).invoke(null, item);
-				Object cacheTag = Reflection.getMinecraftClass("ItemStack").getMethod("getTag").invoke(nms);
+				Object nms = Reflection.getReflection().getCraftBukkitClass("inventory.CraftItemStack").getMethod("asNMSCopy", ItemStack.class).invoke(null, item);
+				Object cacheTag = Reflection.getReflection().getMinecraftClass("ItemStack").getMethod("getTag").invoke(nms);
 				if (cacheTag != null) {
 					String data = (String) cacheTag.getClass().getMethod("getString", String.class).invoke(cacheTag, "ItemJoin");
 					String data1 = (String) cacheTag.getClass().getMethod("getString", String.class).invoke(cacheTag, "ItemJoin Name");

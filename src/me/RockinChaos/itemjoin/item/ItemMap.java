@@ -364,7 +364,7 @@ public class ItemMap {
 	private void setCommandSound() {
 		try { if (this.nodeLocation.getString(".commands-sound") != null) { this.commandSound = Sound.valueOf(this.nodeLocation.getString(".commands-sound")); } } 
 		catch (Exception e) { 
-			ServerHandler.getServer().logSevere("{ItemMap} Your server is running MC " + Reflection.getServerVersion() + " and this version of Minecraft does not have the defined command-sound " + this.nodeLocation.getString(".commands-sound") + "."); 
+			ServerHandler.getServer().logSevere("{ItemMap} Your server is running MC " + Reflection.getReflection().getServerVersion() + " and this version of Minecraft does not have the defined command-sound " + this.nodeLocation.getString(".commands-sound") + "."); 
 			ServerHandler.getServer().sendDebugTrace(e);
 		}
 	}
@@ -3239,10 +3239,10 @@ public class ItemMap {
 	private void setUnbreaking() {
 		if (this.isUnbreakable() || this.hideDurability) {
 			try {
-				Class<?> craftItemStack = Reflection.getCraftBukkitClass("inventory.CraftItemStack");
+				Class<?> craftItemStack = Reflection.getReflection().getCraftBukkitClass("inventory.CraftItemStack");
 				Object nms = craftItemStack.getMethod("asNMSCopy", ItemStack.class).invoke(null, this.tempItem);
-				Object tag = Reflection.getMinecraftClass("ItemStack").getMethod("getTag").invoke(nms);
-				if (tag == null) { tag = Reflection.getMinecraftClass("NBTTagCompound").getConstructor().newInstance(); }
+				Object tag = Reflection.getReflection().getMinecraftClass("ItemStack").getMethod("getTag").invoke(nms);
+				if (tag == null) { tag = Reflection.getReflection().getMinecraftClass("NBTTagCompound").getConstructor().newInstance(); }
 				tag.getClass().getMethod("setInt", String.class, int.class).invoke(tag, "Unbreakable", 1);
 				nms.getClass().getMethod("setTag", tag.getClass()).invoke(nms, tag);
 				this.tempItem = (ItemStack) craftItemStack.getMethod("asCraftMirror", nms.getClass()).invoke(null, nms);
@@ -3281,7 +3281,7 @@ public class ItemMap {
 			for (String page: pages) { copyPages.add(page); }
 			copyPages.set(0, ItemHandler.getItem().cutDelay(copyPages.get(0)));
 			Object localePages = null;
-			try { localePages = Reflection.getMinecraftClass("NBTTagList").getConstructor().newInstance(); } catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
+			try { localePages = Reflection.getReflection().getMinecraftClass("NBTTagList").getConstructor().newInstance(); } catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
 			if (ServerHandler.getServer().hasSpecificUpdate("1_15")) { return this.set1_15JSONPages(player, item, localePages, copyPages); } 
 			else if (ServerHandler.getServer().hasSpecificUpdate("1_14")) { return this.set1_14JSONPages(player, item, localePages, copyPages); }
 			else { return this.set1_13JSONPages(player, item, localePages, copyPages); }
@@ -3303,8 +3303,8 @@ public class ItemMap {
 		for (String textComponent: pages) {
 			try { 
 				textComponent = Utils.getUtils().translateLayout(textComponent, player);
-				Object TagString = Reflection.getMinecraftClass("NBTTagString").getConstructor(String.class).newInstance(textComponent);
-				localePages.getClass().getMethod("add", Reflection.getMinecraftClass("NBTBase")).invoke(localePages, TagString);
+				Object TagString = Reflection.getReflection().getMinecraftClass("NBTTagString").getConstructor(String.class).newInstance(textComponent);
+				localePages.getClass().getMethod("add", Reflection.getReflection().getMinecraftClass("NBTBase")).invoke(localePages, TagString);
 			} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); } 
 		}
 		try { return this.invokePages(item, localePages); } catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
@@ -3326,8 +3326,8 @@ public class ItemMap {
 			String textComponent = pages.get(i);
 			try { 
 				textComponent = Utils.getUtils().translateLayout(textComponent, player);
-				Object TagString = Reflection.getMinecraftClass("NBTTagString").getConstructor(String.class).newInstance(textComponent);
-				localePages.getClass().getMethod("add", int.class, Reflection.getMinecraftClass("NBTBase")).invoke(localePages, 0, TagString);
+				Object TagString = Reflection.getReflection().getMinecraftClass("NBTTagString").getConstructor(String.class).newInstance(textComponent);
+				localePages.getClass().getMethod("add", int.class, Reflection.getReflection().getMinecraftClass("NBTBase")).invoke(localePages, 0, TagString);
 			} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); } 
 		}
 		try { return this.invokePages(item, localePages); } catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
@@ -3349,8 +3349,8 @@ public class ItemMap {
 			String textComponent = pages.get(i);
 			try { 
 				textComponent = Utils.getUtils().translateLayout(textComponent, player);
-				Object TagString = Reflection.getMinecraftClass("NBTTagString").getMethod("a", String.class).invoke(null, textComponent);
-				localePages.getClass().getMethod("add", int.class, Reflection.getMinecraftClass("NBTBase")).invoke(localePages, 0, TagString);
+				Object TagString = Reflection.getReflection().getMinecraftClass("NBTTagString").getMethod("a", String.class).invoke(null, textComponent);
+				localePages.getClass().getMethod("add", int.class, Reflection.getReflection().getMinecraftClass("NBTBase")).invoke(localePages, 0, TagString);
 			} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); } 
 		}
 		try { return this.invokePages(item, localePages); } catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
@@ -3366,11 +3366,11 @@ public class ItemMap {
     * @return The updated ItemStack.
     */
 	private ItemStack invokePages(final ItemStack item, final Object pages) throws Exception {
-		Class<?> craftItemStack = Reflection.getCraftBukkitClass("inventory.CraftItemStack");
+		Class<?> craftItemStack = Reflection.getReflection().getCraftBukkitClass("inventory.CraftItemStack");
 		Object nms = craftItemStack.getMethod("asNMSCopy", ItemStack.class).invoke(null, item);
-		Object tag = Reflection.getMinecraftClass("ItemStack").getMethod("getTag").invoke(nms);
-		if (tag == null) { tag = Reflection.getMinecraftClass("NBTTagCompound").getConstructor().newInstance(); }
-		tag.getClass().getMethod("set", String.class, Reflection.getMinecraftClass("NBTBase")).invoke(tag, "pages", pages); 
+		Object tag = Reflection.getReflection().getMinecraftClass("ItemStack").getMethod("getTag").invoke(nms);
+		if (tag == null) { tag = Reflection.getReflection().getMinecraftClass("NBTTagCompound").getConstructor().newInstance(); }
+		tag.getClass().getMethod("set", String.class, Reflection.getReflection().getMinecraftClass("NBTBase")).invoke(tag, "pages", pages); 
 		nms.getClass().getMethod("setTag", tag.getClass()).invoke(nms, tag);
 		return ((ItemStack)craftItemStack.getMethod("asCraftMirror", nms.getClass()).invoke(null, nms));
 	}
@@ -3382,13 +3382,13 @@ public class ItemMap {
 	private void setNBTData() {
 		if (ItemHandler.getItem().dataTagsEnabled() && !this.isVanilla() && !this.isVanillaControl() && !this.isVanillaStatus()) {
 			try {
-				Object nms = Reflection.getCraftBukkitClass("inventory.CraftItemStack").getMethod("asNMSCopy", ItemStack.class).invoke(null, this.tempItem);
-				Object cacheTag = Reflection.getMinecraftClass("ItemStack").getMethod("getTag").invoke(nms);
+				Object nms = Reflection.getReflection().getCraftBukkitClass("inventory.CraftItemStack").getMethod("asNMSCopy", ItemStack.class).invoke(null, this.tempItem);
+				Object cacheTag = Reflection.getReflection().getMinecraftClass("ItemStack").getMethod("getTag").invoke(nms);
 				if (cacheTag != null) {
 					cacheTag.getClass().getMethod("setString", String.class, String.class).invoke(cacheTag, "ItemJoin Name", this.getConfigName());
 					cacheTag.getClass().getMethod("setString", String.class, String.class).invoke(cacheTag, "ItemJoin Slot", this.getItemValue());
 				} else { nms.getClass().getMethod("setTag", this.newNBTTag.getClass()).invoke(nms, this.newNBTTag); }
-				this.tempItem = (ItemStack) Reflection.getCraftBukkitClass("inventory.CraftItemStack").getMethod("asCraftMirror", nms.getClass()).invoke(null, nms);
+				this.tempItem = (ItemStack) Reflection.getReflection().getCraftBukkitClass("inventory.CraftItemStack").getMethod("asCraftMirror", nms.getClass()).invoke(null, nms);
 			} catch (Exception e) {
 				ServerHandler.getServer().logSevere("{ItemMap} An error has occured when setting NBTData to an item.");
 				ServerHandler.getServer().sendDebugTrace(e);
@@ -3471,9 +3471,9 @@ public class ItemMap {
     * @param player - The Player to be used for placeholders.
     */
 	private void setSkull(final Player player) {
-		if (this.skullOwner != null && !DependAPI.getDepends(false).skinsRestorerEnabled()) {
+		if (this.skullOwner != null) {
 			this.tempMeta = ItemHandler.getItem().setSkullOwner(this.tempMeta, Utils.getUtils().translateLayout(this.skullOwner, player));
-		} else if ((this.skullTexture != null && !this.headDatabase) || (this.skullOwner != null && DependAPI.getDepends(false).skinsRestorerEnabled())) {
+		} else if (this.skullTexture != null && !this.headDatabase) {
 			try {
 				GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
 				gameProfile.getProperties().put("textures", new Property("textures", new String(((this.skullOwner != null && DependAPI.getDepends(false).skinsRestorerEnabled()) ? DependAPI.getDepends(false).getSkinValue(Utils.getUtils().translateLayout(this.skullOwner, player)) : this.skullTexture))));
@@ -4051,7 +4051,7 @@ public class ItemMap {
 				player.playSound(player.getLocation(), this.commandSound, 1, 1);
 			} catch (Exception e) {
 				ServerHandler.getServer().logSevere("{ItemMap} There was an issue executing the commands-sound you defined.");
-				ServerHandler.getServer().logWarn("{ItemMap} " + this.commandSound + " is not a sound in " + Reflection.getServerVersion() + ".");
+				ServerHandler.getServer().logWarn("{ItemMap} " + this.commandSound + " is not a sound in " + Reflection.getReflection().getServerVersion() + ".");
 				ServerHandler.getServer().sendDebugTrace(e);
 			}
 		}
