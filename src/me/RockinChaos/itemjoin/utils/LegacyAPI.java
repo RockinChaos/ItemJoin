@@ -250,7 +250,7 @@ public class LegacyAPI {
     		return (short) view.getId();
     	} catch (Exception | NoSuchMethodError e) { 			
 			try { 
-				return (short) Reflection.getBukkitClass("map.MapView").getMethod("getId").invoke(view);
+				return (short) Reflection.getReflection().getBukkitClass("map.MapView").getMethod("getId").invoke(view);
 			} catch (Exception | NoSuchMethodError e2) { return 1; }
 		}
     }
@@ -266,7 +266,7 @@ public class LegacyAPI {
     		return ItemJoin.getInstance().getServer().getMap((short) id); 
     	} catch (Exception | NoSuchMethodError e) { 
 			try {
-				return (org.bukkit.map.MapView)Reflection.getBukkitClass("Bukkit").getMethod("getMap", short.class).invoke(Reflection.getBukkitClass("map.MapView"), (short)id);
+				return (org.bukkit.map.MapView)Reflection.getReflection().getBukkitClass("Bukkit").getMethod("getMap", short.class).invoke(Reflection.getReflection().getBukkitClass("map.MapView"), (short)id);
 			} catch (Exception | NoSuchMethodError e2) { return null; }
 		}
     }
@@ -344,12 +344,12 @@ public class LegacyAPI {
 	private ItemStack setGlowEnchant(final ItemStack tempItem, final ItemMap itemMap) {
 		if (itemMap.isGlowing() && !ServerHandler.getServer().hasSpecificUpdate("1_11")) {
 			try {
-				Class <?> craftItemStack = Reflection.getCraftBukkitClass("inventory.CraftItemStack");
+				Class <?> craftItemStack = Reflection.getReflection().getCraftBukkitClass("inventory.CraftItemStack");
 				Object nms = craftItemStack.getMethod("asNMSCopy", ItemStack.class).invoke(null, tempItem);
-				Object tag = Reflection.getMinecraftClass("ItemStack").getMethod("getTag").invoke(nms);
-				if (tag == null) { tag = Reflection.getMinecraftClass("NBTTagCompound").getConstructor().newInstance(); }
-				Object ench = Reflection.getMinecraftClass("NBTTagList").getConstructor().newInstance();
-				tag.getClass().getMethod("set", String.class, Reflection.getMinecraftClass("NBTBase")).invoke(tag, "ench", ench);
+				Object tag = Reflection.getReflection().getMinecraftClass("ItemStack").getMethod("getTag").invoke(nms);
+				if (tag == null) { tag = Reflection.getReflection().getMinecraftClass("NBTTagCompound").getConstructor().newInstance(); }
+				Object ench = Reflection.getReflection().getMinecraftClass("NBTTagList").getConstructor().newInstance();
+				tag.getClass().getMethod("set", String.class, Reflection.getReflection().getMinecraftClass("NBTBase")).invoke(tag, "ench", ench);
 				nms.getClass().getMethod("setTag", tag.getClass()).invoke(nms, tag);
 				return (((ItemStack) craftItemStack.getMethod("asCraftMirror", nms.getClass()).invoke(null, nms)));
 			} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }

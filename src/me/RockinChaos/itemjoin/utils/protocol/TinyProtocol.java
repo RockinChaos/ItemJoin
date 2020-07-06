@@ -62,19 +62,19 @@ public abstract class TinyProtocol {
 	
 	private final AtomicInteger ID = new AtomicInteger(0);
 
-	private final MethodInvoker getPlayerHandle = Reflection.getMethod("{obc}.entity.CraftPlayer", "getHandle");
-	private final FieldAccessor<Object> getConnection = Reflection.getField("{nms}.EntityPlayer", "playerConnection", Object.class);
-	private final FieldAccessor<Object> getManager = Reflection.getField("{nms}.PlayerConnection", "networkManager", Object.class);
-	private final FieldAccessor<Channel> getChannel = Reflection.getField("{nms}.NetworkManager", Channel.class, 0);
+	private final MethodInvoker getPlayerHandle = Reflection.getReflection().getMethod("{obc}.entity.CraftPlayer", "getHandle");
+	private final FieldAccessor<Object> getConnection = Reflection.getReflection().getField("{nms}.EntityPlayer", "playerConnection", Object.class);
+	private final FieldAccessor<Object> getManager = Reflection.getReflection().getField("{nms}.PlayerConnection", "networkManager", Object.class);
+	private final FieldAccessor<Channel> getChannel = Reflection.getReflection().getField("{nms}.NetworkManager", Channel.class, 0);
 
-	private final Class<Object> minecraftServerClass = Reflection.getUntypedClass("{nms}.MinecraftServer");
-	private final Class<Object> serverConnectionClass = Reflection.getUntypedClass("{nms}.ServerConnection");
-	private final FieldAccessor<Object> getMinecraftServer = Reflection.getField("{obc}.CraftServer", minecraftServerClass, 0);
-	private final FieldAccessor<Object> getServerConnection = Reflection.getField(minecraftServerClass, serverConnectionClass, 0);
-	private final FieldAccessor<?> getNetworkMarkers = Reflection.getField(serverConnectionClass, (Class<?>)List.class, 1);
+	private final Class<Object> minecraftServerClass = Reflection.getReflection().getUntypedClass("{nms}.MinecraftServer");
+	private final Class<Object> serverConnectionClass = Reflection.getReflection().getUntypedClass("{nms}.ServerConnection");
+	private final FieldAccessor<Object> getMinecraftServer = Reflection.getReflection().getField("{obc}.CraftServer", minecraftServerClass, 0);
+	private final FieldAccessor<Object> getServerConnection = Reflection.getReflection().getField(minecraftServerClass, serverConnectionClass, 0);
+	private final FieldAccessor<?> getNetworkMarkers = Reflection.getReflection().getField(serverConnectionClass, (Class<?>)List.class, 1);
 
-	private final Class<?> PACKET_LOGIN_IN_START = Reflection.getMinecraftClass("PacketLoginInStart");
-	private final FieldAccessor<GameProfile> getGameProfile = Reflection.getField(PACKET_LOGIN_IN_START, GameProfile.class, 0);
+	private final Class<?> PACKET_LOGIN_IN_START = Reflection.getReflection().getMinecraftClass("PacketLoginInStart");
+	private final FieldAccessor<GameProfile> getGameProfile = Reflection.getReflection().getField(PACKET_LOGIN_IN_START, GameProfile.class, 0);
 
 	private Map<String, Channel> channelLookup = new MapMaker().weakValues().makeMap();
 	private Listener listener;
@@ -189,7 +189,7 @@ public abstract class TinyProtocol {
 		this.networkManagers = (List<Object>) this.getNetworkMarkers.get(serverConnection);
 		this.createServerChannelHandler();
 		for (int i = 0; looking; i++) {
-			List<Object> list = Reflection.getField(serverConnection.getClass(), List.class, i).get(serverConnection);
+			List<Object> list = Reflection.getReflection().getField(serverConnection.getClass(), List.class, i).get(serverConnection);
 			for (Object item : list) {
 				if (!ChannelFuture.class.isInstance(item))
 					break;

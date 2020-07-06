@@ -53,7 +53,7 @@ public class EffectAPI {
 				player.getWorld().spawnParticle(particle, player.getLocation(), particleLife);
 			} catch (Exception e) {
 				ServerHandler.getServer().logSevere("{EffectAPI} There was an issue executing the commands-particle you defined.");
-				ServerHandler.getServer().logWarn("{EffectAPI} " + commandParticle + " is not a particle in " + Reflection.getServerVersion() + ".");
+				ServerHandler.getServer().logWarn("{EffectAPI} " + commandParticle + " is not a particle in " + Reflection.getReflection().getServerVersion() + ".");
 				ServerHandler.getServer().sendDebugTrace(e);
 			}
 		}

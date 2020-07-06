@@ -252,6 +252,7 @@ public class ItemAnimation {
 					else if (ownerString != null) { ownerTasks(player); }
 					else if (textureString != null) { textureTasks(player); }
 				}
+				PlayerHandler.getPlayer().updateInventory(player, 1L);
 			}
 		}, UpdateDelay);
 	}

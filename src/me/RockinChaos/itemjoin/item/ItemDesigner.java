@@ -139,11 +139,11 @@ public class ItemDesigner {
 				}
 			}
 			if (!ServerHandler.getServer().hasSpecificUpdate("1_9") && id.equalsIgnoreCase("TIPPED_ARROW") || id.equalsIgnoreCase("440") || id.equalsIgnoreCase("0440")) {
-				ServerHandler.getServer().logWarn("{ItemMap} Your server is running MC " + Reflection.getServerVersion() + " and this version of Minecraft does not have the item TIPPED_ARROW.");
+				ServerHandler.getServer().logWarn("{ItemMap} Your server is running MC " + Reflection.getReflection().getServerVersion() + " and this version of Minecraft does not have the item TIPPED_ARROW.");
 				ServerHandler.getServer().logWarn("{ItemMap} You are receiving this notice because the item(s) exists in your items.yml and will not be set, please remove the item(s) or update your server.");
 				return false;
 			} else if (!ServerHandler.getServer().hasSpecificUpdate("1_9") && id.equalsIgnoreCase("LINGERING_POTION") || id.equalsIgnoreCase("441") || id.equalsIgnoreCase("0441")) {
-				ServerHandler.getServer().logWarn("{ItemMap} Your server is running MC " + Reflection.getServerVersion() + " and this version of Minecraft does not have the item LINGERING_POTION.");
+				ServerHandler.getServer().logWarn("{ItemMap} Your server is running MC " + Reflection.getReflection().getServerVersion() + " and this version of Minecraft does not have the item LINGERING_POTION.");
 				ServerHandler.getServer().logWarn("{ItemMap} You are receiving this notice because the item(s) exists in your items.yml and will not be set, please remove the item(s) or update your server.");
 				return false;
 			} else if (ItemHandler.getItem().getMaterial(id, dataValue) == null) {
@@ -188,7 +188,7 @@ public class ItemDesigner {
 				return false;
 			}
 		} else if (!ServerHandler.getServer().hasSpecificUpdate("1_9") && slot.equalsIgnoreCase("Offhand")) {
-			ServerHandler.getServer().logWarn("{ItemMap} Your server is running MC " + Reflection.getServerVersion() + " and this version of Minecraft does not have OFFHAND support!");
+			ServerHandler.getServer().logWarn("{ItemMap} Your server is running MC " + Reflection.getReflection().getServerVersion() + " and this version of Minecraft does not have OFFHAND support!");
 			return false;
 		}
 		return true;
@@ -399,7 +399,7 @@ public class ItemDesigner {
 	private void setNBTData(final ItemMap itemMap) {
 		if (ItemHandler.getItem().dataTagsEnabled() && !itemMap.isVanilla() && !itemMap.isVanillaControl() && !itemMap.isVanillaStatus()) {
 			try {
-				Object tag = Reflection.getMinecraftClass("NBTTagCompound").getConstructor().newInstance();
+				Object tag = Reflection.getReflection().getMinecraftClass("NBTTagCompound").getConstructor().newInstance();
 				tag.getClass().getMethod("setString", String.class, String.class).invoke(tag, "ItemJoin Name", itemMap.getConfigName());
 				tag.getClass().getMethod("setString", String.class, String.class).invoke(tag, "ItemJoin Slot", itemMap.getItemValue());
 				itemMap.setNewNBTData(itemMap.getConfigName() + " " + itemMap.getItemValue(), tag);

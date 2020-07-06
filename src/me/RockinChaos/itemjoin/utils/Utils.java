@@ -295,7 +295,7 @@ public class Utils {
     * @param player - that will recieve the items.
     */
     public String getMojangUUID(final String name) {
-        String url = "https://api.mojang.com/users/profiles/minecraft/"+name;
+        String url = "https://api.mojang.com/users/profiles/minecraft/" + name;
         try {
             String UUIDJson = new URL(url).toString();           
             if(UUIDJson.isEmpty()) return null;                       
