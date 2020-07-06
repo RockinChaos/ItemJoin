@@ -32,11 +32,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
-
 import de.domedd.betternick.BetterNick;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.utils.DependAPI;
 import me.RockinChaos.itemjoin.utils.LegacyAPI;
+import me.RockinChaos.itemjoin.utils.Reflection;
 
 public class PlayerHandler {
 	
@@ -230,12 +230,19 @@ public class PlayerHandler {
     * @param delay - The ticks to wait before updating the inventory.
     */
 	public void updateInventory(final Player player, final long delay) {
-        Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
-            @Override
+		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
+			@Override
 			public void run() {
-            	LegacyAPI.getLegacy().updateInventory(player);
-            }
-        }, delay);
+				try {
+					for (int i = 0; i < 36; i++) { Reflection.getReflection().sendPacketPlayOutSetSlot(player, player.getInventory().getItem(i), (i < 9 ? (i + 36) : i)); }
+					if (ServerHandler.getServer().hasSpecificUpdate("1_9")) { Reflection.getReflection().sendPacketPlayOutSetSlot(player, getOffHandItem(player), 45); }
+					if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
+						for (int i = 0; i < 5; i++) { Reflection.getReflection().sendPacketPlayOutSetSlot(player, player.getOpenInventory().getTopInventory().getItem(i), i); }
+						for (int i = 0; i < 4; i++) { Reflection.getReflection().sendPacketPlayOutSetSlot(player, player.getInventory().getItem(i + 36), (8 - i)); }
+					}
+				} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
+			}
+		}, delay);
 	}
 	
    /**
