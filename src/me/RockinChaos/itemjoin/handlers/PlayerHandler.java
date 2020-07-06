@@ -234,7 +234,7 @@ public class PlayerHandler {
 			@Override
 			public void run() {
 				try {
-					for (int i = 0; i < 36; i++) { Reflection.getReflection().sendPacketPlayOutSetSlot(player, player.getInventory().getItem(i), (i < 9 ? (i + 36) : i)); }
+				    for (int i = 0; i < 36; i++) { Reflection.getReflection().sendPacketPlayOutSetSlot(player, player.getInventory().getItem(i), (i < 9 ? (i + 36) : i)); }
 					if (ServerHandler.getServer().hasSpecificUpdate("1_9")) { Reflection.getReflection().sendPacketPlayOutSetSlot(player, getOffHandItem(player), 45); }
 					if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
 						for (int i = 0; i < 5; i++) { Reflection.getReflection().sendPacketPlayOutSetSlot(player, player.getOpenInventory().getTopInventory().getItem(i), i); }

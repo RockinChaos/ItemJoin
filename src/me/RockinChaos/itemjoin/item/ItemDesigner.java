@@ -110,6 +110,7 @@ public class ItemDesigner {
 							this.setRecipe(itemMap);
 							
 							ItemUtilities.getUtilities().addItem(itemMap);
+							ItemUtilities.getUtilities().addCraftingItem(itemMap);
 					    	ConfigHandler.getConfig(false).registerListeners(itemMap);
 						}
 					}

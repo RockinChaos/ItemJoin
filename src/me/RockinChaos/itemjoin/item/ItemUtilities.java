@@ -47,6 +47,7 @@ import net.md_5.bungee.api.ChatColor;
 
 public class ItemUtilities {
   	private List < ItemMap > items = new ArrayList < ItemMap >();
+  	private List < ItemMap > craftingItems = new ArrayList < ItemMap >();
   	private List < ItemMap > protectItems = new ArrayList < ItemMap >();
 	private HashMap <Integer, Integer> failCount = new HashMap <Integer, Integer> ();
 	
@@ -753,12 +754,32 @@ public class ItemUtilities {
 	}
 	
    /**
+    * Adds a new item to the crafting items List.
+    * 
+    * @param itemMap - The crafting ItemMap to be added to the items List.
+    */
+	public void addCraftingItem(final ItemMap itemMap) {
+		if (itemMap.isCraftingItem()) { 
+			this.craftingItems.add(itemMap); 
+		}
+	}
+	
+   /**
     * Gets the current ItemMap List.
     * 
     * @return The current ItemMap list.
     */
 	public List < ItemMap > getItems() {
 		return this.items;
+	}
+	
+   /**
+    * Gets the current crafting ItemMap List.
+    * 
+    * @return The current crafting ItemMap list.
+    */
+	public List < ItemMap > getCraftingItems() {
+		return this.craftingItems;
 	}
 
    /**
@@ -768,6 +789,7 @@ public class ItemUtilities {
 	public void clearItems() {
 		this.clearRecipes();
 		this.items = new ArrayList < ItemMap >();
+		this.craftingItems = new ArrayList < ItemMap >();
 	}
 	
    /**

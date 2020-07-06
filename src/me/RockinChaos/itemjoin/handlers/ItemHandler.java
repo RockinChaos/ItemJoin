@@ -413,7 +413,7 @@ public class ItemHandler {
 	public void purgeCraftItems(final boolean saveCrafting) {
 		PlayerHandler.getPlayer().forOnlinePlayers(player -> {
 			if (saveCrafting) { this.saveCraftItems(player); }
-			this.removeCraftItems(player); 
+			LegacyAPI.getLegacy().removeCraftItems(player); 
 		});
 	}
     
@@ -464,7 +464,7 @@ public class ItemHandler {
 		if (inventory != null && PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
 			for (int k = 4; k >= 0; k--) {
 				if (inventory.getItem(k) != null && inventory.getItem(k).getType() != Material.AIR) {
-					craftView.setItem(k, inventory.getItem(k));
+					craftView.setItem(k, inventory.getItem(k).clone());
 				}
 			}
 			PlayerHandler.getPlayer().updateInventory(player, 1L);
@@ -480,13 +480,27 @@ public class ItemHandler {
     * @param player - The Player to have their crafting items removed.
     */
     public void removeCraftItems(final Player player) {
-		ItemStack[] craftingContents = player.getOpenInventory().getTopInventory().getContents();
-		Inventory craftView = player.getOpenInventory().getTopInventory();
-		if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
-			for (int k = 0; k < craftingContents.length; k++) {
-				craftView.setItem(k, new ItemStack(Material.AIR));
-			}
-		}
+    	Inventory craftView = player.getOpenInventory().getBottomInventory();
+    	Inventory inventory = SQLite.getLite(false).getReturnCraftItems(player);
+    	if (inventory != null && ServerHandler.getServer().hasSpecificUpdate("1_15") && PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
+    		for (int k = 4; k >= 0; k--) {
+    			if (inventory.getItem(k) != null && inventory.getItem(k).getType() != Material.AIR) {
+    				int amount = inventory.getItem(k).getAmount();
+    				for (int i = 0; i < craftView.getSize(); i++) {
+    					for (ItemMap itemMap: ItemUtilities.getUtilities().getCraftingItems()) {
+    						if (craftView.getItem(i) != null && craftView.getItem(i).getType() != Material.AIR && itemMap.isReal(inventory.getItem(k)) && itemMap.isReal(craftView.getItem(i))) {
+    							amount -= craftView.getItem(i).getAmount();
+    							if (amount <= 0) {
+    								craftView.getItem(i).setAmount(0);
+    								craftView.setItem(i, new ItemStack(Material.AIR));
+    								if (amount == 0) { break; }
+    							} else { craftView.getItem(i).setAmount(amount); }
+    						}
+    					}
+    				}
+    			}
+    		}
+    	}
     }
     
    /**
