@@ -115,7 +115,7 @@ public class ConfigHandler {
     */
 	private void registerPrevent() {
 		if ((!Utils.getUtils().containsIgnoreCase(this.getPrevent("Pickups"), "FALSE") && !Utils.getUtils().containsIgnoreCase(this.getPrevent("Pickups"), "DISABLED"))) {
-			if (ServerHandler.getServer().hasSpecificUpdate("1_12") && Reflection.getBukkitClass("event.entity.EntityPickupItemEvent") != null && !Utils.getUtils().isRegistered(Pickups.class.getSimpleName())) { 
+			if (ServerHandler.getServer().hasSpecificUpdate("1_12") && Reflection.getReflection().getBukkitClass("event.entity.EntityPickupItemEvent") != null && !Utils.getUtils().isRegistered(Pickups.class.getSimpleName())) { 
 				ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Pickups(), ItemJoin.getInstance()); 
 			} else { LegacyAPI.getLegacy().registerPickups(); }
 		}
@@ -397,7 +397,7 @@ public class ConfigHandler {
 				@Override
 				public void run() {
 					PlayerHandler.getPlayer().restoreCraftItems();
-					ProtocolManager.getManager().handleProtocols();
+					if (ServerHandler.getServer().hasSpecificUpdate("1_8")) { ProtocolManager.getManager().handleProtocols(); }
 				}
 			}, 40L);
 			if (!Utils.getUtils().isRegistered(PlayerQuit.class.getSimpleName())) {
@@ -438,7 +438,7 @@ public class ConfigHandler {
 				LegacyAPI.getLegacy().registerStorable();
 			}
 		}
-		if (itemMap.isMovement() && ServerHandler.getServer().hasSpecificUpdate("1_9") && Reflection.getBukkitClass("event.player.PlayerSwapHandItemsEvent") != null && !Utils.getUtils().isRegistered(SwitchHands.class.getSimpleName())) {
+		if (itemMap.isMovement() && ServerHandler.getServer().hasSpecificUpdate("1_9") && Reflection.getReflection().getBukkitClass("event.player.PlayerSwapHandItemsEvent") != null && !Utils.getUtils().isRegistered(SwitchHands.class.getSimpleName())) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new SwitchHands(), ItemJoin.getInstance());
 		}
 	}

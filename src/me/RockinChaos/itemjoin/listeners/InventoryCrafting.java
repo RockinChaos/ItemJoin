@@ -39,7 +39,6 @@ import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
-import me.RockinChaos.itemjoin.handlers.events.InventoryCloseEvent;
 import me.RockinChaos.itemjoin.handlers.events.PlayerAutoCraftEvent;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
@@ -90,7 +89,40 @@ public class InventoryCrafting implements Listener {
 	* @param event - InventoryCloseEvent
 	*/
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    private void onCraftingClose(InventoryCloseEvent event) {
+    private void onCraftingOpen(org.bukkit.event.inventory.InventoryCloseEvent event) {
+    	final InventoryView view = event.getView();
+    	final Player player = (Player) event.getPlayer();
+    	if (PlayerHandler.getPlayer().isCraftingInv(view)) {
+    		for (int i = 0; i <= 4; i++) { 
+    			for (ItemMap itemMap: ItemUtilities.getUtilities().getItems()) {
+    				ItemStack item = view.getTopInventory().getContents()[i].clone();
+    				if (itemMap.isCraftingItem() && itemMap.isSimilar(view.getTopInventory().getContents()[i])) {
+    					view.getTopInventory().setItem(i, new ItemStack(Material.AIR));
+    					this.delayReturnItem(player, i, item, 3L);
+    				}
+    			}
+    		}
+    	} else {
+    		ServerHandler.getServer().runAsyncThread(main -> {
+            	if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory()) && craftingOpenItems.containsKey(PlayerHandler.getPlayer().getPlayerID(player))) {
+                    ItemStack[] openCraftContents = craftingOpenItems.get(PlayerHandler.getPlayer().getPlayerID(player));
+            		if (openCraftContents != null && openCraftContents.length != 0) { 
+                    for (int i = 4; i >= 0; i--) { this.delayReturnItem(player, i, openCraftContents[i], 1L); }
+                    craftingItems.put(PlayerHandler.getPlayer().getPlayerID(player), craftingOpenItems.get(PlayerHandler.getPlayer().getPlayerID(player)));
+            		craftingOpenItems.remove(PlayerHandler.getPlayer().getPlayerID(player));
+            		}
+            	}
+            });
+    	}
+    }
+	
+   /**
+	* Gives the custom crafting items back when the player closes their inventory if they had items existing previously.
+	* 
+	* @param event - InventoryCloseEvent
+	*/
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    private void onCraftingClose(me.RockinChaos.itemjoin.handlers.events.InventoryCloseEvent event) {
     	final InventoryView view = event.getView();
     	final Player player = event.getPlayer();
     	if (PlayerHandler.getPlayer().isCraftingInv(view)) {

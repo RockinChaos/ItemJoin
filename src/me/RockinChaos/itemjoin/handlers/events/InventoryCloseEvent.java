@@ -25,8 +25,6 @@ import org.bukkit.event.inventory.InventoryEvent;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 
-import me.RockinChaos.itemjoin.handlers.ServerHandler;
-
 /**
 * Called when a player attempts to close an open inventory.
 * 
@@ -128,12 +126,11 @@ public class InventoryCloseEvent extends InventoryEvent implements Cancellable {
 	* @param stack - The ItemStack to be removed.
 	*/
 	public void removeItem(ItemStack stack, int slot) {
-		if (!ServerHandler.getServer().hasSpecificUpdate("1_14")) {
-			this.transaction.setItem(slot, new ItemStack(Material.AIR));
-		} else {
-	    	stack.setAmount(0);
-	    	stack.setType(Material.AIR);
-		}
+		try { 
+			stack.setAmount(0);
+			stack.setType(Material.AIR);
+			this.transaction.getTopInventory().setItem(slot, new ItemStack(Material.AIR)); 
+		} catch (Exception e) { }
 	}
 	
    /**
