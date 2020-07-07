@@ -802,9 +802,9 @@ public class ItemMap {
     * @param count - The stack size to be set.
     */
 	public void setCount(final String count) {
-		if (count != null && Utils.getUtils().isInt(count)) {
+		if (count != null && Utils.getUtils().isInt(count) && Integer.parseInt(count) != 0) {
 			this.count = Integer.parseInt(count);
-		}
+		} else { this.count = 1; }
 	}
 	
    /**
