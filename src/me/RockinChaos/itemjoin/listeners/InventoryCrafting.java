@@ -267,7 +267,10 @@ public class InventoryCrafting implements Listener {
    /**
     * Attempts to save and return the prior open inventory crafting slots.
     * 
+    * @param input - The methods to be executed.
     * @param player - The Player being handled.
+    * @param view - The view being referenced.
+    * @param inventory - The inventory being handled.
     */
 	public void handleClose(final Consumer < Integer > input, Player player, InventoryView view, ItemStack[] inventory) {
 		if (PlayerHandler.getPlayer().isCraftingInv(view)) {
