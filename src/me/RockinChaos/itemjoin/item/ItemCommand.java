@@ -298,10 +298,10 @@ public class ItemCommand {
 	private void sendDispatch(final Player player, final ExecutorType cmdtype, final String slot) {
 		final World world = player.getWorld();
 		this.setPending(player, true); 
-		this.allowDispatch(player, world);
 		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
 			@Override
 			public void run() {
+				allowDispatch(player, world);
 				if (!player.isDead() && player.isOnline() && player.getWorld() == world && !getExecute(player)) {
 					setPending(player, false);
 					switch (cmdtype) {

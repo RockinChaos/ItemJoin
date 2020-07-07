@@ -3714,7 +3714,7 @@ public class ItemMap {
     */
     public boolean executeCommands(final Player player, final ItemStack itemCopy, final String action, final String slot) {
 		boolean playerSuccess = false;
-    	if (this.commands != null && this.commands.length > 0 && !UI.getCreator().isOpen(player) && !this.getWarmPending(player) && isExecutable(player, action) && !this.onCooldown(player) && this.isPlayerChargeable(player, this.itemCost != null && !this.itemCost.isEmpty())) {
+    	if (this.commands != null && this.commands.length > 0 && !UI.getCreator().isOpen(player) && !this.getWarmPending(player) && this.isExecutable(player, action) && !this.onCooldown(player) && this.isPlayerChargeable(player, this.itemCost != null && !this.itemCost.isEmpty())) {
     		this.warmCycle(player, this, this.getWarmDelay(), player.getLocation(), itemCopy, action, slot);
     	}
     	return playerSuccess;
@@ -3744,7 +3744,7 @@ public class ItemMap {
 					if (itemMap.warmLocation(player, location)) {
 						String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = Utils.getUtils().translateLayout(itemMap.getCustomName(), player); 
 						LanguageAPI.getLang(false).sendLangMessage("General.itemWarming", player, placeHolders);
-						itemMap.warmCycle(player, itemMap, warmCount - 1, location, itemCopy, action, slot);	
+						itemMap.warmCycle(player, itemMap, (warmCount - 1), location, itemCopy, action, slot);	
 					} else { 
 						itemMap.delWarmPending(player); 
 						String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = Utils.getUtils().translateLayout(itemMap.getCustomName(), player); 
@@ -3758,7 +3758,7 @@ public class ItemMap {
 			Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
 				@Override
 				public void run() {
-					if (!player.isDead()) {
+					if (!player.isDead() && player.isOnline()) {
 						if (isExecuted(player, action, slot, itemCopy)) { 
 							if (itemMap.itemCost == null || itemMap.itemCost.isEmpty()) { itemMap.withdrawBalance(player); } 
 							else { itemMap.withdrawItemCost(player); }
@@ -3844,7 +3844,7 @@ public class ItemMap {
     		this.getRandomAll(randomCommands, itemCommands, player, action, slot);
     		return false;
     	}
-    	randomCommands.remove(dedicatedMap.getKey());
+    	if (dedicatedMap != null && randomCommands != null) { randomCommands.remove(dedicatedMap.getKey()); }
     	if (dedicatedMap != null && dedicatedMap.getValue() != null && player != null && action != null && slot != null && itemCommands != null && randomCommands != null && 
     	   !randomCommands.isEmpty()) {
     		this.getRandomAll(randomCommands, itemCommands, player, action, slot);
