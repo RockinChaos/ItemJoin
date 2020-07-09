@@ -53,7 +53,7 @@ public class Placement implements Listener {
 	 * 
 	 * @param event - PlayerInteractEvent
 	 */
-	 @EventHandler(ignoreCancelled = true)
+	 @EventHandler(ignoreCancelled = false)
 	 private void onCountLock(PlayerInteractEvent event) {
 	 	ItemStack item = event.getItem();
 	 	Player player = event.getPlayer();
@@ -94,7 +94,7 @@ public class Placement implements Listener {
 	 * 
 	 * @param event - PlayerInteractEntityEvent
 	 */
-	 @EventHandler(ignoreCancelled = true)
+	 @EventHandler(ignoreCancelled = false)
 	 private void onFrameLock(PlayerInteractEntityEvent event) {
 	 	if (event.getRightClicked() instanceof ItemFrame) {
 	 		try {
