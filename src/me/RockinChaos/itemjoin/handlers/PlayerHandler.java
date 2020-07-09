@@ -29,6 +29,7 @@ import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
@@ -82,6 +83,20 @@ public class PlayerHandler {
     */
 	public boolean isAdventureMode(final Player player) {
 		if (player.getGameMode() == GameMode.ADVENTURE) {
+			return true;
+		}
+		return false;
+	}
+	
+   /**
+    * Checks if the player is has an open menu while left clicking.
+    * 
+    * @param view - The InventoryView being compared.
+    * @param view - The action being checked.
+    * @return If the player is currently interacting with an open menu.
+    */
+	public boolean isMenuClick(InventoryView view, Action action) {
+		if (!PlayerHandler.getPlayer().isCraftingInv(view) && (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK)) {
 			return true;
 		}
 		return false;

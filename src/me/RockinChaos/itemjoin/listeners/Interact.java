@@ -53,9 +53,9 @@ public class Interact implements Listener {
 	 private void onInteractCancel(PlayerInteractEvent event) {
 	 	ItemStack item = event.getItem();
 	 	Player player = event.getPlayer();
-	 	if (event.hasItem() && event.getAction() != Action.PHYSICAL && !ItemUtilities.getUtilities().isAllowed(player, item, "cancel-events")
+	 	if (!PlayerHandler.getPlayer().isMenuClick(player.getOpenInventory(), event.getAction()) && (event.hasItem() && event.getAction() != Action.PHYSICAL && !ItemUtilities.getUtilities().isAllowed(player, item, "cancel-events")
 	 			|| event.getAction() != Action.PHYSICAL && ServerHandler.getServer().hasSpecificUpdate("1_9") && event.getHand() != null 
-	 			&& event.getHand().toString().equalsIgnoreCase("OFF_HAND") && !ItemUtilities.getUtilities().isAllowed(player, PlayerHandler.getPlayer().getMainHandItem(event.getPlayer()), "cancel-events")) {
+	 			&& event.getHand().toString().equalsIgnoreCase("OFF_HAND") && !ItemUtilities.getUtilities().isAllowed(player, PlayerHandler.getPlayer().getMainHandItem(event.getPlayer()), "cancel-events"))) {
 	 		if (ItemHandler.getItem().isBookQuill(item) || ItemHandler.getItem().isBookQuill(PlayerHandler.getPlayer().getMainHandItem(event.getPlayer()))) { player.closeInventory(); } 
 	 		event.setCancelled(true);
 	 		PlayerHandler.getPlayer().updateInventory(player, 1L);
@@ -67,18 +67,14 @@ public class Interact implements Listener {
 	 * 
 	 * @param event - PlayerInteractEvent
 	 */
-	 @EventHandler
+	 @EventHandler(ignoreCancelled = false)
 	 private void onInteractCooldown(PlayerInteractEvent event) {
 	 	Player player = event.getPlayer();
 	 	ItemStack item = event.getItem();
-	 	if (event.hasItem() && event.getAction() != Action.PHYSICAL) {
-	 		if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-	 			ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item, null, player.getWorld());
-	 			if (itemMap != null && itemMap.getInteractCooldown() != 0) {
-	 				if (itemMap.onInteractCooldown(player)) {
-	 					event.setCancelled(true);
-	 				}
-	 			}
+	 	if ((event.hasItem() && event.getAction() != Action.PHYSICAL) && (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK)) {
+	 		ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item, null, player.getWorld());
+	 		if (itemMap != null && itemMap.getInteractCooldown() != 0 && itemMap.onInteractCooldown(player)) {
+	 			event.setCancelled(true);
 	 		}
 	 	}
 	 }
@@ -88,7 +84,7 @@ public class Interact implements Listener {
 	* 
 	* @param event - InventoryClickEvent
 	*/
-	@EventHandler
+	@EventHandler(ignoreCancelled = false)
 	private void onInventoryCommands(InventoryClickEvent event) {
 		ItemStack item = event.getCurrentItem();
 		Player player = (Player) event.getWhoClicked();
@@ -103,7 +99,7 @@ public class Interact implements Listener {
 	* 
 	* @param event - PlayerItemHeldEvent
 	*/
-	@EventHandler
+	@EventHandler(ignoreCancelled = false)
 	private void onHoldCommand(PlayerItemHeldEvent event) {
 		Player player = event.getPlayer();
 		ItemStack item = player.getInventory().getItem(event.getNewSlot());
@@ -116,7 +112,7 @@ public class Interact implements Listener {
 	* 
 	* @param event - InventoryClickEvent
 	*/
-	@EventHandler
+	@EventHandler(ignoreCancelled = false)
 	private void onEquipClickCommand(InventoryClickEvent event) {
 		Player player = (Player) event.getWhoClicked();
 		if (Utils.getUtils().containsIgnoreCase(event.getAction().name(), "HOTBAR") && event.getView().getBottomInventory().getItem(event.getHotbarButton()) != null && event.getView().getBottomInventory().getItem(event.getHotbarButton()).getType() != Material.AIR) {
@@ -135,7 +131,7 @@ public class Interact implements Listener {
 	* 
 	* @param event - InventoryDragEvent
 	*/
-	@EventHandler
+	@EventHandler(ignoreCancelled = false)
 	private void onEquipDragCommand(InventoryDragEvent event) {
 		Player player = (Player) event.getWhoClicked();
 		Set<Integer> slideSlots = event.getInventorySlots();
@@ -150,11 +146,11 @@ public class Interact implements Listener {
 	* 
 	* @param event - PlayerInteractEvent
 	*/
-	@EventHandler
+	@EventHandler(ignoreCancelled = false)
 	private void onEquipInteractCommand(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
 		ItemStack item = event.getItem();
-		if (item != null && item.getType() != Material.AIR) {
+		if (item != null && item.getType() != Material.AIR && !PlayerHandler.getPlayer().isMenuClick(player.getOpenInventory(), event.getAction())) {
 			String[] itemType = item.getType().name().split("_");
 			if (itemType.length >= 2 && itemType[1] != null && !itemType[1].isEmpty() && Utils.getUtils().isInt(Utils.getUtils().getArmorSlot(itemType[1], true)) 
 				&& player.getInventory().getItem(Integer.parseInt(Utils.getUtils().getArmorSlot(itemType[1], true))) == null && !this.equipSetup(player, event.getItem(), "ON_EQUIP", Utils.getUtils().getArmorSlot(itemType[1], true), SlotType.ARMOR)) { event.setCancelled(true); }
@@ -166,7 +162,7 @@ public class Interact implements Listener {
 	* 
 	* @param event - PlayerInteractEntityEvent
 	*/
-	@EventHandler
+	@EventHandler(ignoreCancelled = false)
 	private void onEntityCommands(PlayerInteractEntityEvent event) {
 		if (event.getRightClicked() instanceof org.bukkit.entity.ItemFrame) {
 			ItemStack item;
@@ -186,7 +182,7 @@ public class Interact implements Listener {
 	* 
 	* @param event - PlayerInteractAtEntityEvent
 	*/
-	@EventHandler
+	@EventHandler(ignoreCancelled = false)
 	private void onTargetEntityCommands(PlayerInteractAtEntityEvent event) {
 		if (event.getRightClicked().toString().equalsIgnoreCase("CraftArmorStand")) {
 			ItemStack item;
@@ -206,7 +202,7 @@ public class Interact implements Listener {
 	* 
 	* @param event - PlayerInteractEvent
 	*/
-	@EventHandler
+	@EventHandler(ignoreCancelled = false)
 	private void onInteractCommands(PlayerInteractEvent event) {
 		ItemStack item = event.getItem();
 		final Player player = event.getPlayer();
@@ -214,7 +210,7 @@ public class Interact implements Listener {
 		if (PlayerHandler.getPlayer().isAdventureMode(player) && !action.contains("LEFT") 
 				|| !PlayerHandler.getPlayer().isAdventureMode(player)) {
 			ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(PlayerHandler.getPlayer().getHandItem(player), null, player.getWorld());
-			if (itemMap != null && itemMap.isSimilar(item)) {
+			if (!PlayerHandler.getPlayer().isMenuClick(player.getOpenInventory(), event.getAction()) && itemMap != null && itemMap.isSimilar(item)) {
 				if (this.setupCommands(player, item, action, String.valueOf(player.getInventory().getHeldItemSlot()))) { event.setCancelled(true); }
 			}
 		}
@@ -225,7 +221,7 @@ public class Interact implements Listener {
 	* 
 	* @param event - PlayerAnimationEvent
 	*/
-	@EventHandler
+	@EventHandler(ignoreCancelled = false)
 	private void onSwingHandCommands(PlayerAnimationEvent event) {
 		Player player = event.getPlayer();
 		ItemStack item = PlayerHandler.getPlayer().getHandItem(player);
