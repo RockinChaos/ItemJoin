@@ -39,7 +39,7 @@ public class Menu implements Listener {
     * 
     * @param event - InventoryClickEvent
     */
-	@EventHandler
+	@EventHandler(ignoreCancelled = false)
 	private void onClick(InventoryClickEvent event) {
 		InventoryHolder holder = event.getInventory().getHolder();
 		if (holder instanceof Interface) {
@@ -53,7 +53,7 @@ public class Menu implements Listener {
 	* 
 	* @param event - AsyncPlayerChatEvent
 	*/
-	@EventHandler
+	@EventHandler(ignoreCancelled = false)
 	private void onChat(AsyncPlayerChatEvent event) {
 		if (this.expiredInventory != null && this.expiredInventory.chatPending()) {
 			this.expiredInventory.onChat(event);

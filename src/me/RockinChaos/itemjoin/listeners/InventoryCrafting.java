@@ -56,7 +56,7 @@ public class InventoryCrafting implements Listener {
     * 
     * @param event - PlayerAutoCraftEvent
     */
-	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
 	private void onAutoCraft(PlayerAutoCraftEvent event) {
 		for (int i = 0; i <= 4; i++) {
   			final ItemStack[] craftingContents = event.getContents().clone();
@@ -89,7 +89,7 @@ public class InventoryCrafting implements Listener {
 	* 
 	* @param event - InventoryCloseEvent
 	*/
-	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
     private void onCraftingClose(org.bukkit.event.inventory.InventoryCloseEvent event) {
     	this.handleClose(slot -> { 
     		this.delayReturnItem((Player)event.getPlayer(), slot, event.getView().getTopInventory().getContents()[slot].clone(), 3L);
@@ -102,7 +102,7 @@ public class InventoryCrafting implements Listener {
 	* 
 	* @param event - InventoryCloseEvent
 	*/
-	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
     private void onCraftingClose(me.RockinChaos.itemjoin.handlers.events.InventoryCloseEvent event) {
     	this.handleClose(slot -> { 
     		this.delayReturnItem(event.getPlayer(), slot, event.getPreviousContents(true)[slot], 6L);
@@ -116,7 +116,7 @@ public class InventoryCrafting implements Listener {
 	* 
 	* @param event - InventoryClickEvent
 	*/
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
     private void onCraftingClick(InventoryClickEvent event) {
     	final InventoryView view = event.getView();
     	final Player player = (Player) event.getWhoClicked();
