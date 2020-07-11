@@ -1,63 +1,492 @@
-# --{ =-=-=-=-=-=-=-=-=-= ItemJoin's Configuration Settings, by RockinChaos =-=-=-=-=-=-=-=-=-= }--
-# See the tutorial page for a more in-depth explaination; https://github.com/RockinChaos/ItemJoin/wiki
+# +----------------------------------------------------------------------------------------------+ #
+# |                        _____                      _____                                      | #
+# |                       |_   _|_                   |_   _|     _                               | #
+# |                         | | | |                    | |      (_)                              | #
+# |                         | | | |_ ___  _ __ ___     | | ____  _ ____                          | #
+# |                         | | | __/ _ \| '_ ` _ \ _  | |/ _  \| |  _ \                         | #
+# |                        _| |_| ||  __/| | | | | | |_| | (_|  | | | | |                        | #
+# |                       |_____|\__\___||_|_| |_|_|\____/\____/|_|_| |_|                        | #
+# |                                                                                              | #
+# |                   Custom Item Configurations              by RockinChaos                     | #
+# |                                                                                              | #
+# |     SOURCE CODE: https://github.com/RockinChaos/ItemJoin                                     | #
+# |     BUG REPORT:  https://github.com/RockinChaos/ItemJoin/issues                              | #
+# |     WIKI:        https://github.com/RockinChaos/ItemJoin/wiki                                | #
+# |                                                                                              | #
+# |     Each parameter in this file is documented and explained in more detail here:             | #
+# |     ==> https://github.com/RockinChaos/ItemJoin/wiki/Config.yml                              | #
+# |                                                                                              | #
+# |                                                                                              | #
+# |     |If you want to help the project  with ideas                                             | #
+# |     |    or you have a question to the developer;                                            | #
+# |     | ==> https://discord.gg/Xsv6Hkk                                                         | #
+# |                                                                                              | #
+# +----------------------------------------------------------------------------------------------+ #
+
+
+
+# This should NEVER be touched, modifying this will cause the config.yml file to break and regenerate.
 config-Version: 7
 
+
+# Translation of plugin configuration
+#
+#     At the moment, there are only:
+#   ==> English               > en-lang
+#   ==> Russian               > ru-lang
+#   ==> French                > fr-lang
+#   ==> Spanish               > es-lang
+#   ==> Chinese               > cn-lang
+#   ==> Traditional Chinese   > tw-lang
+#
+#   | If you want to help me as well, 
+#   | please create Pull requests with your translation:
+#   | https://github.com/RockinChaos/ItemJoin/tree/master/files/locales
+#
+# - English is the default language.
 Language: 'English'
 
-# These are typically general maintenance settings that do not affect functionality.
+# +----------------------------------------------------------------------------------------------+ #
+# |                                                                                              | #
+# |                                            GENERAL                                           | #
+# |                                                                                              | #
+# |                 General service settings that do not affect the functionality.               | #
+# |                                                                                              | #
+# +----------------------------------------------------------------------------------------------+ #
+
 General:
+  #======================================================================#
+  # CheckforUpdates: true
+  # - Setting this to false will stop ItemJoin from checking for updates 
+  #   and notifying you if an update has been found upon starting the 
+  #   server, or reloading the server.
   CheckforUpdates: true
+  #======================================================================#
+  #
+  #======================================================================#
+  # Metrics-Logging: true
+  # - This should always be kept true, this simply allows ItemJoin to 
+  #   anonymously send data of your item count, server version, most 
+  #   used dependencies, java version, etc. 
+  #
+  # - A way to think of this as it being a statistics page. 
+  #   If you wish to not be included set this to false. 
+  #
+  # - This tool will be really useful in allowing me to increase the 
+  #   quality of the ItemJoin updates as well as supported Minecraft 
+  #   Versions. You can see the ItemJoin stats page here; 
+  #   ==> https://bstats.org/plugin/bukkit/ItemJoin
   Metrics-Logging: true
+  #======================================================================#
+  #
+  #======================================================================#
+  # Log-Commands: true
+  # - Setting this to false will stop the console from logging any of 
+  #   the commands that are executed from ItemJoin item
   Log-Commands: true
+  #======================================================================#
+  #
+  #======================================================================#
+  # Debugging: false
+  # - Setting this to true may help identify a bug you found when 
+  #   reporting it to the developer, it creates more detailed logs and 
+  #   outputs in the console window for debugging later on. 
+  #
+  # - It is recommended to keep this false unless you are experiencing 
+  #   issues with ItemJoin and need help.
   Debugging: false
-
-# These settings are optional as a database file is generated by default or you can setup MySQL database connections.
+  #======================================================================#
+  
+# +----------------------------------------------------------------------------------------------+ #
+# |                                                                                              | #
+# |                                           MySQL SETTINGS                                     | #
+# |                                                                                              | #
+# |              These settings are optional as a database file is generated by default          | #
+# |                          or you can set up MySQL database connections.                       | #
+# |                                                                                              | #
+# +----------------------------------------------------------------------------------------------+ #
 Database:
+  #======================================================================#
+  # MySQL: false
+  # - When setting this to true, a MySQL database will be used 
+  #   (and required) for ItemJoin. When set to false, a local .db file 
+  #   which is located in the ItemJoin folder will be used.
   MySQL: false
+  #======================================================================#
+  #
+  #======================================================================#
+  # host: 'localhost'
+  # - The hostname of your MySQL database. Use the credentials 
+  #   provided by your MySQL provider.
   host: 'localhost'
+  #======================================================================#
+  #
+  #======================================================================#
+  # port: 3306
+  # - The port of your MySQL database. 
+  #
+  # - Port 3306 is the standard port and is normally used. 
+  #
+  # - If you can't connect with this port, and you can't find any 
+  #   clues about the port the database is using, you should contact 
+  #   your service provider, to ask for the port.
   port: 3306
+  #======================================================================#
+  #
+  #======================================================================#
+  # table: 'database_name'
+  # - The name of the table (directory), that will be created. 
+  #
+  # - You can call database_name whatever you want, as long as 
+  #   it is a unique table name.
   table: 'database_name'
+  #======================================================================#
+  #
+  #======================================================================#
+  # user: 'root'
+  # - The username of the database. Use the credentials 
+  #   provided by your MySQL provider.
   user: 'root'
+  #======================================================================#
+  #
+  #======================================================================#
+  # pass: 'password'
+  # - The password of your MySQL database.
+  #
+  # - Use the credentials provided by your MySQL provider.
   pass: 'password'
+  #======================================================================#
 
-# These settings will take effect globally throughout the plugins system.
+
+
+# +----------------------------------------------------------------------------------------------+ #
+# |                                                                                              | #
+# |                                             SETTINGS                                         | #
+# |                                                                                              | #
+# |              These settings will take effect globally throughout the plugins system.         | #
+# |                                                                                              | #
+# +----------------------------------------------------------------------------------------------+ #
 Settings:
+  #======================================================================#
+  # HeldItem-Slot: DISABLED
+  # - This works in a fairly simple way, this option is meant for you 
+  #   to be able to define what slot you want the player that logs in 
+  #   and changes worlds to be selected on.
+  #
+  # - So say you define slot 3 to be what you want the players to be 
+  #   selected on when joining and switching worlds this will be the 
+  #   slot selected, usually great to use if you have a special item 
+  #   in that slot.
+  #
+  # - So simply put, this option forces the players to have this
+  #   specific slot as their selected slot. You may only define slots 0-8,
+  #   as you only have 9 slots in your hot-bar.
+  #  
+  # - If you wish for it to be disabled, set it to None
   HeldItem-Slot: DISABLED
+  #======================================================================#
+  #
+  #======================================================================#
+  # HeldItem-Triggers: JOIN, WORLD-SWITCH
+  # - ????????????????????????????????????????????????????????????????
+  #   ????????????????????????????????????????????????????????????????
+  #   ????????????????????????????????????????????????????????????????
   HeldItem-Triggers: JOIN, WORLD-SWITCH
+  #======================================================================#
+  #
+  #======================================================================#
+  # DataTags: true
+  # - Setting this from true to false or vice versa will require you to
+  #   fully clear the player's inventory, old items will break.
+  #
+  # - When this is set to true ItemJoin will give items NBTTags to help
+  #   identify them as ItemJoin items, if this is set to false it will
+  #   simply define it within the items name in a way that
+  #   you won't see it.
+  #
+  # - Keeping this set to true will allow some ItemJoin features to work
+  #   better so it is best to keep this set to true by default.
+  #
+  # - If you don't understand what this does please do not touch it,
+  #   there should be no change when setting this to false that
+  #   you would notice.
   DataTags: true
+  #======================================================================#
 
-# These permissions if enabled, determine whether the permission(s) is/are applied to certain players.
+
+
+# +----------------------------------------------------------------------------------------------+ #
+# |                                                                                              | #
+# |                                          PERMISSIONS                                         | #
+# |                                                                                              | #
+# |                 These permissions if enabled, determine whether the permission(s)            | # 
+# |                                  is/are applied to certain players.                          | #
+# |                                                                                              | #
+# +----------------------------------------------------------------------------------------------+ #
 Permissions:
+  #======================================================================#
+  # Obtain-Items: false
+  # - Setting this to false will allow all players to get any and all 
+  #   items regardless of what permissions they have. 
+  #
+  # - However, setting this to true will enable ItemJoin 
+  #   permissions for items.
   Obtain-Items: false
+  #======================================================================#
+  #
+  #======================================================================#
+  # Obtain-Items-OP: false
+  # - Setting this to true will require ops to have each item's 
+  #   permissions in order to receive them, rather than getting 
+  #   all items by default. 
+  #
+  # - Keeping this false will allow ops to bypass all Item permissions
+  #   and receive every item.
   Obtain-Items-OP: false
+  #======================================================================#
+  #
+  #======================================================================#
+  # Commands-Get: false
+  # - Setting this to true will require players to have the item's 
+  #   permission when receiving an item that is being given via 
+  #   ===> /itemjoin get 
+  #
+  # - If the player lacks the specific item's permission, an error message
+  #   will be sent to both parties that yourself or the specified is 
+  #   lacking the permission. 
+  #
+  # - Obviously depending on which of the two commands are executed. 
+  #
+  # - Note this does not give or revoke any permissions for a player to 
+  #   run this command, that is still linked to the 
+  #   ===> itemjoin.get | and  ===>itemjoin.get.others | permission nodes
   Commands-Get: false
+  #======================================================================#
+  #
+  #======================================================================#
+  # Commands-OP: false
+  # - Setting this to true will require ops to have each commands 
+  #   permissions or 
+  #         ===>itemjoin.all             ===>itemjoin.* 
+  #   in order to use each command.
+  #
+  #  |- itemjoin.
+  #  |  reload, updates, autoupdate, creator, purge, save, get, get.others, 
+  #  |  remove, remove.others, enable, enable.others, disable, 
+  #  |  disable.others, list 
+  # - Are no longer given to Opped players by default, you will now have
+  #   to set Commands-OP in the config.yml to false to allow ops to get 
+  #   these commands by default (however this is the default selected 
+  #   setting, setting it to true will require ops to be 
+  #   given these permissions).
+  #
+  # - Keeping this false will allow ops to execute the following commands
+  #   by default, without permissions.
+  #  |- itemjoin.
+  #  |  reload, updates, autoupdate, creator, purge, save, get, get.others,
+  #  |  remove, remove.others, enable, enable.others, disable, 
+  #  |  disable.others, list
   Commands-OP: false
+  #======================================================================#
+  #
+  #======================================================================#
+  # Movement-Bypass: false
+  # - Setting this to true will enable the use of the 
+  #   ===> itemjoin.bypass.inventorymodify permission node. 
+  #
+  # - If this is kept false simply giving the player the permission node 
+  #   will not allow them to bypass the inventory modification itemflag.
+  #
+  # - This was implemented because some server owners were using the * 
+  #   permission node which would force the server to give the player 
+  #   every single permission node on the server...
   Movement-Bypass: false
+  #======================================================================#
 
-# If enabled this will clear items from their inventory upon performing the specified action for the specified type.
-# The available types(s) are ALL for all items or ITEMJOIN for only the ItemJoin items.
+
+
+# +----------------------------------------------------------------------------------------------+ #
+# |                                                                                              | #
+# |                                         CLEAR ITEMS                                          | #
+# |                                                                                              | #
+# |                         If enabled this will clear items from their                          | #
+# |             inventory upon performing the specified action for the specified type.           | #
+# |      The available types(s) are ALL for all items or ITEMJOIN for only the ItemJoin items.   | #
+# |                                                                                              | #
+# +----------------------------------------------------------------------------------------------+ # 
 Clear-Items:
+  #======================================================================#
+  # Type: ItemJoin
+  # - There are two options for this, either ItemJoin or All. 
+  #
+  # - ItemJoin - Specifies only ItemJoin items to be the items cleared.
+  #
+  # - All - Specifies any item within the player's inventory to be cleared.
   Type: ITEMJOIN
+  #======================================================================#
+  #
+  #======================================================================#
+  # Delay-Tick: 2
+  # - This is the time in half-seconds before the items will be cleared 
+  #   from the player's inventory. This is useful to combat other plugins 
+  #   giving after the inventory is cleared or restoring a 
+  #   players inventory.
+  #
+  # - If this is set equal to or higher than the items-Delay value in 
+  #   the items.yml it will automatically increase the items-Delay by one 
+  #   half-second to prevent the items from being removed 
+  #   after they are given
   Delay-Tick: 2
+  #======================================================================#
+  #
+  #======================================================================#
+  # Join: DISABL
+  # - Setting this to true will either clear All Items or Only ItemJoin 
+  #   items upon joining the server, depending on what the Clear-Items 
+  #   option is set to do. 
+  #
+  # - Also, instead of setting this to true you can define specific 
+  #   worlds that you wish to clear in if a player joins within that world.
+  #
+  # - Example of specific worlds defined: 
+  #   ===> Join: world, world_nether, world_the_en
   Join: DISABLED
+  #======================================================================#
+  #
+  #======================================================================#
+  # World-Switch: DISABLED
+  # - Setting this to true will either clear All Items or Only ItemJoin 
+  #   items upon switching to a different world, depending on what the 
+  #   Clear-Items option is set to do. 
+  #
+  # - Also, instead of setting this to true you can define specific 
+  #   worlds that you wish to clear in if a player switches to that 
+  #   specific world(s).
+  #
+  # - Example of specific worlds defined:
+  #   ===> World-Switch: world, world_nether, world_the_en
   World-Switch: DISABLED
+  #======================================================================#
+  #
+  #======================================================================#
+  # Region-Enter: DISABLED
+  # - Setting this to true will either clear All Items or Only ItemJoin 
+  #   items upon entering a region, depending on what the 
+  #   Clear-Items option is set to do.
+  #
+  # - Also, instead of setting this to true you can define specific 
+  #   regions that you wish to clear in if a player enters that 
+  #   specific region(s).
+  #
+  # - Example of specific worlds defined:
+  #   ===> Region-Enter: region1, region2
   Region-Enter: DISABLED
+  #======================================================================#
+  #
+  #======================================================================#
+  # Options: PROTECT, RETURN
+  # - Currently, there is only two option(s), that being 
+  #   PROTECT and RETURN. 
+  # - To these options, simply set this to DISABLED.
+  #
+  # - PROTECT -> will protect ALL ItemJoin items that are First-World or 
+  #   First-Join items so they will not be cleared upon 
+  #   world-switch or join.
+  #
+  # - RETURN -> will return any cleared items when exiting the region
+  #   that was entered. 
+  # - This option only works with the Region-Enter clearing event.
   Options: PROTECT, PROTECT_OP, PROTECT_CREATIVE
+  #======================================================================#
+  #
+  #======================================================================#
+  # Blacklist: '{id:BEDROCK}, {slot:4}, {name:Blazefury}'
+  # - ????????????????????????????????????????????????????????????????
+  #   ????????????????????????????????????????????????????????????????
+  #   ????????????????????????????????????????????????????????????????
   Blacklist: '{id:BEDROCK}, {slot:4}, {name:Blazefury}'
+  #======================================================================#
 
-# This is the command(s) executed upon the player performing the defined trigger(s), for the specified world(s).
+
+
+# +----------------------------------------------------------------------------------------------+ #
+# |                                                                                              | #
+# |                                          ACTIVE COMMANDS                                     | #
+# |                                                                                              | #
+# |        This is the command(s) executed upon the player performing the defined trigger(s),    | #
+# |                                   for the specified world(s).                                | #
+# |                                                                                              | #
+# +----------------------------------------------------------------------------------------------+ # 
 Active-Commands:
+  #======================================================================#
+  # commands: 
+  # - This is where you list the commands you wish to execute, 
+  #   keep in mind these are executed as Console so if you wish for them
+  #   to relate to a specific player you will have to use %player% and 
+  #   other placeholders. 
+  #
+  # - There is also the option to execute these commands only once 
+  #   per player, via; first-join.
   commands:
     - 'itemjoin get <item> <player>'
     - 'first-join: say This is a command only executed once per world, per player.'
+  #======================================================================#
+  #
+  #======================================================================#
+  # triggers: JOIN 
+  # - Currently, there is only one trigger, that being JOIN.
+  #
+  # - This will execute the command(s) upon the player performing
+  #   the trigger.
   triggers: JOIN
+  #======================================================================#
+  #
+  #======================================================================#
+  # enabled-worlds: world, world_nether
+  # - These are the list of the worlds separated by commas to execute
+  #   the commands upon joining the server.
   enabled-worlds: DISABLED
+  #======================================================================#
 
-# This determines if the action is allowed for all items in the specified worlds.
-# To disable an action, simply set the action to true for all worlds or list each world separated by a comma.
+
+# +----------------------------------------------------------------------------------------------+ #
+# |                                                                                              | #
+# |                                              PREVENT                                         | #
+# |                                                                                              | #
+# |          This determines if the action is allowed for all items in the specified worlds.     | #
+# |      To disable an action, simply set the action to true for all worlds or list each world   | #
+# |                                        separated by a comma.                                 | #
+# |                                                                                              | #
+# +----------------------------------------------------------------------------------------------+ # 
 Prevent:
+  #======================================================================#
+  # Pickups: DISABLED
+  # - Setting this to true will prevent players from picking up any items on the server.
   Pickups: DISABLED
+  #======================================================================#
+  #
+  #======================================================================#
+  # itemMovement: DISABLED
+  # - Setting this to true will prevent players from moving around any items in their inventory on the server.
   itemMovement: DISABLED
+  #======================================================================#
+  #
+  #======================================================================#
+  # Death-Drops: DISABLED
+  # - Setting this to true will prevent players from dropping any items from their inventory on the server.
   Self-Drops: DISABLED
+  #======================================================================#
+  # Death-Drops: DISABLED
+  # - Setting this to true will prevent players from dropping any items when dying on the server.
   Death-Drops: DISABLED
+  #======================================================================#
+  #
+  #======================================================================#
+  # Bypass: CREATIVE, OP
+  # - Currently, there is only OP and CREATIVE for this, adding CREATIVE
+  #   will allow players that are in creative-mode to not be affected by
+  #   the pickups or item movement restrictions, meaning players in 
+  #   creative or oped players will be able to move and pick up items 
+  #   despite the defined setting.
   Bypass: CREATIVE, OP
+  #======================================================================#
