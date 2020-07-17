@@ -304,7 +304,7 @@ public class InventoryCrafting implements Listener {
     * @param delay - the delay to wait before returning the item.
     */
     private void delayReturnItem(final Player player, final int slot, final ItemStack item, long delay) {
-    	if (item == null) { return; } if (slot == 0) { delay += 2L; }
+    	if (item == null) { return; } if (slot == 0) { delay += 1L; }
     	Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
     		@Override
     		public void run() {
