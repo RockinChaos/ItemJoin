@@ -243,6 +243,7 @@ public class ItemAnimation {
 					else if (ownerString != null || textureString != null) { setSkull(player, player.getItemOnCursor(), ownerString, textureString); }
 					InventoryClick.putCursor(PlayerHandler.getPlayer().getPlayerID(player), item);
 				}
+				PlayerHandler.getPlayer().updateInventory(player, itemMap, 1L);
 				// ============== This has Concluded all Animations.. ============== //
 				if (!hasNext) { 
 					if (nameString != null) { nameTasks(player); }
@@ -252,7 +253,6 @@ public class ItemAnimation {
 					else if (ownerString != null) { ownerTasks(player); }
 					else if (textureString != null) { textureTasks(player); }
 				}
-				PlayerHandler.getPlayer().updateInventory(player, 1L);
 			}
 		}, UpdateDelay);
 	}
