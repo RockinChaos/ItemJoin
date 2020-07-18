@@ -37,6 +37,7 @@ import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import me.RockinChaos.itemjoin.ItemJoin;
+import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.handlers.events.PlayerAutoCraftEvent;
@@ -49,6 +50,7 @@ public class InventoryCrafting implements Listener {
 	private static HashMap<String, ItemStack[]> craftingItems = new HashMap<String, ItemStack[]>();
 	private static HashMap<String, ItemStack[]> craftingOpenItems = new HashMap<String, ItemStack[]>();
 	private static HashMap<String, ItemStack[]> creativeCraftingItems = new HashMap<String, ItemStack[]>();
+	private static HashMap<String, Boolean> antiSpamPlayers = new HashMap<String, Boolean>();
 	private HashMap<String, Boolean> worldSwitch = new HashMap<String, Boolean>();
 	
    /**
@@ -78,7 +80,7 @@ public class InventoryCrafting implements Listener {
     private void onCraftingOpen(InventoryOpenEvent event) {
     	final Player player = (Player) event.getPlayer();
     	if (!craftingOpenItems.containsKey(PlayerHandler.getPlayer().getPlayerID(player))) {
-	    	craftingOpenItems.put(PlayerHandler.getPlayer().getPlayerID(player), this.getContents(player));
+	    	if (antiSpamPlayers.get(PlayerHandler.getPlayer().getPlayerID(player)) == null) { craftingOpenItems.put(PlayerHandler.getPlayer().getPlayerID(player), PlayerHandler.getPlayer().getTopContents(player)); }
 			LegacyAPI.getLegacy().removeCraftItems(player);
 	    	PlayerHandler.getPlayer().updateInventory(player, 1L);
     	}
@@ -90,13 +92,15 @@ public class InventoryCrafting implements Listener {
 	* @param event - InventoryCloseEvent
 	*/
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
-    private void onCraftingClose(org.bukkit.event.inventory.InventoryCloseEvent event) {
-    	this.handleClose(slot -> { 
-    		this.delayReturnItem((Player)event.getPlayer(), slot, event.getView().getTopInventory().getContents()[slot].clone(), 3L);
-    		event.getView().getTopInventory().setItem(slot, new ItemStack(Material.AIR));
-    	}, (Player)event.getPlayer(), event.getView(), event.getView().getTopInventory().getContents());
+	private void onCraftingClose(org.bukkit.event.inventory.InventoryCloseEvent event) {
+		if (!ServerHandler.getServer().hasSpecificUpdate("1_8") || !PlayerHandler.getPlayer().isCraftingInv(event.getView())) {
+			ItemStack[] topContents = ItemHandler.getItem().cloneContents(event.getView().getTopInventory().getContents());
+	    	this.handleClose(slot -> { 
+	    		event.getView().getTopInventory().setItem(slot, new ItemStack(Material.AIR));
+	    	}, (Player)event.getPlayer(), event.getView(), topContents);
+    	}
     }
-	
+    
    /**
 	* Gives the custom crafting items back when the player closes their inventory if they had items existing previously.
 	* 
@@ -104,10 +108,11 @@ public class InventoryCrafting implements Listener {
 	*/
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
     private void onCraftingClose(me.RockinChaos.itemjoin.handlers.events.InventoryCloseEvent event) {
-    	this.handleClose(slot -> { 
-    		this.delayReturnItem(event.getPlayer(), slot, event.getPreviousContents(true)[slot], 6L);
-    		event.removeItem(event.getTopContents()[slot], slot);
-    	}, event.getPlayer(), event.getView(), event.getTopContents());
+		if (ServerHandler.getServer().hasSpecificUpdate("1_8")) {
+	    	this.handleClose(slot -> { 
+	    		event.removeItem(event.getTopContents()[slot], slot);
+	    	}, event.getPlayer(), event.getView(), event.getPreviousContents(true));
+		}
     }
     
    /**
@@ -185,9 +190,7 @@ public class InventoryCrafting implements Listener {
     		@Override
     		public void run() {
     			if (craftingItems.containsKey(PlayerHandler.getPlayer().getPlayerID(player))) {
-    	    		for (int i = 0; i <= 4; i++) {
-    					delayReturnItem(player, i, craftingItems.get(PlayerHandler.getPlayer().getPlayerID(player))[i], 1L);
-    				}
+    				delayReturnCrafting(event.getPlayer(), craftingItems.get(PlayerHandler.getPlayer().getPlayerID(player)), 1L);
     			}
     			worldSwitch.remove(PlayerHandler.getPlayer().getPlayerID(player));
     		}
@@ -206,8 +209,7 @@ public class InventoryCrafting implements Listener {
     		creativeCraftingItems.put(PlayerHandler.getPlayer().getPlayerID(player), craftingItems.get(PlayerHandler.getPlayer().getPlayerID(player)));
     		LegacyAPI.getLegacy().removeCraftItems(player);
     	} else if (event.getNewGameMode() != GameMode.CREATIVE && creativeCraftingItems.containsKey(PlayerHandler.getPlayer().getPlayerID(player))) {
-    		ItemStack[] craftingContents = creativeCraftingItems.get(PlayerHandler.getPlayer().getPlayerID(player));
-    		for (int i = 4; i >= 0; i--) { this.delayReturnItem(player, i, craftingContents[i], 1L); }
+    		this.delayReturnCrafting(event.getPlayer(), creativeCraftingItems.get(PlayerHandler.getPlayer().getPlayerID(player)), 1L);
     		craftingItems.put(PlayerHandler.getPlayer().getPlayerID(player), creativeCraftingItems.get(PlayerHandler.getPlayer().getPlayerID(player)));
     		creativeCraftingItems.remove(PlayerHandler.getPlayer().getPlayerID(player));
     	}
@@ -272,27 +274,50 @@ public class InventoryCrafting implements Listener {
     * @param view - The view being referenced.
     * @param inventory - The inventory being handled.
     */
-	public void handleClose(final Consumer < Integer > input, Player player, InventoryView view, ItemStack[] inventory) {
+	private void handleClose(final Consumer < Integer > input, final Player player, final InventoryView view, final ItemStack[] inventory) {
 		if (PlayerHandler.getPlayer().isCraftingInv(view)) {
-			for (int i = 0; i <= 4; i++) {
-				for (ItemMap itemMap: ItemUtilities.getUtilities().getCraftingItems()) {
-					if (itemMap.isSimilar(inventory[i])) {
-						input.accept(i);
+			if (!ItemHandler.getItem().isContentsEmpty(inventory) && antiSpamPlayers.get(PlayerHandler.getPlayer().getPlayerID(player)) == null) {
+				antiSpamPlayers.put(PlayerHandler.getPlayer().getPlayerID(player), true);
+				for (int i = 0; i <= 4; i++) {
+					for (ItemMap itemMap: ItemUtilities.getUtilities().getCraftingItems()) {
+						if (!itemMap.isSimilar(inventory[i])) {
+							input.accept(i);
+						}
 					}
 				}
+				this.delayReturnCrafting(player, inventory, 1L);
 			}
 		} else {
 			ServerHandler.getServer().runAsyncThread(main -> {
 				if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory()) && craftingOpenItems.containsKey(PlayerHandler.getPlayer().getPlayerID(player))) {
 					ItemStack[] openCraftContents = craftingOpenItems.get(PlayerHandler.getPlayer().getPlayerID(player));
-					if (openCraftContents != null && openCraftContents.length != 0) {
-						for (int i = 4; i >= 0; i--) { this.delayReturnItem(player, i, openCraftContents[i], 1L); }
+					if (openCraftContents != null && openCraftContents.length != 0 && antiSpamPlayers.get(PlayerHandler.getPlayer().getPlayerID(player)) == null) {
+						antiSpamPlayers.put(PlayerHandler.getPlayer().getPlayerID(player), true);
+						this.delayReturnCrafting(player, openCraftContents, 1L);
 						craftingItems.put(PlayerHandler.getPlayer().getPlayerID(player), craftingOpenItems.get(PlayerHandler.getPlayer().getPlayerID(player)));
 						craftingOpenItems.remove(PlayerHandler.getPlayer().getPlayerID(player));
 					}
 				}
 			});
 		}
+	}
+	
+   /**
+    * Returns the custom crafting item to the player after the specified delay.
+    * 
+    * @param player - the Player having their item returned.
+    * @param contents - the crafting contents to be returned.
+    * @param delay - the delay to wait before returning the item.
+    */
+	private void delayReturnCrafting(final Player player, final ItemStack[] contents, final long delay) {
+		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), () -> {
+			if (!player.isOnline()) { return; } else if (!PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) { this.delayReturnCrafting(player, contents, 10L); return; }
+			for (int i = 4; i >= 0; i--) {
+				player.getOpenInventory().getTopInventory().setItem(i, contents[i]);
+				PlayerHandler.getPlayer().updateInventory(player, ItemUtilities.getUtilities().getItemMap(contents[i], null, player.getWorld()), 1L);
+			}
+			if (antiSpamPlayers.get(PlayerHandler.getPlayer().getPlayerID(player)) != null) { antiSpamPlayers.remove(PlayerHandler.getPlayer().getPlayerID(player)); }
+		}, delay);
 	}
 	
    /**
@@ -320,21 +345,20 @@ public class InventoryCrafting implements Listener {
     }
     
    /**
-    * Gets the current crafting slot contents of the player.
+    * Quick saves the current inventories crafting items.
     * 
-    * @param player - the Player to get the crafting contents of.
-    * @return The ItemStack list of crafting slot contents.
+    * @oaram player - The player having their crafting items saved.
     */
-    private ItemStack[] getContents(Player player) {
-		ItemStack[] tempContents = player.getOpenInventory().getTopInventory().getContents();
-		ItemStack[] contents = new ItemStack[5];
-		if (contents != null && tempContents != null) { 
-			for (int i = 0; i <= 4; i++) { 
-				contents[i] = tempContents[i].clone(); 
-			} 
-			return contents;
-		}
-		return tempContents;
+    public static void quickSave(Player player) {
+    	if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
+    		ItemStack[] contents = new ItemStack[5];
+    		if (contents != null && player.getOpenInventory().getTopInventory().getContents() != null) {
+    			for (int i = 0; i <= 4; i++) {
+    				contents[i] = player.getOpenInventory().getTopInventory().getContents()[i].clone();
+    			}
+    		}
+    		craftingItems.put(PlayerHandler.getPlayer().getPlayerID(player), contents);
+    	}
     }
     
    /**

@@ -104,6 +104,24 @@ public class PlayerHandler {
 	}
 	
    /**
+    * Gets the current crafting slot contents of the player.
+    * 
+    * @param player - the Player to get the crafting contents of.
+    * @return The ItemStack list of crafting slot contents.
+    */
+    public ItemStack[] getTopContents(final Player player) {
+		ItemStack[] tempContents = player.getOpenInventory().getTopInventory().getContents();
+		ItemStack[] contents = new ItemStack[5];
+		if (contents != null && tempContents != null) { 
+			for (int i = 0; i <= 4; i++) { 
+				contents[i] = tempContents[i].clone(); 
+			} 
+			return contents;
+		}
+		return tempContents;
+    }
+	
+   /**
     * Sets the currently selected hotbar slot for the specified player.
     * 
     * @param player - The player to have their slot set.

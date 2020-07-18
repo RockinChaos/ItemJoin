@@ -504,6 +504,40 @@ public class ItemHandler {
     }
     
    /**
+    * Copies the specified ItemStack contents.
+    * 
+    * @param contents - The ItemStack contents to be copied.
+    * @return The copied ItemStack contents.
+    */
+    public ItemStack[] cloneContents(final ItemStack[] contents) {
+    	int itr = 0;
+    	ItemStack[] copyContents = contents;
+    	for (ItemStack itemStack: contents) {
+    		if (copyContents[itr] != null) {
+    			copyContents[itr] = itemStack.clone();
+    		}
+    		itr++;
+    	}
+    	return copyContents;
+    }
+    
+   /**
+    * Checks if the ItemStack contents are NULL or empty.
+    * 
+    * @param contents - The ItemStack contents to be checked.
+    * @return If the contents do not exist.
+    */
+    public boolean isContentsEmpty(final ItemStack[] contents) {
+    	int size = 0; 
+    	for (ItemStack itemStack: contents) { 
+    		if (itemStack == null || itemStack.getType().equals(Material.AIR)) { 
+    			size++; 
+    		} 
+    	}
+    	return (size == contents.length);
+    }
+    
+   /**
     * Converts the Inventory to a Base64 String.
     * This is a way of encrypting a Inventory to be decrypted and referenced later.
     * 

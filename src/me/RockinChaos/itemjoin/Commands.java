@@ -35,6 +35,7 @@ import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.handlers.UpdateHandler;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
+import me.RockinChaos.itemjoin.listeners.InventoryCrafting;
 import me.RockinChaos.itemjoin.utils.LanguageAPI;
 import me.RockinChaos.itemjoin.utils.LegacyAPI;
 import me.RockinChaos.itemjoin.utils.UI;
@@ -457,6 +458,7 @@ public class Commands implements CommandExecutor {
 						placeHolders[11] = Integer.toString((amount == 0 ? 1 : amount)); placeHolders[1] = sender.getName();
 						if (!messageSent) { LanguageAPI.getLang(false).sendLangMessage("Commands." + (remove ? "Remove.fromYou" : "Get.toYou"), argsPlayer, placeHolders); }
 						if (!messageSent && (args.length >= 3 && !Utils.getUtils().isInt(args[2]) && !sender.getName().equalsIgnoreCase(argsPlayer.getName()))) { placeHolders[1] = argsPlayer.getName(); LanguageAPI.getLang(false).sendLangMessage("Commands.Get.toTarget", sender, placeHolders); }
+						InventoryCrafting.quickSave(argsPlayer);
 					} else if (!remove && !messageSent) {
 						LanguageAPI.getLang(false).sendLangMessage("Commands.Get." + (args.length >= 3 && !Utils.getUtils().isInt(args[2]) && !sender.getName().equalsIgnoreCase(argsPlayer.getName()) ? "targetNoPermission" : "noPermission"), sender, placeHolders);
 					}
@@ -500,6 +502,7 @@ public class Commands implements CommandExecutor {
 							else { itemMap.giveTo(argsPlayer, amount); }
 							if (!messageSent && !sender.getName().equalsIgnoreCase(argsPlayer.getName())) { LanguageAPI.getLang(false).sendLangMessage("Commands." + (remove ? "Remove.fromYou" : "Get.toYou"), argsPlayer, placeHolders); }
 							if (!messageSent && !handledPlayers.contains(argsPlayer.getName())) { handledPlayers.add(argsPlayer.getName()); }
+							InventoryCrafting.quickSave(argsPlayer);
 						} else if (!messageSent) { 
 							if (!sender.getName().equalsIgnoreCase(argsPlayer.getName())) { LanguageAPI.getLang(false).sendLangMessage("Commands." + (remove ? "Remove.triedRemove" : "Get.triedGive"), argsPlayer, placeHolders); }
 							if (!failedPlayers.contains(argsPlayer.getName())) { failedPlayers.add(argsPlayer.getName()); }
@@ -537,6 +540,7 @@ public class Commands implements CommandExecutor {
 					if (remove) { itemMap.removeFrom(argsPlayer); } 
 					else { itemMap.giveTo(argsPlayer); }
 					if (!itemGiven) { itemGiven = true; }
+					InventoryCrafting.quickSave(argsPlayer);
 				}
 			} else if (!failedPermissions && !itemMap.hasPermission(argsPlayer)) { failedPermissions = true; }
 		}
