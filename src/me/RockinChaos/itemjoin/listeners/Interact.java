@@ -17,6 +17,7 @@
  */
 package me.RockinChaos.itemjoin.listeners;
 
+import java.util.ListIterator;
 import java.util.Set;
 
 import org.bukkit.Material;
@@ -25,6 +26,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryType.SlotType;
@@ -85,13 +87,27 @@ public class Interact implements Listener {
 	* @param event - InventoryClickEvent
 	*/
 	@EventHandler(ignoreCancelled = false)
-	private void onInventoryCommands(InventoryClickEvent event) {
+	private void onInventoryCommand(InventoryClickEvent event) {
 		ItemStack item = event.getCurrentItem();
 		Player player = (Player) event.getWhoClicked();
 		String action = event.getAction().toString();
 		String slot = String.valueOf(event.getSlot());
 		if (event.getSlotType().name().equalsIgnoreCase("CRAFTING")) { slot = "CRAFTING[" + slot + "]"; }
 		if (this.setupCommands(player, item, action, slot)) { event.setCancelled(true); }
+	}
+	
+   /**
+	* Runs the on_death commands for the custom item upon player death.
+	* 
+	* @param event - PlayerDeathEvent.
+	*/
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+	private void onDeathCommand(PlayerDeathEvent event) {
+		ListIterator < ItemStack > litr = event.getDrops().listIterator();
+		while (litr.hasNext()) {
+			ItemStack item = litr.next();
+			this.setupCommands(event.getEntity(), item, "ON_DEATH", null);
+		}
 	}
 
    /**
@@ -163,7 +179,7 @@ public class Interact implements Listener {
 	* @param event - PlayerInteractEntityEvent
 	*/
 	@EventHandler(ignoreCancelled = false)
-	private void onEntityCommands(PlayerInteractEntityEvent event) {
+	private void onEntityCommand(PlayerInteractEntityEvent event) {
 		if (event.getRightClicked() instanceof org.bukkit.entity.ItemFrame) {
 			ItemStack item;
 			if (ServerHandler.getServer().hasSpecificUpdate("1_9")) { item = PlayerHandler.getPlayer().getPerfectHandItem(event.getPlayer(), event.getHand().toString()); } 
@@ -183,7 +199,7 @@ public class Interact implements Listener {
 	* @param event - PlayerInteractAtEntityEvent
 	*/
 	@EventHandler(ignoreCancelled = false)
-	private void onTargetEntityCommands(PlayerInteractAtEntityEvent event) {
+	private void onTargetEntityCommand(PlayerInteractAtEntityEvent event) {
 		if (event.getRightClicked().toString().equalsIgnoreCase("CraftArmorStand")) {
 			ItemStack item;
 			if (ServerHandler.getServer().hasSpecificUpdate("1_9")) { item = PlayerHandler.getPlayer().getPerfectHandItem(event.getPlayer(), event.getHand().toString()); } 
@@ -203,7 +219,7 @@ public class Interact implements Listener {
 	* @param event - PlayerInteractEvent
 	*/
 	@EventHandler(ignoreCancelled = false)
-	private void onInteractCommands(PlayerInteractEvent event) {
+	private void onInteractCommand(PlayerInteractEvent event) {
 		ItemStack item = event.getItem();
 		final Player player = event.getPlayer();
 		String action = event.getAction().toString();
@@ -222,7 +238,7 @@ public class Interact implements Listener {
 	* @param event - PlayerAnimationEvent
 	*/
 	@EventHandler(ignoreCancelled = false)
-	private void onSwingHandCommands(PlayerAnimationEvent event) {
+	private void onSwingHandCommand(PlayerAnimationEvent event) {
 		Player player = event.getPlayer();
 		ItemStack item = PlayerHandler.getPlayer().getHandItem(player);
 		if (PlayerHandler.getPlayer().isAdventureMode(player)) {
@@ -261,7 +277,7 @@ public class Interact implements Listener {
 	private boolean setupCommands(Player player, ItemStack item, String action, String slot) {
 		ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item, null, player.getWorld());
 		if (itemMap != null && itemMap.inWorld(player.getWorld()) && itemMap.hasPermission(player)) {
-			return itemMap.executeCommands(player, item, action, slot);
+			return itemMap.executeCommands(player, item, action, (slot == null ? itemMap.getSlot() : slot));
 		}
 		return false;
 	}

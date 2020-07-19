@@ -279,7 +279,7 @@ public class ItemCommand {
 			@Override
 			public void run() {
 				if (getPending(player)) {
-					if (player.isDead() || !player.isOnline() || player.getWorld() != world) {
+					if ((!actionType.equals(ActionType.ON_DEATH) && player.isDead()) || !player.isOnline() || player.getWorld() != world) {
 						setExecute(player, true);
 						setPending(player, false);
 					} else { allowDispatch(player, world); }
@@ -302,7 +302,7 @@ public class ItemCommand {
 			@Override
 			public void run() {
 				allowDispatch(player, world);
-				if (!player.isDead() && player.isOnline() && player.getWorld() == world && !getExecute(player)) {
+				if (((actionType.equals(ActionType.ON_DEATH) || !player.isDead())) && player.isOnline() && player.getWorld() == world && !getExecute(player)) {
 					setPending(player, false);
 					switch (cmdtype) {
 						case CONSOLE: dispatchConsoleCommands(player); break;
@@ -433,7 +433,7 @@ public class ItemCommand {
 	private void dispatchSwapItem(final Player player, final String slot) {
 		try {
 			for (ItemMap item : ItemUtilities.getUtilities().getItems()) {
-				if (item.getConfigName().equalsIgnoreCase(this.command)) {
+				if (item.getConfigName().equalsIgnoreCase(this.command) && slot != null) {
 					ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(this.itemCopy, null, player.getWorld());
 					if (itemMap != null) { item.removeDisposable(player, itemMap, this.itemCopy, true); }
 					item.swapItem(player, slot);
@@ -504,6 +504,8 @@ public class ItemCommand {
 			return ActionType.ON_EQUIP;
 		} else if (ActionType.UN_EQUIP.hasDefine(definition) && (type.equals(CommandType.INTERACT) || type.equals(CommandType.INVENTORY) || invExists != null || type.equals(CommandType.BOTH))) {
 			return ActionType.UN_EQUIP;
+		} else if (ActionType.ON_DEATH.hasDefine(definition) && (type.equals(CommandType.INTERACT) || type.equals(CommandType.INVENTORY) || invExists != null || type.equals(CommandType.BOTH))) {
+			return ActionType.ON_DEATH;
 		}	
 		return ActionType.DEFAULT;
 	}
@@ -618,9 +620,9 @@ public class ItemCommand {
 	* 
 	*/
 	public enum CommandType {
-		INTERACT("PHYSICAL, LEFT_CLICK_BLOCK, LEFT_CLICK_AIR, RIGHT_CLICK_BLOCK, RIGHT_CLICK_AIR, ON_RECEIVE, ON_HOLD, ON_EQUIP, UN_EQUIP"),
-		INVENTORY("PICKUP_ALL, PICKUP_HALF, PLACE_ALL, ON_RECEIVE, ON_EQUIP, UN_EQUIP"),
-		BOTH("PICKUP_ALL, PICKUP_HALF, PLACE_ALL, PHYSICAL, LEFT_CLICK_BLOCK, LEFT_CLICK_AIR, RIGHT_CLICK_BLOCK, RIGHT_CLICK_AIR, ON_RECEIVE, ON_HOLD, ON_EQUIP, UN_EQUIP");
+		INTERACT("PHYSICAL, LEFT_CLICK_BLOCK, LEFT_CLICK_AIR, RIGHT_CLICK_BLOCK, RIGHT_CLICK_AIR, ON_RECEIVE, ON_HOLD, ON_EQUIP, UN_EQUIP, ON_DEATH"),
+		INVENTORY("PICKUP_ALL, PICKUP_HALF, PLACE_ALL, ON_RECEIVE, ON_EQUIP, UN_EQUIP, ON_DEATH"),
+		BOTH("PICKUP_ALL, PICKUP_HALF, PLACE_ALL, PHYSICAL, LEFT_CLICK_BLOCK, LEFT_CLICK_AIR, RIGHT_CLICK_BLOCK, RIGHT_CLICK_AIR, ON_RECEIVE, ON_HOLD, ON_EQUIP, UN_EQUIP, ON_DEATH");
 		private final String name;
 		private CommandType(String Action) { this.name = Action; }
 		public boolean hasAction(String Action) { return this.name.contains(Action); }
@@ -646,7 +648,8 @@ public class ItemCommand {
 		ON_RECEIVE("ON_RECEIVE", ".on-receive"),
 		ON_HOLD("ON_HOLD", ".on-hold"),
 		ON_EQUIP("ON_EQUIP", ".on-equip"),
-		UN_EQUIP("UN_EQUIP", ".un-equip");
+		UN_EQUIP("UN_EQUIP", ".un-equip"),
+		ON_DEATH("ON_DEATH", ".on-death");
 			
 		private final String name;
 		private final String definition;
