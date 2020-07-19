@@ -1,5 +1,7 @@
 # --{ =-=-=-=-=-=-=-=-=-= ItemJoin's Spanish Language file, by ThatOverPowered =-=-=-=-=-=-=-=-=-= }--
 # Si no desea que se envíe un mensaje, elimínelo por completo o déjelo en blanco.
+
+# Modificar esto hará que el archivo se rompa y se regenere.
 es-Version: 7
 
 # Este es el prefijo que se enviará al comienzo de cada mensaje del archivo de idioma.
@@ -110,3 +112,7 @@ Commands:
     forPlayerWorldFailed: '&cYa habías &edesactivado &clos items de &7[&e%world%&7] &cpara &e%player%&c.'
     globalPlayers: '&aHas &edesactivado &btodos los items &apara &etodos los jugadores&a.'
     globalPlayersFailed: '&cLos items ya estaban &edesactivados &cpara &etodos los jugadores&c.'
+
+# Estos marcadores de posición son específicos de los mensajes del complemento.
+Placeholders:
+  PLAYER_INTERACT: 'Desconocida'

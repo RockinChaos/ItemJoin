@@ -37,6 +37,7 @@ import de.domedd.betternick.BetterNick;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.utils.DependAPI;
+import me.RockinChaos.itemjoin.utils.LanguageAPI;
 import me.RockinChaos.itemjoin.utils.LegacyAPI;
 import me.RockinChaos.itemjoin.utils.Reflection;
 
@@ -96,7 +97,7 @@ public class PlayerHandler {
     * @param view - The action being checked.
     * @return If the player is currently interacting with an open menu.
     */
-	public boolean isMenuClick(InventoryView view, Action action) {
+	public boolean isMenuClick(final InventoryView view, final Action action) {
 		if (!PlayerHandler.getPlayer().isCraftingInv(view) && (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK)) {
 			return true;
 		}
@@ -417,7 +418,7 @@ public class PlayerHandler {
     * @param range - The distance to check for Nearby Players.
     * @return The String name of the Nearby Player.
     */
-    public String getNearbyPlayer(Player player, int range) {
+    public String getNearbyPlayer(final Player player, final int range) {
 	    ArrayList < Location > sight = new ArrayList < Location > ();
 	    ArrayList < Entity > entities = (ArrayList < Entity > ) player.getNearbyEntities(range, range, range);
 	    Location origin = player.getEyeLocation();
@@ -441,7 +442,7 @@ public class PlayerHandler {
 	    		}
 	    	}
 	    }
-    	return "INVALID";
+    	return (LanguageAPI.getLang(false).getLangMessage("Placeholders.PLAYER_INTERACT") != null ? LanguageAPI.getLang(false).getLangMessage("Placeholders.PLAYER_INTERACT") : "INVALID");
     }
 	
    /**

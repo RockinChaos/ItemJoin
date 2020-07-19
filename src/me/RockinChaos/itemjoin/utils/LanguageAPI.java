@@ -54,7 +54,7 @@ public class LanguageAPI {
     */
 	public void sendLangMessage(final String nodeLocation, final CommandSender sender, final String...placeHolder) {
 		Player player = null; if (sender instanceof Player) { player = (Player) sender; }
-		String langMessage = ConfigHandler.getConfig(false).getFile(this.langType.nodeLocation()).getString(nodeLocation);
+		String langMessage = this.getLangMessage(nodeLocation);
 		String prefix = Utils.getUtils().translateLayout(ConfigHandler.getConfig(false).getFile(this.langType.nodeLocation()).getString("Prefix"), player); 
 		if (prefix == null || prefix.isEmpty() || !this.showPrefix(nodeLocation)) { prefix = ""; } else { prefix += " "; }
 		if (langMessage != null && !langMessage.isEmpty()) {
@@ -68,6 +68,15 @@ public class LanguageAPI {
 				else { sender.sendMessage(langStrip);	}
 			}
 		}
+	}
+	
+   /**
+    * Gets the lang message at the node location.
+    * 
+    * @param nodeLocation - The String location of the Language Message. 
+    */
+	public String getLangMessage(final String nodeLocation) {
+		return ConfigHandler.getConfig(false).getFile(this.langType.nodeLocation()).getString(nodeLocation);
 	}
 	
    /**

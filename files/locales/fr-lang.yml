@@ -1,5 +1,7 @@
 # --{ =-=-=-=-=-=-=-=-=-= ItemJoin’s French Language file, by Sashapoun_Nako =-=-=-=-=-=-=-=-=-= }--
 # Si vous ne voulez pas qu’un message soit envoyé, supprimez-le complètement en dessous ou laissez-le vide.
+
+# La modification entraînera la rupture et la régénération du fichier.
 fr-Version: 7
 
 # C’est le préfixe qui sera envoyé au début de chaque message envoyé depuis ce fichier.
@@ -110,3 +112,7 @@ Commands:
     forPlayerWorldFailed: '&cVous avez déjà &edésactivé les items dans &7[&e%world%&7] &cpour &e%player%&c.'
     globalPlayers: '&aVous avez &edésactivé &btous les items &apour &etous les joueurs&a.'
     globalPlayersFailed: '&cLes items ont déja été &edésactivé &cpour &etous les joueurs&c.'
+
+# Ces espaces réservés sont spécifiques aux messages du plugin
+Placeholders:
+  PLAYER_INTERACT: 'Inconnue'

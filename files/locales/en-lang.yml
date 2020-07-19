@@ -1,5 +1,7 @@
 # --{ =-=-=-=-=-=-=-=-=-= ItemJoin's English Language file, by RockinChaos =-=-=-=-=-=-=-=-=-= }--
 # If you don't want a message to be sent, fully remove it from below or make it blank.
+
+# Modifying this will cause the file to break and regenerate.
 en-Version: 7
 
 # This is the prefix that will be sent at the beginning of every single message sent in the language file.
@@ -110,3 +112,7 @@ Commands:
     forPlayerWorldFailed: '&cYou have already &edisabled &7[&e%world%&7] items &cfor &e%player%&c.'
     globalPlayers: '&aYou have &edisabled &ball items &afor &eall players&a.'
     globalPlayersFailed: '&cItems have already been &edisabled &cfor &eall players&c.'
+
+# These placeholders are specific to the plugin messages
+Placeholders:
+  PLAYER_INTERACT: 'Unknown'

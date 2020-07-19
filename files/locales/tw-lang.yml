@@ -1,5 +1,7 @@
 # --{ =-=-=-=-=-=-=-=-=-= ItemJoin's Traditional Chinese Language file, by Momocraft =-=-=-=-=-=-=-=-=-= }--
 # If you don't want a message to be sent, fully remove it from below or make it blank.
+
+# Modifying this will cause the file to break and regenerate.
 tw-Version: 7
  
 # This is the prefix that will be sent at the beginning of every single message sent in the language file.
@@ -110,3 +112,7 @@ Commands:
     forPlayerWorldFailed: '&6你已為 &e%targetplayer% &6取消過 &e%world% &6的所有特殊物品'
     globalPlayers: '&c你已為所有玩家取消特殊物品'
     globalPlayersFailed: '&6所有玩家已取消過所有特殊物品'
+
+# These placeholders are specific to the plugin messages
+Placeholders:
+  PLAYER_INTERACT: '未知'
