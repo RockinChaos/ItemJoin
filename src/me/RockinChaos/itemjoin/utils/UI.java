@@ -1615,7 +1615,6 @@ public class UI {
 			this.commandListPane(player, itemMap, ActionType.INVENTORY);
 		}));
 		clickPane.addButton(new Button(this.fillerPaneGItem), 3);
-		clickPane.addButton(new Button(this.fillerPaneGItem));
 		clickPane.addButton(new Button(ItemHandler.getItem().getItem("DIAMOND_HELMET", 1, false, "&e&lOn-Equip", "&7", "&7*Commands that will execute only", "&7when the item is placed", "&7in an armor slot.", "&7", "&9&lCommands: &a" + 
 		this.listCommands(itemMap, ActionType.ON_EQUIP)), event -> {
 			this.commandListPane(player, itemMap, ActionType.ON_EQUIP);
@@ -1636,6 +1635,10 @@ public class UI {
 			this.commandListPane(player, itemMap, ActionType.ON_RECEIVE);
 		}));
 		clickPane.addButton(new Button(this.fillerPaneGItem));
+		clickPane.addButton(new Button(ItemHandler.getItem().getItem("381", 1, false, "&e&lOn-Death", "&7", "&7*Commands that will execute only", "&7when die with the", "&7item in your inventory.", "&7", "&9&lCommands: &a" + 
+		this.listCommands(itemMap, ActionType.ON_DEATH)), event -> {
+			this.commandListPane(player, itemMap, ActionType.ON_DEATH);
+		}));
 		clickPane.addButton(new Button(ItemHandler.getItem().getItem("37", 1, false, "&e&lMulti-Click-Air", "&7", "&7*Commands that will execute only", "&7when left and right", "&7clicking the air.", "&7", "&9&lCommands: &a" + 
 		this.listCommands(itemMap, ActionType.MULTI_CLICK_AIR)), event -> {
 			this.commandListPane(player, itemMap, ActionType.MULTI_CLICK_AIR);
@@ -2547,7 +2550,6 @@ public class UI {
 			}
 			this.flagPane(player, itemMap);
 		}));
-		flagPane.addButton(new Button(this.fillerPaneGItem));
 		flagPane.addButton(new Button(ItemHandler.getItem().getItem("LAPIS_LAZULI", 1, itemMap.isGlowing(), "&a&l&nGlowing", "&7", 
 				"&a&lTrue&f:&7 The item will glow as if it was enchanted!", "&7",
 				"&c&lFalse&f:&7 The item will not glow.", "&7", 
@@ -2556,6 +2558,18 @@ public class UI {
 				itemMap.setGlowing(false);
 			} else {
 				itemMap.setGlowing(true);
+			}
+			this.flagPane(player, itemMap);
+		}));
+		flagPane.addButton(new Button(this.fillerPaneGItem));
+				flagPane.addButton(new Button(ItemHandler.getItem().getItem("DIAMOND_SHOVEL", 7, itemMap.isStackable(), "&a&l&nStackable", "&7", 
+				"&a&lTrue&f:&7 The item will be stackable with itself!", "&7",
+				"&c&lFalse&f:&7 The item stack only if it did in vanilla.", "&7", 
+				"&9&lENABLED: &a" + (itemMap.isStackable() + "").toUpperCase()), event -> {
+			if (itemMap.isStackable()) {
+				itemMap.setStackable(false);
+			} else {
+				itemMap.setStackable(true);
 			}
 			this.flagPane(player, itemMap);
 		}));
@@ -2571,7 +2585,6 @@ public class UI {
 			}
 			this.flagPane(player, itemMap);
 		}));
-		flagPane.addButton(new Button(this.fillerPaneGItem));
 		flagPane.addButton(new Button(ItemHandler.getItem().getItem("REDSTONE", 1, itemMap.isAutoRemove(), "&a&l&nAuto Remove", "&7", 
 				"&a&lTrue&f:&7 Automatically removes the", "&7item from the players inventory", "&7when entering or joining a", "&7world that is not defined", "&7under the enabled-worlds.", "&7",
 				"&c&lFalse&f:&7 The player will keep the", "&7item when entering or joining", "&7an undefined world.", "&7", 
@@ -2928,6 +2941,7 @@ public class UI {
 		if (itemMap.isDynamic()) { itemflags += "DYNAMIC, "; }
 		if (itemMap.isAnimated()) { itemflags += "ANIMATE, "; }
 		if (itemMap.isGlowing()) { itemflags += "GLOWING, "; }
+		if (itemMap.isStackable()) { itemflags += "STACKABLE, "; }
 		if (itemMap.isItemStore()) { itemflags += "ITEM-STORE, "; }
 		if (itemMap.isCancelEvents()) { itemflags += "CANCEL-EVENTS, "; }
 		if (itemMap.isCountLock()) { itemflags += "COUNT-LOCK, "; }

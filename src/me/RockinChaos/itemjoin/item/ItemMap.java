@@ -235,6 +235,7 @@ public class ItemMap {
 	private boolean itemChangable = false;
 	private boolean alwaysGive = false;
 	private boolean autoRemove = false;
+	private boolean stackable = false;
 	private boolean CreativeBypass = false;
 	private boolean AllowOpBypass = false;
 	
@@ -442,6 +443,7 @@ public class ItemMap {
 			this.itemChangable = Utils.getUtils().containsIgnoreCase(this.itemflags, "allow-modifications") || Utils.getUtils().containsIgnoreCase(this.itemflags, "item-changable");
 			this.alwaysGive = Utils.getUtils().containsIgnoreCase(this.itemflags, "always-give");
 			this.autoRemove = Utils.getUtils().containsIgnoreCase(this.itemflags, "auto-remove");
+			this.stackable = Utils.getUtils().containsIgnoreCase(this.itemflags, "stackable");
 			this.dynamic = Utils.getUtils().containsIgnoreCase(this.itemflags, "dynamic");
 			this.animate = Utils.getUtils().containsIgnoreCase(this.itemflags, "animate");
 			this.glowing = Utils.getUtils().containsIgnoreCase(this.itemflags, "glowing") || Utils.getUtils().containsIgnoreCase(this.itemflags, "glow");
@@ -1266,6 +1268,15 @@ public class ItemMap {
     */
 	public void setAutoRemove(final boolean bool) {
 		this.autoRemove = bool;
+	}
+	
+   /**
+    * Sets the Stackable Flag.
+    * 
+    * @param bool - The value to be set.
+    */
+	public void setStackable(final boolean bool) {
+		this.stackable = bool;
 	}
 	
    /**
@@ -2695,6 +2706,15 @@ public class ItemMap {
 	}
 	
    /**
+    * Checks if the Stackable Flag is enabled.
+    * 
+    * @return If it is enabled.
+    */
+	public boolean isStackable() {
+		return this.stackable;
+	}
+	
+   /**
     * Checks if the Animate Flag is enabled.
     * 
     * @return If it is enabled.
@@ -2881,6 +2901,7 @@ public class ItemMap {
 			else if (findFlag.equals("inventory-modify")) { return blockMovement; }
 			else if (findFlag.equals("inventory-close")) { return closeInventory; }
 			else if (findFlag.equals("item-store")) { return itemStore; } 
+			else if (findFlag.equals("stackable")) { return stackable; } 
 			else if (findFlag.equals("item-modifiable")) { return itemModify; } 
 			else if (findFlag.equals("item-craftable")) { return noCrafting; } 
 			else if (findFlag.equals("item-repairable")) { return noRepairing; } 
@@ -3741,7 +3762,7 @@ public class ItemMap {
 			Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
 				@Override
 				public void run() {
-					if (itemMap.warmLocation(player, location)) {
+					if (itemMap.warmLocation(player, location, action)) {
 						String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = Utils.getUtils().translateLayout(itemMap.getCustomName(), player); 
 						LanguageAPI.getLang(false).sendLangMessage("General.itemWarming", player, placeHolders);
 						itemMap.warmCycle(player, itemMap, (warmCount - 1), location, itemCopy, action, slot);	
@@ -3758,7 +3779,7 @@ public class ItemMap {
 			Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
 				@Override
 				public void run() {
-					if (!player.isDead() && player.isOnline()) {
+					if ((!player.isDead() || action.equalsIgnoreCase("ON_DEATH")) && player.isOnline()) {
 						if (isExecuted(player, action, slot, itemCopy)) { 
 							if (itemMap.itemCost == null || itemMap.itemCost.isEmpty()) { itemMap.withdrawBalance(player); } 
 							else { itemMap.withdrawItemCost(player); }
@@ -3784,8 +3805,8 @@ public class ItemMap {
     * @param Location - The Location of the Warmup.
     * @return If the Player is still inside the Warmup Location.
     */
-	private boolean warmLocation(final Player player, final Location location) {
-	    if (player.getLocation().distance(location) >= 1 || player.isDead()) {
+	private boolean warmLocation(final Player player, final Location location, final String action) {
+	    if (player.getLocation().distance(location) >= 1 || (!action.equalsIgnoreCase("ON_DEATH") && player.isDead())) {
 	    	return false;
 	    }
 	    return true;

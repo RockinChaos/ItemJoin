@@ -492,6 +492,17 @@ public class LegacyAPI {
 	}
 	
    /**
+    * Registers the Legacy Stackable Listener.
+    * Only called when the Server version is below 1.12.
+    * 
+    */
+	public void registerStackable() {
+		if (!ServerHandler.getServer().hasSpecificUpdate("1_12") && !Utils.getUtils().isRegistered(me.RockinChaos.itemjoin.listeners.legacy.Legacy_Stackable.class.getSimpleName())) { 
+			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new me.RockinChaos.itemjoin.listeners.legacy.Legacy_Stackable(), ItemJoin.getInstance()); 
+		}
+	}
+	
+   /**
     * Registers the Legacy Interact Listener.
     * Only called when the Server version is below 1.8.
     * 

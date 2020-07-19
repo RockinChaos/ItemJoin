@@ -44,6 +44,7 @@ import me.RockinChaos.itemjoin.listeners.MobsDrop;
 import me.RockinChaos.itemjoin.listeners.Pickups;
 import me.RockinChaos.itemjoin.listeners.Placement;
 import me.RockinChaos.itemjoin.listeners.RepairCraft;
+import me.RockinChaos.itemjoin.listeners.Stackable;
 import me.RockinChaos.itemjoin.listeners.Storable;
 import me.RockinChaos.itemjoin.listeners.SwitchHands;
 import me.RockinChaos.itemjoin.listeners.triggers.LimitSwitch;
@@ -407,6 +408,11 @@ public class ConfigHandler {
 		}
 		if ((itemMap.isMovement() || itemMap.isInventoryClose()) && !Utils.getUtils().isRegistered(InventoryClick.class.getSimpleName())) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new InventoryClick(), ItemJoin.getInstance());
+		}
+		if (ServerHandler.getServer().hasSpecificUpdate("1_12") && itemMap.isStackable() && !Utils.getUtils().isRegistered(Stackable.class.getSimpleName())) {
+			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Stackable(), ItemJoin.getInstance());
+		} else if (itemMap.isStackable()) {
+			LegacyAPI.getLegacy().registerStackable();
 		}
 		if ((itemMap.isDeathDroppable() || itemMap.isSelfDroppable()) && !Utils.getUtils().isRegistered(Drops.class.getSimpleName())) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Drops(), ItemJoin.getInstance());

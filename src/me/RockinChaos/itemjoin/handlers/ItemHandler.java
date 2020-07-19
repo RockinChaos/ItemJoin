@@ -379,6 +379,34 @@ public class ItemHandler {
 	}
 	
    /**
+	* Stacks two items together.
+	* 
+	* @param player - The player being referenced.
+	* @param item1 - The main item being removed.
+	* @param item2 - The secondary item being stacked.
+	* @param slot - The new event slot of the main item.
+	* @return The Remaining amount to be set (if any).
+	*/
+	public int stackItems(final Player player, final ItemStack item1, final ItemStack item2, final int slot) {
+		int MINECRAFT_STACK_MAX = 64;
+		int DESIRED_STACK_SIZE = item1.getAmount() + item2.getAmount();
+		int REMAINING_STACK_SIZE = 0;
+		if (DESIRED_STACK_SIZE > MINECRAFT_STACK_MAX) {
+			item2.setAmount(MINECRAFT_STACK_MAX);
+			item1.setAmount(DESIRED_STACK_SIZE - MINECRAFT_STACK_MAX);
+			REMAINING_STACK_SIZE = item1.getAmount();
+		} else {
+			item2.setAmount(item2.getAmount() + item1.getAmount());
+			if (slot == -1) {
+				player.getOpenInventory().setCursor(new ItemStack(Material.AIR));
+			} else if (slot != -2) {
+				player.getInventory().setItem(slot, new ItemStack(Material.AIR));
+			}
+		}
+		return REMAINING_STACK_SIZE;
+	}
+	
+   /**
     * Gets the existing MapView for the image id.
     * 
     * @param id - that will recieve the items.
