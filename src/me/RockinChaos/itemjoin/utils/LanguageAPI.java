@@ -76,7 +76,8 @@ public class LanguageAPI {
     * @param nodeLocation - The String location of the Language Message. 
     */
 	public String getLangMessage(final String nodeLocation) {
-		return ConfigHandler.getConfig(false).getFile(this.langType.nodeLocation()).getString(nodeLocation);
+		String message = ConfigHandler.getConfig(false).getFile(this.langType.nodeLocation()).getString(nodeLocation);
+		return (message != null && message.isEmpty() ? null : message);
 	}
 	
    /**
