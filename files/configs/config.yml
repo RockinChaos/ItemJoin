@@ -1,7 +1,26 @@
-# --{ =-=-=-=-=-=-=-=-=-= ItemJoin's Configuration Settings, by RockinChaos =-=-=-=-=-=-=-=-=-= }--
-# See the tutorial page for a more in-depth explaination; https://github.com/RockinChaos/ItemJoin/wiki
+# +----------------------------------------------------------------------------------------------+ #
+# |                        _____                      _____                                      | #
+# |                       |_   _|_                   |_   _|     _                               | #
+# |                         | | | |                    | |      (_)                              | #
+# |                         | | | |_ ___  _ __ ___     | | ____  _ ____                          | #
+# |                         | | | __/ _ \| '_ ` _ \ _  | |/ _  \| |  _ \                         | #
+# |                        _| |_| ||  __/| | | | | | |_| | (_|  | | | | |                        | #
+# |                       |_____|\__\___||_|_| |_|_|\____/\____/|_|_| |_|                        | #
+# |                                                                                              | #
+# |                      ItemJoin's Configuration Settings, by RockinChaos                       | #
+# |                                                                                              | #
+# |     Source Code:     https://github.com/RockinChaos/ItemJoin                                 | #
+# |     Bug Reports:     https://github.com/RockinChaos/ItemJoin/issues                          | #
+# |     Wiki (Docs):     https://github.com/RockinChaos/ItemJoin/wiki                            | #
+# |     Discord Support: https://discord.gg/D5FnJ7C                                              | #
+# |                                                                                              | #
+# +----------------------------------------------------------------------------------------------+ #
+
+# Modifying this will cause this file to break and regenerate.
 config-Version: 7
 
+# At the moment, the available language translations are; English, Russian, French, Spanish, Chinese, Traditional Chinese.
+# If you want to contribute to a language translation please create a pull request; https://github.com/RockinChaos/ItemJoin/tree/master/files/locales
 Language: 'English'
 
 # These are typically general maintenance settings that do not affect functionality.

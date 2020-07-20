@@ -1,5 +1,8 @@
 # --{ =-=-=-=-=-=-=-=-=-= ItemJoin's Custom Item Configurations, by RockinChaos =-=-=-=-=-=-=-=-=-= }--
 # See the tutorial page for a more in-depth explaination; https://github.com/RockinChaos/ItemJoin/wiki
+# Join the discord for easy plugin support; https://discord.gg/D5FnJ7C
+
+# Modifying this will cause this file to break and regenerate.
 items-Version: 6
 
 # General options that apply to the custom items functionality.
