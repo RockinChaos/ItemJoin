@@ -115,7 +115,7 @@ public class ConfigHandler {
 		DependAPI.getDepends(true);
 		LogFilter.getFilter(true);
 		SQLite.getLite(true);
-		ServerHandler.getServer().runAsyncThread(main -> { ItemDesigner.getDesigner(true); });
+		ServerHandler.getServer().runAsyncThread(main -> { ItemDesigner.getDesigner(true); }, 2L);
 		ServerHandler.getServer().runAsyncThread(main -> { Metrics.getMetrics(true); }, 100L);
 	}
 	
