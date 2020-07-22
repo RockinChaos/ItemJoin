@@ -47,6 +47,7 @@ import me.clip.placeholderapi.PlaceholderAPI;
 
 public class Utils {
 	
+	private HashMap < String, String > mojangUUID = new HashMap < String, String > ();
     private static Utils util;
 	
    /**
@@ -296,11 +297,16 @@ public class Utils {
     */
     public String getMojangUUID(final String name) {
         String url = "https://api.mojang.com/users/profiles/minecraft/" + name;
+        if (this.mojangUUID.get(name) != null) { return this.mojangUUID.get(name); }
         try {
-            String UUIDJson = new URL(url).toString();           
-            if(UUIDJson.isEmpty()) return null;                       
-            JSONObject UUIDObject = (JSONObject) JSONValue.parseWithException(UUIDJson);
-            return UUIDObject.get("id").toString();
+        	if (this.mojangUUID.get(name) == null) {
+	            String UUIDJson = new URL(url).toString();           
+	            if(UUIDJson.isEmpty()) return null;                       
+	            JSONObject UUIDObject = (JSONObject) JSONValue.parseWithException(UUIDJson);
+	            String UUID = UUIDObject.get("id").toString();
+	            this.mojangUUID.put(name, UUID);
+	            return UUID;
+        	}
         } catch (Exception e) { }
         return null;
     }

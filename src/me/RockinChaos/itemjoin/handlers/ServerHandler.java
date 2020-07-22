@@ -41,19 +41,6 @@ public class ServerHandler {
 	private static ServerHandler server;
 	private String packageName = ItemJoin.getInstance().getServer().getClass().getPackage().getName();
 	private String serverVersion = this.packageName.substring(this.packageName.lastIndexOf('.') + 1).replace("_", "").replace("R0", "").replace("R1", "").replace("R2", "").replace("R3", "").replace("R4", "").replace("R5", "").replaceAll("[a-z]", "");
-
-   /**
-    * Checks if the server is running the specified version.
-    * 
-    * @param versionString - The version to compare against the server version, example: '1_13'.
-    * @return If the server version is greater than or equal to the specified version.
-    */
-	public boolean hasSpecificUpdate(final String versionString) {
-		if (Integer.parseInt(serverVersion) >= Integer.parseInt(versionString.replace("_", ""))) {
-			return true;
-		}
-		return false;
-	}
 	
    /**
     * Runs the methods Async on the main thread.
@@ -82,19 +69,6 @@ public class ServerHandler {
 	}
 	
    /**
-    * Runs the methods Async on the main thread.
-    * 
-    * @param input - The methods to be executed Async on the main thread.
-    */
-	public void runAsyncThread(final Consumer<String> input, long delay, long period) {
-		Bukkit.getServer().getScheduler().runTaskTimerAsynchronously(ItemJoin.getInstance(), () -> { 
-			Bukkit.getServer().getScheduler().runTask(ItemJoin.getInstance(), () -> {
-				input.accept("MAIN");
-			}); 
-		}, delay, period);
-	}
-	
-   /**
     * Sends a low priority log message as the plugin header.
     * 
     * @param message - The unformatted message text to be sent.
@@ -104,6 +78,19 @@ public class ServerHandler {
 		message = prefix + message;
 		if (message.equalsIgnoreCase("") || message.isEmpty()) { message = ""; }
 		Bukkit.getServer().getLogger().info(message);
+	}
+	
+   /**
+    * Checks if the server is running the specified version.
+    * 
+    * @param versionString - The version to compare against the server version, example: '1_13'.
+    * @return If the server version is greater than or equal to the specified version.
+    */
+	public boolean hasSpecificUpdate(final String versionString) {
+		if (Integer.parseInt(serverVersion) >= Integer.parseInt(versionString.replace("_", ""))) {
+			return true;
+		}
+		return false;
 	}
 	
    /**
@@ -188,7 +175,7 @@ public class ServerHandler {
     * @param uuid - The UUID of the player to have their skin fetched and set to the GameProfile.
     * @return If the skin was successfully found and set to the specified GameProfile.
     */
-	public boolean setSkin(final GameProfile profile, final UUID uuid) {
+	public GameProfile setSkin(final GameProfile profile, final UUID uuid) {
 		try {
 			HttpsURLConnection connection = (HttpsURLConnection) new URL(String.format("https://sessionserver.mojang.com/session/minecraft/profile/%s?unsigned=false", UUIDTypeAdapter.fromUUID(uuid))).openConnection();
 			if (connection.getResponseCode() == HttpsURLConnection.HTTP_OK) {
@@ -196,12 +183,12 @@ public class ServerHandler {
 				String skin = reply.split("\"value\":\"")[1].split("\"")[0];
 				String signature = reply.split("\"signature\":\"")[1].split("\"")[0];
 				profile.getProperties().put("textures", new Property("textures", skin, signature));
-				return true;
+				return profile;
 			} else {
 				ServerHandler.getServer().logWarn("Connection could not be opened (Response code " + connection.getResponseCode() + ", " + connection.getResponseMessage() + ")");
-				return false;
+				return profile;
 			}
-		} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); return false; }
+		} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); return profile; }
 	}
     
    /**

@@ -356,8 +356,7 @@ public class ItemHandler {
 					if (this.gameProfiles.get(owner) == null) {
 						String uuidString = Utils.getUtils().getMojangUUID(owner);
 						if (uuidString != null) {
-							GameProfile profile = new GameProfile(Utils.getUtils().UUIDConversion(uuidString), owner);
-							ServerHandler.getServer().setSkin(profile, Utils.getUtils().UUIDConversion(uuidString));
+							GameProfile profile = ServerHandler.getServer().setSkin(new GameProfile(Utils.getUtils().UUIDConversion(uuidString), owner), Utils.getUtils().UUIDConversion(uuidString));
 							this.gameProfiles.put(owner, profile);
 						}
 					}
