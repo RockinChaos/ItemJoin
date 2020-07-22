@@ -276,7 +276,8 @@ public class InventoryCrafting implements Listener {
     */
 	private void handleClose(final Consumer < Integer > input, final Player player, final InventoryView view, final ItemStack[] inventory) {
 		if (PlayerHandler.getPlayer().isCraftingInv(view)) {
-			if (!ItemHandler.getItem().isContentsEmpty(inventory)) {
+			if (!ItemHandler.getItem().isContentsEmpty(inventory) && antiSpamPlayers.get(PlayerHandler.getPlayer().getPlayerID(player)) == null) {
+				antiSpamPlayers.put(PlayerHandler.getPlayer().getPlayerID(player), true);
 				for (int i = 0; i <= 4; i++) {
 					for (ItemMap itemMap: ItemUtilities.getUtilities().getCraftingItems()) {
 						if (!itemMap.isSimilar(inventory[i])) {
@@ -284,10 +285,7 @@ public class InventoryCrafting implements Listener {
 						}
 					}
 				}
-				if (antiSpamPlayers.get(PlayerHandler.getPlayer().getPlayerID(player)) == null) { 
-					antiSpamPlayers.put(PlayerHandler.getPlayer().getPlayerID(player), true);
-					this.delayReturnCrafting(player, inventory, 1L); 
-				} 
+				this.delayReturnCrafting(player, inventory, 1L);
 			}
 		} else {
 			ServerHandler.getServer().runAsyncThread(main -> {
