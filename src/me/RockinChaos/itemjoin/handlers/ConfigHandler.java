@@ -89,6 +89,15 @@ public class ConfigHandler {
 	    ItemJoin.getInstance().getCommand("itemjoin").setExecutor(new Commands());
 	    ItemJoin.getInstance().getCommand("itemjoin").setTabCompleter(new ChatTab());
 		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Menu(), ItemJoin.getInstance());
+		if (this.clearEnabled("Join") && !Utils.getUtils().isRegistered(PlayerJoin.class.getSimpleName())) {
+			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerJoin(), ItemJoin.getInstance());
+		}
+		if (this.clearEnabled("World-Switch") && !Utils.getUtils().isRegistered(WorldSwitch.class.getSimpleName())) {
+			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new WorldSwitch(), ItemJoin.getInstance());
+		}
+		if (this.clearEnabled("Region-Enter") && !Utils.getUtils().isRegistered(PlayerGuard.class.getSimpleName()) && DependAPI.getDepends(false).getGuard().guardEnabled()) {
+			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerGuard(), ItemJoin.getInstance());
+		}
 		DependAPI.getDepends(false).sendUtilityDepends();
 		ServerHandler.getServer().logInfo(ConfigHandler.getConfig(false).getConfigurationSection().getKeys(false).size() + " Custom item(s) loaded!");
 		this.registerGlow();
@@ -265,6 +274,20 @@ public class ConfigHandler {
 		}
 		return "";
 	}
+	
+   /**
+    * Checks if the specified clear items type is enabled.
+    * 
+    * @param type - The item clearing trigger.
+    * @return If the clear type is enabled.
+    */
+	public boolean clearEnabled(String type) {
+		if (this.getFile("config.yml").getString("Clear-Items." + type) != null 
+		&& !this.getFile("config.yml").getString("Clear-Items." + type).equalsIgnoreCase("DISABLED") && !this.getFile("config.yml").getString("Clear-Items." + type).equalsIgnoreCase("FALSE")) {
+			return true;
+		}
+		return false;
+	}
 
    /**
     * Checks if Debugging is enabled.
@@ -375,8 +398,7 @@ public class ConfigHandler {
 		if (((!itemMap.isGiveOnDisabled() && itemMap.isGiveOnWorldSwitch()) || itemMap.isAutoRemove()) && !Utils.getUtils().isRegistered(WorldSwitch.class.getSimpleName())) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new WorldSwitch(), ItemJoin.getInstance());
 		}
-		if (!itemMap.isGiveOnDisabled() && (itemMap.isGiveOnRegionEnter() || itemMap.isTakeOnRegionLeave() || (this.getFile("config.yml").getString("Clear-Items.Region-Enter") != null 
-			&& !this.getFile("config.yml").getString("Clear-Items.Region-Enter").equalsIgnoreCase("DISABLED") && !this.getFile("config.yml").getString("Clear-Items.Region-Enter").equalsIgnoreCase("FALSE"))) 
+		if (!itemMap.isGiveOnDisabled() && (itemMap.isGiveOnRegionEnter() || itemMap.isTakeOnRegionLeave()) 
 			&& !Utils.getUtils().isRegistered(PlayerGuard.class.getSimpleName()) && DependAPI.getDepends(false).getGuard().guardEnabled()) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerGuard(), ItemJoin.getInstance());
 		}
