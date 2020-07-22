@@ -154,6 +154,20 @@ public class Commands implements CommandExecutor {
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&ahttps://github.com/RockinChaos/ItemJoin/issues");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]----------------&a&l[&e Help Menu 9/9 &a&l]&a&l&m---------------[");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
+		} else if (Execute.DEBUG.accept(sender, args, 1)) {
+			LanguageAPI.getLang(false).dispatchMessage(sender, "");
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&lConfig Version: &e" + ConfigHandler.getConfig(false).getFile("config.yml").getString("config-Version"));
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&lDebugging: &e" + ConfigHandler.getConfig(false).debugEnabled());
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&lClear-Type: &e" + ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Type"));
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&lClear-Delay: &e" + ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Delay-Tick"));
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&lClear-Join: &e" + ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Join"));
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&lClear-World: &e" + ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.World-Switch"));
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&lClear-Region: &e" + ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Region-Enter"));
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&lClear-Options: &e" + ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Options"));
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&lClear-Blacklist: &e" + ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Blacklist"));
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]----------------&a&l[&e Debug Menu 1/1 &a&l]&a&l&m--------------[");
+			LanguageAPI.getLang(false).dispatchMessage(sender, "");
 		} else if (Execute.RELOAD.accept(sender, args, 0)) {
 			SQLite.getLite(false).executeLaterStatements();
 			ItemUtilities.getUtilities().closeAnimations();
@@ -564,6 +578,7 @@ public class Commands implements CommandExecutor {
 	public enum Execute {
 		DEFAULT("", "itemjoin.use", false),
 		HELP("help", "itemjoin.use", false),
+		DEBUG("debug", "itemjoin.debug", false),
 		RELOAD("rl, reload", "itemjoin.reload", false),
 		MENU("menu, creator", "itemjoin.menu", true),
 		INFO("info", "itemjoin.use", true),
