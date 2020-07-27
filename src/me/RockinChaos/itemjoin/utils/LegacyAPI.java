@@ -17,11 +17,11 @@
  */
 package me.RockinChaos.itemjoin.utils;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -31,6 +31,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+import com.sun.xml.internal.ws.util.StringUtils;
 
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
@@ -344,10 +345,47 @@ public class LegacyAPI {
     * 
     * @param tempItem - The ItemStack to be updated.
     * @param itemMap - The ItemMap having their book pages set.
-    * @return The updated ItemStack.
     */
-	public ItemStack setGlowing(final ItemStack tempItem, final ItemMap itemMap) {
-		return this.setGlowEnchant(tempItem, itemMap);
+	public void setGlowing(final ItemStack tempItem, final ItemMap itemMap) {
+		itemMap.setTempItem(this.setGlowEnchant(tempItem, itemMap));
+	}
+	
+   /**
+    * Sets the armor value to the items attributes.
+    * 
+    * @param tempItem - The ItemStack to be updated.
+    * @param itemMap - The ItemMap having their armor value set.
+    */
+	public void setAttributes(final ItemStack tempItem, final ItemMap itemMap) {
+		if (ServerHandler.getServer().hasSpecificUpdate("1_9") && !ServerHandler.getServer().hasSpecificUpdate("1_13") && itemMap.getAttributes() != null && !itemMap.getAttributes().isEmpty()) {
+			try {
+				String slot = ItemHandler.getItem().getDesignatedSlot(itemMap.getMaterial());
+				Class < ? > craftItemStack = Reflection.getReflection().getCraftBukkitClass("inventory.CraftItemStack");
+				Object nms = craftItemStack.getMethod("asNMSCopy", ItemStack.class).invoke(null, tempItem);
+				Object tag = Reflection.getReflection().getMinecraftClass("ItemStack").getMethod("getTag").invoke(nms);
+				Object modifiers = Reflection.getReflection().getMinecraftClass("NBTTagList").getConstructor().newInstance();
+				if (tag == null) { tag = Reflection.getReflection().getMinecraftClass("NBTTagCompound").getConstructor().newInstance(); }
+				for (String attribute: itemMap.getAttributes().keySet()) {
+					int uuid = new BigInteger((itemMap.getConfigName() + attribute).getBytes()).intValue();
+					Object attrib = Reflection.getReflection().getMinecraftClass("NBTTagCompound").getConstructor().newInstance();
+					double value = itemMap.getAttributes().get(attribute);
+					String name = attribute.toLowerCase().replaceFirst("_", ".");
+					if (name.contains("_")) { String[] nameSplit = name.split("_"); name = nameSplit[0]; nameSplit[0] = ""; for (String rename: nameSplit) { name += StringUtils.capitalize(rename); } }
+					attrib.getClass().getMethod("setString", String.class, String.class).invoke(attrib, "AttributeName", name);
+					attrib.getClass().getMethod("setString", String.class, String.class).invoke(attrib, "Name", name);
+					attrib.getClass().getMethod("setString", String.class, String.class).invoke(attrib, "Slot", slot);
+					attrib.getClass().getMethod("setDouble", String.class, double.class).invoke(attrib, "Amount", value);
+					attrib.getClass().getMethod("setInt", String.class, int.class).invoke(attrib, "Operation", 0);
+					attrib.getClass().getMethod("setInt", String.class, int.class).invoke(attrib, "UUIDLeast", uuid);
+					attrib.getClass().getMethod("setInt", String.class, int.class).invoke(attrib, "UUIDMost", (uuid / 2));
+					modifiers.getClass().getMethod("add", Reflection.getReflection().getMinecraftClass("NBTBase")).invoke(modifiers, attrib);
+				}
+				tag.getClass().getMethod("set", String.class, Reflection.getReflection().getMinecraftClass("NBTBase")).invoke(tag, "AttributeModifiers", modifiers);
+				itemMap.setTempItem((ItemStack) craftItemStack.getMethod("asCraftMirror", nms.getClass()).invoke(null, nms));
+			} catch (Exception e) {
+				ServerHandler.getServer().sendDebugTrace(e);
+			}
+		}
 	}
 	
    /**

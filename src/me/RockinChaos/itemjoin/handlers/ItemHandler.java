@@ -17,6 +17,7 @@
  */
 package me.RockinChaos.itemjoin.handlers;
 
+import java.io.EOFException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -604,8 +605,10 @@ public class ItemHandler {
 	        }
 	        data.close();
 	        return inventory;
+	    } catch (EOFException e) {
+	    	return null;
 	    } catch (Exception e) {
-	        e.printStackTrace();
+	        ServerHandler.getServer().sendDebugTrace(e);
 	    }
 	    return null;
 	}
@@ -655,6 +658,19 @@ public class ItemHandler {
 			}
 		}
 		return false;
+	}
+	
+   /**
+    * Attempts to fetch the designated slot of an item.
+    * 
+    * @param material - The ItemStack to be checked for a designated slot.
+    * @return The proper designated slot name.
+    */
+	public String getDesignatedSlot(final Material material) {
+		String name = material.name().contains("_") ? material.name().split("_")[1] : material.name();
+		String hand = (ServerHandler.getServer().hasSpecificUpdate("1_13") ? "hand" : "mainhand");
+		return (name != null ? (name.equalsIgnoreCase("HELMET") ? "head" : name.equalsIgnoreCase("CHESTPLATE") ? "chest" : name.equalsIgnoreCase("LEGGINGS") ? "legs" : name.equalsIgnoreCase("BOOTS") ? "feet" : 
+			    name.equalsIgnoreCase("HOE") ? hand : name.equalsIgnoreCase("SWORD") ? hand : name.equalsIgnoreCase("SHOVEL") ? hand : name.equalsIgnoreCase("AXE") ? hand : name.equalsIgnoreCase("PICKAXE") ? hand : "noslot") : "noslot");
 	}
 	
    /**

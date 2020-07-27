@@ -33,6 +33,7 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.block.banner.Pattern;
 import org.bukkit.block.banner.PatternType;
 import org.bukkit.command.CommandSender;
@@ -496,9 +497,19 @@ public class UI {
 				potionList += "&a" + split + " /n ";
 			}
 		}
+		String attributeList = "";
+		String attributeString = "";
+		if (Utils.getUtils().nullCheck(itemMap.getAttributes().toString()) != "NONE") {
+			for (String attribute: itemMap.getAttributes().keySet()) {
+				attributeString += attribute + ":" + itemMap.getAttributes().get(attribute) + ", ";
+			}
+			for (String split: Utils.getUtils().softSplit(Utils.getUtils().nullCheck(attributeString.substring(0, attributeString.length())))) {
+				attributeList += "&a" + split + " /n ";
+			}
+		}
 		String patternList = "";
 		String patternString = "";
-		if (Utils.getUtils().nullCheck(itemMap.getPotionEffect().toString()) != "NONE") {
+		if (Utils.getUtils().nullCheck(itemMap.getBannerPatterns().toString()) != "NONE") {
 			for (Pattern patterns: itemMap.getBannerPatterns()) {
 				patternString += patterns.getColor() + ":" + patterns.getPattern().name().toUpperCase() + ", ";
 			}
@@ -675,6 +686,10 @@ public class UI {
 		} else if (itemMap.getMaterial().toString().contains("BANNER")) {
 			creatingPane.addButton(new Button(ItemHandler.getItem().getItem("CLAY_BALL", 1, false, "&e&lBanner Patterns", "&7", "&7*Set custom patterns that", "&7will appear on the item.", "&9&lBanner-Meta: &a" + Utils.getUtils().nullCheck(patternList)),
 					event -> this.bannerPane(player, itemMap)));
+		} else if (ServerHandler.getServer().hasSpecificUpdate("1_9") && !ItemHandler.getItem().getDesignatedSlot(itemMap.getMaterial()).equalsIgnoreCase("noslot") && !itemMap.getMaterial().toString().contains("LEATHER_")) {
+			creatingPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "ENCHANTED_GOLDEN_APPLE" : "322:1"), 1, false, "&a&lAttributes", "&7", "&7*Add a custom attribute to", "&7your armor or weapon.", (Utils.getUtils().nullCheck(attributeList) != "NONE" ? "&9&lAttributes: &a" + attributeList : "")), event -> {
+				this.attributePane(player, itemMap, false);
+			}));
 		} else {
 			creatingPane.addButton(new Button(ItemHandler.getItem().getItem("MAGMA_CREAM", 1, false, "&e&lOther Settings", "&7", "&7*Settings that are specific", "&7to the item's material type.", (this.specialItem(itemMap) ? "" : "&7"),
 					(this.specialItem(itemMap) ? "" : "&c&lERROR: &7A " + itemMap.getMaterial().name() + " &7is NOT"), (this.specialItem(itemMap) ? "" : "&7a special material type.")), event -> {
@@ -2539,7 +2554,7 @@ public class UI {
 			}
 			this.flagPane(player, itemMap);
 		}));
-		flagPane.addButton(new Button(ItemHandler.getItem().getItem(itemMap.isCreativeBypass() ? "ENCHANTED_GOLDEN_APPLE" : "GOLDEN_APPLE", 1, itemMap.isCreativeBypass(), "&a&l&nCreativeBypass", "&7", 
+		flagPane.addButton(new Button(ItemHandler.getItem().getItem(itemMap.isCreativeBypass() ? (ServerHandler.getServer().hasSpecificUpdate("1_13") ? "ENCHANTED_GOLDEN_APPLE" : "322:1") : "GOLDEN_APPLE", 1, itemMap.isCreativeBypass(), "&a&l&nCreativeBypass", "&7", 
 				"&a&lTrue&f:&7 Allows players who are in Creative", "&7to bypass any itemflags that add", "&7restrictions for this item.", "&7",
 				"&c&lFalse&f:&7 Players who are in Creative will", "&7be restricted by itemflags that add", "&7restrictions for this item.", "&7", 
 				"&9&lENABLED: &a" + (itemMap.isCreativeBypass() + "").toUpperCase()), event -> {
@@ -4071,7 +4086,7 @@ public class UI {
 			}
 			itemMap.setLimitModes(limitModes.toString().substring(0, limitModes.toString().length() - 1).substring(1));this.limitPane(player, itemMap);
 		}));
-		limitPane.addButton(new Button(ItemHandler.getItem().getItem(limitModes.contains("CREATIVE") ? "ENCHANTED_GOLDEN_APPLE" : "GOLDEN_APPLE", 1, false, "&6&l&nCREATIVE", "&7", "&7*Limits the item to CREATIVE mode.", "&9&lENABLED: &a" + 
+		limitPane.addButton(new Button(ItemHandler.getItem().getItem(limitModes.contains("CREATIVE") ? (ServerHandler.getServer().hasSpecificUpdate("1_13") ? "ENCHANTED_GOLDEN_APPLE" : "322:1") : "GOLDEN_APPLE", 1, false, "&6&l&nCREATIVE", "&7", "&7*Limits the item to CREATIVE mode.", "&9&lENABLED: &a" + 
 		(limitModes.contains("CREATIVE") + "").toUpperCase()), event -> {
 			if (limitModes.contains("CREATIVE")) {
 				limitModes.remove("CREATIVE");
@@ -4896,6 +4911,78 @@ public class UI {
 	
    /**
     * Opens the Pane for the Player.
+    * This Pane is for modifying item attributes.
+    * 
+    * @param player - The Player to have the Pane opened.
+    * @param itemMap - The ItemMap currently being modified.
+    */
+	private void attributePane(final Player player, final ItemMap itemMap, final boolean isLeather) {
+		Interface attributePane = new Interface(true, 3, this.GUIName, player);
+		if (isLeather) {
+			attributePane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the other settings menu."), event -> this.otherPane(player, itemMap)));
+		} else {
+			attributePane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> this.creatingPane(player, itemMap)));
+		}
+		for (Attribute attribute: Attribute.values()) {
+			String checkAttribute = (itemMap.getAttributes().containsKey(attribute.name()) ? (attribute.name() + ":" + itemMap.getAttributes().get(attribute.name())) : "NONE");
+			attributePane.addButton(new Button(ItemHandler.getItem().getItem("NAME_TAG", 1, itemMap.getAttributes().containsKey(attribute.name()), "&f" + attribute.name(), "&7", "&7*Add this custom attribute to the item.", 
+							(checkAttribute != "NONE" ? "&9&lInformation: &a" + checkAttribute : "")), event -> { 
+				if (itemMap.getAttributes().containsKey(attribute.name())) {
+					Map<String, Double> attributeList = itemMap.getAttributes();
+					attributeList.remove(attribute.name());
+					this.attributePane(player, itemMap, isLeather); 
+				} else {
+					this.strengthPane(player, itemMap, attribute, isLeather); 
+				}
+			}));
+		}
+		attributePane.open(player);
+	}
+	
+   /**
+    * Opens the Pane for the Player.
+    * This Pane is for modifying item attributes strength.
+    * 
+    * @param player - The Player to have the Pane opened.
+    * @param itemMap - The ItemMap currently being modified.
+    */
+	private void strengthPane(final Player player, final ItemMap itemMap, final Attribute attribute, final boolean isLeather) {
+		Interface strengthPane = new Interface(true, 6, this.GUIName, player);
+		strengthPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the custom attributes menu."), event -> this.attributePane(player, itemMap, isLeather)));
+		strengthPane.addButton(new Button(ItemHandler.getItem().getItem("STAINED_GLASS_PANE:4", 1, false, "&e&lCustom Strength", "&7", "&7*Click to set a custom strength", "&7value for the custom attribute."), event -> {
+			player.closeInventory();
+			String[] placeHolders = LanguageAPI.getLang(false).newString();
+			placeHolders[14] = "STRENGTH";
+			placeHolders[15] = "14.0";
+			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
+			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+		}, event -> {
+			if (Utils.getUtils().isInt(ChatColor.stripColor(event.getMessage())) || Utils.getUtils().isDouble(ChatColor.stripColor(event.getMessage()))) {
+				Map<String, Double> attributeList = itemMap.getAttributes();
+				attributeList.put(attribute.name(), Double.parseDouble(ChatColor.stripColor(event.getMessage())));
+				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				placeHolders[14] = "STRENGTH";
+				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+			} else {
+				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				placeHolders[16] = ChatColor.stripColor(event.getMessage());
+				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.notInteger", player, placeHolders);
+			}
+			this.attributePane(event.getPlayer(), itemMap, isLeather);
+		}));
+		for (double i = 1; i < 90; i++) {
+			final double k = i;
+			strengthPane.addButton(new Button(ItemHandler.getItem().getItem("STAINED_GLASS_PANE:6", 1, false, "&9&lStrength: &a&l" + k, "&7", "&7*Click to set the strength", "&7 of the custom attribute."), event -> { 
+				Map<String, Double> attributeList = itemMap.getAttributes();
+				attributeList.put(attribute.name(), k);
+				this.attributePane(player, itemMap, isLeather); 
+			}));
+		}
+		strengthPane.open(player);
+	}
+	
+   /**
+    * Opens the Pane for the Player.
     * This Pane is for modifying special items.
     * 
     * @param player - The Player to have the Pane opened.
@@ -5050,7 +5137,21 @@ public class UI {
 					colorPane.open(player);
 				}
 			}));
-			otherPane.addButton(new Button(this.fillerPaneGItem));
+			if (ServerHandler.getServer().hasSpecificUpdate("1_9") && !ItemHandler.getItem().getDesignatedSlot(itemMap.getMaterial()).equalsIgnoreCase("noslot")) {
+				String attributeList = "";
+				String attributeString = "";
+				if (Utils.getUtils().nullCheck(itemMap.getAttributes().toString()) != "NONE") {
+					for (String attribute: itemMap.getAttributes().keySet()) {
+						attributeString += attribute + ":" + itemMap.getAttributes().get(attribute) + ", ";
+					}
+					for (String split: Utils.getUtils().softSplit(Utils.getUtils().nullCheck(attributeString.substring(0, attributeString.length())))) {
+						attributeList += "&a" + split + " /n ";
+					}
+				}
+				otherPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "ENCHANTED_GOLDEN_APPLE" : "322:1"), 1, false, "&a&lAttributes", "&7", "&7*Add a custom attribute to", "&7your armor or weapon.", (Utils.getUtils().nullCheck(attributeList) != "NONE" ? "&9&lAttributes: &a" + attributeList : "")), event -> {
+					this.attributePane(player, itemMap, true);
+				}));
+			} else { otherPane.addButton(new Button(this.fillerPaneGItem)); }
 			otherPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "WRITABLE_BOOK" : "386"), 1, false, "&a&lHex Color", "&7", "&7*Add a custom hex color", "&7to your leather armor.", "&9&lLeather-Color: &a" + 
 			(Utils.getUtils().nullCheck(itemMap.getLeatherHex()) != "NONE" ? Utils.getUtils().nullCheck(itemMap.getLeatherHex()) : Utils.getUtils().nullCheck(itemMap.getLeatherColor()))), event -> {
 				if (itemMap.getLeatherHex() != null) {
@@ -5075,7 +5176,7 @@ public class UI {
 				}
 			}));
 			otherPane.addButton(new Button(this.fillerPaneGItem), 3);
-		}
+		}	
 		otherPane.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> this.creatingPane(player, itemMap)));
 		otherPane.addButton(new Button(this.fillerPaneBItem), 7);
 		otherPane.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> this.creatingPane(player, itemMap)));
@@ -5145,9 +5246,19 @@ public class UI {
 				}
 			}
 		}
+		String attributeList = "";
+		String attributeString = "";
+		if (Utils.getUtils().nullCheck(itemMap.getAttributes().toString()) != "NONE") {
+			for (String attribute: itemMap.getAttributes().keySet()) {
+				attributeString += attribute + ":" + itemMap.getAttributes().get(attribute) + ", ";
+			}
+			for (String split: Utils.getUtils().softSplit(Utils.getUtils().nullCheck(attributeString.substring(0, attributeString.length())))) {
+				attributeList += "&a" + split + " /n ";
+			}
+		}
 		String patternList = "";
 		String patternString = "";
-		if (Utils.getUtils().nullCheck(itemMap.getPotionEffect().toString()) != "NONE") {
+		if (Utils.getUtils().nullCheck(itemMap.getBannerPatterns().toString()) != "NONE") {
 			for (Pattern patterns: itemMap.getBannerPatterns()) {
 				patternString += patterns.getColor() + ":" + patterns.getPattern().name().toUpperCase() + ", ";
 			}
@@ -5198,7 +5309,7 @@ public class UI {
 					(Utils.getUtils().nullCheck(itemMap.getMapImage()) != "NONE" ? "&9&lMap-Image: &a" + itemMap.getMapImage() : ""), (Utils.getUtils().nullCheck(itemMap.getChargeColor() + "") != "NONE" ? "&9&lCharge Color: &a" + itemMap.getChargeColor() : ""),
 					(Utils.getUtils().nullCheck(patternList) != "NONE" ? "&9&lBanner Meta: &a" + patternList : ""), (Utils.getUtils().nullCheck(potionList) != "NONE" ? "&9&lPotion-Effects: &a" + potionList : ""), (itemMap.getIngredients() != null && !itemMap.getIngredients().isEmpty() ? "&9&lRecipe: &aYES" : ""),
 					(!mobs.isEmpty() ? "&9&lMobs Drop: &a" + mobs.substring(0, mobs.length() - 2) : ""), (!blocks.isEmpty() ? "&9&lBlocks Drop: &a" + blocks.substring(0, blocks.length() - 2) : ""),
-					(Utils.getUtils().nullCheck(itemMap.getPages() + "") != "NONE" ? "&9&lBook Pages: &aYES" : ""),
+					(Utils.getUtils().nullCheck(attributeList) != "NONE" ? "&9&lAttributes: &a" + attributeList : ""), (Utils.getUtils().nullCheck(itemMap.getPages() + "") != "NONE" ? "&9&lBook Pages: &aYES" : ""),
 					(Utils.getUtils().nullCheck(itemMap.getAuthor()) != "NONE" ? "&9&lBook Author: &a" + itemMap.getAuthor() : ""), (Utils.getUtils().nullCheck(itemMap.getSkull()) != "NONE" ? "&9&lSkull-Owner: &a" + itemMap.getSkull() : ""), 
 					(Utils.getUtils().nullCheck(itemMap.getSkullTexture()) != "NONE" ? "&9&lSkull-Texture: &a" + (itemMap.getSkullTexture().length() > 40 ? itemMap.getSkullTexture().substring(0, 40) : itemMap.getSkullTexture()) : ""), 
 					(Utils.getUtils().nullCheck(itemMap.getFireworkType() + "") != "NONE" ? "&9&lFirework Type: &a" + itemMap.getFireworkType().name() : ""), 
@@ -5235,7 +5346,8 @@ public class UI {
     */
 	private boolean specialItem(final ItemMap itemMap) {
 		if (itemMap.getMaterial().toString().contains("WRITTEN_BOOK") || itemMap.getMaterial().toString().contains("PLAYER_HEAD") || itemMap.getMaterial().toString().contains("SKULL_ITEM") 
-				|| itemMap.getMaterial().toString().equalsIgnoreCase("FIREWORK") || itemMap.getMaterial().toString().equalsIgnoreCase("FIREWORK_ROCKET") || itemMap.getMaterial().toString().contains("LEATHER_")) {
+				|| itemMap.getMaterial().toString().equalsIgnoreCase("FIREWORK") || itemMap.getMaterial().toString().equalsIgnoreCase("FIREWORK_ROCKET") 
+				|| itemMap.getMaterial().toString().contains("LEATHER_") || !ItemHandler.getItem().getDesignatedSlot(itemMap.getMaterial()).equalsIgnoreCase("noslot")) {
 			return true;
 		}
 		return false;

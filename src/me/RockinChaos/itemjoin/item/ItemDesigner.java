@@ -104,6 +104,7 @@ public class ItemDesigner {
 							this.setBookGeneration(itemMap);
 							this.setLegacyBookPages(itemMap);
 							this.setAttributes(itemMap);
+							this.setAttributeFlags(itemMap);
 							this.setProbability(itemMap);
 							this.setMobsDrop(itemMap);
 							this.setBlocksDrop(itemMap);
@@ -1134,12 +1135,43 @@ public class ItemDesigner {
 	}
 
     /**
- 	* Sets the Attributes of the Custom Book Item,
- 	* shows or hides the Attributes of the item.
+ 	* Sets the Custom Attributes for the Custom Item.
  	* 
  	* @param itemMap - The ItemMap being modified.
  	*/
 	private void setAttributes(final ItemMap itemMap) {
+		String[] attributes = null;
+		String val = itemMap.getNodeLocation().getString(".attributes");
+		if (val != null && val.contains("{") && val.contains("}")) { attributes = val.split(","); }
+		if (ServerHandler.getServer().hasSpecificUpdate("1_9") && attributes != null && attributes.length != 0) {
+			try {
+				if (attributes != null) {
+					Map < String, Double > attributesList = new HashMap < String, Double > ();
+					for (String value: attributes) {
+						String[] valueParts = value.replace("{", "").replace("}", "").replace(" ", "").split(":");
+						if (Utils.getUtils().isInt(valueParts[1]) || Utils.getUtils().isDouble(valueParts[1])) {
+							attributesList.put(valueParts[0], Double.parseDouble(valueParts[1]));
+						} else {
+							ServerHandler.getServer().logSevere("{ItemMap} There was an issue setting the custom attribute " + valueParts[0] + " for " + itemMap.getConfigName()+ ".");
+							ServerHandler.getServer().logSevere("{ItemMap} The value " + valueParts[1] + " is not an integer or double value.");
+						}
+					}
+					itemMap.setAttributes(attributesList);
+				}
+			} catch (Exception e) {
+				ServerHandler.getServer().logSevere("{ItemMap} An error has occurred when setting custom attributes for " + itemMap.getConfigName()+ ".");
+				ServerHandler.getServer().logSevere("{ItemMap} The attributes should look like '{GENERIC_ARMOR:10}, {GENERIC_ARMOR_TOUGHNESS:8}' or \"{GENERIC_ARMOR:10}, {GENERIC_ARMOR_TOUGHNESS:8}\".");
+			}
+		}
+	}
+	
+    /**
+ 	* Sets the Attributes of the Custom Item,
+ 	* shows or hides the Attributes of the item.
+ 	* 
+ 	* @param itemMap - The ItemMap being modified.
+ 	*/
+	private void setAttributeFlags(final ItemMap itemMap) {
 		if (ServerHandler.getServer().hasSpecificUpdate("1_8") && Utils.getUtils().containsIgnoreCase(itemMap.getItemFlags(), "hide-attributes")) {
 			itemMap.setAttributesInfo(true);
 		}

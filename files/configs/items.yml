@@ -37,6 +37,7 @@ items:
     commands-cost: 3
     commands-cooldown: 5
     cooldown-message: '&7[&eItemJoin&7] &a[%item%&a] &cis on cooldown for &a%timeleft% &cseconds..'
+    attributes: '{GENERIC_ATTACK_DAMAGE:15.2}, {GENERIC_ATTACK_SPEED:19.0}'
     enchantment: FIRE_ASPECT:3, DAMAGE_ALL:5, DAMAGE_UNDEAD:5, KNOCKBACK:8
     itemflags: unbreakable, hide-attributes, self-drops, death-drops, CreativeBypass
     triggers: join, respawn, world-switch, region-enter
