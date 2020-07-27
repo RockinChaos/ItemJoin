@@ -23,6 +23,7 @@ import java.util.Iterator;
 import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -43,7 +44,6 @@ import me.RockinChaos.itemjoin.utils.DependAPI;
 import me.RockinChaos.itemjoin.utils.LanguageAPI;
 import me.RockinChaos.itemjoin.utils.Utils;
 import me.RockinChaos.itemjoin.utils.sqlite.SQLite;
-import net.md_5.bungee.api.ChatColor;
 
 public class ItemUtilities {
   	private List < ItemMap > items = new ArrayList < ItemMap >();
