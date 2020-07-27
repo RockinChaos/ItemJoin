@@ -33,6 +33,15 @@ public class BungeeCord implements PluginMessageListener {
 private static BungeeCord bungee;
 
    /**
+    * Initializes the BungeeCord Listener.
+    *
+    */
+	public BungeeCord() {
+		ItemJoin.getInstance().getServer().getMessenger().registerOutgoingPluginChannel(ItemJoin.getInstance(), "BungeeCord");
+		ItemJoin.getInstance().getServer().getMessenger().registerIncomingPluginChannel(ItemJoin.getInstance(), "BungeeCord", this);	
+	}
+
+   /**
     * Sends the specified Player to the specified Server.
     * 
     * @param player - The Player switching servers.
@@ -58,15 +67,11 @@ private static BungeeCord bungee;
     * @param command - The Bungee Command the Player is executing.
     */
 	public void ExecuteCommand(final Player player, final String command) {
-		Messenger messenger = ItemJoin.getInstance().getServer().getMessenger();
-		if (!messenger.isOutgoingChannelRegistered(ItemJoin.getInstance(), "BungeeCord")) {
-			messenger.registerOutgoingPluginChannel(ItemJoin.getInstance(), "BungeeCord");
-		}
 		ByteArrayDataOutput out = ByteStreams.newDataOutput();
 		try {
-			out.writeUTF("Subchannel");
-			out.writeUTF("Argument");
-			out.writeUTF(command);
+			out.writeUTF("Message");
+			out.writeUTF(player.getName());
+			out.writeUTF("/" + command);
 		} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
 		player.sendPluginMessage(ItemJoin.getInstance(), "BungeeCord", out.toByteArray());
 	}
@@ -82,9 +87,9 @@ private static BungeeCord bungee;
 	public void onPluginMessageReceived(final String channel, final Player player, final byte[] message) {
 		if (!channel.equals("BungeeCord")) { return; }
 		ByteArrayDataInput in = ByteStreams.newDataInput(message);
-		String subchannel = in .readUTF();
-		if (!subchannel.contains("PlayerCount")) {
-			player.sendMessage(subchannel + " " + in .readByte());
+		String subchannel = in.readUTF();
+		if (subchannel.equals("ConnectOther") || subchannel.equals("Connect")) {
+			player.sendMessage(subchannel + " " + in.readByte());
 		}
 	} 
 	

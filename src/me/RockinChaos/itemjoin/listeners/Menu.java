@@ -19,6 +19,7 @@ package me.RockinChaos.itemjoin.listeners;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -39,7 +40,7 @@ public class Menu implements Listener {
     * 
     * @param event - InventoryClickEvent
     */
-	@EventHandler(ignoreCancelled = false)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = false)
 	private void onClick(InventoryClickEvent event) {
 		InventoryHolder holder = event.getInventory().getHolder();
 		if (holder instanceof Interface) {
@@ -53,7 +54,7 @@ public class Menu implements Listener {
 	* 
 	* @param event - AsyncPlayerChatEvent
 	*/
-	@EventHandler(ignoreCancelled = false)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = false)
 	private void onChat(AsyncPlayerChatEvent event) {
 		if (this.expiredInventory != null && this.expiredInventory.chatPending()) {
 			this.expiredInventory.onChat(event);
