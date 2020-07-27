@@ -37,6 +37,8 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.banner.Pattern;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -44,6 +46,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -109,6 +112,7 @@ public class ItemMap {
 	private String itemValue = null;
 	
 	private Integer count = 1;
+	private Map < String, Double > attributes = new HashMap < String, Double > ();
 	
 	private Short durability = null;
 	private Integer data = null;
@@ -807,6 +811,17 @@ public class ItemMap {
 		if (count != null && Utils.getUtils().isInt(count) && Integer.parseInt(count) != 0) {
 			this.count = Integer.parseInt(count);
 		} else { this.count = 1; }
+	}
+	
+   /**
+    * Sets the ItemStack attributes.
+    * 
+    * @param attributeList - The list of attributes to be set.
+    */
+	public void setAttributes(final Map < String, Double > attributeList) {
+		if (attributeList != null && !attributeList.isEmpty()) {
+			this.attributes = attributeList;
+		}
 	}
 	
    /**
@@ -1799,6 +1814,15 @@ public class ItemMap {
     */
 	public Integer getCount() {
 		return this.count;
+	}
+	
+   /**
+    * Gets the attribute list.
+    * 
+    * @return The attribute list.
+    */
+	public Map < String, Double > getAttributes() {
+		return this.attributes;
 	}
 	
    /**
@@ -3204,9 +3228,11 @@ public class ItemMap {
 		this.setBookInfo(player);
 		LegacyAPI.getLegacy().setBookPages(player, this.tempMeta, this.bookPages, this);
 		this.setAttributes();
+		this.setAttributeFlags();
 		this.realGlow();
 		this.tempItem.setItemMeta(this.tempMeta);
-		this.tempItem = LegacyAPI.getLegacy().setGlowing(this.tempItem, this);
+		LegacyAPI.getLegacy().setGlowing(this.tempItem, this);
+		LegacyAPI.getLegacy().setAttributes(this.tempItem, this);
 		return this;
 	}
 	
@@ -3268,6 +3294,28 @@ public class ItemMap {
 				nms.getClass().getMethod("setTag", tag.getClass()).invoke(nms, tag);
 				this.tempItem = (ItemStack) craftItemStack.getMethod("asCraftMirror", nms.getClass()).invoke(null, nms);
 			} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
+		}
+	}
+	
+   /**
+    * Sets the armor value to the items attributes.
+    * 
+    */
+	private void setAttributes() {
+		if (ServerHandler.getServer().hasSpecificUpdate("1_13") && this.attributes != null && !this.attributes.isEmpty()) {
+			try {
+				for (String attrib: this.attributes.keySet()) {
+					Attribute attribute = Attribute.valueOf(attrib.toUpperCase());
+					double value = this.attributes.get(attrib);
+					EquipmentSlot slot = EquipmentSlot.valueOf(ItemHandler.getItem().getDesignatedSlot(this.material).toUpperCase());
+					AttributeModifier modifier = new AttributeModifier(UUID.nameUUIDFromBytes((this.configName + attrib).getBytes()), attrib.toLowerCase().replace("_", "."), value, AttributeModifier.Operation.ADD_NUMBER, slot);
+					if (this.tempMeta.getAttributeModifiers() == null || !this.tempMeta.getAttributeModifiers().containsValue(modifier)) {
+						this.tempMeta.addAttributeModifier(attribute, modifier);
+					}
+				}
+			} catch (Exception e) {
+				ServerHandler.getServer().sendDebugTrace(e);
+			}
 		}
 	}
 	
@@ -3589,7 +3637,7 @@ public class ItemMap {
     * Sets the Attributes to the Temporary ItemMeta.
     * 
     */
-	private void setAttributes() {
+	private void setAttributeFlags() {
 		if (ServerHandler.getServer().hasSpecificUpdate("1_8") && this.hideAttributes) {
 			this.tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ATTRIBUTES);
 			this.tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_DESTROYS);
@@ -3702,10 +3750,22 @@ public class ItemMap {
 		    		}
 		    	}, 4L);
 			} else {
-				player.getOpenInventory().getTopInventory().setItem(Utils.getUtils().getSlotConversion(slot), itemStack);
+		    	Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
+		    		@Override
+		    		public void run() {
+		    			player.getOpenInventory().getTopInventory().setItem(Utils.getUtils().getSlotConversion(slot), itemStack);
+		    		}
+		    	}, 2L);
 			}
 		} 
-		else { player.getInventory().setItem(Integer.parseInt(slot), itemStack); }
+		else { 
+		    Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
+			    @Override
+			    public void run() {
+			    	player.getInventory().setItem(Integer.parseInt(slot), itemStack); 	
+			    }
+		    }, 2L);
+		}
 		this.setAnimations(player);
 		this.executeCommands(player, this.tempItem, "ON_RECEIVE", this.getSlot());
 	}
@@ -4533,6 +4593,11 @@ public class ItemMap {
 			String effectList = "";
 			for (PotionEffect effects : this.effect) { effectList += effects.getType().getName() + ":" + effects.getAmplifier() + ":" + effects.getDuration() + ", "; }
 			itemData.set("items." + this.configName + ".potion-effect", effectList.substring(0, effectList.length() - 2)); 
+		}
+		if (this.attributes != null && !this.attributes.isEmpty()) { 
+			String attributeList = "";
+			for (String attribute : this.attributes.keySet()) { attributeList += "{" + attribute + ":" + this.attributes.get(attribute) + "}, "; }
+			itemData.set("items." + this.configName + ".attributes", attributeList.substring(0, attributeList.length() - 2)); 
 		}
 		if (this.enabledRegions != null && !this.enabledRegions.isEmpty()) { 
 			String regionList = "";
