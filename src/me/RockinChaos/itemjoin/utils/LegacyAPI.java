@@ -358,7 +358,7 @@ public class LegacyAPI {
     * @param itemMap - The ItemMap having their armor value set.
     */
 	public void setAttributes(final ItemStack tempItem, final ItemMap itemMap) {
-		if (ServerHandler.getServer().hasSpecificUpdate("1_9") && !ServerHandler.getServer().hasSpecificUpdate("1_13") && itemMap.getAttributes() != null && !itemMap.getAttributes().isEmpty()) {
+		if (!ServerHandler.getServer().hasSpecificUpdate("1_13") && itemMap.getAttributes() != null && !itemMap.getAttributes().isEmpty()) {
 			try {
 				String slot = ItemHandler.getItem().getDesignatedSlot(itemMap.getMaterial());
 				Class < ? > craftItemStack = Reflection.getReflection().getCraftBukkitClass("inventory.CraftItemStack");

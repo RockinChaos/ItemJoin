@@ -119,6 +119,7 @@ public class FileData {
 			itemsData.set("items.random-pane-3.id", "STAINED_GLASS_PANE:6");
 		} else if (ServerHandler.getServer().hasSpecificUpdate("1_8")) {
 			itemsData.set("items.devine-item.commands-sound", "NOTE_PLING");
+			itemsData.set("items.devine-item.attributes", "{GENERIC_ATTACK_DAMAGE:15.2}");
 			itemsData.set("items.map-item.id", "MAP");
 			itemsData.set("items.gamemode-token.id", "FIREWORK_CHARGE");
 			itemsData.set("items.gamemode-token.commands-sound", "NOTE_PLING");
@@ -146,6 +147,7 @@ public class FileData {
 			itemsData.set("items.offhand-item", null);
 		} else if (ServerHandler.getServer().hasSpecificUpdate("1_7")) {
 			itemsData.set("items.devine-item.commands-sound", "NOTE_PLING");
+			itemsData.set("items.devine-item.attributes", "{GENERIC_ATTACK_DAMAGE:15.2}");
 			itemsData.set("items.map-item.id", "MAP");
 			itemsData.set("items.gamemode-token.id", "FIREWORK_CHARGE");
 			itemsData.set("items.gamemode-token.commands-sound", "NOTE_PLING");

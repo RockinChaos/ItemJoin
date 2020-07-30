@@ -1143,7 +1143,7 @@ public class ItemDesigner {
 		String[] attributes = null;
 		String val = itemMap.getNodeLocation().getString(".attributes");
 		if (val != null && val.contains("{") && val.contains("}")) { attributes = val.split(","); }
-		if (ServerHandler.getServer().hasSpecificUpdate("1_9") && attributes != null && attributes.length != 0) {
+		if (attributes != null && attributes.length != 0) {
 			try {
 				if (attributes != null) {
 					Map < String, Double > attributesList = new HashMap < String, Double > ();
