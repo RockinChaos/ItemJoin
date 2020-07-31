@@ -17,6 +17,7 @@
  */
 package me.RockinChaos.itemjoin.utils;
 
+import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.math.BigInteger;
 import java.net.URL;
@@ -25,14 +26,17 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
+
+import javax.net.ssl.HttpsURLConnection;
+
 import java.util.Random;
 import java.util.UUID;
 
+import org.apache.logging.log4j.core.util.IOUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Statistic;
 import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.craftbukkit.libs.org.apache.commons.io.IOUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.RegisteredListener;
@@ -286,16 +290,22 @@ public class Utils {
     * @param player - that will recieve the items.
     */
     public String getMojangUUID(final String name) {
-        String url = "https://api.mojang.com/users/profiles/minecraft/" + name;
         if (this.mojangUUID.get(name) != null) { return this.mojangUUID.get(name); }
         try {
         	if (this.mojangUUID.get(name) == null) {
-	            String UUIDJson = IOUtils.toString(new URL(url), "UTF-8");
-	            if(UUIDJson.isEmpty()) return null;    
-	            JSONObject UUIDObject = (JSONObject) JSONValue.parseWithException(UUIDJson);
-	            String UUID = UUIDObject.get("id").toString();
-	            this.mojangUUID.put(name, UUID);
-	            return UUID;
+        		HttpsURLConnection connection = (HttpsURLConnection) new URL("https://api.mojang.com/users/profiles/minecraft/" + name).openConnection();
+        		if (connection.getResponseCode() == HttpsURLConnection.HTTP_OK) {
+	            	InputStreamReader reader = new InputStreamReader(connection.getInputStream());
+		            String UUIDJson = IOUtils.toString(reader);
+		            if(UUIDJson.isEmpty()) return null;    
+		            JSONObject UUIDObject = (JSONObject) JSONValue.parseWithException(UUIDJson);
+		            String UUID = UUIDObject.get("id").toString();
+		            this.mojangUUID.put(name, UUID);
+		             return UUID;
+        		} else {
+					ServerHandler.getServer().logWarn("Connection could not be opened (Response code " + connection.getResponseCode() + ", " + connection.getResponseMessage() + ")");
+					return null;
+        		}
         	} else { return this.mojangUUID.get(name); }
         } catch (Exception e) { e.printStackTrace(); }
         return null;
