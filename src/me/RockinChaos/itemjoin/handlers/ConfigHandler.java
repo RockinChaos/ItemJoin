@@ -81,14 +81,23 @@ public class ConfigHandler {
 	    ItemJoin.getInstance().getCommand("itemjoin").setExecutor(new Commands());
 	    ItemJoin.getInstance().getCommand("itemjoin").setTabCompleter(new ChatTab());
 		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Menu(), ItemJoin.getInstance());
-		if (this.clearEnabled("Join") && !Utils.getUtils().isRegistered(PlayerJoin.class.getSimpleName())) {
+		if ((this.clearEnabled("Join") || Utils.getUtils().containsIgnoreCase(this.getHotbarTriggers(), "JOIN")) && !Utils.getUtils().isRegistered(PlayerJoin.class.getSimpleName())) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerJoin(), ItemJoin.getInstance());
 		}
-		if (this.clearEnabled("World-Switch") && !Utils.getUtils().isRegistered(WorldSwitch.class.getSimpleName())) {
+		if ((this.clearEnabled("World-Switch") || Utils.getUtils().containsIgnoreCase(this.getHotbarTriggers(), "WORLD-SWITCH")) && !Utils.getUtils().isRegistered(WorldSwitch.class.getSimpleName())) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new WorldSwitch(), ItemJoin.getInstance());
 		}
-		if (this.clearEnabled("Region-Enter") && !Utils.getUtils().isRegistered(PlayerGuard.class.getSimpleName()) && DependAPI.getDepends(false).getGuard().guardEnabled()) {
+		if (Utils.getUtils().containsIgnoreCase(this.getHotbarTriggers(), "RESPAWN") && !Utils.getUtils().isRegistered(Respawn.class.getSimpleName())) {
+			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerJoin(), ItemJoin.getInstance());
+		}
+		if (Utils.getUtils().containsIgnoreCase(this.getHotbarTriggers(), "LIMIT-MODES") && !Utils.getUtils().isRegistered(LimitSwitch.class.getSimpleName())) {
+			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerJoin(), ItemJoin.getInstance());
+		}
+		if ((this.clearEnabled("Region-Enter") || Utils.getUtils().containsIgnoreCase(this.getHotbarTriggers(), "REGION-ENTER")) && !Utils.getUtils().isRegistered(PlayerGuard.class.getSimpleName()) && DependAPI.getDepends(false).getGuard().guardEnabled()) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerGuard(), ItemJoin.getInstance());
+		}
+		if (Utils.getUtils().containsIgnoreCase(this.getHotbarTriggers(), "REGION-LEAVE") && !Utils.getUtils().isRegistered(PlayerGuard.class.getSimpleName())) {
+			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerJoin(), ItemJoin.getInstance());
 		}
 		DependAPI.getDepends(false).sendUtilityDepends();
 		ServerHandler.getServer().logInfo(ConfigHandler.getConfig(false).getConfigurationSection().getKeys(false).size() + " Custom item(s) loaded!");
