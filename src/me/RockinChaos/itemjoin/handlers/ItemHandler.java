@@ -374,7 +374,8 @@ public class ItemHandler {
 			OfflinePlayer player;
 			try { player = Bukkit.getOfflinePlayer(UUID.fromString(Utils.getUtils().getMojangUUID(owner))); }
 			catch (Exception e) { player = LegacyAPI.getLegacy().getOfflinePlayer(owner); }
-			((SkullMeta) meta).setOwningPlayer(player);
+			try { ((SkullMeta) meta).setOwningPlayer(player); }
+			catch (Exception e) { LegacyAPI.getLegacy().setSkullOwner(((SkullMeta) meta), player.getName()); }
 		}
 		return meta;
 	}
