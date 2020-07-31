@@ -351,32 +351,28 @@ public class ItemHandler {
     * @return The ItemMeta with the new Skull Owner.
     */
 	public ItemMeta setSkullOwner(final ItemMeta meta, final String owner) {
-		if (ServerHandler.getServer().hasSpecificUpdate("1_8") && !DependAPI.getDepends(false).skinsRestorerEnabled()) {
-			try {
-				Method fetchProfile = Reflection.getReflection().getCraftBukkitClass("entity.CraftPlayer").getDeclaredMethod("getProfile");
-				Field declaredField = meta.getClass().getDeclaredField("profile");
-				declaredField.setAccessible(true);
-				if (PlayerHandler.getPlayer().getPlayerString(owner) != null) {
-					declaredField.set(meta, fetchProfile.invoke(PlayerHandler.getPlayer().getPlayerString(owner)));
-				} else if (PlayerHandler.getPlayer().getPlayerString(owner) == null) {
-					if (this.gameProfiles.get(owner) == null) {
-						String uuidString = Utils.getUtils().getMojangUUID(owner);
-						if (uuidString != null) {
-							GameProfile profile = ServerHandler.getServer().setSkin(new GameProfile(Utils.getUtils().UUIDConversion(uuidString), owner), Utils.getUtils().UUIDConversion(uuidString));
-							this.gameProfiles.put(owner, profile);
-						}
-					}
-					declaredField.set(meta, this.gameProfiles.get(owner));
-				}
-			} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); LegacyAPI.getLegacy().setSkullOwner(((SkullMeta) meta), owner); }
-		} else if (!DependAPI.getDepends(false).skinsRestorerEnabled()) {
+		if (!ServerHandler.getServer().hasSpecificUpdate("1_8")) {
 			ServerHandler.getServer().logDebug("{ItemMap} Minecraft does not support offline player heads below Version 1.8.");
 			ServerHandler.getServer().logDebug("{ItemMap} Player heads will only be given a skin if the player has previously joined the sever.");
 			return LegacyAPI.getLegacy().setSkullOwner(((SkullMeta) meta), owner);
+		} else if (!DependAPI.getDepends(false).skinsRestorerEnabled()) {
+			try {
+				Field declaredField = meta.getClass().getDeclaredField("profile");
+				declaredField.setAccessible(true);
+				if (this.gameProfiles.get(owner) == null) {
+					ServerHandler.getServer().runAsyncThread(async -> { 
+						String uuidString = Utils.getUtils().getMojangUUID(owner);
+						if (uuidString != null) {
+							GameProfile profile = ItemHandler.getItem().setSkin(new GameProfile(Utils.getUtils().UUIDConversion(uuidString), owner), Utils.getUtils().UUIDConversion(uuidString));
+							this.gameProfiles.put(owner, profile);
+						}
+					});
+				}
+				declaredField.set(meta, this.gameProfiles.get(owner));
+			} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); LegacyAPI.getLegacy().setSkullOwner(((SkullMeta) meta), owner); }
 		} else {
 			OfflinePlayer player;
-			String uuidString = Utils.getUtils().getMojangUUID(owner);
-			try { player = Bukkit.getOfflinePlayer(UUID.fromString(uuidString)); }
+			try { player = Bukkit.getOfflinePlayer(UUID.fromString(Utils.getUtils().getMojangUUID(owner))); }
 			catch (Exception e) { player = LegacyAPI.getLegacy().getOfflinePlayer(owner); }
 			((SkullMeta) meta).setOwningPlayer(player);
 		}
