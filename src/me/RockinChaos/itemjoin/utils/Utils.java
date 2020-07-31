@@ -32,6 +32,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Statistic;
 import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.craftbukkit.libs.org.apache.commons.io.IOUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.RegisteredListener;
@@ -135,17 +136,6 @@ public class Utils {
 			return this.getPath(i + 1);
 		}
 		return i;
-	}
-	
-   /**
-    * Formats any color codes found in the String to Bukkit Colors so the
-    * text will be colorfully formatted.
-    * 
-    * @param str - The String to have its Color Codes properly Converted to Bukkit Colors.
-    * @return The newly formatted String.
-    */
-	public String colorFormat(final String str) {
-		return ChatColor.translateAlternateColorCodes('&', str).toString();
 	}
 	
    /**
@@ -300,14 +290,14 @@ public class Utils {
         if (this.mojangUUID.get(name) != null) { return this.mojangUUID.get(name); }
         try {
         	if (this.mojangUUID.get(name) == null) {
-	            String UUIDJson = new URL(url).toString();           
-	            if(UUIDJson.isEmpty()) return null;                       
+	            String UUIDJson = IOUtils.toString(new URL(url), "UTF-8");
+	            if(UUIDJson.isEmpty()) return null;    
 	            JSONObject UUIDObject = (JSONObject) JSONValue.parseWithException(UUIDJson);
 	            String UUID = UUIDObject.get("id").toString();
 	            this.mojangUUID.put(name, UUID);
 	            return UUID;
-        	}
-        } catch (Exception e) { }
+        	} else { return this.mojangUUID.get(name); }
+        } catch (Exception e) { e.printStackTrace(); }
         return null;
     }
 	
@@ -479,6 +469,17 @@ public class Utils {
 	}
 	
    /**
+    * Formats any color codes found in the String to Bukkit Colors so the
+    * text will be colorfully formatted.
+    * 
+    * @param str - The String to have its Color Codes properly Converted to Bukkit Colors.
+    * @return The newly formatted String.
+    */
+	public String colorFormat(final String str) {
+		return ChatColor.translateAlternateColorCodes('&', str);
+	}
+	
+   /**
     * Translates the specified String by foramtting its color codes and replacing placeholders.
     * 
     * @param str - The String being translated.
@@ -511,11 +512,11 @@ public class Utils {
 			try { str = str.replace("%player_deaths%", String.valueOf(player.getStatistic(Statistic.DEATHS))); } catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
 			try { str = str.replace("%player_food%", String.valueOf(player.getFoodLevel())); } catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
 			try { str = str.replace("%player_health%", String.valueOf(player.getHealth())); } catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
-			try { str = str.replace("%player_location%", player.getLocation().getBlockX() + ", " + player.getLocation().getBlockY() + ", " + player.getLocation().getBlockZ() + ""); } catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
+			try { str = str.replace("%player_location%", player.getLocation().getBlockX() + ", " + player.getLocation().getBlockY() + ", " + player.getLocation().getBlockZ()); } catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
 			try { str = str.replace("%player_interact%", PlayerHandler.getPlayer().getNearbyPlayer(player, 3)); } catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); } }
 		if (player == null) { try { str = str.replace("%player%", "CONSOLE"); } catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); } }
 	
-		str = ChatColor.translateAlternateColorCodes('&', str).toString();
+		str = ChatColor.translateAlternateColorCodes('&', str);
 		if (DependAPI.getDepends(false).placeHolderEnabled()) {
 			try { try { return PlaceholderAPI.setPlaceholders(player, str); } 
 			catch (NoSuchFieldError e) { ServerHandler.getServer().logWarn("An error has occured when setting the PlaceHolder " + e.getMessage() + ", if this issue persits contact the developer of PlaceholderAPI."); return str; }

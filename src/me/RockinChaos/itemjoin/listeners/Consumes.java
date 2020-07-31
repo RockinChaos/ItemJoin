@@ -71,7 +71,7 @@ public class Consumes implements Listener {
 	 		ItemMap offHandMap = ItemUtilities.getUtilities().getItemMap(offStack, null, player.getWorld());
 	 		if ((mainHandMap != null && !ItemUtilities.getUtilities().isAllowed(player, mainStack, "count-lock")) || (offHandMap != null && !ItemUtilities.getUtilities().isAllowed(player, offStack, "count-lock"))) {
 	 			if ((Utils.getUtils().containsIgnoreCase(mainStack.getType().name(), "TOTEM") && mainHandMap != null) || (Utils.getUtils().containsIgnoreCase(offStack.getType().name(), "TOTEM") && offHandMap != null)) {
-	 				ServerHandler.getServer().runAsyncThread(main -> {
+	 				ServerHandler.getServer().runThread(main -> {
 	 					if (mainHandMap != null && mainHandMap.isSimilar(mainStack)) {
 	 						if (Utils.getUtils().containsIgnoreCase(PlayerHandler.getPlayer().getMainHandItem(player).getType().name(), "TOTEM")) {
 	 							PlayerHandler.getPlayer().getMainHandItem(player).setAmount(mainHandMap.getCount());

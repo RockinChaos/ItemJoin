@@ -344,8 +344,10 @@ public class Interface implements InventoryHolder {
     * @param player - The player to have the current inventory page opened.
     */
 	public void open(Player player) {
-		this.renderPage();
-		player.openInventory(getInventory());
+		ServerHandler.getServer().runThread(async -> {
+			this.renderPage();
+			player.openInventory(getInventory());
+		});
 	}
 	
    /**

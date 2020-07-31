@@ -103,7 +103,9 @@ public class Button {
     * @param event - InventoryClickEvent
     */
     public void onClick(InventoryClickEvent event) {
-    	this.clickAction.accept(event);
+    	ServerHandler.getServer().runThread(main -> {
+    		this.clickAction.accept(event);
+    	});
     }
     
    /**
@@ -113,9 +115,8 @@ public class Button {
     * @param event - AsyncPlayerChatEvent
     */
     public void onChat(AsyncPlayerChatEvent event) {
-    	final Consumer<AsyncPlayerChatEvent> chatAction = this.chatAction;
-    	ServerHandler.getServer().runAsyncThread(main -> {
-    	    chatAction.accept(event);
+    	ServerHandler.getServer().runThread(main -> {
+    	    this.chatAction.accept(event);
     	});
     }
     

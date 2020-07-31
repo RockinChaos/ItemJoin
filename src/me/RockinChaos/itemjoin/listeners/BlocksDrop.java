@@ -46,7 +46,7 @@ public class BlocksDrop implements Listener {
 		final Material material = (block != null ? block.getType() : Material.AIR);
 		final Player player = event.getPlayer();
 		final Collection<ItemStack> drops = block.getDrops(PlayerHandler.getPlayer().getMainHandItem(player));
-		ServerHandler.getServer().runAsyncThread(main -> {
+		ServerHandler.getServer().runAsyncThread(async -> {
 			for (ItemMap itemMap: ItemUtilities.getUtilities().getItems()) {
 				if (itemMap.blocksDrop() && block != null && material != Material.AIR && itemMap.getBlocksDrop().containsKey(material) 
 				 && itemMap.inWorld(player.getWorld()) && itemMap.hasPermission(player) && ItemHandler.getItem().containsMaterial(drops, material) && Math.random() <= itemMap.getBlocksDrop().get(material)) {

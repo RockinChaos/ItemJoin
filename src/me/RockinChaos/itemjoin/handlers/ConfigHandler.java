@@ -22,7 +22,6 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.nio.file.CopyOption;
 import java.nio.file.Files;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -74,13 +73,6 @@ public class ConfigHandler {
 	
 	private static ConfigHandler config;
 	
-	
-   /**
-    * Creates a new instance of the ConfigHandler.
-    * 
-    */
-	public ConfigHandler() { }
-	
    /**
     * Registers the command executors and events.
     * 
@@ -115,8 +107,8 @@ public class ConfigHandler {
 		DependAPI.getDepends(true);
 		LogFilter.getFilter(true);
 		SQLite.getLite(true);
-		ServerHandler.getServer().runAsyncThread(main -> { ItemDesigner.getDesigner(true); }, 2L);
-		ServerHandler.getServer().runAsyncThread(main -> { Metrics.getMetrics(true); }, 100L);
+		ServerHandler.getServer().runThread(main -> { ItemDesigner.getDesigner(true); }, 2L);
+		ServerHandler.getServer().runThread(main -> { Metrics.getMetrics(true); }, 100L);
 	}
 	
    /**
@@ -269,7 +261,8 @@ public class ConfigHandler {
     */
 	public String getHotbarTriggers() { 
 		if (this.getFile("config.yml").getString("Settings.HeldItem-Triggers") != null 
-				&& !this.getFile("config.yml").getString("Settings.HeldItem-Triggers").equalsIgnoreCase("DISABLED")) {
+				&& !this.getFile("config.yml").getString("Settings.HeldItem-Triggers").equalsIgnoreCase("DISABLED") 
+				&& !this.getFile("config.yml").getString("Settings.HeldItem-Triggers").equalsIgnoreCase("FALSE")) {
 			return this.getFile("config.yml").getString("Settings.HeldItem-Triggers");
 		}
 		return "";
@@ -382,6 +375,22 @@ public class ConfigHandler {
 	}
 	
    /**
+    * Calculates the exact numer of arbitrary slots,
+    * assigning numbers to each slot to uniquely identify each item.
+    * 
+    * @param slot - The numerical or custom slot value.
+    * @return The exact slot ID to be set to the item.
+    */
+	private int ArbitraryID = 0;
+	public String getItemID(String slot) {
+		if (slot.equalsIgnoreCase("Arbitrary")) {
+			this.ArbitraryID += 1;
+			slot += this.ArbitraryID;
+		}
+		return slot;
+	}
+	
+   /**
     * Registers Events that are utilized by the specified ItemMap.
     * 
     * @param itemMap - The ItemMap that needs its events registered.
@@ -416,12 +425,9 @@ public class ConfigHandler {
 		}
 		if (itemMap.isCraftingItem() && !Utils.getUtils().isRegistered(InventoryCrafting.class.getSimpleName())) {
 			InventoryCrafting.cycleTask();
-			Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
-				@Override
-				public void run() {
-					PlayerHandler.getPlayer().restoreCraftItems();
-					if (ServerHandler.getServer().hasSpecificUpdate("1_8")) { ProtocolManager.getManager().handleProtocols(); }
-				}
+			ServerHandler.getServer().runThread(main -> {
+				PlayerHandler.getPlayer().restoreCraftItems();
+				if (ServerHandler.getServer().hasSpecificUpdate("1_8")) { ProtocolManager.getManager().handleProtocols(); }
 			}, 40L);
 			if (!Utils.getUtils().isRegistered(PlayerQuit.class.getSimpleName())) {
 				ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerQuit(), ItemJoin.getInstance());

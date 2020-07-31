@@ -288,17 +288,15 @@ public class InventoryCrafting implements Listener {
 				this.delayReturnCrafting(player, inventory, 1L);
 			}
 		} else {
-			ServerHandler.getServer().runAsyncThread(main -> {
-				if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory()) && craftingOpenItems.containsKey(PlayerHandler.getPlayer().getPlayerID(player))) {
-					ItemStack[] openCraftContents = craftingOpenItems.get(PlayerHandler.getPlayer().getPlayerID(player));
-					if (openCraftContents != null && openCraftContents.length != 0 && antiSpamPlayers.get(PlayerHandler.getPlayer().getPlayerID(player)) == null) {
-						antiSpamPlayers.put(PlayerHandler.getPlayer().getPlayerID(player), true);
-						this.delayReturnCrafting(player, openCraftContents, 1L);
-						craftingItems.put(PlayerHandler.getPlayer().getPlayerID(player), craftingOpenItems.get(PlayerHandler.getPlayer().getPlayerID(player)));
-						craftingOpenItems.remove(PlayerHandler.getPlayer().getPlayerID(player));
-					}
+			if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory()) && craftingOpenItems.containsKey(PlayerHandler.getPlayer().getPlayerID(player))) {
+				ItemStack[] openCraftContents = craftingOpenItems.get(PlayerHandler.getPlayer().getPlayerID(player));
+				if (openCraftContents != null && openCraftContents.length != 0 && antiSpamPlayers.get(PlayerHandler.getPlayer().getPlayerID(player)) == null) {
+					antiSpamPlayers.put(PlayerHandler.getPlayer().getPlayerID(player), true);
+					this.delayReturnCrafting(player, openCraftContents, 1L);
+					craftingItems.put(PlayerHandler.getPlayer().getPlayerID(player), craftingOpenItems.get(PlayerHandler.getPlayer().getPlayerID(player)));
+					craftingOpenItems.remove(PlayerHandler.getPlayer().getPlayerID(player));
 				}
-			});
+			}
 		}
 	}
 	

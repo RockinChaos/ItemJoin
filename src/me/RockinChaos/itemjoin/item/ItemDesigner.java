@@ -75,7 +75,7 @@ public class ItemDesigner {
 					String[] slots = itemNode.getString(".slot").replace(" ", "").split(",");
 					for (String slot: slots) {
 						if (this.isDefinable(internalName, slot)) {
-							ItemMap itemMap = new ItemMap(this, internalName, slot);
+							ItemMap itemMap = new ItemMap(internalName, slot);
 							
 							this.setMaterial(itemMap);
 							this.setSkullDatabase(itemMap);
@@ -748,7 +748,7 @@ public class ItemDesigner {
 						ingredientList.put(character, material);
 					} else { ServerHandler.getServer().logWarn("{ItemMap} The material " + ingredientParts[1] + " for the custom recipe defined for the item " + itemMap.getConfigName() + " is not a proper material type!"); }
 				}
-				Bukkit.getServer().addRecipe(shapedRecipe);
+				ServerHandler.getServer().runThread(async -> { Bukkit.getServer().addRecipe(shapedRecipe); });
 				itemMap.setIngredients(ingredientList);
 			} else { ServerHandler.getServer().logWarn("{ItemMap} There is a custom recipe defined for the item " + itemMap.getConfigName() + " but it still needs ingredients defined!"); }
 		}
@@ -1175,22 +1175,6 @@ public class ItemDesigner {
 		if (ServerHandler.getServer().hasSpecificUpdate("1_8") && Utils.getUtils().containsIgnoreCase(itemMap.getItemFlags(), "hide-attributes")) {
 			itemMap.setAttributesInfo(true);
 		}
-	}
-	
-   /**
-    * Calculates the exact numer of arbitrary slots,
-    * assigning numbers to each slot to uniquely identify each item.
-    * 
-    * @param slot - The numerical or custom slot value.
-    * @return The exact slot ID to be set to the item.
-    */
-	private int ArbitraryID = 0;
-	public String getItemID(String slot) {
-		if (slot.equalsIgnoreCase("Arbitrary")) {
-			this.ArbitraryID += 1;
-			slot += this.ArbitraryID;
-		}
-		return slot;
 	}
 	
    /**

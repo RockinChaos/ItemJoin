@@ -40,7 +40,7 @@ public class MobsDrop implements Listener {
 	private void onMobDeath(EntityDeathEvent event) {
 		final LivingEntity victim = event.getEntity();
 		final Entity killer = victim.getKiller();
-		ServerHandler.getServer().runAsyncThread(main -> {
+		ServerHandler.getServer().runAsyncThread(async -> {
 			for (ItemMap itemMap: ItemUtilities.getUtilities().getItems()) {
 				if (itemMap.mobsDrop() && itemMap.getMobsDrop().containsKey(victim.getType()) && itemMap.inWorld(victim.getWorld()) 
 			   && ((killer != null && itemMap.hasPermission((Player)killer)) || killer == null) && Math.random() <= itemMap.getMobsDrop().get(victim.getType())) {

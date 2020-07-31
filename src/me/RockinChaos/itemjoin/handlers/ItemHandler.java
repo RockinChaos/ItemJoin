@@ -18,14 +18,17 @@
 package me.RockinChaos.itemjoin.handlers;
 
 import java.io.EOFException;
+import java.io.InputStreamReader;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
+
+import javax.net.ssl.HttpsURLConnection;
 
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.Bukkit;
@@ -40,6 +43,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.map.MapView;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 
@@ -379,6 +384,31 @@ public class ItemHandler {
 	}
 	
    /**
+    * Tries to find the UUID on Mojangs official profile servers,
+    * then apply the found players skin to the specified GameProfile.
+    * 
+    * @param profile - The GameProfile to have its skin set.
+    * @param uuid - The UUID of the player to have their skin fetched and set to the GameProfile.
+    * @return If the skin was successfully found and set to the specified GameProfile.
+    */
+	public GameProfile setSkin(final GameProfile profile, final UUID uuid) {
+		try {
+			HttpsURLConnection connection = (HttpsURLConnection) new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + uuid + "?unsigned=false").openConnection();
+			if (connection.getResponseCode() == HttpsURLConnection.HTTP_OK) {
+            	InputStreamReader reader = new InputStreamReader(connection.getInputStream());
+            	JsonObject properties = new JsonParser().parse(reader).getAsJsonObject().get("properties").getAsJsonArray().get(0).getAsJsonObject();
+            	String texture = properties.get("value").getAsString();
+            	String signature = properties.get("signature").getAsString();
+				profile.getProperties().put("textures", new Property("textures", texture, signature));
+				return profile;
+			} else {
+				ServerHandler.getServer().logWarn("Connection could not be opened (Response code " + connection.getResponseCode() + ", " + connection.getResponseMessage() + ")");
+				return profile;
+			}
+		} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); return profile; }
+	}
+	
+   /**
 	* Stacks two items together.
 	* 
 	* @param player - The player being referenced.
@@ -492,13 +522,13 @@ public class ItemHandler {
 		if (inventory != null && PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
 			for (int k = 4; k >= 0; k--) {
 				if (inventory.getItem(k) != null && inventory.getItem(k).getType() != Material.AIR) {
-					craftView.setItem(k, inventory.getItem(k).clone());
+				 craftView.setItem(k, inventory.getItem(k).clone());
 				}
 			}
 			PlayerHandler.getPlayer().updateInventory(player, 1L);
 			SQLite.getLite(false).removeReturnCraftItems(player);
 		} else if (!PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
-			ServerHandler.getServer().runAsyncThread(main -> { this.restoreCraftItems(player); }, 60L);
+			ServerHandler.getServer().runThread(main -> { this.restoreCraftItems(player); }, 60L);
 		}
     }
     

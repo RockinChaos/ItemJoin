@@ -35,7 +35,6 @@ import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.listeners.InventoryClick;
 import me.RockinChaos.itemjoin.utils.Utils;
-import me.arcaniax.hdb.api.HeadDatabaseAPI;
 import me.RockinChaos.itemjoin.utils.LegacyAPI;
 
 public class ItemAnimation {
@@ -200,7 +199,7 @@ public class ItemAnimation {
     */
 	private void AnimateTask(final Player player, final boolean hasNext, final String nameString, final List<String> loreString, final String materialString, final String ownerString, final String textureString, final List<String> pagesString, final long UpdateDelay, final int position) {
 		final ItemMap itemMap = this.itemMap;
-		ServerHandler.getServer().runAsyncThread(main -> { 
+		ServerHandler.getServer().runAsyncThread(async -> { 
 			if (!stopAnimations) {
 				// ============== Animate Within the Player Inventory ============== //
 				for (ItemStack inPlayerInventory: player.getInventory().getContents()) {
@@ -265,9 +264,11 @@ public class ItemAnimation {
 	* @param nameString - The name to set to the item.
 	*/
 	private void setNameData(final Player player, final ItemStack reviseItem, final String nameString) {
-		final ItemMeta tempmeta = reviseItem.getItemMeta();
-		tempmeta.setDisplayName(Utils.getUtils().translateLayout(ItemHandler.getItem().cutDelay(nameString) + this.itemMap.getLegacySecret(), player));
-		reviseItem.setItemMeta(tempmeta);
+		ServerHandler.getServer().runThread(async -> { 
+			final ItemMeta tempmeta = reviseItem.getItemMeta();
+			tempmeta.setDisplayName(Utils.getUtils().translateLayout(ItemHandler.getItem().cutDelay(nameString) + this.itemMap.getLegacySecret(), player));
+			reviseItem.setItemMeta(tempmeta);
+		});
 	}
 	
    /**
@@ -278,16 +279,18 @@ public class ItemAnimation {
 	* @param loreString - The lore to set to the item.
 	*/
 	private void setLoreData(final Player player, final ItemStack reviseItem, final List<String> loreString) {
-		final ItemMeta tempmeta = reviseItem.getItemMeta();
-		final List < String > loreList = loreString;
-		final List < String > loreFormatList = new ArrayList < String > ();
-		for (int k = 0; k < loreList.size(); k++) {
-			String formatLore = ItemHandler.getItem().cutDelay(loreList.get(k));
-			formatLore = Utils.getUtils().translateLayout(formatLore, player);
-			loreFormatList.add(formatLore);
-		}
-		tempmeta.setLore(loreFormatList);
-		reviseItem.setItemMeta(tempmeta);
+		ServerHandler.getServer().runThread(async -> { 
+			final ItemMeta tempmeta = reviseItem.getItemMeta();
+			final List < String > loreList = loreString;
+			final List < String > loreFormatList = new ArrayList < String > ();
+			for (int k = 0; k < loreList.size(); k++) {
+				String formatLore = ItemHandler.getItem().cutDelay(loreList.get(k));
+				formatLore = Utils.getUtils().translateLayout(formatLore, player);
+				loreFormatList.add(formatLore);
+			}
+			tempmeta.setLore(loreFormatList);
+			reviseItem.setItemMeta(tempmeta);
+		});
 	}
 	
    /**
@@ -297,25 +300,27 @@ public class ItemAnimation {
 	* @param reviseItem - The item to have its material animated.
 	* @param materialString - The material to set to the item.
 	*/
-	private void setMaterialData(final Player player, final ItemStack reviseItem, String materialString) {
-		Material mat = null;
-		materialString = ItemHandler.getItem().cutDelay(materialString);
-		if (materialString.contains(":")) { 
-			final String[] parts = materialString.split(":");
-			if (ServerHandler.getServer().hasSpecificUpdate("1_13")) {
-				if (!Utils.getUtils().isInt(parts[0])) { parts[0] = "LEGACY_" + parts[0]; }
-				if (!Utils.getUtils().isInt(parts[0])) { mat = LegacyAPI.getLegacy().getMaterial(Material.getMaterial(parts[0].toUpperCase()), (byte) Integer.parseInt(parts[1])); } 
-				else { mat = LegacyAPI.getLegacy().getMaterial(Integer.parseInt(parts[0]), (byte) Integer.parseInt(parts[1])); }
-				if (mat != null && mat != Material.AIR) { reviseItem.setType(mat); }
+	private void setMaterialData(final Player player, final ItemStack reviseItem, final String material) {
+		ServerHandler.getServer().runThread(async -> { 
+			Material mat = null;
+			String materialString = ItemHandler.getItem().cutDelay(material);
+			if (materialString.contains(":")) { 
+				final String[] parts = materialString.split(":");
+				if (ServerHandler.getServer().hasSpecificUpdate("1_13")) {
+					if (!Utils.getUtils().isInt(parts[0])) { parts[0] = "LEGACY_" + parts[0]; }
+					if (!Utils.getUtils().isInt(parts[0])) { mat = LegacyAPI.getLegacy().getMaterial(Material.getMaterial(parts[0].toUpperCase()), (byte) Integer.parseInt(parts[1])); } 
+					else { mat = LegacyAPI.getLegacy().getMaterial(Integer.parseInt(parts[0]), (byte) Integer.parseInt(parts[1])); }
+					if (mat != null && mat != Material.AIR) { reviseItem.setType(mat); }
+				} else {
+					mat = ItemHandler.getItem().getMaterial(parts[0], null);
+					if (mat != null && mat != Material.AIR) { reviseItem.setType(mat); }	
+					LegacyAPI.getLegacy().setDurability(reviseItem, (byte) Integer.parseInt(parts[1]));
+				}
 			} else {
-				mat = ItemHandler.getItem().getMaterial(parts[0], null);
-				if (mat != null && mat != Material.AIR) { reviseItem.setType(mat); }	
-				LegacyAPI.getLegacy().setDurability(reviseItem, (byte) Integer.parseInt(parts[1]));
+				mat = ItemHandler.getItem().getMaterial(materialString, null);
+				if (mat != null && mat != Material.AIR) { reviseItem.setType(mat); }
 			}
-		} else {
-			mat = ItemHandler.getItem().getMaterial(materialString, null);
-			if (mat != null && mat != Material.AIR) { reviseItem.setType(mat); }
-		}
+		});
 	}
 	
    /**
@@ -326,12 +331,14 @@ public class ItemAnimation {
 	* @param pagesString - The book pages to set to the item.
 	*/
 	private void setPagesData(final Player player, final ItemStack reviseItem, final List<String> pagesString) {
-		if (ServerHandler.getServer().hasSpecificUpdate("1_8")) {
-			reviseItem.setItemMeta(this.itemMap.setJSONBookPages(player, reviseItem, pagesString).getItemMeta());
-		} else {
-			final ItemMeta itemMeta = LegacyAPI.getLegacy().setBookPages(player, reviseItem.getItemMeta(), pagesString, this.itemMap);
-			reviseItem.setItemMeta(itemMeta);
-		}
+		ServerHandler.getServer().runThread(async -> { 
+			if (ServerHandler.getServer().hasSpecificUpdate("1_8")) {
+				reviseItem.setItemMeta(this.itemMap.setJSONBookPages(player, reviseItem, pagesString).getItemMeta());
+			} else {
+				final ItemMeta itemMeta = LegacyAPI.getLegacy().setBookPages(player, reviseItem.getItemMeta(), pagesString, this.itemMap);
+				reviseItem.setItemMeta(itemMeta);
+			}
+		});
 	}
 
    /**
@@ -343,23 +350,21 @@ public class ItemAnimation {
 	* @param textureString - The skull texture to set to the item.
 	*/
 	private void setSkull(final Player player, ItemStack reviseItem, final String ownerString, final String textureString) {
-		ItemMeta tempMeta = reviseItem.getItemMeta();
-		if (ownerString != null) {
-			tempMeta = ItemHandler.getItem().setSkullOwner(tempMeta, Utils.getUtils().translateLayout(ItemHandler.getItem().cutDelay(ownerString), player));
-		} else if (textureString != null && textureString.contains("hdb-") && this.itemMap.isHeadDatabase()) {
-			final HeadDatabaseAPI api = new HeadDatabaseAPI();
-			final ItemStack sk = api.getItemHead(ItemHandler.getItem().cutDelay(textureString).replace("hdb-", ""));
-			reviseItem = (sk != null ? sk : reviseItem);
-		} else if (textureString != null) {
-			try {
-				final GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
-				gameProfile.getProperties().put("textures", new Property("textures", new String(ItemHandler.getItem().cutDelay(textureString))));
-				final Field declaredField = tempMeta.getClass().getDeclaredField("profile");
-				declaredField.setAccessible(true);
-				declaredField.set(tempMeta, gameProfile);
-			} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
-		}
-		reviseItem.setItemMeta(tempMeta);
+		ServerHandler.getServer().runThread(async -> { 
+			ItemMeta tempMeta = reviseItem.getItemMeta();
+			if (ownerString != null) {
+				tempMeta = ItemHandler.getItem().setSkullOwner(tempMeta, Utils.getUtils().translateLayout(ItemHandler.getItem().cutDelay(ownerString), player));
+			} else if (textureString != null && !textureString.contains("hdb-") && !this.itemMap.isHeadDatabase()) {
+				try {
+					final GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
+					gameProfile.getProperties().put("textures", new Property("textures", new String(ItemHandler.getItem().cutDelay(textureString))));
+					final Field declaredField = tempMeta.getClass().getDeclaredField("profile");
+					declaredField.setAccessible(true);
+					declaredField.set(tempMeta, gameProfile);
+				} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
+			}
+			reviseItem.setItemMeta(tempMeta);
+		});
 	}
 	
    /**

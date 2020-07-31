@@ -126,11 +126,11 @@ public class InventoryCloseEvent extends InventoryEvent implements Cancellable {
 	* @param stack - The ItemStack to be removed.
 	*/
 	public void removeItem(ItemStack stack, int slot) {
-		try { 
 			stack.setAmount(0);
 			stack.setType(Material.AIR);
+		try {
 			this.transaction.getTopInventory().setItem(slot, new ItemStack(Material.AIR)); 
-		} catch (Exception e) { }
+		} catch (IllegalStateException e) { }
 	}
 	
    /**

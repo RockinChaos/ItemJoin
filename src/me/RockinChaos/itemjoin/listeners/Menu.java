@@ -69,7 +69,7 @@ public class Menu implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	private void onClose(InventoryCloseEvent event) {
 		if (UI.getCreator() != null && UI.getCreator().modifyMenu((Player) event.getPlayer())) {
-			ServerHandler.getServer().runAsyncThread(main -> {
+			ServerHandler.getServer().runAsyncThread(async -> {
 				if (!UI.getCreator().isOpen((Player) event.getPlayer())) {
 					UI.getCreator().setModifyMenu(false, (Player) event.getPlayer());
 					for (ItemMap itemMap: ItemUtilities.getUtilities().getItems()) {

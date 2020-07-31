@@ -61,7 +61,7 @@ public class Placement implements Listener {
 	 		if (!ItemUtilities.getUtilities().isAllowed(player, item, "count-lock")) {
 	 			ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item, null, player.getWorld());
 	 			item.setAmount(itemMap.getCount());
-	 			ServerHandler.getServer().runAsyncThread(main -> {
+	 			ServerHandler.getServer().runThread(main -> {
 	 				if (itemMap != null) { if (itemMap.isSimilar(PlayerHandler.getPlayer().getHandItem(player))) { PlayerHandler.getPlayer().getHandItem(player).setAmount(itemMap.getCount()); } }
 	 			}, 2L);
 	 		}

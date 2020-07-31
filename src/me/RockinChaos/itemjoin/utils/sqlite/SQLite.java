@@ -58,7 +58,7 @@ public class SQLite {
     * 
     */
 	public SQLite() {
-        ServerHandler.getServer().runAsyncThread(main -> {
+        ServerHandler.getServer().runAsyncThread(async -> {
 			SQDrivers.getDatabase("database").loadSQLDatabase();
 			this.createTables();
 			this.convertYAMLS();

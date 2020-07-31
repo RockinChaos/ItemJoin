@@ -186,19 +186,24 @@ public class ItemUtilities {
     * @param region - The region the Player is in.
     */
 	public void setItems(final Player player, final TriggerType type, final GameMode newMode, final String region) {
-		this.safeSet(player, type, region);
-		if (this.getItemDelay() != 0 && type != TriggerType.LIMITSWITCH && type != TriggerType.REGIONENTER && type != TriggerType.REGIONLEAVE) { 
-			Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
-				@Override
-				public void run() { 
+		ServerHandler.getServer().runAsyncThread(async_1 -> {
+			this.safeSet(player, type, region);
+			if (this.getItemDelay() != 0 && type != TriggerType.LIMITSWITCH && type != TriggerType.REGIONENTER && type != TriggerType.REGIONLEAVE) { 
+				ServerHandler.getServer().runThread(main -> {
 					ItemHandler.getItem().restoreCraftItems(player);
-					handleItems(player, type, newMode, region); 
-				}
-			}, this.getItemDelay());
-		} else { 
-			ItemHandler.getItem().restoreCraftItems(player);
-			this.handleItems(player, type, newMode, region); 
-		}
+					ServerHandler.getServer().runAsyncThread(async_2 -> {
+						this.handleItems(player, type, newMode, region);
+					});
+				}, this.getItemDelay());
+			} else {
+				ServerHandler.getServer().runThread(main -> {
+					ItemHandler.getItem().restoreCraftItems(player);
+					ServerHandler.getServer().runAsyncThread(async -> { 
+						this.handleItems(player, type, newMode, region);
+					});
+				});
+			}
+		});
 	}
 	
    /**
@@ -248,7 +253,7 @@ public class ItemUtilities {
 		if (type.equals(TriggerType.REGIONLEAVE)) { DependAPI.getDepends(false).getGuard().pasteReturnItems(player, player.getWorld().getName(), region); }
 		if (type.equals(TriggerType.REGIONENTER)) { this.clearEvent(player, "", type.name, region); }
 		if (this.getClearDelay() != 0) {
-			ServerHandler.getServer().runAsyncThread(main -> {
+			ServerHandler.getServer().runAsyncThread(async -> {
 				if (type.equals(TriggerType.JOIN)) {
 							clearEvent(player, player.getWorld().getName(), type.name, "");
 							this.triggerCommands(player);
@@ -495,22 +500,24 @@ public class ItemUtilities {
     * @param size - The expected stack size of the item.
     */
 	public void setInvSlots(final Player player, final ItemMap itemMap, final int size) {
-		ItemStack existingItem = ItemHandler.getItem().getItem(player, itemMap);
-		ItemStack item = itemMap.getItem(player).clone();
-		this.shiftItem(player, itemMap);
-		int nextSlot = this.nextItem(player, itemMap);
-		boolean overWrite = itemMap.isOverwritable() || ConfigHandler.getConfig(false).getFile("items.yml").getBoolean("items-Overwrite");
-		if (size > 1) { item.setAmount(size); }
-		if ((size > 1 || itemMap.isAlwaysGive()) && !overWrite && existingItem != null) {
-			player.getInventory().addItem(item);
-		} else if (nextSlot != 0) {
-			player.getInventory().setItem(nextSlot, item);
-		} else if (player.getInventory().firstEmpty() != -1 || overWrite) {
-			player.getInventory().setItem(Integer.parseInt(itemMap.getSlot()), item);
-		} else if (itemMap.isDropFull()) { 
-			player.getWorld().dropItem(player.getLocation(), item);
-		}
-		ServerHandler.getServer().logDebug("{ItemMap} Given the Item: " + itemMap.getConfigName() + ".");
+		ServerHandler.getServer().runThread(main -> {
+			ItemStack existingItem = ItemHandler.getItem().getItem(player, itemMap);
+			ItemStack item = itemMap.getItem(player).clone();
+			this.shiftItem(player, itemMap);
+			int nextSlot = this.nextItem(player, itemMap);
+			boolean overWrite = itemMap.isOverwritable() || ConfigHandler.getConfig(false).getFile("items.yml").getBoolean("items-Overwrite");
+			if (size > 1) { item.setAmount(size); }
+			if ((size > 1 || itemMap.isAlwaysGive()) && !overWrite && existingItem != null) {
+				player.getInventory().addItem(item);
+			} else if (nextSlot != 0) {
+				player.getInventory().setItem(nextSlot, item);
+			} else if (player.getInventory().firstEmpty() != -1 || overWrite) {
+				player.getInventory().setItem(Integer.parseInt(itemMap.getSlot()), item);
+			} else if (itemMap.isDropFull()) { 
+				player.getWorld().dropItem(player.getLocation(), item);
+			}
+			ServerHandler.getServer().logDebug("{ItemMap} Given the Item: " + itemMap.getConfigName() + ".");
+		});
 		SQLite.getLite(false).saveItemData(player, itemMap);
 	}
 	
@@ -522,44 +529,46 @@ public class ItemUtilities {
     * @param size - The expected stack size of the item.
     */
 	public void setCustomSlots(final Player player, final ItemMap itemMap, final int size) {
-		int craftSlot = Utils.getUtils().getSlotConversion(itemMap.getSlot());
-		ItemStack existingItem = ItemHandler.getItem().getItem(player, itemMap);
-		ItemStack item = itemMap.getItem(player).clone();
-		this.shiftItem(player, itemMap);
-		int nextSlot = this.nextItem(player, itemMap);
-		boolean overWrite = itemMap.isOverwritable() || ConfigHandler.getConfig(false).getFile("items.yml").getBoolean("items-Overwrite");
-		if (size > 1) { item.setAmount(size); }
-		if ((size > 1 || itemMap.isAlwaysGive()) && !overWrite && existingItem != null) {
-			player.getInventory().addItem(item);
-		} else if (nextSlot != 0) {
-			player.getInventory().setItem(nextSlot, item);
-		} else if (CustomSlot.ARBITRARY.isSlot(itemMap.getSlot()) && player.getInventory().firstEmpty() != -1) {
-			player.getInventory().addItem(item);
-		} else if (CustomSlot.HELMET.isSlot(itemMap.getSlot()) && (existingItem == null || overWrite)) {
-			player.getEquipment().setHelmet(item);
-		} else if (CustomSlot.CHESTPLATE.isSlot(itemMap.getSlot()) && (existingItem == null || overWrite)) {
-			player.getEquipment().setChestplate(item);
-		} else if (CustomSlot.LEGGINGS.isSlot(itemMap.getSlot()) && (existingItem == null || overWrite)) {
-			player.getEquipment().setLeggings(item);
-		} else if (CustomSlot.BOOTS.isSlot(itemMap.getSlot()) && (existingItem == null || overWrite)) {
-			player.getEquipment().setBoots(item);
-		} else if (ServerHandler.getServer().hasSpecificUpdate("1_9") && CustomSlot.OFFHAND.isSlot(itemMap.getSlot()) && (existingItem == null || overWrite)) {
-			PlayerHandler.getPlayer().setOffHandItem(player, item);
-		} else if (craftSlot != -1 && (existingItem == null || overWrite)) {
-			if (craftSlot == 0) {
-				ServerHandler.getServer().runAsyncThread(main -> {
-					if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
-			    			player.getOpenInventory().getTopInventory().setItem(craftSlot, item);
-			    			PlayerHandler.getPlayer().updateInventory(player, 1L);
-			    		}
-					}, 2L);
-			} else {
-				player.getOpenInventory().getTopInventory().setItem(craftSlot, item);
+		ServerHandler.getServer().runThread(main -> {
+			int craftSlot = Utils.getUtils().getSlotConversion(itemMap.getSlot());
+			ItemStack existingItem = ItemHandler.getItem().getItem(player, itemMap);
+			ItemStack item = itemMap.getItem(player).clone();
+			this.shiftItem(player, itemMap);
+			int nextSlot = this.nextItem(player, itemMap);
+			boolean overWrite = itemMap.isOverwritable() || ConfigHandler.getConfig(false).getFile("items.yml").getBoolean("items-Overwrite");
+			if (size > 1) { item.setAmount(size); }
+			if ((size > 1 || itemMap.isAlwaysGive()) && !overWrite && existingItem != null) {
+				player.getInventory().addItem(item);
+			} else if (nextSlot != 0) {
+				player.getInventory().setItem(nextSlot, item);
+			} else if (CustomSlot.ARBITRARY.isSlot(itemMap.getSlot()) && player.getInventory().firstEmpty() != -1) {
+				player.getInventory().addItem(item);
+			} else if (CustomSlot.HELMET.isSlot(itemMap.getSlot()) && (existingItem == null || overWrite)) {
+				player.getEquipment().setHelmet(item);
+			} else if (CustomSlot.CHESTPLATE.isSlot(itemMap.getSlot()) && (existingItem == null || overWrite)) {
+				player.getEquipment().setChestplate(item);
+			} else if (CustomSlot.LEGGINGS.isSlot(itemMap.getSlot()) && (existingItem == null || overWrite)) {
+				player.getEquipment().setLeggings(item);
+			} else if (CustomSlot.BOOTS.isSlot(itemMap.getSlot()) && (existingItem == null || overWrite)) {
+				player.getEquipment().setBoots(item);
+			} else if (ServerHandler.getServer().hasSpecificUpdate("1_9") && CustomSlot.OFFHAND.isSlot(itemMap.getSlot()) && (existingItem == null || overWrite)) {
+				PlayerHandler.getPlayer().setOffHandItem(player, item);
+			} else if (craftSlot != -1 && (existingItem == null || overWrite)) {
+				if (craftSlot == 0) {
+					ServerHandler.getServer().runThread(craft -> {
+						if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
+				    			player.getOpenInventory().getTopInventory().setItem(craftSlot, item);
+				    			PlayerHandler.getPlayer().updateInventory(player, 1L);
+				    		}
+						}, 2L);
+				} else {
+					player.getOpenInventory().getTopInventory().setItem(craftSlot, item);
+				}
+			} else if (itemMap.isDropFull()) {
+				player.getWorld().dropItem(player.getLocation(), item);
 			}
-		} else if (itemMap.isDropFull()) {
-			player.getWorld().dropItem(player.getLocation(), item);
-		}
-		ServerHandler.getServer().logDebug("{ItemMap} Given the Item: " + itemMap.getConfigName() + ".");
+			ServerHandler.getServer().logDebug("{ItemMap} Given the Item: " + itemMap.getConfigName() + ".");
+		});
 		SQLite.getLite(false).saveItemData(player, itemMap);
 	}
 	
@@ -630,28 +639,26 @@ public class ItemUtilities {
     * @param player - The Player having the commands executed.
     */
 	public void triggerCommands(final Player player) {
-		ServerHandler.getServer().runAsyncThread(main -> {
-			if ((ConfigHandler.getConfig(false).getFile("config.yml").getString("Active-Commands.enabled-worlds") != null && ConfigHandler.getConfig(false).getFile("config.yml").getStringList("Active-Commands.commands") != null) 
-					&& (!ConfigHandler.getConfig(false).getFile("config.yml").getString("Active-Commands.enabled-worlds").equalsIgnoreCase("DISABLED") || !ConfigHandler.getConfig(false).getFile("config.yml").getString("Active-Commands.enabled-worlds").equalsIgnoreCase("FALSE"))) {
-				String commandsWorlds = ConfigHandler.getConfig(false).getFile("config.yml").getString("Active-Commands.enabled-worlds").replace(" ", "");
-				if (commandsWorlds == null) { commandsWorlds = "DISABLED"; }
-				String[] compareWorlds = commandsWorlds.split(",");
-				for (String compareWorld: compareWorlds) {
-					if (compareWorld.equalsIgnoreCase(player.getWorld().getName()) || compareWorld.equalsIgnoreCase("ALL") || compareWorld.equalsIgnoreCase("GLOBAL")) {
-						for (String commands: ConfigHandler.getConfig(false).getFile("config.yml").getStringList("Active-Commands.commands")) {
-							String formatCommand = Utils.getUtils().translateLayout(commands, player).replace("first-join: ", "").replace("first-join:", "");
-							if (!SQLite.getLite(false).hasFirstCommanded(player, formatCommand)) {
-								Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), formatCommand);
-								if (Utils.getUtils().containsIgnoreCase(commands, "first-join:")) {
-									SQLite.getLite(false).saveFirstCommandData(player, formatCommand);
-								}
+		if ((ConfigHandler.getConfig(false).getFile("config.yml").getString("Active-Commands.enabled-worlds") != null && ConfigHandler.getConfig(false).getFile("config.yml").getStringList("Active-Commands.commands") != null) 
+				&& (!ConfigHandler.getConfig(false).getFile("config.yml").getString("Active-Commands.enabled-worlds").equalsIgnoreCase("DISABLED") || !ConfigHandler.getConfig(false).getFile("config.yml").getString("Active-Commands.enabled-worlds").equalsIgnoreCase("FALSE"))) {
+			String commandsWorlds = ConfigHandler.getConfig(false).getFile("config.yml").getString("Active-Commands.enabled-worlds").replace(" ", "");
+			if (commandsWorlds == null) { commandsWorlds = "DISABLED"; }
+			String[] compareWorlds = commandsWorlds.split(",");
+			for (String compareWorld: compareWorlds) {
+				if (compareWorld.equalsIgnoreCase(player.getWorld().getName()) || compareWorld.equalsIgnoreCase("ALL") || compareWorld.equalsIgnoreCase("GLOBAL")) {
+					for (String commands: ConfigHandler.getConfig(false).getFile("config.yml").getStringList("Active-Commands.commands")) {
+						String formatCommand = Utils.getUtils().translateLayout(commands, player).replace("first-join: ", "").replace("first-join:", "");
+						if (!SQLite.getLite(false).hasFirstCommanded(player, formatCommand)) {
+							Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), formatCommand);
+							if (Utils.getUtils().containsIgnoreCase(commands, "first-join:")) {
+								SQLite.getLite(false).saveFirstCommandData(player, formatCommand);
 							}
 						}
 					}
-					break;
 				}
+				break;
 			}
-		});
+		}
 	}
 	
    /**

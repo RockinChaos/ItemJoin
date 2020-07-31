@@ -103,7 +103,7 @@ public class SQDrivers extends Database {
 	*/
 	@Override
 	public void load() {
-        ServerHandler.getServer().runAsyncThread(main -> {
+        ServerHandler.getServer().runAsyncThread(async -> {
 			connection = getSQLConnection();
 			initialize(remoteEnabled);
         });

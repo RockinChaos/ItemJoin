@@ -331,13 +331,14 @@ public class DependAPI {
     * 
     */
 	public void sendUtilityDepends() {
-		ServerHandler.getServer().logInfo("Hooked into { " + (this.authMeEnabled() ? "AuthMe, " : "") + (this.nickEnabled() ? "BetterNick, " : "") 
+		String enabledPlugins = (this.authMeEnabled() ? "AuthMe, " : "") + (this.nickEnabled() ? "BetterNick, " : "") 
 				+ (this.hyperVerseEnabled() ? "Hyperverse, " : "") + (this.coreEnabled() ? "Multiverse-Core, " : "") + (this.inventoryEnabled() ? "Multiverse-Inventories, " : "") 
 				+ (this.myWorldsEnabled() ? "My Worlds, " : "") + (this.perInventoryEnabled() ? "PerWorldInventory, " : "") 
 				+ (this.perPluginsEnabled() ? "PerWorldPlugins, " : "") + (this.tokenEnchantEnabled() ? "TokenEnchant, " : "") 
 				+ (this.getGuard().guardEnabled() ? "WorldGuard, " : "") + (this.databaseEnabled() ? "HeadDatabase, " : "") 
 				+ (this.xInventoryEnabled() ? "xInventories, " : "") + (this.placeHolderEnabled() ? "PlaceholderAPI, " : "") + (this.skinsRestorer ? "SkinsRestorer, " : "") 
-				+ (this.getVault().vaultEnabled() ? "Vault " : "") + "}");
+				+ (this.getVault().vaultEnabled() ? "Vault " : "");
+		if (!enabledPlugins.isEmpty()) { ServerHandler.getServer().logInfo("Hooked into { " + enabledPlugins + "}"); }
 	}
 	
    /**
