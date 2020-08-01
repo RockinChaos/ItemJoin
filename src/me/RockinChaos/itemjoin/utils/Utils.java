@@ -17,6 +17,8 @@
  */
 package me.RockinChaos.itemjoin.utils;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.math.BigInteger;
@@ -32,7 +34,6 @@ import javax.net.ssl.HttpsURLConnection;
 import java.util.Random;
 import java.util.UUID;
 
-import org.apache.logging.log4j.core.util.IOUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Statistic;
@@ -285,6 +286,21 @@ public class Utils {
 	}
 	
    /**
+    * Converts a BufferedReader to a String output.
+    * 
+    * @param reader - the BufferedReader to be converted.
+    * @return The resulting appended String.
+    */
+	public String toString(BufferedReader reader) throws IOException {
+		String line = null;
+		StringBuilder result = new StringBuilder();
+		while ((line = reader.readLine()) != null) {
+		result.append(line);
+		}
+		return result.toString();
+	}
+	
+   /**
     * Gives all custom items to the specified player.sadsadsadsa
     * 
     * @param player - that will recieve the items.
@@ -296,7 +312,7 @@ public class Utils {
         		HttpsURLConnection connection = (HttpsURLConnection) new URL("https://api.mojang.com/users/profiles/minecraft/" + name).openConnection();
         		if (connection.getResponseCode() == HttpsURLConnection.HTTP_OK) {
 	            	InputStreamReader reader = new InputStreamReader(connection.getInputStream());
-		            String UUIDJson = IOUtils.toString(reader);
+		            String UUIDJson = this.toString(new BufferedReader(reader));
 		            if(UUIDJson.isEmpty()) return null;    
 		            JSONObject UUIDObject = (JSONObject) JSONValue.parseWithException(UUIDJson);
 		            String UUID = UUIDObject.get("id").toString();
