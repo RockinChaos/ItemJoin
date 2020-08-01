@@ -24,6 +24,7 @@ import java.util.function.Consumer;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -97,7 +98,7 @@ public class InventoryCrafting implements Listener {
 			ItemStack[] topContents = ItemHandler.getItem().cloneContents(event.getView().getTopInventory().getContents());
 	    	this.handleClose(slot -> { 
 	    		event.getView().getTopInventory().setItem(slot, new ItemStack(Material.AIR));
-	    	}, (Player)event.getPlayer(), event.getView(), topContents);
+	    	}, (Player)event.getPlayer(), event.getView(), topContents, true);
     	}
     }
     
@@ -108,10 +109,10 @@ public class InventoryCrafting implements Listener {
 	*/
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
     private void onCraftingClose(me.RockinChaos.itemjoin.handlers.events.InventoryCloseEvent event) {
-		if (ServerHandler.getServer().hasSpecificUpdate("1_8")) {
+		if (ServerHandler.getServer().hasSpecificUpdate("1_8") && PlayerHandler.getPlayer().isCraftingInv(event.getView())) {
 	    	this.handleClose(slot -> { 
-	    		event.removeItem(event.getTopContents()[slot], slot);
-	    	}, event.getPlayer(), event.getView(), event.getPreviousContents(true));
+	    		if (!event.isCancelled()) { event.setCancelled(true); }
+	    	}, event.getPlayer(), event.getView(), event.getPreviousContents(true), false);
 		}
     }
     
@@ -190,7 +191,7 @@ public class InventoryCrafting implements Listener {
     		@Override
     		public void run() {
     			if (craftingItems.containsKey(PlayerHandler.getPlayer().getPlayerID(player))) {
-    				delayReturnCrafting(event.getPlayer(), craftingItems.get(PlayerHandler.getPlayer().getPlayerID(player)), 1L);
+    				delayReturnCrafting(event.getPlayer(), craftingItems.get(PlayerHandler.getPlayer().getPlayerID(player)), 1L, false);
     			}
     			worldSwitch.remove(PlayerHandler.getPlayer().getPlayerID(player));
     		}
@@ -209,7 +210,7 @@ public class InventoryCrafting implements Listener {
     		creativeCraftingItems.put(PlayerHandler.getPlayer().getPlayerID(player), craftingItems.get(PlayerHandler.getPlayer().getPlayerID(player)));
     		LegacyAPI.getLegacy().removeCraftItems(player);
     	} else if (event.getNewGameMode() != GameMode.CREATIVE && creativeCraftingItems.containsKey(PlayerHandler.getPlayer().getPlayerID(player))) {
-    		this.delayReturnCrafting(event.getPlayer(), creativeCraftingItems.get(PlayerHandler.getPlayer().getPlayerID(player)), 1L);
+    		this.delayReturnCrafting(event.getPlayer(), creativeCraftingItems.get(PlayerHandler.getPlayer().getPlayerID(player)), 1L, false);
     		craftingItems.put(PlayerHandler.getPlayer().getPlayerID(player), creativeCraftingItems.get(PlayerHandler.getPlayer().getPlayerID(player)));
     		creativeCraftingItems.remove(PlayerHandler.getPlayer().getPlayerID(player));
     	}
@@ -274,29 +275,47 @@ public class InventoryCrafting implements Listener {
     * @param view - The view being referenced.
     * @param inventory - The inventory being handled.
     */
-	private void handleClose(final Consumer < Integer > input, final Player player, final InventoryView view, final ItemStack[] inventory) {
+	private void handleClose(final Consumer < Integer > input, final Player player, final InventoryView view, final ItemStack[] inventory, final boolean slotZero) {
 		if (PlayerHandler.getPlayer().isCraftingInv(view)) {
 			if (!ItemHandler.getItem().isContentsEmpty(inventory) && antiSpamPlayers.get(PlayerHandler.getPlayer().getPlayerID(player)) == null) {
 				antiSpamPlayers.put(PlayerHandler.getPlayer().getPlayerID(player), true);
 				for (int i = 0; i <= 4; i++) {
+					boolean isCrafting = false;
 					for (ItemMap itemMap: ItemUtilities.getUtilities().getCraftingItems()) {
-						if (!itemMap.isSimilar(inventory[i])) {
+						if ((itemMap.isCraftingItem() && itemMap.isSimilar(inventory[i]))) {
+							isCrafting = true;
 							input.accept(i);
 						}
 					}
+					if (!isCrafting && i != 0 && inventory[i] != null && inventory[i].getType() != Material.AIR) {
+						final int k = i;
+						ItemStack drop = inventory[i].clone();
+						ServerHandler.getServer().runThread(main -> {
+							player.getOpenInventory().getTopInventory().setItem(k, new ItemStack(Material.AIR));
+							if (player.getInventory().firstEmpty() != -1) {
+								player.getInventory().addItem(drop);
+							} else { 
+								Item itemDropped = player.getWorld().dropItem(player.getLocation(), drop);
+								itemDropped.setPickupDelay(40);
+							}
+						});
+						inventory[i] = new ItemStack(Material.AIR);
+					}
 				}
-				this.delayReturnCrafting(player, inventory, 1L);
+				this.delayReturnCrafting(player, inventory, 1L, !slotZero);
 			}
 		} else {
-			if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory()) && craftingOpenItems.containsKey(PlayerHandler.getPlayer().getPlayerID(player))) {
-				ItemStack[] openCraftContents = craftingOpenItems.get(PlayerHandler.getPlayer().getPlayerID(player));
-				if (openCraftContents != null && openCraftContents.length != 0 && antiSpamPlayers.get(PlayerHandler.getPlayer().getPlayerID(player)) == null) {
-					antiSpamPlayers.put(PlayerHandler.getPlayer().getPlayerID(player), true);
-					this.delayReturnCrafting(player, openCraftContents, 1L);
-					craftingItems.put(PlayerHandler.getPlayer().getPlayerID(player), craftingOpenItems.get(PlayerHandler.getPlayer().getPlayerID(player)));
-					craftingOpenItems.remove(PlayerHandler.getPlayer().getPlayerID(player));
+			ServerHandler.getServer().runThread(main -> {
+				if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory()) && craftingOpenItems.containsKey(PlayerHandler.getPlayer().getPlayerID(player))) {
+					ItemStack[] openCraftContents = craftingOpenItems.get(PlayerHandler.getPlayer().getPlayerID(player));
+					if (openCraftContents != null && openCraftContents.length != 0 && antiSpamPlayers.get(PlayerHandler.getPlayer().getPlayerID(player)) == null) {
+						antiSpamPlayers.put(PlayerHandler.getPlayer().getPlayerID(player), true);
+						this.delayReturnCrafting(player, openCraftContents, 1L, false);
+						craftingItems.put(PlayerHandler.getPlayer().getPlayerID(player), craftingOpenItems.get(PlayerHandler.getPlayer().getPlayerID(player)));
+						craftingOpenItems.remove(PlayerHandler.getPlayer().getPlayerID(player));
+					}
 				}
-			}
+			});
 		}
 	}
 	
@@ -307,12 +326,17 @@ public class InventoryCrafting implements Listener {
     * @param contents - the crafting contents to be returned.
     * @param delay - the delay to wait before returning the item.
     */
-	private void delayReturnCrafting(final Player player, final ItemStack[] contents, final long delay) {
-		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), () -> {
-			if (!player.isOnline()) { return; } else if (!PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) { this.delayReturnCrafting(player, contents, 10L); return; }
-			for (int i = 4; i >= 0; i--) {
-				player.getOpenInventory().getTopInventory().setItem(i, contents[i]);
-				PlayerHandler.getPlayer().updateInventory(player, ItemUtilities.getUtilities().getItemMap(contents[i], null, player.getWorld()), 1L);
+	private void delayReturnCrafting(final Player player, final ItemStack[] contents, final long delay, final boolean slotZero) {
+		ServerHandler.getServer().runThread(main -> {
+			if (!player.isOnline()) { return; } else if (!PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) { this.delayReturnCrafting(player, contents, 10L, slotZero); return; }
+			if (!slotZero) {
+				for (int i = 4; i >= 0; i--) {
+					player.getOpenInventory().getTopInventory().setItem(i, contents[i]);
+					PlayerHandler.getPlayer().updateInventory(player, ItemUtilities.getUtilities().getItemMap(contents[i], null, player.getWorld()), 1L);
+				}
+			} else { 
+				player.getOpenInventory().getTopInventory().setItem(0, contents[0]); 
+				PlayerHandler.getPlayer().updateInventory(player, ItemUtilities.getUtilities().getItemMap(contents[0], null, player.getWorld()), 1L);
 			}
 			if (antiSpamPlayers.get(PlayerHandler.getPlayer().getPlayerID(player)) != null) { antiSpamPlayers.remove(PlayerHandler.getPlayer().getPlayerID(player)); }
 		}, delay);

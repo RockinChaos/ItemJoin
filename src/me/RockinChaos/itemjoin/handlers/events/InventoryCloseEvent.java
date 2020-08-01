@@ -34,6 +34,7 @@ public class InventoryCloseEvent extends InventoryEvent implements Cancellable {
 	private static final HandlerList handlers = new HandlerList();
 	protected ItemStack[] topContents;
 	protected ItemStack[] bottomContents;
+	private Result inventoryClose;
 	
 	/**
 	* Creates a new InventoryCloseEvent instance.
@@ -64,23 +65,6 @@ public class InventoryCloseEvent extends InventoryEvent implements Cancellable {
 			}
 		}
 	}
-	
-   /**
-	* Gets the cancellation state of this event.
-	* This will always return false as the event cannot be cancelled.
-	*
-	* @return boolean cancellation state.
-	*/
-	public boolean isCancelled() {
-		return false;
-	}
-	
-   /**
-	* Not applicable for this event, setting this to true will change nothing.
-	*
-	* @param cancel true if you wish to cancel this event.
-	*/
-	public void setCancelled(boolean cancel) { }
     
     /**
      * Returns the player involved in this event
@@ -131,6 +115,43 @@ public class InventoryCloseEvent extends InventoryEvent implements Cancellable {
 		try {
 			this.transaction.getTopInventory().setItem(slot, new ItemStack(Material.AIR)); 
 		} catch (IllegalStateException e) { }
+	}
+	
+   /**
+	* Gets the cancellation state of this event.
+	*
+	* @return boolean cancellation state.
+	*/
+	public boolean isCancelled() {
+		return this.inventoryClose() == Result.DENY;
+	}
+	
+   /**
+	* Sets the cancellation state of this event. A canceled event will not be
+	* executed in the server, but will still pass to other plugins.
+	*
+	* @param cancel true if you wish to cancel this event.
+	*/
+	public void setCancelled(boolean cancel) { 
+		this.inventoryClose(cancel ? Result.DENY : this.inventoryClose() == Result.DENY ? Result.DEFAULT : this.inventoryClose());
+	}
+	
+   /**
+	* This controls the action to take with the InventoryCloseEvent.
+	*
+	* @return the action to take with the InventoryCloseEvent.
+	*/
+	public Result inventoryClose() {
+		return inventoryClose;
+	}
+	
+   /**
+    * Sets the InventoryCloseEvent to be enabled or disabled.
+    * 
+	* @param inventoryClose the action to take with the InventoryCloseEvent.
+	*/
+	public void inventoryClose(Result inventoryClose) {
+		this.inventoryClose = inventoryClose;
 	}
 	
    /**

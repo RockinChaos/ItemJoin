@@ -34,7 +34,6 @@ import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import de.domedd.betternick.BetterNick;
-import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.utils.DependAPI;
 import me.RockinChaos.itemjoin.utils.LanguageAPI;
@@ -249,12 +248,9 @@ public class PlayerHandler {
     * @param player - The player to have their levels set.
     */
 	public void updateExperienceLevels(final Player player) {
-        Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
-            @Override
-			public void run() {
-            	player.setExp(player.getExp());
-            	player.setLevel(player.getLevel());
-            }
+        ServerHandler.getServer().runThread(async -> {
+            player.setExp(player.getExp());
+            player.setLevel(player.getLevel());
         }, 1L);
 	}
 	
@@ -276,34 +272,31 @@ public class PlayerHandler {
     * @param delay - The ticks to wait before updating the inventory.
     */
 	public void updateInventory(final Player player, ItemMap itemMap, final long delay) {
-		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
-			@Override
-			public void run() {
-				try {
-				    for (int i = 0; i < 36; i++) { 
-				    	if (itemMap == null || itemMap.isReal(player.getInventory().getItem(i))) { 
-				    		Reflection.getReflection().sendPacketPlayOutSetSlot(player, player.getInventory().getItem(i), (i < 9 ? (i + 36) : i)); 
-				    	}
-				    }
-					if (ServerHandler.getServer().hasSpecificUpdate("1_9")) { 
-						if (itemMap == null || itemMap.isReal(getOffHandItem(player))) { 
-							Reflection.getReflection().sendPacketPlayOutSetSlot(player, getOffHandItem(player), 45); 
-						} 
-					}
-					if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
-						for (int i = 0; i < 5; i++) { 
-							if (itemMap == null || itemMap.isReal(player.getOpenInventory().getTopInventory().getItem(i))) { 
-								Reflection.getReflection().sendPacketPlayOutSetSlot(player, player.getOpenInventory().getTopInventory().getItem(i), i); 
-							}
-						}
-						for (int i = 0; i < 4; i++) { 
-							if (itemMap == null || itemMap.isReal(player.getInventory().getItem(i))) { 
-								Reflection.getReflection().sendPacketPlayOutSetSlot(player, player.getInventory().getItem(i + 36), (8 - i)); 
-							}
+		ServerHandler.getServer().runAsyncThread(async -> {
+			try {
+				for (int i = 0; i < 36; i++) { 
+				    if (itemMap == null || itemMap.isReal(player.getInventory().getItem(i))) { 
+				    	Reflection.getReflection().sendPacketPlayOutSetSlot(player, player.getInventory().getItem(i), (i < 9 ? (i + 36) : i)); 
+				   	}
+				}
+				if (ServerHandler.getServer().hasSpecificUpdate("1_9")) { 
+					if (itemMap == null || itemMap.isReal(getOffHandItem(player))) { 
+						Reflection.getReflection().sendPacketPlayOutSetSlot(player, getOffHandItem(player), 45); 
+					} 
+				}
+				if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
+					for (int i = 4; i >= 0; i--) { 
+						if (itemMap == null || itemMap.isReal(player.getInventory().getItem(i)) || itemMap.isCraftingItem()) { 
+							Reflection.getReflection().sendPacketPlayOutSetSlot(player, player.getOpenInventory().getTopInventory().getItem(i), i); 
 						}
 					}
-				} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
-			}
+					for (int i = 0; i <= 3; i++) { 
+						if (itemMap == null || itemMap.isReal(player.getInventory().getItem(i))) { 
+							Reflection.getReflection().sendPacketPlayOutSetSlot(player, player.getInventory().getItem(i + 36), (8 - i)); 
+						}
+					}
+				}
+			} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
 		}, delay);
 	}
 	
