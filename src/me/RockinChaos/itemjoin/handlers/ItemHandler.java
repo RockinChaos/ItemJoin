@@ -377,7 +377,7 @@ public class ItemHandler {
 			if (this.usesOwningPlayer()) { 
 				try { ((SkullMeta) meta).setOwningPlayer(player); }
 				catch (Exception e) { LegacyAPI.getLegacy().setSkullOwner(((SkullMeta) meta), player.getName()); }
-			} else { LegacyAPI.getLegacy().setSkullOwner(((SkullMeta) meta), player.getName()); }
+			} else { LegacyAPI.getLegacy().setSkullOwner(((SkullMeta) meta), (player != null ? player.getName() : owner)); }
 		}
 		return meta;
 	}
