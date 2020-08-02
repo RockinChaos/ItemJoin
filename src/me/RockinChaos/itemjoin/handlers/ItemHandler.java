@@ -374,8 +374,10 @@ public class ItemHandler {
 			OfflinePlayer player;
 			try { player = Bukkit.getOfflinePlayer(UUID.fromString(Utils.getUtils().getMojangUUID(owner))); }
 			catch (Exception e) { player = LegacyAPI.getLegacy().getOfflinePlayer(owner); }
-			try { ((SkullMeta) meta).setOwningPlayer(player); }
-			catch (Exception e) { LegacyAPI.getLegacy().setSkullOwner(((SkullMeta) meta), player.getName()); }
+			if (this.usesOwningPlayer()) { 
+				try { ((SkullMeta) meta).setOwningPlayer(player); }
+				catch (Exception e) { LegacyAPI.getLegacy().setSkullOwner(((SkullMeta) meta), player.getName()); }
+			} else { LegacyAPI.getLegacy().setSkullOwner(((SkullMeta) meta), player.getName()); }
 		}
 		return meta;
 	}
@@ -709,6 +711,18 @@ public class ItemHandler {
 		if (ServerHandler.getServer().hasSpecificUpdate("1_8")) {
 			return ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Settings.DataTags");
 		}
+		return false;
+	}
+	
+   /**
+    * Checks if the server is using the new skull method.
+    * 
+    * @return If the server is using the new skull method.
+    */
+	public boolean usesOwningPlayer() {
+		try {
+			if (Class.forName("org.bukkit.inventory.meta.SkullMeta").getMethod("getOwningPlayer") != null) { return true; }
+		} catch (Exception e) { }
 		return false;
 	}
 	

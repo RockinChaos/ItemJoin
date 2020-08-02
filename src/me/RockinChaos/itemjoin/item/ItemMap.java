@@ -3020,7 +3020,7 @@ public class ItemMap {
     * @return If the skull meta is similar.
     */
 	private boolean skullMeta(final ItemStack item) {
-		if (!this.isSkull() || skullOwner == null && this.skullTexture == null && PlayerHandler.getPlayer().getSkullOwner(item).equalsIgnoreCase("NULL") && ItemHandler.getItem().getSkullTexture(item.getItemMeta()).isEmpty() 
+		if (!this.isSkull() || this.skullOwner == null && this.skullTexture == null && PlayerHandler.getPlayer().getSkullOwner(item).equalsIgnoreCase("NULL") && ItemHandler.getItem().getSkullTexture(item.getItemMeta()).isEmpty() 
 				|| !this.skullAnimated && ((SkullMeta) item.getItemMeta()).hasOwner() && this.skullOwner != null && PlayerHandler.getPlayer().getSkullOwner(item).equalsIgnoreCase(this.skullOwner) 
 				|| this.skullOwner != null && this.isSkullData(item)
 				|| this.skullOwner != null && Utils.getUtils().containsIgnoreCase(this.skullOwner, "%player%")

@@ -301,18 +301,6 @@ public class PlayerHandler {
 	}
 	
    /**
-    * Checks if the server is using the new skull method.
-    * 
-    * @return If the server is using the new skull method.
-    */
-	private boolean usesOwningPlayer() {
-		try {
-			if (Class.forName("org.bukkit.inventory.meta.SkullMeta").getMethod("getOwningPlayer") != null) { return true; }
-		} catch (Exception e) { }
-		return false;
-	}
-	
-   /**
     * Gets the current skull owner of the specified item.
     * 
     * @param item - The item to have its skull owner fetched.
@@ -320,7 +308,7 @@ public class PlayerHandler {
     */
 	public String getSkullOwner(final ItemStack item) {
 		if (ServerHandler.getServer().hasSpecificUpdate("1_12") && item != null && item.hasItemMeta() && ItemHandler.getItem().isSkull(item.getType()) 
-				&& ((SkullMeta) item.getItemMeta()).hasOwner() && this.usesOwningPlayer() != false) {
+				&& ((SkullMeta) item.getItemMeta()).hasOwner() && ItemHandler.getItem().usesOwningPlayer() != false) {
 			String owner =  ((SkullMeta) item.getItemMeta()).getOwningPlayer().getName();
 			if (owner != null) { return owner; }
 		} else if (item != null && item.hasItemMeta() 
