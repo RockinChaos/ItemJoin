@@ -65,7 +65,7 @@ public class InventoryCrafting implements Listener {
   			final ItemStack[] craftingContents = event.getContents().clone();
   			if (event.isCancelled()) { return; }
   			for (ItemMap itemMap: ItemUtilities.getUtilities().getCraftingItems()) {
-  				if (!event.isCancelled() && itemMap.isSimilar(craftingContents[i])) {
+  				if (!event.isCancelled() && itemMap.isReal(craftingContents[i])) {
   					event.setCancelled(true);
   				} else if (event.isCancelled()) { return; }
   			}
@@ -282,7 +282,7 @@ public class InventoryCrafting implements Listener {
 				for (int i = 0; i <= 4; i++) {
 					boolean isCrafting = false;
 					for (ItemMap itemMap: ItemUtilities.getUtilities().getCraftingItems()) {
-						if ((itemMap.isCraftingItem() && itemMap.isSimilar(inventory[i]))) {
+						if ((itemMap.isCraftingItem() && itemMap.isReal(inventory[i]))) {
 							isCrafting = true;
 							input.accept(i);
 						}
