@@ -27,6 +27,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 
+import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.item.ItemUtilities.TriggerType;
 import me.RockinChaos.itemjoin.utils.DependAPI;
@@ -46,9 +47,11 @@ public class PlayerGuard implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	private void setRegionItems(PlayerMoveEvent event) {
 		final Player player = event.getPlayer();
-		if (SQLite.getLite(false).isEnabled(player)) {
-			this.handleRegions(player);
-		}
+		ServerHandler.getServer().runAsyncThread(async -> {
+			if (SQLite.getLite(false).isEnabled(player)) {
+				this.handleRegions(player);
+			}
+		});
 	}
 	
    /**
