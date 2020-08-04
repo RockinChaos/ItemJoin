@@ -126,9 +126,9 @@ public class PlayerHandler {
     * 
     * @param player - The player to have their slot set.
     */
-	public void setHotbarSlot(final Player player) {
-		if (ConfigHandler.getConfig(false).getHotbarSlot() != -1 && ConfigHandler.getConfig(false).getHotbarSlot() <= 8 && ConfigHandler.getConfig(false).getHotbarSlot() >= 0) {
-			player.getInventory().setHeldItemSlot(ConfigHandler.getConfig(false).getHotbarSlot());
+	public void setHotbarSlot(final Player player, int slot) {
+		if (slot != -1 && slot <= 8 && slot >= 0) {
+			player.getInventory().setHeldItemSlot(slot);
 		}
 	}
 	

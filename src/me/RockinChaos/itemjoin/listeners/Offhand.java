@@ -27,7 +27,7 @@ import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 
-public class SwitchHands implements Listener {
+public class Offhand implements Listener {
 	
    /**
 	* Prevents the player from moving the custom item from their mainhand to offhand slot or from their offhand to mainhand slot.

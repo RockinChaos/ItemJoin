@@ -46,7 +46,7 @@ import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.utils.LegacyAPI;
 
-public class InventoryCrafting implements Listener {
+public class Crafting implements Listener {
 	
 	private static HashMap<String, ItemStack[]> craftingItems = new HashMap<String, ItemStack[]>();
 	private static HashMap<String, ItemStack[]> craftingOpenItems = new HashMap<String, ItemStack[]>();

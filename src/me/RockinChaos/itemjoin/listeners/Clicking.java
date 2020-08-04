@@ -39,7 +39,7 @@ import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.utils.Utils;
 
-public class InventoryClick implements Listener {
+public class Clicking implements Listener {
 
 	private Map < String, Boolean > droppedItem = new HashMap < String, Boolean > ();
 	private Map < String, Boolean > dropClick = new HashMap < String, Boolean > ();

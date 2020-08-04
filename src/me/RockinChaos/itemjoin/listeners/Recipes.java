@@ -29,7 +29,7 @@ import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.utils.Utils;
 
-public class RepairCraft implements Listener {
+public class Recipes implements Listener {
 	
    /**
     * Prevents the player from using the custom item in a crafting recipe.

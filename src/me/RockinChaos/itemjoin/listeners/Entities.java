@@ -29,7 +29,7 @@ import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.utils.DependAPI;
 
-public class MobsDrop implements Listener {
+public class Entities implements Listener {
 
    /**
     * Handles the Mob Death custom item drops.

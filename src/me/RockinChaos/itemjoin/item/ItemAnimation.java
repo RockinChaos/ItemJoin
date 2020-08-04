@@ -33,7 +33,7 @@ import com.mojang.authlib.properties.Property;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
-import me.RockinChaos.itemjoin.listeners.InventoryClick;
+import me.RockinChaos.itemjoin.listeners.Clicking;
 import me.RockinChaos.itemjoin.utils.Utils;
 import me.RockinChaos.itemjoin.utils.LegacyAPI;
 
@@ -234,13 +234,13 @@ public class ItemAnimation {
 				// ============== Animate Within the Player's Cursor =============== //
 				if (player.getItemOnCursor().getType() != null && player.getItemOnCursor().getType() != Material.AIR && itemMap.getTempItem() != null && itemMap.isReal(player.getItemOnCursor())) {
 					ItemStack item = new ItemStack(player.getItemOnCursor());
-					if (InventoryClick.getCursor(PlayerHandler.getPlayer().getPlayerID(player)) != null && itemMap.isReal(InventoryClick.getCursor(PlayerHandler.getPlayer().getPlayerID(player)))) { item = new ItemStack(InventoryClick.getCursor(PlayerHandler.getPlayer().getPlayerID(player))); }
+					if (Clicking.getCursor(PlayerHandler.getPlayer().getPlayerID(player)) != null && itemMap.isReal(Clicking.getCursor(PlayerHandler.getPlayer().getPlayerID(player)))) { item = new ItemStack(Clicking.getCursor(PlayerHandler.getPlayer().getPlayerID(player))); }
 					if (nameString != null) { setNameData(player, player.getItemOnCursor(), nameString); } 
 					else if (loreString != null) { setLoreData(player, player.getItemOnCursor(), loreString); }
 					else if (materialString != null) { setMaterialData(player, player.getItemOnCursor(), materialString); }
 					else if (pagesString != null) { setPagesData(player, player.getItemOnCursor(), pagesString); }
 					else if (ownerString != null || textureString != null) { setSkull(player, player.getItemOnCursor(), ownerString, textureString); }
-					InventoryClick.putCursor(PlayerHandler.getPlayer().getPlayerID(player), item);
+					Clicking.putCursor(PlayerHandler.getPlayer().getPlayerID(player), item);
 				}
 				PlayerHandler.getPlayer().updateInventory(player, itemMap, 1L);
 				// ============== This has Concluded all Animations.. ============== //

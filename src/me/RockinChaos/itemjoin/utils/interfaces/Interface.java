@@ -153,24 +153,12 @@ public class Interface implements InventoryHolder {
     * @param amount - The number of buttons to be added.
     */
 	public void addButton(Button button, int amount) {
-		for (Entry < Integer, Page > entry: this.pages.entrySet()) {
-			for (int i = amount; i >= 1; i--) {
-				if (entry.getValue().addButton(button)) {
-					if (entry.getKey() == this.currentIndex) {
-						this.renderPage();
-					}
-					if (i == 1) {
-						return;
-					}
-				}
+		if (amount == 0 || amount == 1) { this.addButton(button); }
+		else {
+			for (int i = 0; i < amount; i++) {
+				this.addButton(button);
 			}
 		}
-		Page page = new Page(this.pageSize);
-		for (int i = amount; i >= 1; i--) {
-			page.addButton(button);
-		}
-		this.pages.put(this.pages.lastKey() + amount, page);
-		this.renderPage();
 	}
 	
    /**

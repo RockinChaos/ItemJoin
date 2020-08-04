@@ -33,7 +33,7 @@ import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.utils.DependAPI;
 
-public class BlocksDrop implements Listener {
+public class Breaking implements Listener {
 	
    /**
     * Handles the Block Break custom item drops.

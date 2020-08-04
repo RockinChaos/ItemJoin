@@ -547,8 +547,8 @@ public class LegacyAPI {
     * 
     */
 	public void registerInteract() {
-		if (!ServerHandler.getServer().hasSpecificUpdate("1_8") && !Utils.getUtils().isRegistered(me.RockinChaos.itemjoin.listeners.legacy.Legacy_Interact.class.getSimpleName())) {
-			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new me.RockinChaos.itemjoin.listeners.legacy.Legacy_Interact(), ItemJoin.getInstance());
+		if (!ServerHandler.getServer().hasSpecificUpdate("1_8") && !Utils.getUtils().isRegistered(me.RockinChaos.itemjoin.listeners.legacy.Legacy_Commands.class.getSimpleName())) {
+			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new me.RockinChaos.itemjoin.listeners.legacy.Legacy_Commands(), ItemJoin.getInstance());
 		}
 	}
 	
