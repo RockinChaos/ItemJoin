@@ -2591,8 +2591,13 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void flagPane(final Player player, final ItemMap itemMap) {
-		Interface flagPane = new Interface(false, 5, this.GUIName, player);
+		Interface flagPane = new Interface(true, 5, this.GUIName, player);
+		flagPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> {
+			this.setItemFlags(itemMap);
+			this.creatingPane(player, itemMap);
+		}));
 		ServerHandler.getServer().runAsyncThread(async -> {
+			flagPane.addButton(new Button(this.fillerPaneGItem), 9);
 			flagPane.addButton(new Button(ItemHandler.getItem().getItem("DIAMOND", 1, itemMap.isOpBypass(), "&a&l&nAllowOpBypass", "&7", 
 					"&a&lTrue&f:&7 Allows players who are OP to", "&7bypass any itemflags that add", "&7restrictions for this item.", "&7",
 					"&c&lFalse&f:&7 Players who are OP will be", "&7restricted by itemflags that add", "&7restrictions for this item.", "&7", 
@@ -2626,7 +2631,6 @@ public class UI {
 				}
 				this.flagPane(player, itemMap);
 			}));
-			flagPane.addButton(new Button(this.fillerPaneGItem));
 					flagPane.addButton(new Button(ItemHandler.getItem().getItem("DIAMOND_SHOVEL", 7, itemMap.isStackable(), "&a&l&nStackable", "&7", 
 					"&a&lTrue&f:&7 The item will be stackable with itself!", "&7",
 					"&c&lFalse&f:&7 The item stack only if it did in vanilla.", "&7", 
@@ -2638,7 +2642,6 @@ public class UI {
 				}
 				this.flagPane(player, itemMap);
 			}));
-			flagPane.addButton(new Button(this.fillerPaneGItem));
 			flagPane.addButton(new Button(ItemHandler.getItem().getItem("38", 1, itemMap.isInventoryClose(), "&a&l&nInventory Close", "&7", 
 					"&a&lTrue&f:&7 Closes the players current", "&7inventory when clicking the item.", "&7",
 					"&c&lFalse&f:&7 The current inventory will not", "&7be closed when clicking the item.", "&7", 
@@ -2669,6 +2672,17 @@ public class UI {
 					itemMap.setOverwritable(false);
 				} else {
 					itemMap.setOverwritable(true);
+				}
+				this.flagPane(player, itemMap);
+			}));
+			flagPane.addButton(new Button(ItemHandler.getItem().getItem("CACTUS", 1, itemMap.isDisposable(), "&a&l&nDisposable", "&7", 
+					"&a&lTrue&f:&7 If the item has a command", "&7defined, running the command", "&7will remove x1 of the item.", "&7",
+					"&c&lFalse&f:&7 Running item commands will", "&7not lower the items count.", "&7", 
+					"&9&lENABLED: &a" + (itemMap.isDisposable() + "").toUpperCase()), event -> {
+				if (itemMap.isDisposable()) {
+					itemMap.setDisposable(false);
+				} else {
+					itemMap.setDisposable(true);
 				}
 				this.flagPane(player, itemMap);
 			}));
@@ -2872,17 +2886,6 @@ public class UI {
 				}
 				this.flagPane(player, itemMap);
 			}));
-			flagPane.addButton(new Button(ItemHandler.getItem().getItem("CACTUS", 1, itemMap.isDisposable(), "&a&l&nDisposable", "&7", 
-					"&a&lTrue&f:&7 If the item has a command", "&7defined, running the command", "&7will remove x1 of the item.", "&7",
-					"&c&lFalse&f:&7 Running item commands will", "&7not lower the items count.", "&7", 
-					"&9&lENABLED: &a" + (itemMap.isDisposable() + "").toUpperCase()), event -> {
-				if (itemMap.isDisposable()) {
-					itemMap.setDisposable(false);
-				} else {
-					itemMap.setDisposable(true);
-				}
-				this.flagPane(player, itemMap);
-			}));
 			flagPane.addButton(new Button(ItemHandler.getItem().getItem("FURNACE", 1, itemMap.isItemModify(), "&a&l&nItem Modifiable", "&7", 
 					"&a&lTrue&f: &7Blocks the item from being", "&7repaired or enchanted in-game.", "&7",
 					"&c&lFalse&f: &7Allows items to", "&7be repaired and enchanted.", "&7", 
@@ -2894,6 +2897,7 @@ public class UI {
 				}
 				this.flagPane(player, itemMap);
 			}));
+			flagPane.addButton(new Button(this.fillerPaneGItem), 9);
 			flagPane.addButton(new Button(ItemHandler.getItem().getItem("ANVIL", 1, itemMap.isItemRepairable(), "&a&l&nItem Repairable", "&7", 
 					"&a&lTrue&f: &7Blocks the item from being", "&7used in an anvil or repaired.", "&7",
 					"&c&lFalse&f: &7Allows the item to be repaired.", "&7", 
@@ -2939,6 +2943,7 @@ public class UI {
 				}
 				this.flagPane(player, itemMap);
 			}));
+			flagPane.addButton(new Button(this.fillerPaneGItem));
 			flagPane.addButton(new Button(ItemHandler.getItem().getItem("ITEM_FRAME", 1, itemMap.isGiveNext(), "&a&l&nGive Next", "&7", 
 					"&a&lTrue&f: &7Gives the item to the next available slot", "&7only if the defined slot already has an existing item.", 
 					"&cNOTE: &7The overwrite flag will not work.", "&7",
@@ -2974,13 +2979,18 @@ public class UI {
 				}
 				this.flagPane(player, itemMap);
 			}));
-			flagPane.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu"), event -> {
-				this.setItemFlags(itemMap);this.creatingPane(player, itemMap);
+			flagPane.addButton(new Button(ItemHandler.getItem().getItem("SUGAR", 1, itemMap.isSelectable(), "&a&l&nSelectable", "&7", 
+					"&a&lTrue&f: &7Prevents the item from being", "&7held in the players hand.", "&7",
+					"&c&lFalse&f: &7Allows the item to be selected.", "&7", 
+					"&9&lENABLED: &a" +  (itemMap.isSelectable() + "").toUpperCase()), event -> {
+				if (itemMap.isSelectable()) {
+					itemMap.setSelectable(false);
+				} else {
+					itemMap.setSelectable(true);
+				}
+				this.flagPane(player, itemMap);
 			}));
-			flagPane.addButton(new Button(this.fillerPaneBItem), 7);
-			flagPane.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu"), event -> {
-				this.setItemFlags(itemMap);this.creatingPane(player, itemMap);
-			}));
+			flagPane.addButton(new Button(this.fillerPaneGItem), 18);
 		});
 		flagPane.open(player);
 	}
@@ -3008,6 +3018,7 @@ public class UI {
 		if (itemMap.isAnimated()) { itemflags += "ANIMATE, "; }
 		if (itemMap.isGlowing()) { itemflags += "GLOWING, "; }
 		if (itemMap.isStackable()) { itemflags += "STACKABLE, "; }
+		if (itemMap.isSelectable()) { itemflags += "SELECTABLE, "; }
 		if (itemMap.isItemStore()) { itemflags += "ITEM-STORE, "; }
 		if (itemMap.isCancelEvents()) { itemflags += "CANCEL-EVENTS, "; }
 		if (itemMap.isCountLock()) { itemflags += "COUNT-LOCK, "; }

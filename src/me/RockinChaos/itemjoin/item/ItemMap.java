@@ -240,6 +240,7 @@ public class ItemMap {
 	private boolean alwaysGive = false;
 	private boolean autoRemove = false;
 	private boolean stackable = false;
+	private boolean selectable = false;
 	private boolean CreativeBypass = false;
 	private boolean AllowOpBypass = false;
 	
@@ -448,6 +449,7 @@ public class ItemMap {
 			this.alwaysGive = Utils.getUtils().containsIgnoreCase(this.itemflags, "always-give");
 			this.autoRemove = Utils.getUtils().containsIgnoreCase(this.itemflags, "auto-remove");
 			this.stackable = Utils.getUtils().containsIgnoreCase(this.itemflags, "stackable");
+			this.selectable = Utils.getUtils().containsIgnoreCase(this.itemflags, "selectable");
 			this.dynamic = Utils.getUtils().containsIgnoreCase(this.itemflags, "dynamic");
 			this.animate = Utils.getUtils().containsIgnoreCase(this.itemflags, "animate");
 			this.glowing = Utils.getUtils().containsIgnoreCase(this.itemflags, "glowing") || Utils.getUtils().containsIgnoreCase(this.itemflags, "glow");
@@ -1292,6 +1294,15 @@ public class ItemMap {
     */
 	public void setStackable(final boolean bool) {
 		this.stackable = bool;
+	}
+	
+   /**
+    * Sets the Selectable Flag.
+    * 
+    * @param bool - The value to be set.
+    */
+	public void setSelectable(final boolean bool) {
+		this.selectable = bool;
 	}
 	
    /**
@@ -2739,6 +2750,15 @@ public class ItemMap {
 	}
 	
    /**
+    * Checks if the Selectable Flag is enabled.
+    * 
+    * @return If it is enabled.
+    */
+	public boolean isSelectable() {
+		return this.selectable;
+	}
+	
+   /**
     * Checks if the Animate Flag is enabled.
     * 
     * @return If it is enabled.
@@ -2926,6 +2946,7 @@ public class ItemMap {
 			else if (findFlag.equals("inventory-close")) { return closeInventory; }
 			else if (findFlag.equals("item-store")) { return itemStore; } 
 			else if (findFlag.equals("stackable")) { return stackable; } 
+			else if (findFlag.equals("selectable")) { return selectable; } 
 			else if (findFlag.equals("item-modifiable")) { return itemModify; } 
 			else if (findFlag.equals("item-craftable")) { return noCrafting; } 
 			else if (findFlag.equals("item-repairable")) { return noRepairing; } 
