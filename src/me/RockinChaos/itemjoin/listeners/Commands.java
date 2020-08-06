@@ -95,7 +95,7 @@ public class Commands implements Listener {
 	@EventHandler(ignoreCancelled = false)
 	private void onEquipClickCommand(InventoryClickEvent event) {
 		Player player = (Player) event.getWhoClicked();
-		if (Utils.getUtils().containsIgnoreCase(event.getAction().name(), "HOTBAR") && event.getView().getBottomInventory().getSize() >= event.getHotbarButton() 
+		if (Utils.getUtils().containsIgnoreCase(event.getAction().name(), "HOTBAR") && event.getView().getBottomInventory().getSize() >= event.getHotbarButton() && event.getHotbarButton() >= 0
 		 && event.getView().getBottomInventory().getItem(event.getHotbarButton()) != null && event.getView().getBottomInventory().getItem(event.getHotbarButton()).getType() != Material.AIR) {
 			if (!this.equipSetup(player, event.getView().getBottomInventory().getItem(event.getHotbarButton()), "ON_EQUIP", String.valueOf(event.getSlot()), event.getSlotType())) { event.setCancelled(true); }
 		}
