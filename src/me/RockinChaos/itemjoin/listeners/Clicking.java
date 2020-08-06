@@ -77,6 +77,17 @@ public class Clicking implements Listener {
 		for (ItemStack item : items) {
 			if (!ItemUtilities.getUtilities().isAllowed(player, item, "inventory-modify")) {
 				event.setCancelled(true);
+				if (player.getOpenInventory().getType().name().equalsIgnoreCase("CHEST") && !player.getOpenInventory().getTitle().equalsIgnoreCase("CHEST")) {
+					final ItemStack itemCopy = item.clone();
+					ServerHandler.getServer().runThread(main -> { 
+						for (int i = 0; i < player.getOpenInventory().getTopInventory().getSize(); i++) {
+							if (player.getOpenInventory().getTopInventory().getItem(i) != null && player.getOpenInventory().getTopInventory().getItem(i).equals(item)) {
+								player.getOpenInventory().getTopInventory().setItem(i, new ItemStack(Material.AIR));
+								player.getOpenInventory().getBottomInventory().setItem(event.getSlot(), itemCopy); 
+							}
+						}
+					});
+				}
 				if (PlayerHandler.getPlayer().isCreativeMode(player)) { player.closeInventory(); }
 				else if (!ItemUtilities.getUtilities().isAllowed(player, item, "inventory-close")) { player.closeInventory(); }
 				PlayerHandler.getPlayer().updateInventory(player, 1L);
