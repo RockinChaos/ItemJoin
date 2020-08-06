@@ -649,7 +649,9 @@ public class ItemUtilities {
 					for (String commands: ConfigHandler.getConfig(false).getFile("config.yml").getStringList("Active-Commands.commands")) {
 						String formatCommand = Utils.getUtils().translateLayout(commands, player).replace("first-join: ", "").replace("first-join:", "");
 						if (!SQLite.getLite(false).hasFirstCommanded(player, formatCommand)) {
-							Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), formatCommand);
+							ServerHandler.getServer().runThread(main -> {
+								Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), formatCommand);
+							});
 							if (Utils.getUtils().containsIgnoreCase(commands, "first-join:")) {
 								SQLite.getLite(false).saveFirstCommandData(player, formatCommand);
 							}
