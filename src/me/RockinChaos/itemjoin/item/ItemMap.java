@@ -4249,14 +4249,18 @@ public class ItemMap {
 		if (this.playersOnCooldown.containsKey(player.getWorld().getName() + "-.-" + PlayerHandler.getPlayer().getPlayerID(player))) {
 			playersCooldownList = this.playersOnCooldown.get(player.getWorld().getName() + "-.-" + PlayerHandler.getPlayer().getPlayerID(player));
 		}
-		
-		if (System.currentTimeMillis() - playersCooldownList >= this.cooldownSeconds * 1000) { return false; } 
-		else if (this.cooldownMessage != null && this.onCooldownTick(player)) {
+		if (this.cooldownSeconds != 0) {
+			if (System.currentTimeMillis() - playersCooldownList >= this.cooldownSeconds * 1000) { return false; } 
+			else if (this.onCooldownTick(player)) {
 				String cooldownmsg = (this.cooldownMessage.replace("%timeleft%", String.valueOf((this.cooldownSeconds - ((System.currentTimeMillis() - playersCooldownList) / 1000)))).replace("%item%", this.customName).replace("%itemraw%", ItemHandler.getItem().getMaterialName(this.tempItem)));
 				cooldownmsg = Utils.getUtils().translateLayout(cooldownmsg, player);
 				player.sendMessage(cooldownmsg);
 				this.addPlayerOnCooldownTick(player);
 			}
+		} else if (this.onCooldownTick(player)) {
+			this.addPlayerOnCooldownTick(player);
+			return false;
+		}
 		return true;
 	}
 	
