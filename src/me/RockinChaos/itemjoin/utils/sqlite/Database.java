@@ -67,7 +67,12 @@ public abstract class Database {
 			ps = conn.prepareStatement(statement);
 			return !ps.execute();
 		} catch (SQLException e) {
-			ServerHandler.getServer().logSevere("{SQLite} Failed to execute database statement.");
+			ServerHandler.getServer().logSevere("{SQLite} [1] Failed to execute database statement.");
+			try {
+				ServerHandler.getServer().logSevere("{SQLite} [1] Database Status: Open: " + !this.getSQLConnection().isClosed() + "! Writable: " + this.getSQLConnection().isReadOnly() + "!");
+			} catch (SQLException e2) {
+				ServerHandler.getServer().logSevere("{SQLite} [1] Failed to determine the Database Status.");
+			}
 			ServerHandler.getServer().sendDebugTrace(e);
 			return false;
 		} finally {
@@ -79,7 +84,7 @@ public abstract class Database {
 					conn.close();
 				}
 			} catch (SQLException e) {
-				ServerHandler.getServer().logSevere("{SQLite} Failed to close database connection.");
+				ServerHandler.getServer().logSevere("{SQLite} [1] Failed to close database connection.");
 				ServerHandler.getServer().sendDebugTrace(e);
 				return false;
 			}
@@ -105,7 +110,12 @@ public abstract class Database {
 				return rs.getObject(row);
 			}
 		} catch (SQLException e) {
-			ServerHandler.getServer().logSevere("{SQLite} Failed to execute database statement.");
+			ServerHandler.getServer().logSevere("{SQLite} [2] Failed to execute database statement.");
+			try {
+				ServerHandler.getServer().logSevere("{SQLite} [2] Database Status: Open: " + !this.getSQLConnection().isClosed() + "! Writable: " + this.getSQLConnection().isReadOnly() + "!");
+			} catch (SQLException e2) {
+				ServerHandler.getServer().logSevere("{SQLite} [2] Failed to determine the Database Status.");
+			}
 			ServerHandler.getServer().sendDebugTrace(e);
 			try {
 				if (ps != null) {
@@ -115,7 +125,7 @@ public abstract class Database {
 					conn.close();
 				}
 			} catch (SQLException e2) { 
-				ServerHandler.getServer().logSevere("{SQLite} Failed to close database connection."); 
+				ServerHandler.getServer().logSevere("{SQLite} [2] Failed to close database connection."); 
 				ServerHandler.getServer().sendDebugTrace(e2);
 			}
 			return null;
@@ -128,7 +138,7 @@ public abstract class Database {
 					conn.close();
 				}
 			} catch (SQLException e) { 
-				ServerHandler.getServer().logSevere("{SQLite} Failed to close database connection."); 
+				ServerHandler.getServer().logSevere("{SQLite} [3] Failed to close database connection."); 
 				ServerHandler.getServer().sendDebugTrace(e); 
 			}
 		}
@@ -140,7 +150,7 @@ public abstract class Database {
 				conn.close();
 			}
 		} catch (SQLException e) { 
-			ServerHandler.getServer().logSevere("{SQLite} Failed to close database connection."); 
+			ServerHandler.getServer().logSevere("{SQLite} [4] Failed to close database connection."); 
 			ServerHandler.getServer().sendDebugTrace(e); 
 		}
 		return null;
@@ -167,7 +177,12 @@ public abstract class Database {
 			}
 			return objects;
 		} catch (SQLException e) {
-			ServerHandler.getServer().logSevere("{SQLite} Failed to execute database statement.");
+			ServerHandler.getServer().logSevere("{SQLite} [3] Failed to execute database statement.");
+			try {
+				ServerHandler.getServer().logSevere("{SQLite} [3] Database Status: Open: " + !this.getSQLConnection().isClosed() + "! Writable: " + this.getSQLConnection().isReadOnly() + "!");
+			} catch (SQLException e2) {
+				ServerHandler.getServer().logSevere("{SQLite} [3] Failed to determine the Database Status.");
+			}
 			ServerHandler.getServer().sendDebugTrace(e);
 			try {
 				if (ps != null) {
@@ -177,7 +192,7 @@ public abstract class Database {
 					conn.close();
 				}
 			} catch (SQLException e2) { 
-				ServerHandler.getServer().logSevere("{SQLite} Failed to close database connection."); 
+				ServerHandler.getServer().logSevere("{SQLite} [5] Failed to close database connection."); 
 				ServerHandler.getServer().sendDebugTrace(e2);
 			}
 		} finally {
@@ -189,7 +204,7 @@ public abstract class Database {
 					conn.close();
 				}
 			} catch (SQLException e) { 
-				ServerHandler.getServer().logSevere("{SQLite} Failed to close database connection."); 
+				ServerHandler.getServer().logSevere("{SQLite} [6] Failed to close database connection."); 
 				ServerHandler.getServer().sendDebugTrace(e);
 			}
 		}
@@ -215,7 +230,12 @@ public abstract class Database {
 			}
 			rs.close();
 		} catch (SQLException e) {
-			ServerHandler.getServer().logSevere("{SQLite} Failed to execute database statement.");
+			ServerHandler.getServer().logSevere("{SQLite} [4] Failed to execute database statement.");
+			try {
+				ServerHandler.getServer().logSevere("{SQLite} [4] Database Status: Open: " + !this.getSQLConnection().isClosed() + "! Writable: " + this.getSQLConnection().isReadOnly() + "!");
+			} catch (SQLException e2) {
+				ServerHandler.getServer().logSevere("{SQLite} [4] Failed to determine the Database Status.");
+			}
 			ServerHandler.getServer().sendDebugTrace(e);
 		}
 		return existingData;
@@ -248,7 +268,12 @@ public abstract class Database {
 			}
 			return map;
 		} catch (SQLException e) {
-				ServerHandler.getServer().logSevere("{SQLite} Failed to execute database statement.");
+				ServerHandler.getServer().logSevere("{SQLite} [5] Failed to execute database statement.");
+			try {
+				ServerHandler.getServer().logSevere("{SQLite} [5] Database Status: Open: " + !this.getSQLConnection().isClosed() + "! Writable: " + this.getSQLConnection().isReadOnly() + "!");
+			} catch (SQLException e2) {
+				ServerHandler.getServer().logSevere("{SQLite} [5] Failed to determine the Database Status.");
+			}
 				ServerHandler.getServer().sendDebugTrace(e);
 			try {
 				if (ps != null) {
@@ -258,7 +283,7 @@ public abstract class Database {
 					conn.close();
 				}
 			} catch (SQLException e2) { 
-				ServerHandler.getServer().logSevere("{SQLite} Failed to close database connection."); 
+				ServerHandler.getServer().logSevere("{SQLite} [7] Failed to close database connection."); 
 				ServerHandler.getServer().sendDebugTrace(e2);
 			}
 		} finally {
@@ -270,7 +295,7 @@ public abstract class Database {
 					conn.close();
 				}
 			} catch (SQLException e) { 
-				ServerHandler.getServer().logSevere("{SQLite} Failed to close database connection."); 
+				ServerHandler.getServer().logSevere("{SQLite} [8] Failed to close database connection."); 
 				ServerHandler.getServer().sendDebugTrace(e);
 			}
 		}
@@ -291,7 +316,12 @@ public abstract class Database {
 			if (Utils.getUtils().containsIgnoreCase(e.getMessage(), "no such column")) {
 				return false;
 			} else {
-				ServerHandler.getServer().logSevere("{SQLite} Failed to execute database statement.");
+				ServerHandler.getServer().logSevere("{SQLite} [6] Failed to execute database statement.");
+			try {
+				ServerHandler.getServer().logSevere("{SQLite} [6] Database Status: Open: " + !this.getSQLConnection().isClosed() + "! Writable: " + this.getSQLConnection().isReadOnly() + "!");
+			} catch (SQLException e2) {
+				ServerHandler.getServer().logSevere("{SQLite} [6] Failed to determine the Database Status.");
+			}
 				ServerHandler.getServer().sendDebugTrace(e);
 			}
 		}
@@ -317,7 +347,7 @@ public abstract class Database {
 				}
 			}
 		} catch (SQLException e) {
-			ServerHandler.getServer().logSevere("{SQLite} Failed to check if a table exists.");
+			ServerHandler.getServer().logSevere("{SQLite} [9] Failed to check if a table exists.");
 			ServerHandler.getServer().sendDebugTrace(e);
 		}
 		return tExists;
@@ -363,7 +393,7 @@ public abstract class Database {
 				rs.close();
 			}
 		} catch (SQLException e) { 
-			ServerHandler.getServer().logSevere("{SQLite} Failed to close database connection."); 
+			ServerHandler.getServer().logSevere("{SQLite} [10] Failed to close database connection."); 
 			ServerHandler.getServer().sendDebugTrace(e);
 		}
 	}
@@ -376,7 +406,7 @@ public abstract class Database {
 		try {
 			this.getSQLConnection();
 		} catch (Exception e) {
-			ServerHandler.getServer().logSevere("{SQLite} Failed to close database connection."); 
+			ServerHandler.getServer().logSevere("{SQLite} [11] Failed to close database connection."); 
 			ServerHandler.getServer().sendDebugTrace(e);
 		}
 	}
@@ -392,7 +422,7 @@ public abstract class Database {
 			}
 		} catch (SQLException | NullPointerException e) { 
 			if (e.getCause() != null) {
-				ServerHandler.getServer().logSevere("{SQLite} Failed to close database connection."); 
+				ServerHandler.getServer().logSevere("{SQLite} [12] Failed to close database connection."); 
 				ServerHandler.getServer().sendDebugTrace(e);
 			}
 		}

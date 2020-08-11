@@ -90,7 +90,7 @@ public class SQDrivers extends Database {
 				ServerHandler.getServer().logSevere("{SQLite} SQLite exception on initialize.");
 				ServerHandler.getServer().sendDebugTrace(e);
 			} catch (ClassNotFoundException e) { 
-				ServerHandler.getServer().logSevere("{SQLite} You need the SQLite JBDC library, see: &ahttps://bitbucket.org/xerial/sqlite-jdbc/downloads/ &rand put it in /lib folder.");
+				ServerHandler.getServer().logSevere("{SQLite} You need the SQLite JBDC library, see: https://bitbucket.org/xerial/sqlite-jdbc/downloads/ and put it in /lib folder.");
 				ServerHandler.getServer().sendDebugTrace(e);
 			}
 			return null;
