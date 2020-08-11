@@ -459,7 +459,7 @@ public class ConfigHandler {
 			if (ServerHandler.getServer().hasSpecificUpdate("1_8") && !Utils.getUtils().isRegistered(Commands.class.getSimpleName())) {
 				ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Commands(), ItemJoin.getInstance());
 			} else {
-				LegacyAPI.getLegacy().registerInteract();
+				LegacyAPI.getLegacy().registerCommands();
 			}
 		}
 		if ((itemMap.isCancelEvents() || itemMap.isSelectable() || itemMap.getInteractCooldown() != 0)) {

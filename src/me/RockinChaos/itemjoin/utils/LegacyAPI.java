@@ -546,7 +546,7 @@ public class LegacyAPI {
     * Only called when the Server version is below 1.8.
     * 
     */
-	public void registerInteract() {
+	public void registerCommands() {
 		if (!ServerHandler.getServer().hasSpecificUpdate("1_8") && !Utils.getUtils().isRegistered(me.RockinChaos.itemjoin.listeners.legacy.Legacy_Commands.class.getSimpleName())) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new me.RockinChaos.itemjoin.listeners.legacy.Legacy_Commands(), ItemJoin.getInstance());
 		}

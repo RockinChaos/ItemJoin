@@ -57,7 +57,7 @@ public class Interact implements Listener {
 	* 
 	* @param event - PlayerItemHeldEvent
 	*/
-	@EventHandler(ignoreCancelled = false)
+	@EventHandler(ignoreCancelled = true)
 	private void onSelectItem(PlayerItemHeldEvent event) {
 		final Player player = event.getPlayer();
 		final ItemStack item = player.getInventory().getItem(event.getNewSlot());

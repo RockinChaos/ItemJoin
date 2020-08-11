@@ -302,8 +302,13 @@ public class ItemCommand {
 			@Override
 			public void run() {
 				allowDispatch(player, world);
-				if (((actionType.equals(ActionType.ON_DEATH) || !player.isDead())) && player.isOnline() && player.getWorld() == world && !getExecute(player)) {
-					setPending(player, false);
+				setPending(player, false);
+				ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(itemCopy, null, player.getWorld());
+				if ((actionType.equals(ActionType.ON_DEATH) || !player.isDead()) && 
+					((actionType.equals(ActionType.ON_HOLD) && PlayerHandler.getPlayer().getMainHandItem(player).isSimilar(itemCopy)) 
+					|| (actionType.equals(ActionType.ON_RECEIVE) && itemMap != null && itemMap.hasItem(player)) || 
+					(!actionType.equals(ActionType.ON_HOLD) && !actionType.equals(ActionType.ON_RECEIVE))) 
+					&& player.isOnline() && player.getWorld() == world && !getExecute(player)) {
 					switch (cmdtype) {
 						case CONSOLE: dispatchConsoleCommands(player); break;
 						case OP: dispatchOpCommands(player); break;
@@ -639,10 +644,10 @@ public class ItemCommand {
 		MULTI_CLICK_ALL("LEFT_CLICK_BLOCK, LEFT_CLICK_AIR, RIGHT_CLICK_BLOCK, RIGHT_CLICK_AIR, PICKUP_ALL, PICKUP_HALF, PLACE_ALL", ".multi-click"),
 		MULTI_CLICK_AIR("LEFT_CLICK_AIR, RIGHT_CLICK_AIR", ".multi-click-air"),
 		MULTI_CLICK_BLOCK("LEFT_CLICK_BLOCK, RIGHT_CLICK_BLOCK", ".multi-click-block"),
-		LEFT_CLICK_ALL("LEFT_CLICK_AIR, LEFT_CLICK_BLOCK, PICKUP_ALL", ".left-click"),
+		LEFT_CLICK_ALL("LEFT_CLICK_AIR, LEFT_CLICK_BLOCK, PICKUP_ALL, PLACE_ALL", ".left-click"),
 		LEFT_CLICK_AIR("LEFT_CLICK_AIR", ".left-click-air"),
 		LEFT_CLICK_BLOCK("LEFT_CLICK_BLOCK", ".left-click-block"),
-		RIGHT_CLICK_ALL("RIGHT_CLICK_AIR, RIGHT_CLICK_BLOCK, PICKUP_HALF", ".right-click"),
+		RIGHT_CLICK_ALL("RIGHT_CLICK_AIR, RIGHT_CLICK_BLOCK, PICKUP_HALF, PLACE_ALL", ".right-click"),
 		RIGHT_CLICK_AIR("RIGHT_CLICK_AIR", ".right-click-air"),
 		RIGHT_CLICK_BLOCK("RIGHT_CLICK_BLOCK", ".right-click-block"),
 		ON_RECEIVE("ON_RECEIVE", ".on-receive"),
