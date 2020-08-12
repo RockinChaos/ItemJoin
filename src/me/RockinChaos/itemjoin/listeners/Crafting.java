@@ -184,7 +184,7 @@ public class Crafting implements Listener {
 	* 
 	* @param event - PlayerDropItemEvent
 	*/
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler(ignoreCancelled = false)
     private void onCraftingWorlds(PlayerDropItemEvent event) {
     	final Player player = (Player) event.getPlayer();
     	final World world = player.getWorld();
