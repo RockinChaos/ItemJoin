@@ -65,7 +65,7 @@ public class Commands implements Listener {
 	* 
 	* @param event - PlayerDeathEvent.
 	*/
-	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = false)
 	private void onDeathCommand(PlayerDeathEvent event) {
 		ListIterator < ItemStack > litr = event.getDrops().listIterator();
 		while (litr.hasNext()) {
