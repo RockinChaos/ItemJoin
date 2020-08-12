@@ -23,9 +23,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
-import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
-import me.RockinChaos.itemjoin.utils.LegacyAPI;
 
 public class PlayerQuit implements Listener {
 	
@@ -38,9 +36,6 @@ public class PlayerQuit implements Listener {
 	private void Quit(PlayerQuitEvent event) {
 		Player player = event.getPlayer();
 		ItemHandler.getItem().saveCraftItems(player);
-		if (!ServerHandler.getServer().hasSpecificUpdate("1_15")) { 
-			LegacyAPI.getLegacy().removeCraftItems(player); 
-		}
 		ItemUtilities.getUtilities().closeAnimations(player);
 	}
 }

@@ -28,7 +28,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.BookMeta;
@@ -36,7 +35,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
-import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.item.ItemMap;
 
@@ -78,21 +76,6 @@ public class LegacyAPI {
     */
     public void setInHandItem(final Player player, final ItemStack item) {
     	player.setItemInHand(item);
-    }
-    
-   /**
-    * Removes all crafting items from the players inventory.
-    * 
-    * @param player - The Player to have their crafting items removed.
-    */
-    public void removeCraftItems(final Player player) {
-    	ItemStack[] craftingContents = player.getOpenInventory().getTopInventory().getContents();
-	    Inventory craftView = player.getOpenInventory().getTopInventory();
-	    if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
-	    	for (int k = 0; k < craftingContents.length; k++) {
-	    		craftView.setItem(k, new ItemStack(Material.AIR));
-	    	}
-	    }
     }
 	
    /**

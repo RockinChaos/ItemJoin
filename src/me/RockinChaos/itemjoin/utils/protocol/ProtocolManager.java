@@ -52,11 +52,9 @@ public class ProtocolManager {
   		    */
   			@Override
   			public Object onPacketInAsync(Player player, Channel channel, Object packet) {
-  				try {
-	  				if (manageEvents(player, channel, packet)) { 
-	  					return null; 
-	  				}
-  				} catch (Exception e) { }
+	  			if (manageEvents(player, channel, packet)) { 
+	  				return null; 
+	  			}
   				return super.onPacketInAsync(player, channel, packet);
   			}
   		
@@ -87,8 +85,7 @@ public class ProtocolManager {
 	  			PlayerAutoCraftEvent AutoCraft = new PlayerAutoCraftEvent(player, player.getOpenInventory().getTopInventory());
 	  			this.callEvent(AutoCraft);
 			  	return AutoCraft.isCancelled();
-	  		}
-	  		if (packet != null && packet.getClass().getSimpleName().equalsIgnoreCase("PacketPlayInCloseWindow")) {
+	  		} else if (packet != null && packet.getClass().getSimpleName().equalsIgnoreCase("PacketPlayInCloseWindow")) {
 	  			InventoryCloseEvent CloseInventory = new InventoryCloseEvent(player.getOpenInventory());
 	  			this.callEvent(CloseInventory);
 			  	return CloseInventory.isCancelled();

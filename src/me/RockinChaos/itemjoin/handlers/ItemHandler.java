@@ -470,7 +470,7 @@ public class ItemHandler {
 	public void purgeCraftItems(final boolean saveCrafting) {
 		PlayerHandler.getPlayer().forOnlinePlayers(player -> {
 			if (saveCrafting) { this.saveCraftItems(player); }
-			LegacyAPI.getLegacy().removeCraftItems(player); 
+			this.removeCraftItems(player); 
 		});
 	}
     
@@ -537,27 +537,34 @@ public class ItemHandler {
     * @param player - The Player to have their crafting items removed.
     */
     public void removeCraftItems(final Player player) {
-    	Inventory craftView = player.getOpenInventory().getBottomInventory();
-    	Inventory inventory = SQLite.getLite(false).getReturnCraftItems(player);
-    	if (inventory != null && ServerHandler.getServer().hasSpecificUpdate("1_15") && PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
-    		for (int k = 4; k >= 0; k--) {
-    			if (inventory.getItem(k) != null && inventory.getItem(k).getType() != Material.AIR) {
-    				int amount = inventory.getItem(k).getAmount();
-    				for (int i = 0; i < craftView.getSize(); i++) {
-    					for (ItemMap itemMap: ItemUtilities.getUtilities().getCraftingItems()) {
-    						if (craftView.getItem(i) != null && craftView.getItem(i).getType() != Material.AIR && itemMap.isReal(inventory.getItem(k)) && itemMap.isReal(craftView.getItem(i))) {
-    							amount -= craftView.getItem(i).getAmount();
-    							if (amount <= 0) {
-    								craftView.getItem(i).setAmount(0);
-    								craftView.setItem(i, new ItemStack(Material.AIR));
-    								if (amount == 0) { break; }
-    							} else { craftView.getItem(i).setAmount(amount); }
-    						}
-    					}
-    				}
-    			}
+    	ItemStack[] craftingContents = player.getOpenInventory().getTopInventory().getContents();
+	    Inventory craftView = player.getOpenInventory().getTopInventory();
+	    if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
+	    	for (int k = 0; k < craftingContents.length; k++) {
+	    		craftView.setItem(k, new ItemStack(Material.AIR));
+	    	}
+	    }
+    }
+    
+   /**
+    * Returns the custom crafting item to the player after the specified delay.
+    * 
+    * @param player - the Player having their item returned.
+    * @param slot - the slot to return the crafting item to.
+    * @param item - the item to be returned.
+    * @param delay - the delay to wait before returning the item.
+    */
+    public void returnCraftingItem(final Player player, final int slot, final ItemStack item, long delay) {
+    	if (item == null) { return; } if (slot == 0) { delay += 1L; }
+    	ServerHandler.getServer().runThread(main -> {
+    		if (!player.isOnline()) { return; }
+    		if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
+    	    	player.getOpenInventory().getTopInventory().setItem(slot, item);	
+    	    	PlayerHandler.getPlayer().updateInventory(player, 1L);
+    		} else {
+    			this.returnCraftingItem(player, slot, item, 10L);
     		}
-    	}
+    	}, delay);
     }
     
    /**

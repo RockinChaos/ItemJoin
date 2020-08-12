@@ -22,7 +22,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
-import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.item.ItemUtilities.TriggerType;
 
@@ -37,7 +36,6 @@ public class PlayerJoin implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	private void setJoinItems(PlayerJoinEvent event) {
 		final Player player = event.getPlayer();
-		ItemHandler.getItem().removeCraftItems(player);
 		ItemUtilities.getUtilities().setAuthenticating(player, TriggerType.JOIN, org.bukkit.GameMode.ADVENTURE, "GLOBAL"); 
 	}
 }
