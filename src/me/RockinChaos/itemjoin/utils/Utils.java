@@ -33,6 +33,8 @@ import javax.net.ssl.HttpsURLConnection;
 
 import java.util.Random;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -495,6 +497,22 @@ public class Utils {
 	}
 	
    /**
+    * Translated the specified String by formatting its hex color codes.
+    * 
+    * @return The translated string.
+    */
+    public String translateHexColorCodes(final String str) {
+    	final char COLOR_CHAR = ChatColor.COLOR_CHAR;
+    	Matcher matcher = Pattern.compile("&#([A-Fa-f0-9]{6})").matcher(str);
+    	StringBuffer buffer = new StringBuffer(str.length() + 4 * 8);
+    	while (matcher.find()) {
+    		String group = matcher.group(1);
+    		matcher.appendReplacement(buffer, COLOR_CHAR + "x" + COLOR_CHAR + group.charAt(0) + COLOR_CHAR + group.charAt(1) + COLOR_CHAR + group.charAt(2) + COLOR_CHAR + group.charAt(3) + COLOR_CHAR + group.charAt(4) + COLOR_CHAR + group.charAt(5));
+    	}
+    	return matcher.appendTail(buffer).toString();
+    }
+	
+   /**
     * Formats any color codes found in the String to Bukkit Colors so the
     * text will be colorfully formatted.
     * 
@@ -502,7 +520,7 @@ public class Utils {
     * @return The newly formatted String.
     */
 	public String colorFormat(final String str) {
-		return ChatColor.translateAlternateColorCodes('&', str);
+		return ChatColor.translateAlternateColorCodes('&', this.translateHexColorCodes(str));
 	}
 	
    /**
@@ -541,8 +559,7 @@ public class Utils {
 			try { str = str.replace("%player_location%", player.getLocation().getBlockX() + ", " + player.getLocation().getBlockY() + ", " + player.getLocation().getBlockZ()); } catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
 			try { str = str.replace("%player_interact%", PlayerHandler.getPlayer().getNearbyPlayer(player, 3)); } catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); } }
 		if (player == null) { try { str = str.replace("%player%", "CONSOLE"); } catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); } }
-	
-		str = ChatColor.translateAlternateColorCodes('&', str);
+		str = ChatColor.translateAlternateColorCodes('&', this.translateHexColorCodes(str));
 		if (DependAPI.getDepends(false).placeHolderEnabled()) {
 			try { try { return PlaceholderAPI.setPlaceholders(player, str); } 
 			catch (NoSuchFieldError e) { ServerHandler.getServer().logWarn("An error has occured when setting the PlaceHolder " + e.getMessage() + ", if this issue persits contact the developer of PlaceholderAPI."); return str; }
