@@ -499,6 +499,7 @@ public class Utils {
    /**
     * Translated the specified String by formatting its hex color codes.
     * 
+    * @param str - The String to have its Color Codes properly Converted to Mojang Hex Colors.
     * @return The translated string.
     */
     public String translateHexColorCodes(final String str) {
