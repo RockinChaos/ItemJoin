@@ -114,13 +114,15 @@ public class SQDrivers extends Database {
 	* 
 	* @param dbname - the name of the database to be purged.
 	*/
-	public void purgeDatabase() {
-		File dataFolder = new File(ItemJoin.getInstance().getDataFolder(), this.dbname + ".db");
-		if (dataFolder.exists()) {
-			try { dataFolder.delete(); } 
-			catch (Exception e) {
-				ServerHandler.getServer().logSevere("{SQLite} Failed to close database " + this.dbname + ".db after purging.");
-				ServerHandler.getServer().sendDebugTrace(e); 
+	public void deleteDatabase() {
+		if (!(ConfigHandler.getConfig(false).getFile("config.yml").getString("Database.MySQL") != null && ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Database.MySQL"))) {
+			File dataFolder = new File(ItemJoin.getInstance().getDataFolder(), this.dbname + ".db");
+			if (dataFolder.exists()) {
+				try { dataFolder.delete(); } 
+				catch (Exception e) {
+					ServerHandler.getServer().logSevere("{SQLite} Failed to close database " + this.dbname + ".db after purging.");
+					ServerHandler.getServer().sendDebugTrace(e); 
+				}
 			}
 		}
 	}

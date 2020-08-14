@@ -43,7 +43,6 @@ import me.RockinChaos.itemjoin.utils.UI;
 import me.RockinChaos.itemjoin.utils.Chances;
 import me.RockinChaos.itemjoin.utils.Utils;
 import me.RockinChaos.itemjoin.utils.sqlite.SQLite;
-import me.RockinChaos.itemjoin.utils.sqlite.SQDrivers;
 
 public class ChatExecutor implements CommandExecutor {
 	
@@ -371,7 +370,7 @@ public class ChatExecutor implements CommandExecutor {
 		if (this.confirmationRequests.get(table + sender.getName()) != null && this.confirmationRequests.get(table + sender.getName()).equals(true)) {
 			if (!table.equalsIgnoreCase("Database")) { SQLite.getLite(false).purgeDatabaseData(foundPlayer, args, table.replace("-", "_")); } 
 			else {
-				SQDrivers.getDatabase("database").purgeDatabase();
+				SQLite.getLite(false).purgeDatabase();
 				SQLite.getLite(true);
 			}
 			LanguageAPI.getLang(false).sendLangMessage("Commands.Database.purgeSuccess", sender, placeHolders);

@@ -69,7 +69,7 @@ public abstract class Database {
 		} catch (SQLException e) {
 			ServerHandler.getServer().logSevere("{SQLite} [1] Failed to execute database statement.");
 			try {
-				ServerHandler.getServer().logSevere("{SQLite} [1] Database Status: Open: " + !this.getSQLConnection().isClosed() + "! Writable: " + this.getSQLConnection().isReadOnly() + "!");
+				ServerHandler.getServer().logSevere("{SQLite} [1] Database Status: Open: " + !this.getSQLConnection().isClosed() + "! Writable: " + !this.getSQLConnection().isReadOnly() + "!");
 			} catch (SQLException e2) {
 				ServerHandler.getServer().logSevere("{SQLite} [1] Failed to determine the Database Status.");
 			}
@@ -112,7 +112,7 @@ public abstract class Database {
 		} catch (SQLException e) {
 			ServerHandler.getServer().logSevere("{SQLite} [2] Failed to execute database statement.");
 			try {
-				ServerHandler.getServer().logSevere("{SQLite} [2] Database Status: Open: " + !this.getSQLConnection().isClosed() + "! Writable: " + this.getSQLConnection().isReadOnly() + "!");
+				ServerHandler.getServer().logSevere("{SQLite} [2] Database Status: Open: " + !this.getSQLConnection().isClosed() + "! Writable: " + !this.getSQLConnection().isReadOnly() + "!");
 			} catch (SQLException e2) {
 				ServerHandler.getServer().logSevere("{SQLite} [2] Failed to determine the Database Status.");
 			}
@@ -179,7 +179,7 @@ public abstract class Database {
 		} catch (SQLException e) {
 			ServerHandler.getServer().logSevere("{SQLite} [3] Failed to execute database statement.");
 			try {
-				ServerHandler.getServer().logSevere("{SQLite} [3] Database Status: Open: " + !this.getSQLConnection().isClosed() + "! Writable: " + this.getSQLConnection().isReadOnly() + "!");
+				ServerHandler.getServer().logSevere("{SQLite} [3] Database Status: Open: " + !this.getSQLConnection().isClosed() + "! Writable: " + !this.getSQLConnection().isReadOnly() + "!");
 			} catch (SQLException e2) {
 				ServerHandler.getServer().logSevere("{SQLite} [3] Failed to determine the Database Status.");
 			}
@@ -232,7 +232,7 @@ public abstract class Database {
 		} catch (SQLException e) {
 			ServerHandler.getServer().logSevere("{SQLite} [4] Failed to execute database statement.");
 			try {
-				ServerHandler.getServer().logSevere("{SQLite} [4] Database Status: Open: " + !this.getSQLConnection().isClosed() + "! Writable: " + this.getSQLConnection().isReadOnly() + "!");
+				ServerHandler.getServer().logSevere("{SQLite} [4] Database Status: Open: " + !this.getSQLConnection().isClosed() + "! Writable: " + !this.getSQLConnection().isReadOnly() + "!");
 			} catch (SQLException e2) {
 				ServerHandler.getServer().logSevere("{SQLite} [4] Failed to determine the Database Status.");
 			}
@@ -270,7 +270,7 @@ public abstract class Database {
 		} catch (SQLException e) {
 				ServerHandler.getServer().logSevere("{SQLite} [5] Failed to execute database statement.");
 			try {
-				ServerHandler.getServer().logSevere("{SQLite} [5] Database Status: Open: " + !this.getSQLConnection().isClosed() + "! Writable: " + this.getSQLConnection().isReadOnly() + "!");
+				ServerHandler.getServer().logSevere("{SQLite} [5] Database Status: Open: " + !this.getSQLConnection().isClosed() + "! Writable: " + !this.getSQLConnection().isReadOnly() + "!");
 			} catch (SQLException e2) {
 				ServerHandler.getServer().logSevere("{SQLite} [5] Failed to determine the Database Status.");
 			}
@@ -301,7 +301,7 @@ public abstract class Database {
 		}
 		return null;
 	}
-
+	
    /**
 	* Checks if the column exists in the database.
 	* 
@@ -318,7 +318,7 @@ public abstract class Database {
 			} else {
 				ServerHandler.getServer().logSevere("{SQLite} [6] Failed to execute database statement.");
 			try {
-				ServerHandler.getServer().logSevere("{SQLite} [6] Database Status: Open: " + !this.getSQLConnection().isClosed() + "! Writable: " + this.getSQLConnection().isReadOnly() + "!");
+				ServerHandler.getServer().logSevere("{SQLite} [6] Database Status: Open: " + !this.getSQLConnection().isClosed() + "! Writable: " + !this.getSQLConnection().isReadOnly() + "!");
 			} catch (SQLException e2) {
 				ServerHandler.getServer().logSevere("{SQLite} [6] Failed to determine the Database Status.");
 			}

@@ -54,6 +54,14 @@ public class SQLite {
 	private static SQLite lite;
 	
    /**
+	* Defines the existing tables.
+	* 
+	*/
+    private enum Tables {
+       IJ_FIRST_JOIN, IJ_FIRST_WORLD, IJ_IP_LIMITS, IJ_FIRST_COMMANDS, IJ_ENABLED_PLAYERS, IJ_RETURN_ITEMS, IJ_RETURN_CRAFTITEMS, IJ_ON_COOLDOWN, IJ_MAP_IDS
+    }
+	
+   /**
     * Creates a new SQLData instance.
     * 
     */
@@ -82,15 +90,15 @@ public class SQLite {
     */
 	private void createTables() {
 		this.alterTables();
-        SQDrivers.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS ij_first_join (`World_Name` varchar(32), `Player_Name` varchar(32), `Player_UUID` varchar(32), `Item_Name` varchar(32), `Time_Stamp` varchar(32));");
-        SQDrivers.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS ij_first_world (`World_Name` varchar(32), `Player_Name` varchar(32), `Player_UUID` varchar(32), `Item_Name` varchar(32), `Time_Stamp` varchar(32));");
-        SQDrivers.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS ij_ip_limits (`World_Name` varchar(32), `IP_Address` varchar(32), `Player_UUID` varchar(32), `Item_Name` varchar(32), `Time_Stamp` varchar(32));");
-        SQDrivers.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS ij_first_commands (`World_Name` varchar(32), `Player_UUID` varchar(32), `Command_String` varchar(32), `Time_Stamp` varchar(32));");
-        SQDrivers.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS ij_enabled_players (`World_Name` varchar(32), `Player_Name` varchar(32), `Player_UUID` varchar(32), `isEnabled` varchar(32), `Time_Stamp` varchar(32));");
-        SQDrivers.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS ij_return_items (`World_Name` varchar(32), `Region_Name` varchar(32), `Player_UUID` varchar(32), `Inventory64` varchar(32), `Time_Stamp` varchar(32));");
-        SQDrivers.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS ij_return_craftitems (`Player_UUID` varchar(32), `Inventory64` varchar(32), `Time_Stamp` varchar(32));");
-        SQDrivers.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS ij_on_cooldown (`World_Name` varchar(32), `Item_Name` varchar(32), `Player_UUID` varchar(32), `Cooldown` varchar(32), `Duration` varchar(32), `Time_Stamp` varchar(32));");
-        SQDrivers.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS ij_map_ids (`Map_IMG` varchar(32), `Map_ID` varchar(32), `Time_Stamp` varchar(32));");
+        SQDrivers.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS ij_first_join (`World_Name` varchar(1000), `Player_Name` varchar(1000), `Player_UUID` varchar(1000), `Item_Name` varchar(1000), `Time_Stamp` varchar(1000));");
+        SQDrivers.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS ij_first_world (`World_Name` varchar(1000), `Player_Name` varchar(1000), `Player_UUID` varchar(1000), `Item_Name` varchar(1000), `Time_Stamp` varchar(1000));");
+        SQDrivers.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS ij_ip_limits (`World_Name` varchar(1000), `IP_Address` varchar(1000), `Player_UUID` varchar(1000), `Item_Name` varchar(1000), `Time_Stamp` varchar(1000));");
+        SQDrivers.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS ij_first_commands (`World_Name` varchar(1000), `Player_UUID` varchar(1000), `Command_String` varchar(1000), `Time_Stamp` varchar(1000));");
+        SQDrivers.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS ij_enabled_players (`World_Name` varchar(1000), `Player_Name` varchar(1000), `Player_UUID` varchar(1000), `isEnabled` varchar(1000), `Time_Stamp` varchar(1000));");
+        SQDrivers.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS ij_return_items (`World_Name` varchar(1000), `Region_Name` varchar(1000), `Player_UUID` varchar(1000), `Inventory64` varchar(1000), `Time_Stamp` varchar(1000));");
+        SQDrivers.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS ij_return_craftitems (`Player_UUID` varchar(1000), `Inventory64` varchar(1000), `Time_Stamp` varchar(1000));");
+        SQDrivers.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS ij_on_cooldown (`World_Name` varchar(1000), `Item_Name` varchar(1000), `Player_UUID` varchar(1000), `Cooldown` varchar(1000), `Duration` varchar(1000), `Time_Stamp` varchar(1000));");
+        SQDrivers.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS ij_map_ids (`Map_IMG` varchar(1000), `Map_ID` varchar(1000), `Time_Stamp` varchar(1000));");
 	}
 	
    /**
@@ -492,7 +500,7 @@ public class SQLite {
 	}
 	
    /**
-    * Removed limited items from the database data.
+    * Removed specified from the database data.
     * 
     * @param player - The player being removed.
     * @param section - The datatype being removed.
@@ -518,6 +526,16 @@ public class SQLite {
 				this.executeStatementsLater.add("DELETE FROM ij_" + section + " WHERE Player_UUID='" + UUID + "';");
 				this.enabledPlayers.remove(UUID);
 			}
+		}
+	}
+	
+   /**
+    * Removes ij_* tables from the database.
+    * 
+    */
+	public void purgeDatabase() {
+		for (Tables table: Tables.values()) {
+			SQDrivers.getDatabase("database").executeStatement("DROP TABLE IF EXISTS " + table.name().toLowerCase());
 		}
 	}
 	
