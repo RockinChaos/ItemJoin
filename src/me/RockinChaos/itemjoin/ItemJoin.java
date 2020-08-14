@@ -50,7 +50,7 @@ public class ItemJoin extends JavaPlugin {
   	@Override
 	public void onEnable() {
         ConfigHandler.getConfig(true).registerEvents();
-        UpdateHandler.getUpdater(true);
+        ServerHandler.getServer().runAsyncThread(async -> { UpdateHandler.getUpdater(true); });
         ServerHandler.getServer().logInfo("has been Enabled.");
   	}
   	

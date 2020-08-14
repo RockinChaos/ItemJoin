@@ -203,10 +203,10 @@ public class ChatExecutor implements CommandExecutor {
 			this.handleAllItems(sender, args, true);
 		} else if (Execute.UPDATE.accept(sender, args, 0)) {
 			LanguageAPI.getLang(false).sendLangMessage("Commands.Updates.checking", sender);
-			UpdateHandler.getUpdater(false).checkUpdates(sender, false);
+			ServerHandler.getServer().runAsyncThread(async -> { UpdateHandler.getUpdater(false).checkUpdates(sender, false); });
 		} else if (Execute.AUTOUPDATE.accept(sender, args, 0)) {
 			LanguageAPI.getLang(false).sendLangMessage("Commands.Updates.forcing", sender);
-			UpdateHandler.getUpdater(false).forceUpdates(sender);
+			ServerHandler.getServer().runAsyncThread(async -> { UpdateHandler.getUpdater(false).forceUpdates(sender); });
 		} else if (this.matchExecutor(args) == null) {
 			LanguageAPI.getLang(false).sendLangMessage("Commands.Default.unknownCommand", sender);
 		} else if (!this.matchExecutor(args).playerRequired(sender, args)) {

@@ -166,9 +166,7 @@ public class UpdateHandler {
     				}
     			}
     		} catch (Exception e) {
-    			ServerHandler.getServer().messageSender(sender, "&cAn error has occured when checking the plugin version!");
-    			ServerHandler.getServer().messageSender(sender, "&cPlease contact the plugin developer!");
-    			ServerHandler.getServer().sendDebugTrace(e);
+    			ServerHandler.getServer().messageSender(sender, "&cFailed to check for updates, connection could not be made.");
     			return false;
     		}
     	} else if (!onStart) {
