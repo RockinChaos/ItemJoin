@@ -3985,7 +3985,6 @@ public class ItemMap {
         		}
         		else if (!playerSuccess) { playerSuccess = itemCommands[i].execute(player, action, slot, this); }
 				else { itemCommands[i].execute(player, action, slot, this); }
-        		if (Utils.getUtils().containsIgnoreCase(itemCommands[i].getRawCommand(), "swap-item")) { itemCommands[i].setItem(itemCopy); }
         		itemCommands[i].setItem(itemCopy.clone());
 			}
     	}

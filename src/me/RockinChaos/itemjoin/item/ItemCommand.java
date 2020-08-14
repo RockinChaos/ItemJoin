@@ -116,6 +116,14 @@ public class ItemCommand {
     }
 	
    /**
+	* Cancels the tasks for onHold and onRecieve.
+	* 
+	*/
+	private void cancelTask() {
+		Bukkit.getServer().getScheduler().cancelTask(this.cycleTask);
+	}
+	
+   /**
 	* Runs the ItemCommand every x seconds for x amount of times when the player receives the item.
 	* 
 	* @param player - player that is interacting with the custom items command.
@@ -125,23 +133,13 @@ public class ItemCommand {
 	* @param itemMap - the ItemMap of the custom item.
 	*/
 	private void taskOnReceive(final Player player, final String slot, final int cooldown, final int receive, final ItemMap itemMap) {
-    	Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
-    		public void run() {
-    			if (receive != 0) {
-    				sendDispatch(player, executorType, slot); 
-    				taskOnReceive(player, slot, cooldown, (receive - 1), itemMap);
-    			} 
-    		}
+    	ServerHandler.getServer().runThread(main -> {
+    		if (receive != 0) {
+    			this.sendDispatch(player, this.executorType, slot); 
+    			this.taskOnReceive(player, slot, cooldown, (receive - 1), itemMap);
+    		} 
     	}, cooldown);
     }
-	
-   /**
-	* Cancels the tasks for onHold and onRecieve.
-	* 
-	*/
-	private void cancelTask() {
-		Bukkit.getServer().getScheduler().cancelTask(this.cycleTask);
-	}
 	
    /**
 	* Checks if the player is able to execute the command.
@@ -275,15 +273,12 @@ public class ItemCommand {
 	* @param world - the world that the player is in.
 	*/
 	private void allowDispatch(final Player player, final World world) {
-		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
-			@Override
-			public void run() {
-				if (getPending(player)) {
-					if ((!actionType.equals(ActionType.ON_DEATH) && player.isDead()) || !player.isOnline() || player.getWorld() != world) {
-						setExecute(player, true);
-						setPending(player, false);
-					} else { allowDispatch(player, world); }
-				}
+		ServerHandler.getServer().runThread(main -> {
+			if (this.getPending(player)) {
+				if ((!this.actionType.equals(ActionType.ON_DEATH) && player.isDead()) || !player.isOnline() || player.getWorld() != world) {
+					this.setExecute(player, true);
+					this.setPending(player, false);
+				} else { this.allowDispatch(player, world); }
 			}
 		}, 20);
 	}
@@ -298,31 +293,26 @@ public class ItemCommand {
 	private void sendDispatch(final Player player, final ExecutorType cmdtype, final String slot) {
 		final World world = player.getWorld();
 		this.setPending(player, true); 
-		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
-			@Override
-			public void run() {
-				allowDispatch(player, world);
-				setPending(player, false);
-				ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(itemCopy, null, player.getWorld());
-				if ((actionType.equals(ActionType.ON_DEATH) || !player.isDead()) && 
-					((actionType.equals(ActionType.ON_HOLD) && PlayerHandler.getPlayer().getMainHandItem(player).isSimilar(itemCopy)) 
-					|| (actionType.equals(ActionType.ON_RECEIVE) && itemMap != null && itemMap.hasItem(player)) || 
-					(!actionType.equals(ActionType.ON_HOLD) && !actionType.equals(ActionType.ON_RECEIVE))) 
-					&& player.isOnline() && player.getWorld() == world && !getExecute(player)) {
-					switch (cmdtype) {
-						case CONSOLE: dispatchConsoleCommands(player); break;
-						case OP: dispatchOpCommands(player); break;
-						case PLAYER: dispatchPlayerCommands(player); break;
-						case MESSAGE: dispatchMessageCommands(player); break;
-						case SERVERSWITCH: dispatchServerCommands(player); break;
-						case BUNGEE: dispatchBungeeCordCommands(player); break;
-						case SWAPITEM: dispatchSwapItem(player, slot); break;
-						case DEFAULT: dispatchPlayerCommands(player); break;
-						case DELAY: break;
-						default: dispatchPlayerCommands(player); break;
-					}
-				} else if (getExecute(player)) { setExecute(player, false); }
-			}
+		ServerHandler.getServer().runThread(main -> {
+			this.allowDispatch(player, world);
+			this.setPending(player, false);
+			ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(this.itemCopy, null, player.getWorld());
+			if ((this.actionType.equals(ActionType.ON_DEATH) || !player.isDead()) && ((itemMap != null && ((this.actionType.equals(ActionType.ON_HOLD) && itemMap.isSimilar(PlayerHandler.getPlayer().getMainHandItem(player))) 
+				|| (this.actionType.equals(ActionType.ON_RECEIVE) && itemMap.hasItem(player)))) || (!this.actionType.equals(ActionType.ON_HOLD) && !this.actionType.equals(ActionType.ON_RECEIVE))) 
+				&& (player.isOnline() && player.getWorld() == world && !this.getExecute(player))) {
+				switch (cmdtype) {
+					case CONSOLE: this.dispatchConsoleCommands(player); break;
+					case OP: this.dispatchOpCommands(player); break;
+					case PLAYER: this.dispatchPlayerCommands(player); break;
+					case MESSAGE: this.dispatchMessageCommands(player); break;
+					case SERVERSWITCH: this.dispatchServerCommands(player); break;
+					case BUNGEE: this.dispatchBungeeCordCommands(player); break;
+					case SWAPITEM: this.dispatchSwapItem(player, slot); break;
+					case DEFAULT: this.dispatchPlayerCommands(player); break;
+					case DELAY: break;
+					default: this.dispatchPlayerCommands(player); break;
+				}
+			} else if (this.getExecute(player)) { this.setExecute(player, false); }
 		}, this.delay);
 	}
 	
