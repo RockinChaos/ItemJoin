@@ -188,7 +188,7 @@ public class Commands implements Listener {
 	*/
 	@EventHandler(ignoreCancelled = false)
 	private void onInteract(PlayerInteractEvent event) {
-		ItemStack item = event.getItem().clone();
+		ItemStack item = (event.getItem() != null ? event.getItem().clone() : event.getItem());
 		final Player player = event.getPlayer();
 		String action = event.getAction().toString();
 		if (((PlayerHandler.getPlayer().isAdventureMode(player) && !action.contains("LEFT") || !PlayerHandler.getPlayer().isAdventureMode(player))) && !this.isDropEvent(event.getPlayer())) {
