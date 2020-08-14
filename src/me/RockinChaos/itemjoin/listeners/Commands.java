@@ -17,6 +17,7 @@
  */
 package me.RockinChaos.itemjoin.listeners;
 
+import java.util.HashMap;
 import java.util.ListIterator;
 import java.util.Set;
 
@@ -31,6 +32,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryType.SlotType;
 import org.bukkit.event.player.PlayerAnimationEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -51,13 +53,12 @@ public class Commands implements Listener {
 	* @param event - InventoryClickEvent
 	*/
 	@EventHandler(ignoreCancelled = false)
-	private void onInventoryCommand(InventoryClickEvent event) {
+	private void onInventory(InventoryClickEvent event) {
 		ItemStack item = event.getCurrentItem();
 		Player player = (Player) event.getWhoClicked();
 		String action = event.getAction().toString();
-		String slot = String.valueOf(event.getSlot());
-		if (event.getSlotType().name().equalsIgnoreCase("CRAFTING")) { slot = "CRAFTING[" + slot + "]"; }
-		if (this.setupCommands(player, item, action, slot)) { event.setCancelled(true); }
+		String slot = (event.getSlotType().name().equalsIgnoreCase("CRAFTING") ? "CRAFTING[" + String.valueOf(event.getSlot()) + "]" : String.valueOf(event.getSlot()));
+		this.runCommands(player, item, action, slot);
 	}
 	
    /**
@@ -66,11 +67,11 @@ public class Commands implements Listener {
 	* @param event - PlayerDeathEvent.
 	*/
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = false)
-	private void onDeathCommand(PlayerDeathEvent event) {
+	private void onDeath(PlayerDeathEvent event) {
 		ListIterator < ItemStack > litr = event.getDrops().listIterator();
 		while (litr.hasNext()) {
 			ItemStack item = litr.next();
-			this.setupCommands(event.getEntity(), item, "ON_DEATH", null);
+			this.runCommands(event.getEntity(), item, "ON_DEATH", null);
 		}
 	}
 
@@ -80,11 +81,11 @@ public class Commands implements Listener {
 	* @param event - PlayerItemHeldEvent
 	*/
 	@EventHandler(ignoreCancelled = false)
-	private void onHoldCommand(PlayerItemHeldEvent event) {
+	private void onHold(PlayerItemHeldEvent event) {
 		Player player = event.getPlayer();
 		ItemStack item = player.getInventory().getItem(event.getNewSlot());
 		String slot = String.valueOf(event.getNewSlot());
-		if (this.setupCommands(player, item, "ON_HOLD", slot)) { event.setCancelled(true); }
+		this.runCommands(player, item, "ON_HOLD", slot);
 	}
 	
    /**
@@ -93,17 +94,17 @@ public class Commands implements Listener {
 	* @param event - InventoryClickEvent
 	*/
 	@EventHandler(ignoreCancelled = false)
-	private void onEquipClickCommand(InventoryClickEvent event) {
+	private void onEquipClick(InventoryClickEvent event) {
 		Player player = (Player) event.getWhoClicked();
 		if (Utils.getUtils().containsIgnoreCase(event.getAction().name(), "HOTBAR") && event.getView().getBottomInventory().getSize() >= event.getHotbarButton() && event.getHotbarButton() >= 0
 		 && event.getView().getBottomInventory().getItem(event.getHotbarButton()) != null && event.getView().getBottomInventory().getItem(event.getHotbarButton()).getType() != Material.AIR) {
-			if (!this.equipSetup(player, event.getView().getBottomInventory().getItem(event.getHotbarButton()), "ON_EQUIP", String.valueOf(event.getSlot()), event.getSlotType())) { event.setCancelled(true); }
+			this.equipCommands(player, event.getView().getBottomInventory().getItem(event.getHotbarButton()), "ON_EQUIP", String.valueOf(event.getSlot()), event.getSlotType());
 		}
 		if (event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR) {
-			if (!this.equipSetup(player, event.getCurrentItem(), "UN_EQUIP", String.valueOf(event.getSlot()), event.getSlotType())) { event.setCancelled(true); }
+			this.equipCommands(player, event.getCurrentItem(), "UN_EQUIP", String.valueOf(event.getSlot()), event.getSlotType());
 		}
 		if (event.getCursor() != null && event.getCursor().getType() != Material.AIR) { 
-			if (!this.equipSetup(player, event.getCursor(), "ON_EQUIP", String.valueOf(event.getSlot()), event.getSlotType())) { event.setCancelled(true); } 
+			this.equipCommands(player, event.getCursor(), "ON_EQUIP", String.valueOf(event.getSlot()), event.getSlotType());
 		}
 	}
 	
@@ -113,12 +114,12 @@ public class Commands implements Listener {
 	* @param event - InventoryDragEvent
 	*/
 	@EventHandler(ignoreCancelled = false)
-	private void onEquipDragCommand(InventoryDragEvent event) {
+	private void onEquipDrag(InventoryDragEvent event) {
 		Player player = (Player) event.getWhoClicked();
 		Set<Integer> slideSlots = event.getInventorySlots();
 		int slot = 0; for (int actualSlot: slideSlots) { slot = actualSlot; break; }
 		if (event.getOldCursor() != null && event.getOldCursor().getType() != Material.AIR) {
-			if (!this.equipSetup(player, event.getOldCursor(), "ON_EQUIP", String.valueOf(slot), SlotType.ARMOR)) { event.setCancelled(true); }
+			this.equipCommands(player, event.getOldCursor(), "ON_EQUIP", String.valueOf(slot), SlotType.ARMOR);
 		}
 	}
 	
@@ -128,13 +129,15 @@ public class Commands implements Listener {
 	* @param event - PlayerInteractEvent
 	*/
 	@EventHandler(ignoreCancelled = false)
-	private void onEquipInteractCommand(PlayerInteractEvent event) {
+	private void onEquip(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
 		ItemStack item = event.getItem();
 		if (item != null && item.getType() != Material.AIR && !PlayerHandler.getPlayer().isMenuClick(player.getOpenInventory(), event.getAction())) {
 			String[] itemType = item.getType().name().split("_");
 			if (itemType.length >= 2 && itemType[1] != null && !itemType[1].isEmpty() && Utils.getUtils().isInt(Utils.getUtils().getArmorSlot(itemType[1], true)) 
-				&& player.getInventory().getItem(Integer.parseInt(Utils.getUtils().getArmorSlot(itemType[1], true))) == null && !this.equipSetup(player, event.getItem(), "ON_EQUIP", Utils.getUtils().getArmorSlot(itemType[1], true), SlotType.ARMOR)) { event.setCancelled(true); }
+				&& player.getInventory().getItem(Integer.parseInt(Utils.getUtils().getArmorSlot(itemType[1], true))) == null) { 
+				this.equipCommands(player, event.getItem(), "ON_EQUIP", Utils.getUtils().getArmorSlot(itemType[1], true), SlotType.ARMOR);
+			}
 		}
 	}
 	
@@ -144,7 +147,7 @@ public class Commands implements Listener {
 	* @param event - PlayerInteractEntityEvent
 	*/
 	@EventHandler(ignoreCancelled = false)
-	private void onEntityCommand(PlayerInteractEntityEvent event) {
+	private void onEntity(PlayerInteractEntityEvent event) {
 		if (event.getRightClicked() instanceof org.bukkit.entity.ItemFrame) {
 			ItemStack item;
 			if (ServerHandler.getServer().hasSpecificUpdate("1_9")) { item = PlayerHandler.getPlayer().getPerfectHandItem(event.getPlayer(), event.getHand().toString()); } 
@@ -153,7 +156,7 @@ public class Commands implements Listener {
 			String action = Action.RIGHT_CLICK_BLOCK.name();
 			ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(PlayerHandler.getPlayer().getHandItem(player), null, player.getWorld());
 			if (itemMap != null && itemMap.isSimilar(item)) {
-				if (this.setupCommands(player, item, action, String.valueOf(player.getInventory().getHeldItemSlot()))) { event.setCancelled(true); }
+				this.runCommands(player, item, action, String.valueOf(player.getInventory().getHeldItemSlot()));
 			}
 		}
 	}
@@ -164,7 +167,7 @@ public class Commands implements Listener {
 	* @param event - PlayerInteractAtEntityEvent
 	*/
 	@EventHandler(ignoreCancelled = false)
-	private void onTargetEntityCommand(PlayerInteractAtEntityEvent event) {
+	private void onTargetEntity(PlayerInteractAtEntityEvent event) {
 		if (event.getRightClicked().toString().equalsIgnoreCase("CraftArmorStand")) {
 			ItemStack item;
 			if (ServerHandler.getServer().hasSpecificUpdate("1_9")) { item = PlayerHandler.getPlayer().getPerfectHandItem(event.getPlayer(), event.getHand().toString()); } 
@@ -173,7 +176,7 @@ public class Commands implements Listener {
 			String action = Action.RIGHT_CLICK_BLOCK.name();
 			ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(PlayerHandler.getPlayer().getHandItem(player), null, player.getWorld());
 			if (itemMap != null && itemMap.isSimilar(item)) {
-				if (this.setupCommands(player, item, action, String.valueOf(player.getInventory().getHeldItemSlot()))) { event.setCancelled(true); }
+				this.runCommands(player, item, action, String.valueOf(player.getInventory().getHeldItemSlot()));
 			}
 		}
 	}
@@ -184,15 +187,14 @@ public class Commands implements Listener {
 	* @param event - PlayerInteractEvent
 	*/
 	@EventHandler(ignoreCancelled = false)
-	private void onInteractCommand(PlayerInteractEvent event) {
-		ItemStack item = event.getItem();
+	private void onInteract(PlayerInteractEvent event) {
+		ItemStack item = event.getItem().clone();
 		final Player player = event.getPlayer();
 		String action = event.getAction().toString();
-		if (PlayerHandler.getPlayer().isAdventureMode(player) && !action.contains("LEFT") 
-				|| !PlayerHandler.getPlayer().isAdventureMode(player)) {
+		if (((PlayerHandler.getPlayer().isAdventureMode(player) && !action.contains("LEFT") || !PlayerHandler.getPlayer().isAdventureMode(player))) && !this.isDropEvent(event.getPlayer())) {
 			ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(PlayerHandler.getPlayer().getHandItem(player), null, player.getWorld());
 			if (!PlayerHandler.getPlayer().isMenuClick(player.getOpenInventory(), event.getAction()) && itemMap != null && itemMap.isSimilar(item)) {
-				if (this.setupCommands(player, item, action, String.valueOf(player.getInventory().getHeldItemSlot()))) { event.setCancelled(true); }
+				this.runCommands(player, item, action, String.valueOf(player.getInventory().getHeldItemSlot()));
 			}
 		}
 	}
@@ -203,11 +205,29 @@ public class Commands implements Listener {
 	* @param event - PlayerAnimationEvent
 	*/
 	@EventHandler(ignoreCancelled = false)
-	private void onSwingHandCommand(PlayerAnimationEvent event) {
+	private void onSwingArm(PlayerAnimationEvent event) {
 		Player player = event.getPlayer();
 		ItemStack item = PlayerHandler.getPlayer().getHandItem(player);
-		if (PlayerHandler.getPlayer().isAdventureMode(player)) {
-			if (this.setupCommands(player, item, "LEFT_CLICK_AIR", String.valueOf(player.getInventory().getHeldItemSlot()))) { event.setCancelled(true); }
+		if (PlayerHandler.getPlayer().isAdventureMode(player) && !this.isDropEvent(event.getPlayer())) {
+			this.runCommands(player, item, "LEFT_CLICK_AIR", String.valueOf(player.getInventory().getHeldItemSlot()));
+		}
+	}
+	
+   /**
+	* Places the player dropping an item into a temporary hashmap to be noted as,
+	* having recently dropped an item. This is to prevent command execution when dropping an item using the item drop keybind.
+	* 
+	* @param event - PlayerDropItemEvent
+	*/
+	@EventHandler(ignoreCancelled = false)
+	private void onHandDrop(PlayerDropItemEvent event) {
+		if (!this.isDropEvent(event.getPlayer())) {
+			this.itemDrop.put(PlayerHandler.getPlayer().getPlayerID(event.getPlayer()), true);
+			ServerHandler.getServer().runThread(main -> { 
+				if (this.isDropEvent(event.getPlayer())) {
+					this.itemDrop.remove(PlayerHandler.getPlayer().getPlayerID(event.getPlayer()));
+				}
+			}, 1L);
 		}
 	}
 	
@@ -220,15 +240,14 @@ public class Commands implements Listener {
 	* @param slot - the slot the item originally resided in.
 	* @param slotType - the SlotType the item originated in.
 	*/
-	private boolean equipSetup(Player player, ItemStack item, String action, String slot, SlotType slotType) {
+	private void equipCommands(Player player, ItemStack item, String action, String slot, SlotType slotType) {
 		try {
 			String[] itemType = item.getType().name().split("_");
 			if (slotType == SlotType.ARMOR && itemType.length >= 2 && itemType[1] != null && !itemType[1].isEmpty() && !itemType[1].equalsIgnoreCase("HEAD") && (itemType[1].equalsIgnoreCase(Utils.getUtils().getArmorSlot(slot, false)) 
 					|| (itemType[1].equalsIgnoreCase("HEAD") && Utils.getUtils().getArmorSlot(slot, false).equalsIgnoreCase("HELMET")))) {
-				if (this.setupCommands(player, item, action, slot)) { return false; }
+				this.runCommands(player, item, action, slot);
 			}
 		} catch (Exception e) { }
-		return true;
 	}
 	
    /**
@@ -239,10 +258,25 @@ public class Commands implements Listener {
 	* @param action - the action that is being performed.
 	* @param slot - the slot the item originally resided in.
 	*/
-	private boolean setupCommands(Player player, ItemStack item, String action, String slot) {
+	private void runCommands(Player player, ItemStack item, String action, String slot) {
 		ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item, null, player.getWorld());
 		if (itemMap != null && itemMap.inWorld(player.getWorld()) && itemMap.hasPermission(player)) {
-			return itemMap.executeCommands(player, item, action, (slot == null ? itemMap.getSlot() : slot));
+			itemMap.executeCommands(player, item, action, (slot == null ? itemMap.getSlot() : slot));
+		}
+	}
+	
+	private HashMap<String, Boolean> itemDrop = new HashMap<String, Boolean>();
+   /**
+	* Checks if the player recently attempted to drop an item.
+	* 
+	* @param player - The player being checked.
+	* @return If the player has dropped the item.
+	*/
+	private boolean isDropEvent(Player player) {
+		if (!((this.itemDrop.get(PlayerHandler.getPlayer().getPlayerID(player)) == null 
+			 || (this.itemDrop.get(PlayerHandler.getPlayer().getPlayerID(player)) != null 
+			 && !this.itemDrop.get(PlayerHandler.getPlayer().getPlayerID(player)))))) {
+			return true;
 		}
 		return false;
 	}

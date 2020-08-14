@@ -3805,12 +3805,10 @@ public class ItemMap {
     * @param slot - The Slot of the ItemStack.
     * @return If the commands successfully executed.
     */
-    public boolean executeCommands(final Player player, final ItemStack itemCopy, final String action, final String slot) {
-		boolean playerSuccess = false;
+    public void executeCommands(final Player player, final ItemStack itemCopy, final String action, final String slot) {
     	if (this.commands != null && this.commands.length > 0 && !UI.getCreator().isOpen(player) && !this.getWarmPending(player) && this.isExecutable(player, action) && !this.onCooldown(player) && this.isPlayerChargeable(player, this.itemCost != null && !this.itemCost.isEmpty())) {
     		this.warmCycle(player, this, this.getWarmDelay(), player.getLocation(), itemCopy, action, slot);
     	}
-    	return playerSuccess;
     }
 	
    /**
@@ -3988,6 +3986,7 @@ public class ItemMap {
         		else if (!playerSuccess) { playerSuccess = itemCommands[i].execute(player, action, slot, this); }
 				else { itemCommands[i].execute(player, action, slot, this); }
         		if (Utils.getUtils().containsIgnoreCase(itemCommands[i].getRawCommand(), "swap-item")) { itemCommands[i].setItem(itemCopy); }
+        		itemCommands[i].setItem(itemCopy.clone());
 			}
     	}
     	if (this.sequence == CommandSequence.RANDOM) { playerSuccess = this.getRandomAll(randomCommands, itemCommands, player, action, slot); }
