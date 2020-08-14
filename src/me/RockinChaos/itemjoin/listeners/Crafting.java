@@ -163,10 +163,10 @@ public class Crafting implements Listener {
     	final Player player = (Player) event.getPlayer();
     	final ItemStack itemCopy = event.getItemDrop().getItemStack().clone();
     	final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(itemCopy, null, player.getWorld());
-    	if (itemMap.isCraftingItem() && !player.isDead()) {
+    	if (itemMap != null && itemMap.isCraftingItem() && !player.isDead()) {
 	    	event.getItemDrop().remove();
 	    	ServerHandler.getServer().runThread(main -> {
-	    		if (player.isOnline() && itemMap != null && itemMap.isSelfDroppable()) {
+	    		if (player.isOnline() && itemMap.isSelfDroppable()) {
 	    			itemMap.giveTo(player, itemCopy.getAmount());
 	    			if (Utils.getUtils().getSlotConversion(itemMap.getSlot()) != 0) { 
 	    				this.returnSlotZero(player, 0L);
