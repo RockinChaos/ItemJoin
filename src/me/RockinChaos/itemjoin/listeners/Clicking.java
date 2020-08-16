@@ -71,7 +71,8 @@ public class Clicking implements Listener {
 		Player player = (Player) event.getWhoClicked();
 		List<ItemStack> items = new ArrayList<ItemStack>();
 		items.add(event.getCurrentItem()); items.add(event.getCursor());
-		if (Utils.getUtils().containsIgnoreCase(event.getAction().name(), "HOTBAR")) { items.add(event.getView().getBottomInventory().getItem(event.getHotbarButton())); }
+		if (Utils.getUtils().containsIgnoreCase(event.getAction().name(), "HOTBAR") 
+		 && event.getView().getBottomInventory().getSize() >= event.getHotbarButton() && event.getHotbarButton() >= 0) { items.add(event.getView().getBottomInventory().getItem(event.getHotbarButton())); }
 		if (!ServerHandler.getServer().hasSpecificUpdate("1_8")) { PlayerHandler.getPlayer().updateInventory(player, 1L); }
 		this.LegacyDropEvent(player);
 		for (ItemStack item : items) {
