@@ -554,22 +554,36 @@ public class ItemUtilities {
 			} else if (ServerHandler.getServer().hasSpecificUpdate("1_9") && CustomSlot.OFFHAND.isSlot(itemMap.getSlot()) && (existingItem == null || overWrite)) {
 				PlayerHandler.getPlayer().setOffHandItem(player, item);
 			} else if (craftSlot != -1 && (existingItem == null || overWrite)) {
-				if (craftSlot == 0) {
-					ServerHandler.getServer().runThread(craft -> {
-						if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
-				    			player.getOpenInventory().getTopInventory().setItem(craftSlot, item);
-				    			PlayerHandler.getPlayer().updateInventory(player, 1L);
-				    		}
-						}, 2L);
-				} else {
-					player.getOpenInventory().getTopInventory().setItem(craftSlot, item);
-				}
+				this.setCraftingSlots(player, item, craftSlot, 240);
 			} else if (itemMap.isDropFull()) {
 				player.getWorld().dropItem(player.getLocation(), item);
 			}
 			ServerHandler.getServer().logDebug("{ItemMap} Given the Item: " + itemMap.getConfigName() + ".");
 		});
 		SQLite.getLite(false).saveItemData(player, itemMap);
+	}
+	
+   /**
+    * Sets the ItemStack to the Player Inventory Crafting Slots.
+    * 
+    * @param player - The Player to have the ItemStack set to their Crafting slot(s).
+    * @param itemStack - The ItemStack to be given to the Player.
+    * @param craftSlot - The designated slot for the Crafting Item.
+    * @param attempts - The number of attempts to give the Crafting Slot item before failing.
+    */
+	private void setCraftingSlots(final Player player, final ItemStack itemStack, final int craftSlot, int attempts) {
+		if (attempts != 0) {
+			if (craftSlot == 0) {
+				ServerHandler.getServer().runThread(craft -> {
+					if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
+					    	player.getOpenInventory().getTopInventory().setItem(craftSlot, itemStack);
+					    	PlayerHandler.getPlayer().updateInventory(player, 1L);
+					} else { ServerHandler.getServer().runThread(craft_2 -> { this.setCraftingSlots(player, itemStack, craftSlot, (attempts - 1)); }, 20L); }
+				}, 2L);
+			} else if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
+				player.getOpenInventory().getTopInventory().setItem(craftSlot, itemStack);
+			} else { ServerHandler.getServer().runThread(craft -> { this.setCraftingSlots(player, itemStack, craftSlot, (attempts - 1)); }, 20L); }
+		}
 	}
 	
    /**
