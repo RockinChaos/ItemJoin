@@ -73,7 +73,6 @@ import me.RockinChaos.itemjoin.handlers.PermissionsHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.item.ItemCommand.CommandSequence;
-import me.RockinChaos.itemjoin.item.ItemCommand.CommandType;
 import me.RockinChaos.itemjoin.utils.DependAPI;
 import me.RockinChaos.itemjoin.utils.EffectAPI;
 import me.RockinChaos.itemjoin.utils.LanguageAPI;
@@ -297,7 +296,6 @@ public class ItemMap {
 			this.setCommandSound();
 			this.setCommandParticle();
 			this.setCommandCooldown();
-			this.setCommandType();
 			this.setCommandSequence();
 			this.setCommands(ItemCommand.arrayFromString(this, this.sequence == CommandSequence.RANDOM_LIST));
 	        this.setInteractCooldown();
@@ -391,20 +389,6 @@ public class ItemMap {
 		this.useCooldown = this.nodeLocation.getString("commands-cooldown") != null;
 		if (this.useCooldown) { this.cooldownSeconds = this.nodeLocation.getInt("commands-cooldown"); }
 		this.cooldownMessage = this.nodeLocation.getString("cooldown-message");
-	}
-	
-   /**
-    * Sets the ItemMaps Commands Type.
-    * 
-    */
-	private void setCommandType() {
-		if (this.nodeLocation.getString("commands-type") != null) { 
-			if (Utils.getUtils().containsIgnoreCase(this.nodeLocation.getString("commands-type"), "INTERACT") 
-				&& Utils.getUtils().containsIgnoreCase(this.nodeLocation.getString("commands-type"), "INVENTORY")) { this.type = CommandType.BOTH; }
-			else if (Utils.getUtils().containsIgnoreCase(this.nodeLocation.getString("commands-type"), "INTERACT")) { this.type = CommandType.INTERACT; }
-			else if (Utils.getUtils().containsIgnoreCase(this.nodeLocation.getString("commands-type"), "INVENTORY")) { this.type = CommandType.INVENTORY; }
-			else if (Utils.getUtils().containsIgnoreCase(this.nodeLocation.getString("commands-type"), "BOTH") || Utils.getUtils().containsIgnoreCase(this.nodeLocation.getString("commands-type"), "ALL")) { this.type = CommandType.BOTH; }
-		}
 	}
 	
    /**
@@ -757,15 +741,6 @@ public class ItemMap {
     */
 	public void setTriggers(final String triggers) {
 		this.triggers = triggers;
-	}
-	
-   /**
-    * Sets the CommandType.
-    * 
-    * @param type - The CommandType to be set.
-    */
-	public void setCommandType(final CommandType type) {
-		this.type = type;
 	}
 	
    /**
@@ -2086,15 +2061,6 @@ public class ItemMap {
     */
 	public ItemCommand[] getCommands() {
 		return this.commands;
-	}
-	
-   /**
-    * Gets the Commands Type.
-    * 
-    * @return The Commands Type.
-    */
-	public CommandType getCommandType() {
-		return this.type;
 	}
 	
    /**
@@ -3748,7 +3714,7 @@ public class ItemMap {
 		if (this.CustomSlot != null) { ItemUtilities.getUtilities().setCustomSlots(player, this, amount[0]); } 
 		else { ItemUtilities.getUtilities().setInvSlots(player, this, amount[0]); }
 		this.setAnimations(player);
-		this.executeCommands(player, this.tempItem, "ON_RECEIVE", this.getSlot());
+		this.executeCommands(player, this.tempItem, "ON_RECEIVE", "RECEIVED", this.getSlot());
 	}
 	
    /**
@@ -3779,7 +3745,7 @@ public class ItemMap {
 		    }, 2L);
 		}
 		this.setAnimations(player);
-		this.executeCommands(player, this.tempItem, "ON_RECEIVE", this.getSlot());
+		this.executeCommands(player, this.tempItem, "ON_RECEIVE", "RECEIVED", this.getSlot());
 	}
 	
    /**
@@ -3805,9 +3771,9 @@ public class ItemMap {
     * @param slot - The Slot of the ItemStack.
     * @return If the commands successfully executed.
     */
-    public void executeCommands(final Player player, final ItemStack itemCopy, final String action, final String slot) {
-    	if (this.commands != null && this.commands.length > 0 && !UI.getCreator().isOpen(player) && !this.getWarmPending(player) && this.isExecutable(player, action) && !this.onCooldown(player) && this.isPlayerChargeable(player, this.itemCost != null && !this.itemCost.isEmpty())) {
-    		this.warmCycle(player, this, this.getWarmDelay(), player.getLocation(), itemCopy, action, slot);
+    public void executeCommands(final Player player, final ItemStack itemCopy, final String action, final String clickType, final String slot) {
+    	if (this.commands != null && this.commands.length > 0 && !UI.getCreator().isOpen(player) && !this.getWarmPending(player) && this.isExecutable(player, action, clickType) && !this.onCooldown(player) && this.isPlayerChargeable(player, this.itemCost != null && !this.itemCost.isEmpty())) {
+    		this.warmCycle(player, this, this.getWarmDelay(), player.getLocation(), itemCopy, action, clickType, slot);
     	}
     }
 	
@@ -3822,7 +3788,7 @@ public class ItemMap {
     * @param action - The Action that executed the commands.
     * @param slot - The Slot of the ItemStack.
     */
-	private void warmCycle(final Player player, final ItemMap itemMap, final int warmCount, final Location location, final ItemStack itemCopy, final String action, final String slot) {
+	private void warmCycle(final Player player, final ItemMap itemMap, final int warmCount, final Location location, final ItemStack itemCopy, final String action, final String clickType, final String slot) {
 		if (warmCount != 0) {
 			if (itemMap.warmDelay == warmCount) { 
 				String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = Utils.getUtils().translateLayout(itemMap.getCustomName(), player); 
@@ -3833,7 +3799,7 @@ public class ItemMap {
 				if (itemMap.warmLocation(player, location, action)) {
 					String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = Utils.getUtils().translateLayout(itemMap.getCustomName(), player); 
 					LanguageAPI.getLang(false).sendLangMessage("General.itemWarming", player, placeHolders);
-					itemMap.warmCycle(player, itemMap, (warmCount - 1), location, itemCopy, action, slot);	
+					itemMap.warmCycle(player, itemMap, (warmCount - 1), location, itemCopy, action, clickType, slot);	
 				} else { 
 					itemMap.delWarmPending(player); 
 					String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = Utils.getUtils().translateLayout(itemMap.getCustomName(), player); 
@@ -3845,7 +3811,7 @@ public class ItemMap {
 			if (itemMap.warmDelay != 0) { delay = 20; }
 			ServerHandler.getServer().runThread(main -> {
 				if ((!player.isDead() || action.equalsIgnoreCase("ON_DEATH")) && player.isOnline()) {
-					if (isExecuted(player, action, slot, itemCopy)) { 
+					if (isExecuted(player, action, clickType, slot, itemCopy)) { 
 						if (itemMap.itemCost == null || itemMap.itemCost.isEmpty()) { itemMap.withdrawBalance(player); } 
 						else { itemMap.withdrawItemCost(player); }
 			    		itemMap.playSound(player);
@@ -3883,11 +3849,11 @@ public class ItemMap {
     * @param action - The Action that executed the command.
     * @return If the ItemCommands are executable.
     */
-    private boolean isExecutable(final Player player, final String action) {
+    private boolean isExecutable(final Player player, final String action, final String clickType) {
     	boolean playerSuccess = false;
     	ItemCommand[] itemCommands = this.commands;
     	for (int i = 0; i < itemCommands.length; i++) {
-    		if (!playerSuccess) { playerSuccess = itemCommands[i].canExecute(player, action); }
+    		if (!playerSuccess) { playerSuccess = itemCommands[i].canExecute(player, action, clickType); }
 			else { break; }
 		}
     	return playerSuccess;
@@ -3902,11 +3868,11 @@ public class ItemMap {
     * @param slot - The Slot of the ItemStack.
     * @return If it was successful.
     */
-    private boolean getRandomMap(final HashMap < Integer, ItemCommand > randomCommands, final ItemCommand[] itemCommands, final Player player, final String action, final String slot) {
+    private boolean getRandomMap(final HashMap < Integer, ItemCommand > randomCommands, final ItemCommand[] itemCommands, final Player player, final String action, final String clickType, final String slot) {
     	Entry<?, ?> dedicatedMap = Utils.getUtils().randomEntry(randomCommands);
-    	if (dedicatedMap != null && dedicatedMap.getValue() != null && player != null && action != null && slot != null && itemCommands != null && randomCommands != null
-        && !((ItemCommand)dedicatedMap.getValue()).execute(player, action, slot, this)) { 
-    		this.getRandomMap(randomCommands, itemCommands, player, action, slot);
+    	if (dedicatedMap != null && dedicatedMap.getValue() != null && player != null && action != null && clickType != null && slot != null && itemCommands != null && randomCommands != null
+        && !((ItemCommand)dedicatedMap.getValue()).execute(player, action, clickType, slot, this)) { 
+    		this.getRandomMap(randomCommands, itemCommands, player, action, clickType, slot);
     		return false;
     	}
     	return true;
@@ -3921,18 +3887,18 @@ public class ItemMap {
     * @param slot - The Slot of the ItemStack.
     * @return If it was successful.
     */
-    private boolean getRandomAll(final HashMap < Integer, ItemCommand > randomCommands, final ItemCommand[] itemCommands, final Player player, final String action, final String slot) {
+    private boolean getRandomAll(final HashMap < Integer, ItemCommand > randomCommands, final ItemCommand[] itemCommands, final Player player, final String action, final String clickType, final String slot) {
     	Entry<?, ?> dedicatedMap = Utils.getUtils().randomEntry(randomCommands);
     	if (dedicatedMap != null && dedicatedMap.getValue() != null && player != null && action != null && slot != null && itemCommands != null && randomCommands != null 
-        && !((ItemCommand)dedicatedMap.getValue()).execute(player, action, slot, this)) { 
+        && !((ItemCommand)dedicatedMap.getValue()).execute(player, action, clickType, slot, this)) { 
     		randomCommands.remove(dedicatedMap.getKey());
-    		this.getRandomAll(randomCommands, itemCommands, player, action, slot);
+    		this.getRandomAll(randomCommands, itemCommands, player, action, clickType, slot);
     		return false;
     	}
     	if (dedicatedMap != null && randomCommands != null) { randomCommands.remove(dedicatedMap.getKey()); }
     	if (dedicatedMap != null && dedicatedMap.getValue() != null && player != null && action != null && slot != null && itemCommands != null && randomCommands != null && 
     	   !randomCommands.isEmpty()) {
-    		this.getRandomAll(randomCommands, itemCommands, player, action, slot);
+    		this.getRandomAll(randomCommands, itemCommands, player, action, clickType, slot);
     	}
     	return true;
     }
@@ -3969,7 +3935,7 @@ public class ItemMap {
     * @param itemCopy - The ItemStack having their commands executed.
     * @return If the Command(s) were successfully executed.
     */
-    private boolean isExecuted(final Player player, final String action, final String slot, final ItemStack itemCopy) {
+    private boolean isExecuted(final Player player, final String action, final String clickType, final String slot, final ItemStack itemCopy) {
     	boolean playerSuccess = false;
     	ItemCommand[] itemCommands = this.commands;
     	String chosenIdent = this.getRandomList(itemCommands);
@@ -3979,17 +3945,17 @@ public class ItemMap {
         		if (this.sequence == CommandSequence.RANDOM || this.sequence == CommandSequence.RANDOM_SINGLE) { randomCommands.put(Utils.getUtils().getRandom(1, 100000), itemCommands[i]); }
         		else if (this.sequence == CommandSequence.RANDOM_LIST) {
         			if (itemCommands[i].getSection() != null && itemCommands[i].getSection().equalsIgnoreCase(chosenIdent.replace("+", ""))) {
-	        			if (!playerSuccess) { playerSuccess = itemCommands[i].execute(player, action, slot, this); } 
-	        			else { itemCommands[i].execute(player, action, slot, this); } 
+	        			if (!playerSuccess) { playerSuccess = itemCommands[i].execute(player, action, clickType, slot, this); } 
+	        			else { itemCommands[i].execute(player, action, clickType, slot, this); } 
 	        		}
         		}
-        		else if (!playerSuccess) { playerSuccess = itemCommands[i].execute(player, action, slot, this); }
-				else { itemCommands[i].execute(player, action, slot, this); }
+        		else if (!playerSuccess) { playerSuccess = itemCommands[i].execute(player, action, clickType, slot, this); }
+				else { itemCommands[i].execute(player, action, clickType, slot, this); }
         		itemCommands[i].setItem(itemCopy.clone());
 			}
     	}
-    	if (this.sequence == CommandSequence.RANDOM) { playerSuccess = this.getRandomAll(randomCommands, itemCommands, player, action, slot); }
-    	else if (this.sequence == CommandSequence.RANDOM_SINGLE) { playerSuccess = this.getRandomMap(randomCommands, itemCommands, player, action, slot); }
+    	if (this.sequence == CommandSequence.RANDOM) { playerSuccess = this.getRandomAll(randomCommands, itemCommands, player, action, clickType, slot); }
+    	else if (this.sequence == CommandSequence.RANDOM_SINGLE) { playerSuccess = this.getRandomMap(randomCommands, itemCommands, player, action, clickType, slot); }
     	return playerSuccess;
     }
 	
@@ -4459,55 +4425,82 @@ public class ItemMap {
 		}
 		if (this.probability != null && this.probability != -1 && this.probability != 0) { itemData.set("items." + this.configName + ".probability", this.probability); }
 		if (this.commands != null && this.commands.length > 0) {
-			Map<String, List<String>> multiClickAll = new HashMap<String, List<String>>();
-			Map<String, List<String>> leftClickAll = new HashMap<String, List<String>>();
-			Map<String, List<String>> rightClickAll = new HashMap<String, List<String>>();
-			Map<String, List<String>> multiClickAir = new HashMap<String, List<String>>();
-			Map<String, List<String>> multiClickBlock = new HashMap<String, List<String>>();
-			Map<String, List<String>> leftClickAir = new HashMap<String, List<String>>();
-			Map<String, List<String>> leftClickBlock = new HashMap<String, List<String>>();
-			Map<String, List<String>> rightClickAir = new HashMap<String, List<String>>();
-			Map<String, List<String>> rightClickBlock = new HashMap<String, List<String>>();
+			Map<String, List<String>> interactAll = new HashMap<String, List<String>>();
+			Map<String, List<String>> interactLeft = new HashMap<String, List<String>>();
+			Map<String, List<String>> interactRight = new HashMap<String, List<String>>();
+			Map<String, List<String>> interactAir = new HashMap<String, List<String>>();
+			Map<String, List<String>> interactBlock = new HashMap<String, List<String>>();
+			Map<String, List<String>> interactLeftAir = new HashMap<String, List<String>>();
+			Map<String, List<String>> interactLeftBlock = new HashMap<String, List<String>>();
+			Map<String, List<String>> interactRightAir = new HashMap<String, List<String>>();
+			Map<String, List<String>> interactRightBlock = new HashMap<String, List<String>>();
+			Map<String, List<String>> inventoryAll = new HashMap<String, List<String>>();
+			Map<String, List<String>> inventoryMiddle = new HashMap<String, List<String>>();
+			Map<String, List<String>> inventoryCreative = new HashMap<String, List<String>>();
+			Map<String, List<String>> inventoryLeft = new HashMap<String, List<String>>();
+			Map<String, List<String>> inventoryShiftLeft = new HashMap<String, List<String>>();
+			Map<String, List<String>> inventoryRight = new HashMap<String, List<String>>();
+			Map<String, List<String>> inventoryShiftRight = new HashMap<String, List<String>>();
+			Map<String, List<String>> inventorySwapCursor = new HashMap<String, List<String>>();
 			Map<String, List<String>> onEquip = new HashMap<String, List<String>>();
 			Map<String, List<String>> unEquip = new HashMap<String, List<String>>();
 			Map<String, List<String>> onHold = new HashMap<String, List<String>>();
 			Map<String, List<String>> onReceive = new HashMap<String, List<String>>();
+			Map<String, List<String>> onDeath = new HashMap<String, List<String>>();
 			Map<String, List<String>> physical = new HashMap<String, List<String>>();
-			Map<String, List<String>> inventory = new HashMap<String, List<String>>();
 			for(ItemCommand command : this.commands) {
-				if (command.matchAction(ItemCommand.ActionType.MULTI_CLICK_ALL)) { multiClickAll = this.addMapCommand(multiClickAll, command); }
-				else if (command.matchAction(ItemCommand.ActionType.MULTI_CLICK_AIR)) { multiClickAir = this.addMapCommand(multiClickAir, command); }
-				else if (command.matchAction(ItemCommand.ActionType.MULTI_CLICK_BLOCK)) { multiClickBlock = this.addMapCommand(multiClickBlock, command); }
-				else if (command.matchAction(ItemCommand.ActionType.RIGHT_CLICK_ALL)) { rightClickAll = this.addMapCommand(rightClickAll, command); }
-				else if (command.matchAction(ItemCommand.ActionType.RIGHT_CLICK_AIR)) { rightClickAir = this.addMapCommand(rightClickAir, command);}
-				else if (command.matchAction(ItemCommand.ActionType.RIGHT_CLICK_BLOCK)) { rightClickBlock = this.addMapCommand(rightClickBlock, command); }
-				else if (command.matchAction(ItemCommand.ActionType.LEFT_CLICK_ALL)) { leftClickAll = this.addMapCommand(leftClickAll, command); }
-				else if (command.matchAction(ItemCommand.ActionType.LEFT_CLICK_AIR)) { leftClickAir = this.addMapCommand(leftClickAir, command); }
-				else if (command.matchAction(ItemCommand.ActionType.LEFT_CLICK_BLOCK)) { leftClickBlock = this.addMapCommand(leftClickBlock, command); }
-				else if (command.matchAction(ItemCommand.ActionType.ON_EQUIP)) { onEquip = this.addMapCommand(onEquip, command); }
-				else if (command.matchAction(ItemCommand.ActionType.UN_EQUIP)) { unEquip = this.addMapCommand(unEquip, command); }
-				else if (command.matchAction(ItemCommand.ActionType.ON_HOLD)) { onHold = this.addMapCommand(onHold, command); }
-				else if (command.matchAction(ItemCommand.ActionType.ON_RECEIVE)) { onReceive = this.addMapCommand(onReceive, command); }
-				else if (command.matchAction(ItemCommand.ActionType.PHYSICAL)) { physical = this.addMapCommand(physical, command); }
-				else if (command.matchAction(ItemCommand.ActionType.INVENTORY)) { inventory = this.addMapCommand(inventory, command); }
+				if (command.matchAction(ItemCommand.Action.INTERACT_ALL)) { interactAll = this.addMapCommand(interactAll, command); }
+				else if (command.matchAction(ItemCommand.Action.INTERACT_AIR)) { interactAir = this.addMapCommand(interactAir, command); }
+				else if (command.matchAction(ItemCommand.Action.INTERACT_BLOCK)) { interactBlock = this.addMapCommand(interactBlock, command); }
+				else if (command.matchAction(ItemCommand.Action.INTERACT_RIGHT_ALL)) { interactRight = this.addMapCommand(interactRight, command); }
+				else if (command.matchAction(ItemCommand.Action.INTERACT_RIGHT_AIR)) { interactRightAir = this.addMapCommand(interactRightAir, command);}
+				else if (command.matchAction(ItemCommand.Action.INTERACT_RIGHT_BLOCK)) { interactRightBlock = this.addMapCommand(interactRightBlock, command); }
+				else if (command.matchAction(ItemCommand.Action.INTERACT_LEFT_ALL)) { interactLeft = this.addMapCommand(interactLeft, command); }
+				else if (command.matchAction(ItemCommand.Action.INTERACT_LEFT_AIR)) { interactLeftAir = this.addMapCommand(interactLeftAir, command); }
+				else if (command.matchAction(ItemCommand.Action.INTERACT_LEFT_BLOCK)) { interactLeftBlock = this.addMapCommand(interactLeftBlock, command); }
+				
+				else if (command.matchAction(ItemCommand.Action.INVENTORY_ALL)) { inventoryAll = this.addMapCommand(inventoryAll, command); }
+				else if (command.matchAction(ItemCommand.Action.INVENTORY_MIDDLE)) { inventoryMiddle = this.addMapCommand(inventoryMiddle, command); }
+				else if (command.matchAction(ItemCommand.Action.INVENTORY_CREATIVE)) { inventoryCreative = this.addMapCommand(inventoryCreative, command); }
+				else if (command.matchAction(ItemCommand.Action.INVENTORY_LEFT)) { inventoryLeft = this.addMapCommand(inventoryLeft, command); }
+				else if (command.matchAction(ItemCommand.Action.INVENTORY_SHIFT_LEFT)) { inventoryShiftLeft = this.addMapCommand(inventoryShiftLeft, command); }
+				else if (command.matchAction(ItemCommand.Action.INVENTORY_RIGHT)) { inventoryRight = this.addMapCommand(inventoryRight, command); }
+				else if (command.matchAction(ItemCommand.Action.INVENTORY_SHIFT_RIGHT)) { inventoryShiftRight = this.addMapCommand(inventoryShiftRight, command); }
+				else if (command.matchAction(ItemCommand.Action.INVENTORY_SWAP_CURSOR)) { inventorySwapCursor = this.addMapCommand(inventorySwapCursor, command); }
+				
+				else if (command.matchAction(ItemCommand.Action.ON_EQUIP)) { onEquip = this.addMapCommand(onEquip, command); }
+				else if (command.matchAction(ItemCommand.Action.UN_EQUIP)) { unEquip = this.addMapCommand(unEquip, command); }
+				else if (command.matchAction(ItemCommand.Action.ON_HOLD)) { onHold = this.addMapCommand(onHold, command); }
+				else if (command.matchAction(ItemCommand.Action.ON_RECEIVE)) { onReceive = this.addMapCommand(onReceive, command); }
+				else if (command.matchAction(ItemCommand.Action.ON_DEATH)) { onDeath = this.addMapCommand(onDeath, command); }
+				else if (command.matchAction(ItemCommand.Action.PHYSICAL)) { physical = this.addMapCommand(physical, command); }
 			}
-			if (!multiClickAll.isEmpty()) { this.setMapCommand(itemData, multiClickAll, "multi-click"); }
-			if (!multiClickAir.isEmpty()) { this.setMapCommand(itemData, multiClickAir, "multi-click-air"); }
-			if (!multiClickBlock.isEmpty()) { this.setMapCommand(itemData, multiClickBlock, "multi-click-block"); }
-			if (!rightClickAll.isEmpty()) { this.setMapCommand(itemData, rightClickAll, "right-click"); }
-			if (!rightClickAir.isEmpty()) { this.setMapCommand(itemData, rightClickAir, "right-click-air"); }
-			if (!rightClickBlock.isEmpty()) { this.setMapCommand(itemData, rightClickBlock, "right-click-block"); }
-			if (!leftClickAll.isEmpty()) { this.setMapCommand(itemData, leftClickAll, "left-click"); }
-			if (!leftClickAir.isEmpty()) { this.setMapCommand(itemData, leftClickAir, "left-click-air"); }
-			if (!leftClickBlock.isEmpty()) { this.setMapCommand(itemData, leftClickBlock, "left-click-block"); }
+			if (!interactAll.isEmpty()) { this.setMapCommand(itemData, interactAll, "interact"); }
+			if (!interactAir.isEmpty()) { this.setMapCommand(itemData, interactAir, "interact-air"); }
+			if (!interactBlock.isEmpty()) { this.setMapCommand(itemData, interactBlock, "interact-block"); }
+			if (!interactRight.isEmpty()) { this.setMapCommand(itemData, interactRight, "interact-right"); }
+			if (!interactRightAir.isEmpty()) { this.setMapCommand(itemData, interactRightAir, "interact-air-right"); }
+			if (!interactRightBlock.isEmpty()) { this.setMapCommand(itemData, interactRightBlock, "interact-block-right"); }
+			if (!interactLeft.isEmpty()) { this.setMapCommand(itemData, interactLeft, "interact-left"); }
+			if (!interactLeftAir.isEmpty()) { this.setMapCommand(itemData, interactLeftAir, "interact-air-left"); }
+			if (!interactLeftBlock.isEmpty()) { this.setMapCommand(itemData, interactLeftBlock, "interact-block-left"); }
+			
+			if (!inventoryAll.isEmpty()) { this.setMapCommand(itemData, inventoryAll, "inventory"); }
+			if (!inventoryMiddle.isEmpty()) { this.setMapCommand(itemData, inventoryMiddle, "inventory-middle"); }
+			if (!inventoryCreative.isEmpty()) { this.setMapCommand(itemData, inventoryCreative, "inventory-creative"); }
+			if (!inventoryLeft.isEmpty()) { this.setMapCommand(itemData, inventoryLeft, "inventory-left"); }
+			if (!inventoryShiftLeft.isEmpty()) { this.setMapCommand(itemData, inventoryShiftLeft, "inventory-shift-left"); }
+			if (!inventoryRight.isEmpty()) { this.setMapCommand(itemData, inventoryRight, "inventory-right"); }
+			if (!inventoryShiftRight.isEmpty()) { this.setMapCommand(itemData, inventoryShiftRight, "inventory-shift-right"); }
+			if (!inventorySwapCursor.isEmpty()) { this.setMapCommand(itemData, inventorySwapCursor, "inventory-swap-cursor"); }
+			
 			if (!onEquip.isEmpty()) { this.setMapCommand(itemData, onEquip, "on-equip"); }
 			if (!unEquip.isEmpty()) { this.setMapCommand(itemData, unEquip, "un-equip"); }
 			if (!onHold.isEmpty()) { this.setMapCommand(itemData, onHold, "on-hold"); }
 			if (!onReceive.isEmpty()) { this.setMapCommand(itemData, onReceive, "on-receive"); }
+			if (!onDeath.isEmpty()) { this.setMapCommand(itemData, onReceive, "on-death"); }
 			if (!physical.isEmpty()) { this.setMapCommand(itemData, physical, "physical"); }
-			if (!inventory.isEmpty()) { this.setMapCommand(itemData, inventory, "inventory"); }
 		}
-		if (this.type != null) { itemData.set("items." + this.configName + ".commands-type", this.type.name()); }
 		if (this.commandSound != null) { itemData.set("items." + this.configName + ".commands-sound", this.commandSound.name()); }
 		if (this.commandParticle != null && !this.commandParticle.isEmpty()) { itemData.set("items." + this.configName + ".commands-particle", this.commandParticle); }
 		if (this.sequence != null && this.sequence != CommandSequence.SEQUENTIAL) { itemData.set("items." + this.configName + ".commands-sequence", this.sequence.name()); }

@@ -163,7 +163,7 @@ public class FileData {
 			itemsData.set("items.melooooon-item.id", 382);
 			itemsData.set("items.melooooon-item.slot", 20);
 			itemsData.set("items.melooooon-item.name", "&aWater Melooooon!");
-			itemsData.set("items.melooooon-item.commands.multi-click.-", "'message: &aIts a Water Melooooon!'");
+			itemsData.set("items.melooooon-item.commands.interact.-", "'message: &aIts a Water Melooooon!'");
 			itemsData.set("items.melooooon-item.commands-sequence", "RANDOM");
 			itemsData.set("items.melooooon-item.itemflags", "hide-attributes, self-drops, CreativeBypass");
 			itemsData.set("items.melooooon-item.triggers", "join, respawn, world-change, region-enter");

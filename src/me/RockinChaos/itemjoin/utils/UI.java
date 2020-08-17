@@ -61,9 +61,8 @@ import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.item.ItemCommand;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
-import me.RockinChaos.itemjoin.item.ItemCommand.ActionType;
+import me.RockinChaos.itemjoin.item.ItemCommand.Action;
 import me.RockinChaos.itemjoin.item.ItemCommand.CommandSequence;
-import me.RockinChaos.itemjoin.item.ItemCommand.CommandType;
 import me.RockinChaos.itemjoin.utils.interfaces.Button;
 import me.RockinChaos.itemjoin.utils.interfaces.Interface;
 import me.RockinChaos.itemjoin.utils.sqlite.SQLite;
@@ -1529,13 +1528,10 @@ public class UI {
 	private void commandPane(final Player player, final ItemMap itemMap) {
 		Interface commandPane = new Interface(false, 3, this.GUIName, player);
 		ServerHandler.getServer().runAsyncThread(async -> {
-			commandPane.addButton(new Button(this.fillerPaneGItem), 3);
+			commandPane.addButton(new Button(this.fillerPaneGItem), 4);
 			commandPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "WRITABLE_BOOK" : "386"), 1, false, "&e&lCommands", "&7", "&7*Click to define the custom command lines", "&7for the item and click type.", 
 					"&7", "&9&lCommands: &a" + (itemMap.getCommands().length != 0 ? "YES" : "NONE")), event -> this.actionPane(player, itemMap)));
-			commandPane.addButton(new Button(this.fillerPaneGItem));
-			commandPane.addButton(new Button(ItemHandler.getItem().getItem("STICK", 1, false, "&a&lType", "&7", "&7*The event type that will", "&7trigger command execution.", "&9&lCOMMANDS-TYPE: &a" + Utils.getUtils().nullCheck(itemMap.getCommandType() + "")), 
-					event -> this.typePane(player, itemMap)));
-			commandPane.addButton(new Button(this.fillerPaneGItem), 3);
+			commandPane.addButton(new Button(this.fillerPaneGItem), 4);
 			commandPane.addButton(new Button(ItemHandler.getItem().getItem("REDSTONE", 1, false, "&a&lParticle", "&7", "&7*Custom particle(s) that will be", "&7displayed when the commands", "&7are successfully executed.", "&9&lCOMMANDS-PARTICLE: &a" +
 					Utils.getUtils().nullCheck(itemMap.getCommandParticle() + "")), event -> {
 				if (Utils.getUtils().nullCheck(itemMap.getCommandParticle() + "") != "NONE") {
@@ -1564,7 +1560,7 @@ public class UI {
 				}
 			}));
 			commandPane.addButton(new Button(ItemHandler.getItem().getItem("STONE_BUTTON", 1, false, "&a&lReceive", "&7", "&7*The number of times the", "&7commands will execute when", "&7receiving the custom item.", 
-					"&cNOTE: &7Only functions with", "&7the on-receive command type.", "&9&lCOMMANDS-COST: &a" + (Utils.getUtils().nullCheck(itemMap.getCommandReceive() + "&7"))), event -> {
+					"&cNOTE: &7Only functions with", "&7the on-receive command action.", "&9&lCOMMANDS-COST: &a" + (Utils.getUtils().nullCheck(itemMap.getCommandReceive() + "&7"))), event -> {
 				if (Utils.getUtils().nullCheck(itemMap.getCommandReceive() + "&7") != "NONE") {
 					itemMap.setCommandReceive(0);
 					this.commandPane(player, itemMap);
@@ -1639,78 +1635,110 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void actionPane(final Player player, final ItemMap itemMap) {
-		Interface clickPane = new Interface(false, 4, this.GUIName, player);
+		Interface clickPane = new Interface(false, 5, this.GUIName, player);
 		ServerHandler.getServer().runAsyncThread(async -> {
-			clickPane.addButton(new Button(this.fillerPaneGItem), 3);
-			clickPane.addButton(new Button(ItemHandler.getItem().getItem("DIAMOND_SWORD", 1, false, "&e&lMulti-Click", "&7", "&7*Commands that will execute only", "&7when left and right clicking.", "&7", "&9&lCommands: &a" + 
-			this.listCommands(itemMap, ActionType.MULTI_CLICK_ALL)), event -> {
-				this.commandListPane(player, itemMap, ActionType.MULTI_CLICK_ALL);
+			clickPane.addButton(new Button(this.fillerPaneGItem), 2);
+			clickPane.addButton(new Button(ItemHandler.getItem().getItem("DIAMOND_SWORD", 1, false, "&e&lInteract", "&7", "&7*Commands that will execute only", "&7when left and right clicking.", "&7", "&9&lCommands: &a" + 
+			this.listCommands(itemMap, Action.INTERACT_ALL)), event -> {
+				this.commandListPane(player, itemMap, Action.INTERACT_ALL);
 			}));
 			clickPane.addButton(new Button(this.fillerPaneGItem));
-			clickPane.addButton(new Button(ItemHandler.getItem().getItem("CHEST", 1, false, "&e&lInventory", "&7", "&7*Commands that will execute only", "&7when cursor clicking the item", "&7with the players inventory open.", "&7", 
-					"&7&lNote: &7The INVENTORY type", "&7for commands-type will need", "&7to be defined later.", "&7", "&9&lCommands: &a" + this.listCommands(itemMap, ActionType.INVENTORY)), event -> {
-				this.commandListPane(player, itemMap, ActionType.INVENTORY);
+			clickPane.addButton(new Button(ItemHandler.getItem().getItem("CHEST", 1, false, "&e&lInventory", "&7", "&7*Commands that will execute only", "&7when cursor clicking the item", "&7with the players inventory open.", 
+					"&7", "&9&lCommands: &a" + this.listCommands(itemMap, Action.INVENTORY_ALL)), event -> {
+				this.commandListPane(player, itemMap, Action.INVENTORY_ALL);
 			}));
-			clickPane.addButton(new Button(this.fillerPaneGItem), 3);
+			clickPane.addButton(new Button(this.fillerPaneGItem));
+			clickPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "PISTON" : "PISTON_BASE"), 1, false, "&e&lPhysical", "&7", "&7*Commands that will execute", "&7when held in the player hand", "&7and they interact with a object", "&7such as a pressure plate.", "&7", 
+					"&9&lCommands: &a" + this.listCommands(itemMap, Action.PHYSICAL)), event -> {
+				this.commandListPane(player, itemMap, Action.PHYSICAL);
+			}));
+			clickPane.addButton(new Button(this.fillerPaneGItem), 2);
 			clickPane.addButton(new Button(ItemHandler.getItem().getItem("DIAMOND_HELMET", 1, false, "&e&lOn-Equip", "&7", "&7*Commands that will execute only", "&7when the item is placed", "&7in an armor slot.", "&7", "&9&lCommands: &a" + 
-			this.listCommands(itemMap, ActionType.ON_EQUIP)), event -> {
-				this.commandListPane(player, itemMap, ActionType.ON_EQUIP);
+			this.listCommands(itemMap, Action.ON_EQUIP)), event -> {
+				this.commandListPane(player, itemMap, Action.ON_EQUIP);
 			}));
 			clickPane.addButton(new Button(this.fillerPaneGItem));
 			clickPane.addButton(new Button(ItemHandler.getItem().getItem("IRON_HELMET", 1, false, "&e&lUn-Equip", "&7", "&7*Commands that will execute only", "&7when the item is removed", "&7from an armor slot.", "&7", "&9&lCommands: &a" + 
-			this.listCommands(itemMap, ActionType.UN_EQUIP)), event -> {
-				this.commandListPane(player, itemMap, ActionType.UN_EQUIP);
+			this.listCommands(itemMap, Action.UN_EQUIP)), event -> {
+				this.commandListPane(player, itemMap, Action.UN_EQUIP);
 			}));
 			clickPane.addButton(new Button(this.fillerPaneGItem));
 			clickPane.addButton(new Button(ItemHandler.getItem().getItem("IRON_SWORD", 1, false, "&e&lOn-Hold", "&7", "&7*Commands that will execute only", "&7when holding the item.", "&7", "&9&lCommands: &a" + 
-			this.listCommands(itemMap, ActionType.ON_HOLD)), event -> {
-				this.commandListPane(player, itemMap, ActionType.ON_HOLD);
+			this.listCommands(itemMap, Action.ON_HOLD)), event -> {
+				this.commandListPane(player, itemMap, Action.ON_HOLD);
 			}));
 			clickPane.addButton(new Button(this.fillerPaneGItem));
 			clickPane.addButton(new Button(ItemHandler.getItem().getItem("EMERALD", 1, false, "&e&lOn-Receive", "&7", "&7*Commands that will execute only", "&7when you are given the item.", "&7", "&9&lCommands: &a" + 
-			this.listCommands(itemMap, ActionType.ON_RECEIVE)), event -> {
-				this.commandListPane(player, itemMap, ActionType.ON_RECEIVE);
+			this.listCommands(itemMap, Action.ON_RECEIVE)), event -> {
+				this.commandListPane(player, itemMap, Action.ON_RECEIVE);
 			}));
 			clickPane.addButton(new Button(this.fillerPaneGItem));
 			clickPane.addButton(new Button(ItemHandler.getItem().getItem("381", 1, false, "&e&lOn-Death", "&7", "&7*Commands that will execute only", "&7when die with the", "&7item in your inventory.", "&7", "&9&lCommands: &a" + 
-			this.listCommands(itemMap, ActionType.ON_DEATH)), event -> {
-				this.commandListPane(player, itemMap, ActionType.ON_DEATH);
+			this.listCommands(itemMap, Action.ON_DEATH)), event -> {
+				this.commandListPane(player, itemMap, Action.ON_DEATH);
 			}));
-			clickPane.addButton(new Button(ItemHandler.getItem().getItem("37", 1, false, "&e&lMulti-Click-Air", "&7", "&7*Commands that will execute only", "&7when left and right", "&7clicking the air.", "&7", "&9&lCommands: &a" + 
-			this.listCommands(itemMap, ActionType.MULTI_CLICK_AIR)), event -> {
-				this.commandListPane(player, itemMap, ActionType.MULTI_CLICK_AIR);
+			clickPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "GLASS" : "20"), 1, false, "&e&lInteract-Air", "&7", "&7*Commands that will execute only", "&7when left and right", "&7clicking the air.", "&7", "&9&lCommands: &a" + 
+			this.listCommands(itemMap, Action.INTERACT_AIR)), event -> {
+				this.commandListPane(player, itemMap, Action.INTERACT_AIR);
 			}));
-			clickPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "OAK_DOOR" : (ServerHandler.getServer().hasSpecificUpdate("1_8") ? "324" : "64")), 1, false, "&e&lMulti-Click-Block", "&7", "&7*Commands that will execute only", "&7when left and right", "&7clicking a block.", "&7", "&9&lCommands: &a" + 
-			this.listCommands(itemMap, ActionType.MULTI_CLICK_BLOCK)), event -> {
-				this.commandListPane(player, itemMap, ActionType.MULTI_CLICK_BLOCK);
+			clickPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "GLASS" : "20"), 1, false, "&e&lInteract-Air-Left", "&7", "&7*Commands that will execute only", "&7when left clicking the air.", "&7", "&9&lCommands: &a" + 
+			this.listCommands(itemMap, Action.INTERACT_LEFT_AIR)), event -> {
+				this.commandListPane(player, itemMap, Action.INTERACT_LEFT_AIR);
 			}));
-			clickPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "GOLDEN_SWORD" : "GOLD_SWORD"), 1, false, "&e&lLeft-Click", "&7", "&7*Commands that will execute only", "&7when left clicking.", "&7", "&9&lCommands: &a" + 
-			this.listCommands(itemMap, ActionType.LEFT_CLICK_ALL)), event -> {
-				this.commandListPane(player, itemMap, ActionType.LEFT_CLICK_ALL);
+			clickPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "GLASS" : "20"), 1, false, "&e&lInteract-Air-Right", "&7", "&7*Commands that will execute only", "&7when right clicking the air.", "&7", "&9&lCommands: &a" + 
+			this.listCommands(itemMap, Action.INTERACT_RIGHT_AIR)), event -> {
+				this.commandListPane(player, itemMap, Action.INTERACT_RIGHT_AIR);
 			}));
-			clickPane.addButton(new Button(ItemHandler.getItem().getItem("37", 1, false, "&e&lLeft-Click-Air", "&7", "&7*Commands that will execute only", "&7when left clicking the air.", "&7", "&9&lCommands: &a" + 
-			this.listCommands(itemMap, ActionType.LEFT_CLICK_AIR)), event -> {
-				this.commandListPane(player, itemMap, ActionType.LEFT_CLICK_AIR);
+			clickPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "OAK_DOOR" : (ServerHandler.getServer().hasSpecificUpdate("1_8") ? "324" : "64")), 1, false, "&e&lInteract-Block", "&7", "&7*Commands that will execute only", "&7when left and right", "&7clicking a block.", "&7", "&9&lCommands: &a" + 
+			this.listCommands(itemMap, Action.INTERACT_BLOCK)), event -> {
+				this.commandListPane(player, itemMap, Action.INTERACT_BLOCK);
 			}));
-			clickPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "OAK_DOOR" : (ServerHandler.getServer().hasSpecificUpdate("1_8") ? "324" : "64")), 1, false, "&e&lLeft-Click-Block", "&7", "&7*Commands that will execute only", "&7when left clicking a block.", "&7", "&9&lCommands: &a" + 
-			this.listCommands(itemMap, ActionType.LEFT_CLICK_BLOCK)), event -> {
-				this.commandListPane(player, itemMap, ActionType.LEFT_CLICK_BLOCK);
+			clickPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "OAK_DOOR" : (ServerHandler.getServer().hasSpecificUpdate("1_8") ? "324" : "64")), 1, false, "&e&lInteract-Block-Left", "&7", "&7*Commands that will execute only", "&7when left clicking a block.", "&7", "&9&lCommands: &a" + 
+			this.listCommands(itemMap, Action.INTERACT_LEFT_BLOCK)), event -> {
+				this.commandListPane(player, itemMap, Action.INTERACT_LEFT_BLOCK);
 			}));
-			clickPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "GOLDEN_SWORD" : "GOLD_SWORD"), 1, false, "&e&lRight-Click", "&7", "&7*Commands that will execute only", "&7when right clicking.", "&7", "&9&lCommands: &a" + 
-			this.listCommands(itemMap, ActionType.RIGHT_CLICK_ALL)), event -> {
-				this.commandListPane(player, itemMap, ActionType.RIGHT_CLICK_ALL);
+			clickPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "OAK_DOOR" : (ServerHandler.getServer().hasSpecificUpdate("1_8") ? "324" : "64")), 1, false, "&e&lInteract-Block-Right", "&7", "&7*Commands that will execute only", "&7when right clicking a block.", "&7", "&9&lCommands: &a" + 
+			this.listCommands(itemMap, Action.INTERACT_RIGHT_BLOCK)), event -> {
+				this.commandListPane(player, itemMap, Action.INTERACT_RIGHT_BLOCK);
 			}));
-			clickPane.addButton(new Button(ItemHandler.getItem().getItem("37", 1, false, "&e&lRight-Click-Air", "&7", "&7*Commands that will execute only", "&7when right clicking the air.", "&7", "&9&lCommands: &a" + 
-			this.listCommands(itemMap, ActionType.RIGHT_CLICK_AIR)), event -> {
-				this.commandListPane(player, itemMap, ActionType.RIGHT_CLICK_AIR);
+			clickPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "GOLDEN_SWORD" : "GOLD_SWORD"), 1, false, "&e&lInteract-Left", "&7", "&7*Commands that will execute only", "&7when left clicking.", "&7", "&9&lCommands: &a" + 
+			this.listCommands(itemMap, Action.INTERACT_LEFT_ALL)), event -> {
+				this.commandListPane(player, itemMap, Action.INTERACT_LEFT_ALL);
 			}));
-			clickPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "OAK_DOOR" : (ServerHandler.getServer().hasSpecificUpdate("1_8") ? "324" : "64")), 1, false, "&e&lRight-Click-Block", "&7", "&7*Commands that will execute only", "&7when right clicking a block.", "&7", "&9&lCommands: &a" + 
-			this.listCommands(itemMap, ActionType.RIGHT_CLICK_BLOCK)), event -> {
-				this.commandListPane(player, itemMap, ActionType.RIGHT_CLICK_BLOCK);
+			clickPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "GOLDEN_SWORD" : "GOLD_SWORD"), 1, false, "&e&lInteract-Right", "&7", "&7*Commands that will execute only", "&7when right clicking.", "&7", "&9&lCommands: &a" + 
+			this.listCommands(itemMap, Action.INTERACT_RIGHT_ALL)), event -> {
+				this.commandListPane(player, itemMap, Action.INTERACT_RIGHT_ALL);
 			}));
-			clickPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "PISTON" : "PISTON_BASE"), 1, false, "&e&lPhysical", "&7", "&7*Commands that will execute", "&7when held in the player hand", "&7and they interact with a object", "&7such as a pressure plate.", "&7", 
-					"&9&lCommands: &a" + this.listCommands(itemMap, ActionType.PHYSICAL)), event -> {
-				this.commandListPane(player, itemMap, ActionType.PHYSICAL);
+			clickPane.addButton(new Button(ItemHandler.getItem().getItem("FEATHER", 1, false, "&e&lInventory-Swap-Cursor", "&7", "&7*Commands that will execute only", "&7when cursor swapping with another item.", "&7", "&9&lCommands: &a" + 
+			this.listCommands(itemMap, Action.INVENTORY_SWAP_CURSOR)), event -> {
+				this.commandListPane(player, itemMap, Action.INVENTORY_SWAP_CURSOR);
+			}));
+			clickPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "SNOWBALL" : "SNOW_BALL"), 8, false, "&e&lInventory-Middle", "&7", "&7*Commands that will execute only", "&7when cursor middle clicking the item.", "&7", "&9&lCommands: &a" + 
+			this.listCommands(itemMap, Action.INVENTORY_MIDDLE)), event -> {
+				this.commandListPane(player, itemMap, Action.INVENTORY_MIDDLE);
+			}));
+			clickPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "ENCHANTED_GOLDEN_APPLE" : "322:1"), 1, false, "&e&lInventory-Creative", "&7", "&7*Commands that will execute only", "&7when cursor clicking the item in creative mode.", "&7", "&9&lCommands: &a" + 
+			this.listCommands(itemMap, Action.INVENTORY_CREATIVE)), event -> {
+				this.commandListPane(player, itemMap, Action.INVENTORY_CREATIVE);
+			}));
+			clickPane.addButton(new Button(this.fillerPaneGItem));
+			clickPane.addButton(new Button(ItemHandler.getItem().getItem("COMPASS", 1, false, "&e&lInventory-Left", "&7", "&7*Commands that will execute only", "&7when cursor left clicking the item.", "&7", "&9&lCommands: &a" + 
+			this.listCommands(itemMap, Action.INVENTORY_LEFT)), event -> {
+				this.commandListPane(player, itemMap, Action.INVENTORY_LEFT);
+			}));
+			clickPane.addButton(new Button(this.fillerPaneGItem));
+			clickPane.addButton(new Button(ItemHandler.getItem().getItem("COMPASS", 1, false, "&e&lInventory-Right", "&7", "&7*Commands that will execute only", "&7when cursor right clicking the item.", "&7", "&9&lCommands: &a" + 
+			this.listCommands(itemMap, Action.INVENTORY_RIGHT)), event -> {
+				this.commandListPane(player, itemMap, Action.INVENTORY_RIGHT);
+			}));
+			clickPane.addButton(new Button(this.fillerPaneGItem));
+			clickPane.addButton(new Button(ItemHandler.getItem().getItem("COBBLESTONE_SLAB", 2, false, "&e&lInventory-Shift-Left", "&7", "&7*Commands that will execute only", "&7when cursor shift left clicking the item.", "&7", "&9&lCommands: &a" + 
+			this.listCommands(itemMap, Action.INVENTORY_SHIFT_LEFT)), event -> {
+				this.commandListPane(player, itemMap, Action.INVENTORY_SHIFT_LEFT);
+			}));
+			clickPane.addButton(new Button(ItemHandler.getItem().getItem("COBBLESTONE_SLAB", 2, false, "&e&lInventory-Shift-Right", "&7", "&7*Commands that will execute only", "&7when cursor shift right clicking the item.", "&7", "&9&lCommands: &a" + 
+			this.listCommands(itemMap, Action.INVENTORY_SHIFT_RIGHT)), event -> {
+				this.commandListPane(player, itemMap, Action.INVENTORY_SHIFT_RIGHT);
 			}));
 			clickPane.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item commands menu."), event -> this.commandPane(player, itemMap)));
 			clickPane.addButton(new Button(this.fillerPaneBItem), 7);
@@ -1726,7 +1754,7 @@ public class UI {
     * @param action - The action that the command should contain.
     * @return The raw String command.
     */
-	private String listCommands(final ItemMap itemMap, final ActionType action) {
+	private String listCommands(final ItemMap itemMap, final Action action) {
 		String commands = "";
 		String commandReturn = "NONE";
 		for (ItemCommand command: itemMap.getCommands()) {
@@ -1763,7 +1791,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     * @param action - The action to be matched.
     */
-	private int getCommandSize(final ItemMap itemMap, final ActionType action) {
+	private int getCommandSize(final ItemMap itemMap, final Action action) {
 		int l = 0;
 		for (ItemCommand command: itemMap.getCommands()) {
 			if (command.matchAction(action)) {
@@ -1781,7 +1809,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     * @param action - The action to be matched.
     */
-	private void commandListPane(final Player player, final ItemMap itemMap, final ActionType action) {
+	private void commandListPane(final Player player, final ItemMap itemMap, final Action action) {
 		Interface commandListPane = new Interface(true, 2, this.GUIName, player);
 		ServerHandler.getServer().runAsyncThread(async -> {
 			commandListPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the click type menu."), event -> {
@@ -1815,7 +1843,7 @@ public class UI {
     * @param command - The ItemCommand instance being modified.
     * @param orderNumber - The current number that dictates the ItemCommands "place in line".
     */
-	private void orderPane(final Player player, final ItemMap itemMap, final ActionType action, final ItemCommand command, final int orderNumber) {
+	private void orderPane(final Player player, final ItemMap itemMap, final Action action, final ItemCommand command, final int orderNumber) {
 		Interface orderPane = new Interface(true, 2, this.GUIName, player);
 		ServerHandler.getServer().runAsyncThread(async -> {
 			orderPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the command modify menu."), event -> {
@@ -1859,7 +1887,7 @@ public class UI {
     * @param command - The ItemCommand instance being modified.
     * @param orderNumber - The current number that dictates the ItemCommands "place in line".
     */
-	private void modifyCommandsPane(final Player player, final ItemMap itemMap, final ActionType action, final ItemCommand command, final int orderNumber) {
+	private void modifyCommandsPane(final Player player, final ItemMap itemMap, final Action action, final ItemCommand command, final int orderNumber) {
 		Interface modPane = new Interface(false, 3, this.GUIName, player);
 		ServerHandler.getServer().runAsyncThread(async -> {
 			modPane.addButton(new Button(this.fillerPaneGItem), 4);
@@ -1946,7 +1974,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     * @param action - THe action to be matched,
     */
-	private void executorPane(final Player player, final ItemMap itemMap, final ActionType action) {
+	private void executorPane(final Player player, final ItemMap itemMap, final Action action) {
 		Interface executorPane = new Interface(false, 2, this.GUIName, player);
 		ServerHandler.getServer().runAsyncThread(async -> {
 			executorPane.addButton(new Button(ItemHandler.getItem().getItem("289", 1, false, "&f")));
@@ -1957,7 +1985,7 @@ public class UI {
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 			}, event -> {
-				this.modifyCommands(itemMap, ItemCommand.fromString("player: " + ChatColor.stripColor(event.getMessage()), action, CommandType.BOTH, 0L, null), true);
+				this.modifyCommands(itemMap, ItemCommand.fromString("player: " + ChatColor.stripColor(event.getMessage()), action, 0L, null), true);
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[14] = "PLAYER COMMAND";
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
@@ -1971,7 +1999,7 @@ public class UI {
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 			}, event -> {
-				this.modifyCommands(itemMap, ItemCommand.fromString("op: " + ChatColor.stripColor(event.getMessage()), action, CommandType.BOTH, 0L, null), true);
+				this.modifyCommands(itemMap, ItemCommand.fromString("op: " + ChatColor.stripColor(event.getMessage()), action, 0L, null), true);
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[14] = "COMMAND LINE";
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
@@ -1985,7 +2013,7 @@ public class UI {
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 			}, event -> {
-				this.modifyCommands(itemMap, ItemCommand.fromString("console: " + ChatColor.stripColor(event.getMessage()), action, CommandType.BOTH, 0L, null), true);
+				this.modifyCommands(itemMap, ItemCommand.fromString("console: " + ChatColor.stripColor(event.getMessage()), action, 0L, null), true);
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[14] = "OP COMMAND";
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
@@ -2000,7 +2028,7 @@ public class UI {
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 			}, event -> {
-				this.modifyCommands(itemMap, ItemCommand.fromString("server: " + ChatColor.stripColor(event.getMessage()), action, CommandType.BOTH, 0L, null), true);
+				this.modifyCommands(itemMap, ItemCommand.fromString("server: " + ChatColor.stripColor(event.getMessage()), action, 0L, null), true);
 				String[] placeHolders = LanguageAPI.getLang(false).newString();placeHolders[14] = "SERVER SWITCH";
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
 				this.commandListPane(event.getPlayer(), itemMap, action);
@@ -2013,7 +2041,7 @@ public class UI {
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 			}, event -> {
-				this.modifyCommands(itemMap, ItemCommand.fromString("bungee: " + ChatColor.stripColor(event.getMessage()), action, CommandType.BOTH, 0L, null), true);
+				this.modifyCommands(itemMap, ItemCommand.fromString("bungee: " + ChatColor.stripColor(event.getMessage()), action, 0L, null), true);
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[14] = "BUNGEE COMMAND";
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
@@ -2027,7 +2055,7 @@ public class UI {
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 			}, event -> {
-				this.modifyCommands(itemMap, ItemCommand.fromString("message: " + ChatColor.stripColor(event.getMessage()), action, CommandType.BOTH, 0L, null), true);
+				this.modifyCommands(itemMap, ItemCommand.fromString("message: " + ChatColor.stripColor(event.getMessage()), action, 0L, null), true);
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[14] = "MESSAGE";
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
@@ -2050,7 +2078,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     * @param action - The action to be matched.
     */
-	private void swapPane(final Player player, final ItemMap itemMap, final ActionType action) {
+	private void swapPane(final Player player, final ItemMap itemMap, final Action action) {
 		Interface swapPane = new Interface(true, 6, this.GUIName, player);
 		ServerHandler.getServer().runAsyncThread(async -> {
 			swapPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the executors menu."), event -> {
@@ -2060,7 +2088,7 @@ public class UI {
 				if (item.getNodeLocation() != itemMap.getNodeLocation()) {
 					if (itemMap.isAnimated() || itemMap.isDynamic()) { this.setModifyMenu(true, player); itemMap.getAnimationHandler().get(player).setMenu(true, 1); }
 					swapPane.addButton(new Button(ItemHandler.getItem().addLore(item.getTempItem(), "&7", "&6---------------------------", "&7*Click to set as a swap-item.", "&9&lNode: &a" + item.getConfigName(), "&7"), event -> { 
-					this.modifyCommands(itemMap, ItemCommand.fromString("swap-item: " + item.getConfigName(), action, CommandType.BOTH, 0L, null), true);
+					this.modifyCommands(itemMap, ItemCommand.fromString("swap-item: " + item.getConfigName(), action, 0L, null), true);
 					this.commandListPane(player, itemMap, action); }));
 				}
 			}
@@ -2076,7 +2104,7 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     * @param action - The action to be matched.
     */
-	private void delayPane(final Player player, final ItemMap itemMap, final ActionType action) {
+	private void delayPane(final Player player, final ItemMap itemMap, final Action action) {
 		Interface delayPane = new Interface(true, 6, this.GUIName, player);
 		ServerHandler.getServer().runAsyncThread(async -> {
 			delayPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the executors menu."), event -> {
@@ -2091,7 +2119,7 @@ public class UI {
 				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
 			}, event -> {
 				if (Utils.getUtils().isInt(ChatColor.stripColor(event.getMessage()))) {
-					this.modifyCommands(itemMap, ItemCommand.fromString("delay: " + Integer.parseInt(ChatColor.stripColor(event.getMessage())), action, CommandType.BOTH, Integer.parseInt(ChatColor.stripColor(event.getMessage())), null), true);
+					this.modifyCommands(itemMap, ItemCommand.fromString("delay: " + Integer.parseInt(ChatColor.stripColor(event.getMessage())), action, Integer.parseInt(ChatColor.stripColor(event.getMessage())), null), true);
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[14] = "DELAY";
 					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
@@ -2105,7 +2133,7 @@ public class UI {
 			for (int i = 1; i <= 64; i++) {
 				final int k = i;
 				delayPane.addButton(new Button(ItemHandler.getItem().getItem("STAINED_GLASS_PANE:8", k, false, "&9&lDelay: &a&l" + k + " Tick(s)", "&7", "&7*Click to set the", "&7delay of the next command."), event -> {
-					this.modifyCommands(itemMap, ItemCommand.fromString("delay: " + k, action, CommandType.BOTH, k, null), true);
+					this.modifyCommands(itemMap, ItemCommand.fromString("delay: " + k, action, k, null), true);
 					this.commandListPane(player, itemMap, action);
 				}));
 			}
@@ -2471,34 +2499,6 @@ public class UI {
 			}
 		});
 		colorPane.open(player);
-	}
-	
-   /**
-    * Opens the Pane for the Player.
-    * This Pane is for setting the commands type.
-    * 
-    * @param player - The Player to have the Pane opened.
-    * @param itemMap - The ItemMap currently being modified.
-    */
-	private void typePane(final Player player, final ItemMap itemMap) {
-		Interface typePane = new Interface(false, 2, this.GUIName, player);
-		ServerHandler.getServer().runAsyncThread(async -> {
-			typePane.addButton(new Button(this.fillerPaneGItem), 3);
-			typePane.addButton(new Button(ItemHandler.getItem().getItem("DIAMOND_PICKAXE", 1, false, "&a&lInteract", "&7", "&7*Executes the command when", "&7the player clicks the item", "&7with it in their hand", "&7either in the air or on a block."), event -> {
-				itemMap.setCommandType(CommandType.INTERACT);this.commandPane(player, itemMap);
-			}));
-			typePane.addButton(new Button(ItemHandler.getItem().getItem("NETHER_STAR", 1, false, "&a&lBoth", "&7", "&7*Executes the item whether the", "&7player clicks the item in", "&7their inventory or in the air", "&7or on a block."), event -> {
-				itemMap.setCommandType(CommandType.BOTH);this.commandPane(player, itemMap);
-			}));
-			typePane.addButton(new Button(ItemHandler.getItem().getItem("CHEST", 1, false, "&a&lInventory", "&7", "&7*Executes the commands only when", "&7the player clicks the item", "&7with their cursor in their inventory."), event -> {
-				itemMap.setCommandType(CommandType.INVENTORY);this.commandPane(player, itemMap);
-			}));
-			typePane.addButton(new Button(this.fillerPaneGItem), 3);
-			typePane.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item commands menu."), event -> this.commandPane(player, itemMap)));
-			typePane.addButton(new Button(this.fillerPaneBItem), 7);
-			typePane.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item commands menu."), event -> this.commandPane(player, itemMap)));
-		});
-		typePane.open(player);
 	}
 	
 //  ============================================================================================================================================================================================================================================================
@@ -5432,8 +5432,7 @@ public class UI {
 					(Utils.getUtils().nullCheck(itemMap.getDurability() + "&7") != "NONE" ? "&9&lDurability: &a" + itemMap.getDurability() : ""), (Utils.getUtils().nullCheck(itemMap.getData() + "&7") != "NONE" ? "&9&lTexture Data: &a" + itemMap.getData() : ""), (useCommands ? "&9&lCommands: &aYES" : ""), 
 					(Utils.getUtils().nullCheck(itemMap.getItemCost() + "") != "NONE" ? "&9&lCommands-Item: &a" + itemMap.getItemCost() : ""), (Utils.getUtils().nullCheck(itemMap.getCommandCost() + "&7") != "NONE" ? "&9&lCommands-Cost: &a" + itemMap.getCommandCost() : ""), 
 					(Utils.getUtils().nullCheck(itemMap.getCommandReceive() + "&7") != "NONE" ? "&9&lCommands-Receive: &a" + itemMap.getCommandReceive() : ""),
-					(Utils.getUtils().nullCheck(itemMap.getCommandType() + "") != "NONE" ? "&9&lCommands-Type: &a" + itemMap.getCommandType() : ""), (Utils.getUtils().nullCheck(itemMap.getCommandSequence() + "") != "NONE" ? "&9&lCommands-Sequence: &a" + itemMap.getCommandSequence() : ""), 
-					(Utils.getUtils().nullCheck(itemMap.getCommandCooldown() + "&7") != "NONE" ? "&9&lCommands-Cooldown: &a" + itemMap.getCommandCooldown() + " second(s)" : ""), 
+					(Utils.getUtils().nullCheck(itemMap.getCommandSequence() + "") != "NONE" ? "&9&lCommands-Sequence: &a" + itemMap.getCommandSequence() : ""), (Utils.getUtils().nullCheck(itemMap.getCommandCooldown() + "&7") != "NONE" ? "&9&lCommands-Cooldown: &a" + itemMap.getCommandCooldown() + " second(s)" : ""), 
 					(Utils.getUtils().nullCheck(itemMap.getCooldownMessage()) != "NONE" ? "&9&lCooldown-Message: &a" + itemMap.getCooldownMessage() : ""), (Utils.getUtils().nullCheck(itemMap.getCommandSound() + "") != "NONE" ? "&9&lCommands-Sound: &a" + itemMap.getCommandSound() : ""), 
 					(Utils.getUtils().nullCheck(itemMap.getCommandParticle() + "") != "NONE" ? "&9&lCommands-Particle: &a" + itemMap.getCommandParticle() : ""), (Utils.getUtils().nullCheck(itemMap.getEnchantments().toString()) != "NONE" ? "&9&lEnchantments: &a" + enchantList : ""), 
 					(Utils.getUtils().nullCheck(itemMap.getItemFlags()) != "NONE" ? "&9&lItemflags: &a" + itemflagsList : ""), (Utils.getUtils().nullCheck(itemMap.getTriggers()) != "NONE" ? "&9&lTriggers: &a" + triggersList : ""), 

@@ -43,9 +43,8 @@ public class ItemCommand {
 	private String command;
 	private String listSection;
 	private ItemStack itemCopy;
-	private ExecutorType executorType;
-	private ActionType actionType;
-	private CommandType commandType;
+	private Executor executorType;
+	private Action actionType;
 	private List < Player > setStop = new ArrayList < Player > ();
 	private List < Player > setCounting = new ArrayList < Player > ();
 	
@@ -59,15 +58,12 @@ public class ItemCommand {
 	* @param commandType - the interaction type of the command.
 	* @param listSection - the section identifier of the command, used in random lists.
 	*/
-	private ItemCommand(final String command, final ActionType action, final ExecutorType executorType, final long delay, final String commandType, final String listSection) {
+	private ItemCommand(final String command, final Action action, final Executor executorType, final long delay, final String listSection) {
 		this.command = command;
 		this.executorType = executorType;
 		this.actionType = action;
 		this.delay = delay;
 		this.listSection = listSection;
-		if (commandType.equalsIgnoreCase("INTERACT")) { this.commandType = CommandType.INTERACT; } 
-		else if (commandType.equalsIgnoreCase("INVENTORY")) { this.commandType = CommandType.INVENTORY; } 
-		else if (commandType.equalsIgnoreCase("BOTH")) { this.commandType = CommandType.BOTH; }
 	}
 	
    /**
@@ -79,13 +75,13 @@ public class ItemCommand {
 	* @param itemMap - the ItemMap of the custom item.
 	* @return If the command execute was successful.
 	*/
-	public boolean execute(final Player player, final String action, final String slot, final ItemMap itemMap) {
-		if (this.command == null || this.command.length() == 0 || !this.commandType.hasAction(action) || !this.actionType.hasAction(action)) { return false; }
-		if (this.actionType.equals(ActionType.ON_HOLD)) {
+	public boolean execute(final Player player, final String action, final String clickType, final String slot, final ItemMap itemMap) {
+		if (this.command == null || this.command.length() == 0 || !this.actionType.hasClickType(clickType) || !this.actionType.hasAction(action)) { return false; }
+		if (this.actionType.equals(Action.ON_HOLD)) {
 			int cooldown = itemMap.getCommandCooldown() * 20;
 			if (cooldown == 0) { cooldown += 1 * 20; }
 			this.taskOnHold(player, slot, cooldown, itemMap);
-		} else if (this.actionType.equals(ActionType.ON_RECEIVE)) {
+		} else if (this.actionType.equals(Action.ON_RECEIVE)) {
 			int cooldown = itemMap.getCommandCooldown() * 20;
 			if (cooldown == 0) { cooldown += 1 * 20; }
 			int receive = itemMap.getCommandReceive();
@@ -148,8 +144,8 @@ public class ItemCommand {
 	* @param action - the action that triggered the command execution.
 	* @return If the player is able to execute the command.
 	*/
-	public boolean canExecute(final Player player, final String action) {
-		if (this.command == null || this.command.length() == 0 || !this.commandType.hasAction(action) || !this.actionType.hasAction(action)) { return false; }
+	public boolean canExecute(final Player player, final String action, final String clickType) {
+		if (this.command == null || this.command.length() == 0 || !this.actionType.hasClickType(clickType) || !this.actionType.hasAction(action)) { return false; }
 		return true;
 	}
 	
@@ -159,7 +155,7 @@ public class ItemCommand {
 	* @param action - the action that triggered the command execution.
 	* @return If the action matches the defined action.
 	*/
-	public boolean matchAction(final ActionType action) {
+	public boolean matchAction(final Action action) {
 		if (this.actionType.equals(action)) {
 			return true;
 		}
@@ -275,7 +271,7 @@ public class ItemCommand {
 	private void allowDispatch(final Player player, final World world) {
 		ServerHandler.getServer().runThread(main -> {
 			if (this.getPending(player)) {
-				if ((!this.actionType.equals(ActionType.ON_DEATH) && player.isDead()) || !player.isOnline() || player.getWorld() != world) {
+				if ((!this.actionType.equals(Action.ON_DEATH) && player.isDead()) || !player.isOnline() || player.getWorld() != world) {
 					this.setExecute(player, true);
 					this.setPending(player, false);
 				} else { this.allowDispatch(player, world); }
@@ -290,15 +286,15 @@ public class ItemCommand {
 	* @param cmdtype - the executor of the command.
 	* @param slot - the slot the custom item is in.
 	*/
-	private void sendDispatch(final Player player, final ExecutorType cmdtype, final String slot) {
+	private void sendDispatch(final Player player, final Executor cmdtype, final String slot) {
 		final World world = player.getWorld();
 		this.setPending(player, true); 
 		ServerHandler.getServer().runThread(main -> {
 			this.allowDispatch(player, world);
 			this.setPending(player, false);
 			ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(this.itemCopy, null, player.getWorld());
-			if ((this.actionType.equals(ActionType.ON_DEATH) || !player.isDead()) && ((itemMap != null && ((this.actionType.equals(ActionType.ON_HOLD) && itemMap.isSimilar(PlayerHandler.getPlayer().getMainHandItem(player))) 
-				|| (this.actionType.equals(ActionType.ON_RECEIVE) && itemMap.hasItem(player)))) || (!this.actionType.equals(ActionType.ON_HOLD) && !this.actionType.equals(ActionType.ON_RECEIVE))) 
+			if ((this.actionType.equals(Action.ON_DEATH) || !player.isDead()) && ((itemMap != null && ((this.actionType.equals(Action.ON_HOLD) && itemMap.isSimilar(PlayerHandler.getPlayer().getMainHandItem(player))) 
+				|| (this.actionType.equals(Action.ON_RECEIVE) && itemMap.hasItem(player)))) || (!this.actionType.equals(Action.ON_HOLD) && !this.actionType.equals(Action.ON_RECEIVE))) 
 				&& (player.isOnline() && player.getWorld() == world && !this.getExecute(player))) {
 				switch (cmdtype) {
 					case CONSOLE: this.dispatchConsoleCommands(player); break;
@@ -460,49 +456,20 @@ public class ItemCommand {
 	}
 	
    /**
-	* Gets the ActionType for the custom items command.
+	* Gets the Action for the custom items command.
 	* 
 	* @param itemMap - the ItemMap of the custom item.
 	* @param definition - the config definition.
-	* @return The ActionType when executing the command.
+	* @return The Action when executing the command.
 	*/
-	private static ActionType getExactActionType(final ItemMap itemMap, final String definition) {
-		String invExists = itemMap.getNodeLocation().getString(".commands" + ActionType.INVENTORY.definition);
-		CommandType type = CommandType.INTERACT; if (itemMap.getCommandType() != null) { type = itemMap.getCommandType(); } 
-		if ((type.equals(CommandType.INVENTORY) || invExists != null || type.equals(CommandType.BOTH)) && ActionType.INVENTORY.hasDefine(definition)) {
-			return ActionType.INVENTORY;
-		} else if (ActionType.LEFT_CLICK_ALL.hasDefine(definition) && (type.equals(CommandType.INTERACT) || type.equals(CommandType.INVENTORY) || invExists != null || type.equals(CommandType.BOTH))) {
-			return ActionType.LEFT_CLICK_ALL;
-		} else if (ActionType.LEFT_CLICK_AIR.hasDefine(definition) && (type.equals(CommandType.INTERACT) || type.equals(CommandType.BOTH))) {
-			return ActionType.LEFT_CLICK_AIR;
-		} else if (ActionType.LEFT_CLICK_BLOCK.hasDefine(definition) && (type.equals(CommandType.INTERACT) || type.equals(CommandType.BOTH))) {
-			return ActionType.LEFT_CLICK_BLOCK;
-		} else if (ActionType.RIGHT_CLICK_ALL.hasDefine(definition) && (type.equals(CommandType.INTERACT) || type.equals(CommandType.INVENTORY) || invExists != null || type.equals(CommandType.BOTH))) {
-			return ActionType.RIGHT_CLICK_ALL;
-		} else if (ActionType.RIGHT_CLICK_AIR.hasDefine(definition) && (type.equals(CommandType.INTERACT) || type.equals(CommandType.BOTH))) {
-			return ActionType.RIGHT_CLICK_AIR;
-		} else if (ActionType.RIGHT_CLICK_BLOCK.hasDefine(definition) && (type.equals(CommandType.INTERACT) || type.equals(CommandType.BOTH))) {
-			return ActionType.RIGHT_CLICK_BLOCK;
-		} else if (ActionType.MULTI_CLICK_ALL.hasDefine(definition) && (type.equals(CommandType.INTERACT) || type.equals(CommandType.INVENTORY) || invExists != null || type.equals(CommandType.BOTH))) {
-			return ActionType.MULTI_CLICK_ALL;
-		} else if (ActionType.MULTI_CLICK_AIR.hasDefine(definition) && (type.equals(CommandType.INTERACT) || type.equals(CommandType.BOTH))) {
-			return ActionType.MULTI_CLICK_AIR;
-		} else if (ActionType.MULTI_CLICK_BLOCK.hasDefine(definition) && (type.equals(CommandType.INTERACT) || type.equals(CommandType.BOTH))) {
-			return ActionType.MULTI_CLICK_BLOCK;
-		} else if (ActionType.PHYSICAL.hasDefine(definition) && (type.equals(CommandType.INTERACT) || type.equals(CommandType.BOTH))) {
-			return ActionType.PHYSICAL;
-		} else if (ActionType.ON_RECEIVE.hasDefine(definition) && (type.equals(CommandType.INTERACT) || type.equals(CommandType.INVENTORY) || invExists != null || type.equals(CommandType.BOTH))) {
-			return ActionType.ON_RECEIVE;
-		} else if (ActionType.ON_HOLD.hasDefine(definition) && (type.equals(CommandType.INTERACT) || type.equals(CommandType.INVENTORY) || invExists != null || type.equals(CommandType.BOTH))) {
-			return ActionType.ON_HOLD;
-		} else if (ActionType.ON_EQUIP.hasDefine(definition) && (type.equals(CommandType.INTERACT) || type.equals(CommandType.INVENTORY) || invExists != null || type.equals(CommandType.BOTH))) {
-			return ActionType.ON_EQUIP;
-		} else if (ActionType.UN_EQUIP.hasDefine(definition) && (type.equals(CommandType.INTERACT) || type.equals(CommandType.INVENTORY) || invExists != null || type.equals(CommandType.BOTH))) {
-			return ActionType.UN_EQUIP;
-		} else if (ActionType.ON_DEATH.hasDefine(definition) && (type.equals(CommandType.INTERACT) || type.equals(CommandType.INVENTORY) || invExists != null || type.equals(CommandType.BOTH))) {
-			return ActionType.ON_DEATH;
-		}	
-		return ActionType.DEFAULT;
+	private static Action getExactAction(final ItemMap itemMap, final String config) {
+		Action exactAction = Action.DEFAULT;
+		for (Action action: Action.values()) {
+			if (action.hasConfig(config)) {
+				exactAction = action; break;
+			}
+		}
+		return exactAction;
 	}
 	
    /**
@@ -515,24 +482,24 @@ public class ItemCommand {
 	* @param listSection - the listed section identifier.
 	* @return The new ItemCommand instance.
 	*/
-	public static ItemCommand fromString(String input, final ActionType action, final CommandType commandType, final long delay, final String listSection) {
-		if (input == null || input.length() == 0) { return new ItemCommand("", ActionType.DEFAULT, ExecutorType.DEFAULT, 0L, commandType != null ? commandType.name() : "INTERACT", null); }
+	public static ItemCommand fromString(String input, final Action action, final long delay, final String listSection) {
+		if (input == null || input.length() == 0) { return new ItemCommand("", Action.DEFAULT, Executor.DEFAULT, 0L, null); }
 		input = input.trim();
-		ExecutorType type = ExecutorType.DEFAULT;
+		Executor type = Executor.DEFAULT;
 			
-		if (input.startsWith("default:")) { input = input.substring(8); type = ExecutorType.DEFAULT; } 
-		else if (input.startsWith("console:")) { input = input.substring(8); type = ExecutorType.CONSOLE; } 
-		else if (input.startsWith("op:")) { input = input.substring(3); type = ExecutorType.OP; } 
-		else if (input.startsWith("player:")) { input = input.substring(7); type = ExecutorType.PLAYER; } 
-		else if (input.startsWith("server:")) { input = input.substring(7); type = ExecutorType.SERVERSWITCH; } 
-		else if (input.startsWith("bungee:")) { input = input.substring(7); type = ExecutorType.BUNGEE; } 
-		else if (input.startsWith("message:")) { input = input.substring(8); type = ExecutorType.MESSAGE; } 
-		else if (input.startsWith("swap-item:")) { input = input.substring(10); type = ExecutorType.SWAPITEM; }
-		else if (input.startsWith("delay:")) { input = input.substring(6); type = ExecutorType.DELAY; }
+		if (input.startsWith("default:")) { input = input.substring(8); type = Executor.DEFAULT; } 
+		else if (input.startsWith("console:")) { input = input.substring(8); type = Executor.CONSOLE; } 
+		else if (input.startsWith("op:")) { input = input.substring(3); type = Executor.OP; } 
+		else if (input.startsWith("player:")) { input = input.substring(7); type = Executor.PLAYER; } 
+		else if (input.startsWith("server:")) { input = input.substring(7); type = Executor.SERVERSWITCH; } 
+		else if (input.startsWith("bungee:")) { input = input.substring(7); type = Executor.BUNGEE; } 
+		else if (input.startsWith("message:")) { input = input.substring(8); type = Executor.MESSAGE; } 
+		else if (input.startsWith("swap-item:")) { input = input.substring(10); type = Executor.SWAPITEM; }
+		else if (input.startsWith("delay:")) { input = input.substring(6); type = Executor.DELAY; }
 			
 		input = input.trim();
 		input = Utils.getUtils().colorFormat(input);
-		return new ItemCommand(input, action, type, delay, commandType != null ? commandType.name() : "INTERACT", listSection);
+		return new ItemCommand(input, action, type, delay, listSection);
 	}
 	
    /**
@@ -545,7 +512,7 @@ public class ItemCommand {
 	public static ItemCommand[] arrayFromString(final ItemMap itemMap, final boolean isList) {
 		if (ConfigHandler.getConfig(false).getCommandsSection(itemMap.getNodeLocation()) == null) {
 			return new ItemCommand[] {
-				new ItemCommand("", ActionType.DEFAULT, ExecutorType.DEFAULT, 0L, itemMap.getCommandType() != null ? itemMap.getCommandType().name() : "INTERACT", null)
+				new ItemCommand("", Action.DEFAULT, Executor.DEFAULT, 0L, null)
 			};
 		}
 		return fromConfig(itemMap, isList);
@@ -592,7 +559,7 @@ public class ItemCommand {
 		final List < ItemCommand > arrayCommands = new ArrayList < ItemCommand > ();
 		for (int i = 0; i < commandsList.size(); i++) {
 			if (commandsList.get(i).trim().startsWith("delay:")) { delay = delay + ItemHandler.getItem().getDelay(commandsList.get(i).trim()); }
-			arrayCommands.add(fromString(commandsList.get(i).trim(), getExactActionType(itemMap, definition), itemMap.getCommandType(), delay, internalCommands));
+			arrayCommands.add(fromString(commandsList.get(i).trim(), getExactAction(itemMap, definition), delay, internalCommands));
 		}
 		return arrayCommands;	
 	}
@@ -601,56 +568,57 @@ public class ItemCommand {
 	* Defines the Executor type for the command.
 	* 
 	*/
-	private enum ExecutorType {
+	private enum Executor {
 		DEFAULT("default: ", 0), CONSOLE("console: ", 1), OP("op: ", 2), PLAYER("player: ", 3), 
 		SERVERSWITCH("server: ", 4), MESSAGE("message: ", 5), BUNGEE("bungee: ", 6), SWAPITEM("swap-item: ", 7), DELAY("delay: ", 8);
 		
 		private final String name;
-		private ExecutorType(final String name, final int intType) { this.name = name; }
+		private Executor(final String name, final int intType) { this.name = name; }
 		private String getName() { return this.name; }
-	}
-	
-   /**
-	* Defines the config Command type for the command.
-	* 
-	*/
-	public enum CommandType {
-		INTERACT("PHYSICAL, LEFT_CLICK_BLOCK, LEFT_CLICK_AIR, RIGHT_CLICK_BLOCK, RIGHT_CLICK_AIR, ON_RECEIVE, ON_HOLD, ON_EQUIP, UN_EQUIP, ON_DEATH"),
-		INVENTORY("PICKUP_ALL, PICKUP_HALF, PLACE_ALL, ON_RECEIVE, ON_EQUIP, UN_EQUIP, ON_DEATH"),
-		BOTH("PICKUP_ALL, PICKUP_HALF, PLACE_ALL, PHYSICAL, LEFT_CLICK_BLOCK, LEFT_CLICK_AIR, RIGHT_CLICK_BLOCK, RIGHT_CLICK_AIR, ON_RECEIVE, ON_HOLD, ON_EQUIP, UN_EQUIP, ON_DEATH");
-		private final String name;
-		private CommandType(String Action) { this.name = Action; }
-		public boolean hasAction(String Action) { return this.name.contains(Action); }
 	}
 	
    /**
 	* Defines the Action type for the command.
 	* 
 	*/
-	public enum ActionType {
-		DEFAULT("", ""),
-		PHYSICAL("PHYSICAL", ".physical"),
-		INVENTORY("PICKUP_ALL, PICKUP_HALF, PLACE_ALL", ".inventory"),
-		MULTI_CLICK_ALL("LEFT_CLICK_BLOCK, LEFT_CLICK_AIR, RIGHT_CLICK_BLOCK, RIGHT_CLICK_AIR, PICKUP_ALL, PICKUP_HALF, PLACE_ALL", ".multi-click"),
-		MULTI_CLICK_AIR("LEFT_CLICK_AIR, RIGHT_CLICK_AIR", ".multi-click-air"),
-		MULTI_CLICK_BLOCK("LEFT_CLICK_BLOCK, RIGHT_CLICK_BLOCK", ".multi-click-block"),
-		LEFT_CLICK_ALL("LEFT_CLICK_AIR, LEFT_CLICK_BLOCK, PICKUP_ALL, PLACE_ALL", ".left-click"),
-		LEFT_CLICK_AIR("LEFT_CLICK_AIR", ".left-click-air"),
-		LEFT_CLICK_BLOCK("LEFT_CLICK_BLOCK", ".left-click-block"),
-		RIGHT_CLICK_ALL("RIGHT_CLICK_AIR, RIGHT_CLICK_BLOCK, PICKUP_HALF, PLACE_ALL", ".right-click"),
-		RIGHT_CLICK_AIR("RIGHT_CLICK_AIR", ".right-click-air"),
-		RIGHT_CLICK_BLOCK("RIGHT_CLICK_BLOCK", ".right-click-block"),
-		ON_RECEIVE("ON_RECEIVE", ".on-receive"),
-		ON_HOLD("ON_HOLD", ".on-hold"),
-		ON_EQUIP("ON_EQUIP", ".on-equip"),
-		UN_EQUIP("UN_EQUIP", ".un-equip"),
-		ON_DEATH("ON_DEATH", ".on-death");
-			
-		private final String name;
-		private final String definition;
-		private ActionType(String Action, String Definition) { this.name = Action; this.definition = Definition; }
-		public boolean hasAction(String Action) { return this.name.contains(Action); }
-		public boolean hasDefine(String Define) { return this.definition.contains(Define); }
+	public enum Action {
+		DEFAULT("", "", ""),
+		
+		INTERACT_ALL(".interact", "LEFT_CLICK_BLOCK, LEFT_CLICK_AIR, RIGHT_CLICK_BLOCK, RIGHT_CLICK_AIR", "LEFT, RIGHT"),
+		INTERACT_AIR(".interact-air", "LEFT_CLICK_AIR, RIGHT_CLICK_AIR", "LEFT, RIGHT"),
+		INTERACT_BLOCK(".interact-block", "LEFT_CLICK_BLOCK, RIGHT_CLICK_BLOCK", "LEFT, RIGHT"),
+		
+		INTERACT_LEFT_ALL(".interact-left", "LEFT_CLICK_AIR, LEFT_CLICK_BLOCK", "LEFT"),
+		INTERACT_LEFT_AIR(".interact-air-left", "LEFT_CLICK_AIR", "LEFT"),
+		INTERACT_LEFT_BLOCK(".interact-block-left", "LEFT_CLICK_BLOCK", "LEFT"),
+		
+		INTERACT_RIGHT_ALL(".interact-right", "RIGHT_CLICK_AIR, RIGHT_CLICK_BLOCK", "RIGHT"),
+		INTERACT_RIGHT_AIR(".interact-air-right", "RIGHT_CLICK_AIR", "RIGHT"),
+		INTERACT_RIGHT_BLOCK(".interact-block-right", "RIGHT_CLICK_BLOCK", "RIGHT"),
+		
+		INVENTORY_ALL(".inventory", "NOTHING, PICKUP_ALL, PLACE_ALL, PLACE_SOME, PICKUP_HALF, PLACE_ONE, MOVE_TO_OTHER_INVENTORY", "MIDDLE, LEFT, RIGHT, SHIFT_LEFT, SHIFT_RIGHT"),
+		INVENTORY_MIDDLE(".inventory-middle", "NOTHING", "MIDDLE"),
+		INVENTORY_LEFT(".inventory-left", "PICKUP_ALL, PLACE_ALL, PLACE_SOME", "LEFT"),
+		INVENTORY_RIGHT(".inventory-right", "PICKUP_HALF, PLACE_ONE", "RIGHT"),
+		INVENTORY_SHIFT_LEFT(".inventory-shift-left", "MOVE_TO_OTHER_INVENTORY", "SHIFT_LEFT"),
+		INVENTORY_SHIFT_RIGHT(".inventory-shift-right", "MOVE_TO_OTHER_INVENTORY", "SHIFT_RIGHT"),
+		INVENTORY_SWAP_CURSOR(".inventory-swap-cursor", "SWAP_WITH_CURSOR", "LEFT, RIGHT"),
+		INVENTORY_CREATIVE(".inventory-creative", "PICKUP_ALL, PLACE_ALL, PLACE_SOME, PICKUP_HALF, PLACE_ONE, CLONE_STACK", "CREATIVE"),
+		
+		ON_RECEIVE(".on-receive", "ON_RECEIVE", "RECEIVED"),
+		ON_HOLD(".on-hold", "ON_HOLD", "HELD"),
+		ON_EQUIP(".on-equip", "ON_EQUIP", "EQUIPPED"),
+		UN_EQUIP(".un-equip", "UN_EQUIP", "UNEQUIPPED"),
+		ON_DEATH(".on-death", "ON_DEATH", "DEAD"),
+		PHYSICAL(".physical", "PHYSICAL", "INTERACTED");
+		
+		private final String config;
+		private final String actions;
+		private final String clickType;
+		private Action(String Config, String Actions, String ClickType) { this.config = Config; this.actions = Actions; this.clickType = ClickType; }
+		public boolean hasConfig(String Config) { return this.config.contains(Config); }
+		public boolean hasAction(String Action) { return Utils.getUtils().splitIgnoreCase(this.actions, Action); }
+		public boolean hasClickType(String ClickType) { return Utils.getUtils().splitIgnoreCase(this.clickType, ClickType); }
 	}
 	
    /**

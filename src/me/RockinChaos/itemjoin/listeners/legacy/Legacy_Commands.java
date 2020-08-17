@@ -28,6 +28,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryType.SlotType;
@@ -61,9 +62,9 @@ public class Legacy_Commands implements Listener {
 	private void onInventory(InventoryClickEvent event) {
 		ItemStack item = event.getCurrentItem();
 		Player player = (Player) event.getWhoClicked();
-		String action = event.getAction().toString();
+		String action = event.getAction().name();
 		String slot = (event.getSlotType().name().equalsIgnoreCase("CRAFTING") ? "CRAFTING[" + String.valueOf(event.getSlot()) + "]" : String.valueOf(event.getSlot()));
-		this.runCommands(player, item, action, slot);
+		this.runCommands(player, item, action, event.getClick().name(), slot);
 	}
 	
    /**
@@ -77,7 +78,7 @@ public class Legacy_Commands implements Listener {
 		ListIterator < ItemStack > litr = event.getDrops().listIterator();
 		while (litr.hasNext()) {
 			ItemStack item = litr.next();
-			this.runCommands(event.getEntity(), item, "ON_DEATH", null);
+			this.runCommands(event.getEntity(), item, "ON_DEATH", "DEAD", null);
 		}
 	}
 
@@ -92,7 +93,7 @@ public class Legacy_Commands implements Listener {
 		Player player = event.getPlayer();
 		ItemStack item = player.getInventory().getItem(event.getNewSlot());
 		String slot = String.valueOf(event.getNewSlot());
-		this.runCommands(player, item, "ON_HOLD", slot);
+		this.runCommands(player, item, "ON_HOLD", "HELD", slot);
 	}
 	
    /**
@@ -105,14 +106,22 @@ public class Legacy_Commands implements Listener {
 	private void onEquipClick(InventoryClickEvent event) {
 		Player player = (Player) event.getWhoClicked();
 		if (Utils.getUtils().containsIgnoreCase(event.getAction().name(), "HOTBAR") && event.getView().getBottomInventory().getSize() >= event.getHotbarButton() && event.getHotbarButton() >= 0
-		 && event.getView().getBottomInventory().getItem(event.getHotbarButton()) != null && event.getView().getBottomInventory().getItem(event.getHotbarButton()).getType() != Material.AIR) {
-			this.equipCommands(player, event.getView().getBottomInventory().getItem(event.getHotbarButton()), "ON_EQUIP", String.valueOf(event.getSlot()), event.getSlotType());
+		 && !event.getClick().name().equalsIgnoreCase("MIDDLE") && event.getSlotType() == SlotType.ARMOR && event.getView().getBottomInventory().getItem(event.getHotbarButton()) != null && event.getView().getBottomInventory().getItem(event.getHotbarButton()).getType() != Material.AIR) {
+			this.equipCommands(player, event.getView().getBottomInventory().getItem(event.getHotbarButton()), "ON_EQUIP", "EQUIPPED", String.valueOf(event.getSlot()), event.getSlotType());
 		}
-		if (event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR) {
-			this.equipCommands(player, event.getCurrentItem(), "UN_EQUIP", String.valueOf(event.getSlot()), event.getSlotType());
+		if (!event.getClick().name().equalsIgnoreCase("MIDDLE") && event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR) {
+			if (event.getSlotType() == SlotType.ARMOR) { 
+				this.equipCommands(player, event.getCurrentItem(), "UN_EQUIP", "UNEQUIPPED", String.valueOf(event.getSlot()), event.getSlotType());
+			} else if (event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
+			String[] itemType = event.getCurrentItem().getType().name().split("_");
+				if (itemType.length >= 2 && itemType[1] != null && !itemType[1].isEmpty() && Utils.getUtils().isInt(Utils.getUtils().getArmorSlot(itemType[1], true)) 
+					&& player.getInventory().getItem(Integer.parseInt(Utils.getUtils().getArmorSlot(itemType[1], true))) == null) { 
+					this.equipCommands(player, event.getCurrentItem(), "ON_EQUIP", "SHIFT_EQUIPPED", String.valueOf(event.getSlot()), event.getSlotType());
+				}
+			}
 		}
-		if (event.getCursor() != null && event.getCursor().getType() != Material.AIR) { 
-			this.equipCommands(player, event.getCursor(), "ON_EQUIP", String.valueOf(event.getSlot()), event.getSlotType());
+		if (!event.getClick().name().equalsIgnoreCase("MIDDLE") && !event.getClick().name().contains("SHIFT") && event.getSlotType() == SlotType.ARMOR && event.getCursor() != null && event.getCursor().getType() != Material.AIR) { 
+			this.equipCommands(player, event.getCursor(), "ON_EQUIP", "EQUIPPED", String.valueOf(event.getSlot()), event.getSlotType());
 		}
 	}
 	
@@ -128,7 +137,7 @@ public class Legacy_Commands implements Listener {
 		Set<Integer> slideSlots = event.getInventorySlots();
 		int slot = 0; for (int actualSlot: slideSlots) { slot = actualSlot; break; }
 		if (event.getOldCursor() != null && event.getOldCursor().getType() != Material.AIR) {
-			this.equipCommands(player, event.getOldCursor(), "ON_EQUIP", String.valueOf(slot), SlotType.ARMOR);
+			this.equipCommands(player, event.getOldCursor(), "ON_EQUIP", "EQUIPPED", String.valueOf(slot), SlotType.ARMOR);
 		}
 	}
 	
@@ -141,12 +150,12 @@ public class Legacy_Commands implements Listener {
 	@EventHandler(ignoreCancelled = false)
 	private void onEquip(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
-		ItemStack item = event.getItem();
+		ItemStack item = (event.getItem() != null ? event.getItem().clone() : event.getItem());
 		if (item != null && item.getType() != Material.AIR && !PlayerHandler.getPlayer().isMenuClick(player.getOpenInventory(), event.getAction())) {
 			String[] itemType = item.getType().name().split("_");
 			if (itemType.length >= 2 && itemType[1] != null && !itemType[1].isEmpty() && Utils.getUtils().isInt(Utils.getUtils().getArmorSlot(itemType[1], true)) 
 				&& player.getInventory().getItem(Integer.parseInt(Utils.getUtils().getArmorSlot(itemType[1], true))) == null) {
-				this.equipCommands(player, event.getItem(), "ON_EQUIP", Utils.getUtils().getArmorSlot(itemType[1], true), SlotType.ARMOR);
+				this.equipCommands(player, event.getItem(), "ON_EQUIP", "EQUIPPED", Utils.getUtils().getArmorSlot(itemType[1], true), SlotType.ARMOR);
 			}
 		}
 	}
@@ -161,13 +170,13 @@ public class Legacy_Commands implements Listener {
 	private void onEntity(PlayerInteractEntityEvent event) {
 		if (event.getRightClicked() instanceof org.bukkit.entity.ItemFrame) {
 			ItemStack item;
-			if (ServerHandler.getServer().hasSpecificUpdate("1_9")) { item = PlayerHandler.getPlayer().getPerfectHandItem(event.getPlayer(), event.getHand().toString()); } 
+			if (ServerHandler.getServer().hasSpecificUpdate("1_9")) { item = PlayerHandler.getPlayer().getPerfectHandItem(event.getPlayer(), event.getHand().name()); } 
 			else { item = PlayerHandler.getPlayer().getPerfectHandItem(event.getPlayer(), ""); }
 			Player player = event.getPlayer();
 			String action = Action.RIGHT_CLICK_BLOCK.name();
 			ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(PlayerHandler.getPlayer().getHandItem(player), null, player.getWorld());
 			if (itemMap != null && itemMap.isSimilar(item)) {
-				this.runCommands(player, item, action, String.valueOf(player.getInventory().getHeldItemSlot()));
+				this.runCommands(player, item, action, action.split("_")[0], String.valueOf(player.getInventory().getHeldItemSlot()));
 			}
 		}
 	}
@@ -180,14 +189,14 @@ public class Legacy_Commands implements Listener {
 	*/
 	@EventHandler(ignoreCancelled = false)
 	private void onInteract(PlayerInteractEvent event) {
-		ItemStack item = (event.getItem() != null ? event.getItem().clone() : event.getItem());
 		final Player player = event.getPlayer();
-		String action = event.getAction().toString();
+		final ItemStack item = (event.getItem() != null ? event.getItem().clone() : (event.getAction() == Action.PHYSICAL ? PlayerHandler.getPlayer().getMainHandItem(player) : event.getItem()));
+		final String action = event.getAction().name();
 		if ((PlayerHandler.getPlayer().isAdventureMode(player) && !action.contains("LEFT") 
 				|| !PlayerHandler.getPlayer().isAdventureMode(player)) && !this.isDropEvent(event.getPlayer())) {
 			ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(PlayerHandler.getPlayer().getHandItem(player), null, player.getWorld());
 			if (itemMap != null && itemMap.isSimilar(item)) {
-				this.runCommands(player, item, action, String.valueOf(player.getInventory().getHeldItemSlot()));
+				this.runCommands(player, item, action, (event.getAction() == Action.PHYSICAL ? "INTERACTED" : action.split("_")[0]), String.valueOf(player.getInventory().getHeldItemSlot()));
 			}
 		}
 	}
@@ -203,7 +212,7 @@ public class Legacy_Commands implements Listener {
 		Player player = event.getPlayer();
 		ItemStack item = PlayerHandler.getPlayer().getHandItem(player);
 		if (PlayerHandler.getPlayer().isAdventureMode(player) && !this.isDropEvent(event.getPlayer())) {
-			this.runCommands(player, item, "LEFT_CLICK_AIR", String.valueOf(player.getInventory().getHeldItemSlot()));
+			this.runCommands(player, item, "LEFT_CLICK_AIR", "LEFT", String.valueOf(player.getInventory().getHeldItemSlot()));
 		}
 	}
 	
@@ -236,14 +245,14 @@ public class Legacy_Commands implements Listener {
 	* @param slotType - the SlotType the item originated in.
 	* @deprecated This is a LEGACY event, only use on Minecraft versions below 1.8.
 	*/
-	private void equipCommands(Player player, ItemStack item, String action, String slot, SlotType slotType) {
-		try {
+	private void equipCommands(Player player, ItemStack item, String action, String clickType, String slot, SlotType slotType) {
 			String[] itemType = item.getType().name().split("_");
-			if (slotType == SlotType.ARMOR && itemType.length >= 2 && itemType[1] != null && !itemType[1].isEmpty() && !itemType[1].equalsIgnoreCase("HEAD") && (itemType[1].equalsIgnoreCase(Utils.getUtils().getArmorSlot(slot, false)) 
+			if (itemType.length >= 2 && itemType[1] != null && !itemType[1].isEmpty() && !itemType[1].equalsIgnoreCase("HEAD") 
+					&& (clickType.equalsIgnoreCase("SHIFT_EQUIPPED") || itemType[1].equalsIgnoreCase(Utils.getUtils().getArmorSlot(slot, false)) 
 					|| (itemType[1].equalsIgnoreCase("HEAD") && Utils.getUtils().getArmorSlot(slot, false).equalsIgnoreCase("HELMET")))) {
-				this.runCommands(player, item, action, slot);
+				clickType = (clickType.equalsIgnoreCase("SHIFT_EQUIPPED") ? "EQUIPPED" : clickType);
+				this.runCommands(player, item, action, clickType, slot);
 			}
-		} catch (Exception e) { }
 	}
 	
    /**
@@ -255,10 +264,10 @@ public class Legacy_Commands implements Listener {
 	* @param slot - the slot the item originally resided in.
 	* @deprecated This is a LEGACY event, only use on Minecraft versions below 1.8.
 	*/
-	private void runCommands(Player player, ItemStack item, String action, String slot) {
+	private void runCommands(Player player, ItemStack item, String action, String clickType, String slot) {
 		ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item, null, player.getWorld());
 		if (itemMap != null && itemMap.inWorld(player.getWorld()) && itemMap.hasPermission(player)) {
-			itemMap.executeCommands(player, item, action, slot);
+			itemMap.executeCommands(player, item, action, clickType, (slot == null ? itemMap.getSlot() : slot));
 		}
 	}
 	
