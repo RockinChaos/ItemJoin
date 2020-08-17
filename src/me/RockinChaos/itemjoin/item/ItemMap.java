@@ -202,7 +202,6 @@ public class ItemMap {
 	private boolean useCooldown = false;
 	private boolean subjectRemoval = false;
 	private CommandSequence sequence;
-	private CommandType type;
 	private Map < String, Long > playersOnCooldown = new HashMap < String, Long > ();
 	private HashMap < String, Long > playersOnCooldownTick = new HashMap < String, Long > ();
 //  ============================================================================================= //
