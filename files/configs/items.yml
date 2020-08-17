@@ -22,14 +22,13 @@ items:
     - '&7A devine sword.'
     - '&7This sword is many millennium old...'
     commands:
-      multi-click:
+      interact:
       - 'message: &eYou can send yourself custom messages!'
       - 'console: say You can even execute more than one command!'
       - 'delay: 10'
       - 'player: say This is item slot 1.'
       - 'op: say This command executes as if the player is op.'
       - 'say Hello world!'
-    commands-type: interact
     commands-sound: BLOCK_NOTE_BLOCK_PLING
     commands-particle: FIREWORK:BLACK:RED:BURST:10
     commands-sequence: SEQUENTIAL
@@ -67,13 +66,12 @@ items:
     - '&7'
     - '&7Left-Click use spectator token.'
     commands:
-      right-click:
+      interact-right:
       - 'console: gamemode creative %player%'
       - 'message: &eYou have been set to creative mode.'
-      left-click:
+      interact-left:
       - 'console: gamemode spectator %player%'
       - 'message: &eYou have been set to spectator mode.'
-    commands-type: interact
     commands-sound: BLOCK_NOTE_BLOCK_PLING
     commands-cooldown: 2
     itemflags: item-store, death-drops, self-drops, hide-attributes, disposable
@@ -168,7 +166,7 @@ items:
     lore:
     - '&7The creeper is our leader!'
     commands:
-      multi-click:
+      interact:
       - 'message: &bWhere is Herobrine?'
       - 'message: &cWhere is your leader now...?'
     commands-sequence: RANDOM
@@ -205,10 +203,12 @@ items:
     lore:
     - '&7Click to go to the survival server!'
     commands:
-      multi-click:
+      interact:
       - 'server: survival'
       - 'message: &eSending you to the survival server!'
-    commands-type: interact, inventory
+      inventory:
+      - 'server: survival'
+      - 'message: &eSending you to the survival server!'
     commands-sound: BLOCK_NOTE_BLOCK_PLING
     commands-cost: 10
     commands-cooldown: 2
