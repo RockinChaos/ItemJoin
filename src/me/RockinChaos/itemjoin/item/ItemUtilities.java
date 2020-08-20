@@ -483,10 +483,10 @@ public class ItemUtilities {
 			String overWrite = ConfigHandler.getConfig(false).getFile("items.yml").getString("items-Overwrite");
 			if ((overWrite != null && Utils.getUtils().containsLocation(player.getWorld().getName(), overWrite.replace(" ", "")))) {
 				String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[7] = this.failCount.get(session).toString();
-				LanguageAPI.getLang(false).sendLangMessage("General.failedInventory", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("general.failedInventory", player, placeHolders);
 			} else {
 				String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[7] = this.failCount.get(session).toString();
-				LanguageAPI.getLang(false).sendLangMessage("General.failedOverwrite", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("general.failedOverwrite", player, placeHolders);
 			}
 			this.failCount.remove(session);
 		}
@@ -576,8 +576,8 @@ public class ItemUtilities {
 			if (craftSlot == 0) {
 				ServerHandler.getServer().runThread(craft -> {
 					if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
-					    	player.getOpenInventory().getTopInventory().setItem(craftSlot, itemStack);
-					    	PlayerHandler.getPlayer().updateInventory(player, 1L);
+					    player.getOpenInventory().getTopInventory().setItem(craftSlot, itemStack);
+					    PlayerHandler.getPlayer().updateInventory(player, 1L);
 					} else { ServerHandler.getServer().runThread(craft_2 -> { this.setCraftingSlots(player, itemStack, craftSlot, (attempts - 1)); }, 20L); }
 				}, 2L);
 			} else if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {

@@ -29,6 +29,7 @@ import me.RockinChaos.itemjoin.handlers.ServerHandler;
 
 public class LanguageAPI {
 	private Lang langType = Lang.ENGLISH;
+	private String langPrefix = "ItemJoin";
 	
     private static LanguageAPI lang;
 	
@@ -55,14 +56,12 @@ public class LanguageAPI {
 	public void sendLangMessage(final String nodeLocation, final CommandSender sender, final String...placeHolder) {
 		Player player = null; if (sender instanceof Player) { player = (Player) sender; }
 		String langMessage = this.getLangMessage(nodeLocation);
-		String prefix = Utils.getUtils().translateLayout(ConfigHandler.getConfig(false).getFile(this.langType.nodeLocation()).getString("Prefix"), player); 
-		if (prefix == null || prefix.isEmpty() || !this.showPrefix(nodeLocation)) { prefix = ""; } else { prefix += " "; }
 		if (langMessage != null && !langMessage.isEmpty()) {
 			langMessage = this.translateLangHolders(langMessage, this.initializeRows(placeHolder));
 			langMessage = Utils.getUtils().translateLayout(langMessage, player).replace(" \\n ", " \\n").replace(" /n ", " \\n").replace(" /n", " \\n");
 			String[] langLines = langMessage.split(Pattern.quote(" \\" + "n"));
 			for (String langLine : langLines) {
-				String langStrip = prefix + langLine;
+				String langStrip = langLine;
 				if (sender instanceof ConsoleCommandSender) { langStrip = ChatColor.stripColor(langStrip); } 
 				if (this.isConsoleMessage(nodeLocation)) { ServerHandler.getServer().logInfo(ChatColor.stripColor(langLine)); }
 				else { sender.sendMessage(langStrip);	}
@@ -112,39 +111,22 @@ public class LanguageAPI {
 	private String translateLangHolders(final String langMessage, final String...langHolder) {
 		return langMessage
 				.replace("%world%", langHolder[0])
-				.replace("%targetplayer%", langHolder[1])
-				.replace("%targetplayer_world%", langHolder[2])
+				.replace("%target_player%", langHolder[1])
+				.replace("%target_player_world%", langHolder[2])
 				.replace("%item%", langHolder[3])
 				.replace("%item_type%", langHolder[4])
 				.replace("%balance%", langHolder[5])
 				.replace("%cost%", langHolder[6])
-				.replace("%failcount%", langHolder[7])
-				.replace("%failedcount%", langHolder[7])
-				.replace("%database%", langHolder[8])
+				.replace("%fail_count%", langHolder[7])
 				.replace("%command%", langHolder[9])
-				.replace("%purgedata%", langHolder[10])
+				.replace("%purge_data%", langHolder[10])
 				.replace("%amount%", langHolder[11])
 				.replace("%players%", langHolder[12])
-				.replace("%timeleft%", langHolder[13])
-				.replace("%type%", langHolder[14])
-				.replace("%example%", langHolder[15])
-				.replace("%input%", langHolder[16]);
-	}
-	
-   /**
-    * Checks if the Language Prefix should be shown.
-    * 
-    * @param nodeLocation - The String location of the Language Message.
-    * @return If the Prefix is to be shown.
-    */
-	private boolean showPrefix(final String nodeLocation) {
-		if (nodeLocation.equalsIgnoreCase("Commands.List.itemRow") || nodeLocation.equalsIgnoreCase("Commands.List.worldHeader")
-				|| nodeLocation.equalsIgnoreCase("Commands.List.noItemsDefined") || nodeLocation.equalsIgnoreCase("Commands.Info.material")
-				 || nodeLocation.equalsIgnoreCase("Commands.Info.dataValue") || nodeLocation.equalsIgnoreCase("Commands.World.worldRow") 
-				 || nodeLocation.equalsIgnoreCase("Commands.World.worldHeader") || nodeLocation.equalsIgnoreCase("Commands.World.worldsFoundHeader")) {
-			return false;
-		}
-		return true;
+				.replace("%time_left%", langHolder[13])
+				.replace("%input_example%", langHolder[15])
+				.replace("%input%", langHolder[16])
+				.replace("%prefix%", this.langPrefix);
+		
 	}
 	
    /**
@@ -186,6 +168,14 @@ public class LanguageAPI {
     */
 	public String getFile() {
 		return this.langType.nodeLocation();
+	}
+	
+   /**
+    * Sets the Language Prefix
+    * 
+    */
+	public void setPrefix() {
+		this.langPrefix = Utils.getUtils().colorFormat(ConfigHandler.getConfig(false).getFile(this.langType.nodeLocation()).getString("Prefix"));
 	}
 	
    /**

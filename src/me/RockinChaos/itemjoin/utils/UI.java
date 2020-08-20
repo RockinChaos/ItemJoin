@@ -429,7 +429,7 @@ public class UI {
 				itemMap.removeFromConfig();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[3] = itemMap.getConfigName();
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.itemRemoved", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.itemRemoved", player, placeHolders);
 				SQLite.getLite(false).executeLaterStatements();
 				ItemUtilities.getUtilities().closeAnimations();
 				ItemUtilities.getUtilities().clearItems();
@@ -549,17 +549,17 @@ public class UI {
 					} else {
 						player.closeInventory();
 						String[] placeHolders = LanguageAPI.getLang(false).newString();
-						placeHolders[14] = "NAME";
+						placeHolders[16] = "NAME";
 						placeHolders[15] = "&bUltimate Sword";
-						LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
-						LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+						LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+						LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 					}
 				}
 			}, event -> {
 				itemMap.setCustomName(ChatColor.stripColor(event.getMessage()));
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[14] = "NAME";
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+				placeHolders[16] = "NAME";
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				this.creatingPane(event.getPlayer(), itemMap);
 			}));
 			creatingPane.addButton(new Button(ItemHandler.getItem().getItem("386", 1, false, "&b&lLore", "&7", "&7*Set the lore of the item.", "&9&lLORE: &f" + Utils.getUtils().nullCheck(itemMap.getCustomLore().toString())), event -> {
@@ -571,8 +571,8 @@ public class UI {
 			}, event -> {
 				itemMap.setCustomLore(Utils.getUtils().split(ChatColor.stripColor(event.getMessage())));
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[14] = "LORE";
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+				placeHolders[16] = "LORE";
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				this.creatingPane(event.getPlayer(), itemMap);
 			}));
 			creatingPane.addButton(new Button(ItemHandler.getItem().setDurability(ItemHandler.getItem().getItem("DIAMOND_BOOTS", 1, false, "&e&lData", "&7", "&7*Set the damage or the", "&7custom texture of the item."), 160), event -> { this.dataPane(player, itemMap); }));
@@ -591,16 +591,16 @@ public class UI {
 				} else {
 					player.closeInventory();
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
-					placeHolders[14] = "CUSTOM PERMISSION";
+					placeHolders[16] = "CUSTOM PERMISSION";
 					placeHolders[15] = "itemjoin.ultra";
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 				}
 			}, event -> {
 				itemMap.setPerm(ChatColor.stripColor(event.getMessage()));
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[14] = "CUSTOM PERMISSION";
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+				placeHolders[16] = "CUSTOM PERMISSION";
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				this.creatingPane(event.getPlayer(), itemMap);
 			}));
 			creatingPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "GRASS_BLOCK" : "2"), 1, false, "&b&lEnabled Worlds", "&7", "&7*Define the world(s) that the", "&7item will be given in.", 
@@ -651,16 +651,16 @@ public class UI {
 					} else {
 						player.closeInventory();
 						String[] placeHolders = LanguageAPI.getLang(false).newString();
-						placeHolders[14] = "MAP IMAGE";
+						placeHolders[16] = "MAP IMAGE";
 						placeHolders[15] = "minecraft.png OR minecraft-dance.gif";
-						LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
-						LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+						LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+						LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 					}
 				}, event -> {
 					itemMap.setMapImage(ChatColor.stripColor(event.getMessage()));
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
-					placeHolders[14] = "MAP IMAGE";
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+					placeHolders[16] = "MAP IMAGE";
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 					this.creatingPane(event.getPlayer(), itemMap);
 				}));
 			} else if (itemMap.getMaterial().toString().contains("TIPPED_ARROW")) {
@@ -714,7 +714,7 @@ public class UI {
 					itemMap.saveToConfig();
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[3] = itemMap.getConfigName();
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.itemSaved", player, placeHolders);
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.itemSaved", player, placeHolders);
 					SQLite.getLite(false).executeLaterStatements();
 					ItemUtilities.getUtilities().closeAnimations();
 					ItemUtilities.getUtilities().clearItems();
@@ -726,7 +726,7 @@ public class UI {
 					itemMap.saveToConfig();
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[3] = itemMap.getConfigName();
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.itemSaved", player, placeHolders);
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.itemSaved", player, placeHolders);
 					SQLite.getLite(false).executeLaterStatements();
 					ItemUtilities.getUtilities().closeAnimations();
 					ItemUtilities.getUtilities().clearItems();
@@ -760,7 +760,7 @@ public class UI {
 					itemMap.saveToConfig();
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[3] = itemMap.getConfigName();
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.itemSaved", player, placeHolders);
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.itemSaved", player, placeHolders);
 					SQLite.getLite(false).executeLaterStatements();
 					ItemUtilities.getUtilities().closeAnimations();
 					ItemUtilities.getUtilities().clearItems();
@@ -772,7 +772,7 @@ public class UI {
 					itemMap.saveToConfig();
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[3] = itemMap.getConfigName();
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.itemSaved", player, placeHolders);
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.itemSaved", player, placeHolders);
 					SQLite.getLite(false).executeLaterStatements();
 					ItemUtilities.getUtilities().closeAnimations();
 					ItemUtilities.getUtilities().clearItems();
@@ -837,13 +837,13 @@ public class UI {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				if (stage == 2) {
-					placeHolders[14] = "ITEM COST";
+					placeHolders[16] = "ITEM COST";
 				} else {
-					placeHolders[14] = "BUKKIT MATERIAL";
+					placeHolders[16] = "BUKKIT MATERIAL";
 				}
 				placeHolders[15] = "IRON_SWORD";
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				if (ItemHandler.getItem().getMaterial(ChatColor.stripColor(event.getMessage()), null) != null) {
 					if (stage == 2) {
@@ -859,11 +859,11 @@ public class UI {
 					}
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					if (stage == 2) {
-						placeHolders[14] = "ITEM COST";
+						placeHolders[16] = "ITEM COST";
 					} else {
-						placeHolders[14] = "BUKKIT MATERIAL";
+						placeHolders[16] = "BUKKIT MATERIAL";
 					}
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 					if (stage == 3) {
 						this.setIngredients(event.getPlayer(), itemMap, ItemHandler.getItem().getMaterial(ChatColor.stripColor(event.getMessage()), null), position);
 					} else if (stage == 2) {
@@ -874,7 +874,7 @@ public class UI {
 				} else {
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[16] = ChatColor.stripColor(event.getMessage());
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.noMatch", player, placeHolders);
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.noMaterial", player, placeHolders);
 					this.materialPane(player, itemMap, stage, position);
 				}
 			}));
@@ -1401,20 +1401,20 @@ public class UI {
 			texturePane.addButton(new Button(ItemHandler.getItem().getItem("STAINED_GLASS_PANE:4", 1, false, "&e&lCustom Texture", "&7", "&7*Click to set a custom texture", "&7value for the item."), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[14] = "DURABILITY DATA";
+				placeHolders[16] = "DURABILITY DATA";
 				placeHolders[15] = "1193";
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				if (Utils.getUtils().isInt(ChatColor.stripColor(event.getMessage()))) {
 					itemMap.setData(Integer.parseInt(ChatColor.stripColor(event.getMessage())));
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
-					placeHolders[14] = "DURABILITY DATA";
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+					placeHolders[16] = "DURABILITY DATA";
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				} else {
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[16] = ChatColor.stripColor(event.getMessage());
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.notInteger", player, placeHolders);
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.noInteger", player, placeHolders);
 				}
 				this.dataPane(event.getPlayer(), itemMap);
 			}));
@@ -1444,20 +1444,20 @@ public class UI {
 			texturePane.addButton(new Button(ItemHandler.getItem().getItem("STAINED_GLASS_PANE:4", 1, false, "&e&lCustom Model Data", "&7", "&7*Click to set the custom mode data", "&7value for the item."), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[14] = "MODEL DATA";
+				placeHolders[16] = "MODEL DATA";
 				placeHolders[15] = "1193";
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				if (Utils.getUtils().isInt(ChatColor.stripColor(event.getMessage()))) {
 					itemMap.setModelData(Integer.parseInt(ChatColor.stripColor(event.getMessage())));
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
-					placeHolders[14] = "MODEL DATA";
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+					placeHolders[16] = "MODEL DATA";
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				} else {
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[16] = ChatColor.stripColor(event.getMessage());
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.notInteger", player, placeHolders);
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.noInteger", player, placeHolders);
 				}
 				this.dataPane(event.getPlayer(), itemMap);
 			}));
@@ -1487,20 +1487,20 @@ public class UI {
 		damagePane.addButton(new Button(ItemHandler.getItem().getItem("STAINED_GLASS_PANE:4", 1, false, "&e&lCustom Damage", "&7", "&7*Click to set a custom damage", "&7value for the item."), event -> {
 			player.closeInventory();
 			String[] placeHolders = LanguageAPI.getLang(false).newString();
-			placeHolders[14] = "DAMAGE";
+			placeHolders[16] = "DAMAGE";
 			placeHolders[15] = "1893";
-			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
-			LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+			LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+			LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 		}, event -> {
 			if (Utils.getUtils().isInt(ChatColor.stripColor(event.getMessage()))) {
 				itemMap.setDurability((short) Integer.parseInt(ChatColor.stripColor(event.getMessage())));
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[14] = "DAMAGE";
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+				placeHolders[16] = "DAMAGE";
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 			} else {
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[16] = ChatColor.stripColor(event.getMessage());
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.notInteger", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.noInteger", player, placeHolders);
 			}
 			this.dataPane(event.getPlayer(), itemMap);
 		}));
@@ -1585,13 +1585,13 @@ public class UI {
 				} else {
 					player.closeInventory();
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
-					placeHolders[14] = "COOLDOWN MESSAGE";
+					placeHolders[16] = "COOLDOWN MESSAGE";
 					placeHolders[15] = "&cThis item is on cooldown for &a%timeleft% &cseconds..";
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 				}
 			}, event -> {
-				itemMap.setCooldownMessage(ChatColor.stripColor(event.getMessage()));String[] placeHolders = LanguageAPI.getLang(false).newString();placeHolders[14] = "COOLDOWN MESSAGE";LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);this.commandPane(event.getPlayer(), itemMap);
+				itemMap.setCooldownMessage(ChatColor.stripColor(event.getMessage()));String[] placeHolders = LanguageAPI.getLang(false).newString();placeHolders[16] = "COOLDOWN MESSAGE";LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);this.commandPane(event.getPlayer(), itemMap);
 			}));
 			commandPane.addButton(new Button(ItemHandler.getItem().getItem("JUKEBOX", 1, false, "&a&lSound", "&7", "&7*The sound that will be", "&7played after a successful", "&7command execution.", "&9&lCOMMANDS-SOUND: &a" + 
 			Utils.getUtils().nullCheck(itemMap.getCommandSound() + "")), event -> {
@@ -1909,10 +1909,10 @@ public class UI {
 						} else {
 							player.closeInventory();
 							String[] placeHolders = LanguageAPI.getLang(false).newString();
-							placeHolders[14] = "COMMAND IDENTIFIER";
+							placeHolders[16] = "COMMAND IDENTIFIER";
 							placeHolders[15] = "winner";
-							LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
-							LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+							LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+							LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 						}
 					}, event -> {
 						ItemCommand[] commands = itemMap.getCommands();
@@ -1923,18 +1923,18 @@ public class UI {
 						}
 						itemMap.setCommands(commands);
 						String[] placeHolders = LanguageAPI.getLang(false).newString();
-						placeHolders[14] = "COMMAND IDENTIFIER";
-						LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+						placeHolders[16] = "COMMAND IDENTIFIER";
+						LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 						this.commandListPane(event.getPlayer(), itemMap, action);
 					}));
 			modPane.addButton(new Button(this.fillerPaneGItem));
 			modPane.addButton(new Button(ItemHandler.getItem().getItem("PAPER", 1, false, "&fModify", "&7", "&7*Sets the command to", "&7another text entry."), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[14] = "MODIFIED COMMAND";
+				placeHolders[16] = "MODIFIED COMMAND";
 				placeHolders[15] = "gamemode creative";
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				ItemCommand[] commands = itemMap.getCommands();
 				for (ItemCommand Command: commands) {
@@ -1944,8 +1944,8 @@ public class UI {
 				}
 				itemMap.setCommands(commands);
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[14] = "MODIFIED COMMAND";
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+				placeHolders[16] = "MODIFIED COMMAND";
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				this.commandListPane(event.getPlayer(), itemMap, action);
 			}));
 			modPane.addButton(new Button(this.fillerPaneGItem));
@@ -1981,84 +1981,84 @@ public class UI {
 			executorPane.addButton(new Button(ItemHandler.getItem().getItem("BOOK", 1, false, "&e&lPlayer", "&7", "&7*Executes the command", "&7as the player."), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[14] = "PLAYER COMMAND";placeHolders[15] = "spawn";
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+				placeHolders[16] = "PLAYER COMMAND";placeHolders[15] = "spawn";
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				this.modifyCommands(itemMap, ItemCommand.fromString("player: " + ChatColor.stripColor(event.getMessage()), action, 0L, null), true);
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[14] = "PLAYER COMMAND";
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+				placeHolders[16] = "PLAYER COMMAND";
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				this.commandListPane(event.getPlayer(), itemMap, action);
 			}));
 			executorPane.addButton(new Button(ItemHandler.getItem().getItem("BOOK", 1, true, "&e&lOp", "&7", "&7*Executes the command as if the", "&7player has /op (admin permissions)."), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[14] = "OP COMMAND";
+				placeHolders[16] = "OP COMMAND";
 				placeHolders[15] = "broadcast I am &cADMIN!";
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				this.modifyCommands(itemMap, ItemCommand.fromString("op: " + ChatColor.stripColor(event.getMessage()), action, 0L, null), true);
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[14] = "COMMAND LINE";
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+				placeHolders[16] = "COMMAND LINE";
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				this.commandListPane(event.getPlayer(), itemMap, action);
 			}));
 			executorPane.addButton(new Button(ItemHandler.getItem().getItem("EMERALD", 1, false, "&e&lConsole", "&7", "&7*Executes the command", "&7in the console window."), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[14] = "CONSOLE COMMAND";
+				placeHolders[16] = "CONSOLE COMMAND";
 				placeHolders[15] = "gamemode creative %player%";
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				this.modifyCommands(itemMap, ItemCommand.fromString("console: " + ChatColor.stripColor(event.getMessage()), action, 0L, null), true);
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[14] = "OP COMMAND";
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+				placeHolders[16] = "OP COMMAND";
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				this.commandListPane(event.getPlayer(), itemMap, action);
 			}));
 			executorPane.addButton(new Button(ItemHandler.getItem().getItem("HOPPER", 1, false, "&e&lServer", "&7", "&7*Switches the player to", "&7the defined server name.", "&7", "&7&lNote: &7This is the name", 
 					"&7defined in the BungeeCord config."), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[14] = "SERVER SWITCH";
+				placeHolders[16] = "SERVER SWITCH";
 				placeHolders[15] = "survival";
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				this.modifyCommands(itemMap, ItemCommand.fromString("server: " + ChatColor.stripColor(event.getMessage()), action, 0L, null), true);
-				String[] placeHolders = LanguageAPI.getLang(false).newString();placeHolders[14] = "SERVER SWITCH";
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+				String[] placeHolders = LanguageAPI.getLang(false).newString();placeHolders[16] = "SERVER SWITCH";
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				this.commandListPane(event.getPlayer(), itemMap, action);
 			}));
 			executorPane.addButton(new Button(ItemHandler.getItem().getItem("OBSIDIAN", 1, false, "&e&lBungee", "&7", "&7*Executes a BungeeCord specific command."), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[14] = "BUNGEE COMMAND";
+				placeHolders[16] = "BUNGEE COMMAND";
 				placeHolders[15] = "survival";
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				this.modifyCommands(itemMap, ItemCommand.fromString("bungee: " + ChatColor.stripColor(event.getMessage()), action, 0L, null), true);
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[14] = "BUNGEE COMMAND";
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+				placeHolders[16] = "BUNGEE COMMAND";
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				this.commandListPane(event.getPlayer(), itemMap, action);
 			}));
 			executorPane.addButton(new Button(ItemHandler.getItem().getItem("PAPER", 1, false, "&e&lMessage", "&7", "&7*Sends the player a custom message."), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[14] = "MESSAGE";
+				placeHolders[16] = "MESSAGE";
 				placeHolders[15] = "&eWelcome to the Server!";
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				this.modifyCommands(itemMap, ItemCommand.fromString("message: " + ChatColor.stripColor(event.getMessage()), action, 0L, null), true);
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[14] = "MESSAGE";
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+				placeHolders[16] = "MESSAGE";
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				this.commandListPane(event.getPlayer(), itemMap, action);
 			}));
 			executorPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "REPEATER" : "356"), 1, false, "&e&lSwap-Item", "&7", "&7*Swaps the item to another defined item."), event -> this.swapPane(player, itemMap, action)));
@@ -2113,20 +2113,20 @@ public class UI {
 			delayPane.addButton(new Button(ItemHandler.getItem().getItem("STAINED_GLASS_PANE:4", 1, false, "&e&lCustom Cooldown", "&7", "&7*Click to set a custom", "&7delay for the next command."), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[14] = "DELAY";
+				placeHolders[16] = "DELAY";
 				placeHolders[15] = "180";
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				if (Utils.getUtils().isInt(ChatColor.stripColor(event.getMessage()))) {
 					this.modifyCommands(itemMap, ItemCommand.fromString("delay: " + Integer.parseInt(ChatColor.stripColor(event.getMessage())), action, Integer.parseInt(ChatColor.stripColor(event.getMessage())), null), true);
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
-					placeHolders[14] = "DELAY";
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+					placeHolders[16] = "DELAY";
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				} else {
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[16] = ChatColor.stripColor(event.getMessage());
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.notInteger", player, placeHolders);
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.noInteger", player, placeHolders);
 				}
 				this.commandListPane(event.getPlayer(), itemMap, action);
 			}));
@@ -2157,20 +2157,20 @@ public class UI {
 			cooldownPane.addButton(new Button(ItemHandler.getItem().getItem("STAINED_GLASS_PANE:4", 1, false, "&e&lCustom Cooldown", "&7", "&7*Click to set a custom commands-cooldown", "&7value for the item."), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[14] = "COMMAND COOLDOWN";
+				placeHolders[16] = "COMMAND COOLDOWN";
 				placeHolders[15] = "180";
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				if (Utils.getUtils().isInt(ChatColor.stripColor(event.getMessage()))) {
 					itemMap.setCommandCooldown(Integer.parseInt(ChatColor.stripColor(event.getMessage())));
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
-					placeHolders[14] = "COMMAND COOLDOWN";
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+					placeHolders[16] = "COMMAND COOLDOWN";
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				} else {
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[16] = ChatColor.stripColor(event.getMessage());
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.notInteger", player, placeHolders);
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.noInteger", player, placeHolders);
 				}
 				this.commandPane(event.getPlayer(), itemMap);
 			}));
@@ -2201,20 +2201,20 @@ public class UI {
 			warmPane.addButton(new Button(ItemHandler.getItem().getItem("STAINED_GLASS_PANE:4", 1, false, "&e&lCustom Warmup", "&7", "&7*Click to set a custom commands-warmup", "&7value for the item."), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[14] = "COMMAND WARMUP";
+				placeHolders[16] = "COMMAND WARMUP";
 				placeHolders[15] = "12";
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				if (Utils.getUtils().isInt(ChatColor.stripColor(event.getMessage()))) {
 					itemMap.setWarmDelay(Integer.parseInt(ChatColor.stripColor(event.getMessage())));
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
-					placeHolders[14] = "COMMAND WARMUP";
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+					placeHolders[16] = "COMMAND WARMUP";
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				} else {
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[16] = ChatColor.stripColor(event.getMessage());
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.notInteger", player, placeHolders);
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.noInteger", player, placeHolders);
 				}
 				this.commandPane(event.getPlayer(), itemMap);
 			}));
@@ -2245,20 +2245,20 @@ public class UI {
 			costPane.addButton(new Button(ItemHandler.getItem().getItem("STAINED_GLASS_PANE:4", 1, false, "&e&lCustom Cost", "&7", "&7*Click to set a custom commands-cost", "&7value for the item."), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[14] = "COMMAND COST";
+				placeHolders[16] = "COMMAND COST";
 				placeHolders[15] = "340";
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				if (Utils.getUtils().isInt(ChatColor.stripColor(event.getMessage()))) {
 					itemMap.setCommandCost(Integer.parseInt(ChatColor.stripColor(event.getMessage())));
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
-					placeHolders[14] = "COMMAND COST";
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+					placeHolders[16] = "COMMAND COST";
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				} else {
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[16] = ChatColor.stripColor(event.getMessage());
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.notInteger", player, placeHolders);
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.noInteger", player, placeHolders);
 				}
 				this.commandPane(event.getPlayer(), itemMap);
 			}));
@@ -2289,20 +2289,20 @@ public class UI {
 			receivePane.addButton(new Button(ItemHandler.getItem().getItem("STAINED_GLASS_PANE:4", 1, false, "&e&lCustom Receive", "&7", "&7*Click to set a custom commands-receive", "&7value for the item."), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[14] = "COMMAND RECEIVE";
+				placeHolders[16] = "COMMAND RECEIVE";
 				placeHolders[15] = "10";
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				if (Utils.getUtils().isInt(ChatColor.stripColor(event.getMessage()))) {
 					itemMap.setCommandReceive(Integer.parseInt(ChatColor.stripColor(event.getMessage())));
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
-					placeHolders[14] = "COMMAND RECEIVE";
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+					placeHolders[16] = "COMMAND RECEIVE";
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				} else {
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[16] = ChatColor.stripColor(event.getMessage());
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.notInteger", player, placeHolders);
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.noInteger", player, placeHolders);
 				}
 				this.commandPane(event.getPlayer(), itemMap);
 			}));
@@ -2417,10 +2417,10 @@ public class UI {
 			lifePane.addButton(new Button(ItemHandler.getItem().getItem("STAINED_GLASS_PANE:4", 1, false, "&e&lCustom LifeTime", "&7", "&7*Click to set a lifetime (duration)", "&7value for particle effect."), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[14] = "PARTICLE LIFETIME";
+				placeHolders[16] = "PARTICLE LIFETIME";
 				placeHolders[15] = "170";
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				if (Utils.getUtils().isInt(ChatColor.stripColor(event.getMessage()))) {
 					if (stage == 0) {
@@ -2429,12 +2429,12 @@ public class UI {
 						this.explosionPane(player, itemMap, particle, Integer.parseInt(ChatColor.stripColor(event.getMessage())));
 					}
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
-					placeHolders[14] = "PARTICLE LIFETIME";
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+					placeHolders[16] = "PARTICLE LIFETIME";
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				} else {
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[16] = ChatColor.stripColor(event.getMessage());
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.notInteger", player, placeHolders);
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.noInteger", player, placeHolders);
 					this.particlePane(event.getPlayer(), itemMap);
 				}
 			}));
@@ -2552,22 +2552,22 @@ public class UI {
 			enchantLevelPane.addButton(new Button(ItemHandler.getItem().getItem("STAINED_GLASS_PANE:4", 1, false, "&e&lCustom Count", "&7", "&7*Click to set a custom damage", "&7value for the item."), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[14] = "ENCHANT LEVEL";
+				placeHolders[16] = "ENCHANT LEVEL";
 				placeHolders[15] = "86";
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				if (Utils.getUtils().isInt(ChatColor.stripColor(event.getMessage()))) {
 					Map < String, Integer > enchantments = itemMap.getEnchantments();
 					enchantments.put(ItemHandler.getItem().getEnchantName(enchant).toUpperCase(), Integer.parseInt(ChatColor.stripColor(event.getMessage())));
 					itemMap.setEnchantments(enchantments);
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
-					placeHolders[14] = "ENCHANT LEVEL";
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+					placeHolders[16] = "ENCHANT LEVEL";
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				} else {
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[16] = ChatColor.stripColor(event.getMessage());
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.notInteger", player, placeHolders);
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.noInteger", player, placeHolders);
 				}
 				this.enchantPane(event.getPlayer(), itemMap);
 			}));
@@ -3276,14 +3276,14 @@ public class UI {
 			lorePane.addButton(new Button(ItemHandler.getItem().getItem("FEATHER", 1, true, "&eNew Lore Line", "&7", "&7*Add a new lore line", "&7to the item lore."), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[14] = "LORE LINE";
+				placeHolders[16] = "LORE LINE";
 				placeHolders[15] = "&bThis is a new lore line.";
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[14] = "LORE LINE";
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+				placeHolders[16] = "LORE LINE";
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				List<String> lore = new ArrayList<String>(); 
 				if (itemMap.getCustomLore() != null) {
 					lore = itemMap.getCustomLore(); 
@@ -3319,17 +3319,17 @@ public class UI {
 			modifyLorePane.addButton(new Button(ItemHandler.getItem().getItem("WRITABLE_BOOK", 1, false, "&e&l&nModify", "&7", "&7*Change the lore line.", "&9&lLore: &a" + itemMap.getCustomLore().get(position)), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[14] = "LORE LINE";
+				placeHolders[16] = "LORE LINE";
 				placeHolders[15] = "&bThis is a new lore line.";
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				List <  String> lore = itemMap.getCustomLore();
 				lore.set(position, ChatColor.stripColor(event.getMessage()));
 				itemMap.setCustomLore(lore);
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[14] = "LORE LINE";
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+				placeHolders[16] = "LORE LINE";
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				this.modifyLoreLinePane(event.getPlayer(), itemMap, position);
 			}));
 			modifyLorePane.addButton(new Button(this.fillerPaneGItem));
@@ -3400,10 +3400,10 @@ public class UI {
 			selectMaterialPane.addButton(new Button(ItemHandler.getItem().getItem("STICK", 1, true, "&b&lBukkit Material", "&7", "&7*If you know the name", "&7of the BUKKIT material type", "&7simply click and type it."), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[14] = "BUKKIT MATERIAL";
+				placeHolders[16] = "BUKKIT MATERIAL";
 				placeHolders[15] = "IRON_SWORD";
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				if (ItemHandler.getItem().getMaterial(ChatColor.stripColor(event.getMessage()), null) != null) {
 					if (isNew) {
@@ -3415,12 +3415,12 @@ public class UI {
 						this.modifyMaterialPane(player, itemMap, position);
 					}
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
-					placeHolders[14] = "BUKKIT MATERIAL";
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+					placeHolders[16] = "BUKKIT MATERIAL";
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				} else {
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[16] = ChatColor.stripColor(event.getMessage());
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.noMatch", player, placeHolders);
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.noMaterial", player, placeHolders);
 					this.selectMaterialPane(player, itemMap, position, isNew);
 				}
 			}));
@@ -3478,15 +3478,15 @@ public class UI {
 			durationPane.addButton(new Button(ItemHandler.getItem().getItem("STAINED_GLASS_PANE:4", 1, false, "&e&lCustom Duration", "&7", "&7*Click to set a custom duration", "&7value for the animation."), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[14] = "ANIMATION DURATION";
+				placeHolders[16] = "ANIMATION DURATION";
 				placeHolders[15] = "110";
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				if (Utils.getUtils().isInt(ChatColor.stripColor(event.getMessage()))) {
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
-					placeHolders[14] = "ANIMATION DURATION";
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+					placeHolders[16] = "ANIMATION DURATION";
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 					List < String > mats = itemMap.getDynamicMaterials();
 					if (isNew) {
 						if (itemMap.getDynamicMaterials().isEmpty()) {
@@ -3505,7 +3505,7 @@ public class UI {
 				} else {
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[16] = ChatColor.stripColor(event.getMessage());
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.notInteger", player, placeHolders);
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.noInteger", player, placeHolders);
 					this.durationMaterialPane(player, itemMap, position, isNew, value);
 				}
 			}));
@@ -3581,15 +3581,15 @@ public class UI {
 			animatedNamePane.addButton(new Button(ItemHandler.getItem().getItem("FEATHER", 1, true, "&eNew Name Line", "&7", "&7*Add a new name line", "&7to be animated between."), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[14] = "NAME";
+				placeHolders[16] = "NAME";
 				placeHolders[15] = "&bUltimate Sword";
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				this.durationNamePane(player, itemMap, 0, true, ChatColor.stripColor(event.getMessage()));
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[14] = "NAME";
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+				placeHolders[16] = "NAME";
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 			}));
 			for (int i = 1; i <= itemMap.getDynamicNames().size(); i++) {
 				final int k = i;
@@ -3614,15 +3614,15 @@ public class UI {
 			durationPane.addButton(new Button(ItemHandler.getItem().getItem("STAINED_GLASS_PANE:4", 1, false, "&e&lCustom Duration", "&7", "&7*Click to set a custom duration", "&7value for the animation."), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[14] = "ANIMATION DURATION";
+				placeHolders[16] = "ANIMATION DURATION";
 				placeHolders[15] = "110";
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				if (Utils.getUtils().isInt(ChatColor.stripColor(event.getMessage()))) {
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
-					placeHolders[14] = "ANIMATION DURATION";
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+					placeHolders[16] = "ANIMATION DURATION";
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 					List < String > names = itemMap.getDynamicNames();
 					if (isNew) {
 						if (itemMap.getDynamicNames().isEmpty() && itemMap.getCustomName() != null && !itemMap.getCustomName().isEmpty()) {
@@ -3641,7 +3641,7 @@ public class UI {
 				} else {
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[16] = ChatColor.stripColor(event.getMessage());
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.notInteger", player, placeHolders);
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.noInteger", player, placeHolders);
 					this.durationNamePane(player, itemMap, position, isNew, value);
 				}
 			}));
@@ -3683,17 +3683,17 @@ public class UI {
 			modifyNamePane.addButton(new Button(ItemHandler.getItem().getItem("NAME_TAG", 1, false, "&a&l&nName", "&7", "&7*Change the animated name line.", "&9&lName: &a" + ItemHandler.getItem().cutDelay(itemMap.getDynamicNames().get(position))), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[14] = "NAME";
+				placeHolders[16] = "NAME";
 				placeHolders[15] = "&bUltimate Sword";
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				List < String > names = itemMap.getDynamicNames();
 				names.set(position, "<delay:" + Utils.getUtils().returnInteger(ItemHandler.getItem().getDelayFormat(names.get(position))) + ">" + ChatColor.stripColor(event.getMessage()));
 				itemMap.setDynamicNames(names)
 				;String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[14] = "NAME";
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+				placeHolders[16] = "NAME";
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				this.modifyNamePane(event.getPlayer(), itemMap, position);
 			}));
 			modifyNamePane.addButton(new Button(ItemHandler.getItem().getItem("CLOCK", 1, false, "&e&l&nDuration", "&7", "&7*Change the duration of the animation.", "&9&lAnimation Ticks: &a" + 
@@ -3732,14 +3732,14 @@ public class UI {
 			animatedLorePane.addButton(new Button(ItemHandler.getItem().getItem("FEATHER", 1, true, "&eNew Lore Line", "&7", "&7*Add a new lore line", "&7to be animated between."), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[14] = "ANIMATED LORE";
+				placeHolders[16] = "ANIMATED LORE";
 				placeHolders[15] = "&bThis is line 1, &cThis is line 2, &6This is line 3";
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[14] = "ANIMATED LORE";
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+				placeHolders[16] = "ANIMATED LORE";
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				this.durationLorePane(event.getPlayer(), itemMap, 0, true, ChatColor.stripColor(event.getMessage()));
 			}));
 			for (int i = 1; i <= itemMap.getDynamicLores().size(); i++) {
@@ -3765,15 +3765,15 @@ public class UI {
 			durationPane.addButton(new Button(ItemHandler.getItem().getItem("STAINED_GLASS_PANE:4", 1, false, "&e&lCustom Duration", "&7", "&7*Click to set a custom duration", "&7value for the animation."), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[14] = "ANIMATION DURATION";
+				placeHolders[16] = "ANIMATION DURATION";
 				placeHolders[15] = "110";
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				if (Utils.getUtils().isInt(ChatColor.stripColor(event.getMessage()))) {
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
-					placeHolders[14] = "ANIMATION DURATION";
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+					placeHolders[16] = "ANIMATION DURATION";
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 					List < List < String >> lores = itemMap.getDynamicLores();
 					if (isNew) {
 						if (itemMap.getDynamicLores().isEmpty() && itemMap.getCustomLore() != null && !itemMap.getCustomLore().isEmpty()) {
@@ -3796,7 +3796,7 @@ public class UI {
 				} else {
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[16] = ChatColor.stripColor(event.getMessage());
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.notInteger", player, placeHolders);
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.noInteger", player, placeHolders);
 					this.durationLorePane(player, itemMap, position, isNew, value);
 				}
 			}));
@@ -3842,16 +3842,16 @@ public class UI {
 			modifyLorePane.addButton(new Button(ItemHandler.getItem().getItem("WRITABLE_BOOK", 1, false, "&a&l&nLore", "&7", "&7*Change the animated lore line.", "&9&lLore: &a" + ItemHandler.getItem().cutDelay(itemMap.getDynamicLores().get(position))), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[14] = "ANIMATED LORE";
+				placeHolders[16] = "ANIMATED LORE";
 				placeHolders[15] = "&bThis is line 1, &cThis is line 2, &6This is line 3";
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				List < List < String >> lores = itemMap.getDynamicLores();
 				lores.set(position, Utils.getUtils().split("<delay:" + Utils.getUtils().returnInteger(ItemHandler.getItem().getDelayFormat(lores.get(position).get(0))) + ">" + ChatColor.stripColor(event.getMessage())));
 				itemMap.setDynamicLores(lores);
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[14] = "ANIMATED LORE";LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+				placeHolders[16] = "ANIMATED LORE";LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				this.modifyLorePane(event.getPlayer(), itemMap, position);
 			}));
 			modifyLorePane.addButton(new Button(ItemHandler.getItem().getItem("CLOCK", 1, false, "&e&l&nDuration", "&7", "&7*Change the duration of the animation.", "&9&lAnimation Ticks: &a" + 
@@ -3893,15 +3893,15 @@ public class UI {
 				animatedSkullPane.addButton(new Button(ItemHandler.getItem().getItem("FEATHER", 1, true, "&eNew Skull Owner", "&7", "&7*Add a new skull owner", "&7to be animated between."), event -> {
 					player.closeInventory();
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
-					placeHolders[14] = "SKULL OWNER";
+					placeHolders[16] = "SKULL OWNER";
 					placeHolders[15] = "RockinChaos";
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 				}, event -> {
 					this.durationSkullPane(player, itemMap, 0, true, ChatColor.stripColor(event.getMessage()), owner);
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
-					placeHolders[14] = "SKULL OWNER";
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+					placeHolders[16] = "SKULL OWNER";
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				}));
 				for (int i = 1; i <= itemMap.getDynamicOwners().size(); i++) {
 					final int k = i;
@@ -3921,15 +3921,15 @@ public class UI {
 				animatedSkullPane.addButton(new Button(ItemHandler.getItem().getItem("FEATHER", 1, true, "&eNew Skull Texture", "&7", "&7*Add a new skull texture", "&7to be animated between."), event -> {
 					player.closeInventory();
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
-					placeHolders[14] = "SKULL TEXTURE";
+					placeHolders[16] = "SKULL TEXTURE";
 					placeHolders[15] = "eyJ0ZXh0dYMGQVlN2FjZmU3OSJ9fX0=";
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 				}, event -> {
 					this.durationSkullPane(player, itemMap, 0, true, ChatColor.stripColor(event.getMessage()), owner);
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
-					placeHolders[14] = "SKULL TEXTURE";
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+					placeHolders[16] = "SKULL TEXTURE";
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				}));
 				for (int i = 1; i <= itemMap.getDynamicTextures().size(); i++) {
 					final int k = i;
@@ -3956,15 +3956,15 @@ public class UI {
 			durationPane.addButton(new Button(ItemHandler.getItem().getItem("STAINED_GLASS_PANE:4", 1, false, "&e&lCustom Duration", "&7", "&7*Click to set a custom duration", "&7value for the animation."), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[14] = "ANIMATION DURATION";
+				placeHolders[16] = "ANIMATION DURATION";
 				placeHolders[15] = "110";
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				if (Utils.getUtils().isInt(ChatColor.stripColor(event.getMessage()))) {
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
-					placeHolders[14] = "ANIMATION DURATION";
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+					placeHolders[16] = "ANIMATION DURATION";
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 					List < String > skulls = itemMap.getDynamicOwners();
 					if (!owner) {
 						skulls = itemMap.getDynamicTextures();
@@ -3992,7 +3992,7 @@ public class UI {
 				} else {
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[16] = ChatColor.stripColor(event.getMessage());
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.notInteger", player, placeHolders);
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.noInteger", player, placeHolders);
 					this.durationSkullPane(player, itemMap, position, isNew, value, owner);
 				}
 			}));
@@ -4045,17 +4045,17 @@ public class UI {
 			ItemHandler.getItem().cutDelay(itemMap.getDynamicOwners().get(position))), event -> {
 					player.closeInventory();
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
-					placeHolders[14] = "SKULL OWNER";
+					placeHolders[16] = "SKULL OWNER";
 					placeHolders[15] = "RockinChaos";
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 				}, event -> {
 					List < String > skulls = itemMap.getDynamicOwners();
 					skulls.set(position, "<delay:" + Utils.getUtils().returnInteger(ItemHandler.getItem().getDelayFormat(skulls.get(position))) + ">" + ChatColor.stripColor(event.getMessage()));
 					itemMap.setDynamicOwners(skulls);
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
-					placeHolders[14] = "SKULL OWNER";
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+					placeHolders[16] = "SKULL OWNER";
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 					this.modifySkullPane(event.getPlayer(), itemMap, position, owner);
 				}));
 			} else {
@@ -4063,17 +4063,17 @@ public class UI {
 			ItemHandler.getItem().cutDelay(itemMap.getDynamicTextures().get(position))), event -> {
 					player.closeInventory();
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
-					placeHolders[14] = "SKULL TEXTURE";
+					placeHolders[16] = "SKULL TEXTURE";
 					placeHolders[15] = "eyJ0ZXh0dYMGQVlN2FjZmU3OSJ9fX0=";
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 				}, event -> {
 					List < String > skulls = itemMap.getDynamicTextures();
 					skulls.set(position, "<delay:" + Utils.getUtils().returnInteger(ItemHandler.getItem().getDelayFormat(skulls.get(position))) + ">" + ChatColor.stripColor(event.getMessage()));
 					itemMap.setDynamicTextures(skulls);
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
-					placeHolders[14] = "SKULL TEXTURE";
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+					placeHolders[16] = "SKULL TEXTURE";
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 					this.modifySkullPane(event.getPlayer(), itemMap, position, owner);
 				}));
 			}
@@ -4236,20 +4236,20 @@ public class UI {
 			usePane.addButton(new Button(ItemHandler.getItem().getItem("STAINED_GLASS_PANE:4", 1, false, "&e&lCustom Usage", "&7", "&7*Click to set a custom usage cooldown", "&7value for the item."), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[14] = "USAGE COOLDOWN";
+				placeHolders[16] = "USAGE COOLDOWN";
 				placeHolders[15] = "120";
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				if (Utils.getUtils().isInt(ChatColor.stripColor(event.getMessage()))) {
 					itemMap.setInteractCooldown(Integer.parseInt(ChatColor.stripColor(event.getMessage())));
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
-					placeHolders[14] = "USAGE COOLDOWN";
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+					placeHolders[16] = "USAGE COOLDOWN";
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				} else {
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[16] = ChatColor.stripColor(event.getMessage());
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.notInteger", player, placeHolders);
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.noInteger", player, placeHolders);
 				}
 				this.creatingPane(event.getPlayer(), itemMap);
 			}));
@@ -4355,20 +4355,20 @@ public class UI {
 			blockPane.addButton(new Button(ItemHandler.getItem().getItem("STICK", 1, true, "&b&lBukkit Material", "&7", "&7*If you know the name", "&7of the BUKKIT material type", "&7simply click and type it."), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[14] = "BUKKIT MATERIAL";
+				placeHolders[16] = "BUKKIT MATERIAL";
 				placeHolders[15] = "IRON_SWORD";
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				if (ItemHandler.getItem().getMaterial(ChatColor.stripColor(event.getMessage()), null) != null) {
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
-					placeHolders[14] = "BUKKIT MATERIAL";
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+					placeHolders[16] = "BUKKIT MATERIAL";
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 					this.chancePane(player, itemMap, null, ItemHandler.getItem().getMaterial(ChatColor.stripColor(event.getMessage()), null));
 				} else {
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[16] = ChatColor.stripColor(event.getMessage());
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.noMatch", player, placeHolders);
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.noMaterial", player, placeHolders);
 					this.blocksPane(player, itemMap);
 				}
 			}));
@@ -4473,10 +4473,10 @@ public class UI {
 			chancePane.addButton(new Button(ItemHandler.getItem().getItem("STAINED_GLASS_PANE:7", 1, false, "&e&lCustom Drop Chance", "&7", "&7*Click to set a custom drop chance", "&7value for the item."), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[14] = "DROP CHANCE";
+				placeHolders[16] = "DROP CHANCE";
 				placeHolders[15] = "0.001";
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				if (Utils.getUtils().isDouble(ChatColor.stripColor(event.getMessage()))) {
 					if (entity != null) { 
@@ -4489,12 +4489,12 @@ public class UI {
 						itemMap.setBlocksDrop(blocksDrop);
 					}
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
-					placeHolders[14] = "DROP CHANCE";
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+					placeHolders[16] = "DROP CHANCE";
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				} else {
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[16] = ChatColor.stripColor(event.getMessage());
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.notInteger", player, placeHolders);
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.noInteger", player, placeHolders);
 				}
 				if (entity != null) { this.mobsPane(event.getPlayer(), itemMap); }
 				else { this.blocksPane(event.getPlayer(), itemMap); }
@@ -4729,20 +4729,20 @@ public class UI {
 			levelPane.addButton(new Button(ItemHandler.getItem().getItem("STAINED_GLASS_PANE:4", 1, false, "&e&lCustom Level", "&7", "&7*Click to set a custom level (strength)", "&7value for the potion effect."), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[14] = "EFFECT LEVEL";
+				placeHolders[16] = "EFFECT LEVEL";
 				placeHolders[15] = "16";
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				if (Utils.getUtils().isInt(ChatColor.stripColor(event.getMessage()))) {
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
-					placeHolders[14] = "EFFECT LEVEL";
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+					placeHolders[16] = "EFFECT LEVEL";
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 					this.durationPane(event.getPlayer(), itemMap, potion, Integer.parseInt(ChatColor.stripColor(event.getMessage())));
 				} else {
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[16] = ChatColor.stripColor(event.getMessage());
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.notInteger", player, placeHolders);
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.noInteger", player, placeHolders);
 					this.levelPane(event.getPlayer(), itemMap, potion);
 				}
 			}));
@@ -4770,20 +4770,20 @@ public class UI {
 			durationPane.addButton(new Button(ItemHandler.getItem().getItem("STAINED_GLASS_PANE:4", 1, false, "&e&lCustom Duration", "&7", "&7*Click to set a custom duration", "&7value for the potion effect."), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[14] = "EFFECT DURATION";
+				placeHolders[16] = "EFFECT DURATION";
 				placeHolders[15] = "110";
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				if (Utils.getUtils().isInt(ChatColor.stripColor(event.getMessage()))) {
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
-					placeHolders[14] = "EFFECT DURATION";
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+					placeHolders[16] = "EFFECT DURATION";
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 					this.potionPane(event.getPlayer(), itemMap);
 				} else {
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[16] = ChatColor.stripColor(event.getMessage());
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.notInteger", player, placeHolders);
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.noInteger", player, placeHolders);
 					this.durationPane(event.getPlayer(), itemMap, potion, level);
 				}
 			}));
@@ -4813,20 +4813,20 @@ public class UI {
 			powerPane.addButton(new Button(ItemHandler.getItem().getItem("STAINED_GLASS_PANE:4", 1, false, "&e&lCustom Power", "&7", "&7*Click to set a custom power", "&7value for the firework."), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[14] = "FIREWORK POWER";
+				placeHolders[16] = "FIREWORK POWER";
 				placeHolders[15] = "96";
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				if (Utils.getUtils().isInt(ChatColor.stripColor(event.getMessage()))) {
 					itemMap.setFireworkPower(Integer.parseInt(ChatColor.stripColor(event.getMessage())));
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
-					placeHolders[14] = "FIREWORK POWER";
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+					placeHolders[16] = "FIREWORK POWER";
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				} else {
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[16] = ChatColor.stripColor(event.getMessage());
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.notInteger", player, placeHolders);
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.noInteger", player, placeHolders);
 				}
 				this.otherPane(player, itemMap);
 			}));
@@ -4932,17 +4932,17 @@ public class UI {
 				linePane.addButton(new Button(ItemHandler.getItem().getItem("FEATHER", 1, true, "&e&l&nNew Line", "&7", "&7*Add a new line to the book page.", "&7", "&9&lPage: &a" + (page + 1)), event -> {
 					player.closeInventory();
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
-					placeHolders[14] = "PAGE LINE";
+					placeHolders[16] = "PAGE LINE";
 					placeHolders[15] = "&eWelcome to the Server!";
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 				}, event -> {
 					List < String > newPage = new ArrayList < String > ();
 					newPage.add(ChatColor.stripColor(event.getMessage()));pages.add(newPage);
 					itemMap.setListPages(pages);
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
-					placeHolders[14] = "PAGE LINE";
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+					placeHolders[16] = "PAGE LINE";
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 					this.linePane(event.getPlayer(), itemMap, false, page);
 				}));
 			} else {
@@ -4956,17 +4956,17 @@ public class UI {
 					linePane.addButton(new Button(ItemHandler.getItem().getItem("FEATHER", 1, true, "&e&l&nNew Line", "&7", "&7*Add a new line to the book page.", "&7", "&9&lLine: &a" + (selectPage.size() + 1) + "    &9&lPage: &a" + (page + 1)), event -> {
 						player.closeInventory();
 						String[] placeHolders = LanguageAPI.getLang(false).newString();
-						placeHolders[14] = "PAGE LINE";
+						placeHolders[16] = "PAGE LINE";
 						placeHolders[15] = "&eWelcome to the Server!";
-						LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
-						LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+						LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+						LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 					}, event -> {
 						selectPage.add(ChatColor.stripColor(event.getMessage()));
 						pages.set(page, selectPage);
 						itemMap.setListPages(pages);
 						String[] placeHolders = LanguageAPI.getLang(false).newString();
-						placeHolders[14] = "PAGE LINE";
-						LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+						placeHolders[16] = "PAGE LINE";
+						LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 						this.linePane(event.getPlayer(), itemMap, false, page);
 					}));
 				}
@@ -4996,17 +4996,17 @@ public class UI {
 			linePane.addButton(new Button(ItemHandler.getItem().getItem("NAME_TAG", 1, false, "&c&l&nModify", "&7", "&7*Modify this line in the page.", "&7", "&9&lLine: &a" + (line + 1) + "    &9&lPage: &a" + (page + 1)), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[14] = "PAGE LINE";
+				placeHolders[16] = "PAGE LINE";
 				placeHolders[15] = "&eWelcome to the Server!";
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				selectPage.set(line, ChatColor.stripColor(event.getMessage()));
 				pages.set(page, selectPage);
 				itemMap.setListPages(pages);
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[14] = "PAGE LINE";
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+				placeHolders[16] = "PAGE LINE";
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				this.linePane(event.getPlayer(), itemMap, false, page);
 			}));
 			linePane.addButton(new Button(this.fillerPaneGItem));
@@ -5089,21 +5089,21 @@ public class UI {
 			strengthPane.addButton(new Button(ItemHandler.getItem().getItem("STAINED_GLASS_PANE:4", 1, false, "&e&lCustom Strength", "&7", "&7*Click to set a custom strength", "&7value for the custom attribute."), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[14] = "STRENGTH";
+				placeHolders[16] = "STRENGTH";
 				placeHolders[15] = "14.0";
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				if (Utils.getUtils().isInt(ChatColor.stripColor(event.getMessage())) || Utils.getUtils().isDouble(ChatColor.stripColor(event.getMessage()))) {
 					Map<String, Double> attributeList = itemMap.getAttributes();
 					attributeList.put(attribute, Double.parseDouble(ChatColor.stripColor(event.getMessage())));
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
-					placeHolders[14] = "STRENGTH";
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+					placeHolders[16] = "STRENGTH";
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				} else {
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[16] = ChatColor.stripColor(event.getMessage());
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.notInteger", player, placeHolders);
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.noInteger", player, placeHolders);
 				}
 				this.attributePane(event.getPlayer(), itemMap, isLeather);
 			}));
@@ -5144,16 +5144,16 @@ public class UI {
 					} else {
 						player.closeInventory();
 						String[] placeHolders = LanguageAPI.getLang(false).newString();
-						placeHolders[14] = "AUTHOR";
+						placeHolders[16] = "AUTHOR";
 						placeHolders[15] = "RockinChaos";
-						LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
-						LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+						LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+						LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 					}
 				}, event -> {
 					itemMap.setAuthor(ChatColor.stripColor(event.getMessage()));
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
-					placeHolders[14] = "AUTHOR";
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+					placeHolders[16] = "AUTHOR";
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 					this.otherPane(event.getPlayer(), itemMap);
 				}));
 				otherPane.addButton(new Button(this.fillerPaneGItem), 3);
@@ -5170,18 +5170,18 @@ public class UI {
 						} else {
 							player.closeInventory();
 							String[] placeHolders = LanguageAPI.getLang(false).newString();
-							placeHolders[14] = "SKULL OWNER";
+							placeHolders[16] = "SKULL OWNER";
 							placeHolders[15] = "RockinChaos";
-							LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
-							LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+							LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+							LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 						}
 					}
 				}, event -> {
 					itemMap.setSkull(ChatColor.stripColor(event.getMessage()));
 					itemMap.setSkullTexture(null);
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
-					placeHolders[14] = "SKULL OWNER";
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+					placeHolders[16] = "SKULL OWNER";
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 					this.otherPane(event.getPlayer(), itemMap);
 				}));
 				otherPane.addButton(new Button(this.fillerPaneGItem));
@@ -5197,18 +5197,18 @@ public class UI {
 						} else {
 							player.closeInventory();
 							String[] placeHolders = LanguageAPI.getLang(false).newString();
-							placeHolders[14] = "SKULL TEXTURE";
+							placeHolders[16] = "SKULL TEXTURE";
 							placeHolders[15] = "eyJ0ZXh0dYMGQVlN2FjZmU3OSJ9fX0=";
-							LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
-							LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+							LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+							LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 						}
 					}
 				}, event -> {
 					itemMap.setSkullTexture(ChatColor.stripColor(event.getMessage()));
 					itemMap.setSkull(null);
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
-					placeHolders[14] = "SKULL TEXTURE";
-					LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+					placeHolders[16] = "SKULL TEXTURE";
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 					this.otherPane(event.getPlayer(), itemMap);
 				}));
 				otherPane.addButton(new Button(this.fillerPaneGItem), 3);
@@ -5297,18 +5297,18 @@ public class UI {
 					} else {
 						player.closeInventory();
 						String[] placeHolders = LanguageAPI.getLang(false).newString();
-						placeHolders[14] = "HEX COLOR";
+						placeHolders[16] = "HEX COLOR";
 						placeHolders[15] = "#033dfc";
-						LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputType", player, placeHolders);
-						LanguageAPI.getLang(false).sendLangMessage("Commands.UI.normalExample", player, placeHolders);
+						LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+						LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 					}
 				}, event -> {
 					if (itemMap.getLeatherHex() == null) {
 						itemMap.setLeatherHex(ChatColor.stripColor(event.getMessage()));
 						itemMap.setLeatherColor(null);
 						String[] placeHolders = LanguageAPI.getLang(false).newString();
-						placeHolders[14] = "HEX COLOR";
-						LanguageAPI.getLang(false).sendLangMessage("Commands.UI.inputSet", player, placeHolders);
+						placeHolders[16] = "HEX COLOR";
+						LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 						this.otherPane(event.getPlayer(), itemMap);
 					}
 				}));

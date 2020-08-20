@@ -112,7 +112,7 @@ public class ConfigHandler {
 	private void registerClasses() {
 		this.copyFile("config.yml", "config-Version", 7);
 		this.copyFile("items.yml", "items-Version", 6);
-		this.copyFile(LanguageAPI.getLang(true).getFile(), LanguageAPI.getLang(false).getFile().split("-")[0] + "-Version", 7);
+		this.copyFile(LanguageAPI.getLang(true).getFile(), LanguageAPI.getLang(false).getFile().split("-")[0] + "-Version", 8);
 		this.registerPrevent();
 		DependAPI.getDepends(true);
 		LogFilter.getFilter(true);
@@ -231,7 +231,7 @@ public class ConfigHandler {
 			else { source = ItemJoin.getInstance().getResource("files/locales/" + configFile); }
 			if (source != null) {
 				String[] namePart = configFile.split("\\.");
-				String renameFile = namePart[0] + Utils.getUtils().getRandom(1, 50000) + namePart[1];
+				String renameFile = namePart[0] + "-old-" + Utils.getUtils().getRandom(1, 50000) + namePart[1];
 				File renamedFile = new File(ItemJoin.getInstance().getDataFolder(), renameFile);
 				if (!renamedFile.exists()) {
 					File.renameTo(renamedFile);
@@ -248,6 +248,7 @@ public class ConfigHandler {
 			this.Generating = false;
 		}
 		this.getFile(configFile).options().copyDefaults(false);
+		if (configFile.contains("lang.yml")) { LanguageAPI.getLang(false).setPrefix(); }
 	}
 	
    /**

@@ -3791,18 +3791,18 @@ public class ItemMap {
 		if (warmCount != 0) {
 			if (itemMap.warmDelay == warmCount) { 
 				String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = Utils.getUtils().translateLayout(itemMap.getCustomName(), player); 
-				LanguageAPI.getLang(false).sendLangMessage("General.itemWarmingUp", player, placeHolders); 
+				LanguageAPI.getLang(false).sendLangMessage("general.warmingUp", player, placeHolders); 
 				itemMap.addWarmPending(player); 
 			}
 			ServerHandler.getServer().runThread(main -> {
 				if (itemMap.warmLocation(player, location, action)) {
 					String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = Utils.getUtils().translateLayout(itemMap.getCustomName(), player); 
-					LanguageAPI.getLang(false).sendLangMessage("General.itemWarming", player, placeHolders);
+					LanguageAPI.getLang(false).sendLangMessage("general.warmingTime", player, placeHolders);
 					itemMap.warmCycle(player, itemMap, (warmCount - 1), location, itemCopy, action, clickType, slot);	
 				} else { 
 					itemMap.delWarmPending(player); 
 					String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = Utils.getUtils().translateLayout(itemMap.getCustomName(), player); 
-					LanguageAPI.getLang(false).sendLangMessage("General.itemWarmingHalted", player, placeHolders);
+					LanguageAPI.getLang(false).sendLangMessage("general.warmingHalted", player, placeHolders);
 				}
 			}, 20);
 		} else {
@@ -3820,7 +3820,7 @@ public class ItemMap {
 					}
 				} else {
 					String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = Utils.getUtils().translateLayout(itemMap.getCustomName(), player); 
-					LanguageAPI.getLang(false).sendLangMessage("General.itemWarmingHalted", player, placeHolders);
+					LanguageAPI.getLang(false).sendLangMessage("general.warmingHalted", player, placeHolders);
 				}
 				if (itemMap.warmDelay != 0) { itemMap.delWarmPending(player); }
 			}, delay);
@@ -3972,7 +3972,7 @@ public class ItemMap {
 				return true;
 			} else if (!(balance >= this.cost)) {
 				String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[6] = this.cost.toString(); placeHolders[5] = balance + "";
-				LanguageAPI.getLang(false).sendLangMessage("General.itemChargeFailed", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("general.econFailed", player, placeHolders);
 				return false;
 			}
 		} else if (materialCost) {
@@ -4026,8 +4026,11 @@ public class ItemMap {
 					}
 				}
 			}
-			String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[6] = this.cost == 0 ? "1" : this.cost.toString(); placeHolders[5] = foundAmount + "";
-			LanguageAPI.getLang(false).sendLangMessage("General.itemChargeFailed", player, placeHolders);
+			String formatCost = "";
+			for (String str : this.itemCost.toLowerCase().split("_")) { formatCost += str.substring(0, 1).toUpperCase() + str.substring(1) + " "; }
+			formatCost = formatCost.substring(0, formatCost.length() - 1);
+			String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[4] = formatCost; placeHolders[6] = this.cost == 0 ? "1" : this.cost.toString(); placeHolders[5] = foundAmount + "";
+			LanguageAPI.getLang(false).sendLangMessage("general.itemFailed", player, placeHolders);
 			return false;
 		}
 		return true;
@@ -4066,8 +4069,11 @@ public class ItemMap {
 				}
 			}
 		}
-		String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[6] = this.cost.toString();
-		LanguageAPI.getLang(false).sendLangMessage("General.itemChargeSuccess", player, placeHolders);
+		String formatCost = "";
+		for (String str : this.itemCost.toLowerCase().split("_")) { formatCost += str.substring(0, 1).toUpperCase() + str.substring(1) + " "; }
+		formatCost = formatCost.substring(0, formatCost.length() - 1);
+		String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[4] = formatCost; placeHolders[6] = this.cost.toString();
+		LanguageAPI.getLang(false).sendLangMessage("general.itemSuccess", player, placeHolders);
     }
 	
    /**
@@ -4084,7 +4090,7 @@ public class ItemMap {
 				if (parseCost != 0) {
 					try { DependAPI.getDepends(false).getVault().withdrawBalance(player, parseCost); } catch (NullPointerException e) { ServerHandler.getServer().sendDebugTrace(e); }
 					String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[6] = this.cost.toString();
-					LanguageAPI.getLang(false).sendLangMessage("General.itemChargeSuccess", player, placeHolders);
+					LanguageAPI.getLang(false).sendLangMessage("general.econSuccess", player, placeHolders);
 				}
 			}
 		}

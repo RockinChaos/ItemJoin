@@ -423,7 +423,7 @@ public class PlayerHandler {
 	    		}
 	    	}
 	    }
-    	return (LanguageAPI.getLang(false).getLangMessage("Placeholders.PLAYER_INTERACT") != null ? LanguageAPI.getLang(false).getLangMessage("Placeholders.PLAYER_INTERACT") : "INVALID");
+    	return (LanguageAPI.getLang(false).getLangMessage("placeholders.PLAYER_INTERACT") != null ? LanguageAPI.getLang(false).getLangMessage("placeholders.PLAYER_INTERACT") : "INVALID");
     }
 	
    /**

@@ -1,118 +1,118 @@
 # --{ =-=-=-=-=-=-=-=-=-= ItemJoin's Simplified Chinese Language file, by Momocraft =-=-=-=-=-=-=-=-=-= }--
-# If you don't want a message to be sent, fully remove it from below or make it blank.
+# 如果您不希望发送消息，请从下面将其完全删除或将其留空.
 
-# Modifying this will cause the file to break and regenerate.
-cn-Version: 7
+# 修改此设置将导致文件损坏并重新生成.
+cn-Version: 8
  
-# This is the prefix that will be sent at the beginning of every single message sent in the language file.
+# 这是将在语言文件中发送的每条消息的开头发送的前缀.
 Prefix: '&7[&eItemJoin&7]'
  
-# These are simply general messages sent from the plugin item usages.
-General:
-  failedOverwrite: '&c当前背包位置有物品， 无法获得 &e%failcount%个 &c物品'
-  failedInventory: '&c背包已满， 无法获得 &e%failcount%个 &c物品'
-  itemChargeSuccess: '&a成功使用， 花费了 &e$%cost%元'
-  itemChargeFailed: '&c游戏币不足， 你需要 &4$%balance%元'
-  itemWarmingUp: '&e%item% &f正在準备中...'
-  itemWarming: '&e%item% &a将在 &e%timeleft%秒 &a后执行动作！'
-  itemWarmingHalted: '&e%item% &c动作已取消...'
+# 这些只是从插件项用法发送的常规消息.
+general:
+  failedOverwrite: '%prefix% &c当前背包位置有物品， 无法获得 &e%fail_count%个 &c物品'
+  failedInventory: '%prefix% &c背包已满， 无法获得 &e%fail_count%个 &c物品'
+  econSuccess: '%prefix% &a成功使用， 花费了 &e$%cost%元'
+  econFailed: '%prefix% &c游戏币不足， 你需要 &4$%balance%元'
+  itemSuccess: '%prefix% &a成功执行命令 &e%cost% %item_type%(s)&a.'
+  itemFailed: '%prefix% &c你还不够&4%item_type%&c 运行此命令！ \n%prefix% &c你有 &4%balance% &c所需的 &4%cost% %item_type%(s)&c.'
+  warmingUp: '%prefix% &e%item% &f正在準备中...'
+  warmingTime: '%prefix% &e%item% &a将在 &e%time_left%秒 &a后执行动作！'
+  warmingHalted: '%prefix% &e%item% &c动作已取消...'
  
-# These messages are specific to the plugin commands.
-Commands:
-  Default:
-    unknownCommand: '&c无效的指令， 请输入 /ItemJoin Help'
-    noPermission: '&c权限不足'
-    configReload: '&a插件已重新读取！'
-    notPlayer: '&c这是玩家的指令'
-    targetNotFound: '&c找不到玩家 %targetplayer%'
-  UI:
-    creatorLaunched: '&a已打开物品编辑器'
-    itemSaved: '&e%item% &a成功储存！'
-    itemRemoved: '&e%item% &c已成功删除！'
-    notInteger: '&c&l&n错误:&c 输入的内容 &4%input% &c不是数字'
-    noMatch: '&c&l&n错误:&c 输入的内容 &4%input% &c不存在的物品ID'
-    inputType: '&a输入 &e%type% &a在你想要的物品上'
-    inputSet: '&a物品 &e%type% &a成功设置'
-    normalExample: '&a范例: %example%.'
-  Item:
-    notInHand: '&c手上没有物品'
-    invalidItem: '&c物品 &e%item% &c不存在'
-  Info:
+# 这些消息特定于插件命令.
+commands:
+  default:
+    unknownCommand: '%prefix% &c无效的指令， 请输入 /ItemJoin Help'
+    noPermission: '%prefix% &c权限不足'
+    configReload: '%prefix% &a插件已重新读取！'
+    noPlayer: '%prefix% &c这是玩家的指令'
+    noTarget: '%prefix% &c找不到玩家 %target_player%'
+  menu:
+    openMenu: '%prefix% &a已打开物品编辑器'
+    itemSaved: '%prefix% &e%item% &a成功储存！'
+    itemRemoved: '%prefix% &e%item% &c已成功删除！'
+    noInteger: '%prefix% &c&l&n错误:&c 输入的内容 &4%input% &c不是数字'
+    noMaterial: '%prefix% &c&l&n错误:&c 输入的内容 &4%input% &c不存在的物品ID'
+    inputType: '%prefix% &a输入 &e%input% &a在你想要的物品上'
+    inputSet: '%prefix% &a物品 &e%input% &a成功设置'
+    inputExample: '%prefix% &a范例: %input_example%.'
+  item:
+    noItemHeld: '%prefix% &c手上没有物品'
+    noItem: '%prefix% &c物品 &e%item% &c不存在'
+  info:
     material: '&a物品ID (材质): &e%item%'
-    dataValue: '&a物品副ID (编号): &e%item%'
-  List:
+    data: '&a物品副ID (编号): &e%item%'
+  list:
     worldHeader: '&a&l%world%:'
     itemRow: '&a&l   &a%item%'
-    noItemsDefined: '&c&l   &c没有为这个世界定义任何项目'
-  World:
+    noItems: '&c&l   &c没有为这个世界定义任何项目'
+  world:
+    worldFound: '&a找到世界:'
     worldHeader: '&a你现在位于世界：'
     worldRow: '&e- %world%'
-    worldsFoundHeader: '&a找到世界:'
-  Updates:
-    checking: '&4%player% 已请求检查更新！'
-    forcing: '&4%player% 请求强制更新插件！'
-  Get:
-    toYou: '&6&l得到了&c✤ &f%item% &7x%amount%'
-    toTarget: '&6&l得到了&c✤ &e你给予 %targetplayer% &f%item% &7x%amount%'
-    youHaveItem: '&c你已经有那个物品 &e%item%'
-    triedGive: '&e%targetplayer% &c给予你物品 &e%item% &c失败， &c该物品已存在背包中'
-    targetHasItem: '&e%targetplayer% &c已拥有 &e%item%'
-    noPermission: '&c你没有权限得到 &e%item%'
-    targetNoPermission: '&e%targetplayer% &c没有权限得到 &e%item%'
-    invalidSyntax: '&c请输入: /itemjoin get <物品> &l或者 &c/itemjoin get <物品> <数量>！'
-    usageSyntax: '&c请在控制台输入: /ItemJoin get <物品> <玩家>'
-    toOnlinePlayers: '&a你给予所有在线玩家 &f%item% &7x%amount% &8- &e%players%'
-    onlinePlayersHaveItem: '&c所有玩家已拥有 &e%item%'
-    invalidOnlineSyntax: '&c请输入: /itemjoin getOnline <物品> &l或者 &c/itemjoin getOnline <物品> <数量>！'
-  GetAll:
-    toYou: '&a你得到了所有物品'
-    toTarget: '&a你给予 &e%targetplayer% &a所有特殊物品'
-    noPermission: '&c有物品没有权限， 部分物品给予失败'
-    targetNoPermission: '&e%targetplayer% &c有物品没有权限， &c部分物品给予失败'
-    triedGive: '&e%targetplayer% &c给予你所有特殊物品失败， &c所有物品已存在背包中'
-    youHaveItems: '&6你已拥有所有特殊物品！'
-    targetHasItems: '&e%targetplayer% &6已拥有所有特殊物品！'
-  Remove:
-    fromYou: '&e%item% &c已从背包中移除'
-    fromTarget: '&c你移除了 &e%targetplayer% &c背包中的 &e%item%'
-    triedRemove: '&e%targetplayer% &c想要删除物品 &e%item% &c但它不存在你背包中'
-    invalidSyntax: '&c请输入: /itemjoin remove <物品>'
-    usageSyntax: '&c请在控制台输入: /ItemJoin remove <物品> <玩家>'
-    notInInventory: '&c背包中不存在物品 &e%item%'
-    notInTargetInventory: '&e%targetplayer% &c的背包中没有 &e%item%'
-    fromOnlinePlayers: '&c你移除了所有玩家的 &e%item% &8- &e%players%'
-    notInOnlinePlayersInventory: '&e%item% &c不存在任何上线玩家的背包中'
-    invalidOnlineSyntax: '&c请输入: /itemjoin removeOnline <物品>'
-  RemoveAll:
-    fromYou: '&a已移除背包中所有特殊物品'
-    fromTarget: '&a你移除了 &e%targetplayer% &a背包中的所有特殊物品'
-    triedRemove: '&e%targetplayer% &c想要移除你身上所有特殊物品， &c但这是假的， &c业障重'
-    noItemsInInventory: '&c身上没有任何特殊物品'
-    noItemsInTargetInventory: '&e%targetplayer% &c身上没有任何特殊物品'
-  Database:
-    purgeWarn: '&c将移除 &e%targetplayer% &c所有的档案 &8- &e%purgedata%'
-    purgeSuccess: '&e你已移除 &a%targetplayer% &e所有的档案 &8- &a%purgedata%'
-    purgeConfirm: '&a确认删除资料， &a请在五秒内输入: &e%command%'
-    purgeTimeOut: '&c指令已失效...'
-  Enabled:
-    forPlayer: '&a你已为 &e%targetplayer% &a启用所有特殊物品'
-    forTarget: '&e%player% &a已帮你启用所有特殊物品'
-    forPlayerFailed: '&6所有物品已为 &e%player% &6启用过'
-    forPlayerWorld: '&a你已为 &e%targetplayer% &a启用 &e%world% &a的所有特殊物品'
-    forTargetWorld: '&e%player% &a已帮你启用世界 &e%world% &a的所有特殊物品'
-    forPlayerWorldFailed: '&6你已为 &e%targetplayer% &6启用过 &e%world% &6的所有特殊物品'
-    globalPlayers: '&a你已为所有玩家启用特殊物品'
-    globalPlayersFailed: '&6所有玩家已启用过所有特殊物品'
-  Disabled:
-    forPlayer: '&c你已取消 &e%player% &c的所有特殊物品'
-    forTarget: '&e%player% &c取消了你的所有特殊物品'
-    forPlayerFailed: '&6你已取消过 &e%player% &6的所有特殊物品'
-    forPlayerWorld: '&c你已取消 &e%player% &c在 &e%world% &c的所有特殊物品'
-    forTargetWorld: '&e%player% &c已取消你在世界 &e%world% &c的所有特殊物品'
-    forPlayerWorldFailed: '&6你已为 &e%targetplayer% &6取消过 &e%world% &6的所有特殊物品'
-    globalPlayers: '&c你已为所有玩家取消特殊物品'
-    globalPlayersFailed: '&6所有玩家已取消过所有特殊物品'
+  updates:
+    checkRequest: '%prefix% &4%player% 已请求检查更新！'
+    updateRequest: '%prefix% &4%player% 请求强制更新插件！'
+  get:
+    givenYou: '%prefix% &6&l得到了&c✤ &f%item% &7x%amount%'
+    givenYou_All: '%prefix% &a你得到了所有物品'
+    givenTarget: '%prefix% &6&l得到了&c✤ &e你给予 %target_player% &f%item% &7x%amount%'
+    givenTarget_All: '%prefix% &a你给予 &e%target_player% &a所有特殊物品'
+    givenOnline: '%prefix% &a你给予所有在线玩家 &f%item% &7x%amount% &8- &e%players%'
+    targetTriedGive: '%prefix% &e%target_player% &c给予你物品 &e%item% &c失败， &c该物品已存在背包中'
+    targetTriedGive_All: '%prefix% &e%target_player% &c给予你所有特殊物品失败， &c所有物品已存在背包中'
+    failedInventory: '%prefix% &c你已经有那个物品 &e%item%'
+    failedInventory_All: '%prefix% &6你已拥有所有特殊物品！'
+    targetFailedInventory: '%prefix% &e%target_player% &c已拥有 &e%item%'
+    targetFailedInventory_All: '%prefix% &e%target_player% &6已拥有所有特殊物品！'
+    onlineFailedInventory: '%prefix% &c所有玩家已拥有 &e%item%'
+    targetNoPermission: '%prefix% &e%target_player% &c没有权限得到 &e%item%'
+    targetNoPermission_All: '%prefix% &e%target_player% &c有物品没有权限， &c部分物品给予失败'
+    noPermission: '%prefix% &c你没有权限得到 &e%item%'
+    noPermission_All: '%prefix% &c有物品没有权限， 部分物品给予失败'
+    usageSyntax: '%prefix% &c请在控制台输入: /ItemJoin get <物品> <玩家>'
+    badSyntax: '%prefix% &c请输入: /itemjoin get <物品> &l或者 &c/itemjoin get <物品> <数量>！'
+    badOnlineSyntax: '%prefix% &c请输入: /itemjoin getOnline <物品> &l或者 &c/itemjoin getOnline <物品> <数量>！'
+  remove:
+    removedYou: '%prefix% &e%item% &c已从背包中移除'
+    removedYou_All: '%prefix% &a已移除背包中所有特殊物品'
+    removedTarget: '%prefix% &c你移除了 &e%target_player% &c背包中的 &e%item%'
+    removedTarget_All: '%prefix% &a你移除了 &e%target_player% &a背包中的所有特殊物品'
+    removedOnline: '%prefix% &c你移除了所有玩家的 &e%item% &8- &e%players%'
+    targetTriedRemoval: '%prefix% &e%target_player% &c想要删除物品 &e%item% &c但它不存在你背包中'
+    targetTriedRemoval_All: '%prefix% &e%target_player% &c想要移除你身上所有特殊物品， &c但这是假的， &c业障重'
+    failedInventory: '%prefix% &c背包中不存在物品 &e%item%'
+    failedInventory_All: '%prefix% &c身上没有任何特殊物品'
+    targetFailedInventory: '%prefix% &e%target_player% &c的背包中没有 &e%item%'
+    targetFailedInventory_All: '%prefix% &e%target_player% &c身上没有任何特殊物品'
+    onlineFailedInventory: '%prefix% &e%item% &c不存在任何上线玩家的背包中'
+    usageSyntax: '%prefix% &c请在控制台输入: /ItemJoin remove <物品> <玩家>'
+    badSyntax: '%prefix% &c请输入: /itemjoin remove <物品>'
+    badOnlineSyntax: '%prefix% &c请输入: /itemjoin removeOnline <物品>'
+  database:
+    purgeWarn: '%prefix% &c将移除 &e%target_player% &c所有的档案 &8- &e%purge_data%'
+    purgeSuccess: '%prefix% &e你已移除 &a%target_player% &e所有的档案 &8- &a%purge_data%'
+    purgeConfirm: '%prefix% &a确认删除资料， &a请在五秒内输入: &e%command%'
+    purgeTimeOut: '%prefix% &c指令已失效...'
+  enabled:
+    forPlayer: '%prefix% &a你已为 &e%target_player% &a启用所有特殊物品'
+    forTarget: '%prefix% &e%player% &a已帮你启用所有特殊物品'
+    forPlayerFailed: '%prefix% &6所有物品已为 &e%player% &6启用过'
+    forPlayerWorld: '%prefix% &a你已为 &e%target_player% &a启用 &e%world% &a的所有特殊物品'
+    forTargetWorld: '%prefix% &e%player% &a已帮你启用世界 &e%world% &a的所有特殊物品'
+    forPlayerWorldFailed: '%prefix% &6你已为 &e%target_player% &6启用过 &e%world% &6的所有特殊物品'
+    globalPlayers: '%prefix% &a你已为所有玩家启用特殊物品'
+    globalPlayersFailed: '%prefix% &6所有玩家已启用过所有特殊物品'
+  disabled:
+    forPlayer: '%prefix% &c你已取消 &e%player% &c的所有特殊物品'
+    forTarget: '%prefix% &e%player% &c取消了你的所有特殊物品'
+    forPlayerFailed: '%prefix% &6你已取消过 &e%player% &6的所有特殊物品'
+    forPlayerWorld: '%prefix% &c你已取消 &e%player% &c在 &e%world% &c的所有特殊物品'
+    forTargetWorld: '%prefix% &e%player% &c已取消你在世界 &e%world% &c的所有特殊物品'
+    forPlayerWorldFailed: '%prefix% &6你已为 &e%target_player% &6取消过 &e%world% &6的所有特殊物品'
+    globalPlayers: '%prefix% &c你已为所有玩家取消特殊物品'
+    globalPlayersFailed: '%prefix% &6所有玩家已取消过所有特殊物品'
 
-# These placeholders are specific to the plugin messages
-Placeholders:
+# 这些占位符特定于插件消息.
+placeholders:
   PLAYER_INTERACT: '未知'
