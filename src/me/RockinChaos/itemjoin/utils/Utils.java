@@ -202,10 +202,10 @@ public class Utils {
     */
 	public Color getColorFromHexColor(final String hexString) {
 		int hex = Integer.decode("#" + hexString.replace("#", ""));
-		int r = ((hex & 0xFF0000) >> 16);
-		int g = ((hex & 0xFF00) >> 8);
+		int r = (hex & 0xFF0000) >> 16;
+		int g = (hex & 0xFF00) >> 8;
 		int b = (hex & 0xFF);
-		Color bukkitColor = Color.fromBGR(r, g, b);
+		Color bukkitColor = Color.fromRGB(r, g, b);
 		return bukkitColor;
 	}
 	
