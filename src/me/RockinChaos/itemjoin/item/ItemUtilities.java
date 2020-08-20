@@ -479,17 +479,19 @@ public class ItemUtilities {
     * @param session - The current set items session.
     */
 	public void sendFailCount(final Player player, final int session) {
-		if (this.failCount.get(session) != null && this.failCount.get(session) != 0) {
-			String overWrite = ConfigHandler.getConfig(false).getFile("items.yml").getString("items-Overwrite");
-			if ((overWrite != null && Utils.getUtils().containsLocation(player.getWorld().getName(), overWrite.replace(" ", "")))) {
-				String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[7] = this.failCount.get(session).toString();
-				LanguageAPI.getLang(false).sendLangMessage("general.failedInventory", player, placeHolders);
-			} else {
-				String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[7] = this.failCount.get(session).toString();
-				LanguageAPI.getLang(false).sendLangMessage("general.failedOverwrite", player, placeHolders);
+		ServerHandler.getServer().runThread(main -> {
+			if (this.failCount.get(session) != null && this.failCount.get(session) != 0) {
+				String overWrite = ConfigHandler.getConfig(false).getFile("items.yml").getString("items-Overwrite");
+				if ((overWrite != null && Utils.getUtils().containsLocation(player.getWorld().getName(), overWrite.replace(" ", "")))) {
+					String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[7] = this.failCount.get(session).toString();
+					LanguageAPI.getLang(false).sendLangMessage("general.failedInventory", player, placeHolders);
+				} else {
+					String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[7] = this.failCount.get(session).toString();
+					LanguageAPI.getLang(false).sendLangMessage("general.failedOverwrite", player, placeHolders);
+				}
+				this.failCount.remove(session);
 			}
-			this.failCount.remove(session);
-		}
+		});
 	}
 	
    /**
@@ -661,15 +663,15 @@ public class ItemUtilities {
 			for (String compareWorld: compareWorlds) {
 				if (compareWorld.equalsIgnoreCase(player.getWorld().getName()) || compareWorld.equalsIgnoreCase("ALL") || compareWorld.equalsIgnoreCase("GLOBAL")) {
 					for (String commands: ConfigHandler.getConfig(false).getFile("config.yml").getStringList("Active-Commands.commands")) {
-						String formatCommand = Utils.getUtils().translateLayout(commands, player).replace("first-join: ", "").replace("first-join:", "");
-						if (!SQLite.getLite(false).hasFirstCommanded(player, formatCommand)) {
-							ServerHandler.getServer().runThread(main -> {
-								Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), formatCommand);
-							});
-							if (Utils.getUtils().containsIgnoreCase(commands, "first-join:")) {
-								SQLite.getLite(false).saveFirstCommandData(player, formatCommand);
+						ServerHandler.getServer().runThread(main -> {
+							String formatCommand = Utils.getUtils().translateLayout(commands, player).replace("first-join: ", "").replace("first-join:", "");
+							if (!SQLite.getLite(false).hasFirstCommanded(player, formatCommand)) {
+									Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), formatCommand);
+								if (Utils.getUtils().containsIgnoreCase(commands, "first-join:")) {
+									SQLite.getLite(false).saveFirstCommandData(player, formatCommand);
+								}
 							}
-						}
+						});
 					}
 				}
 				break;
