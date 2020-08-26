@@ -52,6 +52,7 @@
 			        </includes>
 			        <repositoryName>repository</repositoryName>
 			        <repositoryOwner>Jacob</repositoryOwner>
+			        <noJekyll>true</noJekyll>
 			    </configuration>
 			    <executions> 
 			      <execution>
