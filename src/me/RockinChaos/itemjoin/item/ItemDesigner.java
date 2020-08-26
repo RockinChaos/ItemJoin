@@ -336,7 +336,7 @@ public class ItemDesigner {
 				}
 				if (enchantName != null) {
 					listEnchants.put(name, level);
-				} else if (enchantName == null && DependAPI.getDepends(false).tokenEnchantEnabled() && TokenEnchantAPI.getInstance().getEnchant(name) != null) {
+				} else if (enchantName == null && DependAPI.getDepends(false).tokenEnchantEnabled() && TokenEnchantAPI.getInstance().getEnchantment(name) != null) {
 					listEnchants.put(name, level);
 				} else if (enchantName == null && !DependAPI.getDepends(false).tokenEnchantEnabled()) {
 					ServerHandler.getServer().logSevere("{ItemMap} An error occurred in the config, " + name + " is not a proper enchant name!");

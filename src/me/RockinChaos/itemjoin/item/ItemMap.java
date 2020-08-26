@@ -3045,7 +3045,7 @@ public class ItemMap {
 		if (item.getItemMeta().hasEnchants() && ((this.enchants != null && !this.enchants.isEmpty()) || this.glowing)) { 
 			ItemStack checkItem = new ItemStack(item.getType());
 			for (Entry<String, Integer> enchantments : this.enchants.entrySet()) {
-				if (enchantments.getKey() == null && DependAPI.getDepends(false).tokenEnchantEnabled() && TokenEnchantAPI.getInstance().getEnchant(enchantments.getKey()) != null) {
+				if (enchantments.getKey() == null && DependAPI.getDepends(false).tokenEnchantEnabled() && TokenEnchantAPI.getInstance().getEnchantment(enchantments.getKey()) != null) {
 					TokenEnchantAPI.getInstance().enchant(null, checkItem, enchantments.getKey(), enchantments.getValue(), true, 0, true);
 				} else { 
 					checkItem.addUnsafeEnchantment(ItemHandler.getItem().getEnchantByName(enchantments.getKey()), enchantments.getValue()); }
@@ -3258,7 +3258,7 @@ public class ItemMap {
 	private void setEnchantments(final Player player) {
 		if (this.enchants != null && !this.enchants.isEmpty()) {
 			for (Entry<String, Integer> enchantments : this.enchants.entrySet()) {
-				if (enchantments.getKey() == null && DependAPI.getDepends(false).tokenEnchantEnabled() && TokenEnchantAPI.getInstance().getEnchant(enchantments.getKey()) != null) {
+				if (enchantments.getKey() == null && DependAPI.getDepends(false).tokenEnchantEnabled() && TokenEnchantAPI.getInstance().getEnchantment(enchantments.getKey()) != null) {
 					TokenEnchantAPI.getInstance().enchant(player, this.tempItem, enchantments.getKey(), enchantments.getValue(), true, 0, true);
 				} else { this.tempItem.addUnsafeEnchantment(ItemHandler.getItem().getEnchantByName(enchantments.getKey()), enchantments.getValue()); }
 			}
