@@ -32,6 +32,7 @@ import javax.net.ssl.HttpsURLConnection;
 
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
@@ -558,7 +559,7 @@ public class ItemHandler {
     	if (item == null) { return; } if (slot == 0) { delay += 1L; }
     	ServerHandler.getServer().runThread(main -> {
     		if (!player.isOnline()) { return; }
-    		if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
+    		if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory()) && player.getGameMode() != GameMode.CREATIVE) {
     	    	player.getOpenInventory().getTopInventory().setItem(slot, item);	
     	    	PlayerHandler.getPlayer().updateInventory(player, 1L);
     		} else {

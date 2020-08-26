@@ -58,7 +58,7 @@ public class Crafting implements Listener {
     * 
     * @param event - PlayerAutoCraftEvent
     */
-	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = false)
 	private void onAutoCraft(PlayerAutoCraftEvent event) {
 		for (int i = 0; i <= 4; i++) {
   			final ItemStack[] craftingContents = event.getContents().clone();
@@ -76,7 +76,7 @@ public class Crafting implements Listener {
 	* 
 	* @param event - InventoryOpenEvent
 	*/
-	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = false)
     private void onCraftingOpen(InventoryOpenEvent event) {
     	final Player player = (Player) event.getPlayer();
     	if (!craftingOpenItems.containsKey(PlayerHandler.getPlayer().getPlayerID(player))) {
@@ -91,7 +91,7 @@ public class Crafting implements Listener {
 	* 
 	* @param event - InventoryCloseEvent
 	*/
-	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = false)
 	private void onCraftingClose(org.bukkit.event.inventory.InventoryCloseEvent event) {
 		if (!ServerHandler.getServer().hasSpecificUpdate("1_8") || !PlayerHandler.getPlayer().isCraftingInv(event.getView())) {
 			ItemStack[] topContents = ItemHandler.getItem().cloneContents(event.getView().getTopInventory().getContents());
@@ -106,7 +106,7 @@ public class Crafting implements Listener {
 	* 
 	* @param event - InventoryCloseEvent
 	*/
-	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = false)
     private void onCraftingClose(me.RockinChaos.itemjoin.handlers.events.InventoryCloseEvent event) {
 		if (ServerHandler.getServer().hasSpecificUpdate("1_8") && PlayerHandler.getPlayer().isCraftingInv(event.getView())) {
 	    	this.handleClose(slot -> { 
@@ -121,7 +121,7 @@ public class Crafting implements Listener {
 	* 
 	* @param event - InventoryClickEvent
 	*/
-	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = false)
     private void onCraftingClick(InventoryClickEvent event) {
     	final InventoryView view = event.getView();
     	final Player player = (Player) event.getWhoClicked();
@@ -158,7 +158,7 @@ public class Crafting implements Listener {
 	* 
 	* @param event - PlayerDropItemEvent
 	*/
-    @EventHandler(ignoreCancelled = false)
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = false)
     private void onCraftingLogout(PlayerDropItemEvent event) {
     	final Player player = (Player) event.getPlayer();
     	final ItemStack itemCopy = event.getItemDrop().getItemStack().clone();
@@ -184,7 +184,7 @@ public class Crafting implements Listener {
 	* 
 	* @param event - PlayerDropItemEvent
 	*/
-    @EventHandler(ignoreCancelled = false)
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = false)
     private void onCraftingWorlds(PlayerDropItemEvent event) {
     	final Player player = (Player) event.getPlayer();
     	final World world = player.getWorld();
@@ -207,7 +207,7 @@ public class Crafting implements Listener {
     * 
     * @param event - PlayerGameModeChangeEvent
     */
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = false)
     private void onSwitchGamemode(PlayerGameModeChangeEvent event) {
     	final Player player = (Player) event.getPlayer();
     	if (event.getNewGameMode() == GameMode.CREATIVE) {

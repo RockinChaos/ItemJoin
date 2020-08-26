@@ -19,6 +19,7 @@ package me.RockinChaos.itemjoin.utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -83,7 +84,9 @@ public class Chances {
     */
 	public Object getRandomElement() {
 		int index = this.random.nextInt(this.sum);
-		for (Chance chance: this.chances) {
+		Iterator<Chance> iterator = this.chances.iterator();
+		while (iterator.hasNext()) {
+			Chance chance = iterator.next();
 			if (chance.getLowerLimit() <= index && chance.getUpperLimit() > index) {
 				return chance.getElement();
 			}
