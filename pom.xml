@@ -114,10 +114,10 @@
             <url>https://raw.githubusercontent.com/TeamVK/maven-repository/master/release/</url>
         </repository>
     <!--SkinsRestorer Repository-->
-		<repository>
+        <repository>
             <id>codemc-snapshots</id>
             <url>https://repo.codemc.org/repository/maven-snapshots/</url>
-		</repository>
+        </repository>
     <!--WorldGuard/WorldEdit Repository-->
 		<repository>
             <id>sk89q-repo</id>
@@ -186,11 +186,11 @@
             <scope>provided</scope>
         </dependency>
     <!--SkinsRestorer API-->
-		<dependency>
+        <dependency>
             <groupId>com</groupId>
             <artifactId>skinsrestorer</artifactId>
-            <version>13.7.5-SNAPSHOT</version>
-		</dependency>
+            <version>13.7.4-SNAPSHOT</version>
+        </dependency>
     <!--Mojang AuthLib API-->
 		<dependency>
 			<groupId>com.mojang</groupId>
