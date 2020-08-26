@@ -50,7 +50,7 @@
 			        <branch>refs/heads/mvn-repo</branch>
 			        <includes><include>**/*</include></includes>
 			        <repositoryName>Repository</repositoryName>
-			        <repositoryOwner>Jacob</repositoryOwner>
+			        <repositoryOwner>RockinChaos</repositoryOwner>
 			    </configuration>
 			    <executions> 
 			      <execution>
