@@ -45,14 +45,12 @@
 			    <version>0.11</version>
 			    <configuration>
 			        <message>Published artifacts me.RockinChaos.itemjoin.ItemJoin:${project.version}</message>
+			        <noJekyll>true</noJekyll>
 			        <outputDirectory>${project.build.directory}/maven-public</outputDirectory>
 			        <branch>refs/heads/maven-public</branch>
-			        <includes>
-			            <include>**/*</include>
-			        </includes>
+			        <includes><include>**/*</include></includes>
 			        <repositoryName>repository</repositoryName>
 			        <repositoryOwner>Jacob</repositoryOwner>
-			        <noJekyll>true</noJekyll>
 			    </configuration>
 			    <executions> 
 			      <execution>
@@ -286,6 +284,13 @@
             <scope>provided</scope>
         </dependency>
 	</dependencies>
+	<distributionManagement>
+	    <repository>
+	        <id>internal.repo</id>
+	        <name>Temporary Staging Repository</name>
+	        <url>file://${project.build.directory}/maven-public</url>
+	    </repository>
+	</distributionManagement>
 	<scm>
 		<url>https://github.com/RockinChaos/ItemJoin</url>
 		<connection>scm:git:ssh://git@github.com/RockinChaos/ItemJoin</connection>
@@ -306,13 +311,6 @@
 		<system>Jenkins</system>
 		<url>http://ci.craftationgaming.com/job/ItemJoin/</url>
 	</ciManagement>
-	<distributionManagement>
-	    <repository>
-	        <id>internal.repo</id>
-	        <name>staging-repository</name>
-	        <url>file://${project.build.directory}/maven-public</url>
-	    </repository>
-	</distributionManagement>
     <properties>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
