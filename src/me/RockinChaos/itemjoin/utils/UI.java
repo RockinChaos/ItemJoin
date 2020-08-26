@@ -2517,20 +2517,22 @@ public class UI {
 				this.creatingPane(player, itemMap);
 			}));
 			for (Enchantment enchant: Enchantment.values()) {
-				boolean containsKey = itemMap.getEnchantments().containsKey(ItemHandler.getItem().getEnchantName(enchant).toUpperCase());
-				ItemStack enchantItem = ItemHandler.getItem().getItem((containsKey ? "ENCHANTED_BOOK" : "BOOK"), 1, false, "&f" + ItemHandler.getItem().getEnchantName(enchant).toUpperCase(), "&7", 
-						"&7*Click to add this enchantment", "&7to the custom item.", "&7", "&9&lENABLED: &a" + (containsKey + "").toUpperCase(), (containsKey ? "&7" : ""), 
-						(containsKey ? "&9&lLEVEL: &a" + itemMap.getEnchantments().get(ItemHandler.getItem().getEnchantName(enchant).toUpperCase()) : ""));
-				enchantPane.addButton(new Button(enchantItem, event -> {
-					if (containsKey) {
-						Map < String, Integer > enchantments = itemMap.getEnchantments();
-						enchantments.remove(ItemHandler.getItem().getEnchantName(enchant).toUpperCase());
-						itemMap.setEnchantments(enchantments);
-						this.enchantPane(player, itemMap);
-					} else {
-						this.enchantLevelPane(player, itemMap, enchant);
-					}
-				}));
+				if (ItemHandler.getItem().getEnchantName(enchant) != null) { 
+					boolean containsKey = (itemMap.getEnchantments() != null) ? itemMap.getEnchantments().containsKey(ItemHandler.getItem().getEnchantName(enchant).toUpperCase()) : false;
+					ItemStack enchantItem = ItemHandler.getItem().getItem((containsKey ? "ENCHANTED_BOOK" : "BOOK"), 1, false, "&f" + ItemHandler.getItem().getEnchantName(enchant).toUpperCase(), "&7", 
+							"&7*Click to add this enchantment", "&7to the custom item.", "&7", "&9&lENABLED: &a" + (containsKey + "").toUpperCase(), (containsKey ? "&7" : ""), 
+							(containsKey ? "&9&lLEVEL: &a" + itemMap.getEnchantments().get(ItemHandler.getItem().getEnchantName(enchant).toUpperCase()) : ""));
+					enchantPane.addButton(new Button(enchantItem, event -> {
+						if (containsKey) {
+							Map < String, Integer > enchantments = itemMap.getEnchantments();
+							enchantments.remove(ItemHandler.getItem().getEnchantName(enchant).toUpperCase());
+							itemMap.setEnchantments(enchantments);
+							this.enchantPane(player, itemMap);
+						} else {
+							this.enchantLevelPane(player, itemMap, enchant);
+						}
+					}));
+				}
 			}
 		});
 		enchantPane.open(player);
@@ -2558,7 +2560,7 @@ public class UI {
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				if (Utils.getUtils().isInt(ChatColor.stripColor(event.getMessage()))) {
-					Map < String, Integer > enchantments = itemMap.getEnchantments();
+					Map < String, Integer > enchantments = (itemMap.getEnchantments() != null) ? itemMap.getEnchantments() : new HashMap < String, Integer >();
 					enchantments.put(ItemHandler.getItem().getEnchantName(enchant).toUpperCase(), Integer.parseInt(ChatColor.stripColor(event.getMessage())));
 					itemMap.setEnchantments(enchantments);
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
@@ -2575,8 +2577,10 @@ public class UI {
 				final int k = i;
 				enchantLevelPane.addButton(new Button(ItemHandler.getItem().getItem("STAINED_GLASS_PANE:11", k, false, "&9&lLevel: &a&l" + k, "&7", "&7*Click to set the", "&7level of the item enchantment.", "&7", "&7This will be &l" + 
 				ItemHandler.getItem().getEnchantName(enchant).toUpperCase() + ":" + k), event -> {
-					Map < String,
-					Integer > enchantments = itemMap.getEnchantments();enchantments.put(ItemHandler.getItem().getEnchantName(enchant).toUpperCase(), k);itemMap.setEnchantments(enchantments);this.enchantPane(player, itemMap);
+					Map < String, Integer > enchantments = (itemMap.getEnchantments() != null) ? itemMap.getEnchantments() : new HashMap < String, Integer >();
+					enchantments.put(ItemHandler.getItem().getEnchantName(enchant).toUpperCase(), k);
+					itemMap.setEnchantments(enchantments);
+					this.enchantPane(player, itemMap);
 				}));
 			}
 		});
