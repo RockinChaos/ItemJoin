@@ -17,6 +17,8 @@
  */
 package me.RockinChaos.itemjoin.utils;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +32,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.PlayerInventory;
 
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
@@ -42,7 +46,16 @@ import me.RockinChaos.itemjoin.utils.sqlite.SQLite;
 
 public class GuardAPI {
 	
-	private boolean isEnabled = false;
+    private Object worldGuard = null;
+    private WorldGuardPlugin worldGuardPlugin = null;
+    private Object regionContainer = null;
+    private Method getRegionContainer = null;
+    private Method getWorldAdapter = null;
+    private Method getRegionManager = null;
+    private Constructor<?> vectorConstructor = null;
+    private Method getVector = null;
+			
+    private boolean isEnabled = false;
 	private int guardVersion = 0;
 	private List < String > localeRegions = new ArrayList < String > ();
 	
@@ -54,6 +67,61 @@ public class GuardAPI {
 	*/
 	public GuardAPI() {
 		this.setGuardStatus(Bukkit.getServer().getPluginManager().getPlugin("WorldEdit") != null && Bukkit.getServer().getPluginManager().getPlugin("WorldGuard") != null);
+		if (this.isEnabled) {
+			if (Bukkit.getServer().getPluginManager().getPlugin("WorldGuard") instanceof WorldGuardPlugin) {
+				this.worldGuardPlugin = (WorldGuardPlugin) Bukkit.getServer().getPluginManager().getPlugin("WorldGuard");
+				try {
+					Class < ? > worldGuard = Class.forName("com.sk89q.worldguard.WorldGuard");
+					Method getInstance = worldGuard.getMethod("getInstance");
+					this.worldGuard = getInstance.invoke(null);
+				} catch (Exception e) {}
+			}
+			if (this.worldGuard != null) {
+				try {
+					Method getPlatForm = this.worldGuard.getClass().getMethod("getPlatform");
+					Object platform = getPlatForm.invoke(this.worldGuard);
+					Method getRegionContainer = platform.getClass().getMethod("getRegionContainer");
+					this.regionContainer = getRegionContainer.invoke(platform);
+					Class < ? > getWorldEditWorld = Class.forName("com.sk89q.worldedit.world.World");
+					Class < ? > getWorldEditAdapter = Class.forName("com.sk89q.worldedit.bukkit.BukkitAdapter");
+					this.getWorldAdapter = getWorldEditAdapter.getMethod("adapt", World.class);
+					this.getRegionContainer = this.regionContainer.getClass().getMethod("get", getWorldEditWorld);
+				} catch (Exception e) {
+					ServerHandler.getServer().logSevere("{GuardAPI} Failed to bind to WorldGuard, integration will not work!");
+					ServerHandler.getServer().sendDebugTrace(e);
+					this.regionContainer = null;
+					return;
+				}
+			} else {
+				try {
+					Method getRegionContainer = this.worldGuardPlugin.getClass().getMethod("getRegionContainer");
+					this.regionContainer = getRegionContainer.invoke(this.worldGuardPlugin);
+					this.getRegionContainer = this.regionContainer.getClass().getMethod("get", World.class);
+				} catch (Exception e) {
+					ServerHandler.getServer().logSevere("{GuardAPI} Failed to bind to WorldGuard, integration will not work!");
+					ServerHandler.getServer().sendDebugTrace(e);
+					this.regionContainer = null;
+					return;
+				}
+			}
+			try {
+				Class < ? > vectorClass = Class.forName("com.sk89q.worldedit.Vector");
+				this.vectorConstructor = vectorClass.getConstructor(Double.TYPE, Double.TYPE, Double.TYPE);
+				this.getRegionManager = RegionManager.class.getMethod("getApplicableRegions", vectorClass);
+			} catch (Exception e) {
+				try {
+					Class < ? > vectorClass = Class.forName("com.sk89q.worldedit.math.BlockVector3");
+					this.getVector = vectorClass.getMethod("at", Double.TYPE, Double.TYPE, Double.TYPE);
+					this.getRegionManager = RegionManager.class.getMethod("getApplicableRegions", vectorClass);
+				} catch (Exception e2) {
+					ServerHandler.getServer().logSevere("{GuardAPI} Failed to bind to WorldGuard (no Vector class?), integration will not work!");
+					ServerHandler.getServer().sendDebugTrace(e);
+					this.regionContainer = null;
+					return;
+				}
+			}
+			if (this.regionContainer == null) { ServerHandler.getServer().logSevere("{GuardAPI} Failed to find RegionContainer, WorldGuard integration will not function!"); }
+		}
 	}
 	
    /**
@@ -90,16 +158,7 @@ public class GuardAPI {
 	* @return The List of Regions for the specified world.
 	*/
 	public Map<String, ProtectedRegion> getRegions(final World world) {
-		if (this.guardVersion() >= 700) {
-			com.sk89q.worldedit.world.World wgWorld;
-			try { wgWorld = com.sk89q.worldguard.WorldGuard.getInstance().getPlatform().getWorldByName(world.getName()); }
-			catch (NoSuchMethodError e) { wgWorld = com.sk89q.worldguard.WorldGuard.getInstance().getPlatform().getMatcher().getWorldByName(world.getName()); }
-			com.sk89q.worldguard.protection.regions.RegionContainer rm = com.sk89q.worldguard.WorldGuard.getInstance().getPlatform().getRegionContainer();
-			if (rm == null) { return null; }
-			if (LegacyAPI.getLegacy().legacySk89q()) {
-				return rm.get(wgWorld).getRegions();
-			} else { return rm.get(wgWorld).getRegions(); }
-		} else { return LegacyAPI.getLegacy().getRegions(world); }
+		return this.getRegionManager(world).getRegions();
 	}
 	
    /**
@@ -108,10 +167,10 @@ public class GuardAPI {
 	* @param player - The player that has entered or exited a region.
 	* @return regionSet The applicable regions at the players location.
 	*/
-	public String getRegionsAtLocation(final Entity entity) {
+	public String getRegionAtEntity(final Entity entity) {
 		ApplicableRegionSet set = null;
 		String regionSet = "";
-		try { set = this.getApplicableRegionSet(entity.getWorld(), entity.getLocation()); } 
+		try { set = this.getRegionSet(entity.getLocation()); } 
 		catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
 		if (set == null) { return regionSet; }
 		for (ProtectedRegion r: set) {
@@ -124,23 +183,45 @@ public class GuardAPI {
    /**
 	* Gets the applicable region(s) set at the players location.
 	* 
-	* @param world - The world that the player is currently in.
 	* @param location - The exact location of the player.
 	* @return ApplicableRegionSet The WorldGuard RegionSet.
 	*/
-	private ApplicableRegionSet getApplicableRegionSet(final World world, final Location location) throws Exception {
-		if (this.guardVersion() >= 700) {
-			com.sk89q.worldedit.world.World wgWorld;
-			try { wgWorld = com.sk89q.worldguard.WorldGuard.getInstance().getPlatform().getWorldByName(world.getName()); } 
-			catch (NoSuchMethodError e) { wgWorld = com.sk89q.worldguard.WorldGuard.getInstance().getPlatform().getMatcher().getWorldByName(world.getName()); }
-			com.sk89q.worldguard.protection.regions.RegionContainer rm = com.sk89q.worldguard.WorldGuard.getInstance().getPlatform().getRegionContainer();
-			if (rm == null) { return null; }
-			if (LegacyAPI.getLegacy().legacySk89q()) {
-				final com.sk89q.worldedit.Vector wgVector = new com.sk89q.worldedit.Vector(location.getX(), location.getY(), location.getZ());
-				return rm.get(wgWorld).getApplicableRegions(wgVector);
-			} else { return rm.get(wgWorld).getApplicableRegions(LegacyAPI.getLegacy().asBlockVector(location)); }
-		} else { return LegacyAPI.getLegacy().getRegionSet(world, location); }
+	private ApplicableRegionSet getRegionSet(final Location location) throws Exception {
+		RegionManager regionManager = this.getRegionManager(location.getWorld());
+		if (regionManager == null) { return null; }
+		try {
+			Object vector = this.getVector == null ? this.vectorConstructor.newInstance(location.getX(), location.getY(), location.getZ()) 
+					        : this.getVector.invoke(null, location.getX(), location.getY(), location.getZ());
+			return (ApplicableRegionSet) this.getRegionManager.invoke(regionManager, vector);
+		} catch (Exception e) {
+			ServerHandler.getServer().logSevere("{GuardAPI} An error occurred looking up a WorldGuard ApplicableRegionSet.");
+			ServerHandler.getServer().sendDebugTrace(e);
+		}
+		return null;
 	}
+	
+   /**
+	* Gets the RegionManager for the Bukkit World.
+	* 
+	* @param world - The world that the player is currently in.
+	* @return The WorldGuard RegionManager for the specified world.
+	*/
+    private RegionManager getRegionManager(final World world) {
+    	if (this.regionContainer == null || this.getRegionContainer == null) { return null; }
+    	RegionManager regionManager = null;
+    	try {
+    		if (this.getWorldAdapter != null) {
+    			Object worldEditWorld = this.getWorldAdapter.invoke(null, world);
+    			regionManager = (RegionManager) this.getRegionContainer.invoke(this.regionContainer, worldEditWorld);
+    		} else {
+    			regionManager = (RegionManager) this.getRegionContainer.invoke(this.regionContainer, world);
+    		}
+    	} catch (Exception e) {
+    		ServerHandler.getServer().logSevere("{GuardAPI} An error occurred looking up a WorldGuard RegionManager.");
+    		ServerHandler.getServer().sendDebugTrace(e);
+    	}
+    	return regionManager;
+    }
 	
    /**
 	* Sets the status of WorldGuard.

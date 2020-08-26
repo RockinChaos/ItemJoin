@@ -21,8 +21,6 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -395,46 +393,6 @@ public class LegacyAPI {
 		}
 		return tempItem;
 	}
-	
-   /**
-    * Gets the RegionSet at the specified World and Location.
-    * 
-    * @param world - The World having its Region Set fetched.
-    * @param location - The Location to have its Region Set fetched.
-    * @return The RegionSet "list of regions" for the specified World and Location.
-    */
-	public com.sk89q.worldguard.protection.ApplicableRegionSet getRegionSet(final org.bukkit.World world, final org.bukkit.Location location) {
-        com.sk89q.worldguard.bukkit.WorldGuardPlugin wg = (com.sk89q.worldguard.bukkit.WorldGuardPlugin) Bukkit.getServer().getPluginManager().getPlugin("WorldGuard");
-        com.sk89q.worldguard.bukkit.RegionContainer rm = wg.getRegionContainer();
-        if (legacySk89q()) {
-        	com.sk89q.worldedit.Vector wgVector = new com.sk89q.worldedit.Vector(location.getX(), location.getY(), location.getZ());
-        	return rm.get(world).getApplicableRegions(wgVector);
-        } else { return rm.get(world).getApplicableRegions(location); }
-	}
-	
-   /**
-    * Gets the HashMap of Regions that are in the specified World.
-    * 
-    * @param world - The World that is having their defined WorldGuard regions fetched.
-    * @return The HashMap of Regions in the specified World. 
-    */
-	public Map<String, com.sk89q.worldguard.protection.regions.ProtectedRegion> getRegions(final org.bukkit.World world) {
-        com.sk89q.worldguard.bukkit.WorldGuardPlugin wg = (com.sk89q.worldguard.bukkit.WorldGuardPlugin) Bukkit.getServer().getPluginManager().getPlugin("WorldGuard");
-        com.sk89q.worldguard.bukkit.RegionContainer rm = wg.getRegionContainer();
-        if (legacySk89q()) {
-        	return rm.get(world).getRegions();
-        } else { return rm.get(world).getRegions(); }
-	}
-	
-   /**
-    * Gets the WorldEdit BlockVector3 from a Bukkit Location.
-    * 
-    * @param location - The Bukkit Location to be converted to WorldEdit BlockVector3.
-    * @return The WorldEdit BlockVector3.
-    */
-    public com.sk89q.worldedit.math.BlockVector3 asBlockVector(final org.bukkit.Location location) {
-        return com.sk89q.worldedit.math.BlockVector3.at(location.getX(), location.getY(), location.getZ());
-    }
 	
    /**
     * Checks if the Sk89q Plugins are the Legacy version.

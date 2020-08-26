@@ -61,7 +61,7 @@ public class PlayerGuard implements Listener {
 	* @param player - The player that has entered or exited a region.
 	*/
 	private void handleRegions(final Player player) {
-		String regions = DependAPI.getDepends(false).getGuard().getRegionsAtLocation(player);
+		String regions = DependAPI.getDepends(false).getGuard().getRegionAtEntity(player);
 		if (this.playerRegions.get(player) != null) {
 			List < String > regionSet = Arrays.asList(regions.replace(" ", "").split(","));
 			List < String > playerSet = Arrays.asList(this.playerRegions.get(player).replace(" ", "").split(","));
