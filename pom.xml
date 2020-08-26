@@ -6,7 +6,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>me.RockinChaos.itemjoin</groupId>
 	<artifactId>ItemJoin</artifactId>
-	<version>5.0.7-SNAPSHOT</version>
+	<version>5.0.7-RELEASE</version>
 	<build>
 		<sourceDirectory>${project.basedir}</sourceDirectory>
 		<resources>
@@ -88,11 +88,6 @@
         	<id>spigot-repo</id>
         	<url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
 		</repository>
-    <!--Maven Repository-->
-		<repository>
-			<id>sk89q-repo</id>
-			<url>https://maven.sk89q.com/repo/</url>
-		</repository>
     <!--PlaceholderAPI Repository-->
         <repository>
             <id>placeholderapi</id>
@@ -113,10 +108,25 @@
 			<id>CodeMC</id>
 			<url>https://repo.codemc.org/repository/maven-public</url>
 		</repository>
+    <!--TokenEnchant Repository-->
+        <repository>
+            <id>teamvk-repo</id>
+            <url>https://raw.githubusercontent.com/TeamVK/maven-repository/master/release/</url>
+        </repository>
     <!--SkinsRestorer Repository-->
 		<repository>
 		    <id>codemc-snapshots</id>
 		    <url>https://repo.codemc.org/repository/maven-snapshots/</url>
+		</repository>
+    <!--WorldGuard/WorldEdit Repository-->
+		<repository>
+            <id>sk89q-repo</id>
+            <url>https://maven.enginehub.org/repo/</url>
+		</repository>
+    <!--Vault Repository-->
+		<repository>
+		    <id>VaultAPI</id>
+		    <url>https://ci.ender.zone/plugin/repository/everything/net/milkbowl/vault/</url>
 		</repository>
 	</repositories>
 	<dependencies>
@@ -137,7 +147,7 @@
 		<dependency>
 			<groupId>org.spigotmc</groupId>
 			<artifactId>spigot-api</artifactId>
-			<version>1.16.1-R0.1-SNAPSHOT</version>
+			<version>1.16.2-R0.1-SNAPSHOT</version>
 	        <scope>provided</scope>
 		</dependency>
     <!--PlaceholderAPI API-->
@@ -154,11 +164,40 @@
 	        <version>5.6.0-SNAPSHOT</version>
 	        <scope>provided</scope>
         </dependency>
+    <!--Vault API-->
+        <dependency>
+	        <groupId>net.milkbowl.vault</groupId>
+	        <artifactId>VaultAPI</artifactId>
+	        <version>1.7</version>
+	        <scope>provided</scope>
+        </dependency>
+    <!--HeadDatabase API-->
+		<dependency>
+			<groupId>com.github.shynixn.headdatabase</groupId>
+			<artifactId>hdb-api</artifactId>
+			<version>1.0</version>
+			<scope>provided</scope>
+		</dependency>
+    <!--TokenEnchant API-->
+        <dependency>
+            <groupId>com.vk2gpz.tokenenchant</groupId>
+            <artifactId>TokenEnchantAPI</artifactId>
+            <version>17.1.13</version>
+            <scope>provided</scope>
+        </dependency>
+    <!--SkinsRestorer API-->
+		<dependency>
+            <groupId>com</groupId>
+            <artifactId>skinsrestorer</artifactId>
+            <version>13.8.3-SNAPSHOT</version>
+	        <scope>provided</scope>
+		</dependency>
     <!--Mojang AuthLib API-->
 		<dependency>
 			<groupId>com.mojang</groupId>
 			<artifactId>authlib</artifactId>
 			<version>1.5.21</version>
+	        <scope>provided</scope>
 		</dependency>
     <!--bStats API-->
     	<dependency>
@@ -171,50 +210,29 @@
     	<dependency>
         	<groupId>commons-io</groupId>
        	 	<artifactId>commons-io</artifactId>
-        	<scope>compile</scope>
         	<version>2.7</version>
+        	<scope>compile</scope>
     	</dependency>
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-api</artifactId>
 			<version>2.13.3</version>
+	        <scope>provided</scope>
 		</dependency>
     <!--GoogleCode API-->
 	    <dependency>
 	        <groupId>com.googlecode.json-simple</groupId>
 	        <artifactId>json-simple</artifactId>
 	        <version>1.1.1</version>
+	        <scope>provided</scope>
 	    </dependency>
     <!--Google API-->
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 			<version>29.0-jre</version>
+	        <scope>provided</scope>
 		</dependency>
-    <!--Vault Local-->
-        <dependency>
-            <groupId>net.milkbowl.vault</groupId>
-            <artifactId>Vault</artifactId>
-            <scope>system</scope>
-            <systemPath>${pom.basedir}/src/me/RockinChaos/itemjoin/extra/VaultAPI.jar</systemPath>
-            <version>LEGACY</version>
-        </dependency>
-    <!-- SkinsRestorer Local -->
-    	<dependency>
-    	    <groupId>me.SkinsRestorerAPI</groupId>
-    	    <artifactId>SkinsRestorerAPI</artifactId>
-            <scope>system</scope>
-            <systemPath>${pom.basedir}/src/me/RockinChaos/itemjoin/extra/SkinsRestorerAPI.jar</systemPath>
-    	    <version>LEGACY</version>
-    	</dependency>
-    <!--HeadDatabase Local-->
-        <dependency>
-            <groupId>me.HeadDatabaseAPI</groupId>
-            <artifactId>HeadDatabaseAPI</artifactId>
-            <scope>system</scope>
-            <systemPath>${pom.basedir}/src/me/RockinChaos/itemjoin/extra/HeadDatabaseAPI.jar</systemPath>
-            <version>LEGACY</version>
-        </dependency>
     <!--BetterNick Local-->
         <dependency>
             <groupId>me.BetterNickAPI</groupId>
@@ -223,29 +241,19 @@
             <systemPath>${pom.basedir}/src/me/RockinChaos/itemjoin/extra/BetterNickAPI.jar</systemPath>
             <version>LEGACY</version>
         </dependency>
-    <!--TokenEnchant Local-->
+    <!--WorldGuard API-->
         <dependency>
-            <groupId>me.TokenEnchantAPI</groupId>
-            <artifactId>TokenEnchantAPI</artifactId>
-            <scope>system</scope>
-            <systemPath>${pom.basedir}/src/me/RockinChaos/itemjoin/extra/TokenEnchantAPI.jar</systemPath>
-            <version>LEGACY</version>
+            <groupId>com.sk89q.worldguard</groupId>
+            <artifactId>worldguard-bukkit</artifactId>
+            <version>7.0.4-SNAPSHOT</version>
+            <scope>provided</scope>
         </dependency>
-    <!--WorldGuard Legacy Local-->
+    <!--WorldEdit API-->
         <dependency>
-            <groupId>me.WorldGuard.Legacy</groupId>
-            <artifactId>WorldGuard</artifactId>
-            <scope>system</scope>
-            <systemPath>${pom.basedir}/src/me/RockinChaos/itemjoin/extra/WorldGuard-Legacy.jar</systemPath>
-            <version>LEGACY</version>
-        </dependency>
-    <!--WorldEdit Legacy Local-->
-        <dependency>
-            <groupId>me.WorldEdit.Legacy</groupId>
-            <artifactId>WorldEdit</artifactId>
-            <scope>system</scope>
-            <systemPath>${pom.basedir}/src/me/RockinChaos/itemjoin/extra/WorldEdit-Legacy.jar</systemPath>
-            <version>LEGACY</version>
+            <groupId>com.sk89q.worldedit</groupId>
+            <artifactId>worldedit-bukkit</artifactId>
+            <version>7.2.0-SNAPSHOT</version>
+            <scope>provided</scope>
         </dependency>
 	</dependencies>
 	<scm>
