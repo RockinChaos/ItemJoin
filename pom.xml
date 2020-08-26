@@ -6,7 +6,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>me.RockinChaos.itemjoin</groupId>
 	<artifactId>ItemJoin</artifactId>
-	<version>5.0.7-RELEASE</version>
+	<version>5.0.7-SNAPSHOT</version>
 	<build>
 		<sourceDirectory>${project.basedir}</sourceDirectory>
 		<resources>
@@ -115,8 +115,8 @@
         </repository>
     <!--SkinsRestorer Repository-->
 		<repository>
-		    <id>codemc-snapshots</id>
-		    <url>https://repo.codemc.org/repository/maven-snapshots/</url>
+            <id>codemc-snapshots</id>
+            <url>https://repo.codemc.org/repository/maven-snapshots/</url>
 		</repository>
     <!--WorldGuard/WorldEdit Repository-->
 		<repository>
@@ -182,15 +182,14 @@
         <dependency>
             <groupId>com.vk2gpz.tokenenchant</groupId>
             <artifactId>TokenEnchantAPI</artifactId>
-            <version>17.1.13</version>
+            <version>18.0.2</version>
             <scope>provided</scope>
         </dependency>
     <!--SkinsRestorer API-->
 		<dependency>
             <groupId>com</groupId>
             <artifactId>skinsrestorer</artifactId>
-            <version>13.8.3-SNAPSHOT</version>
-	        <scope>provided</scope>
+            <version>13.7.5-SNAPSHOT</version>
 		</dependency>
     <!--Mojang AuthLib API-->
 		<dependency>
