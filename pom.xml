@@ -44,12 +44,12 @@
 			    <artifactId>site-maven-plugin</artifactId>
 			    <version>0.11</version>
 			    <configuration>
-			        <message>Published artifacts me.RockinChaos.itemjoin.ItemJoin:${project.version}</message>
+			        <message>Maven artifacts for ${project.version}</message>
 			        <noJekyll>true</noJekyll>
 			        <outputDirectory>${project.build.directory}/mvn-repo</outputDirectory>
 			        <branch>refs/heads/mvn-repo</branch>
 			        <includes><include>**/*</include></includes>
-			        <repositoryName>repository</repositoryName>
+			        <repositoryName>Repository</repositoryName>
 			        <repositoryOwner>Jacob</repositoryOwner>
 			    </configuration>
 			    <executions> 
