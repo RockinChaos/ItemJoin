@@ -132,7 +132,10 @@ public class ConfigHandler {
 			} else { LegacyAPI.getLegacy().registerPickups(); }
 		}
 		if ((!Utils.getUtils().containsIgnoreCase(this.getPrevent("itemMovement"), "FALSE") && !Utils.getUtils().containsIgnoreCase(this.getPrevent("itemMovement"), "DISABLED"))) {
-			if (!Utils.getUtils().isRegistered(Clicking.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Clicking(), ItemJoin.getInstance()); }
+			if (!Utils.getUtils().isRegistered(Clicking.class.getSimpleName())) { 
+				ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Clicking(), ItemJoin.getInstance()); 
+				if (ServerHandler.getServer().hasSpecificUpdate("1_8") && !ProtocolManager.getManager().isHandling()) { ProtocolManager.getManager().handleProtocols(); }
+			}
 		}
 		if ((!Utils.getUtils().containsIgnoreCase(this.getPrevent("Self-Drops"), "FALSE") && !Utils.getUtils().containsIgnoreCase(this.getPrevent("Self-Drops"), "DISABLED"))
 		|| (!Utils.getUtils().containsIgnoreCase(this.getPrevent("Death-Drops"), "FALSE") && !Utils.getUtils().containsIgnoreCase(this.getPrevent("Death-Drops"), "DISABLED"))) {
@@ -438,7 +441,7 @@ public class ConfigHandler {
 			Crafting.cycleTask();
 			ServerHandler.getServer().runThread(main -> {
 				PlayerHandler.getPlayer().restoreCraftItems();
-				if (ServerHandler.getServer().hasSpecificUpdate("1_8")) { ProtocolManager.getManager().handleProtocols(); }
+				if (ServerHandler.getServer().hasSpecificUpdate("1_8") && !ProtocolManager.getManager().isHandling()) { ProtocolManager.getManager().handleProtocols(); }
 			}, 40L);
 			if (!Utils.getUtils().isRegistered(PlayerQuit.class.getSimpleName())) {
 				ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerQuit(), ItemJoin.getInstance());
@@ -447,6 +450,7 @@ public class ConfigHandler {
 		}
 		if ((itemMap.isMovement() || itemMap.isInventoryClose()) && !Utils.getUtils().isRegistered(Clicking.class.getSimpleName())) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Clicking(), ItemJoin.getInstance());
+			if (ServerHandler.getServer().hasSpecificUpdate("1_8") && !ProtocolManager.getManager().isHandling()) { ProtocolManager.getManager().handleProtocols(); }
 		}
 		if (ServerHandler.getServer().hasSpecificUpdate("1_12") && itemMap.isStackable() && !Utils.getUtils().isRegistered(Stackable.class.getSimpleName())) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Stackable(), ItemJoin.getInstance());

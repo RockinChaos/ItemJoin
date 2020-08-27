@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -35,6 +34,7 @@ import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
+import me.RockinChaos.itemjoin.handlers.events.PlayerPickItemEvent;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.utils.Utils;
@@ -57,6 +57,21 @@ public class Clicking implements Listener {
 		  			|| Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getPrevent("itemMovement"), "ALL") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getPrevent("itemMovement"), "GLOBAL")) {
 	  		if (ConfigHandler.getConfig(false).isPreventOP() && player.isOp() || ConfigHandler.getConfig(false).isPreventCreative() && PlayerHandler.getPlayer().isCreativeMode(player)) { } 
 	  		else if (player.getOpenInventory().getTitle().contains("§") || player.getOpenInventory().getTitle().contains("&")) { }
+	  		else { event.setCancelled(true); }
+	  	}
+	}
+
+   /**
+	* Prevents the player from using the pick block feature to move ANY items in their inventory.
+	* 
+	* @param event - PlayerPickItemEvent
+	*/
+	@EventHandler(ignoreCancelled = true)
+	private void onGlobalPickItem(PlayerPickItemEvent event) {
+		Player player = event.getPlayer();
+	  	if (Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getPrevent("itemMovement"), "TRUE") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getPrevent("itemMovement"), player.getWorld().getName())
+		  			|| Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getPrevent("itemMovement"), "ALL") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getPrevent("itemMovement"), "GLOBAL")) {
+	  		if (ConfigHandler.getConfig(false).isPreventOP() && player.isOp() || ConfigHandler.getConfig(false).isPreventCreative() && PlayerHandler.getPlayer().isCreativeMode(player)) { }
 	  		else { event.setCancelled(true); }
 	  	}
 	}
@@ -93,6 +108,38 @@ public class Clicking implements Listener {
 				else if (!ItemUtilities.getUtilities().isAllowed(player, item, "inventory-close")) { player.closeInventory(); }
 				PlayerHandler.getPlayer().updateInventory(player, 1L);
 			}
+		}
+	}
+	
+   /**
+	* Prevents the player from using the pick block feature to move an item in their inventory.
+	* 
+	* @param event - PlayerPickItemEvent
+	*/
+	@EventHandler(ignoreCancelled = true)
+	private void onPickItem(PlayerPickItemEvent event) {
+		final Player player = event.getPlayer();
+		final ItemStack itemCopy = (event.getPickHand() != null ? event.getPickHand().clone() : event.getPickHand());
+		final Material pickMaterial = event.getTargetBlock().getType();
+		if (!ItemUtilities.getUtilities().isAllowed(player, itemCopy, "inventory-modify")) {
+			for (int i = 0; i <= 8; i++) {
+				if (event.getContents()[i] != null && event.getContents()[i].getType() == pickMaterial) {
+					break;
+				} else if (i == 8) {
+					event.setCancelled(true);
+				}
+			}
+		} else {
+			ServerHandler.getServer().runThread(main -> {
+				final ItemStack itemCopy_2 = (event.getPickHand() != null ? event.getPickHand().clone() : event.getPickHand());
+				if (!ItemUtilities.getUtilities().isAllowed(player, itemCopy_2, "inventory-modify")) {
+					final int pickSlot = event.getPickSlot();
+					if (pickSlot != -1) {
+						player.getInventory().setItem(pickSlot, itemCopy_2);
+						PlayerHandler.getPlayer().setMainHandItem(player, itemCopy);
+					}
+				}
+			});
 		}
 	}
 	

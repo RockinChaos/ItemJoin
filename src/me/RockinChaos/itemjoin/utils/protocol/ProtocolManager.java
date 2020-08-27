@@ -29,6 +29,7 @@ import io.netty.channel.Channel;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.events.InventoryCloseEvent;
 import me.RockinChaos.itemjoin.handlers.events.PlayerAutoCraftEvent;
+import me.RockinChaos.itemjoin.handlers.events.PlayerPickItemEvent;
 
 public class ProtocolManager {
 	
@@ -81,15 +82,22 @@ public class ProtocolManager {
     */
   	private boolean manageEvents(Player player, Channel channel, Object packet) {
   		try {
-	  		if (packet != null && packet.getClass().getSimpleName().equalsIgnoreCase("PacketPlayInAutoRecipe")) {
-	  			PlayerAutoCraftEvent AutoCraft = new PlayerAutoCraftEvent(player, player.getOpenInventory().getTopInventory());
-	  			this.callEvent(AutoCraft);
-			  	return AutoCraft.isCancelled();
-	  		} else if (packet != null && packet.getClass().getSimpleName().equalsIgnoreCase("PacketPlayInCloseWindow")) {
-	  			InventoryCloseEvent CloseInventory = new InventoryCloseEvent(player.getOpenInventory());
-	  			this.callEvent(CloseInventory);
-			  	return CloseInventory.isCancelled();
-	  		}
+  			if (packet != null) {
+  				String packetName = packet.getClass().getSimpleName();
+	  			if (packetName.equalsIgnoreCase("PacketPlayInPickItem") || packetName.equalsIgnoreCase("PacketPlayInCustomPayload")) {
+		  			PlayerPickItemEvent PickItem = new PlayerPickItemEvent(player, player.getInventory());
+		  			this.callEvent(PickItem);
+				  	return PickItem.isCancelled();
+		  		} else if (packetName.equalsIgnoreCase("PacketPlayInAutoRecipe")) {
+		  			PlayerAutoCraftEvent AutoCraft = new PlayerAutoCraftEvent(player, player.getOpenInventory().getTopInventory());
+		  			this.callEvent(AutoCraft);
+				  	return AutoCraft.isCancelled();
+		  		} else if (packetName.equalsIgnoreCase("PacketPlayInCloseWindow")) {
+		  			InventoryCloseEvent CloseInventory = new InventoryCloseEvent(player.getOpenInventory());
+		  			this.callEvent(CloseInventory);
+				  	return CloseInventory.isCancelled();
+		  		}
+  			}
   		} catch (Exception e) { }
   		return false;
   	}
@@ -127,6 +135,15 @@ public class ProtocolManager {
   		if (this.protocol != null) {
   			this.protocol.close();
   		}
+  	}
+  	
+   /**
+    * Checks if the protocol handler(s) are open.
+    * 
+    * @return If the protocol handler(s) are open.
+    */
+  	public boolean isHandling() {
+  		return (this.protocol != null);
   	}
   	
    /**
