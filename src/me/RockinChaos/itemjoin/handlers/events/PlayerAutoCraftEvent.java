@@ -26,7 +26,7 @@ import org.bukkit.inventory.ItemStack;
 
 /**
 * Called when a player tries to autocraft using the recipe book.
-* Event is limited to Minecraft 1.12+.
+* 
 */
 public class PlayerAutoCraftEvent extends PlayerEvent implements Cancellable {
 	private static final HandlerList handlers = new HandlerList();
@@ -53,7 +53,7 @@ public class PlayerAutoCraftEvent extends PlayerEvent implements Cancellable {
 	* @return boolean cancellation state.
 	*/
 	public boolean isCancelled() {
-		return useAutoCraft() == Result.DENY;
+		return this.useAutoCraft() == Result.DENY;
 	}
 	
    /**
@@ -66,7 +66,7 @@ public class PlayerAutoCraftEvent extends PlayerEvent implements Cancellable {
 	* @param cancel true if you wish to cancel this event.
 	*/
 	public void setCancelled(boolean cancel) {
-		useAutoCraft(cancel ? Result.DENY : useAutoCraft() == Result.DENY ? Result.DEFAULT : useAutoCraft());
+		this.useAutoCraft(cancel ? Result.DENY : this.useAutoCraft() == Result.DENY ? Result.DEFAULT : this.useAutoCraft());
 	}
 	
    /**
@@ -82,10 +82,10 @@ public class PlayerAutoCraftEvent extends PlayerEvent implements Cancellable {
 	* Convenience method. Returns the contents of the crafting inventory represented by
 	* this event.
 	*
-	* @return Contents the inventory of the crafting inventory.
+	* @return Contents the crafting inventory.
 	*/
 	public ItemStack[] getContents() {
-		return craftingInventory.getContents();
+		return this.craftingInventory.getContents();
 	}
 	
    /**
@@ -94,10 +94,10 @@ public class PlayerAutoCraftEvent extends PlayerEvent implements Cancellable {
 	* records). When this is set to default, it will be allowed if no action
 	* is taken on the crafting inventory.
 	*
-	* @return the action to take with the autocraft pattern.
+	* @return The action to take with the autocraft pattern.
 	*/
 	public Result useAutoCraft() {
-		return useAutoCraft;
+		return this.useAutoCraft;
 	}
 	
    /**
