@@ -105,7 +105,7 @@ public class PlayerPickItemEvent extends PlayerEvent implements Cancellable {
 	* @return The Block being targeted.
 	*/
 	public Block getTargetBlock() {
-		this.cloneInventory(this.inventory);
+		this.cloneInventory();
 		return super.getPlayer().getTargetBlock((Set<Material>) null, 200);
 	}
 	
@@ -115,7 +115,7 @@ public class PlayerPickItemEvent extends PlayerEvent implements Cancellable {
 	* @return The ItemStack that is being swapped.
 	*/
 	public ItemStack getPickHand() {
-		this.cloneInventory(this.inventory);
+		this.cloneInventory();
 		return PlayerHandler.getPlayer().getHandItem(super.getPlayer());
 	}
 	
@@ -125,7 +125,7 @@ public class PlayerPickItemEvent extends PlayerEvent implements Cancellable {
 	* @return Contents the inventory.
 	*/
 	public ItemStack[] getContents() {
-		this.cloneInventory(this.inventory);
+		this.cloneInventory();
 		return this.inventory.getContents();
 	}
 	
@@ -169,16 +169,16 @@ public class PlayerPickItemEvent extends PlayerEvent implements Cancellable {
 	}
 	
    /**
-    * Attempts to clone the specified Inventory.
-    * The cloned Inventory will become the active events Inventory.
+    * Attempts to clone the specified Inventory
+    * The cloned Inventory will become the active event Inventory.
     * 
 	*/
-	public void cloneInventory(Inventory inventory) {
+	public void cloneInventory() {
 		if (!this.clonedInventory) {
 			Inventory cloneInventory = Bukkit.createInventory(super.getPlayer(), 36);
-			for (int i = 0; i < inventory.getContents().length; i++) {
-				if (inventory.getContents()[i] != null && inventory.getContents()[i].getType() != Material.AIR) {
-					cloneInventory.setItem(i, inventory.getContents()[i]);
+			for (int i = 0; i < 36; i++) {
+				if (this.inventory.getContents()[i] != null && this.inventory.getContents()[i].getType() != Material.AIR) {
+					cloneInventory.setItem(i, this.inventory.getContents()[i]);
 				}
 			}
 			this.inventory = cloneInventory;
