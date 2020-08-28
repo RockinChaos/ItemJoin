@@ -49,4 +49,29 @@ Required Libraries when compiling (there are no required dependencies, only soft
 * WorldGuard-LEGACY (Provided)
 ```
 
+###Import with Maven
+If you are using ItemJoin's API, you first have to import it into your project.
+
+To import ItemJoin, simply add the following code to your pom.xml
+Replace {VERSION} with the version with the current release or snapshot version.
+This should look like `5.0.6-RELEASE` or `5.0.7-SNAPSHOT` as an example.
+```
+    <repositories>
+    <!--CraftationGaming Repository-->
+        <repository>
+            <id>CraftationGaming</id>
+            <url>https://raw.githubusercontent.com/RockinChaos/repository/maven-public/</url>
+        </repository>
+    </repositories>
+    <dependencies>
+    <!--ItemJoin API-->
+        <dependency>
+            <groupId>me.RockinChaos.itemjoin</groupId>
+            <artifactId>ItemJoin</artifactId>
+            <version>{VERSION}</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+```
+
 ![](https://i.imgur.com/vFllc29.png)![](https://i.imgur.com/vFllc29.png)[<img src="https://i.imgur.com/WR5dVKN.png">](https://discord.gg/D5FnJ7C)[<img src="https://i.imgur.com/2YBE4mr.png">](http://ci.craftationgaming.com/)
