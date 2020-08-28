@@ -49,7 +49,8 @@ Required Libraries when compiling (there are no required dependencies, only soft
 * WorldGuard-LEGACY (Provided)
 ```
 
-###Import with Maven
+### Import with Maven
+-----
 If you are using ItemJoin's API, you first have to import it into your project.
 
 To import ItemJoin, simply add the following code to your pom.xml
