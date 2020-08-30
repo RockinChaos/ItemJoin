@@ -186,24 +186,22 @@ public class ItemUtilities {
     * @param region - The region the Player is in.
     */
 	public void setItems(final Player player, final TriggerType type, final GameMode newMode, final String region) {
-		ServerHandler.getServer().runAsyncThread(async_1 -> {
-			this.safeSet(player, type, region);
-			if (this.getItemDelay() != 0 && type != TriggerType.LIMITSWITCH && type != TriggerType.REGIONENTER && type != TriggerType.REGIONLEAVE) { 
-				ServerHandler.getServer().runThread(main -> {
-					ItemHandler.getItem().restoreCraftItems(player);
-					ServerHandler.getServer().runAsyncThread(async_2 -> {
-						this.handleItems(player, type, newMode, region);
-					});
-				}, this.getItemDelay());
-			} else {
-				ServerHandler.getServer().runThread(main -> {
-					ItemHandler.getItem().restoreCraftItems(player);
-					ServerHandler.getServer().runAsyncThread(async -> { 
-						this.handleItems(player, type, newMode, region);
-					});
+		this.safeSet(player, type, region);
+		if (this.getItemDelay() != 0 && type != TriggerType.LIMITSWITCH && type != TriggerType.REGIONENTER && type != TriggerType.REGIONLEAVE) { 
+			ServerHandler.getServer().runThread(main -> {
+				ItemHandler.getItem().restoreCraftItems(player);
+				ServerHandler.getServer().runAsyncThread(async_2 -> {
+					this.handleItems(player, type, newMode, region);
 				});
-			}
-		});
+			}, this.getItemDelay());
+		} else {
+			ServerHandler.getServer().runThread(main -> {
+				ItemHandler.getItem().restoreCraftItems(player);
+				ServerHandler.getServer().runAsyncThread(async -> { 
+					this.handleItems(player, type, newMode, region);
+				});
+			});
+		}
 	}
 	
    /**
@@ -253,13 +251,13 @@ public class ItemUtilities {
 		if (type.equals(TriggerType.REGIONLEAVE)) { DependAPI.getDepends(false).getGuard().pasteReturnItems(player, player.getWorld().getName(), region); }
 		if (type.equals(TriggerType.REGIONENTER)) { this.clearEvent(player, "", type.name, region); }
 		if (this.getClearDelay() != 0) {
-			ServerHandler.getServer().runAsyncThread(async -> {
+			ServerHandler.getServer().runThread(async -> {
 				if (type.equals(TriggerType.JOIN)) {
-							clearEvent(player, player.getWorld().getName(), type.name, "");
-							this.triggerCommands(player);
-						} else if (type.equals(TriggerType.WORLDSWITCH)) {
-							this.clearEvent(player, player.getWorld().getName(), type.name, "");
-						}
+					this.clearEvent(player, player.getWorld().getName(), type.name, "");
+					this.triggerCommands(player);
+				} else if (type.equals(TriggerType.WORLDSWITCH)) {
+					this.clearEvent(player, player.getWorld().getName(), type.name, "");
+				}
 			}, this.getClearDelay());
 		} else {
 			if (type.equals(TriggerType.JOIN)) {
@@ -663,15 +661,13 @@ public class ItemUtilities {
 			for (String compareWorld: compareWorlds) {
 				if (compareWorld.equalsIgnoreCase(player.getWorld().getName()) || compareWorld.equalsIgnoreCase("ALL") || compareWorld.equalsIgnoreCase("GLOBAL")) {
 					for (String commands: ConfigHandler.getConfig(false).getFile("config.yml").getStringList("Active-Commands.commands")) {
-						ServerHandler.getServer().runThread(main -> {
-							String formatCommand = Utils.getUtils().translateLayout(commands, player).replace("first-join: ", "").replace("first-join:", "");
-							if (!SQLite.getLite(false).hasFirstCommanded(player, formatCommand)) {
-									Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), formatCommand);
-								if (Utils.getUtils().containsIgnoreCase(commands, "first-join:")) {
-									SQLite.getLite(false).saveFirstCommandData(player, formatCommand);
-								}
+						String formatCommand = Utils.getUtils().translateLayout(commands, player).replace("first-join: ", "").replace("first-join:", "");
+						if (!SQLite.getLite(false).hasFirstCommanded(player, formatCommand)) {
+								Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), formatCommand);
+							if (Utils.getUtils().containsIgnoreCase(commands, "first-join:")) {
+								SQLite.getLite(false).saveFirstCommandData(player, formatCommand);
 							}
-						});
+						}
 					}
 				}
 				break;

@@ -70,7 +70,7 @@ commands:
     targetNoPermission_All: '%prefix% &4%target_player% &cwas missing permissions for an item so &lnot &ball items &cwere given.'
     noPermission: '%prefix% &cYou do not meet the permission requirement to receive the item &7[&b%item%&7]&c.'
     noPermission_All: '%prefix% &cYou were missing permissions for an item so &lnot &ball items &cwere given.'
-    usageSyntax: '%prefix% &cYou should use /ItemJoin get <itemname> as console.'
+    usageSyntax: '%prefix% &cYou should use /ItemJoin get <itemname> <player> as console.'
     badSyntax: '%prefix% &cIncorrect usage! Syntax: /itemjoin get <itemname> &lOR &c/itemjoin get <itemname> <amount>!'
     badOnlineSyntax: '%prefix% &cIncorrect usage! Syntax: /itemjoin getOnline <itemname> &lOR &c/itemjoin getOnline <itemname> <amount>!'
   remove:
@@ -86,7 +86,7 @@ commands:
     targetFailedInventory: '%prefix% &cThe item &7[&e%item%&7] &cdoes not exist in &4%target_player% &cinventory!'
     targetFailedInventory_All: '%prefix% &bNo defined items &cexist in &4%target_player% &cinventory!'
     onlineFailedInventory: '%prefix% &cThe item &b%item% &cdoes not exist in any of the &4Online Players &cinventories.'
-    usageSyntax: '%prefix% &cYou should use /ItemJoin remove <itemname> as console.'
+    usageSyntax: '%prefix% &cYou should use /ItemJoin remove <itemname> <player> as console.'
     badSyntax: '%prefix% &cIncorrect usage! Syntax: /itemjoin remove <itemname>!'
     badOnlineSyntax: '%prefix% &cIncorrect usage! Syntax: /itemjoin removeOnline <itemname>!'
   database:

@@ -111,7 +111,7 @@ public class ConfigHandler {
     */
 	private void registerClasses() {
 		this.copyFile("config.yml", "config-Version", 7);
-		this.copyFile("items.yml", "items-Version", 6);
+		this.copyFile("items.yml", "items-Version", 7);
 		this.copyFile(LanguageAPI.getLang(true).getFile(), LanguageAPI.getLang(false).getFile().split("-")[0] + "-Version", 8);
 		this.registerPrevent();
 		DependAPI.getDepends(true);
