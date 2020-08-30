@@ -101,7 +101,8 @@ public class ConfigHandler {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerJoin(), ItemJoin.getInstance());
 		}
 		DependAPI.getDepends(false).sendUtilityDepends();
-		ServerHandler.getServer().logInfo(ConfigHandler.getConfig(false).getConfigurationSection().getKeys(false).size() + " Custom item(s) loaded!");
+		int customItems = (ConfigHandler.getConfig(false).getConfigurationSection() != null ? ConfigHandler.getConfig(false).getConfigurationSection().getKeys(false).size() : 0);
+		ServerHandler.getServer().logInfo(customItems + " Custom item(s) loaded!");
 		this.registerGlow();
 	}
 	
