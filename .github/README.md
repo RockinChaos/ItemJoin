@@ -38,15 +38,15 @@ This plugin has taken up many countless hours and has had continued support for 
 Required Libraries when compiling (there are no required dependencies, only softDepends):
 ```
 * Bukkit/Spigot (Latest Official)
+* Vault (Latest Official)
 * AuthMe (Latest Official)
+* BetterNick (Latest Official)
+* HeadDatabase (Latest Official)
+* PlaceholderAPI (Latest Official)
+* SkinRestorerX (Latest Official)
+* TokenEnchant (Latest Official)
 * WorldEdit (Latest Official)
 * WorldGuard (Latest Official)
-* Vault (Provided)
-* HeadDatabaseAPI (Provided)
-* TokenEnchantAPI (Provided)
-* BetterNickAPI (Provided)
-* WorldEdit-LEGACY (Provided)
-* WorldGuard-LEGACY (Provided)
 ```
 
 ### Import with Maven
