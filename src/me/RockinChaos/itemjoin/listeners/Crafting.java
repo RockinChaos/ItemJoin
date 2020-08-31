@@ -282,27 +282,32 @@ public class Crafting implements Listener {
 	private void handleClose(final Consumer < Integer > input, final Player player, final InventoryView view, final ItemStack[] inventory, final boolean slotZero) {
 		if (PlayerHandler.getPlayer().isCraftingInv(view)) {
 			if (!ItemHandler.getItem().isContentsEmpty(inventory)) {
+				boolean isCrafting = false;
 				for (int i = 0; i <= 4; i++) {
-					boolean isCrafting = false;
 					for (ItemMap itemMap: ItemUtilities.getUtilities().getCraftingItems()) {
 						if ((itemMap.isCraftingItem() && itemMap.isReal(inventory[i]))) {
 							isCrafting = true;
 							input.accept(i);
 						}
 					}
-					if (!isCrafting && i != 0 && inventory[i] != null && inventory[i].getType() != Material.AIR) {
-						final int k = i;
-						ItemStack drop = inventory[i].clone();
-						ServerHandler.getServer().runThread(main -> {
-							player.getOpenInventory().getTopInventory().setItem(k, new ItemStack(Material.AIR));
-							if (player.getInventory().firstEmpty() != -1) {
-								player.getInventory().addItem(drop);
-							} else { 
-								Item itemDropped = player.getWorld().dropItem(player.getLocation(), drop);
-								itemDropped.setPickupDelay(40);
-							}
-						});
-						inventory[i] = new ItemStack(Material.AIR);
+				}
+				for (int i = 0; i <= 4; i++) {
+					if (isCrafting && i != 0 && inventory[i] != null && inventory[i].getType() != Material.AIR) {
+						ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(inventory[i], null, player.getWorld());
+						if (itemMap == null || !itemMap.isCraftingItem() || !itemMap.isReal(inventory[i])) {
+							final int k = i;
+							ItemStack drop = inventory[i].clone();
+							ServerHandler.getServer().runThread(main -> {
+								player.getOpenInventory().getTopInventory().setItem(k, new ItemStack(Material.AIR));
+								if (player.getInventory().firstEmpty() != -1) {
+									player.getInventory().addItem(drop);
+								} else {
+									Item itemDropped = player.getWorld().dropItem(player.getLocation(), drop);
+									itemDropped.setPickupDelay(40);
+								}
+							});
+							inventory[i] = new ItemStack(Material.AIR);
+						}
 					}
 				}
 				this.returnCrafting(player, inventory, 1L, !slotZero);
