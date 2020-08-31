@@ -73,7 +73,7 @@ public class Chances {
 	public void addChance(final Object element, final int chance) {
 		if (!this.chances.contains(element)) {
 			this.chances.add(new Chance(element, this.sum, this.sum + chance));
-			this.sum = this.sum + chance;
+			this.sum += chance;
 		}
 	}
 	
@@ -87,7 +87,7 @@ public class Chances {
 		Iterator<Chance> iterator = this.chances.iterator();
 		while (iterator.hasNext()) {
 			Chance chance = iterator.next();
-			if (chance.getLowerLimit() <= index && chance.getUpperLimit() > index) {
+			if (chance != null && chance.getLowerLimit() <= index && chance.getUpperLimit() > index) {
 				return chance.getElement();
 			}
 		}
@@ -143,12 +143,14 @@ public class Chances {
     */
 	public ItemMap getRandom(final Player player) {
 		this.newChance();
-		if (!probabilityItems.isEmpty()) {
+		if (probabilityItems != null && !probabilityItems.isEmpty()) {
 			for (ItemMap itemMap: probabilityItems.keySet()) {
 				if (itemMap.hasItem(player)) { 
 					return itemMap; 
 				}
-				this.addChance(itemMap, probabilityItems.get(itemMap));
+				if (probabilityItems.get(itemMap) != null) { 
+					this.addChance(itemMap, probabilityItems.get(itemMap)); 
+				}
 			}
 			return ((ItemMap) this.getRandomElement());
 		}
