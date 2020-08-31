@@ -75,7 +75,7 @@ import me.arcaniax.hdb.api.HeadDatabaseAPI;
 * 
 */
 public class UI {
-	private final String GUIName = ServerHandler.getServer().hasSpecificUpdate("1_9") ? Utils.getUtils().colorFormat("&7           &0&n ItemJoin Menu") : Utils.getUtils().colorFormat("&7           &0&n ItemJoin Menu");
+	private String GUIName = ServerHandler.getServer().hasSpecificUpdate("1_9") ? Utils.getUtils().colorFormat("&7           &0&n ItemJoin Menu") : Utils.getUtils().colorFormat("&7           &0&n ItemJoin Menu");
 	private ItemStack fillerPaneBItem = ItemHandler.getItem().getItem("STAINED_GLASS_PANE:15", 1, false, "&7", "");
 	private ItemStack fillerPaneGItem = ItemHandler.getItem().getItem("STAINED_GLASS_PANE:7", 1, false, "&7", "");
 	private ItemStack exitItem = ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nExit", "&7", "&7*Returns you to the game");
@@ -5537,7 +5537,8 @@ public class UI {
     * @return If the GUI Menu is open.
     */
 	public boolean isOpen(final Player player) {
-		if (player.getOpenInventory().getTitle().toString().equalsIgnoreCase(Utils.getUtils().colorFormat(this.GUIName))) {
+		if (this.GUIName == null) { this.GUIName = ServerHandler.getServer().hasSpecificUpdate("1_9") ? Utils.getUtils().colorFormat("&7           &0&n ItemJoin Menu") : Utils.getUtils().colorFormat("&7           &0&n ItemJoin Menu"); }
+		if (this.GUIName != null && player != null && player.getOpenInventory().getTitle().toString().equalsIgnoreCase(Utils.getUtils().colorFormat(this.GUIName))) {
 			return true;
 		}
 		return false;
