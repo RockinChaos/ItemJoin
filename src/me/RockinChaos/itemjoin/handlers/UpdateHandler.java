@@ -26,10 +26,10 @@ import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.Collection;
 
 public class UpdateHandler {
@@ -74,8 +74,7 @@ public class UpdateHandler {
     		ServerHandler.getServer().messageSender(sender, "&aAn update has been found!");
     		ServerHandler.getServer().messageSender(sender, "&aAttempting to update from " + "&ev" + this.localeVersionRaw + " &ato the new "  + "&ev" + this.latestVersionRaw);
     		try {
-    			URL downloadUrl = new URL(this.AUTOHOST + this.AUTOQUERY);
-    			HttpURLConnection httpConnection = (HttpURLConnection) downloadUrl.openConnection();
+    			HttpURLConnection httpConnection = (HttpURLConnection) new URL(this.AUTOHOST + this.AUTOQUERY + "?_=" + System.currentTimeMillis()).openConnection();
     			httpConnection.setRequestProperty("User-Agent", "Mozilla/5.0...");
     			BufferedInputStream in = new BufferedInputStream(httpConnection.getInputStream());
     			FileOutputStream fos = new FileOutputStream(this.jarLink);
@@ -152,8 +151,8 @@ public class UpdateHandler {
     	if (this.updatesAllowed) {
     		ServerHandler.getServer().messageSender(sender, "&aChecking for updates...");
     		try {
-    			InputStream input = (InputStream) new URL(this.HOST).openStream();
-    			BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+    			URLConnection connection = new URL(this.HOST + "?_=" + System.currentTimeMillis()).openConnection();
+    			BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
     			String version = reader.readLine();
     			reader.close();
     			if (version.length() <= 7) {
