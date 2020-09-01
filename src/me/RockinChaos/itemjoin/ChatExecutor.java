@@ -669,7 +669,7 @@ public class ChatExecutor implements CommandExecutor {
 			return (!this.player
 				|| (!(sender instanceof ConsoleCommandSender)) 
 				|| !(this.player && (((this.equals(Execute.GETALL) || this.equals(Execute.REMOVEALL)) && args.length < 2)
-				|| (this.equals(Execute.GET) || this.equals(Execute.REMOVE)) && ((args.length == 3 && Utils.getUtils().isInt(args[2])) || args.length == 2))));
+				|| (this.equals(Execute.GET) || this.equals(Execute.REMOVE)) && ((args.length == 3 && PlayerHandler.getPlayer().getPlayerString(args[2]) == null && Utils.getUtils().isInt(args[2])) || args.length == 2))));
 		}
 	}
 }
