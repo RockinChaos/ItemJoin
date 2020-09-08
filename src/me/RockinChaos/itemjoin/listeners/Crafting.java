@@ -169,7 +169,7 @@ public class Crafting implements Listener {
 	    		if (player.isOnline() && itemMap.isSelfDroppable()) {
 	    			itemMap.giveTo(player, itemCopy.getAmount());
 	    			if (Utils.getUtils().getSlotConversion(itemMap.getSlot()) != 0) { 
-	    				this.returnSlotZero(player, 0L);
+	    				this.returnSlotZero(player, 4L);
 	    			}
 	    		} else if (player.isOnline()) {
 	    			this.dropItem(player, itemCopy);
@@ -196,7 +196,7 @@ public class Crafting implements Listener {
 	    			event.getItemDrop().getItemStack().setItemMeta(null);
 	    			event.getItemDrop().remove();
 	    			itemMap.giveTo(player, item.getAmount());
-	    			this.returnSlotZero(player, 4L);
+	    			this.returnSlotZero(player, 20L);
 	    		}
 	    	}, 2L);
     	}
