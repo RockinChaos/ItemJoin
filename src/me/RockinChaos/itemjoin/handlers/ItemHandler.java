@@ -72,12 +72,14 @@ public class ItemHandler {
     * @return The ItemStack with its newly added lores.
     */
 	public ItemStack addLore(final ItemStack item, final String... lores) {
-		ItemMeta meta = item.getItemMeta();
-		List<String> newLore = new ArrayList<String>();
-		if (meta.hasLore()) { newLore = meta.getLore(); }
-		for (String lore : lores) { newLore.add(Utils.getUtils().colorFormat(lore)); }
-		meta.setLore(newLore);
-		item.setItemMeta(meta);
+		if (item != null && item.getType() != Material.AIR) {
+			ItemMeta meta = item.getItemMeta();
+			List<String> newLore = new ArrayList<String>();
+			if (meta.hasLore()) { newLore = meta.getLore(); }
+			for (String lore : lores) { newLore.add(Utils.getUtils().colorFormat(lore)); }
+			meta.setLore(newLore);
+			item.setItemMeta(meta);
+		}
 		return item;
 	}
 	
@@ -186,14 +188,16 @@ public class ItemHandler {
     */
     public ItemStack getItem(String material, final int count, final boolean glowing, String name, final String... lores) {
         ItemStack tempItem; if (!ServerHandler.getServer().hasSpecificUpdate("1_8") && material.equals("BARRIER")) { material = "WOOL:14"; }
+        if (material.equalsIgnoreCase("AIR") || material.equalsIgnoreCase("AIR:0")) { material = "GLASS_PANE"; }
         if (this.getMaterial(material, null) == null) { material = "STONE"; } 
         if (ServerHandler.getServer().hasSpecificUpdate("1_13")) { tempItem = new ItemStack(this.getMaterial(material, null), count); } 
-        else { short dataValue = 0; if (material.contains(":")) { String[] parts = material.split(":"); material = parts[0]; dataValue = (short) Integer.parseInt(parts[1]); } tempItem = LegacyAPI.getLegacy().newItemStack(getMaterial(material, null), count, dataValue); }
-        if (glowing && material != "AIR") { tempItem.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 1); }
+        else { short dataValue = 0; if (material.contains(":")) { String[] parts = material.split(":"); material = parts[0]; dataValue = (short) Integer.parseInt(parts[1]); } 
+        tempItem = LegacyAPI.getLegacy().newItemStack(getMaterial(material, null), count, dataValue); }
+        if (glowing) { tempItem.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 1); }
         ItemMeta tempMeta = tempItem.getItemMeta();
-        if (ServerHandler.getServer().hasSpecificUpdate("1_8") && material != "AIR") { tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ENCHANTS); }
-        if (name != null && material != "AIR") { name = Utils.getUtils().colorFormat(name); tempMeta.setDisplayName(name); }
-        if (lores != null && lores.length != 0 && material != "AIR") {
+        if (ServerHandler.getServer().hasSpecificUpdate("1_8")) { tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ENCHANTS); }
+        if (name != null) { name = Utils.getUtils().colorFormat(name); tempMeta.setDisplayName(name); }
+        if (lores != null && lores.length != 0) {
         	ArrayList<String> loreList = new ArrayList<String>();
         	for (String loreString: lores) { 
         		if (!loreString.isEmpty()) {
