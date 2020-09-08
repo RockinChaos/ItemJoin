@@ -78,6 +78,7 @@ public class UI {
 	private String GUIName = ServerHandler.getServer().hasSpecificUpdate("1_9") ? Utils.getUtils().colorFormat("&7           &0&n ItemJoin Menu") : Utils.getUtils().colorFormat("&7           &0&n ItemJoin Menu");
 	private ItemStack fillerPaneBItem = ItemHandler.getItem().getItem("STAINED_GLASS_PANE:15", 1, false, "&7", "");
 	private ItemStack fillerPaneGItem = ItemHandler.getItem().getItem("STAINED_GLASS_PANE:7", 1, false, "&7", "");
+	private ItemStack fillerPaneItem = ItemHandler.getItem().getItem("GLASS_PANE", 1, false, "&7", "");
 	private ItemStack exitItem = ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nExit", "&7", "&7*Returns you to the game");
 	private List<Player> modifyMenu = new ArrayList<Player>();
 	
@@ -162,6 +163,7 @@ public class UI {
     */
 	private void setButton(final Player player, final ItemMap itemMap, final Interface pagedPane) {
 		final ItemStack item = itemMap.getTempItem().clone();
+		if (item.getType() == Material.AIR) { item.setType(this.fillerPaneItem.getType()); }
 		if (itemMap.isAnimated() || itemMap.isDynamic()) { this.setModifyMenu(true, player); itemMap.getAnimationHandler().get(player).setMenu(true, 0); }
 		pagedPane.addButton(new Button(ItemHandler.getItem().addLore(item, "&7", "&6---------------------------", "&7*Click to modify this custom item.", "&9&lNode: &a" + itemMap.getConfigName(), "&7"), event ->  this.choicePane(player, itemMap, item)));
 	}
