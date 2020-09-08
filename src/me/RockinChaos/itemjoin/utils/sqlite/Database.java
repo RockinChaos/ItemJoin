@@ -49,7 +49,7 @@ public abstract class Database {
 			this.close(ps, rs);
 		} catch (SQLException e) { 
 			ServerHandler.getServer().logSevere("{SQLite} Unable to connect to database!");
-			ServerHandler.getServer().sendDebugTrace(e);
+			ServerHandler.getServer().sendSevereTrace(e);
 		}
 	}
 	
@@ -66,14 +66,15 @@ public abstract class Database {
 			conn = this.getSQLConnection();
 			ps = conn.prepareStatement(statement);
 			return !ps.execute();
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			ServerHandler.getServer().logSevere("{SQLite} [1] Failed to execute database statement.");
 			try {
 				ServerHandler.getServer().logSevere("{SQLite} [1] Database Status: Open: " + !this.getSQLConnection().isClosed() + "! Writable: " + !this.getSQLConnection().isReadOnly() + "!");
-			} catch (SQLException e2) {
+			} catch (Exception e2) {
 				ServerHandler.getServer().logSevere("{SQLite} [1] Failed to determine the Database Status.");
 			}
-			ServerHandler.getServer().sendDebugTrace(e);
+			ServerHandler.getServer().logSevere("{SQLite} [1] Statement: " + statement);
+			ServerHandler.getServer().sendSevereTrace(e);
 			return false;
 		} finally {
 			try {
@@ -109,14 +110,15 @@ public abstract class Database {
 			if (rs.next()) {
 				return rs.getObject(row);
 			}
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			ServerHandler.getServer().logSevere("{SQLite} [2] Failed to execute database statement.");
 			try {
 				ServerHandler.getServer().logSevere("{SQLite} [2] Database Status: Open: " + !this.getSQLConnection().isClosed() + "! Writable: " + !this.getSQLConnection().isReadOnly() + "!");
-			} catch (SQLException e2) {
+			} catch (Exception e2) {
 				ServerHandler.getServer().logSevere("{SQLite} [2] Failed to determine the Database Status.");
 			}
-			ServerHandler.getServer().sendDebugTrace(e);
+			ServerHandler.getServer().logSevere("{SQLite} [2] Statement: " + statement);
+			ServerHandler.getServer().sendSevereTrace(e);
 			try {
 				if (ps != null) {
 					ps.close();
@@ -176,14 +178,15 @@ public abstract class Database {
 				objects.add(rs.getObject(row));
 			}
 			return objects;
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			ServerHandler.getServer().logSevere("{SQLite} [3] Failed to execute database statement.");
 			try {
 				ServerHandler.getServer().logSevere("{SQLite} [3] Database Status: Open: " + !this.getSQLConnection().isClosed() + "! Writable: " + !this.getSQLConnection().isReadOnly() + "!");
-			} catch (SQLException e2) {
+			} catch (Exception e2) {
 				ServerHandler.getServer().logSevere("{SQLite} [3] Failed to determine the Database Status.");
 			}
-			ServerHandler.getServer().sendDebugTrace(e);
+			ServerHandler.getServer().logSevere("{SQLite} [3] Statement: " + statement);
+			ServerHandler.getServer().sendSevereTrace(e);
 			try {
 				if (ps != null) {
 					ps.close();
@@ -229,14 +232,15 @@ public abstract class Database {
 				existingData.add(columnData);
 			}
 			rs.close();
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			ServerHandler.getServer().logSevere("{SQLite} [4] Failed to execute database statement.");
 			try {
 				ServerHandler.getServer().logSevere("{SQLite} [4] Database Status: Open: " + !this.getSQLConnection().isClosed() + "! Writable: " + !this.getSQLConnection().isReadOnly() + "!");
-			} catch (SQLException e2) {
+			} catch (Exception e2) {
 				ServerHandler.getServer().logSevere("{SQLite} [4] Failed to determine the Database Status.");
 			}
-			ServerHandler.getServer().sendDebugTrace(e);
+			ServerHandler.getServer().logSevere("{SQLite} [4] Statement: " + statement);
+			ServerHandler.getServer().sendSevereTrace(e);
 		}
 		return existingData;
 	}
@@ -267,14 +271,15 @@ public abstract class Database {
 				}
 			}
 			return map;
-		} catch (SQLException e) {
+		} catch (Exception e) {
 				ServerHandler.getServer().logSevere("{SQLite} [5] Failed to execute database statement.");
 			try {
 				ServerHandler.getServer().logSevere("{SQLite} [5] Database Status: Open: " + !this.getSQLConnection().isClosed() + "! Writable: " + !this.getSQLConnection().isReadOnly() + "!");
-			} catch (SQLException e2) {
+			} catch (Exception e2) {
 				ServerHandler.getServer().logSevere("{SQLite} [5] Failed to determine the Database Status.");
 			}
-				ServerHandler.getServer().sendDebugTrace(e);
+			ServerHandler.getServer().logSevere("{SQLite} [5] Statement: " + statement);
+			ServerHandler.getServer().sendSevereTrace(e);
 			try {
 				if (ps != null) {
 					ps.close();
@@ -312,17 +317,18 @@ public abstract class Database {
 		try (ResultSet rs = this.getSQLConnection().prepareStatement(statement).executeQuery()) {
 			rs.close();
 			return true;
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			if (Utils.getUtils().containsIgnoreCase(e.getMessage(), "no such column")) {
 				return false;
 			} else {
 				ServerHandler.getServer().logSevere("{SQLite} [6] Failed to execute database statement.");
 			try {
 				ServerHandler.getServer().logSevere("{SQLite} [6] Database Status: Open: " + !this.getSQLConnection().isClosed() + "! Writable: " + !this.getSQLConnection().isReadOnly() + "!");
-			} catch (SQLException e2) {
+			} catch (Exception e2) {
 				ServerHandler.getServer().logSevere("{SQLite} [6] Failed to determine the Database Status.");
 			}
-				ServerHandler.getServer().sendDebugTrace(e);
+			ServerHandler.getServer().logSevere("{SQLite} [6] Statement: " + statement);
+			ServerHandler.getServer().sendSevereTrace(e);
 			}
 		}
 		return false;
@@ -373,7 +379,7 @@ public abstract class Database {
 			} finally { result.close(); SQDrivers.getDatabase("database").closeConnection(); }
 		} catch (Exception e) {
 			ServerHandler.getServer().logSevere("{SQLite} Could not read from the database.db file, some ItemJoin features have been disabled!");
-			ServerHandler.getServer().sendDebugTrace(e);
+			ServerHandler.getServer().sendSevereTrace(e);
 		}
 		return false;
 	}

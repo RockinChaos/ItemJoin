@@ -169,6 +169,15 @@ public class ServerHandler {
 	}
 	
    /**
+    * Sends the StackTrace of an Exception if it is Severe.
+    * 
+    * @param e - The exception to be sent.
+    */
+	public void sendSevereTrace(final Exception e) {
+		e.printStackTrace();
+	}
+	
+   /**
     * Sends a chat message to the specified sender.
     * 
     * @param sender - The entity to have the message sent.
