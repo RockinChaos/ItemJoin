@@ -334,7 +334,7 @@ public class Interface implements InventoryHolder {
 	public void open(Player player) {
 		ServerHandler.getServer().runThread(async -> {
 			this.renderPage();
-			player.openInventory(getInventory());
+			player.openInventory(this.getInventory());
 		});
 	}
 	
