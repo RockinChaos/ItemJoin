@@ -52,6 +52,16 @@ public class PlayerHandler {
     public void restoreCraftItems() {
     	this.forOnlinePlayers(player -> { ItemHandler.getItem().restoreCraftItems(player); } );
     }
+    
+   /**
+    * Safely closes the players inventory in order to call the InventoryCloseEvent.
+    * Fixes a bug with player.closeInventory() not calling the event by default, breaking crafting items.
+    * 
+    */
+    public void safeInventoryClose(Player player) {
+    	player.openInventory(Bukkit.createInventory(player.getInventory().getHolder(), 9));
+    	player.closeInventory();	
+    }
 	
    /**
     * Checks if the InventoryView is a player crafting inventory.

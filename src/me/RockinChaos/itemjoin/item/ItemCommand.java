@@ -320,7 +320,7 @@ public class ItemCommand {
 	private void dispatchConsoleCommands(final Player player) {
 		try {
 			if (Utils.getUtils().containsIgnoreCase(this.command, "[close]")) {
-				player.closeInventory();
+				PlayerHandler.getPlayer().safeInventoryClose(player);
 			} else {
 				this.setLoggable(player, "/" + Utils.getUtils().translateLayout(this.command, player));
 				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), Utils.getUtils().translateLayout(this.command, player));
@@ -339,7 +339,7 @@ public class ItemCommand {
 	private void dispatchOpCommands(final Player player) {
 		try {
 			if (Utils.getUtils().containsIgnoreCase(this.command, "[close]")) {
-				player.closeInventory();
+				PlayerHandler.getPlayer().safeInventoryClose(player);
 			} else {
 				boolean isOp = player.isOp();
 				try {
@@ -366,7 +366,7 @@ public class ItemCommand {
 	private void dispatchPlayerCommands(final Player player) {
 		try {
 			if (Utils.getUtils().containsIgnoreCase(this.command, "[close]")) {
-				player.closeInventory();
+				PlayerHandler.getPlayer().safeInventoryClose(player);
 			} else {
 				this.setLoggable(player, "/" + Utils.getUtils().translateLayout(this.command, player));
 				player.chat("/" + Utils.getUtils().translateLayout(this.command, player));
