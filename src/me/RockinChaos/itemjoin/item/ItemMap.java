@@ -4221,9 +4221,11 @@ public class ItemMap {
 		if (this.cooldownSeconds != 0) {
 			if (System.currentTimeMillis() - playersCooldownList >= this.cooldownSeconds * 1000) { return false; } 
 			else if (this.onCooldownTick(player)) {
-				String cooldownmsg = (this.cooldownMessage.replace("%timeleft%", String.valueOf((this.cooldownSeconds - ((System.currentTimeMillis() - playersCooldownList) / 1000)))).replace("%item%", this.customName).replace("%itemraw%", ItemHandler.getItem().getMaterialName(this.tempItem)));
-				cooldownmsg = Utils.getUtils().translateLayout(cooldownmsg, player);
-				player.sendMessage(cooldownmsg);
+				String cooldownmsg = this.cooldownMessage != null ? (this.cooldownMessage.replace("%timeleft%", String.valueOf((this.cooldownSeconds - ((System.currentTimeMillis() - playersCooldownList) / 1000)))).replace("%item%", this.customName).replace("%itemraw%", ItemHandler.getItem().getMaterialName(this.tempItem))) : null;
+				if (cooldownmsg != null && !this.cooldownMessage.isEmpty()) { 
+					cooldownmsg = Utils.getUtils().translateLayout(cooldownmsg, player);
+					player.sendMessage(cooldownmsg);
+				}
 				this.addPlayerOnCooldownTick(player);
 			}
 		} else if (this.onCooldownTick(player)) {
