@@ -21,6 +21,7 @@ import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
+import me.RockinChaos.itemjoin.utils.Utils;
 
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
@@ -55,14 +56,16 @@ public class Placement implements Listener {
 	 */
 	 @EventHandler(ignoreCancelled = false)
 	 private void onCountLock(PlayerInteractEvent event) {
-	 	ItemStack item = event.getItem();
+	 	ItemStack item = (event.getItem() != null ? event.getItem().clone() : event.getItem());
 	 	Player player = event.getPlayer();
 	 	if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK && !PlayerHandler.getPlayer().isCreativeMode(player)) {
 	 		if (!ItemUtilities.getUtilities().isAllowed(player, item, "count-lock")) {
 	 			ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item, null, player.getWorld());
 	 			item.setAmount(itemMap.getCount());
 	 			ServerHandler.getServer().runThread(main -> {
-	 				if (itemMap != null) { if (itemMap.isSimilar(PlayerHandler.getPlayer().getHandItem(player))) { PlayerHandler.getPlayer().getHandItem(player).setAmount(itemMap.getCount()); } }
+	 				if (Utils.getUtils().containsIgnoreCase(item.getType().name(), "WATER") || Utils.getUtils().containsIgnoreCase(item.getType().name(), "LAVA") || item.getType().name().equalsIgnoreCase("BUCKET")) {
+	 					PlayerHandler.getPlayer().setMainHandItem(player, item);
+	 				} else if (itemMap != null) { if (itemMap.isSimilar(PlayerHandler.getPlayer().getHandItem(player))) { PlayerHandler.getPlayer().getHandItem(player).setAmount(itemMap.getCount()); } }
 	 			}, 2L);
 	 		}
 	 	}
