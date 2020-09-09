@@ -27,6 +27,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredListener;
 import io.netty.channel.Channel;
 import me.RockinChaos.itemjoin.ItemJoin;
+import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.handlers.events.InventoryCloseEvent;
 import me.RockinChaos.itemjoin.handlers.events.PlayerAutoCraftEvent;
 import me.RockinChaos.itemjoin.handlers.events.PlayerPickItemEvent;
@@ -84,7 +85,7 @@ public class ProtocolManager {
   		try {
   			if (packet != null) {
   				String packetName = packet.getClass().getSimpleName();
-	  			if (packetName.equalsIgnoreCase("PacketPlayInPickItem") || packetName.equalsIgnoreCase("PacketPlayInCustomPayload")) {
+	  			if (packetName.equalsIgnoreCase("PacketPlayInPickItem")) {
 		  			PlayerPickItemEvent PickItem = new PlayerPickItemEvent(player, player.getInventory());
 		  			this.callEvent(PickItem);
 				  	return PickItem.isCancelled();
