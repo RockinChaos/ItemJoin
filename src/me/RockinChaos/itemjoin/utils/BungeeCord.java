@@ -37,8 +37,13 @@ private static BungeeCord bungee;
     *
     */
 	public BungeeCord() {
-		ItemJoin.getInstance().getServer().getMessenger().registerOutgoingPluginChannel(ItemJoin.getInstance(), "BungeeCord");
-		ItemJoin.getInstance().getServer().getMessenger().registerIncomingPluginChannel(ItemJoin.getInstance(), "BungeeCord", this);	
+		Messenger messenger = ItemJoin.getInstance().getServer().getMessenger();
+		if (!messenger.isOutgoingChannelRegistered(ItemJoin.getInstance(), "BungeeCord")) {
+			messenger.registerOutgoingPluginChannel(ItemJoin.getInstance(), "BungeeCord");
+		}
+		if (!messenger.isIncomingChannelRegistered(ItemJoin.getInstance(), "BungeeCord")) {
+			messenger.registerIncomingPluginChannel(ItemJoin.getInstance(), "BungeeCord", this);
+		}
 	}
 
    /**
@@ -48,10 +53,6 @@ private static BungeeCord bungee;
     * @param server - The String name of the server that the Player is connecting to.
     */
 	public void SwitchServers(final Player player, final String server) {
-		Messenger messenger = ItemJoin.getInstance().getServer().getMessenger();
-		if (!messenger.isOutgoingChannelRegistered(ItemJoin.getInstance(), "BungeeCord")) {
-			messenger.registerOutgoingPluginChannel(ItemJoin.getInstance(), "BungeeCord");
-		}
 		ByteArrayDataOutput out = ByteStreams.newDataOutput();
 		try {
 			out.writeUTF("Connect");
