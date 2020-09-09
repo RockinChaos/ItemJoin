@@ -617,8 +617,8 @@ public class ItemCommand {
 		private final String clickType;
 		private Action(String Config, String Actions, String ClickType) { this.config = Config; this.actions = Actions; this.clickType = ClickType; }
 		public boolean hasConfig(String Config) { return this.config.contains(Config); }
-		public boolean hasAction(String Action) { return Utils.getUtils().splitIgnoreCase(this.actions, Action); }
-		public boolean hasClickType(String ClickType) { return Utils.getUtils().splitIgnoreCase(this.clickType, ClickType); }
+		public boolean hasAction(String Action) { return Utils.getUtils().splitIgnoreCase(this.actions, Action, ","); }
+		public boolean hasClickType(String ClickType) { return Utils.getUtils().splitIgnoreCase(this.clickType, ClickType, ","); }
 	}
 	
    /**

@@ -27,7 +27,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredListener;
 import io.netty.channel.Channel;
 import me.RockinChaos.itemjoin.ItemJoin;
-import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.handlers.events.InventoryCloseEvent;
 import me.RockinChaos.itemjoin.handlers.events.PlayerAutoCraftEvent;
 import me.RockinChaos.itemjoin.handlers.events.PlayerPickItemEvent;
