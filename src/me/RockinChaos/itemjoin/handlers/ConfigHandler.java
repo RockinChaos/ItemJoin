@@ -22,11 +22,11 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.nio.file.CopyOption;
 import java.nio.file.Files;
+import java.util.HashMap;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
-
 import me.RockinChaos.itemjoin.ChatExecutor;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.ChatTab;
@@ -67,10 +67,13 @@ import me.RockinChaos.itemjoin.utils.sqlite.SQLite;
 
 public class ConfigHandler {
 	
+	private HashMap < String, Boolean > noSource = new HashMap < String, Boolean > ();
+	
+	private boolean Generating = false;
+	
 	private YamlConfiguration itemsFile;
 	private YamlConfiguration configFile;
 	private YamlConfiguration langFile;
-	private boolean Generating = false;
 	
 	private static ConfigHandler config;
 	
@@ -169,7 +172,13 @@ public class ConfigHandler {
 	public FileConfiguration getFile(final String path) {
 		final File file = new File(ItemJoin.getInstance().getDataFolder(), path);
 		if (this.configFile == null) { this.getSource(path); }
-		return this.getLoadedConfig(file, false);
+		try {
+			return this.getLoadedConfig(file, false);
+		} catch (Exception e) {
+			ServerHandler.getServer().sendSevereTrace(e);
+			ServerHandler.getServer().logSevere("Cannot load " + file.getName() + " from disk!");
+		}
+		return null;
 	}
 	
    /**
@@ -190,12 +199,22 @@ public class ConfigHandler {
         		if (!file.exists()) { Files.copy(source, file.toPath(), new CopyOption[0]); }
 				if (path.contains("items.yml")) { this.Generating = true; }
 			} catch (Exception e) {
-				ServerHandler.getServer().sendDebugTrace(e);
+				ServerHandler.getServer().sendSevereTrace(e);
 				ServerHandler.getServer().logWarn("Cannot save " + path + " to disk!");
+				this.noSource.put(path, true);
 				return null;
 			}
 		}
-		return this.getLoadedConfig(file, true);
+		try {
+			YamlConfiguration config = this.getLoadedConfig(file, true);
+			this.noSource.put(path, false);
+			return config;
+		} catch (Exception e) {
+			ServerHandler.getServer().sendSevereTrace(e);
+			ServerHandler.getServer().logSevere("Cannot load " + file.getName() + " from disk!");
+			this.noSource.put(file.getName(), true);
+		}
+		return null;
 	}
 
    /**
@@ -205,15 +224,17 @@ public class ConfigHandler {
     * @param commit - If the File should be committed to memory.
     * @return The Memory loaded config file.
     */
-	public YamlConfiguration getLoadedConfig(final File file, final boolean commit) {
+	public YamlConfiguration getLoadedConfig(final File file, final boolean commit) throws Exception {
+		YamlConfiguration config = new YamlConfiguration();
+		if (commit) { config.load(file); }
 		if (file.getName().contains("items.yml")) {
-			if (commit) { this.itemsFile = YamlConfiguration.loadConfiguration(file); }
+			if (commit) { this.itemsFile = config; }
 			return this.itemsFile;
 		} else if (file.getName().contains("config.yml")) {
-			if (commit) { this.configFile = YamlConfiguration.loadConfiguration(file); }
+			if (commit) { this.configFile = config; }
 			return this.configFile;
 		} else if (file.getName().contains("lang.yml")) {
-			if (commit) { this.langFile = YamlConfiguration.loadConfiguration(file); }
+			if (commit) { this.langFile = config; }
 			return this.langFile;
 		}
 		return null;
@@ -229,7 +250,7 @@ public class ConfigHandler {
 	private void copyFile(final String configFile, final String version, final int id) {
 		this.getSource(configFile);
 		File File = new File(ItemJoin.getInstance().getDataFolder(), configFile);
-		if (File.exists() && this.getFile(configFile).getInt(version) != id) {
+		if (File.exists() && !this.noSource.get(configFile) && this.getFile(configFile).getInt(version) != id) {
 			InputStream source;
 			if (!configFile.contains("lang.yml")) { source = ItemJoin.getInstance().getResource("files/configs/" + configFile); } 
 			else { source = ItemJoin.getInstance().getResource("files/locales/" + configFile); }
@@ -245,14 +266,19 @@ public class ConfigHandler {
 					ServerHandler.getServer().logWarn("Your " + configFile + " is out of date and new options are available, generating a new one!");
 				}
 			}
+		} else if (this.noSource.get(configFile)) {
+			ServerHandler.getServer().logSevere("Your " + configFile + " is not using proper YAML Syntax and will not be loaded!");
+			ServerHandler.getServer().logSevere("Check your YAML formatting by using a YAML-PARSER such as http://yaml-online-parser.appspot.com/");
 		}
-		if (this.Generating && configFile.equalsIgnoreCase("items.yml")) { 
-			FileData.getData().generateItemsFile();
-			this.getSource("items.yml");
-			this.Generating = false;
+		if (!this.noSource.get(configFile)) { 
+			if (this.Generating && configFile.equalsIgnoreCase("items.yml")) { 
+				FileData.getData().generateItemsFile();
+				this.getSource("items.yml");
+				this.Generating = false;
+			}
+			this.getFile(configFile).options().copyDefaults(false);
+			if (configFile.contains("lang.yml")) { LanguageAPI.getLang(false).setPrefix(); }
 		}
-		this.getFile(configFile).options().copyDefaults(false);
-		if (configFile.contains("lang.yml")) { LanguageAPI.getLang(false).setPrefix(); }
 	}
 	
    /**
@@ -357,7 +383,7 @@ public class ConfigHandler {
     * @return The material set for the custom item.
     */
 	public ConfigurationSection getMaterialSection(final ConfigurationSection nodeLocation) {
-		return this.getFile("items.yml").getConfigurationSection(nodeLocation.getCurrentPath() + ".id");
+		return (this.getFile("items.yml") != null ? this.getFile("items.yml").getConfigurationSection(nodeLocation.getCurrentPath() + ".id") : null);
 	}
 	
    /**
@@ -367,7 +393,7 @@ public class ConfigHandler {
     * @return The list of commands defined for the custom item.
     */
 	public ConfigurationSection getCommandsSection(final ConfigurationSection nodeLocation) {
-		return this.getFile("items.yml").getConfigurationSection(nodeLocation.getCurrentPath() + ".commands");
+		return (this.getFile("items.yml") != null ? this.getFile("items.yml").getConfigurationSection(nodeLocation.getCurrentPath() + ".commands") : null);
 	}
 	
    /**
@@ -386,7 +412,7 @@ public class ConfigHandler {
     * @return The list of custom items.
     */
 	public ConfigurationSection getConfigurationSection() {
-		return this.getFile("items.yml").getConfigurationSection("items");
+		return (this.getFile("items.yml") != null ? this.getFile("items.yml").getConfigurationSection("items") : null);
 	}
 	
    /**
