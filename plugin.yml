@@ -22,7 +22,7 @@ permissions:
           itemjoin.reload: true
           itemjoin.menu: true
           itemjoin.updates: true
-          itemjoin.autoupdate: true
+          itemjoin.upgrade: true
           itemjoin.permissions: true
           itemjoin.list: true
           itemjoin.purge: true
@@ -47,8 +47,8 @@ permissions:
    itemjoin.updates:
       description: Grants access to the updates command.
       default: false
-   itemjoin.autoupdate:
-      description: Grants access to the autoupdate command.
+   itemjoin.upgrade:
+      description: Grants access to the upgrade command.
       default: false
    itemjoin.permissions:
       description: Grants access to the permissions command

@@ -66,7 +66,7 @@ public class ChatExecutor implements CommandExecutor {
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Help &7- &eThis help menu.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Reload &7- &eReloads the .yml files.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Updates &7- &eChecks for plugin updates.");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin AutoUpdate &7- &eUpdate ItemJoin to latest version.");
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Upgrade &7- &eUpdate ItemJoin to latest version.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&aType &a&l/ItemJoin Help 2 &afor the next page.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]----------------&a&l[&e Help Menu 1/9 &a&l]&a&l&m---------------[");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
@@ -203,7 +203,7 @@ public class ChatExecutor implements CommandExecutor {
 		} else if (Execute.UPDATE.accept(sender, args, 0)) {
 			LanguageAPI.getLang(false).sendLangMessage("commands.updates.checkRequest", sender);
 			ServerHandler.getServer().runAsyncThread(async -> { UpdateHandler.getUpdater(false).checkUpdates(sender, false); });
-		} else if (Execute.AUTOUPDATE.accept(sender, args, 0)) {
+		} else if (Execute.UPGRADE.accept(sender, args, 0)) {
 			LanguageAPI.getLang(false).sendLangMessage("commands.updates.updateRequest", sender);
 			ServerHandler.getServer().runAsyncThread(async -> { UpdateHandler.getUpdater(false).forceUpdates(sender); });
 		} else if (this.matchExecutor(args) == null) {
@@ -310,7 +310,7 @@ public class ChatExecutor implements CommandExecutor {
 			LanguageAPI.getLang(false).dispatchMessage(sender, (PermissionsHandler.getPermissions().hasPermission(sender, "itemjoin.use") ? "&a[\u2714]" : "&c[\u2718]") + " ItemJoin.Use");
 			LanguageAPI.getLang(false).dispatchMessage(sender, (PermissionsHandler.getPermissions().hasPermission(sender, "itemjoin.reload") ? "&a[\u2714]" : "&c[\u2718]") + " ItemJoin.Reload");
 			LanguageAPI.getLang(false).dispatchMessage(sender, (PermissionsHandler.getPermissions().hasPermission(sender, "itemjoin.updates") ? "&a[\u2714]" : "&c[\u2718]") + " ItemJoin.Updates");
-			LanguageAPI.getLang(false).dispatchMessage(sender, (PermissionsHandler.getPermissions().hasPermission(sender, "itemjoin.autoupdate") ? "&a[\u2714]" : "&c[\u2718]") + " ItemJoin.AutoUpdate");
+			LanguageAPI.getLang(false).dispatchMessage(sender, (PermissionsHandler.getPermissions().hasPermission(sender, "itemjoin.upgrade") ? "&a[\u2714]" : "&c[\u2718]") + " ItemJoin.Upgrade");
 			LanguageAPI.getLang(false).dispatchMessage(sender, (PermissionsHandler.getPermissions().hasPermission(sender, "itemjoin.Permissions") ? "&a[\u2714]" : "&c[\u2718]") + " ItemJoin.Permissions");
 			LanguageAPI.getLang(false).dispatchMessage(sender, (PermissionsHandler.getPermissions().hasPermission(sender, "itemjoin.get") ? "&a[\u2714]" : "&c[\u2718]") + " ItemJoin.Get");
 			LanguageAPI.getLang(false).dispatchMessage(sender, (PermissionsHandler.getPermissions().hasPermission(sender, "itemjoin.Remove") ? "&a[\u2714]" : "&c[\u2718]") + " ItemJoin.Remove");
@@ -589,7 +589,7 @@ public class ChatExecutor implements CommandExecutor {
 		REMOVEALL("removeAll", "itemjoin.remove, itemjoin.remove.others", true),
 		REMOVEONLINE("removeOnline", "itemjoin.remove.others", false),
 		UPDATE("update, updates", "itemjoin.updates", false),
-		AUTOUPDATE("autoupdate", "itemjoin.autoupdate", false);
+		UPGRADE("upgrade", "itemjoin.upgrade", false);
 		private final String command;
 		private final String permission;
 		private final boolean player;
