@@ -40,12 +40,10 @@ public class UpdateHandler {
     private final String HOST = "https://api.spigotmc.org/legacy/update.php?resource=" + this.PROJECTID;
     
     private String versionExact = ItemJoin.getInstance().getDescription().getVersion();
-    private String localeVersionRaw = this.versionExact.split("-")[0];
-    private String latestVersionRaw;
-    private double localeVersion = (this.localeVersionRaw.equals("${project.version}") ? -1 : Double.parseDouble(localeVersionRaw.replace(".", "")));
-    private double latestVersion;
+    private String localeVersion = this.versionExact.split("-")[0];
+    private String latestVersion;
     private boolean betaVersion = this.versionExact.contains("-SNAPSHOT") || this.versionExact.contains("-BETA") || this.versionExact.contains("-ALPHA");
-    private boolean devVersion = this.localeVersion == -1;
+    private boolean devVersion = this.localeVersion.equals("${project.version}");
     
     private File jarLink;
     private int BYTE_SIZE = 2048;
@@ -72,7 +70,7 @@ public class UpdateHandler {
     public void forceUpdates(final CommandSender sender) {
     	if (this.updateNeeded(sender, false)) {
     		ServerHandler.getServer().messageSender(sender, "&aAn update has been found!");
-    		ServerHandler.getServer().messageSender(sender, "&aAttempting to update from " + "&ev" + this.localeVersionRaw + " &ato the new "  + "&ev" + this.latestVersionRaw);
+    		ServerHandler.getServer().messageSender(sender, "&aAttempting to update from " + "&ev" + this.localeVersion + " &ato the new "  + "&ev" + this.latestVersion);
     		try {
     			HttpURLConnection httpConnection = (HttpURLConnection) new URL(this.AUTOHOST + this.AUTOQUERY + "?_=" + System.currentTimeMillis()).openConnection();
     			httpConnection.setRequestProperty("User-Agent", "Mozilla/5.0...");
@@ -93,7 +91,7 @@ public class UpdateHandler {
     				}
     			}
     			bout.close(); in.close(); fos.close();
-    			ServerHandler.getServer().messageSender(sender, "&aSuccessfully updated to v" + this.latestVersionRaw + "!");
+    			ServerHandler.getServer().messageSender(sender, "&aSuccessfully updated to v" + this.latestVersion + "!");
     			ServerHandler.getServer().messageSender(sender, "&aYou must restart your server for this to take affect.");
     		} catch (Exception e) {
     			ServerHandler.getServer().messageSender(sender, "&cAn error has occurred while trying to update the plugin ItemJoin.");
@@ -118,12 +116,12 @@ public class UpdateHandler {
     public void checkUpdates(final CommandSender sender, final boolean onStart) {
     	if (this.updateNeeded(sender, onStart) && this.updatesAllowed) {
     		if (this.betaVersion) {
-    			ServerHandler.getServer().messageSender(sender, "&cYour current version: &bv" + this.localeVersionRaw + "-SNAPSHOT");
+    			ServerHandler.getServer().messageSender(sender, "&cYour current version: &bv" + this.localeVersion + "-SNAPSHOT");
     			ServerHandler.getServer().messageSender(sender, "&cThis &bSNAPSHOT &cis outdated and a release version is now available.");
     		} else {
-    			ServerHandler.getServer().messageSender(sender, "&cYour current version: &bv" + this.localeVersionRaw);
+    			ServerHandler.getServer().messageSender(sender, "&cYour current version: &bv" + this.localeVersion + "-RELEASE");
     		}
-    		ServerHandler.getServer().messageSender(sender, "&cA new version is available: " + "&av" + this.latestVersionRaw);
+    		ServerHandler.getServer().messageSender(sender, "&cA new version is available: " + "&av" + this.latestVersion + "-RELEASE");
     		ServerHandler.getServer().messageSender(sender, "&aGet it from: https://www.spigotmc.org/resources/itemjoin.12661/history");
     		ServerHandler.getServer().messageSender(sender, "&aIf you wish to auto update, please type /ItemJoin AutoUpdate");
     		this.sendNotifications();
@@ -147,7 +145,7 @@ public class UpdateHandler {
     * @param onStart - If it is checking for updates on start.
     * @return If an update is needed.
     */
-    private Boolean updateNeeded(final CommandSender sender, final boolean onStart) {
+    private boolean updateNeeded(final CommandSender sender, final boolean onStart) {
     	if (this.updatesAllowed) {
     		ServerHandler.getServer().messageSender(sender, "&aChecking for updates...");
     		try {
@@ -156,11 +154,13 @@ public class UpdateHandler {
     			String version = reader.readLine();
     			reader.close();
     			if (version.length() <= 7) {
-    				this.latestVersionRaw = version.replaceAll("[a-z]", "").replace("-SNAPSHOT", "").replace("-BETA", "").replace("-ALPHA", "").replace("-RELEASE", "");
-    				this.latestVersion = Double.parseDouble(this.latestVersionRaw.replace(".", ""));
+    				this.latestVersion = version.replaceAll("[a-z]", "").replace("-SNAPSHOT", "").replace("-BETA", "").replace("-ALPHA", "").replace("-RELEASE", "");
+    				String[] latestSplit = this.latestVersion.split("\\.");
+    				String[] localeSplit = this.localeVersion.split("\\.");
     				if (this.devVersion) {
     					return false;
-    				} else if (this.latestVersion == this.localeVersion && this.betaVersion || this.localeVersion > this.latestVersion && !this.betaVersion || this.latestVersion > this.localeVersion) {
+    				} else if ((Integer.parseInt(latestSplit[0]) > Integer.parseInt(localeSplit[0]) || Integer.parseInt(latestSplit[1]) > Integer.parseInt(localeSplit[1]) || Integer.parseInt(latestSplit[2]) > Integer.parseInt(localeSplit[2]))
+    						|| (this.betaVersion && (Integer.parseInt(latestSplit[0]) == Integer.parseInt(localeSplit[0]) && Integer.parseInt(latestSplit[1]) == Integer.parseInt(localeSplit[1]) && Integer.parseInt(latestSplit[2]) == Integer.parseInt(localeSplit[2])))) {
     					return true;
     				}
     			}
@@ -190,7 +190,7 @@ public class UpdateHandler {
     				for (Object objPlayer: playersOnline) {
     					if (((Player) objPlayer).isOp()) {
     						ServerHandler.getServer().messageSender(((Player) objPlayer), "&eAn update has been found!");
-    						ServerHandler.getServer().messageSender(((Player) objPlayer), "&ePlease update to the latest version: v" + this.latestVersionRaw);
+    						ServerHandler.getServer().messageSender(((Player) objPlayer), "&ePlease update to the latest version: v" + this.latestVersion);
     					}
     				}
     			}
@@ -199,7 +199,7 @@ public class UpdateHandler {
     			for (Player objPlayer: playersOnlineOld) {
     				if (objPlayer.isOp()) {
 						ServerHandler.getServer().messageSender(objPlayer, "&eAn update has been found!");
-						ServerHandler.getServer().messageSender(objPlayer, "&ePlease update to the latest version: v" + this.latestVersionRaw);
+						ServerHandler.getServer().messageSender(objPlayer, "&ePlease update to the latest version: v" + this.latestVersion);
     				}
     			}
     		}
