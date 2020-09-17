@@ -106,25 +106,49 @@ public class SQLite {
     * 
     */
 	private void alterTables() {
-		if (SQDrivers.getDatabase("database").tableExists("first_join") && !SQDrivers.getDatabase("database").columnExists("SELECT Time_Stamp FROM first_join")) {
-			SQDrivers.getDatabase("database").executeStatement("ALTER TABLE first_join ADD Time_Stamp datatype;");
-			SQDrivers.getDatabase("database").executeStatement("ALTER TABLE first_world ADD Time_Stamp datatype;");
-			SQDrivers.getDatabase("database").executeStatement("ALTER TABLE ip_limits ADD Time_Stamp datatype;");
-			SQDrivers.getDatabase("database").executeStatement("ALTER TABLE first_commands ADD Time_Stamp datatype;");
-			SQDrivers.getDatabase("database").executeStatement("ALTER TABLE enabled_players ADD Time_Stamp datatype;");
-			SQDrivers.getDatabase("database").executeStatement("ALTER TABLE map_ids ADD Time_Stamp datatype;");
-		} 
-		
 		if (!SQDrivers.getDatabase("database").tableExists("ij_first_join") && SQDrivers.getDatabase("database").tableExists("first_join")) {
 			SQDrivers.getDatabase("database").executeStatement("ALTER TABLE first_join RENAME TO ij_first_join;");
+		}
+		if (!SQDrivers.getDatabase("database").tableExists("ij_first_world") && SQDrivers.getDatabase("database").tableExists("first_world")) {
 			SQDrivers.getDatabase("database").executeStatement("ALTER TABLE first_world RENAME TO ij_first_world;");
+		}
+		if (!SQDrivers.getDatabase("database").tableExists("ij_ip_limits") && SQDrivers.getDatabase("database").tableExists("ip_limits")) {
 			SQDrivers.getDatabase("database").executeStatement("ALTER TABLE ip_limits RENAME TO ij_ip_limits;");
+		}
+		if (!SQDrivers.getDatabase("database").tableExists("ij_first_commands") && SQDrivers.getDatabase("database").tableExists("first_commands")) {
 			SQDrivers.getDatabase("database").executeStatement("ALTER TABLE first_commands RENAME TO ij_first_commands;");
+		}
+		if (!SQDrivers.getDatabase("database").tableExists("ij_enabled_players") && SQDrivers.getDatabase("database").tableExists("enabled_players")) {
 			SQDrivers.getDatabase("database").executeStatement("ALTER TABLE enabled_players RENAME TO ij_enabled_players;");
+		}
+		if (!SQDrivers.getDatabase("database").tableExists("ij_return_itemsreturn_items") && SQDrivers.getDatabase("database").tableExists("return_items")) {
 			SQDrivers.getDatabase("database").executeStatement("ALTER TABLE return_items RENAME TO ij_return_items;");
+		}
+		if (!SQDrivers.getDatabase("database").tableExists("ij_return_craftitems") && SQDrivers.getDatabase("database").tableExists("return_craftitems")) {
 			SQDrivers.getDatabase("database").executeStatement("ALTER TABLE return_craftitems RENAME TO ij_return_craftitems;");
+		}
+		if (!SQDrivers.getDatabase("database").tableExists("ij_map_ids") && SQDrivers.getDatabase("database").tableExists("map_ids")) {
 			SQDrivers.getDatabase("database").executeStatement("ALTER TABLE map_ids RENAME TO ij_map_ids;");
 		}
+		
+		if (SQDrivers.getDatabase("database").tableExists("ij_first_join") && !SQDrivers.getDatabase("database").columnExists("SELECT Time_Stamp FROM ij_first_join")) {
+			SQDrivers.getDatabase("database").executeStatement("ALTER TABLE ij_first_join ADD Time_Stamp datatype;");
+		}
+		if (SQDrivers.getDatabase("database").tableExists("ij_first_world") && !SQDrivers.getDatabase("database").columnExists("SELECT Time_Stamp FROM ij_first_world")) {
+			SQDrivers.getDatabase("database").executeStatement("ALTER TABLE ij_first_world ADD Time_Stamp datatype;");
+		}
+		if (SQDrivers.getDatabase("database").tableExists("ij_ip_limits") && !SQDrivers.getDatabase("database").columnExists("SELECT Time_Stamp FROM ij_ip_limits")) {
+			SQDrivers.getDatabase("database").executeStatement("ALTER TABLE ij_ip_limits ADD Time_Stamp datatype;");
+		}
+		if (SQDrivers.getDatabase("database").tableExists("ij_first_commands") && !SQDrivers.getDatabase("database").columnExists("SELECT Time_Stamp FROM ij_first_commands")) {
+			SQDrivers.getDatabase("database").executeStatement("ALTER TABLE ij_first_commands ADD Time_Stamp datatype;");
+		}
+		if (SQDrivers.getDatabase("database").tableExists("ij_enabled_players") && !SQDrivers.getDatabase("database").columnExists("SELECT Time_Stamp FROM ij_enabled_players")) {
+			SQDrivers.getDatabase("database").executeStatement("ALTER TABLE ij_enabled_players ADD Time_Stamp datatype;");
+		}
+		if (SQDrivers.getDatabase("database").tableExists("ij_map_ids") && !SQDrivers.getDatabase("database").columnExists("SELECT Time_Stamp FROM ij_map_ids")) {
+			SQDrivers.getDatabase("database").executeStatement("ALTER TABLE ij_map_ids ADD Time_Stamp datatype;");
+		} 
 	}
 	
    /**
