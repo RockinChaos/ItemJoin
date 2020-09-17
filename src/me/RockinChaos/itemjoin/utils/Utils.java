@@ -322,7 +322,7 @@ public class Utils {
 		            this.mojangUUID.put(name, UUID);
 		             return UUID;
         		} else {
-					ServerHandler.getServer().logWarn("Connection could not be opened (Response code " + connection.getResponseCode() + ", " + connection.getResponseMessage() + ")");
+					ServerHandler.getServer().logWarn("{Utils} [Mojang] Connection could not be opened (Response code " + connection.getResponseCode() + ", " + connection.getResponseMessage() + ")");
 					return null;
         		}
         	} else { return this.mojangUUID.get(name); }

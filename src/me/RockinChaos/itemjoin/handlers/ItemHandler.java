@@ -412,7 +412,7 @@ public class ItemHandler {
 				profile.getProperties().put("textures", new Property("textures", texture, signature));
 				return profile;
 			} else {
-				ServerHandler.getServer().logWarn("Connection could not be opened (Response code " + connection.getResponseCode() + ", " + connection.getResponseMessage() + ")");
+				ServerHandler.getServer().logWarn("{ItemHandler} [Mojang] Connection could not be opened (Response code " + connection.getResponseCode() + ", " + connection.getResponseMessage() + ")");
 				return profile;
 			}
 		} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); return profile; }
