@@ -114,7 +114,9 @@ public class ProtocolManager {
     	for (RegisteredListener registration: listeners) {
     		if (!registration.getPlugin().isEnabled()) { continue; }
     		try {
-    			registration.callEvent(event);
+    			if (event != null && registration != null && registration.getPlugin() != null) { 
+    				registration.callEvent(event);
+    			}
     		} catch (AuthorNagException e) {
     			Plugin plugin = registration.getPlugin();
     			if (plugin.isNaggable()) {

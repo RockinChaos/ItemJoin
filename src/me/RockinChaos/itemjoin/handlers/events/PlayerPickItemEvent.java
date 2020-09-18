@@ -106,7 +106,11 @@ public class PlayerPickItemEvent extends PlayerEvent implements Cancellable {
 	*/
 	public Block getTargetBlock() {
 		this.cloneInventory();
-		return super.getPlayer().getTargetBlock((Set<Material>) null, 200);
+		Block targetBlock = null;
+		try {
+			targetBlock = super.getPlayer().getTargetBlock((Set<Material>) null, 200);
+		} catch (Exception e) { }
+		return targetBlock;
 	}
 	
    /**

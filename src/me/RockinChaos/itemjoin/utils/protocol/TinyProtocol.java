@@ -34,6 +34,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
@@ -167,7 +168,7 @@ public abstract class TinyProtocol {
 					if (!uninjectedChannels.contains(channel)) {
 						injectPlayer(event.getPlayer());
 					}
-				} catch (NullPointerException e) { }
+				} catch (Exception e) { }
 			}
 			@EventHandler
 			public final void onPluginDisable(PluginDisableEvent e) {
@@ -365,7 +366,7 @@ public abstract class TinyProtocol {
 			PacketInterceptor interceptor = (PacketInterceptor) channel.pipeline().get(this.handlerName);
 			if (interceptor == null) {
 				interceptor = new PacketInterceptor();
-				channel.pipeline().addBefore("packet_handler", this.handlerName, interceptor);
+				try { channel.pipeline().addBefore("packet_handler", this.handlerName, interceptor); } catch (NoSuchElementException e) { }
 				this.uninjectedChannels.remove(channel);
 			}
 			return interceptor;
