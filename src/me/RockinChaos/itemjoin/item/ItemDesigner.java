@@ -764,8 +764,13 @@ public class ItemDesigner {
 		if (itemMap.getNodeLocation().getString(".skull-owner") != null) {
 			if (itemMap.getMaterial().toString().equalsIgnoreCase("SKULL_ITEM") || itemMap.getMaterial().toString().equalsIgnoreCase("PLAYER_HEAD")) {
 				if (itemMap.getNodeLocation().getString(".skull-texture") != null) { ServerHandler.getServer().logWarn("{ItemMap} You cannot define a skull owner and a skull texture at the same time, remove one from the item."); return;  }
-				String owner = getActualOwner(itemMap);
+				String owner = this.getActualOwner(itemMap);
 				itemMap.setSkull(owner);
+				if (!Utils.getUtils().containsIgnoreCase(owner,"%") && ItemHandler.getItem().getGameProfile(owner) == null) {
+					ItemHandler.getItem().getProfile(owner);
+				} else if (!ItemHandler.getItem().getLoad().contains(owner)) {
+					ItemHandler.getItem().addLoad(owner);
+				}
 			}
 		}
 	}

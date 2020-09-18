@@ -304,30 +304,34 @@ public class Utils {
 	}
 	
    /**
-    * Gives all custom items to the specified player.sadsadsadsa
+    * Gives all custom items to the specified player.
     * 
     * @param player - that will recieve the items.
     */
     public String getMojangUUID(final String name) {
-        if (this.mojangUUID.get(name) != null) { return this.mojangUUID.get(name); }
-        try {
-        	if (this.mojangUUID.get(name) == null) {
-        		HttpsURLConnection connection = (HttpsURLConnection) new URL("https://api.mojang.com/users/profiles/minecraft/" + name).openConnection();
-        		if (connection.getResponseCode() == HttpsURLConnection.HTTP_OK) {
-	            	InputStreamReader reader = new InputStreamReader(connection.getInputStream());
-		            String UUIDJson = this.toString(new BufferedReader(reader));
-		            if(UUIDJson.isEmpty()) return null;    
-		            JSONObject UUIDObject = (JSONObject) JSONValue.parseWithException(UUIDJson);
-		            String UUID = UUIDObject.get("id").toString();
-		            this.mojangUUID.put(name, UUID);
-		             return UUID;
-        		} else {
-					ServerHandler.getServer().logWarn("{Utils} [Mojang] Connection could not be opened (Response code " + connection.getResponseCode() + ", " + connection.getResponseMessage() + ")");
-					return null;
-        		}
-        	} else { return this.mojangUUID.get(name); }
-        } catch (Exception e) { e.printStackTrace(); }
+        if (this.mojangUUID.get(name) != null) {
+        	return this.mojangUUID.get(name); }
         return null;
+    }
+    
+   /**
+    * loads all custom items to the specified player.
+    * 
+    * @param player - that will recieve the items.
+    */
+    public void loadMojangUUID(final String name) {
+        try {
+	        HttpsURLConnection connection = (HttpsURLConnection) new URL("https://api.mojang.com/users/profiles/minecraft/" + name).openConnection();
+	        if (connection.getResponseCode() == HttpsURLConnection.HTTP_OK) {
+		        InputStreamReader reader = new InputStreamReader(connection.getInputStream());
+			    String UUIDJson = this.toString(new BufferedReader(reader)); 
+			    JSONObject UUIDObject = (JSONObject) JSONValue.parseWithException(UUIDJson);
+			    String UUID = UUIDObject.get("id").toString();
+			    this.mojangUUID.put(name, UUID);
+	        } else {
+				ServerHandler.getServer().logWarn("{Utils} [Mojang] Connection could not be opened (Response code " + connection.getResponseCode() + ", " + connection.getResponseMessage() + ")");
+	        }
+        } catch (Exception e) { e.printStackTrace(); }
     }
 	
    /**

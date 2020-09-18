@@ -63,6 +63,7 @@ public class ItemHandler {
 	
 	private static ItemHandler item;
 	private HashMap < String, GameProfile > gameProfiles = new HashMap < String, GameProfile > ();
+	private List<String> loadLater = new ArrayList<String>();
 	
    /**
     * Adds a list of lores to the specified ItemStack.
@@ -364,18 +365,9 @@ public class ItemHandler {
 			try {
 				Field declaredField = meta.getClass().getDeclaredField("profile");
 				declaredField.setAccessible(true);
-				if (this.gameProfiles.get(owner) == null) {
-					String uuidString = Utils.getUtils().getMojangUUID(owner);
-					if (uuidString != null) {
-						GameProfile profile = ItemHandler.getItem().setSkin(new GameProfile(Utils.getUtils().UUIDConversion(uuidString), owner), Utils.getUtils().UUIDConversion(uuidString));
-						if (profile == null) { this.setStoredSkull(meta, owner); }
-						else {
-							this.gameProfiles.put(owner, profile);
-							try { declaredField.set(meta, this.gameProfiles.get(owner)); } catch (Exception e) { e.printStackTrace(); }
-						}
-					} else { this.setStoredSkull(meta, owner); }
-				}
-				declaredField.set(meta, this.gameProfiles.get(owner));
+				if (ItemHandler.getItem().getProfile(owner) == null) {
+					this.setStoredSkull(meta, owner);
+				} else { declaredField.set(meta, this.gameProfiles.get(owner)); }
 			} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); LegacyAPI.getLegacy().setSkullOwner(((SkullMeta) meta), owner); }
 		} else {
 			this.setStoredSkull(meta, owner);
@@ -383,13 +375,19 @@ public class ItemHandler {
 		return meta;
 	}
 	
+   /**
+    * Sets the locale stored skull owner.
+    * 
+    * @param meta - The referenced ItemMeta.
+    * @param owner - The referenced Skull Owner
+    */
 	public void setStoredSkull(final ItemMeta meta, final String owner) {
 		OfflinePlayer player;
-		try { player = Bukkit.getOfflinePlayer(UUID.fromString(Utils.getUtils().getMojangUUID(owner))); }
+		try { player = (Utils.getUtils().getMojangUUID(owner) != null ? Bukkit.getOfflinePlayer(UUID.fromString(Utils.getUtils().getMojangUUID(owner))) : LegacyAPI.getLegacy().getOfflinePlayer(owner)); }
 		catch (Exception e) { player = LegacyAPI.getLegacy().getOfflinePlayer(owner); }
-		if (this.usesOwningPlayer()) { 
-			try { ((SkullMeta) meta).setOwningPlayer(player); }
-			catch (Exception e) { LegacyAPI.getLegacy().setSkullOwner(((SkullMeta) meta), player.getName()); }
+		if (this.usesOwningPlayer()) {
+			try { if (player != null) { ((SkullMeta) meta).setOwningPlayer(player); } else { LegacyAPI.getLegacy().setSkullOwner(((SkullMeta) meta), (player != null ? player.getName() : owner)); }
+			} catch (Exception e) { LegacyAPI.getLegacy().setSkullOwner(((SkullMeta) meta), (player != null ? player.getName() : owner)); }
 		} else { LegacyAPI.getLegacy().setSkullOwner(((SkullMeta) meta), (player != null ? player.getName() : owner)); }
 	}
 	
@@ -397,25 +395,34 @@ public class ItemHandler {
     * Tries to find the UUID on Mojangs official profile servers,
     * then apply the found players skin to the specified GameProfile.
     * 
-    * @param profile - The GameProfile to have its skin set.
-    * @param uuid - The UUID of the player to have their skin fetched and set to the GameProfile.
+    * @param owner - The players name having their skin set.
     * @return If the skin was successfully found and set to the specified GameProfile.
     */
-	public GameProfile setSkin(final GameProfile profile, final UUID uuid) {
-		try {
-			HttpsURLConnection connection = (HttpsURLConnection) new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + uuid + "?unsigned=false").openConnection();
-			if (connection.getResponseCode() == HttpsURLConnection.HTTP_OK) {
-            	InputStreamReader reader = new InputStreamReader(connection.getInputStream());
-            	JsonObject properties = new JsonParser().parse(reader).getAsJsonObject().get("properties").getAsJsonArray().get(0).getAsJsonObject();
-            	String texture = properties.get("value").getAsString();
-            	String signature = properties.get("signature").getAsString();
-				profile.getProperties().put("textures", new Property("textures", texture, signature));
-				return profile;
-			} else {
-				ServerHandler.getServer().logWarn("{ItemHandler} [Mojang] Connection could not be opened (Response code " + connection.getResponseCode() + ", " + connection.getResponseMessage() + ")");
-				return profile;
-			}
-		} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); return profile; }
+	public GameProfile getProfile(final String owner) {
+		if (this.gameProfiles.get(owner) == null) {
+			ServerHandler.getServer().runAsyncThread(async -> {
+				String UUID = Utils.getUtils().getMojangUUID(owner);
+				if (UUID == null) {
+					Utils.getUtils().loadMojangUUID(owner);
+					UUID = Utils.getUtils().getMojangUUID(owner);
+				}
+				final GameProfile profile = new GameProfile(Utils.getUtils().UUIDConversion(UUID), owner);
+				try {
+					HttpsURLConnection connection = (HttpsURLConnection) new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + UUID + "?unsigned=false").openConnection();
+					if (connection.getResponseCode() == HttpsURLConnection.HTTP_OK) {
+			            InputStreamReader reader = new InputStreamReader(connection.getInputStream());
+			            JsonObject properties = new JsonParser().parse(reader).getAsJsonObject().get("properties").getAsJsonArray().get(0).getAsJsonObject();
+			            String texture = properties.get("value").getAsString();
+			            String signature = properties.get("signature").getAsString();
+						profile.getProperties().put("textures", new Property("textures", texture, signature));
+						this.gameProfiles.put(owner, profile);
+					} else {
+						ServerHandler.getServer().logWarn("{ItemHandler} [Mojang] Connection could not be opened (Response code " + connection.getResponseCode() + ", " + connection.getResponseMessage() + ")");
+					}
+				} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
+			});
+		} else { return this.gameProfiles.get(owner); }
+		return null;
 	}
 	
    /**
@@ -851,6 +858,47 @@ public class ItemHandler {
 			return true; 
 		} 
 		return false;
+	}
+	
+   /**
+    * Preloads the Skull Owners GameProfile.
+    * 
+    * @param player - The player being referenced.
+    */
+	public void preLoad(Player player) {
+		if (!this.loadLater.isEmpty()) {
+			for (String owner: this.loadLater) {
+				this.getProfile(Utils.getUtils().translateLayout(owner, player));
+			}
+		}
+	}
+	
+   /**
+    * Adds a Skull Owner to be loaded later.
+    * 
+    * @param owner - The skull owner being referenced.
+    */
+	public void addLoad(final String owner) {
+		this.loadLater.add(owner);
+	}
+	
+   /**
+    * Fetches the String List containing Skull Owners for loadable later.
+    * 
+    * @return The fetched String List.
+    */
+	public List<String> getLoad() {
+		return this.loadLater;
+	}
+	
+   /**
+    * Attempts to get the current GameProfile for the Skull Owner.
+    * 
+    * @param owner - The skull owner being referenced.
+    * @return The fetched GameProfile instance.
+    */
+	public GameProfile getGameProfile(final String owner) {
+		return this.gameProfiles.get(owner);
 	}
 	
    /**
