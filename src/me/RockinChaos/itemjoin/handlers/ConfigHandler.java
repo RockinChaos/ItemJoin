@@ -50,6 +50,7 @@ import me.RockinChaos.itemjoin.listeners.Offhand;
 import me.RockinChaos.itemjoin.listeners.triggers.LimitSwitch;
 import me.RockinChaos.itemjoin.listeners.triggers.PlayerGuard;
 import me.RockinChaos.itemjoin.listeners.triggers.PlayerJoin;
+import me.RockinChaos.itemjoin.listeners.triggers.PlayerLogin;
 import me.RockinChaos.itemjoin.listeners.triggers.PlayerQuit;
 import me.RockinChaos.itemjoin.listeners.triggers.Respawn;
 import me.RockinChaos.itemjoin.listeners.triggers.WorldSwitch;
@@ -82,6 +83,7 @@ public class ConfigHandler {
     * 
     */
 	public void registerEvents() {
+		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerLogin(), ItemJoin.getInstance());
 	    ItemJoin.getInstance().getCommand("itemjoin").setExecutor(new ChatExecutor());
 	    ItemJoin.getInstance().getCommand("itemjoin").setTabCompleter(new ChatTab());
 		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Menu(), ItemJoin.getInstance());
@@ -122,6 +124,7 @@ public class ConfigHandler {
 		LogFilter.getFilter(true);
 		SQLite.getLite(true);
 		ServerHandler.getServer().runThread(main -> { ItemDesigner.getDesigner(true); }, 2L);
+		ServerHandler.getServer().runThread(main -> { PlayerLogin.startComplete(); }, 3L);
 		ServerHandler.getServer().runThread(main -> { Metrics.getMetrics(true); }, 100L);
 	}
 	
