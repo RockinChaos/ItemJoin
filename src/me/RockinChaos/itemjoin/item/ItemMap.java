@@ -4133,28 +4133,36 @@ public class ItemMap {
     */
 	public void removeDisposable(final Player player, final ItemMap itemMap, final ItemStack itemCopy, final boolean allItems) {
 		if (this.disposable || allItems) {
-			if (!allItems) { setSubjectRemoval(true); }
+			if (!allItems) { this.setSubjectRemoval(true); }
 			ServerHandler.getServer().runThread(main -> {
 				if (PlayerHandler.getPlayer().isCreativeMode(player)) { player.closeInventory(); }
 				if (itemMap.isSimilar(player.getItemOnCursor())) {
 					player.setItemOnCursor(ItemHandler.getItem().modifyItem(player.getItemOnCursor(), allItems, 1));
-					if (!allItems) { setSubjectRemoval(false); }
+					if (!allItems) { this.setSubjectRemoval(false); }
 				} else {
 					int itemSlot = player.getInventory().getHeldItemSlot();
-					if (itemMap.isSimilar(player.getInventory().getItem(itemSlot))) { player.getInventory().setItem(itemSlot, ItemHandler.getItem().modifyItem(player.getInventory().getItem(itemSlot), allItems, 1)); if (!allItems) { setSubjectRemoval(false); }}
+					if (itemMap.isSimilar(player.getInventory().getItem(itemSlot))) { player.getInventory().setItem(itemSlot, ItemHandler.getItem().modifyItem(player.getInventory().getItem(itemSlot), allItems, 1)); if (!allItems) { this.setSubjectRemoval(false); }}
 					else { 
 						for (int i = 0; i < player.getInventory().getSize(); i++) {
 							if (itemMap.isSimilar(player.getInventory().getItem(i))) {
 								player.getInventory().setItem(i, ItemHandler.getItem().modifyItem(player.getInventory().getItem(i), allItems, 1));
-								if (!allItems) { setSubjectRemoval(false); }
+								if (!allItems) { this.setSubjectRemoval(false); }
 								break;
 							}
 						}
 					}
-					if (isSubjectRemoval() && PlayerHandler.getPlayer().isCreativeMode(player)) {
+					if (this.isSubjectRemoval() && PlayerHandler.getPlayer().isCreativeMode(player)) {
 						player.getInventory().addItem(ItemHandler.getItem().modifyItem(itemCopy, allItems, 1));
 						player.setItemOnCursor(new ItemStack(Material.AIR));
-						if (!allItems) { setSubjectRemoval(false); }
+						if (!allItems) { this.setSubjectRemoval(false); }
+					} else if (this.isSubjectRemoval() && PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
+						for (int i = 0; i < player.getOpenInventory().getTopInventory().getSize(); i++) {
+							if (itemMap.isSimilar(player.getOpenInventory().getTopInventory().getItem(i))) {
+								player.getOpenInventory().getTopInventory().setItem(i, ItemHandler.getItem().modifyItem(player.getOpenInventory().getTopInventory().getItem(i), allItems, 1));
+								if (!allItems) { this.setSubjectRemoval(false); }
+								break;
+							}
+						}
 					}
 				}
 			}, 1L);
