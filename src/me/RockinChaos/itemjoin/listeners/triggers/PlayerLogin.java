@@ -23,7 +23,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
 
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
-import me.RockinChaos.itemjoin.utils.Utils;
 
 public class PlayerLogin implements Listener {
 	private static boolean startComplete = false;
@@ -37,9 +36,14 @@ public class PlayerLogin implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST)
 	private void setLoginItems(PlayerLoginEvent event) {
 		ItemHandler.getItem().preLoad(event.getPlayer());
-		if (!startComplete) {
-			event.disallow(PlayerLoginEvent.Result.KICK_OTHER, Utils.getUtils().colorFormat("&7&l[&e&lItemJoin&l&7]\n&cYou cannot join before the server has started!\n&cPlugin has not finished loading, Please try again in a few minutes."));
-		}
+	}
+	
+   /**
+	* Checks if the plugin has fully loaded.
+	* 
+	*/
+	public static boolean hasStarted() {
+		return startComplete;
 	}
 	
    /**
@@ -49,4 +53,5 @@ public class PlayerLogin implements Listener {
 	public static void startComplete() {
 		startComplete = true;
 	}
+	
 }
