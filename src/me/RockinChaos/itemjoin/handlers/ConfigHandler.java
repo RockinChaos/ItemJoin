@@ -122,9 +122,14 @@ public class ConfigHandler {
 		this.registerPrevent();
 		DependAPI.getDepends(true);
 		LogFilter.getFilter(true);
-		SQLite.getLite(true);
-		ServerHandler.getServer().runThread(main -> { ItemDesigner.getDesigner(true); }, 2L);
-		ServerHandler.getServer().runThread(main -> { PlayerLogin.startComplete(); }, 3L);
+		if (!PlayerLogin.hasStarted()) {
+			SQLite.getLite(true);
+			ItemDesigner.getDesigner(true);
+			ServerHandler.getServer().runThread(main -> { PlayerLogin.startComplete(); }, 3L);
+		} else {
+			ServerHandler.getServer().runAsyncThread(async -> { SQLite.getLite(true); });
+			ServerHandler.getServer().runThread(main -> { ItemDesigner.getDesigner(true); }, 2L);
+		}
 		ServerHandler.getServer().runThread(main -> { Metrics.getMetrics(true); }, 100L);
 	}
 	

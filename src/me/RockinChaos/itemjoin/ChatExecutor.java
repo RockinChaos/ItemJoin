@@ -371,7 +371,9 @@ public class ChatExecutor implements CommandExecutor {
 			if (!table.equalsIgnoreCase("Database")) { SQLite.getLite(false).purgeDatabaseData(foundPlayer, args, table.replace("-", "_")); } 
 			else {
 				SQLite.getLite(false).purgeDatabase();
-				SQLite.getLite(true);
+				ServerHandler.getServer().runAsyncThread(async -> { 
+					SQLite.getLite(true);
+				});
 			}
 			LanguageAPI.getLang(false).sendLangMessage("commands.database.purgeSuccess", sender, placeHolders);
 			this.confirmationRequests.remove(table + sender.getName());

@@ -66,22 +66,18 @@ public class SQLite {
     * 
     */
 	public SQLite() {
-        ServerHandler.getServer().runAsyncThread(async -> {
-			SQDrivers.getDatabase("database").loadSQLDatabase();
-			this.createTables();
-			this.convertYAMLS();
-			this.loadCooldown();
-			this.loadMapImages();
-			this.loadFirstJoinPlayers();
-			this.loadFirstWorldPlayers();
-			this.loadFirstCommandPlayers();
-			this.loadIPLimitAddresses();
-			this.loadEnabledPlayers();
-			this.loadReturnRegionItems();
-			this.loadReturnCraftItems();
-			try { SQDrivers.getDatabase("database").closeConnection(); } catch (Exception e) { } 
-			this.executeSaveStatements();
-		});
+		this.createTables();
+		this.convertYAMLS();
+		this.loadCooldown();
+		this.loadMapImages();
+		this.loadFirstJoinPlayers();
+		this.loadFirstWorldPlayers();
+		this.loadFirstCommandPlayers();
+		this.loadIPLimitAddresses();
+		this.loadEnabledPlayers();
+		this.loadReturnRegionItems();
+		this.loadReturnCraftItems();
+		this.executeSaveStatements();
 	}
 	
    /**
