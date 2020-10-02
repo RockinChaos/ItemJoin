@@ -3948,8 +3948,12 @@ public class ItemMap {
 	        			else { itemCommands[i].execute(player, action, clickType, slot, this); } 
 	        		}
         		}
-        		else if (!playerSuccess) { playerSuccess = itemCommands[i].execute(player, action, clickType, slot, this); }
-				else { itemCommands[i].execute(player, action, clickType, slot, this); }
+				else { 
+					synchronized(ItemCommand.class) {
+						if (!playerSuccess) { playerSuccess = itemCommands[i].execute(player, action, clickType, slot, this); }
+						else { itemCommands[i].execute(player, action, clickType, slot, this); }
+					}
+				}
         		itemCommands[i].setItem(itemCopy.clone());
 			}
     	}
