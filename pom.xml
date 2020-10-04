@@ -47,9 +47,6 @@
 			        <message>Published artifacts me.RockinChaos.itemjoin.ItemJoin:${project.version}</message>
 			        <outputDirectory>${env.JENKINS_HOME}/maven-public</outputDirectory>
 			        <branch>refs/heads/maven-public</branch>
-			        <includes>
-			            <include>**/*</include>
-			        </includes>
 			        <repositoryName>Repository</repositoryName>
 			        <repositoryOwner>RockinChaos</repositoryOwner>
 			    </configuration>
