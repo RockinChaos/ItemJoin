@@ -69,16 +69,6 @@
  			       <altDeploymentRepository>internal.repo::default::file://${env.JENKINS_HOME}/maven-public</altDeploymentRepository>
  			   </configuration>
 			</plugin> 
-           		<plugin>
-                		<groupId>org.apache.maven.plugins</groupId>
-                		<artifactId>maven-jar-plugin</artifactId>
-                		<version>2.2</version>
-                		<configuration>
-                    			<excludes>
-                       			 <exclude>*.jar</exclude>
-                    			</excludes>
-                		</configuration>
-           		</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
@@ -95,7 +85,7 @@
 						<configuration>
 							<filters>
 								<filter>
-									<artifact>*</artifact>
+									<artifact>me/RockinChaos</artifact>
 									<excludes>
 										<exclude>META-INF/*.SF</exclude>
 										<exclude>META-INF/*.RSA</exclude>
