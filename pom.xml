@@ -69,16 +69,6 @@
  			       <altDeploymentRepository>internal.repo::default::file://${env.JENKINS_HOME}/maven-public</altDeploymentRepository>
  			   </configuration>
 			</plugin> 
-           		<plugin>
-                		<groupId>org.apache.maven.plugins</groupId>
-                		<artifactId>maven-jar-plugin</artifactId>
-                		<version>2.2</version>
-                		<configuration>
-                    			<excludes>
-                       			 <exclude>*.jar</exclude>
-                    			</excludes>
-                		</configuration>
-           		</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
@@ -93,8 +83,22 @@
 							<goal>shade</goal>
 						</goals>
 						<configuration>
+							<artifactSet>
+								<includes>
+									<include>tv.mineinthebox.simpleserver:SimpleHttpServer:jar:</include>
+								</includes>
+							</artifactSet>
+							<relocations>
+								<relocation>
+									<pattern>tv.mineinthebox.simpleserver</pattern>
+									<shadedPattern>tv.mineinthebox.simpleserver</shadedPattern>
+									<pattern>com.googlecode.json-simple</pattern>
+									<shadedPattern>com.googlecode.json-simple</shadedPattern>
+								</relocation>
+							</relocations>
 							<filters>
 								<filter>
+									<artifact>*</artifact>
 									<excludes>
 										<exclude>META-INF/*.SF</exclude>
 										<exclude>META-INF/*.RSA</exclude>
@@ -111,8 +115,8 @@
 	<repositories>
     <!--Spigot Repository-->
 		<repository>
-			<id>spigot-repo</id>
-			<url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+        	<id>spigot-repo</id>
+        	<url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
 		</repository>
     <!--PlaceholderAPI Repository-->
         <repository>
@@ -120,10 +124,10 @@
             <url>http://repo.extendedclip.com/content/repositories/placeholderapi/</url>
         </repository>
     <!--AuthMe Repository-->
-		<repository>
-			<id>codemc-repo</id>
-			<url>http://repo.codemc.org/repository/maven-public/</url>
-		</repository>
+        <repository>
+        	<id>codemc-repo</id>
+	        <url>http://repo.codemc.org/repository/maven-public/</url>
+        </repository>
     <!--Mojang Repository-->
 		<repository>
 			<id>mojang</id>
@@ -146,19 +150,19 @@
         </repository>
     <!--WorldGuard/WorldEdit Repository-->
 		<repository>
-			<id>sk89q-repo</id>
-			<url>https://maven.enginehub.org/repo/</url>
+            <id>sk89q-repo</id>
+            <url>https://maven.enginehub.org/repo/</url>
 		</repository>
     <!--Vault Repository-->
 		<repository>
-			<id>VaultAPI</id>
-			<url>https://ci.ender.zone/plugin/repository/everything/net/milkbowl/vault/</url>
+		    <id>VaultAPI</id>
+		    <url>https://ci.ender.zone/plugin/repository/everything/net/milkbowl/vault/</url>
 		</repository>
     <!--CraftationGaming Repository-->
-		<repository>
-			<id>CraftationGaming</id>
-			<url>https://raw.githubusercontent.com/RockinChaos/repository/maven-public/</url>
-		</repository>
+        <repository>
+            <id>CraftationGaming</id>
+            <url>https://raw.githubusercontent.com/RockinChaos/repository/maven-public/</url>
+        </repository>
 	</repositories>
 	<dependencies>
     <!--Netty API-->
@@ -178,29 +182,29 @@
 		<dependency>
 			<groupId>org.spigotmc</groupId>
 			<artifactId>spigot-api</artifactId>
-			<version>1.16.3-R0.1-SNAPSHOT</version>
-			<scope>provided</scope>
+			<version>1.16.2-R0.1-SNAPSHOT</version>
+	        <scope>provided</scope>
 		</dependency>
     <!--PlaceholderAPI API-->
         <dependency>
-			<groupId>me.clip</groupId>
-			<artifactId>placeholderapi</artifactId>
-			<version>2.10.4</version>
-			<scope>provided</scope>
+	        <groupId>me.clip</groupId>
+	        <artifactId>placeholderapi</artifactId>
+	        <version>2.10.4</version>
+	        <scope>provided</scope>
         </dependency>
     <!--AuthMe API-->
         <dependency>
-			<groupId>fr.xephi</groupId>
-			<artifactId>authme</artifactId>
-			<version>5.6.0-SNAPSHOT</version>
-			<scope>provided</scope>
+	        <groupId>fr.xephi</groupId>
+	        <artifactId>authme</artifactId>
+	        <version>5.6.0-SNAPSHOT</version>
+	        <scope>provided</scope>
         </dependency>
     <!--Vault API-->
         <dependency>
-			<groupId>net.milkbowl.vault</groupId>
-			<artifactId>VaultAPI</artifactId>
-			<version>1.7</version>
-			<scope>provided</scope>
+	        <groupId>net.milkbowl.vault</groupId>
+	        <artifactId>VaultAPI</artifactId>
+	        <version>1.7</version>
+	        <scope>provided</scope>
         </dependency>
     <!--HeadDatabase API-->
 		<dependency>
@@ -227,7 +231,7 @@
 			<groupId>com.mojang</groupId>
 			<artifactId>authlib</artifactId>
 			<version>1.5.21</version>
-			<scope>provided</scope>
+	        <scope>provided</scope>
 		</dependency>
     <!--bStats API-->
     	<dependency>
@@ -238,29 +242,29 @@
     	</dependency>
     <!--Apache API-->
     	<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>2.7</version>
-			<scope>compile</scope>
+        	<groupId>commons-io</groupId>
+       	 	<artifactId>commons-io</artifactId>
+        	<version>2.7</version>
+        	<scope>compile</scope>
     	</dependency>
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-api</artifactId>
 			<version>2.13.3</version>
-			<scope>provided</scope>
+	        <scope>provided</scope>
 		</dependency>
     <!--Google API-->
-		<dependency>
-			<groupId>com.googlecode.json-simple</groupId>
-			<artifactId>json-simple</artifactId>
-			<version>1.1.1</version>
-			<scope>provided</scope>
-		</dependency>
+	    <dependency>
+	        <groupId>com.googlecode.json-simple</groupId>
+	        <artifactId>json-simple</artifactId>
+	        <version>1.1.1</version>
+	        <scope>provided</scope>
+	    </dependency>
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 			<version>29.0-jre</version>
-			<scope>provided</scope>
+	        <scope>provided</scope>
 		</dependency>
     <!--BetterNick API-->
         <dependency>
@@ -277,12 +281,12 @@
             <scope>provided</scope>
         </dependency>
     <!--WorldEdit API-->
-		<dependency>
+        <dependency>
             <groupId>com.sk89q.worldedit</groupId>
             <artifactId>worldedit-bukkit</artifactId>
             <version>7.2.0-SNAPSHOT</version>
             <scope>provided</scope>
-		</dependency>
+        </dependency>
 	</dependencies>
 	<scm>
 		<url>https://github.com/RockinChaos/ItemJoin</url>
@@ -302,19 +306,19 @@
 	</issueManagement>
 	<ciManagement>
 		<system>Jenkins</system>
-	<url>http://ci.craftationgaming.com/job/ItemJoin/</url>
+		<url>http://ci.craftationgaming.com/job/ItemJoin/</url>
 	</ciManagement>
 	<distributionManagement>
-		<repository>
-		<id>internal.repo</id>
-		<name>staging-repository</name>
-		<url>file://${env.JENKINS_HOME}/maven-public</url>
-	</repository>
+	    <repository>
+	        <id>internal.repo</id>
+	        <name>staging-repository</name>
+	        <url>file://${env.JENKINS_HOME}/maven-public</url>
+	    </repository>
 	</distributionManagement>
-	<properties>
+    <properties>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<github.global.server>github</github.global.server>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	</properties>
+    </properties>
 </project>
