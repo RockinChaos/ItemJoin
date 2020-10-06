@@ -248,20 +248,16 @@ public class ItemUtilities {
 		if (type.equals(TriggerType.REGIONENTER)) { this.clearEvent(player, "", type.name, region); }
 		if (this.getClearDelay() != 0) {
 			ServerHandler.getServer().runThread(main -> {
-				if (type.equals(TriggerType.JOIN)) {
-					this.clearEvent(player, player.getWorld().getName(), type.name, "");
-					this.triggerCommands(player);
-				} else if (type.equals(TriggerType.WORLDSWITCH)) {
+				if (type.equals(TriggerType.JOIN) || type.equals(TriggerType.WORLDSWITCH)) {
 					this.clearEvent(player, player.getWorld().getName(), type.name, "");
 				}
+				this.triggerCommands(player, type);
 			}, this.getClearDelay());
 		} else {
-			if (type.equals(TriggerType.JOIN)) {
-				this.clearEvent(player, player.getWorld().getName(), type.name, "");
-				this.triggerCommands(player);
-			} else if (type.equals(TriggerType.WORLDSWITCH)) {
+			if (type.equals(TriggerType.JOIN) || type.equals(TriggerType.WORLDSWITCH)) {
 				this.clearEvent(player, player.getWorld().getName(), type.name, "");
 			}
+			this.triggerCommands(player, type);
 		}
 	}
 	
@@ -648,9 +644,13 @@ public class ItemUtilities {
     * 
     * @param player - The Player having the commands executed.
     */
-	public void triggerCommands(final Player player) {
+	public void triggerCommands(final Player player, TriggerType trigger) {
 		if ((ConfigHandler.getConfig(false).getFile("config.yml").getString("Active-Commands.enabled-worlds") != null && ConfigHandler.getConfig(false).getFile("config.yml").getStringList("Active-Commands.commands") != null) 
-				&& (!ConfigHandler.getConfig(false).getFile("config.yml").getString("Active-Commands.enabled-worlds").equalsIgnoreCase("DISABLED") || !ConfigHandler.getConfig(false).getFile("config.yml").getString("Active-Commands.enabled-worlds").equalsIgnoreCase("FALSE"))) {
+				&& (!ConfigHandler.getConfig(false).getFile("config.yml").getString("Active-Commands.enabled-worlds").equalsIgnoreCase("DISABLED") || !ConfigHandler.getConfig(false).getFile("config.yml").getString("Active-Commands.enabled-worlds").equalsIgnoreCase("FALSE"))
+				&& ((Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Active-Commands.triggers"), TriggerType.JOIN.name) && trigger.equals(TriggerType.JOIN))
+				|| (Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Active-Commands.triggers"), TriggerType.FIRSTJOIN.name) && trigger.equals(TriggerType.FIRSTJOIN))
+				|| (Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Active-Commands.triggers"), TriggerType.WORLDSWITCH.name) && trigger.equals(TriggerType.WORLDSWITCH))
+				|| (Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Active-Commands.triggers"), TriggerType.RESPAWN.name) && trigger.equals(TriggerType.RESPAWN)))) {
 			String commandsWorlds = ConfigHandler.getConfig(false).getFile("config.yml").getString("Active-Commands.enabled-worlds").replace(" ", "");
 			if (commandsWorlds == null) { commandsWorlds = "DISABLED"; }
 			String[] compareWorlds = commandsWorlds.split(",");
@@ -658,9 +658,9 @@ public class ItemUtilities {
 				if (compareWorld.equalsIgnoreCase(player.getWorld().getName()) || compareWorld.equalsIgnoreCase("ALL") || compareWorld.equalsIgnoreCase("GLOBAL")) {
 					for (String commands: ConfigHandler.getConfig(false).getFile("config.yml").getStringList("Active-Commands.commands")) {
 						String formatCommand = Utils.getUtils().translateLayout(commands, player).replace("first-join: ", "").replace("first-join:", "");
-						if (!SQLite.getLite(false).hasFirstCommanded(player, formatCommand)) {
+						if (!(SQLite.getLite(false).hasFirstCommanded(player, formatCommand) && (Utils.getUtils().containsIgnoreCase(commands, "first-join:") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Active-Commands.triggers"), TriggerType.FIRSTJOIN.name)))) {
 								Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), formatCommand);
-							if (Utils.getUtils().containsIgnoreCase(commands, "first-join:")) {
+							if (Utils.getUtils().containsIgnoreCase(commands, "first-join:") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Active-Commands.triggers"), TriggerType.FIRSTJOIN.name)) {
 								SQLite.getLite(false).saveFirstCommandData(player, formatCommand);
 							}
 						}
@@ -831,6 +831,7 @@ public class ItemUtilities {
     * 
     */
 	public enum TriggerType {
+		FIRSTJOIN("First-Join"),
 		JOIN("Join"),
 		RESPAWN("Respawn"),
 		WORLDSWITCH("World-Switch"),

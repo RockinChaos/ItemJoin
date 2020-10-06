@@ -87,23 +87,23 @@ public class ConfigHandler {
 	    ItemJoin.getInstance().getCommand("itemjoin").setExecutor(new ChatExecutor());
 	    ItemJoin.getInstance().getCommand("itemjoin").setTabCompleter(new ChatTab());
 		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Menu(), ItemJoin.getInstance());
-		if ((this.clearEnabled("Join") || Utils.getUtils().containsIgnoreCase(this.getHotbarTriggers(), "JOIN")) && !Utils.getUtils().isRegistered(PlayerJoin.class.getSimpleName())) {
+		if (((this.clearEnabled("Join") || this.triggerEnabled("Join") || this.triggerEnabled("First-Join")) || Utils.getUtils().containsIgnoreCase(this.getHotbarTriggers(), "JOIN")) && !Utils.getUtils().isRegistered(PlayerJoin.class.getSimpleName())) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerJoin(), ItemJoin.getInstance());
 		}
-		if ((this.clearEnabled("World-Switch") || Utils.getUtils().containsIgnoreCase(this.getHotbarTriggers(), "WORLD-SWITCH")) && !Utils.getUtils().isRegistered(WorldSwitch.class.getSimpleName())) {
+		if (((this.clearEnabled("World-Switch") || this.triggerEnabled("World-Switch")) || Utils.getUtils().containsIgnoreCase(this.getHotbarTriggers(), "WORLD-SWITCH")) && !Utils.getUtils().isRegistered(WorldSwitch.class.getSimpleName())) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new WorldSwitch(), ItemJoin.getInstance());
 		}
-		if (Utils.getUtils().containsIgnoreCase(this.getHotbarTriggers(), "RESPAWN") && !Utils.getUtils().isRegistered(Respawn.class.getSimpleName())) {
-			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerJoin(), ItemJoin.getInstance());
+		if ((Utils.getUtils().containsIgnoreCase(this.getHotbarTriggers(), "RESPAWN") || this.triggerEnabled("Respawn")) && !Utils.getUtils().isRegistered(Respawn.class.getSimpleName())) {
+			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Respawn(), ItemJoin.getInstance());
 		}
 		if (Utils.getUtils().containsIgnoreCase(this.getHotbarTriggers(), "LIMIT-MODES") && !Utils.getUtils().isRegistered(LimitSwitch.class.getSimpleName())) {
-			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerJoin(), ItemJoin.getInstance());
+			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new LimitSwitch(), ItemJoin.getInstance());
 		}
 		if ((this.clearEnabled("Region-Enter") || Utils.getUtils().containsIgnoreCase(this.getHotbarTriggers(), "REGION-ENTER")) && !Utils.getUtils().isRegistered(PlayerGuard.class.getSimpleName()) && DependAPI.getDepends(false).getGuard().guardEnabled()) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerGuard(), ItemJoin.getInstance());
 		}
 		if (Utils.getUtils().containsIgnoreCase(this.getHotbarTriggers(), "REGION-LEAVE") && !Utils.getUtils().isRegistered(PlayerGuard.class.getSimpleName())) {
-			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerJoin(), ItemJoin.getInstance());
+			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerGuard(), ItemJoin.getInstance());
 		}
 		DependAPI.getDepends(false).sendUtilityDepends();
 		int customItems = (ConfigHandler.getConfig(false).getConfigurationSection() != null ? ConfigHandler.getConfig(false).getConfigurationSection().getKeys(false).size() : 0);
@@ -326,6 +326,20 @@ public class ConfigHandler {
 	public boolean clearEnabled(String type) {
 		if (this.getFile("config.yml").getString("Clear-Items." + type) != null 
 		&& !this.getFile("config.yml").getString("Clear-Items." + type).equalsIgnoreCase("DISABLED") && !this.getFile("config.yml").getString("Clear-Items." + type).equalsIgnoreCase("FALSE")) {
+			return true;
+		}
+		return false;
+	}
+	
+   /**
+    * Checks if the specified trigger commands is enabled.
+    * 
+    * @param type - The commands trigger.
+    * @return If the trigger type is enabled.
+    */
+	public boolean triggerEnabled(String type) {
+		if (this.getFile("config.yml").getString("Active-Commands.triggers") != null && Utils.getUtils().containsIgnoreCase(this.getFile("config.yml").getString("Active-Commands.triggers"), type)
+			&& (!this.getFile("config.yml").getString("Active-Commands.enabled-worlds").equalsIgnoreCase("DISABLED") && !this.getFile("config.yml").getString("Active-Commands.enabled-worlds").equalsIgnoreCase("FALSE"))) {
 			return true;
 		}
 		return false;

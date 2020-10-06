@@ -56,11 +56,12 @@ public class ChatTab implements TabCompleter {
 			commands.add("2");
 		} else if ((args.length == 2 || args.length == 3) && args[0].equalsIgnoreCase("purge") && PermissionsHandler.getPermissions().hasPermission(sender, "itemjoin.purge")) {
 			if (args.length == 2) {
-				commands.addAll(Arrays.asList("map-ids","first-join","first-world","ip-limits","enabled-players"));
+				commands.addAll(Arrays.asList("map-ids","first-join","first-world","ip-limits","enabled-players","first-commands"));
 			} else {
 				for (String playerValue: (args[1].equalsIgnoreCase("map-ids") ? SQLite.getLite(false).getMapImages().keySet() : (args[1].equalsIgnoreCase("first-world") ? SQLite.getLite(false).getFirstWorlds().keySet() : 
 					(args[1].equalsIgnoreCase("first-join") ? SQLite.getLite(false).getFirstPlayers().keySet() : 
-					(args[1].equalsIgnoreCase("ip-limits") ? SQLite.getLite(false).getLimitPlayers().keySet() : (args[1].equalsIgnoreCase("enabled-players") ? SQLite.getLite(false).getEnabledPlayers().keySet() : new ArrayList<String>())))))) {
+					(args[1].equalsIgnoreCase("ip-limits") ? SQLite.getLite(false).getLimitPlayers().keySet() : (args[1].equalsIgnoreCase("enabled-players") ? SQLite.getLite(false).getEnabledPlayers().keySet() : 
+					(args[1].equalsIgnoreCase("first-commands") ? SQLite.getLite(false).getFirstCommands().keySet() : new ArrayList<String>()))))))) {
 					commands.add(playerValue.equalsIgnoreCase("ALL") ? "ALL" : (args[1].equalsIgnoreCase("map-ids") ? playerValue : PlayerHandler.getPlayer().getPlayerString(playerValue.replace(".false", "").replace(".true", "")).getName()));
 				}
 			}
