@@ -30,6 +30,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
 public class Placement implements Listener {
@@ -65,7 +66,20 @@ public class Placement implements Listener {
 	 			ServerHandler.getServer().runThread(main -> {
 	 				if (Utils.getUtils().containsIgnoreCase(item.getType().name(), "WATER") || Utils.getUtils().containsIgnoreCase(item.getType().name(), "LAVA") || item.getType().name().equalsIgnoreCase("BUCKET")) {
 	 					PlayerHandler.getPlayer().setMainHandItem(player, item);
-	 				} else if (itemMap != null) { if (itemMap.isSimilar(PlayerHandler.getPlayer().getHandItem(player))) { PlayerHandler.getPlayer().getHandItem(player).setAmount(itemMap.getCount()); } }
+	 				} else if (itemMap != null) { 
+	 					if (PlayerHandler.getPlayer().getHandItem(player) == null || PlayerHandler.getPlayer().getHandItem(player).getAmount() <= 1) {
+	 						if (ServerHandler.getServer().hasSpecificUpdate("1_9")) { 
+	 							if (event.getHand().equals(EquipmentSlot.HAND)) {
+	 								PlayerHandler.getPlayer().setMainHandItem(player, item);
+	 							} else if (event.getHand().equals(EquipmentSlot.OFF_HAND)) {
+	 								PlayerHandler.getPlayer().setOffHandItem(player, item);
+	 							}
+	 						} 
+	 						else { PlayerHandler.getPlayer().setMainHandItem(player, item); }
+	 					} else if (itemMap.isSimilar(PlayerHandler.getPlayer().getHandItem(player))) { 
+	 						PlayerHandler.getPlayer().getHandItem(player).setAmount(itemMap.getCount()); 
+	 					} 
+	 				}
 	 			}, 2L);
 	 		}
 	 	}
@@ -108,7 +122,20 @@ public class Placement implements Listener {
 	 			if (PlayerHandler.getPlayer().isCreativeMode(player)) {
 	 				if (!ItemUtilities.getUtilities().isAllowed(player, item, "count-lock")) {
 	 					ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item, null, player.getWorld());
-	 					if (itemMap != null) { item.setAmount(itemMap.getCount()); }
+	 					if (itemMap != null) { 
+		 					if (PlayerHandler.getPlayer().getHandItem(player) == null || PlayerHandler.getPlayer().getHandItem(player).getAmount() <= 1) {
+		 						if (ServerHandler.getServer().hasSpecificUpdate("1_9")) { 
+		 							if (event.getHand().equals(EquipmentSlot.HAND)) {
+		 								PlayerHandler.getPlayer().setMainHandItem(player, item);
+		 							} else if (event.getHand().equals(EquipmentSlot.OFF_HAND)) {
+		 								PlayerHandler.getPlayer().setOffHandItem(player, item);
+		 							}
+		 						} 
+		 						else { PlayerHandler.getPlayer().setMainHandItem(player, item); }
+		 					} else if (itemMap.isSimilar(PlayerHandler.getPlayer().getHandItem(player))) { 
+		 						PlayerHandler.getPlayer().getHandItem(player).setAmount(itemMap.getCount()); 
+		 					} 
+	 					}
 	 				}
 	 			}
 	 		} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
