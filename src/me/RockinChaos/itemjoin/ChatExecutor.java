@@ -68,7 +68,7 @@ public class ChatExecutor implements CommandExecutor {
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Updates &7- &eChecks for plugin updates.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Upgrade &7- &eUpdate ItemJoin to latest version.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&aType &a&l/ItemJoin Help 2 &afor the next page.");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]----------------&a&l[&e Help Menu 1/9 &a&l]&a&l&m---------------[");
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]---------------&a&l[&e Help Menu 1/10 &a&l]&a&l&m---------------[");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
 		} else if (Execute.HELP.accept(sender, args, 2)) {
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
@@ -79,7 +79,7 @@ public class ChatExecutor implements CommandExecutor {
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Permissions &7- &eLists the permissions you have.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Permissions 2 &7- &ePermissions page 2.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&aType &a&l/ItemJoin Help 3 &afor the next page.");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]----------------&a&l[&e Help Menu 2/9 &a&l]&a&l&m---------------[");
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]---------------&a&l[&e Help Menu 2/10 &a&l]&a&l&m---------------[");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
 		} else if (Execute.HELP.accept(sender, args, 3)) {
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
@@ -90,7 +90,7 @@ public class ChatExecutor implements CommandExecutor {
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Get <Item> <User> &7- &eGives to said player.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Get <Item> <User> <Qty> &7- &eGives qty to player.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&aType &a&l/ItemJoin Help 4 &afor the next page.");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]----------------&a&l[&e Help Menu 3/9 &a&l]&a&l&m---------------[");
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]---------------&a&l[&e Help Menu 3/10 &a&l]&a&l&m---------------[");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
 		} else if (Execute.HELP.accept(sender, args, 4)) {
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
@@ -100,7 +100,7 @@ public class ChatExecutor implements CommandExecutor {
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Remove <Item> <User> &7- &eRemoves from player.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Remove <Item> <User> <Qty> &7- &eRemoves qty.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&aType &a&l/ItemJoin Help 5 &afor the next page.");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]----------------&a&l[&e Help Menu 4/9 &a&l]&a&l&m---------------[");
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]---------------&a&l[&e Help Menu 4/10 &a&l]&a&l&m---------------[");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
 		} else if (Execute.HELP.accept(sender, args, 5)) {
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
@@ -110,7 +110,7 @@ public class ChatExecutor implements CommandExecutor {
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin RemoveOnline <Item> &7- &eRemoves from all online.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin RemoveOnline <Item> <Qty> &7- &eRemoves qty.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&aType &a&l/ItemJoin Help 6 &afor the next page.");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]----------------&a&l[&e Help Menu 5/9 &a&l]&a&l&m---------------[");
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]---------------&a&l[&e Help Menu 5/10 &a&l]&a&l&m---------------[");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
 		} else if (Execute.HELP.accept(sender, args, 6)) {
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
@@ -120,7 +120,7 @@ public class ChatExecutor implements CommandExecutor {
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin RemoveAll &7- &eRemoves all ItemJoin items.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin RemoveAll <User> &7- &eRemoves from player.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&aType &a&l/ItemJoin Help 7 &afor the next page.");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]----------------&a&l[&e Help Menu 6/9 &a&l]&a&l&m---------------[");
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]---------------&a&l[&e Help Menu 6/10 &a&l]&a&l&m---------------[");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
 		} else if (Execute.HELP.accept(sender, args, 7)) {
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
@@ -129,7 +129,7 @@ public class ChatExecutor implements CommandExecutor {
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Enable <User> &7- &eEnables ItemJoin for player.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Enable <User> <World> &7- &eFor player/world.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&aType &a&l/ItemJoin Help 8 &afor the next page.");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]----------------&a&l[&e Help Menu 7/9 &a&l]&a&l&m---------------[");
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]---------------&a&l[&e Help Menu 7/10 &a&l]&a&l&m---------------[");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
 		} else if (Execute.HELP.accept(sender, args, 8)) {
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
@@ -138,7 +138,7 @@ public class ChatExecutor implements CommandExecutor {
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Disable <User> &7- &eDisables ItemJoin for player.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Disable <User> <World> &7- &eFor player/world.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&aType &a&l/ItemJoin Help 9 &afor the next page.");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]----------------&a&l[&e Help Menu 8/9 &a&l]&a&l&m---------------[");
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]---------------&a&l[&e Help Menu 8/10 &a&l]&a&l&m---------------[");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
 		} else if (Execute.HELP.accept(sender, args, 9)) {
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
@@ -149,10 +149,17 @@ public class ChatExecutor implements CommandExecutor {
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Purge first-join <User> &7- &eFirst-Join data.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Purge first-world <User> &7- &eFirst-World data.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Purge ip-limits <User> &7- &eIp-Limits data.");
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]---------------&a&l[&e Help Menu 9/10 &a&l]&a&l&m---------------[");
+			LanguageAPI.getLang(false).dispatchMessage(sender, "");
+		} else if (Execute.HELP.accept(sender, args, 10)) {
+			LanguageAPI.getLang(false).dispatchMessage(sender, "");
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&c&l[DANGER]&eThe Following Destroys Data &nPermanently!&e&c&l[DANGER]");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Purge enabled-players <User> &7- &eData.");
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Purge first-commands <User> &7- &eData.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&aFound a bug? Report it @");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&ahttps://github.com/RockinChaos/ItemJoin/issues");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]----------------&a&l[&e Help Menu 9/9 &a&l]&a&l&m---------------[");
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]---------------&a&l[&e Help Menu 10/10 &a&l]&a&l&m--------------[");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
 		} else if (Execute.RELOAD.accept(sender, args, 0)) {
 			SQLite.getLite(false).executeLaterStatements();
@@ -181,7 +188,8 @@ public class ChatExecutor implements CommandExecutor {
 			this.permissions(sender, Integer.parseInt(args[1]));
 		} else if (Execute.PURGE.accept(sender, args, 0)) {
 			if (args.length == 1) { this.purge(sender, "Database", "All Players"); } 
-			else if (args[1].equalsIgnoreCase("map-ids") || args[1].equalsIgnoreCase("ip-limits") || args[1].equalsIgnoreCase("first-join") || args[1].equalsIgnoreCase("first-world") || args[1].equalsIgnoreCase("enabled-players")) { 
+			else if (args[1].equalsIgnoreCase("map-ids") || args[1].equalsIgnoreCase("ip-limits") || args[1].equalsIgnoreCase("first-join") || args[1].equalsIgnoreCase("first-world") || args[1].equalsIgnoreCase("enabled-players") 
+				  || args[1].equalsIgnoreCase("first-commands")) { 
 				this.purge(sender, args[1], args[2]); 
 			}
 		} else if (Execute.ENABLE.accept(sender, args, 0)) {
@@ -642,7 +650,8 @@ public class ChatExecutor implements CommandExecutor {
 			return ((args.length >= 2 && (args[1].equalsIgnoreCase(String.valueOf(page)) || (!Utils.getUtils().isInt(args[1]) && !this.equals(Execute.PURGE)))) 
 				 || (args.length < 2 && (!this.equals(Execute.GET) && !this.equals(Execute.GETONLINE) && !this.equals(Execute.REMOVE) && !this.equals(Execute.REMOVEONLINE))
 				 || (this.equals(Execute.PURGE) && (args.length == 1 
-				 || (args.length >= 3 && (args[1].equalsIgnoreCase("map-ids") || args[1].equalsIgnoreCase("ip-limits") || args[1].equalsIgnoreCase("first-join") || args[1].equalsIgnoreCase("first-world") || args[1].equalsIgnoreCase("enabled-players")))))));
+				 || (args.length >= 3 && (args[1].equalsIgnoreCase("map-ids") || args[1].equalsIgnoreCase("ip-limits") || args[1].equalsIgnoreCase("first-join") || args[1].equalsIgnoreCase("first-world") || args[1].equalsIgnoreCase("enabled-players") 
+				 || args[1].equalsIgnoreCase("first-commands")))))));
 		}
 		
        /**

@@ -478,6 +478,9 @@ public class SQLite {
 			} else if (section.equalsIgnoreCase("enabled_players") && this.enabledPlayers.values() != null && !this.enabledPlayers.isEmpty()) {
 				this.executeStatementsLater.add("DELETE FROM ij_" + section + " WHERE Player_UUID='" + UUID + "';");
 				this.enabledPlayers.remove(UUID);
+			} else if (section.equalsIgnoreCase("first_commands") && this.firstCommandPlayers.values() != null && !this.firstCommandPlayers.isEmpty()) {
+				this.executeStatementsLater.add("DELETE FROM ij_" + section + " WHERE Player_UUID='" + UUID + "';");
+				this.firstCommandPlayers.remove(UUID);
 			}
 		}
 	}
@@ -666,6 +669,15 @@ public class SQLite {
     */
 	public Map<String, List<String>> getEnabledPlayers() {
 		return this.enabledPlayers;
+	}
+	
+   /**
+    * Gets the players who have first commanded their active commands.
+    * 
+    * @return The HashMap of players that first commanded.
+    */
+	public Map<String, List<String>> getFirstCommands() {
+		return this.firstCommandPlayers;
 	}
 	
    /**
