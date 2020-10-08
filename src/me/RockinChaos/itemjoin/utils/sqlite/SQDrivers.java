@@ -23,7 +23,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-import me.RockinChaos.itemjoin.utils.Utils;
 import me.RockinChaos.itemjoin.utils.sqlite.Database;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
@@ -32,14 +31,8 @@ import me.RockinChaos.itemjoin.handlers.ServerHandler;
 public class SQDrivers extends Database {
 	
 	private String dbname;
-	private int port = 3306;
-	private String host = "localhost";
-	private String table = "database";
-	private String user = "root";
-	private String pass = "password";
-	private boolean remoteEnabled = false;
-	private static SQDrivers database;
-
+	private boolean closeConnection = true;
+	private static SQDrivers drivers;
 	
    /**
 	* Creates a new instance of SQL Connections.
@@ -58,42 +51,48 @@ public class SQDrivers extends Database {
 	*/
 	@Override
 	public Connection getSQLConnection() {
-		if (ConfigHandler.getConfig(false).getFile("config.yml").getString("Database.MySQL") != null && ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Database.MySQL")) {
-			this.remoteEnabled = true;
-			try { 
-				if (this.connection != null && !this.connection.isClosed()) { 
-			    	return this.connection; 
-			    } else {
-			    	Class.forName("com.mysql.jdbc.Driver");
-			    	this.connection = DriverManager.getConnection("jdbc:mysql://" + this.host + ":" + this.port + "/" + this.table + "?useSSL=false", Utils.getUtils().decrypt(this.user), Utils.getUtils().decrypt(this.pass));
-			        return this.connection;
-			    }
-			} catch (Exception e) { 
+		synchronized (this) {
+			if (ConfigHandler.getConfig(false).getFile("config.yml").getString("Database.MySQL") != null && ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Database.MySQL")) {
+				try { 
+					if (this.connection != null && !this.connection.isClosed()) {
+				    	return this.connection; 
+				    } else {
+				    	Class.forName("com.mysql.jdbc.Driver");
+				    	this.connection = DriverManager.getConnection("jdbc:mysql://" + 
+				    						ConfigHandler.getConfig(false).getFile("config.yml").getString("Database.host")+ ":" + 
+				    						ConfigHandler.getConfig(false).getFile("config.yml").getInt("Database.port") + "/" + 
+				    						ConfigHandler.getConfig(false).getFile("config.yml").getString("Database.table") + "?createDatabaseIfNotExist=true" + "&useSSL=false", 
+				    						ConfigHandler.getConfig(false).getFile("config.yml").getString("Database.user"), ConfigHandler.getConfig(false).getFile("config.yml").getString("Database.pass"));
+				    	this.closeConnection = false;
+				        return this.connection;
+				    }
+				} catch (Exception e) { 
 					ServerHandler.getServer().logSevere("{MySQL} Unable to connect to the defined MySQL database, check your settings.");
-					ServerHandler.getServer().sendDebugTrace(e); 
-			}
-			return null;
-		} else {
-			File dataFolder = new File(ItemJoin.getInstance().getDataFolder(), this.dbname + ".db");
-			if (!dataFolder.exists()) {
-				try { dataFolder.createNewFile(); } 
-				catch (IOException e) { 
-					ServerHandler.getServer().logSevere("{SQLite} File write error: " + this.dbname + ".db.");
+					ServerHandler.getServer().sendSevereTrace(e); 
+				}
+				return null;
+			} else {
+				File dataFolder = new File(ItemJoin.getInstance().getDataFolder(), this.dbname + ".db");
+				if (!dataFolder.exists()) {
+					try { dataFolder.createNewFile(); } 
+					catch (IOException e) { 
+						ServerHandler.getServer().logSevere("{SQLite} File write error: " + this.dbname + ".db.");
+						ServerHandler.getServer().sendDebugTrace(e);
+					}
+				} try {
+					if ((connection != null) && (!connection.isClosed())) { return this.connection; }
+					Class.forName("org.sqlite.JDBC");
+					this.connection = DriverManager.getConnection("jdbc:sqlite:" + dataFolder);
+					return this.connection;
+				} catch (SQLException e) { 
+					ServerHandler.getServer().logSevere("{SQLite} SQLite exception on initialize.");
+					ServerHandler.getServer().sendDebugTrace(e);
+				} catch (ClassNotFoundException e) { 
+					ServerHandler.getServer().logSevere("{SQLite} You need the SQLite JBDC library, see: https://bitbucket.org/xerial/sqlite-jdbc/downloads/ and put it in the /lib folder of Java.");
 					ServerHandler.getServer().sendDebugTrace(e);
 				}
-			} try {
-				if ((connection != null) && (!connection.isClosed())) { return this.connection; }
-				Class.forName("org.sqlite.JDBC");
-				this.connection = DriverManager.getConnection("jdbc:sqlite:" + dataFolder);
-				return this.connection;
-			} catch (SQLException e) { 
-				ServerHandler.getServer().logSevere("{SQLite} SQLite exception on initialize.");
-				ServerHandler.getServer().sendDebugTrace(e);
-			} catch (ClassNotFoundException e) { 
-				ServerHandler.getServer().logSevere("{SQLite} You need the SQLite JBDC library, see: https://bitbucket.org/xerial/sqlite-jdbc/downloads/ and put it in /lib folder.");
-				ServerHandler.getServer().sendDebugTrace(e);
+				return null;
 			}
-			return null;
 		}
 	}
 	
@@ -104,58 +103,34 @@ public class SQDrivers extends Database {
 	@Override
 	public void load() {
         ServerHandler.getServer().runAsyncThread(async -> {
-			connection = getSQLConnection();
-			initialize(remoteEnabled);
+			this.connection = this.getSQLConnection();
+			initialize();
         });
 	}
 	
    /**
-	* Purges the data of the specified database.
+	* Attempts to close the Database Connection.
 	* 
-	* @param dbname - the name of the database to be purged.
 	*/
-	public void deleteDatabase() {
-		if (!(ConfigHandler.getConfig(false).getFile("config.yml").getString("Database.MySQL") != null && ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Database.MySQL"))) {
-			File dataFolder = new File(ItemJoin.getInstance().getDataFolder(), this.dbname + ".db");
-			if (dataFolder.exists()) {
-				try { dataFolder.delete(); } 
-				catch (Exception e) {
-					ServerHandler.getServer().logSevere("{SQLite} Failed to close database " + this.dbname + ".db after purging.");
-					ServerHandler.getServer().sendDebugTrace(e); 
-				}
+	public void closeConnection() {
+		if (this.closeConnection) {
+			try {
+				this.connection.close();
+			} catch (SQLException e) {
+				ServerHandler.getServer().logSevere("{SQLite} [11] Failed to close database connection."); 
+				ServerHandler.getServer().sendDebugTrace(e);
 			}
 		}
 	}
 	
    /**
-	* Loads the necessary MySQL Database Connection information.
-    * 
-	*/
-	public void loadSQLDatabase() {
-		if (ConfigHandler.getConfig(false).getFile("config.yml").getString("Database.port") != null) { this.port = ConfigHandler.getConfig(false).getFile("config.yml").getInt("Database.port"); }
-		if (ConfigHandler.getConfig(false).getFile("config.yml").getString("Database.host") != null) { this.host = ConfigHandler.getConfig(false).getFile("config.yml").getString("Database.host"); }
-		if (ConfigHandler.getConfig(false).getFile("config.yml").getString("Database.table") != null) { this.table = ConfigHandler.getConfig(false).getFile("config.yml").getString("Database.table"); }
-		if (ConfigHandler.getConfig(false).getFile("config.yml").getString("Database.user") != null) { this.user = Utils.getUtils().encrypt(ConfigHandler.getConfig(false).getFile("config.yml").getString("Database.user")); }
-		if (ConfigHandler.getConfig(false).getFile("config.yml").getString("Database.pass") != null) { this.pass = Utils.getUtils().encrypt(ConfigHandler.getConfig(false).getFile("config.yml").getString("Database.pass")); }
-	}
-	
-   /**
-	* Checks if there is a remote database or if it is a locale database.
+	* Gets the instance of the SQDrivers.
 	* 
-	* @return If there is a remote database enabled.
-	*/
-	public boolean remoteEnabled() {
-		return this.remoteEnabled;
-	}
-	
-   /**
-	* Gets the instance of the SQL database.
-	* 
-	* @param database - The database being fetched.
-	* @return The SQLite database instance.
+	* @param dbname - The database being fetched.
+	* @return The SQDrivers instance.
 	*/
 	public static SQDrivers getDatabase(final String dbname) {
-		if (database == null) { database = new SQDrivers(dbname); }
-        return database; 
+		if (drivers == null) { drivers = new SQDrivers(dbname); }
+        return drivers; 
 	}
 }

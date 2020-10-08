@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -91,7 +90,6 @@ public class SQLite {
 			}
 			ServerHandler.getServer().logDebug("{SQLite} Saving newly generated data to the database.");
 			this.executeStatementsLater.clear();
-			try { SQDrivers.getDatabase("database").closeConnection(); } catch (Exception e) { }
 		}
 	}
 	
@@ -100,13 +98,10 @@ public class SQLite {
     * 
     */
 	private void executeSaveStatements() {
-        Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
-            @Override
-			public void run() {
-            	executeLaterStatements();
-            	executeSaveStatements();
-            }
-        }, 36000L);
+		ServerHandler.getServer().runThread(main -> {
+			this.executeLaterStatements();
+            this.executeSaveStatements();
+		}, 36000L);
 	}
 	
    /**
@@ -890,7 +885,6 @@ public class SQLite {
 						OfflinePlayer player = ItemJoin.getInstance().getServer().getOfflinePlayer(UUID.fromString(uuid.getName()));
 						if (!SQDrivers.getDatabase("database").dataExists("SELECT * FROM ij_first_join WHERE World_Name='" + world.getName() + "' AND Player_UUID='" + uuid.getName() + "' AND Item_Name='" + item.getName() + "';")) {
 							SQDrivers.getDatabase("database").executeStatement("INSERT INTO ij_first_join (`World_Name`, `Player_Name`, `Player_UUID`, `Item_Name`) VALUES ('" + world.getName() + "','" + player.getName().toString() + "','" + uuid.getName() + "','" + item.getName() + "')");
-							SQDrivers.getDatabase("database").closeConnection();
 						}
 					}
 				}
@@ -924,7 +918,6 @@ public class SQLite {
 						ConfigurationSection ipaddr = item.getConfigurationSection(ipaddrsec);
 						if (!SQDrivers.getDatabase("database").dataExists("SELECT * FROM ij_ip_limits WHERE World_Name='" + world.getName() + "' AND IP_Address='" + ipaddr.getName() + "' AND Item_Name='" + item.getName() + "';")) {
 							SQDrivers.getDatabase("database").executeStatement("INSERT INTO ij_ip_limits (`World_Name`, `IP_Address`, `Player_UUID`, `Item_Name`) VALUES ('" + world.getName() + "','" + ipaddr.getName() + "','" + ipaddr.get("Current User") + "','" + item.getName() + "')");
-							SQDrivers.getDatabase("database").closeConnection();
 						}
 					}
 				}
