@@ -277,7 +277,7 @@ public class GuardAPI {
 			Inventory saveInventory = Bukkit.createInventory(null, 54);
 			for (int i = 0; i <= 47; i++) {
 				for (int k = 0; k < (!protectItems.isEmpty() ? protectItems.size() : 1); k++) {
-					if (ItemUtilities.getUtilities().canClear(inventory.getItem(i), String.valueOf(i), k, clearAll) && i <= 41) {
+					if (i <= 41 && inventory.getSize() >= i && ItemUtilities.getUtilities().canClear(inventory.getItem(i), String.valueOf(i), k, clearAll)) {
 						saveInventory.setItem(i, inventory.getItem(i).clone());
 					} else if (i >= 42 && ItemUtilities.getUtilities().canClear(craftView.getItem(i - 42), "CRAFTING[" + (i - 42) + "]", k, clearAll) && PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
 						saveInventory.setItem(i, craftView.getItem(i - 42).clone());
