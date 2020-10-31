@@ -129,13 +129,17 @@ public class Crafting implements Listener {
     	if (PlayerHandler.getPlayer().isCraftingInv(view) && event.getSlot() <= 4) {
     		if (event.getSlot() != 0 && event.getSlotType() == SlotType.CRAFTING) {
     			if (craftingContents[0] != null && craftingContents[0].getType() != Material.AIR) {
-    				ItemHandler.getItem().returnCraftingItem(player, 0, craftingContents[0], 1L);
+    				final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(craftingContents[0], null, player.getWorld());
+    				if (itemMap != null && itemMap.isCraftingItem()) {
+    					ItemHandler.getItem().returnCraftingItem(player, 0, craftingContents[0], 1L);
+    				}
     			}
     		} else if (event.getSlot() == 0 && event.getSlotType() == SlotType.RESULT) {
     			if (craftingContents[0] != null && craftingContents[0].getType() != Material.AIR) {
     				for (ItemMap itemMap: ItemUtilities.getUtilities().getCraftingItems()) {
     					if (!itemMap.isMovement() && itemMap.isSimilar(craftingContents[0])) {
     						for (int i = 1; i <= 4; i++) { ItemHandler.getItem().returnCraftingItem(player, i, craftingContents[i].clone(), 1L); }
+    						ServerHandler.getServer().runThread(main -> player.getOpenInventory().getTopInventory().setItem(0, new ItemStack(Material.AIR)), 1L);
     						break;
     					}
     				}
