@@ -423,7 +423,7 @@ public class ItemUtilities {
     */
 	public boolean canOverwrite(final Player player, final ItemMap itemMap) {
 		try {
-			if (this.isOverwritable(player, itemMap) || (itemMap.isDropFull() || ((itemMap.isGiveNext() || itemMap.isMoveNext()) && player.getInventory().firstEmpty() != -1))) { return true; }
+			if ((itemMap.isCraftingItem() && Utils.getUtils().getSlotConversion(itemMap.getSlot()) == 0) || this.isOverwritable(player, itemMap) || (itemMap.isDropFull() || ((itemMap.isGiveNext() || itemMap.isMoveNext()) && player.getInventory().firstEmpty() != -1))) { return true; }
 		} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
 		return false;
 	}
@@ -545,7 +545,7 @@ public class ItemUtilities {
 				player.getEquipment().setBoots(item);
 			} else if (ServerHandler.getServer().hasSpecificUpdate("1_9") && CustomSlot.OFFHAND.isSlot(itemMap.getSlot()) && (existingItem == null || overWrite)) {
 				PlayerHandler.getPlayer().setOffHandItem(player, item);
-			} else if (craftSlot != -1 && (existingItem == null || overWrite)) {
+			} else if (craftSlot != -1 && (existingItem == null || overWrite || craftSlot == 0)) {
 				this.setCraftingSlots(player, item, craftSlot, 240);
 			} else if (itemMap.isDropFull()) {
 				player.getWorld().dropItem(player.getLocation(), item);
@@ -573,6 +573,9 @@ public class ItemUtilities {
 					} else { ServerHandler.getServer().runThread(craft_2 -> { this.setCraftingSlots(player, itemStack, craftSlot, (attempts - 1)); }, 20L); }
 				}, 2L);
 			} else if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
+				if (player.getOpenInventory().getTopInventory().getItem(0) != null && !player.getOpenInventory().getTopInventory().getItem(0).getType().equals(Material.AIR)) {
+					ItemHandler.getItem().returnCraftingItem(player, 0, player.getOpenInventory().getTopInventory().getItem(0).clone(), 0L);
+				}
 				player.getOpenInventory().getTopInventory().setItem(craftSlot, itemStack);
 			} else { ServerHandler.getServer().runThread(craft -> { this.setCraftingSlots(player, itemStack, craftSlot, (attempts - 1)); }, 20L); }
 		}
