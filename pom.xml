@@ -83,19 +83,6 @@
 							<goal>shade</goal>
 						</goals>
 						<configuration>
-							<artifactSet>
-								<includes>
-									<include>tv.mineinthebox.simpleserver:SimpleHttpServer:jar:</include>
-								</includes>
-							</artifactSet>
-							<relocations>
-								<relocation>
-									<pattern>tv.mineinthebox.simpleserver</pattern>
-									<shadedPattern>tv.mineinthebox.simpleserver</shadedPattern>
-									<pattern>com.googlecode.json-simple</pattern>
-									<shadedPattern>com.googlecode.json-simple</shadedPattern>
-								</relocation>
-							</relocations>
 							<filters>
 								<filter>
 									<artifact>*</artifact>
@@ -103,6 +90,7 @@
 										<exclude>META-INF/*.SF</exclude>
 										<exclude>META-INF/*.RSA</exclude>
 										<exclude>META-INF/*.INF</exclude>
+										<exclude>META-INF/*.MF</exclude>
 									</excludes>
 								</filter>
 							</filters>
@@ -182,7 +170,7 @@
 		<dependency>
 			<groupId>org.spigotmc</groupId>
 			<artifactId>spigot-api</artifactId>
-			<version>1.16.2-R0.1-SNAPSHOT</version>
+			<version>1.16.3-R0.1-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
 		<!--PlaceholderAPI API-->
@@ -306,7 +294,7 @@
 	</issueManagement>
 	<ciManagement>
 		<system>Jenkins</system>
-		<url>http://ci.craftationgaming.com/job/ItemJoin/</url>
+		<url>https://ci.craftationgaming.com/job/ItemJoin/</url>
 	</ciManagement>
 	<distributionManagement>
 		<repository>
