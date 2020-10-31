@@ -460,7 +460,7 @@ public class ChatExecutor implements CommandExecutor {
 		for (ItemMap itemMap: ItemUtilities.getUtilities().getItems()) {
 			if (itemMap.getConfigName().equalsIgnoreCase(args[1])) {
 				String customName = Utils.getUtils().translateLayout(itemMap.getCustomName(), argsPlayer); placeHolders[3] = customName;
-				if ((remove && itemMap.hasItem(argsPlayer)) || (!remove && (amount != 0 || itemMap.isAlwaysGive() || !itemMap.hasItem(argsPlayer)))) {
+				if ((remove && itemMap.hasItem(argsPlayer)) || (!remove && ItemUtilities.getUtilities().canOverwrite(argsPlayer, itemMap) && (amount != 0 || itemMap.isAlwaysGive() || !itemMap.hasItem(argsPlayer)))) {
 					if (remove || !PermissionsHandler.getPermissions().receiveEnabled() || (itemMap.hasPermission(argsPlayer) && PermissionsHandler.getPermissions().receiveEnabled())) {
 						if (itemMap.isAlwaysGive() && (args.length < 2 || (!Utils.getUtils().isInt(args[args.length - 1])))) { amount = itemMap.getCount(); }
 						if (argsPlayer.getOpenInventory().getTopInventory().getItem(0) != null && !argsPlayer.getOpenInventory().getTopInventory().getItem(0).getType().equals(Material.AIR)) {
@@ -510,7 +510,7 @@ public class ChatExecutor implements CommandExecutor {
 			for (ItemMap itemMap: ItemUtilities.getUtilities().getItems()) {
 				if (itemMap.getConfigName().equalsIgnoreCase(args[1])) {
 					if (remove || !PermissionsHandler.getPermissions().receiveEnabled() || (itemMap.hasPermission(argsPlayer) && PermissionsHandler.getPermissions().receiveEnabled())) {
-						if ((remove && itemMap.hasItem(argsPlayer)) || (!remove && (amount != 0 || itemMap.isAlwaysGive() || !itemMap.hasItem(argsPlayer)))) {
+						if ((remove && itemMap.hasItem(argsPlayer)) || (!remove && ItemUtilities.getUtilities().canOverwrite(argsPlayer, itemMap) && (amount != 0 || itemMap.isAlwaysGive() || !itemMap.hasItem(argsPlayer)))) {
 							if (argsPlayer.getOpenInventory().getTopInventory().getItem(0) != null && !argsPlayer.getOpenInventory().getTopInventory().getItem(0).getType().equals(Material.AIR)) {
 								ItemHandler.getItem().returnCraftingItem(argsPlayer, 0, argsPlayer.getOpenInventory().getTopInventory().getItem(0).clone(), 0L);
 							}
@@ -553,7 +553,6 @@ public class ChatExecutor implements CommandExecutor {
 		}
 		final ItemMap probable = Chances.getChances().getRandom(argsPlayer);
 		for (ItemMap itemMap: ItemUtilities.getUtilities().getItems()) {
-			if ((!remove ? (itemMap.inWorld(argsPlayer.getWorld()) && Chances.getChances().isProbability(itemMap, probable) && 
 				(!PermissionsHandler.getPermissions().receiveEnabled() || (itemMap.hasPermission(argsPlayer) && PermissionsHandler.getPermissions().receiveEnabled()))) : remove)) {
 				if ((remove && itemMap.hasItem(argsPlayer)) || ((!remove && !itemMap.hasItem(argsPlayer)) || (!remove && itemMap.isAlwaysGive()))) {
 					if (remove) { itemMap.removeFrom(argsPlayer); } 
