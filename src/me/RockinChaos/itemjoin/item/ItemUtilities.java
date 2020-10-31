@@ -421,7 +421,7 @@ public class ItemUtilities {
     * @param itemMap - The ItemMap being checked.
     * @return If the ItemMap is Overwritable.
     */
-	private boolean canOverwrite(final Player player, final ItemMap itemMap) {
+	public boolean canOverwrite(final Player player, final ItemMap itemMap) {
 		try {
 			if (this.isOverwritable(player, itemMap) || (itemMap.isDropFull() || ((itemMap.isGiveNext() || itemMap.isMoveNext()) && player.getInventory().firstEmpty() != -1))) { return true; }
 		} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
