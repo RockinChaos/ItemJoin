@@ -1,6 +1,7 @@
 package me.RockinChaos.itemjoin.listeners;
 
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -22,16 +23,16 @@ public class Interact implements Listener {
 	 * 
 	 * @param event - PlayerInteractEvent
 	 */
-	 @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+	 @EventHandler(priority = EventPriority.LOW, ignoreCancelled = false)
 	 private void onInteractCancel(PlayerInteractEvent event) {
 	 	ItemStack item = event.getItem();
 	 	Player player = event.getPlayer();
-	 	if (!PlayerHandler.getPlayer().isMenuClick(player.getOpenInventory(), event.getAction()) && (event.hasItem() && event.getAction() != Action.PHYSICAL && !ItemUtilities.getUtilities().isAllowed(player, item, "cancel-events")
-	 			|| event.getAction() != Action.PHYSICAL && ServerHandler.getServer().hasSpecificUpdate("1_9") && event.getHand() != null 
-	 			&& event.getHand().toString().equalsIgnoreCase("OFF_HAND") && !ItemUtilities.getUtilities().isAllowed(player, PlayerHandler.getPlayer().getMainHandItem(event.getPlayer()), "cancel-events"))) {
+	 	if ((!PlayerHandler.getPlayer().isMenuClick(player.getOpenInventory(), event.getAction()) && (event.hasItem() && event.getAction() != Action.PHYSICAL && !ItemUtilities.getUtilities().isAllowed(player, item, "cancel-events")
+	 			|| (event.getAction() != Action.PHYSICAL && event.getAction() != Action.LEFT_CLICK_AIR && ServerHandler.getServer().hasSpecificUpdate("1_9") && event.getHand() != null 
+	 			&& event.getHand().toString().equalsIgnoreCase("OFF_HAND") && !ItemUtilities.getUtilities().isAllowed(player, PlayerHandler.getPlayer().getMainHandItem(event.getPlayer()), "cancel-events"))))) {
 	 		if (ItemHandler.getItem().isBookQuill(item) || ItemHandler.getItem().isBookQuill(PlayerHandler.getPlayer().getMainHandItem(event.getPlayer()))) { player.closeInventory(); } 
-	 		event.setCancelled(true);
-	 		PlayerHandler.getPlayer().updateInventory(player, 1L);
+	 		event.setUseItemInHand(Result.DENY);
+	 		event.setUseInteractedBlock(Result.DENY);
 	 	}
 	 }
 	 
