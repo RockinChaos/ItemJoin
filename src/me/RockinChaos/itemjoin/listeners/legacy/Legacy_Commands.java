@@ -196,10 +196,15 @@ public class Legacy_Commands implements Listener {
 				|| !PlayerHandler.getPlayer().isAdventureMode(player)) && !this.isDropEvent(event.getPlayer())) {
 			ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(PlayerHandler.getPlayer().getHandItem(player), null, player.getWorld());
 			if (itemMap != null && itemMap.isSimilar(item)) {
-				this.runCommands(player, item, action, (event.getAction() == Action.PHYSICAL ? "INTERACTED" : action.split("_")[0]), String.valueOf(player.getInventory().getHeldItemSlot()));
+				long dupeDuration = (this.interactDupe != null && !this.interactDupe.isEmpty() && this.interactDupe.get(item) != null ? (((System.currentTimeMillis()) - this.interactDupe.get(item))) : -1);
+				if (dupeDuration == -1 || dupeDuration > 30) {
+					this.interactDupe.put(item, System.currentTimeMillis());
+					this.runCommands(player, item, action, (event.getAction() == Action.PHYSICAL ? "INTERACTED" : action.split("_")[0]), String.valueOf(player.getInventory().getHeldItemSlot()));
+				}
 			}
 		}
 	}
+	public HashMap<ItemStack, Long> interactDupe = new HashMap<ItemStack, Long>();
 	
    /**
 	* Runs the commands upon left clicking with the custom item in adventure mode.

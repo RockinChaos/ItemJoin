@@ -144,7 +144,7 @@ public class Commands implements Listener {
 		if (item != null && item.getType() != Material.AIR && !PlayerHandler.getPlayer().isMenuClick(player.getOpenInventory(), event.getAction())) {
 			String[] itemType = item.getType().name().split("_");
 			if (itemType.length >= 2 && itemType[1] != null && !itemType[1].isEmpty() && Utils.getUtils().isInt(Utils.getUtils().getArmorSlot(itemType[1], true)) 
-				&& player.getInventory().getItem(Integer.parseInt(Utils.getUtils().getArmorSlot(itemType[1], true))) == null) { 
+				&& player.getInventory().getItem(Integer.parseInt(Utils.getUtils().getArmorSlot(itemType[1], true))) == null) {
 				this.equipCommands(player, event.getItem(), "ON_EQUIP", "EQUIPPED", Utils.getUtils().getArmorSlot(itemType[1], true), SlotType.ARMOR);
 			}
 		}
@@ -189,7 +189,7 @@ public class Commands implements Listener {
 			}
 		}
 	}
-
+	
    /**
 	* Runs the commands upon physically interacting with the custom item.
 	* 
@@ -203,10 +203,15 @@ public class Commands implements Listener {
 		if (((PlayerHandler.getPlayer().isAdventureMode(player) && !action.contains("LEFT") || !PlayerHandler.getPlayer().isAdventureMode(player))) && !this.isDropEvent(event.getPlayer())) {
 			ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(PlayerHandler.getPlayer().getHandItem(player), null, player.getWorld());
 			if (!PlayerHandler.getPlayer().isMenuClick(player.getOpenInventory(), event.getAction()) && itemMap != null && itemMap.isSimilar(item)) {
-				this.runCommands(player, item, action, (event.getAction() == Action.PHYSICAL ? "INTERACTED" : action.split("_")[0]), String.valueOf(player.getInventory().getHeldItemSlot()));
+				long dupeDuration = (this.interactDupe != null && !this.interactDupe.isEmpty() && this.interactDupe.get(item) != null ? (((System.currentTimeMillis()) - this.interactDupe.get(item))) : -1);
+				if (dupeDuration == -1 || dupeDuration > 30) {
+					this.interactDupe.put(item, System.currentTimeMillis());
+					this.runCommands(player, item, action, (event.getAction() == Action.PHYSICAL ? "INTERACTED" : action.split("_")[0]), String.valueOf(player.getInventory().getHeldItemSlot()));
+				}
 			}
 		}
 	}
+	public HashMap<ItemStack, Long> interactDupe = new HashMap<ItemStack, Long>();
 	
    /**
 	* Runs the commands upon left clicking with the custom item in adventure mode.
