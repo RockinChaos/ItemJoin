@@ -83,6 +83,19 @@
 							<goal>shade</goal>
 						</goals>
 						<configuration>
+							<artifactSet>
+								<includes>
+									<include>tv.mineinthebox.simpleserver:SimpleHttpServer:jar:</include>
+								</includes>
+							</artifactSet>
+							<relocations>
+								<relocation>
+									<pattern>tv.mineinthebox.simpleserver</pattern>
+									<shadedPattern>tv.mineinthebox.simpleserver</shadedPattern>
+									<pattern>com.googlecode.json-simple</pattern>
+									<shadedPattern>com.googlecode.json-simple</shadedPattern>
+								</relocation>
+							</relocations>
 							<filters>
 								<filter>
 									<artifact>*</artifact>
@@ -170,7 +183,7 @@
 		<dependency>
 			<groupId>org.spigotmc</groupId>
 			<artifactId>spigot-api</artifactId>
-			<version>1.16.3-R0.1-SNAPSHOT</version>
+			<version>1.16.4-R0.1-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
 		<!--PlaceholderAPI API-->
