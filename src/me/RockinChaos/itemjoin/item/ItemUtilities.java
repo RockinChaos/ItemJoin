@@ -209,31 +209,29 @@ public class ItemUtilities {
 	private void handleItems(final Player player, TriggerType type, final GameMode newMode, final String region) {
 		final ItemMap randomMap = Chances.getChances().getRandom(player);
 		final int session = Utils.getUtils().getRandom(1, 100000);
-		ServerHandler.getServer().runAsyncThread(async -> { 
-			for (ItemMap item : this.getItems()) { 
-				item.setAnimations(player);
-				if (((type.equals(TriggerType.JOIN) && item.isGiveOnJoin()) 
-				  || (type.equals(TriggerType.RESPAWN) && item.isGiveOnRespawn())
-				  || (type.equals(TriggerType.WORLDSWITCH) && item.isGiveOnWorldSwitch())
-				  || (type.equals(TriggerType.LIMITSWITCH) && item.isUseOnLimitSwitch())
-				  || ((((type.equals(TriggerType.REGIONENTER) && item.isGiveOnRegionEnter()) 
-				  || (type.equals(TriggerType.REGIONLEAVE) && item.isTakeOnRegionLeave())) && item.inRegion(region))))
-						 && item.inWorld(player.getWorld()) && Chances.getChances().isProbability(item, randomMap) 
-						 && SQLite.getLite(false).isEnabled(player) && item.hasPermission(player) 
-						 && this.isObtainable(player, item, session, type, (newMode != null ? newMode : player.getGameMode()))) {
-					item.giveTo(player); 
-				} else if (((type.equals(TriggerType.LIMITSWITCH) && item.isUseOnLimitSwitch() && !item.isLimitMode(newMode))
-						|| (((type.equals(TriggerType.REGIONENTER) && item.isTakeOnRegionLeave()) 
-						|| (type.equals(TriggerType.REGIONLEAVE) && item.isGiveOnRegionEnter())) && item.inRegion(region))) 
-						&& item.inWorld(player.getWorld()) && item.hasItem(player)) {
-					item.removeFrom(player);
-				} else if (item.isAutoRemove() && !item.inWorld(player.getWorld()) && item.hasItem(player)) {
-					item.removeFrom(player);
-				}
+		for (ItemMap item : this.getItems()) { 
+			item.setAnimations(player);
+			if (((type.equals(TriggerType.JOIN) && item.isGiveOnJoin()) 
+			  || (type.equals(TriggerType.RESPAWN) && item.isGiveOnRespawn())
+			  || (type.equals(TriggerType.WORLDSWITCH) && item.isGiveOnWorldSwitch())
+			  || (type.equals(TriggerType.LIMITSWITCH) && item.isUseOnLimitSwitch())
+		      || ((((type.equals(TriggerType.REGIONENTER) && item.isGiveOnRegionEnter()) 
+			  || (type.equals(TriggerType.REGIONLEAVE) && item.isTakeOnRegionLeave())) && item.inRegion(region))))
+			   && item.inWorld(player.getWorld()) && Chances.getChances().isProbability(item, randomMap) 
+			   && SQLite.getData(false).isEnabled(player) && item.hasPermission(player) 
+			   && this.isObtainable(player, item, session, type, (newMode != null ? newMode : player.getGameMode()))) {
+				item.giveTo(player); 
+			} else if (((type.equals(TriggerType.LIMITSWITCH) && item.isUseOnLimitSwitch() && !item.isLimitMode(newMode))
+					|| (((type.equals(TriggerType.REGIONENTER) && item.isTakeOnRegionLeave()) 
+					|| (type.equals(TriggerType.REGIONLEAVE) && item.isGiveOnRegionEnter())) && item.inRegion(region))) 
+					&& item.inWorld(player.getWorld()) && item.hasItem(player)) {
+				item.removeFrom(player);
+			} else if (item.isAutoRemove() && !item.inWorld(player.getWorld()) && item.hasItem(player)) {
+				item.removeFrom(player);
 			}
-			this.sendFailCount(player, session);
-			PlayerHandler.getPlayer().updateInventory(player, 15L);
-		});
+		}
+		this.sendFailCount(player, session);
+		PlayerHandler.getPlayer().updateInventory(player, 15L);
 	}
 	
    /**
