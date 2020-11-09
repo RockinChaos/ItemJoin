@@ -84,11 +84,14 @@
 						</goals>
 						<configuration>
 							<artifactSet>
+								<includes>
+									<include>tv.mineinthebox.simpleserver:SimpleHttpServer:jar:</include>
+								</includes>
 							</artifactSet>
 							<relocations>
 								<relocation>
-									<pattern>com.googlecode.json-simple</pattern>
-									<shadedPattern>com.googlecode.json-simple</shadedPattern>
+									<pattern>tv.mineinthebox.simpleserver</pattern>
+									<shadedPattern>tv.mineinthebox.simpleserver</shadedPattern>
 								</relocation>
 							</relocations>
 							<filters>
