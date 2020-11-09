@@ -218,7 +218,7 @@ public class ItemUtilities {
 		      || ((((type.equals(TriggerType.REGIONENTER) && item.isGiveOnRegionEnter()) 
 			  || (type.equals(TriggerType.REGIONLEAVE) && item.isTakeOnRegionLeave())) && item.inRegion(region))))
 			   && item.inWorld(player.getWorld()) && Chances.getChances().isProbability(item, randomMap) 
-			   && SQLite.getData(false).isEnabled(player) && item.hasPermission(player) 
+			   && SQLite.getLite(false).isEnabled(player) && item.hasPermission(player) 
 			   && this.isObtainable(player, item, session, type, (newMode != null ? newMode : player.getGameMode()))) {
 				item.giveTo(player); 
 			} else if (((type.equals(TriggerType.LIMITSWITCH) && item.isUseOnLimitSwitch() && !item.isLimitMode(newMode))
