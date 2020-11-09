@@ -36,6 +36,7 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Statistic;
@@ -563,7 +564,7 @@ public class Utils {
 			try { str = str.replace("%player_food%", String.valueOf(player.getFoodLevel())); } catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
 			try { str = str.replace("%player_health%", String.valueOf(player.getHealth())); } catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
 			try { str = str.replace("%player_location%", player.getLocation().getBlockX() + ", " + player.getLocation().getBlockY() + ", " + player.getLocation().getBlockZ()); } catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
-			try { str = str.replace("%player_interact%", PlayerHandler.getPlayer().getNearbyPlayer(player, 3)); } catch (Exception e) { } }
+			try { if (Bukkit.isPrimaryThread()) { str = str.replace("%player_interact%", PlayerHandler.getPlayer().getNearbyPlayer(player, 3)); } } catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); } }
 		if (player == null) { try { str = str.replace("%player%", "CONSOLE"); } catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); } }
 		str = ChatColor.translateAlternateColorCodes('&', this.translateHexColorCodes(str));
 		if (DependAPI.getDepends(false).placeHolderEnabled()) {
