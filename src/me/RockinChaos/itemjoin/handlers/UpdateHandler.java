@@ -122,8 +122,8 @@ public class UpdateHandler {
     			ServerHandler.getServer().messageSender(sender, "&cYour current version: &bv" + this.localeVersion + "-RELEASE");
     		}
     		ServerHandler.getServer().messageSender(sender, "&cA new version is available: " + "&av" + this.latestVersion + "-RELEASE");
-    		ServerHandler.getServer().messageSender(sender, "&aGet it from: https://www.spigotmc.org/resources/itemjoin.12661/history");
-    		ServerHandler.getServer().messageSender(sender, "&aIf you wish to auto update, please type /ItemJoin AutoUpdate");
+    		ServerHandler.getServer().messageSender(sender, "&aGet it from: https://www.spigotmc.org/resources/" + ItemJoin.getInstance().getName().toLowerCase() + "." + this.PROJECTID + "/history");
+    		ServerHandler.getServer().messageSender(sender, "&aIf you wish to auto update, please type /ItemJoin Upgrade");
     		this.sendNotifications();
     	} else if (this.updatesAllowed) {
     		if (this.betaVersion) {
