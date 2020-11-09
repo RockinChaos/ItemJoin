@@ -43,7 +43,7 @@ public class PermissionsHandler {
 	}
 	
    /**
-    * Gives all ItemJoin items to the specified player.
+    * Checks if the sender has permission.
     * 
     * @param sender - The entity that is having their permissions checked.
     * @param permission - The permission the sender is expected to have.
