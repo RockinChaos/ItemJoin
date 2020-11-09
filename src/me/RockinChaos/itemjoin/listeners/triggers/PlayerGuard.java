@@ -72,14 +72,14 @@ public class PlayerGuard implements Listener {
 			if (!playerSetList.isEmpty()) {
 				for (String region: playerSetList) {
 					if (region != null && !region.isEmpty()) {
-						ItemUtilities.getUtilities().setItems(player, TriggerType.REGIONLEAVE, org.bukkit.GameMode.ADVENTURE, region);
+						ServerHandler.getServer().runThread(main -> ItemUtilities.getUtilities().setItems(player, TriggerType.REGIONLEAVE, org.bukkit.GameMode.ADVENTURE, region));
 					}
 				}
 			}
 			if (!regionSetList.isEmpty()) {
 				for (String region: regionSetList) {
 					if (region != null && !region.isEmpty()) {
-						ItemUtilities.getUtilities().setItems(player, TriggerType.REGIONENTER, org.bukkit.GameMode.ADVENTURE, region);
+						ServerHandler.getServer().runThread(main -> ItemUtilities.getUtilities().setItems(player, TriggerType.REGIONENTER, org.bukkit.GameMode.ADVENTURE, region));
 					}
 				}
 			}
@@ -87,7 +87,7 @@ public class PlayerGuard implements Listener {
 			List < String > regionSet = Arrays.asList(regions.replace(" ", "").split(","));
 			for (String region: regionSet) {
 				if (region != null && !region.isEmpty()) {
-					ItemUtilities.getUtilities().setItems(player, TriggerType.REGIONENTER, org.bukkit.GameMode.ADVENTURE, region);
+					ServerHandler.getServer().runThread(main -> ItemUtilities.getUtilities().setItems(player, TriggerType.REGIONENTER, org.bukkit.GameMode.ADVENTURE, region));
 				}
 			}
 		}
