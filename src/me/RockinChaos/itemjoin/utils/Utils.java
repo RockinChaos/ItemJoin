@@ -282,10 +282,13 @@ public class Utils {
     * @param player - that will recieve the items.
     */
 	public UUID UUIDConversion(String uuidString) {
-		uuidString = uuidString.replace("-", "");
-		UUID uuid = new UUID(
-		        new BigInteger(uuidString.substring(0, 16), 16).longValue(),
-		        new BigInteger(uuidString.substring(16), 16).longValue());
+		UUID uuid = null;
+		if (uuidString != null && !uuidString.isEmpty()) {
+			uuidString = uuidString.replace("-", "");
+			uuid = new UUID( 
+					new BigInteger(uuidString.substring(0, 16), 16).longValue(),
+			        new BigInteger(uuidString.substring(16), 16).longValue());
+		}
 		return uuid;
 	}
 	
