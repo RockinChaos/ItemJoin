@@ -25,6 +25,8 @@ import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 
+import me.RockinChaos.itemjoin.handlers.PlayerHandler;
+import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 
@@ -42,7 +44,7 @@ public class Legacy_Consumes implements Listener {
 	* @deprecated This is a LEGACY event, only use on Minecraft versions below 1.11.
 	*/
 	@EventHandler(ignoreCancelled = true)
-	private void onPlayerConsumesItem(PlayerItemConsumeEvent event) {
+	private void onPlayerAppleEffects(PlayerItemConsumeEvent event) {
 		ItemStack item = event.getItem();
 		Player player = event.getPlayer();
 		if (item.getType() == Material.GOLDEN_APPLE) {
@@ -54,6 +56,35 @@ public class Legacy_Consumes implements Listener {
 				event.setCancelled(true);
 				player.getInventory().remove(item);
 			}
+		}
+	}
+	
+   /**
+    * Refills the custom item to its original stack size when consuming the item.
+    * 
+    * @param event - PlayerItemConsumeEvent.
+    * @deprecated This is a LEGACY event, only use on Minecraft versions below 1.11.
+	*/
+	@EventHandler(ignoreCancelled = true)
+	private void onPlayerConsumesItem(PlayerItemConsumeEvent event) {
+		ItemStack item = (event.getItem() != null ? event.getItem().clone() : event.getItem());
+		Player player = event.getPlayer();
+		if (!ItemUtilities.getUtilities().isAllowed(player, item, "count-lock")) {
+			ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item, null, player.getWorld());
+			item.setAmount(itemMap.getCount());
+			ServerHandler.getServer().runThread(main -> {
+				if (itemMap != null) {
+					if (PlayerHandler.getPlayer().getHandItem(player) == null || PlayerHandler.getPlayer().getHandItem(player).getAmount() <= 1) {
+	 					if (ServerHandler.getServer().hasSpecificUpdate("1_9")) { 
+	 						if (PlayerHandler.getPlayer().getMainHandItem(player) != null && PlayerHandler.getPlayer().getMainHandItem(player).getType() != Material.AIR) {
+	 							PlayerHandler.getPlayer().setMainHandItem(player, item);
+	 						} else if (PlayerHandler.getPlayer().getOffHandItem(player) != null && PlayerHandler.getPlayer().getOffHandItem(player).getType() != Material.AIR) {
+	 							PlayerHandler.getPlayer().setOffHandItem(player, item);
+	 						}
+	 					} 
+					} else { PlayerHandler.getPlayer().setMainHandItem(player, item); }
+	 			}
+	 		}, 2L);
 		}
 	}
 }

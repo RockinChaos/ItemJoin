@@ -64,7 +64,8 @@ public class Placement implements Listener {
 	 			ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item, null, player.getWorld());
 	 			item.setAmount(itemMap.getCount());
 	 			ServerHandler.getServer().runThread(main -> {
-	 				if (Utils.getUtils().containsIgnoreCase(item.getType().name(), "WATER") || Utils.getUtils().containsIgnoreCase(item.getType().name(), "LAVA") || item.getType().name().equalsIgnoreCase("BUCKET")) {
+	 				if (Utils.getUtils().containsIgnoreCase(item.getType().name(), "WATER") || Utils.getUtils().containsIgnoreCase(item.getType().name(), "LAVA") || item.getType().name().equalsIgnoreCase("BUCKET") 
+	 				 || Utils.getUtils().containsIgnoreCase(item.getType().name(), "POTION")) {
 	 					PlayerHandler.getPlayer().setMainHandItem(player, item);
 	 				} else if (itemMap != null) { 
 	 					if (PlayerHandler.getPlayer().getHandItem(player) == null || PlayerHandler.getPlayer().getHandItem(player).getAmount() <= 1) {
