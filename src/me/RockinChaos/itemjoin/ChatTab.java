@@ -34,7 +34,7 @@ import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.utils.Utils;
-import me.RockinChaos.itemjoin.utils.sqlite.SQLite;
+import me.RockinChaos.itemjoin.utils.sqlite.SQL;
 
 public class ChatTab implements TabCompleter {
 	
@@ -58,10 +58,10 @@ public class ChatTab implements TabCompleter {
 			if (args.length == 2) {
 				commands.addAll(Arrays.asList("map-ids","first-join","first-world","ip-limits","enabled-players","first-commands"));
 			} else {
-				for (String playerValue: (args[1].equalsIgnoreCase("map-ids") ? SQLite.getLite(false).getMapImages().keySet() : (args[1].equalsIgnoreCase("first-world") ? SQLite.getLite(false).getFirstWorlds().keySet() : 
-					(args[1].equalsIgnoreCase("first-join") ? SQLite.getLite(false).getFirstPlayers().keySet() : 
-					(args[1].equalsIgnoreCase("ip-limits") ? SQLite.getLite(false).getLimitPlayers().keySet() : (args[1].equalsIgnoreCase("enabled-players") ? SQLite.getLite(false).getEnabledPlayers().keySet() : 
-					(args[1].equalsIgnoreCase("first-commands") ? SQLite.getLite(false).getFirstCommands().keySet() : new ArrayList<String>()))))))) {
+				for (String playerValue: (args[1].equalsIgnoreCase("map-ids") ? SQL.getData(false).getMapImages().keySet() : (args[1].equalsIgnoreCase("first-world") ? SQL.getData(false).getFirstWorlds().keySet() : 
+					(args[1].equalsIgnoreCase("first-join") ? SQL.getData(false).getFirstPlayers().keySet() : 
+					(args[1].equalsIgnoreCase("ip-limits") ? SQL.getData(false).getLimitPlayers().keySet() : (args[1].equalsIgnoreCase("enabled-players") ? SQL.getData(false).getEnabledPlayers().keySet() : 
+					(args[1].equalsIgnoreCase("first-commands") ? SQL.getData(false).getFirstCommands().keySet() : new ArrayList<String>()))))))) {
 					commands.add(playerValue.equalsIgnoreCase("ALL") ? "ALL" : (args[1].equalsIgnoreCase("map-ids") ? playerValue : PlayerHandler.getPlayer().getPlayerString(playerValue.replace(".false", "").replace(".true", "")).getName()));
 				}
 			}

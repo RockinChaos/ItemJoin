@@ -64,7 +64,7 @@ import me.RockinChaos.itemjoin.utils.Utils;
 import me.RockinChaos.itemjoin.utils.enchants.Glow;
 import me.RockinChaos.itemjoin.utils.FileData;
 import me.RockinChaos.itemjoin.utils.protocol.ProtocolManager;
-import me.RockinChaos.itemjoin.utils.sqlite.SQLite;
+import me.RockinChaos.itemjoin.utils.sqlite.SQL;
 
 public class ConfigHandler {
 	
@@ -123,12 +123,15 @@ public class ConfigHandler {
 		DependAPI.getDepends(true);
 		LogFilter.getFilter(true);
 		if (!PlayerLogin.hasStarted()) {
-			SQLite.getLite(true);
+			SQL.getData(true);
 			ItemDesigner.getDesigner(true);
 			ServerHandler.getServer().runThread(main -> { PlayerLogin.startComplete(); }, 3L);
 		} else {
-			ServerHandler.getServer().runAsyncThread(async -> { SQLite.getLite(true); });
-			ServerHandler.getServer().runThread(main -> { ItemDesigner.getDesigner(true); }, 2L);
+			ServerHandler.getServer().runAsyncThread(async -> { 
+				SQL.getData(true); 
+				ServerHandler.getServer().runThread(main -> { ItemDesigner.getDesigner(true); }, 2L);
+			});
+
 		}
 		ServerHandler.getServer().runThread(main -> { Metrics.getMetrics(true); }, 100L);
 	}
@@ -316,6 +319,15 @@ public class ConfigHandler {
 		}
 		return "";
 	}
+	
+   /**
+    * Checks if the remote MySQL database is enabled.
+    * 
+    * @return If the remote MySQL database is enabled.
+    */
+    public boolean sqlEnabled() {
+    	return this.getFile("config.yml").getString("Database.MySQL") != null && this.getFile("config.yml").getBoolean("Database.MySQL");
+    }
 	
    /**
     * Checks if the specified clear items type is enabled.
@@ -524,7 +536,7 @@ public class ConfigHandler {
 		if ((itemMap.isPlaceable() || itemMap.isCountLock()) && !Utils.getUtils().isRegistered(Placement.class.getSimpleName())) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Placement(), ItemJoin.getInstance());
 		}
-		if (((Utils.getUtils().containsIgnoreCase(itemMap.getMaterial().name(), "TOTEM") && itemMap.isCountLock()) || itemMap.isCustomConsumable())) {
+		if (itemMap.isCountLock() || itemMap.isCustomConsumable()) {
 			if (ServerHandler.getServer().hasSpecificUpdate("1_11") && !Utils.getUtils().isRegistered(Consumes.class.getSimpleName())) {
 				ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Consumes(), ItemJoin.getInstance());
 			} else {

@@ -65,7 +65,7 @@ import me.RockinChaos.itemjoin.item.ItemCommand.Action;
 import me.RockinChaos.itemjoin.item.ItemCommand.CommandSequence;
 import me.RockinChaos.itemjoin.utils.interfaces.Button;
 import me.RockinChaos.itemjoin.utils.interfaces.Interface;
-import me.RockinChaos.itemjoin.utils.sqlite.SQLite;
+import me.RockinChaos.itemjoin.utils.sqlite.SQL;
 import me.arcaniax.hdb.api.HeadDatabaseAPI;
 
 	
@@ -432,7 +432,7 @@ public class UI {
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[3] = itemMap.getConfigName();
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.itemRemoved", player, placeHolders);
-				SQLite.getLite(false).executeLaterStatements();
+				SQL.getData(false).executeLaterStatements();
 				ItemUtilities.getUtilities().closeAnimations();
 				ItemUtilities.getUtilities().clearItems();
 				ConfigHandler.getConfig(true);
@@ -717,7 +717,7 @@ public class UI {
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[3] = itemMap.getConfigName();
 					LanguageAPI.getLang(false).sendLangMessage("commands.menu.itemSaved", player, placeHolders);
-					SQLite.getLite(false).executeLaterStatements();
+					SQL.getData(false).executeLaterStatements();
 					ItemUtilities.getUtilities().closeAnimations();
 					ItemUtilities.getUtilities().clearItems();
 					ConfigHandler.getConfig(true);
@@ -729,7 +729,7 @@ public class UI {
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[3] = itemMap.getConfigName();
 					LanguageAPI.getLang(false).sendLangMessage("commands.menu.itemSaved", player, placeHolders);
-					SQLite.getLite(false).executeLaterStatements();
+					SQL.getData(false).executeLaterStatements();
 					ItemUtilities.getUtilities().closeAnimations();
 					ItemUtilities.getUtilities().clearItems();
 					ConfigHandler.getConfig(true);
@@ -763,7 +763,7 @@ public class UI {
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[3] = itemMap.getConfigName();
 					LanguageAPI.getLang(false).sendLangMessage("commands.menu.itemSaved", player, placeHolders);
-					SQLite.getLite(false).executeLaterStatements();
+					SQL.getData(false).executeLaterStatements();
 					ItemUtilities.getUtilities().closeAnimations();
 					ItemUtilities.getUtilities().clearItems();
 					ConfigHandler.getConfig(true);
@@ -775,7 +775,7 @@ public class UI {
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[3] = itemMap.getConfigName();
 					LanguageAPI.getLang(false).sendLangMessage("commands.menu.itemSaved", player, placeHolders);
-					SQLite.getLite(false).executeLaterStatements();
+					SQL.getData(false).executeLaterStatements();
 					ItemUtilities.getUtilities().closeAnimations();
 					ItemUtilities.getUtilities().clearItems();
 					ConfigHandler.getConfig(true);

@@ -42,7 +42,7 @@ import me.RockinChaos.itemjoin.utils.LegacyAPI;
 import me.RockinChaos.itemjoin.utils.UI;
 import me.RockinChaos.itemjoin.utils.Chances;
 import me.RockinChaos.itemjoin.utils.Utils;
-import me.RockinChaos.itemjoin.utils.sqlite.SQLite;
+import me.RockinChaos.itemjoin.utils.sqlite.SQL;
 
 public class ChatExecutor implements CommandExecutor {
 	
@@ -162,7 +162,7 @@ public class ChatExecutor implements CommandExecutor {
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]---------------&a&l[&e Help Menu 10/10 &a&l]&a&l&m--------------[");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
 		} else if (Execute.RELOAD.accept(sender, args, 0)) {
-			SQLite.getLite(false).executeLaterStatements();
+			SQL.getData(false).executeLaterStatements();
 			ItemUtilities.getUtilities().closeAnimations();
 			ItemUtilities.getUtilities().clearItems();
 			ConfigHandler.getConfig(true);
@@ -376,12 +376,14 @@ public class ChatExecutor implements CommandExecutor {
 			if (!table.equalsIgnoreCase("map-ids") && foundPlayer == null && !args.equalsIgnoreCase("ALL")) { LanguageAPI.getLang(false).sendLangMessage("commands.default.noTarget", sender, placeHolders); return; } 
 		} else { placeHolders[9] = "/ij purge"; }
 		if (this.confirmationRequests.get(table + sender.getName()) != null && this.confirmationRequests.get(table + sender.getName()).equals(true)) {
-			if (!table.equalsIgnoreCase("Database")) { SQLite.getLite(false).purgeDatabaseData(foundPlayer, args, table.replace("-", "_")); } 
+			if (!table.equalsIgnoreCase("Database")) { SQL.getData(false).purgeDatabaseData(foundPlayer, args, table.replace("-", "_")); } 
 			else {
-				SQLite.getLite(false).purgeDatabase();
-				ServerHandler.getServer().runAsyncThread(async -> { 
-					SQLite.getLite(true);
-				});
+				synchronized (this) {
+					ServerHandler.getServer().runAsyncThread(async -> { 
+						SQL.getData(false).purgeDatabase();
+						SQL.getData(true);
+					});
+				}
 			}
 			LanguageAPI.getLang(false).sendLangMessage("commands.database.purgeSuccess", sender, placeHolders);
 			this.confirmationRequests.remove(table + sender.getName());
@@ -410,8 +412,8 @@ public class ChatExecutor implements CommandExecutor {
 		Player argsPlayer = (arguments >= 2 ? PlayerHandler.getPlayer().getPlayerString(player) : null);
 		String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[1] = (arguments >= 2 ? player : sender.getName()); placeHolders[0] = world;
 		if (arguments >= 2 && argsPlayer == null) { LanguageAPI.getLang(false).sendLangMessage("commands.default.noTarget", sender, placeHolders); return; }
-		if (!SQLite.getLite(false).isWritable((arguments == 3 ? world : "Global"), (arguments >= 2 ? PlayerHandler.getPlayer().getPlayerID(argsPlayer) : "ALL"), true)) {
-			SQLite.getLite(false).saveToDatabase(argsPlayer, world, "true", "enabled-players");
+		if (!SQL.getData(false).isWritable((arguments == 3 ? world : "Global"), (arguments >= 2 ? PlayerHandler.getPlayer().getPlayerID(argsPlayer) : "ALL"), true)) {
+			SQL.getData(false).saveToDatabase(argsPlayer, world, "true", "enabled-players");
 			LanguageAPI.getLang(false).sendLangMessage("commands.enabled." + (arguments == 3 ? "forPlayerWorld" : (arguments == 2 ? "forPlayer" : "globalPlayers")), sender, placeHolders); 
 			if (arguments >= 2 && !sender.getName().equalsIgnoreCase(argsPlayer.getName())) { 
 				placeHolders[1] = sender.getName(); 
@@ -432,8 +434,8 @@ public class ChatExecutor implements CommandExecutor {
 		Player argsPlayer = (arguments >= 2 ? PlayerHandler.getPlayer().getPlayerString(player) : null);
 		String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[1] = (arguments >= 2 ? player : sender.getName()); placeHolders[0] = world;
 		if (arguments >= 2 && argsPlayer == null) { LanguageAPI.getLang(false).sendLangMessage("commands.default.noTarget", sender, placeHolders); return; }
-		if (SQLite.getLite(false).isWritable((arguments == 3 ? world : "Global"), (arguments >= 2 ? PlayerHandler.getPlayer().getPlayerID(argsPlayer) : "ALL"), true)) {
-			SQLite.getLite(false).saveToDatabase(argsPlayer, world, "false", "enabled-players");
+		if (SQL.getData(false).isWritable((arguments == 3 ? world : "Global"), (arguments >= 2 ? PlayerHandler.getPlayer().getPlayerID(argsPlayer) : "ALL"), true)) {
+			SQL.getData(false).saveToDatabase(argsPlayer, world, "false", "enabled-players");
 			LanguageAPI.getLang(false).sendLangMessage("commands.disabled." + (arguments == 3 ? "forPlayerWorld" : (arguments == 2 ? "forPlayer" : "globalPlayers")), sender, placeHolders); 
 			if (arguments >= 2 && !sender.getName().equalsIgnoreCase(argsPlayer.getName())) { 
 				placeHolders[1] = sender.getName(); 

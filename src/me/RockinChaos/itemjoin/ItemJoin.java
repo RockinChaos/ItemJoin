@@ -28,7 +28,8 @@ import me.RockinChaos.itemjoin.handlers.UpdateHandler;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.utils.UI;
 import me.RockinChaos.itemjoin.utils.protocol.ProtocolManager;
-import me.RockinChaos.itemjoin.utils.sqlite.SQLite;
+import me.RockinChaos.itemjoin.utils.sqlite.Database;
+import me.RockinChaos.itemjoin.utils.sqlite.SQL;
 
 public class ItemJoin extends JavaPlugin {
 	
@@ -64,7 +65,8 @@ public class ItemJoin extends JavaPlugin {
   		UI.getCreator().closeMenu();
   		ItemHandler.getItem().saveCooldowns();
   		ItemHandler.getItem().purgeCraftItems(true);
-	  	SQLite.getLite(false).executeLaterStatements();
+	  	SQL.getData(false).executeLaterStatements();
+	  	Database.getDatabase("database").closeConnection(true);
 	  	ProtocolManager.getManager().closeProtocol();
 	  	ItemUtilities.getUtilities().clearItems();
   		ServerHandler.getServer().logInfo("has been Disabled.");
