@@ -81,7 +81,7 @@ import me.RockinChaos.itemjoin.utils.Reflection;
 import me.RockinChaos.itemjoin.utils.UI;
 import me.RockinChaos.itemjoin.utils.Utils;
 import me.RockinChaos.itemjoin.utils.enchants.Glow;
-import me.RockinChaos.itemjoin.utils.sqlite.SQLite;
+import me.RockinChaos.itemjoin.utils.sqlite.SQL;
 import me.arcaniax.hdb.api.HeadDatabaseAPI;
 
 public class ItemMap {
@@ -123,7 +123,7 @@ public class ItemMap {
 	private List < String > bookPages = new ArrayList < String > ();
 	private List < List <String> > listPages = new ArrayList < List <String> > ();
 	
-	private short mapId = 1;
+	private short mapId = 0;
 	private MapView mapView = null;
 	private String customMapImage = null;
     
@@ -317,8 +317,7 @@ public class ItemMap {
     * Welcome to nothing!
     * 
     */
-	public ItemMap() { 
-	}
+	public ItemMap() { }
 //  ========================================================================================================= //
 	
 //  ============================================== //
@@ -539,7 +538,7 @@ public class ItemMap {
     */
 	private void setPlayersOnCooldown() {
 		if (this.cooldownSeconds > 0) {
-			this.playersOnCooldown = SQLite.getLite(false).getCooldown(this);
+			this.playersOnCooldown = SQL.getData(false).getCooldown(this);
 		}
 	}
 	

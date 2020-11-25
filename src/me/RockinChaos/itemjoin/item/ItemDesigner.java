@@ -53,7 +53,7 @@ import me.RockinChaos.itemjoin.utils.Chances;
 import me.RockinChaos.itemjoin.utils.DependAPI;
 import me.RockinChaos.itemjoin.utils.ImageRenderer;
 import me.RockinChaos.itemjoin.utils.Utils;
-import me.RockinChaos.itemjoin.utils.sqlite.SQLite;
+import me.RockinChaos.itemjoin.utils.sqlite.SQL;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
@@ -355,10 +355,11 @@ public class ItemDesigner {
 	*/
 	private void setMapImage(final ItemMap itemMap) {
 		if (itemMap.getNodeLocation().getString(".custom-map-image") != null && Utils.getUtils().containsIgnoreCase(itemMap.getMaterial().toString(), "MAP")) {
+			if (itemMap.getNodeLocation().getString(".map-id") != null && Utils.getUtils().isInt(itemMap.getNodeLocation().getString(".map-id"))) { itemMap.setMapID(itemMap.getNodeLocation().getInt(".map-id")); }
 			itemMap.setMapImage(itemMap.getNodeLocation().getString(".custom-map-image"));
 			if (itemMap.getMapImage().equalsIgnoreCase("default.jpg") || new File(ItemJoin.getInstance().getDataFolder(), itemMap.getMapImage()).exists()) {
-				if (SQLite.getLite(false).imageNumberExists(itemMap.getMapImage())) {
-					int mapID = SQLite.getLite(false).getImageNumber(itemMap.getMapImage());
+				if (SQL.getData(false).imageNumberExists(itemMap.getMapImage()) && (itemMap.getMapID() == 0 || (itemMap.getMapID() == SQL.getData(false).getImageNumber(itemMap.getMapImage())))) {
+					int mapID = SQL.getData(false).getImageNumber(itemMap.getMapImage());
 					MapRenderer imgPlatform = this.createRenderer(itemMap.getMapImage(), mapID);
 					MapView view = ItemHandler.getItem().existingView(mapID);
 					itemMap.setMapID(mapID);
@@ -368,12 +369,12 @@ public class ItemDesigner {
 				} else {
 					MapView view = LegacyAPI.getLegacy().createMapView();
 					try { view.removeRenderer(view.getRenderers().get(0)); } catch (NullPointerException e) { ServerHandler.getServer().sendDebugTrace(e); }
-					int mapID = LegacyAPI.getLegacy().getMapID(view);
+					int mapID = (itemMap.getMapID() != 0 ? itemMap.getMapID() : LegacyAPI.getLegacy().getMapID(view));
 					MapRenderer imgPlatform = this.createRenderer(itemMap.getMapImage(), mapID);
 					itemMap.setMapID(mapID);
 					itemMap.setMapView(view);
 					try { view.addRenderer(imgPlatform); } catch (NullPointerException e) { ServerHandler.getServer().sendDebugTrace(e); }
-					SQLite.getLite(false).saveMapImage(itemMap);
+					SQL.getData(false).saveMapImage(itemMap);
 				}
 			}
 		}
