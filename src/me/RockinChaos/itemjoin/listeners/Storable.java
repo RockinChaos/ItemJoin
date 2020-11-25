@@ -54,7 +54,7 @@ public class Storable implements Listener {
 		else { item = event.getCursor(); }
 		if (invType != null) {
 			if (event.getRawSlot() > event.getInventory().getSize() && event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY) || event.getRawSlot() < event.getInventory().getSize()) {
-				if ((invType.contains("CHEST") || invType.contains("BARREL") || invType.contains("FURNACE") || invType.contains("GRINDSTONE") || invType.contains("SHULKER_BOX") 
+				if ((invType.contains("CHEST") || invType.contains("BARREL") || invType.contains("BREWING") || invType.contains("FURNACE") || invType.contains("GRINDSTONE") || invType.contains("SHULKER_BOX") 
 						|| invType.contains("HOPPER") || invType.contains("ANVIL") || invType.contains("WORKBENCH") || invType.contains("DISPENSER") || invType.contains("DROPPER")) && !ItemUtilities.getUtilities().isAllowed(player, item, "item-store")) {
 					event.setCancelled(true);
 					PlayerHandler.getPlayer().updateInventory(player, 1L);
@@ -80,7 +80,7 @@ public class Storable implements Listener {
 		for (int i: event.getRawSlots()) {
 			if (i < inventorySize) {
 				if (invType != null) {
-					if ((invType.contains("CHEST") || invType.contains("BARREL") || invType.contains("FURNACE") || invType.contains("GRINDSTONE") || invType.contains("SHULKER_BOX") 
+					if ((invType.contains("CHEST") || invType.contains("BARREL") || invType.contains("BREWING") || invType.contains("FURNACE") || invType.contains("GRINDSTONE") || invType.contains("SHULKER_BOX") 
 						|| invType.contains("HOPPER") || invType.contains("ANVIL") || invType.contains("WORKBENCH") || invType.contains("DISPENSER") || invType.contains("DROPPER")) && !ItemUtilities.getUtilities().isAllowed(player, item, "item-store")) {
 						event.setCancelled(true);
 						PlayerHandler.getPlayer().updateInventory(player, 1L);
