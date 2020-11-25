@@ -26,12 +26,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.item.ItemUtilities.TriggerType;
 import me.RockinChaos.itemjoin.utils.DependAPI;
-import me.RockinChaos.itemjoin.utils.sqlite.SQLite;
+import me.RockinChaos.itemjoin.utils.sqlite.SQL;
 
 public class PlayerGuard implements Listener {
 	
@@ -48,7 +49,24 @@ public class PlayerGuard implements Listener {
 	private void setRegionItems(PlayerMoveEvent event) {
 		final Player player = event.getPlayer();
 		ServerHandler.getServer().runAsyncThread(async -> {
-			if (SQLite.getLite(false).isEnabled(player)) {
+			if (SQL.getData(false).isEnabled(player)) {
+				this.handleRegions(player);
+			}
+		});
+	}
+	
+   /**
+	* Called on player teleport.
+	* Gives and removes any available 
+	* custom items upon entering or exiting a region.
+	* 
+	* @param event - PlayerTeleportEvent
+	*/
+	@EventHandler(ignoreCancelled = true)
+	private void setRegionItems(PlayerTeleportEvent event) {
+		final Player player = event.getPlayer();
+		ServerHandler.getServer().runAsyncThread(async -> {
+			if (SQL.getData(false).isEnabled(player)) {
 				this.handleRegions(player);
 			}
 		});

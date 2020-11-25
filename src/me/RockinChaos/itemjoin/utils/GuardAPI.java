@@ -42,7 +42,7 @@ import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
-import me.RockinChaos.itemjoin.utils.sqlite.SQLite;
+import me.RockinChaos.itemjoin.utils.sqlite.SQL;
 
 public class GuardAPI {
 	
@@ -284,7 +284,7 @@ public class GuardAPI {
 					}
 				}
 			}
-			SQLite.getLite(false).saveReturnRegionItems(player, player.getWorld().getName(), region, saveInventory);
+			SQL.getData(false).saveReturnRegionItems(player, region, saveInventory);
 		}
 	}
 	
@@ -295,9 +295,9 @@ public class GuardAPI {
     * @param world - The world to be checked.
     * @param region - The region the items were removed from.
     */
-	public void pasteReturnItems(final Player player, final String world, final String region) {
+	public void pasteReturnItems(final Player player, final String region) {
 		if (region != null && !region.isEmpty() && Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Options"), "RETURN")) {
-			Inventory inventory = SQLite.getLite(false).getReturnRegionItems(player, world, region);
+			Inventory inventory = SQL.getData(false).getReturnRegionItems(player, region);
 			for (int i = 47; i >= 0; i--) {
 				if (inventory != null && inventory.getItem(i) != null && inventory.getItem(i).getType() != Material.AIR) {
 					if (i <= 41) {
@@ -307,7 +307,7 @@ public class GuardAPI {
 						PlayerHandler.getPlayer().updateInventory(player, 1L);
 					}
 				}
-				SQLite.getLite(false).removeReturnRegionItems(player, world, region);
+				SQL.getData(false).removeReturnRegionItems(player, region);
 			}
 		}
 	}

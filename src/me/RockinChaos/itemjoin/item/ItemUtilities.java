@@ -43,7 +43,7 @@ import me.RockinChaos.itemjoin.utils.Chances;
 import me.RockinChaos.itemjoin.utils.DependAPI;
 import me.RockinChaos.itemjoin.utils.LanguageAPI;
 import me.RockinChaos.itemjoin.utils.Utils;
-import me.RockinChaos.itemjoin.utils.sqlite.SQLite;
+import me.RockinChaos.itemjoin.utils.sqlite.SQL;
 
 public class ItemUtilities {
   	private List < ItemMap > items = new ArrayList < ItemMap >();
@@ -218,12 +218,11 @@ public class ItemUtilities {
 		      || ((((type.equals(TriggerType.REGIONENTER) && item.isGiveOnRegionEnter()) 
 			  || (type.equals(TriggerType.REGIONLEAVE) && item.isTakeOnRegionLeave())) && item.inRegion(region))))
 			   && item.inWorld(player.getWorld()) && Chances.getChances().isProbability(item, randomMap) 
-			   && SQLite.getLite(false).isEnabled(player) && item.hasPermission(player) 
+			   && SQL.getData(false).isEnabled(player) && item.hasPermission(player) 
 			   && this.isObtainable(player, item, session, type, (newMode != null ? newMode : player.getGameMode()))) {
 				item.giveTo(player); 
 			} else if (((type.equals(TriggerType.LIMITSWITCH) && item.isUseOnLimitSwitch() && !item.isLimitMode(newMode))
-					|| (((type.equals(TriggerType.REGIONENTER) && item.isTakeOnRegionLeave()) 
-					|| (type.equals(TriggerType.REGIONLEAVE) && item.isGiveOnRegionEnter())) && item.inRegion(region))) 
+					|| ((type.equals(TriggerType.REGIONLEAVE) && item.isTakeOnRegionLeave()) && item.inRegion(region))) 
 					&& item.inWorld(player.getWorld()) && item.hasItem(player)) {
 				item.removeFrom(player);
 			} else if (item.isAutoRemove() && !item.inWorld(player.getWorld()) && item.hasItem(player)) {
@@ -242,7 +241,7 @@ public class ItemUtilities {
     */
 	private void safeSet(final Player player, final TriggerType type, final String region) {
 		if (Utils.getUtils().splitIgnoreCase(ConfigHandler.getConfig(false).getHotbarTriggers(), type.name, ",")) { PlayerHandler.getPlayer().setHotbarSlot(player, ConfigHandler.getConfig(false).getHotbarSlot()); }
-		if (type.equals(TriggerType.REGIONLEAVE)) { DependAPI.getDepends(false).getGuard().pasteReturnItems(player, player.getWorld().getName(), region); }
+		if (type.equals(TriggerType.REGIONLEAVE)) { DependAPI.getDepends(false).getGuard().pasteReturnItems(player, region); }
 		if (type.equals(TriggerType.REGIONENTER)) { this.clearEvent(player, "", type.name, region); }
 		if (this.getClearDelay() != 0) {
 			ServerHandler.getServer().runThread(main -> {
@@ -382,9 +381,9 @@ public class ItemUtilities {
     */
 	public boolean isObtainable(final Player player, final ItemMap itemMap, final int session, final TriggerType type, final GameMode gamemode) {
 		if (!itemMap.hasItem(player) || itemMap.isAlwaysGive()) {
-			boolean firstJoin = SQLite.getLite(false).hasFirstJoined(player, itemMap);
-			boolean firstWorld = SQLite.getLite(false).hasFirstWorld(player, itemMap);
-			boolean ipLimit = SQLite.getLite(false).isIPLimited(player, itemMap);
+			boolean firstJoin = SQL.getData(false).hasFirstJoined(player, itemMap);
+			boolean firstWorld = SQL.getData(false).hasFirstWorld(player, itemMap);
+			boolean ipLimit = SQL.getData(false).isIPLimited(player, itemMap);
 			if (itemMap.isLimitMode(gamemode)) {
 				if ((!firstJoin || (firstJoin && itemMap.isOnlyFirstLife() && type.equals(TriggerType.RESPAWN))) && !firstWorld && !ipLimit && this.canOverwrite(player, itemMap)) {
 					return true;
@@ -508,7 +507,7 @@ public class ItemUtilities {
 			}
 			ServerHandler.getServer().logDebug("{ItemMap} Given the Item: " + itemMap.getConfigName() + ".");
 		});
-		SQLite.getLite(false).saveItemData(player, itemMap);
+		SQL.getData(false).saveItemData(player, itemMap);
 	}
 	
    /**
@@ -550,7 +549,7 @@ public class ItemUtilities {
 			}
 			ServerHandler.getServer().logDebug("{ItemMap} Given the Item: " + itemMap.getConfigName() + ".");
 		});
-		SQLite.getLite(false).saveItemData(player, itemMap);
+		SQL.getData(false).saveItemData(player, itemMap);
 	}
 	
    /**
@@ -659,10 +658,10 @@ public class ItemUtilities {
 				if (compareWorld.equalsIgnoreCase(player.getWorld().getName()) || compareWorld.equalsIgnoreCase("ALL") || compareWorld.equalsIgnoreCase("GLOBAL")) {
 					for (String commands: ConfigHandler.getConfig(false).getFile("config.yml").getStringList("Active-Commands.commands")) {
 						String formatCommand = Utils.getUtils().translateLayout(commands, player).replace("first-join: ", "").replace("first-join:", "");
-						if (!(SQLite.getLite(false).hasFirstCommanded(player, formatCommand) && (Utils.getUtils().containsIgnoreCase(commands, "first-join:") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Active-Commands.triggers"), TriggerType.FIRSTJOIN.name)))) {
+						if (!(SQL.getData(false).hasFirstCommanded(player, formatCommand) && (Utils.getUtils().containsIgnoreCase(commands, "first-join:") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Active-Commands.triggers"), TriggerType.FIRSTJOIN.name)))) {
 								Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), formatCommand);
 							if (Utils.getUtils().containsIgnoreCase(commands, "first-join:") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Active-Commands.triggers"), TriggerType.FIRSTJOIN.name)) {
-								SQLite.getLite(false).saveFirstCommandData(player, formatCommand);
+								SQL.getData(false).saveFirstCommandData(player, formatCommand);
 							}
 						}
 					}
