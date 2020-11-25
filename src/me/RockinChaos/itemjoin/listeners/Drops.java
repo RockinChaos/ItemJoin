@@ -29,6 +29,7 @@ import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.utils.Utils;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -143,6 +144,12 @@ public class Drops implements Listener {
 		ListIterator < ItemStack > litr = drops.listIterator();
 		Player player = event.getEntity();
 		ItemUtilities.getUtilities().closeAnimations(player);
+		for (int k = 0; k < player.getOpenInventory().getTopInventory().getSize(); k++) {
+			ItemStack stack = player.getOpenInventory().getTopInventory().getItem(k);
+			if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory()) && !ItemUtilities.getUtilities().isAllowed(player, stack, "death-drops")) {
+				player.getOpenInventory().getTopInventory().setItem(k, new ItemStack(Material.AIR));
+			}
+		}
 		while (litr.hasNext()) {
 			ItemStack stack = litr.next();
 			if (!ItemUtilities.getUtilities().isAllowed(player, stack, "death-drops")) { litr.remove(); }
