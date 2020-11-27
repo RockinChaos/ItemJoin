@@ -3971,7 +3971,7 @@ public class ItemMap {
     private boolean isPlayerChargeable(final Player player, final boolean materialCost) {
 		if (DependAPI.getDepends(false).getVault().vaultEnabled() && !materialCost) {
 			double balance = 0.0; try { balance = DependAPI.getDepends(false).getVault().getBalance(player); } catch (NullPointerException e) { }
-			if (balance >= this.cost) {
+			if (balance >= this.cost || this.cost < 0) {
 				return true;
 			} else if (!(balance >= this.cost)) {
 				String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[6] = this.cost.toString(); placeHolders[5] = balance + "";
@@ -4090,7 +4090,7 @@ public class ItemMap {
 			try { balance = DependAPI.getDepends(false).getVault().getBalance(player); } catch (NullPointerException e) { }
 			int parseCost = this.cost;
 			if (balance >= parseCost) {
-				if (parseCost != 0) {
+				if (parseCost > 0) {
 					try { DependAPI.getDepends(false).getVault().withdrawBalance(player, parseCost); } catch (NullPointerException e) { ServerHandler.getServer().sendDebugTrace(e); }
 					String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[6] = this.cost.toString();
 					LanguageAPI.getLang(false).sendLangMessage("general.econSuccess", player, placeHolders);
