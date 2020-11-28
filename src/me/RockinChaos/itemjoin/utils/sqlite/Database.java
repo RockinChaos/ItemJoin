@@ -37,12 +37,7 @@ import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.listeners.triggers.PlayerLogin;
 import me.RockinChaos.itemjoin.utils.Utils;
 
-public class Database {
-	
-	private String dataFolder, host, port, database, user, pass;
-	private Connection connection;
-	private boolean stopConnection = false;
-	
+public class Database extends Controller {
 	private static Database data;
 	
    /**
@@ -62,51 +57,6 @@ public class Database {
 	}
 	
    /**
-	* Gets the proper SQL connection.
-	* 
-	* @return The SQL connection.
-    * @throws SQLException 
-	*/
-	public Connection getConnection() throws SQLException {
-		if (this.connection != null && !this.connection.isClosed()) {
-			return this.connection; 
-		} else if (!this.stopConnection) {
-			synchronized (this) {
-				if (ConfigHandler.getConfig(false).sqlEnabled()) {
-					try { 
-						Class.forName("com.mysql.jdbc.Driver");
-						if (!PlayerLogin.hasStarted()) {
-						ServerHandler.getServer().logInfo("Loading MySQL Connection...");
-						}
-						this.connection = DriverManager.getConnection("jdbc:mysql://" + this.host + ":" + this.port + "/" + this.database + "?createDatabaseIfNotExist=true" + "&useSSL=false", Utils.getUtils().decrypt(this.user), Utils.getUtils().decrypt(this.pass));
-						return this.connection;
-					} catch (Exception e) { 
-						this.stopConnection = true;
-						ServerHandler.getServer().logSevere("{MySQL} Unable to connect to the defined MySQL database, check your settings.");
-						ServerHandler.getServer().sendSevereTrace(e);
-					}
-					return this.connection;
-				} else {
-					try {
-						Class.forName("org.sqlite.JDBC");
-						this.connection = DriverManager.getConnection("jdbc:sqlite:" + this.getDatabase());
-					} catch (SQLException e) { 
-						this.stopConnection = true;
-						ServerHandler.getServer().logSevere("{SQLite} SQLite exception on initialize.");
-						ServerHandler.getServer().sendDebugTrace(e);
-					} catch (ClassNotFoundException e) { 
-						this.stopConnection = true;
-						ServerHandler.getServer().logSevere("{SQLite} You need the SQLite JBDC library, see: https://bitbucket.org/xerial/sqlite-jdbc/downloads/ and put it in the /lib folder of Java.");
-						ServerHandler.getServer().sendDebugTrace(e);
-					}
-					return this.connection;
-				}
-			}
-		}
-		return this.connection;
-	}
-	
-   /**
 	* Executes a specified SQL statement.
 	* 
 	* @param statement - the statement to be executed.
@@ -122,7 +72,7 @@ public class Database {
 		} catch (Exception e) {
 			ServerHandler.getServer().logSevere("{SQLite} [1] Failed to execute database statement.");
 			try {
-				ServerHandler.getServer().logSevere("{SQLite} [1] Database Status: Open: " + !this.getConnection().isClosed() + "! Writable: " + !this.getConnection().isReadOnly() + "!");
+				ServerHandler.getServer().logSevere("{SQLite} [1] Database Status: Open: " + !this.isClosed(conn, 2) + "! Writable: " + !conn.isReadOnly() + "!");
 			} catch (Exception e2) {
 				ServerHandler.getServer().logSevere("{SQLite} [1] Failed to determine the Database Status.");
 			}
@@ -155,7 +105,7 @@ public class Database {
 		} catch (Exception e) {
 			ServerHandler.getServer().logSevere("{SQLite} [2] Failed to execute database statement.");
 			try {
-				ServerHandler.getServer().logSevere("{SQLite} [2] Database Status: Open: " + !this.getConnection().isClosed() + "! Writable: " + !this.getConnection().isReadOnly() + "!");
+				ServerHandler.getServer().logSevere("{SQLite} [2] Database Status: Open: " + !this.isClosed(conn, 2) + "! Writable: " + !conn.isReadOnly() + "!");
 			} catch (Exception e2) {
 				ServerHandler.getServer().logSevere("{SQLite} [2] Failed to determine the Database Status.");
 			}
@@ -190,7 +140,7 @@ public class Database {
 		} catch (Exception e) {
 			ServerHandler.getServer().logSevere("{SQLite} [3] Failed to execute database statement.");
 			try {
-				ServerHandler.getServer().logSevere("{SQLite} [3] Database Status: Open: " + !this.getConnection().isClosed() + "! Writable: " + !this.getConnection().isReadOnly() + "!");
+				ServerHandler.getServer().logSevere("{SQLite} [3] Database Status: Open: " + !this.isClosed(conn, 2) + "! Writable: " + !conn.isReadOnly() + "!");
 			} catch (Exception e2) {
 				ServerHandler.getServer().logSevere("{SQLite} [3] Failed to determine the Database Status.");
 			}
@@ -221,7 +171,7 @@ public class Database {
 			while (rs.next()) {
 				final HashMap < String, String > columnData = new HashMap < String, String > ();
 				for (final String singleRow: rows.split(", ")) {
-					if (!rs.isClosed() && !conn.isClosed()) {
+					if (!this.isClosed(rs, 1) && !this.isClosed(conn, 2)) {
 						columnData.put(singleRow, rs.getString(singleRow));
 					}
 				}
@@ -230,7 +180,7 @@ public class Database {
 		} catch (Exception e) {
 			ServerHandler.getServer().logSevere("{SQLite} [4] Failed to execute database statement.");
 			try {
-				ServerHandler.getServer().logSevere("{SQLite} [4] Database Status: Open: " + !this.getConnection().isClosed() + "! Writable: " + !this.getConnection().isReadOnly() + "!");
+				ServerHandler.getServer().logSevere("{SQLite} [4] Database Status: Open: " + !this.isClosed(conn, 2) + "! Writable: " + !conn.isReadOnly() + "!");
 			} catch (Exception e2) {
 				ServerHandler.getServer().logSevere("{SQLite} [4] Failed to determine the Database Status.");
 			}
@@ -268,7 +218,7 @@ public class Database {
 		} catch (Exception e) {
 			ServerHandler.getServer().logSevere("{SQLite} [4] Failed to execute database statement.");
 			try {
-				ServerHandler.getServer().logSevere("{SQLite} [4] Database Status: Open: " + !this.getConnection().isClosed() + "! Writable: " + !this.getConnection().isReadOnly() + "!");
+				ServerHandler.getServer().logSevere("{SQLite} [4] Database Status: Open: " + !this.isClosed(conn, 2) + "! Writable: " + !conn.isReadOnly() + "!");
 			} catch (Exception e2) {
 				ServerHandler.getServer().logSevere("{SQLite} [4] Failed to determine the Database Status.");
 			}
@@ -309,7 +259,7 @@ public class Database {
 		} catch (Exception e) {
 				ServerHandler.getServer().logSevere("{SQLite} [5] Failed to execute database statement.");
 			try {
-				ServerHandler.getServer().logSevere("{SQLite} [5] Database Status: Open: " + !this.getConnection().isClosed() + "! Writable: " + !this.getConnection().isReadOnly() + "!");
+				ServerHandler.getServer().logSevere("{SQLite} [5] Database Status: Open: " + !this.isClosed(conn, 2) + "! Writable: " + !conn.isReadOnly() + "!");
 			} catch (Exception e2) {
 				ServerHandler.getServer().logSevere("{SQLite} [5] Failed to determine the Database Status.");
 			}
@@ -342,7 +292,7 @@ public class Database {
 			} else {
 				ServerHandler.getServer().logSevere("{SQLite} [6] Failed to execute database statement.");
 			try {
-				ServerHandler.getServer().logSevere("{SQLite} [6] Database Status: Open: " + !this.getConnection().isClosed() + "! Writable: " + !this.getConnection().isReadOnly() + "!");
+				ServerHandler.getServer().logSevere("{SQLite} [6] Database Status: Open: " + !this.isClosed(conn, 2) + "! Writable: " + !conn.isReadOnly() + "!");
 			} catch (Exception e2) {
 				ServerHandler.getServer().logSevere("{SQLite} [6] Failed to determine the Database Status.");
 			}
@@ -369,7 +319,7 @@ public class Database {
 			conn = this.getConnection();
 			rs = conn.getMetaData().getTables(null, null, tableName, null);
 			while (rs.next()) {
-				if (!rs.isClosed() && !conn.isClosed()) {
+				if (!this.isClosed(rs, 1) && !this.isClosed(conn, 2)) {
 					String tName = rs.getString("TABLE_NAME");
 					if (tName != null && tName.equals(tableName)) {
 						tExists = true;
@@ -415,48 +365,7 @@ public class Database {
 		}
 		return false;
 	}
-	
-   /**
-	* Gets the database file.
-	* 
-	* @return The Database File.
-	*/
-	private File getDatabase() {
-		File dataFolder = new File(ItemJoin.getInstance().getDataFolder(), this.dataFolder + ".db");
-		if (!dataFolder.exists()) {
-			try { dataFolder.createNewFile(); } 
-			catch (IOException e) { 
-				ServerHandler.getServer().logSevere("{SQLite} File write error: " + this.dataFolder + ".db."); 
-				ServerHandler.getServer().sendDebugTrace(e);
-			}
-		}
-		return dataFolder;
-	}
-	
-   /**
-	* Closes the specific PreparedStatement and ResultSet.
-	* 
-	* @param ps - the PreparedStatement being closed.
-	* @param rs - the ResultSet being closed.
-	* @param conn - the Connection being closed.
-	*/
-	public void close(final PreparedStatement ps, final ResultSet rs, final Connection conn, final boolean force) {
-		try {
-			if (ps != null && !ps.isClosed()) {
-				ps.close();
-			}
-			if (rs != null && !rs.isClosed()) {
-				rs.close();
-			}
-			if (conn != null && !conn.isClosed() && (!ConfigHandler.getConfig(false).sqlEnabled() || force)) {
-				conn.close();
-			}
-		} catch (SQLException e) { 
-			ServerHandler.getServer().logSevere("{SQLite} [10] Failed to close database connection."); 
-			ServerHandler.getServer().sendDebugTrace(e);
-		}
-	}
-	
+
    /**
 	* Closes the active database connection.
 	* 
@@ -482,5 +391,144 @@ public class Database {
 			}
 		}
         return data; 
+	}
+}
+
+abstract class Controller {
+	protected Connection connection;
+	protected String dataFolder, host, port, database, user, pass;
+	protected boolean stopConnection = false;
+		
+   /**
+	* Gets the proper SQL connection.
+	* 
+	* @return The SQL connection.
+    * @throws SQLException 
+	*/
+	protected Connection getConnection() throws SQLException {
+		if (!this.isClosed(this.connection, 2)) {
+			return this.connection; 
+		} else if (!this.stopConnection) {
+			synchronized (this) {
+				if (ConfigHandler.getConfig(false).sqlEnabled()) {
+					try { 
+						Class.forName("com.mysql.jdbc.Driver");
+						if (!PlayerLogin.hasStarted()) {
+						ServerHandler.getServer().logInfo("Loading MySQL Connection...");
+						}
+						this.connection = DriverManager.getConnection("jdbc:mysql://" + this.host + ":" + this.port + "/" + this.database + "?createDatabaseIfNotExist=true" + "&useSSL=false", Utils.getUtils().decrypt(this.user), Utils.getUtils().decrypt(this.pass));
+						return this.connection;
+					} catch (Exception e) { 
+						this.stopConnection = true;
+						ServerHandler.getServer().logSevere("{MySQL} Unable to connect to the defined MySQL database, check your settings.");
+						ServerHandler.getServer().sendSevereTrace(e);
+					}
+					return this.connection;
+				} else {
+					try {
+						Class.forName("org.sqlite.JDBC");
+						this.connection = DriverManager.getConnection("jdbc:sqlite:" + this.getDatabase());
+					} catch (SQLException e) { 
+						this.stopConnection = true;
+						ServerHandler.getServer().logSevere("{SQLite} SQLite exception on initialize.");
+						ServerHandler.getServer().sendDebugTrace(e);
+					} catch (ClassNotFoundException e) { 
+						this.stopConnection = true;
+						ServerHandler.getServer().logSevere("{SQLite} You need the SQLite JBDC library, see: https://bitbucket.org/xerial/sqlite-jdbc/downloads/ and put it in the /lib folder of Java.");
+						ServerHandler.getServer().sendDebugTrace(e);
+					}
+					return this.connection;
+				}
+			}
+		}
+		return this.connection;
+	}
+	
+   /**
+	* Checks if the Connection Object isClosed.
+	* 
+	* @return If the Connection isClosed.
+	*/
+	protected boolean isClosed(final Object object, final int cast) {
+		switch (cast) {
+			case 0: { 
+				try {
+					if ((PreparedStatement)object == null || ((PreparedStatement)object).isClosed()) {
+						return true;
+					}
+				} catch (AbstractMethodError | NoClassDefFoundError e) { return false; } 
+				  catch (SQLException e) { 
+					ServerHandler.getServer().logSevere("{SQLite} [11] Failed to close database connection."); 
+					ServerHandler.getServer().sendDebugTrace(e); 
+					return true; 
+				}
+			}
+			case 1: {
+				try {
+					if ((ResultSet)object == null || ((ResultSet)object).isClosed()) {
+						return true;
+					}
+				} catch (AbstractMethodError | NoClassDefFoundError e) { return false; } 
+				  catch (SQLException e) { 
+					ServerHandler.getServer().logSevere("{SQLite} [12] Failed to close database connection."); 
+					ServerHandler.getServer().sendDebugTrace(e); 
+					return true; 
+				}
+			}
+			case 2: {
+				try {
+					if ((Connection)object == null || ((Connection)object).isClosed()) {
+						return true;
+					}
+				} catch (AbstractMethodError | NoClassDefFoundError e) { return false; } 
+				  catch (SQLException e) { 
+					ServerHandler.getServer().logSevere("{SQLite} [13] Failed to close database connection."); 
+					ServerHandler.getServer().sendDebugTrace(e); 
+					return true; 
+				}
+			}
+			default: return false;
+		}
+	}
+	
+   /**
+	* Closes the specific PreparedStatement and ResultSet.
+	* 
+	* @param ps - the PreparedStatement being closed.
+	* @param rs - the ResultSet being closed.
+	* @param conn - the Connection being closed.
+	*/
+	protected void close(final PreparedStatement ps, final ResultSet rs, final Connection conn, final boolean force) {
+		try {
+			if (!this.isClosed(ps, 0)) {
+				ps.close();
+			}
+			if (!this.isClosed(rs, 1)) {
+				rs.close();
+			}
+			if (!this.isClosed(conn, 2) && (!ConfigHandler.getConfig(false).sqlEnabled() || force)) {
+				conn.close();
+			}
+		} catch (SQLException e) { 
+			ServerHandler.getServer().logSevere("{SQLite} [10] Failed to close database connection."); 
+			ServerHandler.getServer().sendDebugTrace(e);
+		}
+	}
+	
+   /**
+	* Gets the database file.
+	* 
+	* @return The Database File.
+	*/
+	private File getDatabase() {
+		File dataFolder = new File(ItemJoin.getInstance().getDataFolder(), this.dataFolder + ".db");
+		if (!dataFolder.exists()) {
+			try { dataFolder.createNewFile(); } 
+			catch (IOException e) { 
+				ServerHandler.getServer().logSevere("{SQLite} File write error: " + this.dataFolder + ".db."); 
+				ServerHandler.getServer().sendDebugTrace(e);
+			}
+		}
+		return dataFolder;
 	}
 }
