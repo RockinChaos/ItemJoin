@@ -17,6 +17,7 @@
  */
 package me.RockinChaos.itemjoin.handlers;
 
+import java.io.BufferedReader;
 import java.io.EOFException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
@@ -43,9 +44,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.map.MapView;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+import org.json.simple.JSONArray;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 
@@ -411,10 +413,12 @@ public class ItemHandler {
 					HttpsURLConnection connection = (HttpsURLConnection) new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + UUID + "?unsigned=false").openConnection();
 					if (connection.getResponseCode() == HttpsURLConnection.HTTP_OK) {
 			            InputStreamReader reader = new InputStreamReader(connection.getInputStream());
-			            JsonObject properties = new JsonParser().parse(reader).getAsJsonObject().get("properties").getAsJsonArray().get(0).getAsJsonObject();
-			            String texture = properties.get("value").getAsString();
-			            String signature = properties.get("signature").getAsString();
-						profile.getProperties().put("textures", new Property("textures", texture, signature));
+			            String JsonString = Utils.getUtils().toString(new BufferedReader(reader)); 
+			            JSONObject objectReader = (JSONObject) JSONValue.parseWithException(JsonString);
+			            objectReader = (JSONObject)(((JSONArray)objectReader.get("properties")).get(0));
+			            String skin = objectReader.get("value").toString();
+			            String signature = objectReader.get("signature").toString();
+						profile.getProperties().put("textures", new Property("textures", skin, signature));
 						this.gameProfiles.put(owner, profile);
 					} else {
 						ServerHandler.getServer().logWarn("{ItemHandler} [Mojang] Connection could not be opened (Response code " + connection.getResponseCode() + ", " + connection.getResponseMessage() + ")");

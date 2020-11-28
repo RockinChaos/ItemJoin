@@ -299,11 +299,8 @@ public class Utils {
     * @return The resulting appended String.
     */
 	public String toString(BufferedReader reader) throws IOException {
-		String line = null;
 		StringBuilder result = new StringBuilder();
-		while ((line = reader.readLine()) != null) {
-		result.append(line);
-		}
+		String line = null; while ((line = reader.readLine()) != null) { result.append(line); }
 		return result.toString();
 	}
 	
