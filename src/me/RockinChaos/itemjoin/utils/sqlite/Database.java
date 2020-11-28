@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.bukkit.configuration.file.FileConfiguration;
-
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
@@ -72,7 +71,7 @@ public class Database extends Controller {
 		} catch (Exception e) {
 			ServerHandler.getServer().logSevere("{SQLite} [1] Failed to execute database statement.");
 			try {
-				ServerHandler.getServer().logSevere("{SQLite} [1] Database Status: Open: " + !this.isClosed(conn, 2) + "! Writable: " + !conn.isReadOnly() + "!");
+				ServerHandler.getServer().logSevere("{SQLite} [1] Database Status: Open: " + !this.isClosed(conn) + "! Writable: " + !conn.isReadOnly() + "!");
 			} catch (Exception e2) {
 				ServerHandler.getServer().logSevere("{SQLite} [1] Failed to determine the Database Status.");
 			}
@@ -105,7 +104,7 @@ public class Database extends Controller {
 		} catch (Exception e) {
 			ServerHandler.getServer().logSevere("{SQLite} [2] Failed to execute database statement.");
 			try {
-				ServerHandler.getServer().logSevere("{SQLite} [2] Database Status: Open: " + !this.isClosed(conn, 2) + "! Writable: " + !conn.isReadOnly() + "!");
+				ServerHandler.getServer().logSevere("{SQLite} [2] Database Status: Open: " + !this.isClosed(conn) + "! Writable: " + !conn.isReadOnly() + "!");
 			} catch (Exception e2) {
 				ServerHandler.getServer().logSevere("{SQLite} [2] Failed to determine the Database Status.");
 			}
@@ -140,7 +139,7 @@ public class Database extends Controller {
 		} catch (Exception e) {
 			ServerHandler.getServer().logSevere("{SQLite} [3] Failed to execute database statement.");
 			try {
-				ServerHandler.getServer().logSevere("{SQLite} [3] Database Status: Open: " + !this.isClosed(conn, 2) + "! Writable: " + !conn.isReadOnly() + "!");
+				ServerHandler.getServer().logSevere("{SQLite} [3] Database Status: Open: " + !this.isClosed(conn) + "! Writable: " + !conn.isReadOnly() + "!");
 			} catch (Exception e2) {
 				ServerHandler.getServer().logSevere("{SQLite} [3] Failed to determine the Database Status.");
 			}
@@ -171,7 +170,7 @@ public class Database extends Controller {
 			while (rs.next()) {
 				final HashMap < String, String > columnData = new HashMap < String, String > ();
 				for (final String singleRow: rows.split(", ")) {
-					if (!this.isClosed(rs, 1) && !this.isClosed(conn, 2)) {
+					if (!this.isClosed(rs) && !this.isClosed(conn)) {
 						columnData.put(singleRow, rs.getString(singleRow));
 					}
 				}
@@ -180,7 +179,7 @@ public class Database extends Controller {
 		} catch (Exception e) {
 			ServerHandler.getServer().logSevere("{SQLite} [4] Failed to execute database statement.");
 			try {
-				ServerHandler.getServer().logSevere("{SQLite} [4] Database Status: Open: " + !this.isClosed(conn, 2) + "! Writable: " + !conn.isReadOnly() + "!");
+				ServerHandler.getServer().logSevere("{SQLite} [4] Database Status: Open: " + !this.isClosed(conn) + "! Writable: " + !conn.isReadOnly() + "!");
 			} catch (Exception e2) {
 				ServerHandler.getServer().logSevere("{SQLite} [4] Failed to determine the Database Status.");
 			}
@@ -218,7 +217,7 @@ public class Database extends Controller {
 		} catch (Exception e) {
 			ServerHandler.getServer().logSevere("{SQLite} [4] Failed to execute database statement.");
 			try {
-				ServerHandler.getServer().logSevere("{SQLite} [4] Database Status: Open: " + !this.isClosed(conn, 2) + "! Writable: " + !conn.isReadOnly() + "!");
+				ServerHandler.getServer().logSevere("{SQLite} [4] Database Status: Open: " + !this.isClosed(conn) + "! Writable: " + !conn.isReadOnly() + "!");
 			} catch (Exception e2) {
 				ServerHandler.getServer().logSevere("{SQLite} [4] Failed to determine the Database Status.");
 			}
@@ -259,7 +258,7 @@ public class Database extends Controller {
 		} catch (Exception e) {
 				ServerHandler.getServer().logSevere("{SQLite} [5] Failed to execute database statement.");
 			try {
-				ServerHandler.getServer().logSevere("{SQLite} [5] Database Status: Open: " + !this.isClosed(conn, 2) + "! Writable: " + !conn.isReadOnly() + "!");
+				ServerHandler.getServer().logSevere("{SQLite} [5] Database Status: Open: " + !this.isClosed(conn) + "! Writable: " + !conn.isReadOnly() + "!");
 			} catch (Exception e2) {
 				ServerHandler.getServer().logSevere("{SQLite} [5] Failed to determine the Database Status.");
 			}
@@ -292,7 +291,7 @@ public class Database extends Controller {
 			} else {
 				ServerHandler.getServer().logSevere("{SQLite} [6] Failed to execute database statement.");
 			try {
-				ServerHandler.getServer().logSevere("{SQLite} [6] Database Status: Open: " + !this.isClosed(conn, 2) + "! Writable: " + !conn.isReadOnly() + "!");
+				ServerHandler.getServer().logSevere("{SQLite} [6] Database Status: Open: " + !this.isClosed(conn) + "! Writable: " + !conn.isReadOnly() + "!");
 			} catch (Exception e2) {
 				ServerHandler.getServer().logSevere("{SQLite} [6] Failed to determine the Database Status.");
 			}
@@ -319,7 +318,7 @@ public class Database extends Controller {
 			conn = this.getConnection();
 			rs = conn.getMetaData().getTables(null, null, tableName, null);
 			while (rs.next()) {
-				if (!this.isClosed(rs, 1) && !this.isClosed(conn, 2)) {
+				if (!this.isClosed(rs) && !this.isClosed(conn)) {
 					String tName = rs.getString("TABLE_NAME");
 					if (tName != null && tName.equals(tableName)) {
 						tExists = true;
@@ -406,7 +405,7 @@ abstract class Controller {
     * @throws SQLException 
 	*/
 	protected Connection getConnection() throws SQLException {
-		if (!this.isClosed(this.connection, 2)) {
+		if (!this.isClosed(this.connection)) {
 			return this.connection; 
 		} else if (!this.stopConnection) {
 			synchronized (this) {
@@ -449,46 +448,56 @@ abstract class Controller {
 	* 
 	* @return If the Connection isClosed.
 	*/
-	protected boolean isClosed(final Object object, final int cast) {
-		switch (cast) {
-			case 0: { 
-				try {
-					if ((PreparedStatement)object == null || ((PreparedStatement)object).isClosed()) {
-						return true;
-					}
-				} catch (AbstractMethodError | NoClassDefFoundError e) { return false; } 
-				  catch (SQLException e) { 
-					ServerHandler.getServer().logSevere("{SQLite} [11] Failed to close database connection."); 
-					ServerHandler.getServer().sendDebugTrace(e); 
-					return true; 
+	protected boolean isClosed(final PreparedStatement object) {
+		try {
+			if (object == null || object.isClosed()) {
+				return true;
 				}
-			}
-			case 1: {
-				try {
-					if ((ResultSet)object == null || ((ResultSet)object).isClosed()) {
-						return true;
-					}
-				} catch (AbstractMethodError | NoClassDefFoundError e) { return false; } 
-				  catch (SQLException e) { 
-					ServerHandler.getServer().logSevere("{SQLite} [12] Failed to close database connection."); 
-					ServerHandler.getServer().sendDebugTrace(e); 
-					return true; 
+			} catch (AbstractMethodError | NoClassDefFoundError e) { return false; } 
+			  catch (SQLException e) { 
+				  ServerHandler.getServer().logSevere("{SQLite} [11] Failed to close database connection."); 
+				  ServerHandler.getServer().sendDebugTrace(e); 
+				  return true; 
+		    }
+		return false;
+	}
+	
+   /**
+	* Checks if the Connection Object isClosed.
+	* 
+	* @return If the Connection isClosed.
+	*/
+	protected boolean isClosed(final ResultSet object) {
+		try {
+			if (object == null || object.isClosed()) {
+				return true;
 				}
-			}
-			case 2: {
-				try {
-					if ((Connection)object == null || ((Connection)object).isClosed()) {
-						return true;
-					}
-				} catch (AbstractMethodError | NoClassDefFoundError e) { return false; } 
-				  catch (SQLException e) { 
-					ServerHandler.getServer().logSevere("{SQLite} [13] Failed to close database connection."); 
-					ServerHandler.getServer().sendDebugTrace(e); 
-					return true; 
+			} catch (AbstractMethodError | NoClassDefFoundError e) { return false; } 
+			  catch (SQLException e) { 
+				  ServerHandler.getServer().logSevere("{SQLite} [11] Failed to close database connection."); 
+				  ServerHandler.getServer().sendDebugTrace(e); 
+				  return true; 
+		    }
+		return false;
+	}
+	
+   /**
+	* Checks if the Connection Object isClosed.
+	* 
+	* @return If the Connection isClosed.
+	*/
+	protected boolean isClosed(final Connection object) {
+		try {
+			if (object == null || object.isClosed()) {
+				return true;
 				}
-			}
-			default: return false;
-		}
+			} catch (AbstractMethodError | NoClassDefFoundError e) { return false; } 
+			  catch (SQLException e) { 
+				  ServerHandler.getServer().logSevere("{SQLite} [11] Failed to close database connection."); 
+				  ServerHandler.getServer().sendDebugTrace(e); 
+				  return true; 
+		    }
+		return false;
 	}
 	
    /**
@@ -500,13 +509,13 @@ abstract class Controller {
 	*/
 	protected void close(final PreparedStatement ps, final ResultSet rs, final Connection conn, final boolean force) {
 		try {
-			if (!this.isClosed(ps, 0)) {
+			if (!this.isClosed(ps)) {
 				ps.close();
 			}
-			if (!this.isClosed(rs, 1)) {
+			if (!this.isClosed(rs)) {
 				rs.close();
 			}
-			if (!this.isClosed(conn, 2) && (!ConfigHandler.getConfig(false).sqlEnabled() || force)) {
+			if (!this.isClosed(conn) && (!ConfigHandler.getConfig(false).sqlEnabled() || force)) {
 				conn.close();
 			}
 		} catch (SQLException e) { 
