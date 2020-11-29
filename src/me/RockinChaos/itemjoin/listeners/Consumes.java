@@ -106,6 +106,42 @@ public class Consumes implements Listener {
 		}
 	}
 	
+   /**
+    * Refills the players arrows item to its original stack size when consuming the item.
+    * 
+    * @param event - EntityShootBowEvent.
+	*/
+	@EventHandler(ignoreCancelled = true)
+	private void onPlayerFireArrow(EntityShootBowEvent event) {
+		LivingEntity entity = event.getEntity();
+		if (ServerHandler.getServer().hasSpecificUpdate("1_16") && entity instanceof Player) {
+			ItemStack item = (event.getConsumable() != null ? event.getConsumable().clone() : event.getConsumable());
+			Player player = (Player) event.getEntity();
+			if (entity instanceof Player && !ItemUtilities.getUtilities().isAllowed(player, item, "count-lock")) {
+				event.setConsumeItem(false);
+				PlayerHandler.getPlayer().updateInventory(player, 1L);
+			}
+		} else if (entity instanceof Player) {
+			HashMap < Integer, ItemStack > map = new HashMap < Integer, ItemStack > ();
+			Player player = (Player) event.getEntity();
+			for (int i = 0; i < player.getInventory().getSize(); i++) {
+				if (player.getInventory().getItem(i) != null && player.getInventory().getItem(i).getType() == Material.ARROW && event.getProjectile().getType().name().equalsIgnoreCase("ARROW")) {
+					map.put(i, player.getInventory().getItem(i).clone());
+				}
+			}
+			ServerHandler.getServer().runThread(main -> {
+				for (Integer mdd: map.keySet()) {
+					if (player.getInventory().getItem(mdd) == null || player.getInventory().getItem(mdd).getAmount() != map.get(mdd).getAmount()) {
+						if (!ItemUtilities.getUtilities().isAllowed(player, map.get(mdd), "count-lock")) {
+							player.getInventory().setItem(mdd, map.get(mdd));
+						}
+					}
+				}
+				PlayerHandler.getPlayer().updateInventory(player, 1L);
+			}, 2L);
+		}
+	}
+	
 	/**
 	 * Refills the players totem item to the original stack count upon use.
 	 * 

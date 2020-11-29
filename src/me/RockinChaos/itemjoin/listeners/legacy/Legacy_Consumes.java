@@ -112,4 +112,34 @@ public class Legacy_Consumes implements Listener {
 	 		}, 2L);
 		}
 	}
+	
+   /**
+    * Refills the players arrows item to its original stack size when consuming the item.
+    * 
+    * @param event - EntityShootBowEvent.
+    * @deprecated This is a LEGACY event, only use on Minecraft versions below 1.11.
+	*/
+	@EventHandler(ignoreCancelled = true)
+	private void onPlayerFireArrow(EntityShootBowEvent event) {
+		LivingEntity entity = event.getEntity();
+		if (entity instanceof Player) {
+			HashMap < Integer, ItemStack > map = new HashMap < Integer, ItemStack > ();
+			Player player = (Player) event.getEntity();
+			for (int i = 0; i < player.getInventory().getSize(); i++) {
+				if (player.getInventory().getItem(i) != null && player.getInventory().getItem(i).getType() == Material.ARROW && event.getProjectile().getType().name().equalsIgnoreCase("ARROW")) {
+					map.put(i, player.getInventory().getItem(i).clone());
+				}
+			}
+			ServerHandler.getServer().runThread(main -> {
+				for (Integer mdd: map.keySet()) {
+					if (player.getInventory().getItem(mdd) == null || player.getInventory().getItem(mdd).getAmount() != map.get(mdd).getAmount()) {
+						if (!ItemUtilities.getUtilities().isAllowed(player, map.get(mdd), "count-lock")) {
+							player.getInventory().setItem(mdd, map.get(mdd));
+						}
+					}
+				}
+				PlayerHandler.getPlayer().updateInventory(player, 1L);
+			}, 2L);
+		}
+	}
 }
