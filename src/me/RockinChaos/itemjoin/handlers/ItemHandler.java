@@ -403,6 +403,10 @@ public class ItemHandler {
 	public GameProfile getProfile(final String owner) {
 		if (this.gameProfiles.get(owner) == null) {
 			ServerHandler.getServer().runAsyncThread(async -> {
+				if (owner == null || owner.isEmpty()) {
+					ServerHandler.getServer().logWarn("{ItemHandler} The defined skull owner cannot be empty or null.");
+					return;
+				}
 				String UUID = Utils.getUtils().getMojangUUID(owner);
 				if (UUID == null) {
 					Utils.getUtils().loadMojangUUID(owner);
@@ -421,7 +425,7 @@ public class ItemHandler {
 						profile.getProperties().put("textures", new Property("textures", skin, signature));
 						this.gameProfiles.put(owner, profile);
 					} else {
-						ServerHandler.getServer().logWarn("{ItemHandler} [Mojang] Connection could not be opened (Response code " + connection.getResponseCode() + ", " + connection.getResponseMessage() + ")");
+						ServerHandler.getServer().logDebug("{ItemHandler} [Mojang] Connection could not be opened (Response code " + connection.getResponseCode() + ", " + connection.getResponseMessage() + ")");
 					}
 				} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
 			});

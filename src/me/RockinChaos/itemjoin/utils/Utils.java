@@ -322,7 +322,7 @@ public class Utils {
     */
     public void loadMojangUUID(final String name) {
         try {
-	        HttpsURLConnection connection = (HttpsURLConnection) new URL("https://api.mojang.com/users/profiles/minecraft/" + name).openConnection();
+	        HttpsURLConnection connection = (HttpsURLConnection) new URL("https://api.mojang.com/users/profiles/minecraft/" + name + "?at=" + System.currentTimeMillis()).openConnection();
 	        if (connection.getResponseCode() == HttpsURLConnection.HTTP_OK) {
 		        InputStreamReader reader = new InputStreamReader(connection.getInputStream());
 			    String UUIDJson = this.toString(new BufferedReader(reader)); 
@@ -330,7 +330,7 @@ public class Utils {
 			    String UUID = UUIDObject.get("id").toString();
 			    this.mojangUUID.put(name, UUID);
 	        } else {
-				ServerHandler.getServer().logWarn("{Utils} [Mojang] Connection could not be opened (Response code " + connection.getResponseCode() + ", " + connection.getResponseMessage() + ")");
+				ServerHandler.getServer().logDebug("{Utils} [Mojang] Connection could not be opened (Response code " + connection.getResponseCode() + ", " + connection.getResponseMessage() + ")");
 	        }
         } catch (Exception e) { e.printStackTrace(); }
     }
