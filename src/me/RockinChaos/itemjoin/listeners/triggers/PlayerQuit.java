@@ -23,6 +23,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
+import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 
 public class PlayerQuit implements Listener {
@@ -35,7 +36,9 @@ public class PlayerQuit implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	private void Quit(PlayerQuitEvent event) {
 		Player player = event.getPlayer();
-		ItemHandler.getItem().saveCraftItems(player);
-		ItemUtilities.getUtilities().closeAnimations(player);
+		if (PlayerHandler.getPlayer().isPlayer(player)) {
+			ItemHandler.getItem().saveCraftItems(player);
+			ItemUtilities.getUtilities().closeAnimations(player);
+		}
 	}
 }

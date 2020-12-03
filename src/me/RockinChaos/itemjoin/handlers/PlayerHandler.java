@@ -39,6 +39,7 @@ import me.RockinChaos.itemjoin.utils.DependAPI;
 import me.RockinChaos.itemjoin.utils.LanguageAPI;
 import me.RockinChaos.itemjoin.utils.LegacyAPI;
 import me.RockinChaos.itemjoin.utils.Reflection;
+import net.citizensnpcs.api.CitizensAPI;
 
 public class PlayerHandler {
 	
@@ -57,10 +58,26 @@ public class PlayerHandler {
     * Safely closes the players inventory in order to call the InventoryCloseEvent.
     * Fixes a bug with player.closeInventory() not calling the event by default, breaking crafting items.
     * 
+    * @param player - The player to have their inventory closed.
     */
     public void safeInventoryClose(Player player) {
     	player.openInventory(Bukkit.createInventory(player.getInventory().getHolder(), 9));
     	player.closeInventory();	
+    }
+    
+   /**
+    * Checks if the Entity is a real player.
+    * 
+    * @param entity - The entity being checked.
+    * @return If the entity is a real Player.
+    */
+    public boolean isPlayer(Entity entity) {
+    	if (DependAPI.getDepends(false).citizensEnabled() && CitizensAPI.getNPCRegistry().isNPC(entity)) {
+    		return false;
+    	} else if (!(entity instanceof Player)) { 
+    		return false; 
+    	}
+    	return true;
     }
 	
    /**

@@ -23,6 +23,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
 
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
+import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 
 public class PlayerLogin implements Listener {
 	private static boolean startComplete = false;
@@ -35,7 +36,9 @@ public class PlayerLogin implements Listener {
 	*/
 	@EventHandler(priority = EventPriority.LOWEST)
 	private void setLoginItems(PlayerLoginEvent event) {
-		ItemHandler.getItem().preLoad(event.getPlayer());
+		if (PlayerHandler.getPlayer().isPlayer(event.getPlayer())) {
+			ItemHandler.getItem().preLoad(event.getPlayer());
+		}
 	}
 	
    /**

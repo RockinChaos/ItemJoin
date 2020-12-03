@@ -22,6 +22,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 
+import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.item.ItemUtilities.TriggerType;
 
@@ -36,6 +37,8 @@ public class WorldSwitch implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	private void setWorldSwitchItems(PlayerChangedWorldEvent event) {
 		final Player player = event.getPlayer();
-		ItemUtilities.getUtilities().setAuthenticating(player, TriggerType.WORLDSWITCH, org.bukkit.GameMode.ADVENTURE, "GLOBAL"); 
+		if (PlayerHandler.getPlayer().isPlayer(player)) {
+			ItemUtilities.getUtilities().setAuthenticating(player, TriggerType.WORLDSWITCH, org.bukkit.GameMode.ADVENTURE, "GLOBAL"); 
+		}
 	}
 }

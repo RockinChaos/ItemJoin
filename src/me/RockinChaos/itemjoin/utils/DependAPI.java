@@ -39,6 +39,7 @@ public class DependAPI {
 	private boolean tokenEnchant = false;
 	private boolean headDatabase = false;
 	private boolean skinsRestorer = false;
+	private boolean citizens = false;
 	
 	private static DependAPI depends;
 	
@@ -60,6 +61,7 @@ public class DependAPI {
 		this.setTokenEnchantStatus(Bukkit.getServer().getPluginManager().getPlugin("TokenEnchant") != null);
 		this.setDatabaseStatus(Bukkit.getServer().getPluginManager().getPlugin("HeadDatabase") != null);
 		this.setSkinsRestorerStatus(Bukkit.getServer().getPluginManager().getPlugin("SkinsRestorer") != null);
+		this.setCitizensStatus(Bukkit.getServer().getPluginManager().getPlugin("Citizens") != null);
 		GuardAPI.getGuard(true);
 		VaultAPI.getVault(true);
 	}
@@ -180,6 +182,15 @@ public class DependAPI {
     public boolean skinsRestorerEnabled() {
     	return this.skinsRestorer;
     }
+    
+   /**
+    * Checks if Citizens is Enabled.
+    * 
+    * @return If Citizens is Enabled.
+    */
+    public boolean citizensEnabled() {
+    	return this.citizens;
+    }
 
    /**
     * Sets the status of Hyperverse.
@@ -299,6 +310,15 @@ public class DependAPI {
     }
     
    /**
+    * Sets the status of Citizens.
+    * 
+    * @param bool - If Citizens is enabled.
+    */
+    public void setCitizensStatus(final boolean bool) {
+    	this.citizens = bool;
+    }
+    
+   /**
     * Gets the set SkinsRestorer skin.
     * 
     * @param owner - The skull owner to have their skin fetched.
@@ -336,7 +356,7 @@ public class DependAPI {
 				+ (this.myWorldsEnabled() ? "My Worlds, " : "") + (this.perInventoryEnabled() ? "PerWorldInventory, " : "") 
 				+ (this.perPluginsEnabled() ? "PerWorldPlugins, " : "") + (this.tokenEnchantEnabled() ? "TokenEnchant, " : "") 
 				+ (this.getGuard().guardEnabled() ? "WorldGuard, " : "") + (this.databaseEnabled() ? "HeadDatabase, " : "") 
-				+ (this.xInventoryEnabled() ? "xInventories, " : "") + (this.placeHolderEnabled() ? "PlaceholderAPI, " : "") + (this.skinsRestorer ? "SkinsRestorer, " : "") 
+				+ (this.xInventoryEnabled() ? "xInventories, " : "") + (this.placeHolderEnabled() ? "PlaceholderAPI, " : "") + (this.skinsRestorer ? "SkinsRestorer, " : "") + (this.citizens ? "Citizens, " : "") 
 				+ (this.getVault().vaultEnabled() ? "Vault " : "");
 		if (!enabledPlugins.isEmpty()) { ServerHandler.getServer().logInfo("Hooked into { " + enabledPlugins + "}"); }
 	}

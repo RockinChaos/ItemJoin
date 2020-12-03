@@ -28,6 +28,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
+import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.item.ItemUtilities.TriggerType;
@@ -48,11 +49,13 @@ public class PlayerGuard implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	private void setRegionItems(PlayerMoveEvent event) {
 		final Player player = event.getPlayer();
-		ServerHandler.getServer().runAsyncThread(async -> {
-			if (SQL.getData(false).isEnabled(player)) {
-				this.handleRegions(player);
-			}
-		});
+		if (PlayerHandler.getPlayer().isPlayer(player)) {
+			ServerHandler.getServer().runAsyncThread(async -> {
+				if (SQL.getData(false).isEnabled(player)) {
+					this.handleRegions(player);
+				}
+			});
+		}
 	}
 	
    /**
@@ -65,11 +68,13 @@ public class PlayerGuard implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	private void setRegionItems(PlayerTeleportEvent event) {
 		final Player player = event.getPlayer();
-		ServerHandler.getServer().runAsyncThread(async -> {
-			if (SQL.getData(false).isEnabled(player)) {
-				this.handleRegions(player);
-			}
-		});
+		if (PlayerHandler.getPlayer().isPlayer(player)) {
+			ServerHandler.getServer().runAsyncThread(async -> {
+				if (SQL.getData(false).isEnabled(player)) {
+					this.handleRegions(player);
+				}
+			});
+		}
 	}
 	
    /**
