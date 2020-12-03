@@ -114,7 +114,7 @@ public class Consumes implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	private void onPlayerFireArrow(EntityShootBowEvent event) {
 		LivingEntity entity = event.getEntity();
-		if (ServerHandler.getServer().hasSpecificUpdate("1_16") && entity instanceof Player) {
+		if (ServerHandler.getServer().hasSpecificUpdate("1_16") && entity instanceof Player && event.getBow() != null && event.getBow().getType() == Material.BOW) {
 			ItemStack item = (event.getConsumable() != null ? event.getConsumable().clone() : event.getConsumable());
 			Player player = (Player) event.getEntity();
 			if (entity instanceof Player && !ItemUtilities.getUtilities().isAllowed(player, item, "count-lock")) {
@@ -126,7 +126,10 @@ public class Consumes implements Listener {
 			Player player = (Player) event.getEntity();
 			for (int i = 0; i < player.getInventory().getSize(); i++) {
 				if (player.getInventory().getItem(i) != null && player.getInventory().getItem(i).getType() == Material.ARROW && event.getProjectile().getType().name().equalsIgnoreCase("ARROW")) {
-					map.put(i, player.getInventory().getItem(i).clone());
+					ItemStack cloneStack = player.getInventory().getItem(i).clone();
+					ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(player.getInventory().getItem(i), null, player.getWorld());
+					if (itemMap != null) { cloneStack.setAmount(itemMap.getCount()); }
+					map.put(i, cloneStack);
 				}
 			}
 			ServerHandler.getServer().runThread(main -> {
