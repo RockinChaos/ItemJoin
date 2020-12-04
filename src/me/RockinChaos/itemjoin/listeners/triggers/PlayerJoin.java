@@ -38,7 +38,7 @@ public class PlayerJoin implements Listener {
 	private void setJoinItems(PlayerJoinEvent event) {
 		final Player player = event.getPlayer();
 		if (PlayerHandler.getPlayer().isPlayer(player)) {
-			ItemUtilities.getUtilities().setAuthenticating(player, TriggerType.JOIN, org.bukkit.GameMode.ADVENTURE, "GLOBAL"); 
+			ItemUtilities.getUtilities().setAuthenticating(player, player.getWorld(), TriggerType.JOIN, org.bukkit.GameMode.ADVENTURE, "GLOBAL"); 
 		}
 	}
 }

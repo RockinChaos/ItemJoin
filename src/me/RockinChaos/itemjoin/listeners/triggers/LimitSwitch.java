@@ -41,7 +41,7 @@ public class LimitSwitch implements Listener {
 		final Player player = event.getPlayer();
 		final GameMode newMode = event.getNewGameMode();
 		if (PlayerHandler.getPlayer().isPlayer(player)) {
-			ItemUtilities.getUtilities().setAuthenticating(player, TriggerType.LIMITSWITCH, newMode, "GLOBAL"); 
+			ItemUtilities.getUtilities().setAuthenticating(player, player.getWorld(), TriggerType.LIMITSWITCH, newMode, "GLOBAL"); 
 		}
 	}
 }

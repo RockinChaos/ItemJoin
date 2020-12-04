@@ -157,23 +157,24 @@ public class ItemUtilities {
     * Then sets the item after Authentication is complete.
     * 
     * @param player - The Player that is being authenticated.
+    * @param world - The World that the player is from.
     * @param type - The TriggerType that is being performed.
     * @param newMode - The GameMode of the Player.
     * @param region - The region the Player is in.
     */
-	public void setAuthenticating(final Player player, TriggerType type, final GameMode newMode, final String region) {
+	public void setAuthenticating(final Player player, final World world, TriggerType type, final GameMode newMode, final String region) {
 		if (DependAPI.getDepends(false).authMeEnabled()) {
 			new BukkitRunnable() {
 				@Override
 				public void run() {
 					if (fr.xephi.authme.api.v3.AuthMeApi.getInstance().isAuthenticated(player)) {
-						setItems(player, type, newMode, region);
+						setItems(player, world, type, newMode, region);
 						this.cancel();
 					}
 				}
 			}.runTaskTimer(ItemJoin.getInstance(), 0, 20);
 		} else { 
-			this.setItems(player, type, newMode, region);
+			this.setItems(player, world, type, newMode, region);
 		}
 	}
 	
@@ -181,12 +182,13 @@ public class ItemUtilities {
     * Sets the items to be given.
     * 
     * @param player - The Player that is having their items set.
+    * @param world - The World that the player is from.
     * @param type - The TriggerType that is being performed.
     * @param newMode - The GameMode of the Player.
     * @param region - The region the Player is in.
     */
-	public void setItems(final Player player, final TriggerType type, final GameMode newMode, final String region) {
-		this.safeSet(player, type, region);
+	public void setItems(final Player player, final World world, final TriggerType type, final GameMode newMode, final String region) {
+		this.safeSet(player, world, type, region);
 		if (this.getItemDelay() != 0 && type != TriggerType.LIMITSWITCH && type != TriggerType.REGIONENTER && type != TriggerType.REGIONLEAVE) { 
 			ServerHandler.getServer().runThread(main -> {
 				ItemHandler.getItem().restoreCraftItems(player);
@@ -239,20 +241,21 @@ public class ItemUtilities {
     * @param player - The Player that is having their items set.
     * @param type - The TriggerType that is being performed.
     */
-	private void safeSet(final Player player, final TriggerType type, final String region) {
+	private void safeSet(final Player player, final World world, final TriggerType type, final String region) {
 		if (Utils.getUtils().splitIgnoreCase(ConfigHandler.getConfig(false).getHotbarTriggers(), type.name, ",")) { PlayerHandler.getPlayer().setHotbarSlot(player, ConfigHandler.getConfig(false).getHotbarSlot()); }
 		if (type.equals(TriggerType.REGIONLEAVE)) { DependAPI.getDepends(false).getGuard().pasteReturnItems(player, region); }
-		if (type.equals(TriggerType.REGIONENTER)) { this.clearEvent(player, "", type.name, region); }
+		if (type.equals(TriggerType.WORLDSWITCH)) { this.pasteReturnItems(type, player, world.getName()); }
+		if (type.equals(TriggerType.REGIONENTER)) { this.clearEvent(type, player, "", region); }
 		if (this.getClearDelay() != 0) {
 			ServerHandler.getServer().runThread(main -> {
 				if (type.equals(TriggerType.JOIN) || type.equals(TriggerType.WORLDSWITCH)) {
-					this.clearEvent(player, player.getWorld().getName(), type.name, "");
+					this.clearEvent(type, player, player.getWorld().getName(), "");
 				}
 				this.triggerCommands(player, type);
 			}, this.getClearDelay());
 		} else {
 			if (type.equals(TriggerType.JOIN) || type.equals(TriggerType.WORLDSWITCH)) {
-				this.clearEvent(player, player.getWorld().getName(), type.name, "");
+				this.clearEvent(type, player, player.getWorld().getName(), "");
 			}
 			this.triggerCommands(player, type);
 		}
@@ -261,22 +264,23 @@ public class ItemUtilities {
    /**
     * Sets the Players items to be cleared upon performing the specified event.
     * 
+    * @param type - The trigger type.
     * @param player - The Player performing the event.
     * @param world - The world the Player is in.
     * @param event - The event/trigger being performed.
     * @param region - The region the Player is in (if any).
     */
-	private void clearEvent(Player player, String world, String event, String region) {
-		String clearEvent = ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items." + event);
+	private void clearEvent(final TriggerType type, final Player player, final String world, final String region) {
+		String clearEvent = ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items." + type.name);
 		if (clearEvent != null && ((region != null && !region.isEmpty() && Utils.getUtils().containsLocation(region, clearEvent.replace(" ", ""))) || Utils.getUtils().containsLocation(world, clearEvent.replace(" ", "")))) {
 			if ((Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Options"), "PROTECT_OP") && player.isOp())
 				|| (Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Options"), "PROTECT_CREATIVE") && PlayerHandler.getPlayer().isCreativeMode(player))) {
 			} else {
 				String clearType = ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Type");
 				if (clearType != null && (clearType.equalsIgnoreCase("ALL") || clearType.equalsIgnoreCase("GLOBAL"))) {
-					this.clearItems(player, region, event, true);
+					this.clearItems(type, player, region, type.name, true);
 				} else if (clearType != null && clearType.equalsIgnoreCase("ITEMJOIN")) {
-					this.clearItems(player, region, event, false);
+					this.clearItems(type, player, region, type.name, false);
 				} else if (clearType != null) {
 					ServerHandler.getServer().logSevere("{ItemMap} " + clearType + " for Clear-Items in the config.yml is not a valid option.");
 				}
@@ -287,16 +291,18 @@ public class ItemUtilities {
    /**
     * Clears the items from the Player Inventory.
     * 
+    * @param type - The trigger type.
     * @param player - The Player performing the event.
     * @param event - The event/trigger being performed.
     * @param region - The region the Player is in (if any).
     * @param clearAll - If ALL items are expected to be cleared from the Player Inventory.
     */
-	private void clearItems(final Player player, final String event, final String region, final boolean clearAll) {
+	private void clearItems(final TriggerType type, final Player player, final String event, final String region, final boolean clearAll) {
 		this.protectItems = this.getProtectItems();
 		PlayerInventory inventory = player.getInventory();
 		Inventory craftView = player.getOpenInventory().getTopInventory();
 		DependAPI.getDepends(false).getGuard().saveReturnItems(player, event, region, craftView, inventory, true);
+		this.saveReturnItems(type, player, player.getWorld().getName(), craftView, inventory, true);
 		for (int i = 0; i < (!this.protectItems.isEmpty() ? this.protectItems.size() : 1); i++) {
 			if (this.canClear(inventory.getHelmet(), "Helmet", i, clearAll)) {
 				inventory.setHelmet(new ItemStack(Material.AIR));
@@ -479,6 +485,59 @@ public class ItemUtilities {
 				this.failCount.remove(session);
 			}
 		});
+	}
+	
+   /**
+    * Saves the current items in the Player Inventory to be returned later.
+    * 
+    * @param type - The trigger executed.
+    * @param player - The Player that had their items saved.
+    * @param world - The world to be checked.
+    * @param type - The clear type that is being executed.
+    * @param craftView - The players current CraftView.
+    * @param inventory - The players current Inventory.
+    * @param clearAll - If ALL items are being cleared.
+    */
+	public void saveReturnItems(final TriggerType type, final Player player, final String world, final Inventory craftView, final PlayerInventory inventory, final boolean clearAll) {
+		boolean doReturn = Utils.getUtils().splitIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Options").replace(" ", ""), "RETURN_SWITCH", ",");
+		List < ItemMap > protectItems = ItemUtilities.getUtilities().getProtectItems();
+		if (type == TriggerType.WORLDSWITCH && doReturn) {
+			Inventory saveInventory = Bukkit.createInventory(null, 54);
+			for (int i = 0; i <= 47; i++) {
+				for (int k = 0; k < (!protectItems.isEmpty() ? protectItems.size() : 1); k++) {
+					if (i <= 41 && inventory.getSize() >= i && ItemUtilities.getUtilities().canClear(inventory.getItem(i), String.valueOf(i), k, clearAll)) {
+						saveInventory.setItem(i, inventory.getItem(i).clone());
+					} else if (i >= 42 && ItemUtilities.getUtilities().canClear(craftView.getItem(i - 42), "CRAFTING[" + (i - 42) + "]", k, clearAll) && PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
+						saveInventory.setItem(i, craftView.getItem(i - 42).clone());
+					}
+				}
+			}
+			SQL.getData(false).saveReturnSwitchItems(player, world, saveInventory);
+		}
+	}
+	
+   /**
+    * Returns the previously removed Region Items to the Player.
+    * 
+    * @param type - The trigger executed.
+    * @param player - The Player that had their items returned.
+    * @param world - The world to be checked.
+    */
+	public void pasteReturnItems(final TriggerType type, final Player player, final String world) {
+		if (type == TriggerType.WORLDSWITCH && Utils.getUtils().splitIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Options").replace(" ", ""), "RETURN_SWITCH", ",")) {
+			Inventory inventory = SQL.getData(false).getReturnSwitchItems(player, world);
+			for (int i = 47; i >= 0; i--) {
+				if (inventory != null && inventory.getItem(i) != null && inventory.getItem(i).getType() != Material.AIR) {
+					if (i <= 41) {
+						player.getInventory().setItem(i, inventory.getItem(i).clone());
+					} else if (i >= 42 && PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
+						player.getOpenInventory().getTopInventory().setItem(i - 42, inventory.getItem(i).clone());
+						PlayerHandler.getPlayer().updateInventory(player, 1L);
+					}
+				}
+				SQL.getData(false).removeReturnSwitchItems(player, world);
+			}
+		}
 	}
 	
    /**

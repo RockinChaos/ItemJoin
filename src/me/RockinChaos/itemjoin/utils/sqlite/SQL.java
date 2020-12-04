@@ -47,6 +47,7 @@ public class SQL {
 	private Map < String, List <String> > enabledPlayers = new HashMap < String, List <String> >();
 	private Map < String, String > returnCraftItems = new HashMap < String, String >();
 	private Map < String, List <String> > returnItems = new HashMap < String, List <String> >();
+	private Map < String, List <String> > returnSwitchItems = new HashMap < String, List <String> >();
 	private Map < String, Long > onCooldown = new HashMap < String, Long >();
 	private List <String> executeStatementsLater = new ArrayList<String>();
 	
@@ -57,7 +58,7 @@ public class SQL {
 	* 
 	*/
     private enum Tables {
-       IJ_FIRST_JOIN, IJ_FIRST_WORLD, IJ_IP_LIMITS, IJ_FIRST_COMMANDS, IJ_ENABLED_PLAYERS, IJ_RETURN_ITEMS, IJ_RETURN_CRAFTITEMS, IJ_ON_COOLDOWN, IJ_MAP_IDS
+       IJ_FIRST_JOIN, IJ_FIRST_WORLD, IJ_IP_LIMITS, IJ_FIRST_COMMANDS, IJ_ENABLED_PLAYERS, IJ_RETURN_ITEMS, IJ_RETURN_SWITCH_ITEMS, IJ_RETURN_CRAFTITEMS, IJ_ON_COOLDOWN, IJ_MAP_IDS
     }
 	
    /**
@@ -75,6 +76,7 @@ public class SQL {
 		this.loadIPLimitAddresses();
 		this.loadEnabledPlayers();
 		this.loadReturnRegionItems();
+		this.loadReturnSwitchItems();
 		this.loadReturnCraftItems();
 		this.executeSaveStatements();
 	}
@@ -246,6 +248,27 @@ public class SQL {
 	}
 	
    /**
+    * Loads the return switch related data.
+    * 
+    */
+	private void loadReturnSwitchItems() {
+		List<List<String>> selectedReturnItems = Database.getDatabase("database").queryTableData("SELECT * FROM ij_return_switch_items", "Player_UUID", "World_Name", "Inventory64");
+		if (selectedReturnItems != null && !selectedReturnItems.isEmpty()) {
+			for (List<String> sl1 : selectedReturnItems) {
+				if (this.returnSwitchItems.get(sl1.get(0)) != null) {
+					List <String> h1 = this.returnSwitchItems.get(sl1.get(0));
+					h1.add(sl1.get(1) + "." + sl1.get(2));
+					this.returnSwitchItems.put(sl1.get(0), h1);
+				} else {
+					List <String> h1 = new ArrayList<String>();
+					h1.add(sl1.get(1) + "." + sl1.get(2));
+					this.returnSwitchItems.put(sl1.get(0), h1);
+				}
+			}
+		}
+	}
+	
+   /**
     * Loads the return crafting related data.
     * 
     */
@@ -378,6 +401,30 @@ public class SQL {
 	}
 	
    /**
+    * Saves the return world switch related data.
+    * 
+    * @param player - The player being saved.
+    * @param world - The world being saved.
+    * @param region - The region being saved.
+    * @param inventory - The inventory items being saved.
+    */
+	public void saveReturnSwitchItems(Player player, String region, Inventory inventory) {
+		String inventory64 = region + "." + ItemHandler.getItem().serializeInventory(inventory);
+		this.executeStatementsLater.add("INSERT INTO ij_return_switch_items (`World_Name`, `Player_UUID`, `Inventory64`, `Time_Stamp`) VALUES ('" + player.getWorld().getName() + "','" + PlayerHandler.getPlayer().getPlayerID(player) + "','" + ItemHandler.getItem().serializeInventory(inventory) + "','" + new Timestamp(System.currentTimeMillis()) + "')");
+		if (this.returnSwitchItems.get(PlayerHandler.getPlayer().getPlayerID(player)) != null && Utils.getUtils().containsIgnoreCase(this.returnSwitchItems.get(PlayerHandler.getPlayer().getPlayerID(player)).toString(), region)) {
+			return;
+	    } else if (this.returnSwitchItems.get(PlayerHandler.getPlayer().getPlayerID(player)) != null) {
+			List <String> h1 = this.returnSwitchItems.get(PlayerHandler.getPlayer().getPlayerID(player));
+			h1.add(inventory64);
+			this.returnSwitchItems.put(PlayerHandler.getPlayer().getPlayerID(player), h1);
+		} else {
+			List <String> h1 = new ArrayList<String>();
+			h1.add(inventory64);
+			this.returnSwitchItems.put(PlayerHandler.getPlayer().getPlayerID(player), h1);
+		}
+	}
+	
+   /**
     * Saves the return crafting related data.
     * 
     * @param player - The player being saved.
@@ -497,17 +544,38 @@ public class SQL {
     * @param world - The world being saved.
     * @param region - The region being saved.
     */
-	public void removeReturnRegionItems(Player player, String region) {
+	public void removeReturnRegionItems(Player player, String world) {
 		List <String> h1 = this.returnItems.get(PlayerHandler.getPlayer().getPlayerID(player));
 		if (this.returnItems.values() != null && !this.returnItems.isEmpty() && h1 != null && !h1.isEmpty()) {
-			this.executeStatementsLater.add("DELETE FROM ij_return_Items WHERE Player_UUID='" + PlayerHandler.getPlayer().getPlayerID(player) + "' AND Region_Name='" + region + "';");
+			this.executeStatementsLater.add("DELETE FROM ij_return_items WHERE Player_UUID='" + PlayerHandler.getPlayer().getPlayerID(player) + "' AND World_Name='" + world + "';");
 			for (String inventory : h1) {
-				if (Utils.getUtils().containsIgnoreCase(inventory, region + ".")) {
+				if (Utils.getUtils().containsIgnoreCase(inventory, world + ".")) {
 					h1.remove(inventory);
 					break;
 				}
 			}
 			this.returnItems.put(PlayerHandler.getPlayer().getPlayerID(player), h1);
+		}
+	}
+	
+   /**
+    * Removes the return region related data.
+    * 
+    * @param player - The player being removed.
+    * @param world - The world being saved.
+    * @param region - The region being saved.
+    */
+	public void removeReturnSwitchItems(Player player, String world) {
+		List <String> h1 = this.returnSwitchItems.get(PlayerHandler.getPlayer().getPlayerID(player));
+		if (this.returnSwitchItems.values() != null && !this.returnSwitchItems.isEmpty() && h1 != null && !h1.isEmpty()) {
+			this.executeStatementsLater.add("DELETE FROM ij_return_switch_items WHERE Player_UUID='" + PlayerHandler.getPlayer().getPlayerID(player) + "' AND World_Name='" + world + "';");
+			for (String inventory : h1) {
+				if (Utils.getUtils().containsIgnoreCase(inventory, world + ".")) {
+					h1.remove(inventory);
+					break;
+				}
+			}
+			this.returnSwitchItems.put(PlayerHandler.getPlayer().getPlayerID(player), h1);
 		}
 	}
 	
@@ -582,6 +650,25 @@ public class SQL {
 			for (String inventory : this.returnItems.get(PlayerHandler.getPlayer().getPlayerID(player))) {
 				if (Utils.getUtils().containsIgnoreCase(inventory, region)) {
 					return ItemHandler.getItem().deserializeInventory(inventory.replace(region + ".", ""));
+				}
+			}
+		}
+		return null;
+	}
+	
+   /**
+    * Gets the return region items.
+    * 
+    * @param player - The player being fetched.
+    * @param world - The world being fetched.
+    * @param region - The region to be fetched.
+    * @return The inventory to be returned.
+    */
+	public Inventory getReturnSwitchItems(Player player, String world) {
+		if (this.returnSwitchItems.get(PlayerHandler.getPlayer().getPlayerID(player)) != null) {
+			for (String inventory : this.returnSwitchItems.get(PlayerHandler.getPlayer().getPlayerID(player))) {
+				if (Utils.getUtils().containsIgnoreCase(inventory, world)) {
+					return ItemHandler.getItem().deserializeInventory(inventory.replace(world + ".", ""));
 				}
 			}
 		}
@@ -791,6 +878,8 @@ public class SQL {
         Database.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS ij_first_commands (`World_Name` varchar(1000), `Player_UUID` varchar(1000), `Command_String` varchar(1000), `Time_Stamp` varchar(1000));");
         Database.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS ij_enabled_players (`World_Name` varchar(1000), `Player_Name` varchar(1000), `Player_UUID` varchar(1000), `isEnabled` varchar(1000), `Time_Stamp` varchar(1000));");
         Database.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS ij_return_items (`World_Name` varchar(1000), `Region_Name` varchar(1000), `Player_UUID` varchar(1000), `Inventory64` varchar(1000), `Time_Stamp` varchar(1000));");
+        Database.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS ij_return_switch_items (`World_Name` varchar(1000), `Player_UUID` varchar(1000), `Inventory64` varchar(1000), `Time_Stamp` varchar(1000));");
+        Database.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS ij_return_join_items (`World_Name` varchar(1000), `Player_UUID` varchar(1000), `Inventory64` varchar(1000), `Time_Stamp` varchar(1000));");
         Database.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS ij_return_craftitems (`Player_UUID` varchar(1000), `Inventory64` varchar(1000), `Time_Stamp` varchar(1000));");
         Database.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS ij_on_cooldown (`World_Name` varchar(1000), `Item_Name` varchar(1000), `Player_UUID` varchar(1000), `Cooldown` varchar(1000), `Duration` varchar(1000), `Time_Stamp` varchar(1000));");
         Database.getDatabase("database").executeStatement("CREATE TABLE IF NOT EXISTS ij_map_ids (`Map_IMG` varchar(1000), `Map_ID` varchar(1000), `Time_Stamp` varchar(1000));");
