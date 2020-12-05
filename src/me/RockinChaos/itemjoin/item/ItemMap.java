@@ -2405,11 +2405,10 @@ public class ItemMap {
 		} else if (this.isOPPermissionNeeded() && player.isOp()) {
 			if ((player.isPermissionSet(customPerm) && player.hasPermission(customPerm) && (!player.isPermissionSet("itemjoin." + worldName + ".*") 
 			|| (player.isPermissionSet("itemjoin." + worldName + ".*") && player.hasPermission("itemjoin." + worldName + ".*"))) 
-			|| (player.isPermissionSet("itemjoin." + worldName + ".*") && player.hasPermission("itemjoin." + worldName + ".*") && (!player.isPermissionSet(customPerm) || (player.isPermissionSet(customPerm) && player.hasPermission(customPerm)))))) {
+			|| ((player.isPermissionSet("itemjoin." + worldName + ".*") && player.hasPermission("itemjoin." + worldName + ".*")) || (player.isPermissionSet(customPerm) && player.hasPermission(customPerm))))) {
 				return true;
 			}
-		} else if ((player.hasPermission(customPerm) && (!player.isPermissionSet("itemjoin." + worldName + ".*") || (player.isPermissionSet("itemjoin." + worldName + ".*") && player.hasPermission("itemjoin." + worldName + ".*"))) 
-			   || (player.hasPermission("itemjoin." + worldName + ".*") && (!player.isPermissionSet(customPerm) || (player.isPermissionSet(customPerm) && player.hasPermission(customPerm)))))) {
+		} else if (((player.isPermissionSet("itemjoin." + worldName + ".*") && player.hasPermission("itemjoin." + worldName + ".*")) || (player.isPermissionSet(customPerm) && player.hasPermission(customPerm)))) {
 			return true;
 		}
 		return false;

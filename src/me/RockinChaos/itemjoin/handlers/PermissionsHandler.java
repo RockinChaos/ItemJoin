@@ -50,7 +50,7 @@ public class PermissionsHandler {
     * @return If the entity has the proper permission.
     */
 	public boolean hasPermission(final CommandSender sender, final String permission) {
-		if (sender.hasPermission(permission) || sender.hasPermission("itemjoin.*") || sender.hasPermission("itemjoin.all") || isDeveloper(sender) || (sender instanceof ConsoleCommandSender)) {
+		if (sender.hasPermission(permission) || sender.hasPermission("itemjoin.*") || sender.hasPermission("itemjoin.all") || this.isDeveloper(sender) || (sender instanceof ConsoleCommandSender)) {
 			return true;
 		} else if (!ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Permissions.Commands-OP") && sender.isOp()) {
 			if (permission.equalsIgnoreCase("itemjoin.use") || permission.equalsIgnoreCase("itemjoin.reload") || permission.equalsIgnoreCase("itemjoin.updates")
