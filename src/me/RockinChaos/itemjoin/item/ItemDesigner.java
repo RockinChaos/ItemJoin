@@ -406,6 +406,21 @@ public class ItemDesigner {
 				tag.getClass().getMethod("setString", String.class, String.class).invoke(tag, "ItemJoin Name", itemMap.getConfigName());
 				tag.getClass().getMethod("setString", String.class, String.class).invoke(tag, "ItemJoin Slot", itemMap.getItemValue());
 				itemMap.setNewNBTData(itemMap.getConfigName() + " " + itemMap.getItemValue(), tag);
+				
+				if (itemMap.getNodeLocation().getString(".properties") != null && !itemMap.getNodeLocation().getString(".properties").isEmpty()) {
+					List<Object> tags = new ArrayList<Object>();
+					Map<String, String> tagValues = new HashMap<String, String>();
+					String[] properties = itemMap.getNodeLocation().getString(".properties").split(",");
+					for (String property: properties) {
+						String[] propertyParts = property.split(":");
+						String identifier = (propertyParts[0].startsWith(" ") ? propertyParts[0].substring(1) : propertyParts[0]);
+						Object propertyTag = Reflection.getReflection().getMinecraftClass("NBTTagCompound").getConstructor().newInstance();
+						propertyTag.getClass().getMethod("setString", String.class, String.class).invoke(propertyTag, identifier, propertyParts[1]);
+						tags.add(propertyTag);
+						tagValues.put(identifier, propertyParts[1]);
+					}
+					itemMap.setNBTProperties(tagValues, tags);
+				}
 			} catch (Exception e) {
 				ServerHandler.getServer().logSevere("{ItemMap} An error has occured when setting NBTData to an item.");
 				ServerHandler.getServer().sendDebugTrace(e);

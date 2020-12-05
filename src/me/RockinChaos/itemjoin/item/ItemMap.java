@@ -152,6 +152,8 @@ public class ItemMap {
 	private boolean customConsumable = false;
 	private Map < String, Integer > enchants = new HashMap < String, Integer > ();
 	
+	private Map < String, String > nbtProperty = new HashMap < String, String > ();
+	private List < Object > nbtProperties = new ArrayList < Object > ();
 	private Map < String, Long > playersOnInteractCooldown = new HashMap < String, Long > ();
 	private HashMap < String, Long > storedSpammedPlayers = new HashMap < String, Long > ();
 	private int spamtime = 1;
@@ -1605,6 +1607,16 @@ public class ItemMap {
 	}
 	
    /**
+    * Sets the NBT Properties.
+    * 
+    * @oaram tags - The Object Tags to be set.
+    */
+	public void setNBTProperties(final Map<String, String> tagValues, final List<Object> tags) {
+		this.nbtProperty = tagValues;
+		this.nbtProperties = tags;
+	}
+	
+   /**
     * Sets the Legacy NBTData (Secret).
     * 
     * @param nbt - The NBT Data to be set.
@@ -2302,6 +2314,15 @@ public class ItemMap {
     */
 	public String getNewNBTData() {
 		return this.newNBTData;
+	}
+	
+   /**
+    * Gets the NBT Properties.
+    * 
+    * @return The NBT Properties.
+    */
+	public List<Object> getNBTProperties() {
+		return this.nbtProperties;
 	}
 	
    /**
@@ -3441,7 +3462,19 @@ public class ItemMap {
 				if (cacheTag != null) {
 					cacheTag.getClass().getMethod("setString", String.class, String.class).invoke(cacheTag, "ItemJoin Name", this.getConfigName());
 					cacheTag.getClass().getMethod("setString", String.class, String.class).invoke(cacheTag, "ItemJoin Slot", this.getItemValue());
-				} else { nms.getClass().getMethod("setTag", this.newNBTTag.getClass()).invoke(nms, this.newNBTTag); }
+					if (this.nbtProperty != null && !this.nbtProperty.isEmpty()) {
+						for (String tag: this.nbtProperty.keySet()) {
+							cacheTag.getClass().getMethod("setString", String.class, String.class).invoke(cacheTag, tag, this.nbtProperty.get(tag));
+						}
+					}
+				} else { 
+					nms.getClass().getMethod("setTag", this.newNBTTag.getClass()).invoke(nms, this.newNBTTag);
+					if (this.nbtProperties != null && !this.nbtProperties.isEmpty()) {
+						for (Object tag: this.nbtProperties) {
+							nms.getClass().getMethod("setTag", tag.getClass()).invoke(nms, tag);
+						}
+					}
+				}
 				this.tempItem = (ItemStack) Reflection.getReflection().getCraftBukkitClass("inventory.CraftItemStack").getMethod("asCraftMirror", nms.getClass()).invoke(null, nms);
 			} catch (Exception e) {
 				ServerHandler.getServer().logSevere("{ItemMap} An error has occured when setting NBTData to an item.");
