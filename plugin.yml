@@ -90,7 +90,6 @@ permissions:
 commands:
    itemjoin:
       description: Displays a menu giving credit to the author and the help menu command.
-      permission: itemjoin.use
       aliases: [ij]
       usage: |
           /itemjoin
