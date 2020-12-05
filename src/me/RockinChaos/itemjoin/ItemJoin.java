@@ -34,6 +34,7 @@ import me.RockinChaos.itemjoin.utils.sqlite.SQL;
 public class ItemJoin extends JavaPlugin {
 	
   	private static ItemJoin instance;
+  	private boolean isStarted = false;
   	
    /**
     * Called when the plugin is loaded.
@@ -71,6 +72,22 @@ public class ItemJoin extends JavaPlugin {
 	  	ItemUtilities.getUtilities().clearItems();
   		ServerHandler.getServer().logInfo("has been Disabled.");
   	}
+  	
+   /**
+	* Checks if the plugin has fully loaded.
+	* 
+	*/
+	public boolean isStarted() {
+		return this.isStarted;
+	}
+	
+   /**
+	* Sets the plugin as fully loaded.
+	* 
+	*/
+	public void setStarted() {
+		this.isStarted = true;
+	}
   	
    /**
     * Gets the Plugin File.

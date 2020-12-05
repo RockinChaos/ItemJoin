@@ -17,19 +17,13 @@
  */
 package me.RockinChaos.itemjoin.handlers;
 
-import java.io.BufferedReader;
 import java.io.EOFException;
-import java.io.InputStreamReader;
 import java.lang.reflect.Field;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
-
-import javax.net.ssl.HttpsURLConnection;
 
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.Bukkit;
@@ -44,10 +38,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.map.MapView;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
-import org.json.simple.JSONArray;
-
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 
@@ -55,7 +45,6 @@ import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.item.ItemUtilities.CustomSlot;
 import me.RockinChaos.itemjoin.listeners.Crafting;
-import me.RockinChaos.itemjoin.utils.DependAPI;
 import me.RockinChaos.itemjoin.utils.LegacyAPI;
 import me.RockinChaos.itemjoin.utils.Reflection;
 import me.RockinChaos.itemjoin.utils.Utils;
@@ -64,8 +53,6 @@ import me.RockinChaos.itemjoin.utils.sqlite.SQL;
 public class ItemHandler {
 	
 	private static ItemHandler item;
-	private HashMap < String, GameProfile > gameProfiles = new HashMap < String, GameProfile > ();
-	private List<String> loadLater = new ArrayList<String>();
 	
    /**
     * Adds a list of lores to the specified ItemStack.
@@ -362,18 +349,8 @@ public class ItemHandler {
 		if (!ServerHandler.getServer().hasSpecificUpdate("1_8")) {
 			ServerHandler.getServer().logDebug("{ItemMap} Minecraft does not support offline player heads below Version 1.8.");
 			ServerHandler.getServer().logDebug("{ItemMap} Player heads will only be given a skin if the player has previously joined the sever.");
-			this.setStoredSkull(meta, owner);
-		} else if (!DependAPI.getDepends(false).skinsRestorerEnabled()) {
-			try {
-				Field declaredField = meta.getClass().getDeclaredField("profile");
-				declaredField.setAccessible(true);
-				if (ItemHandler.getItem().getProfile(owner) == null) {
-					this.setStoredSkull(meta, owner);
-				} else { declaredField.set(meta, this.gameProfiles.get(owner)); }
-			} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); LegacyAPI.getLegacy().setSkullOwner(((SkullMeta) meta), owner); }
-		} else {
-			this.setStoredSkull(meta, owner);
 		}
+		this.setStoredSkull(meta, owner);
 		return meta;
 	}
 	
@@ -384,53 +361,17 @@ public class ItemHandler {
     * @param owner - The referenced Skull Owner
     */
 	public void setStoredSkull(final ItemMeta meta, final String owner) {
-		OfflinePlayer player;
-		try { player = (Utils.getUtils().getMojangUUID(owner) != null ? Bukkit.getOfflinePlayer(UUID.fromString(Utils.getUtils().getMojangUUID(owner))) : LegacyAPI.getLegacy().getOfflinePlayer(owner)); }
-		catch (Exception e) { player = LegacyAPI.getLegacy().getOfflinePlayer(owner); }
-		if (this.usesOwningPlayer()) {
-			try { if (player != null) { ((SkullMeta) meta).setOwningPlayer(player); } else { LegacyAPI.getLegacy().setSkullOwner(((SkullMeta) meta), (player != null ? player.getName() : owner)); }
-			} catch (Exception e) { LegacyAPI.getLegacy().setSkullOwner(((SkullMeta) meta), (player != null ? player.getName() : owner)); }
-		} else { LegacyAPI.getLegacy().setSkullOwner(((SkullMeta) meta), (player != null ? player.getName() : owner)); }
-	}
-	
-   /**
-    * Tries to find the UUID on Mojangs official profile servers,
-    * then apply the found players skin to the specified GameProfile.
-    * 
-    * @param owner - The players name having their skin set.
-    * @return If the skin was successfully found and set to the specified GameProfile.
-    */
-	public GameProfile getProfile(final String owner) {
-		if (this.gameProfiles.get(owner) == null) {
-			ServerHandler.getServer().runAsyncThread(async -> {
-				if (owner == null || owner.isEmpty()) {
-					ServerHandler.getServer().logWarn("{ItemHandler} The defined skull owner cannot be empty or null.");
-					return;
-				}
-				String UUID = Utils.getUtils().getMojangUUID(owner);
-				if (UUID == null) {
-					Utils.getUtils().loadMojangUUID(owner);
-					UUID = Utils.getUtils().getMojangUUID(owner);
-				}
-				final GameProfile profile = new GameProfile(Utils.getUtils().UUIDConversion(UUID), owner);
+		if (!owner.isEmpty()) {
+			SkullMeta skullMeta = (SkullMeta)meta;
+			OfflinePlayer player = LegacyAPI.getLegacy().getOfflinePlayer(owner);
+			if (player != null) {
 				try {
-					HttpsURLConnection connection = (HttpsURLConnection) new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + UUID + "?unsigned=false").openConnection();
-					if (connection.getResponseCode() == HttpsURLConnection.HTTP_OK) {
-			            InputStreamReader reader = new InputStreamReader(connection.getInputStream());
-			            String JsonString = Utils.getUtils().toString(new BufferedReader(reader)); 
-			            JSONObject objectReader = (JSONObject) JSONValue.parseWithException(JsonString);
-			            objectReader = (JSONObject)(((JSONArray)objectReader.get("properties")).get(0));
-			            String skin = objectReader.get("value").toString();
-			            String signature = objectReader.get("signature").toString();
-						profile.getProperties().put("textures", new Property("textures", skin, signature));
-						this.gameProfiles.put(owner, profile);
-					} else {
-						ServerHandler.getServer().logDebug("{ItemHandler} [Mojang] Connection could not be opened (Response code " + connection.getResponseCode() + ", " + connection.getResponseMessage() + ")");
-					}
-				} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
-			});
-		} else { return this.gameProfiles.get(owner); }
-		return null;
+					skullMeta.setOwningPlayer(player);
+				} catch (Throwable t) {
+					LegacyAPI.getLegacy().setSkullOwner(((SkullMeta) meta), player.getName());
+				}
+			}
+		}
 	}
 	
    /**
@@ -866,47 +807,6 @@ public class ItemHandler {
 			return true; 
 		} 
 		return false;
-	}
-	
-   /**
-    * Preloads the Skull Owners GameProfile.
-    * 
-    * @param player - The player being referenced.
-    */
-	public void preLoad(Player player) {
-		if (!this.loadLater.isEmpty()) {
-			for (String owner: this.loadLater) {
-				this.getProfile(Utils.getUtils().translateLayout(owner, player));
-			}
-		}
-	}
-	
-   /**
-    * Adds a Skull Owner to be loaded later.
-    * 
-    * @param owner - The skull owner being referenced.
-    */
-	public void addLoad(final String owner) {
-		this.loadLater.add(owner);
-	}
-	
-   /**
-    * Fetches the String List containing Skull Owners for loadable later.
-    * 
-    * @return The fetched String List.
-    */
-	public List<String> getLoad() {
-		return this.loadLater;
-	}
-	
-   /**
-    * Attempts to get the current GameProfile for the Skull Owner.
-    * 
-    * @param owner - The skull owner being referenced.
-    * @return The fetched GameProfile instance.
-    */
-	public GameProfile getGameProfile(final String owner) {
-		return this.gameProfiles.get(owner);
 	}
 	
    /**

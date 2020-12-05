@@ -33,7 +33,6 @@ import org.bukkit.configuration.file.FileConfiguration;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
-import me.RockinChaos.itemjoin.listeners.triggers.PlayerLogin;
 import me.RockinChaos.itemjoin.utils.Utils;
 
 public class Database extends Controller {
@@ -412,7 +411,7 @@ abstract class Controller {
 				if (ConfigHandler.getConfig(false).sqlEnabled()) {
 					try { 
 						Class.forName("com.mysql.jdbc.Driver");
-						if (!PlayerLogin.hasStarted()) {
+						if (!ItemJoin.getInstance().isStarted()) {
 						ServerHandler.getServer().logInfo("Loading MySQL Connection...");
 						}
 						this.connection = DriverManager.getConnection("jdbc:mysql://" + this.host + ":" + this.port + "/" + this.database + "?createDatabaseIfNotExist=true" + "&useSSL=false", Utils.getUtils().decrypt(this.user), Utils.getUtils().decrypt(this.pass));

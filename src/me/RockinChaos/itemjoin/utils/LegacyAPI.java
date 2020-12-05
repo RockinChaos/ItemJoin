@@ -223,8 +223,7 @@ public class LegacyAPI {
     * @return The found OfflinePlayer.
     */
 	public OfflinePlayer getOfflinePlayer(final String playerName) {
-		OfflinePlayer player = Bukkit.getOfflinePlayer(playerName);
-		return player.hasPlayedBefore() ? Bukkit.getOfflinePlayer(playerName) : null;
+		return Bukkit.getOfflinePlayer(playerName);
 	}
 	
    /**

@@ -50,7 +50,6 @@ import me.RockinChaos.itemjoin.listeners.Offhand;
 import me.RockinChaos.itemjoin.listeners.triggers.LimitSwitch;
 import me.RockinChaos.itemjoin.listeners.triggers.PlayerGuard;
 import me.RockinChaos.itemjoin.listeners.triggers.PlayerJoin;
-import me.RockinChaos.itemjoin.listeners.triggers.PlayerLogin;
 import me.RockinChaos.itemjoin.listeners.triggers.PlayerQuit;
 import me.RockinChaos.itemjoin.listeners.triggers.Respawn;
 import me.RockinChaos.itemjoin.listeners.triggers.WorldSwitch;
@@ -83,7 +82,6 @@ public class ConfigHandler {
     * 
     */
 	public void registerEvents() {
-		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerLogin(), ItemJoin.getInstance());
 	    ItemJoin.getInstance().getCommand("itemjoin").setExecutor(new ChatExecutor());
 	    ItemJoin.getInstance().getCommand("itemjoin").setTabCompleter(new ChatTab());
 		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Menu(), ItemJoin.getInstance());
@@ -122,10 +120,10 @@ public class ConfigHandler {
 		this.registerPrevent();
 		DependAPI.getDepends(true);
 		LogFilter.getFilter(true);
-		if (!PlayerLogin.hasStarted()) {
+		if (!ItemJoin.getInstance().isStarted()) {
 			SQL.getData(true);
 			ItemDesigner.getDesigner(true);
-			ServerHandler.getServer().runThread(main -> { PlayerLogin.startComplete(); }, 3L);
+			ServerHandler.getServer().runThread(main -> { ItemJoin.getInstance().setStarted(); }, 3L);
 		} else {
 			ServerHandler.getServer().runAsyncThread(async -> { 
 				SQL.getData(true); 

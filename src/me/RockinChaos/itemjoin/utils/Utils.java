@@ -19,17 +19,13 @@ package me.RockinChaos.itemjoin.utils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.math.BigInteger;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
-
-import javax.net.ssl.HttpsURLConnection;
 
 import java.util.Random;
 import java.util.UUID;
@@ -44,9 +40,6 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.RegisteredListener;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
-
 import de.domedd.betternick.BetterNick;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
@@ -55,8 +48,7 @@ import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.clip.placeholderapi.PlaceholderAPI;
 
 public class Utils {
-	
-	private HashMap < String, String > mojangUUID = new HashMap < String, String > ();
+
     private static Utils util;
 	
    /**
@@ -303,37 +295,6 @@ public class Utils {
 		String line = null; while ((line = reader.readLine()) != null) { result.append(line); }
 		return result.toString();
 	}
-	
-   /**
-    * Gives all custom items to the specified player.
-    * 
-    * @param player - that will recieve the items.
-    */
-    public String getMojangUUID(final String name) {
-        if (this.mojangUUID.get(name) != null) {
-        	return this.mojangUUID.get(name); }
-        return null;
-    }
-    
-   /**
-    * loads all custom items to the specified player.
-    * 
-    * @param player - that will recieve the items.
-    */
-    public void loadMojangUUID(final String name) {
-        try {
-	        HttpsURLConnection connection = (HttpsURLConnection) new URL("https://api.mojang.com/users/profiles/minecraft/" + name + "?at=" + System.currentTimeMillis()).openConnection();
-	        if (connection.getResponseCode() == HttpsURLConnection.HTTP_OK) {
-		        InputStreamReader reader = new InputStreamReader(connection.getInputStream());
-			    String UUIDJson = this.toString(new BufferedReader(reader)); 
-			    JSONObject UUIDObject = (JSONObject) JSONValue.parseWithException(UUIDJson);
-			    String UUID = UUIDObject.get("id").toString();
-			    this.mojangUUID.put(name, UUID);
-	        } else {
-				ServerHandler.getServer().logDebug("{Utils} [Mojang] Connection could not be opened (Response code " + connection.getResponseCode() + ", " + connection.getResponseMessage() + ")");
-	        }
-        } catch (Exception e) { e.printStackTrace(); }
-    }
 	
    /**
     * Encrypts the String to Base64.
