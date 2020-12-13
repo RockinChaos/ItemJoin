@@ -73,7 +73,7 @@ public class PlayerGuard implements Listener {
 				if (SQL.getData(false).isEnabled(player)) {
 					this.handleRegions(player);
 				}
-			});
+			}, (event.getFrom().getWorld() == event.getTo().getWorld() ? 0 : (ItemUtilities.getUtilities().getClearDelay() + 1)));
 		}
 	}
 	

@@ -745,7 +745,7 @@ public class ItemUtilities {
     * 
     * @return The clear-Delay before the items are cleared.
     */
-	private long getClearDelay() {
+	public long getClearDelay() {
 		if (!Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Join"), "DISABLED") 
 				&& !Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Join"), "FALSE")
 				|| !Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.World-Switch"), "DISABLED")
