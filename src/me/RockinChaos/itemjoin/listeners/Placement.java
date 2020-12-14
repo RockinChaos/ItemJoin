@@ -23,6 +23,9 @@ import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.utils.Utils;
 
+import java.util.HashMap;
+
+import org.bukkit.Material;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -83,6 +86,54 @@ public class Placement implements Listener {
 	 				}
 	 			}, 2L);
 	 		}
+	 	}
+	 }
+	 
+	/**
+	 * Refills the custom arrow item to its original stack size when using a crossbow.
+	 * 
+	 * @param event - PlayerInteractEvent
+	 */
+	 @EventHandler(ignoreCancelled = false)
+	 private void onCrossbow(PlayerInteractEvent event) {
+	 	ItemStack item = (event.getItem() != null ? event.getItem().clone() : event.getItem());
+	 	Player player = event.getPlayer();
+	 	if ((event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) && item != null && item.getType().name().equalsIgnoreCase("CROSSBOW") && !PlayerHandler.getPlayer().isCreativeMode(player)) {
+			HashMap < Integer, ItemStack > map = new HashMap < Integer, ItemStack > ();
+			for (int i = 0; i < player.getInventory().getSize(); i++) {
+				if (player.getInventory().getItem(i) != null && player.getInventory().getItem(i).getType() == Material.ARROW) {
+					ItemStack cloneStack = player.getInventory().getItem(i).clone();
+					ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(player.getInventory().getItem(i), null, player.getWorld());
+					if (itemMap != null) { cloneStack.setAmount(itemMap.getCount()); }
+					map.put(i, cloneStack);
+				}
+			}
+			this.crossyAction(player, map, 10);
+	 	}
+	 }
+	 
+	/**
+	 * Checks if the Crossbow action was triggered.
+	 * 
+	 * @param player - The player performing the action.
+	 * @param map - The slot and stack to be compared to the players inventory.
+	 * @param tries - The number of remaining attempts to refill Crossbow Arrows.
+	 */
+	 public void crossyAction(Player player, HashMap < Integer, ItemStack > map, int tries) {
+	 	if (tries != 0) {
+	 		ServerHandler.getServer().runThread(main -> {
+	 			boolean arrowReturned = false;
+	 			for (Integer key: map.keySet()) {
+	 				if (player.getInventory().getItem(key) == null || player.getInventory().getItem(key).getAmount() != map.get(key).getAmount()) {
+	 					if (!ItemUtilities.getUtilities().isAllowed(player, map.get(key), "count-lock")) {
+	 						player.getInventory().setItem(key, map.get(key));
+	 						arrowReturned = true;
+	 					}
+	 				}
+	 			}
+	 			if (arrowReturned) { PlayerHandler.getPlayer().updateInventory(player, 1L); } 
+	 			else {this.crossyAction(player, map, (tries - 1)); }
+	 		}, 26L);
 	 	}
 	 }
 	 
