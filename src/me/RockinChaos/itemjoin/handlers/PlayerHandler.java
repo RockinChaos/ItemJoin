@@ -87,7 +87,7 @@ public class PlayerHandler {
     * @return If the currently open inventory is a player crafting inventory.
     */
     public boolean isCraftingInv(final InventoryView view) {
-        return view.getTopInventory().getSize() == PLAYER_CRAFT_INV_SIZE;
+        return (!view.getType().name().equalsIgnoreCase("HOPPER") ? view.getTopInventory().getSize() == PLAYER_CRAFT_INV_SIZE : false);
     }
 	
    /**

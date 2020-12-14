@@ -244,7 +244,9 @@ public class Crafting implements Listener {
     								ItemStack[] contents = new ItemStack[5];
     								if (contents != null && tempContents != null) {
 	    								for (int i = 0; i <= 4; i++) {
-	    									contents[i] = tempContents[i].clone();
+	    									if (tempContents[i] != null) { 
+	    										contents[i] = tempContents[i].clone();
+	    									}
 	    								}
     								}
     								craftingItems.put(PlayerHandler.getPlayer().getPlayerID(((Player) objPlayer)), contents);
