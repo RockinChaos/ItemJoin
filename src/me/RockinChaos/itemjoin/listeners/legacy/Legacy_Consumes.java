@@ -131,10 +131,10 @@ public class Legacy_Consumes implements Listener {
 				}
 			}
 			ServerHandler.getServer().runThread(main -> {
-				for (Integer mdd: map.keySet()) {
-					if (player.getInventory().getItem(mdd) == null || player.getInventory().getItem(mdd).getAmount() != map.get(mdd).getAmount()) {
-						if (!ItemUtilities.getUtilities().isAllowed(player, map.get(mdd), "count-lock")) {
-							player.getInventory().setItem(mdd, map.get(mdd));
+				for (Integer key: map.keySet()) {
+					if (player.getInventory().getItem(key) == null || player.getInventory().getItem(key).getAmount() != map.get(key).getAmount()) {
+						if (!ItemUtilities.getUtilities().isAllowed(player, map.get(key), "count-lock")) {
+							player.getInventory().setItem(key, map.get(key));
 						}
 					}
 				}
