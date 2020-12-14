@@ -2949,7 +2949,7 @@ public class ItemMap {
 	public boolean isReal(final ItemStack item) {
 		if (item != null && item.getType() != Material.AIR
 				&& (this.vanillaControl || this.vanillaStatus
-				|| (ItemHandler.getItem().dataTagsEnabled() && ItemHandler.getItem().getNBTData(item) != null && Utils.getUtils().containsIgnoreCase(ItemHandler.getItem().getNBTData(item), this.newNBTData))
+				|| (ItemHandler.getItem().dataTagsEnabled() && ItemHandler.getItem().getNBTData(item) != null && ItemHandler.getItem().getNBTData(item).equalsIgnoreCase(this.newNBTData))
 				|| (this.legacySecret != null && item.hasItemMeta() && item.getItemMeta().hasDisplayName() && item.getItemMeta().getDisplayName().contains(this.legacySecret)))) {
 			return true;
 		}
@@ -2964,7 +2964,7 @@ public class ItemMap {
     */
 	public boolean isSimilar(final ItemStack item) {
 		if ((item != null && item.getType() != Material.AIR && item.getType() == this.material) || (this.materialAnimated && item != null && item.getType() != Material.AIR && this.isMaterial(item))) {
-			if (this.vanillaControl || ItemHandler.getItem().dataTagsEnabled() && ItemHandler.getItem().getNBTData(item) != null && Utils.getUtils().containsIgnoreCase(ItemHandler.getItem().getNBTData(item), this.newNBTData)
+			if (this.vanillaControl || ItemHandler.getItem().dataTagsEnabled() && ItemHandler.getItem().getNBTData(item) != null && ItemHandler.getItem().getNBTData(item).equalsIgnoreCase(this.newNBTData)
 					|| this.legacySecret != null && item.hasItemMeta() && item.getItemMeta().hasDisplayName() && item.getItemMeta().getDisplayName().contains(this.legacySecret) || this.vanillaStatus) {
 				if (this.skullMeta(item)) {
 					if (isEnchantSimilar(item) || !item.getItemMeta().hasEnchants() && enchants.isEmpty() || this.isItemChangable()) {
