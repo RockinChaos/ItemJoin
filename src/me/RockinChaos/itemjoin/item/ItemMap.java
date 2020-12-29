@@ -1768,6 +1768,18 @@ public class ItemMap {
 	}
 	
    /**
+    * Gets the Slot.
+    * 
+    * @return The Slot.
+    */
+	public String getUISlot() {
+		if (this.CustomSlot != null && !this.CustomSlot.contains("%")) { return this.CustomSlot; } 
+		else if (this.CustomSlot != null) { return (0 + ""); }
+		else if (this.InvSlot != null) { return this.InvSlot.toString(); }
+		return null;
+	}
+	
+   /**
     * Gets the Multiple Slots.
     * 
     * @return The Multiple Slots.
@@ -3740,8 +3752,8 @@ public class ItemMap {
     * @param amount - The stack size of the item.
     */
 	public void giveTo(final Player player, int...amount) {
-		if (amount.length == 0) { amount = new int[]{0}; } 
-		if (this.CustomSlot != null) { ItemUtilities.getUtilities().setCustomSlots(player, this, amount[0]); } 
+		if (amount.length == 0) { amount = new int[]{0}; }
+		if (this.CustomSlot != null && !this.CustomSlot.contains("%")) { ItemUtilities.getUtilities().setCustomSlots(player, this, amount[0]); } 
 		else { ItemUtilities.getUtilities().setInvSlots(player, this, amount[0]); }
 		this.setAnimations(player);
 		this.executeCommands(player, this.tempItem, "ON_RECEIVE", "RECEIVED", this.getSlot());

@@ -98,7 +98,7 @@ public class ItemUtilities {
 	public ItemMap getItemMap(final String slot, final List < ItemMap > items) {
 		ItemMap itemMap = null;
 		for (final ItemMap item: items) {
-			if (item.getSlot().equalsIgnoreCase(slot)) {
+			if (item.getUISlot().equalsIgnoreCase(slot)) {
 				itemMap = item;
 				break;
 			}
@@ -560,7 +560,14 @@ public class ItemUtilities {
 			} else if (nextSlot != 0) {
 				player.getInventory().setItem(nextSlot, item);
 			} else if (player.getInventory().firstEmpty() != -1 || overWrite) {
-				player.getInventory().setItem(Integer.parseInt(itemMap.getSlot()), item);
+				if (itemMap.getSlot().contains("%")) {
+					String slot = Utils.getUtils().translateLayout(itemMap.getSlot(), player);
+					if (Utils.getUtils().isInt(slot)) {
+						player.getInventory().setItem(Integer.parseInt(slot), item);
+					}
+				} else {
+					player.getInventory().setItem(Integer.parseInt(itemMap.getSlot()), item);
+				}
 			} else if (itemMap.isDropFull()) { 
 				player.getWorld().dropItem(player.getLocation(), item);
 			}
@@ -646,6 +653,12 @@ public class ItemUtilities {
 	public void shiftItem(final Player player, final ItemMap itemMap) {
 		int i = 0; int k = 0;
 		if (Utils.getUtils().isInt(itemMap.getSlot())) { i = Integer.parseInt(itemMap.getSlot()); k = i; }
+		else if (itemMap.getSlot().contains("%")) {
+			String slot = Utils.getUtils().translateLayout(itemMap.getSlot(), player);
+			if (Utils.getUtils().isInt(slot)) {
+				i = Integer.parseInt(slot); k = i;
+			}
+		} 
 		ItemStack existingItem = ItemHandler.getItem().getItem(player, itemMap);
 		if (itemMap.isMoveNext() && existingItem != null && player.getInventory().firstEmpty() != -1) {
 			for (i = 0; i <= 35; i++) {
@@ -681,6 +694,12 @@ public class ItemUtilities {
 	public int nextItem(final Player player, final ItemMap itemMap) {
 		int i = 0; int k = 0;
 		if (Utils.getUtils().isInt(itemMap.getSlot())) { i = Integer.parseInt(itemMap.getSlot()); k = i; }
+		else if (itemMap.getSlot().contains("%")) {
+			String slot = Utils.getUtils().translateLayout(itemMap.getSlot(), player);
+			if (Utils.getUtils().isInt(slot)) {
+				i = Integer.parseInt(slot); k = i;
+			}
+		} 
 		ItemStack existingItem = ItemHandler.getItem().getItem(player, itemMap);
 		if (itemMap.isGiveNext() && existingItem != null && player.getInventory().firstEmpty() != -1) {
 			for (i = 0; i <= 35; i++) {

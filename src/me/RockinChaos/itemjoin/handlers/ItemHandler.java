@@ -216,6 +216,11 @@ public class ItemHandler {
 		ItemStack existingItem = null;
 		if (Utils.getUtils().isInt(itemMap.getSlot())) {
 			existingItem = player.getInventory().getItem(Integer.parseInt(itemMap.getSlot()));
+		} else if (itemMap.getSlot().contains("%")) {
+			String slot = Utils.getUtils().translateLayout(itemMap.getSlot(), player);
+			if (Utils.getUtils().isInt(slot)) {
+				existingItem = player.getInventory().getItem(Integer.parseInt(slot));
+			}
 		} else if (CustomSlot.HELMET.isSlot(itemMap.getSlot())) {
 			existingItem = player.getEquipment().getHelmet();
 		} else if (CustomSlot.CHESTPLATE.isSlot(itemMap.getSlot())) {
@@ -763,7 +768,7 @@ public class ItemHandler {
     */
 	public boolean isCustomSlot(final String slot) {
 		if (slot.equalsIgnoreCase("Offhand") || slot.equalsIgnoreCase("Arbitrary") || slot.equalsIgnoreCase("Helmet") 
-				|| slot.equalsIgnoreCase("Chestplate") || slot.equalsIgnoreCase("Leggings") || slot.equalsIgnoreCase("Boots") || this.isCraftingSlot(slot)) {
+				|| slot.equalsIgnoreCase("Chestplate") || slot.equalsIgnoreCase("Leggings") || slot.equalsIgnoreCase("Boots") || this.isCraftingSlot(slot) || slot.contains("%")) {
 			return true;
 		}
 		return false;
