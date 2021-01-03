@@ -500,7 +500,7 @@ public class UI {
 			String potionString = "";
 			if (Utils.getUtils().nullCheck(itemMap.getPotionEffect().toString()) != "NONE") {
 				for (PotionEffect potions: itemMap.getPotionEffect()) {
-					potionString += potions.getType().getName().toUpperCase() + ":" + potions.getAmplifier() + ":" + potions.getDuration() / 160 + ", ";
+					potionString += potions.getType().getName().toUpperCase() + ":" + potions.getAmplifier() + ":" + potions.getDuration() + ", ";
 				}
 				for (String split: Utils.getUtils().softSplit(Utils.getUtils().nullCheck(potionString.substring(0, potionString.length())))) {
 					potionList += "&a" + split + " /n ";
@@ -2603,7 +2603,6 @@ public class UI {
 			this.creatingPane(player, itemMap);
 		}));
 		ServerHandler.getServer().runAsyncThread(async -> {
-			flagPane.addButton(new Button(this.fillerPaneGItem), 9);
 			flagPane.addButton(new Button(ItemHandler.getItem().getItem("DIAMOND", 1, itemMap.isOpBypass(), "&a&l&nAllowOpBypass", "&7", 
 					"&a&lTrue&f:&7 Allows players who are OP to", "&7bypass any itemflags that add", "&7restrictions for this item.", "&7",
 					"&c&lFalse&f:&7 Players who are OP will be", "&7restricted by itemflags that add", "&7restrictions for this item.", "&7", 
@@ -2637,7 +2636,7 @@ public class UI {
 				}
 				this.flagPane(player, itemMap);
 			}));
-					flagPane.addButton(new Button(ItemHandler.getItem().getItem("DIAMOND_SHOVEL", 7, itemMap.isStackable(), "&a&l&nStackable", "&7", 
+			flagPane.addButton(new Button(ItemHandler.getItem().getItem("DIAMOND_SHOVEL", 7, itemMap.isStackable(), "&a&l&nStackable", "&7", 
 					"&a&lTrue&f:&7 The item will be stackable with itself!", "&7",
 					"&c&lFalse&f:&7 The item stack only if it did in vanilla.", "&7", 
 					"&9&lENABLED: &a" + (itemMap.isStackable() + "").toUpperCase()), event -> {
@@ -2724,28 +2723,6 @@ public class UI {
 					itemMap.setVanillaControl(false);
 				} else {
 					itemMap.setVanillaControl(true);
-				}
-				this.flagPane(player, itemMap);
-			}));
-			flagPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "FILLED_MAP" : "MAP"), 1, itemMap.isOnlyFirstJoin(), "&a&l&nFirst Join", "&7", 
-					"&a&lTrue&f:&7 Gives the item only ONCE per player.", "&7This will overwrite any triggers", "&7such as respawn, and world-switch.", "&7",
-					"&c&lFalse&f:&7 The item can be given more then once per player.", "&7This will enable the use of triggers.", "&7", 
-					"&9&lENABLED: &a" + (itemMap.isOnlyFirstJoin() + "").toUpperCase()), event -> {
-				if (itemMap.isOnlyFirstJoin()) {
-					itemMap.setOnlyFirstJoin(false);
-				} else {
-					itemMap.setOnlyFirstJoin(true);
-				}
-				this.flagPane(player, itemMap);
-			}));
-			flagPane.addButton(new Button(ItemHandler.getItem().getItem("STONE_SWORD", 1, itemMap.isOnlyFirstWorld(), "&a&l&nFirst World", "&7", 
-					"&a&lTrue&f:&7 The item will be given only ONCE", "&7per specified world per user.", "&7This flag overwrites any triggers", "&7such as respawn, and join.", "&7",
-					"&c&lFalse&f:&7 The item can be given more then once", "&7per specified world per player.", "&7This will enable the use of triggers.", "&7", 
-					"&9&lENABLED: &a" + (itemMap.isOnlyFirstWorld() + "").toUpperCase()), event -> {
-				if (itemMap.isOnlyFirstWorld()) {
-					itemMap.setOnlyFirstWorld(false);
-				} else {
-					itemMap.setOnlyFirstWorld(true);
 				}
 				this.flagPane(player, itemMap);
 			}));
@@ -2903,7 +2880,6 @@ public class UI {
 				}
 				this.flagPane(player, itemMap);
 			}));
-			flagPane.addButton(new Button(this.fillerPaneGItem), 9);
 			flagPane.addButton(new Button(ItemHandler.getItem().getItem("ANVIL", 1, itemMap.isItemRepairable(), "&a&l&nItem Repairable", "&7", 
 					"&a&lTrue&f: &7Blocks the item from being", "&7used in an anvil or repaired.", "&7",
 					"&c&lFalse&f: &7Allows the item to be repaired.", "&7", 
@@ -2926,6 +2902,7 @@ public class UI {
 				}
 				this.flagPane(player, itemMap);
 			}));
+			flagPane.addButton(new Button(this.fillerPaneBItem));
 			flagPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "WHEAT_SEEDS" : "295"), 1, itemMap.isAlwaysGive(), "&a&l&nAlways Give", "&7", 
 					"&a&lTrue&f: &7Gives the item every time the player", "&7performs one of the triggers actions.", "&7regardless of already having the item.", "&7",
 					"&cNOTE: &7Don't use this if you want only ONE instance of the item.", "&7",
@@ -2949,7 +2926,6 @@ public class UI {
 				}
 				this.flagPane(player, itemMap);
 			}));
-			flagPane.addButton(new Button(this.fillerPaneGItem));
 			flagPane.addButton(new Button(ItemHandler.getItem().getItem("ITEM_FRAME", 1, itemMap.isGiveNext(), "&a&l&nGive Next", "&7", 
 					"&a&lTrue&f: &7Gives the item to the next available slot", "&7only if the defined slot already has an existing item.", 
 					"&cNOTE: &7The overwrite flag will not work.", "&7",
@@ -2962,6 +2938,7 @@ public class UI {
 				}
 				this.flagPane(player, itemMap);
 			}));
+			flagPane.addButton(new Button(this.fillerPaneBItem));
 			flagPane.addButton(new Button(ItemHandler.getItem().getItem("MINECART", 1, itemMap.isMoveNext(), "&a&l&nMove Next", "&7", 
 					"&a&lTrue&f: &7Moves the existing item to the next available slot", "&7only if the defined slot already has an existing item.", 
 					"&cNOTE: &7The overwrite flag will not work.", "&7",
@@ -2996,7 +2973,7 @@ public class UI {
 				}
 				this.flagPane(player, itemMap);
 			}));
-			flagPane.addButton(new Button(this.fillerPaneGItem), 18);
+			flagPane.addButton(new Button(this.fillerPaneBItem));
 		});
 		flagPane.open(player);
 	}
@@ -3011,8 +2988,6 @@ public class UI {
 		if (itemMap.isVanilla()) { itemflags += "VANILLA, "; }
 		if (itemMap.isVanillaStatus()) { itemflags += "VANILLA-STATUS, "; }
 		if (itemMap.isVanillaControl()) { itemflags += "VANILLA-CONTROL, "; }
-		if (itemMap.isOnlyFirstJoin()) { itemflags += "FIRST-JOIN, "; }
-		if (itemMap.isOnlyFirstWorld()) { itemflags += "FIRST-WORLD, "; }
 		if (itemMap.isIpLimted()) { itemflags += "IP-LIMIT, "; }
 		if (itemMap.isUnbreakable()) { itemflags += "UNBREAKABLE, "; }
 		if (itemMap.isAttributesInfo()) { itemflags += "HIDE-ATTRIBUTES, "; }
@@ -3055,8 +3030,37 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private void triggerPane(final Player player, final ItemMap itemMap) {
-		Interface triggerPane = new Interface(false, 2, this.GUIName, player);
+		Interface triggerPane = new Interface(false, 3, this.GUIName, player);
 		ServerHandler.getServer().runAsyncThread(async -> {
+			triggerPane.addButton(new Button(this.fillerPaneBItem), 3);
+			triggerPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "FILLED_MAP" : "MAP"), 1, itemMap.isOnlyFirstJoin(), "&e&l&nFirst Join", "&7", "&7*Gives the item when the", "&7player logs into the server", 
+					"&7for the first time only.", "&7This will overwrite any triggers", "&7such as respawn, and world-switch.", "&9&lENABLED: &a" + (itemMap.isOnlyFirstJoin() + "").toUpperCase()), event -> {
+				if (itemMap.isOnlyFirstJoin()) {
+					itemMap.setOnlyFirstJoin(false);
+				} else {
+					itemMap.setOnlyFirstJoin(true);
+				}
+				this.triggerPane(player, itemMap);
+			}));
+			triggerPane.addButton(new Button(ItemHandler.getItem().getItem("STONE_SWORD", 1, itemMap.isOnlyFirstWorld(), "&e&l&nFirst World", "&7", "&7*Gives the item when the", "&7player enters each of the defined", "&7worlds for the first time.", "&7", 
+					"&7This flag overwrites any triggers", "&7such as respawn, and join.", "&9&lENABLED: &a" + (itemMap.isOnlyFirstWorld() + "").toUpperCase()), event -> {
+				if (itemMap.isOnlyFirstWorld()) {
+					itemMap.setOnlyFirstWorld(false);
+				} else {
+					itemMap.setOnlyFirstWorld(true);
+				}
+				this.triggerPane(player, itemMap);
+			}));
+			triggerPane.addButton(new Button(ItemHandler.getItem().getItem(ServerHandler.getServer().hasSpecificUpdate("1_13") ? "TOTEM_OF_UNDYING" : "322:1", 1, itemMap.isOnlyFirstLife(), "&e&l&nFirst Life", "&7", "&7*Gives the item when the", "&7player logs into the server", 
+					"&7for the first time only,", "&7but will give the item", "&7EVERY TIME on player RESPAWN.", "&7This flag overwrites any triggers", "&7such as respawn, and join.", "&9&lENABLED: &a" + (itemMap.isOnlyFirstWorld() + "").toUpperCase()), event -> {
+				if (itemMap.isOnlyFirstWorld()) {
+					itemMap.setOnlyFirstWorld(false);
+				} else {
+					itemMap.setOnlyFirstWorld(true);
+				}
+				this.triggerPane(player, itemMap);
+			}));
+			triggerPane.addButton(new Button(this.fillerPaneBItem), 3);
 			triggerPane.addButton(new Button(ItemHandler.getItem().getItem("REDSTONE", 1, itemMap.isGiveOnDisabled(), "&c&l&nDISABLED", "&7", "&7*Prevents the item from given", "&7through the use of triggers.", "&7", "&7Useful to only get the item", 
 					"&7using &l/itemjoin get <item>", "&9&lENABLED: &a" + (itemMap.isGiveOnDisabled() + "").toUpperCase()), event -> {
 				if (itemMap.isGiveOnDisabled()) {
@@ -3069,7 +3073,9 @@ public class UI {
 					itemMap.setGiveOnWorldSwitch(false);
 					itemMap.setUseOnLimitSwitch(false);
 					itemMap.setGiveOnRegionEnter(false);
-					itemMap.setTakeOnRegionLeave(false);
+					itemMap.setGiveOnRegionLeave(false);
+					itemMap.setGiveOnRegionAccess(false);
+					itemMap.setGiveOnRegionEgress(false);
 					itemMap.setGiveOnDisabled(true);
 				}
 				this.triggerPane(player, itemMap);
@@ -3080,24 +3086,6 @@ public class UI {
 					itemMap.setGiveOnJoin(false);
 				} else {
 					itemMap.setGiveOnJoin(true);
-				}
-				this.triggerPane(player, itemMap);
-			}));
-			triggerPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "FILLED_MAP" : "MAP"), 1, itemMap.isOnlyFirstJoin(), "&e&l&nFirst Join", "&7", "&7*Gives the item when the", "&7player logs into the server.", 
-					"&7for the first time only.", "&7This will overwrite any triggers", "&7such as respawn, and world-switch.", "&9&lENABLED: &a" + (itemMap.isOnlyFirstJoin() + "").toUpperCase()), event -> {
-				if (itemMap.isOnlyFirstJoin()) {
-					itemMap.setOnlyFirstJoin(false);
-				} else {
-					itemMap.setOnlyFirstJoin(true);
-				}
-				this.triggerPane(player, itemMap);
-			}));
-			triggerPane.addButton(new Button(ItemHandler.getItem().getItem("STONE_SWORD", 1, itemMap.isOnlyFirstWorld(), "&e&l&nFirst World", "&7", "&7*Gives the item when the", "&7player enters each of the defined.", "&7worlds for the first time", "&7", 
-					"&7Disables the respawn trigger", "&7if needed use the itemflag", "&7for first world instead.", "&7This flag overwrites any triggers", "&7such as respawn, and join.", "&9&lENABLED: &a" + (itemMap.isOnlyFirstWorld() + "").toUpperCase()), event -> {
-				if (itemMap.isOnlyFirstWorld()) {
-					itemMap.setOnlyFirstWorld(false);
-				} else {
-					itemMap.setOnlyFirstWorld(true);
 				}
 				this.triggerPane(player, itemMap);
 			}));
@@ -3128,21 +3116,47 @@ public class UI {
 				}
 				this.triggerPane(player, itemMap);
 			}));
-			triggerPane.addButton(new Button(ItemHandler.getItem().getItem("OBSIDIAN", 1, itemMap.isGiveOnRegionEnter(), "&e&l&nRegion Enter", "&7", "&7*Gives the item when the", "&7player enters any of the enabled-regions.", "&9&lENABLED: &a" +
+			triggerPane.addButton(new Button(ItemHandler.getItem().getItem("MINECART", 1, itemMap.isGiveOnRegionEnter(), "&e&l&nRegion Enter", "&7", "&7*Gives the item when the", "&7player enters any of the enabled-regions.", "&9&lENABLED: &a" +
 			(itemMap.isGiveOnRegionEnter() + "").toUpperCase()), event -> {
 				if (itemMap.isGiveOnRegionEnter()) {
 					itemMap.setGiveOnRegionEnter(false);
 				} else {
 					itemMap.setGiveOnRegionEnter(true);
+					itemMap.setGiveOnRegionAccess(false);
+					itemMap.setGiveOnRegionEgress(false);
 				}
 				this.triggerPane(player, itemMap);
 			}));
-			triggerPane.addButton(new Button(ItemHandler.getItem().getItem("DIAMOND_PICKAXE", 1, itemMap.isTakeOnRegionLeave(), "&e&l&nRegion Leave", "&7", "&7*Removes the item when the", "&7player leaves any of the enabled-regions.", "&9&lENABLED: &a" +
-			(itemMap.isTakeOnRegionLeave() + "").toUpperCase()), event -> {
-				if (itemMap.isTakeOnRegionLeave()) {
-					itemMap.setTakeOnRegionLeave(false);
+			triggerPane.addButton(new Button(ItemHandler.getItem().getItem("HOPPER_MINECART", 1, itemMap.isGiveOnRegionLeave(), "&e&l&nRegion Leave", "&7", "&7*Removes the item when the", "&7player leaves any of the enabled-regions.", "&9&lENABLED: &a" +
+			(itemMap.isGiveOnRegionLeave() + "").toUpperCase()), event -> {
+				if (itemMap.isGiveOnRegionLeave()) {
+					itemMap.setGiveOnRegionLeave(false);
 				} else {
-					itemMap.setTakeOnRegionLeave(true);
+					itemMap.setGiveOnRegionLeave(true);
+					itemMap.setGiveOnRegionAccess(false);
+					itemMap.setGiveOnRegionEgress(false);
+				}
+				this.triggerPane(player, itemMap);
+			}));
+			triggerPane.addButton(new Button(ItemHandler.getItem().getItem("TNT_MINECART", 1, itemMap.isGiveOnRegionAccess(), "&e&l&nRegion WalkInOut", "&7", "&7*Gives the item when the", "&7player enters any of the enabled-regions", "&7and removes the item when leaving", "&7any of the enabled-regions.", "&9&lENABLED: &a" +
+			(itemMap.isGiveOnRegionAccess() + "").toUpperCase()), event -> {
+				if (itemMap.isGiveOnRegionAccess()) {
+					itemMap.setGiveOnRegionAccess(false);
+				} else {
+					itemMap.setGiveOnRegionAccess(true);
+					itemMap.setGiveOnRegionEnter(false);
+					itemMap.setGiveOnRegionLeave(false);
+				}
+				this.triggerPane(player, itemMap);
+			}));
+			triggerPane.addButton(new Button(ItemHandler.getItem().getItem("CHEST_MINECART", 1, itemMap.isGiveOnRegionEgress(), "&e&l&nRegion WalkOutIn", "&7", "&7*Removes the item when the", "&7player enters any of the enabled-regions", "&7and gives the item when leaving", "&7any of the enabled-regions.", "&9&lENABLED: &a" +
+			(itemMap.isGiveOnRegionEgress() + "").toUpperCase()), event -> {
+				if (itemMap.isGiveOnRegionEgress()) {
+					itemMap.setGiveOnRegionEgress(false);
+				} else {
+					itemMap.setGiveOnRegionEgress(true);
+					itemMap.setGiveOnRegionEnter(false);
+					itemMap.setGiveOnRegionLeave(false);
 				}
 				this.triggerPane(player, itemMap);
 			}));
@@ -3165,14 +3179,17 @@ public class UI {
 	private void setTriggers(final ItemMap itemMap) {
 		String triggers = "";
 		if (itemMap.isGiveOnDisabled()) { triggers += "DISABLED, "; }
-		if (itemMap.isGiveOnJoin()) { triggers += "JOIN, "; }
+		if (itemMap.isGiveOnJoin() && !itemMap.isOnlyFirstJoin() && !itemMap.isOnlyFirstWorld()) { triggers += "JOIN, "; }
 		if (itemMap.isOnlyFirstJoin()) { triggers += "FIRST-JOIN, "; }
 		if (itemMap.isOnlyFirstWorld()) { triggers += "FIRST-WORLD, "; }
-		if (itemMap.isGiveOnRespawn()) { triggers += "RESPAWN, "; }
-		if (itemMap.isGiveOnWorldSwitch()) { triggers += "WORLD-SWITCH, "; }
+		if (itemMap.isOnlyFirstLife()) { triggers += "FIRST-LIFE, "; }
+		if (itemMap.isGiveOnRespawn() && !itemMap.isOnlyFirstJoin() && !itemMap.isOnlyFirstWorld()) { triggers += "RESPAWN, "; }
+		if (itemMap.isGiveOnWorldSwitch() && !itemMap.isOnlyFirstWorld()) { triggers += "WORLD-SWITCH, "; }
 		if (itemMap.isUseOnLimitSwitch()) { triggers += "GAMEMODE-SWITCH, "; }
 		if (itemMap.isGiveOnRegionEnter()) { triggers += "REGION-ENTER, "; }
-		if (itemMap.isTakeOnRegionLeave()) { triggers += "REGION-REMOVE, "; }
+		if (itemMap.isGiveOnRegionLeave()) { triggers += "REGION-LEAVE, "; }
+		if (itemMap.isGiveOnRegionAccess()) { triggers += "REGION-ACCESS, "; }
+		if (itemMap.isGiveOnRegionEgress()) { triggers += "REGION-EGRESS, "; }
 		if (triggers.endsWith(", ")) { triggers = triggers.substring(0, triggers.length() - 2); }
 		itemMap.setTriggers(triggers);
 	}
