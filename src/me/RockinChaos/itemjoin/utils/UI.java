@@ -3069,6 +3069,7 @@ public class UI {
 					itemMap.setGiveOnJoin(false);
 					itemMap.setOnlyFirstJoin(false);
 					itemMap.setOnlyFirstWorld(false);
+					itemMap.setOnlyFirstLife(false);
 					itemMap.setGiveOnRespawn(false);
 					itemMap.setGiveOnWorldSwitch(false);
 					itemMap.setUseOnLimitSwitch(false);
