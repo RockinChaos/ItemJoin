@@ -46,6 +46,7 @@ import me.RockinChaos.itemjoin.listeners.Placement;
 import me.RockinChaos.itemjoin.listeners.Recipes;
 import me.RockinChaos.itemjoin.listeners.Stackable;
 import me.RockinChaos.itemjoin.listeners.Storable;
+import me.RockinChaos.itemjoin.listeners.plugins.ChestSortAPI;
 import me.RockinChaos.itemjoin.listeners.Offhand;
 import me.RockinChaos.itemjoin.listeners.triggers.LimitSwitch;
 import me.RockinChaos.itemjoin.listeners.triggers.PlayerGuard;
@@ -507,9 +508,14 @@ public class ConfigHandler {
 			}
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Crafting(), ItemJoin.getInstance());
 		}
-		if ((itemMap.isMovement() || itemMap.isInventoryClose()) && !Utils.getUtils().isRegistered(Clicking.class.getSimpleName())) {
-			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Clicking(), ItemJoin.getInstance());
-			if (ServerHandler.getServer().hasSpecificUpdate("1_8") && !ProtocolManager.getManager().isHandling()) { ProtocolManager.getManager().handleProtocols(); }
+		if ((itemMap.isMovement() || itemMap.isInventoryClose())) {
+			if (!Utils.getUtils().isRegistered(Clicking.class.getSimpleName())) {
+				ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Clicking(), ItemJoin.getInstance());
+				if (ServerHandler.getServer().hasSpecificUpdate("1_8") && !ProtocolManager.getManager().isHandling()) { ProtocolManager.getManager().handleProtocols(); }
+			}
+			if (DependAPI.getDepends(false).chestSortEnabled() && !Utils.getUtils().isRegistered(ChestSortAPI.class.getSimpleName())) {
+				ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new ChestSortAPI(), ItemJoin.getInstance());
+			}
 		}
 		if (ServerHandler.getServer().hasSpecificUpdate("1_12") && itemMap.isStackable() && !Utils.getUtils().isRegistered(Stackable.class.getSimpleName())) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Stackable(), ItemJoin.getInstance());

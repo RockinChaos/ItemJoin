@@ -39,7 +39,6 @@ import me.RockinChaos.itemjoin.utils.DependAPI;
 import me.RockinChaos.itemjoin.utils.LanguageAPI;
 import me.RockinChaos.itemjoin.utils.LegacyAPI;
 import me.RockinChaos.itemjoin.utils.Reflection;
-import net.citizensnpcs.api.CitizensAPI;
 
 public class PlayerHandler {
 	
@@ -72,7 +71,7 @@ public class PlayerHandler {
     * @return If the entity is a real Player.
     */
     public boolean isPlayer(Entity entity) {
-    	if (DependAPI.getDepends(false).citizensEnabled() && CitizensAPI.getNPCRegistry().isNPC(entity)) {
+    	if (DependAPI.getDepends(false).citizensEnabled() && net.citizensnpcs.api.CitizensAPI.getNPCRegistry().isNPC(entity)) {
     		return false;
     	} else if (!(entity instanceof Player)) { 
     		return false; 

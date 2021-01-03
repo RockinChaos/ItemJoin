@@ -28,22 +28,6 @@ import skinsrestorer.bukkit.SkinsRestorer;
 
 public class DependAPI {
 	
-	private boolean hyperVerse = false;
-	private boolean multiverseCore = false;
-	private boolean multiverseInventories = false;
-	private boolean placeHolderAPI = false;
-	private boolean perWorldPlugins = false;
-	private boolean perWorldInventory = false;
-	private boolean betterNick = false;
-	private boolean authMe = false;
-	private boolean myWorlds = false;
-	private boolean xInventories = false;
-	private boolean tokenEnchant = false;
-	private boolean headDatabase = false;
-	private boolean skinsRestorer = false;
-	private boolean citizens = false;
-	private boolean chestSort = false;
-	
 	private static DependAPI depends;
 	
    /**
@@ -51,21 +35,6 @@ public class DependAPI {
     * 
     */
 	public DependAPI() {
-		this.setHyperverseStatus(Bukkit.getServer().getPluginManager().getPlugin("Hyperverse") != null);
-		this.setCoreStatus(Bukkit.getServer().getPluginManager().getPlugin("Multiverse-Core") != null);
-		this.setInventoryStatus(Bukkit.getServer().getPluginManager().getPlugin("Multiverse-Inventories") != null);
-		this.setPlaceHolderStatus(Bukkit.getServer().getPluginManager().getPlugin("PlaceholderAPI") != null);
-		this.setPerPluginsStatus(Bukkit.getServer().getPluginManager().getPlugin("PerWorldPlugins") != null);
-		this.setPerInventoryStatus(Bukkit.getServer().getPluginManager().getPlugin("PerWorldInventory") != null);
-		this.setNickStatus(Bukkit.getServer().getPluginManager().getPlugin("BetterNick") != null);
-		this.setAuthMeStatus(Bukkit.getServer().getPluginManager().getPlugin("AuthMe") != null);
-		this.setMyWorldsStatus(Bukkit.getServer().getPluginManager().getPlugin("My_Worlds") != null);
-		this.setXInventoryStatus(Bukkit.getServer().getPluginManager().getPlugin("xInventories") != null);
-		this.setTokenEnchantStatus(Bukkit.getServer().getPluginManager().getPlugin("TokenEnchant") != null);
-		this.setDatabaseStatus(Bukkit.getServer().getPluginManager().getPlugin("HeadDatabase") != null);
-		this.setSkinsRestorerStatus(Bukkit.getServer().getPluginManager().getPlugin("SkinsRestorer") != null);
-		this.setCitizensStatus(Bukkit.getServer().getPluginManager().getPlugin("Citizens") != null);
-		this.setChestSortStatus(Bukkit.getServer().getPluginManager().getPlugin("ChestSort") != null);
 		GuardAPI.getGuard(true);
 		VaultAPI.getVault(true);
 	}
@@ -76,7 +45,7 @@ public class DependAPI {
     * @return If Hyperverse is Enabled.
     */
 	public boolean hyperVerseEnabled() {
-		return this.hyperVerse;
+		return Bukkit.getServer().getPluginManager().isPluginEnabled("Hyperverse");
 	}
 
    /**
@@ -85,7 +54,7 @@ public class DependAPI {
     * @return If Multiverse Core is Enabled.
     */
     public boolean coreEnabled() {
-    	return this.multiverseCore;
+    	return Bukkit.getServer().getPluginManager().isPluginEnabled("Multiverse-Core");
     }
     
    /**
@@ -94,7 +63,7 @@ public class DependAPI {
     * @return If Multiverse Inventory is Enabled.
     */
     public boolean inventoryEnabled() {
-    	return this.multiverseInventories;
+    	return Bukkit.getServer().getPluginManager().isPluginEnabled("Multiverse-Inventories");
     }
     
    /**
@@ -103,7 +72,7 @@ public class DependAPI {
     * @return If PlaceHolderAPI is Enabled.
     */
     public boolean placeHolderEnabled() {
-    	return this.placeHolderAPI;
+    	return Bukkit.getServer().getPluginManager().isPluginEnabled("PlaceholderAPI");
     }
     
    /**
@@ -112,7 +81,7 @@ public class DependAPI {
     * @return If PerWorldPlugins is Enabled.
     */
     public boolean perPluginsEnabled() {
-    	return this.perWorldPlugins;
+    	return Bukkit.getServer().getPluginManager().isPluginEnabled("PerWorldPlugins");
     }
     
    /**
@@ -121,7 +90,7 @@ public class DependAPI {
     * @return If PerWorldInventory is Enabled.
     */
     public boolean perInventoryEnabled() {
-    	return this.perWorldInventory;
+    	return Bukkit.getServer().getPluginManager().isPluginEnabled("PerWorldInventory");
     }
     
    /**
@@ -130,7 +99,7 @@ public class DependAPI {
     * @return If BetterNick is Enabled.
     */
     public boolean nickEnabled() {
-    	return this.betterNick;
+    	return Bukkit.getServer().getPluginManager().isPluginEnabled("BetterNick");
     }
     
    /**
@@ -139,7 +108,7 @@ public class DependAPI {
     * @return If AuthMe is Enabled.
     */
     public boolean authMeEnabled() {
-    	return this.authMe;
+    	return Bukkit.getServer().getPluginManager().isPluginEnabled("AuthMe");
     }
     
    /**
@@ -148,7 +117,7 @@ public class DependAPI {
     * @return If My Worlds is Enabled.
     */
     public boolean myWorldsEnabled() {
-    	return this.myWorlds;
+    	return Bukkit.getServer().getPluginManager().isPluginEnabled("My_Worlds");
     }
     
    /**
@@ -157,7 +126,7 @@ public class DependAPI {
     * @return If xInventories is Enabled.
     */
     public boolean xInventoryEnabled() {
-    	return this.xInventories;
+    	return Bukkit.getServer().getPluginManager().isPluginEnabled("xInventories");
     }
     
    /**
@@ -166,7 +135,7 @@ public class DependAPI {
     * @return If TokenEnchant is Enabled.
     */
     public boolean tokenEnchantEnabled() {
-    	return this.tokenEnchant;
+    	return Bukkit.getServer().getPluginManager().isPluginEnabled("TokenEnchant");
     }
     
    /**
@@ -175,7 +144,7 @@ public class DependAPI {
     * @return If HeadDatabase is Enabled.
     */
     public boolean databaseEnabled() {
-    	return this.headDatabase;
+    	return Bukkit.getServer().getPluginManager().isPluginEnabled("HeadDatabase");
     }
     
    /**
@@ -184,7 +153,7 @@ public class DependAPI {
     * @return If SkinsRestorer is Enabled.
     */
     public boolean skinsRestorerEnabled() {
-    	return this.skinsRestorer;
+    	return Bukkit.getServer().getPluginManager().isPluginEnabled("SkinsRestorer");
     }
     
    /**
@@ -193,7 +162,7 @@ public class DependAPI {
     * @return If Citizens is Enabled.
     */
     public boolean citizensEnabled() {
-    	return this.citizens;
+    	return Bukkit.getServer().getPluginManager().isPluginEnabled("Citizens");
     }
     
    /**
@@ -202,142 +171,7 @@ public class DependAPI {
     * @return If ChestSort is Enabled.
     */
     public boolean chestSortEnabled() {
-    	return this.chestSort;
-    }
-
-   /**
-    * Sets the status of Hyperverse.
-    * 
-    * @param bool - If Hyperverse is enabled.
-    */
-    public void setHyperverseStatus(final boolean bool) {
-    	this.hyperVerse = bool;
-    }
-    
-   /**
-    * Sets the status of Multiverse Core.
-    * 
-    * @param bool - If Multiverse Core is enabled.
-    */
-    public void setCoreStatus(final boolean bool) {
-    	this.multiverseCore = bool;
-    }
-    
-   /**
-    * Sets the status of Multiverse Inventory.
-    * 
-    * @param bool - If Multiverse Inventory is enabled.
-    */
-    public void setInventoryStatus(final boolean bool) {
-    	this.multiverseInventories = bool;
-    }
-    
-   /**
-    * Sets the status of PlaceHolderAPI.
-    * 
-    * @param bool - If PlaceHolderAPI is enabled.
-    */
-    public void setPlaceHolderStatus(final boolean bool) {
-    	this.placeHolderAPI = bool;
-    }
-    
-   /**
-    * Sets the status of PerWorldPlugins.
-    * 
-    * @param bool - If PerWorldPlugins is enabled.
-    */
-    public void setPerPluginsStatus(final boolean bool) {
-    	this.perWorldPlugins = bool;
-    }
-    
-   /**
-    * Sets the status of PerWorldInventory.
-    * 
-    * @param bool - If PerWorldInventory is enabled.
-    */
-    public void setPerInventoryStatus(final boolean bool) {
-    	this.perWorldInventory = bool;
-    }
-    
-   /**
-    * Sets the status of BetterNick.
-    * 
-    * @param bool - If BetterNick is enabled.
-    */
-    public void setNickStatus(final boolean bool) {
-    	this.betterNick = bool;
-    }
-    
-   /**
-    * Sets the status of AuthMe.
-    * 
-    * @param bool - If AuthMe is enabled.
-    */
-    public void setAuthMeStatus(boolean bool) {
-    	this.authMe = bool;
-    }
-    
-   /**
-    * Sets the status of My Worlds.
-    * 
-    * @param bool - If My Worlds is enabled.
-    */
-    public void setMyWorldsStatus(final boolean bool) {
-    	this.myWorlds = bool;
-    }
-    
-   /**
-    * Sets the status of xInventory.
-    * 
-    * @param bool - If xInventory is enabled.
-    */
-    public void setXInventoryStatus(final boolean bool) {
-    	this.xInventories = bool;
-    }
-    
-   /**
-    * Sets the status of TokenEnchant.
-    * 
-    * @param bool - If TokenEnchant is enabled.
-    */
-    public void setTokenEnchantStatus(final boolean bool) {
-    	this.tokenEnchant = bool;
-    }
-    
-   /**
-    * Sets the status of HeadDatabase.
-    * 
-    * @param bool - If HeadDatabase is enabled.
-    */
-    public void setDatabaseStatus(final boolean bool) {
-    	this.headDatabase = bool;
-    }
-    
-   /**
-    * Sets the status of SkinsRestorer.
-    * 
-    * @param bool - If SkinsRestorer is enabled.
-    */
-    public void setSkinsRestorerStatus(final boolean bool) {
-    	this.skinsRestorer = bool;
-    }
-    
-   /**
-    * Sets the status of Citizens.
-    * 
-    * @param bool - If Citizens is enabled.
-    */
-    public void setCitizensStatus(final boolean bool) {
-    	this.citizens = bool;
-    }
-    
-   /**
-    * Sets the status of ChestSort.
-    * 
-    * @param bool - If ChestSort is enabled.
-    */
-    public void setChestSortStatus(final boolean bool) {
-    	this.chestSort = bool;
+    	return Bukkit.getServer().getPluginManager().isPluginEnabled("ChestSort");
     }
     
    /**
@@ -378,9 +212,10 @@ public class DependAPI {
 				+ (this.myWorldsEnabled() ? "My Worlds, " : "") + (this.perInventoryEnabled() ? "PerWorldInventory, " : "") 
 				+ (this.perPluginsEnabled() ? "PerWorldPlugins, " : "") + (this.tokenEnchantEnabled() ? "TokenEnchant, " : "") 
 				+ (this.getGuard().guardEnabled() ? "WorldGuard, " : "") + (this.databaseEnabled() ? "HeadDatabase, " : "") 
-				+ (this.xInventoryEnabled() ? "xInventories, " : "") + (this.placeHolderEnabled() ? "PlaceholderAPI, " : "") + (this.skinsRestorer ? "SkinsRestorer, " : "") + (this.citizens ? "Citizens, " : "") + (this.chestSort ? "ChestSort, " : "")
-				+ (this.getVault().vaultEnabled() ? "Vault " : "");
-		if (!enabledPlugins.isEmpty()) { ServerHandler.getServer().logInfo("Hooked into { " + enabledPlugins + "}"); }
+				+ (this.xInventoryEnabled() ? "xInventories, " : "") + (this.placeHolderEnabled() ? "PlaceholderAPI, " : "") + 
+				(this.skinsRestorerEnabled() ? "SkinsRestorer, " : "") + (this.citizensEnabled() ? "Citizens, " : "") + (this.chestSortEnabled() ? "ChestSort, " : "")
+				+ (this.getVault().vaultEnabled() ? "Vault, " : "");
+		if (!enabledPlugins.isEmpty()) { ServerHandler.getServer().logInfo("Hooked into { " + enabledPlugins.substring(0, enabledPlugins.length() - 2) + " }"); }
 	}
 
    /**

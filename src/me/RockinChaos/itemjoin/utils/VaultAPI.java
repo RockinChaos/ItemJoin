@@ -28,7 +28,6 @@ import net.milkbowl.vault.economy.EconomyResponse;
 
 public class VaultAPI {
     private Economy econ = null;
-    private boolean isEnabled = false;
     
     private static VaultAPI vault;
     
@@ -37,7 +36,7 @@ public class VaultAPI {
 	* 
 	*/
     public VaultAPI() {
-    	this.setVaultStatus(Bukkit.getServer().getPluginManager().getPlugin("Vault") != null);
+    	this.enableEconomy();
     }
     
    /**
@@ -45,7 +44,7 @@ public class VaultAPI {
 	* 
 	*/
 	private void enableEconomy() { 
-		if (ItemJoin.getInstance().getServer().getPluginManager().getPlugin("Vault") != null) {
+		if (Bukkit.getServer().getPluginManager().isPluginEnabled("Vault")) {
 			if (!this.setupEconomy()) {
 				ServerHandler.getServer().logDebug("{VaultAPI} An error has occured while setting up enabling Vault-ItemJoin support!");
 			}
@@ -58,7 +57,7 @@ public class VaultAPI {
 	* @return If the Economy instance was successfully enabled.
 	*/
     private boolean setupEconomy() {
-        if (ItemJoin.getInstance().getServer().getPluginManager().getPlugin("Vault") == null) { return false; }
+        if (!Bukkit.getServer().getPluginManager().isPluginEnabled("Vault")) { return false; }
         RegisteredServiceProvider<Economy> rsp = ItemJoin.getInstance().getServer().getServicesManager().getRegistration(Economy.class);
         if (rsp == null) { return false; }
         this.econ = rsp.getProvider();
@@ -80,17 +79,7 @@ public class VaultAPI {
 	* @return If Vault is enabled.
 	*/
     public boolean vaultEnabled() {
-    	return this.isEnabled;
-    }
-    
-   /**
-	* Sets the status of the VaultAPI.
-	* 
-	* @param bool - If Vault is enabled.
-	*/
-    private void setVaultStatus(final boolean bool) {
-    	if (bool) { this.enableEconomy(); }
-    	this.isEnabled = bool;
+    	return Bukkit.getServer().getPluginManager().isPluginEnabled("Vault");
     }
     
    /**

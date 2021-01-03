@@ -54,8 +54,7 @@ public class GuardAPI {
     private Method getRegionManager = null;
     private Constructor<?> vectorConstructor = null;
     private Method getVector = null;
-			
-    private boolean isEnabled = false;
+
 	private int guardVersion = 0;
 	private List < String > localeRegions = new ArrayList < String > ();
 	
@@ -66,8 +65,8 @@ public class GuardAPI {
 	* 
 	*/
 	public GuardAPI() {
-		this.setGuardStatus(Bukkit.getServer().getPluginManager().getPlugin("WorldEdit") != null && Bukkit.getServer().getPluginManager().getPlugin("WorldGuard") != null);
-		if (this.isEnabled) {
+		if (Bukkit.getServer().getPluginManager().isPluginEnabled("WorldEdit") && Bukkit.getServer().getPluginManager().isPluginEnabled("WorldGuard")) {
+			this.enableGuard();
 			if (Bukkit.getServer().getPluginManager().getPlugin("WorldGuard") instanceof WorldGuardPlugin) {
 				this.worldGuardPlugin = (WorldGuardPlugin) Bukkit.getServer().getPluginManager().getPlugin("WorldGuard");
 				try {
@@ -139,7 +138,7 @@ public class GuardAPI {
 	* @return If WorldGuard is enabled.
 	*/
     public boolean guardEnabled() {
-    	return this.isEnabled;
+    	return Bukkit.getServer().getPluginManager().isPluginEnabled("WorldEdit") && Bukkit.getServer().getPluginManager().isPluginEnabled("WorldGuard");
     }
     
    /**
@@ -221,16 +220,6 @@ public class GuardAPI {
     		ServerHandler.getServer().sendDebugTrace(e);
     	}
     	return regionManager;
-    }
-	
-   /**
-	* Sets the status of WorldGuard.
-	* 
-	* @param bool - If WorldGuard is enabled.
-	*/
-    private void setGuardStatus(final boolean bool) {
-    	if (bool) { this.enableGuard(); }
-    	this.isEnabled = bool;
     }
     
    /**
