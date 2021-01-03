@@ -86,29 +86,22 @@ public class PlayerGuard implements Listener {
 	private void handleRegions(final Player player) {
 		String regions = DependAPI.getDepends(false).getGuard().getRegionAtEntity(player);
 		if (this.playerRegions.get(player) != null) {
-			List < String > regionSet = Arrays.asList(regions.replace(" ", "").split(","));
-			List < String > playerSet = Arrays.asList(this.playerRegions.get(player).replace(" ", "").split(","));
-			List < String > regionSetList = new ArrayList < String > (regionSet);
-			List < String > playerSetList = new ArrayList < String > (playerSet);
-			regionSetList.removeAll(playerSet);
-			playerSetList.removeAll(regionSet);
-			if (!playerSetList.isEmpty()) {
-				for (String region: playerSetList) {
-					if (region != null && !region.isEmpty()) {
-						ServerHandler.getServer().runThread(main -> ItemUtilities.getUtilities().setItems(player, player.getWorld(), TriggerType.REGIONLEAVE, org.bukkit.GameMode.ADVENTURE, region));
-					}
+			List < String > regionSet = new ArrayList < String > (Arrays.asList(regions.replace(" ", "").split(",")));
+			List < String > playerSet = new ArrayList < String > (Arrays.asList(this.playerRegions.get(player).replace(" ", "").split(",")));
+			regionSet.removeAll(Arrays.asList(this.playerRegions.get(player).replace(" ", "").split(",")));
+			playerSet.removeAll(Arrays.asList(regions.replace(" ", "").split(",")));
+			for (String region: playerSet) {
+				if (region != null && !region.isEmpty()) {
+					ServerHandler.getServer().runThread(main -> ItemUtilities.getUtilities().setItems(player, player.getWorld(), TriggerType.REGIONLEAVE, org.bukkit.GameMode.ADVENTURE, region));
 				}
 			}
-			if (!regionSetList.isEmpty()) {
-				for (String region: regionSetList) {
-					if (region != null && !region.isEmpty()) {
-						ServerHandler.getServer().runThread(main -> ItemUtilities.getUtilities().setItems(player, player.getWorld(), TriggerType.REGIONENTER, org.bukkit.GameMode.ADVENTURE, region));
-					}
+			for (String region: regionSet) {
+				if (region != null && !region.isEmpty()) {
+					ServerHandler.getServer().runThread(main -> ItemUtilities.getUtilities().setItems(player, player.getWorld(), TriggerType.REGIONENTER, org.bukkit.GameMode.ADVENTURE, region));
 				}
 			}
 		} else {
-			List < String > regionSet = Arrays.asList(regions.replace(" ", "").split(","));
-			for (String region: regionSet) {
+			for (String region: Arrays.asList(regions.replace(" ", "").split(","))) {
 				if (region != null && !region.isEmpty()) {
 					ServerHandler.getServer().runThread(main -> ItemUtilities.getUtilities().setItems(player, player.getWorld(), TriggerType.REGIONENTER, org.bukkit.GameMode.ADVENTURE, region));
 				}

@@ -258,7 +258,9 @@ public class ItemMap {
 	private boolean giveOnRespawn = false;
 	private boolean giveOnWorldSwitch = false;
 	private boolean giveOnRegionEnter = false;
-	private boolean takeOnRegionLeave = false;
+	private boolean giveOnRegionLeave = false;
+	private boolean giveOnRegionAccess = false;
+	private boolean giveOnRegionEgress = false;
 	private boolean useOnLimitSwitch = false;
 	
 	private String triggers = null;
@@ -492,7 +494,10 @@ public class ItemMap {
 				this.giveOnWorldSwitch = true;
 			}
 			this.giveOnRegionEnter = Utils.getUtils().containsIgnoreCase(this.triggers, "REGION-ENTER");
-			this.takeOnRegionLeave = Utils.getUtils().containsIgnoreCase(this.triggers, "REGION-REMOVE") || Utils.getUtils().containsIgnoreCase(this.triggers, "REGION-EXIT") || Utils.getUtils().containsIgnoreCase(this.triggers, "REGION-LEAVE");
+			this.giveOnRegionLeave = Utils.getUtils().containsIgnoreCase(this.triggers, "REGION-REMOVE") || Utils.getUtils().containsIgnoreCase(this.triggers, "REGION-EXIT") || Utils.getUtils().containsIgnoreCase(this.triggers, "REGION-LEAVE");
+			this.giveOnRegionAccess = Utils.getUtils().containsIgnoreCase(this.triggers, "REGION-ACCESS");
+			this.giveOnRegionEgress = Utils.getUtils().containsIgnoreCase(this.triggers, "REGION-EGRESS"); 
+			if (this.giveOnRegionAccess || this.giveOnRegionEgress) { this.giveOnRegionEnter = false; this.giveOnRegionLeave = false; }
 			this.useOnLimitSwitch = Utils.getUtils().containsIgnoreCase(this.triggers, "GAMEMODE-SWITCH");
 		} else { this.giveOnJoin = true; }
 	}
@@ -508,7 +513,7 @@ public class ItemMap {
 				this.enabledRegions.add(region); 
 				DependAPI.getDepends(false).getGuard().addLocaleRegion(region);
 			}
-		} else if (isGiveOnRegionEnter() || isTakeOnRegionLeave()) { 
+		} else if (isGiveOnRegionEnter() || isGiveOnRegionLeave()) { 
 			DependAPI.getDepends(false).getGuard().addLocaleRegion("UNDEFINED"); 
 			this.enabledRegions.add("UNDEFINED"); }
 	}
@@ -1013,7 +1018,10 @@ public class ItemMap {
     */
 	public void setOnlyFirstWorld(final boolean bool) {
 		this.onlyFirstWorld = bool;
-		if (bool) { this.giveOnJoin = true; }
+		if (bool) { 
+			this.giveOnJoin = true; 
+			this.giveOnWorldSwitch = true; 
+		}
 		if (bool && this.giveOnRespawn) {
 			this.giveOnRespawn = false;
 		}
@@ -1060,8 +1068,26 @@ public class ItemMap {
     * 
     * @param bool - The value to be set.
     */
-	public void setTakeOnRegionLeave(final boolean bool) {
-		this.takeOnRegionLeave = bool;
+	public void setGiveOnRegionLeave(final boolean bool) {
+		this.giveOnRegionLeave = bool;
+	}
+	
+   /**
+    * Sets the ItemStack to be given only on region enter and removed on region leave.
+    * 
+    * @param bool - The value to be set.
+    */
+	public void setGiveOnRegionAccess(final boolean bool) {
+		this.giveOnRegionAccess = bool;
+	}
+	
+   /**
+    * Sets the ItemStack to be given only on region leave and removed on region enter.
+    * 
+    * @param bool - The value to be set.
+    */
+	public void setGiveOnRegionEgress(final boolean bool) {
+		this.giveOnRegionEgress = bool;
 	}
 	
    /**
@@ -2481,12 +2507,30 @@ public class ItemMap {
 	}
 	
    /**
-    * Checks if take on region leave is enabled.
+    * Checks if give on region leave is enabled.
     * 
     * @return If it is enabled.
     */
-	public boolean isTakeOnRegionLeave() {
-		return this.takeOnRegionLeave;
+	public boolean isGiveOnRegionLeave() {
+		return this.giveOnRegionLeave;
+	}
+	
+   /**
+    * Checks if give on region enter and remove on region leave is enabled.
+    * 
+    * @return If it is enabled.
+    */
+	public boolean isGiveOnRegionAccess() {
+		return this.giveOnRegionAccess;
+	}
+	
+   /**
+    * Checks if give on region leave and remove on region enter is enabled.
+    * 
+    * @return If it is enabled.
+    */
+	public boolean isGiveOnRegionEgress() {
+		return this.giveOnRegionEgress;
 	}
 	
    /**

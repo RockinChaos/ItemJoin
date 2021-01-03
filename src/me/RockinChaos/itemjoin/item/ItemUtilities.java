@@ -61,6 +61,7 @@ public class ItemUtilities {
     * @param itemflag - The itemflag to be checked if it is allowed.
     */
 	public boolean isAllowed(final Player player, final ItemStack item, final String itemflag) {
+		if (player == null || item == null) { return true; }
 		ItemMap itemMap = this.getItemMap(item, null, player.getWorld());
 		if (itemMap != null && itemMap.isAllowedItem(player, item, itemflag)) {
 			return false;
@@ -217,14 +218,14 @@ public class ItemUtilities {
 			  || (type.equals(TriggerType.RESPAWN) && item.isGiveOnRespawn())
 			  || (type.equals(TriggerType.WORLDSWITCH) && item.isGiveOnWorldSwitch())
 			  || (type.equals(TriggerType.LIMITSWITCH) && item.isUseOnLimitSwitch())
-		      || ((((type.equals(TriggerType.REGIONENTER) && item.isGiveOnRegionEnter()) 
-			  || (type.equals(TriggerType.REGIONLEAVE) && item.isTakeOnRegionLeave())) && item.inRegion(region))))
+		      || ((((type.equals(TriggerType.REGIONENTER) && (item.isGiveOnRegionEnter() || item.isGiveOnRegionAccess())) 
+			  || (type.equals(TriggerType.REGIONLEAVE) && (item.isGiveOnRegionLeave() || item.isGiveOnRegionEgress()))) && item.inRegion(region))))
 			   && item.inWorld(player.getWorld()) && Chances.getChances().isProbability(item, randomMap) 
 			   && SQL.getData(false).isEnabled(player) && item.hasPermission(player) 
 			   && this.isObtainable(player, item, session, type, (newMode != null ? newMode : player.getGameMode()))) {
 				item.giveTo(player); 
 			} else if (((type.equals(TriggerType.LIMITSWITCH) && item.isUseOnLimitSwitch() && !item.isLimitMode(newMode))
-					|| ((type.equals(TriggerType.REGIONLEAVE) && item.isTakeOnRegionLeave()) && item.inRegion(region))) 
+					|| (((type.equals(TriggerType.REGIONLEAVE) && item.isGiveOnRegionAccess()) || (type.equals(TriggerType.REGIONENTER) && item.isGiveOnRegionEgress())) && item.inRegion(region)))
 					&& item.inWorld(player.getWorld()) && item.hasItem(player)) {
 				item.removeFrom(player);
 			} else if (item.isAutoRemove() && !item.inWorld(player.getWorld()) && item.hasItem(player)) {

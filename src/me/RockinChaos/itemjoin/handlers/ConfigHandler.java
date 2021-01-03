@@ -480,7 +480,7 @@ public class ConfigHandler {
 		if (((!itemMap.isGiveOnDisabled() && itemMap.isGiveOnWorldSwitch()) || itemMap.isAutoRemove()) && !Utils.getUtils().isRegistered(WorldSwitch.class.getSimpleName())) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new WorldSwitch(), ItemJoin.getInstance());
 		}
-		if (!itemMap.isGiveOnDisabled() && (itemMap.isGiveOnRegionEnter() || itemMap.isTakeOnRegionLeave()) 
+		if (!itemMap.isGiveOnDisabled() && (itemMap.isGiveOnRegionEnter() || itemMap.isGiveOnRegionLeave() || itemMap.isGiveOnRegionAccess() || itemMap.isGiveOnRegionEgress()) 
 			&& !Utils.getUtils().isRegistered(PlayerGuard.class.getSimpleName()) && DependAPI.getDepends(false).getGuard().guardEnabled()) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerGuard(), ItemJoin.getInstance());
 		}
