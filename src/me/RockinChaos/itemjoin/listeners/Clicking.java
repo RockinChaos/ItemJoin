@@ -114,6 +114,23 @@ public class Clicking implements Listener {
 	}
 	
    /**
+	* Prevents the player from moving the custom item in their inventory when using ChestSort.
+	* 
+	* @param event - ChestSortEvent
+	*/
+	@EventHandler(ignoreCancelled = true)
+	private void onChestSortEvent(de.jeff_media.ChestSortAPI.ChestSortEvent event) {
+		Player player = event.getPlayer();
+		try {
+			for (ItemStack item : event.getInventory().getContents()) {
+				if (!ItemUtilities.getUtilities().isAllowed(player, item, "inventory-modify")) {
+					event.setUnmovable(item);
+				}
+			}
+		} catch (Exception e) { }
+	}
+	
+   /**
 	* Prevents the player from using the pick block feature to move an item in their inventory.
 	* 
 	* @param event - PlayerPickItemEvent

@@ -162,6 +162,11 @@
             <id>everything</id>
             <url>https://repo.citizensnpcs.co/</url>
         </repository>
+		<!--ChestSort Repository-->
+        <repository>
+            <id>jeff-media-repo</id>
+            <url>https://repo.jeff-media.de/maven2</url>
+        </repository>
 		<!--CraftationGaming Repository-->
 		<repository>
 			<id>CraftationGaming</id>
@@ -237,6 +242,13 @@
             <version>2.0.27-SNAPSHOT</version>
             <type>jar</type>
        	    <scope>provided</scope>
+        </dependency>
+		<!--ChestSort API-->
+        <dependency>
+            <groupId>de.jeff_media</groupId>
+            <artifactId>ChestSortAPI</artifactId>
+            <version>1.1.0</version>
+       	    <scope>compile</scope>
         </dependency>
 		<!--Mojang AuthLib API-->
 		<dependency>
