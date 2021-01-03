@@ -247,7 +247,7 @@
         <dependency>
             <groupId>de.jeff_media</groupId>
             <artifactId>ChestSortAPI</artifactId>
-            <version>1.1.0</version>
+            <version>2.0.0</version>
        	    <scope>compile</scope>
         </dependency>
 		<!--Mojang AuthLib API-->
