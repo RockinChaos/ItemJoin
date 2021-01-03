@@ -4708,7 +4708,7 @@ public class UI {
 					if (Utils.getUtils().nullCheck(itemMap.getPotionEffect().toString()) != "NONE") {
 						for (PotionEffect potions: itemMap.getPotionEffect()) {
 							if (potions.getType() == potion) {
-								potionString = potions.getType().getName().toUpperCase() + ":" + potions.getAmplifier() + ":" + potions.getDuration() / 160;
+								potionString = potions.getType().getName().toUpperCase() + ":" + potions.getAmplifier() + ":" + (potions.getDuration());
 								break;
 							}
 						}
@@ -4814,7 +4814,7 @@ public class UI {
 				final int k = i;
 				durationPane.addButton(new Button(ItemHandler.getItem().getItem("STAINED_GLASS_PANE:11", k, false, "&9&lDuration: &a&l" + k + " Second(s)", "&7", "&7*Click to set the", "&7duration of the potion effect."), event -> {
 					List < PotionEffect > effects = itemMap.getPotionEffect();
-					effects.add(new PotionEffect(potion, k * 160, level));
+					effects.add(new PotionEffect(potion, k, level));
 					itemMap.setPotionEffect(effects);this.potionPane(player, itemMap);
 				}));
 			}
@@ -5399,7 +5399,7 @@ public class UI {
 		String potionString = "";
 		if (Utils.getUtils().nullCheck(itemMap.getPotionEffect().toString()) != "NONE") {
 			for (PotionEffect potions: itemMap.getPotionEffect()) {
-				potionString += potions.getType().getName().toUpperCase() + ":" + potions.getAmplifier() + ":" + potions.getDuration() / 160 + ", ";
+				potionString += potions.getType().getName().toUpperCase() + ":" + potions.getAmplifier() + ":" + potions.getDuration() + ", ";
 			}
 			if (potionString.length() >= 2) {
 				for (String split: Utils.getUtils().softSplit(Utils.getUtils().nullCheck(potionString.substring(0, potionString.length() - 2)))) {
