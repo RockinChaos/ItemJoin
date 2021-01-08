@@ -20,11 +20,12 @@ package me.RockinChaos.itemjoin.utils.interfaces;
 import java.util.Objects;
 import java.util.function.Consumer;
 
+import org.bukkit.Bukkit;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.inventory.ItemStack;
 
-import me.RockinChaos.itemjoin.handlers.ServerHandler;
+import me.RockinChaos.itemjoin.ItemJoin;
 
 public class Button {
 	
@@ -103,9 +104,11 @@ public class Button {
     * @param event - InventoryClickEvent
     */
     public void onClick(InventoryClickEvent event) {
-    	ServerHandler.getServer().runThread(main -> {
-    		this.clickAction.accept(event);
-    	});
+		if (ItemJoin.getInstance().isEnabled()) {
+			Bukkit.getServer().getScheduler().runTask(ItemJoin.getInstance(), () -> {
+				this.clickAction.accept(event);
+			});
+		}
     }
     
    /**
@@ -115,9 +118,11 @@ public class Button {
     * @param event - AsyncPlayerChatEvent
     */
     public void onChat(AsyncPlayerChatEvent event) {
-    	ServerHandler.getServer().runThread(main -> {
-    	    this.chatAction.accept(event);
-    	});
+		if (ItemJoin.getInstance().isEnabled()) {
+			Bukkit.getServer().getScheduler().runTask(ItemJoin.getInstance(), () -> {
+				this.chatAction.accept(event);
+			});
+		}
     }
     
    /**

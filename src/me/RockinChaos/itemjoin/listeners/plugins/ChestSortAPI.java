@@ -22,7 +22,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 
+import me.RockinChaos.itemjoin.handlers.ConfigHandler;
+import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
+import me.RockinChaos.itemjoin.utils.Utils;
 
 public class ChestSortAPI implements Listener {
 	
@@ -34,12 +37,20 @@ public class ChestSortAPI implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	private void onChestSortEvent(de.jeff_media.ChestSortAPI.ChestSortEvent event) {
 		Player player = (Player) event.getPlayer();
-		try {
-			for (ItemStack item : event.getInventory().getContents()) {
-				if (!ItemUtilities.getUtilities().isAllowed(player, item, "inventory-modify")) {
-					event.setUnmovable(item);
+	  	if (Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getPrevent("itemMovement"), "TRUE") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getPrevent("itemMovement"), player.getWorld().getName())
+		  			|| Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getPrevent("itemMovement"), "ALL") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getPrevent("itemMovement"), "GLOBAL")) {
+	  		if (ConfigHandler.getConfig(false).isPreventOP() && player.isOp() || ConfigHandler.getConfig(false).isPreventCreative() && PlayerHandler.getPlayer().isCreativeMode(player)) { } 
+	  		else if (player.getOpenInventory().getTitle().contains("§") || player.getOpenInventory().getTitle().contains("&")) { }
+	  		else { event.setCancelled(true); }
+	  	}
+	  	if (!event.isCancelled()) {
+			try {
+				for (ItemStack item : event.getInventory().getContents()) {
+					if (!ItemUtilities.getUtilities().isAllowed(player, item, "inventory-modify")) {
+						event.setUnmovable(item);
+					}
 				}
-			}
-		} catch (NoSuchMethodError e) { }
+			} catch (NoSuchMethodError e) { }
+	  	}
 	}
 }

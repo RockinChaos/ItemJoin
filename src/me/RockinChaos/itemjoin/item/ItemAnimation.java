@@ -23,6 +23,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -30,6 +31,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 
+import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
@@ -199,61 +201,63 @@ public class ItemAnimation {
     */
 	private void AnimateTask(final Player player, final boolean hasNext, final String nameString, final List<String> loreString, final String materialString, final String ownerString, final String textureString, final List<String> pagesString, final long UpdateDelay, final int position) {
 		final ItemMap itemMap = this.itemMap;
-		ServerHandler.getServer().runThread(main -> { 
-			if (!stopAnimations) {
-				// ============== Animate Within the Player Inventory ============== //
-				for (ItemStack inPlayerInventory: player.getInventory().getContents()) {
-					if (inPlayerInventory != null && itemMap.getTempItem() != null && itemMap.isReal(inPlayerInventory)) {
-						if (nameString != null) { setNameData(player, inPlayerInventory, nameString); } 
-						else if (loreString != null) { setLoreData(player, inPlayerInventory, loreString); }
-						else if (materialString != null) { setMaterialData(player, inPlayerInventory, materialString); }
-						else if (pagesString != null) { setPagesData(player, inPlayerInventory, pagesString); }
-						else if (ownerString != null || textureString != null) { setSkull(player, inPlayerInventory, ownerString, textureString); }
+		if (ItemJoin.getInstance().isEnabled()) {
+			Bukkit.getServer().getScheduler().runTaskLater(ItemJoin.getInstance(), () -> {
+				if (!stopAnimations) {
+					// ============== Animate Within the Player Inventory ============== //
+					for (ItemStack inPlayerInventory: player.getInventory().getContents()) {
+						if (inPlayerInventory != null && itemMap.getTempItem() != null && itemMap.isReal(inPlayerInventory)) {
+							if (nameString != null) { setNameData(player, inPlayerInventory, nameString); } 
+							else if (loreString != null) { setLoreData(player, inPlayerInventory, loreString); }
+							else if (materialString != null) { setMaterialData(player, inPlayerInventory, materialString); }
+							else if (pagesString != null) { setPagesData(player, inPlayerInventory, pagesString); }
+							else if (ownerString != null || textureString != null) { setSkull(player, inPlayerInventory, ownerString, textureString); }
+						}
+					}
+					// =============== Animate Within the Player's Armor =============== //
+					for (ItemStack inPlayerInventory: player.getInventory().getArmorContents()) {
+						if (inPlayerInventory != null && itemMap.getTempItem() != null && itemMap.isReal(inPlayerInventory)) {
+							if (nameString != null) { setNameData(player, inPlayerInventory, nameString); } 
+							else if (loreString != null) { setLoreData(player, inPlayerInventory, loreString); }
+							else if (materialString != null) { setMaterialData(player, inPlayerInventory, materialString); }
+							else if (pagesString != null) { setPagesData(player, inPlayerInventory, pagesString); }
+							else if (ownerString != null || textureString != null) { setSkull(player, inPlayerInventory, ownerString, textureString); }
+						}
+					}
+					// ========== Animate Within the Player Crafting/Chests ============ //
+					for (ItemStack inPlayerInventory: player.getOpenInventory().getTopInventory().getContents()) {
+						if (inPlayerInventory != null && itemMap.getTempItem() != null && itemMap.isReal(inPlayerInventory)) {
+							if (nameString != null) { setNameData(player, inPlayerInventory, nameString); } 
+							else if (loreString != null) { if (menu) { setLoreData(player, inPlayerInventory, menuLores.get(position)); } else { setLoreData(player, inPlayerInventory, loreString); } }
+							else if (materialString != null) { setMaterialData(player, inPlayerInventory, materialString); }
+							else if (pagesString != null) { setPagesData(player, inPlayerInventory, pagesString); }
+							else if (ownerString != null || textureString != null) { setSkull(player, inPlayerInventory, ownerString, textureString); }
+						}
+					}
+					// ============== Animate Within the Player's Cursor =============== //
+					if (player.getItemOnCursor().getType() != null && player.getItemOnCursor().getType() != Material.AIR && itemMap.getTempItem() != null && itemMap.isReal(player.getItemOnCursor())) {
+						ItemStack item = new ItemStack(player.getItemOnCursor());
+						if (Clicking.getCursor(PlayerHandler.getPlayer().getPlayerID(player)) != null && itemMap.isReal(Clicking.getCursor(PlayerHandler.getPlayer().getPlayerID(player)))) { item = new ItemStack(Clicking.getCursor(PlayerHandler.getPlayer().getPlayerID(player))); }
+						if (nameString != null) { setNameData(player, player.getItemOnCursor(), nameString); } 
+						else if (loreString != null) { setLoreData(player, player.getItemOnCursor(), loreString); }
+						else if (materialString != null) { setMaterialData(player, player.getItemOnCursor(), materialString); }
+						else if (pagesString != null) { setPagesData(player, player.getItemOnCursor(), pagesString); }
+						else if (ownerString != null || textureString != null) { setSkull(player, player.getItemOnCursor(), ownerString, textureString); }
+						Clicking.putCursor(PlayerHandler.getPlayer().getPlayerID(player), item);
+					}
+					PlayerHandler.getPlayer().updateInventory(player, itemMap, 1L);
+					// ============== This has Concluded all Animations.. ============== //
+					if (!hasNext) { 
+						if (nameString != null) { nameTasks(player); }
+						else if (loreString != null) { loreTasks(player); }
+						else if (materialString != null) { materialTasks(player); }
+						else if (pagesString != null) { pagesTasks(player); }
+						else if (ownerString != null) { ownerTasks(player); }
+						else if (textureString != null) { textureTasks(player); }
 					}
 				}
-				// =============== Animate Within the Player's Armor =============== //
-				for (ItemStack inPlayerInventory: player.getInventory().getArmorContents()) {
-					if (inPlayerInventory != null && itemMap.getTempItem() != null && itemMap.isReal(inPlayerInventory)) {
-						if (nameString != null) { setNameData(player, inPlayerInventory, nameString); } 
-						else if (loreString != null) { setLoreData(player, inPlayerInventory, loreString); }
-						else if (materialString != null) { setMaterialData(player, inPlayerInventory, materialString); }
-						else if (pagesString != null) { setPagesData(player, inPlayerInventory, pagesString); }
-						else if (ownerString != null || textureString != null) { setSkull(player, inPlayerInventory, ownerString, textureString); }
-					}
-				}
-				// ========== Animate Within the Player Crafting/Chests ============ //
-				for (ItemStack inPlayerInventory: player.getOpenInventory().getTopInventory().getContents()) {
-					if (inPlayerInventory != null && itemMap.getTempItem() != null && itemMap.isReal(inPlayerInventory)) {
-						if (nameString != null) { setNameData(player, inPlayerInventory, nameString); } 
-						else if (loreString != null) { if (menu) { setLoreData(player, inPlayerInventory, menuLores.get(position)); } else { setLoreData(player, inPlayerInventory, loreString); } }
-						else if (materialString != null) { setMaterialData(player, inPlayerInventory, materialString); }
-						else if (pagesString != null) { setPagesData(player, inPlayerInventory, pagesString); }
-						else if (ownerString != null || textureString != null) { setSkull(player, inPlayerInventory, ownerString, textureString); }
-					}
-				}
-				// ============== Animate Within the Player's Cursor =============== //
-				if (player.getItemOnCursor().getType() != null && player.getItemOnCursor().getType() != Material.AIR && itemMap.getTempItem() != null && itemMap.isReal(player.getItemOnCursor())) {
-					ItemStack item = new ItemStack(player.getItemOnCursor());
-					if (Clicking.getCursor(PlayerHandler.getPlayer().getPlayerID(player)) != null && itemMap.isReal(Clicking.getCursor(PlayerHandler.getPlayer().getPlayerID(player)))) { item = new ItemStack(Clicking.getCursor(PlayerHandler.getPlayer().getPlayerID(player))); }
-					if (nameString != null) { setNameData(player, player.getItemOnCursor(), nameString); } 
-					else if (loreString != null) { setLoreData(player, player.getItemOnCursor(), loreString); }
-					else if (materialString != null) { setMaterialData(player, player.getItemOnCursor(), materialString); }
-					else if (pagesString != null) { setPagesData(player, player.getItemOnCursor(), pagesString); }
-					else if (ownerString != null || textureString != null) { setSkull(player, player.getItemOnCursor(), ownerString, textureString); }
-					Clicking.putCursor(PlayerHandler.getPlayer().getPlayerID(player), item);
-				}
-				PlayerHandler.getPlayer().updateInventory(player, itemMap, 1L);
-				// ============== This has Concluded all Animations.. ============== //
-				if (!hasNext) { 
-					if (nameString != null) { nameTasks(player); }
-					else if (loreString != null) { loreTasks(player); }
-					else if (materialString != null) { materialTasks(player); }
-					else if (pagesString != null) { pagesTasks(player); }
-					else if (ownerString != null) { ownerTasks(player); }
-					else if (textureString != null) { textureTasks(player); }
-				}
-			}
-		}, UpdateDelay);
+			}, UpdateDelay);
+		}
 	}
 	
    /**

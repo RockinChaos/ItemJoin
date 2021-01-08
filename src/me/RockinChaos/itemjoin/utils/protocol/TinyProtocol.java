@@ -25,6 +25,7 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.ChannelPromise;
+import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.utils.Reflection;
 import me.RockinChaos.itemjoin.utils.Reflection.FieldAccessor;
@@ -110,11 +111,13 @@ public abstract class TinyProtocol {
 			this.registerPlayers(plugin);
 		} catch (IllegalArgumentException ex) {
 			plugin.getLogger().info("[TinyProtocol] Delaying server channel injection due to late bind.");
-			ServerHandler.getServer().runAsyncThread(async -> {
-				this.registerChannelHandler();
-				this.registerPlayers(plugin);
-				plugin.getLogger().info("[TinyProtocol] Late bind injection successful.");
-			});
+			if (ItemJoin.getInstance().isEnabled()) {
+				Bukkit.getServer().getScheduler().runTaskAsynchronously(ItemJoin.getInstance(), () -> {
+					this.registerChannelHandler();
+					this.registerPlayers(plugin);
+					plugin.getLogger().info("[TinyProtocol] Late bind injection successful.");
+				});
+			}
 		}
 	}
 

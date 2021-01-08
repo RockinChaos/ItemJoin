@@ -41,6 +41,7 @@ import org.bukkit.map.MapView;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 
+import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.item.ItemUtilities.CustomSlot;
@@ -499,7 +500,11 @@ public class ItemHandler {
 			PlayerHandler.getPlayer().updateInventory(player, 1L);
 			SQL.getData(false).removeReturnCraftItems(player);
 		} else if (!PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
-			ServerHandler.getServer().runThread(main -> { this.restoreCraftItems(player); }, 60L);
+			if (ItemJoin.getInstance().isEnabled()) {
+				Bukkit.getServer().getScheduler().runTaskLater(ItemJoin.getInstance(), () -> { 
+					this.restoreCraftItems(player); 
+				}, 60L);
+			}
 		}
     }
     
@@ -528,15 +533,17 @@ public class ItemHandler {
     */
     public void returnCraftingItem(final Player player, final int slot, final ItemStack item, long delay) {
     	if (item == null) { return; } if (slot == 0) { delay += 1L; }
-    	ServerHandler.getServer().runThread(main -> {
-    		if (!player.isOnline()) { return; }
-    		if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory()) && player.getGameMode() != GameMode.CREATIVE) {
-    	    	player.getOpenInventory().getTopInventory().setItem(slot, item);	
-    	    	PlayerHandler.getPlayer().updateInventory(player, 1L);
-    		} else {
-    			this.returnCraftingItem(player, slot, item, 10L);
-    		}
-    	}, delay);
+    	if (ItemJoin.getInstance().isEnabled()) {
+			Bukkit.getServer().getScheduler().runTaskLater(ItemJoin.getInstance(), () -> {
+	    		if (!player.isOnline()) { return; }
+	    		if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory()) && player.getGameMode() != GameMode.CREATIVE) {
+	    	    	player.getOpenInventory().getTopInventory().setItem(slot, item);	
+	    	    	PlayerHandler.getPlayer().updateInventory(player, 1L);
+	    		} else {
+	    			this.returnCraftingItem(player, slot, item, 10L);
+	    		}
+	    	}, delay);
+    	}
     }
     
    /**

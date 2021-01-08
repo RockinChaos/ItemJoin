@@ -22,14 +22,15 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
+import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
-import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.item.ItemUtilities.TriggerType;
 import me.RockinChaos.itemjoin.utils.DependAPI;
@@ -50,11 +51,13 @@ public class PlayerGuard implements Listener {
 	private void setRegionItems(PlayerMoveEvent event) {
 		final Player player = event.getPlayer();
 		if (PlayerHandler.getPlayer().isPlayer(player)) {
-			ServerHandler.getServer().runAsyncThread(async -> {
-				if (SQL.getData(false).isEnabled(player)) {
-					this.handleRegions(player);
-				}
-			});
+			if (ItemJoin.getInstance().isEnabled()) {
+				Bukkit.getServer().getScheduler().runTaskAsynchronously(ItemJoin.getInstance(), () -> {
+					if (SQL.getData(false).isEnabled(player)) {
+						this.handleRegions(player);
+					}
+				});
+			}
 		}
 	}
 	
@@ -69,11 +72,13 @@ public class PlayerGuard implements Listener {
 	private void setRegionItems(PlayerTeleportEvent event) {
 		final Player player = event.getPlayer();
 		if (PlayerHandler.getPlayer().isPlayer(player)) {
-			ServerHandler.getServer().runAsyncThread(async -> {
-				if (SQL.getData(false).isEnabled(player)) {
-					this.handleRegions(player);
-				}
-			}, (event.getFrom().getWorld() == event.getTo().getWorld() ? 0 : (ItemUtilities.getUtilities().getClearDelay() + 1)));
+			if (ItemJoin.getInstance().isEnabled()) {
+				Bukkit.getServer().getScheduler().runTaskLaterAsynchronously(ItemJoin.getInstance(), () -> { 
+					if (SQL.getData(false).isEnabled(player)) {
+						this.handleRegions(player);
+					}
+				}, (event.getFrom().getWorld() == event.getTo().getWorld() ? 0 : (ItemUtilities.getUtilities().getClearDelay() + 1)));
+			}
 		}
 	}
 	
@@ -92,18 +97,30 @@ public class PlayerGuard implements Listener {
 			playerSet.removeAll(Arrays.asList(regions.replace(" ", "").split(",")));
 			for (String region: playerSet) {
 				if (region != null && !region.isEmpty()) {
-					ServerHandler.getServer().runThread(main -> ItemUtilities.getUtilities().setItems(player, player.getWorld(), TriggerType.REGIONLEAVE, org.bukkit.GameMode.ADVENTURE, region));
+					if (ItemJoin.getInstance().isEnabled()) {
+						Bukkit.getServer().getScheduler().runTask(ItemJoin.getInstance(), () -> {
+							ItemUtilities.getUtilities().setItems(player, player.getWorld(), TriggerType.REGIONLEAVE, org.bukkit.GameMode.ADVENTURE, region);
+						});
+					}
 				}
 			}
 			for (String region: regionSet) {
 				if (region != null && !region.isEmpty()) {
-					ServerHandler.getServer().runThread(main -> ItemUtilities.getUtilities().setItems(player, player.getWorld(), TriggerType.REGIONENTER, org.bukkit.GameMode.ADVENTURE, region));
+					if (ItemJoin.getInstance().isEnabled()) {
+						Bukkit.getServer().getScheduler().runTask(ItemJoin.getInstance(), () -> {
+							ItemUtilities.getUtilities().setItems(player, player.getWorld(), TriggerType.REGIONENTER, org.bukkit.GameMode.ADVENTURE, region);
+						});
+					}
 				}
 			}
 		} else {
 			for (String region: Arrays.asList(regions.replace(" ", "").split(","))) {
 				if (region != null && !region.isEmpty()) {
-					ServerHandler.getServer().runThread(main -> ItemUtilities.getUtilities().setItems(player, player.getWorld(), TriggerType.REGIONENTER, org.bukkit.GameMode.ADVENTURE, region));
+					if (ItemJoin.getInstance().isEnabled()) {
+					Bukkit.getServer().getScheduler().runTask(ItemJoin.getInstance(), () -> {
+						ItemUtilities.getUtilities().setItems(player, player.getWorld(), TriggerType.REGIONENTER, org.bukkit.GameMode.ADVENTURE, region);
+					});
+					}
 				}
 			}
 		}

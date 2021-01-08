@@ -17,8 +17,6 @@
  */
 package me.RockinChaos.itemjoin.handlers;
 
-import java.util.function.Consumer;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -31,58 +29,6 @@ public class ServerHandler {
 	private static ServerHandler server;
 	private String packageName = ItemJoin.getInstance().getServer().getClass().getPackage().getName();
 	private String serverVersion = this.packageName.substring(this.packageName.lastIndexOf('.') + 1).replace("_", "").replace("R0", "").replace("R1", "").replace("R2", "").replace("R3", "").replace("R4", "").replace("R5", "").replaceAll("[a-z]", "");
-	
-   /**
-    * Runs the methods Async from the main thread.
-    * 
-    * @param input - The methods to be executed Async from the main thread.
-    */
-	public void runAsyncThread(final Consumer<String> input) {
-		if (ItemJoin.getInstance().isEnabled()) {
-			Bukkit.getServer().getScheduler().runTaskAsynchronously(ItemJoin.getInstance(), () -> { 
-				input.accept("ASYNC");
-			});
-		}
-	}
-	
-   /**
-    * Runs the methods Async from the main thread.
-    * 
-    * @param input - The methods to be executed Async from the main thread.
-    */
-	public void runAsyncThread(final Consumer<String> input, long delay) {
-		if (ItemJoin.getInstance().isEnabled()) {
-			Bukkit.getServer().getScheduler().runTaskLaterAsynchronously(ItemJoin.getInstance(), () -> { 
-				input.accept("ASYNC");
-			}, delay); 
-		}
-	}
-	
-   /**
-    * Runs the methods on the main thread.
-    * 
-    * @param input - The methods to be executed on the main thread.
-    */
-	public void runThread(final Consumer<String> input) {
-		if (ItemJoin.getInstance().isEnabled()) {
-			Bukkit.getServer().getScheduler().runTask(ItemJoin.getInstance(), () -> {
-				input.accept("MAIN");
-			});
-		}
-	}
-	
-   /**
-    * Runs the methods on the main thread.
-    * 
-    * @param input - The methods to be executed on the main thread.
-    */
-	public void runThread(final Consumer<String> input, long delay) {
-		if (ItemJoin.getInstance().isEnabled()) {
-			Bukkit.getServer().getScheduler().runTaskLater(ItemJoin.getInstance(), () -> {
-				input.accept("MAIN");
-			}, delay);
-		}
-	}
 	
    /**
     * Checks if the server is running the specified version.

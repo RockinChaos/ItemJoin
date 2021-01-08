@@ -97,14 +97,16 @@ public class Clicking implements Listener {
 				event.setCancelled(true);
 				if (player.getOpenInventory().getType().name().equalsIgnoreCase("CHEST") && !player.getOpenInventory().getTitle().equalsIgnoreCase("CHEST")) {
 					final ItemStack itemCopy = item.clone();
-					ServerHandler.getServer().runThread(main -> { 
-						for (int i = 0; i < player.getOpenInventory().getTopInventory().getSize(); i++) {
-							if (player.getOpenInventory().getTopInventory().getItem(i) != null && player.getOpenInventory().getTopInventory().getItem(i).equals(item)) {
-								player.getOpenInventory().getTopInventory().setItem(i, new ItemStack(Material.AIR));
-								player.getOpenInventory().getBottomInventory().setItem(event.getSlot(), itemCopy); 
+					if (ItemJoin.getInstance().isEnabled()) {
+						Bukkit.getServer().getScheduler().runTask(ItemJoin.getInstance(), () -> {
+							for (int i = 0; i < player.getOpenInventory().getTopInventory().getSize(); i++) {
+								if (player.getOpenInventory().getTopInventory().getItem(i) != null && player.getOpenInventory().getTopInventory().getItem(i).equals(item)) {
+									player.getOpenInventory().getTopInventory().setItem(i, new ItemStack(Material.AIR));
+									player.getOpenInventory().getBottomInventory().setItem(event.getSlot(), itemCopy); 
+								}
 							}
-						}
-					});
+						});
+					}
 				}
 				if (PlayerHandler.getPlayer().isCreativeMode(player)) { player.closeInventory(); }
 				else if (!ItemUtilities.getUtilities().isAllowed(player, item, "inventory-close")) { player.closeInventory(); }
@@ -132,16 +134,18 @@ public class Clicking implements Listener {
 				}
 			}
 		} else {
-			ServerHandler.getServer().runThread(main -> {
-				final ItemStack itemCopy_2 = (event.getPickHand() != null ? event.getPickHand().clone() : event.getPickHand());
-				if (!ItemUtilities.getUtilities().isAllowed(player, itemCopy_2, "inventory-modify")) {
-					final int pickSlot = event.getPickSlot();
-					if (pickSlot != -1) {
-						player.getInventory().setItem(pickSlot, itemCopy_2);
-						PlayerHandler.getPlayer().setMainHandItem(player, itemCopy);
+			if (ItemJoin.getInstance().isEnabled()) {
+				Bukkit.getServer().getScheduler().runTask(ItemJoin.getInstance(), () -> {
+					final ItemStack itemCopy_2 = (event.getPickHand() != null ? event.getPickHand().clone() : event.getPickHand());
+					if (!ItemUtilities.getUtilities().isAllowed(player, itemCopy_2, "inventory-modify")) {
+						final int pickSlot = event.getPickSlot();
+						if (pickSlot != -1) {
+							player.getInventory().setItem(pickSlot, itemCopy_2);
+							PlayerHandler.getPlayer().setMainHandItem(player, itemCopy);
+						}
 					}
-				}
-			});
+				});
+			}
 		}
 	}
 	

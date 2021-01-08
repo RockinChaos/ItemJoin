@@ -23,6 +23,8 @@ import java.lang.reflect.Field;
 import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.util.HashMap;
+
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -124,15 +126,29 @@ public class ConfigHandler {
 		if (!ItemJoin.getInstance().isStarted()) {
 			SQL.getData(true);
 			ItemDesigner.getDesigner(true);
-			ServerHandler.getServer().runThread(main -> { ItemJoin.getInstance().setStarted(); }, 3L);
+			if (ItemJoin.getInstance().isEnabled()) {
+				Bukkit.getServer().getScheduler().runTaskLater(ItemJoin.getInstance(), () -> {
+					ItemJoin.getInstance().setStarted(); 
+				}, 3L);
+			}
 		} else {
-			ServerHandler.getServer().runAsyncThread(async -> { 
-				SQL.getData(true); 
-				ServerHandler.getServer().runThread(main -> { ItemDesigner.getDesigner(true); }, 2L);
-			});
+			if (ItemJoin.getInstance().isEnabled()) {
+				Bukkit.getServer().getScheduler().runTaskAsynchronously(ItemJoin.getInstance(), () -> {
+					SQL.getData(true); 
+				if (ItemJoin.getInstance().isEnabled()) {
+					Bukkit.getServer().getScheduler().runTaskLater(ItemJoin.getInstance(), () -> {
+						ItemDesigner.getDesigner(true);
+						}, 2L);
+					}
+				});
+			}
 
 		}
-		ServerHandler.getServer().runThread(main -> { Metrics.getMetrics(true); }, 100L);
+		if (ItemJoin.getInstance().isEnabled()) {
+			Bukkit.getServer().getScheduler().runTaskLater(ItemJoin.getInstance(), () -> {
+				Metrics.getMetrics(true); 
+			}, 100L);
+		}
 	}
 	
    /**
@@ -499,10 +515,12 @@ public class ConfigHandler {
 		}
 		if (itemMap.isCraftingItem() && !Utils.getUtils().isRegistered(Crafting.class.getSimpleName())) {
 			Crafting.cycleTask();
-			ServerHandler.getServer().runThread(main -> {
-				PlayerHandler.getPlayer().restoreCraftItems();
-				if (ServerHandler.getServer().hasSpecificUpdate("1_8") && !ProtocolManager.getManager().isHandling()) { ProtocolManager.getManager().handleProtocols(); }
-			}, 40L);
+			if (ItemJoin.getInstance().isEnabled()) {
+				Bukkit.getServer().getScheduler().runTaskLater(ItemJoin.getInstance(), () -> {
+					PlayerHandler.getPlayer().restoreCraftItems();
+					if (ServerHandler.getServer().hasSpecificUpdate("1_8") && !ProtocolManager.getManager().isHandling()) { ProtocolManager.getManager().handleProtocols(); }
+				}, 40L);
+			}
 			if (!Utils.getUtils().isRegistered(PlayerQuit.class.getSimpleName())) {
 				ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerQuit(), ItemJoin.getInstance());
 			}

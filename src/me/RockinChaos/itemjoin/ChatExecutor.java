@@ -210,10 +210,18 @@ public class ChatExecutor implements CommandExecutor {
 			this.handleAllItems(sender, args, true);
 		} else if (Execute.UPDATE.accept(sender, args, 0)) {
 			LanguageAPI.getLang(false).sendLangMessage("commands.updates.checkRequest", sender);
-			ServerHandler.getServer().runAsyncThread(async -> { UpdateHandler.getUpdater(false).checkUpdates(sender, false); });
+			if (ItemJoin.getInstance().isEnabled()) {
+				Bukkit.getServer().getScheduler().runTaskAsynchronously(ItemJoin.getInstance(), () -> { 
+					UpdateHandler.getUpdater(false).checkUpdates(sender, false); 
+				});
+			}
 		} else if (Execute.UPGRADE.accept(sender, args, 0)) {
 			LanguageAPI.getLang(false).sendLangMessage("commands.updates.updateRequest", sender);
-			ServerHandler.getServer().runAsyncThread(async -> { UpdateHandler.getUpdater(false).forceUpdates(sender); });
+			if (ItemJoin.getInstance().isEnabled()) {
+				Bukkit.getServer().getScheduler().runTaskAsynchronously(ItemJoin.getInstance(), () -> { 
+					UpdateHandler.getUpdater(false).forceUpdates(sender); 
+					});
+			}
 		} else if (this.matchExecutor(args) == null) {
 			LanguageAPI.getLang(false).sendLangMessage("commands.default.unknownCommand", sender);
 		} else if (!this.matchExecutor(args).playerRequired(sender, args)) {
@@ -379,10 +387,12 @@ public class ChatExecutor implements CommandExecutor {
 			if (!table.equalsIgnoreCase("Database")) { SQL.getData(false).purgeDatabaseData(foundPlayer, args, table.replace("-", "_")); } 
 			else {
 				synchronized (this) {
-					ServerHandler.getServer().runAsyncThread(async -> { 
-						SQL.getData(false).purgeDatabase();
-						SQL.getData(true);
-					});
+					if (ItemJoin.getInstance().isEnabled()) {
+						Bukkit.getServer().getScheduler().runTaskAsynchronously(ItemJoin.getInstance(), () -> {
+							SQL.getData(false).purgeDatabase();
+							SQL.getData(true);
+						});
+					}
 				}
 			}
 			LanguageAPI.getLang(false).sendLangMessage("commands.database.purgeSuccess", sender, placeHolders);
@@ -391,12 +401,14 @@ public class ChatExecutor implements CommandExecutor {
 			this.confirmationRequests.put(table + sender.getName(), true);
 			LanguageAPI.getLang(false).sendLangMessage("commands.database.purgeWarn", sender, placeHolders);
 			LanguageAPI.getLang(false).sendLangMessage("commands.database.purgeConfirm", sender, placeHolders);
-			ServerHandler.getServer().runThread(main -> {
-				if (this.confirmationRequests.get(table + sender.getName()) != null && this.confirmationRequests.get(table + sender.getName()).equals(true)) {
-					LanguageAPI.getLang(false).sendLangMessage("commands.database.purgeTimeOut", sender);
-					this.confirmationRequests.remove(table + sender.getName());
-				} 
-			}, 100L);
+			if (ItemJoin.getInstance().isEnabled()) {
+				Bukkit.getServer().getScheduler().runTaskLater(ItemJoin.getInstance(), () -> {
+					if (this.confirmationRequests.get(table + sender.getName()) != null && this.confirmationRequests.get(table + sender.getName()).equals(true)) {
+						LanguageAPI.getLang(false).sendLangMessage("commands.database.purgeTimeOut", sender);
+						this.confirmationRequests.remove(table + sender.getName());
+					} 
+				}, 100L);
+			}
 		}
 	}
 	

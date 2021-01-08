@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -100,10 +101,12 @@ public class SQL {
     * 
     */
 	private void executeSaveStatements() {
-		ServerHandler.getServer().runThread(main -> {
-			this.executeLaterStatements();
-            this.executeSaveStatements();
-		}, 36000L);
+		if (ItemJoin.getInstance().isEnabled()) {
+			Bukkit.getServer().getScheduler().runTaskLater(ItemJoin.getInstance(), () -> {
+				this.executeLaterStatements();
+	            this.executeSaveStatements();
+			}, 36000L);
+		}
 	}
 	
    /**

@@ -29,6 +29,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
+import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.utils.UI;
@@ -332,10 +333,12 @@ public class Interface implements InventoryHolder {
     * @param player - The player to have the current inventory page opened.
     */
 	public void open(Player player) {
-		ServerHandler.getServer().runThread(async -> {
-			this.renderPage();
-			player.openInventory(this.getInventory());
-		});
+		if (ItemJoin.getInstance().isEnabled()) {
+			Bukkit.getServer().getScheduler().runTask(ItemJoin.getInstance(), () -> {
+				this.renderPage();
+				player.openInventory(this.getInventory());
+			});
+		}
 	}
 	
    /**

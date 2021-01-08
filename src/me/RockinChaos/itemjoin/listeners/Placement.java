@@ -17,6 +17,7 @@
  */
 package me.RockinChaos.itemjoin.listeners;
 
+import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.item.ItemMap;
@@ -25,6 +26,7 @@ import me.RockinChaos.itemjoin.utils.Utils;
 
 import java.util.HashMap;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
@@ -66,26 +68,28 @@ public class Placement implements Listener {
 	 		if (!ItemUtilities.getUtilities().isAllowed(player, item, "count-lock")) {
 	 			ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item, null, player.getWorld());
 	 			item.setAmount(itemMap.getCount());
-	 			ServerHandler.getServer().runThread(main -> {
-	 				if (Utils.getUtils().containsIgnoreCase(item.getType().name(), "WATER") || Utils.getUtils().containsIgnoreCase(item.getType().name(), "LAVA") || item.getType().name().equalsIgnoreCase("BUCKET") 
-	 				 || Utils.getUtils().containsIgnoreCase(item.getType().name(), "POTION")) {
-	 					PlayerHandler.getPlayer().setMainHandItem(player, item);
-	 				} else if (itemMap != null) { 
-	 					if (PlayerHandler.getPlayer().getHandItem(player) == null || PlayerHandler.getPlayer().getHandItem(player).getAmount() <= 1) {
-	 						if (ServerHandler.getServer().hasSpecificUpdate("1_9")) { 
-	 							if (event.getHand().equals(EquipmentSlot.HAND)) {
-	 								PlayerHandler.getPlayer().setMainHandItem(player, item);
-	 							} else if (event.getHand().equals(EquipmentSlot.OFF_HAND)) {
-	 								PlayerHandler.getPlayer().setOffHandItem(player, item);
-	 							}
-	 						} 
-	 						else { PlayerHandler.getPlayer().setMainHandItem(player, item); }
-	 					} else if (itemMap.isSimilar(PlayerHandler.getPlayer().getHandItem(player))) { 
-	 						PlayerHandler.getPlayer().getHandItem(player).setAmount(itemMap.getCount()); 
-	 					} 
-	 				}
-	 			}, 2L);
-	 		}
+				if (ItemJoin.getInstance().isEnabled()) {
+					Bukkit.getServer().getScheduler().runTaskLater(ItemJoin.getInstance(), () -> {
+		 				if (Utils.getUtils().containsIgnoreCase(item.getType().name(), "WATER") || Utils.getUtils().containsIgnoreCase(item.getType().name(), "LAVA") || item.getType().name().equalsIgnoreCase("BUCKET") 
+		 				 || Utils.getUtils().containsIgnoreCase(item.getType().name(), "POTION")) {
+		 					PlayerHandler.getPlayer().setMainHandItem(player, item);
+		 				} else if (itemMap != null) { 
+		 					if (PlayerHandler.getPlayer().getHandItem(player) == null || PlayerHandler.getPlayer().getHandItem(player).getAmount() <= 1) {
+		 						if (ServerHandler.getServer().hasSpecificUpdate("1_9")) { 
+		 							if (event.getHand().equals(EquipmentSlot.HAND)) {
+		 								PlayerHandler.getPlayer().setMainHandItem(player, item);
+		 							} else if (event.getHand().equals(EquipmentSlot.OFF_HAND)) {
+		 								PlayerHandler.getPlayer().setOffHandItem(player, item);
+		 							}
+		 						} 
+		 						else { PlayerHandler.getPlayer().setMainHandItem(player, item); }
+		 					} else if (itemMap.isSimilar(PlayerHandler.getPlayer().getHandItem(player))) { 
+		 						PlayerHandler.getPlayer().getHandItem(player).setAmount(itemMap.getCount()); 
+		 					} 
+		 				}
+		 			}, 2L);
+				}
+			}
 	 	}
 	 }
 	 
@@ -121,19 +125,21 @@ public class Placement implements Listener {
 	 */
 	 public void crossyAction(Player player, HashMap < Integer, ItemStack > map, int tries) {
 	 	if (tries != 0) {
-	 		ServerHandler.getServer().runThread(main -> {
-	 			boolean arrowReturned = false;
-	 			for (Integer key: map.keySet()) {
-	 				if (player.getInventory().getItem(key) == null || player.getInventory().getItem(key).getAmount() != map.get(key).getAmount()) {
-	 					if (!ItemUtilities.getUtilities().isAllowed(player, map.get(key), "count-lock")) {
-	 						player.getInventory().setItem(key, map.get(key));
-	 						arrowReturned = true;
-	 					}
-	 				}
-	 			}
-	 			if (arrowReturned) { PlayerHandler.getPlayer().updateInventory(player, 1L); } 
-	 			else {this.crossyAction(player, map, (tries - 1)); }
-	 		}, 26L);
+			if (ItemJoin.getInstance().isEnabled()) {
+				Bukkit.getServer().getScheduler().runTaskLater(ItemJoin.getInstance(), () -> {
+		 			boolean arrowReturned = false;
+		 			for (Integer key: map.keySet()) {
+		 				if (player.getInventory().getItem(key) == null || player.getInventory().getItem(key).getAmount() != map.get(key).getAmount()) {
+		 					if (!ItemUtilities.getUtilities().isAllowed(player, map.get(key), "count-lock")) {
+		 						player.getInventory().setItem(key, map.get(key));
+		 						arrowReturned = true;
+		 					}
+		 				}
+		 			}
+		 			if (arrowReturned) { PlayerHandler.getPlayer().updateInventory(player, 1L); } 
+		 			else {this.crossyAction(player, map, (tries - 1)); }
+		 		}, 26L);
+			}
 	 	}
 	 }
 	 

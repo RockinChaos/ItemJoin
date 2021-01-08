@@ -52,7 +52,11 @@ public class ItemJoin extends JavaPlugin {
   	@Override
 	public void onEnable() {
         ConfigHandler.getConfig(true).registerEvents();
-        ServerHandler.getServer().runAsyncThread(async -> { UpdateHandler.getUpdater(true); });
+        if (ItemJoin.getInstance().isEnabled()) {
+        	Bukkit.getServer().getScheduler().runTaskAsynchronously(ItemJoin.getInstance(), () -> { 
+        		UpdateHandler.getUpdater(true); 
+        	});
+        }
         ServerHandler.getServer().logInfo("has been Enabled.");
   	}
   	

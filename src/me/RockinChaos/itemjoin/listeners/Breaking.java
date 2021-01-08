@@ -18,6 +18,8 @@
 package me.RockinChaos.itemjoin.listeners;
 
 import java.util.Collection;
+
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -26,9 +28,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 
+import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
-import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.utils.DependAPI;
@@ -46,17 +48,19 @@ public class Breaking implements Listener {
 		final Material material = (block != null ? block.getType() : Material.AIR);
 		final Player player = event.getPlayer();
 		final Collection<ItemStack> drops = block.getDrops(PlayerHandler.getPlayer().getMainHandItem(player));
-		ServerHandler.getServer().runAsyncThread(async -> {
-			for (ItemMap itemMap: ItemUtilities.getUtilities().getItems()) {
-				if (itemMap.blocksDrop() && block != null && material != Material.AIR && itemMap.getBlocksDrop().containsKey(material) 
-				 && itemMap.inWorld(player.getWorld()) && itemMap.hasPermission(player) && ItemHandler.getItem().containsMaterial(drops, material) && Math.random() <= itemMap.getBlocksDrop().get(material)) {
-					for (String region : ((DependAPI.getDepends(false).getGuard().guardEnabled() && !itemMap.getEnabledRegions().isEmpty()) ? DependAPI.getDepends(false).getGuard().getRegionAtEntity(player).split(", ") : new String[]{"FALSE"})) {
-						if (!DependAPI.getDepends(false).getGuard().guardEnabled() || itemMap.getEnabledRegions().isEmpty() || itemMap.inRegion(region)) { 
-							block.getWorld().dropItemNaturally(block.getLocation(), itemMap.getItem(player));
+		if (ItemJoin.getInstance().isEnabled()) {
+			Bukkit.getServer().getScheduler().runTaskAsynchronously(ItemJoin.getInstance(), () -> {
+				for (ItemMap itemMap: ItemUtilities.getUtilities().getItems()) {
+					if (itemMap.blocksDrop() && block != null && material != Material.AIR && itemMap.getBlocksDrop().containsKey(material) 
+					 && itemMap.inWorld(player.getWorld()) && itemMap.hasPermission(player) && ItemHandler.getItem().containsMaterial(drops, material) && Math.random() <= itemMap.getBlocksDrop().get(material)) {
+						for (String region : ((DependAPI.getDepends(false).getGuard().guardEnabled() && !itemMap.getEnabledRegions().isEmpty()) ? DependAPI.getDepends(false).getGuard().getRegionAtEntity(player).split(", ") : new String[]{"FALSE"})) {
+							if (!DependAPI.getDepends(false).getGuard().guardEnabled() || itemMap.getEnabledRegions().isEmpty() || itemMap.inRegion(region)) { 
+								block.getWorld().dropItemNaturally(block.getLocation(), itemMap.getItem(player));
+							}
 						}
 					}
 				}
-			}
-		});
+			});
+		}
 	}
 }

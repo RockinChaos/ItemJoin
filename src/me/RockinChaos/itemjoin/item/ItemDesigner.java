@@ -764,7 +764,11 @@ public class ItemDesigner {
 						ingredientList.put(character, material);
 					} else { ServerHandler.getServer().logWarn("{ItemMap} The material " + ingredientParts[1] + " for the custom recipe defined for the item " + itemMap.getConfigName() + " is not a proper material type!"); }
 				}
-				ServerHandler.getServer().runThread(async -> { Bukkit.getServer().addRecipe(shapedRecipe); });
+				if (ItemJoin.getInstance().isEnabled()) {
+					Bukkit.getServer().getScheduler().runTask(ItemJoin.getInstance(), () -> {
+						Bukkit.getServer().addRecipe(shapedRecipe); 
+					});
+				}
 				itemMap.setIngredients(ingredientList);
 			} else { ServerHandler.getServer().logWarn("{ItemMap} There is a custom recipe defined for the item " + itemMap.getConfigName() + " but it still needs ingredients defined!"); }
 		}

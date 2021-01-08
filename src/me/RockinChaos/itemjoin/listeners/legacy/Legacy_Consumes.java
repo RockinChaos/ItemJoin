@@ -19,6 +19,7 @@ package me.RockinChaos.itemjoin.listeners.legacy;
 
 import java.util.HashMap;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -29,6 +30,7 @@ import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 
+import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.item.ItemMap;
@@ -92,24 +94,26 @@ public class Legacy_Consumes implements Listener {
 		if (!ItemUtilities.getUtilities().isAllowed(player, item, "count-lock")) {
 			ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item, null, player.getWorld());
 			item.setAmount(itemMap.getCount());
-			ServerHandler.getServer().runThread(main -> {
-				if (itemMap != null) { 
-					if (PlayerHandler.getPlayer().getHandItem(player) == null || PlayerHandler.getPlayer().getHandItem(player).getAmount() <= 1) {
-						if (ServerHandler.getServer().hasSpecificUpdate("1_9")) {
-							if (PlayerHandler.getPlayer().getMainHandItem(player) != null && PlayerHandler.getPlayer().getMainHandItem(player).getType() != Material.AIR) {
-								PlayerHandler.getPlayer().setMainHandItem(player, item);
-							} else if (PlayerHandler.getPlayer().getOffHandItem(player) != null && PlayerHandler.getPlayer().getOffHandItem(player).getType() != Material.AIR) {
-								PlayerHandler.getPlayer().setOffHandItem(player, item);
-							} else {
-								itemMap.giveTo(player);
-							}
-	 					} 
-	 					else { PlayerHandler.getPlayer().setMainHandItem(player, item); }
-					} else if (itemMap.isSimilar(PlayerHandler.getPlayer().getHandItem(player))) { 
-						PlayerHandler.getPlayer().getHandItem(player).setAmount(itemMap.getCount()); 
-	 				} 
-				}
-	 		}, 2L);
+			if (ItemJoin.getInstance().isEnabled()) {
+				Bukkit.getServer().getScheduler().runTaskLater(ItemJoin.getInstance(), () -> {
+					if (itemMap != null) { 
+						if (PlayerHandler.getPlayer().getHandItem(player) == null || PlayerHandler.getPlayer().getHandItem(player).getAmount() <= 1) {
+							if (ServerHandler.getServer().hasSpecificUpdate("1_9")) {
+								if (PlayerHandler.getPlayer().getMainHandItem(player) != null && PlayerHandler.getPlayer().getMainHandItem(player).getType() != Material.AIR) {
+									PlayerHandler.getPlayer().setMainHandItem(player, item);
+								} else if (PlayerHandler.getPlayer().getOffHandItem(player) != null && PlayerHandler.getPlayer().getOffHandItem(player).getType() != Material.AIR) {
+									PlayerHandler.getPlayer().setOffHandItem(player, item);
+								} else {
+									itemMap.giveTo(player);
+								}
+		 					} 
+		 					else { PlayerHandler.getPlayer().setMainHandItem(player, item); }
+						} else if (itemMap.isSimilar(PlayerHandler.getPlayer().getHandItem(player))) { 
+							PlayerHandler.getPlayer().getHandItem(player).setAmount(itemMap.getCount()); 
+		 				} 
+					}
+		 		}, 2L);
+			}
 		}
 	}
 	
@@ -130,16 +134,18 @@ public class Legacy_Consumes implements Listener {
 					map.put(i, player.getInventory().getItem(i).clone());
 				}
 			}
-			ServerHandler.getServer().runThread(main -> {
-				for (Integer key: map.keySet()) {
-					if (player.getInventory().getItem(key) == null || player.getInventory().getItem(key).getAmount() != map.get(key).getAmount()) {
-						if (!ItemUtilities.getUtilities().isAllowed(player, map.get(key), "count-lock")) {
-							player.getInventory().setItem(key, map.get(key));
+			if (ItemJoin.getInstance().isEnabled()) {
+				Bukkit.getServer().getScheduler().runTaskLater(ItemJoin.getInstance(), () -> {
+					for (Integer key: map.keySet()) {
+						if (player.getInventory().getItem(key) == null || player.getInventory().getItem(key).getAmount() != map.get(key).getAmount()) {
+							if (!ItemUtilities.getUtilities().isAllowed(player, map.get(key), "count-lock")) {
+								player.getInventory().setItem(key, map.get(key));
+							}
 						}
 					}
-				}
-				PlayerHandler.getPlayer().updateInventory(player, 1L);
-			}, 2L);
+					PlayerHandler.getPlayer().updateInventory(player, 1L);
+				}, 2L);
+			}
 		}
 	}
 }

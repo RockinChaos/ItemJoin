@@ -17,6 +17,7 @@
  */
 package me.RockinChaos.itemjoin.listeners;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -24,7 +25,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 
-import me.RockinChaos.itemjoin.handlers.ServerHandler;
+import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.utils.DependAPI;
@@ -40,17 +41,19 @@ public class Entities implements Listener {
 	private void onMobDeath(EntityDeathEvent event) {
 		final LivingEntity victim = event.getEntity();
 		final Entity killer = victim.getKiller();
-		ServerHandler.getServer().runAsyncThread(async -> {
-			for (ItemMap itemMap: ItemUtilities.getUtilities().getItems()) {
-				if (itemMap.mobsDrop() && itemMap.getMobsDrop().containsKey(victim.getType()) && itemMap.inWorld(victim.getWorld()) 
-			   && ((killer != null && itemMap.hasPermission((Player)killer)) || killer == null) && Math.random() <= itemMap.getMobsDrop().get(victim.getType())) {
-					for (String region : ((DependAPI.getDepends(false).getGuard().guardEnabled() && !itemMap.getEnabledRegions().isEmpty()) ? DependAPI.getDepends(false).getGuard().getRegionAtEntity(victim).split(", ") : new String[]{"FALSE"})) {
-						if (!DependAPI.getDepends(false).getGuard().guardEnabled() || itemMap.getEnabledRegions().isEmpty() || itemMap.inRegion(region)) { 
-							victim.getLocation().getWorld().dropItem(victim.getLocation(), itemMap.getItem((killer != null ? (Player)killer : null)));
+		if (ItemJoin.getInstance().isEnabled()) {
+			Bukkit.getServer().getScheduler().runTaskAsynchronously(ItemJoin.getInstance(), () -> {
+				for (ItemMap itemMap: ItemUtilities.getUtilities().getItems()) {
+					if (itemMap.mobsDrop() && itemMap.getMobsDrop().containsKey(victim.getType()) && itemMap.inWorld(victim.getWorld()) 
+				   && ((killer != null && itemMap.hasPermission((Player)killer)) || killer == null) && Math.random() <= itemMap.getMobsDrop().get(victim.getType())) {
+						for (String region : ((DependAPI.getDepends(false).getGuard().guardEnabled() && !itemMap.getEnabledRegions().isEmpty()) ? DependAPI.getDepends(false).getGuard().getRegionAtEntity(victim).split(", ") : new String[]{"FALSE"})) {
+							if (!DependAPI.getDepends(false).getGuard().guardEnabled() || itemMap.getEnabledRegions().isEmpty() || itemMap.inRegion(region)) { 
+								victim.getLocation().getWorld().dropItem(victim.getLocation(), itemMap.getItem((killer != null ? (Player)killer : null)));
+							}
 						}
 					}
 				}
-			}
-		});
+			});
+		}
 	}
 }
