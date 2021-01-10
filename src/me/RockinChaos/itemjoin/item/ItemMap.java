@@ -39,6 +39,7 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.block.ShulkerBox;
 import org.bukkit.block.banner.Pattern;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -51,6 +52,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.BannerMeta;
+import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.BookMeta.Generation;
 import org.bukkit.inventory.meta.FireworkEffectMeta;
@@ -271,6 +273,8 @@ public class ItemMap {
 	private boolean permissionNeeded = false;
 	private boolean opPermissionNeeded = false;
 	
+	private List < String > contents = new ArrayList < String > ();
+	
 	private List < String > enabledRegions = new ArrayList < String > ();
 	private List < String > enabledWorlds = new ArrayList < String > ();
 // ======================================================================================== //
@@ -307,6 +311,7 @@ public class ItemMap {
 	        this.setTriggers();
 			this.setWorlds();
 			this.setRegions();
+			this.setContents();
 			this.setPlayersOnCooldown();
 	        this.setPerm(this.nodeLocation.getString(".permission-node"));
 	        this.setPermissionNeeded(ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Permissions.Obtain-Items"));
@@ -500,6 +505,18 @@ public class ItemMap {
 			if (this.giveOnRegionAccess || this.giveOnRegionEgress) { this.giveOnRegionEnter = false; this.giveOnRegionLeave = false; }
 			this.useOnLimitSwitch = Utils.getUtils().containsIgnoreCase(this.triggers, "GAMEMODE-SWITCH");
 		} else { this.giveOnJoin = true; }
+	}
+	
+   /**
+    * Sets the ItemMaps Stored Contents.
+    * 
+    */
+	private void setContents() {
+		if (this.material != null && Utils.getUtils().containsIgnoreCase(this.material.toString(), "SHULKER") && this.nodeLocation.getString(".contents") != null && this.nodeLocation.getStringList(".contents") != null && !this.nodeLocation.getStringList(".contents").isEmpty()) {
+			this.contents = this.nodeLocation.getStringList(".contents");
+		} else if (this.material != null && Utils.getUtils().containsIgnoreCase(this.material.toString(), "SHULKER")) {
+			ServerHandler.getServer().logWarn("{ItemMap} The item " + this.getConfigName() + " cannot have contents set as it does not support it.");
+		}
 	}
 	
    /**
@@ -719,6 +736,15 @@ public class ItemMap {
     */
 	public void setEnabledRegions(final List<String> regions) {
 		this.enabledRegions = regions;
+	}
+	
+   /**
+    * Sets the Stored Contents.
+    * 
+    * @param contents - The Stored Contents to be set.
+    */
+	public void setContents(final List<String> contents) {
+		this.contents = contents;
 	}
 	
    /**
@@ -1830,6 +1856,15 @@ public class ItemMap {
     */
 	public List<String> getEnabledRegions() {
 		return this.enabledRegions;
+	}
+	
+   /**
+    * Gets the Stored Contents.
+    * 
+    * @return The Stored Contents.
+    */
+	public List<String> getContents() {
+		return this.contents;
 	}
 	
    /**
@@ -3291,10 +3326,42 @@ public class ItemMap {
 		this.setAttributes();
 		this.setAttributeFlags();
 		this.realGlow();
+		this.setContents(player);
 		this.tempItem.setItemMeta(this.tempMeta);
 		LegacyAPI.getLegacy().setGlowing(this.tempItem, this);
 		LegacyAPI.getLegacy().setAttributes(this.tempItem, this);
 		return this;
+	}
+	
+   /**
+    * Sets the item contents for the storage box.
+    * 
+    */
+	private void setContents(final Player player) {
+		if (this.contents != null && !this.contents.isEmpty()) {
+			ShulkerBox box = (ShulkerBox) ((BlockStateMeta)this.tempMeta).getBlockState();
+			box.getInventory().clear();
+			for (String node : this.contents) {
+				boolean isNull = true;
+				for (ItemMap item : ItemUtilities.getUtilities().getItems()) {
+					if (item != null && item.getConfigName().equalsIgnoreCase(node)) {
+						isNull = false;
+						if (Utils.getUtils().isInt(item.getSlot()) && Integer.parseInt(item.getSlot()) <= 26) {
+							box.getInventory().setItem(Integer.parseInt(item.getSlot()), item.getItemStack(player));
+						} else if (item.getSlot().equalsIgnoreCase("ARBITRARY")) {
+							box.getInventory().addItem(item.getItemStack(player));
+						} else if (Utils.getUtils().isInt(item.getSlot()) && Integer.parseInt(item.getSlot()) > 26) {
+							ServerHandler.getServer().logWarn("{ItemMap} The item " + node + " cannot have the slot " + item.getSlot() + " as the slot cannot be higher than 26 to be set as contents for the item " + this.getConfigName() + ", the item will not be set.");
+						} else if (!Utils.getUtils().isInt(item.getSlot())) {
+							ServerHandler.getServer().logWarn("{ItemMap} The item " + node + " cannot have the slot " + item.getSlot() + " as the item " + this.getConfigName() + " does not support it, the item will not be set.");
+						}
+					}
+				}
+				if (isNull) { ServerHandler.getServer().logWarn("{ItemMap} The item " + node + " does not exist and will not be set as contents for " + this.getConfigName() + "."); }
+			}
+			((BlockStateMeta)this.tempMeta).setBlockState(box);
+			box.update();
+		}
 	}
 	
    /**
@@ -4714,6 +4781,9 @@ public class ItemMap {
 			String attributeList = "";
 			for (String attribute : this.attributes.keySet()) { attributeList += "{" + attribute + ":" + this.attributes.get(attribute) + "}, "; }
 			itemData.set("items." + this.configName + ".attributes", attributeList.substring(0, attributeList.length() - 2)); 
+		}
+		if (this.contents != null && !this.contents.isEmpty()) { 
+			itemData.set("items." + this.configName + ".contents", this.contents); 
 		}
 		if (this.enabledRegions != null && !this.enabledRegions.isEmpty()) { 
 			String regionList = "";
