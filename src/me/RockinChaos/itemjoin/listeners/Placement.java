@@ -87,7 +87,7 @@ public class Placement implements Listener {
 		 						PlayerHandler.getPlayer().getHandItem(player).setAmount(itemMap.getCount()); 
 		 					} 
 		 				}
-		 			}, 2L);
+		 			}, 1L);
 				}
 			}
 	 	}
