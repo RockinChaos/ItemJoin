@@ -138,9 +138,29 @@ public class UI {
 		if (ItemJoin.getInstance().isEnabled()) {
 			Bukkit.getServer().getScheduler().runTaskAsynchronously(ItemJoin.getInstance(), () -> {
 				dragDrop.allowClick(true);
-				dragDrop.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nMain Menu", "&7", "&7*Returns you to the main menu&a&c&b&9&0&a&c&b&7."), event -> this.startMenu(player)));
-				dragDrop.addButton(new Button(this.fillerPaneGItem), 3);
-				dragDrop.addButton(new Button(ItemHandler.getItem().getItem("HOPPER", 1, false, "&a&lDrop Item", "&7", "&7*Click an item from your inventory", "&7to save and drop it in this", "&7friendly little hopper&a&c&b&9&0&a&c&b&7!"), event -> {
+				dragDrop.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nMain Menu", "&7", "&7*Returns you to the main menu."), event -> this.startMenu(player)));
+				dragDrop.addButton(new Button(ItemHandler.getItem().getItem("CHEST", 1, false, "&a&lAutosave", "&7", "&7*Click me to save your whole", "&7inventory to the items.yml as-is,", "&7including current slot positions!", "&7" , "&c&l[&nALL&c&l ITEMS]"), event -> {
+					PlayerInventory playerInv = event.getWhoClicked().getInventory();
+					if (playerInv != null && !playerInv.isEmpty()) {
+						for (int i = 0; i <= 35; i++) {
+							if (playerInv.getItem(i) != null && playerInv.getItem(i).getType() != Material.AIR) {
+								this.convertStack(player, playerInv.getItem(i), Integer.toString(i));
+							}
+						}
+						if (playerInv.getHelmet() != null && playerInv.getHelmet().getType() != Material.AIR) { this.convertStack(player, playerInv.getHelmet(), "HELMET"); }
+						if (playerInv.getChestplate() != null && playerInv.getChestplate().getType() != Material.AIR) { this.convertStack(player, playerInv.getChestplate(), "CHESTPLATE"); }
+						if (playerInv.getLeggings() != null && playerInv.getLeggings().getType() != Material.AIR) { this.convertStack(player, playerInv.getLeggings(),"LEGGINGS"); }
+						if (playerInv.getBoots() != null && playerInv.getBoots().getType() != Material.AIR) { this.convertStack(player, playerInv.getBoots(), "BOOTS"); }
+						if (ServerHandler.getServer().hasSpecificUpdate("1_9") && PlayerHandler.getPlayer().getOffHandItem(player) != null && PlayerHandler.getPlayer().getOffHandItem(player).getType() != Material.AIR) { this.convertStack(player, PlayerHandler.getPlayer().getOffHandItem(player), "OFFHAND"); }
+						SQL.getData(false).executeLaterStatements();
+						ItemUtilities.getUtilities().closeAnimations();
+						ItemUtilities.getUtilities().clearItems();
+						ConfigHandler.getConfig(true);
+						this.startMenu(player);
+					}
+				}));
+				dragDrop.addButton(new Button(this.fillerPaneGItem), 2);
+				dragDrop.addButton(new Button(ItemHandler.getItem().getItem("HOPPER", 1, false, "&a&lDrop an Item", "&7", "&7*Click an item from your inventory", "&7to save and drop it in this", "&7friendly little hopper!", "&7" , "&a&l[&nSINGLE&a&l ITEM]"), event -> {
 					if (event.getCursor().getType() != Material.AIR) {
 						ItemStack item = event.getCursor().clone();
 						event.getWhoClicked().setItemOnCursor(null);
@@ -149,8 +169,28 @@ public class UI {
 						dragDrop.allowClick(false);
 					}
 				}));
-				dragDrop.addButton(new Button(ItemHandler.getItem().getItem("STAINED_GLASS_PANE:7", 1, false, "&a&c&b&9&0&a&c&b&7", "")), 3);
-				dragDrop.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nMain Menu", "&7", "&7*Returns you to the main menu&a&c&b&9&0&a&c&b&7."), event -> this.startMenu(player)));
+				dragDrop.addButton(new Button(ItemHandler.getItem().getItem("STAINED_GLASS_PANE:7", 1, false, "", "")), 2);
+				dragDrop.addButton(new Button(ItemHandler.getItem().getItem("CHEST", 1, false, "&a&lAutosave", "&7", "&7*Click me to save your whole", "&7inventory to the items.yml as-is,", "&7including current slot positions!", "&7" , "&c&l[&nALL&c&l ITEMS]"), event -> {
+					PlayerInventory playerInv = event.getWhoClicked().getInventory();
+					if (playerInv != null && !playerInv.isEmpty()) {
+						for (int i = 0; i <= 35; i++) {
+							if (playerInv.getItem(i) != null && playerInv.getItem(i).getType() != Material.AIR) {
+								this.convertStack(player, playerInv.getItem(i), Integer.toString(i));
+							}
+						}
+						if (playerInv.getHelmet() != null && playerInv.getHelmet().getType() != Material.AIR) { this.convertStack(player, playerInv.getHelmet(), "HELMET"); }
+						if (playerInv.getChestplate() != null && playerInv.getChestplate().getType() != Material.AIR) { this.convertStack(player, playerInv.getChestplate(), "CHESTPLATE"); }
+						if (playerInv.getLeggings() != null && playerInv.getLeggings().getType() != Material.AIR) { this.convertStack(player, playerInv.getLeggings(),"LEGGINGS"); }
+						if (playerInv.getBoots() != null && playerInv.getBoots().getType() != Material.AIR) { this.convertStack(player, playerInv.getBoots(), "BOOTS"); }
+						if (ServerHandler.getServer().hasSpecificUpdate("1_9") && PlayerHandler.getPlayer().getOffHandItem(player) != null && PlayerHandler.getPlayer().getOffHandItem(player).getType() != Material.AIR) { this.convertStack(player, PlayerHandler.getPlayer().getOffHandItem(player), "OFFHAND"); }
+						SQL.getData(false).executeLaterStatements();
+						ItemUtilities.getUtilities().closeAnimations();
+						ItemUtilities.getUtilities().clearItems();
+						ConfigHandler.getConfig(true);
+						this.startMenu(player);
+					}
+				}));
+				dragDrop.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nMain Menu", "&7", "&7*Returns you to the main menu."), event -> this.startMenu(player)));
 			});
 		}
 		dragDrop.open(player);
