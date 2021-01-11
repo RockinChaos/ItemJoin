@@ -1669,6 +1669,15 @@ public class ItemMap {
 	}
 	
    /**
+    * Sets the NBT Values.
+    * 
+    * @oaram tags - The Object Tags to be set.
+    */
+	public void setNBTValues(final Map<String, String> tagValues) {
+		this.nbtProperty = tagValues;
+	}
+	
+   /**
     * Sets the Legacy NBTData (Secret).
     * 
     * @param nbt - The NBT Data to be set.
@@ -2396,6 +2405,15 @@ public class ItemMap {
     */
 	public List<Object> getNBTProperties() {
 		return this.nbtProperties;
+	}
+	
+   /**
+    * Gets the NBT Values.
+    * 
+    * @return The NBT Values.
+    */
+	public Map<String, String> getNBTValues() {
+		return this.nbtProperty;
 	}
 	
    /**
@@ -3834,6 +3852,7 @@ public class ItemMap {
 			if (this.isSimilar(inv.getChestplate())) { inv.setChestplate(new ItemStack(Material.AIR)); }
 			if (this.isSimilar(inv.getLeggings())) { inv.setLeggings(new ItemStack(Material.AIR)); }
 			if (this.isSimilar(inv.getBoots())) { inv.setBoots(new ItemStack(Material.AIR)); }
+			if (ServerHandler.getServer().hasSpecificUpdate("1_9") && this.isSimilar(PlayerHandler.getPlayer().getOffHandItem(player))) { PlayerHandler.getPlayer().setOffHandItem(player, new ItemStack(Material.AIR)); }
 			
 			if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
 				for (int k = 0; k < craftingContents.length; k++) {
@@ -3845,9 +3864,10 @@ public class ItemMap {
 				if (this.isSimilar(contents[k])) { inv.setItem(k, ItemHandler.getItem().modifyItem(inv.getItem(k), false, amount[0])); return; }
 			}
 			if (this.isSimilar(inv.getHelmet())) { inv.setHelmet(ItemHandler.getItem().modifyItem(inv.getHelmet(), false, amount[0])); }
-			else if (this.isSimilar(inv.getChestplate())) { inv.setChestplate(ItemHandler.getItem().modifyItem(inv.getHelmet(), false, amount[0])); }
-			else if (this.isSimilar(inv.getLeggings())) { inv.setLeggings(ItemHandler.getItem().modifyItem(inv.getHelmet(), false, amount[0])); }
-			else if (this.isSimilar(inv.getBoots())) { inv.setBoots(ItemHandler.getItem().modifyItem(inv.getHelmet(), false, amount[0])); }
+			else if (this.isSimilar(inv.getChestplate())) { inv.setChestplate(ItemHandler.getItem().modifyItem(inv.getChestplate(), false, amount[0])); }
+			else if (this.isSimilar(inv.getLeggings())) { inv.setLeggings(ItemHandler.getItem().modifyItem(inv.getLeggings(), false, amount[0])); }
+			else if (this.isSimilar(inv.getBoots())) { inv.setBoots(ItemHandler.getItem().modifyItem(inv.getBoots(), false, amount[0])); }
+			else if (ServerHandler.getServer().hasSpecificUpdate("1_9") && this.isSimilar(PlayerHandler.getPlayer().getOffHandItem(player))) { PlayerHandler.getPlayer().setOffHandItem(player, ItemHandler.getItem().modifyItem(PlayerHandler.getPlayer().getOffHandItem(player), false, amount[0])); }
 			else if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
 				for (int k = 0; k < craftingContents.length; k++) {
 					if (this.isSimilar(craftingContents[k])) { craftView.setItem(k, ItemHandler.getItem().modifyItem(player.getOpenInventory().getItem(k), false, amount[0])); return; }
@@ -4784,6 +4804,11 @@ public class ItemMap {
 		}
 		if (this.contents != null && !this.contents.isEmpty()) { 
 			itemData.set("items." + this.configName + ".contents", this.contents); 
+		}
+		if (this.nbtProperty != null && !this.nbtProperty.isEmpty()) { 
+			String propertyList = "";
+			for (String property : this.nbtProperty.keySet()) { propertyList += property + ":" + this.nbtProperty.get(property) + ", "; }
+			itemData.set("items." + this.configName + ".properties", propertyList.substring(0, propertyList.length() - 2)); 
 		}
 		if (this.enabledRegions != null && !this.enabledRegions.isEmpty()) { 
 			String regionList = "";

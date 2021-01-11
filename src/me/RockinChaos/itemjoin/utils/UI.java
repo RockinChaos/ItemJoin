@@ -43,6 +43,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.BannerMeta;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.FireworkEffectMeta;
@@ -144,7 +145,7 @@ public class UI {
 						ItemStack item = event.getCursor().clone();
 						event.getWhoClicked().setItemOnCursor(null);
 						event.getWhoClicked().getInventory().addItem(item);
-						this.convertStack(player, item);
+						this.convertStack(player, item, null);
 						dragDrop.allowClick(false);
 					}
 				}));
@@ -338,7 +339,7 @@ public class UI {
     * @param player - The Player saving the ItemStack.
     * @param item - The ItemStack to be saved.
     */
-	private void convertStack(Player player, ItemStack item) {
+	private void convertStack(final Player player, final ItemStack item, final String slot) {
 		ItemMap itemMap = new ItemMap("item_" + Utils.getUtils().getPath(1), "ARBITRARY");
 		itemMap.setMaterial(item.getType());
 		if (!ServerHandler.getServer().hasSpecificUpdate("1_13")) { itemMap.setDataValue((short)LegacyAPI.getLegacy().getDataValue(item)); }
@@ -412,7 +413,14 @@ public class UI {
 			}
 			itemMap.setListPages(savePages);
 		}
-		this.switchPane(player, itemMap, 0);
+		if (slot == null) { this.switchPane(player, itemMap, 0); }
+		else { 
+			itemMap.setSlot(slot);
+			itemMap.saveToConfig();
+			String[] placeHolders = LanguageAPI.getLang(false).newString();
+			placeHolders[3] = (item.hasItemMeta() && item.getItemMeta().hasDisplayName() ? item.getItemMeta().getDisplayName() : itemMap.getConfigName());
+			LanguageAPI.getLang(false).sendLangMessage("commands.menu.itemSaved", player, placeHolders);
+		}
 	}
 	
    /**
@@ -657,7 +665,9 @@ public class UI {
 				creatingPane.addButton(new Button(ItemHandler.getItem().getItem("58", 1, false, "&b&lRecipe", "&7", "&7*Define the recipe to be", "&7able to craft this item.", "&9Enabled: &a" + (itemMap.getIngredients() != null && !itemMap.getIngredients().isEmpty() ? "YES" : "NONE")), event -> {
 						this.recipePane(player, itemMap);
 				}));
-				creatingPane.addButton(new Button(this.fillerPaneGItem), 1);
+				creatingPane.addButton(new Button(ItemHandler.getItem().getItem("137", 1, false, "&c&lNBT Properties", "&7", "&7*Define specific NBT Properties", "&7to be set to the item.", "&9Enabled: &a" + (itemMap.getNBTValues() != null && !itemMap.getNBTValues().isEmpty() ? "YES" : "NONE")), event -> {
+						this.nbtPane(player, itemMap);
+				}));
 				if (itemMap.getMaterial().toString().contains("MAP")) {
 					creatingPane.addButton(new Button(ItemHandler.getItem().getItem("FEATHER", 1, false, "&e&lMap Image", "&7", "&7*Adds a custom map image that", "&7will be displayed when held.", "&7", "&7Place the custom map image", 
 							"&7in the MAIN ItemJoin folder.", "&7", "&7The map CAN be a GIF but", "&7must be a 128x128 pixel image.", "&9&lImage: &a" + Utils.getUtils().nullCheck(itemMap.getMapImage())), event -> {
@@ -4711,6 +4721,92 @@ public class UI {
 	}
 	
    /**
+    * Opens the Pane for the Player.
+    * This Pane is for creating NBT Properties.
+    * 
+    * @param player - The Player to have the Pane opened.
+    * @param itemMap - The ItemMap currently being modified.
+    */
+	private void nbtPane(final Player player, final ItemMap itemMap) {
+		Interface nbtPane = new Interface(true, 2, this.GUIName, player);
+		if (ItemJoin.getInstance().isEnabled()) {
+			Bukkit.getServer().getScheduler().runTaskAsynchronously(ItemJoin.getInstance(), () -> {
+				Map<String, String> properties = itemMap.getNBTValues();
+				nbtPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> this.creatingPane(player, itemMap)));
+					nbtPane.addButton(new Button(ItemHandler.getItem().getItem("NAME_TAG", 1, true, "&e&l&nNew Property", "&7", "&7*Add a new NBT Property to the custom item."), event -> {
+						player.closeInventory();
+						String[] placeHolders = LanguageAPI.getLang(false).newString();
+						placeHolders[16] = "NBT PROPERTY";
+						placeHolders[15] = "TranslatableDisplayName:&aUltra &cItem";
+						LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+						LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+					}, event -> {
+						if (ChatColor.stripColor(event.getMessage()).contains(":")) {
+							String[] propertyParts = ChatColor.stripColor(event.getMessage()).split(":");
+							properties.put(propertyParts[0], propertyParts[1]);
+						}
+						itemMap.setNBTValues(properties);
+						String[] placeHolders = LanguageAPI.getLang(false).newString();
+						placeHolders[16] = "NBT PROPERTY";
+						LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+						this.nbtPane(event.getPlayer(), itemMap);
+					}));
+					for (String key : properties.keySet()) {
+						nbtPane.addButton(new Button(ItemHandler.getItem().getItem("137", 1, false, "&f" + key + ":" + properties.get(key), "&7", "&7*Click to modify or delete", "&7this custom NBT Property."), event -> this.modifyProperty(player, itemMap, key)));
+					}
+			});
+		}
+		nbtPane.open(player);
+	}
+	
+   /**
+    * Opens the Pane for the Player.
+    * This Pane is for modifying NBT Propterties.
+    * 
+    * @param player - The Player to have the Pane opened.
+    * @param itemMap - The ItemMap currently being modified.
+    */
+	private void modifyProperty(final Player player, final ItemMap itemMap, final String key) {
+		Interface modifyProperty = new Interface(false, 2, this.GUIName, player);
+		if (ItemJoin.getInstance().isEnabled()) {
+			Bukkit.getServer().getScheduler().runTaskAsynchronously(ItemJoin.getInstance(), () -> {
+				Map<String, String> properties = itemMap.getNBTValues();
+				modifyProperty.addButton(new Button(this.fillerPaneGItem), 3);
+				modifyProperty.addButton(new Button(ItemHandler.getItem().getItem("NAME_TAG", 1, false, "&c&l&nModify", "&7", "&7*Modify this NBT Property.", "&7", "&9&lProperty: &a" + "&f" + key + ":" + properties.get(key)), event -> {
+					player.closeInventory();
+					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					placeHolders[16] = "NBT PROPERTY";
+					placeHolders[15] = "TranslatableDisplayName:&aUltra &cItem";
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				}, event -> {
+					if (ChatColor.stripColor(event.getMessage()).contains(":")) {
+						properties.remove(key);
+						String[] propertyParts = ChatColor.stripColor(event.getMessage()).split(":");
+						properties.put(propertyParts[0], propertyParts[1]);
+					}
+					itemMap.setNBTValues(properties);
+					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					placeHolders[16] = "NBT PROPERTY";
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+					this.nbtPane(event.getPlayer(), itemMap);
+				}));
+				modifyProperty.addButton(new Button(this.fillerPaneGItem));
+				modifyProperty.addButton(new Button(ItemHandler.getItem().getItem("REDSTONE", 1, false, "&c&l&nDelete", "&7", "&7*Delete this custom NBT Property.", "&7", "&9&lProperty: &a" + "&f" + key + ":" + properties.get(key)), event -> {
+					properties.remove(key);
+					itemMap.setNBTValues(properties);
+					this.nbtPane(player, itemMap);
+				}));
+				modifyProperty.addButton(new Button(this.fillerPaneGItem), 3);
+				modifyProperty.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the NBT Properties menu."), event -> this.nbtPane(player, itemMap)));
+				modifyProperty.addButton(new Button(this.fillerPaneBItem), 7);
+				modifyProperty.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the NBT Properties menu."), event -> this.nbtPane(player, itemMap)));
+			});
+		}
+		modifyProperty.open(player);
+	}
+	
+   /**
     * Sets the recipe pattern and ingredients.
     * 
     * @param player - The Player to have the Pane opened.
@@ -5626,7 +5722,7 @@ public class UI {
 					(Utils.getUtils().nullCheck(itemMap.getLeatherColor()) != "NONE" ? "&9&lLeather Color: &a" + itemMap.getLeatherColor() : ""), (Utils.getUtils().nullCheck(itemMap.getLeatherHex()) != "NONE" ? "&9&lLeather Color: &a" + itemMap.getLeatherHex() : ""),
 					(Utils.getUtils().nullCheck(itemMap.getMapImage()) != "NONE" ? "&9&lMap-Image: &a" + itemMap.getMapImage() : ""), (Utils.getUtils().nullCheck(itemMap.getChargeColor() + "") != "NONE" ? "&9&lCharge Color: &a" + itemMap.getChargeColor() : ""),
 					(Utils.getUtils().nullCheck(patternList) != "NONE" ? "&9&lBanner Meta: &a" + patternList : ""), (Utils.getUtils().nullCheck(potionList) != "NONE" ? "&9&lPotion-Effects: &a" + potionList : ""), (itemMap.getIngredients() != null && !itemMap.getIngredients().isEmpty() ? "&9&lRecipe: &aYES" : ""),
-					(!mobs.isEmpty() ? "&9&lMobs Drop: &a" + mobs.substring(0, mobs.length() - 2) : ""), (!blocks.isEmpty() ? "&9&lBlocks Drop: &a" + blocks.substring(0, blocks.length() - 2) : ""),
+					(!mobs.isEmpty() ? "&9&lMobs Drop: &a" + mobs.substring(0, mobs.length() - 2) : ""), (!blocks.isEmpty() ? "&9&lBlocks Drop: &a" + blocks.substring(0, blocks.length() - 2) : ""), (Utils.getUtils().nullCheck(itemMap.getNBTValues() + "") != "NONE" ? "&9&lNBT Properties: &aYES" : ""),
 					(Utils.getUtils().nullCheck(attributeList) != "NONE" ? "&9&lAttributes: &a" + attributeList : ""), (Utils.getUtils().nullCheck(itemMap.getPages() + "") != "NONE" ? "&9&lBook Pages: &aYES" : ""),
 					(Utils.getUtils().nullCheck(itemMap.getAuthor()) != "NONE" ? "&9&lBook Author: &a" + itemMap.getAuthor() : ""), (Utils.getUtils().nullCheck(itemMap.getSkull()) != "NONE" ? "&9&lSkull-Owner: &a" + itemMap.getSkull() : ""), 
 					(Utils.getUtils().nullCheck(itemMap.getSkullTexture()) != "NONE" ? "&9&lSkull-Texture: &a" + (itemMap.getSkullTexture().length() > 40 ? itemMap.getSkullTexture().substring(0, 40) : itemMap.getSkullTexture()) : ""), 
