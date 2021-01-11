@@ -425,7 +425,7 @@ public abstract class TinyProtocol {
 					channel.pipeline().remove(handlerName);
 				}
 			});
-		} catch (NoClassDefFoundError e) { }
+		} catch (NoClassDefFoundError | NoSuchElementException e) { }
 	}
 
    /**
