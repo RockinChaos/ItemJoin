@@ -18,9 +18,14 @@
 package me.RockinChaos.itemjoin.handlers;
 
 import me.RockinChaos.itemjoin.ItemJoin;
+import me.RockinChaos.itemjoin.utils.Utils;
+
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -33,19 +38,14 @@ import java.net.URLConnection;
 import java.util.Collection;
 
 public class UpdateHandler {
-	
-    private final String AUTOQUERY = "projects/itemjoin/files/latest";
-    private final String AUTOHOST = "https://dev.bukkit.org/";
-    private final int PROJECTID = 12661;
-    private final String HOST = "https://api.spigotmc.org/legacy/update.php?resource=" + this.PROJECTID;
-    
+    private final String HOST = "https://api.github.com/repos/RockinChaos/" + ItemJoin.getInstance().getName().toLowerCase() + "/releases/latest";
     private String versionExact = ItemJoin.getInstance().getDescription().getVersion();
     private String localeVersion = this.versionExact.split("-")[0];
     private String latestVersion;
     private boolean betaVersion = this.versionExact.contains("-SNAPSHOT") || this.versionExact.contains("-BETA") || this.versionExact.contains("-ALPHA");
     private boolean devVersion = this.localeVersion.equals("${project.version}");
     
-    private File jarLink;
+    private File jarRef;
     private int BYTE_SIZE = 2048;
     
     private boolean updatesAllowed = ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("General.CheckforUpdates");
@@ -57,12 +57,12 @@ public class UpdateHandler {
     *
     */
     public UpdateHandler() {
-       this.jarLink = ItemJoin.getInstance().getPlugin();
+       this.jarRef = ItemJoin.getInstance().getPlugin();
        this.checkUpdates(ItemJoin.getInstance().getServer().getConsoleSender(), true);
     }
     
    /**
-    * If the spigotmc host has an available update, redirects to download the jar file from devbukkit.
+    * If the GitHub host has an available update, attenots to download the jar file.
     * Downloads and write the new data to the plugin jar file.
     * 
     * @param sender - The executor of the update checking.
@@ -72,10 +72,11 @@ public class UpdateHandler {
     		ServerHandler.getServer().messageSender(sender, "&aAn update has been found!");
     		ServerHandler.getServer().messageSender(sender, "&aAttempting to update from " + "&ev" + this.localeVersion + " &ato the new "  + "&ev" + this.latestVersion);
     		try {
-    			HttpURLConnection httpConnection = (HttpURLConnection) new URL(this.AUTOHOST + this.AUTOQUERY + "?_=" + System.currentTimeMillis()).openConnection();
+    			String uri = this.HOST.replace("repos/", "").replace("api.", "").replace("latest", "download/" + "v" + this.latestVersion + "/" + ItemJoin.getInstance().getName().toLowerCase() + ".jar") + "?_=" + System.currentTimeMillis();
+    			HttpURLConnection httpConnection = (HttpURLConnection) new URL(uri).openConnection();
     			httpConnection.setRequestProperty("User-Agent", "Mozilla/5.0...");
     			BufferedInputStream in = new BufferedInputStream(httpConnection.getInputStream());
-    			FileOutputStream fos = new FileOutputStream(this.jarLink);
+    			FileOutputStream fos = new FileOutputStream(this.jarRef);
     			BufferedOutputStream bout = new BufferedOutputStream(fos, this.BYTE_SIZE);
     			String progressBar = "&a::::::::::::::::::::::::::::::";
     			byte[] data = new byte[this.BYTE_SIZE];
@@ -122,7 +123,7 @@ public class UpdateHandler {
     			ServerHandler.getServer().messageSender(sender, "&cYour current version: &bv" + this.localeVersion + "-RELEASE");
     		}
     		ServerHandler.getServer().messageSender(sender, "&cA new version is available: " + "&av" + this.latestVersion + "-RELEASE");
-    		ServerHandler.getServer().messageSender(sender, "&aGet it from: https://www.spigotmc.org/resources/" + ItemJoin.getInstance().getName().toLowerCase() + "." + this.PROJECTID + "/history");
+    		ServerHandler.getServer().messageSender(sender, "&aGet it from: https://github.com/RockinChaos/" + ItemJoin.getInstance().getName().toLowerCase() + "/releases/latest");
     		ServerHandler.getServer().messageSender(sender, "&aIf you wish to auto update, please type /ItemJoin Upgrade");
     		this.sendNotifications();
     	} else if (this.updatesAllowed) {
@@ -139,7 +140,7 @@ public class UpdateHandler {
     }
     
    /**
-    * Directly checks to see if the spigotmc host has an update available.
+    * Directly checks to see if the GitHub host has an update available.
     * 
     * @param sender - The executor of the update checking.
     * @param onStart - If it is checking for updates on start.
@@ -151,10 +152,12 @@ public class UpdateHandler {
     		try {
     			URLConnection connection = new URL(this.HOST + "?_=" + System.currentTimeMillis()).openConnection();
     			BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-    			String version = reader.readLine();
+    			String JsonString = Utils.getUtils().toString(reader); 
+			    JSONObject objectReader = (JSONObject) JSONValue.parseWithException(JsonString);
+			    String gitVersion = objectReader.get("tag_name").toString();
     			reader.close();
-    			if (version.length() <= 7) {
-    				this.latestVersion = version.replaceAll("[a-z]", "").replace("-SNAPSHOT", "").replace("-BETA", "").replace("-ALPHA", "").replace("-RELEASE", "");
+    			if (gitVersion.length() <= 7) {
+    				this.latestVersion = gitVersion.replaceAll("[a-z]", "").replace("-SNAPSHOT", "").replace("-BETA", "").replace("-ALPHA", "").replace("-RELEASE", "");
     				String[] latestSplit = this.latestVersion.split("\\.");
     				String[] localeSplit = this.localeVersion.split("\\.");
     				if (this.devVersion) {
@@ -165,6 +168,7 @@ public class UpdateHandler {
     				}
     			}
     		} catch (Exception e) {
+    			e.printStackTrace();
     			ServerHandler.getServer().messageSender(sender, "&cFailed to check for updates, connection could not be made.");
     			return false;
     		}
@@ -221,8 +225,8 @@ public class UpdateHandler {
     * 
     * @return The plugins jar file.
     */
-    public File getJarLink() {
-    	return this.jarLink;
+    public File getJarReference() {
+    	return this.jarRef;
     }
     
    /**
