@@ -122,7 +122,7 @@ public class UI {
 		Interface modifyPane = new Interface(true, 6, this.GUIName, player);
 		if (ItemJoin.getInstance().isEnabled()) {
 			Bukkit.getServer().getScheduler().runTaskAsynchronously(ItemJoin.getInstance(), () -> {
-				this.setPage(player, modifyPane, ItemUtilities.getUtilities().copyItems());
+				this.setPage(player, modifyPane, ItemUtilities.getUtilities().copyItems(), null);
 			});
 		}
 		modifyPane.open(player);
@@ -209,11 +209,30 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     * @param pagedPane - The PagedPane.
     */
-	private void setButton(final Player player, final ItemMap itemMap, final Interface pagedPane) {
+	private void setButton(final Player player, final ItemMap itemMap, final Interface modifyPane, final ItemMap contents) {
 		final ItemStack item = itemMap.getTempItem().clone();
 		if (item.getType() == Material.AIR) { item.setType(this.fillerPaneItem.getType()); }
 		if (itemMap.isAnimated() || itemMap.isDynamic()) { this.setModifyMenu(true, player); itemMap.getAnimationHandler().get(player).setMenu(true, 0); }
-		pagedPane.addButton(new Button(ItemHandler.getItem().addLore(item, "&7", "&6---------------------------", "&7*Click to modify this custom item.", "&9&lNode: &a" + itemMap.getConfigName(), "&7"), event ->  this.choicePane(player, itemMap, item)));
+		String lore = (contents == null ? "&7*Click to modify this custom item." : "&7*Click to add into the contents of " + contents.getConfigName() + ".");
+		String space = (contents == null ? "&6---------------------------" : "&6----------------------------------");
+		modifyPane.addButton(new Button(ItemHandler.getItem().addLore(item, "&7", space, lore, "&9&lNode: &a" + itemMap.getConfigName(), "&7", (contents != null ? "&9&lENABLED: " + (contents.getContents().contains(itemMap.getConfigName()) ? "&aYES" : "&aNO") : "")), event -> 
+		{
+			if (contents == null) {
+				this.choicePane(player, itemMap, item);
+			} else {
+				List<String> contentList = contents.getContents();
+				if (contents.getContents().contains(itemMap.getConfigName())) { contentList.remove(itemMap.getConfigName()); } 
+				else { contentList.add(itemMap.getConfigName()); }
+				contents.setContents(contentList);
+				Interface contentsPane = new Interface(true, 6, this.GUIName, player);
+				if (ItemJoin.getInstance().isEnabled()) {
+					Bukkit.getServer().getScheduler().runTaskAsynchronously(ItemJoin.getInstance(), () -> {
+						this.setPage(player, contentsPane, ItemUtilities.getUtilities().copyItems(), contents);
+					});
+				}
+				contentsPane.open(player);
+			}
+		}));
 	}
 	
    /**
@@ -223,16 +242,19 @@ public class UI {
     * @param modifyPane - The PagedPane to have buttons added.
     * @param items - The items to be added to the Pane.
     */
-	private void setPage(final Player player, final Interface modifyPane, final List < ItemMap > items) {
+	private void setPage(final Player player, final Interface modifyPane, final List < ItemMap > items, final ItemMap contents) {
 		ItemMap currentItem = null;
 		boolean crafting = false;
 		boolean arbitrary = false;
+		if (contents != null) {
+			modifyPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to the item definition menu."), event -> this.creatingPane(player, contents)));
+		}
 		Interface craftingPane = new Interface(false, 4, this.GUIName, player);
 		craftingPane.addButton(new Button(this.fillerPaneGItem), 3);
 		currentItem = ItemUtilities.getUtilities().getItemMap("CRAFTING[1]", items);
 		if (currentItem != null) {
 			crafting = true;
-			this.setButton(player, currentItem, craftingPane);
+			this.setButton(player, currentItem, craftingPane, contents);
 			items.remove(currentItem);
 		} else {
 			craftingPane.addButton(new Button(this.fillerPaneGItem));
@@ -241,7 +263,7 @@ public class UI {
 		currentItem = ItemUtilities.getUtilities().getItemMap("CRAFTING[2]", items);
 		if (currentItem != null) {
 			crafting = true;
-			this.setButton(player, currentItem, craftingPane);
+			this.setButton(player, currentItem, craftingPane, contents);
 			items.remove(currentItem);
 		} else {
 			craftingPane.addButton(new Button(this.fillerPaneGItem));
@@ -250,7 +272,7 @@ public class UI {
 		currentItem = ItemUtilities.getUtilities().getItemMap("CRAFTING[0]", items);
 		if (currentItem != null) {
 			crafting = true;
-			this.setButton(player, currentItem, craftingPane);
+			this.setButton(player, currentItem, craftingPane, contents);
 			items.remove(currentItem);
 		} else {
 			craftingPane.addButton(new Button(this.fillerPaneGItem));
@@ -259,7 +281,7 @@ public class UI {
 		currentItem = ItemUtilities.getUtilities().getItemMap("CRAFTING[3]", items);
 		if (currentItem != null) {
 			crafting = true;
-			this.setButton(player, currentItem, craftingPane);
+			this.setButton(player, currentItem, craftingPane, contents);
 			items.remove(currentItem);
 		} else {
 			craftingPane.addButton(new Button(this.fillerPaneGItem));
@@ -268,83 +290,84 @@ public class UI {
 		currentItem = ItemUtilities.getUtilities().getItemMap("CRAFTING[4]", items);
 		if (currentItem != null) {
 			crafting = true;
-			this.setButton(player, currentItem, craftingPane);
+			this.setButton(player, currentItem, craftingPane, contents);
 			items.remove(currentItem);
 		} else {
 			craftingPane.addButton(new Button(this.fillerPaneGItem));
 		}
 		craftingPane.addButton(new Button(this.fillerPaneGItem), 3);
+		String lore = (contents == null ? "&7the modifying selection menu" : "&7the contents selection menu.");
 		if (ServerHandler.getServer().hasSpecificUpdate("1_8")) {
-			craftingPane.addButton(new Button(ItemHandler.getItem().setSkullTexture(ItemHandler.getItem().getItem("SKULL_ITEM:3", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", "&7the main slot selection menu"),
+			craftingPane.addButton(new Button(ItemHandler.getItem().setSkullTexture(ItemHandler.getItem().getItem("SKULL_ITEM:3", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", lore),
 					"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2RjOWU0ZGNmYTQyMjFhMWZhZGMxYjViMmIxMWQ4YmVlYjU3ODc5YWYxYzQyMzYyMTQyYmFlMWVkZDUifX19"), event -> modifyPane.open(player)));
 		} else {
-			craftingPane.addButton(new Button(ItemHandler.getItem().getItem("ARROW", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", "&7the modifying selection menu"), event -> modifyPane.open(player)));
+			craftingPane.addButton(new Button(ItemHandler.getItem().getItem("ARROW", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", lore), event -> modifyPane.open(player)));
 		}
 		craftingPane.addButton(new Button(this.fillerPaneBItem), 7);
 		if (ServerHandler.getServer().hasSpecificUpdate("1_8")) {
-			craftingPane.addButton(new Button(ItemHandler.getItem().setSkullTexture(ItemHandler.getItem().getItem("SKULL_ITEM:3", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", "&7the main slot selection menu"), 
+			craftingPane.addButton(new Button(ItemHandler.getItem().setSkullTexture(ItemHandler.getItem().getItem("SKULL_ITEM:3", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", lore), 
 					"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2RjOWU0ZGNmYTQyMjFhMWZhZGMxYjViMmIxMWQ4YmVlYjU3ODc5YWYxYzQyMzYyMTQyYmFlMWVkZDUifX19"), event -> modifyPane.open(player)));
 		} else {
-			craftingPane.addButton(new Button(ItemHandler.getItem().getItem("ARROW", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", "&7the modifying selection menu"), event -> modifyPane.open(player)));
+			craftingPane.addButton(new Button(ItemHandler.getItem().getItem("ARROW", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", lore), event -> modifyPane.open(player)));
 		}
 		Interface arbitraryPane = new Interface(true, 6, this.GUIName, player);
 		if (ServerHandler.getServer().hasSpecificUpdate("1_8")) {
-			arbitraryPane.setReturnButton(new Button(ItemHandler.getItem().setSkullTexture(ItemHandler.getItem().getItem("SKULL_ITEM:3", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", "&7the modifying selection menu"),
+			arbitraryPane.setReturnButton(new Button(ItemHandler.getItem().setSkullTexture(ItemHandler.getItem().getItem("SKULL_ITEM:3", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", lore),
 					"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2RjOWU0ZGNmYTQyMjFhMWZhZGMxYjViMmIxMWQ4YmVlYjU3ODc5YWYxYzQyMzYyMTQyYmFlMWVkZDUifX19"), event -> modifyPane.open(player)));
 		} else {
-			arbitraryPane.setReturnButton(new Button(ItemHandler.getItem().getItem("ARROW", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", "&7the modifying selection menu"), event -> modifyPane.open(player)));
+			arbitraryPane.setReturnButton(new Button(ItemHandler.getItem().getItem("ARROW", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", lore), event -> modifyPane.open(player)));
 		}
 		List < ItemMap > tempList = new ArrayList < ItemMap > ();
 		tempList.addAll(items);
 		for (final ItemMap item: tempList) {
 			if (item.getSlot().equalsIgnoreCase("ARBITRARY")) {
-				this.setButton(player, item, arbitraryPane);
+				this.setButton(player, item, arbitraryPane, contents);
 				items.remove(item);
 				arbitrary = true;
 			}
 		}
 		modifyPane.addButton(new Button(this.fillerPaneGItem));
 		if (arbitrary == true) {
-			modifyPane.addButton(new Button(ItemHandler.getItem().getItem("SUGAR", 1, false, "&fArbitrary", "&7", "&7*Click to view the existing", "&7Arbitrary slot items to modify."), event -> arbitraryPane.open(player)));
+			modifyPane.addButton(new Button(ItemHandler.getItem().getItem("SUGAR", 1, false, "&fArbitrary", "&7", "&7*Click to view the existing", "&7Arbitrary slot items."), event -> arbitraryPane.open(player)));
 		} else {
 			modifyPane.addButton(new Button(this.fillerPaneGItem));
 		}
 		if (crafting == true) {
-			modifyPane.addButton(new Button(ItemHandler.getItem().getItem("58", 1, false, "&fCrafting", "&7", "&7*Click to view the existing", "&7crafting slot items to modify."), event -> craftingPane.open(player)));
+			modifyPane.addButton(new Button(ItemHandler.getItem().getItem("58", 1, false, "&fCrafting", "&7", "&7*Click to view the existing", "&7crafting slot items."), event -> craftingPane.open(player)));
 		} else {
 			modifyPane.addButton(new Button(this.fillerPaneGItem));
 		}
 		currentItem = ItemUtilities.getUtilities().getItemMap("HELMET", items);
 		if (currentItem != null) {
-			this.setButton(player, currentItem, modifyPane);
+			this.setButton(player, currentItem, modifyPane, contents);
 			items.remove(currentItem);
 		} else {
 			modifyPane.addButton(new Button(this.fillerPaneGItem));
 		}
 		currentItem = ItemUtilities.getUtilities().getItemMap("CHESTPLATE", items);
 		if (currentItem != null) {
-			this.setButton(player, currentItem, modifyPane);
+			this.setButton(player, currentItem, modifyPane, contents);
 			items.remove(currentItem);
 		} else {
 			modifyPane.addButton(new Button(this.fillerPaneGItem));
 		}
 		currentItem = ItemUtilities.getUtilities().getItemMap("LEGGINGS", items);
 		if (currentItem != null) {
-			this.setButton(player, currentItem, modifyPane);
+			this.setButton(player, currentItem, modifyPane, contents);
 			items.remove(currentItem);
 		} else {
 			modifyPane.addButton(new Button(this.fillerPaneGItem));
 		}
 		currentItem = ItemUtilities.getUtilities().getItemMap("BOOTS", items);
 		if (currentItem != null) {
-			this.setButton(player, currentItem, modifyPane);
+			this.setButton(player, currentItem, modifyPane, contents);
 			items.remove(currentItem);
 		} else {
 			modifyPane.addButton(new Button(this.fillerPaneGItem));
 		}
 		currentItem = ItemUtilities.getUtilities().getItemMap("OFFHAND", items);
 		if (currentItem != null) {
-			this.setButton(player, currentItem, modifyPane);
+			this.setButton(player, currentItem, modifyPane, contents);
 			items.remove(currentItem);
 		} else {
 			modifyPane.addButton(new Button(this.fillerPaneGItem));
@@ -353,7 +376,7 @@ public class UI {
 		for (int i = 9; i < 36; i++) {
 			currentItem = ItemUtilities.getUtilities().getItemMap(i + "", items);
 			if (currentItem != null) {
-				this.setButton(player, currentItem, modifyPane);
+				this.setButton(player, currentItem, modifyPane, contents);
 				items.remove(currentItem);
 			} else {
 				modifyPane.addButton(new Button(this.fillerPaneGItem));
@@ -362,14 +385,14 @@ public class UI {
 		for (int j = 0; j < 9; j++) {
 			currentItem = ItemUtilities.getUtilities().getItemMap(j + "", items);
 			if (currentItem != null) {
-				this.setButton(player, currentItem, modifyPane);
+				this.setButton(player, currentItem, modifyPane, contents);
 				items.remove(currentItem);
 			} else {
 				modifyPane.addButton(new Button(this.fillerPaneGItem));
 			}
 		}
 		if (!items.isEmpty()) {
-			this.setPage(player, modifyPane, items);
+			this.setPage(player, modifyPane, items, contents);
 		}
 	}
 	
@@ -762,6 +785,16 @@ public class UI {
 				} else if (!ItemHandler.getItem().getDesignatedSlot(itemMap.getMaterial()).equalsIgnoreCase("noslot") && !itemMap.getMaterial().toString().contains("LEATHER_")) {
 					creatingPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "ENCHANTED_GOLDEN_APPLE" : "322:1"), 1, false, "&a&lAttributes", "&7", "&7*Add a custom attribute to", "&7your armor or weapon.", (Utils.getUtils().nullCheck(attributeList) != "NONE" ? "&9&lAttributes: &a" + attributeList : "")), event -> {
 						this.attributePane(player, itemMap, false);
+					}));
+				} else if (itemMap.getMaterial().toString().contains("SHULKER")) {
+					creatingPane.addButton(new Button(ItemHandler.getItem().getItem("229", 1, false, "&a&lContents", "&7", "&7*Add existing custom items into", "&7the contents of this box.", "&9Enabled: &a" + (itemMap.getContents() != null && !itemMap.getContents().isEmpty() ? "YES" : "NONE")), event -> {
+						Interface contentsPane = new Interface(true, 6, this.GUIName, player);
+						if (ItemJoin.getInstance().isEnabled()) {
+							Bukkit.getServer().getScheduler().runTaskAsynchronously(ItemJoin.getInstance(), () -> {
+								this.setPage(player, contentsPane, ItemUtilities.getUtilities().copyItems(), itemMap);
+							});
+						}
+						contentsPane.open(player);
 					}));
 				} else {
 					creatingPane.addButton(new Button(ItemHandler.getItem().getItem("MAGMA_CREAM", 1, false, "&e&lOther Settings", "&7", "&7*Settings that are specific", "&7to the item's material type.", (this.specialItem(itemMap) ? "" : "&7"),
@@ -5762,7 +5795,8 @@ public class UI {
 					(Utils.getUtils().nullCheck(itemMap.getLeatherColor()) != "NONE" ? "&9&lLeather Color: &a" + itemMap.getLeatherColor() : ""), (Utils.getUtils().nullCheck(itemMap.getLeatherHex()) != "NONE" ? "&9&lLeather Color: &a" + itemMap.getLeatherHex() : ""),
 					(Utils.getUtils().nullCheck(itemMap.getMapImage()) != "NONE" ? "&9&lMap-Image: &a" + itemMap.getMapImage() : ""), (Utils.getUtils().nullCheck(itemMap.getChargeColor() + "") != "NONE" ? "&9&lCharge Color: &a" + itemMap.getChargeColor() : ""),
 					(Utils.getUtils().nullCheck(patternList) != "NONE" ? "&9&lBanner Meta: &a" + patternList : ""), (Utils.getUtils().nullCheck(potionList) != "NONE" ? "&9&lPotion-Effects: &a" + potionList : ""), (itemMap.getIngredients() != null && !itemMap.getIngredients().isEmpty() ? "&9&lRecipe: &aYES" : ""),
-					(!mobs.isEmpty() ? "&9&lMobs Drop: &a" + mobs.substring(0, mobs.length() - 2) : ""), (!blocks.isEmpty() ? "&9&lBlocks Drop: &a" + blocks.substring(0, blocks.length() - 2) : ""), (Utils.getUtils().nullCheck(itemMap.getNBTValues() + "") != "NONE" ? "&9&lNBT Properties: &aYES" : ""),
+					(!mobs.isEmpty() ? "&9&lMobs Drop: &a" + mobs.substring(0, mobs.length() - 2) : ""), (!blocks.isEmpty() ? "&9&lBlocks Drop: &a" + blocks.substring(0, blocks.length() - 2) : ""), 
+					(Utils.getUtils().nullCheck(itemMap.getNBTValues() + "") != "NONE" ? "&9&lNBT Properties: &aYES" : ""), (Utils.getUtils().nullCheck(itemMap.getContents() + "") != "NONE" ? "&9&lContents: &aYES" : ""),
 					(Utils.getUtils().nullCheck(attributeList) != "NONE" ? "&9&lAttributes: &a" + attributeList : ""), (Utils.getUtils().nullCheck(itemMap.getPages() + "") != "NONE" ? "&9&lBook Pages: &aYES" : ""),
 					(Utils.getUtils().nullCheck(itemMap.getAuthor()) != "NONE" ? "&9&lBook Author: &a" + itemMap.getAuthor() : ""), (Utils.getUtils().nullCheck(itemMap.getSkull()) != "NONE" ? "&9&lSkull-Owner: &a" + itemMap.getSkull() : ""), 
 					(Utils.getUtils().nullCheck(itemMap.getSkullTexture()) != "NONE" ? "&9&lSkull-Texture: &a" + (itemMap.getSkullTexture().length() > 40 ? itemMap.getSkullTexture().substring(0, 40) : itemMap.getSkullTexture()) : ""), 
