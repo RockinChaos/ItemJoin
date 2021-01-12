@@ -311,7 +311,6 @@ public class ItemMap {
 	        this.setTriggers();
 			this.setWorlds();
 			this.setRegions();
-			this.setContents();
 			this.setPlayersOnCooldown();
 	        this.setPerm(this.nodeLocation.getString(".permission-node"));
 	        this.setPermissionNeeded(ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Permissions.Obtain-Items"));
@@ -511,10 +510,10 @@ public class ItemMap {
     * Sets the ItemMaps Stored Contents.
     * 
     */
-	private void setContents() {
-		if (this.material != null && Utils.getUtils().containsIgnoreCase(this.material.toString(), "SHULKER") && this.nodeLocation.getString(".contents") != null && this.nodeLocation.getStringList(".contents") != null && !this.nodeLocation.getStringList(".contents").isEmpty()) {
+	public void setContents() {
+		if (this.material != null && Utils.getUtils().containsIgnoreCase(this.getMaterial().toString(), "SHULKER") && this.nodeLocation.getString(".contents") != null && this.nodeLocation.getStringList(".contents") != null && !this.nodeLocation.getStringList(".contents").isEmpty()) {
 			this.contents = this.nodeLocation.getStringList(".contents");
-		} else if (this.material != null && Utils.getUtils().containsIgnoreCase(this.material.toString(), "SHULKER")) {
+		} else if (this.material != null && !Utils.getUtils().containsIgnoreCase(this.getMaterial().toString(), "SHULKER") && this.nodeLocation.getString(".contents") != null && this.nodeLocation.getStringList(".contents") != null && !this.nodeLocation.getStringList(".contents").isEmpty()) {
 			ServerHandler.getServer().logWarn("{ItemMap} The item " + this.getConfigName() + " cannot have contents set as it does not support it.");
 		}
 	}

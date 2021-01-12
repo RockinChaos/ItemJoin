@@ -110,6 +110,7 @@ public class ItemDesigner {
 							this.setBlocksDrop(itemMap);
 							this.setRecipe(itemMap);
 							
+							itemMap.setContents();
 							ItemUtilities.getUtilities().addItem(itemMap);
 							ItemUtilities.getUtilities().addCraftingItem(itemMap);
 					    	ConfigHandler.getConfig(false).registerListeners(itemMap);
