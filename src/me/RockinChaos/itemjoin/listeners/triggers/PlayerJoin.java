@@ -23,6 +23,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
+import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.item.ItemUtilities.TriggerType;
 
@@ -38,7 +39,9 @@ public class PlayerJoin implements Listener {
 	private void setJoinItems(PlayerJoinEvent event) {
 		final Player player = event.getPlayer();
 		if (PlayerHandler.getPlayer().isPlayer(player)) {
-			ItemUtilities.getUtilities().setAuthenticating(player, player.getWorld(), TriggerType.JOIN, org.bukkit.GameMode.ADVENTURE, "GLOBAL"); 
+			ItemUtilities.getUtilities().setAuthenticating(player, player.getWorld(), TriggerType.JOIN, org.bukkit.GameMode.ADVENTURE, "GLOBAL"); {
+				ServerHandler.getServer().sendErrorStatements(player);
+			}
 		}
 	}
 }

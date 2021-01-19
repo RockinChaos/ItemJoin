@@ -25,7 +25,6 @@ import java.util.Map;
 import org.bukkit.Bukkit;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
-import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.utils.sqlite.DataObject.Table;
 
@@ -186,23 +185,23 @@ public class SQL {
 				for (HashMap<String, String> sl1 : selectTable) {
 					DataObject dataObject = null;
 					if (tableEnum.equals(Table.IJ_FIRST_JOIN)) {
-						dataObject = new DataObject(tableEnum, PlayerHandler.getPlayer().getPlayerString(sl1.get("Player_UUID")), "", sl1.get("Item_Name"));
+						dataObject = new DataObject(tableEnum, sl1.get("Player_UUID"), "", sl1.get("Item_Name"));
 					} else if (tableEnum.equals(Table.IJ_FIRST_WORLD)) {
-						dataObject = new DataObject(tableEnum, PlayerHandler.getPlayer().getPlayerString(sl1.get("Player_UUID")), sl1.get("World_Name"), sl1.get("Item_Name"));
+						dataObject = new DataObject(tableEnum, sl1.get("Player_UUID"), sl1.get("World_Name"), sl1.get("Item_Name"));
 					} else if (tableEnum.equals(Table.IJ_IP_LIMITS)) {
-						dataObject = new DataObject(tableEnum, PlayerHandler.getPlayer().getPlayerString(sl1.get("Player_UUID")), sl1.get("World_Name"), sl1.get("Item_Name"), sl1.get("IP_Address"));
+						dataObject = new DataObject(tableEnum, sl1.get("Player_UUID"), sl1.get("World_Name"), sl1.get("Item_Name"), sl1.get("IP_Address"));
 					} else if (tableEnum.equals(Table.IJ_FIRST_COMMANDS)) {
-						dataObject = new DataObject(tableEnum, PlayerHandler.getPlayer().getPlayerString(sl1.get("Player_UUID")), sl1.get("World_Name"), sl1.get("Command_String"));
+						dataObject = new DataObject(tableEnum, sl1.get("Player_UUID"), sl1.get("World_Name"), sl1.get("Command_String"));
 					} else if (tableEnum.equals(Table.IJ_ENABLED_PLAYERS)) {
-						dataObject = new DataObject(tableEnum, PlayerHandler.getPlayer().getPlayerString(sl1.get("Player_UUID")), sl1.get("World_Name"), sl1.get("isEnabled"));
+						dataObject = new DataObject(tableEnum, sl1.get("Player_UUID"), sl1.get("World_Name"), sl1.get("isEnabled"));
 					} else if (tableEnum.equals(Table.IJ_RETURN_ITEMS)) {
-						dataObject = new DataObject(tableEnum, PlayerHandler.getPlayer().getPlayerString(sl1.get("Player_UUID")), sl1.get("World_Name"), sl1.get("Region_Name"), sl1.get("Inventory64"));
+						dataObject = new DataObject(tableEnum, sl1.get("Player_UUID"), sl1.get("World_Name"), sl1.get("Region_Name"), sl1.get("Inventory64"));
 					} else if (tableEnum.equals(Table.IJ_RETURN_CRAFTITEMS)) {
-						dataObject = new DataObject(tableEnum, PlayerHandler.getPlayer().getPlayerString(sl1.get("Player_UUID")), "", sl1.get("Inventory64"));
+						dataObject = new DataObject(tableEnum, sl1.get("Player_UUID"), "", sl1.get("Inventory64"));
 					} else if (tableEnum.equals(Table.IJ_RETURN_SWITCH_ITEMS)) {
-						dataObject = new DataObject(tableEnum, PlayerHandler.getPlayer().getPlayerString(sl1.get("Player_UUID")), sl1.get("World_Name"), sl1.get("Inventory64"));
+						dataObject = new DataObject(tableEnum, sl1.get("Player_UUID"), sl1.get("World_Name"), sl1.get("Inventory64"));
 					} else if (tableEnum.equals(Table.IJ_ON_COOLDOWN)) {
-						dataObject = new DataObject(tableEnum, PlayerHandler.getPlayer().getPlayerString(sl1.get("Player_UUID")), sl1.get("World_Name"), sl1.get("Item_Name"), sl1.get("Cooldown"), sl1.get("Duration"));
+						dataObject = new DataObject(tableEnum, sl1.get("Player_UUID"), sl1.get("World_Name"), sl1.get("Item_Name"), sl1.get("Cooldown"), sl1.get("Duration"));
 					} else if (tableEnum.equals(Table.IJ_MAP_IDS)) {
 						dataObject = new DataObject(tableEnum, null, null, sl1.get("Map_IMG"), sl1.get("Map_ID"));
 					}

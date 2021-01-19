@@ -69,8 +69,8 @@ public class PlayerHandler {
     }
     
     public boolean isEnabled(Player player) {
-    	DataObject dataPlayer = SQL.getData(false).getData(new DataObject(Table.IJ_ENABLED_PLAYERS, player, player.getWorld().getName(), Boolean.toString(true)));
-    	DataObject dataGlobal = SQL.getData(false).getData(new DataObject(Table.IJ_ENABLED_PLAYERS, player, "Global", Boolean.toString(true)));
+    	DataObject dataPlayer = SQL.getData(false).getData(new DataObject(Table.IJ_ENABLED_PLAYERS, PlayerHandler.getPlayer().getPlayerID(player), player.getWorld().getName(), Boolean.toString(true)));
+    	DataObject dataGlobal = SQL.getData(false).getData(new DataObject(Table.IJ_ENABLED_PLAYERS, PlayerHandler.getPlayer().getPlayerID(player), "Global", Boolean.toString(true)));
     	DataObject dataALL = SQL.getData(false).getData(new DataObject(Table.IJ_ENABLED_PLAYERS, null, "Global", Boolean.toString(true)));
     	return (((dataPlayer != null ? Boolean.valueOf(dataPlayer.getEnabled()) : ((dataGlobal != null ? Boolean.valueOf(dataGlobal.getEnabled()) : (dataALL != null ? Boolean.valueOf(dataALL.getEnabled()) : true))))));
     }

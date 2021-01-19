@@ -431,7 +431,7 @@ public class ItemHandler {
 			for (String keys: itemMap.getPlayersOnCooldown().keySet()) {
 				String[] parts = keys.split("-.-");
 				if (System.currentTimeMillis() - itemMap.getPlayersOnCooldown().get(keys) <= itemMap.getCommandCooldown() * 1000) {
-					SQL.getData(false).saveData(new DataObject(Table.IJ_ON_COOLDOWN, PlayerHandler.getPlayer().getPlayerString(parts[1]), parts[0], itemMap.getConfigName(), itemMap.getCommandCooldown().toString(), itemMap.getPlayersOnCooldown().get(keys).toString()));
+					SQL.getData(false).saveData(new DataObject(Table.IJ_ON_COOLDOWN, parts[1], parts[0], itemMap.getConfigName(), itemMap.getCommandCooldown().toString(), itemMap.getPlayersOnCooldown().get(keys).toString()));
 				}
 			}
 		}
@@ -463,7 +463,7 @@ public class ItemHandler {
 					inv.setItem(k, craftingContents[k]); 
 					if (craftingContents[k] != null && craftingContents[k].getType() != Material.AIR) { notNull = true; }
 				}
-				if (notNull) { SQL.getData(false).saveData(new DataObject(Table.IJ_RETURN_CRAFTITEMS, player, "", ItemHandler.getItem().serializeInventory(inv))); }
+				if (notNull) { SQL.getData(false).saveData(new DataObject(Table.IJ_RETURN_CRAFTITEMS, PlayerHandler.getPlayer().getPlayerID(player), "", ItemHandler.getItem().serializeInventory(inv))); }
 			} else if (Crafting.getOpenCraftItems().containsKey(PlayerHandler.getPlayer().getPlayerID(player))) {
 				Inventory inv = Bukkit.createInventory(null, 9);
 				boolean notNull = false;
@@ -472,7 +472,7 @@ public class ItemHandler {
 					inv.setItem(k, craftingContents[k]); 
 					if (craftingContents[k] != null && craftingContents[k].getType() != Material.AIR) { notNull = true; }
 				}
-				if (notNull) { SQL.getData(false).saveData(new DataObject(Table.IJ_RETURN_CRAFTITEMS, player, "", ItemHandler.getItem().serializeInventory(inv))); }
+				if (notNull) { SQL.getData(false).saveData(new DataObject(Table.IJ_RETURN_CRAFTITEMS, PlayerHandler.getPlayer().getPlayerID(player), "", ItemHandler.getItem().serializeInventory(inv))); }
 			} else if (Crafting.getCraftItems().containsKey(PlayerHandler.getPlayer().getPlayerID(player))) {
 				Inventory inv = Bukkit.createInventory(null, 9);
 				boolean notNull = false;
@@ -481,7 +481,7 @@ public class ItemHandler {
 					inv.setItem(k, craftingContents[k]); 
 					if (craftingContents[k] != null && craftingContents[k].getType() != Material.AIR) { notNull = true; }
 				}
-				if (notNull) { SQL.getData(false).saveData(new DataObject(Table.IJ_RETURN_CRAFTITEMS, player, "", ItemHandler.getItem().serializeInventory(inv))); }
+				if (notNull) { SQL.getData(false).saveData(new DataObject(Table.IJ_RETURN_CRAFTITEMS, PlayerHandler.getPlayer().getPlayerID(player), "", ItemHandler.getItem().serializeInventory(inv))); }
 			}
     }
     
@@ -491,7 +491,7 @@ public class ItemHandler {
     * @param player - The Player to have its crafting items restored.
     */
     public void restoreCraftItems(final Player player) {
-    	DataObject dataObject = SQL.getData(false).getData(new DataObject(Table.IJ_RETURN_CRAFTITEMS, player, "", ""));
+    	DataObject dataObject = SQL.getData(false).getData(new DataObject(Table.IJ_RETURN_CRAFTITEMS, PlayerHandler.getPlayer().getPlayerID(player), "", ""));
     	Inventory inventory = (dataObject != null ? ItemHandler.getItem().deserializeInventory(dataObject.getInventory64()) : null);
 		Inventory craftView = player.getOpenInventory().getTopInventory();
 		if (inventory != null && PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {

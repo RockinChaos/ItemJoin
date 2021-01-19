@@ -276,7 +276,7 @@ public class GuardAPI {
 					}
 				}
 			}
-			SQL.getData(false).saveData(new DataObject(Table.IJ_RETURN_ITEMS, player, player.getWorld().getName(), region, ItemHandler.getItem().serializeInventory(saveInventory)));
+			SQL.getData(false).saveData(new DataObject(Table.IJ_RETURN_ITEMS, PlayerHandler.getPlayer().getPlayerID(player), player.getWorld().getName(), region, ItemHandler.getItem().serializeInventory(saveInventory)));
 		}
 	}
 	
@@ -288,7 +288,7 @@ public class GuardAPI {
     */
 	public void pasteReturnItems(final Player player, final String region) {
 		if (region != null && !region.isEmpty() && Utils.getUtils().splitIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Options").replace(" ", ""), "RETURN", ",")) {
-			DataObject dataObject = SQL.getData(false).getData(new DataObject(Table.IJ_RETURN_ITEMS, player, player.getWorld().getName(), region, ""));
+			DataObject dataObject = SQL.getData(false).getData(new DataObject(Table.IJ_RETURN_ITEMS, PlayerHandler.getPlayer().getPlayerID(player), player.getWorld().getName(), region, ""));
 			Inventory inventory = (dataObject != null ? ItemHandler.getItem().deserializeInventory(dataObject.getInventory64().replace(region + ".", "")) : null);
 			for (int i = 47; i >= 0; i--) {
 				if (inventory != null && inventory.getItem(i) != null && inventory.getItem(i).getType() != Material.AIR) {

@@ -224,7 +224,7 @@ public class Commands implements Listener {
 	private void onSwingArm(PlayerAnimationEvent event) {
 		Player player = event.getPlayer();
 		ItemStack item = PlayerHandler.getPlayer().getHandItem(player);
-		if (PlayerHandler.getPlayer().isAdventureMode(player) && !this.isDropEvent(event.getPlayer())) {
+		if (PlayerHandler.getPlayer().isAdventureMode(player) && !this.isDropEvent(event.getPlayer()) && !PlayerHandler.getPlayer().isMenuClick(player.getOpenInventory(), Action.LEFT_CLICK_AIR)) {
 			this.runCommands(player, item, "LEFT_CLICK_AIR", "LEFT", String.valueOf(player.getInventory().getHeldItemSlot()));
 		}
 	}

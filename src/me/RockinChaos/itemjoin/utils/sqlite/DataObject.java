@@ -19,10 +19,6 @@ package me.RockinChaos.itemjoin.utils.sqlite;
 
 import java.sql.Timestamp;
 
-import org.bukkit.entity.Player;
-
-import me.RockinChaos.itemjoin.handlers.PlayerHandler;
-
 public class DataObject {
 	private Table table = Table.IJ_FIRST_JOIN;
 	private Boolean isTemporary = false;
@@ -199,13 +195,13 @@ public class DataObject {
     * Creates a new DataObject instance
     * 
     * @param table - The Table being accessed.
-    * @param player - The Player being referenced.
+    * @param playerId - The Player UUID being referenced.
     * @param worldName - The World Name being referenced.
     * @param object - The Object being referenced.
     */
-	public DataObject(Table table, Player player, String worldName, String object) {
-		if (player != null) {
-			this.playerId = PlayerHandler.getPlayer().getPlayerID(player);
+	public DataObject(Table table, String playerId, String worldName, String object) {
+		if (playerId != null && !playerId.isEmpty()) {
+			this.playerId = playerId;
 		} else if (table.equals(Table.IJ_ENABLED_PLAYERS)) { 
 			this.playerId = "ALL"; 
 		}
@@ -227,14 +223,14 @@ public class DataObject {
     * Creates a new DataObject instance
     * 
     * @param table - The Table being accessed.
-    * @param player - The Player being referenced.
+    * @param playerId - The Player UUID being referenced.
     * @param worldName - The World Name being referenced.
     * @param object1 - The Object being referenced.
     * @param object2 - The Object being referenced.
     */
-	public DataObject(Table table, Player player, String worldName, String object1, String object2) {
-		if (player != null) {
-			this.playerId = PlayerHandler.getPlayer().getPlayerID(player);
+	public DataObject(Table table, String playerId, String worldName, String object1, String object2) {
+		if (playerId != null && !playerId.isEmpty()) {
+			this.playerId = playerId;
 		} else if (table.equals(Table.IJ_ENABLED_PLAYERS)) { 
 			this.playerId = "ALL"; 
 		}
@@ -257,15 +253,15 @@ public class DataObject {
     * Creates a new DataObject instance
     * 
     * @param table - The Table being accessed.
-    * @param player - The Player being referenced.
+    * @param playerId - The Player UUID being referenced.
     * @param worldName - The World Name being referenced.
     * @param object1 - The Object being referenced.
     * @param object2 - The Object being referenced.
     * @param object3 - The Object being referenced.
     */
-	public DataObject(Table table, Player player, String worldName, String object1, String object2, String object3) {
-		if (player != null) {
-			this.playerId = PlayerHandler.getPlayer().getPlayerID(player);
+	public DataObject(Table table, String playerId, String worldName, String object1, String object2, String object3) {
+		if (playerId != null && !playerId.isEmpty()) {
+			this.playerId = playerId;
 		} else if (table.equals(Table.IJ_ENABLED_PLAYERS)) { 
 			this.playerId = "ALL"; 
 		}
