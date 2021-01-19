@@ -518,7 +518,7 @@ public class UI {
 					if (ItemJoin.getInstance().isEnabled()) {
 						Bukkit.getServer().getScheduler().runTaskLater(ItemJoin.getInstance(), () -> { 
 							this.startModify(player); 
-						}, 2L);
+						}, 6L);
 					}
 				}));
 				choicePane.addButton(new Button(this.fillerPaneBItem), 3);
