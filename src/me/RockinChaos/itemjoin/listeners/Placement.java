@@ -69,7 +69,7 @@ public class Placement implements Listener {
 	 			ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item, null, player.getWorld());
 	 			item.setAmount(itemMap.getCount());
 				if (ItemJoin.getInstance().isEnabled()) {
-					Bukkit.getServer().getScheduler().runTaskLater(ItemJoin.getInstance(), () -> {
+					Bukkit.getServer().getScheduler().runTask(ItemJoin.getInstance(), () -> {
 		 				if (Utils.getUtils().containsIgnoreCase(item.getType().name(), "WATER") || Utils.getUtils().containsIgnoreCase(item.getType().name(), "LAVA") || item.getType().name().equalsIgnoreCase("BUCKET") 
 		 				 || Utils.getUtils().containsIgnoreCase(item.getType().name(), "POTION")) {
 		 					PlayerHandler.getPlayer().setMainHandItem(player, item);
@@ -85,9 +85,9 @@ public class Placement implements Listener {
 		 						else { PlayerHandler.getPlayer().setMainHandItem(player, item); }
 		 					} else if (itemMap.isSimilar(PlayerHandler.getPlayer().getHandItem(player))) { 
 		 						PlayerHandler.getPlayer().getHandItem(player).setAmount(itemMap.getCount()); 
-		 					} 
+		 					}
 		 				}
-		 			}, 1L);
+		 			});
 				}
 			}
 	 	}
