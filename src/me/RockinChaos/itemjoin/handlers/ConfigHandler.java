@@ -117,6 +117,7 @@ public class ConfigHandler {
     * 
     */
 	private void registerClasses() {
+		ServerHandler.getServer().clearErrorStatements();
 		this.copyFile("config.yml", "config-Version", 7);
 		this.copyFile("items.yml", "items-Version", 7);
 		this.copyFile(LanguageAPI.getLang(true).getFile(), LanguageAPI.getLang(false).getFile().split("-")[0] + "-Version", 8);
@@ -146,7 +147,8 @@ public class ConfigHandler {
 		}
 		if (ItemJoin.getInstance().isEnabled()) {
 			Bukkit.getServer().getScheduler().runTaskLater(ItemJoin.getInstance(), () -> {
-				Metrics.getMetrics(true); 
+				Metrics.getMetrics(true);
+				ServerHandler.getServer().sendErrorStatements(null);
 			}, 100L);
 		}
 	}

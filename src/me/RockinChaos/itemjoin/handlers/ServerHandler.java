@@ -17,18 +17,25 @@
  */
 package me.RockinChaos.itemjoin.handlers;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.entity.Player;
 
 import me.RockinChaos.itemjoin.ItemJoin;
+import me.RockinChaos.itemjoin.utils.Utils;
 
 public class ServerHandler {
 	
 	private static ServerHandler server;
 	private String packageName = ItemJoin.getInstance().getServer().getClass().getPackage().getName();
 	private String serverVersion = this.packageName.substring(this.packageName.lastIndexOf('.') + 1).replace("_", "").replace("R0", "").replace("R1", "").replace("R2", "").replace("R3", "").replace("R4", "").replace("R5", "").replaceAll("[a-z]", "");
+	
+	private List < String > errorStatements = new ArrayList < String > ();
 	
    /**
     * Checks if the server is running the specified version.
@@ -86,9 +93,9 @@ public class ServerHandler {
     */
 	public void logSevere(String message) {
 		String prefix = "[ItemJoin_ERROR] ";
-		message = prefix + message;
 		if (message.equalsIgnoreCase("") || message.isEmpty()) { message = ""; }
-		Bukkit.getServer().getLogger().severe(message);
+		Bukkit.getServer().getLogger().severe(prefix + message);
+		if (!this.errorStatements.contains(message)) { this.errorStatements.add(message); }
 	}
 	
    /**
@@ -136,6 +143,39 @@ public class ServerHandler {
 		if (message.contains("blankmessage") || message.equalsIgnoreCase("") || message.isEmpty()) { message = ""; }
 		if	(sender instanceof ConsoleCommandSender) { message = ChatColor.stripColor(message); }
 		sender.sendMessage(message);
+	}
+	
+   /**
+    * Sends the current error statements to the online admins.
+    * 
+    * @param player - The Player to have the message sent.
+    */
+	public void sendErrorStatements(Player player) {
+		if (player != null && player.isOp()) {
+			if (ItemJoin.getInstance().isEnabled()) {
+				Bukkit.getServer().getScheduler().runTaskLater(ItemJoin.getInstance(), () -> {
+					for (String statement: this.errorStatements) {
+						player.sendMessage(Utils.getUtils().translateLayout("&7[&eItemJoin&7] &c" + statement, player));
+					}
+				}, 60L);
+			}
+		} else {
+			for (String statement: this.errorStatements) {
+				PlayerHandler.getPlayer().forOnlinePlayers(player_2 -> {
+					if (player_2 != null && player_2.isOp()) {
+						player_2.sendMessage(Utils.getUtils().translateLayout("&7[&eItemJoin&7] &c" + statement, player_2));
+					}
+				});
+			}
+		}
+	}
+	
+   /**
+    * Clears the current error statements.
+    * 
+    */
+	public void clearErrorStatements() {
+		this.errorStatements.clear();
 	}
     
    /**
