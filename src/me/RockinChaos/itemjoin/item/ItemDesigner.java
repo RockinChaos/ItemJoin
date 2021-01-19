@@ -144,11 +144,11 @@ public class ItemDesigner {
 				}
 			}
 			if (!ServerHandler.getServer().hasSpecificUpdate("1_9") && id.equalsIgnoreCase("TIPPED_ARROW") || id.equalsIgnoreCase("440") || id.equalsIgnoreCase("0440")) {
-				ServerHandler.getServer().logWarn("{ItemMap} Your server is running MC " + Reflection.getReflection().getServerVersion() + " and this version of Minecraft does not have the item TIPPED_ARROW.");
+				ServerHandler.getServer().logSevere("{ItemMap} Your server is running MC " + Reflection.getReflection().getServerVersion() + " and this version of Minecraft does not have the item TIPPED_ARROW.");
 				ServerHandler.getServer().logWarn("{ItemMap} You are receiving this notice because the item(s) exists in your items.yml and will not be set, please remove the item(s) or update your server.");
 				return false;
 			} else if (!ServerHandler.getServer().hasSpecificUpdate("1_9") && id.equalsIgnoreCase("LINGERING_POTION") || id.equalsIgnoreCase("441") || id.equalsIgnoreCase("0441")) {
-				ServerHandler.getServer().logWarn("{ItemMap} Your server is running MC " + Reflection.getReflection().getServerVersion() + " and this version of Minecraft does not have the item LINGERING_POTION.");
+				ServerHandler.getServer().logSevere("{ItemMap} Your server is running MC " + Reflection.getReflection().getServerVersion() + " and this version of Minecraft does not have the item LINGERING_POTION.");
 				ServerHandler.getServer().logWarn("{ItemMap} You are receiving this notice because the item(s) exists in your items.yml and will not be set, please remove the item(s) or update your server.");
 				return false;
 			} else if (ItemHandler.getItem().getMaterial(id, dataValue) == null) {
@@ -362,7 +362,7 @@ public class ItemDesigner {
 			itemMap.setMapImage(itemMap.getNodeLocation().getString(".custom-map-image"));
 			if (itemMap.getMapImage().equalsIgnoreCase("default.jpg") || new File(ItemJoin.getInstance().getDataFolder(), itemMap.getMapImage()).exists()) {
 				DataObject dataObject = SQL.getData(false).getData(new DataObject(Table.IJ_MAP_IDS, null, null, itemMap.getMapImage(), null));
-				if (dataObject != null && (itemMap.getMapID() == 0 || (itemMap.getMapID() == Integer.parseInt(dataObject.getMapID())))) {
+				if (dataObject != null && (itemMap.getMapID() == -1 || (itemMap.getMapID() == Integer.parseInt(dataObject.getMapID())))) {
 					int mapID = Integer.parseInt(dataObject.getMapID());
 					MapRenderer imgPlatform = this.createRenderer(itemMap.getMapImage(), mapID);
 					MapView view = ItemHandler.getItem().existingView(mapID);
@@ -373,7 +373,7 @@ public class ItemDesigner {
 				} else {
 					MapView view = LegacyAPI.getLegacy().createMapView();
 					try { view.removeRenderer(view.getRenderers().get(0)); } catch (NullPointerException e) { ServerHandler.getServer().sendDebugTrace(e); }
-					int mapID = (itemMap.getMapID() != 0 ? itemMap.getMapID() : LegacyAPI.getLegacy().getMapID(view));
+					int mapID = (itemMap.getMapID() != -1 ? itemMap.getMapID() : LegacyAPI.getLegacy().getMapID(view));
 					MapRenderer imgPlatform = this.createRenderer(itemMap.getMapImage(), mapID);
 					itemMap.setMapID(mapID);
 					itemMap.setMapView(view);
@@ -381,6 +381,10 @@ public class ItemDesigner {
 					SQL.getData(false).saveData(new DataObject(Table.IJ_MAP_IDS, null, null, itemMap.getMapImage(), Integer.toString(itemMap.getMapID())));
 				}
 			}
+		} else if (itemMap.getNodeLocation().getString(".map-id") != null && Utils.getUtils().isInt(itemMap.getNodeLocation().getString(".map-id")) && Utils.getUtils().containsIgnoreCase(itemMap.getMaterial().toString(), "MAP")) {
+			itemMap.setMapID(itemMap.getNodeLocation().getInt(".map-id"));
+			MapView view = ItemHandler.getItem().existingView(itemMap.getMapID());
+			itemMap.setMapView(view);
 		}
 	}
 	

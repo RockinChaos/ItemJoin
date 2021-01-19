@@ -127,7 +127,7 @@ public class ItemMap {
 	private List < String > bookPages = new ArrayList < String > ();
 	private List < List <String> > listPages = new ArrayList < List <String> > ();
 	
-	private short mapId = 0;
+	private short mapId = -1;
 	private MapView mapView = null;
 	private String customMapImage = null;
     
@@ -3477,7 +3477,7 @@ public class ItemMap {
     * 
     */
 	private void setMapImage() {
-		if (this.customMapImage != null) {
+		if (this.customMapImage != null || this.mapId != -1) {
 			if (ServerHandler.getServer().hasSpecificUpdate("1_13")) {
 				MapMeta mapmeta = (MapMeta) this.tempItem.getItemMeta();
 				try { mapmeta.setMapView(this.mapView); }
@@ -4744,6 +4744,7 @@ public class ItemMap {
 		if (this.leatherColor != null && !this.leatherColor.isEmpty()) { itemData.set("items." + this.configName + ".leather-color", this.leatherColor); }
 		else if (this.leatherHex != null && !this.leatherHex.isEmpty()) { itemData.set("items." + this.configName + ".leather-color", this.leatherHex); }
 		if (this.customMapImage != null && !this.customMapImage.isEmpty()) { itemData.set("items." + this.configName + ".custom-map-image", this.customMapImage); }
+		if (this.mapId != -1) { itemData.set("items." + this.configName + ".map-id", this.mapId); }
 		if (this.skullTexture != null && !this.skullTexture.isEmpty() && (this.dynamicTextures == null || this.dynamicTextures.isEmpty())) { itemData.set("items." + this.configName + ".skull-texture", this.skullTexture); }
 		else if (this.dynamicTextures != null && !this.dynamicTextures.isEmpty()) { 
 			for (int i = 0; i < this.dynamicTextures.size(); i++) {
