@@ -170,8 +170,13 @@ public class ItemUtilities {
 			new BukkitRunnable() {
 				@Override
 				public void run() {
-					if (fr.xephi.authme.api.v3.AuthMeApi.getInstance().isAuthenticated(player)) {
-						setItems(player, world, type, newMode, region);
+					try { 
+						if (fr.xephi.authme.api.v3.AuthMeApi.getInstance().isAuthenticated(player)) {
+							setItems(player, world, type, newMode, region);
+							this.cancel();
+						}
+					} catch (NoClassDefFoundError e) {
+						ServerHandler.getServer().logSevere("{ItemMap} You are using an outdated version of AuthMe, custom items will not be given after login.");
 						this.cancel();
 					}
 				}
@@ -394,9 +399,9 @@ public class ItemUtilities {
     */
 	public boolean isObtainable(final Player player, final ItemMap itemMap, final int session, final TriggerType type, final GameMode gamemode) {
 		if (!itemMap.hasItem(player) || itemMap.isAlwaysGive()) {
-			DataObject firstJoin = SQL.getData(false).getData(new DataObject(Table.IJ_FIRST_JOIN, player, "", itemMap.getConfigName()));
-			DataObject firstWorld = SQL.getData(false).getData(new DataObject(Table.IJ_FIRST_WORLD, player, player.getWorld().getName(), itemMap.getConfigName()));
-			DataObject ipLimit = SQL.getData(false).getData(new DataObject(Table.IJ_IP_LIMITS, player, player.getWorld().getName(), itemMap.getConfigName(), player.getAddress().getHostString()));
+			DataObject firstJoin = SQL.getData(false).getData(new DataObject(Table.IJ_FIRST_JOIN, PlayerHandler.getPlayer().getPlayerID(player), "", itemMap.getConfigName()));
+			DataObject firstWorld = SQL.getData(false).getData(new DataObject(Table.IJ_FIRST_WORLD, PlayerHandler.getPlayer().getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName()));
+			DataObject ipLimit = SQL.getData(false).getData(new DataObject(Table.IJ_IP_LIMITS, PlayerHandler.getPlayer().getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName(), player.getAddress().getHostString()));
 			if (itemMap.isLimitMode(gamemode)) {
 				if ((firstJoin == null || (itemMap.isOnlyFirstLife() && type.equals(TriggerType.RESPAWN))) && firstWorld == null 
 						&& (ipLimit == null || (ipLimit != null && ipLimit.getPlayerId().equalsIgnoreCase(PlayerHandler.getPlayer().getPlayerID(player)))) && this.canOverwrite(player, itemMap)) {
@@ -522,7 +527,7 @@ public class ItemUtilities {
 					}
 				}
 			}
-			SQL.getData(false).saveData(new DataObject(Table.IJ_RETURN_SWITCH_ITEMS, player, world, ItemHandler.getItem().serializeInventory(saveInventory)));
+			SQL.getData(false).saveData(new DataObject(Table.IJ_RETURN_SWITCH_ITEMS, PlayerHandler.getPlayer().getPlayerID(player), world, ItemHandler.getItem().serializeInventory(saveInventory)));
 		}
 	}
 	
@@ -535,7 +540,7 @@ public class ItemUtilities {
     */
 	public void pasteReturnItems(final TriggerType type, final Player player, final String world) {
 		if (type == TriggerType.WORLD_SWITCH && Utils.getUtils().splitIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Options").replace(" ", ""), "RETURN_SWITCH", ",")) {
-			DataObject dataObject = SQL.getData(false).getData(new DataObject(Table.IJ_RETURN_SWITCH_ITEMS, player, world, ""));
+			DataObject dataObject = SQL.getData(false).getData(new DataObject(Table.IJ_RETURN_SWITCH_ITEMS, PlayerHandler.getPlayer().getPlayerID(player), world, ""));
 			Inventory inventory = (dataObject != null ? ItemHandler.getItem().deserializeInventory(dataObject.getInventory64().replace(world + ".", "")) : null);
 			for (int i = 47; i >= 0; i--) {
 				if (inventory != null && inventory.getItem(i) != null && inventory.getItem(i).getType() != Material.AIR) {
@@ -546,7 +551,7 @@ public class ItemUtilities {
 						PlayerHandler.getPlayer().updateInventory(player, 1L);
 					}
 				}
-				SQL.getData(false).removeData(new DataObject(Table.IJ_RETURN_SWITCH_ITEMS, player, world, ""));
+				SQL.getData(false).removeData(new DataObject(Table.IJ_RETURN_SWITCH_ITEMS, PlayerHandler.getPlayer().getPlayerID(player), world, ""));
 			}
 		}
 	}
@@ -586,10 +591,10 @@ public class ItemUtilities {
 				ServerHandler.getServer().logDebug("{ItemMap} Given the Item: " + itemMap.getConfigName() + ".");
 			});
 		}
-		DataObject ipLimit = SQL.getData(false).getData(new DataObject(Table.IJ_IP_LIMITS, player, player.getWorld().getName(), itemMap.getConfigName(), player.getAddress().getHostString()));
-		if ((itemMap.isOnlyFirstJoin() || itemMap.isOnlyFirstLife())) { SQL.getData(false).saveData(new DataObject(Table.IJ_FIRST_JOIN, player, "", itemMap.getConfigName())); }
-		if (itemMap.isOnlyFirstWorld()) { SQL.getData(false).saveData(new DataObject(Table.IJ_FIRST_WORLD, player, player.getWorld().getName(), itemMap.getConfigName())); }
-		if (itemMap.isIpLimted() && ipLimit == null) { SQL.getData(false).saveData(new DataObject(Table.IJ_IP_LIMITS, player, player.getWorld().getName(), itemMap.getConfigName(), player.getAddress().getHostString())); }
+		DataObject ipLimit = SQL.getData(false).getData(new DataObject(Table.IJ_IP_LIMITS, PlayerHandler.getPlayer().getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName(), player.getAddress().getHostString()));
+		if ((itemMap.isOnlyFirstJoin() || itemMap.isOnlyFirstLife())) { SQL.getData(false).saveData(new DataObject(Table.IJ_FIRST_JOIN, PlayerHandler.getPlayer().getPlayerID(player), "", itemMap.getConfigName())); }
+		if (itemMap.isOnlyFirstWorld()) { SQL.getData(false).saveData(new DataObject(Table.IJ_FIRST_WORLD, PlayerHandler.getPlayer().getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName())); }
+		if (itemMap.isIpLimted() && ipLimit == null) { SQL.getData(false).saveData(new DataObject(Table.IJ_IP_LIMITS, PlayerHandler.getPlayer().getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName(), player.getAddress().getHostString())); }
 	}
 	
    /**
@@ -633,10 +638,10 @@ public class ItemUtilities {
 				ServerHandler.getServer().logDebug("{ItemMap} Given the Item: " + itemMap.getConfigName() + ".");
 			});
 		}
-		DataObject ipLimit = SQL.getData(false).getData(new DataObject(Table.IJ_IP_LIMITS, player, player.getWorld().getName(), itemMap.getConfigName(), player.getAddress().getHostString()));
-		if ((itemMap.isOnlyFirstJoin() || itemMap.isOnlyFirstLife())) { SQL.getData(false).saveData(new DataObject(Table.IJ_FIRST_JOIN, player, "", itemMap.getConfigName())); }
-		if (itemMap.isOnlyFirstWorld()) { SQL.getData(false).saveData(new DataObject(Table.IJ_FIRST_WORLD, player, player.getWorld().getName(), itemMap.getConfigName())); }
-		if (itemMap.isIpLimted() && ipLimit == null) { SQL.getData(false).saveData(new DataObject(Table.IJ_IP_LIMITS, player, player.getWorld().getName(), itemMap.getConfigName(), player.getAddress().getHostString())); }
+		DataObject ipLimit = SQL.getData(false).getData(new DataObject(Table.IJ_IP_LIMITS, PlayerHandler.getPlayer().getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName(), player.getAddress().getHostString()));
+		if ((itemMap.isOnlyFirstJoin() || itemMap.isOnlyFirstLife())) { SQL.getData(false).saveData(new DataObject(Table.IJ_FIRST_JOIN, PlayerHandler.getPlayer().getPlayerID(player), "", itemMap.getConfigName())); }
+		if (itemMap.isOnlyFirstWorld()) { SQL.getData(false).saveData(new DataObject(Table.IJ_FIRST_WORLD, PlayerHandler.getPlayer().getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName())); }
+		if (itemMap.isIpLimted() && ipLimit == null) { SQL.getData(false).saveData(new DataObject(Table.IJ_IP_LIMITS, PlayerHandler.getPlayer().getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName(), player.getAddress().getHostString())); }
 	}
 	
    /**
@@ -771,11 +776,11 @@ public class ItemUtilities {
 				if (compareWorld.equalsIgnoreCase(player.getWorld().getName()) || compareWorld.equalsIgnoreCase("ALL") || compareWorld.equalsIgnoreCase("GLOBAL")) {
 					for (String commands: ConfigHandler.getConfig(false).getFile("config.yml").getStringList("Active-Commands.commands")) {
 						String formatCommand = Utils.getUtils().translateLayout(commands, player).replace("first-join: ", "").replace("first-join:", "");
-						DataObject dataObject = SQL.getData(false).getData(new DataObject(Table.IJ_FIRST_COMMANDS, player, player.getWorld().getName(), formatCommand));
+						DataObject dataObject = SQL.getData(false).getData(new DataObject(Table.IJ_FIRST_COMMANDS, PlayerHandler.getPlayer().getPlayerID(player), player.getWorld().getName(), formatCommand));
 						if (!(dataObject != null && (Utils.getUtils().containsIgnoreCase(commands, "first-join:") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Active-Commands.triggers"), TriggerType.FIRST_JOIN.name)))) {
 							Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), formatCommand);
 							if (Utils.getUtils().containsIgnoreCase(commands, "first-join:") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Active-Commands.triggers"), TriggerType.FIRST_JOIN.name)) {
-								SQL.getData(false).saveData(new DataObject(Table.IJ_FIRST_COMMANDS, player, player.getWorld().getName(), formatCommand));
+								SQL.getData(false).saveData(new DataObject(Table.IJ_FIRST_COMMANDS, PlayerHandler.getPlayer().getPlayerID(player), player.getWorld().getName(), formatCommand));
 							}
 						}
 					}
