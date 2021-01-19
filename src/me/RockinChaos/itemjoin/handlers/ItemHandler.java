@@ -501,7 +501,7 @@ public class ItemHandler {
 				}
 			}
 			PlayerHandler.getPlayer().updateInventory(player, 1L);
-			SQL.getData(false).removeReturnCraftItems(player);
+			SQL.getData(false).removeData(dataObject);
 		} else if (!PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
 			if (ItemJoin.getInstance().isEnabled()) {
 				Bukkit.getServer().getScheduler().runTaskLater(ItemJoin.getInstance(), () -> { 
