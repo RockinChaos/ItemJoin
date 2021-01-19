@@ -422,7 +422,9 @@ public abstract class TinyProtocol {
 			channel.eventLoop().execute(new Runnable() {
 				@Override
 				public void run() {
-					channel.pipeline().remove(handlerName);
+					if (channel.pipeline().get(handlerName) != null) {
+						channel.pipeline().remove(handlerName);
+					}
 				}
 			});
 		} catch (NoClassDefFoundError | NoSuchElementException e) { }
