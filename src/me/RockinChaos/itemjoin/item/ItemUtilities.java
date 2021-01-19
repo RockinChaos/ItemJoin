@@ -945,13 +945,13 @@ public class ItemUtilities {
     * 
     */
 	public enum TriggerType {
-		FIRSTJOIN("First-Join"),
+		FIRST_JOIN("First-Join"),
 		JOIN("Join"),
 		RESPAWN("Respawn"),
-		WORLDSWITCH("World-Switch"),
-		LIMITSWITCH("Limit-Modes"),
-		REGIONENTER("Region-Enter"),
-		REGIONLEAVE("Region-Leave"),
+		WORLD_SWITCH("World-Switch"),
+		LIMIT_SWITCH("Limit-Modes"),
+		REGION_ENTER("Region-Enter"),
+		REGION_LEAVE("Region-Leave"),
 		DEFAULT("DEFAULT");
 		private final String name;
 		private TriggerType(String name) { this.name = name; }
