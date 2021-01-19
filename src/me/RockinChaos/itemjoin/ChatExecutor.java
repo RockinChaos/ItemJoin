@@ -164,6 +164,7 @@ public class ChatExecutor implements CommandExecutor {
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]---------------&a&l[&e Help Menu 10/10 &a&l]&a&l&m--------------[");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
 		} else if (Execute.RELOAD.accept(sender, args, 0)) {
+			ItemHandler.getItem().saveCooldowns();
 			SQL.getData(false).executeLaterStatements();
 			ItemUtilities.getUtilities().closeAnimations();
 			ItemUtilities.getUtilities().clearItems();
