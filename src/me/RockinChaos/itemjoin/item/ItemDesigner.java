@@ -53,7 +53,9 @@ import me.RockinChaos.itemjoin.utils.Chances;
 import me.RockinChaos.itemjoin.utils.DependAPI;
 import me.RockinChaos.itemjoin.utils.ImageRenderer;
 import me.RockinChaos.itemjoin.utils.Utils;
+import me.RockinChaos.itemjoin.utils.sqlite.DataObject;
 import me.RockinChaos.itemjoin.utils.sqlite.SQL;
+import me.RockinChaos.itemjoin.utils.sqlite.DataObject.Table;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
@@ -359,8 +361,9 @@ public class ItemDesigner {
 			if (itemMap.getNodeLocation().getString(".map-id") != null && Utils.getUtils().isInt(itemMap.getNodeLocation().getString(".map-id"))) { itemMap.setMapID(itemMap.getNodeLocation().getInt(".map-id")); }
 			itemMap.setMapImage(itemMap.getNodeLocation().getString(".custom-map-image"));
 			if (itemMap.getMapImage().equalsIgnoreCase("default.jpg") || new File(ItemJoin.getInstance().getDataFolder(), itemMap.getMapImage()).exists()) {
-				if (SQL.getData(false).imageNumberExists(itemMap.getMapImage()) && (itemMap.getMapID() == 0 || (itemMap.getMapID() == SQL.getData(false).getImageNumber(itemMap.getMapImage())))) {
-					int mapID = SQL.getData(false).getImageNumber(itemMap.getMapImage());
+				DataObject dataObject = SQL.getData(false).getData(new DataObject(Table.IJ_MAP_IDS, null, null, itemMap.getMapImage(), null));
+				if (dataObject != null && (itemMap.getMapID() == 0 || (itemMap.getMapID() == Integer.parseInt(dataObject.getMapID())))) {
+					int mapID = Integer.parseInt(dataObject.getMapID());
 					MapRenderer imgPlatform = this.createRenderer(itemMap.getMapImage(), mapID);
 					MapView view = ItemHandler.getItem().existingView(mapID);
 					itemMap.setMapID(mapID);
@@ -375,7 +378,7 @@ public class ItemDesigner {
 					itemMap.setMapID(mapID);
 					itemMap.setMapView(view);
 					try { view.addRenderer(imgPlatform); } catch (NullPointerException e) { ServerHandler.getServer().sendDebugTrace(e); }
-					SQL.getData(false).saveMapImage(itemMap);
+					SQL.getData(false).saveData(new DataObject(Table.IJ_MAP_IDS, null, null, itemMap.getMapImage(), Integer.toString(itemMap.getMapID())));
 				}
 			}
 		}

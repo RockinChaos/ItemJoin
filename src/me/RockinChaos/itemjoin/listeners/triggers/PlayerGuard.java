@@ -34,7 +34,6 @@ import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.item.ItemUtilities.TriggerType;
 import me.RockinChaos.itemjoin.utils.DependAPI;
-import me.RockinChaos.itemjoin.utils.sqlite.SQL;
 
 public class PlayerGuard implements Listener {
 	
@@ -53,7 +52,7 @@ public class PlayerGuard implements Listener {
 		if (PlayerHandler.getPlayer().isPlayer(player)) {
 			if (ItemJoin.getInstance().isEnabled()) {
 				Bukkit.getServer().getScheduler().runTaskAsynchronously(ItemJoin.getInstance(), () -> {
-					if (SQL.getData(false).isEnabled(player)) {
+					if (PlayerHandler.getPlayer().isEnabled(player)) {
 						this.handleRegions(player);
 					}
 				});
@@ -74,7 +73,7 @@ public class PlayerGuard implements Listener {
 		if (PlayerHandler.getPlayer().isPlayer(player)) {
 			if (ItemJoin.getInstance().isEnabled()) {
 				Bukkit.getServer().getScheduler().runTaskLaterAsynchronously(ItemJoin.getInstance(), () -> { 
-					if (SQL.getData(false).isEnabled(player)) {
+					if (PlayerHandler.getPlayer().isEnabled(player)) {
 						this.handleRegions(player);
 					}
 				}, (event.getFrom().getWorld() == event.getTo().getWorld() ? 0 : (ItemUtilities.getUtilities().getClearDelay() + 1)));
@@ -99,7 +98,7 @@ public class PlayerGuard implements Listener {
 				if (region != null && !region.isEmpty()) {
 					if (ItemJoin.getInstance().isEnabled()) {
 						Bukkit.getServer().getScheduler().runTask(ItemJoin.getInstance(), () -> {
-							ItemUtilities.getUtilities().setItems(player, player.getWorld(), TriggerType.REGIONLEAVE, org.bukkit.GameMode.ADVENTURE, region);
+							ItemUtilities.getUtilities().setItems(player, player.getWorld(), TriggerType.REGION_LEAVE, org.bukkit.GameMode.ADVENTURE, region);
 						});
 					}
 				}
@@ -108,7 +107,7 @@ public class PlayerGuard implements Listener {
 				if (region != null && !region.isEmpty()) {
 					if (ItemJoin.getInstance().isEnabled()) {
 						Bukkit.getServer().getScheduler().runTask(ItemJoin.getInstance(), () -> {
-							ItemUtilities.getUtilities().setItems(player, player.getWorld(), TriggerType.REGIONENTER, org.bukkit.GameMode.ADVENTURE, region);
+							ItemUtilities.getUtilities().setItems(player, player.getWorld(), TriggerType.REGION_ENTER, org.bukkit.GameMode.ADVENTURE, region);
 						});
 					}
 				}
@@ -118,7 +117,7 @@ public class PlayerGuard implements Listener {
 				if (region != null && !region.isEmpty()) {
 					if (ItemJoin.getInstance().isEnabled()) {
 					Bukkit.getServer().getScheduler().runTask(ItemJoin.getInstance(), () -> {
-						ItemUtilities.getUtilities().setItems(player, player.getWorld(), TriggerType.REGIONENTER, org.bukkit.GameMode.ADVENTURE, region);
+						ItemUtilities.getUtilities().setItems(player, player.getWorld(), TriggerType.REGION_ENTER, org.bukkit.GameMode.ADVENTURE, region);
 					});
 					}
 				}

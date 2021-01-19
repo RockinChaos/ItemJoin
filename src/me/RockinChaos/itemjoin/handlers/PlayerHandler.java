@@ -40,6 +40,9 @@ import me.RockinChaos.itemjoin.utils.DependAPI;
 import me.RockinChaos.itemjoin.utils.LanguageAPI;
 import me.RockinChaos.itemjoin.utils.LegacyAPI;
 import me.RockinChaos.itemjoin.utils.Reflection;
+import me.RockinChaos.itemjoin.utils.sqlite.DataObject;
+import me.RockinChaos.itemjoin.utils.sqlite.SQL;
+import me.RockinChaos.itemjoin.utils.sqlite.DataObject.Table;
 
 public class PlayerHandler {
 	
@@ -63,6 +66,13 @@ public class PlayerHandler {
     public void safeInventoryClose(Player player) {
     	player.openInventory(Bukkit.createInventory(player.getInventory().getHolder(), 9));
     	player.closeInventory();	
+    }
+    
+    public boolean isEnabled(Player player) {
+    	DataObject dataPlayer = SQL.getData(false).getData(new DataObject(Table.IJ_ENABLED_PLAYERS, player, player.getWorld().getName(), Boolean.toString(true)));
+    	DataObject dataGlobal = SQL.getData(false).getData(new DataObject(Table.IJ_ENABLED_PLAYERS, player, "Global", Boolean.toString(true)));
+    	DataObject dataALL = SQL.getData(false).getData(new DataObject(Table.IJ_ENABLED_PLAYERS, null, "Global", Boolean.toString(true)));
+    	return (((dataPlayer != null ? Boolean.valueOf(dataPlayer.getEnabled()) : ((dataGlobal != null ? Boolean.valueOf(dataGlobal.getEnabled()) : (dataALL != null ? Boolean.valueOf(dataALL.getEnabled()) : true))))));
     }
     
    /**

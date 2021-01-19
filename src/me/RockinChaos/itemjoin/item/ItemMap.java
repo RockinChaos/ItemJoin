@@ -83,7 +83,9 @@ import me.RockinChaos.itemjoin.utils.Reflection;
 import me.RockinChaos.itemjoin.utils.UI;
 import me.RockinChaos.itemjoin.utils.Utils;
 import me.RockinChaos.itemjoin.utils.enchants.Glow;
+import me.RockinChaos.itemjoin.utils.sqlite.DataObject;
 import me.RockinChaos.itemjoin.utils.sqlite.SQL;
+import me.RockinChaos.itemjoin.utils.sqlite.DataObject.Table;
 import me.arcaniax.hdb.api.HeadDatabaseAPI;
 
 public class ItemMap {
@@ -561,7 +563,13 @@ public class ItemMap {
     */
 	private void setPlayersOnCooldown() {
 		if (this.cooldownSeconds > 0) {
-			this.playersOnCooldown = SQL.getData(false).getCooldown(this);
+			List<DataObject> dataList = SQL.getData(false).getDataList(new DataObject(Table.IJ_ON_COOLDOWN, null, null, this.getConfigName(), String.valueOf(this.getCommandCooldown()), null));
+			for (DataObject dataObject : dataList) {
+				if (dataObject != null) {
+					this.playersOnCooldown.put(dataObject.getWorld() + "-.-" + dataObject.getPlayerId(), Long.parseLong(dataObject.getDuration()));
+					SQL.getData(false).removeData(new DataObject(Table.IJ_ON_COOLDOWN, null, null, this.getConfigName(), String.valueOf(this.getCommandCooldown()), null));
+				}
+			}
 		}
 	}
 	

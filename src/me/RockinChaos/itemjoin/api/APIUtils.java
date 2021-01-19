@@ -31,7 +31,6 @@ import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.item.ItemUtilities.TriggerType;
 import me.RockinChaos.itemjoin.utils.Chances;
 import me.RockinChaos.itemjoin.utils.Utils;
-import me.RockinChaos.itemjoin.utils.sqlite.SQL;
 
 public class APIUtils {
 	
@@ -44,7 +43,7 @@ public class APIUtils {
 		final ItemMap probable = Chances.getChances().getRandom(player);
 		final int session = Utils.getUtils().getRandom(1, 80000);
 		for (ItemMap item : ItemUtilities.getUtilities().getItems()) {
-			if (item.inWorld(player.getWorld()) && Chances.getChances().isProbability(item, probable) && SQL.getData(false).isEnabled(player)
+			if (item.inWorld(player.getWorld()) && Chances.getChances().isProbability(item, probable) && PlayerHandler.getPlayer().isEnabled(player)
 					&& item.hasPermission(player) && ItemUtilities.getUtilities().isObtainable(player, item, session, TriggerType.DEFAULT, player.getGameMode())) {
 					item.giveTo(player);
 			}

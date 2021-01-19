@@ -34,6 +34,8 @@ import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.utils.Utils;
+import me.RockinChaos.itemjoin.utils.sqlite.DataObject;
+import me.RockinChaos.itemjoin.utils.sqlite.DataObject.Table;
 import me.RockinChaos.itemjoin.utils.sqlite.SQL;
 
 public class ChatTab implements TabCompleter {
@@ -58,11 +60,14 @@ public class ChatTab implements TabCompleter {
 			if (args.length == 2) {
 				commands.addAll(Arrays.asList("map-ids","first-join","first-world","ip-limits","enabled-players","first-commands"));
 			} else {
-				for (String playerValue: (args[1].equalsIgnoreCase("map-ids") ? SQL.getData(false).getMapImages().keySet() : (args[1].equalsIgnoreCase("first-world") ? SQL.getData(false).getFirstWorlds().keySet() : 
-					(args[1].equalsIgnoreCase("first-join") ? SQL.getData(false).getFirstPlayers().keySet() : 
-					(args[1].equalsIgnoreCase("ip-limits") ? SQL.getData(false).getLimitPlayers().keySet() : (args[1].equalsIgnoreCase("enabled-players") ? SQL.getData(false).getEnabledPlayers().keySet() : 
-					(args[1].equalsIgnoreCase("first-commands") ? SQL.getData(false).getFirstCommands().keySet() : new ArrayList<String>()))))))) {
-					commands.add(playerValue.equalsIgnoreCase("ALL") ? "ALL" : (args[1].equalsIgnoreCase("map-ids") ? playerValue : PlayerHandler.getPlayer().getPlayerString(playerValue.replace(".false", "").replace(".true", "")).getName()));
+				List<DataObject> dataList = new ArrayList<DataObject>();
+				try {
+					dataList = SQL.getData(false).getDataList(new DataObject(Table.valueOf("IJ_" + args[1].toUpperCase().replace("-", "_"))));
+				} catch (Exception e) { }
+				for (DataObject dataObject: dataList) {
+					String objectString = (args[1].equalsIgnoreCase("map-ids") ? dataObject.getMapIMG() : 
+						(PlayerHandler.getPlayer().getPlayerString(dataObject.getPlayerId()) != null ? PlayerHandler.getPlayer().getPlayerString(dataObject.getPlayerId()).getName() : dataObject.getPlayerId()));
+					commands.add(objectString);
 				}
 			}
 		} else if ((args.length == 2 || args.length == 3) && (args[0].equalsIgnoreCase("disable") || args[0].equalsIgnoreCase("enable"))) {

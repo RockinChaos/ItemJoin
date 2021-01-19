@@ -38,11 +38,14 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
+import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
+import me.RockinChaos.itemjoin.utils.sqlite.DataObject;
 import me.RockinChaos.itemjoin.utils.sqlite.SQL;
+import me.RockinChaos.itemjoin.utils.sqlite.DataObject.Table;
 
 public class GuardAPI {
 	
@@ -273,7 +276,7 @@ public class GuardAPI {
 					}
 				}
 			}
-			SQL.getData(false).saveReturnRegionItems(player, region, saveInventory);
+			SQL.getData(false).saveData(new DataObject(Table.IJ_RETURN_ITEMS, player, player.getWorld().getName(), region, ItemHandler.getItem().serializeInventory(saveInventory)));
 		}
 	}
 	
@@ -285,7 +288,8 @@ public class GuardAPI {
     */
 	public void pasteReturnItems(final Player player, final String region) {
 		if (region != null && !region.isEmpty() && Utils.getUtils().splitIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Options").replace(" ", ""), "RETURN", ",")) {
-			Inventory inventory = SQL.getData(false).getReturnRegionItems(player, region);
+			DataObject dataObject = SQL.getData(false).getData(new DataObject(Table.IJ_RETURN_ITEMS, player, player.getWorld().getName(), region, ""));
+			Inventory inventory = (dataObject != null ? ItemHandler.getItem().deserializeInventory(dataObject.getInventory64().replace(region + ".", "")) : null);
 			for (int i = 47; i >= 0; i--) {
 				if (inventory != null && inventory.getItem(i) != null && inventory.getItem(i).getType() != Material.AIR) {
 					if (i <= 41) {
@@ -295,7 +299,7 @@ public class GuardAPI {
 						PlayerHandler.getPlayer().updateInventory(player, 1L);
 					}
 				}
-				SQL.getData(false).removeReturnRegionItems(player, region);
+				SQL.getData(false).removeData(dataObject);
 			}
 		}
 	}

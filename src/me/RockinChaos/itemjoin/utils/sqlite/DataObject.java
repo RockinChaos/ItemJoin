@@ -19,56 +19,26 @@ package me.RockinChaos.itemjoin.utils.sqlite;
 
 import java.sql.Timestamp;
 
+import org.bukkit.entity.Player;
+
+import me.RockinChaos.itemjoin.handlers.PlayerHandler;
+
 public class DataObject {
-	private Table table;
-	private String playerId;
-	private String playerName;
-	private String regionName;
-	private String worldName;
-	private String cooldown;
-	private String ipAddress;
-	private String duration;
-	private String command;
-	private String inventory64;
-	private String mapImage;
-	private String mapId;
-	private String item;
-	private String isEnabled;
-	private String timeStamp;
-	
-   /**
-    * Creates a new GuildObject instance
-    * 
-    * @param table - The Table being accessed.
-    * @param playerId - The Player UUID being referenced.
-    * @param playerName - The Player Name being referenced.
-    * @param worldName - The World Name being referenced.
-    * @param regionName - The Region Name being referenced.
-    * @param command - The Command String being referenced.
-    * @param duration - The Total Cooldown Duration being referenced.
-    * @param cooldown - The Time The Cooldown Initiated being referenced.
-    * @param item - The Item Node being referenced.
-    * @param ipAddress - The Player IP Address being referenced.
-    * @param isEnabled - The Player Has ItemJoin Enabled For Them being referenced.
-    * @param inventory64 - The Base64 Encoded Inventory being referenced.
-    */
-	public DataObject(Table table, String playerId, String playerName, String worldName, String regionName, String command, String duration, String cooldown, String item, String ipAddress, String isEnabled, String inventory64, String mapImage, String mapId, String timeStamp) {
-		this.table = table;
-		this.playerId = playerId;
-		this.playerName = playerName;
-		this.worldName = worldName;
-		this.regionName = regionName;
-		this.command = command;
-		this.duration = duration;
-		this.cooldown = cooldown;
-		this.item = item;
-		this.ipAddress = ipAddress;
-		this.isEnabled = isEnabled;
-		this.inventory64 = inventory64;
-		this.mapImage = mapImage;
-		this.mapId = mapId;
-		this.timeStamp = timeStamp;
-	}
+	private Table table = Table.IJ_FIRST_JOIN;
+	private Boolean isTemporary = false;
+	private String playerId = new String();
+	private String regionName = new String();
+	private String worldName = new String();
+	private String cooldown = new String();
+	private String ipAddress = new String();
+	private String duration = new String();
+	private String command = new String();
+	private String inventory64 = new String();
+	private String mapImage = new String();
+	private String mapId = new String();
+	private String item = new String();
+	private String isEnabled = new String();
+	private String timeStamp = new String();
 	
    /**
     * Gets the Player ID of the DataObject
@@ -80,167 +50,346 @@ public class DataObject {
 	}
 	
    /**
-    * Gets the Player ID of the DataObject
+    * Gets the World Name of the DataObject
     * 
-    * @return The Player ID.
-    */
-	public String getPlayerName() {
-		return this.playerName;
-	}
-	
-   /**
-    * Gets the Player ID of the DataObject
-    * 
-    * @return The Player ID.
+    * @return The World Name.
     */
 	public String getWorld() {
 		return this.worldName;
 	}
 	
    /**
-    * Gets the Player ID of the DataObject
+    * Gets the Region Name of the DataObject
     * 
-    * @return The Player ID.
+    * @return The Region Name.
     */
 	public String getRegion() {
 		return this.regionName;
 	}
 	
    /**
-    * Gets the Player ID of the DataObject
+    * Gets the IP Address of the DataObject
     * 
-    * @return The Player ID.
+    * @return The IP Address.
     */
 	public String getIPAddress() {
 		return this.ipAddress;
 	}
 	
    /**
-    * Gets the Player ID of the DataObject
+    * Gets the Map Image of the DataObject
     * 
-    * @return The Player ID.
+    * @return The Map Image.
     */
 	public String getMapIMG() {
 		return this.mapImage;
 	}
 	
    /**
-    * Gets the Player ID of the DataObject
+    * Gets the Map ID of the DataObject
     * 
-    * @return The Player ID.
+    * @return The Map ID.
     */
-	public String getMapId() {
+	public String getMapID() {
 		return this.mapId;
 	}
 	
    /**
-    * Gets the Player ID of the DataObject
+    * Gets the Cooldown of the DataObject
     * 
-    * @return The Player ID.
+    * @return The Cooldown.
     */
 	public String getCooldown() {
 		return this.cooldown;
 	}
 	
    /**
-    * Gets the Player ID of the DataObject
+    * Gets the Duration of the DataObject
     * 
-    * @return The Player ID.
+    * @return The Duration.
     */
 	public String getDuration() {
 		return this.duration;
 	}
 	
    /**
-    * Gets the Player ID of the DataObject
+    * Gets the Enabled/Disabled Boolean of the DataObject
     * 
-    * @return The Player ID.
+    * @return The Enabled/Disabled Boolean.
     */
 	public String getEnabled() {
 		return this.isEnabled;
 	}
 	
    /**
-    * Gets the Player ID of the DataObject
+    * Gets the Inventory in 64 Hash of the DataObject
     * 
-    * @return The Player ID.
+    * @return The Inventory in 64 Hash.
     */
 	public String getInventory64() {
 		return this.inventory64;
 	}
 	
    /**
-    * Gets the Player ID of the DataObject
+    * Gets the Command String of the DataObject
     * 
-    * @return The Player ID.
+    * @return The Command String.
     */
 	public String getCommand() {
 		return this.command;
 	}
 	
    /**
-    * Gets the Player ID of the DataObject
+    * Gets the Item Node of the DataObject
     * 
-    * @return The Player ID.
+    * @return The Item Node.
     */
 	public String getItem() {
 		return this.item;
 	}
 	
    /**
-    * Gets the Player ID of the DataObject
+    * Gets the Time Stamp of the DataObject
     * 
-    * @return The Player ID.
+    * @return The Time Stamp.
     */
 	public String getTimeStamp() {
 		return this.timeStamp;
 	}
+	
+   /**
+    * Sets the Time Stamp of the DataObject
+    * 
+    * @param stamp - The Time Stamp.
+    */
+	public void setTimeStamp(String stamp) {
+		this.timeStamp = stamp;
+	}
 
    /**
-    * Gets the Player ID of the DataObject
+    * Gets the Table of the DataObject
     * 
-    * @return The Player ID.
+    * @return The Table.
     */	
 	public Table getTable() {
 		return this.table;
 	}
 	
    /**
-    * Gets the Player ID of the DataObject
+    * Gets if the DataObject is only a reference.
     * 
-    * @return The Player ID.
+    * @return If the DataObject is a reference.
     */	
-	public String getHeaderValues() {
+	public boolean isTemporary() {
+		return this.isTemporary;
+	}
+	
+   /**
+    * Creates a new DataObject instance
+    * 
+    * @param table - The Table being accessed.
+    * @param isTemporary - If the DataObject is only a reference.
+    */
+	public DataObject(Table table) {
+		this.table = table;
+		this.isTemporary = true;
+	}
+	
+   /**
+    * Creates a new DataObject instance
+    * 
+    * @param table - The Table being accessed.
+    * @param player - The Player being referenced.
+    * @param worldName - The World Name being referenced.
+    * @param object - The Object being referenced.
+    */
+	public DataObject(Table table, Player player, String worldName, String object) {
+		if (player != null) {
+			this.playerId = PlayerHandler.getPlayer().getPlayerID(player);
+		} else if (table.equals(Table.IJ_ENABLED_PLAYERS)) { 
+			this.playerId = "ALL"; 
+		}
+		if (table.equals(Table.IJ_FIRST_JOIN) || table.equals(Table.IJ_FIRST_WORLD)) {
+			this.item = object;
+		} else if (table.equals(Table.IJ_RETURN_CRAFTITEMS) || table.equals(Table.IJ_RETURN_SWITCH_ITEMS)) {
+			this.inventory64 = object;
+		}else if (table.equals(Table.IJ_FIRST_COMMANDS)) {
+			this.command = object;
+		} else if (table.equals(Table.IJ_ENABLED_PLAYERS)) {
+			this.isEnabled = object;
+		}
+		this.table = table;
+		this.worldName = worldName;
+		this.timeStamp = new Timestamp(System.currentTimeMillis()).toString();
+	}
+	
+   /**
+    * Creates a new DataObject instance
+    * 
+    * @param table - The Table being accessed.
+    * @param player - The Player being referenced.
+    * @param worldName - The World Name being referenced.
+    * @param object1 - The Object being referenced.
+    * @param object2 - The Object being referenced.
+    */
+	public DataObject(Table table, Player player, String worldName, String object1, String object2) {
+		if (player != null) {
+			this.playerId = PlayerHandler.getPlayer().getPlayerID(player);
+		} else if (table.equals(Table.IJ_ENABLED_PLAYERS)) { 
+			this.playerId = "ALL"; 
+		}
+		if (table.equals(Table.IJ_MAP_IDS)) {
+			this.mapImage = object1;
+			this.mapId = object2;
+		} else if (table.equals(Table.IJ_RETURN_ITEMS)) {
+			this.regionName = object1;
+			this.inventory64 = object2;
+		} else if (table.equals(Table.IJ_IP_LIMITS)) {
+			this.item = object1;
+			this.ipAddress = object2;
+		} 
+		this.table = table;
+		this.worldName = worldName;
+		this.timeStamp = new Timestamp(System.currentTimeMillis()).toString();
+	}
+	
+   /**
+    * Creates a new DataObject instance
+    * 
+    * @param table - The Table being accessed.
+    * @param player - The Player being referenced.
+    * @param worldName - The World Name being referenced.
+    * @param object1 - The Object being referenced.
+    * @param object2 - The Object being referenced.
+    * @param object3 - The Object being referenced.
+    */
+	public DataObject(Table table, Player player, String worldName, String object1, String object2, String object3) {
+		if (player != null) {
+			this.playerId = PlayerHandler.getPlayer().getPlayerID(player);
+		} else if (table.equals(Table.IJ_ENABLED_PLAYERS)) { 
+			this.playerId = "ALL"; 
+		}
+		if (table.equals(Table.IJ_ON_COOLDOWN)) {
+			this.item = object1;
+			this.cooldown = object2;
+			this.duration = object3;
+		}
+		this.table = table;
+		this.worldName = ((worldName != null && !worldName.isEmpty()) ? worldName : "Global");
+		this.timeStamp = new Timestamp(System.currentTimeMillis()).toString();
+	}
+	
+   /**
+    * Gets the Equal Data of the DataObject
+    * 
+    * @param object1 - The DataObject being compared.
+    * @param object2 - The DataObject being compared.
+    * @return If the data is equal.
+    */	
+	public boolean equalsData(DataObject object1, DataObject object2) {
+		if (object1 == null || object2 == null) { return false; }
+		if (object1.getTable().equals(Table.IJ_FIRST_JOIN)) {
+			if (object1.getPlayerId().equalsIgnoreCase(object2.getPlayerId()) && (object1.getItem().isEmpty() || object1.getItem().equalsIgnoreCase(object2.getItem()))) {
+				return true;
+			}
+		} else if (object1.getTable().equals(Table.IJ_FIRST_WORLD)) {
+			if (object1.getPlayerId().equalsIgnoreCase(object2.getPlayerId()) 
+					&& (object1.getWorld().isEmpty() || object1.getWorld().equalsIgnoreCase(object2.getWorld())) 
+					&& (object1.getItem().isEmpty() || object1.getItem().equalsIgnoreCase(object2.getItem()))) {
+				return true;
+			}
+		} else if (object1.getTable().equals(Table.IJ_IP_LIMITS)) {
+			if ((object1.getItem().isEmpty() && object1.getPlayerId().equalsIgnoreCase(object2.getPlayerId()) 
+					|| (object1.getWorld().equalsIgnoreCase(object2.getWorld()) && object1.getItem().equalsIgnoreCase(object2.getItem()) && object1.getIPAddress().equalsIgnoreCase(object2.getIPAddress())))) {
+				return true;
+			}
+		} else if (object1.getTable().equals(Table.IJ_FIRST_COMMANDS)) {
+			if (object1.getPlayerId().equalsIgnoreCase(object2.getPlayerId()) && (object1.getWorld().isEmpty() || object1.getWorld().equalsIgnoreCase(object2.getWorld())) 
+					&& (object1.getCommand().isEmpty() || object1.getCommand().equalsIgnoreCase(object2.getCommand()))) {
+				return true;
+			}
+		} else if (object1.getTable().equals(Table.IJ_ENABLED_PLAYERS)) {
+			if ((object1.getPlayerId().equalsIgnoreCase(object2.getPlayerId()))
+					&& (object1.getWorld().isEmpty() || (object1.getWorld().equalsIgnoreCase(object2.getWorld()) || object2.getWorld().equalsIgnoreCase("Global")))) {
+				return true;
+			}
+		} else if (object1.getTable().equals(Table.IJ_RETURN_ITEMS)) {
+			if (object1.getPlayerId().equalsIgnoreCase(object2.getPlayerId()) && object1.getWorld().equalsIgnoreCase(object2.getWorld()) && object1.getRegion().equalsIgnoreCase(object2.getRegion())) {
+				return true;
+			}
+		} else if (object1.getTable().equals(Table.IJ_RETURN_SWITCH_ITEMS)) {
+			if (object1.getPlayerId().equalsIgnoreCase(object2.getPlayerId()) && object1.getWorld().equalsIgnoreCase(object2.getWorld())) {
+				return true;
+			}
+		} else if (object1.getTable().equals(Table.IJ_RETURN_CRAFTITEMS)) {
+			if (object1.getPlayerId().equalsIgnoreCase(object2.getPlayerId())) {
+				return true;
+			}
+		} else if (object1.getTable().equals(Table.IJ_ON_COOLDOWN)) {
+			if (object1.getItem().equalsIgnoreCase(object2.getItem()) && object1.getCooldown().equalsIgnoreCase(object2.getCooldown())) {
+				return true;
+			}
+		} else if (object1.getTable().equals(Table.IJ_MAP_IDS)) {
+			if (object1.getMapIMG().equalsIgnoreCase(object2.getMapIMG())) {
+				return true;
+			}
+		} 
+		return false;
+	}
+	
+   /**
+    * Gets the Removal Values of the DataObject
+    * 
+    * @return The Removal Values.
+    */	
+	public String getRemovalValues() {
+		String removal = "";
+		for (String column : table.removal().split(", ")) {
+			if (column.equalsIgnoreCase("Player_UUID")) { removal += "'" + this.getPlayerId() + "',"; }
+			else if (column.equalsIgnoreCase("World_Name")) { removal += "'" + this.getWorld() + "',"; }
+			else if (column.equalsIgnoreCase("Region_Name")) { removal += "'" + this.getRegion() + "',"; }
+			else if (column.equalsIgnoreCase("Map_IMG")) { removal += "'" + this.getMapIMG() + "',"; }
+			else if (column.equalsIgnoreCase("Item_Name")) { removal += "'" + this.getItem() + "',"; }
+		}
+		return removal.substring(0, removal.length() - 1);
+	}
+	
+   /**
+    * Gets the Insert Values of the DataObject
+    * 
+    * @return The Insert Values.
+    */	
+	public String getInsertValues() {
 		return 
-				  (this.getWorld() != null ? "'" + this.getWorld() + "'," : "")
-				+ (this.getPlayerName() != null ? "'" + this.getPlayerName() + "'," : "")
-				+ (this.getRegion() != null ? "'" + this.getRegion() + "'," : "")
-				+ (this.getPlayerId() != null ? "'" + this.getPlayerId() + "'," : "")
-				+ (this.getItem() != null ? "'" + this.getItem() + "'," : "")
-			    + (this.getIPAddress() != null ? "'" + this.getIPAddress() + "'," : "")
-			    + (this.getCooldown() != null ? "'" + this.getCooldown() + "'," : "")
-			    + (this.getDuration() != null ? "'" + this.getDuration() + "'," : "")
-			    + (this.getEnabled() != null ? "'" + this.getEnabled() + "'," : "")
-			    + (this.getInventory64() != null ? "'" + this.getInventory64() + "'," : "")
-			    + (this.getCommand() != null ? "'" + this.getCommand() + "'," : "")
-			    + (this.getMapIMG() != null ? "'" + this.getMapIMG() + "'," : "")
-			    + (this.getMapId() != null ? "'" + this.getMapId() + "'," : "")
+				  (this.getWorld() != null && !this.getWorld().isEmpty() ? "'" + this.getWorld() + "'," : "")
+				+ (this.getRegion() != null && !this.getRegion().isEmpty() ? "'" + this.getRegion() + "'," : "")
+				+ (this.getPlayerId() != null && !this.getPlayerId().isEmpty() ? "'" + this.getPlayerId() + "'," : "")
+				+ (this.getItem() != null && !this.getItem().isEmpty() ? "'" + this.getItem() + "'," : "")
+			    + (this.getIPAddress() != null && !this.getIPAddress().isEmpty() ? "'" + this.getIPAddress() + "'," : "")
+			    + (this.getCooldown() != null && !this.getCooldown().isEmpty() ? "'" + this.getCooldown() + "'," : "")
+			    + (this.getDuration() != null && !this.getDuration().isEmpty() ? "'" + this.getDuration() + "'," : "")
+			    + (this.getEnabled() != null && !this.getEnabled().isEmpty() ? "'" + this.getEnabled() + "'," : "")
+			    + (this.getInventory64() != null && !this.getInventory64().isEmpty() ? "'" + this.getInventory64() + "'," : "")
+			    + (this.getCommand() != null && !this.getCommand().isEmpty() ? "'" + this.getCommand() + "'," : "")
+			    + (this.getMapIMG() != null && !this.getMapIMG().isEmpty() ? "'" + this.getMapIMG() + "'," : "")
+			    + (this.getMapID() != null && !this.getMapID().isEmpty() ? "'" + this.getMapID() + "'," : "")
 			    + "'" + new Timestamp(System.currentTimeMillis()) + "'";
 	}
 	
    /**
 	* Defines the existing tables.
 	* 
-	*/
+	*/ 
     public enum Table {
-       IJ_FIRST_JOIN("`World_Name`, `Player_Name`, `Player_UUID`, `Item_Name`, `Time_Stamp`", "Player_UUID"), 
-       IJ_FIRST_WORLD("`World_Name`, `Player_Name`, `Player_UUID`, `Item_Name`, `Time_Stamp`", "Player_UUID"), 
+       IJ_FIRST_JOIN("`Player_UUID`, `Item_Name`, `Time_Stamp`", "Player_UUID"), 
+       IJ_FIRST_WORLD("`World_Name`, `Player_UUID`, `Item_Name`, `Time_Stamp`", "Player_UUID"), 
        IJ_IP_LIMITS("`World_Name`, `Player_UUID`, `Item_Name`, `IP_Address`, `Time_Stamp`", "Player_UUID"), 
        IJ_FIRST_COMMANDS("`World_Name`, `Player_UUID`, `Command_String`, `Time_Stamp`", "Player_UUID"), 
-       IJ_ENABLED_PLAYERS("`World_Name`, `Player_Name`, `Player_UUID`, `isEnabled`, `Time_Stamp`", "Player_UUID"), 
+       IJ_ENABLED_PLAYERS("`World_Name`, `Player_UUID`, `isEnabled`, `Time_Stamp`", "Player_UUID, World_Name"), 
        IJ_RETURN_ITEMS("`World_Name`, `Region_Name`, `Player_UUID`, `Inventory64`, `Time_Stamp`", "Player_UUID, World_Name, Region_Name"), 
+       IJ_RETURN_SWITCH_ITEMS("`World_Name`, `Player_UUID`, `Inventory64`, `Time_Stamp`", "Player_UUID, World_Name"), 
        IJ_RETURN_CRAFTITEMS("`Player_UUID`, `Inventory64`, `Time_Stamp`", "Player_UUID"), 
-       IJ_ON_COOLDOWN("`World_Name`, `Player_UUID`, `Item_Name`, `Cooldown`, `Duration`, `Time_Stamp`", ""), 
+       IJ_ON_COOLDOWN("`World_Name`, `Player_UUID`, `Item_Name`, `Cooldown`, `Duration`, `Time_Stamp`", "Item_Name"), 
        IJ_MAP_IDS("`Map_IMG`, `Map_ID`, `Time_Stamp`", "Map_IMG");
     	
     	private String header;
