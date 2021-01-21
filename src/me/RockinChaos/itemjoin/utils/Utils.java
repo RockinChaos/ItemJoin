@@ -52,10 +52,32 @@ public class Utils {
     private static Utils util;
 	
    /**
+    * Checks if the condition is met.
+    * 
+    * @param condition - The condition to be compared against the value.
+    * @param operand - The operation to be performed when comparing the condition to the value.
+    * @param value - The value being compared against the condition.
+    * @return If the condition has operand against value.
+    */
+	public boolean conditionMet(final String condition, final String operand, final String value) {
+		if (operand == null) { return false; }
+		if (operand.equalsIgnoreCase("EQUAL") && ((condition != null && value != null && condition.equalsIgnoreCase(value)) || (condition == null && value == null))) {
+			return true;
+		} else if (operand.equalsIgnoreCase("NOTEQUAL") && ((condition != null && value != null && !condition.equalsIgnoreCase(value)) || ((condition == null && value != null) || (condition != null && value == null)))) {
+			return true;
+		} else if (operand.equalsIgnoreCase("OVER") && condition != null && value != null && this.isInt(condition) && this.isInt(value) && Integer.parseInt(condition) > Integer.parseInt(value)) {
+			return true;
+		} else if (operand.equalsIgnoreCase("UNDER") && condition != null && value != null && this.isInt(condition) && this.isInt(value) && Integer.parseInt(condition) < Integer.parseInt(value)) {
+			return true;
+		}
+		return false;
+	}
+    
+   /**
     * Checks if string1 contains string2.
     * 
     * @param string1 - The String to be checked if it contains string2.
-    * @param string2- The String that should be inside string1.
+    * @param string2 - The String that should be inside string1.
     * @return If string1 contains string2.
     */
 	public boolean containsIgnoreCase(final String string1, final String string2) {
@@ -69,7 +91,7 @@ public class Utils {
     * Checks if string1 contains string2.
     * 
     * @param string1 - The String to be checked if it contains string2.
-    * @param string2- The String that should be inside string1.
+    * @param string2 - The String that should be inside string1.
     * @param argument - The argument to be split between the string.
     * @return If string1 contains string2.
     */

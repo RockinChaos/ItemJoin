@@ -3833,6 +3833,34 @@ public class ItemMap {
 	}
 	
    /**
+    * Checks if the condition is met for the ItemMap.
+    * 
+    * @param itemMap - The ItemMap being checked.
+    * @param conditions - The condition list to be fetched.
+    * @return If the condition was successfully met.
+    */
+	public boolean conditionMet(final Player player, final String conditions) {
+		if (this.getNodeLocation().getString(conditions) != null) {
+			List < String > conditionList = (!this.getNodeLocation().getStringList(conditions).isEmpty() ? this.getNodeLocation().getStringList(conditions) : new ArrayList < String > ());
+			if (conditionList.isEmpty() && !this.getNodeLocation().getString(conditions).isEmpty()) { conditionList.add(this.getNodeLocation().getString(conditions)); }
+			for (String condition : conditionList) {
+				String[] parts = (condition != null ? condition.split(":") : null);
+				if (parts != null && parts.length == 3 && Utils.getUtils().conditionMet(parts[0], parts[1], parts[2])) {
+					return true;
+				} else if (!(parts != null && parts.length == 3)) {
+					ServerHandler.getServer().logSevere("{ItemMap} The item " + this.getConfigName() + " has a " + conditions + " defined incorrectly!");
+					ServerHandler.getServer().logWarn("{ItemMap} The condition " + condition + " is not the proper format CONDITION:OPERAND:VALUE, the item may not function properly.");
+				}
+			}
+		} else { return true; }
+		if (this.getNodeLocation().getString(conditions.replace("condition", "fail-message")) != null && !this.getNodeLocation().getString(conditions.replace("condition", "fail-message")).isEmpty()) {
+			player.sendMessage(Utils.getUtils().translateLayout(this.getNodeLocation().getString(conditions.replace("condition", "fail-message")), player));
+		}
+		ServerHandler.getServer().logDebug("{ItemMap} " + player.getName() + " has not met any of the " + conditions + "(s), for the Item: " + this.getConfigName() + "."); 
+		return false;
+	}
+	
+   /**
     * Removes the ItemMap from the Player.
     * 
     * @param player - The Player to have the item removed.
@@ -4005,7 +4033,7 @@ public class ItemMap {
 							else { itemMap.withdrawItemCost(player); }
 				    		itemMap.playSound(player);
 				    		itemMap.playParticle(player);
-							itemMap.removeDisposable(player, itemMap, itemCopy, false);
+				    		itemMap.removeDisposable(player, itemMap, itemCopy, false);
 							itemMap.addPlayerOnCooldown(player);
 						}
 					} else {
@@ -4327,7 +4355,8 @@ public class ItemMap {
     * @param allItems - If the item should not have its amount changed.
     */
 	public void removeDisposable(final Player player, final ItemMap itemMap, final ItemStack itemCopy, final boolean allItems) {
-		if (this.disposable || allItems) {
+		if (this.disposable && this.conditionMet(player, "disposable-condition") || allItems) {
+			
 			if (!allItems) { this.setSubjectRemoval(true); }
 			if (ItemJoin.getInstance().isEnabled()) {
 				Bukkit.getServer().getScheduler().runTaskLater(ItemJoin.getInstance(), () -> {

@@ -45,6 +45,7 @@ public class ItemCommand {
 	private ItemStack itemCopy;
 	private Executor executorType;
 	private Action actionType;
+	private ItemMap itemMap;
 	private List < Player > setStop = new ArrayList < Player > ();
 	private List < Player > setCounting = new ArrayList < Player > ();
 	
@@ -58,10 +59,11 @@ public class ItemCommand {
 	* @param commandType - the interaction type of the command.
 	* @param listSection - the section identifier of the command, used in random lists.
 	*/
-	private ItemCommand(final String command, final Action action, final Executor executorType, final long delay, final String listSection) {
+	private ItemCommand(final String command, final Action action, final Executor executorType, final ItemMap itemMap, final long delay, final String listSection) {
 		this.command = command;
-		this.executorType = executorType;
 		this.actionType = action;
+		this.executorType = executorType;
+		this.itemMap = itemMap;
 		this.delay = delay;
 		this.listSection = listSection;
 	}
@@ -147,7 +149,7 @@ public class ItemCommand {
 	* @return If the player is able to execute the command.
 	*/
 	public boolean canExecute(final Player player, final String action, final String clickType) {
-		if (this.command == null || this.command.length() == 0 || !this.actionType.hasClickType(clickType) || !this.actionType.hasAction(action)) { return false; }
+		if (this.command == null || this.command.length() == 0 || !this.actionType.hasClickType(clickType) || !this.actionType.hasAction(action) || !this.itemMap.conditionMet(player, this.actionType.config.replace(".", "") + "-condition")) { return false; }
 		return true;
 	}
 	
@@ -488,8 +490,8 @@ public class ItemCommand {
 	* @param listSection - the listed section identifier.
 	* @return The new ItemCommand instance.
 	*/
-	public static ItemCommand fromString(String input, final Action action, final long delay, final String listSection) {
-		if (input == null || input.length() == 0) { return new ItemCommand("", Action.DEFAULT, Executor.DEFAULT, 0L, null); }
+	public static ItemCommand fromString(String input, final Action action, final ItemMap itemMap, final long delay, final String listSection) {
+		if (input == null || input.length() == 0) { return new ItemCommand("", Action.DEFAULT, Executor.DEFAULT, null, 0L, null); }
 		input = input.trim();
 		Executor type = Executor.DEFAULT;
 			
@@ -505,7 +507,7 @@ public class ItemCommand {
 			
 		input = input.trim();
 		input = Utils.getUtils().colorFormat(input);
-		return new ItemCommand(input, action, type, delay, listSection);
+		return new ItemCommand(input, action, type, itemMap, delay, listSection);
 	}
 	
    /**
@@ -518,7 +520,7 @@ public class ItemCommand {
 	public static ItemCommand[] arrayFromString(final ItemMap itemMap, final boolean isList) {
 		if (ConfigHandler.getConfig(false).getCommandsSection(itemMap.getNodeLocation()) == null) {
 			return new ItemCommand[] {
-				new ItemCommand("", Action.DEFAULT, Executor.DEFAULT, 0L, null)
+				new ItemCommand("", Action.DEFAULT, Executor.DEFAULT, null, 0L, null)
 			};
 		}
 		return fromConfig(itemMap, isList);
@@ -565,7 +567,7 @@ public class ItemCommand {
 		final List < ItemCommand > arrayCommands = new ArrayList < ItemCommand > ();
 		for (int i = 0; i < commandsList.size(); i++) {
 			if (commandsList.get(i).trim().startsWith("delay:")) { delay = delay + ItemHandler.getItem().getDelay(commandsList.get(i).trim()); }
-			arrayCommands.add(fromString(commandsList.get(i).trim(), getExactAction(itemMap, definition), delay, internalCommands));
+			arrayCommands.add(fromString(commandsList.get(i).trim(), getExactAction(itemMap, definition), itemMap, delay, internalCommands));
 		}
 		return arrayCommands;	
 	}
