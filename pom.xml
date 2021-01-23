@@ -78,39 +78,10 @@
 				</configuration>
 				<executions>
 					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>shade</goal>
-						</goals>
-						<configuration>
-							<artifactSet>
-								<includes>
-									<include>com.zaxxer.hikari:HikariCP:jar:</include>
-									<include>tv.mineinthebox.simpleserver:SimpleHttpServer:jar:</include>
-								</includes>
-							</artifactSet>
-							<relocations>
-								<relocation>
-									<pattern>tv.mineinthebox.simpleserver</pattern>
-									<shadedPattern>tv.mineinthebox.simpleserver</shadedPattern>
-								</relocation>
-								<relocation>
-									<pattern>com.zaxxer.hikari</pattern>
-									<shadedPattern>com.zaxxer.hikari</shadedPattern>
-								</relocation>
-							</relocations>
-							<filters>
-								<filter>
-									<artifact>*</artifact>
-									<excludes>
-										<exclude>META-INF/*.SF</exclude>
-										<exclude>META-INF/*.RSA</exclude>
-										<exclude>META-INF/*.INF</exclude>
-										<exclude>META-INF/*.MF</exclude>
-									</excludes>
-								</filter>
-							</filters>
-						</configuration>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
 					</execution>
 				</executions>
 			</plugin>
