@@ -303,9 +303,12 @@
 		</repository>
 	</distributionManagement>
 	<properties>
-		<maven.compiler.source>1.8</maven.compiler.source>
-		<maven.compiler.target>1.8</maven.compiler.target>
-		<github.global.server>github</github.global.server>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <libs.dir>${project.basedir}${file.separator}libs</libs.dir>
+        <package.dir>${project.build.directory}</package.dir>
+        <package.name>${project.build.finalName}</package.name>
 	</properties>
 </project>
