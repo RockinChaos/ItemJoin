@@ -1,6 +1,5 @@
 package me.RockinChaos.itemjoin.listeners;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
@@ -11,12 +10,12 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.inventory.ItemStack;
 
-import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
+import me.RockinChaos.itemjoin.utils.SchedulerUtils;
 
 public class Interact implements Listener {
 
@@ -67,15 +66,13 @@ public class Interact implements Listener {
 		final int newSlot = event.getNewSlot();
 		final int oldSlot = event.getPreviousSlot();
 		if (!ItemUtilities.getUtilities().isAllowed(player, item, "selectable")) {
-			if (ItemJoin.getInstance().isEnabled()) {
-				Bukkit.getServer().getScheduler().runTaskLater(ItemJoin.getInstance(), () -> {
-					if (PlayerHandler.getPlayer().getMainHandItem(player).equals(item)) {
-						if (!this.setSelectSlot(player, newSlot, (newSlot > oldSlot))) {
-							this.setSelectSlot(player, newSlot, !(newSlot > oldSlot));
-						}
+			SchedulerUtils.getScheduler().runLater(10L, () -> {
+				if (PlayerHandler.getPlayer().getMainHandItem(player).equals(item)) {
+					if (!this.setSelectSlot(player, newSlot, (newSlot > oldSlot))) {
+						this.setSelectSlot(player, newSlot, !(newSlot > oldSlot));
 					}
-				}, 10L);
-			}
+				}
+			});
 		}
 	}
 	

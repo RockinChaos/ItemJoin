@@ -49,6 +49,7 @@ import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.utils.LegacyAPI;
 import me.RockinChaos.itemjoin.utils.Reflection;
+import me.RockinChaos.itemjoin.utils.SchedulerUtils;
 import me.RockinChaos.itemjoin.utils.Chances;
 import me.RockinChaos.itemjoin.utils.DependAPI;
 import me.RockinChaos.itemjoin.utils.ImageRenderer;
@@ -361,7 +362,7 @@ public class ItemDesigner {
 			if (itemMap.getNodeLocation().getString(".map-id") != null && Utils.getUtils().isInt(itemMap.getNodeLocation().getString(".map-id"))) { itemMap.setMapID(itemMap.getNodeLocation().getInt(".map-id")); }
 			itemMap.setMapImage(itemMap.getNodeLocation().getString(".custom-map-image"));
 			if (itemMap.getMapImage().equalsIgnoreCase("default.jpg") || new File(ItemJoin.getInstance().getDataFolder(), itemMap.getMapImage()).exists()) {
-				DataObject dataObject = SQL.getData(false).getData(new DataObject(Table.IJ_MAP_IDS, null, null, itemMap.getMapImage(), null));
+				DataObject dataObject = SQL.getData().getData(new DataObject(Table.IJ_MAP_IDS, null, null, itemMap.getMapImage(), null));
 				if (dataObject != null && (itemMap.getMapID() == -1 || (itemMap.getMapID() == Integer.parseInt(dataObject.getMapID())))) {
 					int mapID = Integer.parseInt(dataObject.getMapID());
 					MapRenderer imgPlatform = this.createRenderer(itemMap.getMapImage(), mapID);
@@ -378,7 +379,7 @@ public class ItemDesigner {
 					itemMap.setMapID(mapID);
 					itemMap.setMapView(view);
 					try { view.addRenderer(imgPlatform); } catch (NullPointerException e) { ServerHandler.getServer().sendDebugTrace(e); }
-					SQL.getData(false).saveData(new DataObject(Table.IJ_MAP_IDS, null, null, itemMap.getMapImage(), Integer.toString(itemMap.getMapID())));
+					SQL.getData().saveData(new DataObject(Table.IJ_MAP_IDS, null, null, itemMap.getMapImage(), Integer.toString(itemMap.getMapID())));
 				}
 			}
 		} else if (itemMap.getNodeLocation().getString(".map-id") != null && Utils.getUtils().isInt(itemMap.getNodeLocation().getString(".map-id")) && Utils.getUtils().containsIgnoreCase(itemMap.getMaterial().toString(), "MAP")) {
@@ -772,11 +773,7 @@ public class ItemDesigner {
 						ingredientList.put(character, material);
 					} else { ServerHandler.getServer().logWarn("{ItemMap} The material " + ingredientParts[1] + " for the custom recipe defined for the item " + itemMap.getConfigName() + " is not a proper material type!"); }
 				}
-				if (ItemJoin.getInstance().isEnabled()) {
-					Bukkit.getServer().getScheduler().runTask(ItemJoin.getInstance(), () -> {
-						Bukkit.getServer().addRecipe(shapedRecipe); 
-					});
-				}
+				SchedulerUtils.getScheduler().run(() -> Bukkit.getServer().addRecipe(shapedRecipe));
 				itemMap.setIngredients(ingredientList);
 			} else { ServerHandler.getServer().logWarn("{ItemMap} There is a custom recipe defined for the item " + itemMap.getConfigName() + " but it still needs ingredients defined!"); }
 		}

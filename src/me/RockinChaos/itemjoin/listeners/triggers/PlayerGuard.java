@@ -22,18 +22,17 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
-import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.item.ItemUtilities.TriggerType;
 import me.RockinChaos.itemjoin.utils.DependAPI;
+import me.RockinChaos.itemjoin.utils.SchedulerUtils;
 
 public class PlayerGuard implements Listener {
 	
@@ -50,13 +49,11 @@ public class PlayerGuard implements Listener {
 	private void setRegionItems(PlayerMoveEvent event) {
 		final Player player = event.getPlayer();
 		if (PlayerHandler.getPlayer().isPlayer(player)) {
-			if (ItemJoin.getInstance().isEnabled()) {
-				Bukkit.getServer().getScheduler().runTaskAsynchronously(ItemJoin.getInstance(), () -> {
-					if (PlayerHandler.getPlayer().isEnabled(player)) {
-						this.handleRegions(player);
-					}
-				});
-			}
+			SchedulerUtils.getScheduler().runAsync(() -> {
+				if (PlayerHandler.getPlayer().isEnabled(player)) {
+					this.handleRegions(player);
+				}
+			});
 		}
 	}
 	
@@ -71,13 +68,11 @@ public class PlayerGuard implements Listener {
 	private void setRegionItems(PlayerTeleportEvent event) {
 		final Player player = event.getPlayer();
 		if (PlayerHandler.getPlayer().isPlayer(player)) {
-			if (ItemJoin.getInstance().isEnabled()) {
-				Bukkit.getServer().getScheduler().runTaskLaterAsynchronously(ItemJoin.getInstance(), () -> { 
-					if (PlayerHandler.getPlayer().isEnabled(player)) {
-						this.handleRegions(player);
-					}
-				}, (event.getFrom().getWorld() == event.getTo().getWorld() ? 0 : (ItemUtilities.getUtilities().getClearDelay() + 1)));
-			}
+			SchedulerUtils.getScheduler().runAsyncLater((event.getFrom().getWorld() == event.getTo().getWorld() ? 0 : (ItemUtilities.getUtilities().getClearDelay() + 1)), () -> {
+				if (PlayerHandler.getPlayer().isEnabled(player)) {
+					this.handleRegions(player);
+				}
+			});
 		}
 	}
 	
@@ -96,30 +91,18 @@ public class PlayerGuard implements Listener {
 			playerSet.removeAll(Arrays.asList(regions.replace(" ", "").split(",")));
 			for (String region: playerSet) {
 				if (region != null && !region.isEmpty()) {
-					if (ItemJoin.getInstance().isEnabled()) {
-						Bukkit.getServer().getScheduler().runTask(ItemJoin.getInstance(), () -> {
-							ItemUtilities.getUtilities().setItems(player, player.getWorld(), TriggerType.REGION_LEAVE, org.bukkit.GameMode.ADVENTURE, region);
-						});
-					}
+					SchedulerUtils.getScheduler().run(() -> ItemUtilities.getUtilities().setItems(player, player.getWorld(), TriggerType.REGION_LEAVE, org.bukkit.GameMode.ADVENTURE, region));
 				}
 			}
 			for (String region: regionSet) {
 				if (region != null && !region.isEmpty()) {
-					if (ItemJoin.getInstance().isEnabled()) {
-						Bukkit.getServer().getScheduler().runTask(ItemJoin.getInstance(), () -> {
-							ItemUtilities.getUtilities().setItems(player, player.getWorld(), TriggerType.REGION_ENTER, org.bukkit.GameMode.ADVENTURE, region);
-						});
-					}
+					SchedulerUtils.getScheduler().run(() -> ItemUtilities.getUtilities().setItems(player, player.getWorld(), TriggerType.REGION_ENTER, org.bukkit.GameMode.ADVENTURE, region));
 				}
 			}
 		} else {
 			for (String region: Arrays.asList(regions.replace(" ", "").split(","))) {
 				if (region != null && !region.isEmpty()) {
-					if (ItemJoin.getInstance().isEnabled()) {
-					Bukkit.getServer().getScheduler().runTask(ItemJoin.getInstance(), () -> {
-						ItemUtilities.getUtilities().setItems(player, player.getWorld(), TriggerType.REGION_ENTER, org.bukkit.GameMode.ADVENTURE, region);
-					});
-					}
+					SchedulerUtils.getScheduler().run(() -> ItemUtilities.getUtilities().setItems(player, player.getWorld(), TriggerType.REGION_ENTER, org.bukkit.GameMode.ADVENTURE, region));
 				}
 			}
 		}

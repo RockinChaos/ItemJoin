@@ -27,6 +27,7 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
 import me.RockinChaos.itemjoin.ItemJoin;
+import me.RockinChaos.itemjoin.utils.SchedulerUtils;
 import me.RockinChaos.itemjoin.utils.Utils;
 
 public class ServerHandler {
@@ -152,13 +153,11 @@ public class ServerHandler {
     */
 	public void sendErrorStatements(Player player) {
 		if (player != null && player.isOp()) {
-			if (ItemJoin.getInstance().isEnabled()) {
-				Bukkit.getServer().getScheduler().runTaskLater(ItemJoin.getInstance(), () -> {
-					for (String statement: this.errorStatements) {
-						player.sendMessage(Utils.getUtils().translateLayout("&7[&eItemJoin&7] &c" + statement, player));
-					}
-				}, 60L);
-			}
+			SchedulerUtils.getScheduler().runLater(60L, () -> {
+				for (String statement: this.errorStatements) {
+					player.sendMessage(Utils.getUtils().translateLayout("&7[&eItemJoin&7] &c" + statement, player));
+				}
+			});
 		} else {
 			for (String statement: this.errorStatements) {
 				PlayerHandler.getPlayer().forOnlinePlayers(player_2 -> {

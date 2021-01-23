@@ -34,12 +34,12 @@ import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import de.domedd.betternick.BetterNick;
-import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.utils.DependAPI;
 import me.RockinChaos.itemjoin.utils.LanguageAPI;
 import me.RockinChaos.itemjoin.utils.LegacyAPI;
 import me.RockinChaos.itemjoin.utils.Reflection;
+import me.RockinChaos.itemjoin.utils.SchedulerUtils;
 import me.RockinChaos.itemjoin.utils.sqlite.DataObject;
 import me.RockinChaos.itemjoin.utils.sqlite.SQL;
 import me.RockinChaos.itemjoin.utils.sqlite.DataObject.Table;
@@ -69,9 +69,9 @@ public class PlayerHandler {
     }
     
     public boolean isEnabled(Player player) {
-    	DataObject dataPlayer = SQL.getData(false).getData(new DataObject(Table.IJ_ENABLED_PLAYERS, PlayerHandler.getPlayer().getPlayerID(player), player.getWorld().getName(), Boolean.toString(true)));
-    	DataObject dataGlobal = SQL.getData(false).getData(new DataObject(Table.IJ_ENABLED_PLAYERS, PlayerHandler.getPlayer().getPlayerID(player), "Global", Boolean.toString(true)));
-    	DataObject dataALL = SQL.getData(false).getData(new DataObject(Table.IJ_ENABLED_PLAYERS, null, "Global", Boolean.toString(true)));
+    	DataObject dataPlayer = SQL.getData().getData(new DataObject(Table.IJ_ENABLED_PLAYERS, PlayerHandler.getPlayer().getPlayerID(player), player.getWorld().getName(), Boolean.toString(true)));
+    	DataObject dataGlobal = SQL.getData().getData(new DataObject(Table.IJ_ENABLED_PLAYERS, PlayerHandler.getPlayer().getPlayerID(player), "Global", Boolean.toString(true)));
+    	DataObject dataALL = SQL.getData().getData(new DataObject(Table.IJ_ENABLED_PLAYERS, null, "Global", Boolean.toString(true)));
     	return (((dataPlayer != null ? Boolean.valueOf(dataPlayer.getEnabled()) : ((dataGlobal != null ? Boolean.valueOf(dataGlobal.getEnabled()) : (dataALL != null ? Boolean.valueOf(dataALL.getEnabled()) : true))))));
     }
     
@@ -285,12 +285,10 @@ public class PlayerHandler {
     * @param player - The player to have their levels set.
     */
 	public void updateExperienceLevels(final Player player) {
-		if (ItemJoin.getInstance().isEnabled()) {
-			Bukkit.getServer().getScheduler().runTaskLater(ItemJoin.getInstance(), () -> {
-	            player.setExp(player.getExp());
-	            player.setLevel(player.getLevel());
-	        }, 1L);
-		}
+		SchedulerUtils.getScheduler().runLater(1L, () -> {
+			player.setExp(player.getExp());
+			player.setLevel(player.getLevel());
+		});
 	}
 	
    /**
@@ -311,34 +309,32 @@ public class PlayerHandler {
     * @param delay - The ticks to wait before updating the inventory.
     */
 	public void updateInventory(final Player player, ItemMap itemMap, final long delay) {
-		if (ItemJoin.getInstance().isEnabled()) {
-			Bukkit.getServer().getScheduler().runTaskLaterAsynchronously(ItemJoin.getInstance(), () -> { 
-				try {
-					for (int i = 0; i < 36; i++) { 
-					    if (itemMap == null || itemMap.isReal(player.getInventory().getItem(i))) { 
-					    	Reflection.getReflection().sendPacketPlayOutSetSlot(player, player.getInventory().getItem(i), (i < 9 ? (i + 36) : i)); 
-					   	}
+		SchedulerUtils.getScheduler().runAsyncLater(delay, () -> {
+			try {
+				for (int i = 0; i < 36; i++) {
+					if (itemMap == null || itemMap.isReal(player.getInventory().getItem(i))) { 
+					    Reflection.getReflection().sendPacketPlayOutSetSlot(player, player.getInventory().getItem(i), (i < 9 ? (i + 36) : i)); 
 					}
-					if (ServerHandler.getServer().hasSpecificUpdate("1_9")) { 
-						if (itemMap == null || itemMap.isReal(getOffHandItem(player))) { 
-							Reflection.getReflection().sendPacketPlayOutSetSlot(player, getOffHandItem(player), 45); 
-						} 
-					}
-					if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
-						for (int i = 4; i >= 0; i--) { 
-							if (itemMap == null || itemMap.isReal(player.getInventory().getItem(i)) || itemMap.isCraftingItem()) { 
-								Reflection.getReflection().sendPacketPlayOutSetSlot(player, player.getOpenInventory().getTopInventory().getItem(i), i); 
-							}
-						}
-						for (int i = 0; i <= 3; i++) { 
-							if (itemMap == null || itemMap.isReal(player.getInventory().getItem(i))) { 
-								Reflection.getReflection().sendPacketPlayOutSetSlot(player, player.getInventory().getItem(i + 36), (8 - i)); 
-							}
+				}
+				if (ServerHandler.getServer().hasSpecificUpdate("1_9")) { 
+					if (itemMap == null || itemMap.isReal(getOffHandItem(player))) { 
+						Reflection.getReflection().sendPacketPlayOutSetSlot(player, getOffHandItem(player), 45); 
+					} 
+				}
+				if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
+					for (int i = 4; i >= 0; i--) { 
+						if (itemMap == null || itemMap.isReal(player.getInventory().getItem(i)) || itemMap.isCraftingItem()) { 
+							Reflection.getReflection().sendPacketPlayOutSetSlot(player, player.getOpenInventory().getTopInventory().getItem(i), i); 
 						}
 					}
-				} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
-			}, delay);
-		}
+					for (int i = 0; i <= 3; i++) { 
+						if (itemMap == null || itemMap.isReal(player.getInventory().getItem(i))) { 
+							Reflection.getReflection().sendPacketPlayOutSetSlot(player, player.getInventory().getItem(i + 36), (8 - i)); 
+						}
+					}
+				}
+			} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
+		});
 	}
 	
    /**

@@ -17,7 +17,6 @@
  */
 package me.RockinChaos.itemjoin.utils;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.FireworkEffect;
@@ -27,7 +26,6 @@ import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.meta.FireworkMeta;
 
-import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 
 public class EffectAPI {
@@ -81,12 +79,9 @@ public class EffectAPI {
         meta.addEffect(effect);
         meta.setPower(1);
         fw.setFireworkMeta(meta);
-		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
-			@Override
-			public void run() {
-				fw.detonate();
-			}
-		}, (detonationDelay * 20));
+        SchedulerUtils.getScheduler().runLater((detonationDelay * 20), () -> { 
+        	fw.detonate();
+        });
 	}
 	
    /**

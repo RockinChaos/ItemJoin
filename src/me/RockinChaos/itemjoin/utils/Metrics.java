@@ -144,12 +144,9 @@ public class Metrics {
                     timer.cancel();
                     return;
                 }
-                Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
-                    @Override
-					public void run() {
-                    	submitData();
-                    }
-                }, 1L);
+                SchedulerUtils.getScheduler().runLater(1L, () -> { 
+                	submitData();
+                });
             }
         }, 1000 * 60 * 5, 1000 * 60 * 30);
     }

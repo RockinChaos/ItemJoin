@@ -290,6 +290,13 @@
 			<version>29.0-jre</version>
 			<scope>provided</scope>
 		</dependency>
+		<!--Hikari API-->
+	    <dependency>
+	      <groupId>com.zaxxer</groupId>
+	      <artifactId>HikariCP</artifactId>
+	      <version>LATEST</version>
+	      <scope>compile</scope>
+	    </dependency>
 		<!--BetterNick API-->
 		<dependency>
 			<groupId>de.domedd.betternick</groupId>

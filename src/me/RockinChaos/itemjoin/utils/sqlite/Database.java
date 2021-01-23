@@ -29,16 +29,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bukkit.Bukkit;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import org.bukkit.configuration.file.FileConfiguration;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
+import me.RockinChaos.itemjoin.utils.SchedulerUtils;
 import me.RockinChaos.itemjoin.utils.Utils;
 
 public class Database extends Controller {
 	
-	private String progress = "Connection Progress: #";
 	private static Database data;
 	
    /**
@@ -47,14 +48,24 @@ public class Database extends Controller {
 	* @param databaseName - The name of the database.
 	* @param createStatement - the statement to be run.
 	*/
-	public Database(String databaseName) {
-		FileConfiguration config = ConfigHandler.getConfig(false).getFile("config.yml");
-		this.dataFolder = databaseName;
-		this.host = config.getString("Database.host");
-		this.port = config.getString("Database.port");
-		this.user = Utils.getUtils().encrypt(config.getString("Database.user"));
-		this.pass = Utils.getUtils().encrypt(config.getString("Database.pass"));
-		this.database = config.getString("Database.table") != null ? config.getString("Database.table") : config.getString("Database.database");
+	public Database(String baseName) {
+		this.dataFolder = baseName;
+		if (ConfigHandler.getConfig(false).sqlEnabled()) {
+			FileConfiguration config = ConfigHandler.getConfig(false).getFile("config.yml");
+	        String database = (config.getString("Database.table") != null ? config.getString("Database.table") : config.getString("Database.database"));
+	        HikariConfig hikariConfig = new HikariConfig();
+	        hikariConfig.setJdbcUrl("jdbc:mysql://" + config.getString("Database.host") + ":" + config.getString("Database.port") + "/" + database + "?useSSL=false" + "&createDatabaseIfNotExist=true" + "&allowPublicKeyRetrieval=true");
+	        hikariConfig.setUsername(config.getString("Database.user"));
+	        hikariConfig.setPassword(config.getString("Database.pass"));
+	        hikariConfig.setMaxLifetime(1500000);
+	        hikariConfig.addDataSourceProperty("cachePrepStmts", "true");
+	        hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250");
+	        hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
+	        hikariConfig.addDataSourceProperty("userServerPrepStmts", "true");
+	        hikariConfig.setLeakDetectionThreshold(10000);
+	        hikariConfig.setMaximumPoolSize(10);
+	        this.hikari = new HikariDataSource(hikariConfig);
+		}
 	}
 	
    /**
@@ -68,16 +79,18 @@ public class Database extends Controller {
 		PreparedStatement ps = null;
 		try {
 			conn = this.getConnection();
-			ps = conn.prepareStatement(statement);
-			ps.executeUpdate();
-		} catch (Exception e) {
-			ServerHandler.getServer().logSevere("{SQLite} [1] Failed to execute database statement.");
-			try {
-				ServerHandler.getServer().logSevere("{SQLite} [1] Database Status: Open: " + !this.isClosed(conn) + "! Writable: " + !conn.isReadOnly() + "!");
-			} catch (Exception e2) {
-				ServerHandler.getServer().logSevere("{SQLite} [1] Failed to determine the Database Status.");
+			if (conn != null) {
+				ps = conn.prepareStatement(statement);
+				ps.executeUpdate();
 			}
-			ServerHandler.getServer().logSevere("{SQLite} [1] Statement: " + statement);
+		} catch (Exception e) {
+			ServerHandler.getServer().logSevere("{SQL} [1] Failed to execute database statement.");
+			try {
+				ServerHandler.getServer().logSevere("{SQL} [1] Database Status: Open: " + !this.isClosed(conn) + "! Writable: " + !conn.isReadOnly() + "!");
+			} catch (Exception e2) {
+				ServerHandler.getServer().logSevere("{SQL} [1] Failed to determine the Database Status.");
+			}
+			ServerHandler.getServer().logSevere("{SQL} [1] Statement: " + statement);
 			ServerHandler.getServer().sendSevereTrace(e);
 		} finally {
 			this.close(ps, null, conn, false);
@@ -98,19 +111,21 @@ public class Database extends Controller {
 		Object returnValue = null;
 		try {
 			conn = this.getConnection();
-			ps = conn.prepareStatement(statement);
-			rs = ps.executeQuery();
-			if (rs.next()) {
-				returnValue = rs.getObject(row);
+			if (conn != null) {
+				ps = conn.prepareStatement(statement);
+				rs = ps.executeQuery();
+				if (rs.next()) {
+					returnValue = rs.getObject(row);
+				}
 			}
 		} catch (Exception e) {
-			ServerHandler.getServer().logSevere("{SQLite} [2] Failed to execute database statement.");
+			ServerHandler.getServer().logSevere("{SQL} [2] Failed to execute database statement.");
 			try {
-				ServerHandler.getServer().logSevere("{SQLite} [2] Database Status: Open: " + !this.isClosed(conn) + "! Writable: " + !conn.isReadOnly() + "!");
+				ServerHandler.getServer().logSevere("{SQL} [2] Database Status: Open: " + !this.isClosed(conn) + "! Writable: " + !conn.isReadOnly() + "!");
 			} catch (Exception e2) {
-				ServerHandler.getServer().logSevere("{SQLite} [2] Failed to determine the Database Status.");
+				ServerHandler.getServer().logSevere("{SQL} [2] Failed to determine the Database Status.");
 			}
-			ServerHandler.getServer().logSevere("{SQLite} [2] Statement: " + statement);
+			ServerHandler.getServer().logSevere("{SQL} [2] Statement: " + statement);
 			ServerHandler.getServer().sendSevereTrace(e);
 		} finally {
 			this.close(ps, rs, conn, false);
@@ -132,19 +147,21 @@ public class Database extends Controller {
 		ResultSet rs = null;
 		try {
 			conn = this.getConnection();
-			ps = conn.prepareStatement(statement);
-			rs = ps.executeQuery();
-			while (rs.next()) {
-				objects.add(rs.getObject(row));
+			if (conn != null) {
+				ps = conn.prepareStatement(statement);
+				rs = ps.executeQuery();
+				while (rs.next()) {
+					objects.add(rs.getObject(row));
+				}
 			}
 		} catch (Exception e) {
-			ServerHandler.getServer().logSevere("{SQLite} [3] Failed to execute database statement.");
+			ServerHandler.getServer().logSevere("{SQL} [3] Failed to execute database statement.");
 			try {
-				ServerHandler.getServer().logSevere("{SQLite} [3] Database Status: Open: " + !this.isClosed(conn) + "! Writable: " + !conn.isReadOnly() + "!");
+				ServerHandler.getServer().logSevere("{SQL} [3] Database Status: Open: " + !this.isClosed(conn) + "! Writable: " + !conn.isReadOnly() + "!");
 			} catch (Exception e2) {
-				ServerHandler.getServer().logSevere("{SQLite} [3] Failed to determine the Database Status.");
+				ServerHandler.getServer().logSevere("{SQL} [3] Failed to determine the Database Status.");
 			}
-			ServerHandler.getServer().logSevere("{SQLite} [3] Statement: " + statement);
+			ServerHandler.getServer().logSevere("{SQL} [3] Statement: " + statement);
 			ServerHandler.getServer().sendSevereTrace(e);
 		} finally {
 			this.close(ps, rs, conn, false);
@@ -166,25 +183,27 @@ public class Database extends Controller {
 		ResultSet rs = null;
 		try {
 			conn = this.getConnection();
-			ps = conn.prepareStatement(statement);
-			rs = ps.executeQuery();
-			while (rs.next()) {
-				final HashMap < String, String > columnData = new HashMap < String, String > ();
-				for (final String singleRow: rows.split(", ")) {
-					if (!this.isClosed(rs) && !this.isClosed(conn)) {
-						columnData.put(singleRow, rs.getString(singleRow));
+			if (conn != null) {
+				ps = conn.prepareStatement(statement);
+				rs = ps.executeQuery();
+				while (rs.next()) {
+					final HashMap < String, String > columnData = new HashMap < String, String > ();
+					for (final String singleRow: rows.split(", ")) {
+						if (!this.isClosed(rs) && !this.isClosed(conn)) {
+							columnData.put(singleRow, rs.getString(singleRow));
+						}
 					}
+					existingData.add(columnData);
 				}
-				existingData.add(columnData);
 			}
 		} catch (Exception e) {
-			ServerHandler.getServer().logSevere("{SQLite} [4] Failed to execute database statement.");
+			ServerHandler.getServer().logSevere("{SQL} [4] Failed to execute database statement.");
 			try {
-				ServerHandler.getServer().logSevere("{SQLite} [4] Database Status: Open: " + !this.isClosed(conn) + "! Writable: " + !conn.isReadOnly() + "!");
+				ServerHandler.getServer().logSevere("{SQL} [4] Database Status: Open: " + !this.isClosed(conn) + "! Writable: " + !conn.isReadOnly() + "!");
 			} catch (Exception e2) {
-				ServerHandler.getServer().logSevere("{SQLite} [4] Failed to determine the Database Status.");
+				ServerHandler.getServer().logSevere("{SQL} [4] Failed to determine the Database Status.");
 			}
-			ServerHandler.getServer().logSevere("{SQLite} [4] Statement: " + statement);
+			ServerHandler.getServer().logSevere("{SQL} [4] Statement: " + statement);
 			ServerHandler.getServer().sendSevereTrace(e);
 		} finally {
 			this.close(ps, rs, conn, false);
@@ -206,23 +225,25 @@ public class Database extends Controller {
 		ResultSet rs = null;
 		try {
 			conn = this.getConnection();
-			ps = conn.prepareStatement(statement);
-			rs = ps.executeQuery();
-			while (rs.next()) {
-				final List < String > columnData = new ArrayList < String > ();
-				for (final String singleRow: row) {
-					columnData.add(rs.getString(singleRow));
+			if (conn != null) {
+				ps = conn.prepareStatement(statement);
+				rs = ps.executeQuery();
+				while (rs.next()) {
+					final List < String > columnData = new ArrayList < String > ();
+					for (final String singleRow: row) {
+						columnData.add(rs.getString(singleRow));
+					}
+					existingData.add(columnData);
 				}
-				existingData.add(columnData);
 			}
 		} catch (Exception e) {
-			ServerHandler.getServer().logSevere("{SQLite} [4] Failed to execute database statement.");
+			ServerHandler.getServer().logSevere("{SQL} [4] Failed to execute database statement.");
 			try {
-				ServerHandler.getServer().logSevere("{SQLite} [4] Database Status: Open: " + !this.isClosed(conn) + "! Writable: " + !conn.isReadOnly() + "!");
+				ServerHandler.getServer().logSevere("{SQL} [4] Database Status: Open: " + !this.isClosed(conn) + "! Writable: " + !conn.isReadOnly() + "!");
 			} catch (Exception e2) {
-				ServerHandler.getServer().logSevere("{SQLite} [4] Failed to determine the Database Status.");
+				ServerHandler.getServer().logSevere("{SQL} [4] Failed to determine the Database Status.");
 			}
-			ServerHandler.getServer().logSevere("{SQLite} [4] Statement: " + statement);
+			ServerHandler.getServer().logSevere("{SQL} [4] Statement: " + statement);
 			ServerHandler.getServer().sendSevereTrace(e);
 		} finally {
 			this.close(ps, rs, conn, false);
@@ -245,24 +266,26 @@ public class Database extends Controller {
 		ResultSet rs = null;
 		try {
 			conn = this.getConnection();
-			ps = conn.prepareStatement(statement);
-			rs = ps.executeQuery();
-			while (rs.next()) {
-				for (final String singleRow: row) {
-					objects.add(rs.getObject(singleRow));
-				}
-				for (final String singleRow: row) {
-					map.put(singleRow, objects);
+			if (conn != null) {
+				ps = conn.prepareStatement(statement);
+				rs = ps.executeQuery();
+				while (rs.next()) {
+					for (final String singleRow: row) {
+						objects.add(rs.getObject(singleRow));
+					}
+					for (final String singleRow: row) {
+						map.put(singleRow, objects);
+					}
 				}
 			}
 		} catch (Exception e) {
-				ServerHandler.getServer().logSevere("{SQLite} [5] Failed to execute database statement.");
+				ServerHandler.getServer().logSevere("{SQL} [5] Failed to execute database statement.");
 			try {
-				ServerHandler.getServer().logSevere("{SQLite} [5] Database Status: Open: " + !this.isClosed(conn) + "! Writable: " + !conn.isReadOnly() + "!");
+				ServerHandler.getServer().logSevere("{SQL} [5] Database Status: Open: " + !this.isClosed(conn) + "! Writable: " + !conn.isReadOnly() + "!");
 			} catch (Exception e2) {
-				ServerHandler.getServer().logSevere("{SQLite} [5] Failed to determine the Database Status.");
+				ServerHandler.getServer().logSevere("{SQL} [5] Failed to determine the Database Status.");
 			}
-			ServerHandler.getServer().logSevere("{SQLite} [5] Statement: " + statement);
+			ServerHandler.getServer().logSevere("{SQL} [5] Statement: " + statement);
 			ServerHandler.getServer().sendSevereTrace(e);
 		} finally {
 			this.close(ps, rs, conn, false);
@@ -283,20 +306,22 @@ public class Database extends Controller {
 		boolean columnExists = false;
 		try {
 			conn = this.getConnection();
-			ps = conn.prepareStatement(statement);
-			rs = ps.executeQuery();
-			columnExists = true;
+			if (conn != null) {
+				ps = conn.prepareStatement(statement);
+				rs = ps.executeQuery();
+				columnExists = true;
+			}
 		} catch (Exception e) {
-			if (Utils.getUtils().containsIgnoreCase(e.getMessage(), "no such column")) {
+			if (Utils.getUtils().containsIgnoreCase(e.getMessage(), "no such column") || Utils.getUtils().containsIgnoreCase(e.getMessage(), "Unknown column")) {
 				columnExists = false;
 			} else {
-				ServerHandler.getServer().logSevere("{SQLite} [6] Failed to execute database statement.");
+				ServerHandler.getServer().logSevere("{SQL} [6] Failed to execute database statement.");
 			try {
-				ServerHandler.getServer().logSevere("{SQLite} [6] Database Status: Open: " + !this.isClosed(conn) + "! Writable: " + !conn.isReadOnly() + "!");
+				ServerHandler.getServer().logSevere("{SQL} [6] Database Status: Open: " + !this.isClosed(conn) + "! Writable: " + !conn.isReadOnly() + "!");
 			} catch (Exception e2) {
-				ServerHandler.getServer().logSevere("{SQLite} [6] Failed to determine the Database Status.");
+				ServerHandler.getServer().logSevere("{SQL} [6] Failed to determine the Database Status.");
 			}
-			ServerHandler.getServer().logSevere("{SQLite} [6] Statement: " + statement);
+			ServerHandler.getServer().logSevere("{SQL} [6] Statement: " + statement);
 			ServerHandler.getServer().sendSevereTrace(e);
 			}
 		} finally {
@@ -317,18 +342,20 @@ public class Database extends Controller {
 		ResultSet rs = null;
 		try {
 			conn = this.getConnection();
-			rs = conn.getMetaData().getTables(null, null, tableName, null);
-			while (rs.next()) {
-				if (!this.isClosed(rs) && !this.isClosed(conn)) {
-					String tName = rs.getString("TABLE_NAME");
-					if (tName != null && tName.equals(tableName)) {
-						tExists = true;
-						break;
+			if (conn != null) {
+				rs = conn.getMetaData().getTables(null, null, tableName, null);
+				while (rs.next()) {
+					if (!this.isClosed(rs) && !this.isClosed(conn)) {
+						String tName = rs.getString("TABLE_NAME");
+						if (tName != null && tName.equals(tableName)) {
+							tExists = true;
+							break;
+						}
 					}
 				}
 			}
 		} catch (SQLException e) {
-			ServerHandler.getServer().logSevere("{SQLite} [9] Failed to check if the table " + tableName + " exists.");
+			ServerHandler.getServer().logSevere("{SQL} [9] Failed to check if the table " + tableName + " exists.");
 			ServerHandler.getServer().sendDebugTrace(e);
 		} finally {
 			this.close(null, rs, conn, false);
@@ -349,17 +376,19 @@ public class Database extends Controller {
 		boolean dataExists = false;
 		try {
 			conn = this.getConnection();
-			ps = conn.prepareStatement(statement);
-			rs = ps.executeQuery();
+			if (conn != null) {
+				ps = conn.prepareStatement(statement);
+				rs = ps.executeQuery();
+			}
 			if (!rs.isBeforeFirst()) {
-				ServerHandler.getServer().logDebug("{SQLite} Result set is empty.");
+				ServerHandler.getServer().logDebug("{SQL} Result set is empty.");
 				dataExists = false;
 			} else {
-				ServerHandler.getServer().logDebug("{SQLite} Result set is not empty.");
+				ServerHandler.getServer().logDebug("{SQL} Result set is not empty.");
 				dataExists = true;
 			}
 		} catch (Exception e) {
-			ServerHandler.getServer().logSevere("{SQLite} Could not read from the database.db file, some ItemJoin features have been disabled!");
+			ServerHandler.getServer().logSevere("{SQL} Could not read from the database.db file, some ItemJoin features have been disabled!");
 			ServerHandler.getServer().sendSevereTrace(e);
 		} finally {
 			this.close(ps, rs, conn, false);
@@ -376,16 +405,21 @@ public class Database extends Controller {
 	}
 	
    /**
-    * Handles the current SQL Connection Status.
-    * 
-    */
-	public void progressBar() {
-		if (ConfigHandler.getConfig(false).sqlEnabled()) { 
-			ServerHandler.getServer().logInfo(this.progress);
-			for (int i = 0; i < Utils.getUtils().getRandom(1, 3); i++) {
-				this.progress += "#";
+	* Gets the instance of the Database.
+	* 
+	* @return The Database instance.
+	*/
+	public static Database getDatabase() {
+		if (data == null || !data.dataFolder.equalsIgnoreCase("database")) {
+			data = new Database("database"); 
+			try {
+				data.getConnection();
+			} catch (SQLException e) {
+				ServerHandler.getServer().logSevere("{SQL} [1] Failed to open database connection."); 
+				ServerHandler.getServer().sendDebugTrace(e);
 			}
 		}
+        return data; 
 	}
 	
    /**
@@ -394,13 +428,13 @@ public class Database extends Controller {
 	* @param dbname - The database being fetched.
 	* @return The Database instance.
 	*/
-	public static Database getDatabase(final String dataFolder) {
-		if (data == null || !data.dataFolder.equalsIgnoreCase(dataFolder)) {
-			data = new Database(dataFolder); 
+	public static Database getDatabase(final String baseName) {
+		if (data == null || !data.dataFolder.equalsIgnoreCase(baseName)) {
+			data = new Database(baseName); 
 			try {
 				data.getConnection();
 			} catch (SQLException e) {
-				ServerHandler.getServer().logSevere("{SQLite} [1] Failed to open database connection."); 
+				ServerHandler.getServer().logSevere("{SQL} [2] Failed to open database connection."); 
 				ServerHandler.getServer().sendDebugTrace(e);
 			}
 		}
@@ -416,7 +450,8 @@ public class Database extends Controller {
  */
 abstract class Controller {
 	protected Connection connection;
-	protected String dataFolder, host, port, database, user, pass;
+	protected String dataFolder;
+    protected HikariDataSource hikari;
 	protected boolean stopConnection = false;
 	protected boolean closeAttempt = false;
 		
@@ -427,21 +462,19 @@ abstract class Controller {
     * @throws SQLException 
 	*/
 	protected Connection getConnection() throws SQLException {
-		if (!this.isClosed(this.connection)) {
+		if (this.stopConnection) {
+			return null;
+		} else if (!this.isClosed(this.connection) && !this.stopConnection) {
 			return this.connection; 
 		} else if (!this.stopConnection) {
 			synchronized (this) {
 				if (ConfigHandler.getConfig(false).sqlEnabled()) {
 					try { 
-						Class.forName("com.mysql.jdbc.Driver");
-						if (!ItemJoin.getInstance().isStarted()) {
-						ServerHandler.getServer().logInfo("Loading MySQL Connection...");
-						}
-						this.connection = DriverManager.getConnection("jdbc:mysql://" + this.host + ":" + this.port + "/" + this.database + "?createDatabaseIfNotExist=true" + "&useSSL=false", Utils.getUtils().decrypt(this.user), Utils.getUtils().decrypt(this.pass));
-						return this.connection;
+						this.connection = this.hikari.getConnection();
+				        return this.connection;
 					} catch (Exception e) { 
 						this.stopConnection = true;
-						ServerHandler.getServer().logSevere("{MySQL} Unable to connect to the defined MySQL database, check your settings.");
+						ServerHandler.getServer().logSevere("{SQL} Unable to connect to the defined MySQL database, check your settings.");
 						ServerHandler.getServer().sendSevereTrace(e);
 					}
 					return this.connection;
@@ -451,11 +484,11 @@ abstract class Controller {
 						this.connection = DriverManager.getConnection("jdbc:sqlite:" + this.getDatabase());
 					} catch (SQLException e) { 
 						this.stopConnection = true;
-						ServerHandler.getServer().logSevere("{SQLite} SQLite exception on initialize.");
+						ServerHandler.getServer().logSevere("{SQL} SQLite exception on initialize.");
 						ServerHandler.getServer().sendDebugTrace(e);
 					} catch (ClassNotFoundException e) { 
 						this.stopConnection = true;
-						ServerHandler.getServer().logSevere("{SQLite} You need the SQLite JBDC library, see: https://bitbucket.org/xerial/sqlite-jdbc/downloads/ and put it in the /lib folder of Java.");
+						ServerHandler.getServer().logSevere("{SQL} You need the SQLite JBDC library, see: https://bitbucket.org/xerial/sqlite-jdbc/downloads/ and put it in the /lib folder of Java.");
 						ServerHandler.getServer().sendDebugTrace(e);
 					}
 					return this.connection;
@@ -477,7 +510,7 @@ abstract class Controller {
 			}
 		} catch (AbstractMethodError | NoClassDefFoundError e) { return false; } 
 		  catch (SQLException e) { 
-			  ServerHandler.getServer().logSevere("{SQLite} [11] Failed to close database connection."); 
+			  ServerHandler.getServer().logSevere("{SQL} [11] Failed to close database connection."); 
 			  ServerHandler.getServer().sendDebugTrace(e); 
 			  return true; 
 		}
@@ -496,7 +529,7 @@ abstract class Controller {
 			}
 		} catch (AbstractMethodError | NoClassDefFoundError e) { return false; } 
 		  catch (SQLException e) { 
-			  ServerHandler.getServer().logSevere("{SQLite} [11] Failed to close database connection."); 
+			  ServerHandler.getServer().logSevere("{SQL} [11] Failed to close database connection."); 
 			  ServerHandler.getServer().sendDebugTrace(e); 
 			  return true; 
 		}
@@ -515,7 +548,7 @@ abstract class Controller {
 			}
 		} catch (AbstractMethodError | NoClassDefFoundError e) { return false; } 
 		  catch (SQLException e) { 
-			  ServerHandler.getServer().logSevere("{SQLite} [11] Failed to close database connection."); 
+			  ServerHandler.getServer().logSevere("{SQL} [11] Failed to close database connection."); 
 			  ServerHandler.getServer().sendDebugTrace(e); 
 			  return true; 
 		}
@@ -540,9 +573,10 @@ abstract class Controller {
 			}
 			if (!this.closeAttempt && (!this.isClosed(conn) && (!ConfigHandler.getConfig(false).sqlEnabled() || force))) {
 				this.closeLater(conn, force);
+				this.stopConnection = force;
 			}
 		} catch (SQLException e) { 
-			ServerHandler.getServer().logSevere("{SQLite} [10] Failed to close database connection."); 
+			ServerHandler.getServer().logSevere("{SQL} [10] Failed to close database connection."); 
 			ServerHandler.getServer().sendDebugTrace(e);
 		}
 	}
@@ -557,17 +591,17 @@ abstract class Controller {
 	protected void closeLater(final Connection conn, final boolean force) { 
 		this.closeAttempt = true;
 		if (ItemJoin.getInstance().isEnabled()) {
-			Bukkit.getServer().getScheduler().runTaskLater(ItemJoin.getInstance(), () -> {
+			SchedulerUtils.getScheduler().runLater(100L, () -> {
 				try {
 					if (!this.isClosed(conn) && (!ConfigHandler.getConfig(false).sqlEnabled() || force)) {
 						conn.close();
 						this.closeAttempt = false;
 					}
 				} catch (SQLException e) { 
-					ServerHandler.getServer().logSevere("{SQLite} [10] Failed to close database connection."); 
+					ServerHandler.getServer().logSevere("{SQL} [10] Failed to close database connection."); 
 					ServerHandler.getServer().sendDebugTrace(e);
 				}
-			}, 100L);
+			});
 		} else {
 			try {
 				if (!this.isClosed(conn) && (!ConfigHandler.getConfig(false).sqlEnabled() || force)) {
@@ -575,7 +609,7 @@ abstract class Controller {
 					this.closeAttempt = false;
 				}
 			} catch (SQLException e) {
-				ServerHandler.getServer().logSevere("{SQLite} [10] Failed to close database connection."); 
+				ServerHandler.getServer().logSevere("{SQL} [10] Failed to close database connection."); 
 				ServerHandler.getServer().sendDebugTrace(e);
 			}
 		}
@@ -591,7 +625,7 @@ abstract class Controller {
 		if (!dataFolder.exists()) {
 			try { dataFolder.createNewFile(); } 
 			catch (IOException e) { 
-				ServerHandler.getServer().logSevere("{SQLite} File write error: " + this.dataFolder + ".db."); 
+				ServerHandler.getServer().logSevere("{SQL} File write error: " + this.dataFolder + ".db."); 
 				ServerHandler.getServer().sendDebugTrace(e);
 			}
 		}

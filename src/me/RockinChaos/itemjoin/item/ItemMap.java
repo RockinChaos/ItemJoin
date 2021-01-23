@@ -80,6 +80,7 @@ import me.RockinChaos.itemjoin.utils.EffectAPI;
 import me.RockinChaos.itemjoin.utils.LanguageAPI;
 import me.RockinChaos.itemjoin.utils.LegacyAPI;
 import me.RockinChaos.itemjoin.utils.Reflection;
+import me.RockinChaos.itemjoin.utils.SchedulerUtils;
 import me.RockinChaos.itemjoin.utils.UI;
 import me.RockinChaos.itemjoin.utils.Utils;
 import me.RockinChaos.itemjoin.utils.enchants.Glow;
@@ -563,11 +564,11 @@ public class ItemMap {
     */
 	private void setPlayersOnCooldown() {
 		if (this.cooldownSeconds > 0) {
-			List<DataObject> dataList = SQL.getData(false).getDataList(new DataObject(Table.IJ_ON_COOLDOWN, null, null, this.getConfigName(), String.valueOf(this.getCommandCooldown()), null));
+			List<DataObject> dataList = SQL.getData().getDataList(new DataObject(Table.IJ_ON_COOLDOWN, null, null, this.getConfigName(), String.valueOf(this.getCommandCooldown()), null));
 			for (DataObject dataObject : dataList) {
 				if (dataObject != null) {
 					this.playersOnCooldown.put(dataObject.getWorld() + "-.-" + dataObject.getPlayerId(), Long.parseLong(dataObject.getDuration()));
-					SQL.getData(false).removeData(new DataObject(Table.IJ_ON_COOLDOWN, null, null, this.getConfigName(), String.valueOf(this.getCommandCooldown()), null));
+					SQL.getData().removeData(new DataObject(Table.IJ_ON_COOLDOWN, null, null, this.getConfigName(), String.valueOf(this.getCommandCooldown()), null));
 				}
 			}
 		}
@@ -3935,28 +3936,22 @@ public class ItemMap {
 		ItemStack itemStack = this.getItem(player);
 		if (Utils.getUtils().containsIgnoreCase(slot, "CRAFTING")) { 
 			if (Utils.getUtils().getSlotConversion(slot) == 0) {
-				if (ItemJoin.getInstance().isEnabled()) {
-					Bukkit.getServer().getScheduler().runTaskLater(ItemJoin.getInstance(), () -> {
-			    		if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
-			    			player.getOpenInventory().getTopInventory().setItem(Utils.getUtils().getSlotConversion(slot), itemStack);
-			    			PlayerHandler.getPlayer().updateInventory(player, 1L);
-			    		}
-					}, 4L);
-				}
-			} else {
-				if (ItemJoin.getInstance().isEnabled()) {
-					Bukkit.getServer().getScheduler().runTaskLater(ItemJoin.getInstance(), () -> {
+				SchedulerUtils.getScheduler().runLater(4L, () -> {
+			    	if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
 			    		player.getOpenInventory().getTopInventory().setItem(Utils.getUtils().getSlotConversion(slot), itemStack);
-			    	}, 2L);
-				}
+			    		PlayerHandler.getPlayer().updateInventory(player, 1L);
+			    	}
+				});
+			} else {
+				SchedulerUtils.getScheduler().runLater(2L, () -> {
+			    	player.getOpenInventory().getTopInventory().setItem(Utils.getUtils().getSlotConversion(slot), itemStack);
+			    });
 			}
 		} 
 		else { 
-			if (ItemJoin.getInstance().isEnabled()) {
-				Bukkit.getServer().getScheduler().runTaskLater(ItemJoin.getInstance(), () -> {
-					player.getInventory().setItem(Integer.parseInt(slot), itemStack); 	
-				}, 2L);
-			}
+			SchedulerUtils.getScheduler().runLater(2L, () -> {
+				player.getInventory().setItem(Integer.parseInt(slot), itemStack); 	
+			});
 		}
 		this.setAnimations(player);
 		this.executeCommands(player, this.tempItem, "ON_RECEIVE", "RECEIVED", this.getSlot());
@@ -4009,40 +4004,36 @@ public class ItemMap {
 				LanguageAPI.getLang(false).sendLangMessage("general.warmingUp", player, placeHolders); 
 				itemMap.addWarmPending(player); 
 			}
-			if (ItemJoin.getInstance().isEnabled()) {
-				Bukkit.getServer().getScheduler().runTaskLater(ItemJoin.getInstance(), () -> {
-					if (itemMap.warmLocation(player, location, action)) {
-						String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = Utils.getUtils().translateLayout(itemMap.getCustomName(), player); 
-						LanguageAPI.getLang(false).sendLangMessage("general.warmingTime", player, placeHolders);
-						itemMap.warmCycle(player, itemMap, (warmCount - 1), location, itemCopy, action, clickType, slot);	
-					} else { 
-						itemMap.delWarmPending(player); 
-						String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = Utils.getUtils().translateLayout(itemMap.getCustomName(), player); 
-						LanguageAPI.getLang(false).sendLangMessage("general.warmingHalted", player, placeHolders);
-					}
-				}, 20);
-			}
+			SchedulerUtils.getScheduler().runLater(20L, () -> {
+				if (itemMap.warmLocation(player, location, action)) {
+					String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = Utils.getUtils().translateLayout(itemMap.getCustomName(), player); 
+					LanguageAPI.getLang(false).sendLangMessage("general.warmingTime", player, placeHolders);
+					itemMap.warmCycle(player, itemMap, (warmCount - 1), location, itemCopy, action, clickType, slot);	
+				} else { 
+					itemMap.delWarmPending(player); 
+					String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = Utils.getUtils().translateLayout(itemMap.getCustomName(), player); 
+					LanguageAPI.getLang(false).sendLangMessage("general.warmingHalted", player, placeHolders);
+				}
+			});
 		} else {
-			int delay = 0;
-			if (itemMap.warmDelay != 0) { delay = 20; }
-			if (ItemJoin.getInstance().isEnabled()) {
-				Bukkit.getServer().getScheduler().runTaskLater(ItemJoin.getInstance(), () -> {
-					if ((!player.isDead() || action.equalsIgnoreCase("ON_DEATH")) && player.isOnline()) {
-						if (isExecuted(player, action, clickType, slot, itemCopy)) { 
-							if (itemMap.itemCost == null || itemMap.itemCost.isEmpty()) { itemMap.withdrawBalance(player); } 
-							else { itemMap.withdrawItemCost(player); }
-				    		itemMap.playSound(player);
-				    		itemMap.playParticle(player);
-				    		itemMap.removeDisposable(player, itemMap, itemCopy, false);
-							itemMap.addPlayerOnCooldown(player);
-						}
-					} else {
-						String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = Utils.getUtils().translateLayout(itemMap.getCustomName(), player); 
-						LanguageAPI.getLang(false).sendLangMessage("general.warmingHalted", player, placeHolders);
+			long delay = 0;
+			if (itemMap.warmDelay != 0) { delay = 20L; }
+			SchedulerUtils.getScheduler().runLater(delay, () -> {
+				if ((!player.isDead() || action.equalsIgnoreCase("ON_DEATH")) && player.isOnline()) {
+					if (isExecuted(player, action, clickType, slot, itemCopy)) { 
+						if (itemMap.itemCost == null || itemMap.itemCost.isEmpty()) { itemMap.withdrawBalance(player); } 
+						else { itemMap.withdrawItemCost(player); }
+				    	itemMap.playSound(player);
+				    	itemMap.playParticle(player);
+				    	itemMap.removeDisposable(player, itemMap, itemCopy, false);
+						itemMap.addPlayerOnCooldown(player);
 					}
-					if (itemMap.warmDelay != 0) { itemMap.delWarmPending(player); }
-				}, delay);
-			}
+				} else {
+					String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = Utils.getUtils().translateLayout(itemMap.getCustomName(), player); 
+					LanguageAPI.getLang(false).sendLangMessage("general.warmingHalted", player, placeHolders);
+				}
+				if (itemMap.warmDelay != 0) { itemMap.delWarmPending(player); }
+			});
 		}
 	}
 	
@@ -4356,42 +4347,39 @@ public class ItemMap {
     */
 	public void removeDisposable(final Player player, final ItemMap itemMap, final ItemStack itemCopy, final boolean allItems) {
 		if (this.disposable && this.conditionMet(player, "disposable-condition") || allItems) {
-			
 			if (!allItems) { this.setSubjectRemoval(true); }
-			if (ItemJoin.getInstance().isEnabled()) {
-				Bukkit.getServer().getScheduler().runTaskLater(ItemJoin.getInstance(), () -> {
-					if (PlayerHandler.getPlayer().isCreativeMode(player)) { player.closeInventory(); }
-					if (itemMap.isSimilar(player.getItemOnCursor())) {
-						player.setItemOnCursor(ItemHandler.getItem().modifyItem(player.getItemOnCursor(), allItems, 1));
-						if (!allItems) { this.setSubjectRemoval(false); }
-					} else {
-						int itemSlot = player.getInventory().getHeldItemSlot();
-						if (itemMap.isSimilar(player.getInventory().getItem(itemSlot))) { player.getInventory().setItem(itemSlot, ItemHandler.getItem().modifyItem(player.getInventory().getItem(itemSlot), allItems, 1)); if (!allItems) { this.setSubjectRemoval(false); }}
-						else { 
-							for (int i = 0; i < player.getInventory().getSize(); i++) {
-								if (itemMap.isSimilar(player.getInventory().getItem(i))) {
-									player.getInventory().setItem(i, ItemHandler.getItem().modifyItem(player.getInventory().getItem(i), allItems, 1));
-									if (!allItems) { this.setSubjectRemoval(false); }
-									break;
-								}
-							}
-						}
-						if (this.isSubjectRemoval() && PlayerHandler.getPlayer().isCreativeMode(player)) {
-							player.getInventory().addItem(ItemHandler.getItem().modifyItem(itemCopy, allItems, 1));
-							player.setItemOnCursor(new ItemStack(Material.AIR));
-							if (!allItems) { this.setSubjectRemoval(false); }
-						} else if (this.isSubjectRemoval() && PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
-							for (int i = 0; i < player.getOpenInventory().getTopInventory().getSize(); i++) {
-								if (itemMap.isSimilar(player.getOpenInventory().getTopInventory().getItem(i))) {
-									player.getOpenInventory().getTopInventory().setItem(i, ItemHandler.getItem().modifyItem(player.getOpenInventory().getTopInventory().getItem(i), allItems, 1));
-									if (!allItems) { this.setSubjectRemoval(false); }
-									break;
-								}
+			SchedulerUtils.getScheduler().runLater(1L, () -> {
+				if (PlayerHandler.getPlayer().isCreativeMode(player)) { player.closeInventory(); }
+				if (itemMap.isSimilar(player.getItemOnCursor())) {
+					player.setItemOnCursor(ItemHandler.getItem().modifyItem(player.getItemOnCursor(), allItems, 1));
+					if (!allItems) { this.setSubjectRemoval(false); }
+				} else {
+					int itemSlot = player.getInventory().getHeldItemSlot();
+					if (itemMap.isSimilar(player.getInventory().getItem(itemSlot))) { player.getInventory().setItem(itemSlot, ItemHandler.getItem().modifyItem(player.getInventory().getItem(itemSlot), allItems, 1)); if (!allItems) { this.setSubjectRemoval(false); }}
+					else { 
+						for (int i = 0; i < player.getInventory().getSize(); i++) {
+							if (itemMap.isSimilar(player.getInventory().getItem(i))) {
+								player.getInventory().setItem(i, ItemHandler.getItem().modifyItem(player.getInventory().getItem(i), allItems, 1));
+								if (!allItems) { this.setSubjectRemoval(false); }
+								break;
 							}
 						}
 					}
-				}, 1L);
-			}
+					if (this.isSubjectRemoval() && PlayerHandler.getPlayer().isCreativeMode(player)) {
+						player.getInventory().addItem(ItemHandler.getItem().modifyItem(itemCopy, allItems, 1));
+						player.setItemOnCursor(new ItemStack(Material.AIR));
+						if (!allItems) { this.setSubjectRemoval(false); }
+					} else if (this.isSubjectRemoval() && PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
+						for (int i = 0; i < player.getOpenInventory().getTopInventory().getSize(); i++) {
+							if (itemMap.isSimilar(player.getOpenInventory().getTopInventory().getItem(i))) {
+								player.getOpenInventory().getTopInventory().setItem(i, ItemHandler.getItem().modifyItem(player.getOpenInventory().getTopInventory().getItem(i), allItems, 1));
+								if (!allItems) { this.setSubjectRemoval(false); }
+								break;
+							}
+						}
+					}
+				}
+			});
 		}
 	}
 	

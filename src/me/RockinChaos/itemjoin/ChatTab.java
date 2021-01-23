@@ -62,7 +62,7 @@ public class ChatTab implements TabCompleter {
 			} else {
 				List<DataObject> dataList = new ArrayList<DataObject>();
 				try {
-					dataList = SQL.getData(false).getDataList(new DataObject(Table.valueOf("IJ_" + args[1].toUpperCase().replace("-", "_"))));
+					dataList = SQL.getData().getDataList(new DataObject(Table.valueOf("IJ_" + args[1].toUpperCase().replace("-", "_"))));
 				} catch (Exception e) { }
 				for (DataObject dataObject: dataList) {
 					String objectString = (args[1].equalsIgnoreCase("map-ids") ? dataObject.getMapIMG() : 

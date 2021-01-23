@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -30,13 +29,13 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 
-import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.handlers.events.PlayerPickItemEvent;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
+import me.RockinChaos.itemjoin.utils.SchedulerUtils;
 import me.RockinChaos.itemjoin.utils.Utils;
 
 public class Clicking implements Listener {
@@ -97,16 +96,14 @@ public class Clicking implements Listener {
 				event.setCancelled(true);
 				if (player.getOpenInventory().getType().name().equalsIgnoreCase("CHEST") && !player.getOpenInventory().getTitle().equalsIgnoreCase("CHEST")) {
 					final ItemStack itemCopy = item.clone();
-					if (ItemJoin.getInstance().isEnabled()) {
-						Bukkit.getServer().getScheduler().runTask(ItemJoin.getInstance(), () -> {
-							for (int i = 0; i < player.getOpenInventory().getTopInventory().getSize(); i++) {
-								if (player.getOpenInventory().getTopInventory().getItem(i) != null && player.getOpenInventory().getTopInventory().getItem(i).equals(item)) {
-									player.getOpenInventory().getTopInventory().setItem(i, new ItemStack(Material.AIR));
-									player.getOpenInventory().getBottomInventory().setItem(event.getSlot(), itemCopy); 
-								}
+					SchedulerUtils.getScheduler().run(() -> {
+						for (int i = 0; i < player.getOpenInventory().getTopInventory().getSize(); i++) {
+							if (player.getOpenInventory().getTopInventory().getItem(i) != null && player.getOpenInventory().getTopInventory().getItem(i).equals(item)) {
+								player.getOpenInventory().getTopInventory().setItem(i, new ItemStack(Material.AIR));
+								player.getOpenInventory().getBottomInventory().setItem(event.getSlot(), itemCopy); 
 							}
-						});
-					}
+						}
+					});
 				}
 				if (PlayerHandler.getPlayer().isCreativeMode(player)) { player.closeInventory(); }
 				else if (!ItemUtilities.getUtilities().isAllowed(player, item, "inventory-close")) { player.closeInventory(); }
@@ -134,18 +131,16 @@ public class Clicking implements Listener {
 				}
 			}
 		} else {
-			if (ItemJoin.getInstance().isEnabled()) {
-				Bukkit.getServer().getScheduler().runTask(ItemJoin.getInstance(), () -> {
-					final ItemStack itemCopy_2 = (event.getPickHand() != null ? event.getPickHand().clone() : event.getPickHand());
-					if (!ItemUtilities.getUtilities().isAllowed(player, itemCopy_2, "inventory-modify")) {
-						final int pickSlot = event.getPickSlot();
-						if (pickSlot != -1) {
-							player.getInventory().setItem(pickSlot, itemCopy_2);
-							PlayerHandler.getPlayer().setMainHandItem(player, itemCopy);
-						}
+			SchedulerUtils.getScheduler().run(() -> {
+				final ItemStack itemCopy_2 = (event.getPickHand() != null ? event.getPickHand().clone() : event.getPickHand());
+				if (!ItemUtilities.getUtilities().isAllowed(player, itemCopy_2, "inventory-modify")) {
+					final int pickSlot = event.getPickSlot();
+					if (pickSlot != -1) {
+						player.getInventory().setItem(pickSlot, itemCopy_2);
+						PlayerHandler.getPlayer().setMainHandItem(player, itemCopy);
 					}
-				});
-			}
+				}
+			});
 		}
 	}
 	
@@ -196,25 +191,22 @@ public class Clicking implements Listener {
 			dropClick.put(PlayerHandler.getPlayer().getPlayerID(player), true);
 			final ItemStack[] Inv = player.getInventory().getContents().clone();
 			final ItemStack[] Armor = player.getInventory().getArmorContents().clone();
-			Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
-				@Override
-				public void run() {
-					if (dropClick.get(PlayerHandler.getPlayer().getPlayerID(player)) != null && dropClick.get(PlayerHandler.getPlayer().getPlayerID(player)) == true 
-						&& droppedItem.get(PlayerHandler.getPlayer().getPlayerID(player)) != null && droppedItem.get(PlayerHandler.getPlayer().getPlayerID(player)) == true) {
-						player.getInventory().clear();
-						player.getInventory().setHelmet(null);
-						player.getInventory().setChestplate(null);
-						player.getInventory().setLeggings(null);
-						player.getInventory().setBoots(null);
-						if (ServerHandler.getServer().hasSpecificUpdate("1_9")) { player.getInventory().setItemInOffHand(null); }
-						player.getInventory().setContents(Inv);
-						player.getInventory().setArmorContents(Armor);
-						PlayerHandler.getPlayer().updateInventory(player, 1L);
-						droppedItem.remove(PlayerHandler.getPlayer().getPlayerID(player));
-					}
-					dropClick.remove(PlayerHandler.getPlayer().getPlayerID(player));
+			SchedulerUtils.getScheduler().runLater(1L, () -> {
+				if (this.dropClick.get(PlayerHandler.getPlayer().getPlayerID(player)) != null && this.dropClick.get(PlayerHandler.getPlayer().getPlayerID(player)) == true 
+					&& this.droppedItem.get(PlayerHandler.getPlayer().getPlayerID(player)) != null && this.droppedItem.get(PlayerHandler.getPlayer().getPlayerID(player)) == true) {
+					player.getInventory().clear();
+					player.getInventory().setHelmet(null);
+					player.getInventory().setChestplate(null);
+					player.getInventory().setLeggings(null);
+					player.getInventory().setBoots(null);
+					if (ServerHandler.getServer().hasSpecificUpdate("1_9")) { player.getInventory().setItemInOffHand(null); }
+					player.getInventory().setContents(Inv);
+					player.getInventory().setArmorContents(Armor);
+					PlayerHandler.getPlayer().updateInventory(player, 1L);
+					this.droppedItem.remove(PlayerHandler.getPlayer().getPlayerID(player));
 				}
-			}, 1L);
+				this.dropClick.remove(PlayerHandler.getPlayer().getPlayerID(player));
+			});
     	}
 	}
     

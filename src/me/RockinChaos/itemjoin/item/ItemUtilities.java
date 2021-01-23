@@ -42,6 +42,7 @@ import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.utils.Chances;
 import me.RockinChaos.itemjoin.utils.DependAPI;
 import me.RockinChaos.itemjoin.utils.LanguageAPI;
+import me.RockinChaos.itemjoin.utils.SchedulerUtils;
 import me.RockinChaos.itemjoin.utils.Utils;
 import me.RockinChaos.itemjoin.utils.sqlite.DataObject;
 import me.RockinChaos.itemjoin.utils.sqlite.DataObject.Table;
@@ -198,12 +199,10 @@ public class ItemUtilities {
 	public void setItems(final Player player, final World world, final TriggerType type, final GameMode newMode, final String region) {
 		this.safeSet(player, world, type, region);
 		if (this.getItemDelay() != 0 && type != TriggerType.LIMIT_SWITCH && type != TriggerType.REGION_ENTER && type != TriggerType.REGION_LEAVE) { 
-			if (ItemJoin.getInstance().isEnabled()) {
-				Bukkit.getServer().getScheduler().runTaskLater(ItemJoin.getInstance(), () -> {
-					ItemHandler.getItem().restoreCraftItems(player);
-					this.handleItems(player, type, newMode, region);
-				}, this.getItemDelay());
-			}
+			SchedulerUtils.getScheduler().runLater(this.getItemDelay(), () -> {
+				ItemHandler.getItem().restoreCraftItems(player);
+				this.handleItems(player, type, newMode, region);
+			});
 		} else {
 			ItemHandler.getItem().restoreCraftItems(player);
 			this.handleItems(player, type, newMode, region);
@@ -257,14 +256,12 @@ public class ItemUtilities {
 		if (type.equals(TriggerType.WORLD_SWITCH)) { this.pasteReturnItems(type, player, world.getName()); }
 		if (type.equals(TriggerType.REGION_ENTER)) { this.clearEvent(type, player, "", region); }
 		if (this.getClearDelay() != 0) {
-			if (ItemJoin.getInstance().isEnabled()) {
-				Bukkit.getServer().getScheduler().runTaskLater(ItemJoin.getInstance(), () -> {
-					if (type.equals(TriggerType.JOIN) || type.equals(TriggerType.WORLD_SWITCH)) {
-						this.clearEvent(type, player, player.getWorld().getName(), "");
-					}
-					this.triggerCommands(player, type);
-				}, this.getClearDelay());
-			}
+			SchedulerUtils.getScheduler().runLater(this.getClearDelay(), () -> {
+				if (type.equals(TriggerType.JOIN) || type.equals(TriggerType.WORLD_SWITCH)) {
+					this.clearEvent(type, player, player.getWorld().getName(), "");
+				}
+				this.triggerCommands(player, type);
+			});
 		} else {
 			if (type.equals(TriggerType.JOIN) || type.equals(TriggerType.WORLD_SWITCH)) {
 				this.clearEvent(type, player, player.getWorld().getName(), "");
@@ -399,9 +396,9 @@ public class ItemUtilities {
     */
 	public boolean isObtainable(final Player player, final ItemMap itemMap, final int session, final TriggerType type, final GameMode gamemode) {
 		if (!itemMap.hasItem(player) || itemMap.isAlwaysGive()) {
-			DataObject firstJoin = SQL.getData(false).getData(new DataObject(Table.IJ_FIRST_JOIN, PlayerHandler.getPlayer().getPlayerID(player), "", itemMap.getConfigName()));
-			DataObject firstWorld = SQL.getData(false).getData(new DataObject(Table.IJ_FIRST_WORLD, PlayerHandler.getPlayer().getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName()));
-			DataObject ipLimit = SQL.getData(false).getData(new DataObject(Table.IJ_IP_LIMITS, PlayerHandler.getPlayer().getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName(), player.getAddress().getHostString()));
+			DataObject firstJoin = SQL.getData().getData(new DataObject(Table.IJ_FIRST_JOIN, PlayerHandler.getPlayer().getPlayerID(player), "", itemMap.getConfigName()));
+			DataObject firstWorld = SQL.getData().getData(new DataObject(Table.IJ_FIRST_WORLD, PlayerHandler.getPlayer().getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName()));
+			DataObject ipLimit = SQL.getData().getData(new DataObject(Table.IJ_IP_LIMITS, PlayerHandler.getPlayer().getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName(), player.getAddress().getHostString()));
 			if (itemMap.isLimitMode(gamemode)) {
 				if ((firstJoin == null || (itemMap.isOnlyFirstLife() && type.equals(TriggerType.RESPAWN))) && firstWorld == null 
 						&& (ipLimit == null || (ipLimit != null && ipLimit.getPlayerId().equalsIgnoreCase(PlayerHandler.getPlayer().getPlayerID(player)))) && this.canOverwrite(player, itemMap)) {
@@ -485,21 +482,19 @@ public class ItemUtilities {
     * @param session - The current set items session.
     */
 	public void sendFailCount(final Player player, final int session) {
-		if (ItemJoin.getInstance().isEnabled()) {
-			Bukkit.getServer().getScheduler().runTask(ItemJoin.getInstance(), () -> {
-				if (this.failCount.get(session) != null && this.failCount.get(session) != 0) {
-					String overWrite = ConfigHandler.getConfig(false).getFile("items.yml").getString("items-Overwrite");
-					if ((overWrite != null && Utils.getUtils().containsLocation(player.getWorld().getName(), overWrite.replace(" ", "")))) {
-						String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[7] = this.failCount.get(session).toString();
-						LanguageAPI.getLang(false).sendLangMessage("general.failedInventory", player, placeHolders);
-					} else {
-						String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[7] = this.failCount.get(session).toString();
-						LanguageAPI.getLang(false).sendLangMessage("general.failedOverwrite", player, placeHolders);
-					}
-					this.failCount.remove(session);
+		SchedulerUtils.getScheduler().run(() -> {
+			if (this.failCount.get(session) != null && this.failCount.get(session) != 0) {
+				String overWrite = ConfigHandler.getConfig(false).getFile("items.yml").getString("items-Overwrite");
+				if ((overWrite != null && Utils.getUtils().containsLocation(player.getWorld().getName(), overWrite.replace(" ", "")))) {
+					String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[7] = this.failCount.get(session).toString();
+					LanguageAPI.getLang(false).sendLangMessage("general.failedInventory", player, placeHolders);
+				} else {
+					String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[7] = this.failCount.get(session).toString();
+					LanguageAPI.getLang(false).sendLangMessage("general.failedOverwrite", player, placeHolders);
 				}
-			});
-		}
+				this.failCount.remove(session);
+			}
+		});
 	}
 	
    /**
@@ -527,7 +522,7 @@ public class ItemUtilities {
 					}
 				}
 			}
-			SQL.getData(false).saveData(new DataObject(Table.IJ_RETURN_SWITCH_ITEMS, PlayerHandler.getPlayer().getPlayerID(player), world, ItemHandler.getItem().serializeInventory(saveInventory)));
+			SQL.getData().saveData(new DataObject(Table.IJ_RETURN_SWITCH_ITEMS, PlayerHandler.getPlayer().getPlayerID(player), world, ItemHandler.getItem().serializeInventory(saveInventory)));
 		}
 	}
 	
@@ -540,7 +535,7 @@ public class ItemUtilities {
     */
 	public void pasteReturnItems(final TriggerType type, final Player player, final String world) {
 		if (type == TriggerType.WORLD_SWITCH && Utils.getUtils().splitIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Options").replace(" ", ""), "RETURN_SWITCH", ",")) {
-			DataObject dataObject = SQL.getData(false).getData(new DataObject(Table.IJ_RETURN_SWITCH_ITEMS, PlayerHandler.getPlayer().getPlayerID(player), world, ""));
+			DataObject dataObject = SQL.getData().getData(new DataObject(Table.IJ_RETURN_SWITCH_ITEMS, PlayerHandler.getPlayer().getPlayerID(player), world, ""));
 			Inventory inventory = (dataObject != null ? ItemHandler.getItem().deserializeInventory(dataObject.getInventory64().replace(world + ".", "")) : null);
 			for (int i = 47; i >= 0; i--) {
 				if (inventory != null && inventory.getItem(i) != null && inventory.getItem(i).getType() != Material.AIR) {
@@ -551,7 +546,7 @@ public class ItemUtilities {
 						PlayerHandler.getPlayer().updateInventory(player, 1L);
 					}
 				}
-				SQL.getData(false).removeData(new DataObject(Table.IJ_RETURN_SWITCH_ITEMS, PlayerHandler.getPlayer().getPlayerID(player), world, ""));
+				SQL.getData().removeData(new DataObject(Table.IJ_RETURN_SWITCH_ITEMS, PlayerHandler.getPlayer().getPlayerID(player), world, ""));
 			}
 		}
 	}
@@ -564,37 +559,35 @@ public class ItemUtilities {
     * @param size - The expected stack size of the item.
     */
 	public void setInvSlots(final Player player, final ItemMap itemMap, final int size) {
-		if (ItemJoin.getInstance().isEnabled()) {
-			Bukkit.getServer().getScheduler().runTask(ItemJoin.getInstance(), () -> {
-				ItemStack existingItem = ItemHandler.getItem().getItem(player, itemMap);
-				ItemStack item = itemMap.getItem(player).clone();
-				this.shiftItem(player, itemMap);
-				int nextSlot = this.nextItem(player, itemMap);
-				boolean overWrite = itemMap.isOverwritable() || ConfigHandler.getConfig(false).getFile("items.yml").getBoolean("items-Overwrite");
-				if (size > 1) { item.setAmount(size); }
-				if ((size > 1 || itemMap.isAlwaysGive()) && !overWrite && existingItem != null) {
-					player.getInventory().addItem(item);
-				} else if (nextSlot != 0) {
-					player.getInventory().setItem(nextSlot, item);
-				} else if (player.getInventory().firstEmpty() != -1 || overWrite) {
-					if (itemMap.getSlot().contains("%")) {
-						String slot = Utils.getUtils().translateLayout(itemMap.getSlot(), player);
-						if (Utils.getUtils().isInt(slot)) {
-							player.getInventory().setItem(Integer.parseInt(slot), item);
-						}
-					} else {
-						player.getInventory().setItem(Integer.parseInt(itemMap.getSlot()), item);
+		SchedulerUtils.getScheduler().run(() -> {
+			ItemStack existingItem = ItemHandler.getItem().getItem(player, itemMap);
+			ItemStack item = itemMap.getItem(player).clone();
+			this.shiftItem(player, itemMap);
+			int nextSlot = this.nextItem(player, itemMap);
+			boolean overWrite = itemMap.isOverwritable() || ConfigHandler.getConfig(false).getFile("items.yml").getBoolean("items-Overwrite");
+			if (size > 1) { item.setAmount(size); }
+			if ((size > 1 || itemMap.isAlwaysGive()) && !overWrite && existingItem != null) {
+				player.getInventory().addItem(item);
+			} else if (nextSlot != 0) {
+				player.getInventory().setItem(nextSlot, item);
+			} else if (player.getInventory().firstEmpty() != -1 || overWrite) {
+				if (itemMap.getSlot().contains("%")) {
+					String slot = Utils.getUtils().translateLayout(itemMap.getSlot(), player);
+					if (Utils.getUtils().isInt(slot)) {
+						player.getInventory().setItem(Integer.parseInt(slot), item);
 					}
-				} else if (itemMap.isDropFull()) { 
-					player.getWorld().dropItem(player.getLocation(), item);
+				} else {
+					player.getInventory().setItem(Integer.parseInt(itemMap.getSlot()), item);
 				}
-				ServerHandler.getServer().logDebug("{ItemMap} Given the Item: " + itemMap.getConfigName() + ".");
-			});
-		}
-		DataObject ipLimit = SQL.getData(false).getData(new DataObject(Table.IJ_IP_LIMITS, PlayerHandler.getPlayer().getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName(), player.getAddress().getHostString()));
-		if ((itemMap.isOnlyFirstJoin() || itemMap.isOnlyFirstLife())) { SQL.getData(false).saveData(new DataObject(Table.IJ_FIRST_JOIN, PlayerHandler.getPlayer().getPlayerID(player), "", itemMap.getConfigName())); }
-		if (itemMap.isOnlyFirstWorld()) { SQL.getData(false).saveData(new DataObject(Table.IJ_FIRST_WORLD, PlayerHandler.getPlayer().getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName())); }
-		if (itemMap.isIpLimted() && ipLimit == null) { SQL.getData(false).saveData(new DataObject(Table.IJ_IP_LIMITS, PlayerHandler.getPlayer().getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName(), player.getAddress().getHostString())); }
+			} else if (itemMap.isDropFull()) { 
+				player.getWorld().dropItem(player.getLocation(), item);
+			}
+			ServerHandler.getServer().logDebug("{ItemMap} Given the Item: " + itemMap.getConfigName() + ".");
+		});
+		DataObject ipLimit = SQL.getData().getData(new DataObject(Table.IJ_IP_LIMITS, PlayerHandler.getPlayer().getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName(), player.getAddress().getHostString()));
+		if ((itemMap.isOnlyFirstJoin() || itemMap.isOnlyFirstLife())) { SQL.getData().saveData(new DataObject(Table.IJ_FIRST_JOIN, PlayerHandler.getPlayer().getPlayerID(player), "", itemMap.getConfigName())); }
+		if (itemMap.isOnlyFirstWorld()) { SQL.getData().saveData(new DataObject(Table.IJ_FIRST_WORLD, PlayerHandler.getPlayer().getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName())); }
+		if (itemMap.isIpLimted() && ipLimit == null) { SQL.getData().saveData(new DataObject(Table.IJ_IP_LIMITS, PlayerHandler.getPlayer().getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName(), player.getAddress().getHostString())); }
 	}
 	
    /**
@@ -605,43 +598,41 @@ public class ItemUtilities {
     * @param size - The expected stack size of the item.
     */
 	public void setCustomSlots(final Player player, final ItemMap itemMap, final int size) {
-		if (ItemJoin.getInstance().isEnabled()) {
-			Bukkit.getServer().getScheduler().runTask(ItemJoin.getInstance(), () -> {
-				int craftSlot = Utils.getUtils().getSlotConversion(itemMap.getSlot());
-				ItemStack existingItem = ItemHandler.getItem().getItem(player, itemMap);
-				ItemStack item = itemMap.getItem(player).clone();
-				this.shiftItem(player, itemMap);
-				int nextSlot = this.nextItem(player, itemMap);
-				boolean overWrite = itemMap.isOverwritable() || ConfigHandler.getConfig(false).getFile("items.yml").getBoolean("items-Overwrite");
-				if (size > 1) { item.setAmount(size); }
-				if ((size > 1 || itemMap.isAlwaysGive()) && !overWrite && existingItem != null) {
-					player.getInventory().addItem(item);
-				} else if (nextSlot != 0) {
-					player.getInventory().setItem(nextSlot, item);
-				} else if (CustomSlot.ARBITRARY.isSlot(itemMap.getSlot()) && player.getInventory().firstEmpty() != -1) {
-					player.getInventory().addItem(item);
-				} else if (CustomSlot.HELMET.isSlot(itemMap.getSlot()) && (existingItem == null || overWrite)) {
-					player.getEquipment().setHelmet(item);
-				} else if (CustomSlot.CHESTPLATE.isSlot(itemMap.getSlot()) && (existingItem == null || overWrite)) {
-					player.getEquipment().setChestplate(item);
-				} else if (CustomSlot.LEGGINGS.isSlot(itemMap.getSlot()) && (existingItem == null || overWrite)) {
-					player.getEquipment().setLeggings(item);
-				} else if (CustomSlot.BOOTS.isSlot(itemMap.getSlot()) && (existingItem == null || overWrite)) {
-					player.getEquipment().setBoots(item);
-				} else if (ServerHandler.getServer().hasSpecificUpdate("1_9") && CustomSlot.OFFHAND.isSlot(itemMap.getSlot()) && (existingItem == null || overWrite)) {
-					PlayerHandler.getPlayer().setOffHandItem(player, item);
-				} else if (craftSlot != -1 && (existingItem == null || overWrite || craftSlot == 0)) {
-					this.setCraftingSlots(player, item, craftSlot, 240);
-				} else if (itemMap.isDropFull()) {
-					player.getWorld().dropItem(player.getLocation(), item);
-				}
-				ServerHandler.getServer().logDebug("{ItemMap} Given the Item: " + itemMap.getConfigName() + ".");
-			});
-		}
-		DataObject ipLimit = SQL.getData(false).getData(new DataObject(Table.IJ_IP_LIMITS, PlayerHandler.getPlayer().getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName(), player.getAddress().getHostString()));
-		if ((itemMap.isOnlyFirstJoin() || itemMap.isOnlyFirstLife())) { SQL.getData(false).saveData(new DataObject(Table.IJ_FIRST_JOIN, PlayerHandler.getPlayer().getPlayerID(player), "", itemMap.getConfigName())); }
-		if (itemMap.isOnlyFirstWorld()) { SQL.getData(false).saveData(new DataObject(Table.IJ_FIRST_WORLD, PlayerHandler.getPlayer().getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName())); }
-		if (itemMap.isIpLimted() && ipLimit == null) { SQL.getData(false).saveData(new DataObject(Table.IJ_IP_LIMITS, PlayerHandler.getPlayer().getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName(), player.getAddress().getHostString())); }
+		SchedulerUtils.getScheduler().run(() -> {
+			int craftSlot = Utils.getUtils().getSlotConversion(itemMap.getSlot());
+			ItemStack existingItem = ItemHandler.getItem().getItem(player, itemMap);
+			ItemStack item = itemMap.getItem(player).clone();
+			this.shiftItem(player, itemMap);
+			int nextSlot = this.nextItem(player, itemMap);
+			boolean overWrite = itemMap.isOverwritable() || ConfigHandler.getConfig(false).getFile("items.yml").getBoolean("items-Overwrite");
+			if (size > 1) { item.setAmount(size); }
+			if ((size > 1 || itemMap.isAlwaysGive()) && !overWrite && existingItem != null) {
+				player.getInventory().addItem(item);
+			} else if (nextSlot != 0) {
+				player.getInventory().setItem(nextSlot, item);
+			} else if (CustomSlot.ARBITRARY.isSlot(itemMap.getSlot()) && player.getInventory().firstEmpty() != -1) {
+				player.getInventory().addItem(item);
+			} else if (CustomSlot.HELMET.isSlot(itemMap.getSlot()) && (existingItem == null || overWrite)) {
+				player.getEquipment().setHelmet(item);
+			} else if (CustomSlot.CHESTPLATE.isSlot(itemMap.getSlot()) && (existingItem == null || overWrite)) {
+				player.getEquipment().setChestplate(item);
+			} else if (CustomSlot.LEGGINGS.isSlot(itemMap.getSlot()) && (existingItem == null || overWrite)) {
+				player.getEquipment().setLeggings(item);
+			} else if (CustomSlot.BOOTS.isSlot(itemMap.getSlot()) && (existingItem == null || overWrite)) {
+				player.getEquipment().setBoots(item);
+			} else if (ServerHandler.getServer().hasSpecificUpdate("1_9") && CustomSlot.OFFHAND.isSlot(itemMap.getSlot()) && (existingItem == null || overWrite)) {
+				PlayerHandler.getPlayer().setOffHandItem(player, item);
+			} else if (craftSlot != -1 && (existingItem == null || overWrite || craftSlot == 0)) {
+				this.setCraftingSlots(player, item, craftSlot, 240);
+			} else if (itemMap.isDropFull()) {
+				player.getWorld().dropItem(player.getLocation(), item);
+			}
+			ServerHandler.getServer().logDebug("{ItemMap} Given the Item: " + itemMap.getConfigName() + ".");
+		});
+		DataObject ipLimit = SQL.getData().getData(new DataObject(Table.IJ_IP_LIMITS, PlayerHandler.getPlayer().getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName(), player.getAddress().getHostString()));
+		if ((itemMap.isOnlyFirstJoin() || itemMap.isOnlyFirstLife())) { SQL.getData().saveData(new DataObject(Table.IJ_FIRST_JOIN, PlayerHandler.getPlayer().getPlayerID(player), "", itemMap.getConfigName())); }
+		if (itemMap.isOnlyFirstWorld()) { SQL.getData().saveData(new DataObject(Table.IJ_FIRST_WORLD, PlayerHandler.getPlayer().getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName())); }
+		if (itemMap.isIpLimted() && ipLimit == null) { SQL.getData().saveData(new DataObject(Table.IJ_IP_LIMITS, PlayerHandler.getPlayer().getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName(), player.getAddress().getHostString())); }
 	}
 	
    /**
@@ -655,31 +646,21 @@ public class ItemUtilities {
 	private void setCraftingSlots(final Player player, final ItemStack itemStack, final int craftSlot, int attempts) {
 		if (attempts != 0) {
 			if (craftSlot == 0) {
-				if (ItemJoin.getInstance().isEnabled()) {
-					Bukkit.getServer().getScheduler().runTaskLater(ItemJoin.getInstance(), () -> {
-						if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
-						    player.getOpenInventory().getTopInventory().setItem(craftSlot, itemStack);
-						    PlayerHandler.getPlayer().updateInventory(player, 1L);
-						} else { 
-							if (ItemJoin.getInstance().isEnabled()) {
-								Bukkit.getServer().getScheduler().runTaskLater(ItemJoin.getInstance(), () -> {
-									this.setCraftingSlots(player, itemStack, craftSlot, (attempts - 1)); 
-								}, 20L); 
-							}
-						}
-					}, 2L);
-				}
+				SchedulerUtils.getScheduler().runLater(2L, () -> {
+					if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
+						player.getOpenInventory().getTopInventory().setItem(craftSlot, itemStack);
+						PlayerHandler.getPlayer().updateInventory(player, 1L);
+					} else { 
+						SchedulerUtils.getScheduler().runLater(20L, () -> this.setCraftingSlots(player, itemStack, craftSlot, (attempts - 1))); 
+					}
+				});
 			} else if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
 				if (player.getOpenInventory().getTopInventory().getItem(0) != null && !player.getOpenInventory().getTopInventory().getItem(0).getType().equals(Material.AIR)) {
 					ItemHandler.getItem().returnCraftingItem(player, 0, player.getOpenInventory().getTopInventory().getItem(0).clone(), 0L);
 				}
 				player.getOpenInventory().getTopInventory().setItem(craftSlot, itemStack);
 			} else { 		
-				if (ItemJoin.getInstance().isEnabled()) {
-					Bukkit.getServer().getScheduler().runTaskLater(ItemJoin.getInstance(), () -> {
-						this.setCraftingSlots(player, itemStack, craftSlot, (attempts - 1)); 
-						}, 20L);
-				}
+				SchedulerUtils.getScheduler().runLater(20L, () -> this.setCraftingSlots(player, itemStack, craftSlot, (attempts - 1)));
 			}
 		}
 	}
@@ -776,11 +757,11 @@ public class ItemUtilities {
 				if (compareWorld.equalsIgnoreCase(player.getWorld().getName()) || compareWorld.equalsIgnoreCase("ALL") || compareWorld.equalsIgnoreCase("GLOBAL")) {
 					for (String commands: ConfigHandler.getConfig(false).getFile("config.yml").getStringList("Active-Commands.commands")) {
 						String formatCommand = Utils.getUtils().translateLayout(commands, player).replace("first-join: ", "").replace("first-join:", "");
-						DataObject dataObject = SQL.getData(false).getData(new DataObject(Table.IJ_FIRST_COMMANDS, PlayerHandler.getPlayer().getPlayerID(player), player.getWorld().getName(), formatCommand));
+						DataObject dataObject = SQL.getData().getData(new DataObject(Table.IJ_FIRST_COMMANDS, PlayerHandler.getPlayer().getPlayerID(player), player.getWorld().getName(), formatCommand));
 						if (!(dataObject != null && (Utils.getUtils().containsIgnoreCase(commands, "first-join:") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Active-Commands.triggers"), TriggerType.FIRST_JOIN.name)))) {
 							Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), formatCommand);
 							if (Utils.getUtils().containsIgnoreCase(commands, "first-join:") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Active-Commands.triggers"), TriggerType.FIRST_JOIN.name)) {
-								SQL.getData(false).saveData(new DataObject(Table.IJ_FIRST_COMMANDS, PlayerHandler.getPlayer().getPlayerID(player), player.getWorld().getName(), formatCommand));
+								SQL.getData().saveData(new DataObject(Table.IJ_FIRST_COMMANDS, PlayerHandler.getPlayer().getPlayerID(player), player.getWorld().getName(), formatCommand));
 							}
 						}
 					}

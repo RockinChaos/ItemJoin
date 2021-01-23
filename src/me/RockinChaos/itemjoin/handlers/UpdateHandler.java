@@ -148,7 +148,7 @@ public class UpdateHandler {
     */
     private boolean updateNeeded(final CommandSender sender, final boolean onStart) {
     	if (this.updatesAllowed) {
-    		ServerHandler.getServer().messageSender(sender, "&aChecking for updates...");
+    		if (!onStart) { ServerHandler.getServer().messageSender(sender, "&aChecking for updates..."); }
     		try {
     			URLConnection connection = new URL(this.HOST + "?_=" + System.currentTimeMillis()).openConnection();
     			BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));

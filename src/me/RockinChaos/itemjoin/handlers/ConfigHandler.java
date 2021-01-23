@@ -24,7 +24,6 @@ import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.util.HashMap;
 
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -34,6 +33,7 @@ import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.ChatTab;
 import me.RockinChaos.itemjoin.item.ItemDesigner;
 import me.RockinChaos.itemjoin.item.ItemMap;
+import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.listeners.Breaking;
 import me.RockinChaos.itemjoin.listeners.Consumes;
 import me.RockinChaos.itemjoin.listeners.Drops;
@@ -53,6 +53,7 @@ import me.RockinChaos.itemjoin.listeners.Offhand;
 import me.RockinChaos.itemjoin.listeners.triggers.LimitSwitch;
 import me.RockinChaos.itemjoin.listeners.triggers.PlayerGuard;
 import me.RockinChaos.itemjoin.listeners.triggers.PlayerJoin;
+import me.RockinChaos.itemjoin.listeners.triggers.PlayerLogin;
 import me.RockinChaos.itemjoin.listeners.triggers.PlayerQuit;
 import me.RockinChaos.itemjoin.listeners.triggers.Respawn;
 import me.RockinChaos.itemjoin.listeners.triggers.WorldSwitch;
@@ -62,6 +63,7 @@ import me.RockinChaos.itemjoin.utils.LanguageAPI;
 import me.RockinChaos.itemjoin.utils.LegacyAPI;
 import me.RockinChaos.itemjoin.utils.Metrics;
 import me.RockinChaos.itemjoin.utils.Reflection;
+import me.RockinChaos.itemjoin.utils.SchedulerUtils;
 import me.RockinChaos.itemjoin.utils.Utils;
 import me.RockinChaos.itemjoin.utils.enchants.Glow;
 import me.RockinChaos.itemjoin.utils.FileData;
@@ -106,9 +108,7 @@ public class ConfigHandler {
 		if (Utils.getUtils().containsIgnoreCase(this.getHotbarTriggers(), "REGION-LEAVE") && !Utils.getUtils().isRegistered(PlayerGuard.class.getSimpleName())) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerGuard(), ItemJoin.getInstance());
 		}
-		DependAPI.getDepends(false).sendUtilityDepends();
-		int customItems = (ConfigHandler.getConfig(false).getConfigurationSection() != null ? ConfigHandler.getConfig(false).getConfigurationSection().getKeys(false).size() : 0);
-		ServerHandler.getServer().logInfo(customItems + " Custom item(s) loaded!");
+		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerLogin(), ItemJoin.getInstance());
 		this.registerGlow();
 	}
 	
@@ -117,40 +117,32 @@ public class ConfigHandler {
     * 
     */
 	private void registerClasses() {
+		final boolean reload = ItemJoin.getInstance().isStarted();
 		ServerHandler.getServer().clearErrorStatements();
 		this.copyFile("config.yml", "config-Version", 7);
 		this.copyFile("items.yml", "items-Version", 7);
 		this.copyFile(LanguageAPI.getLang(true).getFile(), LanguageAPI.getLang(false).getFile().split("-")[0] + "-Version", 8);
 		this.registerPrevent();
-		DependAPI.getDepends(true);
-		LogFilter.getFilter(true);
-		if (!ItemJoin.getInstance().isStarted()) {
-			SQL.getData(true);
-			ItemDesigner.getDesigner(true);
-			if (ItemJoin.getInstance().isEnabled()) {
-				Bukkit.getServer().getScheduler().runTaskLater(ItemJoin.getInstance(), () -> {
-					ItemJoin.getInstance().setStarted(); 
-				}, 3L);
-			}
-		} else {
-			if (ItemJoin.getInstance().isEnabled()) {
-				Bukkit.getServer().getScheduler().runTaskAsynchronously(ItemJoin.getInstance(), () -> {
-					SQL.getData(true); 
-				if (ItemJoin.getInstance().isEnabled()) {
-					Bukkit.getServer().getScheduler().runTaskLater(ItemJoin.getInstance(), () -> {
-						ItemDesigner.getDesigner(true);
-						}, 2L);
+		ItemJoin.getInstance().setStarted(false);
+		SchedulerUtils.getScheduler().runAsync(() -> {
+        	DependAPI.getDepends(true);
+        	DependAPI.getDepends(false).sendUtilityDepends();
+			int customItems = (ConfigHandler.getConfig(false).getConfigurationSection() != null ? ConfigHandler.getConfig(false).getConfigurationSection().getKeys(false).size() : 0);
+			ServerHandler.getServer().logInfo(customItems + " Custom item(s) loaded!");
+			SQL.newData(reload); {
+				SchedulerUtils.getScheduler().runLater(2L, () -> {
+					ItemDesigner.getDesigner(true); {
+						LogFilter.getFilter(true);
+						ItemJoin.getInstance().setStarted(true);
 					}
-				});
+				}); { 
+					SchedulerUtils.getScheduler().runLater(100L, () -> {
+						Metrics.getMetrics(true);
+						ServerHandler.getServer().sendErrorStatements(null);
+					});
+				}
 			}
-
-		}
-		if (ItemJoin.getInstance().isEnabled()) {
-			Bukkit.getServer().getScheduler().runTaskLater(ItemJoin.getInstance(), () -> {
-				Metrics.getMetrics(true);
-				ServerHandler.getServer().sendErrorStatements(null);
-			}, 100L);
-		}
+        });
 	}
 	
    /**
@@ -307,6 +299,34 @@ public class ConfigHandler {
 			this.getFile(configFile).options().copyDefaults(false);
 			if (configFile.contains("lang.yml")) { LanguageAPI.getLang(false).setPrefix(); }
 		}
+	}
+	
+   /**
+    * Saves the changed configuration data to the File.
+    * 
+    * @param dataFile - The FileConfiguration being modified.
+    * @param file - The file name being accessed.
+    */
+	public void saveFile(FileConfiguration dataFile, File fileFolder, String file) {
+		try {
+			dataFile.save(fileFolder); 
+			ConfigHandler.getConfig(false).getSource(file); 
+			ConfigHandler.getConfig(false).getFile(file).options().copyDefaults(false); 
+		} catch (Exception e) { 
+			ItemJoin.getInstance().getServer().getLogger().severe("Could not save data to the " + file + " data file!"); 
+			ServerHandler.getServer().sendDebugTrace(e); 
+		}	
+	}
+	
+   /**
+    * Properly reloads the configuration files.
+    * 
+    */
+	public void reloadConfigs() {
+		SQL.getData().executeLaterStatements();
+		ItemUtilities.getUtilities().closeAnimations();
+		ItemUtilities.getUtilities().clearItems();
+		ConfigHandler.getConfig(true);
 	}
 	
    /**
@@ -517,12 +537,10 @@ public class ConfigHandler {
 		}
 		if (itemMap.isCraftingItem() && !Utils.getUtils().isRegistered(Crafting.class.getSimpleName())) {
 			Crafting.cycleTask();
-			if (ItemJoin.getInstance().isEnabled()) {
-				Bukkit.getServer().getScheduler().runTaskLater(ItemJoin.getInstance(), () -> {
-					PlayerHandler.getPlayer().restoreCraftItems();
-					if (ServerHandler.getServer().hasSpecificUpdate("1_8") && !ProtocolManager.getManager().isHandling()) { ProtocolManager.getManager().handleProtocols(); }
-				}, 40L);
-			}
+			SchedulerUtils.getScheduler().runLater(40L, () -> {
+				PlayerHandler.getPlayer().restoreCraftItems();
+				if (ServerHandler.getServer().hasSpecificUpdate("1_8") && !ProtocolManager.getManager().isHandling()) { ProtocolManager.getManager().handleProtocols(); }
+			});
 			if (!Utils.getUtils().isRegistered(PlayerQuit.class.getSimpleName())) {
 				ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerQuit(), ItemJoin.getInstance());
 			}

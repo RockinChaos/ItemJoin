@@ -22,13 +22,12 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
-import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
+import me.RockinChaos.itemjoin.utils.SchedulerUtils;
 import me.RockinChaos.itemjoin.utils.Utils;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -163,22 +162,19 @@ public class Drops implements Listener {
 	* @param integer - The case 1 or 2 of a creative mode drop.
 	*/
 	private void delayedSaftey(final Player player, final int integer) {
-		Bukkit.getScheduler().scheduleSyncDelayedTask(ItemJoin.getInstance(), new Runnable() {
-			@Override
-			public void run() {
-				switch(integer) {
-				  case 1:
-					  if (isDropping.containsKey(PlayerHandler.getPlayer().getPlayerID(player))) {
-						  isDropping.remove(PlayerHandler.getPlayer().getPlayerID(player));
-					  }
-				    break;
-				  case 2:
-					  if (possibleDropping.containsKey(PlayerHandler.getPlayer().getPlayerID(player))) {
-						  possibleDropping.remove(PlayerHandler.getPlayer().getPlayerID(player));
-					  }
-				    break;
+		SchedulerUtils.getScheduler().runLater(1L, () -> {
+			switch(integer) {
+			case 1:
+				if (this.isDropping.containsKey(PlayerHandler.getPlayer().getPlayerID(player))) {
+					this.isDropping.remove(PlayerHandler.getPlayer().getPlayerID(player));
 				}
+				break;
+				case 2:
+					if (this.possibleDropping.containsKey(PlayerHandler.getPlayer().getPlayerID(player))) {
+						this.possibleDropping.remove(PlayerHandler.getPlayer().getPlayerID(player));
+					}
+			    break;
 			}
-		}, 1L);
+		});
 	}
 }

@@ -26,6 +26,7 @@ import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.handlers.UpdateHandler;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
+import me.RockinChaos.itemjoin.utils.SchedulerUtils;
 import me.RockinChaos.itemjoin.utils.UI;
 import me.RockinChaos.itemjoin.utils.protocol.ProtocolManager;
 import me.RockinChaos.itemjoin.utils.sqlite.Database;
@@ -52,12 +53,11 @@ public class ItemJoin extends JavaPlugin {
   	@Override
 	public void onEnable() {
         ConfigHandler.getConfig(true).registerEvents();
-        if (ItemJoin.getInstance().isEnabled()) {
-        	Bukkit.getServer().getScheduler().runTaskAsynchronously(ItemJoin.getInstance(), () -> { 
-        		UpdateHandler.getUpdater(true); 
-        	});
-        }
-        ServerHandler.getServer().logInfo("has been Enabled.");
+        SchedulerUtils.getScheduler().runAsync(() -> {
+        	UpdateHandler.getUpdater(true); {
+        		ServerHandler.getServer().logDebug("has been Enabled.");
+        	}
+        });
   	}
   	
    /**
@@ -70,11 +70,11 @@ public class ItemJoin extends JavaPlugin {
   		UI.getCreator().closeMenu();
   		ItemHandler.getItem().saveCooldowns();
   		ItemHandler.getItem().purgeCraftItems(true);
-	  	SQL.getData(false).executeLaterStatements();
-	  	Database.getDatabase("database").closeConnection(true);
+	  	SQL.getData().executeLaterStatements();
+	  	Database.getDatabase().closeConnection(true);
 	  	ProtocolManager.getManager().closeProtocol();
 	  	ItemUtilities.getUtilities().clearItems();
-  		ServerHandler.getServer().logInfo("has been Disabled.");
+  		ServerHandler.getServer().logDebug("has been Disabled.");
   	}
   	
    /**
@@ -89,8 +89,8 @@ public class ItemJoin extends JavaPlugin {
 	* Sets the plugin as fully loaded.
 	* 
 	*/
-	public void setStarted() {
-		this.isStarted = true;
+	public void setStarted(final boolean bool) {
+		this.isStarted = bool;
 	}
   	
    /**

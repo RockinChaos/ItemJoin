@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.ListIterator;
 import java.util.Set;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -41,11 +40,11 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.inventory.ItemStack;
 
-import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
+import me.RockinChaos.itemjoin.utils.SchedulerUtils;
 import me.RockinChaos.itemjoin.utils.Utils;
 
 public class Commands implements Listener {
@@ -239,13 +238,11 @@ public class Commands implements Listener {
 	private void onHandDrop(PlayerDropItemEvent event) {
 		if (!this.isDropEvent(event.getPlayer())) {
 			this.itemDrop.put(PlayerHandler.getPlayer().getPlayerID(event.getPlayer()), true);
-			if (ItemJoin.getInstance().isEnabled()) {
-				Bukkit.getServer().getScheduler().runTaskLater(ItemJoin.getInstance(), () -> {
-					if (this.isDropEvent(event.getPlayer())) {
-						this.itemDrop.remove(PlayerHandler.getPlayer().getPlayerID(event.getPlayer()));
-					}
-				}, 1L);
-			}
+			SchedulerUtils.getScheduler().runLater(1L, () -> {
+				if (this.isDropEvent(event.getPlayer())) {
+					this.itemDrop.remove(PlayerHandler.getPlayer().getPlayerID(event.getPlayer()));
+				}
+			});
 		}
 	}
 	

@@ -17,7 +17,6 @@
  */
 package me.RockinChaos.itemjoin.listeners;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -27,9 +26,9 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.inventory.InventoryHolder;
 
-import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
+import me.RockinChaos.itemjoin.utils.SchedulerUtils;
 import me.RockinChaos.itemjoin.utils.UI;
 import me.RockinChaos.itemjoin.utils.interfaces.Interface;
 
@@ -71,18 +70,16 @@ public class Menu implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	private void onClose(InventoryCloseEvent event) {
 		if (UI.getCreator() != null && UI.getCreator().modifyMenu((Player) event.getPlayer())) {
-			if (ItemJoin.getInstance().isEnabled()) {
-				Bukkit.getServer().getScheduler().runTaskLaterAsynchronously(ItemJoin.getInstance(), () -> { 
-					if (!UI.getCreator().isOpen((Player) event.getPlayer())) {
-						UI.getCreator().setModifyMenu(false, (Player) event.getPlayer());
-						for (ItemMap itemMap: ItemUtilities.getUtilities().getItems()) {
-							if (itemMap.getAnimationHandler() != null && itemMap.getAnimationHandler().get(event.getPlayer()) != null) {
-								itemMap.getAnimationHandler().get(event.getPlayer()).setMenu(false, 0);
-							}
+			SchedulerUtils.getScheduler().runAsyncLater(40L, () -> {
+				if (!UI.getCreator().isOpen((Player) event.getPlayer())) {
+					UI.getCreator().setModifyMenu(false, (Player) event.getPlayer());
+					for (ItemMap itemMap: ItemUtilities.getUtilities().getItems()) {
+						if (itemMap.getAnimationHandler() != null && itemMap.getAnimationHandler().get(event.getPlayer()) != null) {
+							itemMap.getAnimationHandler().get(event.getPlayer()).setMenu(false, 0);
 						}
 					}
-				}, 40L);
-			}
+				}
+			});
 		}
 	}
 }

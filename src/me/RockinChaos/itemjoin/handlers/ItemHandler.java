@@ -41,13 +41,13 @@ import org.bukkit.map.MapView;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 
-import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.item.ItemUtilities.CustomSlot;
 import me.RockinChaos.itemjoin.listeners.Crafting;
 import me.RockinChaos.itemjoin.utils.LegacyAPI;
 import me.RockinChaos.itemjoin.utils.Reflection;
+import me.RockinChaos.itemjoin.utils.SchedulerUtils;
 import me.RockinChaos.itemjoin.utils.Utils;
 import me.RockinChaos.itemjoin.utils.sqlite.SQL;
 import me.RockinChaos.itemjoin.utils.sqlite.DataObject;
@@ -431,7 +431,7 @@ public class ItemHandler {
 			for (String keys: itemMap.getPlayersOnCooldown().keySet()) {
 				String[] parts = keys.split("-.-");
 				if (System.currentTimeMillis() - itemMap.getPlayersOnCooldown().get(keys) <= itemMap.getCommandCooldown() * 1000) {
-					SQL.getData(false).saveData(new DataObject(Table.IJ_ON_COOLDOWN, parts[1], parts[0], itemMap.getConfigName(), itemMap.getCommandCooldown().toString(), itemMap.getPlayersOnCooldown().get(keys).toString()));
+					SQL.getData().saveData(new DataObject(Table.IJ_ON_COOLDOWN, parts[1], parts[0], itemMap.getConfigName(), itemMap.getCommandCooldown().toString(), itemMap.getPlayersOnCooldown().get(keys).toString()));
 				}
 			}
 		}
@@ -463,7 +463,7 @@ public class ItemHandler {
 					inv.setItem(k, craftingContents[k]); 
 					if (craftingContents[k] != null && craftingContents[k].getType() != Material.AIR) { notNull = true; }
 				}
-				if (notNull) { SQL.getData(false).saveData(new DataObject(Table.IJ_RETURN_CRAFTITEMS, PlayerHandler.getPlayer().getPlayerID(player), "", ItemHandler.getItem().serializeInventory(inv))); }
+				if (notNull) { SQL.getData().saveData(new DataObject(Table.IJ_RETURN_CRAFTITEMS, PlayerHandler.getPlayer().getPlayerID(player), "", ItemHandler.getItem().serializeInventory(inv))); }
 			} else if (Crafting.getOpenCraftItems().containsKey(PlayerHandler.getPlayer().getPlayerID(player))) {
 				Inventory inv = Bukkit.createInventory(null, 9);
 				boolean notNull = false;
@@ -472,7 +472,7 @@ public class ItemHandler {
 					inv.setItem(k, craftingContents[k]); 
 					if (craftingContents[k] != null && craftingContents[k].getType() != Material.AIR) { notNull = true; }
 				}
-				if (notNull) { SQL.getData(false).saveData(new DataObject(Table.IJ_RETURN_CRAFTITEMS, PlayerHandler.getPlayer().getPlayerID(player), "", ItemHandler.getItem().serializeInventory(inv))); }
+				if (notNull) { SQL.getData().saveData(new DataObject(Table.IJ_RETURN_CRAFTITEMS, PlayerHandler.getPlayer().getPlayerID(player), "", ItemHandler.getItem().serializeInventory(inv))); }
 			} else if (Crafting.getCraftItems().containsKey(PlayerHandler.getPlayer().getPlayerID(player))) {
 				Inventory inv = Bukkit.createInventory(null, 9);
 				boolean notNull = false;
@@ -481,7 +481,7 @@ public class ItemHandler {
 					inv.setItem(k, craftingContents[k]); 
 					if (craftingContents[k] != null && craftingContents[k].getType() != Material.AIR) { notNull = true; }
 				}
-				if (notNull) { SQL.getData(false).saveData(new DataObject(Table.IJ_RETURN_CRAFTITEMS, PlayerHandler.getPlayer().getPlayerID(player), "", ItemHandler.getItem().serializeInventory(inv))); }
+				if (notNull) { SQL.getData().saveData(new DataObject(Table.IJ_RETURN_CRAFTITEMS, PlayerHandler.getPlayer().getPlayerID(player), "", ItemHandler.getItem().serializeInventory(inv))); }
 			}
     }
     
@@ -491,7 +491,7 @@ public class ItemHandler {
     * @param player - The Player to have its crafting items restored.
     */
     public void restoreCraftItems(final Player player) {
-    	DataObject dataObject = SQL.getData(false).getData(new DataObject(Table.IJ_RETURN_CRAFTITEMS, PlayerHandler.getPlayer().getPlayerID(player), "", ""));
+    	DataObject dataObject = SQL.getData().getData(new DataObject(Table.IJ_RETURN_CRAFTITEMS, PlayerHandler.getPlayer().getPlayerID(player), "", ""));
     	Inventory inventory = (dataObject != null ? ItemHandler.getItem().deserializeInventory(dataObject.getInventory64()) : null);
 		Inventory craftView = player.getOpenInventory().getTopInventory();
 		if (inventory != null && PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
@@ -501,13 +501,9 @@ public class ItemHandler {
 				}
 			}
 			PlayerHandler.getPlayer().updateInventory(player, 1L);
-			SQL.getData(false).removeData(dataObject);
+			SQL.getData().removeData(dataObject);
 		} else if (!PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
-			if (ItemJoin.getInstance().isEnabled()) {
-				Bukkit.getServer().getScheduler().runTaskLater(ItemJoin.getInstance(), () -> { 
-					this.restoreCraftItems(player); 
-				}, 60L);
-			}
+			SchedulerUtils.getScheduler().runLater(60L, () -> this.restoreCraftItems(player));
 		}
     }
     
@@ -536,17 +532,15 @@ public class ItemHandler {
     */
     public void returnCraftingItem(final Player player, final int slot, final ItemStack item, long delay) {
     	if (item == null) { return; } if (slot == 0) { delay += 1L; }
-    	if (ItemJoin.getInstance().isEnabled()) {
-			Bukkit.getServer().getScheduler().runTaskLater(ItemJoin.getInstance(), () -> {
-	    		if (!player.isOnline()) { return; }
-	    		if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory()) && player.getGameMode() != GameMode.CREATIVE) {
-	    	    	player.getOpenInventory().getTopInventory().setItem(slot, item);	
-	    	    	PlayerHandler.getPlayer().updateInventory(player, 1L);
-	    		} else {
-	    			this.returnCraftingItem(player, slot, item, 10L);
-	    		}
-	    	}, delay);
-    	}
+    	SchedulerUtils.getScheduler().runLater(delay, () -> {
+	    	if (!player.isOnline()) { return; }
+	    	if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory()) && player.getGameMode() != GameMode.CREATIVE) {
+	    	    player.getOpenInventory().getTopInventory().setItem(slot, item);	
+	    	    PlayerHandler.getPlayer().updateInventory(player, 1L);
+	    	} else {
+	    		this.returnCraftingItem(player, slot, item, 10L);
+	    	}
+	    });
     }
     
    /**

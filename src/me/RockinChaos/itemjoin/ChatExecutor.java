@@ -39,6 +39,7 @@ import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.listeners.Crafting;
 import me.RockinChaos.itemjoin.utils.LanguageAPI;
 import me.RockinChaos.itemjoin.utils.LegacyAPI;
+import me.RockinChaos.itemjoin.utils.SchedulerUtils;
 import me.RockinChaos.itemjoin.utils.UI;
 import me.RockinChaos.itemjoin.utils.Chances;
 import me.RockinChaos.itemjoin.utils.Utils;
@@ -165,10 +166,7 @@ public class ChatExecutor implements CommandExecutor {
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
 		} else if (Execute.RELOAD.accept(sender, args, 0)) {
 			ItemHandler.getItem().saveCooldowns();
-			SQL.getData(false).executeLaterStatements();
-			ItemUtilities.getUtilities().closeAnimations();
-			ItemUtilities.getUtilities().clearItems();
-			ConfigHandler.getConfig(true);
+			ConfigHandler.getConfig(false).reloadConfigs();
 			LanguageAPI.getLang(false).sendLangMessage("commands.default.configReload", sender);
 		} else if (Execute.MENU.accept(sender, args, 0)) {
 			UI.getCreator().startMenu(sender);
@@ -213,18 +211,14 @@ public class ChatExecutor implements CommandExecutor {
 			this.handleAllItems(sender, args, true);
 		} else if (Execute.UPDATE.accept(sender, args, 0)) {
 			LanguageAPI.getLang(false).sendLangMessage("commands.updates.checkRequest", sender);
-			if (ItemJoin.getInstance().isEnabled()) {
-				Bukkit.getServer().getScheduler().runTaskAsynchronously(ItemJoin.getInstance(), () -> { 
-					UpdateHandler.getUpdater(false).checkUpdates(sender, false); 
-				});
-			}
+			SchedulerUtils.getScheduler().runAsync(() -> {
+				UpdateHandler.getUpdater(false).checkUpdates(sender, false); 
+			});
 		} else if (Execute.UPGRADE.accept(sender, args, 0)) {
 			LanguageAPI.getLang(false).sendLangMessage("commands.updates.updateRequest", sender);
-			if (ItemJoin.getInstance().isEnabled()) {
-				Bukkit.getServer().getScheduler().runTaskAsynchronously(ItemJoin.getInstance(), () -> { 
-					UpdateHandler.getUpdater(false).forceUpdates(sender); 
-					});
-			}
+			SchedulerUtils.getScheduler().runAsync(() -> {
+				UpdateHandler.getUpdater(false).forceUpdates(sender); 
+			});
 		} else if (this.matchExecutor(args) == null) {
 			LanguageAPI.getLang(false).sendLangMessage("commands.default.unknownCommand", sender);
 		} else if (!this.matchExecutor(args).playerRequired(sender, args)) {
@@ -396,16 +390,14 @@ public class ChatExecutor implements CommandExecutor {
 						? new DataObject(Table.IJ_IP_LIMITS, PlayerHandler.getPlayer().getPlayerID(PlayerHandler.getPlayer().getPlayerString(args)), "", "", "") : (table.replace("-", "_").equalsIgnoreCase("enabled_players") 
 						? new DataObject(Table.IJ_ENABLED_PLAYERS, PlayerHandler.getPlayer().getPlayerID(PlayerHandler.getPlayer().getPlayerString(args)), "", "", "") : (table.replace("-", "_").equalsIgnoreCase("first_commands") 
 						? new DataObject(Table.IJ_FIRST_COMMANDS, PlayerHandler.getPlayer().getPlayerID(PlayerHandler.getPlayer().getPlayerString(args)), "", "", "") : null))))));
-				if (dataObject != null) { SQL.getData(false).removeData(dataObject); }
+				if (dataObject != null) { SQL.getData().removeData(dataObject); }
 			} 
 			else {
 				synchronized (this) {
-					if (ItemJoin.getInstance().isEnabled()) {
-						Bukkit.getServer().getScheduler().runTaskAsynchronously(ItemJoin.getInstance(), () -> {
-							SQL.getData(false).purgeDatabase();
-							SQL.getData(true);
-						});
-					}
+					SchedulerUtils.getScheduler().runAsync(() -> {
+						SQL.getData().purgeDatabase();
+						SQL.newData(true);
+					});
 				}
 			}
 			LanguageAPI.getLang(false).sendLangMessage("commands.database.purgeSuccess", sender, placeHolders);
@@ -414,14 +406,12 @@ public class ChatExecutor implements CommandExecutor {
 			this.confirmationRequests.put(table + sender.getName(), true);
 			LanguageAPI.getLang(false).sendLangMessage("commands.database.purgeWarn", sender, placeHolders);
 			LanguageAPI.getLang(false).sendLangMessage("commands.database.purgeConfirm", sender, placeHolders);
-			if (ItemJoin.getInstance().isEnabled()) {
-				Bukkit.getServer().getScheduler().runTaskLater(ItemJoin.getInstance(), () -> {
-					if (this.confirmationRequests.get(table + sender.getName()) != null && this.confirmationRequests.get(table + sender.getName()).equals(true)) {
-						LanguageAPI.getLang(false).sendLangMessage("commands.database.purgeTimeOut", sender);
-						this.confirmationRequests.remove(table + sender.getName());
-					} 
-				}, 100L);
-			}
+			SchedulerUtils.getScheduler().runLater(100L, () -> {
+				if (this.confirmationRequests.get(table + sender.getName()) != null && this.confirmationRequests.get(table + sender.getName()).equals(true)) {
+					LanguageAPI.getLang(false).sendLangMessage("commands.database.purgeTimeOut", sender);
+					this.confirmationRequests.remove(table + sender.getName());
+				} 
+			});
 		}
 	}
 	
@@ -437,10 +427,10 @@ public class ChatExecutor implements CommandExecutor {
 		Player argsPlayer = (arguments >= 2 ? PlayerHandler.getPlayer().getPlayerString(player) : null);
 		String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[1] = (arguments >= 2 ? player : sender.getName()); placeHolders[0] = world;
 		if (arguments >= 2 && argsPlayer == null) { LanguageAPI.getLang(false).sendLangMessage("commands.default.noTarget", sender, placeHolders); return; }
-		DataObject dataObject = SQL.getData(false).getData(new DataObject(Table.IJ_ENABLED_PLAYERS, PlayerHandler.getPlayer().getPlayerID(argsPlayer), world, String.valueOf(true)));
+		DataObject dataObject = SQL.getData().getData(new DataObject(Table.IJ_ENABLED_PLAYERS, PlayerHandler.getPlayer().getPlayerID(argsPlayer), world, String.valueOf(true)));
 		if (dataObject == null || Boolean.valueOf(dataObject.getEnabled()).equals(false)) {
-			SQL.getData(false).removeData(new DataObject(Table.IJ_ENABLED_PLAYERS, PlayerHandler.getPlayer().getPlayerID(argsPlayer), world, String.valueOf(false)));
-			SQL.getData(false).saveData(new DataObject(Table.IJ_ENABLED_PLAYERS, PlayerHandler.getPlayer().getPlayerID(argsPlayer), world, String.valueOf(true)));
+			SQL.getData().removeData(new DataObject(Table.IJ_ENABLED_PLAYERS, PlayerHandler.getPlayer().getPlayerID(argsPlayer), world, String.valueOf(false)));
+			SQL.getData().saveData(new DataObject(Table.IJ_ENABLED_PLAYERS, PlayerHandler.getPlayer().getPlayerID(argsPlayer), world, String.valueOf(true)));
 			LanguageAPI.getLang(false).sendLangMessage("commands.enabled." + (arguments == 3 ? "forPlayerWorld" : (arguments == 2 ? "forPlayer" : "globalPlayers")), sender, placeHolders); 
 			if (arguments >= 2 && !sender.getName().equalsIgnoreCase(argsPlayer.getName())) { 
 				placeHolders[1] = sender.getName(); 
@@ -461,10 +451,10 @@ public class ChatExecutor implements CommandExecutor {
 		Player argsPlayer = (arguments >= 2 ? PlayerHandler.getPlayer().getPlayerString(player) : null);
 		String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[1] = (arguments >= 2 ? player : sender.getName()); placeHolders[0] = world;
 		if (arguments >= 2 && argsPlayer == null) { LanguageAPI.getLang(false).sendLangMessage("commands.default.noTarget", sender, placeHolders); return; }
-		DataObject dataObject = SQL.getData(false).getData(new DataObject(Table.IJ_ENABLED_PLAYERS, PlayerHandler.getPlayer().getPlayerID(argsPlayer), world, String.valueOf(false)));
+		DataObject dataObject = SQL.getData().getData(new DataObject(Table.IJ_ENABLED_PLAYERS, PlayerHandler.getPlayer().getPlayerID(argsPlayer), world, String.valueOf(false)));
 		if (dataObject == null || Boolean.valueOf(dataObject.getEnabled()).equals(true)) {
-			SQL.getData(false).removeData(new DataObject(Table.IJ_ENABLED_PLAYERS, PlayerHandler.getPlayer().getPlayerID(argsPlayer), world, String.valueOf(true)));
-			SQL.getData(false).saveData(new DataObject(Table.IJ_ENABLED_PLAYERS, PlayerHandler.getPlayer().getPlayerID(argsPlayer), world, String.valueOf(false)));
+			SQL.getData().removeData(new DataObject(Table.IJ_ENABLED_PLAYERS, PlayerHandler.getPlayer().getPlayerID(argsPlayer), world, String.valueOf(true)));
+			SQL.getData().saveData(new DataObject(Table.IJ_ENABLED_PLAYERS, PlayerHandler.getPlayer().getPlayerID(argsPlayer), world, String.valueOf(false)));
 			LanguageAPI.getLang(false).sendLangMessage("commands.disabled." + (arguments == 3 ? "forPlayerWorld" : (arguments == 2 ? "forPlayer" : "globalPlayers")), sender, placeHolders); 
 			if (arguments >= 2 && !sender.getName().equalsIgnoreCase(argsPlayer.getName())) { 
 				placeHolders[1] = sender.getName(); 
