@@ -69,46 +69,6 @@
 					<altDeploymentRepository>internal.repo::default::file://${env.JENKINS_HOME}/maven-public</altDeploymentRepository>
 				</configuration>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-shade-plugin</artifactId>
-				<version>3.2.1</version>
-				<configuration>
-					<finalName>ItemJoin-${project.version}-b${env.BUILD_NUMBER}</finalName>
-				</configuration>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>shade</goal>
-						</goals>
-						<configuration>
-							<artifactSet>
-								<includes>
-									<include>tv.mineinthebox.simpleserver:SimpleHttpServer:jar:</include>
-								</includes>
-							</artifactSet>
-							<relocations>
-								<relocation>
-									<pattern>tv.mineinthebox.simpleserver</pattern>
-									<shadedPattern>tv.mineinthebox.simpleserver</shadedPattern>
-								</relocation>
-							</relocations>
-							<filters>
-								<filter>
-									<artifact>*</artifact>
-									<excludes>
-										<exclude>META-INF/*.SF</exclude>
-										<exclude>META-INF/*.RSA</exclude>
-										<exclude>META-INF/*.INF</exclude>
-										<exclude>META-INF/*.MF</exclude>
-									</excludes>
-								</filter>
-							</filters>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
 		</plugins>
 	</build>
 	<repositories>
@@ -248,7 +208,7 @@
             <groupId>de.jeff_media</groupId>
             <artifactId>ChestSortAPI</artifactId>
             <version>2.0.0</version>
-       	    <scope>compile</scope>
+       	    <scope>provided</scope>
         </dependency>
 		<!--Mojang AuthLib API-->
 		<dependency>
@@ -262,14 +222,14 @@
 			<groupId>org.bstats</groupId>
 			<artifactId>bstats-bukkit</artifactId>
 			<version>1.4</version>
-			<scope>compile</scope>
+			<scope>provided</scope>
 		</dependency>
 		<!--Apache API-->
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 			<version>2.7</version>
-			<scope>compile</scope>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
