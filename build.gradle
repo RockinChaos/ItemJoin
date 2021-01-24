@@ -1,0 +1,92 @@
+  
+plugins {
+    id "java"
+    id "maven-publish"
+    id "net.minecrell.licenser" version "0.4.1"
+    id "com.github.johnrengelman.shadow" version "6.0.0"
+}
+
+group "me.RockinChaos"
+version "v5.1.1-${System.getProperty("BUILD_NUMBER")}"
+
+description ""
+
+dependencies {
+    compile "io.netty:netty-all:4.1.42.Final"
+	compile "commons-lang:commons-lang:2.6"
+	compile "org.spigotmc:spigot-api:1.16.4-R0.1-SNAPSHOT"
+	compile "me.clip:placeholderapi:2.10.4"
+	compile "fr.xephi:authme:5.6.0-SNAPSHOT"
+	compile "net.milkbowl.vault:VaultAPI:1.7"
+	compile "com.github.shynixn.headdatabase:hdb-api:1.0"
+	compile "com.vk2gpz.tokenenchant:TokenEnchantAPI:18.0.2"
+	compile "com:skinsrestorer:13.8.2-SNAPSHOT"
+	compile "net.citizensnpcs:citizens:2.0.27-SNAPSHOT"
+	compile "de.jeff_media:ChestSortAPI:2.0.0"
+	compile "com.mojang:authlib:1.5.21"
+	compile "org.bstats:bstats-bukkit:1.4"
+	compile "commons-io:commons-io:2.7"
+	compile "org.apache.logging.log4j:log4j-api:2.13.3"
+	compile "com.googlecode.json-simple:json-simple:1.1.1"
+	compile "com.google.guava:guava:29.0-jre"
+	compile "com.zaxxer:HikariCP:LATEST"
+	compile "de.domedd.betternick:BetterNick:7.4-SNAPSHOT"
+	compile "com.sk89q.worldguard:worldguard-bukkit:7.0.4-SNAPSHOT"
+	compile "com.sk89q.worldedit:worldedit-bukkit:7.2.0-SNAPSHOT"
+}
+
+processResources {
+    from(sourceSets.main.resources.srcDirs) {
+        filter org.apache.tools.ant.filters.ReplaceTokens, tokens: [name: rootProject.name, version: project.version.toString(), description: project.description]
+    }
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+
+    withJavadocJar()
+    withSourcesJar()
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}
+
+tasks.withType(Javadoc) {
+    failOnError false
+    options.addStringOption('Xdoclint:none', '-quiet')
+    options.addStringOption('encoding', 'UTF-8')
+    options.addStringOption('charSet', 'UTF-8')
+}
+
+shadowJar {
+    archiveClassifier.set("")
+}
+
+license {
+    include '**/*.java'
+
+    matching('**/*.java') {
+        header = file('config/headers/main.txt')
+    }
+
+    matching('**/JSONMessage.java') {
+        header = file('config/headers/jsonmessage.txt')
+    }
+
+    ext {
+        year = 2020
+    }
+}
+
+test {
+    useJUnitPlatform()
+}
+
+sourceSets {
+    test.compileClasspath += configurations.compileOnly
+    test.runtimeClasspath += configurations.compileOnly
+}
+
+publish.dependsOn clean, test, jar
