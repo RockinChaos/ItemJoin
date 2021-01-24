@@ -1,9 +1,10 @@
 <!-- ItemJoin build file -->
-<project
-	xmlns="http://maven.apache.org/POM/4.0.0"
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+	
 	<packaging>jar</packaging>
 	<groupId>me.RockinChaos.itemjoin</groupId>
 	<artifactId>ItemJoin</artifactId>
@@ -30,10 +31,6 @@
 				<version>3.1.0</version>
 				<configuration>
 					<finalName>ItemJoin</finalName>
-				    <excludes>
-				      <exclude>*.jar</exclude>
-				      <excludeScope>provided</excludeScope>
-				    </excludes>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -45,7 +42,6 @@
 						<excludes>
 							<exclude>org.jetbrains:*</exclude>
 							<exclude>org.intellij.lang:*</exclude>
-							<excludeScope>provided</excludeScope>
 						</excludes>
 					</artifactSet>
 				</configuration>
@@ -194,6 +190,7 @@
 			<groupId>com</groupId>
 			<artifactId>skinsrestorer</artifactId>
 			<version>13.8.2-SNAPSHOT</version>
+			<scope>provided</scope>
 		</dependency>
 		<!--Citizens API-->
         <dependency>
