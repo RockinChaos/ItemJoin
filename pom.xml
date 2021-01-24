@@ -30,6 +30,9 @@
 				<version>3.1.0</version>
 				<configuration>
 					<finalName>ItemJoin</finalName>
+				    <excludes>
+				      <exclude>*.jar</exclude>
+				    </excludes>
 				</configuration>
 			</plugin>
 			<plugin>
