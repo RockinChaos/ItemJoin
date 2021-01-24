@@ -1,141 +1,55 @@
-plugins {
-    id "java"
-    id "maven-publish"
-    id "net.minecrell.licenser" version "0.4.1"
-    id "com.github.johnrengelman.shadow" version "6.0.0"
+apply plugin: 'java'
+apply plugin: 'maven'
+
+group = 'me.RockinChaos.itemjoin'
+version = '5.1.1-SNAPSHOT'
+
+description = """ItemJoin"""
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+tasks.withType(JavaCompile) {
+	options.encoding = 'UTF-8'
 }
 
-group "me.RockinChaos"
-version "v5.1.1-${System.getProperty("BUILD_NUMBER")}"
 
-description "Custom items"
 
 repositories {
-    mavenCentral()
-
-    maven({ url = "https://repo.codemc.org/repository/maven-public" })
-    maven({ url = "https://hub.spigotmc.org/nexus/content/repositories/snapshots/" })
+        
+     maven { url "https://hub.spigotmc.org/nexus/content/repositories/snapshots/" }
+     maven { url "http://repo.extendedclip.com/content/repositories/placeholderapi/" }
+     maven { url "http://repo.codemc.org/repository/maven-public/" }
+     maven { url "https://libraries.minecraft.net/" }
+     maven { url "https://repo.codemc.org/repository/maven-public" }
+     maven { url "https://raw.githubusercontent.com/TeamVK/maven-repository/master/release/" }
+     maven { url "https://repo.codemc.org/repository/maven-snapshots/" }
+     maven { url "https://maven.enginehub.org/repo/" }
+     maven { url "https://ci.ender.zone/plugin/repository/everything/net/milkbowl/vault/" }
+     maven { url "https://repo.citizensnpcs.co/" }
+     maven { url "https://repo.jeff-media.de/maven2" }
+     maven { url "https://raw.githubusercontent.com/RockinChaos/repository/maven-public/" }
+     maven { url "https://repo.maven.apache.org/maven2" }
 }
-
 dependencies {
-    compileOnly "org.spigotmc:spigot-api:1.16.4-R0.1-SNAPSHOT"
-    compileOnly "org.jetbrains:annotations:19.0.0"
-    compileOnly "io.netty:netty-all:4.1.42.Final"
-	compileOnly "commons-lang:commons-lang:2.6"
-	compileOnly "org.spigotmc:spigot-api:1.16.4-R0.1-SNAPSHOT"
-	compileOnly "me.clip:placeholderapi:2.10.4"
-	compileOnly "fr.xephi:authme:5.6.0-SNAPSHOT"
-	compileOnly "net.milkbowl.vault:VaultAPI:1.7"
-	compileOnly "com.github.shynixn.headdatabase:hdb-api:1.0"
-	compileOnly "com.vk2gpz.tokenenchant:TokenEnchantAPI:18.0.2"
-	compileOnly "com:skinsrestorer:13.8.2-SNAPSHOT"
-	compileOnly "net.citizensnpcs:citizens:2.0.27-SNAPSHOT"
-	compileOnly "de.jeff_media:ChestSortAPI:2.0.0"
-	compileOnly "com.mojang:authlib:1.5.21"
-	compileOnly "org.bstats:bstats-bukkit:1.4"
-	compileOnly "commons-io:commons-io:2.7"
-	compileOnly "org.apache.logging.log4j:log4j-api:2.13.3"
-	compileOnly "com.googlecode.json-simple:json-simple:1.1.1"
-	compileOnly "com.google.guava:guava:29.0-jre"
-	compileOnly "com.zaxxer:HikariCP:LATEST"
-	compileOnly "de.domedd.betternick:BetterNick:7.4-SNAPSHOT"
-	compileOnly "com.sk89q.worldguard:worldguard-bukkit:7.0.4-SNAPSHOT"
-	compileOnly "com.sk89q.worldedit:worldedit-bukkit:7.2.0-SNAPSHOT"
+    compile group: 'commons-lang', name: 'commons-lang', version:'2.6'
+    compile group: 'com', name: 'skinsrestorer', version:'13.8.2-SNAPSHOT'
+    compile group: 'com.zaxxer', name: 'HikariCP', version:'LATEST'
+    compileOnly group: 'io.netty', name: 'netty-all', version:'4.1.42.Final'
+    compileOnly group: 'org.spigotmc', name: 'spigot-api', version:'1.16.4-R0.1-SNAPSHOT'
+    compileOnly group: 'me.clip', name: 'placeholderapi', version:'2.10.4'
+    compileOnly group: 'fr.xephi', name: 'authme', version:'5.6.0-SNAPSHOT'
+    compileOnly group: 'net.milkbowl.vault', name: 'VaultAPI', version:'1.7'
+    compileOnly group: 'com.github.shynixn.headdatabase', name: 'hdb-api', version:'1.0'
+    compileOnly group: 'com.vk2gpz.tokenenchant', name: 'TokenEnchantAPI', version:'18.0.2'
+    compileOnly group: 'net.citizensnpcs', name: 'citizens', version:'2.0.27-SNAPSHOT'
+    compileOnly group: 'de.jeff_media', name: 'ChestSortAPI', version:'2.0.0'
+    compileOnly group: 'com.mojang', name: 'authlib', version:'1.5.21'
+    compileOnly group: 'org.bstats', name: 'bstats-bukkit', version:'1.4'
+    compileOnly group: 'commons-io', name: 'commons-io', version:'2.7'
+    compileOnly group: 'org.apache.logging.log4j', name: 'log4j-api', version:'2.13.3'
+    compileOnly group: 'com.googlecode.json-simple', name: 'json-simple', version:'1.1.1'
+    compileOnly group: 'com.google.guava', name: 'guava', version:'29.0-jre'
+    compileOnly group: 'de.domedd.betternick', name: 'BetterNick', version:'7.4-SNAPSHOT'
+    compileOnly group: 'com.sk89q.worldguard', name: 'worldguard-bukkit', version:'7.0.4-SNAPSHOT'
+    compileOnly group: 'com.sk89q.worldedit', name: 'worldedit-bukkit', version:'7.2.0-SNAPSHOT'
 }
-
-processResources {
-    from(sourceSets.main.resources.srcDirs) {
-        filter org.apache.tools.ant.filters.ReplaceTokens, tokens: [name: rootProject.name, version: project.version.toString(), description: project.description]
-    }
-}
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
-
-    withJavadocJar()
-    withSourcesJar()
-}
-
-tasks.withType(JavaCompile) {
-    options.encoding = "UTF-8"
-}
-
-tasks.withType(Javadoc) {
-    failOnError false
-    options.addStringOption('Xdoclint:none', '-quiet')
-    options.addStringOption('encoding', 'UTF-8')
-    options.addStringOption('charSet', 'UTF-8')
-}
-
-shadowJar {
-    archiveClassifier.set("")
-    
-}
-
-license {
-    include '**/*.java'
-
-    matching('**/*.java') {
-        header = file('config/headers/main.txt')
-    }
-
-    matching('**/JSONMessage.java') {
-        header = file('config/headers/jsonmessage.txt')
-    }
-
-    ext {
-        year = 2020
-    }
-}
-
-test {
-    useJUnitPlatform()
-}
-
-sourceSets {
-    test.compileClasspath += configurations.compileOnly
-    test.runtimeClasspath += configurations.compileOnly
-}
-
-publishing {
-    repositories {
-        maven {
-            if (version.contains("-DEV-")) {
-                url = uri("https://craftationgaming.com.com/content/repositories/dev/")
-            } else {
-                url = uri("https://craftationgaming.com/content/repositories/itemjoin/")
-            }
-
-            credentials {
-                username = System.getenv("JENKINS_USER")
-                password = System.getenv("JENKINS_PASS")
-            }
-        }
-    }
-
-    publications {
-        mavenJava(MavenPublication) {
-            artifactId = "itemjoin"
-
-            from components.java
-
-            pom.withXml {
-
-                // some are having issues with bstats so we might need to add that to the pom as well
-
-                asNode().appendNode("packaging", "jar")
-                asNode().remove(asNode().get("dependencies"))
-
-                def dependenciesNode = asNode().appendNode("dependencies")
-                // jetbrains annotations
-                def jetbrainsAnnotations = dependenciesNode.appendNode("dependency")
-                jetbrainsAnnotations.appendNode("groupId", "org.jetbrains")
-                jetbrainsAnnotations.appendNode("artifactId", "annotations")
-                jetbrainsAnnotations.appendNode("version", "19.0.0")
-            }
-        }
-    }
-}
-
-publish.dependsOn clean, test, jar
