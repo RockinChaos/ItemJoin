@@ -25,23 +25,6 @@
 				</configuration>
 			</plugin>
 			<plugin>
-			  <groupId>org.apache.maven.plugins</groupId>
-			  <artifactId>maven-dependency-plugin</artifactId>
-			  <executions>
-			    <execution>
-			      <id>copy-dependencies</id>
-			      <phase>process-resources</phase>
-			      <goals>
-			        <goal>copy-dependencies</goal>
-			      </goals>
-			      <configuration>
-			        <excludeScope>provided</excludeScope>
-			        <outputDirectory>${project.build.directory}/lib</outputDirectory>
-			      </configuration>
-			    </execution>
-			  </executions>
-			</plugin>
-			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
 				<version>3.1.0</version>
@@ -49,6 +32,7 @@
 					<finalName>ItemJoin</finalName>
 				    <excludes>
 				      <exclude>*.jar</exclude>
+				      <excludeScope>provided</excludeScope>
 				    </excludes>
 				</configuration>
 			</plugin>
@@ -61,6 +45,7 @@
 						<excludes>
 							<exclude>org.jetbrains:*</exclude>
 							<exclude>org.intellij.lang:*</exclude>
+							<excludeScope>provided</excludeScope>
 						</excludes>
 					</artifactSet>
 				</configuration>
