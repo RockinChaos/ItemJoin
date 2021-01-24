@@ -4,77 +4,45 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+	<packaging>jar</packaging>
 	<groupId>me.RockinChaos.itemjoin</groupId>
 	<artifactId>ItemJoin</artifactId>
+	<name>ItemJoin</name>
 	<version>5.1.1-SNAPSHOT</version>
+	<description>Get custom items on join.</description>
+	<url>https://www.spigotmc.org/resources/itemjoin.12661/</url>
+	
 	<build>
-		<sourceDirectory>${project.basedir}</sourceDirectory>
-		<resources>
-			<resource>
-				<targetPath>.</targetPath>
-				<filtering>true</filtering>
-				<directory>.</directory>
-				<includes>
-					<include>*.yml</include>
-					<include>LICENSE</include>
-				</includes>
-			</resource>
-			<resource>
-				<targetPath>./files</targetPath>
-				<filtering>true</filtering>
-				<directory>./files</directory>
-				<includes>
-					<include>**/*.yml</include>
-					<include>**/*.jpg</include>
-				</includes>
-			</resource>
-		</resources>
+
 		<plugins>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.1</version>
+				<version>3.8.0</version>
 				<configuration>
-					<encoding>Cp1252</encoding>
-					<source>1.8</source>
-					<target>1.8</target>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
 				</configuration>
 			</plugin>
 			<plugin>
-				<groupId>com.github.github</groupId>
-				<artifactId>site-maven-plugin</artifactId>
-				<version>0.11</version>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>3.1.0</version>
 				<configuration>
-					<message>Published artifacts me.RockinChaos.itemjoin.ItemJoin:${project.version}</message>
-					<outputDirectory>${env.JENKINS_HOME}/maven-public</outputDirectory>
-					<branch>refs/heads/maven-public</branch>
-					<includes>
-						<include>**/*</include>
-					</includes>
-					<repositoryName>Repository</repositoryName>
-					<repositoryOwner>RockinChaos</repositoryOwner>
-				</configuration>
-				<executions>
-					<execution>
-						<goals>
-							<goal>site</goal>
-						</goals>
-						<phase>deploy</phase>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<artifactId>maven-deploy-plugin</artifactId>
-				<version>2.8.2</version>
-				<configuration>
-					<altDeploymentRepository>internal.repo::default::file://${env.JENKINS_HOME}/maven-public</altDeploymentRepository>
+					<finalName>ItemJoin</finalName>
 				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
-				<version>3.2.1</version>
+				<version>3.1.0</version>
 				<configuration>
-					<finalName>ItemJoin-${project.version}-b${env.BUILD_NUMBER}</finalName>
+					<artifactSet>
+						<excludes>
+							<exclude>org.jetbrains:*</exclude>
+							<exclude>org.intellij.lang:*</exclude>
+						</excludes>
+					</artifactSet>
 				</configuration>
 				<executions>
 					<execution>
@@ -82,40 +50,21 @@
 						<goals>
 							<goal>shade</goal>
 						</goals>
-						<configuration>
-							<artifactSet>
-								<includes>
-									<include>com.zaxxer.hikari:HikariCP:jar:</include>
-									<include>tv.mineinthebox.simpleserver:SimpleHttpServer:jar:</include>
-								</includes>
-							</artifactSet>
-							<relocations>
-								<relocation>
-									<pattern>tv.mineinthebox.simpleserver</pattern>
-									<shadedPattern>tv.mineinthebox.simpleserver</shadedPattern>
-								</relocation>
-								<relocation>
-									<pattern>com.zaxxer.hikari</pattern>
-									<shadedPattern>tv.mineinthebox.simpleserver</shadedPattern>
-								</relocation>
-							</relocations>
-							<filters>
-								<filter>
-									<artifact>*</artifact>
-									<excludes>
-										<exclude>META-INF/*.SF</exclude>
-										<exclude>META-INF/*.RSA</exclude>
-										<exclude>META-INF/*.INF</exclude>
-										<exclude>META-INF/*.MF</exclude>
-									</excludes>
-								</filter>
-							</filters>
-						</configuration>
 					</execution>
 				</executions>
 			</plugin>
 		</plugins>
+
+		<extensions>
+			<extension>
+				<groupId>org.apache.maven.wagon</groupId>
+				<artifactId>wagon-ftp</artifactId>
+				<version>3.4.1</version>
+			</extension>
+		</extensions>
+
 	</build>
+	
 	<repositories>
 		<!--Spigot Repository-->
 		<repository>
@@ -178,6 +127,7 @@
 			<url>https://raw.githubusercontent.com/RockinChaos/repository/maven-public/</url>
 		</repository>
 	</repositories>
+	
 	<dependencies>
 		<!--Netty API-->
 		<dependency>
@@ -324,26 +274,28 @@
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
+	
 	<scm>
 		<url>https://github.com/RockinChaos/ItemJoin</url>
 		<connection>scm:git:ssh://git@github.com/RockinChaos/ItemJoin</connection>
 		<developerConnection>scm:git:ssh://git@github.com/RockinChaos/ItemJoin.git</developerConnection>
 	</scm>
+	
 	<organization>
 		<name>ItemJoin</name>
 		<url>https://github.com/RockinChaos/ItemJoin</url>
 	</organization>
-	<name>ItemJoin</name>
-	<url>https://www.spigotmc.org/resources/itemjoin.12661/</url>
-	<description>Get custom items on join.</description>
+	
 	<issueManagement>
 		<url>https://github.com/RockinChaos/ItemJoin/issues</url>
 		<system>Github</system>
 	</issueManagement>
+	
 	<ciManagement>
 		<system>Jenkins</system>
 		<url>https://ci.craftationgaming.com/job/ItemJoin/</url>
 	</ciManagement>
+	
 	<distributionManagement>
 		<repository>
 			<id>internal.repo</id>
@@ -351,10 +303,10 @@
 			<url>file://${env.JENKINS_HOME}/maven-public</url>
 		</repository>
 	</distributionManagement>
+	
 	<properties>
-		<maven.compiler.source>1.8</maven.compiler.source>
-		<maven.compiler.target>1.8</maven.compiler.target>
-		<github.global.server>github</github.global.server>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<java.version>1.8</java.version>
+		<github.global.server>github</github.global.server>
 	</properties>
 </project>
