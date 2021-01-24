@@ -1,0 +1,360 @@
+<!-- ItemJoin build file -->
+<project
+	xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>me.RockinChaos.itemjoin</groupId>
+	<artifactId>ItemJoin</artifactId>
+	<version>5.1.1-SNAPSHOT</version>
+	<build>
+		<sourceDirectory>${project.basedir}</sourceDirectory>
+		<resources>
+			<resource>
+				<targetPath>.</targetPath>
+				<filtering>true</filtering>
+				<directory>.</directory>
+				<includes>
+					<include>*.yml</include>
+					<include>LICENSE</include>
+				</includes>
+			</resource>
+			<resource>
+				<targetPath>./files</targetPath>
+				<filtering>true</filtering>
+				<directory>./files</directory>
+				<includes>
+					<include>**/*.yml</include>
+					<include>**/*.jpg</include>
+				</includes>
+			</resource>
+		</resources>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.8.1</version>
+				<configuration>
+					<encoding>Cp1252</encoding>
+					<source>1.8</source>
+					<target>1.8</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>com.github.github</groupId>
+				<artifactId>site-maven-plugin</artifactId>
+				<version>0.11</version>
+				<configuration>
+					<message>Published artifacts me.RockinChaos.itemjoin.ItemJoin:${project.version}</message>
+					<outputDirectory>${env.JENKINS_HOME}/maven-public</outputDirectory>
+					<branch>refs/heads/maven-public</branch>
+					<includes>
+						<include>**/*</include>
+					</includes>
+					<repositoryName>Repository</repositoryName>
+					<repositoryOwner>RockinChaos</repositoryOwner>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>site</goal>
+						</goals>
+						<phase>deploy</phase>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<version>2.8.2</version>
+				<configuration>
+					<altDeploymentRepository>internal.repo::default::file://${env.JENKINS_HOME}/maven-public</altDeploymentRepository>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>3.2.1</version>
+				<configuration>
+					<finalName>ItemJoin-${project.version}-b${env.BUILD_NUMBER}</finalName>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<artifactSet>
+								<includes>
+									<include>com.zaxxer.hikari:HikariCP:jar:</include>
+									<include>tv.mineinthebox.simpleserver:SimpleHttpServer:jar:</include>
+								</includes>
+							</artifactSet>
+							<relocations>
+								<relocation>
+									<pattern>tv.mineinthebox.simpleserver</pattern>
+									<shadedPattern>tv.mineinthebox.simpleserver</shadedPattern>
+								</relocation>
+								<relocation>
+									<pattern>com.zaxxer.hikari</pattern>
+									<shadedPattern>tv.mineinthebox.simpleserver</shadedPattern>
+								</relocation>
+							</relocations>
+							<filters>
+								<filter>
+									<artifact>*</artifact>
+									<excludes>
+										<exclude>META-INF/*.SF</exclude>
+										<exclude>META-INF/*.RSA</exclude>
+										<exclude>META-INF/*.INF</exclude>
+										<exclude>META-INF/*.MF</exclude>
+									</excludes>
+								</filter>
+							</filters>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+	<repositories>
+		<!--Spigot Repository-->
+		<repository>
+			<id>spigot-repo</id>
+			<url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+		</repository>
+		<!--PlaceholderAPI Repository-->
+		<repository>
+			<id>placeholderapi</id>
+			<url>http://repo.extendedclip.com/content/repositories/placeholderapi/</url>
+		</repository>
+		<!--AuthMe Repository-->
+		<repository>
+			<id>codemc-repo</id>
+			<url>http://repo.codemc.org/repository/maven-public/</url>
+		</repository>
+		<!--Mojang Repository-->
+		<repository>
+			<id>mojang</id>
+			<url>https://libraries.minecraft.net/</url>
+		</repository>
+		<!--bStats Repository-->
+		<repository>
+			<id>CodeMC</id>
+			<url>https://repo.codemc.org/repository/maven-public</url>
+		</repository>
+		<!--TokenEnchant Repository-->
+		<repository>
+			<id>teamvk-repo</id>
+			<url>https://raw.githubusercontent.com/TeamVK/maven-repository/master/release/</url>
+		</repository>
+		<!--SkinsRestorer Repository-->
+		<repository>
+			<id>codemc-snapshots</id>
+			<url>https://repo.codemc.org/repository/maven-snapshots/</url>
+		</repository>
+		<!--WorldGuard/WorldEdit Repository-->
+		<repository>
+			<id>sk89q-repo</id>
+			<url>https://maven.enginehub.org/repo/</url>
+		</repository>
+		<!--Vault Repository-->
+		<repository>
+			<id>VaultAPI</id>
+			<url>https://ci.ender.zone/plugin/repository/everything/net/milkbowl/vault/</url>
+		</repository>
+		<!--Citizens Repository-->
+        <repository>
+            <id>everything</id>
+            <url>https://repo.citizensnpcs.co/</url>
+        </repository>
+		<!--ChestSort Repository-->
+        <repository>
+            <id>jeff-media-repo</id>
+            <url>https://repo.jeff-media.de/maven2</url>
+        </repository>
+		<!--CraftationGaming Repository-->
+		<repository>
+			<id>CraftationGaming</id>
+			<url>https://raw.githubusercontent.com/RockinChaos/repository/maven-public/</url>
+		</repository>
+	</repositories>
+	<dependencies>
+		<!--Netty API-->
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-all</artifactId>
+			<version>4.1.42.Final</version>
+			<scope>provided</scope>
+		</dependency>
+		<!--Maven WorldUtils API-->
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>2.6</version>
+		</dependency>
+		<!--Spigot API-->
+		<dependency>
+			<groupId>org.spigotmc</groupId>
+			<artifactId>spigot-api</artifactId>
+			<version>1.16.4-R0.1-SNAPSHOT</version>
+			<scope>provided</scope>
+		</dependency>
+		<!--PlaceholderAPI API-->
+		<dependency>
+			<groupId>me.clip</groupId>
+			<artifactId>placeholderapi</artifactId>
+			<version>2.10.4</version>
+			<scope>provided</scope>
+		</dependency>
+		<!--AuthMe API-->
+		<dependency>
+			<groupId>fr.xephi</groupId>
+			<artifactId>authme</artifactId>
+			<version>5.6.0-SNAPSHOT</version>
+			<scope>provided</scope>
+		</dependency>
+		<!--Vault API-->
+		<dependency>
+			<groupId>net.milkbowl.vault</groupId>
+			<artifactId>VaultAPI</artifactId>
+			<version>1.7</version>
+			<scope>provided</scope>
+		</dependency>
+		<!--HeadDatabase API-->
+		<dependency>
+			<groupId>com.github.shynixn.headdatabase</groupId>
+			<artifactId>hdb-api</artifactId>
+			<version>1.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<!--TokenEnchant API-->
+		<dependency>
+			<groupId>com.vk2gpz.tokenenchant</groupId>
+			<artifactId>TokenEnchantAPI</artifactId>
+			<version>18.0.2</version>
+			<scope>provided</scope>
+		</dependency>
+		<!--SkinsRestorer API-->
+		<dependency>
+			<groupId>com</groupId>
+			<artifactId>skinsrestorer</artifactId>
+			<version>13.8.2-SNAPSHOT</version>
+		</dependency>
+		<!--Citizens API-->
+        <dependency>
+            <groupId>net.citizensnpcs</groupId>
+            <artifactId>citizens</artifactId>
+            <version>2.0.27-SNAPSHOT</version>
+            <type>jar</type>
+       	    <scope>provided</scope>
+        </dependency>
+		<!--ChestSort API-->
+        <dependency>
+            <groupId>de.jeff_media</groupId>
+            <artifactId>ChestSortAPI</artifactId>
+            <version>2.0.0</version>
+       	    <scope>provided</scope>
+        </dependency>
+		<!--Mojang AuthLib API-->
+		<dependency>
+			<groupId>com.mojang</groupId>
+			<artifactId>authlib</artifactId>
+			<version>1.5.21</version>
+			<scope>provided</scope>
+		</dependency>
+		<!--bStats API-->
+		<dependency>
+			<groupId>org.bstats</groupId>
+			<artifactId>bstats-bukkit</artifactId>
+			<version>1.4</version>
+			<scope>provided</scope>
+		</dependency>
+		<!--Apache API-->
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.7</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-api</artifactId>
+			<version>2.13.3</version>
+			<scope>provided</scope>
+		</dependency>
+		<!--Google API-->
+		<dependency>
+			<groupId>com.googlecode.json-simple</groupId>
+			<artifactId>json-simple</artifactId>
+			<version>1.1.1</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>29.0-jre</version>
+			<scope>provided</scope>
+		</dependency>
+		<!--Hikari API-->
+	    <dependency>
+	      <groupId>com.zaxxer</groupId>
+	      <artifactId>HikariCP</artifactId>
+	      <version>LATEST</version>
+	      <scope>compile</scope>
+	    </dependency>
+		<!--BetterNick API-->
+		<dependency>
+			<groupId>de.domedd.betternick</groupId>
+			<artifactId>BetterNick</artifactId>
+			<version>7.4-SNAPSHOT</version>
+			<scope>provided</scope>
+		</dependency>
+		<!--WorldGuard API-->
+		<dependency>
+			<groupId>com.sk89q.worldguard</groupId>
+			<artifactId>worldguard-bukkit</artifactId>
+			<version>7.0.4-SNAPSHOT</version>
+			<scope>provided</scope>
+		</dependency>
+		<!--WorldEdit API-->
+		<dependency>
+			<groupId>com.sk89q.worldedit</groupId>
+			<artifactId>worldedit-bukkit</artifactId>
+			<version>7.2.0-SNAPSHOT</version>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+	<scm>
+		<url>https://github.com/RockinChaos/ItemJoin</url>
+		<connection>scm:git:ssh://git@github.com/RockinChaos/ItemJoin</connection>
+		<developerConnection>scm:git:ssh://git@github.com/RockinChaos/ItemJoin.git</developerConnection>
+	</scm>
+	<organization>
+		<name>ItemJoin</name>
+		<url>https://github.com/RockinChaos/ItemJoin</url>
+	</organization>
+	<name>ItemJoin</name>
+	<url>https://www.spigotmc.org/resources/itemjoin.12661/</url>
+	<description>Get custom items on join.</description>
+	<issueManagement>
+		<url>https://github.com/RockinChaos/ItemJoin/issues</url>
+		<system>Github</system>
+	</issueManagement>
+	<ciManagement>
+		<system>Jenkins</system>
+		<url>https://ci.craftationgaming.com/job/ItemJoin/</url>
+	</ciManagement>
+	<distributionManagement>
+		<repository>
+			<id>internal.repo</id>
+			<name>staging-repository</name>
+			<url>file://${env.JENKINS_HOME}/maven-public</url>
+		</repository>
+	</distributionManagement>
+	<properties>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+		<github.global.server>github</github.global.server>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+</project>
