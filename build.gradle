@@ -1,4 +1,3 @@
-  
 plugins {
     id "java"
     id "maven-publish"
@@ -6,33 +5,42 @@ plugins {
     id "com.github.johnrengelman.shadow" version "6.0.0"
 }
 
-group "me.RockinChaos"
+group "me.clip"
 version "v5.1.1-${System.getProperty("BUILD_NUMBER")}"
 
-description ""
+description "Custom items"
+
+repositories {
+    mavenCentral()
+
+    maven({ url = "https://repo.codemc.org/repository/maven-public" })
+    maven({ url = "https://hub.spigotmc.org/nexus/content/repositories/snapshots/" })
+}
 
 dependencies {
-    compile "io.netty:netty-all:4.1.42.Final"
-	compile "commons-lang:commons-lang:2.6"
-	compile "org.spigotmc:spigot-api:1.16.4-R0.1-SNAPSHOT"
-	compile "me.clip:placeholderapi:2.10.4"
-	compile "fr.xephi:authme:5.6.0-SNAPSHOT"
-	compile "net.milkbowl.vault:VaultAPI:1.7"
-	compile "com.github.shynixn.headdatabase:hdb-api:1.0"
-	compile "com.vk2gpz.tokenenchant:TokenEnchantAPI:18.0.2"
-	compile "com:skinsrestorer:13.8.2-SNAPSHOT"
-	compile "net.citizensnpcs:citizens:2.0.27-SNAPSHOT"
-	compile "de.jeff_media:ChestSortAPI:2.0.0"
-	compile "com.mojang:authlib:1.5.21"
-	compile "org.bstats:bstats-bukkit:1.4"
-	compile "commons-io:commons-io:2.7"
-	compile "org.apache.logging.log4j:log4j-api:2.13.3"
-	compile "com.googlecode.json-simple:json-simple:1.1.1"
-	compile "com.google.guava:guava:29.0-jre"
-	compile "com.zaxxer:HikariCP:LATEST"
-	compile "de.domedd.betternick:BetterNick:7.4-SNAPSHOT"
-	compile "com.sk89q.worldguard:worldguard-bukkit:7.0.4-SNAPSHOT"
-	compile "com.sk89q.worldedit:worldedit-bukkit:7.2.0-SNAPSHOT"
+    compileOnly "org.spigotmc:spigot-api:1.16.4-R0.1-SNAPSHOT"
+    compileOnly "org.jetbrains:annotations:19.0.0"
+    compileOnly "io.netty:netty-all:4.1.42.Final"
+	compileOnly "commons-lang:commons-lang:2.6"
+	compileOnly "org.spigotmc:spigot-api:1.16.4-R0.1-SNAPSHOT"
+	compileOnly "me.clip:placeholderapi:2.10.4"
+	compileOnly "fr.xephi:authme:5.6.0-SNAPSHOT"
+	compileOnly "net.milkbowl.vault:VaultAPI:1.7"
+	compileOnly "com.github.shynixn.headdatabase:hdb-api:1.0"
+	compileOnly "com.vk2gpz.tokenenchant:TokenEnchantAPI:18.0.2"
+	compileOnly "com:skinsrestorer:13.8.2-SNAPSHOT"
+	compileOnly "net.citizensnpcs:citizens:2.0.27-SNAPSHOT"
+	compileOnly "de.jeff_media:ChestSortAPI:2.0.0"
+	compileOnly "com.mojang:authlib:1.5.21"
+	compileOnly "org.bstats:bstats-bukkit:1.4"
+	compileOnly "commons-io:commons-io:2.7"
+	compileOnly "org.apache.logging.log4j:log4j-api:2.13.3"
+	compileOnly "com.googlecode.json-simple:json-simple:1.1.1"
+	compileOnly "com.google.guava:guava:29.0-jre"
+	compileOnly "com.zaxxer:HikariCP:LATEST"
+	compileOnly "de.domedd.betternick:BetterNick:7.4-SNAPSHOT"
+	compileOnly "com.sk89q.worldguard:worldguard-bukkit:7.0.4-SNAPSHOT"
+	compileOnly "com.sk89q.worldedit:worldedit-bukkit:7.2.0-SNAPSHOT"
 }
 
 processResources {
@@ -62,6 +70,7 @@ tasks.withType(Javadoc) {
 
 shadowJar {
     archiveClassifier.set("")
+    
 }
 
 license {
@@ -87,6 +96,46 @@ test {
 sourceSets {
     test.compileClasspath += configurations.compileOnly
     test.runtimeClasspath += configurations.compileOnly
+}
+
+publishing {
+    repositories {
+        maven {
+            if (version.contains("-DEV-")) {
+                url = uri("https://craftationgaming.com.com/content/repositories/dev/")
+            } else {
+                url = uri("https://craftationgaming.com/content/repositories/itemjoin/")
+            }
+
+            credentials {
+                username = System.getenv("JENKINS_USER")
+                password = System.getenv("JENKINS_PASS")
+            }
+        }
+    }
+
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = "itemjoin"
+
+            from components.java
+
+            pom.withXml {
+
+                // some are having issues with bstats so we might need to add that to the pom as well
+
+                asNode().appendNode("packaging", "jar")
+                asNode().remove(asNode().get("dependencies"))
+
+                def dependenciesNode = asNode().appendNode("dependencies")
+                // jetbrains annotations
+                def jetbrainsAnnotations = dependenciesNode.appendNode("dependency")
+                jetbrainsAnnotations.appendNode("groupId", "org.jetbrains")
+                jetbrainsAnnotations.appendNode("artifactId", "annotations")
+                jetbrainsAnnotations.appendNode("version", "19.0.0")
+            }
+        }
+    }
 }
 
 publish.dependsOn clean, test, jar
