@@ -286,6 +286,12 @@
 			<version>2.13.3</version>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-nop</artifactId>
+			<version>1.7.30</version>
+			<scope>provided</scope>
+		</dependency>
 		<!--Google API-->
 		<dependency>
 			<groupId>com.googlecode.json-simple</groupId>
