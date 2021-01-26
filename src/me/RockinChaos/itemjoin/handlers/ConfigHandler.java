@@ -22,8 +22,12 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.nio.file.CopyOption;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
+import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -75,6 +79,7 @@ public class ConfigHandler {
 	private HashMap < String, Boolean > noSource = new HashMap < String, Boolean > ();
 	
 	private boolean Generating = false;
+	private int permissionLength = 2;
 	
 	private YamlConfiguration itemsFile;
 	private YamlConfiguration configFile;
@@ -138,6 +143,7 @@ public class ConfigHandler {
 				}); { 
 					SchedulerUtils.getScheduler().runLater(100L, () -> {
 						Metrics.getMetrics(true);
+						this.setPermissionPages();
 						ServerHandler.getServer().sendErrorStatements(null);
 					});
 				}
@@ -327,6 +333,36 @@ public class ConfigHandler {
 		ItemUtilities.getUtilities().closeAnimations();
 		ItemUtilities.getUtilities().clearItems();
 		ConfigHandler.getConfig(true);
+	}
+	
+   /**
+    * Sets the number of permission pages.
+    * 
+    */
+	public void setPermissionPages() {
+		List < String > customPermissions = new ArrayList < String > ();
+		for (World world: Bukkit.getServer().getWorlds()) {
+			List < String > inputListed = new ArrayList < String > ();
+			for (ItemMap item: ItemUtilities.getUtilities().getItems()) {
+				if ((item.getPermissionNode() != null ? !customPermissions.contains(item.getPermissionNode()) : true) && !inputListed.contains(item.getConfigName()) && item.inWorld(world)) {
+					if (item.getPermissionNode() != null) { customPermissions.add(item.getPermissionNode()); }
+					inputListed.add(item.getConfigName());
+				}
+			}
+		}
+		if (customPermissions.size() > 15) {
+			//double length = (customPermissions.size() / 15);
+			this.permissionLength = (int) Math.ceil((double)customPermissions.size() / 15) + 1;
+		}
+	}
+	
+   /**
+    * Gets the number of permission pages.
+    * 
+    * @return The number of permission pages.
+    */
+	public int getPermissionPages() {
+		return this.permissionLength;
 	}
 	
    /**

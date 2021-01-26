@@ -80,14 +80,13 @@ public class ChatExecutor implements CommandExecutor {
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin World &7- &eCheck what world you are in, debugging.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Menu &7- &eOpens the GUI Creator for custom items.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Permissions &7- &eLists the permissions you have.");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Permissions 2 &7- &ePermissions page 2.");
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Info &7- &eGets data-info of the held item.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&aType &a&l/ItemJoin Help 3 &afor the next page.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]---------------&a&l[&e Help Menu 2/10 &a&l]&a&l&m---------------[");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
 		} else if (Execute.HELP.accept(sender, args, 3)) {
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Info &7- &eGets data-info of the held item.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Get <Item> &7- &eGives that ItemJoin item.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Get <Item> <Qty> &7- &eGives amount of said item.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Get <Item> <User> &7- &eGives to said player.");
@@ -316,7 +315,7 @@ public class ChatExecutor implements CommandExecutor {
 	*/
 	private void permissions(final CommandSender sender, final int page) {
 		LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
-		int maxPage = 2;
+		int maxPage = ConfigHandler.getConfig(false).getPermissionPages();
 		if (page == 1) {
 			LanguageAPI.getLang(false).dispatchMessage(sender, (PermissionsHandler.getPermissions().hasPermission(sender, "itemjoin.*") ? "&a[\u2714]" : "&c[\u2718]") + " ItemJoin.*");
 			LanguageAPI.getLang(false).dispatchMessage(sender, (PermissionsHandler.getPermissions().hasPermission(sender, "itemjoin.all") ? "&a[\u2714]" : "&c[\u2718]") + " ItemJoin.All");
@@ -342,26 +341,28 @@ public class ChatExecutor implements CommandExecutor {
 							? sender.isPermissionSet("itemjoin." + world.getName() + ".*") : !ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Permissions.Obtain-Items")))
 				? "&a[\u2714]" : "&c[\u2718]") + " ItemJoin." + world.getName() + ".*"); 
 			}
-		} else if (page == 2) {
+		} else if (page != 0) {
 			List < String > customPermissions = new ArrayList < String > ();
+			List < String > inputMessage = new ArrayList < String > ();
 			for (World world: Bukkit.getServer().getWorlds()) {
-				List < String > inputListed = new ArrayList < String > ();
 				final ItemMap probable = Chances.getChances().getRandom(((Player) sender));
 				for (ItemMap item: ItemUtilities.getUtilities().getItems()) {
-					if ((item.getPermissionNode() != null ? !customPermissions.contains(item.getPermissionNode()) : true) && !inputListed.contains(item.getConfigName()) && item.inWorld(world) && Chances.getChances().isProbability(item, probable)) {
+					if ((item.getPermissionNode() != null ? !customPermissions.contains(item.getPermissionNode()) : true) && item.inWorld(world) && Chances.getChances().isProbability(item, probable)) {
 						if (item.getPermissionNode() != null) { customPermissions.add(item.getPermissionNode()); }
-						inputListed.add(item.getConfigName());
 						if (item.hasPermission(((Player) sender))) {
-							LanguageAPI.getLang(false).dispatchMessage(sender, "&a[\u2714] " + PermissionsHandler.getPermissions().customPermissions(item.getPermissionNode(), item.getConfigName(), world.getName()));
+							inputMessage.add("&a[\u2714] " + PermissionsHandler.getPermissions().customPermissions(item.getPermissionNode(), item.getConfigName(), world.getName()));
 						} else {
-							LanguageAPI.getLang(false).dispatchMessage(sender, "&c[\u2718] " + PermissionsHandler.getPermissions().customPermissions(item.getPermissionNode(), item.getConfigName(), world.getName()));
+							inputMessage.add("&c[\u2718] " + PermissionsHandler.getPermissions().customPermissions(item.getPermissionNode(), item.getConfigName(), world.getName()));
 						}
 					}
 				}
 			}
+			for (int i = (page == 2 ? 0 : ((page - 2) * 15) + 1); i <= ((page - 1) * 15 <= inputMessage.size() ? (page - 1) * 15 : (inputMessage.size() - 1)); i++) {
+				LanguageAPI.getLang(false).dispatchMessage(sender, inputMessage.get(i));
+			}
 		}
 		if (page != maxPage) { LanguageAPI.getLang(false).dispatchMessage(sender, "&aType &a&l/ItemJoin Permissions " + (page + 1) + " &afor the next page."); }
-		LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]-------------&a&l[&e Permissions Menu " + page + "/" + maxPage + " &a&l]&a&l&m------------[");
+		LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]------------&a&l[&e Permissions Menu " + page + "/" + maxPage + " &a&l]&a&l&m-----------[");
 	}
 	
    /**
@@ -670,11 +671,13 @@ public class ChatExecutor implements CommandExecutor {
 	    * 
 	    */
 		private boolean hasSyntax(final String[] args, final int page) {
-			return ((args.length >= 2 && (args[1].equalsIgnoreCase(String.valueOf(page)) || (!Utils.getUtils().isInt(args[1]) && !this.equals(Execute.PURGE)))) 
+			return ((args.length >= 2 && (args[1].equalsIgnoreCase(String.valueOf(page)) || (this.equals(Execute.PERMISSIONS) && page == 2 
+				 && Utils.getUtils().isInt(args[1]) && Integer.parseInt(args[1]) != 0 && Integer.parseInt(args[1]) <= ConfigHandler.getConfig(false).getPermissionPages()) 
+				 || (!Utils.getUtils().isInt(args[1]) && !this.equals(Execute.PURGE)))) 
 				 || (args.length < 2 && (!this.equals(Execute.GET) && !this.equals(Execute.GETONLINE) && !this.equals(Execute.REMOVE) && !this.equals(Execute.REMOVEONLINE))
 				 || (this.equals(Execute.PURGE) && (args.length == 1 
-				 || (args.length >= 3 && (args[1].equalsIgnoreCase("map-ids") || args[1].equalsIgnoreCase("ip-limits") || args[1].equalsIgnoreCase("first-join") || args[1].equalsIgnoreCase("first-world") || args[1].equalsIgnoreCase("enabled-players") 
-				 || args[1].equalsIgnoreCase("first-commands")))))));
+				 || (args.length >= 3 && (args[1].equalsIgnoreCase("map-ids") || args[1].equalsIgnoreCase("ip-limits") || args[1].equalsIgnoreCase("first-join") || args[1].equalsIgnoreCase("first-world") 
+				 || args[1].equalsIgnoreCase("enabled-players") || args[1].equalsIgnoreCase("first-commands")))))));
 		}
 		
        /**
