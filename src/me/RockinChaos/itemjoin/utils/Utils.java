@@ -99,7 +99,7 @@ public class Utils {
 		String[] parts = string1.split(argument);
 		boolean splitParts = string1.contains(argument);
 		for (int i = 0; i < (splitParts ? parts.length : 1); i++) {
-			if ((splitParts && parts[i] != null && string2 != null && parts[i].toLowerCase().contains(string2.toLowerCase()))
+			if ((splitParts && parts[i] != null && string2 != null && parts[i].toLowerCase().replace(" ", "").equalsIgnoreCase(string2.replace(" ", "").toLowerCase()))
 			|| (!splitParts && string1 != null && string2 != null && string1.toLowerCase().equalsIgnoreCase(string2.toLowerCase()))) {
 				return true;
 			}

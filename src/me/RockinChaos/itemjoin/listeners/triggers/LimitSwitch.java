@@ -24,6 +24,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
+import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.item.ItemUtilities.TriggerType;
 
@@ -43,5 +44,6 @@ public class LimitSwitch implements Listener {
 		if (PlayerHandler.getPlayer().isPlayer(player)) {
 			ItemUtilities.getUtilities().setAuthenticating(player, player.getWorld(), TriggerType.LIMIT_SWITCH, newMode, "GLOBAL"); 
 		}
+		ServerHandler.getServer().logDebug("{ItemMap} " + player.getName() + " has performed the LIMIT-SWITCH trigger.");
 	}
 }

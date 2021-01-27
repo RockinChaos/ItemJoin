@@ -29,8 +29,8 @@ import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.utils.SchedulerUtils;
 import me.RockinChaos.itemjoin.utils.UI;
 import me.RockinChaos.itemjoin.utils.protocol.ProtocolManager;
-import me.RockinChaos.itemjoin.utils.sqlite.Database;
-import me.RockinChaos.itemjoin.utils.sqlite.SQL;
+import me.RockinChaos.itemjoin.utils.sql.Database;
+import me.RockinChaos.itemjoin.utils.sql.SQL;
 
 public class ItemJoin extends JavaPlugin {
 	

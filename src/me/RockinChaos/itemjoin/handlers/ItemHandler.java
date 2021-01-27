@@ -49,9 +49,9 @@ import me.RockinChaos.itemjoin.utils.LegacyAPI;
 import me.RockinChaos.itemjoin.utils.Reflection;
 import me.RockinChaos.itemjoin.utils.SchedulerUtils;
 import me.RockinChaos.itemjoin.utils.Utils;
-import me.RockinChaos.itemjoin.utils.sqlite.SQL;
-import me.RockinChaos.itemjoin.utils.sqlite.DataObject;
-import me.RockinChaos.itemjoin.utils.sqlite.DataObject.Table;
+import me.RockinChaos.itemjoin.utils.sql.DataObject;
+import me.RockinChaos.itemjoin.utils.sql.SQL;
+import me.RockinChaos.itemjoin.utils.sql.DataObject.Table;
 
 public class ItemHandler {
 	
@@ -312,7 +312,7 @@ public class ItemHandler {
     * @param item - The ItemStack to have its Skull Texture changed.
     * @param skullTexture - The Skull Texture to be added to the ItemStack.
     */
-    public ItemStack setSkullTexture(final ItemStack item, String skullTexture) {
+    public ItemStack setSkullTexture(final ItemStack item, final String skullTexture) {
     	try {
 	        ItemMeta itemMeta = item.getItemMeta();
 			GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);

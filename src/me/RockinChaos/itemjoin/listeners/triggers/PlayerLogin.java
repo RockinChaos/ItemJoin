@@ -36,7 +36,7 @@ public class PlayerLogin implements Listener {
 	* 
 	* @param event - AsyncPlayerPreLoginEvent
 	*/
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	private void onPlayerPreLogin(AsyncPlayerPreLoginEvent event) {
 		if (ConfigHandler.getConfig(false).sqlEnabled() && !ItemJoin.getInstance().isStarted()) {
 			ServerHandler.getServer().logDebug("Processing pre-login for " + (ServerHandler.getServer().hasSpecificUpdate("1_8") ? event.getUniqueId() : "Legacy") + " - " + event.getName());
@@ -51,7 +51,7 @@ public class PlayerLogin implements Listener {
 	* 
 	* @param event - AsyncPlayerPreLoginEvent
 	*/
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onPlayerLogin(PlayerLoginEvent event) {
     	final Player player = event.getPlayer();
     	if (ConfigHandler.getConfig(false).sqlEnabled() && !ItemJoin.getInstance().isStarted()) {
