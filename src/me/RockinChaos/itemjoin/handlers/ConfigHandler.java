@@ -72,7 +72,7 @@ import me.RockinChaos.itemjoin.utils.Utils;
 import me.RockinChaos.itemjoin.utils.enchants.Glow;
 import me.RockinChaos.itemjoin.utils.FileData;
 import me.RockinChaos.itemjoin.utils.protocol.ProtocolManager;
-import me.RockinChaos.itemjoin.utils.sqlite.SQL;
+import me.RockinChaos.itemjoin.utils.sql.SQL;
 
 public class ConfigHandler {
 	
@@ -95,25 +95,6 @@ public class ConfigHandler {
 	    ItemJoin.getInstance().getCommand("itemjoin").setExecutor(new ChatExecutor());
 	    ItemJoin.getInstance().getCommand("itemjoin").setTabCompleter(new ChatTab());
 		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Menu(), ItemJoin.getInstance());
-		if (((this.clearEnabled("Join") || this.triggerEnabled("Join") || this.triggerEnabled("First-Join")) || Utils.getUtils().containsIgnoreCase(this.getHotbarTriggers(), "JOIN")) && !Utils.getUtils().isRegistered(PlayerJoin.class.getSimpleName())) {
-			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerJoin(), ItemJoin.getInstance());
-		}
-		if (((this.clearEnabled("World-Switch") || this.triggerEnabled("World-Switch")) || Utils.getUtils().containsIgnoreCase(this.getHotbarTriggers(), "WORLD-SWITCH")) && !Utils.getUtils().isRegistered(WorldSwitch.class.getSimpleName())) {
-			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new WorldSwitch(), ItemJoin.getInstance());
-		}
-		if ((Utils.getUtils().containsIgnoreCase(this.getHotbarTriggers(), "RESPAWN") || this.triggerEnabled("Respawn")) && !Utils.getUtils().isRegistered(Respawn.class.getSimpleName())) {
-			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Respawn(), ItemJoin.getInstance());
-		}
-		if (Utils.getUtils().containsIgnoreCase(this.getHotbarTriggers(), "LIMIT-MODES") && !Utils.getUtils().isRegistered(LimitSwitch.class.getSimpleName())) {
-			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new LimitSwitch(), ItemJoin.getInstance());
-		}
-		if ((this.clearEnabled("Region-Enter") || Utils.getUtils().containsIgnoreCase(this.getHotbarTriggers(), "REGION-ENTER")) && !Utils.getUtils().isRegistered(PlayerGuard.class.getSimpleName()) && DependAPI.getDepends(false).getGuard().guardEnabled()) {
-			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerGuard(), ItemJoin.getInstance());
-		}
-		if (Utils.getUtils().containsIgnoreCase(this.getHotbarTriggers(), "REGION-LEAVE") && !Utils.getUtils().isRegistered(PlayerGuard.class.getSimpleName())) {
-			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerGuard(), ItemJoin.getInstance());
-		}
-		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerLogin(), ItemJoin.getInstance());
 		this.registerGlow();
 	}
 	
@@ -139,11 +120,11 @@ public class ConfigHandler {
 					ItemDesigner.getDesigner(true); {
 						LogFilter.getFilter(true);
 						ItemJoin.getInstance().setStarted(true);
+						this.setPermissionPages();
 					}
 				}); { 
 					SchedulerUtils.getScheduler().runLater(100L, () -> {
 						Metrics.getMetrics(true);
-						this.setPermissionPages();
 						ServerHandler.getServer().sendErrorStatements(null);
 					});
 				}
@@ -156,6 +137,25 @@ public class ConfigHandler {
     * 
     */
 	private void registerPrevent() {
+		if (((this.clearEnabled("Join") || this.triggerEnabled("Join") || this.triggerEnabled("First-Join")) || Utils.getUtils().containsIgnoreCase(this.getHotbarTriggers(), "JOIN")) && !Utils.getUtils().isRegistered(PlayerJoin.class.getSimpleName())) {
+			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerJoin(), ItemJoin.getInstance());
+		}
+		if (((this.clearEnabled("World-Switch") || this.triggerEnabled("World-Switch")) || Utils.getUtils().containsIgnoreCase(this.getHotbarTriggers(), "WORLD-SWITCH")) && !Utils.getUtils().isRegistered(WorldSwitch.class.getSimpleName())) {
+			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new WorldSwitch(), ItemJoin.getInstance());
+		}
+		if ((Utils.getUtils().containsIgnoreCase(this.getHotbarTriggers(), "RESPAWN") || this.triggerEnabled("Respawn")) && !Utils.getUtils().isRegistered(Respawn.class.getSimpleName())) {
+			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Respawn(), ItemJoin.getInstance());
+		}
+		if (Utils.getUtils().containsIgnoreCase(this.getHotbarTriggers(), "GAMEMODE-SWITCH") && !Utils.getUtils().isRegistered(LimitSwitch.class.getSimpleName())) {
+			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new LimitSwitch(), ItemJoin.getInstance());
+		}
+		if ((this.clearEnabled("Region-Enter") || Utils.getUtils().containsIgnoreCase(this.getHotbarTriggers(), "REGION-ENTER")) && !Utils.getUtils().isRegistered(PlayerGuard.class.getSimpleName()) && DependAPI.getDepends(false).getGuard().guardEnabled()) {
+			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerGuard(), ItemJoin.getInstance());
+		}
+		if (Utils.getUtils().containsIgnoreCase(this.getHotbarTriggers(), "REGION-LEAVE") && !Utils.getUtils().isRegistered(PlayerGuard.class.getSimpleName())) {
+			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerGuard(), ItemJoin.getInstance());
+		}
+		if (!Utils.getUtils().isRegistered(PlayerLogin.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerLogin(), ItemJoin.getInstance()); }
 		if ((!Utils.getUtils().containsIgnoreCase(this.getPrevent("Pickups"), "FALSE") && !Utils.getUtils().containsIgnoreCase(this.getPrevent("Pickups"), "DISABLED"))) {
 			if (ServerHandler.getServer().hasSpecificUpdate("1_12") && Reflection.getReflection().getBukkitClass("event.entity.EntityPickupItemEvent") != null && !Utils.getUtils().isRegistered(Pickups.class.getSimpleName())) { 
 				ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Pickups(), ItemJoin.getInstance()); 
@@ -313,7 +313,7 @@ public class ConfigHandler {
     * @param dataFile - The FileConfiguration being modified.
     * @param file - The file name being accessed.
     */
-	public void saveFile(FileConfiguration dataFile, File fileFolder, String file) {
+	public void saveFile(final FileConfiguration dataFile, final File fileFolder, final String file) {
 		try {
 			dataFile.save(fileFolder); 
 			ConfigHandler.getConfig(false).getSource(file); 
@@ -322,6 +322,17 @@ public class ConfigHandler {
 			ItemJoin.getInstance().getServer().getLogger().severe("Could not save data to the " + file + " data file!"); 
 			ServerHandler.getServer().sendDebugTrace(e); 
 		}	
+	}
+	
+   /**
+    * Softly reloads the configuration files.
+    * Usefully when editing booleans.
+    * 
+    */
+	public void softReload() {
+		this.copyFile("config.yml", "config-Version", 7);
+		this.copyFile("items.yml", "items-Version", 7);
+		this.registerPrevent();
 	}
 	
    /**
@@ -351,7 +362,6 @@ public class ConfigHandler {
 			}
 		}
 		if (customPermissions.size() > 15) {
-			//double length = (customPermissions.size() / 15);
 			this.permissionLength = (int) Math.ceil((double)customPermissions.size() / 15) + 1;
 		}
 	}
@@ -408,7 +418,7 @@ public class ConfigHandler {
     * @param type - The item clearing trigger.
     * @return If the clear type is enabled.
     */
-	public boolean clearEnabled(String type) {
+	public boolean clearEnabled(final String type) {
 		if (this.getFile("config.yml").getString("Clear-Items." + type) != null 
 		&& !this.getFile("config.yml").getString("Clear-Items." + type).equalsIgnoreCase("DISABLED") && !this.getFile("config.yml").getString("Clear-Items." + type).equalsIgnoreCase("FALSE")) {
 			return true;
@@ -422,7 +432,7 @@ public class ConfigHandler {
     * @param type - The commands trigger.
     * @return If the trigger type is enabled.
     */
-	public boolean triggerEnabled(String type) {
+	public boolean triggerEnabled(final String type) {
 		if (this.getFile("config.yml").getString("Active-Commands.triggers") != null && Utils.getUtils().containsIgnoreCase(this.getFile("config.yml").getString("Active-Commands.triggers"), type)
 			&& (!this.getFile("config.yml").getString("Active-Commands.enabled-worlds").equalsIgnoreCase("DISABLED") && !this.getFile("config.yml").getString("Active-Commands.enabled-worlds").equalsIgnoreCase("FALSE"))) {
 			return true;
