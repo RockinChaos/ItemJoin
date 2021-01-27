@@ -44,9 +44,9 @@ import me.RockinChaos.itemjoin.utils.DependAPI;
 import me.RockinChaos.itemjoin.utils.LanguageAPI;
 import me.RockinChaos.itemjoin.utils.SchedulerUtils;
 import me.RockinChaos.itemjoin.utils.Utils;
-import me.RockinChaos.itemjoin.utils.sqlite.DataObject;
-import me.RockinChaos.itemjoin.utils.sqlite.DataObject.Table;
-import me.RockinChaos.itemjoin.utils.sqlite.SQL;
+import me.RockinChaos.itemjoin.utils.sql.DataObject;
+import me.RockinChaos.itemjoin.utils.sql.SQL;
+import me.RockinChaos.itemjoin.utils.sql.DataObject.Table;
 
 public class ItemUtilities {
   	private List < ItemMap > items = new ArrayList < ItemMap >();
@@ -217,7 +217,7 @@ public class ItemUtilities {
     * @param newMode - The GameMode of the Player.
     * @param region - The region the Player is in.
     */
-	private void handleItems(final Player player, TriggerType type, final GameMode newMode, final String region) {
+	private void handleItems(final Player player, TriggerType type, final GameMode gameMode, final String region) {
 		final ItemMap randomMap = Chances.getChances().getRandom(player);
 		final int session = Utils.getUtils().getRandom(1, 100000);
 		for (ItemMap item : this.getItems()) { 
@@ -228,15 +228,15 @@ public class ItemUtilities {
 			  || (type.equals(TriggerType.LIMIT_SWITCH) && item.isUseOnLimitSwitch())
 		      || ((((type.equals(TriggerType.REGION_ENTER) && (item.isGiveOnRegionEnter() || item.isGiveOnRegionAccess())) 
 			  || (type.equals(TriggerType.REGION_LEAVE) && (item.isGiveOnRegionLeave() || item.isGiveOnRegionEgress()))) && item.inRegion(region))))
-			   && item.inWorld(player.getWorld()) && Chances.getChances().isProbability(item, randomMap) && item.conditionMet(player, "trigger-condition")
+			   && item.isLimitMode(gameMode) && item.inWorld(player.getWorld()) && Chances.getChances().isProbability(item, randomMap) && item.conditionMet(player, "trigger-condition")
 			   && PlayerHandler.getPlayer().isEnabled(player) && item.hasPermission(player) 
-			   && this.isObtainable(player, item, session, type, (newMode != null ? newMode : player.getGameMode()))) {
+			   && this.isObtainable(player, item, session, type)) {
 				item.giveTo(player); 
-			} else if (((type.equals(TriggerType.LIMIT_SWITCH) && item.isUseOnLimitSwitch() && !item.isLimitMode(newMode))
+			} else if (((type.equals(TriggerType.LIMIT_SWITCH) && item.isUseOnLimitSwitch() && !item.isLimitMode(gameMode))
 					|| (((type.equals(TriggerType.REGION_LEAVE) && item.isGiveOnRegionAccess()) || (type.equals(TriggerType.REGION_ENTER) && item.isGiveOnRegionEgress())) && item.inRegion(region)))
 					&& item.inWorld(player.getWorld()) && item.hasItem(player)) {
 				item.removeFrom(player);
-			} else if (item.isAutoRemove() && !item.inWorld(player.getWorld()) && item.hasItem(player)) {
+			} else if (item.isAutoRemove() && (!item.inWorld(player.getWorld()) || !item.isLimitMode(gameMode)) && item.hasItem(player)) {
 				item.removeFrom(player);
 			}
 		}
@@ -394,32 +394,30 @@ public class ItemUtilities {
     * @param gamemode - The current GameMode of the Player.
     * @return If the ItemMap is Obtainable.
     */
-	public boolean isObtainable(final Player player, final ItemMap itemMap, final int session, final TriggerType type, final GameMode gamemode) {
+	public boolean isObtainable(final Player player, final ItemMap itemMap, final int session, final TriggerType type) {
 		if (!itemMap.hasItem(player) || itemMap.isAlwaysGive()) {
 			DataObject firstJoin = SQL.getData().getData(new DataObject(Table.IJ_FIRST_JOIN, PlayerHandler.getPlayer().getPlayerID(player), "", itemMap.getConfigName()));
 			DataObject firstWorld = SQL.getData().getData(new DataObject(Table.IJ_FIRST_WORLD, PlayerHandler.getPlayer().getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName()));
 			DataObject ipLimit = SQL.getData().getData(new DataObject(Table.IJ_IP_LIMITS, PlayerHandler.getPlayer().getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName(), player.getAddress().getHostString()));
-			if (itemMap.isLimitMode(gamemode)) {
-				if ((firstJoin == null || (itemMap.isOnlyFirstLife() && type.equals(TriggerType.RESPAWN))) && firstWorld == null 
-						&& (ipLimit == null || (ipLimit != null && ipLimit.getPlayerId().equalsIgnoreCase(PlayerHandler.getPlayer().getPlayerID(player)))) && this.canOverwrite(player, itemMap)) {
-					return true;
-				} else if (firstJoin == null && firstWorld == null && ipLimit == null) {
-					if (session != 0 && this.failCount.get(session) != null) {
-						this.failCount.put(session, this.failCount.get(session) + 1);
-					} else if (session != 0) { this.failCount.put(session, 1); }
-					ServerHandler.getServer().logDebug("{ItemMap} " + player.getName() + " has failed to receive item: " + itemMap.getConfigName() + ".");
+			if ((firstJoin == null || (itemMap.isOnlyFirstLife() && type.equals(TriggerType.RESPAWN))) && firstWorld == null 
+					&& (ipLimit == null || (ipLimit != null && ipLimit.getPlayerId().equalsIgnoreCase(PlayerHandler.getPlayer().getPlayerID(player)))) && this.canOverwrite(player, itemMap)) {
+				return true;
+			} else if (firstJoin == null && firstWorld == null && ipLimit == null) {
+				if (session != 0 && this.failCount.get(session) != null) {
+					this.failCount.put(session, this.failCount.get(session) + 1);
+				} else if (session != 0) { this.failCount.put(session, 1); }
+				ServerHandler.getServer().logDebug("{ItemMap} " + player.getName() + " has failed to receive item: " + itemMap.getConfigName() + ".");
+				return false;
+			} else { 
+				if (firstJoin != null) { 
+					ServerHandler.getServer().logDebug("{ItemMap} " + player.getName() + " has already received first-join " + itemMap.getConfigName() + ", they can no longer recieve this."); 
 					return false;
-				} else { 
-					if (firstJoin != null) { 
-						ServerHandler.getServer().logDebug("{ItemMap} " + player.getName() + " has already received first-join " + itemMap.getConfigName() + ", they can no longer recieve this."); 
-						return false;
-					} else if (firstWorld != null) { 
-						ServerHandler.getServer().logDebug("{ItemMap} " + player.getName() + " has already received first-world " + itemMap.getConfigName() + ", they can no longer recieve this in " + player.getWorld().getName() + "."); 
-						return false;
-					} else if (ipLimit != null && !ipLimit.getPlayerId().equalsIgnoreCase(PlayerHandler.getPlayer().getPlayerID(player))) { 
-						ServerHandler.getServer().logDebug("{ItemMap} " + player.getName() + " has already received ip-limited " + itemMap.getConfigName() + ", they will only recieve this on their dedicated ip.");
-						return false;
-					}
+				} else if (firstWorld != null) { 
+					ServerHandler.getServer().logDebug("{ItemMap} " + player.getName() + " has already received first-world " + itemMap.getConfigName() + ", they can no longer recieve this in " + player.getWorld().getName() + "."); 
+					return false;
+				} else if (ipLimit != null && !ipLimit.getPlayerId().equalsIgnoreCase(PlayerHandler.getPlayer().getPlayerID(player))) { 
+					ServerHandler.getServer().logDebug("{ItemMap} " + player.getName() + " has already received ip-limited " + itemMap.getConfigName() + ", they will only recieve this on their dedicated ip.");
+					return false;
 				}
 			}
 		}
@@ -582,7 +580,7 @@ public class ItemUtilities {
 			} else if (itemMap.isDropFull()) { 
 				player.getWorld().dropItem(player.getLocation(), item);
 			}
-			ServerHandler.getServer().logDebug("{ItemMap} Given the Item: " + itemMap.getConfigName() + ".");
+			ServerHandler.getServer().logDebug("{ItemMap} " + player.getName() + " has been given the item " + itemMap.getConfigName() + " in the world " + player.getWorld().getName() + ".");
 		});
 		DataObject ipLimit = SQL.getData().getData(new DataObject(Table.IJ_IP_LIMITS, PlayerHandler.getPlayer().getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName(), player.getAddress().getHostString()));
 		if ((itemMap.isOnlyFirstJoin() || itemMap.isOnlyFirstLife())) { SQL.getData().saveData(new DataObject(Table.IJ_FIRST_JOIN, PlayerHandler.getPlayer().getPlayerID(player), "", itemMap.getConfigName())); }
@@ -627,7 +625,7 @@ public class ItemUtilities {
 			} else if (itemMap.isDropFull()) {
 				player.getWorld().dropItem(player.getLocation(), item);
 			}
-			ServerHandler.getServer().logDebug("{ItemMap} Given the Item: " + itemMap.getConfigName() + ".");
+			ServerHandler.getServer().logDebug("{ItemMap} " + player.getName() + " has been given the item " + itemMap.getConfigName() + " in " + player.getWorld().getName() + ".");
 		});
 		DataObject ipLimit = SQL.getData().getData(new DataObject(Table.IJ_IP_LIMITS, PlayerHandler.getPlayer().getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName(), player.getAddress().getHostString()));
 		if ((itemMap.isOnlyFirstJoin() || itemMap.isOnlyFirstLife())) { SQL.getData().saveData(new DataObject(Table.IJ_FIRST_JOIN, PlayerHandler.getPlayer().getPlayerID(player), "", itemMap.getConfigName())); }

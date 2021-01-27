@@ -44,7 +44,7 @@ public class APIUtils {
 		final int session = Utils.getUtils().getRandom(1, 80000);
 		for (ItemMap item : ItemUtilities.getUtilities().getItems()) {
 			if (item.inWorld(player.getWorld()) && Chances.getChances().isProbability(item, probable) && PlayerHandler.getPlayer().isEnabled(player)
-					&& item.hasPermission(player) && ItemUtilities.getUtilities().isObtainable(player, item, session, TriggerType.DEFAULT, player.getGameMode())) {
+					&& item.isLimitMode(player.getGameMode()) && item.hasPermission(player) && ItemUtilities.getUtilities().isObtainable(player, item, session, TriggerType.DEFAULT)) {
 					item.giveTo(player);
 			}
 			item.setAnimations(player);
