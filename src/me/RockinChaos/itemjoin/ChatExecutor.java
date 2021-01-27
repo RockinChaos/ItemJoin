@@ -43,9 +43,9 @@ import me.RockinChaos.itemjoin.utils.SchedulerUtils;
 import me.RockinChaos.itemjoin.utils.UI;
 import me.RockinChaos.itemjoin.utils.Chances;
 import me.RockinChaos.itemjoin.utils.Utils;
-import me.RockinChaos.itemjoin.utils.sqlite.DataObject;
-import me.RockinChaos.itemjoin.utils.sqlite.SQL;
-import me.RockinChaos.itemjoin.utils.sqlite.DataObject.Table;
+import me.RockinChaos.itemjoin.utils.sql.DataObject;
+import me.RockinChaos.itemjoin.utils.sql.SQL;
+import me.RockinChaos.itemjoin.utils.sql.DataObject.Table;
 
 public class ChatExecutor implements CommandExecutor {
 	
@@ -616,9 +616,9 @@ public class ChatExecutor implements CommandExecutor {
 		PURGE("purge", "itemjoin.purge", false),
 		ENABLE("enable", "itemjoin.enable, itemjoin.enable.others", false),
 		DISABLE("disable", "itemjoin.disable, itemjoin.disable.others", false),
-		GET("get", "itemjoin.get, itemjoin.get.others", true),
-		GETALL("getAll", "itemjoin.get, itemjoin.get.others", true),
-		GETONLINE("getOnline", "itemjoin.get.others", false),
+		GET("get, give", "itemjoin.get, itemjoin.get.others", true),
+		GETALL("getAll, giveAll", "itemjoin.get, itemjoin.get.others", true),
+		GETONLINE("getOnline, giveOnline", "itemjoin.get.others", false),
 		REMOVE("remove", "itemjoin.remove, itemjoin.remove.others", true),
 		REMOVEALL("removeAll", "itemjoin.remove, itemjoin.remove.others", true),
 		REMOVEONLINE("removeOnline", "itemjoin.remove.others", false),
@@ -647,10 +647,7 @@ public class ChatExecutor implements CommandExecutor {
 	    * 
 	    */
 		public boolean accept(final CommandSender sender, final String[] args, final int page) { 
-			return (args.length == 0 || (Utils.getUtils().splitIgnoreCase(this.command, args[0], ",") 
-			  && this.hasSyntax(args, page)))
-			  && this.playerRequired(sender, args)
-			  && this.hasPermission(sender, args); 
+			return (Utils.getUtils().splitIgnoreCase(this.command, args[0], ",") && this.hasSyntax(args, page) && this.playerRequired(sender, args) && this.hasPermission(sender, args)); 
 		}
 		
        /**
@@ -672,7 +669,8 @@ public class ChatExecutor implements CommandExecutor {
 	    */
 		private boolean hasSyntax(final String[] args, final int page) {
 			return ((args.length >= 2 && (args[1].equalsIgnoreCase(String.valueOf(page)) || (this.equals(Execute.PERMISSIONS) && page == 2 
-				 && Utils.getUtils().isInt(args[1]) && Integer.parseInt(args[1]) != 0 && Integer.parseInt(args[1]) <= ConfigHandler.getConfig(false).getPermissionPages()) 
+				 && Utils.getUtils().isInt(args[1]) && Integer.parseInt(args[1]) != 0 && Integer.parseInt(args[1]) != 1 && Integer.parseInt(args[1]) <= ConfigHandler.getConfig(false).getPermissionPages()) 
+				 || (page == 1 && this.equals(Execute.PERMISSIONS) && Utils.getUtils().isInt(args[1]) && Integer.parseInt(args[1]) == 0)
 				 || (!Utils.getUtils().isInt(args[1]) && !this.equals(Execute.PURGE)))) 
 				 || (args.length < 2 && (!this.equals(Execute.GET) && !this.equals(Execute.GETONLINE) && !this.equals(Execute.REMOVE) && !this.equals(Execute.REMOVEONLINE))
 				 || (this.equals(Execute.PURGE) && (args.length == 1 
@@ -703,10 +701,9 @@ public class ChatExecutor implements CommandExecutor {
 	    * 
 	    */
 		public boolean playerRequired(final CommandSender sender, final String[] args) {
-			return (!this.player
-				|| (!(sender instanceof ConsoleCommandSender)) 
-				|| !(this.player && (((this.equals(Execute.GETALL) || this.equals(Execute.REMOVEALL)) && args.length < 2)
-				|| (this.equals(Execute.GET) || this.equals(Execute.REMOVE)) && ((args.length == 3 && PlayerHandler.getPlayer().getPlayerString(args[2]) == null && Utils.getUtils().isInt(args[2])) || args.length == 2))));
+			return (!this.player || (!(sender instanceof ConsoleCommandSender)) 
+					|| ((this.equals(Execute.GETALL) || this.equals(Execute.REMOVEALL)) && args.length >= 2)
+					|| ((this.equals(Execute.GET) || this.equals(Execute.REMOVE)) && !(((args.length == 3 && PlayerHandler.getPlayer().getPlayerString(args[2]) == null && Utils.getUtils().isInt(args[2])) || args.length == 2))));
 		}
 	}
 }

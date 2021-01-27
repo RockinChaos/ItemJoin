@@ -29,14 +29,15 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.util.StringUtil;
 
+import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.PermissionsHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.utils.Utils;
-import me.RockinChaos.itemjoin.utils.sqlite.DataObject;
-import me.RockinChaos.itemjoin.utils.sqlite.DataObject.Table;
-import me.RockinChaos.itemjoin.utils.sqlite.SQL;
+import me.RockinChaos.itemjoin.utils.sql.DataObject;
+import me.RockinChaos.itemjoin.utils.sql.SQL;
+import me.RockinChaos.itemjoin.utils.sql.DataObject.Table;
 
 public class ChatTab implements TabCompleter {
 	
@@ -55,7 +56,9 @@ public class ChatTab implements TabCompleter {
 		if (args.length == 2 && args[0].equalsIgnoreCase("help") && PermissionsHandler.getPermissions().hasPermission(sender, "itemjoin.use")) {
 			 commands.addAll( Arrays.asList("2","3","4","5","6","7","8","9"));
 		} else if (args.length == 2 && args[0].equalsIgnoreCase("permissions") && PermissionsHandler.getPermissions().hasPermission(sender, "itemjoin.permissions")) {
-			commands.add("2");
+			for (int i = 1; i <= ConfigHandler.getConfig(false).getPermissionPages(); i++) {
+				commands.add(Integer.toString(i));
+			}
 		} else if ((args.length == 2 || args.length == 3) && args[0].equalsIgnoreCase("purge") && PermissionsHandler.getPermissions().hasPermission(sender, "itemjoin.purge")) {
 			if (args.length == 2) {
 				commands.addAll(Arrays.asList("map-ids","first-join","first-world","ip-limits","enabled-players","first-commands"));
