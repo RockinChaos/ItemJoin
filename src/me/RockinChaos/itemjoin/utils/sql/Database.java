@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -57,12 +58,15 @@ public class Database extends Controller {
 	        hikariConfig.setJdbcUrl("jdbc:mysql://" + config.getString("Database.host") + ":" + config.getString("Database.port") + "/" + database + "?useSSL=false" + "&createDatabaseIfNotExist=true" + "&allowPublicKeyRetrieval=true");
 	        hikariConfig.setUsername(config.getString("Database.user"));
 	        hikariConfig.setPassword(config.getString("Database.pass"));
-	        hikariConfig.setMaxLifetime(1500000);
 	        hikariConfig.addDataSourceProperty("cachePrepStmts", "true");
 	        hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250");
 	        hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
 	        hikariConfig.addDataSourceProperty("userServerPrepStmts", "true");
-	        hikariConfig.setLeakDetectionThreshold(10000);
+	        hikariConfig.setLeakDetectionThreshold(TimeUnit.MINUTES.toMillis(1));
+	        hikariConfig.setConnectionTimeout(TimeUnit.MINUTES.toMillis(1));
+	        hikariConfig.setValidationTimeout(TimeUnit.MINUTES.toMillis(1));
+	        hikariConfig.setIdleTimeout(TimeUnit.MINUTES.toMillis(1));
+	        hikariConfig.setMaxLifetime(TimeUnit.MINUTES.toMillis(5));
 	        hikariConfig.setMaximumPoolSize(10);
 	        this.hikari = new HikariDataSource(hikariConfig);
 		}
