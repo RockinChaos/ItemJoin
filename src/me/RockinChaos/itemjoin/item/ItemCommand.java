@@ -145,7 +145,7 @@ public class ItemCommand {
 	* @return If the player is able to execute the command.
 	*/
 	public boolean canExecute(final Player player, final String action, final String clickType) {
-		if (this.command == null || this.command.length() == 0 || !this.actionType.hasClickType(clickType) || !this.actionType.hasAction(action) || !this.itemMap.conditionMet(player, this.actionType.config.replace(".", "") + "-condition")) { return false; }
+		if (this.command == null || this.command.length() == 0 || !this.actionType.hasClickType(clickType) || !this.actionType.hasAction(action) || !this.itemMap.conditionMet(player, this.actionType.config + "-conditions")) { return false; }
 		return true;
 	}
 	
@@ -531,7 +531,7 @@ public class ItemCommand {
 			Iterator < String > it = ConfigHandler.getConfig(false).getCommandsSection(itemMap.getNodeLocation()).getKeys(false).iterator();
 			while (it.hasNext()) {
 				String definition = it.next();
-				ConfigurationSection commandSection = ConfigHandler.getConfig(false).getFile("items.yml").getConfigurationSection(itemMap.getNodeLocation().getCurrentPath() + ".commands." + definition);
+				ConfigurationSection commandSection = ConfigHandler.getConfig(false).getFile("items.yml").getConfigurationSection(itemMap.getNodeLocation().getCurrentPath() + "." + definition);
 				if (isList && commandSection != null) {
 					for (String internalCommands: commandSection.getKeys(false)) {
 						arrayCommands.addAll(arrayFromConfig(itemMap, definition, internalCommands));
@@ -555,7 +555,7 @@ public class ItemCommand {
 	*/
 	private static List < ItemCommand > arrayFromConfig(final ItemMap itemMap, final String definition, final String internalCommands) {
 		long delay = 0L;
-		List < String > commandsList = itemMap.getNodeLocation().getStringList("commands." + definition + (internalCommands != null ?  ("." + internalCommands) : ""));
+		List < String > commandsList = itemMap.getNodeLocation().getStringList("." + definition + (internalCommands != null ?  ("." + internalCommands) : ""));
 		final List < ItemCommand > arrayCommands = new ArrayList < ItemCommand > ();
 		for (int i = 0; i < commandsList.size(); i++) {
 			if (commandsList.get(i).trim().startsWith("delay:")) { delay = delay + ItemHandler.getItem().getDelay(commandsList.get(i).trim()); }
@@ -616,6 +616,7 @@ public class ItemCommand {
 		private final String actions;
 		private final String clickType;
 		private Action(String Config, String Actions, String ClickType) { this.config = Config; this.actions = Actions; this.clickType = ClickType; }
+		public String config() { return this.config; }
 		public boolean hasConfig(String Config) { return this.config.contains(Config); }
 		public boolean hasAction(String Action) { return Utils.getUtils().splitIgnoreCase(this.actions, Action, ","); }
 		public boolean hasClickType(String ClickType) { return Utils.getUtils().splitIgnoreCase(this.clickType, ClickType, ","); }
