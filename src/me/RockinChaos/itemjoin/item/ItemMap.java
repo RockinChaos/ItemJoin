@@ -74,6 +74,7 @@ import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PermissionsHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
+import me.RockinChaos.itemjoin.item.ItemCommand.Action;
 import me.RockinChaos.itemjoin.item.ItemCommand.CommandSequence;
 import me.RockinChaos.itemjoin.utils.DependAPI;
 import me.RockinChaos.itemjoin.utils.EffectAPI;
@@ -147,7 +148,7 @@ public class ItemMap {
     private List <PotionEffect> effect = new ArrayList<PotionEffect>();
     private List <Pattern> bannerPatterns = new ArrayList<Pattern>();
     
-    private Map < Character, Material > ingredients = new HashMap < Character, Material > ();
+    private Map < Character, String > ingredients = new HashMap < Character, String > ();
     private List <Character> recipe = Arrays.asList( 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X' );
     
     private String leatherColor;
@@ -209,6 +210,12 @@ public class ItemMap {
 	private boolean useCooldown = false;
 	private boolean subjectRemoval = false;
 	private CommandSequence sequence;
+	private List<String> disposableConditions = new ArrayList<String>();
+	private List<String> triggerConditions = new ArrayList<String>();
+	private Map < String, List<String> > commandConditions = new HashMap < String, List<String> > ();
+	private String disposableMessage = null;
+	private String triggerMessage = null;
+	private Map < String, String > commandMessages = new HashMap < String, String > ();
 	private Map < String, Long > playersOnCooldown = new HashMap < String, Long > ();
 	private HashMap < String, Long > playersOnCooldownTick = new HashMap < String, Long > ();
 //  ============================================================================================= //
@@ -314,6 +321,7 @@ public class ItemMap {
 	        this.setTriggers();
 			this.setWorlds();
 			this.setRegions();
+			this.setConditions();
 			this.setPlayersOnCooldown();
 	        this.setPerm(this.nodeLocation.getString(".permission-node"));
 	        this.setPermissionNeeded(ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Permissions.Obtain-Items"));
@@ -535,6 +543,41 @@ public class ItemMap {
 		} else if (isGiveOnRegionEnter() || isGiveOnRegionLeave()) { 
 			DependAPI.getDepends(false).getGuard().addLocaleRegion("UNDEFINED"); 
 			this.enabledRegions.add("UNDEFINED"); }
+	}
+	
+   /**
+    * Sets the ItemMaps Conditions.
+    * 
+    */
+	private void setConditions() {
+		if (this.nodeLocation.getString(".trigger-fail-message") != null && !this.nodeLocation.getString(".trigger-fail-message").isEmpty()) {
+			this.triggerMessage = this.nodeLocation.getString(".trigger-fail-message");
+		}
+		if (this.nodeLocation.getStringList(".trigger-conditions") != null && !this.nodeLocation.getStringList(".trigger-conditions").isEmpty()) {
+			this.triggerConditions = this.nodeLocation.getStringList(".trigger-conditions");
+		} else if (this.nodeLocation.getString(".trigger-conditions") != null && !this.nodeLocation.getString(".trigger-conditions").isEmpty()) {
+			this.triggerConditions.add(this.nodeLocation.getString(".trigger-conditions"));
+		} 
+		if (this.nodeLocation.getString(".disposable-fail-message") != null && !this.nodeLocation.getString(".disposable-fail-message").isEmpty()) {
+			this.disposableMessage = this.nodeLocation.getString(".disposable-fail-message");
+		}
+		if (this.nodeLocation.getStringList(".disposable-conditions") != null && !this.nodeLocation.getStringList(".disposable-conditions").isEmpty()) {
+			this.disposableConditions = this.nodeLocation.getStringList(".disposable-conditions");
+		} else if (this.nodeLocation.getString(".disposable-conditions") != null && !this.nodeLocation.getString(".disposable-conditions").isEmpty()) {
+			this.disposableConditions.add(this.nodeLocation.getString(".disposable-conditions"));
+		}
+		for (Action action : Action.values()) {
+			if (this.nodeLocation.getString(action.config() + "-fail-message") != null && !this.nodeLocation.getString(action.config() + "-fail-message").isEmpty()) {
+				this.commandMessages.put(action.config(), this.nodeLocation.getString(action.config() + "-fail-message"));
+			}
+			if (this.nodeLocation.getStringList(action.config() + "-conditions") != null && !this.nodeLocation.getStringList(action.config() + "-conditions").isEmpty()) {
+				this.commandConditions.put(action.config(), this.nodeLocation.getStringList(action.config() + "-conditions"));
+			} else if (this.nodeLocation.getString(action.config() + "-conditions") != null && !this.nodeLocation.getString(action.config() + "-conditions").isEmpty()) {
+				List < String > commandCond = new ArrayList < String > ();
+				commandCond.add(this.nodeLocation.getString(action.config() + "-conditions"));
+				this.commandConditions.put(action.config(), commandCond);
+			}
+		}
 	}
 	
    /**
@@ -819,6 +862,60 @@ public class ItemMap {
 	}
 	
    /**
+    * Sets the Trigger Message.
+    * 
+    * @param s - The Trigger Message to be set.
+    */
+	public void setTriggerMessage(final String s) {
+		this.triggerMessage = s;
+	}
+	
+   /**
+    * Sets the Trigger Conditions.
+    * 
+    * @param s - The Trigger Conditions to be set.
+    */
+	public void setTriggerConditions(final List<String> s) {
+		this.triggerConditions = s;
+	}
+	
+   /**
+    * Sets the Disposable Message.
+    * 
+    * @param s - The Disposable Message to be set.
+    */
+	public void setDisposableMessage(final String s) {
+		this.disposableMessage = s;
+	}
+	
+   /**
+    * Sets the Disposable Conditions.
+    * 
+    * @param s - The Disposable Conditions to be set.
+    */
+	public void setDisposableConditions(final List<String> s) {
+		this.disposableConditions = s;
+	}
+	
+   /**
+    * Sets the Commands Messages.
+    * 
+    * @param s - The Commands Messages to be set.
+    */
+	public void setCommandMessages(final Map<String, String> s) {
+		this.commandMessages = s;
+	}
+	
+   /**
+    * Sets the Commands Conditions.
+    * 
+    * @param s - The Commands Conditions to be set.
+    */
+	public void setCommandConditions(final Map<String, List<String>> s) {
+		this.commandConditions = s;
+	}
+	
+   /**
     * Sets the stack size.
     * 
     * @param count - The stack size to be set.
@@ -975,7 +1072,7 @@ public class ItemMap {
     * 
     * @param ingredients - The recipe ingredients to be set.
     */
-	public void setIngredients(final Map <Character, Material> ingredients) {
+	public void setIngredients(final Map <Character, String> ingredients) {
 		this.ingredients = ingredients;
 	}
 	
@@ -2120,7 +2217,7 @@ public class ItemMap {
     * 
     * @return The recipe ingredients.
     */
-	public Map<Character, Material> getIngredients() {
+	public Map<Character, String> getIngredients() {
 		return this.ingredients;
 	}
 	
@@ -2469,6 +2566,60 @@ public class ItemMap {
     */
 	public String getCooldownMessage() {
 		return this.cooldownMessage;
+	}
+	
+   /**
+    * Gets the Trigger Message.
+    * 
+    * @return The Trigger Message.
+    */
+	public String getTriggerMessage() {
+		return this.triggerMessage;
+	}
+	
+   /**
+    * Gets the Trigger Conditions.
+    * 
+    * @return The Trigger Conditions.
+    */
+	public List<String> getTriggerConditions() {
+		return this.triggerConditions;
+	}
+	
+   /**
+    * Gets the Disposable Message.
+    * 
+    * @return The Disposable Message.
+    */
+	public String getDisposableMessage() {
+		return this.disposableMessage;
+	}
+	
+   /**
+    * Gets the Disposable Conditions.
+    * 
+    * @return The Disposable Conditions.
+    */
+	public List<String> getDisposableConditions() {
+		return this.disposableConditions;
+	}
+	
+   /**
+    * Gets the Commands Message.
+    * 
+    * @return The Commands Message.
+    */
+	public Map<String, String> getCommandMessages() {
+		return this.commandMessages;
+	}
+	
+   /**
+    * Gets the Commands Conditions.
+    * 
+    * @return The Commands Conditions.
+    */
+	public Map<String, List<String>> getCommandConditions() {
+		return this.commandConditions;
 	}
 	
    /**
@@ -3834,17 +3985,47 @@ public class ItemMap {
 	}
 	
    /**
+    * Gets the condition message for the ItemMap.
+    * 
+    * @param conditions - The condition list to be fetched.
+    * @return The fetched condition message.
+    */
+	private List < String > getConditions(final String conditions) {
+		if (conditions.equalsIgnoreCase("disposable-conditions")) {
+			return this.disposableConditions;
+		} else if (conditions.equalsIgnoreCase("trigger-conditions")) {
+			return this.triggerConditions;
+		} else {
+			return this.commandConditions.get(conditions.replace("-conditions", ""));
+		}
+	}
+	
+   /**
+    * Gets the condition message for the ItemMap.
+    * 
+    * @param conditions - The condition list to be fetched.
+    * @return The fetched condition message.
+    */
+	private String getConditionMessage(final String conditions) {
+		if (conditions.replace("conditions", "fail-message").equalsIgnoreCase("disposable-fail-message")) {
+			return this.disposableMessage;
+		} else if (conditions.replace("conditions", "fail-message").equalsIgnoreCase("trigger-fail-message")) {
+			return this.triggerMessage;
+		} else {
+			return this.commandMessages.get(conditions.replace("-conditions", ""));
+		}
+	}
+	
+   /**
     * Checks if the condition is met for the ItemMap.
     * 
-    * @param itemMap - The ItemMap being checked.
+    * @param player - The Player being referenced.
     * @param conditions - The condition list to be fetched.
     * @return If the condition was successfully met.
     */
 	public boolean conditionMet(final Player player, final String conditions) {
-		if (this.getNodeLocation().getString(conditions) != null) {
-			List < String > conditionList = (!this.getNodeLocation().getStringList(conditions).isEmpty() ? this.getNodeLocation().getStringList(conditions) : new ArrayList < String > ());
-			if (conditionList.isEmpty() && !this.getNodeLocation().getString(conditions).isEmpty()) { conditionList.add(this.getNodeLocation().getString(conditions)); }
-			for (String condition : conditionList) {
+		if (this.getConditions(conditions) != null && !this.getConditions(conditions).isEmpty()) {
+			for (String condition : this.getConditions(conditions)) {
 				String[] parts = (condition != null ? condition.split(":") : null);
 				if (parts != null && parts.length == 3 && Utils.getUtils().conditionMet(parts[0], parts[1], parts[2])) {
 					return true;
@@ -3854,8 +4035,8 @@ public class ItemMap {
 				}
 			}
 		} else { return true; }
-		if (this.getNodeLocation().getString(conditions.replace("condition", "fail-message")) != null && !this.getNodeLocation().getString(conditions.replace("condition", "fail-message")).isEmpty()) {
-			player.sendMessage(Utils.getUtils().translateLayout(this.getNodeLocation().getString(conditions.replace("condition", "fail-message")), player));
+		if (this.getConditionMessage(conditions) != null && !this.getConditionMessage(conditions).isEmpty()) {
+			player.sendMessage(Utils.getUtils().translateLayout(this.getConditionMessage(conditions), player));
 		}
 		ServerHandler.getServer().logDebug("{ItemMap} " + player.getName() + " has not met any of the " + conditions + "(s), for the Item: " + this.getConfigName() + "."); 
 		return false;
@@ -4346,7 +4527,7 @@ public class ItemMap {
     * @param allItems - If the item should not have its amount changed.
     */
 	public void removeDisposable(final Player player, final ItemMap itemMap, final ItemStack itemCopy, final boolean allItems) {
-		if (this.disposable && this.conditionMet(player, "disposable-condition") || allItems) {
+		if (this.disposable && this.conditionMet(player, "disposable-conditions") || allItems) {
 			if (!allItems) { this.setSubjectRemoval(true); }
 			SchedulerUtils.getScheduler().runLater(1L, () -> {
 				if (PlayerHandler.getPlayer().isCreativeMode(player)) { player.closeInventory(); }
@@ -4536,7 +4717,7 @@ public class ItemMap {
 			Entry<String, List<String>> mapElement = (Entry<String, List<String>>)iterate.next(); 
 			String mapKey = mapElement.getKey(); 
 			if (mapKey.equalsIgnoreCase("DEFAULT") && map.size() <= 1) { mapKey = ""; } else { mapKey = "." + mapKey; }
-			itemData.set("items." + this.configName + ".commands." + section + mapKey, mapElement.getValue()); 
+			itemData.set("items." + this.configName + "." + section + mapKey, mapElement.getValue()); 
 		}
 	}
 	
@@ -4834,6 +5015,40 @@ public class ItemMap {
 			String propertyList = "";
 			for (String property : this.nbtProperty.keySet()) { propertyList += property + ":" + this.nbtProperty.get(property) + ", "; }
 			itemData.set("items." + this.configName + ".properties", propertyList.substring(0, propertyList.length() - 2)); 
+		}
+		if (this.disposableConditions != null && !this.disposableConditions.isEmpty()) { 
+			if (disposableConditions.size() == 1) {
+				itemData.set("items." + this.configName + ".disposable-conditions", this.disposableConditions.get(0)); 
+			} else if (triggerConditions.size() > 0) {
+				itemData.set("items." + this.configName + ".disposable-conditions", this.disposableConditions); 
+			}
+		}
+		if (this.disposableMessage != null && !this.disposableMessage.isEmpty()) { 
+			itemData.set("items." + this.configName + ".disposable-fail-message", this.disposableMessage); 
+		}
+		if (this.triggerConditions != null && !this.triggerConditions.isEmpty()) { 
+			if (triggerConditions.size() == 1) {
+				itemData.set("items." + this.configName + ".trigger-conditions", this.triggerConditions.get(0)); 
+			} else if (triggerConditions.size() > 0) {
+				itemData.set("items." + this.configName + ".trigger-conditions", this.triggerConditions); 
+			}
+		}
+		if (this.triggerMessage != null && !this.triggerMessage.isEmpty()) { 
+			itemData.set("items." + this.configName + ".trigger-fail-message", this.triggerMessage); 
+		}
+		if (this.commandConditions != null && !this.commandConditions.isEmpty()) { 
+			for (String property : this.commandConditions.keySet()) {
+				if (this.commandConditions.get(property).size() == 1) {
+					itemData.set("items." + this.configName + property + "-conditions", this.commandConditions.get(property).get(0)); 
+				} else if (this.commandConditions.get(property).size() > 0) {
+					itemData.set("items." + this.configName + property + "-conditions", this.commandConditions.get(property)); 
+				}
+			}
+		}
+		if (this.commandMessages != null && !this.commandMessages.isEmpty()) { 
+			for (String property : this.commandMessages.keySet()) {
+				itemData.set("items." + this.configName + property + "-fail-message", this.commandMessages.get(property)); 
+			}
 		}
 		if (this.enabledRegions != null && !this.enabledRegions.isEmpty()) { 
 			String regionList = "";
