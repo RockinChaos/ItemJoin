@@ -21,14 +21,13 @@ items:
     lore:
     - '&7A devine sword.'
     - '&7This sword is many millennium old...'
-    commands:
-      interact:
-      - 'message: &eYou can send yourself custom messages!'
-      - 'console: say You can even execute more than one command!'
-      - 'delay: 10'
-      - 'player: say This is item slot 1.'
-      - 'op: say This command executes as if the player is op.'
-      - 'say Hello world!'
+    interact:
+    - 'message: &eYou can send yourself custom messages!'
+    - 'console: say You can even execute more than one command!'
+    - 'delay: 10'
+    - 'player: say This is item slot 1.'
+    - 'op: say This command executes as if the player is op.'
+    - 'say Hello world!'
     commands-sound: BLOCK_NOTE_BLOCK_PLING
     commands-particle: FIREWORK:BLACK:RED:BURST:10
     commands-sequence: SEQUENTIAL
@@ -65,13 +64,12 @@ items:
     - '&7Right-Click use creative token.'
     - '&7'
     - '&7Left-Click use spectator token.'
-    commands:
-      interact-right:
-      - 'console: gamemode creative %player%'
-      - 'message: &eYou have been set to creative mode.'
-      interact-left:
-      - 'console: gamemode spectator %player%'
-      - 'message: &eYou have been set to spectator mode.'
+    interact-right:
+    - 'console: minecraft:gamemode creative %player%'
+    - 'message: &eYou have been set to creative mode.'
+    interact-left:
+    - 'console: minecraft:gamemode spectator %player%'
+    - 'message: &eYou have been set to spectator mode.'
     commands-sound: BLOCK_NOTE_BLOCK_PLING
     commands-cooldown: 2
     itemflags: item-store, death-drops, self-drops, hide-attributes, disposable
@@ -165,10 +163,9 @@ items:
     name: '&9Mighty Creeper'
     lore:
     - '&7The creeper is our leader!'
-    commands:
-      interact:
-      - 'message: &bWhere is Herobrine?'
-      - 'message: &cWhere is your leader now...?'
+    interact:
+    - 'message: &bWhere is Herobrine?'
+    - 'message: &cWhere is your leader now...?'
     commands-sequence: RANDOM
     itemflags: inventory-modify, hide-attributes, self-drops, CreativeBypass
     triggers: join, respawn, world-switch, region-enter
@@ -202,13 +199,12 @@ items:
     name: '&eSurvival Server'
     lore:
     - '&7Click to go to the survival server!'
-    commands:
-      interact:
-      - 'server: survival'
-      - 'message: &eSending you to the survival server!'
-      inventory:
-      - 'server: survival'
-      - 'message: &eSending you to the survival server!'
+    interact:
+    - 'server: survival'
+    - 'message: &eSending you to the survival server!'
+    inventory:
+    - 'server: survival'
+    - 'message: &eSending you to the survival server!'
     commands-sound: BLOCK_NOTE_BLOCK_PLING
     commands-cost: 10
     commands-cooldown: 2
