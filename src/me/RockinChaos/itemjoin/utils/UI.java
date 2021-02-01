@@ -17,6 +17,7 @@
  */
 package me.RockinChaos.itemjoin.utils;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -38,6 +40,8 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.block.banner.Pattern;
 import org.bukkit.block.banner.PatternType;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -56,6 +60,7 @@ import org.bukkit.potion.PotionEffectType;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 
+import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
@@ -99,12 +104,14 @@ public class UI {
 		Interface pagedPane = new Interface(false, 1, this.GUIName, player);
 		SchedulerUtils.getScheduler().runAsync(() -> {
 			pagedPane.addButton(new Button(this.exitItem, event -> player.closeInventory()));
-			pagedPane.addButton(new Button(this.fillerPaneBItem), 2);
+			pagedPane.addButton(new Button(ItemHandler.getItem().getItem("ENDER_CHEST", 1, false, "&b&l&nConfig Settings", "&7", "&7*Change the GLOBAL plugin", "&7configuration settings."), event -> this.configSettings(player)));
+			pagedPane.addButton(new Button(this.fillerPaneBItem));
 			pagedPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "WRITABLE_BOOK" : "386"), 1, false, "&a&l&nCreate", "&7", "&7*Create a new item from scratch."),
 					event -> this.materialPane(player, new ItemMap("item_" + Utils.getUtils().getPath(1), "ARBITRARY"), 0, 0)));
 			pagedPane.addButton(new Button(ItemHandler.getItem().getItem("HOPPER", 1, false, "&e&l&nSave", "&7", "&7*Save an existing item as a custom item."), event -> this.startHopper(player)));
-			pagedPane.addButton(new Button(ItemHandler.getItem().getItem("NAME_TAG", 1, false, "&c&l&nModify", "&7", "&7*Modify an existing custom item"), event -> this.startModify(player)));
-			pagedPane.addButton(new Button(this.fillerPaneBItem), 2);
+			pagedPane.addButton(new Button(ItemHandler.getItem().getItem("NAME_TAG", 1, false, "&c&l&nModify", "&7", "&7*Modify an existing custom item"), event -> this.startModify(player, null, 0)));
+			pagedPane.addButton(new Button(this.fillerPaneBItem));
+			pagedPane.addButton(new Button(ItemHandler.getItem().getItem("CHEST", 1, false, "&b&l&nItem Settings", "&7", "&7*Change the GLOBAL custom items", "&7configuration settings."), event -> this.itemSettings(player)));
 			pagedPane.addButton(new Button(this.exitItem, event -> player.closeInventory()));
 		});
 		pagedPane.open(player);
@@ -319,10 +326,10 @@ public class UI {
     * 
     * @param player - The Player to have the Pane opened.
     */
-	private void startModify(final Player player) {
+	private void startModify(final Player player, final ItemMap itemMap, final int k) {
 		Interface modifyPane = new Interface(true, 6, this.GUIName, player);
 		SchedulerUtils.getScheduler().runAsync(() -> {
-			this.setPage(player, modifyPane, ItemUtilities.getUtilities().copyItems(), null);
+			this.setPage(player, modifyPane, ItemUtilities.getUtilities().copyItems(), null, itemMap, k);
 		});
 		modifyPane.open(player);
 	}
@@ -400,15 +407,17 @@ public class UI {
     * @param itemMap - The ItemMap currently being modified.
     * @param pagedPane - The PagedPane.
     */
-	private void setButton(final Player player, final ItemMap itemMap, final Interface modifyPane, final ItemMap contents) {
+	private void setButton(final Player player, final ItemMap itemMap, final Interface modifyPane, final ItemMap contents, final ItemMap refMap, final int k) {
 		final ItemStack item = itemMap.getTempItem().clone();
 		if (item.getType() == Material.AIR) { item.setType(this.fillerPaneItem.getType()); }
 		if (itemMap.isAnimated() || itemMap.isDynamic()) { this.setModifyMenu(true, player); itemMap.getAnimationHandler().get(player).setMenu(true, 0); }
-		String lore = (contents == null ? "&7*Click to modify this custom item." : "&7*Click to add into the contents of " + contents.getConfigName() + ".");
+		String lore = (contents == null && refMap == null ? "&7*Click to modify this custom item." : refMap != null ? "&7*Click to set this custom item as an ingredient." : "&7*Click to add into the contents of " + contents.getConfigName() + ".");
 		String space = (contents == null ? "&6---------------------------" : "&6----------------------------------");
 		modifyPane.addButton(new Button(ItemHandler.getItem().addLore(item, "&7", space, lore, "&9&lNode: &a" + itemMap.getConfigName(), "&7", (contents != null ? "&9&lENABLED: " + (contents.getContents().contains(itemMap.getConfigName()) ? "&aYES" : "&aNO") : "")), event -> 
 		{
-			if (contents == null) {
+			if (refMap != null) {
+				this.setIngredients(player, itemMap, itemMap.getConfigName(), k);
+			} else if (contents == null) {
 				this.choicePane(player, itemMap, item);
 			} else {
 				List<String> contentList = contents.getContents();
@@ -417,7 +426,7 @@ public class UI {
 				contents.setContents(contentList);
 				Interface contentsPane = new Interface(true, 6, this.GUIName, player);
 				SchedulerUtils.getScheduler().runAsync(() -> {
-					this.setPage(player, contentsPane, ItemUtilities.getUtilities().copyItems(), contents);
+					this.setPage(player, contentsPane, ItemUtilities.getUtilities().copyItems(), contents, refMap, k);
 				});
 				contentsPane.open(player);
 			}
@@ -431,19 +440,21 @@ public class UI {
     * @param modifyPane - The PagedPane to have buttons added.
     * @param items - The items to be added to the Pane.
     */
-	private void setPage(final Player player, final Interface modifyPane, final List < ItemMap > items, final ItemMap contents) {
+	private void setPage(final Player player, final Interface modifyPane, final List < ItemMap > items, final ItemMap contents, final ItemMap itemMap, final int k) {
 		ItemMap currentItem = null;
 		boolean crafting = false;
 		boolean arbitrary = false;
 		if (contents != null) {
 			modifyPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to the item definition menu."), event -> this.creatingPane(player, contents)));
+		} else if (itemMap != null) { 
+			modifyPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to the recipe menu."), event -> this.recipePane(player, itemMap)));
 		}
 		Interface craftingPane = new Interface(false, 4, this.GUIName, player);
 		craftingPane.addButton(new Button(this.fillerPaneGItem), 3);
 		currentItem = ItemUtilities.getUtilities().getItemMap("CRAFTING[1]", items);
 		if (currentItem != null) {
 			crafting = true;
-			this.setButton(player, currentItem, craftingPane, contents);
+			this.setButton(player, currentItem, craftingPane, contents, itemMap, k);
 			items.remove(currentItem);
 		} else {
 			craftingPane.addButton(new Button(this.fillerPaneGItem));
@@ -452,7 +463,7 @@ public class UI {
 		currentItem = ItemUtilities.getUtilities().getItemMap("CRAFTING[2]", items);
 		if (currentItem != null) {
 			crafting = true;
-			this.setButton(player, currentItem, craftingPane, contents);
+			this.setButton(player, currentItem, craftingPane, contents, itemMap, k);
 			items.remove(currentItem);
 		} else {
 			craftingPane.addButton(new Button(this.fillerPaneGItem));
@@ -461,7 +472,7 @@ public class UI {
 		currentItem = ItemUtilities.getUtilities().getItemMap("CRAFTING[0]", items);
 		if (currentItem != null) {
 			crafting = true;
-			this.setButton(player, currentItem, craftingPane, contents);
+			this.setButton(player, currentItem, craftingPane, contents, itemMap, k);
 			items.remove(currentItem);
 		} else {
 			craftingPane.addButton(new Button(this.fillerPaneGItem));
@@ -470,7 +481,7 @@ public class UI {
 		currentItem = ItemUtilities.getUtilities().getItemMap("CRAFTING[3]", items);
 		if (currentItem != null) {
 			crafting = true;
-			this.setButton(player, currentItem, craftingPane, contents);
+			this.setButton(player, currentItem, craftingPane, contents, itemMap, k);
 			items.remove(currentItem);
 		} else {
 			craftingPane.addButton(new Button(this.fillerPaneGItem));
@@ -479,7 +490,7 @@ public class UI {
 		currentItem = ItemUtilities.getUtilities().getItemMap("CRAFTING[4]", items);
 		if (currentItem != null) {
 			crafting = true;
-			this.setButton(player, currentItem, craftingPane, contents);
+			this.setButton(player, currentItem, craftingPane, contents, itemMap, k);
 			items.remove(currentItem);
 		} else {
 			craftingPane.addButton(new Button(this.fillerPaneGItem));
@@ -510,7 +521,7 @@ public class UI {
 		tempList.addAll(items);
 		for (final ItemMap item: tempList) {
 			if (item.getSlot().equalsIgnoreCase("ARBITRARY")) {
-				this.setButton(player, item, arbitraryPane, contents);
+				this.setButton(player, item, arbitraryPane, contents, itemMap, k);
 				items.remove(item);
 				arbitrary = true;
 			}
@@ -528,35 +539,35 @@ public class UI {
 		}
 		currentItem = ItemUtilities.getUtilities().getItemMap("HELMET", items);
 		if (currentItem != null) {
-			this.setButton(player, currentItem, modifyPane, contents);
+			this.setButton(player, currentItem, modifyPane, contents, itemMap, k);
 			items.remove(currentItem);
 		} else {
 			modifyPane.addButton(new Button(this.fillerPaneGItem));
 		}
 		currentItem = ItemUtilities.getUtilities().getItemMap("CHESTPLATE", items);
 		if (currentItem != null) {
-			this.setButton(player, currentItem, modifyPane, contents);
+			this.setButton(player, currentItem, modifyPane, contents, itemMap, k);
 			items.remove(currentItem);
 		} else {
 			modifyPane.addButton(new Button(this.fillerPaneGItem));
 		}
 		currentItem = ItemUtilities.getUtilities().getItemMap("LEGGINGS", items);
 		if (currentItem != null) {
-			this.setButton(player, currentItem, modifyPane, contents);
+			this.setButton(player, currentItem, modifyPane, contents, itemMap, k);
 			items.remove(currentItem);
 		} else {
 			modifyPane.addButton(new Button(this.fillerPaneGItem));
 		}
 		currentItem = ItemUtilities.getUtilities().getItemMap("BOOTS", items);
 		if (currentItem != null) {
-			this.setButton(player, currentItem, modifyPane, contents);
+			this.setButton(player, currentItem, modifyPane, contents, itemMap, k);
 			items.remove(currentItem);
 		} else {
 			modifyPane.addButton(new Button(this.fillerPaneGItem));
 		}
 		currentItem = ItemUtilities.getUtilities().getItemMap("OFFHAND", items);
 		if (currentItem != null) {
-			this.setButton(player, currentItem, modifyPane, contents);
+			this.setButton(player, currentItem, modifyPane, contents, itemMap, k);
 			items.remove(currentItem);
 		} else {
 			modifyPane.addButton(new Button(this.fillerPaneGItem));
@@ -565,7 +576,7 @@ public class UI {
 		for (int i = 9; i < 36; i++) {
 			currentItem = ItemUtilities.getUtilities().getItemMap(i + "", items);
 			if (currentItem != null) {
-				this.setButton(player, currentItem, modifyPane, contents);
+				this.setButton(player, currentItem, modifyPane, contents, itemMap, k);
 				items.remove(currentItem);
 			} else {
 				modifyPane.addButton(new Button(this.fillerPaneGItem));
@@ -574,14 +585,14 @@ public class UI {
 		for (int j = 0; j < 9; j++) {
 			currentItem = ItemUtilities.getUtilities().getItemMap(j + "", items);
 			if (currentItem != null) {
-				this.setButton(player, currentItem, modifyPane, contents);
+				this.setButton(player, currentItem, modifyPane, contents, itemMap, k);
 				items.remove(currentItem);
 			} else {
 				modifyPane.addButton(new Button(this.fillerPaneGItem));
 			}
 		}
 		if (!items.isEmpty()) {
-			this.setPage(player, modifyPane, items, contents);
+			this.setPage(player, modifyPane, items, contents, itemMap, k);
 		}
 	}
 	
@@ -701,13 +712,13 @@ public class UI {
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.itemRemoved", player, placeHolders);
 				ConfigHandler.getConfig(false).reloadConfigs();
 				SchedulerUtils.getScheduler().runLater(6L, () -> {
-					this.startModify(player); 
+					this.startModify(player, null, 0); 
 				});
 			}));
 			choicePane.addButton(new Button(this.fillerPaneBItem), 3);
-			choicePane.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the modify menu"), event -> this.startModify(player)));
+			choicePane.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the modify menu"), event -> this.startModify(player, null, 0)));
 			choicePane.addButton(new Button(this.fillerPaneBItem), 7);
-			choicePane.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the modify menu"), event -> this.startModify(player)));
+			choicePane.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the modify menu"), event -> this.startModify(player, null, 0)));
 		});
 		choicePane.open(player);
 	}
@@ -905,13 +916,21 @@ public class UI {
 			creatingPane.addButton(new Button(ItemHandler.getItem().getItem("GOLD_INGOT", 1, false, "&e&lDrop Chances", "&7", "&7*Define the drop chance for receiving", "&7this item from mobs or breaking blocks."), event -> {
 					this.dropsPane(player, itemMap);
 			}));
-			creatingPane.addButton(new Button(this.fillerPaneGItem), 3);
+			creatingPane.addButton(new Button(this.fillerPaneGItem));
+			creatingPane.addButton(new Button(ItemHandler.getItem().getItem("LAVA_BUCKET", 1, false, "&b&lConditions", "&7", "&7*Define conditions for triggers,", "&7commands, and the disposable itemflag.", "&9Enabled: &a" + 
+			((itemMap.getTriggerConditions() != null && !itemMap.getTriggerConditions().isEmpty()) || (itemMap.getDisposableConditions() != null && !itemMap.getDisposableConditions().isEmpty()) 
+			|| (itemMap.getCommandConditions() != null && !itemMap.getCommandConditions().isEmpty()) ? "YES" : "NONE")), event -> {
+					this.conditionsPane(player, itemMap);
+			}));
+			creatingPane.addButton(new Button(this.fillerPaneGItem));
 			creatingPane.addButton(new Button(ItemHandler.getItem().getItem("58", 1, false, "&b&lRecipe", "&7", "&7*Define the recipe to be", "&7able to craft this item.", "&9Enabled: &a" + (itemMap.getIngredients() != null && !itemMap.getIngredients().isEmpty() ? "YES" : "NONE")), event -> {
 					this.recipePane(player, itemMap);
 			}));
+			creatingPane.addButton(new Button(this.fillerPaneGItem));
 			creatingPane.addButton(new Button(ItemHandler.getItem().getItem("137", 1, false, "&c&lNBT Properties", "&7", "&7*Define specific NBT Properties", "&7to be set to the item.", "&9Enabled: &a" + (itemMap.getNBTValues() != null && !itemMap.getNBTValues().isEmpty() ? "YES" : "NONE")), event -> {
 					this.nbtPane(player, itemMap);
 			}));
+			creatingPane.addButton(new Button(this.fillerPaneGItem));
 			if (itemMap.getMaterial().toString().contains("MAP")) {
 				creatingPane.addButton(new Button(ItemHandler.getItem().getItem("FEATHER", 1, false, "&e&lMap Image", "&7", "&7*Adds a custom map image that", "&7will be displayed when held.", "&7", "&7Place the custom map image", 
 						"&7in the MAIN ItemJoin folder.", "&7", "&7The map CAN be a GIF but", "&7must be a 128x128 pixel image.", "&9&lImage: &a" + Utils.getUtils().nullCheck(itemMap.getMapImage())), event -> {
@@ -971,7 +990,7 @@ public class UI {
 				creatingPane.addButton(new Button(ItemHandler.getItem().getItem("229", 1, false, "&a&lContents", "&7", "&7*Add existing custom items into", "&7the contents of this box.", "&9Enabled: &a" + (itemMap.getContents() != null && !itemMap.getContents().isEmpty() ? "YES" : "NONE")), event -> {
 					Interface contentsPane = new Interface(true, 6, this.GUIName, player);
 					SchedulerUtils.getScheduler().runAsync(() -> {
-						this.setPage(player, contentsPane, ItemUtilities.getUtilities().copyItems(), itemMap);
+						this.setPage(player, contentsPane, ItemUtilities.getUtilities().copyItems(), itemMap, null, 0);
 					});
 					contentsPane.open(player);
 				}));
@@ -983,7 +1002,7 @@ public class UI {
 					}
 				}));
 			}
-			creatingPane.addButton(new Button(this.fillerPaneGItem), 3);
+			creatingPane.addButton(new Button(this.fillerPaneGItem));
 			creatingPane.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nMain Menu", "&7", "&7*Cancel and return to the main menu.", "&7", "&c&lWARNING: &7This item has NOT been saved!"), event -> this.returnConfirm(player, itemMap)));
 			creatingPane.addButton(new Button(this.fillerPaneBItem), 3);
 			if (ServerHandler.getServer().hasSpecificUpdate("1_8")) {
@@ -2370,44 +2389,77 @@ public class UI {
 	
    /**
     * Opens the Pane for the Player.
-    * This Pane is for confirming the return to the main menu.
     * 
     * @param player - The Player to have the Pane opened.
-    * @param itemMap - The ItemMap currently being modified.
     */
-	private void returnConfirm(final Player player, final ItemMap itemMap) {
-		Interface returnPane = new Interface(false, 1, this.GUIName, player);
+	private void overwritePane(final Player player) {
+		Interface overwritePane = new Interface(true, 6, this.GUIName, player);
 		SchedulerUtils.getScheduler().runAsync(() -> {
-			returnPane.addButton(new Button(this.fillerPaneBItem));
-			returnPane.addButton(new Button(ItemHandler.getItem().getItem("WOOL:14", 1, false, "&c&l&nMain Menu", "&7", "&7*Cancel and return to the", "&7main menu, all modified", "&7settings will be lost.", "&7", "&c&lWARNING: &cThis item has &lNOT&c been saved!"), event -> this.startMenu(player)));
-			returnPane.addButton(new Button(this.fillerPaneBItem), 2);
-			
-			if (ServerHandler.getServer().hasSpecificUpdate("1_8")) {
-				returnPane.addButton(new Button(ItemHandler.getItem().setSkullTexture(ItemHandler.getItem().getItem("SKULL_ITEM:3", 1, false, "&a&l&nSave to Config", "&7", "&7*Saves the custom item", "&7settings to the items.yml file."), 
-						"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzdiNjJkMjc1ZDg3YzA5Y2UxMGFjYmNjZjM0YzRiYTBiNWYxMzVkNjQzZGM1MzdkYTFmMWRmMzU1YTIyNWU4MiJ9fX0"), event -> {
-					itemMap.saveToConfig();
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
-					placeHolders[3] = itemMap.getConfigName();
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.itemSaved", player, placeHolders);
-					ConfigHandler.getConfig(false).reloadConfigs();
-					this.startMenu(player);
-				}));
-			} else {
-				returnPane.addButton(new Button(ItemHandler.getItem().getItem("WOOL:5", 1, false, "&a&l&nSave to Config", "&7", "&7*Saves the custom item", "&7settings to the items.yml file."), event -> {
-					itemMap.saveToConfig();
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
-					placeHolders[3] = itemMap.getConfigName();
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.itemSaved", player, placeHolders);
-					ConfigHandler.getConfig(false).reloadConfigs();
-					this.startMenu(player);
+			overwritePane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the configuration menu."), event -> this.itemSettings(player)));
+			List < String > enabledWorlds = new ArrayList < String > ();
+			String[] enabledParts = ConfigHandler.getConfig(false).getFile("items.yml").getString("items-Overwrite").replace(" ,  ", ",").replace(" , ", ",").replace(",  ", ",").replace(", ", ",").split(",");
+			for (String enabledWorld : enabledParts) {
+				if (enabledWorld.equalsIgnoreCase("ALL") || enabledWorld.equalsIgnoreCase("GLOBAL")) {
+					enabledWorlds.add("ALL");
+				} else {
+					for (World world: Bukkit.getServer().getWorlds()) {
+						if (enabledWorld.equalsIgnoreCase(world.getName())) {
+							enabledWorlds.add(world.getName());
+						}
+					}
+				}
+			}
+		    if (enabledWorlds.isEmpty() && ConfigHandler.getConfig(false).getFile("items.yml").getBoolean("items-Overwrite")) { enabledWorlds.add("ALL"); }
+			overwritePane.addButton(new Button(ItemHandler.getItem().getItem("OBSIDIAN", 1, Utils.getUtils().containsValue(enabledWorlds, "ALL"), "&a&l&nGLOBAL", "&7", "&7*Click to enable item", "&7overwriting in &lALL WORLDS.", 
+					"&9&lENABLED: &a" + (Utils.getUtils().containsValue(enabledWorlds, "ALL") + "").toUpperCase()), event -> {
+					File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "items.yml");
+					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
+					if (Utils.getUtils().containsValue(enabledWorlds, "ALL")) {
+						dataFile.set("items-Overwrite", false); 
+					} else {
+						dataFile.set("items-Overwrite", true); 
+					}
+					ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "items.yml");
+					ConfigHandler.getConfig(false).softReload();
+					SchedulerUtils.getScheduler().runLater(2L, () -> this.overwritePane(player));
+			}));
+			for (World world: Bukkit.getServer().getWorlds()) {
+				String worldMaterial = (ServerHandler.getServer().hasSpecificUpdate("1_13") ? "GRASS_BLOCK" : "2");
+				if (world.getEnvironment().equals(Environment.NETHER)) {
+					worldMaterial = "NETHERRACK";
+				} else if (world.getEnvironment().equals(Environment.THE_END)) {
+					worldMaterial = (ServerHandler.getServer().hasSpecificUpdate("1_13") ? "END_STONE" : "121");
+				}
+				overwritePane.addButton(new Button(ItemHandler.getItem().getItem(worldMaterial, 1, Utils.getUtils().containsValue(enabledWorlds, world.getName()), "&f&l" + world.getName(), "&7", 
+						"&7*Click to enable item", "&7overwriting in this world.", "&9&lENABLED: &a" + (Utils.getUtils().containsValue(enabledWorlds, world.getName()) + "").toUpperCase()), event -> {
+					if (Utils.getUtils().containsValue(enabledWorlds, world.getName())) {
+						enabledWorlds.remove(world.getName());
+					} else {
+						enabledWorlds.add(world.getName());
+					}
+					if (!enabledWorlds.isEmpty() && enabledWorlds.size() > 1) {
+						if (Utils.getUtils().containsValue(enabledWorlds, "ALL")) {
+							enabledWorlds.remove("ALL");
+						} else if (Utils.getUtils().containsValue(enabledWorlds, "GLOBAL")) {
+							enabledWorlds.remove("GLOBAL");
+						}
+					}
+					String worldList = "";
+					for (String worldName : enabledWorlds) { worldList += worldName + ", "; }
+					File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "items.yml");
+					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
+					if (enabledWorlds.isEmpty()) {
+						dataFile.set("items-Overwrite", false); 
+					} else {
+						dataFile.set("items-Overwrite", worldList.substring(0, worldList.length() - 2)); 
+					}
+					ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "items.yml");
+					ConfigHandler.getConfig(false).softReload();
+					SchedulerUtils.getScheduler().runLater(2L, () -> this.overwritePane(player));
 				}));
 			}
-			
-			returnPane.addButton(new Button(this.fillerPaneBItem), 2);
-			returnPane.addButton(new Button(ItemHandler.getItem().getItem("WOOL:4", 1, false, "&e&l&nModify Settings", "&7", "&7*Continue modifying the", "&7custom item settings."), event -> this.creatingPane(player, itemMap)));
-			returnPane.addButton(new Button(this.fillerPaneBItem));
 		});
-		returnPane.open(player);
+		overwritePane.open(player);
 	}
 	
 // =======================================================================================================================================================================================================================================
@@ -2487,7 +2539,7 @@ public class UI {
 					}
 					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 					if (stage == 3) {
-						this.setIngredients(event.getPlayer(), itemMap, ItemHandler.getItem().getMaterial(ChatColor.stripColor(event.getMessage()), null), position);
+						this.setIngredients(event.getPlayer(), itemMap, ItemHandler.getItem().getMaterial(ChatColor.stripColor(event.getMessage()), null).name(), position);
 					} else if (stage == 2) {
 						this.commandPane(event.getPlayer(), itemMap);
 					} else {
@@ -2519,7 +2571,7 @@ public class UI {
 									} else if (stage == 2) {
 										this.commandPane(player, itemMap);
 									} else if (stage == 3) {
-										this.setIngredients(player, itemMap, material, position);
+										this.setIngredients(player, itemMap, material.name(), position);
 									} else {
 										this.creatingPane(player, itemMap);
 									}
@@ -2536,7 +2588,7 @@ public class UI {
 						} else if (stage == 2) { 
 							this.commandPane(player, itemMap);
 						} else if (stage == 3) {
-							this.setIngredients(player, itemMap, material, position);
+							this.setIngredients(player, itemMap, material.name(), position);
 						} else {
 							this.creatingPane(player, itemMap);
 						}
@@ -2558,35 +2610,35 @@ public class UI {
     * @param stage - The stage in the modification.
     */
 	private void switchPane(final Player player, final ItemMap itemMap, final int stage) {
-		Interface slotPane = new Interface(false, 1, this.GUIName, player);
+		Interface switchPane = new Interface(false, 1, this.GUIName, player);
 		SchedulerUtils.getScheduler().runAsync(() -> {
 			if (stage == 0) {
 				if (ServerHandler.getServer().hasSpecificUpdate("1_8")) {
-					slotPane.addButton(new Button(ItemHandler.getItem().setSkullTexture(ItemHandler.getItem().getItem("SKULL_ITEM:3", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", "&7the material selection menu."), 
+					switchPane.addButton(new Button(ItemHandler.getItem().setSkullTexture(ItemHandler.getItem().getItem("SKULL_ITEM:3", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", "&7the material selection menu."), 
 							"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2RjOWU0ZGNmYTQyMjFhMWZhZGMxYjViMmIxMWQ4YmVlYjU3ODc5YWYxYzQyMzYyMTQyYmFlMWVkZDUifX19"), event -> this.materialPane(player, itemMap, 0, 0)));
 				} else {
-					slotPane.addButton(new Button(ItemHandler.getItem().getItem("ARROW", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", "&7the material selection menu."), event -> this.materialPane(player, itemMap, 0, 0)));
+					switchPane.addButton(new Button(ItemHandler.getItem().getItem("ARROW", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", "&7the material selection menu."), event -> this.materialPane(player, itemMap, 0, 0)));
 				}
 			} else { 
-				slotPane.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> this.creatingPane(player, itemMap)));
+				switchPane.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> this.creatingPane(player, itemMap)));
 			}
-			slotPane.addButton(new Button(this.fillerPaneBItem), 2);
-			slotPane.addButton(new Button(ItemHandler.getItem().getItem("GLASS", 1, false, "&a&lSingle Slot", "&7", "&7*Define a single dedicated", "&7 slot for the item."), event -> this.slotPane(player, itemMap, stage, 0)));
-			slotPane.addButton(new Button(this.fillerPaneBItem), 1);
-			slotPane.addButton(new Button(ItemHandler.getItem().getItem("23", 1, false, "&b&lMultiple Slots", "&7", "&7*Define multiple slots for the item."), event -> this.slotPane(player, itemMap, stage, 1)));
-			slotPane.addButton(new Button(this.fillerPaneBItem), 2);
+			switchPane.addButton(new Button(this.fillerPaneBItem), 2);
+			switchPane.addButton(new Button(ItemHandler.getItem().getItem("GLASS", 1, false, "&a&lSingle Slot", "&7", "&7*Define a single dedicated", "&7 slot for the item."), event -> this.slotPane(player, itemMap, stage, 0)));
+			switchPane.addButton(new Button(this.fillerPaneBItem), 1);
+			switchPane.addButton(new Button(ItemHandler.getItem().getItem("23", 1, false, "&b&lMultiple Slots", "&7", "&7*Define multiple slots for the item."), event -> this.slotPane(player, itemMap, stage, 1)));
+			switchPane.addButton(new Button(this.fillerPaneBItem), 2);
 			if (stage == 0) {
 				if (ServerHandler.getServer().hasSpecificUpdate("1_8")) {
-					slotPane.addButton(new Button(ItemHandler.getItem().setSkullTexture(ItemHandler.getItem().getItem("SKULL_ITEM:3", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", "&7the material selection menu."), 
+					switchPane.addButton(new Button(ItemHandler.getItem().setSkullTexture(ItemHandler.getItem().getItem("SKULL_ITEM:3", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", "&7the material selection menu."), 
 							"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2RjOWU0ZGNmYTQyMjFhMWZhZGMxYjViMmIxMWQ4YmVlYjU3ODc5YWYxYzQyMzYyMTQyYmFlMWVkZDUifX19"), event -> this.materialPane(player, itemMap, 0, 0)));
 				} else {
-					slotPane.addButton(new Button(ItemHandler.getItem().getItem("ARROW", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", "&7the material selection menu."), event -> this.materialPane(player, itemMap, 0, 0)));
+					switchPane.addButton(new Button(ItemHandler.getItem().getItem("ARROW", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", "&7the material selection menu."), event -> this.materialPane(player, itemMap, 0, 0)));
 				}
 			} else { 
-				slotPane.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> this.creatingPane(player, itemMap)));
+				switchPane.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> this.creatingPane(player, itemMap)));
 			}
 		});
-		slotPane.open(player);
+		switchPane.open(player);
 	}
 	
    /**
@@ -4759,7 +4811,7 @@ public class UI {
 				}
 				this.triggerPane(player, itemMap);
 			}));
-			triggerPane.addButton(new Button(ItemHandler.getItem().getItem("TNT_MINECART", 1, itemMap.isGiveOnRegionAccess(), "&e&l&nRegion WalkInOut", "&7", "&7*Gives the item when the", "&7player enters any of the enabled-regions", "&7and removes the item when leaving", "&7any of the enabled-regions.", "&9&lENABLED: &a" +
+			triggerPane.addButton(new Button(ItemHandler.getItem().getItem("TNT_MINECART", 1, itemMap.isGiveOnRegionAccess(), "&e&l&nRegion Access", "&7", "&7*Gives the item when the", "&7player enters any of the enabled-regions", "&7and removes the item when leaving", "&7any of the enabled-regions.", "&9&lENABLED: &a" +
 			(itemMap.isGiveOnRegionAccess() + "").toUpperCase()), event -> {
 				if (itemMap.isGiveOnRegionAccess()) {
 					itemMap.setGiveOnRegionAccess(false);
@@ -4770,7 +4822,7 @@ public class UI {
 				}
 				this.triggerPane(player, itemMap);
 			}));
-			triggerPane.addButton(new Button(ItemHandler.getItem().getItem("CHEST_MINECART", 1, itemMap.isGiveOnRegionEgress(), "&e&l&nRegion WalkOutIn", "&7", "&7*Removes the item when the", "&7player enters any of the enabled-regions", "&7and gives the item when leaving", "&7any of the enabled-regions.", "&9&lENABLED: &a" +
+			triggerPane.addButton(new Button(ItemHandler.getItem().getItem("CHEST_MINECART", 1, itemMap.isGiveOnRegionEgress(), "&e&l&nRegion Engress", "&7", "&7*Removes the item when the", "&7player enters any of the enabled-regions", "&7and gives the item when leaving", "&7any of the enabled-regions.", "&9&lENABLED: &a" +
 			(itemMap.isGiveOnRegionEgress() + "").toUpperCase()), event -> {
 				if (itemMap.isGiveOnRegionEgress()) {
 					itemMap.setGiveOnRegionEgress(false);
@@ -6663,19 +6715,47 @@ public class UI {
 			recipePane.addButton(new Button(this.fillerPaneBItem), 3);
 			for (int i = 0; i < 9; i++) {
 				final int k = i;
-				recipePane.addButton(new Button(ItemHandler.getItem().getItem((itemMap.getRecipe().size() > i && itemMap.getRecipe().get(i) != 'X' ? itemMap.getIngredients().get(itemMap.getRecipe().get(i)).toString(): "CHEST"), 1, false, 
-						(itemMap.getRecipe().size() > i ? "&e&l" + itemMap.getRecipe().get(i): "&e&lX"), "&7", "&7*Create a recipe that can be used"), event -> {
-					if ((itemMap.getRecipe().size() > k && itemMap.getRecipe().get(k) != 'X')) { this.setIngredients(player, itemMap, Material.AIR, k); } 
-					else { this.materialPane(player, itemMap, 3, k);}
-				}));
-				if (i == 2) {
-					recipePane.addButton(new Button(this.fillerPaneBItem), 6);
-				} else if (i == 5) {
-					recipePane.addButton(new Button(this.fillerPaneBItem));
-					recipePane.addButton(new Button(this.headerStack(player, itemMap)));
-					recipePane.addButton(new Button(this.fillerPaneBItem), 4);
-				} else if (i == 8) {
-					recipePane.addButton(new Button(this.fillerPaneBItem), 3);
+				String stack = "CHEST";
+				ItemStack stack1 = null;
+				if (itemMap.getRecipe().size() > i && itemMap.getRecipe().get(i) != 'X') {
+					final ItemMap copyMap = ItemUtilities.getUtilities().getItemMap(null, itemMap.getIngredients().get(itemMap.getRecipe().get(i)).toString(), null);
+					if (copyMap != null) { stack1 = copyMap.getItemStack(player); }
+					else { stack = itemMap.getIngredients().get(itemMap.getRecipe().get(i)).toString(); }
+				}
+				if (stack1 != null) {
+					stack1 = ItemHandler.getItem().addLore(stack1, "&9&lDISPLAY: &f" + stack1.getItemMeta().getDisplayName(), "&7", "&7*Create a recipe that can be used.");
+					ItemMeta meta = stack1.getItemMeta();
+					meta.setDisplayName(Utils.getUtils().translateLayout((itemMap.getRecipe().size() > i ? "&e&l" + itemMap.getRecipe().get(i): "&e&lX"), player));
+					stack1.setItemMeta(meta);
+					
+					recipePane.addButton(new Button(stack1, event -> {
+						if ((itemMap.getRecipe().size() > k && itemMap.getRecipe().get(k) != 'X')) { this.setIngredients(player, itemMap, "AIR", k); } 
+						else { this.ingredientPane(player, itemMap, k); }
+					}));
+					if (i == 2) {
+						recipePane.addButton(new Button(this.fillerPaneBItem), 6);
+					} else if (i == 5) {
+						recipePane.addButton(new Button(this.fillerPaneBItem));
+						recipePane.addButton(new Button(this.headerStack(player, itemMap)));
+						recipePane.addButton(new Button(this.fillerPaneBItem), 4);
+					} else if (i == 8) {
+						recipePane.addButton(new Button(this.fillerPaneBItem), 3);
+					}
+				} else {
+					recipePane.addButton(new Button(ItemHandler.getItem().getItem(stack, 1, false, 
+							(itemMap.getRecipe().size() > i ? "&e&l" + itemMap.getRecipe().get(i): "&e&lX"), "&7", "&7*Create a recipe that can be used."), event -> {
+						if ((itemMap.getRecipe().size() > k && itemMap.getRecipe().get(k) != 'X')) { this.setIngredients(player, itemMap, "AIR", k); } 
+						else { this.ingredientPane(player, itemMap, k); }
+					}));
+					if (i == 2) {
+						recipePane.addButton(new Button(this.fillerPaneBItem), 6);
+					} else if (i == 5) {
+						recipePane.addButton(new Button(this.fillerPaneBItem));
+						recipePane.addButton(new Button(this.headerStack(player, itemMap)));
+						recipePane.addButton(new Button(this.fillerPaneBItem), 4);
+					} else if (i == 8) {
+						recipePane.addButton(new Button(this.fillerPaneBItem), 3);
+					}
 				}
 			}
 			recipePane.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> this.creatingPane(player, itemMap)));
@@ -6683,6 +6763,28 @@ public class UI {
 			recipePane.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> this.creatingPane(player, itemMap)));
 		});
 		recipePane.open(player);
+	}
+	
+   /**
+    * Opens the Pane for the Player.
+    * This Pane is for setting the custom recipe.
+    * 
+    * @param player - The Player to have the Pane opened.
+    * @param itemMap - The ItemMap currently being modified.
+    */
+	private void ingredientPane(final Player player, final ItemMap itemMap, final int k) {
+		Interface ingredientPane = new Interface(false, 2, this.GUIName, player);
+		SchedulerUtils.getScheduler().runAsync(() -> {
+			ingredientPane.addButton(new Button(this.fillerPaneBItem), 3);
+			ingredientPane.addButton(new Button(ItemHandler.getItem().getItem("2", 1, false, "&b&lMaterial", "&7", "&7*Select a material type", "&7to be defined in the recipe."), event -> this.materialPane(player, itemMap, 3, k)));
+			ingredientPane.addButton(new Button(this.fillerPaneBItem));
+			ingredientPane.addButton(new Button(ItemHandler.getItem().getItem("CHEST", 1, false, "&b&lCustom Item", "&7", "&7*Select a custom item", "&7to be defined in the recipe."), event -> this.startModify(player, itemMap, k)));
+			ingredientPane.addButton(new Button(this.fillerPaneBItem), 3);
+			ingredientPane.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the recipe menu."), event -> this.recipePane(player, itemMap)));
+			ingredientPane.addButton(new Button(this.fillerPaneBItem), 7);
+			ingredientPane.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the recipe menu."), event -> this.recipePane(player, itemMap)));
+		});
+		ingredientPane.open(player);
 	}
 	
    /**
@@ -6775,8 +6877,8 @@ public class UI {
     * @param material - The material to be set.
     * @param position - The position in the crafting table being set.
     */
-	private void setIngredients(final Player player, final ItemMap itemMap, final Material material, final int position) {
-		Map < Character, Material > ingredients = itemMap.getIngredients();
+	private void setIngredients(final Player player, final ItemMap itemMap, final String material, final int position) {
+		Map<Character, String> ingredients = itemMap.getIngredients();
 		List < Character > recipe = itemMap.getRecipe();
 		char character = 'A';
 		for (char alphabet = 'A'; alphabet <= 'Z'; alphabet++) {
@@ -6791,9 +6893,9 @@ public class UI {
 				break;
 			}
 		}
-		if (material != Material.AIR && !ingredients.containsValue(material)) {
+		if (!Utils.getUtils().containsIgnoreCase(material, "AIR") && !ingredients.containsValue(material)) {
 			ingredients.put(character, material);
-		} else if (material == Material.AIR) {
+		} else if (Utils.getUtils().containsIgnoreCase(material, "AIR")) {
 			int count = 0;
 			for (Character recipes: recipe) {
 				if (recipes.equals(recipe.get(position))) {
@@ -6807,7 +6909,7 @@ public class UI {
 		while (position >= recipe.size()) {
 			recipe.add('X');
 		}
-		recipe.set(position, (material != Material.AIR ? character : 'X'));
+		recipe.set(position, (!Utils.getUtils().containsIgnoreCase(material, "AIR") ? character : 'X'));
 		itemMap.setRecipe(recipe);
 		itemMap.setIngredients(ingredients);
 		this.recipePane(player, itemMap);
@@ -7656,6 +7758,8 @@ public class UI {
 					(Utils.getUtils().nullCheck(itemMap.getMapImage()) != "NONE" ? "&9&lMap-Image: &a" + itemMap.getMapImage() : ""), (Utils.getUtils().nullCheck(itemMap.getChargeColor() + "") != "NONE" ? "&9&lCharge Color: &a" + itemMap.getChargeColor() : ""),
 					(Utils.getUtils().nullCheck(patternList) != "NONE" ? "&9&lBanner Meta: &a" + patternList : ""), (Utils.getUtils().nullCheck(potionList) != "NONE" ? "&9&lPotion-Effects: &a" + potionList : ""), (itemMap.getIngredients() != null && !itemMap.getIngredients().isEmpty() ? "&9&lRecipe: &aYES" : ""),
 					(!mobs.isEmpty() ? "&9&lMobs Drop: &a" + mobs.substring(0, mobs.length() - 2) : ""), (!blocks.isEmpty() ? "&9&lBlocks Drop: &a" + blocks.substring(0, blocks.length() - 2) : ""), 
+					(Utils.getUtils().nullCheck(itemMap.getCommandConditions() + "") != "NONE" ? "&9&lCommand Conditions: &aYES" : ""), (Utils.getUtils().nullCheck(itemMap.getDisposableConditions() + "") != "NONE" ? "&9&lDisposable Conditions: &aYES" : ""), 
+					(Utils.getUtils().nullCheck(itemMap.getTriggerConditions() + "") != "NONE" ? "&9&lTrigger Conditions: &aYES" : ""),
 					(Utils.getUtils().nullCheck(itemMap.getNBTValues() + "") != "NONE" ? "&9&lNBT Properties: &aYES" : ""), (Utils.getUtils().nullCheck(itemMap.getContents() + "") != "NONE" ? "&9&lContents: &aYES" : ""),
 					(Utils.getUtils().nullCheck(attributeList) != "NONE" ? "&9&lAttributes: &a" + attributeList : ""), (Utils.getUtils().nullCheck(itemMap.getPages() + "") != "NONE" ? "&9&lBook Pages: &aYES" : ""),
 					(Utils.getUtils().nullCheck(itemMap.getAuthor()) != "NONE" ? "&9&lBook Author: &a" + itemMap.getAuthor() : ""), (Utils.getUtils().nullCheck(itemMap.getSkull()) != "NONE" ? "&9&lSkull-Owner: &a" + itemMap.getSkull() : ""), 

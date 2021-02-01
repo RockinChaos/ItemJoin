@@ -149,6 +149,23 @@ public class Utils {
 	}
 	
    /**
+    * Replaces the last occurence of the regex.
+    * 
+    * @param str - The String to be checked.
+    * @param sub1 - The occurence to be removed.
+    * @param sub2 - The occurence to placed.
+    * @return The newly replaced String.
+    */
+	public String replaceLast(final String str, final String sub1, final String sub2) {
+	    int pos = str.lastIndexOf(sub1); 
+	    if (pos > -1) { 
+	       return str.substring(0, pos) + sub2 + str.substring(pos + sub1.length(), str.length()); 
+	    } else {
+	       return str;
+	    }
+	}
+	
+   /**
     * Gets the items.yml path for the auto generated item and its corresponding Integer.
     * 
     * @param i - The Integer to be set as the item path.

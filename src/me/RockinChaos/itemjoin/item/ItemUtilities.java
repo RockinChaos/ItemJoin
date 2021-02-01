@@ -228,7 +228,7 @@ public class ItemUtilities {
 			  || (type.equals(TriggerType.LIMIT_SWITCH) && item.isUseOnLimitSwitch())
 		      || ((((type.equals(TriggerType.REGION_ENTER) && (item.isGiveOnRegionEnter() || item.isGiveOnRegionAccess())) 
 			  || (type.equals(TriggerType.REGION_LEAVE) && (item.isGiveOnRegionLeave() || item.isGiveOnRegionEgress()))) && item.inRegion(region))))
-			   && item.isLimitMode(gameMode) && item.inWorld(player.getWorld()) && Chances.getChances().isProbability(item, randomMap) && item.conditionMet(player, "trigger-condition")
+			   && item.isLimitMode(gameMode) && item.inWorld(player.getWorld()) && Chances.getChances().isProbability(item, randomMap) && item.conditionMet(player, "trigger-conditions")
 			   && PlayerHandler.getPlayer().isEnabled(player) && item.hasPermission(player) 
 			   && this.isObtainable(player, item, session, type)) {
 				item.giveTo(player); 

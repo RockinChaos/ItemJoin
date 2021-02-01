@@ -38,6 +38,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
@@ -757,7 +758,7 @@ public class ItemDesigner {
 	private void setRecipe(final ItemMap itemMap) {
 		if (itemMap.getNodeLocation().getString(".recipe") != null) {
 			ShapedRecipe shapedRecipe = (ServerHandler.getServer().hasSpecificUpdate("1_12") ? new ShapedRecipe(new NamespacedKey(ItemJoin.getInstance(), itemMap.getConfigName()), itemMap.getItem(null)) : LegacyAPI.getLegacy().newShapedRecipe(itemMap.getItem(null)));
-			Map < Character, Material > ingredientList = new HashMap < Character, Material > ();
+			Map < Character, String > ingredientList = new HashMap < Character, String > ();
 			String[] shape = itemMap.trimRecipe(itemMap.getNodeLocation().getStringList(".recipe"));
 			shapedRecipe.shape(shape);
 			if (itemMap.getNodeLocation().getString(".ingredients") != null) {
@@ -770,10 +771,21 @@ public class ItemDesigner {
 						try { character = ingredientParts[0].charAt(0); } 
 						catch (Exception e) { ServerHandler.getServer().logWarn("{ItemMap} The character " + ingredientParts[0] + " for the custom recipe defined for the item " + itemMap.getConfigName() + " is not a valid character!"); }
 						shapedRecipe.setIngredient(character, material);
-						ingredientList.put(character, material);
-					} else { ServerHandler.getServer().logWarn("{ItemMap} The material " + ingredientParts[1] + " for the custom recipe defined for the item " + itemMap.getConfigName() + " is not a proper material type!"); }
+						ingredientList.put(character, material.name());
+					} else if (ConfigHandler.getConfig(false).getItemSection(ingredientParts[1]) != null) {
+						SchedulerUtils.getScheduler().runLater(40L, () -> {
+							if (ItemUtilities.getUtilities().getItemMap(null, ingredientParts[1], null) != null) {
+								final ItemStack itemStack = ItemUtilities.getUtilities().getItemMap(null, ingredientParts[1], null).getItemStack(null);
+								char character = 'X';
+								try { character = ingredientParts[0].charAt(0); } 
+								catch (Exception e) { ServerHandler.getServer().logWarn("{ItemMap} The character " + ingredientParts[0] + " for the custom recipe defined for the item " + itemMap.getConfigName() + " is not a valid character!"); }
+								shapedRecipe.setIngredient(character, LegacyAPI.getLegacy().newRecipeChoice(itemStack));
+								ingredientList.put(character, ingredientParts[1]);
+							} else { ServerHandler.getServer().logWarn("{ItemMap} The material " + ingredientParts[1] + " for the custom recipe defined for the item " + itemMap.getConfigName() + " is not a proper material type OR custom item node!"); }
+						});
+					} else { ServerHandler.getServer().logWarn("{ItemMap} The material " + ingredientParts[1] + " for the custom recipe defined for the item " + itemMap.getConfigName() + " is not a proper material type OR custom item node!"); }
 				}
-				SchedulerUtils.getScheduler().run(() -> Bukkit.getServer().addRecipe(shapedRecipe));
+				SchedulerUtils.getScheduler().runLater(45L, () -> Bukkit.getServer().addRecipe(shapedRecipe));
 				itemMap.setIngredients(ingredientList);
 			} else { ServerHandler.getServer().logWarn("{ItemMap} There is a custom recipe defined for the item " + itemMap.getConfigName() + " but it still needs ingredients defined!"); }
 		}

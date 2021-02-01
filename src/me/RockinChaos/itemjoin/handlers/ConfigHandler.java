@@ -99,15 +99,23 @@ public class ConfigHandler {
 	}
 	
    /**
+    * Copies files into memory.
+    * 
+    */
+	public void copyFiles() {
+		this.copyFile("config.yml", "config-Version", 7);
+		this.copyFile("items.yml", "items-Version", 7);
+		this.copyFile(LanguageAPI.getLang(true).getFile(), LanguageAPI.getLang(false).getFile().split("-")[0] + "-Version", 8);
+	}
+	
+   /**
     * Registers new instances of the plugin classes.
     * 
     */
 	private void registerClasses() {
 		final boolean reload = ItemJoin.getInstance().isStarted();
 		ServerHandler.getServer().clearErrorStatements();
-		this.copyFile("config.yml", "config-Version", 7);
-		this.copyFile("items.yml", "items-Version", 7);
-		this.copyFile(LanguageAPI.getLang(true).getFile(), LanguageAPI.getLang(false).getFile().split("-")[0] + "-Version", 8);
+		this.copyFiles();
 		this.registerPrevent();
 		ItemJoin.getInstance().setStarted(false);
 		SchedulerUtils.getScheduler().runAsync(() -> {
@@ -330,8 +338,7 @@ public class ConfigHandler {
     * 
     */
 	public void softReload() {
-		this.copyFile("config.yml", "config-Version", 7);
-		this.copyFile("items.yml", "items-Version", 7);
+		this.copyFiles();
 		this.registerPrevent();
 	}
 	
@@ -510,7 +517,7 @@ public class ConfigHandler {
     * @return The list of commands defined for the custom item.
     */
 	public ConfigurationSection getCommandsSection(final ConfigurationSection nodeLocation) {
-		return (this.getFile("items.yml") != null ? this.getFile("items.yml").getConfigurationSection(nodeLocation.getCurrentPath() + ".commands") : null);
+		return (this.getFile("items.yml") != null ? this.getFile("items.yml").getConfigurationSection(nodeLocation.getCurrentPath()) : null);
 	}
 	
    /**
