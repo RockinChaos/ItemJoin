@@ -6168,6 +6168,490 @@ public class UI {
 	
    /**
     * Opens the Pane for the Player.
+    * This Pane is for setting the item conditions.
+    * 
+    * @param player - The Player to have the Pane opened.
+    * @param itemMap - The ItemMap currently being modified.
+    */
+	private void conditionsPane(final Player player, final ItemMap itemMap) {
+		Interface conditionsPane = new Interface(false, 2, this.GUIName, player);
+		SchedulerUtils.getScheduler().runAsync(() -> {
+			conditionsPane.addButton(new Button(this.fillerPaneBItem), 3);
+			conditionsPane.addButton(new Button(ItemHandler.getItem().getItem("BOOK", 1, false, "&b&l&nCommand&b&l Conditions", "&7", "&7*Condition(s) that must be met", 
+					"&7in order to execute item commands.", "&7", "&9&lENABLED: " + String.valueOf((Utils.getUtils().nullCheck(itemMap.getCommandConditions() + "") != "NONE")).toUpperCase()), event -> this.commandActionPane(player, itemMap)));
+			conditionsPane.addButton(new Button(ItemHandler.getItem().getItem("CACTUS", 1, false, "&b&l&nDisposable&b&l Conditions", "&7", "&7*Condition(s) that must be met", "&7in order for the disposable", "&7itemflag to function.",
+					"&7", "&c&l&nNOTE:&7 The disposable itemflag", "&7must be defined for this", "&7condition to function.",
+					"&7", "&9&lENABLED: " + String.valueOf((Utils.getUtils().nullCheck(itemMap.getDisposableConditions() + "") != "NONE")).toUpperCase()), event -> this.disposableCPane(player, itemMap)));
+			conditionsPane.addButton(new Button(ItemHandler.getItem().getItem("REDSTONE", 1, false, "&b&l&nTrigger&b&l Conditions", "&7", "&7*Condition(s) that must be met", "&7in order to to receive the", 
+					"&7item when performing a trigger.", "&7", "&9&lENABLED: " + String.valueOf((Utils.getUtils().nullCheck(itemMap.getTriggerConditions() + "") != "NONE")).toUpperCase()), event -> this.triggerCPane(player, itemMap)));
+			conditionsPane.addButton(new Button(this.fillerPaneBItem), 3);
+			conditionsPane.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> this.creatingPane(player, itemMap)));
+			conditionsPane.addButton(new Button(this.fillerPaneBItem), 7);
+			conditionsPane.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> this.creatingPane(player, itemMap)));
+		});
+		conditionsPane.open(player);
+	}
+
+   /**
+    * Opens the Pane for the Player.
+    * This Pane is for setting the command action conditions.
+    * 
+    * @param player - The Player to have the Pane opened.
+    * @param itemMap - The ItemMap currently being modified.
+    */
+	private void commandActionPane(final Player player, final ItemMap itemMap) {
+		Interface commandPane = new Interface(false, 5, this.GUIName, player);
+		SchedulerUtils.getScheduler().runAsync(() -> {
+			commandPane.addButton(new Button(this.fillerPaneGItem), 2);
+			commandPane.addButton(new Button(ItemHandler.getItem().getItem("DIAMOND_SWORD", 1, false, "&e&lInteract", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+					"&7", "&9&lENABLED: &a" + (Utils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.INTERACT_ALL.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
+				this.commandCPane(player, itemMap, Action.INTERACT_ALL);
+			}));
+			commandPane.addButton(new Button(this.fillerPaneGItem));
+			commandPane.addButton(new Button(ItemHandler.getItem().getItem("CHEST", 1, false, "&e&lInventory", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+					"&7", "&9&lENABLED: &a" + (Utils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.INVENTORY_ALL.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
+				this.commandCPane(player, itemMap, Action.INVENTORY_ALL);
+			}));
+			commandPane.addButton(new Button(this.fillerPaneGItem));
+			commandPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "PISTON" : "PISTON_BASE"), 1, false, "&e&lPhysical", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+					"&7", "&9&lENABLED: &a" + (Utils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.PHYSICAL.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
+				this.commandCPane(player, itemMap, Action.PHYSICAL);
+			}));
+			commandPane.addButton(new Button(this.fillerPaneGItem), 2);
+			commandPane.addButton(new Button(ItemHandler.getItem().getItem("DIAMOND_HELMET", 1, false, "&e&lOn-Equip", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+					"&7", "&9&lENABLED: &a" + (Utils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.ON_EQUIP.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
+				this.commandCPane(player, itemMap, Action.ON_EQUIP);
+			}));
+			commandPane.addButton(new Button(this.fillerPaneGItem));
+			commandPane.addButton(new Button(ItemHandler.getItem().getItem("IRON_HELMET", 1, false, "&e&lUn-Equip", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+					"&7", "&9&lENABLED: &a" + (Utils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.UN_EQUIP.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
+				this.commandCPane(player, itemMap, Action.UN_EQUIP);
+			}));
+			commandPane.addButton(new Button(this.fillerPaneGItem));
+			commandPane.addButton(new Button(ItemHandler.getItem().getItem("IRON_SWORD", 1, false, "&e&lOn-Hold", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+					"&7", "&9&lENABLED: &a" + (Utils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.ON_HOLD.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
+				this.commandCPane(player, itemMap, Action.ON_HOLD);
+			}));
+			commandPane.addButton(new Button(this.fillerPaneGItem));
+			commandPane.addButton(new Button(ItemHandler.getItem().getItem("EMERALD", 1, false, "&e&lOn-Receive", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+					"&7", "&9&lENABLED: &a" + (Utils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.ON_RECEIVE.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
+				this.commandCPane(player, itemMap, Action.ON_RECEIVE);
+			}));
+			commandPane.addButton(new Button(this.fillerPaneGItem));
+			commandPane.addButton(new Button(ItemHandler.getItem().getItem("381", 1, false, "&e&lOn-Death", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+					"&7", "&9&lENABLED: &a" + (Utils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.ON_DEATH.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
+				this.commandCPane(player, itemMap, Action.ON_DEATH);
+			}));
+			commandPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "GLASS" : "20"), 1, false, "&e&lInteract-Air", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+					"&7", "&9&lENABLED: &a" + (Utils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.INTERACT_AIR.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
+				this.commandCPane(player, itemMap, Action.INTERACT_AIR);
+			}));
+			commandPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "GLASS" : "20"), 1, false, "&e&lInteract-Air-Left", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+					"&7", "&9&lENABLED: &a" + (Utils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.INTERACT_LEFT_AIR.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
+				this.commandCPane(player, itemMap, Action.INTERACT_LEFT_AIR);
+			}));
+			commandPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "GLASS" : "20"), 1, false, "&e&lInteract-Air-Right", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+					"&7", "&9&lENABLED: &a" + (Utils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.INTERACT_RIGHT_AIR.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
+				this.commandCPane(player, itemMap, Action.INTERACT_RIGHT_AIR);
+			}));
+			commandPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "OAK_DOOR" : (ServerHandler.getServer().hasSpecificUpdate("1_8") ? "324" : "64")), 1, false, "&e&lInteract-Block", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+					"&7", "&9&lENABLED: &a" + (Utils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.INTERACT_BLOCK.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
+				this.commandCPane(player, itemMap, Action.INTERACT_BLOCK);
+			}));
+			commandPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "OAK_DOOR" : (ServerHandler.getServer().hasSpecificUpdate("1_8") ? "324" : "64")), 1, false, "&e&lInteract-Block-Left", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+					"&7", "&9&lENABLED: &a" + (Utils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.INTERACT_LEFT_BLOCK.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
+				this.commandCPane(player, itemMap, Action.INTERACT_LEFT_BLOCK);
+			}));
+			commandPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "OAK_DOOR" : (ServerHandler.getServer().hasSpecificUpdate("1_8") ? "324" : "64")), 1, false, "&e&lInteract-Block-Right", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+					"&7", "&9&lENABLED: &a" + (Utils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.INTERACT_RIGHT_BLOCK.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
+				this.commandCPane(player, itemMap, Action.INTERACT_RIGHT_BLOCK);
+			}));
+			commandPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "GOLDEN_SWORD" : "GOLD_SWORD"), 1, false, "&e&lInteract-Left", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+					"&7", "&9&lENABLED: &a" + (Utils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.INTERACT_LEFT_ALL.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
+				this.commandCPane(player, itemMap, Action.INTERACT_LEFT_ALL);
+			}));
+			commandPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "GOLDEN_SWORD" : "GOLD_SWORD"), 1, false, "&e&lInteract-Right", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+					"&7", "&9&lENABLED: &a" + (Utils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.INTERACT_RIGHT_ALL.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
+				this.commandCPane(player, itemMap, Action.INTERACT_RIGHT_ALL);
+			}));
+			commandPane.addButton(new Button(ItemHandler.getItem().getItem("FEATHER", 1, false, "&e&lInventory-Swap-Cursor", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+					"&7", "&9&lENABLED: &a" + (Utils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.INVENTORY_SWAP_CURSOR.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
+				this.commandCPane(player, itemMap, Action.INVENTORY_SWAP_CURSOR);
+			}));
+			commandPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "SNOWBALL" : "SNOW_BALL"), 8, false, "&e&lInventory-Middle", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+					"&7", "&9&lENABLED: &a" + (Utils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.INVENTORY_MIDDLE.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
+				this.commandCPane(player, itemMap, Action.INVENTORY_MIDDLE);
+			}));
+			commandPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "ENCHANTED_GOLDEN_APPLE" : "322:1"), 1, false, "&e&lInventory-Creative", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+					"&7", "&9&lENABLED: &a" + (Utils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.INVENTORY_CREATIVE.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
+				this.commandCPane(player, itemMap, Action.INVENTORY_CREATIVE);
+			}));
+			commandPane.addButton(new Button(this.fillerPaneGItem));
+			commandPane.addButton(new Button(ItemHandler.getItem().getItem("COMPASS", 1, false, "&e&lInventory-Left", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+					"&7", "&9&lENABLED: &a" + (Utils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.INVENTORY_LEFT.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
+				this.commandCPane(player, itemMap, Action.INVENTORY_LEFT);
+			}));
+			commandPane.addButton(new Button(this.fillerPaneGItem));
+			commandPane.addButton(new Button(ItemHandler.getItem().getItem("COMPASS", 1, false, "&e&lInventory-Right", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+					"&7", "&9&lENABLED: &a" + (Utils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.INVENTORY_RIGHT.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
+				this.commandCPane(player, itemMap, Action.INVENTORY_RIGHT);
+			}));
+			commandPane.addButton(new Button(this.fillerPaneGItem));
+			commandPane.addButton(new Button(ItemHandler.getItem().getItem("COBBLESTONE_SLAB", 2, false, "&e&lInventory-Shift-Left", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+					"&7", "&9&lENABLED: &a" + (Utils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.INVENTORY_SHIFT_LEFT.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
+				this.commandCPane(player, itemMap, Action.INVENTORY_SHIFT_LEFT);
+			}));
+			commandPane.addButton(new Button(ItemHandler.getItem().getItem("COBBLESTONE_SLAB", 2, false, "&e&lInventory-Shift-Right", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+					"&7", "&9&lENABLED: &a" + (Utils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.INVENTORY_SHIFT_RIGHT.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
+				this.commandCPane(player, itemMap, Action.INVENTORY_SHIFT_RIGHT);
+			}));
+			commandPane.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item conditions menu."), event -> this.conditionsPane(player, itemMap)));
+			commandPane.addButton(new Button(this.fillerPaneBItem), 7);
+			commandPane.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item conditions menu."), event -> this.conditionsPane(player, itemMap)));
+		});
+		commandPane.open(player);
+	}
+	
+   /**
+    * Opens the Pane for the Player.
+    * This Pane is for setting the commands conditions.
+    * 
+    * @param player - The Player to have the Pane opened.
+    * @param itemMap - The ItemMap currently being modified.
+    * @param commandAction - The command action being referenced.
+    */
+	private void commandCPane(final Player player, final ItemMap itemMap, final Action commandAction) {
+		Interface conditionsPane = new Interface(true, 2, this.GUIName, player);
+		Utils.getUtils();
+		conditionsPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the command actions menu."), event -> this.commandActionPane(player, itemMap)));
+		SchedulerUtils.getScheduler().runAsync(() -> {
+			final String commandIdent = commandAction.config().replace("-", " ").replace(".", "");
+			conditionsPane.addButton(new Button(ItemHandler.getItem().getItem("NAME_TAG", 1, (Utils.getUtils().nullCheck(itemMap.getCommandMessages().get(commandAction.config())) != "NONE"), "&c&l" + String.valueOf(commandIdent.charAt(0)).toUpperCase() + commandIdent.substring(1) + " Fail Message", "&7", "&7*An optional message to be", "&7sent when the player does not", "&7meet the commands conditions.",
+			"&7", "&9&lMESSAGE: &a" + (Utils.getUtils().nullCheck(itemMap.getCommandMessages().get(commandAction.config())) != "NONE" ? itemMap.getCommandMessages().get(commandAction.config()) : "NONE")),
+			event -> {
+				if (Utils.getUtils().nullCheck(itemMap.getCommandMessages().get(commandAction.config())) != "NONE") {
+					Map<String, String> messages = itemMap.getCommandMessages();
+					messages.put(commandAction.config(), null);
+					itemMap.setCommandMessages(messages);
+					this.commandCPane(player, itemMap, commandAction);
+				} else {
+					player.closeInventory();
+					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					placeHolders[16] = "COMMAND FAIL MESSAGE";
+					placeHolders[15] = "&cYou do not meet the conditions to execute this item command.";
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				}
+			}, event -> {
+				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				placeHolders[16] = "COMMAND FAIL MESSAGE";
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+				Map<String, String> messages = itemMap.getCommandMessages();
+				messages.put(commandAction.config(), ChatColor.stripColor(event.getMessage()));
+				itemMap.setCommandMessages(messages);
+				this.commandCPane(player, itemMap, commandAction);
+			}));
+			conditionsPane.addButton(new Button(ItemHandler.getItem().getItem("FEATHER", 1, true, "&b&lAdd Condition", "&7", "&7*Condition(s) that must be met", 
+					"&7in order to execute the", "&7" + commandAction.config().replace("-", " ").replace(".", "") + " item commands."), 			
+			event -> {
+				player.closeInventory();
+				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				placeHolders[16] = "FIRST VALUE";
+				placeHolders[15] = "100";
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+			}, event -> {
+				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				placeHolders[16] = "FIRST VALUE";
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+				this.addConditionPane(event.getPlayer(), itemMap, commandAction, commandAction.config(), ChatColor.stripColor(event.getMessage()));
+			}));
+			if (itemMap.getCommandConditions().get(commandAction.config()) != null) {
+				for (String condition: itemMap.getCommandConditions().get(commandAction.config())) {
+					conditionsPane.addButton(new Button(ItemHandler.getItem().getItem("PAPER", 1, false, "&f" + condition, "&7", "&7*Click to remove this condition."), 
+					event -> {
+						Map<String, List<String>> commands = itemMap.getCommandConditions();
+						List < String > conditions = commands.get(commandAction.config());
+						conditions.remove(condition);
+						commands.put(commandAction.config(), conditions);
+						itemMap.setCommandConditions(commands);
+						this.commandCPane(player, itemMap, commandAction);
+					}));
+				}
+			}
+		});
+		conditionsPane.open(player);
+	}
+	
+   /**
+    * Opens the Pane for the Player.
+    * This Pane is for setting the disposable conditions.
+    * 
+    * @param player - The Player to have the Pane opened.
+    * @param itemMap - The ItemMap currently being modified.
+    */
+	private void disposableCPane(final Player player, final ItemMap itemMap) {
+		Interface conditionsPane = new Interface(true, 2, this.GUIName, player);
+		conditionsPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item conditions menu."), event -> this.conditionsPane(player, itemMap)));
+		SchedulerUtils.getScheduler().runAsync(() -> {
+			conditionsPane.addButton(new Button(ItemHandler.getItem().getItem("NAME_TAG", 1, (Utils.getUtils().nullCheck(itemMap.getDisposableMessage()) != "NONE"), "&c&lDisposable Fail Message", "&7", "&7*An optional message to be", "&7sent when the player does not", "&7meet the disposable conditions.",
+			"&7", "&9&lMESSAGE: &a" + (Utils.getUtils().nullCheck(itemMap.getDisposableMessage()) != "NONE" ? itemMap.getDisposableMessage() : "NONE")),
+			event -> {
+				if (Utils.getUtils().nullCheck(itemMap.getDisposableMessage()) != "NONE") {
+					itemMap.setDisposableMessage(null);
+					this.disposableCPane(player, itemMap);
+				} else {
+					player.closeInventory();
+					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					placeHolders[16] = "DISPOSABLE FAIL MESSAGE";
+					placeHolders[15] = "&cYou do not meet the conditions to dispose of this item.";
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				}
+			}, event -> {
+				itemMap.setDisposableMessage(ChatColor.stripColor(event.getMessage()));
+				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				placeHolders[16] = "DISPOSABLE FAIL MESSAGE";
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+				this.disposableCPane(event.getPlayer(), itemMap);
+			}));
+			conditionsPane.addButton(new Button(ItemHandler.getItem().getItem("FEATHER", 1, true, "&b&lAdd Condition", "&7", "&7*Condition(s) that must be met", "&7in order to dispose of the item."), 			
+			event -> {
+				player.closeInventory();
+				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				placeHolders[16] = "FIRST VALUE";
+				placeHolders[15] = "100";
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+			}, event -> {
+				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				placeHolders[16] = "FIRST VALUE";
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+				this.addConditionPane(event.getPlayer(), itemMap, null, "disposable-conditions", ChatColor.stripColor(event.getMessage()));
+			}));
+			for (String condition: itemMap.getDisposableConditions()) {
+				conditionsPane.addButton(new Button(ItemHandler.getItem().getItem("PAPER", 1, false, "&f" + condition, "&7", "&7*Click to remove this condition."), 
+				event -> {
+					List < String > conditions = itemMap.getDisposableConditions();
+					conditions.remove(condition);
+					itemMap.setDisposableConditions(conditions);
+					this.disposableCPane(player, itemMap);
+				}));
+			}
+		});
+		conditionsPane.open(player);
+	}
+	
+   /**
+    * Opens the Pane for the Player.
+    * This Pane is for setting the trigger conditions.
+    * 
+    * @param player - The Player to have the Pane opened.
+    * @param itemMap - The ItemMap currently being modified.
+    */
+	private void triggerCPane(final Player player, final ItemMap itemMap) {
+		Interface conditionsPane = new Interface(true, 2, this.GUIName, player);
+		conditionsPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item conditions menu."), event -> this.conditionsPane(player, itemMap)));
+		SchedulerUtils.getScheduler().runAsync(() -> {
+			conditionsPane.addButton(new Button(ItemHandler.getItem().getItem("NAME_TAG", 1, (Utils.getUtils().nullCheck(itemMap.getTriggerMessage()) != "NONE"), "&c&lTrigger Fail Message", "&7", "&7*An optional message to be", "&7sent when the player does not", "&7meet the trigger conditions.",
+			"&7", "&9&lMESSAGE: &a" + (Utils.getUtils().nullCheck(itemMap.getTriggerMessage()) != "NONE" ? itemMap.getTriggerMessage() : "NONE")),
+			event -> {
+				if (Utils.getUtils().nullCheck(itemMap.getTriggerMessage()) != "NONE") {
+					itemMap.setTriggerMessage(null);
+					this.triggerCPane(player, itemMap);
+				} else {
+					player.closeInventory();
+					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					placeHolders[16] = "TRIGGER FAIL MESSAGE";
+					placeHolders[15] = "&cYou do not meet the conditions to receive this item.";
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				}
+			}, event -> {
+				itemMap.setTriggerMessage(ChatColor.stripColor(event.getMessage()));
+				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				placeHolders[16] = "TRIGGER FAIL MESSAGE";
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+				this.triggerCPane(event.getPlayer(), itemMap);
+			}));
+			conditionsPane.addButton(new Button(ItemHandler.getItem().getItem("FEATHER", 1, true, "&b&lAdd Condition", "&7", "&7*Condition(s) that must be met", "&7in order to receive the item."), 			
+			event -> {
+				player.closeInventory();
+				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				placeHolders[16] = "FIRST VALUE";
+				placeHolders[15] = "100";
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+			}, event -> {
+				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				placeHolders[16] = "FIRST VALUE";
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+				this.addConditionPane(event.getPlayer(), itemMap, null, "trigger-conditions", ChatColor.stripColor(event.getMessage()));
+			}));
+			for (String condition: itemMap.getTriggerConditions()) {
+				conditionsPane.addButton(new Button(ItemHandler.getItem().getItem("PAPER", 1, false, "&f" + condition, "&7", "&7*Click to remove this condition."), 
+				event -> {
+					List < String > conditions = itemMap.getTriggerConditions();
+					conditions.remove(condition);
+					itemMap.setTriggerConditions(conditions);
+					this.triggerCPane(player, itemMap);
+				}));
+			}
+		});
+		conditionsPane.open(player);
+	}
+	
+   /**
+    * Opens the Pane for the Player.
+    * This Pane is for adding the item condition.
+    * 
+    * @param player - The Player to have the Pane opened.
+    * @param itemMap - The ItemMap currently being modified.
+    * @param condition - The condition currently being modified.
+    */
+	private void addConditionPane(final Player player, final ItemMap itemMap, final Action commandAction, final String condition1, final String value1) {
+		Interface conditionsPane = new Interface(false, 2, this.GUIName, player);
+		SchedulerUtils.getScheduler().runAsync(() -> {
+			conditionsPane.addButton(new Button(this.fillerPaneBItem));
+			conditionsPane.addButton(new Button(ItemHandler.getItem().getItem("MINECART", 1, false, "&b&lEQUAL", "&7", "&7*The first value must be", "&7EQUAL to the second value", "&7for the condition to be met."),			
+			event -> {
+				player.closeInventory();
+				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				placeHolders[16] = "SECOND VALUE";
+				placeHolders[15] = "400";
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+			}, event -> {
+				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				placeHolders[16] = "SECOND VALUE";
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+				List < String > conditions = (condition1.equalsIgnoreCase("disposable-conditions") ? itemMap.getDisposableConditions() : condition1.equalsIgnoreCase("trigger-conditions") ? itemMap.getTriggerConditions() : itemMap.getCommandConditions().get(condition1) != null ? itemMap.getCommandConditions().get(condition1) : new ArrayList < String > ());
+				conditions.add(value1 + ":" + "EQUAL" + ":" + ChatColor.stripColor(event.getMessage()));
+				if (condition1.equalsIgnoreCase("disposable-conditions")) {
+					itemMap.setDisposableConditions(conditions);
+					this.disposableCPane(player, itemMap);
+				} else if (condition1.equalsIgnoreCase("trigger-conditions")) {
+					itemMap.setTriggerConditions(conditions);
+					this.triggerCPane(player, itemMap);
+				} else {
+					Map<String, List<String>> conditions2 = itemMap.getCommandConditions();
+					conditions2.put(condition1.replace("-conditions", ""), conditions);
+					itemMap.setCommandConditions(conditions2);
+					this.commandCPane(player, itemMap, commandAction);
+				}
+			}));
+			conditionsPane.addButton(new Button(this.fillerPaneBItem));
+			conditionsPane.addButton(new Button(ItemHandler.getItem().getItem("85", 1, false, "&b&lNOTEQUAL", "&7", "&7*The first value must be", "&7NOTEQUAL to the second value", "&7for the condition to be met."), 
+			event -> {
+				player.closeInventory();
+				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				placeHolders[16] = "SECOND VALUE";
+				placeHolders[15] = "400";
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+			}, event -> {
+				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				placeHolders[16] = "SECOND VALUE";
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+				List < String > conditions = (condition1.equalsIgnoreCase("disposable-conditions") ? itemMap.getDisposableConditions() : condition1.equalsIgnoreCase("trigger-conditions") ? itemMap.getTriggerConditions() : itemMap.getCommandConditions().get(condition1) != null ? itemMap.getCommandConditions().get(condition1) : new ArrayList < String > ());
+				conditions.add(value1 + ":" + "NOTEQUAL" + ":" + ChatColor.stripColor(event.getMessage()));
+				if (condition1.equalsIgnoreCase("disposable-conditions")) {
+					itemMap.setDisposableConditions(conditions);
+					this.disposableCPane(player, itemMap);
+				} else if (condition1.equalsIgnoreCase("trigger-conditions")) {
+					itemMap.setTriggerConditions(conditions);
+					this.triggerCPane(player, itemMap);
+				} else {
+					Map<String, List<String>> conditions2 = itemMap.getCommandConditions();
+					conditions2.put(condition1.replace("-conditions", ""), conditions);
+					itemMap.setCommandConditions(conditions2);
+					this.commandCPane(player, itemMap, commandAction);
+				}
+			}));
+			conditionsPane.addButton(new Button(this.fillerPaneBItem));
+			conditionsPane.addButton(new Button(ItemHandler.getItem().getItem("53", 1, false, "&b&lOVER", "&7", "&7*The first value must be", "&7OVER the second value", "&7for the condition to be met.", "&7", "&c&l&nNOTE:&7 This only works if both", "&7values referenced are integers."), 
+			event -> {
+				player.closeInventory();
+				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				placeHolders[16] = "SECOND VALUE";
+				placeHolders[15] = "400";
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+			}, event -> {
+				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				placeHolders[16] = "SECOND VALUE";
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+				List < String > conditions = (condition1.equalsIgnoreCase("disposable-conditions") ? itemMap.getDisposableConditions() : condition1.equalsIgnoreCase("trigger-conditions") ? itemMap.getTriggerConditions() : itemMap.getCommandConditions().get(condition1) != null ? itemMap.getCommandConditions().get(condition1) : new ArrayList < String > ());
+				conditions.add(value1 + ":" + "OVER" + ":" + ChatColor.stripColor(event.getMessage()));
+				if (condition1.equalsIgnoreCase("disposable-conditions")) {
+					itemMap.setDisposableConditions(conditions);
+					this.disposableCPane(player, itemMap);
+				} else if (condition1.equalsIgnoreCase("trigger-conditions")) {
+					itemMap.setTriggerConditions(conditions);
+					this.triggerCPane(player, itemMap);
+				} else {
+					Map<String, List<String>> conditions2 = itemMap.getCommandConditions();
+					conditions2.put(condition1.replace("-conditions", ""), conditions);
+					itemMap.setCommandConditions(conditions2);
+					this.commandCPane(player, itemMap, commandAction);
+				}
+			}));
+			conditionsPane.addButton(new Button(this.fillerPaneBItem));
+			conditionsPane.addButton(new Button(ItemHandler.getItem().getItem("333", 1, false, "&b&lUNDER", "&7", "&7*The first value must be", "&7UNDER to the second value", "&7for the condition to be met.", "&7", "&c&l&nNOTE:&7 This only works if both", "&7values referenced are integers."), 
+			event -> {
+				player.closeInventory();
+				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				placeHolders[16] = "SECOND VALUE";
+				placeHolders[15] = "400";
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+			}, event -> {
+				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				placeHolders[16] = "SECOND VALUE";
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+				List < String > conditions = (condition1.equalsIgnoreCase("disposable-conditions") ? itemMap.getDisposableConditions() : condition1.equalsIgnoreCase("trigger-conditions") ? itemMap.getTriggerConditions() : itemMap.getCommandConditions().get(condition1) != null ? itemMap.getCommandConditions().get(condition1) : new ArrayList < String > ());
+				conditions.add(value1 + ":" + "UNDER" + ":" + ChatColor.stripColor(event.getMessage()));
+				if (condition1.equalsIgnoreCase("disposable-conditions")) {
+					itemMap.setDisposableConditions(conditions);
+					this.disposableCPane(player, itemMap);
+				} else if (condition1.equalsIgnoreCase("trigger-conditions")) {
+					itemMap.setTriggerConditions(conditions);
+					this.triggerCPane(player, itemMap);
+				} else {
+					Map<String, List<String>> conditions2 = itemMap.getCommandConditions();
+					conditions2.put(condition1.replace("-conditions", ""), conditions);
+					itemMap.setCommandConditions(conditions2);
+					this.commandCPane(player, itemMap, commandAction);
+				}
+			}));
+			conditionsPane.addButton(new Button(this.fillerPaneBItem));
+			conditionsPane.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the " + condition1.replace("-", " ").replace(".", "") + " condition menu."), 
+			event -> { 
+				if (condition1.equalsIgnoreCase("disposable-conditions")) {
+					this.disposableCPane(player, itemMap);
+				} else if (condition1.equalsIgnoreCase("trigger-conditions")) {
+					this.triggerCPane(player, itemMap);
+				} else {
+					this.commandCPane(player, itemMap, commandAction);
+				}
+			}));
+			conditionsPane.addButton(new Button(this.fillerPaneBItem), 7);
+			conditionsPane.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the " + condition1.replace("-", " ").replace(".", "") + " condition menu."), 
+			event -> { 
+				if (condition1.equalsIgnoreCase("disposable-conditions")) {
+					this.disposableCPane(player, itemMap);
+				} else if (condition1.equalsIgnoreCase("trigger-conditions")) {
+					this.triggerCPane(player, itemMap);
+				} else {
+					this.commandCPane(player, itemMap, commandAction);
+				}
+			}));
+		});
+		conditionsPane.open(player);
+	}
+	
+   /**
+    * Opens the Pane for the Player.
     * This Pane is for setting the custom recipe.
     * 
     * @param player - The Player to have the Pane opened.
