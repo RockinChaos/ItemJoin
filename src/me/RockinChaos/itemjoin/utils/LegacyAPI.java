@@ -27,7 +27,6 @@ import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.RecipeChoice;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -97,16 +96,6 @@ public class LegacyAPI {
     */
     public ShapedRecipe newShapedRecipe(final ItemStack item) {
     	return new ShapedRecipe(item);
-    }
-    
-   /**
-    * Creates a new RecipeChoice.
-    * 
-    * @param item - The ItemStack to be crafted.
-    * @return The new ShapedRecipe.
-    */
-    public RecipeChoice newRecipeChoice(final ItemStack item) {
-    	return new RecipeChoice.ExactChoice(item);
     }
 
    /**

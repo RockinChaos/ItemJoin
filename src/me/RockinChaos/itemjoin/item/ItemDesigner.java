@@ -48,6 +48,7 @@ import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
+import me.RockinChaos.itemjoin.listeners.Recipes;
 import me.RockinChaos.itemjoin.utils.LegacyAPI;
 import me.RockinChaos.itemjoin.utils.Reflection;
 import me.RockinChaos.itemjoin.utils.SchedulerUtils;
@@ -775,12 +776,15 @@ public class ItemDesigner {
 					} else if (ConfigHandler.getConfig(false).getItemSection(ingredientParts[1]) != null) {
 						SchedulerUtils.getScheduler().runLater(40L, () -> {
 							if (ItemUtilities.getUtilities().getItemMap(null, ingredientParts[1], null) != null) {
-								final ItemStack itemStack = ItemUtilities.getUtilities().getItemMap(null, ingredientParts[1], null).getItemStack(null);
+								final ItemStack itemStack = ItemUtilities.getUtilities().getItemMap(null, ingredientParts[1], null).getItem(null);
 								char character = 'X';
 								try { character = ingredientParts[0].charAt(0); } 
 								catch (Exception e) { ServerHandler.getServer().logWarn("{ItemMap} The character " + ingredientParts[0] + " for the custom recipe defined for the item " + itemMap.getConfigName() + " is not a valid character!"); }
-								shapedRecipe.setIngredient(character, LegacyAPI.getLegacy().newRecipeChoice(itemStack));
+								shapedRecipe.setIngredient(character, itemStack.getType());
 								ingredientList.put(character, ingredientParts[1]);
+								if (!Utils.getUtils().isRegistered(Recipes.class.getSimpleName())) {
+									ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Recipes(), ItemJoin.getInstance());
+								}
 							} else { ServerHandler.getServer().logWarn("{ItemMap} The material " + ingredientParts[1] + " for the custom recipe defined for the item " + itemMap.getConfigName() + " is not a proper material type OR custom item node!"); }
 						});
 					} else { ServerHandler.getServer().logWarn("{ItemMap} The material " + ingredientParts[1] + " for the custom recipe defined for the item " + itemMap.getConfigName() + " is not a proper material type OR custom item node!"); }

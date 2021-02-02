@@ -26,6 +26,7 @@ import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.inventory.ItemStack;
 
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
+import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.utils.Utils;
 
@@ -74,4 +75,30 @@ public class Recipes implements Listener {
 	        }
 	    }
 	}
+	
+   /**
+	* Called when the player tries to craft a recipe with a custom item.
+	* 
+	* @param event - PrepareItemCraftEvent
+	*/
+    @EventHandler()
+    public void onPrepareRecipe(PrepareItemCraftEvent event) {
+    	if (event.getRecipe() != null && event.getRecipe().getResult() != null && event.getRecipe().getResult().getType() != Material.AIR) {
+	    	ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(event.getRecipe().getResult(), null, event.getView().getPlayer().getWorld());
+	    	if (itemMap != null && itemMap.getIngredients() != null && !itemMap.getIngredients().isEmpty()) {
+	    		for (int i = 0; i < event.getInventory().getSize(); i++ ){
+	    			final ItemStack item = event.getInventory().getItem(i + 1);
+	    			if (item != null) {
+	    				for (Character ingredient: itemMap.getIngredients().keySet()) {
+	    					ItemMap ingredMap = ItemUtilities.getUtilities().getItemMap(null, itemMap.getIngredients().get(ingredient) , null);
+	    					if (ingredMap != null && itemMap.getRecipe().size() > i && itemMap.getRecipe().get(i) == ingredient && !ingredMap.isSimilar(item)) {
+	    						event.getInventory().setResult(new ItemStack(Material.AIR));
+	    						break;
+	    					}
+	    				}
+	    			}
+				}
+	    	}
+    	}
+    }
 }
