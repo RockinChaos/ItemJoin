@@ -61,8 +61,9 @@ public class Placement implements Listener {
 	 */
 	 @EventHandler(ignoreCancelled = false)
 	 private void onCountLock(PlayerInteractEvent event) {
-	 	ItemStack item = (event.getItem() != null ? event.getItem().clone() : event.getItem());
-	 	Player player = event.getPlayer();
+	 	final ItemStack item = (event.getItem() != null ? event.getItem().clone() : event.getItem());
+	 	final Player player = event.getPlayer();
+	 	final int slot = player.getInventory().getHeldItemSlot();
 	 	if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK && !PlayerHandler.getPlayer().isCreativeMode(player)) {
 	 		if (!ItemUtilities.getUtilities().isAllowed(player, item, "count-lock")) {
 	 			ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item, null, player.getWorld());
@@ -70,17 +71,31 @@ public class Placement implements Listener {
 				SchedulerUtils.getScheduler().run(() -> {
 		 			if (Utils.getUtils().containsIgnoreCase(item.getType().name(), "WATER") || Utils.getUtils().containsIgnoreCase(item.getType().name(), "LAVA") || item.getType().name().equalsIgnoreCase("BUCKET") 
 		 			 || Utils.getUtils().containsIgnoreCase(item.getType().name(), "POTION")) {
-		 				PlayerHandler.getPlayer().setMainHandItem(player, item);
+		 				if (player.getInventory().getHeldItemSlot() == slot) {
+		 					PlayerHandler.getPlayer().setMainHandItem(player, item);
+		 				} else if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
+		 					player.getInventory().setItem(slot, item);
+		 				}
 		 			} else if (itemMap != null) { 
 		 				if (PlayerHandler.getPlayer().getHandItem(player) == null || PlayerHandler.getPlayer().getHandItem(player).getAmount() <= 1) {
 		 					if (ServerHandler.getServer().hasSpecificUpdate("1_9")) { 
 		 						if (event.getHand().equals(EquipmentSlot.HAND)) {
+		 						if (player.getInventory().getHeldItemSlot() == slot) {
 		 							PlayerHandler.getPlayer().setMainHandItem(player, item);
+		 						} else if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
+		 							player.getInventory().setItem(slot, item);
+		 						}
 		 						} else if (event.getHand().equals(EquipmentSlot.OFF_HAND)) {
 		 							PlayerHandler.getPlayer().setOffHandItem(player, item);
 		 						}
 		 					} 
-		 					else { PlayerHandler.getPlayer().setMainHandItem(player, item); }
+		 					else { 
+		 						if (player.getInventory().getHeldItemSlot() == slot) {
+		 							PlayerHandler.getPlayer().setMainHandItem(player, item);
+		 						} else if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
+		 							player.getInventory().setItem(slot, item);
+		 						}
+		 					}
 		 				} else if (itemMap.isSimilar(PlayerHandler.getPlayer().getHandItem(player))) { 
 		 					PlayerHandler.getPlayer().getHandItem(player).setAmount(itemMap.getCount()); 
 		 				}
