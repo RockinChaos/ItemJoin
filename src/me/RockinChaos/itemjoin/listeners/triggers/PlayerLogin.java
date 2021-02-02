@@ -23,7 +23,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
-
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
@@ -49,7 +48,7 @@ public class PlayerLogin implements Listener {
 	* Called when the player attempts to connect to the server before the plugin was even enabled.
 	* Denies the player login attempt as they have managed to bypass the AsyncPlayerPreLoginEvent.
 	* 
-	* @param event - AsyncPlayerPreLoginEvent
+	* @param event - PlayerLoginEvent
 	*/
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onPlayerLogin(PlayerLoginEvent event) {
