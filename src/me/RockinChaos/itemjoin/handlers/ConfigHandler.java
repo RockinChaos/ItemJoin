@@ -103,8 +103,8 @@ public class ConfigHandler {
     * 
     */
 	public void copyFiles() {
-		this.copyFile("config.yml", "config-Version", 7);
-		this.copyFile("items.yml", "items-Version", 7);
+		this.copyFile("config.yml", "config-Version", 8);
+		this.copyFile("items.yml", "items-Version", 8);
 		this.copyFile(LanguageAPI.getLang(true).getFile(), LanguageAPI.getLang(false).getFile().split("-")[0] + "-Version", 8);
 	}
 	
@@ -150,6 +150,9 @@ public class ConfigHandler {
 		}
 		if (((this.clearEnabled("World-Switch") || this.triggerEnabled("World-Switch")) || Utils.getUtils().containsIgnoreCase(this.getHotbarTriggers(), "WORLD-SWITCH")) && !Utils.getUtils().isRegistered(WorldSwitch.class.getSimpleName())) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new WorldSwitch(), ItemJoin.getInstance());
+		}
+		if (((this.clearEnabled("Quit") || this.triggerEnabled("Quit")) || Utils.getUtils().containsIgnoreCase(this.getHotbarTriggers(), "QUIT")) && !Utils.getUtils().isRegistered(PlayerQuit.class.getSimpleName())) {
+			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerQuit(), ItemJoin.getInstance());
 		}
 		if ((Utils.getUtils().containsIgnoreCase(this.getHotbarTriggers(), "RESPAWN") || this.triggerEnabled("Respawn")) && !Utils.getUtils().isRegistered(Respawn.class.getSimpleName())) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Respawn(), ItemJoin.getInstance());
@@ -493,7 +496,7 @@ public class ConfigHandler {
 		if (this.getConfigurationSection() != null) {
 			return true;
 		} else if (this.getConfigurationSection() == null) {
-			ServerHandler.getServer().logSevere("{Config} There are no items detected in the items.yml.");
+			ServerHandler.getServer().logWarn("{Config} There are no items detected in the items.yml.");
 			ServerHandler.getServer().logWarn("{Config} Try adding an item to the items section in the items.yml.");
 			return false;
 		}

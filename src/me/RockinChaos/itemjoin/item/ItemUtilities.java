@@ -255,6 +255,7 @@ public class ItemUtilities {
 		if (type.equals(TriggerType.REGION_LEAVE)) { DependAPI.getDepends(false).getGuard().pasteReturnItems(player, region); }
 		if (type.equals(TriggerType.WORLD_SWITCH)) { this.pasteReturnItems(type, player, world.getName()); }
 		if (type.equals(TriggerType.REGION_ENTER)) { this.clearEvent(type, player, "", region); }
+		if (type.equals(TriggerType.QUIT)) { this.clearEvent(type, player, player.getWorld().getName(), ""); }
 		if (this.getClearDelay() != 0) {
 			SchedulerUtils.getScheduler().runLater(this.getClearDelay(), () -> {
 				if (type.equals(TriggerType.JOIN) || type.equals(TriggerType.WORLD_SWITCH)) {
@@ -263,7 +264,7 @@ public class ItemUtilities {
 				this.triggerCommands(player, type);
 			});
 		} else {
-			if (type.equals(TriggerType.JOIN) || type.equals(TriggerType.WORLD_SWITCH)) {
+			if (type.equals(TriggerType.JOIN) || type.equals(TriggerType.WORLD_SWITCH) || type.equals(TriggerType.QUIT)) {
 				this.clearEvent(type, player, player.getWorld().getName(), "");
 			}
 			this.triggerCommands(player, type);
@@ -787,6 +788,8 @@ public class ItemUtilities {
 	public long getClearDelay() {
 		if (!Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Join"), "DISABLED") 
 				&& !Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Join"), "FALSE")
+				|| !Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Quit"), "DISABLED")
+				&& !Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Quit"), "FALSE")
 				|| !Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.World-Switch"), "DISABLED")
 				&& !Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.World-Switch"), "FALSE")
 				|| !Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Region-Enter"), "DISABLED")
@@ -931,6 +934,7 @@ public class ItemUtilities {
 	public enum TriggerType {
 		FIRST_JOIN("First-Join"),
 		JOIN("Join"),
+		QUIT("Quit"),
 		RESPAWN("Respawn"),
 		WORLD_SWITCH("World-Switch"),
 		LIMIT_SWITCH("Limit-Modes"),
