@@ -3,7 +3,7 @@
 # Join the discord for easy plugin support; https://discord.gg/D5FnJ7C
 
 # Modifying this will cause this file to break and regenerate.
-items-Version: 7
+items-Version: 8
 
 # General options that apply to the custom items functionality.
 items-Delay: 2
