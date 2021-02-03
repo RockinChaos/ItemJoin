@@ -17,7 +17,7 @@
 # +----------------------------------------------------------------------------------------------+ #
 
 # Modifying this will cause this file to break and regenerate.
-config-Version: 7
+config-Version: 8
 
 # At the moment, the available language translations are; English, Russian, French, Spanish, Chinese, Traditional Chinese.
 # If you want to contribute to a language translation please create a pull request; https://github.com/RockinChaos/ItemJoin/tree/master/files/locales
@@ -59,6 +59,7 @@ Clear-Items:
   Type: ITEMJOIN
   Delay-Tick: 2
   Join: false
+  Quit: false
   World-Switch: false
   Region-Enter: false
   Options: PROTECT, PROTECT_OP, PROTECT_CREATIVE
