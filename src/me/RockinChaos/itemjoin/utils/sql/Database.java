@@ -437,8 +437,8 @@ abstract class Controller {
 	protected Connection connection;
 	protected String dataFolder;
     protected HikariDataSource hikari;
+    protected HikariConfig hikariConfig;
 	protected boolean stopConnection = false;
-	protected boolean closeAttempt = false;
 		
    /**
 	* Gets the proper SQL connection.
@@ -454,6 +454,7 @@ abstract class Controller {
 		} else if (!this.stopConnection) {
 			synchronized (this) {
 				try { 
+					this.hikari = new HikariDataSource(this.hikariConfig);
 					this.connection = this.hikari.getConnection();
 				    return this.connection;
 				} catch (Exception e) { 
@@ -513,7 +514,7 @@ abstract class Controller {
 	*/
 	protected boolean isClosed(final Connection object) {
 		try {
-			if (object == null || object.isClosed()) {
+			if (this.hikari == null || this.hikari.isClosed() || object == null || object.isClosed()) {
 				return true;
 			}
 		} catch (AbstractMethodError | NoClassDefFoundError e) { return false; } 
@@ -541,7 +542,7 @@ abstract class Controller {
 			if (!this.isClosed(rs)) {
 				rs.close();
 			}
-			if (!this.closeAttempt && (!this.isClosed(conn) && (!ConfigHandler.getConfig(false).sqlEnabled() || force))) {
+			if (!this.stopConnection && (!this.isClosed(conn) && (!ConfigHandler.getConfig(false).sqlEnabled() || force))) {
 				this.closeLater(conn, force);
 				this.stopConnection = force;
 			}
@@ -559,13 +560,14 @@ abstract class Controller {
 	* @param force - If the connection should be forced to close.
 	*/
 	protected void closeLater(final Connection conn, final boolean force) { 
-		this.closeAttempt = true;
+		this.stopConnection = true;
 		if (ItemJoin.getInstance().isEnabled()) {
 			SchedulerUtils.getScheduler().runLater(100L, () -> {
 				try {
 					if (!this.isClosed(conn) && (!ConfigHandler.getConfig(false).sqlEnabled() || force)) {
 						conn.close();
-						this.closeAttempt = false;
+						this.hikari.close();
+						this.stopConnection = false;
 					}
 				} catch (SQLException e) { 
 					ServerHandler.getServer().logSevere("{SQL} [10] Failed to close database connection."); 
@@ -576,7 +578,8 @@ abstract class Controller {
 			try {
 				if (!this.isClosed(conn) && (!ConfigHandler.getConfig(false).sqlEnabled() || force)) {
 					conn.close();
-					this.closeAttempt = false;
+					this.hikari.close();
+					this.stopConnection = false;
 				}
 			} catch (SQLException e) {
 				ServerHandler.getServer().logSevere("{SQL} [10] Failed to close database connection."); 
@@ -590,27 +593,26 @@ abstract class Controller {
 	* 
 	*/
 	protected void loadSource() {
-		HikariConfig hikariConfig = new HikariConfig();
+		this.hikariConfig = new HikariConfig();
 		FileConfiguration config = ConfigHandler.getConfig(false).getFile("config.yml");
 	    String database = (config.getString("Database.table") != null ? config.getString("Database.table") : config.getString("Database.database"));
 		if (ConfigHandler.getConfig(false).sqlEnabled()) {
-			hikariConfig.setJdbcUrl("jdbc:mysql://" + config.getString("Database.host") + ":" + config.getString("Database.port") + "/" + database + "?useSSL=false" + "&createDatabaseIfNotExist=true" + "&allowPublicKeyRetrieval=true");
-		    hikariConfig.setIdleTimeout(TimeUnit.MINUTES.toMillis(1));
+			this.hikariConfig.setJdbcUrl("jdbc:mysql://" + config.getString("Database.host") + ":" + config.getString("Database.port") + "/" + database + "?useSSL=false" + "&createDatabaseIfNotExist=true" + "&allowPublicKeyRetrieval=true");
+		    this.hikariConfig.setIdleTimeout(TimeUnit.MINUTES.toMillis(1));
 		} else {
-			hikariConfig.setJdbcUrl("jdbc:sqlite:" + this.getDatabaseFile());
+			this.hikariConfig.setJdbcUrl("jdbc:sqlite:" + this.getDatabaseFile());
 		}
-	    hikariConfig.setUsername(config.getString("Database.user"));
-	    hikariConfig.setPassword(config.getString("Database.pass"));
-	    hikariConfig.addDataSourceProperty("cachePrepStmts", "true");
-	    hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250");
-	    hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
-	    hikariConfig.addDataSourceProperty("userServerPrepStmts", "true");
-	    hikariConfig.setLeakDetectionThreshold(TimeUnit.MINUTES.toMillis(1));
-	    hikariConfig.setConnectionTimeout(TimeUnit.MINUTES.toMillis(1));
-	    hikariConfig.setValidationTimeout(TimeUnit.MINUTES.toMillis(1));
-	    hikariConfig.setMaxLifetime(TimeUnit.MINUTES.toMillis(5));
-	    hikariConfig.setMaximumPoolSize(10);
-	    this.hikari = new HikariDataSource(hikariConfig);	
+	    this.hikariConfig.setUsername(config.getString("Database.user"));
+	    this.hikariConfig.setPassword(config.getString("Database.pass"));
+	    this.hikariConfig.addDataSourceProperty("cachePrepStmts", "true");
+	    this.hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250");
+	    this.hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
+	    this.hikariConfig.addDataSourceProperty("userServerPrepStmts", "true");
+	    this.hikariConfig.setLeakDetectionThreshold(TimeUnit.MINUTES.toMillis(1));
+	    this.hikariConfig.setConnectionTimeout(TimeUnit.MINUTES.toMillis(1));
+	    this.hikariConfig.setValidationTimeout(TimeUnit.MINUTES.toMillis(1));
+	    this.hikariConfig.setMaxLifetime(TimeUnit.MINUTES.toMillis(5));
+	    this.hikariConfig.setMaximumPoolSize(10);
 	}
 	
    /**

@@ -24,7 +24,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import me.RockinChaos.itemjoin.ItemJoin;
-import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 
 public class PlayerLogin implements Listener {
@@ -37,7 +36,7 @@ public class PlayerLogin implements Listener {
 	*/
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	private void onPlayerPreLogin(AsyncPlayerPreLoginEvent event) {
-		if (ConfigHandler.getConfig(false).sqlEnabled() && !ItemJoin.getInstance().isStarted()) {
+		if (!ItemJoin.getInstance().isStarted()) {
 			ServerHandler.getServer().logDebug("Processing pre-login for " + (ServerHandler.getServer().hasSpecificUpdate("1_8") ? event.getUniqueId() : "Legacy") + " - " + event.getName());
 			this.enableLatch();
 			ServerHandler.getServer().logDebug("Accepted pre-login for " + (ServerHandler.getServer().hasSpecificUpdate("1_8") ? event.getUniqueId() : "Legacy") + " - " + event.getName());
@@ -53,7 +52,7 @@ public class PlayerLogin implements Listener {
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onPlayerLogin(PlayerLoginEvent event) {
     	final Player player = event.getPlayer();
-    	if (ConfigHandler.getConfig(false).sqlEnabled() && !ItemJoin.getInstance().isStarted()) {
+    	if (!ItemJoin.getInstance().isStarted()) {
     		ServerHandler.getServer().logDebug("Denied login for " + (ServerHandler.getServer().hasSpecificUpdate("1_8") ? player.getUniqueId() : "Legacy") + " - " + player.getName() + ", server is still starting!");
     		event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "Timed out");
     	}
