@@ -605,11 +605,12 @@ public class ItemCommand {
 		INVENTORY_SHIFT_RIGHT(".inventory-shift-right", "MOVE_TO_OTHER_INVENTORY", "SHIFT_RIGHT"),
 		INVENTORY_SWAP_CURSOR(".inventory-swap-cursor", "SWAP_WITH_CURSOR", "LEFT, RIGHT"),
 		
-		ON_RECEIVE(".on-receive", "ON_RECEIVE", "RECEIVED"),
 		ON_HOLD(".on-hold", "ON_HOLD", "HELD"),
 		ON_EQUIP(".on-equip", "ON_EQUIP", "EQUIPPED"),
 		UN_EQUIP(".un-equip", "UN_EQUIP", "UNEQUIPPED"),
 		ON_DEATH(".on-death", "ON_DEATH", "DEAD"),
+		ON_DAMAGE(".on-damage", "ON_DAMAGE", "DAMAGED"),
+		ON_RECEIVE(".on-receive", "ON_RECEIVE", "RECEIVED"),
 		PHYSICAL(".physical", "PHYSICAL", "INTERACTED");
 		
 		private final String config;

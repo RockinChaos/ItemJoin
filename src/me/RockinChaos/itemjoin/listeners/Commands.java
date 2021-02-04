@@ -27,6 +27,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -146,10 +147,27 @@ public class Commands implements Listener {
 			String[] itemType = item.getType().name().split("_");
 			if (itemType.length >= 2 && itemType[1] != null && !itemType[1].isEmpty() && Utils.getUtils().isInt(Utils.getUtils().getArmorSlot(itemType[1], true)) 
 				&& player.getInventory().getItem(Integer.parseInt(Utils.getUtils().getArmorSlot(itemType[1], true))) == null) {
-				this.equipCommands(player, event.getItem(), "ON_EQUIP", "EQUIPPED", Utils.getUtils().getArmorSlot(itemType[1], true), SlotType.ARMOR);
+				this.equipCommands(player, item, "ON_EQUIP", "EQUIPPED", Utils.getUtils().getArmorSlot(itemType[1], true), SlotType.ARMOR);
 			}
 		}
 	}
+	
+   /**
+	* Runs the on_damage commands for the custom item upon damaging an entity or being damaged by an entity.
+	* 
+	* @param event - EntityDamageByEntityEvent
+	*/
+	@EventHandler(ignoreCancelled = false)
+    public void onDamage(EntityDamageByEntityEvent event){
+		Player player = ((event.getEntity() instanceof Player) ? (Player)event.getEntity() : (event.getDamager() instanceof Player) ? (Player)event.getDamager() : null);
+		if (player != null) {
+			final ItemStack item = PlayerHandler.getPlayer().getHandItem(player);
+			final int slot = player.getInventory().getHeldItemSlot();
+			if (item != null && item.getType() != Material.AIR && !PlayerHandler.getPlayer().isMenuClick(player.getOpenInventory(), Action.LEFT_CLICK_AIR)) {
+				this.runCommands(player, item, "ON_DAMAGE", "DAMAGED", Integer.toString(slot));
+			}
+		}
+    }
 	
    /**
 	* Runs the commands upon right or left clicking the custom item on an entity.
@@ -280,7 +298,6 @@ public class Commands implements Listener {
 		}
 	}
 	
-	private HashMap<String, Boolean> itemDrop = new HashMap<String, Boolean>();
    /**
 	* Checks if the player recently attempted to drop an item.
 	* 
@@ -295,4 +312,5 @@ public class Commands implements Listener {
 		}
 		return false;
 	}
+	private HashMap<String, Boolean> itemDrop = new HashMap<String, Boolean>();
 }
