@@ -18,8 +18,6 @@
 package me.RockinChaos.itemjoin.listeners;
 
 import java.util.HashMap;
-import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
@@ -31,6 +29,7 @@ import me.RockinChaos.itemjoin.utils.Utils;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -70,18 +69,20 @@ public class Drops implements Listener {
 	* 
 	* @param event - PlayerDeathEvent.
 	*/
-	@EventHandler(ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	private void onGlobalDeathDrops(PlayerDeathEvent event) {
-		List < ItemStack > drops = event.getDrops();
-		ListIterator < ItemStack > litr = drops.listIterator();
 		Player player = event.getEntity();
 		ItemUtilities.getUtilities().closeAnimations(player);
 		if (Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getPrevent("Death-Drops"), "TRUE") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getPrevent("Death-Drops"), player.getWorld().getName())
 			  	|| Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getPrevent("Death-Drops"), "ALL") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getPrevent("Death-Drops"), "GLOBAL")) {
 		  	if (ConfigHandler.getConfig(false).isPreventOP() && player.isOp() || ConfigHandler.getConfig(false).isPreventCreative() && PlayerHandler.getPlayer().isCreativeMode(player)) { }
 		  	else {
-		  		while (litr.hasNext()) {
-		  			litr.next(); litr.remove();
+				for (int k = 0; k < player.getInventory().getSize(); k++) {
+					ItemStack stack = player.getInventory().getItem(k);
+					if (stack != null && stack.getType() != Material.AIR) { 
+						player.getInventory().remove(stack);
+						event.getDrops().remove(stack);
+					}
 				}
 		  	}
 		}
@@ -137,21 +138,23 @@ public class Drops implements Listener {
 	* 
 	* @param event - PlayerItemConsumeEvent.
 	*/
-	@EventHandler(ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	private void onDeathDrops(PlayerDeathEvent event) {
-		List < ItemStack > drops = event.getDrops();
-		ListIterator < ItemStack > litr = drops.listIterator();
 		Player player = event.getEntity();
 		ItemUtilities.getUtilities().closeAnimations(player);
 		for (int k = 0; k < player.getOpenInventory().getTopInventory().getSize(); k++) {
 			ItemStack stack = player.getOpenInventory().getTopInventory().getItem(k);
 			if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory()) && !ItemUtilities.getUtilities().isAllowed(player, stack, "death-drops")) {
-				player.getOpenInventory().getTopInventory().setItem(k, new ItemStack(Material.AIR));
+				event.getDrops().remove(stack);
+				player.getOpenInventory().getTopInventory().remove(stack);
 			}
 		}
-		while (litr.hasNext()) {
-			ItemStack stack = litr.next();
-			if (!ItemUtilities.getUtilities().isAllowed(player, stack, "death-drops")) { litr.remove(); }
+		for (int k = 0; k < player.getInventory().getSize(); k++) {
+			ItemStack stack = player.getInventory().getItem(k);
+			if (!ItemUtilities.getUtilities().isAllowed(player, stack, "death-drops")) {
+				event.getDrops().remove(stack);
+				player.getInventory().remove(stack);
+			}
 		}
 	}
 	
