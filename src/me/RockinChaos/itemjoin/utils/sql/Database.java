@@ -20,7 +20,6 @@ package me.RockinChaos.itemjoin.utils.sql;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -85,7 +84,7 @@ public class Database extends Controller {
 			conn = this.getConnection();
 			if (conn != null) {
 				ps = conn.prepareStatement(statement);
-				ps.executeUpdate();
+				ps.execute();
 			}
 		} catch (Exception e) {
 			ServerHandler.getServer().logSevere("{SQL} [1] Failed to execute database statement.");
@@ -472,30 +471,15 @@ abstract class Controller {
 			return this.connection; 
 		} else if (!this.stopConnection) {
 			synchronized (this) {
-				if (ConfigHandler.getConfig(false).sqlEnabled()) {
-					try { 
-						this.connection = this.hikari.getConnection();
-				        return this.connection;
-					} catch (Exception e) { 
-						this.stopConnection = true;
+				try { 
+					this.connection = this.hikari.getConnection();
+				    return this.connection;
+				} catch (Exception e) { 
+					this.stopConnection = true;
+					if (ConfigHandler.getConfig(false).sqlEnabled()) {
 						ServerHandler.getServer().logSevere("{SQL} Unable to connect to the defined MySQL database, check your settings.");
-						ServerHandler.getServer().sendSevereTrace(e);
-					}
-					return this.connection;
-				} else {
-					try {
-						Class.forName("org.sqlite.JDBC");
-						this.connection = DriverManager.getConnection("jdbc:sqlite:" + this.getDatabase());
-					} catch (SQLException e) { 
-						this.stopConnection = true;
-						ServerHandler.getServer().logSevere("{SQL} SQLite exception on initialize.");
-						ServerHandler.getServer().sendDebugTrace(e);
-					} catch (ClassNotFoundException e) { 
-						this.stopConnection = true;
-						ServerHandler.getServer().logSevere("{SQL} You need the SQLite JBDC library, see: https://bitbucket.org/xerial/sqlite-jdbc/downloads/ and put it in the /lib folder of Java.");
-						ServerHandler.getServer().sendDebugTrace(e);
-					}
-					return this.connection;
+					} else { ServerHandler.getServer().logSevere("{SQL} SQLite exception on initialize."); }
+					ServerHandler.getServer().sendSevereTrace(e);
 				}
 			}
 		}
@@ -620,11 +604,39 @@ abstract class Controller {
 	}
 	
    /**
+	* Loads the database source connection information.
+	* 
+	*/
+	protected void loadSource() {
+		HikariConfig hikariConfig = new HikariConfig();
+		FileConfiguration config = ConfigHandler.getConfig(false).getFile("config.yml");
+	    String database = (config.getString("Database.table") != null ? config.getString("Database.table") : config.getString("Database.database"));
+		if (ConfigHandler.getConfig(false).sqlEnabled()) {
+			hikariConfig.setJdbcUrl("jdbc:mysql://" + config.getString("Database.host") + ":" + config.getString("Database.port") + "/" + database + "?useSSL=false" + "&createDatabaseIfNotExist=true" + "&allowPublicKeyRetrieval=true");
+		    hikariConfig.setIdleTimeout(TimeUnit.MINUTES.toMillis(1));
+		} else {
+			hikariConfig.setJdbcUrl("jdbc:sqlite:" + this.getDatabaseFile());
+		}
+	    hikariConfig.setUsername(config.getString("Database.user"));
+	    hikariConfig.setPassword(config.getString("Database.pass"));
+	    hikariConfig.addDataSourceProperty("cachePrepStmts", "true");
+	    hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250");
+	    hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
+	    hikariConfig.addDataSourceProperty("userServerPrepStmts", "true");
+	    hikariConfig.setLeakDetectionThreshold(TimeUnit.MINUTES.toMillis(1));
+	    hikariConfig.setConnectionTimeout(TimeUnit.MINUTES.toMillis(1));
+	    hikariConfig.setValidationTimeout(TimeUnit.MINUTES.toMillis(1));
+	    hikariConfig.setMaxLifetime(TimeUnit.MINUTES.toMillis(5));
+	    hikariConfig.setMaximumPoolSize(10);
+	    this.hikari = new HikariDataSource(hikariConfig);	
+	}
+	
+   /**
 	* Gets the database file.
 	* 
 	* @return The Database File.
 	*/
-	private File getDatabase() {
+	protected File getDatabaseFile() {
 		File dataFolder = new File(ItemJoin.getInstance().getDataFolder(), this.dataFolder + ".db");
 		if (!dataFolder.exists()) {
 			try { dataFolder.createNewFile(); } 
