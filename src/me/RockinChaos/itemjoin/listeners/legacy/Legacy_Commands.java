@@ -27,6 +27,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -74,7 +75,7 @@ public class Legacy_Commands implements Listener {
 	* @param event - PlayerDeathEvent.
 	* @deprecated This is a LEGACY event, only use on Minecraft versions below 1.8.
 	*/
-	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = false)
 	private void onDeath(PlayerDeathEvent event) {
 		ListIterator < ItemStack > litr = event.getDrops().listIterator();
 		while (litr.hasNext()) {
@@ -156,10 +157,28 @@ public class Legacy_Commands implements Listener {
 			String[] itemType = item.getType().name().split("_");
 			if (itemType.length >= 2 && itemType[1] != null && !itemType[1].isEmpty() && Utils.getUtils().isInt(Utils.getUtils().getArmorSlot(itemType[1], true)) 
 				&& player.getInventory().getItem(Integer.parseInt(Utils.getUtils().getArmorSlot(itemType[1], true))) == null) {
-				this.equipCommands(player, event.getItem(), "ON_EQUIP", "EQUIPPED", Utils.getUtils().getArmorSlot(itemType[1], true), SlotType.ARMOR);
+				this.equipCommands(player, item, "ON_EQUIP", "EQUIPPED", Utils.getUtils().getArmorSlot(itemType[1], true), SlotType.ARMOR);
 			}
 		}
 	}
+	
+   /**
+	* Runs the on_damage commands for the custom item upon damaging an entity or being damaged by an entity.
+	* 
+	* @param event - EntityDamageByEntityEvent
+	* @deprecated This is a LEGACY event, only use on Minecraft versions below 1.8.
+	*/
+	@EventHandler(ignoreCancelled = false)
+    public void onDamage(EntityDamageByEntityEvent event){
+		Player player = ((event.getEntity() instanceof Player) ? (Player)event.getEntity() : (event.getDamager() instanceof Player) ? (Player)event.getDamager() : null);
+		if (player != null) {
+			final ItemStack item = PlayerHandler.getPlayer().getHandItem(player);
+			final int slot = player.getInventory().getHeldItemSlot();
+			if (item != null && item.getType() != Material.AIR && !PlayerHandler.getPlayer().isMenuClick(player.getOpenInventory(), Action.LEFT_CLICK_AIR)) {
+				this.runCommands(player, item, "ON_DAMAGE", "DAMAGED", Integer.toString(slot));
+			}
+		}
+    }
 	
    /**
 	* Runs the commands upon right or left clicking the custom item on an entity.
@@ -193,10 +212,9 @@ public class Legacy_Commands implements Listener {
 		final Player player = event.getPlayer();
 		final ItemStack item = (event.getItem() != null ? event.getItem().clone() : (event.getAction() == Action.PHYSICAL ? PlayerHandler.getPlayer().getMainHandItem(player) : event.getItem()));
 		final String action = event.getAction().name();
-		if ((PlayerHandler.getPlayer().isAdventureMode(player) && !action.contains("LEFT") 
-				|| !PlayerHandler.getPlayer().isAdventureMode(player)) && !this.isDropEvent(event.getPlayer())) {
+		if (((PlayerHandler.getPlayer().isAdventureMode(player) && !action.contains("LEFT") || !PlayerHandler.getPlayer().isAdventureMode(player))) && !this.isDropEvent(event.getPlayer())) {
 			ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(PlayerHandler.getPlayer().getHandItem(player), null, player.getWorld());
-			if (itemMap != null && itemMap.isSimilar(item)) {
+			if (!PlayerHandler.getPlayer().isMenuClick(player.getOpenInventory(), event.getAction()) && itemMap != null && itemMap.isSimilar(item)) {
 				long dupeDuration = (this.interactDupe != null && !this.interactDupe.isEmpty() && this.interactDupe.get(item) != null ? (((System.currentTimeMillis()) - this.interactDupe.get(item))) : -1);
 				if (dupeDuration == -1 || dupeDuration > 30) {
 					this.interactDupe.put(item, System.currentTimeMillis());
@@ -217,7 +235,7 @@ public class Legacy_Commands implements Listener {
 	private void onSwingArm(PlayerAnimationEvent event) {
 		Player player = event.getPlayer();
 		ItemStack item = PlayerHandler.getPlayer().getHandItem(player);
-		if (PlayerHandler.getPlayer().isAdventureMode(player) && !this.isDropEvent(event.getPlayer())) {
+		if (PlayerHandler.getPlayer().isAdventureMode(player) && !this.isDropEvent(event.getPlayer()) && !PlayerHandler.getPlayer().isMenuClick(player.getOpenInventory(), Action.LEFT_CLICK_AIR)) {
 			this.runCommands(player, item, "LEFT_CLICK_AIR", "LEFT", String.valueOf(player.getInventory().getHeldItemSlot()));
 		}
 	}
@@ -249,7 +267,7 @@ public class Legacy_Commands implements Listener {
 	* @param action - the action that is being performed.
 	* @param slot - the slot the item originally resided in.
 	* @param slotType - the SlotType the item originated in.
-	* @deprecated This is a LEGACY event, only use on Minecraft versions below 1.8.
+	* @deprecated This is a LEGACY method, only use on Minecraft versions below 1.8.
 	*/
 	private void equipCommands(Player player, ItemStack item, String action, String clickType, String slot, SlotType slotType) {
 			String[] itemType = item.getType().name().split("_");
@@ -268,7 +286,7 @@ public class Legacy_Commands implements Listener {
 	* @param item - the item the player is trying to use to execute a command.
 	* @param action - the action that is being performed.
 	* @param slot - the slot the item originally resided in.
-	* @deprecated This is a LEGACY event, only use on Minecraft versions below 1.8.
+	* @deprecated This is a LEGACY method, only use on Minecraft versions below 1.8.
 	*/
 	private void runCommands(Player player, ItemStack item, String action, String clickType, String slot) {
 		ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item, null, player.getWorld());
@@ -277,13 +295,12 @@ public class Legacy_Commands implements Listener {
 		}
 	}
 	
-	private HashMap<String, Boolean> itemDrop = new HashMap<String, Boolean>();
    /**
 	* Checks if the player recently attempted to drop an item.
 	* 
 	* @param player - The player being checked.
 	* @return If the player has dropped the item.
-	* @deprecated This is a LEGACY event, only use on Minecraft versions below 1.8.
+	* @deprecated This is a LEGACY method, only use on Minecraft versions below 1.8.
 	*/
 	private boolean isDropEvent(Player player) {
 		if (!((this.itemDrop.get(PlayerHandler.getPlayer().getPlayerID(player)) == null 
@@ -293,4 +310,5 @@ public class Legacy_Commands implements Listener {
 		}
 		return false;
 	}
+	private HashMap<String, Boolean> itemDrop = new HashMap<String, Boolean>();
 }

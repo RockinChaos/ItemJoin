@@ -367,7 +367,7 @@ public class PlayerHandler {
     */
 	public Player getPlayerString(final String playerName) {
 		Player args = null;
-		try { args = Bukkit.getPlayer(UUID.fromString(playerName)); } catch (Exception e) {}
+		try { args = Bukkit.getPlayer(UUID.fromString(playerName)); } catch (Exception e) { }
 		if (playerName != null && DependAPI.getDepends(false).nickEnabled()) {
 			try { 
 				de.domedd.betternick.api.nickedplayer.NickedPlayer np = new de.domedd.betternick.api.nickedplayer.NickedPlayer(LegacyAPI.getLegacy().getPlayer(playerName));

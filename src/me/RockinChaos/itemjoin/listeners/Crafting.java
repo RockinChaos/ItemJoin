@@ -195,7 +195,9 @@ public class Crafting implements Listener {
     	final Player player = (Player) event.getPlayer();
     	final World world = player.getWorld();
     	final ItemStack item = event.getItemDrop().getItemStack().clone();
-    	if (player.getHealth() > 0) {
+    	double health = 1;
+    	try { health = (ServerHandler.getServer().hasSpecificUpdate("1_8") ? player.getHealth() : (double)player.getClass().getMethod("getHealth", double.class).invoke(player)); } catch (Exception e) { health = (player.isDead() ? 0 : 1);  }
+    	if (health > 0) {
     		final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item, null, player.getWorld());
     		SchedulerUtils.getScheduler().runLater(2L, () -> { 
 		    	if (!world.equals(player.getWorld()) && itemMap != null && itemMap.inWorld(player.getWorld()) && itemMap.hasPermission(player)) {

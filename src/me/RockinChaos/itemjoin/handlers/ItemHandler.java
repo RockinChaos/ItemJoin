@@ -314,13 +314,15 @@ public class ItemHandler {
     */
     public ItemStack setSkullTexture(final ItemStack item, final String skullTexture) {
     	try {
-	        ItemMeta itemMeta = item.getItemMeta();
-			GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
-			gameProfile.getProperties().put("textures", new Property("textures", new String(skullTexture)));
-			Field declaredField = itemMeta.getClass().getDeclaredField("profile");
-			declaredField.setAccessible(true);
-			declaredField.set(itemMeta, gameProfile);
-			item.setItemMeta(itemMeta);
+    		if (ServerHandler.getServer().hasSpecificUpdate("1_8")) {
+		        ItemMeta itemMeta = item.getItemMeta();
+				GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
+				gameProfile.getProperties().put("textures", new Property("textures", new String(skullTexture)));
+				Field declaredField = itemMeta.getClass().getDeclaredField("profile");
+				declaredField.setAccessible(true);
+				declaredField.set(itemMeta, gameProfile);
+				item.setItemMeta(itemMeta);
+    		}
     	} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
     	return item;
     }

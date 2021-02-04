@@ -348,11 +348,13 @@ public class ItemAnimation {
 			tempMeta = ItemHandler.getItem().setSkullOwner(tempMeta, Utils.getUtils().translateLayout(ItemHandler.getItem().cutDelay(ownerString), player));
 		} else if (textureString != null && !textureString.contains("hdb-") && !this.itemMap.isHeadDatabase()) {
 			try {
-				final GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
-				gameProfile.getProperties().put("textures", new Property("textures", new String(ItemHandler.getItem().cutDelay(textureString))));
-				final Field declaredField = tempMeta.getClass().getDeclaredField("profile");
-				declaredField.setAccessible(true);
-				declaredField.set(tempMeta, gameProfile);
+				if (ServerHandler.getServer().hasSpecificUpdate("1_8")) {
+					final GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
+					gameProfile.getProperties().put("textures", new Property("textures", new String(ItemHandler.getItem().cutDelay(textureString))));
+					final Field declaredField = tempMeta.getClass().getDeclaredField("profile");
+					declaredField.setAccessible(true);
+					declaredField.set(tempMeta, gameProfile);
+				}
 			} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
 		}
 		reviseItem.setItemMeta(tempMeta);

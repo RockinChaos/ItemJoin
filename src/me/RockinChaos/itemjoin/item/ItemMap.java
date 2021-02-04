@@ -3515,7 +3515,7 @@ public class ItemMap {
     * 
     */
 	private void setContents(final Player player) {
-		if (this.contents != null && !this.contents.isEmpty()) {
+		if (this.contents != null && !this.contents.isEmpty() && ServerHandler.getServer().hasSpecificUpdate("1_11")) {
 			ShulkerBox box = (ShulkerBox) ((BlockStateMeta)this.tempMeta).getBlockState();
 			box.getInventory().clear();
 			for (String node : this.contents) {
@@ -3861,11 +3861,13 @@ public class ItemMap {
 			this.tempMeta = ItemHandler.getItem().setSkullOwner(this.tempMeta, Utils.getUtils().translateLayout(this.skullOwner, player));
 		} else if (this.skullTexture != null && !this.headDatabase) {
 			try {
-				GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
-				gameProfile.getProperties().put("textures", new Property("textures", new String(((this.skullOwner != null && DependAPI.getDepends(false).skinsRestorerEnabled()) ? DependAPI.getDepends(false).getSkinValue(Utils.getUtils().translateLayout(this.skullOwner, player)) : this.skullTexture))));
-				Field declaredField = this.tempMeta.getClass().getDeclaredField("profile");
-				declaredField.setAccessible(true);
-				declaredField.set(this.tempMeta, gameProfile);
+				if (ServerHandler.getServer().hasSpecificUpdate("1_8")) {
+					GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
+					gameProfile.getProperties().put("textures", new Property("textures", new String(((this.skullOwner != null && DependAPI.getDepends(false).skinsRestorerEnabled()) ? DependAPI.getDepends(false).getSkinValue(Utils.getUtils().translateLayout(this.skullOwner, player)) : this.skullTexture))));
+					Field declaredField = this.tempMeta.getClass().getDeclaredField("profile");
+					declaredField.setAccessible(true);
+					declaredField.set(this.tempMeta, gameProfile);
+				}
 			} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
 		}
 	}

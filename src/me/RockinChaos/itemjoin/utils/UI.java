@@ -374,7 +374,7 @@ public class UI {
 			dragDrop.addButton(new Button(ItemHandler.getItem().getItem("STAINED_GLASS_PANE:7", 1, false, "", "")), 2);
 			dragDrop.addButton(new Button(ItemHandler.getItem().getItem("CHEST", 1, false, "&a&lAutosave", "&7", "&7*Click me to save your whole", "&7inventory to the items.yml as-is,", "&7including current slot positions!", "&7" , "&c&l[&nALL&c&l ITEMS]"), event -> {
 				PlayerInventory playerInv = event.getWhoClicked().getInventory();
-				if (playerInv != null && !playerInv.isEmpty()) {
+				if (playerInv != null) {
 					for (int i = 0; i <= 35; i++) {
 						if (playerInv.getItem(i) != null && playerInv.getItem(i).getType() != Material.AIR) {
 							this.convertStack(player, playerInv.getItem(i), Integer.toString(i));
@@ -7708,7 +7708,7 @@ public class UI {
 		}
 		String patternList = "";
 		String patternString = "";
-		if (Utils.getUtils().nullCheck(itemMap.getBannerPatterns().toString()) != "NONE") {
+		if (ServerHandler.getServer().hasSpecificUpdate("1_8") && Utils.getUtils().nullCheck(itemMap.getBannerPatterns().toString()) != "NONE") {
 			for (Pattern patterns: itemMap.getBannerPatterns()) {
 				patternString += patterns.getColor() + ":" + patterns.getPattern().name().toUpperCase() + ", ";
 			}
@@ -7774,11 +7774,13 @@ public class UI {
 				itemMeta = ItemHandler.getItem().setSkullOwner(itemMeta, Utils.getUtils().translateLayout(itemMap.getSkull(), player));
 			} else if (itemMap.getSkullTexture() != null && !itemMap.isHeadDatabase()) {
 				try {
-					GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
-					gameProfile.getProperties().put("textures", new Property("textures", new String(itemMap.getSkullTexture())));
-					Field declaredField = itemMeta.getClass().getDeclaredField("profile");
-					declaredField.setAccessible(true);
-					declaredField.set(itemMeta, gameProfile);
+					if (ServerHandler.getServer().hasSpecificUpdate("1_8")) {
+						GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
+						gameProfile.getProperties().put("textures", new Property("textures", new String(itemMap.getSkullTexture())));
+						Field declaredField = itemMeta.getClass().getDeclaredField("profile");
+						declaredField.setAccessible(true);
+						declaredField.set(itemMeta, gameProfile);
+					}
 				} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
 			} else if (itemMap.isHeadDatabase() && itemMap.getSkullTexture() != null) {
 				HeadDatabaseAPI api = new HeadDatabaseAPI();

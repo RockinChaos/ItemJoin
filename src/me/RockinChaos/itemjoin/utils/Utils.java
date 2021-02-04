@@ -557,12 +557,16 @@ public class Utils {
 		} else if (player != null) { playerName = player.getName(); }
 		
 		if (playerName != null && player != null && !(player instanceof ConsoleCommandSender)) {
+			
 			try { str = str.replace("%player%", playerName); } catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
 			try { str = str.replace("%mob_kills%", String.valueOf(player.getStatistic(Statistic.MOB_KILLS))); } catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
 			try { str = str.replace("%player_kills%", String.valueOf(player.getStatistic(Statistic.PLAYER_KILLS))); } catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
 			try { str = str.replace("%player_deaths%", String.valueOf(player.getStatistic(Statistic.DEATHS))); } catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
 			try { str = str.replace("%player_food%", String.valueOf(player.getFoodLevel())); } catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
-			try { str = str.replace("%player_health%", String.valueOf(player.getHealth())); } catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
+			try { 
+				final double health = (ServerHandler.getServer().hasSpecificUpdate("1_8") ? player.getHealth() : (double)player.getClass().getMethod("getHealth", double.class).invoke(player));
+				str = str.replace("%player_health%", String.valueOf(health)); 
+			} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
 			try { str = str.replace("%player_location%", player.getLocation().getBlockX() + ", " + player.getLocation().getBlockY() + ", " + player.getLocation().getBlockZ()); } catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
 			try { if (Bukkit.isPrimaryThread()) { str = str.replace("%player_interact%", PlayerHandler.getPlayer().getNearbyPlayer(player, 3)); } } catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); } }
 		if (player == null) { try { str = str.replace("%player%", "CONSOLE"); } catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); } }
