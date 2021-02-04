@@ -50,25 +50,7 @@ public class Database extends Controller {
 	*/
 	public Database(String baseName) {
 		this.dataFolder = baseName;
-		if (ConfigHandler.getConfig(false).sqlEnabled()) {
-			FileConfiguration config = ConfigHandler.getConfig(false).getFile("config.yml");
-	        String database = (config.getString("Database.table") != null ? config.getString("Database.table") : config.getString("Database.database"));
-	        HikariConfig hikariConfig = new HikariConfig();
-	        hikariConfig.setJdbcUrl("jdbc:mysql://" + config.getString("Database.host") + ":" + config.getString("Database.port") + "/" + database + "?useSSL=false" + "&createDatabaseIfNotExist=true" + "&allowPublicKeyRetrieval=true");
-	        hikariConfig.setUsername(config.getString("Database.user"));
-	        hikariConfig.setPassword(config.getString("Database.pass"));
-	        hikariConfig.addDataSourceProperty("cachePrepStmts", "true");
-	        hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250");
-	        hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
-	        hikariConfig.addDataSourceProperty("userServerPrepStmts", "true");
-	        hikariConfig.setLeakDetectionThreshold(TimeUnit.MINUTES.toMillis(1));
-	        hikariConfig.setConnectionTimeout(TimeUnit.MINUTES.toMillis(1));
-	        hikariConfig.setValidationTimeout(TimeUnit.MINUTES.toMillis(1));
-	        hikariConfig.setIdleTimeout(TimeUnit.MINUTES.toMillis(1));
-	        hikariConfig.setMaxLifetime(TimeUnit.MINUTES.toMillis(5));
-	        hikariConfig.setMaximumPoolSize(10);
-	        this.hikari = new HikariDataSource(hikariConfig);
-		}
+		this.loadSource();
 	}
 	
    /**
