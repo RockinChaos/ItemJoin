@@ -4109,7 +4109,11 @@ public class ItemMap {
 		if (this.CustomSlot != null && !this.CustomSlot.contains("%")) { ItemUtilities.getUtilities().setCustomSlots(player, this, amount[0]); } 
 		else { ItemUtilities.getUtilities().setInvSlots(player, this, amount[0]); }
 		this.setAnimations(player);
-		this.executeCommands(player, this.tempItem, "ON_RECEIVE", "RECEIVED", this.getSlot());
+		if (this.getMultipleSlots() != null && !this.getMultipleSlots().isEmpty()) {
+			if (this.getSlot().equalsIgnoreCase(this.getMultipleSlots().get(0))) {
+				this.executeCommands(player, this.tempItem, "ON_RECEIVE", "RECEIVED", this.getSlot());
+			}
+		} else { this.executeCommands(player, this.tempItem, "ON_RECEIVE", "RECEIVED", this.getSlot()); }
 	}
 	
    /**
