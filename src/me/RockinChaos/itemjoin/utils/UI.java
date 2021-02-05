@@ -127,88 +127,88 @@ public class UI {
 		SchedulerUtils.getScheduler().runAsync(() -> {
 			itemPane.addButton(new Button(this.fillerPaneBItem), 3);
 			itemPane.addButton(new Button(ItemHandler.getItem().getItem("CLOCK", 1, false, "&bTrigger Delay", "&7", "&7*This is the delay in half-seconds", "&7that ItemJoin will wait", "&7to give you the items.", "&7",
-					"&cNOTE: &7It is recommended to", "&7set this to 2 or 3 half-seconds.", "&9&lDELAY: &a" + String.valueOf(ConfigHandler.getConfig(false).getFile("items.yml").getString("items-Delay")).toUpperCase() + " half-second(s)"), 
+					"&cNOTE: &7It is recommended to", "&7set this to 2 or 3 half-seconds.", "&9&lDELAY: &a" + String.valueOf(ConfigHandler.getConfig().getFile("items.yml").getString("items-Delay")).toUpperCase() + " half-second(s)"), 
 					event -> this.numberPane(player, 1)));
-			itemPane.addButton(new Button(ItemHandler.getItem().getItem("COOKIE", 1, ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Permissions.Obtain-Items"), 
+			itemPane.addButton(new Button(ItemHandler.getItem().getItem("COOKIE", 1, ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Obtain-Items"), 
 					"&bItem Permissions", "&7", "&7*If custom items should require", "&7the player to have specific", "&7permissions to receive the item.", 
-					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Permissions.Obtain-Items")).toUpperCase()), 
+					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Obtain-Items")).toUpperCase()), 
 					event -> {
 						File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
-						dataFile.set("Permissions.Obtain-Items", !ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Permissions.Obtain-Items")); 	
-						ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "config.yml");
-						ConfigHandler.getConfig(false).softReload();
+						dataFile.set("Permissions.Obtain-Items", !ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Obtain-Items")); 	
+						ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+						ConfigHandler.getConfig().softReload();
 						SchedulerUtils.getScheduler().runLater(2L, () -> this.itemSettings(player));
 					}));
-			itemPane.addButton(new Button(ItemHandler.getItem().getItem("PISTON", 1, ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Permissions.Obtain-Items-OP"), 
+			itemPane.addButton(new Button(ItemHandler.getItem().getItem("PISTON", 1, ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Obtain-Items-OP"), 
 					"&bItem Permissions &c&l[OP PLAYERS]", "&7", "&7*If custom items should require", "&7the &c&lOP player(s)&7 to have specific", "&7permissions to receive the item.", "&c&lNOTE: &7This only applies to &c&lOP player(s)&7.", 
-					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Permissions.Obtain-Items-OP")).toUpperCase()), 
+					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Obtain-Items-OP")).toUpperCase()), 
 					event -> {
 						File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
-						dataFile.set("Permissions.Obtain-Items-OP", !ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Permissions.Obtain-Items-OP")); 	
-						ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "config.yml");
-						ConfigHandler.getConfig(false).softReload();
+						dataFile.set("Permissions.Obtain-Items-OP", !ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Obtain-Items-OP")); 	
+						ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+						ConfigHandler.getConfig().softReload();
 						SchedulerUtils.getScheduler().runLater(2L, () -> this.itemSettings(player));
 					}));
 
 			itemPane.addButton(new Button(this.fillerPaneBItem), 3);
-			itemPane.addButton(new Button(ItemHandler.getItem().getItem("FEATHER", 1, ConfigHandler.getConfig(false).getFile("items.yml").getBoolean("items-Overwrite"), 
+			itemPane.addButton(new Button(ItemHandler.getItem().getItem("FEATHER", 1, ConfigHandler.getConfig().getFile("items.yml").getBoolean("items-Overwrite"), 
 					"&bOverwrite", "&7", "&7*Setting this to true will allow", "&7all custom items to overwrite", "&7any custom or vanilla items.", "&7", "&cNOTE: &7If set to false, the", "&7overwrite itemflag will still", "&7function normally.",
-					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig(false).getFile("items.yml").getString("items-Overwrite")).toUpperCase()), event -> this.overwritePane(player)));
-			itemPane.addButton(new Button(ItemHandler.getItem().getItem("85", 1, ConfigHandler.getConfig(false).getFile("items.yml").getBoolean("items-Spamming"), 
+					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig().getFile("items.yml").getString("items-Overwrite")).toUpperCase()), event -> this.overwritePane(player)));
+			itemPane.addButton(new Button(ItemHandler.getItem().getItem("85", 1, ConfigHandler.getConfig().getFile("items.yml").getBoolean("items-Spamming"), 
 					"&bSpamming", "&7", "&7*Setting this to false will prevent", "&7players from macro spamming", "&7the use of item commands.", "&7", "&cNOTE: &7It is recommended to", "&7leave this set to false.", 
-					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig(false).getFile("items.yml").getBoolean("items-Spamming")).toUpperCase()), 
+					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig().getFile("items.yml").getBoolean("items-Spamming")).toUpperCase()), 
 					event -> {
 						File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "items.yml");
 						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
-						dataFile.set("items-Spamming", !ConfigHandler.getConfig(false).getFile("items.yml").getBoolean("items-Spamming")); 	
-						ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "items.yml");
-						ConfigHandler.getConfig(false).softReload();
+						dataFile.set("items-Spamming", !ConfigHandler.getConfig().getFile("items.yml").getBoolean("items-Spamming")); 	
+						ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "items.yml");
+						ConfigHandler.getConfig().softReload();
 						SchedulerUtils.getScheduler().runLater(2L, () -> this.itemSettings(player));
 					}));
-			itemPane.addButton(new Button(ItemHandler.getItem().getItem("DIAMOND", 1, ConfigHandler.getConfig(false).getFile("items.yml").getBoolean("items-RestrictCount"), 
+			itemPane.addButton(new Button(ItemHandler.getItem().getItem("DIAMOND", 1, ConfigHandler.getConfig().getFile("items.yml").getBoolean("items-RestrictCount"), 
 					"&bRestrict Count", "&7", "&7*Settings this to true will", "&7allow players to have their items", "&7refreshed (topped up) if they have", "&7used/consumed some of the given", "&7stack of custom items.", 
-					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig(false).getFile("items.yml").getBoolean("items-RestrictCount")).toUpperCase()), 
+					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig().getFile("items.yml").getBoolean("items-RestrictCount")).toUpperCase()), 
 					event -> {
 						File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "items.yml");
 						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
-						dataFile.set("items-RestrictCount", !ConfigHandler.getConfig(false).getFile("items.yml").getBoolean("items-RestrictCount")); 	
-						ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "items.yml");
-						ConfigHandler.getConfig(false).softReload();
+						dataFile.set("items-RestrictCount", !ConfigHandler.getConfig().getFile("items.yml").getBoolean("items-RestrictCount")); 	
+						ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "items.yml");
+						ConfigHandler.getConfig().softReload();
 						SchedulerUtils.getScheduler().runLater(2L, () -> this.itemSettings(player));
 					}));
-			itemPane.addButton(new Button(ItemHandler.getItem().getItem("17", 1, ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("General.Log-Commands"), 
+			itemPane.addButton(new Button(ItemHandler.getItem().getItem("17", 1, ConfigHandler.getConfig().getFile("config.yml").getBoolean("General.Log-Commands"), 
 					"&bLog Commands", "&7", "&7*If the plugin prevent CONSOLE", "&7from logging any executed", "&7comamnd from the custom items.", "&7This only works for item command(s).", 
-					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("General.Log-Commands")).toUpperCase()), 
+					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig().getFile("config.yml").getBoolean("General.Log-Commands")).toUpperCase()), 
 					event -> {
 						File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
-						dataFile.set("General.Log-Commands", !ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("General.Log-Commands")); 	
-						ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "config.yml");
-						ConfigHandler.getConfig(false).softReload();
+						dataFile.set("General.Log-Commands", !ConfigHandler.getConfig().getFile("config.yml").getBoolean("General.Log-Commands")); 	
+						ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+						ConfigHandler.getConfig().softReload();
 						SchedulerUtils.getScheduler().runLater(2L, () -> this.itemSettings(player));
 					}));
-			final int heldSlot = ConfigHandler.getConfig(false).getFile("config.yml").getInt("Settings.HeldItem-Slot");
+			final int heldSlot = ConfigHandler.getConfig().getFile("config.yml").getInt("Settings.HeldItem-Slot");
 			itemPane.addButton(new Button(ItemHandler.getItem().getItem("DIAMOND_SWORD", (heldSlot > 0 ? heldSlot : 1), false, 
 					"&bHeld Item Slot", "&7", "&7*This is the hotbar slot that", "&7the player will automatically", "&7have selected upon performing", "&7one of the held item triggers.", 
 					"&9&lSLOT: &a" + String.valueOf((heldSlot >= 0 ? heldSlot : "NONE"))), 
 					event -> this.numberPane(player, 2)));
-			final String heldTriggers = ConfigHandler.getConfig(false).getFile("config.yml").getString("Settings.HeldItem-Triggers");
+			final String heldTriggers = ConfigHandler.getConfig().getFile("config.yml").getString("Settings.HeldItem-Triggers");
 			itemPane.addButton(new Button(ItemHandler.getItem().getItem("REDSTONE", 1, false, 
 					"&bHeld Item Triggers", "&7", "&7*When these trigger(s)", "&7are performed, the held item", "&7slot will be set.", 
 					"&9&lENABLED: &a" + String.valueOf((!heldTriggers.isEmpty() && !Utils.getUtils().containsIgnoreCase(heldTriggers, "DISABLE")) ? heldTriggers : "FALSE").toUpperCase()), 
 					event -> this.triggerPane(player)));
-			itemPane.addButton(new Button(ItemHandler.getItem().getItem("BREWING_STAND", 1, ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Settings.DataTags"), 
+			itemPane.addButton(new Button(ItemHandler.getItem().getItem("BREWING_STAND", 1, ConfigHandler.getConfig().getFile("config.yml").getBoolean("Settings.DataTags"), 
 					"&bDataTags", "&7", "&7*If custom items should use", "&7data tags (NBTTags) to distinguish", "&7each custom item, making them unqiue.", 
 					"&c&lNOTE: &7This only works on Minecraft 1.8+", "&7It is recommended to keep", "&7this set to TRUE.", 
-					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Settings.DataTags")).toUpperCase()), 
+					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig().getFile("config.yml").getBoolean("Settings.DataTags")).toUpperCase()), 
 					event -> {
 						File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
-						dataFile.set("Settings.DataTags", !ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Settings.DataTags")); 	
-						ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "config.yml");
-						ConfigHandler.getConfig(false).reloadConfigs();
+						dataFile.set("Settings.DataTags", !ConfigHandler.getConfig().getFile("config.yml").getBoolean("Settings.DataTags")); 	
+						ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+						ConfigHandler.getConfig().reloadConfigs(true);
 						SchedulerUtils.getScheduler().runLater(2L, () -> this.itemSettings(player));
 					}));
 
@@ -236,81 +236,81 @@ public class UI {
 			configPane.addButton(new Button(this.fillerPaneBItem), 3);
 			configPane.addButton(new Button(ItemHandler.getItem().getItem("PAPER", 1, false, 
 					"&6Language", "&7", "&7*The selected lang.yml language.", "&7This is for messages sent", "&7from the plugin to the player.", 
-					"&9&lLANG: &a" + String.valueOf(ConfigHandler.getConfig(false).getFile("config.yml").getString("Language")).toUpperCase()), 
+					"&9&lLANG: &a" + String.valueOf(ConfigHandler.getConfig().getFile("config.yml").getString("Language")).toUpperCase()), 
 					event -> this.languagePane(player)));
 			configPane.addButton(new Button(this.fillerPaneBItem));
-			configPane.addButton(new Button(ItemHandler.getItem().getItem("COMMAND_BLOCK", 1, ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Database.MySQL"), 
+			configPane.addButton(new Button(ItemHandler.getItem().getItem("COMMAND_BLOCK", 1, ConfigHandler.getConfig().getFile("config.yml").getBoolean("Database.MySQL"), 
 					"&bMySQL Database", "&7", "&7*If the plugin should use", "&7a MySQL Database instead", "&7of the locale SQLite Database.",
-					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Database.MySQL")).toUpperCase()), 
+					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig().getFile("config.yml").getBoolean("Database.MySQL")).toUpperCase()), 
 					event -> this.databasePane(player)));
 			configPane.addButton(new Button(this.fillerPaneBItem), 4);
-			configPane.addButton(new Button(ItemHandler.getItem().getItem("BUCKET", 1, ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("General.CheckforUpdates"), 
+			configPane.addButton(new Button(ItemHandler.getItem().getItem("BUCKET", 1, ConfigHandler.getConfig().getFile("config.yml").getBoolean("General.CheckforUpdates"), 
 					"&bCheck for Updates", "&7", "&7*If the plugin should check", "&7for updates at start-up.", "&7This includes the use of the", "&7/itemjoin updates/upgrade command(s).", 
-					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("General.CheckforUpdates")).toUpperCase()), 
+					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig().getFile("config.yml").getBoolean("General.CheckforUpdates")).toUpperCase()), 
 					event -> {
 						File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
-						dataFile.set("General.CheckforUpdates", !ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("General.CheckforUpdates")); 	
-						ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "config.yml");
-						ConfigHandler.getConfig(false).softReload();
+						dataFile.set("General.CheckforUpdates", !ConfigHandler.getConfig().getFile("config.yml").getBoolean("General.CheckforUpdates")); 	
+						ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+						ConfigHandler.getConfig().softReload();
 						SchedulerUtils.getScheduler().runLater(2L, () -> this.configSettings(player));
 					}));
-			configPane.addButton(new Button(ItemHandler.getItem().getItem("COMPASS", 1, ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("General.Metrics-Logging"), 
+			configPane.addButton(new Button(ItemHandler.getItem().getItem("COMPASS", 1, ConfigHandler.getConfig().getFile("config.yml").getBoolean("General.Metrics-Logging"), 
 					"&bMetrics Logging", "&7", "&7*If the plugin is allowed", "&7to log plugin data such as", "&7the server(s) Java version.", "&7It is recommended to keep this", "&7set to true as it improves", "&7the quality of plugin updates.",
 					"&7", "&7You can view the logged data", "&7Here: https://bstats.org/plugin/bukkit/ItemJoin",
-					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("General.Metrics-Logging")).toUpperCase()), 
+					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig().getFile("config.yml").getBoolean("General.Metrics-Logging")).toUpperCase()), 
 					event -> {
 						File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
-						dataFile.set("General.Metrics-Logging", !ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("General.Metrics-Logging")); 	
-						ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "config.yml");
-						ConfigHandler.getConfig(false).softReload();
+						dataFile.set("General.Metrics-Logging", !ConfigHandler.getConfig().getFile("config.yml").getBoolean("General.Metrics-Logging")); 	
+						ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+						ConfigHandler.getConfig().softReload();
 						SchedulerUtils.getScheduler().runLater(2L, () -> this.configSettings(player));
 					}));
-			configPane.addButton(new Button(ItemHandler.getItem().getItem("STICK", 1, ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("General.Debugging"), 
+			configPane.addButton(new Button(ItemHandler.getItem().getItem("STICK", 1, ConfigHandler.getConfig().getFile("config.yml").getBoolean("General.Debugging"), 
 					"&bDebugging", "&7", "&7*Allows for more detailed", "&7CONSOLE messages from the plugin.", "&7Typically only used by the", "&7plugin developer to determine", "&7issues or bugs with the plugin.", 
-					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("General.Debugging")).toUpperCase()), 
+					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig().getFile("config.yml").getBoolean("General.Debugging")).toUpperCase()), 
 					event -> {
 						File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
-						dataFile.set("General.Debugging", !ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("General.Debugging")); 	
-						ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "config.yml");
-						ConfigHandler.getConfig(false).softReload();
+						dataFile.set("General.Debugging", !ConfigHandler.getConfig().getFile("config.yml").getBoolean("General.Debugging")); 	
+						ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+						ConfigHandler.getConfig().softReload();
 						SchedulerUtils.getScheduler().runLater(2L, () -> this.configSettings(player));
 					}));
 			configPane.addButton(new Button(this.fillerPaneBItem));
-			configPane.addButton(new Button(ItemHandler.getItem().getItem("322", 1, ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Permissions.Commands-OP"), 
+			configPane.addButton(new Button(ItemHandler.getItem().getItem("322", 1, ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Commands-OP"), 
 					"&bPlugin Commands &c&l[OP PLAYERS]", "&7", "&7*If the plugin should check", "&7if the OP player has the", "&7proper permissions set to", "&7use the plugin commands.", 
 					"&7OP Players will no longer get", "&7access to all plugin commands", "&7by default.",
-					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Permissions.Commands-OP")).toUpperCase()), 
+					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Commands-OP")).toUpperCase()), 
 					event -> {
 						File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
-						dataFile.set("Permissions.Commands-OP", !ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Permissions.Commands-OP")); 	
-						ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "config.yml");
-						ConfigHandler.getConfig(false).softReload();
+						dataFile.set("Permissions.Commands-OP", !ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Commands-OP")); 	
+						ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+						ConfigHandler.getConfig().softReload();
 						SchedulerUtils.getScheduler().runLater(2L, () -> this.configSettings(player));
 					}));
-			configPane.addButton(new Button(ItemHandler.getItem().getItem("BOOK", 1, ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Permissions.Commands-Get"), 
+			configPane.addButton(new Button(ItemHandler.getItem().getItem("BOOK", 1, ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Commands-Get"), 
 					"&bGet Commands", "&7", "&7*If the get and getAll", "&7commands should check for item", "&c&lpermissions &7before giving the item.",
-					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Permissions.Commands-Get")).toUpperCase()), 
+					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Commands-Get")).toUpperCase()), 
 					event -> {
 						File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
-						dataFile.set("Permissions.Commands-Get", !ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Permissions.Commands-Get")); 	
-						ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "config.yml");
-						ConfigHandler.getConfig(false).softReload();
+						dataFile.set("Permissions.Commands-Get", !ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Commands-Get")); 	
+						ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+						ConfigHandler.getConfig().softReload();
 						SchedulerUtils.getScheduler().runLater(2L, () -> this.configSettings(player));
 					}));
-			configPane.addButton(new Button(ItemHandler.getItem().getItem("BEDROCK", 1, ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Permissions.Movement-Bypass"), 
+			configPane.addButton(new Button(ItemHandler.getItem().getItem("BEDROCK", 1, ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Movement-Bypass"), 
 					"&bMovement Bypass", "&7", "&7*Enables the use of the", "&aitemjoin.bypass.inventorymodify", "&7permission-node, used to ignore", "&7the global itemMovement prevention", "&7or a custom items itemflag.", 
-					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Permissions.Movement-Bypass")).toUpperCase()), 
+					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Movement-Bypass")).toUpperCase()), 
 					event -> {
 						File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
-						dataFile.set("Permissions.Movement-Bypass", !ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Permissions.Movement-Bypass")); 	
-						ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "config.yml");
-						ConfigHandler.getConfig(false).softReload();
+						dataFile.set("Permissions.Movement-Bypass", !ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Movement-Bypass")); 	
+						ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+						ConfigHandler.getConfig().softReload();
 						SchedulerUtils.getScheduler().runLater(2L, () -> this.configSettings(player));
 					}));
 			configPane.addButton(new Button(this.fillerPaneBItem));
@@ -357,7 +357,7 @@ public class UI {
 					if (playerInv.getLeggings() != null && playerInv.getLeggings().getType() != Material.AIR) { this.convertStack(player, playerInv.getLeggings(),"LEGGINGS"); }
 					if (playerInv.getBoots() != null && playerInv.getBoots().getType() != Material.AIR) { this.convertStack(player, playerInv.getBoots(), "BOOTS"); }
 					if (ServerHandler.getServer().hasSpecificUpdate("1_9") && PlayerHandler.getPlayer().getOffHandItem(player) != null && PlayerHandler.getPlayer().getOffHandItem(player).getType() != Material.AIR) { this.convertStack(player, PlayerHandler.getPlayer().getOffHandItem(player), "OFFHAND"); }
-					ConfigHandler.getConfig(false).reloadConfigs();
+					ConfigHandler.getConfig().reloadConfigs(true);
 					this.startMenu(player);
 				}
 			}));
@@ -385,7 +385,7 @@ public class UI {
 					if (playerInv.getLeggings() != null && playerInv.getLeggings().getType() != Material.AIR) { this.convertStack(player, playerInv.getLeggings(),"LEGGINGS"); }
 					if (playerInv.getBoots() != null && playerInv.getBoots().getType() != Material.AIR) { this.convertStack(player, playerInv.getBoots(), "BOOTS"); }
 					if (ServerHandler.getServer().hasSpecificUpdate("1_9") && PlayerHandler.getPlayer().getOffHandItem(player) != null && PlayerHandler.getPlayer().getOffHandItem(player).getType() != Material.AIR) { this.convertStack(player, PlayerHandler.getPlayer().getOffHandItem(player), "OFFHAND"); }
-					ConfigHandler.getConfig(false).reloadConfigs();
+					ConfigHandler.getConfig().reloadConfigs(true);
 					this.startMenu(player);
 				}
 			}));
@@ -710,7 +710,7 @@ public class UI {
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[3] = itemMap.getConfigName();
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.itemRemoved", player, placeHolders);
-				ConfigHandler.getConfig(false).reloadConfigs();
+				ConfigHandler.getConfig().reloadConfigs(true);
 				SchedulerUtils.getScheduler().runLater(6L, () -> {
 					this.startModify(player, null, 0); 
 				});
@@ -1012,7 +1012,7 @@ public class UI {
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[3] = itemMap.getConfigName();
 					LanguageAPI.getLang(false).sendLangMessage("commands.menu.itemSaved", player, placeHolders);
-					ConfigHandler.getConfig(false).reloadConfigs();
+					ConfigHandler.getConfig().reloadConfigs(true);
 					player.closeInventory();
 				}));
 			} else {
@@ -1021,7 +1021,7 @@ public class UI {
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[3] = itemMap.getConfigName();
 					LanguageAPI.getLang(false).sendLangMessage("commands.menu.itemSaved", player, placeHolders);
-					ConfigHandler.getConfig(false).reloadConfigs();
+					ConfigHandler.getConfig().reloadConfigs(true);
 					player.closeInventory();
 				}));
 			}
@@ -1052,7 +1052,7 @@ public class UI {
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[3] = itemMap.getConfigName();
 					LanguageAPI.getLang(false).sendLangMessage("commands.menu.itemSaved", player, placeHolders);
-					ConfigHandler.getConfig(false).reloadConfigs();
+					ConfigHandler.getConfig().reloadConfigs(true);
 					this.itemSettings(player);
 				}));
 			} else {
@@ -1061,7 +1061,7 @@ public class UI {
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[3] = itemMap.getConfigName();
 					LanguageAPI.getLang(false).sendLangMessage("commands.menu.itemSaved", player, placeHolders);
-					ConfigHandler.getConfig(false).reloadConfigs();
+					ConfigHandler.getConfig().reloadConfigs(true);
 					this.itemSettings(player);
 				}));
 			}
@@ -1104,8 +1104,8 @@ public class UI {
 						File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "items.yml");
 						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 						dataFile.set("items-Delay", k); 	
-						ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "items.yml");
-						ConfigHandler.getConfig(false).softReload();
+						ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "items.yml");
+						ConfigHandler.getConfig().softReload();
 						SchedulerUtils.getScheduler().runLater(2L, () -> this.itemSettings(player));
 					}));
 				} else if (stage == 2) {
@@ -1114,8 +1114,8 @@ public class UI {
 						File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 						dataFile.set("Settings.HeldItem-Slot", k); 	
-						ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "config.yml");
-						ConfigHandler.getConfig(false).softReload();
+						ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+						ConfigHandler.getConfig().softReload();
 						SchedulerUtils.getScheduler().runLater(2L, () -> this.itemSettings(player));
 					}));
 				} else if (stage == 3) {
@@ -1124,8 +1124,8 @@ public class UI {
 						File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 						dataFile.set("Clear-Items.Delay-Tick", k); 	
-						ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "config.yml");
-						ConfigHandler.getConfig(false).softReload();
+						ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+						ConfigHandler.getConfig().softReload();
 						SchedulerUtils.getScheduler().runLater(2L, () -> this.clearPane(player));
 					}));
 				} 
@@ -1147,7 +1147,7 @@ public class UI {
 	private void languagePane(final Player player) {
 		Interface languagePane = new Interface(false, 2, this.GUIName, player);
 		SchedulerUtils.getScheduler().runAsync(() -> {
-			final String language = ConfigHandler.getConfig(false).getFile("config.yml").getString("Language").replace(" ", "");
+			final String language = ConfigHandler.getConfig().getFile("config.yml").getString("Language").replace(" ", "");
 			languagePane.addButton(new Button(this.fillerPaneBItem));
 			languagePane.addButton(new Button(ItemHandler.getItem().getItem("GRASS_BLOCK", 1, language.equalsIgnoreCase("ENGLISH"), "&6&l&nEnglish", "&7", 
 			"&7*Sets the messages sent by", "&7the plugin to the player", "&7to be written in &c&lEnglish&7.", "&7This is the type of lang.yml file", "&7generated in the plugin folder.", 
@@ -1156,8 +1156,8 @@ public class UI {
 					File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 					dataFile.set("Language", "ENGLISH"); 	
-					ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "config.yml");
-					ConfigHandler.getConfig(false).softReload();
+					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+					ConfigHandler.getConfig().softReload();
 					SchedulerUtils.getScheduler().runLater(2L, () -> this.languagePane(player));
 				}
 			}));
@@ -1168,8 +1168,8 @@ public class UI {
 					File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 					dataFile.set("Language", "SPANISH"); 	
-					ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "config.yml");
-					ConfigHandler.getConfig(false).softReload();
+					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+					ConfigHandler.getConfig().softReload();
 					SchedulerUtils.getScheduler().runLater(2L, () -> this.languagePane(player));
 				}
 			}));
@@ -1180,8 +1180,8 @@ public class UI {
 					File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 					dataFile.set("Language", "RUSSIAN"); 	
-					ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "config.yml");
-					ConfigHandler.getConfig(false).softReload();
+					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+					ConfigHandler.getConfig().softReload();
 					SchedulerUtils.getScheduler().runLater(2L, () -> this.languagePane(player));
 				}
 			}));
@@ -1193,8 +1193,8 @@ public class UI {
 					File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 					dataFile.set("Language", "FRENCH"); 	
-					ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "config.yml");
-					ConfigHandler.getConfig(false).softReload();
+					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+					ConfigHandler.getConfig().softReload();
 					SchedulerUtils.getScheduler().runLater(2L, () -> this.languagePane(player));
 				}
 			}));
@@ -1205,8 +1205,8 @@ public class UI {
 					File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 					dataFile.set("Language", "TRADITIONAL CHINESE"); 	
-					ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "config.yml");
-					ConfigHandler.getConfig(false).softReload();
+					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+					ConfigHandler.getConfig().softReload();
 					SchedulerUtils.getScheduler().runLater(2L, () -> this.languagePane(player));
 				}
 			}));
@@ -1217,8 +1217,8 @@ public class UI {
 					File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 					dataFile.set("Language", "SIMPLIFIED CHINESE"); 	
-					ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "config.yml");
-					ConfigHandler.getConfig(false).softReload();
+					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+					ConfigHandler.getConfig().softReload();
 					SchedulerUtils.getScheduler().runLater(2L, () -> this.languagePane(player));
 				}
 			}));
@@ -1239,21 +1239,21 @@ public class UI {
 		Interface databasePane = new Interface(false, 3, this.GUIName, player);
 		SchedulerUtils.getScheduler().runAsync(() -> {
 			databasePane.addButton(new Button(this.fillerPaneBItem), 4);
-			databasePane.addButton(new Button(ItemHandler.getItem().getItem("COMMAND_BLOCK", 1, ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Database.MySQL"), "&b&l&nMySQL", "&7", 
+			databasePane.addButton(new Button(ItemHandler.getItem().getItem("COMMAND_BLOCK", 1, ConfigHandler.getConfig().getFile("config.yml").getBoolean("Database.MySQL"), "&b&l&nMySQL", "&7", 
 			"&7*If the plugin should use a", "&7MySQL connection instead of the", "&7local SQLite database inside", "&7the plugin folder.", "&7", "&c&lNote: &7Keep this set to false", "&7if you do not know what", "&7you are doing.", 
 			"&7", "&c&l&nWARNING: &7Changing this value requires", "&7a server restart for the", "&7changes to take affect.",  
-			"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Database.MySQL")).toUpperCase()), 
+			"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig().getFile("config.yml").getBoolean("Database.MySQL")).toUpperCase()), 
 				event -> {
 					File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
-					dataFile.set("Database.MySQL", !ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Database.MySQL")); 	
-					ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "config.yml");
-					ConfigHandler.getConfig(false).softReload();
+					dataFile.set("Database.MySQL", !ConfigHandler.getConfig().getFile("config.yml").getBoolean("Database.MySQL")); 	
+					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+					ConfigHandler.getConfig().softReload();
 					SchedulerUtils.getScheduler().runLater(2L, () -> this.databasePane(player));
 				}));
 			databasePane.addButton(new Button(this.fillerPaneBItem), 4);
 			databasePane.addButton(new Button(ItemHandler.getItem().getItem("PAPER", 1, false, "&a&lHost", "&7", 
-			"&7*Set the &c&lHost &7for", "&7the MySQL databse connection.", "&9&lHOST: &a" + ConfigHandler.getConfig(false).getFile("config.yml").getString("Database.host")), 
+			"&7*Set the &c&lHost &7for", "&7the MySQL databse connection.", "&9&lHOST: &a" + ConfigHandler.getConfig().getFile("config.yml").getString("Database.host")), 
 				event -> {
 					player.closeInventory();
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
@@ -1268,13 +1268,13 @@ public class UI {
 					File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 					dataFile.set("Database.host", ChatColor.stripColor(event.getMessage())); 	
-					ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "config.yml");
-					ConfigHandler.getConfig(false).softReload();
+					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+					ConfigHandler.getConfig().softReload();
 					SchedulerUtils.getScheduler().runLater(2L, () -> this.databasePane(player));
 				}));
 			databasePane.addButton(new Button(this.fillerPaneBItem));
 			databasePane.addButton(new Button(ItemHandler.getItem().getItem("STONE_BUTTON", 1, false, "&a&lPort", "&7", 
-			"&7*Set the &c&lPort &7for", "&7the MySQL databse connection.", "&9&lPORT: &a" + ConfigHandler.getConfig(false).getFile("config.yml").getString("Database.port")), 
+			"&7*Set the &c&lPort &7for", "&7the MySQL databse connection.", "&9&lPORT: &a" + ConfigHandler.getConfig().getFile("config.yml").getString("Database.port")), 
 				event -> {
 					player.closeInventory();
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
@@ -1290,8 +1290,8 @@ public class UI {
 						File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 						dataFile.set("Database.port", Integer.parseInt(ChatColor.stripColor(event.getMessage()))); 	
-						ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "config.yml");
-						ConfigHandler.getConfig(false).softReload();
+						ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+						ConfigHandler.getConfig().softReload();
 					} else {
 						String[] placeHolders = LanguageAPI.getLang(false).newString();
 						placeHolders[16] = ChatColor.stripColor(event.getMessage());
@@ -1301,7 +1301,7 @@ public class UI {
 				}));
 			databasePane.addButton(new Button(this.fillerPaneBItem));
 			databasePane.addButton(new Button(ItemHandler.getItem().getItem("17", 1, false, "&a&lTable", "&7", 
-			"&7*Set the &c&lTable &7for", "&7the MySQL databse connection.", "&9&lTABLE: &a" + ConfigHandler.getConfig(false).getFile("config.yml").getString("Database.table")), 
+			"&7*Set the &c&lTable &7for", "&7the MySQL databse connection.", "&9&lTABLE: &a" + ConfigHandler.getConfig().getFile("config.yml").getString("Database.table")), 
 				event -> {
 					player.closeInventory();
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
@@ -1316,8 +1316,8 @@ public class UI {
 					File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 					dataFile.set("Database.table", ChatColor.stripColor(event.getMessage())); 	
-					ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "config.yml");
-					ConfigHandler.getConfig(false).softReload();
+					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+					ConfigHandler.getConfig().softReload();
 					SchedulerUtils.getScheduler().runLater(2L, () -> this.databasePane(player));
 				}));
 			databasePane.addButton(new Button(this.fillerPaneBItem));
@@ -1337,8 +1337,8 @@ public class UI {
 					File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 					dataFile.set("Database.user", ChatColor.stripColor(event.getMessage())); 	
-					ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "config.yml");
-					ConfigHandler.getConfig(false).softReload();
+					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+					ConfigHandler.getConfig().softReload();
 					SchedulerUtils.getScheduler().runLater(2L, () -> this.databasePane(player));
 				}));
 			databasePane.addButton(new Button(this.fillerPaneBItem));
@@ -1358,8 +1358,8 @@ public class UI {
 					File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 					dataFile.set("Database.pass", ChatColor.stripColor(event.getMessage())); 	
-					ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "config.yml");
-					ConfigHandler.getConfig(false).softReload();
+					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+					ConfigHandler.getConfig().softReload();
 					SchedulerUtils.getScheduler().runLater(2L, () -> this.databasePane(player));
 				}));
 			databasePane.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the config settings menu."), event -> this.configSettings(player)));
@@ -1378,7 +1378,7 @@ public class UI {
 		Interface triggerPane = new Interface(false, 2, this.GUIName, player);
 		SchedulerUtils.getScheduler().runAsync(() -> {
 			List<String> triggers = new ArrayList<String>();
-			for (String trigger: ConfigHandler.getConfig(false).getFile("config.yml").getString("Settings.HeldItem-Triggers").replace(" ", "").split(",")) {
+			for (String trigger: ConfigHandler.getConfig().getFile("config.yml").getString("Settings.HeldItem-Triggers").replace(" ", "").split(",")) {
 				if (trigger != null && !trigger.isEmpty()) {
 					triggers.add(trigger);
 				}
@@ -1402,8 +1402,8 @@ public class UI {
 				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 				dataFile.set("Settings.HeldItem-Triggers", triggers.toString().replace("[", "").replace("]", "")); 	
-				ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "config.yml");
-				ConfigHandler.getConfig(false).softReload();
+				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+				ConfigHandler.getConfig().softReload();
 				SchedulerUtils.getScheduler().runLater(2L, () -> this.triggerPane(player));
 			}));
 			triggerPane.addButton(new Button(ItemHandler.getItem().getItem("DIAMOND", 1, Utils.getUtils().containsValue(triggers, "RESPAWN"), "&e&l&nRespawn", "&7", "&7*Sets the held item slot", "&7upon player respawning.", "&9&lENABLED: &a" + 
@@ -1423,8 +1423,8 @@ public class UI {
 				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 				dataFile.set("Settings.HeldItem-Triggers", triggers.toString().replace("[", "").replace("]", "")); 	
-				ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "config.yml");
-				ConfigHandler.getConfig(false).softReload();
+				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+				ConfigHandler.getConfig().softReload();
 				SchedulerUtils.getScheduler().runLater(2L, () -> this.triggerPane(player));
 			}));
 			triggerPane.addButton(new Button(ItemHandler.getItem().getItem("STONE_BUTTON", 1, Utils.getUtils().containsValue(triggers, "WORLD-SWITCH"), "&e&l&nWorld Switch", "&7", "&7*Sets the held item slot", "&7upon player switching worlds.", 
@@ -1444,8 +1444,8 @@ public class UI {
 				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 				dataFile.set("Settings.HeldItem-Triggers", triggers.toString().replace("[", "").replace("]", "")); 	
-				ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "config.yml");
-				ConfigHandler.getConfig(false).softReload();
+				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+				ConfigHandler.getConfig().softReload();
 				SchedulerUtils.getScheduler().runLater(2L, () -> this.triggerPane(player));
 			}));
 			triggerPane.addButton(new Button(this.fillerPaneBItem));
@@ -1466,8 +1466,8 @@ public class UI {
 				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 				dataFile.set("Settings.HeldItem-Triggers", triggers.toString().replace("[", "").replace("]", "")); 	
-				ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "config.yml");
-				ConfigHandler.getConfig(false).softReload();
+				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+				ConfigHandler.getConfig().softReload();
 				SchedulerUtils.getScheduler().runLater(2L, () -> this.triggerPane(player));
 			}));
 			triggerPane.addButton(new Button(ItemHandler.getItem().getItem("MINECART", 1, Utils.getUtils().containsValue(triggers, "REGION-ENTER"), "&e&l&nRegion Enter", "&7", "&7*Sets the held item slot when", 
@@ -1487,8 +1487,8 @@ public class UI {
 				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 				dataFile.set("Settings.HeldItem-Triggers", triggers.toString().replace("[", "").replace("]", "")); 	
-				ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "config.yml");
-				ConfigHandler.getConfig(false).softReload();
+				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+				ConfigHandler.getConfig().softReload();
 				SchedulerUtils.getScheduler().runLater(2L, () -> this.triggerPane(player));
 			}));
 			triggerPane.addButton(new Button(ItemHandler.getItem().getItem("HOPPER_MINECART", 1, Utils.getUtils().containsValue(triggers, "REGION-LEAVE"), "&e&l&nRegion Leave", "&7", "&7*Sets the held item slot when", 
@@ -1508,8 +1508,8 @@ public class UI {
 				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 				dataFile.set("Settings.HeldItem-Triggers", triggers.toString().replace("[", "").replace("]", "")); 	
-				ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "config.yml");
-				ConfigHandler.getConfig(false).softReload();
+				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+				ConfigHandler.getConfig().softReload();
 				SchedulerUtils.getScheduler().runLater(2L, () -> this.triggerPane(player));
 			}));
 			triggerPane.addButton(new Button(this.fillerPaneBItem));
@@ -1529,7 +1529,7 @@ public class UI {
 		Interface preventPane = new Interface(false, 3, this.GUIName, player);
 		SchedulerUtils.getScheduler().runAsync(() -> {
 			List<String> bypassList = new ArrayList<String>();
-			for (String bypass: ConfigHandler.getConfig(false).getFile("config.yml").getString("Prevent.Bypass").replace(" ", "").split(",")) {
+			for (String bypass: ConfigHandler.getConfig().getFile("config.yml").getString("Prevent.Bypass").replace(" ", "").split(",")) {
 				if (bypass != null && !bypass.isEmpty()) {
 					bypassList.add(bypass);
 				}
@@ -1554,8 +1554,8 @@ public class UI {
 						File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 						dataFile.set("Prevent.Bypass", bypassList.toString().replace("[", "").replace("]", "")); 	
-						ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "config.yml");
-						ConfigHandler.getConfig(false).softReload();
+						ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+						ConfigHandler.getConfig().softReload();
 						SchedulerUtils.getScheduler().runLater(2L, () -> this.preventPane(player));
 					}));
 			preventPane.addButton(new Button(this.fillerPaneBItem));
@@ -1578,33 +1578,33 @@ public class UI {
 						File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 						dataFile.set("Prevent.Bypass", bypassList.toString().replace("[", "").replace("]", "")); 	
-						ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "config.yml");
-						ConfigHandler.getConfig(false).softReload();
+						ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+						ConfigHandler.getConfig().softReload();
 						SchedulerUtils.getScheduler().runLater(2L, () -> this.preventPane(player));
 					}));
 			preventPane.addButton(new Button(this.fillerPaneBItem), 4);
 			preventPane.addButton(new Button(ItemHandler.getItem().getItem("CHEST", 1, false, 
 					"&c&l&nPrevent Pickups", "&7", "&7*Prevent players from picking up", "&7ANY items, not just custom items.", 
-					"&9&lENABLED: &a" + ((!Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Prevent.Pickups"), "DISABLE") ? 
-					ConfigHandler.getConfig(false).getFile("config.yml").getString("Prevent.Pickups") : "FALSE")).toUpperCase()), 
+					"&9&lENABLED: &a" + ((!Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Prevent.Pickups"), "DISABLE") ? 
+					ConfigHandler.getConfig().getFile("config.yml").getString("Prevent.Pickups") : "FALSE")).toUpperCase()), 
 					event -> this.worldPane(player, "Prevent.Pickups")));
 			preventPane.addButton(new Button(this.fillerPaneBItem));
 			preventPane.addButton(new Button(ItemHandler.getItem().getItem("BEDROCK", 1, false, 
 					"&c&l&nPrevent Movement", "&7", "&7*Prevent players from moving", "&7ANY items around in their", "&7inventory, not just custom items.", 
-					"&9&lENABLED: &a" + ((!Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Prevent.itemMovement"), "DISABLE") ? 
-					ConfigHandler.getConfig(false).getFile("config.yml").getString("Prevent.itemMovement") : "FALSE")).toUpperCase()), 
+					"&9&lENABLED: &a" + ((!Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Prevent.itemMovement"), "DISABLE") ? 
+					ConfigHandler.getConfig().getFile("config.yml").getString("Prevent.itemMovement") : "FALSE")).toUpperCase()), 
 					event -> this.worldPane(player, "Prevent.itemMovement")));
 			preventPane.addButton(new Button(this.fillerPaneBItem));
 			preventPane.addButton(new Button(ItemHandler.getItem().getItem("HOPPER", 1, false, 
 					"&c&l&nPrevent Drops", "&7", "&7*Prevent players from dropping", "&7ANY items, not just custom items.", 
-					"&9&lENABLED: &a" + ((!Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Prevent.Self-Drops"), "DISABLE") ? 
-					ConfigHandler.getConfig(false).getFile("config.yml").getString("Prevent.Self-Drops") : "FALSE")).toUpperCase()), 
+					"&9&lENABLED: &a" + ((!Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Prevent.Self-Drops"), "DISABLE") ? 
+					ConfigHandler.getConfig().getFile("config.yml").getString("Prevent.Self-Drops") : "FALSE")).toUpperCase()), 
 					event -> this.worldPane(player, "Prevent.Self-Drops")));
 			preventPane.addButton(new Button(this.fillerPaneBItem));
 			preventPane.addButton(new Button(ItemHandler.getItem().getItem("BONE", 1, false, 
 					"&c&l&nPrevent Death Drops", "&7", "&7*Prevent players from dropping", "&7ANY items on death, not just custom items.", 
-					"&9&lENABLED: &a" + ((!Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Prevent.Death-Drops"), "DISABLE") ? 
-					ConfigHandler.getConfig(false).getFile("config.yml").getString("Prevent.Death-Drops") : "FALSE")).toUpperCase()), 
+					"&9&lENABLED: &a" + ((!Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Prevent.Death-Drops"), "DISABLE") ? 
+					ConfigHandler.getConfig().getFile("config.yml").getString("Prevent.Death-Drops") : "FALSE")).toUpperCase()), 
 					event -> this.worldPane(player, "Prevent.Death-Drops")));
 			preventPane.addButton(new Button(this.fillerPaneBItem));
 			preventPane.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item settings menu."), event -> this.itemSettings(player)));
@@ -1623,53 +1623,53 @@ public class UI {
 		Interface clearPane = new Interface(false, 3, this.GUIName, player);
 		SchedulerUtils.getScheduler().runAsync(() -> {
 			clearPane.addButton(new Button(this.fillerPaneBItem), 3);
-			clearPane.addButton(new Button(ItemHandler.getItem().getItem("GRASS_BLOCK", 1, ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("ALL"), 
+			clearPane.addButton(new Button(ItemHandler.getItem().getItem("GRASS_BLOCK", 1, ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("ALL"), 
 					"&bType: &a&lALL", "&7", "&7*ALL items including other plugin(s)", "&7and vanilla items should be cleared", "&7upon performing a trigger.", 
-					"&9&lENABLED: &a" + (ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("ALL") + "").toUpperCase()), 
+					"&9&lENABLED: &a" + (ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("ALL") + "").toUpperCase()), 
 					event -> {
-						if (!ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("ALL")) {
+						if (!ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("ALL")) {
 							File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 							FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 							dataFile.set("Clear-Items.Type", "ALL"); 	
-							ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "config.yml");
-							ConfigHandler.getConfig(false).softReload();
+							ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+							ConfigHandler.getConfig().softReload();
 							SchedulerUtils.getScheduler().runLater(2L, () -> this.clearPane(player));
 						}
 					}));
 			clearPane.addButton(new Button(ItemHandler.getItem().getItem("CLOCK", 1, false, 
 					"&b&lClear Delay", "&7", "&7*The number of second(s)", "&7to wait before clearing", "&7items from the player inventory.", 
-					"&9&lDelay: &a" + (ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Delay-Tick") + "").toUpperCase()), 
+					"&9&lDelay: &a" + (ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Delay-Tick") + "").toUpperCase()), 
 					event -> this.numberPane(player, 3)));
-			clearPane.addButton(new Button(ItemHandler.getItem().getItem("PISTON", 1, ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("ITEMJOIN"), 
+			clearPane.addButton(new Button(ItemHandler.getItem().getItem("PISTON", 1, ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("ITEMJOIN"), 
 					"&bType: &a&lITEMJOIN", "&7", "&7*Only ItemJoin (custom items)", "&7should be cleared upon", "&7performing a trigger.", 
-					"&9&lENABLED: &a" + (ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("ITEMJOIN") + "").toUpperCase()), 
+					"&9&lENABLED: &a" + (ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("ITEMJOIN") + "").toUpperCase()), 
 					event -> {
-						if (!ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("ITEMJOIN")) {
+						if (!ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("ITEMJOIN")) {
 							File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 							FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 							dataFile.set("Clear-Items.Type", "ITEMJOIN"); 	
-							ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "config.yml");
-							ConfigHandler.getConfig(false).softReload();
+							ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+							ConfigHandler.getConfig().softReload();
 							SchedulerUtils.getScheduler().runLater(2L, () -> this.clearPane(player));
 						}
 					}));
 			clearPane.addButton(new Button(this.fillerPaneBItem), 3);
 			clearPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "OAK_SIGN" : "SIGN"), 1, false, 
 					"&c&l&nJoin", "&7", "&7*Clears the items from the", "&7player upon joining the server.", 
-					"&9&lENABLED: &a" + ((!Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Join"), "DISABLE") ? 
-					ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Join") : "FALSE")).toUpperCase()), 
+					"&9&lENABLED: &a" + ((!Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Join"), "DISABLE") ? 
+					ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Join") : "FALSE")).toUpperCase()), 
 					event -> this.worldPane(player, "Clear-Items.Join")));
 			clearPane.addButton(new Button(this.fillerPaneBItem));
 			clearPane.addButton(new Button(ItemHandler.getItem().getItem("STONE_BUTTON", 1, false, 
 					"&c&l&nWorld-Switch", "&7", "&7*Clears the items from the", "&7player upon changing worlds.", 
-					"&9&lENABLED: &a" + ((!Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.World-Switch"), "DISABLE") ? 
-					ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.World-Switch") : "FALSE")).toUpperCase()), 
+					"&9&lENABLED: &a" + ((!Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.World-Switch"), "DISABLE") ? 
+					ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.World-Switch") : "FALSE")).toUpperCase()), 
 					event -> this.worldPane(player, "Clear-Items.World-Switch")));
 			clearPane.addButton(new Button(this.fillerPaneBItem));
 			clearPane.addButton(new Button(ItemHandler.getItem().getItem("MINECART", 1, false, 
 					"&c&l&nRegion-Enter", "&7", "&7*Clears the items from the", "&7player upon entering", "&7a WorldGuard region.", 
-					(DependAPI.getDepends(false).getGuard().guardEnabled() ? "&9&lENABLED: &a" + ((!Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Region-Enter"), "DISABLE") ? 
-					ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Region-Enter") : "FALSE")).toUpperCase() : ""), (DependAPI.getDepends(false).getGuard().guardEnabled() ? "" : "&7"), 
+					(DependAPI.getDepends(false).getGuard().guardEnabled() ? "&9&lENABLED: &a" + ((!Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Region-Enter"), "DISABLE") ? 
+					ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Region-Enter") : "FALSE")).toUpperCase() : ""), (DependAPI.getDepends(false).getGuard().guardEnabled() ? "" : "&7"), 
 					(DependAPI.getDepends(false).getGuard().guardEnabled() ? "" : "&c&lERROR: &7WorldGuard was NOT found."), (DependAPI.getDepends(false).getGuard().guardEnabled() ? "" : "&7This button will do nothing...")), 
 					event -> {
 						if (DependAPI.getDepends(false).getGuard().guardEnabled()) {
@@ -1679,13 +1679,13 @@ public class UI {
 			clearPane.addButton(new Button(this.fillerPaneBItem));
 			clearPane.addButton(new Button(ItemHandler.getItem().getItem("COMMAND_BLOCK", 1, false, 
 					"&b&lOptions", "&7", "&7*Actions to apply to", "&7the clear items triggers", "&7such as OP bypass.", 
-					"&9&lENABLED: &a" + ((!Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Options"), "DISABLE") ? 
-					ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Options") : "FALSE")).toUpperCase()), 
+					"&9&lENABLED: &a" + ((!Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Options"), "DISABLE") ? 
+					ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Options") : "FALSE")).toUpperCase()), 
 					event -> this.optionPane(player)));
 			clearPane.addButton(new Button(this.fillerPaneBItem));
 			clearPane.addButton(new Button(ItemHandler.getItem().getItem("CHEST", 1, false, 
 					"&b&lBlackList", "&7", "&7*Materials, Slots, or Item Names", "&7to be blacklisted from being", "&7cleared upon performing a trigger.", 
-					"&9&lENABLED: &a" + (!ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Blacklist").isEmpty() + "").toUpperCase()), 
+					"&9&lENABLED: &a" + (!ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Blacklist").isEmpty() + "").toUpperCase()), 
 					event -> this.blacklistPane(player)));
 			clearPane.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item settings menu."), event -> this.itemSettings(player)));
 			clearPane.addButton(new Button(this.fillerPaneBItem), 7);
@@ -1702,7 +1702,7 @@ public class UI {
 	private void blacklistPane(final Player player) {
 		Interface blacklistPane = new Interface(false, 2, this.GUIName, player);
 		SchedulerUtils.getScheduler().runAsync(() -> {
-			String[] blacklist = ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Blacklist").split(",");
+			String[] blacklist = ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Blacklist").split(",");
 			List<String> materials = new ArrayList<String>();
 			List<String> slots = new ArrayList<String>();
 			List<String> names = new ArrayList<String>();
@@ -1751,7 +1751,7 @@ public class UI {
 		Interface materialPane = new Interface(true, 6, this.GUIName, player);
 		SchedulerUtils.getScheduler().runAsync(() -> {
 			materialPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the blacklist menu."), event -> this.blacklistPane(player)));
-			String[] blacklist = ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Blacklist").split(",");
+			String[] blacklist = ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Blacklist").split(",");
 			List<String> materials = new ArrayList<String>();
 			List<String> saveList = new ArrayList<String>();
 			try {
@@ -1790,8 +1790,8 @@ public class UI {
 					File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 					dataFile.set("Clear-Items.Blacklist", Utils.getUtils().replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
-					ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "config.yml");
-					ConfigHandler.getConfig(false).softReload();
+					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+					ConfigHandler.getConfig().softReload();
 					SchedulerUtils.getScheduler().runLater(2L, () -> this.blacklistMatPane(player));
 				} else {
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
@@ -1816,8 +1816,8 @@ public class UI {
 						File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 						dataFile.set("Clear-Items.Blacklist", Utils.getUtils().replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
-						ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "config.yml");
-						ConfigHandler.getConfig(false).softReload();
+						ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+						ConfigHandler.getConfig().softReload();
 						SchedulerUtils.getScheduler().runLater(2L, () -> this.blacklistMatPane(player));
 					}));
 				}
@@ -1837,7 +1837,7 @@ public class UI {
 		Interface craftingPane = new Interface(false, 4, this.GUIName, player);
 		SchedulerUtils.getScheduler().runAsync(() -> {
 			slotPane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the blacklist menu."), event -> this.blacklistPane(player)));
-			String[] blacklist = ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Blacklist").split(",");
+			String[] blacklist = ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Blacklist").split(",");
 			List<String> slots = new ArrayList<String>();
 			List<String> saveList = new ArrayList<String>();
 			try {
@@ -1867,8 +1867,8 @@ public class UI {
 				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 				dataFile.set("Clear-Items.Blacklist", Utils.getUtils().replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
-				ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "config.yml");
-				ConfigHandler.getConfig(false).softReload();
+				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+				ConfigHandler.getConfig().softReload();
 				SchedulerUtils.getScheduler().runLater(2L, () -> this.blacklistSlotPane(player));
 			}));
 			craftingPane.addButton(new Button(this.fillerPaneGItem));
@@ -1885,8 +1885,8 @@ public class UI {
 				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 				dataFile.set("Clear-Items.Blacklist", Utils.getUtils().replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
-				ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "config.yml");
-				ConfigHandler.getConfig(false).softReload();
+				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+				ConfigHandler.getConfig().softReload();
 				SchedulerUtils.getScheduler().runLater(2L, () -> this.blacklistSlotPane(player));
 			}));
 			craftingPane.addButton(new Button(this.fillerPaneGItem), 10);
@@ -1903,8 +1903,8 @@ public class UI {
 				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 				dataFile.set("Clear-Items.Blacklist", Utils.getUtils().replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
-				ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "config.yml");
-				ConfigHandler.getConfig(false).softReload();
+				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+				ConfigHandler.getConfig().softReload();
 				SchedulerUtils.getScheduler().runLater(2L, () -> this.blacklistSlotPane(player));
 			}));
 			craftingPane.addButton(new Button(this.fillerPaneGItem), 4);
@@ -1921,8 +1921,8 @@ public class UI {
 				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 				dataFile.set("Clear-Items.Blacklist", Utils.getUtils().replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
-				ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "config.yml");
-				ConfigHandler.getConfig(false).softReload();
+				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+				ConfigHandler.getConfig().softReload();
 				SchedulerUtils.getScheduler().runLater(2L, () -> this.blacklistSlotPane(player));
 			}));
 			craftingPane.addButton(new Button(this.fillerPaneGItem));
@@ -1939,8 +1939,8 @@ public class UI {
 				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 				dataFile.set("Clear-Items.Blacklist", Utils.getUtils().replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
-				ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "config.yml");
-				ConfigHandler.getConfig(false).softReload();
+				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+				ConfigHandler.getConfig().softReload();
 				SchedulerUtils.getScheduler().runLater(2L, () -> this.blacklistSlotPane(player));
 			}));
 			craftingPane.addButton(new Button(this.fillerPaneGItem), 3);
@@ -1963,8 +1963,8 @@ public class UI {
 				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 				dataFile.set("Clear-Items.Blacklist", Utils.getUtils().replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
-				ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "config.yml");
-				ConfigHandler.getConfig(false).softReload();
+				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+				ConfigHandler.getConfig().softReload();
 				SchedulerUtils.getScheduler().runLater(2L, () -> this.blacklistSlotPane(player));
 			}));
 			slotPane.addButton(new Button(ItemHandler.getItem().getItem("LEATHER_CHESTPLATE", 1, Utils.getUtils().containsValue(slots, "CHESTPLATE"), "&9&lSlot: &a&lCHESTPLATE", "&7", "&7*Click to prevent this slot", "&7from having its items cleared.",
@@ -1980,8 +1980,8 @@ public class UI {
 				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 				dataFile.set("Clear-Items.Blacklist", Utils.getUtils().replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
-				ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "config.yml");
-				ConfigHandler.getConfig(false).softReload();
+				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+				ConfigHandler.getConfig().softReload();
 				SchedulerUtils.getScheduler().runLater(2L, () -> this.blacklistSlotPane(player));
 			}));
 			slotPane.addButton(new Button(ItemHandler.getItem().getItem("LEATHER_LEGGINGS", 1, Utils.getUtils().containsValue(slots, "LEGGINGS"), "&9&lSlot: &a&lLEGGINGS", "&7", "&7*Click to prevent this slot", "&7from having its items cleared.",
@@ -1997,8 +1997,8 @@ public class UI {
 				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 				dataFile.set("Clear-Items.Blacklist", Utils.getUtils().replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
-				ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "config.yml");
-				ConfigHandler.getConfig(false).softReload();
+				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+				ConfigHandler.getConfig().softReload();
 				SchedulerUtils.getScheduler().runLater(2L, () -> this.blacklistSlotPane(player));
 			}));
 			slotPane.addButton(new Button(ItemHandler.getItem().getItem("LEATHER_BOOTS", 1, Utils.getUtils().containsValue(slots, "BOOTS"), "&9&lSlot: &a&lBOOTS", "&7", "&7*Click to prevent this slot", "&7from having its items cleared.", 
@@ -2014,8 +2014,8 @@ public class UI {
 				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 				dataFile.set("Clear-Items.Blacklist", Utils.getUtils().replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
-				ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "config.yml");
-				ConfigHandler.getConfig(false).softReload();
+				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+				ConfigHandler.getConfig().softReload();
 				SchedulerUtils.getScheduler().runLater(2L, () -> this.blacklistSlotPane(player));
 			}));
 			if (ServerHandler.getServer().hasSpecificUpdate("1_9")) {
@@ -2032,8 +2032,8 @@ public class UI {
 					File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 					dataFile.set("Clear-Items.Blacklist", Utils.getUtils().replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
-					ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "config.yml");
-					ConfigHandler.getConfig(false).softReload();
+					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+					ConfigHandler.getConfig().softReload();
 					SchedulerUtils.getScheduler().runLater(2L, () -> this.blacklistSlotPane(player));
 				}));
 			} else {
@@ -2055,8 +2055,8 @@ public class UI {
 					File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 					dataFile.set("Clear-Items.Blacklist", Utils.getUtils().replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
-					ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "config.yml");
-					ConfigHandler.getConfig(false).softReload();
+					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+					ConfigHandler.getConfig().softReload();
 					SchedulerUtils.getScheduler().runLater(2L, () -> this.blacklistSlotPane(player));
 				}));
 			}
@@ -2079,8 +2079,8 @@ public class UI {
 					File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 					dataFile.set("Clear-Items.Blacklist", Utils.getUtils().replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
-					ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "config.yml");
-					ConfigHandler.getConfig(false).softReload();
+					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+					ConfigHandler.getConfig().softReload();
 					SchedulerUtils.getScheduler().runLater(2L, () -> this.blacklistSlotPane(player));
 				}));
 			}
@@ -2100,7 +2100,7 @@ public class UI {
 		Interface namePane = new Interface(true, 2, this.GUIName, player);
 		SchedulerUtils.getScheduler().runAsync(() -> {
 			namePane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the blacklist menu."), event -> this.blacklistPane(player)));
-			String[] blacklist = ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Blacklist").split(",");
+			String[] blacklist = ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Blacklist").split(",");
 			List<String> names = new ArrayList<String>();
 			List<String> saveList = new ArrayList<String>();
 			try {
@@ -2139,8 +2139,8 @@ public class UI {
 				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 				dataFile.set("Clear-Items.Blacklist", Utils.getUtils().replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
-				ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "config.yml");
-				ConfigHandler.getConfig(false).softReload();
+				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+				ConfigHandler.getConfig().softReload();
 				SchedulerUtils.getScheduler().runLater(2L, () -> this.blacklistNamePane(player));
 			}));
 			for (String itemName : names) {
@@ -2153,8 +2153,8 @@ public class UI {
 					File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 					dataFile.set("Clear-Items.Blacklist", Utils.getUtils().replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
-					ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "config.yml");
-					ConfigHandler.getConfig(false).softReload();
+					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+					ConfigHandler.getConfig().softReload();
 					SchedulerUtils.getScheduler().runLater(2L, () -> this.blacklistNamePane(player));
 				}));
 			}
@@ -2170,7 +2170,7 @@ public class UI {
 	private void optionPane(final Player player) {
 		Interface optionPane = new Interface(false, 2, this.GUIName, player);
 		List<String> optionList = new ArrayList<String>();
-		for (String option: ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Options").replace(" ", "").split(",")) {
+		for (String option: ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Options").replace(" ", "").split(",")) {
 			if (option != null && !option.isEmpty()) {
 				optionList.add(option);
 			}
@@ -2195,8 +2195,8 @@ public class UI {
 						File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 						dataFile.set("Clear-Items.Options", optionList.toString().replace("[", "").replace("]", "")); 	
-						ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "config.yml");
-						ConfigHandler.getConfig(false).softReload();
+						ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+						ConfigHandler.getConfig().softReload();
 						SchedulerUtils.getScheduler().runLater(2L, () -> this.optionPane(player));
 					}));
 			optionPane.addButton(new Button(this.fillerPaneBItem));
@@ -2219,8 +2219,8 @@ public class UI {
 						File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 						dataFile.set("Clear-Items.Options", optionList.toString().replace("[", "").replace("]", "")); 	
-						ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "config.yml");
-						ConfigHandler.getConfig(false).softReload();
+						ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+						ConfigHandler.getConfig().softReload();
 						SchedulerUtils.getScheduler().runLater(2L, () -> this.optionPane(player));
 					}));
 			optionPane.addButton(new Button(this.fillerPaneBItem));
@@ -2243,8 +2243,8 @@ public class UI {
 						File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 						dataFile.set("Clear-Items.Options", optionList.toString().replace("[", "").replace("]", "")); 	
-						ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "config.yml");
-						ConfigHandler.getConfig(false).softReload();
+						ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+						ConfigHandler.getConfig().softReload();
 						SchedulerUtils.getScheduler().runLater(2L, () -> this.optionPane(player));
 					}));
 			optionPane.addButton(new Button(this.fillerPaneBItem));
@@ -2269,8 +2269,8 @@ public class UI {
 							File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 							FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 							dataFile.set("Clear-Items.Options", optionList.toString().replace("[", "").replace("]", "")); 	
-							ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "config.yml");
-							ConfigHandler.getConfig(false).softReload();
+							ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+							ConfigHandler.getConfig().softReload();
 							SchedulerUtils.getScheduler().runLater(2L, () -> this.optionPane(player));
 						}
 					}));
@@ -2294,8 +2294,8 @@ public class UI {
 						File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 						dataFile.set("Clear-Items.Options", optionList.toString().replace("[", "").replace("]", "")); 	
-						ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "config.yml");
-						ConfigHandler.getConfig(false).softReload();
+						ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+						ConfigHandler.getConfig().softReload();
 						SchedulerUtils.getScheduler().runLater(2L, () -> this.optionPane(player));
 					}));
 			optionPane.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the clear settings."), event -> this.clearPane(player)));
@@ -2322,7 +2322,7 @@ public class UI {
 				}
 			}));
 			List < String > enabledWorlds = new ArrayList < String > ();
-			String[] enabledParts = ConfigHandler.getConfig(false).getFile("config.yml").getString(section).replace(" ,  ", ",").replace(" , ", ",").replace(",  ", ",").replace(", ", ",").split(",");
+			String[] enabledParts = ConfigHandler.getConfig().getFile("config.yml").getString(section).replace(" ,  ", ",").replace(" , ", ",").replace(",  ", ",").replace(", ", ",").split(",");
 			for (String enabledWorld : enabledParts) {
 				if (enabledWorld.equalsIgnoreCase("ALL") || enabledWorld.equalsIgnoreCase("GLOBAL")) {
 					enabledWorlds.add("ALL");
@@ -2334,7 +2334,7 @@ public class UI {
 					}
 				}
 			}
-		    if (enabledWorlds.isEmpty() && ConfigHandler.getConfig(false).getFile("config.yml").getBoolean(section)) { enabledWorlds.add("ALL"); }
+		    if (enabledWorlds.isEmpty() && ConfigHandler.getConfig().getFile("config.yml").getBoolean(section)) { enabledWorlds.add("ALL"); }
 			preventPane.addButton(new Button(ItemHandler.getItem().getItem("OBSIDIAN", 1, Utils.getUtils().containsValue(enabledWorlds, "ALL"), "&a&l&nGLOBAL", "&7", "&7*Click to enable &lALL WORLDS.", 
 					"&9&lENABLED: &a" + (Utils.getUtils().containsValue(enabledWorlds, "ALL") + "").toUpperCase()), event -> {
 					File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
@@ -2344,8 +2344,8 @@ public class UI {
 					} else {
 						dataFile.set(section, true); 
 					}
-					ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "config.yml");
-					ConfigHandler.getConfig(false).softReload();
+					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+					ConfigHandler.getConfig().softReload();
 					SchedulerUtils.getScheduler().runLater(2L, () -> this.worldPane(player, section));
 			}));
 			for (World world: Bukkit.getServer().getWorlds()) {
@@ -2378,8 +2378,8 @@ public class UI {
 					} else {
 						dataFile.set(section, worldList.substring(0, worldList.length() - 2)); 
 					}
-					ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "config.yml");
-					ConfigHandler.getConfig(false).softReload();
+					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+					ConfigHandler.getConfig().softReload();
 					SchedulerUtils.getScheduler().runLater(2L, () -> this.worldPane(player, section));
 				}));
 			}
@@ -2397,7 +2397,7 @@ public class UI {
 		SchedulerUtils.getScheduler().runAsync(() -> {
 			overwritePane.setReturnButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the configuration menu."), event -> this.itemSettings(player)));
 			List < String > enabledWorlds = new ArrayList < String > ();
-			String[] enabledParts = ConfigHandler.getConfig(false).getFile("items.yml").getString("items-Overwrite").replace(" ,  ", ",").replace(" , ", ",").replace(",  ", ",").replace(", ", ",").split(",");
+			String[] enabledParts = ConfigHandler.getConfig().getFile("items.yml").getString("items-Overwrite").replace(" ,  ", ",").replace(" , ", ",").replace(",  ", ",").replace(", ", ",").split(",");
 			for (String enabledWorld : enabledParts) {
 				if (enabledWorld.equalsIgnoreCase("ALL") || enabledWorld.equalsIgnoreCase("GLOBAL")) {
 					enabledWorlds.add("ALL");
@@ -2409,7 +2409,7 @@ public class UI {
 					}
 				}
 			}
-		    if (enabledWorlds.isEmpty() && ConfigHandler.getConfig(false).getFile("items.yml").getBoolean("items-Overwrite")) { enabledWorlds.add("ALL"); }
+		    if (enabledWorlds.isEmpty() && ConfigHandler.getConfig().getFile("items.yml").getBoolean("items-Overwrite")) { enabledWorlds.add("ALL"); }
 			overwritePane.addButton(new Button(ItemHandler.getItem().getItem("OBSIDIAN", 1, Utils.getUtils().containsValue(enabledWorlds, "ALL"), "&a&l&nGLOBAL", "&7", "&7*Click to enable item", "&7overwriting in &lALL WORLDS.", 
 					"&9&lENABLED: &a" + (Utils.getUtils().containsValue(enabledWorlds, "ALL") + "").toUpperCase()), event -> {
 					File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "items.yml");
@@ -2419,8 +2419,8 @@ public class UI {
 					} else {
 						dataFile.set("items-Overwrite", true); 
 					}
-					ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "items.yml");
-					ConfigHandler.getConfig(false).softReload();
+					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "items.yml");
+					ConfigHandler.getConfig().softReload();
 					SchedulerUtils.getScheduler().runLater(2L, () -> this.overwritePane(player));
 			}));
 			for (World world: Bukkit.getServer().getWorlds()) {
@@ -2453,8 +2453,8 @@ public class UI {
 					} else {
 						dataFile.set("items-Overwrite", worldList.substring(0, worldList.length() - 2)); 
 					}
-					ConfigHandler.getConfig(false).saveFile(dataFile, fileFolder, "items.yml");
-					ConfigHandler.getConfig(false).softReload();
+					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "items.yml");
+					ConfigHandler.getConfig().softReload();
 					SchedulerUtils.getScheduler().runLater(2L, () -> this.overwritePane(player));
 				}));
 			}
@@ -3312,7 +3312,7 @@ public class UI {
 		Interface clickPane = new Interface(false, 5, this.GUIName, player);
 		SchedulerUtils.getScheduler().runAsync(() -> {
 			clickPane.addButton(new Button(this.fillerPaneGItem), 2);
-			clickPane.addButton(new Button(ItemHandler.getItem().getItem("DIAMOND_SWORD", 1, false, "&e&lInteract", "&7", "&7*Commands that will execute only", "&7when left and right clicking.", "&7", "&9&lCommands: &a" + 
+			clickPane.addButton(new Button(ItemHandler.getItem().getItem("64", 1, false, "&e&lInteract", "&7", "&7*Commands that will execute only", "&7when left and right clicking.", "&7", "&9&lCommands: &a" + 
 			this.listCommands(itemMap, Action.INTERACT_ALL)), event -> {
 				this.commandListPane(player, itemMap, Action.INTERACT_ALL);
 			}));
@@ -3337,7 +3337,7 @@ public class UI {
 				this.commandListPane(player, itemMap, Action.UN_EQUIP);
 			}));
 			clickPane.addButton(new Button(this.fillerPaneGItem));
-			clickPane.addButton(new Button(ItemHandler.getItem().getItem("IRON_SWORD", 1, false, "&e&lOn-Hold", "&7", "&7*Commands that will execute only", "&7when holding the item.", "&7", "&9&lCommands: &a" + 
+			clickPane.addButton(new Button(ItemHandler.getItem().getItem("TORCH", 1, false, "&e&lOn-Hold", "&7", "&7*Commands that will execute only", "&7when holding the item.", "&7", "&9&lCommands: &a" + 
 			this.listCommands(itemMap, Action.ON_HOLD)), event -> {
 				this.commandListPane(player, itemMap, Action.ON_HOLD);
 			}));
@@ -3347,39 +3347,39 @@ public class UI {
 				this.commandListPane(player, itemMap, Action.ON_RECEIVE);
 			}));
 			clickPane.addButton(new Button(this.fillerPaneGItem));
-			clickPane.addButton(new Button(ItemHandler.getItem().getItem("381", 1, false, "&e&lOn-Death", "&7", "&7*Commands that will execute only", "&7when die with the", "&7item in your inventory.", "&7", "&9&lCommands: &a" + 
+			clickPane.addButton(new Button(ItemHandler.getItem().getItem("397", 1, false, "&e&lOn-Death", "&7", "&7*Commands that will execute only", "&7when die with the", "&7item in your inventory.", "&7", "&9&lCommands: &a" + 
 			this.listCommands(itemMap, Action.ON_DEATH)), event -> {
 				this.commandListPane(player, itemMap, Action.ON_DEATH);
 			}));
-			clickPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "GLASS" : "20"), 1, false, "&e&lInteract-Air", "&7", "&7*Commands that will execute only", "&7when left and right", "&7clicking the air.", "&7", "&9&lCommands: &a" + 
+			clickPane.addButton(new Button(ItemHandler.getItem().getItem("20", 1, false, "&e&lInteract-Air", "&7", "&7*Commands that will execute only", "&7when left and right", "&7clicking the air.", "&7", "&9&lCommands: &a" + 
 			this.listCommands(itemMap, Action.INTERACT_AIR)), event -> {
 				this.commandListPane(player, itemMap, Action.INTERACT_AIR);
 			}));
-			clickPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "GLASS" : "20"), 1, false, "&e&lInteract-Air-Left", "&7", "&7*Commands that will execute only", "&7when left clicking the air.", "&7", "&9&lCommands: &a" + 
+			clickPane.addButton(new Button(ItemHandler.getItem().getItem("95:3", 1, false, "&e&lInteract-Air-Left", "&7", "&7*Commands that will execute only", "&7when left clicking the air.", "&7", "&9&lCommands: &a" + 
 			this.listCommands(itemMap, Action.INTERACT_LEFT_AIR)), event -> {
 				this.commandListPane(player, itemMap, Action.INTERACT_LEFT_AIR);
 			}));
-			clickPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "GLASS" : "20"), 1, false, "&e&lInteract-Air-Right", "&7", "&7*Commands that will execute only", "&7when right clicking the air.", "&7", "&9&lCommands: &a" + 
+			clickPane.addButton(new Button(ItemHandler.getItem().getItem("95:6", 1, false, "&e&lInteract-Air-Right", "&7", "&7*Commands that will execute only", "&7when right clicking the air.", "&7", "&9&lCommands: &a" + 
 			this.listCommands(itemMap, Action.INTERACT_RIGHT_AIR)), event -> {
 				this.commandListPane(player, itemMap, Action.INTERACT_RIGHT_AIR);
 			}));
-			clickPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "OAK_DOOR" : (ServerHandler.getServer().hasSpecificUpdate("1_8") ? "324" : "64")), 1, false, "&e&lInteract-Block", "&7", "&7*Commands that will execute only", "&7when left and right", "&7clicking a block.", "&7", "&9&lCommands: &a" + 
+			clickPane.addButton(new Button(ItemHandler.getItem().getItem("2", 1, false, "&e&lInteract-Block", "&7", "&7*Commands that will execute only", "&7when left and right", "&7clicking a block.", "&7", "&9&lCommands: &a" + 
 			this.listCommands(itemMap, Action.INTERACT_BLOCK)), event -> {
 				this.commandListPane(player, itemMap, Action.INTERACT_BLOCK);
 			}));
-			clickPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "OAK_DOOR" : (ServerHandler.getServer().hasSpecificUpdate("1_8") ? "324" : "64")), 1, false, "&e&lInteract-Block-Left", "&7", "&7*Commands that will execute only", "&7when left clicking a block.", "&7", "&9&lCommands: &a" + 
+			clickPane.addButton(new Button(ItemHandler.getItem().getItem("1", 1, false, "&e&lInteract-Block-Left", "&7", "&7*Commands that will execute only", "&7when left clicking a block.", "&7", "&9&lCommands: &a" + 
 			this.listCommands(itemMap, Action.INTERACT_LEFT_BLOCK)), event -> {
 				this.commandListPane(player, itemMap, Action.INTERACT_LEFT_BLOCK);
 			}));
-			clickPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "OAK_DOOR" : (ServerHandler.getServer().hasSpecificUpdate("1_8") ? "324" : "64")), 1, false, "&e&lInteract-Block-Right", "&7", "&7*Commands that will execute only", "&7when right clicking a block.", "&7", "&9&lCommands: &a" + 
+			clickPane.addButton(new Button(ItemHandler.getItem().getItem("4", 1, false, "&e&lInteract-Block-Right", "&7", "&7*Commands that will execute only", "&7when right clicking a block.", "&7", "&9&lCommands: &a" + 
 			this.listCommands(itemMap, Action.INTERACT_RIGHT_BLOCK)), event -> {
 				this.commandListPane(player, itemMap, Action.INTERACT_RIGHT_BLOCK);
 			}));
-			clickPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "GOLDEN_SWORD" : "GOLD_SWORD"), 1, false, "&e&lInteract-Left", "&7", "&7*Commands that will execute only", "&7when left clicking.", "&7", "&9&lCommands: &a" + 
+			clickPane.addButton(new Button(ItemHandler.getItem().getItem("330", 1, false, "&e&lInteract-Left", "&7", "&7*Commands that will execute only", "&7when left clicking.", "&7", "&9&lCommands: &a" + 
 			this.listCommands(itemMap, Action.INTERACT_LEFT_ALL)), event -> {
 				this.commandListPane(player, itemMap, Action.INTERACT_LEFT_ALL);
 			}));
-			clickPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "GOLDEN_SWORD" : "GOLD_SWORD"), 1, false, "&e&lInteract-Right", "&7", "&7*Commands that will execute only", "&7when right clicking.", "&7", "&9&lCommands: &a" + 
+			clickPane.addButton(new Button(ItemHandler.getItem().getItem("64", 1, false, "&e&lInteract-Right", "&7", "&7*Commands that will execute only", "&7when right clicking.", "&7", "&9&lCommands: &a" + 
 			this.listCommands(itemMap, Action.INTERACT_RIGHT_ALL)), event -> {
 				this.commandListPane(player, itemMap, Action.INTERACT_RIGHT_ALL);
 			}));
@@ -3396,23 +3396,26 @@ public class UI {
 				this.commandListPane(player, itemMap, Action.INVENTORY_CREATIVE);
 			}));
 			clickPane.addButton(new Button(this.fillerPaneGItem));
-			clickPane.addButton(new Button(ItemHandler.getItem().getItem("COMPASS", 1, false, "&e&lInventory-Left", "&7", "&7*Commands that will execute only", "&7when cursor left clicking the item.", "&7", "&9&lCommands: &a" + 
+			clickPane.addButton(new Button(ItemHandler.getItem().getItem("ENDER_CHEST", 1, false, "&e&lInventory-Left", "&7", "&7*Commands that will execute only", "&7when cursor left clicking the item.", "&7", "&9&lCommands: &a" + 
 			this.listCommands(itemMap, Action.INVENTORY_LEFT)), event -> {
 				this.commandListPane(player, itemMap, Action.INVENTORY_LEFT);
 			}));
-			clickPane.addButton(new Button(this.fillerPaneGItem));
-			clickPane.addButton(new Button(ItemHandler.getItem().getItem("COMPASS", 1, false, "&e&lInventory-Right", "&7", "&7*Commands that will execute only", "&7when cursor right clicking the item.", "&7", "&9&lCommands: &a" + 
+			clickPane.addButton(new Button(ItemHandler.getItem().getItem("CHEST", 1, false, "&e&lInventory-Right", "&7", "&7*Commands that will execute only", "&7when cursor right clicking the item.", "&7", "&9&lCommands: &a" + 
 			this.listCommands(itemMap, Action.INVENTORY_RIGHT)), event -> {
 				this.commandListPane(player, itemMap, Action.INVENTORY_RIGHT);
 			}));
-			clickPane.addButton(new Button(this.fillerPaneGItem));
-			clickPane.addButton(new Button(ItemHandler.getItem().getItem("COBBLESTONE_SLAB", 2, false, "&e&lInventory-Shift-Left", "&7", "&7*Commands that will execute only", "&7when cursor shift left clicking the item.", "&7", "&9&lCommands: &a" + 
+			clickPane.addButton(new Button(ItemHandler.getItem().getItem("44", 2, false, "&e&lInventory-Shift-Left", "&7", "&7*Commands that will execute only", "&7when cursor shift left clicking the item.", "&7", "&9&lCommands: &a" + 
 			this.listCommands(itemMap, Action.INVENTORY_SHIFT_LEFT)), event -> {
 				this.commandListPane(player, itemMap, Action.INVENTORY_SHIFT_LEFT);
 			}));
-			clickPane.addButton(new Button(ItemHandler.getItem().getItem("COBBLESTONE_SLAB", 2, false, "&e&lInventory-Shift-Right", "&7", "&7*Commands that will execute only", "&7when cursor shift right clicking the item.", "&7", "&9&lCommands: &a" + 
+			clickPane.addButton(new Button(ItemHandler.getItem().getItem("44:3", 2, false, "&e&lInventory-Shift-Right", "&7", "&7*Commands that will execute only", "&7when cursor shift right clicking the item.", "&7", "&9&lCommands: &a" + 
 			this.listCommands(itemMap, Action.INVENTORY_SHIFT_RIGHT)), event -> {
 				this.commandListPane(player, itemMap, Action.INVENTORY_SHIFT_RIGHT);
+			}));
+			clickPane.addButton(new Button(this.fillerPaneGItem));
+			clickPane.addButton(new Button(ItemHandler.getItem().getItem("DIAMOND_SWORD", 1, false, "&e&lOn-Damage", "&7", "&7*Commands that will execute only", "&7when the player damages an", "&7entity or is damaged by an", "&7entity while holding the item.", "&7", "&9&lCommands: &a" + 
+			this.listCommands(itemMap, Action.ON_DAMAGE)), event -> {
+				this.commandListPane(player, itemMap, Action.ON_DAMAGE);
 			}));
 			clickPane.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item commands menu."), event -> this.commandPane(player, itemMap)));
 			clickPane.addButton(new Button(this.fillerPaneBItem), 7);
@@ -6255,7 +6258,7 @@ public class UI {
 		Interface commandPane = new Interface(false, 5, this.GUIName, player);
 		SchedulerUtils.getScheduler().runAsync(() -> {
 			commandPane.addButton(new Button(this.fillerPaneGItem), 2);
-			commandPane.addButton(new Button(ItemHandler.getItem().getItem("DIAMOND_SWORD", 1, false, "&e&lInteract", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+			commandPane.addButton(new Button(ItemHandler.getItem().getItem("64", 1, false, "&e&lInteract", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
 					"&7", "&9&lENABLED: &a" + (Utils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.INTERACT_ALL.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				this.commandCPane(player, itemMap, Action.INTERACT_ALL);
 			}));
@@ -6280,7 +6283,7 @@ public class UI {
 				this.commandCPane(player, itemMap, Action.UN_EQUIP);
 			}));
 			commandPane.addButton(new Button(this.fillerPaneGItem));
-			commandPane.addButton(new Button(ItemHandler.getItem().getItem("IRON_SWORD", 1, false, "&e&lOn-Hold", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+			commandPane.addButton(new Button(ItemHandler.getItem().getItem("TORCH", 1, false, "&e&lOn-Hold", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
 					"&7", "&9&lENABLED: &a" + (Utils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.ON_HOLD.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				this.commandCPane(player, itemMap, Action.ON_HOLD);
 			}));
@@ -6290,39 +6293,39 @@ public class UI {
 				this.commandCPane(player, itemMap, Action.ON_RECEIVE);
 			}));
 			commandPane.addButton(new Button(this.fillerPaneGItem));
-			commandPane.addButton(new Button(ItemHandler.getItem().getItem("381", 1, false, "&e&lOn-Death", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+			commandPane.addButton(new Button(ItemHandler.getItem().getItem("397", 1, false, "&e&lOn-Death", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
 					"&7", "&9&lENABLED: &a" + (Utils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.ON_DEATH.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				this.commandCPane(player, itemMap, Action.ON_DEATH);
 			}));
-			commandPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "GLASS" : "20"), 1, false, "&e&lInteract-Air", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+			commandPane.addButton(new Button(ItemHandler.getItem().getItem("20", 1, false, "&e&lInteract-Air", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
 					"&7", "&9&lENABLED: &a" + (Utils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.INTERACT_AIR.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				this.commandCPane(player, itemMap, Action.INTERACT_AIR);
 			}));
-			commandPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "GLASS" : "20"), 1, false, "&e&lInteract-Air-Left", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+			commandPane.addButton(new Button(ItemHandler.getItem().getItem("95:3", 1, false, "&e&lInteract-Air-Left", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
 					"&7", "&9&lENABLED: &a" + (Utils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.INTERACT_LEFT_AIR.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				this.commandCPane(player, itemMap, Action.INTERACT_LEFT_AIR);
 			}));
-			commandPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "GLASS" : "20"), 1, false, "&e&lInteract-Air-Right", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+			commandPane.addButton(new Button(ItemHandler.getItem().getItem("95:6", 1, false, "&e&lInteract-Air-Right", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
 					"&7", "&9&lENABLED: &a" + (Utils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.INTERACT_RIGHT_AIR.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				this.commandCPane(player, itemMap, Action.INTERACT_RIGHT_AIR);
 			}));
-			commandPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "OAK_DOOR" : (ServerHandler.getServer().hasSpecificUpdate("1_8") ? "324" : "64")), 1, false, "&e&lInteract-Block", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+			commandPane.addButton(new Button(ItemHandler.getItem().getItem("2", 1, false, "&e&lInteract-Block", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
 					"&7", "&9&lENABLED: &a" + (Utils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.INTERACT_BLOCK.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				this.commandCPane(player, itemMap, Action.INTERACT_BLOCK);
 			}));
-			commandPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "OAK_DOOR" : (ServerHandler.getServer().hasSpecificUpdate("1_8") ? "324" : "64")), 1, false, "&e&lInteract-Block-Left", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+			commandPane.addButton(new Button(ItemHandler.getItem().getItem("1", 1, false, "&e&lInteract-Block-Left", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
 					"&7", "&9&lENABLED: &a" + (Utils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.INTERACT_LEFT_BLOCK.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				this.commandCPane(player, itemMap, Action.INTERACT_LEFT_BLOCK);
 			}));
-			commandPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "OAK_DOOR" : (ServerHandler.getServer().hasSpecificUpdate("1_8") ? "324" : "64")), 1, false, "&e&lInteract-Block-Right", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+			commandPane.addButton(new Button(ItemHandler.getItem().getItem("4", 1, false, "&e&lInteract-Block-Right", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
 					"&7", "&9&lENABLED: &a" + (Utils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.INTERACT_RIGHT_BLOCK.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				this.commandCPane(player, itemMap, Action.INTERACT_RIGHT_BLOCK);
 			}));
-			commandPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "GOLDEN_SWORD" : "GOLD_SWORD"), 1, false, "&e&lInteract-Left", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+			commandPane.addButton(new Button(ItemHandler.getItem().getItem("330", 1, false, "&e&lInteract-Left", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
 					"&7", "&9&lENABLED: &a" + (Utils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.INTERACT_LEFT_ALL.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				this.commandCPane(player, itemMap, Action.INTERACT_LEFT_ALL);
 			}));
-			commandPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "GOLDEN_SWORD" : "GOLD_SWORD"), 1, false, "&e&lInteract-Right", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+			commandPane.addButton(new Button(ItemHandler.getItem().getItem("64", 1, false, "&e&lInteract-Right", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
 					"&7", "&9&lENABLED: &a" + (Utils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.INTERACT_RIGHT_ALL.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				this.commandCPane(player, itemMap, Action.INTERACT_RIGHT_ALL);
 			}));
@@ -6339,23 +6342,26 @@ public class UI {
 				this.commandCPane(player, itemMap, Action.INVENTORY_CREATIVE);
 			}));
 			commandPane.addButton(new Button(this.fillerPaneGItem));
-			commandPane.addButton(new Button(ItemHandler.getItem().getItem("COMPASS", 1, false, "&e&lInventory-Left", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+			commandPane.addButton(new Button(ItemHandler.getItem().getItem("ENDER_CHEST", 1, false, "&e&lInventory-Left", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
 					"&7", "&9&lENABLED: &a" + (Utils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.INVENTORY_LEFT.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				this.commandCPane(player, itemMap, Action.INVENTORY_LEFT);
 			}));
-			commandPane.addButton(new Button(this.fillerPaneGItem));
-			commandPane.addButton(new Button(ItemHandler.getItem().getItem("COMPASS", 1, false, "&e&lInventory-Right", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+			commandPane.addButton(new Button(ItemHandler.getItem().getItem("CHEST", 1, false, "&e&lInventory-Right", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
 					"&7", "&9&lENABLED: &a" + (Utils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.INVENTORY_RIGHT.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				this.commandCPane(player, itemMap, Action.INVENTORY_RIGHT);
 			}));
-			commandPane.addButton(new Button(this.fillerPaneGItem));
-			commandPane.addButton(new Button(ItemHandler.getItem().getItem("COBBLESTONE_SLAB", 2, false, "&e&lInventory-Shift-Left", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+			commandPane.addButton(new Button(ItemHandler.getItem().getItem("44", 2, false, "&e&lInventory-Shift-Left", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
 					"&7", "&9&lENABLED: &a" + (Utils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.INVENTORY_SHIFT_LEFT.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				this.commandCPane(player, itemMap, Action.INVENTORY_SHIFT_LEFT);
 			}));
-			commandPane.addButton(new Button(ItemHandler.getItem().getItem("COBBLESTONE_SLAB", 2, false, "&e&lInventory-Shift-Right", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+			commandPane.addButton(new Button(ItemHandler.getItem().getItem("44:3", 2, false, "&e&lInventory-Shift-Right", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
 					"&7", "&9&lENABLED: &a" + (Utils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.INVENTORY_SHIFT_RIGHT.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				this.commandCPane(player, itemMap, Action.INVENTORY_SHIFT_RIGHT);
+			}));
+			commandPane.addButton(new Button(this.fillerPaneGItem));
+			commandPane.addButton(new Button(ItemHandler.getItem().getItem("DIAMOND_SWORD", 1, false, "&e&lOn-Damage", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+					"&7", "&9&lENABLED: &a" + (Utils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.ON_DAMAGE.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
+				this.commandCPane(player, itemMap, Action.ON_DAMAGE);
 			}));
 			commandPane.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item conditions menu."), event -> this.conditionsPane(player, itemMap)));
 			commandPane.addButton(new Button(this.fillerPaneBItem), 7);
