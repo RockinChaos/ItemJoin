@@ -443,8 +443,7 @@ public class ItemMap {
 			this.vanillaControl = Utils.getUtils().containsIgnoreCase(this.itemflags, "vanilla-control");
 			this.disposable = Utils.getUtils().containsIgnoreCase(this.itemflags, "disposable");
 			this.blockPlacement = Utils.getUtils().containsIgnoreCase(this.itemflags, "placement");
-			this.blockMovement = Utils.getUtils().containsIgnoreCase(this.itemflags, "inventory-modify");
-			if (!this.blockMovement) { this.blockMovement = Utils.getUtils().containsIgnoreCase(this.itemflags, "inventory-close"); }
+			this.blockMovement = Utils.getUtils().containsIgnoreCase(this.itemflags, "inventory-modify") || Utils.getUtils().containsIgnoreCase(this.itemflags, "inventory-close");
 			this.closeInventory = Utils.getUtils().containsIgnoreCase(this.itemflags, "inventory-close");
 			this.itemChangable = Utils.getUtils().containsIgnoreCase(this.itemflags, "allow-modifications") || Utils.getUtils().containsIgnoreCase(this.itemflags, "item-changable");
 			this.alwaysGive = Utils.getUtils().containsIgnoreCase(this.itemflags, "always-give");
