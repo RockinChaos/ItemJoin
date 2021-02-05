@@ -598,12 +598,15 @@ abstract class Controller {
 	    String database = (config.getString("Database.table") != null ? config.getString("Database.table") : config.getString("Database.database"));
 		if (ConfigHandler.getConfig().sqlEnabled()) {
 			this.hikariConfig.setJdbcUrl("jdbc:mysql://" + config.getString("Database.host") + ":" + config.getString("Database.port") + "/" + database + "?useSSL=false" + "&createDatabaseIfNotExist=true" + "&allowPublicKeyRetrieval=true");
-		    this.hikariConfig.setIdleTimeout(TimeUnit.MINUTES.toMillis(1));
+		    this.hikariConfig.setDriverClassName("com.mysql.jdbc.Driver");
+			this.hikariConfig.setIdleTimeout(TimeUnit.MINUTES.toMillis(1));
+		    this.hikariConfig.setUsername(config.getString("Database.user"));
+		    this.hikariConfig.setPassword(config.getString("Database.pass"));
 		} else {
 			this.hikariConfig.setJdbcUrl("jdbc:sqlite:" + this.getDatabaseFile());
+			this.hikariConfig.setDriverClassName("org.sqlite.JDBC");
 		}
-	    this.hikariConfig.setUsername(config.getString("Database.user"));
-	    this.hikariConfig.setPassword(config.getString("Database.pass"));
+		this.hikariConfig.setConnectionTestQuery("SELECT 1");
 	    this.hikariConfig.addDataSourceProperty("cachePrepStmts", "true");
 	    this.hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250");
 	    this.hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");

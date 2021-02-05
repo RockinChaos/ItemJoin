@@ -126,7 +126,7 @@ public class UI {
 		Interface itemPane = new Interface(false, 3, this.GUIName, player);
 		SchedulerUtils.getScheduler().runAsync(() -> {
 			itemPane.addButton(new Button(this.fillerPaneBItem), 3);
-			itemPane.addButton(new Button(ItemHandler.getItem().getItem("CLOCK", 1, false, "&bTrigger Delay", "&7", "&7*This is the delay in half-seconds", "&7that ItemJoin will wait", "&7to give you the items.", "&7",
+			itemPane.addButton(new Button(ItemHandler.getItem().getItem("347", 1, false, "&bTrigger Delay", "&7", "&7*This is the delay in half-seconds", "&7that ItemJoin will wait", "&7to give you the items.", "&7",
 					"&cNOTE: &7It is recommended to", "&7set this to 2 or 3 half-seconds.", "&9&lDELAY: &a" + String.valueOf(ConfigHandler.getConfig().getFile("items.yml").getString("items-Delay")).toUpperCase() + " half-second(s)"), 
 					event -> this.numberPane(player, 1)));
 			itemPane.addButton(new Button(ItemHandler.getItem().getItem("COOKIE", 1, ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Obtain-Items"), 
@@ -140,7 +140,7 @@ public class UI {
 						ConfigHandler.getConfig().softReload();
 						SchedulerUtils.getScheduler().runLater(2L, () -> this.itemSettings(player));
 					}));
-			itemPane.addButton(new Button(ItemHandler.getItem().getItem("PISTON", 1, ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Obtain-Items-OP"), 
+			itemPane.addButton(new Button(ItemHandler.getItem().getItem("33", 1, ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Obtain-Items-OP"), 
 					"&bItem Permissions &c&l[OP PLAYERS]", "&7", "&7*If custom items should require", "&7the &c&lOP player(s)&7 to have specific", "&7permissions to receive the item.", "&c&lNOTE: &7This only applies to &c&lOP player(s)&7.", 
 					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Obtain-Items-OP")).toUpperCase()), 
 					event -> {
@@ -199,7 +199,7 @@ public class UI {
 					"&bHeld Item Triggers", "&7", "&7*When these trigger(s)", "&7are performed, the held item", "&7slot will be set.", 
 					"&9&lENABLED: &a" + String.valueOf((!heldTriggers.isEmpty() && !Utils.getUtils().containsIgnoreCase(heldTriggers, "DISABLE")) ? heldTriggers : "FALSE").toUpperCase()), 
 					event -> this.triggerPane(player)));
-			itemPane.addButton(new Button(ItemHandler.getItem().getItem("BREWING_STAND", 1, ConfigHandler.getConfig().getFile("config.yml").getBoolean("Settings.DataTags"), 
+			itemPane.addButton(new Button(ItemHandler.getItem().getItem("116", 1, ConfigHandler.getConfig().getFile("config.yml").getBoolean("Settings.DataTags"), 
 					"&bDataTags", "&7", "&7*If custom items should use", "&7data tags (NBTTags) to distinguish", "&7each custom item, making them unqiue.", 
 					"&c&lNOTE: &7This only works on Minecraft 1.8+", "&7It is recommended to keep", "&7this set to TRUE.", 
 					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig().getFile("config.yml").getBoolean("Settings.DataTags")).toUpperCase()), 
@@ -215,7 +215,7 @@ public class UI {
 			itemPane.addButton(new Button(ItemHandler.getItem().getItem("LAVA_BUCKET", 1, false, 
 					"&bClear Items", "&7", "&7*Modify settings for clearing", "&7specific items when a player", "&7performed a specified action."),
 					event -> this.clearPane(player)));
-			itemPane.addButton(new Button(ItemHandler.getItem().getItem("COMMAND_BLOCK", 1, false, 
+			itemPane.addButton(new Button(ItemHandler.getItem().getItem("137", 1, false, 
 					"&bPrevent Actions", "&7", "&7*Disable certain actions", "&7with items for players."),
 					event -> this.preventPane(player)));
 			itemPane.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the main menu."), event -> this.startMenu(player)));
@@ -239,7 +239,7 @@ public class UI {
 					"&9&lLANG: &a" + String.valueOf(ConfigHandler.getConfig().getFile("config.yml").getString("Language")).toUpperCase()), 
 					event -> this.languagePane(player)));
 			configPane.addButton(new Button(this.fillerPaneBItem));
-			configPane.addButton(new Button(ItemHandler.getItem().getItem("COMMAND_BLOCK", 1, ConfigHandler.getConfig().getFile("config.yml").getBoolean("Database.MySQL"), 
+			configPane.addButton(new Button(ItemHandler.getItem().getItem("137", 1, ConfigHandler.getConfig().getFile("config.yml").getBoolean("Database.MySQL"), 
 					"&bMySQL Database", "&7", "&7*If the plugin should use", "&7a MySQL Database instead", "&7of the locale SQLite Database.",
 					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig().getFile("config.yml").getBoolean("Database.MySQL")).toUpperCase()), 
 					event -> this.databasePane(player)));
@@ -346,7 +346,7 @@ public class UI {
 			dragDrop.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nMain Menu", "&7", "&7*Returns you to the main menu."), event -> this.startMenu(player)));
 			dragDrop.addButton(new Button(ItemHandler.getItem().getItem("CHEST", 1, false, "&a&lAutosave", "&7", "&7*Click me to save your whole", "&7inventory to the items.yml as-is,", "&7including current slot positions!", "&7" , "&c&l[&nALL&c&l ITEMS]"), event -> {
 				PlayerInventory playerInv = event.getWhoClicked().getInventory();
-				if (playerInv != null && !playerInv.isEmpty()) {
+				if (playerInv != null) {
 					for (int i = 0; i <= 35; i++) {
 						if (playerInv.getItem(i) != null && playerInv.getItem(i).getType() != Material.AIR) {
 							this.convertStack(player, playerInv.getItem(i), Integer.toString(i));
@@ -1042,7 +1042,7 @@ public class UI {
 		Interface returnPane = new Interface(false, 1, this.GUIName, player);
 		SchedulerUtils.getScheduler().runAsync(() -> {
 			returnPane.addButton(new Button(this.fillerPaneBItem));
-			returnPane.addButton(new Button(ItemHandler.getItem().getItem("WOOL:14", 1, false, "&c&l&nMain Menu", "&7", "&7*Cancel and return to the", "&7main menu, all modified", "&7settings will be lost.", "&7", "&c&lWARNING: &cThis item has &lNOT&c been saved!"), event -> this.itemSettings(player)));
+			returnPane.addButton(new Button(ItemHandler.getItem().getItem("WOOL:14", 1, false, "&c&l&nMain Menu", "&7", "&7*Cancel and return to the", "&7main menu, all modified", "&7settings will be lost.", "&7", "&c&lWARNING: &cThis item has &lNOT&c been saved!"), event -> this.startMenu(player)));
 			returnPane.addButton(new Button(this.fillerPaneBItem), 2);
 			
 			if (ServerHandler.getServer().hasSpecificUpdate("1_8")) {
@@ -1053,7 +1053,7 @@ public class UI {
 					placeHolders[3] = itemMap.getConfigName();
 					LanguageAPI.getLang(false).sendLangMessage("commands.menu.itemSaved", player, placeHolders);
 					ConfigHandler.getConfig().reloadConfigs(true);
-					this.itemSettings(player);
+					this.startMenu(player);
 				}));
 			} else {
 				returnPane.addButton(new Button(ItemHandler.getItem().getItem("WOOL:5", 1, false, "&a&l&nSave to Config", "&7", "&7*Saves the custom item", "&7settings to the items.yml file."), event -> {
@@ -1062,7 +1062,7 @@ public class UI {
 					placeHolders[3] = itemMap.getConfigName();
 					LanguageAPI.getLang(false).sendLangMessage("commands.menu.itemSaved", player, placeHolders);
 					ConfigHandler.getConfig().reloadConfigs(true);
-					this.itemSettings(player);
+					this.startMenu(player);
 				}));
 			}
 			
@@ -1239,7 +1239,7 @@ public class UI {
 		Interface databasePane = new Interface(false, 3, this.GUIName, player);
 		SchedulerUtils.getScheduler().runAsync(() -> {
 			databasePane.addButton(new Button(this.fillerPaneBItem), 4);
-			databasePane.addButton(new Button(ItemHandler.getItem().getItem("COMMAND_BLOCK", 1, ConfigHandler.getConfig().getFile("config.yml").getBoolean("Database.MySQL"), "&b&l&nMySQL", "&7", 
+			databasePane.addButton(new Button(ItemHandler.getItem().getItem("137", 1, ConfigHandler.getConfig().getFile("config.yml").getBoolean("Database.MySQL"), "&b&l&nMySQL", "&7", 
 			"&7*If the plugin should use a", "&7MySQL connection instead of the", "&7local SQLite database inside", "&7the plugin folder.", "&7", "&c&lNote: &7Keep this set to false", "&7if you do not know what", "&7you are doing.", 
 			"&7", "&c&l&nWARNING: &7Changing this value requires", "&7a server restart for the", "&7changes to take affect.",  
 			"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig().getFile("config.yml").getBoolean("Database.MySQL")).toUpperCase()), 
@@ -1491,7 +1491,7 @@ public class UI {
 				ConfigHandler.getConfig().softReload();
 				SchedulerUtils.getScheduler().runLater(2L, () -> this.triggerPane(player));
 			}));
-			triggerPane.addButton(new Button(ItemHandler.getItem().getItem("HOPPER_MINECART", 1, Utils.getUtils().containsValue(triggers, "REGION-LEAVE"), "&e&l&nRegion Leave", "&7", "&7*Sets the held item slot when", 
+			triggerPane.addButton(new Button(ItemHandler.getItem().getItem("408", 1, Utils.getUtils().containsValue(triggers, "REGION-LEAVE"), "&e&l&nRegion Leave", "&7", "&7*Sets the held item slot when", 
 			"&7the player leaves a WorldGuard region.", "&9&lENABLED: &a" + (Utils.getUtils().containsValue(triggers, "REGION-LEAVE") + "").toUpperCase()), event -> {
 				if (Utils.getUtils().containsValue(triggers, "REGION-LEAVE")) {
 					triggers.remove("REGION-LEAVE");
@@ -1623,7 +1623,7 @@ public class UI {
 		Interface clearPane = new Interface(false, 3, this.GUIName, player);
 		SchedulerUtils.getScheduler().runAsync(() -> {
 			clearPane.addButton(new Button(this.fillerPaneBItem), 3);
-			clearPane.addButton(new Button(ItemHandler.getItem().getItem("GRASS_BLOCK", 1, ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("ALL"), 
+			clearPane.addButton(new Button(ItemHandler.getItem().getItem("2", 1, ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("ALL"), 
 					"&bType: &a&lALL", "&7", "&7*ALL items including other plugin(s)", "&7and vanilla items should be cleared", "&7upon performing a trigger.", 
 					"&9&lENABLED: &a" + (ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("ALL") + "").toUpperCase()), 
 					event -> {
@@ -1636,11 +1636,11 @@ public class UI {
 							SchedulerUtils.getScheduler().runLater(2L, () -> this.clearPane(player));
 						}
 					}));
-			clearPane.addButton(new Button(ItemHandler.getItem().getItem("CLOCK", 1, false, 
+			clearPane.addButton(new Button(ItemHandler.getItem().getItem("347", 1, false, 
 					"&b&lClear Delay", "&7", "&7*The number of second(s)", "&7to wait before clearing", "&7items from the player inventory.", 
 					"&9&lDelay: &a" + (ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Delay-Tick") + "").toUpperCase()), 
 					event -> this.numberPane(player, 3)));
-			clearPane.addButton(new Button(ItemHandler.getItem().getItem("PISTON", 1, ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("ITEMJOIN"), 
+			clearPane.addButton(new Button(ItemHandler.getItem().getItem("33", 1, ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("ITEMJOIN"), 
 					"&bType: &a&lITEMJOIN", "&7", "&7*Only ItemJoin (custom items)", "&7should be cleared upon", "&7performing a trigger.", 
 					"&9&lENABLED: &a" + (ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("ITEMJOIN") + "").toUpperCase()), 
 					event -> {
@@ -1677,7 +1677,7 @@ public class UI {
 						}
 					}));
 			clearPane.addButton(new Button(this.fillerPaneBItem));
-			clearPane.addButton(new Button(ItemHandler.getItem().getItem("COMMAND_BLOCK", 1, false, 
+			clearPane.addButton(new Button(ItemHandler.getItem().getItem("137", 1, false, 
 					"&b&lOptions", "&7", "&7*Actions to apply to", "&7the clear items triggers", "&7such as OP bypass.", 
 					"&9&lENABLED: &a" + ((!Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Options"), "DISABLE") ? 
 					ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Options") : "FALSE")).toUpperCase()), 
@@ -2275,7 +2275,7 @@ public class UI {
 						}
 					}));
 			optionPane.addButton(new Button(this.fillerPaneBItem));
-			optionPane.addButton(new Button(ItemHandler.getItem().getItem("GRASS_BLOCK", 1, Utils.getUtils().containsValue(optionList, "RETURN_SWITCH"), 
+			optionPane.addButton(new Button(ItemHandler.getItem().getItem("2", 1, Utils.getUtils().containsValue(optionList, "RETURN_SWITCH"), 
 					"&e&lReturn Worlds", "&7", "&7*Returns the prior cleared", "&7player inventory from the", "&7prior world upon returning", "&7to that prior world.", 
 					"&9&lENABLED: &a" + (Utils.getUtils().containsValue(optionList, "RETURN_SWITCH") + "").toUpperCase()), 
 					event -> {
@@ -3739,7 +3739,7 @@ public class UI {
 				this.commandListPane(event.getPlayer(), itemMap, action);
 			}));
 			executorPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "REPEATER" : "356"), 1, false, "&e&lSwap-Item", "&7", "&7*Swaps the item to another defined item."), event -> this.swapPane(player, itemMap, action)));
-			executorPane.addButton(new Button(ItemHandler.getItem().getItem("CLOCK", 1, false, "&e&lDelay", "&7", "&7*Adds a delay between command lines."), event -> this.delayPane(player, itemMap, action)));
+			executorPane.addButton(new Button(ItemHandler.getItem().getItem("347", 1, false, "&e&lDelay", "&7", "&7*Adds a delay between command lines."), event -> this.delayPane(player, itemMap, action)));
 			executorPane.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the command lines menu."), event -> this.commandListPane(player, itemMap, action)));
 			executorPane.addButton(new Button(this.fillerPaneBItem), 7);
 			executorPane.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the command lines menu."), event -> this.commandListPane(player, itemMap, action)));
@@ -4300,7 +4300,7 @@ public class UI {
 				}
 				this.flagPane(player, itemMap);
 			}));
-			flagPane.addButton(new Button(ItemHandler.getItem().getItem("LAPIS_LAZULI", 1, itemMap.isGlowing(), "&a&l&nGlowing", "&7", 
+			flagPane.addButton(new Button(ItemHandler.getItem().getItem("351:4", 1, itemMap.isGlowing(), "&a&l&nGlowing", "&7", 
 					"&a&lTrue&f:&7 The item will glow as if it was enchanted!", "&7",
 					"&c&lFalse&f:&7 The item will not glow.", "&7", 
 					"&9&lENABLED: &a" + (itemMap.isGlowing() + "").toUpperCase()), event -> {
@@ -4311,7 +4311,7 @@ public class UI {
 				}
 				this.flagPane(player, itemMap);
 			}));
-			flagPane.addButton(new Button(ItemHandler.getItem().getItem("DIAMOND_SHOVEL", 7, itemMap.isStackable(), "&a&l&nStackable", "&7", 
+			flagPane.addButton(new Button(ItemHandler.getItem().getItem("277", 7, itemMap.isStackable(), "&a&l&nStackable", "&7", 
 					"&a&lTrue&f:&7 The item will be stackable with itself!", "&7",
 					"&c&lFalse&f:&7 The item stack only if it did in vanilla.", "&7", 
 					"&9&lENABLED: &a" + (itemMap.isStackable() + "").toUpperCase()), event -> {
@@ -4511,7 +4511,7 @@ public class UI {
 				}
 				this.flagPane(player, itemMap);
 			}));
-			flagPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "OAK_DOOR" : (ServerHandler.getServer().hasSpecificUpdate("1_8") ? "324" : "64")), 1, itemMap.isCountLock(), "&a&l&nCount Lock", "&7", 
+			flagPane.addButton(new Button(ItemHandler.getItem().getItem("324", 1, itemMap.isCountLock(), "&a&l&nCount Lock", "&7", 
 					"&a&lTrue&f:&7 The item can be used indefinitely.", "&7Useful to give a player infinite apples.", "&cNOTE: &7This will overwrite the disposable flag.", "&7",
 					"&c&lFalse&f:&7 The item will be removed from the inventory on use.", "&7", 
 					"&9&lENABLED: &a" + (itemMap.isCountLock() + "").toUpperCase()), event -> {
@@ -4803,7 +4803,7 @@ public class UI {
 				}
 				this.triggerPane(player, itemMap);
 			}));
-			triggerPane.addButton(new Button(ItemHandler.getItem().getItem("HOPPER_MINECART", 1, itemMap.isGiveOnRegionLeave(), "&e&l&nRegion Leave", "&7", "&7*Removes the item when the", "&7player leaves any of the enabled-regions.", "&9&lENABLED: &a" +
+			triggerPane.addButton(new Button(ItemHandler.getItem().getItem("408", 1, itemMap.isGiveOnRegionLeave(), "&e&l&nRegion Leave", "&7", "&7*Removes the item when the", "&7player leaves any of the enabled-regions.", "&9&lENABLED: &a" +
 			(itemMap.isGiveOnRegionLeave() + "").toUpperCase()), event -> {
 				if (itemMap.isGiveOnRegionLeave()) {
 					itemMap.setGiveOnRegionLeave(false);
@@ -4814,7 +4814,7 @@ public class UI {
 				}
 				this.triggerPane(player, itemMap);
 			}));
-			triggerPane.addButton(new Button(ItemHandler.getItem().getItem("TNT_MINECART", 1, itemMap.isGiveOnRegionAccess(), "&e&l&nRegion Access", "&7", "&7*Gives the item when the", "&7player enters any of the enabled-regions", "&7and removes the item when leaving", "&7any of the enabled-regions.", "&9&lENABLED: &a" +
+			triggerPane.addButton(new Button(ItemHandler.getItem().getItem("407", 1, itemMap.isGiveOnRegionAccess(), "&e&l&nRegion Access", "&7", "&7*Gives the item when the", "&7player enters any of the enabled-regions", "&7and removes the item when leaving", "&7any of the enabled-regions.", "&9&lENABLED: &a" +
 			(itemMap.isGiveOnRegionAccess() + "").toUpperCase()), event -> {
 				if (itemMap.isGiveOnRegionAccess()) {
 					itemMap.setGiveOnRegionAccess(false);
@@ -4825,7 +4825,7 @@ public class UI {
 				}
 				this.triggerPane(player, itemMap);
 			}));
-			triggerPane.addButton(new Button(ItemHandler.getItem().getItem("CHEST_MINECART", 1, itemMap.isGiveOnRegionEgress(), "&e&l&nRegion Engress", "&7", "&7*Removes the item when the", "&7player enters any of the enabled-regions", "&7and gives the item when leaving", "&7any of the enabled-regions.", "&9&lENABLED: &a" +
+			triggerPane.addButton(new Button(ItemHandler.getItem().getItem("342", 1, itemMap.isGiveOnRegionEgress(), "&e&l&nRegion Engress", "&7", "&7*Removes the item when the", "&7player enters any of the enabled-regions", "&7and gives the item when leaving", "&7any of the enabled-regions.", "&9&lENABLED: &a" +
 			(itemMap.isGiveOnRegionEgress() + "").toUpperCase()), event -> {
 				if (itemMap.isGiveOnRegionEgress()) {
 					itemMap.setGiveOnRegionEgress(false);
@@ -5245,7 +5245,7 @@ public class UI {
 			modifyMaterialPane.addButton(new Button(this.fillerPaneGItem), 3);
 			modifyMaterialPane.addButton(new Button(ItemHandler.getItem().getItem("NAME_TAG", 1, false, "&a&l&nMaterial", "&7", "&7*Change the animated material type.", "&9&lMaterial: &a" + ItemHandler.getItem().cutDelay(itemMap.getDynamicMaterials().get(position))),
 					event -> this.selectMaterialPane(player, itemMap, position, false)));
-			modifyMaterialPane.addButton(new Button(ItemHandler.getItem().getItem("CLOCK", 1, false, "&e&l&nDuration", "&7", "&7*Change the duration of the animation.", "&9&lAnimation Ticks: &a" + 
+			modifyMaterialPane.addButton(new Button(ItemHandler.getItem().getItem("347", 1, false, "&e&l&nDuration", "&7", "&7*Change the duration of the animation.", "&9&lAnimation Ticks: &a" + 
 			Utils.getUtils().returnInteger(ItemHandler.getItem().getDelayFormat(itemMap.getDynamicMaterials().get(position)))), event -> this.durationMaterialPane(player, itemMap, position, false, ItemHandler.getItem().cutDelay(itemMap.getDynamicMaterials().get(position)))));
 			modifyMaterialPane.addButton(new Button(ItemHandler.getItem().getItem("REDSTONE", 1, false, "&c&l&nDelete", "&7", "&7*Delete this animated material."), event -> {
 				List < String > mats = itemMap.getDynamicMaterials();mats.remove(position);
@@ -5395,7 +5395,7 @@ public class UI {
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				this.modifyNamePane(event.getPlayer(), itemMap, position);
 			}));
-			modifyNamePane.addButton(new Button(ItemHandler.getItem().getItem("CLOCK", 1, false, "&e&l&nDuration", "&7", "&7*Change the duration of the animation.", "&9&lAnimation Ticks: &a" + 
+			modifyNamePane.addButton(new Button(ItemHandler.getItem().getItem("347", 1, false, "&e&l&nDuration", "&7", "&7*Change the duration of the animation.", "&9&lAnimation Ticks: &a" + 
 			Utils.getUtils().returnInteger(ItemHandler.getItem().getDelayFormat(itemMap.getDynamicNames().get(position)))), event -> this.durationNamePane(player, itemMap, position, false, ItemHandler.getItem().cutDelay(itemMap.getDynamicNames().get(position)))));
 			modifyNamePane.addButton(new Button(ItemHandler.getItem().getItem("REDSTONE", 1, false, "&c&l&nDelete", "&7", "&7*Delete this animated name."), event -> {
 				List < String > names = itemMap.getDynamicNames();
@@ -5553,7 +5553,7 @@ public class UI {
 				placeHolders[16] = "ANIMATED LORE";LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				this.modifyLorePane(event.getPlayer(), itemMap, position);
 			}));
-			modifyLorePane.addButton(new Button(ItemHandler.getItem().getItem("CLOCK", 1, false, "&e&l&nDuration", "&7", "&7*Change the duration of the animation.", "&9&lAnimation Ticks: &a" + 
+			modifyLorePane.addButton(new Button(ItemHandler.getItem().getItem("347", 1, false, "&e&l&nDuration", "&7", "&7*Change the duration of the animation.", "&9&lAnimation Ticks: &a" + 
 			Utils.getUtils().returnInteger(ItemHandler.getItem().getDelayFormat(itemMap.getDynamicLores().get(position).get(0)))), event -> this.durationLorePane(player, itemMap, position, false, "")));
 			modifyLorePane.addButton(new Button(ItemHandler.getItem().getItem("REDSTONE", 1, false, "&c&l&nDelete", "&7", "&7*Delete this animated lore."), event -> {
 				List < List < String >> lores = itemMap.getDynamicLores();
@@ -5776,7 +5776,7 @@ public class UI {
 					this.modifySkullPane(event.getPlayer(), itemMap, position, owner);
 				}));
 			}
-			modifySkullPane.addButton(new Button(ItemHandler.getItem().getItem("CLOCK", 1, false, "&e&l&nDuration", "&7", "&7*Change the duration of the animation.", "&9&lAnimation Ticks: &a" + 
+			modifySkullPane.addButton(new Button(ItemHandler.getItem().getItem("347", 1, false, "&e&l&nDuration", "&7", "&7*Change the duration of the animation.", "&9&lAnimation Ticks: &a" + 
 			Utils.getUtils().returnInteger(ItemHandler.getItem().getDelayFormat((owner ? itemMap.getDynamicOwners().get(position) : itemMap.getDynamicTextures().get(position))))), 
 					event -> this.durationSkullPane(player, itemMap, position, false, ItemHandler.getItem().cutDelay((owner ? itemMap.getDynamicOwners().get(position) : itemMap.getDynamicTextures().get(position))), owner)));
 			modifySkullPane.addButton(new Button(ItemHandler.getItem().getItem("REDSTONE", 1, false, "&c&l&nDelete", "&7", "&7*Delete this animated skull " + (owner ? "owner." : "texture.")), event -> {
@@ -5978,7 +5978,7 @@ public class UI {
 			for (EntityType entity: itemMap.getMobsDrop().keySet()) { mobs += entity.name() + ", "; }
 			for (Material material: itemMap.getBlocksDrop().keySet()) { blocks += material.name() + ", "; }
 			dropsPane.addButton(new Button(this.fillerPaneBItem), 12);
-			dropsPane.addButton(new Button(ItemHandler.getItem().getItem("ZOMBIE_SPAWN_EGG", 1, false, "&b&lMobs Drop", "&7", "&7*Define mobs that are", "&7allowed to drop the item.", (!mobs.isEmpty() ? "&9&lMobs: &a" + mobs.substring(0, mobs.length() - 2) : "")), event -> {
+			dropsPane.addButton(new Button(ItemHandler.getItem().getItem("383:54", 1, false, "&b&lMobs Drop", "&7", "&7*Define mobs that are", "&7allowed to drop the item.", (!mobs.isEmpty() ? "&9&lMobs: &a" + mobs.substring(0, mobs.length() - 2) : "")), event -> {
 				this.mobsPane(player, itemMap);
 			}));
 			dropsPane.addButton(new Button(this.fillerPaneBItem));
@@ -6258,7 +6258,7 @@ public class UI {
 		Interface commandPane = new Interface(false, 5, this.GUIName, player);
 		SchedulerUtils.getScheduler().runAsync(() -> {
 			commandPane.addButton(new Button(this.fillerPaneGItem), 2);
-			commandPane.addButton(new Button(ItemHandler.getItem().getItem("64", 1, false, "&e&lInteract", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+			commandPane.addButton(new Button(ItemHandler.getItem().getItem("324", 1, false, "&e&lInteract", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
 					"&7", "&9&lENABLED: &a" + (Utils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.INTERACT_ALL.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				this.commandCPane(player, itemMap, Action.INTERACT_ALL);
 			}));
@@ -6325,7 +6325,7 @@ public class UI {
 					"&7", "&9&lENABLED: &a" + (Utils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.INTERACT_LEFT_ALL.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				this.commandCPane(player, itemMap, Action.INTERACT_LEFT_ALL);
 			}));
-			commandPane.addButton(new Button(ItemHandler.getItem().getItem("64", 1, false, "&e&lInteract-Right", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+			commandPane.addButton(new Button(ItemHandler.getItem().getItem("324", 1, false, "&e&lInteract-Right", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
 					"&7", "&9&lENABLED: &a" + (Utils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.INTERACT_RIGHT_ALL.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				this.commandCPane(player, itemMap, Action.INTERACT_RIGHT_ALL);
 			}));
