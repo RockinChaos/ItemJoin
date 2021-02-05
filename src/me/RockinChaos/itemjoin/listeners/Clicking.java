@@ -30,6 +30,7 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
+import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.handlers.events.PlayerPickItemEvent;
@@ -84,32 +85,53 @@ public class Clicking implements Listener {
 	private void onModify(InventoryClickEvent event) {
 		Player player = (Player) event.getWhoClicked();
 		List<ItemStack> items = new ArrayList<ItemStack>();
-		items.add(event.getCurrentItem()); items.add(event.getCursor());
-		if (Utils.getUtils().containsIgnoreCase(event.getAction().name(), "HOTBAR")) {
-			if (event.getView().getBottomInventory().getSize() >= event.getHotbarButton() && event.getHotbarButton() >= 0) { items.add(event.getView().getBottomInventory().getItem(event.getHotbarButton())); }
-			else if (ServerHandler.getServer().hasSpecificUpdate("1_9")) { items.add(PlayerHandler.getPlayer().getOffHandItem(player)); } 
-		}
-		if (!ServerHandler.getServer().hasSpecificUpdate("1_8")) { PlayerHandler.getPlayer().updateInventory(player, 1L); }
-		this.LegacyDropEvent(player);
-		for (ItemStack item : items) {
-			if (!ItemUtilities.getUtilities().isAllowed(player, item, "inventory-modify")) {
-				event.setCancelled(true);
-				if (player.getOpenInventory().getType().name().equalsIgnoreCase("CHEST") && !player.getOpenInventory().getTitle().equalsIgnoreCase("CHEST")) {
-					final ItemStack itemCopy = item.clone();
-					SchedulerUtils.getScheduler().run(() -> {
-						for (int i = 0; i < player.getOpenInventory().getTopInventory().getSize(); i++) {
-							if (player.getOpenInventory().getTopInventory().getItem(i) != null && player.getOpenInventory().getTopInventory().getItem(i).equals(item)) {
-								player.getOpenInventory().getTopInventory().setItem(i, new ItemStack(Material.AIR));
-								player.getOpenInventory().getBottomInventory().setItem(event.getSlot(), itemCopy); 
+		if (!this.isCreativeDupe(event)) {
+			items.add(event.getCurrentItem()); items.add(event.getCursor());
+			if (Utils.getUtils().containsIgnoreCase(event.getAction().name(), "HOTBAR")) {
+				if (event.getView().getBottomInventory().getSize() >= event.getHotbarButton() && event.getHotbarButton() >= 0) { items.add(event.getView().getBottomInventory().getItem(event.getHotbarButton())); }
+				else if (ServerHandler.getServer().hasSpecificUpdate("1_9")) { items.add(PlayerHandler.getPlayer().getOffHandItem(player)); } 
+			}
+			if (!ServerHandler.getServer().hasSpecificUpdate("1_8")) { PlayerHandler.getPlayer().updateInventory(player, 1L); }
+			this.LegacyDropEvent(player);
+			for (ItemStack item : items) {
+				if (!ItemUtilities.getUtilities().isAllowed(player, item, "inventory-modify")) {
+					event.setCancelled(true);
+					if (player.getOpenInventory().getType().name().equalsIgnoreCase("CHEST") && !player.getOpenInventory().getTitle().equalsIgnoreCase("CHEST")) {
+						final ItemStack itemCopy = item.clone();
+						SchedulerUtils.getScheduler().run(() -> {
+							for (int i = 0; i < player.getOpenInventory().getTopInventory().getSize(); i++) {
+								if (player.getOpenInventory().getTopInventory().getItem(i) != null && player.getOpenInventory().getTopInventory().getItem(i).equals(item)) {
+									player.getOpenInventory().getTopInventory().setItem(i, new ItemStack(Material.AIR));
+									player.getOpenInventory().getBottomInventory().setItem(event.getSlot(), itemCopy); 
+								}
 							}
-						}
-					});
+						});
+					}
+					if (PlayerHandler.getPlayer().isCreativeMode(player)) { player.closeInventory(); }
+					else if (!ItemUtilities.getUtilities().isAllowed(player, item, "inventory-close")) { player.closeInventory(); }
+					PlayerHandler.getPlayer().updateInventory(player, 1L);
+					break;
 				}
-				if (PlayerHandler.getPlayer().isCreativeMode(player)) { player.closeInventory(); }
-				else if (!ItemUtilities.getUtilities().isAllowed(player, item, "inventory-close")) { player.closeInventory(); }
-				PlayerHandler.getPlayer().updateInventory(player, 1L);
 			}
 		}
+	}
+	
+   /**
+	* Prevents the player from duplicating immobile items while in creative.
+	* 
+	* @param event - InventoryClickEvent
+	*/
+	public boolean isCreativeDupe(final InventoryClickEvent event) {
+		if (PlayerHandler.getPlayer().isCreativeMode((Player) event.getWhoClicked()) && event.getCurrentItem() != null && event.getCursor() != null) {
+			String currentNBT = (ItemHandler.getItem().dataTagsEnabled() ? ItemHandler.getItem().getNBTData(event.getCurrentItem()) 
+					: ((event.getCurrentItem().hasItemMeta() && event.getCurrentItem().getItemMeta().hasDisplayName()) ? Utils.getUtils().colorDecode(event.getCurrentItem().getItemMeta().getDisplayName()) : null));
+			String cursorNBT = (ItemHandler.getItem().dataTagsEnabled() ? ItemHandler.getItem().getNBTData(event.getCursor()) 
+					: ((event.getCursor().hasItemMeta() && event.getCursor().getItemMeta().hasDisplayName()) ? Utils.getUtils().colorDecode(event.getCursor().getItemMeta().getDisplayName()) : null));
+			if (currentNBT != null && cursorNBT != null) {
+				return currentNBT.equalsIgnoreCase(cursorNBT);
+			}	
+		}
+		return false;
 	}
 	
    /**
