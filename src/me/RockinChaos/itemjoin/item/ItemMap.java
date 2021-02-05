@@ -298,9 +298,9 @@ public class ItemMap {
     * @param slot - The slot of the ItemMap.
     */
 	public ItemMap(final String internalName, final String slot) {
-        this.nodeLocation = ConfigHandler.getConfig(false).getItemSection(internalName);
+        this.nodeLocation = ConfigHandler.getConfig().getItemSection(internalName);
         this.configName = internalName;
-        this.setItemValue(ConfigHandler.getConfig(false).getItemID(slot));
+        this.setItemValue(ConfigHandler.getConfig().getItemID(slot));
         this.setSlot(slot);
         if (ItemHandler.getItem().isCraftingSlot(slot)) { this.craftingItem = true; }
         
@@ -324,8 +324,8 @@ public class ItemMap {
 			this.setConditions();
 			this.setPlayersOnCooldown();
 	        this.setPerm(this.nodeLocation.getString(".permission-node"));
-	        this.setPermissionNeeded(ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Permissions.Obtain-Items"));
-	    	this.setOPPermissionNeeded(ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Permissions.Obtain-Items-OP"));
+	        this.setPermissionNeeded(ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Obtain-Items"));
+	    	this.setOPPermissionNeeded(ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Obtain-Items-OP"));
         }
 	}
 	
@@ -438,7 +438,7 @@ public class ItemMap {
 	private void setItemflags() {
 		if (this.nodeLocation.getString(".itemflags") != null) {
 			this.itemflags = this.nodeLocation.getString(".itemflags");
-			this.vanillaItem = Utils.getUtils().containsIgnoreCase(this.itemflags, "vanilla ");
+			this.vanillaItem = Utils.getUtils().containsIgnoreCase(this.itemflags, "vanilla");
 			this.vanillaStatus = Utils.getUtils().containsIgnoreCase(this.itemflags, "vanilla-status");
 			this.vanillaControl = Utils.getUtils().containsIgnoreCase(this.itemflags, "vanilla-control");
 			this.disposable = Utils.getUtils().containsIgnoreCase(this.itemflags, "disposable");
@@ -3361,7 +3361,7 @@ public class ItemMap {
     * @return If the stack size is similar.
     */
 	public boolean isCountSimilar(final ItemStack item) {
-		if (item.getAmount() == count || ConfigHandler.getConfig(false).getFile("items.yml").getBoolean("items-RestrictCount") == false || this.isItemChangable()) {
+		if (item.getAmount() == count || ConfigHandler.getConfig().getFile("items.yml").getBoolean("items-RestrictCount") == false || this.isItemChangable()) {
 			return true;
 		}
 		return false;
@@ -4607,7 +4607,7 @@ public class ItemMap {
     * @return If the Player is on Cooldown.
     */
 	private boolean onSpamCooldown(final Player player) {
-		boolean interactSpam = ConfigHandler.getConfig(false).getFile("items.yml").getBoolean("items-Spamming");
+		boolean interactSpam = ConfigHandler.getConfig().getFile("items.yml").getBoolean("items-Spamming");
 		if (interactSpam != true) {
 			long playersCooldownList = 0L;
 			if (this.storedSpammedPlayers.containsKey(player.getWorld().getName() + "." + PlayerHandler.getPlayer().getPlayerID(player) + ".items." + this.configName)) {
@@ -4654,7 +4654,7 @@ public class ItemMap {
     * @return If the Player is on Cooldown.
     */
 	private boolean onCooldownTick(final Player player) {
-		if (!ConfigHandler.getConfig(false).getFile("items.yml").getBoolean("items-Spamming")) {
+		if (!ConfigHandler.getConfig().getFile("items.yml").getBoolean("items-Spamming")) {
 			long playersCooldownList = 0L;
 			if (this.playersOnCooldownTick.containsKey(player.getWorld().getName() + "." + PlayerHandler.getPlayer().getPlayerID(player))) {
 				playersCooldownList = this.playersOnCooldownTick.get(player.getWorld().getName() + "." + PlayerHandler.getPlayer().getPlayerID(player));
@@ -4779,8 +4779,8 @@ public class ItemMap {
 	public void removeFromConfig() {
 		File itemFile =  new File (ItemJoin.getInstance().getDataFolder(), "items.yml");
 		FileConfiguration itemData = YamlConfiguration.loadConfiguration(itemFile);
-		if (ConfigHandler.getConfig(false).getFile("items.yml").getString("items." + this.configName) != null) { itemData.set("items." + this.configName, null); } 
-		try { itemData.save(itemFile); ConfigHandler.getConfig(false).getSource("items.yml"); ConfigHandler.getConfig(false).getFile("items.yml").options().copyDefaults(false); } 
+		if (ConfigHandler.getConfig().getFile("items.yml").getString("items." + this.configName) != null) { itemData.set("items." + this.configName, null); } 
+		try { itemData.save(itemFile); ConfigHandler.getConfig().getSource("items.yml"); ConfigHandler.getConfig().getFile("items.yml").options().copyDefaults(false); } 
 		catch (Exception e) { ItemJoin.getInstance().getServer().getLogger().severe("Could not remove the custom item " + this.configName + " from the items.yml data file!"); ServerHandler.getServer().sendDebugTrace(e); }	
 	}
 	
@@ -4792,7 +4792,7 @@ public class ItemMap {
 		File itemFile =  new File (ItemJoin.getInstance().getDataFolder(), "items.yml");
 		FileConfiguration itemData = YamlConfiguration.loadConfiguration(itemFile);
 		this.renderItemStack();
-		if (ConfigHandler.getConfig(false).getFile("items.yml").getString("items." + this.configName) != null) { itemData.set("items." + this.configName, null); } 
+		if (ConfigHandler.getConfig().getFile("items.yml").getString("items." + this.configName) != null) { itemData.set("items." + this.configName, null); } 
 		if (!(this.dynamicMaterials != null && !this.dynamicMaterials.isEmpty())) { itemData.set("items." + this.configName + ".id", this.material.toString().toUpperCase() + (this.dataValue != 0 ? ":" + this.dataValue : "")); }
 		else if (this.dynamicMaterials != null && !this.dynamicMaterials.isEmpty()) { 
 			for (int i = 0; i < this.dynamicMaterials.size(); i++) {
@@ -5069,7 +5069,7 @@ public class ItemMap {
 			for (String world : this.enabledWorlds) { worldList += world + ", "; }
 			itemData.set("items." + this.configName + ".enabled-worlds", worldList.substring(0, worldList.length() - 2)); 
 		}
-		try { itemData.save(itemFile); ConfigHandler.getConfig(false).getSource("items.yml"); ConfigHandler.getConfig(false).getFile("items.yml").options().copyDefaults(false); } 
+		try { itemData.save(itemFile); ConfigHandler.getConfig().getSource("items.yml"); ConfigHandler.getConfig().getFile("items.yml").options().copyDefaults(false); } 
 		catch (Exception e) { ItemJoin.getInstance().getServer().getLogger().severe("Could not save the new custom item " + this.configName + " to the items.yml data file!"); ServerHandler.getServer().sendDebugTrace(e); }	
 	}
 	
