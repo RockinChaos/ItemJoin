@@ -38,9 +38,9 @@ public class ChestSortAPI implements Listener {
 	private void onChestSortEvent(de.jeff_media.ChestSortAPI.ChestSortEvent event) {
 		Player player = (Player) event.getPlayer();
 		if (player == null) { player = (Player) event.getInventory().getViewers().get(0); }
-	  	if (Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getPrevent("itemMovement"), "TRUE") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getPrevent("itemMovement"), player.getWorld().getName())
-		  			|| Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getPrevent("itemMovement"), "ALL") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getPrevent("itemMovement"), "GLOBAL")) {
-	  		if (ConfigHandler.getConfig(false).isPreventOP() && player.isOp() || ConfigHandler.getConfig(false).isPreventCreative() && PlayerHandler.getPlayer().isCreativeMode(player)) { } 
+	  	if (Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "TRUE") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), player.getWorld().getName())
+		  			|| Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "ALL") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "GLOBAL")) {
+	  		if (ConfigHandler.getConfig().isPreventOP() && player.isOp() || ConfigHandler.getConfig().isPreventCreative() && PlayerHandler.getPlayer().isCreativeMode(player)) { } 
 	  		else if (player.getOpenInventory().getTitle().contains("§") || player.getOpenInventory().getTitle().contains("&")) { }
 	  		else { event.setCancelled(true); }
 	  	}

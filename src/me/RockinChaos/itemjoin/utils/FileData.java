@@ -185,8 +185,8 @@ public class FileData {
 
 		try {
 			itemsData.save(itemsFile);
-			ConfigHandler.getConfig(false).getSource("items.yml");
-			ConfigHandler.getConfig(false).getFile("items.yml").options().copyDefaults(false);
+			ConfigHandler.getConfig().getSource("items.yml");
+			ConfigHandler.getConfig().getFile("items.yml").options().copyDefaults(false);
 		} catch (Exception e) {
 			ItemJoin.getInstance().getServer().getLogger().severe("Could not save important data changes to the data file items.yml!");
 			e.printStackTrace();

@@ -251,7 +251,7 @@ public class ItemUtilities {
     * @param type - The TriggerType that is being performed.
     */
 	private void safeSet(final Player player, final World world, final TriggerType type, final String region) {
-		if (Utils.getUtils().splitIgnoreCase(ConfigHandler.getConfig(false).getHotbarTriggers(), type.name, ",")) { PlayerHandler.getPlayer().setHotbarSlot(player, ConfigHandler.getConfig(false).getHotbarSlot()); }
+		if (Utils.getUtils().splitIgnoreCase(ConfigHandler.getConfig().getHotbarTriggers(), type.name, ",")) { PlayerHandler.getPlayer().setHotbarSlot(player, ConfigHandler.getConfig().getHotbarSlot()); }
 		if (type.equals(TriggerType.REGION_LEAVE)) { DependAPI.getDepends(false).getGuard().pasteReturnItems(player, region); }
 		if (type.equals(TriggerType.WORLD_SWITCH)) { this.pasteReturnItems(type, player, world.getName()); }
 		if (type.equals(TriggerType.REGION_ENTER)) { this.clearEvent(type, player, "", region); }
@@ -281,12 +281,12 @@ public class ItemUtilities {
     * @param region - The region the Player is in (if any).
     */
 	private void clearEvent(final TriggerType type, final Player player, final String world, final String region) {
-		String clearEvent = ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items." + type.name);
+		String clearEvent = ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items." + type.name);
 		if (clearEvent != null && ((region != null && !region.isEmpty() && Utils.getUtils().containsLocation(region, clearEvent.replace(" ", ""))) || Utils.getUtils().containsLocation(world, clearEvent.replace(" ", "")))) {
-			if ((Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Options"), "PROTECT_OP") && player.isOp())
-				|| (Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Options"), "PROTECT_CREATIVE") && PlayerHandler.getPlayer().isCreativeMode(player))) {
+			if ((Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Options"), "PROTECT_OP") && player.isOp())
+				|| (Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Options"), "PROTECT_CREATIVE") && PlayerHandler.getPlayer().isCreativeMode(player))) {
 			} else {
-				String clearType = ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Type");
+				String clearType = ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Type");
 				if (clearType != null && (clearType.equalsIgnoreCase("ALL") || clearType.equalsIgnoreCase("GLOBAL"))) {
 					this.clearItems(type, player, region, type.name, true);
 				} else if (clearType != null && clearType.equalsIgnoreCase("ITEMJOIN")) {
@@ -361,7 +361,7 @@ public class ItemUtilities {
     */
 	private boolean isBlacklisted(String slot, ItemStack item) {
 		String[] blacklist = null;
-		String list = ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Blacklist");
+		String list = ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Blacklist");
 		if (list != null && list.contains("{") && list.contains("}")) { blacklist = list.split(","); }
 		try {
 			if (blacklist != null) {
@@ -449,9 +449,9 @@ public class ItemUtilities {
     */
 	private boolean isOverwritable(final Player player, final ItemMap itemMap) {
 		try {
-			String overWrite = ConfigHandler.getConfig(false).getFile("items.yml").getString("items-Overwrite");
+			String overWrite = ConfigHandler.getConfig().getFile("items.yml").getString("items-Overwrite");
 			if (itemMap.isOverwritable() || (((overWrite == null || (overWrite != null && Utils.getUtils().containsLocation(player.getWorld().getName(), overWrite.replace(" ", ""))))) 
-					|| (ConfigHandler.getConfig(false).getFile("items.yml").getBoolean("items-Overwrite")))) {
+					|| (ConfigHandler.getConfig().getFile("items.yml").getBoolean("items-Overwrite")))) {
 				return true; 
 			} else if (CustomSlot.ARBITRARY.isSlot(itemMap.getSlot()) && player.getInventory().firstEmpty() == -1) {
 				return false;
@@ -483,7 +483,7 @@ public class ItemUtilities {
 	public void sendFailCount(final Player player, final int session) {
 		SchedulerUtils.getScheduler().run(() -> {
 			if (this.failCount.get(session) != null && this.failCount.get(session) != 0) {
-				String overWrite = ConfigHandler.getConfig(false).getFile("items.yml").getString("items-Overwrite");
+				String overWrite = ConfigHandler.getConfig().getFile("items.yml").getString("items-Overwrite");
 				if ((overWrite != null && Utils.getUtils().containsLocation(player.getWorld().getName(), overWrite.replace(" ", "")))) {
 					String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[7] = this.failCount.get(session).toString();
 					LanguageAPI.getLang(false).sendLangMessage("general.failedInventory", player, placeHolders);
@@ -508,7 +508,7 @@ public class ItemUtilities {
     * @param clearAll - If ALL items are being cleared.
     */
 	public void saveReturnItems(final TriggerType type, final Player player, final String world, final Inventory craftView, final PlayerInventory inventory, final boolean clearAll) {
-		boolean doReturn = Utils.getUtils().splitIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Options").replace(" ", ""), "RETURN_SWITCH", ",");
+		boolean doReturn = Utils.getUtils().splitIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Options").replace(" ", ""), "RETURN_SWITCH", ",");
 		List < ItemMap > protectItems = ItemUtilities.getUtilities().getProtectItems();
 		if (type == TriggerType.WORLD_SWITCH && doReturn) {
 			Inventory saveInventory = Bukkit.createInventory(null, 54);
@@ -533,7 +533,7 @@ public class ItemUtilities {
     * @param world - The world to be checked.
     */
 	public void pasteReturnItems(final TriggerType type, final Player player, final String world) {
-		if (type == TriggerType.WORLD_SWITCH && Utils.getUtils().splitIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Options").replace(" ", ""), "RETURN_SWITCH", ",")) {
+		if (type == TriggerType.WORLD_SWITCH && Utils.getUtils().splitIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Options").replace(" ", ""), "RETURN_SWITCH", ",")) {
 			DataObject dataObject = SQL.getData().getData(new DataObject(Table.IJ_RETURN_SWITCH_ITEMS, PlayerHandler.getPlayer().getPlayerID(player), world, ""));
 			Inventory inventory = (dataObject != null ? ItemHandler.getItem().deserializeInventory(dataObject.getInventory64().replace(world + ".", "")) : null);
 			for (int i = 47; i >= 0; i--) {
@@ -563,7 +563,7 @@ public class ItemUtilities {
 			ItemStack item = itemMap.getItem(player).clone();
 			this.shiftItem(player, itemMap);
 			int nextSlot = this.nextItem(player, itemMap);
-			boolean overWrite = itemMap.isOverwritable() || ConfigHandler.getConfig(false).getFile("items.yml").getBoolean("items-Overwrite");
+			boolean overWrite = itemMap.isOverwritable() || ConfigHandler.getConfig().getFile("items.yml").getBoolean("items-Overwrite");
 			if (size > 1) { item.setAmount(size); }
 			if ((size > 1 || itemMap.isAlwaysGive()) && !overWrite && existingItem != null) {
 				player.getInventory().addItem(item);
@@ -603,7 +603,7 @@ public class ItemUtilities {
 			ItemStack item = itemMap.getItem(player).clone();
 			this.shiftItem(player, itemMap);
 			int nextSlot = this.nextItem(player, itemMap);
-			boolean overWrite = itemMap.isOverwritable() || ConfigHandler.getConfig(false).getFile("items.yml").getBoolean("items-Overwrite");
+			boolean overWrite = itemMap.isOverwritable() || ConfigHandler.getConfig().getFile("items.yml").getBoolean("items-Overwrite");
 			if (size > 1) { item.setAmount(size); }
 			if ((size > 1 || itemMap.isAlwaysGive()) && !overWrite && existingItem != null) {
 				player.getInventory().addItem(item);
@@ -743,23 +743,23 @@ public class ItemUtilities {
     * @param player - The Player having the commands executed.
     */
 	public void triggerCommands(final Player player, TriggerType trigger) {
-		if ((ConfigHandler.getConfig(false).getFile("config.yml").getString("Active-Commands.enabled-worlds") != null && ConfigHandler.getConfig(false).getFile("config.yml").getStringList("Active-Commands.commands") != null) 
-				&& (!ConfigHandler.getConfig(false).getFile("config.yml").getString("Active-Commands.enabled-worlds").equalsIgnoreCase("DISABLED") || !ConfigHandler.getConfig(false).getFile("config.yml").getString("Active-Commands.enabled-worlds").equalsIgnoreCase("FALSE"))
-				&& ((Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Active-Commands.triggers"), TriggerType.JOIN.name) && trigger.equals(TriggerType.JOIN))
-				|| (Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Active-Commands.triggers"), TriggerType.FIRST_JOIN.name) && trigger.equals(TriggerType.FIRST_JOIN))
-				|| (Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Active-Commands.triggers"), TriggerType.WORLD_SWITCH.name) && trigger.equals(TriggerType.WORLD_SWITCH))
-				|| (Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Active-Commands.triggers"), TriggerType.RESPAWN.name) && trigger.equals(TriggerType.RESPAWN)))) {
-			String commandsWorlds = ConfigHandler.getConfig(false).getFile("config.yml").getString("Active-Commands.enabled-worlds").replace(", ", ",");
+		if ((ConfigHandler.getConfig().getFile("config.yml").getString("Active-Commands.enabled-worlds") != null && ConfigHandler.getConfig().getFile("config.yml").getStringList("Active-Commands.commands") != null) 
+				&& (!ConfigHandler.getConfig().getFile("config.yml").getString("Active-Commands.enabled-worlds").equalsIgnoreCase("DISABLED") || !ConfigHandler.getConfig().getFile("config.yml").getString("Active-Commands.enabled-worlds").equalsIgnoreCase("FALSE"))
+				&& ((Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Active-Commands.triggers"), TriggerType.JOIN.name) && trigger.equals(TriggerType.JOIN))
+				|| (Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Active-Commands.triggers"), TriggerType.FIRST_JOIN.name) && trigger.equals(TriggerType.FIRST_JOIN))
+				|| (Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Active-Commands.triggers"), TriggerType.WORLD_SWITCH.name) && trigger.equals(TriggerType.WORLD_SWITCH))
+				|| (Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Active-Commands.triggers"), TriggerType.RESPAWN.name) && trigger.equals(TriggerType.RESPAWN)))) {
+			String commandsWorlds = ConfigHandler.getConfig().getFile("config.yml").getString("Active-Commands.enabled-worlds").replace(", ", ",");
 			if (commandsWorlds == null) { commandsWorlds = "DISABLED"; }
 			String[] compareWorlds = commandsWorlds.split(",");
 			for (String compareWorld: compareWorlds) {
 				if (compareWorld.equalsIgnoreCase(player.getWorld().getName()) || compareWorld.equalsIgnoreCase("ALL") || compareWorld.equalsIgnoreCase("GLOBAL")) {
-					for (String commands: ConfigHandler.getConfig(false).getFile("config.yml").getStringList("Active-Commands.commands")) {
+					for (String commands: ConfigHandler.getConfig().getFile("config.yml").getStringList("Active-Commands.commands")) {
 						String formatCommand = Utils.getUtils().translateLayout(commands, player).replace("first-join: ", "").replace("first-join:", "");
 						DataObject dataObject = SQL.getData().getData(new DataObject(Table.IJ_FIRST_COMMANDS, PlayerHandler.getPlayer().getPlayerID(player), player.getWorld().getName(), formatCommand));
-						if (!(dataObject != null && (Utils.getUtils().containsIgnoreCase(commands, "first-join:") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Active-Commands.triggers"), TriggerType.FIRST_JOIN.name)))) {
+						if (!(dataObject != null && (Utils.getUtils().containsIgnoreCase(commands, "first-join:") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Active-Commands.triggers"), TriggerType.FIRST_JOIN.name)))) {
 							Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), formatCommand);
-							if (Utils.getUtils().containsIgnoreCase(commands, "first-join:") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Active-Commands.triggers"), TriggerType.FIRST_JOIN.name)) {
+							if (Utils.getUtils().containsIgnoreCase(commands, "first-join:") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Active-Commands.triggers"), TriggerType.FIRST_JOIN.name)) {
 								SQL.getData().saveData(new DataObject(Table.IJ_FIRST_COMMANDS, PlayerHandler.getPlayer().getPlayerID(player), player.getWorld().getName(), formatCommand));
 							}
 						}
@@ -776,8 +776,8 @@ public class ItemUtilities {
     * @return The items-Delay that is to be expected before the items are given.
     */
 	private long getItemDelay() {
-		if ((this.getClearDelay() / 20) >= (ConfigHandler.getConfig(false).getFile("items.yml").getInt("items-Delay") / 2) && this.getClearDelay() != -1) { return this.getClearDelay() + 1; }
-		return ConfigHandler.getConfig(false).getFile("items.yml").getInt("items-Delay") * 10L;
+		if ((this.getClearDelay() / 20) >= (ConfigHandler.getConfig().getFile("items.yml").getInt("items-Delay") / 2) && this.getClearDelay() != -1) { return this.getClearDelay() + 1; }
+		return ConfigHandler.getConfig().getFile("items.yml").getInt("items-Delay") * 10L;
 	}
 	
    /**
@@ -786,15 +786,15 @@ public class ItemUtilities {
     * @return The clear-Delay before the items are cleared.
     */
 	public long getClearDelay() {
-		if (!Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Join"), "DISABLED") 
-				&& !Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Join"), "FALSE")
-				|| !Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Quit"), "DISABLED")
-				&& !Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Quit"), "FALSE")
-				|| !Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.World-Switch"), "DISABLED")
-				&& !Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.World-Switch"), "FALSE")
-				|| !Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Region-Enter"), "DISABLED")
-				&& !Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Region-Enter"), "FALSE")) {
-				return ConfigHandler.getConfig(false).getFile("config.yml").getInt("Clear-Items.Delay-Tick");
+		if (!Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Join"), "DISABLED") 
+				&& !Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Join"), "FALSE")
+				|| !Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Quit"), "DISABLED")
+				&& !Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Quit"), "FALSE")
+				|| !Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.World-Switch"), "DISABLED")
+				&& !Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.World-Switch"), "FALSE")
+				|| !Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Region-Enter"), "DISABLED")
+				&& !Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Region-Enter"), "FALSE")) {
+				return ConfigHandler.getConfig().getFile("config.yml").getInt("Clear-Items.Delay-Tick");
 		}
 		return -1;
 	}
@@ -817,7 +817,7 @@ public class ItemUtilities {
     */
 	public List<ItemMap> getProtectItems() {
 		List<ItemMap> protectItems = new ArrayList<ItemMap>();
-		if (Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Options"), "PROTECT")) {
+		if (Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Options"), "PROTECT")) {
 			for (ItemMap item: this.getItems()) {
 				if (item.isOnlyFirstJoin() || item.isOnlyFirstLife() || item.isOnlyFirstWorld()) {
 					protectItems.add(item);

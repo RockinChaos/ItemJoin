@@ -276,15 +276,15 @@ public class ItemHandler {
     */
 	public String getMaterial(final ConfigurationSection itemNode) {
 		String material = this.cutDelay(itemNode.getString(".id"));
-		if (ConfigHandler.getConfig(false).getMaterialSection(itemNode) != null) {
+		if (ConfigHandler.getConfig().getMaterialSection(itemNode) != null) {
 			List<String> materials = new ArrayList<String>();
-			for (String materialKey : ConfigHandler.getConfig(false).getMaterialSection(itemNode).getKeys(false)) {
+			for (String materialKey : ConfigHandler.getConfig().getMaterialSection(itemNode).getKeys(false)) {
 				String materialList = itemNode.getString(".id." + materialKey);
 				if (materialList != null) {
 					materials.add(materialList);
 				}
 			}
-			material = this.cutDelay(itemNode.getString(".id." + ConfigHandler.getConfig(false).getMaterialSection(itemNode).getKeys(false).iterator().next()));
+			material = this.cutDelay(itemNode.getString(".id." + ConfigHandler.getConfig().getMaterialSection(itemNode).getKeys(false).iterator().next()));
 			return material;
 		}
 		return material;
@@ -694,7 +694,7 @@ public class ItemHandler {
     */
 	public boolean dataTagsEnabled() {
 		if (ServerHandler.getServer().hasSpecificUpdate("1_8")) {
-			return ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Settings.DataTags");
+			return ConfigHandler.getConfig().getFile("config.yml").getBoolean("Settings.DataTags");
 		}
 		return false;
 	}

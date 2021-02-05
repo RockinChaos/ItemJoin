@@ -39,9 +39,9 @@ public class Pickups implements Listener {
 	  	Entity entity = event.getEntity();
 	  	if (entity instanceof Player) {
 	  		Player player = (Player) event.getEntity();
-	  		if (Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getPrevent("Pickups"), "TRUE") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getPrevent("Pickups"), player.getWorld().getName())
-	  			|| Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getPrevent("Pickups"), "ALL") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getPrevent("Pickups"), "GLOBAL")) {
-	  			if (ConfigHandler.getConfig(false).isPreventOP() && player.isOp() || ConfigHandler.getConfig(false).isPreventCreative() && PlayerHandler.getPlayer().isCreativeMode(player)) { } 
+	  		if (Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Pickups"), "TRUE") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Pickups"), player.getWorld().getName())
+	  			|| Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Pickups"), "ALL") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Pickups"), "GLOBAL")) {
+	  			if (ConfigHandler.getConfig().isPreventOP() && player.isOp() || ConfigHandler.getConfig().isPreventCreative() && PlayerHandler.getPlayer().isCreativeMode(player)) { } 
 	  			else { event.setCancelled(true); }
 	  		}
 	  	}

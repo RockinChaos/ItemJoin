@@ -445,7 +445,7 @@ public class ItemCommand {
 	* @param logCommand - the command that wont be logged.
 	*/
 	private void setLoggable(final Player player, final String logCommand) {
-		if (!ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("General.Log-Commands")) {
+		if (!ConfigHandler.getConfig().getFile("config.yml").getBoolean("General.Log-Commands")) {
 			ArrayList < String > templist = new ArrayList < String > ();
 			if (LogFilter.getFilter(false).getHidden().get("commands-list") != null && !LogFilter.getFilter(false).getHidden().get("commands-list").contains(logCommand)) {
 				templist = LogFilter.getFilter(false).getHidden().get("commands-list");
@@ -510,7 +510,7 @@ public class ItemCommand {
 	* @return The list of ItemCommands relating to the specified ItemMap.
 	*/
 	public static ItemCommand[] arrayFromString(final ItemMap itemMap, final boolean isList) {
-		if (ConfigHandler.getConfig(false).getCommandsSection(itemMap.getNodeLocation()) == null) {
+		if (ConfigHandler.getConfig().getCommandsSection(itemMap.getNodeLocation()) == null) {
 			return new ItemCommand[] {
 				new ItemCommand("", Action.DEFAULT, Executor.DEFAULT, null, 0L, null)
 			};
@@ -526,12 +526,12 @@ public class ItemCommand {
 	* @return The list of ItemCommands relating to the specified ItemMap.
 	*/
 	private static ItemCommand[] fromConfig(final ItemMap itemMap, final boolean isList) {
-		if (ConfigHandler.getConfig(false).getCommandsSection(itemMap.getNodeLocation()) != null) {
+		if (ConfigHandler.getConfig().getCommandsSection(itemMap.getNodeLocation()) != null) {
 			final List < ItemCommand > arrayCommands = new ArrayList < ItemCommand > ();
-			Iterator < String > it = ConfigHandler.getConfig(false).getCommandsSection(itemMap.getNodeLocation()).getKeys(false).iterator();
+			Iterator < String > it = ConfigHandler.getConfig().getCommandsSection(itemMap.getNodeLocation()).getKeys(false).iterator();
 			while (it.hasNext()) {
 				String definition = it.next();
-				ConfigurationSection commandSection = ConfigHandler.getConfig(false).getFile("items.yml").getConfigurationSection(itemMap.getNodeLocation().getCurrentPath() + "." + definition);
+				ConfigurationSection commandSection = ConfigHandler.getConfig().getFile("items.yml").getConfigurationSection(itemMap.getNodeLocation().getCurrentPath() + "." + definition);
 				if (isList && commandSection != null) {
 					for (String internalCommands: commandSection.getKeys(false)) {
 						arrayCommands.addAll(arrayFromConfig(itemMap, definition, internalCommands));

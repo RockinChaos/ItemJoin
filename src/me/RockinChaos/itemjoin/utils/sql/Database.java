@@ -459,7 +459,7 @@ abstract class Controller {
 				    return this.connection;
 				} catch (Exception e) { 
 					this.stopConnection = true;
-					if (ConfigHandler.getConfig(false).sqlEnabled()) {
+					if (ConfigHandler.getConfig().sqlEnabled()) {
 						ServerHandler.getServer().logSevere("{SQL} Unable to connect to the defined MySQL database, check your settings.");
 					} else { ServerHandler.getServer().logSevere("{SQL} SQLite exception on initialize."); }
 					ServerHandler.getServer().sendSevereTrace(e);
@@ -542,7 +542,7 @@ abstract class Controller {
 			if (!this.isClosed(rs)) {
 				rs.close();
 			}
-			if (!this.stopConnection && (!this.isClosed(conn) && (!ConfigHandler.getConfig(false).sqlEnabled() || force))) {
+			if (!this.stopConnection && (!this.isClosed(conn) && (!ConfigHandler.getConfig().sqlEnabled() || force))) {
 				this.closeLater(conn, force);
 				this.stopConnection = force;
 			}
@@ -564,7 +564,7 @@ abstract class Controller {
 		if (ItemJoin.getInstance().isEnabled()) {
 			SchedulerUtils.getScheduler().runLater(100L, () -> {
 				try {
-					if (!this.isClosed(conn) && (!ConfigHandler.getConfig(false).sqlEnabled() || force)) {
+					if (!this.isClosed(conn) && (!ConfigHandler.getConfig().sqlEnabled() || force)) {
 						conn.close();
 						this.hikari.close();
 						this.stopConnection = false;
@@ -576,7 +576,7 @@ abstract class Controller {
 			});
 		} else {
 			try {
-				if (!this.isClosed(conn) && (!ConfigHandler.getConfig(false).sqlEnabled() || force)) {
+				if (!this.isClosed(conn) && (!ConfigHandler.getConfig().sqlEnabled() || force)) {
 					conn.close();
 					this.hikari.close();
 					this.stopConnection = false;
@@ -594,9 +594,9 @@ abstract class Controller {
 	*/
 	protected void loadSource() {
 		this.hikariConfig = new HikariConfig();
-		FileConfiguration config = ConfigHandler.getConfig(false).getFile("config.yml");
+		FileConfiguration config = ConfigHandler.getConfig().getFile("config.yml");
 	    String database = (config.getString("Database.table") != null ? config.getString("Database.table") : config.getString("Database.database"));
-		if (ConfigHandler.getConfig(false).sqlEnabled()) {
+		if (ConfigHandler.getConfig().sqlEnabled()) {
 			this.hikariConfig.setJdbcUrl("jdbc:mysql://" + config.getString("Database.host") + ":" + config.getString("Database.port") + "/" + database + "?useSSL=false" + "&createDatabaseIfNotExist=true" + "&allowPublicKeyRetrieval=true");
 		    this.hikariConfig.setIdleTimeout(TimeUnit.MINUTES.toMillis(1));
 		} else {

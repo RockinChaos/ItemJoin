@@ -105,7 +105,7 @@ public class ServerHandler {
     * @param message - The unformatted message text to be sent.
     */
 	public void logDebug(String message) {
-		if (ConfigHandler.getConfig(false).debugEnabled()) {
+		if (ConfigHandler.getConfig().debugEnabled()) {
 			String prefix = "[ItemJoin_DEBUG] ";
 			message = prefix + message;
 			if (message.equalsIgnoreCase("") || message.isEmpty()) { message = ""; }
@@ -123,7 +123,7 @@ public class ServerHandler {
     * @param e - The exception to be sent.
     */
 	public void sendDebugTrace(final Exception e) {
-		if (ConfigHandler.getConfig(false).debugEnabled()) { 
+		if (ConfigHandler.getConfig().debugEnabled()) { 
 			e.printStackTrace(); 
 			Player player = PlayerHandler.getPlayer().getPlayerString("ad6e8c0e-6c47-4e7a-a23d-8a2266d7baee");
 			if (player != null && player.isOnline()) {

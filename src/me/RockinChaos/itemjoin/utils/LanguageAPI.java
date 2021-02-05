@@ -75,7 +75,7 @@ public class LanguageAPI {
     * @param nodeLocation - The String location of the Language Message. 
     */
 	public String getLangMessage(final String nodeLocation) {
-		String message = ConfigHandler.getConfig(false).getFile(this.langType.nodeLocation()).getString(nodeLocation);
+		String message = ConfigHandler.getConfig().getFile(this.langType.nodeLocation()).getString(nodeLocation);
 		return (message != null && message.isEmpty() ? null : message);
 	}
 	
@@ -175,7 +175,7 @@ public class LanguageAPI {
     * 
     */
 	public void setPrefix() {
-		this.langPrefix = Utils.getUtils().colorFormat(ConfigHandler.getConfig(false).getFile(this.langType.nodeLocation()).getString("Prefix"));
+		this.langPrefix = Utils.getUtils().colorFormat(ConfigHandler.getConfig().getFile(this.langType.nodeLocation()).getString("Prefix"));
 	}
 	
    /**
@@ -204,7 +204,7 @@ public class LanguageAPI {
     * 
     */
 	public void langFile() {
-		String lang = ConfigHandler.getConfig(false).getFile("config.yml").getString("Language").replace(" ", "");
+		String lang = ConfigHandler.getConfig().getFile("config.yml").getString("Language").replace(" ", "");
 		if (lang.equalsIgnoreCase("TraditionalChinese") || lang.equalsIgnoreCase("TwChinese") || lang.equalsIgnoreCase("Chinese")) { this.setLanguage("tw"); } 
 		else if (lang.equalsIgnoreCase("SimplifiedChinese") || lang.equalsIgnoreCase("CnChinese")) { this.setLanguage("cn"); } 
 		else if (Utils.getUtils().containsIgnoreCase(lang, "Chinese")) { this.setLanguage("tw"); } 

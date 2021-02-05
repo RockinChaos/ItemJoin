@@ -50,9 +50,9 @@ public class Drops implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	private void onGlobalDrop(PlayerDropItemEvent event) {
 		final Player player = event.getPlayer();
-		  if (Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getPrevent("Self-Drops"), "TRUE") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getPrevent("Self-Drops"), player.getWorld().getName())
-		  	|| Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getPrevent("Self-Drops"), "ALL") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getPrevent("Self-Drops"), "GLOBAL")) {
-		  	if (ConfigHandler.getConfig(false).isPreventOP() && player.isOp() || ConfigHandler.getConfig(false).isPreventCreative() && PlayerHandler.getPlayer().isCreativeMode(player)) { } 
+		  if (Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Self-Drops"), "TRUE") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Self-Drops"), player.getWorld().getName())
+		  	|| Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Self-Drops"), "ALL") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Self-Drops"), "GLOBAL")) {
+		  	if (ConfigHandler.getConfig().isPreventOP() && player.isOp() || ConfigHandler.getConfig().isPreventCreative() && PlayerHandler.getPlayer().isCreativeMode(player)) { } 
 		  	else { 
 		  		if (!player.isDead()) {
 		  			if (PlayerHandler.getPlayer().isCreativeMode(player)) { player.closeInventory(); } 
@@ -73,9 +73,9 @@ public class Drops implements Listener {
 	private void onGlobalDeathDrops(PlayerDeathEvent event) {
 		Player player = event.getEntity();
 		ItemUtilities.getUtilities().closeAnimations(player);
-		if (Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getPrevent("Death-Drops"), "TRUE") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getPrevent("Death-Drops"), player.getWorld().getName())
-			  	|| Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getPrevent("Death-Drops"), "ALL") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig(false).getPrevent("Death-Drops"), "GLOBAL")) {
-		  	if (ConfigHandler.getConfig(false).isPreventOP() && player.isOp() || ConfigHandler.getConfig(false).isPreventCreative() && PlayerHandler.getPlayer().isCreativeMode(player)) { }
+		if (Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Death-Drops"), "TRUE") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Death-Drops"), player.getWorld().getName())
+			  	|| Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Death-Drops"), "ALL") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Death-Drops"), "GLOBAL")) {
+		  	if (ConfigHandler.getConfig().isPreventOP() && player.isOp() || ConfigHandler.getConfig().isPreventCreative() && PlayerHandler.getPlayer().isCreativeMode(player)) { }
 		  	else {
 				for (int k = 0; k < player.getInventory().getSize(); k++) {
 					ItemStack stack = player.getInventory().getItem(k);

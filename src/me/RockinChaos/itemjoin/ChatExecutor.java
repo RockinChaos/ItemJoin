@@ -165,7 +165,7 @@ public class ChatExecutor implements CommandExecutor {
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
 		} else if (Execute.RELOAD.accept(sender, args, 0)) {
 			ItemHandler.getItem().saveCooldowns();
-			ConfigHandler.getConfig(false).reloadConfigs();
+			ConfigHandler.getConfig().reloadConfigs(false);
 			LanguageAPI.getLang(false).sendLangMessage("commands.default.configReload", sender);
 		} else if (Execute.MENU.accept(sender, args, 0)) {
 			UI.getCreator().startMenu(sender);
@@ -315,7 +315,7 @@ public class ChatExecutor implements CommandExecutor {
 	*/
 	private void permissions(final CommandSender sender, final int page) {
 		LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
-		int maxPage = ConfigHandler.getConfig(false).getPermissionPages();
+		int maxPage = ConfigHandler.getConfig().getPermissionPages();
 		if (page == 1) {
 			LanguageAPI.getLang(false).dispatchMessage(sender, (PermissionsHandler.getPermissions().hasPermission(sender, "itemjoin.*") ? "&a[\u2714]" : "&c[\u2718]") + " ItemJoin.*");
 			LanguageAPI.getLang(false).dispatchMessage(sender, (PermissionsHandler.getPermissions().hasPermission(sender, "itemjoin.all") ? "&a[\u2714]" : "&c[\u2718]") + " ItemJoin.All");
@@ -335,10 +335,10 @@ public class ChatExecutor implements CommandExecutor {
 			LanguageAPI.getLang(false).dispatchMessage(sender, (PermissionsHandler.getPermissions().hasPermission(sender, "itemjoin.bypass.inventorymodify") ? "&a[\u2714]" : "&c[\u2718]") + " ItemJoin.Bypass.InventoryModify");
 			for (World world: Bukkit.getWorlds()) { 
 				LanguageAPI.getLang(false).dispatchMessage(sender, (PermissionsHandler.getPermissions().hasPermission(sender, "itemjoin." + world.getName()  + ".*")
-					&& ((ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Permissions.Obtain-Items-OP") && sender.isOp() 
-							? sender.isPermissionSet("itemjoin." + world.getName() + ".*") : !ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Permissions.Obtain-Items-OP"))
-					||  (ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Permissions.Obtain-Items") && !sender.isOp() 
-							? sender.isPermissionSet("itemjoin." + world.getName() + ".*") : !ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Permissions.Obtain-Items")))
+					&& ((ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Obtain-Items-OP") && sender.isOp() 
+							? sender.isPermissionSet("itemjoin." + world.getName() + ".*") : !ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Obtain-Items-OP"))
+					||  (ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Obtain-Items") && !sender.isOp() 
+							? sender.isPermissionSet("itemjoin." + world.getName() + ".*") : !ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Obtain-Items")))
 				? "&a[\u2714]" : "&c[\u2718]") + " ItemJoin." + world.getName() + ".*"); 
 			}
 		} else if (page != 0) {
@@ -669,7 +669,7 @@ public class ChatExecutor implements CommandExecutor {
 	    */
 		private boolean hasSyntax(final String[] args, final int page) {
 			return ((args.length >= 2 && (args[1].equalsIgnoreCase(String.valueOf(page)) || (this.equals(Execute.PERMISSIONS) && page == 2 
-				 && Utils.getUtils().isInt(args[1]) && Integer.parseInt(args[1]) != 0 && Integer.parseInt(args[1]) != 1 && Integer.parseInt(args[1]) <= ConfigHandler.getConfig(false).getPermissionPages()) 
+				 && Utils.getUtils().isInt(args[1]) && Integer.parseInt(args[1]) != 0 && Integer.parseInt(args[1]) != 1 && Integer.parseInt(args[1]) <= ConfigHandler.getConfig().getPermissionPages()) 
 				 || (page == 1 && this.equals(Execute.PERMISSIONS) && Utils.getUtils().isInt(args[1]) && Integer.parseInt(args[1]) == 0)
 				 || (!Utils.getUtils().isInt(args[1]) && !this.equals(Execute.PURGE)))) 
 				 || (args.length < 2 && (!this.equals(Execute.GET) && !this.equals(Execute.GETONLINE) && !this.equals(Execute.REMOVE) && !this.equals(Execute.REMOVEONLINE))

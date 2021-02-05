@@ -66,7 +66,7 @@ public class Metrics {
 	            throw new IllegalArgumentException("Plugin cannot be null!");
 	        }
 	        this.plugin = ItemJoin.getInstance();
-			if (ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("General.Metrics-Logging")) { 
+			if (ConfigHandler.getConfig().getFile("config.yml").getBoolean("General.Metrics-Logging")) { 
 	        File bStatsFolder = new File(plugin.getDataFolder().getParentFile(), "bStats");
 	        File configFile = new File(bStatsFolder, "config.yml");
 	        YamlConfiguration config = YamlConfiguration.loadConfiguration(configFile);

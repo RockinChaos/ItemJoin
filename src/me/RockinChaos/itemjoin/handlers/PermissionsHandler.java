@@ -52,7 +52,7 @@ public class PermissionsHandler {
 	public boolean hasPermission(final CommandSender sender, final String permission) {
 		if (sender.hasPermission(permission) || sender.hasPermission("itemjoin.*") || sender.hasPermission("itemjoin.all") || this.isDeveloper(sender) || (sender instanceof ConsoleCommandSender)) {
 			return true;
-		} else if (!ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Permissions.Commands-OP") && sender.isOp()) {
+		} else if (!ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Commands-OP") && sender.isOp()) {
 			if (permission.equalsIgnoreCase("itemjoin.use") || permission.equalsIgnoreCase("itemjoin.reload") || permission.equalsIgnoreCase("itemjoin.updates")
 					|| permission.equalsIgnoreCase("itemjoin.autoupdate") || permission.equalsIgnoreCase("itemjoin.menu") 
 					|| permission.equalsIgnoreCase("itemjoin.purge") || permission.equalsIgnoreCase("itemjoin.get") || permission.equalsIgnoreCase("itemjoin.get.others")
@@ -72,7 +72,7 @@ public class PermissionsHandler {
     * @return If the command sender is the developer of the plugin.
     */
 	private boolean isDeveloper(final CommandSender sender) {
-		if (ConfigHandler.getConfig(false).debugEnabled()) {
+		if (ConfigHandler.getConfig().debugEnabled()) {
 			if (sender instanceof Player) {
 				try { 
 					if (((Player)sender).getUniqueId().toString().equalsIgnoreCase("ad6e8c0e-6c47-4e7a-a23d-8a2266d7baee")) { return true; }
@@ -88,7 +88,7 @@ public class PermissionsHandler {
     * @return If the custom items require certain permissions to be given or used.
     */
 	public boolean receiveEnabled() {
-		return ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Permissions.Commands-Get");
+		return ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Commands-Get");
 	}
 	
    /**

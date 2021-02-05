@@ -56,7 +56,7 @@ public class ChatTab implements TabCompleter {
 		if (args.length == 2 && args[0].equalsIgnoreCase("help") && PermissionsHandler.getPermissions().hasPermission(sender, "itemjoin.use")) {
 			 commands.addAll( Arrays.asList("2","3","4","5","6","7","8","9"));
 		} else if (args.length == 2 && args[0].equalsIgnoreCase("permissions") && PermissionsHandler.getPermissions().hasPermission(sender, "itemjoin.permissions")) {
-			for (int i = 1; i <= ConfigHandler.getConfig(false).getPermissionPages(); i++) {
+			for (int i = 1; i <= ConfigHandler.getConfig().getPermissionPages(); i++) {
 				commands.add(Integer.toString(i));
 			}
 		} else if ((args.length == 2 || args.length == 3) && args[0].equalsIgnoreCase("purge") && PermissionsHandler.getPermissions().hasPermission(sender, "itemjoin.purge")) {

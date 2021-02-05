@@ -73,9 +73,9 @@ public class ItemDesigner {
 	* 
 	*/
 	public ItemDesigner() {
-		if (ConfigHandler.getConfig(false).itemsExist()) {
-			for (String internalName: ConfigHandler.getConfig(false).getConfigurationSection().getKeys(false)) {
-				ConfigurationSection itemNode = ConfigHandler.getConfig(false).getItemSection(internalName);
+		if (ConfigHandler.getConfig().itemsExist()) {
+			for (String internalName: ConfigHandler.getConfig().getConfigurationSection().getKeys(false)) {
+				ConfigurationSection itemNode = ConfigHandler.getConfig().getItemSection(internalName);
 				if (this.isConfigurable(internalName, itemNode)) {
 					String[] slots = itemNode.getString(".slot").replace(" ", "").split(",");
 					for (String slot: slots) {
@@ -118,7 +118,7 @@ public class ItemDesigner {
 							itemMap.setContents();
 							ItemUtilities.getUtilities().addItem(itemMap);
 							ItemUtilities.getUtilities().addCraftingItem(itemMap);
-					    	ConfigHandler.getConfig(false).registerListeners(itemMap);
+					    	ConfigHandler.getConfig().registerListeners(itemMap);
 						}
 					}
 				}
@@ -221,16 +221,16 @@ public class ItemDesigner {
 	*/
 	private Material getActualMaterial(final ItemMap itemMap) {
 		String material = ItemHandler.getItem().cutDelay(itemMap.getNodeLocation().getString(".id"));
-		if (ConfigHandler.getConfig(false).getMaterialSection(itemMap.getNodeLocation()) != null) {
+		if (ConfigHandler.getConfig().getMaterialSection(itemMap.getNodeLocation()) != null) {
 			List<String> materials = new ArrayList<String>();
-			for (String materialKey : ConfigHandler.getConfig(false).getMaterialSection(itemMap.getNodeLocation()).getKeys(false)) {
+			for (String materialKey : ConfigHandler.getConfig().getMaterialSection(itemMap.getNodeLocation()).getKeys(false)) {
 				String materialList = itemMap.getNodeLocation().getString(".id." + materialKey);
 				if (materialList != null) {
 					materials.add(materialList);
 				}
 			}
 			itemMap.setDynamicMaterials(materials);
-			material = ItemHandler.getItem().cutDelay(itemMap.getNodeLocation().getString(".id." + ConfigHandler.getConfig(false).getMaterialSection(itemMap.getNodeLocation()).getKeys(false).iterator().next()));
+			material = ItemHandler.getItem().cutDelay(itemMap.getNodeLocation().getString(".id." + ConfigHandler.getConfig().getMaterialSection(itemMap.getNodeLocation()).getKeys(false).iterator().next()));
 			if (material.contains(":")) { String[] parts = material.split(":"); itemMap.setDataValue((short) Integer.parseInt(parts[1])); }
 			return ItemHandler.getItem().getMaterial(material, null);
 		}
@@ -268,7 +268,7 @@ public class ItemDesigner {
 	* @return The found skull texture.
 	*/
 	private String getActualTexture(final ItemMap itemMap) {
-		ConfigurationSection textureSection = ConfigHandler.getConfig(false).getFile("items.yml").getConfigurationSection(itemMap.getNodeLocation().getCurrentPath() + ".skull-texture");
+		ConfigurationSection textureSection = ConfigHandler.getConfig().getFile("items.yml").getConfigurationSection(itemMap.getNodeLocation().getCurrentPath() + ".skull-texture");
 		String texture = ItemHandler.getItem().cutDelay(itemMap.getNodeLocation().getString(".skull-texture"));
 		if (textureSection != null) {
 			List<String> textures = new ArrayList<String>();
@@ -446,7 +446,7 @@ public class ItemDesigner {
 	* @param itemMap - The ItemMap being modified.
 	*/
 	private void setJSONBookPages(final ItemMap itemMap) {
-		ConfigurationSection pagesSection = ConfigHandler.getConfig(false).getFile("items.yml").getConfigurationSection(itemMap.getNodeLocation().getCurrentPath() + ".pages");
+		ConfigurationSection pagesSection = ConfigHandler.getConfig().getFile("items.yml").getConfigurationSection(itemMap.getNodeLocation().getCurrentPath() + ".pages");
 		if (itemMap.getMaterial().toString().equalsIgnoreCase("WRITTEN_BOOK") && itemMap.getNodeLocation().getString(".pages") != null && pagesSection != null && ServerHandler.getServer().hasSpecificUpdate("1_8")) {
 			List < String > JSONPages = new ArrayList < String > ();
 			List < List < String > > rawPages = new ArrayList < List < String > > ();
@@ -568,7 +568,7 @@ public class ItemDesigner {
 	* @return The correctly formatted display name.
 	*/
 	private String getActualName(final ItemMap itemMap) {
-		ConfigurationSection nameSection = ConfigHandler.getConfig(false).getFile("items.yml").getConfigurationSection(itemMap.getNodeLocation().getCurrentPath() + ".name");
+		ConfigurationSection nameSection = ConfigHandler.getConfig().getFile("items.yml").getConfigurationSection(itemMap.getNodeLocation().getCurrentPath() + ".name");
 		String name = itemMap.getNodeLocation().getString(".name");
 		try { ItemHandler.getItem().cutDelay(itemMap.getNodeLocation().getString(".name")); } catch (Exception e) { }
 		if (nameSection != null) {
@@ -613,7 +613,7 @@ public class ItemDesigner {
 	* @return The correctly formatted list of displayed lores.
 	*/
 	private List < String > getActualLore(final ItemMap itemMap) {
-		ConfigurationSection loreSection = ConfigHandler.getConfig(false).getFile("items.yml").getConfigurationSection(itemMap.getNodeLocation().getCurrentPath() + ".lore");
+		ConfigurationSection loreSection = ConfigHandler.getConfig().getFile("items.yml").getConfigurationSection(itemMap.getNodeLocation().getCurrentPath() + ".lore");
 		List <String> lore = itemMap.getNodeLocation().getStringList(".lore");
 		if (loreSection != null) {
 			List<List<String>> lores = new ArrayList<List<String>>();
@@ -773,7 +773,7 @@ public class ItemDesigner {
 						catch (Exception e) { ServerHandler.getServer().logWarn("{ItemMap} The character " + ingredientParts[0] + " for the custom recipe defined for the item " + itemMap.getConfigName() + " is not a valid character!"); }
 						shapedRecipe.setIngredient(character, material);
 						ingredientList.put(character, material.name());
-					} else if (ConfigHandler.getConfig(false).getItemSection(ingredientParts[1]) != null) {
+					} else if (ConfigHandler.getConfig().getItemSection(ingredientParts[1]) != null) {
 						SchedulerUtils.getScheduler().runLater(40L, () -> {
 							if (ItemUtilities.getUtilities().getItemMap(null, ingredientParts[1], null) != null) {
 								final ItemStack itemStack = ItemUtilities.getUtilities().getItemMap(null, ingredientParts[1], null).getItem(null);
@@ -818,7 +818,7 @@ public class ItemDesigner {
 	* @return The found skull owner.
 	*/
 	private String getActualOwner(final ItemMap itemMap) {
-		ConfigurationSection ownerSection = ConfigHandler.getConfig(false).getFile("items.yml").getConfigurationSection(itemMap.getNodeLocation().getCurrentPath() + ".skull-owner");
+		ConfigurationSection ownerSection = ConfigHandler.getConfig().getFile("items.yml").getConfigurationSection(itemMap.getNodeLocation().getCurrentPath() + ".skull-owner");
 		String owner = ItemHandler.getItem().cutDelay(itemMap.getNodeLocation().getString(".skull-owner"));
 		if (ownerSection != null) {
 			List<String> owners = new ArrayList<String>();
@@ -1146,7 +1146,7 @@ public class ItemDesigner {
  	* @param itemMap - The ItemMap being modified.
  	*/
 	private void setLegacyBookPages(final ItemMap itemMap) {
-		ConfigurationSection pagesSection = ConfigHandler.getConfig(false).getFile("items.yml").getConfigurationSection(itemMap.getNodeLocation().getCurrentPath() + ".pages");
+		ConfigurationSection pagesSection = ConfigHandler.getConfig().getFile("items.yml").getConfigurationSection(itemMap.getNodeLocation().getCurrentPath() + ".pages");
 		if (!ServerHandler.getServer().hasSpecificUpdate("1_8") && itemMap.getMaterial().toString().equalsIgnoreCase("WRITTEN_BOOK") 
 			&& itemMap.getNodeLocation().getString(".pages") != null && pagesSection != null) {
 			List < String > formattedPages = new ArrayList < String > ();

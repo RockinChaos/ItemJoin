@@ -172,7 +172,7 @@ public class Utils {
     * @return The Integer to be set as the auto generated item path.
     */
 	public int getPath(final int i) {
-		if (ConfigHandler.getConfig(false).getFile("items.yml").getString("items.item_" + i) != null) {
+		if (ConfigHandler.getConfig().getFile("items.yml").getString("items.item_" + i) != null) {
 			return this.getPath(i + 1);
 		}
 		return i;

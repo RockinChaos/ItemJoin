@@ -263,7 +263,7 @@ public class GuardAPI {
     * @param clearAll - If ALL items are being cleared.
     */
 	public void saveReturnItems(final Player player, final String region, final String type, final Inventory craftView, final PlayerInventory inventory, final boolean clearAll) {
-		boolean doReturn = Utils.getUtils().splitIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Options").replace(" ", ""), "RETURN", ",");
+		boolean doReturn = Utils.getUtils().splitIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Options").replace(" ", ""), "RETURN", ",");
 		List < ItemMap > protectItems = ItemUtilities.getUtilities().getProtectItems();
 		if (region != null && !region.isEmpty() && type.equalsIgnoreCase("REGION-ENTER") && doReturn) {
 			Inventory saveInventory = Bukkit.createInventory(null, 54);
@@ -287,7 +287,7 @@ public class GuardAPI {
     * @param region - The region the items were removed from.
     */
 	public void pasteReturnItems(final Player player, final String region) {
-		if (region != null && !region.isEmpty() && Utils.getUtils().splitIgnoreCase(ConfigHandler.getConfig(false).getFile("config.yml").getString("Clear-Items.Options").replace(" ", ""), "RETURN", ",")) {
+		if (region != null && !region.isEmpty() && Utils.getUtils().splitIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Options").replace(" ", ""), "RETURN", ",")) {
 			DataObject dataObject = SQL.getData().getData(new DataObject(Table.IJ_RETURN_ITEMS, PlayerHandler.getPlayer().getPlayerID(player), player.getWorld().getName(), region, ""));
 			Inventory inventory = (dataObject != null ? ItemHandler.getItem().deserializeInventory(dataObject.getInventory64().replace(region + ".", "")) : null);
 			for (int i = 47; i >= 0; i--) {

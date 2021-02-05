@@ -112,7 +112,7 @@ public class ConfigHandler {
     * Registers new instances of the plugin classes.
     * 
     */
-	private void registerClasses() {
+	private void registerClasses(boolean silent) {
 		final boolean reload = ItemJoin.getInstance().isStarted();
 		ServerHandler.getServer().clearErrorStatements();
 		this.copyFiles();
@@ -120,9 +120,11 @@ public class ConfigHandler {
 		ItemJoin.getInstance().setStarted(false);
 		SchedulerUtils.getScheduler().runAsync(() -> {
         	DependAPI.getDepends(true);
-        	DependAPI.getDepends(false).sendUtilityDepends();
-			int customItems = (ConfigHandler.getConfig(false).getConfigurationSection() != null ? ConfigHandler.getConfig(false).getConfigurationSection().getKeys(false).size() : 0);
-			ServerHandler.getServer().logInfo(customItems + " Custom item(s) loaded!");
+			int customItems = (ConfigHandler.getConfig().getConfigurationSection() != null ? ConfigHandler.getConfig().getConfigurationSection().getKeys(false).size() : 0);
+			if (!silent) { 
+				DependAPI.getDepends(false).sendUtilityDepends();
+				ServerHandler.getServer().logInfo(customItems + " Custom item(s) loaded!"); 
+			}
 			SQL.newData(reload); {
 				SchedulerUtils.getScheduler().runLater(2L, () -> {
 					ItemDesigner.getDesigner(true); {
@@ -327,8 +329,8 @@ public class ConfigHandler {
 	public void saveFile(final FileConfiguration dataFile, final File fileFolder, final String file) {
 		try {
 			dataFile.save(fileFolder); 
-			ConfigHandler.getConfig(false).getSource(file); 
-			ConfigHandler.getConfig(false).getFile(file).options().copyDefaults(false); 
+			ConfigHandler.getConfig().getSource(file); 
+			ConfigHandler.getConfig().getFile(file).options().copyDefaults(false); 
 		} catch (Exception e) { 
 			ItemJoin.getInstance().getServer().getLogger().severe("Could not save data to the " + file + " data file!"); 
 			ServerHandler.getServer().sendDebugTrace(e); 
@@ -349,11 +351,12 @@ public class ConfigHandler {
     * Properly reloads the configuration files.
     * 
     */
-	public void reloadConfigs() {
+	public void reloadConfigs(boolean silent) {
 		SQL.getData().executeLaterStatements();
 		ItemUtilities.getUtilities().closeAnimations();
 		ItemUtilities.getUtilities().clearItems();
-		ConfigHandler.getConfig(true);
+		config = new ConfigHandler(); 
+        config.registerClasses(silent);
 	}
 	
    /**
@@ -659,13 +662,12 @@ public class ConfigHandler {
    /**
     * Gets the instance of the ConfigHandler.
     * 
-    * @param regen - If the instance should be regenerated.
     * @return The ConfigHandler instance.
     */
-    public static ConfigHandler getConfig(final boolean regen) { 
-        if (config == null || regen) {
+    public static ConfigHandler getConfig() { 
+        if (config == null) {
         	config = new ConfigHandler(); 
-        	config.registerClasses();
+        	config.registerClasses(false);
         }
         return config; 
     } 

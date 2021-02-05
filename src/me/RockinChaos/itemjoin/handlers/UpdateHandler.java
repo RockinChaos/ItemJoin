@@ -48,7 +48,7 @@ public class UpdateHandler {
     private File jarRef;
     private int BYTE_SIZE = 2048;
     
-    private boolean updatesAllowed = ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("General.CheckforUpdates");
+    private boolean updatesAllowed = ConfigHandler.getConfig().getFile("config.yml").getBoolean("General.CheckforUpdates");
     
     private static UpdateHandler updater;
         

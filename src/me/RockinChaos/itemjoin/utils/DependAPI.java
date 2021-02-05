@@ -225,7 +225,7 @@ public class DependAPI {
     */
 	public void addCustomCharts(Metrics metrics) {
 		metrics.addCustomChart(new Metrics.SimplePie("items", ItemUtilities.getUtilities().getItems().size() + " "));
-		metrics.addCustomChart(new Metrics.SimplePie("itemPermissions", ConfigHandler.getConfig(false).getFile("config.yml").getBoolean("Permissions.Obtain-Items") ? "True" : "False"));
+		metrics.addCustomChart(new Metrics.SimplePie("itemPermissions", ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Obtain-Items") ? "True" : "False"));
 		metrics.addCustomChart(new Metrics.SimplePie("language", LanguageAPI.getLang(false).getLanguage()));
 		metrics.addCustomChart(new Metrics.SimplePie("softDepend", DependAPI.getDepends(false).authMeEnabled() ? "AuthMe" : ""));
 		metrics.addCustomChart(new Metrics.SimplePie("softDepend", DependAPI.getDepends(false).nickEnabled() ? "BetterNick" : ""));
