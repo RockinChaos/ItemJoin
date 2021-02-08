@@ -70,6 +70,7 @@ Active-Commands:
   commands:
     - 'itemjoin get <item> <player>'
     - 'first-join: say This is a command only executed once per world, per player.'
+  commands-sequence: SEQUENTIAL
   triggers: JOIN
   enabled-worlds: DISABLED
 

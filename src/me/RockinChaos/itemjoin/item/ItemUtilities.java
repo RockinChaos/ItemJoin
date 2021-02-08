@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
+
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -754,7 +756,10 @@ public class ItemUtilities {
 			String[] compareWorlds = commandsWorlds.split(",");
 			for (String compareWorld: compareWorlds) {
 				if (compareWorld.equalsIgnoreCase(player.getWorld().getName()) || compareWorld.equalsIgnoreCase("ALL") || compareWorld.equalsIgnoreCase("GLOBAL")) {
-					for (String commands: ConfigHandler.getConfig().getFile("config.yml").getStringList("Active-Commands.commands")) {
+					HashMap<Integer, String> commandMap = new HashMap<Integer, String>();
+					for (String cmd : ConfigHandler.getConfig().getFile("config.yml").getStringList("Active-Commands.commands")) { commandMap.put(Utils.getUtils().getRandom(1, 100000), cmd); }
+					List<String> commandList = this.getRandomMap(commandMap, player);
+					for (String commands: commandList) {
 						String formatCommand = Utils.getUtils().translateLayout(commands, player).replace("first-join: ", "").replace("first-join:", "");
 						DataObject dataObject = SQL.getData().getData(new DataObject(Table.IJ_FIRST_COMMANDS, PlayerHandler.getPlayer().getPlayerID(player), player.getWorld().getName(), formatCommand));
 						if (!(dataObject != null && (Utils.getUtils().containsIgnoreCase(commands, "first-join:") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Active-Commands.triggers"), TriggerType.FIRST_JOIN.name)))) {
@@ -769,6 +774,26 @@ public class ItemUtilities {
 			}
 		}
 	}
+	
+   /**
+    * Randomly Selected a Command Entry for a Single Command.
+    * 
+    * @param commands - The commands to have an entry randomly selected.
+    * @param player - The Player having their commands randomly selected.
+    * @return The newly generated ArrayList.
+    */
+    private List<String> getRandomMap(final HashMap<?, ?> commands, final Player player) {
+    	final String commandSequence = ConfigHandler.getConfig().getFile("config.yml").getString("Active-Commands.commands-sequence");
+    	if (commandSequence != null && commandSequence.replace(" ", "").equalsIgnoreCase("RANDOM_SINGLE")) {
+	    	Entry<?, ?> dedicatedMap = Utils.getUtils().randomEntry(commands);
+	    	if (dedicatedMap != null && dedicatedMap.getValue() != null && player != null) {
+	    		List<String> returnList = new ArrayList<String>();
+	    		returnList.add(((String)dedicatedMap.getValue()));
+	    		return returnList;
+	    	}
+    	}
+    	return ConfigHandler.getConfig().getFile("config.yml").getStringList("Active-Commands.commands");
+    }
 	
    /**
     * Gets the ItemDelay.
