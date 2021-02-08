@@ -425,14 +425,21 @@ public class ItemCommand {
 		try {
 			for (ItemMap item : ItemUtilities.getUtilities().getItems()) {
 				if (item.getConfigName().equalsIgnoreCase(this.command) && slot != null) {
-					ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(this.itemCopy, null, player.getWorld());
-					if (itemMap != null) { item.removeDisposable(player, itemMap, this.itemCopy, true); }
-					item.swapItem(player, slot);
+					boolean itemExists = false;
+					for (ItemCommand command : this.itemMap.getCommands()) {
+						if (command.executorType == Executor.SWAPITEM && this.matchAction(command.actionType)) {
+							ItemMap commandMap = ItemUtilities.getUtilities().getItemMap(null, command.command, null);
+							if (commandMap != null) {
+								if (!itemExists) { itemExists = commandMap.hasItem(player); }
+								commandMap.removeDisposable(player, commandMap, commandMap.getItem(player), true); 
+							}
+						}
+					}
+					if (itemExists) { item.swapItem(player, slot); }
 					break;
 				}
 			}
-		} 
-		catch (Exception e) {
+		} catch (Exception e) {
 			ServerHandler.getServer().logSevere("{ItemCommand} There was an error executing an item's command to swap an items attributes, if this continues report it to the developer.");
 			ServerHandler.getServer().sendDebugTrace(e);
 		}

@@ -3454,7 +3454,7 @@ public class ItemMap {
 				}
 			}
 		}
-		return false;
+		return (player.getItemOnCursor() != null && player.getItemOnCursor().getType() != Material.AIR && this.isSimilar(player.getItemOnCursor()) && this.isCountSimilar(player.getItemOnCursor()));
 	}
 	
    /**
