@@ -882,7 +882,7 @@ public class UI {
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				this.creatingPane(event.getPlayer(), itemMap);
 			}));
-			creatingPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "GRASS_BLOCK" : "2"), 1, false, "&b&lEnabled Worlds", "&7", "&7*Define the world(s) that the", "&7item will be given in.", 
+			creatingPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_8") ? "GRASS_BLOCK" : "2"), 1, false, "&b&lEnabled Worlds", "&7", "&7*Define the world(s) that the", "&7item will be given in.", 
 					"&9&lENABLED-WORLDS: &a" + (Utils.getUtils().nullCheck(itemMap.getEnabledWorlds().toString()) != "NONE" ? "&a" + worldList : "NONE")), event -> this.worldPane(player, itemMap)));
 			creatingPane.addButton(new Button(ItemHandler.getItem().getItem("GOLD_BLOCK", 1, true, "&b&lEnabled Regions", "&7", "&7*Define the region(s) that the", "&7item will be given in.", (DependAPI.getDepends(false).getGuard().guardEnabled() ? 
 					"&9&lENABLED-REGIONS: &a" + (Utils.getUtils().nullCheck(itemMap.getEnabledRegions().toString()) != "NONE" ? "&a" + regionList : "NONE") : ""), (DependAPI.getDepends(false).getGuard().guardEnabled() ? "" : "&7"), 
@@ -1149,7 +1149,7 @@ public class UI {
 		SchedulerUtils.getScheduler().runAsync(() -> {
 			final String language = ConfigHandler.getConfig().getFile("config.yml").getString("Language").replace(" ", "");
 			languagePane.addButton(new Button(this.fillerPaneBItem));
-			languagePane.addButton(new Button(ItemHandler.getItem().getItem("GRASS_BLOCK", 1, language.equalsIgnoreCase("ENGLISH"), "&6&l&nEnglish", "&7", 
+			languagePane.addButton(new Button(ItemHandler.getItem().getItem(ServerHandler.getServer().hasSpecificUpdate("1_8") ? "GRASS_BLOCK" : "2", 1, language.equalsIgnoreCase("ENGLISH"), "&6&l&nEnglish", "&7", 
 			"&7*Sets the messages sent by", "&7the plugin to the player", "&7to be written in &c&lEnglish&7.", "&7This is the type of lang.yml file", "&7generated in the plugin folder.", 
 			"&9&lENABLED: &a" + (language.equalsIgnoreCase("ENGLISH") + "").toUpperCase()), event -> {
 				if (!language.equalsIgnoreCase("ENGLISH")) {
@@ -1198,7 +1198,7 @@ public class UI {
 					SchedulerUtils.getScheduler().runLater(2L, () -> this.languagePane(player));
 				}
 			}));
-			languagePane.addButton(new Button(ItemHandler.getItem().getItem("1:3", 1, language.equalsIgnoreCase("TRADITIONALCHINESE"), "&6&l&nTraditional Chinese", "&7", 
+			languagePane.addButton(new Button(ItemHandler.getItem().getItem(ServerHandler.getServer().hasSpecificUpdate("1_8") ? "1:3" : "5", 1, language.equalsIgnoreCase("TRADITIONALCHINESE"), "&6&l&nTraditional Chinese", "&7", 
 			"&7*Sets the messages sent by", "&7the plugin to the player", "&7to be written in &c&lTraditional Chinese&7.", "&7This is the type of lang.yml file", "&7generated in the plugin folder.", 
 			"&9&lENABLED: &a" + (language.equalsIgnoreCase("TRADITIONALCHINESE") + "").toUpperCase()), event -> {
 				if (!language.equalsIgnoreCase("TRADITIONALCHINESE")) {
@@ -1210,7 +1210,7 @@ public class UI {
 					SchedulerUtils.getScheduler().runLater(2L, () -> this.languagePane(player));
 				}
 			}));
-			languagePane.addButton(new Button(ItemHandler.getItem().getItem("1:4", 1, language.equalsIgnoreCase("SIMPLIFIEDCHINESE"), "&6&l&nSimplified Chinese", "&7", 
+			languagePane.addButton(new Button(ItemHandler.getItem().getItem(ServerHandler.getServer().hasSpecificUpdate("1_8") ? "1:4" : "5:3", 1, language.equalsIgnoreCase("SIMPLIFIEDCHINESE"), "&6&l&nSimplified Chinese", "&7", 
 			"&7*Sets the messages sent by", "&7the plugin to the player", "&7to be written in &c&lSimplified Chinese&7.", "&7This is the type of lang.yml file", "&7generated in the plugin folder.", 
 			"&9&lENABLED: &a" + (language.equalsIgnoreCase("SIMPLIFIEDCHINESE") + "").toUpperCase()), event -> {
 				if (!language.equalsIgnoreCase("SIMPLIFIEDCHINESE")) {
@@ -1384,7 +1384,7 @@ public class UI {
 				}
 			}
 			triggerPane.addButton(new Button(this.fillerPaneBItem));
-			triggerPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "OAK_SIGN" : "SIGN"), 1, Utils.getUtils().containsValue(triggers, "JOIN"), "&e&l&nJoin", "&7", 
+			triggerPane.addButton(new Button(ItemHandler.getItem().getItem("323", 1, Utils.getUtils().containsValue(triggers, "JOIN"), "&e&l&nJoin", "&7", 
 					"&7*Sets the held item slot", "&7upon joinning the server.", 
 			"&9&lENABLED: &a" + (Utils.getUtils().containsValue(triggers, "JOIN") + "").toUpperCase()), event -> {
 				if (Utils.getUtils().containsValue(triggers, "JOIN")) {
@@ -1654,7 +1654,7 @@ public class UI {
 						}
 					}));
 			clearPane.addButton(new Button(this.fillerPaneBItem), 3);
-			clearPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "OAK_SIGN" : "SIGN"), 1, false, 
+			clearPane.addButton(new Button(ItemHandler.getItem().getItem("323", 1, false, 
 					"&c&l&nJoin", "&7", "&7*Clears the items from the", "&7player upon joining the server.", 
 					"&9&lENABLED: &a" + ((!Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Join"), "DISABLE") ? 
 					ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Join") : "FALSE")).toUpperCase()), 
@@ -2349,7 +2349,7 @@ public class UI {
 					SchedulerUtils.getScheduler().runLater(2L, () -> this.worldPane(player, section));
 			}));
 			for (World world: Bukkit.getServer().getWorlds()) {
-				String worldMaterial = (ServerHandler.getServer().hasSpecificUpdate("1_13") ? "GRASS_BLOCK" : "2");
+				String worldMaterial = (ServerHandler.getServer().hasSpecificUpdate("1_8") ? "GRASS_BLOCK" : "2");
 				if (world.getEnvironment().equals(Environment.NETHER)) {
 					worldMaterial = "NETHERRACK";
 				} else if (world.getEnvironment().equals(Environment.THE_END)) {
@@ -2424,7 +2424,7 @@ public class UI {
 					SchedulerUtils.getScheduler().runLater(2L, () -> this.overwritePane(player));
 			}));
 			for (World world: Bukkit.getServer().getWorlds()) {
-				String worldMaterial = (ServerHandler.getServer().hasSpecificUpdate("1_13") ? "GRASS_BLOCK" : "2");
+				String worldMaterial = (ServerHandler.getServer().hasSpecificUpdate("1_8") ? "GRASS_BLOCK" : "2");
 				if (world.getEnvironment().equals(Environment.NETHER)) {
 					worldMaterial = "NETHERRACK";
 				} else if (world.getEnvironment().equals(Environment.THE_END)) {
@@ -3251,7 +3251,7 @@ public class UI {
 					this.cooldownPane(player, itemMap);
 				}
 			}));
-			commandPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "OAK_SIGN" : "SIGN"), 1, false, "&a&lCooldown Message", "&7", "&7*Optional cooldown message", "&7to be displayed when", "&7the items commands are", 
+			commandPane.addButton(new Button(ItemHandler.getItem().getItem("323", 1, false, "&a&lCooldown Message", "&7", "&7*Optional cooldown message", "&7to be displayed when", "&7the items commands are", 
 					"&7on cooldown.", "&9&lCOOLDOWN-MESSAGE: &a" + Utils.getUtils().nullCheck(itemMap.getCooldownMessage())), event -> {
 				if (Utils.getUtils().nullCheck(itemMap.getCooldownMessage()) != "NONE") {
 					itemMap.setCooldownMessage(null);
@@ -3312,7 +3312,7 @@ public class UI {
 		Interface clickPane = new Interface(false, 5, this.GUIName, player);
 		SchedulerUtils.getScheduler().runAsync(() -> {
 			clickPane.addButton(new Button(this.fillerPaneGItem), 2);
-			clickPane.addButton(new Button(ItemHandler.getItem().getItem("64", 1, false, "&e&lInteract", "&7", "&7*Commands that will execute only", "&7when left and right clicking.", "&7", "&9&lCommands: &a" + 
+			clickPane.addButton(new Button(ItemHandler.getItem().getItem(ServerHandler.getServer().hasSpecificUpdate("1_8") ? "324" : "64", 1, false, "&e&lInteract", "&7", "&7*Commands that will execute only", "&7when left and right clicking.", "&7", "&9&lCommands: &a" + 
 			this.listCommands(itemMap, Action.INTERACT_ALL)), event -> {
 				this.commandListPane(player, itemMap, Action.INTERACT_ALL);
 			}));
@@ -3379,7 +3379,7 @@ public class UI {
 			this.listCommands(itemMap, Action.INTERACT_LEFT_ALL)), event -> {
 				this.commandListPane(player, itemMap, Action.INTERACT_LEFT_ALL);
 			}));
-			clickPane.addButton(new Button(ItemHandler.getItem().getItem("64", 1, false, "&e&lInteract-Right", "&7", "&7*Commands that will execute only", "&7when right clicking.", "&7", "&9&lCommands: &a" + 
+			clickPane.addButton(new Button(ItemHandler.getItem().getItem(ServerHandler.getServer().hasSpecificUpdate("1_8") ? "324" : "64", 1, false, "&e&lInteract-Right", "&7", "&7*Commands that will execute only", "&7when right clicking.", "&7", "&9&lCommands: &a" + 
 			this.listCommands(itemMap, Action.INTERACT_RIGHT_ALL)), event -> {
 				this.commandListPane(player, itemMap, Action.INTERACT_RIGHT_ALL);
 			}));
@@ -4511,7 +4511,7 @@ public class UI {
 				}
 				this.flagPane(player, itemMap);
 			}));
-			flagPane.addButton(new Button(ItemHandler.getItem().getItem("324", 1, itemMap.isCountLock(), "&a&l&nCount Lock", "&7", 
+			flagPane.addButton(new Button(ItemHandler.getItem().getItem(ServerHandler.getServer().hasSpecificUpdate("1_8") ? "324" : "64", 1, itemMap.isCountLock(), "&a&l&nCount Lock", "&7", 
 					"&a&lTrue&f:&7 The item can be used indefinitely.", "&7Useful to give a player infinite apples.", "&cNOTE: &7This will overwrite the disposable flag.", "&7",
 					"&c&lFalse&f:&7 The item will be removed from the inventory on use.", "&7", 
 					"&9&lENABLED: &a" + (itemMap.isCountLock() + "").toUpperCase()), event -> {
@@ -4756,7 +4756,7 @@ public class UI {
 				}
 				this.triggerPane(player, itemMap);
 			}));
-			triggerPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "OAK_SIGN" : "SIGN"), 1, itemMap.isGiveOnJoin(), "&e&l&nJoin", "&7", "&7*Gives the item when the", "&7player logs into the server.", 
+			triggerPane.addButton(new Button(ItemHandler.getItem().getItem("323", 1, itemMap.isGiveOnJoin(), "&e&l&nJoin", "&7", "&7*Gives the item when the", "&7player logs into the server.", 
 					"&9&lENABLED: &a" + (itemMap.isGiveOnJoin() + "").toUpperCase()), event -> {
 				if (itemMap.isGiveOnJoin()) {
 					itemMap.setGiveOnJoin(false);
@@ -4895,7 +4895,7 @@ public class UI {
 				itemMap.setEnabledWorlds(enabledWorlds);this.worldPane(player, itemMap);
 			}));
 			for (World world: Bukkit.getServer().getWorlds()) {
-				String worldMaterial = (ServerHandler.getServer().hasSpecificUpdate("1_13") ? "GRASS_BLOCK" : "2");
+				String worldMaterial = (ServerHandler.getServer().hasSpecificUpdate("1_8") ? "GRASS_BLOCK" : "2");
 				if (world.getEnvironment().equals(Environment.NETHER)) {
 					worldMaterial = "NETHERRACK";
 				} else if (world.getEnvironment().equals(Environment.THE_END)) {
@@ -4940,7 +4940,7 @@ public class UI {
 			}));
 			for (World world: Bukkit.getServer().getWorlds()) {
 				for (String region: DependAPI.getDepends(false).getGuard().getRegions(world).keySet()) {
-					String regionMaterial = (ServerHandler.getServer().hasSpecificUpdate("1_13") ? "GRASS_BLOCK" : "2");
+					String regionMaterial = (ServerHandler.getServer().hasSpecificUpdate("1_8") ? "GRASS_BLOCK" : "2");
 					if (world.getEnvironment().equals(Environment.NETHER)) {
 						regionMaterial = "NETHERRACK";
 					} else if (world.getEnvironment().equals(Environment.THE_END)) {
@@ -6258,7 +6258,7 @@ public class UI {
 		Interface commandPane = new Interface(false, 5, this.GUIName, player);
 		SchedulerUtils.getScheduler().runAsync(() -> {
 			commandPane.addButton(new Button(this.fillerPaneGItem), 2);
-			commandPane.addButton(new Button(ItemHandler.getItem().getItem("324", 1, false, "&e&lInteract", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+			commandPane.addButton(new Button(ItemHandler.getItem().getItem(ServerHandler.getServer().hasSpecificUpdate("1_8") ? "324" : "64", 1, false, "&e&lInteract", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
 					"&7", "&9&lENABLED: &a" + (Utils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.INTERACT_ALL.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				this.commandCPane(player, itemMap, Action.INTERACT_ALL);
 			}));
@@ -6325,7 +6325,7 @@ public class UI {
 					"&7", "&9&lENABLED: &a" + (Utils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.INTERACT_LEFT_ALL.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				this.commandCPane(player, itemMap, Action.INTERACT_LEFT_ALL);
 			}));
-			commandPane.addButton(new Button(ItemHandler.getItem().getItem("324", 1, false, "&e&lInteract-Right", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+			commandPane.addButton(new Button(ItemHandler.getItem().getItem(ServerHandler.getServer().hasSpecificUpdate("1_8") ? "324" : "64", 1, false, "&e&lInteract-Right", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
 					"&7", "&9&lENABLED: &a" + (Utils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.INTERACT_RIGHT_ALL.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				this.commandCPane(player, itemMap, Action.INTERACT_RIGHT_ALL);
 			}));

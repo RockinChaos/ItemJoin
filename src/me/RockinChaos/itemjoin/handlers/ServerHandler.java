@@ -45,11 +45,20 @@ public class ServerHandler {
     * @return If the server version is greater than or equal to the specified version.
     */
 	public boolean hasSpecificUpdate(final String versionString) {
-		if (Integer.parseInt(serverVersion) >= Integer.parseInt(versionString.replace("_", ""))) {
+		if (Integer.parseInt(this.serverVersion) >= Integer.parseInt(versionString.replace("_", ""))) {
 			return true;
 		}
 		return false;
 	}
+
+    /**
+     * Checks if the server supports UUIDS.
+     *
+     * @return If the server supports UUIDs.
+     */
+    public boolean isUUIDCompatible() {
+        return this.hasSpecificUpdate("1_8");
+    }
 	
    /**
     * Sends a low priority log message as the plugin header.
