@@ -161,10 +161,13 @@ public class Commands implements Listener {
     public void onDamage(EntityDamageByEntityEvent event){
 		Player player = ((event.getEntity() instanceof Player) ? (Player)event.getEntity() : (event.getDamager() instanceof Player) ? (Player)event.getDamager() : null);
 		if (player != null) {
-			final ItemStack item = PlayerHandler.getPlayer().getHandItem(player);
-			final int slot = player.getInventory().getHeldItemSlot();
-			if (item != null && item.getType() != Material.AIR && !PlayerHandler.getPlayer().isMenuClick(player.getOpenInventory(), Action.LEFT_CLICK_AIR)) {
-				this.runCommands(player, item, "ON_DAMAGE", "DAMAGED", Integer.toString(slot));
+			for (int i = 0; i < player.getInventory().getSize(); i++) {
+				this.handleOnDamage(player, String.valueOf(i));
+			}
+			if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
+				for (int i = 0; i < player.getOpenInventory().getTopInventory().getSize(); i++) {
+					this.handleOnDamage(player, "CR" + i);
+				}
 			}
 		}
     }
@@ -261,6 +264,19 @@ public class Commands implements Listener {
 					this.itemDrop.remove(PlayerHandler.getPlayer().getPlayerID(event.getPlayer()));
 				}
 			});
+		}
+	}
+	
+   /**
+	* Runs the on damage commands.
+	* 
+	* @param player - The player being damaged or damaging an entity.
+	* @param slot - The slot being checked.
+	*/
+	public void handleOnDamage(final Player player, final String slot) {
+		final ItemStack item = (slot.startsWith("CR") ? player.getOpenInventory().getTopInventory().getItem(Integer.valueOf(slot.replace("CR", ""))) : player.getInventory().getItem(Integer.valueOf(slot)));
+		if (item != null && item.getType() != Material.AIR && !PlayerHandler.getPlayer().isMenuClick(player.getOpenInventory(), Action.LEFT_CLICK_AIR)) {
+			this.runCommands(player, item, "ON_DAMAGE", "DAMAGED", slot.replace("CR", ""));
 		}
 	}
 	
