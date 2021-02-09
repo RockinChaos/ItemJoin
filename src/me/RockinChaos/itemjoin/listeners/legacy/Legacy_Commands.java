@@ -184,6 +184,23 @@ public class Legacy_Commands implements Listener {
     }
 	
    /**
+	* Runs the on_hit commands for the custom item upon damaging an entity.
+	* 
+	* @param event - EntityDamageByEntityEvent
+	*/
+	@EventHandler(ignoreCancelled = false)
+    public void onHit(EntityDamageByEntityEvent event){
+		Player player = ((event.getDamager() instanceof Player) ? (Player)event.getDamager() : null);
+		if (player != null) {
+			final ItemStack item = PlayerHandler.getPlayer().getHandItem(player);
+			final int slot = player.getInventory().getHeldItemSlot();
+			if (item != null && item.getType() != Material.AIR && !PlayerHandler.getPlayer().isMenuClick(player.getOpenInventory(), Action.LEFT_CLICK_AIR)) {
+				this.runCommands(player, item, "ON_HIT", "HIT", Integer.toString(slot));
+			}
+		}
+    }
+	
+   /**
 	* Runs the commands upon right or left clicking the custom item on an entity.
 	* 
 	* @param event - PlayerInteractEntityEvent

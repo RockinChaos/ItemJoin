@@ -3395,7 +3395,6 @@ public class UI {
 			this.listCommands(itemMap, Action.INVENTORY_CREATIVE)), event -> {
 				this.commandListPane(player, itemMap, Action.INVENTORY_CREATIVE);
 			}));
-			clickPane.addButton(new Button(this.fillerPaneGItem));
 			clickPane.addButton(new Button(ItemHandler.getItem().getItem("ENDER_CHEST", 1, false, "&e&lInventory-Left", "&7", "&7*Commands that will execute only", "&7when cursor left clicking the item.", "&7", "&9&lCommands: &a" + 
 			this.listCommands(itemMap, Action.INVENTORY_LEFT)), event -> {
 				this.commandListPane(player, itemMap, Action.INVENTORY_LEFT);
@@ -3413,9 +3412,13 @@ public class UI {
 				this.commandListPane(player, itemMap, Action.INVENTORY_SHIFT_RIGHT);
 			}));
 			clickPane.addButton(new Button(this.fillerPaneGItem));
-			clickPane.addButton(new Button(ItemHandler.getItem().getItem("DIAMOND_SWORD", 1, false, "&e&lOn-Damage", "&7", "&7*Commands that will execute only", "&7when the player damages an", "&7entity or is damaged by an", "&7entity while holding the item.", "&7", "&9&lCommands: &a" + 
+			clickPane.addButton(new Button(ItemHandler.getItem().getItem("LAVA_BUCKET", 1, false, "&e&lOn-Damage", "&7", "&7*Commands that will execute only", "&7when the player damages an", "&7entity or is damaged by an", "&7entity with the item in", "&7their inventory.", "&7", "&9&lCommands: &a" + 
 			this.listCommands(itemMap, Action.ON_DAMAGE)), event -> {
 				this.commandListPane(player, itemMap, Action.ON_DAMAGE);
+			}));
+			clickPane.addButton(new Button(ItemHandler.getItem().getItem("DIAMOND_SWORD", 1, false, "&e&lOn-Hit", "&7", "&7*Commands that will execute only", "&7when the player damages an", "&7entity while holding the item.", "&7", "&9&lCommands: &a" + 
+			this.listCommands(itemMap, Action.ON_HIT)), event -> {
+				this.commandListPane(player, itemMap, Action.ON_HIT);
 			}));
 			clickPane.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item commands menu."), event -> this.commandPane(player, itemMap)));
 			clickPane.addButton(new Button(this.fillerPaneBItem), 7);
@@ -4004,23 +4007,30 @@ public class UI {
 	private void sequencePane(final Player player, final ItemMap itemMap) {
 		Interface sequencePane = new Interface(false, 2, this.GUIName, player);
 		SchedulerUtils.getScheduler().runAsync(() -> {
-			sequencePane.addButton(new Button(this.fillerPaneGItem));
 			sequencePane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "CLOCK" : "347"), 1, false, "&a&lSequential", "&7", "&7*Executes the command lines", "&7in order from top to bottom."), event -> {
-				itemMap.setCommandSequence(CommandSequence.SEQUENTIAL);this.commandPane(player, itemMap);
+				itemMap.setCommandSequence(CommandSequence.SEQUENTIAL);
+				this.commandPane(player, itemMap);
 			}));
 			sequencePane.addButton(new Button(this.fillerPaneGItem));
 			sequencePane.addButton(new Button(ItemHandler.getItem().getItem("DIAMOND", 1, false, "&a&lRandom Single", "&7", "&7*Executes one of the command lines", "&7randomly with equal values."), event -> {
-				itemMap.setCommandSequence(CommandSequence.RANDOM_SINGLE); this.commandPane(player, itemMap);
+				itemMap.setCommandSequence(CommandSequence.RANDOM_SINGLE);
+				this.commandPane(player, itemMap);
 			}));
 			sequencePane.addButton(new Button(this.fillerPaneGItem));
 			sequencePane.addButton(new Button(ItemHandler.getItem().getItem("PAPER", 1, false, "&a&lRandom List", "&7", "&7*Randomly selects from a list", "&7of commands to execute."), event -> {
-				itemMap.setCommandSequence(CommandSequence.RANDOM_LIST); this.commandPane(player, itemMap);
+				itemMap.setCommandSequence(CommandSequence.RANDOM_LIST);
+				this.commandPane(player, itemMap);
 			}));
 			sequencePane.addButton(new Button(this.fillerPaneGItem));
 			sequencePane.addButton(new Button(ItemHandler.getItem().getItem("EMERALD", 1, false, "&a&lRandom", "&7", "&7*Executes each command line in a", "&7random order with equal values."), event -> {
-				itemMap.setCommandSequence(CommandSequence.RANDOM);this.commandPane(player, itemMap);
+				itemMap.setCommandSequence(CommandSequence.RANDOM);
+				this.commandPane(player, itemMap);
 			}));
 			sequencePane.addButton(new Button(this.fillerPaneGItem));
+			sequencePane.addButton(new Button(ItemHandler.getItem().getItem("CHEST", 1, false, "&a&lRemain", "&7", "&7*Executes each command only if", "&7the item exists in the player", "&7inventory at the time of executing", "&7a delayed command line."), event -> {
+				itemMap.setCommandSequence(CommandSequence.REMAIN);
+				this.commandPane(player, itemMap);
+			}));
 			sequencePane.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item commands menu."), event -> this.commandPane(player, itemMap)));
 			sequencePane.addButton(new Button(this.fillerPaneBItem), 7);
 			sequencePane.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item commands menu."), event -> this.commandPane(player, itemMap)));
@@ -6341,7 +6351,6 @@ public class UI {
 					"&7", "&9&lENABLED: &a" + (Utils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.INVENTORY_CREATIVE.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				this.commandCPane(player, itemMap, Action.INVENTORY_CREATIVE);
 			}));
-			commandPane.addButton(new Button(this.fillerPaneGItem));
 			commandPane.addButton(new Button(ItemHandler.getItem().getItem("ENDER_CHEST", 1, false, "&e&lInventory-Left", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
 					"&7", "&9&lENABLED: &a" + (Utils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.INVENTORY_LEFT.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				this.commandCPane(player, itemMap, Action.INVENTORY_LEFT);
@@ -6359,9 +6368,13 @@ public class UI {
 				this.commandCPane(player, itemMap, Action.INVENTORY_SHIFT_RIGHT);
 			}));
 			commandPane.addButton(new Button(this.fillerPaneGItem));
-			commandPane.addButton(new Button(ItemHandler.getItem().getItem("DIAMOND_SWORD", 1, false, "&e&lOn-Damage", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+			commandPane.addButton(new Button(ItemHandler.getItem().getItem("LAVA_BUCKET", 1, false, "&e&lOn-Damage", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
 					"&7", "&9&lENABLED: &a" + (Utils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.ON_DAMAGE.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				this.commandCPane(player, itemMap, Action.ON_DAMAGE);
+			}));
+			commandPane.addButton(new Button(ItemHandler.getItem().getItem("DIAMOND_SWORD", 1, false, "&e&lOn-Hit", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+					"&7", "&9&lENABLED: &a" + (Utils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.ON_HIT.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
+				this.commandCPane(player, itemMap, Action.ON_HIT);
 			}));
 			commandPane.addButton(new Button(ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item conditions menu."), event -> this.conditionsPane(player, itemMap)));
 			commandPane.addButton(new Button(this.fillerPaneBItem), 7);
