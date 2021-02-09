@@ -25,8 +25,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
@@ -42,7 +40,6 @@ public class ItemCommand {
 	private int cycleTask = 0;
 	private String command;
 	private String listSection;
-	private ItemStack itemCopy;
 	private Executor executorType;
 	private Action actionType;
 	private ItemMap itemMap;
@@ -253,15 +250,6 @@ public class ItemCommand {
 	}
 	
    /**
-	* Sets the Swap Item ItemStack to be removed.
-	* 
-	* @param itemCopy - The ItemStack to be removed.
-	*/
-	public void setItem(final ItemStack itemCopy) {
-		this.itemCopy = itemCopy.clone();
-	}
-	
-   /**
 	* Checks if the dispatched command is allowed execution.
 	* Prevents the command from being executed if the player is offline or dead.
 	* 
@@ -292,9 +280,9 @@ public class ItemCommand {
 		SchedulerUtils.getScheduler().runLater(this.delay, () -> {
 			this.allowDispatch(player, world);
 			this.setPending(player, false);
-			ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(this.itemCopy, null, player.getWorld());
-			if ((this.actionType.equals(Action.ON_DEATH) || !player.isDead()) && ((itemMap != null && ((this.actionType.equals(Action.ON_HOLD) && itemMap.isSimilar(PlayerHandler.getPlayer().getMainHandItem(player))) 
-				|| (this.actionType.equals(Action.ON_RECEIVE) && itemMap.hasItem(player)))) || (!this.actionType.equals(Action.ON_HOLD) && !this.actionType.equals(Action.ON_RECEIVE))) 
+			if ((this.actionType.equals(Action.ON_DEATH) || !player.isDead()) && ((this.itemMap != null && ((this.actionType.equals(Action.ON_HOLD) && this.itemMap.isSimilar(PlayerHandler.getPlayer().getMainHandItem(player))) 
+				|| (this.actionType.equals(Action.ON_RECEIVE) && this.itemMap.hasItem(player)))) || (!this.actionType.equals(Action.ON_HOLD) && !this.actionType.equals(Action.ON_RECEIVE))) 
+				&& ((this.itemMap.getCommandSequence() == CommandSequence.REMAIN && this.itemMap.hasItem(player)) || this.itemMap.getCommandSequence() != CommandSequence.REMAIN)
 				&& (player.isOnline() && player.getWorld() == world && !this.getExecute(player))) {
 				switch (cmdtype) {
 					case CONSOLE: this.dispatchConsoleCommands(player); break;
@@ -617,6 +605,7 @@ public class ItemCommand {
 		UN_EQUIP(".un-equip", "UN_EQUIP", "UNEQUIPPED"),
 		ON_DEATH(".on-death", "ON_DEATH", "DEAD"),
 		ON_DAMAGE(".on-damage", "ON_DAMAGE", "DAMAGED"),
+		ON_HIT(".on-hit", "ON_HIT", "HIT"),
 		ON_RECEIVE(".on-receive", "ON_RECEIVE", "RECEIVED"),
 		PHYSICAL(".physical", "PHYSICAL", "INTERACTED");
 		
@@ -634,5 +623,5 @@ public class ItemCommand {
 	* Defines the Sequence for the command.
 	* 
 	*/
-	public enum CommandSequence { RANDOM, RANDOM_SINGLE, RANDOM_LIST, SEQUENTIAL, ALL; }
+	public enum CommandSequence { RANDOM, RANDOM_SINGLE, RANDOM_LIST, REMAIN, SEQUENTIAL, ALL; }
 }
