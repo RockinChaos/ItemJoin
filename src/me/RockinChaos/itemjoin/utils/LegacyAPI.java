@@ -23,14 +23,17 @@ import java.util.EnumSet;
 import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.SkullType;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.Skull;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
-
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
@@ -203,6 +206,22 @@ public class LegacyAPI {
     */
 	public org.bukkit.inventory.meta.ItemMeta setSkullOwner(final org.bukkit.inventory.meta.SkullMeta skullMeta, final String owner) {
 		skullMeta.setOwner(owner);
+		if (!ServerHandler.getServer().hasSpecificUpdate("1_13") && ServerHandler.getServer().hasSpecificUpdate("1_8")) {
+			Location loc = new Location(Bukkit.getWorlds().get(0), 200, 1, 200);
+			BlockState blockState = loc.getBlock().getState();
+			try {
+				loc.getBlock().setType(Material.valueOf("SKULL"));
+				Skull skull = (Skull)loc.getBlock().getState();
+				skull.setSkullType(SkullType.PLAYER);
+				skull.setOwner(owner);
+				skull.update();
+				final String texture = ItemHandler.getItem().getSkullTexture(skull);
+				if (texture != null && !texture.isEmpty()) {
+					ItemHandler.getItem().setSkullTexture(skullMeta, texture);
+				}
+			} catch (Exception e) { }
+			blockState.update(true);
+		}
 		return skullMeta;
 	}
 	

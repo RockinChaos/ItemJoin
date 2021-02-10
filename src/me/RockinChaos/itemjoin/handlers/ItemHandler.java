@@ -30,6 +30,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.block.Skull;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -326,6 +327,25 @@ public class ItemHandler {
     	} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
     	return item;
     }
+    
+   /**
+    * Sets the Skull Texture to the ItemStack.
+    * 
+    * @param item - The ItemStack to have its Skull Texture changed.
+    * @param skullTexture - The Skull Texture to be added to the ItemStack.
+    */
+    public ItemMeta setSkullTexture(final ItemMeta itemMeta, final String skullTexture) {
+    	try {
+    		if (ServerHandler.getServer().hasSpecificUpdate("1_8")) {
+				GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
+				gameProfile.getProperties().put("textures", new Property("textures", new String(skullTexture)));
+				Field declaredField = itemMeta.getClass().getDeclaredField("profile");
+				declaredField.setAccessible(true);
+				declaredField.set(itemMeta, gameProfile);
+    		}
+    	} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
+    	return itemMeta;
+    }
 	
    /**
     * Gets the current Skull Texture of the ItemMeta.
@@ -340,6 +360,25 @@ public class ItemHandler {
 			final Field field = real.getClass().getDeclaredField("profile");
 			field.setAccessible(true);
 			final GameProfile profile = (GameProfile) field.get(real);
+			final Collection < Property > props = profile.getProperties().get("textures");
+			for (final Property property: props) {
+				if (property.getName().equals("textures")) { return property.getValue(); }
+			}
+		} catch (Exception e) { }
+		return "";
+	}
+	
+   /**
+    * Gets the current Skull Texture of the ItemMeta.
+    * 
+    * @param skull - The Skull to have its Skull Texture found.
+    * @return The found Skull Texture String value.
+    */
+	public String getSkullTexture(final Skull skull) {
+		try {
+			final Field field = skull.getClass().getDeclaredField("profile");
+			field.setAccessible(true);
+			final GameProfile profile = (GameProfile) field.get(skull);
 			final Collection < Property > props = profile.getProperties().get("textures");
 			for (final Property property: props) {
 				if (property.getName().equals("textures")) { return property.getValue(); }
@@ -378,8 +417,10 @@ public class ItemHandler {
 				try {
 					skullMeta.setOwningPlayer(player);
 				} catch (Throwable t) {
-					LegacyAPI.getLegacy().setSkullOwner(((SkullMeta) meta), player.getName());
+					LegacyAPI.getLegacy().setSkullOwner(skullMeta, player.getName());
 				}
+			} else {
+				LegacyAPI.getLegacy().setSkullOwner(skullMeta, owner);
 			}
 		}
 	}
