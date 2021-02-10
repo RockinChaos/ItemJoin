@@ -22,7 +22,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
 import me.RockinChaos.itemjoin.ItemJoin;
-import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
 
@@ -36,20 +35,10 @@ public class VaultAPI {
 	* 
 	*/
     public VaultAPI() {
-    	this.enableEconomy();
-    }
-    
-   /**
-	* Attempts to enable the economy.
-	* 
-	*/
-	private void enableEconomy() { 
 		if (Bukkit.getServer().getPluginManager().isPluginEnabled("Vault")) {
-			if (!this.setupEconomy()) {
-				ServerHandler.getServer().logDebug("{VaultAPI} An error has occured while setting up enabling Vault-ItemJoin support!");
-			}
+			this.setupEconomy();
 		}
-	}
+    }
 
    /**
 	* Sets the Economy instance.
@@ -57,11 +46,13 @@ public class VaultAPI {
 	* @return If the Economy instance was successfully enabled.
 	*/
     private boolean setupEconomy() {
-        if (!Bukkit.getServer().getPluginManager().isPluginEnabled("Vault")) { return false; }
-        RegisteredServiceProvider<Economy> rsp = ItemJoin.getInstance().getServer().getServicesManager().getRegistration(Economy.class);
-        if (rsp == null) { return false; }
-        this.econ = rsp.getProvider();
-        return this.econ != null;
+    	try {
+	        if (!Bukkit.getServer().getPluginManager().isPluginEnabled("Vault")) { return false; }
+	        RegisteredServiceProvider<Economy> rsp = ItemJoin.getInstance().getServer().getServicesManager().getRegistration(Economy.class);
+	        if (rsp == null) { return false; }
+	        this.econ = rsp.getProvider();
+	        return this.econ != null;
+    	} catch (Exception e) { return false; }
     }
     
    /**
@@ -79,7 +70,7 @@ public class VaultAPI {
 	* @return If Vault is enabled.
 	*/
     public boolean vaultEnabled() {
-    	return Bukkit.getServer().getPluginManager().isPluginEnabled("Vault");
+    	return Bukkit.getServer().getPluginManager().isPluginEnabled("Vault") && econ != null;
     }
     
    /**

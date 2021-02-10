@@ -116,7 +116,6 @@ public class ConfigHandler {
 		final boolean reload = ItemJoin.getInstance().isStarted();
 		ServerHandler.getServer().clearErrorStatements();
 		this.copyFiles();
-		this.registerPrevent();
 		ItemJoin.getInstance().setStarted(false);
 		SchedulerUtils.getScheduler().runAsync(() -> {
         	DependAPI.getDepends(true);
@@ -125,6 +124,7 @@ public class ConfigHandler {
 				DependAPI.getDepends(false).sendUtilityDepends();
 				ServerHandler.getServer().logInfo(customItems + " Custom item(s) loaded!"); 
 			}
+			this.registerPrevent();
 			SQL.newData(reload); {
 				SchedulerUtils.getScheduler().runLater(2L, () -> {
 					ItemDesigner.getDesigner(true); {
