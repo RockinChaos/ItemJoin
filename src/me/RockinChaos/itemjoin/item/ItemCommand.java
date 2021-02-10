@@ -282,7 +282,8 @@ public class ItemCommand {
 			this.setPending(player, false);
 			if ((this.actionType.equals(Action.ON_DEATH) || !player.isDead()) && ((this.itemMap != null && ((this.actionType.equals(Action.ON_HOLD) && this.itemMap.isSimilar(PlayerHandler.getPlayer().getMainHandItem(player))) 
 				|| (this.actionType.equals(Action.ON_RECEIVE) && this.itemMap.hasItem(player)))) || (!this.actionType.equals(Action.ON_HOLD) && !this.actionType.equals(Action.ON_RECEIVE))) 
-				&& ((this.itemMap.getCommandSequence() == CommandSequence.REMAIN && this.itemMap.hasItem(player)) || this.itemMap.getCommandSequence() != CommandSequence.REMAIN)
+				&& (((this.itemMap.getCommandSequence() == CommandSequence.REMAIN && cmdtype != Executor.SWAPITEM && cmdtype != Executor.DELAY && this.itemMap.hasItem(player)) 
+				|| ((this.itemMap.getCommandSequence() == CommandSequence.REMAIN && (cmdtype == Executor.SWAPITEM || cmdtype == Executor.DELAY))) || this.itemMap.getCommandSequence() != CommandSequence.REMAIN))
 				&& (player.isOnline() && player.getWorld() == world && !this.getExecute(player))) {
 				switch (cmdtype) {
 					case CONSOLE: this.dispatchConsoleCommands(player); break;
@@ -413,7 +414,8 @@ public class ItemCommand {
 		try {
 			for (ItemMap item : ItemUtilities.getUtilities().getItems()) {
 				if (item.getConfigName().equalsIgnoreCase(this.command) && slot != null) {
-					boolean itemExists = false;
+					boolean itemExists = ((this.itemMap.getCommandSequence() == CommandSequence.REMAIN && this.itemMap.hasItem(player)) || this.itemMap.getCommandSequence() != CommandSequence.REMAIN);
+					this.itemMap.removeDisposable(player, this.itemMap, this.itemMap.getItem(player), true); 
 					for (ItemCommand command : this.itemMap.getCommands()) {
 						if (command.executorType == Executor.SWAPITEM && this.matchAction(command.actionType)) {
 							ItemMap commandMap = ItemUtilities.getUtilities().getItemMap(null, command.command, null);

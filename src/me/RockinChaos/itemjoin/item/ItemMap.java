@@ -4124,27 +4124,37 @@ public class ItemMap {
     */
 	public void swapItem(final Player player, final String slot) {
 		ItemStack itemStack = this.getItem(player);
-		if (Utils.getUtils().containsIgnoreCase(slot, "CRAFTING")) { 
-			if (Utils.getUtils().getSlotConversion(slot) == 0) {
-				SchedulerUtils.getScheduler().runLater(4L, () -> {
-			    	if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
-			    		player.getOpenInventory().getTopInventory().setItem(Utils.getUtils().getSlotConversion(slot), itemStack);
-			    		PlayerHandler.getPlayer().updateInventory(player, 1L);
-			    	}
-				});
-			} else {
+		if ((!slot.startsWith("CH") && slot.startsWith("C")) || Utils.getUtils().isInt(slot)) {
+			if (Utils.getUtils().containsIgnoreCase(slot, "CRAFTING")) { 
+				if (Utils.getUtils().getSlotConversion(slot) == 0) {
+					SchedulerUtils.getScheduler().runLater(4L, () -> {
+				    	if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
+				    		player.getOpenInventory().getTopInventory().setItem(Utils.getUtils().getSlotConversion(slot), itemStack);
+				    		PlayerHandler.getPlayer().updateInventory(player, 1L);
+				    	}
+					});
+				} else {
+					SchedulerUtils.getScheduler().runLater(2L, () -> {
+				    	player.getOpenInventory().getTopInventory().setItem(Utils.getUtils().getSlotConversion(slot), itemStack);
+				    });
+				}
+			} 
+			else { 
 				SchedulerUtils.getScheduler().runLater(2L, () -> {
-			    	player.getOpenInventory().getTopInventory().setItem(Utils.getUtils().getSlotConversion(slot), itemStack);
-			    });
+					player.getInventory().setItem(Integer.parseInt(slot), itemStack); 	
+				});
 			}
-		} 
-		else { 
+		} else {
 			SchedulerUtils.getScheduler().runLater(2L, () -> {
-				player.getInventory().setItem(Integer.parseInt(slot), itemStack); 	
+				if (PlayerHandler.getPlayer().getMainHandItem(player) == null || PlayerHandler.getPlayer().getMainHandItem(player).getType() == Material.AIR) {
+					PlayerHandler.getPlayer().setMainHandItem(player, itemStack);
+				} else {
+					player.getInventory().addItem(itemStack);
+				}
 			});
 		}
 		this.setAnimations(player);
-		this.executeCommands(player, this.tempItem, "ON_RECEIVE", "RECEIVED", this.getSlot());
+		this.executeCommands(player, this.tempItem, "ON_RECEIVE", "RECEIVED", slot);
 	}
 	
    /**
