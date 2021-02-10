@@ -93,16 +93,18 @@ public class SQL {
     * @param object - The DataObject data being saved.
     */
 	public void saveData(DataObject object) {
-		String table = object.getTable().name().toLowerCase();
-		this.executeStatementsLater.add("INSERT INTO " + object.getTable().name().toLowerCase() + " (" + object.getTable().headers() + ") VALUES (" + object.getInsertValues() + ")");
-		if (this.databaseData.get(table) != null) {
-			List <DataObject> h1 = this.databaseData.get(table);
-			h1.add(object);
-			this.databaseData.put(table, h1);
-		} else {
-			List <DataObject> h1 = new ArrayList<DataObject>();
-			h1.add(object);
-			this.databaseData.put(table, h1);
+		if (object != null) { 
+			String table = object.getTable().name().toLowerCase();
+			this.executeStatementsLater.add("INSERT INTO " + object.getTable().name().toLowerCase() + " (" + object.getTable().headers() + ") VALUES (" + object.getInsertValues() + ")");
+			if (this.databaseData.get(table) != null) {
+				List <DataObject> h1 = this.databaseData.get(table);
+				h1.add(object);
+				this.databaseData.put(table, h1);
+			} else {
+				List <DataObject> h1 = new ArrayList<DataObject>();
+				h1.add(object);
+				this.databaseData.put(table, h1);
+			}
 		}
 	}
 	
@@ -112,14 +114,16 @@ public class SQL {
     * @param object - The DataObject being accessed.
     */
 	public void removeData(DataObject object) {
-		String table = object.getTable().name().toLowerCase();
-		if (this.databaseData.get(table) != null && !this.databaseData.get(table).isEmpty()) {
-			Iterator<DataObject> dataSet = this.databaseData.get(table).iterator();
-			while (dataSet.hasNext()) {
-				DataObject dataObject = dataSet.next();
-				if (dataObject != null && dataObject.getTable().equals(object.getTable()) && object.equalsData(object, dataObject)) {
-					this.executeStatementsLater.add("DELETE FROM " + dataObject.getTable().name().toLowerCase() + " WHERE (" + dataObject.getTable().removal() + ") = (" + dataObject.getRemovalValues() + ")");
-					dataSet.remove();
+		if (object != null) { 
+			String table = object.getTable().name().toLowerCase();
+			if (this.databaseData.get(table) != null && !this.databaseData.get(table).isEmpty()) {
+				Iterator<DataObject> dataSet = this.databaseData.get(table).iterator();
+				while (dataSet.hasNext()) {
+					DataObject dataObject = dataSet.next();
+					if (dataObject != null && dataObject.getTable().equals(object.getTable()) && object.equalsData(object, dataObject)) {
+						this.executeStatementsLater.add("DELETE FROM " + dataObject.getTable().name().toLowerCase() + " WHERE (" + dataObject.getTable().removal() + ") = (" + dataObject.getRemovalValues() + ")");
+						dataSet.remove();
+					}
 				}
 			}
 		}
@@ -132,13 +136,15 @@ public class SQL {
     * @return The found table data.
     */
 	public DataObject getData(DataObject object) {
-		String table = object.getTable().name().toLowerCase();
-		if (this.databaseData.get(table) != null && !this.databaseData.get(table).isEmpty()) {
-			Iterator<DataObject> dataSet = this.databaseData.get(table).iterator();
-			while (dataSet.hasNext()) {
-				DataObject dataObject = dataSet.next();
-				if (dataObject != null && dataObject.getTable().equals(object.getTable()) && object.equalsData(object, dataObject)) {
-					return dataObject;
+		if (object != null) { 
+			String table = object.getTable().name().toLowerCase();
+			if (this.databaseData.get(table) != null && !this.databaseData.get(table).isEmpty()) {
+				Iterator<DataObject> dataSet = this.databaseData.get(table).iterator();
+				while (dataSet.hasNext()) {
+					DataObject dataObject = dataSet.next();
+					if (dataObject != null && dataObject.getTable().equals(object.getTable()) && object.equalsData(object, dataObject)) {
+						return dataObject;
+					}
 				}
 			}
 		}
