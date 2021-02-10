@@ -389,19 +389,29 @@ public class PlayerHandler {
     * @return The UUID of the player or if not found, their String name.
     */
 	public String getPlayerID(final Player player) {
-		if (player != null && player.getUniqueId() != null) {
-			return player.getUniqueId().toString();
-		} else if (player != null && DependAPI.getDepends(false).nickEnabled()) {
-			try {
-				de.domedd.betternick.api.nickedplayer.NickedPlayer np = new de.domedd.betternick.api.nickedplayer.NickedPlayer(player);
-				if (np.isNicked()) { return np.getRealName();
-				} else { return player.getName(); }
-			} catch (NoClassDefFoundError e) {
-				if (BetterNick.getApi().isPlayerNicked(player)) { return BetterNick.getApi().getRealName(player);
-				} else { return player.getName(); }
+		try {
+			if (player != null && ServerHandler.getServer().hasSpecificUpdate("1_8") && player.getUniqueId() != null) {
+				return player.getUniqueId().toString();
+			} else if (player != null && DependAPI.getDepends(false).nickEnabled()) {
+				try {
+					de.domedd.betternick.api.nickedplayer.NickedPlayer np = new de.domedd.betternick.api.nickedplayer.NickedPlayer(player);
+					if (np.isNicked()) { 
+						if (ServerHandler.getServer().hasSpecificUpdate("1_8") && np.getUniqueId() != null) {
+							return np.getUniqueId().toString();
+						} else {
+							return np.getRealName();
+						}
+					} else { return player.getName(); }
+				} catch (NoClassDefFoundError e) {
+					if (BetterNick.getApi().isPlayerNicked(player)) { return BetterNick.getApi().getRealName(player);
+					} else { return player.getName(); }
+				}
+			} else if (player != null) {
+				return player.getName();
 			}
-		} else if (player != null) {
-			return player.getName();
+		} catch (Exception e) { 
+			if (player != null) { return player.getName(); }
+			ServerHandler.getServer().sendDebugTrace(e);
 		}
 		return "";
 	}
