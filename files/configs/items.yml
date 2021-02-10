@@ -9,7 +9,7 @@ items-Version: 8
 items-Delay: 2
 items-Overwrite: false
 items-Spamming: false
-items-RestrictCount : false
+items-RestrictCount: false
 
 # This is the section that the custom created items will be stored.
 # All created items should be saved under the 'items' section for each 'custom-item' subsection.

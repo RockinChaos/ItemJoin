@@ -4027,7 +4027,7 @@ public class UI {
 				this.commandPane(player, itemMap);
 			}));
 			sequencePane.addButton(new Button(this.fillerPaneGItem));
-			sequencePane.addButton(new Button(ItemHandler.getItem().getItem("CHEST", 1, false, "&a&lRemain", "&7", "&7*Executes each command only if", "&7the item exists in the player", "&7inventory at the time of executing", "&7a delayed command line."), event -> {
+			sequencePane.addButton(new Button(ItemHandler.getItem().getItem("CHEST", 1, false, "&a&lRemain", "&7", "&7*Executes each command only if", "&7the item exists in the player", "&7inventory at the time of executing", "&7a delayed command line.", "&7The commands will be sent in", "order from top to bottom."), event -> {
 				itemMap.setCommandSequence(CommandSequence.REMAIN);
 				this.commandPane(player, itemMap);
 			}));
