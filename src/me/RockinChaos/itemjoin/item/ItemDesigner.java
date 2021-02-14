@@ -990,14 +990,18 @@ public class ItemDesigner {
 			List <Pattern> patterns = new ArrayList <Pattern> ();
 			for (String banner: bannerList.split(",")) {
 				String[] bannerSection = banner.split(":");
-				DyeColor Color = DyeColor.valueOf(bannerSection[0].toUpperCase());
-				PatternType Pattern = PatternType.valueOf(bannerSection[1].toUpperCase());
+				DyeColor Color = null;
+				PatternType Pattern = null;
+				try {
+					Color = DyeColor.valueOf(bannerSection[0].toUpperCase());
+					Pattern = PatternType.valueOf(bannerSection[1].toUpperCase());
+				} catch (Exception e) { }
 				if (Color != null && Pattern != null) {
 					patterns.add(new Pattern(Color, Pattern));
 				} else if (Color == null) {
 					ServerHandler.getServer().logSevere("{ItemMap} An error occurred in the config, " + bannerSection[0] + " is an incorrect dye color.");
 					ServerHandler.getServer().logWarn("{ItemMap} Please see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/DyeColor.html for a list of correct dye colors.");
-				} else if (Pattern == null) {
+				} else if (Pattern == null && banner.contains(":")) {
 					ServerHandler.getServer().logSevere("{ItemMap} An error occurred in the config, " + bannerSection[1] + " is an incorrect pattern type.");
 					ServerHandler.getServer().logWarn("{ItemMap} Please see: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/block/banner/PatternType.html for a list of correct pattern types.");
 				}
