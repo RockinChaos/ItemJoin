@@ -3234,7 +3234,7 @@ public class UI {
 				}
 			}));
 			commandPane.addButton(new Button(ItemHandler.getItem().getItem("STONE_BUTTON", 1, false, "&a&lReceive", "&7", "&7*The number of times the", "&7commands will execute when", "&7receiving the custom item.", 
-					"&cNOTE: &7Only functions with", "&7the on-receive command action.", "&9&lCOMMANDS-COST: &a" + (Utils.getUtils().nullCheck(itemMap.getCommandReceive() + "&7"))), event -> {
+					"&cNOTE: &7Only functions with", "&7the on-receive command action.", "&9&lCOMMANDS-RECEIVE: &a" + (Utils.getUtils().nullCheck(itemMap.getCommandReceive() + "&7"))), event -> {
 				if (Utils.getUtils().nullCheck(itemMap.getCommandReceive() + "&7") != "NONE") {
 					itemMap.setCommandReceive(0);
 					this.commandPane(player, itemMap);
@@ -4027,7 +4027,7 @@ public class UI {
 				this.commandPane(player, itemMap);
 			}));
 			sequencePane.addButton(new Button(this.fillerPaneGItem));
-			sequencePane.addButton(new Button(ItemHandler.getItem().getItem("CHEST", 1, false, "&a&lRemain", "&7", "&7*Executes each command only if", "&7the item exists in the player", "&7inventory at the time of executing", "&7a delayed command line.", "&7The commands will be sent in", "order from top to bottom."), event -> {
+			sequencePane.addButton(new Button(ItemHandler.getItem().getItem("CHEST", 1, false, "&a&lRemain", "&7", "&7*Executes each command only if", "&7the item exists in the player", "&7inventory at the time of executing", "&7a delayed command line.", "&7The commands will be sent in", "&7order from top to bottom."), event -> {
 				itemMap.setCommandSequence(CommandSequence.REMAIN);
 				this.commandPane(player, itemMap);
 			}));
