@@ -4033,17 +4033,18 @@ public class ItemMap {
 					String value1 = (parts[0] != null && !Utils.getUtils().isInt(parts[0]) ? Utils.getUtils().translateLayout(parts[0], player) : parts[0]);
 					String operand = parts[1];
 					String value2 = (parts[2] != null && !Utils.getUtils().isInt(parts[2]) ? Utils.getUtils().translateLayout(parts[2], player) : parts[2]);
-					return Utils.getUtils().conditionMet(value1, operand, value2);
+					final boolean conditionMet = Utils.getUtils().conditionMet(value1, operand, value2);
+					if (!conditionMet && this.getConditionMessage(conditions) != null && !this.getConditionMessage(conditions).isEmpty()) {
+						player.sendMessage(Utils.getUtils().translateLayout(this.getConditionMessage(conditions), player));
+						ServerHandler.getServer().logDebug("{ItemMap} " + player.getName() + " has not met any of the " + conditions + "(s), for the Item: " + this.getConfigName() + "."); 
+					}
+					return conditionMet;
 				} else if (!(parts != null && parts.length == 3)) {
 					ServerHandler.getServer().logSevere("{ItemMap} The item " + this.getConfigName() + " has a " + conditions + " defined incorrectly!");
 					ServerHandler.getServer().logWarn("{ItemMap} The condition " + condition + " is not the proper format CONDITION:OPERAND:VALUE, the item may not function properly.");
 				}
 			}
 		} else { return true; }
-		if (this.getConditionMessage(conditions) != null && !this.getConditionMessage(conditions).isEmpty()) {
-			player.sendMessage(Utils.getUtils().translateLayout(this.getConditionMessage(conditions), player));
-		}
-		ServerHandler.getServer().logDebug("{ItemMap} " + player.getName() + " has not met any of the " + conditions + "(s), for the Item: " + this.getConfigName() + "."); 
 		return false;
 	}
 	
