@@ -27,6 +27,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.SkullType;
+import org.bukkit.World;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Skull;
 import org.bukkit.entity.Player;
@@ -89,6 +90,18 @@ public class LegacyAPI {
     */
     public ItemStack newItemStack(final Material material, final int count, final short dataValue) {
     	return new ItemStack(material, count, dataValue);
+    }
+    
+   /**
+    * Gets the GameRule for the World.
+    * 
+    * @param world - The world being referenced.
+    * @param gamerule - The gamerule to locate.
+    * @return The boolean value fo the gamerule.
+    */
+    public boolean getGameRule(final World world, final String gamerule) {
+    	String value = world.getGameRuleValue(gamerule);
+    	return (value != null && !value.isEmpty() ? Boolean.valueOf(value) : false);
     }
     
    /**

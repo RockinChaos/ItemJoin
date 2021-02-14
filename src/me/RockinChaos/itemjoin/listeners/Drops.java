@@ -23,6 +23,7 @@ import java.util.Map;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
+import me.RockinChaos.itemjoin.utils.LegacyAPI;
 import me.RockinChaos.itemjoin.utils.SchedulerUtils;
 import me.RockinChaos.itemjoin.utils.Utils;
 
@@ -76,7 +77,7 @@ public class Drops implements Listener {
 		if (Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Death-Drops"), "TRUE") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Death-Drops"), player.getWorld().getName())
 			  	|| Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Death-Drops"), "ALL") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Death-Drops"), "GLOBAL")) {
 		  	if (ConfigHandler.getConfig().isPreventOP() && player.isOp() || ConfigHandler.getConfig().isPreventCreative() && PlayerHandler.getPlayer().isCreativeMode(player)) { }
-		  	else {
+		  	else if (!LegacyAPI.getLegacy().getGameRule(player.getWorld(), "keepInventory")) {
 				for (int k = 0; k < player.getInventory().getSize(); k++) {
 					ItemStack stack = player.getInventory().getItem(k);
 					if (stack != null && stack.getType() != Material.AIR) { 
@@ -142,18 +143,20 @@ public class Drops implements Listener {
 	private void onDeathDrops(PlayerDeathEvent event) {
 		Player player = event.getEntity();
 		ItemUtilities.getUtilities().closeAnimations(player);
-		for (int k = 0; k < player.getOpenInventory().getTopInventory().getSize(); k++) {
-			ItemStack stack = player.getOpenInventory().getTopInventory().getItem(k);
-			if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory()) && !ItemUtilities.getUtilities().isAllowed(player, stack, "death-drops")) {
-				event.getDrops().remove(stack);
-				player.getOpenInventory().getTopInventory().remove(stack);
+		if (!LegacyAPI.getLegacy().getGameRule(player.getWorld(), "keepInventory")) {
+			for (int k = 0; k < player.getOpenInventory().getTopInventory().getSize(); k++) {
+				ItemStack stack = player.getOpenInventory().getTopInventory().getItem(k);
+				if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory()) && !ItemUtilities.getUtilities().isAllowed(player, stack, "death-drops")) {
+					event.getDrops().remove(stack);
+					player.getOpenInventory().getTopInventory().remove(stack);
+				}
 			}
-		}
-		for (int k = 0; k < player.getInventory().getSize(); k++) {
-			ItemStack stack = player.getInventory().getItem(k);
-			if (!ItemUtilities.getUtilities().isAllowed(player, stack, "death-drops")) {
-				event.getDrops().remove(stack);
-				player.getInventory().remove(stack);
+			for (int k = 0; k < player.getInventory().getSize(); k++) {
+				ItemStack stack = player.getInventory().getItem(k);
+				if (!ItemUtilities.getUtilities().isAllowed(player, stack, "death-drops")) {
+					event.getDrops().remove(stack);
+					player.getInventory().remove(stack);
+				}
 			}
 		}
 	}
