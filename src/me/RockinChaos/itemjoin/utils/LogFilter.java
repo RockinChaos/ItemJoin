@@ -50,6 +50,11 @@ public class LogFilter extends AbstractFilter {
 	            }
 	        }
         }
+        if (message.toLowerCase().contains("com.zaxxer.hikari.pool.PoolBase") || message.toLowerCase().contains("com.zaxxer.hikari.pool.HikariPool") 
+        	|| message.toLowerCase().contains("com.zaxxer.hikari.HikariDataSource") || message.toLowerCase().contains("com.zaxxer.hikari.HikariConfig")
+        	|| message.toLowerCase().contains("com.zaxxer.hikari.util.DriverDataSource")) {
+        	return Result.DENY;
+        }
         return Result.NEUTRAL;
     }
 
