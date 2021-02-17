@@ -455,7 +455,13 @@ abstract class Controller {
 			synchronized (this) {
 				try { 
 					this.hikari = new HikariDataSource(this.hikariConfig);
-					this.connection = this.hikari.getConnection();
+					try {
+						this.connection = this.hikari.getConnection();
+					} catch (Exception e) { 
+						if (Utils.getUtils().containsIgnoreCase(e.getMessage(), "Apparent connection leak detected")) {
+							ServerHandler.getServer().logDebug("{SQL} Connection leak due to server lag has been detected, restarting database connection.");
+						} else { e.printStackTrace(); }
+					}
 				    return this.connection;
 				} catch (Exception e) { 
 					this.stopConnection = true;
@@ -544,7 +550,6 @@ abstract class Controller {
 			}
 			if (!this.stopConnection && (!this.isClosed(conn) && (!ConfigHandler.getConfig().sqlEnabled() || force))) {
 				this.closeLater(conn, force);
-				this.stopConnection = force;
 			}
 		} catch (SQLException e) { 
 			ServerHandler.getServer().logSevere("{SQL} [10] Failed to close database connection."); 
@@ -614,7 +619,7 @@ abstract class Controller {
 	    this.hikariConfig.setLeakDetectionThreshold(TimeUnit.MINUTES.toMillis(1));
 	    this.hikariConfig.setConnectionTimeout(TimeUnit.MINUTES.toMillis(1));
 	    this.hikariConfig.setValidationTimeout(TimeUnit.MINUTES.toMillis(1));
-	    this.hikariConfig.setMaxLifetime(TimeUnit.MINUTES.toMillis(5));
+	    this.hikariConfig.setMaxLifetime(TimeUnit.MINUTES.toMillis(10));
 	    this.hikariConfig.setMaximumPoolSize(10);
 	}
 	
