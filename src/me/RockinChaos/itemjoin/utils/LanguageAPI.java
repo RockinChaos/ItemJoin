@@ -196,6 +196,8 @@ public class LanguageAPI {
 			this.langType = Lang.RUSSIAN;
 		} else if (lang.equalsIgnoreCase("fr")) {
 			this.langType = Lang.FRENCH;
+		} else if (lang.equalsIgnoreCase("nl")) {
+			this.langType = Lang.DUTCH;
 		}
 	}
 	
@@ -211,6 +213,7 @@ public class LanguageAPI {
 		else if (lang.equalsIgnoreCase("Spanish")) { this.setLanguage("es"); } 
 		else if (lang.equalsIgnoreCase("Russian")) { this.setLanguage("ru"); } 
 		else if (lang.equalsIgnoreCase("French")) { this.setLanguage("fr"); } 
+		else if (lang.equalsIgnoreCase("Dutch")) { this.setLanguage("nl"); } 
 		else { this.setLanguage("en"); }
 	}
 	
@@ -219,7 +222,7 @@ public class LanguageAPI {
 	* 
 	*/
 	private enum Lang {
-		DEFAULT("en-lang.yml", 0), ENGLISH("en-lang.yml", 1), SPANISH("es-lang.yml", 2), TWCHINESE("tw-lang.yml", 3), CNCHINESE("cn-lang.yml", 4), RUSSIAN("ru-lang.yml", 5), FRENCH("fr-lang.yml", 6);
+		DEFAULT("en-lang.yml", 0), ENGLISH("en-lang.yml", 1), SPANISH("es-lang.yml", 2), TWCHINESE("tw-lang.yml", 3), CNCHINESE("cn-lang.yml", 4), RUSSIAN("ru-lang.yml", 5), FRENCH("fr-lang.yml", 6), DUTCH("nl-lang.yml", 7);
 		private Lang(final String nodeLocation, final int i) { this.nodeLocation = nodeLocation; }
 		private final String nodeLocation;
 		private String nodeLocation() { return nodeLocation; }

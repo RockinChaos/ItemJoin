@@ -115,4 +115,4 @@ commands:
 
 # Deze placeholders zijn specifiek voor plugin messages
 placeholders:
-  PLAYER_INTERACT: 'Unknown'
+  PLAYER_INTERACT: 'Onbekend'
