@@ -447,9 +447,7 @@ abstract class Controller {
     * @throws SQLException 
 	*/
 	protected Connection getConnection() throws SQLException {
-		if (this.stopConnection) {
-			return null;
-		} else if (!this.isClosed(this.connection) && !this.stopConnection) {
+		if (!this.isClosed(this.connection)) {
 			return this.connection; 
 		} else if (!this.stopConnection) {
 			synchronized (this) {
@@ -464,7 +462,7 @@ abstract class Controller {
 					}
 				    return this.connection;
 				} catch (Exception e) { 
-					this.stopConnection = true;
+					this.close(null, null, this.connection, true);
 					if (ConfigHandler.getConfig().sqlEnabled()) {
 						ServerHandler.getServer().logSevere("{SQL} Unable to connect to the defined MySQL database, check your settings.");
 					} else { ServerHandler.getServer().logSevere("{SQL} SQLite exception on initialize."); }
@@ -604,7 +602,7 @@ abstract class Controller {
 		if (ConfigHandler.getConfig().sqlEnabled()) {
 			this.hikariConfig.setJdbcUrl("jdbc:mysql://" + config.getString("Database.host") + ":" + config.getString("Database.port") + "/" + database + "?useSSL=false" + "&createDatabaseIfNotExist=true" + "&allowPublicKeyRetrieval=true");
 		    this.hikariConfig.setDriverClassName("com.mysql.jdbc.Driver");
-			this.hikariConfig.setIdleTimeout(TimeUnit.MINUTES.toMillis(1));
+			this.hikariConfig.setIdleTimeout(TimeUnit.SECONDS.toMillis(100));
 		    this.hikariConfig.setUsername(config.getString("Database.user"));
 		    this.hikariConfig.setPassword(config.getString("Database.pass"));
 		} else {
@@ -616,9 +614,9 @@ abstract class Controller {
 	    this.hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250");
 	    this.hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
 	    this.hikariConfig.addDataSourceProperty("userServerPrepStmts", "true");
-	    this.hikariConfig.setLeakDetectionThreshold(TimeUnit.MINUTES.toMillis(1));
-	    this.hikariConfig.setConnectionTimeout(TimeUnit.MINUTES.toMillis(1));
-	    this.hikariConfig.setValidationTimeout(TimeUnit.MINUTES.toMillis(1));
+	    this.hikariConfig.setLeakDetectionThreshold(TimeUnit.SECONDS.toMillis(90));
+	    this.hikariConfig.setConnectionTimeout(TimeUnit.SECONDS.toMillis(100));
+	    this.hikariConfig.setValidationTimeout(TimeUnit.SECONDS.toMillis(100));
 	    this.hikariConfig.setMaxLifetime(TimeUnit.MINUTES.toMillis(10));
 	    this.hikariConfig.setMaximumPoolSize(10);
 	}
