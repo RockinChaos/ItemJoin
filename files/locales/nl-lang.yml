@@ -1,0 +1,118 @@
+# --{ =-=-=-=-=-=-=-=-=-= ItemJoin's Dutch Language file, by Marijn2341 =-=-=-=-=-=-=-=-=-= }--
+# Als je niet wilt dat een bericht wordt verzonden, Verwijder het dan volledig of maak het dan leeg.
+
+# Als je dit wijzigt wordt het bestand opnieuw gegenereerd!
+nl-Version: 8
+
+# Dit is het voorvoegsel dat wordt verzonden aan het begin van elk bericht.
+Prefix: '&7[&eItemJoin&7]'
+
+# Dit zijn algemene berichten die worden verzonden bij het gebruiken van deze plugin.
+general:
+  failedOverwrite: '%prefix% &cWe konden geen &4%fail_count% &citems geven, U mag geen items overschrijven!'
+  failedInventory: '%prefix% &cWe konden geen &4%fail_count% &citems geven, Je inventaris is vol!'
+  econSuccess: '%prefix% &aDe command is succesvol uitgevoerd voor &e$%cost%&a.'
+  econFailed: '%prefix% &cJe hebt niet genoeg om deze command te kunnen uitvoeren! \n%prefix% &cJe hebt &4$%balance% &cvan de &4$%cost%.'
+  itemSuccess: '%prefix% &aDe command is succesvol uitgevoerd voor &e%cost% %item_type%(s)&a.'
+  itemFailed: '%prefix% &cJe hebt niet genoeg &4%item_type%&c om deze command uit te voeren! \n%prefix% &cJe hebt &4%balance% &cvan de &4%cost% %item_type%(s)&c.'
+  warmingUp: '%prefix% &aHet item [%item%&a] is aan het opwarmen...'
+  warmingTime: '%prefix% &aCommencing [%item%&a] uitvoering in &2%time_left%&a seconden.'
+  warmingHalted: '%prefix% &cCommence van &4[&c%item%&4] &cuitvoering geannuleerd!'
+
+# Dit zijn berichten die voorkomen bij het gebruiken van 1 van de commands.
+commands:
+  default:
+    unknownCommand: '%prefix% &cOnbekende command, Zie &l/ItemJoin Help &cvoor de volledige command lijst.'
+    noPermission: '%prefix% &cJij hebt geen permissie voor deze command!'
+    configReload: '%prefix% &aconfiguratie(s) herladen!'
+    noPlayer: '%prefix% &cJe moet een speler zijn om deze command te kunnen uitvoeren!'
+    noTarget: '%prefix% &cDe speler &c%target_player% &ckon niet worden gevonden!'
+  menu:
+    openMenu: '%prefix% &aMenu is geopend.'
+    itemSaved: '%prefix% &e%item% &ais succesvol opgeslagen.'
+    itemRemoved: '%prefix% &e%item% &cis succesvol verwijderd.'
+    noInteger: '%prefix% &c&l&nFOUT:&c De waarde &4%input% &cdie je hebt ingevuld is geen volledig getal!'
+    noMaterial: '%prefix% &c&l&nFOUT:&c Het materiaal &4%input% &cis geen geschikt materiaal!'
+    inputType: '%prefix% &aTyp de &e%input% &adie je wilt hebben op je item.'
+    inputSet: '%prefix% &aDe items &e%input% &azijn succesvol ingesteld!'
+    inputExample: '%prefix% &aVoorbeeld: %input_example%'
+  item:
+    noItemHeld: '%prefix% &cJe hebt geen item in je hand!'
+    noItem: '%prefix% &cHet item &b%item% &cbestaat niet!'
+  info:
+    material: '&aItem ID (Materiaal Type): &e&l%item%'
+    data: '&aItem Waarde (Data Type): &e&l%item%'
+  list:
+    worldHeader: '&a&l%world%:'
+    itemRow: '&a&l   &a%item%'
+    noItems: '&c&l   &cEr zijn geen items gedefinieerd voor deze wereld!'
+  world:
+    worldFound: '&aDe wereld(en) zijn gevonden:'
+    worldHeader: '&aJe bent in de wereld:'
+    worldRow: '&e- %world%'
+  updates:
+    checkRequest: '%prefix% &4%player% heeft gevraagd om te controleren voor updates!'
+    updateRequest: '%prefix% &4%player% heeft gevraagd om een update voor deze plugin te forceren!'
+  get:
+    givenYou: '%prefix% &aJe hebt het volgende ontvangen: &b%amount%x &7[&e%item%&7]&a.'
+    givenYou_All: '%prefix% &aJe hebt &balle items&a ontvangen.'
+    givenTarget: '%prefix% &aJe hebt &b%amount%x &7[&e%item%&7]&a gegeven aan %target_player%.'
+    givenTarget_All: '%prefix% &aJe hebt &balle items&a gegeven aan %target_player% .'
+    givenOnline: '%prefix% &aJe hebt het item &b%amount%x &7[&b%item%&7]&a gegeven aan de spelers &e%players%&c.'
+    targetTriedGive: '%prefix% &4%target_player% &cProbeerde om jou &7[&b%item%&7]&c te geven maar jij hebt dit al in je inventory!'
+    targetTriedGive_All: '%prefix% &4%target_player% &cprobeerde om jou &balle items &cte geven maar jij hebt dit al in je inventory!'
+    failedInventory: '%prefix% &cJe hebt het volgende al: &7[&b%item%&7]&c!'
+    failedInventory_All: '%prefix% &cJe hebt alle &bitems&c al'
+    targetFailedInventory: '%prefix% &4%target_player% &cheeft het item &7[&b%item%&7]&c al!'
+    targetFailedInventory_All: '%prefix% &4%target_player% &cheeft al &ball the items&c!'
+    onlineFailedInventory: '%prefix% &4Alle online spelers &chebben het item &7[&b%item%&7]&c al!'
+    targetNoPermission: '%prefix% &4%target_player% &cheeft niet de juiste permission om het volgende te ontvangen: &7[&b%item%&7]&c.'
+    targetNoPermission_All: '%prefix% &4%target_player% &cheeft niet de juiste permissies dus heeft &lniet &balle items &contvangen.'
+    noPermission: '%prefix% &cJe hebt niet genoeg permissies om het volgende te ontvangen: &7[&b%item%&7]&c.'
+    noPermission_All: '%prefix% &cJe hebt niet genoeg permissies waardoor je &lniet &balle items&c hebt ontvangen.'
+    usageSyntax: '%prefix% &cGebruik /ItemJoin get <item naam> <speler> in de console.'
+    badSyntax: '%prefix% &cJe gebruikt de command verkeerd! Syntax: /itemjoin get <item naam> &lOR &c/itemjoin get <item naam> <aantal>!'
+    badOnlineSyntax: '%prefix% &cJe gebruikt de command verkeerd! Syntax: /itemjoin getOnline <item naam> &lOR &c/itemjoin getOnline <item naam> <aantal>!'
+  remove:
+    removedYou: '%prefix% &b%amount%x &7[&e%item%&7]&c zijn verwijderd uit je inventory.'
+    removedYou_All: '%prefix% &bAlle items &azijn verwijderd uit je inventroy.'
+    removedTarget: '%prefix% &cJe hebt &b%amount%x &7[&e%item%&7]&c verwijderd van &4%target_player%&c.'
+    removedTarget_All: '%prefix% &aJe hebt &balle items &avan &b%target_player%&a verwijderd.'
+    removedOnline: '%prefix% &cJe hebt &b%amount%x &7[&b%item%&7]&c verwijderd van de spelers &4%players%&c.'
+    targetTriedRemoval: '%prefix% &4%target_player% &cprobeerde om &7[&b%item%&7]&c te verwijderen maar jij bezit het niet!'
+    targetTriedRemoval_All: '%prefix% &4%target_player% &cprobeerde om &balle items &cte verwijderen maar jij hebt deze niet in je inventory!'
+    failedInventory: '%prefix% &cHet item &7[&e%item%&7] &czit niet in jou inventory!'
+    failedInventory_All: '%prefix% &cGeen &bbepaalde items &cin jouw inventory!'
+    targetFailedInventory: '%prefix% &cHet item &7[&e%item%&7] &czit niet in &4%target_player% &czijn inventory!'
+    targetFailedInventory_All: '%prefix% &bGeen bepaalde items &cbestaan in &4%target_player% &czijn inventory!'
+    onlineFailedInventory: '%prefix% &cHet item &b%item% &czit niet in 1 van de &4Online Spelers &chun inventories.'
+    usageSyntax: '%prefix% &cGebruik /ItemJoin remove <item naam> <speler> as console.'
+    badSyntax: '%prefix% &cJe gebruikt de command verkeerd! Syntax: /itemjoin remove <item naam>!'
+    badOnlineSyntax: '%prefix% &cJe gebruikt de command verkeerd! Syntax: /itemjoin removeOnline <item naam>!'
+  database:
+    purgeWarn: '%prefix% &aAls u de database opschoont verwijderd u &cALLE &a%purge_data% data van &b%target_player%&a.'
+    purgeSuccess: '%prefix% &aU hebt de %purge_data% data van &b%target_player%&a verwijderd!'
+    purgeConfirm: '%prefix% &aJe hebt 5 seconden de tijd om de command &e%command% &aopnieuw te typen om te bevestigen dat u de database wilt ospchonen.'
+    purgeTimeOut: '%prefix% &cJe hebt het niet binnen &b5 seconden&c bevestigd, Het is geannuleerd!'
+  enabled:
+    forPlayer: '%prefix% &aJe hebt &balle items &eingeschakeld &avoor &e%target_player%&a.'
+    forTarget: '%prefix% &a%player% heeft &balle items &eingeschakeld &avoor jou.'
+    forPlayerFailed: '%prefix% &cItems zijn al &eingeschakeld &cvoor &e%player%&c.'
+    forPlayerWorld: '%prefix% &aJe hebt &7[&e%world%&7] items &eingeschakeld &avoor &e%player%&a.'
+    forTargetWorld: '%prefix% &a%player% heeft &7[&e%world%&7] items &eingeschakeld &avoor jou.'
+    forPlayerWorldFailed: '%prefix% &cJe hebt al &7[&e%world%&7] items &eingschakeld &cvoor &e%player%&c.'
+    globalPlayers: '%prefix% &aJe hebt &balle items &eingeschakeld &avoor &ealle spelers&a.'
+    globalPlayersFailed: '%prefix% &cItems zijn al &eingeschakeld &cvoor &ealle spelers&c.'
+  disabled:
+    forPlayer: '%prefix% &aJe hebt &balle items &euitgeschakeld &avoor &e%player%&a.'
+    forTarget: '%prefix% &a%player% heeft &balle items &euitgeschakeld &avoor you.'
+    forPlayerFailed: '%prefix% &cItems zijn al &euitschakeld &cvoor &e%player%&c.'
+    forPlayerWorld: '%prefix% &aJe hebt &7[&e%world%&7] items &euitgeschakeld &avoor &e%player%&a.'
+    forTargetWorld: '%prefix% &a%player% heeft &7[&e%world%&7] items &euitgeschakeld voor jou.'
+    forPlayerWorldFailed: '%prefix% &cJe hebt al &7[&e%world%&7] items &euitgeschakeld &cvoor &e%player%&c.'
+    globalPlayers: '%prefix% &aJe hebt &balle items &euitgeschakeld &avoor &ealle spelers&a.'
+    globalPlayersFailed: '%prefix% &cItems zijn al &euitgeschakeld &cvoor &ealle spelers&c.'
+
+# Deze placeholders zijn specifiek voor plugin messages
+placeholders:
+  PLAYER_INTERACT: 'Unknown'
