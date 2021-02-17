@@ -8,7 +8,7 @@
 	<groupId>me.RockinChaos.itemjoin</groupId>
 	<artifactId>ItemJoin</artifactId>
 	<name>ItemJoin</name>
-	<version>5.2.1-SNAPSHOT</version>
+	<version>5.2.1-RELEASE</version>
 	<description>Get custom items on join.</description>
 	<url>https://www.spigotmc.org/resources/itemjoin.12661/</url>
 	
