@@ -399,9 +399,9 @@ public class ItemUtilities {
     */
 	public boolean isObtainable(final Player player, final ItemMap itemMap, final int session, final TriggerType type) {
 		if (!itemMap.hasItem(player) || itemMap.isAlwaysGive()) {
-			DataObject firstJoin = SQL.getData().getData(new DataObject(Table.IJ_FIRST_JOIN, PlayerHandler.getPlayer().getPlayerID(player), "", itemMap.getConfigName()));
-			DataObject firstWorld = SQL.getData().getData(new DataObject(Table.IJ_FIRST_WORLD, PlayerHandler.getPlayer().getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName()));
-			DataObject ipLimit = SQL.getData().getData(new DataObject(Table.IJ_IP_LIMITS, PlayerHandler.getPlayer().getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName(), player.getAddress().getHostString()));
+			DataObject firstJoin = (itemMap.isOnlyFirstLife() && type.equals(TriggerType.RESPAWN) || itemMap.isOnlyFirstJoin() ? SQL.getData().getData(new DataObject(Table.IJ_FIRST_JOIN, PlayerHandler.getPlayer().getPlayerID(player), "", itemMap.getConfigName())) : null);
+			DataObject firstWorld = itemMap.isOnlyFirstWorld() ? SQL.getData().getData(new DataObject(Table.IJ_FIRST_WORLD, PlayerHandler.getPlayer().getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName())) : null;
+			DataObject ipLimit = itemMap.isIpLimted() ? SQL.getData().getData(new DataObject(Table.IJ_IP_LIMITS, PlayerHandler.getPlayer().getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName(), player.getAddress().getHostString())) : null;
 			if ((firstJoin == null || (itemMap.isOnlyFirstLife() && type.equals(TriggerType.RESPAWN))) && firstWorld == null 
 					&& (ipLimit == null || (ipLimit != null && ipLimit.getPlayerId().equalsIgnoreCase(PlayerHandler.getPlayer().getPlayerID(player)))) && this.canOverwrite(player, itemMap)) {
 				return true;
