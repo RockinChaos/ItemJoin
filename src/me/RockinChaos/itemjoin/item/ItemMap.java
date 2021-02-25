@@ -4803,7 +4803,7 @@ public class ItemMap {
 		FileConfiguration itemData = YamlConfiguration.loadConfiguration(itemFile);
 		this.renderItemStack();
 		if (ConfigHandler.getConfig().getFile("items.yml").getString("items." + this.configName) != null) { itemData.set("items." + this.configName, null); } 
-		if (!(this.dynamicMaterials != null && !this.dynamicMaterials.isEmpty())) { itemData.set("items." + this.configName + ".id", this.material.toString().toUpperCase() + (this.dataValue != 0 ? ":" + this.dataValue : "")); }
+		if (!(this.dynamicMaterials != null && !this.dynamicMaterials.isEmpty())) { itemData.set("items." + this.configName + ".id", this.material.toString().toUpperCase() + (this.dataValue != null && this.dataValue != 0 ? ":" + this.dataValue : "")); }
 		else if (this.dynamicMaterials != null && !this.dynamicMaterials.isEmpty()) { 
 			for (int i = 0; i < this.dynamicMaterials.size(); i++) {
 				itemData.set("items." + this.configName + ".id." + (i + 1), this.dynamicMaterials.get(i)); 	

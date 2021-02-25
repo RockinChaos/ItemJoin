@@ -806,8 +806,8 @@ public class UI {
 			creatingPane.addButton(new Button(this.fillerPaneGItem), 4);
 			creatingPane.addButton(new Button(this.headerStack(player, itemMap)));
 			creatingPane.addButton(new Button(this.fillerPaneGItem), 4);
-			creatingPane.addButton(new Button(ItemHandler.getItem().getItem(itemMap.getMaterial().toString() + ":" + itemMap.getDataValue(), 1, false, "&c&lMaterial", "&7", "&7*Set the material of the item.", "&9&lMATERIAL: &a" + 
-			itemMap.getMaterial().toString() + (itemMap.getDataValue() != 0 ? ":" + itemMap.getDataValue() : "")), event -> { 
+			creatingPane.addButton(new Button(ItemHandler.getItem().getItem(itemMap.getMaterial().toString() + ((itemMap.getDataValue() != null && itemMap.getDataValue() != 0) ? ":" + itemMap.getDataValue() : ""), 1, false, "&c&lMaterial", "&7", "&7*Set the material of the item.", "&9&lMATERIAL: &a" + 
+			itemMap.getMaterial().toString() + ((itemMap.getDataValue() != null && itemMap.getDataValue() != 0) ? ":" + itemMap.getDataValue() : "")), event -> { 
 				if (itemMap.getDynamicMaterials() != null && !itemMap.getDynamicMaterials().isEmpty()) {
 					this.animateMaterialPane(player, itemMap);
 				} else {
@@ -882,7 +882,7 @@ public class UI {
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				this.creatingPane(event.getPlayer(), itemMap);
 			}));
-			creatingPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_8") ? "GRASS_BLOCK" : "2"), 1, false, "&b&lEnabled Worlds", "&7", "&7*Define the world(s) that the", "&7item will be given in.", 
+			creatingPane.addButton(new Button(ItemHandler.getItem().getItem((ServerHandler.getServer().hasSpecificUpdate("1_13") ? "GRASS_BLOCK" : "2"), 1, false, "&b&lEnabled Worlds", "&7", "&7*Define the world(s) that the", "&7item will be given in.", 
 					"&9&lENABLED-WORLDS: &a" + (Utils.getUtils().nullCheck(itemMap.getEnabledWorlds().toString()) != "NONE" ? "&a" + worldList : "NONE")), event -> this.worldPane(player, itemMap)));
 			creatingPane.addButton(new Button(ItemHandler.getItem().getItem("GOLD_BLOCK", 1, true, "&b&lEnabled Regions", "&7", "&7*Define the region(s) that the", "&7item will be given in.", (DependAPI.getDepends(false).getGuard().guardEnabled() ? 
 					"&9&lENABLED-REGIONS: &a" + (Utils.getUtils().nullCheck(itemMap.getEnabledRegions().toString()) != "NONE" ? "&a" + regionList : "NONE") : ""), (DependAPI.getDepends(false).getGuard().guardEnabled() ? "" : "&7"), 
@@ -1149,7 +1149,7 @@ public class UI {
 		SchedulerUtils.getScheduler().runAsync(() -> {
 			final String language = ConfigHandler.getConfig().getFile("config.yml").getString("Language").replace(" ", "");
 			languagePane.addButton(new Button(this.fillerPaneBItem));
-			languagePane.addButton(new Button(ItemHandler.getItem().getItem(ServerHandler.getServer().hasSpecificUpdate("1_8") ? "GRASS_BLOCK" : "2", 1, language.equalsIgnoreCase("ENGLISH"), "&6&l&nEnglish", "&7", 
+			languagePane.addButton(new Button(ItemHandler.getItem().getItem(ServerHandler.getServer().hasSpecificUpdate("1_13") ? "GRASS_BLOCK" : "2", 1, language.equalsIgnoreCase("ENGLISH"), "&6&l&nEnglish", "&7", 
 			"&7*Sets the messages sent by", "&7the plugin to the player", "&7to be written in &c&lEnglish&7.", "&7This is the type of lang.yml file", "&7generated in the plugin folder.", 
 			"&9&lENABLED: &a" + (language.equalsIgnoreCase("ENGLISH") + "").toUpperCase()), event -> {
 				if (!language.equalsIgnoreCase("ENGLISH")) {
@@ -2349,7 +2349,7 @@ public class UI {
 					SchedulerUtils.getScheduler().runLater(2L, () -> this.worldPane(player, section));
 			}));
 			for (World world: Bukkit.getServer().getWorlds()) {
-				String worldMaterial = (ServerHandler.getServer().hasSpecificUpdate("1_8") ? "GRASS_BLOCK" : "2");
+				String worldMaterial = (ServerHandler.getServer().hasSpecificUpdate("1_13") ? "GRASS_BLOCK" : "2");
 				if (world.getEnvironment().equals(Environment.NETHER)) {
 					worldMaterial = "NETHERRACK";
 				} else if (world.getEnvironment().equals(Environment.THE_END)) {
@@ -2424,7 +2424,7 @@ public class UI {
 					SchedulerUtils.getScheduler().runLater(2L, () -> this.overwritePane(player));
 			}));
 			for (World world: Bukkit.getServer().getWorlds()) {
-				String worldMaterial = (ServerHandler.getServer().hasSpecificUpdate("1_8") ? "GRASS_BLOCK" : "2");
+				String worldMaterial = (ServerHandler.getServer().hasSpecificUpdate("1_13") ? "GRASS_BLOCK" : "2");
 				if (world.getEnvironment().equals(Environment.NETHER)) {
 					worldMaterial = "NETHERRACK";
 				} else if (world.getEnvironment().equals(Environment.THE_END)) {
@@ -4905,7 +4905,7 @@ public class UI {
 				itemMap.setEnabledWorlds(enabledWorlds);this.worldPane(player, itemMap);
 			}));
 			for (World world: Bukkit.getServer().getWorlds()) {
-				String worldMaterial = (ServerHandler.getServer().hasSpecificUpdate("1_8") ? "GRASS_BLOCK" : "2");
+				String worldMaterial = (ServerHandler.getServer().hasSpecificUpdate("1_13") ? "GRASS_BLOCK" : "2");
 				if (world.getEnvironment().equals(Environment.NETHER)) {
 					worldMaterial = "NETHERRACK";
 				} else if (world.getEnvironment().equals(Environment.THE_END)) {
@@ -4950,7 +4950,7 @@ public class UI {
 			}));
 			for (World world: Bukkit.getServer().getWorlds()) {
 				for (String region: DependAPI.getDepends(false).getGuard().getRegions(world).keySet()) {
-					String regionMaterial = (ServerHandler.getServer().hasSpecificUpdate("1_8") ? "GRASS_BLOCK" : "2");
+					String regionMaterial = (ServerHandler.getServer().hasSpecificUpdate("1_13") ? "GRASS_BLOCK" : "2");
 					if (world.getEnvironment().equals(Environment.NETHER)) {
 						regionMaterial = "NETHERRACK";
 					} else if (world.getEnvironment().equals(Environment.THE_END)) {
@@ -7756,8 +7756,8 @@ public class UI {
 		String blocks = "";
 		for (Material material: itemMap.getBlocksDrop().keySet()) { blocks += material.name() + ", "; }
 		try {
-			item = ItemHandler.getItem().getItem(itemMap.getMaterial().toString() + ":" + itemMap.getDataValue(), 1, false, "&7*&6&l&nItem Information", "&7", "&9&lNode: &a" + itemMap.getConfigName(), "&9&lMaterial: &a" 
-			+ itemMap.getMaterial().toString() + (itemMap.getDataValue() != 0 ? ":" + itemMap.getDataValue() : ""), 
+			item = ItemHandler.getItem().getItem(itemMap.getMaterial().toString() + ((itemMap.getDataValue() != null && itemMap.getDataValue() != 0) ? ":" + itemMap.getDataValue() : ""), 1, false, "&7*&6&l&nItem Information", "&7", "&9&lNode: &a" + itemMap.getConfigName(), "&9&lMaterial: &a" 
+			+ itemMap.getMaterial().toString() + ((itemMap.getDataValue() != null && itemMap.getDataValue() != 0) ? ":" + itemMap.getDataValue() : ""), 
 					(itemMap.getMultipleSlots() != null && !itemMap.getMultipleSlots().isEmpty() ? "&9&lSlot(s): &a" + slotList : "&9&lSlot: &a" + itemMap.getSlot().toUpperCase()), (itemMap.getCount() != 1 && itemMap.getCount() != 0) ? "&9&lCount: &a" + itemMap.getCount() : "", 
 					((Utils.getUtils().nullCheck(itemMap.getCustomName()) != "NONE" && !ItemHandler.getItem().getMaterialName(itemMap.getTempItem()).equalsIgnoreCase(itemMap.getCustomName())) ? "&9&lName: &a" + itemMap.getCustomName() : ""), (Utils.getUtils().nullCheck(itemMap.getCustomLore().toString()) != "NONE" ? "&9&lLore: &a" + (Utils.getUtils().nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",").length() > 40 ? Utils.getUtils().nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",").substring(0, 40) : Utils.getUtils().nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",")) : ""), 
 					(Utils.getUtils().nullCheck(itemMap.getDurability() + "&7") != "NONE" ? "&9&lDurability: &a" + itemMap.getDurability() : ""), (Utils.getUtils().nullCheck(itemMap.getData() + "&7") != "NONE" ? "&9&lTexture Data: &a" + itemMap.getData() : ""), (useCommands ? "&9&lCommands: &aYES" : ""), 
