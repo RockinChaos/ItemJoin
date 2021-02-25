@@ -16,7 +16,7 @@
 # |                                                                                              | #
 # +----------------------------------------------------------------------------------------------+ #
 
-# Modifying this will cause this file to break and regenerate.
+# Modifying the Version will cause this file to break and regenerate.
 config-Version: 8
 
 # At the moment, the available language translations are; English, Russian, French, Dutch, Spanish, Chinese, Traditional Chinese.
