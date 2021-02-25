@@ -8,7 +8,7 @@
 	<groupId>me.RockinChaos.itemjoin</groupId>
 	<artifactId>ItemJoin</artifactId>
 	<name>ItemJoin</name>
-	<version>5.2.1-RELEASE</version>
+	<version>5.2.2-SNAPSHOT</version>
 	<description>Get custom items on join.</description>
 	<url>https://www.spigotmc.org/resources/itemjoin.12661/</url>
 	
@@ -303,7 +303,7 @@
 	    <dependency>
 	      <groupId>com.zaxxer</groupId>
 	      <artifactId>HikariCP</artifactId>
-	      <version>LATEST</version>
+	      <version>4.0.2</version>
 	      <scope>compile</scope>
 	    </dependency>
 		<dependency>
