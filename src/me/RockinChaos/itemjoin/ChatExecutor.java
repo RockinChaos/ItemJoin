@@ -394,12 +394,14 @@ public class ChatExecutor implements CommandExecutor {
 				if (dataObject != null) { SQL.getData().removeData(dataObject); }
 			} 
 			else {
-				synchronized (this) {
-					SchedulerUtils.getScheduler().runAsync(() -> {
-						SQL.getData().purgeDatabase();
-						SQL.newData(true);
-					});
-				}
+			ItemJoin.getInstance().setStarted(false);
+				SchedulerUtils.getScheduler().runAsync(() -> {
+					SQL.getData().purgeDatabase(); {
+						SQL.newData(false); {
+							ItemJoin.getInstance().setStarted(true);	
+						}
+					}
+				});
 			}
 			LanguageAPI.getLang(false).sendLangMessage("commands.database.purgeSuccess", sender, placeHolders);
 			this.confirmationRequests.remove(table + sender.getName());

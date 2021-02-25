@@ -116,6 +116,7 @@ public class ConfigHandler {
 		final boolean reload = ItemJoin.getInstance().isStarted();
 		ServerHandler.getServer().clearErrorStatements();
 		this.copyFiles();
+		LogFilter.getFilter(true);
 		ItemJoin.getInstance().setStarted(false);
 		SchedulerUtils.getScheduler().runAsync(() -> {
         	DependAPI.getDepends(true);
@@ -128,7 +129,6 @@ public class ConfigHandler {
 			SQL.newData(reload); {
 				SchedulerUtils.getScheduler().runLater(2L, () -> {
 					ItemDesigner.getDesigner(true); {
-						LogFilter.getFilter(true);
 						ItemJoin.getInstance().setStarted(true);
 						this.setPermissionPages();
 					}
