@@ -390,6 +390,17 @@ public class Database extends Controller {
 	}
 	
    /**
+	* Closes the active database connections and destroys existing Singletons.
+	* 
+	*/
+	public static void kill() {
+		if (data != null) {
+			data.closeConnection(true);
+			data = null;
+		}
+	}
+	
+   /**
 	* Gets the instance of the Database.
 	* 
 	* @return The Database instance.
@@ -439,6 +450,7 @@ abstract class Controller {
     protected HikariDataSource hikari;
     protected HikariConfig hikariConfig;
 	protected boolean stopConnection = false;
+	protected boolean constConnection = false;
 		
    /**
 	* Gets the proper SQL connection.
@@ -447,26 +459,25 @@ abstract class Controller {
     * @throws SQLException 
 	*/
 	protected Connection getConnection() throws SQLException {
-		if (!this.isClosed(this.connection)) {
-			return this.connection; 
-		} else if (!this.stopConnection) {
+		if (this.isClosed(this.connection) && !this.stopConnection) {
 			synchronized (this) {
-				try { 
-					this.hikari = new HikariDataSource(this.hikariConfig);
-					try {
+				try {
+					if (this.isClosed(this.connection)) {
+					    try {
+					    	this.hikari = new HikariDataSource(this.hikariConfig);
+						} catch (Exception e) { 
+							this.close(null, null, this.connection, true);
+							if (ConfigHandler.getConfig().sqlEnabled()) {
+								ServerHandler.getServer().logSevere("{SQL} Unable to connect to the defined MySQL database, check your settings.");
+							} else { ServerHandler.getServer().logSevere("{SQL} SQLite exception on initialize."); }
+							ServerHandler.getServer().sendSevereTrace(e);
+						}
 						this.connection = this.hikari.getConnection();
-					} catch (Exception e) { 
-						if (Utils.getUtils().containsIgnoreCase(e.getMessage(), "Apparent connection leak detected")) {
-							ServerHandler.getServer().logDebug("{SQL} Connection leak due to server lag has been detected, restarting database connection.");
-						} else { e.printStackTrace(); }
 					}
-				    return this.connection;
 				} catch (Exception e) { 
-					this.close(null, null, this.connection, true);
-					if (ConfigHandler.getConfig().sqlEnabled()) {
-						ServerHandler.getServer().logSevere("{SQL} Unable to connect to the defined MySQL database, check your settings.");
-					} else { ServerHandler.getServer().logSevere("{SQL} SQLite exception on initialize."); }
-					ServerHandler.getServer().sendSevereTrace(e);
+					if (Utils.getUtils().containsIgnoreCase(e.getMessage(), "Apparent connection leak detected") || Utils.getUtils().containsIgnoreCase(e.getMessage(), "Connection leak detection triggered")) {
+						ServerHandler.getServer().logSevere("{SQL} Connection leak due to server lag has been detected, restarting database connection.");
+					} else { e.printStackTrace(); }
 				}
 			}
 		}
@@ -602,23 +613,34 @@ abstract class Controller {
 		if (ConfigHandler.getConfig().sqlEnabled()) {
 			this.hikariConfig.setJdbcUrl("jdbc:mysql://" + config.getString("Database.host") + ":" + config.getString("Database.port") + "/" + database + "?useSSL=false" + "&createDatabaseIfNotExist=true" + "&allowPublicKeyRetrieval=true");
 		    this.hikariConfig.setDriverClassName("com.mysql.jdbc.Driver");
-			this.hikariConfig.setIdleTimeout(TimeUnit.SECONDS.toMillis(100));
+	    	this.hikariConfig.setConnectionTimeout(TimeUnit.MINUTES.toMillis(60));
+	    	this.hikariConfig.setValidationTimeout(TimeUnit.SECONDS.toMillis(100));
 		    this.hikariConfig.setUsername(config.getString("Database.user"));
 		    this.hikariConfig.setPassword(config.getString("Database.pass"));
+		    this.constConnection = true;
 		} else {
 			this.hikariConfig.setJdbcUrl("jdbc:sqlite:" + this.getDatabaseFile());
 			this.hikariConfig.setDriverClassName("org.sqlite.JDBC");
+	    	this.hikariConfig.setConnectionTimeout(TimeUnit.SECONDS.toMillis(100));
+	    	this.hikariConfig.setValidationTimeout(TimeUnit.SECONDS.toMillis(100));
+	    	this.hikariConfig.setMaxLifetime(TimeUnit.MINUTES.toMillis(10));
 		}
+		this.hikariConfig.setLeakDetectionThreshold(TimeUnit.SECONDS.toMillis(300));
 		this.hikariConfig.setConnectionTestQuery("SELECT 1");
 	    this.hikariConfig.addDataSourceProperty("cachePrepStmts", "true");
 	    this.hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250");
 	    this.hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
 	    this.hikariConfig.addDataSourceProperty("userServerPrepStmts", "true");
-	    this.hikariConfig.setLeakDetectionThreshold(TimeUnit.SECONDS.toMillis(90));
-	    this.hikariConfig.setConnectionTimeout(TimeUnit.SECONDS.toMillis(100));
-	    this.hikariConfig.setValidationTimeout(TimeUnit.SECONDS.toMillis(100));
-	    this.hikariConfig.setMaxLifetime(TimeUnit.MINUTES.toMillis(10));
+
 	    this.hikariConfig.setMaximumPoolSize(10);
+	}
+	
+   /**
+	* Checks if the connection is an SQL Constant.
+	* 
+	*/
+	public boolean getConstant() {
+		return this.constConnection;
 	}
 	
    /**
