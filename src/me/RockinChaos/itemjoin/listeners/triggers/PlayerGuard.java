@@ -89,8 +89,12 @@ public class PlayerGuard implements Listener {
 		if (this.playerRegions.get(player) != null) {
 			List < String > regionSet = new ArrayList < String > (Arrays.asList(regions.replace(" ", "").split(",")));
 			List < String > playerSet = new ArrayList < String > (Arrays.asList(this.playerRegions.get(player).replace(" ", "").split(",")));
-			regionSet.removeAll(Arrays.asList(this.playerRegions.get(player).replace(" ", "").split(",")));
-			playerSet.removeAll(Arrays.asList(regions.replace(" ", "").split(",")));
+			if (player != null && this.playerRegions != null && this.playerRegions.get(player) != null && regionSet != null) {
+				regionSet.removeAll(Arrays.asList(this.playerRegions.get(player).replace(" ", "").split(",")));
+			}
+			if (playerSet != null && regions != null) {
+				playerSet.removeAll(Arrays.asList(regions.replace(" ", "").split(",")));
+			}
 			for (String region: playerSet) {
 				if (region != null && !region.isEmpty()) {
 					SchedulerUtils.getScheduler().run(() -> ItemUtilities.getUtilities().setItems(player, player.getWorld(), TriggerType.REGION_LEAVE, player.getGameMode(), region));
