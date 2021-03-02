@@ -310,7 +310,7 @@ public class DataObject {
 				return true;
 			}
 		} else if (object1.getTable().equals(Table.IJ_RETURN_ITEMS)) {
-			if (object1.getPlayerId().equalsIgnoreCase(object2.getPlayerId()) && object1.getWorld().equalsIgnoreCase(object2.getWorld()) && object1.getRegion().equalsIgnoreCase(object2.getRegion())) {
+			if (object1.getPlayerId().equalsIgnoreCase(object2.getPlayerId()) && object1.getRegion().equalsIgnoreCase(object2.getRegion())) {
 				return true;
 			}
 		} else if (object1.getTable().equals(Table.IJ_RETURN_SWITCH_ITEMS)) {
