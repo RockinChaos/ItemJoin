@@ -54,7 +54,7 @@ public class PermissionsHandler {
 			return true;
 		} else if (!ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Commands-OP") && sender.isOp()) {
 			if (permission.equalsIgnoreCase("itemjoin.use") || permission.equalsIgnoreCase("itemjoin.reload") || permission.equalsIgnoreCase("itemjoin.updates")
-					|| permission.equalsIgnoreCase("itemjoin.autoupdate") || permission.equalsIgnoreCase("itemjoin.menu") 
+					|| permission.equalsIgnoreCase("itemjoin.upgrade") || permission.equalsIgnoreCase("itemjoin.menu") 
 					|| permission.equalsIgnoreCase("itemjoin.purge") || permission.equalsIgnoreCase("itemjoin.get") || permission.equalsIgnoreCase("itemjoin.get.others")
 							|| permission.equalsIgnoreCase("itemjoin.remove") || permission.equalsIgnoreCase("itemjoin.remove.others") || permission.equalsIgnoreCase("itemjoin.disable") 
 							|| permission.equalsIgnoreCase("itemjoin.disable.others") || permission.equalsIgnoreCase("itemjoin.enable") || permission.equalsIgnoreCase("itemjoin.enable.others")
