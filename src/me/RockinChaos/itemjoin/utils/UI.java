@@ -416,7 +416,7 @@ public class UI {
 		modifyPane.addButton(new Button(ItemHandler.getItem().addLore(item, "&7", space, lore, "&9&lNode: &a" + itemMap.getConfigName(), "&7", (contents != null ? "&9&lENABLED: " + (contents.getContents().contains(itemMap.getConfigName()) ? "&aYES" : "&aNO") : "")), event -> 
 		{
 			if (refMap != null) {
-				this.setIngredients(player, itemMap, itemMap.getConfigName(), k);
+				this.setIngredients(player, refMap, itemMap.getConfigName(), k);
 			} else if (contents == null) {
 				this.choicePane(player, itemMap, item);
 			} else {
