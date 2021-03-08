@@ -99,7 +99,7 @@ public class ItemCommand {
 	* @param itemMap - the ItemMap of the custom item.
 	*/
 	private void taskOnHold(final Player player, final String slot, final int cooldown, final ItemMap itemMap) {
-    	this.cycleTask = SchedulerUtils.getScheduler().runAtInterval(cooldown, 0L, () -> {
+    	this.cycleTask = SchedulerUtils.getScheduler().runAsyncAtInterval(cooldown, 0L, () -> {
     		if (itemMap.isSimilar(PlayerHandler.getPlayer().getMainHandItem(player))) {
     			this.sendDispatch(player, this.executorType, slot);
     		} else if (itemMap.isSimilar(PlayerHandler.getPlayer().getOffHandItem(player))) {
@@ -126,7 +126,7 @@ public class ItemCommand {
 	* @param itemMap - the ItemMap of the custom item.
 	*/
 	private void taskOnReceive(final Player player, final String slot, final int cooldown, final int receive, final ItemMap itemMap) {
-		SchedulerUtils.getScheduler().runLater(cooldown, () -> {
+		SchedulerUtils.getScheduler().runAsyncLater(cooldown, () -> {
 	    	if (receive != 0) {
 	    		this.sendDispatch(player, this.executorType, slot); 
 	    		this.taskOnReceive(player, slot, cooldown, (receive - 1), itemMap);
@@ -257,7 +257,7 @@ public class ItemCommand {
 	* @param world - the world that the player is in.
 	*/
 	private void allowDispatch(final Player player, final World world) {
-		SchedulerUtils.getScheduler().runLater(20L, () -> {
+		SchedulerUtils.getScheduler().runAsyncLater(20L, () -> {
 			if (this.getPending(player)) {
 				if ((!this.actionType.equals(Action.ON_DEATH) && player.isDead()) || !player.isOnline() || player.getWorld() != world) {
 					this.setExecute(player, true);
@@ -277,7 +277,7 @@ public class ItemCommand {
 	private void sendDispatch(final Player player, final Executor cmdtype, final String slot) {
 		final World world = player.getWorld();
 		this.setPending(player, true); 
-		SchedulerUtils.getScheduler().runLater(this.delay, () -> {
+		SchedulerUtils.getScheduler().runAsyncLater(this.delay, () -> {
 			this.allowDispatch(player, world);
 			this.setPending(player, false);
 			if ((this.actionType.equals(Action.ON_DEATH) || !player.isDead()) && ((this.itemMap != null && ((this.actionType.equals(Action.ON_HOLD) && this.itemMap.isSimilar(PlayerHandler.getPlayer().getMainHandItem(player))) 
@@ -309,10 +309,14 @@ public class ItemCommand {
 	private void dispatchConsoleCommands(final Player player) {
 		try {
 			if (Utils.getUtils().containsIgnoreCase(this.command, "[close]")) {
-				PlayerHandler.getPlayer().safeInventoryClose(player);
+				SchedulerUtils.getScheduler().run(() -> {
+					PlayerHandler.getPlayer().safeInventoryClose(player);
+				});
 			} else {
 				this.setLoggable(player, "/" + Utils.getUtils().translateLayout(this.command, player));
-				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), Utils.getUtils().translateLayout(this.command, player));
+				SchedulerUtils.getScheduler().run(() -> {
+					Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), Utils.getUtils().translateLayout(this.command, player));
+				});
 			}
 		} catch (Exception e) {
 			ServerHandler.getServer().logSevere("{ItemCommand} There was an error executing an item's command as console, if this continues report it to the developer.");
@@ -328,13 +332,17 @@ public class ItemCommand {
 	private void dispatchOpCommands(final Player player) {
 		try {
 			if (Utils.getUtils().containsIgnoreCase(this.command, "[close]")) {
-				PlayerHandler.getPlayer().safeInventoryClose(player);
+				SchedulerUtils.getScheduler().run(() -> {
+					PlayerHandler.getPlayer().safeInventoryClose(player);
+				});
 			} else {
 				boolean isOp = player.isOp();
 				try {
 					player.setOp(true);
 					this.setLoggable(player, "/" + Utils.getUtils().translateLayout(this.command, player));
-					player.chat("/" + Utils.getUtils().translateLayout(this.command, player));
+					SchedulerUtils.getScheduler().run(() -> {
+						player.chat("/" + Utils.getUtils().translateLayout(this.command, player));
+					});
 				} catch (Exception e) {
 					ServerHandler.getServer().sendDebugTrace(e);
 					player.setOp(isOp);
@@ -355,10 +363,14 @@ public class ItemCommand {
 	private void dispatchPlayerCommands(final Player player) {
 		try {
 			if (Utils.getUtils().containsIgnoreCase(this.command, "[close]")) {
-				PlayerHandler.getPlayer().safeInventoryClose(player);
+				SchedulerUtils.getScheduler().run(() -> {
+					PlayerHandler.getPlayer().safeInventoryClose(player);
+				});
 			} else {
 				this.setLoggable(player, "/" + Utils.getUtils().translateLayout(this.command, player));
-				player.chat("/" + Utils.getUtils().translateLayout(this.command, player));
+				SchedulerUtils.getScheduler().run(() -> {
+					player.chat("/" + Utils.getUtils().translateLayout(this.command, player));
+				});
 			}
 		} catch (Exception e) {
 			ServerHandler.getServer().logSevere("{ItemCommand} There was an error executing an item's command as a player, if this continues report it to the developer.");
@@ -372,7 +384,11 @@ public class ItemCommand {
 	* @param player - player that is interacting with the custom items command.
 	*/
 	private void dispatchMessageCommands(final Player player) {
-		try { player.sendMessage(Utils.getUtils().translateLayout(this.command, player)); } 
+		try { 
+			SchedulerUtils.getScheduler().run(() -> {
+				player.sendMessage(Utils.getUtils().translateLayout(this.command, player)); 
+			});
+		} 
 		catch (Exception e) {
 			ServerHandler.getServer().logSevere("{ItemCommand} There was an error executing an item's command to send a message, if this continues report it to the developer.");
 			ServerHandler.getServer().sendDebugTrace(e);
@@ -385,7 +401,11 @@ public class ItemCommand {
 	* @param player - player that is interacting with the custom items command.
 	*/
 	private void dispatchServerCommands(final Player player) {
-		try { BungeeCord.getBungee().SwitchServers(player, Utils.getUtils().translateLayout(this.command, player)); } 
+		try { 
+			SchedulerUtils.getScheduler().run(() -> {
+				BungeeCord.getBungee().SwitchServers(player, Utils.getUtils().translateLayout(this.command, player)); 
+			});
+		} 
 		catch (Exception e) {
 			ServerHandler.getServer().logSevere("{ItemCommand} There was an error executing an item's command to switch servers, if this continues report it to the developer.");
 			ServerHandler.getServer().sendDebugTrace(e);
@@ -398,7 +418,11 @@ public class ItemCommand {
 	* @param player - player that is interacting with the custom items command.
 	*/
 	private void dispatchBungeeCordCommands(final Player player) {
-		try { BungeeCord.getBungee().ExecuteCommand(player, Utils.getUtils().translateLayout(this.command, player)); } 
+		try { 
+			SchedulerUtils.getScheduler().run(() -> {
+				BungeeCord.getBungee().ExecuteCommand(player, Utils.getUtils().translateLayout(this.command, player)); 
+			});
+		} 
 		catch (Exception e) {
 			ServerHandler.getServer().logSevere("{ItemCommand} There was an error executing an item's command to BungeeCord, if this continues report it to the developer.");
 			ServerHandler.getServer().sendDebugTrace(e);

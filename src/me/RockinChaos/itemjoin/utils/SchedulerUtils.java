@@ -53,9 +53,9 @@ public class SchedulerUtils {
     * @param interval - The interval in which to run the task.
     * @return The repeating task identifier.
     */
-    public int runAtInterval(final long delay, final long interval, final Runnable runnable) {
+    public int runAsyncAtInterval(final long delay, final long interval, final Runnable runnable) {
     	if (ItemJoin.getInstance().isEnabled()) {
-    		return Bukkit.getScheduler().scheduleSyncRepeatingTask(ItemJoin.getInstance(), runnable, interval, delay);
+    		return Bukkit.getScheduler().runTaskTimerAsynchronously(ItemJoin.getInstance(), runnable, interval, delay).getTaskId();
     	}
     	return 0;
     }
