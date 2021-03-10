@@ -83,6 +83,35 @@ public class Database extends Controller {
 	}
 	
    /**
+	* Executes a specified SQL statement.
+	* 
+	* @param statement - the statement to be executed.
+	* @return The statement was successfully executed.
+	*/
+	public void executeStatementLater(final String statement) throws Exception {
+		Connection conn = null;
+		PreparedStatement ps = null;
+		try {
+			conn = this.getConnection();
+			if (conn != null) {
+				ps = conn.prepareStatement(statement);
+				ps.execute();
+			}
+		} catch (Exception e) {
+			ServerHandler.getServer().logSevere("{SQL} [1] Failed to execute database statement.");
+			try {
+				ServerHandler.getServer().logSevere("{SQL} [1] Database Status: Open: " + !this.isClosed(conn) + "! Writable: " + !conn.isReadOnly() + "!");
+			} catch (Exception e2) {
+				ServerHandler.getServer().logSevere("{SQL} [1] Failed to determine the Database Status.");
+			}
+			ServerHandler.getServer().logSevere("{SQL} [1] Statement: " + statement);
+			ServerHandler.getServer().sendSevereTrace(e);
+		} finally {
+			this.close(ps, null, conn, false);
+		}
+	}
+	
+   /**
 	* Queries the specified row and the specified statement for a specific value.
     * 
 	* @param statement - the statement to be executed.

@@ -27,7 +27,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.PlayerInventory;
@@ -164,15 +163,15 @@ public class GuardAPI {
 	}
 	
    /**
-	* Gets the current region(s) the player is currently in.
+	* Gets the current region(s) at the specified location
 	* 
-	* @param player - The player that has entered or exited a region.
-	* @return regionSet The applicable regions at the players location.
+	* @param location - The Location to have exiting regions fetched.
+	* @return regionSet The applicable regions at the Location.
 	*/
-	public String getRegionAtEntity(final Entity entity) {
+	public String getRegionAtLocation(final Location location) {
 		ApplicableRegionSet set = null;
 		String regionSet = "";
-		try { set = this.getRegionSet(entity.getLocation()); } 
+		try { set = this.getRegionSet(location); } 
 		catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
 		if (set == null) { return regionSet; }
 		for (ProtectedRegion r: set) {

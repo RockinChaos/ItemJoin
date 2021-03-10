@@ -57,14 +57,23 @@ public class SQL {
 			for (String statement : this.executeStatementsLater) {
 				if (ItemJoin.getInstance().isEnabled()) {
 					SchedulerUtils.getScheduler().runAsync(() -> {
-						Database.getDatabase().executeStatement(statement);
+						try {
+							Database.getDatabase().executeStatementLater(statement);
+							this.executeStatementsLater.remove(statement);
+						} catch (Exception e) {
+							ServerHandler.getServer().sendSevereTrace(e);
+						} 
 					});
 				} else {
-					Database.getDatabase().executeStatement(statement);
+					try {
+						Database.getDatabase().executeStatementLater(statement);
+						this.executeStatementsLater.remove(statement);
+					} catch (Exception e) {
+						ServerHandler.getServer().sendSevereTrace(e);
+					} 
 				}
 			}
 			ServerHandler.getServer().logDebug("{SQL} Saving newly generated data to the database.");
-			this.executeStatementsLater.clear();
 		}
 	}
 	
