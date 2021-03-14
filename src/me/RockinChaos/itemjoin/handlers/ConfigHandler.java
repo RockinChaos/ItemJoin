@@ -352,7 +352,6 @@ public class ConfigHandler {
     * 
     */
 	public void reloadConfigs(boolean silent) {
-		SQL.getData().executeLaterStatements();
 		ItemUtilities.getUtilities().closeAnimations();
 		ItemUtilities.getUtilities().clearItems();
 		config = new ConfigHandler(); 

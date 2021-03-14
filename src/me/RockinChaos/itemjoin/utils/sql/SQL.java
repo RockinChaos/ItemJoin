@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ServerHandler;
@@ -31,7 +32,6 @@ import me.RockinChaos.itemjoin.utils.sql.DataObject.Table;
 public class SQL {
 	
 	private Map < String, List<DataObject> > databaseData = new HashMap < String, List<DataObject> >();
-	private List <String> executeStatementsLater = new ArrayList<String>();
 	
 	private static SQL data;
 	
@@ -43,49 +43,8 @@ public class SQL {
 		Database.kill(); {
 			this.createTables();
 			this.loadData();
-			this.executeSaveStatements();
 			ServerHandler.getServer().logDebug("{SQL} Database Connected."); 
 		}
-	}
-
-   /**
-    * Executes pending datatypes to be saved to the SQL database.
-    * 
-    */
-	public void executeLaterStatements() {
-		if (this.executeStatementsLater != null && !this.executeStatementsLater.isEmpty()) {
-			for (String statement : this.executeStatementsLater) {
-				if (ItemJoin.getInstance().isEnabled()) {
-					SchedulerUtils.getScheduler().runAsync(() -> {
-						try {
-							Database.getDatabase().executeStatementLater(statement);
-							this.executeStatementsLater.remove(statement);
-						} catch (Exception e) {
-							ServerHandler.getServer().sendSevereTrace(e);
-						} 
-					});
-				} else {
-					try {
-						Database.getDatabase().executeStatementLater(statement);
-						this.executeStatementsLater.remove(statement);
-					} catch (Exception e) {
-						ServerHandler.getServer().sendSevereTrace(e);
-					} 
-				}
-			}
-			ServerHandler.getServer().logDebug("{SQL} Saving newly generated data to the database.");
-		}
-	}
-	
-   /**
-    * Saves the pending data to the database data file.
-    * 
-    */
-	private void executeSaveStatements() {
-		SchedulerUtils.getScheduler().runLater(36000L, () -> {
-			this.executeLaterStatements();
-			this.executeSaveStatements();
-		});
 	}
 	
    /**
@@ -94,9 +53,11 @@ public class SQL {
     */
 	public void purgeDatabase() {
 		this.databaseData.clear();
-		for (Table table: Table.values()) {
-			Database.getDatabase().executeStatement("DROP TABLE IF EXISTS " + table.name().toLowerCase());
-		}
+		SchedulerUtils.getScheduler().runAsync(() -> {
+			for (Table table: Table.values()) {
+				Database.getDatabase().executeStatement("DROP TABLE IF EXISTS " + table.name().toLowerCase());
+			}
+		});
 	}
 	
    /**
@@ -107,7 +68,13 @@ public class SQL {
 	public void saveData(DataObject object) {
 		if (object != null) { 
 			String table = object.getTable().name().toLowerCase();
-			this.executeStatementsLater.add("INSERT INTO " + object.getTable().name().toLowerCase() + " (" + object.getTable().headers() + ") VALUES (" + object.getInsertValues() + ")");
+			if (ItemJoin.getInstance().isEnabled()) {
+				SchedulerUtils.getScheduler().runAsync(() -> {
+					Database.getDatabase().executeStatement("INSERT INTO " + object.getTable().name().toLowerCase() + " (" + object.getTable().headers() + ") VALUES (" + object.getInsertValues() + ")");
+				});
+			} else {
+				Database.getDatabase().executeStatement("INSERT INTO " + object.getTable().name().toLowerCase() + " (" + object.getTable().headers() + ") VALUES (" + object.getInsertValues() + ")");
+			}
 			if (this.databaseData.get(table) != null) {
 				List <DataObject> h1 = this.databaseData.get(table);
 				h1.add(object);
@@ -133,7 +100,13 @@ public class SQL {
 				while (dataSet.hasNext()) {
 					DataObject dataObject = dataSet.next();
 					if (dataObject != null && dataObject.getTable().equals(object.getTable()) && object.equalsData(object, dataObject)) {
-						this.executeStatementsLater.add("DELETE FROM " + dataObject.getTable().name().toLowerCase() + " WHERE (" + dataObject.getTable().removal() + ") = (" + dataObject.getRemovalValues() + ")");
+						if (ItemJoin.getInstance().isEnabled()) {
+							SchedulerUtils.getScheduler().runAsync(() -> {
+								Database.getDatabase().executeStatement("DELETE FROM " + dataObject.getTable().name().toLowerCase() + " WHERE (" + dataObject.getTable().removal() + ") = (" + dataObject.getRemovalValues() + ")");
+							});
+						} else {
+							Database.getDatabase().executeStatement("DELETE FROM " + dataObject.getTable().name().toLowerCase() + " WHERE (" + dataObject.getTable().removal() + ") = (" + dataObject.getRemovalValues() + ")");
+						}
 						dataSet.remove();
 					}
 				}
@@ -291,25 +264,6 @@ public class SQL {
 		}
 		if (!Database.getDatabase().tableExists("ij_map_ids") && Database.getDatabase().tableExists("map_ids")) {
 			Database.getDatabase().executeStatement("ALTER TABLE map_ids RENAME TO ij_map_ids;");
-		}
-		// Add Time_Stamp datatype to legacy tables.
-		if (Database.getDatabase().tableExists("ij_first_join") && !Database.getDatabase().columnExists("SELECT Time_Stamp FROM ij_first_join")) {
-			Database.getDatabase().executeStatement("ALTER TABLE ij_first_join ADD Time_Stamp datatype;");
-		}
-		if (Database.getDatabase().tableExists("ij_first_world") && !Database.getDatabase().columnExists("SELECT Time_Stamp FROM ij_first_world")) {
-			Database.getDatabase().executeStatement("ALTER TABLE ij_first_world ADD Time_Stamp datatype;");
-		}
-		if (Database.getDatabase().tableExists("ij_ip_limits") && !Database.getDatabase().columnExists("SELECT Time_Stamp FROM ij_ip_limits")) {
-			Database.getDatabase().executeStatement("ALTER TABLE ij_ip_limits ADD Time_Stamp datatype;");
-		}
-		if (Database.getDatabase().tableExists("ij_first_commands") && !Database.getDatabase().columnExists("SELECT Time_Stamp FROM ij_first_commands")) {
-			Database.getDatabase().executeStatement("ALTER TABLE ij_first_commands ADD Time_Stamp datatype;");
-		}
-		if (Database.getDatabase().tableExists("ij_enabled_players") && !Database.getDatabase().columnExists("SELECT Time_Stamp FROM ij_enabled_players")) {
-			Database.getDatabase().executeStatement("ALTER TABLE ij_enabled_players ADD Time_Stamp datatype;");
-		}
-		if (Database.getDatabase().tableExists("ij_map_ids") && !Database.getDatabase().columnExists("SELECT Time_Stamp FROM ij_map_ids")) {
-			Database.getDatabase().executeStatement("ALTER TABLE ij_map_ids ADD Time_Stamp datatype;");
 		}
 		// Removes legacy columns from legacy tables.
 		if (Database.getDatabase().tableExists("ij_first_join") && Database.getDatabase().columnExists("SELECT Player_Name FROM ij_first_join")) {

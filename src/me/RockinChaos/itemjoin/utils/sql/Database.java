@@ -20,17 +20,14 @@ package me.RockinChaos.itemjoin.utils.sql;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
+import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
-
 import org.bukkit.configuration.file.FileConfiguration;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
@@ -50,7 +47,6 @@ public class Database extends Controller {
 	*/
 	public Database(String baseName) {
 		this.dataFolder = baseName;
-		this.loadSource();
 	}
 	
    /**
@@ -61,41 +57,12 @@ public class Database extends Controller {
 	*/
 	public void executeStatement(final String statement) {
 		Connection conn = null;
-		PreparedStatement ps = null;
+		Statement ps = null;
 		try {
 			conn = this.getConnection();
 			if (conn != null) {
-				ps = conn.prepareStatement(statement);
-				ps.execute();
-			}
-		} catch (Exception e) {
-			ServerHandler.getServer().logSevere("{SQL} [1] Failed to execute database statement.");
-			try {
-				ServerHandler.getServer().logSevere("{SQL} [1] Database Status: Open: " + !this.isClosed(conn) + "! Writable: " + !conn.isReadOnly() + "!");
-			} catch (Exception e2) {
-				ServerHandler.getServer().logSevere("{SQL} [1] Failed to determine the Database Status.");
-			}
-			ServerHandler.getServer().logSevere("{SQL} [1] Statement: " + statement);
-			ServerHandler.getServer().sendSevereTrace(e);
-		} finally {
-			this.close(ps, null, conn, false);
-		}
-	}
-	
-   /**
-	* Executes a specified SQL statement.
-	* 
-	* @param statement - the statement to be executed.
-	* @return The statement was successfully executed.
-	*/
-	public void executeStatementLater(final String statement) throws Exception {
-		Connection conn = null;
-		PreparedStatement ps = null;
-		try {
-			conn = this.getConnection();
-			if (conn != null) {
-				ps = conn.prepareStatement(statement);
-				ps.execute();
+				ps = conn.createStatement();
+				ps.executeUpdate(statement);
 			}
 		} catch (Exception e) {
 			ServerHandler.getServer().logSevere("{SQL} [1] Failed to execute database statement.");
@@ -120,14 +87,14 @@ public class Database extends Controller {
 	*/
 	public Object queryValue(final String statement, final String row) {
 		Connection conn = null;
-		PreparedStatement ps = null;
+		Statement ps = null;
 		ResultSet rs = null;
 		Object returnValue = null;
 		try {
 			conn = this.getConnection();
 			if (conn != null) {
-				ps = conn.prepareStatement(statement);
-				rs = ps.executeQuery();
+				ps = conn.createStatement();
+				rs = ps.executeQuery(statement);
 				if (rs.next()) {
 					returnValue = rs.getObject(row);
 				}
@@ -157,13 +124,13 @@ public class Database extends Controller {
 	public List < Object > queryRow(final String statement, final String row) {
 		final List < Object > objects = new ArrayList < Object > ();
 		Connection conn = null;
-		PreparedStatement ps = null;
+		Statement ps = null;
 		ResultSet rs = null;
 		try {
 			conn = this.getConnection();
 			if (conn != null) {
-				ps = conn.prepareStatement(statement);
-				rs = ps.executeQuery();
+				ps = conn.createStatement();
+				rs = ps.executeQuery(statement);
 				while (rs.next()) {
 					objects.add(rs.getObject(row));
 				}
@@ -193,13 +160,13 @@ public class Database extends Controller {
 	public List < HashMap < String, String >> queryTableData(final String statement, final String rows) {
 		final List < HashMap < String, String > > existingData = new ArrayList < HashMap < String, String > > ();
 		Connection conn = null;
-		PreparedStatement ps = null;
+		Statement ps = null;
 		ResultSet rs = null;
 		try {
 			conn = this.getConnection();
 			if (conn != null) {
-				ps = conn.prepareStatement(statement);
-				rs = ps.executeQuery();
+				ps = conn.createStatement();
+				rs = ps.executeQuery(statement);
 				while (rs.next()) {
 					final HashMap < String, String > columnData = new HashMap < String, String > ();
 					for (final String singleRow: rows.split(", ")) {
@@ -235,13 +202,13 @@ public class Database extends Controller {
 	public List < List < String >> queryTableData(final String statement, final String...row) { //old remove later
 		final List < List < String > > existingData = new ArrayList < List < String > > ();
 		Connection conn = null;
-		PreparedStatement ps = null;
+		Statement ps = null;
 		ResultSet rs = null;
 		try {
 			conn = this.getConnection();
 			if (conn != null) {
-				ps = conn.prepareStatement(statement);
-				rs = ps.executeQuery();
+				ps = conn.createStatement();
+				rs = ps.executeQuery(statement);
 				while (rs.next()) {
 					final List < String > columnData = new ArrayList < String > ();
 					for (final String singleRow: row) {
@@ -276,13 +243,13 @@ public class Database extends Controller {
 		final List < Object > objects = new ArrayList < Object > ();
 		final Map < String, List < Object >> map = new HashMap < String, List < Object >> ();
 		Connection conn = null;
-		PreparedStatement ps = null;
+		Statement ps = null;
 		ResultSet rs = null;
 		try {
 			conn = this.getConnection();
 			if (conn != null) {
-				ps = conn.prepareStatement(statement);
-				rs = ps.executeQuery();
+				ps = conn.createStatement();
+				rs = ps.executeQuery(statement);
 				while (rs.next()) {
 					for (final String singleRow: row) {
 						objects.add(rs.getObject(singleRow));
@@ -315,14 +282,14 @@ public class Database extends Controller {
 	*/
 	public boolean columnExists(final String statement) {
 		Connection conn = null;
-		PreparedStatement ps = null;
+		Statement ps = null;
 		ResultSet rs = null;
 		boolean columnExists = false;
 		try {
 			conn = this.getConnection();
 			if (conn != null) {
-				ps = conn.prepareStatement(statement);
-				rs = ps.executeQuery();
+				ps = conn.createStatement();
+				rs = ps.executeQuery(statement);
 				columnExists = true;
 			}
 		} catch (Exception e) {
@@ -368,7 +335,7 @@ public class Database extends Controller {
 					}
 				}
 			}
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			ServerHandler.getServer().logSevere("{SQL} [9] Failed to check if the table " + tableName + " exists.");
 			ServerHandler.getServer().sendDebugTrace(e);
 		} finally {
@@ -385,14 +352,14 @@ public class Database extends Controller {
 	*/
 	public boolean dataExists(String statement) {
 		Connection conn = null;
-		PreparedStatement ps = null;
+		Statement ps = null;
 		ResultSet rs = null;
 		boolean dataExists = false;
 		try {
 			conn = this.getConnection();
 			if (conn != null) {
-				ps = conn.prepareStatement(statement);
-				rs = ps.executeQuery();
+				ps = conn.createStatement();
+				rs = ps.executeQuery(statement);
 			}
 			if (!rs.isBeforeFirst()) {
 				ServerHandler.getServer().logDebug("{SQL} Result set is empty.");
@@ -439,7 +406,7 @@ public class Database extends Controller {
 			data = new Database("database"); 
 			try {
 				data.getConnection();
-			} catch (SQLException e) {
+			} catch (Exception e) {
 				ServerHandler.getServer().logSevere("{SQL} [1] Failed to open database connection."); 
 				ServerHandler.getServer().sendDebugTrace(e);
 			}
@@ -458,7 +425,7 @@ public class Database extends Controller {
 			data = new Database(baseName); 
 			try {
 				data.getConnection();
-			} catch (SQLException e) {
+			} catch (Exception e) {
 				ServerHandler.getServer().logSevere("{SQL} [2] Failed to open database connection."); 
 				ServerHandler.getServer().sendDebugTrace(e);
 			}
@@ -466,7 +433,6 @@ public class Database extends Controller {
         return data; 
 	}
 }
-
 
 /**
  * Handles the current Controller instance.
@@ -476,8 +442,6 @@ public class Database extends Controller {
 abstract class Controller {
 	protected Connection connection;
 	protected String dataFolder;
-    protected HikariDataSource hikari;
-    protected HikariConfig hikariConfig;
 	protected boolean stopConnection = false;
 	protected boolean constConnection = false;
 		
@@ -489,25 +453,30 @@ abstract class Controller {
 	*/
 	protected Connection getConnection() throws SQLException {
 		if (this.isClosed(this.connection) && !this.stopConnection) {
-			synchronized (this) {
-				try {
-					if (this.isClosed(this.connection)) {
-					    try {
-					    	this.hikari = new HikariDataSource(this.hikariConfig);
-						} catch (Exception e) { 
-							this.close(null, null, this.connection, true);
-							if (ConfigHandler.getConfig().sqlEnabled()) {
-								ServerHandler.getServer().logSevere("{SQL} Unable to connect to the defined MySQL database, check your settings.");
-							} else { ServerHandler.getServer().logSevere("{SQL} SQLite exception on initialize."); }
-							ServerHandler.getServer().sendSevereTrace(e);
-						}
-						this.connection = this.hikari.getConnection();
-					}
-				} catch (Exception e) { 
-					if (Utils.getUtils().containsIgnoreCase(e.getMessage(), "Apparent connection leak detected") || Utils.getUtils().containsIgnoreCase(e.getMessage(), "Connection leak detection triggered")) {
-						ServerHandler.getServer().logSevere("{SQL} Connection leak due to server lag has been detected, restarting database connection.");
-					} else { e.printStackTrace(); }
-				}
+			if (this.isClosed(this.connection)) {
+				if (ConfigHandler.getConfig().sqlEnabled()) {
+					try {
+		                FileConfiguration config = ConfigHandler.getConfig().getFile("config.yml");
+		                String database = "jdbc:mysql://" + config.getString("Database.host") + ":" + config.getString("Database.port") + "/" + (config.getString("Database.table") != null ? config.getString("Database.table") : config.getString("Database.database")) + "?useUnicode=true&characterEncoding=utf-8&connectTimeout=10000&useSSL=false&allowPublicKeyRetrieval=true&useCursorFetch=true&useLocalSessionState=true&rewriteBatchedStatements=true&maintainTimeStats=false";
+		                Class.forName("com.mysql.jdbc.Driver").newInstance();
+		                connection = DriverManager.getConnection(database, config.getString("Database.user"), config.getString("Database.pass"));
+		                Statement statement = connection.createStatement();
+		                statement.executeUpdate("SET NAMES 'utf8'");
+		                statement.close();
+		            } catch (Exception e) {
+		            	ServerHandler.getServer().logSevere("{SQL} Unable to connect to the defined MySQL database, check your settings.");
+		            	ServerHandler.getServer().sendSevereTrace(e);
+		            }
+		        } else {
+		        	try {
+		        		String database = "jdbc:sqlite:" + this.getDatabaseFile();
+		        		Class.forName("org.sqlite.JDBC");
+		        		connection = DriverManager.getConnection(database);
+		        	} catch (Exception e) {
+		        		ServerHandler.getServer().logSevere("{SQL} SQLite exception on initialize.");
+		        		ServerHandler.getServer().sendSevereTrace(e);
+		        	}
+		        }
 			}
 		}
 		return this.connection;
@@ -518,7 +487,7 @@ abstract class Controller {
 	* 
 	* @return If the Connection isClosed.
 	*/
-	protected boolean isClosed(final PreparedStatement object) {
+	protected boolean isClosed(final Statement object) {
 		try {
 			if (object == null || object.isClosed()) {
 				return true;
@@ -558,7 +527,7 @@ abstract class Controller {
 	*/
 	protected boolean isClosed(final Connection object) {
 		try {
-			if (this.hikari == null || this.hikari.isClosed() || object == null || object.isClosed()) {
+			if (object == null || object.isClosed()) {
 				return true;
 			}
 		} catch (AbstractMethodError | NoClassDefFoundError e) { return false; } 
@@ -578,7 +547,7 @@ abstract class Controller {
 	* @param conn - the Connection being closed.
 	* @param force - If the connection should be forced to close.
 	*/
-	protected void close(final PreparedStatement ps, final ResultSet rs, final Connection conn, final boolean force) {
+	protected void close(final Statement ps, final ResultSet rs, final Connection conn, final boolean force) {
 		try {
 			if (!this.isClosed(ps)) {
 				ps.close();
@@ -609,7 +578,6 @@ abstract class Controller {
 				try {
 					if (!this.isClosed(conn) && (!ConfigHandler.getConfig().sqlEnabled() || force)) {
 						conn.close();
-						this.hikari.close();
 						this.stopConnection = false;
 					}
 				} catch (SQLException e) { 
@@ -621,7 +589,6 @@ abstract class Controller {
 			try {
 				if (!this.isClosed(conn) && (!ConfigHandler.getConfig().sqlEnabled() || force)) {
 					conn.close();
-					this.hikari.close();
 					this.stopConnection = false;
 				}
 			} catch (SQLException e) {
@@ -629,39 +596,6 @@ abstract class Controller {
 				ServerHandler.getServer().sendDebugTrace(e);
 			}
 		}
-	}
-	
-   /**
-	* Loads the database source connection information.
-	* 
-	*/
-	protected void loadSource() {
-		this.hikariConfig = new HikariConfig();
-		FileConfiguration config = ConfigHandler.getConfig().getFile("config.yml");
-	    String database = (config.getString("Database.table") != null ? config.getString("Database.table") : config.getString("Database.database"));
-		if (ConfigHandler.getConfig().sqlEnabled()) {
-			this.hikariConfig.setJdbcUrl("jdbc:mysql://" + config.getString("Database.host") + ":" + config.getString("Database.port") + "/" + database + "?useSSL=false" + "&createDatabaseIfNotExist=true" + "&allowPublicKeyRetrieval=true");
-		    this.hikariConfig.setDriverClassName("com.mysql.jdbc.Driver");
-	    	this.hikariConfig.setConnectionTimeout(TimeUnit.MINUTES.toMillis(60));
-	    	this.hikariConfig.setValidationTimeout(TimeUnit.SECONDS.toMillis(100));
-		    this.hikariConfig.setUsername(config.getString("Database.user"));
-		    this.hikariConfig.setPassword(config.getString("Database.pass"));
-		    this.constConnection = true;
-		} else {
-			this.hikariConfig.setJdbcUrl("jdbc:sqlite:" + this.getDatabaseFile());
-			this.hikariConfig.setDriverClassName("org.sqlite.JDBC");
-	    	this.hikariConfig.setConnectionTimeout(TimeUnit.SECONDS.toMillis(100));
-	    	this.hikariConfig.setValidationTimeout(TimeUnit.SECONDS.toMillis(100));
-	    	this.hikariConfig.setMaxLifetime(TimeUnit.MINUTES.toMillis(10));
-		}
-		this.hikariConfig.setLeakDetectionThreshold(TimeUnit.SECONDS.toMillis(300));
-		this.hikariConfig.setConnectionTestQuery("SELECT 1");
-	    this.hikariConfig.addDataSourceProperty("cachePrepStmts", "true");
-	    this.hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250");
-	    this.hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
-	    this.hikariConfig.addDataSourceProperty("userServerPrepStmts", "true");
-
-	    this.hikariConfig.setMaximumPoolSize(10);
 	}
 	
    /**

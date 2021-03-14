@@ -30,7 +30,6 @@ import me.RockinChaos.itemjoin.utils.SchedulerUtils;
 import me.RockinChaos.itemjoin.utils.UI;
 import me.RockinChaos.itemjoin.utils.protocol.ProtocolManager;
 import me.RockinChaos.itemjoin.utils.sql.Database;
-import me.RockinChaos.itemjoin.utils.sql.SQL;
 
 public class ItemJoin extends JavaPlugin {
 	
@@ -70,7 +69,6 @@ public class ItemJoin extends JavaPlugin {
   		UI.getCreator().closeMenu();
   		ItemHandler.getItem().saveCooldowns();
   		ItemHandler.getItem().purgeCraftItems(true);
-	  	SQL.getData().executeLaterStatements();
 	  	Database.getDatabase().closeConnection(true);
 	  	ProtocolManager.getManager().closeProtocol();
 	  	ItemUtilities.getUtilities().clearItems();

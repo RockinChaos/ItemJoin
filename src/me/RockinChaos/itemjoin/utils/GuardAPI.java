@@ -265,7 +265,7 @@ public class GuardAPI {
 		boolean doReturn = Utils.getUtils().splitIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Options").replace(" ", ""), "RETURN", ",");
 		List < ItemMap > protectItems = ItemUtilities.getUtilities().getProtectItems();
 		DataObject dataObject = SQL.getData().getData(new DataObject(Table.IJ_RETURN_ITEMS, PlayerHandler.getPlayer().getPlayerID(player), player.getWorld().getName(), region, ""));
-		if (region != null && !region.isEmpty() && type.equalsIgnoreCase("REGION-ENTER") && doReturn && (dataObject == null || !dataObject.getRegion().equalsIgnoreCase(region))) {
+		if (region != null && !region.isEmpty() && type.equalsIgnoreCase("REGION-ENTER") && doReturn && dataObject == null) {
 			Inventory saveInventory = Bukkit.createInventory(null, 54);
 			for (int i = 0; i <= 47; i++) {
 				for (int k = 0; k < (!protectItems.isEmpty() ? protectItems.size() : 1); k++) {
