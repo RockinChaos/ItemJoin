@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -32,12 +34,12 @@ import org.bukkit.inventory.ItemStack;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
-import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.handlers.events.PlayerPickItemEvent;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.utils.SchedulerUtils;
-import me.RockinChaos.itemjoin.utils.Utils;
+import me.RockinChaos.itemjoin.utils.ServerUtils;
+import me.RockinChaos.itemjoin.utils.StringUtils;
 
 public class Clicking implements Listener {
 
@@ -53,9 +55,9 @@ public class Clicking implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	private void onGlobalModify(InventoryClickEvent event) {
 		Player player = (Player) event.getWhoClicked();
-	  	if (Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "TRUE") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), player.getWorld().getName())
-		  			|| Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "ALL") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "GLOBAL")) {
-	  		if (ConfigHandler.getConfig().isPreventOP() && player.isOp() || ConfigHandler.getConfig().isPreventCreative() && PlayerHandler.getPlayer().isCreativeMode(player)) { } 
+	  	if (StringUtils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "TRUE") || StringUtils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), player.getWorld().getName())
+		  			|| StringUtils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "ALL") || StringUtils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "GLOBAL")) {
+	  		if (ConfigHandler.getConfig().isPreventOP() && player.isOp() || ConfigHandler.getConfig().isPreventCreative() && PlayerHandler.isCreativeMode(player)) { } 
 	  		else if (player.getOpenInventory().getTitle().contains("§") || player.getOpenInventory().getTitle().contains("&")) { }
 	  		else { event.setCancelled(true); }
 	  	}
@@ -69,9 +71,9 @@ public class Clicking implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	private void onGlobalPickItem(PlayerPickItemEvent event) {
 		Player player = event.getPlayer();
-	  	if (Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "TRUE") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), player.getWorld().getName())
-		  			|| Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "ALL") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "GLOBAL")) {
-	  		if (ConfigHandler.getConfig().isPreventOP() && player.isOp() || ConfigHandler.getConfig().isPreventCreative() && PlayerHandler.getPlayer().isCreativeMode(player)) { }
+	  	if (StringUtils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "TRUE") || StringUtils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), player.getWorld().getName())
+		  			|| StringUtils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "ALL") || StringUtils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "GLOBAL")) {
+	  		if (ConfigHandler.getConfig().isPreventOP() && player.isOp() || ConfigHandler.getConfig().isPreventCreative() && PlayerHandler.isCreativeMode(player)) { }
 	  		else { event.setCancelled(true); }
 	  	}
 	}
@@ -87,18 +89,18 @@ public class Clicking implements Listener {
 		List<ItemStack> items = new ArrayList<ItemStack>();
 		if (!this.isCreativeDupe(event)) {
 			items.add(event.getCurrentItem()); items.add(event.getCursor());
-			if (Utils.getUtils().containsIgnoreCase(event.getAction().name(), "HOTBAR")) {
+			if (StringUtils.getUtils().containsIgnoreCase(event.getAction().name(), "HOTBAR")) {
 				if (event.getView().getBottomInventory().getSize() >= event.getHotbarButton() && event.getHotbarButton() >= 0) { items.add(event.getView().getBottomInventory().getItem(event.getHotbarButton())); }
-				else if (ServerHandler.getServer().hasSpecificUpdate("1_9")) { items.add(PlayerHandler.getPlayer().getOffHandItem(player)); } 
+				else if (ServerUtils.hasSpecificUpdate("1_9")) { items.add(PlayerHandler.getOffHandItem(player)); } 
 			}
-			if (!ServerHandler.getServer().hasSpecificUpdate("1_8")) { PlayerHandler.getPlayer().updateInventory(player, 1L); }
+			if (!ServerUtils.hasSpecificUpdate("1_8")) { PlayerHandler.updateInventory(player, 1L); }
 			this.LegacyDropEvent(player);
 			for (ItemStack item : items) {
 				if (!ItemUtilities.getUtilities().isAllowed(player, item, "inventory-modify")) {
 					event.setCancelled(true);
 					if (player.getOpenInventory().getType().name().equalsIgnoreCase("CHEST") && !player.getOpenInventory().getTitle().equalsIgnoreCase("CHEST")) {
 						final ItemStack itemCopy = item.clone();
-						SchedulerUtils.getScheduler().run(() -> {
+						SchedulerUtils.run(() -> {
 							for (int i = 0; i < player.getOpenInventory().getTopInventory().getSize(); i++) {
 								if (player.getOpenInventory().getTopInventory().getItem(i) != null && player.getOpenInventory().getTopInventory().getItem(i).equals(item)) {
 									player.getOpenInventory().getTopInventory().setItem(i, new ItemStack(Material.AIR));
@@ -107,9 +109,12 @@ public class Clicking implements Listener {
 							}
 						});
 					}
-					if (PlayerHandler.getPlayer().isCreativeMode(player)) { player.closeInventory(); }
-					else if (!ItemUtilities.getUtilities().isAllowed(player, item, "inventory-close")) { player.closeInventory(); }
-					PlayerHandler.getPlayer().updateInventory(player, 1L);
+					if (PlayerHandler.isCreativeMode(player)) { player.closeInventory(); }
+					else if (!ItemUtilities.getUtilities().isAllowed(player, item, "inventory-close")) { 
+						player.openInventory(Bukkit.createInventory(player, 9, "INVENTORY-CLOSE"));
+						player.closeInventory(); 
+					}
+					PlayerHandler.updateInventory(player, 1L);
 					break;
 				}
 			}
@@ -122,11 +127,11 @@ public class Clicking implements Listener {
 	* @param event - InventoryClickEvent
 	*/
 	public boolean isCreativeDupe(final InventoryClickEvent event) {
-		if (PlayerHandler.getPlayer().isCreativeMode((Player) event.getWhoClicked()) && event.getCurrentItem() != null && event.getCursor() != null) {
-			String currentNBT = (ItemHandler.getItem().dataTagsEnabled() ? ItemHandler.getItem().getNBTData(event.getCurrentItem()) 
-					: ((event.getCurrentItem().hasItemMeta() && event.getCurrentItem().getItemMeta().hasDisplayName()) ? Utils.getUtils().colorDecode(event.getCurrentItem().getItemMeta().getDisplayName()) : null));
-			String cursorNBT = (ItemHandler.getItem().dataTagsEnabled() ? ItemHandler.getItem().getNBTData(event.getCursor()) 
-					: ((event.getCursor().hasItemMeta() && event.getCursor().getItemMeta().hasDisplayName()) ? Utils.getUtils().colorDecode(event.getCursor().getItemMeta().getDisplayName()) : null));
+		if (PlayerHandler.isCreativeMode((Player) event.getWhoClicked()) && event.getCurrentItem() != null && event.getCursor() != null) {
+			String currentNBT = (ItemHandler.dataTagsEnabled() ? ItemHandler.getNBTData(event.getCurrentItem()) 
+					: ((event.getCurrentItem().hasItemMeta() && event.getCurrentItem().getItemMeta().hasDisplayName()) ? StringUtils.getUtils().colorDecode(event.getCurrentItem().getItemMeta().getDisplayName()) : null));
+			String cursorNBT = (ItemHandler.dataTagsEnabled() ? ItemHandler.getNBTData(event.getCursor()) 
+					: ((event.getCursor().hasItemMeta() && event.getCursor().getItemMeta().hasDisplayName()) ? StringUtils.getUtils().colorDecode(event.getCursor().getItemMeta().getDisplayName()) : null));
 			if (currentNBT != null && cursorNBT != null) {
 				return currentNBT.equalsIgnoreCase(cursorNBT);
 			}	
@@ -153,13 +158,13 @@ public class Clicking implements Listener {
 				}
 			}
 		} else {
-			SchedulerUtils.getScheduler().run(() -> {
+			SchedulerUtils.run(() -> {
 				final ItemStack itemCopy_2 = (event.getPickHand() != null ? event.getPickHand().clone() : event.getPickHand());
 				if (!ItemUtilities.getUtilities().isAllowed(player, itemCopy_2, "inventory-modify")) {
 					final int pickSlot = event.getPickSlot();
 					if (pickSlot != -1) {
 						player.getInventory().setItem(pickSlot, itemCopy_2);
-						PlayerHandler.getPlayer().setMainHandItem(player, itemCopy);
+						PlayerHandler.setMainHandItem(player, itemCopy);
 					}
 				}
 			});
@@ -177,28 +182,28 @@ public class Clicking implements Listener {
 		String itemflag = "inventory-modify";
     	if (event.getAction().toString().contains("PLACE_ALL") || event.getAction().toString().contains("PLACE_ONE")) {
     		ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(event.getCursor(), null, player.getWorld());
-    		if (itemMap != null && itemMap.isSimilar(cursorItem.get(PlayerHandler.getPlayer().getPlayerID(player)))) {
+    		if (itemMap != null && itemMap.isSimilar(cursorItem.get(PlayerHandler.getPlayerID(player)))) {
     		final int slot = event.getSlot();
     		event.setCancelled(true);
     		player.setItemOnCursor(new ItemStack(Material.AIR));
     		if (event.getRawSlot() <= 4 && event.getInventory().getType() == InventoryType.CRAFTING || event.getInventory().getType() != InventoryType.CRAFTING && player.getOpenInventory().getTopInventory().getSize() - 1 >= event.getRawSlot()) {
-    			player.getOpenInventory().getTopInventory().setItem(slot, cursorItem.get(PlayerHandler.getPlayer().getPlayerID(player)));
-    		} else { player.getInventory().setItem(slot, cursorItem.get(PlayerHandler.getPlayer().getPlayerID(player)));   }
-			cursorItem.remove(PlayerHandler.getPlayer().getPlayerID(player));
-			ServerHandler.getServer().logDebug("{ItemMap} (Cursor_Place): Updated Animation Item."); 
+    			player.getOpenInventory().getTopInventory().setItem(slot, cursorItem.get(PlayerHandler.getPlayerID(player)));
+    		} else { player.getInventory().setItem(slot, cursorItem.get(PlayerHandler.getPlayerID(player)));   }
+			cursorItem.remove(PlayerHandler.getPlayerID(player));
+			ServerUtils.logDebug("{ItemMap} (Cursor_Place): Updated Animation Item."); 
     		}
     	} else if (event.getAction().toString().contains("SWAP_WITH_CURSOR")) {
     		ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(event.getCursor(), null, player.getWorld());
-    		if (itemMap != null && itemMap.isSimilar(cursorItem.get(PlayerHandler.getPlayer().getPlayerID(player))) && ItemUtilities.getUtilities().isAllowed(player, event.getCurrentItem(), itemflag)) {
+    		if (itemMap != null && itemMap.isSimilar(cursorItem.get(PlayerHandler.getPlayerID(player))) && ItemUtilities.getUtilities().isAllowed(player, event.getCurrentItem(), itemflag)) {
     		final int slot = event.getSlot();
     		final ItemStack item = new ItemStack(event.getCurrentItem());
     		event.setCancelled(true);
     		player.setItemOnCursor(item);
     		if (event.getRawSlot() <= 4 && event.getInventory().getType() == InventoryType.CRAFTING || event.getInventory().getType() != InventoryType.CRAFTING && player.getOpenInventory().getTopInventory().getSize() - 1 >= event.getRawSlot()) {
-    			player.getOpenInventory().getTopInventory().setItem(slot, cursorItem.get(PlayerHandler.getPlayer().getPlayerID(player)));
-    		} else { player.getInventory().setItem(slot, cursorItem.get(PlayerHandler.getPlayer().getPlayerID(player)));   }
-			cursorItem.remove(PlayerHandler.getPlayer().getPlayerID(player));
-			ServerHandler.getServer().logDebug("{ItemMap} (Cursor_Swap): Updated Animation Item."); 
+    			player.getOpenInventory().getTopInventory().setItem(slot, cursorItem.get(PlayerHandler.getPlayerID(player)));
+    		} else { player.getInventory().setItem(slot, cursorItem.get(PlayerHandler.getPlayerID(player)));   }
+			cursorItem.remove(PlayerHandler.getPlayerID(player));
+			ServerUtils.logDebug("{ItemMap} (Cursor_Swap): Updated Animation Item."); 
     		}
     	}
     }
@@ -209,25 +214,25 @@ public class Clicking implements Listener {
     * @param player - that is dropping the item.
     */
     private void LegacyDropEvent(final Player player) {
-    	if (!ServerHandler.getServer().hasSpecificUpdate("1_9")) {
-			dropClick.put(PlayerHandler.getPlayer().getPlayerID(player), true);
+    	if (!ServerUtils.hasSpecificUpdate("1_9")) {
+			dropClick.put(PlayerHandler.getPlayerID(player), true);
 			final ItemStack[] Inv = player.getInventory().getContents().clone();
 			final ItemStack[] Armor = player.getInventory().getArmorContents().clone();
-			SchedulerUtils.getScheduler().runLater(1L, () -> {
-				if (this.dropClick.get(PlayerHandler.getPlayer().getPlayerID(player)) != null && this.dropClick.get(PlayerHandler.getPlayer().getPlayerID(player)) == true 
-					&& this.droppedItem.get(PlayerHandler.getPlayer().getPlayerID(player)) != null && this.droppedItem.get(PlayerHandler.getPlayer().getPlayerID(player)) == true) {
+			SchedulerUtils.runLater(1L, () -> {
+				if (this.dropClick.get(PlayerHandler.getPlayerID(player)) != null && this.dropClick.get(PlayerHandler.getPlayerID(player)) == true 
+					&& this.droppedItem.get(PlayerHandler.getPlayerID(player)) != null && this.droppedItem.get(PlayerHandler.getPlayerID(player)) == true) {
 					player.getInventory().clear();
 					player.getInventory().setHelmet(null);
 					player.getInventory().setChestplate(null);
 					player.getInventory().setLeggings(null);
 					player.getInventory().setBoots(null);
-					if (ServerHandler.getServer().hasSpecificUpdate("1_9")) { player.getInventory().setItemInOffHand(null); }
+					if (ServerUtils.hasSpecificUpdate("1_9")) { player.getInventory().setItemInOffHand(null); }
 					player.getInventory().setContents(Inv);
 					player.getInventory().setArmorContents(Armor);
-					PlayerHandler.getPlayer().updateInventory(player, 1L);
-					this.droppedItem.remove(PlayerHandler.getPlayer().getPlayerID(player));
+					PlayerHandler.updateInventory(player, 1L);
+					this.droppedItem.remove(PlayerHandler.getPlayerID(player));
 				}
-				this.dropClick.remove(PlayerHandler.getPlayer().getPlayerID(player));
+				this.dropClick.remove(PlayerHandler.getPlayerID(player));
 			});
     	}
 	}
