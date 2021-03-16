@@ -120,7 +120,7 @@ public class PlayerPickItemEvent extends PlayerEvent implements Cancellable {
 	*/
 	public ItemStack getPickHand() {
 		this.cloneInventory();
-		return PlayerHandler.getPlayer().getHandItem(super.getPlayer());
+		return PlayerHandler.getHandItem(super.getPlayer());
 	}
 	
    /**

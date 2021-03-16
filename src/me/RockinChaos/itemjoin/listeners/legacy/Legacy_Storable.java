@@ -28,9 +28,9 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.ItemStack;
 
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
-import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
-import me.RockinChaos.itemjoin.utils.Utils;
+import me.RockinChaos.itemjoin.utils.ServerUtils;
+import me.RockinChaos.itemjoin.utils.StringUtils;
 
 /**
 * Handles the Storage events for custom items.
@@ -50,7 +50,7 @@ public class Legacy_Storable implements Listener {
 		Player player = (Player) event.getWhoClicked();
 		String invType = event.getView().getType().toString();
 		ItemStack item = null;
-		if (Utils.getUtils().containsIgnoreCase(event.getAction().name(), "HOTBAR")) {
+		if (StringUtils.getUtils().containsIgnoreCase(event.getAction().name(), "HOTBAR")) {
 			if (event.getView().getBottomInventory().getSize() >= event.getHotbarButton() && event.getHotbarButton() >= 0) {
 				item = event.getView().getBottomInventory().getItem(event.getHotbarButton());
 			}
@@ -62,10 +62,10 @@ public class Legacy_Storable implements Listener {
 				if ((invType.contains("CHEST") || invType.contains("BARREL") || invType.contains("BREWING") || invType.contains("FURNACE") || invType.contains("GRINDSTONE") || invType.contains("SHULKER_BOX") 
 						|| invType.contains("HOPPER") || invType.contains("ANVIL") || invType.contains("WORKBENCH") || invType.contains("DISPENSER") || invType.contains("DROPPER")) && !ItemUtilities.getUtilities().isAllowed(player, item, "item-store")) {
 					event.setCancelled(true);
-					PlayerHandler.getPlayer().updateInventory(player, 1L);
+					PlayerHandler.updateInventory(player, 1L);
 				} else if ((invType.contains("ENCHANTING") || invType.contains("ANVIL")) && !ItemUtilities.getUtilities().isAllowed(player, item, "item-modifiable")) {
 					event.setCancelled(true);
-					PlayerHandler.getPlayer().updateInventory(player, 1L);
+					PlayerHandler.updateInventory(player, 1L);
 				}
 			}
 		}
@@ -89,11 +89,11 @@ public class Legacy_Storable implements Listener {
 					if ((invType.contains("CHEST") || invType.contains("BARREL") || invType.contains("BREWING") || invType.contains("FURNACE") || invType.contains("GRINDSTONE") || invType.contains("SHULKER_BOX") 
 						|| invType.contains("HOPPER") || invType.contains("ANVIL") || invType.contains("WORKBENCH") || invType.contains("DISPENSER") || invType.contains("DROPPER")) && !ItemUtilities.getUtilities().isAllowed(player, item, "item-store")) {
 						event.setCancelled(true);
-						PlayerHandler.getPlayer().updateInventory(player, 1L);
+						PlayerHandler.updateInventory(player, 1L);
 						break;
 					} else if ((invType.contains("ENCHANTING") || invType.contains("ANVIL")) && !ItemUtilities.getUtilities().isAllowed(player, item, "item-modifiable")) {
 						event.setCancelled(true);
-						PlayerHandler.getPlayer().updateInventory(player, 1L);
+						PlayerHandler.updateInventory(player, 1L);
 						break;
 					}
 				}
@@ -111,12 +111,12 @@ public class Legacy_Storable implements Listener {
 	private void onInteractItemFrame(PlayerInteractEntityEvent event) {
 		if (event.getRightClicked() instanceof ItemFrame) {
 			ItemStack item;
-			if (ServerHandler.getServer().hasSpecificUpdate("1_9")) { item = PlayerHandler.getPlayer().getPerfectHandItem(event.getPlayer(), event.getHand().toString()); } 
-			else { item = PlayerHandler.getPlayer().getPerfectHandItem(event.getPlayer(), ""); }
+			if (ServerUtils.hasSpecificUpdate("1_9")) { item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().toString()); } 
+			else { item = PlayerHandler.getPerfectHandItem(event.getPlayer(), ""); }
 			Player player = event.getPlayer();
 			if (!ItemUtilities.getUtilities().isAllowed(player, item, "item-store")) {
 				event.setCancelled(true);
-				PlayerHandler.getPlayer().updateInventory(player, 1L);
+				PlayerHandler.updateInventory(player, 1L);
 			}
 		}
 	}

@@ -46,17 +46,16 @@ import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.item.ItemUtilities.CustomSlot;
 import me.RockinChaos.itemjoin.listeners.Crafting;
-import me.RockinChaos.itemjoin.utils.LegacyAPI;
-import me.RockinChaos.itemjoin.utils.Reflection;
+import me.RockinChaos.itemjoin.utils.ReflectionUtils;
 import me.RockinChaos.itemjoin.utils.SchedulerUtils;
-import me.RockinChaos.itemjoin.utils.Utils;
+import me.RockinChaos.itemjoin.utils.ServerUtils;
+import me.RockinChaos.itemjoin.utils.StringUtils;
+import me.RockinChaos.itemjoin.utils.api.LegacyAPI;
 import me.RockinChaos.itemjoin.utils.sql.DataObject;
 import me.RockinChaos.itemjoin.utils.sql.SQL;
 import me.RockinChaos.itemjoin.utils.sql.DataObject.Table;
 
 public class ItemHandler {
-	
-	private static ItemHandler item;
 	
    /**
     * Adds a list of lores to the specified ItemStack.
@@ -65,12 +64,12 @@ public class ItemHandler {
     * @param lores - The list of lores to be added to the item.
     * @return The ItemStack with its newly added lores.
     */
-	public ItemStack addLore(final ItemStack item, final String... lores) {
+	public static ItemStack addLore(final ItemStack item, final String... lores) {
 		if (item != null && item.getType() != Material.AIR) {
 			ItemMeta meta = item.getItemMeta();
 			List<String> newLore = new ArrayList<String>();
 			if (meta.hasLore()) { newLore = meta.getLore(); }
-			for (String lore : lores) { newLore.add(Utils.getUtils().colorFormat(lore)); }
+			for (String lore : lores) { newLore.add(StringUtils.getUtils().colorFormat(lore)); }
 			meta.setLore(newLore);
 			item.setItemMeta(meta);
 		}
@@ -83,10 +82,10 @@ public class ItemHandler {
     * @param item - The ItemStack to have its Material name fetched.
     * @return A friendly String version of the Material name with normal case and no underlines.
     */
-	public String getMaterialName(final ItemStack item) {
+	public static String getMaterialName(final ItemStack item) {
 		try {
 			return WordUtils.capitalizeFully(item.getType().name().toLowerCase().replace('_', ' '));
-		} catch (NullPointerException e) {ServerHandler.getServer().sendDebugTrace(e); }
+		} catch (NullPointerException e) { ServerUtils.sendDebugTrace(e); }
 		return null;
 	}
 	
@@ -96,8 +95,8 @@ public class ItemHandler {
     * @param enchant - The Enchantment to have its String name found.
     * @return The String name of the Bukkit Enchantment.
     */
-	public String getEnchantName(final Enchantment enchant) {
-		if (!ServerHandler.getServer().hasSpecificUpdate("1_13")) { return LegacyAPI.getLegacy().getEnchantName(enchant); } 
+	public static String getEnchantName(final Enchantment enchant) {
+		if (!ServerUtils.hasSpecificUpdate("1_13")) { return LegacyAPI.getEnchantName(enchant); } 
 		else { return enchant.getKey().getKey().toString(); }
 	}
 	
@@ -107,17 +106,17 @@ public class ItemHandler {
     * @param name - Name of the Bukkit Enchantment.
     * @return The proper Bukkit Enchantment instance.
     */
-	public Enchantment getEnchantByName(final String name) {
-		if (!ServerHandler.getServer().hasSpecificUpdate("1_13")) {
-			Enchantment enchantName = LegacyAPI.getLegacy().getEnchant(name);
+	public static Enchantment getEnchantByName(final String name) {
+		if (!ServerUtils.hasSpecificUpdate("1_13")) {
+			Enchantment enchantName = LegacyAPI.getEnchant(name);
 			if (enchantName != null) { return enchantName; }
 		} else {
 			try {
 				Enchantment enchantName = Enchantment.getByKey(org.bukkit.NamespacedKey.minecraft(name.toLowerCase()));
 				if (enchantName != null) {
 					return enchantName;
-				} else { return LegacyAPI.getLegacy().getEnchant(name); }
-			} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
+				} else { return LegacyAPI.getEnchant(name); }
+			} catch (Exception e) { ServerUtils.sendDebugTrace(e); }
 		}
 		return null;
 	}
@@ -128,9 +127,9 @@ public class ItemHandler {
     * @param item - The ItemStack to have its Durability found.
     * @return The Durability value of the ItemStack.
     */
-	public short getDurability(final ItemStack item) {
-		if (!ServerHandler.getServer().hasSpecificUpdate("1_13")) {
-			return LegacyAPI.getLegacy().getDurability(item);
+	public static short getDurability(final ItemStack item) {
+		if (!ServerUtils.hasSpecificUpdate("1_13")) {
+			return LegacyAPI.getDurability(item);
 		} else { return ((short) ((org.bukkit.inventory.meta.Damageable) item.getItemMeta()).getDamage()); }
 	}
 	
@@ -141,15 +140,15 @@ public class ItemHandler {
     * @param durability - The Durability to be set to the ItemStack.
     * @return The ItemStack with its new Durability.
     */
-	public ItemStack setDurability(final ItemStack item, final int durability) {
+	public static ItemStack setDurability(final ItemStack item, final int durability) {
 		if (item.getType().getMaxDurability() != 0 && durability != 0) {
-			if (ServerHandler.getServer().hasSpecificUpdate("1_13")) {
+			if (ServerUtils.hasSpecificUpdate("1_13")) {
 				ItemMeta tempMeta = item.getItemMeta();
 				((org.bukkit.inventory.meta.Damageable) tempMeta).setDamage(durability);
 				item.setItemMeta(tempMeta);
 				return item;
 			} else {
-				return LegacyAPI.getLegacy().setDurability(item, (short)durability);
+				return LegacyAPI.setDurability(item, (short)durability);
 			}
 		}
 		return item;
@@ -163,7 +162,7 @@ public class ItemHandler {
     * @param amount - The intended stack size.
     * @return The newly Modified ItemStack.
     */
-	public ItemStack modifyItem(final ItemStack itemCopy, final boolean allItems, final int amount) {
+	public static ItemStack modifyItem(final ItemStack itemCopy, final boolean allItems, final int amount) {
 		ItemStack item = new ItemStack(itemCopy);
 		if (((item.getAmount() > amount && item.getAmount() != amount) || item.getAmount() < amount) && !allItems) { item.setAmount(item.getAmount() - amount); } 
 		else { item = new ItemStack(Material.AIR); }
@@ -180,25 +179,25 @@ public class ItemHandler {
     * @param name - The custom name to be added to the ItemStack.
     * @param lores - The custom lore to be added to the ItemStack.
     */
-    public ItemStack getItem(String material, final int count, final boolean glowing, String name, final String... lores) {
-        ItemStack tempItem; if (!ServerHandler.getServer().hasSpecificUpdate("1_8") && material.equals("BARRIER")) { material = "WOOL:14"; }
+    public static ItemStack getItem(String material, final int count, final boolean glowing, String name, final String... lores) {
+        ItemStack tempItem; if (!ServerUtils.hasSpecificUpdate("1_8") && material.equals("BARRIER")) { material = "WOOL:14"; }
         if (material.equalsIgnoreCase("AIR") || material.equalsIgnoreCase("AIR:0")) { material = "GLASS_PANE"; }
-        if (this.getMaterial(material, null) == null) { material = "STONE"; } 
-        if (ServerHandler.getServer().hasSpecificUpdate("1_13")) { tempItem = new ItemStack(this.getMaterial(material, null), count); } 
+        if (getMaterial(material, null) == null) { material = "STONE"; } 
+        if (ServerUtils.hasSpecificUpdate("1_13")) { tempItem = new ItemStack(getMaterial(material, null), count); } 
         else { short dataValue = 0; if (material.contains(":")) { String[] parts = material.split(":"); material = parts[0]; dataValue = (short) Integer.parseInt(parts[1]); } 
-        tempItem = LegacyAPI.getLegacy().newItemStack(getMaterial(material, null), count, dataValue); }
+        tempItem = LegacyAPI.newItemStack(getMaterial(material, null), count, dataValue); }
         if (glowing) { tempItem.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 1); }
         ItemMeta tempMeta = tempItem.getItemMeta();
-        if (ServerHandler.getServer().hasSpecificUpdate("1_8")) { tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ENCHANTS); }
-        if (name != null) { name = Utils.getUtils().colorFormat(name); tempMeta.setDisplayName(name); }
+        if (ServerUtils.hasSpecificUpdate("1_8")) { tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ENCHANTS); }
+        if (name != null) { name = StringUtils.getUtils().colorFormat(name); tempMeta.setDisplayName(name); }
         if (lores != null && lores.length != 0) {
         	ArrayList<String> loreList = new ArrayList<String>();
         	for (String loreString: lores) { 
         		if (!loreString.isEmpty()) {
         			if (loreString.contains("/n")) {
         				String[] loreSplit = loreString.split(" /n ");
-        				for (String loreStringSplit : loreSplit) { loreList.add(Utils.getUtils().colorFormat(loreStringSplit)); }
-        			} else { loreList.add(Utils.getUtils().colorFormat(loreString)); }
+        				for (String loreStringSplit : loreSplit) { loreList.add(StringUtils.getUtils().colorFormat(loreStringSplit)); }
+        			} else { loreList.add(StringUtils.getUtils().colorFormat(loreString)); }
         		} 
         	}
         	tempMeta.setLore(loreList);
@@ -215,14 +214,14 @@ public class ItemHandler {
     * @param itemMap - The ItemMap that is having its slot checked.
     * @return The existing ItemStack from the Players Inventory.
     */
-	public ItemStack getItem(final Player player, final ItemMap itemMap) {
-		int craftSlot = Utils.getUtils().getSlotConversion(itemMap.getSlot());
+	public static ItemStack getItem(final Player player, final ItemMap itemMap) {
+		int craftSlot = StringUtils.getUtils().getSlotConversion(itemMap.getSlot());
 		ItemStack existingItem = null;
-		if (Utils.getUtils().isInt(itemMap.getSlot())) {
+		if (StringUtils.getUtils().isInt(itemMap.getSlot())) {
 			existingItem = player.getInventory().getItem(Integer.parseInt(itemMap.getSlot()));
 		} else if (itemMap.getSlot().contains("%")) {
-			String slot = Utils.getUtils().translateLayout(itemMap.getSlot(), player);
-			if (Utils.getUtils().isInt(slot)) {
+			String slot = StringUtils.getUtils().translateLayout(itemMap.getSlot(), player);
+			if (StringUtils.getUtils().isInt(slot)) {
 				existingItem = player.getInventory().getItem(Integer.parseInt(slot));
 			}
 		} else if (CustomSlot.HELMET.isSlot(itemMap.getSlot())) {
@@ -233,7 +232,7 @@ public class ItemHandler {
 			existingItem = player.getEquipment().getLeggings();
 		} else if (CustomSlot.BOOTS.isSlot(itemMap.getSlot())) {
 			existingItem = player.getEquipment().getBoots();
-		} else if (ServerHandler.getServer().hasSpecificUpdate("1_9") && CustomSlot.OFFHAND.isSlot(itemMap.getSlot())) {
+		} else if (ServerUtils.hasSpecificUpdate("1_9") && CustomSlot.OFFHAND.isSlot(itemMap.getSlot())) {
 			existingItem = player.getEquipment().getItemInOffHand();
 		} else if (craftSlot != -1) {
 			existingItem = player.getOpenInventory().getTopInventory().getItem(craftSlot);
@@ -248,24 +247,24 @@ public class ItemHandler {
     * @param data - The data value of the item, usually this is zero.
     * @return The proper Bukkit Material instance.
     */
-	public Material getMaterial(String material, String data) {
+	public static Material getMaterial(String material, String data) {
 		try {
 			boolean isLegacy = (data != null);
 			if (material.contains(":")) { String[] parts = material.split(":"); material = parts[0]; if (!parts[1].equalsIgnoreCase("0")) { data = parts[1]; isLegacy = true; } }
-			if (Utils.getUtils().isInt(material) && !ServerHandler.getServer().hasSpecificUpdate("1_13")) {
-				return LegacyAPI.getLegacy().findMaterial(Integer.parseInt(material));
-			} else if (Utils.getUtils().isInt(material) && ServerHandler.getServer().hasSpecificUpdate("1_13") || isLegacy && ServerHandler.getServer().hasSpecificUpdate("1_13")) {
+			if (StringUtils.getUtils().isInt(material) && !ServerUtils.hasSpecificUpdate("1_13")) {
+				return LegacyAPI.findMaterial(Integer.parseInt(material));
+			} else if (StringUtils.getUtils().isInt(material) && ServerUtils.hasSpecificUpdate("1_13") || isLegacy && ServerUtils.hasSpecificUpdate("1_13")) {
 				int dataValue;
-				if (!Utils.getUtils().isInt(material)) { material = "LEGACY_" + material; }
+				if (!StringUtils.getUtils().isInt(material)) { material = "LEGACY_" + material; }
 				if (data != null) { dataValue = Integer.parseInt(data); } else { dataValue = 0; }
-				if (!Utils.getUtils().isInt(material)) { return LegacyAPI.getLegacy().getMaterial(Material.getMaterial(material.toUpperCase()), (byte) dataValue); } 
-				else { return LegacyAPI.getLegacy().getMaterial(Integer.parseInt(material), (byte) dataValue); }
-			} else if (!ServerHandler.getServer().hasSpecificUpdate("1_13")) {
+				if (!StringUtils.getUtils().isInt(material)) { return LegacyAPI.getMaterial(Material.getMaterial(material.toUpperCase()), (byte) dataValue); } 
+				else { return LegacyAPI.getMaterial(Integer.parseInt(material), (byte) dataValue); }
+			} else if (!ServerUtils.hasSpecificUpdate("1_13")) {
 				return Material.getMaterial(material.toUpperCase());
 			} else {
 				return Material.matchMaterial(material.toUpperCase());
 			}
-		} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
+		} catch (Exception e) { ServerUtils.sendDebugTrace(e); }
 		return null;
 	}
 	
@@ -275,8 +274,8 @@ public class ItemHandler {
     * @param itemNode - The node ConfigurationSection (location) of the config section.
     * @return The material exactly as found in the Configuration Section, without any animation delay.
     */
-	public String getMaterial(final ConfigurationSection itemNode) {
-		String material = this.cutDelay(itemNode.getString(".id"));
+	public static String getMaterial(final ConfigurationSection itemNode) {
+		String material = cutDelay(itemNode.getString(".id"));
 		if (ConfigHandler.getConfig().getMaterialSection(itemNode) != null) {
 			List<String> materials = new ArrayList<String>();
 			for (String materialKey : ConfigHandler.getConfig().getMaterialSection(itemNode).getKeys(false)) {
@@ -285,7 +284,7 @@ public class ItemHandler {
 					materials.add(materialList);
 				}
 			}
-			material = this.cutDelay(itemNode.getString(".id." + ConfigHandler.getConfig().getMaterialSection(itemNode).getKeys(false).iterator().next()));
+			material = cutDelay(itemNode.getString(".id." + ConfigHandler.getConfig().getMaterialSection(itemNode).getKeys(false).iterator().next()));
 			return material;
 		}
 		return material;
@@ -298,7 +297,7 @@ public class ItemHandler {
     * @param material - The Material expected.
     * @return If the List contains the Material
     */
-	public boolean containsMaterial(final Collection<ItemStack> itemstacks, final Material material) {
+	public static boolean containsMaterial(final Collection<ItemStack> itemstacks, final Material material) {
 		for (ItemStack item: itemstacks) {
 			if (item.getType().equals(material)) {
 				return true;
@@ -313,9 +312,9 @@ public class ItemHandler {
     * @param item - The ItemStack to have its Skull Texture changed.
     * @param skullTexture - The Skull Texture to be added to the ItemStack.
     */
-    public ItemStack setSkullTexture(final ItemStack item, final String skullTexture) {
+    public static ItemStack setSkullTexture(final ItemStack item, final String skullTexture) {
     	try {
-    		if (ServerHandler.getServer().hasSpecificUpdate("1_8")) {
+    		if (ServerUtils.hasSpecificUpdate("1_8")) {
 		        ItemMeta itemMeta = item.getItemMeta();
 				GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
 				gameProfile.getProperties().put("textures", new Property("textures", new String(skullTexture)));
@@ -324,7 +323,7 @@ public class ItemHandler {
 				declaredField.set(itemMeta, gameProfile);
 				item.setItemMeta(itemMeta);
     		}
-    	} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
+    	} catch (Exception e) { ServerUtils.sendDebugTrace(e); }
     	return item;
     }
     
@@ -334,16 +333,16 @@ public class ItemHandler {
     * @param item - The ItemStack to have its Skull Texture changed.
     * @param skullTexture - The Skull Texture to be added to the ItemStack.
     */
-    public ItemMeta setSkullTexture(final ItemMeta itemMeta, final String skullTexture) {
+    public static ItemMeta setSkullTexture(final ItemMeta itemMeta, final String skullTexture) {
     	try {
-    		if (ServerHandler.getServer().hasSpecificUpdate("1_8")) {
+    		if (ServerUtils.hasSpecificUpdate("1_8")) {
 				GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
 				gameProfile.getProperties().put("textures", new Property("textures", new String(skullTexture)));
 				Field declaredField = itemMeta.getClass().getDeclaredField("profile");
 				declaredField.setAccessible(true);
 				declaredField.set(itemMeta, gameProfile);
     		}
-    	} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
+    	} catch (Exception e) { ServerUtils.sendDebugTrace(e); }
     	return itemMeta;
     }
 	
@@ -353,9 +352,9 @@ public class ItemHandler {
     * @param meta - The ItemMeta to have its Skull Texture found.
     * @return The found Skull Texture String value.
     */
-	public String getSkullTexture(final ItemMeta meta) {
+	public static String getSkullTexture(final ItemMeta meta) {
 		try {
-			final Class < ? > cls = Reflection.getReflection().getCraftBukkitClass("inventory.CraftMetaSkull");
+			final Class < ? > cls = ReflectionUtils.getCraftBukkitClass("inventory.CraftMetaSkull");
 			final Object real = cls.cast(meta);
 			final Field field = real.getClass().getDeclaredField("profile");
 			field.setAccessible(true);
@@ -374,7 +373,7 @@ public class ItemHandler {
     * @param skull - The Skull to have its Skull Texture found.
     * @return The found Skull Texture String value.
     */
-	public String getSkullTexture(final Skull skull) {
+	public static String getSkullTexture(final Skull skull) {
 		try {
 			final Field field = skull.getClass().getDeclaredField("profile");
 			field.setAccessible(true);
@@ -394,12 +393,12 @@ public class ItemHandler {
     * @param owner - The String name of the Skull Owner to be set.
     * @return The ItemMeta with the new Skull Owner.
     */
-	public ItemMeta setSkullOwner(final ItemMeta meta, final String owner) {
-		if (!ServerHandler.getServer().hasSpecificUpdate("1_8")) {
-			ServerHandler.getServer().logDebug("{ItemMap} Minecraft does not support offline player heads below Version 1.8.");
-			ServerHandler.getServer().logDebug("{ItemMap} Player heads will only be given a skin if the player has previously joined the sever.");
+	public static ItemMeta setSkullOwner(final ItemMeta meta, final String owner) {
+		if (!ServerUtils.hasSpecificUpdate("1_8")) {
+			ServerUtils.logDebug("{ItemMap} Minecraft does not support offline player heads below Version 1.8.");
+			ServerUtils.logDebug("{ItemMap} Player heads will only be given a skin if the player has previously joined the sever.");
 		}
-		this.setStoredSkull(meta, owner);
+		setStoredSkull(meta, owner);
 		return meta;
 	}
 	
@@ -409,18 +408,18 @@ public class ItemHandler {
     * @param meta - The referenced ItemMeta.
     * @param owner - The referenced Skull Owner
     */
-	public void setStoredSkull(final ItemMeta meta, final String owner) {
+	public static void setStoredSkull(final ItemMeta meta, final String owner) {
 		if (!owner.isEmpty()) {
 			SkullMeta skullMeta = (SkullMeta)meta;
-			OfflinePlayer player = LegacyAPI.getLegacy().getOfflinePlayer(owner);
+			OfflinePlayer player = LegacyAPI.getOfflinePlayer(owner);
 			if (player != null) {
 				try {
 					skullMeta.setOwningPlayer(player);
 				} catch (Throwable t) {
-					LegacyAPI.getLegacy().setSkullOwner(skullMeta, player.getName());
+					LegacyAPI.setSkullOwner(skullMeta, player.getName());
 				}
 			} else {
-				LegacyAPI.getLegacy().setSkullOwner(skullMeta, owner);
+				LegacyAPI.setSkullOwner(skullMeta, owner);
 			}
 		}
 	}
@@ -434,7 +433,7 @@ public class ItemHandler {
 	* @param slot - The new event slot of the main item.
 	* @return The Remaining amount to be set (if any).
 	*/
-	public int stackItems(final Player player, final ItemStack item1, final ItemStack item2, final int slot) {
+	public static int stackItems(final Player player, final ItemStack item1, final ItemStack item2, final int slot) {
 		int MINECRAFT_STACK_MAX = 64;
 		int DESIRED_STACK_SIZE = item1.getAmount() + item2.getAmount();
 		int REMAINING_STACK_SIZE = 0;
@@ -459,9 +458,9 @@ public class ItemHandler {
     * @param id - that will recieve the items.
     * @retrn The existing MapView.
     */
-	public MapView existingView(final int id) {
-		MapView view = LegacyAPI.getLegacy().getMapView(id);
-		if (view == null) { view = LegacyAPI.getLegacy().createMapView(); }
+	public static MapView existingView(final int id) {
+		MapView view = LegacyAPI.getMapView(id);
+		if (view == null) { view = LegacyAPI.createMapView(); }
 		return view;
 	}
 	
@@ -469,12 +468,12 @@ public class ItemHandler {
     * Saves any existing players that are on cooldown for each item.
     * 
     */
-	public void saveCooldowns() {
+	public static void saveCooldowns() {
 		for (ItemMap itemMap: ItemUtilities.getUtilities().getItems()) {
 			for (String keys: itemMap.getPlayersOnCooldown().keySet()) {
 				String[] parts = keys.split("-.-");
 				if (System.currentTimeMillis() - itemMap.getPlayersOnCooldown().get(keys) <= itemMap.getCommandCooldown() * 1000) {
-					SQL.getData().saveData(new DataObject(Table.IJ_ON_COOLDOWN, parts[1], parts[0], itemMap.getConfigName(), itemMap.getCommandCooldown().toString(), itemMap.getPlayersOnCooldown().get(keys).toString()));
+					SQL.getData().saveData(new DataObject(Table.ON_COOLDOWN, parts[1], parts[0], itemMap.getConfigName(), itemMap.getCommandCooldown().toString(), itemMap.getPlayersOnCooldown().get(keys).toString()));
 				}
 			}
 		}
@@ -485,10 +484,10 @@ public class ItemHandler {
     * 
     * @param saveCrafting - If the Crafting Items should be saved to be returned later.
     */
-	public void purgeCraftItems(final boolean saveCrafting) {
-		PlayerHandler.getPlayer().forOnlinePlayers(player -> {
-			if (saveCrafting) { this.saveCraftItems(player); }
-			this.removeCraftItems(player); 
+	public static void purgeCraftItems(final boolean saveCrafting) {
+		PlayerHandler.forOnlinePlayers(player -> {
+			if (saveCrafting) { saveCraftItems(player); }
+			removeCraftItems(player); 
 		});
 	}
     
@@ -497,34 +496,34 @@ public class ItemHandler {
     * 
     * @param player - The Player to have its crafting items saved.
     */
-    public void saveCraftItems(final Player player) {
-			if (Crafting.getCreativeCraftItems().containsKey(PlayerHandler.getPlayer().getPlayerID(player))) {
+    public static void saveCraftItems(final Player player) {
+			if (Crafting.getCreativeCraftItems().containsKey(PlayerHandler.getPlayerID(player))) {
 				Inventory inv = Bukkit.createInventory(null, 9);
 				boolean notNull = false;
-				ItemStack[] craftingContents = Crafting.getCreativeCraftItems().get(PlayerHandler.getPlayer().getPlayerID(player));
+				ItemStack[] craftingContents = Crafting.getCreativeCraftItems().get(PlayerHandler.getPlayerID(player));
 				for (int k = 0; k <= 4; k++) {
 					inv.setItem(k, craftingContents[k]); 
 					if (craftingContents[k] != null && craftingContents[k].getType() != Material.AIR) { notNull = true; }
 				}
-				if (notNull) { SQL.getData().saveData(new DataObject(Table.IJ_RETURN_CRAFTITEMS, PlayerHandler.getPlayer().getPlayerID(player), "", ItemHandler.getItem().serializeInventory(inv))); }
-			} else if (Crafting.getOpenCraftItems().containsKey(PlayerHandler.getPlayer().getPlayerID(player))) {
+				if (notNull) { SQL.getData().saveData(new DataObject(Table.RETURN_CRAFTITEMS, PlayerHandler.getPlayerID(player), "", serializeInventory(inv))); }
+			} else if (Crafting.getOpenCraftItems().containsKey(PlayerHandler.getPlayerID(player))) {
 				Inventory inv = Bukkit.createInventory(null, 9);
 				boolean notNull = false;
-				ItemStack[] craftingContents = Crafting.getOpenCraftItems().get(PlayerHandler.getPlayer().getPlayerID(player));
+				ItemStack[] craftingContents = Crafting.getOpenCraftItems().get(PlayerHandler.getPlayerID(player));
 				for (int k = 0; k <= 4; k++) {
 					inv.setItem(k, craftingContents[k]); 
 					if (craftingContents[k] != null && craftingContents[k].getType() != Material.AIR) { notNull = true; }
 				}
-				if (notNull) { SQL.getData().saveData(new DataObject(Table.IJ_RETURN_CRAFTITEMS, PlayerHandler.getPlayer().getPlayerID(player), "", ItemHandler.getItem().serializeInventory(inv))); }
-			} else if (Crafting.getCraftItems().containsKey(PlayerHandler.getPlayer().getPlayerID(player))) {
+				if (notNull) { SQL.getData().saveData(new DataObject(Table.RETURN_CRAFTITEMS, PlayerHandler.getPlayerID(player), "", serializeInventory(inv))); }
+			} else if (Crafting.getCraftItems().containsKey(PlayerHandler.getPlayerID(player))) {
 				Inventory inv = Bukkit.createInventory(null, 9);
 				boolean notNull = false;
-				ItemStack[] craftingContents = Crafting.getCraftItems().get(PlayerHandler.getPlayer().getPlayerID(player));
+				ItemStack[] craftingContents = Crafting.getCraftItems().get(PlayerHandler.getPlayerID(player));
 				for (int k = 0; k <= 4; k++) {
 					inv.setItem(k, craftingContents[k]); 
 					if (craftingContents[k] != null && craftingContents[k].getType() != Material.AIR) { notNull = true; }
 				}
-				if (notNull) { SQL.getData().saveData(new DataObject(Table.IJ_RETURN_CRAFTITEMS, PlayerHandler.getPlayer().getPlayerID(player), "", ItemHandler.getItem().serializeInventory(inv))); }
+				if (notNull) { SQL.getData().saveData(new DataObject(Table.RETURN_CRAFTITEMS, PlayerHandler.getPlayerID(player), "", serializeInventory(inv))); }
 			}
     }
     
@@ -533,20 +532,20 @@ public class ItemHandler {
     * 
     * @param player - The Player to have its crafting items restored.
     */
-    public void restoreCraftItems(final Player player) {
-    	DataObject dataObject = SQL.getData().getData(new DataObject(Table.IJ_RETURN_CRAFTITEMS, PlayerHandler.getPlayer().getPlayerID(player), "", ""));
-    	Inventory inventory = (dataObject != null ? ItemHandler.getItem().deserializeInventory(dataObject.getInventory64()) : null);
+    public static void restoreCraftItems(final Player player) {
+    	DataObject dataObject = SQL.getData().getData(new DataObject(Table.RETURN_CRAFTITEMS, PlayerHandler.getPlayerID(player), "", ""));
+    	Inventory inventory = (dataObject != null ? deserializeInventory(dataObject.getInventory64()) : null);
 		Inventory craftView = player.getOpenInventory().getTopInventory();
-		if (inventory != null && PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
+		if (inventory != null && PlayerHandler.isCraftingInv(player.getOpenInventory())) {
 			for (int k = 4; k >= 0; k--) {
 				if (inventory.getItem(k) != null && inventory.getItem(k).getType() != Material.AIR) {
 				 craftView.setItem(k, inventory.getItem(k).clone());
 				}
 			}
-			PlayerHandler.getPlayer().updateInventory(player, 1L);
+			PlayerHandler.updateInventory(player, 1L);
 			SQL.getData().removeData(dataObject);
-		} else if (!PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
-			SchedulerUtils.getScheduler().runLater(60L, () -> this.restoreCraftItems(player));
+		} else if (!PlayerHandler.isCraftingInv(player.getOpenInventory())) {
+			SchedulerUtils.runLater(60L, () -> restoreCraftItems(player));
 		}
     }
     
@@ -555,10 +554,10 @@ public class ItemHandler {
     * 
     * @param player - The Player to have their crafting items removed.
     */
-    public void removeCraftItems(final Player player) {
+    public static void removeCraftItems(final Player player) {
     	ItemStack[] craftingContents = player.getOpenInventory().getTopInventory().getContents();
 	    Inventory craftView = player.getOpenInventory().getTopInventory();
-	    if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
+	    if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
 	    	for (int k = 0; k < craftingContents.length; k++) {
 	    		craftView.setItem(k, new ItemStack(Material.AIR));
 	    	}
@@ -573,15 +572,15 @@ public class ItemHandler {
     * @param item - the item to be returned.
     * @param delay - the delay to wait before returning the item.
     */
-    public void returnCraftingItem(final Player player, final int slot, final ItemStack item, long delay) {
+    public static void returnCraftingItem(final Player player, final int slot, final ItemStack item, long delay) {
     	if (item == null) { return; } if (slot == 0) { delay += 1L; }
-    	SchedulerUtils.getScheduler().runLater(delay, () -> {
+    	SchedulerUtils.runLater(delay, () -> {
 	    	if (!player.isOnline()) { return; }
-	    	if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory()) && player.getGameMode() != GameMode.CREATIVE) {
+	    	if (PlayerHandler.isCraftingInv(player.getOpenInventory()) && player.getGameMode() != GameMode.CREATIVE) {
 	    	    player.getOpenInventory().getTopInventory().setItem(slot, item);	
-	    	    PlayerHandler.getPlayer().updateInventory(player, 1L);
+	    	    PlayerHandler.updateInventory(player, 1L);
 	    	} else {
-	    		this.returnCraftingItem(player, slot, item, 10L);
+	    		returnCraftingItem(player, slot, item, 10L);
 	    	}
 	    });
     }
@@ -592,7 +591,7 @@ public class ItemHandler {
     * @param contents - The ItemStack contents to be copied.
     * @return The copied ItemStack contents.
     */
-    public ItemStack[] cloneContents(final ItemStack[] contents) {
+    public static ItemStack[] cloneContents(final ItemStack[] contents) {
     	int itr = 0;
     	ItemStack[] copyContents = contents;
     	for (ItemStack itemStack: contents) {
@@ -610,7 +609,7 @@ public class ItemHandler {
     * @param contents - The ItemStack contents to be checked.
     * @return If the contents do not exist.
     */
-    public boolean isContentsEmpty(final ItemStack[] contents) {
+    public static boolean isContentsEmpty(final ItemStack[] contents) {
     	int size = 0; 
     	for (ItemStack itemStack: contents) { 
     		if (itemStack == null || itemStack.getType().equals(Material.AIR)) { 
@@ -627,7 +626,7 @@ public class ItemHandler {
     * @param inventory - The Inventory to be converted.
     * @return The Base64 String of the Inventory.
     */
-	public String serializeInventory(final Inventory inventory) {
+	public static String serializeInventory(final Inventory inventory) {
 	    try {
 	    	java.io.ByteArrayOutputStream str = new java.io.ByteArrayOutputStream();
 	        org.bukkit.util.io.BukkitObjectOutputStream data = new org.bukkit.util.io.BukkitObjectOutputStream(str);
@@ -650,7 +649,7 @@ public class ItemHandler {
     * @param inventoryData - The Base64 String to be converted to an Inventory.
     * @return The Inventory instance that has been deserialized.
     */
-	public Inventory deserializeInventory(final String inventoryData) {
+	public static Inventory deserializeInventory(final String inventoryData) {
 	    try {
 	    	java.io.ByteArrayInputStream stream = new java.io.ByteArrayInputStream(Base64.getDecoder().decode(inventoryData));
 	        org.bukkit.util.io.BukkitObjectInputStream data = new org.bukkit.util.io.BukkitObjectInputStream(stream);
@@ -663,7 +662,7 @@ public class ItemHandler {
 	    } catch (EOFException e) {
 	    	return null;
 	    } catch (Exception e) {
-	        ServerHandler.getServer().sendDebugTrace(e);
+	        ServerUtils.sendDebugTrace(e);
 	    }
 	    return null;
 	}
@@ -674,11 +673,11 @@ public class ItemHandler {
     * @param item - The ItemStack to have its custom NBTData found.
     * @return The String of NBTData found on the ItemStack.
     */
-	public String getNBTData(final ItemStack item) {
-		if (this.dataTagsEnabled() && item != null && item.getType() != Material.AIR) {
+	public static String getNBTData(final ItemStack item) {
+		if (dataTagsEnabled() && item != null && item.getType() != Material.AIR) {
 			try {
-				Object nms = Reflection.getReflection().getCraftBukkitClass("inventory.CraftItemStack").getMethod("asNMSCopy", ItemStack.class).invoke(null, item);
-				Object cacheTag = Reflection.getReflection().getMinecraftClass("ItemStack").getMethod("getTag").invoke(nms);
+				Object nms = ReflectionUtils.getCraftBukkitClass("inventory.CraftItemStack").getMethod("asNMSCopy", ItemStack.class).invoke(null, item);
+				Object cacheTag = ReflectionUtils.getMinecraftClass("ItemStack").getMethod("getTag").invoke(nms);
 				if (cacheTag != null) {
 					String data = (String) cacheTag.getClass().getMethod("getString", String.class).invoke(cacheTag, "ItemJoin");
 					String data1 = (String) cacheTag.getClass().getMethod("getString", String.class).invoke(cacheTag, "ItemJoin Name");
@@ -690,8 +689,8 @@ public class ItemHandler {
 					}
 				}
 			} catch (Exception e) {
-				ServerHandler.getServer().logSevere("{ItemMap} An error has occured when getting NBTData to an item.");
-				ServerHandler.getServer().sendDebugTrace(e);
+				ServerUtils.logSevere("{ItemMap} An error has occured when getting NBTData to an item.");
+				ServerUtils.sendDebugTrace(e);
 			}
 		}
 		return null;
@@ -703,12 +702,12 @@ public class ItemHandler {
     * @param item - The ItemStack to be checked for custom NBTData.
     * @return If the ItemStack has plugin specific NBTData.
     */
-	public boolean containsNBTData(final ItemStack item) {
-		if (this.dataTagsEnabled() && item != null && item.getType() != Material.AIR && this.getNBTData(item) != null) {
+	public static boolean containsNBTData(final ItemStack item) {
+		if (dataTagsEnabled() && item != null && item.getType() != Material.AIR && getNBTData(item) != null) {
 			return true;
-		} else if (!this.dataTagsEnabled()) { 
+		} else if (!dataTagsEnabled()) { 
 			if (item != null && item.hasItemMeta() && item.getItemMeta().hasDisplayName()
-				&& Utils.getUtils().colorDecode(item.getItemMeta().getDisplayName()).contains(Utils.getUtils().colorDecode(Utils.getUtils().colorEncode("ItemJoin")))) {
+				&& StringUtils.getUtils().colorDecode(item.getItemMeta().getDisplayName()).contains(StringUtils.getUtils().colorDecode(StringUtils.getUtils().colorEncode("ItemJoin")))) {
 				return true;
 			}
 		}
@@ -721,9 +720,9 @@ public class ItemHandler {
     * @param material - The ItemStack to be checked for a designated slot.
     * @return The proper designated slot name.
     */
-	public String getDesignatedSlot(final Material material) {
+	public static String getDesignatedSlot(final Material material) {
 		String name = material.name().contains("_") ? material.name().split("_")[1] : material.name();
-		String hand = (ServerHandler.getServer().hasSpecificUpdate("1_13") ? "hand" : "mainhand");
+		String hand = (ServerUtils.hasSpecificUpdate("1_13") ? "hand" : "mainhand");
 		return (name != null ? (name.equalsIgnoreCase("HELMET") ? "head" : name.equalsIgnoreCase("CHESTPLATE") ? "chest" : name.equalsIgnoreCase("LEGGINGS") ? "legs" : name.equalsIgnoreCase("BOOTS") ? "feet" : 
 			    name.equalsIgnoreCase("HOE") ? hand : name.equalsIgnoreCase("SWORD") ? hand : name.equalsIgnoreCase("SHOVEL") ? hand : name.equalsIgnoreCase("AXE") ? hand : name.equalsIgnoreCase("PICKAXE") ? hand : "noslot") : "noslot");
 	}
@@ -733,8 +732,8 @@ public class ItemHandler {
     * 
     * @return If NBTData is enabled.
     */
-	public boolean dataTagsEnabled() {
-		if (ServerHandler.getServer().hasSpecificUpdate("1_8")) {
+	public static boolean dataTagsEnabled() {
+		if (ServerUtils.hasSpecificUpdate("1_8")) {
 			return ConfigHandler.getConfig().getFile("config.yml").getBoolean("Settings.DataTags");
 		}
 		return false;
@@ -745,7 +744,7 @@ public class ItemHandler {
     * 
     * @return If the server is using the new skull method.
     */
-	public boolean usesOwningPlayer() {
+	public static boolean usesOwningPlayer() {
 		try {
 			if (Class.forName("org.bukkit.inventory.meta.SkullMeta").getMethod("getOwningPlayer") != null) { return true; }
 		} catch (Exception e) { }
@@ -758,9 +757,9 @@ public class ItemHandler {
     * @param context - The String to have the Delay found.
     * @return The Delay of the String as an Integer.
     */
-	public int getDelay(final String context) {
-		try { if (Utils.getUtils().returnInteger(context) != null) { return Utils.getUtils().returnInteger(context); } } 
-		catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
+	public static int getDelay(final String context) {
+		try { if (StringUtils.getUtils().returnInteger(context) != null) { return StringUtils.getUtils().returnInteger(context); } } 
+		catch (Exception e) { ServerUtils.sendDebugTrace(e); }
 		return 0;
 	}
 	
@@ -770,12 +769,12 @@ public class ItemHandler {
     * @param context - The String to have the Delay found.
     * @return The Delay Format of the String with the proper Integer value.
     */
-	public String getDelayFormat(final String context) {
-		if (Utils.getUtils().containsIgnoreCase(context, "<delay:" + Utils.getUtils().returnInteger(context) + ">") 
-				|| Utils.getUtils().containsIgnoreCase(context, "delay:" + Utils.getUtils().returnInteger(context) + "") 
-				|| Utils.getUtils().containsIgnoreCase(context, "<delay: " + Utils.getUtils().returnInteger(context) + ">")
-				|| Utils.getUtils().containsIgnoreCase(context, "delay: " + Utils.getUtils().returnInteger(context) + "")) {
-			return ("<delay:" + Utils.getUtils().returnInteger(context) + ">");
+	public static String getDelayFormat(final String context) {
+		if (StringUtils.getUtils().containsIgnoreCase(context, "<delay:" + StringUtils.getUtils().returnInteger(context) + ">") 
+				|| StringUtils.getUtils().containsIgnoreCase(context, "delay:" + StringUtils.getUtils().returnInteger(context) + "") 
+				|| StringUtils.getUtils().containsIgnoreCase(context, "<delay: " + StringUtils.getUtils().returnInteger(context) + ">")
+				|| StringUtils.getUtils().containsIgnoreCase(context, "delay: " + StringUtils.getUtils().returnInteger(context) + "")) {
+			return ("<delay:" + StringUtils.getUtils().returnInteger(context) + ">");
 		}
 		return null;
 	}
@@ -786,9 +785,9 @@ public class ItemHandler {
     * @param context - The String to have the Delay Formatting removed.
     * @return The String with the removed Delay Formatting.
     */
-	public String cutDelay(final String context) {
-		if (this.getDelayFormat(context) != null) {
-			return context.replace(this.getDelayFormat(context), "");
+	public static String cutDelay(final String context) {
+		if (getDelayFormat(context) != null) {
+			return context.replace(getDelayFormat(context), "");
 		} 
 		return context;
 	}
@@ -799,10 +798,10 @@ public class ItemHandler {
     * @param context - The String List to have the Delay Formatting removed.
     * @return The String List with the removed Delay Formatting.
     */
-	public List<String> cutDelay(final List <String> context) {
+	public static List<String> cutDelay(final List <String> context) {
 		List<String> newContext = new ArrayList<String>();
 		for (String minorContext : context) {
-			newContext.add(this.cutDelay(minorContext));
+			newContext.add(cutDelay(minorContext));
 		}
 		return newContext;
 	}
@@ -813,9 +812,9 @@ public class ItemHandler {
     * @param slot - The slot to be checked.
     * @return If the slot is a custom slot.
     */
-	public boolean isCustomSlot(final String slot) {
+	public static boolean isCustomSlot(final String slot) {
 		if (slot.equalsIgnoreCase("Offhand") || slot.equalsIgnoreCase("Arbitrary") || slot.equalsIgnoreCase("Helmet") 
-				|| slot.equalsIgnoreCase("Chestplate") || slot.equalsIgnoreCase("Leggings") || slot.equalsIgnoreCase("Boots") || this.isCraftingSlot(slot) || slot.contains("%")) {
+				|| slot.equalsIgnoreCase("Chestplate") || slot.equalsIgnoreCase("Leggings") || slot.equalsIgnoreCase("Boots") || isCraftingSlot(slot) || slot.contains("%")) {
 			return true;
 		}
 		return false;
@@ -827,7 +826,7 @@ public class ItemHandler {
     * @param slot - The slot to be checked.
     * @return If the slot is a crafting slot.
     */
-	public boolean isCraftingSlot(final String slot) {
+	public static boolean isCraftingSlot(final String slot) {
 		if (slot.equalsIgnoreCase("CRAFTING[0]") || slot.equalsIgnoreCase("CRAFTING[1]") 
 				|| slot.equalsIgnoreCase("CRAFTING[2]") || slot.equalsIgnoreCase("CRAFTING[3]") || slot.equalsIgnoreCase("CRAFTING[4]")) {
 			return true;
@@ -841,7 +840,7 @@ public class ItemHandler {
     * @param material - The Material to be checked.
     * @return If the Material is a Skull/Player Head.
     */
-	public boolean isSkull(final Material material) {
+	public static boolean isSkull(final Material material) {
 		if (material.toString().equalsIgnoreCase("SKULL_ITEM") || material.toString().equalsIgnoreCase("PLAYER_HEAD")) {
 			return true;
 		}
@@ -854,20 +853,10 @@ public class ItemHandler {
     * @param item - The ItemStack to be checked.
     * @return If the ItemStack is a Writable Book.
     */
-	public boolean isBookQuill(ItemStack item) {
+	public static boolean isBookQuill(ItemStack item) {
 		if (item != null && item.getType() != null && (item.getType().toString().equalsIgnoreCase("WRITABLE_BOOK") || item.getType().toString().equalsIgnoreCase("BOOK_AND_QUILL"))) {
 			return true; 
 		} 
 		return false;
 	}
-	
-   /**
-    * Gets the instance of the ItemHandler.
-    * 
-    * @return The ItemHandler instance.
-    */
-    public static ItemHandler getItem() { 
-        if (item == null) { item = new ItemHandler(); }
-        return item; 
-    } 
 }

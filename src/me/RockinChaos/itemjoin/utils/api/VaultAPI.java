@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package me.RockinChaos.itemjoin.utils;
+package me.RockinChaos.itemjoin.utils.api;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;

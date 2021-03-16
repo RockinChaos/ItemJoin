@@ -24,8 +24,8 @@ import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
-import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
+import me.RockinChaos.itemjoin.utils.ServerUtils;
 
 public class Offhand implements Listener {
 	
@@ -36,16 +36,16 @@ public class Offhand implements Listener {
 	*/
 	@EventHandler(ignoreCancelled = true)
 	private void onHandModify(PlayerSwapHandItemsEvent event) {
-		if (ServerHandler.getServer().hasSpecificUpdate("1_9")) {
+		if (ServerUtils.hasSpecificUpdate("1_9")) {
 			ItemStack offhand = event.getOffHandItem();
 			ItemStack mainhand = event.getMainHandItem();
 			Player player = event.getPlayer();
 			if (!ItemUtilities.getUtilities().isAllowed(player, offhand, "inventory-modify")) {
 				event.setCancelled(true);
-				PlayerHandler.getPlayer().updateInventory(player, 1L);
+				PlayerHandler.updateInventory(player, 1L);
 			} else if (!ItemUtilities.getUtilities().isAllowed(player, mainhand, "inventory-modify")) {
 				event.setCancelled(true);
-				PlayerHandler.getPlayer().updateInventory(player, 1L);
+				PlayerHandler.updateInventory(player, 1L);
 			}
 		}
 	}

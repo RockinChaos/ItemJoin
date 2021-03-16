@@ -23,9 +23,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerRespawnEvent;
 
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
-import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.item.ItemUtilities.TriggerType;
+import me.RockinChaos.itemjoin.utils.ServerUtils;
 
 public class Respawn implements Listener {
 	
@@ -38,9 +38,9 @@ public class Respawn implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	private void setRespawnItems(PlayerRespawnEvent event) {
 		final Player player = event.getPlayer();
-		if (PlayerHandler.getPlayer().isPlayer(player)) {
+		if (PlayerHandler.isPlayer(player)) {
 			ItemUtilities.getUtilities().setAuthenticating(player, player.getWorld(), TriggerType.RESPAWN, player.getGameMode(), "GLOBAL"); 
 		}
-		ServerHandler.getServer().logDebug("{ItemMap} " + player.getName() + " has performed the RESPAWN trigger.");
+		ServerUtils.logDebug("{ItemMap} " + player.getName() + " has performed the RESPAWN trigger.");
 	}
 }

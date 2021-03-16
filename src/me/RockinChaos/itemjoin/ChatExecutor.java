@@ -32,17 +32,17 @@ import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PermissionsHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
-import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.handlers.UpdateHandler;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.listeners.Crafting;
-import me.RockinChaos.itemjoin.utils.LanguageAPI;
-import me.RockinChaos.itemjoin.utils.LegacyAPI;
 import me.RockinChaos.itemjoin.utils.SchedulerUtils;
-import me.RockinChaos.itemjoin.utils.UI;
-import me.RockinChaos.itemjoin.utils.Chances;
-import me.RockinChaos.itemjoin.utils.Utils;
+import me.RockinChaos.itemjoin.utils.ServerUtils;
+import me.RockinChaos.itemjoin.utils.api.ChanceAPI;
+import me.RockinChaos.itemjoin.utils.api.LanguageAPI;
+import me.RockinChaos.itemjoin.utils.api.LegacyAPI;
+import me.RockinChaos.itemjoin.utils.interfaces.pages.InterMenu;
+import me.RockinChaos.itemjoin.utils.StringUtils;
 import me.RockinChaos.itemjoin.utils.sql.DataObject;
 import me.RockinChaos.itemjoin.utils.sql.SQL;
 import me.RockinChaos.itemjoin.utils.sql.DataObject.Table;
@@ -164,11 +164,11 @@ public class ChatExecutor implements CommandExecutor {
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]---------------&a&l[&e Help Menu 10/10 &a&l]&a&l&m--------------[");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
 		} else if (Execute.RELOAD.accept(sender, args, 0)) {
-			ItemHandler.getItem().saveCooldowns();
+			ItemHandler.saveCooldowns();
 			ConfigHandler.getConfig().reloadConfigs(false);
 			LanguageAPI.getLang(false).sendLangMessage("commands.default.configReload", sender);
 		} else if (Execute.MENU.accept(sender, args, 0)) {
-			UI.getCreator().startMenu(sender);
+			InterMenu.startMenu(sender);
 			LanguageAPI.getLang(false).sendLangMessage("commands.menu.openMenu", sender);
 		} else if (Execute.INFO.accept(sender, args, 0)) {
 			this.info(sender);
@@ -210,12 +210,12 @@ public class ChatExecutor implements CommandExecutor {
 			this.handleAllItems(sender, args, true);
 		} else if (Execute.UPDATE.accept(sender, args, 0)) {
 			LanguageAPI.getLang(false).sendLangMessage("commands.updates.checkRequest", sender);
-			SchedulerUtils.getScheduler().runAsync(() -> {
+			SchedulerUtils.runAsync(() -> {
 				UpdateHandler.getUpdater(false).checkUpdates(sender, false); 
 			});
 		} else if (Execute.UPGRADE.accept(sender, args, 0)) {
 			LanguageAPI.getLang(false).sendLangMessage("commands.updates.updateRequest", sender);
-			SchedulerUtils.getScheduler().runAsync(() -> {
+			SchedulerUtils.runAsync(() -> {
 				UpdateHandler.getUpdater(false).forceUpdates(sender); 
 			});
 		} else if (this.matchExecutor(args) == null) {
@@ -261,15 +261,15 @@ public class ChatExecutor implements CommandExecutor {
 	* 
 	*/
 	private void info(final CommandSender sender) {
-		if (PlayerHandler.getPlayer().getHandItem((Player) sender) != null && PlayerHandler.getPlayer().getHandItem((Player) sender).getType() != Material.AIR) {
+		if (PlayerHandler.getHandItem((Player) sender) != null && PlayerHandler.getHandItem((Player) sender).getType() != Material.AIR) {
 			LanguageAPI.getLang(false).dispatchMessage(sender, " ");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]-----------------&a&l[&e Item Info &a&l]&a&l&m----------------[");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
 			String[] placeHolders = LanguageAPI.getLang(false).newString(); 
-			placeHolders[3] = PlayerHandler.getPlayer().getHandItem((Player) sender).getType().toString();
+			placeHolders[3] = PlayerHandler.getHandItem((Player) sender).getType().toString();
 			LanguageAPI.getLang(false).sendLangMessage("commands.info.material", sender, placeHolders);
-			if (!ServerHandler.getServer().hasSpecificUpdate("1_13")) {
-				placeHolders[3] = LegacyAPI.getLegacy().getDataValue(PlayerHandler.getPlayer().getHandItem((Player) sender)) + "";
+			if (!ServerUtils.hasSpecificUpdate("1_13")) {
+				placeHolders[3] = LegacyAPI.getDataValue(PlayerHandler.getHandItem((Player) sender)) + "";
 				LanguageAPI.getLang(false).sendLangMessage("commands.info.data", sender, placeHolders);
 			}
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
@@ -345,9 +345,9 @@ public class ChatExecutor implements CommandExecutor {
 			List < String > customPermissions = new ArrayList < String > ();
 			List < String > inputMessage = new ArrayList < String > ();
 			for (World world: Bukkit.getServer().getWorlds()) {
-				final ItemMap probable = Chances.getChances().getRandom(((Player) sender));
+				final ItemMap probable = ChanceAPI.getChances().getRandom(((Player) sender));
 				for (ItemMap item: ItemUtilities.getUtilities().getItems()) {
-					if ((item.getPermissionNode() != null ? !customPermissions.contains(item.getPermissionNode()) : true) && item.inWorld(world) && Chances.getChances().isProbability(item, probable)) {
+					if ((item.getPermissionNode() != null ? !customPermissions.contains(item.getPermissionNode()) : true) && item.inWorld(world) && ChanceAPI.getChances().isProbability(item, probable)) {
 						if (item.getPermissionNode() != null) { customPermissions.add(item.getPermissionNode()); }
 						if (item.hasPermission(((Player) sender))) {
 							inputMessage.add("&a[\u2714] " + PermissionsHandler.getPermissions().customPermissions(item.getPermissionNode(), item.getConfigName(), world.getName()));
@@ -378,30 +378,30 @@ public class ChatExecutor implements CommandExecutor {
 		OfflinePlayer foundPlayer = null;
 		if (!table.equalsIgnoreCase("Database")) { 
 			placeHolders[9] = "/ij purge " + table + (table.equalsIgnoreCase("map-ids") ? " <image>" : " <player>"); 
-			if (!table.equalsIgnoreCase("map-ids")) { foundPlayer = LegacyAPI.getLegacy().getOfflinePlayer(args); }
+			if (!table.equalsIgnoreCase("map-ids")) { foundPlayer = LegacyAPI.getOfflinePlayer(args); }
 			if (!table.equalsIgnoreCase("map-ids") && foundPlayer == null && !args.equalsIgnoreCase("ALL")) { LanguageAPI.getLang(false).sendLangMessage("commands.default.noTarget", sender, placeHolders); return; } 
 		} else { placeHolders[9] = "/ij purge"; }
 		if (this.confirmationRequests.get(table + sender.getName()) != null && this.confirmationRequests.get(table + sender.getName()).equals(true)) {
 			if (!table.equalsIgnoreCase("Database")) { 
-				PlayerHandler.getPlayer().getPlayerID(PlayerHandler.getPlayer().getPlayerString(args));
+				PlayerHandler.getPlayerID(PlayerHandler.getPlayerString(args));
 				DataObject dataObject = (table.replace("-", "_").equalsIgnoreCase("map_ids") 
-						? new DataObject(Table.IJ_MAP_IDS, null, "", args, "") : (table.replace("-", "_").equalsIgnoreCase("first_join") 
-						? new DataObject(Table.IJ_FIRST_JOIN, PlayerHandler.getPlayer().getPlayerID(PlayerHandler.getPlayer().getPlayerString(args)), "", "", "") : (table.replace("-", "_").equalsIgnoreCase("first_world") 
-						? new DataObject(Table.IJ_FIRST_WORLD, PlayerHandler.getPlayer().getPlayerID(PlayerHandler.getPlayer().getPlayerString(args)), "", "", "") : (table.replace("-", "_").equalsIgnoreCase("ip_limits") 
-						? new DataObject(Table.IJ_IP_LIMITS, PlayerHandler.getPlayer().getPlayerID(PlayerHandler.getPlayer().getPlayerString(args)), "", "", "") : (table.replace("-", "_").equalsIgnoreCase("enabled_players") 
-						? new DataObject(Table.IJ_ENABLED_PLAYERS, PlayerHandler.getPlayer().getPlayerID(PlayerHandler.getPlayer().getPlayerString(args)), "", "", "") : (table.replace("-", "_").equalsIgnoreCase("first_commands") 
-						? new DataObject(Table.IJ_FIRST_COMMANDS, PlayerHandler.getPlayer().getPlayerID(PlayerHandler.getPlayer().getPlayerString(args)), "", "", "") : null))))));
+						? new DataObject(Table.MAP_IDS, null, "", args, "") : (table.replace("-", "_").equalsIgnoreCase("first_join") 
+						? new DataObject(Table.FIRST_JOIN, PlayerHandler.getPlayerID(PlayerHandler.getPlayerString(args)), "", "", "") : (table.replace("-", "_").equalsIgnoreCase("first_world") 
+						? new DataObject(Table.FIRST_WORLD, PlayerHandler.getPlayerID(PlayerHandler.getPlayerString(args)), "", "", "") : (table.replace("-", "_").equalsIgnoreCase("ip_limits") 
+						? new DataObject(Table.IP_LIMITS, PlayerHandler.getPlayerID(PlayerHandler.getPlayerString(args)), "", "", "") : (table.replace("-", "_").equalsIgnoreCase("enabled_players") 
+						? new DataObject(Table.ENABLED_PLAYERS, PlayerHandler.getPlayerID(PlayerHandler.getPlayerString(args)), "", "", "") : (table.replace("-", "_").equalsIgnoreCase("first_commands") 
+						? new DataObject(Table.FIRST_COMMANDS, PlayerHandler.getPlayerID(PlayerHandler.getPlayerString(args)), "", "", "") : null))))));
 				if (dataObject != null) { SQL.getData().removeData(dataObject); }
 			} 
 			else {
 			ItemJoin.getInstance().setStarted(false);
-				SchedulerUtils.getScheduler().runAsync(() -> {
-					SQL.getData().purgeDatabase(); {
+				SQL.getData().purgeDatabase(); {
+					SchedulerUtils.runAsync(() -> {
 						SQL.newData(false); {
 							ItemJoin.getInstance().setStarted(true);	
 						}
-					}
-				});
+					});
+				}
 			}
 			LanguageAPI.getLang(false).sendLangMessage("commands.database.purgeSuccess", sender, placeHolders);
 			this.confirmationRequests.remove(table + sender.getName());
@@ -409,7 +409,7 @@ public class ChatExecutor implements CommandExecutor {
 			this.confirmationRequests.put(table + sender.getName(), true);
 			LanguageAPI.getLang(false).sendLangMessage("commands.database.purgeWarn", sender, placeHolders);
 			LanguageAPI.getLang(false).sendLangMessage("commands.database.purgeConfirm", sender, placeHolders);
-			SchedulerUtils.getScheduler().runLater(100L, () -> {
+			SchedulerUtils.runLater(100L, () -> {
 				if (this.confirmationRequests.get(table + sender.getName()) != null && this.confirmationRequests.get(table + sender.getName()).equals(true)) {
 					LanguageAPI.getLang(false).sendLangMessage("commands.database.purgeTimeOut", sender);
 					this.confirmationRequests.remove(table + sender.getName());
@@ -427,13 +427,13 @@ public class ChatExecutor implements CommandExecutor {
 	* 
 	*/
 	private void enable(final CommandSender sender, final String player, final String world, final int arguments) {
-		Player argsPlayer = (arguments >= 2 ? PlayerHandler.getPlayer().getPlayerString(player) : null);
+		Player argsPlayer = (arguments >= 2 ? PlayerHandler.getPlayerString(player) : null);
 		String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[1] = (arguments >= 2 ? player : sender.getName()); placeHolders[0] = world;
 		if (arguments >= 2 && argsPlayer == null) { LanguageAPI.getLang(false).sendLangMessage("commands.default.noTarget", sender, placeHolders); return; }
-		DataObject dataObject = SQL.getData().getData(new DataObject(Table.IJ_ENABLED_PLAYERS, PlayerHandler.getPlayer().getPlayerID(argsPlayer), world, String.valueOf(true)));
+		DataObject dataObject = SQL.getData().getData(new DataObject(Table.ENABLED_PLAYERS, PlayerHandler.getPlayerID(argsPlayer), world, String.valueOf(true)));
 		if (dataObject == null || Boolean.valueOf(dataObject.getEnabled()).equals(false)) {
-			SQL.getData().removeData(new DataObject(Table.IJ_ENABLED_PLAYERS, PlayerHandler.getPlayer().getPlayerID(argsPlayer), world, String.valueOf(false)));
-			SQL.getData().saveData(new DataObject(Table.IJ_ENABLED_PLAYERS, PlayerHandler.getPlayer().getPlayerID(argsPlayer), world, String.valueOf(true)));
+			SQL.getData().removeData(new DataObject(Table.ENABLED_PLAYERS, PlayerHandler.getPlayerID(argsPlayer), world, String.valueOf(false)));
+			SQL.getData().saveData(new DataObject(Table.ENABLED_PLAYERS, PlayerHandler.getPlayerID(argsPlayer), world, String.valueOf(true)));
 			LanguageAPI.getLang(false).sendLangMessage("commands.enabled." + (arguments == 3 ? "forPlayerWorld" : (arguments == 2 ? "forPlayer" : "globalPlayers")), sender, placeHolders); 
 			if (arguments >= 2 && !sender.getName().equalsIgnoreCase(argsPlayer.getName())) { 
 				placeHolders[1] = sender.getName(); 
@@ -451,13 +451,13 @@ public class ChatExecutor implements CommandExecutor {
 	* 
 	*/
 	private void disable(final CommandSender sender, final String player, final String world, final int arguments) {
-		Player argsPlayer = (arguments >= 2 ? PlayerHandler.getPlayer().getPlayerString(player) : null);
+		Player argsPlayer = (arguments >= 2 ? PlayerHandler.getPlayerString(player) : null);
 		String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[1] = (arguments >= 2 ? player : sender.getName()); placeHolders[0] = world;
 		if (arguments >= 2 && argsPlayer == null) { LanguageAPI.getLang(false).sendLangMessage("commands.default.noTarget", sender, placeHolders); return; }
-		DataObject dataObject = SQL.getData().getData(new DataObject(Table.IJ_ENABLED_PLAYERS, PlayerHandler.getPlayer().getPlayerID(argsPlayer), world, String.valueOf(false)));
+		DataObject dataObject = SQL.getData().getData(new DataObject(Table.ENABLED_PLAYERS, PlayerHandler.getPlayerID(argsPlayer), world, String.valueOf(false)));
 		if (dataObject == null || Boolean.valueOf(dataObject.getEnabled()).equals(true)) {
-			SQL.getData().removeData(new DataObject(Table.IJ_ENABLED_PLAYERS, PlayerHandler.getPlayer().getPlayerID(argsPlayer), world, String.valueOf(true)));
-			SQL.getData().saveData(new DataObject(Table.IJ_ENABLED_PLAYERS, PlayerHandler.getPlayer().getPlayerID(argsPlayer), world, String.valueOf(false)));
+			SQL.getData().removeData(new DataObject(Table.ENABLED_PLAYERS, PlayerHandler.getPlayerID(argsPlayer), world, String.valueOf(true)));
+			SQL.getData().saveData(new DataObject(Table.ENABLED_PLAYERS, PlayerHandler.getPlayerID(argsPlayer), world, String.valueOf(false)));
 			LanguageAPI.getLang(false).sendLangMessage("commands.disabled." + (arguments == 3 ? "forPlayerWorld" : (arguments == 2 ? "forPlayer" : "globalPlayers")), sender, placeHolders); 
 			if (arguments >= 2 && !sender.getName().equalsIgnoreCase(argsPlayer.getName())) { 
 				placeHolders[1] = sender.getName(); 
@@ -474,32 +474,32 @@ public class ChatExecutor implements CommandExecutor {
 	* 
 	*/
 	private void handleItems(final CommandSender sender, final String[] args, final boolean remove) {
-		Player argsPlayer = (args.length >= 3 ? PlayerHandler.getPlayer().getPlayerString(args[2]) : (Player)sender);
+		Player argsPlayer = (args.length >= 3 ? PlayerHandler.getPlayerString(args[2]) : (Player)sender);
 		String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[1] = (args.length >= 3 && argsPlayer != null ? argsPlayer.getName() : (args.length >= 3 ? args[2] : sender.getName())); placeHolders[3] = args[1];
-		int amount = (((args.length >= 3 && argsPlayer == null) || (args.length > 3)) && Utils.getUtils().isInt(args[args.length - 1]) ? Integer.parseInt(args[args.length - 1]) : 0);
-		if (args.length >= 3 && !Utils.getUtils().isInt(args[2]) && argsPlayer == null) { LanguageAPI.getLang(false).sendLangMessage("commands.default.noTarget", sender, placeHolders); return; } else if (argsPlayer == null && sender instanceof Player) { argsPlayer = (Player)sender; }
+		int amount = (((args.length >= 3 && argsPlayer == null) || (args.length > 3)) && StringUtils.getUtils().isInt(args[args.length - 1]) ? Integer.parseInt(args[args.length - 1]) : 0);
+		if (args.length >= 3 && !StringUtils.getUtils().isInt(args[2]) && argsPlayer == null) { LanguageAPI.getLang(false).sendLangMessage("commands.default.noTarget", sender, placeHolders); return; } else if (argsPlayer == null && sender instanceof Player) { argsPlayer = (Player)sender; }
 		boolean messageSent = false;
 		ItemMap itemMapExist = ItemUtilities.getUtilities().getItemMap(null, args[1], argsPlayer.getWorld());
 		if (itemMapExist == null) { LanguageAPI.getLang(false).sendLangMessage("commands.item.noItem", sender, placeHolders); return; }
 		for (ItemMap itemMap: ItemUtilities.getUtilities().getItems()) {
 			if (itemMap.getConfigName().equalsIgnoreCase(args[1])) {
-				String customName = Utils.getUtils().translateLayout(itemMap.getCustomName(), argsPlayer); placeHolders[3] = customName;
+				String customName = StringUtils.getUtils().translateLayout(itemMap.getCustomName(), argsPlayer); placeHolders[3] = customName;
 				if ((remove && itemMap.hasItem(argsPlayer)) || (!remove && (itemMap.conditionMet(argsPlayer, "trigger-conditions") && (ItemUtilities.getUtilities().canOverwrite(argsPlayer, itemMap) && (amount != 0 || itemMap.isAlwaysGive() || !itemMap.hasItem(argsPlayer)))))) {
 					if (remove || !PermissionsHandler.getPermissions().receiveEnabled() || (itemMap.hasPermission(argsPlayer) && PermissionsHandler.getPermissions().receiveEnabled())) {
-						if (itemMap.isAlwaysGive() && (args.length < 2 || (!Utils.getUtils().isInt(args[args.length - 1])))) { amount = itemMap.getCount(); }
-						if (Utils.getUtils().getSlotConversion(itemMap.getSlot()) != 0 && argsPlayer.getOpenInventory().getTopInventory().getItem(0) != null && !argsPlayer.getOpenInventory().getTopInventory().getItem(0).getType().equals(Material.AIR)) {
-							ItemHandler.getItem().returnCraftingItem(argsPlayer, 0, argsPlayer.getOpenInventory().getTopInventory().getItem(0).clone(), 0L);
+						if (itemMap.isAlwaysGive() && (args.length < 2 || (!StringUtils.getUtils().isInt(args[args.length - 1])))) { amount = itemMap.getCount(); }
+						if (StringUtils.getUtils().getSlotConversion(itemMap.getSlot()) != 0 && argsPlayer.getOpenInventory().getTopInventory().getItem(0) != null && !argsPlayer.getOpenInventory().getTopInventory().getItem(0).getType().equals(Material.AIR)) {
+							ItemHandler.returnCraftingItem(argsPlayer, 0, argsPlayer.getOpenInventory().getTopInventory().getItem(0).clone(), 0L);
 						}
 						if (remove) { itemMap.removeFrom(argsPlayer, amount); } 
 						else        { itemMap.giveTo(argsPlayer, amount); }
 						placeHolders[11] = Integer.toString((amount == 0 ? 1 : amount)); placeHolders[1] = sender.getName();
 						if (!messageSent) { LanguageAPI.getLang(false).sendLangMessage("commands." + (remove ? "remove.removedYou" : "get.givenYou"), argsPlayer, placeHolders); }
-						if (!messageSent && (args.length >= 3 && !Utils.getUtils().isInt(args[2]) && !sender.getName().equalsIgnoreCase(argsPlayer.getName()))) { placeHolders[1] = argsPlayer.getName(); LanguageAPI.getLang(false).sendLangMessage("commands." + (remove ? "remove.removedTarget" : "get.givenTarget"), sender, placeHolders); }
+						if (!messageSent && (args.length >= 3 && !StringUtils.getUtils().isInt(args[2]) && !sender.getName().equalsIgnoreCase(argsPlayer.getName()))) { placeHolders[1] = argsPlayer.getName(); LanguageAPI.getLang(false).sendLangMessage("commands." + (remove ? "remove.removedTarget" : "get.givenTarget"), sender, placeHolders); }
 						Crafting.quickSave(argsPlayer);
 					} else if (!remove && !messageSent) {
-						LanguageAPI.getLang(false).sendLangMessage("commands.get." + (args.length >= 3 && !Utils.getUtils().isInt(args[2]) && !sender.getName().equalsIgnoreCase(argsPlayer.getName()) ? "targetNoPermission" : "noPermission"), sender, placeHolders);
+						LanguageAPI.getLang(false).sendLangMessage("commands.get." + (args.length >= 3 && !StringUtils.getUtils().isInt(args[2]) && !sender.getName().equalsIgnoreCase(argsPlayer.getName()) ? "targetNoPermission" : "noPermission"), sender, placeHolders);
 					}
-				} else if (!messageSent && (args.length >= 3 && !Utils.getUtils().isInt(args[2]) && !sender.getName().equalsIgnoreCase(argsPlayer.getName()))) {
+				} else if (!messageSent && (args.length >= 3 && !StringUtils.getUtils().isInt(args[2]) && !sender.getName().equalsIgnoreCase(argsPlayer.getName()))) {
 					placeHolders[1] = sender.getName();
 					LanguageAPI.getLang(false).sendLangMessage("commands." + (remove ? "remove.targetTriedRemoval" : "get.targetTriedGive"), argsPlayer, placeHolders);
 					placeHolders[1] = argsPlayer.getName();
@@ -525,18 +525,18 @@ public class ChatExecutor implements CommandExecutor {
 		List < String > handledPlayers = new ArrayList < String > ();
 		List < String > failedPlayers = new ArrayList < String > ();
 		int amount = (args.length == 3 ? Integer.parseInt(args[2]) : 0);
-		PlayerHandler.getPlayer().forOnlinePlayers(argsPlayer -> {
+		PlayerHandler.forOnlinePlayers(argsPlayer -> {
 			boolean messageSent = false;
 			ItemMap itemMapExist = ItemUtilities.getUtilities().getItemMap(null, args[1], argsPlayer.getWorld());
 			if (itemMapExist == null) { LanguageAPI.getLang(false).sendLangMessage("commands.item.noItem", sender, placeHolders); return; }
-			placeHolders[3] = Utils.getUtils().translateLayout(itemMapExist.getCustomName(), argsPlayer); placeHolders[1] = sender.getName();
+			placeHolders[3] = StringUtils.getUtils().translateLayout(itemMapExist.getCustomName(), argsPlayer); placeHolders[1] = sender.getName();
 			placeHolders[11] = (amount == 0 ? "&lAll" : Integer.toString(amount));
 			for (ItemMap itemMap: ItemUtilities.getUtilities().getItems()) {
 				if (itemMap.getConfigName().equalsIgnoreCase(args[1])) {
 					if (remove || !PermissionsHandler.getPermissions().receiveEnabled() || (itemMap.hasPermission(argsPlayer) && PermissionsHandler.getPermissions().receiveEnabled())) {
 						if ((remove && itemMap.hasItem(argsPlayer)) || (!remove && (itemMap.conditionMet(argsPlayer, "trigger-conditions") && (ItemUtilities.getUtilities().canOverwrite(argsPlayer, itemMap) && (amount != 0 || itemMap.isAlwaysGive() || !itemMap.hasItem(argsPlayer)))))) {
-							if (Utils.getUtils().getSlotConversion(itemMap.getSlot()) != 0 && argsPlayer.getOpenInventory().getTopInventory().getItem(0) != null && !argsPlayer.getOpenInventory().getTopInventory().getItem(0).getType().equals(Material.AIR)) {
-								ItemHandler.getItem().returnCraftingItem(argsPlayer, 0, argsPlayer.getOpenInventory().getTopInventory().getItem(0).clone(), 0L);
+							if (StringUtils.getUtils().getSlotConversion(itemMap.getSlot()) != 0 && argsPlayer.getOpenInventory().getTopInventory().getItem(0) != null && !argsPlayer.getOpenInventory().getTopInventory().getItem(0).getType().equals(Material.AIR)) {
+								ItemHandler.returnCraftingItem(argsPlayer, 0, argsPlayer.getOpenInventory().getTopInventory().getItem(0).clone(), 0L);
 							}
 							if (remove) { itemMap.removeFrom(argsPlayer, amount); }
 							else { itemMap.giveTo(argsPlayer, amount); }
@@ -568,16 +568,16 @@ public class ChatExecutor implements CommandExecutor {
 	* 
 	*/
 	private void handleAllItems(final CommandSender sender, final String[] args, final boolean remove) {
-		Player argsPlayer = (args.length >= 2 ? PlayerHandler.getPlayer().getPlayerString(args[1]) : (Player) sender);
+		Player argsPlayer = (args.length >= 2 ? PlayerHandler.getPlayerString(args[1]) : (Player) sender);
 		String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[1] = (args.length >= 2 ? args[1] : sender.getName());
 		if (argsPlayer == null) { LanguageAPI.getLang(false).sendLangMessage("commands.default.noTarget", sender, placeHolders); return; }
 		boolean itemGiven = false; boolean failedPermissions = false;
 		if (!remove && argsPlayer.getOpenInventory().getTopInventory().getItem(0) != null && !argsPlayer.getOpenInventory().getTopInventory().getItem(0).getType().equals(Material.AIR)) {
-			ItemHandler.getItem().returnCraftingItem(argsPlayer, 0, argsPlayer.getOpenInventory().getTopInventory().getItem(0).clone(), 0L);
+			ItemHandler.returnCraftingItem(argsPlayer, 0, argsPlayer.getOpenInventory().getTopInventory().getItem(0).clone(), 0L);
 		}
-		final ItemMap probable = Chances.getChances().getRandom(argsPlayer);
+		final ItemMap probable = ChanceAPI.getChances().getRandom(argsPlayer);
 		for (ItemMap itemMap: ItemUtilities.getUtilities().getItems()) {
-			if ((!remove ? (itemMap.inWorld(argsPlayer.getWorld()) && Chances.getChances().isProbability(itemMap, probable) && ItemUtilities.getUtilities().canOverwrite(argsPlayer, itemMap) && 
+			if ((!remove ? (itemMap.inWorld(argsPlayer.getWorld()) && ChanceAPI.getChances().isProbability(itemMap, probable) && ItemUtilities.getUtilities().canOverwrite(argsPlayer, itemMap) && 
 				(!PermissionsHandler.getPermissions().receiveEnabled() || (itemMap.hasPermission(argsPlayer) && PermissionsHandler.getPermissions().receiveEnabled()))) : remove)) {
 				if ((remove && itemMap.hasItem(argsPlayer)) || ((!remove && !itemMap.hasItem(argsPlayer)) || (!remove && itemMap.isAlwaysGive()))) {
 					if (remove || (!remove && itemMap.conditionMet(argsPlayer, "trigger-conditions"))) {
@@ -649,7 +649,7 @@ public class ChatExecutor implements CommandExecutor {
 	    * 
 	    */
 		public boolean accept(final CommandSender sender, final String[] args, final int page) { 
-			return ((args.length == 0 || Utils.getUtils().splitIgnoreCase(this.command, args[0], ",")) && this.hasSyntax(args, page) && this.playerRequired(sender, args) && this.hasPermission(sender, args)); 
+			return ((args.length == 0 || StringUtils.getUtils().splitIgnoreCase(this.command, args[0], ",")) && this.hasSyntax(args, page) && this.playerRequired(sender, args) && this.hasPermission(sender, args)); 
 		}
 		
        /**
@@ -660,7 +660,7 @@ public class ChatExecutor implements CommandExecutor {
 	    * 
 	    */
 		public boolean acceptArgs(final String[] args) {
-			return Utils.getUtils().splitIgnoreCase(this.command, args[0], ",");
+			return StringUtils.getUtils().splitIgnoreCase(this.command, args[0], ",");
 		}
 		
        /**
@@ -671,9 +671,9 @@ public class ChatExecutor implements CommandExecutor {
 	    */
 		private boolean hasSyntax(final String[] args, final int page) {
 			return ((args.length >= 2 && (args[1].equalsIgnoreCase(String.valueOf(page)) || (this.equals(Execute.PERMISSIONS) && page == 2 
-				 && Utils.getUtils().isInt(args[1]) && Integer.parseInt(args[1]) != 0 && Integer.parseInt(args[1]) != 1 && Integer.parseInt(args[1]) <= ConfigHandler.getConfig().getPermissionPages()) 
-				 || (page == 1 && this.equals(Execute.PERMISSIONS) && Utils.getUtils().isInt(args[1]) && Integer.parseInt(args[1]) == 0)
-				 || (!Utils.getUtils().isInt(args[1]) && !this.equals(Execute.PURGE)))) 
+				 && StringUtils.getUtils().isInt(args[1]) && Integer.parseInt(args[1]) != 0 && Integer.parseInt(args[1]) != 1 && Integer.parseInt(args[1]) <= ConfigHandler.getConfig().getPermissionPages()) 
+				 || (page == 1 && this.equals(Execute.PERMISSIONS) && StringUtils.getUtils().isInt(args[1]) && Integer.parseInt(args[1]) == 0)
+				 || (!StringUtils.getUtils().isInt(args[1]) && !this.equals(Execute.PURGE)))) 
 				 || (args.length < 2 && (!this.equals(Execute.GET) && !this.equals(Execute.GETONLINE) && !this.equals(Execute.REMOVE) && !this.equals(Execute.REMOVEONLINE))
 				 || (this.equals(Execute.PURGE) && (args.length == 1 
 				 || (args.length >= 3 && (args[1].equalsIgnoreCase("map-ids") || args[1].equalsIgnoreCase("ip-limits") || args[1].equalsIgnoreCase("first-join") || args[1].equalsIgnoreCase("first-world") 
@@ -689,10 +689,10 @@ public class ChatExecutor implements CommandExecutor {
 		public boolean hasPermission(final CommandSender sender, final String[] args) {
 			String[] permissions = this.permission.replace(" ", "").split(",");
 			boolean multiPerms = this.permission.contains(",");
-			return (multiPerms && ((((!this.equals(Execute.GET) && !this.equals(Execute.REMOVE)) && ((args.length >= 2 && !Utils.getUtils().isInt(args[1]) && PermissionsHandler.getPermissions().hasPermission(sender, permissions[1])) 
-			   || ((args.length < 2 || (args.length >= 2 && Utils.getUtils().isInt(args[1]))) && PermissionsHandler.getPermissions().hasPermission(sender, permissions[0]))))) 
-			   || (((this.equals(Execute.GET) || this.equals(Execute.REMOVE)) && (((args.length == 3 && Utils.getUtils().isInt(args[2])) || args.length == 2)) && PermissionsHandler.getPermissions().hasPermission(sender, permissions[0])) 
-			   || (((args.length == 3 && !Utils.getUtils().isInt(args[2])) || args.length >= 3)) && PermissionsHandler.getPermissions().hasPermission(sender, permissions[1]))))
+			return (multiPerms && ((((!this.equals(Execute.GET) && !this.equals(Execute.REMOVE)) && ((args.length >= 2 && !StringUtils.getUtils().isInt(args[1]) && PermissionsHandler.getPermissions().hasPermission(sender, permissions[1])) 
+			   || ((args.length < 2 || (args.length >= 2 && StringUtils.getUtils().isInt(args[1]))) && PermissionsHandler.getPermissions().hasPermission(sender, permissions[0]))))) 
+			   || (((this.equals(Execute.GET) || this.equals(Execute.REMOVE)) && (((args.length == 3 && StringUtils.getUtils().isInt(args[2])) || args.length == 2)) && PermissionsHandler.getPermissions().hasPermission(sender, permissions[0])) 
+			   || (((args.length == 3 && !StringUtils.getUtils().isInt(args[2])) || args.length >= 3)) && PermissionsHandler.getPermissions().hasPermission(sender, permissions[1]))))
 		       || (!multiPerms && PermissionsHandler.getPermissions().hasPermission(sender, this.permission));
 		}
 		
@@ -705,7 +705,7 @@ public class ChatExecutor implements CommandExecutor {
 		public boolean playerRequired(final CommandSender sender, final String[] args) {
 			return (!this.player || (!(sender instanceof ConsoleCommandSender)) 
 					|| ((this.equals(Execute.GETALL) || this.equals(Execute.REMOVEALL)) && args.length >= 2)
-					|| ((this.equals(Execute.GET) || this.equals(Execute.REMOVE)) && !(((args.length == 3 && PlayerHandler.getPlayer().getPlayerString(args[2]) == null && Utils.getUtils().isInt(args[2])) || args.length == 2))));
+					|| ((this.equals(Execute.GET) || this.equals(Execute.REMOVE)) && !(((args.length == 3 && PlayerHandler.getPlayerString(args[2]) == null && StringUtils.getUtils().isInt(args[2])) || args.length == 2))));
 		}
 	}
 }

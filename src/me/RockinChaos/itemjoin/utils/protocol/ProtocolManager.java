@@ -33,16 +33,15 @@ import me.RockinChaos.itemjoin.handlers.events.PlayerPickItemEvent;
 
 public class ProtocolManager {
 	
-	private TinyProtocol protocol;
-	private static ProtocolManager manager;
+	private static TinyProtocol protocol;
 	
    /**
     * Handles both server side and client side protocol packets.
     * 
     */
-  	public void handleProtocols() {
-  		if (this.protocol != null) { this.closeProtocol(); }
-  		this.protocol = new TinyProtocol(ItemJoin.getInstance()) {
+  	public static void handleProtocols() {
+  		if (protocol != null) { closeProtocol(); }
+  		protocol = new TinyProtocol(ItemJoin.getInstance()) {
   			
   		   /**
   		    * Handles all incmming client packets.
@@ -80,21 +79,21 @@ public class ProtocolManager {
     * @param channel - the channel the packet was called on.
     * @param packet - the packet object.
     */
-  	private boolean manageEvents(Player player, Channel channel, Object packet) {
+  	private static boolean manageEvents(Player player, Channel channel, Object packet) {
   		try {
   			if (packet != null) {
   				String packetName = packet.getClass().getSimpleName();
 	  			if (packetName.equalsIgnoreCase("PacketPlayInPickItem")) {
 		  			PlayerPickItemEvent PickItem = new PlayerPickItemEvent(player, player.getInventory());
-		  			this.callEvent(PickItem);
+		  			callEvent(PickItem);
 				  	return PickItem.isCancelled();
 		  		} else if (packetName.equalsIgnoreCase("PacketPlayInAutoRecipe")) {
 		  			PlayerAutoCraftEvent AutoCraft = new PlayerAutoCraftEvent(player, player.getOpenInventory().getTopInventory());
-		  			this.callEvent(AutoCraft);
+		  			callEvent(AutoCraft);
 				  	return AutoCraft.isCancelled();
 		  		} else if (packetName.equalsIgnoreCase("PacketPlayInCloseWindow")) {
 		  			InventoryCloseEvent CloseInventory = new InventoryCloseEvent(player.getOpenInventory());
-		  			this.callEvent(CloseInventory);
+		  			callEvent(CloseInventory);
 				  	return CloseInventory.isCancelled();
 		  		}
   			}
@@ -108,7 +107,7 @@ public class ProtocolManager {
     * 
     * @param event - The event to be triggered.
     */
-    private void callEvent(Event event) {
+    private static void callEvent(Event event) {
     	HandlerList handlers = event.getHandlers();
     	RegisteredListener[] listeners = handlers.getRegisteredListeners();
     	for (RegisteredListener registration: listeners) {
@@ -133,9 +132,9 @@ public class ProtocolManager {
     * Closes the currently open protocol handler(s).
     * 
     */
-  	public void closeProtocol() {
-  		if (this.protocol != null) {
-  			this.protocol.close();
+  	public static void closeProtocol() {
+  		if (protocol != null) {
+  			protocol.close();
   		}
   	}
   	
@@ -144,18 +143,7 @@ public class ProtocolManager {
     * 
     * @return If the protocol handler(s) are open.
     */
-  	public boolean isHandling() {
-  		return (this.protocol != null);
+  	public static boolean isHandling() {
+  		return (protocol != null);
   	}
-  	
-   /**
-    * Gets the instance of the ProtocolManager.
-    * 
-    * @param regen - If the ProtocolManager should have a new instance created.
-    * @return The ProtocolManager instance.
-    */
-    public static ProtocolManager getManager() { 
-        if (manager == null) { manager = new ProtocolManager(); }
-        return manager; 
-    } 
 }

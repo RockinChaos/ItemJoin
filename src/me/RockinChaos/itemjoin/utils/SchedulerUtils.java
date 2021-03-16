@@ -18,18 +18,19 @@
 package me.RockinChaos.itemjoin.utils;
 
 import org.bukkit.Bukkit;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import me.RockinChaos.itemjoin.ItemJoin;
 
 public class SchedulerUtils {
 	
-	private static SchedulerUtils scheduler;
+	public static boolean SINGLE_THREAD_TRANSACTING = false;
 
    /**
     * Runs the task on the main thread
     * @param runnable - The task to be performed.
     */
-    public void run(final Runnable runnable){
+    public static void run(final Runnable runnable){
     	if (ItemJoin.getInstance().isEnabled()) {
     		Bukkit.getScheduler().runTask(ItemJoin.getInstance(), runnable);
     	}
@@ -40,7 +41,7 @@ public class SchedulerUtils {
     * @param runnable - The task to be performed.
     * @param delay - The ticks to wait before performing the task.
     */
-    public void runLater(final long delay, final Runnable runnable) {
+    public static void runLater(final long delay, final Runnable runnable) {
     	if (ItemJoin.getInstance().isEnabled()) {
     		Bukkit.getScheduler().runTaskLater(ItemJoin.getInstance(), runnable, delay);
     	}
@@ -53,7 +54,7 @@ public class SchedulerUtils {
     * @param interval - The interval in which to run the task.
     * @return The repeating task identifier.
     */
-    public int runAsyncAtInterval(final long delay, final long interval, final Runnable runnable) {
+    public static int runAsyncAtInterval(final long delay, final long interval, final Runnable runnable) {
     	if (ItemJoin.getInstance().isEnabled()) {
     		return Bukkit.getScheduler().runTaskTimerAsynchronously(ItemJoin.getInstance(), runnable, interval, delay).getTaskId();
     	}
@@ -64,7 +65,7 @@ public class SchedulerUtils {
     * Runs the task on another thread.
     * @param runnable - The task to be performed.
     */
-    public void runAsync(final Runnable runnable) {
+    public static void runAsync(final Runnable runnable) {
     	if (ItemJoin.getInstance().isEnabled()) {
     		Bukkit.getScheduler().runTaskAsynchronously(ItemJoin.getInstance(), runnable);
     	}
@@ -75,7 +76,7 @@ public class SchedulerUtils {
     * @param runnable - The task to be performed.
     * @param delay - The ticks to wait before performing the task.
     */
-    public void runAsyncLater(final long delay, final Runnable runnable) {
+    public static void runAsyncLater(final long delay, final Runnable runnable) {
     	if (ItemJoin.getInstance().isEnabled()) {
     		Bukkit.getScheduler().runTaskLaterAsynchronously(ItemJoin.getInstance(), runnable, delay);
     	}
@@ -87,19 +88,36 @@ public class SchedulerUtils {
     * @param delay - The ticks to wait before performing the task.
     * @param interval - The interval in which to run the task.
     */
-    public void runAsyncTimer(final long delay, final long interval, final Runnable runnable) {
+    public static void runAsyncTimer(final long delay, final long interval, final Runnable runnable) {
     	if (ItemJoin.getInstance().isEnabled()) {
     		Bukkit.getScheduler().runTaskTimerAsynchronously(ItemJoin.getInstance(), runnable, interval, delay);
     	}
     }
     
    /**
-    * Gets the instance of the SchedulerUtils.
-    * 
-    * @return The SchedulerUtils instance.
+    * Runs the task on another thread without duplication.
+    * @param runnable - The task to be performed.
     */
-    public static SchedulerUtils getScheduler() { 
-        if (scheduler == null) { scheduler = new SchedulerUtils(); }
-        return scheduler; 
-    } 
+    public static void runSingleAsync(final Runnable runnable) {
+    	if (ItemJoin.getInstance().isEnabled()) {
+    		if (!SINGLE_THREAD_TRANSACTING) {
+    			SINGLE_THREAD_TRANSACTING = true;
+    			new BukkitRunnable() {
+		            @Override
+		            public void run() {
+		            	runnable.run(); {
+		            		SINGLE_THREAD_TRANSACTING = false;
+		            	}
+		            }
+		        }.runTaskAsynchronously(ItemJoin.getInstance());
+    		} else { 
+				try { 
+					Thread.sleep(500);
+					runSingleAsync(runnable);
+				} catch (InterruptedException e) { 
+					runSingleAsync(runnable);
+				} 
+    		}
+    	}
+    }
 }

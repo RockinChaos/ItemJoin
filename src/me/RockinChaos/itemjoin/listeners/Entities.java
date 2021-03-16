@@ -26,8 +26,8 @@ import org.bukkit.event.entity.EntityDeathEvent;
 
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
-import me.RockinChaos.itemjoin.utils.DependAPI;
 import me.RockinChaos.itemjoin.utils.SchedulerUtils;
+import me.RockinChaos.itemjoin.utils.api.DependAPI;
 
 public class Entities implements Listener {
 
@@ -40,13 +40,13 @@ public class Entities implements Listener {
 	private void onMobDeath(EntityDeathEvent event) {
 		final LivingEntity victim = event.getEntity();
 		final Entity killer = victim.getKiller();
-		SchedulerUtils.getScheduler().runAsync(() -> {
+		SchedulerUtils.runAsync(() -> {
 			for (ItemMap itemMap: ItemUtilities.getUtilities().getItems()) {
 				if (itemMap.mobsDrop() && itemMap.getMobsDrop().containsKey(victim.getType()) && itemMap.inWorld(victim.getWorld())
 					&& ((killer != null && killer instanceof Player && itemMap.isLimitMode(((Player)killer).getGameMode()) && itemMap.hasPermission((Player)killer)) || killer == null) && Math.random() <= itemMap.getMobsDrop().get(victim.getType())) {
 					for (String region : ((DependAPI.getDepends(false).getGuard().guardEnabled() && !itemMap.getEnabledRegions().isEmpty()) ? DependAPI.getDepends(false).getGuard().getRegionAtLocation(victim.getLocation()).split(", ") : new String[]{"FALSE"})) {
 						if (!DependAPI.getDepends(false).getGuard().guardEnabled() || itemMap.getEnabledRegions().isEmpty() || itemMap.inRegion(region)) { 
-							SchedulerUtils.getScheduler().run(() -> victim.getLocation().getWorld().dropItem(victim.getLocation(), itemMap.getItem((killer != null ? (Player)killer : null))));
+							SchedulerUtils.run(() -> victim.getLocation().getWorld().dropItem(victim.getLocation(), itemMap.getItem((killer != null ? (Player)killer : null))));
 						}
 					}
 				}

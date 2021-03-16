@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package me.RockinChaos.itemjoin.utils;
+package me.RockinChaos.itemjoin.utils.api;
 
 import java.util.regex.Pattern;
 
@@ -25,7 +25,8 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
-import me.RockinChaos.itemjoin.handlers.ServerHandler;
+import me.RockinChaos.itemjoin.utils.ServerUtils;
+import me.RockinChaos.itemjoin.utils.StringUtils;
 
 public class LanguageAPI {
 	private Lang langType = Lang.ENGLISH;
@@ -41,7 +42,7 @@ public class LanguageAPI {
     */
 	public void dispatchMessage(final CommandSender sender, String langMessage) { 
 		Player player = null; if (sender instanceof Player) { player = (Player) sender; }
-		langMessage = Utils.getUtils().translateLayout(langMessage, player);
+		langMessage = StringUtils.getUtils().translateLayout(langMessage, player);
 		if (sender instanceof ConsoleCommandSender) { langMessage = ChatColor.stripColor(langMessage); } 
 		sender.sendMessage(langMessage);
 	}
@@ -58,12 +59,12 @@ public class LanguageAPI {
 		String langMessage = (sender.isPermissionSet("itemjoin.lang." + nodeLocation) ? sender.hasPermission("itemjoin.lang." + nodeLocation) ? this.getLangMessage(nodeLocation) : null : this.getLangMessage(nodeLocation));
 		if (langMessage != null && !langMessage.isEmpty()) {
 			langMessage = this.translateLangHolders(langMessage, this.initializeRows(placeHolder));
-			langMessage = Utils.getUtils().translateLayout(langMessage, player).replace(" \\n ", " \\n").replace(" /n ", " \\n").replace(" /n", " \\n");
+			langMessage = StringUtils.getUtils().translateLayout(langMessage, player).replace(" \\n ", " \\n").replace(" /n ", " \\n").replace(" /n", " \\n");
 			String[] langLines = langMessage.split(Pattern.quote(" \\" + "n"));
 			for (String langLine : langLines) {
 				String langStrip = langLine;
 				if (sender instanceof ConsoleCommandSender) { langStrip = ChatColor.stripColor(langStrip); } 
-				if (this.isConsoleMessage(nodeLocation)) { ServerHandler.getServer().logInfo(ChatColor.stripColor(langLine)); }
+				if (this.isConsoleMessage(nodeLocation)) { ServerUtils.logInfo(ChatColor.stripColor(langLine)); }
 				else { sender.sendMessage(langStrip);	}
 			}
 		}
@@ -175,7 +176,7 @@ public class LanguageAPI {
     * 
     */
 	public void setPrefix() {
-		this.langPrefix = Utils.getUtils().colorFormat(ConfigHandler.getConfig().getFile(this.langType.nodeLocation()).getString("Prefix"));
+		this.langPrefix = StringUtils.getUtils().colorFormat(ConfigHandler.getConfig().getFile(this.langType.nodeLocation()).getString("Prefix"));
 	}
 	
    /**
@@ -209,7 +210,7 @@ public class LanguageAPI {
 		String lang = ConfigHandler.getConfig().getFile("config.yml").getString("Language").replace(" ", "");
 		if (lang.equalsIgnoreCase("TraditionalChinese") || lang.equalsIgnoreCase("TwChinese") || lang.equalsIgnoreCase("Chinese")) { this.setLanguage("tw"); } 
 		else if (lang.equalsIgnoreCase("SimplifiedChinese") || lang.equalsIgnoreCase("CnChinese")) { this.setLanguage("cn"); } 
-		else if (Utils.getUtils().containsIgnoreCase(lang, "Chinese")) { this.setLanguage("tw"); } 
+		else if (StringUtils.getUtils().containsIgnoreCase(lang, "Chinese")) { this.setLanguage("tw"); } 
 		else if (lang.equalsIgnoreCase("Spanish")) { this.setLanguage("es"); } 
 		else if (lang.equalsIgnoreCase("Russian")) { this.setLanguage("ru"); } 
 		else if (lang.equalsIgnoreCase("French")) { this.setLanguage("fr"); } 

@@ -23,9 +23,9 @@ import java.util.Map;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
-import me.RockinChaos.itemjoin.utils.LegacyAPI;
 import me.RockinChaos.itemjoin.utils.SchedulerUtils;
-import me.RockinChaos.itemjoin.utils.Utils;
+import me.RockinChaos.itemjoin.utils.StringUtils;
+import me.RockinChaos.itemjoin.utils.api.LegacyAPI;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -51,12 +51,12 @@ public class Drops implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	private void onGlobalDrop(PlayerDropItemEvent event) {
 		final Player player = event.getPlayer();
-		  if (Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Self-Drops"), "TRUE") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Self-Drops"), player.getWorld().getName())
-		  	|| Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Self-Drops"), "ALL") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Self-Drops"), "GLOBAL")) {
-		  	if (ConfigHandler.getConfig().isPreventOP() && player.isOp() || ConfigHandler.getConfig().isPreventCreative() && PlayerHandler.getPlayer().isCreativeMode(player)) { } 
+		  if (StringUtils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Self-Drops"), "TRUE") || StringUtils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Self-Drops"), player.getWorld().getName())
+		  	|| StringUtils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Self-Drops"), "ALL") || StringUtils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Self-Drops"), "GLOBAL")) {
+		  	if (ConfigHandler.getConfig().isPreventOP() && player.isOp() || ConfigHandler.getConfig().isPreventCreative() && PlayerHandler.isCreativeMode(player)) { } 
 		  	else { 
 		  		if (!player.isDead()) {
-		  			if (PlayerHandler.getPlayer().isCreativeMode(player)) { player.closeInventory(); } 
+		  			if (PlayerHandler.isCreativeMode(player)) { player.closeInventory(); } 
 					event.setCancelled(true);
 		  		} else if (player.isDead()) {
 					event.getItemDrop().remove();
@@ -74,10 +74,10 @@ public class Drops implements Listener {
 	private void onGlobalDeathDrops(PlayerDeathEvent event) {
 		Player player = event.getEntity();
 		ItemUtilities.getUtilities().closeAnimations(player);
-		if (Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Death-Drops"), "TRUE") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Death-Drops"), player.getWorld().getName())
-			  	|| Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Death-Drops"), "ALL") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Death-Drops"), "GLOBAL")) {
-		  	if (ConfigHandler.getConfig().isPreventOP() && player.isOp() || ConfigHandler.getConfig().isPreventCreative() && PlayerHandler.getPlayer().isCreativeMode(player)) { }
-		  	else if (!LegacyAPI.getLegacy().getGameRule(player.getWorld(), "keepInventory")) {
+		if (StringUtils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Death-Drops"), "TRUE") || StringUtils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Death-Drops"), player.getWorld().getName())
+			  	|| StringUtils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Death-Drops"), "ALL") || StringUtils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Death-Drops"), "GLOBAL")) {
+		  	if (ConfigHandler.getConfig().isPreventOP() && player.isOp() || ConfigHandler.getConfig().isPreventCreative() && PlayerHandler.isCreativeMode(player)) { }
+		  	else if (!LegacyAPI.getGameRule(player.getWorld(), "keepInventory")) {
 				for (int k = 0; k < player.getInventory().getSize(); k++) {
 					ItemStack stack = player.getInventory().getItem(k);
 					if (stack != null && stack.getType() != Material.AIR) { 
@@ -99,14 +99,14 @@ public class Drops implements Listener {
 		ItemStack item = event.getItemDrop().getItemStack();
 		final Player player = event.getPlayer();
 		if (!player.isDead() && !ItemUtilities.getUtilities().isAllowed(player, item, "self-drops") && !ItemUtilities.getUtilities().getItemMap(item, null, player.getWorld()).isCraftingItem()) {
-			if (!this.possibleDropping.containsKey(PlayerHandler.getPlayer().getPlayerID(player))) { event.setCancelled(true); }
-			if (PlayerHandler.getPlayer().isCreativeMode(player) && this.possibleDropping.containsKey(PlayerHandler.getPlayer().getPlayerID(player)) && this.possibleDropping.get(PlayerHandler.getPlayer().getPlayerID(player))) { 
+			if (!this.possibleDropping.containsKey(PlayerHandler.getPlayerID(player))) { event.setCancelled(true); }
+			if (PlayerHandler.isCreativeMode(player) && this.possibleDropping.containsKey(PlayerHandler.getPlayerID(player)) && this.possibleDropping.get(PlayerHandler.getPlayerID(player))) { 
 				player.closeInventory();
 				event.getItemDrop().remove(); 
-				this.isDropping.put(PlayerHandler.getPlayer().getPlayerID(player), true);
-				this.possibleDropping.remove(PlayerHandler.getPlayer().getPlayerID(player));
+				this.isDropping.put(PlayerHandler.getPlayerID(player), true);
+				this.possibleDropping.remove(PlayerHandler.getPlayerID(player));
 				this.delayedSaftey(player, 1);
-			} else if (PlayerHandler.getPlayer().isCreativeMode(player)) { player.closeInventory(); } 
+			} else if (PlayerHandler.isCreativeMode(player)) { player.closeInventory(); } 
 		} else if (player.isDead() && !ItemUtilities.getUtilities().isAllowed(player, item, "self-drops")) {
 			event.getItemDrop().remove();
 		}
@@ -120,16 +120,16 @@ public class Drops implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	private void onCreativeDrop(InventoryClickEvent event) {
 		Player player = (Player) event.getWhoClicked();
-		if (PlayerHandler.getPlayer().isCreativeMode(player) && this.isDropping.containsKey(PlayerHandler.getPlayer().getPlayerID(player)) && this.isDropping.get(PlayerHandler.getPlayer().getPlayerID(player))) {
+		if (PlayerHandler.isCreativeMode(player) && this.isDropping.containsKey(PlayerHandler.getPlayerID(player)) && this.isDropping.get(PlayerHandler.getPlayerID(player))) {
 			if (!ItemUtilities.getUtilities().isAllowed(player, event.getCurrentItem(), "self-drops")) {
 				event.setCancelled(true);
 				player.closeInventory();
-				PlayerHandler.getPlayer().updateInventory(player, 1L);
-				this.isDropping.remove(PlayerHandler.getPlayer().getPlayerID(player));
+				PlayerHandler.updateInventory(player, 1L);
+				this.isDropping.remove(PlayerHandler.getPlayerID(player));
 			}
 		}
-		if (PlayerHandler.getPlayer().isCreativeMode(player) && event.getSlot() == -999 && !this.possibleDropping.containsKey(PlayerHandler.getPlayer().getPlayerID(player))) {
-			this.possibleDropping.put(PlayerHandler.getPlayer().getPlayerID(player), true);
+		if (PlayerHandler.isCreativeMode(player) && event.getSlot() == -999 && !this.possibleDropping.containsKey(PlayerHandler.getPlayerID(player))) {
+			this.possibleDropping.put(PlayerHandler.getPlayerID(player), true);
 			this.delayedSaftey(player, 2); 
 		}
 	}
@@ -143,10 +143,10 @@ public class Drops implements Listener {
 	private void onDeathDrops(PlayerDeathEvent event) {
 		Player player = event.getEntity();
 		ItemUtilities.getUtilities().closeAnimations(player);
-		if (!LegacyAPI.getLegacy().getGameRule(player.getWorld(), "keepInventory")) {
+		if (!LegacyAPI.getGameRule(player.getWorld(), "keepInventory")) {
 			for (int k = 0; k < player.getOpenInventory().getTopInventory().getSize(); k++) {
 				ItemStack stack = player.getOpenInventory().getTopInventory().getItem(k);
-				if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory()) && !ItemUtilities.getUtilities().isAllowed(player, stack, "death-drops")) {
+				if (PlayerHandler.isCraftingInv(player.getOpenInventory()) && !ItemUtilities.getUtilities().isAllowed(player, stack, "death-drops")) {
 					event.getDrops().remove(stack);
 					player.getOpenInventory().getTopInventory().remove(stack);
 				}
@@ -168,16 +168,16 @@ public class Drops implements Listener {
 	* @param integer - The case 1 or 2 of a creative mode drop.
 	*/
 	private void delayedSaftey(final Player player, final int integer) {
-		SchedulerUtils.getScheduler().runLater(1L, () -> {
+		SchedulerUtils.runLater(1L, () -> {
 			switch(integer) {
 			case 1:
-				if (this.isDropping.containsKey(PlayerHandler.getPlayer().getPlayerID(player))) {
-					this.isDropping.remove(PlayerHandler.getPlayer().getPlayerID(player));
+				if (this.isDropping.containsKey(PlayerHandler.getPlayerID(player))) {
+					this.isDropping.remove(PlayerHandler.getPlayerID(player));
 				}
 				break;
 				case 2:
-					if (this.possibleDropping.containsKey(PlayerHandler.getPlayer().getPlayerID(player))) {
-						this.possibleDropping.remove(PlayerHandler.getPlayer().getPlayerID(player));
+					if (this.possibleDropping.containsKey(PlayerHandler.getPlayerID(player))) {
+						this.possibleDropping.remove(PlayerHandler.getPlayerID(player));
 					}
 			    break;
 			}

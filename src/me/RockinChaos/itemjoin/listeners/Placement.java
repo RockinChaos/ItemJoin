@@ -18,11 +18,11 @@
 package me.RockinChaos.itemjoin.listeners;
 
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
-import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.utils.SchedulerUtils;
-import me.RockinChaos.itemjoin.utils.Utils;
+import me.RockinChaos.itemjoin.utils.ServerUtils;
+import me.RockinChaos.itemjoin.utils.StringUtils;
 
 import java.util.HashMap;
 
@@ -50,7 +50,7 @@ public class Placement implements Listener {
 	 	Player player = event.getPlayer();
 	 	if (event.getAction() == Action.RIGHT_CLICK_BLOCK && !ItemUtilities.getUtilities().isAllowed(player, item, "placement")) {
 	 		event.setCancelled(true);
-	 		PlayerHandler.getPlayer().updateInventory(player, 1L);
+	 		PlayerHandler.updateInventory(player, 1L);
 	 	}
 	 }
 	
@@ -64,40 +64,40 @@ public class Placement implements Listener {
 	 	final ItemStack item = (event.getItem() != null ? event.getItem().clone() : event.getItem());
 	 	final Player player = event.getPlayer();
 	 	final int slot = player.getInventory().getHeldItemSlot();
-	 	if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK && !PlayerHandler.getPlayer().isCreativeMode(player)) {
+	 	if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK && !PlayerHandler.isCreativeMode(player)) {
 	 		if (!ItemUtilities.getUtilities().isAllowed(player, item, "count-lock")) {
 	 			ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item, null, player.getWorld());
 	 			item.setAmount(itemMap.getCount());
-				SchedulerUtils.getScheduler().run(() -> {
-		 			if (Utils.getUtils().containsIgnoreCase(item.getType().name(), "WATER") || Utils.getUtils().containsIgnoreCase(item.getType().name(), "LAVA") || item.getType().name().equalsIgnoreCase("BUCKET") 
-		 			 || Utils.getUtils().containsIgnoreCase(item.getType().name(), "POTION")) {
+				SchedulerUtils.run(() -> {
+		 			if (StringUtils.getUtils().containsIgnoreCase(item.getType().name(), "WATER") || StringUtils.getUtils().containsIgnoreCase(item.getType().name(), "LAVA") || item.getType().name().equalsIgnoreCase("BUCKET") 
+		 			 || StringUtils.getUtils().containsIgnoreCase(item.getType().name(), "POTION")) {
 		 				if (player.getInventory().getHeldItemSlot() == slot) {
-		 					PlayerHandler.getPlayer().setMainHandItem(player, item);
-		 				} else if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
+		 					PlayerHandler.setMainHandItem(player, item);
+		 				} else if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
 		 					player.getInventory().setItem(slot, item);
 		 				}
 		 			} else if (itemMap != null) { 
-		 				if (PlayerHandler.getPlayer().getHandItem(player) == null || PlayerHandler.getPlayer().getHandItem(player).getAmount() <= 1) {
-		 					if (ServerHandler.getServer().hasSpecificUpdate("1_9")) { 
+		 				if (PlayerHandler.getHandItem(player) == null || PlayerHandler.getHandItem(player).getAmount() <= 1) {
+		 					if (ServerUtils.hasSpecificUpdate("1_9")) { 
 		 						if (event.getHand().equals(EquipmentSlot.HAND)) {
 		 						if (player.getInventory().getHeldItemSlot() == slot) {
-		 							PlayerHandler.getPlayer().setMainHandItem(player, item);
-		 						} else if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
+		 							PlayerHandler.setMainHandItem(player, item);
+		 						} else if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
 		 							player.getInventory().setItem(slot, item);
 		 						}
 		 						} else if (event.getHand().equals(EquipmentSlot.OFF_HAND)) {
-		 							PlayerHandler.getPlayer().setOffHandItem(player, item);
+		 							PlayerHandler.setOffHandItem(player, item);
 		 						}
 		 					} 
 		 					else { 
 		 						if (player.getInventory().getHeldItemSlot() == slot) {
-		 							PlayerHandler.getPlayer().setMainHandItem(player, item);
-		 						} else if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
+		 							PlayerHandler.setMainHandItem(player, item);
+		 						} else if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
 		 							player.getInventory().setItem(slot, item);
 		 						}
 		 					}
-		 				} else if (itemMap.isSimilar(PlayerHandler.getPlayer().getHandItem(player))) { 
-		 					PlayerHandler.getPlayer().getHandItem(player).setAmount(itemMap.getCount()); 
+		 				} else if (itemMap.isSimilar(PlayerHandler.getHandItem(player))) { 
+		 					PlayerHandler.getHandItem(player).setAmount(itemMap.getCount()); 
 		 				}
 		 			}
 		 		});
@@ -114,7 +114,7 @@ public class Placement implements Listener {
 	 private void onCrossbow(PlayerInteractEvent event) {
 	 	ItemStack item = (event.getItem() != null ? event.getItem().clone() : event.getItem());
 	 	Player player = event.getPlayer();
-	 	if ((event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) && item != null && item.getType().name().equalsIgnoreCase("CROSSBOW") && !PlayerHandler.getPlayer().isCreativeMode(player)) {
+	 	if ((event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) && item != null && item.getType().name().equalsIgnoreCase("CROSSBOW") && !PlayerHandler.isCreativeMode(player)) {
 			HashMap < Integer, ItemStack > map = new HashMap < Integer, ItemStack > ();
 			for (int i = 0; i < player.getInventory().getSize(); i++) {
 				if (player.getInventory().getItem(i) != null && player.getInventory().getItem(i).getType() == Material.ARROW) {
@@ -137,7 +137,7 @@ public class Placement implements Listener {
 	 */
 	 public void crossyAction(Player player, HashMap < Integer, ItemStack > map, int tries) {
 	 	if (tries != 0) {
-			SchedulerUtils.getScheduler().runLater(26L, () -> {
+			SchedulerUtils.runLater(26L, () -> {
 		 		boolean arrowReturned = false;
 		 		for (Integer key: map.keySet()) {
 		 			if (player.getInventory().getItem(key) == null || player.getInventory().getItem(key).getAmount() != map.get(key).getAmount()) {
@@ -147,7 +147,7 @@ public class Placement implements Listener {
 		 				}
 		 			}
 		 		}
-		 		if (arrowReturned) { PlayerHandler.getPlayer().updateInventory(player, 1L); } 
+		 		if (arrowReturned) { PlayerHandler.updateInventory(player, 1L); } 
 		 		else {this.crossyAction(player, map, (tries - 1)); }
 		 	});
 	 	}
@@ -163,14 +163,14 @@ public class Placement implements Listener {
 	 	if (event.getRightClicked() instanceof ItemFrame) {
 	 		try {
 	 			ItemStack item = null;
-	 			if (ServerHandler.getServer().hasSpecificUpdate("1_9")) { item = PlayerHandler.getPlayer().getPerfectHandItem(event.getPlayer(), event.getHand().toString()); } 
-	 			else { item = PlayerHandler.getPlayer().getPerfectHandItem(event.getPlayer(), ""); }
+	 			if (ServerUtils.hasSpecificUpdate("1_9")) { item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().toString()); } 
+	 			else { item = PlayerHandler.getPerfectHandItem(event.getPlayer(), ""); }
 	 			Player player = event.getPlayer();
 	 			if (!ItemUtilities.getUtilities().isAllowed(player, item, "placement")) {
 	 				event.setCancelled(true);
-	 				PlayerHandler.getPlayer().updateInventory(player, 1L);
+	 				PlayerHandler.updateInventory(player, 1L);
 	 			}
-	 		} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
+	 		} catch (Exception e) { ServerUtils.sendDebugTrace(e); }
 	 	}
 	 }
 	 
@@ -184,29 +184,29 @@ public class Placement implements Listener {
 	 	if (event.getRightClicked() instanceof ItemFrame) {
 	 		try {
 	 			ItemStack item = null;
-	 			if (ServerHandler.getServer().hasSpecificUpdate("1_9")) { item = PlayerHandler.getPlayer().getPerfectHandItem(event.getPlayer(), event.getHand().toString()); } 
-	 			else { item = PlayerHandler.getPlayer().getPerfectHandItem(event.getPlayer(), ""); }
+	 			if (ServerUtils.hasSpecificUpdate("1_9")) { item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().toString()); } 
+	 			else { item = PlayerHandler.getPerfectHandItem(event.getPlayer(), ""); }
 	 			Player player = event.getPlayer();
-	 			if (PlayerHandler.getPlayer().isCreativeMode(player)) {
+	 			if (PlayerHandler.isCreativeMode(player)) {
 	 				if (!ItemUtilities.getUtilities().isAllowed(player, item, "count-lock")) {
 	 					ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item, null, player.getWorld());
 	 					if (itemMap != null) { 
-		 					if (PlayerHandler.getPlayer().getHandItem(player) == null || PlayerHandler.getPlayer().getHandItem(player).getAmount() <= 1) {
-		 						if (ServerHandler.getServer().hasSpecificUpdate("1_9")) { 
+		 					if (PlayerHandler.getHandItem(player) == null || PlayerHandler.getHandItem(player).getAmount() <= 1) {
+		 						if (ServerUtils.hasSpecificUpdate("1_9")) { 
 		 							if (event.getHand().equals(EquipmentSlot.HAND)) {
-		 								PlayerHandler.getPlayer().setMainHandItem(player, item);
+		 								PlayerHandler.setMainHandItem(player, item);
 		 							} else if (event.getHand().equals(EquipmentSlot.OFF_HAND)) {
-		 								PlayerHandler.getPlayer().setOffHandItem(player, item);
+		 								PlayerHandler.setOffHandItem(player, item);
 		 							}
 		 						} 
-		 						else { PlayerHandler.getPlayer().setMainHandItem(player, item); }
-		 					} else if (itemMap.isSimilar(PlayerHandler.getPlayer().getHandItem(player))) { 
-		 						PlayerHandler.getPlayer().getHandItem(player).setAmount(itemMap.getCount()); 
+		 						else { PlayerHandler.setMainHandItem(player, item); }
+		 					} else if (itemMap.isSimilar(PlayerHandler.getHandItem(player))) { 
+		 						PlayerHandler.getHandItem(player).setAmount(itemMap.getCount()); 
 		 					} 
 	 					}
 	 				}
 	 			}
-	 		} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
+	 		} catch (Exception e) { ServerUtils.sendDebugTrace(e); }
 	 	}
 	 }
 }

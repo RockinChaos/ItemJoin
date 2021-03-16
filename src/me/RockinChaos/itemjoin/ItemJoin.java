@@ -23,11 +23,11 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
-import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.handlers.UpdateHandler;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.utils.SchedulerUtils;
-import me.RockinChaos.itemjoin.utils.UI;
+import me.RockinChaos.itemjoin.utils.ServerUtils;
+import me.RockinChaos.itemjoin.utils.interfaces.pages.InterMenu;
 import me.RockinChaos.itemjoin.utils.protocol.ProtocolManager;
 import me.RockinChaos.itemjoin.utils.sql.Database;
 
@@ -52,9 +52,9 @@ public class ItemJoin extends JavaPlugin {
   	@Override
 	public void onEnable() {
         ConfigHandler.getConfig().registerEvents();
-        SchedulerUtils.getScheduler().runAsync(() -> {
+        SchedulerUtils.runAsync(() -> {
         	UpdateHandler.getUpdater(true); {
-        		ServerHandler.getServer().logDebug("has been Enabled.");
+        		ServerUtils.logDebug("has been Enabled.");
         	}
         });
   	}
@@ -66,13 +66,13 @@ public class ItemJoin extends JavaPlugin {
   	@Override
 	public void onDisable() {
   		Bukkit.getScheduler().cancelTasks(this);
-  		UI.getCreator().closeMenu();
-  		ItemHandler.getItem().saveCooldowns();
-  		ItemHandler.getItem().purgeCraftItems(true);
+  		InterMenu.closeMenu();
+  		ItemHandler.saveCooldowns();
+  		ItemHandler.purgeCraftItems(true);
 	  	Database.getDatabase().closeConnection(true);
-	  	ProtocolManager.getManager().closeProtocol();
+	  	ProtocolManager.closeProtocol();
 	  	ItemUtilities.getUtilities().clearItems();
-  		ServerHandler.getServer().logDebug("has been Disabled.");
+  		ServerUtils.logDebug("has been Disabled.");
   	}
   	
    /**

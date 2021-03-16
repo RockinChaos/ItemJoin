@@ -29,8 +29,8 @@ import me.RockinChaos.itemjoin.item.ItemCommand;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.item.ItemUtilities.TriggerType;
-import me.RockinChaos.itemjoin.utils.Chances;
-import me.RockinChaos.itemjoin.utils.Utils;
+import me.RockinChaos.itemjoin.utils.StringUtils;
+import me.RockinChaos.itemjoin.utils.api.ChanceAPI;
 
 public class APIUtils {
 	
@@ -40,17 +40,17 @@ public class APIUtils {
      * @param player - that will recieve the items.
      */
 	 public void setItems(Player player) {
-		final ItemMap probable = Chances.getChances().getRandom(player);
-		final int session = Utils.getUtils().getRandom(1, 80000);
+		final ItemMap probable = ChanceAPI.getChances().getRandom(player);
+		final int session = StringUtils.getUtils().getRandom(1, 80000);
 		for (ItemMap item : ItemUtilities.getUtilities().getItems()) {
-			if (item.inWorld(player.getWorld()) && Chances.getChances().isProbability(item, probable) && PlayerHandler.getPlayer().isEnabled(player)
+			if (item.inWorld(player.getWorld()) && ChanceAPI.getChances().isProbability(item, probable) && PlayerHandler.isEnabled(player)
 					&& item.isLimitMode(player.getGameMode()) && item.hasPermission(player) && ItemUtilities.getUtilities().isObtainable(player, item, session, TriggerType.DEFAULT)) {
 					item.giveTo(player);
 			}
 			item.setAnimations(player);
 		}
 		ItemUtilities.getUtilities().sendFailCount(player, session);
-		PlayerHandler.getPlayer().updateInventory(player, 15L);
+		PlayerHandler.updateInventory(player, 15L);
 	 }
 	 
 	/**

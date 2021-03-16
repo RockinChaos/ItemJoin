@@ -46,7 +46,7 @@ public class Stackable implements Listener {
 			ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(event.getCursor(), null, player.getWorld());
 			if (itemMap != null && itemMap.isSimilar(event.getCurrentItem()) && !ItemUtilities.getUtilities().isAllowed(player, event.getCursor(), "stackable")) {
 				event.setCancelled(true);
-				ItemHandler.getItem().stackItems(player, event.getCursor(), event.getCurrentItem(), -1);
+				ItemHandler.stackItems(player, event.getCursor(), event.getCurrentItem(), -1);
 			}
 		} else if (event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY) && event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR && !ItemUtilities.getUtilities().isAllowed(player, event.getCurrentItem(), "stackable")) {
 			ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(event.getCurrentItem(), null, player.getWorld());
@@ -55,7 +55,7 @@ public class Stackable implements Listener {
 			if (itemMap != null && event.getSlot() > 8 && event.getView().getType().name().equalsIgnoreCase("CRAFTING")) {
 				for (int i = 0; i < 8; i++) {
 					if (itemMap.isSimilar(player.getInventory().getItem(i))) {
-						REMAINING_STACK_SIZE = ItemHandler.getItem().stackItems(player, event.getCurrentItem(), player.getInventory().getItem(i), event.getSlot());
+						REMAINING_STACK_SIZE = ItemHandler.stackItems(player, event.getCurrentItem(), player.getInventory().getItem(i), event.getSlot());
 						if (REMAINING_STACK_SIZE <= 0) {
 							break;
 						}
@@ -64,7 +64,7 @@ public class Stackable implements Listener {
 			} else if (itemMap != null && event.getView().getType().name().equalsIgnoreCase("CRAFTING")) {
 				for (int i = 8; i < 36; i++) {
 					if (itemMap.isSimilar(player.getInventory().getItem(i))) {
-						REMAINING_STACK_SIZE = ItemHandler.getItem().stackItems(player, event.getCurrentItem(), player.getInventory().getItem(i), event.getSlot());
+						REMAINING_STACK_SIZE = ItemHandler.stackItems(player, event.getCurrentItem(), player.getInventory().getItem(i), event.getSlot());
 						if (REMAINING_STACK_SIZE <= 0) {
 							break;
 						}
@@ -72,7 +72,7 @@ public class Stackable implements Listener {
 				}
 			}
 			if (REMAINING_STACK_SIZE > 0) { event.setCancelled(false); }
-			PlayerHandler.getPlayer().updateInventory(player, 1L);
+			PlayerHandler.updateInventory(player, 1L);
 		}
 	}
 	
@@ -92,14 +92,14 @@ public class Stackable implements Listener {
 			event.setCancelled(true);
 			for (int i = 0; i < 36; i++) {
 				if (itemMap != null && itemMap.isSimilar(player.getInventory().getItem(i))) {
-					REMAINING_STACK_SIZE = ItemHandler.getItem().stackItems(player, item1, player.getInventory().getItem(i), -2);
+					REMAINING_STACK_SIZE = ItemHandler.stackItems(player, item1, player.getInventory().getItem(i), -2);
 					if (REMAINING_STACK_SIZE <= 0) {
 						break;
 					}
 				}
 			}
 			if (REMAINING_STACK_SIZE > 0) { event.setCancelled(false); } else { event.getItem().remove(); }
-			PlayerHandler.getPlayer().updateInventory(player, 1L);
+			PlayerHandler.updateInventory(player, 1L);
 		}
 	}
 }

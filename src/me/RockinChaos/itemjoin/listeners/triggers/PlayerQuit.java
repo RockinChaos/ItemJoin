@@ -24,9 +24,9 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
-import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.item.ItemUtilities.TriggerType;
+import me.RockinChaos.itemjoin.utils.ServerUtils;
 
 public class PlayerQuit implements Listener {
 	
@@ -38,13 +38,13 @@ public class PlayerQuit implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	private void setQuit(PlayerQuitEvent event) {
 		Player player = event.getPlayer();
-		if (PlayerHandler.getPlayer().isPlayer(player)) {
-			ItemHandler.getItem().saveCraftItems(player); {
+		if (PlayerHandler.isPlayer(player)) {
+			ItemHandler.saveCraftItems(player); {
 				ItemUtilities.getUtilities().closeAnimations(player); {
 					ItemUtilities.getUtilities().setAuthenticating(player, player.getWorld(), TriggerType.QUIT, player.getGameMode(), "GLOBAL");
 				}
 			}
 		}
-		ServerHandler.getServer().logDebug("{ItemMap} " + player.getName() + " has performed the QUIT trigger.");
+		ServerUtils.logDebug("{ItemMap} " + player.getName() + " has performed the QUIT trigger.");
 	}
 }

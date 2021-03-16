@@ -28,7 +28,7 @@ import org.bukkit.inventory.ItemStack;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
-import me.RockinChaos.itemjoin.utils.Utils;
+import me.RockinChaos.itemjoin.utils.StringUtils;
 
 public class Recipes implements Listener {
 	
@@ -46,7 +46,7 @@ public class Recipes implements Listener {
     				ItemStack reAdd = player.getOpenInventory().getTopInventory().getItem(i).clone();
     				player.getOpenInventory().getTopInventory().setItem(i, null);
     				player.getInventory().addItem(reAdd);
-    				PlayerHandler.getPlayer().updateInventory(player, 1L);
+    				PlayerHandler.updateInventory(player, 1L);
     				break;
     			}
     		}
@@ -66,11 +66,11 @@ public class Recipes implements Listener {
 	        if (rSlot == 2 && event.getInventory().getItem(1) != null &&
 	            event.getInventory().getItem(1).getType() != Material.AIR) {
 	            ItemStack item = event.getInventory().getItem(2);
-	            if (!Utils.getUtils().containsIgnoreCase(event.getInventory().getItem(1).getType().toString(), "PAPER") && !Utils.getUtils().containsIgnoreCase(event.getInventory().getItem(1).getType().toString(), "NAME_TAG") &&
+	            if (!StringUtils.getUtils().containsIgnoreCase(event.getInventory().getItem(1).getType().toString(), "PAPER") && !StringUtils.getUtils().containsIgnoreCase(event.getInventory().getItem(1).getType().toString(), "NAME_TAG") &&
 	                !ItemUtilities.getUtilities().isAllowed(player, item, "item-repairable") || !ItemUtilities.getUtilities().isAllowed(player, event.getInventory().getItem(1), "item-repairable")) {
 	                event.setCancelled(true);
-	                PlayerHandler.getPlayer().updateExperienceLevels(player);
-	                PlayerHandler.getPlayer().updateInventory(player, 1L);
+	                PlayerHandler.updateExperienceLevels(player);
+	                PlayerHandler.updateInventory(player, 1L);
 	            }
 	        }
 	    }

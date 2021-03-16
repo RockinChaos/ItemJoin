@@ -25,7 +25,7 @@ import org.bukkit.inventory.ItemStack;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
-import me.RockinChaos.itemjoin.utils.Utils;
+import me.RockinChaos.itemjoin.utils.StringUtils;
 
 public class ChestSortAPI implements Listener {
 	
@@ -38,9 +38,9 @@ public class ChestSortAPI implements Listener {
 	private void onChestSortEvent(de.jeff_media.ChestSortAPI.ChestSortEvent event) {
 		Player player = (Player) event.getPlayer();
 		if (player == null) { player = (Player) event.getInventory().getViewers().get(0); }
-	  	if (Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "TRUE") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), player.getWorld().getName())
-		  			|| Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "ALL") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "GLOBAL")) {
-	  		if (ConfigHandler.getConfig().isPreventOP() && player.isOp() || ConfigHandler.getConfig().isPreventCreative() && PlayerHandler.getPlayer().isCreativeMode(player)) { } 
+	  	if (StringUtils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "TRUE") || StringUtils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), player.getWorld().getName())
+		  			|| StringUtils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "ALL") || StringUtils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "GLOBAL")) {
+	  		if (ConfigHandler.getConfig().isPreventOP() && player.isOp() || ConfigHandler.getConfig().isPreventCreative() && PlayerHandler.isCreativeMode(player)) { } 
 	  		else if (player.getOpenInventory().getTitle().contains("§") || player.getOpenInventory().getTitle().contains("&")) { }
 	  		else { event.setCancelled(true); }
 	  	}

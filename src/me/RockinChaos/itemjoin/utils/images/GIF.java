@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package me.RockinChaos.itemjoin.utils;
+package me.RockinChaos.itemjoin.utils.images;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -35,9 +35,9 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import me.RockinChaos.itemjoin.ItemJoin;
-import me.RockinChaos.itemjoin.handlers.ServerHandler;
+import me.RockinChaos.itemjoin.utils.ServerUtils;
 
-public class GIFImage {
+public class GIF {
 
     private final List<Frame> frames;
 
@@ -48,7 +48,7 @@ public class GIFImage {
     * @param image - The image file name with extension to be located.
     * @return The newly created GIFImage.
     */
-    public GIFImage(File folder, String image) {
+    public GIF(File folder, String image) {
     	GIFDecoder decoder = new GIFDecoder(ItemJoin.getInstance().getDataFolder(), image);
         List<Frame> frames = IntStream.range(0, decoder.getFrameCount()).mapToObj((i) -> new Frame(decoder.getFrame(i), decoder.getDelay(i))).collect(Collectors.toList());
         this.frames = Collections.unmodifiableList(frames);
@@ -76,7 +76,7 @@ public class GIFImage {
    /**
     * A class for decoding an animated gif.
     *
-    * @see GIFImage
+    * @see GIF
     * @see Frame
     */
     
@@ -572,7 +572,7 @@ public class GIFImage {
    /**
     * A class representing a single frame in an animated gif.
     *
-    * @see GIFImage
+    * @see GIF
     */
     public class Frame {
         private final BufferedImage image;
@@ -589,8 +589,8 @@ public class GIFImage {
         private Frame(BufferedImage image, int delay) {
             this.image = image;
             this.delay = delay;
-	        if (image == null) { ServerHandler.getServer().logSevere("{GifImage} Image must not be null."); }
-	        if (!(delay > 0)) { ServerHandler.getServer().logSevere("{GifImage} Duration must be positive."); }
+	        if (image == null) { ServerUtils.logSevere("{GIF} Image must not be null."); }
+	        if (!(delay > 0)) { ServerUtils.logSevere("{GIF} Duration must be positive."); }
         }
 
        /**

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package me.RockinChaos.itemjoin.utils;
+package me.RockinChaos.itemjoin.utils.images;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -28,11 +28,11 @@ import org.bukkit.map.MapCanvas;
 import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
 import me.RockinChaos.itemjoin.ItemJoin;
-import me.RockinChaos.itemjoin.handlers.ServerHandler;
+import me.RockinChaos.itemjoin.utils.ServerUtils;
 
-public class ImageRenderer extends MapRenderer {
+public class Renderer extends MapRenderer {
 	
-    private GIFImage gifImage = null;
+    private GIF gifImage = null;
     private boolean repeatForever = false;
 
     private int currentFrame = 0;
@@ -52,16 +52,16 @@ public class ImageRenderer extends MapRenderer {
     * @param image - The image to be rendered, ex: 'default.jpg'.
     * @param imageID - The id of the MapView.
     */
-	public ImageRenderer(final String image, final int imageID) {
+	public Renderer(final String image, final int imageID) {
 		this.id = imageID;
 		this.staticImage = image;
 		if (image != null && !image.equalsIgnoreCase("default.jpg")) {
 			try { 
 				this.imgCache = ImageIO.read(new File(ItemJoin.getInstance().getDataFolder(), String.valueOf(image)));
-			} catch (IOException e) { ServerHandler.getServer().sendDebugTrace(e); }
+			} catch (IOException e) { ServerUtils.sendDebugTrace(e); }
 		} else if (image != null && image.equalsIgnoreCase("default.jpg") && ItemJoin.getInstance().getResource("files/generated/default.jpg") != null) {
 			try { this.imgCache = ImageIO.read(ItemJoin.getInstance().getResource("files/generated/default.jpg"));
-			} catch (IOException e) { ServerHandler.getServer().sendDebugTrace(e); }
+			} catch (IOException e) { ServerUtils.sendDebugTrace(e); }
 		}
 	}
 	
@@ -74,15 +74,15 @@ public class ImageRenderer extends MapRenderer {
     * @param startFrame - The frame of the GIF to start at.
     * @param repeat - The number of times to repeat the GIF animation.
     */
-    public ImageRenderer(final String image, final int imageID, final int startFrame, final int repeat) {
-        this.gifImage = new GIFImage(ItemJoin.getInstance().getDataFolder(), image);
+    public Renderer(final String image, final int imageID, final int startFrame, final int repeat) {
+        this.gifImage = new GIF(ItemJoin.getInstance().getDataFolder(), image);
         this.currentFrame = startFrame;
         this.toRepeat = repeat;
         this.ticksToWait = (this.gifImage.get(this.currentFrame).getDelay() / 1000 * 20);
         this.repeatForever = this.toRepeat < 0;
-        if (this.gifImage == null) { ServerHandler.getServer().logSevere("{ImageRenderer} GIF image must not be null."); }
-        if (!(startFrame >= 0 && startFrame < this.gifImage.getFrameCount())) { ServerHandler.getServer().logSevere("{ImageRenderer} Frame index out of bounds."); }
-        ServerHandler.getServer().logDebug("{ImageRenderer} Rendering custom-map-image; " + image + " with the id " + this.id);
+        if (this.gifImage == null) { ServerUtils.logSevere("{Renderer} GIF image must not be null."); }
+        if (!(startFrame >= 0 && startFrame < this.gifImage.getFrameCount())) { ServerUtils.logSevere("{Renderer} Frame index out of bounds."); }
+        ServerUtils.logDebug("{Renderer} Rendering custom-map-image; " + image + " with the id " + this.id);
     }
     
    /**
@@ -103,7 +103,7 @@ public class ImageRenderer extends MapRenderer {
 	                return;
 	            }
 	        }
-	        GIFImage.Frame frame = this.gifImage.get(this.currentFrame++);
+	        GIF.Frame frame = this.gifImage.get(this.currentFrame++);
 	        mapCanvas.drawImage(0, 0, frame.getImage());
 	        this.ticksToWait = (frame.getDelay() / 1000 * 20);
     	} else if (this.Rendered.isEmpty() || !this.Rendered.contains(this.id)) {
@@ -111,11 +111,11 @@ public class ImageRenderer extends MapRenderer {
     			this.Rendered.add(this.id);
 				mapView.setScale(MapView.Scale.NORMAL);
 				mapCanvas.drawImage(0, 0, this.imgCache);
-				ServerHandler.getServer().logDebug("{ImageRenderer} Rendering custom-map-image; " + this.staticImage + " with the id " + this.id);
+				ServerUtils.logDebug("{Renderer} Rendering custom-map-image; " + this.staticImage + " with the id " + this.id);
 			} catch (Exception e) {
-				ServerHandler.getServer().logSevere("{ImageRenderer} There was a problem rending your map(s)!");
-				ServerHandler.getServer().logWarn("{ImageRenderer} Please check and make sure your image size is no larger than 128x128 pixels.");
-				ServerHandler.getServer().sendDebugTrace(e);
+				ServerUtils.logSevere("{Renderer} There was a problem rending your map(s)!");
+				ServerUtils.logWarn("{Renderer} Please check and make sure your image size is no larger than 128x128 pixels.");
+				ServerUtils.sendDebugTrace(e);
 			}
     	}
     }
@@ -146,6 +146,6 @@ public class ImageRenderer extends MapRenderer {
     */
     public void setFrame(int frame) {
         this.currentFrame = frame;
-        if (!(frame >= 0 && frame < this.gifImage.getFrameCount())) { ServerHandler.getServer().logSevere("{ImageRenderer} Frame index out of bounds."); }
+        if (!(frame >= 0 && frame < this.gifImage.getFrameCount())) { ServerUtils.logSevere("{Renderer} Frame index out of bounds."); }
     }
 }

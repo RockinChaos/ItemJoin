@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package me.RockinChaos.itemjoin.utils;
+package me.RockinChaos.itemjoin.handlers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,10 +30,10 @@ import org.apache.logging.log4j.core.filter.AbstractFilter;
 import org.apache.logging.log4j.message.Message;
 
 
-public class LogFilter extends AbstractFilter {
+public class LogHandler extends AbstractFilter {
 	
 	private HashMap < String, ArrayList < String > > hiddenExecutors = new HashMap < String, ArrayList < String > > ();
-	private static LogFilter filter;
+	private static LogHandler filter;
 	
    /**
     * Sets the Result of the filter,
@@ -133,9 +133,9 @@ public class LogFilter extends AbstractFilter {
     * @param regen - If the CustomFilter should have a new instance created.
     * @return The CustomFilter instance.
     */
-    public static LogFilter getFilter(final boolean regen) { 
+    public static LogHandler getFilter(final boolean regen) { 
         if (filter == null || regen) { 
-            filter = new LogFilter();
+            filter = new LogHandler();
             ((LoggerContext) LogManager.getContext(false)).getConfiguration().getLoggerConfig(LogManager.ROOT_LOGGER_NAME).addFilter(filter);
         }
         return filter; 

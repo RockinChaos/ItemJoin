@@ -29,8 +29,8 @@ import org.bukkit.inventory.InventoryHolder;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.utils.SchedulerUtils;
-import me.RockinChaos.itemjoin.utils.UI;
 import me.RockinChaos.itemjoin.utils.interfaces.Interface;
+import me.RockinChaos.itemjoin.utils.interfaces.pages.InterMenu;
 
 public class Menu implements Listener {
 
@@ -69,10 +69,10 @@ public class Menu implements Listener {
 	*/
 	@EventHandler(ignoreCancelled = true)
 	private void onClose(InventoryCloseEvent event) {
-		if (UI.getCreator() != null && UI.getCreator().modifyMenu((Player) event.getPlayer())) {
-			SchedulerUtils.getScheduler().runAsyncLater(40L, () -> {
-				if (!UI.getCreator().isOpen((Player) event.getPlayer())) {
-					UI.getCreator().setModifyMenu(false, (Player) event.getPlayer());
+		if (InterMenu.modifyMenu((Player) event.getPlayer())) {
+			SchedulerUtils.runAsyncLater(40L, () -> {
+				if (!InterMenu.isOpen((Player) event.getPlayer())) {
+					InterMenu.setModifyMenu(false, (Player) event.getPlayer());
 					for (ItemMap itemMap: ItemUtilities.getUtilities().getItems()) {
 						if (itemMap.getAnimationHandler() != null && itemMap.getAnimationHandler().get(event.getPlayer()) != null) {
 							itemMap.getAnimationHandler().get(event.getPlayer()).setMenu(false, 0);

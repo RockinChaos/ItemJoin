@@ -30,10 +30,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
-import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.utils.SchedulerUtils;
+import me.RockinChaos.itemjoin.utils.ServerUtils;
 
 /**
 * Handles the Consumption events for custom items.
@@ -62,17 +62,17 @@ public class Legacy_Consumes implements Listener {
 				event.setCancelled(true);
 				if (ItemUtilities.getUtilities().isAllowed(player, item, "count-lock")) { 
 					if (item.getAmount() <= 1) {
-						if (itemMap.isReal(PlayerHandler.getPlayer().getMainHandItem(player))) {
-							PlayerHandler.getPlayer().setMainHandItem(player, new ItemStack(Material.AIR));
-						} else if (itemMap.isReal(PlayerHandler.getPlayer().getOffHandItem(player))) {
-							PlayerHandler.getPlayer().setOffHandItem(player, new ItemStack(Material.AIR));
+						if (itemMap.isReal(PlayerHandler.getMainHandItem(player))) {
+							PlayerHandler.setMainHandItem(player, new ItemStack(Material.AIR));
+						} else if (itemMap.isReal(PlayerHandler.getOffHandItem(player))) {
+							PlayerHandler.setOffHandItem(player, new ItemStack(Material.AIR));
 						}
 					} else {
 						item.setAmount((item.getAmount() - 1)); 
-						if (itemMap.isReal(PlayerHandler.getPlayer().getMainHandItem(player))) {
-							PlayerHandler.getPlayer().setMainHandItem(player, item);
-						} else if (itemMap.isReal(PlayerHandler.getPlayer().getOffHandItem(player))) {
-							PlayerHandler.getPlayer().setOffHandItem(player, item);
+						if (itemMap.isReal(PlayerHandler.getMainHandItem(player))) {
+							PlayerHandler.setMainHandItem(player, item);
+						} else if (itemMap.isReal(PlayerHandler.getOffHandItem(player))) {
+							PlayerHandler.setOffHandItem(player, item);
 						}
 					}
 				}
@@ -93,21 +93,21 @@ public class Legacy_Consumes implements Listener {
 		if (!ItemUtilities.getUtilities().isAllowed(player, item, "count-lock")) {
 			ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item, null, player.getWorld());
 			item.setAmount(itemMap.getCount());
-			SchedulerUtils.getScheduler().runLater(2L, () -> {
+			SchedulerUtils.runLater(2L, () -> {
 				if (itemMap != null) { 
-					if (PlayerHandler.getPlayer().getHandItem(player) == null || PlayerHandler.getPlayer().getHandItem(player).getAmount() <= 1) {
-						if (ServerHandler.getServer().hasSpecificUpdate("1_9")) {
-							if (PlayerHandler.getPlayer().getMainHandItem(player) != null && PlayerHandler.getPlayer().getMainHandItem(player).getType() != Material.AIR) {
-								PlayerHandler.getPlayer().setMainHandItem(player, item);
-							} else if (PlayerHandler.getPlayer().getOffHandItem(player) != null && PlayerHandler.getPlayer().getOffHandItem(player).getType() != Material.AIR) {
-								PlayerHandler.getPlayer().setOffHandItem(player, item);
+					if (PlayerHandler.getHandItem(player) == null || PlayerHandler.getHandItem(player).getAmount() <= 1) {
+						if (ServerUtils.hasSpecificUpdate("1_9")) {
+							if (PlayerHandler.getMainHandItem(player) != null && PlayerHandler.getMainHandItem(player).getType() != Material.AIR) {
+								PlayerHandler.setMainHandItem(player, item);
+							} else if (PlayerHandler.getOffHandItem(player) != null && PlayerHandler.getOffHandItem(player).getType() != Material.AIR) {
+								PlayerHandler.setOffHandItem(player, item);
 							} else {
 								itemMap.giveTo(player);
 							}
 		 				} 
-		 				else { PlayerHandler.getPlayer().setMainHandItem(player, item); }
-					} else if (itemMap.isSimilar(PlayerHandler.getPlayer().getHandItem(player))) { 
-						PlayerHandler.getPlayer().getHandItem(player).setAmount(itemMap.getCount()); 
+		 				else { PlayerHandler.setMainHandItem(player, item); }
+					} else if (itemMap.isSimilar(PlayerHandler.getHandItem(player))) { 
+						PlayerHandler.getHandItem(player).setAmount(itemMap.getCount()); 
 		 			} 
 				}
 		 	});
@@ -131,7 +131,7 @@ public class Legacy_Consumes implements Listener {
 					map.put(i, player.getInventory().getItem(i).clone());
 				}
 			}
-			SchedulerUtils.getScheduler().runLater(2L, () -> {
+			SchedulerUtils.runLater(2L, () -> {
 				for (Integer key: map.keySet()) {
 					if (player.getInventory().getItem(key) == null || player.getInventory().getItem(key).getAmount() != map.get(key).getAmount()) {
 						if (!ItemUtilities.getUtilities().isAllowed(player, map.get(key), "count-lock")) {
@@ -139,7 +139,7 @@ public class Legacy_Consumes implements Listener {
 						}
 					}
 				}
-				PlayerHandler.getPlayer().updateInventory(player, 1L);
+				PlayerHandler.updateInventory(player, 1L);
 			});
 		}
 	}

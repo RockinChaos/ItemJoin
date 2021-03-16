@@ -32,13 +32,11 @@ import org.bukkit.inventory.ItemStack;
 * An utility class that simplifies reflection in Bukkit plugins.
 * 
 */
-public final class Reflection {
-	private String OBC_PREFIX = Bukkit.getServer().getClass().getPackage().getName();
-	private String NMS_PREFIX = OBC_PREFIX.replace("org.bukkit.craftbukkit", "net.minecraft.server");
-	private String VERSION = OBC_PREFIX.replace("org.bukkit.craftbukkit", "").replace(".", "");
-	private Pattern MATCH_VARIABLE = Pattern.compile("\\{([^\\}]+)\\}");
-	
-	private static Reflection reflection;
+public final class ReflectionUtils {
+	private static String OBC_PREFIX = Bukkit.getServer().getClass().getPackage().getName();
+	private static String NMS_PREFIX = OBC_PREFIX.replace("org.bukkit.craftbukkit", "net.minecraft.server");
+	private static String VERSION = OBC_PREFIX.replace("org.bukkit.craftbukkit", "").replace(".", "");
+	private static Pattern MATCH_VARIABLE = Pattern.compile("\\{([^\\}]+)\\}");
 	
    /**
 	* An interface for invoking a specific constructor.
@@ -106,8 +104,8 @@ public final class Reflection {
 	* @param fieldType - a compatible field type.
 	* @return The field accessor.
 	*/
-	public <T> FieldAccessor<T> getField(final Class<?> target, final String name, final Class<T> fieldType) {
-		return this.getField(target, name, fieldType, 0);
+	public static <T> FieldAccessor<T> getField(final Class<?> target, final String name, final Class<T> fieldType) {
+		return getField(target, name, fieldType, 0);
 	}
 
    /**
@@ -118,8 +116,8 @@ public final class Reflection {
 	* @param fieldType - a compatible field type.
 	* @return The field accessor.
 	*/
-	public <T> FieldAccessor<T> getField(final String className, final String name, final Class<T> fieldType) {
-		return this.getField(this.getClass(className), name, fieldType, 0);
+	public static <T> FieldAccessor<T> getField(final String className, final String name, final Class<T> fieldType) {
+		return getField(getClass(className), name, fieldType, 0);
 	}
 
    /**
@@ -130,8 +128,8 @@ public final class Reflection {
 	* @param index - the number of compatible fields to skip.
 	* @return The field accessor.
 	*/
-	public <T> FieldAccessor<T> getField(final Class<?> target, final Class<T> fieldType, final int index) {
-		return this.getField(target, null, fieldType, index);
+	public static <T> FieldAccessor<T> getField(final Class<?> target, final Class<T> fieldType, final int index) {
+		return getField(target, null, fieldType, index);
 	}
 
    /**
@@ -142,8 +140,8 @@ public final class Reflection {
 	* @param index - the number of compatible fields to skip.
 	* @return The field accessor.
 	*/
-	public <T> FieldAccessor<T> getField(final String className, final Class<T> fieldType, final int index) {
-		return this.getField(this.getClass(className), fieldType, index);
+	public static <T> FieldAccessor<T> getField(final String className, final Class<T> fieldType, final int index) {
+		return getField(getClass(className), fieldType, index);
 	}
 
    /**
@@ -154,7 +152,7 @@ public final class Reflection {
 	* @param index - the number of compatible fields to skip.
 	* @return The field accessor.
 	*/
-	private <T> FieldAccessor<T> getField(final Class<?> target, final String name, Class<T> fieldType, int index) {
+	private static <T> FieldAccessor<T> getField(final Class<?> target, final String name, Class<T> fieldType, int index) {
 		for (final Field field : target.getDeclaredFields()) {
 			if ((name == null || field.getName().equals(name)) && fieldType.isAssignableFrom(field.getType()) && index-- <= 0) {
 				field.setAccessible(true);
@@ -183,7 +181,7 @@ public final class Reflection {
 			}
 		}
 		if (target.getSuperclass() != null)
-			return this.getField(target.getSuperclass(), name, fieldType, index);
+			return getField(target.getSuperclass(), name, fieldType, index);
 		throw new IllegalArgumentException("Cannot find field with type " + fieldType);
 	}
 
@@ -196,8 +194,8 @@ public final class Reflection {
 	* @return An object that invokes this specific method.
 	* @throws IllegalStateException If we cannot find this method.
 	*/
-	public MethodInvoker getMethod(final String className, final String methodName, final Class<?>... params) {
-		return this.getTypedMethod(this.getClass(className), methodName, null, params);
+	public static MethodInvoker getMethod(final String className, final String methodName, final Class<?>... params) {
+		return getTypedMethod(getClass(className), methodName, null, params);
 	}
 
    /**
@@ -209,8 +207,8 @@ public final class Reflection {
 	* @return An object that invokes this specific method.
 	* @throws IllegalStateException If we cannot find this method.
 	*/
-	public MethodInvoker getMethod(final Class<?> clazz, final String methodName, final Class<?>... params) {
-		return this.getTypedMethod(clazz, methodName, null, params);
+	public static MethodInvoker getMethod(final Class<?> clazz, final String methodName, final Class<?>... params) {
+		return getTypedMethod(clazz, methodName, null, params);
 	}
 
    /**
@@ -223,7 +221,7 @@ public final class Reflection {
 	* @return An object that invokes this specific method.
 	* @throws IllegalStateException If we cannot find this method.
 	*/
-	public MethodInvoker getTypedMethod(final Class<?> clazz, final String methodName, final Class<?> returnType, final Class<?>... params) {
+	public static MethodInvoker getTypedMethod(final Class<?> clazz, final String methodName, final Class<?> returnType, final Class<?>... params) {
 		for (final Method method : clazz.getDeclaredMethods()) {
 			if ((methodName == null || method.getName().equals(methodName))
 					&& (returnType == null || method.getReturnType().equals(returnType))
@@ -243,7 +241,7 @@ public final class Reflection {
 			}
 		}
 		if (clazz.getSuperclass() != null)
-			return this.getMethod(clazz.getSuperclass(), methodName, params);
+			return getMethod(clazz.getSuperclass(), methodName, params);
 		throw new IllegalStateException(String.format("Unable to find method %s (%s).", methodName, Arrays.asList(params)));
 	}
 
@@ -255,8 +253,8 @@ public final class Reflection {
 	* @return An object that invokes this constructor.
 	* @throws IllegalStateException If we cannot find this method.
 	*/
-	public ConstructorInvoker getConstructor(final String className, final Class<?>... params) {
-		return this.getConstructor(this.getClass(className), params);
+	public static ConstructorInvoker getConstructor(final String className, final Class<?>... params) {
+		return getConstructor(getClass(className), params);
 	}
 
    /**
@@ -267,7 +265,7 @@ public final class Reflection {
 	* @return An object that invokes this constructor.
 	* @throws IllegalStateException If we cannot find this method.
 	*/
-	public ConstructorInvoker getConstructor(final Class<?> clazz, final Class<?>... params) {
+	public static ConstructorInvoker getConstructor(final Class<?> clazz, final Class<?>... params) {
 		for (final Constructor<?> constructor : clazz.getDeclaredConstructors()) {
 			if (Arrays.equals(constructor.getParameterTypes(), params)) {
 				constructor.setAccessible(true);
@@ -296,8 +294,8 @@ public final class Reflection {
 	* @param lookupName - the class name with variables.
 	* @return The class.
 	*/
-	public Class<Object> getUntypedClass(final String lookupName) {
-		Class<Object> clazz = (Class<Object>) this.getClass(lookupName);
+	public static Class<Object> getUntypedClass(final String lookupName) {
+		Class<Object> clazz = (Class<Object>) getClass(lookupName);
 		return clazz;
 	}
 	
@@ -305,8 +303,8 @@ public final class Reflection {
 	* Retrieve a the version referenced in the packages.
 	* 
 	*/
-	public String getServerVersion() {
-		return this.VERSION;
+	public static String getServerVersion() {
+		return VERSION;
 	}
 
    /**
@@ -337,8 +335,8 @@ public final class Reflection {
 	* @return The looked up class.
 	* @throws IllegalArgumentException If a variable or class could not be found.
 	*/
-	public Class<?> getClass(final String lookupName) {
-		return this.getCanonicalClass(this.expandVariables(lookupName));
+	public static Class<?> getClass(final String lookupName) {
+		return getCanonicalClass(expandVariables(lookupName));
 	}
 
    /**
@@ -347,8 +345,8 @@ public final class Reflection {
 	* @param name - the name of the class, excluding the package.
 	* @throws IllegalArgumentException If the class doesn't exist.
 	*/
-	public Class<?> getMinecraftClass(final String name) {
-		return this.getCanonicalClass(this.NMS_PREFIX + "." + name);
+	public static Class<?> getMinecraftClass(final String name) {
+		return getCanonicalClass(NMS_PREFIX + "." + name);
 	}
 
    /**
@@ -357,8 +355,8 @@ public final class Reflection {
 	* @param name - the name of the class, excluding the package.
 	* @throws IllegalArgumentException If the class doesn't exist.
 	*/
-	public Class<?> getCraftBukkitClass(final String name) {
-		return this.getCanonicalClass(this.OBC_PREFIX + "." + name);
+	public static Class<?> getCraftBukkitClass(final String name) {
+		return getCanonicalClass(OBC_PREFIX + "." + name);
 	}
 	
    /**
@@ -367,8 +365,8 @@ public final class Reflection {
 	* @param name - the name of the class, excluding the package.
 	* @throws IllegalArgumentException If the class doesn't exist.
 	*/
-	public Class<?> getBukkitClass(final String name) {
-		return this.getCanonicalClass("org.bukkit." + name);
+	public static Class<?> getBukkitClass(final String name) {
+		return getCanonicalClass("org.bukkit." + name);
 	}
 
    /**
@@ -377,7 +375,7 @@ public final class Reflection {
     * @param canonicalName - the canonical name.
 	* @return The class.
 	*/
-	private Class<?> getCanonicalClass(final String canonicalName) {
+	private static Class<?> getCanonicalClass(final String canonicalName) {
 		try {
 			return Class.forName(canonicalName);
 		} catch (ClassNotFoundException e) {
@@ -392,11 +390,11 @@ public final class Reflection {
     * @param item - The ItemStack to be sent to the slot.
     * @param index - The slot to have the item sent.
 	*/
-	public void sendPacketPlayOutSetSlot(Player player, ItemStack item, int index) throws Exception {
-		Class < ? > itemStack = this.getMinecraftClass("ItemStack");
-		Object nms = this.getCraftBukkitClass("inventory.CraftItemStack").getMethod("asNMSCopy", ItemStack.class).invoke(null, item);
-		Object packet = this.getMinecraftClass("PacketPlayOutSetSlot").getConstructor(int.class, int.class, itemStack).newInstance(0, index, itemStack.cast(nms));
-		this.sendPacket(player, packet);
+	public static void sendPacketPlayOutSetSlot(Player player, ItemStack item, int index) throws Exception {
+		Class < ? > itemStack = getMinecraftClass("ItemStack");
+		Object nms = getCraftBukkitClass("inventory.CraftItemStack").getMethod("asNMSCopy", ItemStack.class).invoke(null, item);
+		Object packet = getMinecraftClass("PacketPlayOutSetSlot").getConstructor(int.class, int.class, itemStack).newInstance(0, index, itemStack.cast(nms));
+		sendPacket(player, packet);
 	}
 	
    /**
@@ -405,10 +403,10 @@ public final class Reflection {
     * @param player - The player receiving the packet.
     * @param packet - The Packet Object being sent.
 	*/
-	public void sendPacket(final Player player, final Object packet) throws Exception {
+	public static void sendPacket(final Player player, final Object packet) throws Exception {
 	    Object nmsPlayer = player.getClass().getMethod("getHandle").invoke(player);
 	    Object playerHandle = nmsPlayer.getClass().getField("playerConnection").get(nmsPlayer);
-	    playerHandle.getClass().getMethod("sendPacket", this.getMinecraftClass("Packet")).invoke(playerHandle, packet);
+	    playerHandle.getClass().getMethod("sendPacket", getMinecraftClass("Packet")).invoke(playerHandle, packet);
 	}
 
    /**
@@ -417,18 +415,18 @@ public final class Reflection {
 	* @param name - the full name of the class.
 	* @return The expanded string.
 	*/
-	private String expandVariables(final String name) {
+	private static String expandVariables(final String name) {
 		StringBuffer output = new StringBuffer();
-		Matcher matcher = this.MATCH_VARIABLE.matcher(name);
+		Matcher matcher = MATCH_VARIABLE.matcher(name);
 		while (matcher.find()) {
 			String variable = matcher.group(1);
 			String replacement = "";
 			if ("nms".equalsIgnoreCase(variable))
-				replacement = this.NMS_PREFIX;
+				replacement = NMS_PREFIX;
 			else if ("obc".equalsIgnoreCase(variable))
-				replacement = this.OBC_PREFIX;
+				replacement = OBC_PREFIX;
 			else if ("version".equalsIgnoreCase(variable))
-				replacement = this.VERSION;
+				replacement = VERSION;
 			else
 				throw new IllegalArgumentException("Unknown variable: " + variable);
 			if (replacement.length() > 0 && matcher.end() < name.length() && name.charAt(matcher.end()) != '.')
@@ -438,14 +436,4 @@ public final class Reflection {
 		matcher.appendTail(output);
 		return output.toString();
 	}
-	
-   /**
-    * Gets the instance of the Reflection.
-    * 
-    * @return The Reflection instance.
-    */
-    public static Reflection getReflection() { 
-        if (reflection == null) { reflection = new Reflection(); }
-        return reflection; 
-    } 
 }

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package me.RockinChaos.itemjoin.utils;
+package me.RockinChaos.itemjoin.utils.api;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,20 +28,20 @@ import org.bukkit.entity.Player;
 
 import me.RockinChaos.itemjoin.item.ItemMap;
 
-public class Chances {
+public class ChanceAPI {
 	private List < Chance > chances;
 	private int sum;
 	private Random random;
 	
 	private Map < ItemMap, Integer > probabilityItems = new HashMap < ItemMap, Integer > ();
 	
-	private static Chances chance;
+	private static ChanceAPI chance;
 	
    /**
     * Creates a new Chances instance.
     * 
     */
-	public Chances() { }
+	public ChanceAPI() { }
 	
    /**
     * Initializes the Chances instance.
@@ -163,9 +163,9 @@ public class Chances {
     * 
     * @return The Chances instance.
     */
-    public static Chances getChances() { 
+    public static ChanceAPI getChances() { 
         if (chance == null) {
-        	chance = new Chances(); 
+        	chance = new ChanceAPI(); 
         }
         return chance; 
     } 

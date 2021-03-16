@@ -31,11 +31,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
-import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.utils.SchedulerUtils;
-import me.RockinChaos.itemjoin.utils.Utils;
+import me.RockinChaos.itemjoin.utils.ServerUtils;
+import me.RockinChaos.itemjoin.utils.StringUtils;
 
 public class Consumes implements Listener {
 
@@ -57,17 +57,17 @@ public class Consumes implements Listener {
 				event.setCancelled(true);
 				if (ItemUtilities.getUtilities().isAllowed(player, item, "count-lock")) { 
 					if (item.getAmount() <= 1) {
-						if (itemMap.isReal(PlayerHandler.getPlayer().getMainHandItem(player))) {
-							PlayerHandler.getPlayer().setMainHandItem(player, new ItemStack(Material.AIR));
-						} else if (itemMap.isReal(PlayerHandler.getPlayer().getOffHandItem(player))) {
-							PlayerHandler.getPlayer().setOffHandItem(player, new ItemStack(Material.AIR));
+						if (itemMap.isReal(PlayerHandler.getMainHandItem(player))) {
+							PlayerHandler.setMainHandItem(player, new ItemStack(Material.AIR));
+						} else if (itemMap.isReal(PlayerHandler.getOffHandItem(player))) {
+							PlayerHandler.setOffHandItem(player, new ItemStack(Material.AIR));
 						}
 					} else {
 						item.setAmount((item.getAmount() - 1)); 
-						if (itemMap.isReal(PlayerHandler.getPlayer().getMainHandItem(player))) {
-							PlayerHandler.getPlayer().setMainHandItem(player, item);
-						} else if (itemMap.isReal(PlayerHandler.getPlayer().getOffHandItem(player))) {
-							PlayerHandler.getPlayer().setOffHandItem(player, item);
+						if (itemMap.isReal(PlayerHandler.getMainHandItem(player))) {
+							PlayerHandler.setMainHandItem(player, item);
+						} else if (itemMap.isReal(PlayerHandler.getOffHandItem(player))) {
+							PlayerHandler.setOffHandItem(player, item);
 						}
 					}
 				}
@@ -87,21 +87,21 @@ public class Consumes implements Listener {
 		if (!ItemUtilities.getUtilities().isAllowed(player, item, "count-lock")) {
 			ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item, null, player.getWorld());
 			item.setAmount(itemMap.getCount());
-			SchedulerUtils.getScheduler().runLater(2L, () -> {
+			SchedulerUtils.runLater(2L, () -> {
 				if (itemMap != null) { 
-					if (PlayerHandler.getPlayer().getHandItem(player) == null || PlayerHandler.getPlayer().getHandItem(player).getAmount() <= 1) {
-						if (ServerHandler.getServer().hasSpecificUpdate("1_9")) {
-							if (PlayerHandler.getPlayer().getMainHandItem(player) != null && PlayerHandler.getPlayer().getMainHandItem(player).getType() != Material.AIR) {
-								PlayerHandler.getPlayer().setMainHandItem(player, item);
-							} else if (PlayerHandler.getPlayer().getOffHandItem(player) != null && PlayerHandler.getPlayer().getOffHandItem(player).getType() != Material.AIR) {
-								PlayerHandler.getPlayer().setOffHandItem(player, item);
+					if (PlayerHandler.getHandItem(player) == null || PlayerHandler.getHandItem(player).getAmount() <= 1) {
+						if (ServerUtils.hasSpecificUpdate("1_9")) {
+							if (PlayerHandler.getMainHandItem(player) != null && PlayerHandler.getMainHandItem(player).getType() != Material.AIR) {
+								PlayerHandler.setMainHandItem(player, item);
+							} else if (PlayerHandler.getOffHandItem(player) != null && PlayerHandler.getOffHandItem(player).getType() != Material.AIR) {
+								PlayerHandler.setOffHandItem(player, item);
 							} else {
 								itemMap.giveTo(player);
 							}
 		 				} 
-		 				else { PlayerHandler.getPlayer().setMainHandItem(player, item); }
-					} else if (itemMap.isSimilar(PlayerHandler.getPlayer().getHandItem(player))) { 
-						PlayerHandler.getPlayer().getHandItem(player).setAmount(itemMap.getCount()); 
+		 				else { PlayerHandler.setMainHandItem(player, item); }
+					} else if (itemMap.isSimilar(PlayerHandler.getHandItem(player))) { 
+						PlayerHandler.getHandItem(player).setAmount(itemMap.getCount()); 
 		 			} 
 				}
 		 	});
@@ -116,12 +116,12 @@ public class Consumes implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	private void onPlayerFireArrow(EntityShootBowEvent event) {
 		LivingEntity entity = event.getEntity();
-		if (ServerHandler.getServer().hasSpecificUpdate("1_16") && entity instanceof Player && event.getBow() != null && event.getBow().getType() == Material.BOW) {
+		if (ServerUtils.hasSpecificUpdate("1_16") && entity instanceof Player && event.getBow() != null && event.getBow().getType() == Material.BOW) {
 			ItemStack item = (event.getConsumable() != null ? event.getConsumable().clone() : event.getConsumable());
 			Player player = (Player) event.getEntity();
 			if (entity instanceof Player && !ItemUtilities.getUtilities().isAllowed(player, item, "count-lock")) {
 				event.setConsumeItem(false);
-				PlayerHandler.getPlayer().updateInventory(player, 1L);
+				PlayerHandler.updateInventory(player, 1L);
 			}
 		} else if (entity instanceof Player) {
 			HashMap < Integer, ItemStack > map = new HashMap < Integer, ItemStack > ();
@@ -134,7 +134,7 @@ public class Consumes implements Listener {
 					map.put(i, cloneStack);
 				}
 			}
-			SchedulerUtils.getScheduler().runLater(2L, () -> {
+			SchedulerUtils.runLater(2L, () -> {
 				for (Integer key: map.keySet()) {
 					if (player.getInventory().getItem(key) == null || player.getInventory().getItem(key).getAmount() != map.get(key).getAmount()) {
 						if (!ItemUtilities.getUtilities().isAllowed(player, map.get(key), "count-lock")) {
@@ -142,7 +142,7 @@ public class Consumes implements Listener {
 						}
 					}
 				}
-				PlayerHandler.getPlayer().updateInventory(player, 1L);
+				PlayerHandler.updateInventory(player, 1L);
 			});
 		}
 	}
@@ -156,36 +156,36 @@ public class Consumes implements Listener {
 	 private void onRefillTotem(EntityResurrectEvent event) {
 	 	if (event.getEntity() instanceof Player) {
 	 		Player player = (Player) event.getEntity();
-	 		ItemStack saveMainStack = null; if (PlayerHandler.getPlayer().getMainHandItem(player) != null) { saveMainStack = PlayerHandler.getPlayer().getMainHandItem(player).clone(); }
+	 		ItemStack saveMainStack = null; if (PlayerHandler.getMainHandItem(player) != null) { saveMainStack = PlayerHandler.getMainHandItem(player).clone(); }
 	 		final ItemStack mainStack = saveMainStack;
-	 		ItemStack saveOffStack = null; if (PlayerHandler.getPlayer().getOffHandItem(player) != null) { saveOffStack = PlayerHandler.getPlayer().getOffHandItem(player).clone(); }
+	 		ItemStack saveOffStack = null; if (PlayerHandler.getOffHandItem(player) != null) { saveOffStack = PlayerHandler.getOffHandItem(player).clone(); }
 	 		final ItemStack offStack = saveOffStack;
 	 		ItemMap mainHandMap = ItemUtilities.getUtilities().getItemMap(mainStack, null, player.getWorld());
 	 		ItemMap offHandMap = ItemUtilities.getUtilities().getItemMap(offStack, null, player.getWorld());
 	 		if ((mainHandMap != null && !ItemUtilities.getUtilities().isAllowed(player, mainStack, "count-lock")) || (offHandMap != null && !ItemUtilities.getUtilities().isAllowed(player, offStack, "count-lock"))) {
-	 			if ((Utils.getUtils().containsIgnoreCase(mainStack.getType().name(), "TOTEM") && mainHandMap != null) || (Utils.getUtils().containsIgnoreCase(offStack.getType().name(), "TOTEM") && offHandMap != null)) {
-					SchedulerUtils.getScheduler().runLater(1L, () -> {
+	 			if ((StringUtils.getUtils().containsIgnoreCase(mainStack.getType().name(), "TOTEM") && mainHandMap != null) || (StringUtils.getUtils().containsIgnoreCase(offStack.getType().name(), "TOTEM") && offHandMap != null)) {
+					SchedulerUtils.runLater(1L, () -> {
 		 				if (mainHandMap != null && mainHandMap.isSimilar(mainStack)) {
-		 					if (Utils.getUtils().containsIgnoreCase(PlayerHandler.getPlayer().getMainHandItem(player).getType().name(), "TOTEM")) {
-		 						PlayerHandler.getPlayer().getMainHandItem(player).setAmount(mainHandMap.getCount());
-		 					} else if (Utils.getUtils().containsIgnoreCase(PlayerHandler.getPlayer().getOffHandItem(player).getType().name(), "TOTEM")) {
-		 						PlayerHandler.getPlayer().getOffHandItem(player).setAmount(mainHandMap.getCount());
+		 					if (StringUtils.getUtils().containsIgnoreCase(PlayerHandler.getMainHandItem(player).getType().name(), "TOTEM")) {
+		 						PlayerHandler.getMainHandItem(player).setAmount(mainHandMap.getCount());
+		 					} else if (StringUtils.getUtils().containsIgnoreCase(PlayerHandler.getOffHandItem(player).getType().name(), "TOTEM")) {
+		 						PlayerHandler.getOffHandItem(player).setAmount(mainHandMap.getCount());
 		 					}
-		 					if (PlayerHandler.getPlayer().getMainHandItem(player).getType() == Material.AIR) {
-		 						PlayerHandler.getPlayer().setMainHandItem(player, mainStack);
-		 					} else if (PlayerHandler.getPlayer().getOffHandItem(player).getType() == Material.AIR) {
-		 						PlayerHandler.getPlayer().setOffHandItem(player, mainStack);
+		 					if (PlayerHandler.getMainHandItem(player).getType() == Material.AIR) {
+		 						PlayerHandler.setMainHandItem(player, mainStack);
+		 					} else if (PlayerHandler.getOffHandItem(player).getType() == Material.AIR) {
+		 						PlayerHandler.setOffHandItem(player, mainStack);
 		 					}
 		 				} else if (offHandMap != null && offHandMap.isSimilar(offStack)) {
-		 					if (Utils.getUtils().containsIgnoreCase(PlayerHandler.getPlayer().getOffHandItem(player).getType().name(), "TOTEM")) {
-		 						PlayerHandler.getPlayer().getOffHandItem(player).setAmount(offHandMap.getCount());
-		 					} else if (Utils.getUtils().containsIgnoreCase(PlayerHandler.getPlayer().getMainHandItem(player).getType().name(), "TOTEM")) {
-		 						PlayerHandler.getPlayer().getMainHandItem(player).setAmount(offHandMap.getCount());
+		 					if (StringUtils.getUtils().containsIgnoreCase(PlayerHandler.getOffHandItem(player).getType().name(), "TOTEM")) {
+		 						PlayerHandler.getOffHandItem(player).setAmount(offHandMap.getCount());
+		 					} else if (StringUtils.getUtils().containsIgnoreCase(PlayerHandler.getMainHandItem(player).getType().name(), "TOTEM")) {
+		 						PlayerHandler.getMainHandItem(player).setAmount(offHandMap.getCount());
 		 					}
-		 					if (PlayerHandler.getPlayer().getOffHandItem(player).getType() == Material.AIR) {
-		 						PlayerHandler.getPlayer().setOffHandItem(player, offStack);
-		 					} else if (PlayerHandler.getPlayer().getMainHandItem(player).getType() == Material.AIR) {
-		 						PlayerHandler.getPlayer().setMainHandItem(player, offStack);
+		 					if (PlayerHandler.getOffHandItem(player).getType() == Material.AIR) {
+		 						PlayerHandler.setOffHandItem(player, offStack);
+		 					} else if (PlayerHandler.getMainHandItem(player).getType() == Material.AIR) {
+		 						PlayerHandler.setMainHandItem(player, offStack);
 		 					}
 		 				}
 		 			});

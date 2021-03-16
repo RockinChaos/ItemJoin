@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package me.RockinChaos.itemjoin.utils;
+package me.RockinChaos.itemjoin.utils.api;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -28,6 +28,8 @@ import org.json.simple.JSONObject;
 
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
+import me.RockinChaos.itemjoin.utils.SchedulerUtils;
+
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
@@ -43,7 +45,7 @@ import java.util.zip.GZIPOutputStream;
 * bStats Metrics Collection
 * Collects some data for plugin authors.
 */
-public class Metrics {
+public class MetricsAPI {
     public static final int B_STATS_VERSION = 1;
     private static final String URL = "https://bStats.org/submitData/bukkit";
     private boolean enabled;
@@ -53,15 +55,13 @@ public class Metrics {
     private static String serverUUID;
     private final Plugin plugin;
     private final List<CustomChart> charts = new ArrayList<>();
-    
-    private static Metrics metrics;
 
    /**
     * Class constructor.
     *
     * @param plugin The plugin which stats should be submitted.
     */
-    public Metrics() {
+    public MetricsAPI() {
 	        if (ItemJoin.getInstance() == null) {
 	            throw new IllegalArgumentException("Plugin cannot be null!");
 	        }
@@ -102,7 +102,7 @@ public class Metrics {
 	                    break;
 	                } catch (NoSuchFieldException ignored) { }
 	            }
-	            Bukkit.getServicesManager().register(Metrics.class, this, plugin, ServicePriority.Normal);
+	            Bukkit.getServicesManager().register(MetricsAPI.class, this, plugin, ServicePriority.Normal);
 	            if (!found) {
 	                startSubmitting();
 	            }
@@ -144,7 +144,7 @@ public class Metrics {
                     timer.cancel();
                     return;
                 }
-                SchedulerUtils.getScheduler().runLater(1L, () -> { 
+                SchedulerUtils.runLater(1L, () -> { 
                 	submitData();
                 });
             }
@@ -632,15 +632,4 @@ public class Metrics {
             return data;
         }
     }
-	
-   /**
-    * Gets the instance of the Metrics.
-    * 
-    * @param regen - If the Metrics should have a new instance created.
-    * @return The Metrics instance.
-    */
-    public static Metrics getMetrics(final boolean regen) { 
-        if (metrics == null || regen) { metrics = new Metrics(); }
-        return metrics; 
-    } 
 }

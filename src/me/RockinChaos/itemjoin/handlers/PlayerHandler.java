@@ -35,26 +35,26 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import de.domedd.betternick.BetterNick;
 import me.RockinChaos.itemjoin.item.ItemMap;
-import me.RockinChaos.itemjoin.utils.DependAPI;
-import me.RockinChaos.itemjoin.utils.LanguageAPI;
-import me.RockinChaos.itemjoin.utils.LegacyAPI;
-import me.RockinChaos.itemjoin.utils.Reflection;
+import me.RockinChaos.itemjoin.utils.ReflectionUtils;
 import me.RockinChaos.itemjoin.utils.SchedulerUtils;
+import me.RockinChaos.itemjoin.utils.ServerUtils;
+import me.RockinChaos.itemjoin.utils.api.DependAPI;
+import me.RockinChaos.itemjoin.utils.api.LanguageAPI;
+import me.RockinChaos.itemjoin.utils.api.LegacyAPI;
 import me.RockinChaos.itemjoin.utils.sql.DataObject;
 import me.RockinChaos.itemjoin.utils.sql.SQL;
 import me.RockinChaos.itemjoin.utils.sql.DataObject.Table;
 
 public class PlayerHandler {
 	
-	private static PlayerHandler player;
-	private final int PLAYER_CRAFT_INV_SIZE = 5;
+	private static final int PLAYER_CRAFT_INV_SIZE = 5;
 	
    /**
     * Restores the crafting items for all currently online players.
     * 
     */
-    public void restoreCraftItems() {
-    	this.forOnlinePlayers(player -> { ItemHandler.getItem().restoreCraftItems(player); } );
+    public static void restoreCraftItems() {
+    	forOnlinePlayers(player -> { ItemHandler.restoreCraftItems(player); } );
     }
     
    /**
@@ -63,17 +63,17 @@ public class PlayerHandler {
     * 
     * @param player - The player to have their inventory closed.
     */
-    public void safeInventoryClose(final Player player) {
+    public static void safeInventoryClose(final Player player) {
     	player.openInventory(Bukkit.createInventory(player.getInventory().getHolder(), 9));
     	player.closeInventory();	
     }
     
-    public boolean isEnabled(final Player player) {
-    	DataObject dataPlayer = SQL.getData().getData(new DataObject(Table.IJ_ENABLED_PLAYERS, PlayerHandler.getPlayer().getPlayerID(player), player.getWorld().getName(), Boolean.toString(true)));
-    	DataObject dataGlobal = SQL.getData().getData(new DataObject(Table.IJ_ENABLED_PLAYERS, PlayerHandler.getPlayer().getPlayerID(player), "Global", Boolean.toString(true)));
-    	DataObject dataALL = SQL.getData().getData(new DataObject(Table.IJ_ENABLED_PLAYERS, null, "Global", Boolean.toString(true)));
+    public static boolean isEnabled(final Player player) {
+    	DataObject dataPlayer = SQL.getData().getData(new DataObject(Table.ENABLED_PLAYERS, getPlayerID(player), player.getWorld().getName(), Boolean.toString(true)));
+    	DataObject dataGlobal = SQL.getData().getData(new DataObject(Table.ENABLED_PLAYERS, getPlayerID(player), "Global", Boolean.toString(true)));
+    	DataObject dataALL = SQL.getData().getData(new DataObject(Table.ENABLED_PLAYERS, null, "Global", Boolean.toString(true)));
     	final boolean enabled = (((dataPlayer != null ? Boolean.valueOf(dataPlayer.getEnabled()) : ((dataGlobal != null ? Boolean.valueOf(dataGlobal.getEnabled()) : (dataALL != null ? Boolean.valueOf(dataALL.getEnabled()) : true))))));
-    	if (!enabled) { ServerHandler.getServer().logDebug("{ItemMap} " + player.getName() + " will not receive any items, they have custom items are disabled."); }
+    	if (!enabled) { ServerUtils.logDebug("{ItemMap} " + player.getName() + " will not receive any items, they have custom items are disabled."); }
     	return enabled;
     }
     
@@ -83,7 +83,7 @@ public class PlayerHandler {
     * @param entity - The entity being checked.
     * @return If the entity is a real Player.
     */
-    public boolean isPlayer(final Entity entity) {
+    public static boolean isPlayer(final Entity entity) {
     	if (DependAPI.getDepends(false).citizensEnabled() && net.citizensnpcs.api.CitizensAPI.getNPCRegistry().isNPC(entity)) {
     		return false;
     	} else if (!(entity instanceof Player)) { 
@@ -98,7 +98,7 @@ public class PlayerHandler {
     * @param view - The InventoryView to be checked.
     * @return If the currently open inventory is a player crafting inventory.
     */
-    public boolean isCraftingInv(final InventoryView view) {
+    public static boolean isCraftingInv(final InventoryView view) {
         return ((!view.getType().name().equalsIgnoreCase("HOPPER") && !view.getType().name().equalsIgnoreCase("BREWING")) ? view.getTopInventory().getSize() == PLAYER_CRAFT_INV_SIZE : false);
     }
 	
@@ -108,7 +108,7 @@ public class PlayerHandler {
     * @param player - The player to be checked.
     * @return If the player is currently in creative mode.
     */
-	public boolean isCreativeMode(final Player player) {
+	public static boolean isCreativeMode(final Player player) {
 		if (player.getGameMode() == GameMode.CREATIVE) {
 			return true;
 		}
@@ -121,7 +121,7 @@ public class PlayerHandler {
     * @param player - The player to be checked.
     * @return If the player is currently in adventure mode.
     */
-	public boolean isAdventureMode(final Player player) {
+	public static boolean isAdventureMode(final Player player) {
 		if (player.getGameMode() == GameMode.ADVENTURE) {
 			return true;
 		}
@@ -135,8 +135,8 @@ public class PlayerHandler {
     * @param view - The action being checked.
     * @return If the player is currently interacting with an open menu.
     */
-	public boolean isMenuClick(final InventoryView view, final Action action) {
-		if (!PlayerHandler.getPlayer().isCraftingInv(view) && (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK)) {
+	public static boolean isMenuClick(final InventoryView view, final Action action) {
+		if (!isCraftingInv(view) && (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK)) {
 			return true;
 		}
 		return false;
@@ -148,7 +148,7 @@ public class PlayerHandler {
     * @param player - the Player to get the crafting contents of.
     * @return The ItemStack list of crafting slot contents.
     */
-    public ItemStack[] getTopContents(final Player player) {
+    public static ItemStack[] getTopContents(final Player player) {
 		ItemStack[] tempContents = player.getOpenInventory().getTopInventory().getContents();
 		ItemStack[] contents = new ItemStack[5];
 		if (contents != null && tempContents != null) { 
@@ -165,7 +165,7 @@ public class PlayerHandler {
     * 
     * @param player - The player to have their slot set.
     */
-	public void setHotbarSlot(final Player player, int slot) {
+	public static void setHotbarSlot(final Player player, int slot) {
 		if (slot != -1 && slot <= 8 && slot >= 0) {
 			player.getInventory().setHeldItemSlot(slot);
 		}
@@ -180,13 +180,13 @@ public class PlayerHandler {
     * @param player - The player to be checked.
     * @return The current ItemStack in the players hand.
     */
-	public ItemStack getHandItem(final Player player) {
-		if (ServerHandler.getServer().hasSpecificUpdate("1_9") && player.getInventory().getItemInMainHand().getType() != null && player.getInventory().getItemInMainHand().getType() != Material.AIR) {
+	public static ItemStack getHandItem(final Player player) {
+		if (ServerUtils.hasSpecificUpdate("1_9") && player.getInventory().getItemInMainHand().getType() != null && player.getInventory().getItemInMainHand().getType() != Material.AIR) {
 			return player.getInventory().getItemInMainHand();
-		} else if (ServerHandler.getServer().hasSpecificUpdate("1_9") && player.getInventory().getItemInOffHand().getType() != null && player.getInventory().getItemInOffHand().getType() != Material.AIR) {
+		} else if (ServerUtils.hasSpecificUpdate("1_9") && player.getInventory().getItemInOffHand().getType() != null && player.getInventory().getItemInOffHand().getType() != Material.AIR) {
 			return player.getInventory().getItemInOffHand();
-		} else if (!ServerHandler.getServer().hasSpecificUpdate("1_9")) {
-			return LegacyAPI.getLegacy().getInHandItem(player);
+		} else if (!ServerUtils.hasSpecificUpdate("1_9")) {
+			return LegacyAPI.getInHandItem(player);
 		}
 		return null;
 	}
@@ -200,13 +200,13 @@ public class PlayerHandler {
     * @param type - The hand type to get.
     * @return The current ItemStack in the players hand.
     */
-	public ItemStack getPerfectHandItem(final Player player, final String type) {
-		if (ServerHandler.getServer().hasSpecificUpdate("1_9") && type != null && type.equalsIgnoreCase("HAND")) {
+	public static ItemStack getPerfectHandItem(final Player player, final String type) {
+		if (ServerUtils.hasSpecificUpdate("1_9") && type != null && type.equalsIgnoreCase("HAND")) {
 			return player.getInventory().getItemInMainHand();
-		} else if (ServerHandler.getServer().hasSpecificUpdate("1_9") && type != null && type.equalsIgnoreCase("OFF_HAND")) {
+		} else if (ServerUtils.hasSpecificUpdate("1_9") && type != null && type.equalsIgnoreCase("OFF_HAND")) {
 			return player.getInventory().getItemInOffHand();
-		} else if (!ServerHandler.getServer().hasSpecificUpdate("1_9")) {
-			return LegacyAPI.getLegacy().getInHandItem(player);
+		} else if (!ServerUtils.hasSpecificUpdate("1_9")) {
+			return LegacyAPI.getInHandItem(player);
 		}
 		return null;
 	}
@@ -219,11 +219,11 @@ public class PlayerHandler {
     * @param player - The player to be checked.
     * @return The current ItemStack in the players hand.
     */
-	public ItemStack getMainHandItem(final Player player) {
-		if (ServerHandler.getServer().hasSpecificUpdate("1_9")) {
+	public static ItemStack getMainHandItem(final Player player) {
+		if (ServerUtils.hasSpecificUpdate("1_9")) {
 			return player.getInventory().getItemInMainHand();
-		} else if (!ServerHandler.getServer().hasSpecificUpdate("1_9")) {
-			return LegacyAPI.getLegacy().getInHandItem(player);
+		} else if (!ServerUtils.hasSpecificUpdate("1_9")) {
+			return LegacyAPI.getInHandItem(player);
 		}
 		return null;
 	}
@@ -236,11 +236,11 @@ public class PlayerHandler {
     * @param player - The player to be checked.
     * @return The current ItemStack in the players hand.
     */
-	public ItemStack getOffHandItem(final Player player) {
-		if (ServerHandler.getServer().hasSpecificUpdate("1_9")) {
+	public static ItemStack getOffHandItem(final Player player) {
+		if (ServerUtils.hasSpecificUpdate("1_9")) {
 			return player.getInventory().getItemInOffHand();
-		} else if (!ServerHandler.getServer().hasSpecificUpdate("1_9")) {
-			return LegacyAPI.getLegacy().getInHandItem(player);
+		} else if (!ServerUtils.hasSpecificUpdate("1_9")) {
+			return LegacyAPI.getInHandItem(player);
 		}
 		return null;
 	}
@@ -253,11 +253,11 @@ public class PlayerHandler {
     * @param player - The player to have the item set.
     * @param item - The ItemStack to be set.
     */
-	public void setMainHandItem(final Player player, final ItemStack item) {
-		if (ServerHandler.getServer().hasSpecificUpdate("1_9")) {
+	public static void setMainHandItem(final Player player, final ItemStack item) {
+		if (ServerUtils.hasSpecificUpdate("1_9")) {
 			player.getInventory().setItemInMainHand(item);
-		} else if (!ServerHandler.getServer().hasSpecificUpdate("1_9")) {
-			LegacyAPI.getLegacy().setInHandItem(player, item);
+		} else if (!ServerUtils.hasSpecificUpdate("1_9")) {
+			LegacyAPI.setInHandItem(player, item);
 		}
 	}
 	
@@ -269,11 +269,11 @@ public class PlayerHandler {
     * @param player - The player to have the item set.
     * @param item - The ItemStack to be set.
     */
-	public void setOffHandItem(final Player player, final ItemStack item) {
-		if (ServerHandler.getServer().hasSpecificUpdate("1_9")) {
+	public static void setOffHandItem(final Player player, final ItemStack item) {
+		if (ServerUtils.hasSpecificUpdate("1_9")) {
 			player.getInventory().setItemInOffHand(item);
-		} else if (!ServerHandler.getServer().hasSpecificUpdate("1_9")) {
-			LegacyAPI.getLegacy().setInHandItem(player, item);
+		} else if (!ServerUtils.hasSpecificUpdate("1_9")) {
+			LegacyAPI.setInHandItem(player, item);
 		}
 	}
 	
@@ -286,8 +286,8 @@ public class PlayerHandler {
     * 
     * @param player - The player to have their levels set.
     */
-	public void updateExperienceLevels(final Player player) {
-		SchedulerUtils.getScheduler().runLater(1L, () -> {
+	public static void updateExperienceLevels(final Player player) {
+		SchedulerUtils.runLater(1L, () -> {
 			player.setExp(player.getExp());
 			player.setLevel(player.getLevel());
 		});
@@ -299,8 +299,8 @@ public class PlayerHandler {
     * @param player - The player to have their inventory updated.
     * @param delay - The ticks to wait before updating the inventory.
     */
-	public void updateInventory(final Player player, final long delay) {
-		this.updateInventory(player, null, delay);
+	public static void updateInventory(final Player player, final long delay) {
+		updateInventory(player, null, delay);
 	}
 	
    /**
@@ -310,32 +310,32 @@ public class PlayerHandler {
     * @param itemMap - The ItemMap expected to be updated.
     * @param delay - The ticks to wait before updating the inventory.
     */
-	public void updateInventory(final Player player, final ItemMap itemMap, final long delay) {
-		SchedulerUtils.getScheduler().runAsyncLater(delay, () -> {
+	public static void updateInventory(final Player player, final ItemMap itemMap, final long delay) {
+		SchedulerUtils.runAsyncLater(delay, () -> {
 			try {
 				for (int i = 0; i < 36; i++) {
 					if (itemMap == null || itemMap.isReal(player.getInventory().getItem(i))) { 
-					    Reflection.getReflection().sendPacketPlayOutSetSlot(player, player.getInventory().getItem(i), (i < 9 ? (i + 36) : i)); 
+					    ReflectionUtils.sendPacketPlayOutSetSlot(player, player.getInventory().getItem(i), (i < 9 ? (i + 36) : i)); 
 					}
 				}
-				if (ServerHandler.getServer().hasSpecificUpdate("1_9")) { 
+				if (ServerUtils.hasSpecificUpdate("1_9")) { 
 					if (itemMap == null || itemMap.isReal(getOffHandItem(player))) { 
-						Reflection.getReflection().sendPacketPlayOutSetSlot(player, getOffHandItem(player), 45); 
+						ReflectionUtils.sendPacketPlayOutSetSlot(player, getOffHandItem(player), 45); 
 					} 
 				}
-				if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
+				if (isCraftingInv(player.getOpenInventory())) {
 					for (int i = 4; i >= 0; i--) { 
 						if (itemMap == null || itemMap.isReal(player.getInventory().getItem(i)) || itemMap.isCraftingItem()) { 
-							Reflection.getReflection().sendPacketPlayOutSetSlot(player, player.getOpenInventory().getTopInventory().getItem(i), i); 
+							ReflectionUtils.sendPacketPlayOutSetSlot(player, player.getOpenInventory().getTopInventory().getItem(i), i); 
 						}
 					}
 					for (int i = 0; i <= 3; i++) { 
 						if (itemMap == null || itemMap.isReal(player.getInventory().getItem(i))) { 
-							Reflection.getReflection().sendPacketPlayOutSetSlot(player, player.getInventory().getItem(i + 36), (8 - i)); 
+							ReflectionUtils.sendPacketPlayOutSetSlot(player, player.getInventory().getItem(i + 36), (8 - i)); 
 						}
 					}
 				}
-			} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
+			} catch (Exception e) { ServerUtils.sendDebugTrace(e); }
 		});
 	}
 	
@@ -345,15 +345,15 @@ public class PlayerHandler {
     * @param item - The item to have its skull owner fetched.
     * @return The ItemStacks current skull owner.
     */
-	public String getSkullOwner(final ItemStack item) {
-		if (ServerHandler.getServer().hasSpecificUpdate("1_12") && item != null && item.hasItemMeta() && ItemHandler.getItem().isSkull(item.getType()) 
-				&& ((SkullMeta) item.getItemMeta()).hasOwner() && ItemHandler.getItem().usesOwningPlayer() != false) {
+	public static String getSkullOwner(final ItemStack item) {
+		if (ServerUtils.hasSpecificUpdate("1_12") && item != null && item.hasItemMeta() && ItemHandler.isSkull(item.getType()) 
+				&& ((SkullMeta) item.getItemMeta()).hasOwner() && ItemHandler.usesOwningPlayer() != false) {
 			String owner =  ((SkullMeta) item.getItemMeta()).getOwningPlayer().getName();
 			if (owner != null) { return owner; }
 		} else if (item != null && item.hasItemMeta() 
-				&& ItemHandler.getItem().isSkull(item.getType())
+				&& ItemHandler.isSkull(item.getType())
 				&& ((SkullMeta) item.getItemMeta()).hasOwner()) {
-			String owner = LegacyAPI.getLegacy().getSkullOwner(((SkullMeta) item.getItemMeta()));
+			String owner = LegacyAPI.getSkullOwner(((SkullMeta) item.getItemMeta()));
 			if (owner != null) { return owner; }
 		} 
 		return "NULL";
@@ -365,19 +365,19 @@ public class PlayerHandler {
     * @param playerName - The player name to be transformed.
     * @return The fetched Player instance.
     */
-	public Player getPlayerString(final String playerName) {
+	public static Player getPlayerString(final String playerName) {
 		Player args = null;
 		try { args = Bukkit.getPlayer(UUID.fromString(playerName)); } catch (Exception e) { }
 		if (playerName != null && DependAPI.getDepends(false).nickEnabled()) {
 			try { 
-				de.domedd.betternick.api.nickedplayer.NickedPlayer np = new de.domedd.betternick.api.nickedplayer.NickedPlayer(LegacyAPI.getLegacy().getPlayer(playerName));
-				if (np.isNicked()) { return LegacyAPI.getLegacy().getPlayer(np.getRealName()); }
-				else { return LegacyAPI.getLegacy().getPlayer(playerName); }
+				de.domedd.betternick.api.nickedplayer.NickedPlayer np = new de.domedd.betternick.api.nickedplayer.NickedPlayer(LegacyAPI.getPlayer(playerName));
+				if (np.isNicked()) { return LegacyAPI.getPlayer(np.getRealName()); }
+				else { return LegacyAPI.getPlayer(playerName); }
 			} catch (NoClassDefFoundError e) {
-				if (BetterNick.getApi().isPlayerNicked(LegacyAPI.getLegacy().getPlayer(playerName))) { return LegacyAPI.getLegacy().getPlayer(BetterNick.getApi().getRealName(LegacyAPI.getLegacy().getPlayer(playerName))); }
-				else { return LegacyAPI.getLegacy().getPlayer(playerName); }
+				if (BetterNick.getApi().isPlayerNicked(LegacyAPI.getPlayer(playerName))) { return LegacyAPI.getPlayer(BetterNick.getApi().getRealName(LegacyAPI.getPlayer(playerName))); }
+				else { return LegacyAPI.getPlayer(playerName); }
 			}
-		} else if (args == null) { return LegacyAPI.getLegacy().getPlayer(playerName); }
+		} else if (args == null) { return LegacyAPI.getPlayer(playerName); }
 		return args;
 	}
 	
@@ -388,15 +388,15 @@ public class PlayerHandler {
     * @param player - The player to have their UUID fetched.
     * @return The UUID of the player or if not found, their String name.
     */
-	public String getPlayerID(final Player player) {
+	public static String getPlayerID(final Player player) {
 		try {
-			if (player != null && ServerHandler.getServer().hasSpecificUpdate("1_8") && player.getUniqueId() != null) {
+			if (player != null && ServerUtils.hasSpecificUpdate("1_8") && player.getUniqueId() != null) {
 				return player.getUniqueId().toString();
 			} else if (player != null && DependAPI.getDepends(false).nickEnabled()) {
 				try {
 					de.domedd.betternick.api.nickedplayer.NickedPlayer np = new de.domedd.betternick.api.nickedplayer.NickedPlayer(player);
 					if (np.isNicked()) { 
-						if (ServerHandler.getServer().hasSpecificUpdate("1_8") && np.getUniqueId() != null) {
+						if (ServerUtils.hasSpecificUpdate("1_8") && np.getUniqueId() != null) {
 							return np.getUniqueId().toString();
 						} else {
 							return np.getRealName();
@@ -411,7 +411,7 @@ public class PlayerHandler {
 			}
 		} catch (Exception e) { 
 			if (player != null) { return player.getName(); }
-			ServerHandler.getServer().sendDebugTrace(e);
+			ServerUtils.sendDebugTrace(e);
 		}
 		return "";
 	}
@@ -423,15 +423,15 @@ public class PlayerHandler {
     * @param player - The OfflinePlayer instance to have their UUID fetched.
     * @return The UUID of the player or if not found, their String name.
     */
-	public String getOfflinePlayerID(final OfflinePlayer player) {
+	public static String getOfflinePlayerID(final OfflinePlayer player) {
 		try {
-			if (player != null && ServerHandler.getServer().hasSpecificUpdate("1_8") && player.getUniqueId() != null) {
+			if (player != null && ServerUtils.hasSpecificUpdate("1_8") && player.getUniqueId() != null) {
 				return player.getUniqueId().toString();
 			} else if (player != null && DependAPI.getDepends(false).nickEnabled()) {
 				try {
 					de.domedd.betternick.api.nickedplayer.NickedPlayer np = new de.domedd.betternick.api.nickedplayer.NickedPlayer((BetterNick) player);
 					if (np.isNicked()) { 
-						if (ServerHandler.getServer().hasSpecificUpdate("1_8") && np.getUniqueId() != null) {
+						if (ServerUtils.hasSpecificUpdate("1_8") && np.getUniqueId() != null) {
 							return np.getUniqueId().toString();
 						} else {
 							return np.getRealName();
@@ -446,7 +446,7 @@ public class PlayerHandler {
 			}
 		} catch (Exception e) { 
 			if (player != null) { return player.getName(); }
-			ServerHandler.getServer().sendDebugTrace(e);
+			ServerUtils.sendDebugTrace(e);
 		}
 		return "";
 	}
@@ -458,7 +458,7 @@ public class PlayerHandler {
     * @param range - The distance to check for Nearby Players.
     * @return The String name of the Nearby Player.
     */
-    public String getNearbyPlayer(final Player player, final int range) {
+    public static String getNearbyPlayer(final Player player, final int range) {
 	    ArrayList < Location > sight = new ArrayList < Location > ();
 	    ArrayList < Entity > entities = (ArrayList < Entity > ) player.getNearbyEntities(range, range, range);
 	    Location origin = player.getEyeLocation();
@@ -471,7 +471,7 @@ public class PlayerHandler {
 	    			if (Math.abs(entities.get(k).getLocation().getY() - sight.get(i).getY()) < 1.5) {
 	    				if (Math.abs(entities.get(k).getLocation().getZ() - sight.get(i).getZ()) < 1.3) {
 	    					if (entities.get(k) instanceof Player) {
-	    						if (ServerHandler.getServer().hasSpecificUpdate("1_8")) {
+	    						if (ServerUtils.hasSpecificUpdate("1_8")) {
 	    							return entities.get(k).getName();
 	    						} else {
 	    							return ((Player) entities.get(k)).getName();
@@ -490,7 +490,7 @@ public class PlayerHandler {
     * 
     * @param input - The methods to be executed.
     */
-    public void forOnlinePlayers(final Consumer<Player> input) {
+    public static void forOnlinePlayers(final Consumer<Player> input) {
 		try {
 		  /** New method for getting the current online players.
 			* This is for MC 1.12+
@@ -510,16 +510,6 @@ public class PlayerHandler {
 					input.accept(player);
 				}
 			}
-		} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
+		} catch (Exception e) { ServerUtils.sendDebugTrace(e); }
 	}
-
-   /**
-    * Gets the instance of the PlayerHandler.
-    * 
-    * @return The PlayerHandler instance.
-    */
-    public static PlayerHandler getPlayer() { 
-        if (player == null) { player = new PlayerHandler(); }
-        return player; 
-    } 
 }

@@ -32,11 +32,11 @@ import com.mojang.authlib.properties.Property;
 
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
-import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.listeners.Clicking;
-import me.RockinChaos.itemjoin.utils.Utils;
-import me.RockinChaos.itemjoin.utils.LegacyAPI;
+import me.RockinChaos.itemjoin.utils.StringUtils;
+import me.RockinChaos.itemjoin.utils.api.LegacyAPI;
 import me.RockinChaos.itemjoin.utils.SchedulerUtils;
+import me.RockinChaos.itemjoin.utils.ServerUtils;
 
 public class ItemAnimation {
 	
@@ -87,7 +87,7 @@ public class ItemAnimation {
    */
 	public void closeAnimation(final Player player) {
 		this.stopAnimations = true;
-		ServerHandler.getServer().logDebug("{Animation} Successfully closed all animations for the item " + this.itemMap.getConfigName() + " with the instanced player " + player.getName() + ".");
+		ServerUtils.logDebug("{Animation} Successfully closed all animations for the item " + this.itemMap.getConfigName() + " with the instanced player " + player.getName() + ".");
 	}
 	
    /**
@@ -100,7 +100,7 @@ public class ItemAnimation {
 		final Iterator <String> it = this.dynamicNames.iterator();
 		while (it.hasNext()) {
 			final String name = it.next();
-			if (Utils.getUtils().returnInteger(ItemHandler.getItem().getDelayFormat(name)) != null) { ticks = ticks + Utils.getUtils().returnInteger(ItemHandler.getItem().getDelayFormat(name)); }
+			if (StringUtils.getUtils().returnInteger(ItemHandler.getDelayFormat(name)) != null) { ticks = ticks + StringUtils.getUtils().returnInteger(ItemHandler.getDelayFormat(name)); }
 			else { ticks = ticks + 180; }
 			this.AnimateTask(player, it.hasNext(), name, null, null, null, null, null, ticks, 0);
 		}
@@ -117,7 +117,7 @@ public class ItemAnimation {
 		final Iterator<List<String>> it = this.dynamicLores.iterator();
 		while (it.hasNext()) {
 			final List<String> lore = it.next();
-			if (Utils.getUtils().returnInteger(ItemHandler.getItem().getDelayFormat(lore.get(0))) != null) { ticks = ticks + Utils.getUtils().returnInteger(ItemHandler.getItem().getDelayFormat(lore.get(0))); }
+			if (StringUtils.getUtils().returnInteger(ItemHandler.getDelayFormat(lore.get(0))) != null) { ticks = ticks + StringUtils.getUtils().returnInteger(ItemHandler.getDelayFormat(lore.get(0))); }
 			else { ticks = ticks + 180; }
 			this.AnimateTask(player, it.hasNext(), null, lore, null, null, null, null, ticks, position);
 			position++;
@@ -134,7 +134,7 @@ public class ItemAnimation {
 		final Iterator<String> it = this.dynamicMaterials.iterator();
 		while (it.hasNext()) {
 			final String mat = it.next();
-			if (Utils.getUtils().returnInteger(ItemHandler.getItem().getDelayFormat(mat)) != null) { ticks = ticks + Utils.getUtils().returnInteger(ItemHandler.getItem().getDelayFormat(mat)); }
+			if (StringUtils.getUtils().returnInteger(ItemHandler.getDelayFormat(mat)) != null) { ticks = ticks + StringUtils.getUtils().returnInteger(ItemHandler.getDelayFormat(mat)); }
 			else { ticks = ticks + 180; }
 			this.AnimateTask(player, it.hasNext(), null, null, mat, null, null, null, ticks, 0);
 		}
@@ -147,7 +147,7 @@ public class ItemAnimation {
 	*/
 	private void pagesTasks(final Player player) {
 		long ticks = 0;
-		if (Utils.getUtils().returnInteger(ItemHandler.getItem().getDelayFormat(this.dynamicPages.get(0))) != null) { ticks = ticks + Utils.getUtils().returnInteger(ItemHandler.getItem().getDelayFormat(this.dynamicPages.get(0))); }
+		if (StringUtils.getUtils().returnInteger(ItemHandler.getDelayFormat(this.dynamicPages.get(0))) != null) { ticks = ticks + StringUtils.getUtils().returnInteger(ItemHandler.getDelayFormat(this.dynamicPages.get(0))); }
 		else { ticks = ticks + 180; }
 		this.AnimateTask(player, false, null, null, null, null, null, this.dynamicPages, ticks, 0);
 	}
@@ -162,7 +162,7 @@ public class ItemAnimation {
 		final Iterator<String> it = this.dynamicOwners.iterator();
 		while (it.hasNext()) {
 			final String owner = it.next();
-			if (Utils.getUtils().returnInteger(ItemHandler.getItem().getDelayFormat(owner)) != null) { ticks = ticks + Utils.getUtils().returnInteger(ItemHandler.getItem().getDelayFormat(owner)); }
+			if (StringUtils.getUtils().returnInteger(ItemHandler.getDelayFormat(owner)) != null) { ticks = ticks + StringUtils.getUtils().returnInteger(ItemHandler.getDelayFormat(owner)); }
 			else { ticks = ticks + 180; }
 			this.AnimateTask(player, it.hasNext(), null, null, null, owner, null, null, ticks, 0);
 		}
@@ -178,7 +178,7 @@ public class ItemAnimation {
 		final Iterator<String> it = this.dynamicTextures.iterator();
 		while (it.hasNext()) {
 			final String texture = it.next();
-			if (Utils.getUtils().returnInteger(ItemHandler.getItem().getDelayFormat(texture)) != null) { ticks = ticks + Utils.getUtils().returnInteger(ItemHandler.getItem().getDelayFormat(texture)); }
+			if (StringUtils.getUtils().returnInteger(ItemHandler.getDelayFormat(texture)) != null) { ticks = ticks + StringUtils.getUtils().returnInteger(ItemHandler.getDelayFormat(texture)); }
 			else { ticks = ticks + 180; }
 			this.AnimateTask(player, it.hasNext(), null, null, null, null, texture, null, ticks, 0);
 		}
@@ -200,7 +200,7 @@ public class ItemAnimation {
     */
 	private void AnimateTask(final Player player, final boolean hasNext, final String nameString, final List<String> loreString, final String materialString, final String ownerString, final String textureString, final List<String> pagesString, final long UpdateDelay, final int position) {
 		final ItemMap itemMap = this.itemMap;
-		SchedulerUtils.getScheduler().runLater(UpdateDelay, () -> {
+		SchedulerUtils.runLater(UpdateDelay, () -> {
 			if (!stopAnimations) {
 				// ============== Animate Within the Player Inventory ============== //
 				for (ItemStack inPlayerInventory: player.getInventory().getContents()) {
@@ -235,15 +235,15 @@ public class ItemAnimation {
 				// ============== Animate Within the Player's Cursor =============== //
 				if (player.getItemOnCursor().getType() != null && player.getItemOnCursor().getType() != Material.AIR && itemMap.getTempItem() != null && itemMap.isReal(player.getItemOnCursor())) {
 					ItemStack item = new ItemStack(player.getItemOnCursor());
-					if (Clicking.getCursor(PlayerHandler.getPlayer().getPlayerID(player)) != null && itemMap.isReal(Clicking.getCursor(PlayerHandler.getPlayer().getPlayerID(player)))) { item = new ItemStack(Clicking.getCursor(PlayerHandler.getPlayer().getPlayerID(player))); }
+					if (Clicking.getCursor(PlayerHandler.getPlayerID(player)) != null && itemMap.isReal(Clicking.getCursor(PlayerHandler.getPlayerID(player)))) { item = new ItemStack(Clicking.getCursor(PlayerHandler.getPlayerID(player))); }
 					if (nameString != null) { setNameData(player, player.getItemOnCursor(), nameString); } 
 					else if (loreString != null) { setLoreData(player, player.getItemOnCursor(), loreString); }
 					else if (materialString != null) { setMaterialData(player, player.getItemOnCursor(), materialString); }
 					else if (pagesString != null) { setPagesData(player, player.getItemOnCursor(), pagesString); }
 					else if (ownerString != null || textureString != null) { setSkull(player, player.getItemOnCursor(), ownerString, textureString); }
-					Clicking.putCursor(PlayerHandler.getPlayer().getPlayerID(player), item);
+					Clicking.putCursor(PlayerHandler.getPlayerID(player), item);
 				}
-				PlayerHandler.getPlayer().updateInventory(player, itemMap, 1L);
+				PlayerHandler.updateInventory(player, itemMap, 1L);
 				// ============== This has Concluded all Animations.. ============== //
 				if (!hasNext) { 
 					if (nameString != null) { nameTasks(player); }
@@ -266,7 +266,7 @@ public class ItemAnimation {
 	*/
 	private void setNameData(final Player player, final ItemStack reviseItem, final String nameString) {
 		final ItemMeta tempmeta = reviseItem.getItemMeta();
-		tempmeta.setDisplayName(Utils.getUtils().translateLayout(ItemHandler.getItem().cutDelay(nameString) + this.itemMap.getLegacySecret(), player));
+		tempmeta.setDisplayName(StringUtils.getUtils().translateLayout(ItemHandler.cutDelay(nameString) + this.itemMap.getLegacySecret(), player));
 		reviseItem.setItemMeta(tempmeta);
 	}
 	
@@ -282,8 +282,8 @@ public class ItemAnimation {
 		final List < String > loreList = loreString;
 		final List < String > loreFormatList = new ArrayList < String > ();
 		for (int k = 0; k < loreList.size(); k++) {
-			String formatLore = ItemHandler.getItem().cutDelay(loreList.get(k));
-			formatLore = Utils.getUtils().translateLayout(formatLore, player);
+			String formatLore = ItemHandler.cutDelay(loreList.get(k));
+			formatLore = StringUtils.getUtils().translateLayout(formatLore, player);
 			loreFormatList.add(formatLore);
 		}
 		tempmeta.setLore(loreFormatList);
@@ -299,21 +299,21 @@ public class ItemAnimation {
 	*/
 	private void setMaterialData(final Player player, final ItemStack reviseItem, final String material) {
 		Material mat = null;
-		String materialString = ItemHandler.getItem().cutDelay(material);
+		String materialString = ItemHandler.cutDelay(material);
 		if (materialString.contains(":")) { 
 			final String[] parts = materialString.split(":");
-			if (ServerHandler.getServer().hasSpecificUpdate("1_13")) {
-				if (!Utils.getUtils().isInt(parts[0])) { parts[0] = "LEGACY_" + parts[0]; }
-				if (!Utils.getUtils().isInt(parts[0])) { mat = LegacyAPI.getLegacy().getMaterial(Material.getMaterial(parts[0].toUpperCase()), (byte) Integer.parseInt(parts[1])); } 
-				else { mat = LegacyAPI.getLegacy().getMaterial(Integer.parseInt(parts[0]), (byte) Integer.parseInt(parts[1])); }
+			if (ServerUtils.hasSpecificUpdate("1_13")) {
+				if (!StringUtils.getUtils().isInt(parts[0])) { parts[0] = "LEGACY_" + parts[0]; }
+				if (!StringUtils.getUtils().isInt(parts[0])) { mat = LegacyAPI.getMaterial(Material.getMaterial(parts[0].toUpperCase()), (byte) Integer.parseInt(parts[1])); } 
+				else { mat = LegacyAPI.getMaterial(Integer.parseInt(parts[0]), (byte) Integer.parseInt(parts[1])); }
 				if (mat != null && mat != Material.AIR) { reviseItem.setType(mat); }
 			} else {
-				mat = ItemHandler.getItem().getMaterial(parts[0], null);
+				mat = ItemHandler.getMaterial(parts[0], null);
 				if (mat != null && mat != Material.AIR) { reviseItem.setType(mat); }	
-				LegacyAPI.getLegacy().setDurability(reviseItem, (byte) Integer.parseInt(parts[1]));
+				LegacyAPI.setDurability(reviseItem, (byte) Integer.parseInt(parts[1]));
 			}
 		} else {
-			mat = ItemHandler.getItem().getMaterial(materialString, null);
+			mat = ItemHandler.getMaterial(materialString, null);
 			if (mat != null && mat != Material.AIR) { reviseItem.setType(mat); }
 		}
 	}
@@ -326,10 +326,10 @@ public class ItemAnimation {
 	* @param pagesString - The book pages to set to the item.
 	*/
 	private void setPagesData(final Player player, final ItemStack reviseItem, final List<String> pagesString) {
-		if (ServerHandler.getServer().hasSpecificUpdate("1_8")) {
+		if (ServerUtils.hasSpecificUpdate("1_8")) {
 			reviseItem.setItemMeta(this.itemMap.setJSONBookPages(player, reviseItem, pagesString).getItemMeta());
 		} else {
-			final ItemMeta itemMeta = LegacyAPI.getLegacy().setBookPages(player, reviseItem.getItemMeta(), pagesString, this.itemMap);
+			final ItemMeta itemMeta = LegacyAPI.setBookPages(player, reviseItem.getItemMeta(), pagesString, this.itemMap);
 			reviseItem.setItemMeta(itemMeta);
 		}
 	}
@@ -345,17 +345,17 @@ public class ItemAnimation {
 	private void setSkull(final Player player, ItemStack reviseItem, final String ownerString, final String textureString) {
 		ItemMeta tempMeta = reviseItem.getItemMeta();
 		if (ownerString != null) {
-			tempMeta = ItemHandler.getItem().setSkullOwner(tempMeta, Utils.getUtils().translateLayout(ItemHandler.getItem().cutDelay(ownerString), player));
+			tempMeta = ItemHandler.setSkullOwner(tempMeta, StringUtils.getUtils().translateLayout(ItemHandler.cutDelay(ownerString), player));
 		} else if (textureString != null && !textureString.contains("hdb-") && !this.itemMap.isHeadDatabase()) {
 			try {
-				if (ServerHandler.getServer().hasSpecificUpdate("1_8")) {
+				if (ServerUtils.hasSpecificUpdate("1_8")) {
 					final GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
-					gameProfile.getProperties().put("textures", new Property("textures", new String(ItemHandler.getItem().cutDelay(textureString))));
+					gameProfile.getProperties().put("textures", new Property("textures", new String(ItemHandler.cutDelay(textureString))));
 					final Field declaredField = tempMeta.getClass().getDeclaredField("profile");
 					declaredField.setAccessible(true);
 					declaredField.set(tempMeta, gameProfile);
 				}
-			} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
+			} catch (Exception e) { ServerUtils.sendDebugTrace(e); }
 		}
 		reviseItem.setItemMeta(tempMeta);
 	}

@@ -34,7 +34,7 @@ import me.RockinChaos.itemjoin.handlers.PermissionsHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
-import me.RockinChaos.itemjoin.utils.Utils;
+import me.RockinChaos.itemjoin.utils.StringUtils;
 import me.RockinChaos.itemjoin.utils.sql.DataObject;
 import me.RockinChaos.itemjoin.utils.sql.SQL;
 import me.RockinChaos.itemjoin.utils.sql.DataObject.Table;
@@ -69,14 +69,14 @@ public class ChatTab implements TabCompleter {
 				} catch (Exception e) { }
 				for (DataObject dataObject: dataList) {
 					String objectString = (args[1].equalsIgnoreCase("map-ids") ? dataObject.getMapIMG() : 
-						(PlayerHandler.getPlayer().getPlayerString(dataObject.getPlayerId()) != null ? PlayerHandler.getPlayer().getPlayerString(dataObject.getPlayerId()).getName() : dataObject.getPlayerId()));
+						(PlayerHandler.getPlayerString(dataObject.getPlayerId()) != null ? PlayerHandler.getPlayerString(dataObject.getPlayerId()).getName() : dataObject.getPlayerId()));
 					commands.add(objectString);
 				}
 			}
 		} else if ((args.length == 2 || args.length == 3) && (args[0].equalsIgnoreCase("disable") || args[0].equalsIgnoreCase("enable"))) {
 			if (args.length == 2 && ((PermissionsHandler.getPermissions().hasPermission(sender, "itemjoin.enable.others") && args[0].equalsIgnoreCase("enable")) 
 				|| (PermissionsHandler.getPermissions().hasPermission(sender, "itemjoin.disable.others") && args[0].equalsIgnoreCase("disable")))) {
-				PlayerHandler.getPlayer().forOnlinePlayers(player -> {
+				PlayerHandler.forOnlinePlayers(player -> {
 					commands.add(player.getName());
 				});
 			} else {
@@ -93,17 +93,17 @@ public class ChatTab implements TabCompleter {
 				|| (PermissionsHandler.getPermissions().hasPermission(sender, "itemjoin.remove.others") && (args[0].equalsIgnoreCase("remove") || args[0].equalsIgnoreCase("removeOnline"))))) {
 				commands.addAll(Arrays.asList("2","4","8","16"));
 				if (!args[0].equalsIgnoreCase("getOnline") && !args[0].equalsIgnoreCase("removeOnline")) {
-					PlayerHandler.getPlayer().forOnlinePlayers(player -> {
+					PlayerHandler.forOnlinePlayers(player -> {
 						commands.add(player.getName());
 					});
 				}
-			} else if (args.length == 4 && !Utils.getUtils().isInt(args[2]) && !args[0].equalsIgnoreCase("getOnline") && !args[0].equalsIgnoreCase("removeOnline") && ((PermissionsHandler.getPermissions().hasPermission(sender, "itemjoin.get.others") 
+			} else if (args.length == 4 && !StringUtils.getUtils().isInt(args[2]) && !args[0].equalsIgnoreCase("getOnline") && !args[0].equalsIgnoreCase("removeOnline") && ((PermissionsHandler.getPermissions().hasPermission(sender, "itemjoin.get.others") 
 				&& args[0].equalsIgnoreCase("get")) || (PermissionsHandler.getPermissions().hasPermission(sender, "itemjoin.remove.others") && args[0].equalsIgnoreCase("remove")))) {
 				commands.addAll(Arrays.asList("2","3","4","6","8","16","32","64"));
 			}
 		} else if (args.length == 2 && (args[0].equalsIgnoreCase("getAll") && PermissionsHandler.getPermissions().hasPermission(sender, "itemjoin.get.others") || args[0].equalsIgnoreCase("removeAll") 
 			&& PermissionsHandler.getPermissions().hasPermission(sender, "itemjoin.remove.others"))) {
-			PlayerHandler.getPlayer().forOnlinePlayers(player -> {
+			PlayerHandler.forOnlinePlayers(player -> {
 				commands.add(player.getName());
 			});
 		} else if (args.length == 1) {

@@ -44,12 +44,12 @@ import de.domedd.betternick.BetterNick;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
-import me.RockinChaos.itemjoin.handlers.ServerHandler;
+import me.RockinChaos.itemjoin.utils.api.DependAPI;
 import me.clip.placeholderapi.PlaceholderAPI;
 
-public class Utils {
+public class StringUtils {
 
-    private static Utils util;
+    private static StringUtils util;
 	
    /**
     * Checks if the condition is met.
@@ -193,7 +193,7 @@ public class Utils {
 			}
 			return hiddenData;
 		} catch (Exception e) {
-			ServerHandler.getServer().sendDebugTrace(e);
+			ServerUtils.sendDebugTrace(e);
 			return null;
 		}
 	}
@@ -222,7 +222,7 @@ public class Utils {
 				return returnData;
 			}
 		} catch (Exception e) {
-			ServerHandler.getServer().sendDebugTrace(e);
+			ServerUtils.sendDebugTrace(e);
 			return null;
 		}
 	}
@@ -345,8 +345,8 @@ public class Utils {
 		try {
 			return Base64.getEncoder().encodeToString(str.getBytes("UTF-8"));
 		} catch (Exception e) {
-			ServerHandler.getServer().logDebug("{Utils} Failure to encrypt sensitive text!");
-			ServerHandler.getServer().sendDebugTrace(e);
+			ServerUtils.logDebug("{Utils} Failure to encrypt sensitive text!");
+			ServerUtils.sendDebugTrace(e);
 		}
 		return null;
 	}
@@ -361,8 +361,8 @@ public class Utils {
 		try {
 			return new String(Base64.getDecoder().decode(str), "UTF-8");
 		} catch (Exception e) {
-			ServerHandler.getServer().logDebug("{Utils} Failure to decrypt sensitive text!");
-			ServerHandler.getServer().sendDebugTrace(e);
+			ServerUtils.logDebug("{Utils} Failure to decrypt sensitive text!");
+			ServerUtils.sendDebugTrace(e);
 		}
 		return null;
 	}
@@ -558,22 +558,22 @@ public class Utils {
 		
 		if (playerName != null && player != null && !(player instanceof ConsoleCommandSender)) {
 			
-			try { str = str.replace("%player%", playerName); } catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
-			try { str = str.replace("%mob_kills%", String.valueOf(player.getStatistic(Statistic.MOB_KILLS))); } catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
-			try { str = str.replace("%player_kills%", String.valueOf(player.getStatistic(Statistic.PLAYER_KILLS))); } catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
-			try { str = str.replace("%player_deaths%", String.valueOf(player.getStatistic(Statistic.DEATHS))); } catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
-			try { str = str.replace("%player_food%", String.valueOf(player.getFoodLevel())); } catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
+			try { str = str.replace("%player%", playerName); } catch (Exception e) { ServerUtils.sendDebugTrace(e); }
+			try { str = str.replace("%mob_kills%", String.valueOf(player.getStatistic(Statistic.MOB_KILLS))); } catch (Exception e) { ServerUtils.sendDebugTrace(e); }
+			try { str = str.replace("%player_kills%", String.valueOf(player.getStatistic(Statistic.PLAYER_KILLS))); } catch (Exception e) { ServerUtils.sendDebugTrace(e); }
+			try { str = str.replace("%player_deaths%", String.valueOf(player.getStatistic(Statistic.DEATHS))); } catch (Exception e) { ServerUtils.sendDebugTrace(e); }
+			try { str = str.replace("%player_food%", String.valueOf(player.getFoodLevel())); } catch (Exception e) { ServerUtils.sendDebugTrace(e); }
 			try { 
-				final double health = (ServerHandler.getServer().hasSpecificUpdate("1_8") ? player.getHealth() : (double)player.getClass().getMethod("getHealth", double.class).invoke(player));
+				final double health = (ServerUtils.hasSpecificUpdate("1_8") ? player.getHealth() : (double)player.getClass().getMethod("getHealth", double.class).invoke(player));
 				str = str.replace("%player_health%", String.valueOf(health)); 
-			} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
-			try { str = str.replace("%player_location%", player.getLocation().getBlockX() + ", " + player.getLocation().getBlockY() + ", " + player.getLocation().getBlockZ()); } catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
-			try { if (Bukkit.isPrimaryThread()) { str = str.replace("%player_interact%", PlayerHandler.getPlayer().getNearbyPlayer(player, 3)); } } catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); } }
-		if (player == null) { try { str = str.replace("%player%", "CONSOLE"); } catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); } }
+			} catch (Exception e) { ServerUtils.sendDebugTrace(e); }
+			try { str = str.replace("%player_location%", player.getLocation().getBlockX() + ", " + player.getLocation().getBlockY() + ", " + player.getLocation().getBlockZ()); } catch (Exception e) { ServerUtils.sendDebugTrace(e); }
+			try { if (Bukkit.isPrimaryThread()) { str = str.replace("%player_interact%", PlayerHandler.getNearbyPlayer(player, 3)); } } catch (Exception e) { ServerUtils.sendDebugTrace(e); } }
+		if (player == null) { try { str = str.replace("%player%", "CONSOLE"); } catch (Exception e) { ServerUtils.sendDebugTrace(e); } }
 		str = ChatColor.translateAlternateColorCodes('&', this.translateHexColorCodes(str));
 		if (DependAPI.getDepends(false).placeHolderEnabled()) {
 			try { try { return PlaceholderAPI.setPlaceholders(player, str); } 
-			catch (NoSuchFieldError e) { ServerHandler.getServer().logWarn("An error has occured when setting the PlaceHolder " + e.getMessage() + ", if this issue persits contact the developer of PlaceholderAPI."); return str; }
+			catch (NoSuchFieldError e) { ServerUtils.logWarn("An error has occured when setting the PlaceHolder " + e.getMessage() + ", if this issue persits contact the developer of PlaceholderAPI."); return str; }
 			} catch (Exception e) { }
 		}
 		return str;
@@ -584,8 +584,8 @@ public class Utils {
     * 
     * @return The Utils instance.
     */
-    public static Utils getUtils() { 
-        if (util == null) { util = new Utils(); }
+    public static StringUtils getUtils() { 
+        if (util == null) { util = new StringUtils(); }
         return util; 
     } 
 }

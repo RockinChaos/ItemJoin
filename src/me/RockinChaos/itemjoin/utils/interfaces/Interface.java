@@ -30,10 +30,10 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
-import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.utils.SchedulerUtils;
-import me.RockinChaos.itemjoin.utils.UI;
-import me.RockinChaos.itemjoin.utils.Utils;
+import me.RockinChaos.itemjoin.utils.ServerUtils;
+import me.RockinChaos.itemjoin.utils.StringUtils;
+import me.RockinChaos.itemjoin.utils.interfaces.pages.InterMenu;
 
 public class Interface implements InventoryHolder {
 	
@@ -67,7 +67,7 @@ public class Interface implements InventoryHolder {
 		} else {
 			this.pageSize = rows * 9;
 		}
-		this.inventory = Bukkit.createInventory(this, rows * 9, Utils.getUtils().colorFormat(title));
+		this.inventory = Bukkit.createInventory(this, rows * 9, StringUtils.getUtils().colorFormat(title));
 		this.inventory.setMaxStackSize(128);
 		this.pages.put(0, new Page(this.pageSize));
 		this.createControls(this.inventory);
@@ -209,50 +209,50 @@ public class Interface implements InventoryHolder {
 		if (this.isPaged) {
 			if (this.getCurrentPage() > 1) {
 				ItemStack backItem;
-				if (ServerHandler.getServer().hasSpecificUpdate("1_8")) {
-					backItem = ItemHandler.getItem().setSkullTexture(ItemHandler.getItem().getItem("SKULL_ITEM:3", 1, false, "&3&n&lPrevious Page", "&7", "&7*Previous page &a&l" + (this.getCurrentPage() - 1) + "&7 / &c&l" + this.getPageAmount()), "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2RjOWU0ZGNmYTQyMjFhMWZhZGMxYjViMmIxMWQ4YmVlYjU3ODc5YWYxYzQyMzYyMTQyYmFlMWVkZDUifX19");
+				if (ServerUtils.hasSpecificUpdate("1_8")) {
+					backItem = ItemHandler.setSkullTexture(ItemHandler.getItem("SKULL_ITEM:3", 1, false, "&3&n&lPrevious Page", "&7", "&7*Previous page &a&l" + (this.getCurrentPage() - 1) + "&7 / &c&l" + this.getPageAmount()), "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2RjOWU0ZGNmYTQyMjFhMWZhZGMxYjViMmIxMWQ4YmVlYjU3ODc5YWYxYzQyMzYyMTQyYmFlMWVkZDUifX19");
 				} else {
-					backItem = ItemHandler.getItem().getItem("ARROW", 1, false, "&3&n&lPrevious Page", "&7", "&7*Previous page &a&l" + (this.getCurrentPage() - 1) + "&7 / &c&l" + this.getPageAmount());
+					backItem = ItemHandler.getItem("ARROW", 1, false, "&3&n&lPrevious Page", "&7", "&7*Previous page &a&l" + (this.getCurrentPage() - 1) + "&7 / &c&l" + this.getPageAmount());
 				}
 				this.controlBack = new Button(backItem, event -> this.selectPage(this.currentIndex - 1));
 				inventory.setItem(inventory.getSize() - 8, backItem);
 			} else {
 				ItemStack backItem;
-				if (ServerHandler.getServer().hasSpecificUpdate("1_8")) {
-					backItem = ItemHandler.getItem().setSkullTexture(ItemHandler.getItem().getItem("SKULL_ITEM:3", 1, false, "&c&n&lPrevious Page", "&7", "&7*You are already at the first page."), "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTdjMjE0NGZkY2I1NWMzZmMxYmYxZGU1MWNhYmRmNTJjMzg4M2JjYjU3ODkyMzIyNmJlYjBkODVjYjJkOTgwIn19fQ==");
+				if (ServerUtils.hasSpecificUpdate("1_8")) {
+					backItem = ItemHandler.setSkullTexture(ItemHandler.getItem("SKULL_ITEM:3", 1, false, "&c&n&lPrevious Page", "&7", "&7*You are already at the first page."), "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTdjMjE0NGZkY2I1NWMzZmMxYmYxZGU1MWNhYmRmNTJjMzg4M2JjYjU3ODkyMzIyNmJlYjBkODVjYjJkOTgwIn19fQ==");
 				} else {
-					backItem = ItemHandler.getItem().getItem("LEVER", 1, false, "&c&n&lPrevious Page", "&7", "&7*You are already at the first page.");
+					backItem = ItemHandler.getItem("LEVER", 1, false, "&c&n&lPrevious Page", "&7", "&7*You are already at the first page.");
 				}
 				inventory.setItem(inventory.getSize() - 8, backItem);
 			}
 			if (this.getCurrentPage() < this.getPageAmount()) {
 				ItemStack nextItem;
-				if (ServerHandler.getServer().hasSpecificUpdate("1_8")) {
-					nextItem = ItemHandler.getItem().setSkullTexture(ItemHandler.getItem().getItem("SKULL_ITEM:3", 1, false, "&3&n&lNext Page", "&7", "&7*Next page &a&l" + (this.getCurrentPage() + 1) + "&7 / &c&l" + this.getPageAmount()), "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTU2YTM2MTg0NTllNDNiMjg3YjIyYjdlMjM1ZWM2OTk1OTQ1NDZjNmZjZDZkYzg0YmZjYTRjZjMwYWI5MzExIn19fQ");
+				if (ServerUtils.hasSpecificUpdate("1_8")) {
+					nextItem = ItemHandler.setSkullTexture(ItemHandler.getItem("SKULL_ITEM:3", 1, false, "&3&n&lNext Page", "&7", "&7*Next page &a&l" + (this.getCurrentPage() + 1) + "&7 / &c&l" + this.getPageAmount()), "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTU2YTM2MTg0NTllNDNiMjg3YjIyYjdlMjM1ZWM2OTk1OTQ1NDZjNmZjZDZkYzg0YmZjYTRjZjMwYWI5MzExIn19fQ");
 				} else {
-					nextItem = ItemHandler.getItem().getItem("ARROW", 1, false, "&3&n&lNext Page", "&7", "&7*Next page &a&l" + (this.getCurrentPage() + 1) + "&7 / &c&l" + this.getPageAmount());
+					nextItem = ItemHandler.getItem("ARROW", 1, false, "&3&n&lNext Page", "&7", "&7*Next page &a&l" + (this.getCurrentPage() + 1) + "&7 / &c&l" + this.getPageAmount());
 				}
 				this.controlNext = new Button(nextItem, event -> this.selectPage(this.getCurrentPage()));
 				inventory.setItem(inventory.getSize() - 2, nextItem);
 			} else {
 				ItemStack nextItem;
-				if (ServerHandler.getServer().hasSpecificUpdate("1_8")) {
-					nextItem = ItemHandler.getItem().setSkullTexture(ItemHandler.getItem().getItem("SKULL_ITEM:3", 1, false, "&c&n&lNext Page", "&7", "&7*You are already at the last page."), "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTdjMjE0NGZkY2I1NWMzZmMxYmYxZGU1MWNhYmRmNTJjMzg4M2JjYjU3ODkyMzIyNmJlYjBkODVjYjJkOTgwIn19fQ==");
+				if (ServerUtils.hasSpecificUpdate("1_8")) {
+					nextItem = ItemHandler.setSkullTexture(ItemHandler.getItem("SKULL_ITEM:3", 1, false, "&c&n&lNext Page", "&7", "&7*You are already at the last page."), "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTdjMjE0NGZkY2I1NWMzZmMxYmYxZGU1MWNhYmRmNTJjMzg4M2JjYjU3ODkyMzIyNmJlYjBkODVjYjJkOTgwIn19fQ==");
 				} else {
-					nextItem = ItemHandler.getItem().getItem("LEVER", 1, false, "&c&n&lNext Page", "&7", "&7*You are already at the last page.");
+					nextItem = ItemHandler.getItem("LEVER", 1, false, "&c&n&lNext Page", "&7", "&7*You are already at the last page.");
 				}
 				inventory.setItem(inventory.getSize() - 2, nextItem);
 			}
-			inventory.setItem(inventory.getSize() - 5, ItemHandler.getItem().getItem("BOOK", 1, false, "&3&lPage &a&l" + this.getCurrentPage() + "&7 / &c&l" + this.getPageAmount(), "&7You are on page &a&l" + this.getCurrentPage() + "&7 / &c&l" + this.getPageAmount()));
-			ItemStack exitItem = ItemHandler.getItem().getItem("BARRIER", 1, false, "&c&l&nMain Menu", "&7", "&7*Returns you to the main menu.");
+			inventory.setItem(inventory.getSize() - 5, ItemHandler.getItem("BOOK", 1, false, "&3&lPage &a&l" + this.getCurrentPage() + "&7 / &c&l" + this.getPageAmount(), "&7You are on page &a&l" + this.getCurrentPage() + "&7 / &c&l" + this.getPageAmount()));
+			ItemStack exitItem = ItemHandler.getItem("BARRIER", 1, false, "&c&l&nMain Menu", "&7", "&7*Returns you to the main menu.");
 			if (this.controlExit == null) {
-				this.controlExit = new Button(exitItem, event -> UI.getCreator().startMenu(((Player)event.getWhoClicked())));
+				this.controlExit = new Button(exitItem, event -> InterMenu.startMenu(((Player)event.getWhoClicked())));
 			} else {
 				exitItem = controlExit.getItemStack();
 			}
 			inventory.setItem(inventory.getSize() - 9, exitItem);
 			inventory.setItem(inventory.getSize() - 1, exitItem);
-			ItemStack blackPane = ItemHandler.getItem().getItem("STAINED_GLASS_PANE:15", 1, false, "&f", "");
+			ItemStack blackPane = ItemHandler.getItem("STAINED_GLASS_PANE:15", 1, false, "&f", "");
 			inventory.setItem(inventory.getSize() - 3, blackPane);
 			inventory.setItem(inventory.getSize() - 4, blackPane);
 			inventory.setItem(inventory.getSize() - 6, blackPane);
@@ -309,7 +309,7 @@ public class Interface implements InventoryHolder {
     * @return If the inventory clicked is the same as the current inventory page.
     */
 	public boolean clickInventory(InventoryClickEvent event) {
-		if (ServerHandler.getServer().hasSpecificUpdate("1_14")) {
+		if (ServerUtils.hasSpecificUpdate("1_14")) {
 			return (event.getClickedInventory() == event.getWhoClicked().getInventory());
 		} else {
 			final ItemStack clickItem = event.getCurrentItem();
@@ -333,7 +333,7 @@ public class Interface implements InventoryHolder {
     * @param player - The player to have the current inventory page opened.
     */
 	public void open(Player player) {
-		SchedulerUtils.getScheduler().run(() -> {
+		SchedulerUtils.run(() -> {
 			this.renderPage();
 			player.openInventory(this.getInventory());
 		});

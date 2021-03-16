@@ -31,8 +31,8 @@ import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
-import me.RockinChaos.itemjoin.utils.DependAPI;
 import me.RockinChaos.itemjoin.utils.SchedulerUtils;
+import me.RockinChaos.itemjoin.utils.api.DependAPI;
 
 public class Breaking implements Listener {
 	
@@ -46,14 +46,14 @@ public class Breaking implements Listener {
 		final Block block = event.getBlock();
 		final Material material = (block != null ? block.getType() : Material.AIR);
 		final Player player = event.getPlayer();
-		final Collection<ItemStack> drops = block.getDrops(PlayerHandler.getPlayer().getMainHandItem(player));
-		SchedulerUtils.getScheduler().runAsync(() -> {
+		final Collection<ItemStack> drops = block.getDrops(PlayerHandler.getMainHandItem(player));
+		SchedulerUtils.runAsync(() -> {
 			for (ItemMap itemMap: ItemUtilities.getUtilities().getItems()) {
 				if (itemMap.blocksDrop() && block != null && material != Material.AIR && itemMap.getBlocksDrop().containsKey(material) 
-				 && itemMap.inWorld(player.getWorld()) && itemMap.isLimitMode(player.getGameMode()) && itemMap.hasPermission(player) && ItemHandler.getItem().containsMaterial(drops, material) && Math.random() <= itemMap.getBlocksDrop().get(material)) {
+				 && itemMap.inWorld(player.getWorld()) && itemMap.isLimitMode(player.getGameMode()) && itemMap.hasPermission(player) && ItemHandler.containsMaterial(drops, material) && Math.random() <= itemMap.getBlocksDrop().get(material)) {
 					for (String region : ((DependAPI.getDepends(false).getGuard().guardEnabled() && !itemMap.getEnabledRegions().isEmpty()) ? DependAPI.getDepends(false).getGuard().getRegionAtLocation(player.getLocation()).split(", ") : new String[]{"FALSE"})) {
 						if (!DependAPI.getDepends(false).getGuard().guardEnabled() || itemMap.getEnabledRegions().isEmpty() || itemMap.inRegion(region)) { 
-							SchedulerUtils.getScheduler().run(() -> block.getWorld().dropItemNaturally(block.getLocation(), itemMap.getItem(player)));
+							SchedulerUtils.run(() -> block.getWorld().dropItemNaturally(block.getLocation(), itemMap.getItem(player)));
 						}
 					}
 				}

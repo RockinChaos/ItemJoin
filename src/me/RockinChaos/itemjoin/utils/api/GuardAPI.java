@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package me.RockinChaos.itemjoin.utils;
+package me.RockinChaos.itemjoin.utils.api;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -39,9 +39,10 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
-import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
+import me.RockinChaos.itemjoin.utils.ServerUtils;
+import me.RockinChaos.itemjoin.utils.StringUtils;
 import me.RockinChaos.itemjoin.utils.sql.DataObject;
 import me.RockinChaos.itemjoin.utils.sql.SQL;
 import me.RockinChaos.itemjoin.utils.sql.DataObject.Table;
@@ -88,8 +89,8 @@ public class GuardAPI {
 					this.getWorldAdapter = getWorldEditAdapter.getMethod("adapt", World.class);
 					this.getRegionContainer = this.regionContainer.getClass().getMethod("get", getWorldEditWorld);
 				} catch (Exception e) {
-					ServerHandler.getServer().logSevere("{GuardAPI} Failed to bind to WorldGuard, integration will not work!");
-					ServerHandler.getServer().sendDebugTrace(e);
+					ServerUtils.logSevere("{GuardAPI} Failed to bind to WorldGuard, integration will not work!");
+					ServerUtils.sendDebugTrace(e);
 					this.regionContainer = null;
 					return;
 				}
@@ -99,8 +100,8 @@ public class GuardAPI {
 					this.regionContainer = getRegionContainer.invoke(this.worldGuardPlugin);
 					this.getRegionContainer = this.regionContainer.getClass().getMethod("get", World.class);
 				} catch (Exception e) {
-					ServerHandler.getServer().logSevere("{GuardAPI} Failed to bind to WorldGuard, integration will not work!");
-					ServerHandler.getServer().sendDebugTrace(e);
+					ServerUtils.logSevere("{GuardAPI} Failed to bind to WorldGuard, integration will not work!");
+					ServerUtils.sendDebugTrace(e);
 					this.regionContainer = null;
 					return;
 				}
@@ -115,13 +116,13 @@ public class GuardAPI {
 					this.getVector = vectorClass.getMethod("at", Double.TYPE, Double.TYPE, Double.TYPE);
 					this.getRegionManager = RegionManager.class.getMethod("getApplicableRegions", vectorClass);
 				} catch (Exception e2) {
-					ServerHandler.getServer().logSevere("{GuardAPI} Failed to bind to WorldGuard (no Vector class?), integration will not work!");
-					ServerHandler.getServer().sendDebugTrace(e);
+					ServerUtils.logSevere("{GuardAPI} Failed to bind to WorldGuard (no Vector class?), integration will not work!");
+					ServerUtils.sendDebugTrace(e);
 					this.regionContainer = null;
 					return;
 				}
 			}
-			if (this.regionContainer == null) { ServerHandler.getServer().logSevere("{GuardAPI} Failed to find RegionContainer, WorldGuard integration will not function!"); }
+			if (this.regionContainer == null) { ServerUtils.logSevere("{GuardAPI} Failed to find RegionContainer, WorldGuard integration will not function!"); }
 		}
 	}
 	
@@ -172,7 +173,7 @@ public class GuardAPI {
 		ApplicableRegionSet set = null;
 		String regionSet = "";
 		try { set = this.getRegionSet(location); } 
-		catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
+		catch (Exception e) { ServerUtils.sendDebugTrace(e); }
 		if (set == null) { return regionSet; }
 		for (ProtectedRegion r: set) {
 			if (regionSet.isEmpty()) { regionSet += r.getId(); }
@@ -195,8 +196,8 @@ public class GuardAPI {
 					        : this.getVector.invoke(null, location.getX(), location.getY(), location.getZ());
 			return (ApplicableRegionSet) this.getRegionManager.invoke(regionManager, vector);
 		} catch (Exception e) {
-			ServerHandler.getServer().logSevere("{GuardAPI} An error occurred looking up a WorldGuard ApplicableRegionSet.");
-			ServerHandler.getServer().sendDebugTrace(e);
+			ServerUtils.logSevere("{GuardAPI} An error occurred looking up a WorldGuard ApplicableRegionSet.");
+			ServerUtils.sendDebugTrace(e);
 		}
 		return null;
 	}
@@ -218,8 +219,8 @@ public class GuardAPI {
     			regionManager = (RegionManager) this.getRegionContainer.invoke(this.regionContainer, world);
     		}
     	} catch (Exception e) {
-    		ServerHandler.getServer().logSevere("{GuardAPI} An error occurred looking up a WorldGuard RegionManager.");
-    		ServerHandler.getServer().sendDebugTrace(e);
+    		ServerUtils.logSevere("{GuardAPI} An error occurred looking up a WorldGuard RegionManager.");
+    		ServerUtils.sendDebugTrace(e);
     	}
     	return regionManager;
     }
@@ -262,21 +263,21 @@ public class GuardAPI {
     * @param clearAll - If ALL items are being cleared.
     */
 	public void saveReturnItems(final Player player, final String region, final String type, final Inventory craftView, final PlayerInventory inventory, final boolean clearAll) {
-		boolean doReturn = Utils.getUtils().splitIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Options").replace(" ", ""), "RETURN", ",");
+		boolean doReturn = StringUtils.getUtils().splitIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Options").replace(" ", ""), "RETURN", ",");
 		List < ItemMap > protectItems = ItemUtilities.getUtilities().getProtectItems();
-		DataObject dataObject = SQL.getData().getData(new DataObject(Table.IJ_RETURN_ITEMS, PlayerHandler.getPlayer().getPlayerID(player), player.getWorld().getName(), region, ""));
+		DataObject dataObject = SQL.getData().getData(new DataObject(Table.RETURN_ITEMS, PlayerHandler.getPlayerID(player), player.getWorld().getName(), region, ""));
 		if (region != null && !region.isEmpty() && type.equalsIgnoreCase("REGION-ENTER") && doReturn && dataObject == null) {
 			Inventory saveInventory = Bukkit.createInventory(null, 54);
 			for (int i = 0; i <= 47; i++) {
 				for (int k = 0; k < (!protectItems.isEmpty() ? protectItems.size() : 1); k++) {
 					if (i <= 41 && inventory.getSize() >= i && ItemUtilities.getUtilities().canClear(inventory.getItem(i), String.valueOf(i), k, clearAll)) {
 						saveInventory.setItem(i, inventory.getItem(i).clone());
-					} else if (i >= 42 && ItemUtilities.getUtilities().canClear(craftView.getItem(i - 42), "CRAFTING[" + (i - 42) + "]", k, clearAll) && PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
+					} else if (i >= 42 && ItemUtilities.getUtilities().canClear(craftView.getItem(i - 42), "CRAFTING[" + (i - 42) + "]", k, clearAll) && PlayerHandler.isCraftingInv(player.getOpenInventory())) {
 						saveInventory.setItem(i, craftView.getItem(i - 42).clone());
 					}
 				}
 			}
-			SQL.getData().saveData(new DataObject(Table.IJ_RETURN_ITEMS, PlayerHandler.getPlayer().getPlayerID(player), player.getWorld().getName(), region, ItemHandler.getItem().serializeInventory(saveInventory)));
+			SQL.getData().saveData(new DataObject(Table.RETURN_ITEMS, PlayerHandler.getPlayerID(player), player.getWorld().getName(), region, ItemHandler.serializeInventory(saveInventory)));
 		}
 	}
 	
@@ -287,16 +288,16 @@ public class GuardAPI {
     * @param region - The region the items were removed from.
     */
 	public void pasteReturnItems(final Player player, final String region) {
-		if (region != null && !region.isEmpty() && Utils.getUtils().splitIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Options").replace(" ", ""), "RETURN", ",")) {
-			DataObject dataObject = SQL.getData().getData(new DataObject(Table.IJ_RETURN_ITEMS, PlayerHandler.getPlayer().getPlayerID(player), player.getWorld().getName(), region, ""));
-			Inventory inventory = (dataObject != null ? ItemHandler.getItem().deserializeInventory(dataObject.getInventory64().replace(region + ".", "")) : null);
+		if (region != null && !region.isEmpty() && StringUtils.getUtils().splitIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Options").replace(" ", ""), "RETURN", ",")) {
+			DataObject dataObject = SQL.getData().getData(new DataObject(Table.RETURN_ITEMS, PlayerHandler.getPlayerID(player), player.getWorld().getName(), region, ""));
+			Inventory inventory = (dataObject != null ? ItemHandler.deserializeInventory(dataObject.getInventory64().replace(region + ".", "")) : null);
 			for (int i = 47; i >= 0; i--) {
 				if (inventory != null && inventory.getItem(i) != null && inventory.getItem(i).getType() != Material.AIR) {
 					if (i <= 41) {
 						player.getInventory().setItem(i, inventory.getItem(i).clone());
-					} else if (i >= 42 && PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
+					} else if (i >= 42 && PlayerHandler.isCraftingInv(player.getOpenInventory())) {
 						player.getOpenInventory().getTopInventory().setItem(i - 42, inventory.getItem(i).clone());
-						PlayerHandler.getPlayer().updateInventory(player, 1L);
+						PlayerHandler.updateInventory(player, 1L);
 					}
 				}
 				SQL.getData().removeData(dataObject);

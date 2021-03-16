@@ -19,7 +19,7 @@ package me.RockinChaos.itemjoin.listeners.legacy;
 
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
-import me.RockinChaos.itemjoin.utils.Utils;
+import me.RockinChaos.itemjoin.utils.StringUtils;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -41,9 +41,9 @@ public class Legacy_Pickups implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	private void Deprecated_onGlobalPickup(org.bukkit.event.player.PlayerPickupItemEvent event) {
 	  	Player player = event.getPlayer();
-  		if (Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Pickups"), "TRUE") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Pickups"), player.getWorld().getName())
-	  			|| Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Pickups"), "ALL") || Utils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Pickups"), "GLOBAL")) {
-  			if (ConfigHandler.getConfig().isPreventOP() && player.isOp() || ConfigHandler.getConfig().isPreventCreative() && PlayerHandler.getPlayer().isCreativeMode(player)) { } 
+  		if (StringUtils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Pickups"), "TRUE") || StringUtils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Pickups"), player.getWorld().getName())
+	  			|| StringUtils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Pickups"), "ALL") || StringUtils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Pickups"), "GLOBAL")) {
+  			if (ConfigHandler.getConfig().isPreventOP() && player.isOp() || ConfigHandler.getConfig().isPreventCreative() && PlayerHandler.isCreativeMode(player)) { } 
   			else { event.setCancelled(true); }
 	  	}
 	}

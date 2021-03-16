@@ -18,7 +18,8 @@
 package me.RockinChaos.itemjoin.handlers;
 
 import me.RockinChaos.itemjoin.ItemJoin;
-import me.RockinChaos.itemjoin.utils.Utils;
+import me.RockinChaos.itemjoin.utils.ServerUtils;
+import me.RockinChaos.itemjoin.utils.StringUtils;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -69,8 +70,8 @@ public class UpdateHandler {
     */
     public void forceUpdates(final CommandSender sender) {
     	if (this.updateNeeded(sender, false)) {
-    		ServerHandler.getServer().messageSender(sender, "&aAn update has been found!");
-    		ServerHandler.getServer().messageSender(sender, "&aAttempting to update from " + "&ev" + this.localeVersion + " &ato the new "  + "&ev" + this.latestVersion);
+    		ServerUtils.messageSender(sender, "&aAn update has been found!");
+    		ServerUtils.messageSender(sender, "&aAttempting to update from " + "&ev" + this.localeVersion + " &ato the new "  + "&ev" + this.latestVersion);
     		try {
     			String uri = this.HOST.replace("repos/", "").replace("api.", "").replace("latest", "download/" + "v" + this.latestVersion + "/" + ItemJoin.getInstance().getName().toLowerCase() + ".jar") + "?_=" + System.currentTimeMillis();
     			HttpURLConnection httpConnection = (HttpURLConnection) new URL(uri).openConnection();
@@ -88,23 +89,23 @@ public class UpdateHandler {
     				fetchedSize += bytesRead;
     				final int currentProgress = (int)(((double) fetchedSize / (double) cloudFileSize) * 30);
     				if ((((fetchedSize * 100) / cloudFileSize) % 25) == 0 && currentProgress > 10) {
-    					ServerHandler.getServer().messageSender(sender, progressBar.substring(0, currentProgress + 2) + "&c" + progressBar.substring(currentProgress + 2));
+    					ServerUtils.messageSender(sender, progressBar.substring(0, currentProgress + 2) + "&c" + progressBar.substring(currentProgress + 2));
     				}
     			}
     			bout.close(); in.close(); fos.close();
-    			ServerHandler.getServer().messageSender(sender, "&aSuccessfully updated to v" + this.latestVersion + "!");
-    			ServerHandler.getServer().messageSender(sender, "&aYou must restart your server for this to take affect.");
+    			ServerUtils.messageSender(sender, "&aSuccessfully updated to v" + this.latestVersion + "!");
+    			ServerUtils.messageSender(sender, "&aYou must restart your server for this to take affect.");
     		} catch (Exception e) {
-    			ServerHandler.getServer().messageSender(sender, "&cAn error has occurred while trying to update the plugin ItemJoin.");
-    			ServerHandler.getServer().messageSender(sender, "&cPlease try again later, if you continue to see this please contact the plugin developer.");
-    			ServerHandler.getServer().sendDebugTrace(e);
+    			ServerUtils.messageSender(sender, "&cAn error has occurred while trying to update the plugin ItemJoin.");
+    			ServerUtils.messageSender(sender, "&cPlease try again later, if you continue to see this please contact the plugin developer.");
+    			ServerUtils.sendDebugTrace(e);
     		}
     	} else {
     		if (this.betaVersion) {
-    			ServerHandler.getServer().messageSender(sender, "&aYou are running a SNAPSHOT!");
-    			ServerHandler.getServer().messageSender(sender, "&aIf you find any bugs please report them!");
+    			ServerUtils.messageSender(sender, "&aYou are running a SNAPSHOT!");
+    			ServerUtils.messageSender(sender, "&aIf you find any bugs please report them!");
     		}
-    		ServerHandler.getServer().messageSender(sender, "&aYou are up to date!");
+    		ServerUtils.messageSender(sender, "&aYou are up to date!");
     	}
     }
     
@@ -117,25 +118,25 @@ public class UpdateHandler {
     public void checkUpdates(final CommandSender sender, final boolean onStart) {
     	if (this.updateNeeded(sender, onStart) && this.updatesAllowed) {
     		if (this.betaVersion) {
-    			ServerHandler.getServer().messageSender(sender, "&cYour current version: &bv" + this.localeVersion + "-SNAPSHOT");
-    			ServerHandler.getServer().messageSender(sender, "&cThis &bSNAPSHOT &cis outdated and a release version is now available.");
+    			ServerUtils.messageSender(sender, "&cYour current version: &bv" + this.localeVersion + "-SNAPSHOT");
+    			ServerUtils.messageSender(sender, "&cThis &bSNAPSHOT &cis outdated and a release version is now available.");
     		} else {
-    			ServerHandler.getServer().messageSender(sender, "&cYour current version: &bv" + this.localeVersion + "-RELEASE");
+    			ServerUtils.messageSender(sender, "&cYour current version: &bv" + this.localeVersion + "-RELEASE");
     		}
-    		ServerHandler.getServer().messageSender(sender, "&cA new version is available: " + "&av" + this.latestVersion + "-RELEASE");
-    		ServerHandler.getServer().messageSender(sender, "&aGet it from: https://github.com/RockinChaos/" + ItemJoin.getInstance().getName().toLowerCase() + "/releases/latest");
-    		ServerHandler.getServer().messageSender(sender, "&aIf you wish to auto update, please type /ItemJoin Upgrade");
+    		ServerUtils.messageSender(sender, "&cA new version is available: " + "&av" + this.latestVersion + "-RELEASE");
+    		ServerUtils.messageSender(sender, "&aGet it from: https://github.com/RockinChaos/" + ItemJoin.getInstance().getName().toLowerCase() + "/releases/latest");
+    		ServerUtils.messageSender(sender, "&aIf you wish to auto update, please type /ItemJoin Upgrade");
     		this.sendNotifications();
     	} else if (this.updatesAllowed) {
     		if (this.betaVersion) {
-    			ServerHandler.getServer().messageSender(sender, "&aYou are running a SNAPSHOT!");
-    			ServerHandler.getServer().messageSender(sender, "&aIf you find any bugs please report them!");
+    			ServerUtils.messageSender(sender, "&aYou are running a SNAPSHOT!");
+    			ServerUtils.messageSender(sender, "&aIf you find any bugs please report them!");
     		} else if (this.devVersion) {
-    			ServerHandler.getServer().messageSender(sender, "&aYou are running a DEVELOPER SNAPSHOT!");
-    			ServerHandler.getServer().messageSender(sender, "&aIf you find any bugs please report them!");
-    			ServerHandler.getServer().messageSender(sender, "&aYou will not receive any updates requiring you to manually update.");
+    			ServerUtils.messageSender(sender, "&aYou are running a DEVELOPER SNAPSHOT!");
+    			ServerUtils.messageSender(sender, "&aIf you find any bugs please report them!");
+    			ServerUtils.messageSender(sender, "&aYou will not receive any updates requiring you to manually update.");
     		}
-    		ServerHandler.getServer().messageSender(sender, "&aYou are up to date!");
+    		ServerUtils.messageSender(sender, "&aYou are up to date!");
     	}
     }
     
@@ -148,11 +149,11 @@ public class UpdateHandler {
     */
     private boolean updateNeeded(final CommandSender sender, final boolean onStart) {
     	if (this.updatesAllowed) {
-    		if (!onStart) { ServerHandler.getServer().messageSender(sender, "&aChecking for updates..."); }
+    		if (!onStart) { ServerUtils.messageSender(sender, "&aChecking for updates..."); }
     		try {
     			URLConnection connection = new URL(this.HOST + "?_=" + System.currentTimeMillis()).openConnection();
     			BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-    			String JsonString = Utils.getUtils().toString(reader); 
+    			String JsonString = StringUtils.getUtils().toString(reader); 
 			    JSONObject objectReader = (JSONObject) JSONValue.parseWithException(JsonString);
 			    String gitVersion = objectReader.get("tag_name").toString();
     			reader.close();
@@ -169,12 +170,12 @@ public class UpdateHandler {
     			}
     		} catch (Exception e) {
     			e.printStackTrace();
-    			ServerHandler.getServer().messageSender(sender, "&cFailed to check for updates, connection could not be made.");
+    			ServerUtils.messageSender(sender, "&cFailed to check for updates, connection could not be made.");
     			return false;
     		}
     	} else if (!onStart) {
-    		ServerHandler.getServer().messageSender(sender, "&cUpdate checking is currently disabled in the config.yml");
-    		ServerHandler.getServer().messageSender(sender, "&cIf you wish to use the auto update feature, you will need to enable it.");
+    		ServerUtils.messageSender(sender, "&cUpdate checking is currently disabled in the config.yml");
+    		ServerUtils.messageSender(sender, "&cIf you wish to use the auto update feature, you will need to enable it.");
         }
     	return false;
     }
@@ -193,8 +194,8 @@ public class UpdateHandler {
     				playersOnline = ((Collection < ? > ) Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).invoke(null, new Object[0]));
     				for (Object objPlayer: playersOnline) {
     					if (((Player) objPlayer).isOp()) {
-    						ServerHandler.getServer().messageSender(((Player) objPlayer), "&eAn update has been found!");
-    						ServerHandler.getServer().messageSender(((Player) objPlayer), "&ePlease update to the latest version: v" + this.latestVersion);
+    						ServerUtils.messageSender(((Player) objPlayer), "&eAn update has been found!");
+    						ServerUtils.messageSender(((Player) objPlayer), "&ePlease update to the latest version: v" + this.latestVersion);
     					}
     				}
     			}
@@ -202,12 +203,12 @@ public class UpdateHandler {
     			playersOnlineOld = ((Player[]) Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).invoke(null, new Object[0]));
     			for (Player objPlayer: playersOnlineOld) {
     				if (objPlayer.isOp()) {
-						ServerHandler.getServer().messageSender(objPlayer, "&eAn update has been found!");
-						ServerHandler.getServer().messageSender(objPlayer, "&ePlease update to the latest version: v" + this.latestVersion);
+						ServerUtils.messageSender(objPlayer, "&eAn update has been found!");
+						ServerUtils.messageSender(objPlayer, "&ePlease update to the latest version: v" + this.latestVersion);
     				}
     			}
     		}
-    	} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
+    	} catch (Exception e) { ServerUtils.sendDebugTrace(e); }
     }
     
     
