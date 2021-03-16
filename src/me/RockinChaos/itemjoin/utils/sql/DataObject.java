@@ -20,7 +20,7 @@ package me.RockinChaos.itemjoin.utils.sql;
 import java.sql.Timestamp;
 
 public class DataObject {
-	private Table table = Table.IJ_FIRST_JOIN;
+	private Table table = Table.FIRST_JOIN;
 	private Boolean isTemporary = false;
 	private String playerId = new String();
 	private String regionName = new String();
@@ -202,16 +202,16 @@ public class DataObject {
 	public DataObject(Table table, String playerId, String worldName, String object) {
 		if (playerId != null && !playerId.isEmpty()) {
 			this.playerId = playerId;
-		} else if (table.equals(Table.IJ_ENABLED_PLAYERS)) { 
+		} else if (table.equals(Table.ENABLED_PLAYERS)) { 
 			this.playerId = "ALL"; 
 		}
-		if (table.equals(Table.IJ_FIRST_JOIN) || table.equals(Table.IJ_FIRST_WORLD)) {
+		if (table.equals(Table.FIRST_JOIN) || table.equals(Table.FIRST_WORLD)) {
 			this.item = object;
-		} else if (table.equals(Table.IJ_RETURN_CRAFTITEMS) || table.equals(Table.IJ_RETURN_SWITCH_ITEMS)) {
+		} else if (table.equals(Table.RETURN_CRAFTITEMS) || table.equals(Table.RETURN_SWITCH_ITEMS)) {
 			this.inventory64 = object;
-		}else if (table.equals(Table.IJ_FIRST_COMMANDS)) {
+		}else if (table.equals(Table.FIRST_COMMANDS)) {
 			this.command = object;
-		} else if (table.equals(Table.IJ_ENABLED_PLAYERS)) {
+		} else if (table.equals(Table.ENABLED_PLAYERS)) {
 			this.isEnabled = object;
 		}
 		this.table = table;
@@ -231,16 +231,16 @@ public class DataObject {
 	public DataObject(Table table, String playerId, String worldName, String object1, String object2) {
 		if (playerId != null && !playerId.isEmpty()) {
 			this.playerId = playerId;
-		} else if (table.equals(Table.IJ_ENABLED_PLAYERS)) { 
+		} else if (table.equals(Table.ENABLED_PLAYERS)) { 
 			this.playerId = "ALL"; 
 		}
-		if (table.equals(Table.IJ_MAP_IDS)) {
+		if (table.equals(Table.MAP_IDS)) {
 			this.mapImage = object1;
 			this.mapId = object2;
-		} else if (table.equals(Table.IJ_RETURN_ITEMS)) {
+		} else if (table.equals(Table.RETURN_ITEMS)) {
 			this.regionName = object1;
 			this.inventory64 = object2;
-		} else if (table.equals(Table.IJ_IP_LIMITS)) {
+		} else if (table.equals(Table.IP_LIMITS)) {
 			this.item = object1;
 			this.ipAddress = object2;
 		} 
@@ -262,10 +262,10 @@ public class DataObject {
 	public DataObject(Table table, String playerId, String worldName, String object1, String object2, String object3) {
 		if (playerId != null && !playerId.isEmpty()) {
 			this.playerId = playerId;
-		} else if (table.equals(Table.IJ_ENABLED_PLAYERS)) { 
+		} else if (table.equals(Table.ENABLED_PLAYERS)) { 
 			this.playerId = "ALL"; 
 		}
-		if (table.equals(Table.IJ_ON_COOLDOWN)) {
+		if (table.equals(Table.ON_COOLDOWN)) {
 			this.item = object1;
 			this.cooldown = object2;
 			this.duration = object3;
@@ -284,48 +284,48 @@ public class DataObject {
     */	
 	public boolean equalsData(DataObject object1, DataObject object2) {
 		if (object1 == null || object2 == null) { return false; }
-		if (object1.getTable().equals(Table.IJ_FIRST_JOIN)) {
+		if (object1.getTable().equals(Table.FIRST_JOIN)) {
 			if (object1.getPlayerId().equalsIgnoreCase(object2.getPlayerId()) && (object1.getItem().isEmpty() || object1.getItem().equalsIgnoreCase(object2.getItem()))) {
 				return true;
 			}
-		} else if (object1.getTable().equals(Table.IJ_FIRST_WORLD)) {
+		} else if (object1.getTable().equals(Table.FIRST_WORLD)) {
 			if (object1.getPlayerId().equalsIgnoreCase(object2.getPlayerId()) 
 					&& (object1.getWorld().isEmpty() || object1.getWorld().equalsIgnoreCase(object2.getWorld())) 
 					&& (object1.getItem().isEmpty() || object1.getItem().equalsIgnoreCase(object2.getItem()))) {
 				return true;
 			}
-		} else if (object1.getTable().equals(Table.IJ_IP_LIMITS)) {
+		} else if (object1.getTable().equals(Table.IP_LIMITS)) {
 			if ((object1.getItem().isEmpty() && object1.getPlayerId().equalsIgnoreCase(object2.getPlayerId()) 
 					|| (object1.getWorld().equalsIgnoreCase(object2.getWorld()) && object1.getItem().equalsIgnoreCase(object2.getItem()) && object1.getIPAddress().equalsIgnoreCase(object2.getIPAddress())))) {
 				return true;
 			}
-		} else if (object1.getTable().equals(Table.IJ_FIRST_COMMANDS)) {
+		} else if (object1.getTable().equals(Table.FIRST_COMMANDS)) {
 			if (object1.getPlayerId().equalsIgnoreCase(object2.getPlayerId()) && (object1.getWorld().isEmpty() || object1.getWorld().equalsIgnoreCase(object2.getWorld())) 
 					&& (object1.getCommand().isEmpty() || object1.getCommand().equalsIgnoreCase(object2.getCommand()))) {
 				return true;
 			}
-		} else if (object1.getTable().equals(Table.IJ_ENABLED_PLAYERS)) {
+		} else if (object1.getTable().equals(Table.ENABLED_PLAYERS)) {
 			if ((object1.getPlayerId().equalsIgnoreCase(object2.getPlayerId()))
 					&& (object1.getWorld().isEmpty() || (object1.getWorld().equalsIgnoreCase(object2.getWorld()) || object2.getWorld().equalsIgnoreCase("Global")))) {
 				return true;
 			}
-		} else if (object1.getTable().equals(Table.IJ_RETURN_ITEMS)) {
+		} else if (object1.getTable().equals(Table.RETURN_ITEMS)) {
 			if (object1.getPlayerId().equalsIgnoreCase(object2.getPlayerId()) && object1.getRegion().equalsIgnoreCase(object2.getRegion())) {
 				return true;
 			}
-		} else if (object1.getTable().equals(Table.IJ_RETURN_SWITCH_ITEMS)) {
+		} else if (object1.getTable().equals(Table.RETURN_SWITCH_ITEMS)) {
 			if (object1.getPlayerId().equalsIgnoreCase(object2.getPlayerId()) && object1.getWorld().equalsIgnoreCase(object2.getWorld())) {
 				return true;
 			}
-		} else if (object1.getTable().equals(Table.IJ_RETURN_CRAFTITEMS)) {
+		} else if (object1.getTable().equals(Table.RETURN_CRAFTITEMS)) {
 			if (object1.getPlayerId().equalsIgnoreCase(object2.getPlayerId())) {
 				return true;
 			}
-		} else if (object1.getTable().equals(Table.IJ_ON_COOLDOWN)) {
+		} else if (object1.getTable().equals(Table.ON_COOLDOWN)) {
 			if (object1.getItem().equalsIgnoreCase(object2.getItem()) && object1.getCooldown().equalsIgnoreCase(object2.getCooldown())) {
 				return true;
 			}
-		} else if (object1.getTable().equals(Table.IJ_MAP_IDS)) {
+		} else if (object1.getTable().equals(Table.MAP_IDS)) {
 			if (object1.getMapIMG().equalsIgnoreCase(object2.getMapIMG())) {
 				return true;
 			}
@@ -377,16 +377,16 @@ public class DataObject {
 	* 
 	*/ 
     public enum Table {
-       IJ_FIRST_JOIN("`Player_UUID`, `Item_Name`, `Time_Stamp`", "Player_UUID"), 
-       IJ_FIRST_WORLD("`World_Name`, `Player_UUID`, `Item_Name`, `Time_Stamp`", "Player_UUID"), 
-       IJ_IP_LIMITS("`World_Name`, `Player_UUID`, `Item_Name`, `IP_Address`, `Time_Stamp`", "Player_UUID"), 
-       IJ_FIRST_COMMANDS("`World_Name`, `Player_UUID`, `Command_String`, `Time_Stamp`", "Player_UUID"), 
-       IJ_ENABLED_PLAYERS("`World_Name`, `Player_UUID`, `isEnabled`, `Time_Stamp`", "Player_UUID, World_Name"), 
-       IJ_RETURN_ITEMS("`World_Name`, `Region_Name`, `Player_UUID`, `Inventory64`, `Time_Stamp`", "Player_UUID, World_Name, Region_Name"), 
-       IJ_RETURN_SWITCH_ITEMS("`World_Name`, `Player_UUID`, `Inventory64`, `Time_Stamp`", "Player_UUID, World_Name"), 
-       IJ_RETURN_CRAFTITEMS("`Player_UUID`, `Inventory64`, `Time_Stamp`", "Player_UUID"), 
-       IJ_ON_COOLDOWN("`World_Name`, `Player_UUID`, `Item_Name`, `Cooldown`, `Duration`, `Time_Stamp`", "Item_Name"), 
-       IJ_MAP_IDS("`Map_IMG`, `Map_ID`, `Time_Stamp`", "Map_IMG");
+       FIRST_JOIN("`Player_UUID`, `Item_Name`, `Time_Stamp`", "Player_UUID"), 
+       FIRST_WORLD("`World_Name`, `Player_UUID`, `Item_Name`, `Time_Stamp`", "Player_UUID"), 
+       IP_LIMITS("`World_Name`, `Player_UUID`, `Item_Name`, `IP_Address`, `Time_Stamp`", "Player_UUID"), 
+       FIRST_COMMANDS("`World_Name`, `Player_UUID`, `Command_String`, `Time_Stamp`", "Player_UUID"), 
+       ENABLED_PLAYERS("`World_Name`, `Player_UUID`, `isEnabled`, `Time_Stamp`", "Player_UUID, World_Name"), 
+       RETURN_ITEMS("`World_Name`, `Region_Name`, `Player_UUID`, `Inventory64`, `Time_Stamp`", "Player_UUID, World_Name, Region_Name"), 
+       RETURN_SWITCH_ITEMS("`World_Name`, `Player_UUID`, `Inventory64`, `Time_Stamp`", "Player_UUID, World_Name"), 
+       RETURN_CRAFTITEMS("`Player_UUID`, `Inventory64`, `Time_Stamp`", "Player_UUID"), 
+       ON_COOLDOWN("`World_Name`, `Player_UUID`, `Item_Name`, `Cooldown`, `Duration`, `Time_Stamp`", "Item_Name"), 
+       MAP_IDS("`Map_IMG`, `Map_ID`, `Time_Stamp`", "Map_IMG");
     	
     	private String header;
     	private String removal;
@@ -396,6 +396,5 @@ public class DataObject {
     	}
     	public String headers() { return this.header; }
     	public String removal() { return this.removal; }
-    	
     }
 }

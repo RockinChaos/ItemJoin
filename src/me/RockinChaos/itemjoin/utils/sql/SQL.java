@@ -25,8 +25,8 @@ import java.util.Map;
 
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
-import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.utils.SchedulerUtils;
+import me.RockinChaos.itemjoin.utils.ServerUtils;
 import me.RockinChaos.itemjoin.utils.sql.DataObject.Table;
 
 public class SQL {
@@ -43,20 +43,22 @@ public class SQL {
 		Database.kill(); {
 			this.createTables();
 			this.loadData();
-			ServerHandler.getServer().logDebug("{SQL} Database Connected."); 
+			ServerUtils.logDebug("{SQL} Database Connected."); 
 		}
 	}
 	
    /**
-    * Removes ij_* tables from the database.
+    * Removes ItemJoin tables from the database.
     * 
     */
 	public void purgeDatabase() {
 		this.databaseData.clear();
-		SchedulerUtils.getScheduler().runAsync(() -> {
+		SchedulerUtils.runSingleAsync(() -> {
 			for (Table table: Table.values()) {
-				Database.getDatabase().executeStatement("DROP TABLE IF EXISTS " + table.name().toLowerCase());
-			}
+				synchronized("IJ_SQL") {
+					Database.getDatabase().executeStatement("DROP TABLE IF EXISTS " + ConfigHandler.getConfig().getTable() + table.name().toLowerCase());
+				}
+			} { this.createTables(); }
 		});
 	}
 	
@@ -69,11 +71,15 @@ public class SQL {
 		if (object != null) { 
 			String table = object.getTable().name().toLowerCase();
 			if (ItemJoin.getInstance().isEnabled()) {
-				SchedulerUtils.getScheduler().runAsync(() -> {
-					Database.getDatabase().executeStatement("INSERT INTO " + object.getTable().name().toLowerCase() + " (" + object.getTable().headers() + ") VALUES (" + object.getInsertValues() + ")");
+				SchedulerUtils.runSingleAsync(() -> {
+					synchronized("IJ_SQL") {
+						Database.getDatabase().executeStatement("INSERT INTO " + ConfigHandler.getConfig().getTable() + object.getTable().name().toLowerCase() + " (" + object.getTable().headers() + ") VALUES (" + object.getInsertValues() + ")");
+					}
 				});
 			} else {
-				Database.getDatabase().executeStatement("INSERT INTO " + object.getTable().name().toLowerCase() + " (" + object.getTable().headers() + ") VALUES (" + object.getInsertValues() + ")");
+				synchronized("IJ_SQL") {
+					Database.getDatabase().executeStatement("INSERT INTO " + ConfigHandler.getConfig().getTable() + object.getTable().name().toLowerCase() + " (" + object.getTable().headers() + ") VALUES (" + object.getInsertValues() + ")");
+				}
 			}
 			if (this.databaseData.get(table) != null) {
 				List <DataObject> h1 = this.databaseData.get(table);
@@ -101,11 +107,15 @@ public class SQL {
 					DataObject dataObject = dataSet.next();
 					if (dataObject != null && dataObject.getTable().equals(object.getTable()) && object.equalsData(object, dataObject)) {
 						if (ItemJoin.getInstance().isEnabled()) {
-							SchedulerUtils.getScheduler().runAsync(() -> {
-								Database.getDatabase().executeStatement("DELETE FROM " + dataObject.getTable().name().toLowerCase() + " WHERE (" + dataObject.getTable().removal() + ") = (" + dataObject.getRemovalValues() + ")");
+							SchedulerUtils.runSingleAsync(() -> {
+								synchronized("IJ_SQL") {
+									Database.getDatabase().executeStatement("DELETE FROM " + ConfigHandler.getConfig().getTable() + dataObject.getTable().name().toLowerCase() + " WHERE (" + dataObject.getTable().removal() + ") = (" + dataObject.getRemovalValues() + ")");
+								}
 							});
 						} else {
-							Database.getDatabase().executeStatement("DELETE FROM " + dataObject.getTable().name().toLowerCase() + " WHERE (" + dataObject.getTable().removal() + ") = (" + dataObject.getRemovalValues() + ")");
+							synchronized("IJ_SQL") {
+								Database.getDatabase().executeStatement("DELETE FROM " + ConfigHandler.getConfig().getTable() + dataObject.getTable().name().toLowerCase() + " WHERE (" + dataObject.getTable().removal() + ") = (" + dataObject.getRemovalValues() + ")");
+							}
 						}
 						dataSet.remove();
 					}
@@ -164,29 +174,29 @@ public class SQL {
 	private void loadData() {
 		for (Table tableEnum: Table.values()) {
 			String table = tableEnum.name().toLowerCase();
-			List<HashMap<String, String>> selectTable = Database.getDatabase().queryTableData("SELECT * FROM " + table, tableEnum.headers().replace("`", ""));
+			List<HashMap<String, String>> selectTable = Database.getDatabase().queryTableData("SELECT * FROM " + ConfigHandler.getConfig().getTable() + table, tableEnum.headers().replace("`", ""));
 			if (selectTable != null && !selectTable.isEmpty()) {
 				for (HashMap<String, String> sl1 : selectTable) {
 					DataObject dataObject = null;
-					if (tableEnum.equals(Table.IJ_FIRST_JOIN)) {
+					if (tableEnum.equals(Table.FIRST_JOIN)) {
 						dataObject = new DataObject(tableEnum, sl1.get("Player_UUID"), "", sl1.get("Item_Name"));
-					} else if (tableEnum.equals(Table.IJ_FIRST_WORLD)) {
+					} else if (tableEnum.equals(Table.FIRST_WORLD)) {
 						dataObject = new DataObject(tableEnum, sl1.get("Player_UUID"), sl1.get("World_Name"), sl1.get("Item_Name"));
-					} else if (tableEnum.equals(Table.IJ_IP_LIMITS)) {
+					} else if (tableEnum.equals(Table.IP_LIMITS)) {
 						dataObject = new DataObject(tableEnum, sl1.get("Player_UUID"), sl1.get("World_Name"), sl1.get("Item_Name"), sl1.get("IP_Address"));
-					} else if (tableEnum.equals(Table.IJ_FIRST_COMMANDS)) {
+					} else if (tableEnum.equals(Table.FIRST_COMMANDS)) {
 						dataObject = new DataObject(tableEnum, sl1.get("Player_UUID"), sl1.get("World_Name"), sl1.get("Command_String"));
-					} else if (tableEnum.equals(Table.IJ_ENABLED_PLAYERS)) {
+					} else if (tableEnum.equals(Table.ENABLED_PLAYERS)) {
 						dataObject = new DataObject(tableEnum, sl1.get("Player_UUID"), sl1.get("World_Name"), sl1.get("isEnabled"));
-					} else if (tableEnum.equals(Table.IJ_RETURN_ITEMS)) {
+					} else if (tableEnum.equals(Table.RETURN_ITEMS)) {
 						dataObject = new DataObject(tableEnum, sl1.get("Player_UUID"), sl1.get("World_Name"), sl1.get("Region_Name"), sl1.get("Inventory64"));
-					} else if (tableEnum.equals(Table.IJ_RETURN_CRAFTITEMS)) {
+					} else if (tableEnum.equals(Table.RETURN_CRAFTITEMS)) {
 						dataObject = new DataObject(tableEnum, sl1.get("Player_UUID"), "", sl1.get("Inventory64"));
-					} else if (tableEnum.equals(Table.IJ_RETURN_SWITCH_ITEMS)) {
+					} else if (tableEnum.equals(Table.RETURN_SWITCH_ITEMS)) {
 						dataObject = new DataObject(tableEnum, sl1.get("Player_UUID"), sl1.get("World_Name"), sl1.get("Inventory64"));
-					} else if (tableEnum.equals(Table.IJ_ON_COOLDOWN)) {
+					} else if (tableEnum.equals(Table.ON_COOLDOWN)) {
 						dataObject = new DataObject(tableEnum, sl1.get("Player_UUID"), sl1.get("World_Name"), sl1.get("Item_Name"), sl1.get("Cooldown"), sl1.get("Duration"));
-					} else if (tableEnum.equals(Table.IJ_MAP_IDS)) {
+					} else if (tableEnum.equals(Table.MAP_IDS)) {
 						dataObject = new DataObject(tableEnum, null, null, sl1.get("Map_IMG"), sl1.get("Map_ID"));
 					}
 					dataObject.setTimeStamp(sl1.get("Time_Stamp"));
@@ -222,16 +232,16 @@ public class SQL {
     */
 	private void createTables() {
 		this.alterTables(); {
-	        Database.getDatabase().executeStatement("CREATE TABLE IF NOT EXISTS ij_first_join (`Player_UUID` varchar(1000), `Item_Name` varchar(1000), `Time_Stamp` varchar(1000));");
-	        Database.getDatabase().executeStatement("CREATE TABLE IF NOT EXISTS ij_first_world (`World_Name` varchar(1000), `Player_UUID` varchar(1000), `Item_Name` varchar(1000), `Time_Stamp` varchar(1000));");
-	        Database.getDatabase().executeStatement("CREATE TABLE IF NOT EXISTS ij_ip_limits (`World_Name` varchar(1000), `IP_Address` varchar(1000), `Player_UUID` varchar(1000), `Item_Name` varchar(1000), `Time_Stamp` varchar(1000));");
-	        Database.getDatabase().executeStatement("CREATE TABLE IF NOT EXISTS ij_first_commands (`World_Name` varchar(1000), `Player_UUID` varchar(1000), `Command_String` varchar(1000), `Time_Stamp` varchar(1000));");
-	        Database.getDatabase().executeStatement("CREATE TABLE IF NOT EXISTS ij_enabled_players (`World_Name` varchar(1000), `Player_UUID` varchar(1000), `isEnabled` varchar(1000), `Time_Stamp` varchar(1000));");
-	        Database.getDatabase().executeStatement("CREATE TABLE IF NOT EXISTS ij_return_items (`World_Name` varchar(1000), `Region_Name` varchar(1000), `Player_UUID` varchar(1000), `Inventory64` varchar(1000), `Time_Stamp` varchar(1000));");
-	        Database.getDatabase().executeStatement("CREATE TABLE IF NOT EXISTS ij_return_craftitems (`Player_UUID` varchar(1000), `Inventory64` varchar(1000), `Time_Stamp` varchar(1000));");
-	        Database.getDatabase().executeStatement("CREATE TABLE IF NOT EXISTS ij_return_switch_items (`World_Name` varchar(1000), `Player_UUID` varchar(1000), `Inventory64` varchar(1000), `Time_Stamp` varchar(1000));");
-	        Database.getDatabase().executeStatement("CREATE TABLE IF NOT EXISTS ij_on_cooldown (`World_Name` varchar(1000), `Item_Name` varchar(1000), `Player_UUID` varchar(1000), `Cooldown` varchar(1000), `Duration` varchar(1000), `Time_Stamp` varchar(1000));");
-	        Database.getDatabase().executeStatement("CREATE TABLE IF NOT EXISTS ij_map_ids (`Map_IMG` varchar(1000), `Map_ID` varchar(1000), `Time_Stamp` varchar(1000));");
+	        Database.getDatabase().executeStatement("CREATE TABLE IF NOT EXISTS " + ConfigHandler.getConfig().getTable() + "first_join (`Player_UUID` varchar(1000), `Item_Name` varchar(1000), `Time_Stamp` varchar(1000));");
+	        Database.getDatabase().executeStatement("CREATE TABLE IF NOT EXISTS " + ConfigHandler.getConfig().getTable() + "first_world (`World_Name` varchar(1000), `Player_UUID` varchar(1000), `Item_Name` varchar(1000), `Time_Stamp` varchar(1000));");
+	        Database.getDatabase().executeStatement("CREATE TABLE IF NOT EXISTS " + ConfigHandler.getConfig().getTable() + "ip_limits (`World_Name` varchar(1000), `IP_Address` varchar(1000), `Player_UUID` varchar(1000), `Item_Name` varchar(1000), `Time_Stamp` varchar(1000));");
+	        Database.getDatabase().executeStatement("CREATE TABLE IF NOT EXISTS " + ConfigHandler.getConfig().getTable() + "first_commands (`World_Name` varchar(1000), `Player_UUID` varchar(1000), `Command_String` varchar(1000), `Time_Stamp` varchar(1000));");
+	        Database.getDatabase().executeStatement("CREATE TABLE IF NOT EXISTS " + ConfigHandler.getConfig().getTable() + "enabled_players (`World_Name` varchar(1000), `Player_UUID` varchar(1000), `isEnabled` varchar(1000), `Time_Stamp` varchar(1000));");
+	        Database.getDatabase().executeStatement("CREATE TABLE IF NOT EXISTS " + ConfigHandler.getConfig().getTable() + "return_items (`World_Name` varchar(1000), `Region_Name` varchar(1000), `Player_UUID` varchar(1000), `Inventory64` varchar(1000), `Time_Stamp` varchar(1000));");
+	        Database.getDatabase().executeStatement("CREATE TABLE IF NOT EXISTS " + ConfigHandler.getConfig().getTable() + "return_craftitems (`Player_UUID` varchar(1000), `Inventory64` varchar(1000), `Time_Stamp` varchar(1000));");
+	        Database.getDatabase().executeStatement("CREATE TABLE IF NOT EXISTS " + ConfigHandler.getConfig().getTable() + "return_switch_items (`World_Name` varchar(1000), `Player_UUID` varchar(1000), `Inventory64` varchar(1000), `Time_Stamp` varchar(1000));");
+	        Database.getDatabase().executeStatement("CREATE TABLE IF NOT EXISTS " + ConfigHandler.getConfig().getTable() + "on_cooldown (`World_Name` varchar(1000), `Item_Name` varchar(1000), `Player_UUID` varchar(1000), `Cooldown` varchar(1000), `Duration` varchar(1000), `Time_Stamp` varchar(1000));");
+	        Database.getDatabase().executeStatement("CREATE TABLE IF NOT EXISTS " + ConfigHandler.getConfig().getTable() + "map_ids (`Map_IMG` varchar(1000), `Map_ID` varchar(1000), `Time_Stamp` varchar(1000));");
 		}
 	}
 	
@@ -240,55 +250,30 @@ public class SQL {
     * 
     */
 	private void alterTables() {
-		// Change legacy table names to include the ij_ prefix.
-		if (!Database.getDatabase().tableExists("ij_first_join") && Database.getDatabase().tableExists("first_join")) {
-			Database.getDatabase().executeStatement("ALTER TABLE first_join RENAME TO ij_first_join;");
-		}
-		if (!Database.getDatabase().tableExists("ij_first_world") && Database.getDatabase().tableExists("first_world")) {
-			Database.getDatabase().executeStatement("ALTER TABLE first_world RENAME TO ij_first_world;");
-		}
-		if (!Database.getDatabase().tableExists("ij_ip_limits") && Database.getDatabase().tableExists("ip_limits")) {
-			Database.getDatabase().executeStatement("ALTER TABLE ip_limits RENAME TO ij_ip_limits;");
-		}
-		if (!Database.getDatabase().tableExists("ij_first_commands") && Database.getDatabase().tableExists("first_commands")) {
-			Database.getDatabase().executeStatement("ALTER TABLE first_commands RENAME TO ij_first_commands;");
-		}
-		if (!Database.getDatabase().tableExists("ij_enabled_players") && Database.getDatabase().tableExists("enabled_players")) {
-			Database.getDatabase().executeStatement("ALTER TABLE enabled_players RENAME TO ij_enabled_players;");
-		}
-		if (!Database.getDatabase().tableExists("ij_return_items") && Database.getDatabase().tableExists("return_items")) {
-			Database.getDatabase().executeStatement("ALTER TABLE return_items RENAME TO ij_return_items;");
-		}
-		if (!Database.getDatabase().tableExists("ij_return_craftitems") && Database.getDatabase().tableExists("return_craftitems")) {
-			Database.getDatabase().executeStatement("ALTER TABLE return_craftitems RENAME TO ij_return_craftitems;");
-		}
-		if (!Database.getDatabase().tableExists("ij_map_ids") && Database.getDatabase().tableExists("map_ids")) {
-			Database.getDatabase().executeStatement("ALTER TABLE map_ids RENAME TO ij_map_ids;");
-		}
 		// Removes legacy columns from legacy tables.
-		if (Database.getDatabase().tableExists("ij_first_join") && Database.getDatabase().columnExists("SELECT Player_Name FROM ij_first_join")) {
-			Database.getDatabase().executeStatement("CREATE TEMPORARY TABLE ij_first_join_backup (`Player_UUID` varchar(1000), `Item_Name` varchar(1000), `Time_Stamp` varchar(1000));");
-			Database.getDatabase().executeStatement("INSERT INTO ij_first_join_backup SELECT Player_UUID,Item_Name,Time_Stamp FROM ij_first_join;");
-			Database.getDatabase().executeStatement("DROP TABLE ij_first_join");
-			Database.getDatabase().executeStatement("CREATE TABLE ij_first_join (`Player_UUID` varchar(1000), `Item_Name` varchar(1000), `Time_Stamp` varchar(1000));");
-			Database.getDatabase().executeStatement("INSERT INTO ij_first_join SELECT Player_UUID,Item_Name,Time_Stamp FROM ij_first_join_backup;");
-			Database.getDatabase().executeStatement("DROP TABLE ij_first_join_backup");
+		if (Database.getDatabase().tableExists(ConfigHandler.getConfig().getTable() + "first_join") && Database.getDatabase().columnExists("SELECT Player_Name FROM " + ConfigHandler.getConfig().getTable() + "first_join")) {
+			Database.getDatabase().executeStatement("CREATE TEMPORARY TABLE " + ConfigHandler.getConfig().getTable() + "first_join_backup (`Player_UUID` varchar(1000), `Item_Name` varchar(1000), `Time_Stamp` varchar(1000));");
+			Database.getDatabase().executeStatement("INSERT INTO " + ConfigHandler.getConfig().getTable() + "first_join_backup SELECT Player_UUID,Item_Name,Time_Stamp FROM " + ConfigHandler.getConfig().getTable() + "first_join;");
+			Database.getDatabase().executeStatement("DROP TABLE " + ConfigHandler.getConfig().getTable() + "first_join");
+			Database.getDatabase().executeStatement("CREATE TABLE " + ConfigHandler.getConfig().getTable() + "first_join (`Player_UUID` varchar(1000), `Item_Name` varchar(1000), `Time_Stamp` varchar(1000));");
+			Database.getDatabase().executeStatement("INSERT INTO " + ConfigHandler.getConfig().getTable() + "first_join SELECT Player_UUID,Item_Name,Time_Stamp FROM " + ConfigHandler.getConfig().getTable() + "first_join_backup;");
+			Database.getDatabase().executeStatement("DROP TABLE " + ConfigHandler.getConfig().getTable() + "first_join_backup");
 		}
-		if (Database.getDatabase().tableExists("ij_first_world") && Database.getDatabase().columnExists("SELECT Player_Name FROM ij_first_world")) {
-			Database.getDatabase().executeStatement("CREATE TEMPORARY TABLE ij_first_world_backup (`World_Name` varchar(1000), `Player_UUID` varchar(1000), `Item_Name` varchar(1000), `Time_Stamp` varchar(1000));");
-			Database.getDatabase().executeStatement("INSERT INTO ij_first_world_backup SELECT World_Name,Player_UUID,Item_Name,Time_Stamp FROM ij_first_world;");
-			Database.getDatabase().executeStatement("DROP TABLE ij_first_world");
-			Database.getDatabase().executeStatement("CREATE TABLE ij_first_world (`World_Name` varchar(1000), `Player_UUID` varchar(1000), `Item_Name` varchar(1000), `Time_Stamp` varchar(1000));");
-			Database.getDatabase().executeStatement("INSERT INTO ij_first_world SELECT World_Name,Player_UUID,Item_Name,Time_Stamp FROM ij_first_world_backup;");
-			Database.getDatabase().executeStatement("DROP TABLE ij_first_world_backup");
+		if (Database.getDatabase().tableExists(ConfigHandler.getConfig().getTable() + "first_world") && Database.getDatabase().columnExists("SELECT Player_Name FROM " + ConfigHandler.getConfig().getTable() + "first_world")) {
+			Database.getDatabase().executeStatement("CREATE TEMPORARY TABLE " + ConfigHandler.getConfig().getTable() + "first_world_backup (`World_Name` varchar(1000), `Player_UUID` varchar(1000), `Item_Name` varchar(1000), `Time_Stamp` varchar(1000));");
+			Database.getDatabase().executeStatement("INSERT INTO " + ConfigHandler.getConfig().getTable() + "first_world_backup SELECT World_Name,Player_UUID,Item_Name,Time_Stamp FROM " + ConfigHandler.getConfig().getTable() + "first_world;");
+			Database.getDatabase().executeStatement("DROP TABLE " + ConfigHandler.getConfig().getTable() + "first_world");
+			Database.getDatabase().executeStatement("CREATE TABLE " + ConfigHandler.getConfig().getTable() + "first_world (`World_Name` varchar(1000), `Player_UUID` varchar(1000), `Item_Name` varchar(1000), `Time_Stamp` varchar(1000));");
+			Database.getDatabase().executeStatement("INSERT INTO " + ConfigHandler.getConfig().getTable() + "first_world SELECT World_Name,Player_UUID,Item_Name,Time_Stamp FROM " + ConfigHandler.getConfig().getTable() + "first_world_backup;");
+			Database.getDatabase().executeStatement("DROP TABLE " + ConfigHandler.getConfig().getTable() + "first_world_backup");
 		}
-		if (Database.getDatabase().tableExists("ij_enabled_players") && Database.getDatabase().columnExists("SELECT Player_Name FROM ij_enabled_players")) {
-			Database.getDatabase().executeStatement("CREATE TEMPORARY TABLE ij_enabled_players_backup (`World_Name` varchar(1000), `Player_UUID` varchar(1000), `isEnabled` varchar(1000), `Time_Stamp` varchar(1000));");
-			Database.getDatabase().executeStatement("INSERT INTO ij_enabled_players_backup SELECT World_Name,Player_UUID,isEnabled,Time_Stamp FROM ij_enabled_players;");
-			Database.getDatabase().executeStatement("DROP TABLE ij_enabled_players");
-			Database.getDatabase().executeStatement("CREATE TABLE ij_enabled_players (`World_Name` varchar(1000), `Player_UUID` varchar(1000), `isEnabled` varchar(1000), `Time_Stamp` varchar(1000));");
-			Database.getDatabase().executeStatement("INSERT INTO ij_enabled_players SELECT World_Name,Player_UUID,isEnabled,Time_Stamp FROM ij_enabled_players_backup;");
-			Database.getDatabase().executeStatement("DROP TABLE ij_enabled_players_backup");
+		if (Database.getDatabase().tableExists(ConfigHandler.getConfig().getTable() + "enabled_players") && Database.getDatabase().columnExists("SELECT Player_Name FROM " + ConfigHandler.getConfig().getTable() + "enabled_players")) {
+			Database.getDatabase().executeStatement("CREATE TEMPORARY TABLE " + ConfigHandler.getConfig().getTable() + "enabled_players_backup (`World_Name` varchar(1000), `Player_UUID` varchar(1000), `isEnabled` varchar(1000), `Time_Stamp` varchar(1000));");
+			Database.getDatabase().executeStatement("INSERT INTO " + ConfigHandler.getConfig().getTable() + "enabled_players_backup SELECT World_Name,Player_UUID,isEnabled,Time_Stamp FROM " + ConfigHandler.getConfig().getTable() + "enabled_players;");
+			Database.getDatabase().executeStatement("DROP TABLE " + ConfigHandler.getConfig().getTable() + "enabled_players");
+			Database.getDatabase().executeStatement("CREATE TABLE " + ConfigHandler.getConfig().getTable() + "enabled_players (`World_Name` varchar(1000), `Player_UUID` varchar(1000), `isEnabled` varchar(1000), `Time_Stamp` varchar(1000));");
+			Database.getDatabase().executeStatement("INSERT INTO " + ConfigHandler.getConfig().getTable() + "enabled_players SELECT World_Name,Player_UUID,isEnabled,Time_Stamp FROM " + ConfigHandler.getConfig().getTable() + "enabled_players_backup;");
+			Database.getDatabase().executeStatement("DROP TABLE " + ConfigHandler.getConfig().getTable() + "enabled_players_backup");
 		}
 	}
 	
