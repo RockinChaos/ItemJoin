@@ -88,7 +88,7 @@ public class ServerUtils {
     * 
     * @param message - The unformatted message text to be sent.
     */
-	public static void logDsev(String message) {
+	public static void logDev(String message) {
 		String prefix = "[ItemJoin_DEVELOPER] ";
 		message = prefix + message;
 		if (message.equalsIgnoreCase("") || message.isEmpty()) { message = ""; }
