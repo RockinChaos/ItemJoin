@@ -73,18 +73,18 @@ import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PermissionsHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
-import me.RockinChaos.itemjoin.handlers.ServerHandler;
 import me.RockinChaos.itemjoin.item.ItemCommand.Action;
 import me.RockinChaos.itemjoin.item.ItemCommand.CommandSequence;
-import me.RockinChaos.itemjoin.utils.DependAPI;
-import me.RockinChaos.itemjoin.utils.EffectAPI;
-import me.RockinChaos.itemjoin.utils.LanguageAPI;
-import me.RockinChaos.itemjoin.utils.LegacyAPI;
-import me.RockinChaos.itemjoin.utils.Reflection;
+import me.RockinChaos.itemjoin.utils.ReflectionUtils;
 import me.RockinChaos.itemjoin.utils.SchedulerUtils;
-import me.RockinChaos.itemjoin.utils.UI;
-import me.RockinChaos.itemjoin.utils.Utils;
+import me.RockinChaos.itemjoin.utils.ServerUtils;
+import me.RockinChaos.itemjoin.utils.api.DependAPI;
+import me.RockinChaos.itemjoin.utils.api.EffectAPI;
+import me.RockinChaos.itemjoin.utils.api.LanguageAPI;
+import me.RockinChaos.itemjoin.utils.api.LegacyAPI;
+import me.RockinChaos.itemjoin.utils.StringUtils;
 import me.RockinChaos.itemjoin.utils.enchants.Glow;
+import me.RockinChaos.itemjoin.utils.interfaces.pages.InterMenu;
 import me.RockinChaos.itemjoin.utils.sql.DataObject;
 import me.RockinChaos.itemjoin.utils.sql.SQL;
 import me.RockinChaos.itemjoin.utils.sql.DataObject.Table;
@@ -302,7 +302,7 @@ public class ItemMap {
         this.configName = internalName;
         this.setItemValue(ConfigHandler.getConfig().getItemID(slot));
         this.setSlot(slot);
-        if (ItemHandler.getItem().isCraftingSlot(slot)) { this.craftingItem = true; }
+        if (ItemHandler.isCraftingSlot(slot)) { this.craftingItem = true; }
         
         if (this.nodeLocation != null) {
         	this.setMultipleSlots();
@@ -347,7 +347,7 @@ public class ItemMap {
     * 
     */
 	private void setMultipleSlots() {
-        if (this.nodeLocation.getString(".slot").contains(",")) {
+        if (this.nodeLocation.getString(".slot") != null && !this.nodeLocation.getString(".slot").isEmpty() && this.nodeLocation.getString(".slot").contains(",")) {
         	String[] slots = this.nodeLocation.getString(".slot").replace(" ", "").split(",");
 			for (String s: slots) { this.AllSlots.add(s); }
         }
@@ -359,7 +359,7 @@ public class ItemMap {
     */
 	private void setCommandCost() {
 		if (this.nodeLocation.getString("commands-item") != null && !this.nodeLocation.getString("commands-item").isEmpty()) { this.itemCost = this.nodeLocation.getString("commands-item"); }
-		if (this.nodeLocation.getString("commands-cost") != null && Utils.getUtils().isInt(this.nodeLocation.getString("commands-cost"))) { this.cost = this.nodeLocation.getInt("commands-cost"); }
+		if (this.nodeLocation.getString("commands-cost") != null && StringUtils.getUtils().isInt(this.nodeLocation.getString("commands-cost"))) { this.cost = this.nodeLocation.getInt("commands-cost"); }
 	}
 	
    /**
@@ -367,7 +367,7 @@ public class ItemMap {
     * 
     */
 	private void setCommandReceive() {
-		if (this.nodeLocation.getString("commands-receive") != null && Utils.getUtils().isInt(this.nodeLocation.getString("commands-receive"))) { this.commandsReceive = this.nodeLocation.getInt("commands-receive"); }
+		if (this.nodeLocation.getString("commands-receive") != null && StringUtils.getUtils().isInt(this.nodeLocation.getString("commands-receive"))) { this.commandsReceive = this.nodeLocation.getInt("commands-receive"); }
 	}
 	
    /**
@@ -375,7 +375,7 @@ public class ItemMap {
     * 
     */
 	private void setCommandWarmDelay() {
-		if (this.nodeLocation.getString("commands-warmup") != null && Utils.getUtils().isInt(this.nodeLocation.getString("commands-warmup"))) { this.warmDelay = this.nodeLocation.getInt("commands-warmup"); }
+		if (this.nodeLocation.getString("commands-warmup") != null && StringUtils.getUtils().isInt(this.nodeLocation.getString("commands-warmup"))) { this.warmDelay = this.nodeLocation.getInt("commands-warmup"); }
 	}
 	
    /**
@@ -385,8 +385,8 @@ public class ItemMap {
 	private void setCommandSound() {
 		try { if (this.nodeLocation.getString(".commands-sound") != null) { this.commandSound = Sound.valueOf(this.nodeLocation.getString(".commands-sound")); } } 
 		catch (Exception e) { 
-			ServerHandler.getServer().logSevere("{ItemMap} Your server is running MC " + Reflection.getReflection().getServerVersion() + " and this version of Minecraft does not have the defined command-sound " + this.nodeLocation.getString(".commands-sound") + "."); 
-			ServerHandler.getServer().sendDebugTrace(e);
+			ServerUtils.logSevere("{ItemMap} Your server is running MC " + ReflectionUtils.getServerVersion() + " and this version of Minecraft does not have the defined command-sound " + this.nodeLocation.getString(".commands-sound") + "."); 
+			ServerUtils.sendDebugTrace(e);
 		}
 	}
 	
@@ -414,11 +414,11 @@ public class ItemMap {
     */
 	private void setCommandSequence() {
 		if (this.nodeLocation.getString("commands-sequence") != null) { 
-		    if (Utils.getUtils().containsIgnoreCase(this.nodeLocation.getString("commands-sequence"), "SEQUENTIAL")) { this.sequence = CommandSequence.SEQUENTIAL; }
-		    else if (Utils.getUtils().containsIgnoreCase(this.nodeLocation.getString("commands-sequence"), "RANDOM_SINGLE")) { this.sequence = CommandSequence.RANDOM_SINGLE; }
-		    else if (Utils.getUtils().containsIgnoreCase(this.nodeLocation.getString("commands-sequence"), "RANDOM_LIST")) { this.sequence = CommandSequence.RANDOM_LIST; }
-			else if (Utils.getUtils().containsIgnoreCase(this.nodeLocation.getString("commands-sequence"), "RANDOM")) { this.sequence = CommandSequence.RANDOM; }
-		    else if (Utils.getUtils().containsIgnoreCase(this.nodeLocation.getString("commands-sequence"), "REMAIN")) { this.sequence = CommandSequence.REMAIN; }
+		    if (StringUtils.getUtils().containsIgnoreCase(this.nodeLocation.getString("commands-sequence"), "SEQUENTIAL")) { this.sequence = CommandSequence.SEQUENTIAL; }
+		    else if (StringUtils.getUtils().containsIgnoreCase(this.nodeLocation.getString("commands-sequence"), "RANDOM_SINGLE")) { this.sequence = CommandSequence.RANDOM_SINGLE; }
+		    else if (StringUtils.getUtils().containsIgnoreCase(this.nodeLocation.getString("commands-sequence"), "RANDOM_LIST")) { this.sequence = CommandSequence.RANDOM_LIST; }
+			else if (StringUtils.getUtils().containsIgnoreCase(this.nodeLocation.getString("commands-sequence"), "RANDOM")) { this.sequence = CommandSequence.RANDOM; }
+		    else if (StringUtils.getUtils().containsIgnoreCase(this.nodeLocation.getString("commands-sequence"), "REMAIN")) { this.sequence = CommandSequence.REMAIN; }
 		}
 	}
 	
@@ -439,39 +439,39 @@ public class ItemMap {
 	private void setItemflags() {
 		if (this.nodeLocation.getString(".itemflags") != null) {
 			this.itemflags = this.nodeLocation.getString(".itemflags");
-			this.vanillaItem = Utils.getUtils().containsIgnoreCase(this.itemflags, "vanilla");
-			this.vanillaStatus = Utils.getUtils().containsIgnoreCase(this.itemflags, "vanilla-status");
-			this.vanillaControl = Utils.getUtils().containsIgnoreCase(this.itemflags, "vanilla-control");
-			this.disposable = Utils.getUtils().containsIgnoreCase(this.itemflags, "disposable");
-			this.blockPlacement = Utils.getUtils().containsIgnoreCase(this.itemflags, "placement");
-			this.blockMovement = Utils.getUtils().containsIgnoreCase(this.itemflags, "inventory-modify") || Utils.getUtils().containsIgnoreCase(this.itemflags, "inventory-close");
-			this.closeInventory = Utils.getUtils().containsIgnoreCase(this.itemflags, "inventory-close");
-			this.itemChangable = Utils.getUtils().containsIgnoreCase(this.itemflags, "allow-modifications") || Utils.getUtils().containsIgnoreCase(this.itemflags, "item-changable");
-			this.alwaysGive = Utils.getUtils().containsIgnoreCase(this.itemflags, "always-give");
-			this.autoRemove = Utils.getUtils().containsIgnoreCase(this.itemflags, "auto-remove");
-			this.stackable = Utils.getUtils().containsIgnoreCase(this.itemflags, "stackable");
-			this.selectable = Utils.getUtils().containsIgnoreCase(this.itemflags, "selectable");
-			this.dynamic = Utils.getUtils().containsIgnoreCase(this.itemflags, "dynamic");
-			this.animate = Utils.getUtils().containsIgnoreCase(this.itemflags, "animate");
-			this.glowing = Utils.getUtils().containsIgnoreCase(this.itemflags, "glowing") || Utils.getUtils().containsIgnoreCase(this.itemflags, "glow");
-			this.giveNext = Utils.getUtils().containsIgnoreCase(this.itemflags, "give-next");
-			this.moveNext = Utils.getUtils().containsIgnoreCase(this.itemflags, "move-next");
-			this.dropFull = Utils.getUtils().containsIgnoreCase(this.itemflags, "drop-full");
-			this.itemStore = Utils.getUtils().containsIgnoreCase(this.itemflags, "item-store");
-			this.itemModify = Utils.getUtils().containsIgnoreCase(this.itemflags, "item-modifiable");
-			this.noCrafting = Utils.getUtils().containsIgnoreCase(this.itemflags, "item-craftable");
-			this.noRepairing = Utils.getUtils().containsIgnoreCase(this.itemflags, "item-repairable");
-			this.cancelEvents = Utils.getUtils().containsIgnoreCase(this.itemflags, "cancel-events");
-			this.countLock = Utils.getUtils().containsIgnoreCase(this.itemflags, "count-lock");
-			this.setOnlyFirstJoin(Utils.getUtils().containsIgnoreCase(this.itemflags, "first-join"));
-			this.setOnlyFirstLife(Utils.getUtils().containsIgnoreCase(this.itemflags, "first-life"));
-			this.onlyFirstWorld = Utils.getUtils().containsIgnoreCase(this.itemflags, "first-world");
-			this.overwritable = Utils.getUtils().containsIgnoreCase(this.itemflags, "overwrite");
-			this.ipLimited = Utils.getUtils().containsIgnoreCase(this.itemflags, "ip-limit");
-			this.deathDroppable = Utils.getUtils().containsIgnoreCase(this.itemflags, "death-drops");
-			this.selfDroppable = Utils.getUtils().containsIgnoreCase(this.itemflags, "self-drops");
-			this.AllowOpBypass = Utils.getUtils().containsIgnoreCase(this.itemflags, "AllowOpBypass");
-			this.CreativeBypass = Utils.getUtils().containsIgnoreCase(this.itemflags, "CreativeBypass");
+			this.vanillaItem = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "vanilla");
+			this.vanillaStatus = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "vanilla-status");
+			this.vanillaControl = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "vanilla-control");
+			this.disposable = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "disposable");
+			this.blockPlacement = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "placement");
+			this.blockMovement = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "inventory-modify") || StringUtils.getUtils().containsIgnoreCase(this.itemflags, "inventory-close");
+			this.closeInventory = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "inventory-close");
+			this.itemChangable = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "allow-modifications") || StringUtils.getUtils().containsIgnoreCase(this.itemflags, "item-changable");
+			this.alwaysGive = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "always-give");
+			this.autoRemove = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "auto-remove");
+			this.stackable = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "stackable");
+			this.selectable = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "selectable");
+			this.dynamic = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "dynamic");
+			this.animate = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "animate");
+			this.glowing = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "glowing") || StringUtils.getUtils().containsIgnoreCase(this.itemflags, "glow");
+			this.giveNext = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "give-next");
+			this.moveNext = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "move-next");
+			this.dropFull = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "drop-full");
+			this.itemStore = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "item-store");
+			this.itemModify = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "item-modifiable");
+			this.noCrafting = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "item-craftable");
+			this.noRepairing = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "item-repairable");
+			this.cancelEvents = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "cancel-events");
+			this.countLock = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "count-lock");
+			this.setOnlyFirstJoin(StringUtils.getUtils().containsIgnoreCase(this.itemflags, "first-join"));
+			this.setOnlyFirstLife(StringUtils.getUtils().containsIgnoreCase(this.itemflags, "first-life"));
+			this.onlyFirstWorld = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "first-world");
+			this.overwritable = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "overwrite");
+			this.ipLimited = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "ip-limit");
+			this.deathDroppable = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "death-drops");
+			this.selfDroppable = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "self-drops");
+			this.AllowOpBypass = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "AllowOpBypass");
+			this.CreativeBypass = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "CreativeBypass");
 		}
 	}
 	
@@ -490,30 +490,30 @@ public class ItemMap {
 	private void setTriggers() {
 		if (this.nodeLocation.getString("triggers") != null) {
 			this.triggers = this.nodeLocation.getString("triggers");
-			this.giveOnDisabled = Utils.getUtils().containsIgnoreCase(this.triggers, "DISABLED");
-			this.giveOnJoin = Utils.getUtils().containsIgnoreCase(this.triggers, "JOIN");
-			this.giveOnRespawn = Utils.getUtils().containsIgnoreCase(this.triggers, "RESPAWN");
-			if (Utils.getUtils().containsIgnoreCase(this.triggers, "FIRST-JOIN")) { 
+			this.giveOnDisabled = StringUtils.getUtils().containsIgnoreCase(this.triggers, "DISABLED");
+			this.giveOnJoin = StringUtils.getUtils().containsIgnoreCase(this.triggers, "JOIN");
+			this.giveOnRespawn = StringUtils.getUtils().containsIgnoreCase(this.triggers, "RESPAWN");
+			if (StringUtils.getUtils().containsIgnoreCase(this.triggers, "FIRST-JOIN")) { 
 				this.onlyFirstJoin = true;
 				this.giveOnJoin = true;
 			}
-			if (Utils.getUtils().containsIgnoreCase(this.triggers, "FIRST-LIFE")) {
+			if (StringUtils.getUtils().containsIgnoreCase(this.triggers, "FIRST-LIFE")) {
 				this.onlyFirstLife = true;
 				this.giveOnJoin = true;
 				this.giveOnRespawn = true;
 			}
-		    this.giveOnWorldSwitch = Utils.getUtils().containsIgnoreCase(this.triggers, "WORLD-CHANGE") || Utils.getUtils().containsIgnoreCase(this.triggers, "WORLD-SWITCH");
-			if (Utils.getUtils().containsIgnoreCase(this.triggers, "FIRST-WORLD")) { 
+		    this.giveOnWorldSwitch = StringUtils.getUtils().containsIgnoreCase(this.triggers, "WORLD-CHANGE") || StringUtils.getUtils().containsIgnoreCase(this.triggers, "WORLD-SWITCH");
+			if (StringUtils.getUtils().containsIgnoreCase(this.triggers, "FIRST-WORLD")) { 
 				this.giveOnJoin = true;
 				this.onlyFirstWorld = true;
 				this.giveOnWorldSwitch = true;
 			}
-			this.giveOnRegionEnter = Utils.getUtils().containsIgnoreCase(this.triggers, "REGION-ENTER");
-			this.giveOnRegionLeave = Utils.getUtils().containsIgnoreCase(this.triggers, "REGION-REMOVE") || Utils.getUtils().containsIgnoreCase(this.triggers, "REGION-EXIT") || Utils.getUtils().containsIgnoreCase(this.triggers, "REGION-LEAVE");
-			this.giveOnRegionAccess = Utils.getUtils().containsIgnoreCase(this.triggers, "REGION-ACCESS");
-			this.giveOnRegionEgress = Utils.getUtils().containsIgnoreCase(this.triggers, "REGION-EGRESS"); 
+			this.giveOnRegionEnter = StringUtils.getUtils().containsIgnoreCase(this.triggers, "REGION-ENTER");
+			this.giveOnRegionLeave = StringUtils.getUtils().containsIgnoreCase(this.triggers, "REGION-REMOVE") || StringUtils.getUtils().containsIgnoreCase(this.triggers, "REGION-EXIT") || StringUtils.getUtils().containsIgnoreCase(this.triggers, "REGION-LEAVE");
+			this.giveOnRegionAccess = StringUtils.getUtils().containsIgnoreCase(this.triggers, "REGION-ACCESS");
+			this.giveOnRegionEgress = StringUtils.getUtils().containsIgnoreCase(this.triggers, "REGION-EGRESS"); 
 			if (this.giveOnRegionAccess || this.giveOnRegionEgress) { this.giveOnRegionEnter = false; this.giveOnRegionLeave = false; }
-			this.useOnLimitSwitch = Utils.getUtils().containsIgnoreCase(this.triggers, "GAMEMODE-SWITCH");
+			this.useOnLimitSwitch = StringUtils.getUtils().containsIgnoreCase(this.triggers, "GAMEMODE-SWITCH");
 		} else { this.giveOnJoin = true; }
 	}
 	
@@ -522,10 +522,10 @@ public class ItemMap {
     * 
     */
 	public void setContents() {
-		if (this.material != null && Utils.getUtils().containsIgnoreCase(this.getMaterial().toString(), "SHULKER") && this.nodeLocation.getString(".contents") != null && this.nodeLocation.getStringList(".contents") != null && !this.nodeLocation.getStringList(".contents").isEmpty()) {
+		if (this.material != null && StringUtils.getUtils().containsIgnoreCase(this.getMaterial().toString(), "SHULKER") && this.nodeLocation.getString(".contents") != null && this.nodeLocation.getStringList(".contents") != null && !this.nodeLocation.getStringList(".contents").isEmpty()) {
 			this.contents = this.nodeLocation.getStringList(".contents");
-		} else if (this.material != null && !Utils.getUtils().containsIgnoreCase(this.getMaterial().toString(), "SHULKER") && this.nodeLocation.getString(".contents") != null && this.nodeLocation.getStringList(".contents") != null && !this.nodeLocation.getStringList(".contents").isEmpty()) {
-			ServerHandler.getServer().logWarn("{ItemMap} The item " + this.getConfigName() + " cannot have contents set as it does not support it.");
+		} else if (this.material != null && !StringUtils.getUtils().containsIgnoreCase(this.getMaterial().toString(), "SHULKER") && this.nodeLocation.getString(".contents") != null && this.nodeLocation.getStringList(".contents") != null && !this.nodeLocation.getStringList(".contents").isEmpty()) {
+			ServerUtils.logWarn("{ItemMap} The item " + this.getConfigName() + " cannot have contents set as it does not support it.");
 		}
 	}
 	
@@ -607,11 +607,11 @@ public class ItemMap {
     */
 	private void setPlayersOnCooldown() {
 		if (this.cooldownSeconds > 0) {
-			List<DataObject> dataList = SQL.getData().getDataList(new DataObject(Table.IJ_ON_COOLDOWN, null, null, this.getConfigName(), String.valueOf(this.getCommandCooldown()), null));
+			List<DataObject> dataList = SQL.getData().getDataList(new DataObject(Table.ON_COOLDOWN, null, null, this.getConfigName(), String.valueOf(this.getCommandCooldown()), null));
 			for (DataObject dataObject : dataList) {
 				if (dataObject != null) {
 					this.playersOnCooldown.put(dataObject.getWorld() + "-.-" + dataObject.getPlayerId(), Long.parseLong(dataObject.getDuration()));
-					SQL.getData().removeData(new DataObject(Table.IJ_ON_COOLDOWN, null, null, this.getConfigName(), String.valueOf(this.getCommandCooldown()), null));
+					SQL.getData().removeData(new DataObject(Table.ON_COOLDOWN, null, null, this.getConfigName(), String.valueOf(this.getCommandCooldown()), null));
 				}
 			}
 		}
@@ -623,7 +623,7 @@ public class ItemMap {
     */
 	public void renderItemStack() {
         if (this.dataValue != null) {
-        	this.tempItem = LegacyAPI.getLegacy().newItemStack(this.material, this.count, this.dataValue);
+        	this.tempItem = LegacyAPI.newItemStack(this.material, this.count, this.dataValue);
         } else { this.tempItem = new ItemStack(this.material, this.count); }
 	}
 //  ======================================================================================================================================================================================== //
@@ -753,10 +753,10 @@ public class ItemMap {
     * @param slot - The Slot to be set.
     */
 	public void setSlot(final String slot) {
-		if (ItemHandler.getItem().isCustomSlot(slot)) {
+		if (ItemHandler.isCustomSlot(slot)) {
 			this.CustomSlot = slot;
 			this.InvSlot = null;
-		} else if (Utils.getUtils().isInt(slot)) {
+		} else if (StringUtils.getUtils().isInt(slot)) {
 			this.InvSlot = Integer.parseInt(slot);
 			this.CustomSlot = null;
 		}
@@ -921,7 +921,7 @@ public class ItemMap {
     * @param count - The stack size to be set.
     */
 	public void setCount(final String count) {
-		if (count != null && Utils.getUtils().isInt(count) && Integer.parseInt(count) != 0) {
+		if (count != null && StringUtils.getUtils().isInt(count) && Integer.parseInt(count) != 0) {
 			this.count = Integer.parseInt(count);
 		} else { this.count = 1; }
 	}
@@ -2527,7 +2527,7 @@ public class ItemMap {
     * @return The NBTData (Secret).
     */
 	public String getLegacySecret() {
-		if (!ItemHandler.getItem().dataTagsEnabled()) {
+		if (!ItemHandler.dataTagsEnabled()) {
 			return this.legacySecret;
 		} else { return ""; }
 	}
@@ -2806,9 +2806,9 @@ public class ItemMap {
     */
 	public boolean isLimitMode(final GameMode newMode) {
 		if (this.limitModes != null) {
-			if (Utils.getUtils().containsIgnoreCase(this.limitModes, newMode.name())) {
+			if (StringUtils.getUtils().containsIgnoreCase(this.limitModes, newMode.name())) {
 				return true;
-			} else if (!Utils.getUtils().containsIgnoreCase(this.limitModes, newMode.name())) {
+			} else if (!StringUtils.getUtils().containsIgnoreCase(this.limitModes, newMode.name())) {
 				return false;
 			}
 		}
@@ -3185,7 +3185,7 @@ public class ItemMap {
     * @return If the ItemFlag is to be prevented.
     */
 	public boolean isAllowedItem(final Player player, final ItemStack item, final String findFlag) {
-		if (!UI.getCreator().isOpen(player) && this.isSimilar(item)) {
+		if (!InterMenu.isOpen(player) && this.isSimilar(item)) {
 			if (this.AllowOpBypass && player.isOp() || this.CreativeBypass && player.getGameMode() == GameMode.CREATIVE 
 					|| findFlag.equalsIgnoreCase("inventory-modify") && player.hasPermission("itemjoin.bypass.inventorymodify") 
 					&& ItemJoin.getInstance().getConfig().getBoolean("Permissions.Movement-Bypass")) {
@@ -3217,7 +3217,7 @@ public class ItemMap {
 	public boolean isReal(final ItemStack item) {
 		if (item != null && item.getType() != Material.AIR
 				&& (this.vanillaControl || this.vanillaStatus
-				|| (ItemHandler.getItem().dataTagsEnabled() && ItemHandler.getItem().getNBTData(item) != null && ItemHandler.getItem().getNBTData(item).equalsIgnoreCase(this.newNBTData))
+				|| (ItemHandler.dataTagsEnabled() && ItemHandler.getNBTData(item) != null && ItemHandler.getNBTData(item).equalsIgnoreCase(this.newNBTData))
 				|| (this.legacySecret != null && item.hasItemMeta() && item.getItemMeta().hasDisplayName() && item.getItemMeta().getDisplayName().contains(this.legacySecret)))) {
 			return true;
 		}
@@ -3232,7 +3232,7 @@ public class ItemMap {
     */
 	public boolean isSimilar(final ItemStack item) {
 		if ((item != null && item.getType() != Material.AIR && item.getType() == this.material) || (this.materialAnimated && item != null && item.getType() != Material.AIR && this.isMaterial(item))) {
-			if (this.vanillaControl || ItemHandler.getItem().dataTagsEnabled() && ItemHandler.getItem().getNBTData(item) != null && ItemHandler.getItem().getNBTData(item).equalsIgnoreCase(this.newNBTData)
+			if (this.vanillaControl || ItemHandler.dataTagsEnabled() && ItemHandler.getNBTData(item) != null && ItemHandler.getNBTData(item).equalsIgnoreCase(this.newNBTData)
 					|| this.legacySecret != null && item.hasItemMeta() && item.getItemMeta().hasDisplayName() && item.getItemMeta().getDisplayName().contains(this.legacySecret) || this.vanillaStatus) {
 				if (this.skullMeta(item)) {
 					if (isEnchantSimilar(item) || !item.getItemMeta().hasEnchants() && enchants.isEmpty() || this.isItemChangable()) {
@@ -3293,12 +3293,12 @@ public class ItemMap {
     * @return If the skull meta is similar.
     */
 	private boolean skullMeta(final ItemStack item) {
-		if (!this.isSkull() || this.skullOwner == null && this.skullTexture == null && PlayerHandler.getPlayer().getSkullOwner(item).equalsIgnoreCase("NULL") && ItemHandler.getItem().getSkullTexture(item.getItemMeta()).isEmpty() 
-				|| !this.skullAnimated && ((SkullMeta) item.getItemMeta()).hasOwner() && this.skullOwner != null && PlayerHandler.getPlayer().getSkullOwner(item).equalsIgnoreCase(this.skullOwner) 
+		if (!this.isSkull() || this.skullOwner == null && this.skullTexture == null && PlayerHandler.getSkullOwner(item).equalsIgnoreCase("NULL") && ItemHandler.getSkullTexture(item.getItemMeta()).isEmpty() 
+				|| !this.skullAnimated && ((SkullMeta) item.getItemMeta()).hasOwner() && this.skullOwner != null && PlayerHandler.getSkullOwner(item).equalsIgnoreCase(this.skullOwner) 
 				|| this.skullOwner != null && this.isSkullData(item)
-				|| this.skullOwner != null && Utils.getUtils().containsIgnoreCase(this.skullOwner, "%player%")
+				|| this.skullOwner != null && StringUtils.getUtils().containsIgnoreCase(this.skullOwner, "%player%")
 				|| this.skullTexture != null && this.skullOwner == null 
-				&& ItemHandler.getItem().getSkullTexture(item.getItemMeta()).equalsIgnoreCase(this.skullTexture)
+				&& ItemHandler.getSkullTexture(item.getItemMeta()).equalsIgnoreCase(this.skullTexture)
 				|| this.skullAnimated && this.isSkull(item) || this.skullTexture != null && this.skullOwner == null && this.isHeadSimilar(item)) {
 			return true;
 		}
@@ -3315,7 +3315,7 @@ public class ItemMap {
 		if (this.headDatabase) {
 			HeadDatabaseAPI api = new HeadDatabaseAPI();
 			ItemStack itemCopy = api.getItemHead(this.skullTexture);
-			if (itemCopy != null && ItemHandler.getItem().getSkullTexture(item.getItemMeta()).equalsIgnoreCase(ItemHandler.getItem().getSkullTexture(itemCopy.getItemMeta()))) {
+			if (itemCopy != null && ItemHandler.getSkullTexture(item.getItemMeta()).equalsIgnoreCase(ItemHandler.getSkullTexture(itemCopy.getItemMeta()))) {
 				return true;
 			}
 		}
@@ -3335,7 +3335,7 @@ public class ItemMap {
 				if (enchantments.getKey() == null && DependAPI.getDepends(false).tokenEnchantEnabled() && TokenEnchantAPI.getInstance().getEnchantment(enchantments.getKey()) != null) {
 					TokenEnchantAPI.getInstance().enchant(null, checkItem, enchantments.getKey(), enchantments.getValue(), true, 0, true);
 				} else { 
-					checkItem.addUnsafeEnchantment(ItemHandler.getItem().getEnchantByName(enchantments.getKey()), enchantments.getValue()); }
+					checkItem.addUnsafeEnchantment(ItemHandler.getEnchantByName(enchantments.getKey()), enchantments.getValue()); }
 			}
 			return (this.glowing ? true : item.getItemMeta().getEnchants().equals(checkItem.getItemMeta().getEnchants()));
 		}
@@ -3375,10 +3375,10 @@ public class ItemMap {
     */
 	private boolean isMaterial(final ItemStack item) {
 		for (String material : this.dynamicMaterials) {
-			material = ItemHandler.getItem().cutDelay(material);
+			material = ItemHandler.cutDelay(material);
 			String dataValue = null;
 			if (material.contains(":")) { String[] parts = material.split(":"); dataValue = parts[1]; }
-			if (item.getType() == ItemHandler.getItem().getMaterial(material, dataValue)) {
+			if (item.getType() == ItemHandler.getMaterial(material, dataValue)) {
 				return true;
 			}
 		}
@@ -3394,8 +3394,8 @@ public class ItemMap {
 	private boolean isSkull(final ItemStack item) {
 		if (this.dynamicOwners != null && !this.dynamicOwners.isEmpty()) {
 			for (String owners : this.dynamicOwners) {
-				owners = ItemHandler.getItem().cutDelay(owners);
-				if (PlayerHandler.getPlayer().getSkullOwner(item) != null && PlayerHandler.getPlayer().getSkullOwner(item).equalsIgnoreCase(this.skullOwner) || PlayerHandler.getPlayer().getSkullOwner(item) != null && Utils.getUtils().containsIgnoreCase(this.skullOwner, "%player%")) {
+				owners = ItemHandler.cutDelay(owners);
+				if (PlayerHandler.getSkullOwner(item) != null && PlayerHandler.getSkullOwner(item).equalsIgnoreCase(this.skullOwner) || PlayerHandler.getSkullOwner(item) != null && StringUtils.getUtils().containsIgnoreCase(this.skullOwner, "%player%")) {
 					return true;
 				} else if (this.isSkullData(item) && this.isSkull()){
 					return true;
@@ -3404,8 +3404,8 @@ public class ItemMap {
 			if (this.dynamicOwners.toString().contains("%player%")) { return true; }
 		} else if (this.dynamicTextures != null && !this.dynamicTextures.isEmpty()) {
 			for (String textures : this.dynamicTextures) {
-				textures = ItemHandler.getItem().cutDelay(textures);
-				if (ItemHandler.getItem().getSkullTexture(item.getItemMeta()).equalsIgnoreCase(textures)) {
+				textures = ItemHandler.cutDelay(textures);
+				if (ItemHandler.getSkullTexture(item.getItemMeta()).equalsIgnoreCase(textures)) {
 					return true;
 				}
 			}
@@ -3420,7 +3420,7 @@ public class ItemMap {
     * @return If the Skull Data is similar.
     */
 	private boolean isSkullData(final ItemStack item) {
-		if (ItemHandler.getItem().getSkullTexture(item.getItemMeta()).equalsIgnoreCase(ItemHandler.getItem().getSkullTexture(this.tempMeta))) {
+		if (ItemHandler.getSkullTexture(item.getItemMeta()).equalsIgnoreCase(ItemHandler.getSkullTexture(this.tempMeta))) {
 			return true;	
 		}
 		return false;
@@ -3443,12 +3443,12 @@ public class ItemMap {
 				return true;
 			}
 		}
-		if (ServerHandler.getServer().hasSpecificUpdate("1_9") 
+		if (ServerUtils.hasSpecificUpdate("1_9") 
 				&& this.isSimilar(player.getInventory().getItemInOffHand())
 				&& this.isCountSimilar(player.getInventory().getItemInOffHand())) {
 			return true;
 		}
-		if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
+		if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
 			for (ItemStack craftInventory: player.getOpenInventory().getTopInventory()) {
 				if (this.isSimilar(craftInventory) && this.isCountSimilar(craftInventory)) {
 					return true;
@@ -3499,14 +3499,14 @@ public class ItemMap {
 		this.setFireChargeColor();
 		this.setDye();
 		this.setBookInfo(player);
-		LegacyAPI.getLegacy().setBookPages(player, this.tempMeta, this.bookPages, this);
+		LegacyAPI.setBookPages(player, this.tempMeta, this.bookPages, this);
 		this.setAttributes();
 		this.setAttributeFlags();
 		this.realGlow();
 		this.setContents(player);
 		this.tempItem.setItemMeta(this.tempMeta);
-		LegacyAPI.getLegacy().setGlowing(this.tempItem, this);
-		LegacyAPI.getLegacy().setAttributes(this.tempItem, this);
+		LegacyAPI.setGlowing(this.tempItem, this);
+		LegacyAPI.setAttributes(this.tempItem, this);
 		return this;
 	}
 	
@@ -3515,7 +3515,7 @@ public class ItemMap {
     * 
     */
 	private void setContents(final Player player) {
-		if (this.contents != null && !this.contents.isEmpty() && ServerHandler.getServer().hasSpecificUpdate("1_11")) {
+		if (this.contents != null && !this.contents.isEmpty() && ServerUtils.hasSpecificUpdate("1_11")) {
 			ShulkerBox box = (ShulkerBox) ((BlockStateMeta)this.tempMeta).getBlockState();
 			box.getInventory().clear();
 			for (String node : this.contents) {
@@ -3523,18 +3523,18 @@ public class ItemMap {
 				for (ItemMap item : ItemUtilities.getUtilities().getItems()) {
 					if (item != null && item.getConfigName().equalsIgnoreCase(node)) {
 						isNull = false;
-						if (Utils.getUtils().isInt(item.getSlot()) && Integer.parseInt(item.getSlot()) <= 26) {
+						if (StringUtils.getUtils().isInt(item.getSlot()) && Integer.parseInt(item.getSlot()) <= 26) {
 							box.getInventory().setItem(Integer.parseInt(item.getSlot()), item.getItemStack(player));
 						} else if (item.getSlot().equalsIgnoreCase("ARBITRARY")) {
 							box.getInventory().addItem(item.getItemStack(player));
-						} else if (Utils.getUtils().isInt(item.getSlot()) && Integer.parseInt(item.getSlot()) > 26) {
-							ServerHandler.getServer().logWarn("{ItemMap} The item " + node + " cannot have the slot " + item.getSlot() + " as the slot cannot be higher than 26 to be set as contents for the item " + this.getConfigName() + ", the item will not be set.");
-						} else if (!Utils.getUtils().isInt(item.getSlot())) {
-							ServerHandler.getServer().logWarn("{ItemMap} The item " + node + " cannot have the slot " + item.getSlot() + " as the item " + this.getConfigName() + " does not support it, the item will not be set.");
+						} else if (StringUtils.getUtils().isInt(item.getSlot()) && Integer.parseInt(item.getSlot()) > 26) {
+							ServerUtils.logWarn("{ItemMap} The item " + node + " cannot have the slot " + item.getSlot() + " as the slot cannot be higher than 26 to be set as contents for the item " + this.getConfigName() + ", the item will not be set.");
+						} else if (!StringUtils.getUtils().isInt(item.getSlot())) {
+							ServerUtils.logWarn("{ItemMap} The item " + node + " cannot have the slot " + item.getSlot() + " as the item " + this.getConfigName() + " does not support it, the item will not be set.");
 						}
 					}
 				}
-				if (isNull) { ServerHandler.getServer().logWarn("{ItemMap} The item " + node + " does not exist and will not be set as contents for " + this.getConfigName() + "."); }
+				if (isNull) { ServerUtils.logWarn("{ItemMap} The item " + node + " does not exist and will not be set as contents for " + this.getConfigName() + "."); }
 			}
 			((BlockStateMeta)this.tempMeta).setBlockState(box);
 			box.update();
@@ -3547,10 +3547,10 @@ public class ItemMap {
     */
 	private void realGlow() {
 		if (this.glowing) { 
-			if (ServerHandler.getServer().hasSpecificUpdate("1_13")) {
+			if (ServerUtils.hasSpecificUpdate("1_13")) {
 				Glow glow = new Glow();
 				this.tempMeta.addEnchant(glow, 1, true);
-			} else if (!ServerHandler.getServer().hasSpecificUpdate("1_13") && ServerHandler.getServer().hasSpecificUpdate("1_11")) {
+			} else if (!ServerUtils.hasSpecificUpdate("1_13") && ServerUtils.hasSpecificUpdate("1_11")) {
 				this.tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ENCHANTS);
 				this.tempMeta.addEnchant(Enchantment.LURE, 0, true);
 			} 
@@ -3579,7 +3579,7 @@ public class ItemMap {
 			for (Entry<String, Integer> enchantments : this.enchants.entrySet()) {
 				if (enchantments.getKey() == null && DependAPI.getDepends(false).tokenEnchantEnabled() && TokenEnchantAPI.getInstance().getEnchantment(enchantments.getKey()) != null) {
 					TokenEnchantAPI.getInstance().enchant(player, this.tempItem, enchantments.getKey(), enchantments.getValue(), true, 0, true);
-				} else { this.tempItem.addUnsafeEnchantment(ItemHandler.getItem().getEnchantByName(enchantments.getKey()), enchantments.getValue()); }
+				} else { this.tempItem.addUnsafeEnchantment(ItemHandler.getEnchantByName(enchantments.getKey()), enchantments.getValue()); }
 			}
 		}
 	}
@@ -3591,14 +3591,14 @@ public class ItemMap {
 	private void setUnbreaking() {
 		if (this.isUnbreakable() || this.hideDurability) {
 			try {
-				Class<?> craftItemStack = Reflection.getReflection().getCraftBukkitClass("inventory.CraftItemStack");
+				Class<?> craftItemStack = ReflectionUtils.getCraftBukkitClass("inventory.CraftItemStack");
 				Object nms = craftItemStack.getMethod("asNMSCopy", ItemStack.class).invoke(null, this.tempItem);
-				Object tag = Reflection.getReflection().getMinecraftClass("ItemStack").getMethod("getTag").invoke(nms);
-				if (tag == null) { tag = Reflection.getReflection().getMinecraftClass("NBTTagCompound").getConstructor().newInstance(); }
+				Object tag = ReflectionUtils.getMinecraftClass("ItemStack").getMethod("getTag").invoke(nms);
+				if (tag == null) { tag = ReflectionUtils.getMinecraftClass("NBTTagCompound").getConstructor().newInstance(); }
 				tag.getClass().getMethod("setInt", String.class, int.class).invoke(tag, "Unbreakable", 1);
 				nms.getClass().getMethod("setTag", tag.getClass()).invoke(nms, tag);
 				this.tempItem = (ItemStack) craftItemStack.getMethod("asCraftMirror", nms.getClass()).invoke(null, nms);
-			} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
+			} catch (Exception e) { ServerUtils.sendDebugTrace(e); }
 		}
 	}
 	
@@ -3607,19 +3607,19 @@ public class ItemMap {
     * 
     */
 	private void setAttributes() {
-		if (ServerHandler.getServer().hasSpecificUpdate("1_13") && this.attributes != null && !this.attributes.isEmpty()) {
+		if (ServerUtils.hasSpecificUpdate("1_13") && this.attributes != null && !this.attributes.isEmpty()) {
 			try {
 				for (String attrib: this.attributes.keySet()) {
 					Attribute attribute = Attribute.valueOf(attrib.toUpperCase());
 					double value = this.attributes.get(attrib);
-					EquipmentSlot slot = EquipmentSlot.valueOf(ItemHandler.getItem().getDesignatedSlot(this.material).toUpperCase());
+					EquipmentSlot slot = EquipmentSlot.valueOf(ItemHandler.getDesignatedSlot(this.material).toUpperCase());
 					AttributeModifier modifier = new AttributeModifier(UUID.nameUUIDFromBytes((this.configName + attrib).getBytes()), attrib.toLowerCase().replace("_", "."), value, AttributeModifier.Operation.ADD_NUMBER, slot);
 					if (this.tempMeta.getAttributeModifiers() == null || !this.tempMeta.getAttributeModifiers().containsValue(modifier)) {
 						this.tempMeta.addAttributeModifier(attribute, modifier);
 					}
 				}
 			} catch (Exception e) {
-				ServerHandler.getServer().sendDebugTrace(e);
+				ServerUtils.sendDebugTrace(e);
 			}
 		}
 	}
@@ -3630,13 +3630,13 @@ public class ItemMap {
     */
 	private void setMapImage() {
 		if (this.customMapImage != null || this.mapId != -1) {
-			if (ServerHandler.getServer().hasSpecificUpdate("1_13")) {
+			if (ServerUtils.hasSpecificUpdate("1_13")) {
 				MapMeta mapmeta = (MapMeta) this.tempItem.getItemMeta();
 				try { mapmeta.setMapView(this.mapView); }
-				catch (NoSuchMethodError e) { mapmeta = LegacyAPI.getLegacy().setMapID(mapmeta, this.mapId); }
+				catch (NoSuchMethodError e) { mapmeta = LegacyAPI.setMapID(mapmeta, this.mapId); }
 				this.tempItem.setItemMeta(mapmeta);
 			} else {
-				LegacyAPI.getLegacy().setDurability(this.tempItem, this.mapId);
+				LegacyAPI.setDurability(this.tempItem, this.mapId);
 			}
 		}
 	}
@@ -3650,14 +3650,14 @@ public class ItemMap {
     * @return The updated ItemStack.
     */
 	public ItemStack setJSONBookPages(final Player player, final ItemStack item, final List<String> pages) {
-		if (item.getType().toString().equalsIgnoreCase("WRITTEN_BOOK") && pages != null && !pages.isEmpty() && pages.size() != 0 && ServerHandler.getServer().hasSpecificUpdate("1_8")) {
+		if (item.getType().toString().equalsIgnoreCase("WRITTEN_BOOK") && pages != null && !pages.isEmpty() && pages.size() != 0 && ServerUtils.hasSpecificUpdate("1_8")) {
 			List<String> copyPages = new ArrayList<String>();
 			for (String page: pages) { copyPages.add(page); }
-			copyPages.set(0, ItemHandler.getItem().cutDelay(copyPages.get(0)));
+			copyPages.set(0, ItemHandler.cutDelay(copyPages.get(0)));
 			Object localePages = null;
-			try { localePages = Reflection.getReflection().getMinecraftClass("NBTTagList").getConstructor().newInstance(); } catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
-			if (ServerHandler.getServer().hasSpecificUpdate("1_15")) { return this.set1_15JSONPages(player, item, localePages, copyPages); } 
-			else if (ServerHandler.getServer().hasSpecificUpdate("1_14")) { return this.set1_14JSONPages(player, item, localePages, copyPages); }
+			try { localePages = ReflectionUtils.getMinecraftClass("NBTTagList").getConstructor().newInstance(); } catch (Exception e) { ServerUtils.sendDebugTrace(e); }
+			if (ServerUtils.hasSpecificUpdate("1_15")) { return this.set1_15JSONPages(player, item, localePages, copyPages); } 
+			else if (ServerUtils.hasSpecificUpdate("1_14")) { return this.set1_14JSONPages(player, item, localePages, copyPages); }
 			else { return this.set1_13JSONPages(player, item, localePages, copyPages); }
 		}
 		return item;
@@ -3676,12 +3676,12 @@ public class ItemMap {
 	private ItemStack set1_13JSONPages(final Player player, final ItemStack item, final Object localePages, final List<String> pages) {
 		for (String textComponent: pages) {
 			try { 
-				textComponent = Utils.getUtils().translateLayout(textComponent, player);
-				Object TagString = Reflection.getReflection().getMinecraftClass("NBTTagString").getConstructor(String.class).newInstance(textComponent);
-				localePages.getClass().getMethod("add", Reflection.getReflection().getMinecraftClass("NBTBase")).invoke(localePages, TagString);
-			} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); } 
+				textComponent = StringUtils.getUtils().translateLayout(textComponent, player);
+				Object TagString = ReflectionUtils.getMinecraftClass("NBTTagString").getConstructor(String.class).newInstance(textComponent);
+				localePages.getClass().getMethod("add", ReflectionUtils.getMinecraftClass("NBTBase")).invoke(localePages, TagString);
+			} catch (Exception e) { ServerUtils.sendDebugTrace(e); } 
 		}
-		try { return this.invokePages(item, localePages); } catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
+		try { return this.invokePages(item, localePages); } catch (Exception e) { ServerUtils.sendDebugTrace(e); }
 		return item;
 	}
 	
@@ -3699,12 +3699,12 @@ public class ItemMap {
 		for (int i = pages.size() - 1; i >= 0; i--) {
 			String textComponent = pages.get(i);
 			try { 
-				textComponent = Utils.getUtils().translateLayout(textComponent, player);
-				Object TagString = Reflection.getReflection().getMinecraftClass("NBTTagString").getConstructor(String.class).newInstance(textComponent);
-				localePages.getClass().getMethod("add", int.class, Reflection.getReflection().getMinecraftClass("NBTBase")).invoke(localePages, 0, TagString);
-			} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); } 
+				textComponent = StringUtils.getUtils().translateLayout(textComponent, player);
+				Object TagString = ReflectionUtils.getMinecraftClass("NBTTagString").getConstructor(String.class).newInstance(textComponent);
+				localePages.getClass().getMethod("add", int.class, ReflectionUtils.getMinecraftClass("NBTBase")).invoke(localePages, 0, TagString);
+			} catch (Exception e) { ServerUtils.sendDebugTrace(e); } 
 		}
-		try { return this.invokePages(item, localePages); } catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
+		try { return this.invokePages(item, localePages); } catch (Exception e) { ServerUtils.sendDebugTrace(e); }
 		return item;
 	}
 	
@@ -3722,12 +3722,12 @@ public class ItemMap {
 		for (int i = pages.size() - 1; i >= 0; i--) {
 			String textComponent = pages.get(i);
 			try { 
-				textComponent = Utils.getUtils().translateLayout(textComponent, player);
-				Object TagString = Reflection.getReflection().getMinecraftClass("NBTTagString").getMethod("a", String.class).invoke(null, textComponent);
-				localePages.getClass().getMethod("add", int.class, Reflection.getReflection().getMinecraftClass("NBTBase")).invoke(localePages, 0, TagString);
-			} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); } 
+				textComponent = StringUtils.getUtils().translateLayout(textComponent, player);
+				Object TagString = ReflectionUtils.getMinecraftClass("NBTTagString").getMethod("a", String.class).invoke(null, textComponent);
+				localePages.getClass().getMethod("add", int.class, ReflectionUtils.getMinecraftClass("NBTBase")).invoke(localePages, 0, TagString);
+			} catch (Exception e) { ServerUtils.sendDebugTrace(e); } 
 		}
-		try { return this.invokePages(item, localePages); } catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
+		try { return this.invokePages(item, localePages); } catch (Exception e) { ServerUtils.sendDebugTrace(e); }
 		return item;
 	}
 	
@@ -3740,11 +3740,11 @@ public class ItemMap {
     * @return The updated ItemStack.
     */
 	private ItemStack invokePages(final ItemStack item, final Object pages) throws Exception {
-		Class<?> craftItemStack = Reflection.getReflection().getCraftBukkitClass("inventory.CraftItemStack");
+		Class<?> craftItemStack = ReflectionUtils.getCraftBukkitClass("inventory.CraftItemStack");
 		Object nms = craftItemStack.getMethod("asNMSCopy", ItemStack.class).invoke(null, item);
-		Object tag = Reflection.getReflection().getMinecraftClass("ItemStack").getMethod("getTag").invoke(nms);
-		if (tag == null) { tag = Reflection.getReflection().getMinecraftClass("NBTTagCompound").getConstructor().newInstance(); }
-		tag.getClass().getMethod("set", String.class, Reflection.getReflection().getMinecraftClass("NBTBase")).invoke(tag, "pages", pages); 
+		Object tag = ReflectionUtils.getMinecraftClass("ItemStack").getMethod("getTag").invoke(nms);
+		if (tag == null) { tag = ReflectionUtils.getMinecraftClass("NBTTagCompound").getConstructor().newInstance(); }
+		tag.getClass().getMethod("set", String.class, ReflectionUtils.getMinecraftClass("NBTBase")).invoke(tag, "pages", pages); 
 		nms.getClass().getMethod("setTag", tag.getClass()).invoke(nms, tag);
 		return ((ItemStack)craftItemStack.getMethod("asCraftMirror", nms.getClass()).invoke(null, nms));
 	}
@@ -3754,10 +3754,10 @@ public class ItemMap {
     * 
     */
 	private void setNBTData() {
-		if (ItemHandler.getItem().dataTagsEnabled() && !this.isVanilla() && !this.isVanillaControl() && !this.isVanillaStatus()) {
+		if (ItemHandler.dataTagsEnabled() && !this.isVanilla() && !this.isVanillaControl() && !this.isVanillaStatus()) {
 			try {
-				Object nms = Reflection.getReflection().getCraftBukkitClass("inventory.CraftItemStack").getMethod("asNMSCopy", ItemStack.class).invoke(null, this.tempItem);
-				Object cacheTag = Reflection.getReflection().getMinecraftClass("ItemStack").getMethod("getTag").invoke(nms);
+				Object nms = ReflectionUtils.getCraftBukkitClass("inventory.CraftItemStack").getMethod("asNMSCopy", ItemStack.class).invoke(null, this.tempItem);
+				Object cacheTag = ReflectionUtils.getMinecraftClass("ItemStack").getMethod("getTag").invoke(nms);
 				if (cacheTag != null) {
 					cacheTag.getClass().getMethod("setString", String.class, String.class).invoke(cacheTag, "ItemJoin Name", this.getConfigName());
 					cacheTag.getClass().getMethod("setString", String.class, String.class).invoke(cacheTag, "ItemJoin Slot", this.getItemValue());
@@ -3774,10 +3774,10 @@ public class ItemMap {
 						}
 					}
 				}
-				this.tempItem = (ItemStack) Reflection.getReflection().getCraftBukkitClass("inventory.CraftItemStack").getMethod("asCraftMirror", nms.getClass()).invoke(null, nms);
+				this.tempItem = (ItemStack) ReflectionUtils.getCraftBukkitClass("inventory.CraftItemStack").getMethod("asCraftMirror", nms.getClass()).invoke(null, nms);
 			} catch (Exception e) {
-				ServerHandler.getServer().logSevere("{ItemMap} An error has occured when setting NBTData to an item.");
-				ServerHandler.getServer().sendDebugTrace(e);
+				ServerUtils.logSevere("{ItemMap} An error has occured when setting NBTData to an item.");
+				ServerUtils.sendDebugTrace(e);
 			}
 		}
 	}
@@ -3788,8 +3788,8 @@ public class ItemMap {
     * @param player - The Player to be used for placeholders.
     */
 	private void setCustomName(final Player player) {
-		if (this.customName != null && !this.customName.equalsIgnoreCase(ItemHandler.getItem().getMaterialName(this.tempItem))) {
-			this.tempMeta.setDisplayName(Utils.getUtils().translateLayout(ItemHandler.getItem().cutDelay(this.customName), player));
+		if (this.customName != null && !this.customName.equalsIgnoreCase(ItemHandler.getMaterialName(this.tempItem))) {
+			this.tempMeta.setDisplayName(StringUtils.getUtils().translateLayout(ItemHandler.cutDelay(this.customName), player));
 		}
 	}
 	
@@ -3803,8 +3803,8 @@ public class ItemMap {
 			List < String > loreList = this.customLore;
 			List < String > loreFormatList = new ArrayList < String > ();
 			for (int k = 0; k < loreList.size(); k++) {
-				String formatLore = ItemHandler.getItem().cutDelay(loreList.get(k));
-				formatLore = Utils.getUtils().translateLayout(formatLore, player);
+				String formatLore = ItemHandler.cutDelay(loreList.get(k));
+				formatLore = StringUtils.getUtils().translateLayout(formatLore, player);
 				loreFormatList.add(formatLore);
 			}
 			this.tempMeta.setLore(loreFormatList);
@@ -3817,10 +3817,10 @@ public class ItemMap {
     */
 	private void setDurability() {
 		if (this.durability != null && (this.data == null || this.data == 0)) {
-			if (ServerHandler.getServer().hasSpecificUpdate("1_13")) {
+			if (ServerUtils.hasSpecificUpdate("1_13")) {
 				((org.bukkit.inventory.meta.Damageable) this.tempMeta).setDamage(this.durability);
 			} else {
-				LegacyAPI.getLegacy().setDurability(this.tempItem, this.durability);
+				LegacyAPI.setDurability(this.tempItem, this.durability);
 			}
 		}
 	}
@@ -3831,10 +3831,10 @@ public class ItemMap {
     */
 	private void setData() {
 		if (this.data != null) {
-			if (ServerHandler.getServer().hasSpecificUpdate("1_13")) {
+			if (ServerUtils.hasSpecificUpdate("1_13")) {
 				((org.bukkit.inventory.meta.Damageable) this.tempMeta).setDamage(this.data);
 			} else {
-				LegacyAPI.getLegacy().setDurability(this.tempItem, Short.parseShort(this.data + ""));
+				LegacyAPI.setDurability(this.tempItem, Short.parseShort(this.data + ""));
 			}
 		}
 	}
@@ -3845,9 +3845,9 @@ public class ItemMap {
     */
 	private void setModelData() {
 		if (this.modelData != null && this.modelData != 0) {
-			if (ServerHandler.getServer().hasSpecificUpdate("1_14")) {
+			if (ServerUtils.hasSpecificUpdate("1_14")) {
 				this.tempMeta.setCustomModelData(this.modelData);
-			} else { ServerHandler.getServer().logWarn("{ItemMap} The item " + this.getConfigName() + " is using Custom Model Data which is not supported until Minecraft 1.14+."); }
+			} else { ServerUtils.logWarn("{ItemMap} The item " + this.getConfigName() + " is using Custom Model Data which is not supported until Minecraft 1.14+."); }
 		}
 	}
 	
@@ -3858,17 +3858,17 @@ public class ItemMap {
     */
 	private void setSkull(final Player player) {
 		if (this.skullOwner != null) {
-			this.tempMeta = ItemHandler.getItem().setSkullOwner(this.tempMeta, Utils.getUtils().translateLayout(this.skullOwner, player));
+			this.tempMeta = ItemHandler.setSkullOwner(this.tempMeta, StringUtils.getUtils().translateLayout(this.skullOwner, player));
 		} else if (this.skullTexture != null && !this.headDatabase) {
 			try {
-				if (ServerHandler.getServer().hasSpecificUpdate("1_8")) {
+				if (ServerUtils.hasSpecificUpdate("1_8")) {
 					GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
-					gameProfile.getProperties().put("textures", new Property("textures", new String(((this.skullOwner != null && DependAPI.getDepends(false).skinsRestorerEnabled()) ? DependAPI.getDepends(false).getSkinValue(Utils.getUtils().translateLayout(this.skullOwner, player)) : this.skullTexture))));
+					gameProfile.getProperties().put("textures", new Property("textures", new String(((this.skullOwner != null && DependAPI.getDepends(false).skinsRestorerEnabled()) ? DependAPI.getDepends(false).getSkinValue(StringUtils.getUtils().translateLayout(this.skullOwner, player)) : this.skullTexture))));
 					Field declaredField = this.tempMeta.getClass().getDeclaredField("profile");
 					declaredField.setAccessible(true);
 					declaredField.set(this.tempMeta, gameProfile);
 				}
-			} catch (Exception e) { ServerHandler.getServer().sendDebugTrace(e); }
+			} catch (Exception e) { ServerUtils.sendDebugTrace(e); }
 		}
 	}
 	
@@ -3927,7 +3927,7 @@ public class ItemMap {
 		if (this.leatherColor != null) {
 			((LeatherArmorMeta) this.tempMeta).setColor(DyeColor.valueOf(this.leatherColor).getFireworkColor());
 		} else if (this.leatherHex != null) {
-			((LeatherArmorMeta) this.tempMeta).setColor(Utils.getUtils().getColorFromHexColor(this.leatherHex));
+			((LeatherArmorMeta) this.tempMeta).setColor(StringUtils.getUtils().getColorFromHexColor(this.leatherHex));
 		}
 	}
 	
@@ -3938,16 +3938,16 @@ public class ItemMap {
     */
 	private void setBookInfo(final Player player) {
 		if (this.author != null) {
-			this.author = Utils.getUtils().translateLayout(this.author, player);
+			this.author = StringUtils.getUtils().translateLayout(this.author, player);
 			((BookMeta) this.tempMeta).setAuthor(this.author);
 		}
 		
 		if (this.title != null) {
-			this.title = Utils.getUtils().translateLayout(this.title, player);
+			this.title = StringUtils.getUtils().translateLayout(this.title, player);
 			((BookMeta) this.tempMeta).setTitle(this.title);
 		}
 		
-		if (this.generation != null && ServerHandler.getServer().hasSpecificUpdate("1_10")) {
+		if (this.generation != null && ServerUtils.hasSpecificUpdate("1_10")) {
 			((BookMeta) this.tempMeta).setGeneration((Generation) this.generation);
 		}
 	}
@@ -3957,7 +3957,7 @@ public class ItemMap {
     * 
     */
 	private void setAttributeFlags() {
-		if (ServerHandler.getServer().hasSpecificUpdate("1_8") && this.hideAttributes) {
+		if (ServerUtils.hasSpecificUpdate("1_8") && this.hideAttributes) {
 			this.tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ATTRIBUTES);
 			this.tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_DESTROYS);
 			this.tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ENCHANTS);
@@ -4030,18 +4030,18 @@ public class ItemMap {
 			for (String condition : this.getConditions(conditions)) {
 				String[] parts = (condition != null ? condition.split(":") : null);
 				if (parts != null && parts.length == 3) {
-					String value1 = (parts[0] != null && !Utils.getUtils().isInt(parts[0]) ? Utils.getUtils().translateLayout(parts[0], player) : parts[0]);
+					String value1 = (parts[0] != null && !StringUtils.getUtils().isInt(parts[0]) ? StringUtils.getUtils().translateLayout(parts[0], player) : parts[0]);
 					String operand = parts[1];
-					String value2 = (parts[2] != null && !Utils.getUtils().isInt(parts[2]) ? Utils.getUtils().translateLayout(parts[2], player) : parts[2]);
-					final boolean conditionMet = Utils.getUtils().conditionMet(value1, operand, value2);
+					String value2 = (parts[2] != null && !StringUtils.getUtils().isInt(parts[2]) ? StringUtils.getUtils().translateLayout(parts[2], player) : parts[2]);
+					final boolean conditionMet = StringUtils.getUtils().conditionMet(value1, operand, value2);
 					if (!conditionMet && this.getConditionMessage(conditions) != null && !this.getConditionMessage(conditions).isEmpty()) {
-						player.sendMessage(Utils.getUtils().translateLayout(this.getConditionMessage(conditions), player));
-						ServerHandler.getServer().logDebug("{ItemMap} " + player.getName() + " has not met any of the " + conditions + "(s), for the Item: " + this.getConfigName() + "."); 
+						player.sendMessage(StringUtils.getUtils().translateLayout(this.getConditionMessage(conditions), player));
+						ServerUtils.logDebug("{ItemMap} " + player.getName() + " has not met any of the " + conditions + "(s), for the Item: " + this.getConfigName() + "."); 
 					}
 					return conditionMet;
 				} else if (!(parts != null && parts.length == 3)) {
-					ServerHandler.getServer().logSevere("{ItemMap} The item " + this.getConfigName() + " has a " + conditions + " defined incorrectly!");
-					ServerHandler.getServer().logWarn("{ItemMap} The condition " + condition + " is not the proper format CONDITION:OPERAND:VALUE, the item may not function properly.");
+					ServerUtils.logSevere("{ItemMap} The item " + this.getConfigName() + " has a " + conditions + " defined incorrectly!");
+					ServerUtils.logWarn("{ItemMap} The condition " + condition + " is not the proper format CONDITION:OPERAND:VALUE, the item may not function properly.");
 				}
 			}
 		} else { return true; }
@@ -4075,25 +4075,25 @@ public class ItemMap {
 			if (this.isSimilar(inv.getChestplate())) { inv.setChestplate(new ItemStack(Material.AIR)); }
 			if (this.isSimilar(inv.getLeggings())) { inv.setLeggings(new ItemStack(Material.AIR)); }
 			if (this.isSimilar(inv.getBoots())) { inv.setBoots(new ItemStack(Material.AIR)); }
-			if (ServerHandler.getServer().hasSpecificUpdate("1_9") && this.isSimilar(PlayerHandler.getPlayer().getOffHandItem(player))) { PlayerHandler.getPlayer().setOffHandItem(player, new ItemStack(Material.AIR)); }
+			if (ServerUtils.hasSpecificUpdate("1_9") && this.isSimilar(PlayerHandler.getOffHandItem(player))) { PlayerHandler.setOffHandItem(player, new ItemStack(Material.AIR)); }
 			
-			if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
+			if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
 				for (int k = 0; k < craftingContents.length; k++) {
 					if (this.isSimilar(craftingContents[k])) { craftView.setItem(k, new ItemStack(Material.AIR)); }
 				}
 			}
 		} else {
 			for (int k = 0; k < contents.length; k++) {
-				if (this.isSimilar(contents[k])) { inv.setItem(k, ItemHandler.getItem().modifyItem(inv.getItem(k), false, amount[0])); return; }
+				if (this.isSimilar(contents[k])) { inv.setItem(k, ItemHandler.modifyItem(inv.getItem(k), false, amount[0])); return; }
 			}
-			if (this.isSimilar(inv.getHelmet())) { inv.setHelmet(ItemHandler.getItem().modifyItem(inv.getHelmet(), false, amount[0])); }
-			else if (this.isSimilar(inv.getChestplate())) { inv.setChestplate(ItemHandler.getItem().modifyItem(inv.getChestplate(), false, amount[0])); }
-			else if (this.isSimilar(inv.getLeggings())) { inv.setLeggings(ItemHandler.getItem().modifyItem(inv.getLeggings(), false, amount[0])); }
-			else if (this.isSimilar(inv.getBoots())) { inv.setBoots(ItemHandler.getItem().modifyItem(inv.getBoots(), false, amount[0])); }
-			else if (ServerHandler.getServer().hasSpecificUpdate("1_9") && this.isSimilar(PlayerHandler.getPlayer().getOffHandItem(player))) { PlayerHandler.getPlayer().setOffHandItem(player, ItemHandler.getItem().modifyItem(PlayerHandler.getPlayer().getOffHandItem(player), false, amount[0])); }
-			else if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
+			if (this.isSimilar(inv.getHelmet())) { inv.setHelmet(ItemHandler.modifyItem(inv.getHelmet(), false, amount[0])); }
+			else if (this.isSimilar(inv.getChestplate())) { inv.setChestplate(ItemHandler.modifyItem(inv.getChestplate(), false, amount[0])); }
+			else if (this.isSimilar(inv.getLeggings())) { inv.setLeggings(ItemHandler.modifyItem(inv.getLeggings(), false, amount[0])); }
+			else if (this.isSimilar(inv.getBoots())) { inv.setBoots(ItemHandler.modifyItem(inv.getBoots(), false, amount[0])); }
+			else if (ServerUtils.hasSpecificUpdate("1_9") && this.isSimilar(PlayerHandler.getOffHandItem(player))) { PlayerHandler.setOffHandItem(player, ItemHandler.modifyItem(PlayerHandler.getOffHandItem(player), false, amount[0])); }
+			else if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
 				for (int k = 0; k < craftingContents.length; k++) {
-					if (this.isSimilar(craftingContents[k])) { craftView.setItem(k, ItemHandler.getItem().modifyItem(player.getOpenInventory().getItem(k), false, amount[0])); return; }
+					if (this.isSimilar(craftingContents[k])) { craftView.setItem(k, ItemHandler.modifyItem(player.getOpenInventory().getItem(k), false, amount[0])); return; }
 				}
 			}
 		}
@@ -4125,30 +4125,30 @@ public class ItemMap {
     */
 	public void swapItem(final Player player, final String slot) {
 		ItemStack itemStack = this.getItem(player);
-		if ((!slot.startsWith("CH") && slot.startsWith("C")) || Utils.getUtils().isInt(slot)) {
-			if (Utils.getUtils().containsIgnoreCase(slot, "CRAFTING")) { 
-				if (Utils.getUtils().getSlotConversion(slot) == 0) {
-					SchedulerUtils.getScheduler().runLater(4L, () -> {
-				    	if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
-				    		player.getOpenInventory().getTopInventory().setItem(Utils.getUtils().getSlotConversion(slot), itemStack);
-				    		PlayerHandler.getPlayer().updateInventory(player, 1L);
+		if ((!slot.startsWith("CH") && slot.startsWith("C")) || StringUtils.getUtils().isInt(slot)) {
+			if (StringUtils.getUtils().containsIgnoreCase(slot, "CRAFTING")) { 
+				if (StringUtils.getUtils().getSlotConversion(slot) == 0) {
+					SchedulerUtils.runLater(4L, () -> {
+				    	if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
+				    		player.getOpenInventory().getTopInventory().setItem(StringUtils.getUtils().getSlotConversion(slot), itemStack);
+				    		PlayerHandler.updateInventory(player, 1L);
 				    	}
 					});
 				} else {
-					SchedulerUtils.getScheduler().runLater(2L, () -> {
-				    	player.getOpenInventory().getTopInventory().setItem(Utils.getUtils().getSlotConversion(slot), itemStack);
+					SchedulerUtils.runLater(2L, () -> {
+				    	player.getOpenInventory().getTopInventory().setItem(StringUtils.getUtils().getSlotConversion(slot), itemStack);
 				    });
 				}
 			} 
 			else { 
-				SchedulerUtils.getScheduler().runLater(2L, () -> {
+				SchedulerUtils.runLater(2L, () -> {
 					player.getInventory().setItem(Integer.parseInt(slot), itemStack); 	
 				});
 			}
 		} else {
-			SchedulerUtils.getScheduler().runLater(2L, () -> {
-				if (PlayerHandler.getPlayer().getMainHandItem(player) == null || PlayerHandler.getPlayer().getMainHandItem(player).getType() == Material.AIR) {
-					PlayerHandler.getPlayer().setMainHandItem(player, itemStack);
+			SchedulerUtils.runLater(2L, () -> {
+				if (PlayerHandler.getMainHandItem(player) == null || PlayerHandler.getMainHandItem(player).getType() == Material.AIR) {
+					PlayerHandler.setMainHandItem(player, itemStack);
 				} else {
 					player.getInventory().addItem(itemStack);
 				}
@@ -4182,7 +4182,7 @@ public class ItemMap {
     * @return If the commands successfully executed.
     */
     public void executeCommands(final Player player, final ItemStack itemCopy, final String action, final String clickType, final String slot) {
-    	if (this.commands != null && this.commands.length > 0 && !UI.getCreator().isOpen(player) && !this.getWarmPending(player) && this.isExecutable(player, action, clickType) && !this.onCooldown(player) && this.isPlayerChargeable(player, this.itemCost != null && !this.itemCost.isEmpty())) {
+    	if (this.commands != null && this.commands.length > 0 && !InterMenu.isOpen(player) && !this.getWarmPending(player) && this.isExecutable(player, action, clickType) && !this.onCooldown(player) && this.isPlayerChargeable(player, this.itemCost != null && !this.itemCost.isEmpty())) {
     		this.warmCycle(player, this, this.getWarmDelay(), player.getLocation(), itemCopy, action, clickType, slot);
     	}
     }
@@ -4201,25 +4201,25 @@ public class ItemMap {
 	private void warmCycle(final Player player, final ItemMap itemMap, final int warmCount, final Location location, final ItemStack itemCopy, final String action, final String clickType, final String slot) {
 		if (warmCount != 0) {
 			if (itemMap.warmDelay == warmCount) { 
-				String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = Utils.getUtils().translateLayout(itemMap.getCustomName(), player); 
+				String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = StringUtils.getUtils().translateLayout(itemMap.getCustomName(), player); 
 				LanguageAPI.getLang(false).sendLangMessage("general.warmingUp", player, placeHolders); 
 				itemMap.addWarmPending(player); 
 			}
-			SchedulerUtils.getScheduler().runLater(20L, () -> {
+			SchedulerUtils.runLater(20L, () -> {
 				if (itemMap.warmLocation(player, location, action)) {
-					String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = Utils.getUtils().translateLayout(itemMap.getCustomName(), player); 
+					String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = StringUtils.getUtils().translateLayout(itemMap.getCustomName(), player); 
 					LanguageAPI.getLang(false).sendLangMessage("general.warmingTime", player, placeHolders);
 					itemMap.warmCycle(player, itemMap, (warmCount - 1), location, itemCopy, action, clickType, slot);	
 				} else { 
 					itemMap.delWarmPending(player); 
-					String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = Utils.getUtils().translateLayout(itemMap.getCustomName(), player); 
+					String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = StringUtils.getUtils().translateLayout(itemMap.getCustomName(), player); 
 					LanguageAPI.getLang(false).sendLangMessage("general.warmingHalted", player, placeHolders);
 				}
 			});
 		} else {
 			long delay = 0;
 			if (itemMap.warmDelay != 0) { delay = 20L; }
-			SchedulerUtils.getScheduler().runLater(delay, () -> {
+			SchedulerUtils.runLater(delay, () -> {
 				if ((!player.isDead() || action.equalsIgnoreCase("ON_DEATH")) && player.isOnline()) {
 					if (isExecuted(player, action, clickType, slot)) { 
 						if (itemMap.itemCost == null || itemMap.itemCost.isEmpty()) { itemMap.withdrawBalance(player); } 
@@ -4230,7 +4230,7 @@ public class ItemMap {
 						itemMap.addPlayerOnCooldown(player);
 					}
 				} else {
-					String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = Utils.getUtils().translateLayout(itemMap.getCustomName(), player); 
+					String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = StringUtils.getUtils().translateLayout(itemMap.getCustomName(), player); 
 					LanguageAPI.getLang(false).sendLangMessage("general.warmingHalted", player, placeHolders);
 				}
 				if (itemMap.warmDelay != 0) { itemMap.delWarmPending(player); }
@@ -4279,7 +4279,7 @@ public class ItemMap {
     * @return If it was successful.
     */
     private boolean getRandomMap(final HashMap < Integer, ItemCommand > randomCommands, final ItemCommand[] itemCommands, final Player player, final String action, final String clickType, final String slot) {
-    	Entry<?, ?> dedicatedMap = Utils.getUtils().randomEntry(randomCommands);
+    	Entry<?, ?> dedicatedMap = StringUtils.getUtils().randomEntry(randomCommands);
     	if (dedicatedMap != null && dedicatedMap.getValue() != null && player != null && action != null && clickType != null && slot != null && itemCommands != null && randomCommands != null
         && !((ItemCommand)dedicatedMap.getValue()).execute(player, action, clickType, slot, this)) { 
     		this.getRandomMap(randomCommands, itemCommands, player, action, clickType, slot);
@@ -4298,7 +4298,7 @@ public class ItemMap {
     * @return If it was successful.
     */
     private boolean getRandomAll(final HashMap < Integer, ItemCommand > randomCommands, final ItemCommand[] itemCommands, final Player player, final String action, final String clickType, final String slot) {
-    	Entry<?, ?> dedicatedMap = Utils.getUtils().randomEntry(randomCommands);
+    	Entry<?, ?> dedicatedMap = StringUtils.getUtils().randomEntry(randomCommands);
     	if (dedicatedMap != null && dedicatedMap.getValue() != null && player != null && action != null && slot != null && itemCommands != null && randomCommands != null 
         && !((ItemCommand)dedicatedMap.getValue()).execute(player, action, clickType, slot, this)) { 
     		randomCommands.remove(dedicatedMap.getKey());
@@ -4329,9 +4329,9 @@ public class ItemMap {
     		}
     		HashMap < Integer, String > randomIdent = new HashMap < Integer, String > ();
     		for (String ident: listIdent) {
-    			randomIdent.put(Utils.getUtils().getRandom(1, 100000), ident);
+    			randomIdent.put(StringUtils.getUtils().getRandom(1, 100000), ident);
     		}
-    		return (String) Utils.getUtils().randomEntry(randomIdent).getValue();
+    		return (String) StringUtils.getUtils().randomEntry(randomIdent).getValue();
     	}
     	return null;
     }
@@ -4352,7 +4352,7 @@ public class ItemMap {
     	HashMap < Integer, ItemCommand > randomCommands = new HashMap < Integer, ItemCommand > ();
     	if (!this.subjectRemoval) {
     		for (int i = 0; i < itemCommands.length; i++) { 
-        		if (this.sequence == CommandSequence.RANDOM || this.sequence == CommandSequence.RANDOM_SINGLE) { randomCommands.put(Utils.getUtils().getRandom(1, 100000), itemCommands[i]); }
+        		if (this.sequence == CommandSequence.RANDOM || this.sequence == CommandSequence.RANDOM_SINGLE) { randomCommands.put(StringUtils.getUtils().getRandom(1, 100000), itemCommands[i]); }
         		else if (this.sequence == CommandSequence.RANDOM_LIST) {
         			if (itemCommands[i].getSection() != null && itemCommands[i].getSection().equalsIgnoreCase(chosenIdent.replace("+", ""))) {
 	        			if (!playerSuccess) { playerSuccess = itemCommands[i].execute(player, action, clickType, slot, this); } 
@@ -4390,7 +4390,7 @@ public class ItemMap {
 				return false;
 			}
 		} else if (materialCost) {
-			Material mat = ItemHandler.getItem().getMaterial(this.itemCost, null);
+			Material mat = ItemHandler.getMaterial(this.itemCost, null);
 			int foundAmount = 0;
 			for (ItemStack playerInventory: player.getInventory().getContents()) {
 				if (playerInventory != null && playerInventory.getType() == mat) {
@@ -4416,7 +4416,7 @@ public class ItemMap {
 					}
 				}
 			}
-			if (ServerHandler.getServer().hasSpecificUpdate("1_9") && player.getInventory().getItemInOffHand() != null && player.getInventory().getItemInOffHand().getType() == mat) {
+			if (ServerUtils.hasSpecificUpdate("1_9") && player.getInventory().getItemInOffHand() != null && player.getInventory().getItemInOffHand().getType() == mat) {
 				if (player.getInventory().getItemInOffHand().getAmount() >= this.cost) {
 					return true;
 				} else { 
@@ -4426,7 +4426,7 @@ public class ItemMap {
 					}
 				}
 			}
-			if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
+			if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
 				for (ItemStack craftInventory: player.getOpenInventory().getTopInventory()) {
 					if (craftInventory != null && craftInventory.getType() == mat && craftInventory.getAmount() >= this.cost) {
 						if (craftInventory.getAmount() >= this.cost) {
@@ -4456,30 +4456,30 @@ public class ItemMap {
     * @param player - The Player to have their Item Cost changed.
     */
     private void withdrawItemCost(final Player player) {
-		Material mat = ItemHandler.getItem().getMaterial(this.itemCost, null);
+		Material mat = ItemHandler.getMaterial(this.itemCost, null);
 		Integer removeAmount = this.cost; if (this.cost == 0) { removeAmount = 1; }
 		for (int i = 0; i < player.getInventory().getSize(); i++) {
 			if (player.getInventory().getItem(i) != null && player.getInventory().getItem(i).getType() == mat) {
 				if (player.getInventory().getItem(i).getAmount() < removeAmount) {
 					removeAmount -= player.getInventory().getItem(i).getAmount();
-					player.getInventory().setItem(i, ItemHandler.getItem().modifyItem(player.getInventory().getItem(i), false, player.getInventory().getItem(i).getAmount()));
-				} else { player.getInventory().setItem(i, ItemHandler.getItem().modifyItem(player.getInventory().getItem(i), false, removeAmount)); break; } 
+					player.getInventory().setItem(i, ItemHandler.modifyItem(player.getInventory().getItem(i), false, player.getInventory().getItem(i).getAmount()));
+				} else { player.getInventory().setItem(i, ItemHandler.modifyItem(player.getInventory().getItem(i), false, removeAmount)); break; } 
 			}
 		}
-		if (ServerHandler.getServer().hasSpecificUpdate("1_9") && player.getInventory().getItemInOffHand() != null && player.getInventory().getItemInOffHand().getType() == mat) {
+		if (ServerUtils.hasSpecificUpdate("1_9") && player.getInventory().getItemInOffHand() != null && player.getInventory().getItemInOffHand().getType() == mat) {
 			if (player.getInventory().getItemInOffHand().getAmount() < removeAmount) {
 				removeAmount -= player.getInventory().getItemInOffHand().getAmount();
-				PlayerHandler.getPlayer().setOffHandItem(player, ItemHandler.getItem().modifyItem(player.getInventory().getItemInOffHand(), false, player.getInventory().getItemInOffHand().getAmount()));
-			} else { PlayerHandler.getPlayer().setOffHandItem(player, ItemHandler.getItem().modifyItem(player.getInventory().getItemInOffHand(), false, removeAmount));} 
-			PlayerHandler.getPlayer().setOffHandItem(player, ItemHandler.getItem().modifyItem(player.getInventory().getItemInOffHand(), false, removeAmount));
+				PlayerHandler.setOffHandItem(player, ItemHandler.modifyItem(player.getInventory().getItemInOffHand(), false, player.getInventory().getItemInOffHand().getAmount()));
+			} else { PlayerHandler.setOffHandItem(player, ItemHandler.modifyItem(player.getInventory().getItemInOffHand(), false, removeAmount));} 
+			PlayerHandler.setOffHandItem(player, ItemHandler.modifyItem(player.getInventory().getItemInOffHand(), false, removeAmount));
 		}
-		if (PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
+		if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
 			for (int i = 0; i < player.getOpenInventory().getTopInventory().getSize(); i++) {
 				if (player.getOpenInventory().getTopInventory().getItem(i) != null && player.getOpenInventory().getTopInventory().getItem(i).getType() == mat) {
 					if (player.getOpenInventory().getTopInventory().getItem(i).getAmount() < removeAmount) {
 						removeAmount -= player.getOpenInventory().getTopInventory().getItem(i).getAmount();
-						player.getOpenInventory().getTopInventory().setItem(i, ItemHandler.getItem().modifyItem(player.getOpenInventory().getTopInventory().getItem(i), false, player.getOpenInventory().getTopInventory().getItem(i).getAmount()));
-					} else { player.getOpenInventory().getTopInventory().setItem(i, ItemHandler.getItem().modifyItem(player.getOpenInventory().getTopInventory().getItem(i), false, removeAmount)); break; } 
+						player.getOpenInventory().getTopInventory().setItem(i, ItemHandler.modifyItem(player.getOpenInventory().getTopInventory().getItem(i), false, player.getOpenInventory().getTopInventory().getItem(i).getAmount()));
+					} else { player.getOpenInventory().getTopInventory().setItem(i, ItemHandler.modifyItem(player.getOpenInventory().getTopInventory().getItem(i), false, removeAmount)); break; } 
 				}
 			}
 		}
@@ -4502,7 +4502,7 @@ public class ItemMap {
 			int parseCost = this.cost;
 			if (balance >= parseCost) {
 				if (parseCost > 0) {
-					try { DependAPI.getDepends(false).getVault().withdrawBalance(player, parseCost); } catch (NullPointerException e) { ServerHandler.getServer().sendDebugTrace(e); }
+					try { DependAPI.getDepends(false).getVault().withdrawBalance(player, parseCost); } catch (NullPointerException e) { ServerUtils.sendDebugTrace(e); }
 					String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[6] = this.cost.toString();
 					LanguageAPI.getLang(false).sendLangMessage("general.econSuccess", player, placeHolders);
 				}
@@ -4520,9 +4520,9 @@ public class ItemMap {
 			try {
 				player.playSound(player.getLocation(), this.commandSound, 1, 1);
 			} catch (Exception e) {
-				ServerHandler.getServer().logSevere("{ItemMap} There was an issue executing the commands-sound you defined.");
-				ServerHandler.getServer().logWarn("{ItemMap} " + this.commandSound + " is not a sound in " + Reflection.getReflection().getServerVersion() + ".");
-				ServerHandler.getServer().sendDebugTrace(e);
+				ServerUtils.logSevere("{ItemMap} There was an issue executing the commands-sound you defined.");
+				ServerUtils.logWarn("{ItemMap} " + this.commandSound + " is not a sound in " + ReflectionUtils.getServerVersion() + ".");
+				ServerUtils.sendDebugTrace(e);
 			}
 		}
 	}
@@ -4534,7 +4534,7 @@ public class ItemMap {
     */
 	private void playParticle(final Player player) {
 		if (this.commandParticle != null) {
-			EffectAPI.getEffects().spawnParticle(player, this.commandParticle);
+			EffectAPI.spawnParticle(player, this.commandParticle);
 		}
 	}
 	
@@ -4548,31 +4548,31 @@ public class ItemMap {
 	public void removeDisposable(final Player player, final ItemMap itemMap, final ItemStack itemCopy, final boolean allItems) {
 		if (this.disposable && this.conditionMet(player, "disposable-conditions") || allItems) {
 			if (!allItems) { this.setSubjectRemoval(true); }
-			SchedulerUtils.getScheduler().runLater(1L, () -> {
-				if (PlayerHandler.getPlayer().isCreativeMode(player)) { player.closeInventory(); }
+			SchedulerUtils.runLater(1L, () -> {
+				if (PlayerHandler.isCreativeMode(player)) { player.closeInventory(); }
 				if (itemMap.isSimilar(player.getItemOnCursor())) {
-					player.setItemOnCursor(ItemHandler.getItem().modifyItem(player.getItemOnCursor(), allItems, 1));
+					player.setItemOnCursor(ItemHandler.modifyItem(player.getItemOnCursor(), allItems, 1));
 					if (!allItems) { this.setSubjectRemoval(false); }
 				} else {
 					int itemSlot = player.getInventory().getHeldItemSlot();
-					if (itemMap.isSimilar(player.getInventory().getItem(itemSlot))) { player.getInventory().setItem(itemSlot, ItemHandler.getItem().modifyItem(player.getInventory().getItem(itemSlot), allItems, 1)); if (!allItems) { this.setSubjectRemoval(false); }}
+					if (itemMap.isSimilar(player.getInventory().getItem(itemSlot))) { player.getInventory().setItem(itemSlot, ItemHandler.modifyItem(player.getInventory().getItem(itemSlot), allItems, 1)); if (!allItems) { this.setSubjectRemoval(false); }}
 					else { 
 						for (int i = 0; i < player.getInventory().getSize(); i++) {
 							if (itemMap.isSimilar(player.getInventory().getItem(i))) {
-								player.getInventory().setItem(i, ItemHandler.getItem().modifyItem(player.getInventory().getItem(i), allItems, 1));
+								player.getInventory().setItem(i, ItemHandler.modifyItem(player.getInventory().getItem(i), allItems, 1));
 								if (!allItems) { this.setSubjectRemoval(false); }
 								break;
 							}
 						}
 					}
-					if (this.isSubjectRemoval() && PlayerHandler.getPlayer().isCreativeMode(player)) {
-						player.getInventory().addItem(ItemHandler.getItem().modifyItem(itemCopy, allItems, 1));
+					if (this.isSubjectRemoval() && PlayerHandler.isCreativeMode(player)) {
+						player.getInventory().addItem(ItemHandler.modifyItem(itemCopy, allItems, 1));
 						player.setItemOnCursor(new ItemStack(Material.AIR));
 						if (!allItems) { this.setSubjectRemoval(false); }
-					} else if (this.isSubjectRemoval() && PlayerHandler.getPlayer().isCraftingInv(player.getOpenInventory())) {
+					} else if (this.isSubjectRemoval() && PlayerHandler.isCraftingInv(player.getOpenInventory())) {
 						for (int i = 0; i < player.getOpenInventory().getTopInventory().getSize(); i++) {
 							if (itemMap.isSimilar(player.getOpenInventory().getTopInventory().getItem(i))) {
-								player.getOpenInventory().getTopInventory().setItem(i, ItemHandler.getItem().modifyItem(player.getOpenInventory().getTopInventory().getItem(i), allItems, 1));
+								player.getOpenInventory().getTopInventory().setItem(i, ItemHandler.modifyItem(player.getOpenInventory().getTopInventory().getItem(i), allItems, 1));
 								if (!allItems) { this.setSubjectRemoval(false); }
 								break;
 							}
@@ -4591,18 +4591,18 @@ public class ItemMap {
     */
 	public boolean onInteractCooldown(final Player player) {
 		long playersCooldownList = 0L;
-		if (this.playersOnInteractCooldown.containsKey(player.getWorld().getName() + "." + PlayerHandler.getPlayer().getPlayerID(player) + ".items." + this.configName)) {
-			playersCooldownList = this.playersOnInteractCooldown.get(player.getWorld().getName() + "." + PlayerHandler.getPlayer().getPlayerID(player) + ".items." + this.configName);
+		if (this.playersOnInteractCooldown.containsKey(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + this.configName)) {
+			playersCooldownList = this.playersOnInteractCooldown.get(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + this.configName);
 		}
 		if (System.currentTimeMillis() - playersCooldownList >= this.interactCooldown * 1000) {
-			this.playersOnInteractCooldown.put(player.getWorld().getName() + "." + PlayerHandler.getPlayer().getPlayerID(player) + ".items." + this.configName, System.currentTimeMillis());
+			this.playersOnInteractCooldown.put(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + this.configName, System.currentTimeMillis());
 			return false;
 		} else {
 			if (this.onSpamCooldown(player)) {
-				this.storedSpammedPlayers.put(player.getWorld().getName() + "." + PlayerHandler.getPlayer().getPlayerID(player) + ".items." + this.configName, System.currentTimeMillis());
+				this.storedSpammedPlayers.put(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + this.configName, System.currentTimeMillis());
 				if (this.cooldownMessage != null && !this.cooldownMessage.isEmpty()) {
 					int timeLeft = (int)(this.interactCooldown - ((System.currentTimeMillis() - playersCooldownList) / 1000));
-					player.sendMessage(Utils.getUtils().translateLayout(this.cooldownMessage.replace("%timeleft%", String.valueOf(timeLeft)).replace("%item%", this.customName), player));
+					player.sendMessage(StringUtils.getUtils().translateLayout(this.cooldownMessage.replace("%timeleft%", String.valueOf(timeLeft)).replace("%item%", this.customName), player));
 				}
 			}
 			return true;
@@ -4620,8 +4620,8 @@ public class ItemMap {
 		boolean interactSpam = ConfigHandler.getConfig().getFile("items.yml").getBoolean("items-Spamming");
 		if (interactSpam != true) {
 			long playersCooldownList = 0L;
-			if (this.storedSpammedPlayers.containsKey(player.getWorld().getName() + "." + PlayerHandler.getPlayer().getPlayerID(player) + ".items." + this.configName)) {
-				playersCooldownList = this.storedSpammedPlayers.get(player.getWorld().getName() + "." + PlayerHandler.getPlayer().getPlayerID(player) + ".items." + this.configName);
+			if (this.storedSpammedPlayers.containsKey(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + this.configName)) {
+				playersCooldownList = this.storedSpammedPlayers.get(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + this.configName);
 			}
 			if (System.currentTimeMillis() - playersCooldownList >= this.spamtime * 1000) { } 
 			else { return false; }
@@ -4637,15 +4637,15 @@ public class ItemMap {
     */
 	private boolean onCooldown(final Player player) {
 		long playersCooldownList = 0L;
-		if (this.playersOnCooldown.containsKey(player.getWorld().getName() + "-.-" + PlayerHandler.getPlayer().getPlayerID(player))) {
-			playersCooldownList = this.playersOnCooldown.get(player.getWorld().getName() + "-.-" + PlayerHandler.getPlayer().getPlayerID(player));
+		if (this.playersOnCooldown.containsKey(player.getWorld().getName() + "-.-" + PlayerHandler.getPlayerID(player))) {
+			playersCooldownList = this.playersOnCooldown.get(player.getWorld().getName() + "-.-" + PlayerHandler.getPlayerID(player));
 		}
 		if (this.cooldownSeconds != 0) {
 			if (System.currentTimeMillis() - playersCooldownList >= this.cooldownSeconds * 1000) { return false; } 
 			else if (this.onCooldownTick(player)) {
-				String cooldownmsg = this.cooldownMessage != null ? (this.cooldownMessage.replace("%timeleft%", String.valueOf((this.cooldownSeconds - ((System.currentTimeMillis() - playersCooldownList) / 1000)))).replace("%item%", this.customName).replace("%itemraw%", ItemHandler.getItem().getMaterialName(this.tempItem))) : null;
+				String cooldownmsg = this.cooldownMessage != null ? (this.cooldownMessage.replace("%timeleft%", String.valueOf((this.cooldownSeconds - ((System.currentTimeMillis() - playersCooldownList) / 1000)))).replace("%item%", this.customName).replace("%itemraw%", ItemHandler.getMaterialName(this.tempItem))) : null;
 				if (cooldownmsg != null && !this.cooldownMessage.isEmpty()) { 
-					cooldownmsg = Utils.getUtils().translateLayout(cooldownmsg, player);
+					cooldownmsg = StringUtils.getUtils().translateLayout(cooldownmsg, player);
 					player.sendMessage(cooldownmsg);
 				}
 				this.addPlayerOnCooldownTick(player);
@@ -4666,8 +4666,8 @@ public class ItemMap {
 	private boolean onCooldownTick(final Player player) {
 		if (!ConfigHandler.getConfig().getFile("items.yml").getBoolean("items-Spamming")) {
 			long playersCooldownList = 0L;
-			if (this.playersOnCooldownTick.containsKey(player.getWorld().getName() + "." + PlayerHandler.getPlayer().getPlayerID(player))) {
-				playersCooldownList = this.playersOnCooldownTick.get(player.getWorld().getName() + "." + PlayerHandler.getPlayer().getPlayerID(player));
+			if (this.playersOnCooldownTick.containsKey(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player))) {
+				playersCooldownList = this.playersOnCooldownTick.get(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player));
 			}
 			
 			if (!(System.currentTimeMillis() - playersCooldownList >= 1000)) { return false; }
@@ -4682,7 +4682,7 @@ public class ItemMap {
     * @param player - The Player to be put on Cooldown.
     */
 	private void addPlayerOnCooldownTick(final Player player) {
-		this.playersOnCooldownTick.put(player.getWorld().getName() + "." + PlayerHandler.getPlayer().getPlayerID(player), System.currentTimeMillis());
+		this.playersOnCooldownTick.put(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player), System.currentTimeMillis());
 	}
 	
    /**
@@ -4691,7 +4691,7 @@ public class ItemMap {
     * @param player - The Player to be put on Cooldown.
     */
 	private void addPlayerOnCooldown(final Player player) {
-		this.playersOnCooldown.put(player.getWorld().getName() + "-.-" + PlayerHandler.getPlayer().getPlayerID(player), System.currentTimeMillis());
+		this.playersOnCooldown.put(player.getWorld().getName() + "-.-" + PlayerHandler.getPlayerID(player), System.currentTimeMillis());
 	}
 	
    /**
@@ -4791,7 +4791,7 @@ public class ItemMap {
 		FileConfiguration itemData = YamlConfiguration.loadConfiguration(itemFile);
 		if (ConfigHandler.getConfig().getFile("items.yml").getString("items." + this.configName) != null) { itemData.set("items." + this.configName, null); } 
 		try { itemData.save(itemFile); ConfigHandler.getConfig().getSource("items.yml"); ConfigHandler.getConfig().getFile("items.yml").options().copyDefaults(false); } 
-		catch (Exception e) { ItemJoin.getInstance().getServer().getLogger().severe("Could not remove the custom item " + this.configName + " from the items.yml data file!"); ServerHandler.getServer().sendDebugTrace(e); }	
+		catch (Exception e) { ItemJoin.getInstance().getServer().getLogger().severe("Could not remove the custom item " + this.configName + " from the items.yml data file!"); ServerUtils.sendDebugTrace(e); }	
 	}
 	
    /**
@@ -4812,10 +4812,16 @@ public class ItemMap {
 		if (this.AllSlots != null && !this.AllSlots.isEmpty()) { 
 			String saveSlots = "";
 			for (String slot : this.AllSlots) { saveSlots += slot + ", "; }
-			itemData.set("items." + this.configName + ".slot", saveSlots.substring(0, saveSlots.length() - 2)); 
+			if (!saveSlots.substring(0, saveSlots.length() - 2).equalsIgnoreCase("ARBITRARY")) {
+				itemData.set("items." + this.configName + ".slot", saveSlots.substring(0, saveSlots.length() - 2)); 
+			}
 		}
 		else if (this.CustomSlot == null) { itemData.set("items." + this.configName + ".slot", this.InvSlot); }
-		else { itemData.set("items." + this.configName + ".slot", this.CustomSlot); }
+		else { 
+			if (!this.CustomSlot.equalsIgnoreCase("ARBITRARY")) {
+				itemData.set("items." + this.configName + ".slot", this.CustomSlot); 
+			}
+		}
 		if (this.count > 1) { itemData.set("items." + this.configName + ".count", this.count); }
 		if (this.durability != null && this.durability > 0) { itemData.set("items." + this.configName + ".durability", this.durability); }
 		if (this.data != null && this.data > 0) { itemData.set("items." + this.configName + ".data", this.data); }
@@ -4823,8 +4829,8 @@ public class ItemMap {
 		if (this.author != null && !this.author.isEmpty()) { itemData.set("items." + this.configName + ".author", this.author.replace("§", "&")); }
 		if (this.customName != null && !this.customName.isEmpty() && (this.dynamicNames == null || this.dynamicNames.isEmpty())) { 
 			String setName = this.customName.replace(this.getLegacySecret(), "").replace("§", "&");
-			if (setName.startsWith("&f") && (!ItemHandler.getItem().dataTagsEnabled() || !ServerHandler.getServer().hasSpecificUpdate("1_8"))) { setName = setName.substring(2, setName.length()); }
-				if (!ItemHandler.getItem().getMaterialName(this.tempItem).equalsIgnoreCase(setName)) { 
+			if (setName.startsWith("&f") && (!ItemHandler.dataTagsEnabled() || !ServerUtils.hasSpecificUpdate("1_8"))) { setName = setName.substring(2, setName.length()); }
+				if (!ItemHandler.getMaterialName(this.tempItem).equalsIgnoreCase(setName)) { 
 					itemData.set("items." + this.configName + ".name", setName); 
 				}
 			}
@@ -4996,13 +5002,13 @@ public class ItemMap {
 			String recipeLine = "";
 			for (Character recipeCharacter: this.recipe) {
 				recipeLine += recipeCharacter;
-				if (Utils.getUtils().countCharacters(recipeLine) == 3) {
+				if (StringUtils.getUtils().countCharacters(recipeLine) == 3) {
 					recipeTempList.add(recipeLine);
 					recipeLine = "";
 				}
 			}
 			if (!recipeLine.isEmpty()) { 
-				while (Utils.getUtils().countCharacters(recipeTempList.get(0)) != Utils.getUtils().countCharacters(recipeLine)) { recipeLine += "X"; }
+				while (StringUtils.getUtils().countCharacters(recipeTempList.get(0)) != StringUtils.getUtils().countCharacters(recipeLine)) { recipeLine += "X"; }
 				recipeTempList.add(recipeLine);  
 			}
 			for (String str: this.trimRecipe(recipeTempList)) { recipeList.add(str.replace(" ", "X")); }
@@ -5083,10 +5089,12 @@ public class ItemMap {
 		if (this.enabledWorlds != null && !this.enabledWorlds.isEmpty()) { 
 			String worldList = "";
 			for (String world : this.enabledWorlds) { worldList += world + ", "; }
-			itemData.set("items." + this.configName + ".enabled-worlds", worldList.substring(0, worldList.length() - 2)); 
+			if (!worldList.startsWith("ALL") && !worldList.startsWith("GLOBAL")) {
+				itemData.set("items." + this.configName + ".enabled-worlds", worldList.substring(0, worldList.length() - 2)); 
+			}
 		}
 		try { itemData.save(itemFile); ConfigHandler.getConfig().getSource("items.yml"); ConfigHandler.getConfig().getFile("items.yml").options().copyDefaults(false); } 
-		catch (Exception e) { ItemJoin.getInstance().getServer().getLogger().severe("Could not save the new custom item " + this.configName + " to the items.yml data file!"); ServerHandler.getServer().sendDebugTrace(e); }	
+		catch (Exception e) { ItemJoin.getInstance().getServer().getLogger().severe("Could not save the new custom item " + this.configName + " to the items.yml data file!"); ServerUtils.sendDebugTrace(e); }	
 	}
 	
    /**
@@ -5102,6 +5110,6 @@ public class ItemMap {
 	                field.set(clone, field.get(this));
 	            }
             return (ItemMap)clone;
-        } catch(Exception e) { ServerHandler.getServer().sendDebugTrace(e); return this; }
+        } catch(Exception e) { ServerUtils.sendDebugTrace(e); return this; }
     }
 }
