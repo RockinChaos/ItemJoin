@@ -557,7 +557,6 @@ public class StringUtils {
 		} else if (player != null) { playerName = player.getName(); }
 		
 		if (playerName != null && player != null && !(player instanceof ConsoleCommandSender)) {
-			
 			try { str = str.replace("%player%", playerName); } catch (Exception e) { ServerUtils.sendDebugTrace(e); }
 			try { str = str.replace("%mob_kills%", String.valueOf(player.getStatistic(Statistic.MOB_KILLS))); } catch (Exception e) { ServerUtils.sendDebugTrace(e); }
 			try { str = str.replace("%player_kills%", String.valueOf(player.getStatistic(Statistic.PLAYER_KILLS))); } catch (Exception e) { ServerUtils.sendDebugTrace(e); }
@@ -568,9 +567,10 @@ public class StringUtils {
 				str = str.replace("%player_health%", String.valueOf(health)); 
 			} catch (Exception e) { ServerUtils.sendDebugTrace(e); }
 			try { str = str.replace("%player_location%", player.getLocation().getBlockX() + ", " + player.getLocation().getBlockY() + ", " + player.getLocation().getBlockZ()); } catch (Exception e) { ServerUtils.sendDebugTrace(e); }
+			try { if (placeHolder != null && placeHolder.length <= 1) { str = str.replace("%player_hit%", placeHolder[0]); } } catch (Exception e) { ServerUtils.sendDebugTrace(e); }
 			try { if (Bukkit.isPrimaryThread()) { str = str.replace("%player_interact%", PlayerHandler.getNearbyPlayer(player, 3)); } } catch (Exception e) { ServerUtils.sendDebugTrace(e); } }
-		if (player == null) { try { str = str.replace("%player%", "CONSOLE"); } catch (Exception e) { ServerUtils.sendDebugTrace(e); } }
-		str = ChatColor.translateAlternateColorCodes('&', this.translateHexColorCodes(str));
+			if (player == null) { try { str = str.replace("%player%", "CONSOLE"); } catch (Exception e) { ServerUtils.sendDebugTrace(e); } }
+			str = ChatColor.translateAlternateColorCodes('&', this.translateHexColorCodes(str));
 		if (DependAPI.getDepends(false).placeHolderEnabled()) {
 			try { try { return PlaceholderAPI.setPlaceholders(player, str); } 
 			catch (NoSuchFieldError e) { ServerUtils.logWarn("An error has occured when setting the PlaceHolder " + e.getMessage() + ", if this issue persits contact the developer of PlaceholderAPI."); return str; }
