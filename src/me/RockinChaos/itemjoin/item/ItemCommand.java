@@ -69,24 +69,25 @@ public class ItemCommand {
 	* Executes the command for the specified player.
     * 
 	* @param player - player that is interacting with the custom items command.
+	* @param altPlayer - that is associated with the commands.
 	* @param action - the action when interacting with the item.
 	* @param slot - the slot that the custom item is in.
 	* @param itemMap - the ItemMap of the custom item.
 	* @return If the command execute was successful.
 	*/
-	public boolean execute(final Player player, final String action, final String clickType, final String slot, final ItemMap itemMap) {
+	public boolean execute(final Player player, final Player altPlayer, final String action, final String clickType, final String slot, final ItemMap itemMap) {
 		if (this.command == null || this.command.length() == 0 || !this.actionType.hasClickType(clickType) || !this.actionType.hasAction(action)) { return false; }
 		if (this.actionType.equals(Action.ON_HOLD)) {
 			int cooldown = itemMap.getCommandCooldown() * 20;
 			if (cooldown == 0) { cooldown += 1 * 20; }
-			this.taskOnHold(player, slot, cooldown, itemMap);
+			this.taskOnHold(player, altPlayer, slot, cooldown, itemMap);
 		} else if (this.actionType.equals(Action.ON_RECEIVE)) {
 			int cooldown = itemMap.getCommandCooldown() * 20;
 			if (cooldown == 0) { cooldown += 1 * 20; }
 			int receive = itemMap.getCommandReceive();
-			this.sendDispatch(player, this.executorType, slot);
-			if (receive >= 2) { this.taskOnReceive(player, slot, cooldown, (receive - 1), itemMap); }
-		} else { this.sendDispatch(player, this.executorType, slot); }
+			this.sendDispatch(player, altPlayer, this.executorType, slot);
+			if (receive >= 2) { this.taskOnReceive(player, altPlayer, slot, cooldown, (receive - 1), itemMap); }
+		} else { this.sendDispatch(player, altPlayer, this.executorType, slot); }
 		return true;
 	}
 
@@ -94,16 +95,17 @@ public class ItemCommand {
 	* Runs the ItemCommand every x seconds while the player is holding the custom item.
 	* 
 	* @param player - player that is interacting with the custom items command.
+	* @param altPlayer - that is associated with the commands.
 	* @param slot - the slot that the custom item is in.
 	* @param cooldown - the delay between each command execution.
 	* @param itemMap - the ItemMap of the custom item.
 	*/
-	private void taskOnHold(final Player player, final String slot, final int cooldown, final ItemMap itemMap) {
+	private void taskOnHold(final Player player, final Player altPlayer, final String slot, final int cooldown, final ItemMap itemMap) {
     	this.cycleTask = SchedulerUtils.runAsyncAtInterval(cooldown, 0L, () -> {
     		if (itemMap.isSimilar(PlayerHandler.getMainHandItem(player))) {
-    			this.sendDispatch(player, this.executorType, slot);
+    			this.sendDispatch(player, altPlayer, this.executorType, slot);
     		} else if (itemMap.isSimilar(PlayerHandler.getOffHandItem(player))) {
-    			this.sendDispatch(player, this.executorType, slot);
+    			this.sendDispatch(player, altPlayer, this.executorType, slot);
     		} else { this.cancelTask(); }
     	});
     }
@@ -120,16 +122,17 @@ public class ItemCommand {
 	* Runs the ItemCommand every x seconds for x amount of times when the player receives the item.
 	* 
 	* @param player - player that is interacting with the custom items command.
+	* @param altPlayer - that is associated with the commands.
 	* @param slot - the slot that the custom item is in.
 	* @param cooldown - the delay between each command execution.
 	* @param receive - the number of times to execute the ItemCommand.
 	* @param itemMap - the ItemMap of the custom item.
 	*/
-	private void taskOnReceive(final Player player, final String slot, final int cooldown, final int receive, final ItemMap itemMap) {
+	private void taskOnReceive(final Player player, final Player altPlayer, final String slot, final int cooldown, final int receive, final ItemMap itemMap) {
 		SchedulerUtils.runAsyncLater(cooldown, () -> {
 	    	if (receive != 0) {
-	    		this.sendDispatch(player, this.executorType, slot); 
-	    		this.taskOnReceive(player, slot, cooldown, (receive - 1), itemMap);
+	    		this.sendDispatch(player, altPlayer, this.executorType, slot); 
+	    		this.taskOnReceive(player, altPlayer, slot, cooldown, (receive - 1), itemMap);
 	    	} 
 	    });
     }
@@ -271,10 +274,11 @@ public class ItemCommand {
 	* Officially executes the ItemCommand.
 	* 
 	* @param player - player that is interacting with the custom items command.
+	* @param altPlayer - that is associated with the commands.
 	* @param cmdtype - the executor of the command.
 	* @param slot - the slot the custom item is in.
 	*/
-	private void sendDispatch(final Player player, final Executor cmdtype, final String slot) {
+	private void sendDispatch(final Player player, final Player altPlayer, final Executor cmdtype, final String slot) {
 		final World world = player.getWorld();
 		this.setPending(player, true); 
 		SchedulerUtils.runAsyncLater(this.delay, () -> {
@@ -286,16 +290,16 @@ public class ItemCommand {
 				|| ((this.itemMap.getCommandSequence() == CommandSequence.REMAIN && (cmdtype == Executor.SWAPITEM || cmdtype == Executor.DELAY))) || this.itemMap.getCommandSequence() != CommandSequence.REMAIN))
 				&& (player.isOnline() && player.getWorld() == world && !this.getExecute(player))) {
 				switch (cmdtype) {
-					case CONSOLE: this.dispatchConsoleCommands(player); break;
-					case OP: this.dispatchOpCommands(player); break;
-					case PLAYER: this.dispatchPlayerCommands(player); break;
-					case MESSAGE: this.dispatchMessageCommands(player); break;
-					case SERVERSWITCH: this.dispatchServerCommands(player); break;
-					case BUNGEE: this.dispatchBungeeCordCommands(player); break;
-					case SWAPITEM: this.dispatchSwapItem(player, slot); break;
-					case DEFAULT: this.dispatchPlayerCommands(player); break;
+					case CONSOLE: this.dispatchConsoleCommands(player, altPlayer); break;
+					case OP: this.dispatchOpCommands(player, altPlayer); break;
+					case PLAYER: this.dispatchPlayerCommands(player, altPlayer); break;
+					case MESSAGE: this.dispatchMessageCommands(player, altPlayer); break;
+					case SERVERSWITCH: this.dispatchServerCommands(player, altPlayer); break;
+					case BUNGEE: this.dispatchBungeeCordCommands(player, altPlayer); break;
+					case SWAPITEM: this.dispatchSwapItem(player, altPlayer, slot); break;
+					case DEFAULT: this.dispatchPlayerCommands(player, altPlayer); break;
 					case DELAY: break;
-					default: this.dispatchPlayerCommands(player); break;
+					default: this.dispatchPlayerCommands(player, altPlayer); break;
 				}
 			} else if (this.getExecute(player)) { this.setExecute(player, false); }
 		});
@@ -305,17 +309,20 @@ public class ItemCommand {
 	* Executes the ItemCommand as Console.
 	* 
 	* @param player - player that is interacting with the custom items command.
+	* @param altPlayer - that is associated with the commands.
 	*/
-	private void dispatchConsoleCommands(final Player player) {
+	private void dispatchConsoleCommands(final Player player, final Player altPlayer) {
 		try {
 			if (StringUtils.getUtils().containsIgnoreCase(this.command, "[close]")) {
 				SchedulerUtils.run(() -> {
 					PlayerHandler.safeInventoryClose(player);
 				});
 			} else {
-				this.setLoggable(player, "/" + StringUtils.getUtils().translateLayout(this.command, player));
+				String[] values = new String[1];
+				if (altPlayer != null) { values[0] = altPlayer.getName(); }
+				this.setLoggable(player, "/" + StringUtils.getUtils().translateLayout(this.command, player, values));
 				SchedulerUtils.run(() -> {
-					Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), StringUtils.getUtils().translateLayout(this.command, player));
+					Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), StringUtils.getUtils().translateLayout(this.command, player, values));
 				});
 			}
 		} catch (Exception e) {
@@ -328,8 +335,9 @@ public class ItemCommand {
 	* Executes the ItemCommand as the specified Player with OP permissions.
 	* 
 	* @param player - player that is interacting with the custom items command.
+	* @param altPlayer - that is associated with the commands.
 	*/
-	private void dispatchOpCommands(final Player player) {
+	private void dispatchOpCommands(final Player player, final Player altPlayer) {
 		try {
 			if (StringUtils.getUtils().containsIgnoreCase(this.command, "[close]")) {
 				SchedulerUtils.run(() -> {
@@ -339,9 +347,11 @@ public class ItemCommand {
 				boolean isOp = player.isOp();
 				try {
 					player.setOp(true);
-					this.setLoggable(player, "/" + StringUtils.getUtils().translateLayout(this.command, player));
+					String[] values = new String[1];
+					if (altPlayer != null) { values[0] = altPlayer.getName(); }
+					this.setLoggable(player, "/" + StringUtils.getUtils().translateLayout(this.command, player, values));
 					SchedulerUtils.run(() -> {
-						player.chat("/" + StringUtils.getUtils().translateLayout(this.command, player));
+						player.chat("/" + StringUtils.getUtils().translateLayout(this.command, player, values));
 					});
 				} catch (Exception e) {
 					ServerUtils.sendDebugTrace(e);
@@ -359,17 +369,20 @@ public class ItemCommand {
 	* Executes the ItemCommand as the specified Player.
 	* 
 	* @param player - player that is interacting with the custom items command.
+	* @param altPlayer - that is associated with the commands.
 	*/
-	private void dispatchPlayerCommands(final Player player) {
+	private void dispatchPlayerCommands(final Player player, final Player altPlayer) {
 		try {
 			if (StringUtils.getUtils().containsIgnoreCase(this.command, "[close]")) {
 				SchedulerUtils.run(() -> {
 					PlayerHandler.safeInventoryClose(player);
 				});
 			} else {
-				this.setLoggable(player, "/" + StringUtils.getUtils().translateLayout(this.command, player));
+				String[] values = new String[1];
+				if (altPlayer != null) { values[0] = altPlayer.getName(); }
+				this.setLoggable(player, "/" + StringUtils.getUtils().translateLayout(this.command, player, values));
 				SchedulerUtils.run(() -> {
-					player.chat("/" + StringUtils.getUtils().translateLayout(this.command, player));
+					player.chat("/" + StringUtils.getUtils().translateLayout(this.command, player, values));
 				});
 			}
 		} catch (Exception e) {
@@ -382,11 +395,14 @@ public class ItemCommand {
 	* Executes the ItemCommand as a custom Message.
 	* 
 	* @param player - player that is interacting with the custom items command.
+	* @param altPlayer - that is associated with the commands.
 	*/
-	private void dispatchMessageCommands(final Player player) {
+	private void dispatchMessageCommands(final Player player, final Player altPlayer) {
 		try { 
 			SchedulerUtils.run(() -> {
-				player.sendMessage(StringUtils.getUtils().translateLayout(this.command, player)); 
+				String[] values = new String[1];
+				if (altPlayer != null) { values[0] = altPlayer.getName(); }
+				player.sendMessage(StringUtils.getUtils().translateLayout(this.command, player, values)); 
 			});
 		} 
 		catch (Exception e) {
@@ -399,11 +415,14 @@ public class ItemCommand {
 	* Sends the specified Player to the defined commands Bungee server.
 	* 
 	* @param player - player that is interacting with the custom items command.
+	* @param altPlayer - that is associated with the commands.
 	*/
-	private void dispatchServerCommands(final Player player) {
+	private void dispatchServerCommands(final Player player, final Player altPlayer) {
 		try { 
 			SchedulerUtils.run(() -> {
-				BungeeCordAPI.SwitchServers(player, StringUtils.getUtils().translateLayout(this.command, player)); 
+				String[] values = new String[1];
+				if (altPlayer != null) { values[0] = altPlayer.getName(); }
+				BungeeCordAPI.SwitchServers(player, StringUtils.getUtils().translateLayout(this.command, player, values)); 
 			});
 		} 
 		catch (Exception e) {
@@ -416,11 +435,14 @@ public class ItemCommand {
 	* Sends the ItemCommand to be executed in BungeeCord.
 	* 
 	* @param player - player that is interacting with the custom items command.
+	* @param altPlayer - that is associated with the commands.
 	*/
-	private void dispatchBungeeCordCommands(final Player player) {
+	private void dispatchBungeeCordCommands(final Player player, final Player altPlayer) {
 		try { 
 			SchedulerUtils.run(() -> {
-				BungeeCordAPI.ExecuteCommand(player, StringUtils.getUtils().translateLayout(this.command, player)); 
+				String[] values = new String[1];
+				if (altPlayer != null) { values[0] = altPlayer.getName(); }
+				BungeeCordAPI.ExecuteCommand(player, StringUtils.getUtils().translateLayout(this.command, player, values)); 
 			});
 		} 
 		catch (Exception e) {
@@ -433,8 +455,9 @@ public class ItemCommand {
 	* Swaps the executed command item with the defined command item.
 	* 
 	* @param player - player that is interacting with the custom items command.
+	* @param altPlayer - that is associated with the commands.
 	*/
-	private void dispatchSwapItem(final Player player, final String slot) {
+	private void dispatchSwapItem(final Player player, final Player altPlayer, final String slot) {
 		try {
 			for (ItemMap item : ItemUtilities.getUtilities().getItems()) {
 				if (item.getConfigName().equalsIgnoreCase(this.command) && slot != null) {

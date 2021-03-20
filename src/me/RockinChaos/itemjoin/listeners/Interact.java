@@ -63,7 +63,7 @@ public class Interact implements Listener {
 	 		}
 	 	}
 	 }
-	 public HashMap<ItemStack, Long> interactLock = new HashMap<ItemStack, Long>();
+	 private HashMap<ItemStack, Long> interactLock = new HashMap<ItemStack, Long>();
 	
 	 
    /**

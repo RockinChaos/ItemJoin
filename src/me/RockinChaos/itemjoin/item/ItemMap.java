@@ -4112,9 +4112,9 @@ public class ItemMap {
 		this.setAnimations(player);
 		if (this.getMultipleSlots() != null && !this.getMultipleSlots().isEmpty()) {
 			if (this.getSlot().equalsIgnoreCase(this.getMultipleSlots().get(0))) {
-				this.executeCommands(player, this.tempItem, "ON_RECEIVE", "RECEIVED", this.getSlot());
+				this.executeCommands(player, null, this.tempItem, "ON_RECEIVE", "RECEIVED", this.getSlot());
 			}
-		} else { this.executeCommands(player, this.tempItem, "ON_RECEIVE", "RECEIVED", this.getSlot()); }
+		} else { this.executeCommands(player, null, this.tempItem, "ON_RECEIVE", "RECEIVED", this.getSlot()); }
 	}
 	
    /**
@@ -4155,7 +4155,7 @@ public class ItemMap {
 			});
 		}
 		this.setAnimations(player);
-		this.executeCommands(player, this.tempItem, "ON_RECEIVE", "RECEIVED", slot);
+		this.executeCommands(player, null, this.tempItem, "ON_RECEIVE", "RECEIVED", slot);
 	}
 	
    /**
@@ -4176,14 +4176,15 @@ public class ItemMap {
     * Attempts to Execute the ItemCommands.
     * 
     * @param player - The Player that executed the commands.
+    * @param altPlayer - that is associated with the commands.
     * @param itemCopy - The ItemStack having their commands executed.
     * @param action - The Action that executed the commands.
     * @param slot - The Slot of the ItemStack.
     * @return If the commands successfully executed.
     */
-    public void executeCommands(final Player player, final ItemStack itemCopy, final String action, final String clickType, final String slot) {
+    public void executeCommands(final Player player, final Player altPlayer, final ItemStack itemCopy, final String action, final String clickType, final String slot) {
     	if (this.commands != null && this.commands.length > 0 && !Menu.isOpen(player) && !this.getWarmPending(player) && this.isExecutable(player, action, clickType) && !this.onCooldown(player) && this.isPlayerChargeable(player, this.itemCost != null && !this.itemCost.isEmpty())) {
-    		this.warmCycle(player, this, this.getWarmDelay(), player.getLocation(), itemCopy, action, clickType, slot);
+    		this.warmCycle(player, altPlayer, this, this.getWarmDelay(), player.getLocation(), itemCopy, action, clickType, slot);
     	}
     }
 	
@@ -4191,6 +4192,7 @@ public class ItemMap {
     * Starts the Warmup for the Player pending command execution.
     * 
     * @param player - The Player that executed the commands.
+    * @param altPlayer - that is associated with the commands.
     * @param itemMap - The ItemMap having their commands executed.
     * @param warmCount - The duration of the Warmup.
     * @param location - The Location of the Warmup.
@@ -4198,7 +4200,7 @@ public class ItemMap {
     * @param action - The Action that executed the commands.
     * @param slot - The Slot of the ItemStack.
     */
-	private void warmCycle(final Player player, final ItemMap itemMap, final int warmCount, final Location location, final ItemStack itemCopy, final String action, final String clickType, final String slot) {
+	private void warmCycle(final Player player, final Player altPlayer, final ItemMap itemMap, final int warmCount, final Location location, final ItemStack itemCopy, final String action, final String clickType, final String slot) {
 		if (warmCount != 0) {
 			if (itemMap.warmDelay == warmCount) { 
 				String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = StringUtils.getUtils().translateLayout(itemMap.getCustomName(), player); 
@@ -4209,7 +4211,7 @@ public class ItemMap {
 				if (itemMap.warmLocation(player, location, action)) {
 					String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = StringUtils.getUtils().translateLayout(itemMap.getCustomName(), player); 
 					LanguageAPI.getLang(false).sendLangMessage("general.warmingTime", player, placeHolders);
-					itemMap.warmCycle(player, itemMap, (warmCount - 1), location, itemCopy, action, clickType, slot);	
+					itemMap.warmCycle(player, altPlayer, itemMap, (warmCount - 1), location, itemCopy, action, clickType, slot);	
 				} else { 
 					itemMap.delWarmPending(player); 
 					String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = StringUtils.getUtils().translateLayout(itemMap.getCustomName(), player); 
@@ -4221,7 +4223,7 @@ public class ItemMap {
 			if (itemMap.warmDelay != 0) { delay = 20L; }
 			SchedulerUtils.runLater(delay, () -> {
 				if ((!player.isDead() || action.equalsIgnoreCase("ON_DEATH")) && player.isOnline()) {
-					if (isExecuted(player, action, clickType, slot)) { 
+					if (isExecuted(player, altPlayer, action, clickType, slot)) { 
 						if (itemMap.itemCost == null || itemMap.itemCost.isEmpty()) { itemMap.withdrawBalance(player); } 
 						else { itemMap.withdrawItemCost(player); }
 				    	itemMap.playSound(player);
@@ -4274,15 +4276,16 @@ public class ItemMap {
     * 
     * @param itemCommands - The ItemCommands to have an entry randomly selected.
     * @param player - The Player having their commands randomly selected.
+    * @param altPlayer - that is associated with the commands.
     * @param action - The Action that executed the commands.
     * @param slot - The Slot of the ItemStack.
     * @return If it was successful.
     */
-    private boolean getRandomMap(final HashMap < Integer, ItemCommand > randomCommands, final ItemCommand[] itemCommands, final Player player, final String action, final String clickType, final String slot) {
+    private boolean getRandomMap(final HashMap < Integer, ItemCommand > randomCommands, final ItemCommand[] itemCommands, final Player player, final Player altPlayer, final String action, final String clickType, final String slot) {
     	Entry<?, ?> dedicatedMap = StringUtils.getUtils().randomEntry(randomCommands);
     	if (dedicatedMap != null && dedicatedMap.getValue() != null && player != null && action != null && clickType != null && slot != null && itemCommands != null && randomCommands != null
-        && !((ItemCommand)dedicatedMap.getValue()).execute(player, action, clickType, slot, this)) { 
-    		this.getRandomMap(randomCommands, itemCommands, player, action, clickType, slot);
+        && !((ItemCommand)dedicatedMap.getValue()).execute(player, altPlayer, action, clickType, slot, this)) { 
+    		this.getRandomMap(randomCommands, itemCommands, player, altPlayer, action, clickType, slot);
     		return false;
     	}
     	return true;
@@ -4293,22 +4296,23 @@ public class ItemMap {
     * 
     * @param itemCommands - The ItemCommands to have an entry randomly selected.
     * @param player - The Player having their commands randomly selected.
+    * @param altPlayer - that is associated with the commands.
     * @param action - The Action that executed the commands.
     * @param slot - The Slot of the ItemStack.
     * @return If it was successful.
     */
-    private boolean getRandomAll(final HashMap < Integer, ItemCommand > randomCommands, final ItemCommand[] itemCommands, final Player player, final String action, final String clickType, final String slot) {
+    private boolean getRandomAll(final HashMap < Integer, ItemCommand > randomCommands, final ItemCommand[] itemCommands, final Player player, final Player altPlayer, final String action, final String clickType, final String slot) {
     	Entry<?, ?> dedicatedMap = StringUtils.getUtils().randomEntry(randomCommands);
     	if (dedicatedMap != null && dedicatedMap.getValue() != null && player != null && action != null && slot != null && itemCommands != null && randomCommands != null 
-        && !((ItemCommand)dedicatedMap.getValue()).execute(player, action, clickType, slot, this)) { 
+        && !((ItemCommand)dedicatedMap.getValue()).execute(player, altPlayer, action, clickType, slot, this)) { 
     		randomCommands.remove(dedicatedMap.getKey());
-    		this.getRandomAll(randomCommands, itemCommands, player, action, clickType, slot);
+    		this.getRandomAll(randomCommands, itemCommands, player, altPlayer, action, clickType, slot);
     		return false;
     	}
     	if (dedicatedMap != null && randomCommands != null) { randomCommands.remove(dedicatedMap.getKey()); }
     	if (dedicatedMap != null && dedicatedMap.getValue() != null && player != null && action != null && slot != null && itemCommands != null && randomCommands != null && 
     	   !randomCommands.isEmpty()) {
-    		this.getRandomAll(randomCommands, itemCommands, player, action, clickType, slot);
+    		this.getRandomAll(randomCommands, itemCommands, player, altPlayer, action, clickType, slot);
     	}
     	return true;
     }
@@ -4340,12 +4344,13 @@ public class ItemMap {
     * Executes the ItemCommands.
     * 
     * @param player - The Player executing the commands.
+    * @param altPlayer - that is associated with the commands.
     * @param action - The Action executing the commands.
     * @param slot - The slot of the ItemStack.
     * @param itemCopy - The ItemStack having their commands executed.
     * @return If the Command(s) were successfully executed.
     */
-    private boolean isExecuted(final Player player, final String action, final String clickType, final String slot) {
+    private boolean isExecuted(final Player player, final Player altPlayer, final String action, final String clickType, final String slot) {
     	boolean playerSuccess = false;
     	ItemCommand[] itemCommands = this.commands;
     	String chosenIdent = this.getRandomList(itemCommands);
@@ -4355,20 +4360,20 @@ public class ItemMap {
         		if (this.sequence == CommandSequence.RANDOM || this.sequence == CommandSequence.RANDOM_SINGLE) { randomCommands.put(StringUtils.getUtils().getRandom(1, 100000), itemCommands[i]); }
         		else if (this.sequence == CommandSequence.RANDOM_LIST) {
         			if (itemCommands[i].getSection() != null && itemCommands[i].getSection().equalsIgnoreCase(chosenIdent.replace("+", ""))) {
-	        			if (!playerSuccess) { playerSuccess = itemCommands[i].execute(player, action, clickType, slot, this); } 
-	        			else { itemCommands[i].execute(player, action, clickType, slot, this); } 
+	        			if (!playerSuccess) { playerSuccess = itemCommands[i].execute(player, altPlayer, action, clickType, slot, this); } 
+	        			else { itemCommands[i].execute(player, altPlayer, action, clickType, slot, this); } 
 	        		}
         		}
 				else { 
 					synchronized(ItemCommand.class) {
-						if (!playerSuccess) { playerSuccess = itemCommands[i].execute(player, action, clickType, slot, this); }
-						else { itemCommands[i].execute(player, action, clickType, slot, this); }
+						if (!playerSuccess) { playerSuccess = itemCommands[i].execute(player, altPlayer, action, clickType, slot, this); }
+						else { itemCommands[i].execute(player, altPlayer, action, clickType, slot, this); }
 					}
 				}
 			}
     	}
-    	if (this.sequence == CommandSequence.RANDOM) { playerSuccess = this.getRandomAll(randomCommands, itemCommands, player, action, clickType, slot); }
-    	else if (this.sequence == CommandSequence.RANDOM_SINGLE) { playerSuccess = this.getRandomMap(randomCommands, itemCommands, player, action, clickType, slot); }
+    	if (this.sequence == CommandSequence.RANDOM) { playerSuccess = this.getRandomAll(randomCommands, itemCommands, player, altPlayer, action, clickType, slot); }
+    	else if (this.sequence == CommandSequence.RANDOM_SINGLE) { playerSuccess = this.getRandomMap(randomCommands, itemCommands, player, altPlayer, action, clickType, slot); }
     	return playerSuccess;
     }
 	
