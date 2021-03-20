@@ -1,5 +1,7 @@
 package me.RockinChaos.itemjoin.listeners;
 
+import java.util.HashMap;
+
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
@@ -16,6 +18,7 @@ import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.utils.SchedulerUtils;
 import me.RockinChaos.itemjoin.utils.ServerUtils;
+import me.RockinChaos.itemjoin.utils.api.ItemAPI;
 
 public class Interact implements Listener {
 
@@ -46,13 +49,22 @@ public class Interact implements Listener {
 	 private void onInteractCooldown(PlayerInteractEvent event) {
 	 	Player player = event.getPlayer();
 	 	ItemStack item = event.getItem();
-	 	if ((event.hasItem() && event.getAction() != Action.PHYSICAL) && (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK)) {
+	 	if ((event.hasItem() && event.getAction() != Action.PHYSICAL) && ((ItemAPI.isPlaceable(event.getMaterial()) && event.getAction() == Action.RIGHT_CLICK_AIR) || event.getAction() == Action.RIGHT_CLICK_BLOCK)) {
 	 		ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item, null, player.getWorld());
-	 		if (itemMap != null && itemMap.getInteractCooldown() != 0 && itemMap.onInteractCooldown(player)) {
-	 			event.setCancelled(true);
+	 		if (itemMap != null && itemMap.getInteractCooldown() != 0) {
+	 			long lockDuration = (this.interactLock != null && !this.interactLock.isEmpty() && this.interactLock.get(item) != null ? (((System.currentTimeMillis()) - this.interactLock.get(item))) : -1);
+	 			this.interactLock.put(item, System.currentTimeMillis());
+	 			if (itemMap.onInteractCooldown(player)) {
+					if (lockDuration == -1 || lockDuration > 30) {
+			 			event.setCancelled(true);
+			 			PlayerHandler.updateInventory(player);
+					}
+	 			}
 	 		}
 	 	}
 	 }
+	 public HashMap<ItemStack, Long> interactLock = new HashMap<ItemStack, Long>();
+	
 	 
    /**
 	* Prevents the player from selecting custom items with the selectable itemflag upon holding it.
