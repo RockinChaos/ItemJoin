@@ -299,6 +299,16 @@ public class PlayerHandler {
     * @param player - The player to have their inventory updated.
     * @param delay - The ticks to wait before updating the inventory.
     */
+	public static void updateInventory(final Player player) {
+		updateInventory(player, null, 0L);
+	}
+	
+   /**
+    * Updates the specified players inventory.
+    * 
+    * @param player - The player to have their inventory updated.
+    * @param delay - The ticks to wait before updating the inventory.
+    */
 	public static void updateInventory(final Player player, final long delay) {
 		updateInventory(player, null, delay);
 	}

@@ -84,7 +84,7 @@ import me.RockinChaos.itemjoin.utils.api.LanguageAPI;
 import me.RockinChaos.itemjoin.utils.api.LegacyAPI;
 import me.RockinChaos.itemjoin.utils.StringUtils;
 import me.RockinChaos.itemjoin.utils.enchants.Glow;
-import me.RockinChaos.itemjoin.utils.interfaces.pages.InterMenu;
+import me.RockinChaos.itemjoin.utils.interfaces.menus.Menu;
 import me.RockinChaos.itemjoin.utils.sql.DataObject;
 import me.RockinChaos.itemjoin.utils.sql.SQL;
 import me.RockinChaos.itemjoin.utils.sql.DataObject.Table;
@@ -3185,7 +3185,7 @@ public class ItemMap {
     * @return If the ItemFlag is to be prevented.
     */
 	public boolean isAllowedItem(final Player player, final ItemStack item, final String findFlag) {
-		if (!InterMenu.isOpen(player) && this.isSimilar(item)) {
+		if (!Menu.isOpen(player) && this.isSimilar(item)) {
 			if (this.AllowOpBypass && player.isOp() || this.CreativeBypass && player.getGameMode() == GameMode.CREATIVE 
 					|| findFlag.equalsIgnoreCase("inventory-modify") && player.hasPermission("itemjoin.bypass.inventorymodify") 
 					&& ItemJoin.getInstance().getConfig().getBoolean("Permissions.Movement-Bypass")) {
@@ -4182,7 +4182,7 @@ public class ItemMap {
     * @return If the commands successfully executed.
     */
     public void executeCommands(final Player player, final ItemStack itemCopy, final String action, final String clickType, final String slot) {
-    	if (this.commands != null && this.commands.length > 0 && !InterMenu.isOpen(player) && !this.getWarmPending(player) && this.isExecutable(player, action, clickType) && !this.onCooldown(player) && this.isPlayerChargeable(player, this.itemCost != null && !this.itemCost.isEmpty())) {
+    	if (this.commands != null && this.commands.length > 0 && !Menu.isOpen(player) && !this.getWarmPending(player) && this.isExecutable(player, action, clickType) && !this.onCooldown(player) && this.isPlayerChargeable(player, this.itemCost != null && !this.itemCost.isEmpty())) {
     		this.warmCycle(player, this, this.getWarmDelay(), player.getLocation(), itemCopy, action, clickType, slot);
     	}
     }

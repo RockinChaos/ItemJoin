@@ -470,14 +470,14 @@ abstract class Controller {
 			                		Statement ps = null;
 			                		try {
 				                		String newDatabase = "jdbc:mysql://" + config.getString("Database.host") + ":" + config.getString("Database.port") + "?useUnicode=true&characterEncoding=utf-8&connectTimeout=10000&useSSL=false&allowPublicKeyRetrieval=true&useCursorFetch=true&useLocalSessionState=true&rewriteBatchedStatements=true&maintainTimeStats=false";
-				                		connection = DriverManager.getConnection(newDatabase, config.getString("Database.user"), config.getString("Database.pass"));
-				                		ps = connection.createStatement();
+				                		this.connection = DriverManager.getConnection(newDatabase, config.getString("Database.user"), config.getString("Database.pass"));
+				                		ps = this.connection.createStatement();
 				                		ps.executeUpdate("CREATE DATABASE IF NOT EXISTS " + (config.getString("Database.table") != null ? config.getString("Database.table") : config.getString("Database.database")) + ";");
 			                		} catch (Exception e2) {
 			                			ServerUtils.logSevere("{SQL} [1] Failed create the database, please manually create the database defined in your config.yml Database settings."); 
 										ServerUtils.sendSevereTrace(e);
 			                		} finally {
-			                			this.close(ps, null, connection, true); {
+			                			this.close(ps, null, this.connection, true); {
 			                				this.getConnection();
 			                			}
 			                		}

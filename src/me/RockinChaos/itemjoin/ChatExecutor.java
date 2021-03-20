@@ -41,7 +41,7 @@ import me.RockinChaos.itemjoin.utils.ServerUtils;
 import me.RockinChaos.itemjoin.utils.api.ChanceAPI;
 import me.RockinChaos.itemjoin.utils.api.LanguageAPI;
 import me.RockinChaos.itemjoin.utils.api.LegacyAPI;
-import me.RockinChaos.itemjoin.utils.interfaces.pages.InterMenu;
+import me.RockinChaos.itemjoin.utils.interfaces.menus.Menu;
 import me.RockinChaos.itemjoin.utils.StringUtils;
 import me.RockinChaos.itemjoin.utils.sql.DataObject;
 import me.RockinChaos.itemjoin.utils.sql.SQL;
@@ -168,7 +168,7 @@ public class ChatExecutor implements CommandExecutor {
 			ConfigHandler.getConfig().reloadConfigs(false);
 			LanguageAPI.getLang(false).sendLangMessage("commands.default.configReload", sender);
 		} else if (Execute.MENU.accept(sender, args, 0)) {
-			InterMenu.startMenu(sender);
+			Menu.startMenu(sender);
 			LanguageAPI.getLang(false).sendLangMessage("commands.menu.openMenu", sender);
 		} else if (Execute.INFO.accept(sender, args, 0)) {
 			this.info(sender);

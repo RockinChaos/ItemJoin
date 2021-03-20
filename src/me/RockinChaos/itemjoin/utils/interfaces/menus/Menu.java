@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package me.RockinChaos.itemjoin.utils.interfaces.pages;
+package me.RockinChaos.itemjoin.utils.interfaces.menus;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -84,7 +84,7 @@ import me.arcaniax.hdb.api.HeadDatabaseAPI;
 * Allows the Admin to modify, create, delete, and save custom items in-game.
 * 
 */
-public class InterMenu {
+public class Menu {
 	private static String GUIName = ServerUtils.hasSpecificUpdate("1_9") ? StringUtils.getUtils().colorFormat("&7           &0&n ItemJoin Menu") : StringUtils.getUtils().colorFormat("&7           &0&n ItemJoin Menu");
 	private static ItemStack fillerPaneBItem = ItemHandler.getItem("STAINED_GLASS_PANE:15", 1, false, "&7", "");
 	private static ItemStack fillerPaneGItem = ItemHandler.getItem("STAINED_GLASS_PANE:7", 1, false, "&7", "");
@@ -499,26 +499,11 @@ public class InterMenu {
 		}
 		craftingPane.addButton(new Button(fillerPaneGItem), 3);
 		String lore = (contents == null ? "&7the modifying selection menu" : "&7the contents selection menu.");
-		if (ServerUtils.hasSpecificUpdate("1_8")) {
-			craftingPane.addButton(new Button(ItemHandler.setSkullTexture(ItemHandler.getItem("SKULL_ITEM:3", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", lore),
-					"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2RjOWU0ZGNmYTQyMjFhMWZhZGMxYjViMmIxMWQ4YmVlYjU3ODc5YWYxYzQyMzYyMTQyYmFlMWVkZDUifX19"), event -> modifyPane.open(player)));
-		} else {
-			craftingPane.addButton(new Button(ItemHandler.getItem("ARROW", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", lore), event -> modifyPane.open(player)));
-		}
+		craftingPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", lore), event -> modifyPane.open(player)));
 		craftingPane.addButton(new Button(fillerPaneBItem), 7);
-		if (ServerUtils.hasSpecificUpdate("1_8")) {
-			craftingPane.addButton(new Button(ItemHandler.setSkullTexture(ItemHandler.getItem("SKULL_ITEM:3", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", lore), 
-					"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2RjOWU0ZGNmYTQyMjFhMWZhZGMxYjViMmIxMWQ4YmVlYjU3ODc5YWYxYzQyMzYyMTQyYmFlMWVkZDUifX19"), event -> modifyPane.open(player)));
-		} else {
-			craftingPane.addButton(new Button(ItemHandler.getItem("ARROW", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", lore), event -> modifyPane.open(player)));
-		}
+		craftingPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", lore), event -> modifyPane.open(player)));
 		Interface arbitraryPane = new Interface(true, 6, GUIName, player);
-		if (ServerUtils.hasSpecificUpdate("1_8")) {
-			arbitraryPane.setReturnButton(new Button(ItemHandler.setSkullTexture(ItemHandler.getItem("SKULL_ITEM:3", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", lore),
-					"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2RjOWU0ZGNmYTQyMjFhMWZhZGMxYjViMmIxMWQ4YmVlYjU3ODc5YWYxYzQyMzYyMTQyYmFlMWVkZDUifX19"), event -> modifyPane.open(player)));
-		} else {
-			arbitraryPane.setReturnButton(new Button(ItemHandler.getItem("ARROW", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", lore), event -> modifyPane.open(player)));
-		}
+		arbitraryPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", lore), event -> modifyPane.open(player)));
 		List < ItemMap > tempList = new ArrayList < ItemMap > ();
 		tempList.addAll(items);
 		for (final ItemMap item: tempList) {
@@ -1007,26 +992,14 @@ public class InterMenu {
 			creatingPane.addButton(new Button(fillerPaneGItem));
 			creatingPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nMain Menu", "&7", "&7*Cancel and return to the main menu.", "&7", "&c&lWARNING: &7This item has NOT been saved!"), event -> returnConfirm(player, itemMap)));
 			creatingPane.addButton(new Button(fillerPaneBItem), 3);
-			if (ServerUtils.hasSpecificUpdate("1_8")) {
-				creatingPane.addButton(new Button(ItemHandler.setSkullTexture(ItemHandler.getItem("SKULL_ITEM:3", 1, false, "&a&l&nSave to Config", "&7", "&7*Saves the custom item", "&7settings to the items.yml file."), 
-						"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzdiNjJkMjc1ZDg3YzA5Y2UxMGFjYmNjZjM0YzRiYTBiNWYxMzVkNjQzZGM1MzdkYTFmMWRmMzU1YTIyNWU4MiJ9fX0"), event -> {
-					itemMap.saveToConfig();
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
-					placeHolders[3] = itemMap.getConfigName();
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.itemSaved", player, placeHolders);
-					ConfigHandler.getConfig().reloadConfigs(true);
-					player.closeInventory();
-				}));
-			} else {
-				creatingPane.addButton(new Button(ItemHandler.getItem("WOOL:5", 1, false, "&a&l&nSave to Config", "&7", "&7*Saves the custom item", "&7settings to the items.yml file."), event -> {
-					itemMap.saveToConfig();
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
-					placeHolders[3] = itemMap.getConfigName();
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.itemSaved", player, placeHolders);
-					ConfigHandler.getConfig().reloadConfigs(true);
-					player.closeInventory();
-				}));
-			}
+			creatingPane.addButton(new Button(ItemHandler.getItem("WOOL:5", 1, false, "&a&l&nSave to Config", "&7", "&7*Saves the custom item", "&7settings to the items.yml file."), event -> {
+				itemMap.saveToConfig();
+				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				placeHolders[3] = itemMap.getConfigName();
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.itemSaved", player, placeHolders);
+				ConfigHandler.getConfig().reloadConfigs(true);
+				player.closeInventory();
+			}));
 			creatingPane.addButton(new Button(fillerPaneBItem), 3);
 			creatingPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nMain Menu", "&7", "&7*Cancel and return you to the main menu.", "&7", "&c&lWARNING: &7This item has NOT been saved!"), event -> returnConfirm(player, itemMap)));
 			});
@@ -1046,28 +1019,14 @@ public class InterMenu {
 			returnPane.addButton(new Button(fillerPaneBItem));
 			returnPane.addButton(new Button(ItemHandler.getItem("WOOL:14", 1, false, "&c&l&nMain Menu", "&7", "&7*Cancel and return to the", "&7main menu, all modified", "&7settings will be lost.", "&7", "&c&lWARNING: &cThis item has &lNOT&c been saved!"), event -> startMenu(player)));
 			returnPane.addButton(new Button(fillerPaneBItem), 2);
-			
-			if (ServerUtils.hasSpecificUpdate("1_8")) {
-				returnPane.addButton(new Button(ItemHandler.setSkullTexture(ItemHandler.getItem("SKULL_ITEM:3", 1, false, "&a&l&nSave to Config", "&7", "&7*Saves the custom item", "&7settings to the items.yml file."), 
-						"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzdiNjJkMjc1ZDg3YzA5Y2UxMGFjYmNjZjM0YzRiYTBiNWYxMzVkNjQzZGM1MzdkYTFmMWRmMzU1YTIyNWU4MiJ9fX0"), event -> {
-					itemMap.saveToConfig();
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
-					placeHolders[3] = itemMap.getConfigName();
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.itemSaved", player, placeHolders);
-					ConfigHandler.getConfig().reloadConfigs(true);
-					startMenu(player);
-				}));
-			} else {
-				returnPane.addButton(new Button(ItemHandler.getItem("WOOL:5", 1, false, "&a&l&nSave to Config", "&7", "&7*Saves the custom item", "&7settings to the items.yml file."), event -> {
-					itemMap.saveToConfig();
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
-					placeHolders[3] = itemMap.getConfigName();
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.itemSaved", player, placeHolders);
-					ConfigHandler.getConfig().reloadConfigs(true);
-					startMenu(player);
-				}));
-			}
-			
+			returnPane.addButton(new Button(ItemHandler.getItem("WOOL:5", 1, false, "&a&l&nSave to Config", "&7", "&7*Saves the custom item", "&7settings to the items.yml file."), event -> {
+				itemMap.saveToConfig();
+				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				placeHolders[3] = itemMap.getConfigName();
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.itemSaved", player, placeHolders);
+				ConfigHandler.getConfig().reloadConfigs(true);
+				startMenu(player);
+			}));
 			returnPane.addButton(new Button(fillerPaneBItem), 2);
 			returnPane.addButton(new Button(ItemHandler.getItem("WOOL:4", 1, false, "&e&l&nModify Settings", "&7", "&7*Continue modifying the", "&7custom item settings."), event -> creatingPane(player, itemMap)));
 			returnPane.addButton(new Button(fillerPaneBItem));
@@ -2615,12 +2574,7 @@ public class InterMenu {
 		Interface switchPane = new Interface(false, 1, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			if (stage == 0) {
-				if (ServerUtils.hasSpecificUpdate("1_8")) {
-					switchPane.addButton(new Button(ItemHandler.setSkullTexture(ItemHandler.getItem("SKULL_ITEM:3", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", "&7the material selection menu."), 
-							"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2RjOWU0ZGNmYTQyMjFhMWZhZGMxYjViMmIxMWQ4YmVlYjU3ODc5YWYxYzQyMzYyMTQyYmFlMWVkZDUifX19"), event -> materialPane(player, itemMap, 0, 0)));
-				} else {
-					switchPane.addButton(new Button(ItemHandler.getItem("ARROW", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", "&7the material selection menu."), event -> materialPane(player, itemMap, 0, 0)));
-				}
+				switchPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", "&7the material selection menu."), event -> materialPane(player, itemMap, 0, 0)));
 			} else { 
 				switchPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> creatingPane(player, itemMap)));
 			}
@@ -2630,12 +2584,7 @@ public class InterMenu {
 			switchPane.addButton(new Button(ItemHandler.getItem("23", 1, false, "&b&lMultiple Slots", "&7", "&7*Define multiple slots for the item."), event -> slotPane(player, itemMap, stage, 1)));
 			switchPane.addButton(new Button(fillerPaneBItem), 2);
 			if (stage == 0) {
-				if (ServerUtils.hasSpecificUpdate("1_8")) {
-					switchPane.addButton(new Button(ItemHandler.setSkullTexture(ItemHandler.getItem("SKULL_ITEM:3", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", "&7the material selection menu."), 
-							"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2RjOWU0ZGNmYTQyMjFhMWZhZGMxYjViMmIxMWQ4YmVlYjU3ODc5YWYxYzQyMzYyMTQyYmFlMWVkZDUifX19"), event -> materialPane(player, itemMap, 0, 0)));
-				} else {
-					switchPane.addButton(new Button(ItemHandler.getItem("ARROW", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", "&7the material selection menu."), event -> materialPane(player, itemMap, 0, 0)));
-				}
+				switchPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", "&7the material selection menu."), event -> materialPane(player, itemMap, 0, 0)));
 			} else { 
 				switchPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> creatingPane(player, itemMap)));
 			}
@@ -2762,12 +2711,7 @@ public class InterMenu {
 				}
 			}));
 			craftingPane.addButton(new Button(fillerPaneGItem), 3);
-			if (ServerUtils.hasSpecificUpdate("1_8")) {
-				craftingPane.addButton(new Button(ItemHandler.setSkullTexture(ItemHandler.getItem("SKULL_ITEM:3", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", "&7the main slot selection menu"), 
-						"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2RjOWU0ZGNmYTQyMjFhMWZhZGMxYjViMmIxMWQ4YmVlYjU3ODc5YWYxYzQyMzYyMTQyYmFlMWVkZDUifX19"), event -> slotPane.open(player)));
-			} else {
-				craftingPane.addButton(new Button(ItemHandler.getItem("ARROW", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", "&7the main slot selection menu"), event -> slotPane.open(player)));
-			}
+			craftingPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", "&7the main slot selection menu"), event -> slotPane.open(player)));
 			if (type > 0) {
 				craftingPane.addButton(new Button(fillerPaneBItem), 3);
 				craftingPane.addButton(new Button(ItemHandler.getItem("EMERALD", 1, false, "&a&lFinish Selecting", "&7", "&7*Saves the chosen slots", "&7to the item definition."), event -> creatingPane(player, itemMap)));
@@ -2775,12 +2719,7 @@ public class InterMenu {
 			} else {
 				craftingPane.addButton(new Button(fillerPaneBItem), 7);
 			}
-			if (ServerUtils.hasSpecificUpdate("1_8")) {
-				craftingPane.addButton(new Button(ItemHandler.setSkullTexture(ItemHandler.getItem("SKULL_ITEM:3", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", "&7the main slot selection menu"), 
-						"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2RjOWU0ZGNmYTQyMjFhMWZhZGMxYjViMmIxMWQ4YmVlYjU3ODc5YWYxYzQyMzYyMTQyYmFlMWVkZDUifX19"), event -> slotPane.open(player)));
-			} else {
-				craftingPane.addButton(new Button(ItemHandler.getItem("ARROW", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", "&7the main slot selection menu"), event -> slotPane.open(player)));
-			}
+			craftingPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", "&7the main slot selection menu"), event -> slotPane.open(player)));
 			slotPane.addButton(new Button(fillerPaneGItem));
 			slotPane.addButton(new Button(ItemHandler.getItem("SUGAR", 1, (type > 0 ? StringUtils.getUtils().containsValue(itemMap.getMultipleSlots(), "ARBITRARY") : false), "&9&lSlot: &a&lARBITRARY", "&7", "&7*Click to set the custom item", 
 					"&7to appear in slot &a&lArbitrary&7", "&7", "&7*Arbitrary is defined as giving the", "&7item in the first available slot.", (type > 0 && StringUtils.getUtils().containsValue(itemMap.getMultipleSlots(), "ARBITRARY") ? "&9&lENABLED: &aTRUE" : "")), 
@@ -2959,12 +2898,7 @@ public class InterMenu {
 					}
 				}));
 			}
-			if (ServerUtils.hasSpecificUpdate("1_8")) {
-				slotPane.addButton(new Button(ItemHandler.setSkullTexture(ItemHandler.getItem("SKULL_ITEM:3", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", "&7the slot(s) selection menu."),
-						"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2RjOWU0ZGNmYTQyMjFhMWZhZGMxYjViMmIxMWQ4YmVlYjU3ODc5YWYxYzQyMzYyMTQyYmFlMWVkZDUifX19"), event -> switchPane(player, itemMap, stage)));
-			} else {
-				slotPane.addButton(new Button(ItemHandler.getItem("ARROW", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", "&7the slot(s) selection menu."), event -> switchPane(player, itemMap, stage)));
-			}
+			slotPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", "&7the slot(s) selection menu."), event -> switchPane(player, itemMap, stage)));
 			if (type > 0) {
 				slotPane.addButton(new Button(fillerPaneBItem), 3);
 				slotPane.addButton(new Button(ItemHandler.getItem("EMERALD", 1, false, "&a&lFinish Selecting", "&7", "&7*Saves the chosen slots", "&7to the item definition."), event -> creatingPane(player, itemMap)));
@@ -2972,12 +2906,7 @@ public class InterMenu {
 			} else {
 				slotPane.addButton(new Button(fillerPaneBItem), 7);
 			}
-			if (ServerUtils.hasSpecificUpdate("1_8")) {
-				slotPane.addButton(new Button(ItemHandler.setSkullTexture(ItemHandler.getItem("SKULL_ITEM:3", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", "&7the slot(s) selection menu."), 
-						"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2RjOWU0ZGNmYTQyMjFhMWZhZGMxYjViMmIxMWQ4YmVlYjU3ODc5YWYxYzQyMzYyMTQyYmFlMWVkZDUifX19"), event -> switchPane(player, itemMap, stage)));
-			} else {
-				slotPane.addButton(new Button(ItemHandler.getItem("ARROW", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", "&7the slot(s) selection menu."), event -> switchPane(player, itemMap, stage)));
-			}
+			slotPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", "&7the slot(s) selection menu."), event -> switchPane(player, itemMap, stage)));
 		});
 		if (type == 2) {
 			craftingPane.open(player);
@@ -5616,7 +5545,7 @@ public class InterMenu {
 				}));
 				for (int i = 1; i <= itemMap.getDynamicOwners().size(); i++) {
 					final int k = i;
-					animatedSkullPane.addButton(new Button(ItemHandler.getItem("GOLDEN_HELMET", 1, false, "&fSkull Owner " + k, "&7", "&7*Click modify this animated skull owner.", "&9&lSkull Owner: &a" + 
+					animatedSkullPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GOLDEN_HELMET" : "314"), 1, false, "&fSkull Owner " + k, "&7", "&7*Click modify this animated skull owner.", "&9&lSkull Owner: &a" + 
 					ItemHandler.cutDelay(itemMap.getDynamicOwners().get(k - 1)), "&9&lAnimation Ticks: &a" + StringUtils.getUtils().returnInteger(ItemHandler.getDelayFormat(itemMap.getDynamicOwners().get(k - 1)))), event -> modifySkullPane(player, itemMap, k - 1, owner)));
 				}
 			} else {
@@ -5752,7 +5681,7 @@ public class InterMenu {
 		SchedulerUtils.runAsync(() -> {
 			modifySkullPane.addButton(new Button(fillerPaneGItem), 3);
 			if (owner) {
-				modifySkullPane.addButton(new Button(ItemHandler.getItem("GOLDEN_HELMET", 1, false, "&a&l&nSkull Owner", "&7", "&7*Change the animated skull owner.", "&9&lSkull Owner: &a" + 
+				modifySkullPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GOLDEN_HELMET" : "314"), 1, false, "&a&l&nSkull Owner", "&7", "&7*Change the animated skull owner.", "&9&lSkull Owner: &a" + 
 			ItemHandler.cutDelay(itemMap.getDynamicOwners().get(position))), event -> {
 					player.closeInventory();
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
@@ -5834,7 +5763,7 @@ public class InterMenu {
 			animationPane.addButton(new Button(ItemHandler.getItem("386", 1, false, "&b&l&nLore", "&7", "&7*Add additional custom lores", "&7to have the item change between.", "&9&lAnimated Lores: &a" + 
 			(StringUtils.getUtils().nullCheck(itemMap.getDynamicLores() + "") != "NONE" ? "YES" : "NONE")), event -> animatedLorePane(player, itemMap)));
 			if (itemMap.getMaterial().toString().contains("PLAYER_HEAD") || itemMap.getMaterial().toString().contains("SKULL_ITEM")) {
-				animationPane.addButton(new Button(ItemHandler.getItem("GOLDEN_HELMET", 1, false, "&a&lSkull Owner", "&7", "&7*Add additional skull owners", "&7to have the item change between.", "&7", "&7You can only define skull owner", 
+				animationPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GOLDEN_HELMET" : "314"), 1, false, "&a&lSkull Owner", "&7", "&7*Add additional skull owners", "&7to have the item change between.", "&7", "&7You can only define skull owner", 
 						"&7or skull texture, this will", "&7remove any skull textures.", "&9&lAnimated Owners: &a" + (StringUtils.getUtils().nullCheck(itemMap.getDynamicOwners() + "") != "NONE" ? "YES" : "NONE")), event -> animatedSkullPane(player, itemMap, true)));
 				animationPane.addButton(new Button(ItemHandler.getItem("STRING", 1, false, "&b&lSkull Texture", "&7", "&7*Add additional skull textures", "&7to have the item change between.", "&7", "&7You can only define skull texture", 
 						"&7or skull owner, this will", "&7remove any skull owners.", "&7", "&7Skull textures can be found", "&7at websites like &aminecraft-heads.com", "&7and the value is listed under", "&7the OTHER section.", 
@@ -7492,7 +7421,7 @@ public class InterMenu {
 				otherPane.addButton(new Button(fillerPaneGItem), 3);
 			} else if (itemMap.getMaterial().toString().contains("PLAYER_HEAD") || itemMap.getMaterial().toString().contains("SKULL_ITEM")) {
 				otherPane.addButton(new Button(fillerPaneGItem), 3);
-				otherPane.addButton(new Button(ItemHandler.getItem("GOLDEN_HELMET", 1, false, "&b&lSkull Owner", "&7", "&7*Define a skull owner for the", "&7head adding that persons skin.", "&7", "&7You can only define skull owner", 
+				otherPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GOLDEN_HELMET" : "314"), 1, false, "&b&lSkull Owner", "&7", "&7*Define a skull owner for the", "&7head adding that persons skin.", "&7", "&7You can only define skull owner", 
 						"&7or skull texture, this will", "&7remove any skull textures.", "&9&lSkull-Owner: &a" + StringUtils.getUtils().nullCheck(itemMap.getSkull())), event -> {
 					if (itemMap.getDynamicOwners() != null && !itemMap.getDynamicOwners().isEmpty()) {
 						animatedSkullPane(player, itemMap, true);

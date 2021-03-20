@@ -30,9 +30,9 @@ import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.utils.SchedulerUtils;
 import me.RockinChaos.itemjoin.utils.interfaces.Interface;
-import me.RockinChaos.itemjoin.utils.interfaces.pages.InterMenu;
+import me.RockinChaos.itemjoin.utils.interfaces.menus.Menu;
 
-public class Menu implements Listener {
+public class Interfaces implements Listener {
 
   	private Interface expiredInventory;
 
@@ -69,10 +69,10 @@ public class Menu implements Listener {
 	*/
 	@EventHandler(ignoreCancelled = true)
 	private void onClose(InventoryCloseEvent event) {
-		if (InterMenu.modifyMenu((Player) event.getPlayer())) {
+		if (Menu.modifyMenu((Player) event.getPlayer())) {
 			SchedulerUtils.runAsyncLater(40L, () -> {
-				if (!InterMenu.isOpen((Player) event.getPlayer())) {
-					InterMenu.setModifyMenu(false, (Player) event.getPlayer());
+				if (!Menu.isOpen((Player) event.getPlayer())) {
+					Menu.setModifyMenu(false, (Player) event.getPlayer());
 					for (ItemMap itemMap: ItemUtilities.getUtilities().getItems()) {
 						if (itemMap.getAnimationHandler() != null && itemMap.getAnimationHandler().get(event.getPlayer()) != null) {
 							itemMap.getAnimationHandler().get(event.getPlayer()).setMenu(false, 0);

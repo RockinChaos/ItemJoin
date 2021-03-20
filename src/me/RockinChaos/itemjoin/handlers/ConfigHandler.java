@@ -45,7 +45,7 @@ import me.RockinChaos.itemjoin.listeners.Interact;
 import me.RockinChaos.itemjoin.listeners.Commands;
 import me.RockinChaos.itemjoin.listeners.Clicking;
 import me.RockinChaos.itemjoin.listeners.Crafting;
-import me.RockinChaos.itemjoin.listeners.Menu;
+import me.RockinChaos.itemjoin.listeners.Interfaces;
 import me.RockinChaos.itemjoin.listeners.Entities;
 import me.RockinChaos.itemjoin.listeners.Pickups;
 import me.RockinChaos.itemjoin.listeners.Placement;
@@ -93,7 +93,7 @@ public class ConfigHandler {
 	public void registerEvents() {
 	    ItemJoin.getInstance().getCommand("itemjoin").setExecutor(new ChatExecutor());
 	    ItemJoin.getInstance().getCommand("itemjoin").setTabCompleter(new ChatTab());
-		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Menu(), ItemJoin.getInstance());
+		ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Interfaces(), ItemJoin.getInstance());
 		this.registerGlow();
 	}
 	
