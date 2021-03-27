@@ -75,4 +75,4 @@ This should look like `5.0.6-RELEASE` or `5.0.7-SNAPSHOT` as an example.
     </dependencies>
 ```
 
-![](https://i.imgur.com/vFllc29.png)![](https://i.imgur.com/vFllc29.png)[<img src="https://i.imgur.com/WR5dVKN.png">](https://discord.gg/D5FnJ7C)[<img src="https://i.imgur.com/2YBE4mr.png">](http://ci.craftationgaming.com/)
+![](https://i.imgur.com/vFllc29.png)![](https://i.imgur.com/vFllc29.png)[<img src="https://i.imgur.com/WR5dVKN.png">](https://discord.gg/D5FnJ7C)[<img src="https://i.imgur.com/LJsmwSd.png">](http://ci.craftationgaming.com/)
