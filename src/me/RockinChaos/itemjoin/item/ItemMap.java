@@ -359,7 +359,7 @@ public class ItemMap {
     */
 	private void setCommandCost() {
 		if (this.nodeLocation.getString("commands-item") != null && !this.nodeLocation.getString("commands-item").isEmpty()) { this.itemCost = this.nodeLocation.getString("commands-item"); }
-		if (this.nodeLocation.getString("commands-cost") != null && StringUtils.getUtils().isInt(this.nodeLocation.getString("commands-cost"))) { this.cost = this.nodeLocation.getInt("commands-cost"); }
+		if (this.nodeLocation.getString("commands-cost") != null && StringUtils.isInt(this.nodeLocation.getString("commands-cost"))) { this.cost = this.nodeLocation.getInt("commands-cost"); }
 	}
 	
    /**
@@ -367,7 +367,7 @@ public class ItemMap {
     * 
     */
 	private void setCommandReceive() {
-		if (this.nodeLocation.getString("commands-receive") != null && StringUtils.getUtils().isInt(this.nodeLocation.getString("commands-receive"))) { this.commandsReceive = this.nodeLocation.getInt("commands-receive"); }
+		if (this.nodeLocation.getString("commands-receive") != null && StringUtils.isInt(this.nodeLocation.getString("commands-receive"))) { this.commandsReceive = this.nodeLocation.getInt("commands-receive"); }
 	}
 	
    /**
@@ -375,7 +375,7 @@ public class ItemMap {
     * 
     */
 	private void setCommandWarmDelay() {
-		if (this.nodeLocation.getString("commands-warmup") != null && StringUtils.getUtils().isInt(this.nodeLocation.getString("commands-warmup"))) { this.warmDelay = this.nodeLocation.getInt("commands-warmup"); }
+		if (this.nodeLocation.getString("commands-warmup") != null && StringUtils.isInt(this.nodeLocation.getString("commands-warmup"))) { this.warmDelay = this.nodeLocation.getInt("commands-warmup"); }
 	}
 	
    /**
@@ -414,11 +414,11 @@ public class ItemMap {
     */
 	private void setCommandSequence() {
 		if (this.nodeLocation.getString("commands-sequence") != null) { 
-		    if (StringUtils.getUtils().containsIgnoreCase(this.nodeLocation.getString("commands-sequence"), "SEQUENTIAL")) { this.sequence = CommandSequence.SEQUENTIAL; }
-		    else if (StringUtils.getUtils().containsIgnoreCase(this.nodeLocation.getString("commands-sequence"), "RANDOM_SINGLE")) { this.sequence = CommandSequence.RANDOM_SINGLE; }
-		    else if (StringUtils.getUtils().containsIgnoreCase(this.nodeLocation.getString("commands-sequence"), "RANDOM_LIST")) { this.sequence = CommandSequence.RANDOM_LIST; }
-			else if (StringUtils.getUtils().containsIgnoreCase(this.nodeLocation.getString("commands-sequence"), "RANDOM")) { this.sequence = CommandSequence.RANDOM; }
-		    else if (StringUtils.getUtils().containsIgnoreCase(this.nodeLocation.getString("commands-sequence"), "REMAIN")) { this.sequence = CommandSequence.REMAIN; }
+		    if (StringUtils.containsIgnoreCase(this.nodeLocation.getString("commands-sequence"), "SEQUENTIAL")) { this.sequence = CommandSequence.SEQUENTIAL; }
+		    else if (StringUtils.containsIgnoreCase(this.nodeLocation.getString("commands-sequence"), "RANDOM_SINGLE")) { this.sequence = CommandSequence.RANDOM_SINGLE; }
+		    else if (StringUtils.containsIgnoreCase(this.nodeLocation.getString("commands-sequence"), "RANDOM_LIST")) { this.sequence = CommandSequence.RANDOM_LIST; }
+			else if (StringUtils.containsIgnoreCase(this.nodeLocation.getString("commands-sequence"), "RANDOM")) { this.sequence = CommandSequence.RANDOM; }
+		    else if (StringUtils.containsIgnoreCase(this.nodeLocation.getString("commands-sequence"), "REMAIN")) { this.sequence = CommandSequence.REMAIN; }
 		}
 	}
 	
@@ -439,39 +439,39 @@ public class ItemMap {
 	private void setItemflags() {
 		if (this.nodeLocation.getString(".itemflags") != null) {
 			this.itemflags = this.nodeLocation.getString(".itemflags");
-			this.vanillaItem = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "vanilla");
-			this.vanillaStatus = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "vanilla-status");
-			this.vanillaControl = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "vanilla-control");
-			this.disposable = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "disposable");
-			this.blockPlacement = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "placement");
-			this.blockMovement = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "inventory-modify") || StringUtils.getUtils().containsIgnoreCase(this.itemflags, "inventory-close");
-			this.closeInventory = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "inventory-close");
-			this.itemChangable = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "allow-modifications") || StringUtils.getUtils().containsIgnoreCase(this.itemflags, "item-changable");
-			this.alwaysGive = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "always-give");
-			this.autoRemove = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "auto-remove");
-			this.stackable = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "stackable");
-			this.selectable = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "selectable");
-			this.dynamic = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "dynamic");
-			this.animate = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "animate");
-			this.glowing = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "glowing") || StringUtils.getUtils().containsIgnoreCase(this.itemflags, "glow");
-			this.giveNext = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "give-next");
-			this.moveNext = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "move-next");
-			this.dropFull = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "drop-full");
-			this.itemStore = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "item-store");
-			this.itemModify = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "item-modifiable");
-			this.noCrafting = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "item-craftable");
-			this.noRepairing = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "item-repairable");
-			this.cancelEvents = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "cancel-events");
-			this.countLock = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "count-lock");
-			this.setOnlyFirstJoin(StringUtils.getUtils().containsIgnoreCase(this.itemflags, "first-join"));
-			this.setOnlyFirstLife(StringUtils.getUtils().containsIgnoreCase(this.itemflags, "first-life"));
-			this.onlyFirstWorld = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "first-world");
-			this.overwritable = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "overwrite");
-			this.ipLimited = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "ip-limit");
-			this.deathDroppable = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "death-drops");
-			this.selfDroppable = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "self-drops");
-			this.AllowOpBypass = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "AllowOpBypass");
-			this.CreativeBypass = StringUtils.getUtils().containsIgnoreCase(this.itemflags, "CreativeBypass");
+			this.vanillaItem = StringUtils.containsIgnoreCase(this.itemflags, "vanilla");
+			this.vanillaStatus = StringUtils.containsIgnoreCase(this.itemflags, "vanilla-status");
+			this.vanillaControl = StringUtils.containsIgnoreCase(this.itemflags, "vanilla-control");
+			this.disposable = StringUtils.containsIgnoreCase(this.itemflags, "disposable");
+			this.blockPlacement = StringUtils.containsIgnoreCase(this.itemflags, "placement");
+			this.blockMovement = StringUtils.containsIgnoreCase(this.itemflags, "inventory-modify") || StringUtils.containsIgnoreCase(this.itemflags, "inventory-close");
+			this.closeInventory = StringUtils.containsIgnoreCase(this.itemflags, "inventory-close");
+			this.itemChangable = StringUtils.containsIgnoreCase(this.itemflags, "allow-modifications") || StringUtils.containsIgnoreCase(this.itemflags, "item-changable");
+			this.alwaysGive = StringUtils.containsIgnoreCase(this.itemflags, "always-give");
+			this.autoRemove = StringUtils.containsIgnoreCase(this.itemflags, "auto-remove");
+			this.stackable = StringUtils.containsIgnoreCase(this.itemflags, "stackable");
+			this.selectable = StringUtils.containsIgnoreCase(this.itemflags, "selectable");
+			this.dynamic = StringUtils.containsIgnoreCase(this.itemflags, "dynamic");
+			this.animate = StringUtils.containsIgnoreCase(this.itemflags, "animate");
+			this.glowing = StringUtils.containsIgnoreCase(this.itemflags, "glowing") || StringUtils.containsIgnoreCase(this.itemflags, "glow");
+			this.giveNext = StringUtils.containsIgnoreCase(this.itemflags, "give-next");
+			this.moveNext = StringUtils.containsIgnoreCase(this.itemflags, "move-next");
+			this.dropFull = StringUtils.containsIgnoreCase(this.itemflags, "drop-full");
+			this.itemStore = StringUtils.containsIgnoreCase(this.itemflags, "item-store");
+			this.itemModify = StringUtils.containsIgnoreCase(this.itemflags, "item-modifiable");
+			this.noCrafting = StringUtils.containsIgnoreCase(this.itemflags, "item-craftable");
+			this.noRepairing = StringUtils.containsIgnoreCase(this.itemflags, "item-repairable");
+			this.cancelEvents = StringUtils.containsIgnoreCase(this.itemflags, "cancel-events");
+			this.countLock = StringUtils.containsIgnoreCase(this.itemflags, "count-lock");
+			this.setOnlyFirstJoin(StringUtils.containsIgnoreCase(this.itemflags, "first-join"));
+			this.setOnlyFirstLife(StringUtils.containsIgnoreCase(this.itemflags, "first-life"));
+			this.onlyFirstWorld = StringUtils.containsIgnoreCase(this.itemflags, "first-world");
+			this.overwritable = StringUtils.containsIgnoreCase(this.itemflags, "overwrite");
+			this.ipLimited = StringUtils.containsIgnoreCase(this.itemflags, "ip-limit");
+			this.deathDroppable = StringUtils.containsIgnoreCase(this.itemflags, "death-drops");
+			this.selfDroppable = StringUtils.containsIgnoreCase(this.itemflags, "self-drops");
+			this.AllowOpBypass = StringUtils.containsIgnoreCase(this.itemflags, "AllowOpBypass");
+			this.CreativeBypass = StringUtils.containsIgnoreCase(this.itemflags, "CreativeBypass");
 		}
 	}
 	
@@ -490,30 +490,30 @@ public class ItemMap {
 	private void setTriggers() {
 		if (this.nodeLocation.getString("triggers") != null) {
 			this.triggers = this.nodeLocation.getString("triggers");
-			this.giveOnDisabled = StringUtils.getUtils().containsIgnoreCase(this.triggers, "DISABLED");
-			this.giveOnJoin = StringUtils.getUtils().containsIgnoreCase(this.triggers, "JOIN");
-			this.giveOnRespawn = StringUtils.getUtils().containsIgnoreCase(this.triggers, "RESPAWN");
-			if (StringUtils.getUtils().containsIgnoreCase(this.triggers, "FIRST-JOIN")) { 
+			this.giveOnDisabled = StringUtils.containsIgnoreCase(this.triggers, "DISABLED");
+			this.giveOnJoin = StringUtils.containsIgnoreCase(this.triggers, "JOIN");
+			this.giveOnRespawn = StringUtils.containsIgnoreCase(this.triggers, "RESPAWN");
+			if (StringUtils.containsIgnoreCase(this.triggers, "FIRST-JOIN")) { 
 				this.onlyFirstJoin = true;
 				this.giveOnJoin = true;
 			}
-			if (StringUtils.getUtils().containsIgnoreCase(this.triggers, "FIRST-LIFE")) {
+			if (StringUtils.containsIgnoreCase(this.triggers, "FIRST-LIFE")) {
 				this.onlyFirstLife = true;
 				this.giveOnJoin = true;
 				this.giveOnRespawn = true;
 			}
-		    this.giveOnWorldSwitch = StringUtils.getUtils().containsIgnoreCase(this.triggers, "WORLD-CHANGE") || StringUtils.getUtils().containsIgnoreCase(this.triggers, "WORLD-SWITCH");
-			if (StringUtils.getUtils().containsIgnoreCase(this.triggers, "FIRST-WORLD")) { 
+		    this.giveOnWorldSwitch = StringUtils.containsIgnoreCase(this.triggers, "WORLD-CHANGE") || StringUtils.containsIgnoreCase(this.triggers, "WORLD-SWITCH");
+			if (StringUtils.containsIgnoreCase(this.triggers, "FIRST-WORLD")) { 
 				this.giveOnJoin = true;
 				this.onlyFirstWorld = true;
 				this.giveOnWorldSwitch = true;
 			}
-			this.giveOnRegionEnter = StringUtils.getUtils().containsIgnoreCase(this.triggers, "REGION-ENTER");
-			this.giveOnRegionLeave = StringUtils.getUtils().containsIgnoreCase(this.triggers, "REGION-REMOVE") || StringUtils.getUtils().containsIgnoreCase(this.triggers, "REGION-EXIT") || StringUtils.getUtils().containsIgnoreCase(this.triggers, "REGION-LEAVE");
-			this.giveOnRegionAccess = StringUtils.getUtils().containsIgnoreCase(this.triggers, "REGION-ACCESS");
-			this.giveOnRegionEgress = StringUtils.getUtils().containsIgnoreCase(this.triggers, "REGION-EGRESS"); 
+			this.giveOnRegionEnter = StringUtils.containsIgnoreCase(this.triggers, "REGION-ENTER");
+			this.giveOnRegionLeave = StringUtils.containsIgnoreCase(this.triggers, "REGION-REMOVE") || StringUtils.containsIgnoreCase(this.triggers, "REGION-EXIT") || StringUtils.containsIgnoreCase(this.triggers, "REGION-LEAVE");
+			this.giveOnRegionAccess = StringUtils.containsIgnoreCase(this.triggers, "REGION-ACCESS");
+			this.giveOnRegionEgress = StringUtils.containsIgnoreCase(this.triggers, "REGION-EGRESS"); 
 			if (this.giveOnRegionAccess || this.giveOnRegionEgress) { this.giveOnRegionEnter = false; this.giveOnRegionLeave = false; }
-			this.useOnLimitSwitch = StringUtils.getUtils().containsIgnoreCase(this.triggers, "GAMEMODE-SWITCH");
+			this.useOnLimitSwitch = StringUtils.containsIgnoreCase(this.triggers, "GAMEMODE-SWITCH");
 		} else { this.giveOnJoin = true; }
 	}
 	
@@ -522,9 +522,9 @@ public class ItemMap {
     * 
     */
 	public void setContents() {
-		if (this.material != null && StringUtils.getUtils().containsIgnoreCase(this.getMaterial().toString(), "SHULKER") && this.nodeLocation.getString(".contents") != null && this.nodeLocation.getStringList(".contents") != null && !this.nodeLocation.getStringList(".contents").isEmpty()) {
+		if (this.material != null && StringUtils.containsIgnoreCase(this.getMaterial().toString(), "SHULKER") && this.nodeLocation.getString(".contents") != null && this.nodeLocation.getStringList(".contents") != null && !this.nodeLocation.getStringList(".contents").isEmpty()) {
 			this.contents = this.nodeLocation.getStringList(".contents");
-		} else if (this.material != null && !StringUtils.getUtils().containsIgnoreCase(this.getMaterial().toString(), "SHULKER") && this.nodeLocation.getString(".contents") != null && this.nodeLocation.getStringList(".contents") != null && !this.nodeLocation.getStringList(".contents").isEmpty()) {
+		} else if (this.material != null && !StringUtils.containsIgnoreCase(this.getMaterial().toString(), "SHULKER") && this.nodeLocation.getString(".contents") != null && this.nodeLocation.getStringList(".contents") != null && !this.nodeLocation.getStringList(".contents").isEmpty()) {
 			ServerUtils.logWarn("{ItemMap} The item " + this.getConfigName() + " cannot have contents set as it does not support it.");
 		}
 	}
@@ -756,7 +756,7 @@ public class ItemMap {
 		if (ItemHandler.isCustomSlot(slot)) {
 			this.CustomSlot = slot;
 			this.InvSlot = null;
-		} else if (StringUtils.getUtils().isInt(slot)) {
+		} else if (StringUtils.isInt(slot)) {
 			this.InvSlot = Integer.parseInt(slot);
 			this.CustomSlot = null;
 		}
@@ -921,7 +921,7 @@ public class ItemMap {
     * @param count - The stack size to be set.
     */
 	public void setCount(final String count) {
-		if (count != null && StringUtils.getUtils().isInt(count) && Integer.parseInt(count) != 0) {
+		if (count != null && StringUtils.isInt(count) && Integer.parseInt(count) != 0) {
 			this.count = Integer.parseInt(count);
 		} else { this.count = 1; }
 	}
@@ -2649,7 +2649,7 @@ public class ItemMap {
     */
 	public boolean hasPermission(final Player player) {
 		String worldName = player.getWorld().getName();
-		String customPerm = PermissionsHandler.getPermissions().customPermissions(this.permissionNode, this.configName, worldName);
+		String customPerm = PermissionsHandler.customPermissions(this.permissionNode, this.configName, worldName);
 		if (!this.isPermissionNeeded() && !player.isOp() || (!this.isOPPermissionNeeded() && player.isOp())) {
 			return true;
 		} else if (this.isOPPermissionNeeded() && player.isOp()) {
@@ -2806,9 +2806,9 @@ public class ItemMap {
     */
 	public boolean isLimitMode(final GameMode newMode) {
 		if (this.limitModes != null) {
-			if (StringUtils.getUtils().containsIgnoreCase(this.limitModes, newMode.name())) {
+			if (StringUtils.containsIgnoreCase(this.limitModes, newMode.name())) {
 				return true;
-			} else if (!StringUtils.getUtils().containsIgnoreCase(this.limitModes, newMode.name())) {
+			} else if (!StringUtils.containsIgnoreCase(this.limitModes, newMode.name())) {
 				return false;
 			}
 		}
@@ -3296,7 +3296,7 @@ public class ItemMap {
 		if (!this.isSkull() || this.skullOwner == null && this.skullTexture == null && PlayerHandler.getSkullOwner(item).equalsIgnoreCase("NULL") && ItemHandler.getSkullTexture(item.getItemMeta()).isEmpty() 
 				|| !this.skullAnimated && ((SkullMeta) item.getItemMeta()).hasOwner() && this.skullOwner != null && PlayerHandler.getSkullOwner(item).equalsIgnoreCase(this.skullOwner) 
 				|| this.skullOwner != null && this.isSkullData(item)
-				|| this.skullOwner != null && StringUtils.getUtils().containsIgnoreCase(this.skullOwner, "%player%")
+				|| this.skullOwner != null && StringUtils.containsIgnoreCase(this.skullOwner, "%player%")
 				|| this.skullTexture != null && this.skullOwner == null 
 				&& ItemHandler.getSkullTexture(item.getItemMeta()).equalsIgnoreCase(this.skullTexture)
 				|| this.skullAnimated && this.isSkull(item) || this.skullTexture != null && this.skullOwner == null && this.isHeadSimilar(item)) {
@@ -3395,7 +3395,7 @@ public class ItemMap {
 		if (this.dynamicOwners != null && !this.dynamicOwners.isEmpty()) {
 			for (String owners : this.dynamicOwners) {
 				owners = ItemHandler.cutDelay(owners);
-				if (PlayerHandler.getSkullOwner(item) != null && PlayerHandler.getSkullOwner(item).equalsIgnoreCase(this.skullOwner) || PlayerHandler.getSkullOwner(item) != null && StringUtils.getUtils().containsIgnoreCase(this.skullOwner, "%player%")) {
+				if (PlayerHandler.getSkullOwner(item) != null && PlayerHandler.getSkullOwner(item).equalsIgnoreCase(this.skullOwner) || PlayerHandler.getSkullOwner(item) != null && StringUtils.containsIgnoreCase(this.skullOwner, "%player%")) {
 					return true;
 				} else if (this.isSkullData(item) && this.isSkull()){
 					return true;
@@ -3523,13 +3523,13 @@ public class ItemMap {
 				for (ItemMap item : ItemUtilities.getUtilities().getItems()) {
 					if (item != null && item.getConfigName().equalsIgnoreCase(node)) {
 						isNull = false;
-						if (StringUtils.getUtils().isInt(item.getSlot()) && Integer.parseInt(item.getSlot()) <= 26) {
+						if (StringUtils.isInt(item.getSlot()) && Integer.parseInt(item.getSlot()) <= 26) {
 							box.getInventory().setItem(Integer.parseInt(item.getSlot()), item.getItemStack(player));
 						} else if (item.getSlot().equalsIgnoreCase("ARBITRARY")) {
 							box.getInventory().addItem(item.getItemStack(player));
-						} else if (StringUtils.getUtils().isInt(item.getSlot()) && Integer.parseInt(item.getSlot()) > 26) {
+						} else if (StringUtils.isInt(item.getSlot()) && Integer.parseInt(item.getSlot()) > 26) {
 							ServerUtils.logWarn("{ItemMap} The item " + node + " cannot have the slot " + item.getSlot() + " as the slot cannot be higher than 26 to be set as contents for the item " + this.getConfigName() + ", the item will not be set.");
-						} else if (!StringUtils.getUtils().isInt(item.getSlot())) {
+						} else if (!StringUtils.isInt(item.getSlot())) {
 							ServerUtils.logWarn("{ItemMap} The item " + node + " cannot have the slot " + item.getSlot() + " as the item " + this.getConfigName() + " does not support it, the item will not be set.");
 						}
 					}
@@ -3676,7 +3676,7 @@ public class ItemMap {
 	private ItemStack set1_13JSONPages(final Player player, final ItemStack item, final Object localePages, final List<String> pages) {
 		for (String textComponent: pages) {
 			try { 
-				textComponent = StringUtils.getUtils().translateLayout(textComponent, player);
+				textComponent = StringUtils.translateLayout(textComponent, player);
 				Object TagString = ReflectionUtils.getMinecraftClass("NBTTagString").getConstructor(String.class).newInstance(textComponent);
 				localePages.getClass().getMethod("add", ReflectionUtils.getMinecraftClass("NBTBase")).invoke(localePages, TagString);
 			} catch (Exception e) { ServerUtils.sendDebugTrace(e); } 
@@ -3699,7 +3699,7 @@ public class ItemMap {
 		for (int i = pages.size() - 1; i >= 0; i--) {
 			String textComponent = pages.get(i);
 			try { 
-				textComponent = StringUtils.getUtils().translateLayout(textComponent, player);
+				textComponent = StringUtils.translateLayout(textComponent, player);
 				Object TagString = ReflectionUtils.getMinecraftClass("NBTTagString").getConstructor(String.class).newInstance(textComponent);
 				localePages.getClass().getMethod("add", int.class, ReflectionUtils.getMinecraftClass("NBTBase")).invoke(localePages, 0, TagString);
 			} catch (Exception e) { ServerUtils.sendDebugTrace(e); } 
@@ -3722,7 +3722,7 @@ public class ItemMap {
 		for (int i = pages.size() - 1; i >= 0; i--) {
 			String textComponent = pages.get(i);
 			try { 
-				textComponent = StringUtils.getUtils().translateLayout(textComponent, player);
+				textComponent = StringUtils.translateLayout(textComponent, player);
 				Object TagString = ReflectionUtils.getMinecraftClass("NBTTagString").getMethod("a", String.class).invoke(null, textComponent);
 				localePages.getClass().getMethod("add", int.class, ReflectionUtils.getMinecraftClass("NBTBase")).invoke(localePages, 0, TagString);
 			} catch (Exception e) { ServerUtils.sendDebugTrace(e); } 
@@ -3789,7 +3789,7 @@ public class ItemMap {
     */
 	private void setCustomName(final Player player) {
 		if (this.customName != null && !this.customName.equalsIgnoreCase(ItemHandler.getMaterialName(this.tempItem))) {
-			this.tempMeta.setDisplayName(StringUtils.getUtils().translateLayout(ItemHandler.cutDelay(this.customName), player));
+			this.tempMeta.setDisplayName(StringUtils.translateLayout(ItemHandler.cutDelay(this.customName), player));
 		}
 	}
 	
@@ -3804,7 +3804,7 @@ public class ItemMap {
 			List < String > loreFormatList = new ArrayList < String > ();
 			for (int k = 0; k < loreList.size(); k++) {
 				String formatLore = ItemHandler.cutDelay(loreList.get(k));
-				formatLore = StringUtils.getUtils().translateLayout(formatLore, player);
+				formatLore = StringUtils.translateLayout(formatLore, player);
 				loreFormatList.add(formatLore);
 			}
 			this.tempMeta.setLore(loreFormatList);
@@ -3858,12 +3858,12 @@ public class ItemMap {
     */
 	private void setSkull(final Player player) {
 		if (this.skullOwner != null) {
-			this.tempMeta = ItemHandler.setSkullOwner(this.tempMeta, StringUtils.getUtils().translateLayout(this.skullOwner, player));
+			this.tempMeta = ItemHandler.setSkullOwner(this.tempMeta, StringUtils.translateLayout(this.skullOwner, player));
 		} else if (this.skullTexture != null && !this.headDatabase) {
 			try {
 				if (ServerUtils.hasSpecificUpdate("1_8")) {
 					GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
-					gameProfile.getProperties().put("textures", new Property("textures", new String(((this.skullOwner != null && DependAPI.getDepends(false).skinsRestorerEnabled()) ? DependAPI.getDepends(false).getSkinValue(StringUtils.getUtils().translateLayout(this.skullOwner, player)) : this.skullTexture))));
+					gameProfile.getProperties().put("textures", new Property("textures", new String(((this.skullOwner != null && DependAPI.getDepends(false).skinsRestorerEnabled()) ? DependAPI.getDepends(false).getSkinValue(StringUtils.translateLayout(this.skullOwner, player)) : this.skullTexture))));
 					Field declaredField = this.tempMeta.getClass().getDeclaredField("profile");
 					declaredField.setAccessible(true);
 					declaredField.set(this.tempMeta, gameProfile);
@@ -3927,7 +3927,7 @@ public class ItemMap {
 		if (this.leatherColor != null) {
 			((LeatherArmorMeta) this.tempMeta).setColor(DyeColor.valueOf(this.leatherColor).getFireworkColor());
 		} else if (this.leatherHex != null) {
-			((LeatherArmorMeta) this.tempMeta).setColor(StringUtils.getUtils().getColorFromHexColor(this.leatherHex));
+			((LeatherArmorMeta) this.tempMeta).setColor(StringUtils.getColorFromHexColor(this.leatherHex));
 		}
 	}
 	
@@ -3938,12 +3938,12 @@ public class ItemMap {
     */
 	private void setBookInfo(final Player player) {
 		if (this.author != null) {
-			this.author = StringUtils.getUtils().translateLayout(this.author, player);
+			this.author = StringUtils.translateLayout(this.author, player);
 			((BookMeta) this.tempMeta).setAuthor(this.author);
 		}
 		
 		if (this.title != null) {
-			this.title = StringUtils.getUtils().translateLayout(this.title, player);
+			this.title = StringUtils.translateLayout(this.title, player);
 			((BookMeta) this.tempMeta).setTitle(this.title);
 		}
 		
@@ -4030,12 +4030,12 @@ public class ItemMap {
 			for (String condition : this.getConditions(conditions)) {
 				String[] parts = (condition != null ? condition.split(":") : null);
 				if (parts != null && parts.length == 3) {
-					String value1 = (parts[0] != null && !StringUtils.getUtils().isInt(parts[0]) ? StringUtils.getUtils().translateLayout(parts[0], player) : parts[0]);
+					String value1 = (parts[0] != null && !StringUtils.isInt(parts[0]) ? StringUtils.translateLayout(parts[0], player) : parts[0]);
 					String operand = parts[1];
-					String value2 = (parts[2] != null && !StringUtils.getUtils().isInt(parts[2]) ? StringUtils.getUtils().translateLayout(parts[2], player) : parts[2]);
-					final boolean conditionMet = StringUtils.getUtils().conditionMet(value1, operand, value2);
+					String value2 = (parts[2] != null && !StringUtils.isInt(parts[2]) ? StringUtils.translateLayout(parts[2], player) : parts[2]);
+					final boolean conditionMet = StringUtils.conditionMet(value1, operand, value2);
 					if (!conditionMet && this.getConditionMessage(conditions) != null && !this.getConditionMessage(conditions).isEmpty()) {
-						player.sendMessage(StringUtils.getUtils().translateLayout(this.getConditionMessage(conditions), player));
+						player.sendMessage(StringUtils.translateLayout(this.getConditionMessage(conditions), player));
 						ServerUtils.logDebug("{ItemMap} " + player.getName() + " has not met any of the " + conditions + "(s), for the Item: " + this.getConfigName() + "."); 
 					}
 					return conditionMet;
@@ -4125,18 +4125,18 @@ public class ItemMap {
     */
 	public void swapItem(final Player player, final String slot) {
 		ItemStack itemStack = this.getItem(player);
-		if ((!slot.startsWith("CH") && slot.startsWith("C")) || StringUtils.getUtils().isInt(slot)) {
-			if (StringUtils.getUtils().containsIgnoreCase(slot, "CRAFTING")) { 
-				if (StringUtils.getUtils().getSlotConversion(slot) == 0) {
+		if ((!slot.startsWith("CH") && slot.startsWith("C")) || StringUtils.isInt(slot)) {
+			if (StringUtils.containsIgnoreCase(slot, "CRAFTING")) { 
+				if (StringUtils.getSlotConversion(slot) == 0) {
 					SchedulerUtils.runLater(4L, () -> {
 				    	if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
-				    		player.getOpenInventory().getTopInventory().setItem(StringUtils.getUtils().getSlotConversion(slot), itemStack);
+				    		player.getOpenInventory().getTopInventory().setItem(StringUtils.getSlotConversion(slot), itemStack);
 				    		PlayerHandler.updateInventory(player, 1L);
 				    	}
 					});
 				} else {
 					SchedulerUtils.runLater(2L, () -> {
-				    	player.getOpenInventory().getTopInventory().setItem(StringUtils.getUtils().getSlotConversion(slot), itemStack);
+				    	player.getOpenInventory().getTopInventory().setItem(StringUtils.getSlotConversion(slot), itemStack);
 				    });
 				}
 			} 
@@ -4203,18 +4203,18 @@ public class ItemMap {
 	private void warmCycle(final Player player, final Player altPlayer, final ItemMap itemMap, final int warmCount, final Location location, final ItemStack itemCopy, final String action, final String clickType, final String slot) {
 		if (warmCount != 0) {
 			if (itemMap.warmDelay == warmCount) { 
-				String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = StringUtils.getUtils().translateLayout(itemMap.getCustomName(), player); 
+				String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = StringUtils.translateLayout(itemMap.getCustomName(), player); 
 				LanguageAPI.getLang(false).sendLangMessage("general.warmingUp", player, placeHolders); 
 				itemMap.addWarmPending(player); 
 			}
 			SchedulerUtils.runLater(20L, () -> {
 				if (itemMap.warmLocation(player, location, action)) {
-					String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = StringUtils.getUtils().translateLayout(itemMap.getCustomName(), player); 
+					String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = StringUtils.translateLayout(itemMap.getCustomName(), player); 
 					LanguageAPI.getLang(false).sendLangMessage("general.warmingTime", player, placeHolders);
 					itemMap.warmCycle(player, altPlayer, itemMap, (warmCount - 1), location, itemCopy, action, clickType, slot);	
 				} else { 
 					itemMap.delWarmPending(player); 
-					String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = StringUtils.getUtils().translateLayout(itemMap.getCustomName(), player); 
+					String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = StringUtils.translateLayout(itemMap.getCustomName(), player); 
 					LanguageAPI.getLang(false).sendLangMessage("general.warmingHalted", player, placeHolders);
 				}
 			});
@@ -4232,7 +4232,7 @@ public class ItemMap {
 						itemMap.addPlayerOnCooldown(player);
 					}
 				} else {
-					String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = StringUtils.getUtils().translateLayout(itemMap.getCustomName(), player); 
+					String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = StringUtils.translateLayout(itemMap.getCustomName(), player); 
 					LanguageAPI.getLang(false).sendLangMessage("general.warmingHalted", player, placeHolders);
 				}
 				if (itemMap.warmDelay != 0) { itemMap.delWarmPending(player); }
@@ -4282,7 +4282,7 @@ public class ItemMap {
     * @return If it was successful.
     */
     private boolean getRandomMap(final HashMap < Integer, ItemCommand > randomCommands, final ItemCommand[] itemCommands, final Player player, final Player altPlayer, final String action, final String clickType, final String slot) {
-    	Entry<?, ?> dedicatedMap = StringUtils.getUtils().randomEntry(randomCommands);
+    	Entry<?, ?> dedicatedMap = StringUtils.randomEntry(randomCommands);
     	if (dedicatedMap != null && dedicatedMap.getValue() != null && player != null && action != null && clickType != null && slot != null && itemCommands != null && randomCommands != null
         && !((ItemCommand)dedicatedMap.getValue()).execute(player, altPlayer, action, clickType, slot, this)) { 
     		this.getRandomMap(randomCommands, itemCommands, player, altPlayer, action, clickType, slot);
@@ -4302,7 +4302,7 @@ public class ItemMap {
     * @return If it was successful.
     */
     private boolean getRandomAll(final HashMap < Integer, ItemCommand > randomCommands, final ItemCommand[] itemCommands, final Player player, final Player altPlayer, final String action, final String clickType, final String slot) {
-    	Entry<?, ?> dedicatedMap = StringUtils.getUtils().randomEntry(randomCommands);
+    	Entry<?, ?> dedicatedMap = StringUtils.randomEntry(randomCommands);
     	if (dedicatedMap != null && dedicatedMap.getValue() != null && player != null && action != null && slot != null && itemCommands != null && randomCommands != null 
         && !((ItemCommand)dedicatedMap.getValue()).execute(player, altPlayer, action, clickType, slot, this)) { 
     		randomCommands.remove(dedicatedMap.getKey());
@@ -4333,9 +4333,9 @@ public class ItemMap {
     		}
     		HashMap < Integer, String > randomIdent = new HashMap < Integer, String > ();
     		for (String ident: listIdent) {
-    			randomIdent.put(StringUtils.getUtils().getRandom(1, 100000), ident);
+    			randomIdent.put(StringUtils.getRandom(1, 100000), ident);
     		}
-    		return (String) StringUtils.getUtils().randomEntry(randomIdent).getValue();
+    		return (String) StringUtils.randomEntry(randomIdent).getValue();
     	}
     	return null;
     }
@@ -4357,7 +4357,7 @@ public class ItemMap {
     	HashMap < Integer, ItemCommand > randomCommands = new HashMap < Integer, ItemCommand > ();
     	if (!this.subjectRemoval) {
     		for (int i = 0; i < itemCommands.length; i++) { 
-        		if (this.sequence == CommandSequence.RANDOM || this.sequence == CommandSequence.RANDOM_SINGLE) { randomCommands.put(StringUtils.getUtils().getRandom(1, 100000), itemCommands[i]); }
+        		if (this.sequence == CommandSequence.RANDOM || this.sequence == CommandSequence.RANDOM_SINGLE) { randomCommands.put(StringUtils.getRandom(1, 100000), itemCommands[i]); }
         		else if (this.sequence == CommandSequence.RANDOM_LIST) {
         			if (itemCommands[i].getSection() != null && itemCommands[i].getSection().equalsIgnoreCase(chosenIdent.replace("+", ""))) {
 	        			if (!playerSuccess) { playerSuccess = itemCommands[i].execute(player, altPlayer, action, clickType, slot, this); } 
@@ -4607,7 +4607,7 @@ public class ItemMap {
 				this.storedSpammedPlayers.put(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + this.configName, System.currentTimeMillis());
 				if (this.cooldownMessage != null && !this.cooldownMessage.isEmpty()) {
 					int timeLeft = (int)(this.interactCooldown - ((System.currentTimeMillis() - playersCooldownList) / 1000));
-					player.sendMessage(StringUtils.getUtils().translateLayout(this.cooldownMessage.replace("%timeleft%", String.valueOf(timeLeft)).replace("%item%", this.customName), player));
+					player.sendMessage(StringUtils.translateLayout(this.cooldownMessage.replace("%timeleft%", String.valueOf(timeLeft)).replace("%item%", this.customName), player));
 				}
 			}
 			return true;
@@ -4650,7 +4650,7 @@ public class ItemMap {
 			else if (this.onCooldownTick(player)) {
 				String cooldownmsg = this.cooldownMessage != null ? (this.cooldownMessage.replace("%timeleft%", String.valueOf((this.cooldownSeconds - ((System.currentTimeMillis() - playersCooldownList) / 1000)))).replace("%item%", this.customName).replace("%itemraw%", ItemHandler.getMaterialName(this.tempItem))) : null;
 				if (cooldownmsg != null && !this.cooldownMessage.isEmpty()) { 
-					cooldownmsg = StringUtils.getUtils().translateLayout(cooldownmsg, player);
+					cooldownmsg = StringUtils.translateLayout(cooldownmsg, player);
 					player.sendMessage(cooldownmsg);
 				}
 				this.addPlayerOnCooldownTick(player);
@@ -5007,13 +5007,13 @@ public class ItemMap {
 			String recipeLine = "";
 			for (Character recipeCharacter: this.recipe) {
 				recipeLine += recipeCharacter;
-				if (StringUtils.getUtils().countCharacters(recipeLine) == 3) {
+				if (StringUtils.countCharacters(recipeLine) == 3) {
 					recipeTempList.add(recipeLine);
 					recipeLine = "";
 				}
 			}
 			if (!recipeLine.isEmpty()) { 
-				while (StringUtils.getUtils().countCharacters(recipeTempList.get(0)) != StringUtils.getUtils().countCharacters(recipeLine)) { recipeLine += "X"; }
+				while (StringUtils.countCharacters(recipeTempList.get(0)) != StringUtils.countCharacters(recipeLine)) { recipeLine += "X"; }
 				recipeTempList.add(recipeLine);  
 			}
 			for (String str: this.trimRecipe(recipeTempList)) { recipeList.add(str.replace(" ", "X")); }

@@ -50,7 +50,7 @@ public class Legacy_Storable implements Listener {
 		Player player = (Player) event.getWhoClicked();
 		String invType = event.getView().getType().toString();
 		ItemStack item = null;
-		if (StringUtils.getUtils().containsIgnoreCase(event.getAction().name(), "HOTBAR")) {
+		if (StringUtils.containsIgnoreCase(event.getAction().name(), "HOTBAR")) {
 			if (event.getView().getBottomInventory().getSize() >= event.getHotbarButton() && event.getHotbarButton() >= 0) {
 				item = event.getView().getBottomInventory().getItem(event.getHotbarButton());
 			}

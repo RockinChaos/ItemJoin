@@ -48,8 +48,6 @@ import me.RockinChaos.itemjoin.utils.api.DependAPI;
 import me.clip.placeholderapi.PlaceholderAPI;
 
 public class StringUtils {
-
-    private static StringUtils util;
 	
    /**
     * Checks if the condition is met.
@@ -59,15 +57,15 @@ public class StringUtils {
     * @param value - The value being compared against the condition.
     * @return If the condition has operand against value.
     */
-	public boolean conditionMet(final String condition, final String operand, final String value) {
+	public static boolean conditionMet(final String condition, final String operand, final String value) {
 		if (operand == null) { return false; }
 		if (operand.equalsIgnoreCase("EQUAL") && ((condition != null && value != null && condition.equalsIgnoreCase(value)) || (condition == null && value == null))) {
 			return true;
 		} else if (operand.equalsIgnoreCase("NOTEQUAL") && ((condition != null && value != null && !condition.equalsIgnoreCase(value)) || ((condition == null && value != null) || (condition != null && value == null)))) {
 			return true;
-		} else if (operand.equalsIgnoreCase("OVER") && condition != null && value != null && this.isInt(condition) && this.isInt(value) && Integer.parseInt(condition) > Integer.parseInt(value)) {
+		} else if (operand.equalsIgnoreCase("OVER") && condition != null && value != null && isInt(condition) && isInt(value) && Integer.parseInt(condition) > Integer.parseInt(value)) {
 			return true;
-		} else if (operand.equalsIgnoreCase("UNDER") && condition != null && value != null && this.isInt(condition) && this.isInt(value) && Integer.parseInt(condition) < Integer.parseInt(value)) {
+		} else if (operand.equalsIgnoreCase("UNDER") && condition != null && value != null && isInt(condition) && isInt(value) && Integer.parseInt(condition) < Integer.parseInt(value)) {
 			return true;
 		}
 		return false;
@@ -80,7 +78,7 @@ public class StringUtils {
     * @param string2 - The String that should be inside string1.
     * @return If string1 contains string2.
     */
-	public boolean containsIgnoreCase(final String string1, final String string2) {
+	public static boolean containsIgnoreCase(final String string1, final String string2) {
 		if (string1 != null && string2 != null && string1.toLowerCase().contains(string2.toLowerCase())) {
 			return true;
 		}
@@ -95,7 +93,7 @@ public class StringUtils {
     * @param argument - The argument to be split between the string.
     * @return If string1 contains string2.
     */
-	public boolean splitIgnoreCase(final String string1, final String string2, final String argument) {
+	public static boolean splitIgnoreCase(final String string1, final String string2, final String argument) {
 		String[] parts = string1.split(argument);
 		boolean splitParts = string1.contains(argument);
 		for (int i = 0; i < (splitParts ? parts.length : 1); i++) {
@@ -114,7 +112,7 @@ public class StringUtils {
     * @param str - The String that should be inside the List.
     * @return If the List contained the String.
     */
-	public boolean containsValue(final List<?> list, final String str) {
+	public static boolean containsValue(final List<?> list, final String str) {
 		boolean bool = false;
 		for (Object l : list) { if (l.toString().equalsIgnoreCase(str)) { bool = true; break; } }
 		return bool;
@@ -126,7 +124,7 @@ public class StringUtils {
     * @param str - The String to be Split.
     * @return The newly formatted String[].
     */
-	public String[] softSplit(final String str) {
+	public static String[] softSplit(final String str) {
 		if (str.split(", ").length < 3) { return str.split("` "); }
 		String splitTest = ""; int index = 1;
 	    for (String sd : str.split(", ")) { if (index == 3) { splitTest += sd + "` "; index = 1; } else { splitTest += sd + ", "; index++; } }
@@ -140,7 +138,7 @@ public class StringUtils {
     * @param str - The String to be Split.
     * @return The split String as a List.
     */
-	public List<String> split(final String str) {
+	public static List<String> split(final String str) {
 		List<String> splitList = new ArrayList<String>();
 		for (String split : str.split(", ")) {
 			splitList.add(split);
@@ -156,7 +154,7 @@ public class StringUtils {
     * @param sub2 - The occurence to placed.
     * @return The newly replaced String.
     */
-	public String replaceLast(final String str, final String sub1, final String sub2) {
+	public static String replaceLast(final String str, final String sub1, final String sub2) {
 	    int pos = str.lastIndexOf(sub1); 
 	    if (pos > -1) { 
 	       return str.substring(0, pos) + sub2 + str.substring(pos + sub1.length(), str.length()); 
@@ -171,9 +169,9 @@ public class StringUtils {
     * @param i - The Integer to be set as the item path.
     * @return The Integer to be set as the auto generated item path.
     */
-	public int getPath(final int i) {
+	public static int getPath(final int i) {
 		if (ConfigHandler.getConfig().getFile("items.yml").getString("items.item_" + i) != null) {
-			return this.getPath(i + 1);
+			return getPath(i + 1);
 		}
 		return i;
 	}
@@ -185,7 +183,7 @@ public class StringUtils {
     * @param str - The String to be Color Encoded.
     * @return The Color Encoded String.
     */
-	public String colorEncode(final String str) {
+	public static String colorEncode(final String str) {
 		try {
 			String hiddenData = "";
 			for (char c: str.toCharArray()) {
@@ -204,7 +202,7 @@ public class StringUtils {
     * @param str - The String to be Color Decoded.
     * @return The Color Decoded String.
     */
-	public String colorDecode(final String str) {
+	public static String colorDecode(final String str) {
 		try {
 			String[] hiddenData = str.split("(?:\\w{2,}|\\d[0-9A-Fa-f])+");
 			String returnData = "";
@@ -233,7 +231,7 @@ public class StringUtils {
     * @param hexString - The HexColor to be converted to Color.
     * @return The Color found from the HexColor.
     */
-	public Color getColorFromHexColor(final String hexString) {
+	public static Color getColorFromHexColor(final String hexString) {
 		int hex = Integer.decode("#" + hexString.replace("#", ""));
 		int r = (hex & 0xFF0000) >> 16;
 		int g = (hex & 0xFF00) >> 8;
@@ -248,7 +246,7 @@ public class StringUtils {
     * @param str - The String to be checked.
     * @return The number of characters in the String..
     */
-	public int countCharacters(final String str) {
+	public static int countCharacters(final String str) {
 		int count = 0;
 		for (int i = 0; i < str.length(); i++) {
 			if (Character.isLetter(str.charAt(i)))
@@ -263,7 +261,7 @@ public class StringUtils {
     * @param str - The String to be checked.
     * @return If the String is an Integer Value.
     */
-	public boolean isInt(final String str) {
+	public static boolean isInt(final String str) {
 		try {
 			Integer.parseInt(str);
 		} catch (NumberFormatException e) { return false; }
@@ -276,7 +274,7 @@ public class StringUtils {
     * @param str - The String to be checked.
     * @return If the String is an Double Value.
     */
-	public boolean isDouble(final String str) {
+	public static boolean isDouble(final String str) {
 		try {
 			Double.parseDouble(str);
 		} catch (NumberFormatException e) { return false; }
@@ -289,7 +287,7 @@ public class StringUtils {
     * @param str - The String to be checked.
     * @return The first found Integer.
     */
-	public Integer returnInteger(final String str) {
+	public static Integer returnInteger(final String str) {
 		if (str == null) { return null; }
 		else {
 			char[] characters = str.toCharArray();
@@ -312,7 +310,7 @@ public class StringUtils {
     * 
     * @param player - that will recieve the items.
     */
-	public UUID UUIDConversion(String uuidString) {
+	public static UUID UUIDConversion(String uuidString) {
 		UUID uuid = null;
 		if (uuidString != null && !uuidString.isEmpty()) {
 			uuidString = uuidString.replace("-", "");
@@ -329,7 +327,7 @@ public class StringUtils {
     * @param reader - the BufferedReader to be converted.
     * @return The resulting appended String.
     */
-	public String toString(BufferedReader reader) throws IOException {
+	public static String toString(BufferedReader reader) throws IOException {
 		StringBuilder result = new StringBuilder();
 		String line = null; while ((line = reader.readLine()) != null) { result.append(line); }
 		return result.toString();
@@ -341,7 +339,7 @@ public class StringUtils {
     * @param str - The String to be encrypted.
     * @return The Base64 encoded String.
     */
-	public String encrypt(final String str) {
+	public static String encrypt(final String str) {
 		try {
 			return Base64.getEncoder().encodeToString(str.getBytes("UTF-8"));
 		} catch (Exception e) {
@@ -357,7 +355,7 @@ public class StringUtils {
     * @param str - The String to be decrypted.
     * @return The decrypted String.
     */
-	public String decrypt(final String str) {
+	public static String decrypt(final String str) {
 		try {
 			return new String(Base64.getDecoder().decode(str), "UTF-8");
 		} catch (Exception e) {
@@ -374,7 +372,7 @@ public class StringUtils {
     * @param upper - The upper limit.
     * @return The randomly selected Integer between the limits.
     */
-	public int getRandom(final int lower, final int upper) {
+	public static int getRandom(final int lower, final int upper) {
 		return new Random().nextInt((upper - lower) + 1) + lower;
 	}
 	
@@ -384,7 +382,7 @@ public class StringUtils {
     * @param map - The HashMap to have a entry selected.
     * @return The randomly selected entry.
     */
-	public Entry<?, ?> randomEntry(final HashMap<?, ?> map) {
+	public static Entry<?, ?> randomEntry(final HashMap<?, ?> map) {
 		try {
 			Field table = HashMap.class.getDeclaredField("table");
 			table.setAccessible(true);
@@ -407,7 +405,7 @@ public class StringUtils {
     * @param str - The String to be checked.
     * @return 
     */
-	public boolean containsLocation(final String location, final String str) {
+	public static boolean containsLocation(final String location, final String str) {
 		if (str.equalsIgnoreCase("ALL") || str.equalsIgnoreCase("GLOBAL") 
 			|| str.equalsIgnoreCase("ENABLED") || str.equalsIgnoreCase("TRUE")) {
 			return true;
@@ -427,7 +425,7 @@ public class StringUtils {
     * @param str - The String to be checked.
     * @return The Crafting Slot Value.
     */
-	public int getSlotConversion(final String str) {
+	public static int getSlotConversion(final String str) {
 		if (str.equalsIgnoreCase("CRAFTING[0]") || str.equalsIgnoreCase("C[0]") || str.equalsIgnoreCase("C(0)")) {
 			return 0;
 		} else if (str.equalsIgnoreCase("CRAFTING[1]") || str.equalsIgnoreCase("C[1]") || str.equalsIgnoreCase("C(1)")) {
@@ -449,7 +447,7 @@ public class StringUtils {
     * @param integer - If the return value should be a String or Integer value.
     * @return The Armor Slot ID.
     */
-	public String getArmorSlot(final String slot, final boolean integer) {
+	public static String getArmorSlot(final String slot, final boolean integer) {
 		if (!integer) {
 			if (slot.equalsIgnoreCase("39")) { return "HELMET"; }
 			else if (slot.equalsIgnoreCase("38")) { return "CHESTPLATE"; }
@@ -471,7 +469,7 @@ public class StringUtils {
     * @param listener - The name of the Listener to be checked.
     * @return If the Listener is Registered.
     */
-	public boolean isRegistered(final String listener) {
+	public static boolean isRegistered(final String listener) {
 		boolean returnValue = false;
         ArrayList<RegisteredListener> rls = HandlerList.getRegisteredListeners(ItemJoin.getInstance());
         for(RegisteredListener rl: rls) {
@@ -489,7 +487,7 @@ public class StringUtils {
     * @param input - The String to be checked.
     * @return The newly formatted String.
     */
-	public String nullCheck(String input) {
+	public static String nullCheck(String input) {
 		if (input == null || input.equalsIgnoreCase("NULL") || input.contains("[]") || input.contains("{}") || input.equals("0&7") || input.equals("-1&a%") || input.equals("") || input.equals(" ")) {
 			return "NONE";
 		}
@@ -508,7 +506,7 @@ public class StringUtils {
     * @param str - The String to have its Color Codes properly Converted to Mojang Hex Colors.
     * @return The translated string.
     */
-    public String translateHexColorCodes(final String str) {
+    public static String translateHexColorCodes(final String str) {
     	final char COLOR_CHAR = ChatColor.COLOR_CHAR;
     	Matcher matcher = Pattern.compile("&#([A-Fa-f0-9]{6})").matcher(str);
     	StringBuffer buffer = new StringBuffer(str.length() + 4 * 8);
@@ -526,8 +524,8 @@ public class StringUtils {
     * @param str - The String to have its Color Codes properly Converted to Bukkit Colors.
     * @return The newly formatted String.
     */
-	public String colorFormat(final String str) {
-		return ChatColor.translateAlternateColorCodes('&', this.translateHexColorCodes(str));
+	public static String colorFormat(final String str) {
+		return ChatColor.translateAlternateColorCodes('&', translateHexColorCodes(str));
 	}
 	
    /**
@@ -538,7 +536,7 @@ public class StringUtils {
     * @param placeHolder - The placeholders to be replaced into the String.
     * @return The newly translated String.
     */
-	public String translateLayout(String str, final Player player, final String...placeHolder) {
+	public static String translateLayout(String str, final Player player, final String...placeHolder) {
 		String playerName = "EXEMPT";
 		
 		if (player != null && DependAPI.getDepends(false).nickEnabled()) {
@@ -570,7 +568,7 @@ public class StringUtils {
 			try { if (placeHolder != null && placeHolder.length >= 1) { str = str.replace("%player_hit%", placeHolder[0]); } } catch (Exception e) { ServerUtils.sendDebugTrace(e); }
 			try { if (Bukkit.isPrimaryThread()) { str = str.replace("%player_interact%", PlayerHandler.getNearbyPlayer(player, 3)); } } catch (Exception e) { ServerUtils.sendDebugTrace(e); } }
 			if (player == null) { try { str = str.replace("%player%", "CONSOLE"); } catch (Exception e) { ServerUtils.sendDebugTrace(e); } }
-			str = ChatColor.translateAlternateColorCodes('&', this.translateHexColorCodes(str));
+			str = ChatColor.translateAlternateColorCodes('&', translateHexColorCodes(str));
 		if (DependAPI.getDepends(false).placeHolderEnabled()) {
 			try { try { return PlaceholderAPI.setPlaceholders(player, str); } 
 			catch (NoSuchFieldError e) { ServerUtils.logWarn("An error has occured when setting the PlaceHolder " + e.getMessage() + ", if this issue persits contact the developer of PlaceholderAPI."); return str; }
@@ -578,14 +576,4 @@ public class StringUtils {
 		}
 		return str;
 	}
-	
-   /**
-    * Gets the instance of the Utils.
-    * 
-    * @return The Utils instance.
-    */
-    public static StringUtils getUtils() { 
-        if (util == null) { util = new StringUtils(); }
-        return util; 
-    } 
 }

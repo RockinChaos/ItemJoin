@@ -80,12 +80,11 @@ import me.arcaniax.hdb.api.HeadDatabaseAPI;
 
 	
 /**
-* Handles the in-game GUI Creator.
-* Allows the Admin to modify, create, delete, and save custom items in-game.
+* Handles the in-game GUI.
 * 
 */
 public class Menu {
-	private static String GUIName = ServerUtils.hasSpecificUpdate("1_9") ? StringUtils.getUtils().colorFormat("&7           &0&n ItemJoin Menu") : StringUtils.getUtils().colorFormat("&7           &0&n ItemJoin Menu");
+	private static String GUIName = ServerUtils.hasSpecificUpdate("1_9") ? StringUtils.colorFormat("&7           &0&n ItemJoin Menu") : StringUtils.colorFormat("&7           &0&n ItemJoin Menu");
 	private static ItemStack fillerPaneBItem = ItemHandler.getItem("STAINED_GLASS_PANE:15", 1, false, "&7", "");
 	private static ItemStack fillerPaneGItem = ItemHandler.getItem("STAINED_GLASS_PANE:7", 1, false, "&7", "");
 	private static ItemStack fillerPaneItem = ItemHandler.getItem("GLASS_PANE", 1, false, "&7", "");
@@ -109,7 +108,7 @@ public class Menu {
 			pagedPane.addButton(new Button(ItemHandler.getItem("ENDER_CHEST", 1, false, "&b&l&nConfig Settings", "&7", "&7*Change the GLOBAL plugin", "&7configuration settings."), event -> configSettings(player)));
 			pagedPane.addButton(new Button(fillerPaneBItem));
 			pagedPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "WRITABLE_BOOK" : "386"), 1, false, "&a&l&nCreate", "&7", "&7*Create a new item from scratch."),
-					event -> materialPane(player, new ItemMap("item_" + StringUtils.getUtils().getPath(1), "ARBITRARY"), 0, 0)));
+					event -> materialPane(player, new ItemMap("item_" + StringUtils.getPath(1), "ARBITRARY"), 0, 0)));
 			pagedPane.addButton(new Button(ItemHandler.getItem("HOPPER", 1, false, "&e&l&nSave", "&7", "&7*Save an existing item as a custom item."), event -> startHopper(player)));
 			pagedPane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, false, "&c&l&nModify", "&7", "&7*Modify an existing custom item"), event -> startModify(player, null, 0)));
 			pagedPane.addButton(new Button(fillerPaneBItem));
@@ -199,7 +198,7 @@ public class Menu {
 			final String heldTriggers = ConfigHandler.getConfig().getFile("config.yml").getString("Settings.HeldItem-Triggers");
 			itemPane.addButton(new Button(ItemHandler.getItem("REDSTONE", 1, false, 
 					"&bHeld Item Triggers", "&7", "&7*When these trigger(s)", "&7are performed, the held item", "&7slot will be set.", 
-					"&9&lENABLED: &a" + String.valueOf((!heldTriggers.isEmpty() && !StringUtils.getUtils().containsIgnoreCase(heldTriggers, "DISABLE")) ? heldTriggers : "FALSE").toUpperCase()), 
+					"&9&lENABLED: &a" + String.valueOf((!heldTriggers.isEmpty() && !StringUtils.containsIgnoreCase(heldTriggers, "DISABLE")) ? heldTriggers : "FALSE").toUpperCase()), 
 					event -> triggerPane(player)));
 			itemPane.addButton(new Button(ItemHandler.getItem("116", 1, ConfigHandler.getConfig().getFile("config.yml").getBoolean("Settings.DataTags"), 
 					"&bDataTags", "&7", "&7*If custom items should use", "&7data tags (NBTTags) to distinguish", "&7each custom item, making them unqiue.", 
@@ -590,7 +589,7 @@ public class Menu {
     * @param item - The ItemStack to be saved.
     */
 	private static void convertStack(final Player player, final ItemStack item, final String slot) {
-		ItemMap itemMap = new ItemMap("item_" + StringUtils.getUtils().getPath(1), "ARBITRARY");
+		ItemMap itemMap = new ItemMap("item_" + StringUtils.getPath(1), "ARBITRARY");
 		itemMap.setMaterial(item.getType());
 		if (!ServerUtils.hasSpecificUpdate("1_13")) { itemMap.setDataValue((short)LegacyAPI.getDataValue(item)); }
 		itemMap.setCount(String.valueOf(item.getAmount()));
@@ -616,7 +615,7 @@ public class Menu {
 				itemMap.setEnchantments(enchantList);
 			}
 		}
-		if (StringUtils.getUtils().containsIgnoreCase(item.getType().toString(), "LEATHER_")) {
+		if (StringUtils.containsIgnoreCase(item.getType().toString(), "LEATHER_")) {
 			LeatherArmorMeta meta = (LeatherArmorMeta) item.getItemMeta();
 			if (meta.getColor() != null) {
 				itemMap.setLeatherColor(DyeColor.getByColor(meta.getColor()).name());
@@ -722,71 +721,71 @@ public class Menu {
 			SchedulerUtils.runAsync(() -> {
 			String slotList = "";
 			String slotString = "";
-			if (StringUtils.getUtils().nullCheck(itemMap.getMultipleSlots().toString()) != "NONE") {
+			if (StringUtils.nullCheck(itemMap.getMultipleSlots().toString()) != "NONE") {
 				for (String slot: itemMap.getMultipleSlots()) {
 					slotString += slot + ", ";
 				}
-				for (String split: StringUtils.getUtils().softSplit(StringUtils.getUtils().nullCheck(slotString.substring(0, slotString.length())))) {
+				for (String split: StringUtils.softSplit(StringUtils.nullCheck(slotString.substring(0, slotString.length())))) {
 					slotList += "&a" + split + " /n ";
 				}
 			}
 			String itemflagsList = "";
-			if (StringUtils.getUtils().nullCheck(itemMap.getItemFlags()) != "NONE") {
-				for (String split: StringUtils.getUtils().softSplit(itemMap.getItemFlags())) {
+			if (StringUtils.nullCheck(itemMap.getItemFlags()) != "NONE") {
+				for (String split: StringUtils.softSplit(itemMap.getItemFlags())) {
 					itemflagsList += "&a" + split + " /n ";
 				}
 			}
 			String triggersList = "";
-			if (StringUtils.getUtils().nullCheck(itemMap.getTriggers()) != "NONE") {
-				for (String split: StringUtils.getUtils().softSplit(itemMap.getTriggers())) {
+			if (StringUtils.nullCheck(itemMap.getTriggers()) != "NONE") {
+				for (String split: StringUtils.softSplit(itemMap.getTriggers())) {
 					triggersList += "&a" + split + " /n ";
 				}
 			}
 			String worldList = "";
-			if (StringUtils.getUtils().nullCheck(itemMap.getEnabledWorlds().toString()) != "NONE") {
-				for (String split: StringUtils.getUtils().softSplit(StringUtils.getUtils().nullCheck(itemMap.getEnabledWorlds().toString()))) {
+			if (StringUtils.nullCheck(itemMap.getEnabledWorlds().toString()) != "NONE") {
+				for (String split: StringUtils.softSplit(StringUtils.nullCheck(itemMap.getEnabledWorlds().toString()))) {
 					worldList += "&a" + split + " /n ";
 				}
 			}
 			String regionList = "";
-			if (StringUtils.getUtils().nullCheck(itemMap.getEnabledRegions().toString()) != "NONE") {
-				for (String split: StringUtils.getUtils().softSplit(StringUtils.getUtils().nullCheck(itemMap.getEnabledRegions().toString()))) {
+			if (StringUtils.nullCheck(itemMap.getEnabledRegions().toString()) != "NONE") {
+				for (String split: StringUtils.softSplit(StringUtils.nullCheck(itemMap.getEnabledRegions().toString()))) {
 					regionList += "&a" + split + " /n ";
 				}
 			}
 			String enchantList = "";
-			if (StringUtils.getUtils().nullCheck(itemMap.getEnchantments().toString()) != "NONE") {
-				for (String split: StringUtils.getUtils().softSplit(StringUtils.getUtils().nullCheck(itemMap.getEnchantments().toString()))) {
+			if (StringUtils.nullCheck(itemMap.getEnchantments().toString()) != "NONE") {
+				for (String split: StringUtils.softSplit(StringUtils.nullCheck(itemMap.getEnchantments().toString()))) {
 					enchantList += "&a" + split + " /n ";
 				}
 			}
 			String potionList = "";
 			String potionString = "";
-			if (StringUtils.getUtils().nullCheck(itemMap.getPotionEffect().toString()) != "NONE") {
+			if (StringUtils.nullCheck(itemMap.getPotionEffect().toString()) != "NONE") {
 				for (PotionEffect potions: itemMap.getPotionEffect()) {
 					potionString += potions.getType().getName().toUpperCase() + ":" + potions.getAmplifier() + ":" + potions.getDuration() + ", ";
 				}
-				for (String split: StringUtils.getUtils().softSplit(StringUtils.getUtils().nullCheck(potionString.substring(0, potionString.length())))) {
+				for (String split: StringUtils.softSplit(StringUtils.nullCheck(potionString.substring(0, potionString.length())))) {
 					potionList += "&a" + split + " /n ";
 				}
 			}
 			String attributeList = "";
 			String attributeString = "";
-			if (StringUtils.getUtils().nullCheck(itemMap.getAttributes().toString()) != "NONE") {
+			if (StringUtils.nullCheck(itemMap.getAttributes().toString()) != "NONE") {
 				for (String attribute: itemMap.getAttributes().keySet()) {
 					attributeString += attribute + ":" + itemMap.getAttributes().get(attribute) + ", ";
 				}
-				for (String split: StringUtils.getUtils().softSplit(StringUtils.getUtils().nullCheck(attributeString.substring(0, attributeString.length())))) {
+				for (String split: StringUtils.softSplit(StringUtils.nullCheck(attributeString.substring(0, attributeString.length())))) {
 					attributeList += "&a" + split + " /n ";
 				}
 			}
 			String patternList = "";
 			String patternString = "";
-			if (StringUtils.getUtils().nullCheck(itemMap.getBannerPatterns().toString()) != "NONE") {
+			if (StringUtils.nullCheck(itemMap.getBannerPatterns().toString()) != "NONE") {
 				for (Pattern patterns: itemMap.getBannerPatterns()) {
 					patternString += patterns.getColor() + ":" + patterns.getPattern().name().toUpperCase() + ", ";
 				}
-				for (String split: StringUtils.getUtils().softSplit(StringUtils.getUtils().nullCheck(patternString.substring(0, patternString.length())))) {
+				for (String split: StringUtils.softSplit(StringUtils.nullCheck(patternString.substring(0, patternString.length())))) {
 					patternList += "&a" + split + " /n ";
 				}
 			}
@@ -805,11 +804,11 @@ public class Menu {
 					!itemMap.getMultipleSlots().isEmpty() ? "&9&lSlot(s): &a" + slotList : "&9&lSLOT: &a" + itemMap.getSlot().toUpperCase())), event -> switchPane(player, itemMap, 1)));
 			creatingPane.addButton(new Button(ItemHandler.getItem("DIAMOND", itemMap.getCount(), false, "&b&lCount", "&7", "&7*Set the amount of the", "&7item to be given.", "&9&lCOUNT: &a" + 
 					itemMap.getCount()), event -> countPane(player, itemMap)));
-			creatingPane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, false, "&b&lName", "&7", "&7*Set the name of the item.", "&9&lNAME: &f" + StringUtils.getUtils().nullCheck(itemMap.getCustomName())), event -> {
+			creatingPane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, false, "&b&lName", "&7", "&7*Set the name of the item.", "&9&lNAME: &f" + StringUtils.nullCheck(itemMap.getCustomName())), event -> {
 				if (itemMap.getDynamicNames() != null && !itemMap.getDynamicNames().isEmpty()) {
 					animatedNamePane(player, itemMap);
 				} else {
-					if (StringUtils.getUtils().nullCheck(itemMap.getCustomName()) != "NONE") {
+					if (StringUtils.nullCheck(itemMap.getCustomName()) != "NONE") {
 						itemMap.setCustomName(null);
 						creatingPane(player, itemMap);
 					} else {
@@ -828,14 +827,14 @@ public class Menu {
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				creatingPane(event.getPlayer(), itemMap);
 			}));
-			creatingPane.addButton(new Button(ItemHandler.getItem("386", 1, false, "&b&lLore", "&7", "&7*Set the lore of the item.", "&9&lLORE: &f" + StringUtils.getUtils().nullCheck(itemMap.getCustomLore().toString())), event -> {
+			creatingPane.addButton(new Button(ItemHandler.getItem("386", 1, false, "&b&lLore", "&7", "&7*Set the lore of the item.", "&9&lLORE: &f" + StringUtils.nullCheck(itemMap.getCustomLore().toString())), event -> {
 				if (itemMap.getDynamicLores() != null && !itemMap.getDynamicLores().isEmpty()) {
 					animatedLorePane(player, itemMap);
 				} else { 
 					lorePane(player, itemMap);
 				}
 			}, event -> {
-				itemMap.setCustomLore(StringUtils.getUtils().split(ChatColor.stripColor(event.getMessage())));
+				itemMap.setCustomLore(StringUtils.split(ChatColor.stripColor(event.getMessage())));
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[16] = "LORE";
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
@@ -844,14 +843,14 @@ public class Menu {
 			creatingPane.addButton(new Button(ItemHandler.setDurability(ItemHandler.getItem("DIAMOND_BOOTS", 1, false, "&e&lData", "&7", "&7*Set the damage or the", "&7custom texture of the item."), 160), event -> { dataPane(player, itemMap); }));
 			creatingPane.addButton(new Button(ItemHandler.getItem("BOOK", 1, false, "&e&lCommand Settings", "&7", "&7*Define commands for the item", "&7which execute upon being", "&7interacted with."), event -> commandPane(player, itemMap)));
 			creatingPane.addButton(new Button(ItemHandler.getItem("ENCHANTED_BOOK", 1, false, "&b&lEnchantments", "&7", "&7*Add enchants to make the", "&7item sparkle and powerful.", "&9&lENCHANTMENTS: &a" + 
-			(StringUtils.getUtils().nullCheck(itemMap.getEnchantments().toString()) != "NONE" ? "&a" + enchantList : "NONE")), event -> enchantPane(player, itemMap)));
+			(StringUtils.nullCheck(itemMap.getEnchantments().toString()) != "NONE" ? "&a" + enchantList : "NONE")), event -> enchantPane(player, itemMap)));
 			creatingPane.addButton(new Button(ItemHandler.getItem("CHEST", 1, false, "&b&lItemflags", "&7", "&7*Special flags that will give", "&7the item abilities and", "&7custom features.", "&9&lITEMFLAGS: &a" + 
-			(StringUtils.getUtils().nullCheck(itemMap.getItemFlags()) != "NONE" ? "&a" + itemflagsList : "NONE")), event -> flagPane(player, itemMap)));
+			(StringUtils.nullCheck(itemMap.getItemFlags()) != "NONE" ? "&a" + itemflagsList : "NONE")), event -> flagPane(player, itemMap)));
 			creatingPane.addButton(new Button(ItemHandler.getItem("REDSTONE", 1, false, "&b&lTriggers", "&7", "&7*When the players act upon these", "&7events, the item will be given.", "&9&lTRIGGERS: &a" +
-			(StringUtils.getUtils().nullCheck(itemMap.getTriggers()) != "NONE" ? "&a" + triggersList : "NONE")), event -> triggerPane(player, itemMap)));
+			(StringUtils.nullCheck(itemMap.getTriggers()) != "NONE" ? "&a" + triggersList : "NONE")), event -> triggerPane(player, itemMap)));
 			creatingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_15") ? "REDSTONE_TORCH" : "76"), 1, false, "&b&lPermission Node", "&7", "&7*Custom permission node that", "&7will be required by a permission", "&7plugin to receive the item.", "&7&lNote: &7Do NOT include", 
-					"&7any spaces or special characters", "&9&lPERMISSION-NODE: &a" + StringUtils.getUtils().nullCheck(itemMap.getPermissionNode())), event -> {
-				if (StringUtils.getUtils().nullCheck(itemMap.getPermissionNode()) != "NONE") {
+					"&7any spaces or special characters", "&9&lPERMISSION-NODE: &a" + StringUtils.nullCheck(itemMap.getPermissionNode())), event -> {
+				if (StringUtils.nullCheck(itemMap.getPermissionNode()) != "NONE") {
 					itemMap.setPerm(null);
 					creatingPane(player, itemMap);
 				} else {
@@ -870,9 +869,9 @@ public class Menu {
 				creatingPane(event.getPlayer(), itemMap);
 			}));
 			creatingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GRASS_BLOCK" : "2"), 1, false, "&b&lEnabled Worlds", "&7", "&7*Define the world(s) that the", "&7item will be given in.", 
-					"&9&lENABLED-WORLDS: &a" + (StringUtils.getUtils().nullCheck(itemMap.getEnabledWorlds().toString()) != "NONE" ? "&a" + worldList : "NONE")), event -> worldPane(player, itemMap)));
+					"&9&lENABLED-WORLDS: &a" + (StringUtils.nullCheck(itemMap.getEnabledWorlds().toString()) != "NONE" ? "&a" + worldList : "NONE")), event -> worldPane(player, itemMap)));
 			creatingPane.addButton(new Button(ItemHandler.getItem("GOLD_BLOCK", 1, true, "&b&lEnabled Regions", "&7", "&7*Define the region(s) that the", "&7item will be given in.", (DependAPI.getDepends(false).getGuard().guardEnabled() ? 
-					"&9&lENABLED-REGIONS: &a" + (StringUtils.getUtils().nullCheck(itemMap.getEnabledRegions().toString()) != "NONE" ? "&a" + regionList : "NONE") : ""), (DependAPI.getDepends(false).getGuard().guardEnabled() ? "" : "&7"), 
+					"&9&lENABLED-REGIONS: &a" + (StringUtils.nullCheck(itemMap.getEnabledRegions().toString()) != "NONE" ? "&a" + regionList : "NONE") : ""), (DependAPI.getDepends(false).getGuard().guardEnabled() ? "" : "&7"), 
 					(DependAPI.getDepends(false).getGuard().guardEnabled() ? "" : "&c&lERROR: &7WorldGuard was NOT found."), (DependAPI.getDepends(false).getGuard().guardEnabled() ? "" : "&7This button will do nothing...")), event -> {
 				if (DependAPI.getDepends(false).getGuard().guardEnabled()) {
 					regionPane(player, itemMap);
@@ -881,10 +880,10 @@ public class Menu {
 			creatingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "STICKY_PISTON" : "29"), 1, false, "&e&lAnimation Settings", "&7", "&7*Define animations for the item", "&7Example: Custom iterations for the", 
 					"&7items name, lore, and material type"), event -> animationPane(player, itemMap)));
 			creatingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "OAK_FENCE" : "FENCE"), 1, false, "&b&lLimit-Modes", "&7", "&7*Define the gamemode(s) that the", "&7item will be limited to.", "&9&lLIMIT-MODES: &a" + 
-					StringUtils.getUtils().nullCheck(itemMap.getLimitModes())), event -> limitPane(player, itemMap)));
+					StringUtils.nullCheck(itemMap.getLimitModes())), event -> limitPane(player, itemMap)));
 			creatingPane.addButton(new Button(ItemHandler.getItem("NETHER_STAR", 1, false, "&b&lProbability", "&7", "&7*Define the chance that the", "&7item will be given to the player.", "&7", "&c&lNOTICE:&7 Only ONE item defined with", "&7a probability value will be selected.", "&7Probability is the same as a dice roll.", "&7", "&9&lPROBABILITY: &a" +
-					StringUtils.getUtils().nullCheck(itemMap.getProbability() + "&a%")), event -> {
-				if (StringUtils.getUtils().nullCheck(itemMap.getProbability() + "&a%") != "NONE") {
+					StringUtils.nullCheck(itemMap.getProbability() + "&a%")), event -> {
+				if (StringUtils.nullCheck(itemMap.getProbability() + "&a%") != "NONE") {
 					itemMap.setProbability(-1);
 					creatingPane(player, itemMap);
 				} else {
@@ -892,8 +891,8 @@ public class Menu {
 				}
 			}));
 			creatingPane.addButton(new Button(ItemHandler.getItem("ICE", 1, false, "&b&lUsage Cooldown", "&7", "&7*Define the cooldown for", "&7interacting with the item.", "&9&lUSE-COOLDOWN: &a" +
-			StringUtils.getUtils().nullCheck(itemMap.getInteractCooldown() + "&7")), event -> {
-				if (StringUtils.getUtils().nullCheck(itemMap.getInteractCooldown() + "&7") != "NONE") {
+			StringUtils.nullCheck(itemMap.getInteractCooldown() + "&7")), event -> {
+				if (StringUtils.nullCheck(itemMap.getInteractCooldown() + "&7") != "NONE") {
 					itemMap.setInteractCooldown(0);
 					creatingPane(player, itemMap);
 				} else {
@@ -920,8 +919,8 @@ public class Menu {
 			creatingPane.addButton(new Button(fillerPaneGItem));
 			if (itemMap.getMaterial().toString().contains("MAP")) {
 				creatingPane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, false, "&e&lMap Image", "&7", "&7*Adds a custom map image that", "&7will be displayed when held.", "&7", "&7Place the custom map image", 
-						"&7in the MAIN ItemJoin folder.", "&7", "&7The map CAN be a GIF but", "&7must be a 128x128 pixel image.", "&9&lImage: &a" + StringUtils.getUtils().nullCheck(itemMap.getMapImage())), event -> {
-					if (StringUtils.getUtils().nullCheck(itemMap.getMapImage()) != "NONE") {
+						"&7in the MAIN ItemJoin folder.", "&7", "&7The map CAN be a GIF but", "&7must be a 128x128 pixel image.", "&9&lImage: &a" + StringUtils.nullCheck(itemMap.getMapImage())), event -> {
+					if (StringUtils.nullCheck(itemMap.getMapImage()) != "NONE") {
 						itemMap.setMapImage(null);
 						creatingPane(player, itemMap);
 					} else {
@@ -940,7 +939,7 @@ public class Menu {
 					creatingPane(event.getPlayer(), itemMap);
 				}));
 			} else if (itemMap.getMaterial().toString().contains("TIPPED_ARROW")) {
-				creatingPane.addButton(new Button(ItemHandler.getItem("BLAZE_POWDER", 1, false, "&e&lEffects", "&7", "&7*Add custom effects", "&7to the arrow tip.", "&9&lTipped-Effect: &a" + StringUtils.getUtils().nullCheck(potionList)),
+				creatingPane.addButton(new Button(ItemHandler.getItem("BLAZE_POWDER", 1, false, "&e&lEffects", "&7", "&7*Add custom effects", "&7to the arrow tip.", "&9&lTipped-Effect: &a" + StringUtils.nullCheck(potionList)),
 						event -> potionPane(player, itemMap)));
 			} else if (itemMap.getMaterial().toString().contains("CHARGE") || itemMap.getMaterial().toString().equalsIgnoreCase("FIREWORK_STAR")) {
 				Interface colorPane = new Interface(true, 6, GUIName, player);
@@ -952,8 +951,8 @@ public class Menu {
 					}));
 				}
 				creatingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "PINK_DYE" : "351:9"), 1, false, "&e&lCharge Color", "&7", "&7*Set the color of", "&7the firework star.", "&9&lColor: &a" +
-				StringUtils.getUtils().nullCheck(itemMap.getChargeColor() + "")), event -> {
-					if (StringUtils.getUtils().nullCheck(itemMap.getChargeColor() + "") != "NONE") {
+				StringUtils.nullCheck(itemMap.getChargeColor() + "")), event -> {
+					if (StringUtils.nullCheck(itemMap.getChargeColor() + "") != "NONE") {
 						itemMap.setChargeColor(null);
 						creatingPane(player, itemMap);
 					} else {
@@ -961,16 +960,16 @@ public class Menu {
 					}
 				}));
 			} else if (itemMap.getMaterial().toString().contains("GOLDEN_APPLE")) {
-				creatingPane.addButton(new Button(ItemHandler.getItem("POTION", 1, false, "&e&lEffects", "&7", "&7*Add custom effects after", "&7consuming the apple item.", "&9&lNotch-Effects: &a" + StringUtils.getUtils().nullCheck(potionList)),
+				creatingPane.addButton(new Button(ItemHandler.getItem("POTION", 1, false, "&e&lEffects", "&7", "&7*Add custom effects after", "&7consuming the apple item.", "&9&lNotch-Effects: &a" + StringUtils.nullCheck(potionList)),
 						event -> potionPane(player, itemMap)));
 			} else if (itemMap.getMaterial().toString().equalsIgnoreCase("POTION")) {
-				creatingPane.addButton(new Button(ItemHandler.getItem("POTION", 1, false, "&e&lEffects", "&7", "&7*Add custom effects after", "&7consuming the potion item.", "&9&lPotion-Effects: &a" + StringUtils.getUtils().nullCheck(potionList)),
+				creatingPane.addButton(new Button(ItemHandler.getItem("POTION", 1, false, "&e&lEffects", "&7", "&7*Add custom effects after", "&7consuming the potion item.", "&9&lPotion-Effects: &a" + StringUtils.nullCheck(potionList)),
 						event -> potionPane(player, itemMap)));
 			} else if (itemMap.getMaterial().toString().contains("BANNER")) {
-				creatingPane.addButton(new Button(ItemHandler.getItem("CLAY_BALL", 1, false, "&e&lBanner Patterns", "&7", "&7*Set custom patterns that", "&7will appear on the item.", "&9&lBanner-Meta: &a" + StringUtils.getUtils().nullCheck(patternList)),
+				creatingPane.addButton(new Button(ItemHandler.getItem("CLAY_BALL", 1, false, "&e&lBanner Patterns", "&7", "&7*Set custom patterns that", "&7will appear on the item.", "&9&lBanner-Meta: &a" + StringUtils.nullCheck(patternList)),
 						event -> bannerPane(player, itemMap)));
 			} else if (!ItemHandler.getDesignatedSlot(itemMap.getMaterial()).equalsIgnoreCase("noslot") && !itemMap.getMaterial().toString().contains("LEATHER_")) {
-				creatingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "ENCHANTED_GOLDEN_APPLE" : "322:1"), 1, false, "&a&lAttributes", "&7", "&7*Add a custom attribute to", "&7your armor or weapon.", (StringUtils.getUtils().nullCheck(attributeList) != "NONE" ? "&9&lAttributes: &a" + attributeList : "")), event -> {
+				creatingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "ENCHANTED_GOLDEN_APPLE" : "322:1"), 1, false, "&a&lAttributes", "&7", "&7*Add a custom attribute to", "&7your armor or weapon.", (StringUtils.nullCheck(attributeList) != "NONE" ? "&9&lAttributes: &a" + attributeList : "")), event -> {
 					attributePane(player, itemMap, false);
 				}));
 			} else if (itemMap.getMaterial().toString().contains("SHULKER")) {
@@ -1244,7 +1243,7 @@ public class Menu {
 					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
 					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 				}, event -> {
-					if (StringUtils.getUtils().isInt(ChatColor.stripColor(event.getMessage()))) {
+					if (StringUtils.isInt(ChatColor.stripColor(event.getMessage()))) {
 						String[] placeHolders = LanguageAPI.getLang(false).newString();
 						placeHolders[16] = "ADDRESS PORT";
 						LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
@@ -1345,19 +1344,19 @@ public class Menu {
 				}
 			}
 			triggerPane.addButton(new Button(fillerPaneBItem));
-			triggerPane.addButton(new Button(ItemHandler.getItem("323", 1, StringUtils.getUtils().containsValue(triggers, "JOIN"), "&e&l&nJoin", "&7", 
+			triggerPane.addButton(new Button(ItemHandler.getItem("323", 1, StringUtils.containsValue(triggers, "JOIN"), "&e&l&nJoin", "&7", 
 					"&7*Sets the held item slot", "&7upon joinning the server.", 
-			"&9&lENABLED: &a" + (StringUtils.getUtils().containsValue(triggers, "JOIN") + "").toUpperCase()), event -> {
-				if (StringUtils.getUtils().containsValue(triggers, "JOIN")) {
+			"&9&lENABLED: &a" + (StringUtils.containsValue(triggers, "JOIN") + "").toUpperCase()), event -> {
+				if (StringUtils.containsValue(triggers, "JOIN")) {
 					triggers.remove("JOIN");
 				} else {
 					triggers.add("JOIN");
 				}
 				if (triggers.isEmpty()) { 
 					triggers.add("DISABLED"); 
-				} else if (StringUtils.getUtils().containsValue(triggers, "DISABLED")) {
+				} else if (StringUtils.containsValue(triggers, "DISABLED")) {
 					triggers.remove("DISABLED");
-				} else if (StringUtils.getUtils().containsValue(triggers, "DISABLE")) {
+				} else if (StringUtils.containsValue(triggers, "DISABLE")) {
 					triggers.remove("DISABLE");
 				}
 				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
@@ -1367,18 +1366,18 @@ public class Menu {
 				ConfigHandler.getConfig().softReload();
 				SchedulerUtils.runLater(2L, () -> triggerPane(player));
 			}));
-			triggerPane.addButton(new Button(ItemHandler.getItem("DIAMOND", 1, StringUtils.getUtils().containsValue(triggers, "RESPAWN"), "&e&l&nRespawn", "&7", "&7*Sets the held item slot", "&7upon player respawning.", "&9&lENABLED: &a" + 
-			(StringUtils.getUtils().containsValue(triggers, "RESPAWN") + "").toUpperCase()), event -> {
-				if (StringUtils.getUtils().containsValue(triggers, "RESPAWN")) {
+			triggerPane.addButton(new Button(ItemHandler.getItem("DIAMOND", 1, StringUtils.containsValue(triggers, "RESPAWN"), "&e&l&nRespawn", "&7", "&7*Sets the held item slot", "&7upon player respawning.", "&9&lENABLED: &a" + 
+			(StringUtils.containsValue(triggers, "RESPAWN") + "").toUpperCase()), event -> {
+				if (StringUtils.containsValue(triggers, "RESPAWN")) {
 					triggers.remove("RESPAWN");
 				} else {
 					triggers.add("RESPAWN");
 				}
 				if (triggers.isEmpty()) { 
 					triggers.add("DISABLED"); 
-				} else if (StringUtils.getUtils().containsValue(triggers, "DISABLED")) {
+				} else if (StringUtils.containsValue(triggers, "DISABLED")) {
 					triggers.remove("DISABLED");
-				} else if (StringUtils.getUtils().containsValue(triggers, "DISABLE")) {
+				} else if (StringUtils.containsValue(triggers, "DISABLE")) {
 					triggers.remove("DISABLE");
 				}
 				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
@@ -1388,18 +1387,18 @@ public class Menu {
 				ConfigHandler.getConfig().softReload();
 				SchedulerUtils.runLater(2L, () -> triggerPane(player));
 			}));
-			triggerPane.addButton(new Button(ItemHandler.getItem("STONE_BUTTON", 1, StringUtils.getUtils().containsValue(triggers, "WORLD-SWITCH"), "&e&l&nWorld Switch", "&7", "&7*Sets the held item slot", "&7upon player switching worlds.", 
-			"&9&lENABLED: &a" + (StringUtils.getUtils().containsValue(triggers, "WORLD-SWITCH") + "").toUpperCase()), event -> {
-				if (StringUtils.getUtils().containsValue(triggers, "WORLD-SWITCH")) {
+			triggerPane.addButton(new Button(ItemHandler.getItem("STONE_BUTTON", 1, StringUtils.containsValue(triggers, "WORLD-SWITCH"), "&e&l&nWorld Switch", "&7", "&7*Sets the held item slot", "&7upon player switching worlds.", 
+			"&9&lENABLED: &a" + (StringUtils.containsValue(triggers, "WORLD-SWITCH") + "").toUpperCase()), event -> {
+				if (StringUtils.containsValue(triggers, "WORLD-SWITCH")) {
 					triggers.remove("WORLD-SWITCH");
 				} else {
 					triggers.add("WORLD-SWITCH");
 				}
 				if (triggers.isEmpty()) { 
 					triggers.add("DISABLED"); 
-				} else if (StringUtils.getUtils().containsValue(triggers, "DISABLED")) {
+				} else if (StringUtils.containsValue(triggers, "DISABLED")) {
 					triggers.remove("DISABLED");
-				} else if (StringUtils.getUtils().containsValue(triggers, "DISABLE")) {
+				} else if (StringUtils.containsValue(triggers, "DISABLE")) {
 					triggers.remove("DISABLE");
 				}
 				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
@@ -1410,18 +1409,18 @@ public class Menu {
 				SchedulerUtils.runLater(2L, () -> triggerPane(player));
 			}));
 			triggerPane.addButton(new Button(fillerPaneBItem));
-			triggerPane.addButton(new Button(ItemHandler.getItem("LEVER", 1, StringUtils.getUtils().containsValue(triggers, "GAMEMODE-SWITCH"), "&e&l&nGamemode Switch", "&7", "&7*Sets the held item slot", 
-				"&7when the player changes", "&7to a different gamemode.", "&9&lENABLED: &a" + (StringUtils.getUtils().containsValue(triggers, "GAMEMODE-SWITCH") + "").toUpperCase()), event -> {
-				if (StringUtils.getUtils().containsValue(triggers, "GAMEMODE-SWITCH")) {
+			triggerPane.addButton(new Button(ItemHandler.getItem("LEVER", 1, StringUtils.containsValue(triggers, "GAMEMODE-SWITCH"), "&e&l&nGamemode Switch", "&7", "&7*Sets the held item slot", 
+				"&7when the player changes", "&7to a different gamemode.", "&9&lENABLED: &a" + (StringUtils.containsValue(triggers, "GAMEMODE-SWITCH") + "").toUpperCase()), event -> {
+				if (StringUtils.containsValue(triggers, "GAMEMODE-SWITCH")) {
 					triggers.remove("GAMEMODE-SWITCH");
 				} else {
 					triggers.add("GAMEMODE-SWITCH");
 				}
 				if (triggers.isEmpty()) { 
 					triggers.add("DISABLED"); 
-				} else if (StringUtils.getUtils().containsValue(triggers, "DISABLED")) {
+				} else if (StringUtils.containsValue(triggers, "DISABLED")) {
 					triggers.remove("DISABLED");
-				} else if (StringUtils.getUtils().containsValue(triggers, "DISABLE")) {
+				} else if (StringUtils.containsValue(triggers, "DISABLE")) {
 					triggers.remove("DISABLE");
 				}
 				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
@@ -1431,18 +1430,18 @@ public class Menu {
 				ConfigHandler.getConfig().softReload();
 				SchedulerUtils.runLater(2L, () -> triggerPane(player));
 			}));
-			triggerPane.addButton(new Button(ItemHandler.getItem("MINECART", 1, StringUtils.getUtils().containsValue(triggers, "REGION-ENTER"), "&e&l&nRegion Enter", "&7", "&7*Sets the held item slot when", 
-			"&7the player enters a WorldGuard region.", "&9&lENABLED: &a" + (StringUtils.getUtils().containsValue(triggers, "REGION-ENTER") + "").toUpperCase()), event -> {
-				if (StringUtils.getUtils().containsValue(triggers, "REGION-ENTER")) {
+			triggerPane.addButton(new Button(ItemHandler.getItem("MINECART", 1, StringUtils.containsValue(triggers, "REGION-ENTER"), "&e&l&nRegion Enter", "&7", "&7*Sets the held item slot when", 
+			"&7the player enters a WorldGuard region.", "&9&lENABLED: &a" + (StringUtils.containsValue(triggers, "REGION-ENTER") + "").toUpperCase()), event -> {
+				if (StringUtils.containsValue(triggers, "REGION-ENTER")) {
 					triggers.remove("REGION-ENTER");
 				} else {
 					triggers.add("REGION-ENTER");
 				}
 				if (triggers.isEmpty()) { 
 					triggers.add("DISABLED"); 
-				} else if (StringUtils.getUtils().containsValue(triggers, "DISABLED")) {
+				} else if (StringUtils.containsValue(triggers, "DISABLED")) {
 					triggers.remove("DISABLED");
-				} else if (StringUtils.getUtils().containsValue(triggers, "DISABLE")) {
+				} else if (StringUtils.containsValue(triggers, "DISABLE")) {
 					triggers.remove("DISABLE");
 				}
 				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
@@ -1452,18 +1451,18 @@ public class Menu {
 				ConfigHandler.getConfig().softReload();
 				SchedulerUtils.runLater(2L, () -> triggerPane(player));
 			}));
-			triggerPane.addButton(new Button(ItemHandler.getItem("408", 1, StringUtils.getUtils().containsValue(triggers, "REGION-LEAVE"), "&e&l&nRegion Leave", "&7", "&7*Sets the held item slot when", 
-			"&7the player leaves a WorldGuard region.", "&9&lENABLED: &a" + (StringUtils.getUtils().containsValue(triggers, "REGION-LEAVE") + "").toUpperCase()), event -> {
-				if (StringUtils.getUtils().containsValue(triggers, "REGION-LEAVE")) {
+			triggerPane.addButton(new Button(ItemHandler.getItem("408", 1, StringUtils.containsValue(triggers, "REGION-LEAVE"), "&e&l&nRegion Leave", "&7", "&7*Sets the held item slot when", 
+			"&7the player leaves a WorldGuard region.", "&9&lENABLED: &a" + (StringUtils.containsValue(triggers, "REGION-LEAVE") + "").toUpperCase()), event -> {
+				if (StringUtils.containsValue(triggers, "REGION-LEAVE")) {
 					triggers.remove("REGION-LEAVE");
 				} else {
 					triggers.add("REGION-LEAVE");
 				}
 				if (triggers.isEmpty()) { 
 					triggers.add("DISABLED"); 
-				} else if (StringUtils.getUtils().containsValue(triggers, "DISABLED")) {
+				} else if (StringUtils.containsValue(triggers, "DISABLED")) {
 					triggers.remove("DISABLED");
-				} else if (StringUtils.getUtils().containsValue(triggers, "DISABLE")) {
+				} else if (StringUtils.containsValue(triggers, "DISABLE")) {
 					triggers.remove("DISABLE");
 				}
 				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
@@ -1496,20 +1495,20 @@ public class Menu {
 				}
 			}
 			preventPane.addButton(new Button(fillerPaneBItem), 3);
-			preventPane.addButton(new Button(ItemHandler.getItem(StringUtils.getUtils().containsValue(bypassList, "CREATIVE") ? "322:1" : "322", 1, StringUtils.getUtils().containsValue(bypassList, "CREATIVE"), 
+			preventPane.addButton(new Button(ItemHandler.getItem(StringUtils.containsValue(bypassList, "CREATIVE") ? "322:1" : "322", 1, StringUtils.containsValue(bypassList, "CREATIVE"), 
 					"&bCreative Bypass", "&7", "&7*Players in creative mode", "&7will ignore the prevent actions.", 
-					"&9&lENABLED: &a" + (StringUtils.getUtils().containsValue(bypassList, "CREATIVE") + "").toUpperCase()), 
+					"&9&lENABLED: &a" + (StringUtils.containsValue(bypassList, "CREATIVE") + "").toUpperCase()), 
 					event -> {
-						if (StringUtils.getUtils().containsValue(bypassList, "CREATIVE")) {
+						if (StringUtils.containsValue(bypassList, "CREATIVE")) {
 							bypassList.remove("CREATIVE");
 						} else {
 							bypassList.add("CREATIVE");
 						}
 						if (bypassList.isEmpty()) {
 							bypassList.add("DISABLED");
-						} else if (StringUtils.getUtils().containsValue(bypassList, "DISABLED")) {
+						} else if (StringUtils.containsValue(bypassList, "DISABLED")) {
 							bypassList.remove("DISABLED");
-						} else if (StringUtils.getUtils().containsValue(bypassList, "DISABLE")) {
+						} else if (StringUtils.containsValue(bypassList, "DISABLE")) {
 							bypassList.remove("DISABLE");
 						}
 						File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
@@ -1520,20 +1519,20 @@ public class Menu {
 						SchedulerUtils.runLater(2L, () -> preventPane(player));
 					}));
 			preventPane.addButton(new Button(fillerPaneBItem));
-			preventPane.addButton(new Button(ItemHandler.getItem("DIAMOND", 1, StringUtils.getUtils().containsValue(bypassList, "OP"), 
+			preventPane.addButton(new Button(ItemHandler.getItem("DIAMOND", 1, StringUtils.containsValue(bypassList, "OP"), 
 					"&bOP Bypass", "&7", "&7*Players that are OP", "&7will ignore the prevent actions.", 
-					"&9&lENABLED: &a" + (StringUtils.getUtils().containsValue(bypassList, "OP") + "").toUpperCase()), 
+					"&9&lENABLED: &a" + (StringUtils.containsValue(bypassList, "OP") + "").toUpperCase()), 
 					event -> {
-						if (StringUtils.getUtils().containsValue(bypassList, "OP")) {
+						if (StringUtils.containsValue(bypassList, "OP")) {
 							bypassList.remove("OP");
 						} else {
 							bypassList.add("OP");
 						}
 						if (bypassList.isEmpty()) {
 							bypassList.add("DISABLED");
-						} else if (StringUtils.getUtils().containsValue(bypassList, "DISABLED")) {
+						} else if (StringUtils.containsValue(bypassList, "DISABLED")) {
 							bypassList.remove("DISABLED");
-						} else if (StringUtils.getUtils().containsValue(bypassList, "DISABLE")) {
+						} else if (StringUtils.containsValue(bypassList, "DISABLE")) {
 							bypassList.remove("DISABLE");
 						}
 						File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
@@ -1546,25 +1545,25 @@ public class Menu {
 			preventPane.addButton(new Button(fillerPaneBItem), 4);
 			preventPane.addButton(new Button(ItemHandler.getItem("CHEST", 1, false, 
 					"&c&l&nPrevent Pickups", "&7", "&7*Prevent players from picking up", "&7ANY items, not just custom items.", 
-					"&9&lENABLED: &a" + ((!StringUtils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Prevent.Pickups"), "DISABLE") ? 
+					"&9&lENABLED: &a" + ((!StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Prevent.Pickups"), "DISABLE") ? 
 					ConfigHandler.getConfig().getFile("config.yml").getString("Prevent.Pickups") : "FALSE")).toUpperCase()), 
 					event -> worldPane(player, "Prevent.Pickups")));
 			preventPane.addButton(new Button(fillerPaneBItem));
 			preventPane.addButton(new Button(ItemHandler.getItem("BEDROCK", 1, false, 
 					"&c&l&nPrevent Movement", "&7", "&7*Prevent players from moving", "&7ANY items around in their", "&7inventory, not just custom items.", 
-					"&9&lENABLED: &a" + ((!StringUtils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Prevent.itemMovement"), "DISABLE") ? 
+					"&9&lENABLED: &a" + ((!StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Prevent.itemMovement"), "DISABLE") ? 
 					ConfigHandler.getConfig().getFile("config.yml").getString("Prevent.itemMovement") : "FALSE")).toUpperCase()), 
 					event -> worldPane(player, "Prevent.itemMovement")));
 			preventPane.addButton(new Button(fillerPaneBItem));
 			preventPane.addButton(new Button(ItemHandler.getItem("HOPPER", 1, false, 
 					"&c&l&nPrevent Drops", "&7", "&7*Prevent players from dropping", "&7ANY items, not just custom items.", 
-					"&9&lENABLED: &a" + ((!StringUtils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Prevent.Self-Drops"), "DISABLE") ? 
+					"&9&lENABLED: &a" + ((!StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Prevent.Self-Drops"), "DISABLE") ? 
 					ConfigHandler.getConfig().getFile("config.yml").getString("Prevent.Self-Drops") : "FALSE")).toUpperCase()), 
 					event -> worldPane(player, "Prevent.Self-Drops")));
 			preventPane.addButton(new Button(fillerPaneBItem));
 			preventPane.addButton(new Button(ItemHandler.getItem("BONE", 1, false, 
 					"&c&l&nPrevent Death Drops", "&7", "&7*Prevent players from dropping", "&7ANY items on death, not just custom items.", 
-					"&9&lENABLED: &a" + ((!StringUtils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Prevent.Death-Drops"), "DISABLE") ? 
+					"&9&lENABLED: &a" + ((!StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Prevent.Death-Drops"), "DISABLE") ? 
 					ConfigHandler.getConfig().getFile("config.yml").getString("Prevent.Death-Drops") : "FALSE")).toUpperCase()), 
 					event -> worldPane(player, "Prevent.Death-Drops")));
 			preventPane.addButton(new Button(fillerPaneBItem));
@@ -1617,19 +1616,19 @@ public class Menu {
 			clearPane.addButton(new Button(fillerPaneBItem), 3);
 			clearPane.addButton(new Button(ItemHandler.getItem("323", 1, false, 
 					"&c&l&nJoin", "&7", "&7*Clears the items from the", "&7player upon joining the server.", 
-					"&9&lENABLED: &a" + ((!StringUtils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Join"), "DISABLE") ? 
+					"&9&lENABLED: &a" + ((!StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Join"), "DISABLE") ? 
 					ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Join") : "FALSE")).toUpperCase()), 
 					event -> worldPane(player, "Clear-Items.Join")));
 			clearPane.addButton(new Button(fillerPaneBItem));
 			clearPane.addButton(new Button(ItemHandler.getItem("STONE_BUTTON", 1, false, 
 					"&c&l&nWorld-Switch", "&7", "&7*Clears the items from the", "&7player upon changing worlds.", 
-					"&9&lENABLED: &a" + ((!StringUtils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.World-Switch"), "DISABLE") ? 
+					"&9&lENABLED: &a" + ((!StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.World-Switch"), "DISABLE") ? 
 					ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.World-Switch") : "FALSE")).toUpperCase()), 
 					event -> worldPane(player, "Clear-Items.World-Switch")));
 			clearPane.addButton(new Button(fillerPaneBItem));
 			clearPane.addButton(new Button(ItemHandler.getItem("MINECART", 1, false, 
 					"&c&l&nRegion-Enter", "&7", "&7*Clears the items from the", "&7player upon entering", "&7a WorldGuard region.", 
-					(DependAPI.getDepends(false).getGuard().guardEnabled() ? "&9&lENABLED: &a" + ((!StringUtils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Region-Enter"), "DISABLE") ? 
+					(DependAPI.getDepends(false).getGuard().guardEnabled() ? "&9&lENABLED: &a" + ((!StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Region-Enter"), "DISABLE") ? 
 					ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Region-Enter") : "FALSE")).toUpperCase() : ""), (DependAPI.getDepends(false).getGuard().guardEnabled() ? "" : "&7"), 
 					(DependAPI.getDepends(false).getGuard().guardEnabled() ? "" : "&c&lERROR: &7WorldGuard was NOT found."), (DependAPI.getDepends(false).getGuard().guardEnabled() ? "" : "&7This button will do nothing...")), 
 					event -> {
@@ -1640,7 +1639,7 @@ public class Menu {
 			clearPane.addButton(new Button(fillerPaneBItem));
 			clearPane.addButton(new Button(ItemHandler.getItem("137", 1, false, 
 					"&b&lOptions", "&7", "&7*Actions to apply to", "&7the clear items triggers", "&7such as OP bypass.", 
-					"&9&lENABLED: &a" + ((!StringUtils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Options"), "DISABLE") ? 
+					"&9&lENABLED: &a" + ((!StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Options"), "DISABLE") ? 
 					ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Options") : "FALSE")).toUpperCase()), 
 					event -> optionPane(player)));
 			clearPane.addButton(new Button(fillerPaneBItem));
@@ -1670,7 +1669,7 @@ public class Menu {
 			try {
 				if (blacklist != null) {
 					for (String value: blacklist) {
-						String valType = (StringUtils.getUtils().containsIgnoreCase(value, "{id") ? "id" : (StringUtils.getUtils().containsIgnoreCase(value, "{slot") ? "slot" : (StringUtils.getUtils().containsIgnoreCase(value, "{name") ? "name" : "")));
+						String valType = (StringUtils.containsIgnoreCase(value, "{id") ? "id" : (StringUtils.containsIgnoreCase(value, "{slot") ? "slot" : (StringUtils.containsIgnoreCase(value, "{name") ? "name" : "")));
 						String inputResult = org.apache.commons.lang.StringUtils.substringBetween(value, "{" + valType + ":", "}");
 						if (valType.equalsIgnoreCase("id") && ItemHandler.getMaterial(inputResult.trim(), null) != null) {
 							materials.add(inputResult.trim().toUpperCase());
@@ -1685,15 +1684,15 @@ public class Menu {
 			blacklistPane.addButton(new Button(fillerPaneBItem), 3);
 			blacklistPane.addButton(new Button(ItemHandler.getItem("DIAMOND_SWORD", 1, false, 
 					"&b&l&nMaterials", "&7", "&7*The material to be blacklisted", "&7from being cleared.", "&7",
-					"&9&lMaterials: &a" + ((!materials.isEmpty() ? StringUtils.getUtils().replaceLast(materials.toString().replaceFirst("\\[", ""), "]", "") : "NONE"))), 
+					"&9&lMaterials: &a" + ((!materials.isEmpty() ? StringUtils.replaceLast(materials.toString().replaceFirst("\\[", ""), "]", "") : "NONE"))), 
 					event -> blacklistMatPane(player)));
 			blacklistPane.addButton(new Button(ItemHandler.getItem("20", 1, false, 
 					"&b&l&nSlots", "&7", "&7*The inventory slots to be", "&7blacklisted from being cleared.", "&7",
-					"&9&lSlots: &a" + ((!slots.isEmpty() ? StringUtils.getUtils().replaceLast(slots.toString().replaceFirst("\\[", ""), "]", "") : "NONE"))), 
+					"&9&lSlots: &a" + ((!slots.isEmpty() ? StringUtils.replaceLast(slots.toString().replaceFirst("\\[", ""), "]", "") : "NONE"))), 
 					event -> blacklistSlotPane(player)));
 			blacklistPane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, false, 
 					"&b&l&nNames", "&7", "&7*The items display names to", "&7be blacklisted from being cleared.", "&7",
-					"&9&lNames: &a" + ((!names.isEmpty() ? StringUtils.getUtils().replaceLast(names.toString().replaceFirst("\\[", ""), "]", "") : "NONE"))), 
+					"&9&lNames: &a" + ((!names.isEmpty() ? StringUtils.replaceLast(names.toString().replaceFirst("\\[", ""), "]", "") : "NONE"))), 
 					event -> blacklistNamePane(player)));
 			blacklistPane.addButton(new Button(fillerPaneBItem), 3);
 			blacklistPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the clear settings."), event -> clearPane(player)));
@@ -1718,7 +1717,7 @@ public class Menu {
 			try {
 				if (blacklist != null) {
 					for (String value: blacklist) {
-						String valType = (StringUtils.getUtils().containsIgnoreCase(value, "{id") ? "id" : (StringUtils.getUtils().containsIgnoreCase(value, "{slot") ? "slot" : (StringUtils.getUtils().containsIgnoreCase(value, "{name") ? "name" : "")));
+						String valType = (StringUtils.containsIgnoreCase(value, "{id") ? "id" : (StringUtils.containsIgnoreCase(value, "{slot") ? "slot" : (StringUtils.containsIgnoreCase(value, "{name") ? "name" : "")));
 						String inputResult = org.apache.commons.lang.StringUtils.substringBetween(value, "{" + valType + ":", "}");
 						if (valType.equalsIgnoreCase("id") && ItemHandler.getMaterial(inputResult.trim(), null) != null) {
 							materials.add(inputResult.trim().toUpperCase());
@@ -1737,7 +1736,7 @@ public class Menu {
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				if (ItemHandler.getMaterial(ChatColor.stripColor(event.getMessage()), null) != null) {
-					if (!StringUtils.getUtils().containsValue(materials, ChatColor.stripColor(event.getMessage()))) {
+					if (!StringUtils.containsValue(materials, ChatColor.stripColor(event.getMessage()))) {
 						materials.add(ChatColor.stripColor(event.getMessage()).toUpperCase());
 					} else {
 						materials.remove(ChatColor.stripColor(event.getMessage()).toUpperCase());
@@ -1750,7 +1749,7 @@ public class Menu {
 					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 					File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
-					dataFile.set("Clear-Items.Blacklist", StringUtils.getUtils().replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
+					dataFile.set("Clear-Items.Blacklist", StringUtils.replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
 					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
 					ConfigHandler.getConfig().softReload();
 					SchedulerUtils.runLater(2L, () -> blacklistMatPane(player));
@@ -1764,9 +1763,9 @@ public class Menu {
 			Inventory inventoryCheck = Bukkit.getServer().createInventory(null, 9, GUIName);
 			for (Material material: Material.values()) {
 				if (!material.name().contains("LEGACY") && material.name() != "AIR" && safeMaterial(ItemHandler.getItem(material.toString(), 1, false, "", ""), inventoryCheck)) {
-					materialPane.addButton(new Button(ItemHandler.getItem(material.toString(), 1, StringUtils.getUtils().containsValue(materials, material.name()), "", "&7", "&7*Click to set the material.", "&7to be blacklisted from clearing.",
-					"&7", (StringUtils.getUtils().containsValue(materials, material.name()) ? "&a&l&nENABLED: &e&lYES" : "")), event -> {
-						if (!StringUtils.getUtils().containsValue(materials, material.name())) {
+					materialPane.addButton(new Button(ItemHandler.getItem(material.toString(), 1, StringUtils.containsValue(materials, material.name()), "", "&7", "&7*Click to set the material.", "&7to be blacklisted from clearing.",
+					"&7", (StringUtils.containsValue(materials, material.name()) ? "&a&l&nENABLED: &e&lYES" : "")), event -> {
+						if (!StringUtils.containsValue(materials, material.name())) {
 							materials.add(material.name());
 						} else {
 							materials.remove(material.name());
@@ -1776,7 +1775,7 @@ public class Menu {
 						}
 						File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
-						dataFile.set("Clear-Items.Blacklist", StringUtils.getUtils().replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
+						dataFile.set("Clear-Items.Blacklist", StringUtils.replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
 						ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
 						ConfigHandler.getConfig().softReload();
 						SchedulerUtils.runLater(2L, () -> blacklistMatPane(player));
@@ -1804,7 +1803,7 @@ public class Menu {
 			try {
 				if (blacklist != null) {
 					for (String value: blacklist) {
-						String valType = (StringUtils.getUtils().containsIgnoreCase(value, "{id") ? "id" : (StringUtils.getUtils().containsIgnoreCase(value, "{slot") ? "slot" : (StringUtils.getUtils().containsIgnoreCase(value, "{name") ? "name" : "")));
+						String valType = (StringUtils.containsIgnoreCase(value, "{id") ? "id" : (StringUtils.containsIgnoreCase(value, "{slot") ? "slot" : (StringUtils.containsIgnoreCase(value, "{name") ? "name" : "")));
 						String inputResult = org.apache.commons.lang.StringUtils.substringBetween(value, "{" + valType + ":", "}");
 						if (valType.equalsIgnoreCase("slot")) {
 							slots.add(inputResult.trim().toUpperCase());
@@ -1815,9 +1814,9 @@ public class Menu {
 				}
 			} catch (Exception e) { }
 			craftingPane.addButton(new Button(fillerPaneGItem), 3);
-			craftingPane.addButton(new Button(ItemHandler.getItem("58", 1, StringUtils.getUtils().containsValue(slots, "CRAFTING[1]"), "&9&lSlot: &7&lCRAFTING&a&l[1]", "&7", "&7*Click to prevent this slot", "&7from having its items cleared.",
-				(StringUtils.getUtils().containsValue(slots, "CRAFTING[1]") ? "&9&lENABLED: &aTRUE" : "")), event -> {
-				if (!StringUtils.getUtils().containsValue(slots, "CRAFTING[1]")) {
+			craftingPane.addButton(new Button(ItemHandler.getItem("58", 1, StringUtils.containsValue(slots, "CRAFTING[1]"), "&9&lSlot: &7&lCRAFTING&a&l[1]", "&7", "&7*Click to prevent this slot", "&7from having its items cleared.",
+				(StringUtils.containsValue(slots, "CRAFTING[1]") ? "&9&lENABLED: &aTRUE" : "")), event -> {
+				if (!StringUtils.containsValue(slots, "CRAFTING[1]")) {
 					slots.add("CRAFTING[1]");
 				} else {
 					slots.remove("CRAFTING[1]");
@@ -1827,15 +1826,15 @@ public class Menu {
 				}
 				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
-				dataFile.set("Clear-Items.Blacklist", StringUtils.getUtils().replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
+				dataFile.set("Clear-Items.Blacklist", StringUtils.replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
 				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
 				ConfigHandler.getConfig().softReload();
 				SchedulerUtils.runLater(2L, () -> blacklistSlotPane(player));
 			}));
 			craftingPane.addButton(new Button(fillerPaneGItem));
-			craftingPane.addButton(new Button(ItemHandler.getItem("58", 2, StringUtils.getUtils().containsValue(slots, "CRAFTING[2]"), "&9&lSlot: &7&lCRAFTING&a&l[2]", "&7", "&7*Click to prevent this slot", "&7from having its items cleared.",
-				(StringUtils.getUtils().containsValue(slots, "CRAFTING[2]") ? "&9&lENABLED: &aTRUE" : "")), event -> {
-				if (!StringUtils.getUtils().containsValue(slots, "CRAFTING[2]")) {
+			craftingPane.addButton(new Button(ItemHandler.getItem("58", 2, StringUtils.containsValue(slots, "CRAFTING[2]"), "&9&lSlot: &7&lCRAFTING&a&l[2]", "&7", "&7*Click to prevent this slot", "&7from having its items cleared.",
+				(StringUtils.containsValue(slots, "CRAFTING[2]") ? "&9&lENABLED: &aTRUE" : "")), event -> {
+				if (!StringUtils.containsValue(slots, "CRAFTING[2]")) {
 					slots.add("CRAFTING[2]");
 				} else {
 					slots.remove("CRAFTING[2]");
@@ -1845,15 +1844,15 @@ public class Menu {
 				}
 				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
-				dataFile.set("Clear-Items.Blacklist", StringUtils.getUtils().replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
+				dataFile.set("Clear-Items.Blacklist", StringUtils.replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
 				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
 				ConfigHandler.getConfig().softReload();
 				SchedulerUtils.runLater(2L, () -> blacklistSlotPane(player));
 			}));
 			craftingPane.addButton(new Button(fillerPaneGItem), 10);
-			craftingPane.addButton(new Button(ItemHandler.getItem("58", 1, StringUtils.getUtils().containsValue(slots, "CRAFTING[0]"), "&9&lSlot: &7&lCRAFTING&a&l[0]", "&7", "&7*Click to prevent this slot", "&7from having its items cleared.",
-				(StringUtils.getUtils().containsValue(slots, "CRAFTING[0]") ? "&9&lENABLED: &aTRUE" : "")), event -> {
-				if (!StringUtils.getUtils().containsValue(slots, "CRAFTING[0]")) {
+			craftingPane.addButton(new Button(ItemHandler.getItem("58", 1, StringUtils.containsValue(slots, "CRAFTING[0]"), "&9&lSlot: &7&lCRAFTING&a&l[0]", "&7", "&7*Click to prevent this slot", "&7from having its items cleared.",
+				(StringUtils.containsValue(slots, "CRAFTING[0]") ? "&9&lENABLED: &aTRUE" : "")), event -> {
+				if (!StringUtils.containsValue(slots, "CRAFTING[0]")) {
 					slots.add("CRAFTING[0]");
 				} else {
 					slots.remove("CRAFTING[0]");
@@ -1863,15 +1862,15 @@ public class Menu {
 				}
 				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
-				dataFile.set("Clear-Items.Blacklist", StringUtils.getUtils().replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
+				dataFile.set("Clear-Items.Blacklist", StringUtils.replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
 				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
 				ConfigHandler.getConfig().softReload();
 				SchedulerUtils.runLater(2L, () -> blacklistSlotPane(player));
 			}));
 			craftingPane.addButton(new Button(fillerPaneGItem), 4);
-			craftingPane.addButton(new Button(ItemHandler.getItem("58", 3, StringUtils.getUtils().containsValue(slots, "CRAFTING[3]"), "&9&lSlot: &7&lCRAFTING&a&l[3]", "&7", "&7*Click to prevent this slot", "&7from having its items cleared.",
-				(StringUtils.getUtils().containsValue(slots, "CRAFTING[3]") ? "&9&lENABLED: &aTRUE" : "")), event -> {
-				if (!StringUtils.getUtils().containsValue(slots, "CRAFTING[3]")) {
+			craftingPane.addButton(new Button(ItemHandler.getItem("58", 3, StringUtils.containsValue(slots, "CRAFTING[3]"), "&9&lSlot: &7&lCRAFTING&a&l[3]", "&7", "&7*Click to prevent this slot", "&7from having its items cleared.",
+				(StringUtils.containsValue(slots, "CRAFTING[3]") ? "&9&lENABLED: &aTRUE" : "")), event -> {
+				if (!StringUtils.containsValue(slots, "CRAFTING[3]")) {
 					slots.add("CRAFTING[3]");
 				} else {
 					slots.remove("CRAFTING[3]");
@@ -1881,15 +1880,15 @@ public class Menu {
 				}
 				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
-				dataFile.set("Clear-Items.Blacklist", StringUtils.getUtils().replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
+				dataFile.set("Clear-Items.Blacklist", StringUtils.replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
 				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
 				ConfigHandler.getConfig().softReload();
 				SchedulerUtils.runLater(2L, () -> blacklistSlotPane(player));
 			}));
 			craftingPane.addButton(new Button(fillerPaneGItem));
-			craftingPane.addButton(new Button(ItemHandler.getItem("58", 4, StringUtils.getUtils().containsValue(slots, "CRAFTING[4]"), "&9&lSlot: &7&lCRAFTING&a&l[4]", "&7", "&7*Click to prevent this slot", "&7from having its items cleared.",
-				(StringUtils.getUtils().containsValue(slots, "CRAFTING[4]") ? "&9&lENABLED: &aTRUE" : "")), event -> {
-				if (!StringUtils.getUtils().containsValue(slots, "CRAFTING[4]")) {
+			craftingPane.addButton(new Button(ItemHandler.getItem("58", 4, StringUtils.containsValue(slots, "CRAFTING[4]"), "&9&lSlot: &7&lCRAFTING&a&l[4]", "&7", "&7*Click to prevent this slot", "&7from having its items cleared.",
+				(StringUtils.containsValue(slots, "CRAFTING[4]") ? "&9&lENABLED: &aTRUE" : "")), event -> {
+				if (!StringUtils.containsValue(slots, "CRAFTING[4]")) {
 					slots.add("CRAFTING[4]");
 				} else {
 					slots.remove("CRAFTING[4]");
@@ -1899,7 +1898,7 @@ public class Menu {
 				}
 				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
-				dataFile.set("Clear-Items.Blacklist", StringUtils.getUtils().replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
+				dataFile.set("Clear-Items.Blacklist", StringUtils.replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
 				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
 				ConfigHandler.getConfig().softReload();
 				SchedulerUtils.runLater(2L, () -> blacklistSlotPane(player));
@@ -1911,9 +1910,9 @@ public class Menu {
 			slotPane.addButton(new Button(fillerPaneGItem));
 			slotPane.addButton(new Button(ItemHandler.getItem("58", 1, false, "&9&lSlot: &a&lCRAFTING", "&7", "&7*Click to see a list of crafting slots"), event -> craftingPane.open(player)));
 			slotPane.addButton(new Button(fillerPaneGItem));
-			slotPane.addButton(new Button(ItemHandler.getItem("LEATHER_HELMET", 1, StringUtils.getUtils().containsValue(slots, "HELMET"), "&9&lSlot: &a&lHELMET", "&7", "&7*Click to prevent this slot", "&7from having its items cleared.",
-				(StringUtils.getUtils().containsValue(slots, "HELMET")? "&9&lENABLED: &aTRUE" : "")), event -> {
-				if (!StringUtils.getUtils().containsValue(slots, "HELMET")) {
+			slotPane.addButton(new Button(ItemHandler.getItem("LEATHER_HELMET", 1, StringUtils.containsValue(slots, "HELMET"), "&9&lSlot: &a&lHELMET", "&7", "&7*Click to prevent this slot", "&7from having its items cleared.",
+				(StringUtils.containsValue(slots, "HELMET")? "&9&lENABLED: &aTRUE" : "")), event -> {
+				if (!StringUtils.containsValue(slots, "HELMET")) {
 					slots.add("HELMET");
 				} else {
 					slots.remove("HELMET");
@@ -1923,14 +1922,14 @@ public class Menu {
 				}
 				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
-				dataFile.set("Clear-Items.Blacklist", StringUtils.getUtils().replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
+				dataFile.set("Clear-Items.Blacklist", StringUtils.replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
 				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
 				ConfigHandler.getConfig().softReload();
 				SchedulerUtils.runLater(2L, () -> blacklistSlotPane(player));
 			}));
-			slotPane.addButton(new Button(ItemHandler.getItem("LEATHER_CHESTPLATE", 1, StringUtils.getUtils().containsValue(slots, "CHESTPLATE"), "&9&lSlot: &a&lCHESTPLATE", "&7", "&7*Click to prevent this slot", "&7from having its items cleared.",
-				(StringUtils.getUtils().containsValue(slots, "CHESTPLATE") ? "&9&lENABLED: &aTRUE" : "")), event -> {
-				if (!StringUtils.getUtils().containsValue(slots, "CHESTPLATE")) {
+			slotPane.addButton(new Button(ItemHandler.getItem("LEATHER_CHESTPLATE", 1, StringUtils.containsValue(slots, "CHESTPLATE"), "&9&lSlot: &a&lCHESTPLATE", "&7", "&7*Click to prevent this slot", "&7from having its items cleared.",
+				(StringUtils.containsValue(slots, "CHESTPLATE") ? "&9&lENABLED: &aTRUE" : "")), event -> {
+				if (!StringUtils.containsValue(slots, "CHESTPLATE")) {
 					slots.add("CHESTPLATE");
 				} else {
 					slots.remove("CHESTPLATE");
@@ -1940,14 +1939,14 @@ public class Menu {
 				}
 				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
-				dataFile.set("Clear-Items.Blacklist", StringUtils.getUtils().replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
+				dataFile.set("Clear-Items.Blacklist", StringUtils.replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
 				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
 				ConfigHandler.getConfig().softReload();
 				SchedulerUtils.runLater(2L, () -> blacklistSlotPane(player));
 			}));
-			slotPane.addButton(new Button(ItemHandler.getItem("LEATHER_LEGGINGS", 1, StringUtils.getUtils().containsValue(slots, "LEGGINGS"), "&9&lSlot: &a&lLEGGINGS", "&7", "&7*Click to prevent this slot", "&7from having its items cleared.",
-				(StringUtils.getUtils().containsValue(slots, "LEGGINGS") ? "&9&lENABLED: &aTRUE" : "")), event -> {
-				if (!StringUtils.getUtils().containsValue(slots, "LEGGINGS")) {
+			slotPane.addButton(new Button(ItemHandler.getItem("LEATHER_LEGGINGS", 1, StringUtils.containsValue(slots, "LEGGINGS"), "&9&lSlot: &a&lLEGGINGS", "&7", "&7*Click to prevent this slot", "&7from having its items cleared.",
+				(StringUtils.containsValue(slots, "LEGGINGS") ? "&9&lENABLED: &aTRUE" : "")), event -> {
+				if (!StringUtils.containsValue(slots, "LEGGINGS")) {
 					slots.add("LEGGINGS");
 				} else {
 					slots.remove("LEGGINGS");
@@ -1957,14 +1956,14 @@ public class Menu {
 				}
 				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
-				dataFile.set("Clear-Items.Blacklist", StringUtils.getUtils().replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
+				dataFile.set("Clear-Items.Blacklist", StringUtils.replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
 				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
 				ConfigHandler.getConfig().softReload();
 				SchedulerUtils.runLater(2L, () -> blacklistSlotPane(player));
 			}));
-			slotPane.addButton(new Button(ItemHandler.getItem("LEATHER_BOOTS", 1, StringUtils.getUtils().containsValue(slots, "BOOTS"), "&9&lSlot: &a&lBOOTS", "&7", "&7*Click to prevent this slot", "&7from having its items cleared.", 
-				(StringUtils.getUtils().containsValue(slots, "BOOTS") ? "&9&lENABLED: &aTRUE" : "")), event -> {
-				if (!StringUtils.getUtils().containsValue(slots, "BOOTS")) {
+			slotPane.addButton(new Button(ItemHandler.getItem("LEATHER_BOOTS", 1, StringUtils.containsValue(slots, "BOOTS"), "&9&lSlot: &a&lBOOTS", "&7", "&7*Click to prevent this slot", "&7from having its items cleared.", 
+				(StringUtils.containsValue(slots, "BOOTS") ? "&9&lENABLED: &aTRUE" : "")), event -> {
+				if (!StringUtils.containsValue(slots, "BOOTS")) {
 					slots.add("BOOTS");
 				} else {
 					slots.remove("BOOTS");
@@ -1974,15 +1973,15 @@ public class Menu {
 				}
 				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
-				dataFile.set("Clear-Items.Blacklist", StringUtils.getUtils().replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
+				dataFile.set("Clear-Items.Blacklist", StringUtils.replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
 				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
 				ConfigHandler.getConfig().softReload();
 				SchedulerUtils.runLater(2L, () -> blacklistSlotPane(player));
 			}));
 			if (ServerUtils.hasSpecificUpdate("1_9")) {
-				slotPane.addButton(new Button(ItemHandler.getItem("SHIELD", 1, StringUtils.getUtils().containsValue(slots, "OFFHAND"), "&9&lSlot: &a&lOFFHAND", "&7", "&7*Click to prevent this slot", "&7from having its item cleared.",
-					(StringUtils.getUtils().containsValue(slots, "OFFHAND") ? "&9&lENABLED: &aTRUE" : "")), event -> {
-					if (!StringUtils.getUtils().containsValue(slots, "OFFHAND")) {
+				slotPane.addButton(new Button(ItemHandler.getItem("SHIELD", 1, StringUtils.containsValue(slots, "OFFHAND"), "&9&lSlot: &a&lOFFHAND", "&7", "&7*Click to prevent this slot", "&7from having its item cleared.",
+					(StringUtils.containsValue(slots, "OFFHAND") ? "&9&lENABLED: &aTRUE" : "")), event -> {
+					if (!StringUtils.containsValue(slots, "OFFHAND")) {
 						slots.add("OFFHAND");
 					} else {
 						slots.remove("OFFHAND");
@@ -1992,7 +1991,7 @@ public class Menu {
 					}
 					File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
-					dataFile.set("Clear-Items.Blacklist", StringUtils.getUtils().replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
+					dataFile.set("Clear-Items.Blacklist", StringUtils.replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
 					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
 					ConfigHandler.getConfig().softReload();
 					SchedulerUtils.runLater(2L, () -> blacklistSlotPane(player));
@@ -2003,9 +2002,9 @@ public class Menu {
 			slotPane.addButton(new Button(fillerPaneGItem));
 			for (int i = 9; i < 36; i++) {
 				final int slot = i;
-				slotPane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:3", i, (StringUtils.getUtils().containsValue(slots, String.valueOf(slot))), "&9&lSlot: &a&l" + i, "&7", "&7*Click to prevent this slot", 
-					"&7from having its item cleared.", (StringUtils.getUtils().containsValue(slots, String.valueOf(slot)) ? "&9&lENABLED: &aTRUE" : "")), event -> {
-					if (!StringUtils.getUtils().containsValue(slots, String.valueOf(slot))) {
+				slotPane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:3", i, (StringUtils.containsValue(slots, String.valueOf(slot))), "&9&lSlot: &a&l" + i, "&7", "&7*Click to prevent this slot", 
+					"&7from having its item cleared.", (StringUtils.containsValue(slots, String.valueOf(slot)) ? "&9&lENABLED: &aTRUE" : "")), event -> {
+					if (!StringUtils.containsValue(slots, String.valueOf(slot))) {
 						slots.add(String.valueOf(slot));
 					} else {
 						slots.remove(String.valueOf(slot));
@@ -2015,7 +2014,7 @@ public class Menu {
 					}
 					File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
-					dataFile.set("Clear-Items.Blacklist", StringUtils.getUtils().replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
+					dataFile.set("Clear-Items.Blacklist", StringUtils.replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
 					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
 					ConfigHandler.getConfig().softReload();
 					SchedulerUtils.runLater(2L, () -> blacklistSlotPane(player));
@@ -2027,9 +2026,9 @@ public class Menu {
 				if (slot == 0) {
 					count = 1;
 				}
-				slotPane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:11", count, (StringUtils.getUtils().containsValue(slots, String.valueOf(slot))), "&9&lSlot: &a&l" + j, "&7", "&7*Click to prevent this slot", 
-					"&7from having its item cleared.", (StringUtils.getUtils().containsValue(slots, String.valueOf(slot)) ? "&9&lENABLED: &aTRUE" : "")), event -> {
-					if (!StringUtils.getUtils().containsValue(slots, String.valueOf(slot))) {
+				slotPane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:11", count, (StringUtils.containsValue(slots, String.valueOf(slot))), "&9&lSlot: &a&l" + j, "&7", "&7*Click to prevent this slot", 
+					"&7from having its item cleared.", (StringUtils.containsValue(slots, String.valueOf(slot)) ? "&9&lENABLED: &aTRUE" : "")), event -> {
+					if (!StringUtils.containsValue(slots, String.valueOf(slot))) {
 						slots.add(String.valueOf(slot));
 					} else {
 						slots.remove(String.valueOf(slot));
@@ -2039,7 +2038,7 @@ public class Menu {
 					}
 					File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
-					dataFile.set("Clear-Items.Blacklist", StringUtils.getUtils().replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
+					dataFile.set("Clear-Items.Blacklist", StringUtils.replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
 					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
 					ConfigHandler.getConfig().softReload();
 					SchedulerUtils.runLater(2L, () -> blacklistSlotPane(player));
@@ -2067,7 +2066,7 @@ public class Menu {
 			try {
 				if (blacklist != null) {
 					for (String value: blacklist) {
-						String valType = (StringUtils.getUtils().containsIgnoreCase(value, "{id") ? "id" : (StringUtils.getUtils().containsIgnoreCase(value, "{slot") ? "slot" : (StringUtils.getUtils().containsIgnoreCase(value, "{name") ? "name" : "")));
+						String valType = (StringUtils.containsIgnoreCase(value, "{id") ? "id" : (StringUtils.containsIgnoreCase(value, "{slot") ? "slot" : (StringUtils.containsIgnoreCase(value, "{name") ? "name" : "")));
 						String inputResult = org.apache.commons.lang.StringUtils.substringBetween(value, "{" + valType + ":", "}");
 						if (valType.equalsIgnoreCase("name")) {
 							names.add(inputResult.trim().toUpperCase());
@@ -2086,7 +2085,7 @@ public class Menu {
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
-				if (!StringUtils.getUtils().containsValue(names, ChatColor.stripColor(event.getMessage()))) {
+				if (!StringUtils.containsValue(names, ChatColor.stripColor(event.getMessage()))) {
 					names.add(ChatColor.stripColor(event.getMessage()));
 				} else {
 					names.remove(ChatColor.stripColor(event.getMessage()));
@@ -2099,7 +2098,7 @@ public class Menu {
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
-				dataFile.set("Clear-Items.Blacklist", StringUtils.getUtils().replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
+				dataFile.set("Clear-Items.Blacklist", StringUtils.replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
 				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
 				ConfigHandler.getConfig().softReload();
 				SchedulerUtils.runLater(2L, () -> blacklistNamePane(player));
@@ -2113,7 +2112,7 @@ public class Menu {
 					}
 					File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
-					dataFile.set("Clear-Items.Blacklist", StringUtils.getUtils().replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
+					dataFile.set("Clear-Items.Blacklist", StringUtils.replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
 					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
 					ConfigHandler.getConfig().softReload();
 					SchedulerUtils.runLater(2L, () -> blacklistNamePane(player));
@@ -2137,20 +2136,20 @@ public class Menu {
 			}
 		}
 		SchedulerUtils.runAsync(() -> {
-			optionPane.addButton(new Button(ItemHandler.getItem("DIAMOND_CHESTPLATE", 1, StringUtils.getUtils().containsValue(optionList, "PROTECT"), 
+			optionPane.addButton(new Button(ItemHandler.getItem("DIAMOND_CHESTPLATE", 1, StringUtils.containsValue(optionList, "PROTECT"), 
 					"&e&lProtect", "&7", "&7*Prevents ALL players from", "&7having their first-join and", "&7first-world items cleared.", 
-					"&9&lENABLED: &a" + (StringUtils.getUtils().containsValue(optionList, "PROTECT") + "").toUpperCase()), 
+					"&9&lENABLED: &a" + (StringUtils.containsValue(optionList, "PROTECT") + "").toUpperCase()), 
 					event -> {
-						if (StringUtils.getUtils().containsValue(optionList, "PROTECT")) {
+						if (StringUtils.containsValue(optionList, "PROTECT")) {
 							optionList.remove("PROTECT");
 						} else {
 							optionList.add("PROTECT");
 						}
 						if (optionList.isEmpty()) {
 							optionList.add("DISABLED");
-						} else if (StringUtils.getUtils().containsValue(optionList, "DISABLED")) {
+						} else if (StringUtils.containsValue(optionList, "DISABLED")) {
 							optionList.remove("DISABLED");
-						} else if (StringUtils.getUtils().containsValue(optionList, "DISABLE")) {
+						} else if (StringUtils.containsValue(optionList, "DISABLE")) {
 							optionList.remove("DISABLE");
 						}
 						File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
@@ -2161,20 +2160,20 @@ public class Menu {
 						SchedulerUtils.runLater(2L, () -> optionPane(player));
 					}));
 			optionPane.addButton(new Button(fillerPaneBItem));
-			optionPane.addButton(new Button(ItemHandler.getItem("DIAMOND", 1, StringUtils.getUtils().containsValue(optionList, "PROTECT_OP"), 
+			optionPane.addButton(new Button(ItemHandler.getItem("DIAMOND", 1, StringUtils.containsValue(optionList, "PROTECT_OP"), 
 					"&e&lProtect OP", "&7", "&7*Prevents OP players from", "&7having their first-join and", "&7first-world items cleared.", 
-					"&9&lENABLED: &a" + (StringUtils.getUtils().containsValue(optionList, "PROTECT_OP") + "").toUpperCase()), 
+					"&9&lENABLED: &a" + (StringUtils.containsValue(optionList, "PROTECT_OP") + "").toUpperCase()), 
 					event -> {
-						if (StringUtils.getUtils().containsValue(optionList, "PROTECT_OP")) {
+						if (StringUtils.containsValue(optionList, "PROTECT_OP")) {
 							optionList.remove("PROTECT_OP");
 						} else {
 							optionList.add("PROTECT_OP");
 						}
 						if (optionList.isEmpty()) {
 							optionList.add("DISABLED");
-						} else if (StringUtils.getUtils().containsValue(optionList, "DISABLED")) {
+						} else if (StringUtils.containsValue(optionList, "DISABLED")) {
 							optionList.remove("DISABLED");
-						} else if (StringUtils.getUtils().containsValue(optionList, "DISABLE")) {
+						} else if (StringUtils.containsValue(optionList, "DISABLE")) {
 							optionList.remove("DISABLE");
 						}
 						File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
@@ -2185,20 +2184,20 @@ public class Menu {
 						SchedulerUtils.runLater(2L, () -> optionPane(player));
 					}));
 			optionPane.addButton(new Button(fillerPaneBItem));
-			optionPane.addButton(new Button(ItemHandler.getItem("322", 1, StringUtils.getUtils().containsValue(optionList, "PROTECT_CREATIVE"), 
+			optionPane.addButton(new Button(ItemHandler.getItem("322", 1, StringUtils.containsValue(optionList, "PROTECT_CREATIVE"), 
 					"&e&lProtect Creative", "&7", "&7*Prevents players in creative mode", "&7from having their first-join", "&7and first-world items cleared.", 
-					"&9&lENABLED: &a" + (StringUtils.getUtils().containsValue(optionList, "PROTECT_CREATIVE") + "").toUpperCase()), 
+					"&9&lENABLED: &a" + (StringUtils.containsValue(optionList, "PROTECT_CREATIVE") + "").toUpperCase()), 
 					event -> {
-						if (StringUtils.getUtils().containsValue(optionList, "PROTECT_CREATIVE")) {
+						if (StringUtils.containsValue(optionList, "PROTECT_CREATIVE")) {
 							optionList.remove("PROTECT_CREATIVE");
 						} else {
 							optionList.add("PROTECT_CREATIVE");
 						}
 						if (optionList.isEmpty()) {
 							optionList.add("DISABLED");
-						} else if (StringUtils.getUtils().containsValue(optionList, "DISABLED")) {
+						} else if (StringUtils.containsValue(optionList, "DISABLED")) {
 							optionList.remove("DISABLED");
-						} else if (StringUtils.getUtils().containsValue(optionList, "DISABLE")) {
+						} else if (StringUtils.containsValue(optionList, "DISABLE")) {
 							optionList.remove("DISABLE");
 						}
 						File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
@@ -2209,22 +2208,22 @@ public class Menu {
 						SchedulerUtils.runLater(2L, () -> optionPane(player));
 					}));
 			optionPane.addButton(new Button(fillerPaneBItem));
-			optionPane.addButton(new Button(ItemHandler.getItem("GOLD_BLOCK", 1, (StringUtils.getUtils().containsValue(optionList, "RETURN") && DependAPI.getDepends(false).getGuard().guardEnabled()), 
+			optionPane.addButton(new Button(ItemHandler.getItem("GOLD_BLOCK", 1, (StringUtils.containsValue(optionList, "RETURN") && DependAPI.getDepends(false).getGuard().guardEnabled()), 
 					"&e&lReturn Regions", "&7*Returns the cleared player inventory", "&7when exiting a cleared region", "&7or entering a region which is", "&7not listed as clearable.", (DependAPI.getDepends(false).getGuard().guardEnabled() ? 
-					"&9&lENABLED: &a" + (StringUtils.getUtils().containsValue(optionList, "RETURN") ? "true" : "false") : ""), (DependAPI.getDepends(false).getGuard().guardEnabled() ? "" : "&7"), 
+					"&9&lENABLED: &a" + (StringUtils.containsValue(optionList, "RETURN") ? "true" : "false") : ""), (DependAPI.getDepends(false).getGuard().guardEnabled() ? "" : "&7"), 
 					(DependAPI.getDepends(false).getGuard().guardEnabled() ? "" : "&c&lERROR: &7WorldGuard was NOT found."), (DependAPI.getDepends(false).getGuard().guardEnabled() ? "" : "&7This button will do nothing...")), 
 					event -> {
 						if (DependAPI.getDepends(false).getGuard().guardEnabled()) {
-							if (StringUtils.getUtils().containsValue(optionList, "RETURN")) {
+							if (StringUtils.containsValue(optionList, "RETURN")) {
 								optionList.remove("RETURN");
 							} else {
 								optionList.add("RETURN");
 							}
 							if (optionList.isEmpty()) {
 								optionList.add("DISABLED");
-							} else if (StringUtils.getUtils().containsValue(optionList, "DISABLED")) {
+							} else if (StringUtils.containsValue(optionList, "DISABLED")) {
 								optionList.remove("DISABLED");
-							} else if (StringUtils.getUtils().containsValue(optionList, "DISABLE")) {
+							} else if (StringUtils.containsValue(optionList, "DISABLE")) {
 								optionList.remove("DISABLE");
 							}
 							File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
@@ -2236,20 +2235,20 @@ public class Menu {
 						}
 					}));
 			optionPane.addButton(new Button(fillerPaneBItem));
-			optionPane.addButton(new Button(ItemHandler.getItem("2", 1, StringUtils.getUtils().containsValue(optionList, "RETURN_SWITCH"), 
+			optionPane.addButton(new Button(ItemHandler.getItem("2", 1, StringUtils.containsValue(optionList, "RETURN_SWITCH"), 
 					"&e&lReturn Worlds", "&7", "&7*Returns the prior cleared", "&7player inventory from the", "&7prior world upon returning", "&7to that prior world.", 
-					"&9&lENABLED: &a" + (StringUtils.getUtils().containsValue(optionList, "RETURN_SWITCH") + "").toUpperCase()), 
+					"&9&lENABLED: &a" + (StringUtils.containsValue(optionList, "RETURN_SWITCH") + "").toUpperCase()), 
 					event -> {
-						if (StringUtils.getUtils().containsValue(optionList, "RETURN_SWITCH")) {
+						if (StringUtils.containsValue(optionList, "RETURN_SWITCH")) {
 							optionList.remove("RETURN_SWITCH");
 						} else {
 							optionList.add("RETURN_SWITCH");
 						}
 						if (optionList.isEmpty()) {
 							optionList.add("DISABLED");
-						} else if (StringUtils.getUtils().containsValue(optionList, "DISABLED")) {
+						} else if (StringUtils.containsValue(optionList, "DISABLED")) {
 							optionList.remove("DISABLED");
-						} else if (StringUtils.getUtils().containsValue(optionList, "DISABLE")) {
+						} else if (StringUtils.containsValue(optionList, "DISABLE")) {
 							optionList.remove("DISABLE");
 						}
 						File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
@@ -2296,11 +2295,11 @@ public class Menu {
 				}
 			}
 		    if (enabledWorlds.isEmpty() && ConfigHandler.getConfig().getFile("config.yml").getBoolean(section)) { enabledWorlds.add("ALL"); }
-			preventPane.addButton(new Button(ItemHandler.getItem("OBSIDIAN", 1, StringUtils.getUtils().containsValue(enabledWorlds, "ALL"), "&a&l&nGLOBAL", "&7", "&7*Click to enable &lALL WORLDS.", 
-					"&9&lENABLED: &a" + (StringUtils.getUtils().containsValue(enabledWorlds, "ALL") + "").toUpperCase()), event -> {
+			preventPane.addButton(new Button(ItemHandler.getItem("OBSIDIAN", 1, StringUtils.containsValue(enabledWorlds, "ALL"), "&a&l&nGLOBAL", "&7", "&7*Click to enable &lALL WORLDS.", 
+					"&9&lENABLED: &a" + (StringUtils.containsValue(enabledWorlds, "ALL") + "").toUpperCase()), event -> {
 					File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
-					if (StringUtils.getUtils().containsValue(enabledWorlds, "ALL")) {
+					if (StringUtils.containsValue(enabledWorlds, "ALL")) {
 						dataFile.set(section, false); 
 					} else {
 						dataFile.set(section, true); 
@@ -2316,17 +2315,17 @@ public class Menu {
 				} else if (world.getEnvironment().equals(Environment.THE_END)) {
 					worldMaterial = (ServerUtils.hasSpecificUpdate("1_13") ? "END_STONE" : "121");
 				}
-				preventPane.addButton(new Button(ItemHandler.getItem(worldMaterial, 1, StringUtils.getUtils().containsValue(enabledWorlds, world.getName()), "&f&l" + world.getName(), "&7", 
-						"&7*Click to enable this world.", "&9&lENABLED: &a" + (StringUtils.getUtils().containsValue(enabledWorlds, world.getName()) + "").toUpperCase()), event -> {
-					if (StringUtils.getUtils().containsValue(enabledWorlds, world.getName())) {
+				preventPane.addButton(new Button(ItemHandler.getItem(worldMaterial, 1, StringUtils.containsValue(enabledWorlds, world.getName()), "&f&l" + world.getName(), "&7", 
+						"&7*Click to enable this world.", "&9&lENABLED: &a" + (StringUtils.containsValue(enabledWorlds, world.getName()) + "").toUpperCase()), event -> {
+					if (StringUtils.containsValue(enabledWorlds, world.getName())) {
 						enabledWorlds.remove(world.getName());
 					} else {
 						enabledWorlds.add(world.getName());
 					}
 					if (!enabledWorlds.isEmpty() && enabledWorlds.size() > 1) {
-						if (StringUtils.getUtils().containsValue(enabledWorlds, "ALL")) {
+						if (StringUtils.containsValue(enabledWorlds, "ALL")) {
 							enabledWorlds.remove("ALL");
-						} else if (StringUtils.getUtils().containsValue(enabledWorlds, "GLOBAL")) {
+						} else if (StringUtils.containsValue(enabledWorlds, "GLOBAL")) {
 							enabledWorlds.remove("GLOBAL");
 						}
 					}
@@ -2371,11 +2370,11 @@ public class Menu {
 				}
 			}
 		    if (enabledWorlds.isEmpty() && ConfigHandler.getConfig().getFile("items.yml").getBoolean("items-Overwrite")) { enabledWorlds.add("ALL"); }
-			overwritePane.addButton(new Button(ItemHandler.getItem("OBSIDIAN", 1, StringUtils.getUtils().containsValue(enabledWorlds, "ALL"), "&a&l&nGLOBAL", "&7", "&7*Click to enable item", "&7overwriting in &lALL WORLDS.", 
-					"&9&lENABLED: &a" + (StringUtils.getUtils().containsValue(enabledWorlds, "ALL") + "").toUpperCase()), event -> {
+			overwritePane.addButton(new Button(ItemHandler.getItem("OBSIDIAN", 1, StringUtils.containsValue(enabledWorlds, "ALL"), "&a&l&nGLOBAL", "&7", "&7*Click to enable item", "&7overwriting in &lALL WORLDS.", 
+					"&9&lENABLED: &a" + (StringUtils.containsValue(enabledWorlds, "ALL") + "").toUpperCase()), event -> {
 					File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "items.yml");
 					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
-					if (StringUtils.getUtils().containsValue(enabledWorlds, "ALL")) {
+					if (StringUtils.containsValue(enabledWorlds, "ALL")) {
 						dataFile.set("items-Overwrite", false); 
 					} else {
 						dataFile.set("items-Overwrite", true); 
@@ -2391,17 +2390,17 @@ public class Menu {
 				} else if (world.getEnvironment().equals(Environment.THE_END)) {
 					worldMaterial = (ServerUtils.hasSpecificUpdate("1_13") ? "END_STONE" : "121");
 				}
-				overwritePane.addButton(new Button(ItemHandler.getItem(worldMaterial, 1, StringUtils.getUtils().containsValue(enabledWorlds, world.getName()), "&f&l" + world.getName(), "&7", 
-						"&7*Click to enable item", "&7overwriting in this world.", "&9&lENABLED: &a" + (StringUtils.getUtils().containsValue(enabledWorlds, world.getName()) + "").toUpperCase()), event -> {
-					if (StringUtils.getUtils().containsValue(enabledWorlds, world.getName())) {
+				overwritePane.addButton(new Button(ItemHandler.getItem(worldMaterial, 1, StringUtils.containsValue(enabledWorlds, world.getName()), "&f&l" + world.getName(), "&7", 
+						"&7*Click to enable item", "&7overwriting in this world.", "&9&lENABLED: &a" + (StringUtils.containsValue(enabledWorlds, world.getName()) + "").toUpperCase()), event -> {
+					if (StringUtils.containsValue(enabledWorlds, world.getName())) {
 						enabledWorlds.remove(world.getName());
 					} else {
 						enabledWorlds.add(world.getName());
 					}
 					if (!enabledWorlds.isEmpty() && enabledWorlds.size() > 1) {
-						if (StringUtils.getUtils().containsValue(enabledWorlds, "ALL")) {
+						if (StringUtils.containsValue(enabledWorlds, "ALL")) {
 							enabledWorlds.remove("ALL");
-						} else if (StringUtils.getUtils().containsValue(enabledWorlds, "GLOBAL")) {
+						} else if (StringUtils.containsValue(enabledWorlds, "GLOBAL")) {
 							enabledWorlds.remove("GLOBAL");
 						}
 					}
@@ -2487,7 +2486,7 @@ public class Menu {
 						itemMap.setMaterial(ItemHandler.getMaterial(ChatColor.stripColor(event.getMessage()), null)); 
 						if (!ServerUtils.hasSpecificUpdate("1_13") && ChatColor.stripColor(event.getMessage()).contains(":")) {
 							String[] dataValue = ChatColor.stripColor(event.getMessage()).split(":");
-							if (StringUtils.getUtils().isInt(dataValue[1])) {
+							if (StringUtils.isInt(dataValue[1])) {
 								itemMap.setDataValue((short)Integer.parseInt(dataValue[1]));
 							}	
 						}
@@ -2606,14 +2605,14 @@ public class Menu {
 		Interface craftingPane = new Interface(false, 4, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			craftingPane.addButton(new Button(fillerPaneGItem), 3);
-			craftingPane.addButton(new Button(ItemHandler.getItem("58", 1, (type > 0 ? StringUtils.getUtils().containsValue(itemMap.getMultipleSlots(), "CRAFTING[1]") : false), "&9&lSlot: &7&lCRAFTING&a&l[1]", "&7", "&7*Click to set the custom item", 
-					"&7to appear in the &lCRAFTING &7slot &a&l[1]&7", (type > 0 && StringUtils.getUtils().containsValue(itemMap.getMultipleSlots(), "CRAFTING[1]") ? "&9&lENABLED: &aTRUE" : "")), event -> {
+			craftingPane.addButton(new Button(ItemHandler.getItem("58", 1, (type > 0 ? StringUtils.containsValue(itemMap.getMultipleSlots(), "CRAFTING[1]") : false), "&9&lSlot: &7&lCRAFTING&a&l[1]", "&7", "&7*Click to set the custom item", 
+					"&7to appear in the &lCRAFTING &7slot &a&l[1]&7", (type > 0 && StringUtils.containsValue(itemMap.getMultipleSlots(), "CRAFTING[1]") ? "&9&lENABLED: &aTRUE" : "")), event -> {
 				if (type == 0) { 
 					itemMap.setSlot("CRAFTING[1]"); 
 					itemMap.setMultipleSlots(new ArrayList<String>()); 
 					creatingPane(player, itemMap);
 				} else { 
-					if (StringUtils.getUtils().containsValue(itemMap.getMultipleSlots(), "CRAFTING[1]")) {
+					if (StringUtils.containsValue(itemMap.getMultipleSlots(), "CRAFTING[1]")) {
 						List<String> slots = itemMap.getMultipleSlots(); 
 						slots.remove("CRAFTING[1]"); 
 						itemMap.setMultipleSlots(slots);
@@ -2627,14 +2626,14 @@ public class Menu {
 				}
 			}));
 			craftingPane.addButton(new Button(fillerPaneGItem));
-			craftingPane.addButton(new Button(ItemHandler.getItem("58", 2, (type > 0 ? StringUtils.getUtils().containsValue(itemMap.getMultipleSlots(), "CRAFTING[2]") : false), "&9&lSlot: &7&lCRAFTING&a&l[2]", "&7", "&7*Click to set the custom item", 
-					"&7to appear in the &lCRAFTING &7slot &a&l[2]&7", (type > 0 && StringUtils.getUtils().containsValue(itemMap.getMultipleSlots(), "CRAFTING[2]") ? "&9&lENABLED: &aTRUE" : "")), event -> {
+			craftingPane.addButton(new Button(ItemHandler.getItem("58", 2, (type > 0 ? StringUtils.containsValue(itemMap.getMultipleSlots(), "CRAFTING[2]") : false), "&9&lSlot: &7&lCRAFTING&a&l[2]", "&7", "&7*Click to set the custom item", 
+					"&7to appear in the &lCRAFTING &7slot &a&l[2]&7", (type > 0 && StringUtils.containsValue(itemMap.getMultipleSlots(), "CRAFTING[2]") ? "&9&lENABLED: &aTRUE" : "")), event -> {
 				if (type == 0) { 
 					itemMap.setSlot("CRAFTING[2]"); 
 					itemMap.setMultipleSlots(new ArrayList<String>()); 
 					creatingPane(player, itemMap);
 				} else { 
-					if (StringUtils.getUtils().containsValue(itemMap.getMultipleSlots(), "CRAFTING[2]")) {
+					if (StringUtils.containsValue(itemMap.getMultipleSlots(), "CRAFTING[2]")) {
 						List<String> slots = itemMap.getMultipleSlots(); 
 						slots.remove("CRAFTING[2]"); 
 						itemMap.setMultipleSlots(slots);
@@ -2648,14 +2647,14 @@ public class Menu {
 				}
 			}));
 			craftingPane.addButton(new Button(fillerPaneGItem), 10);
-			craftingPane.addButton(new Button(ItemHandler.getItem("58", 1, (type > 0 ? StringUtils.getUtils().containsValue(itemMap.getMultipleSlots(), "CRAFTING[0]") : false), "&9&lSlot: &7&lCRAFTING&a&l[0]", "&7", "&7*Click to set the custom item", 
-					"&7to appear in the &lCRAFTING &7slot &a&l[0]&7", (type > 0 && StringUtils.getUtils().containsValue(itemMap.getMultipleSlots(), "CRAFTING[0]") ? "&9&lENABLED: &aTRUE" : "")), event -> {
+			craftingPane.addButton(new Button(ItemHandler.getItem("58", 1, (type > 0 ? StringUtils.containsValue(itemMap.getMultipleSlots(), "CRAFTING[0]") : false), "&9&lSlot: &7&lCRAFTING&a&l[0]", "&7", "&7*Click to set the custom item", 
+					"&7to appear in the &lCRAFTING &7slot &a&l[0]&7", (type > 0 && StringUtils.containsValue(itemMap.getMultipleSlots(), "CRAFTING[0]") ? "&9&lENABLED: &aTRUE" : "")), event -> {
 				if (type == 0) { 
 					itemMap.setSlot("CRAFTING[0]"); 
 					itemMap.setMultipleSlots(new ArrayList<String>()); 
 					creatingPane(player, itemMap);
 				} else { 
-					if (StringUtils.getUtils().containsValue(itemMap.getMultipleSlots(), "CRAFTING[0]")) {
+					if (StringUtils.containsValue(itemMap.getMultipleSlots(), "CRAFTING[0]")) {
 						List<String> slots = itemMap.getMultipleSlots(); 
 						slots.remove("CRAFTING[0]"); 
 						itemMap.setMultipleSlots(slots);
@@ -2669,14 +2668,14 @@ public class Menu {
 				}
 			}));
 			craftingPane.addButton(new Button(fillerPaneGItem), 4);
-			craftingPane.addButton(new Button(ItemHandler.getItem("58", 3, (type > 0 ? StringUtils.getUtils().containsValue(itemMap.getMultipleSlots(), "CRAFTING[3]") : false), "&9&lSlot: &7&lCRAFTING&a&l[3]", "&7", "&7*Click to set the custom item", 
-					"&7to appear in the &lCRAFTING &7slot &a&l[3]&7", (type > 0 && StringUtils.getUtils().containsValue(itemMap.getMultipleSlots(), "CRAFTING[3]") ? "&9&lENABLED: &aTRUE" : "")), event -> {
+			craftingPane.addButton(new Button(ItemHandler.getItem("58", 3, (type > 0 ? StringUtils.containsValue(itemMap.getMultipleSlots(), "CRAFTING[3]") : false), "&9&lSlot: &7&lCRAFTING&a&l[3]", "&7", "&7*Click to set the custom item", 
+					"&7to appear in the &lCRAFTING &7slot &a&l[3]&7", (type > 0 && StringUtils.containsValue(itemMap.getMultipleSlots(), "CRAFTING[3]") ? "&9&lENABLED: &aTRUE" : "")), event -> {
 				if (type == 0) { 
 					itemMap.setSlot("CRAFTING[3]"); 
 					itemMap.setMultipleSlots(new ArrayList<String>()); 
 					creatingPane(player, itemMap);
 				} else { 
-					if (StringUtils.getUtils().containsValue(itemMap.getMultipleSlots(), "CRAFTING[3]")) {
+					if (StringUtils.containsValue(itemMap.getMultipleSlots(), "CRAFTING[3]")) {
 						List<String> slots = itemMap.getMultipleSlots(); 
 						slots.remove("CRAFTING[3]"); 
 						itemMap.setMultipleSlots(slots);
@@ -2690,14 +2689,14 @@ public class Menu {
 				}
 			}));
 			craftingPane.addButton(new Button(fillerPaneGItem));
-			craftingPane.addButton(new Button(ItemHandler.getItem("58", 4, (type > 0 ? StringUtils.getUtils().containsValue(itemMap.getMultipleSlots(), "CRAFTING[4]") : false), "&9&lSlot: &7&lCRAFTING&a&l[4]", "&7", "&7*Click to set the custom item", 
-					"&7to appear in the &lCRAFTING &7slot &a&l[4]&7", (type > 0 && StringUtils.getUtils().containsValue(itemMap.getMultipleSlots(), "CRAFTING[4]") ? "&9&lENABLED: &aTRUE" : "")), event -> {
+			craftingPane.addButton(new Button(ItemHandler.getItem("58", 4, (type > 0 ? StringUtils.containsValue(itemMap.getMultipleSlots(), "CRAFTING[4]") : false), "&9&lSlot: &7&lCRAFTING&a&l[4]", "&7", "&7*Click to set the custom item", 
+					"&7to appear in the &lCRAFTING &7slot &a&l[4]&7", (type > 0 && StringUtils.containsValue(itemMap.getMultipleSlots(), "CRAFTING[4]") ? "&9&lENABLED: &aTRUE" : "")), event -> {
 				if (type == 0) { 
 					itemMap.setSlot("CRAFTING[4]"); 
 					itemMap.setMultipleSlots(new ArrayList<String>()); 
 					creatingPane(player, itemMap);
 				} else { 
-					if (StringUtils.getUtils().containsValue(itemMap.getMultipleSlots(), "CRAFTING[4]")) {
+					if (StringUtils.containsValue(itemMap.getMultipleSlots(), "CRAFTING[4]")) {
 						List<String> slots = itemMap.getMultipleSlots(); 
 						slots.remove("CRAFTING[4]"); 
 						itemMap.setMultipleSlots(slots);
@@ -2721,15 +2720,15 @@ public class Menu {
 			}
 			craftingPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", "&7the main slot selection menu"), event -> slotPane.open(player)));
 			slotPane.addButton(new Button(fillerPaneGItem));
-			slotPane.addButton(new Button(ItemHandler.getItem("SUGAR", 1, (type > 0 ? StringUtils.getUtils().containsValue(itemMap.getMultipleSlots(), "ARBITRARY") : false), "&9&lSlot: &a&lARBITRARY", "&7", "&7*Click to set the custom item", 
-					"&7to appear in slot &a&lArbitrary&7", "&7", "&7*Arbitrary is defined as giving the", "&7item in the first available slot.", (type > 0 && StringUtils.getUtils().containsValue(itemMap.getMultipleSlots(), "ARBITRARY") ? "&9&lENABLED: &aTRUE" : "")), 
+			slotPane.addButton(new Button(ItemHandler.getItem("SUGAR", 1, (type > 0 ? StringUtils.containsValue(itemMap.getMultipleSlots(), "ARBITRARY") : false), "&9&lSlot: &a&lARBITRARY", "&7", "&7*Click to set the custom item", 
+					"&7to appear in slot &a&lArbitrary&7", "&7", "&7*Arbitrary is defined as giving the", "&7item in the first available slot.", (type > 0 && StringUtils.containsValue(itemMap.getMultipleSlots(), "ARBITRARY") ? "&9&lENABLED: &aTRUE" : "")), 
 					event -> {
 				if (type == 0) { 
 					itemMap.setSlot("ARBITRARY"); 
 					itemMap.setMultipleSlots(new ArrayList<String>()); 
 					creatingPane(player, itemMap);
 				} else { 
-					if (StringUtils.getUtils().containsValue(itemMap.getMultipleSlots(), "ARBITRARY")) {
+					if (StringUtils.containsValue(itemMap.getMultipleSlots(), "ARBITRARY")) {
 						List<String> slots = itemMap.getMultipleSlots(); 
 						slots.remove("ARBITRARY"); 
 						itemMap.setMultipleSlots(slots);
@@ -2743,14 +2742,14 @@ public class Menu {
 				}
 			}));
 			slotPane.addButton(new Button(ItemHandler.getItem("58", 1, false, "&9&lSlot: &a&lCRAFTING", "&7", "&7*Click to see a list of crafting slots"), event -> craftingPane.open(player)));
-			slotPane.addButton(new Button(ItemHandler.getItem("LEATHER_HELMET", 1, (type > 0 ? StringUtils.getUtils().containsValue(itemMap.getMultipleSlots(), "HELMET") : false), "&9&lSlot: &a&lHELMET", "&7", "&7*Click to set the custom item", 
-					"&7to appear in slot &a&lHELMET&7", (type > 0 && StringUtils.getUtils().containsValue(itemMap.getMultipleSlots(), "HELMET") ? "&9&lENABLED: &aTRUE" : "")), event -> {
+			slotPane.addButton(new Button(ItemHandler.getItem("LEATHER_HELMET", 1, (type > 0 ? StringUtils.containsValue(itemMap.getMultipleSlots(), "HELMET") : false), "&9&lSlot: &a&lHELMET", "&7", "&7*Click to set the custom item", 
+					"&7to appear in slot &a&lHELMET&7", (type > 0 && StringUtils.containsValue(itemMap.getMultipleSlots(), "HELMET") ? "&9&lENABLED: &aTRUE" : "")), event -> {
 				if (type == 0) { 
 					itemMap.setSlot("HELMET"); 
 					itemMap.setMultipleSlots(new ArrayList<String>()); 
 					creatingPane(player, itemMap);
 				} else { 
-					if (StringUtils.getUtils().containsValue(itemMap.getMultipleSlots(), "HELMET")) {
+					if (StringUtils.containsValue(itemMap.getMultipleSlots(), "HELMET")) {
 						List<String> slots = itemMap.getMultipleSlots(); 
 						slots.remove("HELMET"); 
 						itemMap.setMultipleSlots(slots);
@@ -2763,14 +2762,14 @@ public class Menu {
 					}
 				}
 			}));
-			slotPane.addButton(new Button(ItemHandler.getItem("LEATHER_CHESTPLATE", 1, (type > 0 ? StringUtils.getUtils().containsValue(itemMap.getMultipleSlots(), "CHESTPLATE") : false), "&9&lSlot: &a&lCHESTPLATE", "&7", "&7*Click to set the custom item", 
-					"&7to appear in slot &a&lCHESTPLATE&7", (type > 0 && StringUtils.getUtils().containsValue(itemMap.getMultipleSlots(), "CHESTPLATE") ? "&9&lENABLED: &aTRUE" : "")), event -> {
+			slotPane.addButton(new Button(ItemHandler.getItem("LEATHER_CHESTPLATE", 1, (type > 0 ? StringUtils.containsValue(itemMap.getMultipleSlots(), "CHESTPLATE") : false), "&9&lSlot: &a&lCHESTPLATE", "&7", "&7*Click to set the custom item", 
+					"&7to appear in slot &a&lCHESTPLATE&7", (type > 0 && StringUtils.containsValue(itemMap.getMultipleSlots(), "CHESTPLATE") ? "&9&lENABLED: &aTRUE" : "")), event -> {
 				if (type == 0) { 
 					itemMap.setSlot("CHESTPLATE"); 
 					itemMap.setMultipleSlots(new ArrayList<String>()); 
 					creatingPane(player, itemMap);
 				} else { 
-					if (StringUtils.getUtils().containsValue(itemMap.getMultipleSlots(), "CHESTPLATE")) {
+					if (StringUtils.containsValue(itemMap.getMultipleSlots(), "CHESTPLATE")) {
 						List<String> slots = itemMap.getMultipleSlots(); 
 						slots.remove("CHESTPLATE"); 
 						itemMap.setMultipleSlots(slots);
@@ -2783,14 +2782,14 @@ public class Menu {
 					}
 				}
 			}));
-			slotPane.addButton(new Button(ItemHandler.getItem("LEATHER_LEGGINGS", 1, (type > 0 ? StringUtils.getUtils().containsValue(itemMap.getMultipleSlots(), "LEGGINGS") : false), "&9&lSlot: &a&lLEGGINGS", "&7", "&7*Click to set the custom item", 
-					"&7to appear in slot &a&lLEGGINGS&7", (type > 0 && StringUtils.getUtils().containsValue(itemMap.getMultipleSlots(), "LEGGINGS") ? "&9&lENABLED: &aTRUE" : "")), event -> {
+			slotPane.addButton(new Button(ItemHandler.getItem("LEATHER_LEGGINGS", 1, (type > 0 ? StringUtils.containsValue(itemMap.getMultipleSlots(), "LEGGINGS") : false), "&9&lSlot: &a&lLEGGINGS", "&7", "&7*Click to set the custom item", 
+					"&7to appear in slot &a&lLEGGINGS&7", (type > 0 && StringUtils.containsValue(itemMap.getMultipleSlots(), "LEGGINGS") ? "&9&lENABLED: &aTRUE" : "")), event -> {
 				if (type == 0) { 
 					itemMap.setSlot("LEGGINGS"); 
 					itemMap.setMultipleSlots(new ArrayList<String>()); 
 					creatingPane(player, itemMap);
 				} else { 
-					if (StringUtils.getUtils().containsValue(itemMap.getMultipleSlots(), "LEGGINGS")) {
+					if (StringUtils.containsValue(itemMap.getMultipleSlots(), "LEGGINGS")) {
 						List<String> slots = itemMap.getMultipleSlots(); 
 						slots.remove("LEGGINGS"); 
 						itemMap.setMultipleSlots(slots);
@@ -2803,14 +2802,14 @@ public class Menu {
 					}
 				}
 			}));
-			slotPane.addButton(new Button(ItemHandler.getItem("LEATHER_BOOTS", 1, (type > 0 ? StringUtils.getUtils().containsValue(itemMap.getMultipleSlots(), "BOOTS") : false), "&9&lSlot: &a&lBOOTS", "&7", "&7*Click to set the custom item", 
-					"&7to appear in slot &a&lBOOTS&7", (type > 0 && StringUtils.getUtils().containsValue(itemMap.getMultipleSlots(), "BOOTS") ? "&9&lENABLED: &aTRUE" : "")), event -> {
+			slotPane.addButton(new Button(ItemHandler.getItem("LEATHER_BOOTS", 1, (type > 0 ? StringUtils.containsValue(itemMap.getMultipleSlots(), "BOOTS") : false), "&9&lSlot: &a&lBOOTS", "&7", "&7*Click to set the custom item", 
+					"&7to appear in slot &a&lBOOTS&7", (type > 0 && StringUtils.containsValue(itemMap.getMultipleSlots(), "BOOTS") ? "&9&lENABLED: &aTRUE" : "")), event -> {
 				if (type == 0) { 
 					itemMap.setSlot("BOOTS"); 
 					itemMap.setMultipleSlots(new ArrayList<String>()); 
 					creatingPane(player, itemMap);
 				} else { 
-					if (StringUtils.getUtils().containsValue(itemMap.getMultipleSlots(), "BOOTS")) {
+					if (StringUtils.containsValue(itemMap.getMultipleSlots(), "BOOTS")) {
 						List<String> slots = itemMap.getMultipleSlots(); 
 						slots.remove("BOOTS"); 
 						itemMap.setMultipleSlots(slots);
@@ -2824,14 +2823,14 @@ public class Menu {
 				}
 			}));
 			if (ServerUtils.hasSpecificUpdate("1_9")) {
-				slotPane.addButton(new Button(ItemHandler.getItem("SHIELD", 1, (type > 0 ? StringUtils.getUtils().containsValue(itemMap.getMultipleSlots(), "OFFHAND") : false), "&9&lSlot: &a&lOFFHAND", "&7", "&7*Click to set the custom item", 
-						"&7to appear in slot &a&lOFFHAND&7", (type > 0 && StringUtils.getUtils().containsValue(itemMap.getMultipleSlots(), "OFFHAND") ? "&9&lENABLED: &aTRUE" : "")), event -> {
+				slotPane.addButton(new Button(ItemHandler.getItem("SHIELD", 1, (type > 0 ? StringUtils.containsValue(itemMap.getMultipleSlots(), "OFFHAND") : false), "&9&lSlot: &a&lOFFHAND", "&7", "&7*Click to set the custom item", 
+						"&7to appear in slot &a&lOFFHAND&7", (type > 0 && StringUtils.containsValue(itemMap.getMultipleSlots(), "OFFHAND") ? "&9&lENABLED: &aTRUE" : "")), event -> {
 					if (type == 0) { 
 						itemMap.setSlot("OFFHAND"); 
 						itemMap.setMultipleSlots(new ArrayList<String>()); 
 						creatingPane(player, itemMap);
 					} else { 
-						if (StringUtils.getUtils().containsValue(itemMap.getMultipleSlots(), "OFFHAND")) {
+						if (StringUtils.containsValue(itemMap.getMultipleSlots(), "OFFHAND")) {
 							List<String> slots = itemMap.getMultipleSlots(); 
 							slots.remove("OFFHAND"); 
 							itemMap.setMultipleSlots(slots);
@@ -2850,14 +2849,14 @@ public class Menu {
 			slotPane.addButton(new Button(fillerPaneGItem));
 			for (int i = 9; i < 36; i++) {
 				final int slot = i;
-				slotPane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:3", i, (type > 0 ? StringUtils.getUtils().containsValue(itemMap.getMultipleSlots(), slot + "") : false), "&9&lSlot: &a&l" + i, "&7", "&7*Click to set the custom item", 
-						"&7to appear in slot &a&l" + i + "&7", (type > 0 && StringUtils.getUtils().containsValue(itemMap.getMultipleSlots(), slot + "") ? "&9&lENABLED: &aTRUE" : "")), event -> {
+				slotPane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:3", i, (type > 0 ? StringUtils.containsValue(itemMap.getMultipleSlots(), slot + "") : false), "&9&lSlot: &a&l" + i, "&7", "&7*Click to set the custom item", 
+						"&7to appear in slot &a&l" + i + "&7", (type > 0 && StringUtils.containsValue(itemMap.getMultipleSlots(), slot + "") ? "&9&lENABLED: &aTRUE" : "")), event -> {
 					if (type == 0) { 
 						itemMap.setSlot(slot + ""); 
 						itemMap.setMultipleSlots(new ArrayList<String>()); 
 						creatingPane(player, itemMap);
 					} else { 
-						if (StringUtils.getUtils().containsValue(itemMap.getMultipleSlots(), slot + "")) {
+						if (StringUtils.containsValue(itemMap.getMultipleSlots(), slot + "")) {
 							List<String> slots = itemMap.getMultipleSlots(); 
 							slots.remove(slot + ""); 
 							itemMap.setMultipleSlots(slots);
@@ -2877,14 +2876,14 @@ public class Menu {
 				if (slot == 0) {
 					count = 1;
 				}
-				slotPane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:11", count, (type > 0 ? StringUtils.getUtils().containsValue(itemMap.getMultipleSlots(), slot + "") : false), "&9&lSlot: &a&l" + j, "&7", "&7*Click to set the custom item", 
-						"&7to appear in slot &a&l" + j + "&7", (type > 0 && StringUtils.getUtils().containsValue(itemMap.getMultipleSlots(), slot + "") ? "&9&lENABLED: &aTRUE" : "")), event -> {
+				slotPane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:11", count, (type > 0 ? StringUtils.containsValue(itemMap.getMultipleSlots(), slot + "") : false), "&9&lSlot: &a&l" + j, "&7", "&7*Click to set the custom item", 
+						"&7to appear in slot &a&l" + j + "&7", (type > 0 && StringUtils.containsValue(itemMap.getMultipleSlots(), slot + "") ? "&9&lENABLED: &aTRUE" : "")), event -> {
 					if (type == 0) { 
 						itemMap.setSlot(slot + ""); 
 						itemMap.setMultipleSlots(new ArrayList<String>()); 
 						creatingPane(player, itemMap);
 					} else { 
-						if (StringUtils.getUtils().containsValue(itemMap.getMultipleSlots(), slot + "")) {
+						if (StringUtils.containsValue(itemMap.getMultipleSlots(), slot + "")) {
 							List<String> slots = itemMap.getMultipleSlots(); 
 							slots.remove(slot + ""); 
 							itemMap.setMultipleSlots(slots);
@@ -2950,8 +2949,8 @@ public class Menu {
 		SchedulerUtils.runAsync(() -> {
 			dataPane.addButton(new Button(fillerPaneBItem));
 			dataPane.addButton(new Button(ItemHandler.setDurability(ItemHandler.getItem("BOW", 1, false, "&b&lDamage", "&7", "&7*Set the damage of the item.", (itemMap.getMaterial().getMaxDurability() != 0 ? "&9&lDURABILITY: &a" + 
-			StringUtils.getUtils().nullCheck(itemMap.getDurability() + "&7") : "&c&lERROR: &7This item is NOT damagable.")), 50), event -> {
-				if (StringUtils.getUtils().nullCheck(itemMap.getDurability() + "&7") != "NONE") {
+			StringUtils.nullCheck(itemMap.getDurability() + "&7") : "&c&lERROR: &7This item is NOT damagable.")), 50), event -> {
+				if (StringUtils.nullCheck(itemMap.getDurability() + "&7") != "NONE") {
 					itemMap.setDurability(null);
 					dataPane(player, itemMap);
 				} else if (itemMap.getMaterial().getMaxDurability() != 0) {
@@ -2959,8 +2958,8 @@ public class Menu {
 				}
 			}));
 			dataPane.addButton(new Button(fillerPaneBItem), 2);
-			dataPane.addButton(new Button(ItemHandler.getItem("STICK", 1, false, "&a&lCustom Texture", "&7", "&7*Set the custom data of the item.", "&7This is the damage value assigned", "&7to the custom resource texture.", "&9&lDURABILITY DATA: &a" + StringUtils.getUtils().nullCheck(itemMap.getData() + "&7")), event -> {
-				if (StringUtils.getUtils().nullCheck(itemMap.getData() + "&7") != "NONE") {
+			dataPane.addButton(new Button(ItemHandler.getItem("STICK", 1, false, "&a&lCustom Texture", "&7", "&7*Set the custom data of the item.", "&7This is the damage value assigned", "&7to the custom resource texture.", "&9&lDURABILITY DATA: &a" + StringUtils.nullCheck(itemMap.getData() + "&7")), event -> {
+				if (StringUtils.nullCheck(itemMap.getData() + "&7") != "NONE") {
 					itemMap.setData(null);
 					dataPane(player, itemMap);
 				} else {
@@ -2970,8 +2969,8 @@ public class Menu {
 			dataPane.addButton(new Button(fillerPaneBItem), 2);
 			dataPane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, false, "&e&lCustom Model Data", "&7", "&7*Set the custom model data of the item.", 
 					!ServerUtils.hasSpecificUpdate("1_14") ? "&c&l[ERROR] &7This version of Minecraft does" : "", !ServerUtils.hasSpecificUpdate("1_14") ? "&7not support custom model data." : "", 
-					!ServerUtils.hasSpecificUpdate("1_14") ? "&7This was implemented in 1.14+." : "", "&9&lTEXTURE DATA: &a" + StringUtils.getUtils().nullCheck(itemMap.getModelData() + "&7")), event -> {
-				if (StringUtils.getUtils().nullCheck(itemMap.getModelData() + "&7") != "NONE" && ServerUtils.hasSpecificUpdate("1_14")) {
+					!ServerUtils.hasSpecificUpdate("1_14") ? "&7This was implemented in 1.14+." : "", "&9&lTEXTURE DATA: &a" + StringUtils.nullCheck(itemMap.getModelData() + "&7")), event -> {
+				if (StringUtils.nullCheck(itemMap.getModelData() + "&7") != "NONE" && ServerUtils.hasSpecificUpdate("1_14")) {
 					itemMap.setModelData(null);
 					dataPane(player, itemMap);
 				} else if (ServerUtils.hasSpecificUpdate("1_14")){
@@ -3011,7 +3010,7 @@ public class Menu {
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
-				if (StringUtils.getUtils().isInt(ChatColor.stripColor(event.getMessage()))) {
+				if (StringUtils.isInt(ChatColor.stripColor(event.getMessage()))) {
 					itemMap.setData(Integer.parseInt(ChatColor.stripColor(event.getMessage())));
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[16] = "DURABILITY DATA";
@@ -3054,7 +3053,7 @@ public class Menu {
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
-				if (StringUtils.getUtils().isInt(ChatColor.stripColor(event.getMessage()))) {
+				if (StringUtils.isInt(ChatColor.stripColor(event.getMessage()))) {
 					itemMap.setModelData(Integer.parseInt(ChatColor.stripColor(event.getMessage())));
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[16] = "MODEL DATA";
@@ -3097,7 +3096,7 @@ public class Menu {
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
-				if (StringUtils.getUtils().isInt(ChatColor.stripColor(event.getMessage()))) {
+				if (StringUtils.isInt(ChatColor.stripColor(event.getMessage()))) {
 					itemMap.setDurability((short) Integer.parseInt(ChatColor.stripColor(event.getMessage())));
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[16] = "DAMAGE";
@@ -3138,8 +3137,8 @@ public class Menu {
 					"&7", "&9&lCommands: &a" + (itemMap.getCommands().length != 0 ? "YES" : "NONE")), event -> actionPane(player, itemMap)));
 			commandPane.addButton(new Button(fillerPaneGItem), 4);
 			commandPane.addButton(new Button(ItemHandler.getItem("REDSTONE", 1, false, "&a&lParticle", "&7", "&7*Custom particle(s) that will be", "&7displayed when the commands", "&7are successfully executed.", "&9&lCOMMANDS-PARTICLE: &a" +
-					StringUtils.getUtils().nullCheck(itemMap.getCommandParticle() + "")), event -> {
-				if (StringUtils.getUtils().nullCheck(itemMap.getCommandParticle() + "") != "NONE") {
+					StringUtils.nullCheck(itemMap.getCommandParticle() + "")), event -> {
+				if (StringUtils.nullCheck(itemMap.getCommandParticle() + "") != "NONE") {
 					itemMap.setCommandParticle(null);
 					commandPane(player, itemMap);
 				} else {
@@ -3147,8 +3146,8 @@ public class Menu {
 				}
 			}));
 			commandPane.addButton(new Button(ItemHandler.getItem("EMERALD", 1, false, "&a&lItem Cost", "&7", "&7*Material that will", "&7be charged upon successfully", "&7executing the commands.", "&9&lCOMMANDS-ITEM: &a" + 
-			(StringUtils.getUtils().nullCheck(itemMap.getItemCost()))), event -> {
-				if (StringUtils.getUtils().nullCheck(itemMap.getItemCost()) != "NONE") {
+			(StringUtils.nullCheck(itemMap.getItemCost()))), event -> {
+				if (StringUtils.nullCheck(itemMap.getItemCost()) != "NONE") {
 					itemMap.setItemCost(null);
 					commandPane(player, itemMap);
 				} else {
@@ -3156,8 +3155,8 @@ public class Menu {
 				}
 			}));
 			commandPane.addButton(new Button(ItemHandler.getItem("DIAMOND", 1, false, "&a&lCost", "&7", "&7*Amount that the player will", "&7be charged upon successfully", "&7executing the commands.", "&9&lCOMMANDS-COST: &a" + 
-			(StringUtils.getUtils().nullCheck(itemMap.getCommandCost() + "&7"))), event -> {
-				if (StringUtils.getUtils().nullCheck(itemMap.getCommandCost() + "&7") != "NONE") {
+			(StringUtils.nullCheck(itemMap.getCommandCost() + "&7"))), event -> {
+				if (StringUtils.nullCheck(itemMap.getCommandCost() + "&7") != "NONE") {
 					itemMap.setCommandCost(0);
 					commandPane(player, itemMap);
 				} else {
@@ -3165,17 +3164,17 @@ public class Menu {
 				}
 			}));
 			commandPane.addButton(new Button(ItemHandler.getItem("STONE_BUTTON", 1, false, "&a&lReceive", "&7", "&7*The number of times the", "&7commands will execute when", "&7receiving the custom item.", 
-					"&cNOTE: &7Only functions with", "&7the on-receive command action.", "&9&lCOMMANDS-RECEIVE: &a" + (StringUtils.getUtils().nullCheck(itemMap.getCommandReceive() + "&7"))), event -> {
-				if (StringUtils.getUtils().nullCheck(itemMap.getCommandReceive() + "&7") != "NONE") {
+					"&cNOTE: &7Only functions with", "&7the on-receive command action.", "&9&lCOMMANDS-RECEIVE: &a" + (StringUtils.nullCheck(itemMap.getCommandReceive() + "&7"))), event -> {
+				if (StringUtils.nullCheck(itemMap.getCommandReceive() + "&7") != "NONE") {
 					itemMap.setCommandReceive(0);
 					commandPane(player, itemMap);
 				} else {
 					receivePane(player, itemMap);
 				}
 			}));
-			commandPane.addButton(new Button(ItemHandler.getItem("ICE", 1, false, "&a&lCooldown", "&7", "&7*The time that the commands will", "&7be on cooldown for.", "&7", "&9&lCOMMANDS-COOLDOWN: &a" + StringUtils.getUtils().nullCheck(itemMap.getCommandCooldown() + "&7") + 
-					(StringUtils.getUtils().nullCheck(itemMap.getCommandCooldown() + "&7") != "NONE" ? "&a second(s)" : "")), event -> {
-				if (StringUtils.getUtils().nullCheck(itemMap.getCommandCooldown() + "&7") != "NONE") {
+			commandPane.addButton(new Button(ItemHandler.getItem("ICE", 1, false, "&a&lCooldown", "&7", "&7*The time that the commands will", "&7be on cooldown for.", "&7", "&9&lCOMMANDS-COOLDOWN: &a" + StringUtils.nullCheck(itemMap.getCommandCooldown() + "&7") + 
+					(StringUtils.nullCheck(itemMap.getCommandCooldown() + "&7") != "NONE" ? "&a second(s)" : "")), event -> {
+				if (StringUtils.nullCheck(itemMap.getCommandCooldown() + "&7") != "NONE") {
 					itemMap.setCommandCooldown(0);
 					commandPane(player, itemMap);
 				} else {
@@ -3183,8 +3182,8 @@ public class Menu {
 				}
 			}));
 			commandPane.addButton(new Button(ItemHandler.getItem("323", 1, false, "&a&lCooldown Message", "&7", "&7*Optional cooldown message", "&7to be displayed when", "&7the items commands are", 
-					"&7on cooldown.", "&9&lCOOLDOWN-MESSAGE: &a" + StringUtils.getUtils().nullCheck(itemMap.getCooldownMessage())), event -> {
-				if (StringUtils.getUtils().nullCheck(itemMap.getCooldownMessage()) != "NONE") {
+					"&7on cooldown.", "&9&lCOOLDOWN-MESSAGE: &a" + StringUtils.nullCheck(itemMap.getCooldownMessage())), event -> {
+				if (StringUtils.nullCheck(itemMap.getCooldownMessage()) != "NONE") {
 					itemMap.setCooldownMessage(null);
 					commandPane(player, itemMap);
 				} else {
@@ -3199,8 +3198,8 @@ public class Menu {
 				itemMap.setCooldownMessage(ChatColor.stripColor(event.getMessage()));String[] placeHolders = LanguageAPI.getLang(false).newString();placeHolders[16] = "COOLDOWN MESSAGE";LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);commandPane(event.getPlayer(), itemMap);
 			}));
 			commandPane.addButton(new Button(ItemHandler.getItem("JUKEBOX", 1, false, "&a&lSound", "&7", "&7*The sound that will be", "&7played after a successful", "&7command execution.", "&9&lCOMMANDS-SOUND: &a" + 
-			StringUtils.getUtils().nullCheck(itemMap.getCommandSound() + "")), event -> {
-				if (StringUtils.getUtils().nullCheck(itemMap.getCommandSound() + "") != "NONE") {
+			StringUtils.nullCheck(itemMap.getCommandSound() + "")), event -> {
+				if (StringUtils.nullCheck(itemMap.getCommandSound() + "") != "NONE") {
 					itemMap.setCommandSound(null);
 					commandPane(player, itemMap);
 				} else {
@@ -3208,8 +3207,8 @@ public class Menu {
 				}
 			}));
 			commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "REPEATER" : "356"), 1, false, "&a&lSequence", "&7", "&7*The order that the command lines", "&7will be executed in.", "&9&lCOMMANDS-SEQUENCE: &a" + 
-			StringUtils.getUtils().nullCheck(itemMap.getCommandSequence() + "")), event -> {
-				if (StringUtils.getUtils().nullCheck(itemMap.getCommandSequence() + "") != "NONE") {
+			StringUtils.nullCheck(itemMap.getCommandSequence() + "")), event -> {
+				if (StringUtils.nullCheck(itemMap.getCommandSequence() + "") != "NONE") {
 					itemMap.setCommandSequence(null);
 					commandPane(player, itemMap);
 				} else {
@@ -3217,8 +3216,8 @@ public class Menu {
 				}
 			}));
 			commandPane.addButton(new Button(ItemHandler.getItem("327", 1, false, "&a&lWarmup", "&7", "&7*The time it will take before", "&7the commands are executed.", "&7Player movement will cancel the", "&7pending commands execution.", "&7", 
-					"&9&lCOMMANDS-WARMUP: &a" + StringUtils.getUtils().nullCheck(itemMap.getWarmDelay() + "&7") + (StringUtils.getUtils().nullCheck(itemMap.getWarmDelay() + "&7") != "NONE" ? "&a second(s)" : "")), event -> {
-				if (StringUtils.getUtils().nullCheck(itemMap.getWarmDelay() + "&7") != "NONE") {
+					"&9&lCOMMANDS-WARMUP: &a" + StringUtils.nullCheck(itemMap.getWarmDelay() + "&7") + (StringUtils.nullCheck(itemMap.getWarmDelay() + "&7") != "NONE" ? "&a second(s)" : "")), event -> {
+				if (StringUtils.nullCheck(itemMap.getWarmDelay() + "&7") != "NONE") {
 					itemMap.setWarmDelay(0);
 					commandPane(player, itemMap);
 				} else {
@@ -3373,7 +3372,7 @@ public class Menu {
 				commands += command.getRawCommand() + " /n ";
 			}
 		}
-		if (StringUtils.getUtils().nullCheck(commands) != "NONE") {
+		if (StringUtils.nullCheck(commands) != "NONE") {
 			commandReturn = commands;
 		}
 		return commandReturn;
@@ -3506,8 +3505,8 @@ public class Menu {
 			modPane.addButton(new Button(fillerPaneGItem), 4);
 			modPane.addButton(new Button(fillerPaneGItem));
 			modPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "REPEATER" : "356"), 1, false, "&fIdentifier", "&7", "&7*Set a custom identifier", "&7for this command line.", "&7", "&cNOTE: &7This is in order to set", "&7a random command list sequence.", 
-					"&7Only use this if", "&7the commands sequence is", "&7set to &aRANDOM_LIST&7.", "&7", "&9&lIDENTIFIER: &a" + StringUtils.getUtils().nullCheck(command.getSection())), event -> {
-						if (StringUtils.getUtils().nullCheck(command.getSection()) != "NONE") {
+					"&7Only use this if", "&7the commands sequence is", "&7set to &aRANDOM_LIST&7.", "&7", "&9&lIDENTIFIER: &a" + StringUtils.nullCheck(command.getSection())), event -> {
+						if (StringUtils.nullCheck(command.getSection()) != "NONE") {
 							ItemCommand[] commands = itemMap.getCommands();
 							for (ItemCommand Command: commands) {
 								if (Command.equals(command)) {
@@ -3729,7 +3728,7 @@ public class Menu {
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
-				if (StringUtils.getUtils().isInt(ChatColor.stripColor(event.getMessage()))) {
+				if (StringUtils.isInt(ChatColor.stripColor(event.getMessage()))) {
 					modifyCommands(itemMap, ItemCommand.fromString("delay: " + Integer.parseInt(ChatColor.stripColor(event.getMessage())), action, itemMap, Integer.parseInt(ChatColor.stripColor(event.getMessage())), null), true);
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[16] = "DELAY";
@@ -3773,7 +3772,7 @@ public class Menu {
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
-				if (StringUtils.getUtils().isInt(ChatColor.stripColor(event.getMessage()))) {
+				if (StringUtils.isInt(ChatColor.stripColor(event.getMessage()))) {
 					itemMap.setCommandCooldown(Integer.parseInt(ChatColor.stripColor(event.getMessage())));
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[16] = "COMMAND COOLDOWN";
@@ -3817,7 +3816,7 @@ public class Menu {
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
-				if (StringUtils.getUtils().isInt(ChatColor.stripColor(event.getMessage()))) {
+				if (StringUtils.isInt(ChatColor.stripColor(event.getMessage()))) {
 					itemMap.setWarmDelay(Integer.parseInt(ChatColor.stripColor(event.getMessage())));
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[16] = "COMMAND WARMUP";
@@ -3861,7 +3860,7 @@ public class Menu {
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
-				if (StringUtils.getUtils().isInt(ChatColor.stripColor(event.getMessage()))) {
+				if (StringUtils.isInt(ChatColor.stripColor(event.getMessage()))) {
 					itemMap.setCommandCost(Integer.parseInt(ChatColor.stripColor(event.getMessage())));
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[16] = "COMMAND COST";
@@ -3905,7 +3904,7 @@ public class Menu {
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
-				if (StringUtils.getUtils().isInt(ChatColor.stripColor(event.getMessage()))) {
+				if (StringUtils.isInt(ChatColor.stripColor(event.getMessage()))) {
 					itemMap.setCommandReceive(Integer.parseInt(ChatColor.stripColor(event.getMessage())));
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[16] = "COMMAND RECEIVE";
@@ -4040,7 +4039,7 @@ public class Menu {
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
-				if (StringUtils.getUtils().isInt(ChatColor.stripColor(event.getMessage()))) {
+				if (StringUtils.isInt(ChatColor.stripColor(event.getMessage()))) {
 					if (stage == 0) {
 						itemMap.setCommandParticle(particle + ":" + ChatColor.stripColor(event.getMessage()));
 					} else {
@@ -4177,7 +4176,7 @@ public class Menu {
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
-				if (StringUtils.getUtils().isInt(ChatColor.stripColor(event.getMessage()))) {
+				if (StringUtils.isInt(ChatColor.stripColor(event.getMessage()))) {
 					Map < String, Integer > enchantments = (itemMap.getEnchantments() != null) ? itemMap.getEnchantments() : new HashMap < String, Integer >();
 					enchantments.put(ItemHandler.getEnchantName(enchant).toUpperCase(), Integer.parseInt(ChatColor.stripColor(event.getMessage())));
 					itemMap.setEnchantments(enchantments);
@@ -5018,7 +5017,7 @@ public class Menu {
 			for (int i = 1; i <= itemMap.getDynamicMaterials().size(); i++) {
 				final int k = i;
 				animateMaterialPane.addButton(new Button(ItemHandler.getItem(ItemHandler.cutDelay(itemMap.getDynamicMaterials().get(k - 1)), 1, false, "&fMaterial " + k, "&7", "&7*Click modify this animated material.", 
-						"&9&lAnimation Ticks: &a" + StringUtils.getUtils().returnInteger(ItemHandler.getDelayFormat(itemMap.getDynamicMaterials().get(k - 1)))), event -> modifyMaterialPane(player, itemMap, k - 1)));
+						"&9&lAnimation Ticks: &a" + StringUtils.returnInteger(ItemHandler.getDelayFormat(itemMap.getDynamicMaterials().get(k - 1)))), event -> modifyMaterialPane(player, itemMap, k - 1)));
 			}
 		});
 		animateMaterialPane.open(player);
@@ -5050,7 +5049,7 @@ public class Menu {
 						durationMaterialPane(player, itemMap, position, isNew, ChatColor.stripColor(event.getMessage()).toUpperCase());
 					} else {
 						List < String > mats = itemMap.getDynamicMaterials();
-						mats.set(position, "<delay:" + StringUtils.getUtils().returnInteger(ItemHandler.getDelayFormat(mats.get(position))) + ">" + ChatColor.stripColor(event.getMessage()).toUpperCase());
+						mats.set(position, "<delay:" + StringUtils.returnInteger(ItemHandler.getDelayFormat(mats.get(position))) + ">" + ChatColor.stripColor(event.getMessage()).toUpperCase());
 						itemMap.setDynamicMaterials(mats);
 						modifyMaterialPane(player, itemMap, position);
 					}
@@ -5077,8 +5076,8 @@ public class Menu {
 										else { durationMaterialPane(player, itemMap, position, isNew, material.name()); }
 									} else {
 										List < String > mats = itemMap.getDynamicMaterials();
-										if (dataValue != 0) { mats.set(position, "<delay:" + StringUtils.getUtils().returnInteger(ItemHandler.getDelayFormat(mats.get(position))) + ">" + material.name() + ":" + dataValue); }
-										else { mats.set(position, "<delay:" + StringUtils.getUtils().returnInteger(ItemHandler.getDelayFormat(mats.get(position))) + ">" + material.name()); }
+										if (dataValue != 0) { mats.set(position, "<delay:" + StringUtils.returnInteger(ItemHandler.getDelayFormat(mats.get(position))) + ">" + material.name() + ":" + dataValue); }
+										else { mats.set(position, "<delay:" + StringUtils.returnInteger(ItemHandler.getDelayFormat(mats.get(position))) + ">" + material.name()); }
 										itemMap.setDynamicMaterials(mats);
 										modifyMaterialPane(player, itemMap, position);
 									}
@@ -5091,7 +5090,7 @@ public class Menu {
 								durationMaterialPane(player, itemMap, position, isNew, material.name());
 							} else {
 								List < String > mats = itemMap.getDynamicMaterials();
-								mats.set(position, "<delay:" + StringUtils.getUtils().returnInteger(ItemHandler.getDelayFormat(mats.get(position))) + ">" + material.name());
+								mats.set(position, "<delay:" + StringUtils.returnInteger(ItemHandler.getDelayFormat(mats.get(position))) + ">" + material.name());
 								itemMap.setDynamicMaterials(mats);
 								modifyMaterialPane(player, itemMap, position);
 							}
@@ -5123,7 +5122,7 @@ public class Menu {
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
-				if (StringUtils.getUtils().isInt(ChatColor.stripColor(event.getMessage()))) {
+				if (StringUtils.isInt(ChatColor.stripColor(event.getMessage()))) {
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[16] = "ANIMATION DURATION";
 					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
@@ -5187,7 +5186,7 @@ public class Menu {
 			modifyMaterialPane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, false, "&a&l&nMaterial", "&7", "&7*Change the animated material type.", "&9&lMaterial: &a" + ItemHandler.cutDelay(itemMap.getDynamicMaterials().get(position))),
 					event -> selectMaterialPane(player, itemMap, position, false)));
 			modifyMaterialPane.addButton(new Button(ItemHandler.getItem("347", 1, false, "&e&l&nDuration", "&7", "&7*Change the duration of the animation.", "&9&lAnimation Ticks: &a" + 
-			StringUtils.getUtils().returnInteger(ItemHandler.getDelayFormat(itemMap.getDynamicMaterials().get(position)))), event -> durationMaterialPane(player, itemMap, position, false, ItemHandler.cutDelay(itemMap.getDynamicMaterials().get(position)))));
+			StringUtils.returnInteger(ItemHandler.getDelayFormat(itemMap.getDynamicMaterials().get(position)))), event -> durationMaterialPane(player, itemMap, position, false, ItemHandler.cutDelay(itemMap.getDynamicMaterials().get(position)))));
 			modifyMaterialPane.addButton(new Button(ItemHandler.getItem("REDSTONE", 1, false, "&c&l&nDelete", "&7", "&7*Delete this animated material."), event -> {
 				List < String > mats = itemMap.getDynamicMaterials();mats.remove(position);
 				itemMap.setDynamicMaterials(mats);
@@ -5234,7 +5233,7 @@ public class Menu {
 			for (int i = 1; i <= itemMap.getDynamicNames().size(); i++) {
 				final int k = i;
 				animatedNamePane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, false, "&fName " + k, "&7", "&7*Click modify this animated name.", "&9&lName: &a" + ItemHandler.cutDelay(itemMap.getDynamicNames().get(k - 1)), 
-						"&9&lAnimation Ticks: &a" + StringUtils.getUtils().returnInteger(ItemHandler.getDelayFormat(itemMap.getDynamicNames().get(k - 1)))), event -> modifyNamePane(player, itemMap, k - 1)));
+						"&9&lAnimation Ticks: &a" + StringUtils.returnInteger(ItemHandler.getDelayFormat(itemMap.getDynamicNames().get(k - 1)))), event -> modifyNamePane(player, itemMap, k - 1)));
 			}
 		});	
 		animatedNamePane.open(player);
@@ -5259,7 +5258,7 @@ public class Menu {
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
-				if (StringUtils.getUtils().isInt(ChatColor.stripColor(event.getMessage()))) {
+				if (StringUtils.isInt(ChatColor.stripColor(event.getMessage()))) {
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[16] = "ANIMATION DURATION";
 					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
@@ -5329,7 +5328,7 @@ public class Menu {
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				List < String > names = itemMap.getDynamicNames();
-				names.set(position, "<delay:" + StringUtils.getUtils().returnInteger(ItemHandler.getDelayFormat(names.get(position))) + ">" + ChatColor.stripColor(event.getMessage()));
+				names.set(position, "<delay:" + StringUtils.returnInteger(ItemHandler.getDelayFormat(names.get(position))) + ">" + ChatColor.stripColor(event.getMessage()));
 				itemMap.setDynamicNames(names)
 				;String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[16] = "NAME";
@@ -5337,7 +5336,7 @@ public class Menu {
 				modifyNamePane(event.getPlayer(), itemMap, position);
 			}));
 			modifyNamePane.addButton(new Button(ItemHandler.getItem("347", 1, false, "&e&l&nDuration", "&7", "&7*Change the duration of the animation.", "&9&lAnimation Ticks: &a" + 
-			StringUtils.getUtils().returnInteger(ItemHandler.getDelayFormat(itemMap.getDynamicNames().get(position)))), event -> durationNamePane(player, itemMap, position, false, ItemHandler.cutDelay(itemMap.getDynamicNames().get(position)))));
+			StringUtils.returnInteger(ItemHandler.getDelayFormat(itemMap.getDynamicNames().get(position)))), event -> durationNamePane(player, itemMap, position, false, ItemHandler.cutDelay(itemMap.getDynamicNames().get(position)))));
 			modifyNamePane.addButton(new Button(ItemHandler.getItem("REDSTONE", 1, false, "&c&l&nDelete", "&7", "&7*Delete this animated name."), event -> {
 				List < String > names = itemMap.getDynamicNames();
 				names.remove(position);
@@ -5385,7 +5384,7 @@ public class Menu {
 			for (int i = 1; i <= itemMap.getDynamicLores().size(); i++) {
 				final int k = i;
 				animatedLorePane.addButton(new Button(ItemHandler.getItem("WRITABLE_BOOK", 1, false, "&fLore " + k, "&7", "&7*Click modify this animated lore.", "&9&lLore: &a" + ItemHandler.cutDelay(itemMap.getDynamicLores().get(k - 1)), 
-						"&9&lAnimation Ticks: &a" + StringUtils.getUtils().returnInteger(ItemHandler.getDelayFormat(itemMap.getDynamicLores().get(k - 1).get(0)))), event -> modifyLorePane(player, itemMap, k - 1)));
+						"&9&lAnimation Ticks: &a" + StringUtils.returnInteger(ItemHandler.getDelayFormat(itemMap.getDynamicLores().get(k - 1).get(0)))), event -> modifyLorePane(player, itemMap, k - 1)));
 			}
 		});
 		animatedLorePane.open(player);
@@ -5410,7 +5409,7 @@ public class Menu {
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
-				if (StringUtils.getUtils().isInt(ChatColor.stripColor(event.getMessage()))) {
+				if (StringUtils.isInt(ChatColor.stripColor(event.getMessage()))) {
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[16] = "ANIMATION DURATION";
 					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
@@ -5421,7 +5420,7 @@ public class Menu {
 							loreCut.set(0, "<delay:" + Integer.parseInt(ChatColor.stripColor(event.getMessage())) + ">" + loreCut.get(0));
 							lores.add(loreCut);
 						}
-						lores.add(StringUtils.getUtils().split("<delay:" + Integer.parseInt(ChatColor.stripColor(event.getMessage())) + ">" + value));
+						lores.add(StringUtils.split("<delay:" + Integer.parseInt(ChatColor.stripColor(event.getMessage())) + ">" + value));
 					} else {
 						List < String > loreCut = ItemHandler.cutDelay(lores.get(position));
 						loreCut.set(0, "<delay:" + Integer.parseInt(ChatColor.stripColor(event.getMessage())) + ">" + loreCut.get(0));
@@ -5450,7 +5449,7 @@ public class Menu {
 							loreCut.set(0, "<delay:" + k + ">" + loreCut.get(0));
 							lores.add(loreCut);
 						}
-						lores.add(StringUtils.getUtils().split("<delay:" + k + ">" + value));
+						lores.add(StringUtils.split("<delay:" + k + ">" + value));
 					} else {
 						List < String > loreCut = ItemHandler.cutDelay(lores.get(position));
 						loreCut.set(0, "<delay:" + k + ">" + loreCut.get(0));
@@ -5488,14 +5487,14 @@ public class Menu {
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				List < List < String >> lores = itemMap.getDynamicLores();
-				lores.set(position, StringUtils.getUtils().split("<delay:" + StringUtils.getUtils().returnInteger(ItemHandler.getDelayFormat(lores.get(position).get(0))) + ">" + ChatColor.stripColor(event.getMessage())));
+				lores.set(position, StringUtils.split("<delay:" + StringUtils.returnInteger(ItemHandler.getDelayFormat(lores.get(position).get(0))) + ">" + ChatColor.stripColor(event.getMessage())));
 				itemMap.setDynamicLores(lores);
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[16] = "ANIMATED LORE";LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				modifyLorePane(event.getPlayer(), itemMap, position);
 			}));
 			modifyLorePane.addButton(new Button(ItemHandler.getItem("347", 1, false, "&e&l&nDuration", "&7", "&7*Change the duration of the animation.", "&9&lAnimation Ticks: &a" + 
-			StringUtils.getUtils().returnInteger(ItemHandler.getDelayFormat(itemMap.getDynamicLores().get(position).get(0)))), event -> durationLorePane(player, itemMap, position, false, "")));
+			StringUtils.returnInteger(ItemHandler.getDelayFormat(itemMap.getDynamicLores().get(position).get(0)))), event -> durationLorePane(player, itemMap, position, false, "")));
 			modifyLorePane.addButton(new Button(ItemHandler.getItem("REDSTONE", 1, false, "&c&l&nDelete", "&7", "&7*Delete this animated lore."), event -> {
 				List < List < String >> lores = itemMap.getDynamicLores();
 				lores.remove(position);
@@ -5546,7 +5545,7 @@ public class Menu {
 				for (int i = 1; i <= itemMap.getDynamicOwners().size(); i++) {
 					final int k = i;
 					animatedSkullPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GOLDEN_HELMET" : "314"), 1, false, "&fSkull Owner " + k, "&7", "&7*Click modify this animated skull owner.", "&9&lSkull Owner: &a" + 
-					ItemHandler.cutDelay(itemMap.getDynamicOwners().get(k - 1)), "&9&lAnimation Ticks: &a" + StringUtils.getUtils().returnInteger(ItemHandler.getDelayFormat(itemMap.getDynamicOwners().get(k - 1)))), event -> modifySkullPane(player, itemMap, k - 1, owner)));
+					ItemHandler.cutDelay(itemMap.getDynamicOwners().get(k - 1)), "&9&lAnimation Ticks: &a" + StringUtils.returnInteger(ItemHandler.getDelayFormat(itemMap.getDynamicOwners().get(k - 1)))), event -> modifySkullPane(player, itemMap, k - 1, owner)));
 				}
 			} else {
 				animatedSkullPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the animation menu."), event -> {
@@ -5575,7 +5574,7 @@ public class Menu {
 					final int k = i;
 					animatedSkullPane.addButton(new Button(ItemHandler.getItem("STRING", 1, false, "&fSkull Texture " + k, "&7", "&7*Click modify this animated skull texture.", "&9&lSkull Texture: &a" + 
 					(ItemHandler.cutDelay(itemMap.getDynamicTextures().get(k - 1)).length() > 40 ? ItemHandler.cutDelay(itemMap.getDynamicTextures().get(k - 1)).substring(0, 40) : ItemHandler.cutDelay(itemMap.getDynamicTextures().get(k - 1))),
-					"&9&lAnimation Ticks: &a" + StringUtils.getUtils().returnInteger(ItemHandler.getDelayFormat(itemMap.getDynamicTextures().get(k - 1)))), event -> modifySkullPane(player, itemMap, k - 1, owner)));
+					"&9&lAnimation Ticks: &a" + StringUtils.returnInteger(ItemHandler.getDelayFormat(itemMap.getDynamicTextures().get(k - 1)))), event -> modifySkullPane(player, itemMap, k - 1, owner)));
 				}
 			}
 		});
@@ -5601,7 +5600,7 @@ public class Menu {
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
-				if (StringUtils.getUtils().isInt(ChatColor.stripColor(event.getMessage()))) {
+				if (StringUtils.isInt(ChatColor.stripColor(event.getMessage()))) {
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[16] = "ANIMATION DURATION";
 					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
@@ -5691,7 +5690,7 @@ public class Menu {
 					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 				}, event -> {
 					List < String > skulls = itemMap.getDynamicOwners();
-					skulls.set(position, "<delay:" + StringUtils.getUtils().returnInteger(ItemHandler.getDelayFormat(skulls.get(position))) + ">" + ChatColor.stripColor(event.getMessage()));
+					skulls.set(position, "<delay:" + StringUtils.returnInteger(ItemHandler.getDelayFormat(skulls.get(position))) + ">" + ChatColor.stripColor(event.getMessage()));
 					itemMap.setDynamicOwners(skulls);
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[16] = "SKULL OWNER";
@@ -5709,7 +5708,7 @@ public class Menu {
 					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 				}, event -> {
 					List < String > skulls = itemMap.getDynamicTextures();
-					skulls.set(position, "<delay:" + StringUtils.getUtils().returnInteger(ItemHandler.getDelayFormat(skulls.get(position))) + ">" + ChatColor.stripColor(event.getMessage()));
+					skulls.set(position, "<delay:" + StringUtils.returnInteger(ItemHandler.getDelayFormat(skulls.get(position))) + ">" + ChatColor.stripColor(event.getMessage()));
 					itemMap.setDynamicTextures(skulls);
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[16] = "SKULL TEXTURE";
@@ -5718,7 +5717,7 @@ public class Menu {
 				}));
 			}
 			modifySkullPane.addButton(new Button(ItemHandler.getItem("347", 1, false, "&e&l&nDuration", "&7", "&7*Change the duration of the animation.", "&9&lAnimation Ticks: &a" + 
-			StringUtils.getUtils().returnInteger(ItemHandler.getDelayFormat((owner ? itemMap.getDynamicOwners().get(position) : itemMap.getDynamicTextures().get(position))))), 
+			StringUtils.returnInteger(ItemHandler.getDelayFormat((owner ? itemMap.getDynamicOwners().get(position) : itemMap.getDynamicTextures().get(position))))), 
 					event -> durationSkullPane(player, itemMap, position, false, ItemHandler.cutDelay((owner ? itemMap.getDynamicOwners().get(position) : itemMap.getDynamicTextures().get(position))), owner)));
 			modifySkullPane.addButton(new Button(ItemHandler.getItem("REDSTONE", 1, false, "&c&l&nDelete", "&7", "&7*Delete this animated skull " + (owner ? "owner." : "texture.")), event -> {
 				List < String > skulls = itemMap.getDynamicOwners();
@@ -5757,17 +5756,17 @@ public class Menu {
 				animationPane.addButton(new Button(fillerPaneGItem), 3);
 			}
 			animationPane.addButton(new Button(ItemHandler.getItem(itemMap.getMaterial().toString(), 1, false, "&c&l&nMaterial", "&7", "&7*Add additional material types", "&7to have the item change between.", "&9&lAnimated Materials: &a" + 
-			(StringUtils.getUtils().nullCheck(itemMap.getDynamicMaterials() + "") != "NONE" ? "YES" : "NONE")), event -> animateMaterialPane(player, itemMap)));
+			(StringUtils.nullCheck(itemMap.getDynamicMaterials() + "") != "NONE" ? "YES" : "NONE")), event -> animateMaterialPane(player, itemMap)));
 			animationPane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, false, "&a&l&nName", "&7", "&7*Add additional custom names", "&7to have the item change between.", "&9&lAnimated Names: &a" + 
-			(StringUtils.getUtils().nullCheck(itemMap.getDynamicNames() + "") != "NONE" ? "YES" : "NONE")), event -> animatedNamePane(player, itemMap)));
+			(StringUtils.nullCheck(itemMap.getDynamicNames() + "") != "NONE" ? "YES" : "NONE")), event -> animatedNamePane(player, itemMap)));
 			animationPane.addButton(new Button(ItemHandler.getItem("386", 1, false, "&b&l&nLore", "&7", "&7*Add additional custom lores", "&7to have the item change between.", "&9&lAnimated Lores: &a" + 
-			(StringUtils.getUtils().nullCheck(itemMap.getDynamicLores() + "") != "NONE" ? "YES" : "NONE")), event -> animatedLorePane(player, itemMap)));
+			(StringUtils.nullCheck(itemMap.getDynamicLores() + "") != "NONE" ? "YES" : "NONE")), event -> animatedLorePane(player, itemMap)));
 			if (itemMap.getMaterial().toString().contains("PLAYER_HEAD") || itemMap.getMaterial().toString().contains("SKULL_ITEM")) {
 				animationPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GOLDEN_HELMET" : "314"), 1, false, "&a&lSkull Owner", "&7", "&7*Add additional skull owners", "&7to have the item change between.", "&7", "&7You can only define skull owner", 
-						"&7or skull texture, this will", "&7remove any skull textures.", "&9&lAnimated Owners: &a" + (StringUtils.getUtils().nullCheck(itemMap.getDynamicOwners() + "") != "NONE" ? "YES" : "NONE")), event -> animatedSkullPane(player, itemMap, true)));
+						"&7or skull texture, this will", "&7remove any skull textures.", "&9&lAnimated Owners: &a" + (StringUtils.nullCheck(itemMap.getDynamicOwners() + "") != "NONE" ? "YES" : "NONE")), event -> animatedSkullPane(player, itemMap, true)));
 				animationPane.addButton(new Button(ItemHandler.getItem("STRING", 1, false, "&b&lSkull Texture", "&7", "&7*Add additional skull textures", "&7to have the item change between.", "&7", "&7You can only define skull texture", 
 						"&7or skull owner, this will", "&7remove any skull owners.", "&7", "&7Skull textures can be found", "&7at websites like &aminecraft-heads.com", "&7and the value is listed under", "&7the OTHER section.", 
-						"&9&lAnimated Textures: &a" + (StringUtils.getUtils().nullCheck(itemMap.getDynamicTextures() + "") != "NONE" ? "YES" : "NONE")), event -> animatedSkullPane(player, itemMap, false)));
+						"&9&lAnimated Textures: &a" + (StringUtils.nullCheck(itemMap.getDynamicTextures() + "") != "NONE" ? "YES" : "NONE")), event -> animatedSkullPane(player, itemMap, false)));
 				animationPane.addButton(new Button(fillerPaneGItem), 2);
 			} else {
 				animationPane.addButton(new Button(fillerPaneGItem), 3);
@@ -5792,13 +5791,13 @@ public class Menu {
 		Interface limitPane = new Interface(false, 2, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			List < String > limitModes = new ArrayList < String > ();
-			if (StringUtils.getUtils().containsIgnoreCase(itemMap.getLimitModes(), "ADVENTURE")) {
+			if (StringUtils.containsIgnoreCase(itemMap.getLimitModes(), "ADVENTURE")) {
 				limitModes.add("ADVENTURE");
 			}
-			if (StringUtils.getUtils().containsIgnoreCase(itemMap.getLimitModes(), "SURVIVAL")) {
+			if (StringUtils.containsIgnoreCase(itemMap.getLimitModes(), "SURVIVAL")) {
 				limitModes.add("SURVIVAL");
 			}
-			if (StringUtils.getUtils().containsIgnoreCase(itemMap.getLimitModes(), "CREATIVE")) {
+			if (StringUtils.containsIgnoreCase(itemMap.getLimitModes(), "CREATIVE")) {
 				limitModes.add("CREATIVE");
 			}
 			limitPane.addButton(new Button(fillerPaneGItem), 3);
@@ -5881,7 +5880,7 @@ public class Menu {
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
-				if (StringUtils.getUtils().isInt(ChatColor.stripColor(event.getMessage()))) {
+				if (StringUtils.isInt(ChatColor.stripColor(event.getMessage()))) {
 					itemMap.setInteractCooldown(Integer.parseInt(ChatColor.stripColor(event.getMessage())));
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[16] = "USAGE COOLDOWN";
@@ -6118,7 +6117,7 @@ public class Menu {
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
-				if (StringUtils.getUtils().isDouble(ChatColor.stripColor(event.getMessage()))) {
+				if (StringUtils.isDouble(ChatColor.stripColor(event.getMessage()))) {
 					if (entity != null) { 
 						Map<EntityType, Double> mobsDrop = itemMap.getMobsDrop();
 						mobsDrop.put(entity, Double.parseDouble(ChatColor.stripColor(event.getMessage())));
@@ -6174,12 +6173,12 @@ public class Menu {
 		SchedulerUtils.runAsync(() -> {
 			conditionsPane.addButton(new Button(fillerPaneBItem), 3);
 			conditionsPane.addButton(new Button(ItemHandler.getItem("BOOK", 1, false, "&b&l&nCommand&b&l Conditions", "&7", "&7*Condition(s) that must be met", 
-					"&7in order to execute item commands.", "&7", "&9&lENABLED: " + String.valueOf((StringUtils.getUtils().nullCheck(itemMap.getCommandConditions() + "") != "NONE")).toUpperCase()), event -> commandActionPane(player, itemMap)));
+					"&7in order to execute item commands.", "&7", "&9&lENABLED: " + String.valueOf((StringUtils.nullCheck(itemMap.getCommandConditions() + "") != "NONE")).toUpperCase()), event -> commandActionPane(player, itemMap)));
 			conditionsPane.addButton(new Button(ItemHandler.getItem("CACTUS", 1, false, "&b&l&nDisposable&b&l Conditions", "&7", "&7*Condition(s) that must be met", "&7in order for the disposable", "&7itemflag to function.",
 					"&7", "&c&l&nNOTE:&7 The disposable itemflag", "&7must be defined for this", "&7condition to function.",
-					"&7", "&9&lENABLED: " + String.valueOf((StringUtils.getUtils().nullCheck(itemMap.getDisposableConditions() + "") != "NONE")).toUpperCase()), event -> disposableCPane(player, itemMap)));
+					"&7", "&9&lENABLED: " + String.valueOf((StringUtils.nullCheck(itemMap.getDisposableConditions() + "") != "NONE")).toUpperCase()), event -> disposableCPane(player, itemMap)));
 			conditionsPane.addButton(new Button(ItemHandler.getItem("REDSTONE", 1, false, "&b&l&nTrigger&b&l Conditions", "&7", "&7*Condition(s) that must be met", "&7in order to to receive the", 
-					"&7item when performing a trigger.", "&7", "&9&lENABLED: " + String.valueOf((StringUtils.getUtils().nullCheck(itemMap.getTriggerConditions() + "") != "NONE")).toUpperCase()), event -> triggerCPane(player, itemMap)));
+					"&7item when performing a trigger.", "&7", "&9&lENABLED: " + String.valueOf((StringUtils.nullCheck(itemMap.getTriggerConditions() + "") != "NONE")).toUpperCase()), event -> triggerCPane(player, itemMap)));
 			conditionsPane.addButton(new Button(fillerPaneBItem), 3);
 			conditionsPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> creatingPane(player, itemMap)));
 			conditionsPane.addButton(new Button(fillerPaneBItem), 7);
@@ -6200,111 +6199,111 @@ public class Menu {
 		SchedulerUtils.runAsync(() -> {
 			commandPane.addButton(new Button(fillerPaneGItem), 2);
 			commandPane.addButton(new Button(ItemHandler.getItem(ServerUtils.hasSpecificUpdate("1_8") ? "324" : "64", 1, false, "&e&lInteract", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
-					"&7", "&9&lENABLED: &a" + (StringUtils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.INTERACT_ALL.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
+					"&7", "&9&lENABLED: &a" + (StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.INTERACT_ALL.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				commandCPane(player, itemMap, Action.INTERACT_ALL);
 			}));
 			commandPane.addButton(new Button(fillerPaneGItem));
 			commandPane.addButton(new Button(ItemHandler.getItem("CHEST", 1, false, "&e&lInventory", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
-					"&7", "&9&lENABLED: &a" + (StringUtils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.INVENTORY_ALL.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
+					"&7", "&9&lENABLED: &a" + (StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.INVENTORY_ALL.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				commandCPane(player, itemMap, Action.INVENTORY_ALL);
 			}));
 			commandPane.addButton(new Button(fillerPaneGItem));
 			commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "PISTON" : "PISTON_BASE"), 1, false, "&e&lPhysical", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
-					"&7", "&9&lENABLED: &a" + (StringUtils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.PHYSICAL.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
+					"&7", "&9&lENABLED: &a" + (StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.PHYSICAL.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				commandCPane(player, itemMap, Action.PHYSICAL);
 			}));
 			commandPane.addButton(new Button(fillerPaneGItem), 2);
 			commandPane.addButton(new Button(ItemHandler.getItem("DIAMOND_HELMET", 1, false, "&e&lOn-Equip", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
-					"&7", "&9&lENABLED: &a" + (StringUtils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.ON_EQUIP.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
+					"&7", "&9&lENABLED: &a" + (StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.ON_EQUIP.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				commandCPane(player, itemMap, Action.ON_EQUIP);
 			}));
 			commandPane.addButton(new Button(fillerPaneGItem));
 			commandPane.addButton(new Button(ItemHandler.getItem("IRON_HELMET", 1, false, "&e&lUn-Equip", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
-					"&7", "&9&lENABLED: &a" + (StringUtils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.UN_EQUIP.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
+					"&7", "&9&lENABLED: &a" + (StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.UN_EQUIP.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				commandCPane(player, itemMap, Action.UN_EQUIP);
 			}));
 			commandPane.addButton(new Button(fillerPaneGItem));
 			commandPane.addButton(new Button(ItemHandler.getItem("TORCH", 1, false, "&e&lOn-Hold", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
-					"&7", "&9&lENABLED: &a" + (StringUtils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.ON_HOLD.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
+					"&7", "&9&lENABLED: &a" + (StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.ON_HOLD.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				commandCPane(player, itemMap, Action.ON_HOLD);
 			}));
 			commandPane.addButton(new Button(fillerPaneGItem));
 			commandPane.addButton(new Button(ItemHandler.getItem("EMERALD", 1, false, "&e&lOn-Receive", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
-					"&7", "&9&lENABLED: &a" + (StringUtils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.ON_RECEIVE.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
+					"&7", "&9&lENABLED: &a" + (StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.ON_RECEIVE.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				commandCPane(player, itemMap, Action.ON_RECEIVE);
 			}));
 			commandPane.addButton(new Button(fillerPaneGItem));
 			commandPane.addButton(new Button(ItemHandler.getItem("397", 1, false, "&e&lOn-Death", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
-					"&7", "&9&lENABLED: &a" + (StringUtils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.ON_DEATH.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
+					"&7", "&9&lENABLED: &a" + (StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.ON_DEATH.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				commandCPane(player, itemMap, Action.ON_DEATH);
 			}));
 			commandPane.addButton(new Button(ItemHandler.getItem("20", 1, false, "&e&lInteract-Air", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
-					"&7", "&9&lENABLED: &a" + (StringUtils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.INTERACT_AIR.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
+					"&7", "&9&lENABLED: &a" + (StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.INTERACT_AIR.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				commandCPane(player, itemMap, Action.INTERACT_AIR);
 			}));
 			commandPane.addButton(new Button(ItemHandler.getItem("95:3", 1, false, "&e&lInteract-Air-Left", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
-					"&7", "&9&lENABLED: &a" + (StringUtils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.INTERACT_LEFT_AIR.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
+					"&7", "&9&lENABLED: &a" + (StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.INTERACT_LEFT_AIR.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				commandCPane(player, itemMap, Action.INTERACT_LEFT_AIR);
 			}));
 			commandPane.addButton(new Button(ItemHandler.getItem("95:6", 1, false, "&e&lInteract-Air-Right", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
-					"&7", "&9&lENABLED: &a" + (StringUtils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.INTERACT_RIGHT_AIR.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
+					"&7", "&9&lENABLED: &a" + (StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.INTERACT_RIGHT_AIR.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				commandCPane(player, itemMap, Action.INTERACT_RIGHT_AIR);
 			}));
 			commandPane.addButton(new Button(ItemHandler.getItem("2", 1, false, "&e&lInteract-Block", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
-					"&7", "&9&lENABLED: &a" + (StringUtils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.INTERACT_BLOCK.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
+					"&7", "&9&lENABLED: &a" + (StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.INTERACT_BLOCK.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				commandCPane(player, itemMap, Action.INTERACT_BLOCK);
 			}));
 			commandPane.addButton(new Button(ItemHandler.getItem("1", 1, false, "&e&lInteract-Block-Left", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
-					"&7", "&9&lENABLED: &a" + (StringUtils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.INTERACT_LEFT_BLOCK.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
+					"&7", "&9&lENABLED: &a" + (StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.INTERACT_LEFT_BLOCK.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				commandCPane(player, itemMap, Action.INTERACT_LEFT_BLOCK);
 			}));
 			commandPane.addButton(new Button(ItemHandler.getItem("4", 1, false, "&e&lInteract-Block-Right", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
-					"&7", "&9&lENABLED: &a" + (StringUtils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.INTERACT_RIGHT_BLOCK.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
+					"&7", "&9&lENABLED: &a" + (StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.INTERACT_RIGHT_BLOCK.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				commandCPane(player, itemMap, Action.INTERACT_RIGHT_BLOCK);
 			}));
 			commandPane.addButton(new Button(ItemHandler.getItem("330", 1, false, "&e&lInteract-Left", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
-					"&7", "&9&lENABLED: &a" + (StringUtils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.INTERACT_LEFT_ALL.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
+					"&7", "&9&lENABLED: &a" + (StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.INTERACT_LEFT_ALL.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				commandCPane(player, itemMap, Action.INTERACT_LEFT_ALL);
 			}));
 			commandPane.addButton(new Button(ItemHandler.getItem(ServerUtils.hasSpecificUpdate("1_8") ? "324" : "64", 1, false, "&e&lInteract-Right", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
-					"&7", "&9&lENABLED: &a" + (StringUtils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.INTERACT_RIGHT_ALL.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
+					"&7", "&9&lENABLED: &a" + (StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.INTERACT_RIGHT_ALL.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				commandCPane(player, itemMap, Action.INTERACT_RIGHT_ALL);
 			}));
 			commandPane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, false, "&e&lInventory-Swap-Cursor", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
-					"&7", "&9&lENABLED: &a" + (StringUtils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.INVENTORY_SWAP_CURSOR.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
+					"&7", "&9&lENABLED: &a" + (StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.INVENTORY_SWAP_CURSOR.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				commandCPane(player, itemMap, Action.INVENTORY_SWAP_CURSOR);
 			}));
 			commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "SNOWBALL" : "SNOW_BALL"), 8, false, "&e&lInventory-Middle", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
-					"&7", "&9&lENABLED: &a" + (StringUtils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.INVENTORY_MIDDLE.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
+					"&7", "&9&lENABLED: &a" + (StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.INVENTORY_MIDDLE.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				commandCPane(player, itemMap, Action.INVENTORY_MIDDLE);
 			}));
 			commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "ENCHANTED_GOLDEN_APPLE" : "322:1"), 1, false, "&e&lInventory-Creative", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
-					"&7", "&9&lENABLED: &a" + (StringUtils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.INVENTORY_CREATIVE.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
+					"&7", "&9&lENABLED: &a" + (StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.INVENTORY_CREATIVE.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				commandCPane(player, itemMap, Action.INVENTORY_CREATIVE);
 			}));
 			commandPane.addButton(new Button(ItemHandler.getItem("ENDER_CHEST", 1, false, "&e&lInventory-Left", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
-					"&7", "&9&lENABLED: &a" + (StringUtils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.INVENTORY_LEFT.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
+					"&7", "&9&lENABLED: &a" + (StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.INVENTORY_LEFT.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				commandCPane(player, itemMap, Action.INVENTORY_LEFT);
 			}));
 			commandPane.addButton(new Button(ItemHandler.getItem("CHEST", 1, false, "&e&lInventory-Right", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
-					"&7", "&9&lENABLED: &a" + (StringUtils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.INVENTORY_RIGHT.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
+					"&7", "&9&lENABLED: &a" + (StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.INVENTORY_RIGHT.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				commandCPane(player, itemMap, Action.INVENTORY_RIGHT);
 			}));
 			commandPane.addButton(new Button(ItemHandler.getItem("44", 2, false, "&e&lInventory-Shift-Left", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
-					"&7", "&9&lENABLED: &a" + (StringUtils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.INVENTORY_SHIFT_LEFT.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
+					"&7", "&9&lENABLED: &a" + (StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.INVENTORY_SHIFT_LEFT.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				commandCPane(player, itemMap, Action.INVENTORY_SHIFT_LEFT);
 			}));
 			commandPane.addButton(new Button(ItemHandler.getItem("44:3", 2, false, "&e&lInventory-Shift-Right", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
-					"&7", "&9&lENABLED: &a" + (StringUtils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.INVENTORY_SHIFT_RIGHT.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
+					"&7", "&9&lENABLED: &a" + (StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.INVENTORY_SHIFT_RIGHT.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				commandCPane(player, itemMap, Action.INVENTORY_SHIFT_RIGHT);
 			}));
 			commandPane.addButton(new Button(fillerPaneGItem));
 			commandPane.addButton(new Button(ItemHandler.getItem("LAVA_BUCKET", 1, false, "&e&lOn-Damage", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
-					"&7", "&9&lENABLED: &a" + (StringUtils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.ON_DAMAGE.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
+					"&7", "&9&lENABLED: &a" + (StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.ON_DAMAGE.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				commandCPane(player, itemMap, Action.ON_DAMAGE);
 			}));
 			commandPane.addButton(new Button(ItemHandler.getItem("DIAMOND_SWORD", 1, false, "&e&lOn-Hit", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
-					"&7", "&9&lENABLED: &a" + (StringUtils.getUtils().nullCheck(itemMap.getCommandConditions().get(Action.ON_HIT.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
+					"&7", "&9&lENABLED: &a" + (StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.ON_HIT.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				commandCPane(player, itemMap, Action.ON_HIT);
 			}));
 			commandPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item conditions menu."), event -> conditionsPane(player, itemMap)));
@@ -6324,14 +6323,13 @@ public class Menu {
     */
 	private static void commandCPane(final Player player, final ItemMap itemMap, final Action commandAction) {
 		Interface conditionsPane = new Interface(true, 2, GUIName, player);
-		StringUtils.getUtils();
 		conditionsPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the command actions menu."), event -> commandActionPane(player, itemMap)));
 		SchedulerUtils.runAsync(() -> {
 			final String commandIdent = commandAction.config().replace("-", " ").replace(".", "");
-			conditionsPane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, (StringUtils.getUtils().nullCheck(itemMap.getCommandMessages().get(commandAction.config())) != "NONE"), "&c&l" + String.valueOf(commandIdent.charAt(0)).toUpperCase() + commandIdent.substring(1) + " Fail Message", "&7", "&7*An optional message to be", "&7sent when the player does not", "&7meet the commands conditions.",
-			"&7", "&9&lMESSAGE: &a" + (StringUtils.getUtils().nullCheck(itemMap.getCommandMessages().get(commandAction.config())) != "NONE" ? itemMap.getCommandMessages().get(commandAction.config()) : "NONE")),
+			conditionsPane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, (StringUtils.nullCheck(itemMap.getCommandMessages().get(commandAction.config())) != "NONE"), "&c&l" + String.valueOf(commandIdent.charAt(0)).toUpperCase() + commandIdent.substring(1) + " Fail Message", "&7", "&7*An optional message to be", "&7sent when the player does not", "&7meet the commands conditions.",
+			"&7", "&9&lMESSAGE: &a" + (StringUtils.nullCheck(itemMap.getCommandMessages().get(commandAction.config())) != "NONE" ? itemMap.getCommandMessages().get(commandAction.config()) : "NONE")),
 			event -> {
-				if (StringUtils.getUtils().nullCheck(itemMap.getCommandMessages().get(commandAction.config())) != "NONE") {
+				if (StringUtils.nullCheck(itemMap.getCommandMessages().get(commandAction.config())) != "NONE") {
 					Map<String, String> messages = itemMap.getCommandMessages();
 					messages.put(commandAction.config(), null);
 					itemMap.setCommandMessages(messages);
@@ -6396,10 +6394,10 @@ public class Menu {
 		Interface conditionsPane = new Interface(true, 2, GUIName, player);
 		conditionsPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item conditions menu."), event -> conditionsPane(player, itemMap)));
 		SchedulerUtils.runAsync(() -> {
-			conditionsPane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, (StringUtils.getUtils().nullCheck(itemMap.getDisposableMessage()) != "NONE"), "&c&lDisposable Fail Message", "&7", "&7*An optional message to be", "&7sent when the player does not", "&7meet the disposable conditions.",
-			"&7", "&9&lMESSAGE: &a" + (StringUtils.getUtils().nullCheck(itemMap.getDisposableMessage()) != "NONE" ? itemMap.getDisposableMessage() : "NONE")),
+			conditionsPane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, (StringUtils.nullCheck(itemMap.getDisposableMessage()) != "NONE"), "&c&lDisposable Fail Message", "&7", "&7*An optional message to be", "&7sent when the player does not", "&7meet the disposable conditions.",
+			"&7", "&9&lMESSAGE: &a" + (StringUtils.nullCheck(itemMap.getDisposableMessage()) != "NONE" ? itemMap.getDisposableMessage() : "NONE")),
 			event -> {
-				if (StringUtils.getUtils().nullCheck(itemMap.getDisposableMessage()) != "NONE") {
+				if (StringUtils.nullCheck(itemMap.getDisposableMessage()) != "NONE") {
 					itemMap.setDisposableMessage(null);
 					disposableCPane(player, itemMap);
 				} else {
@@ -6455,10 +6453,10 @@ public class Menu {
 		Interface conditionsPane = new Interface(true, 2, GUIName, player);
 		conditionsPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item conditions menu."), event -> conditionsPane(player, itemMap)));
 		SchedulerUtils.runAsync(() -> {
-			conditionsPane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, (StringUtils.getUtils().nullCheck(itemMap.getTriggerMessage()) != "NONE"), "&c&lTrigger Fail Message", "&7", "&7*An optional message to be", "&7sent when the player does not", "&7meet the trigger conditions.",
-			"&7", "&9&lMESSAGE: &a" + (StringUtils.getUtils().nullCheck(itemMap.getTriggerMessage()) != "NONE" ? itemMap.getTriggerMessage() : "NONE")),
+			conditionsPane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, (StringUtils.nullCheck(itemMap.getTriggerMessage()) != "NONE"), "&c&lTrigger Fail Message", "&7", "&7*An optional message to be", "&7sent when the player does not", "&7meet the trigger conditions.",
+			"&7", "&9&lMESSAGE: &a" + (StringUtils.nullCheck(itemMap.getTriggerMessage()) != "NONE" ? itemMap.getTriggerMessage() : "NONE")),
 			event -> {
-				if (StringUtils.getUtils().nullCheck(itemMap.getTriggerMessage()) != "NONE") {
+				if (StringUtils.nullCheck(itemMap.getTriggerMessage()) != "NONE") {
 					itemMap.setTriggerMessage(null);
 					triggerCPane(player, itemMap);
 				} else {
@@ -6675,7 +6673,7 @@ public class Menu {
 				if (stack1 != null) {
 					stack1 = ItemHandler.addLore(stack1, "&9&lDISPLAY: &f" + stack1.getItemMeta().getDisplayName(), "&7", "&7*Create a recipe that can be used.");
 					ItemMeta meta = stack1.getItemMeta();
-					meta.setDisplayName(StringUtils.getUtils().translateLayout((itemMap.getRecipe().size() > i ? "&e&l" + itemMap.getRecipe().get(i): "&e&lX"), player));
+					meta.setDisplayName(StringUtils.translateLayout((itemMap.getRecipe().size() > i ? "&e&l" + itemMap.getRecipe().get(i): "&e&lX"), player));
 					stack1.setItemMeta(meta);
 					
 					recipePane.addButton(new Button(stack1, event -> {
@@ -6843,9 +6841,9 @@ public class Menu {
 				break;
 			}
 		}
-		if (!StringUtils.getUtils().containsIgnoreCase(material, "AIR") && !ingredients.containsValue(material)) {
+		if (!StringUtils.containsIgnoreCase(material, "AIR") && !ingredients.containsValue(material)) {
 			ingredients.put(character, material);
-		} else if (StringUtils.getUtils().containsIgnoreCase(material, "AIR")) {
+		} else if (StringUtils.containsIgnoreCase(material, "AIR")) {
 			int count = 0;
 			for (Character recipes: recipe) {
 				if (recipes.equals(recipe.get(position))) {
@@ -6859,7 +6857,7 @@ public class Menu {
 		while (position >= recipe.size()) {
 			recipe.add('X');
 		}
-		recipe.set(position, (!StringUtils.getUtils().containsIgnoreCase(material, "AIR") ? character : 'X'));
+		recipe.set(position, (!StringUtils.containsIgnoreCase(material, "AIR") ? character : 'X'));
 		itemMap.setRecipe(recipe);
 		itemMap.setIngredients(ingredients);
 		recipePane(player, itemMap);
@@ -6878,7 +6876,7 @@ public class Menu {
 			bannerPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> creatingPane(player, itemMap)));
 			for (PatternType pattern: PatternType.values()) {
 				String patternString = "NONE";
-				if (StringUtils.getUtils().nullCheck(itemMap.getBannerPatterns().toString()) != "NONE") {
+				if (StringUtils.nullCheck(itemMap.getBannerPatterns().toString()) != "NONE") {
 					for (Pattern patterns: itemMap.getBannerPatterns()) {
 						if (patterns.getPattern() == pattern) {
 							patternString = patterns.getColor() + ":" + patterns.getPattern().name().toUpperCase();
@@ -6891,7 +6889,7 @@ public class Menu {
 						"&9&lInformation: &a" + checkPattern : "")), event -> {
 					if (checkPattern != "NONE") {
 						List < Pattern > patternList = itemMap.getBannerPatterns();
-						if (StringUtils.getUtils().nullCheck(itemMap.getBannerPatterns().toString()) != "NONE") {
+						if (StringUtils.nullCheck(itemMap.getBannerPatterns().toString()) != "NONE") {
 							for (Pattern patterns: patternList) {
 							if (patterns.getPattern() == pattern) {
 									patternList.remove(patterns);
@@ -6944,7 +6942,7 @@ public class Menu {
 			for (PotionEffectType potion: PotionEffectType.values()) {
 				if (potion != null) {
 					String potionString = "NONE";
-					if (StringUtils.getUtils().nullCheck(itemMap.getPotionEffect().toString()) != "NONE") {
+					if (StringUtils.nullCheck(itemMap.getPotionEffect().toString()) != "NONE") {
 						for (PotionEffect potions: itemMap.getPotionEffect()) {
 							if (potions.getType() == potion) {
 								potionString = potions.getType().getName().toUpperCase() + ":" + potions.getAmplifier() + ":" + (potions.getDuration());
@@ -6957,7 +6955,7 @@ public class Menu {
 							(checkPotion != "NONE" ? "&9&lInformation: &a" + checkPotion : "")), event -> {
 						if (checkPotion != "NONE") {
 							List < PotionEffect > potionEffects = itemMap.getPotionEffect();
-							if (StringUtils.getUtils().nullCheck(itemMap.getPotionEffect().toString()) != "NONE") {
+							if (StringUtils.nullCheck(itemMap.getPotionEffect().toString()) != "NONE") {
 								for (PotionEffect potions: potionEffects) {
 									if (potions.getType() == potion) {
 										potionEffects.remove(potions);
@@ -6996,7 +6994,7 @@ public class Menu {
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
-				if (StringUtils.getUtils().isInt(ChatColor.stripColor(event.getMessage()))) {
+				if (StringUtils.isInt(ChatColor.stripColor(event.getMessage()))) {
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[16] = "EFFECT LEVEL";
 					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
@@ -7037,7 +7035,7 @@ public class Menu {
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
-				if (StringUtils.getUtils().isInt(ChatColor.stripColor(event.getMessage()))) {
+				if (StringUtils.isInt(ChatColor.stripColor(event.getMessage()))) {
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[16] = "EFFECT DURATION";
 					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
@@ -7080,7 +7078,7 @@ public class Menu {
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
-				if (StringUtils.getUtils().isInt(ChatColor.stripColor(event.getMessage()))) {
+				if (StringUtils.isInt(ChatColor.stripColor(event.getMessage()))) {
 					itemMap.setFireworkPower(Integer.parseInt(ChatColor.stripColor(event.getMessage())));
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[16] = "FIREWORK POWER";
@@ -7115,10 +7113,10 @@ public class Menu {
 		SchedulerUtils.runAsync(() -> {
 			colorPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the special settings menu."), event -> otherPane(player, itemMap)));
 			for (DyeColor color: DyeColor.values()) {
-				colorPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GRAY_DYE" : "351:8"), 1, StringUtils.getUtils().containsValue(itemMap.getFireworkColor(), color.name()), "&f" + color.name(), 
-						"&7", "&7*This will be the color", "&7of your firework charge.", "&9&lENABLED: &a" + (StringUtils.getUtils().containsValue(itemMap.getFireworkColor(), color.name()) + "").toUpperCase()), event -> {
+				colorPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GRAY_DYE" : "351:8"), 1, StringUtils.containsValue(itemMap.getFireworkColor(), color.name()), "&f" + color.name(), 
+						"&7", "&7*This will be the color", "&7of your firework charge.", "&9&lENABLED: &a" + (StringUtils.containsValue(itemMap.getFireworkColor(), color.name()) + "").toUpperCase()), event -> {
 					List < DyeColor > colors = itemMap.getFireworkColor();
-					if (StringUtils.getUtils().containsIgnoreCase(itemMap.getFireworkColor().toString(), color.name())) {
+					if (StringUtils.containsIgnoreCase(itemMap.getFireworkColor().toString(), color.name())) {
 						colors.remove(color);
 					} else {
 						colors.add(color);
@@ -7356,7 +7354,7 @@ public class Menu {
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
-				if (StringUtils.getUtils().isInt(ChatColor.stripColor(event.getMessage())) || StringUtils.getUtils().isDouble(ChatColor.stripColor(event.getMessage()))) {
+				if (StringUtils.isInt(ChatColor.stripColor(event.getMessage())) || StringUtils.isDouble(ChatColor.stripColor(event.getMessage()))) {
 					Map<String, Double> attributeList = itemMap.getAttributes();
 					attributeList.put(attribute, Double.parseDouble(ChatColor.stripColor(event.getMessage())));
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
@@ -7397,10 +7395,10 @@ public class Menu {
 			if (itemMap.getMaterial().toString().contains("WRITTEN_BOOK")) {
 				otherPane.addButton(new Button(fillerPaneGItem), 3);
 				otherPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "WRITABLE_BOOK" : "386"), 1, false, "&e&lPages", "&7", "&7*Define custom pages for the book.", 
-						"&9&lPages: &a" + (StringUtils.getUtils().nullCheck(itemMap.getPages() + "") != "NONE" ? "YES" : "NONE")), event -> pagePane(player, itemMap)));
+						"&9&lPages: &a" + (StringUtils.nullCheck(itemMap.getPages() + "") != "NONE" ? "YES" : "NONE")), event -> pagePane(player, itemMap)));
 				otherPane.addButton(new Button(fillerPaneGItem));
-				otherPane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, false, "&a&lAuthor", "&7", "&7*Define the author of the book.", "&9&lAuthor: &a" + StringUtils.getUtils().nullCheck(itemMap.getAuthor())), event -> {
-					if (StringUtils.getUtils().nullCheck(itemMap.getAuthor()) != "NONE") {
+				otherPane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, false, "&a&lAuthor", "&7", "&7*Define the author of the book.", "&9&lAuthor: &a" + StringUtils.nullCheck(itemMap.getAuthor())), event -> {
+					if (StringUtils.nullCheck(itemMap.getAuthor()) != "NONE") {
 						itemMap.setAuthor(null);
 						otherPane(player, itemMap);
 					} else {
@@ -7422,11 +7420,11 @@ public class Menu {
 			} else if (itemMap.getMaterial().toString().contains("PLAYER_HEAD") || itemMap.getMaterial().toString().contains("SKULL_ITEM")) {
 				otherPane.addButton(new Button(fillerPaneGItem), 3);
 				otherPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GOLDEN_HELMET" : "314"), 1, false, "&b&lSkull Owner", "&7", "&7*Define a skull owner for the", "&7head adding that persons skin.", "&7", "&7You can only define skull owner", 
-						"&7or skull texture, this will", "&7remove any skull textures.", "&9&lSkull-Owner: &a" + StringUtils.getUtils().nullCheck(itemMap.getSkull())), event -> {
+						"&7or skull texture, this will", "&7remove any skull textures.", "&9&lSkull-Owner: &a" + StringUtils.nullCheck(itemMap.getSkull())), event -> {
 					if (itemMap.getDynamicOwners() != null && !itemMap.getDynamicOwners().isEmpty()) {
 						animatedSkullPane(player, itemMap, true);
 					} else {
-						if (StringUtils.getUtils().nullCheck(itemMap.getSkull()) != "NONE") {
+						if (StringUtils.nullCheck(itemMap.getSkull()) != "NONE") {
 							itemMap.setSkull(null);
 							otherPane(player, itemMap);
 						} else {
@@ -7449,11 +7447,11 @@ public class Menu {
 				otherPane.addButton(new Button(fillerPaneGItem));
 				otherPane.addButton(new Button(ItemHandler.getItem("STRING", 1, false, "&a&lSkull Texture", "&7", "&7*Add a skull texture for the", "&7head as a custom skin.", "&7", "&7You can only define skull texture", 
 						"&7or skull owner, this will", "&7remove any skull owners.", "&7", "&7Skull textures can be found", "&7at websites like &aminecraft-heads.com", "&7and the value is listed under", "&7the OTHER section.", "&9&lSkull-Texture: &a" + 
-				(StringUtils.getUtils().nullCheck(itemMap.getSkullTexture()) != "NONE" ? (itemMap.getSkullTexture().length() > 40 ? itemMap.getSkullTexture().substring(0, 40) : itemMap.getSkullTexture()) : "")), event -> {
+				(StringUtils.nullCheck(itemMap.getSkullTexture()) != "NONE" ? (itemMap.getSkullTexture().length() > 40 ? itemMap.getSkullTexture().substring(0, 40) : itemMap.getSkullTexture()) : "")), event -> {
 					if (itemMap.getDynamicTextures() != null && !itemMap.getDynamicTextures().isEmpty()) {
 						animatedSkullPane(player, itemMap, false);
 						} else {
-						if (StringUtils.getUtils().nullCheck(itemMap.getSkullTexture()) != "NONE") {
+						if (StringUtils.nullCheck(itemMap.getSkullTexture()) != "NONE") {
 							itemMap.setSkullTexture(null);
 							otherPane(player, itemMap);
 						} else {
@@ -7476,14 +7474,14 @@ public class Menu {
 				otherPane.addButton(new Button(fillerPaneGItem), 3);
 			} else if (itemMap.getMaterial().toString().equalsIgnoreCase("FIREWORK") || itemMap.getMaterial().toString().equalsIgnoreCase("FIREWORK_ROCKET")) {
 				String colorList = "";
-				if (StringUtils.getUtils().nullCheck(itemMap.getFireworkColor().toString()) != "NONE") {
-					for (String split: StringUtils.getUtils().softSplit(StringUtils.getUtils().nullCheck(itemMap.getFireworkColor().toString()))) {
+				if (StringUtils.nullCheck(itemMap.getFireworkColor().toString()) != "NONE") {
+					for (String split: StringUtils.softSplit(StringUtils.nullCheck(itemMap.getFireworkColor().toString()))) {
 						colorList += "&a" + split + " /n ";
 					}
 				}
 				otherPane.addButton(new Button(fillerPaneGItem), 2);
-				otherPane.addButton(new Button(ItemHandler.getItem("EGG", 1, false, "&a&lType", "&7", "&7*Set the style of the explosion.", "&9&lType: &a" + StringUtils.getUtils().nullCheck(itemMap.getFireworkType() + "")), event -> {
-					if (StringUtils.getUtils().nullCheck(itemMap.getFireworkType() + "") != "NONE") {
+				otherPane.addButton(new Button(ItemHandler.getItem("EGG", 1, false, "&a&lType", "&7", "&7*Set the style of the explosion.", "&9&lType: &a" + StringUtils.nullCheck(itemMap.getFireworkType() + "")), event -> {
+					if (StringUtils.nullCheck(itemMap.getFireworkType() + "") != "NONE") {
 						itemMap.setFireworkType(null);
 						otherPane(player, itemMap);
 					} else {
@@ -7507,8 +7505,8 @@ public class Menu {
 					}
 					otherPane(player, itemMap);
 				}));
-				otherPane.addButton(new Button(ItemHandler.getItem("SUGAR", 1, false, "&a&lPower", "&7", "&7*Set the power (distance)", "&7that the firework travels.", "&9&lPower: &a" + StringUtils.getUtils().nullCheck(itemMap.getFireworkPower() + "&7")), event -> {
-					if (StringUtils.getUtils().nullCheck(itemMap.getFireworkPower() + "&7") != "NONE") {
+				otherPane.addButton(new Button(ItemHandler.getItem("SUGAR", 1, false, "&a&lPower", "&7", "&7*Set the power (distance)", "&7that the firework travels.", "&9&lPower: &a" + StringUtils.nullCheck(itemMap.getFireworkPower() + "&7")), event -> {
+					if (StringUtils.nullCheck(itemMap.getFireworkPower() + "&7") != "NONE") {
 						itemMap.setFireworkPower(0);
 						otherPane(player, itemMap);
 					} else {
@@ -7516,7 +7514,7 @@ public class Menu {
 					}
 				}));
 				otherPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "LIME_DYE" : "351:10"), 1, false, "&a&lColor(s)", "&7", "&7*Define the individual colors of the", "&7firework effect type.", 
-						"&9&lColor(s): &a" + (StringUtils.getUtils().nullCheck(colorList) != "NONE" ? colorList : "NONE")), event -> colorPane(player, itemMap)));
+						"&9&lColor(s): &a" + (StringUtils.nullCheck(colorList) != "NONE" ? colorList : "NONE")), event -> colorPane(player, itemMap)));
 				otherPane.addButton(new Button(fillerPaneGItem), 2);
 			} else if (itemMap.getMaterial().toString().contains("LEATHER_")) {
 				Interface colorPane = new Interface(true, 6, GUIName, player);
@@ -7528,7 +7526,7 @@ public class Menu {
 				}
 				otherPane.addButton(new Button(fillerPaneGItem), 3);
 				otherPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_DYE" : "351:11"), 1, false, "&a&lDye", "&7", "&7*Add a custom color to", "&7your leather armor.", "&9&lLeather-Color: &a" +
-				(StringUtils.getUtils().nullCheck(itemMap.getLeatherColor()) != "NONE" ? StringUtils.getUtils().nullCheck(itemMap.getLeatherColor()) : StringUtils.getUtils().nullCheck(itemMap.getLeatherHex()))), event -> {
+				(StringUtils.nullCheck(itemMap.getLeatherColor()) != "NONE" ? StringUtils.nullCheck(itemMap.getLeatherColor()) : StringUtils.nullCheck(itemMap.getLeatherHex()))), event -> {
 					if (itemMap.getLeatherColor() != null) {
 						itemMap.setLeatherColor(null);
 						otherPane(player, itemMap);
@@ -7539,20 +7537,20 @@ public class Menu {
 				if (!ItemHandler.getDesignatedSlot(itemMap.getMaterial()).equalsIgnoreCase("noslot")) {
 					String attributeList = "";
 					String attributeString = "";
-					if (StringUtils.getUtils().nullCheck(itemMap.getAttributes().toString()) != "NONE") {
+					if (StringUtils.nullCheck(itemMap.getAttributes().toString()) != "NONE") {
 						for (String attribute: itemMap.getAttributes().keySet()) {
 							attributeString += attribute + ":" + itemMap.getAttributes().get(attribute) + ", ";
 						}
-						for (String split: StringUtils.getUtils().softSplit(StringUtils.getUtils().nullCheck(attributeString.substring(0, attributeString.length())))) {
+						for (String split: StringUtils.softSplit(StringUtils.nullCheck(attributeString.substring(0, attributeString.length())))) {
 							attributeList += "&a" + split + " /n ";
 						}
 					}
-					otherPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "ENCHANTED_GOLDEN_APPLE" : "322:1"), 1, false, "&a&lAttributes", "&7", "&7*Add a custom attribute to", "&7your armor or weapon.", (StringUtils.getUtils().nullCheck(attributeList) != "NONE" ? "&9&lAttributes: &a" + attributeList : "")), event -> {
+					otherPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "ENCHANTED_GOLDEN_APPLE" : "322:1"), 1, false, "&a&lAttributes", "&7", "&7*Add a custom attribute to", "&7your armor or weapon.", (StringUtils.nullCheck(attributeList) != "NONE" ? "&9&lAttributes: &a" + attributeList : "")), event -> {
 						attributePane(player, itemMap, true);
 					}));
 				} else { otherPane.addButton(new Button(fillerPaneGItem)); }
 				otherPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "WRITABLE_BOOK" : "386"), 1, false, "&a&lHex Color", "&7", "&7*Add a custom hex color", "&7to your leather armor.", "&9&lLeather-Color: &a" + 
-				(StringUtils.getUtils().nullCheck(itemMap.getLeatherHex()) != "NONE" ? StringUtils.getUtils().nullCheck(itemMap.getLeatherHex()) : StringUtils.getUtils().nullCheck(itemMap.getLeatherColor()))), event -> {
+				(StringUtils.nullCheck(itemMap.getLeatherHex()) != "NONE" ? StringUtils.nullCheck(itemMap.getLeatherHex()) : StringUtils.nullCheck(itemMap.getLeatherColor()))), event -> {
 					if (itemMap.getLeatherHex() != null) {
 						itemMap.setLeatherHex(null);
 						otherPane(player, itemMap);
@@ -7594,83 +7592,83 @@ public class Menu {
 		String slotList = "";
 		String slotString = "";
 		ItemStack item = new ItemStack(Material.STONE);
-		if (StringUtils.getUtils().nullCheck(itemMap.getMultipleSlots().toString()) != "NONE") {
+		if (StringUtils.nullCheck(itemMap.getMultipleSlots().toString()) != "NONE") {
 			for (String slot: itemMap.getMultipleSlots()) {
 				slotString += slot + ", ";
 			}
 			if (slotString.length() >= 2) {
-				for (String split: StringUtils.getUtils().softSplit(StringUtils.getUtils().nullCheck(slotString.substring(0, slotString.length() - 2)))) {
+				for (String split: StringUtils.softSplit(StringUtils.nullCheck(slotString.substring(0, slotString.length() - 2)))) {
 					slotList += "&a" + split + " /n ";
 				}
 			}
 		}
 		String itemflagsList = "";
-		if (StringUtils.getUtils().nullCheck(itemMap.getItemFlags()) != "NONE") {
-			for (String split: StringUtils.getUtils().softSplit(itemMap.getItemFlags())) {
+		if (StringUtils.nullCheck(itemMap.getItemFlags()) != "NONE") {
+			for (String split: StringUtils.softSplit(itemMap.getItemFlags())) {
 				itemflagsList += "&a" + split + " /n ";
 			}
 		}
 		String triggersList = "";
-		if (StringUtils.getUtils().nullCheck(itemMap.getTriggers()) != "NONE") {
-			for (String split: StringUtils.getUtils().softSplit(itemMap.getTriggers())) {
+		if (StringUtils.nullCheck(itemMap.getTriggers()) != "NONE") {
+			for (String split: StringUtils.softSplit(itemMap.getTriggers())) {
 				triggersList += "&a" + split + " /n ";
 			}
 		}
 		String worldList = "";
-		if (StringUtils.getUtils().nullCheck(itemMap.getEnabledWorlds().toString()) != "NONE") {
-			for (String split: StringUtils.getUtils().softSplit(StringUtils.getUtils().nullCheck(itemMap.getEnabledWorlds().toString()))) {
+		if (StringUtils.nullCheck(itemMap.getEnabledWorlds().toString()) != "NONE") {
+			for (String split: StringUtils.softSplit(StringUtils.nullCheck(itemMap.getEnabledWorlds().toString()))) {
 				worldList += "&a" + split + " /n ";
 			}
 		}
 		String regionList = "";
-		if (StringUtils.getUtils().nullCheck(itemMap.getEnabledRegions().toString()) != "NONE") {
-			for (String split: StringUtils.getUtils().softSplit(StringUtils.getUtils().nullCheck(itemMap.getEnabledRegions().toString()))) {
+		if (StringUtils.nullCheck(itemMap.getEnabledRegions().toString()) != "NONE") {
+			for (String split: StringUtils.softSplit(StringUtils.nullCheck(itemMap.getEnabledRegions().toString()))) {
 				regionList += "&a" + split + " /n ";
 			}
 		}
 		String enchantList = "";
-		if (StringUtils.getUtils().nullCheck(itemMap.getEnchantments().toString()) != "NONE") {
-			for (String split: StringUtils.getUtils().softSplit(StringUtils.getUtils().nullCheck(itemMap.getEnchantments().toString()))) {
+		if (StringUtils.nullCheck(itemMap.getEnchantments().toString()) != "NONE") {
+			for (String split: StringUtils.softSplit(StringUtils.nullCheck(itemMap.getEnchantments().toString()))) {
 				enchantList += "&a" + split + " /n ";
 			}
 		}
 		String potionList = "";
 		String potionString = "";
-		if (StringUtils.getUtils().nullCheck(itemMap.getPotionEffect().toString()) != "NONE") {
+		if (StringUtils.nullCheck(itemMap.getPotionEffect().toString()) != "NONE") {
 			for (PotionEffect potions: itemMap.getPotionEffect()) {
 				potionString += potions.getType().getName().toUpperCase() + ":" + potions.getAmplifier() + ":" + potions.getDuration() + ", ";
 			}
 			if (potionString.length() >= 2) {
-				for (String split: StringUtils.getUtils().softSplit(StringUtils.getUtils().nullCheck(potionString.substring(0, potionString.length() - 2)))) {
+				for (String split: StringUtils.softSplit(StringUtils.nullCheck(potionString.substring(0, potionString.length() - 2)))) {
 					potionList += "&a" + split + " /n ";
 				}
 			}
 		}
 		String attributeList = "";
 		String attributeString = "";
-		if (StringUtils.getUtils().nullCheck(itemMap.getAttributes().toString()) != "NONE") {
+		if (StringUtils.nullCheck(itemMap.getAttributes().toString()) != "NONE") {
 			for (String attribute: itemMap.getAttributes().keySet()) {
 				attributeString += attribute + ":" + itemMap.getAttributes().get(attribute) + ", ";
 			}
-			for (String split: StringUtils.getUtils().softSplit(StringUtils.getUtils().nullCheck(attributeString.substring(0, attributeString.length())))) {
+			for (String split: StringUtils.softSplit(StringUtils.nullCheck(attributeString.substring(0, attributeString.length())))) {
 				attributeList += "&a" + split + " /n ";
 			}
 		}
 		String patternList = "";
 		String patternString = "";
-		if (ServerUtils.hasSpecificUpdate("1_8") && StringUtils.getUtils().nullCheck(itemMap.getBannerPatterns().toString()) != "NONE") {
+		if (ServerUtils.hasSpecificUpdate("1_8") && StringUtils.nullCheck(itemMap.getBannerPatterns().toString()) != "NONE") {
 			for (Pattern patterns: itemMap.getBannerPatterns()) {
 				patternString += patterns.getColor() + ":" + patterns.getPattern().name().toUpperCase() + ", ";
 			}
 			if (patternString.length() >= 2) {
-				for (String split: StringUtils.getUtils().softSplit(StringUtils.getUtils().nullCheck(patternString.substring(0, patternString.length() - 2)))) {
+				for (String split: StringUtils.softSplit(StringUtils.nullCheck(patternString.substring(0, patternString.length() - 2)))) {
 					patternList += "&a" + split + " /n ";
 				}
 			}
 		}
 		String colorList = "";
-		if (StringUtils.getUtils().nullCheck(itemMap.getFireworkColor().toString()) != "NONE") {
-			for (String split: StringUtils.getUtils().softSplit(StringUtils.getUtils().nullCheck(itemMap.getFireworkColor().toString()))) {
+		if (StringUtils.nullCheck(itemMap.getFireworkColor().toString()) != "NONE") {
+			for (String split: StringUtils.softSplit(StringUtils.nullCheck(itemMap.getFireworkColor().toString()))) {
 				colorList += "&a" + split + " /n ";
 			}
 		}
@@ -7690,38 +7688,38 @@ public class Menu {
 			item = ItemHandler.getItem(itemMap.getMaterial().toString() + ((itemMap.getDataValue() != null && itemMap.getDataValue() != 0) ? ":" + itemMap.getDataValue() : ""), 1, false, "&7*&6&l&nItem Information", "&7", "&9&lNode: &a" + itemMap.getConfigName(), "&9&lMaterial: &a" 
 			+ itemMap.getMaterial().toString() + ((itemMap.getDataValue() != null && itemMap.getDataValue() != 0) ? ":" + itemMap.getDataValue() : ""), 
 					(itemMap.getMultipleSlots() != null && !itemMap.getMultipleSlots().isEmpty() ? "&9&lSlot(s): &a" + slotList : "&9&lSlot: &a" + itemMap.getSlot().toUpperCase()), (itemMap.getCount() != 1 && itemMap.getCount() != 0) ? "&9&lCount: &a" + itemMap.getCount() : "", 
-					((StringUtils.getUtils().nullCheck(itemMap.getCustomName()) != "NONE" && !ItemHandler.getMaterialName(itemMap.getTempItem()).equalsIgnoreCase(itemMap.getCustomName())) ? "&9&lName: &a" + itemMap.getCustomName() : ""), (StringUtils.getUtils().nullCheck(itemMap.getCustomLore().toString()) != "NONE" ? "&9&lLore: &a" + (StringUtils.getUtils().nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",").length() > 40 ? StringUtils.getUtils().nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",").substring(0, 40) : StringUtils.getUtils().nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",")) : ""), 
-					(StringUtils.getUtils().nullCheck(itemMap.getDurability() + "&7") != "NONE" ? "&9&lDurability: &a" + itemMap.getDurability() : ""), (StringUtils.getUtils().nullCheck(itemMap.getData() + "&7") != "NONE" ? "&9&lTexture Data: &a" + itemMap.getData() : ""), (useCommands ? "&9&lCommands: &aYES" : ""), 
-					(StringUtils.getUtils().nullCheck(itemMap.getItemCost() + "") != "NONE" ? "&9&lCommands-Item: &a" + itemMap.getItemCost() : ""), (StringUtils.getUtils().nullCheck(itemMap.getCommandCost() + "&7") != "NONE" ? "&9&lCommands-Cost: &a" + itemMap.getCommandCost() : ""), 
-					(StringUtils.getUtils().nullCheck(itemMap.getCommandReceive() + "&7") != "NONE" ? "&9&lCommands-Receive: &a" + itemMap.getCommandReceive() : ""),
-					(StringUtils.getUtils().nullCheck(itemMap.getCommandSequence() + "") != "NONE" ? "&9&lCommands-Sequence: &a" + itemMap.getCommandSequence() : ""), (StringUtils.getUtils().nullCheck(itemMap.getCommandCooldown() + "&7") != "NONE" ? "&9&lCommands-Cooldown: &a" + itemMap.getCommandCooldown() + " second(s)" : ""), 
-					(StringUtils.getUtils().nullCheck(itemMap.getCooldownMessage()) != "NONE" ? "&9&lCooldown-Message: &a" + itemMap.getCooldownMessage() : ""), (StringUtils.getUtils().nullCheck(itemMap.getCommandSound() + "") != "NONE" ? "&9&lCommands-Sound: &a" + itemMap.getCommandSound() : ""), 
-					(StringUtils.getUtils().nullCheck(itemMap.getCommandParticle() + "") != "NONE" ? "&9&lCommands-Particle: &a" + itemMap.getCommandParticle() : ""), (StringUtils.getUtils().nullCheck(itemMap.getEnchantments().toString()) != "NONE" ? "&9&lEnchantments: &a" + enchantList : ""), 
-					(StringUtils.getUtils().nullCheck(itemMap.getItemFlags()) != "NONE" ? "&9&lItemflags: &a" + itemflagsList : ""), (StringUtils.getUtils().nullCheck(itemMap.getTriggers()) != "NONE" ? "&9&lTriggers: &a" + triggersList : ""), 
-					(StringUtils.getUtils().nullCheck(itemMap.getPermissionNode()) != "NONE" ? "&9&lPermission Node: &a" + itemMap.getPermissionNode() : ""), (StringUtils.getUtils().nullCheck(itemMap.getEnabledWorlds().toString()) != "NONE" ? "&9&lEnabled Worlds: &a" + worldList : ""), 
-					(StringUtils.getUtils().nullCheck(itemMap.getEnabledRegions().toString()) != "NONE" ? "&9&lEnabled Regions: &a" + regionList : ""), (!itemMap.getDynamicMaterials().isEmpty() ? "&9&lMaterial Animations: &aYES" : ""), 
+					((StringUtils.nullCheck(itemMap.getCustomName()) != "NONE" && !ItemHandler.getMaterialName(itemMap.getTempItem()).equalsIgnoreCase(itemMap.getCustomName())) ? "&9&lName: &a" + itemMap.getCustomName() : ""), (StringUtils.nullCheck(itemMap.getCustomLore().toString()) != "NONE" ? "&9&lLore: &a" + (StringUtils.nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",").length() > 40 ? StringUtils.nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",").substring(0, 40) : StringUtils.nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",")) : ""), 
+					(StringUtils.nullCheck(itemMap.getDurability() + "&7") != "NONE" ? "&9&lDurability: &a" + itemMap.getDurability() : ""), (StringUtils.nullCheck(itemMap.getData() + "&7") != "NONE" ? "&9&lTexture Data: &a" + itemMap.getData() : ""), (useCommands ? "&9&lCommands: &aYES" : ""), 
+					(StringUtils.nullCheck(itemMap.getItemCost() + "") != "NONE" ? "&9&lCommands-Item: &a" + itemMap.getItemCost() : ""), (StringUtils.nullCheck(itemMap.getCommandCost() + "&7") != "NONE" ? "&9&lCommands-Cost: &a" + itemMap.getCommandCost() : ""), 
+					(StringUtils.nullCheck(itemMap.getCommandReceive() + "&7") != "NONE" ? "&9&lCommands-Receive: &a" + itemMap.getCommandReceive() : ""),
+					(StringUtils.nullCheck(itemMap.getCommandSequence() + "") != "NONE" ? "&9&lCommands-Sequence: &a" + itemMap.getCommandSequence() : ""), (StringUtils.nullCheck(itemMap.getCommandCooldown() + "&7") != "NONE" ? "&9&lCommands-Cooldown: &a" + itemMap.getCommandCooldown() + " second(s)" : ""), 
+					(StringUtils.nullCheck(itemMap.getCooldownMessage()) != "NONE" ? "&9&lCooldown-Message: &a" + itemMap.getCooldownMessage() : ""), (StringUtils.nullCheck(itemMap.getCommandSound() + "") != "NONE" ? "&9&lCommands-Sound: &a" + itemMap.getCommandSound() : ""), 
+					(StringUtils.nullCheck(itemMap.getCommandParticle() + "") != "NONE" ? "&9&lCommands-Particle: &a" + itemMap.getCommandParticle() : ""), (StringUtils.nullCheck(itemMap.getEnchantments().toString()) != "NONE" ? "&9&lEnchantments: &a" + enchantList : ""), 
+					(StringUtils.nullCheck(itemMap.getItemFlags()) != "NONE" ? "&9&lItemflags: &a" + itemflagsList : ""), (StringUtils.nullCheck(itemMap.getTriggers()) != "NONE" ? "&9&lTriggers: &a" + triggersList : ""), 
+					(StringUtils.nullCheck(itemMap.getPermissionNode()) != "NONE" ? "&9&lPermission Node: &a" + itemMap.getPermissionNode() : ""), (StringUtils.nullCheck(itemMap.getEnabledWorlds().toString()) != "NONE" ? "&9&lEnabled Worlds: &a" + worldList : ""), 
+					(StringUtils.nullCheck(itemMap.getEnabledRegions().toString()) != "NONE" ? "&9&lEnabled Regions: &a" + regionList : ""), (!itemMap.getDynamicMaterials().isEmpty() ? "&9&lMaterial Animations: &aYES" : ""), 
 					(!itemMap.getDynamicNames().isEmpty() ? "&9&lName Animations: &aYES" : ""), (!itemMap.getDynamicLores().isEmpty() ? "&9&lLore Animations: &aYES" : ""), 
-					(!itemMap.getDynamicOwners().isEmpty() || !itemMap.getDynamicTextures().isEmpty() ? "&9&lSkull Animations: &aYES" : ""), (StringUtils.getUtils().nullCheck(itemMap.getLimitModes()) != "NONE" ? "&9&lLimit-Modes: &a" + itemMap.getLimitModes() : ""), 
-					(StringUtils.getUtils().nullCheck(itemMap.getProbability() + "&a%") != "NONE" ? "&9&lProbability: &a" + itemMap.getProbability() + "%" : ""), 
-					(StringUtils.getUtils().nullCheck(itemMap.getInteractCooldown() + "&7") != "NONE" ? "&9&lUse-Cooldown: &a" + itemMap.getInteractCooldown() : ""), 
-					(StringUtils.getUtils().nullCheck(itemMap.getLeatherColor()) != "NONE" ? "&9&lLeather Color: &a" + itemMap.getLeatherColor() : ""), (StringUtils.getUtils().nullCheck(itemMap.getLeatherHex()) != "NONE" ? "&9&lLeather Color: &a" + itemMap.getLeatherHex() : ""),
-					(StringUtils.getUtils().nullCheck(itemMap.getMapImage()) != "NONE" ? "&9&lMap-Image: &a" + itemMap.getMapImage() : ""), (StringUtils.getUtils().nullCheck(itemMap.getChargeColor() + "") != "NONE" ? "&9&lCharge Color: &a" + itemMap.getChargeColor() : ""),
-					(StringUtils.getUtils().nullCheck(patternList) != "NONE" ? "&9&lBanner Meta: &a" + patternList : ""), (StringUtils.getUtils().nullCheck(potionList) != "NONE" ? "&9&lPotion-Effects: &a" + potionList : ""), (itemMap.getIngredients() != null && !itemMap.getIngredients().isEmpty() ? "&9&lRecipe: &aYES" : ""),
+					(!itemMap.getDynamicOwners().isEmpty() || !itemMap.getDynamicTextures().isEmpty() ? "&9&lSkull Animations: &aYES" : ""), (StringUtils.nullCheck(itemMap.getLimitModes()) != "NONE" ? "&9&lLimit-Modes: &a" + itemMap.getLimitModes() : ""), 
+					(StringUtils.nullCheck(itemMap.getProbability() + "&a%") != "NONE" ? "&9&lProbability: &a" + itemMap.getProbability() + "%" : ""), 
+					(StringUtils.nullCheck(itemMap.getInteractCooldown() + "&7") != "NONE" ? "&9&lUse-Cooldown: &a" + itemMap.getInteractCooldown() : ""), 
+					(StringUtils.nullCheck(itemMap.getLeatherColor()) != "NONE" ? "&9&lLeather Color: &a" + itemMap.getLeatherColor() : ""), (StringUtils.nullCheck(itemMap.getLeatherHex()) != "NONE" ? "&9&lLeather Color: &a" + itemMap.getLeatherHex() : ""),
+					(StringUtils.nullCheck(itemMap.getMapImage()) != "NONE" ? "&9&lMap-Image: &a" + itemMap.getMapImage() : ""), (StringUtils.nullCheck(itemMap.getChargeColor() + "") != "NONE" ? "&9&lCharge Color: &a" + itemMap.getChargeColor() : ""),
+					(StringUtils.nullCheck(patternList) != "NONE" ? "&9&lBanner Meta: &a" + patternList : ""), (StringUtils.nullCheck(potionList) != "NONE" ? "&9&lPotion-Effects: &a" + potionList : ""), (itemMap.getIngredients() != null && !itemMap.getIngredients().isEmpty() ? "&9&lRecipe: &aYES" : ""),
 					(!mobs.isEmpty() ? "&9&lMobs Drop: &a" + mobs.substring(0, mobs.length() - 2) : ""), (!blocks.isEmpty() ? "&9&lBlocks Drop: &a" + blocks.substring(0, blocks.length() - 2) : ""), 
-					(StringUtils.getUtils().nullCheck(itemMap.getCommandConditions() + "") != "NONE" ? "&9&lCommand Conditions: &aYES" : ""), (StringUtils.getUtils().nullCheck(itemMap.getDisposableConditions() + "") != "NONE" ? "&9&lDisposable Conditions: &aYES" : ""), 
-					(StringUtils.getUtils().nullCheck(itemMap.getTriggerConditions() + "") != "NONE" ? "&9&lTrigger Conditions: &aYES" : ""),
-					(StringUtils.getUtils().nullCheck(itemMap.getNBTValues() + "") != "NONE" ? "&9&lNBT Properties: &aYES" : ""), (StringUtils.getUtils().nullCheck(itemMap.getContents() + "") != "NONE" ? "&9&lContents: &aYES" : ""),
-					(StringUtils.getUtils().nullCheck(attributeList) != "NONE" ? "&9&lAttributes: &a" + attributeList : ""), (StringUtils.getUtils().nullCheck(itemMap.getPages() + "") != "NONE" ? "&9&lBook Pages: &aYES" : ""),
-					(StringUtils.getUtils().nullCheck(itemMap.getAuthor()) != "NONE" ? "&9&lBook Author: &a" + itemMap.getAuthor() : ""), (StringUtils.getUtils().nullCheck(itemMap.getSkull()) != "NONE" ? "&9&lSkull-Owner: &a" + itemMap.getSkull() : ""), 
-					(StringUtils.getUtils().nullCheck(itemMap.getSkullTexture()) != "NONE" ? "&9&lSkull-Texture: &a" + (itemMap.getSkullTexture().length() > 40 ? itemMap.getSkullTexture().substring(0, 40) : itemMap.getSkullTexture()) : ""), 
-					(StringUtils.getUtils().nullCheck(itemMap.getFireworkType() + "") != "NONE" ? "&9&lFirework Type: &a" + itemMap.getFireworkType().name() : ""), 
-					(StringUtils.getUtils().nullCheck(itemMap.getFireworkPower() + "&7") != "NONE" ? "&9&lFirework Power: &a" + itemMap.getFireworkPower() : ""), (StringUtils.getUtils().nullCheck(colorList) != "NONE" ? "&9&lFirework Color(s): &a" + colorList : ""), 
+					(StringUtils.nullCheck(itemMap.getCommandConditions() + "") != "NONE" ? "&9&lCommand Conditions: &aYES" : ""), (StringUtils.nullCheck(itemMap.getDisposableConditions() + "") != "NONE" ? "&9&lDisposable Conditions: &aYES" : ""), 
+					(StringUtils.nullCheck(itemMap.getTriggerConditions() + "") != "NONE" ? "&9&lTrigger Conditions: &aYES" : ""),
+					(StringUtils.nullCheck(itemMap.getNBTValues() + "") != "NONE" ? "&9&lNBT Properties: &aYES" : ""), (StringUtils.nullCheck(itemMap.getContents() + "") != "NONE" ? "&9&lContents: &aYES" : ""),
+					(StringUtils.nullCheck(attributeList) != "NONE" ? "&9&lAttributes: &a" + attributeList : ""), (StringUtils.nullCheck(itemMap.getPages() + "") != "NONE" ? "&9&lBook Pages: &aYES" : ""),
+					(StringUtils.nullCheck(itemMap.getAuthor()) != "NONE" ? "&9&lBook Author: &a" + itemMap.getAuthor() : ""), (StringUtils.nullCheck(itemMap.getSkull()) != "NONE" ? "&9&lSkull-Owner: &a" + itemMap.getSkull() : ""), 
+					(StringUtils.nullCheck(itemMap.getSkullTexture()) != "NONE" ? "&9&lSkull-Texture: &a" + (itemMap.getSkullTexture().length() > 40 ? itemMap.getSkullTexture().substring(0, 40) : itemMap.getSkullTexture()) : ""), 
+					(StringUtils.nullCheck(itemMap.getFireworkType() + "") != "NONE" ? "&9&lFirework Type: &a" + itemMap.getFireworkType().name() : ""), 
+					(StringUtils.nullCheck(itemMap.getFireworkPower() + "&7") != "NONE" ? "&9&lFirework Power: &a" + itemMap.getFireworkPower() : ""), (StringUtils.nullCheck(colorList) != "NONE" ? "&9&lFirework Color(s): &a" + colorList : ""), 
 					(itemMap.getFireworkTrail() ? "&9&lFirework Trail: &aENABLED" : ""), (itemMap.getFireworkFlicker() ? "&9&lFirework Flicker: &aENABLED" : ""));
 		} catch (Exception e) { ServerUtils.sendDebugTrace(e); }
 		if (ItemHandler.isSkull(itemMap.getMaterial())) {
 			ItemMeta itemMeta = item.getItemMeta();
 			if (itemMap.getSkull() != null) {
-				itemMeta = ItemHandler.setSkullOwner(itemMeta, StringUtils.getUtils().translateLayout(itemMap.getSkull(), player));
+				itemMeta = ItemHandler.setSkullOwner(itemMeta, StringUtils.translateLayout(itemMap.getSkull(), player));
 			} else if (itemMap.getSkullTexture() != null && !itemMap.isHeadDatabase()) {
 				try {
 					if (ServerUtils.hasSpecificUpdate("1_8")) {
@@ -7800,8 +7798,8 @@ public class Menu {
     * @return If the GUI Menu is open.
     */
 	public static boolean isOpen(final Player player) {
-		if (GUIName == null) { GUIName = ServerUtils.hasSpecificUpdate("1_9") ? StringUtils.getUtils().colorFormat("&7           &0&n ItemJoin Menu") : StringUtils.getUtils().colorFormat("&7           &0&n ItemJoin Menu"); }
-		if (GUIName != null && player != null && player.getOpenInventory().getTitle().toString().equalsIgnoreCase(StringUtils.getUtils().colorFormat(GUIName))) {
+		if (GUIName == null) { GUIName = ServerUtils.hasSpecificUpdate("1_9") ? StringUtils.colorFormat("&7           &0&n ItemJoin Menu") : StringUtils.colorFormat("&7           &0&n ItemJoin Menu"); }
+		if (GUIName != null && player != null && player.getOpenInventory().getTitle().toString().equalsIgnoreCase(StringUtils.colorFormat(GUIName))) {
 			return true;
 		}
 		return false;

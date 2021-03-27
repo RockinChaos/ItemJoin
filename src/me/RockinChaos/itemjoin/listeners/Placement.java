@@ -69,8 +69,8 @@ public class Placement implements Listener {
 	 			ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item, null, player.getWorld());
 	 			item.setAmount(itemMap.getCount());
 				SchedulerUtils.run(() -> {
-		 			if (StringUtils.getUtils().containsIgnoreCase(item.getType().name(), "WATER") || StringUtils.getUtils().containsIgnoreCase(item.getType().name(), "LAVA") || item.getType().name().equalsIgnoreCase("BUCKET") 
-		 			 || StringUtils.getUtils().containsIgnoreCase(item.getType().name(), "POTION")) {
+		 			if (StringUtils.containsIgnoreCase(item.getType().name(), "WATER") || StringUtils.containsIgnoreCase(item.getType().name(), "LAVA") || item.getType().name().equalsIgnoreCase("BUCKET") 
+		 			 || StringUtils.containsIgnoreCase(item.getType().name(), "POTION")) {
 		 				if (player.getInventory().getHeldItemSlot() == slot) {
 		 					PlayerHandler.setMainHandItem(player, item);
 		 				} else if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {

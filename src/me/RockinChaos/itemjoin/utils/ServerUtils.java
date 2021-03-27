@@ -173,14 +173,14 @@ public class ServerUtils {
 		if (player != null && player.isOp()) {
 			SchedulerUtils.runLater(60L, () -> {
 				for (String statement: errorStatements) {
-					player.sendMessage(StringUtils.getUtils().translateLayout("&7[&eItemJoin&7] &c" + statement, player));
+					player.sendMessage(StringUtils.translateLayout("&7[&eItemJoin&7] &c" + statement, player));
 				}
 			});
 		} else {
 			for (String statement: errorStatements) {
 				PlayerHandler.forOnlinePlayers(player_2 -> {
 					if (player_2 != null && player_2.isOp()) {
-						player_2.sendMessage(StringUtils.getUtils().translateLayout("&7[&eItemJoin&7] &c" + statement, player_2));
+						player_2.sendMessage(StringUtils.translateLayout("&7[&eItemJoin&7] &c" + statement, player_2));
 					}
 				});
 			}

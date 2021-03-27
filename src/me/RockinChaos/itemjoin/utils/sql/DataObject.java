@@ -340,7 +340,7 @@ public class DataObject {
     */	
 	public String getRemovalValues() {
 		String removal = "";
-		for (String column : table.removal().split(", ")) {
+		for (String column : this.table.removal().split(", ")) {
 			if (column.equalsIgnoreCase("Player_UUID")) { removal += "'" + this.getPlayerId() + "',"; }
 			else if (column.equalsIgnoreCase("World_Name")) { removal += "'" + this.getWorld() + "',"; }
 			else if (column.equalsIgnoreCase("Region_Name")) { removal += "'" + this.getRegion() + "',"; }

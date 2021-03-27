@@ -67,7 +67,7 @@ public class Interface implements InventoryHolder {
 		} else {
 			this.pageSize = rows * 9;
 		}
-		this.inventory = Bukkit.createInventory(this, rows * 9, StringUtils.getUtils().colorFormat(title));
+		this.inventory = Bukkit.createInventory(this, rows * 9, StringUtils.colorFormat(title));
 		this.inventory.setMaxStackSize(128);
 		this.pages.put(0, new Page(this.pageSize));
 		this.createControls(this.inventory);

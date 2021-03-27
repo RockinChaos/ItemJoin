@@ -42,7 +42,7 @@ public class LanguageAPI {
     */
 	public void dispatchMessage(final CommandSender sender, String langMessage) { 
 		Player player = null; if (sender instanceof Player) { player = (Player) sender; }
-		langMessage = StringUtils.getUtils().translateLayout(langMessage, player);
+		langMessage = StringUtils.translateLayout(langMessage, player);
 		if (sender instanceof ConsoleCommandSender) { langMessage = ChatColor.stripColor(langMessage); } 
 		sender.sendMessage(langMessage);
 	}
@@ -59,7 +59,7 @@ public class LanguageAPI {
 		String langMessage = (sender.isPermissionSet("itemjoin.lang." + nodeLocation) ? sender.hasPermission("itemjoin.lang." + nodeLocation) ? this.getLangMessage(nodeLocation) : null : this.getLangMessage(nodeLocation));
 		if (langMessage != null && !langMessage.isEmpty()) {
 			langMessage = this.translateLangHolders(langMessage, this.initializeRows(placeHolder));
-			langMessage = StringUtils.getUtils().translateLayout(langMessage, player).replace(" \\n ", " \\n").replace(" /n ", " \\n").replace(" /n", " \\n");
+			langMessage = StringUtils.translateLayout(langMessage, player).replace(" \\n ", " \\n").replace(" /n ", " \\n").replace(" /n", " \\n");
 			String[] langLines = langMessage.split(Pattern.quote(" \\" + "n"));
 			for (String langLine : langLines) {
 				String langStrip = langLine;
@@ -176,7 +176,7 @@ public class LanguageAPI {
     * 
     */
 	public void setPrefix() {
-		this.langPrefix = StringUtils.getUtils().colorFormat(ConfigHandler.getConfig().getFile(this.langType.nodeLocation()).getString("Prefix"));
+		this.langPrefix = StringUtils.colorFormat(ConfigHandler.getConfig().getFile(this.langType.nodeLocation()).getString("Prefix"));
 	}
 	
    /**
@@ -210,7 +210,7 @@ public class LanguageAPI {
 		String lang = ConfigHandler.getConfig().getFile("config.yml").getString("Language").replace(" ", "");
 		if (lang.equalsIgnoreCase("TraditionalChinese") || lang.equalsIgnoreCase("TwChinese") || lang.equalsIgnoreCase("Chinese")) { this.setLanguage("tw"); } 
 		else if (lang.equalsIgnoreCase("SimplifiedChinese") || lang.equalsIgnoreCase("CnChinese")) { this.setLanguage("cn"); } 
-		else if (StringUtils.getUtils().containsIgnoreCase(lang, "Chinese")) { this.setLanguage("tw"); } 
+		else if (StringUtils.containsIgnoreCase(lang, "Chinese")) { this.setLanguage("tw"); } 
 		else if (lang.equalsIgnoreCase("Spanish")) { this.setLanguage("es"); } 
 		else if (lang.equalsIgnoreCase("Russian")) { this.setLanguage("ru"); } 
 		else if (lang.equalsIgnoreCase("French")) { this.setLanguage("fr"); } 

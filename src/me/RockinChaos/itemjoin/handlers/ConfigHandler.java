@@ -65,6 +65,7 @@ import me.RockinChaos.itemjoin.utils.ReflectionUtils;
 import me.RockinChaos.itemjoin.utils.SchedulerUtils;
 import me.RockinChaos.itemjoin.utils.ServerUtils;
 import me.RockinChaos.itemjoin.utils.StringUtils;
+import me.RockinChaos.itemjoin.utils.api.BungeeCordAPI;
 import me.RockinChaos.itemjoin.utils.api.DependAPI;
 import me.RockinChaos.itemjoin.utils.api.LanguageAPI;
 import me.RockinChaos.itemjoin.utils.api.LegacyAPI;
@@ -116,10 +117,11 @@ public class ConfigHandler {
 		ServerUtils.clearErrorStatements();
 		this.copyFiles();
 		LogHandler.getFilter(true);
+		BungeeCordAPI.getBungee(true);
 		ItemJoin.getInstance().setStarted(false);
 		SchedulerUtils.runAsync(() -> {
         	DependAPI.getDepends(true);
-			int customItems = (ConfigHandler.getConfig().getConfigurationSection() != null ? ConfigHandler.getConfig().getConfigurationSection().getKeys(false).size() : 0);
+			int customItems = (this.getConfigurationSection() != null ? this.getConfigurationSection().getKeys(false).size() : 0);
 			if (!silent) { 
 				DependAPI.getDepends(false).sendUtilityDepends();
 				ServerUtils.logInfo(customItems + " Custom item(s) loaded!"); 
@@ -146,42 +148,42 @@ public class ConfigHandler {
     * 
     */
 	private void registerPrevent() {
-		if (((this.clearEnabled("Join") || this.triggerEnabled("Join") || this.triggerEnabled("First-Join")) || StringUtils.getUtils().containsIgnoreCase(this.getHotbarTriggers(), "JOIN")) && !StringUtils.getUtils().isRegistered(PlayerJoin.class.getSimpleName())) {
+		if (((this.clearEnabled("Join") || this.triggerEnabled("Join") || this.triggerEnabled("First-Join")) || StringUtils.containsIgnoreCase(this.getHotbarTriggers(), "JOIN")) && !StringUtils.isRegistered(PlayerJoin.class.getSimpleName())) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerJoin(), ItemJoin.getInstance());
 		}
-		if (((this.clearEnabled("World-Switch") || this.triggerEnabled("World-Switch")) || StringUtils.getUtils().containsIgnoreCase(this.getHotbarTriggers(), "WORLD-SWITCH")) && !StringUtils.getUtils().isRegistered(WorldSwitch.class.getSimpleName())) {
+		if (((this.clearEnabled("World-Switch") || this.triggerEnabled("World-Switch")) || StringUtils.containsIgnoreCase(this.getHotbarTriggers(), "WORLD-SWITCH")) && !StringUtils.isRegistered(WorldSwitch.class.getSimpleName())) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new WorldSwitch(), ItemJoin.getInstance());
 		}
-		if (((this.clearEnabled("Quit") || this.triggerEnabled("Quit")) || StringUtils.getUtils().containsIgnoreCase(this.getHotbarTriggers(), "QUIT")) && !StringUtils.getUtils().isRegistered(PlayerQuit.class.getSimpleName())) {
+		if (((this.clearEnabled("Quit") || this.triggerEnabled("Quit")) || StringUtils.containsIgnoreCase(this.getHotbarTriggers(), "QUIT")) && !StringUtils.isRegistered(PlayerQuit.class.getSimpleName())) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerQuit(), ItemJoin.getInstance());
 		}
-		if ((StringUtils.getUtils().containsIgnoreCase(this.getHotbarTriggers(), "RESPAWN") || this.triggerEnabled("Respawn")) && !StringUtils.getUtils().isRegistered(Respawn.class.getSimpleName())) {
+		if ((StringUtils.containsIgnoreCase(this.getHotbarTriggers(), "RESPAWN") || this.triggerEnabled("Respawn")) && !StringUtils.isRegistered(Respawn.class.getSimpleName())) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Respawn(), ItemJoin.getInstance());
 		}
-		if (StringUtils.getUtils().containsIgnoreCase(this.getHotbarTriggers(), "GAMEMODE-SWITCH") && !StringUtils.getUtils().isRegistered(LimitSwitch.class.getSimpleName())) {
+		if (StringUtils.containsIgnoreCase(this.getHotbarTriggers(), "GAMEMODE-SWITCH") && !StringUtils.isRegistered(LimitSwitch.class.getSimpleName())) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new LimitSwitch(), ItemJoin.getInstance());
 		}
-		if ((this.clearEnabled("Region-Enter") || StringUtils.getUtils().containsIgnoreCase(this.getHotbarTriggers(), "REGION-ENTER")) && !StringUtils.getUtils().isRegistered(PlayerGuard.class.getSimpleName()) && DependAPI.getDepends(false).getGuard().guardEnabled()) {
+		if ((this.clearEnabled("Region-Enter") || StringUtils.containsIgnoreCase(this.getHotbarTriggers(), "REGION-ENTER")) && !StringUtils.isRegistered(PlayerGuard.class.getSimpleName()) && DependAPI.getDepends(false).getGuard().guardEnabled()) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerGuard(), ItemJoin.getInstance());
 		}
-		if (StringUtils.getUtils().containsIgnoreCase(this.getHotbarTriggers(), "REGION-LEAVE") && !StringUtils.getUtils().isRegistered(PlayerGuard.class.getSimpleName())) {
+		if (StringUtils.containsIgnoreCase(this.getHotbarTriggers(), "REGION-LEAVE") && !StringUtils.isRegistered(PlayerGuard.class.getSimpleName())) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerGuard(), ItemJoin.getInstance());
 		}
-		if (!StringUtils.getUtils().isRegistered(PlayerLogin.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerLogin(), ItemJoin.getInstance()); }
-		if ((!StringUtils.getUtils().containsIgnoreCase(this.getPrevent("Pickups"), "FALSE") && !StringUtils.getUtils().containsIgnoreCase(this.getPrevent("Pickups"), "DISABLED"))) {
-			if (ServerUtils.hasSpecificUpdate("1_12") && ReflectionUtils.getBukkitClass("event.entity.EntityPickupItemEvent") != null && !StringUtils.getUtils().isRegistered(Pickups.class.getSimpleName())) { 
+		if (!StringUtils.isRegistered(PlayerLogin.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerLogin(), ItemJoin.getInstance()); }
+		if ((!StringUtils.containsIgnoreCase(this.getPrevent("Pickups"), "FALSE") && !StringUtils.containsIgnoreCase(this.getPrevent("Pickups"), "DISABLED"))) {
+			if (ServerUtils.hasSpecificUpdate("1_12") && ReflectionUtils.getBukkitClass("event.entity.EntityPickupItemEvent") != null && !StringUtils.isRegistered(Pickups.class.getSimpleName())) { 
 				ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Pickups(), ItemJoin.getInstance()); 
 			} else { LegacyAPI.registerPickups(); }
 		}
-		if ((!StringUtils.getUtils().containsIgnoreCase(this.getPrevent("itemMovement"), "FALSE") && !StringUtils.getUtils().containsIgnoreCase(this.getPrevent("itemMovement"), "DISABLED"))) {
-			if (!StringUtils.getUtils().isRegistered(Clicking.class.getSimpleName())) { 
+		if ((!StringUtils.containsIgnoreCase(this.getPrevent("itemMovement"), "FALSE") && !StringUtils.containsIgnoreCase(this.getPrevent("itemMovement"), "DISABLED"))) {
+			if (!StringUtils.isRegistered(Clicking.class.getSimpleName())) { 
 				ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Clicking(), ItemJoin.getInstance()); 
 				if (ServerUtils.hasSpecificUpdate("1_8") && !ProtocolManager.isHandling()) { ProtocolManager.handleProtocols(); }
 			}
 		}
-		if ((!StringUtils.getUtils().containsIgnoreCase(this.getPrevent("Self-Drops"), "FALSE") && !StringUtils.getUtils().containsIgnoreCase(this.getPrevent("Self-Drops"), "DISABLED"))
-		|| (!StringUtils.getUtils().containsIgnoreCase(this.getPrevent("Death-Drops"), "FALSE") && !StringUtils.getUtils().containsIgnoreCase(this.getPrevent("Death-Drops"), "DISABLED"))) {
-			if (!StringUtils.getUtils().isRegistered(Drops.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Drops(), ItemJoin.getInstance()); }
+		if ((!StringUtils.containsIgnoreCase(this.getPrevent("Self-Drops"), "FALSE") && !StringUtils.containsIgnoreCase(this.getPrevent("Self-Drops"), "DISABLED"))
+		|| (!StringUtils.containsIgnoreCase(this.getPrevent("Death-Drops"), "FALSE") && !StringUtils.containsIgnoreCase(this.getPrevent("Death-Drops"), "DISABLED"))) {
+			if (!StringUtils.isRegistered(Drops.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Drops(), ItemJoin.getInstance()); }
 		}
 	}
 	
@@ -294,7 +296,7 @@ public class ConfigHandler {
 			else { source = ItemJoin.getInstance().getResource("files/locales/" + configFile); }
 			if (source != null) {
 				String[] namePart = configFile.split("\\.");
-				String renameFile = namePart[0] + "-old-" + StringUtils.getUtils().getRandom(1, 50000) + namePart[1];
+				String renameFile = namePart[0] + "-old-" + StringUtils.getRandom(1, 50000) + namePart[1];
 				File renamedFile = new File(ItemJoin.getInstance().getDataFolder(), renameFile);
 				if (!renamedFile.exists()) {
 					File.renameTo(renamedFile);
@@ -328,8 +330,8 @@ public class ConfigHandler {
 	public void saveFile(final FileConfiguration dataFile, final File fileFolder, final String file) {
 		try {
 			dataFile.save(fileFolder); 
-			ConfigHandler.getConfig().getSource(file); 
-			ConfigHandler.getConfig().getFile(file).options().copyDefaults(false); 
+			this.getSource(file); 
+			this.getFile(file).options().copyDefaults(false); 
 		} catch (Exception e) { 
 			ItemJoin.getInstance().getServer().getLogger().severe("Could not save data to the " + file + " data file!"); 
 			ServerUtils.sendDebugTrace(e); 
@@ -394,7 +396,7 @@ public class ConfigHandler {
 	public int getHotbarSlot() { 
 		if (this.getFile("config.yml").getString("Settings.HeldItem-Slot") != null 
 				&& !this.getFile("config.yml").getString("Settings.HeldItem-Slot").equalsIgnoreCase("DISABLED") 
-				&& StringUtils.getUtils().isInt(this.getFile("config.yml").getString("Settings.HeldItem-Slot"))) {
+				&& StringUtils.isInt(this.getFile("config.yml").getString("Settings.HeldItem-Slot"))) {
 			return this.getFile("config.yml").getInt("Settings.HeldItem-Slot");
 		}
 		return -1;
@@ -453,7 +455,7 @@ public class ConfigHandler {
     * @return If the trigger type is enabled.
     */
 	public boolean triggerEnabled(final String type) {
-		if (this.getFile("config.yml").getString("Active-Commands.triggers") != null && StringUtils.getUtils().containsIgnoreCase(this.getFile("config.yml").getString("Active-Commands.triggers"), type)
+		if (this.getFile("config.yml").getString("Active-Commands.triggers") != null && StringUtils.containsIgnoreCase(this.getFile("config.yml").getString("Active-Commands.triggers"), type)
 			&& (!this.getFile("config.yml").getString("Active-Commands.enabled-worlds").equalsIgnoreCase("DISABLED") && !this.getFile("config.yml").getString("Active-Commands.enabled-worlds").equalsIgnoreCase("FALSE"))) {
 			return true;
 		}
@@ -485,7 +487,7 @@ public class ConfigHandler {
     * @return If OP is defined for the Prevent actions.
     */
 	public boolean isPreventOP() {
-		return StringUtils.getUtils().containsIgnoreCase(this.getFile("config.yml").getString("Prevent.Bypass"), "OP");
+		return StringUtils.containsIgnoreCase(this.getFile("config.yml").getString("Prevent.Bypass"), "OP");
 	}
 	
    /**
@@ -494,7 +496,7 @@ public class ConfigHandler {
     * @return If CREATIVE is defined for the Prevent actions.
     */
 	public boolean isPreventCreative() {
-		return StringUtils.getUtils().containsIgnoreCase(this.getFile("config.yml").getString("Prevent.Bypass"), "CREATIVE");
+		return StringUtils.containsIgnoreCase(this.getFile("config.yml").getString("Prevent.Bypass"), "CREATIVE");
 	}
 	
    /**
@@ -576,92 +578,92 @@ public class ConfigHandler {
 	public void registerListeners(final ItemMap itemMap) {
 		if (((!itemMap.isGiveOnDisabled() && itemMap.isGiveOnJoin()) || itemMap.isAutoRemove() || (this.getFile("config.yml").getString("Active-Commands.enabled-worlds") != null 
 			&& (!this.getFile("config.yml").getString("Active-Commands.enabled-worlds").equalsIgnoreCase("DISABLED") || !this.getFile("config.yml").getString("Active-Commands.enabled-worlds").equalsIgnoreCase("FALSE")))) 
-			&& !StringUtils.getUtils().isRegistered(PlayerJoin.class.getSimpleName())) {
+			&& !StringUtils.isRegistered(PlayerJoin.class.getSimpleName())) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerJoin(), ItemJoin.getInstance());
 		}
-		if (((!itemMap.isGiveOnDisabled() && itemMap.isGiveOnRespawn()) || itemMap.isAutoRemove()) && !StringUtils.getUtils().isRegistered(Respawn.class.getSimpleName())) {
+		if (((!itemMap.isGiveOnDisabled() && itemMap.isGiveOnRespawn()) || itemMap.isAutoRemove()) && !StringUtils.isRegistered(Respawn.class.getSimpleName())) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Respawn(), ItemJoin.getInstance());
 		}
-		if (((!itemMap.isGiveOnDisabled() && itemMap.isGiveOnWorldSwitch()) || itemMap.isAutoRemove()) && !StringUtils.getUtils().isRegistered(WorldSwitch.class.getSimpleName())) {
+		if (((!itemMap.isGiveOnDisabled() && itemMap.isGiveOnWorldSwitch()) || itemMap.isAutoRemove()) && !StringUtils.isRegistered(WorldSwitch.class.getSimpleName())) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new WorldSwitch(), ItemJoin.getInstance());
 		}
 		if (!itemMap.isGiveOnDisabled() && (itemMap.isGiveOnRegionEnter() || itemMap.isGiveOnRegionLeave() || itemMap.isGiveOnRegionAccess() || itemMap.isGiveOnRegionEgress()) 
-			&& !StringUtils.getUtils().isRegistered(PlayerGuard.class.getSimpleName()) && DependAPI.getDepends(false).getGuard().guardEnabled()) {
+			&& !StringUtils.isRegistered(PlayerGuard.class.getSimpleName()) && DependAPI.getDepends(false).getGuard().guardEnabled()) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerGuard(), ItemJoin.getInstance());
 		}
-		if (!itemMap.isGiveOnDisabled() && itemMap.isUseOnLimitSwitch() && !StringUtils.getUtils().isRegistered(LimitSwitch.class.getSimpleName())) {
+		if (!itemMap.isGiveOnDisabled() && itemMap.isUseOnLimitSwitch() && !StringUtils.isRegistered(LimitSwitch.class.getSimpleName())) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new LimitSwitch(), ItemJoin.getInstance());
 		}
-		if ((itemMap.isAnimated() || itemMap.isDynamic()) && !StringUtils.getUtils().isRegistered(PlayerQuit.class.getSimpleName())) {
+		if ((itemMap.isAnimated() || itemMap.isDynamic()) && !StringUtils.isRegistered(PlayerQuit.class.getSimpleName())) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerQuit(), ItemJoin.getInstance());
 		}
-		if (itemMap.mobsDrop() && !StringUtils.getUtils().isRegistered(Entities.class.getSimpleName())) {
+		if (itemMap.mobsDrop() && !StringUtils.isRegistered(Entities.class.getSimpleName())) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Entities(), ItemJoin.getInstance());
 		}
-		if (itemMap.blocksDrop() && !StringUtils.getUtils().isRegistered(Breaking.class.getSimpleName())) {
+		if (itemMap.blocksDrop() && !StringUtils.isRegistered(Breaking.class.getSimpleName())) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Breaking(), ItemJoin.getInstance());
 		}
-		if (itemMap.isCraftingItem() && !StringUtils.getUtils().isRegistered(Crafting.class.getSimpleName())) {
+		if (itemMap.isCraftingItem() && !StringUtils.isRegistered(Crafting.class.getSimpleName())) {
 			Crafting.cycleTask();
 			SchedulerUtils.runLater(40L, () -> {
 				PlayerHandler.restoreCraftItems();
 				if (ServerUtils.hasSpecificUpdate("1_8") && !ProtocolManager.isHandling()) { ProtocolManager.handleProtocols(); }
 			});
-			if (!StringUtils.getUtils().isRegistered(PlayerQuit.class.getSimpleName())) {
+			if (!StringUtils.isRegistered(PlayerQuit.class.getSimpleName())) {
 				ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerQuit(), ItemJoin.getInstance());
 			}
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Crafting(), ItemJoin.getInstance());
 		}
 		if ((itemMap.isMovement() || itemMap.isInventoryClose())) {
-			if (!StringUtils.getUtils().isRegistered(Clicking.class.getSimpleName())) {
+			if (!StringUtils.isRegistered(Clicking.class.getSimpleName())) {
 				ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Clicking(), ItemJoin.getInstance());
 				if (ServerUtils.hasSpecificUpdate("1_8") && !ProtocolManager.isHandling()) { ProtocolManager.handleProtocols(); }
 			}
-			if (DependAPI.getDepends(false).chestSortEnabled() && !StringUtils.getUtils().isRegistered(ChestSortAPI.class.getSimpleName())) {
+			if (DependAPI.getDepends(false).chestSortEnabled() && !StringUtils.isRegistered(ChestSortAPI.class.getSimpleName())) {
 				ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new ChestSortAPI(), ItemJoin.getInstance());
 			}
 		}
-		if (ServerUtils.hasSpecificUpdate("1_12") && itemMap.isStackable() && !StringUtils.getUtils().isRegistered(Stackable.class.getSimpleName())) {
+		if (ServerUtils.hasSpecificUpdate("1_12") && itemMap.isStackable() && !StringUtils.isRegistered(Stackable.class.getSimpleName())) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Stackable(), ItemJoin.getInstance());
 		} else if (itemMap.isStackable()) {
 			LegacyAPI.registerStackable();
 		}
-		if ((itemMap.isDeathDroppable() || itemMap.isSelfDroppable()) && !StringUtils.getUtils().isRegistered(Drops.class.getSimpleName())) {
+		if ((itemMap.isDeathDroppable() || itemMap.isSelfDroppable()) && !StringUtils.isRegistered(Drops.class.getSimpleName())) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Drops(), ItemJoin.getInstance());
 		}
 		if (itemMap.getCommands() != null && itemMap.getCommands().length != 0) {
-			if (ServerUtils.hasSpecificUpdate("1_8") && !StringUtils.getUtils().isRegistered(Commands.class.getSimpleName())) {
+			if (ServerUtils.hasSpecificUpdate("1_8") && !StringUtils.isRegistered(Commands.class.getSimpleName())) {
 				ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Commands(), ItemJoin.getInstance());
 			} else {
 				LegacyAPI.registerCommands();
 			}
 		}
 		if ((itemMap.isCancelEvents() || itemMap.isSelectable() || itemMap.getInteractCooldown() != 0)) {
-			if (!StringUtils.getUtils().isRegistered(Interact.class.getSimpleName())) {
+			if (!StringUtils.isRegistered(Interact.class.getSimpleName())) {
 				ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Interact(), ItemJoin.getInstance());
 			}
 		}
-		if ((itemMap.isPlaceable() || itemMap.isCountLock()) && !StringUtils.getUtils().isRegistered(Placement.class.getSimpleName())) {
+		if ((itemMap.isPlaceable() || itemMap.isCountLock()) && !StringUtils.isRegistered(Placement.class.getSimpleName())) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Placement(), ItemJoin.getInstance());
 		}
 		if (itemMap.isCountLock() || itemMap.isCustomConsumable()) {
-			if (ServerUtils.hasSpecificUpdate("1_11") && !StringUtils.getUtils().isRegistered(Consumes.class.getSimpleName())) {
+			if (ServerUtils.hasSpecificUpdate("1_11") && !StringUtils.isRegistered(Consumes.class.getSimpleName())) {
 				ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Consumes(), ItemJoin.getInstance());
 			} else {
 				LegacyAPI.registerConsumes();
 			}
 		}
-		if ((itemMap.isItemRepairable() || itemMap.isItemCraftable()) && !StringUtils.getUtils().isRegistered(Recipes.class.getSimpleName())) {
+		if ((itemMap.isItemRepairable() || itemMap.isItemCraftable()) && !StringUtils.isRegistered(Recipes.class.getSimpleName())) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Recipes(), ItemJoin.getInstance());
 		}
 		if (itemMap.isItemStore() || itemMap.isItemModify()) {
-			if (ServerUtils.hasSpecificUpdate("1_8") && !StringUtils.getUtils().isRegistered(Storable.class.getSimpleName())) {
+			if (ServerUtils.hasSpecificUpdate("1_8") && !StringUtils.isRegistered(Storable.class.getSimpleName())) {
 				ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Storable(), ItemJoin.getInstance());
 			} else {
 				LegacyAPI.registerStorable();
 			}
 		}
-		if (itemMap.isMovement() && ServerUtils.hasSpecificUpdate("1_9") && ReflectionUtils.getBukkitClass("event.player.PlayerSwapHandItemsEvent") != null && !StringUtils.getUtils().isRegistered(Offhand.class.getSimpleName())) {
+		if (itemMap.isMovement() && ServerUtils.hasSpecificUpdate("1_9") && ReflectionUtils.getBukkitClass("event.player.PlayerSwapHandItemsEvent") != null && !StringUtils.isRegistered(Offhand.class.getSimpleName())) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Offhand(), ItemJoin.getInstance());
 		}
 	}
@@ -821,8 +823,8 @@ public class ConfigHandler {
 
 		try {
 			itemsData.save(itemsFile);
-			ConfigHandler.getConfig().getSource("items.yml");
-			ConfigHandler.getConfig().getFile("items.yml").options().copyDefaults(false);
+			this.getSource("items.yml");
+			this.getFile("items.yml").options().copyDefaults(false);
 		} catch (Exception e) {
 			ItemJoin.getInstance().getServer().getLogger().severe("Could not save important data changes to the data file items.yml!");
 			e.printStackTrace();

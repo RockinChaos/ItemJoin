@@ -41,7 +41,7 @@ public class APIUtils {
      */
 	 public void setItems(Player player) {
 		final ItemMap probable = ChanceAPI.getChances().getRandom(player);
-		final int session = StringUtils.getUtils().getRandom(1, 80000);
+		final int session = StringUtils.getRandom(1, 80000);
 		for (ItemMap item : ItemUtilities.getUtilities().getItems()) {
 			if (item.inWorld(player.getWorld()) && ChanceAPI.getChances().isProbability(item, probable) && PlayerHandler.isEnabled(player)
 					&& item.isLimitMode(player.getGameMode()) && item.hasPermission(player) && ItemUtilities.getUtilities().isObtainable(player, item, session, TriggerType.DEFAULT)) {

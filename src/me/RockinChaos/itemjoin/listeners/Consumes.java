@@ -163,12 +163,12 @@ public class Consumes implements Listener {
 	 		ItemMap mainHandMap = ItemUtilities.getUtilities().getItemMap(mainStack, null, player.getWorld());
 	 		ItemMap offHandMap = ItemUtilities.getUtilities().getItemMap(offStack, null, player.getWorld());
 	 		if ((mainHandMap != null && !ItemUtilities.getUtilities().isAllowed(player, mainStack, "count-lock")) || (offHandMap != null && !ItemUtilities.getUtilities().isAllowed(player, offStack, "count-lock"))) {
-	 			if ((StringUtils.getUtils().containsIgnoreCase(mainStack.getType().name(), "TOTEM") && mainHandMap != null) || (StringUtils.getUtils().containsIgnoreCase(offStack.getType().name(), "TOTEM") && offHandMap != null)) {
+	 			if ((StringUtils.containsIgnoreCase(mainStack.getType().name(), "TOTEM") && mainHandMap != null) || (StringUtils.containsIgnoreCase(offStack.getType().name(), "TOTEM") && offHandMap != null)) {
 					SchedulerUtils.runLater(1L, () -> {
 		 				if (mainHandMap != null && mainHandMap.isSimilar(mainStack)) {
-		 					if (StringUtils.getUtils().containsIgnoreCase(PlayerHandler.getMainHandItem(player).getType().name(), "TOTEM")) {
+		 					if (StringUtils.containsIgnoreCase(PlayerHandler.getMainHandItem(player).getType().name(), "TOTEM")) {
 		 						PlayerHandler.getMainHandItem(player).setAmount(mainHandMap.getCount());
-		 					} else if (StringUtils.getUtils().containsIgnoreCase(PlayerHandler.getOffHandItem(player).getType().name(), "TOTEM")) {
+		 					} else if (StringUtils.containsIgnoreCase(PlayerHandler.getOffHandItem(player).getType().name(), "TOTEM")) {
 		 						PlayerHandler.getOffHandItem(player).setAmount(mainHandMap.getCount());
 		 					}
 		 					if (PlayerHandler.getMainHandItem(player).getType() == Material.AIR) {
@@ -177,9 +177,9 @@ public class Consumes implements Listener {
 		 						PlayerHandler.setOffHandItem(player, mainStack);
 		 					}
 		 				} else if (offHandMap != null && offHandMap.isSimilar(offStack)) {
-		 					if (StringUtils.getUtils().containsIgnoreCase(PlayerHandler.getOffHandItem(player).getType().name(), "TOTEM")) {
+		 					if (StringUtils.containsIgnoreCase(PlayerHandler.getOffHandItem(player).getType().name(), "TOTEM")) {
 		 						PlayerHandler.getOffHandItem(player).setAmount(offHandMap.getCount());
-		 					} else if (StringUtils.getUtils().containsIgnoreCase(PlayerHandler.getMainHandItem(player).getType().name(), "TOTEM")) {
+		 					} else if (StringUtils.containsIgnoreCase(PlayerHandler.getMainHandItem(player).getType().name(), "TOTEM")) {
 		 						PlayerHandler.getMainHandItem(player).setAmount(offHandMap.getCount());
 		 					}
 		 					if (PlayerHandler.getOffHandItem(player).getType() == Material.AIR) {

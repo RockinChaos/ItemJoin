@@ -40,7 +40,7 @@ public class EffectAPI {
     * @param commandParticle - The Particle to be built.
     */
 	public static void spawnParticle(final Player player, final String commandParticle) {
-		if (StringUtils.getUtils().containsIgnoreCase(commandParticle, "FIREWORK")) {
+		if (StringUtils.containsIgnoreCase(commandParticle, "FIREWORK")) {
 			particleFirework(player, commandParticle);
 		} else {
 			try {
@@ -48,7 +48,7 @@ public class EffectAPI {
 				org.bukkit.Particle particle;
 				int particleLife = 1;
 				particle = org.bukkit.Particle.valueOf(particleParts[0]);
-				if (particleParts[1] != null && !particleParts[1].isEmpty() && StringUtils.getUtils().isInt(particleParts[1])) { particleLife = Integer.parseInt(particleParts[1]); }
+				if (particleParts[1] != null && !particleParts[1].isEmpty() && StringUtils.isInt(particleParts[1])) { particleLife = Integer.parseInt(particleParts[1]); }
 				player.getWorld().spawnParticle(particle, player.getLocation(), particleLife);
 			} catch (Exception e) {
 				ServerUtils.logSevere("{EffectAPI} There was an issue executing the commands-particle you defined.");
@@ -73,7 +73,7 @@ public class EffectAPI {
 		if (projectileParts[1] != null && !projectileParts[1].isEmpty()) { startColor = DyeColor.valueOf(projectileParts[1].toUpperCase()).getFireworkColor(); }
 		if (projectileParts[2] != null && !projectileParts[2].isEmpty()) { endColor = DyeColor.valueOf(projectileParts[2].toUpperCase()).getFireworkColor(); }
 		if (projectileParts[3] != null && !projectileParts[3].isEmpty()) { effectType = FireworkEffect.Type.valueOf(projectileParts[3]); }
-		if (projectileParts[4] != null && !projectileParts[4].isEmpty() && StringUtils.getUtils().isInt(projectileParts[4])) { detonationDelay = Integer.parseInt(projectileParts[4]); }
+		if (projectileParts[4] != null && !projectileParts[4].isEmpty() && StringUtils.isInt(projectileParts[4])) { detonationDelay = Integer.parseInt(projectileParts[4]); }
 		FireworkEffect effect = FireworkEffect.builder().withColor(startColor).withFade(endColor).with(effectType).trail(true).flicker(true).build();
         final Firework fw = (Firework)player.getWorld().spawnEntity(player.getLocation(), EntityType.FIREWORK);
         FireworkMeta meta = fw.getFireworkMeta();

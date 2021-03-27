@@ -174,7 +174,7 @@ public class Crafting implements Listener {
     		SchedulerUtils.runLater(2L, () -> { 
     			if (player.isOnline() && itemMap.isSelfDroppable()) {
 		    		itemMap.giveTo(player, itemCopy.getAmount());
-		    		if (StringUtils.getUtils().getSlotConversion(itemMap.getSlot()) != 0) { 
+		    		if (StringUtils.getSlotConversion(itemMap.getSlot()) != 0) { 
 		    			this.returnSlotZero(player, 4L);
 		    		}
 		    	} else if (player.isOnline()) {
@@ -347,7 +347,7 @@ public class Crafting implements Listener {
     		this.pendingZero.put(PlayerHandler.getPlayerID(player), true);
 			SchedulerUtils.runLater(delay, () -> { 
 		    	for (ItemMap craftMap: ItemUtilities.getUtilities().getCraftingItems()) {
-			    	if (StringUtils.getUtils().getSlotConversion(craftMap.getSlot()) == 0 && craftMap.inWorld(player.getWorld()) && craftMap.hasPermission(player)) {
+			    	if (StringUtils.getSlotConversion(craftMap.getSlot()) == 0 && craftMap.inWorld(player.getWorld()) && craftMap.hasPermission(player)) {
 			    		craftMap.giveTo(player);
 			    		this.pendingZero.remove(PlayerHandler.getPlayerID(player));
 			    	}

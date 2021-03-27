@@ -157,7 +157,7 @@ public class ItemDesigner {
 			} else if (ItemHandler.getMaterial(id, dataValue) == null) {
 				ServerUtils.logSevere("{ItemMap} The Item " + internalName + "'s Material 'ID' is invalid or does not exist.");
 				ServerUtils.logWarn("{ItemMap} The Item " + internalName + " will not be set!");
-				if (StringUtils.getUtils().isInt(id)) {
+				if (StringUtils.isInt(id)) {
 					ServerUtils.logSevere("{ItemMap} If you are using a numerical id and a numerical dataValue.");
 					ServerUtils.logSevere("{ItemMap} Include quotations or apostrophes at the beginning and the end or this error will persist, the id should look like '160:15' or \"160:15\".");
 				}
@@ -180,11 +180,11 @@ public class ItemDesigner {
 	* @return If the slot is valid.
 	*/
 	private boolean isDefinable(final String internalName, final String slot) {
-		if (!StringUtils.getUtils().isInt(slot) && !ItemHandler.isCustomSlot(slot)) {
+		if (!StringUtils.isInt(slot) && !ItemHandler.isCustomSlot(slot)) {
 			ServerUtils.logSevere("{ItemMap} The Item " + internalName + "'s slot is invalid or does not exist.");
 			ServerUtils.logWarn("{ItemMap} The Item " + internalName + " will not be set!");
 			return false;
-		} else if (StringUtils.getUtils().isInt(slot)) {
+		} else if (StringUtils.isInt(slot)) {
 			int parseSlot = Integer.parseInt(slot);
 			if (!(parseSlot >= 0 && parseSlot <= 35)) {
 				ServerUtils.logSevere("{ItemMap} The Item " + internalName + "'s slot must be between 0 and 35.");
@@ -293,7 +293,7 @@ public class ItemDesigner {
 	* @param itemMap - The ItemMap being modified.
 	*/
 	private void setUnbreaking(final ItemMap itemMap) {
-		if (StringUtils.getUtils().containsIgnoreCase(itemMap.getItemFlags(), "unbreakable")) {
+		if (StringUtils.containsIgnoreCase(itemMap.getItemFlags(), "unbreakable")) {
 			try {
 				itemMap.setUnbreakable(true);
 			} catch (Exception e) { ServerUtils.sendDebugTrace(e); } }
@@ -305,7 +305,7 @@ public class ItemDesigner {
 	* @param itemMap - The ItemMap being modified.
 	*/
 	private void durabilityBar(final ItemMap itemMap) {
-		if (StringUtils.getUtils().containsIgnoreCase(itemMap.getItemFlags(), "hide-durability")) {
+		if (StringUtils.containsIgnoreCase(itemMap.getItemFlags(), "hide-durability")) {
 			try {
 				itemMap.setDurabilityBar(true);
 			} catch (Exception e) { ServerUtils.sendDebugTrace(e); } }
@@ -327,7 +327,7 @@ public class ItemDesigner {
 				String name = parts[0].toUpperCase();
 				int level = 1;
 				Enchantment enchantName = ItemHandler.getEnchantByName(name);
-				if (StringUtils.getUtils().containsIgnoreCase(enchantment, ":")) {
+				if (StringUtils.containsIgnoreCase(enchantment, ":")) {
 					try {
 						level = Integer.parseInt(parts[1]);
 					} catch (NumberFormatException e) {
@@ -356,8 +356,8 @@ public class ItemDesigner {
 	* @param itemMap - The ItemMap being modified.
 	*/
 	private void setMapImage(final ItemMap itemMap) {
-		if (itemMap.getNodeLocation().getString(".custom-map-image") != null && StringUtils.getUtils().containsIgnoreCase(itemMap.getMaterial().toString(), "MAP")) {
-			if (itemMap.getNodeLocation().getString(".map-id") != null && StringUtils.getUtils().isInt(itemMap.getNodeLocation().getString(".map-id"))) { itemMap.setMapID(itemMap.getNodeLocation().getInt(".map-id")); }
+		if (itemMap.getNodeLocation().getString(".custom-map-image") != null && StringUtils.containsIgnoreCase(itemMap.getMaterial().toString(), "MAP")) {
+			if (itemMap.getNodeLocation().getString(".map-id") != null && StringUtils.isInt(itemMap.getNodeLocation().getString(".map-id"))) { itemMap.setMapID(itemMap.getNodeLocation().getInt(".map-id")); }
 			itemMap.setMapImage(itemMap.getNodeLocation().getString(".custom-map-image"));
 			if (itemMap.getMapImage().equalsIgnoreCase("default.jpg") || new File(ItemJoin.getInstance().getDataFolder(), itemMap.getMapImage()).exists()) {
 				DataObject dataObject = SQL.getData().getData(new DataObject(Table.MAP_IDS, null, null, itemMap.getMapImage(), null));
@@ -380,7 +380,7 @@ public class ItemDesigner {
 					SQL.getData().saveData(new DataObject(Table.MAP_IDS, null, null, itemMap.getMapImage(), Integer.toString(itemMap.getMapID())));
 				}
 			}
-		} else if (itemMap.getNodeLocation().getString(".map-id") != null && StringUtils.getUtils().isInt(itemMap.getNodeLocation().getString(".map-id")) && StringUtils.getUtils().containsIgnoreCase(itemMap.getMaterial().toString(), "MAP")) {
+		} else if (itemMap.getNodeLocation().getString(".map-id") != null && StringUtils.isInt(itemMap.getNodeLocation().getString(".map-id")) && StringUtils.containsIgnoreCase(itemMap.getMaterial().toString(), "MAP")) {
 			itemMap.setMapID(itemMap.getNodeLocation().getInt(".map-id"));
 			MapView view = ItemHandler.existingView(itemMap.getMapID());
 			itemMap.setMapView(view);
@@ -395,7 +395,7 @@ public class ItemDesigner {
     * @return The newly created MapRenderer instance.
     */
     public MapRenderer createRenderer(final String image, final int imageID) {
-    	if (StringUtils.getUtils().containsIgnoreCase(image, ".GIF")) { 
+    	if (StringUtils.containsIgnoreCase(image, ".GIF")) { 
     		return new Renderer(image, imageID, 0, -1);
     	} else { return new Renderer(image, imageID); }
     }
@@ -432,7 +432,7 @@ public class ItemDesigner {
 				ServerUtils.logSevere("{ItemMap} An error has occured when setting NBTData to an item.");
 				ServerUtils.sendDebugTrace(e);
 			}
-		} else { itemMap.setLegacySecret(StringUtils.getUtils().colorEncode(itemMap.getNBTFormat())); }
+		} else { itemMap.setLegacySecret(StringUtils.colorEncode(itemMap.getNBTFormat())); }
 	}
 	
    /**
@@ -524,7 +524,7 @@ public class ItemDesigner {
 	*/
 	private void safteyCheckURL(final ItemMap itemMap, final JSONEvent type, final String inputResult) {
 		if (type.equals(JSONEvent.OPEN_URL)) {
-			if (!StringUtils.getUtils().containsIgnoreCase(inputResult, "https") && !StringUtils.getUtils().containsIgnoreCase(inputResult, "http")) {
+			if (!StringUtils.containsIgnoreCase(inputResult, "https") && !StringUtils.containsIgnoreCase(inputResult, "http")) {
 				ServerUtils.logSevere("{ItemMap} The URL Specified for the clickable link in the book " + itemMap.getConfigName() + " is missing http or https and will not be clickable.");
 				ServerUtils.logWarn("{ItemMap} A URL designed for a clickable link should resemble this link structure: https://www.google.com/");
 			}
@@ -705,12 +705,12 @@ public class ItemDesigner {
 			List < String > mobs = itemMap.getNodeLocation().getStringList(".mobs-drop");
 			for (String mobsLine: mobs) {
 				String[] mobsParts = mobsLine.replace(" ", "").split(":");
-				if (mobsParts[0] != null && mobsParts[1] != null && StringUtils.getUtils().isDouble(mobsParts[1])) {
+				if (mobsParts[0] != null && mobsParts[1] != null && StringUtils.isDouble(mobsParts[1])) {
 					EntityType mob = EntityType.valueOf(mobsParts[0].toUpperCase());
 					if (mob != null) {
 						mobsDrop.put(mob, Double.parseDouble(mobsParts[1]));
 					} else { ServerUtils.logWarn("{ItemMap} The mob " + mobsParts[0] + " is not a valid mob type, please check the wiki on this usage."); }
-				} else if (!StringUtils.getUtils().isDouble(mobsParts[1])) {
+				} else if (!StringUtils.isDouble(mobsParts[1])) {
 					ServerUtils.logWarn("{ItemMap} The percentage value for the mob " + mobsParts[0] + " is not a valid number, please check the wiki on this usage.");
 				} else {
 					ServerUtils.logWarn("{ItemMap} An error has occured when trying to set mobs drop for " + itemMap.getConfigName() + ", please check your formatting.");
@@ -732,12 +732,12 @@ public class ItemDesigner {
 			List < String > blocks = itemMap.getNodeLocation().getStringList(".blocks-drop");
 			for (String blocksLine: blocks) {
 				String[] blocksParts = blocksLine.replace(" ", "").split(":");
-				if (blocksParts[0] != null && blocksParts[1] != null && StringUtils.getUtils().isDouble(blocksParts[1])) {
+				if (blocksParts[0] != null && blocksParts[1] != null && StringUtils.isDouble(blocksParts[1])) {
 					Material block = ItemHandler.getMaterial(blocksParts[0].toUpperCase(), null);
 					if (block != null && block != Material.AIR) {
 						blocksDrop.put(block, Double.parseDouble(blocksParts[1]));
 					} else { ServerUtils.logWarn("{ItemMap} The material " + blocksParts[0] + " is not a valid material type, please check the wiki on this usage."); }
-				} else if (!StringUtils.getUtils().isDouble(blocksParts[1])) {
+				} else if (!StringUtils.isDouble(blocksParts[1])) {
 					ServerUtils.logWarn("{ItemMap} The percentage value for the material " + blocksParts[0] + " is not a valid number, please check the wiki on this usage.");
 				} else {
 					ServerUtils.logWarn("{ItemMap} An error has occured when trying to set blocks drop for " + itemMap.getConfigName() + ", please check your formatting.");
@@ -778,7 +778,7 @@ public class ItemDesigner {
 								catch (Exception e) { ServerUtils.logWarn("{ItemMap} The character " + ingredientParts[0] + " for the custom recipe defined for the item " + itemMap.getConfigName() + " is not a valid character!"); }
 								shapedRecipe.setIngredient(character, itemStack.getType());
 								ingredientList.put(character, ingredientParts[1]);
-								if (!StringUtils.getUtils().isRegistered(Recipes.class.getSimpleName())) {
+								if (!StringUtils.isRegistered(Recipes.class.getSimpleName())) {
 									ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Recipes(), ItemJoin.getInstance());
 								}
 							} else { ServerUtils.logWarn("{ItemMap} The material " + ingredientParts[1] + " for the custom recipe defined for the item " + itemMap.getConfigName() + " is not a proper material type OR custom item node!"); }
@@ -875,7 +875,7 @@ public class ItemDesigner {
 					try {
 						int duritation = 1;
 						int amplifier = 1;
-						if (StringUtils.getUtils().containsIgnoreCase(potion, ":")) {
+						if (StringUtils.containsIgnoreCase(potion, ":")) {
 							if (Integer.parseInt(potionSection[1]) == 1 || Integer.parseInt(potionSection[1]) == 2 || Integer.parseInt(potionSection[1]) == 3) {
 								amplifier = Integer.parseInt(potionSection[1]) - 1;
 							} else { amplifier = Integer.parseInt(potionSection[1]); }
@@ -915,7 +915,7 @@ public class ItemDesigner {
 					if (PotionEffectType.getByName(potionSection[0].toUpperCase()) != null) {
 						try {
 							int duritation = 1; int amplifier = 1;
-							if (StringUtils.getUtils().containsIgnoreCase(potion, ":")) {
+							if (StringUtils.containsIgnoreCase(potion, ":")) {
 								if (Integer.parseInt(potionSection[1]) == 1 || Integer.parseInt(potionSection[1]) == 2 || Integer.parseInt(potionSection[1]) == 3) { amplifier = Integer.parseInt(potionSection[1]) - 1; } 
 								else { amplifier = Integer.parseInt(potionSection[1]); }
 							}
@@ -953,7 +953,7 @@ public class ItemDesigner {
 					if (PotionEffectType.getByName(tippedSection[0].toUpperCase()) != null) {
 						try {
 							int level = 1; int duration;
-							if (StringUtils.getUtils().containsIgnoreCase(effect, ":")) {
+							if (StringUtils.containsIgnoreCase(effect, ":")) {
 								if (Integer.parseInt(tippedSection[1]) == 1 || Integer.parseInt(tippedSection[1]) == 2 || Integer.parseInt(tippedSection[1]) == 3) { level = Integer.parseInt(tippedSection[1]) - 1; } 
 								else { level = Integer.parseInt(tippedSection[1]); }
 							}
@@ -981,7 +981,7 @@ public class ItemDesigner {
  	* @param itemMap - The ItemMap being modified.
  	*/
 	private void setBanners(final ItemMap itemMap) {
-		if (itemMap.getNodeLocation().getString(".banner-meta") != null && ServerUtils.hasSpecificUpdate("1_8") && StringUtils.getUtils().containsIgnoreCase(itemMap.getMaterial().toString(), "BANNER")) {
+		if (itemMap.getNodeLocation().getString(".banner-meta") != null && ServerUtils.hasSpecificUpdate("1_8") && StringUtils.containsIgnoreCase(itemMap.getMaterial().toString(), "BANNER")) {
 			String bannerList = itemMap.getNodeLocation().getString(".banner-meta").replace(" ", "");
 			List <Pattern> patterns = new ArrayList <Pattern> ();
 			for (String banner: bannerList.split(",")) {
@@ -1051,7 +1051,7 @@ public class ItemDesigner {
  	*/
 	private void setFireChargeColor(final ItemMap itemMap) {
 		if (itemMap.getNodeLocation().getString(".charge-color") != null) {
-			if (StringUtils.getUtils().containsIgnoreCase(itemMap.getMaterial().toString(), "CHARGE") || StringUtils.getUtils().containsIgnoreCase(itemMap.getMaterial().toString(), "STAR")) {
+			if (StringUtils.containsIgnoreCase(itemMap.getMaterial().toString(), "CHARGE") || StringUtils.containsIgnoreCase(itemMap.getMaterial().toString(), "STAR")) {
 				String color = itemMap.getNodeLocation().getString(".charge-color").toUpperCase();
 				itemMap.setChargeColor(DyeColor.valueOf(color));
 			}
@@ -1190,7 +1190,7 @@ public class ItemDesigner {
 					Map < String, Double > attributesList = new HashMap < String, Double > ();
 					for (String value: attributes) {
 						String[] valueParts = value.replace("{", "").replace("}", "").replace(" ", "").split(":");
-						if (StringUtils.getUtils().isInt(valueParts[1]) || StringUtils.getUtils().isDouble(valueParts[1])) {
+						if (StringUtils.isInt(valueParts[1]) || StringUtils.isDouble(valueParts[1])) {
 							attributesList.put(valueParts[0], Double.parseDouble(valueParts[1]));
 						} else {
 							ServerUtils.logSevere("{ItemMap} There was an issue setting the custom attribute " + valueParts[0] + " for " + itemMap.getConfigName()+ ".");
@@ -1213,7 +1213,7 @@ public class ItemDesigner {
  	* @param itemMap - The ItemMap being modified.
  	*/
 	private void setAttributeFlags(final ItemMap itemMap) {
-		if (ServerUtils.hasSpecificUpdate("1_8") && StringUtils.getUtils().containsIgnoreCase(itemMap.getItemFlags(), "hide-attributes")) {
+		if (ServerUtils.hasSpecificUpdate("1_8") && StringUtils.containsIgnoreCase(itemMap.getItemFlags(), "hide-attributes")) {
 			itemMap.setAttributesInfo(true);
 		}
 	}

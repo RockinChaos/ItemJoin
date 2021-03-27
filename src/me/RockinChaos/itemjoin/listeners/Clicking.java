@@ -55,8 +55,8 @@ public class Clicking implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	private void onGlobalModify(InventoryClickEvent event) {
 		Player player = (Player) event.getWhoClicked();
-	  	if (StringUtils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "TRUE") || StringUtils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), player.getWorld().getName())
-		  			|| StringUtils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "ALL") || StringUtils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "GLOBAL")) {
+	  	if (StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "TRUE") || StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), player.getWorld().getName())
+		  			|| StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "ALL") || StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "GLOBAL")) {
 	  		if (ConfigHandler.getConfig().isPreventOP() && player.isOp() || ConfigHandler.getConfig().isPreventCreative() && PlayerHandler.isCreativeMode(player)) { } 
 	  		else if (player.getOpenInventory().getTitle().contains("§") || player.getOpenInventory().getTitle().contains("&")) { }
 	  		else { event.setCancelled(true); }
@@ -71,8 +71,8 @@ public class Clicking implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	private void onGlobalPickItem(PlayerPickItemEvent event) {
 		Player player = event.getPlayer();
-	  	if (StringUtils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "TRUE") || StringUtils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), player.getWorld().getName())
-		  			|| StringUtils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "ALL") || StringUtils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "GLOBAL")) {
+	  	if (StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "TRUE") || StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), player.getWorld().getName())
+		  			|| StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "ALL") || StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "GLOBAL")) {
 	  		if (ConfigHandler.getConfig().isPreventOP() && player.isOp() || ConfigHandler.getConfig().isPreventCreative() && PlayerHandler.isCreativeMode(player)) { }
 	  		else { event.setCancelled(true); }
 	  	}
@@ -89,7 +89,7 @@ public class Clicking implements Listener {
 		List<ItemStack> items = new ArrayList<ItemStack>();
 		if (!this.isCreativeDupe(event)) {
 			items.add(event.getCurrentItem()); items.add(event.getCursor());
-			if (StringUtils.getUtils().containsIgnoreCase(event.getAction().name(), "HOTBAR")) {
+			if (StringUtils.containsIgnoreCase(event.getAction().name(), "HOTBAR")) {
 				if (event.getView().getBottomInventory().getSize() >= event.getHotbarButton() && event.getHotbarButton() >= 0) { items.add(event.getView().getBottomInventory().getItem(event.getHotbarButton())); }
 				else if (ServerUtils.hasSpecificUpdate("1_9")) { items.add(PlayerHandler.getOffHandItem(player)); } 
 			}
@@ -129,9 +129,9 @@ public class Clicking implements Listener {
 	public boolean isCreativeDupe(final InventoryClickEvent event) {
 		if (PlayerHandler.isCreativeMode((Player) event.getWhoClicked()) && event.getCurrentItem() != null && event.getCursor() != null) {
 			String currentNBT = (ItemHandler.dataTagsEnabled() ? ItemHandler.getNBTData(event.getCurrentItem()) 
-					: ((event.getCurrentItem().hasItemMeta() && event.getCurrentItem().getItemMeta().hasDisplayName()) ? StringUtils.getUtils().colorDecode(event.getCurrentItem().getItemMeta().getDisplayName()) : null));
+					: ((event.getCurrentItem().hasItemMeta() && event.getCurrentItem().getItemMeta().hasDisplayName()) ? StringUtils.colorDecode(event.getCurrentItem().getItemMeta().getDisplayName()) : null));
 			String cursorNBT = (ItemHandler.dataTagsEnabled() ? ItemHandler.getNBTData(event.getCursor()) 
-					: ((event.getCursor().hasItemMeta() && event.getCursor().getItemMeta().hasDisplayName()) ? StringUtils.getUtils().colorDecode(event.getCursor().getItemMeta().getDisplayName()) : null));
+					: ((event.getCursor().hasItemMeta() && event.getCursor().getItemMeta().hasDisplayName()) ? StringUtils.colorDecode(event.getCursor().getItemMeta().getDisplayName()) : null));
 			if (currentNBT != null && cursorNBT != null) {
 				return currentNBT.equalsIgnoreCase(cursorNBT);
 			}	

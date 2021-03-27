@@ -153,7 +153,7 @@ public class UpdateHandler {
     		try {
     			URLConnection connection = new URL(this.HOST + "?_=" + System.currentTimeMillis()).openConnection();
     			BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-    			String JsonString = StringUtils.getUtils().toString(reader); 
+    			String JsonString = StringUtils.toString(reader); 
 			    JSONObject objectReader = (JSONObject) JSONValue.parseWithException(JsonString);
 			    String gitVersion = objectReader.get("tag_name").toString();
     			reader.close();

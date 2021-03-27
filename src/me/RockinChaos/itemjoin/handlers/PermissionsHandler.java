@@ -25,8 +25,6 @@ import me.RockinChaos.itemjoin.utils.ServerUtils;
 
 public class PermissionsHandler {
 
-	private static PermissionsHandler permissions;
-
    /**
     * Checks if the permission is a custom permission.
     * This fetches the proper permission node, so if a custom permission is not
@@ -37,7 +35,7 @@ public class PermissionsHandler {
     * @param worldName - The name of the current world.
     * @return The permission node of the item.
     */
-	public String customPermissions(final String permissionNode, final String item, final String worldName) {
+	public static String customPermissions(final String permissionNode, final String item, final String worldName) {
 		if (permissionNode != null) {
 			return permissionNode;
 		}
@@ -51,8 +49,8 @@ public class PermissionsHandler {
     * @param permission - The permission the sender is expected to have.
     * @return If the entity has the proper permission.
     */
-	public boolean hasPermission(final CommandSender sender, final String permission) {
-		if (sender.hasPermission(permission) || sender.hasPermission("itemjoin.*") || sender.hasPermission("itemjoin.all") || this.isDeveloper(sender) || (sender instanceof ConsoleCommandSender)) {
+	public static boolean hasPermission(final CommandSender sender, final String permission) {
+		if (sender.hasPermission(permission) || sender.hasPermission("itemjoin.*") || sender.hasPermission("itemjoin.all") || isDeveloper(sender) || (sender instanceof ConsoleCommandSender)) {
 			return true;
 		} else if (!ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Commands-OP") && sender.isOp()) {
 			if (permission.equalsIgnoreCase("itemjoin.use") || permission.equalsIgnoreCase("itemjoin.reload") || permission.equalsIgnoreCase("itemjoin.updates")
@@ -73,7 +71,7 @@ public class PermissionsHandler {
     * @param sender - The entity executing the plugin command.
     * @return If the command sender is the developer of the plugin.
     */
-	private boolean isDeveloper(final CommandSender sender) {
+	private static boolean isDeveloper(final CommandSender sender) {
 		if (ConfigHandler.getConfig().debugEnabled()) {
 			if (sender instanceof Player) {
 				try { 
@@ -90,17 +88,7 @@ public class PermissionsHandler {
     * 
     * @return If the custom items require certain permissions to be given or used.
     */
-	public boolean receiveEnabled() {
+	public static boolean receiveEnabled() {
 		return ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Commands-Get");
 	}
-	
-   /**
-    * Gets the instance of the PermissionsHandler.
-    * 
-    * @return The PermissionsHandler instance.
-    */
-    public static PermissionsHandler getPermissions() { 
-        if (permissions == null) { permissions = new PermissionsHandler(); }
-        return permissions; 
-    } 
 }

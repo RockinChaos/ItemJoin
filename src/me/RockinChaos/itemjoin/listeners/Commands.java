@@ -102,7 +102,7 @@ public class Commands implements Listener {
 	@EventHandler(ignoreCancelled = false)
 	private void onEquipClick(InventoryClickEvent event) {
 		Player player = (Player) event.getWhoClicked();
-		if (StringUtils.getUtils().containsIgnoreCase(event.getAction().name(), "HOTBAR") && event.getView().getBottomInventory().getSize() >= event.getHotbarButton() && event.getHotbarButton() >= 0
+		if (StringUtils.containsIgnoreCase(event.getAction().name(), "HOTBAR") && event.getView().getBottomInventory().getSize() >= event.getHotbarButton() && event.getHotbarButton() >= 0
 		 && !event.getClick().name().equalsIgnoreCase("MIDDLE") && event.getSlotType() == SlotType.ARMOR && event.getView().getBottomInventory().getItem(event.getHotbarButton()) != null && event.getView().getBottomInventory().getItem(event.getHotbarButton()).getType() != Material.AIR) {
 			this.equipCommands(player, null, event.getView().getBottomInventory().getItem(event.getHotbarButton()), "ON_EQUIP", "EQUIPPED", String.valueOf(event.getSlot()), event.getSlotType());
 		}
@@ -111,8 +111,8 @@ public class Commands implements Listener {
 				this.equipCommands(player, null, event.getCurrentItem(), "UN_EQUIP", "UNEQUIPPED", String.valueOf(event.getSlot()), event.getSlotType());
 			} else if (event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
 			String[] itemType = event.getCurrentItem().getType().name().split("_");
-				if (itemType.length >= 2 && itemType[1] != null && !itemType[1].isEmpty() && StringUtils.getUtils().isInt(StringUtils.getUtils().getArmorSlot(itemType[1], true)) 
-					&& player.getInventory().getItem(Integer.parseInt(StringUtils.getUtils().getArmorSlot(itemType[1], true))) == null) { 
+				if (itemType.length >= 2 && itemType[1] != null && !itemType[1].isEmpty() && StringUtils.isInt(StringUtils.getArmorSlot(itemType[1], true)) 
+					&& player.getInventory().getItem(Integer.parseInt(StringUtils.getArmorSlot(itemType[1], true))) == null) { 
 					this.equipCommands(player, null, event.getCurrentItem(), "ON_EQUIP", "SHIFT_EQUIPPED", String.valueOf(event.getSlot()), event.getSlotType());
 				}
 			}
@@ -148,9 +148,9 @@ public class Commands implements Listener {
 		ItemStack item = (event.getItem() != null ? event.getItem().clone() : event.getItem());
 		if (item != null && item.getType() != Material.AIR && !PlayerHandler.isMenuClick(player.getOpenInventory(), event.getAction())) {
 			String[] itemType = item.getType().name().split("_");
-			if (itemType.length >= 2 && itemType[1] != null && !itemType[1].isEmpty() && StringUtils.getUtils().isInt(StringUtils.getUtils().getArmorSlot(itemType[1], true)) 
-				&& player.getInventory().getItem(Integer.parseInt(StringUtils.getUtils().getArmorSlot(itemType[1], true))) == null) {
-				this.equipCommands(player, null, item, "ON_EQUIP", "EQUIPPED", StringUtils.getUtils().getArmorSlot(itemType[1], true), SlotType.ARMOR);
+			if (itemType.length >= 2 && itemType[1] != null && !itemType[1].isEmpty() && StringUtils.isInt(StringUtils.getArmorSlot(itemType[1], true)) 
+				&& player.getInventory().getItem(Integer.parseInt(StringUtils.getArmorSlot(itemType[1], true))) == null) {
+				this.equipCommands(player, null, item, "ON_EQUIP", "EQUIPPED", StringUtils.getArmorSlot(itemType[1], true), SlotType.ARMOR);
 			}
 		}
 	}
@@ -355,8 +355,8 @@ public class Commands implements Listener {
 	private void equipCommands(final Player player, final Player altPlayer, final ItemStack item, final String action, String clickType, final String slot, final SlotType slotType) {
 			String[] itemType = item.getType().name().split("_");
 			if (itemType.length >= 2 && itemType[1] != null && !itemType[1].isEmpty() && !itemType[1].equalsIgnoreCase("HEAD") 
-					&& (clickType.equalsIgnoreCase("SHIFT_EQUIPPED") || itemType[1].equalsIgnoreCase(StringUtils.getUtils().getArmorSlot(slot, false)) 
-					|| (itemType[1].equalsIgnoreCase("HEAD") && StringUtils.getUtils().getArmorSlot(slot, false).equalsIgnoreCase("HELMET")))) {
+					&& (clickType.equalsIgnoreCase("SHIFT_EQUIPPED") || itemType[1].equalsIgnoreCase(StringUtils.getArmorSlot(slot, false)) 
+					|| (itemType[1].equalsIgnoreCase("HEAD") && StringUtils.getArmorSlot(slot, false).equalsIgnoreCase("HELMET")))) {
 				clickType = (clickType.equalsIgnoreCase("SHIFT_EQUIPPED") ? "EQUIPPED" : clickType);
 				this.runCommands(player, altPlayer, item, action, clickType, slot);
 			}

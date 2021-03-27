@@ -66,7 +66,7 @@ public class Recipes implements Listener {
 	        if (rSlot == 2 && event.getInventory().getItem(1) != null &&
 	            event.getInventory().getItem(1).getType() != Material.AIR) {
 	            ItemStack item = event.getInventory().getItem(2);
-	            if (!StringUtils.getUtils().containsIgnoreCase(event.getInventory().getItem(1).getType().toString(), "PAPER") && !StringUtils.getUtils().containsIgnoreCase(event.getInventory().getItem(1).getType().toString(), "NAME_TAG") &&
+	            if (!StringUtils.containsIgnoreCase(event.getInventory().getItem(1).getType().toString(), "PAPER") && !StringUtils.containsIgnoreCase(event.getInventory().getItem(1).getType().toString(), "NAME_TAG") &&
 	                !ItemUtilities.getUtilities().isAllowed(player, item, "item-repairable") || !ItemUtilities.getUtilities().isAllowed(player, event.getInventory().getItem(1), "item-repairable")) {
 	                event.setCancelled(true);
 	                PlayerHandler.updateExperienceLevels(player);

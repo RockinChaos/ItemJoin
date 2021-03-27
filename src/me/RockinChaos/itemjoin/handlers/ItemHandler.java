@@ -69,7 +69,7 @@ public class ItemHandler {
 			ItemMeta meta = item.getItemMeta();
 			List<String> newLore = new ArrayList<String>();
 			if (meta.hasLore()) { newLore = meta.getLore(); }
-			for (String lore : lores) { newLore.add(StringUtils.getUtils().colorFormat(lore)); }
+			for (String lore : lores) { newLore.add(StringUtils.colorFormat(lore)); }
 			meta.setLore(newLore);
 			item.setItemMeta(meta);
 		}
@@ -189,15 +189,15 @@ public class ItemHandler {
         if (glowing) { tempItem.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 1); }
         ItemMeta tempMeta = tempItem.getItemMeta();
         if (ServerUtils.hasSpecificUpdate("1_8")) { tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ENCHANTS); }
-        if (name != null) { name = StringUtils.getUtils().colorFormat(name); tempMeta.setDisplayName(name); }
+        if (name != null) { name = StringUtils.colorFormat(name); tempMeta.setDisplayName(name); }
         if (lores != null && lores.length != 0) {
         	ArrayList<String> loreList = new ArrayList<String>();
         	for (String loreString: lores) { 
         		if (!loreString.isEmpty()) {
         			if (loreString.contains("/n")) {
         				String[] loreSplit = loreString.split(" /n ");
-        				for (String loreStringSplit : loreSplit) { loreList.add(StringUtils.getUtils().colorFormat(loreStringSplit)); }
-        			} else { loreList.add(StringUtils.getUtils().colorFormat(loreString)); }
+        				for (String loreStringSplit : loreSplit) { loreList.add(StringUtils.colorFormat(loreStringSplit)); }
+        			} else { loreList.add(StringUtils.colorFormat(loreString)); }
         		} 
         	}
         	tempMeta.setLore(loreList);
@@ -215,13 +215,13 @@ public class ItemHandler {
     * @return The existing ItemStack from the Players Inventory.
     */
 	public static ItemStack getItem(final Player player, final ItemMap itemMap) {
-		int craftSlot = StringUtils.getUtils().getSlotConversion(itemMap.getSlot());
+		int craftSlot = StringUtils.getSlotConversion(itemMap.getSlot());
 		ItemStack existingItem = null;
-		if (StringUtils.getUtils().isInt(itemMap.getSlot())) {
+		if (StringUtils.isInt(itemMap.getSlot())) {
 			existingItem = player.getInventory().getItem(Integer.parseInt(itemMap.getSlot()));
 		} else if (itemMap.getSlot().contains("%")) {
-			String slot = StringUtils.getUtils().translateLayout(itemMap.getSlot(), player);
-			if (StringUtils.getUtils().isInt(slot)) {
+			String slot = StringUtils.translateLayout(itemMap.getSlot(), player);
+			if (StringUtils.isInt(slot)) {
 				existingItem = player.getInventory().getItem(Integer.parseInt(slot));
 			}
 		} else if (CustomSlot.HELMET.isSlot(itemMap.getSlot())) {
@@ -251,13 +251,13 @@ public class ItemHandler {
 		try {
 			boolean isLegacy = (data != null);
 			if (material.contains(":")) { String[] parts = material.split(":"); material = parts[0]; if (!parts[1].equalsIgnoreCase("0")) { data = parts[1]; isLegacy = true; } }
-			if (StringUtils.getUtils().isInt(material) && !ServerUtils.hasSpecificUpdate("1_13")) {
+			if (StringUtils.isInt(material) && !ServerUtils.hasSpecificUpdate("1_13")) {
 				return LegacyAPI.findMaterial(Integer.parseInt(material));
-			} else if (StringUtils.getUtils().isInt(material) && ServerUtils.hasSpecificUpdate("1_13") || isLegacy && ServerUtils.hasSpecificUpdate("1_13")) {
+			} else if (StringUtils.isInt(material) && ServerUtils.hasSpecificUpdate("1_13") || isLegacy && ServerUtils.hasSpecificUpdate("1_13")) {
 				int dataValue;
-				if (!StringUtils.getUtils().isInt(material)) { material = "LEGACY_" + material; }
+				if (!StringUtils.isInt(material)) { material = "LEGACY_" + material; }
 				if (data != null) { dataValue = Integer.parseInt(data); } else { dataValue = 0; }
-				if (!StringUtils.getUtils().isInt(material)) { return LegacyAPI.getMaterial(Material.getMaterial(material.toUpperCase()), (byte) dataValue); } 
+				if (!StringUtils.isInt(material)) { return LegacyAPI.getMaterial(Material.getMaterial(material.toUpperCase()), (byte) dataValue); } 
 				else { return LegacyAPI.getMaterial(Integer.parseInt(material), (byte) dataValue); }
 			} else if (!ServerUtils.hasSpecificUpdate("1_13")) {
 				return Material.getMaterial(material.toUpperCase());
@@ -707,7 +707,7 @@ public class ItemHandler {
 			return true;
 		} else if (!dataTagsEnabled()) { 
 			if (item != null && item.hasItemMeta() && item.getItemMeta().hasDisplayName()
-				&& StringUtils.getUtils().colorDecode(item.getItemMeta().getDisplayName()).contains(StringUtils.getUtils().colorDecode(StringUtils.getUtils().colorEncode("ItemJoin")))) {
+				&& StringUtils.colorDecode(item.getItemMeta().getDisplayName()).contains(StringUtils.colorDecode(StringUtils.colorEncode("ItemJoin")))) {
 				return true;
 			}
 		}
@@ -758,7 +758,7 @@ public class ItemHandler {
     * @return The Delay of the String as an Integer.
     */
 	public static int getDelay(final String context) {
-		try { if (StringUtils.getUtils().returnInteger(context) != null) { return StringUtils.getUtils().returnInteger(context); } } 
+		try { if (StringUtils.returnInteger(context) != null) { return StringUtils.returnInteger(context); } } 
 		catch (Exception e) { ServerUtils.sendDebugTrace(e); }
 		return 0;
 	}
@@ -770,11 +770,11 @@ public class ItemHandler {
     * @return The Delay Format of the String with the proper Integer value.
     */
 	public static String getDelayFormat(final String context) {
-		if (StringUtils.getUtils().containsIgnoreCase(context, "<delay:" + StringUtils.getUtils().returnInteger(context) + ">") 
-				|| StringUtils.getUtils().containsIgnoreCase(context, "delay:" + StringUtils.getUtils().returnInteger(context) + "") 
-				|| StringUtils.getUtils().containsIgnoreCase(context, "<delay: " + StringUtils.getUtils().returnInteger(context) + ">")
-				|| StringUtils.getUtils().containsIgnoreCase(context, "delay: " + StringUtils.getUtils().returnInteger(context) + "")) {
-			return ("<delay:" + StringUtils.getUtils().returnInteger(context) + ">");
+		if (StringUtils.containsIgnoreCase(context, "<delay:" + StringUtils.returnInteger(context) + ">") 
+				|| StringUtils.containsIgnoreCase(context, "delay:" + StringUtils.returnInteger(context) + "") 
+				|| StringUtils.containsIgnoreCase(context, "<delay: " + StringUtils.returnInteger(context) + ">")
+				|| StringUtils.containsIgnoreCase(context, "delay: " + StringUtils.returnInteger(context) + "")) {
+			return ("<delay:" + StringUtils.returnInteger(context) + ">");
 		}
 		return null;
 	}

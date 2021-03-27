@@ -143,7 +143,7 @@ public class LegacyAPI {
     */
     public static org.bukkit.Material findMaterial(final int typeID) {
         final Material[] foundMaterial = new Material[1];
-        EnumSet.allOf(Material.class).forEach(material -> { try { if (StringUtils.getUtils().containsIgnoreCase(material.toString(), "LEGACY_") && material.getId() == typeID || !ServerUtils.hasSpecificUpdate("1_13") && material.getId() == typeID) { foundMaterial[0] = material; } } catch (Exception e) { }});
+        EnumSet.allOf(Material.class).forEach(material -> { try { if (StringUtils.containsIgnoreCase(material.toString(), "LEGACY_") && material.getId() == typeID || !ServerUtils.hasSpecificUpdate("1_13") && material.getId() == typeID) { foundMaterial[0] = material; } } catch (Exception e) { }});
         return foundMaterial[0];
     }
 
@@ -343,7 +343,7 @@ public class LegacyAPI {
 			copyPages.set(0, ItemHandler.cutDelay(copyPages.get(0)));
 			List < String > bookList = new ArrayList < String > ();
 			for (int k = 0; k < pages.size(); k++) {
-				bookList.add(StringUtils.getUtils().translateLayout(pages.get(k), player));
+				bookList.add(StringUtils.translateLayout(pages.get(k), player));
 			}
 			((BookMeta) meta).setPages(bookList);
 			itemMap.setPages(bookList);
@@ -455,38 +455,38 @@ public class LegacyAPI {
     */
 	public static int getDataValue(final Material material) {
 		if (material == Material.STONE) { return 6; }
-		else if (StringUtils.getUtils().containsIgnoreCase(material.toString(), "DIRT")) { return 2; }
+		else if (StringUtils.containsIgnoreCase(material.toString(), "DIRT")) { return 2; }
 		else if (material.toString().equalsIgnoreCase("WOOD")) { return 5; }
 		else if (material.toString().equalsIgnoreCase("LOG")) { return 3; }
-		else if (StringUtils.getUtils().containsIgnoreCase(material.toString(), "SAPLING")) { return 5; }
+		else if (StringUtils.containsIgnoreCase(material.toString(), "SAPLING")) { return 5; }
 		else if (material.toString().equalsIgnoreCase("SAND")) { return 1; }
 		else if (material.toString().equalsIgnoreCase("LEAVES")) { return 3; }
-		else if (StringUtils.getUtils().containsIgnoreCase(material.toString(), "SPONGE")) { return 1; }
-		else if (StringUtils.getUtils().containsIgnoreCase(material.toString(), "SANDSTONE") && !StringUtils.getUtils().containsIgnoreCase(material.toString(), "STAIRS")) { return 2; }
-		else if (StringUtils.getUtils().containsIgnoreCase(material.toString(), "LONG_GRASS")) { return 2; }
-		else if (StringUtils.getUtils().containsIgnoreCase(material.toString(), "RED_ROSE")) { return 8; }
-		else if (StringUtils.getUtils().containsIgnoreCase(material.toString(), "WOOD_STEP")) { return 5; }
-		else if (StringUtils.getUtils().containsIgnoreCase(material.toString(), "STEP")) { return 7; }
-		else if (StringUtils.getUtils().containsIgnoreCase(material.toString(), "STAINED_GLASS")) { return 15; }
-		else if (StringUtils.getUtils().containsIgnoreCase(material.toString(), "MONSTER_EGGS")) { return 5; }
-		else if (StringUtils.getUtils().containsIgnoreCase(material.toString(), "SMOOTH_BRICK")) { return 3; }
-		else if (StringUtils.getUtils().containsIgnoreCase(material.toString(), "COBBLE_WALL")) { return 1; }
-		else if (StringUtils.getUtils().containsIgnoreCase(material.toString(), "QUARTZ_BLOCK")) { return 2; }
-		else if (StringUtils.getUtils().containsIgnoreCase(material.toString(), "STAINED_CLAY")) { return 15; }
-		else if (StringUtils.getUtils().containsIgnoreCase(material.toString(), "LOG_2")) { return 1; }
-		else if (StringUtils.getUtils().containsIgnoreCase(material.toString(), "LEAVES_2")) { return 1; }
+		else if (StringUtils.containsIgnoreCase(material.toString(), "SPONGE")) { return 1; }
+		else if (StringUtils.containsIgnoreCase(material.toString(), "SANDSTONE") && !StringUtils.containsIgnoreCase(material.toString(), "STAIRS")) { return 2; }
+		else if (StringUtils.containsIgnoreCase(material.toString(), "LONG_GRASS")) { return 2; }
+		else if (StringUtils.containsIgnoreCase(material.toString(), "RED_ROSE")) { return 8; }
+		else if (StringUtils.containsIgnoreCase(material.toString(), "WOOD_STEP")) { return 5; }
+		else if (StringUtils.containsIgnoreCase(material.toString(), "STEP")) { return 7; }
+		else if (StringUtils.containsIgnoreCase(material.toString(), "STAINED_GLASS")) { return 15; }
+		else if (StringUtils.containsIgnoreCase(material.toString(), "MONSTER_EGGS")) { return 5; }
+		else if (StringUtils.containsIgnoreCase(material.toString(), "SMOOTH_BRICK")) { return 3; }
+		else if (StringUtils.containsIgnoreCase(material.toString(), "COBBLE_WALL")) { return 1; }
+		else if (StringUtils.containsIgnoreCase(material.toString(), "QUARTZ_BLOCK")) { return 2; }
+		else if (StringUtils.containsIgnoreCase(material.toString(), "STAINED_CLAY")) { return 15; }
+		else if (StringUtils.containsIgnoreCase(material.toString(), "LOG_2")) { return 1; }
+		else if (StringUtils.containsIgnoreCase(material.toString(), "LEAVES_2")) { return 1; }
 		else if (material.toString().equalsIgnoreCase("PRISMARINE")) { return 2; }
-		else if (StringUtils.getUtils().containsIgnoreCase(material.toString(), "CARPET")) { return 15; }
-		else if (StringUtils.getUtils().containsIgnoreCase(material.toString(), "DOUBLE_PLANT")) { return 5; }
-		else if (StringUtils.getUtils().containsIgnoreCase(material.toString(), "RED_SANDSTONE")) { return 2; }
-		else if (StringUtils.getUtils().containsIgnoreCase(material.toString(), "GOLDEN_APPLE")) { return 1; }
-		else if (StringUtils.getUtils().containsIgnoreCase(material.toString(), "RAW_FISH")) { return 3; }
-		else if (StringUtils.getUtils().containsIgnoreCase(material.toString(), "COOKED_FISHED")) { return 1; }
-		else if (StringUtils.getUtils().containsIgnoreCase(material.toString(), "INK_SAC")) { return 15; }
-		else if (StringUtils.getUtils().containsIgnoreCase(material.toString(), "SKULL_ITEM") && ServerUtils.hasSpecificUpdate("1_9")) { return 5; }
-		else if (StringUtils.getUtils().containsIgnoreCase(material.toString(), "SKULL_ITEM")) { return 4; }
-		else if (StringUtils.getUtils().containsIgnoreCase(material.toString(), "CONCRETE")) { return 15; }
-		else if (StringUtils.getUtils().containsIgnoreCase(material.toString(), "WOOL")) { return 15; }
+		else if (StringUtils.containsIgnoreCase(material.toString(), "CARPET")) { return 15; }
+		else if (StringUtils.containsIgnoreCase(material.toString(), "DOUBLE_PLANT")) { return 5; }
+		else if (StringUtils.containsIgnoreCase(material.toString(), "RED_SANDSTONE")) { return 2; }
+		else if (StringUtils.containsIgnoreCase(material.toString(), "GOLDEN_APPLE")) { return 1; }
+		else if (StringUtils.containsIgnoreCase(material.toString(), "RAW_FISH")) { return 3; }
+		else if (StringUtils.containsIgnoreCase(material.toString(), "COOKED_FISHED")) { return 1; }
+		else if (StringUtils.containsIgnoreCase(material.toString(), "INK_SAC")) { return 15; }
+		else if (StringUtils.containsIgnoreCase(material.toString(), "SKULL_ITEM") && ServerUtils.hasSpecificUpdate("1_9")) { return 5; }
+		else if (StringUtils.containsIgnoreCase(material.toString(), "SKULL_ITEM")) { return 4; }
+		else if (StringUtils.containsIgnoreCase(material.toString(), "CONCRETE")) { return 15; }
+		else if (StringUtils.containsIgnoreCase(material.toString(), "WOOL")) { return 15; }
 		return 0;
 	}
     
@@ -496,7 +496,7 @@ public class LegacyAPI {
     * 
     */
 	public static void registerPickups() {
-		if (!StringUtils.getUtils().isRegistered(me.RockinChaos.itemjoin.listeners.legacy.Legacy_Pickups.class.getSimpleName())) { 
+		if (!StringUtils.isRegistered(me.RockinChaos.itemjoin.listeners.legacy.Legacy_Pickups.class.getSimpleName())) { 
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new me.RockinChaos.itemjoin.listeners.legacy.Legacy_Pickups(), ItemJoin.getInstance()); 
 		}
 	}
@@ -507,7 +507,7 @@ public class LegacyAPI {
     * 
     */
 	public static void registerStackable() {
-		if (!ServerUtils.hasSpecificUpdate("1_12") && !StringUtils.getUtils().isRegistered(me.RockinChaos.itemjoin.listeners.legacy.Legacy_Stackable.class.getSimpleName())) { 
+		if (!ServerUtils.hasSpecificUpdate("1_12") && !StringUtils.isRegistered(me.RockinChaos.itemjoin.listeners.legacy.Legacy_Stackable.class.getSimpleName())) { 
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new me.RockinChaos.itemjoin.listeners.legacy.Legacy_Stackable(), ItemJoin.getInstance()); 
 		}
 	}
@@ -518,7 +518,7 @@ public class LegacyAPI {
     * 
     */
 	public static void registerCommands() {
-		if (!ServerUtils.hasSpecificUpdate("1_8") && !StringUtils.getUtils().isRegistered(me.RockinChaos.itemjoin.listeners.legacy.Legacy_Commands.class.getSimpleName())) {
+		if (!ServerUtils.hasSpecificUpdate("1_8") && !StringUtils.isRegistered(me.RockinChaos.itemjoin.listeners.legacy.Legacy_Commands.class.getSimpleName())) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new me.RockinChaos.itemjoin.listeners.legacy.Legacy_Commands(), ItemJoin.getInstance());
 		}
 	}
@@ -529,7 +529,7 @@ public class LegacyAPI {
     * 
     */
 	public static void registerConsumes() {
-		if (!ServerUtils.hasSpecificUpdate("1_11") && !StringUtils.getUtils().isRegistered( me.RockinChaos.itemjoin.listeners.legacy.Legacy_Consumes.class.getSimpleName())) {
+		if (!ServerUtils.hasSpecificUpdate("1_11") && !StringUtils.isRegistered( me.RockinChaos.itemjoin.listeners.legacy.Legacy_Consumes.class.getSimpleName())) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new  me.RockinChaos.itemjoin.listeners.legacy.Legacy_Consumes(), ItemJoin.getInstance());
 		}
 	}
@@ -540,7 +540,7 @@ public class LegacyAPI {
     * 
     */
 	public static void registerStorable() {
-		if (!ServerUtils.hasSpecificUpdate("1_8") && !StringUtils.getUtils().isRegistered(me.RockinChaos.itemjoin.listeners.legacy.Legacy_Storable.class.getSimpleName())) {
+		if (!ServerUtils.hasSpecificUpdate("1_8") && !StringUtils.isRegistered(me.RockinChaos.itemjoin.listeners.legacy.Legacy_Storable.class.getSimpleName())) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new me.RockinChaos.itemjoin.listeners.legacy.Legacy_Storable(), ItemJoin.getInstance());
 		}
 	}

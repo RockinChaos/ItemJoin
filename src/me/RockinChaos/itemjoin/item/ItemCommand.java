@@ -196,7 +196,7 @@ public class ItemCommand {
 	*/
 	public void setCommand(String input) {
 		input = input.trim();
-		input = StringUtils.getUtils().colorFormat(input);
+		input = StringUtils.colorFormat(input);
 		this.command = input;
 	}
 	
@@ -313,16 +313,16 @@ public class ItemCommand {
 	*/
 	private void dispatchConsoleCommands(final Player player, final Player altPlayer) {
 		try {
-			if (StringUtils.getUtils().containsIgnoreCase(this.command, "[close]")) {
+			if (StringUtils.containsIgnoreCase(this.command, "[close]")) {
 				SchedulerUtils.run(() -> {
 					PlayerHandler.safeInventoryClose(player);
 				});
 			} else {
 				String[] values = new String[1];
 				if (altPlayer != null) { values[0] = altPlayer.getName(); }
-				this.setLoggable(player, "/" + StringUtils.getUtils().translateLayout(this.command, player, values));
+				this.setLoggable(player, "/" + StringUtils.translateLayout(this.command, player, values));
 				SchedulerUtils.run(() -> {
-					Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), StringUtils.getUtils().translateLayout(this.command, player, values));
+					Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), StringUtils.translateLayout(this.command, player, values));
 				});
 			}
 		} catch (Exception e) {
@@ -339,7 +339,7 @@ public class ItemCommand {
 	*/
 	private void dispatchOpCommands(final Player player, final Player altPlayer) {
 		try {
-			if (StringUtils.getUtils().containsIgnoreCase(this.command, "[close]")) {
+			if (StringUtils.containsIgnoreCase(this.command, "[close]")) {
 				SchedulerUtils.run(() -> {
 					PlayerHandler.safeInventoryClose(player);
 				});
@@ -349,9 +349,9 @@ public class ItemCommand {
 					player.setOp(true);
 					String[] values = new String[1];
 					if (altPlayer != null) { values[0] = altPlayer.getName(); }
-					this.setLoggable(player, "/" + StringUtils.getUtils().translateLayout(this.command, player, values));
+					this.setLoggable(player, "/" + StringUtils.translateLayout(this.command, player, values));
 					SchedulerUtils.run(() -> {
-						player.chat("/" + StringUtils.getUtils().translateLayout(this.command, player, values));
+						player.chat("/" + StringUtils.translateLayout(this.command, player, values));
 					});
 				} catch (Exception e) {
 					ServerUtils.sendDebugTrace(e);
@@ -373,16 +373,16 @@ public class ItemCommand {
 	*/
 	private void dispatchPlayerCommands(final Player player, final Player altPlayer) {
 		try {
-			if (StringUtils.getUtils().containsIgnoreCase(this.command, "[close]")) {
+			if (StringUtils.containsIgnoreCase(this.command, "[close]")) {
 				SchedulerUtils.run(() -> {
 					PlayerHandler.safeInventoryClose(player);
 				});
 			} else {
 				String[] values = new String[1];
 				if (altPlayer != null) { values[0] = altPlayer.getName(); }
-				this.setLoggable(player, "/" + StringUtils.getUtils().translateLayout(this.command, player, values));
+				this.setLoggable(player, "/" + StringUtils.translateLayout(this.command, player, values));
 				SchedulerUtils.run(() -> {
-					player.chat("/" + StringUtils.getUtils().translateLayout(this.command, player, values));
+					player.chat("/" + StringUtils.translateLayout(this.command, player, values));
 				});
 			}
 		} catch (Exception e) {
@@ -402,7 +402,7 @@ public class ItemCommand {
 			SchedulerUtils.run(() -> {
 				String[] values = new String[1];
 				if (altPlayer != null) { values[0] = altPlayer.getName(); }
-				player.sendMessage(StringUtils.getUtils().translateLayout(this.command, player, values)); 
+				player.sendMessage(StringUtils.translateLayout(this.command, player, values)); 
 			});
 		} 
 		catch (Exception e) {
@@ -422,7 +422,7 @@ public class ItemCommand {
 			SchedulerUtils.run(() -> {
 				String[] values = new String[1];
 				if (altPlayer != null) { values[0] = altPlayer.getName(); }
-				BungeeCordAPI.SwitchServers(player, StringUtils.getUtils().translateLayout(this.command, player, values)); 
+				BungeeCordAPI.getBungee(false).SwitchServers(player, StringUtils.translateLayout(this.command, player, values)); 
 			});
 		} 
 		catch (Exception e) {
@@ -442,7 +442,7 @@ public class ItemCommand {
 			SchedulerUtils.run(() -> {
 				String[] values = new String[1];
 				if (altPlayer != null) { values[0] = altPlayer.getName(); }
-				BungeeCordAPI.ExecuteCommand(player, StringUtils.getUtils().translateLayout(this.command, player, values)); 
+				BungeeCordAPI.getBungee(false).ExecuteCommand(player, StringUtils.translateLayout(this.command, player, values)); 
 			});
 		} 
 		catch (Exception e) {
@@ -542,7 +542,7 @@ public class ItemCommand {
 		else if (input.startsWith("delay:")) { input = input.substring(6); type = Executor.DELAY; }
 			
 		input = input.trim();
-		input = StringUtils.getUtils().colorFormat(input);
+		input = StringUtils.colorFormat(input);
 		return new ItemCommand(input, action, type, itemMap, delay, listSection);
 	}
 	
@@ -664,8 +664,8 @@ public class ItemCommand {
 		private Action(String Config, String Actions, String ClickType) { this.config = Config; this.actions = Actions; this.clickType = ClickType; }
 		public String config() { return this.config; }
 		public boolean hasConfig(String Config) { return this.config.contains(Config); }
-		public boolean hasAction(String Action) { return StringUtils.getUtils().splitIgnoreCase(this.actions, Action, ","); }
-		public boolean hasClickType(String ClickType) { return StringUtils.getUtils().splitIgnoreCase(this.clickType, ClickType, ","); }
+		public boolean hasAction(String Action) { return StringUtils.splitIgnoreCase(this.actions, Action, ","); }
+		public boolean hasClickType(String ClickType) { return StringUtils.splitIgnoreCase(this.clickType, ClickType, ","); }
 	}
 	
    /**

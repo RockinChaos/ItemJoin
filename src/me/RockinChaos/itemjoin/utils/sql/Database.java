@@ -293,7 +293,7 @@ public class Database extends Controller {
 				columnExists = true;
 			}
 		} catch (Exception e) {
-			if (StringUtils.getUtils().containsIgnoreCase(e.getMessage(), "no such column") || StringUtils.getUtils().containsIgnoreCase(e.getMessage(), "Unknown column")) {
+			if (StringUtils.containsIgnoreCase(e.getMessage(), "no such column") || StringUtils.containsIgnoreCase(e.getMessage(), "Unknown column")) {
 				columnExists = false;
 			} else {
 				ServerUtils.logSevere("{SQL} [6] Failed to execute database statement.");

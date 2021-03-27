@@ -39,8 +39,8 @@ public class Pickups implements Listener {
 	  	Entity entity = event.getEntity();
 	  	if (entity instanceof Player) {
 	  		Player player = (Player) event.getEntity();
-	  		if (StringUtils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Pickups"), "TRUE") || StringUtils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Pickups"), player.getWorld().getName())
-	  			|| StringUtils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Pickups"), "ALL") || StringUtils.getUtils().containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Pickups"), "GLOBAL")) {
+	  		if (StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Pickups"), "TRUE") || StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Pickups"), player.getWorld().getName())
+	  			|| StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Pickups"), "ALL") || StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Pickups"), "GLOBAL")) {
 	  			if (ConfigHandler.getConfig().isPreventOP() && player.isOp() || ConfigHandler.getConfig().isPreventCreative() && PlayerHandler.isCreativeMode(player)) { } 
 	  			else { event.setCancelled(true); }
 	  		}
