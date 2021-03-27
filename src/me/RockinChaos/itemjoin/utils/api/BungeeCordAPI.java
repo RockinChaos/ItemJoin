@@ -18,6 +18,7 @@
 package me.RockinChaos.itemjoin.utils.api;
 
 import me.RockinChaos.itemjoin.ItemJoin;
+import me.RockinChaos.itemjoin.utils.SchedulerUtils;
 import me.RockinChaos.itemjoin.utils.ServerUtils;
 
 import org.bukkit.entity.Player;
@@ -29,6 +30,10 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 
 public class BungeeCordAPI implements PluginMessageListener {
+	
+	private final String PLUGIN_CHANNEL = "plugin:itemjoin";
+	private boolean bungeePlugin = false;
+	private static BungeeCordAPI bungee;
 
    /**
     * Initializes the BungeeCord Listener.
@@ -36,10 +41,12 @@ public class BungeeCordAPI implements PluginMessageListener {
     */
 	public BungeeCordAPI() {
 		Messenger messenger = ItemJoin.getInstance().getServer().getMessenger();
-		if (!messenger.isOutgoingChannelRegistered(ItemJoin.getInstance(), "BungeeCord")) {
+		if (!messenger.isOutgoingChannelRegistered(ItemJoin.getInstance(), this.PLUGIN_CHANNEL)) {
+			messenger.registerOutgoingPluginChannel(ItemJoin.getInstance(), this.PLUGIN_CHANNEL);
 			messenger.registerOutgoingPluginChannel(ItemJoin.getInstance(), "BungeeCord");
 		}
-		if (!messenger.isIncomingChannelRegistered(ItemJoin.getInstance(), "BungeeCord")) {
+		if (!messenger.isIncomingChannelRegistered(ItemJoin.getInstance(), this.PLUGIN_CHANNEL)) {
+			messenger.registerIncomingPluginChannel(ItemJoin.getInstance(), this.PLUGIN_CHANNEL, this);
 			messenger.registerIncomingPluginChannel(ItemJoin.getInstance(), "BungeeCord", this);
 		}
 	}
@@ -50,7 +57,7 @@ public class BungeeCordAPI implements PluginMessageListener {
     * @param player - The Player switching servers.
     * @param server - The String name of the server that the Player is connecting to.
     */
-	public static void SwitchServers(final Player player, final String server) {
+	public void SwitchServers(final Player player, final String server) {
 		ByteArrayDataOutput out = ByteStreams.newDataOutput();
 		try {
 			out.writeUTF("Connect");
@@ -65,16 +72,23 @@ public class BungeeCordAPI implements PluginMessageListener {
     * @param player - The Player executing the Bungee Command.
     * @param command - The Bungee Command the Player is executing.
     */
-	public static void ExecuteCommand(final Player player, final String command) {
+	public void ExecuteCommand(final Player player, final String command) {
 		ByteArrayDataOutput out = ByteStreams.newDataOutput();
 		try {
-			out.writeUTF("Message");
 			out.writeUTF(player.getName());
-			out.writeUTF("/" + command);
+			out.writeUTF(command);
 		} catch (Exception e) { ServerUtils.sendDebugTrace(e); }
-		player.sendPluginMessage(ItemJoin.getInstance(), "BungeeCord", out.toByteArray());
+		player.sendPluginMessage(ItemJoin.getInstance(), this.PLUGIN_CHANNEL, out.toByteArray());
+		if (!this.bungeePlugin) {
+			SchedulerUtils.runLater(10L, () -> {
+				if (!this.bungeePlugin) {
+					ServerUtils.messageSender(player, "&cItemJoin-Bungee was not detected on your BungeeCord server, the specified command /" + command + " will not work without it.");
+					ServerUtils.logSevere("A custom item is set to execute the Bungee command /" + command + " but, ItemJoin-Bungee was not detected on your BungeeCord server.");
+				}
+			});
+		}
 	}
-	
+
    /**
     * Sends the Server Switch message when attempting to switch servers.
     * 
@@ -84,11 +98,25 @@ public class BungeeCordAPI implements PluginMessageListener {
     */
 	@Override
 	public void onPluginMessageReceived(final String channel, final Player player, final byte[] message) {
-		if (!channel.equals("BungeeCord")) { return; }
+		if (!channel.equals(this.PLUGIN_CHANNEL) && !channel.equals("BungeeCord")) { return; }
 		ByteArrayDataInput in = ByteStreams.newDataInput(message);
 		String subchannel = in.readUTF();
 		if (subchannel.equals("ConnectOther") || subchannel.equals("Connect")) {
 			player.sendMessage(subchannel + " " + in.readByte());
+		} else if (subchannel.equals("Confirmation")) {
+			this.bungeePlugin = true;
 		}
 	} 
+	
+   /**
+    * Gets the instance of the ConfigHandler.
+    * 
+    * @return The ConfigHandler instance.
+    */
+    public static BungeeCordAPI getBungee(final boolean regen) { 
+        if (bungee == null || regen) {
+        	bungee = new BungeeCordAPI(); 
+        }
+        return bungee; 
+    } 
 }
