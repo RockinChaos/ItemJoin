@@ -538,7 +538,6 @@ public class StringUtils {
     */
 	public static String translateLayout(String str, final Player player, final String...placeHolder) {
 		String playerName = "EXEMPT";
-		
 		if (player != null && DependAPI.getDepends(false).nickEnabled()) {
 			try {
 				de.domedd.betternick.api.nickedplayer.NickedPlayer np = new de.domedd.betternick.api.nickedplayer.NickedPlayer(player);
@@ -553,7 +552,6 @@ public class StringUtils {
 				} catch (NullPointerException e2) { playerName = player.getName(); }
 			}
 		} else if (player != null) { playerName = player.getName(); }
-		
 		if (playerName != null && player != null && !(player instanceof ConsoleCommandSender)) {
 			try { str = str.replace("%player%", playerName); } catch (Exception e) { ServerUtils.sendDebugTrace(e); }
 			try { str = str.replace("%mob_kills%", String.valueOf(player.getStatistic(Statistic.MOB_KILLS))); } catch (Exception e) { ServerUtils.sendDebugTrace(e); }
@@ -565,7 +563,7 @@ public class StringUtils {
 				str = str.replace("%player_health%", String.valueOf(health)); 
 			} catch (Exception e) { ServerUtils.sendDebugTrace(e); }
 			try { str = str.replace("%player_location%", player.getLocation().getBlockX() + ", " + player.getLocation().getBlockY() + ", " + player.getLocation().getBlockZ()); } catch (Exception e) { ServerUtils.sendDebugTrace(e); }
-			try { if (placeHolder != null && placeHolder.length >= 1) { str = str.replace("%player_hit%", placeHolder[0]); } } catch (Exception e) { ServerUtils.sendDebugTrace(e); }
+			try { if (placeHolder != null && placeHolder.length >= 1 && placeHolder[0] != null) { str = str.replace("%player_hit%", placeHolder[0]); } } catch (Exception e) { ServerUtils.sendDebugTrace(e); }
 			try { if (Bukkit.isPrimaryThread()) { str = str.replace("%player_interact%", PlayerHandler.getNearbyPlayer(player, 3)); } } catch (Exception e) { ServerUtils.sendDebugTrace(e); } }
 			if (player == null) { try { str = str.replace("%player%", "CONSOLE"); } catch (Exception e) { ServerUtils.sendDebugTrace(e); } }
 			str = ChatColor.translateAlternateColorCodes('&', translateHexColorCodes(str));
