@@ -49,6 +49,7 @@ import me.RockinChaos.itemjoin.listeners.Interfaces;
 import me.RockinChaos.itemjoin.listeners.Entities;
 import me.RockinChaos.itemjoin.listeners.Pickups;
 import me.RockinChaos.itemjoin.listeners.Placement;
+import me.RockinChaos.itemjoin.listeners.Projectile;
 import me.RockinChaos.itemjoin.listeners.Recipes;
 import me.RockinChaos.itemjoin.listeners.Stackable;
 import me.RockinChaos.itemjoin.listeners.Storable;
@@ -645,6 +646,9 @@ public class ConfigHandler {
 		}
 		if ((itemMap.isPlaceable() || itemMap.isCountLock()) && !StringUtils.isRegistered(Placement.class.getSimpleName())) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Placement(), ItemJoin.getInstance());
+		}
+		if ((itemMap.isCountLock() || itemMap.isTeleport()) && !StringUtils.isRegistered(Projectile.class.getSimpleName())) {
+			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Projectile(), ItemJoin.getInstance());
 		}
 		if (itemMap.isCountLock() || itemMap.isCustomConsumable()) {
 			if (ServerUtils.hasSpecificUpdate("1_11") && !StringUtils.isRegistered(Consumes.class.getSimpleName())) {

@@ -938,9 +938,9 @@ public class Menu {
 					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 					creatingPane(event.getPlayer(), itemMap);
 				}));
-			} else if (itemMap.getMaterial().toString().contains("TIPPED_ARROW")) {
-				creatingPane.addButton(new Button(ItemHandler.getItem("BLAZE_POWDER", 1, false, "&e&lEffects", "&7", "&7*Add custom effects", "&7to the arrow tip.", "&9&lTipped-Effect: &a" + StringUtils.nullCheck(potionList)),
-						event -> potionPane(player, itemMap)));
+			} if (itemMap.getMaterial().toString().contains("ARROW") && !itemMap.getMaterial().toString().contains("TIPPED_ARROW")) {
+				creatingPane.addButton(new Button(ItemHandler.getItem("ENDER_PEARL", 1, false, "&e&lTeleport", "&7", "&7*Set the arrow to teleport", "&7the player upon landing.", "&9&lEnabled: &a" + String.valueOf(itemMap.isTeleport()).toUpperCase()),
+						event -> teleportPane(player, itemMap, 0)));
 			} else if (itemMap.getMaterial().toString().contains("CHARGE") || itemMap.getMaterial().toString().equalsIgnoreCase("FIREWORK_STAR")) {
 				Interface colorPane = new Interface(true, 6, GUIName, player);
 				colorPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu"), event -> creatingPane(player, itemMap)));
@@ -961,10 +961,10 @@ public class Menu {
 				}));
 			} else if (itemMap.getMaterial().toString().contains("GOLDEN_APPLE")) {
 				creatingPane.addButton(new Button(ItemHandler.getItem("POTION", 1, false, "&e&lEffects", "&7", "&7*Add custom effects after", "&7consuming the apple item.", "&9&lNotch-Effects: &a" + StringUtils.nullCheck(potionList)),
-						event -> potionPane(player, itemMap)));
+						event -> potionPane(player, itemMap, 0)));
 			} else if (itemMap.getMaterial().toString().equalsIgnoreCase("POTION")) {
 				creatingPane.addButton(new Button(ItemHandler.getItem("POTION", 1, false, "&e&lEffects", "&7", "&7*Add custom effects after", "&7consuming the potion item.", "&9&lPotion-Effects: &a" + StringUtils.nullCheck(potionList)),
-						event -> potionPane(player, itemMap)));
+						event -> potionPane(player, itemMap, 0)));
 			} else if (itemMap.getMaterial().toString().contains("BANNER")) {
 				creatingPane.addButton(new Button(ItemHandler.getItem("CLAY_BALL", 1, false, "&e&lBanner Patterns", "&7", "&7*Set custom patterns that", "&7will appear on the item.", "&9&lBanner-Meta: &a" + StringUtils.nullCheck(patternList)),
 						event -> bannerPane(player, itemMap)));
@@ -3142,7 +3142,7 @@ public class Menu {
 					itemMap.setCommandParticle(null);
 					commandPane(player, itemMap);
 				} else {
-					particlePane(player, itemMap);
+					particlePane(player, itemMap, 3);
 				}
 			}));
 			commandPane.addButton(new Button(ItemHandler.getItem("EMERALD", 1, false, "&a&lItem Cost", "&7", "&7*Material that will", "&7be charged upon successfully", "&7executing the commands.", "&9&lCOMMANDS-ITEM: &a" + 
@@ -3203,7 +3203,7 @@ public class Menu {
 					itemMap.setCommandSound(null);
 					commandPane(player, itemMap);
 				} else {
-					soundPane(player, itemMap);
+					soundPane(player, itemMap, 3);
 				}
 			}));
 			commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "REPEATER" : "356"), 1, false, "&a&lSequence", "&7", "&7*The order that the command lines", "&7will be executed in.", "&9&lCOMMANDS-SEQUENCE: &a" + 
@@ -3975,17 +3975,27 @@ public class Menu {
     * @param player - The Player to have the Pane opened.
     * @param itemMap - The ItemMap currently being modified.
     */
-	private static void soundPane(final Player player, final ItemMap itemMap) {
+	private static void soundPane(final Player player, final ItemMap itemMap, final int stage) {
 		Interface soundPane = new Interface(true, 6, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
-			soundPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item commands menu."), event -> {
-				commandPane(player, itemMap);
-			}));
+				if (stage != 3) {
+					soundPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the teleport menu."), event -> commandPane(player, itemMap)));
+				} else { 
+					soundPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item commands menu."), event -> commandPane(player, itemMap))); 
+				}
+			
 			for (Sound sound: Sound.values()) {
-				soundPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "MUSIC_DISC_MELLOHI" : "2262"), 1, false, "&f" + sound.name(), "&7", "&7*Click to set the", "&7commands-sound of the item."), event -> {
-					itemMap.setCommandSound(sound);
-					commandPane(player, itemMap);
-				}));
+				if (stage != 3) {
+					soundPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "MUSIC_DISC_MELLOHI" : "2262"), 1, false, "&f" + sound.name(), "&7", "&7*Click to set the", "&7teleport-sound of the item."), event -> {
+						itemMap.setTeleportSound(sound.name());
+						teleportPane(player, itemMap, stage);
+					}));
+				} else {
+					soundPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "MUSIC_DISC_MELLOHI" : "2262"), 1, false, "&f" + sound.name(), "&7", "&7*Click to set the", "&7commands-sound of the item."), event -> {
+						itemMap.setCommandSound(sound);
+						commandPane(player, itemMap);
+					}));
+				}
 			}
 		});
 		soundPane.open(player);
@@ -3998,20 +4008,43 @@ public class Menu {
     * @param player - The Player to have the Pane opened.
     * @param itemMap - The ItemMap currently being modified.
     */
-	private static void particlePane(final Player player, final ItemMap itemMap) {
+	private static void particlePane(final Player player, final ItemMap itemMap, final int stage) {
 		Interface particlePane = new Interface(true, 6, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
-			particlePane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item commands menu."), event -> {
-				commandPane(player, itemMap);
-			}));
-			particlePane.addButton(new Button(ItemHandler.getItem("SUGAR", 1, false, "&fFIREWORK_FAKE", "&7", "&7*Click to set the lifetime", "&7commands-particle of the item."), event -> lifePane(player, itemMap, "FIREWORK", 1)));
+			if (stage != 3) {
+				particlePane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the teleport menu."), event -> {
+					teleportPane(player, itemMap, stage);
+				}));
+			} else {
+				particlePane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item commands menu."), event -> {
+					commandPane(player, itemMap);
+				}));
+			}
+			if (stage != 3) { } 
+			else {
+				particlePane.addButton(new Button(ItemHandler.getItem("SUGAR", 1, false, "&fFIREWORK_FAKE", "&7", "&7*Click to set the lifetime", "&7commands-particle of the item."), event -> lifePane(player, itemMap, "FIREWORK", 1)));
+			}
 			if (ServerUtils.hasSpecificUpdate("1_9")) {
 				for (org.bukkit.Particle particle: org.bukkit.Particle.values()) {
-					particlePane.addButton(new Button(ItemHandler.getItem("SUGAR", 1, false, "&f" + particle.name(), "&7", "&7*Click to set the", "&7commands-particle of the item."), event -> lifePane(player, itemMap, particle.name(), 0)));
+					if (stage != 3) {
+						particlePane.addButton(new Button(ItemHandler.getItem("SUGAR", 1, false, "&f" + particle.name(), "&7", "&7*Click to set the", "&7teleport-effect of the item."), event -> { 
+							itemMap.setTeleportEffect(particle.name());
+							teleportPane(player, itemMap, stage); 
+						}));
+					} else {
+						particlePane.addButton(new Button(ItemHandler.getItem("SUGAR", 1, false, "&f" + particle.name(), "&7", "&7*Click to set the", "&7commands-particle of the item."), event -> lifePane(player, itemMap, particle.name(), 0)));
+					}
 				}
 			} else {
 				for (org.bukkit.Effect effect: org.bukkit.Effect.values()) {
-					particlePane.addButton(new Button(ItemHandler.getItem("SUGAR", 1, false, "&f" + effect.name(), "&7", "&7*Click to set the", "&7commands-particle of the item."), event -> lifePane(player, itemMap, effect.name(), 0)));
+					if (stage != 3) {
+						particlePane.addButton(new Button(ItemHandler.getItem("SUGAR", 1, false, "&f" + effect.name(), "&7", "&7*Click to set the", "&7teleport-effect of the item."), event -> { 
+							itemMap.setTeleportEffect(effect.name());
+							teleportPane(player, itemMap, stage); 
+						}));
+					} else {
+						particlePane.addButton(new Button(ItemHandler.getItem("SUGAR", 1, false, "&f" + effect.name(), "&7", "&7*Click to set the", "&7commands-particle of the item."), event -> lifePane(player, itemMap, effect.name(), 0)));
+					}
 				}
 			}
 		});
@@ -4029,7 +4062,7 @@ public class Menu {
 		Interface lifePane = new Interface(true, 6, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			lifePane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the particle menu."), event -> {
-				particlePane(player, itemMap);
+				particlePane(player, itemMap, 3);
 			}));
 			lifePane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:4", 1, false, "&e&lCustom LifeTime", "&7", "&7*Click to set a lifetime (duration)", "&7value for particle effect."), event -> {
 				player.closeInventory();
@@ -4052,7 +4085,7 @@ public class Menu {
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[16] = ChatColor.stripColor(event.getMessage());
 					LanguageAPI.getLang(false).sendLangMessage("commands.menu.noInteger", player, placeHolders);
-					particlePane(event.getPlayer(), itemMap);
+					particlePane(event.getPlayer(), itemMap, 3);
 				}
 			}));
 			for (int i = 1; i <= 64; i++) {
@@ -4081,7 +4114,7 @@ public class Menu {
 		Interface patternPane = new Interface(true, 2, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			patternPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the particle menu."), event -> {
-				particlePane(player, itemMap);
+				particlePane(player, itemMap, 3);
 			}));
 			for (Type explosion: Type.values()) {
 				patternPane.addButton(new Button(ItemHandler.getItem("PAPER", 1, false, "&f" + explosion.name(), "&7", "&7*Click to set the pattern", "&7of the firework explosion effect."), 
@@ -4102,7 +4135,7 @@ public class Menu {
 		Interface colorPane = new Interface(true, 6, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			colorPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the particle menu."), event -> {
-				particlePane(player, itemMap);
+				particlePane(player, itemMap, 3);
 			}));
 			for (DyeColor color: DyeColor.values()) {
 				colorPane.addButton(new Button(ItemHandler.getItem("GRAY_DYE", 1, false, "&f" + color.name(), "&7", "&7*Click to set the " + (color1 != null ? "&c&lend color" : "&9&lstart color"), "&7of the firework explosion effect."), event -> {
@@ -4553,7 +4586,19 @@ public class Menu {
 				}
 				flagPane(player, itemMap);
 			}));
-			flagPane.addButton(new Button(fillerPaneBItem));
+			if (itemMap.getMaterial().toString().contains("TIPPED_ARROW") || itemMap.getMaterial().toString().contains("ARROW")) {
+				flagPane.addButton(new Button(ItemHandler.getItem("ENDER_PEARL", 1, itemMap.isTeleport(), "&a&l&nTeleport", "&7", 
+						"&a&lTrue&f: &7Teleports the Player to the location", "&7that the arrow landed.", 
+						"&cNOTE: &7This only works if the arrow is fired by a Bow.",
+						"&9&lENABLED: &a" + (itemMap.isTeleport() + "").toUpperCase()), event -> {
+					if (itemMap.isTeleport()) {
+						itemMap.setTeleport(false);
+					} else {
+						itemMap.setTeleport(true);
+					}
+					flagPane(player, itemMap);
+				}));
+			} else { flagPane.addButton(new Button(fillerPaneBItem)); }
 			flagPane.addButton(new Button(ItemHandler.getItem("MINECART", 1, itemMap.isMoveNext(), "&a&l&nMove Next", "&7", 
 					"&a&lTrue&f: &7Moves the existing item to the next available slot", "&7only if the defined slot already has an existing item.", 
 					"&cNOTE: &7The overwrite flag will not work.", "&7",
@@ -4626,6 +4671,7 @@ public class Menu {
 		if (itemMap.isItemCraftable()) { itemflags += "ITEM-CRAFTABLE, "; }
 		if (itemMap.isAlwaysGive()) { itemflags += "ALWAYS-GIVE, "; }
 		if (itemMap.isItemChangable()) { itemflags += "ITEM-CHANGABLE, "; }
+		if (itemMap.isTeleport()) { itemflags += "TELEPORT, "; }
 		if (itemMap.isGiveNext()) { itemflags += "GIVE-NEXT, "; }
 		if (itemMap.isMoveNext()) { itemflags += "MOVE-NEXT, "; }
 		if (itemMap.isDropFull()) { itemflags += "DROP-FULL, "; }
@@ -6935,10 +6981,14 @@ public class Menu {
     * @param player - The Player to have the Pane opened.
     * @param itemMap - The ItemMap currently being modified.
     */
-	private static void potionPane(final Player player, final ItemMap itemMap) {
+	private static void potionPane(final Player player, final ItemMap itemMap, final int stage) {
 		Interface potionPane = new Interface(true, 6, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
-			potionPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the special settings menu."), event -> creatingPane(player, itemMap)));
+			if (stage != 1) {
+				potionPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the special settings menu."), event -> creatingPane(player, itemMap)));
+			} else {
+				potionPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the special settings menu."), event -> otherPane(player, itemMap)));
+			}
 			for (PotionEffectType potion: PotionEffectType.values()) {
 				if (potion != null) {
 					String potionString = "NONE";
@@ -6964,9 +7014,9 @@ public class Menu {
 									}
 								}
 							}
-							potionPane(player, itemMap);
+							potionPane(player, itemMap, stage);
 						} else {
-							levelPane(player, itemMap, potion);
+							levelPane(player, itemMap, potion, stage);
 						}
 					}));
 				}
@@ -6977,15 +7027,72 @@ public class Menu {
 	
    /**
     * Opens the Pane for the Player.
+    * This Pane is for selecting the Teleport Arrow.
+    * 
+    * @param player - The Player to have the Pane opened.
+    * @param itemMap - The ItemMap currently being modified.
+    */
+	private static void teleportPane(final Player player, final ItemMap itemMap, final int stage) {
+		Interface teleportPane = new Interface(false, 1, GUIName, player);
+		SchedulerUtils.runAsync(() -> {
+			if (stage == 1) {
+				teleportPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the other settings menu."), event -> { 
+					setItemFlags(itemMap);
+					otherPane(player, itemMap); 
+				}));
+			} else {
+				teleportPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> { 
+					setItemFlags(itemMap);
+					creatingPane(player, itemMap); 
+				}));
+			}
+			teleportPane.addButton(new Button(fillerPaneGItem), 2);
+			teleportPane.addButton(new Button(ItemHandler.getItem("BLAZE_POWDER", 1, false, "&b&lTeleport Effect", "&7", "&7*The effect to play at the", "&7arrow landed location when", "&7the player is teleported.", 
+					"&9&lTeleport-Effect: &a" + StringUtils.nullCheck(itemMap.getTeleportEffect())), event -> {
+				particlePane(player, itemMap, stage);
+			}));
+			teleportPane.addButton(new Button(ItemHandler.getItem("ENDER_PEARL", 1, itemMap.isTeleport(), "&a&l&nTeleport", "&7", 
+					"&a&lTrue&f: &7Teleports the Player to the location", "&7that the arrow landed.", 
+					"&cNOTE: &7This only works if the arrow is fired by a Bow.",
+					"&9&lENABLED: &a" + String.valueOf(itemMap.isTeleport()).toUpperCase()), event -> {
+				if (itemMap.isTeleport()) {
+					itemMap.setTeleport(false);
+				} else {
+					itemMap.setTeleport(true);
+				}
+				teleportPane(player, itemMap, stage);
+			}));
+			teleportPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "MUSIC_DISC_MELLOHI" : "2262"), 1, false, "&a&lTeleport Sound", "&7", "&7*The sound to play at the", "&7arrow landed location when", "&7the player is teleported.", 
+			"&9&lTeleport-Sound: &a" + StringUtils.nullCheck(itemMap.getTeleportSound())), event -> {
+				soundPane(player, itemMap, stage);
+			}));
+			teleportPane.addButton(new Button(fillerPaneGItem), 2);
+			if (stage == 1) {
+				teleportPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the other settings menu."), event -> { 
+					setItemFlags(itemMap);
+					otherPane(player, itemMap); 
+				}));
+			} else {
+				teleportPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> { 
+					setItemFlags(itemMap);
+					creatingPane(player, itemMap); 
+				}));
+			}
+		});
+		teleportPane.open(player);
+	}
+	
+   /**
+    * Opens the Pane for the Player.
     * This Pane is for setting the Potion Level.
     * 
     * @param player - The Player to have the Pane opened.
     * @param itemMap - The ItemMap currently being modified.
     */
-	private static void levelPane(final Player player, final ItemMap itemMap, final PotionEffectType potion) {
+	private static void levelPane(final Player player, final ItemMap itemMap, final PotionEffectType potion, final int stage) {
 		Interface levelPane = new Interface(true, 6, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
-			levelPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the potion effect menu."), event -> potionPane(player, itemMap)));
+			levelPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the potion effect menu."), event -> potionPane(player, itemMap, stage)));
 			levelPane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:4", 1, false, "&e&lCustom Level", "&7", "&7*Click to set a custom level (strength)", "&7value for the potion effect."), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
@@ -6998,18 +7105,18 @@ public class Menu {
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[16] = "EFFECT LEVEL";
 					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
-					durationPane(event.getPlayer(), itemMap, potion, Integer.parseInt(ChatColor.stripColor(event.getMessage())));
+					durationPane(event.getPlayer(), itemMap, potion, Integer.parseInt(ChatColor.stripColor(event.getMessage())), stage);
 				} else {
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[16] = ChatColor.stripColor(event.getMessage());
 					LanguageAPI.getLang(false).sendLangMessage("commands.menu.noInteger", player, placeHolders);
-					levelPane(event.getPlayer(), itemMap, potion);
+					levelPane(event.getPlayer(), itemMap, potion, stage);
 				}
 			}));
 			for (int i = 1; i <= 64; i++) {
 				final int k = i;
 				levelPane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:6", k, false, "&d&lLevel: &a&l" + k + "", "&7", "&7*Click to set the", "&7level (strength) of the potion effect."), event -> {
-					itemMap.setInteractCooldown(k);durationPane(player, itemMap, potion, k);
+					itemMap.setInteractCooldown(k);durationPane(player, itemMap, potion, k, stage);
 				}));
 			}
 		});
@@ -7023,10 +7130,10 @@ public class Menu {
     * @param player - The Player to have the Pane opened.
     * @param itemMap - The ItemMap currently being modified.
     */
-	private static void durationPane(final Player player, final ItemMap itemMap, final PotionEffectType potion, int level) {
+	private static void durationPane(final Player player, final ItemMap itemMap, final PotionEffectType potion, int level, final int stage) {
 		Interface durationPane = new Interface(true, 6, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
-			durationPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the potion effect menu."), event -> potionPane(player, itemMap)));
+			durationPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the potion effect menu."), event -> potionPane(player, itemMap, stage)));
 			durationPane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:4", 1, false, "&e&lCustom Duration", "&7", "&7*Click to set a custom duration", "&7value for the potion effect."), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
@@ -7039,12 +7146,12 @@ public class Menu {
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[16] = "EFFECT DURATION";
 					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
-					potionPane(event.getPlayer(), itemMap);
+					potionPane(event.getPlayer(), itemMap, stage);
 				} else {
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
 					placeHolders[16] = ChatColor.stripColor(event.getMessage());
 					LanguageAPI.getLang(false).sendLangMessage("commands.menu.noInteger", player, placeHolders);
-					durationPane(event.getPlayer(), itemMap, potion, level);
+					durationPane(event.getPlayer(), itemMap, potion, level, stage);
 				}
 			}));
 			for (int i = 1; i <= 64; i++) {
@@ -7052,7 +7159,7 @@ public class Menu {
 				durationPane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:11", k, false, "&9&lDuration: &a&l" + k + " Second(s)", "&7", "&7*Click to set the", "&7duration of the potion effect."), event -> {
 					List < PotionEffect > effects = itemMap.getPotionEffect();
 					effects.add(new PotionEffect(potion, k, level));
-					itemMap.setPotionEffect(effects);potionPane(player, itemMap);
+					itemMap.setPotionEffect(effects);potionPane(player, itemMap, stage);
 				}));
 			}
 		});
@@ -7472,6 +7579,24 @@ public class Menu {
 					otherPane(event.getPlayer(), itemMap);
 				}));
 				otherPane.addButton(new Button(fillerPaneGItem), 3);
+			} else if (itemMap.getMaterial().toString().contains("TIPPED_ARROW")) {
+				String potionList = "";
+				String potionString = "";
+				if (StringUtils.nullCheck(itemMap.getPotionEffect().toString()) != "NONE") {
+					for (PotionEffect potions: itemMap.getPotionEffect()) {
+						potionString += potions.getType().getName().toUpperCase() + ":" + potions.getAmplifier() + ":" + potions.getDuration() + ", ";
+					}
+					for (String split: StringUtils.softSplit(StringUtils.nullCheck(potionString.substring(0, potionString.length())))) {
+						potionList += "&a" + split + " /n ";
+					}
+				}
+				otherPane.addButton(new Button(fillerPaneGItem), 3);
+				otherPane.addButton(new Button(ItemHandler.getItem("BLAZE_POWDER", 1, false, "&e&lEffects", "&7", "&7*Add custom effects", "&7to the arrow tip.", "&9&lTipped-Effect: &a" + StringUtils.nullCheck(potionList)),
+						event -> potionPane(player, itemMap, 1)));
+				otherPane.addButton(new Button(fillerPaneGItem));
+				otherPane.addButton(new Button(ItemHandler.getItem("ENDER_PEARL", 1, false, "&e&lTeleport", "&7", "&7*Set the arrow to teleport", "&7the player upon landing.", "&9&lEnabled: &a" + String.valueOf(itemMap.isTeleport()).toUpperCase()),
+						event -> teleportPane(player, itemMap, 1)));
+				otherPane.addButton(new Button(fillerPaneGItem), 3);
 			} else if (itemMap.getMaterial().toString().equalsIgnoreCase("FIREWORK") || itemMap.getMaterial().toString().equalsIgnoreCase("FIREWORK_ROCKET")) {
 				String colorList = "";
 				if (StringUtils.nullCheck(itemMap.getFireworkColor().toString()) != "NONE") {
@@ -7749,7 +7874,7 @@ public class Menu {
 	private static boolean specialItem(final ItemMap itemMap) {
 		if (itemMap.getMaterial().toString().contains("WRITTEN_BOOK") || itemMap.getMaterial().toString().contains("PLAYER_HEAD") || itemMap.getMaterial().toString().contains("SKULL_ITEM") 
 				|| itemMap.getMaterial().toString().equalsIgnoreCase("FIREWORK") || itemMap.getMaterial().toString().equalsIgnoreCase("FIREWORK_ROCKET") 
-				|| itemMap.getMaterial().toString().contains("LEATHER_") || !ItemHandler.getDesignatedSlot(itemMap.getMaterial()).equalsIgnoreCase("noslot")) {
+				|| itemMap.getMaterial().toString().contains("TIPPED_ARROW") || itemMap.getMaterial().toString().contains("LEATHER_") || !ItemHandler.getDesignatedSlot(itemMap.getMaterial()).equalsIgnoreCase("noslot")) {
 			return true;
 		}
 		return false;

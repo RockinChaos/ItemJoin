@@ -17,15 +17,11 @@
  */
 package me.RockinChaos.itemjoin.listeners;
 
-import java.util.HashMap;
-
 import org.bukkit.Material;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityResurrectEvent;
-import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -105,45 +101,6 @@ public class Consumes implements Listener {
 		 			} 
 				}
 		 	});
-		}
-	}
-	
-   /**
-    * Refills the players arrows item to its original stack size when consuming the item.
-    * 
-    * @param event - EntityShootBowEvent.
-	*/
-	@EventHandler(ignoreCancelled = true)
-	private void onPlayerFireArrow(EntityShootBowEvent event) {
-		LivingEntity entity = event.getEntity();
-		if (ServerUtils.hasSpecificUpdate("1_16") && entity instanceof Player && event.getBow() != null && event.getBow().getType() == Material.BOW) {
-			ItemStack item = (event.getConsumable() != null ? event.getConsumable().clone() : event.getConsumable());
-			Player player = (Player) event.getEntity();
-			if (entity instanceof Player && !ItemUtilities.getUtilities().isAllowed(player, item, "count-lock")) {
-				event.setConsumeItem(false);
-				PlayerHandler.updateInventory(player, 1L);
-			}
-		} else if (entity instanceof Player) {
-			HashMap < Integer, ItemStack > map = new HashMap < Integer, ItemStack > ();
-			Player player = (Player) event.getEntity();
-			for (int i = 0; i < player.getInventory().getSize(); i++) {
-				if (player.getInventory().getItem(i) != null && player.getInventory().getItem(i).getType() == Material.ARROW && event.getProjectile().getType().name().equalsIgnoreCase("ARROW")) {
-					ItemStack cloneStack = player.getInventory().getItem(i).clone();
-					ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(player.getInventory().getItem(i), null, player.getWorld());
-					if (itemMap != null) { cloneStack.setAmount(itemMap.getCount()); }
-					map.put(i, cloneStack);
-				}
-			}
-			SchedulerUtils.runLater(2L, () -> {
-				for (Integer key: map.keySet()) {
-					if (player.getInventory().getItem(key) == null || player.getInventory().getItem(key).getAmount() != map.get(key).getAmount()) {
-						if (!ItemUtilities.getUtilities().isAllowed(player, map.get(key), "count-lock")) {
-							player.getInventory().setItem(key, map.get(key));
-						}
-					}
-				}
-				PlayerHandler.updateInventory(player, 1L);
-			});
 		}
 	}
 	

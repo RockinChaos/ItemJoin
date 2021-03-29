@@ -154,6 +154,9 @@ public class ItemMap {
     private String leatherColor;
     private String leatherHex;
     
+    private String teleportEffect;
+    private String teleportSound;
+    
 	private Integer interactCooldown = 0;
 	private boolean customConsumable = false;
 	private Map < String, Integer > enchants = new HashMap < String, Integer > ();
@@ -231,6 +234,7 @@ public class ItemMap {
 	private boolean vanillaControl = false;
 	private boolean unbreakable = false;
 	private boolean countLock = false;
+	private boolean teleportArrow = false;
 	private boolean cancelEvents = false;
 	private boolean itemStore = false;
 	private boolean itemModify = false;
@@ -319,6 +323,7 @@ public class ItemMap {
 	        this.setItemflags();
 	        this.setLimitModes();
 	        this.setTriggers();
+	        this.setTeleportArrow();
 			this.setWorlds();
 			this.setRegions();
 			this.setConditions();
@@ -433,6 +438,15 @@ public class ItemMap {
 	}
 	
    /**
+    * Sets the ItemMaps Interact Cooldown.
+    * 
+    */
+	private void setTeleportArrow() {
+        this.teleportEffect = this.nodeLocation.getString(".teleport-effect");
+        this.teleportSound = this.nodeLocation.getString(".teleport-sound");
+	}
+	
+   /**
     * Sets the ItemMaps ItemFlags.
     * 
     */
@@ -463,6 +477,7 @@ public class ItemMap {
 			this.noRepairing = StringUtils.containsIgnoreCase(this.itemflags, "item-repairable");
 			this.cancelEvents = StringUtils.containsIgnoreCase(this.itemflags, "cancel-events");
 			this.countLock = StringUtils.containsIgnoreCase(this.itemflags, "count-lock");
+			this.teleportArrow = StringUtils.containsIgnoreCase(this.itemflags, "teleport");
 			this.setOnlyFirstJoin(StringUtils.containsIgnoreCase(this.itemflags, "first-join"));
 			this.setOnlyFirstLife(StringUtils.containsIgnoreCase(this.itemflags, "first-life"));
 			this.onlyFirstWorld = StringUtils.containsIgnoreCase(this.itemflags, "first-world");
@@ -1258,6 +1273,24 @@ public class ItemMap {
 	}
 	
    /**
+    * Sets the Teleport Effect.
+    * 
+    * @param name - The value to be set.
+    */
+	public void setTeleportEffect(final String name) {
+        this.teleportEffect = name;
+	}
+	
+   /**
+    * Sets the Teleport Sound.
+    * 
+    * @param name - The value to be set.
+    */
+	public void setTeleportSound(final String name) {
+        this.teleportSound = name;
+	}
+	
+   /**
     * Sets the Permissions to be Required.
     * 
     * @param bool - The value to be set.
@@ -1345,6 +1378,15 @@ public class ItemMap {
     */
 	public void setCountLock(final boolean bool) {
 		this.countLock = bool;
+	}
+	
+   /**
+    * Sets the Teleport Flag.
+    * 
+    * @param bool - The value to be set.
+    */
+	public void setTeleport(final boolean bool) {
+		this.teleportArrow = bool;
 	}
 	
    /**
@@ -2560,6 +2602,24 @@ public class ItemMap {
 	}
 	
    /**
+    * Gets the Teleport Effect.
+    * 
+    * @return The Teleport Effect.
+    */
+	public String getTeleportEffect() {
+		return this.teleportEffect;
+	}
+	
+   /**
+    * Gets the Teleport Sound.
+    * 
+    * @return The Teleport Sound.
+    */
+	public String getTeleportSound() {
+		return this.teleportSound;
+	}
+	
+   /**
     * Gets the Commands Cooldown Message.
     * 
     * @return The Commands Cooldown Message.
@@ -2921,6 +2981,15 @@ public class ItemMap {
 	}
 	
    /**
+    * Checks if the Teleport Flag is enabled.
+    * 
+    * @return If it is enabled.
+    */
+	public boolean isTeleport() {
+		return this.teleportArrow;
+	}
+	
+   /**
     * Checks if the Cancel Events Flag is enabled.
     * 
     * @return If it is enabled.
@@ -3204,6 +3273,7 @@ public class ItemMap {
 			else if (findFlag.equals("item-repairable")) { return noRepairing; } 
 			else if (findFlag.equals("placement")) { return blockPlacement; } 
 			else if (findFlag.equals("count-lock")) { return countLock; }
+			else if (findFlag.equals("teleport")) { return teleportArrow; }
 		}
 		return false;
 	}
@@ -4971,6 +5041,8 @@ public class ItemMap {
 			itemData.set("items." + this.configName + ".firework.colors", colorList.substring(0, colorList.length() - 2)); 
 		}
 		if (this.interactCooldown != null && this.interactCooldown != 0) { itemData.set("items." + this.configName + ".use-cooldown", this.interactCooldown); }
+		if (this.teleportEffect != null && !this.teleportEffect.isEmpty()) { itemData.set("items." + this.configName + ".teleport-effect", this.teleportEffect); }
+		if (this.teleportSound != null && !this.teleportSound.isEmpty()) { itemData.set("items." + this.configName + ".teleport-sound", this.teleportSound); }
 		if (this.itemflags != null && !this.itemflags.isEmpty()) { itemData.set("items." + this.configName + ".itemflags", this.itemflags); }
 		if (this.triggers != null && !this.triggers.isEmpty()) { itemData.set("items." + this.configName + ".triggers", this.triggers); }
 		if (this.limitModes != null && !this.limitModes.isEmpty()) { itemData.set("items." + this.configName + ".limit-modes", this.limitModes); }

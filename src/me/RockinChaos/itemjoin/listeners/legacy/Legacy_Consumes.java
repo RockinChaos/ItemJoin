@@ -17,14 +17,10 @@
  */
 package me.RockinChaos.itemjoin.listeners.legacy;
 
-import java.util.HashMap;
-
 import org.bukkit.Material;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -111,36 +107,6 @@ public class Legacy_Consumes implements Listener {
 		 			} 
 				}
 		 	});
-		}
-	}
-	
-   /**
-    * Refills the players arrows item to its original stack size when consuming the item.
-    * 
-    * @param event - EntityShootBowEvent.
-    * @deprecated This is a LEGACY event, only use on Minecraft versions below 1.11.
-	*/
-	@EventHandler(ignoreCancelled = true)
-	private void onPlayerFireArrow(EntityShootBowEvent event) {
-		LivingEntity entity = event.getEntity();
-		if (entity instanceof Player) {
-			HashMap < Integer, ItemStack > map = new HashMap < Integer, ItemStack > ();
-			Player player = (Player) event.getEntity();
-			for (int i = 0; i < player.getInventory().getSize(); i++) {
-				if (player.getInventory().getItem(i) != null && player.getInventory().getItem(i).getType() == Material.ARROW && event.getProjectile().getType().name().equalsIgnoreCase("ARROW")) {
-					map.put(i, player.getInventory().getItem(i).clone());
-				}
-			}
-			SchedulerUtils.runLater(2L, () -> {
-				for (Integer key: map.keySet()) {
-					if (player.getInventory().getItem(key) == null || player.getInventory().getItem(key).getAmount() != map.get(key).getAmount()) {
-						if (!ItemUtilities.getUtilities().isAllowed(player, map.get(key), "count-lock")) {
-							player.getInventory().setItem(key, map.get(key));
-						}
-					}
-				}
-				PlayerHandler.updateInventory(player, 1L);
-			});
 		}
 	}
 }
