@@ -487,7 +487,7 @@ public class ChatExecutor implements CommandExecutor {
 				if ((remove && itemMap.hasItem(argsPlayer)) || (!remove && (itemMap.conditionMet(argsPlayer, "trigger-conditions") && (ItemUtilities.getUtilities().canOverwrite(argsPlayer, itemMap) && (amount != 0 || itemMap.isAlwaysGive() || !itemMap.hasItem(argsPlayer)))))) {
 					if (remove || !PermissionsHandler.receiveEnabled() || (itemMap.hasPermission(argsPlayer) && PermissionsHandler.receiveEnabled())) {
 						if (itemMap.isAlwaysGive() && (args.length < 2 || (!StringUtils.isInt(args[args.length - 1])))) { amount = itemMap.getCount(); }
-						if (StringUtils.getSlotConversion(itemMap.getSlot()) != 0 && argsPlayer.getOpenInventory().getTopInventory().getItem(0) != null && !argsPlayer.getOpenInventory().getTopInventory().getItem(0).getType().equals(Material.AIR)) {
+						if (StringUtils.getSlotConversion(itemMap.getSlot()) != 0 && PlayerHandler.isCraftingInv(argsPlayer.getOpenInventory()) && argsPlayer.getOpenInventory().getTopInventory().getItem(0) != null && !argsPlayer.getOpenInventory().getTopInventory().getItem(0).getType().equals(Material.AIR)) {
 							ItemHandler.returnCraftingItem(argsPlayer, 0, argsPlayer.getOpenInventory().getTopInventory().getItem(0).clone(), 0L);
 						}
 						if (remove) { itemMap.removeFrom(argsPlayer, amount); } 
@@ -535,7 +535,7 @@ public class ChatExecutor implements CommandExecutor {
 				if (itemMap.getConfigName().equalsIgnoreCase(args[1])) {
 					if (remove || !PermissionsHandler.receiveEnabled() || (itemMap.hasPermission(argsPlayer) && PermissionsHandler.receiveEnabled())) {
 						if ((remove && itemMap.hasItem(argsPlayer)) || (!remove && (itemMap.conditionMet(argsPlayer, "trigger-conditions") && (ItemUtilities.getUtilities().canOverwrite(argsPlayer, itemMap) && (amount != 0 || itemMap.isAlwaysGive() || !itemMap.hasItem(argsPlayer)))))) {
-							if (StringUtils.getSlotConversion(itemMap.getSlot()) != 0 && argsPlayer.getOpenInventory().getTopInventory().getItem(0) != null && !argsPlayer.getOpenInventory().getTopInventory().getItem(0).getType().equals(Material.AIR)) {
+							if (StringUtils.getSlotConversion(itemMap.getSlot()) != 0 && PlayerHandler.isCraftingInv(argsPlayer.getOpenInventory()) && argsPlayer.getOpenInventory().getTopInventory().getItem(0) != null && !argsPlayer.getOpenInventory().getTopInventory().getItem(0).getType().equals(Material.AIR)) {
 								ItemHandler.returnCraftingItem(argsPlayer, 0, argsPlayer.getOpenInventory().getTopInventory().getItem(0).clone(), 0L);
 							}
 							if (remove) { itemMap.removeFrom(argsPlayer, amount); }
@@ -572,7 +572,7 @@ public class ChatExecutor implements CommandExecutor {
 		String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[1] = (args.length >= 2 ? args[1] : sender.getName());
 		if (argsPlayer == null) { LanguageAPI.getLang(false).sendLangMessage("commands.default.noTarget", sender, placeHolders); return; }
 		boolean itemGiven = false; boolean failedPermissions = false;
-		if (!remove && argsPlayer.getOpenInventory().getTopInventory().getItem(0) != null && !argsPlayer.getOpenInventory().getTopInventory().getItem(0).getType().equals(Material.AIR)) {
+		if (!remove && PlayerHandler.isCraftingInv(argsPlayer.getOpenInventory()) && argsPlayer.getOpenInventory().getTopInventory().getItem(0) != null && !argsPlayer.getOpenInventory().getTopInventory().getItem(0).getType().equals(Material.AIR)) {
 			ItemHandler.returnCraftingItem(argsPlayer, 0, argsPlayer.getOpenInventory().getTopInventory().getItem(0).clone(), 0L);
 		}
 		final ItemMap probable = ChanceAPI.getChances().getRandom(argsPlayer);
