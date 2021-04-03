@@ -251,6 +251,7 @@ public class ItemMap {
 	private boolean closeInventory = false;
 	private boolean selfDroppable = false;
 	private boolean deathDroppable = false;
+	private boolean deathKeepable = false;
 	private boolean disposable = false;
 	private boolean itemChangable = false;
 	private boolean alwaysGive = false;
@@ -487,6 +488,7 @@ public class ItemMap {
 			this.onlyFirstWorld = StringUtils.containsIgnoreCase(this.itemflags, "first-world");
 			this.overwritable = StringUtils.containsIgnoreCase(this.itemflags, "overwrite");
 			this.ipLimited = StringUtils.containsIgnoreCase(this.itemflags, "ip-limit");
+			this.deathKeepable = StringUtils.containsIgnoreCase(this.itemflags, "death-keep");
 			this.deathDroppable = StringUtils.containsIgnoreCase(this.itemflags, "death-drops");
 			this.selfDroppable = StringUtils.containsIgnoreCase(this.itemflags, "self-drops");
 			this.AllowOpBypass = StringUtils.containsIgnoreCase(this.itemflags, "AllowOpBypass");
@@ -1589,6 +1591,15 @@ public class ItemMap {
     */
 	public void setDeathDroppable(final boolean bool) {
 		this.deathDroppable = bool;
+	}
+	
+   /**
+    * Sets the Death Keepable Flag.
+    * 
+    * @param bool - The value to be set.
+    */
+	public void setDeathKeepable(final boolean bool) {
+		this.deathKeepable = bool;
 	}
 	
    /**
@@ -3192,6 +3203,15 @@ public class ItemMap {
 	}
 	
    /**
+    * Checks if the Death Keepable Flag is enabled.
+    * 
+    * @return If it is enabled.
+    */
+	public boolean isDeathKeepable() {
+		return this.deathKeepable;
+	}
+	
+   /**
     * Checks if the CeativeBypass Flag is enabled.
     * 
     * @return If it is enabled.
@@ -3267,6 +3287,7 @@ public class ItemMap {
 			else if (findFlag.equals("cancel-events")) { return cancelEvents; } 
 			else if (findFlag.equals("self-drops")) { return selfDroppable; } 
 			else if (findFlag.equals("death-drops")) { return deathDroppable; } 
+			else if (findFlag.equals("death-keep")) { return deathKeepable; } 
 			else if (findFlag.equals("inventory-modify")) { return blockMovement; }
 			else if (findFlag.equals("inventory-close")) { return closeInventory; }
 			else if (findFlag.equals("item-store")) { return itemStore; } 

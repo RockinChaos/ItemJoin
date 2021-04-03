@@ -146,14 +146,14 @@ public class Drops implements Listener {
 		if (!LegacyAPI.getGameRule(player.getWorld(), "keepInventory")) {
 			for (int k = 0; k < player.getOpenInventory().getTopInventory().getSize(); k++) {
 				ItemStack stack = player.getOpenInventory().getTopInventory().getItem(k);
-				if (PlayerHandler.isCraftingInv(player.getOpenInventory()) && !ItemUtilities.getUtilities().isAllowed(player, stack, "death-drops")) {
+				if (PlayerHandler.isCraftingInv(player.getOpenInventory()) && (!ItemUtilities.getUtilities().isAllowed(player, stack, "death-drops") || !ItemUtilities.getUtilities().isAllowed(player, stack, "death-keep"))) {
 					event.getDrops().remove(stack);
 					player.getOpenInventory().getTopInventory().remove(stack);
 				}
 			}
 			for (int k = 0; k < player.getInventory().getSize(); k++) {
 				ItemStack stack = player.getInventory().getItem(k);
-				if (!ItemUtilities.getUtilities().isAllowed(player, stack, "death-drops")) {
+				if (!ItemUtilities.getUtilities().isAllowed(player, stack, "death-drops") || !ItemUtilities.getUtilities().isAllowed(player, stack, "death-keep")) {
 					event.getDrops().remove(stack);
 					player.getInventory().remove(stack);
 				}

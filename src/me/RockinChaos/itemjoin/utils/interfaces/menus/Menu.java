@@ -4473,17 +4473,6 @@ public class Menu {
 				}
 				flagPane(player, itemMap);
 			}));
-			flagPane.addButton(new Button(ItemHandler.getItem("BOW", 1, itemMap.isCancelEvents(), "&a&l&nCancel Events", "&7", 
-					"&a&lTrue&f: &7Prevents almost any event from executing", "&7when right-clicking the item.", "&7",
-					"&c&lFalse&f: &7Allows item events to be executed freely.", "&7", 
-					"&9&lENABLED: &a" + (itemMap.isCancelEvents() + "").toUpperCase()), event -> {
-				if (itemMap.isCancelEvents()) {
-					itemMap.setCancelEvents(false);
-				} else {
-					itemMap.setCancelEvents(true);
-				}
-				flagPane(player, itemMap);
-			}));
 			flagPane.addButton(new Button(ItemHandler.getItem(ServerUtils.hasSpecificUpdate("1_8") ? "324" : "64", 1, itemMap.isCountLock(), "&a&l&nCount Lock", "&7", 
 					"&a&lTrue&f:&7 The item can be used indefinitely.", "&7Useful to give a player infinite apples.", "&cNOTE: &7This will overwrite the disposable flag.", "&7",
 					"&c&lFalse&f:&7 The item will be removed from the inventory on use.", "&7", 
@@ -4492,6 +4481,17 @@ public class Menu {
 					itemMap.setCountLock(false);
 				} else {
 					itemMap.setCountLock(true);
+				}
+				flagPane(player, itemMap);
+			}));
+			flagPane.addButton(new Button(ItemHandler.getItem("CHEST", 1, itemMap.isDeathKeepable(), "&a&l&nDeath Keep", "&7", 
+					"&a&lTrue&f:&7 On death, the item will remain", "&7in players inventory on respawn.", "&7",
+					"&c&lFalse&f:&7 On death, the item will be dropped", "&7at the death location as normal.", "&7", 
+					"&9&lENABLED: &a" + (itemMap.isDeathKeepable() + "").toUpperCase()), event -> {
+				if (itemMap.isDeathKeepable()) {
+					itemMap.setDeathKeepable(false);
+				} else {
+					itemMap.setDeathKeepable(true);
 				}
 				flagPane(player, itemMap);
 			}));
@@ -4550,7 +4550,17 @@ public class Menu {
 				}
 				flagPane(player, itemMap);
 			}));
-			flagPane.addButton(new Button(fillerPaneBItem));
+			flagPane.addButton(new Button(ItemHandler.getItem("BOW", 1, itemMap.isCancelEvents(), "&a&l&nCancel Events", "&7", 
+					"&a&lTrue&f: &7Prevents almost any event from executing", "&7when right-clicking the item.", "&7",
+					"&c&lFalse&f: &7Allows item events to be executed freely.", "&7", 
+					"&9&lENABLED: &a" + (itemMap.isCancelEvents() + "").toUpperCase()), event -> {
+				if (itemMap.isCancelEvents()) {
+					itemMap.setCancelEvents(false);
+				} else {
+					itemMap.setCancelEvents(true);
+				}
+				flagPane(player, itemMap);
+			}));
 			flagPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "WHEAT_SEEDS" : "295"), 1, itemMap.isAlwaysGive(), "&a&l&nAlways Give", "&7", 
 					"&a&lTrue&f: &7Gives the item every time the player", "&7performs one of the triggers actions.", "&7regardless of already having the item.", "&7",
 					"&cNOTE: &7Don't use this if you want only ONE instance of the item.", "&7",
@@ -4663,6 +4673,7 @@ public class Menu {
 		if (itemMap.isItemStore()) { itemflags += "ITEM-STORE, "; }
 		if (itemMap.isCancelEvents()) { itemflags += "CANCEL-EVENTS, "; }
 		if (itemMap.isCountLock()) { itemflags += "COUNT-LOCK, "; }
+		if (itemMap.isDeathKeepable()) { itemflags += "DEATH-KEEP, "; }
 		if (itemMap.isDeathDroppable()) { itemflags += "DEATH-DROPS, "; }
 		if (itemMap.isSelfDroppable()) { itemflags += "SELF-DROPS, "; }
 		if (itemMap.isDisposable()) { itemflags += "DISPOSABLE, "; }

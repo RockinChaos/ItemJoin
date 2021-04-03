@@ -224,7 +224,7 @@ public class ItemUtilities {
 		for (ItemMap item : this.getItems()) { 
 			item.setAnimations(player);
 			if (((type.equals(TriggerType.JOIN) && item.isGiveOnJoin()) 
-			  || (type.equals(TriggerType.RESPAWN) && item.isGiveOnRespawn())
+			  || (type.equals(TriggerType.RESPAWN) && (item.isGiveOnRespawn() || item.isDeathKeepable()))
 			  || (type.equals(TriggerType.WORLD_SWITCH) && item.isGiveOnWorldSwitch())
 			  || (type.equals(TriggerType.LIMIT_SWITCH) && item.isUseOnLimitSwitch())
 		      || ((((type.equals(TriggerType.REGION_ENTER) && (item.isGiveOnRegionEnter() || item.isGiveOnRegionAccess())) 
