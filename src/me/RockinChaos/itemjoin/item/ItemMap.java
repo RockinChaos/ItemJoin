@@ -354,7 +354,11 @@ public class ItemMap {
 	private void setMultipleSlots() {
         if (this.nodeLocation.getString(".slot") != null && !this.nodeLocation.getString(".slot").isEmpty() && this.nodeLocation.getString(".slot").contains(",")) {
         	String[] slots = this.nodeLocation.getString(".slot").replace(" ", "").split(",");
-			for (String s: slots) { this.AllSlots.add(s); }
+			for (String slot: slots) { 
+				if (slot.startsWith("C[") || slot.startsWith("C(")) { slot = slot.replace("C", "CRAFTING"); }
+				if (slot.startsWith("CRAFTING")) { slot = slot.replace("(", "[").replace(")", "]"); }
+				this.AllSlots.add(slot); 
+			}
         }
 	}
 	
