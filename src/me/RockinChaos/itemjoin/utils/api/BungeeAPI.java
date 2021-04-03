@@ -29,17 +29,17 @@ import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 
-public class BungeeCordAPI implements PluginMessageListener {
+public class BungeeAPI implements PluginMessageListener {
 	
 	private final String PLUGIN_CHANNEL = "plugin:itemjoin";
 	private boolean bungeePlugin = false;
-	private static BungeeCordAPI bungee;
+	private static BungeeAPI bungee;
 
    /**
     * Initializes the BungeeCord Listener.
     *
     */
-	public BungeeCordAPI() {
+	public BungeeAPI() {
 		Messenger messenger = ItemJoin.getInstance().getServer().getMessenger();
 		if (!messenger.isOutgoingChannelRegistered(ItemJoin.getInstance(), this.PLUGIN_CHANNEL)) {
 			messenger.registerOutgoingPluginChannel(ItemJoin.getInstance(), this.PLUGIN_CHANNEL);
@@ -113,9 +113,9 @@ public class BungeeCordAPI implements PluginMessageListener {
     * 
     * @return The ConfigHandler instance.
     */
-    public static BungeeCordAPI getBungee(final boolean regen) { 
+    public static BungeeAPI getBungee(final boolean regen) { 
         if (bungee == null || regen) {
-        	bungee = new BungeeCordAPI(); 
+        	bungee = new BungeeAPI(); 
         }
         return bungee; 
     } 

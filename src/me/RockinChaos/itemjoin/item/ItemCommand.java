@@ -32,7 +32,7 @@ import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.utils.SchedulerUtils;
 import me.RockinChaos.itemjoin.utils.ServerUtils;
 import me.RockinChaos.itemjoin.utils.StringUtils;
-import me.RockinChaos.itemjoin.utils.api.BungeeCordAPI;
+import me.RockinChaos.itemjoin.utils.api.BungeeAPI;
 
 public class ItemCommand {
 	
@@ -422,7 +422,7 @@ public class ItemCommand {
 			SchedulerUtils.run(() -> {
 				String[] values = new String[1];
 				if (altPlayer != null) { values[0] = altPlayer.getName(); }
-				BungeeCordAPI.getBungee(false).SwitchServers(player, StringUtils.translateLayout(this.command, player, values)); 
+				BungeeAPI.getBungee(false).SwitchServers(player, StringUtils.translateLayout(this.command, player, values)); 
 			});
 		} 
 		catch (Exception e) {
@@ -442,7 +442,7 @@ public class ItemCommand {
 			SchedulerUtils.run(() -> {
 				String[] values = new String[1];
 				if (altPlayer != null) { values[0] = altPlayer.getName(); }
-				BungeeCordAPI.getBungee(false).ExecuteCommand(player, StringUtils.translateLayout(this.command, player, values)); 
+				BungeeAPI.getBungee(false).ExecuteCommand(player, StringUtils.translateLayout(this.command, player, values)); 
 			});
 		} 
 		catch (Exception e) {

@@ -66,7 +66,7 @@ import me.RockinChaos.itemjoin.utils.ReflectionUtils;
 import me.RockinChaos.itemjoin.utils.SchedulerUtils;
 import me.RockinChaos.itemjoin.utils.ServerUtils;
 import me.RockinChaos.itemjoin.utils.StringUtils;
-import me.RockinChaos.itemjoin.utils.api.BungeeCordAPI;
+import me.RockinChaos.itemjoin.utils.api.BungeeAPI;
 import me.RockinChaos.itemjoin.utils.api.DependAPI;
 import me.RockinChaos.itemjoin.utils.api.LanguageAPI;
 import me.RockinChaos.itemjoin.utils.api.LegacyAPI;
@@ -118,7 +118,7 @@ public class ConfigHandler {
 		ServerUtils.clearErrorStatements();
 		this.copyFiles();
 		LogHandler.getFilter(true);
-		BungeeCordAPI.getBungee(true);
+		BungeeAPI.getBungee(true);
 		ItemJoin.getInstance().setStarted(false);
 		SchedulerUtils.runAsync(() -> {
         	DependAPI.getDepends(true);
