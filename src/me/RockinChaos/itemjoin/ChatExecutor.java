@@ -180,8 +180,10 @@ public class ChatExecutor implements CommandExecutor {
 			LanguageAPI.getLang(false).sendLangMessage("commands.world.worldRow", sender, placeHolders);
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]--------------&a&l[&e Worlds In Menu 1/1 &a&l]&a&l&m-------------[");
-		} else if (Execute.LIST.accept(sender, args, 0)) {
-			this.list(sender);
+		} else if (Execute.LIST.accept(sender, args, 1)) {
+			this.list(sender, 1);
+		} else if (Execute.LIST.accept(sender, args, 2)) {
+			this.list(sender, Integer.parseInt(args[1]));
 		} else if (Execute.PERMISSIONS.accept(sender, args, 1)) {
 			this.permissions(sender, 1);
 		} else if (Execute.PERMISSIONS.accept(sender, args, 2)) {
@@ -283,28 +285,50 @@ public class ChatExecutor implements CommandExecutor {
 	* @param sender - Source of the command. 
 	* 
 	*/
-	private void list(final CommandSender sender) {
+	private void list(final CommandSender sender, final int page) {
 		LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
+		int maxPage = ConfigHandler.getConfig().getListPages();
+		int lineCount = 0;
+		boolean worldSent = false;
 		for (World world: Bukkit.getWorlds()) {
+			if (((lineCount + 1) != (page * 15))) {
 			boolean itemFound = false;
 			String[] placeHolders = LanguageAPI.getLang(false).newString();
 			placeHolders[0] = world.getName();
-			LanguageAPI.getLang(false).sendLangMessage("commands.list.worldHeader", sender, placeHolders);
+			if (!(lineCount > (page * 15)) && (page == 1 || !(lineCount < ((page - 1) * 15)))) {
+				LanguageAPI.getLang(false).sendLangMessage("commands.list.worldHeader", sender, placeHolders);
+				lineCount++;
+				worldSent = true;
+			} else { lineCount++; }
 			List < String > inputListed = new ArrayList < String > ();
 			for (ItemMap itemMap: ItemUtilities.getUtilities().getItems()) {
 				if (!inputListed.contains(itemMap.getConfigName()) && itemMap.inWorld(world)) {
-					placeHolders[3] = itemMap.getConfigName();
-					placeHolders[4] = itemMap.getConfigName();
-					LanguageAPI.getLang(false).sendLangMessage("commands.list.itemRow", sender, placeHolders);
-					inputListed.add(itemMap.getConfigName());
+					if ((page == 1 && !(lineCount >= (page * 15))) || (page != 1 && !(lineCount > (page * 15))) && (page == 1 || !(lineCount < ((page - 1) * 15)))) {
+						if (!worldSent) { 
+							placeHolders[0] = world.getName();
+							if (!(lineCount > (page * 15)) && (page == 1 || !(lineCount < ((page - 1) * 15)))) {
+								LanguageAPI.getLang(false).sendLangMessage("commands.list.worldHeader", sender, placeHolders);
+								lineCount++;
+								worldSent = true;
+							}
+						}
+						placeHolders[3] = itemMap.getConfigName();
+						placeHolders[4] = itemMap.getConfigName();
+						inputListed.add(itemMap.getConfigName());
+						LanguageAPI.getLang(false).sendLangMessage("commands.list.itemRow", sender, placeHolders);
+						lineCount++;
+					} else { lineCount++; }
 					itemFound = true;
 				}
 			}
 			if (!itemFound) {
 				LanguageAPI.getLang(false).sendLangMessage("commands.list.noItems", sender);
+				lineCount++;
+			}
 			}
 		}
-		LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]----------------&a&l[&e List Menu 1/1 &a&l]&a&l&m---------------[");
+		if (page != maxPage) { LanguageAPI.getLang(false).dispatchMessage(sender, "&aType &a&l/ItemJoin List " + (page + 1) + " &afor the next page."); }
+		LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]----------------&a&l[&e List Menu " + page + "/" + maxPage + " &a&l]&a&l&m---------------[");
 	}
 	
    /**
@@ -670,8 +694,9 @@ public class ChatExecutor implements CommandExecutor {
 	    * 
 	    */
 		private boolean hasSyntax(final String[] args, final int page) {
-			return ((args.length >= 2 && (args[1].equalsIgnoreCase(String.valueOf(page)) || (this.equals(Execute.PERMISSIONS) && page == 2 
-				 && StringUtils.isInt(args[1]) && Integer.parseInt(args[1]) != 0 && Integer.parseInt(args[1]) != 1 && Integer.parseInt(args[1]) <= ConfigHandler.getConfig().getPermissionPages()) 
+			return ((args.length >= 2 && (args[1].equalsIgnoreCase(String.valueOf(page)) || (page == 2 
+				 && StringUtils.isInt(args[1]) && Integer.parseInt(args[1]) != 0 && Integer.parseInt(args[1]) != 1 && ((this.equals(Execute.PERMISSIONS) && Integer.parseInt(args[1]) <= ConfigHandler.getConfig().getPermissionPages()) 
+				 || (this.equals(Execute.LIST) && Integer.parseInt(args[1]) <= ConfigHandler.getConfig().getListPages()))) 
 				 || (page == 1 && this.equals(Execute.PERMISSIONS) && StringUtils.isInt(args[1]) && Integer.parseInt(args[1]) == 0)
 				 || (!StringUtils.isInt(args[1]) && !this.equals(Execute.PURGE)))) 
 				 || (args.length < 2 && (!this.equals(Execute.GET) && !this.equals(Execute.GETONLINE) && !this.equals(Execute.REMOVE) && !this.equals(Execute.REMOVEONLINE))

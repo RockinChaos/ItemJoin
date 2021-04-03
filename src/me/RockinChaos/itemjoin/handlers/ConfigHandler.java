@@ -81,6 +81,7 @@ public class ConfigHandler {
 	
 	private boolean Generating = false;
 	private int permissionLength = 2;
+	private int listLength = 1;
 	
 	private YamlConfiguration itemsFile;
 	private YamlConfiguration configFile;
@@ -132,7 +133,7 @@ public class ConfigHandler {
 				SchedulerUtils.runLater(2L, () -> {
 					ItemDesigner.getDesigner(true); {
 						ItemJoin.getInstance().setStarted(true);
-						this.setPermissionPages();
+						this.setPages();
 					}
 				}); { 
 					SchedulerUtils.runLater(100L, () -> {
@@ -361,22 +362,29 @@ public class ConfigHandler {
 	}
 	
    /**
-    * Sets the number of permission pages.
+    * Sets the number of list and permission pages.
     * 
     */
-	public void setPermissionPages() {
-		List < String > customPermissions = new ArrayList < String > ();
-		for (World world: Bukkit.getServer().getWorlds()) {
-			List < String > inputListed = new ArrayList < String > ();
-			for (ItemMap item: ItemUtilities.getUtilities().getItems()) {
-				if ((item.getPermissionNode() != null ? !customPermissions.contains(item.getPermissionNode()) : true) && !inputListed.contains(item.getConfigName()) && item.inWorld(world)) {
-					if (item.getPermissionNode() != null) { customPermissions.add(item.getPermissionNode()); }
-					inputListed.add(item.getConfigName());
+	public void setPages() {
+		int customItems = (this.getConfigurationSection() != null ? this.getConfigurationSection().getKeys(false).size() : 0);
+		if (customItems > 15) {
+			this.permissionLength = (int) Math.ceil((double)customItems / 15) + 1;
+		}
+		
+		int listCount = 0;
+		for (World world: Bukkit.getWorlds()) {
+			List < String > listItems = new ArrayList < String > ();
+			listCount++;
+			for (ItemMap itemMap: ItemUtilities.getUtilities().getItems()) {
+				if (!listItems.contains(itemMap.getConfigName()) && itemMap.inWorld(world)) {
+					listCount++;
+					listItems.add(itemMap.getConfigName());
 				}
 			}
 		}
-		if (customPermissions.size() > 15) {
-			this.permissionLength = (int) Math.ceil((double)customPermissions.size() / 15) + 1;
+		
+		if (listCount > 15) {
+			this.listLength = (int) Math.ceil((double)listCount / 15);
 		}
 	}
 	
@@ -387,6 +395,15 @@ public class ConfigHandler {
     */
 	public int getPermissionPages() {
 		return this.permissionLength;
+	}
+	
+   /**
+    * Gets the number of list pages.
+    * 
+    * @return The number of list pages.
+    */
+	public int getListPages() {
+		return this.listLength;
 	}
 	
    /**
@@ -582,7 +599,7 @@ public class ConfigHandler {
 			&& !StringUtils.isRegistered(PlayerJoin.class.getSimpleName())) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerJoin(), ItemJoin.getInstance());
 		}
-		if (((!itemMap.isGiveOnDisabled() && itemMap.isGiveOnRespawn()) || itemMap.isAutoRemove()) && !StringUtils.isRegistered(Respawn.class.getSimpleName())) {
+		if ((((!itemMap.isGiveOnDisabled() && itemMap.isGiveOnRespawn()) || itemMap.isDeathKeepable()) || itemMap.isAutoRemove()) && !StringUtils.isRegistered(Respawn.class.getSimpleName())) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Respawn(), ItemJoin.getInstance());
 		}
 		if (((!itemMap.isGiveOnDisabled() && itemMap.isGiveOnWorldSwitch()) || itemMap.isAutoRemove()) && !StringUtils.isRegistered(WorldSwitch.class.getSimpleName())) {
@@ -629,7 +646,7 @@ public class ConfigHandler {
 		} else if (itemMap.isStackable()) {
 			LegacyAPI.registerStackable();
 		}
-		if ((itemMap.isDeathDroppable() || itemMap.isSelfDroppable()) && !StringUtils.isRegistered(Drops.class.getSimpleName())) {
+		if ((itemMap.isDeathKeepable() || itemMap.isDeathDroppable() || itemMap.isSelfDroppable()) && !StringUtils.isRegistered(Drops.class.getSimpleName())) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Drops(), ItemJoin.getInstance());
 		}
 		if (itemMap.getCommands() != null && itemMap.getCommands().length != 0) {
