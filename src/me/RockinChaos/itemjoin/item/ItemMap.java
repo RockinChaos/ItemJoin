@@ -2720,20 +2720,20 @@ public class ItemMap {
     * Checks if the Player has Permission.
     * 
     * @param player - The Player that should have Permission.
+    * @param world - The world to check permission.
     * @return If the Player has Permission.
     */
-	public boolean hasPermission(final Player player) {
-		String worldName = player.getWorld().getName();
-		String customPerm = PermissionsHandler.customPermissions(this.permissionNode, this.configName, worldName);
+	public boolean hasPermission(final Player player, final World world) {
+		String customPerm = PermissionsHandler.customPermissions(this.permissionNode, this.configName, world.getName());
 		if (!this.isPermissionNeeded() && !player.isOp() || (!this.isOPPermissionNeeded() && player.isOp())) {
 			return true;
 		} else if (this.isOPPermissionNeeded() && player.isOp()) {
-			if ((player.isPermissionSet(customPerm) && player.hasPermission(customPerm) && (!player.isPermissionSet("itemjoin." + worldName + ".*") 
-			|| (player.isPermissionSet("itemjoin." + worldName + ".*") && player.hasPermission("itemjoin." + worldName + ".*"))) 
-			|| ((player.isPermissionSet("itemjoin." + worldName + ".*") && player.hasPermission("itemjoin." + worldName + ".*")) || (player.isPermissionSet(customPerm) && player.hasPermission(customPerm))))) {
+			if ((player.isPermissionSet(customPerm) && player.hasPermission(customPerm) && (!player.isPermissionSet("itemjoin." + world.getName() + ".*") 
+			|| (player.isPermissionSet("itemjoin." + world.getName() + ".*") && player.hasPermission("itemjoin." + world.getName() + ".*"))) 
+			|| ((player.isPermissionSet("itemjoin." + world.getName() + ".*") && player.hasPermission("itemjoin." + world.getName() + ".*")) || (player.isPermissionSet(customPerm) && player.hasPermission(customPerm))))) {
 				return true;
 			}
-		} else if (((player.isPermissionSet("itemjoin." + worldName + ".*") && player.hasPermission("itemjoin." + worldName + ".*")) || (player.isPermissionSet(customPerm) && player.hasPermission(customPerm)))) {
+		} else if (((player.isPermissionSet("itemjoin." + world.getName() + ".*") && player.hasPermission("itemjoin." + world.getName() + ".*")) || (player.isPermissionSet(customPerm) && player.hasPermission(customPerm)))) {
 			return true;
 		}
 		return false;

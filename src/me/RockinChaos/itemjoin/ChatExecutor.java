@@ -35,7 +35,6 @@ import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.handlers.UpdateHandler;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
-import me.RockinChaos.itemjoin.listeners.Crafting;
 import me.RockinChaos.itemjoin.utils.SchedulerUtils;
 import me.RockinChaos.itemjoin.utils.ServerUtils;
 import me.RockinChaos.itemjoin.utils.api.ChanceAPI;
@@ -347,9 +346,9 @@ public class ChatExecutor implements CommandExecutor {
 			LanguageAPI.getLang(false).dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.reload") ? "&a[\u2714]" : "&c[\u2718]") + " ItemJoin.Reload");
 			LanguageAPI.getLang(false).dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.updates") ? "&a[\u2714]" : "&c[\u2718]") + " ItemJoin.Updates");
 			LanguageAPI.getLang(false).dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.upgrade") ? "&a[\u2714]" : "&c[\u2718]") + " ItemJoin.Upgrade");
-			LanguageAPI.getLang(false).dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.Permissions") ? "&a[\u2714]" : "&c[\u2718]") + " ItemJoin.Permissions");
+			LanguageAPI.getLang(false).dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.permissions") ? "&a[\u2714]" : "&c[\u2718]") + " ItemJoin.Permissions");
 			LanguageAPI.getLang(false).dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.get") ? "&a[\u2714]" : "&c[\u2718]") + " ItemJoin.Get");
-			LanguageAPI.getLang(false).dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.Remove") ? "&a[\u2714]" : "&c[\u2718]") + " ItemJoin.Remove");
+			LanguageAPI.getLang(false).dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.remove") ? "&a[\u2714]" : "&c[\u2718]") + " ItemJoin.Remove");
 			LanguageAPI.getLang(false).dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.enable") ? "&a[\u2714]" : "&c[\u2718]") + " ItemJoin.Enable");
 			LanguageAPI.getLang(false).dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.disable") ? "&a[\u2714]" : "&c[\u2718]") + " ItemJoin.Disable");
 			LanguageAPI.getLang(false).dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.get.others") ? "&a[\u2714]" : "&c[\u2718]") + " ItemJoin.Get.Others");
@@ -373,7 +372,7 @@ public class ChatExecutor implements CommandExecutor {
 				for (ItemMap item: ItemUtilities.getUtilities().getItems()) {
 					if ((item.getPermissionNode() != null ? !customPermissions.contains(item.getPermissionNode()) : true) && item.inWorld(world) && ChanceAPI.getChances().isProbability(item, probable)) {
 						if (item.getPermissionNode() != null) { customPermissions.add(item.getPermissionNode()); }
-						if (item.hasPermission(((Player) sender))) {
+						if (item.hasPermission(((Player) sender), world)) {
 							inputMessage.add("&a[\u2714] " + PermissionsHandler.customPermissions(item.getPermissionNode(), item.getConfigName(), world.getName()));
 						} else {
 							inputMessage.add("&c[\u2718] " + PermissionsHandler.customPermissions(item.getPermissionNode(), item.getConfigName(), world.getName()));
@@ -509,7 +508,7 @@ public class ChatExecutor implements CommandExecutor {
 			if (itemMap.getConfigName().equalsIgnoreCase(args[1])) {
 				String customName = StringUtils.translateLayout(itemMap.getCustomName(), argsPlayer); placeHolders[3] = customName;
 				if ((remove && itemMap.hasItem(argsPlayer)) || (!remove && (itemMap.conditionMet(argsPlayer, "trigger-conditions") && (ItemUtilities.getUtilities().canOverwrite(argsPlayer, itemMap) && (amount != 0 || itemMap.isAlwaysGive() || !itemMap.hasItem(argsPlayer)))))) {
-					if (remove || !PermissionsHandler.receiveEnabled() || (itemMap.hasPermission(argsPlayer) && PermissionsHandler.receiveEnabled())) {
+					if (remove || !PermissionsHandler.receiveEnabled() || (itemMap.hasPermission(argsPlayer, argsPlayer.getWorld()) && PermissionsHandler.receiveEnabled())) {
 						if (itemMap.isAlwaysGive() && (args.length < 2 || (!StringUtils.isInt(args[args.length - 1])))) { amount = itemMap.getCount(); }
 						if (StringUtils.getSlotConversion(itemMap.getSlot()) != 0 && PlayerHandler.isCraftingInv(argsPlayer.getOpenInventory()) && argsPlayer.getOpenInventory().getTopInventory().getItem(0) != null && !argsPlayer.getOpenInventory().getTopInventory().getItem(0).getType().equals(Material.AIR)) {
 							ItemHandler.returnCraftingItem(argsPlayer, 0, argsPlayer.getOpenInventory().getTopInventory().getItem(0).clone(), 0L);
@@ -519,7 +518,7 @@ public class ChatExecutor implements CommandExecutor {
 						placeHolders[11] = Integer.toString((amount == 0 ? 1 : amount)); placeHolders[1] = sender.getName();
 						if (!messageSent) { LanguageAPI.getLang(false).sendLangMessage("commands." + (remove ? "remove.removedYou" : "get.givenYou"), argsPlayer, placeHolders); }
 						if (!messageSent && (args.length >= 3 && !StringUtils.isInt(args[2]) && !sender.getName().equalsIgnoreCase(argsPlayer.getName()))) { placeHolders[1] = argsPlayer.getName(); LanguageAPI.getLang(false).sendLangMessage("commands." + (remove ? "remove.removedTarget" : "get.givenTarget"), sender, placeHolders); }
-						Crafting.quickSave(argsPlayer);
+						PlayerHandler.quickCraftSave(argsPlayer);
 					} else if (!remove && !messageSent) {
 						LanguageAPI.getLang(false).sendLangMessage("commands.get." + (args.length >= 3 && !StringUtils.isInt(args[2]) && !sender.getName().equalsIgnoreCase(argsPlayer.getName()) ? "targetNoPermission" : "noPermission"), sender, placeHolders);
 					}
@@ -557,7 +556,7 @@ public class ChatExecutor implements CommandExecutor {
 			placeHolders[11] = (amount == 0 ? "&lAll" : Integer.toString(amount));
 			for (ItemMap itemMap: ItemUtilities.getUtilities().getItems()) {
 				if (itemMap.getConfigName().equalsIgnoreCase(args[1])) {
-					if (remove || !PermissionsHandler.receiveEnabled() || (itemMap.hasPermission(argsPlayer) && PermissionsHandler.receiveEnabled())) {
+					if (remove || !PermissionsHandler.receiveEnabled() || (itemMap.hasPermission(argsPlayer, argsPlayer.getWorld()) && PermissionsHandler.receiveEnabled())) {
 						if ((remove && itemMap.hasItem(argsPlayer)) || (!remove && (itemMap.conditionMet(argsPlayer, "trigger-conditions") && (ItemUtilities.getUtilities().canOverwrite(argsPlayer, itemMap) && (amount != 0 || itemMap.isAlwaysGive() || !itemMap.hasItem(argsPlayer)))))) {
 							if (StringUtils.getSlotConversion(itemMap.getSlot()) != 0 && PlayerHandler.isCraftingInv(argsPlayer.getOpenInventory()) && argsPlayer.getOpenInventory().getTopInventory().getItem(0) != null && !argsPlayer.getOpenInventory().getTopInventory().getItem(0).getType().equals(Material.AIR)) {
 								ItemHandler.returnCraftingItem(argsPlayer, 0, argsPlayer.getOpenInventory().getTopInventory().getItem(0).clone(), 0L);
@@ -566,7 +565,7 @@ public class ChatExecutor implements CommandExecutor {
 							else { itemMap.giveTo(argsPlayer, amount); }
 							if (!messageSent && !sender.getName().equalsIgnoreCase(argsPlayer.getName())) { LanguageAPI.getLang(false).sendLangMessage("commands." + (remove ? "remove.removedYou" : "get.givenYou"), argsPlayer, placeHolders); }
 							if (!messageSent && !handledPlayers.contains(argsPlayer.getName())) { handledPlayers.add(argsPlayer.getName()); }
-							Crafting.quickSave(argsPlayer);
+							PlayerHandler.quickCraftSave(argsPlayer);
 						} else if (!messageSent) { 
 							if (!sender.getName().equalsIgnoreCase(argsPlayer.getName())) { LanguageAPI.getLang(false).sendLangMessage("commands." + (remove ? "remove.targetTriedRemoval" : "get.targetTriedGive"), argsPlayer, placeHolders); }
 							if (!failedPlayers.contains(argsPlayer.getName())) { failedPlayers.add(argsPlayer.getName()); }
@@ -602,16 +601,16 @@ public class ChatExecutor implements CommandExecutor {
 		final ItemMap probable = ChanceAPI.getChances().getRandom(argsPlayer);
 		for (ItemMap itemMap: ItemUtilities.getUtilities().getItems()) {
 			if ((!remove ? (itemMap.inWorld(argsPlayer.getWorld()) && ChanceAPI.getChances().isProbability(itemMap, probable) && ItemUtilities.getUtilities().canOverwrite(argsPlayer, itemMap) && 
-				(!PermissionsHandler.receiveEnabled() || (itemMap.hasPermission(argsPlayer) && PermissionsHandler.receiveEnabled()))) : remove)) {
+				(!PermissionsHandler.receiveEnabled() || (itemMap.hasPermission(argsPlayer, argsPlayer.getWorld()) && PermissionsHandler.receiveEnabled()))) : remove)) {
 				if ((remove && itemMap.hasItem(argsPlayer)) || ((!remove && !itemMap.hasItem(argsPlayer)) || (!remove && itemMap.isAlwaysGive()))) {
 					if (remove || (!remove && itemMap.conditionMet(argsPlayer, "trigger-conditions"))) {
 						if (remove) { itemMap.removeFrom(argsPlayer); } 
 						else { itemMap.giveTo(argsPlayer); }
 						if (!itemGiven) { itemGiven = true; }
-						Crafting.quickSave(argsPlayer);
+						PlayerHandler.quickCraftSave(argsPlayer);
 					}
 				}
-			} else if (!failedPermissions && !itemMap.hasPermission(argsPlayer)) { failedPermissions = true; }
+			} else if (!failedPermissions && !itemMap.hasPermission(argsPlayer, argsPlayer.getWorld())) { failedPermissions = true; }
 		}
 		if (itemGiven) {
 			failedPermissions = false;

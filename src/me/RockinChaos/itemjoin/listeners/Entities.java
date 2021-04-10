@@ -43,7 +43,7 @@ public class Entities implements Listener {
 		SchedulerUtils.runAsync(() -> {
 			for (ItemMap itemMap: ItemUtilities.getUtilities().getItems()) {
 				if (itemMap.mobsDrop() && itemMap.getMobsDrop().containsKey(victim.getType()) && itemMap.inWorld(victim.getWorld())
-					&& ((killer != null && killer instanceof Player && itemMap.isLimitMode(((Player)killer).getGameMode()) && itemMap.hasPermission((Player)killer)) || killer == null) && Math.random() <= itemMap.getMobsDrop().get(victim.getType())) {
+					&& ((killer != null && killer instanceof Player && itemMap.isLimitMode(((Player)killer).getGameMode()) && itemMap.hasPermission((Player)killer, killer.getWorld())) || killer == null) && Math.random() <= itemMap.getMobsDrop().get(victim.getType())) {
 					for (String region : ((DependAPI.getDepends(false).getGuard().guardEnabled() && !itemMap.getEnabledRegions().isEmpty()) ? DependAPI.getDepends(false).getGuard().getRegionAtLocation(victim.getLocation()).split(", ") : new String[]{"FALSE"})) {
 						if (!DependAPI.getDepends(false).getGuard().guardEnabled() || itemMap.getEnabledRegions().isEmpty() || itemMap.inRegion(region)) { 
 							SchedulerUtils.run(() -> victim.getLocation().getWorld().dropItem(victim.getLocation(), itemMap.getItem((killer != null ? (Player)killer : null))));
