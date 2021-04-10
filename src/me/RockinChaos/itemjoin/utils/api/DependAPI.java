@@ -24,6 +24,7 @@ import com.mojang.authlib.properties.Property;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.utils.ServerUtils;
+import me.RockinChaos.itemjoin.utils.api.MetricsAPI.SimplePie;
 import skinsrestorer.bukkit.SkinsRestorer;
 
 public class DependAPI {
@@ -175,6 +176,15 @@ public class DependAPI {
     }
     
    /**
+    * Checks if ProtocolLib is Enabled.
+    * 
+    * @return If ProtocolLib is Enabled.
+    */
+    public boolean protocolEnabled() {
+    	return Bukkit.getServer().getPluginManager().isPluginEnabled("ProtocolLib");
+    }
+    
+   /**
     * Gets the set SkinsRestorer skin.
     * 
     * @param owner - The skull owner to have their skin fetched.
@@ -212,7 +222,7 @@ public class DependAPI {
 				+ (this.myWorldsEnabled() ? "My Worlds, " : "") + (this.perInventoryEnabled() ? "PerWorldInventory, " : "") 
 				+ (this.perPluginsEnabled() ? "PerWorldPlugins, " : "") + (this.tokenEnchantEnabled() ? "TokenEnchant, " : "") 
 				+ (this.getGuard().guardEnabled() ? "WorldGuard, " : "") + (this.databaseEnabled() ? "HeadDatabase, " : "") 
-				+ (this.xInventoryEnabled() ? "xInventories, " : "") + (this.placeHolderEnabled() ? "PlaceholderAPI, " : "") + 
+				+ (this.xInventoryEnabled() ? "xInventories, " : "") + (this.placeHolderEnabled() ? "PlaceholderAPI, " : "") + (this.protocolEnabled() ? "ProtocolLib, " : "") + 
 				(this.skinsRestorerEnabled() ? "SkinsRestorer, " : "") + (this.citizensEnabled() ? "Citizens, " : "") + (this.chestSortEnabled() ? "ChestSort, " : "")
 				+ (this.getVault().vaultEnabled() ? "Vault, " : "");
 		if (!enabledPlugins.isEmpty()) { ServerUtils.logInfo("Hooked into { " + enabledPlugins.substring(0, enabledPlugins.length() - 2) + " }"); }
@@ -228,27 +238,28 @@ public class DependAPI {
     * 
     * @param metrics - The referenced Metrics connection.
     */
-	public void addCustomCharts(MetricsAPI metrics) {
-		metrics.addCustomChart(new MetricsAPI.SimplePie("items", ItemUtilities.getUtilities().getItems().size() + " "));
-		metrics.addCustomChart(new MetricsAPI.SimplePie("itemPermissions", ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Obtain-Items") ? "True" : "False"));
-		metrics.addCustomChart(new MetricsAPI.SimplePie("language", LanguageAPI.getLang(false).getLanguage()));
-		metrics.addCustomChart(new MetricsAPI.SimplePie("softDepend", this.authMeEnabled() ? "AuthMe" : ""));
-		metrics.addCustomChart(new MetricsAPI.SimplePie("softDepend", this.nickEnabled() ? "BetterNick" : ""));
-		metrics.addCustomChart(new MetricsAPI.SimplePie("softDepend", this.hyperVerseEnabled() ? "HeadDatabase" : ""));
-		metrics.addCustomChart(new MetricsAPI.SimplePie("softDepend", this.hyperVerseEnabled() ? "Hyperverse" : ""));
-		metrics.addCustomChart(new MetricsAPI.SimplePie("softDepend", this.coreEnabled() ? "Multiverse-Core" : ""));
-		metrics.addCustomChart(new MetricsAPI.SimplePie("softDepend", this.inventoryEnabled() ? "Multiverse-Inventories" : ""));
-		metrics.addCustomChart(new MetricsAPI.SimplePie("softDepend", this.myWorldsEnabled() ? "My Worlds" : ""));
-		metrics.addCustomChart(new MetricsAPI.SimplePie("softDepend", this.perInventoryEnabled() ? "PerWorldInventory" : ""));
-		metrics.addCustomChart(new MetricsAPI.SimplePie("softDepend", this.perPluginsEnabled() ? "PerWorldPlugins" : ""));
-		metrics.addCustomChart(new MetricsAPI.SimplePie("softDepend", this.placeHolderEnabled() ? "PlaceholderAPI" : ""));
-		metrics.addCustomChart(new MetricsAPI.SimplePie("softDepend", this.skinsRestorerEnabled() ? "SkinsRestorer" : ""));
-		metrics.addCustomChart(new MetricsAPI.SimplePie("softDepend", this.citizensEnabled() ? "Citizens" : ""));
-		metrics.addCustomChart(new MetricsAPI.SimplePie("softDepend", this.chestSortEnabled() ? "ChestSort" : ""));
-		metrics.addCustomChart(new MetricsAPI.SimplePie("softDepend", this.tokenEnchantEnabled() ? "TokenEnchant" : ""));
-		metrics.addCustomChart(new MetricsAPI.SimplePie("softDepend", this.getVault().vaultEnabled() ? "Vault" : ""));
-		metrics.addCustomChart(new MetricsAPI.SimplePie("softDepend", this.getGuard().guardEnabled() ? "WorldGuard" : ""));
-		metrics.addCustomChart(new MetricsAPI.SimplePie("softDepend", this.xInventoryEnabled() ? "xInventories" : ""));
+	public void addCustomCharts(final MetricsAPI metrics) {
+		metrics.addCustomChart(new SimplePie("items", () -> ItemUtilities.getUtilities().getItems().size() + " "));
+		metrics.addCustomChart(new SimplePie("itemPermissions", () -> ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Obtain-Items") ? "True" : "False"));
+		metrics.addCustomChart(new SimplePie("language", () -> LanguageAPI.getLang(false).getLanguage()));
+		metrics.addCustomChart(new SimplePie("softDepend", () -> this.authMeEnabled() ? "AuthMe" : ""));
+		metrics.addCustomChart(new SimplePie("softDepend", () -> this.nickEnabled() ? "BetterNick" : ""));
+		metrics.addCustomChart(new SimplePie("softDepend", () -> this.hyperVerseEnabled() ? "HeadDatabase" : ""));
+		metrics.addCustomChart(new SimplePie("softDepend", () -> this.hyperVerseEnabled() ? "Hyperverse" : ""));
+		metrics.addCustomChart(new SimplePie("softDepend", () -> this.coreEnabled() ? "Multiverse-Core" : ""));
+		metrics.addCustomChart(new SimplePie("softDepend", () -> this.inventoryEnabled() ? "Multiverse-Inventories" : ""));
+		metrics.addCustomChart(new SimplePie("softDepend", () -> this.myWorldsEnabled() ? "My Worlds" : ""));
+		metrics.addCustomChart(new SimplePie("softDepend", () -> this.perInventoryEnabled() ? "PerWorldInventory" : ""));
+		metrics.addCustomChart(new SimplePie("softDepend", () -> this.perPluginsEnabled() ? "PerWorldPlugins" : ""));
+		metrics.addCustomChart(new SimplePie("softDepend", () -> this.placeHolderEnabled() ? "PlaceholderAPI" : ""));
+		metrics.addCustomChart(new SimplePie("softDepend", () -> this.protocolEnabled() ? "ProtocolLib" : ""));
+		metrics.addCustomChart(new SimplePie("softDepend", () -> this.skinsRestorerEnabled() ? "SkinsRestorer" : ""));
+		metrics.addCustomChart(new SimplePie("softDepend", () -> this.citizensEnabled() ? "Citizens" : ""));
+		metrics.addCustomChart(new SimplePie("softDepend", () -> this.chestSortEnabled() ? "ChestSort" : ""));
+		metrics.addCustomChart(new SimplePie("softDepend", () -> this.tokenEnchantEnabled() ? "TokenEnchant" : ""));
+		metrics.addCustomChart(new SimplePie("softDepend", () -> this.getVault().vaultEnabled() ? "Vault" : ""));
+		metrics.addCustomChart(new SimplePie("softDepend", () -> this.getGuard().guardEnabled() ? "WorldGuard" : ""));
+		metrics.addCustomChart(new SimplePie("softDepend", () -> this.xInventoryEnabled() ? "xInventories" : ""));
 	} 
 	
    /**

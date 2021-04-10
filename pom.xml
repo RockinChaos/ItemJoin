@@ -173,6 +173,11 @@
             <id>jeff-media-repo</id>
             <url>https://repo.jeff-media.de/maven2</url>
         </repository>
+		<!--ProtocolLib Repository-->
+        <repository>
+            <id>dmulloy2-repo</id>
+            <url>https://repo.dmulloy2.net/repository/public/</url>
+        </repository>
 		<!--CraftationGaming Repository-->
 		<repository>
 			<id>CraftationGaming</id>
@@ -257,6 +262,13 @@
             <groupId>de.jeff_media</groupId>
             <artifactId>ChestSortAPI</artifactId>
             <version>2.0.0</version>
+       	    <scope>provided</scope>
+        </dependency>
+		<!--ProtocolLib API-->
+        <dependency>
+            <groupId>com.comphenix.protocol</groupId>
+            <artifactId>ProtocolLib</artifactId>
+            <version>4.6.0</version>
        	    <scope>provided</scope>
         </dependency>
 		<!--Mojang AuthLib API-->
