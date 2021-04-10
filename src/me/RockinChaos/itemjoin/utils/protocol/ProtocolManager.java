@@ -44,15 +44,15 @@ public class ProtocolManager {
   		protocol = new TinyProtocol(ItemJoin.getInstance()) {
   			
   		   /**
-  		    * Handles all incmming client packets.
+  		    * Handles all incomming client packets.
   		    * 
             * @param player - the player tied to the packet.
             * @param channel - the channel the packet was called on.
             * @param packet - the packet object.
   		    */
   			@Override
-  			public Object onPacketInAsync(Player player, Channel channel, Object packet) {
-	  			if (manageEvents(player, channel, packet)) { 
+  			public Object onPacketInAsync(final Player player, final Channel channel, final Object packet) {
+	  			if (manageEvents(player, packet)) { 
 	  				return null; 
 	  			}
   				return super.onPacketInAsync(player, channel, packet);
@@ -66,7 +66,7 @@ public class ProtocolManager {
             * @param packet - the packet object.
   		    */
   			@Override
-  			public Object onPacketOutAsync(Player player, Channel channel, Object packet) {
+  			public Object onPacketOutAsync(final Player player, final Channel channel, final Object packet) {
   				return packet;
   			}
   		};
@@ -79,7 +79,7 @@ public class ProtocolManager {
     * @param channel - the channel the packet was called on.
     * @param packet - the packet object.
     */
-  	private static boolean manageEvents(Player player, Channel channel, Object packet) {
+  	public static boolean manageEvents(final Player player, final Object packet) {
   		try {
   			if (packet != null) {
   				String packetName = packet.getClass().getSimpleName();
@@ -107,7 +107,7 @@ public class ProtocolManager {
     * 
     * @param event - The event to be triggered.
     */
-    private static void callEvent(Event event) {
+    private static void callEvent(final Event event) {
     	HandlerList handlers = event.getHandlers();
     	RegisteredListener[] listeners = handlers.getRegisteredListeners();
     	for (RegisteredListener registration: listeners) {

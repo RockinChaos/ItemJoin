@@ -103,20 +103,20 @@ public class SchedulerUtils {
     		if (!SINGLE_THREAD_TRANSACTING) {
     			SINGLE_THREAD_TRANSACTING = true;
     			new BukkitRunnable() {
-		            @Override
-		            public void run() {
-		            	runnable.run(); {
-		            		SINGLE_THREAD_TRANSACTING = false;
-		            	}
-		            }
-		        }.runTaskAsynchronously(ItemJoin.getInstance());
-    		} else { 
-				try { 
-					Thread.sleep(500);
-					runSingleAsync(runnable);
-				} catch (InterruptedException e) { 
-					runSingleAsync(runnable);
-				} 
+    				@Override
+    				public void run() {
+    					runnable.run(); {
+    						SINGLE_THREAD_TRANSACTING = false;
+    					}
+    				}
+    			}.runTaskAsynchronously(ItemJoin.getInstance());
+    		} else {
+    			try {
+    				Thread.sleep(500);
+    				runSingleAsync(runnable);
+    			} catch (InterruptedException e) {
+    				runSingleAsync(runnable);
+    			}
     		}
     	}
     }

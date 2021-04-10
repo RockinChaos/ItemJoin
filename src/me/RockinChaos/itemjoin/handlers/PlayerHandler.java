@@ -19,6 +19,7 @@ package me.RockinChaos.itemjoin.handlers;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -28,6 +29,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.InventoryView;
@@ -47,6 +49,9 @@ import me.RockinChaos.itemjoin.utils.sql.DataObject.Table;
 
 public class PlayerHandler {
 	
+	private static HashMap<String, ItemStack[]> craftingItems = new HashMap<String, ItemStack[]>();
+	private static HashMap<String, ItemStack[]> craftingOpenItems = new HashMap<String, ItemStack[]>();
+	private static HashMap<String, ItemStack[]> creativeCraftingItems = new HashMap<String, ItemStack[]>();
 	private static final int PLAYER_CRAFT_INV_SIZE = 5;
 	
    /**
@@ -460,6 +465,161 @@ public class PlayerHandler {
 		}
 		return "";
 	}
+	
+   /**
+    * Quick saves the current inventories crafting items.
+    * 
+    * @oaram player - The player having their crafting items saved.
+    */
+    public static void quickCraftSave(Player player) {
+    	if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
+    		ItemStack[] contents = new ItemStack[5];
+    		if (contents != null && player.getOpenInventory().getTopInventory().getContents() != null) {
+    			for (int i = 0; i <= 4; i++) {
+    				contents[i] = player.getOpenInventory().getTopInventory().getContents()[i].clone();
+    			}
+    		}
+    		craftingItems.put(PlayerHandler.getPlayerID(player), contents);
+    	}
+    }
+    
+   /**
+    * Emulates the Player dropping the ItemStack.
+    * 
+    * @param player - The Player being referenced.
+    * @param item - The item to be dropped.
+    */
+    public static void dropItem(final Player player, final ItemStack item) { 
+    	Location location = player.getLocation();
+    	location.setY(location.getY() + 1);
+    	Item dropped = player.getWorld().dropItem(location, item);
+		dropped.setVelocity(location.getDirection().multiply(.30));
+    }
+    
+   /**
+    * Gets the crafting items HashMap of players crafting contents.
+    * 
+    * @return The HashMap of players and their crafting contents.
+    */
+    public static HashMap<String, ItemStack[]> getCraftItems() {
+    	return craftingItems;
+    }
+    
+   /**
+    * Adds the Player and their Crafting items to a HashMap.
+    * 
+    * @param player - The player being referenced.
+    * @param items - THe items to be added.
+    */
+    public static void addCraftItems(final Player player, final ItemStack[] items) {
+    	craftingItems.put(PlayerHandler.getPlayerID(player), items);
+    }
+    
+   /**
+    * Gets the crafting items HashMap of players prior to creative crafting contents.
+    * 
+    * @return The HashMap of players and their prior to creative crafting contents.
+    */
+    public static HashMap<String, ItemStack[]> getCreativeCraftItems() {
+    	return creativeCraftingItems;
+    }
+    
+   /**
+    * Adds the Player and their Crafting items to a HashMap.
+    * 
+    * @param player - The player being referenced.
+    * @param items - THe items to be added.
+    */
+    public static void addCreativeCraftItems(final Player player, final ItemStack[] items) {
+    	creativeCraftingItems.put(PlayerHandler.getPlayerID(player), items);
+    }
+    
+   /**
+    * Removves the Player and their Crafting items from a HashMap.
+    * 
+    * @param player - The player being referenced.
+    */
+    public static void removeCreativeCraftItems(final Player player) {
+    	creativeCraftingItems.remove(PlayerHandler.getPlayerID(player));
+    }
+    
+   /**
+    * Gets the crafting items HashMap of players prior to opened inventory crafting contents.
+    * 
+    * @return The HashMap of players and their prior to opened inventory crafting contents.
+    */
+    public static HashMap<String, ItemStack[]> getOpenCraftItems() {
+    	return craftingOpenItems;
+    }
+    
+   /**
+    * Adds the Player and their Crafting items to a HashMap.
+    * 
+    * @param player - The player being referenced.
+    * @param items - THe items to be added.
+    */
+    public static void addOpenCraftItems(final Player player, final ItemStack[] items) {
+    	craftingOpenItems.put(PlayerHandler.getPlayerID(player), items);
+    }
+    
+   /**
+    * Removves the Player and their Crafting items from a HashMap.
+    * 
+    * @param player - The player being referenced.
+    */
+    public static void removeOpenCraftItems(final Player player) {
+    	craftingOpenItems.remove(PlayerHandler.getPlayerID(player));
+    }
+    
+   /**
+    * Constantly cycles through the players crafting slots saving them to a HashMap for later use.
+    * 
+    */
+    public static void cycleCrafting() {
+    	SchedulerUtils.runAsyncTimer(40L, 0L, () -> {
+    		Collection < ? > playersOnlineNew = null;
+    		Player[] playersOnlineOld;
+    		try {
+    			if (Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).getReturnType() == Collection.class) {
+    				if (Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).getReturnType() == Collection.class) {
+    					playersOnlineNew = ((Collection < ? > ) Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).invoke(null, new Object[0]));
+    					for (Object objPlayer: playersOnlineNew) {
+    						if (((Player) objPlayer).isOnline() && PlayerHandler.isCraftingInv(((Player) objPlayer).getOpenInventory())) {
+    							ItemStack[] tempContents = ((Player) objPlayer).getOpenInventory().getTopInventory().getContents();
+    							ItemStack[] contents = new ItemStack[5];
+    							if (contents != null && tempContents != null) {
+	    							for (int i = 0; i <= 4; i++) {
+	    								if (tempContents[i] != null) { 
+	    									contents[i] = tempContents[i].clone();
+	    								}
+	    							}
+    							}
+    							craftingItems.put(PlayerHandler.getPlayerID(((Player) objPlayer)), contents);
+    						} else {
+    							craftingItems.remove(PlayerHandler.getPlayerID((Player) objPlayer));
+    						}
+    					}
+    				}
+    			} else {
+    				playersOnlineOld = ((Player[]) Bukkit.class.getMethod("getOnlinePlayers", new Class < ? > [0]).invoke(null, new Object[0]));
+    				for (Player player: playersOnlineOld) {
+    					if (player.isOnline() && PlayerHandler.isCraftingInv(player.getOpenInventory())) {
+    						ItemStack[] tempContents = player.getOpenInventory().getTopInventory().getContents();
+    						ItemStack[] contents = new ItemStack[5];
+    						if (contents != null && tempContents != null) {
+    							for (int i = 0; i <= 4; i++) {
+    								contents[i] = tempContents[i].clone();
+    							}
+    						}
+    						craftingItems.put(PlayerHandler.getPlayerID(player), contents);
+    					} else {
+    						craftingItems.remove(PlayerHandler.getPlayerID(player));
+    					}
+    				}
+    			}
+    		} catch (Exception e) { ServerUtils.sendDebugTrace(e); }
+    	});
+    }
 	
    /**
     * Gets the Nearby Players from the specified Players Location inside the Range.

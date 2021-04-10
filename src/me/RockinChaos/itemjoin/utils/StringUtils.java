@@ -327,8 +327,8 @@ public class StringUtils {
     * @param reader - the BufferedReader to be converted.
     * @return The resulting appended String.
     */
-	public static String toString(BufferedReader reader) throws IOException {
-		StringBuilder result = new StringBuilder();
+	public static String toString(final BufferedReader reader) throws IOException {
+		final StringBuilder result = new StringBuilder();
 		String line = null; while ((line = reader.readLine()) != null) { result.append(line); }
 		return result.toString();
 	}

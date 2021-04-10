@@ -44,7 +44,6 @@ import me.RockinChaos.itemjoin.listeners.Drops;
 import me.RockinChaos.itemjoin.listeners.Interact;
 import me.RockinChaos.itemjoin.listeners.Commands;
 import me.RockinChaos.itemjoin.listeners.Clicking;
-import me.RockinChaos.itemjoin.listeners.Crafting;
 import me.RockinChaos.itemjoin.listeners.Interfaces;
 import me.RockinChaos.itemjoin.listeners.Entities;
 import me.RockinChaos.itemjoin.listeners.Pickups;
@@ -53,6 +52,7 @@ import me.RockinChaos.itemjoin.listeners.Projectile;
 import me.RockinChaos.itemjoin.listeners.Recipes;
 import me.RockinChaos.itemjoin.listeners.Stackable;
 import me.RockinChaos.itemjoin.listeners.Storable;
+import me.RockinChaos.itemjoin.listeners.Crafting;
 import me.RockinChaos.itemjoin.listeners.plugins.ChestSortAPI;
 import me.RockinChaos.itemjoin.listeners.Offhand;
 import me.RockinChaos.itemjoin.listeners.triggers.LimitSwitch;
@@ -71,6 +71,7 @@ import me.RockinChaos.itemjoin.utils.api.DependAPI;
 import me.RockinChaos.itemjoin.utils.api.LanguageAPI;
 import me.RockinChaos.itemjoin.utils.api.LegacyAPI;
 import me.RockinChaos.itemjoin.utils.api.MetricsAPI;
+import me.RockinChaos.itemjoin.utils.api.ProtocolAPI;
 import me.RockinChaos.itemjoin.utils.enchants.Glow;
 import me.RockinChaos.itemjoin.utils.protocol.ProtocolManager;
 import me.RockinChaos.itemjoin.utils.sql.SQL;
@@ -114,7 +115,7 @@ public class ConfigHandler {
     * Registers new instances of the plugin classes.
     * 
     */
-	private void registerClasses(boolean silent) {
+	private void registerClasses(final boolean silent) {
 		final boolean reload = ItemJoin.getInstance().isStarted();
 		ServerUtils.clearErrorStatements();
 		this.copyFiles();
@@ -137,7 +138,8 @@ public class ConfigHandler {
 					}
 				}); { 
 					SchedulerUtils.runLater(100L, () -> {
-						new MetricsAPI();
+						final MetricsAPI metrics = new MetricsAPI(ItemJoin.getInstance(), 4115);
+						DependAPI.getDepends(false).addCustomCharts(metrics);
 						ServerUtils.sendErrorStatements(null);
 					});
 				}
@@ -354,7 +356,7 @@ public class ConfigHandler {
     * Properly reloads the configuration files.
     * 
     */
-	public void reloadConfigs(boolean silent) {
+	public void reloadConfigs(final boolean silent) {
 		ItemUtilities.getUtilities().closeAnimations();
 		ItemUtilities.getUtilities().clearItems();
 		config = new ConfigHandler(); 
@@ -622,10 +624,11 @@ public class ConfigHandler {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Breaking(), ItemJoin.getInstance());
 		}
 		if (itemMap.isCraftingItem() && !StringUtils.isRegistered(Crafting.class.getSimpleName())) {
-			Crafting.cycleTask();
+			PlayerHandler.cycleCrafting();
 			SchedulerUtils.runLater(40L, () -> {
 				PlayerHandler.restoreCraftItems();
-				if (ServerUtils.hasSpecificUpdate("1_8") && !ProtocolManager.isHandling()) { ProtocolManager.handleProtocols(); }
+				if (ServerUtils.hasSpecificUpdate("1_8") && !DependAPI.getDepends(false).protocolEnabled() && !ProtocolManager.isHandling()) { ProtocolManager.handleProtocols(); }
+				else if (ServerUtils.hasSpecificUpdate("1_8") && DependAPI.getDepends(false).protocolEnabled() && !ProtocolAPI.isHandling()) { ProtocolAPI.handleProtocols(); }
 			});
 			if (!StringUtils.isRegistered(PlayerQuit.class.getSimpleName())) {
 				ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerQuit(), ItemJoin.getInstance());

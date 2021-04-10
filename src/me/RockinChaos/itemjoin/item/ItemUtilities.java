@@ -230,7 +230,7 @@ public class ItemUtilities {
 		      || ((((type.equals(TriggerType.REGION_ENTER) && (item.isGiveOnRegionEnter() || item.isGiveOnRegionAccess())) 
 			  || (type.equals(TriggerType.REGION_LEAVE) && (item.isGiveOnRegionLeave() || item.isGiveOnRegionEgress()))) && item.inRegion(region))))
 			   && item.isLimitMode(gameMode) && item.inWorld(player.getWorld()) && ChanceAPI.getChances().isProbability(item, randomMap) && item.conditionMet(player, "trigger-conditions")
-			   && PlayerHandler.isEnabled(player) && item.hasPermission(player) 
+			   && PlayerHandler.isEnabled(player) && item.hasPermission(player, player.getWorld()) 
 			   && this.isObtainable(player, item, session, type)) {
 				item.giveTo(player); 
 			} else if (((type.equals(TriggerType.LIMIT_SWITCH) && item.isUseOnLimitSwitch() && !item.isLimitMode(gameMode))
@@ -582,7 +582,7 @@ public class ItemUtilities {
 			} else if (itemMap.isDropFull()) { 
 				player.getWorld().dropItem(player.getLocation(), item);
 			}
-			ServerUtils.logDebug("{ItemMap} " + player.getName() + " has been given the item " + itemMap.getConfigName() + " in the world " + player.getWorld().getName() + ".");
+			ServerUtils.logDebug("{ItemMap} " + player.getName() + " has been given the item " + itemMap.getConfigName() + " in the world [" + player.getWorld().getName() + "].");
 		});
 		DataObject ipLimit = SQL.getData().getData(new DataObject(Table.IP_LIMITS, PlayerHandler.getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName(), player.getAddress().getHostString()));
 		if ((itemMap.isOnlyFirstJoin() || itemMap.isOnlyFirstLife())) { SQL.getData().saveData(new DataObject(Table.FIRST_JOIN, PlayerHandler.getPlayerID(player), "", itemMap.getConfigName())); }
@@ -627,7 +627,7 @@ public class ItemUtilities {
 			} else if (itemMap.isDropFull()) {
 				player.getWorld().dropItem(player.getLocation(), item);
 			}
-			ServerUtils.logDebug("{ItemMap} " + player.getName() + " has been given the item " + itemMap.getConfigName() + " in " + player.getWorld().getName() + ".");
+			ServerUtils.logDebug("{ItemMap} " + player.getName() + " has been given the item " + itemMap.getConfigName() + " in the world [" + player.getWorld().getName() + "].");
 		});
 		DataObject ipLimit = SQL.getData().getData(new DataObject(Table.IP_LIMITS, PlayerHandler.getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName(), player.getAddress().getHostString()));
 		if ((itemMap.isOnlyFirstJoin() || itemMap.isOnlyFirstLife())) { SQL.getData().saveData(new DataObject(Table.FIRST_JOIN, PlayerHandler.getPlayerID(player), "", itemMap.getConfigName())); }
