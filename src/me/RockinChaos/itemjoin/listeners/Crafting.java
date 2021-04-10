@@ -74,6 +74,7 @@ public class Crafting implements Listener {
     private void onCraftingOpen(InventoryOpenEvent event) {
     	final Player player = (Player) event.getPlayer();
     	if (!PlayerHandler.getOpenCraftItems().containsKey(PlayerHandler.getPlayerID(player))) {
+    		ServerUtils.logDebug("{CRAFTING} Bukkit inventory was opened for the player " + event.getPlayer().getName() + ".");
 	    	PlayerHandler.addOpenCraftItems(player, PlayerHandler.getTopContents(player));
 			ItemHandler.removeCraftItems(player);
 	    	PlayerHandler.updateInventory(player, 1L);
@@ -87,7 +88,8 @@ public class Crafting implements Listener {
 	*/
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = false)
 	private void onCraftingClose(org.bukkit.event.inventory.InventoryCloseEvent event) {
-		if (!ServerUtils.hasSpecificUpdate("1_8") || !PlayerHandler.isCraftingInv(event.getView())) {
+		long dupeDuration = (this.closeDupe != null && !this.closeDupe.isEmpty() && this.closeDupe.get(PlayerHandler.getPlayerID((Player)event.getPlayer())) != null ? (((System.currentTimeMillis()) - this.closeDupe.get(PlayerHandler.getPlayerID((Player)event.getPlayer())))) : -1);
+		if (!ServerUtils.hasSpecificUpdate("1_8") || !PlayerHandler.isCraftingInv(event.getView()) || (PlayerHandler.isCraftingInv(event.getView()) && (dupeDuration == -1 || dupeDuration > 30))) {
 			ServerUtils.logDebug("{CRAFTING} Bukkit inventory was closed for the player " + event.getPlayer().getName() + ".");
 			ItemStack[] topContents = ItemHandler.cloneContents(event.getView().getTopInventory().getContents());
 	    	this.handleClose(slot -> { 
@@ -95,6 +97,7 @@ public class Crafting implements Listener {
 	    	}, (Player)event.getPlayer(), event.getView(), topContents, true);
     	}
     }
+	private HashMap<String, Long> closeDupe = new HashMap<String, Long>();
     
    /**
 	* Gives the custom crafting items back when the player closes their inventory if they had items existing previously.
@@ -105,6 +108,7 @@ public class Crafting implements Listener {
     private void onCraftingClose(me.RockinChaos.itemjoin.handlers.events.InventoryCloseEvent event) {
 		if (ServerUtils.hasSpecificUpdate("1_8") && PlayerHandler.isCraftingInv(event.getView())) {
 			ServerUtils.logDebug("{CRAFTING} Protocol-Packet inventory was closed for the player " + event.getPlayer().getName() + ".");
+			this.closeDupe.put(PlayerHandler.getPlayerID(event.getPlayer()), System.currentTimeMillis());
 	    	this.handleClose(slot -> { 
 	    		if (!event.isCancelled()) { event.setCancelled(true); }
 	    	}, event.getPlayer(), event.getView(), event.getPreviousContents(true), false);

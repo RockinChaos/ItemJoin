@@ -560,6 +560,7 @@ public class ItemUtilities {
     */
 	public void setInvSlots(final Player player, final ItemMap itemMap, final int size) {
 		SchedulerUtils.run(() -> {
+			boolean isGiven = false;
 			ItemStack existingItem = ItemHandler.getItem(player, itemMap);
 			ItemStack item = itemMap.getItem(player).clone();
 			this.shiftItem(player, itemMap);
@@ -567,27 +568,34 @@ public class ItemUtilities {
 			boolean overWrite = itemMap.isOverwritable() || ConfigHandler.getConfig().getFile("items.yml").getBoolean("items-Overwrite");
 			if (size > 1) { item.setAmount(size); }
 			if ((size > 1 || itemMap.isAlwaysGive()) && !overWrite && existingItem != null) {
+				isGiven = true;
 				player.getInventory().addItem(item);
 			} else if (nextSlot != 0) {
+				isGiven = true;
 				player.getInventory().setItem(nextSlot, item);
 			} else if (player.getInventory().firstEmpty() != -1 || overWrite) {
 				if (itemMap.getSlot().contains("%")) {
 					String slot = StringUtils.translateLayout(itemMap.getSlot(), player);
 					if (StringUtils.isInt(slot)) {
+						isGiven = true;
 						player.getInventory().setItem(Integer.parseInt(slot), item);
 					}
 				} else {
+					isGiven = true;
 					player.getInventory().setItem(Integer.parseInt(itemMap.getSlot()), item);
 				}
 			} else if (itemMap.isDropFull()) { 
+				isGiven = true;
 				player.getWorld().dropItem(player.getLocation(), item);
 			}
-			ServerUtils.logDebug("{ItemMap} " + player.getName() + " has been given the item " + itemMap.getConfigName() + " in the world [" + player.getWorld().getName() + "].");
+			if (isGiven) {
+				ServerUtils.logDebug("{ItemMap} " + player.getName() + " has been given the item " + itemMap.getConfigName() + " in the world [" + player.getWorld().getName() + "].");
+				DataObject ipLimit = SQL.getData().getData(new DataObject(Table.IP_LIMITS, PlayerHandler.getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName(), player.getAddress().getHostString()));
+				if ((itemMap.isOnlyFirstJoin() || itemMap.isOnlyFirstLife())) { SQL.getData().saveData(new DataObject(Table.FIRST_JOIN, PlayerHandler.getPlayerID(player), "", itemMap.getConfigName())); }
+				if (itemMap.isOnlyFirstWorld()) { SQL.getData().saveData(new DataObject(Table.FIRST_WORLD, PlayerHandler.getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName())); }
+				if (itemMap.isIpLimted() && ipLimit == null) { SQL.getData().saveData(new DataObject(Table.IP_LIMITS, PlayerHandler.getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName(), player.getAddress().getHostString())); }
+			}
 		});
-		DataObject ipLimit = SQL.getData().getData(new DataObject(Table.IP_LIMITS, PlayerHandler.getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName(), player.getAddress().getHostString()));
-		if ((itemMap.isOnlyFirstJoin() || itemMap.isOnlyFirstLife())) { SQL.getData().saveData(new DataObject(Table.FIRST_JOIN, PlayerHandler.getPlayerID(player), "", itemMap.getConfigName())); }
-		if (itemMap.isOnlyFirstWorld()) { SQL.getData().saveData(new DataObject(Table.FIRST_WORLD, PlayerHandler.getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName())); }
-		if (itemMap.isIpLimted() && ipLimit == null) { SQL.getData().saveData(new DataObject(Table.IP_LIMITS, PlayerHandler.getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName(), player.getAddress().getHostString())); }
 	}
 	
    /**
@@ -599,6 +607,7 @@ public class ItemUtilities {
     */
 	public void setCustomSlots(final Player player, final ItemMap itemMap, final int size) {
 		SchedulerUtils.run(() -> {
+			boolean isGiven = false;
 			int craftSlot = StringUtils.getSlotConversion(itemMap.getSlot());
 			ItemStack existingItem = ItemHandler.getItem(player, itemMap);
 			ItemStack item = itemMap.getItem(player).clone();
@@ -607,32 +616,46 @@ public class ItemUtilities {
 			boolean overWrite = itemMap.isOverwritable() || ConfigHandler.getConfig().getFile("items.yml").getBoolean("items-Overwrite");
 			if (size > 1) { item.setAmount(size); }
 			if ((size > 1 || itemMap.isAlwaysGive()) && !overWrite && existingItem != null) {
+				isGiven = true;
 				player.getInventory().addItem(item);
 			} else if (nextSlot != 0) {
+				isGiven = true;
 				player.getInventory().setItem(nextSlot, item);
 			} else if (CustomSlot.ARBITRARY.isSlot(itemMap.getSlot()) && player.getInventory().firstEmpty() != -1) {
+				isGiven = true;
 				player.getInventory().addItem(item);
 			} else if (CustomSlot.HELMET.isSlot(itemMap.getSlot()) && (existingItem == null || overWrite)) {
+				isGiven = true;
 				player.getEquipment().setHelmet(item);
 			} else if (CustomSlot.CHESTPLATE.isSlot(itemMap.getSlot()) && (existingItem == null || overWrite)) {
+				isGiven = true;
 				player.getEquipment().setChestplate(item);
 			} else if (CustomSlot.LEGGINGS.isSlot(itemMap.getSlot()) && (existingItem == null || overWrite)) {
+				isGiven = true;
 				player.getEquipment().setLeggings(item);
 			} else if (CustomSlot.BOOTS.isSlot(itemMap.getSlot()) && (existingItem == null || overWrite)) {
+				isGiven = true;
 				player.getEquipment().setBoots(item);
 			} else if (ServerUtils.hasSpecificUpdate("1_9") && CustomSlot.OFFHAND.isSlot(itemMap.getSlot()) && (existingItem == null || overWrite)) {
+				isGiven = true;
 				PlayerHandler.setOffHandItem(player, item);
 			} else if (craftSlot != -1 && (existingItem == null || overWrite || craftSlot == 0)) {
-				this.setCraftingSlots(player, item, craftSlot, 240);
+				isGiven = true;
+				SchedulerUtils.runLater(6L, () -> {
+					this.setCraftingSlots(player, item, craftSlot, 240);
+				});
 			} else if (itemMap.isDropFull()) {
+				isGiven = true;
 				player.getWorld().dropItem(player.getLocation(), item);
 			}
-			ServerUtils.logDebug("{ItemMap} " + player.getName() + " has been given the item " + itemMap.getConfigName() + " in the world [" + player.getWorld().getName() + "].");
+			if (isGiven) {
+				ServerUtils.logDebug("{ItemMap} " + player.getName() + " has been given the item " + itemMap.getConfigName() + " in the world [" + player.getWorld().getName() + "].");
+				DataObject ipLimit = SQL.getData().getData(new DataObject(Table.IP_LIMITS, PlayerHandler.getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName(), player.getAddress().getHostString()));
+				if ((itemMap.isOnlyFirstJoin() || itemMap.isOnlyFirstLife())) { SQL.getData().saveData(new DataObject(Table.FIRST_JOIN, PlayerHandler.getPlayerID(player), "", itemMap.getConfigName())); }
+				if (itemMap.isOnlyFirstWorld()) { SQL.getData().saveData(new DataObject(Table.FIRST_WORLD, PlayerHandler.getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName())); }
+				if (itemMap.isIpLimted() && ipLimit == null) { SQL.getData().saveData(new DataObject(Table.IP_LIMITS, PlayerHandler.getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName(), player.getAddress().getHostString())); }
+			}
 		});
-		DataObject ipLimit = SQL.getData().getData(new DataObject(Table.IP_LIMITS, PlayerHandler.getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName(), player.getAddress().getHostString()));
-		if ((itemMap.isOnlyFirstJoin() || itemMap.isOnlyFirstLife())) { SQL.getData().saveData(new DataObject(Table.FIRST_JOIN, PlayerHandler.getPlayerID(player), "", itemMap.getConfigName())); }
-		if (itemMap.isOnlyFirstWorld()) { SQL.getData().saveData(new DataObject(Table.FIRST_WORLD, PlayerHandler.getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName())); }
-		if (itemMap.isIpLimted() && ipLimit == null) { SQL.getData().saveData(new DataObject(Table.IP_LIMITS, PlayerHandler.getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName(), player.getAddress().getHostString())); }
 	}
 	
    /**

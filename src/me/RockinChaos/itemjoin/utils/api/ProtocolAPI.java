@@ -20,17 +20,19 @@ public class ProtocolAPI {
     */
 	public static void handleProtocols() {
 		if (protocolManager == null) { protocolManager = ProtocolLibrary.getProtocolManager(); }
-		protocolManager.addPacketListener(new PacketAdapter(ItemJoin.getInstance(), ListenerPriority.NORMAL, PacketType.Play.Client.AUTO_RECIPE, PacketType.Play.Client.CLOSE_WINDOW) {
+		protocolManager.addPacketListener(new PacketAdapter(ItemJoin.getInstance(), ListenerPriority.LOWEST, PacketType.Play.Client.AUTO_RECIPE, PacketType.Play.Client.CLOSE_WINDOW, 
+				PacketType.Play.Client.PICK_ITEM) {
   		   /**
   		    * Handles incomming client packets.
   		    * 
-            * @param player - the player tied to the packet.
-            * @param channel - the channel the packet was called on.
-            * @param packet - the packet object.
+            * @param event - PacketEvent
   		    */
 		    @Override
 		    public void onPacketReceiving(final PacketEvent event) {
-		        if (me.RockinChaos.itemjoin.utils.protocol.ProtocolManager.manageEvents(event.getPlayer(), event.getPacket())) {
+		    	String packetName = (event.getPacket() != null && event.getPacketType() == PacketType.Play.Client.AUTO_RECIPE ? "PacketPlayInAutoRecipe" : 
+		    						(event.getPacket() != null && event.getPacketType() == PacketType.Play.Client.CLOSE_WINDOW ? "PacketPlayInCloseWindow" : 
+		    						(event.getPacket() != null && event.getPacketType() == PacketType.Play.Client.PICK_ITEM ? "PacketPlayInPickItem" : null)));
+		        if (me.RockinChaos.itemjoin.utils.protocol.ProtocolManager.manageEvents(event.getPlayer(), packetName)) {
 		        	event.setCancelled(true);
 		        }
 		    }

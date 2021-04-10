@@ -52,7 +52,8 @@ public class ProtocolManager {
   		    */
   			@Override
   			public Object onPacketInAsync(final Player player, final Channel channel, final Object packet) {
-	  			if (manageEvents(player, packet)) { 
+  				String packetName = (packet != null ? packet.getClass().getSimpleName() : null);
+	  			if (manageEvents(player, packetName)) { 
 	  				return null; 
 	  			}
   				return super.onPacketInAsync(player, channel, packet);
@@ -79,10 +80,9 @@ public class ProtocolManager {
     * @param channel - the channel the packet was called on.
     * @param packet - the packet object.
     */
-  	public static boolean manageEvents(final Player player, final Object packet) {
+  	public static boolean manageEvents(final Player player, final String packetName) {
   		try {
-  			if (packet != null) {
-  				String packetName = packet.getClass().getSimpleName();
+  			if (packetName != null) {
 	  			if (packetName.equalsIgnoreCase("PacketPlayInPickItem")) {
 		  			PlayerPickItemEvent PickItem = new PlayerPickItemEvent(player, player.getInventory());
 		  			callEvent(PickItem);

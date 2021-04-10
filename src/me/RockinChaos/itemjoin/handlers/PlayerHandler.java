@@ -576,7 +576,7 @@ public class PlayerHandler {
     * 
     */
     public static void cycleCrafting() {
-    	SchedulerUtils.runAsyncTimer(40L, 0L, () -> {
+    	SchedulerUtils.runAsyncTimer(15L, 0L, () -> {
     		Collection < ? > playersOnlineNew = null;
     		Player[] playersOnlineOld;
     		try {
