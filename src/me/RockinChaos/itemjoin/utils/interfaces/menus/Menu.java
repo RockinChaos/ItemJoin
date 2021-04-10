@@ -3918,7 +3918,7 @@ public class Menu {
 			}));
 			for (int i = 0; i <= 64; i++) {
 				final int k = i;
-				receivePane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:11", (k == 0 ? 1 : k), false, "&9&lReceive: &a$&l" + k, "&7", "&7*Click to set the", "&7commands-receive of the item."), event -> {
+				receivePane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:11", (k == 0 ? 1 : k), false, "&9&lReceive: &a#&l" + k, "&7", "&7*Click to set the", "&7commands-receive of the item."), event -> {
 					itemMap.setCommandReceive(k);
 					commandPane(player, itemMap);
 				}));
