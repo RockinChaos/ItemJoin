@@ -501,8 +501,10 @@ public class ItemHandler {
 				boolean notNull = false;
 				ItemStack[] craftingContents = PlayerHandler.getCreativeCraftItems().get(PlayerHandler.getPlayerID(player));
 				for (int k = 0; k <= 4; k++) {
-					inv.setItem(k, craftingContents[k]); 
-					if (craftingContents[k] != null && craftingContents[k].getType() != Material.AIR) { notNull = true; }
+					if (craftingContents != null && craftingContents[k] != null) {
+						inv.setItem(k, craftingContents[k]); 
+						if (craftingContents[k] != null && craftingContents[k].getType() != Material.AIR) { notNull = true; }
+					}
 				}
 				if (notNull) { SQL.getData().saveData(new DataObject(Table.RETURN_CRAFTITEMS, PlayerHandler.getPlayerID(player), "", serializeInventory(inv))); }
 			} else if (PlayerHandler.getOpenCraftItems().containsKey(PlayerHandler.getPlayerID(player))) {
@@ -510,8 +512,10 @@ public class ItemHandler {
 				boolean notNull = false;
 				ItemStack[] craftingContents = PlayerHandler.getOpenCraftItems().get(PlayerHandler.getPlayerID(player));
 				for (int k = 0; k <= 4; k++) {
-					inv.setItem(k, craftingContents[k]); 
-					if (craftingContents[k] != null && craftingContents[k].getType() != Material.AIR) { notNull = true; }
+					if (craftingContents != null && craftingContents[k] != null) {
+						inv.setItem(k, craftingContents[k]); 
+						if (craftingContents[k] != null && craftingContents[k].getType() != Material.AIR) { notNull = true; }
+					}
 				}
 				if (notNull) { SQL.getData().saveData(new DataObject(Table.RETURN_CRAFTITEMS, PlayerHandler.getPlayerID(player), "", serializeInventory(inv))); }
 			} else if (PlayerHandler.getCraftItems().containsKey(PlayerHandler.getPlayerID(player))) {
@@ -519,8 +523,10 @@ public class ItemHandler {
 				boolean notNull = false;
 				ItemStack[] craftingContents = PlayerHandler.getCraftItems().get(PlayerHandler.getPlayerID(player));
 				for (int k = 0; k <= 4; k++) {
-					inv.setItem(k, craftingContents[k]); 
-					if (craftingContents[k] != null && craftingContents[k].getType() != Material.AIR) { notNull = true; }
+					if (craftingContents != null && craftingContents[k] != null) {
+						inv.setItem(k, craftingContents[k]); 
+						if (craftingContents[k] != null && craftingContents[k].getType() != Material.AIR) { notNull = true; }
+					}
 				}
 				if (notNull) { SQL.getData().saveData(new DataObject(Table.RETURN_CRAFTITEMS, PlayerHandler.getPlayerID(player), "", serializeInventory(inv))); }
 			}
