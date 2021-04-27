@@ -2704,7 +2704,7 @@ public class ItemMap {
     * @return The NBTData format to be set to an item.
     */
 	public String getNBTFormat() {
-		return "ItemJoin" + this.getItemValue() + this.getConfigName();
+		return this.getItemValue() + this.getConfigName();
 	}
 	
    /**
@@ -3313,7 +3313,8 @@ public class ItemMap {
 		if (item != null && item.getType() != Material.AIR
 				&& (this.vanillaControl || this.vanillaStatus
 				|| (ItemHandler.dataTagsEnabled() && ItemHandler.getNBTData(item) != null && ItemHandler.getNBTData(item).equalsIgnoreCase(this.newNBTData))
-				|| (this.legacySecret != null && item.hasItemMeta() && item.getItemMeta().hasDisplayName() && item.getItemMeta().getDisplayName().contains(this.legacySecret)))) {
+				|| (this.legacySecret != null && item.hasItemMeta() && (ServerUtils.hasSpecificUpdate("1_14") || (!ServerUtils.hasSpecificUpdate("1_14") && item.getItemMeta().hasDisplayName())) 
+				&& StringUtils.colorDecode(item) != null && StringUtils.colorDecode(item).contains(this.legacySecret)))) {
 			return true;
 		}
 		return false;
@@ -3327,8 +3328,9 @@ public class ItemMap {
     */
 	public boolean isSimilar(final ItemStack item) {
 		if ((item != null && item.getType() != Material.AIR && item.getType() == this.material) || (this.materialAnimated && item != null && item.getType() != Material.AIR && this.isMaterial(item))) {
-			if (this.vanillaControl || ItemHandler.dataTagsEnabled() && ItemHandler.getNBTData(item) != null && ItemHandler.getNBTData(item).equalsIgnoreCase(this.newNBTData)
-					|| this.legacySecret != null && item.hasItemMeta() && item.getItemMeta().hasDisplayName() && item.getItemMeta().getDisplayName().contains(this.legacySecret) || this.vanillaStatus) {
+			if (this.vanillaControl || this.vanillaStatus || (ItemHandler.dataTagsEnabled() && ItemHandler.getNBTData(item) != null && ItemHandler.getNBTData(item).equalsIgnoreCase(this.newNBTData))
+					|| (this.legacySecret != null && item.hasItemMeta() && (ServerUtils.hasSpecificUpdate("1_14") || (!ServerUtils.hasSpecificUpdate("1_14") && item.getItemMeta().hasDisplayName())) 
+					&& StringUtils.colorDecode(item) != null && StringUtils.colorDecode(item).contains(this.legacySecret))) {
 				if (this.skullMeta(item)) {
 					if (isEnchantSimilar(item) || !item.getItemMeta().hasEnchants() && enchants.isEmpty() || this.isItemChangable()) {
 						if (this.material.toString().toUpperCase().contains("BOOK") 
@@ -3874,6 +3876,8 @@ public class ItemMap {
 				ServerUtils.logSevere("{ItemMap} An error has occured when setting NBTData to an item.");
 				ServerUtils.sendDebugTrace(e);
 			}
+		} else if (!ItemHandler.dataTagsEnabled()) {
+			this.tempItem = StringUtils.colorEncode(this.tempItem, this.legacySecret);
 		}
 	}
 	
@@ -3884,7 +3888,12 @@ public class ItemMap {
     */
 	private void setCustomName(final Player player) {
 		if (this.customName != null && !this.customName.equalsIgnoreCase(ItemHandler.getMaterialName(this.tempItem))) {
-			this.tempMeta.setDisplayName(StringUtils.translateLayout(ItemHandler.cutDelay(this.customName), player));
+			if (this.legacySecret != null && !ServerUtils.hasSpecificUpdate("1_14")) {
+				final String itemData = this.tempMeta.getDisplayName();
+				this.tempMeta.setDisplayName(StringUtils.translateLayout(ItemHandler.cutDelay(this.customName), player) + "§r" + itemData);
+			} else {
+				this.tempMeta.setDisplayName(StringUtils.translateLayout(ItemHandler.cutDelay(this.customName), player));
+			}
 		}
 	}
 	
@@ -4928,7 +4937,17 @@ public class ItemMap {
 		if (this.modelData != null && this.modelData > 0) { itemData.set("items." + this.configName + ".model-data", this.modelData); }
 		if (this.author != null && !this.author.isEmpty()) { itemData.set("items." + this.configName + ".author", this.author.replace("§", "&")); }
 		if (this.customName != null && !this.customName.isEmpty() && (this.dynamicNames == null || this.dynamicNames.isEmpty())) { 
-			String setName = this.customName.replace(this.getLegacySecret(), "").replace("§", "&");
+			String setName = null;
+			if (this.legacySecret != null && !ServerUtils.hasSpecificUpdate("1_14")) {
+				final ItemMeta itemMeta = this.tempItem.getItemMeta();
+				itemMeta.setDisplayName("");
+				this.tempItem.setItemMeta(itemMeta);
+				StringUtils.colorEncode(this.tempItem, this.legacySecret);
+				final String itemInfo = this.tempItem.getItemMeta().getDisplayName();
+				setName = this.customName.replace(itemInfo, "").replace("§", "&");
+			} else {
+				setName = this.customName.replace("§", "&");
+			}
 			if (setName.startsWith("&f") && (!ItemHandler.dataTagsEnabled() || !ServerUtils.hasSpecificUpdate("1_8"))) { setName = setName.substring(2, setName.length()); }
 				if (!ItemHandler.getMaterialName(this.tempItem).equalsIgnoreCase(setName)) { 
 					itemData.set("items." + this.configName + ".name", setName); 

@@ -129,9 +129,9 @@ public class Clicking implements Listener {
 	public boolean isCreativeDupe(final InventoryClickEvent event) {
 		if (PlayerHandler.isCreativeMode((Player) event.getWhoClicked()) && event.getCurrentItem() != null && event.getCursor() != null) {
 			String currentNBT = (ItemHandler.dataTagsEnabled() ? ItemHandler.getNBTData(event.getCurrentItem()) 
-					: ((event.getCurrentItem().hasItemMeta() && event.getCurrentItem().getItemMeta().hasDisplayName()) ? StringUtils.colorDecode(event.getCurrentItem().getItemMeta().getDisplayName()) : null));
+					: ((event.getCurrentItem().hasItemMeta() && event.getCurrentItem().getItemMeta().hasDisplayName()) ? StringUtils.colorDecode(event.getCurrentItem()) : null));
 			String cursorNBT = (ItemHandler.dataTagsEnabled() ? ItemHandler.getNBTData(event.getCursor()) 
-					: ((event.getCursor().hasItemMeta() && event.getCursor().getItemMeta().hasDisplayName()) ? StringUtils.colorDecode(event.getCursor().getItemMeta().getDisplayName()) : null));
+					: ((event.getCursor().hasItemMeta() && event.getCursor().getItemMeta().hasDisplayName()) ? StringUtils.colorDecode(event.getCursor()) : null));
 			if (currentNBT != null && cursorNBT != null) {
 				return currentNBT.equalsIgnoreCase(cursorNBT);
 			}	

@@ -425,6 +425,57 @@ public class LegacyAPI {
 	}
 	
    /**
+    * Color Encodes a String so that it is completely hidden in color codes,
+    * this will be invisible to a normal eye and will not display any text.
+    * Only to be used on server versions below 1.13, will not function on 1.13+.
+    * 
+    * @param str - The String to be Color Encoded.
+    * @return The Color Encoded String.
+    */
+	public static String colorEncode(final String str) {
+		try {
+			String hiddenData = "";
+			for (char c: str.toCharArray()) {
+				hiddenData += "§" + c;
+			}
+			return hiddenData;
+		} catch (Exception e) {
+			ServerUtils.sendDebugTrace(e);
+			return null;
+		}
+	}
+
+   /**
+    * Decodes a Color Encoded String.
+    * Only to be used on server versions below 1.13, will not function on 1.13+.
+    * 
+    * @param str - The String to be Color Decoded.
+    * @return The Color Decoded String.
+    */
+	public static String colorDecode(final String str) {
+		try {
+			String[] hiddenData = str.split("(?:\\w{2,}|\\d[0-9A-Fa-f])+");
+			String returnData = "";
+			if (hiddenData == null) {
+				hiddenData = str.split("§");
+				for (int i = 0; i < hiddenData.length; i++) {
+					returnData += hiddenData[i];
+				}
+				return returnData;
+			} else {
+				String[] d = hiddenData[hiddenData.length - 1].split("§");
+				for (int i = 1; i < d.length; i++) {
+					returnData += d[i];
+				}
+				return returnData;
+			}
+		} catch (Exception e) {
+			ServerUtils.sendDebugTrace(e);
+			return null;
+		}
+	}
+	
+   /**
     * Checks if the Sk89q Plugins are the Legacy version.
     * 
     * @return If the plugins are Legacy.

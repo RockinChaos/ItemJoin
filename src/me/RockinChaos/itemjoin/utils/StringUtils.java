@@ -39,12 +39,15 @@ import org.bukkit.Statistic;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.RegisteredListener;
 import de.domedd.betternick.BetterNick;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.utils.api.DependAPI;
+import me.RockinChaos.itemjoin.utils.api.LegacyAPI;
 import me.clip.placeholderapi.PlaceholderAPI;
 
 public class StringUtils {
@@ -183,16 +186,19 @@ public class StringUtils {
     * @param str - The String to be Color Encoded.
     * @return The Color Encoded String.
     */
-	public static String colorEncode(final String str) {
-		try {
-			String hiddenData = "";
-			for (char c: str.toCharArray()) {
-				hiddenData += "§" + c;
-			}
-			return hiddenData;
-		} catch (Exception e) {
-			ServerUtils.sendDebugTrace(e);
-			return null;
+	public static ItemStack colorEncode(final ItemStack itemStack, final String endData) {
+		if (ServerUtils.hasSpecificUpdate("1_14")) {
+			final ItemMeta itemMeta = itemStack.getItemMeta();
+			final org.bukkit.NamespacedKey key = new org.bukkit.NamespacedKey(ItemJoin.getInstance(), "Item_Data");
+			itemMeta.getPersistentDataContainer().set(key, org.bukkit.persistence.PersistentDataType.STRING, endData);
+			itemStack.setItemMeta(itemMeta);
+			return itemStack;
+		} else {
+			final String encodedData = LegacyAPI.colorEncode("ItemJoin" + endData);
+			final ItemMeta itemMeta = itemStack.getItemMeta();
+			itemMeta.setDisplayName(encodedData);
+			itemStack.setItemMeta(itemMeta);
+			return itemStack;
 		}
 	}
 
@@ -202,27 +208,18 @@ public class StringUtils {
     * @param str - The String to be Color Decoded.
     * @return The Color Decoded String.
     */
-	public static String colorDecode(final String str) {
-		try {
-			String[] hiddenData = str.split("(?:\\w{2,}|\\d[0-9A-Fa-f])+");
-			String returnData = "";
-			if (hiddenData == null) {
-				hiddenData = str.split("§");
-				for (int i = 0; i < hiddenData.length; i++) {
-					returnData += hiddenData[i];
-				}
-				return returnData;
-			} else {
-				String[] d = hiddenData[hiddenData.length - 1].split("§");
-				for (int i = 1; i < d.length; i++) {
-					returnData += d[i];
-				}
-				return returnData;
+	public static String colorDecode(final ItemStack itemStack) {
+		if (ServerUtils.hasSpecificUpdate("1_14")) {
+			final ItemMeta itemMeta = itemStack.getItemMeta();
+			final org.bukkit.NamespacedKey key = new org.bukkit.NamespacedKey(ItemJoin.getInstance(), "Item_Data");
+			final org.bukkit.persistence.PersistentDataContainer container = itemMeta.getPersistentDataContainer();
+			if (container.has(key, org.bukkit.persistence.PersistentDataType.STRING)) {
+			    return container.get(key, org.bukkit.persistence.PersistentDataType.STRING);
 			}
-		} catch (Exception e) {
-			ServerUtils.sendDebugTrace(e);
-			return null;
+		} else {
+			return LegacyAPI.colorDecode(itemStack.getItemMeta().getDisplayName());
 		}
+		return null;
 	}
 	
    /**

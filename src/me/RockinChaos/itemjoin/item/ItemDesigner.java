@@ -434,7 +434,7 @@ public class ItemDesigner {
 				ServerUtils.logSevere("{ItemMap} An error has occured when setting NBTData to an item.");
 				ServerUtils.sendDebugTrace(e);
 			}
-		} else { itemMap.setLegacySecret(StringUtils.colorEncode(itemMap.getNBTFormat())); }
+		} else { itemMap.setLegacySecret(itemMap.getNBTFormat()); }
 	}
 	
    /**
@@ -541,24 +541,13 @@ public class ItemDesigner {
 	*/
 	private void setName(final ItemMap itemMap) {
 		String name = getActualName(itemMap);
-		if (ItemHandler.dataTagsEnabled() && ServerUtils.hasSpecificUpdate("1_8") || itemMap.isVanilla() && ServerUtils.hasSpecificUpdate("1_8")) {
+		if ((ItemHandler.dataTagsEnabled() && ServerUtils.hasSpecificUpdate("1_8")) || (itemMap.isVanilla() && ServerUtils.hasSpecificUpdate("1_8"))) {
 			itemMap.setCustomName(name);
 		} else {
-			itemMap.setCustomName(encodeName(itemMap, name));
+			itemMap.setCustomName("§f" + name);
 		}
 	}
-	
-   /**
-	* Encodes the LegacySecret into the Custom Items name.
-	* 
-	* @param itemMap - The ItemMap being modified.
-	* @param text - The String to be encoded.
-	* @return The correctly encoded display name containing the plugin secret.
-	*/
-	private String encodeName(final ItemMap itemMap, final String text) {
-		return ("&f" + text + itemMap.getLegacySecret());
-	}
-	
+
    /**
 	* Gets the exact name to be set to the Custom Item.
 	* 

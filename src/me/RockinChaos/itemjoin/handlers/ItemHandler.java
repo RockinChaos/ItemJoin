@@ -712,7 +712,7 @@ public class ItemHandler {
 			return true;
 		} else if (!dataTagsEnabled()) { 
 			if (item != null && item.hasItemMeta() && item.getItemMeta().hasDisplayName()
-				&& StringUtils.colorDecode(item.getItemMeta().getDisplayName()).contains(StringUtils.colorDecode(StringUtils.colorEncode("ItemJoin")))) {
+				&& StringUtils.colorDecode(item) != null && !StringUtils.colorDecode(item).isEmpty()) {
 				return true;
 			}
 		}
