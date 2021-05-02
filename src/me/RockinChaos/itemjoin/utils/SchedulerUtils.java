@@ -17,6 +17,9 @@
  */
 package me.RockinChaos.itemjoin.utils;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -24,7 +27,7 @@ import me.RockinChaos.itemjoin.ItemJoin;
 
 public class SchedulerUtils {
 	
-	public static boolean SINGLE_THREAD_TRANSACTING = false;
+	private static Map < Boolean, Long > SINGLE_THREAD_TRANSACTING = new HashMap < Boolean, Long > ();
 
    /**
     * Runs the task on the main thread
@@ -100,19 +103,23 @@ public class SchedulerUtils {
     */
     public static void runSingleAsync(final Runnable runnable) {
     	if (ItemJoin.getInstance().isEnabled()) {
-    		if (!SINGLE_THREAD_TRANSACTING) {
-    			SINGLE_THREAD_TRANSACTING = true;
+    		if (!SINGLE_THREAD_TRANSACTING.containsKey(true)) {
+    			SINGLE_THREAD_TRANSACTING.put(true, System.currentTimeMillis());
     			new BukkitRunnable() {
     				@Override
     				public void run() {
     					runnable.run(); {
-    						SINGLE_THREAD_TRANSACTING = false;
+    						SINGLE_THREAD_TRANSACTING.remove(true);
     					}
     				}
     			}.runTaskAsynchronously(ItemJoin.getInstance());
     		} else {
     			try {
     				Thread.sleep(500);
+    				int timeSleeping = (int)((System.currentTimeMillis() - SINGLE_THREAD_TRANSACTING.get(true)) / 1000);
+    				if (timeSleeping >= 10) {
+    					SINGLE_THREAD_TRANSACTING.remove(true);
+    				}
     				runSingleAsync(runnable);
     			} catch (InterruptedException e) {
     				runSingleAsync(runnable);
