@@ -266,14 +266,15 @@ public class ItemAnimation {
 	*/
 	private void setNameData(final Player player, final ItemStack reviseItem, final String nameString) {
 		final ItemMeta tempmeta = reviseItem.getItemMeta();
-		if (this.itemMap.getLegacySecret() != null) {
-			final String itemData = tempmeta.getDisplayName();
-			tempmeta.setDisplayName(StringUtils.translateLayout(ItemHandler.cutDelay(nameString), player) + "§r" + itemData);
-			reviseItem.setItemMeta(tempmeta);
-		} else {
-			tempmeta.setDisplayName(StringUtils.translateLayout(ItemHandler.cutDelay(nameString), player));
-			reviseItem.setItemMeta(tempmeta);
+		String itemData = "";
+		if (this.itemMap.getLegacySecret() != null && !this.itemMap.getLegacySecret().isEmpty()) {
+			final String encodeData = StringUtils.colorEncode(new ItemStack(Material.STICK), this.itemMap.getLegacySecret()).getItemMeta().getDisplayName();
+			if (encodeData != null && !encodeData.isEmpty()) {
+				itemData = "§r" + encodeData;
+			}
 		}
+		tempmeta.setDisplayName(StringUtils.translateLayout(ItemHandler.cutDelay(nameString), player) + itemData);
+		reviseItem.setItemMeta(tempmeta);
 	}
 	
    /**

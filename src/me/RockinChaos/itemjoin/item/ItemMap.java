@@ -2586,7 +2586,7 @@ public class ItemMap {
 	public String getLegacySecret() {
 		if (!ItemHandler.dataTagsEnabled()) {
 			return this.legacySecret;
-		} else { return ""; }
+		} else { return null; }
 	}
 	
    /**
