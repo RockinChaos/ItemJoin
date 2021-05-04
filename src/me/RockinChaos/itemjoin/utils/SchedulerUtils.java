@@ -114,16 +114,15 @@ public class SchedulerUtils {
     				}
     			}.runTaskAsynchronously(ItemJoin.getInstance());
     		} else {
-    			try {
-    				Thread.sleep(500);
-    				int timeSleeping = (int)((System.currentTimeMillis() - SINGLE_THREAD_TRANSACTING.get(true)) / 1000);
-    				if (timeSleeping >= 10) {
-    					SINGLE_THREAD_TRANSACTING.remove(true);
-    				}
-    				runSingleAsync(runnable);
-    			} catch (InterruptedException e) {
-    				runSingleAsync(runnable);
-    			}
+	    		int timeSleeping = (int)((System.currentTimeMillis() - SINGLE_THREAD_TRANSACTING.get(true)) / 1000);
+	    		if (timeSleeping >= 10) {
+	    			SINGLE_THREAD_TRANSACTING.remove(true);
+	    			runSingleAsync(runnable);
+	    		} else {
+	    			runAsyncLater(10L, () -> {
+		    			runSingleAsync(runnable); 
+	    			});
+	    		}
     		}
     	}
     }
