@@ -117,7 +117,7 @@ public class SchedulerUtils {
 	    		int timeSleeping = (int)((System.currentTimeMillis() - SINGLE_THREAD_TRANSACTING.get(true)) / 1000);
 	    		if (timeSleeping >= 10) {
 	    			SINGLE_THREAD_TRANSACTING.remove(true);
-	    			runSingleAsync(runnable);
+	    			runAsync(runnable);
 	    		} else {
 	    			runAsyncLater(10L, () -> {
 		    			runSingleAsync(runnable); 

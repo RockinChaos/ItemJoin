@@ -55,8 +55,8 @@ public class Clicking implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	private void onGlobalModify(InventoryClickEvent event) {
 		Player player = (Player) event.getWhoClicked();
-	  	if (StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "TRUE") || StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), player.getWorld().getName())
-		  			|| StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "ALL") || StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "GLOBAL")) {
+	  	if (StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "TRUE", ",") || StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), player.getWorld().getName(), ",")
+		  			|| StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "ALL", ",") || StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "GLOBAL", ",")) {
 	  		if (ConfigHandler.getConfig().isPreventOP() && player.isOp() || ConfigHandler.getConfig().isPreventCreative() && PlayerHandler.isCreativeMode(player)) { } 
 	  		else if (player.getOpenInventory().getTitle().contains("§") || player.getOpenInventory().getTitle().contains("&")) { }
 	  		else { event.setCancelled(true); }
@@ -71,8 +71,8 @@ public class Clicking implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	private void onGlobalPickItem(PlayerPickItemEvent event) {
 		Player player = event.getPlayer();
-	  	if (StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "TRUE") || StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), player.getWorld().getName())
-		  			|| StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "ALL") || StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "GLOBAL")) {
+	  	if (StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "TRUE", ",") || StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), player.getWorld().getName(), ",")
+		  			|| StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "ALL", ",") || StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "GLOBAL", ",")) {
 	  		if (ConfigHandler.getConfig().isPreventOP() && player.isOp() || ConfigHandler.getConfig().isPreventCreative() && PlayerHandler.isCreativeMode(player)) { }
 	  		else { event.setCancelled(true); }
 	  	}

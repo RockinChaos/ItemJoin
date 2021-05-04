@@ -41,8 +41,8 @@ public class Legacy_Pickups implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	private void Deprecated_onGlobalPickup(org.bukkit.event.player.PlayerPickupItemEvent event) {
 	  	Player player = event.getPlayer();
-  		if (StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Pickups"), "TRUE") || StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Pickups"), player.getWorld().getName())
-	  			|| StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Pickups"), "ALL") || StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Pickups"), "GLOBAL")) {
+  		if (StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("Pickups"), "TRUE", ",") || StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("Pickups"), player.getWorld().getName(), ",")
+	  			|| StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("Pickups"), "ALL", ",") || StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("Pickups"), "GLOBAL", ",")) {
   			if (ConfigHandler.getConfig().isPreventOP() && player.isOp() || ConfigHandler.getConfig().isPreventCreative() && PlayerHandler.isCreativeMode(player)) { } 
   			else { event.setCancelled(true); }
 	  	}

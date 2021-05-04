@@ -51,8 +51,8 @@ public class Drops implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	private void onGlobalDrop(PlayerDropItemEvent event) {
 		final Player player = event.getPlayer();
-		  if (StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Self-Drops"), "TRUE") || StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Self-Drops"), player.getWorld().getName())
-		  	|| StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Self-Drops"), "ALL") || StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Self-Drops"), "GLOBAL")) {
+		  if (StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("Self-Drops"), "TRUE", ",") || StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("Self-Drops"), player.getWorld().getName(), ",")
+		  	|| StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("Self-Drops"), "ALL", ",") || StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("Self-Drops"), "GLOBAL", ",")) {
 		  	if (ConfigHandler.getConfig().isPreventOP() && player.isOp() || ConfigHandler.getConfig().isPreventCreative() && PlayerHandler.isCreativeMode(player)) { } 
 		  	else { 
 		  		if (!player.isDead()) {
@@ -74,8 +74,8 @@ public class Drops implements Listener {
 	private void onGlobalDeathDrops(PlayerDeathEvent event) {
 		Player player = event.getEntity();
 		ItemUtilities.getUtilities().closeAnimations(player);
-		if (StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Death-Drops"), "TRUE") || StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Death-Drops"), player.getWorld().getName())
-			  	|| StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Death-Drops"), "ALL") || StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getPrevent("Death-Drops"), "GLOBAL")) {
+		if (StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("Death-Drops"), "TRUE", ",") || StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("Death-Drops"), player.getWorld().getName(), ",")
+			  	|| StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("Death-Drops"), "ALL", ",") || StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("Death-Drops"), "GLOBAL", ",")) {
 		  	if (ConfigHandler.getConfig().isPreventOP() && player.isOp() || ConfigHandler.getConfig().isPreventCreative() && PlayerHandler.isCreativeMode(player)) { }
 		  	else if (!LegacyAPI.getGameRule(player.getWorld(), "keepInventory")) {
 				for (int k = 0; k < player.getInventory().getSize(); k++) {

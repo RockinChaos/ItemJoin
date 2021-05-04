@@ -174,19 +174,19 @@ public class ConfigHandler {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerGuard(), ItemJoin.getInstance());
 		}
 		if (!StringUtils.isRegistered(PlayerLogin.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerLogin(), ItemJoin.getInstance()); }
-		if ((!StringUtils.containsIgnoreCase(this.getPrevent("Pickups"), "FALSE") && !StringUtils.containsIgnoreCase(this.getPrevent("Pickups"), "DISABLED"))) {
+		if ((!StringUtils.splitIgnoreCase(this.getPrevent("Pickups"), "FALSE", ",") && !StringUtils.splitIgnoreCase(this.getPrevent("Pickups"), "DISABLED", ","))) {
 			if (ServerUtils.hasSpecificUpdate("1_12") && ReflectionUtils.getBukkitClass("event.entity.EntityPickupItemEvent") != null && !StringUtils.isRegistered(Pickups.class.getSimpleName())) { 
 				ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Pickups(), ItemJoin.getInstance()); 
 			} else { LegacyAPI.registerPickups(); }
 		}
-		if ((!StringUtils.containsIgnoreCase(this.getPrevent("itemMovement"), "FALSE") && !StringUtils.containsIgnoreCase(this.getPrevent("itemMovement"), "DISABLED"))) {
+		if ((!StringUtils.splitIgnoreCase(this.getPrevent("itemMovement"), "FALSE", ",") && !StringUtils.splitIgnoreCase(this.getPrevent("itemMovement"), "DISABLED", ","))) {
 			if (!StringUtils.isRegistered(Clicking.class.getSimpleName())) { 
 				ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Clicking(), ItemJoin.getInstance()); 
 				if (ServerUtils.hasSpecificUpdate("1_8") && !ProtocolManager.isHandling()) { ProtocolManager.handleProtocols(); }
 			}
 		}
-		if ((!StringUtils.containsIgnoreCase(this.getPrevent("Self-Drops"), "FALSE") && !StringUtils.containsIgnoreCase(this.getPrevent("Self-Drops"), "DISABLED"))
-		|| (!StringUtils.containsIgnoreCase(this.getPrevent("Death-Drops"), "FALSE") && !StringUtils.containsIgnoreCase(this.getPrevent("Death-Drops"), "DISABLED"))) {
+		if ((!StringUtils.splitIgnoreCase(this.getPrevent("Self-Drops"), "FALSE", ",") && !StringUtils.splitIgnoreCase(this.getPrevent("Self-Drops"), "DISABLED", ","))
+		|| (!StringUtils.splitIgnoreCase(this.getPrevent("Death-Drops"), "FALSE", ",") && !StringUtils.splitIgnoreCase(this.getPrevent("Death-Drops"), "DISABLED", ","))) {
 			if (!StringUtils.isRegistered(Drops.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Drops(), ItemJoin.getInstance()); }
 		}
 	}
