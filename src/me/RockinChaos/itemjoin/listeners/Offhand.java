@@ -23,11 +23,34 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 
+import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.utils.ServerUtils;
+import me.RockinChaos.itemjoin.utils.StringUtils;
 
 public class Offhand implements Listener {
+	
+   /**
+	* Prevents the player from moving all items from their mainhand to offhand slot or from their offhand to mainhand slot.
+	* 
+	* @param event - PlayerSwapHandItemsEvent
+	*/
+	@EventHandler(ignoreCancelled = true)
+	private void onGlobalHandModify(PlayerSwapHandItemsEvent event) {
+		if (ServerUtils.hasSpecificUpdate("1_9")) {
+			Player player = event.getPlayer();
+			if (StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "TRUE", ",") || StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), player.getWorld().getName(), ",")
+					|| StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "ALL", ",") || StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "GLOBAL", ",")) {
+				if (ConfigHandler.getConfig().isPreventOP() && player.isOp() || ConfigHandler.getConfig().isPreventCreative() && PlayerHandler.isCreativeMode(player)) { } 
+				else if (player.getOpenInventory().getTitle().contains("§") || player.getOpenInventory().getTitle().contains("&")) { }
+				else { 
+					event.setCancelled(true); 
+					PlayerHandler.updateInventory(player, 1L);
+				}
+			}
+		}
+	}
 	
    /**
 	* Prevents the player from moving the custom item from their mainhand to offhand slot or from their offhand to mainhand slot.
