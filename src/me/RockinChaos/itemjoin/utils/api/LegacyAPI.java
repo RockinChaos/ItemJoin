@@ -371,7 +371,12 @@ public class LegacyAPI {
 	public static void setAttributes(final ItemStack tempItem, final ItemMap itemMap) {
 		if (!ServerUtils.hasSpecificUpdate("1_13") && itemMap.getAttributes() != null && !itemMap.getAttributes().isEmpty()) {
 			try {
-				String slot = ItemHandler.getDesignatedSlot(itemMap.getMaterial());
+				String slot = null;
+				if (ItemHandler.getDesignatedSlot(itemMap.getMaterial()).equalsIgnoreCase("noslot")) {
+					slot = "HAND";
+				} else {
+					slot = ItemHandler.getDesignatedSlot(itemMap.getMaterial()).toUpperCase();
+				}
 				Class < ? > craftItemStack = ReflectionUtils.getCraftBukkitClass("inventory.CraftItemStack");
 				Object nms = craftItemStack.getMethod("asNMSCopy", ItemStack.class).invoke(null, tempItem);
 				Object tag = ReflectionUtils.getMinecraftClass("ItemStack").getMethod("getTag").invoke(nms);

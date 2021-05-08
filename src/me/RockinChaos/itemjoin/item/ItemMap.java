@@ -3709,7 +3709,12 @@ public class ItemMap {
 				for (String attrib: this.attributes.keySet()) {
 					Attribute attribute = Attribute.valueOf(attrib.toUpperCase());
 					double value = this.attributes.get(attrib);
-					EquipmentSlot slot = EquipmentSlot.valueOf(ItemHandler.getDesignatedSlot(this.material).toUpperCase());
+					EquipmentSlot slot = null;
+					if (ItemHandler.getDesignatedSlot(this.material).equalsIgnoreCase("noslot")) {
+						slot = EquipmentSlot.HAND;
+					} else {
+						slot = EquipmentSlot.valueOf(ItemHandler.getDesignatedSlot(this.material).toUpperCase());
+					}
 					AttributeModifier modifier = new AttributeModifier(UUID.nameUUIDFromBytes((this.configName + attrib).getBytes()), attrib.toLowerCase().replace("_", "."), value, AttributeModifier.Operation.ADD_NUMBER, slot);
 					if (this.tempMeta.getAttributeModifiers() == null || !this.tempMeta.getAttributeModifiers().containsValue(modifier)) {
 						this.tempMeta.addAttributeModifier(attribute, modifier);
