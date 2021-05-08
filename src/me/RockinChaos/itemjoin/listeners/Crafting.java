@@ -162,51 +162,38 @@ public class Crafting implements Listener {
    /**
 	* Removes all crafting items from the 2x2 crafting view when the player leaves the server.
 	* 
-	* @param event - PlayerDropItemEvent
-	*/
-    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = false)
-    private void onCraftingLogout(PlayerDropItemEvent event) {
-    	final Player player = (Player) event.getPlayer();
-    	final ItemStack itemCopy = event.getItemDrop().getItemStack().clone();
-    	final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(itemCopy, null, player.getWorld());
-    	if (itemMap != null && itemMap.isCraftingItem() && !player.isDead()) {
-	    	event.getItemDrop().remove();
-    		SchedulerUtils.runLater(2L, () -> { 
-    			if (player.isOnline() && itemMap.isSelfDroppable()) {
-		    		itemMap.giveTo(player, itemCopy.getAmount());
-		    		if (StringUtils.getSlotConversion(itemMap.getSlot()) != 0) { 
-		    			this.returnSlotZero(player, 4L);
-		    		}
-		    	} else if (player.isOnline()) {
-		    		PlayerHandler.dropItem(player, itemCopy);
-		    	}
-    		});
-    	}
-    }
-    
-   /**
 	* Returns the custom crafting item to the player if it is dropped automagically when switching worlds,
 	* typically via the nether portal causing duplication glitches.
 	* 
 	* @param event - PlayerDropItemEvent
 	*/
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = false)
-    private void onCraftingWorlds(PlayerDropItemEvent event) {
+    private void onCraftingDrop(PlayerDropItemEvent event) {
     	final Player player = (Player) event.getPlayer();
     	final World world = player.getWorld();
-    	final ItemStack item = event.getItemDrop().getItemStack().clone();
+    	final ItemStack itemCopy = event.getItemDrop().getItemStack().clone();
+    	final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(itemCopy, null, player.getWorld());
     	double health = 1;
     	try { health = (ServerUtils.hasSpecificUpdate("1_8") ? player.getHealth() : (double)player.getClass().getMethod("getHealth", double.class).invoke(player)); } catch (Exception e) { health = (player.isDead() ? 0 : 1);  }
-    	if (health > 0) {
-    		final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item, null, player.getWorld());
+    	if (health > 0 && itemMap != null && itemMap.isCraftingItem()) {
+	    	event.getItemDrop().remove();
     		SchedulerUtils.runLater(2L, () -> { 
-		    	if (!world.equals(player.getWorld()) && itemMap != null && itemMap.inWorld(player.getWorld()) && itemMap.hasPermission(player, player.getWorld())) {
-		    		event.getItemDrop().getItemStack().setItemMeta(null);
-		    		event.getItemDrop().remove();
-		    		itemMap.giveTo(player, item.getAmount());
-		    		this.returnSlotZero(player, 20L);
-		    	}
-		    });
+    			if (!world.equals(player.getWorld()) && itemMap != null && itemMap.inWorld(player.getWorld())) {
+			    	itemMap.giveTo(player, itemCopy.getAmount());
+			    	if (StringUtils.getSlotConversion(itemMap.getSlot()) != 0) { 
+			    		this.returnSlotZero(player, 4L);
+			    	}
+    			} else if (world.equals(player.getWorld())) {
+	    			if (player.isOnline() && itemMap.isSelfDroppable()) {
+			    		itemMap.giveTo(player, itemCopy.getAmount());
+			    		if (StringUtils.getSlotConversion(itemMap.getSlot()) != 0) { 
+			    			this.returnSlotZero(player, 4L);
+			    		}
+			    	} else if (player.isOnline()) {
+			    		PlayerHandler.dropItem(player, itemCopy);
+			    	}
+    			}
+    		});
     	}
     }
 
