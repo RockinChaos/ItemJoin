@@ -469,10 +469,9 @@ public class ItemHandler {
     */
 	public static void saveCooldowns() {
 		for (ItemMap itemMap: ItemUtilities.getUtilities().getItems()) {
-			for (String keys: itemMap.getPlayersOnCooldown().keySet()) {
-				String[] parts = keys.split("-.-");
-				if (System.currentTimeMillis() - itemMap.getPlayersOnCooldown().get(keys) <= itemMap.getCommandCooldown() * 1000) {
-					SQL.getData().saveData(new DataObject(Table.ON_COOLDOWN, parts[1], parts[0], itemMap.getConfigName(), itemMap.getCommandCooldown().toString(), itemMap.getPlayersOnCooldown().get(keys).toString()));
+			for (String key: itemMap.getPlayersOnCooldown().keySet()) {
+				if (System.currentTimeMillis() - itemMap.getPlayersOnCooldown().get(key) <= itemMap.getCommandCooldown() * 1000) {
+					SQL.getData().saveData(new DataObject(Table.ON_COOLDOWN, key, "GLOBAL", itemMap.getConfigName(), itemMap.getCommandCooldown().toString(), itemMap.getPlayersOnCooldown().get(key).toString()));
 				}
 			}
 		}

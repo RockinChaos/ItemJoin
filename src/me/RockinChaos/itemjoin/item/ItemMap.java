@@ -631,7 +631,7 @@ public class ItemMap {
 			List<DataObject> dataList = SQL.getData().getDataList(new DataObject(Table.ON_COOLDOWN, null, null, this.getConfigName(), String.valueOf(this.getCommandCooldown()), null));
 			for (DataObject dataObject : dataList) {
 				if (dataObject != null) {
-					this.playersOnCooldown.put(dataObject.getWorld() + "-.-" + dataObject.getPlayerId(), Long.parseLong(dataObject.getDuration()));
+					this.playersOnCooldown.put(dataObject.getPlayerId(), Long.parseLong(dataObject.getDuration()));
 					SQL.getData().removeData(new DataObject(Table.ON_COOLDOWN, null, null, this.getConfigName(), String.valueOf(this.getCommandCooldown()), null));
 				}
 			}
@@ -4352,7 +4352,7 @@ public class ItemMap {
     * @return If the Player is still inside the Warmup Location.
     */
 	private boolean warmLocation(final Player player, final Location location, final String action) {
-	    if (player.getLocation().distance(location) >= 1 || (!action.equalsIgnoreCase("ON_DEATH") && player.isDead())) {
+	    if (!player.getLocation().getWorld().equals(location.getWorld()) || player.getLocation().distance(location) >= 1 || (!action.equalsIgnoreCase("ON_DEATH") && player.isDead())) {
 	    	return false;
 	    }
 	    return true;
@@ -4700,15 +4700,15 @@ public class ItemMap {
     */
 	public boolean onInteractCooldown(final Player player) {
 		long playersCooldownList = 0L;
-		if (this.playersOnInteractCooldown.containsKey(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + this.configName)) {
-			playersCooldownList = this.playersOnInteractCooldown.get(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + this.configName);
+		if (this.playersOnInteractCooldown.containsKey(PlayerHandler.getPlayerID(player) + ".items." + this.configName)) {
+			playersCooldownList = this.playersOnInteractCooldown.get(PlayerHandler.getPlayerID(player) + ".items." + this.configName);
 		}
 		if (System.currentTimeMillis() - playersCooldownList >= this.interactCooldown * 1000) {
-			this.playersOnInteractCooldown.put(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + this.configName, System.currentTimeMillis());
+			this.playersOnInteractCooldown.put(PlayerHandler.getPlayerID(player) + ".items." + this.configName, System.currentTimeMillis());
 			return false;
 		} else {
 			if (this.onSpamCooldown(player)) {
-				this.storedSpammedPlayers.put(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + this.configName, System.currentTimeMillis());
+				this.storedSpammedPlayers.put(PlayerHandler.getPlayerID(player) + ".items." + this.configName, System.currentTimeMillis());
 				if (this.cooldownMessage != null && !this.cooldownMessage.isEmpty()) {
 					int timeLeft = (int)(this.interactCooldown - ((System.currentTimeMillis() - playersCooldownList) / 1000));
 					player.sendMessage(StringUtils.translateLayout(this.cooldownMessage.replace("%timeleft%", String.valueOf(timeLeft)).replace("%item%", this.customName), player));
@@ -4729,8 +4729,8 @@ public class ItemMap {
 		boolean interactSpam = ConfigHandler.getConfig().getFile("items.yml").getBoolean("items-Spamming");
 		if (interactSpam != true) {
 			long playersCooldownList = 0L;
-			if (this.storedSpammedPlayers.containsKey(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + this.configName)) {
-				playersCooldownList = this.storedSpammedPlayers.get(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player) + ".items." + this.configName);
+			if (this.storedSpammedPlayers.containsKey(PlayerHandler.getPlayerID(player) + ".items." + this.configName)) {
+				playersCooldownList = this.storedSpammedPlayers.get(PlayerHandler.getPlayerID(player) + ".items." + this.configName);
 			}
 			if (System.currentTimeMillis() - playersCooldownList >= this.spamtime * 1000) { } 
 			else { return false; }
@@ -4746,8 +4746,8 @@ public class ItemMap {
     */
 	private boolean onCooldown(final Player player) {
 		long playersCooldownList = 0L;
-		if (this.playersOnCooldown.containsKey(player.getWorld().getName() + "-.-" + PlayerHandler.getPlayerID(player))) {
-			playersCooldownList = this.playersOnCooldown.get(player.getWorld().getName() + "-.-" + PlayerHandler.getPlayerID(player));
+		if (this.playersOnCooldown.containsKey(PlayerHandler.getPlayerID(player))) {
+			playersCooldownList = this.playersOnCooldown.get(PlayerHandler.getPlayerID(player));
 		}
 		if (this.cooldownSeconds != 0) {
 			if (System.currentTimeMillis() - playersCooldownList >= this.cooldownSeconds * 1000) { return false; } 
@@ -4775,8 +4775,8 @@ public class ItemMap {
 	private boolean onCooldownTick(final Player player) {
 		if (!ConfigHandler.getConfig().getFile("items.yml").getBoolean("items-Spamming")) {
 			long playersCooldownList = 0L;
-			if (this.playersOnCooldownTick.containsKey(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player))) {
-				playersCooldownList = this.playersOnCooldownTick.get(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player));
+			if (this.playersOnCooldownTick.containsKey(PlayerHandler.getPlayerID(player))) {
+				playersCooldownList = this.playersOnCooldownTick.get(PlayerHandler.getPlayerID(player));
 			}
 			
 			if (!(System.currentTimeMillis() - playersCooldownList >= 1000)) { return false; }
@@ -4791,7 +4791,7 @@ public class ItemMap {
     * @param player - The Player to be put on Cooldown.
     */
 	private void addPlayerOnCooldownTick(final Player player) {
-		this.playersOnCooldownTick.put(player.getWorld().getName() + "." + PlayerHandler.getPlayerID(player), System.currentTimeMillis());
+		this.playersOnCooldownTick.put(PlayerHandler.getPlayerID(player), System.currentTimeMillis());
 	}
 	
    /**
@@ -4800,7 +4800,7 @@ public class ItemMap {
     * @param player - The Player to be put on Cooldown.
     */
 	private void addPlayerOnCooldown(final Player player) {
-		this.playersOnCooldown.put(player.getWorld().getName() + "-.-" + PlayerHandler.getPlayerID(player), System.currentTimeMillis());
+		this.playersOnCooldown.put(PlayerHandler.getPlayerID(player), System.currentTimeMillis());
 	}
 	
    /**
