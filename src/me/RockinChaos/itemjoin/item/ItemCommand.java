@@ -285,8 +285,8 @@ public class ItemCommand {
 			this.allowDispatch(player, world);
 			this.setPending(player, false);
 			if ((this.actionType.equals(Action.ON_DEATH) || !player.isDead()) && ((this.itemMap != null && ((this.actionType.equals(Action.ON_HOLD) && this.itemMap.isSimilar(PlayerHandler.getMainHandItem(player))) 
-				|| (this.actionType.equals(Action.ON_RECEIVE) && this.itemMap.hasItem(player)))) || (!this.actionType.equals(Action.ON_HOLD) && !this.actionType.equals(Action.ON_RECEIVE))) 
-				&& (((this.itemMap.getCommandSequence() == CommandSequence.REMAIN && cmdtype != Executor.SWAPITEM && cmdtype != Executor.DELAY && this.itemMap.hasItem(player)) 
+				|| (this.actionType.equals(Action.ON_RECEIVE) && this.itemMap.hasItem(player, true)))) || (!this.actionType.equals(Action.ON_HOLD) && !this.actionType.equals(Action.ON_RECEIVE))) 
+				&& (((this.itemMap.getCommandSequence() == CommandSequence.REMAIN && cmdtype != Executor.SWAPITEM && cmdtype != Executor.DELAY && this.itemMap.hasItem(player, true)) 
 				|| ((this.itemMap.getCommandSequence() == CommandSequence.REMAIN && (cmdtype == Executor.SWAPITEM || cmdtype == Executor.DELAY))) || this.itemMap.getCommandSequence() != CommandSequence.REMAIN))
 				&& (player.isOnline() && player.getWorld() == world && !this.getExecute(player))) {
 				switch (cmdtype) {
@@ -461,13 +461,13 @@ public class ItemCommand {
 		try {
 			for (ItemMap item : ItemUtilities.getUtilities().getItems()) {
 				if (item.getConfigName().equalsIgnoreCase(this.command) && slot != null) {
-					boolean itemExists = ((this.itemMap.getCommandSequence() == CommandSequence.REMAIN && this.itemMap.hasItem(player)) || this.itemMap.getCommandSequence() != CommandSequence.REMAIN);
+					boolean itemExists = ((this.itemMap.getCommandSequence() == CommandSequence.REMAIN && this.itemMap.hasItem(player, true)) || this.itemMap.getCommandSequence() != CommandSequence.REMAIN);
 					this.itemMap.removeDisposable(player, this.itemMap, this.itemMap.getItem(player), true); 
 					for (ItemCommand command : this.itemMap.getCommands()) {
 						if (command.executorType == Executor.SWAPITEM && this.matchAction(command.actionType)) {
 							ItemMap commandMap = ItemUtilities.getUtilities().getItemMap(null, command.command, null);
 							if (commandMap != null) {
-								if (!itemExists) { itemExists = commandMap.hasItem(player); }
+								if (!itemExists) { itemExists = commandMap.hasItem(player, true); }
 								commandMap.removeDisposable(player, commandMap, commandMap.getItem(player), true); 
 							}
 						}

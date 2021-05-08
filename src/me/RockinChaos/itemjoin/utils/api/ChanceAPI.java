@@ -146,7 +146,7 @@ public class ChanceAPI {
 		this.newChance();
 		if (probabilityItems != null && !probabilityItems.isEmpty()) {
 			for (ItemMap itemMap: probabilityItems.keySet()) {
-				if (itemMap.hasItem(player)) { 
+				if (itemMap.hasItem(player, true)) { 
 					return itemMap; 
 				}
 				if (probabilityItems.get(itemMap) != null) { 

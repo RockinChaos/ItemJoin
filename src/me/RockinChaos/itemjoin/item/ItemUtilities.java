@@ -201,12 +201,14 @@ public class ItemUtilities {
 		this.safeSet(player, world, type, region);
 		if (this.getItemDelay() != 0 && type != TriggerType.LIMIT_SWITCH && type != TriggerType.REGION_ENTER && type != TriggerType.REGION_LEAVE) { 
 			SchedulerUtils.runLater(this.getItemDelay(), () -> {
-				ItemHandler.restoreCraftItems(player);
-				this.handleItems(player, type, newMode, region);
+				ItemHandler.restoreCraftItems(player); {
+					this.handleItems(player, type, newMode, region);
+				}
 			});
 		} else {
-			ItemHandler.restoreCraftItems(player);
-			this.handleItems(player, type, newMode, region);
+			ItemHandler.restoreCraftItems(player); {
+				this.handleItems(player, type, newMode, region);
+			}
 		}
 	}
 	
@@ -235,9 +237,9 @@ public class ItemUtilities {
 				item.giveTo(player); 
 			} else if (((type.equals(TriggerType.LIMIT_SWITCH) && item.isUseOnLimitSwitch() && !item.isLimitMode(gameMode))
 					|| (((type.equals(TriggerType.REGION_LEAVE) && item.isGiveOnRegionAccess()) || (type.equals(TriggerType.REGION_ENTER) && item.isGiveOnRegionEgress())) && item.inRegion(region)))
-					&& item.inWorld(player.getWorld()) && item.hasItem(player)) {
+					&& item.inWorld(player.getWorld()) && item.hasItem(player, false)) {
 				item.removeFrom(player);
-			} else if (item.isAutoRemove() && (!item.inWorld(player.getWorld()) || !item.isLimitMode(gameMode)) && item.hasItem(player)) {
+			} else if (item.isAutoRemove() && (!item.inWorld(player.getWorld()) || !item.isLimitMode(gameMode)) && item.hasItem(player, true)) {
 				item.removeFrom(player);
 			}
 		}
@@ -397,7 +399,7 @@ public class ItemUtilities {
     * @return If the ItemMap is Obtainable.
     */
 	public boolean isObtainable(final Player player, final ItemMap itemMap, final int session, final TriggerType type) {
-		if (!itemMap.hasItem(player) || itemMap.isAlwaysGive()) {
+		if (!itemMap.hasItem(player, false) || itemMap.isAlwaysGive()) {
 			DataObject firstJoin = (itemMap.isOnlyFirstLife() && type.equals(TriggerType.RESPAWN) || itemMap.isOnlyFirstJoin() ? SQL.getData().getData(new DataObject(Table.FIRST_JOIN, PlayerHandler.getPlayerID(player), "", itemMap.getConfigName())) : null);
 			DataObject firstWorld = itemMap.isOnlyFirstWorld() ? SQL.getData().getData(new DataObject(Table.FIRST_WORLD, PlayerHandler.getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName())) : null;
 			DataObject ipLimit = itemMap.isIpLimted() ? SQL.getData().getData(new DataObject(Table.IP_LIMITS, PlayerHandler.getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName(), player.getAddress().getHostString())) : null;

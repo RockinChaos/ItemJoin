@@ -3529,30 +3529,30 @@ public class ItemMap {
     * @param player - The Player being checked.
     * @return If the Player already has the ItemMap.
     */
-	public boolean hasItem(final Player player) {
+	public boolean hasItem(final Player player, boolean ignoreCount) {
 		for (ItemStack inPlayerInventory: player.getInventory().getContents()) {
-			if (this.isSimilar(inPlayerInventory) && this.isCountSimilar(inPlayerInventory)) {
+			if (this.isSimilar(inPlayerInventory) && (ignoreCount || this.isCountSimilar(inPlayerInventory))) {
 				return true;
 			}
 		}
 		for (ItemStack equipInventory: player.getEquipment().getArmorContents()) {
-			if (this.isSimilar(equipInventory) && this.isCountSimilar(equipInventory)) {
+			if (this.isSimilar(equipInventory) && (ignoreCount || this.isCountSimilar(equipInventory))) {
 				return true;
 			}
 		}
 		if (ServerUtils.hasSpecificUpdate("1_9") 
 				&& this.isSimilar(player.getInventory().getItemInOffHand())
-				&& this.isCountSimilar(player.getInventory().getItemInOffHand())) {
+				&& (ignoreCount || this.isCountSimilar(player.getInventory().getItemInOffHand()))) {
 			return true;
 		}
 		if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
 			for (ItemStack craftInventory: player.getOpenInventory().getTopInventory()) {
-				if (this.isSimilar(craftInventory) && this.isCountSimilar(craftInventory)) {
+				if (this.isSimilar(craftInventory) && (ignoreCount || this.isCountSimilar(craftInventory))) {
 					return true;
 				}
 			}
 		}
-		return (player.getItemOnCursor() != null && player.getItemOnCursor().getType() != Material.AIR && this.isSimilar(player.getItemOnCursor()) && this.isCountSimilar(player.getItemOnCursor()));
+		return (player.getItemOnCursor() != null && player.getItemOnCursor().getType() != Material.AIR && this.isSimilar(player.getItemOnCursor()) && (ignoreCount || this.isCountSimilar(player.getItemOnCursor())));
 	}
 	
    /**
