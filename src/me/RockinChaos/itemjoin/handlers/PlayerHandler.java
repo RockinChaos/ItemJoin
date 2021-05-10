@@ -37,6 +37,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import de.domedd.betternick.BetterNick;
 import me.RockinChaos.itemjoin.item.ItemMap;
+import me.RockinChaos.itemjoin.item.ItemUtilities.TriggerType;
 import me.RockinChaos.itemjoin.utils.ReflectionUtils;
 import me.RockinChaos.itemjoin.utils.SchedulerUtils;
 import me.RockinChaos.itemjoin.utils.ServerUtils;
@@ -59,7 +60,7 @@ public class PlayerHandler {
     * 
     */
     public static void restoreCraftItems() {
-    	forOnlinePlayers(player -> { ItemHandler.restoreCraftItems(player); } );
+    	forOnlinePlayers(player -> { ItemHandler.restoreCraftItems(player, TriggerType.DEFAULT); } );
     }
     
    /**

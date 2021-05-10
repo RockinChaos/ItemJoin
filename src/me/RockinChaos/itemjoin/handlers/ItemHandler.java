@@ -45,6 +45,7 @@ import com.mojang.authlib.properties.Property;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.item.ItemUtilities.CustomSlot;
+import me.RockinChaos.itemjoin.item.ItemUtilities.TriggerType;
 import me.RockinChaos.itemjoin.utils.ReflectionUtils;
 import me.RockinChaos.itemjoin.utils.SchedulerUtils;
 import me.RockinChaos.itemjoin.utils.ServerUtils;
@@ -536,21 +537,23 @@ public class ItemHandler {
     * 
     * @param player - The Player to have its crafting items restored.
     */
-    public static void restoreCraftItems(final Player player) {
-    	DataObject dataObject = SQL.getData().getData(new DataObject(Table.RETURN_CRAFTITEMS, PlayerHandler.getPlayerID(player), "", ""));
-    	Inventory inventory = (dataObject != null ? deserializeInventory(dataObject.getInventory64()) : null);
-		Inventory craftView = player.getOpenInventory().getTopInventory();
-		if (inventory != null && PlayerHandler.isCraftingInv(player.getOpenInventory())) {
-			for (int k = 4; k >= 0; k--) {
-				if (inventory.getItem(k) != null && inventory.getItem(k).getType() != Material.AIR) {
-				 craftView.setItem(k, inventory.getItem(k).clone());
+    public static void restoreCraftItems(final Player player, final TriggerType type) {
+    	if (!type.equals(TriggerType.QUIT)) {
+	    	DataObject dataObject = SQL.getData().getData(new DataObject(Table.RETURN_CRAFTITEMS, PlayerHandler.getPlayerID(player), "", ""));
+	    	Inventory inventory = (dataObject != null ? deserializeInventory(dataObject.getInventory64()) : null);
+			Inventory craftView = player.getOpenInventory().getTopInventory();
+			if (inventory != null && PlayerHandler.isCraftingInv(player.getOpenInventory())) {
+				for (int k = 4; k >= 0; k--) {
+					if (inventory.getItem(k) != null && inventory.getItem(k).getType() != Material.AIR) {
+					 craftView.setItem(k, inventory.getItem(k).clone());
+					}
 				}
+				PlayerHandler.updateInventory(player, 1L);
+				SQL.getData().removeData(dataObject);
+			} else if (!PlayerHandler.isCraftingInv(player.getOpenInventory())) {
+				SchedulerUtils.runLater(60L, () -> restoreCraftItems(player, type));
 			}
-			PlayerHandler.updateInventory(player, 1L);
-			SQL.getData().removeData(dataObject);
-		} else if (!PlayerHandler.isCraftingInv(player.getOpenInventory())) {
-			SchedulerUtils.runLater(60L, () -> restoreCraftItems(player));
-		}
+    	}
     }
     
    /**

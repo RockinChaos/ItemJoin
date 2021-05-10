@@ -244,13 +244,17 @@ public class Crafting implements Listener {
 							final int k = i;
 							ItemStack drop = inventory[i].clone();
 							SchedulerUtils.run(() -> { 
-								player.getOpenInventory().getTopInventory().setItem(k, new ItemStack(Material.AIR));
-								if (player.getInventory().firstEmpty() != -1) {
-									player.getInventory().addItem(drop);
-								} else {
-									Item itemDropped = player.getWorld().dropItem(player.getLocation(), drop);
-									itemDropped.setPickupDelay(40);
-								}
+								double health = 1;
+		    					try { health = (ServerUtils.hasSpecificUpdate("1_8") ? player.getHealth() : (double)player.getClass().getMethod("getHealth", double.class).invoke(player)); } catch (Exception e) { health = (player.isDead() ? 0 : 1);  }
+    							if (health > 0) {
+									player.getOpenInventory().getTopInventory().setItem(k, new ItemStack(Material.AIR));
+									if (player.getInventory().firstEmpty() != -1) {
+										player.getInventory().addItem(drop);
+									} else {
+										Item itemDropped = player.getWorld().dropItem(player.getLocation(), drop);
+										itemDropped.setPickupDelay(40);
+									}
+    							}
 							});
 							inventory[i] = new ItemStack(Material.AIR);
 						}
@@ -260,7 +264,9 @@ public class Crafting implements Listener {
 			}
 		} else {
 			SchedulerUtils.run(() -> { 
-				if (PlayerHandler.isCraftingInv(player.getOpenInventory()) && PlayerHandler.getOpenCraftItems().containsKey(PlayerHandler.getPlayerID(player))) {
+				double health = 1;
+		    	try { health = (ServerUtils.hasSpecificUpdate("1_8") ? player.getHealth() : (double)player.getClass().getMethod("getHealth", double.class).invoke(player)); } catch (Exception e) { health = (player.isDead() ? 0 : 1); }
+				if (health > 0 && PlayerHandler.isCraftingInv(player.getOpenInventory()) && PlayerHandler.getOpenCraftItems().containsKey(PlayerHandler.getPlayerID(player))) {
 					ItemStack[] openCraftContents = PlayerHandler.getOpenCraftItems().get(PlayerHandler.getPlayerID(player));
 					if (openCraftContents != null && openCraftContents.length != 0) {
 						this.returnCrafting(player, openCraftContents, 1L, false);

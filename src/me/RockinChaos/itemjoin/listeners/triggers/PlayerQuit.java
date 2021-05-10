@@ -41,7 +41,9 @@ public class PlayerQuit implements Listener {
 		if (PlayerHandler.isPlayer(player)) {
 			ItemHandler.saveCraftItems(player); {
 				ItemUtilities.getUtilities().closeAnimations(player); {
-					ItemUtilities.getUtilities().setAuthenticating(player, player.getWorld(), TriggerType.QUIT, player.getGameMode(), "GLOBAL");
+					ItemHandler.removeCraftItems(player); {
+						ItemUtilities.getUtilities().setAuthenticating(player, player.getWorld(), TriggerType.QUIT, player.getGameMode(), "GLOBAL");
+					}
 				}
 			}
 		}

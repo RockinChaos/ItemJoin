@@ -201,12 +201,12 @@ public class ItemUtilities {
 		this.safeSet(player, world, type, region);
 		if (this.getItemDelay() != 0 && type != TriggerType.LIMIT_SWITCH && type != TriggerType.REGION_ENTER && type != TriggerType.REGION_LEAVE) { 
 			SchedulerUtils.runLater(this.getItemDelay(), () -> {
-				ItemHandler.restoreCraftItems(player); {
+				ItemHandler.restoreCraftItems(player, type); {
 					this.handleItems(player, type, newMode, region);
 				}
 			});
 		} else {
-			ItemHandler.restoreCraftItems(player); {
+			ItemHandler.restoreCraftItems(player, type); {
 				this.handleItems(player, type, newMode, region);
 			}
 		}
