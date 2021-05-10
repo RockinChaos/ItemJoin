@@ -320,15 +320,15 @@ public class ItemMap {
 			this.setCommandCooldown();
 			this.setCommandSequence();
 			this.setCommands(ItemCommand.arrayFromString(this, this.sequence == CommandSequence.RANDOM_LIST));
+			this.setConditions();
 	        this.setInteractCooldown();
-	        this.setItemflags();
+			this.setPlayersOnCooldown();
+	        this.setTeleportArrow();
 	        this.setLimitModes();
 	        this.setTriggers();
-	        this.setTeleportArrow();
+	        this.setItemflags();
 			this.setWorlds();
 			this.setRegions();
-			this.setConditions();
-			this.setPlayersOnCooldown();
 	        this.setPerm(this.nodeLocation.getString(".permission-node"));
 	        this.setPermissionNeeded(ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Obtain-Items"));
 	    	this.setOPPermissionNeeded(ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Obtain-Items-OP"));
@@ -511,30 +511,18 @@ public class ItemMap {
 	private void setTriggers() {
 		if (this.nodeLocation.getString("triggers") != null) {
 			this.triggers = this.nodeLocation.getString("triggers");
-			this.giveOnDisabled = StringUtils.containsIgnoreCase(this.triggers, "DISABLED");
-			this.giveOnJoin = StringUtils.containsIgnoreCase(this.triggers, "JOIN");
-			this.giveOnRespawn = StringUtils.containsIgnoreCase(this.triggers, "RESPAWN");
-			if (StringUtils.containsIgnoreCase(this.triggers, "FIRST-JOIN")) { 
-				this.onlyFirstJoin = true;
-				this.giveOnJoin = true;
-			}
-			if (StringUtils.containsIgnoreCase(this.triggers, "FIRST-LIFE")) {
-				this.onlyFirstLife = true;
-				this.giveOnJoin = true;
-				this.giveOnRespawn = true;
-			}
-		    this.giveOnWorldSwitch = StringUtils.containsIgnoreCase(this.triggers, "WORLD-CHANGE") || StringUtils.containsIgnoreCase(this.triggers, "WORLD-SWITCH");
-			if (StringUtils.containsIgnoreCase(this.triggers, "FIRST-WORLD")) { 
-				this.giveOnJoin = true;
-				this.onlyFirstWorld = true;
-				this.giveOnWorldSwitch = true;
-			}
-			this.giveOnRegionEnter = StringUtils.containsIgnoreCase(this.triggers, "REGION-ENTER");
-			this.giveOnRegionLeave = StringUtils.containsIgnoreCase(this.triggers, "REGION-REMOVE") || StringUtils.containsIgnoreCase(this.triggers, "REGION-EXIT") || StringUtils.containsIgnoreCase(this.triggers, "REGION-LEAVE");
-			this.giveOnRegionAccess = StringUtils.containsIgnoreCase(this.triggers, "REGION-ACCESS");
-			this.giveOnRegionEgress = StringUtils.containsIgnoreCase(this.triggers, "REGION-EGRESS"); 
+			this.giveOnDisabled = StringUtils.splitIgnoreCase(this.triggers, "DISABLED", ",");
+			this.giveOnJoin = StringUtils.splitIgnoreCase(this.triggers, "JOIN", ",");
+			this.giveOnRespawn = StringUtils.splitIgnoreCase(this.triggers, "RESPAWN", ",");
+			this.giveOnRegionEnter = StringUtils.splitIgnoreCase(this.triggers, "REGION-ENTER", ",");
+			this.giveOnRegionLeave = StringUtils.splitIgnoreCase(this.triggers, "REGION-REMOVE", ",") || StringUtils.splitIgnoreCase(this.triggers, "REGION-EXIT", ",") || StringUtils.splitIgnoreCase(this.triggers, "REGION-LEAVE", ",");
+			this.giveOnRegionAccess = StringUtils.splitIgnoreCase(this.triggers, "REGION-ACCESS", ",");
+			this.giveOnRegionEgress = StringUtils.splitIgnoreCase(this.triggers, "REGION-EGRESS", ","); 
 			if (this.giveOnRegionAccess || this.giveOnRegionEgress) { this.giveOnRegionEnter = false; this.giveOnRegionLeave = false; }
-			this.useOnLimitSwitch = StringUtils.containsIgnoreCase(this.triggers, "GAMEMODE-SWITCH");
+			this.useOnLimitSwitch = StringUtils.splitIgnoreCase(this.triggers, "GAMEMODE-SWITCH", ",");
+			this.setOnlyFirstJoin(StringUtils.splitIgnoreCase(this.triggers, "FIRST-JOIN", ","));
+			this.setOnlyFirstLife(StringUtils.splitIgnoreCase(this.triggers, "FIRST-LIFE", ","));
+			this.onlyFirstWorld = StringUtils.splitIgnoreCase(this.triggers, "FIRST-WORLD", ",");
 		} else { this.giveOnJoin = true; }
 	}
 	
@@ -1144,9 +1132,9 @@ public class ItemMap {
     */
 	public void setOnlyFirstJoin(final boolean bool) {
 		this.onlyFirstJoin = bool;
-		if (bool) { this.giveOnJoin = true; }
-		if (bool && this.giveOnRespawn) {
-			this.giveOnRespawn = false;
+		if (bool && !this.giveOnRegionEnter && !this.giveOnRegionLeave && !this.giveOnRegionAccess && !this.giveOnRegionEgress) { 
+			this.giveOnJoin = true; 
+			this.giveOnRespawn = false; 
 		}
 	}
 	
@@ -1157,7 +1145,7 @@ public class ItemMap {
     */
 	public void setOnlyFirstLife(final boolean bool) {
 		this.onlyFirstLife = bool;
-		if (bool) { 
+		if (bool && !this.giveOnRegionEnter && !this.giveOnRegionLeave && !this.giveOnRegionAccess && !this.giveOnRegionEgress) { 
 			this.giveOnJoin = true; 
 			this.giveOnRespawn = true;
 		}
@@ -1170,11 +1158,9 @@ public class ItemMap {
     */
 	public void setOnlyFirstWorld(final boolean bool) {
 		this.onlyFirstWorld = bool;
-		if (bool) { 
+		if (bool && !this.giveOnRegionEnter && !this.giveOnRegionLeave && !this.giveOnRegionAccess && !this.giveOnRegionEgress) { 
 			this.giveOnJoin = true; 
 			this.giveOnWorldSwitch = true; 
-		}
-		if (bool && this.giveOnRespawn) {
 			this.giveOnRespawn = false;
 		}
 	}
