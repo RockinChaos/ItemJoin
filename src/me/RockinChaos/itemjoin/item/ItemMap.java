@@ -322,7 +322,7 @@ public class ItemMap {
 			this.setCommands(ItemCommand.arrayFromString(this, this.sequence == CommandSequence.RANDOM_LIST));
 			this.setConditions();
 	        this.setInteractCooldown();
-			this.setPlayersOnCooldown();
+	        this.setPlayersOnCooldown();
 	        this.setTeleportArrow();
 	        this.setLimitModes();
 	        this.setTriggers();
@@ -4321,9 +4321,9 @@ public class ItemMap {
 					if (isExecuted(player, altPlayer, action, clickType, slot)) { 
 						if (itemMap.itemCost == null || itemMap.itemCost.isEmpty()) { itemMap.withdrawBalance(player); } 
 						else { itemMap.withdrawItemCost(player); }
-				    	itemMap.playSound(player);
-				    	itemMap.playParticle(player);
-				    	itemMap.removeDisposable(player, itemMap, itemCopy, false);
+					    itemMap.playSound(player);
+					    itemMap.playParticle(player);
+					    itemMap.removeDisposable(player, itemMap, itemCopy, false);
 						itemMap.addPlayerOnCooldown(player);
 					}
 				} else {
@@ -4380,8 +4380,7 @@ public class ItemMap {
     	Entry<?, ?> dedicatedMap = StringUtils.randomEntry(randomCommands);
     	if (dedicatedMap != null && dedicatedMap.getValue() != null && player != null && action != null && clickType != null && slot != null && itemCommands != null && randomCommands != null
         && !((ItemCommand)dedicatedMap.getValue()).execute(player, altPlayer, action, clickType, slot, this)) { 
-    		this.getRandomMap(randomCommands, itemCommands, player, altPlayer, action, clickType, slot);
-    		return false;
+    		return this.getRandomMap(randomCommands, itemCommands, player, altPlayer, action, clickType, slot);
     	}
     	return true;
     }
@@ -4401,8 +4400,7 @@ public class ItemMap {
     	if (dedicatedMap != null && dedicatedMap.getValue() != null && player != null && action != null && slot != null && itemCommands != null && randomCommands != null 
         && !((ItemCommand)dedicatedMap.getValue()).execute(player, altPlayer, action, clickType, slot, this)) { 
     		randomCommands.remove(dedicatedMap.getKey());
-    		this.getRandomAll(randomCommands, itemCommands, player, altPlayer, action, clickType, slot);
-    		return false;
+    		return this.getRandomAll(randomCommands, itemCommands, player, altPlayer, action, clickType, slot);
     	}
     	if (dedicatedMap != null && randomCommands != null) { randomCommands.remove(dedicatedMap.getKey()); }
     	if (dedicatedMap != null && dedicatedMap.getValue() != null && player != null && action != null && slot != null && itemCommands != null && randomCommands != null && 
@@ -4466,9 +4464,9 @@ public class ItemMap {
 					}
 				}
 			}
+    		if (this.sequence == CommandSequence.RANDOM) { playerSuccess = this.getRandomAll(randomCommands, itemCommands, player, altPlayer, action, clickType, slot); }
+    		else if (this.sequence == CommandSequence.RANDOM_SINGLE) { playerSuccess = this.getRandomMap(randomCommands, itemCommands, player, altPlayer, action, clickType, slot); }
     	}
-    	if (this.sequence == CommandSequence.RANDOM) { playerSuccess = this.getRandomAll(randomCommands, itemCommands, player, altPlayer, action, clickType, slot); }
-    	else if (this.sequence == CommandSequence.RANDOM_SINGLE) { playerSuccess = this.getRandomMap(randomCommands, itemCommands, player, altPlayer, action, clickType, slot); }
     	return playerSuccess;
     }
 	
