@@ -43,8 +43,8 @@ public class ItemCommand {
 	private Executor executorType;
 	private Action actionType;
 	private ItemMap itemMap;
-	private List < Player > setStop = new ArrayList < Player > ();
-	private List < Player > setCounting = new ArrayList < Player > ();
+	private List < Player > playerVoid = new ArrayList < Player > ();
+	private List < Player > playerPending = new ArrayList < Player > ();
 	
    /**
 	* Creates a new ItemCommand instance.
@@ -208,7 +208,7 @@ public class ItemCommand {
 	* @return if the player is able to succesfully execute.
 	*/
 	private boolean getExecute(final Player player) {
-		return this.setStop.contains(player);
+		return this.playerVoid.contains(player);
 	}
 	
    /**
@@ -219,10 +219,12 @@ public class ItemCommand {
 	* @param bool - if the player is able to succesfully execute.
 	*/
 	private void setExecute(final Player player, final boolean bool) {
-		if (bool) { 
-			this.setStop.add(player);
-		} else { 
-			this.setStop.remove(player); 
+		synchronized("IJ_VOID") {
+			if (bool) { 
+				this.playerVoid.add(player);
+			} else { 
+				this.playerVoid.remove(player); 
+			}
 		}
 	}
 	
@@ -234,7 +236,7 @@ public class ItemCommand {
 	* @return if the player is pending execution.
 	*/
 	private boolean getPending(final Player player) {
-		return this.setCounting.contains(player);
+		return this.playerPending.contains(player);
 	}
 	
    /**
@@ -245,10 +247,12 @@ public class ItemCommand {
 	* @param bool - if the player is pending execution.
 	*/
 	private void setPending(final Player player, final boolean bool) {
-		if (bool) {
-			this.setCounting.add(player); 
-		} else { 
-			this.setCounting.remove(player); 
+		synchronized("IJ_PENDING") {
+			if (bool) {
+				this.playerPending.add(player); 
+			} else { 
+				this.playerPending.remove(player); 
+			}
 		}
 	}
 	
@@ -261,11 +265,13 @@ public class ItemCommand {
 	*/
 	private void allowDispatch(final Player player, final World world) {
 		SchedulerUtils.runAsyncLater(20L, () -> {
-			if (this.getPending(player)) {
-				if ((!this.actionType.equals(Action.ON_DEATH) && player.isDead()) || !player.isOnline() || player.getWorld() != world) {
-					this.setExecute(player, true);
-					this.setPending(player, false);
-				} else { this.allowDispatch(player, world); }
+			synchronized("IJ_ALLOW") {
+				if (this.getPending(player)) {
+					if ((!this.actionType.equals(Action.ON_DEATH) && player.isDead()) || !player.isOnline() || player.getWorld() != world) {
+						this.setExecute(player, true);
+						this.setPending(player, false);
+					} else { this.allowDispatch(player, world); }
+				}
 			}
 		});
 	}
@@ -282,26 +288,28 @@ public class ItemCommand {
 		final World world = player.getWorld();
 		this.setPending(player, true); 
 		SchedulerUtils.runAsyncLater(this.delay, () -> {
-			this.allowDispatch(player, world);
-			this.setPending(player, false);
-			if ((this.actionType.equals(Action.ON_DEATH) || !player.isDead()) && ((this.itemMap != null && ((this.actionType.equals(Action.ON_HOLD) && this.itemMap.isSimilar(PlayerHandler.getMainHandItem(player))) 
-				|| (this.actionType.equals(Action.ON_RECEIVE) && this.itemMap.hasItem(player, true)))) || (!this.actionType.equals(Action.ON_HOLD) && !this.actionType.equals(Action.ON_RECEIVE))) 
-				&& (((this.itemMap.getCommandSequence() == CommandSequence.REMAIN && cmdtype != Executor.SWAPITEM && cmdtype != Executor.DELAY && this.itemMap.hasItem(player, true)) 
-				|| ((this.itemMap.getCommandSequence() == CommandSequence.REMAIN && (cmdtype == Executor.SWAPITEM || cmdtype == Executor.DELAY))) || this.itemMap.getCommandSequence() != CommandSequence.REMAIN))
-				&& (player.isOnline() && player.getWorld() == world && !this.getExecute(player))) {
-				switch (cmdtype) {
-					case CONSOLE: this.dispatchConsoleCommands(player, altPlayer); break;
-					case OP: this.dispatchOpCommands(player, altPlayer); break;
-					case PLAYER: this.dispatchPlayerCommands(player, altPlayer); break;
-					case MESSAGE: this.dispatchMessageCommands(player, altPlayer); break;
-					case SERVERSWITCH: this.dispatchServerCommands(player, altPlayer); break;
-					case BUNGEE: this.dispatchBungeeCordCommands(player, altPlayer); break;
-					case SWAPITEM: this.dispatchSwapItem(player, altPlayer, slot); break;
-					case DEFAULT: this.dispatchPlayerCommands(player, altPlayer); break;
-					case DELAY: break;
-					default: this.dispatchPlayerCommands(player, altPlayer); break;
-				}
-			} else if (this.getExecute(player)) { this.setExecute(player, false); }
+			synchronized("IJ_DISPATCH") {
+				this.allowDispatch(player, world);
+				this.setPending(player, false);
+				if ((this.actionType.equals(Action.ON_DEATH) || !player.isDead()) && ((this.itemMap != null && ((this.actionType.equals(Action.ON_HOLD) && this.itemMap.isSimilar(PlayerHandler.getMainHandItem(player))) 
+					|| (this.actionType.equals(Action.ON_RECEIVE) && this.itemMap.hasItem(player, true)))) || (!this.actionType.equals(Action.ON_HOLD) && !this.actionType.equals(Action.ON_RECEIVE))) 
+					&& (((this.itemMap.getCommandSequence() == CommandSequence.REMAIN && cmdtype != Executor.SWAPITEM && cmdtype != Executor.DELAY && this.itemMap.hasItem(player, true)) 
+					|| ((this.itemMap.getCommandSequence() == CommandSequence.REMAIN && (cmdtype == Executor.SWAPITEM || cmdtype == Executor.DELAY))) || this.itemMap.getCommandSequence() != CommandSequence.REMAIN))
+					&& (player.isOnline() && player.getWorld() == world && !this.getExecute(player))) {
+					switch (cmdtype) {
+						case CONSOLE: this.dispatchConsoleCommands(player, altPlayer); break;
+						case OP: this.dispatchOpCommands(player, altPlayer); break;
+						case PLAYER: this.dispatchPlayerCommands(player, altPlayer); break;
+						case MESSAGE: this.dispatchMessageCommands(player, altPlayer); break;
+						case SERVERSWITCH: this.dispatchServerCommands(player, altPlayer); break;
+						case BUNGEE: this.dispatchBungeeCordCommands(player, altPlayer); break;
+						case SWAPITEM: this.dispatchSwapItem(player, altPlayer, slot); break;
+						case DEFAULT: this.dispatchPlayerCommands(player, altPlayer); break;
+						case DELAY: break;
+						default: this.dispatchPlayerCommands(player, altPlayer); break;
+					}
+				} else if (this.getExecute(player)) { this.setExecute(player, false); }
+			}
 		});
 	}
 	
