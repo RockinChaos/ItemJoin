@@ -299,7 +299,7 @@ public class Legacy_Commands implements Listener {
 	private void onSwingArm(PlayerAnimationEvent event) {
 		Player player = event.getPlayer();
 		ItemStack item = PlayerHandler.getHandItem(player);
-		if (PlayerHandler.isAdventureMode(player) && !this.isDropEvent(event.getPlayer()) && !PlayerHandler.isMenuClick(player.getOpenInventory(), Action.LEFT_CLICK_AIR)) {
+		if (PlayerHandler.isAdventureMode(player) && !this.isDropEvent(event.getPlayer()) && (!PlayerHandler.isMenuClick(player.getOpenInventory(), Action.LEFT_CLICK_AIR) || !PlayerHandler.isMenuClick(player.getOpenInventory(), Action.LEFT_CLICK_BLOCK))) {
 			this.runCommands(player, null, item, "LEFT_CLICK_AIR", "LEFT", String.valueOf(player.getInventory().getHeldItemSlot()));
 		}
 	}
