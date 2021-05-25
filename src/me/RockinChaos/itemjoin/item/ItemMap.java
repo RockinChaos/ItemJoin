@@ -483,16 +483,18 @@ public class ItemMap {
 			this.cancelEvents = StringUtils.containsIgnoreCase(this.itemflags, "cancel-events");
 			this.countLock = StringUtils.containsIgnoreCase(this.itemflags, "count-lock");
 			this.teleportArrow = StringUtils.containsIgnoreCase(this.itemflags, "teleport");
-			this.setOnlyFirstJoin(StringUtils.containsIgnoreCase(this.itemflags, "first-join"));
-			this.setOnlyFirstLife(StringUtils.containsIgnoreCase(this.itemflags, "first-life"));
-			this.onlyFirstWorld = StringUtils.containsIgnoreCase(this.itemflags, "first-world");
 			this.overwritable = StringUtils.containsIgnoreCase(this.itemflags, "overwrite");
 			this.ipLimited = StringUtils.containsIgnoreCase(this.itemflags, "ip-limit");
 			this.deathKeepable = StringUtils.containsIgnoreCase(this.itemflags, "death-keep");
 			this.deathDroppable = StringUtils.containsIgnoreCase(this.itemflags, "death-drops");
 			this.selfDroppable = StringUtils.containsIgnoreCase(this.itemflags, "self-drops");
-			this.AllowOpBypass = StringUtils.containsIgnoreCase(this.itemflags, "AllowOpBypass");
-			this.CreativeBypass = StringUtils.containsIgnoreCase(this.itemflags, "CreativeBypass");
+			
+			// Shared with Triggers //
+			this.setOnlyFirstJoin((StringUtils.containsIgnoreCase(this.itemflags, "first-join")  ? true : this.onlyFirstJoin));
+			this.setOnlyFirstLife((StringUtils.containsIgnoreCase(this.itemflags, "first-life")  ? true : this.onlyFirstLife));
+			this.onlyFirstWorld = (StringUtils.containsIgnoreCase(this.itemflags, "first-world") ? true : this.onlyFirstWorld);
+			this.AllowOpBypass = (StringUtils.containsIgnoreCase(this.itemflags, "AllowOpBypass") ? true : this.AllowOpBypass);
+			this.CreativeBypass = (StringUtils.containsIgnoreCase(this.itemflags, "CreativeBypass") ? true : this.CreativeBypass);
 		}
 	}
 	
