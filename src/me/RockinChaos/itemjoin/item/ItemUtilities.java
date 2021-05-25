@@ -202,12 +202,12 @@ public class ItemUtilities {
 		if (this.getItemDelay() != 0 && type != TriggerType.LIMIT_SWITCH && type != TriggerType.REGION_ENTER && type != TriggerType.REGION_LEAVE) { 
 			SchedulerUtils.runLater(this.getItemDelay(), () -> {
 				ItemHandler.restoreCraftItems(player, type); {
-					this.handleItems(player, type, newMode, region);
+					this.handleItems(player, world, type, newMode, region);
 				}
 			});
 		} else {
 			ItemHandler.restoreCraftItems(player, type); {
-				this.handleItems(player, type, newMode, region);
+				this.handleItems(player, world, type, newMode, region);
 			}
 		}
 	}
@@ -220,7 +220,7 @@ public class ItemUtilities {
     * @param newMode - The GameMode of the Player.
     * @param region - The region the Player is in.
     */
-	private void handleItems(final Player player, TriggerType type, final GameMode gameMode, final String region) {
+	private void handleItems(final Player player, final World world, TriggerType type, final GameMode gameMode, final String region) {
 		final ItemMap randomMap = ChanceAPI.getChances().getRandom(player);
 		final int session = StringUtils.getRandom(1, 100000);
 		for (ItemMap item : this.getItems()) { 
@@ -231,13 +231,13 @@ public class ItemUtilities {
 			  || (type.equals(TriggerType.LIMIT_SWITCH) && item.isUseOnLimitSwitch())
 		      || ((((type.equals(TriggerType.REGION_ENTER) && (item.isGiveOnRegionEnter() || item.isGiveOnRegionAccess())) 
 			  || (type.equals(TriggerType.REGION_LEAVE) && (item.isGiveOnRegionLeave() || item.isGiveOnRegionEgress()))) && item.inRegion(region))))
-			   && item.isLimitMode(gameMode) && item.inWorld(player.getWorld()) && ChanceAPI.getChances().isProbability(item, randomMap) && item.conditionMet(player, "trigger-conditions")
-			   && PlayerHandler.isEnabled(player) && item.hasPermission(player, player.getWorld()) 
+			   && item.isLimitMode(gameMode) && item.inWorld(world) && ChanceAPI.getChances().isProbability(item, randomMap) && item.conditionMet(player, "trigger-conditions")
+			   && PlayerHandler.isEnabled(player) && item.hasPermission(player, world) 
 			   && this.isObtainable(player, item, session, type)) {
 				item.giveTo(player); 
 			} else if (((type.equals(TriggerType.LIMIT_SWITCH) && item.isUseOnLimitSwitch() && !item.isLimitMode(gameMode))
 					|| (((type.equals(TriggerType.REGION_LEAVE) && item.isGiveOnRegionAccess()) || (type.equals(TriggerType.REGION_ENTER) && item.isGiveOnRegionEgress())) && item.inRegion(region)))
-					&& item.inWorld(player.getWorld()) && item.hasItem(player, false)) {
+					&& item.inWorld(world) && item.hasItem(player, false)) {
 				item.removeFrom(player);
 			} else if (item.isAutoRemove() && (!item.inWorld(player.getWorld()) || !item.isLimitMode(gameMode)) && item.hasItem(player, true)) {
 				item.removeFrom(player);
@@ -258,7 +258,7 @@ public class ItemUtilities {
 		if (type.equals(TriggerType.REGION_LEAVE)) { DependAPI.getDepends(false).getGuard().pasteReturnItems(player, region); }
 		if (type.equals(TriggerType.WORLD_SWITCH)) { this.pasteReturnItems(type, player, world.getName()); }
 		if (type.equals(TriggerType.REGION_ENTER)) { this.clearEvent(type, player, "", region); }
-		if (type.equals(TriggerType.QUIT)) { this.clearEvent(type, player, player.getWorld().getName(), ""); }
+		if (type.equals(TriggerType.QUIT)) { this.clearEvent(type, player, world.getName(), ""); }
 		if (this.getClearDelay() != 0) {
 			SchedulerUtils.runLater(this.getClearDelay(), () -> {
 				if (type.equals(TriggerType.JOIN) || type.equals(TriggerType.WORLD_SWITCH)) {

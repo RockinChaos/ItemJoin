@@ -97,18 +97,18 @@ public class PlayerGuard implements Listener {
 			for (String region: playerSet) {
 				if (region != null && !region.isEmpty()) {
 					if (async) { 
-						SchedulerUtils.run(() -> ItemUtilities.getUtilities().setItems(player, player.getWorld(), TriggerType.REGION_LEAVE, player.getGameMode(), region));
+						SchedulerUtils.run(() -> ItemUtilities.getUtilities().setItems(player, location.getWorld(), TriggerType.REGION_LEAVE, player.getGameMode(), region));
 					} else {
-						ItemUtilities.getUtilities().setItems(player, player.getWorld(), TriggerType.REGION_LEAVE, player.getGameMode(), region);
+						ItemUtilities.getUtilities().setItems(player, location.getWorld(), TriggerType.REGION_LEAVE, player.getGameMode(), region);
 					}
 				}
 			}
 			for (String region: regionSet) {
 				if (region != null && !region.isEmpty()) {
 					if (async) { 
-						SchedulerUtils.run(() -> ItemUtilities.getUtilities().setItems(player, player.getWorld(), TriggerType.REGION_ENTER, player.getGameMode(), region));
+						SchedulerUtils.run(() -> ItemUtilities.getUtilities().setItems(player, location.getWorld(), TriggerType.REGION_ENTER, player.getGameMode(), region));
 					} else {
-						ItemUtilities.getUtilities().setItems(player, player.getWorld(), TriggerType.REGION_ENTER, player.getGameMode(), region);
+						ItemUtilities.getUtilities().setItems(player, location.getWorld(), TriggerType.REGION_ENTER, player.getGameMode(), region);
 					}
 				}
 			}
@@ -116,9 +116,9 @@ public class PlayerGuard implements Listener {
 			for (String region: Arrays.asList(regions.replace(" ", "").split(","))) {
 				if (region != null && !region.isEmpty()) {
 					if (async) { 
-						SchedulerUtils.run(() -> ItemUtilities.getUtilities().setItems(player, player.getWorld(), TriggerType.REGION_ENTER, player.getGameMode(), region));
+						SchedulerUtils.run(() -> ItemUtilities.getUtilities().setItems(player, location.getWorld(), TriggerType.REGION_ENTER, player.getGameMode(), region));
 					} else {
-						ItemUtilities.getUtilities().setItems(player, player.getWorld(), TriggerType.REGION_ENTER, player.getGameMode(), region);
+						ItemUtilities.getUtilities().setItems(player, location.getWorld(), TriggerType.REGION_ENTER, player.getGameMode(), region);
 					}
 				}
 			}
