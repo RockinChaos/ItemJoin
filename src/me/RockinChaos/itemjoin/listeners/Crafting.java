@@ -31,6 +31,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.InventoryType.SlotType;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.inventory.InventoryView;
@@ -196,6 +197,27 @@ public class Crafting implements Listener {
     		});
     	}
     }
+    
+   /**
+	* Called on player switching worlds.
+	* Removes any crafting items from the player which ended up in their inventory slots.
+	* 
+	* @param event - PlayerChangedWorldEvent
+	*/
+	@EventHandler(ignoreCancelled = true)
+	private void onCraftingWorldSwitch(PlayerChangedWorldEvent event) {
+		final Player player = event.getPlayer();
+		final ItemStack[] inventory = player.getInventory().getContents();
+		if (!ItemHandler.isContentsEmpty(inventory)) {
+			for (int i = 0; i < inventory.length; i++) {
+				for (ItemMap itemMap: ItemUtilities.getUtilities().getCraftingItems()) {
+					if ((itemMap.isCraftingItem() && itemMap.isReal(inventory[i]))) {
+						player.getInventory().setItem(i, new ItemStack(Material.AIR));
+					}
+				}
+			}
+		}
+	}
 
    /**
     * Removes custom crafting items from the player when they enter creative mode.
@@ -250,9 +272,11 @@ public class Crafting implements Listener {
 									player.getOpenInventory().getTopInventory().setItem(k, new ItemStack(Material.AIR));
 									if (player.getInventory().firstEmpty() != -1) {
 										player.getInventory().addItem(drop);
+										ServerUtils.logDebug("{CRAFTING} An item was flagged as non-crafting, adding it back to the player " + player.getName());
 									} else {
 										Item itemDropped = player.getWorld().dropItem(player.getLocation(), drop);
 										itemDropped.setPickupDelay(40);
+										ServerUtils.logDebug("{CRAFTING} An item was flagged as non-crafting and the player " + player.getName() + " has a full inventory, item will instead be self-dropped.");
 									}
     							}
 							});
