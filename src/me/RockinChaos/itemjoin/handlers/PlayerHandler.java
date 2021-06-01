@@ -90,11 +90,17 @@ public class PlayerHandler {
     * @return If the entity is a real Player.
     */
     public static boolean isPlayer(final Entity entity) {
-    	if (DependAPI.getDepends(false).citizensEnabled() && net.citizensnpcs.api.CitizensAPI.getNPCRegistry().isNPC(entity)) {
-    		return false;
-    	} else if (!(entity instanceof Player)) { 
-    		return false; 
-    	}
+    	try {
+	    	if (DependAPI.getDepends(false).citizensEnabled() && net.citizensnpcs.api.CitizensAPI.getNPCRegistry().isNPC(entity)) {
+	    		return false;
+	    	} else if (!(entity instanceof Player)) { 
+	    		return false; 
+	    	} else if (PlayerHandler.getPlayerID((Player)entity) == null || PlayerHandler.getPlayerID((Player)entity).isEmpty()) { 
+	    		return false;
+	    	} else if (((Player)entity).getAddress().getHostString() == null) {
+	    		return false;
+	    	}
+    	} catch (Exception e) { return false; }
     	return true;
     }
 	
