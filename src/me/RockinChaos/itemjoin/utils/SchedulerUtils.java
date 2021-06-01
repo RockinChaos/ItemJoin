@@ -17,9 +17,8 @@
  */
 package me.RockinChaos.itemjoin.utils;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import java.util.ArrayList;
+import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -27,7 +26,8 @@ import me.RockinChaos.itemjoin.ItemJoin;
 
 public class SchedulerUtils {
 	
-	private static Map < Boolean, Long > SINGLE_THREAD_TRANSACTING = new HashMap < Boolean, Long > ();
+	private static List < Runnable > SINGLE_QUEUE = new ArrayList < Runnable > ();
+	private static Boolean SINGLE_ACTIVE = false;
 
    /**
     * Runs the task on the main thread
@@ -102,27 +102,34 @@ public class SchedulerUtils {
     * @param runnable - The task to be performed.
     */
     public static void runSingleAsync(final Runnable runnable) {
+    	SINGLE_QUEUE.add(runnable);
+    	if (SINGLE_ACTIVE == false) { 
+    		SINGLE_ACTIVE = true; {
+    			cycleAsync();
+    		}
+    	}
+    }
+    
+   /**
+    * Runs the task on another thread without duplication.
+    * 
+    */
+    public static void cycleAsync() {
     	if (ItemJoin.getInstance().isEnabled()) {
-    		if (!SINGLE_THREAD_TRANSACTING.containsKey(true)) {
-    			SINGLE_THREAD_TRANSACTING.put(true, System.currentTimeMillis());
+    		if (!SINGLE_QUEUE.isEmpty()) {
+    			final Runnable runnable = SINGLE_QUEUE.get(0);
     			new BukkitRunnable() {
     				@Override
     				public void run() {
     					runnable.run(); {
-    						SINGLE_THREAD_TRANSACTING.remove(true);
+    						SINGLE_QUEUE.remove(runnable); {
+    							cycleAsync();
+    						}
     					}
     				}
     			}.runTaskAsynchronously(ItemJoin.getInstance());
     		} else {
-	    		int timeSleeping = (int)((System.currentTimeMillis() - SINGLE_THREAD_TRANSACTING.get(true)) / 1000);
-	    		if (timeSleeping >= 10) {
-	    			SINGLE_THREAD_TRANSACTING.remove(true);
-	    			runAsync(runnable);
-	    		} else {
-	    			runAsyncLater(10L, () -> {
-		    			runSingleAsync(runnable); 
-	    			});
-	    		}
+    			SINGLE_ACTIVE = false;
     		}
     	}
     }

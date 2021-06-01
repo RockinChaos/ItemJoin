@@ -4321,7 +4321,7 @@ public class ItemMap {
 			if (itemMap.warmDelay != 0) { delay = 20L; }
 			SchedulerUtils.runLater(delay, () -> {
 				if ((!player.isDead() || action.equalsIgnoreCase("ON_DEATH")) && player.isOnline()) {
-					if (isExecuted(player, altPlayer, action, clickType, slot)) { 
+					if (this.isExecuted(player, altPlayer, action, clickType, slot)) { 
 						if (itemMap.itemCost == null || itemMap.itemCost.isEmpty()) { itemMap.withdrawBalance(player); } 
 						else { itemMap.withdrawItemCost(player); }
 					    itemMap.playSound(player);

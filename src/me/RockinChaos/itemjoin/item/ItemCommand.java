@@ -287,11 +287,11 @@ public class ItemCommand {
 	private void sendDispatch(final Player player, final Player altPlayer, final Executor cmdtype, final String slot) {
 		final World world = player.getWorld();
 		this.setPending(player, true); 
-		SchedulerUtils.runAsyncLater(this.delay, () -> {
+		SchedulerUtils.runLater(this.delay, () -> {
 			synchronized("IJ_DISPATCH") {
 				this.allowDispatch(player, world);
 				this.setPending(player, false);
-				if ((this.actionType.equals(Action.ON_DEATH) || !player.isDead()) && ((this.itemMap != null && ((this.actionType.equals(Action.ON_HOLD) && this.itemMap.isSimilar(PlayerHandler.getMainHandItem(player))) 
+				if ((this.actionType.equals(Action.ON_DEATH) || !player.isDead()) && ((this.itemMap != null && ((this.actionType.equals(Action.ON_HOLD) && this.itemMap.isReal(PlayerHandler.getMainHandItem(player))) 
 					|| (this.actionType.equals(Action.ON_RECEIVE) && this.itemMap.hasItem(player, true)))) || (!this.actionType.equals(Action.ON_HOLD) && !this.actionType.equals(Action.ON_RECEIVE))) 
 					&& (((this.itemMap.getCommandSequence() == CommandSequence.REMAIN && cmdtype != Executor.SWAPITEM && cmdtype != Executor.DELAY && this.itemMap.hasItem(player, true)) 
 					|| ((this.itemMap.getCommandSequence() == CommandSequence.REMAIN && (cmdtype == Executor.SWAPITEM || cmdtype == Executor.DELAY))) || this.itemMap.getCommandSequence() != CommandSequence.REMAIN))
