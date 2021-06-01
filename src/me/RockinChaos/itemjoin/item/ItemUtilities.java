@@ -220,9 +220,10 @@ public class ItemUtilities {
     * @param newMode - The GameMode of the Player.
     * @param region - The region the Player is in.
     */
-	private void handleItems(final Player player, final World world, TriggerType type, final GameMode gameMode, final String region) {
+	private void handleItems(final Player player, World world, final TriggerType type, final GameMode gameMode, final String region) {
 		final ItemMap randomMap = ChanceAPI.getChances().getRandom(player);
 		final int session = StringUtils.getRandom(1, 100000);
+		if (type.equals(TriggerType.WORLD_SWITCH)) { world = player.getWorld(); }
 		for (ItemMap item : this.getItems()) { 
 			item.setAnimations(player);
 			if (((type.equals(TriggerType.JOIN) && item.isGiveOnJoin()) 
