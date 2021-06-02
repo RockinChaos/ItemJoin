@@ -959,11 +959,8 @@ public class Menu {
 						colorPane.open(player);
 					}
 				}));
-			} else if (itemMap.getMaterial().toString().contains("GOLDEN_APPLE")) {
-				creatingPane.addButton(new Button(ItemHandler.getItem("POTION", 1, false, "&e&lEffects", "&7", "&7*Add custom effects after", "&7consuming the apple item.", "&9&lNotch-Effects: &a" + StringUtils.nullCheck(potionList)),
-						event -> potionPane(player, itemMap, 0)));
-			} else if (itemMap.getMaterial().toString().equalsIgnoreCase("POTION")) {
-				creatingPane.addButton(new Button(ItemHandler.getItem("POTION", 1, false, "&e&lEffects", "&7", "&7*Add custom effects after", "&7consuming the potion item.", "&9&lPotion-Effects: &a" + StringUtils.nullCheck(potionList)),
+			} else if (itemMap.getMaterial().isEdible() || itemMap.getMaterial().toString().equalsIgnoreCase("POTION")) {
+				creatingPane.addButton(new Button(ItemHandler.getItem("POTION", 1, false, "&e&lEffects", "&7", "&7*Add custom effects after", "&7consuming the item.", "&9&lPotion-Effects: &a" + StringUtils.nullCheck(potionList)),
 						event -> potionPane(player, itemMap, 0)));
 			} else if (itemMap.getMaterial().toString().contains("BANNER")) {
 				creatingPane.addButton(new Button(ItemHandler.getItem("CLAY_BALL", 1, false, "&e&lBanner Patterns", "&7", "&7*Set custom patterns that", "&7will appear on the item.", "&9&lBanner-Meta: &a" + StringUtils.nullCheck(patternList)),
@@ -3261,22 +3258,28 @@ public class Menu {
 			listCommands(itemMap, Action.ON_EQUIP)), event -> {
 				commandListPane(player, itemMap, Action.ON_EQUIP);
 			}));
-			clickPane.addButton(new Button(fillerPaneGItem));
 			clickPane.addButton(new Button(ItemHandler.getItem("IRON_HELMET", 1, false, "&e&lUn-Equip", "&7", "&7*Commands that will execute only", "&7when the item is removed", "&7from an armor slot.", "&7", "&9&lCommands: &a" + 
 			listCommands(itemMap, Action.UN_EQUIP)), event -> {
 				commandListPane(player, itemMap, Action.UN_EQUIP);
 			}));
-			clickPane.addButton(new Button(fillerPaneGItem));
 			clickPane.addButton(new Button(ItemHandler.getItem("TORCH", 1, false, "&e&lOn-Hold", "&7", "&7*Commands that will execute only", "&7when holding the item.", "&7", "&9&lCommands: &a" + 
 			listCommands(itemMap, Action.ON_HOLD)), event -> {
 				commandListPane(player, itemMap, Action.ON_HOLD);
 			}));
 			clickPane.addButton(new Button(fillerPaneGItem));
+			clickPane.addButton(new Button(ItemHandler.getItem("ARROW", 1, false, "&e&lOn-Fire", "&7", "&7*Commands that will execute only", "&7when an arrow or bow is fired.", "&7", "&9&lCommands: &a" + 
+			listCommands(itemMap, Action.ON_FIRE)), event -> {
+				commandListPane(player, itemMap, Action.ON_FIRE);
+			}));
+			clickPane.addButton(new Button(fillerPaneGItem));
+			clickPane.addButton(new Button(ItemHandler.getItem("POTION", 1, false, "&e&lOn-Consume", "&7", "&7*Commands that will execute only", "&7when you consume an the item.", "&7", "&9&lCommands: &a" + 
+			listCommands(itemMap, Action.ON_CONSUME)), event -> {
+				commandListPane(player, itemMap, Action.ON_CONSUME);
+			}));
 			clickPane.addButton(new Button(ItemHandler.getItem("EMERALD", 1, false, "&e&lOn-Receive", "&7", "&7*Commands that will execute only", "&7when you are given the item.", "&7", "&9&lCommands: &a" + 
 			listCommands(itemMap, Action.ON_RECEIVE)), event -> {
 				commandListPane(player, itemMap, Action.ON_RECEIVE);
 			}));
-			clickPane.addButton(new Button(fillerPaneGItem));
 			clickPane.addButton(new Button(ItemHandler.getItem("397", 1, false, "&e&lOn-Death", "&7", "&7*Commands that will execute only", "&7when die with the", "&7item in your inventory.", "&7", "&9&lCommands: &a" + 
 			listCommands(itemMap, Action.ON_DEATH)), event -> {
 				commandListPane(player, itemMap, Action.ON_DEATH);
@@ -6274,22 +6277,28 @@ public class Menu {
 					"&7", "&9&lENABLED: &a" + (StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.ON_EQUIP.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				commandCPane(player, itemMap, Action.ON_EQUIP);
 			}));
-			commandPane.addButton(new Button(fillerPaneGItem));
 			commandPane.addButton(new Button(ItemHandler.getItem("IRON_HELMET", 1, false, "&e&lUn-Equip", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
 					"&7", "&9&lENABLED: &a" + (StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.UN_EQUIP.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				commandCPane(player, itemMap, Action.UN_EQUIP);
 			}));
-			commandPane.addButton(new Button(fillerPaneGItem));
 			commandPane.addButton(new Button(ItemHandler.getItem("TORCH", 1, false, "&e&lOn-Hold", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
 					"&7", "&9&lENABLED: &a" + (StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.ON_HOLD.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				commandCPane(player, itemMap, Action.ON_HOLD);
 			}));
 			commandPane.addButton(new Button(fillerPaneGItem));
+			commandPane.addButton(new Button(ItemHandler.getItem("ARROW", 1, false, "&e&lOn-Fire", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+					"&7", "&9&lENABLED: &a" + (StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.ON_FIRE.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
+				commandCPane(player, itemMap, Action.ON_FIRE);
+			}));
+			commandPane.addButton(new Button(fillerPaneGItem));
+			commandPane.addButton(new Button(ItemHandler.getItem("POTION", 1, false, "&e&lOn-Consume", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+					"&7", "&9&lENABLED: &a" + (StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.ON_CONSUME.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
+				commandCPane(player, itemMap, Action.ON_CONSUME);
+			}));
 			commandPane.addButton(new Button(ItemHandler.getItem("EMERALD", 1, false, "&e&lOn-Receive", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
 					"&7", "&9&lENABLED: &a" + (StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.ON_RECEIVE.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				commandCPane(player, itemMap, Action.ON_RECEIVE);
 			}));
-			commandPane.addButton(new Button(fillerPaneGItem));
 			commandPane.addButton(new Button(ItemHandler.getItem("397", 1, false, "&e&lOn-Death", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
 					"&7", "&9&lENABLED: &a" + (StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.ON_DEATH.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				commandCPane(player, itemMap, Action.ON_DEATH);
@@ -6996,9 +7005,9 @@ public class Menu {
 		Interface potionPane = new Interface(true, 6, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			if (stage != 1) {
-				potionPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the special settings menu."), event -> creatingPane(player, itemMap)));
+				potionPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> creatingPane(player, itemMap)));
 			} else {
-				potionPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the special settings menu."), event -> otherPane(player, itemMap)));
+				potionPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the other settings menu."), event -> otherPane(player, itemMap)));
 			}
 			for (PotionEffectType potion: PotionEffectType.values()) {
 				if (potion != null) {
@@ -7536,7 +7545,17 @@ public class Menu {
 				}));
 				otherPane.addButton(new Button(fillerPaneGItem), 3);
 			} else if (itemMap.getMaterial().toString().contains("PLAYER_HEAD") || itemMap.getMaterial().toString().contains("SKULL_ITEM")) {
-				otherPane.addButton(new Button(fillerPaneGItem), 3);
+				String potionList = "";
+				String potionString = "";
+				if (StringUtils.nullCheck(itemMap.getPotionEffect().toString()) != "NONE") {
+					for (PotionEffect potions: itemMap.getPotionEffect()) {
+						potionString += potions.getType().getName().toUpperCase() + ":" + potions.getAmplifier() + ":" + potions.getDuration() + ", ";
+					}
+					for (String split: StringUtils.softSplit(StringUtils.nullCheck(potionString.substring(0, potionString.length())))) {
+						potionList += "&a" + split + " /n ";
+					}
+				}
+				otherPane.addButton(new Button(fillerPaneGItem), 2);
 				otherPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GOLDEN_HELMET" : "314"), 1, false, "&b&lSkull Owner", "&7", "&7*Define a skull owner for the", "&7head adding that persons skin.", "&7", "&7You can only define skull owner", 
 						"&7or skull texture, this will", "&7remove any skull textures.", "&9&lSkull-Owner: &a" + StringUtils.nullCheck(itemMap.getSkull())), event -> {
 					if (itemMap.getDynamicOwners() != null && !itemMap.getDynamicOwners().isEmpty()) {
@@ -7589,7 +7608,10 @@ public class Menu {
 					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 					otherPane(event.getPlayer(), itemMap);
 				}));
-				otherPane.addButton(new Button(fillerPaneGItem), 3);
+				otherPane.addButton(new Button(fillerPaneGItem));
+				otherPane.addButton(new Button(ItemHandler.getItem("POTION", 1, false, "&e&lEffects", "&7", "&7*Add custom effects after", "&7consuming the item.", "&9&lPotion-Effects: &a" + StringUtils.nullCheck(potionList)),
+						event -> potionPane(player, itemMap, 1)));
+				otherPane.addButton(new Button(fillerPaneGItem), 2);
 			} else if (itemMap.getMaterial().toString().contains("TIPPED_ARROW")) {
 				String potionList = "";
 				String potionString = "";

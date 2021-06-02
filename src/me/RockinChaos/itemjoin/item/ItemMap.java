@@ -4994,6 +4994,8 @@ public class ItemMap {
 			Map<String, List<String>> onDeath = new HashMap<String, List<String>>();
 			Map<String, List<String>> onDamage = new HashMap<String, List<String>>();
 			Map<String, List<String>> onHit = new HashMap<String, List<String>>();
+			Map<String, List<String>> onFire = new HashMap<String, List<String>>();
+			Map<String, List<String>> onConsume = new HashMap<String, List<String>>();
 			Map<String, List<String>> onReceive = new HashMap<String, List<String>>();
 			Map<String, List<String>> physical = new HashMap<String, List<String>>();
 			for(ItemCommand command : this.commands) {
@@ -5022,6 +5024,8 @@ public class ItemMap {
 				else if (command.matchAction(ItemCommand.Action.ON_DEATH)) { onDeath = this.addMapCommand(onDeath, command); }
 				else if (command.matchAction(ItemCommand.Action.ON_DAMAGE)) { onDamage = this.addMapCommand(onDamage, command); }
 				else if (command.matchAction(ItemCommand.Action.ON_HIT)) { onHit = this.addMapCommand(onHit, command); }
+				else if (command.matchAction(ItemCommand.Action.ON_FIRE)) { onFire = this.addMapCommand(onFire, command); }
+				else if (command.matchAction(ItemCommand.Action.ON_CONSUME)) { onConsume = this.addMapCommand(onConsume, command); }
 				else if (command.matchAction(ItemCommand.Action.ON_RECEIVE)) { onReceive = this.addMapCommand(onReceive, command); }
 				else if (command.matchAction(ItemCommand.Action.PHYSICAL)) { physical = this.addMapCommand(physical, command); }
 			}

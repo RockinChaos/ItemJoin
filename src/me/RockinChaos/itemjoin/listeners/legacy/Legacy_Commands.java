@@ -89,6 +89,32 @@ public class Legacy_Commands implements Listener {
 			this.runCommands(event.getEntity(), null, item, "ON_DEATH", "DEAD", null);
 		}
 	}
+	
+   /**
+	* Runs the on_consume commands for the custom item upon item consumption.
+	* 
+	* @param event - PlayerItemConsumeEvent.
+	* @deprecated This is a LEGACY event, only use on Minecraft versions below 1.8.
+	*/
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = false)
+	private void onConsume(PlayerItemConsumeEvent event) {
+		final ItemStack item = event.getItem();
+		this.runCommands(event.getPlayer(), null, item, "ON_CONSUME", "CONSUME", String.valueOf(event.getPlayer().getInventory().getHeldItemSlot()));
+	}
+	
+   /**
+	* Runs the on_fire commands for the custom item upon the player shooting a bow.
+	* 
+	* @param event - EntityShootBowEvent.
+	* @deprecated This is a LEGACY event, only use on Minecraft versions below 1.8.
+	*/
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = false)
+	private void onFire(EntityShootBowEvent event) {
+		if (event.getEntity() instanceof Player) {
+			final ItemStack bow = (event.getBow() != null ? event.getBow().clone() : event.getBow());
+			this.runCommands((Player)event.getEntity(), null, bow, "ON_FIRE", "FIRE", String.valueOf(((Player)event.getEntity()).getInventory().getHeldItemSlot()));
+		}
+	}
 
    /**
 	* Runs the on_hold commands for the custom item upon holding it.
