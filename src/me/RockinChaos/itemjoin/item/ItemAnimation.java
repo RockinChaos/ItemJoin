@@ -30,6 +30,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 
+import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.listeners.Clicking;
@@ -204,7 +205,8 @@ public class ItemAnimation {
 			if (!stopAnimations) {
 				// ============== Animate Within the Player Inventory ============== //
 				for (ItemStack inPlayerInventory: player.getInventory().getContents()) {
-					if (inPlayerInventory != null && itemMap.getTempItem() != null && itemMap.isReal(inPlayerInventory)) {
+					boolean heldAnimations = ConfigHandler.getConfig().getFile("config.yml").getBoolean("Settings.HeldItem-Animations");
+					if (inPlayerInventory != null && itemMap.getTempItem() != null && itemMap.isReal(inPlayerInventory) && (heldAnimations || !itemMap.isReal(PlayerHandler.getHandItem(player)))) {
 						if (nameString != null) { setNameData(player, inPlayerInventory, nameString); } 
 						else if (loreString != null) { setLoreData(player, inPlayerInventory, loreString); }
 						else if (materialString != null) { setMaterialData(player, inPlayerInventory, materialString); }
