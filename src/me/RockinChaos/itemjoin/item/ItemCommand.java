@@ -322,16 +322,12 @@ public class ItemCommand {
 	private void dispatchConsoleCommands(final Player player, final Player altPlayer) {
 		try {
 			if (StringUtils.containsIgnoreCase(this.command, "[close]")) {
-				SchedulerUtils.run(() -> {
-					PlayerHandler.safeInventoryClose(player);
-				});
+				PlayerHandler.safeInventoryClose(player);
 			} else {
 				String[] values = new String[1];
 				if (altPlayer != null) { values[0] = altPlayer.getName(); }
 				this.setLoggable(player, "/" + StringUtils.translateLayout(this.command, player, values));
-				SchedulerUtils.run(() -> {
-					Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), StringUtils.translateLayout(this.command, player, values));
-				});
+				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), StringUtils.translateLayout(this.command, player, values));
 			}
 		} catch (Exception e) {
 			ServerUtils.logSevere("{ItemCommand} There was an error executing an item's command as console, if this continues report it to the developer.");
@@ -348,24 +344,20 @@ public class ItemCommand {
 	private void dispatchOpCommands(final Player player, final Player altPlayer) {
 		try {
 			if (StringUtils.containsIgnoreCase(this.command, "[close]")) {
-				SchedulerUtils.run(() -> {
-					PlayerHandler.safeInventoryClose(player);
-				});
+				PlayerHandler.safeInventoryClose(player);
 			} else {
-				SchedulerUtils.run(() -> {
-					boolean isOp = player.isOp();
-					try {
-						player.setOp(true);
-						String[] values = new String[1];
-						if (altPlayer != null) { values[0] = altPlayer.getName(); }
-						this.setLoggable(player, "/" + StringUtils.translateLayout(this.command, player, values));
-						player.chat("/" + StringUtils.translateLayout(this.command, player, values));
-					} catch (Exception e) {
-						ServerUtils.sendDebugTrace(e);
-						player.setOp(isOp);
-						ServerUtils.logSevere("{ItemCommand} An critical error has occurred while setting " + player.getName() + " status on the OP list, to maintain server security they have been removed as an OP.");
-					} finally { player.setOp(isOp); }
-				});
+				boolean isOp = player.isOp();
+				try {
+					player.setOp(true);
+					String[] values = new String[1];
+					if (altPlayer != null) { values[0] = altPlayer.getName(); }
+					this.setLoggable(player, "/" + StringUtils.translateLayout(this.command, player, values));
+					player.chat("/" + StringUtils.translateLayout(this.command, player, values));
+				} catch (Exception e) {
+					ServerUtils.sendDebugTrace(e);
+					player.setOp(isOp);
+					ServerUtils.logSevere("{ItemCommand} An critical error has occurred while setting " + player.getName() + " status on the OP list, to maintain server security they have been removed as an OP.");
+				} finally { player.setOp(isOp); }
 			}
 		} catch (Exception e) {
 			ServerUtils.logSevere("{ItemCommand} There was an error executing an item's command as an op, if this continues report it to the developer.");
@@ -382,16 +374,12 @@ public class ItemCommand {
 	private void dispatchPlayerCommands(final Player player, final Player altPlayer) {
 		try {
 			if (StringUtils.containsIgnoreCase(this.command, "[close]")) {
-				SchedulerUtils.run(() -> {
-					PlayerHandler.safeInventoryClose(player);
-				});
+				PlayerHandler.safeInventoryClose(player);
 			} else {
 				String[] values = new String[1];
 				if (altPlayer != null) { values[0] = altPlayer.getName(); }
 				this.setLoggable(player, "/" + StringUtils.translateLayout(this.command, player, values));
-				SchedulerUtils.run(() -> {
-					player.chat("/" + StringUtils.translateLayout(this.command, player, values));
-				});
+				player.chat("/" + StringUtils.translateLayout(this.command, player, values));
 			}
 		} catch (Exception e) {
 			ServerUtils.logSevere("{ItemCommand} There was an error executing an item's command as a player, if this continues report it to the developer.");
@@ -407,11 +395,9 @@ public class ItemCommand {
 	*/
 	private void dispatchMessageCommands(final Player player, final Player altPlayer) {
 		try { 
-			SchedulerUtils.run(() -> {
-				String[] values = new String[1];
-				if (altPlayer != null) { values[0] = altPlayer.getName(); }
-				player.sendMessage(StringUtils.translateLayout(this.command, player, values)); 
-			});
+			String[] values = new String[1];
+			if (altPlayer != null) { values[0] = altPlayer.getName(); }
+			player.sendMessage(StringUtils.translateLayout(this.command, player, values)); 
 		} 
 		catch (Exception e) {
 			ServerUtils.logSevere("{ItemCommand} There was an error executing an item's command to send a message, if this continues report it to the developer.");
@@ -427,11 +413,9 @@ public class ItemCommand {
 	*/
 	private void dispatchServerCommands(final Player player, final Player altPlayer) {
 		try { 
-			SchedulerUtils.run(() -> {
-				String[] values = new String[1];
-				if (altPlayer != null) { values[0] = altPlayer.getName(); }
-				BungeeAPI.getBungee(false).SwitchServers(player, StringUtils.translateLayout(this.command, player, values)); 
-			});
+			String[] values = new String[1];
+			if (altPlayer != null) { values[0] = altPlayer.getName(); }
+			BungeeAPI.getBungee(false).SwitchServers(player, StringUtils.translateLayout(this.command, player, values)); 
 		} 
 		catch (Exception e) {
 			ServerUtils.logSevere("{ItemCommand} There was an error executing an item's command to switch servers, if this continues report it to the developer.");
@@ -447,11 +431,9 @@ public class ItemCommand {
 	*/
 	private void dispatchBungeeCordCommands(final Player player, final Player altPlayer) {
 		try { 
-			SchedulerUtils.run(() -> {
-				String[] values = new String[1];
-				if (altPlayer != null) { values[0] = altPlayer.getName(); }
-				BungeeAPI.getBungee(false).ExecuteCommand(player, StringUtils.translateLayout(this.command, player, values)); 
-			});
+			String[] values = new String[1];
+			if (altPlayer != null) { values[0] = altPlayer.getName(); }
+			BungeeAPI.getBungee(false).ExecuteCommand(player, StringUtils.translateLayout(this.command, player, values)); 
 		} 
 		catch (Exception e) {
 			ServerUtils.logSevere("{ItemCommand} There was an error executing an item's command to BungeeCord, if this continues report it to the developer.");
@@ -663,6 +645,8 @@ public class ItemCommand {
 		ON_DEATH(".on-death", "ON_DEATH", "DEAD"),
 		ON_DAMAGE(".on-damage", "ON_DAMAGE", "DAMAGED"),
 		ON_HIT(".on-hit", "ON_HIT", "HIT"),
+		ON_FIRE(".on-fire", "ON_FIRE", "FIRE"),
+		ON_CONSUME(".on-consume", "ON_CONSUME", "CONSUME"),
 		ON_RECEIVE(".on-receive", "ON_RECEIVE", "RECEIVED"),
 		PHYSICAL(".physical", "PHYSICAL", "INTERACTED");
 		
