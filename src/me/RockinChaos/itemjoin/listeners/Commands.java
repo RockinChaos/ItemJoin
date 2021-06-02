@@ -30,6 +30,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
@@ -42,6 +43,7 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.inventory.ItemStack;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
@@ -60,10 +62,10 @@ public class Commands implements Listener {
 	*/
 	@EventHandler(ignoreCancelled = false)
 	private void onInventory(InventoryClickEvent event) {
-		ItemStack item = event.getCurrentItem();
-		Player player = (Player) event.getWhoClicked();
-		String action = event.getAction().name();
-		String slot = (event.getSlotType().name().equalsIgnoreCase("CRAFTING") ? "CRAFTING[" + String.valueOf(event.getSlot()) + "]" : String.valueOf(event.getSlot()));
+		final ItemStack item = event.getCurrentItem();
+		final Player player = (Player) event.getWhoClicked();
+		final String action = event.getAction().name();
+		final String slot = (event.getSlotType().name().equalsIgnoreCase("CRAFTING") ? "CRAFTING[" + String.valueOf(event.getSlot()) + "]" : String.valueOf(event.getSlot()));
 		this.runCommands(player, null, item, action, event.getClick().name(), slot);
 	}
 	
@@ -74,9 +76,9 @@ public class Commands implements Listener {
 	*/
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = false)
 	private void onDeath(PlayerDeathEvent event) {
-		ListIterator < ItemStack > litr = event.getDrops().listIterator();
+		final ListIterator < ItemStack > litr = event.getDrops().listIterator();
 		while (litr.hasNext()) {
-			ItemStack item = litr.next();
+			final ItemStack item = litr.next();
 			this.runCommands(event.getEntity(), null, item, "ON_DEATH", "DEAD", null);
 		}
 	}
@@ -88,9 +90,9 @@ public class Commands implements Listener {
 	*/
 	@EventHandler(ignoreCancelled = false)
 	private void onHold(PlayerItemHeldEvent event) {
-		Player player = event.getPlayer();
-		ItemStack item = player.getInventory().getItem(event.getNewSlot());
-		String slot = String.valueOf(event.getNewSlot());
+		final Player player = event.getPlayer();
+		final ItemStack item = player.getInventory().getItem(event.getNewSlot());
+		final String slot = String.valueOf(event.getNewSlot());
 		this.runCommands(player, null, item, "ON_HOLD", "HELD", slot);
 	}
 	
@@ -101,7 +103,7 @@ public class Commands implements Listener {
 	*/
 	@EventHandler(ignoreCancelled = false)
 	private void onEquipClick(InventoryClickEvent event) {
-		Player player = (Player) event.getWhoClicked();
+		final Player player = (Player) event.getWhoClicked();
 		if (StringUtils.containsIgnoreCase(event.getAction().name(), "HOTBAR") && event.getView().getBottomInventory().getSize() >= event.getHotbarButton() && event.getHotbarButton() >= 0
 		 && !event.getClick().name().equalsIgnoreCase("MIDDLE") && event.getSlotType() == SlotType.ARMOR && event.getView().getBottomInventory().getItem(event.getHotbarButton()) != null && event.getView().getBottomInventory().getItem(event.getHotbarButton()).getType() != Material.AIR) {
 			this.equipCommands(player, null, event.getView().getBottomInventory().getItem(event.getHotbarButton()), "ON_EQUIP", "EQUIPPED", String.valueOf(event.getSlot()), event.getSlotType());
@@ -129,8 +131,8 @@ public class Commands implements Listener {
 	*/
 	@EventHandler(ignoreCancelled = false)
 	private void onEquipDrag(InventoryDragEvent event) {
-		Player player = (Player) event.getWhoClicked();
-		Set<Integer> slideSlots = event.getInventorySlots();
+		final Player player = (Player) event.getWhoClicked();
+		final Set<Integer> slideSlots = event.getInventorySlots();
 		int slot = 0; for (int actualSlot: slideSlots) { slot = actualSlot; break; }
 		if (event.getOldCursor() != null && event.getOldCursor().getType() != Material.AIR) {
 			this.equipCommands(player, null, event.getOldCursor(), "ON_EQUIP", "EQUIPPED", String.valueOf(slot), SlotType.ARMOR);
@@ -144,10 +146,10 @@ public class Commands implements Listener {
 	*/
 	@EventHandler(ignoreCancelled = false)
 	private void onEquip(PlayerInteractEvent event) {
-		Player player = event.getPlayer();
-		ItemStack item = (event.getItem() != null ? event.getItem().clone() : event.getItem());
+		final Player player = event.getPlayer();
+		final ItemStack item = (event.getItem() != null ? event.getItem().clone() : event.getItem());
 		if (item != null && item.getType() != Material.AIR && !PlayerHandler.isMenuClick(player.getOpenInventory(), event.getAction())) {
-			String[] itemType = item.getType().name().split("_");
+			final String[] itemType = item.getType().name().split("_");
 			if (itemType.length >= 2 && itemType[1] != null && !itemType[1].isEmpty() && StringUtils.isInt(StringUtils.getArmorSlot(itemType[1], true)) 
 				&& player.getInventory().getItem(Integer.parseInt(StringUtils.getArmorSlot(itemType[1], true))) == null) {
 				this.equipCommands(player, null, item, "ON_EQUIP", "EQUIPPED", StringUtils.getArmorSlot(itemType[1], true), SlotType.ARMOR);
@@ -162,7 +164,7 @@ public class Commands implements Listener {
 	*/
 	@EventHandler(ignoreCancelled = false)
     public void onDamage(EntityDamageByEntityEvent event){
-		Player player = ((event.getEntity() instanceof Player) ? (Player)event.getEntity() : (event.getDamager() instanceof Player) ? (Player)event.getDamager() : null);
+		final Player player = ((event.getEntity() instanceof Player) ? (Player)event.getEntity() : (event.getDamager() instanceof Player) ? (Player)event.getDamager() : null);
 		if (player != null) {
 			for (int i = 0; i < player.getInventory().getSize(); i++) {
 				this.handleOnDamage(player, (event.getEntity() instanceof Player ? (Player)event.getEntity() : null), String.valueOf(i));
@@ -182,7 +184,7 @@ public class Commands implements Listener {
 	*/
 	@EventHandler(ignoreCancelled = false)
     public void onHit(EntityDamageByEntityEvent event) {
-		Player player = ((event.getDamager() instanceof Player) ? (Player)event.getDamager() : null);
+		final Player player = ((event.getDamager() instanceof Player) ? (Player)event.getDamager() : null);
 		if (player != null) {
 			final ItemStack item = PlayerHandler.getHandItem(player);
 			final int slot = player.getInventory().getHeldItemSlot();
@@ -244,9 +246,9 @@ public class Commands implements Listener {
 			ItemStack item;
 			if (ServerUtils.hasSpecificUpdate("1_9")) { item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().name()); } 
 			else { item = PlayerHandler.getPerfectHandItem(event.getPlayer(), ""); }
-			Player player = event.getPlayer();
-			String action = Action.RIGHT_CLICK_BLOCK.name();
-			ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(PlayerHandler.getHandItem(player), null, player.getWorld());
+			final Player player = event.getPlayer();
+			final String action = Action.RIGHT_CLICK_BLOCK.name();
+			final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(PlayerHandler.getHandItem(player), null, player.getWorld());
 			if (itemMap != null && itemMap.isSimilar(item)) {
 				this.runCommands(player, (event.getRightClicked() instanceof Player ? (Player)event.getRightClicked() : null), item, action, action.split("_")[0], String.valueOf(player.getInventory().getHeldItemSlot()));
 			}
@@ -264,9 +266,9 @@ public class Commands implements Listener {
 			ItemStack item;
 			if (ServerUtils.hasSpecificUpdate("1_9")) { item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().name()); } 
 			else { item = PlayerHandler.getPerfectHandItem(event.getPlayer(), ""); }
-			Player player = event.getPlayer();
-			String action = Action.RIGHT_CLICK_BLOCK.name();
-			ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(PlayerHandler.getHandItem(player), null, player.getWorld());
+			final Player player = event.getPlayer();
+			final String action = Action.RIGHT_CLICK_BLOCK.name();
+			final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(PlayerHandler.getHandItem(player), null, player.getWorld());
 			if (itemMap != null && itemMap.isSimilar(item)) {
 				this.runCommands(player, (event.getRightClicked() instanceof Player ? (Player)event.getRightClicked() : null), item, action, action.split("_")[0], String.valueOf(player.getInventory().getHeldItemSlot()));
 			}
@@ -284,7 +286,7 @@ public class Commands implements Listener {
 		final ItemStack item = (event.getItem() != null ? event.getItem().clone() : (event.getAction() == Action.PHYSICAL ? PlayerHandler.getMainHandItem(player) : event.getItem()));
 		final String action = event.getAction().name();
 		if (((PlayerHandler.isAdventureMode(player) && !action.contains("LEFT") || !PlayerHandler.isAdventureMode(player))) && !this.isDropEvent(event.getPlayer())) {
-			ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(PlayerHandler.getHandItem(player), null, player.getWorld());
+			final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(PlayerHandler.getHandItem(player), null, player.getWorld());
 			if (!PlayerHandler.isMenuClick(player.getOpenInventory(), event.getAction()) && itemMap != null && itemMap.isSimilar(item)) {
 				long dupeDuration = (this.interactDupe != null && !this.interactDupe.isEmpty() && this.interactDupe.get(item) != null ? (((System.currentTimeMillis()) - this.interactDupe.get(item))) : -1);
 				if (dupeDuration == -1 || dupeDuration > 30) {
@@ -303,8 +305,8 @@ public class Commands implements Listener {
 	*/
 	@EventHandler(ignoreCancelled = false)
 	private void onSwingArm(PlayerAnimationEvent event) {
-		Player player = event.getPlayer();
-		ItemStack item = PlayerHandler.getHandItem(player);
+		final Player player = event.getPlayer();
+		final ItemStack item = PlayerHandler.getHandItem(player);
 		if (PlayerHandler.isAdventureMode(player) && !this.isDropEvent(event.getPlayer()) && (!PlayerHandler.isMenuClick(player.getOpenInventory(), Action.LEFT_CLICK_AIR) || !PlayerHandler.isMenuClick(player.getOpenInventory(), Action.LEFT_CLICK_BLOCK))) {
 			this.runCommands(player, null, item, "LEFT_CLICK_AIR", "LEFT", String.valueOf(player.getInventory().getHeldItemSlot()));
 		}
@@ -353,7 +355,7 @@ public class Commands implements Listener {
 	* @param slotType - the SlotType the item originated in.
 	*/
 	private void equipCommands(final Player player, final Player altPlayer, final ItemStack item, final String action, String clickType, final String slot, final SlotType slotType) {
-			String[] itemType = item.getType().name().split("_");
+			final String[] itemType = item.getType().name().split("_");
 			if (itemType.length >= 2 && itemType[1] != null && !itemType[1].isEmpty() && !itemType[1].equalsIgnoreCase("HEAD") 
 					&& (clickType.equalsIgnoreCase("SHIFT_EQUIPPED") || itemType[1].equalsIgnoreCase(StringUtils.getArmorSlot(slot, false)) 
 					|| (itemType[1].equalsIgnoreCase("HEAD") && StringUtils.getArmorSlot(slot, false).equalsIgnoreCase("HELMET")))) {
@@ -372,7 +374,7 @@ public class Commands implements Listener {
 	* @param slot - the slot the item originally resided in.
 	*/
 	private void runCommands(final Player player, final Player altPlayer, final ItemStack item, final String action, final String clickType, final String slot) {
-		ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item, null, player.getWorld());
+		final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item, null, player.getWorld());
 		if (itemMap != null && itemMap.inWorld(player.getWorld()) && itemMap.hasPermission(player, player.getWorld())) {
 			itemMap.executeCommands(player, altPlayer, item, action, clickType, (slot == null ? itemMap.getSlot() : slot));
 		}

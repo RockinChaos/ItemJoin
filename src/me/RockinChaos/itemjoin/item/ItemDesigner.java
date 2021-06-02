@@ -229,11 +229,13 @@ public class ItemDesigner {
 			}
 			itemMap.setDynamicMaterials(materials);
 			material = ItemHandler.cutDelay(itemMap.getNodeLocation().getString(".id." + ConfigHandler.getConfig().getMaterialSection(itemMap.getNodeLocation()).getKeys(false).iterator().next()));
-			if (material.contains(":")) { String[] parts = material.split(":"); itemMap.setDataValue((short) Integer.parseInt(parts[1])); }
-			return ItemHandler.getMaterial(material, null);
+			final Material mat = ItemHandler.getMaterial(material, null);
+			if (material.contains(":") && !mat.name().equalsIgnoreCase("PLAYER_HEAD")) { String[] parts = material.split(":"); itemMap.setDataValue((short) Integer.parseInt(parts[1])); }
+			return mat;
 		}
-		if (material.contains(":")) { String[] parts = material.split(":"); itemMap.setDataValue((short) Integer.parseInt(parts[1])); }
-		return ItemHandler.getMaterial(material, null);
+		final Material mat = ItemHandler.getMaterial(material, null);
+		if (material.contains(":") && !mat.name().equalsIgnoreCase("PLAYER_HEAD")) { String[] parts = material.split(":"); itemMap.setDataValue((short) Integer.parseInt(parts[1])); }
+		return mat;
 	}
 	
    /**
@@ -856,8 +858,9 @@ public class ItemDesigner {
  	* @param itemMap - The ItemMap being modified.
  	*/
 	private void setConsumableEffects(final ItemMap itemMap) {
-		if (itemMap.getNodeLocation().getString(".potion-effect") != null && itemMap.getMaterial().toString().equalsIgnoreCase("GOLDEN_APPLE")) {
-			String potionList = itemMap.getNodeLocation().getString(".potion-effect").replace(" ", "");
+		String potionEffect = (itemMap.getNodeLocation().getString(".potion-effect") != null ? itemMap.getNodeLocation().getString(".potion-effect") : itemMap.getNodeLocation().getString(".potion-effects"));
+		if (potionEffect != null && (itemMap.getMaterial().isEdible() || ItemHandler.isSkull(itemMap.getMaterial()))) {
+			String potionList = potionEffect.replace(" ", "");
 			List < PotionEffect > potionEffectList = new ArrayList < PotionEffect > ();
 			for (String potion: potionList.split(",")) {
 				String[] potionSection = potion.split(":");
@@ -895,10 +898,11 @@ public class ItemDesigner {
  	* @param itemMap - The ItemMap being modified.
  	*/
 	private void setPotionEffects(final ItemMap itemMap) {
-		if (itemMap.getNodeLocation().getString(".potion-effect") != null) {
+		String potionEffect = (itemMap.getNodeLocation().getString(".potion-effect") != null ? itemMap.getNodeLocation().getString(".potion-effect") : itemMap.getNodeLocation().getString(".potion-effects"));
+		if (potionEffect != null) {
 			if (itemMap.getMaterial().toString().equalsIgnoreCase("POTION") || itemMap.getMaterial().toString().equalsIgnoreCase("SPLASH_POTION")
 				|| ServerUtils.hasSpecificUpdate("1_9") && itemMap.getMaterial().toString().equalsIgnoreCase("LINGERING_POTION")) {
-				String potionList = itemMap.getNodeLocation().getString(".potion-effect").replace(" ", "");
+				String potionList = potionEffect.replace(" ", "");
 				List <PotionEffect> potionEffectList = new ArrayList<PotionEffect>();
 				for (String potion: potionList.split(",")) {
 					String[] potionSection = potion.split(":");
@@ -934,9 +938,10 @@ public class ItemDesigner {
  	* @param itemMap - The ItemMap being modified.
  	*/
 	private void setTippedArrows(final ItemMap itemMap) {
-		if (itemMap.getNodeLocation().getString(".potion-effect") != null) {
+		String potionEffect = (itemMap.getNodeLocation().getString(".potion-effect") != null ? itemMap.getNodeLocation().getString(".potion-effect") : itemMap.getNodeLocation().getString(".potion-effects"));
+		if (potionEffect != null) {
 			if (ServerUtils.hasSpecificUpdate("1_9") && !ItemJoin.getInstance().getServer().getVersion().contains("(MC: 1.9)") && itemMap.getMaterial().toString().equalsIgnoreCase("TIPPED_ARROW")) {
-				String effectList = itemMap.getNodeLocation().getString(".potion-effect").replace(" ", "");
+				String effectList = potionEffect.replace(" ", "");
 				List <PotionEffect> potionEffectList = new ArrayList<PotionEffect>();
 				for (String effect: effectList.split(",")) {
 					String[] tippedSection = effect.split(":");

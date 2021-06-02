@@ -5047,9 +5047,11 @@ public class ItemMap {
 			if (!onEquip.isEmpty()) { this.setMapCommand(itemData, onEquip, "on-equip"); }
 			if (!unEquip.isEmpty()) { this.setMapCommand(itemData, unEquip, "un-equip"); }
 			if (!onHold.isEmpty()) { this.setMapCommand(itemData, onHold, "on-hold"); }
-			if (!onDeath.isEmpty()) { this.setMapCommand(itemData, onReceive, "on-death"); }
-			if (!onDamage.isEmpty()) { this.setMapCommand(itemData, onReceive, "on-damage"); }
-			if (!onHit.isEmpty()) { this.setMapCommand(itemData, onReceive, "on-hit"); }
+			if (!onDeath.isEmpty()) { this.setMapCommand(itemData, onDeath, "on-death"); }
+			if (!onDamage.isEmpty()) { this.setMapCommand(itemData, onDamage, "on-damage"); }
+			if (!onHit.isEmpty()) { this.setMapCommand(itemData, onHit, "on-hit"); }
+			if (!onFire.isEmpty()) { this.setMapCommand(itemData, onFire, "on-fire"); }
+			if (!onConsume.isEmpty()) { this.setMapCommand(itemData, onConsume, "on-consume"); }
 			if (!onReceive.isEmpty()) { this.setMapCommand(itemData, onReceive, "on-receive"); }
 			if (!physical.isEmpty()) { this.setMapCommand(itemData, physical, "physical"); }
 		}
