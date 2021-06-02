@@ -21,10 +21,12 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 
+import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
@@ -38,41 +40,64 @@ import me.RockinChaos.itemjoin.utils.ServerUtils;
 */
 public class Legacy_Consumes implements Listener {
 	
-	
    /**
-	* Gives the players the defined custom items potion effects upon consumption.
-	* 
-	* @param event - PlayerItemConsumeEvent.
-	* @deprecated This is a LEGACY event, only use on Minecraft versions below 1.11.
+    * Gives the players the defined custom items potion effects upon consumption.
+    * 
+    * @param event - PlayerItemConsumeEvent.
+    * @deprecated This is a LEGACY event, only use on Minecraft versions below 1.11.
 	*/
 	@EventHandler(ignoreCancelled = true)
-	private void onPlayerAppleEffects(PlayerItemConsumeEvent event) {
+	private void onConsumeEffects(PlayerItemConsumeEvent event) {
 		ItemStack item = event.getItem();
 		Player player = event.getPlayer();
-		if (item.getType() == Material.GOLDEN_APPLE) {
-			ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item, null, player.getWorld());
-			if (itemMap != null && itemMap.getMaterial() == Material.GOLDEN_APPLE && itemMap.isCustomConsumable()) {
-				if (itemMap.getPotionEffect() != null && !itemMap.getPotionEffect().isEmpty()) {
-					for (PotionEffect potion: itemMap.getPotionEffect()) { player.addPotionEffect(potion); }
-				}
-				event.setCancelled(true);
-				if (ItemUtilities.getUtilities().isAllowed(player, item, "count-lock")) { 
-					if (item.getAmount() <= 1) {
-						if (itemMap.isReal(PlayerHandler.getMainHandItem(player))) {
-							PlayerHandler.setMainHandItem(player, new ItemStack(Material.AIR));
-						} else if (itemMap.isReal(PlayerHandler.getOffHandItem(player))) {
-							PlayerHandler.setOffHandItem(player, new ItemStack(Material.AIR));
-						}
-					} else {
-						item.setAmount((item.getAmount() - 1)); 
-						if (itemMap.isReal(PlayerHandler.getMainHandItem(player))) {
-							PlayerHandler.setMainHandItem(player, item);
-						} else if (itemMap.isReal(PlayerHandler.getOffHandItem(player))) {
-							PlayerHandler.setOffHandItem(player, item);
-						}
+		ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item, null, player.getWorld());
+		if (itemMap != null && itemMap.getMaterial().isEdible() && itemMap.isCustomConsumable()) {
+			if (itemMap.getPotionEffect() != null && !itemMap.getPotionEffect().isEmpty()) {
+				for (PotionEffect potion: itemMap.getPotionEffect()) { player.addPotionEffect(potion); }
+			}
+			event.setCancelled(true);
+			if (ItemUtilities.getUtilities().isAllowed(player, item, "count-lock")) { 
+				if (item.getAmount() <= 1) {
+					if (itemMap.isReal(PlayerHandler.getMainHandItem(player))) {
+						PlayerHandler.setMainHandItem(player, new ItemStack(Material.AIR));
+					} else if (itemMap.isReal(PlayerHandler.getOffHandItem(player))) {
+						PlayerHandler.setOffHandItem(player, new ItemStack(Material.AIR));
+					}
+				} else {
+					item.setAmount((item.getAmount() - 1)); 
+					if (itemMap.isReal(PlayerHandler.getMainHandItem(player))) {
+						PlayerHandler.setMainHandItem(player, item);
+					} else if (itemMap.isReal(PlayerHandler.getOffHandItem(player))) {
+						PlayerHandler.setOffHandItem(player, item);
 					}
 				}
 			}
+		}
+	}
+	
+   /**
+    * Gives the players the defined custom items potion effects upon consuming a skull.
+    * 
+    * @param event - PlayerInteractEvent.
+    * @deprecated This is a LEGACY event, only use on Minecraft versions below 1.11.
+	*/
+	@EventHandler(ignoreCancelled = false)
+	private void onConsumeSkullEffects(PlayerInteractEvent event) {
+		final ItemStack item = event.getItem();
+		final Player player = event.getPlayer();
+		final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item, null, player.getWorld());
+		if (itemMap != null && ItemHandler.isSkull(itemMap.getMaterial()) && itemMap.isCustomConsumable()) {
+			if (itemMap.getPotionEffect() != null && !itemMap.getPotionEffect().isEmpty()) {
+				for (PotionEffect potion: itemMap.getPotionEffect()) { player.addPotionEffect(potion); }
+			}
+			event.setCancelled(true);
+			if (item.getAmount() > 1) {
+				item.setAmount(item.getAmount() - 1);
+			} else if (itemMap.isReal(PlayerHandler.getMainHandItem(player))) {
+				PlayerHandler.setMainHandItem(player, new ItemStack(Material.AIR));
+			} else if (itemMap.isReal(PlayerHandler.getOffHandItem(player))) {
+				PlayerHandler.setOffHandItem(player, new ItemStack(Material.AIR));
+			}		
 		}
 	}
 	
