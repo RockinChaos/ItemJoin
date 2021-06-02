@@ -5151,7 +5151,7 @@ public class ItemMap {
 		if (this.effect != null && !this.effect.isEmpty()) { 
 			String effectList = "";
 			for (PotionEffect effects : this.effect) { effectList += effects.getType().getName() + ":" + effects.getAmplifier() + ":" + effects.getDuration() + ", "; }
-			itemData.set("items." + this.configName + ".potion-effect", effectList.substring(0, effectList.length() - 2)); 
+			itemData.set("items." + this.configName + ".potion-effects", effectList.substring(0, effectList.length() - 2)); 
 		}
 		if (this.attributes != null && !this.attributes.isEmpty()) { 
 			String attributeList = "";
