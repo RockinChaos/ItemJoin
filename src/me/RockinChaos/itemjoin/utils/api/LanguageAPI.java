@@ -126,6 +126,8 @@ public class LanguageAPI {
 				.replace("%time_left%", langHolder[13])
 				.replace("%input_example%", langHolder[15])
 				.replace("%input%", langHolder[16])
+				.replace("%item_slot%", langHolder[17])
+				.replace("%item_permission%", langHolder[18])
 				.replace("%prefix%", this.langPrefix);
 		
 	}
@@ -150,7 +152,7 @@ public class LanguageAPI {
     * @return The new String Array.
     */
 	public String[] newString() {
-		return new String[18];
+		return new String[20];
 	}
 	
    /**
