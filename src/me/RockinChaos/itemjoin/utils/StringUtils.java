@@ -21,6 +21,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.math.BigInteger;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
@@ -328,6 +330,29 @@ public class StringUtils {
 		final StringBuilder result = new StringBuilder();
 		String line = null; while ((line = reader.readLine()) != null) { result.append(line); }
 		return result.toString();
+	}
+	
+   /**
+    * Encodes the Texture String to Base64.
+    * 
+    * @param str - The String to be encoded.
+    * @return The Texture Base64 encoded String.
+    */
+	public static String toTexture64(String url) {
+		if (!StringUtils.containsIgnoreCase(url, "minecraft.net") && !StringUtils.containsIgnoreCase(url, "http") && !StringUtils.containsIgnoreCase(url, "https")) { 
+			url = "https://textures.minecraft.net/texture/" + url; 
+		}
+		URI actualUrl = null;
+		try {
+			actualUrl = new URI(url);
+		} catch (URISyntaxException e) {
+			ServerUtils.logSevere("{Utils} Unable to reach the url " + url + " for a skull-texture.");
+			ServerUtils.logSevere("{Utils} " + e.getReason());
+		} 
+		if (actualUrl != null) {
+			url = "{\"textures\":{\"SKIN\":{\"url\":\"" + actualUrl.toString() + "\"}}}";
+		}
+		return Base64.getEncoder().encodeToString(url.getBytes());
 	}
 	
    /**

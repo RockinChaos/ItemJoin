@@ -275,16 +275,29 @@ public class ItemDesigner {
 			for (String textureKey : textureSection.getKeys(false)) {
 				String textureList = itemMap.getNodeLocation().getString(".skull-texture." + textureKey);
 				if (textureList != null) {
+					if (StringUtils.containsIgnoreCase(textureList, "url-")) {
+						final String delay = (ItemHandler.getDelayFormat(textureList) != null ? ItemHandler.getDelayFormat(textureList) : "");
+						textureList = delay + StringUtils.toTexture64(ItemHandler.cutDelay(textureList.replace("url-", "")));
+					} 
 					textures.add(textureList);
 				}
 			}
 			itemMap.setDynamicTextures(textures);
-			return ItemHandler.cutDelay(itemMap.getNodeLocation().getString(".skull-texture." + textureSection.getKeys(false).iterator().next()));
-		}
-		if (texture != null && !texture.isEmpty()) {
+			return ItemHandler.cutDelay(textures.get(0));
+		} else if (texture != null && !texture.isEmpty()) {
 			if (itemMap.isDynamic() || itemMap.isAnimated()) {
-				List<String> textures = new ArrayList<String>(); textures.add(texture);
+				List<String> textures = new ArrayList<String>(); 
+				if (StringUtils.containsIgnoreCase(texture, "url-")) {
+					final String delay = (ItemHandler.getDelayFormat(texture) != null ? ItemHandler.getDelayFormat(texture) : "");
+					texture = delay + StringUtils.toTexture64(ItemHandler.cutDelay(texture.replace("url-", "")));
+				} 
+				textures.add(texture);
 				itemMap.setDynamicTextures(textures);
+			} else {
+				if (StringUtils.containsIgnoreCase(texture, "url-")) {
+					final String delay = (ItemHandler.getDelayFormat(texture) != null ? ItemHandler.getDelayFormat(texture) : "");
+					texture = delay + StringUtils.toTexture64(ItemHandler.cutDelay(texture.replace("url-", "")));
+				} 
 			}
 		}
 		return texture;
@@ -839,8 +852,8 @@ public class ItemDesigner {
     	if (ServerUtils.hasSpecificUpdate("1_8") && itemMap.getNodeLocation().getString(".skull-texture") != null) {
     		if (itemMap.getMaterial().toString().equalsIgnoreCase("SKULL_ITEM") || itemMap.getMaterial().toString().equalsIgnoreCase("PLAYER_HEAD")) {
 				if (itemMap.getNodeLocation().getString(".skull-owner") != null) { ServerUtils.logWarn("{ItemMap} You cannot define a skull owner and a skull texture at the same time, remove one from the item."); return;  }
-    			String texture = getActualTexture(itemMap);
-    			if (!texture.contains("hdb-")) {
+    			String texture = this.getActualTexture(itemMap);
+    			if (!StringUtils.containsIgnoreCase(texture, "hdb-")) {
     				GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
     				gameProfile.getProperties().put("textures", new Property("textures", new String(texture)));
     				try {
