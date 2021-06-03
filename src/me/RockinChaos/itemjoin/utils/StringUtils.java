@@ -19,10 +19,12 @@ package me.RockinChaos.itemjoin.utils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
@@ -44,9 +46,14 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.RegisteredListener;
+
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import de.domedd.betternick.BetterNick;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
+import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.utils.api.DependAPI;
 import me.RockinChaos.itemjoin.utils.api.LegacyAPI;
@@ -339,6 +346,7 @@ public class StringUtils {
     * @return The Texture Base64 encoded String.
     */
 	public static String toTexture64(String url) {
+		url = ItemHandler.cutDelay(url.replace("url-", ""));
 		if (!StringUtils.containsIgnoreCase(url, "minecraft.net") && !StringUtils.containsIgnoreCase(url, "http") && !StringUtils.containsIgnoreCase(url, "https")) { 
 			url = "https://textures.minecraft.net/texture/" + url; 
 		}
@@ -353,6 +361,31 @@ public class StringUtils {
 			url = "{\"textures\":{\"SKIN\":{\"url\":\"" + actualUrl.toString() + "\"}}}";
 		}
 		return Base64.getEncoder().encodeToString(url.getBytes());
+	}
+	
+   /**
+    * Encodes the Player UUID as a texture String.
+    * 
+    * @param player - The Player to be referenced.
+    * @param configName - The node name of the item.
+    * @param skullTexture - The skullTexture being fetched.
+    * @return The Player UUID texture String.
+    */
+	public static String toTextureUUID(final Player player, final String configName, final String skullTexture) {
+		if (StringUtils.containsIgnoreCase(skullTexture, "uuid")) {
+			String https = ("https://sessionserver.mojang.com/session/minecraft/profile/" + StringUtils.translateLayout(skullTexture, player));
+			try {
+				URL url = new URL(https);
+				InputStreamReader read = new InputStreamReader(url.openStream());
+				JsonObject textureProperty = new JsonParser().parse(read).getAsJsonObject().get("properties").getAsJsonArray().get(0).getAsJsonObject();
+				return textureProperty.get("value").getAsString();
+			} catch (IOException e) {
+				ServerUtils.logSevere("{ItemMap} Unable to connect to " + https);
+				ServerUtils.logSevere("{ItemMap} " + e.getMessage());
+				ServerUtils.logSevere("{ItemMap} The item " + configName + " will NOT have its skull-texture set!");
+			}
+		}
+		return skullTexture;
 	}
 	
    /**

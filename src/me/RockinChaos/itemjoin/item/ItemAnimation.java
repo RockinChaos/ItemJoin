@@ -359,7 +359,7 @@ public class ItemAnimation {
 			try {
 				if (ServerUtils.hasSpecificUpdate("1_8")) {
 					final GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
-					gameProfile.getProperties().put("textures", new Property("textures", new String(ItemHandler.cutDelay(textureString))));
+					gameProfile.getProperties().put("textures", new Property("textures", new String(ItemHandler.cutDelay(StringUtils.toTextureUUID(player, this.itemMap.getConfigName(), textureString)))));
 					final Field declaredField = tempMeta.getClass().getDeclaredField("profile");
 					declaredField.setAccessible(true);
 					declaredField.set(tempMeta, gameProfile);

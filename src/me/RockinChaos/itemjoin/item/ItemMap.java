@@ -64,6 +64,7 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.map.MapView;
 import org.bukkit.potion.PotionEffect;
+
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.vk2gpz.tokenenchant.api.TokenEnchantAPI;
@@ -3961,7 +3962,7 @@ public class ItemMap {
 			try {
 				if (ServerUtils.hasSpecificUpdate("1_8")) {
 					GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
-					gameProfile.getProperties().put("textures", new Property("textures", new String(((this.skullOwner != null && DependAPI.getDepends(false).skinsRestorerEnabled()) ? DependAPI.getDepends(false).getSkinValue(StringUtils.translateLayout(this.skullOwner, player)) : this.skullTexture))));
+					gameProfile.getProperties().put("textures", new Property("textures", new String(((this.skullOwner != null && DependAPI.getDepends(false).skinsRestorerEnabled()) ? DependAPI.getDepends(false).getSkinValue(StringUtils.translateLayout(this.skullOwner, player)) : StringUtils.toTextureUUID(player, this.configName, this.skullTexture)))));
 					Field declaredField = this.tempMeta.getClass().getDeclaredField("profile");
 					declaredField.setAccessible(true);
 					declaredField.set(this.tempMeta, gameProfile);
