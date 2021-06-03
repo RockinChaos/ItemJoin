@@ -42,6 +42,12 @@ commands:
   info:
     material: '&aItem ID (Tipo de material): &e&l%item%'
     data: '&aItem Value (Tipo de datos): &e&l%item%'
+  query:
+    node: '&aNodo: &e&l%item%'
+    material: '&aMaterial: &e&l%item_type%'
+    slot: '&aEspacio: &e&l%item_slot%'
+    permission: '&aPermiso: %item_permission%'
+    badSyntax: '%prefix% &c¡Uso incorrecto! Sintaxis: /itemjoin query <itemname>!'
   list:
     worldHeader: '&a&l%world%:'
     itemRow: '&a&l   &a%item%'

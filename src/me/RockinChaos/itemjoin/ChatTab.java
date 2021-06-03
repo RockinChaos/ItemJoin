@@ -110,21 +110,26 @@ public class ChatTab implements TabCompleter {
 			PlayerHandler.forOnlinePlayers(player -> {
 				commands.add(player.getName());
 			});
+		} else if (args.length == 2 && (args[0].equalsIgnoreCase("query") && PermissionsHandler.hasPermission(sender, "itemjoin.query"))) {
+			for (ItemMap itemMap: ItemUtilities.getUtilities().getItems()) {
+				commands.add(itemMap.getConfigName());
+			}
 		} else if (args.length == 1) {
 			if (PermissionsHandler.hasPermission(sender, "itemjoin.use")) { 		 	commands.addAll(Arrays.asList("help","info","world")); }
 			if (PermissionsHandler.hasPermission(sender, "itemjoin.permissions")) { 	commands.add("permissions"); }
 			if (PermissionsHandler.hasPermission(sender, "itemjoin.purge")) { 		 	commands.add("purge"); }
-			if (PermissionsHandler.hasPermission(sender, "itemjoin.enable")) { 	 	commands.add("enable"); }
+			if (PermissionsHandler.hasPermission(sender, "itemjoin.enable")) { 	 	    commands.add("enable"); }
 			if (PermissionsHandler.hasPermission(sender, "itemjoin.disable")) { 	 	commands.add("disable"); }
 			if (PermissionsHandler.hasPermission(sender, "itemjoin.get")) { 	   	 	commands.addAll(Arrays.asList("get","getAll")); }
 			if (PermissionsHandler.hasPermission(sender, "itemjoin.get.others")) {  	commands.add("getOnline"); }
-			if (PermissionsHandler.hasPermission(sender, "itemjoin.remove")) { 	    commands.addAll(Arrays.asList("remove","removeAll")); }
-			if (PermissionsHandler.hasPermission(sender, "itemjoin.remove.others")) {  commands.add("removeOnline"); }
-			if (PermissionsHandler.hasPermission(sender, "itemjoin.reload")) { 		commands.add("reload"); }
+			if (PermissionsHandler.hasPermission(sender, "itemjoin.remove")) { 	        commands.addAll(Arrays.asList("remove","removeAll")); }
+			if (PermissionsHandler.hasPermission(sender, "itemjoin.remove.others")) {   commands.add("removeOnline"); }
+			if (PermissionsHandler.hasPermission(sender, "itemjoin.reload")) { 		    commands.add("reload"); }
 			if (PermissionsHandler.hasPermission(sender, "itemjoin.menu")) { 			commands.add("menu"); }
+			if (PermissionsHandler.hasPermission(sender, "itemjoin.query")) { 			commands.add("query"); }
 			if (PermissionsHandler.hasPermission(sender, "itemjoin.list")) { 			commands.add("list"); }
 			if (PermissionsHandler.hasPermission(sender, "itemjoin.updates")) { 		commands.add("updates"); }
-			if (PermissionsHandler.hasPermission(sender, "itemjoin.autoupdate")) { 	commands.add("autoupdate"); }
+			if (PermissionsHandler.hasPermission(sender, "itemjoin.autoupdate")) { 	    commands.add("autoupdate"); }
 		}
 		StringUtil.copyPartialMatches(args[(args.length - 1)], commands, completions);
 		Collections.sort(completions);

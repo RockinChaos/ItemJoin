@@ -42,6 +42,12 @@ commands:
   info:
     material: '&fID предмета &7(Тип материала)&f: &7[&a%item%&7]'
     data: '&fЗначение предмета &7(Под-тип материала)&f: &7[&a%item%&7]'
+  query:
+    node: '&aУзел: &e&l%item%'
+    material: '&aМатериал: &e&l%item_type%'
+    slot: '&aСлот: &e&l%item_slot%'
+    permission: '&aРазрешение: %item_permission%'
+    badSyntax: '%prefix% &cНеправильное использование! Синтаксис: /itemjoin query <itemname>!'
   list:
     worldHeader: '&e&l%world%:'
     itemRow: '&a&l   &a%item%'

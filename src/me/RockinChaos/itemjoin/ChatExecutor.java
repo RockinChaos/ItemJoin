@@ -78,6 +78,7 @@ public class ChatExecutor implements CommandExecutor {
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin World &7- &eCheck what world you are in, debugging.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Menu &7- &eOpens the GUI Creator for custom items.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Permissions &7- &eLists the permissions you have.");
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Query <Item> &7- &eDisplays the custom item data.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Info &7- &eGets data-info of the held item.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&aType &a&l/ItemJoin Help 3 &afor the next page.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]---------------&a&l[&e Help Menu 2/10 &a&l]&a&l&m---------------[");
@@ -89,7 +90,7 @@ public class ChatExecutor implements CommandExecutor {
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Get <Item> <Qty> &7- &eGives amount of said item.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Get <Item> <User> &7- &eGives to said player.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Get <Item> <User> <Qty> &7- &eGives qty to player.");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&aType &a&l/ItemJoin Help 4 &afor the next page.");
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&aType &a&l/ItemJoin Help 5 &afor the next page.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]---------------&a&l[&e Help Menu 3/10 &a&l]&a&l&m---------------[");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
 		} else if (Execute.HELP.accept(sender, args, 4)) {
@@ -99,7 +100,7 @@ public class ChatExecutor implements CommandExecutor {
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Remove <Item> <Qty> &7- &eRemoves qty of item.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Remove <Item> <User> &7- &eRemoves from player.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Remove <Item> <User> <Qty> &7- &eRemoves qty.");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&aType &a&l/ItemJoin Help 5 &afor the next page.");
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&aType &a&l/ItemJoin Help 6 &afor the next page.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]---------------&a&l[&e Help Menu 4/10 &a&l]&a&l&m---------------[");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
 		} else if (Execute.HELP.accept(sender, args, 5)) {
@@ -109,7 +110,7 @@ public class ChatExecutor implements CommandExecutor {
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin GetOnline <Item> <Qty> &7- &eGives qty to all online.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin RemoveOnline <Item> &7- &eRemoves from all online.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin RemoveOnline <Item> <Qty> &7- &eRemoves qty.");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&aType &a&l/ItemJoin Help 6 &afor the next page.");
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&aType &a&l/ItemJoin Help 7 &afor the next page.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]---------------&a&l[&e Help Menu 5/10 &a&l]&a&l&m---------------[");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
 		} else if (Execute.HELP.accept(sender, args, 6)) {
@@ -119,7 +120,7 @@ public class ChatExecutor implements CommandExecutor {
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin GetAll <User> &7- &eGives all items to said player.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin RemoveAll &7- &eRemoves all ItemJoin items.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin RemoveAll <User> &7- &eRemoves from player.");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&aType &a&l/ItemJoin Help 7 &afor the next page.");
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&aType &a&l/ItemJoin Help 8 &afor the next page.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]---------------&a&l[&e Help Menu 6/10 &a&l]&a&l&m---------------[");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
 		} else if (Execute.HELP.accept(sender, args, 7)) {
@@ -128,7 +129,7 @@ public class ChatExecutor implements CommandExecutor {
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Enable &7- &eEnables ItemJoin for all players.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Enable <User> &7- &eEnables ItemJoin for player.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Enable <User> <World> &7- &eFor player/world.");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&aType &a&l/ItemJoin Help 8 &afor the next page.");
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&aType &a&l/ItemJoin Help 9 &afor the next page.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]---------------&a&l[&e Help Menu 7/10 &a&l]&a&l&m---------------[");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
 		} else if (Execute.HELP.accept(sender, args, 8)) {
@@ -137,7 +138,7 @@ public class ChatExecutor implements CommandExecutor {
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Disable &7- &eDisables ItemJoin for all players.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Disable <User> &7- &eDisables ItemJoin for player.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Disable <User> <World> &7- &eFor player/world.");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&aType &a&l/ItemJoin Help 9 &afor the next page.");
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&aType &a&l/ItemJoin Help 10 &afor the next page.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]---------------&a&l[&e Help Menu 8/10 &a&l]&a&l&m---------------[");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
 		} else if (Execute.HELP.accept(sender, args, 9)) {
@@ -149,7 +150,8 @@ public class ChatExecutor implements CommandExecutor {
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Purge first-join <User> &7- &eFirst-Join data.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Purge first-world <User> &7- &eFirst-World data.");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Purge ip-limits <User> &7- &eIp-Limits data.");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]---------------&a&l[&e Help Menu 9/10 &a&l]&a&l&m---------------[");
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&aType &a&l/ItemJoin Help 11 &afor the next page.");
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]--------------&a&l[&e Help Menu 9/10 &a&l]&a&l&m---------------[");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
 		} else if (Execute.HELP.accept(sender, args, 10)) {
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
@@ -170,6 +172,8 @@ public class ChatExecutor implements CommandExecutor {
 			LanguageAPI.getLang(false).sendLangMessage("commands.menu.openMenu", sender);
 		} else if (Execute.INFO.accept(sender, args, 0)) {
 			this.info(sender);
+		} else if (Execute.QUERY.accept(sender, args, 0)) {
+			this.query(sender, args);
 		} else if (Execute.WORLD.accept(sender, args, 0)) {
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
@@ -234,6 +238,7 @@ public class ChatExecutor implements CommandExecutor {
 			else if (executor.equals(Execute.REMOVE))       { LanguageAPI.getLang(false).sendLangMessage("commands.remove.badSyntax", sender); } 
 			else if (executor.equals(Execute.REMOVEONLINE)) { LanguageAPI.getLang(false).sendLangMessage("commands.remove.badOnlineSyntax", sender); }
 			else if (executor.equals(Execute.PURGE))        { LanguageAPI.getLang(false).sendLangMessage("commands.default.unknownCommand", sender); }
+			else if (executor.equals(Execute.QUERY))        { LanguageAPI.getLang(false).sendLangMessage("commands.query.badSyntax", sender); }
 		} else if (!this.matchExecutor(args).hasPermission(sender, args)) {
 			LanguageAPI.getLang(false).sendLangMessage("commands.default.noPermission", sender);
 		}
@@ -273,9 +278,46 @@ public class ChatExecutor implements CommandExecutor {
 				LanguageAPI.getLang(false).sendLangMessage("commands.info.data", sender, placeHolders);
 			}
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]---------------&a&l[&e Item Info Menu &a&l]&a&l&m--------------[");
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]-----------------&a&l[&e Item Info &a&l]&a&l&m----------------[");
 			LanguageAPI.getLang(false).dispatchMessage(sender, " ");
 		} else { LanguageAPI.getLang(false).sendLangMessage("commands.item.noItemHeld", sender); }	
+	}
+	
+   /**
+	* Called when the CommandSender executes the Query command.
+	* @param sender - Source of the command. 
+	* @param args - Passed command arguments.
+	* 
+	*/
+	private void query(final CommandSender sender, final String[] args) {
+		final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(null, args[1], null);
+		String[] placeHolders = LanguageAPI.getLang(false).newString(); 
+		placeHolders[3] = (itemMap != null ? itemMap.getConfigName() : args[1]);
+		if (itemMap != null) {
+			placeHolders[4] = ((itemMap.getDynamicMaterials() == null || itemMap.getDynamicMaterials().isEmpty()) ? itemMap.getMaterial().name() : itemMap.getDynamicMaterials().toString().replace("[", "").replace("{", "").replace("]", "").replace("}", ""));
+			placeHolders[17] = ((itemMap.getMultipleSlots() == null || itemMap.getMultipleSlots().isEmpty()) ? itemMap.getSlot() : itemMap.getMultipleSlots().toString().replace("[", "").replace("{", "").replace("]", "").replace("}", ""));
+			if (sender instanceof Player) {
+				if (itemMap.hasPermission(((Player) sender), ((Player) sender).getWorld())) {
+					placeHolders[18] = "&a[\u2714] " + PermissionsHandler.customPermissions(itemMap.getPermissionNode(), itemMap.getConfigName(), ((Player) sender).getWorld().getName());
+				} else {
+					placeHolders[18] = "&c[\u2718] " + PermissionsHandler.customPermissions(itemMap.getPermissionNode(), itemMap.getConfigName(), ((Player) sender).getWorld().getName());
+				}
+			} else { 
+				placeHolders[18] = "&a[\u2714] " + PermissionsHandler.customPermissions(itemMap.getPermissionNode(), itemMap.getConfigName(), ((Player) sender).getWorld().getName());
+			}
+			LanguageAPI.getLang(false).dispatchMessage(sender, " ");
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]-----------------&a&l[&e Query Data &a&l]&a&l&m----------------[");
+			LanguageAPI.getLang(false).dispatchMessage(sender, "");
+			LanguageAPI.getLang(false).sendLangMessage("commands.query.node", sender, placeHolders);
+			LanguageAPI.getLang(false).sendLangMessage("commands.query.material", sender, placeHolders);
+			LanguageAPI.getLang(false).sendLangMessage("commands.query.slot", sender, placeHolders);
+			LanguageAPI.getLang(false).sendLangMessage("commands.query.permission", sender, placeHolders);
+			LanguageAPI.getLang(false).dispatchMessage(sender, "");
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]-----------------&a&l[&e Query Data &a&l]&a&l&m----------------[");
+			LanguageAPI.getLang(false).dispatchMessage(sender, " ");
+		} else { 
+			LanguageAPI.getLang(false).sendLangMessage("commands.item.noItem", sender, placeHolders);	
+		}
 	}
 	
    /**
@@ -634,6 +676,7 @@ public class ChatExecutor implements CommandExecutor {
 		RELOAD("rl, reload", "itemjoin.reload", false),
 		MENU("menu, creator", "itemjoin.menu", true),
 		INFO("info", "itemjoin.use", true),
+		QUERY("query", "itemjoin.query", false),
 		WORLD("world, worlds", "itemjoin.use", true),
 		LIST("list", "itemjoin.list", false),
 		PERMISSIONS("permission, permissions", "itemjoin.permissions", true),
@@ -697,7 +740,7 @@ public class ChatExecutor implements CommandExecutor {
 				 || (this.equals(Execute.LIST) && Integer.parseInt(args[1]) <= ConfigHandler.getConfig().getListPages()))) 
 				 || (page == 1 && this.equals(Execute.PERMISSIONS) && StringUtils.isInt(args[1]) && Integer.parseInt(args[1]) == 0)
 				 || (!StringUtils.isInt(args[1]) && !this.equals(Execute.PURGE)))) 
-				 || (args.length < 2 && (!this.equals(Execute.GET) && !this.equals(Execute.GETONLINE) && !this.equals(Execute.REMOVE) && !this.equals(Execute.REMOVEONLINE))
+				 || (args.length < 2 && (!this.equals(Execute.GET) && !this.equals(Execute.GETONLINE) && !this.equals(Execute.REMOVE) && !this.equals(Execute.REMOVEONLINE) && !this.equals(Execute.QUERY))
 				 || (this.equals(Execute.PURGE) && (args.length == 1 
 				 || (args.length >= 3 && (args[1].equalsIgnoreCase("map-ids") || args[1].equalsIgnoreCase("ip-limits") || args[1].equalsIgnoreCase("first-join") || args[1].equalsIgnoreCase("first-world") 
 				 || args[1].equalsIgnoreCase("enabled-players") || args[1].equalsIgnoreCase("first-commands")))))));

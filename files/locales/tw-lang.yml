@@ -42,6 +42,12 @@ commands:
   info:
     material: '&a物品ID (材質): &e%item%'
     data: '&a物品副ID (編號): &e%item%'
+  query:
+    node: '&a節點: &e&l%item%'
+    material: '&a材料: &e&l%item_type%'
+    slot: '&a投幣口: &e&l%item_slot%'
+    permission: '&a允許: %item_permission%'
+    badSyntax: '%prefix% &c使用不當！句法: /itemjoin query <itemname>!'
   list:
     worldHeader: '&a&l%world%:'
     itemRow: '&a&l   &a%item%'

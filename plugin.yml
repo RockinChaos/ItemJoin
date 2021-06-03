@@ -24,6 +24,7 @@ permissions:
           itemjoin.updates: true
           itemjoin.upgrade: true
           itemjoin.permissions: true
+          itemjoin.query: true
           itemjoin.list: true
           itemjoin.purge: true
           itemjoin.get: true
@@ -53,6 +54,9 @@ permissions:
    itemjoin.permissions:
       description: Grants access to the permissions command
       default: true
+   itemjoin.query:
+      description: Grants access to the query command.
+      default: false
    itemjoin.list:
       description: Grants access to the list command.
       default: false
