@@ -277,7 +277,7 @@ public class ItemDesigner {
 				if (textureList != null) {
 					if (StringUtils.containsIgnoreCase(textureList, "url-")) {
 						final String delay = (ItemHandler.getDelayFormat(textureList) != null ? ItemHandler.getDelayFormat(textureList) : "");
-						textureList = delay + StringUtils.toTexture64(ItemHandler.cutDelay(textureList.replace("url-", "")));
+						textureList = delay + StringUtils.toTexture64(textureList);
 					} 
 					textures.add(textureList);
 				}
@@ -289,14 +289,14 @@ public class ItemDesigner {
 				List<String> textures = new ArrayList<String>(); 
 				if (StringUtils.containsIgnoreCase(texture, "url-")) {
 					final String delay = (ItemHandler.getDelayFormat(texture) != null ? ItemHandler.getDelayFormat(texture) : "");
-					texture = delay + StringUtils.toTexture64(ItemHandler.cutDelay(texture.replace("url-", "")));
+					texture = delay + StringUtils.toTexture64(texture);
 				} 
 				textures.add(texture);
 				itemMap.setDynamicTextures(textures);
 			} else {
 				if (StringUtils.containsIgnoreCase(texture, "url-")) {
 					final String delay = (ItemHandler.getDelayFormat(texture) != null ? ItemHandler.getDelayFormat(texture) : "");
-					texture = delay + StringUtils.toTexture64(ItemHandler.cutDelay(texture.replace("url-", "")));
+					texture = delay + StringUtils.toTexture64(texture);
 				} 
 			}
 		}
