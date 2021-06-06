@@ -45,6 +45,7 @@ Settings:
   HeldItem-Slot: -1
   HeldItem-Triggers: JOIN, WORLD-SWITCH
   HeldItem-Animations: true
+  Default-Triggers: JOIN
   DataTags: true
 
 # These permissions if enabled, determine whether the permission(s) is/are applied to certain players.

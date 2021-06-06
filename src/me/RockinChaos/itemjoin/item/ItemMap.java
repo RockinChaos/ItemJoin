@@ -512,22 +512,21 @@ public class ItemMap {
     * 
     */
 	private void setTriggers() {
-		if (this.nodeLocation.getString("triggers") != null) {
-			this.triggers = this.nodeLocation.getString("triggers");
-			this.giveOnDisabled = StringUtils.splitIgnoreCase(this.triggers, "DISABLED", ",");
-			this.giveOnJoin = StringUtils.splitIgnoreCase(this.triggers, "JOIN", ",");
-			this.giveOnRespawn = StringUtils.splitIgnoreCase(this.triggers, "RESPAWN", ",");
-			this.giveOnWorldSwitch = StringUtils.splitIgnoreCase(this.triggers, "WORLD-CHANGE", ",") || StringUtils.splitIgnoreCase(this.triggers, "WORLD-SWITCH", ",");
-			this.giveOnRegionEnter = StringUtils.splitIgnoreCase(this.triggers, "REGION-ENTER", ",");
-			this.giveOnRegionLeave = StringUtils.splitIgnoreCase(this.triggers, "REGION-REMOVE", ",") || StringUtils.splitIgnoreCase(this.triggers, "REGION-EXIT", ",") || StringUtils.splitIgnoreCase(this.triggers, "REGION-LEAVE", ",");
-			this.giveOnRegionAccess = StringUtils.splitIgnoreCase(this.triggers, "REGION-ACCESS", ",");
-			this.giveOnRegionEgress = StringUtils.splitIgnoreCase(this.triggers, "REGION-EGRESS", ","); 
-			if (this.giveOnRegionAccess || this.giveOnRegionEgress) { this.giveOnRegionEnter = false; this.giveOnRegionLeave = false; }
-			this.useOnLimitSwitch = StringUtils.splitIgnoreCase(this.triggers, "GAMEMODE-SWITCH", ",");
-			this.setOnlyFirstJoin(StringUtils.splitIgnoreCase(this.triggers, "FIRST-JOIN", ","));
-			this.setOnlyFirstLife(StringUtils.splitIgnoreCase(this.triggers, "FIRST-LIFE", ","));
-			this.onlyFirstWorld = StringUtils.splitIgnoreCase(this.triggers, "FIRST-WORLD", ",");
-		} else { this.giveOnJoin = true; }
+		final String defaultTriggers = ConfigHandler.getConfig().getFile("config.yml").getString("Settings.Default-Triggers");
+		this.triggers = (this.nodeLocation.getString("triggers") != null ? this.nodeLocation.getString("triggers") : (defaultTriggers != null && !defaultTriggers.isEmpty() ? defaultTriggers : "JOIN"));
+		this.giveOnDisabled = StringUtils.splitIgnoreCase(this.triggers, "DISABLED", ",");
+		this.giveOnJoin = StringUtils.splitIgnoreCase(this.triggers, "JOIN", ",");
+		this.giveOnRespawn = StringUtils.splitIgnoreCase(this.triggers, "RESPAWN", ",");
+		this.giveOnWorldSwitch = StringUtils.splitIgnoreCase(this.triggers, "WORLD-CHANGE", ",") || StringUtils.splitIgnoreCase(this.triggers, "WORLD-SWITCH", ",");
+		this.giveOnRegionEnter = StringUtils.splitIgnoreCase(this.triggers, "REGION-ENTER", ",");
+		this.giveOnRegionLeave = StringUtils.splitIgnoreCase(this.triggers, "REGION-REMOVE", ",") || StringUtils.splitIgnoreCase(this.triggers, "REGION-EXIT", ",") || StringUtils.splitIgnoreCase(this.triggers, "REGION-LEAVE", ",");
+		this.giveOnRegionAccess = StringUtils.splitIgnoreCase(this.triggers, "REGION-ACCESS", ",");
+		this.giveOnRegionEgress = StringUtils.splitIgnoreCase(this.triggers, "REGION-EGRESS", ","); 
+		if (this.giveOnRegionAccess || this.giveOnRegionEgress) { this.giveOnRegionEnter = false; this.giveOnRegionLeave = false; }
+		this.useOnLimitSwitch = StringUtils.splitIgnoreCase(this.triggers, "GAMEMODE-SWITCH", ",");
+		this.setOnlyFirstJoin(StringUtils.splitIgnoreCase(this.triggers, "FIRST-JOIN", ","));
+		this.setOnlyFirstLife(StringUtils.splitIgnoreCase(this.triggers, "FIRST-LIFE", ","));
+		this.onlyFirstWorld = StringUtils.splitIgnoreCase(this.triggers, "FIRST-WORLD", ",");
 	}
 	
    /**
