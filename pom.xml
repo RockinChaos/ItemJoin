@@ -126,12 +126,12 @@
 		<!--PlaceholderAPI Repository-->
 		<repository>
 			<id>placeholderapi</id>
-			<url>http://repo.extendedclip.com/content/repositories/placeholderapi/</url>
+			<url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
 		</repository>
 		<!--AuthMe Repository-->
 		<repository>
 			<id>codemc-repo</id>
-			<url>http://repo.codemc.org/repository/maven-public/</url>
+			<url>https://repo.codemc.org/repository/maven-public/</url>
 		</repository>
 		<!--Mojang Repository-->
 		<repository>
