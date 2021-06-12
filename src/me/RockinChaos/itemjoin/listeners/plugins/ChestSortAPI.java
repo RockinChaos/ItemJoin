@@ -35,7 +35,7 @@ public class ChestSortAPI implements Listener {
 	* @param event - ChestSortEvent
 	*/
 	@EventHandler(ignoreCancelled = true)
-	private void onChestSortEvent(de.jeff_media.ChestSortAPI.ChestSortEvent event) {
+	private void onChestSortEvent(de.jeff_media.chestsort.ChestSortEvent event) {
 		Player player = (Player) event.getPlayer();
 		if (player == null) { player = (Player) event.getInventory().getViewers().get(0); }
 	  	if (StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "TRUE", ",") || StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), player.getWorld().getName(), ",")
