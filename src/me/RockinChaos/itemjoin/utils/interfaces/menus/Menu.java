@@ -4622,6 +4622,17 @@ public class Menu {
 				}
 				flagPane(player, itemMap);
 			}));
+			flagPane.addButton(new Button(ItemHandler.getItem("DIAMOND_HELMET", 1, itemMap.isEquip(), "&a&l&nCancel Equip", "&7", 
+					"&a&lTrue&f: &7Prevents the item from being", "&7moved or switched to armor slots.", "&7",	
+					"&c&lFalse&f:&7 Allows the item to be moved", "&7freely inside the players inventory.", "&7", 
+					"&9&lENABLED: &a" + (itemMap.isEquip() + "").toUpperCase()), event -> {
+				if (itemMap.isEquip()) {
+					itemMap.setEquip(false);
+				} else {
+					itemMap.setEquip(true);
+				}
+				flagPane(player, itemMap);
+			}));
 			flagPane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, itemMap.isDynamic(), "&a&l&nDynamic", "&7", 
 					"&a&lTrue&f: &7Allows the item to dynamically", "&7update every 100 ticks", "&7Useful for updating placeholders.", "&7",
 					"&c&lFalse&f: &7Item will not update its name, lore, etc.", "&7", 
@@ -4755,7 +4766,7 @@ public class Menu {
 				}
 				flagPane(player, itemMap);
 			}));
-			flagPane.addButton(new Button(ItemHandler.getItem("DIAMOND_HELMET", 1, itemMap.isItemChangable(), "&a&l&nAllow Modifications", "&7", 
+			flagPane.addButton(new Button(ItemHandler.getItem("116", 1, itemMap.isItemChangable(), "&a&l&nAllow Modifications", "&7", 
 					"&a&lTrue&f: &7Allows the players to modify the item", "&7while retaining all properties.", "&7",
 					"&c&lFalse&f: &7Item will not be modifiable.", "&7", 
 					"&9&lENABLED: &a" + (itemMap.isItemChangable() + "").toUpperCase()), event -> {
@@ -4763,18 +4774,6 @@ public class Menu {
 					itemMap.setItemChangable(false);
 				} else {
 					itemMap.setItemChangable(true);
-				}
-				flagPane(player, itemMap);
-			}));
-			flagPane.addButton(new Button(ItemHandler.getItem("ITEM_FRAME", 1, itemMap.isGiveNext(), "&a&l&nGive Next", "&7", 
-					"&a&lTrue&f: &7Gives the item to the next available slot", "&7only if the defined slot already has an existing item.", 
-					"&cNOTE: &7The overwrite flag will not work.", "&7",
-					"&c&lFalse&f:&7 The item will be only given in the defined slot.", "&7If an item is already in the slot the", "&7item wont be given, unless the overwrite", "&7flag is set to &l&aTrue&7.", "&7", 
-					"&9&lENABLED: &a" + (itemMap.isGiveNext() + "").toUpperCase()), event -> {
-				if (itemMap.isGiveNext()) {
-					itemMap.setGiveNext(false);
-				} else {
-					itemMap.setGiveNext(true);
 				}
 				flagPane(player, itemMap);
 			}));
@@ -4791,6 +4790,18 @@ public class Menu {
 					flagPane(player, itemMap);
 				}));
 			} else { flagPane.addButton(new Button(fillerPaneBItem)); }
+			flagPane.addButton(new Button(ItemHandler.getItem("ITEM_FRAME", 1, itemMap.isGiveNext(), "&a&l&nGive Next", "&7", 
+					"&a&lTrue&f: &7Gives the item to the next available slot", "&7only if the defined slot already has an existing item.", 
+					"&cNOTE: &7The overwrite flag will not work.", "&7",
+					"&c&lFalse&f:&7 The item will be only given in the defined slot.", "&7If an item is already in the slot the", "&7item wont be given, unless the overwrite", "&7flag is set to &l&aTrue&7.", "&7", 
+					"&9&lENABLED: &a" + (itemMap.isGiveNext() + "").toUpperCase()), event -> {
+				if (itemMap.isGiveNext()) {
+					itemMap.setGiveNext(false);
+				} else {
+					itemMap.setGiveNext(true);
+				}
+				flagPane(player, itemMap);
+			}));
 			flagPane.addButton(new Button(ItemHandler.getItem("MINECART", 1, itemMap.isMoveNext(), "&a&l&nMove Next", "&7", 
 					"&a&lTrue&f: &7Moves the existing item to the next available slot", "&7only if the defined slot already has an existing item.", 
 					"&cNOTE: &7The overwrite flag will not work.", "&7",
@@ -4825,7 +4836,6 @@ public class Menu {
 				}
 				flagPane(player, itemMap);
 			}));
-			flagPane.addButton(new Button(fillerPaneBItem));
 		});
 		flagPane.open(player);
 	}
@@ -4845,6 +4855,7 @@ public class Menu {
 		if (itemMap.isAttributesInfo()) { itemflags += "HIDE-ATTRIBUTES, "; }
 		if (itemMap.isDurabilityBar()) { itemflags += "HIDE-DURABILITY, "; }
 		if (itemMap.isPlaceable()) { itemflags += "PLACEMENT, "; }
+		if (itemMap.isEquip()) { itemflags += "CANCEL-EQUIP, "; }
 		if (itemMap.isMovement()) { itemflags += "INVENTORY-MODIFY, "; }
 		if (itemMap.isInventoryClose()) { itemflags += "INVENTORY-CLOSE, "; }
 		if (itemMap.isDynamic()) { itemflags += "DYNAMIC, "; }

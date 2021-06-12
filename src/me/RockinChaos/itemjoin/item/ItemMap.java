@@ -248,6 +248,7 @@ public class ItemMap {
 	private boolean blockPlacement = false;
 	private boolean hideAttributes = false;
 	private boolean hideDurability = false;
+	private boolean blockEquip = false;
 	private boolean blockMovement = false;
 	private boolean closeInventory = false;
 	private boolean selfDroppable = false;
@@ -465,6 +466,7 @@ public class ItemMap {
 			this.disposable = StringUtils.containsIgnoreCase(this.itemflags, "disposable");
 			this.blockPlacement = StringUtils.containsIgnoreCase(this.itemflags, "placement");
 			this.blockMovement = StringUtils.containsIgnoreCase(this.itemflags, "inventory-modify") || StringUtils.containsIgnoreCase(this.itemflags, "inventory-close");
+			this.blockEquip = StringUtils.containsIgnoreCase(this.itemflags, "cancel-equip");
 			this.closeInventory = StringUtils.containsIgnoreCase(this.itemflags, "inventory-close");
 			this.itemChangable = StringUtils.containsIgnoreCase(this.itemflags, "allow-modifications") || StringUtils.containsIgnoreCase(this.itemflags, "item-changable");
 			this.alwaysGive = StringUtils.containsIgnoreCase(this.itemflags, "always-give");
@@ -1544,6 +1546,15 @@ public class ItemMap {
     */
 	public void setMovement(final boolean bool) {
 		this.blockMovement = bool;
+	}
+	
+   /**
+    * Sets the Equip Flag.
+    * 
+    * @param bool - The value to be set.
+    */
+	public void setEquip(final boolean bool) {
+		this.blockEquip = bool;
 	}
 	
    /**
@@ -3156,6 +3167,15 @@ public class ItemMap {
 	}
 	
    /**
+    * Checks if the Equip Flag is enabled.
+    * 
+    * @return If it is enabled.
+    */
+	public boolean isEquip() {
+		return this.blockEquip;
+	}
+	
+   /**
     * Checks if the Inventory Close Flag is enabled.
     * 
     * @return If it is enabled.
@@ -3277,6 +3297,7 @@ public class ItemMap {
 			else if (findFlag.equals("self-drops")) { return selfDroppable; } 
 			else if (findFlag.equals("death-drops")) { return deathDroppable; } 
 			else if (findFlag.equals("death-keep")) { return deathKeepable; } 
+			else if (findFlag.equals("cancel-equip")) { return blockEquip; }
 			else if (findFlag.equals("inventory-modify")) { return blockMovement; }
 			else if (findFlag.equals("inventory-close")) { return closeInventory; }
 			else if (findFlag.equals("item-store")) { return itemStore; } 

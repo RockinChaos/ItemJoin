@@ -21,14 +21,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.inventory.InventoryType.SlotType;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
@@ -119,6 +124,106 @@ public class Clicking implements Listener {
 				}
 			}
 		}
+	}
+	
+   /**
+	* Prevents the custom item from being equipped upon clicking and moving it to the armor slots.
+	* 
+	* @param event - InventoryClickEvent
+	*/
+	@EventHandler(ignoreCancelled = false)
+	private void onEquipment(InventoryClickEvent event) {
+		final Player player = (Player) event.getWhoClicked();
+		if (StringUtils.containsIgnoreCase(event.getAction().name(), "HOTBAR") && event.getView().getBottomInventory().getSize() >= event.getHotbarButton() && event.getHotbarButton() >= 0
+			&& !event.getClick().name().equalsIgnoreCase("MIDDLE") && event.getSlotType() == SlotType.ARMOR && event.getView().getBottomInventory().getItem(event.getHotbarButton()) != null 
+			&& event.getView().getBottomInventory().getItem(event.getHotbarButton()).getType() != Material.AIR
+		 	&& this.isEquipment(player, event.getView().getBottomInventory().getItem(event.getHotbarButton()), "EQUIPPED", String.valueOf(event.getSlot()))
+		 	&& !ItemUtilities.getUtilities().isAllowed(player, event.getView().getBottomInventory().getItem(event.getHotbarButton()), "cancel-equip")) {
+			event.setCancelled(true);
+			PlayerHandler.updateInventory(player, 1L);
+		}
+		if (!event.getClick().name().equalsIgnoreCase("MIDDLE") && event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR) {
+			if (event.getSlotType() == SlotType.ARMOR
+					&& this.isEquipment(player, event.getCurrentItem(), "UNEQUIPPED", String.valueOf(event.getSlot()))
+					&& !ItemUtilities.getUtilities().isAllowed(player, event.getCurrentItem(), "cancel-equip")) {
+				event.setCancelled(true);
+				PlayerHandler.updateInventory(player, 1L);
+			} else if (event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
+			String[] itemType = event.getCurrentItem().getType().name().split("_");
+				if (itemType.length >= 2 && itemType[1] != null && !itemType[1].isEmpty() && StringUtils.isInt(StringUtils.getArmorSlot(itemType[1], true)) 
+					&& player.getInventory().getItem(Integer.parseInt(StringUtils.getArmorSlot(itemType[1], true))) == null
+					&& this.isEquipment(player, event.getCurrentItem(), "SHIFT_EQUIPPED", String.valueOf(event.getSlot()))
+					&& !ItemUtilities.getUtilities().isAllowed(player, event.getCurrentItem(), "cancel-equip")) {
+				event.setCancelled(true);
+				PlayerHandler.updateInventory(player, 1L);
+				}
+			}
+		}
+		if (!event.getClick().name().equalsIgnoreCase("MIDDLE") && !event.getClick().name().contains("SHIFT") 
+				&& event.getSlotType() == SlotType.ARMOR && event.getCursor() != null && event.getCursor().getType() != Material.AIR
+				&& this.isEquipment(player, event.getCursor(), "EQUIPPED", String.valueOf(event.getSlot()))
+				&& !ItemUtilities.getUtilities().isAllowed(player, event.getCursor(), "cancel-equip")) {
+				event.setCancelled(true);
+				PlayerHandler.updateInventory(player, 1L);
+		}
+	}
+	
+   /**
+	* Prevents the custom item from being equipped upon clicking and dragging it to the armor slots.
+	* 
+	* @param event - InventoryDragEvent
+	*/
+	@EventHandler(ignoreCancelled = false)
+	private void onEquipmentDrag(InventoryDragEvent event) {
+		final Player player = (Player) event.getWhoClicked();
+		final Set<Integer> slideSlots = event.getInventorySlots();
+		int slot = 0; for (int actualSlot: slideSlots) { slot = actualSlot; break; }
+		if (event.getOldCursor() != null && event.getOldCursor().getType() != Material.AIR
+				&& this.isEquipment(player, event.getOldCursor(), "EQUIPPED", String.valueOf(slot))
+				&& !ItemUtilities.getUtilities().isAllowed(player, event.getOldCursor(), "cancel-equip")) {
+				event.setCancelled(true);
+				PlayerHandler.updateInventory(player, 1L);
+		}
+	}
+	
+   /**
+	* Prevents the custom item from being equipped upon right clicking it from their hand to the armor slots.
+	* 
+	* @param event - PlayerInteractEvent
+	*/
+	@EventHandler(ignoreCancelled = false)
+	private void onEquipmentClick(PlayerInteractEvent event) {
+		final Player player = event.getPlayer();
+		final ItemStack item = (event.getItem() != null ? event.getItem().clone() : event.getItem());
+		if (item != null && item.getType() != Material.AIR && !PlayerHandler.isMenuClick(player.getOpenInventory(), event.getAction())) {
+			final String[] itemType = item.getType().name().split("_");
+			if (itemType.length >= 2 && itemType[1] != null && !itemType[1].isEmpty() && StringUtils.isInt(StringUtils.getArmorSlot(itemType[1], true)) 
+				&& player.getInventory().getItem(Integer.parseInt(StringUtils.getArmorSlot(itemType[1], true))) == null
+				&& this.isEquipment(player, item, "EQUIPPED", StringUtils.getArmorSlot(itemType[1], true))
+				|| !ItemUtilities.getUtilities().isAllowed(player, item, "cancel-equip"))) {
+				event.setCancelled(true);
+				PlayerHandler.updateInventory(player, 1L);
+			}
+		}
+	}
+	
+   /**
+	* Checks if the item being moved is actually an equippable item.
+    * 
+	* @param player - that is interacting with the item.
+	* @param item - the item the player is trying to move.
+	* @param clickType - the clicking type that is being performed.
+	* @param slot - the slot the item originally resided in.
+ * @return 
+	*/
+	private boolean isEquipment(final Player player, final ItemStack item, String clickType, final String slot) {
+			final String[] itemType = item.getType().name().split("_");
+			if (itemType.length >= 2 && itemType[1] != null && !itemType[1].isEmpty() && !itemType[1].equalsIgnoreCase("HEAD") 
+					&& (clickType.equalsIgnoreCase("SHIFT_EQUIPPED") || itemType[1].equalsIgnoreCase(StringUtils.getArmorSlot(slot, false)) 
+					|| (itemType[1].equalsIgnoreCase("HEAD") && StringUtils.getArmorSlot(slot, false).equalsIgnoreCase("HELMET")))) {
+				return true;
+			}
+			return false;
 	}
 	
    /**
