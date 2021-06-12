@@ -200,6 +200,7 @@ public class Clicking implements Listener {
 			if (itemType.length >= 2 && itemType[1] != null && !itemType[1].isEmpty() && StringUtils.isInt(StringUtils.getArmorSlot(itemType[1], true)) 
 				&& player.getInventory().getItem(Integer.parseInt(StringUtils.getArmorSlot(itemType[1], true))) == null
 				&& this.isEquipment(player, item, "EQUIPPED", StringUtils.getArmorSlot(itemType[1], true))
+				&& (!ItemUtilities.getUtilities().isAllowed(player, item, "inventory-modify")
 				|| !ItemUtilities.getUtilities().isAllowed(player, item, "cancel-equip"))) {
 				event.setCancelled(true);
 				PlayerHandler.updateInventory(player, 1L);
