@@ -244,10 +244,9 @@
 		</dependency>
 		<!--SkinsRestorer API-->
 		<dependency>
-			<groupId>com</groupId>
-			<artifactId>skinsrestorer</artifactId>
-			<version>14.0.0</version>
-			<scope>provided</scope>
+            <groupId>net.skinsrestorer</groupId>
+            <artifactId>skinsrestorer</artifactId>
+            <version>14.0.0</version>
 		</dependency>
 		<!--Citizens API-->
         <dependency>
