@@ -18,14 +18,13 @@
 package me.RockinChaos.itemjoin.utils.api;
 
 import org.bukkit.Bukkit;
-
 import com.mojang.authlib.properties.Property;
 
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
+import me.RockinChaos.itemjoin.utils.ReflectionUtils;
 import me.RockinChaos.itemjoin.utils.ServerUtils;
 import me.RockinChaos.itemjoin.utils.api.MetricsAPI.SimplePie;
-import skinsrestorer.bukkit.SkinsRestorer;
 
 public class DependAPI {
 	
@@ -191,7 +190,27 @@ public class DependAPI {
     * @return The found Skin Texture value.
     */
     public String getSkinValue(final String owner) {
-    	return ((Property) SkinsRestorer.getInstance().getSkinsRestorerBukkitAPI().getSkinData(owner)).getValue();
+    	Class<?> netty = null;
+    	try {
+    		netty = ReflectionUtils.getClass("net.skinsrestorer.bukkit.SkinsRestorer");
+    	} catch (Exception e1) {
+    		try {
+    			netty = ReflectionUtils.getClass("skinsrestorer.bukkit.SkinsRestorer");
+    		} catch (Exception e2) {
+    			ServerUtils.logSevere("{DependAPI} Unsupported SkinsRestorer version detected, unable to set the skull owner " + owner + ".");
+    		}
+    	}
+    	if (netty != null) {
+	    	try {
+				final Object skinsRestorer = netty.getMethod("getInstance").invoke(null);
+				final Object skinsAPI = skinsRestorer.getClass().getMethod("getSkinsRestorerBukkitAPI").invoke(skinsRestorer);
+				final Object skinData = skinsAPI.getClass().getMethod("getSkinData", String.class).invoke(skinsAPI, owner);
+				return ((Property) skinData).getValue();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+    	}
+    	return owner;
     }
     
    /**

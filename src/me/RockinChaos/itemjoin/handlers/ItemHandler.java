@@ -50,6 +50,7 @@ import me.RockinChaos.itemjoin.utils.ReflectionUtils;
 import me.RockinChaos.itemjoin.utils.SchedulerUtils;
 import me.RockinChaos.itemjoin.utils.ServerUtils;
 import me.RockinChaos.itemjoin.utils.StringUtils;
+import me.RockinChaos.itemjoin.utils.api.DependAPI;
 import me.RockinChaos.itemjoin.utils.api.LegacyAPI;
 import me.RockinChaos.itemjoin.utils.sql.DataObject;
 import me.RockinChaos.itemjoin.utils.sql.SQL;
@@ -412,7 +413,9 @@ public class ItemHandler {
 		if (!owner.isEmpty()) {
 			SkullMeta skullMeta = (SkullMeta)meta;
 			OfflinePlayer player = LegacyAPI.getOfflinePlayer(owner);
-			if (player != null) {
+			if (DependAPI.getDepends(false).skinsRestorerEnabled()) {
+				setSkullTexture(meta, DependAPI.getDepends(false).getSkinValue(owner));
+			} else if (player != null) {
 				try {
 					skullMeta.setOwningPlayer(player);
 				} catch (Throwable t) {
