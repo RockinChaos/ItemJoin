@@ -35,8 +35,10 @@ import org.bukkit.inventory.ItemStack;
 public final class ReflectionUtils {
 	private static String OBC_PREFIX = Bukkit.getServer().getClass().getPackage().getName();
 	private static String NMS_PREFIX = OBC_PREFIX.replace("org.bukkit.craftbukkit", "net.minecraft.server");
+	private static String MC_PREFIX = "net.minecraft";
 	private static String VERSION = OBC_PREFIX.replace("org.bukkit.craftbukkit", "").replace(".", "");
 	private static Pattern MATCH_VARIABLE = Pattern.compile("\\{([^\\}]+)\\}");
+	private static boolean NO_REFLECTIONS = (Integer.parseInt(VERSION.replace("_", "").replace("R0", "").replace("R1", "").replace("R2", "").replace("R3", "").replace("R4", "").replace("R5", "").replaceAll("[a-z]", "")) >= 117);
 	
    /**
 	* An interface for invoking a specific constructor.
@@ -346,7 +348,11 @@ public final class ReflectionUtils {
 	* @throws IllegalArgumentException If the class doesn't exist.
 	*/
 	public static Class<?> getMinecraftClass(final String name) {
-		return getCanonicalClass(NMS_PREFIX + "." + name);
+		if (NO_REFLECTIONS) {
+			return getMinecraftTag(name);
+		} else { 
+			return getCanonicalClass(NMS_PREFIX + "." + name); 
+		}
 	}
 
    /**
@@ -405,7 +411,7 @@ public final class ReflectionUtils {
 	*/
 	public static void sendPacket(final Player player, final Object packet) throws Exception {
 	    Object nmsPlayer = player.getClass().getMethod("getHandle").invoke(player);
-	    Object playerHandle = nmsPlayer.getClass().getField("playerConnection").get(nmsPlayer);
+	    Object playerHandle = nmsPlayer.getClass().getField((NO_REFLECTIONS ? "b" : "playerConnection")).get(nmsPlayer);
 	    playerHandle.getClass().getMethod("sendPacket", getMinecraftClass("Packet")).invoke(playerHandle, packet);
 	}
 
@@ -421,19 +427,70 @@ public final class ReflectionUtils {
 		while (matcher.find()) {
 			String variable = matcher.group(1);
 			String replacement = "";
-			if ("nms".equalsIgnoreCase(variable))
+			if ("nms".equalsIgnoreCase(variable)) {
+				if (NO_REFLECTIONS) {
+					replacement = MC_PREFIX;
+				}
 				replacement = NMS_PREFIX;
-			else if ("obc".equalsIgnoreCase(variable))
+			}
+			else if ("obc".equalsIgnoreCase(variable)) {
 				replacement = OBC_PREFIX;
-			else if ("version".equalsIgnoreCase(variable))
+			}
+			else if ("version".equalsIgnoreCase(variable)) {
 				replacement = VERSION;
-			else
+			}
+			else {
 				throw new IllegalArgumentException("Unknown variable: " + variable);
+			}
 			if (replacement.length() > 0 && matcher.end() < name.length() && name.charAt(matcher.end()) != '.')
 				replacement += ".";
 			matcher.appendReplacement(output, Matcher.quoteReplacement(replacement));
+			
 		}
 		matcher.appendTail(output);
 		return output.toString();
+	}
+	
+   /**
+	* Searchable tags that no longer require NBT Reflections.
+	* 
+	*/
+	public enum MinecraftTags {
+		NBTTagCompound(".nbt"),
+		NBTTagList(".nbt"),
+		NBTTagString(".nbt"),
+		NBTBase(".nbt"),
+		ItemStack(".world.item"),
+		Packet(".network.protocol"),
+		PacketLoginInStart(".network.protocol.login"),
+		PacketPlayOutSetSlot(".network.protocol.game"),
+		PlayerConnection(".server.network"),
+		EntityPlayer(".server.level"),
+		NetworkManager(".network"),
+		MinecraftServer(".server"),
+		ServerConnection(".server.network");
+		public String tag;
+		private MinecraftTags(final String tag) {
+			this.tag = tag;
+		}
+	}
+	    	
+   /**
+	* Gets the correct location of the searchable tag.
+	* 
+	* @param name - The Tag being located.
+	* @return The located searchable tag.
+	*/
+	public static Class<?> getMinecraftTag(final String name) {
+		for (MinecraftTags tag: MinecraftTags.values()) {
+		    if (tag.name().equalsIgnoreCase(name)) {
+		        return getCanonicalClass(MC_PREFIX + tag.tag + "."  + name);
+		    }
+		}
+		return null;
+	}
+	
+	public static boolean noReflections() {
+		return NO_REFLECTIONS;
 	}
 }

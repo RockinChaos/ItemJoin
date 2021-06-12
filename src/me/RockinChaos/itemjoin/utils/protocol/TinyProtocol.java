@@ -65,12 +65,12 @@ public abstract class TinyProtocol {
 	private final AtomicInteger ID = new AtomicInteger(0);
 
 	private final MethodInvoker getPlayerHandle = ReflectionUtils.getMethod("{obc}.entity.CraftPlayer", "getHandle");
-	private final FieldAccessor<Object> getConnection = ReflectionUtils.getField("{nms}.EntityPlayer", "playerConnection", Object.class);
-	private final FieldAccessor<Object> getManager = ReflectionUtils.getField("{nms}.PlayerConnection", "networkManager", Object.class);
-	private final FieldAccessor<Channel> getChannel = ReflectionUtils.getField("{nms}.NetworkManager", Channel.class, 0);
+	private final FieldAccessor<Object> getConnection = ReflectionUtils.getField(ReflectionUtils.getMinecraftClass("EntityPlayer").getCanonicalName(), (ReflectionUtils.noReflections() ? "b" : "playerConnection"), Object.class);
+	private final FieldAccessor<Object> getManager = ReflectionUtils.getField(ReflectionUtils.getMinecraftClass("PlayerConnection").getCanonicalName(), (ReflectionUtils.noReflections() ? "a" : "networkManager"), Object.class);
+	private final FieldAccessor<Channel> getChannel = ReflectionUtils.getField(ReflectionUtils.getMinecraftClass("NetworkManager").getCanonicalName(), Channel.class, 0);
 
-	private final Class<Object> minecraftServerClass = ReflectionUtils.getUntypedClass("{nms}.MinecraftServer");
-	private final Class<Object> serverConnectionClass = ReflectionUtils.getUntypedClass("{nms}.ServerConnection");
+	private final Class<Object> minecraftServerClass = ReflectionUtils.getUntypedClass(ReflectionUtils.getMinecraftClass("MinecraftServer").getCanonicalName());
+	private final Class<Object> serverConnectionClass = ReflectionUtils.getUntypedClass(ReflectionUtils.getMinecraftClass("ServerConnection").getCanonicalName());
 	private final FieldAccessor<Object> getMinecraftServer = ReflectionUtils.getField("{obc}.CraftServer", minecraftServerClass, 0);
 	private final FieldAccessor<Object> getServerConnection = ReflectionUtils.getField(minecraftServerClass, serverConnectionClass, 0);
 	private final FieldAccessor<?> getNetworkMarkers = ReflectionUtils.getField(serverConnectionClass, (Class<?>)List.class, 1);
