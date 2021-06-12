@@ -32,6 +32,7 @@ import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -69,7 +70,10 @@ public class UpdateHandler {
     * @param sender - The executor of the update checking.
     */
     public void forceUpdates(final CommandSender sender) {
-    	if (this.updateNeeded(sender, false)) {
+    	boolean updateNeeded = false;
+    	try { updateNeeded = this.updateNeeded(sender, false); }
+    	catch (IOException e) { ServerUtils.messageSender(sender, "&c&l[403] &cFailed to check for updates, GitHub has detected too many access requests, try again later."); }
+    	if (updateNeeded) {
     		ServerUtils.messageSender(sender, "&aAn update has been found!");
     		ServerUtils.messageSender(sender, "&aAttempting to update from " + "&ev" + this.localeVersion + " &ato the new "  + "&ev" + this.latestVersion);
     		try {
@@ -116,7 +120,10 @@ public class UpdateHandler {
     * @param onStart - If it is checking for updates on start.
     */
     public void checkUpdates(final CommandSender sender, final boolean onStart) {
-    	if (this.updateNeeded(sender, onStart) && this.updatesAllowed) {
+    	boolean updateNeeded = false;
+    	try { updateNeeded = this.updateNeeded(sender, onStart); }
+    	catch (IOException e) { ServerUtils.messageSender(sender, "&c&l[403] &cFailed to check for updates, GitHub has detected too many access requests, try again later."); }
+    	if (updateNeeded && this.updatesAllowed) {
     		if (this.betaVersion) {
     			ServerUtils.messageSender(sender, "&cYour current version: &bv" + this.localeVersion + "-SNAPSHOT");
     			ServerUtils.messageSender(sender, "&cThis &bSNAPSHOT &cis outdated and a release version is now available.");
@@ -147,7 +154,7 @@ public class UpdateHandler {
     * @param onStart - If it is checking for updates on start.
     * @return If an update is needed.
     */
-    private boolean updateNeeded(final CommandSender sender, final boolean onStart) {
+    private boolean updateNeeded(final CommandSender sender, final boolean onStart) throws IOException {
     	if (this.updatesAllowed) {
     		if (!onStart) { ServerUtils.messageSender(sender, "&aChecking for updates..."); }
     		try {
