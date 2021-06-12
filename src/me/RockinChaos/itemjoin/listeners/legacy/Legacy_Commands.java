@@ -373,6 +373,7 @@ public class Legacy_Commands implements Listener {
 	* @param altPlayer - that is associated with the commands.
 	* @param item - the item the player is trying to use to execute a command.
 	* @param action - the action that is being performed.
+	* @param clickType - the clicking type that is being performed.
 	* @param slot - the slot the item originally resided in.
 	* @param slotType - the SlotType the item originated in.
 	* @deprecated This is a LEGACY method, only use on Minecraft versions below 1.8.
