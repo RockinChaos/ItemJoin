@@ -126,10 +126,16 @@ public class Menu {
 	private static void itemSettings(final Player player) {
 		Interface itemPane = new Interface(false, 3, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
-			itemPane.addButton(new Button(fillerPaneBItem), 3);
 			itemPane.addButton(new Button(ItemHandler.getItem("347", 1, false, "&bTrigger Delay", "&7", "&7*This is the delay in half-seconds", "&7that ItemJoin will wait", "&7to give you the items.", "&7",
 					"&cNOTE: &7It is recommended to", "&7set this to 2 or 3 half-seconds.", "&9&lDELAY: &a" + String.valueOf(ConfigHandler.getConfig().getFile("items.yml").getString("items-Delay")).toUpperCase() + " half-second(s)"), 
 					event -> numberPane(player, 1)));
+			itemPane.addButton(new Button(fillerPaneBItem));
+			final String defaultTriggers = ConfigHandler.getConfig().getFile("config.yml").getString("Settings.Default-Triggers");
+			itemPane.addButton(new Button(ItemHandler.getItem("REDSTONE", 1, false, 
+					"&bDefault Triggers", "&7", "&7*This will be the default", "&7triggers used if a custom", "&7item is defined without", "&7specifying any triggers.", 
+					"&9&lENABLED: &a" + String.valueOf((!defaultTriggers.isEmpty() && !StringUtils.containsIgnoreCase(defaultTriggers, "DISABLE")) ? defaultTriggers : "FALSE").toUpperCase()), 
+					event -> triggerPane(player, 0)));
+			itemPane.addButton(new Button(fillerPaneBItem));
 			itemPane.addButton(new Button(ItemHandler.getItem("COOKIE", 1, ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Obtain-Items"), 
 					"&bItem Permissions", "&7", "&7*If custom items should require", "&7the player to have specific", "&7permissions to receive the item.", 
 					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Obtain-Items")).toUpperCase()), 
@@ -141,6 +147,7 @@ public class Menu {
 						ConfigHandler.getConfig().softReload();
 						SchedulerUtils.runLater(2L, () -> itemSettings(player));
 					}));
+			itemPane.addButton(new Button(fillerPaneBItem));
 			itemPane.addButton(new Button(ItemHandler.getItem("33", 1, ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Obtain-Items-OP"), 
 					"&bItem Permissions &c&l[OP PLAYERS]", "&7", "&7*If custom items should require", "&7the &c&lOP player(s)&7 to have specific", "&7permissions to receive the item.", "&c&lNOTE: &7This only applies to &c&lOP player(s)&7.", 
 					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Obtain-Items-OP")).toUpperCase()), 
@@ -152,8 +159,7 @@ public class Menu {
 						ConfigHandler.getConfig().softReload();
 						SchedulerUtils.runLater(2L, () -> itemSettings(player));
 					}));
-
-			itemPane.addButton(new Button(fillerPaneBItem), 3);
+			itemPane.addButton(new Button(fillerPaneBItem));
 			itemPane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, ConfigHandler.getConfig().getFile("items.yml").getBoolean("items-Overwrite"), 
 					"&bOverwrite", "&7", "&7*Setting this to true will allow", "&7all custom items to overwrite", "&7any custom or vanilla items.", "&7", "&cNOTE: &7If set to false, the", "&7overwrite itemflag will still", "&7function normally.",
 					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig().getFile("items.yml").getString("items-Overwrite")).toUpperCase()), event -> overwritePane(player)));
@@ -190,16 +196,28 @@ public class Menu {
 						ConfigHandler.getConfig().softReload();
 						SchedulerUtils.runLater(2L, () -> itemSettings(player));
 					}));
+			itemPane.addButton(new Button(ItemHandler.getItem("IRON_HELMET", 1, ConfigHandler.getConfig().getFile("config.yml").getBoolean("Settings.HeldItem-Animations"), 
+					"&bHeld Item Animations", "&7", "&7*If the animate or dynamic", "&7itemflags should update the item", "&7while the player is holding the item.", "&7", 
+					"&7This essentially prevents the", "&7glitchy held item animation", "&7from the item constantly updating.", 
+					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig().getFile("config.yml").getBoolean("Settings.HeldItem-Animations")).toUpperCase()), 
+					event -> {
+						File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
+						dataFile.set("Settings.HeldItem-Animations", !ConfigHandler.getConfig().getFile("config.yml").getBoolean("Settings.HeldItem-Animations")); 	
+						ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+						ConfigHandler.getConfig().reloadConfigs(true);
+						SchedulerUtils.runLater(2L, () -> itemSettings(player));
+					}));
 			final int heldSlot = ConfigHandler.getConfig().getFile("config.yml").getInt("Settings.HeldItem-Slot");
 			itemPane.addButton(new Button(ItemHandler.getItem("DIAMOND_SWORD", (heldSlot > 0 ? heldSlot : 1), false, 
 					"&bHeld Item Slot", "&7", "&7*This is the hotbar slot that", "&7the player will automatically", "&7have selected upon performing", "&7one of the held item triggers.", 
 					"&9&lSLOT: &a" + String.valueOf((heldSlot >= 0 ? heldSlot : "NONE"))), 
 					event -> numberPane(player, 2)));
 			final String heldTriggers = ConfigHandler.getConfig().getFile("config.yml").getString("Settings.HeldItem-Triggers");
-			itemPane.addButton(new Button(ItemHandler.getItem("REDSTONE", 1, false, 
+			itemPane.addButton(new Button(ItemHandler.getItem("SUGAR", 1, false, 
 					"&bHeld Item Triggers", "&7", "&7*When these trigger(s)", "&7are performed, the held item", "&7slot will be set.", 
 					"&9&lENABLED: &a" + String.valueOf((!heldTriggers.isEmpty() && !StringUtils.containsIgnoreCase(heldTriggers, "DISABLE")) ? heldTriggers : "FALSE").toUpperCase()), 
-					event -> triggerPane(player)));
+					event -> triggerPane(player, 1)));
 			itemPane.addButton(new Button(ItemHandler.getItem("116", 1, ConfigHandler.getConfig().getFile("config.yml").getBoolean("Settings.DataTags"), 
 					"&bDataTags", "&7", "&7*If custom items should use", "&7data tags (NBTTags) to distinguish", "&7each custom item, making them unqiue.", 
 					"&c&lNOTE: &7This only works on Minecraft 1.8+", "&7It is recommended to keep", "&7this set to TRUE.", 
@@ -212,7 +230,6 @@ public class Menu {
 						ConfigHandler.getConfig().reloadConfigs(true);
 						SchedulerUtils.runLater(2L, () -> itemSettings(player));
 					}));
-
 			itemPane.addButton(new Button(ItemHandler.getItem("LAVA_BUCKET", 1, false, 
 					"&bClear Items", "&7", "&7*Modify settings for clearing", "&7specific items when a player", "&7performed a specified action."),
 					event -> clearPane(player)));
@@ -1229,7 +1246,6 @@ public class Menu {
 					ConfigHandler.getConfig().softReload();
 					SchedulerUtils.runLater(2L, () -> databasePane(player));
 				}));
-			databasePane.addButton(new Button(fillerPaneBItem));
 			databasePane.addButton(new Button(ItemHandler.getItem("STONE_BUTTON", 1, false, "&a&lPort", "&7", 
 			"&7*Set the &c&lPort &7for", "&7the MySQL databse connection.", "&9&lPORT: &a" + ConfigHandler.getConfig().getFile("config.yml").getString("Database.port")), 
 				event -> {
@@ -1257,8 +1273,9 @@ public class Menu {
 					SchedulerUtils.runLater(2L, () -> databasePane(player));
 				}));
 			databasePane.addButton(new Button(fillerPaneBItem));
+			final String databaseString = (ConfigHandler.getConfig().getFile("config.yml").getString("Database.table") != null ? "Database.table" : "Database.database");
 			databasePane.addButton(new Button(ItemHandler.getItem("17", 1, false, "&a&lTable", "&7", 
-			"&7*Set the &c&lTable &7for", "&7the MySQL databse connection.", "&9&lTABLE: &a" + ConfigHandler.getConfig().getFile("config.yml").getString("Database.table")), 
+			"&7*Set the &c&lTable &7for", "&7the MySQL databse connection.", "&9&lTABLE: &a" + ConfigHandler.getConfig().getFile("config.yml").getString(databaseString)), 
 				event -> {
 					player.closeInventory();
 					String[] placeHolders = LanguageAPI.getLang(false).newString();
@@ -1272,7 +1289,28 @@ public class Menu {
 					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 					File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
-					dataFile.set("Database.table", ChatColor.stripColor(event.getMessage())); 	
+					dataFile.set(databaseString, ChatColor.stripColor(event.getMessage())); 	
+					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+					ConfigHandler.getConfig().softReload();
+					SchedulerUtils.runLater(2L, () -> databasePane(player));
+				}));
+			databasePane.addButton(new Button(fillerPaneBItem));
+			databasePane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, false, "&a&lPrefix", "&7", 
+			"&7*Set the &c&lTable &7for", "&7the MySQL databse connection.", "&9&lTABLE: &a" + ConfigHandler.getConfig().getFile("config.yml").getString("Database.prefix")), 
+				event -> {
+					player.closeInventory();
+					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					placeHolders[16] = "TABLE PREFIX";
+					placeHolders[15] = "IJ_";
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				}, event -> {
+					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					placeHolders[16] = "TABLE PREFIX";
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+					File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
+					dataFile.set("Database.prefix", ChatColor.stripColor(event.getMessage())); 	
 					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
 					ConfigHandler.getConfig().softReload();
 					SchedulerUtils.runLater(2L, () -> databasePane(player));
@@ -1298,7 +1336,6 @@ public class Menu {
 					ConfigHandler.getConfig().softReload();
 					SchedulerUtils.runLater(2L, () -> databasePane(player));
 				}));
-			databasePane.addButton(new Button(fillerPaneBItem));
 			databasePane.addButton(new Button(ItemHandler.getItem("REDSTONE", 1, false, "&a&lPassword", "&7", 
 			"&7*Set the &c&lPassword &7for", "&7the MySQL databse connection.", "&9&lPORT: &a****"),  
 				event -> {
@@ -1331,19 +1368,109 @@ public class Menu {
     * 
     * @param player - The Player to have the Pane opened.
     */
-	private static void triggerPane(final Player player) {
-		Interface triggerPane = new Interface(false, 2, GUIName, player);
+	private static void triggerPane(final Player player, final int stage) {
+		final Interface triggerPane = new Interface(false, 3, GUIName, player);
+		final String triggerOption = (stage == 0 ? "&7*Gives the custom item when the" : "&7*Sets the held item slot when the");
+		final String triggerString = (stage == 0 ? "Settings.Default-Triggers" : "Settings.HeldItem-Triggers");
 		SchedulerUtils.runAsync(() -> {
 			List<String> triggers = new ArrayList<String>();
-			for (String trigger: ConfigHandler.getConfig().getFile("config.yml").getString("Settings.HeldItem-Triggers").replace(" ", "").split(",")) {
+			for (String trigger: ConfigHandler.getConfig().getFile("config.yml").getString(triggerString).replace(" ", "").split(",")) {
 				if (trigger != null && !trigger.isEmpty()) {
 					triggers.add(trigger);
 				}
 			}
-			triggerPane.addButton(new Button(fillerPaneBItem));
-			triggerPane.addButton(new Button(ItemHandler.getItem("323", 1, StringUtils.containsValue(triggers, "JOIN"), "&e&l&nJoin", "&7", 
-					"&7*Sets the held item slot", "&7upon joinning the server.", 
-			"&9&lENABLED: &a" + (StringUtils.containsValue(triggers, "JOIN") + "").toUpperCase()), event -> {
+			triggerPane.addButton(new Button(fillerPaneBItem), 3);
+			triggerPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "FILLED_MAP" : "MAP"), 1, StringUtils.containsValue(triggers, "FIRST-JOIN"), "&e&l&nFirst Join", "&7", triggerOption, "&7player logs into the server", 
+					"&7for the first time only.", "&7This will overwrite any triggers", "&7such as respawn, and world-switch.", "&9&lENABLED: &a" + (StringUtils.containsValue(triggers, "FIRST-JOIN") + "").toUpperCase()), event -> {
+				if (StringUtils.containsValue(triggers, "FIRST-JOIN")) {
+					triggers.remove("FIRST-JOIN");
+				} else {
+					triggers.add("FIRST-JOIN");
+				}
+				if (triggers.isEmpty()) { 
+					triggers.add("DISABLED"); 
+				} else if (StringUtils.containsValue(triggers, "DISABLED")) {
+					triggers.remove("DISABLED");
+				} else if (StringUtils.containsValue(triggers, "DISABLE")) {
+					triggers.remove("DISABLE");
+				}
+				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
+				dataFile.set(triggerString, triggers.toString().replace("[", "").replace("]", "")); 	
+				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+				ConfigHandler.getConfig().softReload();
+				SchedulerUtils.runLater(2L, () -> triggerPane(player, stage));
+			}));
+			triggerPane.addButton(new Button(ItemHandler.getItem("STONE_SWORD", 1, StringUtils.containsValue(triggers, "FIRST-WORLD"), "&e&l&nFirst World", "&7", triggerOption, "&7player enters each of the defined", "&7worlds for the first time.", "&7", 
+					"&7This flag overwrites any triggers", "&7such as respawn, and join.", "&9&lENABLED: &a" + (StringUtils.containsValue(triggers, "FIRST-WORLD") + "").toUpperCase()), event -> {
+				if (StringUtils.containsValue(triggers, "FIRST-WORLD")) {
+					triggers.remove("FIRST-WORLD");
+				} else {
+					triggers.add("FIRST-WORLD");
+				}
+				if (triggers.isEmpty()) { 
+					triggers.add("DISABLED"); 
+				} else if (StringUtils.containsValue(triggers, "DISABLED")) {
+					triggers.remove("DISABLED");
+				} else if (StringUtils.containsValue(triggers, "DISABLE")) {
+					triggers.remove("DISABLE");
+				}
+				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
+				dataFile.set(triggerString, triggers.toString().replace("[", "").replace("]", "")); 	
+				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+				ConfigHandler.getConfig().softReload();
+				SchedulerUtils.runLater(2L, () -> triggerPane(player, stage));
+			}));
+			triggerPane.addButton(new Button(ItemHandler.getItem(ServerUtils.hasSpecificUpdate("1_13") ? "TOTEM_OF_UNDYING" : "322:1", 1, StringUtils.containsValue(triggers, "FIRST-LIFE"), "&e&l&nFirst Life", "&7", triggerOption, "&7player logs into the server", 
+					"&7for the first time only,", "&7but will give the item", "&7EVERY TIME on player RESPAWN.", "&7This flag overwrites any triggers", "&7such as respawn, and join.", "&9&lENABLED: &a" + (StringUtils.containsValue(triggers, "FIRST-LIFE") + "").toUpperCase()), event -> {
+				if (StringUtils.containsValue(triggers, "FIRST-LIFE")) {
+					triggers.remove("FIRST-LIFE");
+				} else {
+					triggers.add("FIRST-LIFE");
+				}
+				if (triggers.isEmpty()) { 
+					triggers.add("DISABLED"); 
+				} else if (StringUtils.containsValue(triggers, "DISABLED")) {
+					triggers.remove("DISABLED");
+				} else if (StringUtils.containsValue(triggers, "DISABLE")) {
+					triggers.remove("DISABLE");
+				}
+				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
+				dataFile.set(triggerString, triggers.toString().replace("[", "").replace("]", "")); 	
+				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+				ConfigHandler.getConfig().softReload();
+				SchedulerUtils.runLater(2L, () -> triggerPane(player, stage));
+			}));
+			triggerPane.addButton(new Button(fillerPaneBItem), 3);
+			triggerPane.addButton(new Button(ItemHandler.getItem("REDSTONE", 1, (StringUtils.containsValue(triggers, "DISABLE") || StringUtils.containsValue(triggers, "DISABLED")), "&c&l&nDISABLED", "&7", "&7*Disables the use of triggers", "&7for this section.", "&7", "&9&lENABLED: &a" + ((StringUtils.containsValue(triggers, "DISABLE") || StringUtils.containsValue(triggers, "DISABLED")) + "").toUpperCase()), event -> {
+				if (StringUtils.containsValue(triggers, "DISABLE") || StringUtils.containsValue(triggers, "DISABLED")) {
+					triggers.remove("DISABLED"); 
+					triggers.remove("DISABLE");
+				} else if (!(StringUtils.containsValue(triggers, "DISABLE") || StringUtils.containsValue(triggers, "DISABLED"))) {
+					triggers.add("DISABLED"); 
+					triggers.remove("JOIN");
+					triggers.remove("FIRST-JOIN");
+					triggers.remove("FIRST-WORLD");
+					triggers.remove("FIRST-LIFE");
+					triggers.remove("RESPAWN");
+					triggers.remove("WORLD-SWITCH");
+					triggers.remove("GAMEMODE-SWITCH");
+					triggers.remove("REDGION-ENTER");
+					triggers.remove("REGION-LEAVE");
+					triggers.remove("REGION-ACCESS");
+					triggers.remove("REGION-ENGRESS");
+				} 
+				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
+				dataFile.set(triggerString, triggers.toString().replace("[", "").replace("]", "")); 	
+				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+				ConfigHandler.getConfig().softReload();
+				SchedulerUtils.runLater(2L, () -> triggerPane(player, stage));
+			}));
+			triggerPane.addButton(new Button(ItemHandler.getItem("323", 1, StringUtils.containsValue(triggers, "JOIN"), "&e&l&nJoin", "&7", triggerOption, "&7player logs into the server.", 
+					"&9&lENABLED: &a" + (StringUtils.containsValue(triggers, "JOIN") + "").toUpperCase()), event -> {
 				if (StringUtils.containsValue(triggers, "JOIN")) {
 					triggers.remove("JOIN");
 				} else {
@@ -1358,12 +1485,12 @@ public class Menu {
 				}
 				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
-				dataFile.set("Settings.HeldItem-Triggers", triggers.toString().replace("[", "").replace("]", "")); 	
+				dataFile.set(triggerString, triggers.toString().replace("[", "").replace("]", "")); 	
 				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
 				ConfigHandler.getConfig().softReload();
-				SchedulerUtils.runLater(2L, () -> triggerPane(player));
+				SchedulerUtils.runLater(2L, () -> triggerPane(player, stage));
 			}));
-			triggerPane.addButton(new Button(ItemHandler.getItem("DIAMOND", 1, StringUtils.containsValue(triggers, "RESPAWN"), "&e&l&nRespawn", "&7", "&7*Sets the held item slot", "&7upon player respawning.", "&9&lENABLED: &a" + 
+			triggerPane.addButton(new Button(ItemHandler.getItem("DIAMOND", 1, StringUtils.containsValue(triggers, "RESPAWN"), "&e&l&nRespawn", "&7", triggerOption, "&7player respawns from a death event.", "&9&lENABLED: &a" + 
 			(StringUtils.containsValue(triggers, "RESPAWN") + "").toUpperCase()), event -> {
 				if (StringUtils.containsValue(triggers, "RESPAWN")) {
 					triggers.remove("RESPAWN");
@@ -1379,13 +1506,13 @@ public class Menu {
 				}
 				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
-				dataFile.set("Settings.HeldItem-Triggers", triggers.toString().replace("[", "").replace("]", "")); 	
+				dataFile.set(triggerString, triggers.toString().replace("[", "").replace("]", "")); 	
 				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
 				ConfigHandler.getConfig().softReload();
-				SchedulerUtils.runLater(2L, () -> triggerPane(player));
+				SchedulerUtils.runLater(2L, () -> triggerPane(player, stage));
 			}));
-			triggerPane.addButton(new Button(ItemHandler.getItem("STONE_BUTTON", 1, StringUtils.containsValue(triggers, "WORLD-SWITCH"), "&e&l&nWorld Switch", "&7", "&7*Sets the held item slot", "&7upon player switching worlds.", 
-			"&9&lENABLED: &a" + (StringUtils.containsValue(triggers, "WORLD-SWITCH") + "").toUpperCase()), event -> {
+			triggerPane.addButton(new Button(ItemHandler.getItem("STONE_BUTTON", 1, StringUtils.containsValue(triggers, "WORLD-SWITCH"), "&e&l&nWorld Switch", "&7", triggerOption, "&7player teleports to one", "&7of the specified worlds.", 
+					"&9&lENABLED: &a" + (StringUtils.containsValue(triggers, "WORLD-SWITCH") + "").toUpperCase()), event -> {
 				if (StringUtils.containsValue(triggers, "WORLD-SWITCH")) {
 					triggers.remove("WORLD-SWITCH");
 				} else {
@@ -1400,14 +1527,13 @@ public class Menu {
 				}
 				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
-				dataFile.set("Settings.HeldItem-Triggers", triggers.toString().replace("[", "").replace("]", "")); 	
+				dataFile.set(triggerString, triggers.toString().replace("[", "").replace("]", "")); 	
 				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
 				ConfigHandler.getConfig().softReload();
-				SchedulerUtils.runLater(2L, () -> triggerPane(player));
+				SchedulerUtils.runLater(2L, () -> triggerPane(player, stage));
 			}));
-			triggerPane.addButton(new Button(fillerPaneBItem));
-			triggerPane.addButton(new Button(ItemHandler.getItem("LEVER", 1, StringUtils.containsValue(triggers, "GAMEMODE-SWITCH"), "&e&l&nGamemode Switch", "&7", "&7*Sets the held item slot", 
-				"&7when the player changes", "&7to a different gamemode.", "&9&lENABLED: &a" + (StringUtils.containsValue(triggers, "GAMEMODE-SWITCH") + "").toUpperCase()), event -> {
+			triggerPane.addButton(new Button(ItemHandler.getItem("LEVER", 1, StringUtils.containsValue(triggers, "GAMEMODE-SWITCH"), "&e&l&nGamemode Switch", "&7", triggerOption, "&7player changes gamemodes to any", "&7of the defined limit-modes.", 
+					"&9&lENABLED: &a" + (StringUtils.containsValue(triggers, "GAMEMODE-SWITCH") + "").toUpperCase()), event -> {
 				if (StringUtils.containsValue(triggers, "GAMEMODE-SWITCH")) {
 					triggers.remove("GAMEMODE-SWITCH");
 				} else {
@@ -1422,17 +1548,19 @@ public class Menu {
 				}
 				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
-				dataFile.set("Settings.HeldItem-Triggers", triggers.toString().replace("[", "").replace("]", "")); 	
+				dataFile.set(triggerString, triggers.toString().replace("[", "").replace("]", "")); 	
 				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
 				ConfigHandler.getConfig().softReload();
-				SchedulerUtils.runLater(2L, () -> triggerPane(player));
+				SchedulerUtils.runLater(2L, () -> triggerPane(player, stage));
 			}));
-			triggerPane.addButton(new Button(ItemHandler.getItem("MINECART", 1, StringUtils.containsValue(triggers, "REGION-ENTER"), "&e&l&nRegion Enter", "&7", "&7*Sets the held item slot when", 
-			"&7the player enters a WorldGuard region.", "&9&lENABLED: &a" + (StringUtils.containsValue(triggers, "REGION-ENTER") + "").toUpperCase()), event -> {
+			triggerPane.addButton(new Button(ItemHandler.getItem("MINECART", 1, StringUtils.containsValue(triggers, "REGION-ENTER"), "&e&l&nRegion Enter", "&7", triggerOption, "&7player enters any of the enabled-regions.", "&9&lENABLED: &a" +
+			(StringUtils.containsValue(triggers, "REGION-ENTER") + "").toUpperCase()), event -> {
 				if (StringUtils.containsValue(triggers, "REGION-ENTER")) {
 					triggers.remove("REGION-ENTER");
 				} else {
 					triggers.add("REGION-ENTER");
+					triggers.add("REGION-ACCESS");
+					triggers.add("REGION-ENGRESS");
 				}
 				if (triggers.isEmpty()) { 
 					triggers.add("DISABLED"); 
@@ -1443,17 +1571,19 @@ public class Menu {
 				}
 				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
-				dataFile.set("Settings.HeldItem-Triggers", triggers.toString().replace("[", "").replace("]", "")); 	
+				dataFile.set(triggerString, triggers.toString().replace("[", "").replace("]", "")); 	
 				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
 				ConfigHandler.getConfig().softReload();
-				SchedulerUtils.runLater(2L, () -> triggerPane(player));
+				SchedulerUtils.runLater(2L, () -> triggerPane(player, stage));
 			}));
-			triggerPane.addButton(new Button(ItemHandler.getItem("408", 1, StringUtils.containsValue(triggers, "REGION-LEAVE"), "&e&l&nRegion Leave", "&7", "&7*Sets the held item slot when", 
-			"&7the player leaves a WorldGuard region.", "&9&lENABLED: &a" + (StringUtils.containsValue(triggers, "REGION-LEAVE") + "").toUpperCase()), event -> {
+			triggerPane.addButton(new Button(ItemHandler.getItem("408", 1, StringUtils.containsValue(triggers, "REGION-LEAVE"), "&e&l&nRegion Leave", "&7", triggerOption.replace("Gives", "Removes"), "&7player leaves any of the enabled-regions.", "&9&lENABLED: &a" +
+			(StringUtils.containsValue(triggers, "REGION-LEAVE") + "").toUpperCase()), event -> {
 				if (StringUtils.containsValue(triggers, "REGION-LEAVE")) {
 					triggers.remove("REGION-LEAVE");
 				} else {
 					triggers.add("REGION-LEAVE");
+					triggers.remove("REGION-ACCESS");
+					triggers.remove("REGION-ENGRESS");
 				}
 				if (triggers.isEmpty()) { 
 					triggers.add("DISABLED"); 
@@ -1464,12 +1594,57 @@ public class Menu {
 				}
 				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
-				dataFile.set("Settings.HeldItem-Triggers", triggers.toString().replace("[", "").replace("]", "")); 	
+				dataFile.set(triggerString, triggers.toString().replace("[", "").replace("]", "")); 	
 				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
 				ConfigHandler.getConfig().softReload();
-				SchedulerUtils.runLater(2L, () -> triggerPane(player));
+				SchedulerUtils.runLater(2L, () -> triggerPane(player, stage));
 			}));
-			triggerPane.addButton(new Button(fillerPaneBItem));
+			triggerPane.addButton(new Button(ItemHandler.getItem("407", 1, StringUtils.containsValue(triggers, "REGION-ACCESS"), "&e&l&nRegion Access", "&7", triggerOption, "&7player enters any of the enabled-regions", "&7and removes the item when leaving", "&7any of the enabled-regions.", "&9&lENABLED: &a" +
+			(StringUtils.containsValue(triggers, "REGION-ACCESS") + "").toUpperCase()), event -> {
+				if (StringUtils.containsValue(triggers, "REGION-ACCESS")) {
+					triggers.remove("REGION-ACCESS");
+				} else {
+					triggers.add("REGION-ACCESS");
+					triggers.remove("REGION-ENTER");
+					triggers.remove("REGION-LEAVE");
+				}
+				if (triggers.isEmpty()) { 
+					triggers.add("DISABLED"); 
+				} else if (StringUtils.containsValue(triggers, "DISABLED")) {
+					triggers.remove("DISABLED");
+				} else if (StringUtils.containsValue(triggers, "DISABLE")) {
+					triggers.remove("DISABLE");
+				}
+				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
+				dataFile.set(triggerString, triggers.toString().replace("[", "").replace("]", "")); 	
+				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+				ConfigHandler.getConfig().softReload();
+				SchedulerUtils.runLater(2L, () -> triggerPane(player, stage));
+			}));
+			triggerPane.addButton(new Button(ItemHandler.getItem("342", 1, StringUtils.containsValue(triggers, "REGION-ENGRESS"), "&e&l&nRegion Engress", "&7", triggerOption.replace("Gives", "Removes"), "&7player enters any of the enabled-regions", "&7and gives the item when leaving", "&7any of the enabled-regions.", "&9&lENABLED: &a" +
+			(StringUtils.containsValue(triggers, "REGION-ENGRESS") + "").toUpperCase()), event -> {
+				if (StringUtils.containsValue(triggers, "REGION-ENGRESS")) {
+					triggers.remove("REGION-ENGRESS");
+				} else {
+					triggers.add("REGION-ENGRESS");
+					triggers.remove("REGION-ENTER");
+					triggers.remove("REGION-LEAVE");
+				}
+				if (triggers.isEmpty()) { 
+					triggers.add("DISABLED"); 
+				} else if (StringUtils.containsValue(triggers, "DISABLED")) {
+					triggers.remove("DISABLED");
+				} else if (StringUtils.containsValue(triggers, "DISABLE")) {
+					triggers.remove("DISABLE");
+				}
+				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
+				dataFile.set(triggerString, triggers.toString().replace("[", "").replace("]", "")); 	
+				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+				ConfigHandler.getConfig().softReload();
+				SchedulerUtils.runLater(2L, () -> triggerPane(player, stage));
+			}));
 			triggerPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item settings menu."), event -> itemSettings(player)));
 			triggerPane.addButton(new Button(fillerPaneBItem), 7);
 			triggerPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item settings menu."), event -> itemSettings(player)));
@@ -1616,6 +1791,11 @@ public class Menu {
 					"&9&lENABLED: &a" + ((!StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Join"), "DISABLE") ? 
 					ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Join") : "FALSE")).toUpperCase()), 
 					event -> worldPane(player, "Clear-Items.Join")));
+			clearPane.addButton(new Button(ItemHandler.getItem("LAVA_BUCKET", 1, false, 
+					"&c&l&nQuit", "&7", "&7*Clears the items from the", "&7player upon quiting the server.", 
+					"&9&lENABLED: &a" + ((!StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Quit"), "DISABLE") ? 
+					ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Quit") : "FALSE")).toUpperCase()), 
+					event -> worldPane(player, "Clear-Items.Quit")));
 			clearPane.addButton(new Button(fillerPaneBItem));
 			clearPane.addButton(new Button(ItemHandler.getItem("STONE_BUTTON", 1, false, 
 					"&c&l&nWorld-Switch", "&7", "&7*Clears the items from the", "&7player upon changing worlds.", 
@@ -1639,7 +1819,6 @@ public class Menu {
 					"&9&lENABLED: &a" + ((!StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Options"), "DISABLE") ? 
 					ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Options") : "FALSE")).toUpperCase()), 
 					event -> optionPane(player)));
-			clearPane.addButton(new Button(fillerPaneBItem));
 			clearPane.addButton(new Button(ItemHandler.getItem("CHEST", 1, false, 
 					"&b&lBlackList", "&7", "&7*Materials, Slots, or Item Names", "&7to be blacklisted from being", "&7cleared upon performing a trigger.", 
 					"&9&lENABLED: &a" + (!ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Blacklist").isEmpty() + "").toUpperCase()), 
