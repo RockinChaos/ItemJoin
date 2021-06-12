@@ -128,20 +128,20 @@
 			<id>placeholderapi</id>
 			<url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
 		</repository>
-		<!--AuthMe Repository-->
-		<repository>
-			<id>codemc-repo</id>
-			<url>https://repo.codemc.org/repository/maven-public/</url>
-		</repository>
 		<!--Mojang Repository-->
 		<repository>
 			<id>mojang</id>
 			<url>https://libraries.minecraft.net/</url>
 		</repository>
-		<!--bStats Repository-->
+		<!--AuthMe / bStats Repository-->
 		<repository>
 			<id>CodeMC</id>
 			<url>https://repo.codemc.org/repository/maven-public</url>
+		</repository>
+		<!-- HeadDatabase-API -->
+		<repository>
+			<id>headdatabase-api</id>
+			<url>https://mvn.intellectualsites.com/content/repositories/thirdparty/</url>
 		</repository>
 		<!--TokenEnchant Repository-->
 		<repository>
@@ -230,16 +230,16 @@
 		</dependency>
 		<!--HeadDatabase API-->
 		<dependency>
-			<groupId>com.github.shynixn.headdatabase</groupId>
-			<artifactId>hdb-api</artifactId>
-			<version>1.0</version>
+			<groupId>me.arcaniax</groupId>
+			<artifactId>HeadDatabase-API</artifactId>
+			<version>1.0.0</version>
 			<scope>provided</scope>
 		</dependency>
 		<!--TokenEnchant API-->
 		<dependency>
 			<groupId>com.vk2gpz.tokenenchant</groupId>
 			<artifactId>TokenEnchantAPI</artifactId>
-			<version>18.0.2</version>
+			<version>18.18.1</version>
 			<scope>provided</scope>
 		</dependency>
 		<!--SkinsRestorer API-->
@@ -261,7 +261,7 @@
         <dependency>
             <groupId>de.jeff_media</groupId>
             <artifactId>ChestSortAPI</artifactId>
-            <version>2.0.0</version>
+            <version>4.0.1</version>
        	    <scope>provided</scope>
         </dependency>
 		<!--ProtocolLib API-->
