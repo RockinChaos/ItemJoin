@@ -5223,7 +5223,7 @@ public class ItemMap {
     */
 	public ItemMap clone() {
         try {
-            Object clone = this.getClass().newInstance();
+            Object clone = this.getClass().getDeclaredConstructor().newInstance();
 	            for (Field field : this.getClass().getDeclaredFields()) {
 	                field.setAccessible(true);
 	                field.set(clone, field.get(this));

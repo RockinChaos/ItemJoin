@@ -459,7 +459,7 @@ abstract class Controller {
 						try {
 			                FileConfiguration config = ConfigHandler.getConfig().getFile("config.yml");
 			                String database = "jdbc:mysql://" + config.getString("Database.host") + ":" + config.getString("Database.port") + "/" + (config.getString("Database.table") != null ? config.getString("Database.table") : config.getString("Database.database")) + "?useUnicode=true&characterEncoding=utf-8&connectTimeout=10000&useSSL=false&allowPublicKeyRetrieval=true&useCursorFetch=true&useLocalSessionState=true&rewriteBatchedStatements=true&maintainTimeStats=false";
-			                Class.forName("com.mysql.jdbc.Driver").newInstance();
+			                Class.forName("com.mysql.jdbc.Driver").getDeclaredConstructor().newInstance();
 			                try {
 			                	connection = DriverManager.getConnection(database, config.getString("Database.user"), config.getString("Database.pass"));
 				                Statement statement = connection.createStatement();
