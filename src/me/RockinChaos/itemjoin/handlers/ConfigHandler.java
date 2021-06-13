@@ -133,8 +133,10 @@ public class ConfigHandler {
 			SQL.newData(reload); {
 				SchedulerUtils.runLater(2L, () -> {
 					ItemDesigner.getDesigner(true); {
-						ItemJoin.getInstance().setStarted(true);
-						this.setPages();
+						SchedulerUtils.runSingleAsync(() -> {
+							ItemJoin.getInstance().setStarted(true);
+							this.setPages();
+						});
 					}
 				}); { 
 					SchedulerUtils.runLater(100L, () -> {

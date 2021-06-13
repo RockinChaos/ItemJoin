@@ -205,7 +205,7 @@ public class DependAPI {
 				final Object skinsRestorer = netty.getMethod("getInstance").invoke(null);
 				final Object skinsAPI = skinsRestorer.getClass().getMethod("getSkinsRestorerBukkitAPI").invoke(skinsRestorer);
 				final Object skinData = skinsAPI.getClass().getMethod("getSkinData", String.class).invoke(skinsAPI, owner);
-				return ((Property) skinData).getValue();
+				return (skinData != null ? ((Property) skinData).getValue() : null);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

@@ -50,11 +50,11 @@ public class ServerUtils {
 		return false;
 	}
 
-    /**
-     * Checks if the server supports UUIDS.
-     *
-     * @return If the server supports UUIDs.
-     */
+   /**
+    * Checks if the server supports UUIDS.
+    *
+    * @return If the server supports UUIDs.
+    */
     public static boolean isUUIDCompatible() {
         return hasSpecificUpdate("1_8");
     }

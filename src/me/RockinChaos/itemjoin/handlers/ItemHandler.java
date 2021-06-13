@@ -414,7 +414,18 @@ public class ItemHandler {
 			SkullMeta skullMeta = (SkullMeta)meta;
 			OfflinePlayer player = LegacyAPI.getOfflinePlayer(owner);
 			if (DependAPI.getDepends(false).skinsRestorerEnabled()) {
-				setSkullTexture(meta, DependAPI.getDepends(false).getSkinValue(owner));
+				final String textureValue = DependAPI.getDepends(false).getSkinValue(owner);
+				if (textureValue != null) {
+					setSkullTexture(meta, textureValue);
+				} else if (player != null) {
+					try {
+						skullMeta.setOwningPlayer(player);
+					} catch (Throwable t) {
+						LegacyAPI.setSkullOwner(skullMeta, player.getName());
+					}
+				} else {
+					LegacyAPI.setSkullOwner(skullMeta, owner);
+				}
 			} else if (player != null) {
 				try {
 					skullMeta.setOwningPlayer(player);
