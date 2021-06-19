@@ -84,9 +84,9 @@ public class ConfigHandler {
 	private int permissionLength = 2;
 	private int listLength = 1;
 	
-	private YamlConfiguration itemsFile;
-	private YamlConfiguration configFile;
-	private YamlConfiguration langFile;
+	private YamlConfiguration itemsFile = new YamlConfiguration();
+	private YamlConfiguration configFile = new YamlConfiguration();
+	private YamlConfiguration langFile = new YamlConfiguration();
 	
 	private static ConfigHandler config;
 	
@@ -271,16 +271,14 @@ public class ConfigHandler {
     * @return The Memory loaded config file.
     */
 	public YamlConfiguration getLoadedConfig(final File file, final boolean commit) throws Exception {
-		YamlConfiguration config = new YamlConfiguration();
-		if (commit) { config.load(file); }
 		if (file.getName().contains("items.yml")) {
-			if (commit) { this.itemsFile = config; }
+			if (commit) { this.itemsFile.load(file); }
 			return this.itemsFile;
 		} else if (file.getName().contains("config.yml")) {
-			if (commit) { this.configFile = config; }
+			if (commit) { this.configFile.load(file); }
 			return this.configFile;
 		} else if (file.getName().contains("lang.yml")) {
-			if (commit) { this.langFile = config; }
+			if (commit) { this.langFile.load(file); }
 			return this.langFile;
 		}
 		return null;
