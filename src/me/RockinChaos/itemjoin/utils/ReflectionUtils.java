@@ -468,7 +468,11 @@ public final class ReflectionUtils {
 		EntityPlayer(".server.level"),
 		NetworkManager(".network"),
 		MinecraftServer(".server"),
-		ServerConnection(".server.network");
+		ServerConnection(".server.network"),
+		IChatBaseComponent(".network.chat"),
+		IChatBaseComponent$ChatSerializer(".network.chat"),
+		PacketPlayOutChat(".network.protocol.game"),
+		ChatMessageType(".network.chat");
 		public String tag;
 		private MinecraftTags(final String tag) {
 			this.tag = tag;
