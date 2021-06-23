@@ -117,11 +117,11 @@ public class ConfigHandler {
     */
 	private void registerClasses(final boolean silent) {
 		final boolean reload = ItemJoin.getInstance().isStarted();
+		ItemJoin.getInstance().setStarted(false);
 		ServerUtils.clearErrorStatements();
-		this.copyFiles();
 		LogHandler.getFilter(true);
 		BungeeAPI.getBungee(true);
-		ItemJoin.getInstance().setStarted(false);
+		this.copyFiles();
 		SchedulerUtils.runAsync(() -> {
         	DependAPI.getDepends(true);
 			int customItems = (this.getConfigurationSection() != null ? this.getConfigurationSection().getKeys(false).size() : 0);
@@ -131,7 +131,7 @@ public class ConfigHandler {
 			}
 			this.registerPrevent();
 			SQL.newData(reload); {
-				SchedulerUtils.runLater(2L, () -> {
+				SchedulerUtils.runAsyncLater(2L, () -> {
 					ItemDesigner.getDesigner(true); {
 						SchedulerUtils.runSingleAsync(() -> {
 							ItemJoin.getInstance().setStarted(true);
@@ -139,14 +139,14 @@ public class ConfigHandler {
 						});
 					}
 				}); { 
-					SchedulerUtils.runLater(100L, () -> {
+					SchedulerUtils.runAsyncLater(100L, () -> {
 						final MetricsAPI metrics = new MetricsAPI(ItemJoin.getInstance(), 4115);
 						DependAPI.getDepends(false).addCustomCharts(metrics);
 						ServerUtils.sendErrorStatements(null);
 					});
 				}
 			}
-        });
+		});
 	}
 	
    /**
@@ -184,7 +184,8 @@ public class ConfigHandler {
 		if ((!StringUtils.splitIgnoreCase(this.getPrevent("itemMovement"), "FALSE", ",") && !StringUtils.splitIgnoreCase(this.getPrevent("itemMovement"), "DISABLED", ","))) {
 			if (!StringUtils.isRegistered(Clicking.class.getSimpleName())) { 
 				ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Clicking(), ItemJoin.getInstance()); 
-				if (ServerUtils.hasSpecificUpdate("1_8") && !ProtocolManager.isHandling()) { ProtocolManager.handleProtocols(); }
+				if (ServerUtils.hasSpecificUpdate("1_8") && !DependAPI.getDepends(false).protocolEnabled() && !ProtocolManager.isHandling()) { ProtocolManager.handleProtocols(); }
+				else if (ServerUtils.hasSpecificUpdate("1_8") && DependAPI.getDepends(false).protocolEnabled() && !ProtocolAPI.isHandling()) { ProtocolAPI.handleProtocols(); }
 			}
 		}
 		if ((!StringUtils.splitIgnoreCase(this.getPrevent("Self-Drops"), "FALSE", ",") && !StringUtils.splitIgnoreCase(this.getPrevent("Self-Drops"), "DISABLED", ","))
@@ -368,26 +369,28 @@ public class ConfigHandler {
     * 
     */
 	public void setPages() {
-		int customItems = (this.getConfigurationSection() != null ? this.getConfigurationSection().getKeys(false).size() : 0);
-		if (customItems > 15) {
-			this.permissionLength = (int) Math.ceil((double)customItems / 15) + 1;
-		}
-		
-		int listCount = 0;
-		for (World world: Bukkit.getWorlds()) {
-			List < String > listItems = new ArrayList < String > ();
-			listCount++;
-			for (ItemMap itemMap: ItemUtilities.getUtilities().getItems()) {
-				if (!listItems.contains(itemMap.getConfigName()) && itemMap.inWorld(world)) {
-					listCount++;
-					listItems.add(itemMap.getConfigName());
+		SchedulerUtils.runAsync(() -> {
+			int customItems = (this.getConfigurationSection() != null ? this.getConfigurationSection().getKeys(false).size() : 0);
+			if (customItems > 15) {
+				this.permissionLength = (int) Math.ceil((double)customItems / 15) + 1;
+			}
+			
+			int listCount = 0;
+			for (World world: Bukkit.getWorlds()) {
+				List < String > listItems = new ArrayList < String > ();
+				listCount++;
+				for (ItemMap itemMap: ItemUtilities.getUtilities().getItems()) {
+					if (!listItems.contains(itemMap.getConfigName()) && itemMap.inWorld(world)) {
+						listCount++;
+						listItems.add(itemMap.getConfigName());
+					}
 				}
 			}
-		}
-		
-		if (listCount > 15) {
-			this.listLength = (int) Math.ceil((double)listCount / 15);
-		}
+			
+			if (listCount > 15) {
+				this.listLength = (int) Math.ceil((double)listCount / 15);
+			}
+		});
 	}
 	
    /**
@@ -638,7 +641,8 @@ public class ConfigHandler {
 		if ((itemMap.isMovement() || itemMap.isEquip() || itemMap.isInventoryClose())) {
 			if (!StringUtils.isRegistered(Clicking.class.getSimpleName())) {
 				ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Clicking(), ItemJoin.getInstance());
-				if (ServerUtils.hasSpecificUpdate("1_8") && !ProtocolManager.isHandling()) { ProtocolManager.handleProtocols(); }
+				if (ServerUtils.hasSpecificUpdate("1_8") && !DependAPI.getDepends(false).protocolEnabled() && !ProtocolManager.isHandling()) { ProtocolManager.handleProtocols(); }
+				else if (ServerUtils.hasSpecificUpdate("1_8") && DependAPI.getDepends(false).protocolEnabled() && !ProtocolAPI.isHandling()) { ProtocolAPI.handleProtocols(); }
 			}
 			if (DependAPI.getDepends(false).chestSortEnabled() && !StringUtils.isRegistered(ChestSortAPI.class.getSimpleName())) {
 				ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new ChestSortAPI(), ItemJoin.getInstance());
