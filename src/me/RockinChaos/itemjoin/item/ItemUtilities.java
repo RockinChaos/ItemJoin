@@ -21,8 +21,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map.Entry;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -781,8 +779,8 @@ public class ItemUtilities {
 			String[] compareWorlds = commandsWorlds.split(",");
 			for (String compareWorld: compareWorlds) {
 				if (compareWorld.equalsIgnoreCase(player.getWorld().getName()) || compareWorld.equalsIgnoreCase("ALL") || compareWorld.equalsIgnoreCase("GLOBAL")) {
-					HashMap<Integer, String> commandMap = new HashMap<Integer, String>();
-					for (String cmd : ConfigHandler.getConfig().getFile("config.yml").getStringList("Active-Commands.commands")) { commandMap.put(StringUtils.getRandom(1, 100000), cmd); }
+					ArrayList < String > commandMap = new ArrayList < String >();
+					for (String cmd : ConfigHandler.getConfig().getFile("config.yml").getStringList("Active-Commands.commands")) { commandMap.add(cmd); }
 					List<String> commandList = this.getRandomMap(commandMap, player);
 					for (String commands: commandList) {
 						String formatCommand = StringUtils.translateLayout(commands, player).replace("first-join: ", "").replace("first-join:", "");
@@ -807,13 +805,13 @@ public class ItemUtilities {
     * @param player - The Player having their commands randomly selected.
     * @return The newly generated ArrayList.
     */
-    private List<String> getRandomMap(final HashMap<?, ?> commands, final Player player) {
+    private List < String > getRandomMap(final ArrayList < String > commands, final Player player) {
     	final String commandSequence = ConfigHandler.getConfig().getFile("config.yml").getString("Active-Commands.commands-sequence");
     	if (commandSequence != null && commandSequence.replace(" ", "").equalsIgnoreCase("RANDOM_SINGLE")) {
-	    	Entry<?, ?> dedicatedMap = StringUtils.randomEntry(commands);
-	    	if (dedicatedMap != null && dedicatedMap.getValue() != null && player != null) {
+	    	String dedicatedMap = (String) StringUtils.randomEntry(commands);
+	    	if (dedicatedMap != null && dedicatedMap != null && player != null) {
 	    		List<String> returnList = new ArrayList<String>();
-	    		returnList.add(((String)dedicatedMap.getValue()));
+	    		returnList.add(dedicatedMap);
 	    		return returnList;
 	    	}
     	}

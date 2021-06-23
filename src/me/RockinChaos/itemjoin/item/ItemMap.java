@@ -4400,10 +4400,10 @@ public class ItemMap {
     * @param slot - The Slot of the ItemStack.
     * @return If it was successful.
     */
-    private boolean getRandomMap(final HashMap < Integer, ItemCommand > randomCommands, final ItemCommand[] itemCommands, final Player player, final Player altPlayer, final String action, final String clickType, final String slot) {
-    	Entry<?, ?> dedicatedMap = StringUtils.randomEntry(randomCommands);
-    	if (dedicatedMap != null && dedicatedMap.getValue() != null && player != null && action != null && clickType != null && slot != null && itemCommands != null && randomCommands != null
-        && !((ItemCommand)dedicatedMap.getValue()).execute(player, altPlayer, action, clickType, slot, this)) { 
+    private boolean getRandomMap(final ArrayList < ItemCommand > randomCommands, final ItemCommand[] itemCommands, final Player player, final Player altPlayer, final String action, final String clickType, final String slot) {
+    	ItemCommand dedicatedMap = (ItemCommand) StringUtils.randomEntry(randomCommands);
+    	if (dedicatedMap != null && dedicatedMap != null && player != null && action != null && clickType != null && slot != null && itemCommands != null && randomCommands != null
+        && !dedicatedMap.execute(player, altPlayer, action, clickType, slot, this)) { 
     		return this.getRandomMap(randomCommands, itemCommands, player, altPlayer, action, clickType, slot);
     	}
     	return true;
@@ -4419,15 +4419,15 @@ public class ItemMap {
     * @param slot - The Slot of the ItemStack.
     * @return If it was successful.
     */
-    private boolean getRandomAll(final HashMap < Integer, ItemCommand > randomCommands, final ItemCommand[] itemCommands, final Player player, final Player altPlayer, final String action, final String clickType, final String slot) {
-    	Entry<?, ?> dedicatedMap = StringUtils.randomEntry(randomCommands);
-    	if (dedicatedMap != null && dedicatedMap.getValue() != null && player != null && action != null && slot != null && itemCommands != null && randomCommands != null 
-        && !((ItemCommand)dedicatedMap.getValue()).execute(player, altPlayer, action, clickType, slot, this)) { 
-    		randomCommands.remove(dedicatedMap.getKey());
+    private boolean getRandomAll(final ArrayList < ItemCommand > randomCommands, final ItemCommand[] itemCommands, final Player player, final Player altPlayer, final String action, final String clickType, final String slot) {
+    	ItemCommand dedicatedMap = (ItemCommand) StringUtils.randomEntry(randomCommands);
+    	if (dedicatedMap != null && dedicatedMap != null && player != null && action != null && slot != null && itemCommands != null && randomCommands != null 
+        && !dedicatedMap.execute(player, altPlayer, action, clickType, slot, this)) { 
+    		randomCommands.remove(dedicatedMap);
     		return this.getRandomAll(randomCommands, itemCommands, player, altPlayer, action, clickType, slot);
     	}
-    	if (dedicatedMap != null && randomCommands != null) { randomCommands.remove(dedicatedMap.getKey()); }
-    	if (dedicatedMap != null && dedicatedMap.getValue() != null && player != null && action != null && slot != null && itemCommands != null && randomCommands != null && 
+    	if (dedicatedMap != null && randomCommands != null) { randomCommands.remove(dedicatedMap); }
+    	if (dedicatedMap != null && dedicatedMap != null && player != null && action != null && slot != null && itemCommands != null && randomCommands != null && 
     	   !randomCommands.isEmpty()) {
     		this.getRandomAll(randomCommands, itemCommands, player, altPlayer, action, clickType, slot);
     	}
@@ -4442,17 +4442,13 @@ public class ItemMap {
     */
     private String getRandomList(final ItemCommand[] itemCommands) {
     	if (this.sequence == CommandSequence.RANDOM_LIST) {
-    		List < String > listIdent = new ArrayList < String > ();
+    		ArrayList < String > listIdent = new ArrayList < String > ();
     		for (int i = 0; i < itemCommands.length; i++) {
     			if (!listIdent.contains("+" + itemCommands[i].getSection() + "+")) {
     				listIdent.add("+" + itemCommands[i].getSection() + "+");
     			}
     		}
-    		HashMap < Integer, String > randomIdent = new HashMap < Integer, String > ();
-    		for (String ident: listIdent) {
-    			randomIdent.put(StringUtils.getRandom(1, 100000), ident);
-    		}
-    		return (String) StringUtils.randomEntry(randomIdent).getValue();
+    		return (String) StringUtils.randomEntry(listIdent);
     	}
     	return null;
     }
@@ -4471,10 +4467,10 @@ public class ItemMap {
     	boolean playerSuccess = false;
     	ItemCommand[] itemCommands = this.commands;
     	String chosenIdent = this.getRandomList(itemCommands);
-    	HashMap < Integer, ItemCommand > randomCommands = new HashMap < Integer, ItemCommand > ();
+    	ArrayList < ItemCommand > randomCommands = new ArrayList < ItemCommand > ();
     	if (!this.subjectRemoval) {
     		for (int i = 0; i < itemCommands.length; i++) { 
-        		if (this.sequence == CommandSequence.RANDOM || this.sequence == CommandSequence.RANDOM_SINGLE) { randomCommands.put(StringUtils.getRandom(1, 100000), itemCommands[i]); }
+        		if (this.sequence == CommandSequence.RANDOM || this.sequence == CommandSequence.RANDOM_SINGLE) { randomCommands.add(itemCommands[i]); }
         		else if (this.sequence == CommandSequence.RANDOM_LIST) {
         			if (itemCommands[i].getSection() != null && itemCommands[i].getSection().equalsIgnoreCase(chosenIdent.replace("+", ""))) {
 	        			if (!playerSuccess) { playerSuccess = itemCommands[i].execute(player, altPlayer, action, clickType, slot, this); } 
