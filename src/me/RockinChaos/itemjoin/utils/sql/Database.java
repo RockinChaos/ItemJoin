@@ -369,7 +369,7 @@ public class Database extends Controller {
 				dataExists = true;
 			}
 		} catch (Exception e) {
-			ServerUtils.logSevere("{SQL} Could not read from the database.db file, some ItemJoin features have been disabled!");
+			ServerUtils.logSevere("{SQL} Could not read from the " + data.dataFolder + ".db file, some ItemJoin features have been disabled!");
 			ServerUtils.sendSevereTrace(e);
 		} finally {
 			this.close(ps, rs, conn, false);

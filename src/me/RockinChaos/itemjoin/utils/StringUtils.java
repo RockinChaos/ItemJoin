@@ -20,17 +20,13 @@ package me.RockinChaos.itemjoin.utils;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.lang.reflect.Field;
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map.Entry;
-
 import java.util.Random;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -432,25 +428,14 @@ public class StringUtils {
 	}
 	
    /**
-    * Randomly selects an Entry from a HashMap.
+    * Randomly selects an Entry from a ArrayList.
     * 
-    * @param map - The HashMap to have a entry selected.
+    * @param map - The ArrayList to have a entry selected.
     * @return The randomly selected entry.
     */
-	public static Entry<?, ?> randomEntry(final HashMap<?, ?> map) {
-		try {
-			Field table = HashMap.class.getDeclaredField("table");
-			table.setAccessible(true);
-			Random rand = new Random();
-			Entry<?, ?>[] entries = (Entry[]) table.get(map);
-			int start = rand.nextInt(entries.length);
-	    	for(int i=0;i<entries.length;i++) {
-	    		int idx = (start + i) % entries.length;
-	    		Entry<?, ?> entry = entries[idx];
-	       		if (entry != null) return entry;
-	    	}
-		} catch (Exception e) {}
-	    return null;
+	public static Object randomEntry(final ArrayList<?> list) {
+		Random rand = new Random();
+		return list.get(rand.nextInt(list.size()));
 	}
 	
    /**
