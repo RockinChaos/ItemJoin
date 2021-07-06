@@ -828,6 +828,56 @@ public class ItemHandler {
 	}
 	
    /**
+	* Checks if the book pages contains a JSONEvent.
+	* 
+	* @param formatPage - The page to be formatted..
+	* @return If the book page contains a JSONEvent.
+	*/
+	public static boolean containsJSONEvent(final String formatPage) {
+		if (formatPage.contains(JSONEvent.TEXT.matchType) || formatPage.contains(JSONEvent.SHOW_TEXT.matchType) || formatPage.contains(JSONEvent.OPEN_URL.matchType) || formatPage.contains(JSONEvent.RUN_COMMAND.matchType)) {
+			return true;
+		}
+		return false;
+	}
+	
+   /**
+	* Checks to see if the open_url is correctly defined with https or http.
+	* 
+	* @param itemMap - The ItemMap being modified.
+	* @param type - The JSONEvent type.
+	* @param inputResult - The input for the JSONEvent.
+	*/
+	public static void safteyCheckURL(final ItemMap itemMap, final JSONEvent type, final String inputResult) {
+		if (type.equals(JSONEvent.OPEN_URL)) {
+			if (!StringUtils.containsIgnoreCase(inputResult, "https") && !StringUtils.containsIgnoreCase(inputResult, "http")) {
+				ServerUtils.logSevere("{ItemMap} The URL Specified for the clickable link in the book " + itemMap.getConfigName() + " is missing http or https and will not be clickable.");
+				ServerUtils.logWarn("{ItemMap} A URL designed for a clickable link should resemble this link structure: https://www.google.com/");
+			}
+		}
+	}
+	
+	
+   /**
+	* Defines the JSONEvents for their action, event, and matchType.
+	* 
+	*/
+	public enum JSONEvent {
+		TEXT("nullEvent", "text", "<text:"),
+		SHOW_TEXT("hoverEvent", "show_text", "<show_text:"),
+		OPEN_URL("clickEvent", "open_url", "<open_url:"),
+		RUN_COMMAND("clickEvent", "run_command", "<run_command:"),
+		CHANGE_PAGE("clickEvent", "change_page", "<change_page:");
+		public final String event;
+		public final String action;
+		public final String matchType;
+		private JSONEvent(String Event, String Action, String MatchType) {
+			this.event = Event;
+			this.action = Action;
+			this.matchType = MatchType;
+		}
+	}
+	
+   /**
     * Checks if the specified String slot is a Custom Slot.
     * 
     * @param slot - The slot to be checked.

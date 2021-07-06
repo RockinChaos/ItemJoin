@@ -18,15 +18,20 @@
 package me.RockinChaos.itemjoin.item;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
+import me.RockinChaos.itemjoin.handlers.ItemHandler.JSONEvent;
 import me.RockinChaos.itemjoin.handlers.LogHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.utils.SchedulerUtils;
@@ -397,12 +402,72 @@ public class ItemCommand {
 		try { 
 			String[] values = new String[1];
 			if (altPlayer != null) { values[0] = altPlayer.getName(); }
-			player.sendMessage(StringUtils.translateLayout(this.command, player, values)); 
+			String jsonMessage = this.getJSONMessage(StringUtils.translateLayout(this.command, player, values));
+			Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(),"tellraw " + player.getName() + " " + jsonMessage);
 		} 
 		catch (Exception e) {
 			ServerUtils.logSevere("{ItemCommand} There was an error executing an item's command to send a message, if this continues report it to the developer.");
 			ServerUtils.sendDebugTrace(e);
 		}
+	}
+	
+    /**
+ 	* Sets the JSON String of the Message,
+ 	* sending the message to the player with JSON Formatting.
+ 	* 
+ 	* @param message - The Message being modified.
+ 	*/
+	private String getJSONMessage(final String message) {
+		String textBuilder = "[\"\"";
+		Map < Integer, String > JSONBuilder = new HashMap < Integer, String > ();
+		String formatLine = message;
+		if (ItemHandler.containsJSONEvent(formatLine)) {
+			while (ItemHandler.containsJSONEvent(formatLine)) {
+				for (JSONEvent jsonType: JSONEvent.values()) {
+					Matcher matchPattern = java.util.regex.Pattern.compile(jsonType.matchType + "(.*?)>").matcher(formatLine);
+					if (matchPattern.find()) {
+						String inputResult = matchPattern.group(1);
+						JSONBuilder.put(JSONBuilder.size(), ((jsonType != JSONEvent.TEXT) ? (",\"" + jsonType.event + "\":{\"action\":\"" 
+						+ jsonType.action + "\",\"value\":\"" + inputResult + "\"}") : ("," + "{\"" + jsonType.action + "\":\"" + inputResult + "\"")));
+						formatLine = formatLine.replace(jsonType.matchType + inputResult + ">", "<JSONEvent>");
+						ItemHandler.safteyCheckURL(itemMap, jsonType, inputResult);
+					}
+				}
+			}
+			if (!formatLine.isEmpty() && formatLine.length() != 0 && !formatLine.trim().isEmpty()) {
+				boolean definingText = false;
+				String[] JSONEvents = formatLine.split("<JSONEvent>");
+				if (!(org.apache.commons.lang.StringUtils.countMatches(formatLine, "<JSONEvent>") <= JSONEvents.length)) {
+					String adjustLine = new String();
+					for (String s: formatLine.split("JSONEvent>")) {
+						adjustLine += s + "JSONEvent> ";
+					}
+					JSONEvents = adjustLine.split("<JSONEvent>");
+				}
+				for (int i = 0; i < JSONEvents.length; i++) {
+					if (!JSONEvents[i].isEmpty() && JSONEvents[i].length() != 0 && !JSONEvents[i].trim().isEmpty()) {
+						textBuilder += ((i == 0) ? "," : "},") + "{\"" + "text" + "\":\"" + JSONEvents[i] + ((JSONBuilder.get(i) != null 
+						&& JSONBuilder.get(i).contains("\"text\"")) ? "\"}" : "\"") + (JSONBuilder.get(i) != null ? JSONBuilder.get(i) : "");
+					} else if (JSONBuilder.get(i) != null) {
+						if (JSONBuilder.get(i).contains("\"text\"") && !definingText) {
+							textBuilder += JSONBuilder.get(i);
+							definingText = true;
+						} else if (JSONBuilder.get(i).contains("\"text\"") && definingText) {
+							textBuilder += "}" + JSONBuilder.get(i);
+							definingText = false;
+						} else {
+							textBuilder += JSONBuilder.get(i);
+						}
+					}
+				}
+				textBuilder += "}";
+			}
+		} else if (message.contains("raw:")) {
+			return message.replace("raw: ", "").replace("raw:", "");
+		} else {
+			textBuilder += "," + "{\"text\":\"" + formatLine + "\"}";
+		}
+		return textBuilder + "]";
 	}
 	
    /**

@@ -46,6 +46,7 @@ import org.bukkit.potion.PotionEffectType;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
+import me.RockinChaos.itemjoin.handlers.ItemHandler.JSONEvent;
 import me.RockinChaos.itemjoin.listeners.Recipes;
 import me.RockinChaos.itemjoin.utils.ReflectionUtils;
 import me.RockinChaos.itemjoin.utils.SchedulerUtils;
@@ -470,8 +471,8 @@ public class ItemDesigner {
 				for (int k = 0; k < pageList.size(); k++) {
 					Map < Integer, String > JSONBuilder = new HashMap < Integer, String > ();
 					String formatLine = pageList.get(k);
-					if (this.containsJSONEvent(formatLine)) {
-						while (this.containsJSONEvent(formatLine)) {
+					if (ItemHandler.containsJSONEvent(formatLine)) {
+						while (ItemHandler.containsJSONEvent(formatLine)) {
 							for (JSONEvent jsonType: JSONEvent.values()) {
 								Matcher matchPattern = java.util.regex.Pattern.compile(jsonType.matchType + "(.*?)>").matcher(formatLine);
 								if (matchPattern.find()) {
@@ -480,7 +481,7 @@ public class ItemDesigner {
 										? (",\"" + jsonType.event + "\":{\"action\":\"" + jsonType.action + "\",\"value\":\"" + inputResult + "\"}") 
 										: ("," + "{\"" + jsonType.action + "\":\"" + inputResult + "\"")));
 									formatLine = formatLine.replace(jsonType.matchType + inputResult + ">", "<JSONEvent>");
-									this.safteyCheckURL(itemMap, jsonType, inputResult);
+									ItemHandler.safteyCheckURL(itemMap, jsonType, inputResult);
 								}
 							}
 						}
@@ -516,35 +517,6 @@ public class ItemDesigner {
 			}
 			itemMap.setPages(JSONPages);
 			itemMap.setListPages(rawPages);
-		}
-	}
-	
-   /**
-	* Checks if the book pages contains a JSONEvent.
-	* 
-	* @param formatPage - The page to be formatted..
-	* @return If the book page contains a JSONEvent.
-	*/
-	private boolean containsJSONEvent(final String formatPage) {
-		if (formatPage.contains(JSONEvent.TEXT.matchType) || formatPage.contains(JSONEvent.SHOW_TEXT.matchType) || formatPage.contains(JSONEvent.OPEN_URL.matchType) || formatPage.contains(JSONEvent.RUN_COMMAND.matchType)) {
-			return true;
-		}
-		return false;
-	}
-	
-   /**
-	* Checks to see if the open_url is correctly defined with https or http.
-	* 
-	* @param itemMap - The ItemMap being modified.
-	* @param type - The JSONEvent type.
-	* @param inputResult - The input for the JSONEvent.
-	*/
-	private void safteyCheckURL(final ItemMap itemMap, final JSONEvent type, final String inputResult) {
-		if (type.equals(JSONEvent.OPEN_URL)) {
-			if (!StringUtils.containsIgnoreCase(inputResult, "https") && !StringUtils.containsIgnoreCase(inputResult, "http")) {
-				ServerUtils.logSevere("{ItemMap} The URL Specified for the clickable link in the book " + itemMap.getConfigName() + " is missing http or https and will not be clickable.");
-				ServerUtils.logWarn("{ItemMap} A URL designed for a clickable link should resemble this link structure: https://www.google.com/");
-			}
 		}
 	}
 	
@@ -1166,7 +1138,7 @@ public class ItemDesigner {
 				String saveList = "";
 				for (int k = 0; k < pageList.size(); k++) {
 					String formatLine = pageList.get(k);
-					if (this.containsJSONEvent(formatLine)) {
+					if (ItemHandler.containsJSONEvent(formatLine)) {
 						for (JSONEvent jsonType: JSONEvent.values()) {
 							Matcher matchPattern = java.util.regex.Pattern.compile(jsonType.matchType + "(.*?)>").matcher(pageList.get(k));
 							while (matchPattern.find()) {
@@ -1224,26 +1196,6 @@ public class ItemDesigner {
 	private void setAttributeFlags(final ItemMap itemMap) {
 		if (ServerUtils.hasSpecificUpdate("1_8") && StringUtils.containsIgnoreCase(itemMap.getItemFlags(), "hide-attributes")) {
 			itemMap.setAttributesInfo(true);
-		}
-	}
-	
-   /**
-	* Defines the JSONEvents for their action, event, and matchType.
-	* 
-	*/
-	private enum JSONEvent {
-		TEXT("nullEvent", "text", "<text:"),
-		SHOW_TEXT("hoverEvent", "show_text", "<show_text:"),
-		OPEN_URL("clickEvent", "open_url", "<open_url:"),
-		RUN_COMMAND("clickEvent", "run_command", "<run_command:"),
-		CHANGE_PAGE("clickEvent", "change_page", "<change_page:");
-		private final String event;
-		private final String action;
-		private final String matchType;
-		private JSONEvent(String Event, String Action, String MatchType) {
-			this.event = Event;
-			this.action = Action;
-			this.matchType = MatchType;
 		}
 	}
 	
