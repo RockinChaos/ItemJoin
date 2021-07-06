@@ -219,9 +219,9 @@ public class Clicking implements Listener {
 	*/
 	private boolean isEquipment(final Player player, final ItemStack item, String clickType, final String slot) {
 			final String[] itemType = item.getType().name().split("_");
-			if (itemType.length >= 2 && itemType[1] != null && !itemType[1].isEmpty() && !itemType[1].equalsIgnoreCase("HEAD") 
-					&& (clickType.equalsIgnoreCase("SHIFT_EQUIPPED") || itemType[1].equalsIgnoreCase(StringUtils.getArmorSlot(slot, false)) 
-					|| (itemType[1].equalsIgnoreCase("HEAD") && StringUtils.getArmorSlot(slot, false).equalsIgnoreCase("HELMET")))) {
+			if (itemType.length >= 2 && itemType[1] != null && !itemType[1].isEmpty()
+					&& (clickType.equalsIgnoreCase("SHIFT_EQUIPPED") || itemType[1].equalsIgnoreCase(StringUtils.getArmorSlot(slot, false))) 
+					|| ((ItemHandler.isSkull(item.getType()) || itemType[1].equalsIgnoreCase("HEAD")) && StringUtils.getArmorSlot(slot, false).equalsIgnoreCase("HELMET"))) {
 				return true;
 			}
 			return false;
