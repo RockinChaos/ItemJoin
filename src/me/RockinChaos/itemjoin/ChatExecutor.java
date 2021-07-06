@@ -27,6 +27,8 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
+
+import me.RockinChaos.itemjoin.ChatComponent.ClickAction;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PermissionsHandler;
@@ -58,109 +60,107 @@ public class ChatExecutor implements CommandExecutor {
 	@Override
 	public boolean onCommand(final CommandSender sender, final Command command, final String label, final String[] args) {
 		if (Execute.DEFAULT.accept(sender, args, 0)) {
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&aItemJoin v" + ItemJoin.getInstance().getDescription().getVersion() + "&e by RockinChaos");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&aType &a&l/ItemJoin Help &afor the help menu.");
+			LanguageAPI.getLang(false).dispatchMessage(sender, ("&aItemJoin v" + ItemJoin.getInstance().getDescription().getVersion() + "&e by RockinChaos"), "&bThis should be the version submitted to the developer \n&bwhen submitting a bug or feature request.", "https://github.com/RockinChaos/ItemJoin/issues", ClickAction.OPEN_URL);
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&aType &a&l/ItemJoin Help &afor the help menu.", "&eClick to View the Help Menu.", "/itemjoin help", ClickAction.RUN_COMMAND);
 		} else if (Execute.HELP.accept(sender, args, 1)) {
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&aItemJoin v" + ItemJoin.getInstance().getDescription().getVersion() + "&e by RockinChaos");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Help &7- &eThis help menu.");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Reload &7- &eReloads the .yml files.");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Updates &7- &eChecks for plugin updates.");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Upgrade &7- &eUpdate ItemJoin to latest version.");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&aType &a&l/ItemJoin Help 2 &afor the next page.");
+            LanguageAPI.getLang(false).dispatchMessage(sender, ("&aItemJoin v" + ItemJoin.getInstance().getDescription().getVersion() + "&e by RockinChaos"), "&bThis should be the version submitted to the developer \n&bwhen submitting a bug or feature request.", "https://github.com/RockinChaos/ItemJoin/issues", ClickAction.OPEN_URL);
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Help &7- &eThis help menu.", "&aExecuting this command shows this help menu!", "/itemjoin help", ClickAction.SUGGEST_COMMAND);
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Reload &7- &eReloads the .yml files.", "&aFully reloads the plugin, fetching \n&aany changes made to the .yml files. \n\n&aBe sure to save changes made to your .yml files!", "/itemjoin reload", ClickAction.SUGGEST_COMMAND);
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Updates &7- &eChecks for plugin updates.", "&aChecks to see if there are any updates available for this plugin.", "/itemjoin updates", ClickAction.SUGGEST_COMMAND);
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Upgrade &7- &eUpdates to latest version.", "&aAttempts to Upgrade this plugin to the latest version. \n&aYou will need to restart the server for this process to complete.", "/itemjoin upgrade", ClickAction.SUGGEST_COMMAND);
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&aType &a&l/ItemJoin Help 2 &afor the next page.", "&eClick to View the Next Page.", "/itemjoin help 2", ClickAction.RUN_COMMAND);
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]---------------&a&l[&e Help Menu 1/10 &a&l]&a&l&m---------------[");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
 		} else if (Execute.HELP.accept(sender, args, 2)) {
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin List &7- &eCheck items you can get each what worlds.");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin World &7- &eCheck what world you are in, debugging.");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Menu &7- &eOpens the GUI Creator for custom items.");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Permissions &7- &eLists the permissions you have.");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Query <Item> &7- &eDisplays the custom item data.");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Info &7- &eGets data-info of the held item.");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&aType &a&l/ItemJoin Help 3 &afor the next page.");
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin List &7- &eView existing items and their worlds.", "&aView an entire list of the existing \n&acustom items and their respective worlds.", "/itemjoin list", ClickAction.SUGGEST_COMMAND);
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin World &7- &eCheck what world you are in, debugging.", "&aDisplays the world that your Player is currently in. \n&aUseful for debugging, such as comparing to your enabled-worlds.", "/itemjoin world", ClickAction.SUGGEST_COMMAND);
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Menu &7- &eOpens the GUI Creator for custom items.", "&aCreate custom items in-game without the need \n&ato manually edit the .yml files.", "/itemjoin menu", ClickAction.SUGGEST_COMMAND);
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Permissions &7- &eLists your permissions.", "&aLists the Permissions for your Player. \n\n&aGreen &bmeans you have permission whereas \n&cRed &bmeans you do not have permission.", "/itemjoin permissions", ClickAction.SUGGEST_COMMAND);
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Query <Item> &7- &eDisplays the custom item data.", "&aDisplays the important item info for the existing custom item-node.", "/itemjoin query ", ClickAction.SUGGEST_COMMAND);
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Info &7- &eGets data-info of the held item.", "&aDisplays the important item info for the item you are currently holding. \n&aUseful for finding the data-value and id of the item to be used.", "/itemjoin info", ClickAction.SUGGEST_COMMAND);
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&aType &a&l/ItemJoin Help 3 &afor the next page.", "&eClick to View the Next Page.", "/itemjoin help 3", ClickAction.RUN_COMMAND);
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]---------------&a&l[&e Help Menu 2/10 &a&l]&a&l&m---------------[");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
 		} else if (Execute.HELP.accept(sender, args, 3)) {
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Get <Item> &7- &eGives that ItemJoin item.");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Get <Item> <Qty> &7- &eGives amount of said item.");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Get <Item> <User> &7- &eGives to said player.");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Get <Item> <User> <Qty> &7- &eGives qty to player.");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&aType &a&l/ItemJoin Help 5 &afor the next page.");
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Get <Item> &7- &eGives that ItemJoin item.", "&aGives you the custom item in its designated slot. \n\n&aThis will not work if you already have the item.", "/itemjoin get ", ClickAction.SUGGEST_COMMAND);
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Get <Item> <Qty> &7- &eGives amount of said item.", "&aGives you the custom item in its designated slot with the specified quantity. \n\n&aThis &cWILL &awork if you already have the item.", "/itemjoin get ", ClickAction.SUGGEST_COMMAND);
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Get <Item> <User> &7- &eGives to said player.", "&aGives the custom item to the specified player name. \n\n&aThis will not work if they already have the item.", "/itemjoin get ", ClickAction.SUGGEST_COMMAND);
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Get <Item> <User> <Qty> &7- &eGives qty to player.", "&aGives the custom item to the specified player name with the specified quantity. \n\n&aThis &cWILL &awork if they already have the item.", "/itemjoin get ", ClickAction.SUGGEST_COMMAND);
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&aType &a&l/ItemJoin Help 4 &afor the next page.", "&eClick to View the Next Page.", "/itemjoin help 4", ClickAction.RUN_COMMAND);
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]---------------&a&l[&e Help Menu 3/10 &a&l]&a&l&m---------------[");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
 		} else if (Execute.HELP.accept(sender, args, 4)) {
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Remove <Item> &7- &eRemoves item from inventory.");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Remove <Item> <Qty> &7- &eRemoves qty of item.");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Remove <Item> <User> &7- &eRemoves from player.");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Remove <Item> <User> <Qty> &7- &eRemoves qty.");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&aType &a&l/ItemJoin Help 6 &afor the next page.");
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Remove <Item> &7- &eRemoves item from inventory.", "&aRemoves the custom item from your inventory. \n\n&aThis will not work if you do not have the item.", "/itemjoin remove ", ClickAction.SUGGEST_COMMAND);
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Remove <Item> <Qty> &7- &eRemoves qty of item.", "&aRemoves the custom item from your inventory with the specified quantity. \n\n&aThis will not work if you do not have the item.", "/itemjoin remove ", ClickAction.SUGGEST_COMMAND);
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Remove <Item> <Qty> &7- &eRemoves qty of item.", "&aRemoves the custom item from the specified player name. \n\n&aThis will not work if they do not have the item.", "/itemjoin remove ", ClickAction.SUGGEST_COMMAND);
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Remove <Item> <User> <Qty> &7- &eRemoves qty.", "&aRemoves the custom item from the specified player name with the specified quantity. \n\n&aThis will not work if they do not have the item.", "/itemjoin remove ", ClickAction.SUGGEST_COMMAND);
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&aType &a&l/ItemJoin Help 5 &afor the next page.", "&eClick to View the Next Page.", "/itemjoin help 5", ClickAction.RUN_COMMAND);
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]---------------&a&l[&e Help Menu 4/10 &a&l]&a&l&m---------------[");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
 		} else if (Execute.HELP.accept(sender, args, 5)) {
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin GetOnline <Item> &7- &eGives to all online.");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin GetOnline <Item> <Qty> &7- &eGives qty to all online.");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin RemoveOnline <Item> &7- &eRemoves from all online.");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin RemoveOnline <Item> <Qty> &7- &eRemoves qty.");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&aType &a&l/ItemJoin Help 7 &afor the next page.");
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin GetOnline <Item> &7- &eGives to all online.", "&aGives the custom item to all online players.", "/itemjoin getonline ", ClickAction.SUGGEST_COMMAND);
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin GetOnline <Item> <Qty> &7- &eGives qty to all online.", "&aGives the custom item with the specified quantity to all online players.", "/itemjoin getonline ", ClickAction.SUGGEST_COMMAND);
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin RemoveOnline <Item> &7- &eRemoves from all online.", "&aRemoves the custom item from all online players.", "/itemjoin removeonline ", ClickAction.SUGGEST_COMMAND);
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin RemoveOnline <Item> <Qty> &7- &eRemoves qty.", "&aRemoves the custom item with the specified quantity from all online players.", "/itemjoin removeonline ", ClickAction.SUGGEST_COMMAND);
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&aType &a&l/ItemJoin Help 6 &afor the next page.", "&eClick to View the Next Page.", "/itemjoin help 6", ClickAction.RUN_COMMAND);
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]---------------&a&l[&e Help Menu 5/10 &a&l]&a&l&m---------------[");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
 		} else if (Execute.HELP.accept(sender, args, 6)) {
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin GetAll &7- &eGives all ItemJoin items.");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin GetAll <User> &7- &eGives all items to said player.");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin RemoveAll &7- &eRemoves all ItemJoin items.");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin RemoveAll <User> &7- &eRemoves from player.");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&aType &a&l/ItemJoin Help 8 &afor the next page.");
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin GetAll &7- &eGives all ItemJoin items.", "&aGives you all the custom items.", "/itemjoin getall", ClickAction.SUGGEST_COMMAND);
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin GetAll <User> &7- &eGives all items to said player.", "&aGives all custom items to the specified player name.", "/itemjoin getall ", ClickAction.SUGGEST_COMMAND);
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin RemoveAll &7- &eRemoves all ItemJoin items.", "&aRemoves all custom items from your inventory.", "/itemjoin removeall", ClickAction.SUGGEST_COMMAND);
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin RemoveAll <User> &7- &eRemoves from player.", "&aRemoves all custom items from the specified player name.", "/itemjoin removeall ", ClickAction.SUGGEST_COMMAND);
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&aType &a&l/ItemJoin Help 7 &afor the next page.", "&eClick to View the Next Page.", "/itemjoin help 7", ClickAction.RUN_COMMAND);
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]---------------&a&l[&e Help Menu 6/10 &a&l]&a&l&m---------------[");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
 		} else if (Execute.HELP.accept(sender, args, 7)) {
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Enable &7- &eEnables ItemJoin for all players.");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Enable <User> &7- &eEnables ItemJoin for player.");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Enable <User> <World> &7- &eFor player/world.");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&aType &a&l/ItemJoin Help 9 &afor the next page.");
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Enable &7- &eEnables ItemJoin for all players.", "&aEnables ItemJoin for all players. \nPlayers will be able to get custom items.", "/itemjoin enable", ClickAction.SUGGEST_COMMAND);
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Enable <User> &7- &eEnables ItemJoin for player.", "&aEnables ItemJoin for the specified player name. \nThis player will be able to get custom items.", "/itemjoin enable ", ClickAction.SUGGEST_COMMAND);
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Enable <User> <World> &7- &eFor player/world.", "&aEnables ItemJoin for the specified player name in the specified world. \nThis player will be able to get custom items in this world.", "/itemjoin enable ", ClickAction.SUGGEST_COMMAND);
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&aType &a&l/ItemJoin Help 8 &afor the next page.", "&eClick to View the Next Page.", "/itemjoin help 8", ClickAction.RUN_COMMAND);
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]---------------&a&l[&e Help Menu 7/10 &a&l]&a&l&m---------------[");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
 		} else if (Execute.HELP.accept(sender, args, 8)) {
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Disable &7- &eDisables ItemJoin for all players.");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Disable <User> &7- &eDisables ItemJoin for player.");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Disable <User> <World> &7- &eFor player/world.");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&aType &a&l/ItemJoin Help 10 &afor the next page.");
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Disable &7- &eDisables ItemJoin for all players.", "&aDisables ItemJoin for all players. \nPlayers will NOT be able to get custom items.", "/itemjoin disable", ClickAction.SUGGEST_COMMAND);
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Disable <User> &7- &eDisables ItemJoin for player.", "&aDisables ItemJoin for the specified player name. \nThis player will NOT be able to get custom items.", "/itemjoin disable ", ClickAction.SUGGEST_COMMAND);
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Disable <User> <World> &7- &eFor player/world.", "&aDisables ItemJoin for the specified player name in the specified world. \nThis player will NOT be able to get custom items in this world.", "/itemjoin disable ", ClickAction.SUGGEST_COMMAND);
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&aType &a&l/ItemJoin Help 9 &afor the next page.", "&eClick to View the Next Page.", "/itemjoin help 9", ClickAction.RUN_COMMAND);
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]---------------&a&l[&e Help Menu 8/10 &a&l]&a&l&m---------------[");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
 		} else if (Execute.HELP.accept(sender, args, 9)) {
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&c&l[DANGER]&eThe Following Destroys Data &nPermanently!&e&c&l[DANGER]");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Purge &7- &eDeletes the database file!");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Purge map-id <Image> &7- &eMap-Images data.");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Purge first-join <User> &7- &eFirst-Join data.");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Purge first-world <User> &7- &eFirst-World data.");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Purge ip-limits <User> &7- &eIp-Limits data.");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&aType &a&l/ItemJoin Help 11 &afor the next page.");
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Purge &7- &eDeletes the database file.", "&c&l[DANGER] &eThe Following Destroys Data &nPermanently!&e&c&l [DANGER] \n\n&aPurges ALL Player Data from the Database file! \n\n&c&n&lTHIS CANNOT BE UNDONE.", "/itemjoin purge", ClickAction.SUGGEST_COMMAND);
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Purge map-id <Image> &7- &eMap-Images data.", "&c&l[DANGER] &eThe Following Destroys Data &nPermanently!&e&c&l [DANGER] \n\n&aPurges the map-id data for the custom-image from the Database file! \n\n&c&n&lTHIS CANNOT BE UNDONE.", "/itemjoin purge map-id ", ClickAction.SUGGEST_COMMAND);
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Purge first-join <User> &7- &eFirst-Join data.", "&c&l[DANGER] &eThe Following Destroys Data &nPermanently!&e&c&l [DANGER] \n\n&aPurges the first-join data for the player name from the Database file! \n\n&c&n&lTHIS CANNOT BE UNDONE.", "/itemjoin purge first-join ", ClickAction.SUGGEST_COMMAND);
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Purge first-world <User> &7- &eFirst-World data.", "&c&l[DANGER] &eThe Following Destroys Data &nPermanently!&e&c&l [DANGER] \n\n&aPurges the first-world data for the player name from the Database file! \n\n&c&n&lTHIS CANNOT BE UNDONE.", "/itemjoin purge first-world ", ClickAction.SUGGEST_COMMAND);
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Purge ip-limits <User> &7- &eIp-Limits data.", "&c&l[DANGER] &eThe Following Destroys Data &nPermanently!&e&c&l [DANGER] \n\n&aPurges the ip-limits data for the player name from the Database file! \n\n&c&n&lTHIS CANNOT BE UNDONE.", "/itemjoin purge ip-limits ", ClickAction.SUGGEST_COMMAND);
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&aType &a&l/ItemJoin Help 10 &afor the next page.", "&eClick to View the Next Page.", "/itemjoin help 10", ClickAction.RUN_COMMAND);
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]--------------&a&l[&e Help Menu 9/10 &a&l]&a&l&m---------------[");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
 		} else if (Execute.HELP.accept(sender, args, 10)) {
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&c&l[DANGER]&eThe Following Destroys Data &nPermanently!&e&c&l[DANGER]");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Purge enabled-players <User> &7- &eData.");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Purge first-commands <User> &7- &eData.");
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Purge enabled-players <User> &7- &eThe Data.", "&c&l[DANGER] &eThe Following Destroys Data &nPermanently!&e&c&l [DANGER] \n\n&aPurges the enabled-players data for the player name from the Database file! \n\n&c&n&lTHIS CANNOT BE UNDONE.", "/itemjoin purge enabled-players ", ClickAction.SUGGEST_COMMAND);
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l/ItemJoin Purge first-commands <User> &7- &eThe Data.", "&c&l[DANGER] &eThe Following Destroys Data &nPermanently!&e&c&l [DANGER] \n\n&aPurges the first-commands data for the player name from the Database file! \n\n&c&n&lTHIS CANNOT BE UNDONE.", "/itemjoin purge first-commands ", ClickAction.SUGGEST_COMMAND);
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&aFound a bug? Report it @");
-			LanguageAPI.getLang(false).dispatchMessage(sender, "&ahttps://github.com/RockinChaos/ItemJoin/issues");
+			LanguageAPI.getLang(false).dispatchMessage(sender, "&ahttps://github.com/RockinChaos/ItemJoin/issues", "&eClick to Submit a Bug or Feature Request.", "https://github.com/RockinChaos/ItemJoin/issues", ClickAction.OPEN_URL);
 			LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]---------------&a&l[&e Help Menu 10/10 &a&l]&a&l&m--------------[");
 			LanguageAPI.getLang(false).dispatchMessage(sender, "");
 		} else if (Execute.RELOAD.accept(sender, args, 0)) {
@@ -367,7 +367,7 @@ public class ChatExecutor implements CommandExecutor {
 			}
 			}
 		}
-		if (page != maxPage) { LanguageAPI.getLang(false).dispatchMessage(sender, "&aType &a&l/ItemJoin List " + (page + 1) + " &afor the next page."); }
+		if (page != maxPage) { LanguageAPI.getLang(false).dispatchMessage(sender, "&aType &a&l/ItemJoin List " + (page + 1) + " &afor the next page.", "&eClick to View the Next Page.", "/itemjoin list " + (page + 1), ClickAction.RUN_COMMAND); }
 		LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]----------------&a&l[&e List Menu " + page + "/" + maxPage + " &a&l]&a&l&m---------------[");
 	}
 	
@@ -388,6 +388,7 @@ public class ChatExecutor implements CommandExecutor {
 			LanguageAPI.getLang(false).dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.updates") ? "&a[\u2714]" : "&c[\u2718]") + " ItemJoin.Updates");
 			LanguageAPI.getLang(false).dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.upgrade") ? "&a[\u2714]" : "&c[\u2718]") + " ItemJoin.Upgrade");
 			LanguageAPI.getLang(false).dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.permissions") ? "&a[\u2714]" : "&c[\u2718]") + " ItemJoin.Permissions");
+			LanguageAPI.getLang(false).dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.query") ? "&a[\u2714]" : "&c[\u2718]") + " ItemJoin.Query");
 			LanguageAPI.getLang(false).dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.get") ? "&a[\u2714]" : "&c[\u2718]") + " ItemJoin.Get");
 			LanguageAPI.getLang(false).dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.remove") ? "&a[\u2714]" : "&c[\u2718]") + " ItemJoin.Remove");
 			LanguageAPI.getLang(false).dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.enable") ? "&a[\u2714]" : "&c[\u2718]") + " ItemJoin.Enable");
@@ -425,15 +426,15 @@ public class ChatExecutor implements CommandExecutor {
 				LanguageAPI.getLang(false).dispatchMessage(sender, inputMessage.get(i));
 			}
 		}
-		if (page != maxPage) { LanguageAPI.getLang(false).dispatchMessage(sender, "&aType &a&l/ItemJoin Permissions " + (page + 1) + " &afor the next page."); }
+		if (page != maxPage) { LanguageAPI.getLang(false).dispatchMessage(sender, "&aType &a&l/ItemJoin Permissions " + (page + 1) + " &afor the next page.", "&eClick to View the Next Page.", "/itemjoin permissions " + (page + 1), ClickAction.RUN_COMMAND); }
 		LanguageAPI.getLang(false).dispatchMessage(sender, "&a&l&m]------------&a&l[&e Permissions Menu " + page + "/" + maxPage + " &a&l]&a&l&m-----------[");
 	}
 	
    /**
 	* Called when the CommandSender executes the Purge command.
 	* @param sender - Source of the command. 
-	* @param player - The Player name having their data purged.
 	* @param table - The table being purged of data.
+	* @param args - The player name having their data purged.
 	* 
 	*/
 	private HashMap < String, Boolean > confirmationRequests = new HashMap < String, Boolean > ();
