@@ -246,7 +246,7 @@
 		<dependency>
 			<groupId>net.skinsrestorer</groupId>
 			<artifactId>skinsrestorer</artifactId>
-			<version>14.0.0</version>
+			<version>14.1.1</version>
 			<scope>provided</scope>
 		</dependency>
 		<!--Citizens API-->
