@@ -27,6 +27,10 @@ import org.bukkit.entity.Player;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.utils.ServerUtils;
 import me.RockinChaos.itemjoin.utils.StringUtils;
+import me.RockinChaos.itemjoin.ChatComponent;
+import me.RockinChaos.itemjoin.ChatComponent.ClickAction;
+import me.RockinChaos.itemjoin.ChatComponent.ClickEvent;
+import me.RockinChaos.itemjoin.ChatComponent.TextSection;
 
 public class LanguageAPI {
 	private Lang langType = Lang.ENGLISH;
@@ -45,6 +49,40 @@ public class LanguageAPI {
 		langMessage = StringUtils.translateLayout(langMessage, player);
 		if (sender instanceof ConsoleCommandSender) { langMessage = ChatColor.stripColor(langMessage); } 
 		sender.sendMessage(langMessage);
+	}
+	
+   /**
+    * Executes a Message to the Sender.
+    * 
+    * @param sender - The sender receiving the Message.
+    * @param langMessage - The Message being sent.
+    * @param hoverMessage - The Hoverable Message being attached to langMessage.
+    * @param clickMessage - The Clicked Message being attached to langMessage.
+    */
+	public void dispatchMessage(final CommandSender sender, String langMessage, String hoverMessage, String clickMessage, final ClickAction action) { 
+		Player player = null; if (sender instanceof Player) { player = (Player) sender; }
+		langMessage = StringUtils.translateLayout(langMessage, player);
+		hoverMessage = (hoverMessage != null ? StringUtils.translateLayout(hoverMessage, player) : null);
+		clickMessage = (clickMessage != null ? StringUtils.translateLayout(clickMessage, player) : null);
+		if (sender instanceof ConsoleCommandSender) { 
+			langMessage = ChatColor.stripColor(langMessage); 
+			sender.sendMessage(langMessage);
+		} else if (ServerUtils.hasSpecificUpdate("1_8")) {
+			TextSection textComponent = ChatComponent.of(langMessage);
+			if (hoverMessage != null) {
+				TextSection.HoverEvent hoverEvent = new TextSection.HoverEvent(ChatComponent.of(hoverMessage));
+				textComponent.hoverEvent(hoverEvent);
+			}
+			if (clickMessage != null) {
+				ClickEvent clickEvent = new ClickEvent();
+				clickEvent.action(action);
+				clickEvent.click(clickMessage);
+				textComponent.clickEvent(clickEvent);
+			}
+			ChatComponent.sendTo(textComponent, player);
+		} else {
+			sender.sendMessage(langMessage);
+		}
 	}
 	
    /**
