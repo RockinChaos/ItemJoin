@@ -58,7 +58,7 @@ public class PermissionsHandler {
 					|| permission.equalsIgnoreCase("itemjoin.purge") || permission.equalsIgnoreCase("itemjoin.get") || permission.equalsIgnoreCase("itemjoin.get.others")
 							|| permission.equalsIgnoreCase("itemjoin.remove") || permission.equalsIgnoreCase("itemjoin.remove.others") || permission.equalsIgnoreCase("itemjoin.disable") 
 							|| permission.equalsIgnoreCase("itemjoin.disable.others") || permission.equalsIgnoreCase("itemjoin.enable") || permission.equalsIgnoreCase("itemjoin.enable.others")
-							|| permission.equalsIgnoreCase("itemjoin.list")) {
+							|| permission.equalsIgnoreCase("itemjoin.list") || permission.equalsIgnoreCase("itemjoin.query")) {
 				return true;
 			}
 		}
