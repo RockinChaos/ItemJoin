@@ -20,6 +20,7 @@ package me.RockinChaos.itemjoin.utils;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -372,7 +373,7 @@ public class StringUtils {
 			String https = ("https://sessionserver.mojang.com/session/minecraft/profile/" + StringUtils.translateLayout(skullTexture, player));
 			try {
 				URL url = new URL(https);
-				InputStreamReader read = new InputStreamReader(url.openStream());
+				Reader read = new InputStreamReader(url.openStream());
 				JsonObject textureProperty = JsonParser.parseReader(read).getAsJsonObject().get("properties").getAsJsonArray().get(0).getAsJsonObject();
 				return textureProperty.get("value").getAsString();
 			} catch (IOException e) {
