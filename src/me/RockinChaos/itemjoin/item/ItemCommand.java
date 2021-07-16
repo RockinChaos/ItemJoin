@@ -403,7 +403,7 @@ public class ItemCommand {
 			String[] values = new String[1];
 			if (altPlayer != null) { values[0] = altPlayer.getName(); }
 			String jsonMessage = this.getJSONMessage(StringUtils.translateLayout(this.command, player, values));
-			Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(),"tellraw " + player.getName() + " " + jsonMessage);
+			Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(),"minecraft:tellraw " + player.getName() + " " + jsonMessage);
 		} 
 		catch (Exception e) {
 			ServerUtils.logSevere("{ItemCommand} There was an error executing an item's command to send a message, if this continues report it to the developer.");
