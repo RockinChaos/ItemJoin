@@ -30,6 +30,7 @@ import me.RockinChaos.itemjoin.utils.SchedulerUtils;
 import me.RockinChaos.itemjoin.utils.ServerUtils;
 import me.RockinChaos.itemjoin.utils.ReflectionUtils.FieldAccessor;
 import me.RockinChaos.itemjoin.utils.ReflectionUtils.MethodInvoker;
+import me.RockinChaos.itemjoin.utils.ReflectionUtils.MinecraftField;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -65,8 +66,8 @@ public abstract class TinyProtocol {
 	private final AtomicInteger ID = new AtomicInteger(0);
 
 	private final MethodInvoker getPlayerHandle = ReflectionUtils.getMethod("{obc}.entity.CraftPlayer", "getHandle");
-	private final FieldAccessor<Object> getConnection = ReflectionUtils.getField(ReflectionUtils.getMinecraftClass("EntityPlayer").getCanonicalName(), (ReflectionUtils.noReflections() ? "b" : "playerConnection"), Object.class);
-	private final FieldAccessor<Object> getManager = ReflectionUtils.getField(ReflectionUtils.getMinecraftClass("PlayerConnection").getCanonicalName(), (ReflectionUtils.noReflections() ? "a" : "networkManager"), Object.class);
+	private final FieldAccessor<Object> getConnection = ReflectionUtils.getField(ReflectionUtils.getMinecraftClass("EntityPlayer").getCanonicalName(), (MinecraftField.PlayerConnection.getField()), Object.class);
+	private final FieldAccessor<Object> getManager = ReflectionUtils.getField(ReflectionUtils.getMinecraftClass("PlayerConnection").getCanonicalName(), (MinecraftField.NetworkManager.getField()), Object.class);
 	private final FieldAccessor<Channel> getChannel = ReflectionUtils.getField(ReflectionUtils.getMinecraftClass("NetworkManager").getCanonicalName(), Channel.class, 0);
 
 	private final Class<Object> minecraftServerClass = ReflectionUtils.getUntypedClass(ReflectionUtils.getMinecraftClass("MinecraftServer").getCanonicalName());
