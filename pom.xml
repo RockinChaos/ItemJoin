@@ -300,9 +300,9 @@
 		</dependency>
 		<!--Google API-->
 		<dependency>
-			<groupId>com.googlecode.json-simple</groupId>
-			<artifactId>json-simple</artifactId>
-			<version>1.1.1</version>
+			<groupId>javax</groupId>
+			<artifactId>javaee-api</artifactId>
+			<version>7.0</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
