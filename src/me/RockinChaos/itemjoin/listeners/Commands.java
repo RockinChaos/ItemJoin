@@ -387,9 +387,9 @@ public class Commands implements Listener {
 	*/
 	private void equipCommands(final Player player, final Player altPlayer, final ItemStack item, final String action, String clickType, final String slot, final SlotType slotType) {
 			final String[] itemType = item.getType().name().split("_");
-			if (itemType.length >= 2 && itemType[1] != null && !itemType[1].isEmpty()
+			if (itemType.length >= 2 && (itemType[1] != null && !itemType[1].isEmpty()
 					&& (clickType.equalsIgnoreCase("SHIFT_EQUIPPED") || itemType[1].equalsIgnoreCase(StringUtils.getArmorSlot(slot, false)) 
-					|| ((ItemHandler.isSkull(item.getType()) || itemType[1].equalsIgnoreCase("HEAD")) && StringUtils.getArmorSlot(slot, false).equalsIgnoreCase("HELMET")))) {
+					|| ((ItemHandler.isSkull(item.getType()) || itemType[1].equalsIgnoreCase("HEAD")) && StringUtils.getArmorSlot(slot, false).equalsIgnoreCase("HELMET"))))) {
 				clickType = (clickType.equalsIgnoreCase("SHIFT_EQUIPPED") ? "EQUIPPED" : clickType);
 				this.runCommands(player, altPlayer, item, action, clickType, slot);
 			}
