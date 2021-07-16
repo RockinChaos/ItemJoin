@@ -687,6 +687,7 @@ public class Menu {
 			placeHolders[3] = (item.hasItemMeta() && item.getItemMeta().hasDisplayName() ? item.getItemMeta().getDisplayName() : itemMap.getConfigName());
 			LanguageAPI.getLang(false).sendLangMessage("commands.menu.itemSaved", player, placeHolders);
 		}
+		itemMap.renderItemStack();
 	}
 	
    /**
