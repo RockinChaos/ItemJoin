@@ -18,8 +18,8 @@
 package me.RockinChaos.itemjoin.utils.api;
 
 import me.RockinChaos.itemjoin.ItemJoin;
-import me.RockinChaos.itemjoin.utils.SchedulerUtils;
 import me.RockinChaos.itemjoin.utils.ServerUtils;
+import me.RockinChaos.itemjoin.utils.StringUtils;
 
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.Messenger;
@@ -31,8 +31,7 @@ import com.google.common.io.ByteStreams;
 
 public class BungeeAPI implements PluginMessageListener {
 	
-	private final String PLUGIN_CHANNEL = "plugin:itemjoin";
-	private boolean bungeePlugin = false;
+	private final String PLUGIN_CHANNEL = "plugin:cloudsync";
 	private static BungeeAPI bungee;
 
    /**
@@ -73,19 +72,16 @@ public class BungeeAPI implements PluginMessageListener {
     * @param command - The Bungee Command the Player is executing.
     */
 	public void ExecuteCommand(final Player player, final String command) {
-		ByteArrayDataOutput out = ByteStreams.newDataOutput();
-		try {
-			out.writeUTF(player.getName());
-			out.writeUTF(command);
-		} catch (Exception e) { ServerUtils.sendDebugTrace(e); }
-		player.sendPluginMessage(ItemJoin.getInstance(), this.PLUGIN_CHANNEL, out.toByteArray());
-		if (!this.bungeePlugin) {
-			SchedulerUtils.runLater(10L, () -> {
-				if (!this.bungeePlugin) {
-					ServerUtils.messageSender(player, "&cItemJoin-Bungee was not detected on your BungeeCord server, the specified command /" + command + " will not work without it.");
-					ServerUtils.logSevere("A custom item is set to execute the Bungee command /" + command + " but, ItemJoin-Bungee was not detected on your BungeeCord server.");
-				}
-			});
+		if (StringUtils.containsIgnoreCase(player.getListeningPluginChannels().toString(), "plugin:cloudsync")) {
+			ByteArrayDataOutput out = ByteStreams.newDataOutput();
+			try {
+				out.writeUTF(player.getName());
+				out.writeUTF(command);
+			} catch (Exception e) { ServerUtils.sendDebugTrace(e); }
+			player.sendPluginMessage(ItemJoin.getInstance(), this.PLUGIN_CHANNEL, out.toByteArray());
+		} else {
+			ServerUtils.messageSender(player, "&cCloudSync was not detected on your BungeeCord server, the specified command /" + command + " will not work without it.");
+			ServerUtils.logWarn("A custom item is set to execute the Bungee command /" + command + " but, CloudSync was not detected on your BungeeCord server.");
 		}
 	}
 
@@ -98,13 +94,11 @@ public class BungeeAPI implements PluginMessageListener {
     */
 	@Override
 	public void onPluginMessageReceived(final String channel, final Player player, final byte[] message) {
-		if (!channel.equals(this.PLUGIN_CHANNEL) && !channel.equals("BungeeCord")) { return; }
+		if (!channel.equals(this.PLUGIN_CHANNEL)) { return; }
 		ByteArrayDataInput in = ByteStreams.newDataInput(message);
 		String subchannel = in.readUTF();
 		if (subchannel.equals("ConnectOther") || subchannel.equals("Connect")) {
 			player.sendMessage(subchannel + " " + in.readByte());
-		} else if (subchannel.equals("Confirmation")) {
-			this.bungeePlugin = true;
 		}
 	} 
 	
