@@ -89,7 +89,7 @@ public class Menu {
 	private static ItemStack fillerPaneGItem = ItemHandler.getItem("STAINED_GLASS_PANE:7", 1, false, "&7", "");
 	private static ItemStack fillerPaneItem = ItemHandler.getItem("GLASS_PANE", 1, false, "&7", "");
 	private static ItemStack exitItem = ItemHandler.getItem("BARRIER", 1, false, "&c&l&nExit", "&7", "&7*Returns you to the game");
-	private static List<Player> modifyMenu = new ArrayList<Player>();
+	private static List<String> modifyMenu = new ArrayList<String>();
 
 //  ============================================== //
 //  			   Selection Menus      	       //
@@ -8126,8 +8126,12 @@ public class Menu {
     * @param player - The Player to be set to the Modify Menu.
     */
 	public static void setModifyMenu(final boolean bool, final Player player) {
-		if (bool) { modifyMenu.add(player); } 
-		else { modifyMenu.remove(player); }
+		try {
+			SchedulerUtils.runAsync(() -> {
+				if (bool) { modifyMenu.add(PlayerHandler.getPlayerID(player)); } 
+				else { modifyMenu.remove(PlayerHandler.getPlayerID(player)); }
+			});
+		} catch (ArrayIndexOutOfBoundsException e) { }
 	}
 	
    /**
@@ -8137,7 +8141,7 @@ public class Menu {
     * @return If the Player is in the Modify Menu.
     */
 	public static boolean modifyMenu(final Player player) {
-		return modifyMenu.contains(player);
+		return modifyMenu.contains(PlayerHandler.getPlayerID(player));
 	}
 	
    /**
