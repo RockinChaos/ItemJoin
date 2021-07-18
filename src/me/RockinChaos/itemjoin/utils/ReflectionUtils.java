@@ -403,7 +403,16 @@ public final class ReflectionUtils {
 	public static void sendPacketPlayOutSetSlot(Player player, ItemStack item, int index) throws Exception {
 		Class < ? > itemStack = getMinecraftClass("ItemStack");
 		Object nms = getCraftBukkitClass("inventory.CraftItemStack").getMethod("asNMSCopy", ItemStack.class).invoke(null, item);
-		Object packet = getMinecraftClass("PacketPlayOutSetSlot").getConstructor(int.class, int.class, itemStack).newInstance(0, index, itemStack.cast(nms));
+		Object packet = null;
+		if (MC_REMAPPED) {
+			try {
+				packet = getMinecraftClass("PacketPlayOutSetSlot").getConstructor(int.class, int.class, int.class, itemStack).newInstance(0, 0, index, itemStack.cast(nms));
+			} catch (NoSuchMethodException e) {
+				packet = getMinecraftClass("PacketPlayOutSetSlot").getConstructor(int.class, int.class, itemStack).newInstance(0, index, itemStack.cast(nms));
+			}
+		} else {
+			packet = getMinecraftClass("PacketPlayOutSetSlot").getConstructor(int.class, int.class, itemStack).newInstance(0, index, itemStack.cast(nms));
+		}
 		sendPacket(player, packet);
 	}
 	
