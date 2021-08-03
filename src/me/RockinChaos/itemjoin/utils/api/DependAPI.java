@@ -18,6 +18,8 @@
 package me.RockinChaos.itemjoin.utils.api;
 
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.FileConfiguration;
+
 import com.mojang.authlib.properties.Property;
 
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
@@ -37,6 +39,15 @@ public class DependAPI {
 	public DependAPI() {
 		GuardAPI.getGuard(true);
 		VaultAPI.getVault(true);
+	}
+	
+   /**
+    * Checks if Hyperverse is Enabled.
+    * 
+    * @return If Hyperverse is Enabled.
+    */
+	public boolean exploitFixerEnabled() {
+		return Bukkit.getServer().getPluginManager().isPluginEnabled("ExploitFixer");
 	}
 	
    /**
@@ -250,7 +261,7 @@ public class DependAPI {
     */
 	public void sendUtilityDepends() {
 		String enabledPlugins = (this.authMeEnabled() ? "AuthMe, " : "") + (this.nickEnabled() ? "BetterNick, " : "") 
-				+ (this.hyperVerseEnabled() ? "Hyperverse, " : "") + (this.coreEnabled() ? "Multiverse-Core, " : "") + (this.inventoryEnabled() ? "Multiverse-Inventories, " : "") 
+				+ (this.exploitFixerEnabled() ? "ExploitFixer, " : "")+ (this.hyperVerseEnabled() ? "Hyperverse, " : "") + (this.coreEnabled() ? "Multiverse-Core, " : "") + (this.inventoryEnabled() ? "Multiverse-Inventories, " : "") 
 				+ (this.myWorldsEnabled() ? "My Worlds, " : "") + (this.perInventoryEnabled() ? "PerWorldInventory, " : "") 
 				+ (this.perPluginsEnabled() ? "PerWorldPlugins, " : "") + (this.tokenEnchantEnabled() ? "TokenEnchant, " : "") 
 				+ (this.getGuard().guardEnabled() ? "WorldGuard, " : "") + (this.databaseEnabled() ? "HeadDatabase, " : "") 
@@ -261,6 +272,14 @@ public class DependAPI {
 		
 		if (Bukkit.getServer().getPluginManager().isPluginEnabled("Vault") && !this.getVault().vaultEnabled()) {
 			ServerUtils.logDebug("{VaultAPI} An error has occured while setting up enabling Vault-ItemJoin support, no economy plugin detected."); 
+		}
+		
+		if (this.exploitFixerEnabled()) {
+			final FileConfiguration exploitConfig = Bukkit.getPluginManager().getPlugin("ExploitFixer").getConfig();
+			if (exploitConfig.getString("itemsfix.enabled") != null && exploitConfig.getBoolean("itemsfix.enabled")) {
+				ServerUtils.logSevere("{DependAPI} ExploitFixer has been detected with itemsfix enabled! ItemJoin and other custom items plugins WILL BREAK with this feature enabled."
+						+ "Please set itemsfix.enabled to false in the config.yml of ExploitFixer to resolve this conflict.");
+			}
 		}
 		
 	}
@@ -276,6 +295,7 @@ public class DependAPI {
 		metrics.addCustomChart(new SimplePie("language", () -> LanguageAPI.getLang(false).getLanguage()));
 		metrics.addCustomChart(new SimplePie("softDepend", () -> this.authMeEnabled() ? "AuthMe" : ""));
 		metrics.addCustomChart(new SimplePie("softDepend", () -> this.nickEnabled() ? "BetterNick" : ""));
+		metrics.addCustomChart(new SimplePie("softDepend", () -> this.exploitFixerEnabled() ? "ExploitFixer" : ""));
 		metrics.addCustomChart(new SimplePie("softDepend", () -> this.hyperVerseEnabled() ? "HeadDatabase" : ""));
 		metrics.addCustomChart(new SimplePie("softDepend", () -> this.hyperVerseEnabled() ? "Hyperverse" : ""));
 		metrics.addCustomChart(new SimplePie("softDepend", () -> this.coreEnabled() ? "Multiverse-Core" : ""));

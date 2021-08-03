@@ -114,6 +114,7 @@ public class ConfigHandler {
    /**
     * Registers new instances of the plugin classes.
     * 
+    * @param silent - If any messages should be sent.
     */
 	private void registerClasses(final boolean silent) {
 		final boolean reload = ItemJoin.getInstance().isStarted();
@@ -127,6 +128,9 @@ public class ConfigHandler {
 			int customItems = (this.getConfigurationSection() != null ? this.getConfigurationSection().getKeys(false).size() : 0);
 			if (!silent) { 
 				DependAPI.getDepends(false).sendUtilityDepends();
+				if (ServerUtils.hasSpecificUpdate("1_13")) {
+					ServerUtils.logInfo("Initializing Legacy Material Support ..."); 
+				}
 				ServerUtils.logInfo(customItems + " Custom item(s) loaded!"); 
 			}
 			this.registerPrevent();
@@ -356,6 +360,7 @@ public class ConfigHandler {
    /**
     * Properly reloads the configuration files.
     * 
+    * @param silent - If any messages should be sent.
     */
 	public void reloadConfigs(final boolean silent) {
 		ItemUtilities.getUtilities().closeAnimations();
