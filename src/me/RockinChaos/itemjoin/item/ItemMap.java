@@ -3587,33 +3587,37 @@ public class ItemMap {
     * @return The Player specific ItemStack.
     */
 	public ItemMap updateItem(final Player player) {
-		this.setSkullDatabase();
-		this.setUnbreaking();
-		this.setEnchantments(player);
-		this.setMapImage();
-		this.tempItem = this.setJSONBookPages(player, this.tempItem, this.bookPages);
-		this.setNBTData();
-		this.tempMeta = this.tempItem.getItemMeta();
-		this.setCustomName(player);
-		this.setCustomLore(player);
-		this.setSkull(player);
-		this.setDurability();
-		this.setData();
-		this.setModelData();
-		this.setPotionEffects();
-		this.setBanners();
-		this.setFireworks();
-		this.setFireChargeColor();
-		this.setDye();
-		this.setBookInfo(player);
-		LegacyAPI.setBookPages(player, this.tempMeta, this.bookPages, this);
-		this.setAttributes();
-		this.setAttributeFlags();
-		this.realGlow();
-		this.setContents(player);
-		this.tempItem.setItemMeta(this.tempMeta);
-		LegacyAPI.setGlowing(this.tempItem, this);
-		LegacyAPI.setAttributes(this.tempItem, this);
+		if (this.tempItem != null) {
+			this.setSkullDatabase();
+			this.setUnbreaking();
+			this.setEnchantments(player);
+			this.setMapImage();
+			this.tempItem = this.setJSONBookPages(player, this.tempItem, this.bookPages);
+			this.setNBTData();
+			this.tempMeta = this.tempItem.getItemMeta();
+		}
+		if (tempMeta != null) {
+			this.setCustomName(player);
+			this.setCustomLore(player);
+			this.setSkull(player);
+			this.setDurability();
+			this.setData();
+			this.setModelData();
+			this.setPotionEffects();
+			this.setBanners();
+			this.setFireworks();
+			this.setFireChargeColor();
+			this.setDye();
+			this.setBookInfo(player);
+			LegacyAPI.setBookPages(player, this.tempMeta, this.bookPages, this);
+			this.setAttributes();
+			this.setAttributeFlags();
+			this.realGlow();
+			this.setContents(player);
+			this.tempItem.setItemMeta(this.tempMeta);
+			LegacyAPI.setGlowing(this.tempItem, this);
+			LegacyAPI.setAttributes(this.tempItem, this);
+		}
 		return this;
 	}
 	

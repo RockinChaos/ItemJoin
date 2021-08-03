@@ -128,7 +128,6 @@ public class Clicking implements Listener {
 	
    /**
 	* Prevents the custom item from being equipped upon clicking and moving it to the armor slots.
-	* 
 	* @param event - InventoryClickEvent
 	*/
 	@EventHandler(ignoreCancelled = false)
@@ -149,7 +148,7 @@ public class Clicking implements Listener {
 				event.setCancelled(true);
 				PlayerHandler.updateInventory(player, 1L);
 			} else if (event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
-			String[] itemType = event.getCurrentItem().getType().name().split("_");
+			final String[] itemType = (event.getCurrentItem().getType().name().equalsIgnoreCase("ELYTRA") ? "ELYTRA_CHESTPLATE".split("_") : event.getCurrentItem().getType().name().split("_"));
 				if (itemType.length >= 2 && itemType[1] != null && !itemType[1].isEmpty() && StringUtils.isInt(StringUtils.getArmorSlot(itemType[1], true)) 
 					&& player.getInventory().getItem(Integer.parseInt(StringUtils.getArmorSlot(itemType[1], true))) == null
 					&& this.isEquipment(player, event.getCurrentItem(), "SHIFT_EQUIPPED", String.valueOf(event.getSlot()))
@@ -196,7 +195,7 @@ public class Clicking implements Listener {
 		final Player player = event.getPlayer();
 		final ItemStack item = (event.getItem() != null ? event.getItem().clone() : event.getItem());
 		if (item != null && item.getType() != Material.AIR && !PlayerHandler.isMenuClick(player.getOpenInventory(), event.getAction())) {
-			final String[] itemType = item.getType().name().split("_");
+			final String[] itemType = (item.getType().name().equalsIgnoreCase("ELYTRA") ? "ELYTRA_CHESTPLATE".split("_") : item.getType().name().split("_"));
 			if (itemType.length >= 2 && itemType[1] != null && !itemType[1].isEmpty() && StringUtils.isInt(StringUtils.getArmorSlot(itemType[1], true)) 
 				&& player.getInventory().getItem(Integer.parseInt(StringUtils.getArmorSlot(itemType[1], true))) == null
 				&& this.isEquipment(player, item, "EQUIPPED", StringUtils.getArmorSlot(itemType[1], true))
@@ -218,10 +217,9 @@ public class Clicking implements Listener {
  * @return 
 	*/
 	private boolean isEquipment(final Player player, final ItemStack item, String clickType, final String slot) {
-			final String[] itemType = item.getType().name().split("_");
-			if (itemType.length >= 2 && (itemType[1] != null && !itemType[1].isEmpty()
-					&& (clickType.equalsIgnoreCase("SHIFT_EQUIPPED") || itemType[1].equalsIgnoreCase(StringUtils.getArmorSlot(slot, false))) 
-					|| ((ItemHandler.isSkull(item.getType()) || itemType[1].equalsIgnoreCase("HEAD")) && StringUtils.getArmorSlot(slot, false).equalsIgnoreCase("HELMET")))) {
+			final String[] itemType = (item.getType().name().equalsIgnoreCase("ELYTRA") ? "ELYTRA_CHESTPLATE".split("_") : 
+				(ItemHandler.isSkull(item.getType()) || StringUtils.splitIgnoreCase(item.getType().name(), "HEAD", "_") ? "SKULL_HELMET".split("_") : item.getType().name().split("_")));
+			if (itemType.length >= 2 && (itemType[1] != null && !itemType[1].isEmpty() && (clickType.equalsIgnoreCase("SHIFT_EQUIPPED") || itemType[1].equalsIgnoreCase(StringUtils.getArmorSlot(slot, false))))) {
 				return true;
 			}
 			return false;
