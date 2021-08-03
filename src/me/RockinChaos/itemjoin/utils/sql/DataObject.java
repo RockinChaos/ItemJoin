@@ -158,7 +158,7 @@ public class DataObject {
     * 
     * @param stamp - The Time Stamp.
     */
-	public void setTimeStamp(String stamp) {
+	public void setTimeStamp(final String stamp) {
 		this.timeStamp = stamp;
 	}
 
@@ -199,7 +199,7 @@ public class DataObject {
     * @param worldName - The World Name being referenced.
     * @param object - The Object being referenced.
     */
-	public DataObject(Table table, String playerId, String worldName, String object) {
+	public DataObject(final Table table, final String playerId, final String worldName, final String object) {
 		if (playerId != null && !playerId.isEmpty()) {
 			this.playerId = playerId;
 		} else if (table.equals(Table.ENABLED_PLAYERS)) { 
@@ -228,7 +228,7 @@ public class DataObject {
     * @param object1 - The Object being referenced.
     * @param object2 - The Object being referenced.
     */
-	public DataObject(Table table, String playerId, String worldName, String object1, String object2) {
+	public DataObject(final Table table, final String playerId, final String worldName, final String object1, final String object2) {
 		if (playerId != null && !playerId.isEmpty()) {
 			this.playerId = playerId;
 		} else if (table.equals(Table.ENABLED_PLAYERS)) { 
@@ -259,7 +259,7 @@ public class DataObject {
     * @param object2 - The Object being referenced.
     * @param object3 - The Object being referenced.
     */
-	public DataObject(Table table, String playerId, String worldName, String object1, String object2, String object3) {
+	public DataObject(final Table table, final String playerId, final String worldName, final String object1, final String object2, final String object3) {
 		if (playerId != null && !playerId.isEmpty()) {
 			this.playerId = playerId;
 		} else if (table.equals(Table.ENABLED_PLAYERS)) { 
@@ -282,7 +282,7 @@ public class DataObject {
     * @param object2 - The DataObject being compared.
     * @return If the data is equal.
     */	
-	public boolean equalsData(DataObject object1, DataObject object2) {
+	public boolean equalsData(final DataObject object1, final DataObject object2) {
 		if (object1 == null || object2 == null) { return false; }
 		if (object1.getTable().equals(Table.FIRST_JOIN)) {
 			if (object1.getPlayerId().equalsIgnoreCase(object2.getPlayerId()) && (object1.getItem().isEmpty() || object1.getItem().equalsIgnoreCase(object2.getItem()))) {

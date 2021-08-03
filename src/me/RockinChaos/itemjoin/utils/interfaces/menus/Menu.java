@@ -2612,7 +2612,7 @@ public class Menu {
     * @param item - The ItemStack to be checked.
     * @param inventoryCheck - The Inventory used for checking the ItemStack.
     */
-	private static boolean safeMaterial(ItemStack item, Inventory inventoryCheck) {
+	private static boolean safeMaterial(final ItemStack item, final Inventory inventoryCheck) {
 		inventoryCheck.setItem(0, item);
 		if (inventoryCheck.getItem(0) != null && inventoryCheck.getItem(0).getType().name() != "AIR") {
 			return true;
