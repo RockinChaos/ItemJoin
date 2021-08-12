@@ -236,7 +236,7 @@ public class Interface implements InventoryHolder {
 			}
 			inventory.setItem(inventory.getSize() - 9, exitItem);
 			inventory.setItem(inventory.getSize() - 1, exitItem);
-			ItemStack blackPane = ItemHandler.getItem("STAINED_GLASS_PANE:15", 1, false, "&f", "");
+			ItemStack blackPane = ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "BLACK_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:15"), 1, false, "&f", "");
 			inventory.setItem(inventory.getSize() - 3, blackPane);
 			inventory.setItem(inventory.getSize() - 4, blackPane);
 			inventory.setItem(inventory.getSize() - 6, blackPane);

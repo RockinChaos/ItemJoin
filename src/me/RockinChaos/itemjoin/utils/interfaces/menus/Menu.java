@@ -85,8 +85,8 @@ import me.arcaniax.hdb.api.HeadDatabaseAPI;
 */
 public class Menu {
 	private static String GUIName = ServerUtils.hasSpecificUpdate("1_9") ? StringUtils.colorFormat("&7           &0&n ItemJoin Menu") : StringUtils.colorFormat("&7           &0&n ItemJoin Menu");
-	private static ItemStack fillerPaneBItem = ItemHandler.getItem("STAINED_GLASS_PANE:15", 1, false, "&7", "");
-	private static ItemStack fillerPaneGItem = ItemHandler.getItem("STAINED_GLASS_PANE:7", 1, false, "&7", "");
+	private static ItemStack fillerPaneBItem = ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "BLACK_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:15"), 1, false, "&7", "");
+	private static ItemStack fillerPaneGItem = ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GRAY_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:7"), 1, false, "&7", "");
 	private static ItemStack fillerPaneItem = ItemHandler.getItem("GLASS_PANE", 1, false, "&7", "");
 	private static ItemStack exitItem = ItemHandler.getItem("BARRIER", 1, false, "&c&l&nExit", "&7", "&7*Returns you to the game");
 	private static List<String> modifyMenu = new ArrayList<String>();
@@ -126,14 +126,14 @@ public class Menu {
 	private static void itemSettings(final Player player) {
 		Interface itemPane = new Interface(false, 3, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
-			itemPane.addButton(new Button(ItemHandler.getItem("347", 1, false, "&bTrigger Delay", "&7", "&7*This is the delay in half-seconds", "&7that ItemJoin will wait", "&7to give you the items.", "&7",
+			itemPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CLOCK" : "347"), 1, false, "&bTrigger Delay", "&7", "&7*This is the delay in half-seconds", "&7that ItemJoin will wait", "&7to give you the items.", "&7",
 					"&cNOTE: &7It is recommended to", "&7set this to 2 or 3 half-seconds.", "&9&lDELAY: &a" + String.valueOf(ConfigHandler.getConfig().getFile("items.yml").getString("items-Delay")).toUpperCase() + " half-second(s)"), 
 					event -> numberPane(player, 1)));
 			itemPane.addButton(new Button(fillerPaneBItem));
 			final String defaultTriggers = ConfigHandler.getConfig().getFile("config.yml").getString("Settings.Default-Triggers");
 			itemPane.addButton(new Button(ItemHandler.getItem("REDSTONE", 1, false, 
 					"&bDefault Triggers", "&7", "&7*This will be the default", "&7triggers used if a custom", "&7item is defined without", "&7specifying any triggers.", 
-					"&9&lENABLED: &a" + String.valueOf((!defaultTriggers.isEmpty() && !StringUtils.containsIgnoreCase(defaultTriggers, "DISABLE")) ? defaultTriggers : "FALSE").toUpperCase()), 
+					"&9&lENABLED: &a" + String.valueOf((defaultTriggers != null && !defaultTriggers.isEmpty() && !StringUtils.containsIgnoreCase(defaultTriggers, "DISABLE")) ? defaultTriggers : "FALSE").toUpperCase()), 
 					event -> triggerPane(player, 0)));
 			itemPane.addButton(new Button(fillerPaneBItem));
 			itemPane.addButton(new Button(ItemHandler.getItem("COOKIE", 1, ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Obtain-Items"), 
@@ -148,7 +148,7 @@ public class Menu {
 						SchedulerUtils.runLater(2L, () -> itemSettings(player));
 					}));
 			itemPane.addButton(new Button(fillerPaneBItem));
-			itemPane.addButton(new Button(ItemHandler.getItem("33", 1, ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Obtain-Items-OP"), 
+			itemPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "PISTON" : "33"), 1, ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Obtain-Items-OP"), 
 					"&bItem Permissions &c&l[OP PLAYERS]", "&7", "&7*If custom items should require", "&7the &c&lOP player(s)&7 to have specific", "&7permissions to receive the item.", "&c&lNOTE: &7This only applies to &c&lOP player(s)&7.", 
 					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Obtain-Items-OP")).toUpperCase()), 
 					event -> {
@@ -163,7 +163,7 @@ public class Menu {
 			itemPane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, ConfigHandler.getConfig().getFile("items.yml").getBoolean("items-Overwrite"), 
 					"&bOverwrite", "&7", "&7*Setting this to true will allow", "&7all custom items to overwrite", "&7any custom or vanilla items.", "&7", "&cNOTE: &7If set to false, the", "&7overwrite itemflag will still", "&7function normally.",
 					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig().getFile("items.yml").getString("items-Overwrite")).toUpperCase()), event -> overwritePane(player)));
-			itemPane.addButton(new Button(ItemHandler.getItem("85", 1, ConfigHandler.getConfig().getFile("items.yml").getBoolean("items-Spamming"), 
+			itemPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "OAK_FENCE" : "85"), 1, ConfigHandler.getConfig().getFile("items.yml").getBoolean("items-Spamming"), 
 					"&bSpamming", "&7", "&7*Setting this to false will prevent", "&7players from macro spamming", "&7the use of item commands.", "&7", "&cNOTE: &7It is recommended to", "&7leave this set to false.", 
 					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig().getFile("items.yml").getBoolean("items-Spamming")).toUpperCase()), 
 					event -> {
@@ -185,7 +185,7 @@ public class Menu {
 						ConfigHandler.getConfig().softReload();
 						SchedulerUtils.runLater(2L, () -> itemSettings(player));
 					}));
-			itemPane.addButton(new Button(ItemHandler.getItem("17", 1, ConfigHandler.getConfig().getFile("config.yml").getBoolean("General.Log-Commands"), 
+			itemPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "OAK_WOOD" : "17"), 1, ConfigHandler.getConfig().getFile("config.yml").getBoolean("General.Log-Commands"), 
 					"&bLog Commands", "&7", "&7*If the plugin prevent CONSOLE", "&7from logging any executed", "&7comamnd from the custom items.", "&7This only works for item command(s).", 
 					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig().getFile("config.yml").getBoolean("General.Log-Commands")).toUpperCase()), 
 					event -> {
@@ -216,9 +216,9 @@ public class Menu {
 			final String heldTriggers = ConfigHandler.getConfig().getFile("config.yml").getString("Settings.HeldItem-Triggers");
 			itemPane.addButton(new Button(ItemHandler.getItem("SUGAR", 1, false, 
 					"&bHeld Item Triggers", "&7", "&7*When these trigger(s)", "&7are performed, the held item", "&7slot will be set.", 
-					"&9&lENABLED: &a" + String.valueOf((!heldTriggers.isEmpty() && !StringUtils.containsIgnoreCase(heldTriggers, "DISABLE")) ? heldTriggers : "FALSE").toUpperCase()), 
+					"&9&lENABLED: &a" + String.valueOf((heldTriggers != null && !heldTriggers.isEmpty() && !StringUtils.containsIgnoreCase(heldTriggers, "DISABLE")) ? heldTriggers : "FALSE").toUpperCase()), 
 					event -> triggerPane(player, 1)));
-			itemPane.addButton(new Button(ItemHandler.getItem("116", 1, ConfigHandler.getConfig().getFile("config.yml").getBoolean("Settings.DataTags"), 
+			itemPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "ENCHANTMENT_TABLE" : "116"), 1, ConfigHandler.getConfig().getFile("config.yml").getBoolean("Settings.DataTags"), 
 					"&bDataTags", "&7", "&7*If custom items should use", "&7data tags (NBTTags) to distinguish", "&7each custom item, making them unqiue.", 
 					"&c&lNOTE: &7This only works on Minecraft 1.8+", "&7It is recommended to keep", "&7this set to TRUE.", 
 					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig().getFile("config.yml").getBoolean("Settings.DataTags")).toUpperCase()), 
@@ -233,7 +233,7 @@ public class Menu {
 			itemPane.addButton(new Button(ItemHandler.getItem("LAVA_BUCKET", 1, false, 
 					"&bClear Items", "&7", "&7*Modify settings for clearing", "&7specific items when a player", "&7performed a specified action."),
 					event -> clearPane(player)));
-			itemPane.addButton(new Button(ItemHandler.getItem("137", 1, false, 
+			itemPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "COMMAND_BLOCK" : "137"), 1, false, 
 					"&bPrevent Actions", "&7", "&7*Disable certain actions", "&7with items for players."),
 					event -> preventPane(player)));
 			itemPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the main menu."), event -> startMenu(player)));
@@ -257,7 +257,7 @@ public class Menu {
 					"&9&lLANG: &a" + String.valueOf(ConfigHandler.getConfig().getFile("config.yml").getString("Language")).toUpperCase()), 
 					event -> languagePane(player)));
 			configPane.addButton(new Button(fillerPaneBItem));
-			configPane.addButton(new Button(ItemHandler.getItem("137", 1, ConfigHandler.getConfig().getFile("config.yml").getBoolean("Database.MySQL"), 
+			configPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "COMMAND_BLOCK" : "137"), 1, ConfigHandler.getConfig().getFile("config.yml").getBoolean("Database.MySQL"), 
 					"&bMySQL Database", "&7", "&7*If the plugin should use", "&7a MySQL Database instead", "&7of the locale SQLite Database.",
 					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig().getFile("config.yml").getBoolean("Database.MySQL")).toUpperCase()), 
 					event -> databasePane(player)));
@@ -297,7 +297,7 @@ public class Menu {
 						SchedulerUtils.runLater(2L, () -> configSettings(player));
 					}));
 			configPane.addButton(new Button(fillerPaneBItem));
-			configPane.addButton(new Button(ItemHandler.getItem("322", 1, ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Commands-OP"), 
+			configPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GOLDEN_APPLE" : "322"), 1, ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Commands-OP"), 
 					"&bPlugin Commands &c&l[OP PLAYERS]", "&7", "&7*If the plugin should check", "&7if the OP player has the", "&7proper permissions set to", "&7use the plugin commands.", 
 					"&7OP Players will no longer get", "&7access to all plugin commands", "&7by default.",
 					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Commands-OP")).toUpperCase()), 
@@ -389,7 +389,7 @@ public class Menu {
 					dragDrop.allowClick(false);
 				}
 			}));
-			dragDrop.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:7", 1, false, "", "")), 2);
+			dragDrop.addButton(new Button(fillerPaneGItem), 2);
 			dragDrop.addButton(new Button(ItemHandler.getItem("CHEST", 1, false, "&a&lAutosave", "&7", "&7*Click me to save your whole", "&7inventory to the items.yml as-is,", "&7including current slot positions!", "&7" , "&c&l[&nALL&c&l ITEMS]"), event -> {
 				PlayerInventory playerInv = event.getWhoClicked().getInventory();
 				if (playerInv != null) {
@@ -536,7 +536,7 @@ public class Menu {
 			modifyPane.addButton(new Button(fillerPaneGItem));
 		}
 		if (crafting == true) {
-			modifyPane.addButton(new Button(ItemHandler.getItem("58", 1, false, "&fCrafting", "&7", "&7*Click to view the existing", "&7crafting slot items."), event -> craftingPane.open(player)));
+			modifyPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CRAFTING_TABLE" : "58"), 1, false, "&fCrafting", "&7", "&7*Click to view the existing", "&7crafting slot items."), event -> craftingPane.open(player)));
 		} else {
 			modifyPane.addButton(new Button(fillerPaneGItem));
 		}
@@ -845,7 +845,7 @@ public class Menu {
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				creatingPane(event.getPlayer(), itemMap);
 			}));
-			creatingPane.addButton(new Button(ItemHandler.getItem("386", 1, false, "&b&lLore", "&7", "&7*Set the lore of the item.", "&9&lLORE: &f" + StringUtils.nullCheck(itemMap.getCustomLore().toString())), event -> {
+			creatingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "WRITABLE_BOOK" : "386"), 1, false, "&b&lLore", "&7", "&7*Set the lore of the item.", "&9&lLORE: &f" + StringUtils.nullCheck(itemMap.getCustomLore().toString())), event -> {
 				if (itemMap.getDynamicLores() != null && !itemMap.getDynamicLores().isEmpty()) {
 					animatedLorePane(player, itemMap);
 				} else { 
@@ -866,7 +866,7 @@ public class Menu {
 			(StringUtils.nullCheck(itemMap.getItemFlags()) != "NONE" ? "&a" + itemflagsList : "NONE")), event -> flagPane(player, itemMap)));
 			creatingPane.addButton(new Button(ItemHandler.getItem("REDSTONE", 1, false, "&b&lTriggers", "&7", "&7*When the players act upon these", "&7events, the item will be given.", "&9&lTRIGGERS: &a" +
 			(StringUtils.nullCheck(itemMap.getTriggers()) != "NONE" ? "&a" + triggersList : "NONE")), event -> triggerPane(player, itemMap)));
-			creatingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_15") ? "REDSTONE_TORCH" : "76"), 1, false, "&b&lPermission Node", "&7", "&7*Custom permission node that", "&7will be required by a permission", "&7plugin to receive the item.", "&7&lNote: &7Do NOT include", 
+			creatingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "REDSTONE_TORCH" : "76"), 1, false, "&b&lPermission Node", "&7", "&7*Custom permission node that", "&7will be required by a permission", "&7plugin to receive the item.", "&7&lNote: &7Do NOT include", 
 					"&7any spaces or special characters", "&9&lPERMISSION-NODE: &a" + StringUtils.nullCheck(itemMap.getPermissionNode())), event -> {
 				if (StringUtils.nullCheck(itemMap.getPermissionNode()) != "NONE") {
 					itemMap.setPerm(null);
@@ -927,11 +927,11 @@ public class Menu {
 					conditionsPane(player, itemMap);
 			}));
 			creatingPane.addButton(new Button(fillerPaneGItem));
-			creatingPane.addButton(new Button(ItemHandler.getItem("58", 1, false, "&b&lRecipe", "&7", "&7*Define the recipe to be", "&7able to craft this item.", "&9Enabled: &a" + (itemMap.getIngredients() != null && !itemMap.getIngredients().isEmpty() ? "YES" : "NONE")), event -> {
+			creatingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CRAFTING_TABLE" : "58"), 1, false, "&b&lRecipe", "&7", "&7*Define the recipe to be", "&7able to craft this item.", "&9Enabled: &a" + (itemMap.getIngredients() != null && !itemMap.getIngredients().isEmpty() ? "YES" : "NONE")), event -> {
 					recipePane(player, itemMap);
 			}));
 			creatingPane.addButton(new Button(fillerPaneGItem));
-			creatingPane.addButton(new Button(ItemHandler.getItem("137", 1, false, "&c&lNBT Properties", "&7", "&7*Define specific NBT Properties", "&7to be set to the item.", "&9Enabled: &a" + (itemMap.getNBTValues() != null && !itemMap.getNBTValues().isEmpty() ? "YES" : "NONE")), event -> {
+			creatingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "COMMAND_BLOCK" : "137"), 1, false, "&c&lNBT Properties", "&7", "&7*Define specific NBT Properties", "&7to be set to the item.", "&9Enabled: &a" + (itemMap.getNBTValues() != null && !itemMap.getNBTValues().isEmpty() ? "YES" : "NONE")), event -> {
 					nbtPane(player, itemMap);
 			}));
 			creatingPane.addButton(new Button(fillerPaneGItem));
@@ -988,7 +988,7 @@ public class Menu {
 					attributePane(player, itemMap, false);
 				}));
 			} else if (itemMap.getMaterial().toString().contains("SHULKER")) {
-				creatingPane.addButton(new Button(ItemHandler.getItem("229", 1, false, "&a&lContents", "&7", "&7*Add existing custom items into", "&7the contents of this box.", "&9Enabled: &a" + (itemMap.getContents() != null && !itemMap.getContents().isEmpty() ? "YES" : "NONE")), event -> {
+				creatingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "PURPLE_SHULKER_BOX" : "229"), 1, false, "&a&lContents", "&7", "&7*Add existing custom items into", "&7the contents of this box.", "&9Enabled: &a" + (itemMap.getContents() != null && !itemMap.getContents().isEmpty() ? "YES" : "NONE")), event -> {
 					Interface contentsPane = new Interface(true, 6, GUIName, player);
 					SchedulerUtils.runAsync(() -> {
 						setPage(player, contentsPane, ItemUtilities.getUtilities().copyItems(), itemMap, null, 0);
@@ -1006,7 +1006,7 @@ public class Menu {
 			creatingPane.addButton(new Button(fillerPaneGItem));
 			creatingPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nMain Menu", "&7", "&7*Cancel and return to the main menu.", "&7", "&c&lWARNING: &7This item has NOT been saved!"), event -> returnConfirm(player, itemMap)));
 			creatingPane.addButton(new Button(fillerPaneBItem), 3);
-			creatingPane.addButton(new Button(ItemHandler.getItem("WOOL:5", 1, false, "&a&l&nSave to Config", "&7", "&7*Saves the custom item", "&7settings to the items.yml file."), event -> {
+			creatingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "LIME_WOOL" : "WOOL:5"), 1, false, "&a&l&nSave to Config", "&7", "&7*Saves the custom item", "&7settings to the items.yml file."), event -> {
 				itemMap.saveToConfig();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[3] = itemMap.getConfigName();
@@ -1031,9 +1031,9 @@ public class Menu {
 		Interface returnPane = new Interface(false, 1, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			returnPane.addButton(new Button(fillerPaneBItem));
-			returnPane.addButton(new Button(ItemHandler.getItem("WOOL:14", 1, false, "&c&l&nMain Menu", "&7", "&7*Cancel and return to the", "&7main menu, all modified", "&7settings will be lost.", "&7", "&c&lWARNING: &cThis item has &lNOT&c been saved!"), event -> startMenu(player)));
+			returnPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "RED_WOOL" : "WOOL:14"), 1, false, "&c&l&nMain Menu", "&7", "&7*Cancel and return to the", "&7main menu, all modified", "&7settings will be lost.", "&7", "&c&lWARNING: &cThis item has &lNOT&c been saved!"), event -> startMenu(player)));
 			returnPane.addButton(new Button(fillerPaneBItem), 2);
-			returnPane.addButton(new Button(ItemHandler.getItem("WOOL:5", 1, false, "&a&l&nSave to Config", "&7", "&7*Saves the custom item", "&7settings to the items.yml file."), event -> {
+			returnPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "LIME_WOOL" : "WOOL:5"), 1, false, "&a&l&nSave to Config", "&7", "&7*Saves the custom item", "&7settings to the items.yml file."), event -> {
 				itemMap.saveToConfig();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[3] = itemMap.getConfigName();
@@ -1042,7 +1042,7 @@ public class Menu {
 				startMenu(player);
 			}));
 			returnPane.addButton(new Button(fillerPaneBItem), 2);
-			returnPane.addButton(new Button(ItemHandler.getItem("WOOL:4", 1, false, "&e&l&nModify Settings", "&7", "&7*Continue modifying the", "&7custom item settings."), event -> creatingPane(player, itemMap)));
+			returnPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_WOOL" : "WOOL:4"), 1, false, "&e&l&nModify Settings", "&7", "&7*Continue modifying the", "&7custom item settings."), event -> creatingPane(player, itemMap)));
 			returnPane.addButton(new Button(fillerPaneBItem));
 		});
 		returnPane.open(player);
@@ -1074,7 +1074,7 @@ public class Menu {
 			for (int i = 0; i <= (stage == 1 || stage == 3 ? 64 : stage == 2 ? 8 : 0); i++) {
 				final int k = i;
 				if (stage == 1) {
-					numberPane.addButton(new Button(ItemHandler.getItem((i == 0 ? "STAINED_GLASS_PANE:14" : "STAINED_GLASS_PANE:11"), (i == 0 ? 1 : i), false, "&9&lDelay: &a&l" + i, "&7", 
+					numberPane.addButton(new Button(ItemHandler.getItem((i == 0 ? (ServerUtils.hasSpecificUpdate("1_13") ? "RED_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:14") : (ServerUtils.hasSpecificUpdate("1_13") ? "BLUE_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:11")), (i == 0 ? 1 : i), false, "&9&lDelay: &a&l" + i, "&7", 
 					"&7*Click to set the trigger", "&7delay for giving custom items.", "&aSecond(s): &e" + (i == 0 ? 0 : ((Double.parseDouble(String.valueOf(i))) / 2))), event -> {
 						File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "items.yml");
 						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
@@ -1084,7 +1084,7 @@ public class Menu {
 						SchedulerUtils.runLater(2L, () -> itemSettings(player));
 					}));
 				} else if (stage == 2) {
-					numberPane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:11", (i == 0 ? 1 : i), false, "&9&lSlot: &a&l" + i + " &9&l[HOTBAR]", "&7", 
+					numberPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "BLUE_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:11"), (i == 0 ? 1 : i), false, "&9&lSlot: &a&l" + i + " &9&l[HOTBAR]", "&7", 
 					"&7*Click to set the held item slot", "&7that is automatically selected", "&7when performing a held item trigger.", "&aSlot: &e" + k), event -> {
 						File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
@@ -1094,7 +1094,7 @@ public class Menu {
 						SchedulerUtils.runLater(2L, () -> itemSettings(player));
 					}));
 				} else if (stage == 3) {
-					numberPane.addButton(new Button(ItemHandler.getItem((i == 0 ? "STAINED_GLASS_PANE:14" : "STAINED_GLASS_PANE:11"), (i == 0 ? 1 : i), false, "&9&lDelay: &a&l" + i, "&7", 
+					numberPane.addButton(new Button(ItemHandler.getItem((i == 0 ? (ServerUtils.hasSpecificUpdate("1_13") ? "RED_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:14") : (ServerUtils.hasSpecificUpdate("1_13") ? "BLUE_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:11")), (i == 0 ? 1 : i), false, "&9&lDelay: &a&l" + i, "&7", 
 					"&7*Click to set the trigger", "&7delay for clearing items.", "&aSecond(s): &e" + (i == 0 ? 0 : (Double.parseDouble(String.valueOf(i))))), event -> {
 						File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
 						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
@@ -1148,7 +1148,7 @@ public class Menu {
 					SchedulerUtils.runLater(2L, () -> languagePane(player));
 				}
 			}));
-			languagePane.addButton(new Button(ItemHandler.getItem("80", 1, language.equalsIgnoreCase("RUSSIAN"), "&6&l&nRussian", "&7", 
+			languagePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "SNOW_BLOCK" : "80"), 1, language.equalsIgnoreCase("RUSSIAN"), "&6&l&nRussian", "&7", 
 			"&7*Sets the messages sent by", "&7the plugin to the player", "&7to be written in &c&lRussian&7.", "&7This is the type of lang.yml file", "&7generated in the plugin folder.", 
 			"&9&lENABLED: &a" + (language.equalsIgnoreCase("RUSSIAN") + "").toUpperCase()), event -> {
 				if (!language.equalsIgnoreCase("RUSSIAN")) {
@@ -1161,7 +1161,7 @@ public class Menu {
 				}
 			}));
 			languagePane.addButton(new Button(fillerPaneBItem));
-			languagePane.addButton(new Button(ItemHandler.getItem("98", 1, language.equalsIgnoreCase("FRENCH"), "&6&l&nFrench", "&7", 
+			languagePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "STONE_BRICKS" : "98"), 1, language.equalsIgnoreCase("FRENCH"), "&6&l&nFrench", "&7", 
 			"&7*Sets the messages sent by", "&7the plugin to the player", "&7to be written in &c&lFrench&7.", "&7This is the type of lang.yml file", "&7generated in the plugin folder.", 
 			"&9&lENABLED: &a" + (language.equalsIgnoreCase("FRENCH") + "").toUpperCase()), event -> {
 				if (!language.equalsIgnoreCase("FRENCH")) {
@@ -1173,7 +1173,7 @@ public class Menu {
 					SchedulerUtils.runLater(2L, () -> languagePane(player));
 				}
 			}));
-			languagePane.addButton(new Button(ItemHandler.getItem(ServerUtils.hasSpecificUpdate("1_8") ? "1:3" : "5", 1, language.equalsIgnoreCase("TRADITIONALCHINESE"), "&6&l&nTraditional Chinese", "&7", 
+			languagePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "DIORITE" : (ServerUtils.hasSpecificUpdate("1_8") ? "1:3" : "5")), 1, language.equalsIgnoreCase("TRADITIONALCHINESE"), "&6&l&nTraditional Chinese", "&7", 
 			"&7*Sets the messages sent by", "&7the plugin to the player", "&7to be written in &c&lTraditional Chinese&7.", "&7This is the type of lang.yml file", "&7generated in the plugin folder.", 
 			"&9&lENABLED: &a" + (language.equalsIgnoreCase("TRADITIONALCHINESE") + "").toUpperCase()), event -> {
 				if (!language.equalsIgnoreCase("TRADITIONALCHINESE")) {
@@ -1185,7 +1185,7 @@ public class Menu {
 					SchedulerUtils.runLater(2L, () -> languagePane(player));
 				}
 			}));
-			languagePane.addButton(new Button(ItemHandler.getItem(ServerUtils.hasSpecificUpdate("1_8") ? "1:4" : "5:3", 1, language.equalsIgnoreCase("SIMPLIFIEDCHINESE"), "&6&l&nSimplified Chinese", "&7", 
+			languagePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "POLISHED_DIORITE" : (ServerUtils.hasSpecificUpdate("1_8") ? "1:4" : "5:3")), 1, language.equalsIgnoreCase("SIMPLIFIEDCHINESE"), "&6&l&nSimplified Chinese", "&7", 
 			"&7*Sets the messages sent by", "&7the plugin to the player", "&7to be written in &c&lSimplified Chinese&7.", "&7This is the type of lang.yml file", "&7generated in the plugin folder.", 
 			"&9&lENABLED: &a" + (language.equalsIgnoreCase("SIMPLIFIEDCHINESE") + "").toUpperCase()), event -> {
 				if (!language.equalsIgnoreCase("SIMPLIFIEDCHINESE")) {
@@ -1214,7 +1214,7 @@ public class Menu {
 		Interface databasePane = new Interface(false, 3, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			databasePane.addButton(new Button(fillerPaneBItem), 4);
-			databasePane.addButton(new Button(ItemHandler.getItem("137", 1, ConfigHandler.getConfig().getFile("config.yml").getBoolean("Database.MySQL"), "&b&l&nMySQL", "&7", 
+			databasePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "COMMAND_BLOCK" : "137"), 1, ConfigHandler.getConfig().getFile("config.yml").getBoolean("Database.MySQL"), "&b&l&nMySQL", "&7", 
 			"&7*If the plugin should use a", "&7MySQL connection instead of the", "&7local SQLite database inside", "&7the plugin folder.", "&7", "&c&lNote: &7Keep this set to false", "&7if you do not know what", "&7you are doing.", 
 			"&7", "&c&l&nWARNING: &7Changing this value requires", "&7a server restart for the", "&7changes to take affect.",  
 			"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig().getFile("config.yml").getBoolean("Database.MySQL")).toUpperCase()), 
@@ -1275,7 +1275,7 @@ public class Menu {
 				}));
 			databasePane.addButton(new Button(fillerPaneBItem));
 			final String databaseString = (ConfigHandler.getConfig().getFile("config.yml").getString("Database.table") != null ? "Database.table" : "Database.database");
-			databasePane.addButton(new Button(ItemHandler.getItem("17", 1, false, "&a&lTable", "&7", 
+			databasePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "OAK_WOOD" : "17"), 1, false, "&a&lTable", "&7", 
 			"&7*Set the &c&lTable &7for", "&7the MySQL databse connection.", "&9&lTABLE: &a" + ConfigHandler.getConfig().getFile("config.yml").getString(databaseString)), 
 				event -> {
 					player.closeInventory();
@@ -1317,7 +1317,7 @@ public class Menu {
 					SchedulerUtils.runLater(2L, () -> databasePane(player));
 				}));
 			databasePane.addButton(new Button(fillerPaneBItem));
-			databasePane.addButton(new Button(ItemHandler.getItem("53", 1, false, "&a&lUser", "&7", 
+			databasePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "OAK_STAIRS" : "53"), 1, false, "&a&lUser", "&7", 
 			"&7*Set the &c&lUser &7for", "&7the MySQL databse connection.", "&9&lUSER: &a***********"), 
 				event -> {
 					player.closeInventory();
@@ -1375,11 +1375,13 @@ public class Menu {
 		final String triggerString = (stage == 0 ? "Settings.Default-Triggers" : "Settings.HeldItem-Triggers");
 		SchedulerUtils.runAsync(() -> {
 			List<String> triggers = new ArrayList<String>();
-			for (String trigger: ConfigHandler.getConfig().getFile("config.yml").getString(triggerString).replace(" ", "").split(",")) {
-				if (trigger != null && !trigger.isEmpty()) {
-					triggers.add(trigger);
+			try {
+				for (String trigger: ConfigHandler.getConfig().getFile("config.yml").getString(triggerString).replace(" ", "").split(",")) {
+					if (trigger != null && !trigger.isEmpty()) {
+						triggers.add(trigger);
+					}
 				}
-			}
+			} catch (Exception e) {}
 			triggerPane.addButton(new Button(fillerPaneBItem), 3);
 			triggerPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "FILLED_MAP" : "MAP"), 1, StringUtils.containsValue(triggers, "FIRST-JOIN"), "&e&l&nFirst Join", "&7", triggerOption, "&7player logs into the server", 
 					"&7for the first time only.", "&7This will overwrite any triggers", "&7such as respawn, and world-switch.", "&9&lENABLED: &a" + (StringUtils.containsValue(triggers, "FIRST-JOIN") + "").toUpperCase()), event -> {
@@ -1470,7 +1472,7 @@ public class Menu {
 				ConfigHandler.getConfig().softReload();
 				SchedulerUtils.runLater(2L, () -> triggerPane(player, stage));
 			}));
-			triggerPane.addButton(new Button(ItemHandler.getItem("323", 1, StringUtils.containsValue(triggers, "JOIN"), "&e&l&nJoin", "&7", triggerOption, "&7player logs into the server.", 
+			triggerPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "OAK_SIGN" : "323"), 1, StringUtils.containsValue(triggers, "JOIN"), "&e&l&nJoin", "&7", triggerOption, "&7player logs into the server.", 
 					"&9&lENABLED: &a" + (StringUtils.containsValue(triggers, "JOIN") + "").toUpperCase()), event -> {
 				if (StringUtils.containsValue(triggers, "JOIN")) {
 					triggers.remove("JOIN");
@@ -1577,7 +1579,7 @@ public class Menu {
 				ConfigHandler.getConfig().softReload();
 				SchedulerUtils.runLater(2L, () -> triggerPane(player, stage));
 			}));
-			triggerPane.addButton(new Button(ItemHandler.getItem("408", 1, StringUtils.containsValue(triggers, "REGION-LEAVE"), "&e&l&nRegion Leave", "&7", triggerOption.replace("Gives", "Removes"), "&7player leaves any of the enabled-regions.", "&9&lENABLED: &a" +
+			triggerPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "HOPPER_MINECRAFT" : "408"), 1, StringUtils.containsValue(triggers, "REGION-LEAVE"), "&e&l&nRegion Leave", "&7", triggerOption.replace("Gives", "Removes"), "&7player leaves any of the enabled-regions.", "&9&lENABLED: &a" +
 			(StringUtils.containsValue(triggers, "REGION-LEAVE") + "").toUpperCase()), event -> {
 				if (StringUtils.containsValue(triggers, "REGION-LEAVE")) {
 					triggers.remove("REGION-LEAVE");
@@ -1600,7 +1602,7 @@ public class Menu {
 				ConfigHandler.getConfig().softReload();
 				SchedulerUtils.runLater(2L, () -> triggerPane(player, stage));
 			}));
-			triggerPane.addButton(new Button(ItemHandler.getItem("407", 1, StringUtils.containsValue(triggers, "REGION-ACCESS"), "&e&l&nRegion Access", "&7", triggerOption, "&7player enters any of the enabled-regions", "&7and removes the item when leaving", "&7any of the enabled-regions.", "&9&lENABLED: &a" +
+			triggerPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "TNT_MINECART" : "407"), 1, StringUtils.containsValue(triggers, "REGION-ACCESS"), "&e&l&nRegion Access", "&7", triggerOption, "&7player enters any of the enabled-regions", "&7and removes the item when leaving", "&7any of the enabled-regions.", "&9&lENABLED: &a" +
 			(StringUtils.containsValue(triggers, "REGION-ACCESS") + "").toUpperCase()), event -> {
 				if (StringUtils.containsValue(triggers, "REGION-ACCESS")) {
 					triggers.remove("REGION-ACCESS");
@@ -1623,7 +1625,7 @@ public class Menu {
 				ConfigHandler.getConfig().softReload();
 				SchedulerUtils.runLater(2L, () -> triggerPane(player, stage));
 			}));
-			triggerPane.addButton(new Button(ItemHandler.getItem("342", 1, StringUtils.containsValue(triggers, "REGION-ENGRESS"), "&e&l&nRegion Engress", "&7", triggerOption.replace("Gives", "Removes"), "&7player enters any of the enabled-regions", "&7and gives the item when leaving", "&7any of the enabled-regions.", "&9&lENABLED: &a" +
+			triggerPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CHEST_MINECART" : "342"), 1, StringUtils.containsValue(triggers, "REGION-ENGRESS"), "&e&l&nRegion Engress", "&7", triggerOption.replace("Gives", "Removes"), "&7player enters any of the enabled-regions", "&7and gives the item when leaving", "&7any of the enabled-regions.", "&9&lENABLED: &a" +
 			(StringUtils.containsValue(triggers, "REGION-ENGRESS") + "").toUpperCase()), event -> {
 				if (StringUtils.containsValue(triggers, "REGION-ENGRESS")) {
 					triggers.remove("REGION-ENGRESS");
@@ -1668,7 +1670,7 @@ public class Menu {
 				}
 			}
 			preventPane.addButton(new Button(fillerPaneBItem), 3);
-			preventPane.addButton(new Button(ItemHandler.getItem(StringUtils.containsValue(bypassList, "CREATIVE") ? "322:1" : "322", 1, StringUtils.containsValue(bypassList, "CREATIVE"), 
+			preventPane.addButton(new Button(ItemHandler.getItem(StringUtils.containsValue(bypassList, "CREATIVE") ? (ServerUtils.hasSpecificUpdate("1_13") ? "ENCHANTED_GOLDEN_APPLE" : "322:1") : (ServerUtils.hasSpecificUpdate("1_13") ? "GOLDEN_APPLE" : "322"), 1, StringUtils.containsValue(bypassList, "CREATIVE"), 
 					"&bCreative Bypass", "&7", "&7*Players in creative mode", "&7will ignore the prevent actions.", 
 					"&9&lENABLED: &a" + (StringUtils.containsValue(bypassList, "CREATIVE") + "").toUpperCase()), 
 					event -> {
@@ -1756,7 +1758,7 @@ public class Menu {
 		Interface clearPane = new Interface(false, 3, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			clearPane.addButton(new Button(fillerPaneBItem), 3);
-			clearPane.addButton(new Button(ItemHandler.getItem("2", 1, ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("ALL"), 
+			clearPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GRASS_BLOCK" : "2"), 1, ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("ALL"), 
 					"&bType: &a&lALL", "&7", "&7*ALL items including other plugin(s)", "&7and vanilla items should be cleared", "&7upon performing a trigger.", 
 					"&9&lENABLED: &a" + (ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("ALL") + "").toUpperCase()), 
 					event -> {
@@ -1769,11 +1771,11 @@ public class Menu {
 							SchedulerUtils.runLater(2L, () -> clearPane(player));
 						}
 					}));
-			clearPane.addButton(new Button(ItemHandler.getItem("347", 1, false, 
+			clearPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CLOCK" : "342"), 1, false, 
 					"&b&lClear Delay", "&7", "&7*The number of second(s)", "&7to wait before clearing", "&7items from the player inventory.", 
 					"&9&lDelay: &a" + (ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Delay-Tick") + "").toUpperCase()), 
 					event -> numberPane(player, 3)));
-			clearPane.addButton(new Button(ItemHandler.getItem("33", 1, ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("ITEMJOIN"), 
+			clearPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "PISTON" : "33"), 1, ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("ITEMJOIN"), 
 					"&bType: &a&lITEMJOIN", "&7", "&7*Only ItemJoin (custom items)", "&7should be cleared upon", "&7performing a trigger.", 
 					"&9&lENABLED: &a" + (ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("ITEMJOIN") + "").toUpperCase()), 
 					event -> {
@@ -1787,7 +1789,7 @@ public class Menu {
 						}
 					}));
 			clearPane.addButton(new Button(fillerPaneBItem), 3);
-			clearPane.addButton(new Button(ItemHandler.getItem("323", 1, false, 
+			clearPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "OAK_SIGN" : "323"), 1, false, 
 					"&c&l&nJoin", "&7", "&7*Clears the items from the", "&7player upon joining the server.", 
 					"&9&lENABLED: &a" + ((!StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Join"), "DISABLE") ? 
 					ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Join") : "FALSE")).toUpperCase()), 
@@ -1815,7 +1817,7 @@ public class Menu {
 						}
 					}));
 			clearPane.addButton(new Button(fillerPaneBItem));
-			clearPane.addButton(new Button(ItemHandler.getItem("137", 1, false, 
+			clearPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "COMMAND_BLOCK" : "137"), 1, false, 
 					"&b&lOptions", "&7", "&7*Actions to apply to", "&7the clear items triggers", "&7such as OP bypass.", 
 					"&9&lENABLED: &a" + ((!StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Options"), "DISABLE") ? 
 					ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Options") : "FALSE")).toUpperCase()), 
@@ -1863,7 +1865,7 @@ public class Menu {
 					"&b&l&nMaterials", "&7", "&7*The material to be blacklisted", "&7from being cleared.", "&7",
 					"&9&lMaterials: &a" + ((!materials.isEmpty() ? StringUtils.replaceLast(materials.toString().replaceFirst("\\[", ""), "]", "") : "NONE"))), 
 					event -> blacklistMatPane(player)));
-			blacklistPane.addButton(new Button(ItemHandler.getItem("20", 1, false, 
+			blacklistPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GLASS" : "20"), 1, false, 
 					"&b&l&nSlots", "&7", "&7*The inventory slots to be", "&7blacklisted from being cleared.", "&7",
 					"&9&lSlots: &a" + ((!slots.isEmpty() ? StringUtils.replaceLast(slots.toString().replaceFirst("\\[", ""), "]", "") : "NONE"))), 
 					event -> blacklistSlotPane(player)));
@@ -1991,7 +1993,7 @@ public class Menu {
 				}
 			} catch (Exception e) { }
 			craftingPane.addButton(new Button(fillerPaneGItem), 3);
-			craftingPane.addButton(new Button(ItemHandler.getItem("58", 1, StringUtils.containsValue(slots, "CRAFTING[1]"), "&9&lSlot: &7&lCRAFTING&a&l[1]", "&7", "&7*Click to prevent this slot", "&7from having its items cleared.",
+			craftingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CRAFTING_TABLE" : "58"), 1, StringUtils.containsValue(slots, "CRAFTING[1]"), "&9&lSlot: &7&lCRAFTING&a&l[1]", "&7", "&7*Click to prevent this slot", "&7from having its items cleared.",
 				(StringUtils.containsValue(slots, "CRAFTING[1]") ? "&9&lENABLED: &aTRUE" : "")), event -> {
 				if (!StringUtils.containsValue(slots, "CRAFTING[1]")) {
 					slots.add("CRAFTING[1]");
@@ -2009,7 +2011,7 @@ public class Menu {
 				SchedulerUtils.runLater(2L, () -> blacklistSlotPane(player));
 			}));
 			craftingPane.addButton(new Button(fillerPaneGItem));
-			craftingPane.addButton(new Button(ItemHandler.getItem("58", 2, StringUtils.containsValue(slots, "CRAFTING[2]"), "&9&lSlot: &7&lCRAFTING&a&l[2]", "&7", "&7*Click to prevent this slot", "&7from having its items cleared.",
+			craftingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CRAFTING_TABLE" : "58"), 2, StringUtils.containsValue(slots, "CRAFTING[2]"), "&9&lSlot: &7&lCRAFTING&a&l[2]", "&7", "&7*Click to prevent this slot", "&7from having its items cleared.",
 				(StringUtils.containsValue(slots, "CRAFTING[2]") ? "&9&lENABLED: &aTRUE" : "")), event -> {
 				if (!StringUtils.containsValue(slots, "CRAFTING[2]")) {
 					slots.add("CRAFTING[2]");
@@ -2027,7 +2029,7 @@ public class Menu {
 				SchedulerUtils.runLater(2L, () -> blacklistSlotPane(player));
 			}));
 			craftingPane.addButton(new Button(fillerPaneGItem), 10);
-			craftingPane.addButton(new Button(ItemHandler.getItem("58", 1, StringUtils.containsValue(slots, "CRAFTING[0]"), "&9&lSlot: &7&lCRAFTING&a&l[0]", "&7", "&7*Click to prevent this slot", "&7from having its items cleared.",
+			craftingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CRAFTING_TABLE" : "58"), 1, StringUtils.containsValue(slots, "CRAFTING[0]"), "&9&lSlot: &7&lCRAFTING&a&l[0]", "&7", "&7*Click to prevent this slot", "&7from having its items cleared.",
 				(StringUtils.containsValue(slots, "CRAFTING[0]") ? "&9&lENABLED: &aTRUE" : "")), event -> {
 				if (!StringUtils.containsValue(slots, "CRAFTING[0]")) {
 					slots.add("CRAFTING[0]");
@@ -2045,7 +2047,7 @@ public class Menu {
 				SchedulerUtils.runLater(2L, () -> blacklistSlotPane(player));
 			}));
 			craftingPane.addButton(new Button(fillerPaneGItem), 4);
-			craftingPane.addButton(new Button(ItemHandler.getItem("58", 3, StringUtils.containsValue(slots, "CRAFTING[3]"), "&9&lSlot: &7&lCRAFTING&a&l[3]", "&7", "&7*Click to prevent this slot", "&7from having its items cleared.",
+			craftingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CRAFTING_TABLE" : "58"), 3, StringUtils.containsValue(slots, "CRAFTING[3]"), "&9&lSlot: &7&lCRAFTING&a&l[3]", "&7", "&7*Click to prevent this slot", "&7from having its items cleared.",
 				(StringUtils.containsValue(slots, "CRAFTING[3]") ? "&9&lENABLED: &aTRUE" : "")), event -> {
 				if (!StringUtils.containsValue(slots, "CRAFTING[3]")) {
 					slots.add("CRAFTING[3]");
@@ -2063,7 +2065,7 @@ public class Menu {
 				SchedulerUtils.runLater(2L, () -> blacklistSlotPane(player));
 			}));
 			craftingPane.addButton(new Button(fillerPaneGItem));
-			craftingPane.addButton(new Button(ItemHandler.getItem("58", 4, StringUtils.containsValue(slots, "CRAFTING[4]"), "&9&lSlot: &7&lCRAFTING&a&l[4]", "&7", "&7*Click to prevent this slot", "&7from having its items cleared.",
+			craftingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CRAFTING_TABLE" : "58"), 4, StringUtils.containsValue(slots, "CRAFTING[4]"), "&9&lSlot: &7&lCRAFTING&a&l[4]", "&7", "&7*Click to prevent this slot", "&7from having its items cleared.",
 				(StringUtils.containsValue(slots, "CRAFTING[4]") ? "&9&lENABLED: &aTRUE" : "")), event -> {
 				if (!StringUtils.containsValue(slots, "CRAFTING[4]")) {
 					slots.add("CRAFTING[4]");
@@ -2085,7 +2087,7 @@ public class Menu {
 			craftingPane.addButton(new Button(fillerPaneBItem), 7);
 			craftingPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", "&7the slot blacklist menu"), event -> blacklistSlotPane(player)));
 			slotPane.addButton(new Button(fillerPaneGItem));
-			slotPane.addButton(new Button(ItemHandler.getItem("58", 1, false, "&9&lSlot: &a&lCRAFTING", "&7", "&7*Click to see a list of crafting slots"), event -> craftingPane.open(player)));
+			slotPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CRAFTING_TABLE" : "58"), 1, false, "&9&lSlot: &a&lCRAFTING", "&7", "&7*Click to see a list of crafting slots"), event -> craftingPane.open(player)));
 			slotPane.addButton(new Button(fillerPaneGItem));
 			slotPane.addButton(new Button(ItemHandler.getItem("LEATHER_HELMET", 1, StringUtils.containsValue(slots, "HELMET"), "&9&lSlot: &a&lHELMET", "&7", "&7*Click to prevent this slot", "&7from having its items cleared.",
 				(StringUtils.containsValue(slots, "HELMET")? "&9&lENABLED: &aTRUE" : "")), event -> {
@@ -2179,7 +2181,7 @@ public class Menu {
 			slotPane.addButton(new Button(fillerPaneGItem));
 			for (int i = 9; i < 36; i++) {
 				final int slot = i;
-				slotPane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:3", i, (StringUtils.containsValue(slots, String.valueOf(slot))), "&9&lSlot: &a&l" + i, "&7", "&7*Click to prevent this slot", 
+				slotPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "LIGHT_BLUE_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:3"), i, (StringUtils.containsValue(slots, String.valueOf(slot))), "&9&lSlot: &a&l" + i, "&7", "&7*Click to prevent this slot", 
 					"&7from having its item cleared.", (StringUtils.containsValue(slots, String.valueOf(slot)) ? "&9&lENABLED: &aTRUE" : "")), event -> {
 					if (!StringUtils.containsValue(slots, String.valueOf(slot))) {
 						slots.add(String.valueOf(slot));
@@ -2203,7 +2205,7 @@ public class Menu {
 				if (slot == 0) {
 					count = 1;
 				}
-				slotPane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:11", count, (StringUtils.containsValue(slots, String.valueOf(slot))), "&9&lSlot: &a&l" + j, "&7", "&7*Click to prevent this slot", 
+				slotPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "BLUE_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:11"), count, (StringUtils.containsValue(slots, String.valueOf(slot))), "&9&lSlot: &a&l" + j, "&7", "&7*Click to prevent this slot", 
 					"&7from having its item cleared.", (StringUtils.containsValue(slots, String.valueOf(slot)) ? "&9&lENABLED: &aTRUE" : "")), event -> {
 					if (!StringUtils.containsValue(slots, String.valueOf(slot))) {
 						slots.add(String.valueOf(slot));
@@ -2361,7 +2363,7 @@ public class Menu {
 						SchedulerUtils.runLater(2L, () -> optionPane(player));
 					}));
 			optionPane.addButton(new Button(fillerPaneBItem));
-			optionPane.addButton(new Button(ItemHandler.getItem("322", 1, StringUtils.containsValue(optionList, "PROTECT_CREATIVE"), 
+			optionPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GOLDEN_APPLE" : "322"), 1, StringUtils.containsValue(optionList, "PROTECT_CREATIVE"), 
 					"&e&lProtect Creative", "&7", "&7*Prevents players in creative mode", "&7from having their first-join", "&7and first-world items cleared.", 
 					"&9&lENABLED: &a" + (StringUtils.containsValue(optionList, "PROTECT_CREATIVE") + "").toUpperCase()), 
 					event -> {
@@ -2412,7 +2414,7 @@ public class Menu {
 						}
 					}));
 			optionPane.addButton(new Button(fillerPaneBItem));
-			optionPane.addButton(new Button(ItemHandler.getItem("2", 1, StringUtils.containsValue(optionList, "RETURN_SWITCH"), 
+			optionPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GRASS_BLOCK" : "2"), 1, StringUtils.containsValue(optionList, "RETURN_SWITCH"), 
 					"&e&lReturn Worlds", "&7", "&7*Returns the prior cleared", "&7player inventory from the", "&7prior world upon returning", "&7to that prior world.", 
 					"&9&lENABLED: &a" + (StringUtils.containsValue(optionList, "RETURN_SWITCH") + "").toUpperCase()), 
 					event -> {
@@ -2757,7 +2759,7 @@ public class Menu {
 			switchPane.addButton(new Button(fillerPaneBItem), 2);
 			switchPane.addButton(new Button(ItemHandler.getItem("GLASS", 1, false, "&a&lSingle Slot", "&7", "&7*Define a single dedicated", "&7 slot for the item."), event -> slotPane(player, itemMap, stage, 0)));
 			switchPane.addButton(new Button(fillerPaneBItem), 1);
-			switchPane.addButton(new Button(ItemHandler.getItem("23", 1, false, "&b&lMultiple Slots", "&7", "&7*Define multiple slots for the item."), event -> slotPane(player, itemMap, stage, 1)));
+			switchPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "DISPENSER" : "23"), 1, false, "&b&lMultiple Slots", "&7", "&7*Define multiple slots for the item."), event -> slotPane(player, itemMap, stage, 1)));
 			switchPane.addButton(new Button(fillerPaneBItem), 2);
 			if (stage == 0) {
 				switchPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", "&7the material selection menu."), event -> materialPane(player, itemMap, 0, 0)));
@@ -2782,7 +2784,7 @@ public class Menu {
 		Interface craftingPane = new Interface(false, 4, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			craftingPane.addButton(new Button(fillerPaneGItem), 3);
-			craftingPane.addButton(new Button(ItemHandler.getItem("58", 1, (type > 0 ? StringUtils.containsValue(itemMap.getMultipleSlots(), "CRAFTING[1]") : false), "&9&lSlot: &7&lCRAFTING&a&l[1]", "&7", "&7*Click to set the custom item", 
+			craftingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CRAFTING_TABLE" : "58"), 1, (type > 0 ? StringUtils.containsValue(itemMap.getMultipleSlots(), "CRAFTING[1]") : false), "&9&lSlot: &7&lCRAFTING&a&l[1]", "&7", "&7*Click to set the custom item", 
 					"&7to appear in the &lCRAFTING &7slot &a&l[1]&7", (type > 0 && StringUtils.containsValue(itemMap.getMultipleSlots(), "CRAFTING[1]") ? "&9&lENABLED: &aTRUE" : "")), event -> {
 				if (type == 0) { 
 					itemMap.setSlot("CRAFTING[1]"); 
@@ -2803,7 +2805,7 @@ public class Menu {
 				}
 			}));
 			craftingPane.addButton(new Button(fillerPaneGItem));
-			craftingPane.addButton(new Button(ItemHandler.getItem("58", 2, (type > 0 ? StringUtils.containsValue(itemMap.getMultipleSlots(), "CRAFTING[2]") : false), "&9&lSlot: &7&lCRAFTING&a&l[2]", "&7", "&7*Click to set the custom item", 
+			craftingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CRAFTING_TABLE" : "58"), 2, (type > 0 ? StringUtils.containsValue(itemMap.getMultipleSlots(), "CRAFTING[2]") : false), "&9&lSlot: &7&lCRAFTING&a&l[2]", "&7", "&7*Click to set the custom item", 
 					"&7to appear in the &lCRAFTING &7slot &a&l[2]&7", (type > 0 && StringUtils.containsValue(itemMap.getMultipleSlots(), "CRAFTING[2]") ? "&9&lENABLED: &aTRUE" : "")), event -> {
 				if (type == 0) { 
 					itemMap.setSlot("CRAFTING[2]"); 
@@ -2824,7 +2826,7 @@ public class Menu {
 				}
 			}));
 			craftingPane.addButton(new Button(fillerPaneGItem), 10);
-			craftingPane.addButton(new Button(ItemHandler.getItem("58", 1, (type > 0 ? StringUtils.containsValue(itemMap.getMultipleSlots(), "CRAFTING[0]") : false), "&9&lSlot: &7&lCRAFTING&a&l[0]", "&7", "&7*Click to set the custom item", 
+			craftingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CRAFTING_TABLE" : "58"), 1, (type > 0 ? StringUtils.containsValue(itemMap.getMultipleSlots(), "CRAFTING[0]") : false), "&9&lSlot: &7&lCRAFTING&a&l[0]", "&7", "&7*Click to set the custom item", 
 					"&7to appear in the &lCRAFTING &7slot &a&l[0]&7", (type > 0 && StringUtils.containsValue(itemMap.getMultipleSlots(), "CRAFTING[0]") ? "&9&lENABLED: &aTRUE" : "")), event -> {
 				if (type == 0) { 
 					itemMap.setSlot("CRAFTING[0]"); 
@@ -2845,7 +2847,7 @@ public class Menu {
 				}
 			}));
 			craftingPane.addButton(new Button(fillerPaneGItem), 4);
-			craftingPane.addButton(new Button(ItemHandler.getItem("58", 3, (type > 0 ? StringUtils.containsValue(itemMap.getMultipleSlots(), "CRAFTING[3]") : false), "&9&lSlot: &7&lCRAFTING&a&l[3]", "&7", "&7*Click to set the custom item", 
+			craftingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CRAFTING_TABLE" : "58"), 3, (type > 0 ? StringUtils.containsValue(itemMap.getMultipleSlots(), "CRAFTING[3]") : false), "&9&lSlot: &7&lCRAFTING&a&l[3]", "&7", "&7*Click to set the custom item", 
 					"&7to appear in the &lCRAFTING &7slot &a&l[3]&7", (type > 0 && StringUtils.containsValue(itemMap.getMultipleSlots(), "CRAFTING[3]") ? "&9&lENABLED: &aTRUE" : "")), event -> {
 				if (type == 0) { 
 					itemMap.setSlot("CRAFTING[3]"); 
@@ -2866,7 +2868,7 @@ public class Menu {
 				}
 			}));
 			craftingPane.addButton(new Button(fillerPaneGItem));
-			craftingPane.addButton(new Button(ItemHandler.getItem("58", 4, (type > 0 ? StringUtils.containsValue(itemMap.getMultipleSlots(), "CRAFTING[4]") : false), "&9&lSlot: &7&lCRAFTING&a&l[4]", "&7", "&7*Click to set the custom item", 
+			craftingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CRAFTING_TABLE" : "58"), 4, (type > 0 ? StringUtils.containsValue(itemMap.getMultipleSlots(), "CRAFTING[4]") : false), "&9&lSlot: &7&lCRAFTING&a&l[4]", "&7", "&7*Click to set the custom item", 
 					"&7to appear in the &lCRAFTING &7slot &a&l[4]&7", (type > 0 && StringUtils.containsValue(itemMap.getMultipleSlots(), "CRAFTING[4]") ? "&9&lENABLED: &aTRUE" : "")), event -> {
 				if (type == 0) { 
 					itemMap.setSlot("CRAFTING[4]"); 
@@ -2918,7 +2920,7 @@ public class Menu {
 					}
 				}
 			}));
-			slotPane.addButton(new Button(ItemHandler.getItem("58", 1, false, "&9&lSlot: &a&lCRAFTING", "&7", "&7*Click to see a list of crafting slots"), event -> craftingPane.open(player)));
+			slotPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CRAFTING_TABLE" : "58"), 1, false, "&9&lSlot: &a&lCRAFTING", "&7", "&7*Click to see a list of crafting slots"), event -> craftingPane.open(player)));
 			slotPane.addButton(new Button(ItemHandler.getItem("LEATHER_HELMET", 1, (type > 0 ? StringUtils.containsValue(itemMap.getMultipleSlots(), "HELMET") : false), "&9&lSlot: &a&lHELMET", "&7", "&7*Click to set the custom item", 
 					"&7to appear in slot &a&lHELMET&7", (type > 0 && StringUtils.containsValue(itemMap.getMultipleSlots(), "HELMET") ? "&9&lENABLED: &aTRUE" : "")), event -> {
 				if (type == 0) { 
@@ -3026,7 +3028,7 @@ public class Menu {
 			slotPane.addButton(new Button(fillerPaneGItem));
 			for (int i = 9; i < 36; i++) {
 				final int slot = i;
-				slotPane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:3", i, (type > 0 ? StringUtils.containsValue(itemMap.getMultipleSlots(), slot + "") : false), "&9&lSlot: &a&l" + i, "&7", "&7*Click to set the custom item", 
+				slotPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "LIGHT_BLUE_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:3"), i, (type > 0 ? StringUtils.containsValue(itemMap.getMultipleSlots(), slot + "") : false), "&9&lSlot: &a&l" + i, "&7", "&7*Click to set the custom item", 
 						"&7to appear in slot &a&l" + i + "&7", (type > 0 && StringUtils.containsValue(itemMap.getMultipleSlots(), slot + "") ? "&9&lENABLED: &aTRUE" : "")), event -> {
 					if (type == 0) { 
 						itemMap.setSlot(slot + ""); 
@@ -3053,7 +3055,7 @@ public class Menu {
 				if (slot == 0) {
 					count = 1;
 				}
-				slotPane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:11", count, (type > 0 ? StringUtils.containsValue(itemMap.getMultipleSlots(), slot + "") : false), "&9&lSlot: &a&l" + j, "&7", "&7*Click to set the custom item", 
+				slotPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "BLUE_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:11"), count, (type > 0 ? StringUtils.containsValue(itemMap.getMultipleSlots(), slot + "") : false), "&9&lSlot: &a&l" + j, "&7", "&7*Click to set the custom item", 
 						"&7to appear in slot &a&l" + j + "&7", (type > 0 && StringUtils.containsValue(itemMap.getMultipleSlots(), slot + "") ? "&9&lENABLED: &aTRUE" : "")), event -> {
 					if (type == 0) { 
 						itemMap.setSlot(slot + ""); 
@@ -3106,7 +3108,7 @@ public class Menu {
 			}));
 			for (int i = 1; i <= 64; i++) {
 				final int k = i;
-				countPane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:11", k, false, "&9&lCount: &a&l" + k, "&7", "&7*Click to set the", "&7count of the item."), event -> {
+				countPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "BLUE_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:11"), k, false, "&9&lCount: &a&l" + k, "&7", "&7*Click to set the", "&7count of the item."), event -> {
 					itemMap.setCount(k + "");creatingPane(player, itemMap);
 				}));
 			}
@@ -3179,7 +3181,7 @@ public class Menu {
 			texturePane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> {
 				dataPane(player, itemMap);
 			}));
-			texturePane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:4", 1, false, "&e&lCustom Texture", "&7", "&7*Click to set a custom texture", "&7value for the item."), event -> {
+			texturePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, "&e&lCustom Texture", "&7", "&7*Click to set a custom texture", "&7value for the item."), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[16] = "DURABILITY DATA";
@@ -3201,7 +3203,7 @@ public class Menu {
 			}));
 			for (int i = 1; i <= 2000; i++) {
 				final int k = i;
-				texturePane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:6", 1, false, "&9&lData: &a&l" + k, "&7", "&7*Click to set the", "&7durability data of the item."), event -> {
+				texturePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "PINK_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:6"), 1, false, "&9&lData: &a&l" + k, "&7", "&7*Click to set the", "&7durability data of the item."), event -> {
 					itemMap.setData(k); dataPane(player, itemMap);
 				}));
 			}
@@ -3222,7 +3224,7 @@ public class Menu {
 			texturePane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> {
 				dataPane(player, itemMap);
 			}));
-			texturePane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:4", 1, false, "&e&lCustom Model Data", "&7", "&7*Click to set the custom mode data", "&7value for the item."), event -> {
+			texturePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, "&e&lCustom Model Data", "&7", "&7*Click to set the custom mode data", "&7value for the item."), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[16] = "MODEL DATA";
@@ -3244,7 +3246,7 @@ public class Menu {
 			}));
 			for (int i = 1; i <= 2000; i++) {
 				final int k = i;
-				texturePane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:6", 1, false, "&9&lModel Data: &a&l" + k, "&7", "&7*Click to set the", "&7custom model data for the item."), event -> {
+				texturePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "PINK_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:6"), 1, false, "&9&lModel Data: &a&l" + k, "&7", "&7*Click to set the", "&7custom model data for the item."), event -> {
 					itemMap.setModelData(k); dataPane(player, itemMap);
 				}));
 			}
@@ -3265,7 +3267,7 @@ public class Menu {
 			damagePane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> {
 				dataPane(player, itemMap);
 			}));
-			damagePane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:4", 1, false, "&e&lCustom Damage", "&7", "&7*Click to set a custom damage", "&7value for the item."), event -> {
+			damagePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, "&e&lCustom Damage", "&7", "&7*Click to set a custom damage", "&7value for the item."), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[16] = "DAMAGE";
@@ -3287,7 +3289,7 @@ public class Menu {
 			}));
 			for (int i = 1; i <= itemMap.getMaterial().getMaxDurability(); i++) {
 				final int k = i;
-				damagePane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:6", 1, false, "&9&lDamage: &a&l" + k, "&7", "&7*Click to set the", "&7damage of the item."), event -> {
+				damagePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "PINK_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:6"), 1, false, "&9&lDamage: &a&l" + k, "&7", "&7*Click to set the", "&7damage of the item."), event -> {
 					itemMap.setDurability((short) k); dataPane(player, itemMap);
 				}));
 			}
@@ -3358,7 +3360,7 @@ public class Menu {
 					cooldownPane(player, itemMap);
 				}
 			}));
-			commandPane.addButton(new Button(ItemHandler.getItem("323", 1, false, "&a&lCooldown Message", "&7", "&7*Optional cooldown message", "&7to be displayed when", "&7the items commands are", 
+			commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "OAK_SIGN" : "323"), 1, false, "&a&lCooldown Message", "&7", "&7*Optional cooldown message", "&7to be displayed when", "&7the items commands are", 
 					"&7on cooldown.", "&9&lCOOLDOWN-MESSAGE: &a" + StringUtils.nullCheck(itemMap.getCooldownMessage())), event -> {
 				if (StringUtils.nullCheck(itemMap.getCooldownMessage()) != "NONE") {
 					itemMap.setCooldownMessage(null);
@@ -3392,7 +3394,7 @@ public class Menu {
 					sequencePane(player, itemMap);
 				}
 			}));
-			commandPane.addButton(new Button(ItemHandler.getItem("327", 1, false, "&a&lWarmup", "&7", "&7*The time it will take before", "&7the commands are executed.", "&7Player movement will cancel the", "&7pending commands execution.", "&7", 
+			commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "LAVA_BUCKET" : "327"), 1, false, "&a&lWarmup", "&7", "&7*The time it will take before", "&7the commands are executed.", "&7Player movement will cancel the", "&7pending commands execution.", "&7", 
 					"&9&lCOMMANDS-WARMUP: &a" + StringUtils.nullCheck(itemMap.getWarmDelay() + "&7") + (StringUtils.nullCheck(itemMap.getWarmDelay() + "&7") != "NONE" ? "&a second(s)" : "")), event -> {
 				if (StringUtils.nullCheck(itemMap.getWarmDelay() + "&7") != "NONE") {
 					itemMap.setWarmDelay(0);
@@ -3419,7 +3421,7 @@ public class Menu {
 		Interface clickPane = new Interface(false, 5, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			clickPane.addButton(new Button(fillerPaneGItem), 2);
-			clickPane.addButton(new Button(ItemHandler.getItem(ServerUtils.hasSpecificUpdate("1_8") ? "324" : "64", 1, false, "&e&lInteract", "&7", "&7*Commands that will execute only", "&7when left and right clicking.", "&7", "&9&lCommands: &a" + 
+			clickPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "OAK_DOOR" : (ServerUtils.hasSpecificUpdate("1_8") ? "324" : "64")), 1, false, "&e&lInteract", "&7", "&7*Commands that will execute only", "&7when left and right clicking.", "&7", "&9&lCommands: &a" + 
 			listCommands(itemMap, Action.INTERACT_ALL)), event -> {
 				commandListPane(player, itemMap, Action.INTERACT_ALL);
 			}));
@@ -3460,39 +3462,39 @@ public class Menu {
 			listCommands(itemMap, Action.ON_RECEIVE)), event -> {
 				commandListPane(player, itemMap, Action.ON_RECEIVE);
 			}));
-			clickPane.addButton(new Button(ItemHandler.getItem("397", 1, false, "&e&lOn-Death", "&7", "&7*Commands that will execute only", "&7when die with the", "&7item in your inventory.", "&7", "&9&lCommands: &a" + 
+			clickPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "SKELETON_SKULL" : "397"), 1, false, "&e&lOn-Death", "&7", "&7*Commands that will execute only", "&7when die with the", "&7item in your inventory.", "&7", "&9&lCommands: &a" + 
 			listCommands(itemMap, Action.ON_DEATH)), event -> {
 				commandListPane(player, itemMap, Action.ON_DEATH);
 			}));
-			clickPane.addButton(new Button(ItemHandler.getItem("20", 1, false, "&e&lInteract-Air", "&7", "&7*Commands that will execute only", "&7when left and right", "&7clicking the air.", "&7", "&9&lCommands: &a" + 
+			clickPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GLASS" : "20"), 1, false, "&e&lInteract-Air", "&7", "&7*Commands that will execute only", "&7when left and right", "&7clicking the air.", "&7", "&9&lCommands: &a" + 
 			listCommands(itemMap, Action.INTERACT_AIR)), event -> {
 				commandListPane(player, itemMap, Action.INTERACT_AIR);
 			}));
-			clickPane.addButton(new Button(ItemHandler.getItem("95:3", 1, false, "&e&lInteract-Air-Left", "&7", "&7*Commands that will execute only", "&7when left clicking the air.", "&7", "&9&lCommands: &a" + 
+			clickPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "LIGHT_BLUE_STAINED_GLASS" : "95:3"), 1, false, "&e&lInteract-Air-Left", "&7", "&7*Commands that will execute only", "&7when left clicking the air.", "&7", "&9&lCommands: &a" + 
 			listCommands(itemMap, Action.INTERACT_LEFT_AIR)), event -> {
 				commandListPane(player, itemMap, Action.INTERACT_LEFT_AIR);
 			}));
-			clickPane.addButton(new Button(ItemHandler.getItem("95:6", 1, false, "&e&lInteract-Air-Right", "&7", "&7*Commands that will execute only", "&7when right clicking the air.", "&7", "&9&lCommands: &a" + 
+			clickPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "PINK_STAINED_GLASS" : "95:6"), 1, false, "&e&lInteract-Air-Right", "&7", "&7*Commands that will execute only", "&7when right clicking the air.", "&7", "&9&lCommands: &a" + 
 			listCommands(itemMap, Action.INTERACT_RIGHT_AIR)), event -> {
 				commandListPane(player, itemMap, Action.INTERACT_RIGHT_AIR);
 			}));
-			clickPane.addButton(new Button(ItemHandler.getItem("2", 1, false, "&e&lInteract-Block", "&7", "&7*Commands that will execute only", "&7when left and right", "&7clicking a block.", "&7", "&9&lCommands: &a" + 
+			clickPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GRASS_BLOCK" : "2"), 1, false, "&e&lInteract-Block", "&7", "&7*Commands that will execute only", "&7when left and right", "&7clicking a block.", "&7", "&9&lCommands: &a" + 
 			listCommands(itemMap, Action.INTERACT_BLOCK)), event -> {
 				commandListPane(player, itemMap, Action.INTERACT_BLOCK);
 			}));
-			clickPane.addButton(new Button(ItemHandler.getItem("1", 1, false, "&e&lInteract-Block-Left", "&7", "&7*Commands that will execute only", "&7when left clicking a block.", "&7", "&9&lCommands: &a" + 
+			clickPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "STONE" : "1"), 1, false, "&e&lInteract-Block-Left", "&7", "&7*Commands that will execute only", "&7when left clicking a block.", "&7", "&9&lCommands: &a" + 
 			listCommands(itemMap, Action.INTERACT_LEFT_BLOCK)), event -> {
 				commandListPane(player, itemMap, Action.INTERACT_LEFT_BLOCK);
 			}));
-			clickPane.addButton(new Button(ItemHandler.getItem("4", 1, false, "&e&lInteract-Block-Right", "&7", "&7*Commands that will execute only", "&7when right clicking a block.", "&7", "&9&lCommands: &a" + 
+			clickPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "COBBLESTONE" : "4"), 1, false, "&e&lInteract-Block-Right", "&7", "&7*Commands that will execute only", "&7when right clicking a block.", "&7", "&9&lCommands: &a" + 
 			listCommands(itemMap, Action.INTERACT_RIGHT_BLOCK)), event -> {
 				commandListPane(player, itemMap, Action.INTERACT_RIGHT_BLOCK);
 			}));
-			clickPane.addButton(new Button(ItemHandler.getItem("330", 1, false, "&e&lInteract-Left", "&7", "&7*Commands that will execute only", "&7when left clicking.", "&7", "&9&lCommands: &a" + 
+			clickPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "IRON_DOOR" : "330"), 1, false, "&e&lInteract-Left", "&7", "&7*Commands that will execute only", "&7when left clicking.", "&7", "&9&lCommands: &a" + 
 			listCommands(itemMap, Action.INTERACT_LEFT_ALL)), event -> {
 				commandListPane(player, itemMap, Action.INTERACT_LEFT_ALL);
 			}));
-			clickPane.addButton(new Button(ItemHandler.getItem(ServerUtils.hasSpecificUpdate("1_8") ? "324" : "64", 1, false, "&e&lInteract-Right", "&7", "&7*Commands that will execute only", "&7when right clicking.", "&7", "&9&lCommands: &a" + 
+			clickPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "OAK_DOOR" : (ServerUtils.hasSpecificUpdate("1_8") ? "324" : "64")), 1, false, "&e&lInteract-Right", "&7", "&7*Commands that will execute only", "&7when right clicking.", "&7", "&9&lCommands: &a" + 
 			listCommands(itemMap, Action.INTERACT_RIGHT_ALL)), event -> {
 				commandListPane(player, itemMap, Action.INTERACT_RIGHT_ALL);
 			}));
@@ -3516,11 +3518,11 @@ public class Menu {
 			listCommands(itemMap, Action.INVENTORY_RIGHT)), event -> {
 				commandListPane(player, itemMap, Action.INVENTORY_RIGHT);
 			}));
-			clickPane.addButton(new Button(ItemHandler.getItem("44", 2, false, "&e&lInventory-Shift-Left", "&7", "&7*Commands that will execute only", "&7when cursor shift left clicking the item.", "&7", "&9&lCommands: &a" + 
+			clickPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "STONE_SLAB" : "44"), 2, false, "&e&lInventory-Shift-Left", "&7", "&7*Commands that will execute only", "&7when cursor shift left clicking the item.", "&7", "&9&lCommands: &a" + 
 			listCommands(itemMap, Action.INVENTORY_SHIFT_LEFT)), event -> {
 				commandListPane(player, itemMap, Action.INVENTORY_SHIFT_LEFT);
 			}));
-			clickPane.addButton(new Button(ItemHandler.getItem("44:3", 2, false, "&e&lInventory-Shift-Right", "&7", "&7*Commands that will execute only", "&7when cursor shift right clicking the item.", "&7", "&9&lCommands: &a" + 
+			clickPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "COBBLESTONE_SLAB" : "44:3"), 2, false, "&e&lInventory-Shift-Right", "&7", "&7*Commands that will execute only", "&7when cursor shift right clicking the item.", "&7", "&9&lCommands: &a" + 
 			listCommands(itemMap, Action.INVENTORY_SHIFT_RIGHT)), event -> {
 				commandListPane(player, itemMap, Action.INVENTORY_SHIFT_RIGHT);
 			}));
@@ -3644,7 +3646,7 @@ public class Menu {
 			}));
 			for (int i = 1; i <= getCommandSize(itemMap, action); i++) {
 				final int k = i;
-				orderPane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:3", k, false, "&9&lOrder Number: &a&l" + k, "&7", "&7*Click to set the order", "&7number of the command."), event -> {
+				orderPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "LIGHT_BLUE_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:3"), k, false, "&9&lOrder Number: &a&l" + k, "&7", "&7*Click to set the order", "&7number of the command."), event -> {
 					List < ItemCommand > arrayCommands = new ArrayList < ItemCommand > ();
 					int l = 0;
 					for (ItemCommand Command: itemMap.getCommands()) {
@@ -3770,7 +3772,7 @@ public class Menu {
 	private static void executorPane(final Player player, final ItemMap itemMap, final Action action) {
 		Interface executorPane = new Interface(false, 2, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
-			executorPane.addButton(new Button(ItemHandler.getItem("289", 1, false, "&f")));
+			executorPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GUNPOWDER" : "289"), 1, false, "&f")));
 			executorPane.addButton(new Button(ItemHandler.getItem("BOOK", 1, false, "&e&lPlayer", "&7", "&7*Executes the command", "&7as the player."), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
@@ -3855,7 +3857,7 @@ public class Menu {
 				commandListPane(event.getPlayer(), itemMap, action);
 			}));
 			executorPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "REPEATER" : "356"), 1, false, "&e&lSwap-Item", "&7", "&7*Swaps the item to another defined item."), event -> swapPane(player, itemMap, action)));
-			executorPane.addButton(new Button(ItemHandler.getItem("347", 1, false, "&e&lDelay", "&7", "&7*Adds a delay between command lines."), event -> delayPane(player, itemMap, action)));
+			executorPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CLOCK" : "347"), 1, false, "&e&lDelay", "&7", "&7*Adds a delay between command lines."), event -> delayPane(player, itemMap, action)));
 			executorPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the command lines menu."), event -> commandListPane(player, itemMap, action)));
 			executorPane.addButton(new Button(fillerPaneBItem), 7);
 			executorPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the command lines menu."), event -> commandListPane(player, itemMap, action)));
@@ -3903,7 +3905,7 @@ public class Menu {
 			delayPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the executors menu."), event -> {
 				executorPane(player, itemMap, action);
 			}));
-			delayPane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:4", 1, false, "&e&lCustom Cooldown", "&7", "&7*Click to set a custom", "&7delay for the next command."), event -> {
+			delayPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, "&e&lCustom Cooldown", "&7", "&7*Click to set a custom", "&7delay for the next command."), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[16] = "DELAY";
@@ -3925,7 +3927,7 @@ public class Menu {
 			}));
 			for (int i = 1; i <= 64; i++) {
 				final int k = i;
-				delayPane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:8", k, false, "&9&lDelay: &a&l" + k + " Tick(s)", "&7", "&7*Click to set the", "&7delay of the next command."), event -> {
+				delayPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "LIGHT_GRAY_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:8"), k, false, "&9&lDelay: &a&l" + k + " Tick(s)", "&7", "&7*Click to set the", "&7delay of the next command."), event -> {
 					modifyCommands(itemMap, ItemCommand.fromString("delay: " + k, action, itemMap, k, null), true);
 					commandListPane(player, itemMap, action);
 				}));
@@ -3947,7 +3949,7 @@ public class Menu {
 			cooldownPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item commands menu."), event -> {
 				commandPane(player, itemMap);
 			}));
-			cooldownPane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:4", 1, false, "&e&lCustom Cooldown", "&7", "&7*Click to set a custom commands-cooldown", "&7value for the item."), event -> {
+			cooldownPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, "&e&lCustom Cooldown", "&7", "&7*Click to set a custom commands-cooldown", "&7value for the item."), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[16] = "COMMAND COOLDOWN";
@@ -3969,7 +3971,7 @@ public class Menu {
 			}));
 			for (int i = 1; i <= 64; i++) {
 				final int k = i;
-				cooldownPane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:11", k, false, "&9&lDuration: &a&l" + k + " Second(s)", "&7", "&7*Click to set the", "&7commands-cooldown of the item."), event -> {
+				cooldownPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "BLUE_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:11"), k, false, "&9&lDuration: &a&l" + k + " Second(s)", "&7", "&7*Click to set the", "&7commands-cooldown of the item."), event -> {
 					itemMap.setCommandCooldown(k);
 					commandPane(player, itemMap);
 				}));
@@ -3991,7 +3993,7 @@ public class Menu {
 			warmPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item commands menu."), event -> {
 				commandPane(player, itemMap);
 			}));
-			warmPane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:4", 1, false, "&e&lCustom Warmup", "&7", "&7*Click to set a custom commands-warmup", "&7value for the item."), event -> {
+			warmPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, "&e&lCustom Warmup", "&7", "&7*Click to set a custom commands-warmup", "&7value for the item."), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[16] = "COMMAND WARMUP";
@@ -4013,7 +4015,7 @@ public class Menu {
 			}));
 			for (int i = 1; i <= 64; i++) {
 				final int k = i;
-				warmPane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:11", k, false, "&9&lWarming: &a&l" + k + " Second(s)", "&7", "&7*Click to set the", "&7commands-warmup of the item."), event -> {
+				warmPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "BLUE_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:11"), k, false, "&9&lWarming: &a&l" + k + " Second(s)", "&7", "&7*Click to set the", "&7commands-warmup of the item."), event -> {
 					itemMap.setWarmDelay(k);
 					commandPane(player, itemMap);
 				}));
@@ -4035,7 +4037,7 @@ public class Menu {
 			costPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item commands menu."), event -> {
 				commandPane(player, itemMap);
 			}));
-			costPane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:4", 1, false, "&e&lCustom Cost", "&7", "&7*Click to set a custom commands-cost", "&7value for the item."), event -> {
+			costPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, "&e&lCustom Cost", "&7", "&7*Click to set a custom commands-cost", "&7value for the item."), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[16] = "COMMAND COST";
@@ -4057,7 +4059,7 @@ public class Menu {
 			}));
 			for (int i = 0; i <= 64; i++) {
 				final int k = i;
-				costPane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:11", (k == 0 ? 1 : k), false, "&9&lCost: &a$&l" + k, "&7", "&7*Click to set the", "&7commands-cost of the item."), event -> {
+				costPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "BLUE_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:11"), (k == 0 ? 1 : k), false, "&9&lCost: &a$&l" + k, "&7", "&7*Click to set the", "&7commands-cost of the item."), event -> {
 					itemMap.setCommandCost(k);
 					commandPane(player, itemMap);
 				}));
@@ -4079,7 +4081,7 @@ public class Menu {
 			receivePane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item commands menu."), event -> {
 				commandPane(player, itemMap);
 			}));
-			receivePane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:4", 1, false, "&e&lCustom Receive", "&7", "&7*Click to set a custom commands-receive", "&7value for the item."), event -> {
+			receivePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, "&e&lCustom Receive", "&7", "&7*Click to set a custom commands-receive", "&7value for the item."), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[16] = "COMMAND RECEIVE";
@@ -4101,7 +4103,7 @@ public class Menu {
 			}));
 			for (int i = 0; i <= 64; i++) {
 				final int k = i;
-				receivePane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:11", (k == 0 ? 1 : k), false, "&9&lReceive: &a#&l" + k, "&7", "&7*Click to set the", "&7commands-receive of the item."), event -> {
+				receivePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "BLUE_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:11"), (k == 0 ? 1 : k), false, "&9&lReceive: &a#&l" + k, "&7", "&7*Click to set the", "&7commands-receive of the item."), event -> {
 					itemMap.setCommandReceive(k);
 					commandPane(player, itemMap);
 				}));
@@ -4247,7 +4249,7 @@ public class Menu {
 			lifePane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the particle menu."), event -> {
 				particlePane(player, itemMap, 3);
 			}));
-			lifePane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:4", 1, false, "&e&lCustom LifeTime", "&7", "&7*Click to set a lifetime (duration)", "&7value for particle effect."), event -> {
+			lifePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, "&e&lCustom LifeTime", "&7", "&7*Click to set a lifetime (duration)", "&7value for particle effect."), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[16] = "PARTICLE LIFETIME";
@@ -4273,7 +4275,7 @@ public class Menu {
 			}));
 			for (int i = 1; i <= 64; i++) {
 				final int k = i;
-				lifePane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:9", k, false, "&9&lLifeTime: &a&l" + k + " Tick(s)", "&7", "&7*Click to set the lifetime", "&7(duration) of the particle effect."), event -> {
+				lifePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CYAN_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:9"), k, false, "&9&lLifeTime: &a&l" + k + " Tick(s)", "&7", "&7*Click to set the lifetime", "&7(duration) of the particle effect."), event -> {
 					if (stage == 0) {
 						itemMap.setCommandParticle(particle + ":" + k);
 						commandPane(player, itemMap);
@@ -4384,7 +4386,7 @@ public class Menu {
 			enchantLevelPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the enchant selection menu."), event -> {
 				enchantPane(player, itemMap);
 			}));
-			enchantLevelPane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:4", 1, false, "&e&lCustom Count", "&7", "&7*Click to set a custom damage", "&7value for the item."), event -> {
+			enchantLevelPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, "&e&lCustom Count", "&7", "&7*Click to set a custom damage", "&7value for the item."), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[16] = "ENCHANT LEVEL";
@@ -4408,7 +4410,7 @@ public class Menu {
 			}));
 			for (int i = 1; i <= 64; i++) {
 				final int k = i;
-				enchantLevelPane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:11", k, false, "&9&lLevel: &a&l" + k, "&7", "&7*Click to set the", "&7level of the item enchantment.", "&7", "&7This will be &l" + 
+				enchantLevelPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "BLUE_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:11"), k, false, "&9&lLevel: &a&l" + k, "&7", "&7*Click to set the", "&7level of the item enchantment.", "&7", "&7This will be &l" + 
 				ItemHandler.getEnchantName(enchant).toUpperCase() + ":" + k), event -> {
 					Map < String, Integer > enchantments = (itemMap.getEnchantments() != null) ? itemMap.getEnchantments() : new HashMap < String, Integer >();
 					enchantments.put(ItemHandler.getEnchantName(enchant).toUpperCase(), k);
@@ -4456,7 +4458,7 @@ public class Menu {
 				}
 				flagPane(player, itemMap);
 			}));
-			flagPane.addButton(new Button(ItemHandler.getItem("351:4", 1, itemMap.isGlowing(), "&a&l&nGlowing", "&7", 
+			flagPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "LAPIS_LAZULI" : "351:4"), 1, itemMap.isGlowing(), "&a&l&nGlowing", "&7", 
 					"&a&lTrue&f:&7 The item will glow as if it was enchanted!", "&7",
 					"&c&lFalse&f:&7 The item will not glow.", "&7", 
 					"&9&lENABLED: &a" + (itemMap.isGlowing() + "").toUpperCase()), event -> {
@@ -4467,7 +4469,7 @@ public class Menu {
 				}
 				flagPane(player, itemMap);
 			}));
-			flagPane.addButton(new Button(ItemHandler.getItem("277", 7, itemMap.isStackable(), "&a&l&nStackable", "&7", 
+			flagPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "DIAMOND_SHOVEL" : "277"), 7, itemMap.isStackable(), "&a&l&nStackable", "&7", 
 					"&a&lTrue&f:&7 The item will be stackable with itself!", "&7",
 					"&c&lFalse&f:&7 The item stack only if it did in vanilla.", "&7", 
 					"&9&lENABLED: &a" + (itemMap.isStackable() + "").toUpperCase()), event -> {
@@ -4478,7 +4480,7 @@ public class Menu {
 				}
 				flagPane(player, itemMap);
 			}));
-			flagPane.addButton(new Button(ItemHandler.getItem("38", 1, itemMap.isInventoryClose(), "&a&l&nInventory Close", "&7", 
+			flagPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "POPPY" : "38"), 1, itemMap.isInventoryClose(), "&a&l&nInventory Close", "&7", 
 					"&a&lTrue&f:&7 Closes the players current", "&7inventory when clicking the item.", "&7",
 					"&c&lFalse&f:&7 The current inventory will not", "&7be closed when clicking the item.", "&7", 
 					"&9&lENABLED: &a" + (itemMap.isInventoryClose() + "").toUpperCase()), event -> {
@@ -4667,7 +4669,7 @@ public class Menu {
 				}
 				flagPane(player, itemMap);
 			}));
-			flagPane.addButton(new Button(ItemHandler.getItem(ServerUtils.hasSpecificUpdate("1_8") ? "324" : "64", 1, itemMap.isCountLock(), "&a&l&nCount Lock", "&7", 
+			flagPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "OAK_DOOR" : (ServerUtils.hasSpecificUpdate("1_8") ? "324" : "64")), 1, itemMap.isCountLock(), "&a&l&nCount Lock", "&7", 
 					"&a&lTrue&f:&7 The item can be used indefinitely.", "&7Useful to give a player infinite apples.", "&cNOTE: &7This will overwrite the disposable flag.", "&7",
 					"&c&lFalse&f:&7 The item will be removed from the inventory on use.", "&7", 
 					"&9&lENABLED: &a" + (itemMap.isCountLock() + "").toUpperCase()), event -> {
@@ -4767,7 +4769,7 @@ public class Menu {
 				}
 				flagPane(player, itemMap);
 			}));
-			flagPane.addButton(new Button(ItemHandler.getItem("116", 1, itemMap.isItemChangable(), "&a&l&nAllow Modifications", "&7", 
+			flagPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "ENCHANTMENT_TABLE" : "116"), 1, itemMap.isItemChangable(), "&a&l&nAllow Modifications", "&7", 
 					"&a&lTrue&f: &7Allows the players to modify the item", "&7while retaining all properties.", "&7",
 					"&c&lFalse&f: &7Item will not be modifiable.", "&7", 
 					"&9&lENABLED: &a" + (itemMap.isItemChangable() + "").toUpperCase()), event -> {
@@ -4947,7 +4949,7 @@ public class Menu {
 				}
 				triggerPane(player, itemMap);
 			}));
-			triggerPane.addButton(new Button(ItemHandler.getItem("323", 1, itemMap.isGiveOnJoin(), "&e&l&nJoin", "&7", "&7*Gives the item when the", "&7player logs into the server.", 
+			triggerPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "OAK_SIGN" : "323"), 1, itemMap.isGiveOnJoin(), "&e&l&nJoin", "&7", "&7*Gives the item when the", "&7player logs into the server.", 
 					"&9&lENABLED: &a" + (itemMap.isGiveOnJoin() + "").toUpperCase()), event -> {
 				if (itemMap.isGiveOnJoin()) {
 					itemMap.setGiveOnJoin(false);
@@ -4994,7 +4996,7 @@ public class Menu {
 				}
 				triggerPane(player, itemMap);
 			}));
-			triggerPane.addButton(new Button(ItemHandler.getItem("408", 1, itemMap.isGiveOnRegionLeave(), "&e&l&nRegion Leave", "&7", "&7*Removes the item when the", "&7player leaves any of the enabled-regions.", "&9&lENABLED: &a" +
+			triggerPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "HOPPER_MINECART" : "408"), 1, itemMap.isGiveOnRegionLeave(), "&e&l&nRegion Leave", "&7", "&7*Removes the item when the", "&7player leaves any of the enabled-regions.", "&9&lENABLED: &a" +
 			(itemMap.isGiveOnRegionLeave() + "").toUpperCase()), event -> {
 				if (itemMap.isGiveOnRegionLeave()) {
 					itemMap.setGiveOnRegionLeave(false);
@@ -5005,7 +5007,7 @@ public class Menu {
 				}
 				triggerPane(player, itemMap);
 			}));
-			triggerPane.addButton(new Button(ItemHandler.getItem("407", 1, itemMap.isGiveOnRegionAccess(), "&e&l&nRegion Access", "&7", "&7*Gives the item when the", "&7player enters any of the enabled-regions", "&7and removes the item when leaving", "&7any of the enabled-regions.", "&9&lENABLED: &a" +
+			triggerPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "TNT_MINECART" : "407"), 1, itemMap.isGiveOnRegionAccess(), "&e&l&nRegion Access", "&7", "&7*Gives the item when the", "&7player enters any of the enabled-regions", "&7and removes the item when leaving", "&7any of the enabled-regions.", "&9&lENABLED: &a" +
 			(itemMap.isGiveOnRegionAccess() + "").toUpperCase()), event -> {
 				if (itemMap.isGiveOnRegionAccess()) {
 					itemMap.setGiveOnRegionAccess(false);
@@ -5016,7 +5018,7 @@ public class Menu {
 				}
 				triggerPane(player, itemMap);
 			}));
-			triggerPane.addButton(new Button(ItemHandler.getItem("342", 1, itemMap.isGiveOnRegionEgress(), "&e&l&nRegion Engress", "&7", "&7*Removes the item when the", "&7player enters any of the enabled-regions", "&7and gives the item when leaving", "&7any of the enabled-regions.", "&9&lENABLED: &a" +
+			triggerPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CHEST_MINECART" : "342"), 1, itemMap.isGiveOnRegionEgress(), "&e&l&nRegion Engress", "&7", "&7*Removes the item when the", "&7player enters any of the enabled-regions", "&7and gives the item when leaving", "&7any of the enabled-regions.", "&9&lENABLED: &a" +
 			(itemMap.isGiveOnRegionEgress() + "").toUpperCase()), event -> {
 				if (itemMap.isGiveOnRegionEgress()) {
 					itemMap.setGiveOnRegionEgress(false);
@@ -5365,7 +5367,7 @@ public class Menu {
 		Interface durationPane = new Interface(true, 6, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			durationPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the animated menu."), event -> animateMaterialPane(player, itemMap)));
-			durationPane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:4", 1, false, "&e&lCustom Duration", "&7", "&7*Click to set a custom duration", "&7value for the animation."), event -> {
+			durationPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, "&e&lCustom Duration", "&7", "&7*Click to set a custom duration", "&7value for the animation."), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[16] = "ANIMATION DURATION";
@@ -5401,7 +5403,7 @@ public class Menu {
 			}));
 			for (int i = 1; i <= 64; i++) {
 				final int k = i;
-				durationPane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:11", k, false, "&9&lDuration: &a&l" + k + " Ticks(s)", "&7", "&7*Click to set the", "&7duration of the animation."), event -> {
+				durationPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "BLUE_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:11"), k, false, "&9&lDuration: &a&l" + k + " Ticks(s)", "&7", "&7*Click to set the", "&7duration of the animation."), event -> {
 					List < String > mats = itemMap.getDynamicMaterials();
 					if (isNew) {
 						if (itemMap.getDynamicMaterials().isEmpty()) {
@@ -5436,7 +5438,7 @@ public class Menu {
 			modifyMaterialPane.addButton(new Button(fillerPaneGItem), 3);
 			modifyMaterialPane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, false, "&a&l&nMaterial", "&7", "&7*Change the animated material type.", "&9&lMaterial: &a" + ItemHandler.cutDelay(itemMap.getDynamicMaterials().get(position))),
 					event -> selectMaterialPane(player, itemMap, position, false)));
-			modifyMaterialPane.addButton(new Button(ItemHandler.getItem("347", 1, false, "&e&l&nDuration", "&7", "&7*Change the duration of the animation.", "&9&lAnimation Ticks: &a" + 
+			modifyMaterialPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CLOCK" : "347"), 1, false, "&e&l&nDuration", "&7", "&7*Change the duration of the animation.", "&9&lAnimation Ticks: &a" + 
 			StringUtils.returnInteger(ItemHandler.getDelayFormat(itemMap.getDynamicMaterials().get(position)))), event -> durationMaterialPane(player, itemMap, position, false, ItemHandler.cutDelay(itemMap.getDynamicMaterials().get(position)))));
 			modifyMaterialPane.addButton(new Button(ItemHandler.getItem("REDSTONE", 1, false, "&c&l&nDelete", "&7", "&7*Delete this animated material."), event -> {
 				List < String > mats = itemMap.getDynamicMaterials();mats.remove(position);
@@ -5501,7 +5503,7 @@ public class Menu {
 		Interface durationPane = new Interface(true, 6, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			durationPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the animated menu."), event -> animatedNamePane(player, itemMap)));
-			durationPane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:4", 1, false, "&e&lCustom Duration", "&7", "&7*Click to set a custom duration", "&7value for the animation."), event -> {
+			durationPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, "&e&lCustom Duration", "&7", "&7*Click to set a custom duration", "&7value for the animation."), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[16] = "ANIMATION DURATION";
@@ -5537,7 +5539,7 @@ public class Menu {
 			}));
 			for (int i = 1; i <= 64; i++) {
 				final int k = i;
-				durationPane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:11", k, false, "&9&lDuration: &a&l" + k + " Ticks(s)", "&7", "&7*Click to set the", "&7duration of the animation."), event -> {
+				durationPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "BLUE_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:11"), k, false, "&9&lDuration: &a&l" + k + " Ticks(s)", "&7", "&7*Click to set the", "&7duration of the animation."), event -> {
 					List < String > names = itemMap.getDynamicNames();
 					if (isNew) {
 						if (itemMap.getDynamicNames().isEmpty() && itemMap.getCustomName() != null && !itemMap.getCustomName().isEmpty()) {
@@ -5586,7 +5588,7 @@ public class Menu {
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				modifyNamePane(event.getPlayer(), itemMap, position);
 			}));
-			modifyNamePane.addButton(new Button(ItemHandler.getItem("347", 1, false, "&e&l&nDuration", "&7", "&7*Change the duration of the animation.", "&9&lAnimation Ticks: &a" + 
+			modifyNamePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CLOCK" : "347"), 1, false, "&e&l&nDuration", "&7", "&7*Change the duration of the animation.", "&9&lAnimation Ticks: &a" + 
 			StringUtils.returnInteger(ItemHandler.getDelayFormat(itemMap.getDynamicNames().get(position)))), event -> durationNamePane(player, itemMap, position, false, ItemHandler.cutDelay(itemMap.getDynamicNames().get(position)))));
 			modifyNamePane.addButton(new Button(ItemHandler.getItem("REDSTONE", 1, false, "&c&l&nDelete", "&7", "&7*Delete this animated name."), event -> {
 				List < String > names = itemMap.getDynamicNames();
@@ -5652,7 +5654,7 @@ public class Menu {
 		Interface durationPane = new Interface(true, 6, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			durationPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the animated menu."), event -> animatedLorePane(player, itemMap)));
-			durationPane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:4", 1, false, "&e&lCustom Duration", "&7", "&7*Click to set a custom duration", "&7value for the animation."), event -> {
+			durationPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, "&e&lCustom Duration", "&7", "&7*Click to set a custom duration", "&7value for the animation."), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[16] = "ANIMATION DURATION";
@@ -5692,7 +5694,7 @@ public class Menu {
 			}));
 			for (int i = 1; i <= 64; i++) {
 				final int k = i;
-				durationPane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:11", k, false, "&9&lDuration: &a&l" + k + " Ticks(s)", "&7", "&7*Click to set the", "&7duration of the animation."), event -> {
+				durationPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "BLUE_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:11"), k, false, "&9&lDuration: &a&l" + k + " Ticks(s)", "&7", "&7*Click to set the", "&7duration of the animation."), event -> {
 					List < List < String >> lores = itemMap.getDynamicLores();
 					if (isNew) {
 						if (itemMap.getDynamicLores().isEmpty() && itemMap.getCustomLore() != null && !itemMap.getCustomLore().isEmpty()) {
@@ -5744,7 +5746,7 @@ public class Menu {
 				placeHolders[16] = "ANIMATED LORE";LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				modifyLorePane(event.getPlayer(), itemMap, position);
 			}));
-			modifyLorePane.addButton(new Button(ItemHandler.getItem("347", 1, false, "&e&l&nDuration", "&7", "&7*Change the duration of the animation.", "&9&lAnimation Ticks: &a" + 
+			modifyLorePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CLOCK" : "347"), 1, false, "&e&l&nDuration", "&7", "&7*Change the duration of the animation.", "&9&lAnimation Ticks: &a" + 
 			StringUtils.returnInteger(ItemHandler.getDelayFormat(itemMap.getDynamicLores().get(position).get(0)))), event -> durationLorePane(player, itemMap, position, false, "")));
 			modifyLorePane.addButton(new Button(ItemHandler.getItem("REDSTONE", 1, false, "&c&l&nDelete", "&7", "&7*Delete this animated lore."), event -> {
 				List < List < String >> lores = itemMap.getDynamicLores();
@@ -5843,7 +5845,7 @@ public class Menu {
 		Interface durationPane = new Interface(true, 6, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			durationPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the animated menu."), event -> animatedSkullPane(player, itemMap, owner)));
-			durationPane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:4", 1, false, "&e&lCustom Duration", "&7", "&7*Click to set a custom duration", "&7value for the animation."), event -> {
+			durationPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, "&e&lCustom Duration", "&7", "&7*Click to set a custom duration", "&7value for the animation."), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[16] = "ANIMATION DURATION";
@@ -5888,7 +5890,7 @@ public class Menu {
 			}));
 			for (int i = 1; i <= 64; i++) {
 				final int k = i;
-				durationPane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:11", k, false, "&9&lDuration: &a&l" + k + " Ticks(s)", "&7", "&7*Click to set the", "&7duration of the animation."), event -> {
+				durationPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "BLUE_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:11"), k, false, "&9&lDuration: &a&l" + k + " Ticks(s)", "&7", "&7*Click to set the", "&7duration of the animation."), event -> {
 					List < String > skulls = itemMap.getDynamicOwners();
 					if (!owner) {
 						skulls = itemMap.getDynamicTextures();
@@ -5967,7 +5969,7 @@ public class Menu {
 					modifySkullPane(event.getPlayer(), itemMap, position, owner);
 				}));
 			}
-			modifySkullPane.addButton(new Button(ItemHandler.getItem("347", 1, false, "&e&l&nDuration", "&7", "&7*Change the duration of the animation.", "&9&lAnimation Ticks: &a" + 
+			modifySkullPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CLOCK" : "347"), 1, false, "&e&l&nDuration", "&7", "&7*Change the duration of the animation.", "&9&lAnimation Ticks: &a" + 
 			StringUtils.returnInteger(ItemHandler.getDelayFormat((owner ? itemMap.getDynamicOwners().get(position) : itemMap.getDynamicTextures().get(position))))), 
 					event -> durationSkullPane(player, itemMap, position, false, ItemHandler.cutDelay((owner ? itemMap.getDynamicOwners().get(position) : itemMap.getDynamicTextures().get(position))), owner)));
 			modifySkullPane.addButton(new Button(ItemHandler.getItem("REDSTONE", 1, false, "&c&l&nDelete", "&7", "&7*Delete this animated skull " + (owner ? "owner." : "texture.")), event -> {
@@ -6010,7 +6012,7 @@ public class Menu {
 			(StringUtils.nullCheck(itemMap.getDynamicMaterials() + "") != "NONE" ? "YES" : "NONE")), event -> animateMaterialPane(player, itemMap)));
 			animationPane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, false, "&a&l&nName", "&7", "&7*Add additional custom names", "&7to have the item change between.", "&9&lAnimated Names: &a" + 
 			(StringUtils.nullCheck(itemMap.getDynamicNames() + "") != "NONE" ? "YES" : "NONE")), event -> animatedNamePane(player, itemMap)));
-			animationPane.addButton(new Button(ItemHandler.getItem("386", 1, false, "&b&l&nLore", "&7", "&7*Add additional custom lores", "&7to have the item change between.", "&9&lAnimated Lores: &a" + 
+			animationPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "WRITABLE_BOOK" : "386"), 1, false, "&b&l&nLore", "&7", "&7*Add additional custom lores", "&7to have the item change between.", "&9&lAnimated Lores: &a" + 
 			(StringUtils.nullCheck(itemMap.getDynamicLores() + "") != "NONE" ? "YES" : "NONE")), event -> animatedLorePane(player, itemMap)));
 			if (itemMap.getMaterial().toString().contains("PLAYER_HEAD") || itemMap.getMaterial().toString().contains("SKULL_ITEM")) {
 				animationPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GOLDEN_HELMET" : "314"), 1, false, "&a&lSkull Owner", "&7", "&7*Add additional skull owners", "&7to have the item change between.", "&7", "&7You can only define skull owner", 
@@ -6102,7 +6104,7 @@ public class Menu {
 			}));
 			for (int i = 1; i < 100; i++) {
 				final int k = i;
-				probabilityPane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:11", 1, false, "&9&lChance: &a&l" + k + "%", "&7", "&7*Click to set the", "&7probability of the item."), event -> {
+				probabilityPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "BLUE_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:11"), 1, false, "&9&lChance: &a&l" + k + "%", "&7", "&7*Click to set the", "&7probability of the item."), event -> {
 					itemMap.setProbability(k);creatingPane(player, itemMap);
 				}));
 			}
@@ -6123,7 +6125,7 @@ public class Menu {
 			usePane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> {
 				creatingPane(player, itemMap);
 			}));
-			usePane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:4", 1, false, "&e&lCustom Usage", "&7", "&7*Click to set a custom usage cooldown", "&7value for the item."), event -> {
+			usePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, "&e&lCustom Usage", "&7", "&7*Click to set a custom usage cooldown", "&7value for the item."), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[16] = "USAGE COOLDOWN";
@@ -6145,7 +6147,7 @@ public class Menu {
 			}));
 			for (int i = 1; i <= 64; i++) {
 				final int k = i;
-				usePane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:11", k, false, "&9&lDuration: &a&l" + k + " Second(s)", "&7", "&7*Click to set the", "&7use-cooldown of the item."), event -> {
+				usePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "BLUE_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:11"), k, false, "&9&lDuration: &a&l" + k + " Second(s)", "&7", "&7*Click to set the", "&7use-cooldown of the item."), event -> {
 					itemMap.setInteractCooldown(k);
 					creatingPane(player, itemMap);
 				}));
@@ -6169,7 +6171,7 @@ public class Menu {
 			for (EntityType entity: itemMap.getMobsDrop().keySet()) { mobs += entity.name() + ", "; }
 			for (Material material: itemMap.getBlocksDrop().keySet()) { blocks += material.name() + ", "; }
 			dropsPane.addButton(new Button(fillerPaneBItem), 12);
-			dropsPane.addButton(new Button(ItemHandler.getItem("383:54", 1, false, "&b&lMobs Drop", "&7", "&7*Define mobs that are", "&7allowed to drop the item.", (!mobs.isEmpty() ? "&9&lMobs: &a" + mobs.substring(0, mobs.length() - 2) : "")), event -> {
+			dropsPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "ZOMBIE_SPAWN_EGG" : "383:54"), 1, false, "&b&lMobs Drop", "&7", "&7*Define mobs that are", "&7allowed to drop the item.", (!mobs.isEmpty() ? "&9&lMobs: &a" + mobs.substring(0, mobs.length() - 2) : "")), event -> {
 				mobsPane(player, itemMap);
 			}));
 			dropsPane.addButton(new Button(fillerPaneBItem));
@@ -6360,7 +6362,7 @@ public class Menu {
 					blocksPane(player, itemMap);
 				}));
 			}
-			chancePane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:7", 1, false, "&e&lCustom Drop Chance", "&7", "&7*Click to set a custom drop chance", "&7value for the item."), event -> {
+			chancePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GRAY_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:7"), 1, false, "&e&lCustom Drop Chance", "&7", "&7*Click to set a custom drop chance", "&7value for the item."), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[16] = "DROP CHANCE";
@@ -6394,7 +6396,7 @@ public class Menu {
 						.format(
 								Double.parseDouble(Double.toString(i).replace(",", ".")))
 						.replace(",", "."));
-				chancePane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:10", 1, false, "&9&lCost: &a$&l" + k, "&7", "&7*Click to set the", "&7drop chance of the item."), event -> {
+				chancePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "PURPLE_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:10"), 1, false, "&9&lCost: &a$&l" + k, "&7", "&7*Click to set the", "&7drop chance of the item."), event -> {
 					if (entity != null) { 
 						Map<EntityType, Double> mobsDrop = itemMap.getMobsDrop();
 						mobsDrop.put(entity, k);
@@ -6449,7 +6451,7 @@ public class Menu {
 		Interface commandPane = new Interface(false, 5, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			commandPane.addButton(new Button(fillerPaneGItem), 2);
-			commandPane.addButton(new Button(ItemHandler.getItem(ServerUtils.hasSpecificUpdate("1_8") ? "324" : "64", 1, false, "&e&lInteract", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+			commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "OAK_DOOR" : (ServerUtils.hasSpecificUpdate("1_8") ? "324" : "64")), 1, false, "&e&lInteract", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
 					"&7", "&9&lENABLED: &a" + (StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.INTERACT_ALL.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				commandCPane(player, itemMap, Action.INTERACT_ALL);
 			}));
@@ -6490,39 +6492,39 @@ public class Menu {
 					"&7", "&9&lENABLED: &a" + (StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.ON_RECEIVE.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				commandCPane(player, itemMap, Action.ON_RECEIVE);
 			}));
-			commandPane.addButton(new Button(ItemHandler.getItem("397", 1, false, "&e&lOn-Death", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+			commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "SKELETON_SKULL" : "397"), 1, false, "&e&lOn-Death", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
 					"&7", "&9&lENABLED: &a" + (StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.ON_DEATH.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				commandCPane(player, itemMap, Action.ON_DEATH);
 			}));
-			commandPane.addButton(new Button(ItemHandler.getItem("20", 1, false, "&e&lInteract-Air", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+			commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GLASS" : "20"), 1, false, "&e&lInteract-Air", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
 					"&7", "&9&lENABLED: &a" + (StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.INTERACT_AIR.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				commandCPane(player, itemMap, Action.INTERACT_AIR);
 			}));
-			commandPane.addButton(new Button(ItemHandler.getItem("95:3", 1, false, "&e&lInteract-Air-Left", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+			commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "LIGHT_BLUE_STAINED_GLASS" : "95:3"), 1, false, "&e&lInteract-Air-Left", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
 					"&7", "&9&lENABLED: &a" + (StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.INTERACT_LEFT_AIR.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				commandCPane(player, itemMap, Action.INTERACT_LEFT_AIR);
 			}));
-			commandPane.addButton(new Button(ItemHandler.getItem("95:6", 1, false, "&e&lInteract-Air-Right", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+			commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "PINK_STAINED_GLASS" : "95:6"), 1, false, "&e&lInteract-Air-Right", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
 					"&7", "&9&lENABLED: &a" + (StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.INTERACT_RIGHT_AIR.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				commandCPane(player, itemMap, Action.INTERACT_RIGHT_AIR);
 			}));
-			commandPane.addButton(new Button(ItemHandler.getItem("2", 1, false, "&e&lInteract-Block", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+			commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GRASS_BLOCK" : "2:4"), 1, false, "&e&lInteract-Block", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
 					"&7", "&9&lENABLED: &a" + (StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.INTERACT_BLOCK.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				commandCPane(player, itemMap, Action.INTERACT_BLOCK);
 			}));
-			commandPane.addButton(new Button(ItemHandler.getItem("1", 1, false, "&e&lInteract-Block-Left", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+			commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "STONE" : "1"), 1, false, "&e&lInteract-Block-Left", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
 					"&7", "&9&lENABLED: &a" + (StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.INTERACT_LEFT_BLOCK.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				commandCPane(player, itemMap, Action.INTERACT_LEFT_BLOCK);
 			}));
-			commandPane.addButton(new Button(ItemHandler.getItem("4", 1, false, "&e&lInteract-Block-Right", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+			commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "COBBLESTONE" : "4"), 1, false, "&e&lInteract-Block-Right", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
 					"&7", "&9&lENABLED: &a" + (StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.INTERACT_RIGHT_BLOCK.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				commandCPane(player, itemMap, Action.INTERACT_RIGHT_BLOCK);
 			}));
-			commandPane.addButton(new Button(ItemHandler.getItem("330", 1, false, "&e&lInteract-Left", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+			commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "IRON_DOOR" : "330"), 1, false, "&e&lInteract-Left", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
 					"&7", "&9&lENABLED: &a" + (StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.INTERACT_LEFT_ALL.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				commandCPane(player, itemMap, Action.INTERACT_LEFT_ALL);
 			}));
-			commandPane.addButton(new Button(ItemHandler.getItem(ServerUtils.hasSpecificUpdate("1_8") ? "324" : "64", 1, false, "&e&lInteract-Right", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+			commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "OAK_DOOR" : (ServerUtils.hasSpecificUpdate("1_8") ? "324" : "64")), 1, false, "&e&lInteract-Right", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
 					"&7", "&9&lENABLED: &a" + (StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.INTERACT_RIGHT_ALL.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				commandCPane(player, itemMap, Action.INTERACT_RIGHT_ALL);
 			}));
@@ -6546,11 +6548,11 @@ public class Menu {
 					"&7", "&9&lENABLED: &a" + (StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.INVENTORY_RIGHT.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				commandCPane(player, itemMap, Action.INVENTORY_RIGHT);
 			}));
-			commandPane.addButton(new Button(ItemHandler.getItem("44", 2, false, "&e&lInventory-Shift-Left", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+			commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "STONE_SLAB" : "44"), 2, false, "&e&lInventory-Shift-Left", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
 					"&7", "&9&lENABLED: &a" + (StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.INVENTORY_SHIFT_LEFT.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				commandCPane(player, itemMap, Action.INVENTORY_SHIFT_LEFT);
 			}));
-			commandPane.addButton(new Button(ItemHandler.getItem("44:3", 2, false, "&e&lInventory-Shift-Right", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+			commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "COBBLESTONE_SLAB" : "44:3"), 2, false, "&e&lInventory-Shift-Right", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
 					"&7", "&9&lENABLED: &a" + (StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.INVENTORY_SHIFT_RIGHT.config()) + "") != "NONE" ? "YES" : "NO")), event -> {
 				commandCPane(player, itemMap, Action.INVENTORY_SHIFT_RIGHT);
 			}));
@@ -6798,7 +6800,7 @@ public class Menu {
 				}
 			}));
 			conditionsPane.addButton(new Button(fillerPaneBItem));
-			conditionsPane.addButton(new Button(ItemHandler.getItem("85", 1, false, "&b&lNOTEQUAL", "&7", "&7*The first value must be", "&7NOTEQUAL to the second value", "&7for the condition to be met."), 
+			conditionsPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "OAK_FENCE" : "85"), 1, false, "&b&lNOTEQUAL", "&7", "&7*The first value must be", "&7NOTEQUAL to the second value", "&7for the condition to be met."), 
 			event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
@@ -6826,7 +6828,7 @@ public class Menu {
 				}
 			}));
 			conditionsPane.addButton(new Button(fillerPaneBItem));
-			conditionsPane.addButton(new Button(ItemHandler.getItem("53", 1, false, "&b&lOVER", "&7", "&7*The first value must be", "&7OVER the second value", "&7for the condition to be met.", "&7", "&c&l&nNOTE:&7 This only works if both", "&7values referenced are integers."), 
+			conditionsPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "OAK_STAIRS" : "53"), 1, false, "&b&lOVER", "&7", "&7*The first value must be", "&7OVER the second value", "&7for the condition to be met.", "&7", "&c&l&nNOTE:&7 This only works if both", "&7values referenced are integers."), 
 			event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
@@ -6854,7 +6856,7 @@ public class Menu {
 				}
 			}));
 			conditionsPane.addButton(new Button(fillerPaneBItem));
-			conditionsPane.addButton(new Button(ItemHandler.getItem("333", 1, false, "&b&lUNDER", "&7", "&7*The first value must be", "&7UNDER to the second value", "&7for the condition to be met.", "&7", "&c&l&nNOTE:&7 This only works if both", "&7values referenced are integers."), 
+			conditionsPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "OAK_BOAT" : "333"), 1, false, "&b&lUNDER", "&7", "&7*The first value must be", "&7UNDER to the second value", "&7for the condition to be met.", "&7", "&c&l&nNOTE:&7 This only works if both", "&7values referenced are integers."), 
 			event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
@@ -6981,7 +6983,7 @@ public class Menu {
 		Interface ingredientPane = new Interface(false, 2, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			ingredientPane.addButton(new Button(fillerPaneBItem), 3);
-			ingredientPane.addButton(new Button(ItemHandler.getItem("2", 1, false, "&b&lMaterial", "&7", "&7*Select a material type", "&7to be defined in the recipe."), event -> materialPane(player, itemMap, 3, k)));
+			ingredientPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GRASS_BLOCK" : "2"), 1, false, "&b&lMaterial", "&7", "&7*Select a material type", "&7to be defined in the recipe."), event -> materialPane(player, itemMap, 3, k)));
 			ingredientPane.addButton(new Button(fillerPaneBItem));
 			ingredientPane.addButton(new Button(ItemHandler.getItem("CHEST", 1, false, "&b&lCustom Item", "&7", "&7*Select a custom item", "&7to be defined in the recipe."), event -> startModify(player, itemMap, k)));
 			ingredientPane.addButton(new Button(fillerPaneBItem), 3);
@@ -7023,7 +7025,7 @@ public class Menu {
 					nbtPane(event.getPlayer(), itemMap);
 				}));
 				for (String key : properties.keySet()) {
-					nbtPane.addButton(new Button(ItemHandler.getItem("137", 1, false, "&f" + key + ":" + properties.get(key), "&7", "&7*Click to modify or delete", "&7this custom NBT Property."), event -> modifyProperty(player, itemMap, key)));
+					nbtPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "COMMAND_BLOCK" : "137"), 1, false, "&f" + key + ":" + properties.get(key), "&7", "&7*Click to modify or delete", "&7this custom NBT Property."), event -> modifyProperty(player, itemMap, key)));
 				}
 		});
 		nbtPane.open(player);
@@ -7304,7 +7306,7 @@ public class Menu {
 		Interface levelPane = new Interface(true, 6, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			levelPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the potion effect menu."), event -> potionPane(player, itemMap, stage)));
-			levelPane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:4", 1, false, "&e&lCustom Level", "&7", "&7*Click to set a custom level (strength)", "&7value for the potion effect."), event -> {
+			levelPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, "&e&lCustom Level", "&7", "&7*Click to set a custom level (strength)", "&7value for the potion effect."), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[16] = "EFFECT LEVEL";
@@ -7326,7 +7328,7 @@ public class Menu {
 			}));
 			for (int i = 1; i <= 64; i++) {
 				final int k = i;
-				levelPane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:6", k, false, "&d&lLevel: &a&l" + k + "", "&7", "&7*Click to set the", "&7level (strength) of the potion effect."), event -> {
+				levelPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "PINK_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:6"), k, false, "&d&lLevel: &a&l" + k + "", "&7", "&7*Click to set the", "&7level (strength) of the potion effect."), event -> {
 					itemMap.setInteractCooldown(k);durationPane(player, itemMap, potion, k, stage);
 				}));
 			}
@@ -7345,7 +7347,7 @@ public class Menu {
 		Interface durationPane = new Interface(true, 6, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			durationPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the potion effect menu."), event -> potionPane(player, itemMap, stage)));
-			durationPane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:4", 1, false, "&e&lCustom Duration", "&7", "&7*Click to set a custom duration", "&7value for the potion effect."), event -> {
+			durationPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, "&e&lCustom Duration", "&7", "&7*Click to set a custom duration", "&7value for the potion effect."), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[16] = "EFFECT DURATION";
@@ -7367,7 +7369,7 @@ public class Menu {
 			}));
 			for (int i = 1; i <= 64; i++) {
 				final int k = i;
-				durationPane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:11", k, false, "&9&lDuration: &a&l" + k + " Second(s)", "&7", "&7*Click to set the", "&7duration of the potion effect."), event -> {
+				durationPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "BLUE_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:11"), k, false, "&9&lDuration: &a&l" + k + " Second(s)", "&7", "&7*Click to set the", "&7duration of the potion effect."), event -> {
 					List < PotionEffect > effects = itemMap.getPotionEffect();
 					effects.add(new PotionEffect(potion, k, level));
 					itemMap.setPotionEffect(effects);potionPane(player, itemMap, stage);
@@ -7388,7 +7390,7 @@ public class Menu {
 		Interface powerPane = new Interface(true, 6, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			powerPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the special settings menu."), event -> otherPane(player, itemMap)));
-			powerPane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:4", 1, false, "&e&lCustom Power", "&7", "&7*Click to set a custom power", "&7value for the firework."), event -> {
+			powerPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, "&e&lCustom Power", "&7", "&7*Click to set a custom power", "&7value for the firework."), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[16] = "FIREWORK POWER";
@@ -7410,7 +7412,7 @@ public class Menu {
 			}));
 			for (int i = 1; i <= 64; i++) {
 				final int k = i;
-				powerPane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:11", k, false, "&9&lPower Level: &a&l" + k, "&7", "&7*Click to set the", "&7power level of the firework."), event -> {
+				powerPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "BLUE_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:11"), k, false, "&9&lPower Level: &a&l" + k, "&7", "&7*Click to set the", "&7power level of the firework."), event -> {
 					itemMap.setFireworkPower(k);
 					otherPane(player, itemMap);
 				}));
@@ -7664,7 +7666,7 @@ public class Menu {
 		Interface strengthPane = new Interface(true, 6, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			strengthPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the custom attributes menu."), event -> attributePane(player, itemMap, isLeather)));
-			strengthPane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:4", 1, false, "&e&lCustom Strength", "&7", "&7*Click to set a custom strength", "&7value for the custom attribute."), event -> {
+			strengthPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, "&e&lCustom Strength", "&7", "&7*Click to set a custom strength", "&7value for the custom attribute."), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[16] = "STRENGTH";
@@ -7687,7 +7689,7 @@ public class Menu {
 			}));
 			for (double i = 1; i < 90; i++) {
 				final double k = i;
-				strengthPane.addButton(new Button(ItemHandler.getItem("STAINED_GLASS_PANE:6", 1, false, "&9&lStrength: &a&l" + k, "&7", "&7*Click to set the strength", "&7 of the custom attribute."), event -> { 
+				strengthPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "PINK_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:6"), 1, false, "&9&lStrength: &a&l" + k, "&7", "&7*Click to set the strength", "&7 of the custom attribute."), event -> { 
 					Map<String, Double> attributeList = itemMap.getAttributes();
 					attributeList.put(attribute, k);
 					attributePane(player, itemMap, isLeather); 

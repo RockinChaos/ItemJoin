@@ -143,7 +143,9 @@ public class ItemDesigner {
 		String dataValue = null;
 		if (id != null) {
 			if (id.contains(":")) {
-				String[] parts = id.split(":"); id = parts[0]; dataValue = parts[1];
+				String[] parts = id.split(":"); 
+				id = parts[0]; 
+				dataValue = parts[1];
 				if (ServerUtils.hasSpecificUpdate("1_13")) {
 					ServerUtils.logWarn("{ItemMap} The item " + internalName + " is using a Legacy Material which is no longer supported as of Minecraft 1.13.");
 					ServerUtils.logWarn("{ItemMap} This will cause issues, please see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html for a list of material names.");
