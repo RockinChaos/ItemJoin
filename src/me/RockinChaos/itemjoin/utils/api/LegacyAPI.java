@@ -50,6 +50,8 @@ import me.RockinChaos.itemjoin.utils.StringUtils;
 @SuppressWarnings("deprecation")
 public class LegacyAPI {
 	
+	private static boolean legacyMaterial = false;
+	
    /**
     * Updates the Players Inventory.
     * 
@@ -121,6 +123,9 @@ public class LegacyAPI {
     * @return The found Bukkit Material.
     */
     public static org.bukkit.Material getMaterial(final int typeID, final byte dataValue) {
+        			try { 
+        				initializeLegacy();
+        			} catch (Exception e) { e.printStackTrace(); }
 		return ItemJoin.getInstance().getServer().getUnsafe().fromLegacy(new org.bukkit.material.MaterialData(findMaterial(typeID), dataValue));
     }
     
@@ -132,6 +137,9 @@ public class LegacyAPI {
     * @return The found Bukkit Material.
     */
     public static org.bukkit.Material getMaterial(final Material material, final byte dataValue) {
+        try { 
+        	initializeLegacy();
+        } catch (Exception e) { e.printStackTrace(); }
   		return ItemJoin.getInstance().getServer().getUnsafe().fromLegacy(new org.bukkit.material.MaterialData(material, dataValue));
     }
     
@@ -143,8 +151,37 @@ public class LegacyAPI {
     */
     public static org.bukkit.Material findMaterial(final int typeID) {
         final Material[] foundMaterial = new Material[1];
-        EnumSet.allOf(Material.class).forEach(material -> { try { if (StringUtils.containsIgnoreCase(material.toString(), "LEGACY_") && material.getId() == typeID || !ServerUtils.hasSpecificUpdate("1_13") && material.getId() == typeID) { foundMaterial[0] = material; } } catch (Exception e) { }});
+        EnumSet.allOf(Material.class).forEach(material -> { 
+        	try { 
+        		if (StringUtils.containsIgnoreCase(material.toString(), "LEGACY_") && material.getId() == typeID || !ServerUtils.hasSpecificUpdate("1_13") && material.getId() == typeID) {
+        			try { 
+        				initializeLegacy();
+        			} catch (Exception e) { e.printStackTrace(); }
+        			foundMaterial[0] = material; 
+        		} 
+        	} catch (Exception e) { }});
         return foundMaterial[0];
+    }
+    
+   /**
+    * Sends a info/debug message if the server is running Minecraft 1.13+ and is attempting to call a Legacy material.
+ * @throws Exception 
+    * 
+    */
+    private static void initializeLegacy() {
+		if (ServerUtils.hasSpecificUpdate("1_13") && !legacyMaterial) {
+			legacyMaterial = true;
+			ServerUtils.logInfo("Initializing Legacy Material Support ..."); 
+			ServerUtils.logDebug("Your items.yml has one or more item(s) containing a numerical id and/or data values."); 
+			ServerUtils.logDebug("Minecraft 1.13 removed the use of these values, please change your items ids to reflect this change.");
+			ServerUtils.logDebug("Your custom items will continue to function but the id set may not appear as expected.");
+			ServerUtils.logDebug("If you believe this is a bug, please report it to the developer!"); 
+			try {
+				throw new Exception("Invalid usage of item id, this is not a bug!");
+			} catch (Exception e) {
+				ServerUtils.sendDebugTrace(e);
+			}
+		}
     }
 
    /**

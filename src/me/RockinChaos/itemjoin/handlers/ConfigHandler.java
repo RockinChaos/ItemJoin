@@ -128,9 +128,6 @@ public class ConfigHandler {
 			int customItems = (this.getConfigurationSection() != null ? this.getConfigurationSection().getKeys(false).size() : 0);
 			if (!silent) { 
 				DependAPI.getDepends(false).sendUtilityDepends();
-				if (ServerUtils.hasSpecificUpdate("1_13")) {
-					ServerUtils.logInfo("Initializing Legacy Material Support ..."); 
-				}
 				ServerUtils.logInfo(customItems + " Custom item(s) loaded!"); 
 			}
 			this.registerPrevent();
