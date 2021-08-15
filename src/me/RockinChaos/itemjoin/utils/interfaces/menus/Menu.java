@@ -759,10 +759,16 @@ public class Menu {
 					triggersList += "&a" + split + " /n ";
 				}
 			}
-			String worldList = "";
+			String disabledList = "";
+			if (StringUtils.nullCheck(itemMap.getDisabledWorlds().toString()) != "NONE") {
+				for (String split: StringUtils.softSplit(StringUtils.nullCheck(itemMap.getDisabledWorlds().toString()))) {
+					disabledList += "&a" + split + " /n ";
+				}
+			}
+			String enabledList = "";
 			if (StringUtils.nullCheck(itemMap.getEnabledWorlds().toString()) != "NONE") {
 				for (String split: StringUtils.softSplit(StringUtils.nullCheck(itemMap.getEnabledWorlds().toString()))) {
-					worldList += "&a" + split + " /n ";
+					enabledList += "&a" + split + " /n ";
 				}
 			}
 			String regionList = "";
@@ -886,8 +892,10 @@ public class Menu {
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				creatingPane(event.getPlayer(), itemMap);
 			}));
+			creatingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "BEDROCK" : "7"), 1, false, "&b&lDisabled Worlds", "&7", "&7*Define the world(s) that the", "&7item will &l&nNOT&7 be given in.", 
+					"&9&lDISABLED-WORLDS: &a" + (StringUtils.nullCheck(itemMap.getDisabledWorlds().toString()) != "NONE" ? "&a" + disabledList : "NONE")), event -> worldPane(player, itemMap, 0)));
 			creatingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GRASS_BLOCK" : "2"), 1, false, "&b&lEnabled Worlds", "&7", "&7*Define the world(s) that the", "&7item will be given in.", 
-					"&9&lENABLED-WORLDS: &a" + (StringUtils.nullCheck(itemMap.getEnabledWorlds().toString()) != "NONE" ? "&a" + worldList : "NONE")), event -> worldPane(player, itemMap)));
+					"&9&lENABLED-WORLDS: &a" + (StringUtils.nullCheck(itemMap.getEnabledWorlds().toString()) != "NONE" ? "&a" + enabledList : "NONE")), event -> worldPane(player, itemMap, 1)));
 			creatingPane.addButton(new Button(ItemHandler.getItem("GOLD_BLOCK", 1, true, "&b&lEnabled Regions", "&7", "&7*Define the region(s) that the", "&7item will be given in.", (DependAPI.getDepends(false).getGuard().guardEnabled() ? 
 					"&9&lENABLED-REGIONS: &a" + (StringUtils.nullCheck(itemMap.getEnabledRegions().toString()) != "NONE" ? "&a" + regionList : "NONE") : ""), (DependAPI.getDepends(false).getGuard().guardEnabled() ? "" : "&7"), 
 					(DependAPI.getDepends(false).getGuard().guardEnabled() ? "" : "&c&lERROR: &7WorldGuard was NOT found."), (DependAPI.getDepends(false).getGuard().guardEnabled() ? "" : "&7This button will do nothing...")), event -> {
@@ -917,10 +925,6 @@ public class Menu {
 					usePane(player, itemMap);
 				}
 			}));
-			creatingPane.addButton(new Button(ItemHandler.getItem("GOLD_INGOT", 1, false, "&e&lDrop Chances", "&7", "&7*Define the drop chance for receiving", "&7this item from mobs or breaking blocks."), event -> {
-					dropsPane(player, itemMap);
-			}));
-			creatingPane.addButton(new Button(fillerPaneGItem));
 			creatingPane.addButton(new Button(ItemHandler.getItem("LAVA_BUCKET", 1, false, "&b&lConditions", "&7", "&7*Define conditions for triggers,", "&7commands, and the disposable itemflag.", "&9Enabled: &a" + 
 			((itemMap.getTriggerConditions() != null && !itemMap.getTriggerConditions().isEmpty()) || (itemMap.getDisposableConditions() != null && !itemMap.getDisposableConditions().isEmpty()) 
 			|| (itemMap.getCommandConditions() != null && !itemMap.getCommandConditions().isEmpty()) ? "YES" : "NONE")), event -> {
@@ -929,6 +933,10 @@ public class Menu {
 			creatingPane.addButton(new Button(fillerPaneGItem));
 			creatingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CRAFTING_TABLE" : "58"), 1, false, "&b&lRecipe", "&7", "&7*Define the recipe to be", "&7able to craft this item.", "&9Enabled: &a" + (itemMap.getIngredients() != null && !itemMap.getIngredients().isEmpty() ? "YES" : "NONE")), event -> {
 					recipePane(player, itemMap);
+			}));
+			creatingPane.addButton(new Button(fillerPaneGItem));
+			creatingPane.addButton(new Button(ItemHandler.getItem("GOLD_INGOT", 1, false, "&e&lDrop Chances", "&7", "&7*Define the drop chance for receiving", "&7this item from mobs or breaking blocks."), event -> {
+					dropsPane(player, itemMap);
 			}));
 			creatingPane.addButton(new Button(fillerPaneGItem));
 			creatingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "COMMAND_BLOCK" : "137"), 1, false, "&c&lNBT Properties", "&7", "&7*Define specific NBT Properties", "&7to be set to the item.", "&9Enabled: &a" + (itemMap.getNBTValues() != null && !itemMap.getNBTValues().isEmpty() ? "YES" : "NONE")), event -> {
@@ -1003,7 +1011,6 @@ public class Menu {
 					}
 				}));
 			}
-			creatingPane.addButton(new Button(fillerPaneGItem));
 			creatingPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nMain Menu", "&7", "&7*Cancel and return to the main menu.", "&7", "&c&lWARNING: &7This item has NOT been saved!"), event -> returnConfirm(player, itemMap)));
 			creatingPane.addButton(new Button(fillerPaneBItem), 3);
 			creatingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "LIME_WOOL" : "WOOL:5"), 1, false, "&a&l&nSave to Config", "&7", "&7*Saves the custom item", "&7settings to the items.yml file."), event -> {
@@ -5069,23 +5076,30 @@ public class Menu {
     * 
     * @param player - The Player to have the Pane opened.
     * @param itemMap - The ItemMap currently being modified.
+    * @param stage - The type of selection Pane.
     */
-	private static void worldPane(final Player player, final ItemMap itemMap) {
+	private static void worldPane(final Player player, final ItemMap itemMap, final int stage) {
 		Interface worldPane = new Interface(true, 6, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			worldPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> {
 				creatingPane(player, itemMap);
 			}));
-			List < String > enabledWorlds = itemMap.getEnabledWorlds();
-			worldPane.addButton(new Button(ItemHandler.getItem("OBSIDIAN", 1, itemMap.containsWorld("ALL"), "&a&l&nGLOBAL", "&7", "&7*Click to enable the", "&7custom item in &lALL WORLDS.", "&9&lENABLED: &a" + 
-			(itemMap.containsWorld("ALL") + "").toUpperCase()), event -> {
-				if (itemMap.containsWorld("ALL")) {
-					enabledWorlds.remove("GLOBAL");
-					enabledWorlds.remove("ALL");
+			List < String > listWorlds = (stage == 0 ? itemMap.getDisabledWorlds() : itemMap.getEnabledWorlds());
+			worldPane.addButton(new Button(ItemHandler.getItem("OBSIDIAN", 1, itemMap.containsWorld("ALL", (stage == 0 ? true : false)), "&a&l&nGLOBAL", "&7", "&7*Click to " + 
+					(stage == 0 ? "disable" : "enable") + " the", "&7custom item in &lALL WORLDS.", (stage == 0 ? "&9&lDISABLED:" : "&9&lENABLED:") + " &a" + 
+					(itemMap.containsWorld("ALL", (stage == 0 ? true : false)) + "").toUpperCase()), event -> {
+				if (itemMap.containsWorld("ALL", (stage == 0 ? true : false))) {
+					listWorlds.remove("GLOBAL");
+					listWorlds.remove("ALL");
 				} else {
-					enabledWorlds.add("GLOBAL");
+					listWorlds.add("GLOBAL");
 				}
-				itemMap.setEnabledWorlds(enabledWorlds);worldPane(player, itemMap);
+				if (stage == 0) {
+					itemMap.setDisabledWorlds(listWorlds);
+				} else {
+					itemMap.setEnabledWorlds(listWorlds);
+				}
+				worldPane(player, itemMap, stage);
 			}));
 			for (World world: Bukkit.getServer().getWorlds()) {
 				String worldMaterial = (ServerUtils.hasSpecificUpdate("1_13") ? "GRASS_BLOCK" : "2");
@@ -5094,14 +5108,20 @@ public class Menu {
 				} else if (world.getEnvironment().equals(Environment.THE_END)) {
 					worldMaterial = (ServerUtils.hasSpecificUpdate("1_13") ? "END_STONE" : "121");
 				}
-				worldPane.addButton(new Button(ItemHandler.getItem(worldMaterial, 1, itemMap.containsWorld(world.getName()), "&f&l" + world.getName(), "&7", "&7*Click to enable the", "&7custom item in this world.", 
-						"&9&lENABLED: &a" + (itemMap.containsWorld(world.getName()) + "").toUpperCase()), event -> {
-					if (itemMap.containsWorld(world.getName())) {
-						enabledWorlds.remove(world.getName());
+				worldPane.addButton(new Button(ItemHandler.getItem(worldMaterial, 1, itemMap.containsWorld(world.getName(), (stage == 0 ? true : false)), 
+						"&f&l" + world.getName(), "&7", "&7*Click to " + (stage == 0 ? "disable" : "enable") + " the", "&7custom item in this world.", 
+						(stage == 0 ? "&9&lDISABLED:" : "&9&lENABLED:") + " &a" + (itemMap.containsWorld(world.getName(), (stage == 0 ? true : false)) + "").toUpperCase()), event -> {
+					if (itemMap.containsWorld(world.getName(), (stage == 0 ? true : false))) {
+						listWorlds.remove(world.getName());
 					} else {
-						enabledWorlds.add(world.getName());
+						listWorlds.add(world.getName());
 					}
-					itemMap.setEnabledWorlds(enabledWorlds);worldPane(player, itemMap);
+					if (stage == 0) {
+						itemMap.setDisabledWorlds(listWorlds);
+					} else {
+						itemMap.setEnabledWorlds(listWorlds);
+					}
+					worldPane(player, itemMap, stage);
 				}));
 			}
 		});
@@ -7965,10 +7985,16 @@ public class Menu {
 				triggersList += "&a" + split + " /n ";
 			}
 		}
-		String worldList = "";
+		String disabledList = "";
+		if (StringUtils.nullCheck(itemMap.getDisabledWorlds().toString()) != "NONE") {
+			for (String split: StringUtils.softSplit(StringUtils.nullCheck(itemMap.getDisabledWorlds().toString()))) {
+				disabledList += "&a" + split + " /n ";
+			}
+		}
+		String enabledList = "";
 		if (StringUtils.nullCheck(itemMap.getEnabledWorlds().toString()) != "NONE") {
 			for (String split: StringUtils.softSplit(StringUtils.nullCheck(itemMap.getEnabledWorlds().toString()))) {
-				worldList += "&a" + split + " /n ";
+				enabledList += "&a" + split + " /n ";
 			}
 		}
 		String regionList = "";
@@ -8047,7 +8073,8 @@ public class Menu {
 					(StringUtils.nullCheck(itemMap.getCooldownMessage()) != "NONE" ? "&9&lCooldown-Message: &a" + itemMap.getCooldownMessage() : ""), (StringUtils.nullCheck(itemMap.getCommandSound() + "") != "NONE" ? "&9&lCommands-Sound: &a" + itemMap.getCommandSound() : ""), 
 					(StringUtils.nullCheck(itemMap.getCommandParticle() + "") != "NONE" ? "&9&lCommands-Particle: &a" + itemMap.getCommandParticle() : ""), (StringUtils.nullCheck(itemMap.getEnchantments().toString()) != "NONE" ? "&9&lEnchantments: &a" + enchantList : ""), 
 					(StringUtils.nullCheck(itemMap.getItemFlags()) != "NONE" ? "&9&lItemflags: &a" + itemflagsList : ""), (StringUtils.nullCheck(itemMap.getTriggers()) != "NONE" ? "&9&lTriggers: &a" + triggersList : ""), 
-					(StringUtils.nullCheck(itemMap.getPermissionNode()) != "NONE" ? "&9&lPermission Node: &a" + itemMap.getPermissionNode() : ""), (StringUtils.nullCheck(itemMap.getEnabledWorlds().toString()) != "NONE" ? "&9&lEnabled Worlds: &a" + worldList : ""), 
+					(StringUtils.nullCheck(itemMap.getPermissionNode()) != "NONE" ? "&9&lPermission Node: &a" + itemMap.getPermissionNode() : ""), 
+					(StringUtils.nullCheck(itemMap.getDisabledWorlds().toString()) != "NONE" ? "&9&lDisabled Worlds: &a" + disabledList : ""), (StringUtils.nullCheck(itemMap.getEnabledWorlds().toString()) != "NONE" ? "&9&lEnabled Worlds: &a" + enabledList : ""), 
 					(StringUtils.nullCheck(itemMap.getEnabledRegions().toString()) != "NONE" ? "&9&lEnabled Regions: &a" + regionList : ""), (!itemMap.getDynamicMaterials().isEmpty() ? "&9&lMaterial Animations: &aYES" : ""), 
 					(!itemMap.getDynamicNames().isEmpty() ? "&9&lName Animations: &aYES" : ""), (!itemMap.getDynamicLores().isEmpty() ? "&9&lLore Animations: &aYES" : ""), 
 					(!itemMap.getDynamicOwners().isEmpty() || !itemMap.getDynamicTextures().isEmpty() ? "&9&lSkull Animations: &aYES" : ""), (StringUtils.nullCheck(itemMap.getLimitModes()) != "NONE" ? "&9&lLimit-Modes: &a" + itemMap.getLimitModes() : ""), 

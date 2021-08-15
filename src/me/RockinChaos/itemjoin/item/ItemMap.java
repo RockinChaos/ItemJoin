@@ -294,6 +294,7 @@ public class ItemMap {
 	
 	private List < String > enabledRegions = new ArrayList < String > ();
 	private List < String > enabledWorlds = new ArrayList < String > ();
+	private List < String > disabledWorlds = new ArrayList < String > ();
 // ======================================================================================== //
 	
    /**
@@ -613,6 +614,20 @@ public class ItemMap {
 				}
 			}
 		} else { this.enabledWorlds.add("ALL"); }
+		if (this.nodeLocation.getString(".disabled-worlds") != null && !this.nodeLocation.getString(".disabled-worlds").isEmpty()) {
+			String[] disabledParts = this.nodeLocation.getString(".disabled-worlds").replace(" ,  ", ",").replace(" , ", ",").replace(",  ", ",").replace(", ", ",").split(",");
+			for (String disabledWorld : disabledParts) {
+				if (disabledWorld.equalsIgnoreCase("ALL") || disabledWorld.equalsIgnoreCase("GLOBAL")) {
+					this.disabledWorlds.add("ALL");
+				} else {
+					for (World world: Bukkit.getServer().getWorlds()) {
+						if (disabledWorld.equalsIgnoreCase(world.getName())) {
+							this.disabledWorlds.add(world.getName());
+						}
+					}
+				}
+			}
+		}
 	}
 	
    /**
@@ -783,6 +798,15 @@ public class ItemMap {
     */
 	public void setMultipleSlots(final List<String> slots) {
 		this.AllSlots = slots;
+	}
+	
+   /**
+    * Sets the Disabled Worlds.
+    * 
+    * @param worlds - The Disabled Worlds to be set.
+    */
+	public void setDisabledWorlds(final List<String> worlds) {
+		this.disabledWorlds = worlds;
 	}
 	
    /**
@@ -2009,6 +2033,15 @@ public class ItemMap {
     */
 	public List<String> getMultipleSlots() {
 		return this.AllSlots;
+	}
+	
+   /**
+    * Gets the Disabled Worlds.
+    * 
+    * @return The Disabled Worlds.
+    */
+	public List<String> getDisabledWorlds() {
+		return this.disabledWorlds;
 	}
 	
    /**
@@ -3249,14 +3282,15 @@ public class ItemMap {
 	}
 	
    /**
-    * Checks if the String World Name is an Enabled World.
+    * Checks if the String World Name is an Disabled/Enabled World.
     * 
     * @param world - The name of the World being checked.
-    * @return If the World is an Enabled World.
+    * @param isDisabled - If the worlds being checked are Disabled.
+    * @return If the World is an Disabled/Enabled World.
     */
-	public boolean containsWorld(final String world) {
-		for (String enabledWorld: this.getEnabledWorlds()) {
-			if (enabledWorld.equalsIgnoreCase(world) || enabledWorld.equalsIgnoreCase("ALL") || enabledWorld.equalsIgnoreCase("GLOBAL")) {
+	public boolean containsWorld(final String world, final boolean isDisabled) {
+		for (String worldString: (isDisabled ? this.getDisabledWorlds() : this.getEnabledWorlds())) {
+			if (worldString.equalsIgnoreCase(world) || worldString.equalsIgnoreCase("ALL") || worldString.equalsIgnoreCase("GLOBAL")) {
 				return true;
 			}
 		}
@@ -4098,15 +4132,33 @@ public class ItemMap {
     * @return If the World is an Enabled World.
     */
 	public boolean inWorld(final World world) {
-		if (this.enabledWorlds == null) { return true; }
-			for (String compareWorld: this.enabledWorlds) {
-				if (compareWorld.equalsIgnoreCase(world.getName()) 
-						|| compareWorld.equalsIgnoreCase("ALL") 
-						|| compareWorld.equalsIgnoreCase("GLOBAL")) {
-					return true;
+		if (this.enabledWorlds == null && this.disabledWorlds == null) { return true; }
+			for (String enabledWorld : this.enabledWorlds) {
+				if (enabledWorld.equalsIgnoreCase(world.getName()) 
+						|| enabledWorld.equalsIgnoreCase("ALL") 
+						|| enabledWorld.equalsIgnoreCase("GLOBAL")) {
+					return !this.isDisabled(world);
 				}
 			}
 		return false;
+	}
+	
+   /**
+    * Checks if the World is an Disabled World.
+    * 
+    * @param world - The world to be checked.
+    * @return If the World is an Disabled World.
+    */
+	public boolean isDisabled(final World world) {
+		boolean isDisabled = false;
+		for (String disabledWorld : this.disabledWorlds) {
+			if (disabledWorld.equalsIgnoreCase(world.getName()) 
+					|| disabledWorld.equalsIgnoreCase("ALL") 
+					|| disabledWorld.equalsIgnoreCase("GLOBAL")) {
+				isDisabled = true;
+			}
+		}
+		return isDisabled;
 	}
 	
    /**
@@ -5231,6 +5283,13 @@ public class ItemMap {
 			for (String world : this.enabledWorlds) { worldList += world + ", "; }
 			if (!worldList.startsWith("ALL") && !worldList.startsWith("GLOBAL")) {
 				itemData.set("items." + this.configName + ".enabled-worlds", worldList.substring(0, worldList.length() - 2)); 
+			}
+		}
+		if (this.disabledWorlds != null && !this.disabledWorlds.isEmpty()) { 
+			String worldList = "";
+			for (String world : this.disabledWorlds) { worldList += world + ", "; }
+			if (!worldList.startsWith("ALL") && !worldList.startsWith("GLOBAL")) {
+				itemData.set("items." + this.configName + ".disabled-worlds", worldList.substring(0, worldList.length() - 2)); 
 			}
 		}
 		try { itemData.save(itemFile); ConfigHandler.getConfig().getSource("items.yml"); ConfigHandler.getConfig().getFile("items.yml").options().copyDefaults(false); } 
