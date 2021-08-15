@@ -123,9 +123,7 @@ public class LegacyAPI {
     * @return The found Bukkit Material.
     */
     public static org.bukkit.Material getMaterial(final int typeID, final byte dataValue) {
-        			try { 
-        				initializeLegacy();
-        			} catch (Exception e) { e.printStackTrace(); }
+        initializeLegacy();
 		return ItemJoin.getInstance().getServer().getUnsafe().fromLegacy(new org.bukkit.material.MaterialData(findMaterial(typeID), dataValue));
     }
     
@@ -137,9 +135,7 @@ public class LegacyAPI {
     * @return The found Bukkit Material.
     */
     public static org.bukkit.Material getMaterial(final Material material, final byte dataValue) {
-        try { 
-        	initializeLegacy();
-        } catch (Exception e) { e.printStackTrace(); }
+        initializeLegacy();
   		return ItemJoin.getInstance().getServer().getUnsafe().fromLegacy(new org.bukkit.material.MaterialData(material, dataValue));
     }
     
@@ -165,7 +161,6 @@ public class LegacyAPI {
     
    /**
     * Sends a info/debug message if the server is running Minecraft 1.13+ and is attempting to call a Legacy material.
- * @throws Exception 
     * 
     */
     private static void initializeLegacy() {
@@ -256,8 +251,8 @@ public class LegacyAPI {
 	public static org.bukkit.inventory.meta.ItemMeta setSkullOwner(final org.bukkit.inventory.meta.SkullMeta skullMeta, final String owner) {
 		skullMeta.setOwner(owner);
 		if (!ServerUtils.hasSpecificUpdate("1_13") && ServerUtils.hasSpecificUpdate("1_8")) {
-			Location loc = new Location(Bukkit.getWorlds().get(0), 200, 1, 200);
-			BlockState blockState = loc.getBlock().getState();
+			final Location loc = new Location(Bukkit.getWorlds().get(0), 200, 1, 200);
+			final BlockState blockState = loc.getBlock().getState();
 			try {
 				loc.getBlock().setType(Material.valueOf("SKULL"));
 				Skull skull = (Skull)loc.getBlock().getState();

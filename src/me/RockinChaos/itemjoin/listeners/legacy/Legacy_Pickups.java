@@ -35,7 +35,7 @@ public class Legacy_Pickups implements Listener {
    /**
 	* Prevents the player from picking up all items.
 	* 
-	* @param event - EntityPickupItemEvent
+	* @param event - PlayerPickupItemEvent
 	* @deprecated This is a LEGACY event, only use on Minecraft versions below 1.12.
 	*/
 	@EventHandler(ignoreCancelled = true)
