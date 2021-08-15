@@ -25,6 +25,7 @@ import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
 
 import me.RockinChaos.itemjoin.ItemJoin;
+import me.RockinChaos.itemjoin.utils.ServerUtils;
 
 public class ProtocolAPI {
 	
@@ -37,8 +38,23 @@ public class ProtocolAPI {
     */
 	public static void handleProtocols() {
 		if (protocolManager == null) { protocolManager = ProtocolLibrary.getProtocolManager(); }
-		protocolManager.addPacketListener(new PacketAdapter(ItemJoin.getInstance(), ListenerPriority.LOWEST, PacketType.Play.Client.AUTO_RECIPE, PacketType.Play.Client.CLOSE_WINDOW, 
-				PacketType.Play.Client.PICK_ITEM) {
+		
+		PacketType[] packetType = null;
+		if (ServerUtils.hasSpecificUpdate("1_12")) {
+			packetType = new PacketType[3];
+			packetType[0] = PacketType.Play.Client.CLOSE_WINDOW;
+			packetType[1] = PacketType.Play.Client.PICK_ITEM;
+			packetType[2] = PacketType.Play.Client.AUTO_RECIPE;
+		} else if (ServerUtils.hasSpecificUpdate("1_9")) {
+			packetType = new PacketType[2];
+			packetType[0] = PacketType.Play.Client.CLOSE_WINDOW;
+			packetType[1] = PacketType.Play.Client.PICK_ITEM;
+		} else {
+			packetType = new PacketType[1];
+			packetType[0] = PacketType.Play.Client.CLOSE_WINDOW;
+		}
+		
+		protocolManager.addPacketListener(new PacketAdapter(ItemJoin.getInstance(), ListenerPriority.LOWEST, packetType) {
   		   /**
   		    * Handles incomming client packets.
   		    * 
