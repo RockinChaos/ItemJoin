@@ -377,24 +377,28 @@ public class DataObject {
 	* 
 	*/ 
     public enum Table {
-       FIRST_JOIN("`Player_UUID`, `Item_Name`, `Time_Stamp`", "Player_UUID"), 
-       FIRST_WORLD("`World_Name`, `Player_UUID`, `Item_Name`, `Time_Stamp`", "Player_UUID"), 
-       IP_LIMITS("`World_Name`, `Player_UUID`, `Item_Name`, `IP_Address`, `Time_Stamp`", "Player_UUID"), 
-       FIRST_COMMANDS("`World_Name`, `Player_UUID`, `Command_String`, `Time_Stamp`", "Player_UUID"), 
-       ENABLED_PLAYERS("`World_Name`, `Player_UUID`, `isEnabled`, `Time_Stamp`", "Player_UUID, World_Name"), 
-       RETURN_ITEMS("`World_Name`, `Region_Name`, `Player_UUID`, `Inventory64`, `Time_Stamp`", "Player_UUID, World_Name, Region_Name"), 
-       RETURN_SWITCH_ITEMS("`World_Name`, `Player_UUID`, `Inventory64`, `Time_Stamp`", "Player_UUID, World_Name"), 
-       RETURN_CRAFTITEMS("`Player_UUID`, `Inventory64`, `Time_Stamp`", "Player_UUID"), 
-       ON_COOLDOWN("`World_Name`, `Player_UUID`, `Item_Name`, `Cooldown`, `Duration`, `Time_Stamp`", "Item_Name"), 
-       MAP_IDS("`Map_IMG`, `Map_ID`, `Time_Stamp`", "Map_IMG");
+       FIRST_JOIN("first_join", "`Player_UUID`, `Item_Name`, `Time_Stamp`", "Player_UUID"), 
+       FIRST_WORLD("first_world", "`World_Name`, `Player_UUID`, `Item_Name`, `Time_Stamp`", "Player_UUID"), 
+       IP_LIMITS("ip_limits", "`World_Name`, `Player_UUID`, `Item_Name`, `IP_Address`, `Time_Stamp`", "Player_UUID"), 
+       FIRST_COMMANDS("first_commands", "`World_Name`, `Player_UUID`, `Command_String`, `Time_Stamp`", "Player_UUID"), 
+       ENABLED_PLAYERS("enabled_players", "`World_Name`, `Player_UUID`, `isEnabled`, `Time_Stamp`", "Player_UUID, World_Name"), 
+       RETURN_ITEMS("return_items", "`World_Name`, `Region_Name`, `Player_UUID`, `Inventory64`, `Time_Stamp`", "Player_UUID, World_Name, Region_Name"), 
+       RETURN_SWITCH_ITEMS("return_switch_items", "`World_Name`, `Player_UUID`, `Inventory64`, `Time_Stamp`", "Player_UUID, World_Name"), 
+       RETURN_CRAFTITEMS("return_craftitems", "`Player_UUID`, `Inventory64`, `Time_Stamp`", "Player_UUID"), 
+       ON_COOLDOWN("on_cooldown", "`World_Name`, `Player_UUID`, `Item_Name`, `Cooldown`, `Duration`, `Time_Stamp`", "Item_Name"), 
+       MAP_IDS("map_ids", "`Map_IMG`, `Map_ID`, `Time_Stamp`", "Map_IMG");
     	
+    	private String tableName;
     	private String header;
     	private String removal;
-    	private Table(String header, String removal) {
+    	private Table(final String tableName, final String header, final String removal) {
+    		this.tableName = tableName;
     		this.header = header;
     		this.removal = removal;
     	}
-    	public String headers() { return this.header; }
-    	public String removal() { return this.removal; }
+    	
+    	public String tableName() { return this.tableName; }
+    	public String headers()   { return this.header; }
+    	public String removal()   { return this.removal; }
     }
 }

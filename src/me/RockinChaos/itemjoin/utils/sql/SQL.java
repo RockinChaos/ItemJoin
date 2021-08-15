@@ -56,7 +56,7 @@ public class SQL {
 		SchedulerUtils.runSingleAsync(() -> {
 			for (Table table: Table.values()) {
 				synchronized("IJ_SQL") {
-					Database.getDatabase().executeStatement("DROP TABLE IF EXISTS " + ConfigHandler.getConfig().getTable() + table.name().toLowerCase());
+					Database.getDatabase().executeStatement("DROP TABLE IF EXISTS " + ConfigHandler.getConfig().getTable() + table.tableName());
 				}
 			} { this.createTables(); }
 		});
@@ -69,16 +69,16 @@ public class SQL {
     */
 	public void saveData(DataObject object) {
 		if (object != null) { 
-			String table = object.getTable().name().toLowerCase();
+			String table = object.getTable().tableName();
 			if (ItemJoin.getInstance().isEnabled()) {
 				SchedulerUtils.runSingleAsync(() -> {
 					synchronized("IJ_SQL") {
-						Database.getDatabase().executeStatement("INSERT INTO " + ConfigHandler.getConfig().getTable() + object.getTable().name().toLowerCase() + " (" + object.getTable().headers() + ") VALUES (" + object.getInsertValues() + ")");
+						Database.getDatabase().executeStatement("INSERT INTO " + ConfigHandler.getConfig().getTable() + object.getTable().tableName() + " (" + object.getTable().headers() + ") VALUES (" + object.getInsertValues() + ")");
 					}
 				});
 			} else {
 				synchronized("IJ_SQL") {
-					Database.getDatabase().executeStatement("INSERT INTO " + ConfigHandler.getConfig().getTable() + object.getTable().name().toLowerCase() + " (" + object.getTable().headers() + ") VALUES (" + object.getInsertValues() + ")");
+					Database.getDatabase().executeStatement("INSERT INTO " + ConfigHandler.getConfig().getTable() + object.getTable().tableName() + " (" + object.getTable().headers() + ") VALUES (" + object.getInsertValues() + ")");
 				}
 			}
 			if (this.databaseData.get(table) != null) {
@@ -100,7 +100,7 @@ public class SQL {
     */
 	public void removeData(DataObject object) {
 		if (object != null) { 
-			String table = object.getTable().name().toLowerCase();
+			String table = object.getTable().tableName();
 			if (this.databaseData.get(table) != null && !this.databaseData.get(table).isEmpty()) {
 				Iterator<DataObject> dataSet = this.databaseData.get(table).iterator();
 				while (dataSet.hasNext()) {
@@ -109,12 +109,12 @@ public class SQL {
 						if (ItemJoin.getInstance().isEnabled()) {
 							SchedulerUtils.runSingleAsync(() -> {
 								synchronized("IJ_SQL") {
-									Database.getDatabase().executeStatement("DELETE FROM " + ConfigHandler.getConfig().getTable() + dataObject.getTable().name().toLowerCase() + " WHERE (" + dataObject.getTable().removal() + ") = (" + dataObject.getRemovalValues() + ")");
+									Database.getDatabase().executeStatement("DELETE FROM " + ConfigHandler.getConfig().getTable() + dataObject.getTable().tableName() + " WHERE (" + dataObject.getTable().removal() + ") = (" + dataObject.getRemovalValues() + ")");
 								}
 							});
 						} else {
 							synchronized("IJ_SQL") {
-								Database.getDatabase().executeStatement("DELETE FROM " + ConfigHandler.getConfig().getTable() + dataObject.getTable().name().toLowerCase() + " WHERE (" + dataObject.getTable().removal() + ") = (" + dataObject.getRemovalValues() + ")");
+								Database.getDatabase().executeStatement("DELETE FROM " + ConfigHandler.getConfig().getTable() + dataObject.getTable().tableName() + " WHERE (" + dataObject.getTable().removal() + ") = (" + dataObject.getRemovalValues() + ")");
 							}
 						}
 						dataSet.remove();
@@ -132,7 +132,7 @@ public class SQL {
     */
 	public DataObject getData(DataObject object) {
 		if (object != null) { 
-			String table = object.getTable().name().toLowerCase();
+			String table = object.getTable().tableName();
 			if (this.databaseData.get(table) != null && !this.databaseData.get(table).isEmpty()) {
 				Iterator<DataObject> dataSet = this.databaseData.get(table).iterator();
 				while (dataSet.hasNext()) {
@@ -154,7 +154,7 @@ public class SQL {
     */
 	public List<DataObject> getDataList(DataObject object) {
 		List<DataObject> dataList = new ArrayList<DataObject>();
-		String table = object.getTable().name().toLowerCase();
+		String table = object.getTable().tableName();
 		if (this.databaseData.get(table) != null && !this.databaseData.get(table).isEmpty()) {
 			Iterator<DataObject> dataSet = this.databaseData.get(table).iterator();
 			while (dataSet.hasNext()) {
@@ -173,7 +173,7 @@ public class SQL {
     */
 	private void loadData() {
 		for (Table tableEnum: Table.values()) {
-			String table = tableEnum.name().toLowerCase();
+			String table = tableEnum.tableName();
 			List<HashMap<String, String>> selectTable = Database.getDatabase().queryTableData("SELECT * FROM " + ConfigHandler.getConfig().getTable() + table, tableEnum.headers().replace("`", ""));
 			if (selectTable != null && !selectTable.isEmpty()) {
 				for (HashMap<String, String> sl1 : selectTable) {
@@ -215,7 +215,7 @@ public class SQL {
     * @return If the data is equal.
     */	
 	public boolean hasDataSet(DataObject object) {
-		String table = object.getTable().name().toLowerCase();
+		String table = object.getTable().tableName();
 		Iterator<DataObject> dataSet = this.databaseData.get(table).iterator();
 		while (dataSet.hasNext()) {
 			DataObject dataObject = dataSet.next();
