@@ -124,22 +124,20 @@ public class ConfigHandler {
 		BungeeAPI.getBungee(true);
 		this.copyFiles();
 		SchedulerUtils.runAsync(() -> {
-        	DependAPI.getDepends(true);
+			DependAPI.getDepends(true);
 			int customItems = (this.getConfigurationSection() != null ? this.getConfigurationSection().getKeys(false).size() : 0);
-			if (!silent) { 
+			if (!silent) {
 				DependAPI.getDepends(false).sendUtilityDepends();
-				ServerUtils.logInfo(customItems + " Custom item(s) loaded!"); 
+				ServerUtils.logInfo(customItems + " Custom item(s) loaded!");
 			}
 			this.registerPrevent();
 			SQL.newData(reload); {
-				SchedulerUtils.runAsyncLater(2L, () -> {
-					ItemDesigner.getDesigner(true); {
-						SchedulerUtils.runSingleAsync(() -> {
-							ItemJoin.getInstance().setStarted(true);
-							this.setPages();
-						});
-					}
-				}); { 
+				ItemDesigner.getDesigner(true); {
+					SchedulerUtils.runSingleAsync(() -> {
+						ItemJoin.getInstance().setStarted(true);
+						this.setPages();
+					});
+				} {
 					SchedulerUtils.runAsyncLater(100L, () -> {
 						final MetricsAPI metrics = new MetricsAPI(ItemJoin.getInstance(), 4115);
 						DependAPI.getDepends(false).addCustomCharts(metrics);

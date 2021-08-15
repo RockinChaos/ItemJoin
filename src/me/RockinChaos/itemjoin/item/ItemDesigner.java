@@ -73,61 +73,65 @@ public class ItemDesigner {
 	* 
 	*/
 	public ItemDesigner() {
-		if (ConfigHandler.getConfig().itemsExist()) {
-			for (String internalName: ConfigHandler.getConfig().getConfigurationSection().getKeys(false)) {
-				ConfigurationSection itemNode = ConfigHandler.getConfig().getItemSection(internalName);
-				if (this.isConfigurable(internalName, itemNode)) {
-					String slotList = ((itemNode.getString(".slot") != null && !itemNode.getString(".slot").isEmpty()) ? itemNode.getString(".slot") : "ARBITRARY");
-					String[] slots = slotList.replace(" ", "").split(",");
-					for (String slot: slots) {
-						if (slot.startsWith("C[") || slot.startsWith("C(")) { slot = slot.replace("C", "CRAFTING"); }
-						if (slot.startsWith("CRAFTING")) { slot = slot.replace("(", "[").replace(")", "]"); }
-						if (this.isDefinable(internalName, slot)) {
-							ItemMap itemMap = new ItemMap(internalName, slot);
-							
-							this.setMaterial(itemMap);
-							this.setSkullDatabase(itemMap);
-							this.setUnbreaking(itemMap);
-							this.durabilityBar(itemMap);
-							this.setEnchantments(itemMap);
-							this.setMapImage(itemMap);
-							this.setJSONBookPages(itemMap);
-							this.setNBTData(itemMap);
-							this.setName(itemMap);
-							this.setLore(itemMap);
-							this.setDurability(itemMap);
-							this.setData(itemMap);
-							this.setModelData(itemMap);
-							this.setSkull(itemMap);
-							this.setSkullTexture(itemMap);
-							this.setConsumableEffects(itemMap);
-							this.setPotionEffects(itemMap);
-							this.setTippedArrows(itemMap);
-							this.setBanners(itemMap);
-							this.setFireworks(itemMap);
-							this.setFireChargeColor(itemMap);
-							this.setDye(itemMap);
-							this.setBookAuthor(itemMap);
-							this.setBookTitle(itemMap);
-							this.setBookGeneration(itemMap);
-							this.setLegacyBookPages(itemMap);
-							this.setAttributes(itemMap);
-							this.setAttributeFlags(itemMap);
-							this.setProbability(itemMap);
-							this.setMobsDrop(itemMap);
-							this.setBlocksDrop(itemMap);
-							this.setRecipe(itemMap);
-							
-							itemMap.setContents();
-							ItemUtilities.getUtilities().addItem(itemMap);
-							ItemUtilities.getUtilities().addCraftingItem(itemMap);
-					    	ConfigHandler.getConfig().registerListeners(itemMap);
+		SchedulerUtils.runAsyncLater(2L, () -> {
+			if (ConfigHandler.getConfig().itemsExist()) {
+				for (String internalName: ConfigHandler.getConfig().getConfigurationSection().getKeys(false)) {
+					ConfigurationSection itemNode = ConfigHandler.getConfig().getItemSection(internalName);
+					if (this.isConfigurable(internalName, itemNode)) {
+						String slotList = ((itemNode.getString(".slot") != null && !itemNode.getString(".slot").isEmpty()) ? itemNode.getString(".slot") : "ARBITRARY");
+						String[] slots = slotList.replace(" ", "").split(",");
+						for (String slot: slots) {
+							if (slot.startsWith("C[") || slot.startsWith("C(")) { slot = slot.replace("C", "CRAFTING"); }
+							if (slot.startsWith("CRAFTING")) { slot = slot.replace("(", "[").replace(")", "]"); }
+							if (this.isDefinable(internalName, slot)) {
+								ItemMap itemMap = new ItemMap(internalName, slot);
+								
+								this.setMaterial(itemMap);
+								this.setSkullDatabase(itemMap);
+								this.setUnbreaking(itemMap);
+								this.durabilityBar(itemMap);
+								this.setEnchantments(itemMap);
+								this.setMapImage(itemMap);
+								this.setJSONBookPages(itemMap);
+								this.setNBTData(itemMap);
+								this.setName(itemMap);
+								this.setLore(itemMap);
+								this.setDurability(itemMap);
+								this.setData(itemMap);
+								this.setModelData(itemMap);
+								this.setSkull(itemMap);
+								this.setSkullTexture(itemMap);
+								this.setConsumableEffects(itemMap);
+								this.setPotionEffects(itemMap);
+								this.setTippedArrows(itemMap);
+								this.setBanners(itemMap);
+								this.setFireworks(itemMap);
+								this.setFireChargeColor(itemMap);
+								this.setDye(itemMap);
+								this.setBookAuthor(itemMap);
+								this.setBookTitle(itemMap);
+								this.setBookGeneration(itemMap);
+								this.setLegacyBookPages(itemMap);
+								this.setAttributes(itemMap);
+								this.setAttributeFlags(itemMap);
+								this.setProbability(itemMap);
+								this.setMobsDrop(itemMap);
+								this.setBlocksDrop(itemMap);
+								this.setRecipe(itemMap);
+								
+								itemMap.setContents();
+								ItemUtilities.getUtilities().addItem(itemMap);
+								ItemUtilities.getUtilities().addCraftingItem(itemMap);
+						    	ConfigHandler.getConfig().registerListeners(itemMap);
+							}
 						}
 					}
 				}
+				SchedulerUtils.run(() -> {
+					ItemUtilities.getUtilities().updateItems();
+				});
 			}
-			ItemUtilities.getUtilities().updateItems();
-		}
+		});
 	}
 	
    /**
