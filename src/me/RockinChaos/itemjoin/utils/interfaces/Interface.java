@@ -292,13 +292,13 @@ public class Interface implements InventoryHolder {
     * @param event - InventoryClickEvent
     * @return If the inventory clicked is the same as the current inventory page.
     */
-	public boolean clickInventory(InventoryClickEvent event) {
+	public boolean clickInventory(final InventoryClickEvent event) {
 		if (ServerUtils.hasSpecificUpdate("1_14")) {
-			return (event.getClickedInventory() == event.getWhoClicked().getInventory());
+			return (event.getSlot() == -999 || event.getSlot() == -1 || event.getClickedInventory() == event.getWhoClicked().getInventory());
 		} else {
 			final ItemStack clickItem = event.getCurrentItem();
 			final int slot = event.getSlot();
-			return clickItem.equals(event.getWhoClicked().getInventory().getItem(slot)) || clickItem.getType() == org.bukkit.Material.AIR;
+			return (slot == -999 || slot == -1 || (clickItem.equals(event.getWhoClicked().getInventory().getItem(slot)) || clickItem.getType() == org.bukkit.Material.AIR));
 		}
 	}
 	

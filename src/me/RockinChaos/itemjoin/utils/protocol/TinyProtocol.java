@@ -200,6 +200,7 @@ public abstract class TinyProtocol {
 				this.serverChannels.add(serverChannel);
 				serverChannel.pipeline().addFirst(this.serverChannelHandler);
 				looking = false;
+				break;
 			}
 		}
 	}
