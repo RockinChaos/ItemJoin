@@ -73,12 +73,14 @@ public class ItemAnimation {
 	* @param player - The player which will have animations started.
 	*/
 	public void openAnimation(final Player player) {
-		if (this.dynamicNames != null) { this.nameTasks(player); }
-		if (this.dynamicLores != null) { this.loreTasks(player); }
-		if (this.dynamicMaterials != null) { this.materialTasks(player); }
-		if (this.dynamicPages != null) { this.pagesTasks(player); }
-		if (this.dynamicOwners != null) { this.ownerTasks(player); }
-		else if (this.dynamicTextures != null) { this.textureTasks(player); }
+		SchedulerUtils.runAsync(() -> {
+			if (this.dynamicNames != null) { this.nameTasks(player); }
+			if (this.dynamicLores != null) { this.loreTasks(player); }
+			if (this.dynamicMaterials != null) { this.materialTasks(player); }
+			if (this.dynamicPages != null) { this.pagesTasks(player); }
+			if (this.dynamicOwners != null) { this.ownerTasks(player); }
+			else if (this.dynamicTextures != null) { this.textureTasks(player); }
+		});
 	}
 	
   /**

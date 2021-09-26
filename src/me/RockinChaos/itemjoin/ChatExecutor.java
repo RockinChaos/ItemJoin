@@ -719,7 +719,7 @@ public class ChatExecutor implements CommandExecutor {
 	    * 
 	    */
 		public boolean accept(final CommandSender sender, final String[] args, final int page) { 
-			return ((args.length == 0 || StringUtils.splitIgnoreCase(this.command, args[0], ",")) && this.hasSyntax(args, page) && this.playerRequired(sender, args) && this.hasPermission(sender, args)); 
+			return (((args.length == 0 && this.equals(Execute.DEFAULT) && this.hasPermission(sender, args)) || (args.length != 0 && StringUtils.splitIgnoreCase(this.command, args[0], ",")) && this.hasSyntax(args, page) && this.playerRequired(sender, args) && this.hasPermission(sender, args))); 
 		}
 		
        /**
@@ -730,7 +730,7 @@ public class ChatExecutor implements CommandExecutor {
 	    * 
 	    */
 		public boolean acceptArgs(final String[] args) {
-			return StringUtils.splitIgnoreCase(this.command, args[0], ",");
+			return (args.length == 0 || StringUtils.splitIgnoreCase(this.command, args[0], ","));
 		}
 		
        /**
