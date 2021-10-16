@@ -4787,17 +4787,6 @@ public class Menu {
 				}
 				flagPane(player, itemMap);
 			}));
-			flagPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "ENCHANTMENT_TABLE" : "116"), 1, itemMap.isItemChangable(), "&a&l&nAllow Modifications", "&7", 
-					"&a&lTrue&f: &7Allows the players to modify the item", "&7while retaining all properties.", "&7",
-					"&c&lFalse&f: &7Item will not be modifiable.", "&7", 
-					"&9&lENABLED: &a" + (itemMap.isItemChangable() + "").toUpperCase()), event -> {
-				if (itemMap.isItemChangable()) {
-					itemMap.setItemChangable(false);
-				} else {
-					itemMap.setItemChangable(true);
-				}
-				flagPane(player, itemMap);
-			}));
 			if (itemMap.getMaterial().toString().contains("TIPPED_ARROW") || itemMap.getMaterial().toString().contains("ARROW")) {
 				flagPane.addButton(new Button(ItemHandler.getItem("ENDER_PEARL", 1, itemMap.isTeleport(), "&a&l&nTeleport", "&7", 
 						"&a&lTrue&f: &7Teleports the Player to the location", "&7that the arrow landed.", 
