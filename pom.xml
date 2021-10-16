@@ -261,7 +261,7 @@
         <dependency>
             <groupId>de.jeff_media</groupId>
             <artifactId>ChestSortAPI</artifactId>
-            <version>12.0.2-SNAPSHOT</version>
+            <version>11.0.0-SNAPSHOT</version>
        	    <scope>provided</scope>
         </dependency>
 		<!--ProtocolLib API-->
