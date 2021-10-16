@@ -247,6 +247,7 @@ public class ItemMap {
 	private boolean overwritable = false;
 	private boolean blockPlacement = false;
 	private boolean hideAttributes = false;
+	private boolean hideFlags = false;
 	private boolean hideDurability = false;
 	private boolean blockEquip = false;
 	private boolean blockMovement = false;
@@ -1552,6 +1553,15 @@ public class ItemMap {
     */
 	public void setAttributesInfo(final boolean bool) {
 		this.hideAttributes = bool;
+	}
+	
+   /**
+    * Sets the Flags.
+    * 
+    * @param bool - The value to be set.
+    */
+	public void setFlagsInfo(final boolean bool) {
+		this.hideFlags = bool;
 	}
 	
    /**
@@ -3182,6 +3192,15 @@ public class ItemMap {
 	}
 	
    /**
+    * Checks if the Attributes Flag is enabled.
+    * 
+    * @return If it is enabled.
+    */
+	public boolean isFlagsInfo() {
+		return this.hideFlags;
+	}
+	
+   /**
     * Checks if the Durability Bar Flag is enabled.
     * 
     * @return If it is enabled.
@@ -3646,6 +3665,7 @@ public class ItemMap {
 			LegacyAPI.setBookPages(player, this.tempMeta, this.bookPages, this);
 			this.setAttributes();
 			this.setAttributeFlags();
+			this.setFlags();
 			this.realGlow();
 			this.setContents(player);
 			this.tempItem.setItemMeta(this.tempMeta);
@@ -4115,6 +4135,16 @@ public class ItemMap {
     */
 	private void setAttributeFlags() {
 		if (ServerUtils.hasSpecificUpdate("1_8") && this.hideAttributes) {
+			this.tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ATTRIBUTES);
+		}
+	}
+	
+   /**
+    * Sets the Flags to the Temporary ItemMeta.
+    * 
+    */
+	private void setFlags() {
+		if (ServerUtils.hasSpecificUpdate("1_8") && this.hideFlags) {
 			this.tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ATTRIBUTES);
 			this.tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_DESTROYS);
 			this.tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ENCHANTS);

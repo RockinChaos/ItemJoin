@@ -218,7 +218,7 @@ public class Menu {
 					"&bHeld Item Triggers", "&7", "&7*When these trigger(s)", "&7are performed, the held item", "&7slot will be set.", 
 					"&9&lENABLED: &a" + String.valueOf((heldTriggers != null && !heldTriggers.isEmpty() && !StringUtils.containsIgnoreCase(heldTriggers, "DISABLE")) ? heldTriggers : "FALSE").toUpperCase()), 
 					event -> triggerPane(player, 1)));
-			itemPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "ENCHANTMENT_TABLE" : "116"), 1, ConfigHandler.getConfig().getFile("config.yml").getBoolean("Settings.DataTags"), 
+			itemPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "ENCHANTING_TABLE" : "116"), 1, ConfigHandler.getConfig().getFile("config.yml").getBoolean("Settings.DataTags"), 
 					"&bDataTags", "&7", "&7*If custom items should use", "&7data tags (NBTTags) to distinguish", "&7each custom item, making them unqiue.", 
 					"&c&lNOTE: &7This only works on Minecraft 1.8+", "&7It is recommended to keep", "&7this set to TRUE.", 
 					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig().getFile("config.yml").getBoolean("Settings.DataTags")).toUpperCase()), 
@@ -4588,8 +4588,19 @@ public class Menu {
 				}
 				flagPane(player, itemMap);
 			}));
-			flagPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "ENDER_EYE" : "381"), 1, itemMap.isAttributesInfo(), "&a&l&nHide Attributes", "&7", 
+			flagPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "FILLED_MAP" : "358"), 1, itemMap.isFlagsInfo(), "&a&l&nHide Flags", "&7", 
 					"&a&lTrue&f: &7Hides all information tags from the item", "&7such as firework colors, damage values, enchants, etc.", "&7", 
+					"&c&lFalse&f:&7 The item will have information tags visible.", "&7", 
+					"&9&lENABLED: &a" + (itemMap.isFlagsInfo() + "").toUpperCase()), event -> {
+				if (itemMap.isFlagsInfo()) {
+					itemMap.setFlagsInfo(false);
+				} else {
+					itemMap.setFlagsInfo(true);
+				}
+				flagPane(player, itemMap);
+			}));
+			flagPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "ENDER_EYE" : "381"), 1, itemMap.isAttributesInfo(), "&a&l&nHide Attributes", "&7", 
+					"&a&lTrue&f: &7Hides all attribute tags from the item", "&7such damage values, attack speed, hit points, etc.", "&7Typically this is the information that", "&7starts with (When in Main Hand:).", "&7", 
 					"&c&lFalse&f:&7 The item will have information tags visible.", "&7", 
 					"&9&lENABLED: &a" + (itemMap.isAttributesInfo() + "").toUpperCase()), event -> {
 				if (itemMap.isAttributesInfo()) {
@@ -4800,6 +4811,17 @@ public class Menu {
 					flagPane(player, itemMap);
 				}));
 			} else { flagPane.addButton(new Button(fillerPaneBItem)); }
+			flagPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "ENCHANTING_TABLE" : "116"), 1, itemMap.isItemChangable(), "&a&l&nAllow Modifications", "&7", 
+					"&a&lTrue&f: &7Allows the players to modify the item", "&7while retaining all properties.", "&7",
+					"&c&lFalse&f: &7Item will not be modifiable.", "&7", 
+					"&9&lENABLED: &a" + (itemMap.isItemChangable() + "").toUpperCase()), event -> {
+				if (itemMap.isItemChangable()) {
+					itemMap.setItemChangable(false);
+				} else {
+					itemMap.setItemChangable(true);
+				}
+				flagPane(player, itemMap);
+			}));
 			flagPane.addButton(new Button(ItemHandler.getItem("ITEM_FRAME", 1, itemMap.isGiveNext(), "&a&l&nGive Next", "&7", 
 					"&a&lTrue&f: &7Gives the item to the next available slot", "&7only if the defined slot already has an existing item.", 
 					"&cNOTE: &7The overwrite flag will not work.", "&7",
@@ -4846,6 +4868,7 @@ public class Menu {
 				}
 				flagPane(player, itemMap);
 			}));
+			flagPane.addButton(new Button(fillerPaneBItem), 35);
 		});
 		flagPane.open(player);
 	}
@@ -4863,6 +4886,7 @@ public class Menu {
 		if (itemMap.isIpLimted()) { itemflags += "IP-LIMIT, "; }
 		if (itemMap.isUnbreakable()) { itemflags += "UNBREAKABLE, "; }
 		if (itemMap.isAttributesInfo()) { itemflags += "HIDE-ATTRIBUTES, "; }
+		if (itemMap.isFlagsInfo()) { itemflags += "HIDE-FLAGS, "; }
 		if (itemMap.isDurabilityBar()) { itemflags += "HIDE-DURABILITY, "; }
 		if (itemMap.isPlaceable()) { itemflags += "PLACEMENT, "; }
 		if (itemMap.isEquip()) { itemflags += "CANCEL-EQUIP, "; }
@@ -7326,7 +7350,7 @@ public class Menu {
 		Interface levelPane = new Interface(true, 6, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			levelPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the potion effect menu."), event -> potionPane(player, itemMap, stage)));
-			levelPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, "&e&lCustom Level", "&7", "&7*Click to set a custom level (strength)", "&7value for the potion effect."), event -> {
+			levelPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, "&e&lCustom Level", "&7", "&7*Click to set a custom level (strength)", "&7value for the potion effect.", "&7", "&c&lNote: &7Any duration LONGER than", "&71800 seconds (30 minutes) will", "&7result in an infinite duration."), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[16] = "EFFECT LEVEL";

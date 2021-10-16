@@ -114,6 +114,7 @@ public class ItemDesigner {
 								this.setLegacyBookPages(itemMap);
 								this.setAttributes(itemMap);
 								this.setAttributeFlags(itemMap);
+								this.setFlags(itemMap);
 								this.setProbability(itemMap);
 								this.setMobsDrop(itemMap);
 								this.setBlocksDrop(itemMap);
@@ -1202,6 +1203,18 @@ public class ItemDesigner {
 	private void setAttributeFlags(final ItemMap itemMap) {
 		if (ServerUtils.hasSpecificUpdate("1_8") && StringUtils.containsIgnoreCase(itemMap.getItemFlags(), "hide-attributes")) {
 			itemMap.setAttributesInfo(true);
+		}
+	}
+	
+    /**
+ 	* Sets the Flags of the Custom Item,
+ 	* shows or hides the Flags of the item.
+ 	* 
+ 	* @param itemMap - The ItemMap being modified.
+ 	*/
+	private void setFlags(final ItemMap itemMap) {
+		if (ServerUtils.hasSpecificUpdate("1_8") && StringUtils.containsIgnoreCase(itemMap.getItemFlags(), "hide-flags")) {
+			itemMap.setFlagsInfo(true);
 		}
 	}
 	
