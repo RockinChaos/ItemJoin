@@ -591,6 +591,10 @@ public class StringUtils {
 					} else { playerName = player.getName(); }	
 				} catch (NullPointerException e2) { playerName = player.getName(); }
 			}
+		} else if (player != null && DependAPI.getDepends(false).nickAPIEnabled()) {
+			if (xyz.haoshoku.nick.api.NickAPI.isNicked(player)) {
+				playerName = xyz.haoshoku.nick.api.NickAPI.getOriginalName(player);
+			} else { playerName = player.getName(); }
 		} else if (player != null) { playerName = player.getName(); }
 		if (playerName != null && player != null && !(player instanceof ConsoleCommandSender)) {
 			try { str = str.replace("%player%", playerName); } catch (Exception e) { ServerUtils.sendDebugTrace(e); }
