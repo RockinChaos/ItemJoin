@@ -320,7 +320,7 @@
 		<!--Nick API-->
         <dependency>
             <groupId>xyz.haoshoku.nick</groupId>
-            <artifactId>nickapi</artifactId>
+            <artifactId>NickAPI</artifactId>
             <version>6.2.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
