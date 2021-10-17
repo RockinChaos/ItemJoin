@@ -264,7 +264,7 @@ public class Crafting implements Listener {
 						ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(inventory[i], null, player.getWorld());
 						if (itemMap == null || !itemMap.isCraftingItem() || !itemMap.isReal(inventory[i])) {
 							final int k = i;
-							ItemStack drop = inventory[i].clone();
+							final ItemStack drop = inventory[i].clone();
 							SchedulerUtils.run(() -> { 
 								double health = 1;
 		    					try { health = (ServerUtils.hasSpecificUpdate("1_8") ? player.getHealth() : (double)player.getClass().getMethod("getHealth", double.class).invoke(player)); } catch (Exception e) { health = (player.isDead() ? 0 : 1);  }
@@ -284,7 +284,16 @@ public class Crafting implements Listener {
 						}
 					}
 				}
-				this.returnCrafting(player, inventory, 1L, !slotZero);
+				if (isCrafting) {
+					if (!slotZero || (slotZero && ItemUtilities.getUtilities().getItemMap(inventory[0], null, null) != null)) {
+						this.returnCrafting(player, inventory, 1L, !slotZero);
+					} else {
+						SchedulerUtils.runLater(1L, () -> { 
+							player.getOpenInventory().getTopInventory().setItem(0, new ItemStack(Material.AIR)); 
+							PlayerHandler.updateInventory(player, ItemUtilities.getUtilities().getItemMap(new ItemStack(Material.AIR), null, player.getWorld()), 1L);
+						});
+					}
+				}
 			}
 		} else {
 			SchedulerUtils.run(() -> { 
@@ -336,12 +345,18 @@ public class Crafting implements Listener {
 			if (!player.isOnline()) { return; } else if (!PlayerHandler.isCraftingInv(player.getOpenInventory())) { this.returnCrafting(player, contents, 10L, slotZero); return; }
 			if (!slotZero) {
 				for (int i = 4; i >= 0; i--) {
-					player.getOpenInventory().getTopInventory().setItem(i, contents[i]);
-					PlayerHandler.updateInventory(player, ItemUtilities.getUtilities().getItemMap(contents[i], null, player.getWorld()), 1L);
+					final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(contents[i], null, player.getWorld());
+					if (contents != null && contents[i] != null && itemMap != null) {
+						player.getOpenInventory().getTopInventory().setItem(i, contents[i]);
+						PlayerHandler.updateInventory(player, itemMap, 1L);
+					}
 				}
 			} else { 
-				player.getOpenInventory().getTopInventory().setItem(0, contents[0]); 
-				PlayerHandler.updateInventory(player, ItemUtilities.getUtilities().getItemMap(contents[0], null, player.getWorld()), 1L);
+				final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(contents[0], null, player.getWorld());
+				if (contents != null && contents[0] != null && itemMap != null) {
+					player.getOpenInventory().getTopInventory().setItem(0, contents[0]); 
+					PlayerHandler.updateInventory(player, ItemUtilities.getUtilities().getItemMap(contents[0], null, player.getWorld()), 1L);
+				}
 			}
 		});
 	}
