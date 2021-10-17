@@ -114,6 +114,15 @@ public class DependAPI {
     }
     
    /**
+    * Checks if NickAPI is Enabled.
+    * 
+    * @return If NickAPI is Enabled.
+    */
+    public boolean nickAPIEnabled() {
+    	return Bukkit.getServer().getPluginManager().isPluginEnabled("NickAPI");
+    }
+    
+   /**
     * Checks if AuthMe is Enabled.
     * 
     * @return If AuthMe is Enabled.
@@ -260,7 +269,7 @@ public class DependAPI {
     * 
     */
 	public void sendUtilityDepends() {
-		String enabledPlugins = (this.authMeEnabled() ? "AuthMe, " : "") + (this.nickEnabled() ? "BetterNick, " : "") 
+		String enabledPlugins = (this.authMeEnabled() ? "AuthMe, " : "") + (this.nickEnabled() ? "BetterNick, " : "") + (this.nickAPIEnabled() ? "NickAPI, " : "") 
 				+ (this.exploitFixerEnabled() ? "ExploitFixer, " : "")+ (this.hyperVerseEnabled() ? "Hyperverse, " : "") + (this.coreEnabled() ? "Multiverse-Core, " : "") + (this.inventoryEnabled() ? "Multiverse-Inventories, " : "") 
 				+ (this.myWorldsEnabled() ? "My Worlds, " : "") + (this.perInventoryEnabled() ? "PerWorldInventory, " : "") 
 				+ (this.perPluginsEnabled() ? "PerWorldPlugins, " : "") + (this.tokenEnchantEnabled() ? "TokenEnchant, " : "") 
@@ -295,6 +304,7 @@ public class DependAPI {
 		metrics.addCustomChart(new SimplePie("language", () -> LanguageAPI.getLang(false).getLanguage()));
 		metrics.addCustomChart(new SimplePie("softDepend", () -> this.authMeEnabled() ? "AuthMe" : ""));
 		metrics.addCustomChart(new SimplePie("softDepend", () -> this.nickEnabled() ? "BetterNick" : ""));
+		metrics.addCustomChart(new SimplePie("softDepend", () -> this.nickAPIEnabled() ? "NickAPI" : ""));
 		metrics.addCustomChart(new SimplePie("softDepend", () -> this.exploitFixerEnabled() ? "ExploitFixer" : ""));
 		metrics.addCustomChart(new SimplePie("softDepend", () -> this.hyperVerseEnabled() ? "HeadDatabase" : ""));
 		metrics.addCustomChart(new SimplePie("softDepend", () -> this.hyperVerseEnabled() ? "Hyperverse" : ""));

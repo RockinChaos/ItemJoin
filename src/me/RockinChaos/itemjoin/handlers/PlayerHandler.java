@@ -399,6 +399,10 @@ public class PlayerHandler {
 				if (BetterNick.getApi().isPlayerNicked(LegacyAPI.getPlayer(playerName))) { return LegacyAPI.getPlayer(BetterNick.getApi().getRealName(LegacyAPI.getPlayer(playerName))); }
 				else { return LegacyAPI.getPlayer(playerName); }
 			}
+		} else if (playerName != null && DependAPI.getDepends(false).nickAPIEnabled()) {
+			if (xyz.haoshoku.nick.api.NickAPI.isNicked(xyz.haoshoku.nick.api.NickAPI.getPlayerOfNickedName(playerName))) {
+				return xyz.haoshoku.nick.api.NickAPI.getPlayerOfNickedName(playerName);
+			} else { return LegacyAPI.getPlayer(playerName); }
 		} else if (args == null) { return LegacyAPI.getPlayer(playerName); }
 		return args;
 	}
@@ -428,6 +432,10 @@ public class PlayerHandler {
 					if (BetterNick.getApi().isPlayerNicked(player)) { return BetterNick.getApi().getRealName(player);
 					} else { return player.getName(); }
 				}
+			} else if (player != null && DependAPI.getDepends(false).nickAPIEnabled()) {
+				if (xyz.haoshoku.nick.api.NickAPI.isNicked(player)) {
+					return xyz.haoshoku.nick.api.NickAPI.getOriginalName(player);
+				} else { return player.getName(); }
 			} else if (player != null) {
 				return player.getName();
 			}
@@ -463,6 +471,10 @@ public class PlayerHandler {
 					if (BetterNick.getApi().isPlayerNicked((Player) player)) { return BetterNick.getApi().getRealName((Player) player);
 					} else { return player.getName(); }
 				}
+			} else if (player != null && DependAPI.getDepends(false).nickAPIEnabled()) {
+				if (xyz.haoshoku.nick.api.NickAPI.isNickedName(player.getName())) {
+					return xyz.haoshoku.nick.api.NickAPI.getOriginalName(xyz.haoshoku.nick.api.NickAPI.getPlayerOfNickedName(player.getName()));
+				} else { return player.getName(); }
 			} else if (player != null) {
 				return player.getName();
 			}

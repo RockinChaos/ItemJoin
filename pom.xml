@@ -153,6 +153,11 @@
 			<id>codemc-snapshots</id>
 			<url>https://repo.codemc.org/repository/maven-snapshots/</url>
 		</repository>
+		<!--NickAPI Repository-->
+        <repository>
+            <id>public</id>
+            <url>http://haoshoku.xyz:8081/repository/public</url>
+        </repository>
 		<!--WorldGuard/WorldEdit Repository-->
 		<repository>
 			<id>sk89q-repo</id>
@@ -317,6 +322,13 @@
 			<version>2.8.7</version>
 			<scope>provided</scope>
 		</dependency>
+		<!--Nick API-->
+        <dependency>
+            <groupId>xyz.haoshoku.nick</groupId>
+            <artifactId>nickapi</artifactId>
+            <version>6.2.1-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
 		<!--BetterNick API-->
 		<dependency>
 			<groupId>de.domedd.betternick</groupId>
