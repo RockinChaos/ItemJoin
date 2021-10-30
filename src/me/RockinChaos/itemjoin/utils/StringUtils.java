@@ -373,7 +373,7 @@ public class StringUtils {
 			try {
 				URL url = new URL(https);
 				InputStreamReader read = new InputStreamReader(url.openStream());
-				JsonObject textureProperty = JsonParser.parseReader(read).getAsJsonObject().get("properties").getAsJsonArray().get(0).getAsJsonObject();
+				JsonObject textureProperty = new JsonParser().parse(read).getAsJsonObject().get("properties").getAsJsonArray().get(0).getAsJsonObject();
 				return textureProperty.get("value").getAsString();
 			} catch (IOException e) {
 				ServerUtils.logSevere("{ItemMap} Unable to connect to " + https);
