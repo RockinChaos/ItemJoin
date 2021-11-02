@@ -60,13 +60,15 @@ public class Recipes implements Listener {
     */
 	@EventHandler(ignoreCancelled = true)
 	private void onRepairAnvil(InventoryClickEvent event) {
-	    if (event.getInventory().getType().toString().contains("ANVIL")) {
+		final boolean isAnvil = event.getInventory().getType().toString().contains("ANVIL");
+		final boolean isGrindstone = event.getInventory().getType().toString().contains("GRINDSTONE");
+	    if (isAnvil || isGrindstone) {
 	        Player player = (Player) event.getWhoClicked();
 	        int rSlot = event.getSlot();
 	        if (rSlot == 2 && event.getInventory().getItem(1) != null &&
 	            event.getInventory().getItem(1).getType() != Material.AIR) {
 	            ItemStack item = event.getInventory().getItem(2);
-	            if (!StringUtils.containsIgnoreCase(event.getInventory().getItem(1).getType().toString(), "PAPER") && !StringUtils.containsIgnoreCase(event.getInventory().getItem(1).getType().toString(), "NAME_TAG") &&
+	            if ((isGrindstone || (!StringUtils.containsIgnoreCase(event.getInventory().getItem(1).getType().toString(), "PAPER") && !StringUtils.containsIgnoreCase(event.getInventory().getItem(1).getType().toString(), "NAME_TAG"))) &&
 	                !ItemUtilities.getUtilities().isAllowed(player, item, "item-repairable") || !ItemUtilities.getUtilities().isAllowed(player, event.getInventory().getItem(1), "item-repairable")) {
 	                event.setCancelled(true);
 	                PlayerHandler.updateExperienceLevels(player);
