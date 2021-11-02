@@ -43,9 +43,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.RegisteredListener;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-
 import de.domedd.betternick.BetterNick;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
@@ -369,19 +366,33 @@ public class StringUtils {
     */
 	public static String toTextureUUID(final Player player, final String configName, final String skullTexture) {
 		if (StringUtils.containsIgnoreCase(skullTexture, "uuid")) {
-			String https = ("https://sessionserver.mojang.com/session/minecraft/profile/" + StringUtils.translateLayout(skullTexture, player));
+			String https = ("https://sessionserver.mojang.com/session/minecraft/profile/" + StringUtils.translateLayout(skullTexture.replace("uuid-", "").replace("uuid", ""), player));
 			try {
-				URL url = new URL(https);
-				InputStreamReader read = new InputStreamReader(url.openStream());
-				JsonObject textureProperty = new JsonParser().parse(read).getAsJsonObject().get("properties").getAsJsonArray().get(0).getAsJsonObject();
-				return textureProperty.get("value").getAsString();
+				final URL url = new URL(https);
+				final BufferedReader read = new BufferedReader(new InputStreamReader(url.openStream()));
+			    final StringBuffer stringBuilder = new StringBuffer();
+			    String valueResult;
+			    while ((valueResult = read.readLine()) != null) {
+			    	if (StringUtils.containsIgnoreCase(valueResult, "value")) {
+			    		stringBuilder.append(valueResult);
+			    	}
+			    } {
+					Matcher m = Pattern.compile("\"([^\"]*)\"").matcher(stringBuilder);
+					while (m.find()) {
+						final String stringValue = m.group(1);
+						if (!StringUtils.containsIgnoreCase(stringValue, "value")) {
+							valueResult = stringValue;
+						}
+					} 
+				}
+				return valueResult;
 			} catch (IOException e) {
 				ServerUtils.logSevere("{ItemMap} Unable to connect to " + https);
 				ServerUtils.logSevere("{ItemMap} " + e.getMessage());
 				ServerUtils.logSevere("{ItemMap} The item " + configName + " will NOT have its skull-texture set!");
 			}
 		}
-		return skullTexture;
+		return (skullTexture == null || skullTexture.isEmpty() ? skullTexture : skullTexture.replace("uuid-", "").replace("uuid", ""));
 	}
 	
    /**
