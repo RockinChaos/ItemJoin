@@ -739,7 +739,7 @@ public class ItemDesigner {
 	*/
 	private void setRecipe(final ItemMap itemMap) {
 		if (itemMap.getNodeLocation().getString(".recipe") != null) {
-			ShapedRecipe shapedRecipe = (ServerUtils.hasSpecificUpdate("1_12") ? new ShapedRecipe(new NamespacedKey(ItemJoin.getInstance(), itemMap.getConfigName()), itemMap.getItem(null)) : LegacyAPI.newShapedRecipe(itemMap.getItem(null)));
+			final ShapedRecipe shapedRecipe = (ServerUtils.hasSpecificUpdate("1_12") ? new ShapedRecipe(new NamespacedKey(ItemJoin.getInstance(), itemMap.getConfigName()), itemMap.getItem(null)) : LegacyAPI.newShapedRecipe(itemMap.getItem(null)));
 			Map < Character, String > ingredientList = new HashMap < Character, String > ();
 			String[] shape = itemMap.trimRecipe(itemMap.getNodeLocation().getStringList(".recipe"));
 			shapedRecipe.shape(shape);
@@ -770,7 +770,17 @@ public class ItemDesigner {
 						});
 					} else { ServerUtils.logWarn("{ItemMap} The material " + ingredientParts[1] + " for the custom recipe defined for the item " + itemMap.getConfigName() + " is not a proper material type OR custom item node!"); }
 				}
-				SchedulerUtils.runLater(45L, () -> Bukkit.getServer().addRecipe(shapedRecipe));
+				SchedulerUtils.runLater(45L, () -> { 
+					try {
+						Bukkit.getServer().addRecipe(shapedRecipe);
+					} catch (NullPointerException e) {
+						if (e.getMessage() != null && !e.getMessage().isEmpty() && e.getMessage().contains("registry")) {
+							ServerUtils.logWarn("{ItemMap} Magma has been detected on the server which currently doesn't support ShapedRecipes.");
+							ServerUtils.logWarn("{ItemMap} The recipe for " + itemMap.getConfigName() + " may still continue to function in limited capacity.");
+							ServerUtils.sendDebugTrace(e);
+						}
+					}
+				});
 				itemMap.setIngredients(ingredientList);
 			} else { ServerUtils.logWarn("{ItemMap} There is a custom recipe defined for the item " + itemMap.getConfigName() + " but it still needs ingredients defined!"); }
 		}
