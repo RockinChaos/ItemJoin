@@ -46,8 +46,12 @@ public class Storable implements Listener {
 		String invType = event.getView().getType().toString();
 		ItemStack item = null;
 		if (StringUtils.containsIgnoreCase(event.getAction().name(), "HOTBAR")) {
-			if (event.getView().getBottomInventory().getSize() >= event.getHotbarButton() && event.getHotbarButton() >= 0) {
-				item = event.getView().getBottomInventory().getItem(event.getHotbarButton());
+			if (event.getView().getBottomInventory().getSize() >= event.getHotbarButton() && (event.getHotbarButton() >= 0 || event.getHotbarButton() == -1)) {
+				if (event.getHotbarButton() == -1) {
+					item = PlayerHandler.getOffHandItem(player);
+				} else {
+					item = event.getView().getBottomInventory().getItem(event.getHotbarButton());
+				}
 			}
 			if (item == null) { item = event.getCurrentItem(); }
 		} else if (event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY)) { item = event.getCurrentItem(); } 
