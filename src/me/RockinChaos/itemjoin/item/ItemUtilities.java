@@ -224,21 +224,21 @@ public class ItemUtilities {
 		if (type.equals(TriggerType.WORLD_SWITCH)) { world = player.getWorld(); }
 		for (ItemMap item : this.getItems()) { 
 			item.setAnimations(player);
-			if (((type.equals(TriggerType.JOIN) && item.isGiveOnJoin()) 
+			if (((((type.equals(TriggerType.JOIN) && item.isGiveOnJoin()) 
 			  || (type.equals(TriggerType.RESPAWN) && (item.isGiveOnRespawn() || item.isDeathKeepable()))
 			  || (type.equals(TriggerType.WORLD_SWITCH) && item.isGiveOnWorldSwitch())
-			  || (type.equals(TriggerType.LIMIT_SWITCH) && item.isUseOnLimitSwitch())
+			  || (type.equals(TriggerType.LIMIT_SWITCH) && item.isUseOnLimitSwitch())) && item.inWorld(world))
 		      || ((((type.equals(TriggerType.REGION_ENTER) && (item.isGiveOnRegionEnter() || item.isGiveOnRegionAccess())) 
 			  || (type.equals(TriggerType.REGION_LEAVE) && (item.isGiveOnRegionLeave() || item.isGiveOnRegionEgress()))) && item.inRegion(region))))
-			   && item.isLimitMode(gameMode) && item.inWorld(world) && ChanceAPI.getChances().isProbability(item, randomMap) && item.conditionMet(player, "trigger-conditions")
+			   && item.isLimitMode(gameMode) && ChanceAPI.getChances().isProbability(item, randomMap) && item.conditionMet(player, "trigger-conditions")
 			   && PlayerHandler.isEnabled(player) && item.hasPermission(player, world) 
 			   && this.isObtainable(player, item, session, type)) {
 				item.giveTo(player); 
 			} else if (((type.equals(TriggerType.LIMIT_SWITCH) && item.isUseOnLimitSwitch() && !item.isLimitMode(gameMode))
 					|| (((type.equals(TriggerType.REGION_LEAVE) && item.isGiveOnRegionAccess()) || (type.equals(TriggerType.REGION_ENTER) && item.isGiveOnRegionEgress())) && item.inRegion(region)))
-					&& item.inWorld(world) && item.hasItem(player, false)) {
+					&& item.hasItem(player, false)) {
 				item.removeFrom(player);
-			} else if (item.isAutoRemove() && (!item.inWorld(player.getWorld()) || !item.isLimitMode(gameMode)) && item.hasItem(player, true)) {
+			} else if (item.isAutoRemove() && (!item.inWorld(world) || !item.isLimitMode(gameMode)) && item.hasItem(player, true)) {
 				item.removeFrom(player);
 			}
 		}
