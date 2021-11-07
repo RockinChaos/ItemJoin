@@ -514,12 +514,27 @@ public class ItemCommand {
 	*/
 	private void dispatchSwapItem(final Player player, final Player altPlayer, final String slot) {
 		try {
+			final List<ItemMap> mapDisposable = new ArrayList<ItemMap>();
 			for (ItemMap item : ItemUtilities.getUtilities().getItems()) {
 				if (item.getConfigName().equalsIgnoreCase(this.command) && slot != null) {
 					boolean itemExists = ((this.itemMap.getCommandSequence() == CommandSequence.REMAIN && this.itemMap.hasItem(player, true)) || this.itemMap.getCommandSequence() != CommandSequence.REMAIN);
+					mapDisposable.add(this.itemMap);
+					for (ItemCommand command : this.itemMap.getCommands()) {
+						if (command.executorType == Executor.SWAPITEM && this.matchAction(command.actionType)) {
+							ItemMap commandMap = ItemUtilities.getUtilities().getItemMap(null, command.command, null);
+							if (commandMap != null) {
+								if (!itemExists) { itemExists = commandMap.hasItem(player, true); }
+								mapDisposable.add(commandMap);
+							}
+						}
+					}
 					if (itemExists) { 
 						item.swapItem(player, slot); {
-							this.itemMap.removeDisposable(player, this.itemMap, this.itemMap.getItem(player), true);
+							for (ItemMap commandMap: mapDisposable) {
+								if (!item.getConfigName().equalsIgnoreCase(commandMap.getConfigName())) {
+									commandMap.removeDisposable(player, commandMap, commandMap.getItem(player), true); 
+								}
+							}
 						}
 					}
 					break;
