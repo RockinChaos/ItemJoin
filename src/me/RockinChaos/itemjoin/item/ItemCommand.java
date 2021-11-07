@@ -517,17 +517,11 @@ public class ItemCommand {
 			for (ItemMap item : ItemUtilities.getUtilities().getItems()) {
 				if (item.getConfigName().equalsIgnoreCase(this.command) && slot != null) {
 					boolean itemExists = ((this.itemMap.getCommandSequence() == CommandSequence.REMAIN && this.itemMap.hasItem(player, true)) || this.itemMap.getCommandSequence() != CommandSequence.REMAIN);
-					this.itemMap.removeDisposable(player, this.itemMap, this.itemMap.getItem(player), true); 
-					for (ItemCommand command : this.itemMap.getCommands()) {
-						if (command.executorType == Executor.SWAPITEM && this.matchAction(command.actionType)) {
-							ItemMap commandMap = ItemUtilities.getUtilities().getItemMap(null, command.command, null);
-							if (commandMap != null) {
-								if (!itemExists) { itemExists = commandMap.hasItem(player, true); }
-								commandMap.removeDisposable(player, commandMap, commandMap.getItem(player), true); 
-							}
+					if (itemExists) { 
+						item.swapItem(player, slot); {
+							this.itemMap.removeDisposable(player, this.itemMap, this.itemMap.getItem(player), true);
 						}
 					}
-					if (itemExists) { item.swapItem(player, slot); }
 					break;
 				}
 			}

@@ -4333,31 +4333,25 @@ public class ItemMap {
 		if ((!slot.startsWith("CH") && slot.startsWith("C")) || StringUtils.isInt(slot)) {
 			if (StringUtils.containsIgnoreCase(slot, "CRAFTING")) { 
 				if (StringUtils.getSlotConversion(slot) == 0) {
-					SchedulerUtils.runLater(4L, () -> {
+					SchedulerUtils.runLater(1L, () -> {
 				    	if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
 				    		player.getOpenInventory().getTopInventory().setItem(StringUtils.getSlotConversion(slot), itemStack);
 				    		PlayerHandler.updateInventory(player, 1L);
 				    	}
 					});
 				} else {
-					SchedulerUtils.runLater(2L, () -> {
-				    	player.getOpenInventory().getTopInventory().setItem(StringUtils.getSlotConversion(slot), itemStack);
-				    });
+				    player.getOpenInventory().getTopInventory().setItem(StringUtils.getSlotConversion(slot), itemStack);
 				}
 			} 
 			else { 
-				SchedulerUtils.runLater(2L, () -> {
-					player.getInventory().setItem(Integer.parseInt(slot), itemStack); 	
-				});
+				player.getInventory().setItem(Integer.parseInt(slot), itemStack);
 			}
 		} else {
-			SchedulerUtils.runLater(2L, () -> {
-				if (PlayerHandler.getMainHandItem(player) == null || PlayerHandler.getMainHandItem(player).getType() == Material.AIR) {
-					PlayerHandler.setMainHandItem(player, itemStack);
-				} else {
-					player.getInventory().addItem(itemStack);
-				}
-			});
+			if (PlayerHandler.getMainHandItem(player) == null || PlayerHandler.getMainHandItem(player).getType() == Material.AIR) {
+				PlayerHandler.setMainHandItem(player, itemStack);
+			} else {
+				player.getInventory().addItem(itemStack);
+			}
 		}
 		this.setAnimations(player);
 		this.executeCommands(player, null, this.tempItem, "ON_RECEIVE", "RECEIVED", slot);
@@ -4773,7 +4767,7 @@ public class ItemMap {
 						player.getInventory().addItem(ItemHandler.modifyItem(itemCopy, allItems, 1));
 						player.setItemOnCursor(new ItemStack(Material.AIR));
 						if (!allItems) { this.setSubjectRemoval(false); }
-					} else if (this.isSubjectRemoval() && PlayerHandler.isCraftingInv(player.getOpenInventory())) {
+					} else if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
 						for (int i = 0; i < player.getOpenInventory().getTopInventory().getSize(); i++) {
 							if (itemMap.isSimilar(player.getOpenInventory().getTopInventory().getItem(i))) {
 								player.getOpenInventory().getTopInventory().setItem(i, ItemHandler.modifyItem(player.getOpenInventory().getTopInventory().getItem(i), allItems, 1));
