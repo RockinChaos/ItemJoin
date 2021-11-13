@@ -74,11 +74,12 @@ public class PlayerHandler {
     	player.closeInventory();	
     }
     
-    public static boolean isEnabled(final Player player) {
-    	DataObject dataPlayer = SQL.getData().getData(new DataObject(Table.ENABLED_PLAYERS, getPlayerID(player), player.getWorld().getName(), Boolean.toString(true)));
-    	DataObject dataGlobal = SQL.getData().getData(new DataObject(Table.ENABLED_PLAYERS, getPlayerID(player), "Global", Boolean.toString(true)));
-    	DataObject dataALL = SQL.getData().getData(new DataObject(Table.ENABLED_PLAYERS, null, "Global", Boolean.toString(true)));
-    	final boolean enabled = (((dataPlayer != null ? Boolean.valueOf(dataPlayer.getEnabled()) : ((dataGlobal != null ? Boolean.valueOf(dataGlobal.getEnabled()) : (dataALL != null ? Boolean.valueOf(dataALL.getEnabled()) : true))))));
+    public static boolean isEnabled(final Player player, final String item) {
+    	DataObject dataItem = SQL.getData().getData(new DataObject(Table.ENABLED_PLAYERS, getPlayerID(player), player.getWorld().getName(), item, Boolean.toString(true)));
+    	DataObject dataPlayer = SQL.getData().getData(new DataObject(Table.ENABLED_PLAYERS, getPlayerID(player), player.getWorld().getName(), "ALL", Boolean.toString(true)));
+    	DataObject dataGlobal = SQL.getData().getData(new DataObject(Table.ENABLED_PLAYERS, getPlayerID(player), "Global", "ALL", Boolean.toString(true)));
+    	DataObject dataALL = SQL.getData().getData(new DataObject(Table.ENABLED_PLAYERS, null, "Global", "ALL", Boolean.toString(true)));
+    	final boolean enabled = (((dataItem != null ? Boolean.valueOf(dataItem.getEnabled()) : (dataPlayer != null ? Boolean.valueOf(dataPlayer.getEnabled()) : ((dataGlobal != null ? Boolean.valueOf(dataGlobal.getEnabled()) : (dataALL != null ? Boolean.valueOf(dataALL.getEnabled()) : true)))))));
     	if (!enabled) { ServerUtils.logDebug("{ItemMap} " + player.getName() + " will not receive any items, they have custom items are disabled."); }
     	return enabled;
     }

@@ -18,6 +18,7 @@
 package me.RockinChaos.itemjoin.item;
 
 import java.io.File;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,6 +42,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.block.banner.Pattern;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -63,12 +65,15 @@ import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.map.MapView;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.vk2gpz.tokenenchant.api.TokenEnchantAPI;
 
+import me.RockinChaos.itemjoin.ChatToggleExecutor;
+import me.RockinChaos.itemjoin.ChatToggleTab;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
@@ -287,6 +292,11 @@ public class ItemMap {
 	private String limitModes = null;
 //  ============================================== //
 	
+	private String toggleNode = null;
+	private String toggleMessage = null;
+	private List<String> toggleCommands = new ArrayList < String > ();
+	private List<PluginCommand> togglePlugins = new ArrayList < PluginCommand > ();
+	
 	private String permissionNode = null;
 	private boolean permissionNeeded = false;
 	private boolean opPermissionNeeded = false;
@@ -324,6 +334,7 @@ public class ItemMap {
 			this.setCommandCooldown();
 			this.setCommandSequence();
 			this.setCommands(ItemCommand.arrayFromString(this, this.sequence == CommandSequence.RANDOM_LIST));
+			this.setToggleCommands(this.nodeLocation.getString(".toggle"));
 			this.setConditions();
 	        this.setInteractCooldown();
 	        this.setPlayersOnCooldown();
@@ -333,6 +344,8 @@ public class ItemMap {
 	        this.setItemflags();
 			this.setWorlds();
 			this.setRegions();
+			this.setTogglePerm(this.nodeLocation.getString(".toggle-permission"));
+			this.setToggleMessage(this.nodeLocation.getString(".toggle-message"));
 	        this.setPerm(this.nodeLocation.getString(".permission-node"));
 	        this.setPermissionNeeded(ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Obtain-Items"));
 	    	this.setOPPermissionNeeded(ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Obtain-Items-OP"));
@@ -1156,6 +1169,24 @@ public class ItemMap {
 	}
 	
    /**
+    * Sets the Toggle Permission.
+    * 
+    * @param permission - The Permission to be set.
+    */
+	public void setTogglePerm(final String permission) {
+		this.toggleNode = permission == null || permission.length() == 0 ? null : permission;
+	}
+	
+   /**
+    * Sets the Toggle Message.
+    * 
+    * @param message - The Message to be set.
+    */
+	public void setToggleMessage(final String message) {
+		this.toggleMessage = message;
+	}
+	
+   /**
     * Sets the ItemStack to be given only on First Join.
     * 
     * @param bool - The value to be set.
@@ -1917,6 +1948,69 @@ public class ItemMap {
     public void setCommands(final ItemCommand[] commands) {
         this.commands = commands;
     }
+    
+   /**
+    * Sets the Toggle Commands.
+    * 
+    * @param commands - The Toggle Commands to be set.
+    */
+    private void setToggleCommands(final String toggleSingle) {
+    	final List<String> commandList = new ArrayList<String>();
+    	if ((toggleSingle != null && this.nodeLocation.getStringList(".toggle") != null && !this.nodeLocation.getStringList(".toggle").isEmpty())
+    			|| (toggleSingle == null && this.toggleCommands != null && !this.toggleCommands.isEmpty())) {
+    		for (String command : (toggleSingle != null ? this.nodeLocation.getStringList(".toggle") : this.toggleCommands)) {
+    			PluginCommand cmd = null;
+    			try {
+    				Constructor<PluginCommand> pluginCommand = PluginCommand.class.getDeclaredConstructor(String.class, Plugin.class);
+    				pluginCommand.setAccessible(true);
+    				cmd = (PluginCommand)pluginCommand.newInstance(new Object[]{(command.contains(" ") ? command.split(" ")[0] : command), ItemJoin.getInstance()});
+    			} catch (Exception e) {
+    				ServerUtils.sendDebugTrace(e);
+    			}
+	    		cmd.setDescription(this.configName);
+            	cmd.setExecutor(new ChatToggleExecutor());
+            	cmd.setTabCompleter(new ChatToggleTab());
+	    		this.togglePlugins.add(cmd);
+	    		commandList.add(command);
+    		}
+    	} else if (toggleSingle != null && !toggleSingle.isEmpty() && !toggleSingle.equalsIgnoreCase(" ")) {
+			PluginCommand cmd = null;
+		    try {
+		    	Constructor<PluginCommand> pluginCommand = PluginCommand.class.getDeclaredConstructor(String.class, Plugin.class);
+		    	pluginCommand.setAccessible(true);
+		    	cmd = (PluginCommand)pluginCommand.newInstance(new Object[]{(toggleSingle.contains(" ") ? toggleSingle.split(" ")[0] : toggleSingle), ItemJoin.getInstance()});
+		    } catch (Exception e) {
+		    	ServerUtils.sendDebugTrace(e);
+		    }
+    		cmd.setDescription(this.configName);
+            cmd.setExecutor(new ChatToggleExecutor());
+            cmd.setTabCompleter(new ChatToggleTab());
+    		this.togglePlugins.add(cmd);
+    		commandList.add(toggleSingle);
+    	}
+    	ServerUtils.registerCommands(this.togglePlugins);
+        this.toggleCommands = commandList;
+    }
+    
+   /**
+    * Sets the Toggle Commands.
+    * 
+    */
+	public void setToggleCommands(final List<String> cmds) {
+		this.toggleCommands = cmds;
+		this.setToggleCommands((String)null);
+	}
+    
+   /**
+    * Deletes the Toggle Commands.
+    * 
+    * @param commands - The Toggle Commands to be deleted.
+    */
+    public void delToggleCommands() {
+    	if (this.togglePlugins != null && !this.togglePlugins.isEmpty()) {
+    		ServerUtils.unregisterCommands(this.togglePlugins);
+    	}
+    }
 	
    /**
     * Sets the Custom Consumable.
@@ -2133,6 +2227,24 @@ public class ItemMap {
     */
 	public String getPermissionNode() {
 		return permissionNode;
+	}
+	
+   /**
+    * Gets the Toggle Permission.
+    * 
+    * @return The Permission.
+    */
+	public String getToggleNode() {
+		return toggleNode;
+	}
+	
+   /**
+    * Gets the Toggle Message.
+    * 
+    * @return The Toggle Message.
+    */
+	public String getToggleMessage() {
+		return toggleMessage;
 	}
 	
    /**
@@ -2358,6 +2470,15 @@ public class ItemMap {
     */
 	public ItemCommand[] getCommands() {
 		return this.commands;
+	}
+	
+   /**
+    * Gets the Toggle Commands.
+    * 
+    * @return The Toggle Commands.
+    */
+	public List<String> getToggleCommands() {
+		return this.toggleCommands;
 	}
 	
    /**
@@ -5156,6 +5277,7 @@ public class ItemMap {
 			if (!onReceive.isEmpty()) { this.setMapCommand(itemData, onReceive, "on-receive"); }
 			if (!physical.isEmpty()) { this.setMapCommand(itemData, physical, "physical"); }
 		}
+		if (this.toggleCommands != null && !this.getToggleCommands().isEmpty()) { itemData.set("items." + this.configName + ".toggle", this.toggleCommands); }
 		if (this.commandSound != null) { itemData.set("items." + this.configName + ".commands-sound", this.commandSound.name()); }
 		if (this.commandParticle != null && !this.commandParticle.isEmpty()) { itemData.set("items." + this.configName + ".commands-particle", this.commandParticle); }
 		if (this.sequence != null && this.sequence != CommandSequence.SEQUENTIAL) { itemData.set("items." + this.configName + ".commands-sequence", this.sequence.name()); }
@@ -5165,6 +5287,7 @@ public class ItemMap {
 		if (this.warmDelay != null && this.warmDelay != 0) { itemData.set("items." + this.configName + ".commands-warmup", this.warmDelay); }
 		if (this.cooldownSeconds != null && this.cooldownSeconds != 0) { itemData.set("items." + this.configName + ".commands-cooldown", this.cooldownSeconds); }
 		if (this.cooldownMessage != null && !this.cooldownMessage.isEmpty()) { itemData.set("items." + this.configName + ".cooldown-message", this.cooldownMessage); }
+		if (this.toggleMessage != null && !this.toggleMessage.isEmpty()) { itemData.set("items." + this.configName + ".toggle-message", this.toggleMessage); }
 		if (this.enchants != null && !this.enchants.isEmpty()) { 
 			String enchantList = "";
 			for (Entry<String, Integer> enchantments : this.enchants.entrySet()) { enchantList += enchantments.getKey() + ":" + enchantments.getValue() + ", "; }
@@ -5185,6 +5308,7 @@ public class ItemMap {
 		if (this.itemflags != null && !this.itemflags.isEmpty()) { itemData.set("items." + this.configName + ".itemflags", this.itemflags); }
 		if (this.triggers != null && !this.triggers.isEmpty()) { itemData.set("items." + this.configName + ".triggers", this.triggers); }
 		if (this.limitModes != null && !this.limitModes.isEmpty()) { itemData.set("items." + this.configName + ".limit-modes", this.limitModes); }
+		if (this.toggleNode != null && !this.toggleNode.isEmpty()) { itemData.set("items." + this.configName + ".toggle-permission", this.toggleNode); }
 		if (this.permissionNode != null && !this.permissionNode.isEmpty()) { itemData.set("items." + this.configName + ".permission-node", this.permissionNode); }
 		if (this.leatherColor != null && !this.leatherColor.isEmpty()) { itemData.set("items." + this.configName + ".leather-color", this.leatherColor); }
 		else if (this.leatherHex != null && !this.leatherHex.isEmpty()) { itemData.set("items." + this.configName + ".leather-color", this.leatherHex); }

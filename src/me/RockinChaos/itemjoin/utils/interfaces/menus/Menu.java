@@ -925,12 +925,15 @@ public class Menu {
 					usePane(player, itemMap);
 				}
 			}));
+			creatingPane.addButton(new Button(fillerPaneGItem));
 			creatingPane.addButton(new Button(ItemHandler.getItem("LAVA_BUCKET", 1, false, "&b&lConditions", "&7", "&7*Define conditions for triggers,", "&7commands, and the disposable itemflag.", "&9Enabled: &a" + 
 			((itemMap.getTriggerConditions() != null && !itemMap.getTriggerConditions().isEmpty()) || (itemMap.getDisposableConditions() != null && !itemMap.getDisposableConditions().isEmpty()) 
 			|| (itemMap.getCommandConditions() != null && !itemMap.getCommandConditions().isEmpty()) ? "YES" : "NONE")), event -> {
 					conditionsPane(player, itemMap);
 			}));
-			creatingPane.addButton(new Button(fillerPaneGItem));
+			creatingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "REPEATER" : "356"), 1, false, "&b&lToggle", "&7", "&7*Specify command(s) players can", "&7execute to enable or disable the", "&7custom item for themselves.", "&9Enabled: &a" + (itemMap.getToggleCommands() != null && !itemMap.getToggleCommands().isEmpty() ? "YES" : "NONE")), event -> {
+					togglePane(player, itemMap);
+			}));
 			creatingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CRAFTING_TABLE" : "58"), 1, false, "&b&lRecipe", "&7", "&7*Define the recipe to be", "&7able to craft this item.", "&9Enabled: &a" + (itemMap.getIngredients() != null && !itemMap.getIngredients().isEmpty() ? "YES" : "NONE")), event -> {
 					recipePane(player, itemMap);
 			}));
@@ -938,11 +941,9 @@ public class Menu {
 			creatingPane.addButton(new Button(ItemHandler.getItem("GOLD_INGOT", 1, false, "&e&lDrop Chances", "&7", "&7*Define the drop chance for receiving", "&7this item from mobs or breaking blocks."), event -> {
 					dropsPane(player, itemMap);
 			}));
-			creatingPane.addButton(new Button(fillerPaneGItem));
 			creatingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "COMMAND_BLOCK" : "137"), 1, false, "&c&lNBT Properties", "&7", "&7*Define specific NBT Properties", "&7to be set to the item.", "&9Enabled: &a" + (itemMap.getNBTValues() != null && !itemMap.getNBTValues().isEmpty() ? "YES" : "NONE")), event -> {
 					nbtPane(player, itemMap);
 			}));
-			creatingPane.addButton(new Button(fillerPaneGItem));
 			if (itemMap.getMaterial().toString().contains("MAP")) {
 				creatingPane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, false, "&e&lMap Image", "&7", "&7*Adds a custom map image that", "&7will be displayed when held.", "&7", "&7Place the custom map image", 
 						"&7in the MAIN ItemJoin folder.", "&7", "&7The map CAN be a GIF but", "&7must be a 128x128 pixel image.", "&9&lImage: &a" + StringUtils.nullCheck(itemMap.getMapImage())), event -> {
@@ -964,7 +965,7 @@ public class Menu {
 					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 					creatingPane(event.getPlayer(), itemMap);
 				}));
-			} if (itemMap.getMaterial().toString().contains("ARROW") && !itemMap.getMaterial().toString().contains("TIPPED_ARROW")) {
+			} else if (itemMap.getMaterial().toString().contains("ARROW") && !itemMap.getMaterial().toString().contains("TIPPED_ARROW")) {
 				creatingPane.addButton(new Button(ItemHandler.getItem("ENDER_PEARL", 1, false, "&e&lTeleport", "&7", "&7*Set the arrow to teleport", "&7the player upon landing.", "&9&lEnabled: &a" + String.valueOf(itemMap.isTeleport()).toUpperCase()),
 						event -> teleportPane(player, itemMap, 0)));
 			} else if (itemMap.getMaterial().toString().contains("CHARGE") || itemMap.getMaterial().toString().equalsIgnoreCase("FIREWORK_STAR")) {
@@ -1011,6 +1012,7 @@ public class Menu {
 					}
 				}));
 			}
+			creatingPane.addButton(new Button(fillerPaneGItem));
 			creatingPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nMain Menu", "&7", "&7*Cancel and return to the main menu.", "&7", "&c&lWARNING: &7This item has NOT been saved!"), event -> returnConfirm(player, itemMap)));
 			creatingPane.addButton(new Button(fillerPaneBItem), 3);
 			creatingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "LIME_WOOL" : "WOOL:5"), 1, false, "&a&l&nSave to Config", "&7", "&7*Saves the custom item", "&7settings to the items.yml file."), event -> {
@@ -6944,6 +6946,158 @@ public class Menu {
 	
    /**
     * Opens the Pane for the Player.
+    * This Pane is for modifying an items list of toggle commands.
+    * 
+    * @param player - The Player to have the Pane opened.
+    * @param itemMap - The ItemMap currently being modified.
+    * @param action - The action to be matched.
+    */
+	private static void toggleCommandPane(final Player player, final ItemMap itemMap) {
+		Interface commandListPane = new Interface(true, 2, GUIName, player);
+		SchedulerUtils.runAsync(() -> {
+			commandListPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the click type menu."), event -> {
+				togglePane(player, itemMap);
+			}));
+			commandListPane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, true, "&e&lNew Line", "&7", "&7*Add a new command to be executed."), event -> {
+				player.closeInventory();
+				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				placeHolders[16] = "TOGGLE COMMAND";
+				placeHolders[15] = "pvp";
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+			}, event -> {
+				final List<String> toggleCommands = itemMap.getToggleCommands();
+				toggleCommands.add(ChatColor.stripColor(event.getMessage()));
+				itemMap.setToggleCommands(toggleCommands);
+				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				placeHolders[16] = "TOGGLE COMMAND";
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+				toggleCommandPane(event.getPlayer(), itemMap);
+			}));
+			final List<String> toggleCommands = itemMap.getToggleCommands();
+			for (String command: toggleCommands) {
+				commandListPane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, false, "&f" + command, "&7", "&7*Click to &lmodify &7this toggle command."), event -> {
+					modifyToggleCommandsPane(player, itemMap, command);
+				}));
+			}
+		});
+		commandListPane.open(player);
+	}
+	
+   /**
+    * Opens the Pane for the Player.
+    * This Pane is for creating a new command for an item.
+    * 
+    * @param player - The Player to have the Pane opened.
+    * @param itemMap - The ItemMap currently being modified.
+    * @param action - The action to be matched.
+    * @param command - The ItemCommand instance being modified.
+    * @param orderNumber - The current number that dictates the ItemCommands "place in line".
+    */
+	private static void modifyToggleCommandsPane(final Player player, final ItemMap itemMap, final String command) {
+		Interface modPane = new Interface(false, 3, GUIName, player);
+		SchedulerUtils.runAsync(() -> {
+			modPane.addButton(new Button(fillerPaneGItem), 4);
+			modPane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, true, "&f" + command, "&7", "&7*You are modifying this command.")));
+			modPane.addButton(new Button(fillerPaneGItem), 7);
+			modPane.addButton(new Button(ItemHandler.getItem("PAPER", 1, false, "&fModify", "&7", "&7*Sets the command to", "&7another text entry."), event -> {
+				player.closeInventory();
+				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				placeHolders[16] = "MODIFIED TOGGLE COMMAND";
+				placeHolders[15] = "pvp on";
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+			}, event -> {
+				final List<String> toggleCommands = itemMap.getToggleCommands();
+				toggleCommands.remove(command);
+				toggleCommands.add(ChatColor.stripColor(event.getMessage()));
+				itemMap.setToggleCommands(toggleCommands);
+				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				placeHolders[16] = "MODIFIED TOGGLE COMMAND";
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+				toggleCommandPane(player, itemMap);
+			}));
+			modPane.addButton(new Button(fillerPaneGItem));
+			modPane.addButton(new Button(ItemHandler.getItem("REDSTONE", 1, false, "&fDelete", "&7", "&7*Click to &cdelete &7this toggle command."), event -> {
+				final List<String> toggleCommands = itemMap.getToggleCommands();
+				toggleCommands.remove(command);
+				itemMap.setToggleCommands(toggleCommands);
+				toggleCommandPane(player, itemMap);
+			}));
+			modPane.addButton(new Button(fillerPaneGItem), 3);
+			modPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the toggle commands menu."), event -> toggleCommandPane(player, itemMap)));
+			modPane.addButton(new Button(fillerPaneBItem), 7);
+			modPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the oggle commands menu."), event -> toggleCommandPane(player, itemMap)));
+		});
+		modPane.open(player);
+	}
+	
+   /**
+    * Opens the Pane for the Player.
+    * This Pane is for setting the custom toggle commands.
+    * 
+    * @param player - The Player to have the Pane opened.
+    * @param itemMap - The ItemMap currently being modified.
+    */
+	private static void togglePane(final Player player, final ItemMap itemMap) {
+		Interface togglePane = new Interface(false, 2, GUIName, player);
+		SchedulerUtils.runAsync(() -> {
+			togglePane.addButton(new Button(fillerPaneBItem), 2);
+			togglePane.addButton(new Button(ItemHandler.getItem("BOOK", 1, false, "&e&lCommands", "&7", "&7*Define specific commands which", "&7players can use to enable or disable", "&7the custom item upon execution."), event -> toggleCommandPane(player, itemMap)));
+			togglePane.addButton(new Button(fillerPaneBItem));
+			togglePane.addButton(new Button(ItemHandler.getItem("PAPER", 1, (StringUtils.nullCheck(itemMap.getToggleMessage()) != "NONE"), "&b&lMessage", 
+					"&7", "&7*Set a custom message that", "&7will be sent to the player", "&7upon executing a toggle command.", 
+					"&9&lMESSAGE: &f" + StringUtils.nullCheck(itemMap.getToggleMessage())), event -> {
+				if (StringUtils.nullCheck(itemMap.getToggleMessage()) != "NONE") {
+					itemMap.setToggleMessage(null);
+					togglePane(player, itemMap);
+				} else {
+					player.closeInventory();
+					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					placeHolders[16] = "TOGGLE MESSAGE";
+					placeHolders[15] = "&a%item% has been toggled!";
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				}
+			}, event -> {
+				itemMap.setToggleMessage(ChatColor.stripColor(event.getMessage()));
+				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				placeHolders[16] = "TOGGLE MESSAGE";
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+				togglePane(event.getPlayer(), itemMap);
+			}));
+			togglePane.addButton(new Button(fillerPaneBItem));
+			togglePane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, (StringUtils.nullCheck(itemMap.getToggleNode()) != "NONE"), 
+					"&b&lPermissions", "&7", "&7*Set a custom permissions node", "&7that each player needs in order", 
+					"&7to execute the toggle commands.", "&9&lPERMISSIONS: &f" + StringUtils.nullCheck(itemMap.getToggleNode())), event -> {
+				if (StringUtils.nullCheck(itemMap.getToggleNode()) != "NONE") {
+					itemMap.setTogglePerm(null);
+					togglePane(player, itemMap);
+				} else {
+					player.closeInventory();
+					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					placeHolders[16] = "TOGGLE PERMISSION";
+					placeHolders[15] = "itemjoin.toggle";
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				}
+			}, event -> {
+				itemMap.setTogglePerm(ChatColor.stripColor(event.getMessage()));
+				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				placeHolders[16] = "TOGGLE PERMISSION";
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+				togglePane(event.getPlayer(), itemMap);
+			}));
+			togglePane.addButton(new Button(fillerPaneBItem), 2);
+			togglePane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> creatingPane(player, itemMap)));
+			togglePane.addButton(new Button(fillerPaneBItem), 7);
+			togglePane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> creatingPane(player, itemMap)));
+		});
+		togglePane.open(player);
+	}
+	
+   /**
+    * Opens the Pane for the Player.
     * This Pane is for setting the custom recipe.
     * 
     * @param player - The Player to have the Pane opened.
@@ -8070,6 +8224,7 @@ public class Menu {
 				}
 			}
 		} else if (itemMap.getCommands().length == 0) { useCommands = false; }
+		boolean useToggle = itemMap.getToggleCommands() != null && !itemMap.getToggleCommands().isEmpty();
 		String mobs = "";
 		for (EntityType entity: itemMap.getMobsDrop().keySet()) { mobs += entity.name() + ", "; }
 		String blocks = "";
@@ -8079,7 +8234,7 @@ public class Menu {
 			+ itemMap.getMaterial().toString() + ((itemMap.getDataValue() != null && itemMap.getDataValue() != 0) ? ":" + itemMap.getDataValue() : ""), 
 					(itemMap.getMultipleSlots() != null && !itemMap.getMultipleSlots().isEmpty() ? "&9&lSlot(s): &a" + slotList : "&9&lSlot: &a" + itemMap.getSlot().toUpperCase()), (itemMap.getCount() != 1 && itemMap.getCount() != 0) ? "&9&lCount: &a" + itemMap.getCount() : "", 
 					((StringUtils.nullCheck(itemMap.getCustomName()) != "NONE" && !ItemHandler.getMaterialName(itemMap.getTempItem()).equalsIgnoreCase(itemMap.getCustomName())) ? "&9&lName: &a" + itemMap.getCustomName() : ""), (StringUtils.nullCheck(itemMap.getCustomLore().toString()) != "NONE" ? "&9&lLore: &a" + (StringUtils.nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",").length() > 40 ? StringUtils.nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",").substring(0, 40) : StringUtils.nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",")) : ""), 
-					(StringUtils.nullCheck(itemMap.getDurability() + "&7") != "NONE" ? "&9&lDurability: &a" + itemMap.getDurability() : ""), (StringUtils.nullCheck(itemMap.getData() + "&7") != "NONE" ? "&9&lTexture Data: &a" + itemMap.getData() : ""), (useCommands ? "&9&lCommands: &aYES" : ""), 
+					(StringUtils.nullCheck(itemMap.getDurability() + "&7") != "NONE" ? "&9&lDurability: &a" + itemMap.getDurability() : ""), (StringUtils.nullCheck(itemMap.getData() + "&7") != "NONE" ? "&9&lTexture Data: &a" + itemMap.getData() : ""), (useCommands ? "&9&lCommands: &aYES" : ""), (useToggle ? "&9&lTogglable: &aYES" : ""),
 					(StringUtils.nullCheck(itemMap.getItemCost() + "") != "NONE" ? "&9&lCommands-Item: &a" + itemMap.getItemCost() : ""), (StringUtils.nullCheck(itemMap.getCommandCost() + "&7") != "NONE" ? "&9&lCommands-Cost: &a" + itemMap.getCommandCost() : ""), 
 					(StringUtils.nullCheck(itemMap.getCommandReceive() + "&7") != "NONE" ? "&9&lCommands-Receive: &a" + itemMap.getCommandReceive() : ""),
 					(StringUtils.nullCheck(itemMap.getCommandSequence() + "") != "NONE" ? "&9&lCommands-Sequence: &a" + itemMap.getCommandSequence() : ""), (StringUtils.nullCheck(itemMap.getCommandCooldown() + "&7") != "NONE" ? "&9&lCommands-Cooldown: &a" + itemMap.getCommandCooldown() + " second(s)" : ""), 

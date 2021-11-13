@@ -52,7 +52,7 @@ public class PlayerGuard implements Listener {
 		final Player player = event.getPlayer();
 		if (PlayerHandler.isPlayer(player)) {
 			SchedulerUtils.runAsync(() -> {
-				if (PlayerHandler.isEnabled(player)) {
+				if (PlayerHandler.isEnabled(player, "ALL")) {
 					this.handleRegions(player, player.getLocation(), true);
 				}
 			});
@@ -70,7 +70,7 @@ public class PlayerGuard implements Listener {
 	private void setRegionItems(PlayerTeleportEvent event) {
 		final Player player = event.getPlayer();
 		if (PlayerHandler.isPlayer(player)) {
-			if (PlayerHandler.isEnabled(player)) {
+			if (PlayerHandler.isEnabled(player, "ALL")) {
 				this.handleRegions(player, event.getTo(), false);
 			}
 		}

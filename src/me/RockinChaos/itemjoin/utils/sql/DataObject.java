@@ -211,8 +211,6 @@ public class DataObject {
 			this.inventory64 = object;
 		}else if (table.equals(Table.FIRST_COMMANDS)) {
 			this.command = object;
-		} else if (table.equals(Table.ENABLED_PLAYERS)) {
-			this.isEnabled = object;
 		}
 		this.table = table;
 		this.worldName = worldName;
@@ -243,7 +241,10 @@ public class DataObject {
 		} else if (table.equals(Table.IP_LIMITS)) {
 			this.item = object1;
 			this.ipAddress = object2;
-		} 
+		} else if (table.equals(Table.ENABLED_PLAYERS)) {
+			this.item = object1;
+			this.isEnabled = object2;
+		}
 		this.table = table;
 		this.worldName = worldName;
 		this.timeStamp = new Timestamp(System.currentTimeMillis()).toString();
@@ -306,7 +307,8 @@ public class DataObject {
 			}
 		} else if (object1.getTable().equals(Table.ENABLED_PLAYERS)) {
 			if ((object1.getPlayerId().equalsIgnoreCase(object2.getPlayerId()))
-					&& (object1.getWorld().isEmpty() || (object1.getWorld().equalsIgnoreCase(object2.getWorld()) || object2.getWorld().equalsIgnoreCase("Global")))) {
+					&& (object1.getWorld().isEmpty() || (object1.getWorld().equalsIgnoreCase(object2.getWorld()) || object2.getWorld().equalsIgnoreCase("Global")))
+					&& (object1.getItem().equalsIgnoreCase(object2.getItem()))) {
 				return true;
 			}
 		} else if (object1.getTable().equals(Table.RETURN_ITEMS)) {
@@ -381,7 +383,7 @@ public class DataObject {
        FIRST_WORLD("first_world", "`World_Name`, `Player_UUID`, `Item_Name`, `Time_Stamp`", "Player_UUID"), 
        IP_LIMITS("ip_limits", "`World_Name`, `Player_UUID`, `Item_Name`, `IP_Address`, `Time_Stamp`", "Player_UUID"), 
        FIRST_COMMANDS("first_commands", "`World_Name`, `Player_UUID`, `Command_String`, `Time_Stamp`", "Player_UUID"), 
-       ENABLED_PLAYERS("enabled_players", "`World_Name`, `Player_UUID`, `isEnabled`, `Time_Stamp`", "Player_UUID, World_Name"), 
+       ENABLED_PLAYERS("enabled_players", "`World_Name`, `Player_UUID`, `Item_Name`, `isEnabled`, `Time_Stamp`", "Player_UUID, World_Name"), 
        RETURN_ITEMS("return_items", "`World_Name`, `Region_Name`, `Player_UUID`, `Inventory64`, `Time_Stamp`", "Player_UUID, World_Name, Region_Name"), 
        RETURN_SWITCH_ITEMS("return_switch_items", "`World_Name`, `Player_UUID`, `Inventory64`, `Time_Stamp`", "Player_UUID, World_Name"), 
        RETURN_CRAFTITEMS("return_craftitems", "`Player_UUID`, `Inventory64`, `Time_Stamp`", "Player_UUID"), 

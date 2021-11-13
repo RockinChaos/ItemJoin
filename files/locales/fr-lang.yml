@@ -109,6 +109,7 @@ commands:
     forPlayerWorldFailed: '%prefix% &cVous avez déjà &eactivé les items dans &7[&e%world%&7] &cpour &e%player%&c.'
     globalPlayers: '%prefix% &aVous avez &eactivé &btous les items &apour &etous les joueurs&a.'
     globalPlayersFailed: '%prefix% &cLes items ont déja été &eactivé &cpour &etous les joueurs&c.'
+    togglePlayerFailed: '%prefix% &cVous ne pouvez pas activer l'élément %item% car tous les éléments sont désactivés pour vous globalement !'
   disabled:
     forPlayer: '%prefix% &aVous avez &edésactivé &btous les items &apour &e%player%&a.'
     forTarget: '%prefix% &a%player% a &edésactivé &btous les items &apour vous.'
@@ -118,6 +119,7 @@ commands:
     forPlayerWorldFailed: '%prefix% &cVous avez déjà &edésactivé les items dans &7[&e%world%&7] &cpour &e%player%&c.'
     globalPlayers: '%prefix% &aVous avez &edésactivé &btous les items &apour &etous les joueurs&a.'
     globalPlayersFailed: '%prefix% &cLes items ont déja été &edésactivé &cpour &etous les joueurs&c.'
+    togglePlayerFailed: '%prefix% &cVous ne pouvez pas désactiver l'élément %item% car tous les éléments sont désactivés pour vous globalement !'
 
 # Ces espaces réservés sont spécifiques aux messages du plugin.
 placeholders:

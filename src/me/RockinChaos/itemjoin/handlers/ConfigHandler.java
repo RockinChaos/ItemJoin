@@ -33,8 +33,8 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import me.RockinChaos.itemjoin.ChatExecutor;
-import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.ChatTab;
+import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.item.ItemDesigner;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
@@ -131,13 +131,13 @@ public class ConfigHandler {
 				ServerUtils.logInfo(customItems + " Custom item(s) loaded!");
 			}
 			this.registerPrevent();
-			SQL.newData(reload); {
+			SQL.newData(reload);
+		}); {
 				ItemDesigner.getDesigner(true); {
 					SchedulerUtils.runSingleAsync(() -> {
 						ItemJoin.getInstance().setStarted(true);
 						this.setPages();
-					});
-				} {
+					}); {
 					SchedulerUtils.runAsyncLater(100L, () -> {
 						final MetricsAPI metrics = new MetricsAPI(ItemJoin.getInstance(), 4115);
 						DependAPI.getDepends(false).addCustomCharts(metrics);
@@ -145,7 +145,7 @@ public class ConfigHandler {
 					});
 				}
 			}
-		});
+		}
 	}
 	
    /**
@@ -359,6 +359,7 @@ public class ConfigHandler {
     */
 	public void reloadConfigs(final boolean silent) {
 		ItemUtilities.getUtilities().closeAnimations();
+		ItemUtilities.getUtilities().delToggleCommands();
 		ItemUtilities.getUtilities().clearItems();
 		config = new ConfigHandler(); 
         config.registerClasses(silent);

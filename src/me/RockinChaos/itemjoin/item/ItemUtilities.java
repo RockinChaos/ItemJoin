@@ -118,6 +118,16 @@ public class ItemUtilities {
 	}
 	
    /**
+    * Deletes the Toggle Commands registered for the server.
+    * 
+    */
+	public void delToggleCommands() {
+		for (ItemMap item : this.getItems()) {
+			item.delToggleCommands();
+		}
+	}
+	
+   /**
     * Closes the ItemAnimations for the specified Player.
     * 
     * @param player - The Player that is having their item animations closed.
@@ -231,7 +241,7 @@ public class ItemUtilities {
 		      || ((((type.equals(TriggerType.REGION_ENTER) && (item.isGiveOnRegionEnter() || item.isGiveOnRegionAccess())) 
 			  || (type.equals(TriggerType.REGION_LEAVE) && (item.isGiveOnRegionLeave() || item.isGiveOnRegionEgress()))) && item.inRegion(region))))
 			   && item.isLimitMode(gameMode) && ChanceAPI.getChances().isProbability(item, randomMap) && item.conditionMet(player, "trigger-conditions")
-			   && PlayerHandler.isEnabled(player) && item.hasPermission(player, world) 
+			   && PlayerHandler.isEnabled(player, item.getConfigName()) && item.hasPermission(player, world) 
 			   && this.isObtainable(player, item, session, type)) {
 				item.giveTo(player); 
 			} else if (((type.equals(TriggerType.LIMIT_SWITCH) && item.isUseOnLimitSwitch() && !item.isLimitMode(gameMode))

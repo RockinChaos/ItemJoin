@@ -17,14 +17,21 @@
  */
 package me.RockinChaos.itemjoin.utils;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandMap;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.command.PluginCommand;
+import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.SimplePluginManager;
 
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.handlers.ConfigHandler;
@@ -57,6 +64,53 @@ public class ServerUtils {
     */
     public static boolean isUUIDCompatible() {
         return hasSpecificUpdate("1_8");
+    }
+    
+   /**
+    * Attempts to manually register a PluginCommands list for the plugin instance.
+    *
+    * @param commands - The PluginCommands to be registered.
+    */
+    public static void registerCommands(final List<PluginCommand> commands){
+        try {
+        	CommandMap commandMap = null;
+            if (Bukkit.getPluginManager() instanceof SimplePluginManager) {
+                Field f = SimplePluginManager.class.getDeclaredField("commandMap");
+                f.setAccessible(true);
+                commandMap = (CommandMap)f.get((Object)Bukkit.getPluginManager());
+            } {
+	            for (PluginCommand command : commands) {
+	            	commandMap.register(ItemJoin.getInstance().getDescription().getName(), (Command)command);
+	            }
+            }
+        } catch (Exception e) {
+            ServerUtils.sendDebugTrace(e);
+        }
+    }
+    
+   /**
+    * Attempts to manually unregister a PluginCommands list for the plugin instance.
+    *
+    * @param commands - The PluginCommands to be unregistered.
+    */
+    public static void unregisterCommands(final List<PluginCommand> commands) {
+        Field commandMap = null;
+        Field knownCommands = null;
+        try {
+        	if (Bukkit.getPluginManager() instanceof SimplePluginManager) {
+	            commandMap = Bukkit.getServer().getClass().getDeclaredField("commandMap");
+	            commandMap.setAccessible(true);
+	            knownCommands = SimpleCommandMap.class.getDeclaredField("knownCommands");
+	            knownCommands.setAccessible(true);
+        	} {
+	            for (PluginCommand command : commands) {
+		            ((Map<String, Command>) knownCommands.get((SimpleCommandMap) commandMap.get(Bukkit.getServer()))).remove(command.getName());
+		            command.unregister((CommandMap) commandMap.get(Bukkit.getServer()));
+	            }
+        	}
+        } catch (Exception e) {
+        	ServerUtils.sendDebugTrace(e);
+        }
     }
 	
    /**

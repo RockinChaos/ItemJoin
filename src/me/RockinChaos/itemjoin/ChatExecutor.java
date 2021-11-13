@@ -454,7 +454,7 @@ public class ChatExecutor implements CommandExecutor {
 						? new DataObject(Table.FIRST_JOIN, PlayerHandler.getPlayerID(PlayerHandler.getPlayerString(args)), "", "", "") : (table.replace("-", "_").equalsIgnoreCase("first_world") 
 						? new DataObject(Table.FIRST_WORLD, PlayerHandler.getPlayerID(PlayerHandler.getPlayerString(args)), "", "", "") : (table.replace("-", "_").equalsIgnoreCase("ip_limits") 
 						? new DataObject(Table.IP_LIMITS, PlayerHandler.getPlayerID(PlayerHandler.getPlayerString(args)), "", "", "") : (table.replace("-", "_").equalsIgnoreCase("enabled_players") 
-						? new DataObject(Table.ENABLED_PLAYERS, PlayerHandler.getPlayerID(PlayerHandler.getPlayerString(args)), "", "", "") : (table.replace("-", "_").equalsIgnoreCase("first_commands") 
+						? new DataObject(Table.ENABLED_PLAYERS, PlayerHandler.getPlayerID(PlayerHandler.getPlayerString(args)), "", "", "", "") : (table.replace("-", "_").equalsIgnoreCase("first_commands") 
 						? new DataObject(Table.FIRST_COMMANDS, PlayerHandler.getPlayerID(PlayerHandler.getPlayerString(args)), "", "", "") : null))))));
 				if (dataObject != null) { SQL.getData().removeData(dataObject); }
 			} 
@@ -499,10 +499,10 @@ public class ChatExecutor implements CommandExecutor {
 		Player argsPlayer = (arguments >= 2 ? PlayerHandler.getPlayerString(player) : null);
 		String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[1] = (arguments >= 2 ? player : sender.getName()); placeHolders[0] = world;
 		if (arguments >= 2 && argsPlayer == null) { LanguageAPI.getLang(false).sendLangMessage("commands.default.noTarget", sender, placeHolders); return; }
-		DataObject dataObject = SQL.getData().getData(new DataObject(Table.ENABLED_PLAYERS, PlayerHandler.getPlayerID(argsPlayer), world, String.valueOf(true)));
+		DataObject dataObject = SQL.getData().getData(new DataObject(Table.ENABLED_PLAYERS, PlayerHandler.getPlayerID(argsPlayer), world, "ALL", String.valueOf(true)));
 		if (dataObject == null || Boolean.valueOf(dataObject.getEnabled()).equals(false)) {
-			SQL.getData().removeData(new DataObject(Table.ENABLED_PLAYERS, PlayerHandler.getPlayerID(argsPlayer), world, String.valueOf(false)));
-			SQL.getData().saveData(new DataObject(Table.ENABLED_PLAYERS, PlayerHandler.getPlayerID(argsPlayer), world, String.valueOf(true)));
+			SQL.getData().removeData(new DataObject(Table.ENABLED_PLAYERS, PlayerHandler.getPlayerID(argsPlayer), world, "ALL", String.valueOf(false)));
+			SQL.getData().saveData(new DataObject(Table.ENABLED_PLAYERS, PlayerHandler.getPlayerID(argsPlayer), world, "ALL", String.valueOf(true)));
 			LanguageAPI.getLang(false).sendLangMessage("commands.enabled." + (arguments == 3 ? "forPlayerWorld" : (arguments == 2 ? "forPlayer" : "globalPlayers")), sender, placeHolders); 
 			if (arguments >= 2 && !sender.getName().equalsIgnoreCase(argsPlayer.getName())) { 
 				placeHolders[1] = sender.getName(); 
@@ -523,10 +523,10 @@ public class ChatExecutor implements CommandExecutor {
 		Player argsPlayer = (arguments >= 2 ? PlayerHandler.getPlayerString(player) : null);
 		String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[1] = (arguments >= 2 ? player : sender.getName()); placeHolders[0] = world;
 		if (arguments >= 2 && argsPlayer == null) { LanguageAPI.getLang(false).sendLangMessage("commands.default.noTarget", sender, placeHolders); return; }
-		DataObject dataObject = SQL.getData().getData(new DataObject(Table.ENABLED_PLAYERS, PlayerHandler.getPlayerID(argsPlayer), world, String.valueOf(false)));
+		DataObject dataObject = SQL.getData().getData(new DataObject(Table.ENABLED_PLAYERS, PlayerHandler.getPlayerID(argsPlayer), world, "ALL", String.valueOf(false)));
 		if (dataObject == null || Boolean.valueOf(dataObject.getEnabled()).equals(true)) {
-			SQL.getData().removeData(new DataObject(Table.ENABLED_PLAYERS, PlayerHandler.getPlayerID(argsPlayer), world, String.valueOf(true)));
-			SQL.getData().saveData(new DataObject(Table.ENABLED_PLAYERS, PlayerHandler.getPlayerID(argsPlayer), world, String.valueOf(false)));
+			SQL.getData().removeData(new DataObject(Table.ENABLED_PLAYERS, PlayerHandler.getPlayerID(argsPlayer), world, "ALL", String.valueOf(true)));
+			SQL.getData().saveData(new DataObject(Table.ENABLED_PLAYERS, PlayerHandler.getPlayerID(argsPlayer), world, "ALL", String.valueOf(false)));
 			LanguageAPI.getLang(false).sendLangMessage("commands.disabled." + (arguments == 3 ? "forPlayerWorld" : (arguments == 2 ? "forPlayer" : "globalPlayers")), sender, placeHolders); 
 			if (arguments >= 2 && !sender.getName().equalsIgnoreCase(argsPlayer.getName())) { 
 				placeHolders[1] = sender.getName(); 

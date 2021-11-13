@@ -109,6 +109,7 @@ commands:
     forPlayerWorldFailed: '%prefix% &6你已为 &e%target_player% &6启用过 &e%world% &6的所有特殊物品'
     globalPlayers: '%prefix% &a你已为所有玩家启用特殊物品'
     globalPlayersFailed: '%prefix% &6所有玩家已启用过所有特殊物品'
+    togglePlayerFailed: '%prefix% &c您无法启用项目 %item%，因为所有项目都已为您全局禁用！'
   disabled:
     forPlayer: '%prefix% &c你已取消 &e%player% &c的所有特殊物品'
     forTarget: '%prefix% &e%player% &c取消了你的所有特殊物品'
@@ -118,6 +119,7 @@ commands:
     forPlayerWorldFailed: '%prefix% &6你已为 &e%target_player% &6取消过 &e%world% &6的所有特殊物品'
     globalPlayers: '%prefix% &c你已为所有玩家取消特殊物品'
     globalPlayersFailed: '%prefix% &6所有玩家已取消过所有特殊物品'
+    togglePlayerFailed: '%prefix% &c您无法禁用项目 %item%，因为所有项目都已为您全局禁用！'
 
 # 这些占位符特定于插件消息.
 placeholders:
