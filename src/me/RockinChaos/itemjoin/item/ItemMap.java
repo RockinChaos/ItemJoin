@@ -4274,6 +4274,9 @@ public class ItemMap {
 			this.tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_PLACED_ON);
 			this.tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_POTION_EFFECTS);
 			this.tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_UNBREAKABLE);
+			if (ServerUtils.hasSpecificUpdate("1_17")) {
+				this.tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_DYE);
+			}
 		}
 	}
 //  =========================================================================================================================================================== //	
