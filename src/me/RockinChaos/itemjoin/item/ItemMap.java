@@ -162,6 +162,8 @@ public class ItemMap {
     
     private String teleportEffect;
     private String teleportSound;
+	private Double teleportSoundVolume = 1.0;
+	private Double teleportSoundPitch = 1.0;
     
 	private Integer interactCooldown = 0;
 	private boolean customConsumable = false;
@@ -211,6 +213,8 @@ public class ItemMap {
 	private Integer commandsReceive = 0;
 	private String cooldownMessage;
 	private Sound commandSound;
+	private Double commandSoundVolume = 1.0;
+	private Double commandSoundPitch = 1.0;
 	private String commandParticle;
 	private String itemCost;
 	private Integer cost = 0;
@@ -410,8 +414,24 @@ public class ItemMap {
     * 
     */
 	private void setCommandSound() {
-		try { if (this.nodeLocation.getString(".commands-sound") != null) { this.commandSound = Sound.valueOf(this.nodeLocation.getString(".commands-sound")); } } 
-		catch (Exception e) { 
+		try { 
+			if (this.nodeLocation.getString(".commands-sound") != null) { 
+				final String sound = this.nodeLocation.getString(".commands-sound");
+				if (sound.contains(":")) {
+					final String[] soundParts = sound.split(":");
+					this.commandSound = Sound.valueOf(soundParts[0]);
+					try {
+						this.commandSoundVolume = Double.valueOf(soundParts[1]);
+						this.commandSoundPitch = Double.valueOf(soundParts[2]);
+					} catch (Exception e) { 
+						ServerUtils.logSevere("{ItemMap} The formatting for the item " + this.configName + " commands-sound is incorrect and will not be set!"); 
+						ServerUtils.sendDebugTrace(e);
+					}
+				} else {
+					this.commandSound = Sound.valueOf(this.nodeLocation.getString(".commands-sound"));
+				}
+			} 
+		} catch (Exception e) { 
 			ServerUtils.logSevere("{ItemMap} Your server is running MC " + ReflectionUtils.getServerVersion() + " and this version of Minecraft does not have the defined command-sound " + this.nodeLocation.getString(".commands-sound") + "."); 
 			ServerUtils.sendDebugTrace(e);
 		}
@@ -460,12 +480,28 @@ public class ItemMap {
 	}
 	
    /**
-    * Sets the ItemMaps Interact Cooldown.
+    * Sets the ItemMaps Teleport Arrow.
     * 
     */
 	private void setTeleportArrow() {
         this.teleportEffect = this.nodeLocation.getString(".teleport-effect");
-        this.teleportSound = this.nodeLocation.getString(".teleport-sound");
+        final String sound = this.nodeLocation.getString(".teleport-sound");
+        if (sound != null && sound.contains(":")) {
+        	
+        }
+		if (sound != null && sound.contains(":")) {
+			final String[] soundParts = sound.split(":");
+			this.teleportSound = soundParts[0];
+			try {
+				this.teleportSoundVolume = Double.valueOf(soundParts[1]);
+				this.teleportSoundPitch = Double.valueOf(soundParts[2]);
+			} catch (Exception e) { 
+				ServerUtils.logSevere("{ItemMap} The formatting for the item " + this.configName + " teleport-sound is incorrect and will not be set!"); 
+				ServerUtils.sendDebugTrace(e);
+			}
+		} else {
+			this.teleportSound = sound;
+		}
 	}
 	
    /**
@@ -1055,6 +1091,24 @@ public class ItemMap {
 	}
 	
    /**
+    * Sets the Commands Sound Volume.
+    * 
+    * @param sound - The Commands Sound Volume to be set.
+    */
+	public void setCommandVolume(final Double volume) {
+		this.commandSoundVolume = volume;
+	}
+	
+   /**
+    * Sets the Commands Sound Pitch.
+    * 
+    * @param sound - The Commands Sound Pitch to be set.
+    */
+	public void setCommandPitch(final Double pitch) {
+		this.commandSoundPitch = pitch;
+	}
+	
+   /**
     * Sets the Commands Cost.
     * 
     * @param cost - The Commands Cost to be set.
@@ -1343,6 +1397,24 @@ public class ItemMap {
     */
 	public void setTeleportSound(final String name) {
         this.teleportSound = name;
+	}
+	
+   /**
+    * Sets the Teleport Volume.
+    * 
+    * @param volume - The value to be set.
+    */
+	public void setTeleportVolume(final Double volume) {
+        this.teleportSoundVolume = volume;
+	}
+	
+   /**
+    * Sets the Teleport Pitch.
+    * 
+    * @param pitch - The value to be set.
+    */
+	public void setTeleportPitch(final Double pitch) {
+        this.teleportSoundPitch = pitch;
 	}
 	
    /**
@@ -2361,6 +2433,24 @@ public class ItemMap {
 	}
 	
    /**
+    * Gets the Commands Sound Volume.
+    * 
+    * @return The Commands Sound Volume.
+    */
+	public Double getCommandVolume() {
+		return this.commandSoundVolume;	
+	}
+	
+   /**
+    * Gets the Commands Sound Pitch.
+    * 
+    * @return The Commands Sound Pitch.
+    */
+	public Double getCommandPitch() {
+		return this.commandSoundPitch;	
+	}
+	
+   /**
     * Gets the Commands Warmup Delay.
     * 
     * @return The Commands Warmup Delay.
@@ -2798,6 +2888,24 @@ public class ItemMap {
     */
 	public String getTeleportSound() {
 		return this.teleportSound;
+	}
+	
+   /**
+    * Gets the Teleport Volume.
+    * 
+    * @return The Teleport Volume.
+    */
+	public Double getTeleportVolume() {
+		return this.teleportSoundVolume;
+	}
+	
+   /**
+    * Gets the Teleport Pitch.
+    * 
+    * @return The Teleport Pitch.
+    */
+	public Double getTeleportPitch() {
+		return this.teleportSoundPitch;
 	}
 	
    /**
@@ -4842,7 +4950,7 @@ public class ItemMap {
 	private void playSound(final Player player) {
 		if (this.commandSound != null) {
 			try {
-				player.playSound(player.getLocation(), this.commandSound, 1, 1);
+				player.playSound(player.getLocation(), this.commandSound, (float) ((double)this.commandSoundVolume), (float) ((double)this.commandSoundPitch));
 			} catch (Exception e) {
 				ServerUtils.logSevere("{ItemMap} There was an issue executing the commands-sound you defined.");
 				ServerUtils.logWarn("{ItemMap} " + this.commandSound + " is not a sound in " + ReflectionUtils.getServerVersion() + ".");
@@ -5283,7 +5391,7 @@ public class ItemMap {
 			if (!physical.isEmpty()) { this.setMapCommand(itemData, physical, "physical"); }
 		}
 		if (this.toggleCommands != null && !this.getToggleCommands().isEmpty()) { itemData.set("items." + this.configName + ".toggle", this.toggleCommands); }
-		if (this.commandSound != null) { itemData.set("items." + this.configName + ".commands-sound", this.commandSound.name()); }
+		if (this.commandSound != null) { itemData.set("items." + this.configName + ".commands-sound", this.commandSound.name() + ((this.commandSoundVolume != 1.0 && this.commandSoundPitch != 1.0) ? ":" + this.commandSoundVolume + ":" + this.commandSoundPitch : "")); }
 		if (this.commandParticle != null && !this.commandParticle.isEmpty()) { itemData.set("items." + this.configName + ".commands-particle", this.commandParticle); }
 		if (this.sequence != null && this.sequence != CommandSequence.SEQUENTIAL) { itemData.set("items." + this.configName + ".commands-sequence", this.sequence.name()); }
 		if (this.itemCost != null && !this.itemCost.isEmpty()) { itemData.set("items." + this.configName + ".commands-item", this.itemCost); }
@@ -5309,7 +5417,7 @@ public class ItemMap {
 		}
 		if (this.interactCooldown != null && this.interactCooldown != 0) { itemData.set("items." + this.configName + ".use-cooldown", this.interactCooldown); }
 		if (this.teleportEffect != null && !this.teleportEffect.isEmpty()) { itemData.set("items." + this.configName + ".teleport-effect", this.teleportEffect); }
-		if (this.teleportSound != null && !this.teleportSound.isEmpty()) { itemData.set("items." + this.configName + ".teleport-sound", this.teleportSound); }
+		if (this.teleportSound != null && !this.teleportSound.isEmpty()) { itemData.set("items." + this.configName + ".teleport-sound", this.teleportSound + ((this.teleportSoundVolume != 1.0 && this.teleportSoundPitch != 1.0) ? ":" + this.teleportSoundVolume + ":" + this.teleportSoundPitch : "")); }
 		if (this.itemflags != null && !this.itemflags.isEmpty()) { itemData.set("items." + this.configName + ".itemflags", this.itemflags); }
 		if (this.triggers != null && !this.triggers.isEmpty()) { itemData.set("items." + this.configName + ".triggers", this.triggers); }
 		if (this.limitModes != null && !this.limitModes.isEmpty()) { itemData.set("items." + this.configName + ".limit-modes", this.limitModes); }

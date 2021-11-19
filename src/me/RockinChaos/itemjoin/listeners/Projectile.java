@@ -108,9 +108,9 @@ public class Projectile implements Listener {
 	            		ServerUtils.logSevere("The defined teleport-effect " + itemMap.getTeleportEffect() + " for the item " + itemMap.getConfigName() + " is not valid!"); 
 	            	}
 	            }
-	            if (itemMap.getTeleportSound() != null) {
+	            if (itemMap.getTeleportSound() != null && !itemMap.getTeleportSound().isEmpty()) {
 	            	try {
-	            		((Arrow)projectile).getWorld().playSound(((Arrow)projectile).getLocation(), Sound.valueOf(itemMap.getTeleportSound()), 2.0f, 1.0f);
+	            		((Arrow)projectile).getWorld().playSound(((Arrow)projectile).getLocation(), Sound.valueOf(itemMap.getTeleportSound()), (float) ((double)itemMap.getTeleportVolume()), (float) ((double)itemMap.getTeleportPitch()));
 	            	} catch (Exception e) {
 	            		ServerUtils.logSevere("The defined teleport-sound " + itemMap.getTeleportSound() + " for the item " + itemMap.getConfigName() + " is not valid!"); 
 	            	}

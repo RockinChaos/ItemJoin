@@ -3386,7 +3386,9 @@ public class Menu {
 				itemMap.setCooldownMessage(ChatColor.stripColor(event.getMessage()));String[] placeHolders = LanguageAPI.getLang(false).newString();placeHolders[16] = "COOLDOWN MESSAGE";LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);commandPane(event.getPlayer(), itemMap);
 			}));
 			commandPane.addButton(new Button(ItemHandler.getItem("JUKEBOX", 1, false, "&a&lSound", "&7", "&7*The sound that will be", "&7played after a successful", "&7command execution.", "&9&lCOMMANDS-SOUND: &a" + 
-			StringUtils.nullCheck(itemMap.getCommandSound() + "")), event -> {
+			StringUtils.nullCheck(itemMap.getCommandSound() + ""), 
+			"&9&lVOLUME: &a" + ((StringUtils.nullCheck(itemMap.getCommandSound() + "") != "NONE") ? itemMap.getCommandVolume() : "0"),
+			"&9&lPITCH: &a" + ((StringUtils.nullCheck(itemMap.getCommandSound() + "") != "NONE") ? itemMap.getCommandPitch() : "0")), event -> {
 				if (StringUtils.nullCheck(itemMap.getCommandSound() + "") != "NONE") {
 					itemMap.setCommandSound(null);
 					commandPane(player, itemMap);
@@ -4173,7 +4175,7 @@ public class Menu {
 		Interface soundPane = new Interface(true, 6, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 				if (stage != 3) {
-					soundPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the teleport menu."), event -> commandPane(player, itemMap)));
+					soundPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the teleport menu."), event -> teleportPane(player, itemMap, stage)));
 				} else { 
 					soundPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item commands menu."), event -> commandPane(player, itemMap))); 
 				}
@@ -4182,14 +4184,126 @@ public class Menu {
 				if (stage != 3) {
 					soundPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "MUSIC_DISC_MELLOHI" : "2262"), 1, false, "&f" + sound.name(), "&7", "&7*Click to set the", "&7teleport-sound of the item."), event -> {
 						itemMap.setTeleportSound(sound.name());
-						teleportPane(player, itemMap, stage);
+						soundVolumePane(player, itemMap, stage);
 					}));
 				} else {
 					soundPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "MUSIC_DISC_MELLOHI" : "2262"), 1, false, "&f" + sound.name(), "&7", "&7*Click to set the", "&7commands-sound of the item."), event -> {
 						itemMap.setCommandSound(sound);
-						commandPane(player, itemMap);
+						soundVolumePane(player, itemMap, stage);
 					}));
 				}
+			}
+		});
+		soundPane.open(player);
+	}
+	
+   /**
+    * Opens the Pane for the Player.
+    * This Pane is for setting an item commands sound volume.
+    * 
+    * @param player - The Player to have the Pane opened.
+    * @param itemMap - The ItemMap currently being modified.
+    */
+	private static void soundVolumePane(final Player player, final ItemMap itemMap, final int stage) {
+		Interface soundPane = new Interface(true, 6, GUIName, player);
+		SchedulerUtils.runAsync(() -> {
+			if (stage != 3) {
+				soundPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the teleport menu."), event -> teleportPane(player, itemMap, stage)));
+			} else { 
+				soundPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item commands menu."), event -> commandPane(player, itemMap))); 
+			}
+			soundPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, "&e&lCustom Volume", "&7", "&7*Click to set a custom sound volume value."), event -> {
+				player.closeInventory();
+				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				placeHolders[16] = "SOUND VOLUME";
+				placeHolders[15] = "1.4";
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+			}, event -> {
+				if (StringUtils.isDouble(ChatColor.stripColor(event.getMessage()))) {
+					if (stage != 3) {
+						itemMap.setTeleportVolume(Double.parseDouble(ChatColor.stripColor(event.getMessage())));
+					} else {
+						itemMap.setCommandVolume(Double.parseDouble(ChatColor.stripColor(event.getMessage())));
+					}
+					soundPitchPane(player, itemMap, stage);
+					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					placeHolders[16] = "SOUND VOLUME";
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+				} else {
+					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					placeHolders[16] = ChatColor.stripColor(event.getMessage());
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.noInteger", player, placeHolders);
+					soundVolumePane(event.getPlayer(), itemMap, stage);
+				}
+			}));
+			for (int i = 1; i <= 64; i++) {
+				final int k = i;
+				soundPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GREEN_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:13"), k, false, "&9&lVolume: &a&l" + k, "&7", "&7*Click to set the sound volume."), event -> {
+					if (stage != 3) {
+						itemMap.setTeleportVolume((double) k);
+					} else {
+						itemMap.setCommandVolume((double) k);
+					}
+					soundPitchPane(player, itemMap, stage);
+				}));
+			}
+		});
+		soundPane.open(player);
+	}
+	
+   /**
+    * Opens the Pane for the Player.
+    * This Pane is for setting an item commands sound pitch.
+    * 
+    * @param player - The Player to have the Pane opened.
+    * @param itemMap - The ItemMap currently being modified.
+    */
+	private static void soundPitchPane(final Player player, final ItemMap itemMap, final int stage) {
+		Interface soundPane = new Interface(true, 6, GUIName, player);
+		SchedulerUtils.runAsync(() -> {
+			if (stage != 3) {
+				soundPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the teleport menu."), event -> teleportPane(player, itemMap, stage)));
+			} else { 
+				soundPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item commands menu."), event -> commandPane(player, itemMap))); 
+			}
+			soundPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, "&e&lCustom Pitch", "&7", "&7*Click to set a custom sound pitch", "&7value for the command sound."), event -> {
+				player.closeInventory();
+				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				placeHolders[16] = "SOUND PITCH";
+				placeHolders[15] = "0.8";
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
+				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+			}, event -> {
+				if (StringUtils.isDouble(ChatColor.stripColor(event.getMessage()))) {
+					if (stage != 3) {
+						itemMap.setTeleportPitch(Double.parseDouble(ChatColor.stripColor(event.getMessage())));
+						teleportPane(player, itemMap, stage);
+					} else {
+						itemMap.setCommandPitch(Double.parseDouble(ChatColor.stripColor(event.getMessage())));
+						commandPane(player, itemMap);
+					}
+					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					placeHolders[16] = "SOUND PITCH";
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+				} else {
+					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					placeHolders[16] = ChatColor.stripColor(event.getMessage());
+					LanguageAPI.getLang(false).sendLangMessage("commands.menu.noInteger", player, placeHolders);
+					soundPitchPane(event.getPlayer(), itemMap, stage);
+				}
+			}));
+			for (int i = 1; i <= 64; i++) {
+				final int k = i;
+				soundPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "BLUE_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:11"), k, false, "&9&lPitch: &a&l" + k, "&7", "&7*Click to set the sound pitch", "&7for the command sound."), event -> {
+					if (stage != 3) {
+						itemMap.setTeleportPitch((double) k);
+						teleportPane(player, itemMap, stage);
+					} else {
+						itemMap.setCommandPitch((double) k);
+						commandPane(player, itemMap);
+					}
+				}));
 			}
 		});
 		soundPane.open(player);
@@ -7463,8 +7577,16 @@ public class Menu {
 				teleportPane(player, itemMap, stage);
 			}));
 			teleportPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "MUSIC_DISC_MELLOHI" : "2262"), 1, false, "&a&lTeleport Sound", "&7", "&7*The sound to play at the", "&7arrow landed location when", "&7the player is teleported.", 
-			"&9&lTeleport-Sound: &a" + StringUtils.nullCheck(itemMap.getTeleportSound())), event -> {
+			"&9&lTeleport-Sound: &a" + StringUtils.nullCheck(itemMap.getTeleportSound()),
+			"&9&lVolume: &a" + ((StringUtils.nullCheck(itemMap.getTeleportSound() + "") != "NONE") ? itemMap.getTeleportVolume() : "NONE"),
+			"&9&lPitch: &a" + ((StringUtils.nullCheck(itemMap.getTeleportSound() + "") != "NONE") ? itemMap.getTeleportPitch() : "NONE")), event -> {
 				soundPane(player, itemMap, stage);
+				if (StringUtils.nullCheck(itemMap.getTeleportSound() + "") != "NONE") {
+					itemMap.setTeleportSound(null);
+					teleportPane(player, itemMap, stage);
+				} else {
+					soundPane(player, itemMap, stage);
+				}
 			}));
 			teleportPane.addButton(new Button(fillerPaneGItem), 2);
 			if (stage == 1) {
