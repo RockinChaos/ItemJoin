@@ -32,6 +32,7 @@ import com.google.common.io.ByteStreams;
 public class BungeeAPI implements PluginMessageListener {
 	
 	private final String PLUGIN_CHANNEL = "plugin:cloudsync";
+	private boolean detectFailure = false;
 	private static BungeeAPI bungee;
 
    /**
@@ -80,8 +81,10 @@ public class BungeeAPI implements PluginMessageListener {
 			} catch (Exception e) { ServerUtils.sendDebugTrace(e); }
 			player.sendPluginMessage(ItemJoin.getInstance(), this.PLUGIN_CHANNEL, out.toByteArray());
 		} else {
-			ServerUtils.messageSender(player, "&cCloudSync was not detected on your BungeeCord server, the specified command /" + command + " will not work without it.");
-			ServerUtils.logWarn("A custom item is set to execute the Bungee command /" + command + " but, CloudSync was not detected on your BungeeCord server.");
+			if (!this.detectFailure) {
+				ServerUtils.logSevere("A custom item is set to execute the Bungee command /" + command + " but, CloudSync was not detected on your BungeeCord server.");
+				this.detectFailure = true;
+			}
 		}
 	}
 
