@@ -181,8 +181,13 @@ public class ItemUtilities {
 				@Override
 				public void run() {
 					try { 
-						if (fr.xephi.authme.api.v3.AuthMeApi.getInstance().isAuthenticated(player)) {
+						final fr.xephi.authme.api.v3.AuthMeApi authMe = fr.xephi.authme.api.v3.AuthMeApi.getInstance();
+						if (fr.xephi.authme.api.v3.AuthMeApi.getInstance().isAuthenticated(player) 
+						|| (authMe.getPlugin().getConfig().getString("settings.registration.force") != null 
+					    && !authMe.getPlugin().getConfig().getBoolean("settings.registration.force"))) {
 							setItems(player, world, type, newMode, region);
+							this.cancel();
+						} else if (!player.isOnline()) {
 							this.cancel();
 						}
 					} catch (NoClassDefFoundError e) {
