@@ -296,7 +296,12 @@ public class Menu {
 						ConfigHandler.getConfig().softReload();
 						SchedulerUtils.runLater(2L, () -> configSettings(player));
 					}));
-			configPane.addButton(new Button(fillerPaneBItem));
+			configPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GRASS_BLOCK" : "2"), 1, ((ConfigHandler.getConfig().getFile("config.yml").getStringList("Active-Commands.commands").size() != 0 
+					&& !StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Active-Commands.enabled-worlds"), "DISABLED"))), 
+					"&bActive Commands", "&7", "&7*Specify a list of commands", "&7to be executed upon performing a trigger.", "&7These commands are not related to", "&7custom items, rather the server itself.", 
+					"&9&lENABLED: &a" + ((ConfigHandler.getConfig().getFile("config.yml").getStringList("Active-Commands.commands").size() != 0 
+					&& !StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Active-Commands.enabled-worlds"), "DISABLED")) ? "YES" : "NO")), 
+					event -> activeCommands(player)));
 			configPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GOLDEN_APPLE" : "322"), 1, ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Commands-OP"), 
 					"&bPlugin Commands &c&l[OP PLAYERS]", "&7", "&7*If the plugin should check", "&7if the OP player has the", "&7proper permissions set to", "&7use the plugin commands.", 
 					"&7OP Players will no longer get", "&7access to all plugin commands", "&7by default.",
@@ -1219,6 +1224,39 @@ public class Menu {
     * 
     * @param player - The Player to have the Pane opened.
     */
+	private static void activeCommands(final Player player) {
+		Interface activePane = new Interface(false, 3, GUIName, player);
+		SchedulerUtils.runAsync(() -> {
+			final String triggers = ConfigHandler.getConfig().getFile("config.yml").getString("Active-Commands.triggers");
+			final String enabledList = ConfigHandler.getConfig().getFile("config.yml").getString("Active-Commands.enabled-worlds");
+			activePane.addButton(new Button(fillerPaneBItem), 4);
+			activePane.addButton(new Button(ItemHandler.getItem("BOOK", 1, ConfigHandler.getConfig().getFile("config.yml").getStringList("Active-Commands.commands").size() != 0, "&b&l&nCommands", "&7", 
+			"&7*Specify a list of commands to be", "&7executed upon performing a trigger.", 
+			"&9&lENABLED: &a" + (ConfigHandler.getConfig().getFile("config.yml").getStringList("Active-Commands.commands").size() != 0 ? "YES" : "NO")), event -> altCommandPane(player, null, 4)));
+			activePane.addButton(new Button(fillerPaneBItem), 6);
+			activePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "REPEATER" : "356"), 1, false, "&a&lSequence", "&7", "&7*The order that the command lines", 
+					"&7will be executed in.", "&9&lCOMMANDS-SEQUENCE: &a" + StringUtils.nullCheck(ConfigHandler.getConfig().getFile("config.yml").getString("Active-Commands.commands-sequence") + "")), event -> sequencePane(player, null, 4)));
+			activePane.addButton(new Button(fillerPaneBItem));
+			activePane.addButton(new Button(ItemHandler.getItem("REDSTONE", 1, false, 
+					"&bTriggers", "&7", "&7*This will be the triggers", "&7that will cause the command lines", "&7to execute.", 
+					"&9&lENABLED: &a" + String.valueOf((triggers != null && !triggers.isEmpty() && !StringUtils.containsIgnoreCase(triggers, "DISABLE")) ? triggers : "FALSE").toUpperCase()), 
+					event -> triggerPane(player, 4)));
+			activePane.addButton(new Button(fillerPaneBItem));
+			activePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GRASS_BLOCK" : "2"), 1, false, "&b&lEnabled Worlds", "&7", "&7*Define the world(s) that the", "&7commands will be executed in.", 
+					"&9&lENABLED-WORLDS: &a" + (StringUtils.nullCheck(enabledList) != "NONE" ? "&a" + enabledList : "NONE")), event -> worldPane(player, null, 4)));
+			activePane.addButton(new Button(fillerPaneBItem), 2);
+			activePane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the config settings menu."), event -> configSettings(player)));
+			activePane.addButton(new Button(fillerPaneBItem), 7);
+			activePane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the config settings menu."), event -> configSettings(player)));
+		});
+		activePane.open(player);
+	}
+	
+   /**
+    * Opens the Pane for the Player.
+    * 
+    * @param player - The Player to have the Pane opened.
+    */
 	private static void databasePane(final Player player) {
 		Interface databasePane = new Interface(false, 3, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
@@ -1380,8 +1418,8 @@ public class Menu {
     */
 	private static void triggerPane(final Player player, final int stage) {
 		final Interface triggerPane = new Interface(false, 3, GUIName, player);
-		final String triggerOption = (stage == 0 ? "&7*Gives the custom item when the" : "&7*Sets the held item slot when the");
-		final String triggerString = (stage == 0 ? "Settings.Default-Triggers" : "Settings.HeldItem-Triggers");
+		final String triggerOption = (stage == 4 ? "&7*Executes the commands when the" : (stage == 0 ? "&7*Gives the custom item when the" : "&7*Sets the held item slot when the"));
+		final String triggerString = (stage == 4 ? "Active-Commands.triggers" : (stage == 0 ? "Settings.Default-Triggers" : "Settings.HeldItem-Triggers"));
 		SchedulerUtils.runAsync(() -> {
 			List<String> triggers = new ArrayList<String>();
 			try {
@@ -1657,9 +1695,17 @@ public class Menu {
 				ConfigHandler.getConfig().softReload();
 				SchedulerUtils.runLater(2L, () -> triggerPane(player, stage));
 			}));
-			triggerPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item settings menu."), event -> itemSettings(player)));
+			if (stage == 4) {
+				triggerPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the active commands menu."), event -> activeCommands(player)));
+			} else {
+				triggerPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item settings menu."), event -> itemSettings(player)));
+			}
 			triggerPane.addButton(new Button(fillerPaneBItem), 7);
-			triggerPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item settings menu."), event -> itemSettings(player)));
+			if (stage == 4) {
+				triggerPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the active commands menu."), event -> activeCommands(player)));
+			} else {
+				triggerPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item settings menu."), event -> itemSettings(player)));
+			}
 		});
 		triggerPane.open(player);
 	}
@@ -3402,7 +3448,7 @@ public class Menu {
 					itemMap.setCommandSequence(null);
 					commandPane(player, itemMap);
 				} else {
-					sequencePane(player, itemMap);
+					sequencePane(player, itemMap, 0);
 				}
 			}));
 			commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "LAVA_BUCKET" : "327"), 1, false, "&a&lWarmup", "&7", "&7*The time it will take before", "&7the commands are executed.", "&7Player movement will cancel the", "&7pending commands execution.", "&7", 
@@ -4130,36 +4176,85 @@ public class Menu {
     * @param player - The Player to have the Pane opened.
     * @param itemMap - The ItemMap currently being modified.
     */
-	private static void sequencePane(final Player player, final ItemMap itemMap) {
+	private static void sequencePane(final Player player, final ItemMap itemMap, final int stage) {
 		Interface sequencePane = new Interface(false, 2, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
+			if (stage == 4) {
+				sequencePane.addButton(new Button(fillerPaneGItem));
+			} 
 			sequencePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CLOCK" : "347"), 1, false, "&a&lSequential", "&7", "&7*Executes the command lines", "&7in order from top to bottom."), event -> {
-				itemMap.setCommandSequence(CommandSequence.SEQUENTIAL);
-				commandPane(player, itemMap);
+				if (stage == 4) {
+					File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
+					dataFile.set("Active-Commands.commands-sequence", "SEQUENTIAL"); 	
+					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+					ConfigHandler.getConfig().softReload();
+					SchedulerUtils.runLater(2L, () -> activeCommands(player));
+				} else {
+					itemMap.setCommandSequence(CommandSequence.SEQUENTIAL);
+					commandPane(player, itemMap);
+				}
 			}));
 			sequencePane.addButton(new Button(fillerPaneGItem));
 			sequencePane.addButton(new Button(ItemHandler.getItem("DIAMOND", 1, false, "&a&lRandom Single", "&7", "&7*Executes one of the command lines", "&7randomly with equal values."), event -> {
-				itemMap.setCommandSequence(CommandSequence.RANDOM_SINGLE);
-				commandPane(player, itemMap);
+				if (stage == 4) {
+					File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
+					dataFile.set("Active-Commands.commands-sequence", "RANDOM_SINGLE"); 	
+					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+					ConfigHandler.getConfig().softReload();
+					SchedulerUtils.runLater(2L, () -> activeCommands(player));
+				} else {
+					itemMap.setCommandSequence(CommandSequence.RANDOM_SINGLE);
+					commandPane(player, itemMap);
+				}
 			}));
 			sequencePane.addButton(new Button(fillerPaneGItem));
 			sequencePane.addButton(new Button(ItemHandler.getItem("PAPER", 1, false, "&a&lRandom List", "&7", "&7*Randomly selects from a list", "&7of commands to execute."), event -> {
-				itemMap.setCommandSequence(CommandSequence.RANDOM_LIST);
-				commandPane(player, itemMap);
+				if (stage == 4) {
+					File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
+					dataFile.set("Active-Commands.commands-sequence", "RANDOM_LIST"); 	
+					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+					ConfigHandler.getConfig().softReload();
+					SchedulerUtils.runLater(2L, () -> activeCommands(player));
+				} else {
+					itemMap.setCommandSequence(CommandSequence.RANDOM_LIST);
+					commandPane(player, itemMap);
+				}
 			}));
 			sequencePane.addButton(new Button(fillerPaneGItem));
 			sequencePane.addButton(new Button(ItemHandler.getItem("EMERALD", 1, false, "&a&lRandom", "&7", "&7*Executes each command line in a", "&7random order with equal values."), event -> {
-				itemMap.setCommandSequence(CommandSequence.RANDOM);
-				commandPane(player, itemMap);
+				if (stage == 4) {
+					File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
+					dataFile.set("Active-Commands.commands-sequence", "RANDOM"); 	
+					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+					ConfigHandler.getConfig().softReload();
+					SchedulerUtils.runLater(2L, () -> activeCommands(player));
+				} else {
+					itemMap.setCommandSequence(CommandSequence.RANDOM);
+					commandPane(player, itemMap);
+				}
 			}));
 			sequencePane.addButton(new Button(fillerPaneGItem));
-			sequencePane.addButton(new Button(ItemHandler.getItem("CHEST", 1, false, "&a&lRemain", "&7", "&7*Executes each command only if", "&7the item exists in the player", "&7inventory at the time of executing", "&7a delayed command line.", "&7The commands will be sent in", "&7order from top to bottom."), event -> {
-				itemMap.setCommandSequence(CommandSequence.REMAIN);
-				commandPane(player, itemMap);
-			}));
-			sequencePane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item commands menu."), event -> commandPane(player, itemMap)));
+			if (stage != 4) {
+				sequencePane.addButton(new Button(ItemHandler.getItem("CHEST", 1, false, "&a&lRemain", "&7", "&7*Executes each command only if", "&7the item exists in the player", "&7inventory at the time of executing", "&7a delayed command line.", "&7The commands will be sent in", "&7order from top to bottom."), event -> {
+					itemMap.setCommandSequence(CommandSequence.REMAIN);
+					commandPane(player, itemMap);
+				}));
+			}
+			if (stage == 4) {
+				sequencePane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the active commands menu."), event -> activeCommands(player)));
+			} else {
+				sequencePane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item commands menu."), event -> commandPane(player, itemMap)));
+			}
 			sequencePane.addButton(new Button(fillerPaneBItem), 7);
-			sequencePane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item commands menu."), event -> commandPane(player, itemMap)));
+			if (stage == 4) {
+				sequencePane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the active commands menu."), event -> activeCommands(player)));
+			} else {
+				sequencePane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item commands menu."), event -> commandPane(player, itemMap)));
+			}
 		});
 		sequencePane.open(player);
 	}
@@ -5210,25 +5305,44 @@ public class Menu {
 	private static void worldPane(final Player player, final ItemMap itemMap, final int stage) {
 		Interface worldPane = new Interface(true, 6, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
-			worldPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> {
-				creatingPane(player, itemMap);
-			}));
-			List < String > listWorlds = (stage == 0 ? itemMap.getDisabledWorlds() : itemMap.getEnabledWorlds());
-			worldPane.addButton(new Button(ItemHandler.getItem("OBSIDIAN", 1, itemMap.containsWorld("ALL", (stage == 0 ? true : false)), "&a&l&nGLOBAL", "&7", "&7*Click to " + 
+			if (stage == 4) {
+				worldPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the active commands menu."), event -> {
+					activeCommands(player);
+				}));
+			} else {
+				worldPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> {
+					creatingPane(player, itemMap);
+				}));
+			}
+			List < String > listWorlds = (stage == 4 ? new ArrayList<String>(): (stage == 0 ? itemMap.getDisabledWorlds() : itemMap.getEnabledWorlds()));
+			if (stage == 4) {
+				for (String world : ConfigHandler.getConfig().getFile("config.yml").getString("Active-Commands.enabled-worlds").replace(" ", "").split(",")) {
+					listWorlds.add(world);
+				}
+			}
+			worldPane.addButton(new Button(ItemHandler.getItem("OBSIDIAN", 1, (stage == 4 ? (StringUtils.containsValue(listWorlds, "ALL") || StringUtils.containsValue(listWorlds, "GLOBAL")) : itemMap.containsWorld("ALL", (stage == 0 ? true : false))), "&a&l&nGLOBAL", "&7", "&7*Click to " + 
 					(stage == 0 ? "disable" : "enable") + " the", "&7custom item in &lALL WORLDS.", (stage == 0 ? "&9&lDISABLED:" : "&9&lENABLED:") + " &a" + 
-					(itemMap.containsWorld("ALL", (stage == 0 ? true : false)) + "").toUpperCase()), event -> {
-				if (itemMap.containsWorld("ALL", (stage == 0 ? true : false))) {
+					(stage == 4 ? (StringUtils.containsValue(listWorlds, "ALL") || StringUtils.containsValue(listWorlds, "GLOBAL")) : (itemMap.containsWorld("ALL", (stage == 0 ? true : false))) + "")), event -> {
+				if ((stage == 4 && (StringUtils.containsValue(listWorlds, "ALL") || StringUtils.containsValue(listWorlds, "GLOBAL"))) || (stage != 4 && itemMap.containsWorld("ALL", (stage == 0 ? true : false)))) {
 					listWorlds.remove("GLOBAL");
 					listWorlds.remove("ALL");
 				} else {
 					listWorlds.add("GLOBAL");
 				}
-				if (stage == 0) {
+				if (stage == 4) {
+						File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
+						dataFile.set("Active-Commands.enabled-worlds", (listWorlds.isEmpty() ? "DISABLED" : "GLOBAL")); 	
+						ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+						ConfigHandler.getConfig().softReload();
+						SchedulerUtils.runLater(2L, () -> worldPane(player, itemMap, stage));
+				} else if (stage == 0) {
 					itemMap.setDisabledWorlds(listWorlds);
+					worldPane(player, itemMap, stage);
 				} else {
 					itemMap.setEnabledWorlds(listWorlds);
+					worldPane(player, itemMap, stage);
 				}
-				worldPane(player, itemMap, stage);
 			}));
 			for (World world: Bukkit.getServer().getWorlds()) {
 				String worldMaterial = (ServerUtils.hasSpecificUpdate("1_13") ? "GRASS_BLOCK" : "2");
@@ -5237,20 +5351,40 @@ public class Menu {
 				} else if (world.getEnvironment().equals(Environment.THE_END)) {
 					worldMaterial = (ServerUtils.hasSpecificUpdate("1_13") ? "END_STONE" : "121");
 				}
-				worldPane.addButton(new Button(ItemHandler.getItem(worldMaterial, 1, itemMap.containsWorld(world.getName(), (stage == 0 ? true : false)), 
+				worldPane.addButton(new Button(ItemHandler.getItem(worldMaterial, 1, (stage == 4 ? StringUtils.containsValue(listWorlds, world.getName()) : itemMap.containsWorld(world.getName(), (stage == 0 ? true : false))), 
 						"&f&l" + world.getName(), "&7", "&7*Click to " + (stage == 0 ? "disable" : "enable") + " the", "&7custom item in this world.", 
-						(stage == 0 ? "&9&lDISABLED:" : "&9&lENABLED:") + " &a" + (itemMap.containsWorld(world.getName(), (stage == 0 ? true : false)) + "").toUpperCase()), event -> {
-					if (itemMap.containsWorld(world.getName(), (stage == 0 ? true : false))) {
+						(stage == 0 ? "&9&lDISABLED:" : "&9&lENABLED:") + " &a" + (stage == 4 ? StringUtils.containsValue(listWorlds, world.getName()) : (itemMap.containsWorld(world.getName(), (stage == 0 ? true : false))) + "")), event -> {
+					if ((stage == 4 && StringUtils.containsValue(listWorlds, world.getName())) || (stage != 4 && itemMap.containsWorld(world.getName(), (stage == 0 ? true : false)))) {
 						listWorlds.remove(world.getName());
 					} else {
 						listWorlds.add(world.getName());
 					}
-					if (stage == 0) {
+					if (stage == 4) {
+						if (listWorlds.isEmpty()) {
+							listWorlds.add("DISABLED");
+						} else if (StringUtils.containsValue(listWorlds, "DISABLED") || StringUtils.containsValue(listWorlds, "DISABLE")) {
+							listWorlds.remove("DISABLED");
+						}
+						String worldList = "";
+						for (String worldString : listWorlds) {
+							worldList += worldString + ", ";
+						}
+						if (!worldList.isEmpty()) {
+							worldList = worldList.substring(0, worldList.length() - 2);
+						}
+						File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
+						dataFile.set("Active-Commands.enabled-worlds", worldList); 	
+						ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+						ConfigHandler.getConfig().softReload();
+						SchedulerUtils.runLater(2L, () -> worldPane(player, itemMap, stage));
+					} else if (stage == 0) {
 						itemMap.setDisabledWorlds(listWorlds);
+						worldPane(player, itemMap, stage);
 					} else {
 						itemMap.setEnabledWorlds(listWorlds);
+						worldPane(player, itemMap, stage);
 					}
-					worldPane(player, itemMap, stage);
 				}));
 			}
 		});
@@ -7060,38 +7194,55 @@ public class Menu {
 	
    /**
     * Opens the Pane for the Player.
-    * This Pane is for modifying an items list of toggle commands.
+    * This Pane is for modifying a list of commands.
     * 
     * @param player - The Player to have the Pane opened.
     * @param itemMap - The ItemMap currently being modified.
-    * @param action - The action to be matched.
+    * @param stage - The stage to be matched.
     */
-	private static void toggleCommandPane(final Player player, final ItemMap itemMap) {
+	private static void altCommandPane(final Player player, final ItemMap itemMap, final int stage) {
 		Interface commandListPane = new Interface(true, 2, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
-			commandListPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the click type menu."), event -> {
-				togglePane(player, itemMap);
-			}));
+			if (stage == 4) {
+				commandListPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the active commands menu."), event -> {
+					activeCommands(player);
+				}));
+			} else {
+				commandListPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the click type menu."), event -> {
+					togglePane(player, itemMap);
+				}));
+			}
 			commandListPane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, true, "&e&lNew Line", "&7", "&7*Add a new command to be executed."), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[16] = "TOGGLE COMMAND";
-				placeHolders[15] = "pvp";
+				placeHolders[16] = (stage == 4 ? "ACTIVE COMMAND" : "TOGGLE COMMAND");
+				placeHolders[15] = (stage == 4 ? "gamemode creative %player%" : "pvp");
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
-				final List<String> toggleCommands = itemMap.getToggleCommands();
-				toggleCommands.add(ChatColor.stripColor(event.getMessage()));
-				itemMap.setToggleCommands(toggleCommands);
+				if (stage == 4) {
+					final List<String> commands = ConfigHandler.getConfig().getFile("config.yml").getStringList("Active-Commands.commands");
+					commands.add(ChatColor.stripColor(event.getMessage()));
+					File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
+					dataFile.set("Active-Commands.commands", commands); 	
+					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+					ConfigHandler.getConfig().softReload();
+					SchedulerUtils.runLater(2L, () -> altCommandPane(player, itemMap, stage));
+				} else {
+					final List<String> toggleCommands = itemMap.getToggleCommands();
+					toggleCommands.add(ChatColor.stripColor(event.getMessage()));
+					itemMap.setToggleCommands(toggleCommands);
+				}
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[16] = "TOGGLE COMMAND";
+				placeHolders[16] = (stage == 4 ? "ACTIVE COMMAND" : "TOGGLE COMMAND");
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
-				toggleCommandPane(event.getPlayer(), itemMap);
+				altCommandPane(event.getPlayer(), itemMap, stage);
 			}));
-			final List<String> toggleCommands = itemMap.getToggleCommands();
-			for (String command: toggleCommands) {
-				commandListPane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, false, "&f" + command, "&7", "&7*Click to &lmodify &7this toggle command."), event -> {
-					modifyToggleCommandsPane(player, itemMap, command);
+			final List<String> commandsList = (stage == 4 ? ConfigHandler.getConfig().getFile("config.yml").getStringList("Active-Commands.commands") : itemMap.getToggleCommands());
+			for (String command: commandsList) {
+				commandListPane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, false, "&f" + command, "&7", "&7*Click to &lmodify &7this command."), event -> {
+					modifyAltCommandsPane(player, itemMap, command, stage);
 				}));
 			}
 		});
@@ -7100,15 +7251,14 @@ public class Menu {
 	
    /**
     * Opens the Pane for the Player.
-    * This Pane is for creating a new command for an item.
+    * This Pane is for modifying a command.
     * 
     * @param player - The Player to have the Pane opened.
     * @param itemMap - The ItemMap currently being modified.
-    * @param action - The action to be matched.
-    * @param command - The ItemCommand instance being modified.
-    * @param orderNumber - The current number that dictates the ItemCommands "place in line".
+    * @param command - The command being modified.
+    * @param stage - The stage to be matched.
     */
-	private static void modifyToggleCommandsPane(final Player player, final ItemMap itemMap, final String command) {
+	private static void modifyAltCommandsPane(final Player player, final ItemMap itemMap, final String command, final int stage) {
 		Interface modPane = new Interface(false, 3, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			modPane.addButton(new Button(fillerPaneGItem), 4);
@@ -7117,31 +7267,62 @@ public class Menu {
 			modPane.addButton(new Button(ItemHandler.getItem("PAPER", 1, false, "&fModify", "&7", "&7*Sets the command to", "&7another text entry."), event -> {
 				player.closeInventory();
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[16] = "MODIFIED TOGGLE COMMAND";
-				placeHolders[15] = "pvp on";
+				placeHolders[16] = (stage == 4 ? "MODIFIED ACTIVE COMMAND" : "MODIFIED TOGGLE COMMAND");
+				placeHolders[15] = (stage == 4 ? "gamemode survival %player%" : "pvp on");
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
-				final List<String> toggleCommands = itemMap.getToggleCommands();
-				toggleCommands.remove(command);
-				toggleCommands.add(ChatColor.stripColor(event.getMessage()));
-				itemMap.setToggleCommands(toggleCommands);
+				if (stage == 4) {
+					final List<String> commands = ConfigHandler.getConfig().getFile("config.yml").getStringList("Active-Commands.commands");
+					commands.remove(command);
+					commands.add(ChatColor.stripColor(event.getMessage()));
+					File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
+					dataFile.set("Active-Commands.commands", commands); 	
+					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+					ConfigHandler.getConfig().softReload();
+					SchedulerUtils.runLater(2L, () -> altCommandPane(player, itemMap, stage));
+				} else {
+					final List<String> toggleCommands = itemMap.getToggleCommands();
+					toggleCommands.remove(command);
+					toggleCommands.add(ChatColor.stripColor(event.getMessage()));
+					itemMap.setToggleCommands(toggleCommands);
+				}
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[16] = "MODIFIED TOGGLE COMMAND";
+				placeHolders[16] = (stage == 4 ? "MODIFIED ACTIVE COMMAND" : "MODIFIED TOGGLE COMMAND");
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
-				toggleCommandPane(player, itemMap);
+				altCommandPane(player, itemMap, stage);
 			}));
 			modPane.addButton(new Button(fillerPaneGItem));
-			modPane.addButton(new Button(ItemHandler.getItem("REDSTONE", 1, false, "&fDelete", "&7", "&7*Click to &cdelete &7this toggle command."), event -> {
-				final List<String> toggleCommands = itemMap.getToggleCommands();
-				toggleCommands.remove(command);
-				itemMap.setToggleCommands(toggleCommands);
-				toggleCommandPane(player, itemMap);
+			modPane.addButton(new Button(ItemHandler.getItem("REDSTONE", 1, false, "&fDelete", "&7", "&7*Click to &cdelete &7this command."), event -> {
+				if (stage == 4) {
+					final List<String> commands = ConfigHandler.getConfig().getFile("config.yml").getStringList("Active-Commands.commands");
+					commands.remove(command);
+					File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
+					dataFile.set("Active-Commands.commands", commands); 	
+					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+					ConfigHandler.getConfig().softReload();
+					SchedulerUtils.runLater(2L, () -> altCommandPane(player, itemMap, stage));
+				} else {
+					final List<String> toggleCommands = itemMap.getToggleCommands();
+					toggleCommands.remove(command);
+					itemMap.setToggleCommands(toggleCommands);
+				}
+				altCommandPane(player, itemMap, stage);
 			}));
 			modPane.addButton(new Button(fillerPaneGItem), 3);
-			modPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the toggle commands menu."), event -> toggleCommandPane(player, itemMap)));
+			if (stage == 4) {
+				modPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the active commands menu."), event -> altCommandPane(player, itemMap, stage)));
+			} else {
+				modPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the toggle commands menu."), event -> altCommandPane(player, itemMap, stage)));
+			}
 			modPane.addButton(new Button(fillerPaneBItem), 7);
-			modPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the oggle commands menu."), event -> toggleCommandPane(player, itemMap)));
+			if (stage == 4) {
+				modPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the active commands menu."), event -> altCommandPane(player, itemMap, stage)));
+			} else {
+				modPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the oggle commands menu."), event -> altCommandPane(player, itemMap, stage)));
+			}
 		});
 		modPane.open(player);
 	}
@@ -7157,7 +7338,7 @@ public class Menu {
 		Interface togglePane = new Interface(false, 2, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			togglePane.addButton(new Button(fillerPaneBItem), 2);
-			togglePane.addButton(new Button(ItemHandler.getItem("BOOK", 1, false, "&e&lCommands", "&7", "&7*Define specific commands which", "&7players can use to enable or disable", "&7the custom item upon execution."), event -> toggleCommandPane(player, itemMap)));
+			togglePane.addButton(new Button(ItemHandler.getItem("BOOK", 1, false, "&e&lCommands", "&7", "&7*Define specific commands which", "&7players can use to enable or disable", "&7the custom item upon execution."), event -> altCommandPane(player, itemMap, 0)));
 			togglePane.addButton(new Button(fillerPaneBItem));
 			togglePane.addButton(new Button(ItemHandler.getItem("PAPER", 1, (StringUtils.nullCheck(itemMap.getToggleMessage()) != "NONE"), "&b&lMessage", 
 					"&7", "&7*Set a custom message that", "&7will be sent to the player", "&7upon executing a toggle command.", 
