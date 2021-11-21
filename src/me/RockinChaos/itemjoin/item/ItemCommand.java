@@ -351,18 +351,21 @@ public class ItemCommand {
 			if (StringUtils.containsIgnoreCase(this.command, "[close]")) {
 				PlayerHandler.safeInventoryClose(player);
 			} else {
-				boolean isOp = player.isOp();
-				try {
-					player.setOp(true);
-					String[] values = new String[1];
-					if (altPlayer != null) { values[0] = altPlayer.getName(); }
-					this.setLoggable(player, "/" + StringUtils.translateLayout(this.command, player, values));
-					player.chat("/" + StringUtils.translateLayout(this.command, player, values));
-				} catch (Exception e) {
-					ServerUtils.sendDebugTrace(e);
-					player.setOp(isOp);
-					ServerUtils.logSevere("{ItemCommand} An critical error has occurred while setting " + player.getName() + " status on the OP list, to maintain server security they have been removed as an OP.");
-				} finally { player.setOp(isOp); }
+				if (!player.isOp()) {
+					try {
+						player.setOp(true);
+						String[] values = new String[1];
+						if (altPlayer != null) { values[0] = altPlayer.getName(); }
+						this.setLoggable(player, "/" + StringUtils.translateLayout(this.command, player, values));
+						player.chat("/" + StringUtils.translateLayout(this.command, player, values));
+					} catch (Exception e) {
+						ServerUtils.sendDebugTrace(e);
+						player.setOp(false);
+						ServerUtils.logSevere("{ItemCommand} An critical error has occurred while setting " + player.getName() + " status on the OP list, to maintain server security they have been removed as an OP.");
+					} finally { player.setOp(false); }
+				} else {
+					this.dispatchPlayerCommands(player, altPlayer);
+				}
 			}
 		} catch (Exception e) {
 			ServerUtils.logSevere("{ItemCommand} There was an error executing an item's command as an op, if this continues report it to the developer.");
