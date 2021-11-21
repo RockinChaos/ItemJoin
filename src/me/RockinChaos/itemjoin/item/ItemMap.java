@@ -579,7 +579,7 @@ public class ItemMap {
 		this.useOnLimitSwitch = StringUtils.splitIgnoreCase(this.triggers, "GAMEMODE-SWITCH", ",");
 		this.setOnlyFirstJoin(StringUtils.splitIgnoreCase(this.triggers, "FIRST-JOIN", ","));
 		this.setOnlyFirstLife(StringUtils.splitIgnoreCase(this.triggers, "FIRST-LIFE", ","));
-		this.onlyFirstWorld = StringUtils.splitIgnoreCase(this.triggers, "FIRST-WORLD", ",");
+		this.setOnlyFirstWorld(StringUtils.splitIgnoreCase(this.triggers, "FIRST-WORLD", ","));
 	}
 	
    /**
