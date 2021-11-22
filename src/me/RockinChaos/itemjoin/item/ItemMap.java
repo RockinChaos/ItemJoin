@@ -660,6 +660,8 @@ public class ItemMap {
 						for (World world: Bukkit.getServer().getWorlds()) {
 							if (enabledWorld.equalsIgnoreCase(world.getName())) {
 								this.enabledWorlds.add(world.getName());
+							} else if (enabledWorld.contains("*") && world.getName().toUpperCase().startsWith(enabledWorld.split("\\*")[0].toUpperCase())) {
+								this.enabledWorlds.add(enabledWorld);
 							}
 						}
 					}
@@ -674,6 +676,8 @@ public class ItemMap {
 						for (World world: Bukkit.getServer().getWorlds()) {
 							if (disabledWorld.equalsIgnoreCase(world.getName())) {
 								this.disabledWorlds.add(world.getName());
+							} else if (disabledWorld.contains("*") && world.getName().toUpperCase().startsWith(disabledWorld.split("\\*")[0].toUpperCase())) {
+								this.disabledWorlds.add(disabledWorld);
 							}
 						}
 					}
@@ -4400,7 +4404,8 @@ public class ItemMap {
 			for (String enabledWorld : this.enabledWorlds) {
 				if (enabledWorld.equalsIgnoreCase(world.getName()) 
 						|| enabledWorld.equalsIgnoreCase("ALL") 
-						|| enabledWorld.equalsIgnoreCase("GLOBAL")) {
+						|| enabledWorld.equalsIgnoreCase("GLOBAL")
+						|| (enabledWorld.contains("*") && world.getName().toUpperCase().startsWith(enabledWorld.split("\\*")[0].toUpperCase()))) {
 					return !this.isDisabled(world);
 				}
 			}
@@ -4418,7 +4423,8 @@ public class ItemMap {
 		for (String disabledWorld : this.disabledWorlds) {
 			if (disabledWorld.equalsIgnoreCase(world.getName()) 
 					|| disabledWorld.equalsIgnoreCase("ALL") 
-					|| disabledWorld.equalsIgnoreCase("GLOBAL")) {
+					|| disabledWorld.equalsIgnoreCase("GLOBAL") ||
+					(disabledWorld.contains("*") && world.getName().toUpperCase().startsWith(disabledWorld.split("\\*")[0].toUpperCase()))) {
 				isDisabled = true;
 			}
 		}
