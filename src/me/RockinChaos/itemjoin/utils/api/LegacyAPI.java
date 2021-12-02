@@ -411,8 +411,10 @@ public class LegacyAPI {
 					slot = ItemHandler.getDesignatedSlot(itemMap.getMaterial()).toUpperCase();
 				}
 				Class < ? > craftItemStack = ReflectionUtils.getCraftBukkitClass("inventory.CraftItemStack");
+				Class < ? > itemClass = ReflectionUtils.getMinecraftClass("ItemStack");
+				Class < ? > baseClass = ReflectionUtils.getMinecraftClass("NBTBase");
 				Object nms = craftItemStack.getMethod("asNMSCopy", ItemStack.class).invoke(null, tempItem);
-				Object tag = ReflectionUtils.getMinecraftClass("ItemStack").getMethod(MinecraftMethod.getTag.getMethod(ReflectionUtils.getMinecraftClass("ItemStack"))).invoke(nms);
+				Object tag = itemClass.getMethod(MinecraftMethod.getTag.getMethod(itemClass)).invoke(nms);
 				Object modifiers = ReflectionUtils.getMinecraftClass("NBTTagList").getConstructor().newInstance();
 				if (tag == null) { tag = ReflectionUtils.getMinecraftClass("NBTTagCompound").getConstructor().newInstance(); }
 				for (String attribute: itemMap.getAttributes().keySet()) {
@@ -421,16 +423,16 @@ public class LegacyAPI {
 					double value = itemMap.getAttributes().get(attribute);
 					String name = attribute.toLowerCase().replaceFirst("_", ".");
 					if (name.contains("_")) { String[] nameSplit = name.split("_"); name = nameSplit[0]; nameSplit[0] = ""; for (String rename: nameSplit) { name += org.apache.commons.lang.StringUtils.capitalize(rename); } }
-					attrib.getClass().getMethod(MinecraftMethod.setString.getMethod(attrib.getClass(), String.class, String.class), String.class, String.class).invoke(attrib, "AttributeName", name);
-					attrib.getClass().getMethod(MinecraftMethod.setString.getMethod(attrib.getClass(), String.class, String.class), String.class, String.class).invoke(attrib, "Name", name);
-					attrib.getClass().getMethod(MinecraftMethod.setString.getMethod(attrib.getClass(), String.class, String.class), String.class, String.class).invoke(attrib, "Slot", slot);
-					attrib.getClass().getMethod(MinecraftMethod.setDouble.getMethod(attrib.getClass(), String.class, double.class), String.class, double.class).invoke(attrib, "Amount", value);
-					attrib.getClass().getMethod(MinecraftMethod.setInt.getMethod(attrib.getClass(), String.class, int.class), String.class, int.class).invoke(attrib, "Operation", 0);
-					attrib.getClass().getMethod(MinecraftMethod.setInt.getMethod(attrib.getClass(), String.class, int.class), String.class, int.class).invoke(attrib, "UUIDLeast", uuid);
-					attrib.getClass().getMethod(MinecraftMethod.setInt.getMethod(attrib.getClass(), String.class, int.class), String.class, int.class).invoke(attrib, "UUIDMost", (uuid / 2));
-					modifiers.getClass().getMethod(MinecraftMethod.add.getMethod(modifiers.getClass(), ReflectionUtils.getMinecraftClass("NBTBase")), ReflectionUtils.getMinecraftClass("NBTBase")).invoke(modifiers, attrib);
+					attrib.getClass().getMethod(MinecraftMethod.setString.getMethod(attrib, String.class, String.class), String.class, String.class).invoke(attrib, "AttributeName", name);
+					attrib.getClass().getMethod(MinecraftMethod.setString.getMethod(attrib, String.class, String.class), String.class, String.class).invoke(attrib, "Name", name);
+					attrib.getClass().getMethod(MinecraftMethod.setString.getMethod(attrib, String.class, String.class), String.class, String.class).invoke(attrib, "Slot", slot);
+					attrib.getClass().getMethod(MinecraftMethod.setDouble.getMethod(attrib, String.class, double.class), String.class, double.class).invoke(attrib, "Amount", value);
+					attrib.getClass().getMethod(MinecraftMethod.setInt.getMethod(attrib, String.class, int.class), String.class, int.class).invoke(attrib, "Operation", 0);
+					attrib.getClass().getMethod(MinecraftMethod.setInt.getMethod(attrib, String.class, int.class), String.class, int.class).invoke(attrib, "UUIDLeast", uuid);
+					attrib.getClass().getMethod(MinecraftMethod.setInt.getMethod(attrib, String.class, int.class), String.class, int.class).invoke(attrib, "UUIDMost", (uuid / 2));
+					modifiers.getClass().getMethod(MinecraftMethod.add.getMethod(modifiers, baseClass), baseClass).invoke(modifiers, attrib);
 				}
-				tag.getClass().getMethod(MinecraftMethod.set.getMethod(tag.getClass(), String.class, ReflectionUtils.getMinecraftClass("NBTBase")), String.class, ReflectionUtils.getMinecraftClass("NBTBase")).invoke(tag, "AttributeModifiers", modifiers);
+				tag.getClass().getMethod(MinecraftMethod.set.getMethod(tag, String.class, baseClass), String.class,baseClass).invoke(tag, "AttributeModifiers", modifiers);
 				itemMap.setTempItem((ItemStack) craftItemStack.getMethod("asCraftMirror", nms.getClass()).invoke(null, nms));
 			} catch (Exception e) {
 				ServerUtils.sendDebugTrace(e);
@@ -450,12 +452,14 @@ public class LegacyAPI {
 		if (itemMap.isGlowing() && !ServerUtils.hasSpecificUpdate("1_11")) {
 			try {
 				Class <?> craftItemStack = ReflectionUtils.getCraftBukkitClass("inventory.CraftItemStack");
+				Class < ? > itemClass = ReflectionUtils.getMinecraftClass("ItemStack");
+				Class < ? > baseClass = ReflectionUtils.getMinecraftClass("NBTBase");
 				Object nms = craftItemStack.getMethod("asNMSCopy", ItemStack.class).invoke(null, tempItem);
-				Object tag = ReflectionUtils.getMinecraftClass("ItemStack").getMethod("getTag").invoke(nms);
+				Object tag = itemClass.getMethod(MinecraftMethod.getTag.getMethod(itemClass)).invoke(nms);
 				if (tag == null) { tag = ReflectionUtils.getMinecraftClass("NBTTagCompound").getConstructor().newInstance(); }
 				Object ench = ReflectionUtils.getMinecraftClass("NBTTagList").getConstructor().newInstance();
-				tag.getClass().getMethod(MinecraftMethod.set.getMethod(tag.getClass(), String.class, ReflectionUtils.getMinecraftClass("NBTBase")), String.class, ReflectionUtils.getMinecraftClass("NBTBase")).invoke(tag, "ench", ench);
-				nms.getClass().getMethod(MinecraftMethod.setTag.getMethod(nms.getClass(), tag.getClass()), tag.getClass()).invoke(nms, tag);
+				tag.getClass().getMethod(MinecraftMethod.set.getMethod(tag, String.class, baseClass), String.class, baseClass).invoke(tag, "ench", ench);
+				nms.getClass().getMethod(MinecraftMethod.setTag.getMethod(nms, tag.getClass()), tag.getClass()).invoke(nms, tag);
 				return (((ItemStack) craftItemStack.getMethod("asCraftMirror", nms.getClass()).invoke(null, nms)));
 			} catch (Exception e) { ServerUtils.sendDebugTrace(e); }
 		}

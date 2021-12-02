@@ -3994,10 +3994,11 @@ public class ItemMap {
 			try {
 				Class<?> craftItemStack = ReflectionUtils.getCraftBukkitClass("inventory.CraftItemStack");
 				Object nms = craftItemStack.getMethod("asNMSCopy", ItemStack.class).invoke(null, this.tempItem);
-				Object tag = ReflectionUtils.getMinecraftClass("ItemStack").getMethod(MinecraftMethod.getTag.getMethod(ReflectionUtils.getMinecraftClass("ItemStack"))).invoke(nms);
+				Class<?> itemClass = ReflectionUtils.getMinecraftClass("ItemStack");
+				Object tag = itemClass.getMethod(MinecraftMethod.getTag.getMethod(itemClass)).invoke(nms);
 				if (tag == null) { tag = ReflectionUtils.getMinecraftClass("NBTTagCompound").getConstructor().newInstance(); }
-				tag.getClass().getMethod(MinecraftMethod.setInt.getMethod(tag.getClass(), String.class, int.class), String.class, int.class).invoke(tag, "Unbreakable", 1);
-				nms.getClass().getMethod(MinecraftMethod.setTag.getMethod(nms.getClass(), tag.getClass()), tag.getClass()).invoke(nms, tag);
+				tag.getClass().getMethod(MinecraftMethod.setInt.getMethod(tag, String.class, int.class), String.class, int.class).invoke(tag, "Unbreakable", 1);
+				nms.getClass().getMethod(MinecraftMethod.setTag.getMethod(nms, tag.getClass()), tag.getClass()).invoke(nms, tag);
 				this.tempItem = (ItemStack) craftItemStack.getMethod("asCraftMirror", nms.getClass()).invoke(null, nms);
 			} catch (Exception e) { ServerUtils.sendDebugTrace(e); }
 		}
@@ -4084,7 +4085,8 @@ public class ItemMap {
 			try { 
 				textComponent = StringUtils.translateLayout(textComponent, player);
 				Object TagString = ReflectionUtils.getMinecraftClass("NBTTagString").getConstructor(String.class).newInstance(textComponent);
-				localePages.getClass().getMethod(MinecraftMethod.add.getMethod(localePages.getClass(), ReflectionUtils.getMinecraftClass("NBTBase")), ReflectionUtils.getMinecraftClass("NBTBase")).invoke(localePages, TagString);
+				Class<?> baseClass = ReflectionUtils.getMinecraftClass("NBTBase");
+				localePages.getClass().getMethod(MinecraftMethod.add.getMethod(localePages, baseClass), baseClass).invoke(localePages, TagString);
 			} catch (Exception e) { ServerUtils.sendDebugTrace(e); } 
 		}
 		try { return this.invokePages(item, localePages); } catch (Exception e) { ServerUtils.sendDebugTrace(e); }
@@ -4107,7 +4109,8 @@ public class ItemMap {
 			try { 
 				textComponent = StringUtils.translateLayout(textComponent, player);
 				Object TagString = ReflectionUtils.getMinecraftClass("NBTTagString").getConstructor(String.class).newInstance(textComponent);
-				localePages.getClass().getMethod(MinecraftMethod.add.getMethod(localePages.getClass(), int.class, ReflectionUtils.getMinecraftClass("NBTBase")), int.class, ReflectionUtils.getMinecraftClass("NBTBase")).invoke(localePages, 0, TagString);
+				Class<?> baseClass = ReflectionUtils.getMinecraftClass("NBTBase");
+				localePages.getClass().getMethod(MinecraftMethod.add.getMethod(localePages, int.class, baseClass), int.class, baseClass).invoke(localePages, 0, TagString);
 			} catch (Exception e) { ServerUtils.sendDebugTrace(e); } 
 		}
 		try { return this.invokePages(item, localePages); } catch (Exception e) { ServerUtils.sendDebugTrace(e); }
@@ -4129,8 +4132,10 @@ public class ItemMap {
 			String textComponent = pages.get(i);
 			try { 
 				textComponent = StringUtils.translateLayout(textComponent, player);
-				Object TagString = ReflectionUtils.getMinecraftClass("NBTTagString").getMethod(MinecraftMethod.getPage.getMethod(ReflectionUtils.getMinecraftClass("NBTTagString")), String.class).invoke(null, textComponent);
-				localePages.getClass().getMethod(MinecraftMethod.add.getMethod(localePages.getClass(), int.class, ReflectionUtils.getMinecraftClass("NBTBase")), int.class, ReflectionUtils.getMinecraftClass("NBTBase")).invoke(localePages, 0, TagString);
+				Class<?> stringClass = ReflectionUtils.getMinecraftClass("NBTTagString");
+				Class<?> baseClass = ReflectionUtils.getMinecraftClass("NBTBase");
+				Object TagString = stringClass.getMethod(MinecraftMethod.getPage.getMethod(stringClass), String.class).invoke(null, textComponent);
+				localePages.getClass().getMethod(MinecraftMethod.add.getMethod(localePages, int.class, baseClass), int.class, baseClass).invoke(localePages, 0, TagString);
 			} catch (Exception e) { ServerUtils.sendDebugTrace(e); } 
 		}
 		try { return this.invokePages(item, localePages); } catch (Exception e) { ServerUtils.sendDebugTrace(e); }
@@ -4147,11 +4152,13 @@ public class ItemMap {
     */
 	private ItemStack invokePages(final ItemStack item, final Object pages) throws Exception {
 		Class<?> craftItemStack = ReflectionUtils.getCraftBukkitClass("inventory.CraftItemStack");
+		Class<?> itemClass = ReflectionUtils.getMinecraftClass("ItemStack");
+		Class<?> baseClass = ReflectionUtils.getMinecraftClass("NBTBase");
 		Object nms = craftItemStack.getMethod("asNMSCopy", ItemStack.class).invoke(null, item);
-		Object tag = ReflectionUtils.getMinecraftClass("ItemStack").getMethod(MinecraftMethod.getTag.getMethod(ReflectionUtils.getMinecraftClass("ItemStack"))).invoke(nms);
+		Object tag = itemClass.getMethod(MinecraftMethod.getTag.getMethod(itemClass)).invoke(nms);
 		if (tag == null) { tag = ReflectionUtils.getMinecraftClass("NBTTagCompound").getConstructor().newInstance(); }
-		tag.getClass().getMethod(MinecraftMethod.set.getMethod(tag.getClass(), String.class, ReflectionUtils.getMinecraftClass("NBTBase")), String.class, ReflectionUtils.getMinecraftClass("NBTBase")).invoke(tag, "pages", pages); 
-		nms.getClass().getMethod(MinecraftMethod.setTag.getMethod(nms.getClass(), tag.getClass()), tag.getClass()).invoke(nms, tag);
+		tag.getClass().getMethod(MinecraftMethod.set.getMethod(tag, String.class, baseClass), String.class, baseClass).invoke(tag, "pages", pages); 
+		nms.getClass().getMethod(MinecraftMethod.setTag.getMethod(nms, tag.getClass()), tag.getClass()).invoke(nms, tag);
 		return ((ItemStack)craftItemStack.getMethod("asCraftMirror", nms.getClass()).invoke(null, nms));
 	}
 	
@@ -4162,21 +4169,22 @@ public class ItemMap {
 	private void setNBTData() {
 		if (ItemHandler.dataTagsEnabled() && !this.isVanilla() && !this.isVanillaControl() && !this.isVanillaStatus()) {
 			try {
+				Class<?> itemClass = ReflectionUtils.getMinecraftClass("ItemStack");
 				Object nms = ReflectionUtils.getCraftBukkitClass("inventory.CraftItemStack").getMethod("asNMSCopy", ItemStack.class).invoke(null, this.tempItem);
-				Object cacheTag = ReflectionUtils.getMinecraftClass("ItemStack").getMethod(MinecraftMethod.getTag.getMethod(ReflectionUtils.getMinecraftClass("ItemStack"))).invoke(nms);
+				Object cacheTag = itemClass.getMethod(MinecraftMethod.getTag.getMethod(itemClass)).invoke(nms);
 				if (cacheTag != null) {
-					cacheTag.getClass().getMethod(MinecraftMethod.setString.getMethod(cacheTag.getClass(), String.class, String.class), String.class, String.class).invoke(cacheTag, "ItemJoin Name", this.getConfigName());
-					cacheTag.getClass().getMethod(MinecraftMethod.setString.getMethod(cacheTag.getClass(), String.class, String.class), String.class, String.class).invoke(cacheTag, "ItemJoin Slot", this.getItemValue());
+					cacheTag.getClass().getMethod(MinecraftMethod.setString.getMethod(cacheTag, String.class, String.class), String.class, String.class).invoke(cacheTag, "ItemJoin Name", this.getConfigName());
+					cacheTag.getClass().getMethod(MinecraftMethod.setString.getMethod(cacheTag, String.class, String.class), String.class, String.class).invoke(cacheTag, "ItemJoin Slot", this.getItemValue());
 					if (this.nbtProperty != null && !this.nbtProperty.isEmpty()) {
 						for (String tag: this.nbtProperty.keySet()) {
-							cacheTag.getClass().getMethod(MinecraftMethod.setString.getMethod(cacheTag.getClass(), String.class, String.class), String.class, String.class).invoke(cacheTag, tag, this.nbtProperty.get(tag));
+							cacheTag.getClass().getMethod(MinecraftMethod.setString.getMethod(cacheTag, String.class, String.class), String.class, String.class).invoke(cacheTag, tag, this.nbtProperty.get(tag));
 						}
 					}
 				} else { 
-					nms.getClass().getMethod(MinecraftMethod.setTag.getMethod(nms.getClass(), this.newNBTTag.getClass()), this.newNBTTag.getClass()).invoke(nms, this.newNBTTag);
+					nms.getClass().getMethod(MinecraftMethod.setTag.getMethod(nms, this.newNBTTag.getClass()), this.newNBTTag.getClass()).invoke(nms, this.newNBTTag);
 					if (this.nbtProperties != null && !this.nbtProperties.isEmpty()) {
 						for (Object tag: this.nbtProperties) {
-							nms.getClass().getMethod(MinecraftMethod.setTag.getMethod(nms.getClass(), tag.getClass()), tag.getClass()).invoke(nms, tag);
+							nms.getClass().getMethod(MinecraftMethod.setTag.getMethod(nms, tag.getClass()), tag.getClass()).invoke(nms, tag);
 						}
 					}
 				}

@@ -448,8 +448,8 @@ public class ItemDesigner {
 		if (ItemHandler.dataTagsEnabled() && !itemMap.isVanilla() && !itemMap.isVanillaControl() && !itemMap.isVanillaStatus()) {
 			try {
 				Object tag = ReflectionUtils.getMinecraftClass("NBTTagCompound").getConstructor().newInstance();
-				tag.getClass().getMethod(MinecraftMethod.setString.getMethod(tag.getClass(), String.class, String.class), String.class, String.class).invoke(tag, "ItemJoin Name", itemMap.getConfigName());
-				tag.getClass().getMethod(MinecraftMethod.setString.getMethod(tag.getClass(), String.class, String.class), String.class, String.class).invoke(tag, "ItemJoin Slot", itemMap.getItemValue());
+				tag.getClass().getMethod(MinecraftMethod.setString.getMethod(tag, String.class, String.class), String.class, String.class).invoke(tag, "ItemJoin Name", itemMap.getConfigName());
+				tag.getClass().getMethod(MinecraftMethod.setString.getMethod(tag, String.class, String.class), String.class, String.class).invoke(tag, "ItemJoin Slot", itemMap.getItemValue());
 				itemMap.setNewNBTData(itemMap.getConfigName() + " " + itemMap.getItemValue(), tag);
 				if (itemMap.getNodeLocation().getString(".properties") != null && !itemMap.getNodeLocation().getString(".properties").isEmpty()) {
 					List<Object> tags = new ArrayList<Object>();
@@ -459,7 +459,7 @@ public class ItemDesigner {
 						String[] propertyParts = property.split(":");
 						String identifier = (propertyParts[0].startsWith(" ") ? propertyParts[0].substring(1) : propertyParts[0]);
 						Object propertyTag = ReflectionUtils.getMinecraftClass("NBTTagCompound").getConstructor().newInstance();
-						propertyTag.getClass().getMethod(MinecraftMethod.setString.getMethod(propertyTag.getClass(), String.class, String.class), String.class, String.class).invoke(propertyTag, identifier, propertyParts[1]);
+						propertyTag.getClass().getMethod(MinecraftMethod.setString.getMethod(propertyTag, String.class, String.class), String.class, String.class).invoke(propertyTag, identifier, propertyParts[1]);
 						tags.add(propertyTag);
 						tagValues.put(identifier, propertyParts[1]);
 					}

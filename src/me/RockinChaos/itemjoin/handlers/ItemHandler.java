@@ -699,11 +699,12 @@ public class ItemHandler {
 		if (dataTagsEnabled() && item != null && item.getType() != Material.AIR) {
 			try {
 				Object nms = ReflectionUtils.getCraftBukkitClass("inventory.CraftItemStack").getMethod("asNMSCopy", ItemStack.class).invoke(null, item);
-				Object cacheTag = ReflectionUtils.getMinecraftClass("ItemStack").getMethod(MinecraftMethod.getTag.getMethod(ReflectionUtils.getMinecraftClass("ItemStack"))).invoke(nms);
+				Class<?> itemClass = ReflectionUtils.getMinecraftClass("ItemStack");
+				Object cacheTag = itemClass.getMethod(MinecraftMethod.getTag.getMethod(itemClass)).invoke(nms);
 				if (cacheTag != null) {
-					String data = (String) cacheTag.getClass().getMethod(MinecraftMethod.getString.getMethod(cacheTag.getClass(), String.class), String.class).invoke(cacheTag, "ItemJoin");
-					String data1 = (String) cacheTag.getClass().getMethod(MinecraftMethod.getString.getMethod(cacheTag.getClass(), String.class), String.class).invoke(cacheTag, "ItemJoin Name");
-					String data2 = (String) cacheTag.getClass().getMethod(MinecraftMethod.getString.getMethod(cacheTag.getClass(), String.class), String.class).invoke(cacheTag, "ItemJoin Slot");
+					String data = (String) cacheTag.getClass().getMethod(MinecraftMethod.getString.getMethod(cacheTag, String.class), String.class).invoke(cacheTag, "ItemJoin");
+					String data1 = (String) cacheTag.getClass().getMethod(MinecraftMethod.getString.getMethod(cacheTag, String.class), String.class).invoke(cacheTag, "ItemJoin Name");
+					String data2 = (String) cacheTag.getClass().getMethod(MinecraftMethod.getString.getMethod(cacheTag, String.class), String.class).invoke(cacheTag, "ItemJoin Slot");
 					if (data1 != null && data2 != null && !data1.isEmpty() && !data2.isEmpty()) {
 						return data1 + " " + data2;
 					} else if (data != null && !data.isEmpty()) { 

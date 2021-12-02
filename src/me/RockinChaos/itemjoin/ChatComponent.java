@@ -57,19 +57,20 @@ public abstract class ChatComponent {
             Class<?> baseComponent = ReflectionUtils.getMinecraftClass("IChatBaseComponent");
             Class<?> serializer = ReflectionUtils.getMinecraftClass("IChatBaseComponent$ChatSerializer");
             Class<?> chatPacket = ReflectionUtils.getMinecraftClass("PacketPlayOutChat");
+            Class<?> packetClass = ReflectionUtils.getMinecraftClass("Packet");
             Object component = serializer.getDeclaredMethod("a", String.class).invoke(null, text.toString());
             
             if (ServerUtils.hasSpecificUpdate("1_16")) {
             	Constructor<?> packet = chatPacket.getConstructor(baseComponent, ReflectionUtils.getMinecraftClass("ChatMessageType"), player.getUniqueId().getClass());
             	try {
             		Class<?> chatMessage = ReflectionUtils.getMinecraftClass("ChatMessageType");
-            		connection.getClass().getMethod(MinecraftMethod.sendPacket.getMethod(connection.getClass(), ReflectionUtils.getMinecraftClass("Packet")), ReflectionUtils.getMinecraftClass("Packet")).invoke(connection, packet.newInstance(component, chatMessage.getMethod("a", byte.class).invoke(null, (byte)0), player.getUniqueId()));
+            		connection.getClass().getMethod(MinecraftMethod.sendPacket.getMethod(connection, packetClass), packetClass).invoke(connection, packet.newInstance(component, chatMessage.getMethod("a", byte.class).invoke(null, (byte)0), player.getUniqueId()));
             	} catch (Exception e) {
             		ServerUtils.sendSevereTrace(e);
             	}
             } else {
             	Constructor<?> packet = chatPacket.getConstructor(baseComponent);
-            	connection.getClass().getMethod(MinecraftMethod.sendPacket.getMethod(connection.getClass(), ReflectionUtils.getMinecraftClass("Packet")), ReflectionUtils.getMinecraftClass("Packet")).invoke(connection, packet.newInstance(component));
+            	connection.getClass().getMethod(MinecraftMethod.sendPacket.getMethod(connection, packetClass), packetClass).invoke(connection, packet.newInstance(component));
             }
         } catch (Exception e) {
         	ServerUtils.sendSevereTrace(e);

@@ -425,7 +425,8 @@ public final class ReflectionUtils {
 	public static void sendPacket(final Player player, final Object packet) throws Exception {
 	    Object nmsPlayer = player.getClass().getMethod("getHandle").invoke(player);
 	    Object playerHandle = nmsPlayer.getClass().getField(MinecraftField.PlayerConnection.getField(nmsPlayer.getClass())).get(nmsPlayer);
-	    playerHandle.getClass().getMethod(MinecraftMethod.sendPacket.getMethod(playerHandle.getClass(), getMinecraftClass("Packet")), getMinecraftClass("Packet")).invoke(playerHandle, packet);
+	    Class<?> packetClass = getMinecraftClass("Packet");
+	    playerHandle.getClass().getMethod(MinecraftMethod.sendPacket.getMethod(playerHandle.getClass(), packetClass), packetClass).invoke(playerHandle, packet);
 	}
 
    /**
@@ -496,8 +497,9 @@ public final class ReflectionUtils {
 			this.remapped = remapped;
 		}
 		
-		public String getMethod(final Class<? extends Object> canonicalClass, Class<?>...arguments) {
+		public String getMethod(final Object objClass, Class<?>...arguments) {
 			try {
+				Class<?> canonicalClass = (!(objClass instanceof Class<?>) ? objClass.getClass() : (Class<?>)objClass);
 				Method forMethod = (arguments == null ? canonicalClass.getMethod((ReflectionUtils.remapped() ? this.remapped : this.original)) : canonicalClass.getMethod((ReflectionUtils.remapped() ? this.remapped : this.original), arguments));
 				if (forMethod != null) {
 					return (ReflectionUtils.remapped() ? this.remapped : this.original);	
