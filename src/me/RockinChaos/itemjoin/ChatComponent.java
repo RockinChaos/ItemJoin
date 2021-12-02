@@ -20,6 +20,7 @@ package me.RockinChaos.itemjoin;
 import com.google.gson.JsonObject;
 
 import me.RockinChaos.itemjoin.utils.ReflectionUtils;
+import me.RockinChaos.itemjoin.utils.ReflectionUtils.MinecraftMethod;
 import me.RockinChaos.itemjoin.utils.ServerUtils;
 
 import org.bukkit.ChatColor;
@@ -62,13 +63,13 @@ public abstract class ChatComponent {
             	Constructor<?> packet = chatPacket.getConstructor(baseComponent, ReflectionUtils.getMinecraftClass("ChatMessageType"), player.getUniqueId().getClass());
             	try {
             		Class<?> chatMessage = ReflectionUtils.getMinecraftClass("ChatMessageType");
-            		connection.getClass().getMethod("sendPacket", ReflectionUtils.getMinecraftClass("Packet")).invoke(connection, packet.newInstance(component, chatMessage.getMethod("a", byte.class).invoke(null, (byte)0), player.getUniqueId()));
+            		connection.getClass().getMethod(MinecraftMethod.sendPacket.getMethod(connection.getClass(), ReflectionUtils.getMinecraftClass("Packet")), ReflectionUtils.getMinecraftClass("Packet")).invoke(connection, packet.newInstance(component, chatMessage.getMethod("a", byte.class).invoke(null, (byte)0), player.getUniqueId()));
             	} catch (Exception e) {
             		ServerUtils.sendSevereTrace(e);
             	}
             } else {
             	Constructor<?> packet = chatPacket.getConstructor(baseComponent);
-            	connection.getClass().getMethod("sendPacket", ReflectionUtils.getMinecraftClass("Packet")).invoke(connection, packet.newInstance(component));
+            	connection.getClass().getMethod(MinecraftMethod.sendPacket.getMethod(connection.getClass(), ReflectionUtils.getMinecraftClass("Packet")), ReflectionUtils.getMinecraftClass("Packet")).invoke(connection, packet.newInstance(component));
             }
         } catch (Exception e) {
         	ServerUtils.sendSevereTrace(e);

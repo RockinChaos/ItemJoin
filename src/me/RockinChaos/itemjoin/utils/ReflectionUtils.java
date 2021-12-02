@@ -424,8 +424,8 @@ public final class ReflectionUtils {
 	*/
 	public static void sendPacket(final Player player, final Object packet) throws Exception {
 	    Object nmsPlayer = player.getClass().getMethod("getHandle").invoke(player);
-	    Object playerHandle = nmsPlayer.getClass().getField(MinecraftField.PlayerConnection.getField()).get(nmsPlayer);
-	    playerHandle.getClass().getMethod("sendPacket", getMinecraftClass("Packet")).invoke(playerHandle, packet);
+	    Object playerHandle = nmsPlayer.getClass().getField(MinecraftField.PlayerConnection.getField(nmsPlayer.getClass())).get(nmsPlayer);
+	    playerHandle.getClass().getMethod(MinecraftMethod.sendPacket.getMethod(playerHandle.getClass(), getMinecraftClass("Packet")), getMinecraftClass("Packet")).invoke(playerHandle, packet);
 	}
 
    /**
@@ -473,13 +473,48 @@ public final class ReflectionUtils {
 		return output.toString();
 	}
 	
+	
+   /**
+	* Searchable methods that no longer require NBT Reflections.
+	* 
+	*/
+	public enum MinecraftMethod {
+		add("add", "c"),
+		set("set", "a"),
+		setInt("setInt", "a"),
+		getPage("a", "a"),
+		getTag("getTag", "s"),
+		setTag("setTag", "c"),
+		setString("setString", "a"),
+		getString("getString", "l"),
+		setDouble("setDouble", "a"),
+		sendPacket("sendPacket", "a");
+		public String original;
+		public String remapped;
+		private MinecraftMethod(final String original, final String remapped) {
+			this.original = original;
+			this.remapped = remapped;
+		}
+		
+		public String getMethod(final Class<? extends Object> canonicalClass, Class<?>...arguments) {
+			try {
+				Method forMethod = (arguments == null ? canonicalClass.getMethod((ReflectionUtils.remapped() ? this.remapped : this.original)) : canonicalClass.getMethod((ReflectionUtils.remapped() ? this.remapped : this.original), arguments));
+				if (forMethod != null) {
+					return (ReflectionUtils.remapped() ? this.remapped : this.original);	
+				} else { return this.original; }
+			} catch (Exception e) {
+				return this.original;
+			}
+		}
+	}
+	
    /**
 	* Searchable tags that no longer require NBT Reflections.
 	* 
 	*/
 	public enum MinecraftField {
 		PlayerConnection("playerConnection", "b"),
-		NetworkManager("networkManager", "a"),;
+		NetworkManager("networkManager", "a");
 		public String original;
 		public String remapped;
 		private MinecraftField(final String original, final String remapped) {
@@ -487,10 +522,10 @@ public final class ReflectionUtils {
 			this.remapped = remapped;
 		}
 		
-		public String getField() {
+		public String getField(final Class<? extends Object> canonicalClass) {
 			try {
-				String forClass = ReflectionUtils.getMinecraftClass(this.toString()).getCanonicalName();
-				if (forClass != null) {
+				Field forField = canonicalClass.getField((ReflectionUtils.remapped() ? this.remapped : this.original));
+				if (forField != null) {
 					return (ReflectionUtils.remapped() ? this.remapped : this.original);	
 				} else { return this.original; }
 			} catch (Exception e) {

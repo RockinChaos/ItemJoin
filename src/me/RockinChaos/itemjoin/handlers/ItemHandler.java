@@ -47,6 +47,7 @@ import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.item.ItemUtilities.CustomSlot;
 import me.RockinChaos.itemjoin.item.ItemUtilities.TriggerType;
 import me.RockinChaos.itemjoin.utils.ReflectionUtils;
+import me.RockinChaos.itemjoin.utils.ReflectionUtils.MinecraftMethod;
 import me.RockinChaos.itemjoin.utils.SchedulerUtils;
 import me.RockinChaos.itemjoin.utils.ServerUtils;
 import me.RockinChaos.itemjoin.utils.StringUtils;
@@ -698,11 +699,11 @@ public class ItemHandler {
 		if (dataTagsEnabled() && item != null && item.getType() != Material.AIR) {
 			try {
 				Object nms = ReflectionUtils.getCraftBukkitClass("inventory.CraftItemStack").getMethod("asNMSCopy", ItemStack.class).invoke(null, item);
-				Object cacheTag = ReflectionUtils.getMinecraftClass("ItemStack").getMethod("getTag").invoke(nms);
+				Object cacheTag = ReflectionUtils.getMinecraftClass("ItemStack").getMethod(MinecraftMethod.getTag.getMethod(ReflectionUtils.getMinecraftClass("ItemStack"))).invoke(nms);
 				if (cacheTag != null) {
-					String data = (String) cacheTag.getClass().getMethod("getString", String.class).invoke(cacheTag, "ItemJoin");
-					String data1 = (String) cacheTag.getClass().getMethod("getString", String.class).invoke(cacheTag, "ItemJoin Name");
-					String data2 = (String) cacheTag.getClass().getMethod("getString", String.class).invoke(cacheTag, "ItemJoin Slot");
+					String data = (String) cacheTag.getClass().getMethod(MinecraftMethod.getString.getMethod(cacheTag.getClass(), String.class), String.class).invoke(cacheTag, "ItemJoin");
+					String data1 = (String) cacheTag.getClass().getMethod(MinecraftMethod.getString.getMethod(cacheTag.getClass(), String.class), String.class).invoke(cacheTag, "ItemJoin Name");
+					String data2 = (String) cacheTag.getClass().getMethod(MinecraftMethod.getString.getMethod(cacheTag.getClass(), String.class), String.class).invoke(cacheTag, "ItemJoin Slot");
 					if (data1 != null && data2 != null && !data1.isEmpty() && !data2.isEmpty()) {
 						return data1 + " " + data2;
 					} else if (data != null && !data.isEmpty()) { 
