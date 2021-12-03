@@ -409,7 +409,7 @@ public class Commands implements Listener {
 	*/
 	private void runCommands(final Player player, final Player altPlayer, final ItemStack item, final String action, final String clickType, final String slot) {
 		final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item, null, player.getWorld());
-		if (itemMap != null && itemMap.inWorld(player.getWorld()) && itemMap.hasPermission(player, player.getWorld())) {
+		if (itemMap != null && itemMap.inWorld(player.getWorld())) {
 			itemMap.executeCommands(player, altPlayer, item, action, clickType, (slot == null ? itemMap.getSlot() : slot));
 		}
 	}
