@@ -40,7 +40,7 @@ public class BungeeAPI implements PluginMessageListener {
     *
     */
 	public BungeeAPI() {
-		Messenger messenger = ItemJoin.getInstance().getServer().getMessenger();
+		final Messenger messenger = ItemJoin.getInstance().getServer().getMessenger();
 		if (!messenger.isOutgoingChannelRegistered(ItemJoin.getInstance(), this.PLUGIN_CHANNEL)) {
 			messenger.registerOutgoingPluginChannel(ItemJoin.getInstance(), this.PLUGIN_CHANNEL);
 			messenger.registerOutgoingPluginChannel(ItemJoin.getInstance(), "BungeeCord");
@@ -58,7 +58,7 @@ public class BungeeAPI implements PluginMessageListener {
     * @param server - The String name of the server that the Player is connecting to.
     */
 	public void SwitchServers(final Player player, final String server) {
-		ByteArrayDataOutput out = ByteStreams.newDataOutput();
+		final ByteArrayDataOutput out = ByteStreams.newDataOutput();
 		try {
 			out.writeUTF("Connect");
 			out.writeUTF(server);
@@ -74,7 +74,7 @@ public class BungeeAPI implements PluginMessageListener {
     */
 	public void ExecuteCommand(final Player player, final String command) {
 		if (StringUtils.containsIgnoreCase(player.getListeningPluginChannels().toString(), "plugin:cloudsync")) {
-			ByteArrayDataOutput out = ByteStreams.newDataOutput();
+			final ByteArrayDataOutput out = ByteStreams.newDataOutput();
 			try {
 				out.writeUTF(player.getName());
 				out.writeUTF(command);
@@ -98,8 +98,8 @@ public class BungeeAPI implements PluginMessageListener {
 	@Override
 	public void onPluginMessageReceived(final String channel, final Player player, final byte[] message) {
 		if (!channel.equals(this.PLUGIN_CHANNEL)) { return; }
-		ByteArrayDataInput in = ByteStreams.newDataInput(message);
-		String subchannel = in.readUTF();
+		final ByteArrayDataInput in = ByteStreams.newDataInput(message);
+		final String subchannel = in.readUTF();
 		if (subchannel.equals("ConnectOther") || subchannel.equals("Connect")) {
 			player.sendMessage(subchannel + " " + in.readByte());
 		}
