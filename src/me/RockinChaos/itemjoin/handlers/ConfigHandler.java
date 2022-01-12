@@ -682,7 +682,7 @@ public class ConfigHandler {
 				LegacyAPI.registerConsumes();
 			}
 		}
-		if ((itemMap.isItemRepairable() || itemMap.isItemCraftable()) && !StringUtils.isRegistered(Recipes.class.getSimpleName())) {
+		if (((itemMap.isItemRepairable() || itemMap.isItemCraftable()) || (itemMap.getIngredients() != null || !itemMap.getIngredients().isEmpty())) && !StringUtils.isRegistered(Recipes.class.getSimpleName())) {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Recipes(), ItemJoin.getInstance());
 		}
 		if (itemMap.isItemStore() || itemMap.isItemModify()) {

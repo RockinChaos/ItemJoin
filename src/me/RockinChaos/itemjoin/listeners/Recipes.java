@@ -38,7 +38,7 @@ public class Recipes implements Listener {
     * @param event - PrepareItemCraftEvent
     */
     @EventHandler(ignoreCancelled = true)
-    private void onPlayerCraft(PrepareItemCraftEvent event) {
+    private void onPlayerCraft(final PrepareItemCraftEvent event) {
     	Player player = (Player) event.getInventory().getHolder();
     	for (int i = 0; i < player.getOpenInventory().getTopInventory().getSize(); i++) {
     		if (player.getOpenInventory().getTopInventory().getItem(i) != null && player.getOpenInventory().getTopInventory().getItem(i).getType() != Material.AIR) {
@@ -59,7 +59,7 @@ public class Recipes implements Listener {
     * @param event - InventoryClickEvent
     */
 	@EventHandler(ignoreCancelled = true)
-	private void onRepairAnvil(InventoryClickEvent event) {
+	private void onRepairAnvil(final InventoryClickEvent event) {
 		final boolean isAnvil = event.getInventory().getType().toString().contains("ANVIL");
 		final boolean isGrindstone = event.getInventory().getType().toString().contains("GRINDSTONE");
 	    if (isAnvil || isGrindstone) {
@@ -84,22 +84,26 @@ public class Recipes implements Listener {
 	* @param event - PrepareItemCraftEvent
 	*/
     @EventHandler()
-    public void onPrepareRecipe(PrepareItemCraftEvent event) {
+    public void onPrepareRecipe(final PrepareItemCraftEvent event) {
     	if (event.getRecipe() != null && event.getRecipe().getResult() != null && event.getRecipe().getResult().getType() != Material.AIR) {
 	    	ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(event.getRecipe().getResult(), null, event.getView().getPlayer().getWorld());
 	    	if (itemMap != null && itemMap.getIngredients() != null && !itemMap.getIngredients().isEmpty()) {
-	    		for (int i = 0; i < event.getInventory().getSize(); i++ ){
-	    			final ItemStack item = event.getInventory().getItem(i + 1);
-	    			if (item != null) {
-	    				for (Character ingredient: itemMap.getIngredients().keySet()) {
-	    					ItemMap ingredMap = ItemUtilities.getUtilities().getItemMap(null, itemMap.getIngredients().get(ingredient) , null);
-	    					if (ingredMap != null && itemMap.getRecipe().size() > i && itemMap.getRecipe().get(i) == ingredient && !ingredMap.isSimilar(item)) {
-	    						event.getInventory().setResult(new ItemStack(Material.AIR));
-	    						break;
-	    					}
-	    				}
-	    			}
-				}
+	    		if (!itemMap.hasPermission((Player)event.getView().getPlayer(), event.getView().getPlayer().getWorld())) {
+	    			event.getInventory().setResult(new ItemStack(Material.AIR));
+	    		} else {
+		    		for (int i = 0; i < event.getInventory().getSize(); i++ ){
+		    			final ItemStack item = event.getInventory().getItem(i + 1);
+		    			if (item != null) {
+		    				for (Character ingredient: itemMap.getIngredients().keySet()) {
+		    					ItemMap ingredMap = ItemUtilities.getUtilities().getItemMap(null, itemMap.getIngredients().get(ingredient) , null);
+		    					if (ingredMap != null && itemMap.getRecipe().size() > i && itemMap.getRecipe().get(i) == ingredient && !ingredMap.isSimilar(item)) {
+		    						event.getInventory().setResult(new ItemStack(Material.AIR));
+		    						break;
+		    					}
+		    				}
+		    			}
+					}
+	    		}
 	    	}
     	}
     }
