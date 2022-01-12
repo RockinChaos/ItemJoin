@@ -67,6 +67,7 @@ public class MetricsAPI {
   * @param serviceId - The id of the service. It can be found at <a
   *     href="https://bstats.org/what-is-my-plugin-id">What is my plugin id?</a>
   */
+  @SuppressWarnings("deprecation")
   public MetricsAPI(final JavaPlugin plugin, final int serviceId) {
     this.plugin = plugin;
     File bStatsFolder = new File(plugin.getDataFolder().getParentFile(), "bStats");
