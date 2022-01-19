@@ -579,6 +579,11 @@ public final class ReflectionUtils {
 		return null;
 	}
 	
+   /**
+	* Checks if the Server is running a remapped version of NBT.
+	* 
+	* @return If the Server is remapped.
+	*/
 	public static boolean remapped() {
 		return MC_REMAPPED;
 	}
