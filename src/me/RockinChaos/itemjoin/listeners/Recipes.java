@@ -91,7 +91,7 @@ public class Recipes implements Listener {
     	if (event.getRecipe() != null && event.getRecipe().getResult() != null && event.getRecipe().getResult().getType() != Material.AIR) {
 	    	List<ItemMap> mapList = new ArrayList<ItemMap>();
 	    	ItemMap checkMap = ItemUtilities.getUtilities().getItemMap(event.getRecipe().getResult(), null, event.getView().getPlayer().getWorld());
-	    	if (checkMap != null) { mapList.add(checkMap); }
+	    	if (checkMap != null) { mapList.add(checkMap); } else { return; }
 	    	for (ItemMap itemMap : ItemUtilities.getUtilities().getItems()) {
 	    		if (itemMap != null && itemMap.getIngredients() != null && !itemMap.getIngredients().isEmpty()) {
 	    			mapList.add(itemMap);
