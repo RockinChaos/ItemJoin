@@ -40,16 +40,11 @@ public class ProtocolAPI {
 		if (protocolManager == null) { protocolManager = ProtocolLibrary.getProtocolManager(); }
 		
 		PacketType[] packetType = null;
-		if (ServerUtils.hasSpecificUpdate("1_12")) {
+		if (ServerUtils.hasSpecificUpdate("1_13")) {
 			packetType = new PacketType[3];
 			packetType[0] = PacketType.Play.Client.CLOSE_WINDOW;
-			if (ServerUtils.hasSpecificUpdate("1_13")) {
-				packetType[1] = PacketType.Play.Client.PICK_ITEM;
-				packetType[2] = PacketType.Play.Client.AUTO_RECIPE;
-			}
-		} else if (ServerUtils.hasSpecificUpdate("1_9")) {
-			packetType = new PacketType[2];
-			packetType[0] = PacketType.Play.Client.CLOSE_WINDOW;
+			packetType[1] = PacketType.Play.Client.PICK_ITEM;
+			packetType[2] = PacketType.Play.Client.AUTO_RECIPE;
 		} else {
 			packetType = new PacketType[1];
 			packetType[0] = PacketType.Play.Client.CLOSE_WINDOW;
