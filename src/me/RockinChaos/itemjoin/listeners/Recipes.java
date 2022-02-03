@@ -104,24 +104,34 @@ public class Recipes implements Listener {
 		    		if (!itemMap.hasPermission((Player)event.getView().getPlayer(), event.getView().getPlayer().getWorld())) {
 		    			event.getInventory().setResult(new ItemStack(Material.AIR));
 		    		} else {
+		    			boolean addRecipe = false;
+		    			int ingredientSize = 0;
+		    			int confirmations = 0;
+		    			for (Character character : itemMap.getRecipe()) {
+		    				if (character != 'X') {
+		    					ingredientSize += 1;
+		    				}
+		    			}
 			    		for (int i = 0; i < event.getInventory().getSize(); i++ ){
 			    			final ItemStack item = event.getInventory().getItem(i + 1);
 			    			if (item != null) {
-			    				boolean isSafe = true;
 			    				for (Character ingredient: itemMap.getIngredients().keySet()) {
 			    					ItemMap ingredMap = ItemUtilities.getUtilities().getItemMap(null, itemMap.getIngredients().get(ingredient) , null);
-			    					if (ingredMap != null && itemMap.getRecipe().size() > i && itemMap.getRecipe().get(i) == ingredient && !ingredMap.isSimilar(item)) {
-			    						event.getInventory().setResult(new ItemStack(Material.AIR));
-			    						isSafe = false;
-			    						break;
-			    					}
-			    				} {
-			    					if (isSafe) {
-			    						event.getInventory().setResult(itemMap.getItem((Player)event.getView().getPlayer()));
-			    						isBreak = true;
-			    						break;
+			    					if (itemMap.getRecipe().size() > i && itemMap.getRecipe().get(i) == ingredient) {
+			    						if (((ingredMap == null && itemMap.getIngredients().get(ingredient).equalsIgnoreCase(item.getType().name())) 
+			    						  || (ingredMap != null && ingredMap.isSimilar(item)))) {
+			    							confirmations += 1;
+				    						if (ingredMap != null) {
+				    							addRecipe = true;
+				    						}
+			    						}
 			    					}
 			    				}
+			    			}
+			    			if (confirmations == ingredientSize && addRecipe) {
+			    				event.getInventory().setResult(itemMap.getItem((Player)event.getView().getPlayer()));
+			    				isBreak = true;
+			    				break;
 			    			}
 						}
 		    		}
