@@ -248,9 +248,9 @@ public class LanguageAPI {
     */
 	public void langFile() {
 		String lang = ConfigHandler.getConfig().getFile("config.yml").getString("Language").replace(" ", "");
-		if (lang.equalsIgnoreCase("TraditionalChinese") || lang.equalsIgnoreCase("TwChinese") || lang.equalsIgnoreCase("Chinese")) { this.setLanguage("tw"); } 
-		else if (lang.equalsIgnoreCase("SimplifiedChinese") || lang.equalsIgnoreCase("CnChinese")) { this.setLanguage("cn"); } 
-		else if (StringUtils.containsIgnoreCase(lang, "Chinese")) { this.setLanguage("tw"); } 
+		if (lang.equalsIgnoreCase("TraditionalChinese") || lang.equalsIgnoreCase("TwChinese")) { this.setLanguage("tw"); } 
+		else if (lang.equalsIgnoreCase("SimplifiedChinese") || lang.equalsIgnoreCase("CnChinese") || lang.equalsIgnoreCase("Chinese")) { this.setLanguage("cn"); } 
+		else if (StringUtils.containsIgnoreCase(lang, "Chinese")) { this.setLanguage("cn"); } 
 		else if (lang.equalsIgnoreCase("Spanish")) { this.setLanguage("es"); } 
 		else if (lang.equalsIgnoreCase("Russian")) { this.setLanguage("ru"); } 
 		else if (lang.equalsIgnoreCase("French")) { this.setLanguage("fr"); } 
