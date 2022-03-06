@@ -366,7 +366,7 @@ public class StringUtils {
     */
 	public static String toTextureUUID(final Player player, final String configName, final String skullTexture) {
 		if (StringUtils.containsIgnoreCase(skullTexture, "uuid")) {
-			String https = ("https://sessionserver.mojang.com/session/minecraft/profile/" + StringUtils.translateLayout(skullTexture.replace("uuid-", "").replace("uuid", ""), player));
+			String https = ("https://sessionserver.mojang.com/session/minecraft/profile/" + StringUtils.translateLayout(skullTexture, player).replace("uuid-", "").replace("uuid", ""));
 			try {
 				final URL url = new URL(https);
 				final BufferedReader read = new BufferedReader(new InputStreamReader(url.openStream()));
@@ -609,6 +609,7 @@ public class StringUtils {
 		} else if (player != null) { playerName = player.getName(); }
 		if (playerName != null && player != null && !(player instanceof ConsoleCommandSender)) {
 			try { str = str.replace("%player%", playerName); } catch (Exception e) { ServerUtils.sendDebugTrace(e); }
+			try { str = str.replace("%player_uuid%", player.getUniqueId().toString()); } catch (Exception e) { ServerUtils.sendDebugTrace(e); }
 			try { str = str.replace("%mob_kills%", String.valueOf(player.getStatistic(Statistic.MOB_KILLS))); } catch (Exception e) { ServerUtils.sendDebugTrace(e); }
 			try { str = str.replace("%player_kills%", String.valueOf(player.getStatistic(Statistic.PLAYER_KILLS))); } catch (Exception e) { ServerUtils.sendDebugTrace(e); }
 			try { str = str.replace("%player_deaths%", String.valueOf(player.getStatistic(Statistic.DEATHS))); } catch (Exception e) { ServerUtils.sendDebugTrace(e); }

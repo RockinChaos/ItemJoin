@@ -63,7 +63,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.map.MapView;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
@@ -201,7 +200,6 @@ public class ItemMap {
 	private List < String > dynamicOwners = new ArrayList < String > ();
 	private List < String > dynamicTextures = new ArrayList < String > ();
 	private boolean materialAnimated = false;
-	private boolean skullAnimated = false;
 	private Map < Player, ItemAnimation > localeAnimations = new HashMap < Player, ItemAnimation > ();
 //  ====================================================================================================== //
 	
@@ -802,7 +800,6 @@ public class ItemMap {
     */
 	public void setDynamicOwners(final List<String> owners) {
 		this.dynamicOwners = owners;
-		this.skullAnimated = true;
 	}
 	
    /**
@@ -812,7 +809,6 @@ public class ItemMap {
     */
 	public void setDynamicTextures(final List<String> textures) {
 		this.dynamicTextures = textures;
-		this.skullAnimated = true;
 	}
 	
    /**
@@ -3628,17 +3624,15 @@ public class ItemMap {
 	public boolean isSimilar(final ItemStack item) {
 		if ((item != null && item.getType() != Material.AIR && item.getType() == this.material) || (this.materialAnimated && item != null && item.getType() != Material.AIR && this.isMaterial(item))) {
 			if (this.vanillaControl || this.vanillaStatus || (ItemHandler.dataTagsEnabled() && ItemHandler.getNBTData(item) != null && ItemHandler.getNBTData(item).equalsIgnoreCase(this.newNBTData))
-					|| (this.legacySecret != null && item.hasItemMeta() && (ServerUtils.hasSpecificUpdate("1_14") || (!ServerUtils.hasSpecificUpdate("1_14") && item.getItemMeta().hasDisplayName())) 
-					&& StringUtils.colorDecode(item) != null && StringUtils.colorDecode(item).contains(this.legacySecret))) {
-				if (this.skullMeta(item)) {
-					if (isEnchantSimilar(item) || !item.getItemMeta().hasEnchants() && enchants.isEmpty() || this.isItemChangable()) {
-						if (this.material.toString().toUpperCase().contains("BOOK") 
-								&& (this.isBookMeta(item) 
-								&& ((BookMeta) item.getItemMeta()).getPages().equals(((BookMeta) tempItem.getItemMeta()).getPages()) || this.isDynamic())
-								|| this.material.toString().toUpperCase().contains("BOOK") && !this.isBookMeta(item) || !this.material.toString().toUpperCase().contains("BOOK") || this.isItemChangable()) {
-							if (!this.vanillaControl || this.vanillaControl && this.displayMeta(item)) {
-								return true;
-							}
+				|| (this.legacySecret != null && item.hasItemMeta() && (ServerUtils.hasSpecificUpdate("1_14") || (!ServerUtils.hasSpecificUpdate("1_14") && item.getItemMeta().hasDisplayName())) 
+				&& StringUtils.colorDecode(item) != null && StringUtils.colorDecode(item).contains(this.legacySecret))) {
+				if (isEnchantSimilar(item) || !item.getItemMeta().hasEnchants() && enchants.isEmpty() || this.isItemChangable()) {
+					if (this.material.toString().toUpperCase().contains("BOOK") 
+							&& (this.isBookMeta(item) 
+							&& ((BookMeta) item.getItemMeta()).getPages().equals(((BookMeta) tempItem.getItemMeta()).getPages()) || this.isDynamic())
+							|| this.material.toString().toUpperCase().contains("BOOK") && !this.isBookMeta(item) || !this.material.toString().toUpperCase().contains("BOOK") || this.isItemChangable()) {
+						if (!this.vanillaControl || this.vanillaControl && this.displayMeta(item)) {
+							return true;
 						}
 					}
 				}
@@ -3679,42 +3673,6 @@ public class ItemMap {
 				return true;
 			}
 		} else if (this.tempMeta == null) { return true; }
-		return false;
-	}
-	
-   /**
-    * Checks if the Skull Meta is similar.
-    * 
-    * @param item - The ItemStack being checked.
-    * @return If the skull meta is similar.
-    */
-	private boolean skullMeta(final ItemStack item) {
-		if (!this.isSkull() || this.skullOwner == null && this.skullTexture == null && PlayerHandler.getSkullOwner(item).equalsIgnoreCase("NULL") && ItemHandler.getSkullTexture(item.getItemMeta()).isEmpty() 
-				|| !this.skullAnimated && ((SkullMeta) item.getItemMeta()).hasOwner() && this.skullOwner != null && PlayerHandler.getSkullOwner(item).equalsIgnoreCase(this.skullOwner) 
-				|| this.skullOwner != null && this.isSkullData(item)
-				|| this.skullOwner != null && StringUtils.containsIgnoreCase(this.skullOwner, "%player%")
-				|| this.skullTexture != null && this.skullOwner == null 
-				&& ItemHandler.getSkullTexture(item.getItemMeta()).equalsIgnoreCase(this.skullTexture)
-				|| this.skullAnimated && this.isSkull(item) || this.skullTexture != null && this.skullOwner == null && this.isHeadSimilar(item)) {
-			return true;
-		}
-		return false;
-	}
-	
-   /**
-    * Checks if the HeadDatabase Skull is Similar.
-    * 
-    * @param item - The ItemStack being checked.
-    * @return If the HeadDatabase Skull is similar.
-    */
-	private boolean isHeadSimilar(final ItemStack item) {
-		if (this.headDatabase) {
-			HeadDatabaseAPI api = new HeadDatabaseAPI();
-			ItemStack itemCopy = api.getItemHead(this.skullTexture);
-			if (itemCopy != null && ItemHandler.getSkullTexture(item.getItemMeta()).equalsIgnoreCase(ItemHandler.getSkullTexture(itemCopy.getItemMeta()))) {
-				return true;
-			}
-		}
 		return false;
 	}
 	
@@ -3777,47 +3735,6 @@ public class ItemMap {
 			if (item.getType() == ItemHandler.getMaterial(material, dataValue)) {
 				return true;
 			}
-		}
-		return false;
-	}
-	
-   /**
-    * Checks if the Skull Owners or Textures are similar.
-    * 
-    * @param item - The ItemStack being checked.
-    * @return If the Skull Owwners or Skull Textures are similar.
-    */
-	private boolean isSkull(final ItemStack item) {
-		if (this.dynamicOwners != null && !this.dynamicOwners.isEmpty()) {
-			for (String owners : this.dynamicOwners) {
-				owners = ItemHandler.cutDelay(owners);
-				if (PlayerHandler.getSkullOwner(item) != null && PlayerHandler.getSkullOwner(item).equalsIgnoreCase(this.skullOwner) || PlayerHandler.getSkullOwner(item) != null && StringUtils.containsIgnoreCase(this.skullOwner, "%player%")) {
-					return true;
-				} else if (this.isSkullData(item) && this.isSkull()){
-					return true;
-				}
-			}
-			if (this.dynamicOwners.toString().contains("%player%")) { return true; }
-		} else if (this.dynamicTextures != null && !this.dynamicTextures.isEmpty()) {
-			for (String textures : this.dynamicTextures) {
-				textures = ItemHandler.cutDelay(textures);
-				if (ItemHandler.getSkullTexture(item.getItemMeta()).equalsIgnoreCase(textures)) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-	
-   /**
-    * Checks if the Skull Data is Similar.
-    * 
-    * @param item - The ItemStack being checked.
-    * @return If the Skull Data is similar.
-    */
-	private boolean isSkullData(final ItemStack item) {
-		if (ItemHandler.getSkullTexture(item.getItemMeta()).equalsIgnoreCase(ItemHandler.getSkullTexture(this.tempMeta))) {
-			return true;	
 		}
 		return false;
 	}
