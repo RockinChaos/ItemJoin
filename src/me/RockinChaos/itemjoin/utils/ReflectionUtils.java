@@ -484,7 +484,7 @@ public final class ReflectionUtils {
 		set("set", "a"),
 		setInt("setInt", "a"),
 		getPage("a", "a"),
-		getTag("getTag", "s"),
+		getTag("getTag", (ServerUtils.hasPreciseUpdate("1_18_2") ? "t" : "s")),
 		setTag("setTag", "c"),
 		setString("setString", "a"),
 		getString("getString", "l"),
@@ -496,7 +496,6 @@ public final class ReflectionUtils {
 			this.original = original;
 			this.remapped = remapped;
 		}
-		
 		public String getMethod(final Object objClass, Class<?>...arguments) {
 			try {
 				Class<?> canonicalClass = (!(objClass instanceof Class<?>) ? objClass.getClass() : (Class<?>)objClass);

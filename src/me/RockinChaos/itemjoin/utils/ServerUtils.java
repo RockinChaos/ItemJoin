@@ -41,7 +41,7 @@ public class ServerUtils {
 	
 	private static String packageName = ItemJoin.getInstance().getServer().getClass().getPackage().getName();
 	private static String serverVersion = packageName.substring(packageName.lastIndexOf('.') + 1).replace("_", "").replace("R0", "").replace("R1", "").replace("R2", "").replace("R3", "").replace("R4", "").replace("R5", "").replaceAll("[a-z]", "");
-	
+	private static String serverPreciseVersion = packageName.substring(packageName.lastIndexOf('.') + 1).replace("_", "").replace("R", "").replaceAll("[a-z]", "");
 	private static List < String > errorStatements = new ArrayList < String > ();
 	
    /**
@@ -52,6 +52,19 @@ public class ServerUtils {
     */
 	public static boolean hasSpecificUpdate(final String versionString) {
 		if (Integer.parseInt(serverVersion) >= Integer.parseInt(versionString.replace("_", ""))) {
+			return true;
+		}
+		return false;
+	}
+	
+   /**
+    * Checks if the server is running the specified version.
+    * 
+    * @param versionString - The version to compare against the server version, example: '1_13'.
+    * @return If the server version is greater than or equal to the specified version.
+    */
+	public static boolean hasPreciseUpdate(final String versionString) {
+		if (Integer.parseInt(serverPreciseVersion) >= Integer.parseInt(versionString.replace("_", ""))) {
 			return true;
 		}
 		return false;
