@@ -123,8 +123,8 @@ public class ConfigHandler {
 		LogHandler.getFilter(true);
 		BungeeAPI.getBungee(true);
 		this.copyFiles();
+		DependAPI.getDepends(true);
 		SchedulerUtils.runAsync(() -> {
-			DependAPI.getDepends(true);
 			int customItems = (this.getConfigurationSection() != null ? this.getConfigurationSection().getKeys(false).size() : 0);
 			if (!silent) {
 				DependAPI.getDepends(false).sendUtilityDepends();
