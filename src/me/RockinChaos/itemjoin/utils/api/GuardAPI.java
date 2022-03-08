@@ -68,7 +68,7 @@ public class GuardAPI {
 	* 
 	*/
 	public GuardAPI() {
-		if (Bukkit.getServer().getPluginManager().isPluginEnabled("WorldEdit") && Bukkit.getServer().getPluginManager().isPluginEnabled("WorldGuard")) {
+		if (guardEnabled()) {
 			this.enableGuard();
 			if (Bukkit.getServer().getPluginManager().getPlugin("WorldGuard") instanceof WorldGuardPlugin) {
 				this.worldGuardPlugin = (WorldGuardPlugin) Bukkit.getServer().getPluginManager().getPlugin("WorldGuard");
@@ -141,7 +141,8 @@ public class GuardAPI {
 	* @return If WorldGuard is enabled.
 	*/
     public boolean guardEnabled() {
-    	return Bukkit.getServer().getPluginManager().isPluginEnabled("WorldEdit") && Bukkit.getServer().getPluginManager().isPluginEnabled("WorldGuard");
+    	return Bukkit.getServer().getPluginManager().isPluginEnabled("WorldEdit") && Bukkit.getServer().getPluginManager().isPluginEnabled("WorldGuard") 
+    			&& !StringUtils.containsIgnoreCase(DependAPI.getDepends(false).getIgnoreList(), "WorldEdit") && !StringUtils.containsIgnoreCase(DependAPI.getDepends(false).getIgnoreList(), "WorldGuard");
     }
     
    /**

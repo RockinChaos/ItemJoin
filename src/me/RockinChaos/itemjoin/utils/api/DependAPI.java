@@ -26,6 +26,7 @@ import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.utils.ReflectionUtils;
 import me.RockinChaos.itemjoin.utils.ServerUtils;
+import me.RockinChaos.itemjoin.utils.StringUtils;
 import me.RockinChaos.itemjoin.utils.api.MetricsAPI.SimplePie;
 
 public class DependAPI {
@@ -42,12 +43,21 @@ public class DependAPI {
 	}
 	
    /**
+    * Gets the list of dependencies that should be ignored.
+    * 
+    * @return The list of dependencies to be ignored.
+    */
+	public String getIgnoreList() {
+		return ConfigHandler.getConfig().getFile("config.yml").getString("General.ignoreDepend");
+	}
+	
+   /**
     * Checks if Hyperverse is Enabled.
     * 
     * @return If Hyperverse is Enabled.
     */
 	public boolean exploitFixerEnabled() {
-		return Bukkit.getServer().getPluginManager().isPluginEnabled("ExploitFixer");
+		return Bukkit.getServer().getPluginManager().isPluginEnabled("ExploitFixer") && !StringUtils.containsIgnoreCase(this.getIgnoreList(), "ExploitFixer");
 	}
 	
    /**
@@ -56,7 +66,7 @@ public class DependAPI {
     * @return If Hyperverse is Enabled.
     */
 	public boolean hyperVerseEnabled() {
-		return Bukkit.getServer().getPluginManager().isPluginEnabled("Hyperverse");
+		return Bukkit.getServer().getPluginManager().isPluginEnabled("Hyperverse") && !StringUtils.containsIgnoreCase(this.getIgnoreList(), "Hyperverse");
 	}
 
    /**
@@ -65,7 +75,7 @@ public class DependAPI {
     * @return If Multiverse Core is Enabled.
     */
     public boolean coreEnabled() {
-    	return Bukkit.getServer().getPluginManager().isPluginEnabled("Multiverse-Core");
+    	return Bukkit.getServer().getPluginManager().isPluginEnabled("Multiverse-Core") && !StringUtils.containsIgnoreCase(this.getIgnoreList(), "Multiverse-Core");
     }
     
    /**
@@ -74,7 +84,7 @@ public class DependAPI {
     * @return If Multiverse Inventory is Enabled.
     */
     public boolean inventoryEnabled() {
-    	return Bukkit.getServer().getPluginManager().isPluginEnabled("Multiverse-Inventories");
+    	return Bukkit.getServer().getPluginManager().isPluginEnabled("Multiverse-Inventories") && !StringUtils.containsIgnoreCase(this.getIgnoreList(), "Multiverse-Inventories");
     }
     
    /**
@@ -83,7 +93,7 @@ public class DependAPI {
     * @return If PlaceHolderAPI is Enabled.
     */
     public boolean placeHolderEnabled() {
-    	return Bukkit.getServer().getPluginManager().isPluginEnabled("PlaceholderAPI");
+    	return Bukkit.getServer().getPluginManager().isPluginEnabled("PlaceholderAPI") && !StringUtils.containsIgnoreCase(this.getIgnoreList(), "PlaceholderAPI");
     }
     
    /**
@@ -92,7 +102,7 @@ public class DependAPI {
     * @return If PerWorldPlugins is Enabled.
     */
     public boolean perPluginsEnabled() {
-    	return Bukkit.getServer().getPluginManager().isPluginEnabled("PerWorldPlugins");
+    	return Bukkit.getServer().getPluginManager().isPluginEnabled("PerWorldPlugins") && !StringUtils.containsIgnoreCase(this.getIgnoreList(), "PerWorldInventory");
     }
     
    /**
@@ -101,7 +111,7 @@ public class DependAPI {
     * @return If PerWorldInventory is Enabled.
     */
     public boolean perInventoryEnabled() {
-    	return Bukkit.getServer().getPluginManager().isPluginEnabled("PerWorldInventory");
+    	return Bukkit.getServer().getPluginManager().isPluginEnabled("PerWorldInventory") && !StringUtils.containsIgnoreCase(this.getIgnoreList(), "PerWorldInventory");
     }
     
    /**
@@ -110,7 +120,7 @@ public class DependAPI {
     * @return If BetterNick is Enabled.
     */
     public boolean nickEnabled() {
-    	return Bukkit.getServer().getPluginManager().isPluginEnabled("BetterNick");
+    	return Bukkit.getServer().getPluginManager().isPluginEnabled("BetterNick") && !StringUtils.containsIgnoreCase(this.getIgnoreList(), "BetterNick");
     }
     
    /**
@@ -119,7 +129,7 @@ public class DependAPI {
     * @return If NickAPI is Enabled.
     */
     public boolean nickAPIEnabled() {
-    	return Bukkit.getServer().getPluginManager().isPluginEnabled("NickAPI");
+    	return Bukkit.getServer().getPluginManager().isPluginEnabled("NickAPI") && !StringUtils.containsIgnoreCase(this.getIgnoreList(), "NickAPI");
     }
     
    /**
@@ -128,7 +138,7 @@ public class DependAPI {
     * @return If AuthMe is Enabled.
     */
     public boolean authMeEnabled() {
-    	return Bukkit.getServer().getPluginManager().isPluginEnabled("AuthMe");
+    	return Bukkit.getServer().getPluginManager().isPluginEnabled("AuthMe") && !StringUtils.containsIgnoreCase(this.getIgnoreList(), "AuthMe");
     }
     
    /**
@@ -137,7 +147,7 @@ public class DependAPI {
     * @return If My Worlds is Enabled.
     */
     public boolean myWorldsEnabled() {
-    	return Bukkit.getServer().getPluginManager().isPluginEnabled("My_Worlds");
+    	return Bukkit.getServer().getPluginManager().isPluginEnabled("My_Worlds") && !StringUtils.containsIgnoreCase(this.getIgnoreList(), "My_Worlds");
     }
     
    /**
@@ -146,7 +156,7 @@ public class DependAPI {
     * @return If xInventories is Enabled.
     */
     public boolean xInventoryEnabled() {
-    	return Bukkit.getServer().getPluginManager().isPluginEnabled("xInventories");
+    	return Bukkit.getServer().getPluginManager().isPluginEnabled("xInventories") && !StringUtils.containsIgnoreCase(this.getIgnoreList(), "xInventories");
     }
     
    /**
@@ -155,7 +165,7 @@ public class DependAPI {
     * @return If TokenEnchant is Enabled.
     */
     public boolean tokenEnchantEnabled() {
-    	return Bukkit.getServer().getPluginManager().isPluginEnabled("TokenEnchant");
+    	return Bukkit.getServer().getPluginManager().isPluginEnabled("TokenEnchant") && !StringUtils.containsIgnoreCase(this.getIgnoreList(), "TokenEnchant");
     }
     
    /**
@@ -164,7 +174,7 @@ public class DependAPI {
     * @return If HeadDatabase is Enabled.
     */
     public boolean databaseEnabled() {
-    	return Bukkit.getServer().getPluginManager().isPluginEnabled("HeadDatabase");
+    	return Bukkit.getServer().getPluginManager().isPluginEnabled("HeadDatabase") && !StringUtils.containsIgnoreCase(this.getIgnoreList(), "HeadDatabase");
     }
     
    /**
@@ -173,7 +183,7 @@ public class DependAPI {
     * @return If SkinsRestorer is Enabled.
     */
     public boolean skinsRestorerEnabled() {
-    	return Bukkit.getServer().getPluginManager().isPluginEnabled("SkinsRestorer");
+    	return Bukkit.getServer().getPluginManager().isPluginEnabled("SkinsRestorer") && !StringUtils.containsIgnoreCase(this.getIgnoreList(), "SkinsRestorer");
     }
     
    /**
@@ -182,7 +192,7 @@ public class DependAPI {
     * @return If Citizens is Enabled.
     */
     public boolean citizensEnabled() {
-    	return Bukkit.getServer().getPluginManager().isPluginEnabled("Citizens");
+    	return Bukkit.getServer().getPluginManager().isPluginEnabled("Citizens") && !StringUtils.containsIgnoreCase(this.getIgnoreList(), "Citizens");
     }
     
    /**
@@ -191,7 +201,7 @@ public class DependAPI {
     * @return If ChestSort is Enabled.
     */
     public boolean chestSortEnabled() {
-    	return Bukkit.getServer().getPluginManager().isPluginEnabled("ChestSort");
+    	return Bukkit.getServer().getPluginManager().isPluginEnabled("ChestSort") && !StringUtils.containsIgnoreCase(this.getIgnoreList(), "ChestSort");
     }
     
    /**
@@ -200,7 +210,7 @@ public class DependAPI {
     * @return If ProtocolLib is Enabled.
     */
     public boolean protocolEnabled() {
-    	return Bukkit.getServer().getPluginManager().isPluginEnabled("ProtocolLib");
+    	return Bukkit.getServer().getPluginManager().isPluginEnabled("ProtocolLib") && !StringUtils.containsIgnoreCase(this.getIgnoreList(), "ProtocolLib");
     }
     
    /**
@@ -278,7 +288,10 @@ public class DependAPI {
 				(this.skinsRestorerEnabled() ? "SkinsRestorer, " : "") + (this.citizensEnabled() ? "Citizens, " : "") + (this.chestSortEnabled() ? "ChestSort, " : "")
 				+ (this.getVault().vaultEnabled() ? "Vault, " : "");
 		if (!enabledPlugins.isEmpty()) { ServerUtils.logInfo("Hooked into { " + enabledPlugins.substring(0, enabledPlugins.length() - 2) + " }"); }
-		
+		if (this.getIgnoreList() != null && !this.getIgnoreList().isEmpty() && !StringUtils.containsIgnoreCase(this.getIgnoreList(), "NONE") 
+				&& !StringUtils.containsIgnoreCase(this.getIgnoreList(), "DISABLED") && !StringUtils.containsIgnoreCase(this.getIgnoreList(), "DISABLE")) {
+			ServerUtils.logInfo("The following plugins will be ignored { " + this.getIgnoreList() + " }");
+		}
 		if (Bukkit.getServer().getPluginManager().isPluginEnabled("Vault") && !this.getVault().vaultEnabled()) {
 			ServerUtils.logDebug("{VaultAPI} An error has occured while setting up enabling Vault-ItemJoin support, no economy plugin detected."); 
 		}
