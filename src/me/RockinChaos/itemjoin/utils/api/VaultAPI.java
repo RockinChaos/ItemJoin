@@ -22,6 +22,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
 import me.RockinChaos.itemjoin.ItemJoin;
+import me.RockinChaos.itemjoin.utils.SchedulerUtils;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
 
@@ -47,12 +48,22 @@ public class VaultAPI {
 	*/
     private boolean setupEconomy() {
     	try {
-	        if (!Bukkit.getServer().getPluginManager().isPluginEnabled("Vault")) { return false; }
-	        RegisteredServiceProvider<Economy> rsp = ItemJoin.getInstance().getServer().getServicesManager().getRegistration(Economy.class);
-	        if (rsp == null) { return false; }
-	        this.econ = rsp.getProvider();
-	        return this.econ != null;
+    		if (!Bukkit.getServer().getPluginManager().isPluginEnabled("Vault")) { 
+    			if (!ItemJoin.getInstance().isStarted()) {
+    				SchedulerUtils.runLater(1L, () -> {
+    					this.setupEconomy();
+    				});
+    			} else {
+    				 return false;
+    			}
+		    } else {
+	    		RegisteredServiceProvider<Economy> rsp = ItemJoin.getInstance().getServer().getServicesManager().getRegistration(Economy.class);
+	    		if (rsp == null) { return false; }
+	    		this.econ = rsp.getProvider();
+	    		return this.econ != null;
+		    }
     	} catch (Exception e) { return false; }
+		return false;
     }
     
    /**
