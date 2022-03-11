@@ -64,7 +64,7 @@ public class Placement implements Listener {
 	 	if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK && !PlayerHandler.isCreativeMode(player)) {
 	 		if (!ItemUtilities.getUtilities().isAllowed(player, item, "count-lock")) {
 	 			ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item, null, player.getWorld());
-	 			item.setAmount(itemMap.getCount());
+	 			item.setAmount(itemMap.getCount(player));
 				SchedulerUtils.run(() -> {
 		 			if (StringUtils.containsIgnoreCase(item.getType().name(), "WATER") || StringUtils.containsIgnoreCase(item.getType().name(), "LAVA") || item.getType().name().equalsIgnoreCase("BUCKET") 
 		 			 || StringUtils.containsIgnoreCase(item.getType().name(), "POTION")) {
@@ -94,7 +94,7 @@ public class Placement implements Listener {
 		 						}
 		 					}
 		 				} else if (itemMap.isSimilar(PlayerHandler.getHandItem(player))) { 
-		 					PlayerHandler.getHandItem(player).setAmount(itemMap.getCount()); 
+		 					PlayerHandler.getHandItem(player).setAmount(itemMap.getCount(player)); 
 		 				}
 		 			}
 		 		});
@@ -150,7 +150,7 @@ public class Placement implements Listener {
 		 						} 
 		 						else { PlayerHandler.setMainHandItem(player, item); }
 		 					} else if (itemMap.isSimilar(PlayerHandler.getHandItem(player))) { 
-		 						PlayerHandler.getHandItem(player).setAmount(itemMap.getCount()); 
+		 						PlayerHandler.getHandItem(player).setAmount(itemMap.getCount(player)); 
 		 					} 
 	 					}
 	 				}

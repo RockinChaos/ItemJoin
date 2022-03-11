@@ -525,7 +525,7 @@ public class ItemUtilities {
     * @param clearAll - If ALL items are being cleared.
     */
 	public void saveReturnItems(final TriggerType type, final Player player, final String world, final Inventory craftView, final PlayerInventory inventory, final boolean clearAll) {
-		boolean doReturn = StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Options").replace(" ", ""), "RETURN_SWITCH", ",");
+		boolean doReturn = StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Options"), "RETURN_SWITCH", ",");
 		List < ItemMap > protectItems = ItemUtilities.getUtilities().getProtectItems();
 		if (type == TriggerType.WORLD_SWITCH && doReturn) {
 			Inventory saveInventory = Bukkit.createInventory(null, 54);

@@ -831,8 +831,8 @@ public class Menu {
 				}));
 			creatingPane.addButton(new Button(ItemHandler.getItem("GLASS", 1, false, "&c&lSlot", "&7", "&7*Set the slot that the", "&7item will be given in.", (itemMap.getMultipleSlots() != null && 
 					!itemMap.getMultipleSlots().isEmpty() ? "&9&lSlot(s): &a" + slotList : "&9&lSLOT: &a" + itemMap.getSlot().toUpperCase())), event -> switchPane(player, itemMap, 1)));
-			creatingPane.addButton(new Button(ItemHandler.getItem("DIAMOND", itemMap.getCount(), false, "&b&lCount", "&7", "&7*Set the amount of the", "&7item to be given.", "&9&lCOUNT: &a" + 
-					itemMap.getCount()), event -> countPane(player, itemMap)));
+			creatingPane.addButton(new Button(ItemHandler.getItem("DIAMOND", itemMap.getCount(player), false, "&b&lCount", "&7", "&7*Set the amount of the", "&7item to be given.", "&9&lCOUNT: &a" + 
+					itemMap.getCount(player)), event -> countPane(player, itemMap)));
 			creatingPane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, false, "&b&lName", "&7", "&7*Set the name of the item.", "&9&lNAME: &f" + StringUtils.nullCheck(itemMap.getCustomName())), event -> {
 				if (itemMap.getDynamicNames() != null && !itemMap.getDynamicNames().isEmpty()) {
 					animatedNamePane(player, itemMap);
@@ -8535,7 +8535,7 @@ public class Menu {
 		try {
 			item = ItemHandler.getItem(itemMap.getMaterial().toString() + ((itemMap.getDataValue() != null && itemMap.getDataValue() != 0) ? ":" + itemMap.getDataValue() : ""), 1, false, "&7*&6&l&nItem Information", "&7", "&9&lNode: &a" + itemMap.getConfigName(), "&9&lMaterial: &a" 
 			+ itemMap.getMaterial().toString() + ((itemMap.getDataValue() != null && itemMap.getDataValue() != 0) ? ":" + itemMap.getDataValue() : ""), 
-					(itemMap.getMultipleSlots() != null && !itemMap.getMultipleSlots().isEmpty() ? "&9&lSlot(s): &a" + slotList : "&9&lSlot: &a" + itemMap.getSlot().toUpperCase()), (itemMap.getCount() != 1 && itemMap.getCount() != 0) ? "&9&lCount: &a" + itemMap.getCount() : "", 
+					(itemMap.getMultipleSlots() != null && !itemMap.getMultipleSlots().isEmpty() ? "&9&lSlot(s): &a" + slotList : "&9&lSlot: &a" + itemMap.getSlot().toUpperCase()), (itemMap.getCount(player) != 1 && itemMap.getCount(player) != 0) ? "&9&lCount: &a" + itemMap.getCount(player) : "", 
 					((StringUtils.nullCheck(itemMap.getCustomName()) != "NONE" && !ItemHandler.getMaterialName(itemMap.getTempItem()).equalsIgnoreCase(itemMap.getCustomName())) ? "&9&lName: &a" + itemMap.getCustomName() : ""), (StringUtils.nullCheck(itemMap.getCustomLore().toString()) != "NONE" ? "&9&lLore: &a" + (StringUtils.nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",").length() > 40 ? StringUtils.nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",").substring(0, 40) : StringUtils.nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",")) : ""), 
 					(StringUtils.nullCheck(itemMap.getDurability() + "&7") != "NONE" ? "&9&lDurability: &a" + itemMap.getDurability() : ""), (StringUtils.nullCheck(itemMap.getData() + "&7") != "NONE" ? "&9&lTexture Data: &a" + itemMap.getData() : ""), (useCommands ? "&9&lCommands: &aYES" : ""), (useToggle ? "&9&lTogglable: &aYES" : ""),
 					(StringUtils.nullCheck(itemMap.getItemCost() + "") != "NONE" ? "&9&lCommands-Item: &a" + itemMap.getItemCost() : ""), (StringUtils.nullCheck(itemMap.getCommandCost() + "&7") != "NONE" ? "&9&lCommands-Cost: &a" + itemMap.getCommandCost() : ""), 

@@ -122,7 +122,7 @@ public class ItemMap {
 	private String Arbitrary = null;
 	private String itemValue = null;
 	
-	private Integer count = 1;
+	private String count = "1";
 	private Map < String, Double > attributes = new HashMap < String, Double > ();
 	
 	private Short durability = null;
@@ -328,7 +328,7 @@ public class ItemMap {
         
         if (this.nodeLocation != null) {
         	this.setMultipleSlots();
-	        this.setCount(this.nodeLocation.getString(".count"));
+        	this.setCount(this.nodeLocation.getString(".count"));
 			this.setCommandCost();
 			this.setCommandReceive();
 			this.setCommandWarmDelay();
@@ -707,8 +707,8 @@ public class ItemMap {
     */
 	public void renderItemStack() {
         if (this.dataValue != null) {
-        	this.tempItem = LegacyAPI.newItemStack(this.material, this.count, this.dataValue);
-        } else { this.tempItem = new ItemStack(this.material, this.count); }
+	        this.tempItem = LegacyAPI.newItemStack(this.material, 1, this.dataValue);
+        } else { this.tempItem = new ItemStack(this.material, 1); }
 	}
 //  ======================================================================================================================================================================================== //
 
@@ -1012,9 +1012,7 @@ public class ItemMap {
     * @param count - The stack size to be set.
     */
 	public void setCount(final String count) {
-		if (count != null && StringUtils.isInt(count) && Integer.parseInt(count) != 0) {
-			this.count = Integer.parseInt(count);
-		} else { this.count = 1; }
+		this.count = count;
 	}
 	
    /**
@@ -2264,8 +2262,22 @@ public class ItemMap {
     * 
     * @return The stack size.
     */
-	public Integer getCount() {
-		return this.count;
+	public Integer getCount(final Player player) {
+		Integer countParse = 1;
+		if (this.count != null && !this.count.isEmpty()) {
+			try {
+				countParse = Integer.parseInt(StringUtils.translateLayout(this.count.replace(" ", ""), player));
+				if (countParse == 0) { 
+					countParse = 1; 
+				}
+			} catch (Exception e) {
+				ServerUtils.sendDebugTrace(e);
+				ServerUtils.logSevere("{ItemMap} The count set for the item " + this.configName + " is set to " + this.count + " but this is not a valid integer!");
+				ServerUtils.logSevere("{ItemMap} Check that the set value is an integer or placeholder that parses to an integer.");
+				ServerUtils.logSevere("{ItemMap} The count for the item " + this.configName + " will now default to 1.");
+			}
+		}
+		return countParse;
 	}
 	
    /**
@@ -3714,8 +3726,8 @@ public class ItemMap {
     * @param item - The ItemStack being checked.
     * @return If the stack size is similar.
     */
-	public boolean isCountSimilar(final ItemStack item) {
-		if (item.getAmount() == count || ConfigHandler.getConfig().getFile("items.yml").getBoolean("items-RestrictCount") == false || this.isItemChangable()) {
+	public boolean isCountSimilar(final Player player, final ItemStack item) {
+		if (item.getAmount() == this.getCount(player) || ConfigHandler.getConfig().getFile("items.yml").getBoolean("items-RestrictCount") == false || this.isItemChangable()) {
 			return true;
 		}
 		return false;
@@ -3747,28 +3759,28 @@ public class ItemMap {
     */
 	public boolean hasItem(final Player player, boolean ignoreCount) {
 		for (ItemStack inPlayerInventory: player.getInventory().getContents()) {
-			if (this.isSimilar(inPlayerInventory) && (ignoreCount || this.isCountSimilar(inPlayerInventory))) {
+			if (this.isSimilar(inPlayerInventory) && (ignoreCount || this.isCountSimilar(player, inPlayerInventory))) {
 				return true;
 			}
 		}
 		for (ItemStack equipInventory: player.getEquipment().getArmorContents()) {
-			if (this.isSimilar(equipInventory) && (ignoreCount || this.isCountSimilar(equipInventory))) {
+			if (this.isSimilar(equipInventory) && (ignoreCount || this.isCountSimilar(player, equipInventory))) {
 				return true;
 			}
 		}
 		if (ServerUtils.hasSpecificUpdate("1_9") 
 				&& this.isSimilar(player.getInventory().getItemInOffHand())
-				&& (ignoreCount || this.isCountSimilar(player.getInventory().getItemInOffHand()))) {
+				&& (ignoreCount || this.isCountSimilar(player, player.getInventory().getItemInOffHand()))) {
 			return true;
 		}
 		if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
 			for (ItemStack craftInventory: player.getOpenInventory().getTopInventory()) {
-				if (this.isSimilar(craftInventory) && (ignoreCount || this.isCountSimilar(craftInventory))) {
+				if (this.isSimilar(craftInventory) && (ignoreCount || this.isCountSimilar(player, craftInventory))) {
 					return true;
 				}
 			}
 		}
-		return (player.getItemOnCursor() != null && player.getItemOnCursor().getType() != Material.AIR && this.isSimilar(player.getItemOnCursor()) && (ignoreCount || this.isCountSimilar(player.getItemOnCursor())));
+		return (player.getItemOnCursor() != null && player.getItemOnCursor().getType() != Material.AIR && this.isSimilar(player.getItemOnCursor()) && (ignoreCount || this.isCountSimilar(player, player.getItemOnCursor())));
 	}
 	
    /**
@@ -3822,6 +3834,7 @@ public class ItemMap {
 			this.realGlow();
 			this.setContents(player);
 			this.tempItem.setItemMeta(this.tempMeta);
+			this.tempItem.setAmount(this.getCount(player));
 			LegacyAPI.setGlowing(this.tempItem, this);
 			LegacyAPI.setAttributes(this.tempItem, this);
 		}
@@ -5186,7 +5199,7 @@ public class ItemMap {
 				itemData.set("items." + this.configName + ".slot", this.CustomSlot); 
 			}
 		}
-		if (this.count > 1) { itemData.set("items." + this.configName + ".count", this.count); }
+		if (this.getCount(null) > 1 && !this.count.contains("%")) { itemData.set("items." + this.configName + ".count", this.count); }
 		if (this.durability != null && this.durability > 0) { itemData.set("items." + this.configName + ".durability", this.durability); }
 		if (this.data != null && this.data > 0) { itemData.set("items." + this.configName + ".data", this.data); }
 		if (this.modelData != null && this.modelData > 0) { itemData.set("items." + this.configName + ".model-data", this.modelData); }

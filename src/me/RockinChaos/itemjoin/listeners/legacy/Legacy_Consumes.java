@@ -113,7 +113,7 @@ public class Legacy_Consumes implements Listener {
 		Player player = event.getPlayer();
 		if (!ItemUtilities.getUtilities().isAllowed(player, item, "count-lock")) {
 			ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item, null, player.getWorld());
-			item.setAmount(itemMap.getCount());
+			item.setAmount(itemMap.getCount(player));
 			SchedulerUtils.runLater(2L, () -> {
 				if (itemMap != null) { 
 					if (PlayerHandler.getHandItem(player) == null || PlayerHandler.getHandItem(player).getAmount() <= 1) {
@@ -128,7 +128,7 @@ public class Legacy_Consumes implements Listener {
 		 				} 
 		 				else { PlayerHandler.setMainHandItem(player, item); }
 					} else if (itemMap.isSimilar(PlayerHandler.getHandItem(player))) { 
-						PlayerHandler.getHandItem(player).setAmount(itemMap.getCount()); 
+						PlayerHandler.getHandItem(player).setAmount(itemMap.getCount(player)); 
 		 			} 
 				}
 		 	});

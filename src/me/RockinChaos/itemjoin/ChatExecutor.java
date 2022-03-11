@@ -555,7 +555,7 @@ public class ChatExecutor implements CommandExecutor {
 				String customName = StringUtils.translateLayout(itemMap.getCustomName(), argsPlayer); placeHolders[3] = customName;
 				if ((remove && itemMap.hasItem(argsPlayer, true)) || (!remove && (itemMap.conditionMet(argsPlayer, "trigger-conditions") && (ItemUtilities.getUtilities().canOverwrite(argsPlayer, itemMap) && (amount != 0 || itemMap.isAlwaysGive() || !itemMap.hasItem(argsPlayer, false)))))) {
 					if (remove || !PermissionsHandler.receiveEnabled() || (itemMap.hasPermission(argsPlayer, argsPlayer.getWorld()) && PermissionsHandler.receiveEnabled())) {
-						if (itemMap.isAlwaysGive() && (args.length < 2 || (!StringUtils.isInt(args[args.length - 1])))) { amount = itemMap.getCount(); }
+						if (itemMap.isAlwaysGive() && (args.length < 2 || (!StringUtils.isInt(args[args.length - 1])))) { amount = itemMap.getCount(argsPlayer); }
 						if (StringUtils.getSlotConversion(itemMap.getSlot()) != 0 && PlayerHandler.isCraftingInv(argsPlayer.getOpenInventory()) && argsPlayer.getOpenInventory().getTopInventory().getItem(0) != null && !argsPlayer.getOpenInventory().getTopInventory().getItem(0).getType().equals(Material.AIR)) {
 							ItemHandler.returnCraftingItem(argsPlayer, 0, argsPlayer.getOpenInventory().getTopInventory().getItem(0).clone(), 0L);
 						}

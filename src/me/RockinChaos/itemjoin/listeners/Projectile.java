@@ -66,7 +66,7 @@ public class Projectile implements Listener {
 				if (player.getInventory().getItem(i) != null && player.getInventory().getItem(i).getType() == Material.ARROW && event.getProjectile().getType().name().equalsIgnoreCase("ARROW")) {
 					ItemStack cloneStack = player.getInventory().getItem(i).clone();
 					ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(player.getInventory().getItem(i), null, player.getWorld());
-					if (itemMap != null) { cloneStack.setAmount(itemMap.getCount()); }
+					if (itemMap != null) { cloneStack.setAmount(itemMap.getCount(player)); }
 					map.put(i, cloneStack);
 				}
 			}
@@ -135,7 +135,7 @@ public class Projectile implements Listener {
 				if (player.getInventory().getItem(i) != null && player.getInventory().getItem(i).getType() == Material.ARROW) {
 					ItemStack cloneStack = player.getInventory().getItem(i).clone();
 					ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(player.getInventory().getItem(i), null, player.getWorld());
-					if (itemMap != null) { cloneStack.setAmount(itemMap.getCount()); }
+					if (itemMap != null) { cloneStack.setAmount(itemMap.getCount(player)); }
 					map.put(i, cloneStack);
 				}
 			}
