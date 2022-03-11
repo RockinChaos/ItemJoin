@@ -279,6 +279,7 @@ public class ItemAnimation {
 		}
 		tempmeta.setDisplayName(StringUtils.translateLayout(ItemHandler.cutDelay(nameString), player) + itemData);
 		reviseItem.setItemMeta(tempmeta);
+		reviseItem.setAmount(this.itemMap.getCount(player)); // Temporary, implementation for a list of animated item count is planned.
 	}
 	
    /**
