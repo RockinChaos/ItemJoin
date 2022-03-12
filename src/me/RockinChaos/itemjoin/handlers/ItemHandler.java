@@ -397,8 +397,8 @@ public class ItemHandler {
     */
 	public static ItemMeta setSkullOwner(final ItemMeta meta, final String owner) {
 		if (!ServerUtils.hasSpecificUpdate("1_8")) {
-			ServerUtils.logDebug("{ItemMap} Minecraft does not support offline player heads below Version 1.8.");
-			ServerUtils.logDebug("{ItemMap} Player heads will only be given a skin if the player has previously joined the sever.");
+			ServerUtils.logDebug("{ItemHandler} Minecraft does not support offline player heads below Version 1.8.");
+			ServerUtils.logDebug("{ItemHandler} Player heads will only be given a skin if the player has previously joined the sever.");
 		}
 		setStoredSkull(meta, owner);
 		return meta;
@@ -712,7 +712,7 @@ public class ItemHandler {
 					}
 				}
 			} catch (Exception e) {
-				ServerUtils.logSevere("{ItemMap} An error has occured when getting NBTData to an item.");
+				ServerUtils.logSevere("{ItemHandler} An error has occured when getting NBTData to an item.");
 				ServerUtils.sendDebugTrace(e);
 			}
 		}
@@ -852,8 +852,8 @@ public class ItemHandler {
 	public static void safteyCheckURL(final ItemMap itemMap, final JSONEvent type, final String inputResult) {
 		if (type.equals(JSONEvent.OPEN_URL)) {
 			if (!StringUtils.containsIgnoreCase(inputResult, "https") && !StringUtils.containsIgnoreCase(inputResult, "http")) {
-				ServerUtils.logSevere("{ItemMap} The URL Specified for the clickable link in the book " + itemMap.getConfigName() + " is missing http or https and will not be clickable.");
-				ServerUtils.logWarn("{ItemMap} A URL designed for a clickable link should resemble this link structure: https://www.google.com/");
+				ServerUtils.logSevere("{ItemHandler} The URL Specified for the clickable link in the book " + itemMap.getConfigName() + " is missing http or https and will not be clickable.");
+				ServerUtils.logWarn("{ItemHandler} A URL designed for a clickable link should resemble this link structure: https://www.google.com/");
 			}
 		}
 	}
