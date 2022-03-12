@@ -2266,7 +2266,8 @@ public class ItemMap {
 		Integer countParse = 1;
 		if (this.count != null && !this.count.isEmpty()) {
 			try {
-				countParse = Integer.parseInt(StringUtils.translateLayout(this.count.replace(" ", ""), player));
+				final String translateCount = StringUtils.translateLayout(this.count, player).replaceAll("[^\\d.]", "").replace("-", "").replace(".", "").replace(" ", "");
+				countParse = Integer.parseInt(translateCount);
 				if (countParse == 0) { 
 					countParse = 1; 
 				}
