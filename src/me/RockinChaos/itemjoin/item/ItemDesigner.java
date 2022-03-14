@@ -1083,7 +1083,9 @@ public class ItemDesigner {
 		if (itemMap.getNodeLocation().getString(".leather-color") != null) {
 			if (itemMap.getMaterial().toString().equalsIgnoreCase("LEATHER_HELMET") || itemMap.getMaterial().toString().equalsIgnoreCase("LEATHER_CHESTPLATE")
 				|| itemMap.getMaterial().toString().equalsIgnoreCase("LEATHER_LEGGINGS") || itemMap.getMaterial().toString().equalsIgnoreCase("LEATHER_BOOTS")) {
-				String leatherColor = itemMap.getNodeLocation().getString(".leather-color").toUpperCase();
+				String leatherColor = itemMap.getNodeLocation().getString(".leather-color");
+				if (leatherColor.contains("%")) { leatherColor = StringUtils.translateLayout(leatherColor, null); }
+				leatherColor = leatherColor.toUpperCase();
 				try { 
 					if (leatherColor.startsWith("#")) { 
 						itemMap.setLeatherHex(leatherColor); 
