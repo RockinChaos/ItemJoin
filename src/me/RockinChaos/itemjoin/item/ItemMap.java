@@ -3826,7 +3826,7 @@ public class ItemMap {
 			this.setBanners();
 			this.setFireworks();
 			this.setFireChargeColor();
-			this.setDye();
+			this.setDye(player);
 			this.setBookInfo(player);
 			LegacyAPI.setBookPages(player, this.tempMeta, this.bookPages, this);
 			this.setAttributes();
@@ -4275,9 +4275,23 @@ public class ItemMap {
     * Sets the ItemStack DyeColor.
     * 
     */
-	private void setDye() {
+	private void setDye(final Player player) {
 		if (this.leatherColor != null) {
-			((LeatherArmorMeta) this.tempMeta).setColor(DyeColor.valueOf(this.leatherColor).getFireworkColor());
+			String newColor;
+			if (this.leatherColor.contains("%")) {
+				newColor = StringUtils.translateLayout(this.leatherColor, player);
+				if (newColor.contains("#")) {
+					((LeatherArmorMeta) this.tempMeta).setColor(StringUtils.getColorFromHexColor(newColor));
+				} else {
+					try {
+						((LeatherArmorMeta) this.tempMeta).setColor(DyeColor.valueOf(newColor).getFireworkColor());
+					} catch (Exception e) {
+						((LeatherArmorMeta) this.tempMeta).setColor(StringUtils.getColorFromHexColor(newColor));
+					}
+				}
+			} else {
+				((LeatherArmorMeta) this.tempMeta).setColor(DyeColor.valueOf(this.leatherColor).getFireworkColor());
+			}
 		} else if (this.leatherHex != null) {
 			((LeatherArmorMeta) this.tempMeta).setColor(StringUtils.getColorFromHexColor(this.leatherHex));
 		}

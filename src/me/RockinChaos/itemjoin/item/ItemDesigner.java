@@ -142,7 +142,7 @@ public class ItemDesigner {
 					}
 				}
 			}
-			SchedulerUtils.run(() -> {
+			SchedulerUtils.runLater(8L, () -> {
 				ItemUtilities.getUtilities().updateItems();
 			});
 		}	
@@ -1084,12 +1084,13 @@ public class ItemDesigner {
 			if (itemMap.getMaterial().toString().equalsIgnoreCase("LEATHER_HELMET") || itemMap.getMaterial().toString().equalsIgnoreCase("LEATHER_CHESTPLATE")
 				|| itemMap.getMaterial().toString().equalsIgnoreCase("LEATHER_LEGGINGS") || itemMap.getMaterial().toString().equalsIgnoreCase("LEATHER_BOOTS")) {
 				String leatherColor = itemMap.getNodeLocation().getString(".leather-color");
-				if (leatherColor.contains("%")) { leatherColor = StringUtils.translateLayout(leatherColor, null); }
-				leatherColor = leatherColor.toUpperCase();
+				boolean isPlaceholder = false;
+				if (leatherColor.contains("%")) { isPlaceholder = true; }
+				leatherColor = leatherColor.toUpperCase().replace(" ", "");
 				try { 
 					if (leatherColor.startsWith("#")) { 
 						itemMap.setLeatherHex(leatherColor); 
-					} else { 
+					} else if (!isPlaceholder) { 
 						boolean hexValue = true;
 						for (DyeColor color: DyeColor.values()) {
 							if (color.name().replace(" ", "").equalsIgnoreCase(leatherColor)) {
@@ -1099,7 +1100,9 @@ public class ItemDesigner {
 							}
 						}
 						if (hexValue) { itemMap.setLeatherHex(leatherColor); }
-					} 
+					} else {
+						itemMap.setLeatherColor(leatherColor);
+					}
 				} catch (Exception ex) { 
 					ServerUtils.logSevere("{ItemMap} The leather-color: " + leatherColor + " is not a valid color for the item " + itemMap.getConfigName() + "."); 
 					ServerUtils.logWarn("{ItemMap} Use hexcolor or see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/DyeColor.html for valid bukkit colors."); 
