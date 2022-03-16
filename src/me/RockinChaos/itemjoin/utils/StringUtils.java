@@ -478,15 +478,20 @@ public class StringUtils {
     * @return The Crafting Slot Value.
     */
 	public static int getSlotConversion(final String str) {
-		if (str.equalsIgnoreCase("CRAFTING[0]")) {
+		if (str.equalsIgnoreCase("CRAFTING[0]") || str.equalsIgnoreCase("C[0]")
+			|| str.equalsIgnoreCase("CRAFTING(0)") || str.equalsIgnoreCase("C(0)")) {
 			return 0;
-		} else if (str.equalsIgnoreCase("CRAFTING[1]")) {
+		} else if (str.equalsIgnoreCase("CRAFTING[1]") || str.equalsIgnoreCase("C[1]")
+			|| str.equalsIgnoreCase("CRAFTING(1)") || str.equalsIgnoreCase("C(1)")) {
 			return 1;
-		} else if (str.equalsIgnoreCase("CRAFTING[2]")) {
+		} else if (str.equalsIgnoreCase("CRAFTING[2]") || str.equalsIgnoreCase("C[2]")
+			|| str.equalsIgnoreCase("CRAFTING(2)") || str.equalsIgnoreCase("C(2)")) {
 			return 2;
-		} else if (str.equalsIgnoreCase("CRAFTING[3]")) {
+		} else if (str.equalsIgnoreCase("CRAFTING[3]") || str.equalsIgnoreCase("C[3]")
+			|| str.equalsIgnoreCase("CRAFTING(3)") || str.equalsIgnoreCase("C(3)")) {
 			return 3;
-		} else if (str.equalsIgnoreCase("CRAFTING[4]")) {
+		} else if (str.equalsIgnoreCase("CRAFTING[4]") || str.equalsIgnoreCase("C[4]")
+			|| str.equalsIgnoreCase("CRAFTING(4)") || str.equalsIgnoreCase("C(4)")) {
 			return 4;
 		}
 		return -1;

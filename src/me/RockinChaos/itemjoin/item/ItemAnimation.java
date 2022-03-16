@@ -247,7 +247,11 @@ public class ItemAnimation {
 					else if (ownerString != null || textureString != null) { setSkull(player, player.getItemOnCursor(), ownerString, textureString); }
 					Clicking.putCursor(PlayerHandler.getPlayerID(player), item);
 				}
-				PlayerHandler.updateInventory(player, itemMap, 1L);
+				if (StringUtils.getSlotConversion(itemMap.getSlot()) != -1 && !ServerUtils.hasSpecificUpdate("1_13")) {
+					LegacyAPI.updateInventory(player);
+				} else {
+					PlayerHandler.updateInventory(player, itemMap, 1L);
+				}
 				// ============== This has Concluded all Animations.. ============== //
 				if (!hasNext) { 
 					if (nameString != null) { nameTasks(player); }
