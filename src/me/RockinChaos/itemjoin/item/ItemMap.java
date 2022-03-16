@@ -2268,8 +2268,14 @@ public class ItemMap {
 			try {
 				final String translateCount = StringUtils.translateLayout(this.count, player).replaceAll("[^\\d.]", "").replace("-", "").replace(".", "").replace(" ", "");
 				countParse = Integer.parseInt(translateCount);
-				if (countParse == 0) { 
-					countParse = 1; 
+				if (countParse > 127) {
+					while (countParse > 127) {
+						countParse -= 127;
+					}
+				} {
+					if (countParse == 0) { 
+						countParse = 1; 
+					}
 				}
 			} catch (Exception e) {
 				ServerUtils.sendDebugTrace(e);
