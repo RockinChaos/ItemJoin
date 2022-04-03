@@ -38,7 +38,6 @@ public class ProtocolAPI {
     */
 	public static void handleProtocols() {
 		if (protocolManager == null) { protocolManager = ProtocolLibrary.getProtocolManager(); }
-		
 		PacketType[] packetType = null;
 		if (ServerUtils.hasSpecificUpdate("1_13")) {
 			packetType = new PacketType[3];
@@ -58,9 +57,12 @@ public class ProtocolAPI {
   		    */
 		    @Override
 		    public void onPacketReceiving(final PacketEvent event) {
-		    	String packetName = (event.getPacket() != null && ServerUtils.hasSpecificUpdate("1_13") && event.getPacketType() == PacketType.Play.Client.AUTO_RECIPE ? "PacketPlayInAutoRecipe" : 
-		    						(event.getPacket() != null && event.getPacketType() == PacketType.Play.Client.CLOSE_WINDOW ? "PacketPlayInCloseWindow" : 
-		    						(event.getPacket() != null && ServerUtils.hasSpecificUpdate("1_13") && event.getPacket() != null && event.getPacketType() == PacketType.Play.Client.PICK_ITEM ? "PacketPlayInPickItem" : null)));
+		    	String packetName = null;
+		    			try { 
+		    				packetName = (event.getPacket() != null && ServerUtils.hasSpecificUpdate("1_13") && event.getPacketType() == PacketType.Play.Client.AUTO_RECIPE ? "PacketPlayInAutoRecipe" : 
+		    				(event.getPacket() != null && event.getPacketType() == PacketType.Play.Client.CLOSE_WINDOW ? "PacketPlayInCloseWindow" : 
+		    				(event.getPacket() != null && ServerUtils.hasSpecificUpdate("1_13") && event.getPacket() != null && event.getPacketType() == PacketType.Play.Client.PICK_ITEM ? "PacketPlayInPickItem" : null)));
+		    			} catch (NullPointerException e) { }
 		        if (me.RockinChaos.itemjoin.utils.protocol.ProtocolManager.manageEvents(event.getPlayer(), packetName)) {
 		        	event.setCancelled(true);
 		        }
