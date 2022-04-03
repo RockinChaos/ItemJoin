@@ -39,7 +39,7 @@ import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 
 public class ServerUtils {
 	
-	private static String packageName = ItemJoin.getInstance().getServer().getClass().getPackage().getName();
+	private static String packageName = Bukkit.getServer().getClass().getPackage().getName();
 	private static String serverVersion = packageName.substring(packageName.lastIndexOf('.') + 1).replace("_", "").replace("R0", "").replace("R1", "").replace("R2", "").replace("R3", "").replace("R4", "").replace("R5", "").replaceAll("[a-z]", "");
 	private static String serverPreciseVersion = packageName.substring(packageName.lastIndexOf('.') + 1).replace("_", "").replace("R", "").replaceAll("[a-z]", "");
 	private static List < String > errorStatements = new ArrayList < String > ();
