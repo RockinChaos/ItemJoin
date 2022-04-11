@@ -53,7 +53,7 @@ public class PlayerGuard implements Listener {
 		if (PlayerHandler.isPlayer(player)) {
 			SchedulerUtils.runAsync(() -> {
 				if (PlayerHandler.isEnabled(player, "ALL")) {
-					this.handleRegions(player, player.getLocation(), true);
+					this.handleRegions(player, player.getLocation(), true, null);
 				}
 			});
 		}
@@ -71,7 +71,7 @@ public class PlayerGuard implements Listener {
 		final Player player = event.getPlayer();
 		if (PlayerHandler.isPlayer(player)) {
 			if (PlayerHandler.isEnabled(player, "ALL")) {
-				this.handleRegions(player, event.getTo(), false);
+				this.handleRegions(player, event.getTo(), false, event.getFrom());
 			}
 		}
 		ServerUtils.logDebug("{ItemMap} " + player.getName() + " has performed A REGION trigger by teleporting.");
@@ -83,7 +83,7 @@ public class PlayerGuard implements Listener {
 	* 
 	* @param player - The player that has entered or exited a region.
 	*/
-	private void handleRegions(final Player player, final Location location, final boolean async) {
+	private void handleRegions(final Player player, final Location location, final boolean async, final Location fromLocation) {
 		String regions = DependAPI.getDepends(false).getGuard().getRegionAtLocation(location);
 		if (this.playerRegions.get(player) != null) {
 			List < String > regionSet = new ArrayList < String > (Arrays.asList(regions.replace(" ", "").split(",")));
@@ -97,9 +97,9 @@ public class PlayerGuard implements Listener {
 			for (String region: playerSet) {
 				if (region != null && !region.isEmpty()) {
 					if (async) { 
-						SchedulerUtils.run(() -> ItemUtilities.getUtilities().setItems(player, location.getWorld(), TriggerType.REGION_LEAVE, player.getGameMode(), region));
+						SchedulerUtils.run(() -> ItemUtilities.getUtilities().setItems(player, (async ? fromLocation.getWorld() : location.getWorld()), TriggerType.REGION_LEAVE, player.getGameMode(), region));
 					} else {
-						ItemUtilities.getUtilities().setItems(player, location.getWorld(), TriggerType.REGION_LEAVE, player.getGameMode(), region);
+						ItemUtilities.getUtilities().setItems(player, (async ? fromLocation.getWorld() : location.getWorld()), TriggerType.REGION_LEAVE, player.getGameMode(), region);
 					}
 				}
 			}
