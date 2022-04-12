@@ -352,7 +352,13 @@ public class Menu {
 	private static void startModify(final Player player, final ItemMap itemMap, final int k) {
 		Interface modifyPane = new Interface(true, 6, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
-			setPage(player, modifyPane, ItemUtilities.getUtilities().copyItems(), null, itemMap, k);
+			try {
+				setPage(player, modifyPane, ItemUtilities.getUtilities().copyItems(), null, itemMap, k);
+			} catch (Exception e) {
+				SchedulerUtils.runLater(2L, () -> {
+					startModify(player, itemMap, k);
+				});
+			}
 		});
 		modifyPane.open(player);
 	}
@@ -719,10 +725,11 @@ public class Menu {
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[3] = itemMap.getConfigName();
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.itemRemoved", player, placeHolders);
-				ConfigHandler.getConfig().reloadConfigs(true);
-				SchedulerUtils.runLater(6L, () -> {
-					startModify(player, null, 0); 
-				});
+				ConfigHandler.getConfig().reloadConfigs(true); {
+					SchedulerUtils.runLater(4L, () -> {
+						startModify(player, null, 0); 
+					});
+				}
 			}));
 			choicePane.addButton(new Button(fillerPaneBItem), 3);
 			choicePane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the modify menu"), event -> startModify(player, null, 0)));
