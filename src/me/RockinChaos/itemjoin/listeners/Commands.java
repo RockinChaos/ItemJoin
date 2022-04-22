@@ -45,6 +45,7 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 
 import me.RockinChaos.itemjoin.handlers.ItemHandler;
@@ -134,24 +135,27 @@ public class Commands implements Listener {
 	@EventHandler(ignoreCancelled = false)
 	private void onEquipClick(InventoryClickEvent event) {
 		final Player player = (Player) event.getWhoClicked();
-		if (StringUtils.containsIgnoreCase(event.getAction().name(), "HOTBAR") && event.getView().getBottomInventory().getSize() >= event.getHotbarButton() && event.getHotbarButton() >= 0
-		 && !event.getClick().name().equalsIgnoreCase("MIDDLE") && event.getSlotType() == SlotType.ARMOR && event.getView().getBottomInventory().getItem(event.getHotbarButton()) != null && event.getView().getBottomInventory().getItem(event.getHotbarButton()).getType() != Material.AIR) {
-			this.equipCommands(player, null, event.getView().getBottomInventory().getItem(event.getHotbarButton()), "ON_EQUIP", "EQUIPPED", String.valueOf(event.getSlot()), event.getSlotType());
-		}
-		if (!event.getClick().name().equalsIgnoreCase("MIDDLE") && event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR) {
-			if (event.getSlotType() == SlotType.ARMOR) { 
-				this.equipCommands(player, null, event.getCurrentItem(), "UN_EQUIP", "UNEQUIPPED", String.valueOf(event.getSlot()), event.getSlotType());
-			} else if (event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
-			final String[] itemType = (event.getCurrentItem().getType().name().equalsIgnoreCase("ELYTRA") ? "ELYTRA_CHESTPLATE".split("_") : 
-				(ItemHandler.isSkull(event.getCurrentItem().getType()) || StringUtils.splitIgnoreCase(event.getCurrentItem().getType().name(), "HEAD", "_") ? "SKULL_HELMET".split("_") : event.getCurrentItem().getType().name().split("_")));
-				if (itemType.length >= 2 && itemType[1] != null && !itemType[1].isEmpty() && StringUtils.isInt(StringUtils.getArmorSlot(itemType[1], true)) 
-					&& player.getInventory().getItem(Integer.parseInt(StringUtils.getArmorSlot(itemType[1], true))) == null) { 
-					this.equipCommands(player, null, event.getCurrentItem(), "ON_EQUIP", "SHIFT_EQUIPPED", String.valueOf(event.getSlot()), event.getSlotType());
+		final InventoryView view = event.getView();
+		if (PlayerHandler.isCraftingInv(view)) {
+			if (StringUtils.containsIgnoreCase(event.getAction().name(), "HOTBAR") && view.getBottomInventory().getSize() >= event.getHotbarButton() && event.getHotbarButton() >= 0
+			 && !event.getClick().name().equalsIgnoreCase("MIDDLE") && event.getSlotType() == SlotType.ARMOR && view.getBottomInventory().getItem(event.getHotbarButton()) != null && view.getBottomInventory().getItem(event.getHotbarButton()).getType() != Material.AIR) {
+				this.equipCommands(player, null, view.getBottomInventory().getItem(event.getHotbarButton()), "ON_EQUIP", "EQUIPPED", String.valueOf(event.getSlot()), event.getSlotType());
+			}
+			if (!event.getClick().name().equalsIgnoreCase("MIDDLE") && event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR) {
+				if (event.getSlotType() == SlotType.ARMOR) { 
+					this.equipCommands(player, null, event.getCurrentItem(), "UN_EQUIP", "UNEQUIPPED", String.valueOf(event.getSlot()), event.getSlotType());
+				} else if (event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
+				final String[] itemType = (event.getCurrentItem().getType().name().equalsIgnoreCase("ELYTRA") ? "ELYTRA_CHESTPLATE".split("_") : 
+					(ItemHandler.isSkull(event.getCurrentItem().getType()) || StringUtils.splitIgnoreCase(event.getCurrentItem().getType().name(), "HEAD", "_") ? "SKULL_HELMET".split("_") : event.getCurrentItem().getType().name().split("_")));
+					if (itemType.length >= 2 && itemType[1] != null && !itemType[1].isEmpty() && StringUtils.isInt(StringUtils.getArmorSlot(itemType[1], true)) 
+						&& player.getInventory().getItem(Integer.parseInt(StringUtils.getArmorSlot(itemType[1], true))) == null) { 
+						this.equipCommands(player, null, event.getCurrentItem(), "ON_EQUIP", "SHIFT_EQUIPPED", String.valueOf(event.getSlot()), event.getSlotType());
+					}
 				}
 			}
-		}
-		if (!event.getClick().name().equalsIgnoreCase("MIDDLE") && !event.getClick().name().contains("SHIFT") && event.getSlotType() == SlotType.ARMOR && event.getCursor() != null && event.getCursor().getType() != Material.AIR) { 
-			this.equipCommands(player, null, event.getCursor(), "ON_EQUIP", "EQUIPPED", String.valueOf(event.getSlot()), event.getSlotType());
+			if (!event.getClick().name().equalsIgnoreCase("MIDDLE") && !event.getClick().name().contains("SHIFT") && event.getSlotType() == SlotType.ARMOR && event.getCursor() != null && event.getCursor().getType() != Material.AIR) { 
+				this.equipCommands(player, null, event.getCursor(), "ON_EQUIP", "EQUIPPED", String.valueOf(event.getSlot()), event.getSlotType());
+			}
 		}
 	}
 	
@@ -165,7 +169,7 @@ public class Commands implements Listener {
 		final Player player = (Player) event.getWhoClicked();
 		final Set<Integer> slideSlots = event.getInventorySlots();
 		int slot = 0; for (int actualSlot: slideSlots) { slot = actualSlot; break; }
-		if (event.getOldCursor() != null && event.getOldCursor().getType() != Material.AIR) {
+		if (event.getOldCursor() != null && event.getOldCursor().getType() != Material.AIR && PlayerHandler.isCraftingInv(event.getView())) {
 			this.equipCommands(player, null, event.getOldCursor(), "ON_EQUIP", "EQUIPPED", String.valueOf(slot), SlotType.ARMOR);
 		}
 	}
@@ -179,7 +183,7 @@ public class Commands implements Listener {
 	private void onEquip(PlayerInteractEvent event) {
 		final Player player = event.getPlayer();
 		final ItemStack item = (event.getItem() != null ? event.getItem().clone() : event.getItem());
-		if (item != null && item.getType() != Material.AIR && !PlayerHandler.isMenuClick(player.getOpenInventory(), event.getAction())) {
+		if (item != null && item.getType() != Material.AIR && PlayerHandler.isCraftingInv(player.getOpenInventory()) && !PlayerHandler.isMenuClick(player.getOpenInventory(), event.getAction())) {
 			final String[] itemType = (item.getType().name().equalsIgnoreCase("ELYTRA") ? "ELYTRA_CHESTPLATE".split("_") : 
 				(ItemHandler.isSkull(item.getType()) || StringUtils.splitIgnoreCase(item.getType().name(), "HEAD", "_") ? "SKULL_HELMET".split("_") : item.getType().name().split("_")));
 			if (itemType.length >= 2 && itemType[1] != null && !itemType[1].isEmpty() && StringUtils.isInt(StringUtils.getArmorSlot(itemType[1], true)) 
