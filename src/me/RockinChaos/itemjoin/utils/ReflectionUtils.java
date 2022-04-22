@@ -385,7 +385,7 @@ public final class ReflectionUtils {
     * @param canonicalName - the canonical name.
 	* @return The class.
 	*/
-	private static Class<?> getCanonicalClass(final String canonicalName) {
+	public static Class<?> getCanonicalClass(final String canonicalName) {
 		try {
 			return Class.forName(canonicalName);
 		} catch (ClassNotFoundException e) {
