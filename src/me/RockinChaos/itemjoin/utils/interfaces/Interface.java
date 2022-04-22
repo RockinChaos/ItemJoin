@@ -81,25 +81,27 @@ public class Interface implements InventoryHolder {
     */
 	public void onClick(InventoryClickEvent event) {
 		if (this.panePlayer.equals(event.getWhoClicked()) && !(this.pendingClick && event.getSlot() <= event.getWhoClicked().getInventory().getSize() && event.getSlot() >= 0 && this.clickInventory(event))) {
-			if (this.isPaged && event.getSlot() == this.inventory.getSize() - 8 && this.getCurrentPage() > 1) {
-				if (this.controlBack != null) {
-					this.controlBack.onClick(event);
+			try {
+				if (this.isPaged && event.getSlot() == this.inventory.getSize() - 8 && this.getCurrentPage() > 1) {
+					if (this.controlBack != null) {
+						this.controlBack.onClick(event);
+					}
+				} else if (this.isPaged && event.getSlot() == this.inventory.getSize() - 2 && this.getCurrentPage() < this.getPageAmount()) {
+					if (this.controlNext != null) {
+						this.controlNext.onClick(event);
+					}
+				} else if (this.isPaged && (event.getSlot() == this.inventory.getSize() - 1 || event.getSlot() == this.inventory.getSize() - 9)) {
+					if (this.controlExit != null) {
+						this.controlExit.onClick(event);
+					}
+				} else if (event.getCurrentItem() != null) {
+					this.pages.get(this.currentIndex).handleClick(event);
+					this.activeButton = event.getSlot();
+					if (this.pages.get(this.currentIndex).chatEvent(event.getSlot())) {
+						this.pendingChat = true;
+					}
 				}
-			} else if (this.isPaged && event.getSlot() == this.inventory.getSize() - 2 && this.getCurrentPage() < this.getPageAmount()) {
-				if (this.controlNext != null) {
-					this.controlNext.onClick(event);
-				}
-			} else if (this.isPaged && (event.getSlot() == this.inventory.getSize() - 1 || event.getSlot() == this.inventory.getSize() - 9)) {
-				if (this.controlExit != null) {
-					this.controlExit.onClick(event);
-				}
-			} else if (event.getCurrentItem() != null) {
-				this.pages.get(this.currentIndex).handleClick(event);
-				this.activeButton = event.getSlot();
-				if (this.pages.get(this.currentIndex).chatEvent(event.getSlot())) {
-					this.pendingChat = true;
-				}
-			}
+			} catch (IndexOutOfBoundsException e) { }
 			event.setCancelled(true);
 		}
 	}
