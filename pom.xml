@@ -173,11 +173,6 @@
             <id>everything</id>
             <url>https://repo.citizensnpcs.co/</url>
         </repository>
-		<!--ChestSort Repository-->
-        <repository>
-            <id>jeff-media-repo</id>
-            <url>https://repo.jeff-media.de/maven2</url>
-        </repository>
 		<!--ProtocolLib Repository-->
         <repository>
             <id>dmulloy2-repo</id>
@@ -262,20 +257,6 @@
             <type>jar</type>
        	    <scope>provided</scope>
         </dependency>
-		<!--ChestSort API-->
-        <dependency>
-            <groupId>de.jeff_media</groupId>
-            <artifactId>ChestSortAPI</artifactId>
-            <version>11.0.0-SNAPSHOT</version>
-       	    <scope>provided</scope>
-        </dependency>
-		<!--Legacy_ChestSort API-->
-        <dependency>
-            <groupId>de.jeff_media_legacy</groupId>
-            <artifactId>ChestSortAPI</artifactId>
-            <version>9.5.1-SNAPSHOT</version>
-       	    <scope>provided</scope>
-        </dependency>
 		<!--ProtocolLib API-->
         <dependency>
             <groupId>com.comphenix.protocol</groupId>
@@ -343,6 +324,13 @@
 			<version>7.4-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
+		<!--ChestSort API-->
+        <dependency>
+            <groupId>de.domedd.chestsortapi</groupId>
+            <artifactId>ChestSortAPI</artifactId>
+            <version>11.0.0-SNAPSHOT</version>
+       	    <scope>provided</scope>
+        </dependency>
 		<!--WorldGuard API-->
 		<dependency>
 			<groupId>com.sk89q.worldguard</groupId>
