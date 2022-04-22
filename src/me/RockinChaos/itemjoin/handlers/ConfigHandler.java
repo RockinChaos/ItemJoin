@@ -54,6 +54,7 @@ import me.RockinChaos.itemjoin.listeners.Stackable;
 import me.RockinChaos.itemjoin.listeners.Storable;
 import me.RockinChaos.itemjoin.listeners.Crafting;
 import me.RockinChaos.itemjoin.listeners.plugins.ChestSortAPI;
+import me.RockinChaos.itemjoin.listeners.plugins.legacy.Legacy_ChestSortAPI;
 import me.RockinChaos.itemjoin.listeners.Offhand;
 import me.RockinChaos.itemjoin.listeners.triggers.LimitSwitch;
 import me.RockinChaos.itemjoin.listeners.triggers.PlayerGuard;
@@ -645,8 +646,20 @@ public class ConfigHandler {
 				if (ServerUtils.hasSpecificUpdate("1_8") && !DependAPI.getDepends(false).protocolEnabled() && !ProtocolManager.isHandling()) { ProtocolManager.handleProtocols(); }
 				else if (ServerUtils.hasSpecificUpdate("1_8") && DependAPI.getDepends(false).protocolEnabled() && !ProtocolAPI.isHandling()) { ProtocolAPI.handleProtocols(); }
 			}
-			if (DependAPI.getDepends(false).chestSortEnabled() && !StringUtils.isRegistered(ChestSortAPI.class.getSimpleName())) {
-				ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new ChestSortAPI(), ItemJoin.getInstance());
+			if (DependAPI.getDepends(false).chestSortEnabled()) {
+				boolean newAPI = true;
+				try {
+					ReflectionUtils.getCanonicalClass("de.jeff_media.chestsort.api.ChestSortEvent");
+					newAPI = true;
+				} catch (IllegalArgumentException e) {
+					ReflectionUtils.getCanonicalClass("de.jeff_media.ChestSortAPI.ChestSortEvent");
+					newAPI = false;
+				}
+				if (newAPI && !StringUtils.isRegistered(ChestSortAPI.class.getSimpleName())) {
+					ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new ChestSortAPI(), ItemJoin.getInstance());
+				} else if (!newAPI && !StringUtils.isRegistered(Legacy_ChestSortAPI.class.getSimpleName())) {
+					ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Legacy_ChestSortAPI(), ItemJoin.getInstance());
+				}
 			}
 		}
 		if (ServerUtils.hasSpecificUpdate("1_12") && itemMap.isStackable() && !StringUtils.isRegistered(Stackable.class.getSimpleName())) {
