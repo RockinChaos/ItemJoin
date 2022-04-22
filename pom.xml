@@ -271,7 +271,7 @@
         </dependency>
 		<!--Legacy_ChestSort API-->
         <dependency>
-            <groupId>de.jeff_media</groupId>
+            <groupId>de.jeff_media_legacy</groupId>
             <artifactId>ChestSortAPI</artifactId>
             <version>9.5.1-SNAPSHOT</version>
        	    <scope>provided</scope>
