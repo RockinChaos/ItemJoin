@@ -4778,7 +4778,7 @@ public class ItemMap {
     * @return If the Player has the required economy balance to execute the command.
     */
     private boolean isPlayerChargeable(final Player player, final boolean materialCost) {
-		if (DependAPI.getDepends(false).getVault().vaultEnabled() && !materialCost) {
+		if (DependAPI.getDepends(false).getVault().vaultEnabled() && !materialCost && !(this.cost < 0)) {
 			double balance = 0.0; try { balance = DependAPI.getDepends(false).getVault().getBalance(player); } catch (NullPointerException e) { }
 			if (balance >= this.cost || this.cost < 0) {
 				return true;
