@@ -573,6 +573,17 @@ public class StringUtils {
     	}
     	return matcher.appendTail(buffer).toString();
     }
+    
+   /**
+    * Formats any color codes found in the String to their string format so the
+    * text will be restored.
+    * 
+    * @param str - The String to have its Color Codes properly Converted to String.
+    * @return The newly formatted String.
+    */
+	public static String restoreColor(final String str) {
+		return str.replace('§', '&');
+	}
 	
    /**
     * Formats any color codes found in the String to Bukkit Colors so the

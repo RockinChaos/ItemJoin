@@ -857,7 +857,7 @@ public class Menu {
 					}
 				}
 			}, event -> {
-				itemMap.setCustomName(ChatColor.stripColor(event.getMessage()));
+				itemMap.setCustomName(StringUtils.restoreColor(event.getMessage()));
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[16] = "NAME";
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
@@ -870,7 +870,7 @@ public class Menu {
 					lorePane(player, itemMap);
 				}
 			}, event -> {
-				itemMap.setCustomLore(StringUtils.split(ChatColor.stripColor(event.getMessage())));
+				itemMap.setCustomLore(StringUtils.split(StringUtils.restoreColor(event.getMessage())));
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[16] = "LORE";
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
@@ -5469,10 +5469,10 @@ public class Menu {
 				List<String> lore = new ArrayList<String>(); 
 				if (itemMap.getCustomLore() != null) {
 					lore = itemMap.getCustomLore(); 
-					lore.add(ChatColor.stripColor(event.getMessage())); 
+					lore.add(StringUtils.restoreColor(event.getMessage())); 
 					itemMap.setCustomLore(lore); 
 				} else { 
-					lore.add(ChatColor.stripColor(event.getMessage())); 
+					lore.add(StringUtils.restoreColor(event.getMessage())); 
 					itemMap.setCustomLore(lore);
 				}
 				lorePane(player, itemMap);
@@ -5507,7 +5507,7 @@ public class Menu {
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				List <  String> lore = itemMap.getCustomLore();
-				lore.set(position, ChatColor.stripColor(event.getMessage()));
+				lore.set(position, StringUtils.restoreColor(event.getMessage()));
 				itemMap.setCustomLore(lore);
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[16] = "LORE LINE";
@@ -5768,7 +5768,7 @@ public class Menu {
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
-				durationNamePane(player, itemMap, 0, true, ChatColor.stripColor(event.getMessage()));
+				durationNamePane(player, itemMap, 0, true, StringUtils.restoreColor(event.getMessage()));
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[16] = "NAME";
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
@@ -5871,7 +5871,7 @@ public class Menu {
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				List < String > names = itemMap.getDynamicNames();
-				names.set(position, "<delay:" + StringUtils.returnInteger(ItemHandler.getDelayFormat(names.get(position))) + ">" + ChatColor.stripColor(event.getMessage()));
+				names.set(position, "<delay:" + StringUtils.returnInteger(ItemHandler.getDelayFormat(names.get(position))) + ">" + StringUtils.restoreColor(event.getMessage()));
 				itemMap.setDynamicNames(names)
 				;String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[16] = "NAME";
@@ -5922,7 +5922,7 @@ public class Menu {
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[16] = "ANIMATED LORE";
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
-				durationLorePane(event.getPlayer(), itemMap, 0, true, ChatColor.stripColor(event.getMessage()));
+				durationLorePane(event.getPlayer(), itemMap, 0, true, StringUtils.restoreColor(event.getMessage()));
 			}));
 			for (int i = 1; i <= itemMap.getDynamicLores().size(); i++) {
 				final int k = i;
@@ -6030,7 +6030,7 @@ public class Menu {
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				List < List < String >> lores = itemMap.getDynamicLores();
-				lores.set(position, StringUtils.split("<delay:" + StringUtils.returnInteger(ItemHandler.getDelayFormat(lores.get(position).get(0))) + ">" + ChatColor.stripColor(event.getMessage())));
+				lores.set(position, StringUtils.split("<delay:" + StringUtils.returnInteger(ItemHandler.getDelayFormat(lores.get(position).get(0))) + ">" + StringUtils.restoreColor(event.getMessage())));
 				itemMap.setDynamicLores(lores);
 				String[] placeHolders = LanguageAPI.getLang(false).newString();
 				placeHolders[16] = "ANIMATED LORE";LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
