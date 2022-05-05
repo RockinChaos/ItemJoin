@@ -448,7 +448,7 @@ public class ItemHandler {
 	* @param slot - The new event slot of the main item.
 	* @return The Remaining amount to be set (if any).
 	*/
-	public static int stackItems(final Player player, final ItemStack item1, final ItemStack item2, final int slot) {
+	public static int stackItems(final Player player, final ItemStack item1, final ItemStack item2, final int slot, final boolean topInventory) {
 		int MINECRAFT_STACK_MAX = 64;
 		int DESIRED_STACK_SIZE = item1.getAmount() + item2.getAmount();
 		int REMAINING_STACK_SIZE = 0;
@@ -461,7 +461,11 @@ public class ItemHandler {
 			if (slot == -1) {
 				player.getOpenInventory().setCursor(new ItemStack(Material.AIR));
 			} else if (slot != -2) {
-				player.getInventory().setItem(slot, new ItemStack(Material.AIR));
+				if (topInventory) {
+					player.getOpenInventory().getTopInventory().setItem(slot, new ItemStack(Material.AIR));
+				} else {
+					player.getInventory().setItem(slot, new ItemStack(Material.AIR));
+				}
 			}
 		}
 		return REMAINING_STACK_SIZE;

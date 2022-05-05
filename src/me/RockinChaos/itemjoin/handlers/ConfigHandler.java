@@ -640,7 +640,7 @@ public class ConfigHandler {
 			}
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Crafting(), ItemJoin.getInstance());
 		}
-		if ((itemMap.isMovement() || itemMap.isEquip() || itemMap.isInventoryClose())) {
+		if ((itemMap.isMovement() || itemMap.isStackable() || itemMap.isEquip() || itemMap.isInventoryClose())) {
 			if (!StringUtils.isRegistered(Clicking.class.getSimpleName())) {
 				ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Clicking(), ItemJoin.getInstance());
 				if (ServerUtils.hasSpecificUpdate("1_8") && !DependAPI.getDepends(false).protocolEnabled() && !ProtocolManager.isHandling()) { ProtocolManager.handleProtocols(); }
