@@ -26,6 +26,7 @@ import me.RockinChaos.itemjoin.handlers.ConfigHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.utils.StringUtils;
+import me.RockinChaos.itemjoin.utils.interfaces.menus.Menu;
 
 public class ChestSortAPI implements Listener {
 	
@@ -52,6 +53,13 @@ public class ChestSortAPI implements Listener {
 					}
 				}
 			} catch (NoSuchMethodError e) { }
+			if (Menu.isOpen(player)) {
+				try {
+					for (ItemStack item : player.getOpenInventory().getTopInventory()) {
+						event.setUnmovable(item);
+					}
+				} catch (NoSuchMethodError e) { }
+			}
 	  	}
 	}
 }
