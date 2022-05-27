@@ -53,7 +53,7 @@ public class PlayerGuard implements Listener {
 		if (PlayerHandler.isPlayer(player)) {
 			SchedulerUtils.runAsync(() -> {
 				if (PlayerHandler.isEnabled(player, "ALL")) {
-					this.handleRegions(player, player.getLocation(), true, null);
+					this.handleRegions(player, player.getLocation(), true, (event.getFrom() == null ? player.getLocation() : event.getFrom()));
 				}
 			});
 		}
@@ -71,7 +71,7 @@ public class PlayerGuard implements Listener {
 		final Player player = event.getPlayer();
 		if (PlayerHandler.isPlayer(player)) {
 			if (PlayerHandler.isEnabled(player, "ALL")) {
-				this.handleRegions(player, event.getTo(), false, event.getFrom());
+				this.handleRegions(player, event.getTo(), false, (event.getFrom() == null ? event.getTo() : event.getFrom()));
 			}
 		}
 		ServerUtils.logDebug("{ItemMap} " + player.getName() + " has performed A REGION trigger by teleporting.");
