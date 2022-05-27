@@ -43,16 +43,18 @@ public class Recipes implements Listener {
     @EventHandler(ignoreCancelled = true)
     private void onPlayerCraft(final PrepareItemCraftEvent event) {
     	Player player = (Player) event.getInventory().getHolder();
-    	for (int i = 0; i < player.getOpenInventory().getTopInventory().getSize(); i++) {
-    		if (player.getOpenInventory().getTopInventory().getItem(i) != null && player.getOpenInventory().getTopInventory().getItem(i).getType() != Material.AIR) {
-    			if (!ItemUtilities.getUtilities().isAllowed(player, player.getOpenInventory().getTopInventory().getItem(i), "item-craftable")) {
-    				ItemStack reAdd = player.getOpenInventory().getTopInventory().getItem(i).clone();
-    				player.getOpenInventory().getTopInventory().setItem(i, null);
-    				player.getInventory().addItem(reAdd);
-    				PlayerHandler.updateInventory(player, 1L);
-    				break;
-    			}
-    		}
+    	if (player != null) { 
+	    	for (int i = 0; i < player.getOpenInventory().getTopInventory().getSize(); i++) {
+	    		if (player.getOpenInventory().getTopInventory().getItem(i) != null && player.getOpenInventory().getTopInventory().getItem(i).getType() != Material.AIR) {
+	    			if (!ItemUtilities.getUtilities().isAllowed(player, player.getOpenInventory().getTopInventory().getItem(i), "item-craftable")) {
+	    				ItemStack reAdd = player.getOpenInventory().getTopInventory().getItem(i).clone();
+	    				player.getOpenInventory().getTopInventory().setItem(i, null);
+	    				player.getInventory().addItem(reAdd);
+	    				PlayerHandler.updateInventory(player, 1L);
+	    				break;
+	    			}
+	    		}
+	    	}
     	}
     }
   
@@ -88,7 +90,8 @@ public class Recipes implements Listener {
 	*/
     @EventHandler()
     public void onPrepareRecipe(final PrepareItemCraftEvent event) {
-    	if (event.getRecipe() != null && event.getRecipe().getResult() != null && event.getRecipe().getResult().getType() != Material.AIR) {
+    	if (event.getRecipe() != null && event.getRecipe().getResult() != null 
+    	 && event.getRecipe().getResult().getType() != Material.AIR && event.getView() != null && event.getView().getPlayer() != null) {
 	    	List<ItemMap> mapList = new ArrayList<ItemMap>();
 	    	ItemMap checkMap = ItemUtilities.getUtilities().getItemMap(event.getRecipe().getResult(), null, event.getView().getPlayer().getWorld());
 	    	if (checkMap != null) { mapList.add(checkMap); } else { return; }
