@@ -77,7 +77,6 @@ public abstract class TinyProtocol {
 	private final FieldAccessor<?> getNetworkMarkers = ReflectionUtils.getField(serverConnectionClass, (Class<?>)List.class, 1);
 
 	private final Class<?> PACKET_LOGIN_IN_START = ReflectionUtils.getMinecraftClass("PacketLoginInStart");
-	private final FieldAccessor<GameProfile> getGameProfile = ReflectionUtils.getField(PACKET_LOGIN_IN_START, GameProfile.class, 0);
 
 	private Map<String, Channel> channelLookup = new MapMaker().weakValues().makeMap();
 	private Listener listener;
@@ -520,7 +519,12 @@ public abstract class TinyProtocol {
 		*/
 		private void handleLoginStart(Channel channel, Object packet) {
 			if (PACKET_LOGIN_IN_START.isInstance(packet)) {
-				GameProfile profile = getGameProfile.get(packet);
+				GameProfile profile;
+				if (ServerUtils.hasSpecificUpdate("1_19")) {
+					profile = new GameProfile(null, ReflectionUtils.getField(PACKET_LOGIN_IN_START, String.class, 0).get(packet));	
+				} else {
+					profile = ReflectionUtils.getField(PACKET_LOGIN_IN_START, GameProfile.class, 0).get(packet);	
+				}
 				channelLookup.put(profile.getName(), channel);
 			}
 		}

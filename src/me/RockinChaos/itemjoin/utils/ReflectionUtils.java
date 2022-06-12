@@ -119,7 +119,8 @@ public final class ReflectionUtils {
 	* @return The field accessor.
 	*/
 	public static <T> FieldAccessor<T> getField(final String className, final String name, final Class<T> fieldType) {
-		return getField(getClass(className), name, fieldType, 0);
+		FieldAccessor<T> fail = getField(getClass(className), name, fieldType, 0);
+		return fail;
 	}
 
    /**
@@ -156,6 +157,7 @@ public final class ReflectionUtils {
 	*/
 	private static <T> FieldAccessor<T> getField(final Class<?> target, final String name, Class<T> fieldType, int index) {
 		for (final Field field : target.getDeclaredFields()) {
+			
 			if ((name == null || field.getName().equals(name)) && fieldType.isAssignableFrom(field.getType()) && index-- <= 0) {
 				field.setAccessible(true);
 				return new FieldAccessor<T>() {
@@ -484,7 +486,7 @@ public final class ReflectionUtils {
 		set("set", "a"),
 		setInt("setInt", "a"),
 		getPage("a", "a"),
-		getTag("getTag", (ServerUtils.hasPreciseUpdate("1_18_2") ? "t" : "s")),
+		getTag("getTag", (ServerUtils.hasSpecificUpdate("1_19") ? "v" : ServerUtils.hasPreciseUpdate("1_18_2") ? "t" : "s")),
 		setTag("setTag", "c"),
 		setString("setString", "a"),
 		getString("getString", "l"),
@@ -515,7 +517,7 @@ public final class ReflectionUtils {
 	*/
 	public enum MinecraftField {
 		PlayerConnection("playerConnection", "b"),
-		NetworkManager("networkManager", "a");
+		NetworkManager("networkManager", (ServerUtils.hasSpecificUpdate("1_19") ? "b" : "a"));
 		public String original;
 		public String remapped;
 		private MinecraftField(final String original, final String remapped) {
