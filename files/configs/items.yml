@@ -37,7 +37,7 @@ items:
     cooldown-message: '&7[&eItemJoin&7] &a[%item%&a] &cis on cooldown for &a%timeleft% &cseconds..'
     attributes: '{GENERIC_ATTACK_DAMAGE:15.2}, {GENERIC_ATTACK_SPEED:19.0}'
     enchantment: FIRE_ASPECT:3, DAMAGE_ALL:5, DAMAGE_UNDEAD:5, KNOCKBACK:8
-    itemflags: unbreakable, hide-attributes, self-drops, death-drops, CreativeBypass
+    itemflags: unbreakable, hide-flags, self-drops, death-drops, CreativeBypass
     triggers: join, respawn, world-switch, region-enter
     permission-node: itemjoin.ultra
     enabled-regions: region1, region2
@@ -50,7 +50,7 @@ items:
     lore:
     - '&7Server promotions'
     - '&7Directions or custom maps.'
-    itemflags: item-store, unbreakable, hide-attributes, death-drops, self-drops, CreativeBypass
+    itemflags: item-store, unbreakable, hide-flags, death-drops, self-drops, CreativeBypass
     triggers: join, respawn, world-switch
     permission-node: itemjoin.map
     enabled-worlds: ALL
@@ -72,7 +72,7 @@ items:
     - 'message: &eYou have been set to spectator mode.'
     commands-sound: BLOCK_NOTE_BLOCK_PLING
     commands-cooldown: 2
-    itemflags: item-store, death-drops, self-drops, hide-attributes, disposable
+    itemflags: item-store, death-drops, self-drops, hide-flags, disposable
     triggers: join, respawn, world-switch
     permission-node: itemjoin.token
     enabled-worlds: world, world_nether, world_the_end
@@ -167,7 +167,7 @@ items:
     - 'message: &bWhere is Herobrine?'
     - 'message: &cWhere is your leader now...?'
     commands-sequence: RANDOM
-    itemflags: inventory-modify, hide-attributes, self-drops, CreativeBypass
+    itemflags: inventory-modify, hide-flags, self-drops, CreativeBypass
     triggers: join, respawn, world-switch, region-enter
     enabled-worlds: world, world_nether, world_the_end
   animated-sign:
@@ -209,7 +209,7 @@ items:
     commands-cost: 10
     commands-cooldown: 2
     enchantment: FIRE_ASPECT:3
-    itemflags: inventory-modify, hide-attributes, death-drops, self-drops
+    itemflags: inventory-modify, hide-flags, death-drops, self-drops
     triggers: join, respawn, world-switch
     permission-node: itemjoin.bungee
     enabled-worlds: ALL
@@ -236,7 +236,7 @@ items:
       power: 1
       colors: GRAY, WHITE, PURPLE, LIGHT_GRAY, GREEN
     use-cooldown: 3
-    itemflags: count-lock, death-drops, hide-attributes, self-drops
+    itemflags: count-lock, death-drops, hide-flags, self-drops
     triggers: join, respawn, world-switch
     enabled-worlds: world, world_nether, world_the_end
   potion-item:
@@ -301,7 +301,7 @@ items:
     slot: helmet
     name: '&aSolace'
     enchantment: PROTECTION_ENVIRONMENTAL:5
-    itemflags: inventory-modify, death-drops, self-drops
+    itemflags: inventory-modify, death-drops, self-drops, hide-attributes
     triggers: join
     enabled-worlds: world, world_nether, world_the_end
   chestplate-item:
@@ -317,7 +317,7 @@ items:
     slot: leggings
     name: '&aChains of Desire'
     enchantment: PROTECTION_ENVIRONMENTAL:3
-    itemflags: inventory-modify, death-drops, self-drops
+    itemflags: inventory-modify, death-drops, self-drops, hide-attributes
     triggers: join
     enabled-worlds: world, world_nether, world_the_end
   boots-item:
