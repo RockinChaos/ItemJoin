@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Matcher;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -754,7 +756,7 @@ public class ItemDesigner {
 	private void setRecipe(final ItemMap itemMap) {
 		if (itemMap.getNodeLocation().getString(".recipe") != null) {
 			final ShapedRecipe shapedRecipe = (ServerUtils.hasSpecificUpdate("1_12") ? new ShapedRecipe(new NamespacedKey(ItemJoin.getInstance(), itemMap.getConfigName()), itemMap.getItem(null)) : LegacyAPI.newShapedRecipe(itemMap.getItem(null)));
-			Map < Character, String > ingredientList = new HashMap < Character, String > ();
+			Map < Character, Map<String,Integer> > ingredientList = new HashMap < Character, Map<String,Integer> > ();
 			String[] shape = itemMap.trimRecipe(itemMap.getNodeLocation().getStringList(".recipe"));
 			shapedRecipe.shape(shape);
 			boolean register = true;
@@ -763,13 +765,15 @@ public class ItemDesigner {
 				for (String ingredient: ingredients) {
 					String[] ingredientParts = ingredient.split(":");
 					Material material = ItemHandler.getMaterial(ingredientParts[1], null);
-					if (material != null) {
+					int getCount = 1; if (ingredientParts.length > 2) { try { getCount = Integer.parseInt(ingredientParts[2]); } catch (Exception e) { ServerUtils.logWarn("{ItemDesigner} " + ingredientParts[2] + " is not a valid count!"); } }
+					final int count = getCount; 
+					if (material != null && count >= 1) {
 						char character = 'X';
 						try { character = ingredientParts[0].charAt(0); } 
 						catch (Exception e) { ServerUtils.logWarn("{ItemDesigner} The character " + ingredientParts[0] + " for the custom recipe defined for the item " + itemMap.getConfigName() + " is not a valid character!"); }
 						shapedRecipe.setIngredient(character, material);
-						ingredientList.put(character, material.name());
-					} else if (ConfigHandler.getConfig().getItemSection(ingredientParts[1]) != null) {
+						ingredientList.put(character, Stream.of(new Object[][] {{ material.name(), count }, }).collect(Collectors.toMap(data -> (String) data[0], data -> (Integer) data[1])));
+					} else if (ConfigHandler.getConfig().getItemSection(ingredientParts[1]) != null && count >= 1) {
 						register = false;
 						SchedulerUtils.runLater(40L, () -> {
 							if (ItemUtilities.getUtilities().getItemMap(null, ingredientParts[1], null) != null) {
@@ -778,7 +782,7 @@ public class ItemDesigner {
 								try { character = ingredientParts[0].charAt(0); } 
 								catch (Exception e) { ServerUtils.logWarn("{ItemDesigner} The character " + ingredientParts[0] + " for the custom recipe defined for the item " + itemMap.getConfigName() + " is not a valid character!"); }
 								shapedRecipe.setIngredient(character, itemStack.getType());
-								ingredientList.put(character, ingredientParts[1]);
+								ingredientList.put(character, Stream.of(new Object[][] {{ ingredientParts[1], count }, }).collect(Collectors.toMap(data -> (String) data[0], data -> (Integer) data[1])));
 								if (!StringUtils.isRegistered(Recipes.class.getSimpleName())) {
 									ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Recipes(), ItemJoin.getInstance());
 								}

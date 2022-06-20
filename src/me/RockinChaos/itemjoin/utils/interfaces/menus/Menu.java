@@ -24,7 +24,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -7414,9 +7417,13 @@ public class Menu {
 				String stack = "CHEST";
 				ItemStack stack1 = null;
 				if (itemMap.getRecipe().size() > i && itemMap.getRecipe().get(i) != 'X') {
-					final ItemMap copyMap = ItemUtilities.getUtilities().getItemMap(null, itemMap.getIngredients().get(itemMap.getRecipe().get(i)).toString(), null);
-					if (copyMap != null) { stack1 = copyMap.getItemStack(player); }
-					else { stack = itemMap.getIngredients().get(itemMap.getRecipe().get(i)).toString(); }
+					final Entry<String, Integer> ingredientSet = itemMap.getIngredients().get(itemMap.getRecipe().get(i)).entrySet().iterator().next();
+					final ItemMap copyMap = ItemUtilities.getUtilities().getItemMap(null, ingredientSet.getKey(), null);
+					if (copyMap != null) { 
+						stack1 = copyMap.getItemStack(player); 
+						stack1.setAmount(ingredientSet.getValue());
+					}
+					else { stack = ingredientSet.getKey() + ":" + ingredientSet.getValue(); }
 				}
 				if (stack1 != null) {
 					stack1 = ItemHandler.addLore(stack1, "&9&lDISPLAY: &f" + stack1.getItemMeta().getDisplayName(), "&7", "&7*Create a recipe that can be used.");
@@ -7438,7 +7445,7 @@ public class Menu {
 						recipePane.addButton(new Button(fillerPaneBItem), 3);
 					}
 				} else {
-					recipePane.addButton(new Button(ItemHandler.getItem(stack, 1, false, 
+					recipePane.addButton(new Button(ItemHandler.getItem((stack.contains(":") ? stack.split(":")[0] : stack), (stack.contains(":") ? Integer.parseInt(stack.split(":")[1]) : 1), false, 
 							(itemMap.getRecipe().size() > i ? "&e&l" + itemMap.getRecipe().get(i): "&e&lX"), "&7", "&7*Create a recipe that can be used."), event -> {
 						if ((itemMap.getRecipe().size() > k && itemMap.getRecipe().get(k) != 'X')) { setIngredients(player, itemMap, "AIR", k); } 
 						else { ingredientPane(player, itemMap, k); }
@@ -7574,7 +7581,7 @@ public class Menu {
     * @param position - The position in the crafting table being set.
     */
 	private static void setIngredients(final Player player, final ItemMap itemMap, final String material, final int position) {
-		Map<Character, String> ingredients = itemMap.getIngredients();
+		Map<Character, Map<String, Integer>> ingredients = itemMap.getIngredients();
 		List < Character > recipe = itemMap.getRecipe();
 		char character = 'A';
 		for (char alphabet = 'A'; alphabet <= 'Z'; alphabet++) {
@@ -7583,14 +7590,37 @@ public class Menu {
 				break;
 			}
 		}
+		boolean containsMaterial = false;
 		for (Character characters: ingredients.keySet()) {
-			if (ingredients.get(characters).equals(material)) {
+			final Entry<String, Integer> ingredientSet = ingredients.get(characters).entrySet().iterator().next();
+			if (ingredientSet.getKey().equals(material)) {
 				character = characters;
+				containsMaterial = true;
 				break;
 			}
 		}
-		if (!StringUtils.containsIgnoreCase(material, "AIR") && !ingredients.containsValue(material)) {
-			ingredients.put(character, material);
+		if (!StringUtils.containsIgnoreCase(material, "AIR") && !containsMaterial) {
+			final char finalCharacter = character;
+			Interface ingrPane = new Interface(true, 6, GUIName, player);
+			SchedulerUtils.runAsync(() -> {
+				ingrPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item recipe menu."), event -> {
+					creatingPane(player, itemMap);
+				}));
+				for (int i = 1; i <= 64; i++) {
+					final int k = i;
+					ingrPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "BLUE_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:11"), k, false, "&9&lCount: &a&l" + k, "&7", "&7*Click to set the", "&7ingredient count (stack size)."), event -> {
+						ingredients.put(finalCharacter, Stream.of(new Object[][] {{ material, k }, }).collect(Collectors.toMap(data -> (String) data[0], data -> (Integer) data[1])));
+						while (position >= recipe.size()) {
+							recipe.add('X');
+						}
+						recipe.set(position, (!StringUtils.containsIgnoreCase(material, "AIR") ? finalCharacter : 'X'));
+						itemMap.setRecipe(recipe);
+						itemMap.setIngredients(ingredients);
+						recipePane(player, itemMap);
+					}));
+				}
+			});
+			ingrPane.open(player);
 		} else if (StringUtils.containsIgnoreCase(material, "AIR")) {
 			int count = 0;
 			for (Character recipes: recipe) {
@@ -7601,14 +7631,14 @@ public class Menu {
 			if (count == 1) {
 				ingredients.remove(recipe.get(position));
 			}
+			while (position >= recipe.size()) {
+				recipe.add('X');
+			}
+			recipe.set(position, (!StringUtils.containsIgnoreCase(material, "AIR") ? character : 'X'));
+			itemMap.setRecipe(recipe);
+			itemMap.setIngredients(ingredients);
+			recipePane(player, itemMap);
 		}
-		while (position >= recipe.size()) {
-			recipe.add('X');
-		}
-		recipe.set(position, (!StringUtils.containsIgnoreCase(material, "AIR") ? character : 'X'));
-		itemMap.setRecipe(recipe);
-		itemMap.setIngredients(ingredients);
-		recipePane(player, itemMap);
 	}
 	
    /**
@@ -8593,6 +8623,7 @@ public class Menu {
 			}
 			item.setItemMeta(itemMeta);
 		}
+		item.setAmount(itemMap.getCount(player));
 		return item;
 	}
 	

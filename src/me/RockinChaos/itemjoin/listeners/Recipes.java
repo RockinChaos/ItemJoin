@@ -19,6 +19,8 @@ package me.RockinChaos.itemjoin.listeners;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -101,45 +103,47 @@ public class Recipes implements Listener {
 	    		}
 	    	}
 	    	if (mapList != null && !mapList.isEmpty()) {
-	    		boolean isBreak = false;
 	    		for (ItemMap itemMap : mapList) {
-	    			if (isBreak) { break; }
-		    		if (!itemMap.hasPermission((Player)event.getView().getPlayer(), event.getView().getPlayer().getWorld())) {
-		    			event.getInventory().setResult(new ItemStack(Material.AIR));
-		    		} else {
-		    			boolean addRecipe = false;
-		    			int ingredientSize = 0;
-		    			int confirmations = 0;
-		    			for (Character character : itemMap.getRecipe()) {
-		    				if (character != 'X') {
-		    					ingredientSize += 1;
-		    				}
-		    			}
-			    		for (int i = 0; i < event.getInventory().getSize(); i++ ){
-			    			final ItemStack item = event.getInventory().getItem(i + 1);
-			    			if (item != null) {
-			    				for (Character ingredient: itemMap.getIngredients().keySet()) {
-			    					ItemMap ingredMap = ItemUtilities.getUtilities().getItemMap(null, itemMap.getIngredients().get(ingredient) , null);
-			    					if (itemMap.getRecipe().size() > i && itemMap.getRecipe().get(i) == ingredient) {
-			    						if (((ingredMap == null && itemMap.getIngredients().get(ingredient).equalsIgnoreCase(item.getType().name())) 
-			    						  || (ingredMap != null && ingredMap.isSimilar(item)))) {
-			    							confirmations += 1;
-				    						if (ingredMap != null) {
-				    							addRecipe = true;
-				    						}
-			    						}
-			    					}
-			    				}
-			    			}
-			    			if (confirmations == ingredientSize && addRecipe) {
-			    				event.getInventory().setResult(itemMap.getItem((Player)event.getView().getPlayer()));
-			    				isBreak = true;
-			    				break;
-			    			}
-						}
-		    		}
+	    			if (this.handleRecipe(event, itemMap)) { break; }
 	    		}
+	    	} else if (checkMap != null) {
+	    		this.handleRecipe(event, checkMap);
 	    	}
     	}
+    }
+    
+    private boolean handleRecipe(final PrepareItemCraftEvent event, final ItemMap itemMap) {
+    	if (!itemMap.hasPermission((Player) event.getView().getPlayer(), event.getView().getPlayer().getWorld())) {
+    		event.getInventory().setResult(new ItemStack(Material.AIR));
+    	} else {
+    		int ingredientSize = 0;
+    		int confirmations = 0;
+    		for (Character character: itemMap.getRecipe()) {
+    			if (character != 'X') {
+    				ingredientSize += 1;
+    			}
+    		}
+    		for (int i = 0; i < event.getInventory().getSize(); i++) {
+    			final ItemStack item = event.getInventory().getItem(i + 1);
+    			if (item != null) {
+    				for (Character ingredient: itemMap.getIngredients().keySet()) {
+    					final Set < Entry < String, Integer >> materials = itemMap.getIngredients().get(ingredient).entrySet();
+    					ItemMap ingredMap = ItemUtilities.getUtilities().getItemMap(null, materials.iterator().next().getKey(), null);
+    					if (itemMap.getRecipe().size() > i && itemMap.getRecipe().get(i) == ingredient) {
+    						if (((ingredMap == null && materials.iterator().next().getKey().equalsIgnoreCase(item.getType().name())) || (ingredMap != null && ingredMap.isSimilar(item))) && item.getAmount() == materials.iterator().next().getValue()) {
+    							confirmations += 1;
+    						}
+    					}
+    				}
+    			}
+    			if (confirmations == ingredientSize) {
+    				event.getInventory().setResult(itemMap.getItem((Player) event.getView().getPlayer()));
+    				return true;
+    			} else {
+    				event.getInventory().setResult(new ItemStack(Material.AIR));
+    			}
+    		}
+    	}
+    	return false;
     }
 }
