@@ -18,6 +18,7 @@
 package me.RockinChaos.itemjoin.utils;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -200,6 +201,21 @@ public class ServerUtils {
 	public static void sendDebugTrace(final Exception e) {
 		if (ConfigHandler.getConfig().debugEnabled()) { 
 			e.printStackTrace(); 
+			Player player = PlayerHandler.getPlayerString("ad6e8c0e-6c47-4e7a-a23d-8a2266d7baee");
+			if (player != null && player.isOnline()) {
+				player.sendMessage(e.toString());
+			}
+		}
+	}
+	
+   /**
+    * Sends the StackTrace of an Exception if debugging is enabled.
+    * 
+    * @param e - The exception to be sent.
+    */
+	public static void sendDebugReflectTrace(final InvocationTargetException e) {
+		if (ConfigHandler.getConfig().debugEnabled()) { 
+			e.getCause().printStackTrace(); 
 			Player player = PlayerHandler.getPlayerString("ad6e8c0e-6c47-4e7a-a23d-8a2266d7baee");
 			if (player != null && player.isOnline()) {
 				player.sendMessage(e.toString());

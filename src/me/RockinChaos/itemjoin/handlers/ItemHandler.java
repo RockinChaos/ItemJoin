@@ -19,6 +19,7 @@ package me.RockinChaos.itemjoin.handlers;
 
 import java.io.EOFException;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collection;
@@ -715,9 +716,12 @@ public class ItemHandler {
 						return data.replace("Slot: ", "");
 					}
 				}
-			} catch (Exception e) {
-				ServerUtils.logSevere("{ItemHandler} An error has occured when getting NBTData to an item.");
-				ServerUtils.sendDebugTrace(e);
+			} catch (InvocationTargetException e1) {
+				ServerUtils.logSevere("{ItemHandler} An error has occured when getting NBTData to an item, reason: " + e1.getCause() + ".");
+				ServerUtils.sendDebugReflectTrace(e1);
+			} catch (Exception e2) {
+				ServerUtils.logSevere("{ItemHandler} An error has occured when getting NBTData to an item, reason: " + e2.getCause() + ".");
+				ServerUtils.sendDebugTrace(e2);
 			}
 		}
 		return null;
