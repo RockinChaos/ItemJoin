@@ -112,6 +112,13 @@ public class Recipes implements Listener {
     	}
     }
     
+   /**
+	* Handles the recipe examination check.
+	* 
+	* @param event - PrepareItemCraftEvent
+	* @param itemMap - The itemMap being checked.
+	* @return If the loop should break.
+	*/
     private boolean handleRecipe(final PrepareItemCraftEvent event, final ItemMap itemMap) {
     	if (!itemMap.hasPermission((Player) event.getView().getPlayer(), event.getView().getPlayer().getWorld())) {
     		event.getInventory().setResult(new ItemStack(Material.AIR));
