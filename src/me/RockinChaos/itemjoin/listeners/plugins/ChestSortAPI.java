@@ -46,17 +46,14 @@ public class ChestSortAPI implements Listener {
 	  		else { event.setCancelled(true); }
 	  	}
 	  	if (!event.isCancelled()) {
-			try {
-				for (ItemStack item : event.getInventory().getContents()) {
-					if (!ItemUtilities.getUtilities().isAllowed(player, item, "inventory-modify")) {
-						event.setUnmovable(item);
-					}
-				}
-			} catch (NoSuchMethodError e) { }
 			if (Menu.isOpen(player)) {
+				event.setCancelled(true);
+			} else {
 				try {
-					for (ItemStack item : player.getOpenInventory().getTopInventory()) {
-						event.setUnmovable(item);
+					for (ItemStack item : event.getInventory().getContents()) {
+						if (!ItemUtilities.getUtilities().isAllowed(player, item, "inventory-modify")) {
+							event.setUnmovable(item);
+						}
 					}
 				} catch (NoSuchMethodError e) { }
 			}
