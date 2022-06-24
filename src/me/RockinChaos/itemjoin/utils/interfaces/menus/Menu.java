@@ -352,15 +352,22 @@ public class Menu {
     * 
     * @param player - The Player to have the Pane opened.
     */
+	private static int failCycle = 0;
 	private static void startModify(final Player player, final ItemMap itemMap, final int k) {
 		Interface modifyPane = new Interface(true, 6, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			try {
 				setPage(player, modifyPane, ItemUtilities.getUtilities().copyItems(), null, itemMap, k);
 			} catch (Exception e) {
-				SchedulerUtils.runLater(2L, () -> {
-					startModify(player, itemMap, k);
-				});
+				if (failCycle != 6) {
+					failCycle++;
+					SchedulerUtils.runLater(2L, () -> {
+						startModify(player, itemMap, k);
+					});
+				} else {
+					failCycle = 0;
+					ServerUtils.sendSevereTrace(e);
+				}
 			}
 		});
 		modifyPane.open(player);
@@ -844,7 +851,7 @@ public class Menu {
 			creatingPane.addButton(new Button(ItemHandler.getItem("DIAMOND", itemMap.getCount(player), false, "&b&lCount", "&7", "&7*Set the amount of the", "&7item to be given.", "&9&lCOUNT: &a" + 
 					itemMap.getCount(player)), event -> countPane(player, itemMap)));
 			creatingPane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, false, "&b&lName", "&7", "&7*Set the name of the item.", "&9&lNAME: &f" + StringUtils.nullCheck(itemMap.getCustomName())), event -> {
-				if (itemMap.getDynamicNames() != null && !itemMap.getDynamicNames().isEmpty()) {
+				if (itemMap.getDynamicNames() != null && itemMap.isAnimated()) {
 					animatedNamePane(player, itemMap);
 				} else {
 					if (StringUtils.nullCheck(itemMap.getCustomName()) != "NONE") {
@@ -4892,8 +4899,17 @@ public class Menu {
 					"&9&lENABLED: &a" + (itemMap.isAnimated() + "").toUpperCase()), event -> {
 				if (itemMap.isAnimated()) {
 					itemMap.setAnimate(false);
+					if (itemMap.getDynamicNames() != null && !itemMap.getDynamicNames().isEmpty()) {
+						itemMap.setCustomName(ItemHandler.cutDelay(itemMap.getDynamicNames().get(0)));
+						itemMap.setDynamicNames(new ArrayList<String>());
+					}
 				} else {
 					itemMap.setAnimate(true);
+					if (itemMap.getCustomName() != null && !itemMap.getCustomName().isEmpty()) {
+						List <String> names = new ArrayList<String>();
+						names.add(itemMap.getCustomName());
+						itemMap.setDynamicNames(names);
+					}
 				}
 				flagPane(player, itemMap);
 			}));
@@ -5562,8 +5578,9 @@ public class Menu {
 			animateMaterialPane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, true, "&eNew Material", "&7", "&7*Add a new material", "&7to be animated between."), event -> selectMaterialPane(player, itemMap, 0, true)));
 			for (int i = 1; i <= itemMap.getDynamicMaterials().size(); i++) {
 				final int k = i;
+				final Integer delay = StringUtils.returnInteger(ItemHandler.getDelayFormat(itemMap.getDynamicMaterials().get(k - 1)));
 				animateMaterialPane.addButton(new Button(ItemHandler.getItem(ItemHandler.cutDelay(itemMap.getDynamicMaterials().get(k - 1)), 1, false, "&fMaterial " + k, "&7", "&7*Click modify this animated material.", 
-						"&9&lAnimation Ticks: &a" + StringUtils.returnInteger(ItemHandler.getDelayFormat(itemMap.getDynamicMaterials().get(k - 1)))), event -> modifyMaterialPane(player, itemMap, k - 1)));
+						"&9&lAnimation Ticks: &a" + (StringUtils.nullCheck(String.valueOf(delay)) != "NONE" ? String.valueOf(delay) : "20")), event -> modifyMaterialPane(player, itemMap, k - 1)));
 			}
 		});
 		animateMaterialPane.open(player);
@@ -5731,8 +5748,9 @@ public class Menu {
 			modifyMaterialPane.addButton(new Button(fillerPaneGItem), 3);
 			modifyMaterialPane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, false, "&a&l&nMaterial", "&7", "&7*Change the animated material type.", "&9&lMaterial: &a" + ItemHandler.cutDelay(itemMap.getDynamicMaterials().get(position))),
 					event -> selectMaterialPane(player, itemMap, position, false)));
+			final Integer delay = StringUtils.returnInteger(ItemHandler.getDelayFormat(itemMap.getDynamicMaterials().get(position)));
 			modifyMaterialPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CLOCK" : "347"), 1, false, "&e&l&nDuration", "&7", "&7*Change the duration of the animation.", "&9&lAnimation Ticks: &a" + 
-			StringUtils.returnInteger(ItemHandler.getDelayFormat(itemMap.getDynamicMaterials().get(position)))), event -> durationMaterialPane(player, itemMap, position, false, ItemHandler.cutDelay(itemMap.getDynamicMaterials().get(position)))));
+			(StringUtils.nullCheck(String.valueOf(delay)) != "NONE" ? String.valueOf(delay) : "20")), event -> durationMaterialPane(player, itemMap, position, false, ItemHandler.cutDelay(itemMap.getDynamicMaterials().get(position)))));
 			modifyMaterialPane.addButton(new Button(ItemHandler.getItem("REDSTONE", 1, false, "&c&l&nDelete", "&7", "&7*Delete this animated material."), event -> {
 				List < String > mats = itemMap.getDynamicMaterials();mats.remove(position);
 				itemMap.setDynamicMaterials(mats);
@@ -5778,8 +5796,9 @@ public class Menu {
 			}));
 			for (int i = 1; i <= itemMap.getDynamicNames().size(); i++) {
 				final int k = i;
+				final Integer delay = StringUtils.returnInteger(ItemHandler.getDelayFormat(itemMap.getDynamicNames().get(k - 1)));
 				animatedNamePane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, false, "&fName " + k, "&7", "&7*Click modify this animated name.", "&9&lName: &a" + ItemHandler.cutDelay(itemMap.getDynamicNames().get(k - 1)), 
-						"&9&lAnimation Ticks: &a" + StringUtils.returnInteger(ItemHandler.getDelayFormat(itemMap.getDynamicNames().get(k - 1)))), event -> modifyNamePane(player, itemMap, k - 1)));
+						"&9&lAnimation Ticks: &a" + (StringUtils.nullCheck(String.valueOf(delay)) != "NONE" ? String.valueOf(delay) : "20")), event -> modifyNamePane(player, itemMap, k - 1)));
 			}
 		});	
 		animatedNamePane.open(player);
@@ -5881,8 +5900,9 @@ public class Menu {
 				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				modifyNamePane(event.getPlayer(), itemMap, position);
 			}));
+			final Integer delay = StringUtils.returnInteger(ItemHandler.getDelayFormat(itemMap.getDynamicNames().get(position)));
 			modifyNamePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CLOCK" : "347"), 1, false, "&e&l&nDuration", "&7", "&7*Change the duration of the animation.", "&9&lAnimation Ticks: &a" + 
-			StringUtils.returnInteger(ItemHandler.getDelayFormat(itemMap.getDynamicNames().get(position)))), event -> durationNamePane(player, itemMap, position, false, ItemHandler.cutDelay(itemMap.getDynamicNames().get(position)))));
+			(StringUtils.nullCheck(String.valueOf(delay)) != "NONE" ? String.valueOf(delay) : "20")), event -> durationNamePane(player, itemMap, position, false, ItemHandler.cutDelay(itemMap.getDynamicNames().get(position)))));
 			modifyNamePane.addButton(new Button(ItemHandler.getItem("REDSTONE", 1, false, "&c&l&nDelete", "&7", "&7*Delete this animated name."), event -> {
 				List < String > names = itemMap.getDynamicNames();
 				names.remove(position);
@@ -5929,8 +5949,9 @@ public class Menu {
 			}));
 			for (int i = 1; i <= itemMap.getDynamicLores().size(); i++) {
 				final int k = i;
+				final Integer delay = StringUtils.returnInteger(ItemHandler.getDelayFormat(itemMap.getDynamicLores().get(k - 1).get(0)));
 				animatedLorePane.addButton(new Button(ItemHandler.getItem("WRITABLE_BOOK", 1, false, "&fLore " + k, "&7", "&7*Click modify this animated lore.", "&9&lLore: &a" + ItemHandler.cutDelay(itemMap.getDynamicLores().get(k - 1)), 
-						"&9&lAnimation Ticks: &a" + StringUtils.returnInteger(ItemHandler.getDelayFormat(itemMap.getDynamicLores().get(k - 1).get(0)))), event -> modifyLorePane(player, itemMap, k - 1)));
+						"&9&lAnimation Ticks: &a" + (StringUtils.nullCheck(String.valueOf(delay)) != "NONE" ? String.valueOf(delay) : "20")), event -> modifyLorePane(player, itemMap, k - 1)));
 			}
 		});
 		animatedLorePane.open(player);
@@ -6039,8 +6060,9 @@ public class Menu {
 				placeHolders[16] = "ANIMATED LORE";LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				modifyLorePane(event.getPlayer(), itemMap, position);
 			}));
+			final Integer delay = StringUtils.returnInteger(ItemHandler.getDelayFormat(itemMap.getDynamicLores().get(position).get(0)));
 			modifyLorePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CLOCK" : "347"), 1, false, "&e&l&nDuration", "&7", "&7*Change the duration of the animation.", "&9&lAnimation Ticks: &a" + 
-			StringUtils.returnInteger(ItemHandler.getDelayFormat(itemMap.getDynamicLores().get(position).get(0)))), event -> durationLorePane(player, itemMap, position, false, "")));
+			(StringUtils.nullCheck(String.valueOf(delay)) != "NONE" ? String.valueOf(delay) : "20")), event -> durationLorePane(player, itemMap, position, false, "")));
 			modifyLorePane.addButton(new Button(ItemHandler.getItem("REDSTONE", 1, false, "&c&l&nDelete", "&7", "&7*Delete this animated lore."), event -> {
 				List < List < String >> lores = itemMap.getDynamicLores();
 				lores.remove(position);
@@ -6090,8 +6112,9 @@ public class Menu {
 				}));
 				for (int i = 1; i <= itemMap.getDynamicOwners().size(); i++) {
 					final int k = i;
+					final Integer delay = StringUtils.returnInteger(ItemHandler.getDelayFormat(itemMap.getDynamicOwners().get(k - 1)));
 					animatedSkullPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GOLDEN_HELMET" : "314"), 1, false, "&fSkull Owner " + k, "&7", "&7*Click modify this animated skull owner.", "&9&lSkull Owner: &a" + 
-					ItemHandler.cutDelay(itemMap.getDynamicOwners().get(k - 1)), "&9&lAnimation Ticks: &a" + StringUtils.returnInteger(ItemHandler.getDelayFormat(itemMap.getDynamicOwners().get(k - 1)))), event -> modifySkullPane(player, itemMap, k - 1, owner)));
+					ItemHandler.cutDelay(itemMap.getDynamicOwners().get(k - 1)), "&9&lAnimation Ticks: &a" + (StringUtils.nullCheck(String.valueOf(delay)) != "NONE" ? String.valueOf(delay) : "20")), event -> modifySkullPane(player, itemMap, k - 1, owner)));
 				}
 			} else {
 				animatedSkullPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the animation menu."), event -> {
@@ -6118,9 +6141,10 @@ public class Menu {
 				}));
 				for (int i = 1; i <= itemMap.getDynamicTextures().size(); i++) {
 					final int k = i;
+					final Integer delay = StringUtils.returnInteger(ItemHandler.getDelayFormat(itemMap.getDynamicTextures().get(k - 1)));
 					animatedSkullPane.addButton(new Button(ItemHandler.getItem("STRING", 1, false, "&fSkull Texture " + k, "&7", "&7*Click modify this animated skull texture.", "&9&lSkull Texture: &a" + 
 					(ItemHandler.cutDelay(itemMap.getDynamicTextures().get(k - 1)).length() > 40 ? ItemHandler.cutDelay(itemMap.getDynamicTextures().get(k - 1)).substring(0, 40) : ItemHandler.cutDelay(itemMap.getDynamicTextures().get(k - 1))),
-					"&9&lAnimation Ticks: &a" + StringUtils.returnInteger(ItemHandler.getDelayFormat(itemMap.getDynamicTextures().get(k - 1)))), event -> modifySkullPane(player, itemMap, k - 1, owner)));
+					"&9&lAnimation Ticks: &a" + (StringUtils.nullCheck(String.valueOf(delay)) != "NONE" ? String.valueOf(delay) : "20")), event -> modifySkullPane(player, itemMap, k - 1, owner)));
 				}
 			}
 		});
@@ -6262,8 +6286,9 @@ public class Menu {
 					modifySkullPane(event.getPlayer(), itemMap, position, owner);
 				}));
 			}
+			final Integer delay = StringUtils.returnInteger(ItemHandler.getDelayFormat((owner ? itemMap.getDynamicOwners().get(position) : itemMap.getDynamicTextures().get(position))));
 			modifySkullPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CLOCK" : "347"), 1, false, "&e&l&nDuration", "&7", "&7*Change the duration of the animation.", "&9&lAnimation Ticks: &a" + 
-			StringUtils.returnInteger(ItemHandler.getDelayFormat((owner ? itemMap.getDynamicOwners().get(position) : itemMap.getDynamicTextures().get(position))))), 
+			(StringUtils.nullCheck(String.valueOf(delay)) != "NONE" ? String.valueOf(delay) : "20")), 
 					event -> durationSkullPane(player, itemMap, position, false, ItemHandler.cutDelay((owner ? itemMap.getDynamicOwners().get(position) : itemMap.getDynamicTextures().get(position))), owner)));
 			modifySkullPane.addButton(new Button(ItemHandler.getItem("REDSTONE", 1, false, "&c&l&nDelete", "&7", "&7*Delete this animated skull " + (owner ? "owner." : "texture.")), event -> {
 				List < String > skulls = itemMap.getDynamicOwners();
@@ -8469,6 +8494,7 @@ public class Menu {
 	private static ItemStack headerStack(final Player player, final ItemMap itemMap) {
 		String slotList = "";
 		String slotString = "";
+		itemMap.renderItemStack();
 		ItemStack item = new ItemStack(Material.STONE);
 		if (StringUtils.nullCheck(itemMap.getMultipleSlots().toString()) != "NONE") {
 			for (String slot: itemMap.getMultipleSlots()) {
