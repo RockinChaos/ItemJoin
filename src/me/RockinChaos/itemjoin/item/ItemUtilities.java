@@ -236,7 +236,7 @@ public class ItemUtilities {
 	private void handleItems(final Player player, World world, final TriggerType type, final GameMode gameMode, final String region) {
 		final ItemMap randomMap = ChanceAPI.getChances().getRandom(player);
 		final int session = StringUtils.getRandom(1, 100000);
-		if (type.equals(TriggerType.WORLD_SWITCH)) { world = player.getWorld(); }
+		if (type.equals(TriggerType.WORLD_SWITCH) || type.equals(TriggerType.JOIN)) { world = player.getWorld(); }
 		for (ItemMap item : this.getItems()) { 
 			item.setAnimations(player);
 			if (((((type.equals(TriggerType.JOIN) && item.isGiveOnJoin()) 
@@ -300,8 +300,9 @@ public class ItemUtilities {
 	private void clearEvent(final TriggerType type, final Player player, final String world, final String region) {
 		String clearEvent = ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items." + type.name);
 		if (clearEvent != null && ((region != null && !region.isEmpty() && StringUtils.containsLocation(region, clearEvent.replace(" ", ""))) || StringUtils.containsLocation(world, clearEvent.replace(" ", "")))) {
-			if ((StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Options"), "PROTECT_OP") && player.isOp())
-				|| (StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Options"), "PROTECT_CREATIVE") && PlayerHandler.isCreativeMode(player))) {
+			if ((ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Options") != null && player != null 
+				&& (StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Options"), "PROTECT_OP") && player.isOp())
+				|| (StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Options"), "PROTECT_CREATIVE") && PlayerHandler.isCreativeMode(player)))) {
 			} else {
 				String clearType = ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Type");
 				if (clearType != null && (clearType.equalsIgnoreCase("ALL") || clearType.equalsIgnoreCase("GLOBAL"))) {
