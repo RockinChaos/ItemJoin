@@ -22,12 +22,17 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
+import org.bukkit.inventory.CraftingInventory;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
@@ -102,13 +107,45 @@ public class Recipes implements Listener {
 	    			mapList.add(itemMap);
 	    		}
 	    	}
+    		final Inventory inventoryClone = Bukkit.createInventory(null, 9);
+    		int setSlot = 0;
+    		for (int i = 0; i < event.getInventory().getSize(); i++) {
+    			if (setSlot >= 9) { break; }
+    			else if (!checkMap.isSimilar(event.getInventory().getItem(i))) {
+    				inventoryClone.setItem(setSlot, event.getInventory().getItem(i).clone());
+    				setSlot++;
+    			}
+    		}
 	    	if (mapList != null && !mapList.isEmpty()) {
 	    		for (ItemMap itemMap : mapList) {
-	    			if (this.handleRecipe(event, itemMap)) { break; }
+	    			if (this.handleRecipe(itemMap, event.getInventory(), inventoryClone, event.getView(), false, false)) { break; }
 	    		}
 	    	} else if (checkMap != null) {
-	    		this.handleRecipe(event, checkMap);
+	    		this.handleRecipe(checkMap, event.getInventory(), inventoryClone, event.getView(), false, false);
 	    	}
+    	}
+    }
+    
+   /**
+	* Called when the player tries to craft a recipe with a custom item.
+	* 
+	* @param event - PrepareItemCraftEvent
+	*/
+    @EventHandler()
+    public void onCraftRecipe(final CraftItemEvent event) {
+    	final ItemMap checkMap = ItemUtilities.getUtilities().getItemMap(event.getRecipe().getResult(), null, event.getView().getPlayer().getWorld());
+    	if (checkMap != null) {
+    		final Inventory inventoryClone = Bukkit.createInventory(null, 18);
+    		int setSlot = 0;
+    		for (int i = 0; i < event.getInventory().getSize(); i++) {
+    			if (setSlot >= 9) { break; }
+    			else if (!checkMap.isSimilar(event.getInventory().getItem(i))) {
+    				inventoryClone.setItem(setSlot, event.getInventory().getItem(i).clone());
+    				setSlot++;
+    			}
+    			
+    		}
+    		this.handleRecipe(checkMap, event.getInventory(), inventoryClone, event.getView(), true, event.isShiftClick());
     	}
     }
     
@@ -119,10 +156,13 @@ public class Recipes implements Listener {
 	* @param itemMap - The itemMap being checked.
 	* @return If the loop should break.
 	*/
-    private boolean handleRecipe(final PrepareItemCraftEvent event, final ItemMap itemMap) {
-    	if (!itemMap.hasPermission((Player) event.getView().getPlayer(), event.getView().getPlayer().getWorld())) {
-    		event.getInventory().setResult(new ItemStack(Material.AIR));
+    private boolean handleRecipe(final ItemMap itemMap, final CraftingInventory craftInventory, final Inventory inventoryClone, final InventoryView view, final boolean isCrafted, final boolean isShiftClick) {
+    	if (!itemMap.hasPermission((Player) view.getPlayer(), view.getPlayer().getWorld())) {
+    		craftInventory.setResult(new ItemStack(Material.AIR));
     	} else {
+    		final ItemStack result = (craftInventory.getResult() != null ? craftInventory.getResult().clone() : new ItemStack(Material.AIR));
+    		boolean removed = false;
+    		int resultSize = 0;
     		int ingredientSize = 0;
     		int confirmations = 0;
     		for (Character character: itemMap.getRecipe()) {
@@ -130,27 +170,74 @@ public class Recipes implements Listener {
     				ingredientSize += 1;
     			}
     		}
-    		for (int i = 0; i < event.getInventory().getSize(); i++) {
-    			final ItemStack item = event.getInventory().getItem(i + 1);
+    		if (!isCrafted) { confirmations = this.getConfirmations(inventoryClone, itemMap); }
+    		else { 
+    			boolean cycleShift = true;
+    			while (this.getConfirmations(inventoryClone, itemMap) == ingredientSize && cycleShift) {
+    				cycleShift = isShiftClick;
+		    		for (int i = 0; i < inventoryClone.getSize(); i++) {
+		    			final ItemStack item = inventoryClone.getItem(i);
+		    			if (item != null) {
+		    				for (Character ingredient: itemMap.getIngredients().keySet()) {
+		    					final Set < Entry < String, Integer >> materials = itemMap.getIngredients().get(ingredient).entrySet();
+		    					ItemMap ingredMap = ItemUtilities.getUtilities().getItemMap(null, materials.iterator().next().getKey(), null);
+		    					if (itemMap.getRecipe().size() > i && itemMap.getRecipe().get(i) == ingredient) {
+		    						if (((ingredMap == null && materials.iterator().next().getKey().equalsIgnoreCase(item.getType().name())) || (ingredMap != null && ingredMap.isSimilar(item))) && item.getAmount() >= materials.iterator().next().getValue()) {
+		    							if (!isCrafted) {
+		    								confirmations += 1;
+		    							} else {
+		    								int removal = (item.getAmount() - materials.iterator().next().getValue());
+		    								if (removal == materials.iterator().next().getValue()) {
+		    									removal = removal + 1;
+		    								}
+		    								if (removal <= 0) { 
+		    									craftInventory.getItem((i + 1)).setAmount(1);
+		    									inventoryClone.getItem(i).setAmount(1);
+		    									removed = true;
+		    								} else {
+		    									craftInventory.getItem((i + 1)).setAmount(removal);
+		    									inventoryClone.getItem(i).setAmount(removal);
+		    									removed = true;
+		    								}
+		    							}
+		    						}
+		    					}
+		    				}
+		    			}
+		    			
+		    		}
+		    		resultSize++;
+    			}
+    		}
+    			if (!isCrafted && confirmations == ingredientSize) {
+    				craftInventory.setResult(itemMap.getItem((Player) view.getPlayer()));
+    				return true;
+    			} else if (!isCrafted) {
+    				craftInventory.setResult(new ItemStack(Material.AIR));
+    			} else if (isCrafted && removed) {
+    				if (resultSize > 0 && isShiftClick) { result.setAmount(resultSize); }
+    				craftInventory.setResult(result);
+    			}
+    	}
+    	return false;
+    }
+    
+    private int getConfirmations(final Inventory inventoryClone, final ItemMap itemMap) {
+    	int confirmations = 0;
+    		for (int i = 0; i < inventoryClone.getSize(); i++) {
+    			final ItemStack item = inventoryClone.getItem(i);
     			if (item != null) {
     				for (Character ingredient: itemMap.getIngredients().keySet()) {
     					final Set < Entry < String, Integer >> materials = itemMap.getIngredients().get(ingredient).entrySet();
     					ItemMap ingredMap = ItemUtilities.getUtilities().getItemMap(null, materials.iterator().next().getKey(), null);
     					if (itemMap.getRecipe().size() > i && itemMap.getRecipe().get(i) == ingredient) {
-    						if (((ingredMap == null && materials.iterator().next().getKey().equalsIgnoreCase(item.getType().name())) || (ingredMap != null && ingredMap.isSimilar(item))) && item.getAmount() == materials.iterator().next().getValue()) {
-    							confirmations += 1;
+    						if (((ingredMap == null && materials.iterator().next().getKey().equalsIgnoreCase(item.getType().name())) || (ingredMap != null && ingredMap.isSimilar(item))) && item.getAmount() >= materials.iterator().next().getValue()) {
+    								confirmations += 1;
+    							}
     						}
     					}
     				}
     			}
-    			if (confirmations == ingredientSize) {
-    				event.getInventory().setResult(itemMap.getItem((Player) event.getView().getPlayer()));
-    				return true;
-    			} else {
-    				event.getInventory().setResult(new ItemStack(Material.AIR));
-    			}
-    		}
-    	}
-    	return false;
+    		return confirmations;
     }
 }

@@ -5417,7 +5417,7 @@ public class ItemMap {
 			List<String> recipeList = new ArrayList<String>();
 			for (Character ingredient: this.ingredients.keySet()) { 
 				final Entry<String, Integer> ingriedientSet = this.ingredients.get(ingredient).entrySet().iterator().next();
-				ingredientList.add(ingredient + ":" + ingriedientSet.getKey() + ":" + ingriedientSet.getValue());
+				ingredientList.add(ingredient + ":" + ingriedientSet.getKey() + ":#" + ingriedientSet.getValue());
 			}
 			String recipeLine = "";
 			for (Character recipeCharacter: this.recipe) {

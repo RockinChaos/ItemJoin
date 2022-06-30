@@ -764,9 +764,26 @@ public class ItemDesigner {
 				List < String > ingredients = itemMap.getNodeLocation().getStringList(".ingredients");
 				for (String ingredient: ingredients) {
 					String[] ingredientParts = ingredient.split(":");
-					Material material = ItemHandler.getMaterial(ingredientParts[1], null);
-					int getCount = 1; if (ingredientParts.length > 2) { try { getCount = Integer.parseInt(ingredientParts[2]); } catch (Exception e) { ServerUtils.logWarn("{ItemDesigner} " + ingredientParts[2] + " is not a valid count!"); } }
+					int getCount = 1; 
+					int itemData = 0;
+					if (ingredientParts.length > 2 && ingredientParts[2].startsWith("#")) { 
+						try { 
+							getCount = Integer.parseInt(ingredientParts[2].replace("#", "")); 
+						} catch (Exception e) { ServerUtils.logWarn("{ItemDesigner} [1] " + ingredientParts[2].replace("#", "") + " is not a valid count!"); } 
+					} else if (ingredientParts.length > 3 && ingredientParts[3].startsWith("#")) { 
+						try { 
+							getCount = Integer.parseInt(ingredientParts[3].replace("#", "")); 
+						} catch (Exception e) { ServerUtils.logWarn("{ItemDesigner} [2] " + ingredientParts[3].replace("#", "") + " is not a valid count!"); } 
+						try { 
+							itemData = Integer.parseInt(ingredientParts[2]); 
+						} catch (Exception e) { ServerUtils.logWarn("{ItemDesigner} [3] " + ingredientParts[2] + " is not a valid item data!"); } 
+					} else if (ingredientParts.length > 2 && !ingredientParts[2].startsWith("#")) {
+						try { 
+							itemData = Integer.parseInt(ingredientParts[2]); 
+						} catch (Exception e) { ServerUtils.logWarn("{ItemDesigner} [4] " + ingredientParts[2] + " is not a valid item data!"); } 
+					}
 					final int count = getCount; 
+					final Material material = ItemHandler.getMaterial(ingredientParts[1], String.valueOf(itemData));
 					if (material != null && count >= 1) {
 						char character = 'X';
 						try { character = ingredientParts[0].charAt(0); } 
