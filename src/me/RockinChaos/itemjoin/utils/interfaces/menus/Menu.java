@@ -1789,7 +1789,14 @@ public class Menu {
 						ConfigHandler.getConfig().softReload();
 						SchedulerUtils.runLater(2L, () -> preventPane(player));
 					}));
-			preventPane.addButton(new Button(fillerPaneBItem), 4);
+			preventPane.addButton(new Button(fillerPaneBItem), 3);
+			preventPane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, false, 
+					"&c&l&nPrevent Chat", "&7", "&7*Prevent players from being able", "&7to send chat messages.", "&7", "&7Useful if you are using BungeeChat.", 
+					"&9&lENABLED: &a" + (((ConfigHandler.getConfig().getFile("config.yml").getString("Prevent.Chat") != null &&
+					!StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Prevent.Chat"), "DISABLE")) ? 
+					ConfigHandler.getConfig().getFile("config.yml").getString("Prevent.Chat") : "FALSE")).toUpperCase()), 
+					event -> worldPane(player, "Prevent.Chat")));
+			preventPane.addButton(new Button(fillerPaneBItem));
 			preventPane.addButton(new Button(ItemHandler.getItem("CHEST", 1, false, 
 					"&c&l&nPrevent Pickups", "&7", "&7*Prevent players from picking up", "&7ANY items, not just custom items.", 
 					"&9&lENABLED: &a" + ((!StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Prevent.Pickups"), "DISABLE") ? 
@@ -1813,7 +1820,6 @@ public class Menu {
 					"&9&lENABLED: &a" + ((!StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Prevent.Death-Drops"), "DISABLE") ? 
 					ConfigHandler.getConfig().getFile("config.yml").getString("Prevent.Death-Drops") : "FALSE")).toUpperCase()), 
 					event -> worldPane(player, "Prevent.Death-Drops")));
-			preventPane.addButton(new Button(fillerPaneBItem));
 			preventPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item settings menu."), event -> itemSettings(player)));
 			preventPane.addButton(new Button(fillerPaneBItem), 7);
 			preventPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item settings menu."), event -> itemSettings(player)));
@@ -2533,11 +2539,11 @@ public class Menu {
 				}
 			}));
 			List < String > enabledWorlds = new ArrayList < String > ();
-			String[] enabledParts = ConfigHandler.getConfig().getFile("config.yml").getString(section).replace(" ,  ", ",").replace(" , ", ",").replace(",  ", ",").replace(", ", ",").split(",");
+			String[] enabledParts = (ConfigHandler.getConfig().getFile("config.yml").getString(section) != null ? ConfigHandler.getConfig().getFile("config.yml").getString(section).replace(" ,  ", ",").replace(" , ", ",").replace(",  ", ",").replace(", ", ",").split(",") : new String[1]);
 			for (String enabledWorld : enabledParts) {
-				if (enabledWorld.equalsIgnoreCase("ALL") || enabledWorld.equalsIgnoreCase("GLOBAL")) {
+				if (enabledWorld != null && (enabledWorld.equalsIgnoreCase("ALL") || enabledWorld.equalsIgnoreCase("GLOBAL"))) {
 					enabledWorlds.add("ALL");
-				} else {
+				} else if (enabledWorld != null) {
 					for (World world: Bukkit.getServer().getWorlds()) {
 						if (enabledWorld.equalsIgnoreCase(world.getName())) {
 							enabledWorlds.add(world.getName());

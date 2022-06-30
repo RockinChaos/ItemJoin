@@ -39,6 +39,7 @@ import me.RockinChaos.itemjoin.item.ItemDesigner;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.listeners.Breaking;
+import me.RockinChaos.itemjoin.listeners.Chat;
 import me.RockinChaos.itemjoin.listeners.Consumes;
 import me.RockinChaos.itemjoin.listeners.Drops;
 import me.RockinChaos.itemjoin.listeners.Interact;
@@ -176,6 +177,9 @@ public class ConfigHandler {
 			ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerGuard(), ItemJoin.getInstance());
 		}
 		if (!StringUtils.isRegistered(PlayerLogin.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new PlayerLogin(), ItemJoin.getInstance()); }
+		if ((!StringUtils.splitIgnoreCase(this.getPrevent("Chat"), "FALSE", ",") && !StringUtils.splitIgnoreCase(this.getPrevent("Chat"), "DISABLED", ","))) {
+			if (!StringUtils.isRegistered(Chat.class.getSimpleName())) { ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Chat(), ItemJoin.getInstance()); }
+		}
 		if ((!StringUtils.splitIgnoreCase(this.getPrevent("Pickups"), "FALSE", ",") && !StringUtils.splitIgnoreCase(this.getPrevent("Pickups"), "DISABLED", ","))) {
 			if (ServerUtils.hasSpecificUpdate("1_12") && ReflectionUtils.getBukkitClass("event.entity.EntityPickupItemEvent") != null && !StringUtils.isRegistered(Pickups.class.getSimpleName())) { 
 				ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Pickups(), ItemJoin.getInstance()); 

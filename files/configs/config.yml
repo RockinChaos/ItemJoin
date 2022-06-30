@@ -81,6 +81,7 @@ Active-Commands:
 # This determines if the action is allowed for all items in the specified worlds.
 # To disable an action, simply set the action to true for all worlds or list each world separated by a comma.
 Prevent:
+  Chat: false
   Pickups: false
   itemMovement: false
   Self-Drops: false
