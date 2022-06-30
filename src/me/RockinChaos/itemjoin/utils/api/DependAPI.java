@@ -236,7 +236,7 @@ public class DependAPI {
 				final Object playerData = skinsAPI.getClass().getMethod("getSkinName", String.class).invoke(skinsAPI, owner);
 				final String ownerData = (playerData != null ? (String) playerData : owner);
 				final Object skinData = skinsAPI.getClass().getMethod("getSkinData", String.class).invoke(skinsAPI, ownerData);
-				return (skinData != null ? ((com.mojang.authlib.properties.Property) skinData).getValue() : null);
+				return (skinData != null ? (String) skinData.getClass().getMethod("getValue").invoke(skinData) : null);
 			} catch (Exception e1) {
 				try {
 					netty = ReflectionUtils.getClass("net.skinsrestorer.api.SkinsRestorerAPI");
@@ -244,19 +244,10 @@ public class DependAPI {
 					final Object playerData = skinsRestorer.getClass().getMethod("getSkinName", String.class).invoke(skinsRestorer, owner);
 					final String ownerData = (playerData != null ? (String) playerData : owner);
 					final Object skinData = skinsRestorer.getClass().getMethod("getSkinData", String.class).invoke(skinsRestorer, ownerData);
-					return (skinData != null ? ((com.mojang.authlib.properties.Property) skinData).getValue() : null);
+					return (skinData != null ? (String) skinData.getClass().getMethod("getValue").invoke(skinData) : null);
 				} catch (Exception e2) {
-					try {
-						netty = ReflectionUtils.getClass("net.skinsrestorer.api.SkinsRestorerAPI");
-						final Object skinsRestorer = netty.getMethod("getApi").invoke(null);
-						final Object playerData = skinsRestorer.getClass().getMethod("getSkinName", String.class).invoke(skinsRestorer, owner);
-						final String ownerData = (playerData != null ? (String) playerData : owner);
-						final Object skinData = skinsRestorer.getClass().getMethod("getSkinData", String.class).invoke(skinsRestorer, ownerData);
-						return (skinData != null ? ((net.skinsrestorer.bukkit.utils.BukkitProperty) skinData).getValue() : null);
-					} catch (Exception e3) {
-						ServerUtils.sendDebugTrace(e2);
-						ServerUtils.logSevere("{DependAPI} [2] Unsupported SkinsRestorer version detected, unable to set the skull owner " + owner + ".");
-					}
+					ServerUtils.sendDebugTrace(e2);
+					ServerUtils.logSevere("{DependAPI} [2] Unsupported SkinsRestorer version detected, unable to set the skull owner " + owner + ".");
 				}
 			}
     	}
