@@ -135,8 +135,8 @@
 		</repository>
 		<!--AuthMe / bStats Repository-->
 		<repository>
-			<id>CodeMC</id>
-			<url>https://repo.codemc.org/repository/maven-public</url>
+			<id>codemc-releases</id>
+			<url>https://repo.codemc.org/repository/maven-releases/</url>
 		</repository>
 		<!-- HeadDatabase-API -->
 		<repository>
@@ -245,7 +245,7 @@
 		<!--SkinsRestorer API-->
 		<dependency>
 			<groupId>net.skinsrestorer</groupId>
-			<artifactId>skinsrestorer</artifactId>
+			<artifactId>skinsrestorer-api</artifactId>
 			<version>14.2.1</version>
 			<scope>provided</scope>
 		</dependency>
