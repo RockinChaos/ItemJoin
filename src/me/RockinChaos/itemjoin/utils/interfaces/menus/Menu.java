@@ -24,11 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -68,6 +64,7 @@ import me.RockinChaos.itemjoin.handlers.ItemHandler;
 import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.item.ItemCommand;
 import me.RockinChaos.itemjoin.item.ItemMap;
+import me.RockinChaos.itemjoin.item.ItemRecipe;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.item.ItemCommand.Action;
 import me.RockinChaos.itemjoin.item.ItemCommand.CommandSequence;
@@ -7448,13 +7445,13 @@ public class Menu {
 				String stack = "CHEST";
 				ItemStack stack1 = null;
 				if (itemMap.getRecipe().size() > i && itemMap.getRecipe().get(i) != 'X') {
-					final Entry<String, Integer> ingredientSet = itemMap.getIngredients().get(itemMap.getRecipe().get(i)).entrySet().iterator().next();
-					final ItemMap copyMap = ItemUtilities.getUtilities().getItemMap(null, ingredientSet.getKey(), null);
+					final ItemRecipe itemRecipe = itemMap.getIngredients().get(itemMap.getRecipe().get(i));
+					final ItemMap copyMap = ItemUtilities.getUtilities().getItemMap(null, itemRecipe.getMap(), null);
 					if (copyMap != null) { 
 						stack1 = copyMap.getItemStack(player); 
-						stack1.setAmount(ingredientSet.getValue());
+						stack1.setAmount(itemRecipe.getCount());
 					}
-					else { stack = ingredientSet.getKey() + ":" + ingredientSet.getValue(); }
+					else { stack = itemRecipe.getMaterial().name() + (itemRecipe.getData() > 0 ? (":" + itemRecipe.getData()) : "") + "#" + itemRecipe.getCount(); }
 				}
 				if (stack1 != null) {
 					stack1 = ItemHandler.addLore(stack1, "&9&lDISPLAY: &f" + stack1.getItemMeta().getDisplayName(), "&7", "&7*Create a recipe that can be used.");
@@ -7476,7 +7473,7 @@ public class Menu {
 						recipePane.addButton(new Button(fillerPaneBItem), 3);
 					}
 				} else {
-					recipePane.addButton(new Button(ItemHandler.getItem((stack.contains(":") ? stack.split(":")[0] : stack), (stack.contains(":") ? Integer.parseInt(stack.split(":")[1]) : 1), false, 
+					recipePane.addButton(new Button(ItemHandler.getItem((stack.contains("#") ? stack.split("#")[0] : stack), (stack.contains("#") ? Integer.parseInt(stack.split("#")[1]) : 1), false, 
 							(itemMap.getRecipe().size() > i ? "&e&l" + itemMap.getRecipe().get(i): "&e&lX"), "&7", "&7*Create a recipe that can be used."), event -> {
 						if ((itemMap.getRecipe().size() > k && itemMap.getRecipe().get(k) != 'X')) { setIngredients(player, itemMap, "AIR", k); } 
 						else { ingredientPane(player, itemMap, k); }
@@ -7612,7 +7609,7 @@ public class Menu {
     * @param position - The position in the crafting table being set.
     */
 	private static void setIngredients(final Player player, final ItemMap itemMap, final String material, final int position) {
-		Map<Character, Map<String, Integer>> ingredients = itemMap.getIngredients();
+		Map<Character, ItemRecipe> ingredients = itemMap.getIngredients();
 		List < Character > recipe = itemMap.getRecipe();
 		char character = 'A';
 		for (char alphabet = 'A'; alphabet <= 'Z'; alphabet++) {
@@ -7623,8 +7620,8 @@ public class Menu {
 		}
 		boolean containsMaterial = false;
 		for (Character characters: ingredients.keySet()) {
-			final Entry<String, Integer> ingredientSet = ingredients.get(characters).entrySet().iterator().next();
-			if (ingredientSet.getKey().equals(material)) {
+			final ItemRecipe itemRecipe = ingredients.get(characters);
+			if (itemRecipe.getMaterial().name().equalsIgnoreCase(material)) {
 				character = characters;
 				containsMaterial = true;
 				break;
@@ -7640,7 +7637,12 @@ public class Menu {
 				for (int i = 1; i <= 64; i++) {
 					final int k = i;
 					ingrPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "BLUE_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:11"), k, false, "&9&lCount: &a&l" + k, "&7", "&7*Click to set the", "&7ingredient count (stack size)."), event -> {
-						ingredients.put(finalCharacter, Stream.of(new Object[][] {{ material, k }, }).collect(Collectors.toMap(data -> (String) data[0], data -> (Integer) data[1])));
+						ItemMap ingredMap = ItemUtilities.getUtilities().getItemMap(null, material, null);
+						if (ingredMap == null) {
+							ingredients.put(finalCharacter, new ItemRecipe(null, ItemHandler.getMaterial(material, null), (byte)0, k));
+						} else {
+							ingredients.put(finalCharacter, new ItemRecipe(material, null, (byte)0, k));
+						}
 						while (position >= recipe.size()) {
 							recipe.add('X');
 						}

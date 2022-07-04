@@ -115,6 +115,18 @@ public class LegacyAPI {
     public static ShapedRecipe newShapedRecipe(final ItemStack item) {
     	return new ShapedRecipe(item);
     }
+    
+   /**
+    * Adds an ingredient to the ShapedRecipe with a Data Value.
+    * 
+    * @param shapedRecipe - The shaped recipe reference.
+    * @param character - The identifier of the ingredient.
+    * @param material - The material of the ingredient.
+    * @param itemData - The Data Value of the ingredient.
+    */
+    public static void setIngredient(final ShapedRecipe shapedRecipe, final char character, final Material material, final byte itemData) {
+    	shapedRecipe.setIngredient(character, material, itemData);
+    }
 
    /**
     * Matches the Material from its Bukkit Material and Data Value.

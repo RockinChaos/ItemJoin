@@ -154,7 +154,7 @@ public class ItemMap {
     private List <PotionEffect> effect = new ArrayList<PotionEffect>();
     private List <Pattern> bannerPatterns = new ArrayList<Pattern>();
     
-    private Map<Character, Map<String, Integer>> ingredients = new HashMap < Character, Map<String, Integer> > ();
+    private Map<Character, ItemRecipe> ingredients = new HashMap < Character, ItemRecipe > ();
     private List <Character> recipe = Arrays.asList( 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X' );
     
     private String leatherColor;
@@ -1179,7 +1179,7 @@ public class ItemMap {
     * 
     * @param ingredientList - The recipe ingredients to be set.
     */
-	public void setIngredients(final Map<Character, Map<String, Integer>> ingredientList) {
+	public void setIngredients(final Map<Character, ItemRecipe> ingredientList) {
 		this.ingredients = ingredientList;
 	}
 	
@@ -2541,7 +2541,7 @@ public class ItemMap {
     * 
     * @return The recipe ingredients.
     */
-	public Map<Character, Map<String, Integer>> getIngredients() {
+	public Map<Character, ItemRecipe> getIngredients() {
 		return this.ingredients;
 	}
 	
@@ -5416,8 +5416,8 @@ public class ItemMap {
 			List<String> recipeTempList = new ArrayList<String>();
 			List<String> recipeList = new ArrayList<String>();
 			for (Character ingredient: this.ingredients.keySet()) { 
-				final Entry<String, Integer> ingriedientSet = this.ingredients.get(ingredient).entrySet().iterator().next();
-				ingredientList.add(ingredient + ":" + ingriedientSet.getKey() + ":#" + ingriedientSet.getValue());
+				final ItemRecipe itemRecipe = this.ingredients.get(ingredient);
+				ingredientList.add(ingredient + ":" + (itemRecipe.getMaterial() != null ? itemRecipe.getMaterial().name() : itemRecipe.getMap()) + (itemRecipe.getData() > 0 ? (":" + itemRecipe.getData()) : "") + (itemRecipe.getCount() > 1 ? (":#" + itemRecipe.getCount()) : ""));
 			}
 			String recipeLine = "";
 			for (Character recipeCharacter: this.recipe) {

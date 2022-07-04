@@ -31,6 +31,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.Recipe;
+import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import me.RockinChaos.itemjoin.ItemJoin;
@@ -896,21 +897,36 @@ public class ItemUtilities {
     * 
     */
   	public void clearRecipes() {
-  		List < Recipe > backupRecipes = new ArrayList < Recipe > ();
-  		Iterator < Recipe > recipes = Bukkit.getServer().recipeIterator();
+  		final List < Recipe > backupRecipes = new ArrayList < Recipe > ();
+  		final Iterator < Recipe > recipes = Bukkit.getServer().recipeIterator();
+  		boolean itemRecipes = false;
   		while (recipes.hasNext()) {
-  			Recipe recipe = recipes.next();
-  			ItemStack result = recipe.getResult();
-  			boolean backupItem = true;
-  			for (ItemMap itemMap: this.getItems()) {
-  				if (itemMap.isSimilar(result) && !itemMap.getIngredients().isEmpty()) {
-  					backupItem = false;
+  			final Recipe nextRecipe = recipes.next();
+  			if (nextRecipe instanceof ShapedRecipe) {
+  				final ShapedRecipe recipe = (ShapedRecipe) nextRecipe;
+  				final ItemStack result = recipe.getResult();
+  				boolean backupItem = true;
+  				for (final ItemMap itemMap: this.getItems()) {
+  					if (itemMap.getIngredients() != null && !itemMap.getIngredients().isEmpty()) {
+  						itemRecipes = true;
+  						if (itemMap.isSimilar(result) || recipe.getKey().getKey().contains(itemMap.getConfigName())) {
+  							backupItem = false;
+  						}
+  					}
+  					if (backupItem) {
+  						backupRecipes.add(recipe);
+  					}
   				}
   			}
-  			if (backupItem) { backupRecipes.add(recipe); }
   		}
-  		Bukkit.getServer().clearRecipes();
-  		for (Recipe recipe: backupRecipes) { try { Bukkit.getServer().addRecipe(recipe); } catch (IllegalStateException e) { } }
+  		if (itemRecipes) {
+  			Bukkit.getServer().clearRecipes();
+  			for (final Recipe recipe: backupRecipes) {
+  				try {
+  					Bukkit.getServer().addRecipe(recipe);
+  				} catch (IllegalStateException e) { }
+  			}
+  		}
   	}
 	
    /**
@@ -969,9 +985,10 @@ public class ItemUtilities {
     * 
     */
 	public void clearItems() {
-		this.clearRecipes();
-		this.items = new ArrayList < ItemMap >();
-		this.craftingItems = new ArrayList < ItemMap >();
+		this.clearRecipes(); {
+			this.items = new ArrayList < ItemMap >();
+			this.craftingItems = new ArrayList < ItemMap >();
+		}
 	}
 	
    /**

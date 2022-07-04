@@ -24,9 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Matcher;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
@@ -756,7 +753,7 @@ public class ItemDesigner {
 	private void setRecipe(final ItemMap itemMap) {
 		if (itemMap.getNodeLocation().getString(".recipe") != null) {
 			final ShapedRecipe shapedRecipe = (ServerUtils.hasSpecificUpdate("1_12") ? new ShapedRecipe(new NamespacedKey(ItemJoin.getInstance(), itemMap.getConfigName()), itemMap.getItem(null)) : LegacyAPI.newShapedRecipe(itemMap.getItem(null)));
-			Map < Character, Map<String,Integer> > ingredientList = new HashMap < Character, Map<String,Integer> > ();
+			Map<Character, ItemRecipe> ingredientList = new HashMap < Character, ItemRecipe > ();
 			String[] shape = itemMap.trimRecipe(itemMap.getNodeLocation().getStringList(".recipe"));
 			shapedRecipe.shape(shape);
 			boolean register = true;
@@ -765,7 +762,7 @@ public class ItemDesigner {
 				for (String ingredient: ingredients) {
 					String[] ingredientParts = ingredient.split(":");
 					int getCount = 1; 
-					int itemData = 0;
+					int getData = 0;
 					if (ingredientParts.length > 2 && ingredientParts[2].startsWith("#")) { 
 						try { 
 							getCount = Integer.parseInt(ingredientParts[2].replace("#", "")); 
@@ -775,21 +772,26 @@ public class ItemDesigner {
 							getCount = Integer.parseInt(ingredientParts[3].replace("#", "")); 
 						} catch (Exception e) { ServerUtils.logWarn("{ItemDesigner} [2] " + ingredientParts[3].replace("#", "") + " is not a valid count!"); } 
 						try { 
-							itemData = Integer.parseInt(ingredientParts[2]); 
+							getData = Integer.parseInt(ingredientParts[2]); 
 						} catch (Exception e) { ServerUtils.logWarn("{ItemDesigner} [3] " + ingredientParts[2] + " is not a valid item data!"); } 
 					} else if (ingredientParts.length > 2 && !ingredientParts[2].startsWith("#")) {
 						try { 
-							itemData = Integer.parseInt(ingredientParts[2]); 
+							getData = Integer.parseInt(ingredientParts[2]); 
 						} catch (Exception e) { ServerUtils.logWarn("{ItemDesigner} [4] " + ingredientParts[2] + " is not a valid item data!"); } 
 					}
 					final int count = getCount; 
+					final int itemData = getData;
 					final Material material = ItemHandler.getMaterial(ingredientParts[1], String.valueOf(itemData));
 					if (material != null && count >= 1) {
 						char character = 'X';
 						try { character = ingredientParts[0].charAt(0); } 
 						catch (Exception e) { ServerUtils.logWarn("{ItemDesigner} The character " + ingredientParts[0] + " for the custom recipe defined for the item " + itemMap.getConfigName() + " is not a valid character!"); }
-						shapedRecipe.setIngredient(character, material);
-						ingredientList.put(character, Stream.of(new Object[][] {{ material.name(), count }, }).collect(Collectors.toMap(data -> (String) data[0], data -> (Integer) data[1])));
+						if (itemData <= 0) {
+							shapedRecipe.setIngredient(character, material);
+						} else {
+							LegacyAPI.setIngredient(shapedRecipe, character, material, (byte)itemData);
+						}
+						ingredientList.put(character, new ItemRecipe(null, material, (byte)itemData, count));
 					} else if (ConfigHandler.getConfig().getItemSection(ingredientParts[1]) != null && count >= 1) {
 						register = false;
 						SchedulerUtils.runLater(40L, () -> {
@@ -799,7 +801,7 @@ public class ItemDesigner {
 								try { character = ingredientParts[0].charAt(0); } 
 								catch (Exception e) { ServerUtils.logWarn("{ItemDesigner} The character " + ingredientParts[0] + " for the custom recipe defined for the item " + itemMap.getConfigName() + " is not a valid character!"); }
 								shapedRecipe.setIngredient(character, itemStack.getType());
-								ingredientList.put(character, Stream.of(new Object[][] {{ ingredientParts[1], count }, }).collect(Collectors.toMap(data -> (String) data[0], data -> (Integer) data[1])));
+								ingredientList.put(character, new ItemRecipe(ingredientParts[1], null, (byte)itemData, count));
 								if (!StringUtils.isRegistered(Recipes.class.getSimpleName())) {
 									ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Recipes(), ItemJoin.getInstance());
 								}
@@ -811,13 +813,15 @@ public class ItemDesigner {
 				SchedulerUtils.runLater(45L, () -> { 
 					try {
 						if (addRecipe) {
-							Bukkit.getServer().addRecipe(shapedRecipe);
+							try {
+								Bukkit.getServer().addRecipe(shapedRecipe);
+							} catch (IllegalStateException e1) { }
 						}
-					} catch (NullPointerException e) {
-						if (e.getMessage() != null && !e.getMessage().isEmpty() && e.getMessage().contains("registry")) {
+					} catch (NullPointerException e2) {
+						if (e2.getMessage() != null && !e2.getMessage().isEmpty() && e2.getMessage().contains("registry")) {
 							ServerUtils.logWarn("{ItemDesigner} Magma has been detected on the server which currently doesn't support ShapedRecipes.");
 							ServerUtils.logWarn("{ItemDesigner} The recipe for " + itemMap.getConfigName() + " may still continue to function in limited capacity.");
-							ServerUtils.sendDebugTrace(e);
+							ServerUtils.sendDebugTrace(e2);
 						}
 					}
 				});

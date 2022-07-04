@@ -365,9 +365,10 @@ public class ConfigHandler {
 	public void reloadConfigs(final boolean silent) {
 		ItemUtilities.getUtilities().closeAnimations();
 		ItemUtilities.getUtilities().delToggleCommands();
-		ItemUtilities.getUtilities().clearItems();
-		config = new ConfigHandler(); 
-        config.registerClasses(silent);
+		ItemUtilities.getUtilities().clearItems(); {
+			config = new ConfigHandler(); 
+	        config.registerClasses(silent);
+		}
 	}
 	
    /**
