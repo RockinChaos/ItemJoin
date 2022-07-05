@@ -18,6 +18,8 @@
 package me.RockinChaos.itemjoin.item;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -100,14 +102,29 @@ public class ItemUtilities {
     * @return The ItemMap matching the specified slot.
     */
 	public ItemMap getItemMap(final String slot, final List < ItemMap > items) {
-		ItemMap itemMap = null;
-		for (final ItemMap item: items) {
-			if (item.getUISlot().equalsIgnoreCase(slot)) {
-				itemMap = item;
-				break;
+		final List<String> configMap = new ArrayList<String>();
+		for (final ItemMap item: items) { configMap.add(item.getConfigName()); } {
+			Collections.sort(configMap, new Comparator<String>() {
+			    @Override
+			    public int compare(String s1, String s2) {
+			        return s1.compareToIgnoreCase(s2);
+			    }
+			});
+		} {
+			ItemMap itemMap = null;
+			boolean located = false;
+			for (final String configName: configMap) {
+				if (located) { break; }
+				for (final ItemMap item: items) { 
+					if (located) { break; }
+					if (item.getConfigName().equalsIgnoreCase(configName) && item.getUISlot().equalsIgnoreCase(slot)) {
+						itemMap = item;
+						located = true;
+					}
+				}
 			}
+			return itemMap;
 		}
-		return itemMap;
 	}
 	
    /**
