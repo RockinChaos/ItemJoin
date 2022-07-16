@@ -663,7 +663,7 @@ public class ChatExecutor implements CommandExecutor {
 			placeHolders[1] = sender.getName();
 			LanguageAPI.getLang(false).sendLangMessage("commands." + (remove ? "remove.removedYou_All": "get.givenYou_All"), argsPlayer, placeHolders);
 			if (!sender.getName().equalsIgnoreCase(argsPlayer.getName())) { placeHolders[1] = argsPlayer.getName(); LanguageAPI.getLang(false).sendLangMessage("commands." + (remove ? "remove.removedTarget_All": "get.givenTarget_All"), sender, placeHolders); }
-		} else {
+		} else if (!failedPermissions) {
 			placeHolders[1] = argsPlayer.getName();
 			LanguageAPI.getLang(false).sendLangMessage("commands." + (!sender.getName().equalsIgnoreCase(argsPlayer.getName()) ? (remove ? "remove.targetFailedInventory_All" : "get.targetFailedInventory_All") : (remove ? "remove.failedInventory_All" : "get.failedInventory_All")), sender, placeHolders);
 			if (!sender.getName().equalsIgnoreCase(argsPlayer.getName())) { placeHolders[1] = sender.getName(); LanguageAPI.getLang(false).sendLangMessage("commands." + (remove ? "remove.targetTriedRemoval_All": "get.targetFailedInventory_All"), argsPlayer, placeHolders); }
