@@ -366,8 +366,10 @@ public class ConfigHandler {
 		ItemUtilities.getUtilities().closeAnimations();
 		ItemUtilities.getUtilities().delToggleCommands();
 		ItemUtilities.getUtilities().clearItems(); {
-			config = new ConfigHandler(); 
-	        config.registerClasses(silent);
+			SchedulerUtils.runLater(20L, () -> {
+				config = new ConfigHandler(); 
+		        config.registerClasses(silent);
+			});
 		}
 	}
 	

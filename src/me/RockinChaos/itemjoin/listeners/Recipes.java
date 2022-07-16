@@ -148,7 +148,6 @@ public class Recipes implements Listener {
     				}
     				setSlot++;
     			}
-    			
     		}
     		this.handleRecipe(checkMap, event.getInventory(), inventoryClone, event.getView(), true, event.isShiftClick(), event);
     	}

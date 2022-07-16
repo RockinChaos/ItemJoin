@@ -930,18 +930,19 @@ public class ItemUtilities {
   							backupItem = false;
   						}
   					}
-  					if (backupItem) {
-  						backupRecipes.add(recipe);
-  					}
   				}
+  				if (backupItem) {
+	  				backupRecipes.add(recipe);
+	  			}
   			}
   		}
   		if (itemRecipes) {
-  			Bukkit.getServer().clearRecipes();
-  			for (final Recipe recipe: backupRecipes) {
-  				try {
-  					Bukkit.getServer().addRecipe(recipe);
-  				} catch (IllegalStateException e) { }
+  			Bukkit.getServer().clearRecipes(); {
+	  			for (final Recipe recipe: backupRecipes) {
+	  				try {
+	  					Bukkit.getServer().addRecipe(recipe);
+	  				} catch (IllegalStateException e) { }
+	  			}
   			}
   		}
   	}

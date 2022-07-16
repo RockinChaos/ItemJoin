@@ -756,7 +756,6 @@ public class ItemDesigner {
 			Map<Character, ItemRecipe> ingredientList = new HashMap < Character, ItemRecipe > ();
 			String[] shape = itemMap.trimRecipe(itemMap.getNodeLocation().getStringList(".recipe"));
 			shapedRecipe.shape(shape);
-			boolean register = true;
 			if (itemMap.getNodeLocation().getString(".ingredients") != null) {
 				List < String > ingredients = itemMap.getNodeLocation().getStringList(".ingredients");
 				for (String ingredient: ingredients) {
@@ -793,7 +792,6 @@ public class ItemDesigner {
 						}
 						ingredientList.put(character, new ItemRecipe(null, material, (byte)itemData, count));
 					} else if (ConfigHandler.getConfig().getItemSection(ingredientParts[1]) != null && count >= 1) {
-						register = false;
 						SchedulerUtils.runLater(40L, () -> {
 							if (ItemUtilities.getUtilities().getItemMap(null, ingredientParts[1], null) != null) {
 								final ItemStack itemStack = ItemUtilities.getUtilities().getItemMap(null, ingredientParts[1], null).getItem(null);
@@ -809,14 +807,11 @@ public class ItemDesigner {
 						});
 					} else { ServerUtils.logWarn("{ItemDesigner} The material " + ingredientParts[1] + " for the custom recipe defined for the item " + itemMap.getConfigName() + " is not a proper material type OR custom item node!"); }
 				}
-				final boolean addRecipe = register;
 				SchedulerUtils.runLater(45L, () -> { 
 					try {
-						if (addRecipe) {
-							try {
-								Bukkit.getServer().addRecipe(shapedRecipe);
-							} catch (IllegalStateException e1) { }
-						}
+						try {
+							Bukkit.getServer().addRecipe(shapedRecipe);
+						} catch (IllegalStateException e1) { }
 					} catch (NullPointerException e2) {
 						if (e2.getMessage() != null && !e2.getMessage().isEmpty() && e2.getMessage().contains("registry")) {
 							ServerUtils.logWarn("{ItemDesigner} Magma has been detected on the server which currently doesn't support ShapedRecipes.");
