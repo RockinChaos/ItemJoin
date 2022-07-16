@@ -267,9 +267,8 @@ public class ItemUtilities {
 			   && PlayerHandler.isEnabled(player, item.getConfigName()) && item.hasPermission(player, world) 
 			   && this.isObtainable(player, item, session, type)) {
 				item.giveTo(player); 
-			} else if (((type.equals(TriggerType.LIMIT_SWITCH) && item.isUseOnLimitSwitch() && !item.isLimitMode(gameMode))
-					|| (((type.equals(TriggerType.REGION_LEAVE) && item.isGiveOnRegionAccess()) || (type.equals(TriggerType.REGION_ENTER) && item.isGiveOnRegionEgress())) && item.inRegion(region)))
-					&& item.hasItem(player, false)) {
+			} else if (((type.equals(TriggerType.LIMIT_SWITCH) && item.isUseOnLimitSwitch() && !item.isLimitMode(gameMode)) || (((type.equals(TriggerType.REGION_LEAVE) && (item.isGiveOnRegionAccess() 
+					|| !item.inRegion(region))) || (type.equals(TriggerType.REGION_ENTER) && (item.isGiveOnRegionEgress() || !item.inRegion(region)))))) && item.hasItem(player, false)) {
 				item.removeFrom(player);
 			} else if (item.isAutoRemove() && (!item.inWorld(world) || !item.isLimitMode(gameMode)) && item.hasItem(player, true)) {
 				item.removeFrom(player);
