@@ -574,7 +574,8 @@ public class ItemMap {
 		this.giveOnRegionLeave = StringUtils.splitIgnoreCase(this.triggers, "REGION-REMOVE", ",") || StringUtils.splitIgnoreCase(this.triggers, "REGION-EXIT", ",") || StringUtils.splitIgnoreCase(this.triggers, "REGION-LEAVE", ",");
 		this.giveOnRegionAccess = StringUtils.splitIgnoreCase(this.triggers, "REGION-ACCESS", ",");
 		this.giveOnRegionEgress = StringUtils.splitIgnoreCase(this.triggers, "REGION-EGRESS", ","); 
-		if (this.giveOnRegionAccess || this.giveOnRegionEgress) { this.giveOnRegionEnter = false; this.giveOnRegionLeave = false; }
+		if (this.giveOnRegionAccess || this.giveOnRegionEgress) { this.giveOnRegionEnter = false; this.giveOnRegionLeave = false; this.giveOnWorldSwitch = false; }
+		if (this.giveOnRegionEnter || this.giveOnRegionLeave) { this.giveOnWorldSwitch = false; }
 		this.useOnLimitSwitch = StringUtils.splitIgnoreCase(this.triggers, "GAMEMODE-SWITCH", ",");
 		this.setOnlyFirstJoin(StringUtils.splitIgnoreCase(this.triggers, "FIRST-JOIN", ","));
 		this.setOnlyFirstLife(StringUtils.splitIgnoreCase(this.triggers, "FIRST-LIFE", ","));
