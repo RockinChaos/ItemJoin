@@ -1846,10 +1846,19 @@ public class Menu {
 							SchedulerUtils.runLater(2L, () -> clearPane(player));
 						}
 					}));
-			clearPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CLOCK" : "342"), 1, false, 
-					"&b&lClear Delay", "&7", "&7*The number of second(s)", "&7to wait before clearing", "&7items from the player inventory.", 
-					"&9&lDelay: &a" + (ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Delay-Tick") + "").toUpperCase()), 
-					event -> numberPane(player, 3)));
+			clearPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "DANDELION" : "37"), 1, ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("VANILLA"), 
+					"&bType: &a&lVANILLA", "&7", "&7*Only Vanilla items", "&7NOT (Custom ItemJoin item)", "&7should be cleared upon", "&7performing a trigger.", 
+					"&9&lENABLED: &a" + (ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("VANILLA") + "").toUpperCase()), 
+					event -> {
+						if (!ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("VANILLA")) {
+							File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+							FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
+							dataFile.set("Clear-Items.Type", "VANILLA"); 	
+							ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
+							ConfigHandler.getConfig().softReload();
+							SchedulerUtils.runLater(2L, () -> clearPane(player));
+						}
+					}));
 			clearPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "PISTON" : "33"), 1, ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("ITEMJOIN"), 
 					"&bType: &a&lITEMJOIN", "&7", "&7*Only ItemJoin (custom items)", "&7should be cleared upon", "&7performing a trigger.", 
 					"&9&lENABLED: &a" + (ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("ITEMJOIN") + "").toUpperCase()), 
@@ -1880,7 +1889,10 @@ public class Menu {
 					"&9&lENABLED: &a" + ((!StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.World-Switch"), "DISABLE") ? 
 					ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.World-Switch") : "FALSE")).toUpperCase()), 
 					event -> worldPane(player, "Clear-Items.World-Switch")));
-			clearPane.addButton(new Button(fillerPaneBItem));
+			clearPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CLOCK" : "342"), 1, false, 
+					"&b&lClear Delay", "&7", "&7*The number of second(s)", "&7to wait before clearing", "&7items from the player inventory.", 
+					"&9&lDelay: &a" + (ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Delay-Tick") + "").toUpperCase()), 
+					event -> numberPane(player, 3)));
 			clearPane.addButton(new Button(ItemHandler.getItem("MINECART", 1, false, 
 					"&c&l&nRegion-Enter", "&7", "&7*Clears the items from the", "&7player upon entering", "&7a WorldGuard region.", 
 					(DependAPI.getDepends(false).getGuard().guardEnabled() ? "&9&lENABLED: &a" + ((!StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Region-Enter"), "DISABLE") ? 

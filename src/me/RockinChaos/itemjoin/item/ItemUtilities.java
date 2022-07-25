@@ -323,9 +323,11 @@ public class ItemUtilities {
 			} else {
 				String clearType = ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Type");
 				if (clearType != null && (clearType.equalsIgnoreCase("ALL") || clearType.equalsIgnoreCase("GLOBAL"))) {
-					this.clearItems(type, player, region, type.name, true);
+					this.clearItems(type, player, region, type.name, 0);
+				} else if (clearType != null && clearType.equalsIgnoreCase("VANILLA")) {
+					this.clearItems(type, player, region, type.name, 1);
 				} else if (clearType != null && clearType.equalsIgnoreCase("ITEMJOIN")) {
-					this.clearItems(type, player, region, type.name, false);
+					this.clearItems(type, player, region, type.name, 2);
 				} else if (clearType != null) {
 					ServerUtils.logSevere("{ItemMap} " + clearType + " for Clear-Items in the config.yml is not a valid option.");
 				}
@@ -342,32 +344,32 @@ public class ItemUtilities {
     * @param region - The region the Player is in (if any).
     * @param clearAll - If ALL items are expected to be cleared from the Player Inventory.
     */
-	private void clearItems(final TriggerType type, final Player player, final String event, final String region, final boolean clearAll) {
+	private void clearItems(final TriggerType type, final Player player, final String event, final String region, final int clearType) {
 		this.protectItems = this.getProtectItems();
 		PlayerInventory inventory = player.getInventory();
 		Inventory craftView = player.getOpenInventory().getTopInventory();
-		DependAPI.getDepends(false).getGuard().saveReturnItems(player, event, region, craftView, inventory, true);
-		this.saveReturnItems(type, player, player.getWorld().getName(), craftView, inventory, true);
+		DependAPI.getDepends(false).getGuard().saveReturnItems(player, event, region, craftView, inventory, 0);
+		this.saveReturnItems(type, player, player.getWorld().getName(), craftView, inventory, 0);
 		for (int i = 0; i < (!this.protectItems.isEmpty() ? this.protectItems.size() : 1); i++) {
-			if (this.canClear(inventory.getHelmet(), "Helmet", i, clearAll)) {
+			if (this.canClear(inventory.getHelmet(), "Helmet", i, clearType)) {
 				inventory.setHelmet(new ItemStack(Material.AIR));
-			} if (this.canClear(inventory.getChestplate(), "Chestplate", i, clearAll)) {
+			} if (this.canClear(inventory.getChestplate(), "Chestplate", i, clearType)) {
 				inventory.setChestplate(new ItemStack(Material.AIR));
-			} if (this.canClear(inventory.getLeggings(), "Leggings", i, clearAll)) {
+			} if (this.canClear(inventory.getLeggings(), "Leggings", i, clearType)) {
 				inventory.setLeggings(new ItemStack(Material.AIR));
-			} if (this.canClear(inventory.getBoots(), "Boots", i, clearAll)) {
+			} if (this.canClear(inventory.getBoots(), "Boots", i, clearType)) {
 				inventory.setBoots(new ItemStack(Material.AIR));
-			} if (ServerUtils.hasSpecificUpdate("1_9") && this.canClear(inventory.getItemInOffHand(), "OffHand", i, clearAll)) {
+			} if (ServerUtils.hasSpecificUpdate("1_9") && this.canClear(inventory.getItemInOffHand(), "OffHand", i, clearType)) {
 				PlayerHandler.setOffHandItem(player, new ItemStack(Material.AIR));
 			} if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
 				for (int k = 0; k < player.getOpenInventory().getTopInventory().getContents().length; k++) {
-					if (this.canClear(player.getOpenInventory().getTopInventory().getItem(k), "CRAFTING[" + k + "]", i, clearAll)) {
+					if (this.canClear(player.getOpenInventory().getTopInventory().getItem(k), "CRAFTING[" + k + "]", i, clearType)) {
 						craftView.setItem(k, new ItemStack(Material.AIR));
 					}
 				}
 			}
 			for (int f = 0; f < inventory.getSize(); f++) {
-				if (this.canClear(inventory.getItem(f), Integer.toString(f), i, clearAll)) {
+				if (this.canClear(inventory.getItem(f), Integer.toString(f), i, clearType)) {
 					inventory.setItem(f, new ItemStack(Material.AIR));
 				}
 			}
@@ -383,8 +385,9 @@ public class ItemUtilities {
     * @param clearAll - If ALL items are expected to be cleared from the Player Inventory.
     * @return If the ItemStack is allowed.
     */
-	public boolean canClear(final ItemStack item, final String slot, final int i, final boolean clearAll) {
-		return item != null && !this.isBlacklisted(slot, item) && !this.isProtected(i, item) && (clearAll ? true : ItemHandler.containsNBTData(item));
+	public boolean canClear(final ItemStack item, final String slot, final int i, final int clearType) {
+		return item != null && !this.isBlacklisted(slot, item) && !this.isProtected(i, item) && 
+			   (clearType == 0 || (clearType == 1 && !ItemHandler.containsNBTData(item)) || (clearType == 2 && ItemHandler.containsNBTData(item)));
 	}
 	
    /**
@@ -542,16 +545,16 @@ public class ItemUtilities {
     * @param inventory - The players current Inventory.
     * @param clearAll - If ALL items are being cleared.
     */
-	public void saveReturnItems(final TriggerType type, final Player player, final String world, final Inventory craftView, final PlayerInventory inventory, final boolean clearAll) {
+	public void saveReturnItems(final TriggerType type, final Player player, final String world, final Inventory craftView, final PlayerInventory inventory, final int clearType) {
 		boolean doReturn = StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Options"), "RETURN_SWITCH", ",");
 		List < ItemMap > protectItems = ItemUtilities.getUtilities().getProtectItems();
 		if (type == TriggerType.WORLD_SWITCH && doReturn) {
 			Inventory saveInventory = Bukkit.createInventory(null, 54);
 			for (int i = 0; i <= 47; i++) {
 				for (int k = 0; k < (!protectItems.isEmpty() ? protectItems.size() : 1); k++) {
-					if (i <= 41 && inventory.getSize() >= i && ItemUtilities.getUtilities().canClear(inventory.getItem(i), String.valueOf(i), k, clearAll)) {
+					if (i <= 41 && inventory.getSize() >= i && ItemUtilities.getUtilities().canClear(inventory.getItem(i), String.valueOf(i), k, clearType)) {
 						saveInventory.setItem(i, inventory.getItem(i).clone());
-					} else if (i >= 42 && ItemUtilities.getUtilities().canClear(craftView.getItem(i - 42), "CRAFTING[" + (i - 42) + "]", k, clearAll) && PlayerHandler.isCraftingInv(player.getOpenInventory())) {
+					} else if (i >= 42 && ItemUtilities.getUtilities().canClear(craftView.getItem(i - 42), "CRAFTING[" + (i - 42) + "]", k, clearType) && PlayerHandler.isCraftingInv(player.getOpenInventory())) {
 						saveInventory.setItem(i, craftView.getItem(i - 42).clone());
 					}
 				}

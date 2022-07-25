@@ -277,7 +277,7 @@ public class GuardAPI {
     * @param inventory - The players current Inventory.
     * @param clearAll - If ALL items are being cleared.
     */
-	public void saveReturnItems(final Player player, final String region, final String type, final Inventory craftView, final PlayerInventory inventory, final boolean clearAll) {
+	public void saveReturnItems(final Player player, final String region, final String type, final Inventory craftView, final PlayerInventory inventory, final int clearType) {
 		boolean doReturn = ((ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Options") != null) ? StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Options").replace(" ", ""), "RETURN", ",") : false);
 		List < ItemMap > protectItems = ItemUtilities.getUtilities().getProtectItems();
 		DataObject dataObject = SQL.getData().getData(new DataObject(Table.RETURN_ITEMS, PlayerHandler.getPlayerID(player), player.getWorld().getName(), region, ""));
@@ -285,9 +285,9 @@ public class GuardAPI {
 			Inventory saveInventory = Bukkit.createInventory(null, 54);
 			for (int i = 0; i <= 47; i++) {
 				for (int k = 0; k < (!protectItems.isEmpty() ? protectItems.size() : 1); k++) {
-					if (i <= 41 && inventory.getSize() >= i && ItemUtilities.getUtilities().canClear(inventory.getItem(i), String.valueOf(i), k, clearAll)) {
+					if (i <= 41 && inventory.getSize() >= i && ItemUtilities.getUtilities().canClear(inventory.getItem(i), String.valueOf(i), k, clearType)) {
 						saveInventory.setItem(i, inventory.getItem(i).clone());
-					} else if (i >= 42 && ItemUtilities.getUtilities().canClear(craftView.getItem(i - 42), "CRAFTING[" + (i - 42) + "]", k, clearAll) && PlayerHandler.isCraftingInv(player.getOpenInventory())) {
+					} else if (i >= 42 && ItemUtilities.getUtilities().canClear(craftView.getItem(i - 42), "CRAFTING[" + (i - 42) + "]", k, clearType) && PlayerHandler.isCraftingInv(player.getOpenInventory())) {
 						saveInventory.setItem(i, craftView.getItem(i - 42).clone());
 					}
 				}
