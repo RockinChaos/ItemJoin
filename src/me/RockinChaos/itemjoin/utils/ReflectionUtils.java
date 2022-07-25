@@ -476,7 +476,6 @@ public final class ReflectionUtils {
 		return output.toString();
 	}
 	
-	
    /**
 	* Searchable methods that no longer require NBT Reflections.
 	* 
