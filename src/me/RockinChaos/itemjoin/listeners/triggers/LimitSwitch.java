@@ -17,6 +17,7 @@
  */
 package me.RockinChaos.itemjoin.listeners.triggers;
 
+import java.util.Arrays;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -27,6 +28,7 @@ import me.RockinChaos.itemjoin.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.item.ItemUtilities.TriggerType;
 import me.RockinChaos.itemjoin.utils.ServerUtils;
+import me.RockinChaos.itemjoin.utils.api.DependAPI;
 
 public class LimitSwitch implements Listener {
 
@@ -42,8 +44,27 @@ public class LimitSwitch implements Listener {
 		final Player player = event.getPlayer();
 		final GameMode newMode = event.getNewGameMode();
 		if (PlayerHandler.isPlayer(player)) {
-			ItemUtilities.getUtilities().setAuthenticating(player, player.getWorld(), TriggerType.LIMIT_SWITCH, newMode, "GLOBAL"); 
+			if (DependAPI.getDepends(false).getGuard().guardEnabled()) {
+				this.handleRegions(player, newMode);
+			} else { 
+				ItemUtilities.getUtilities().setAuthenticating(player, player.getWorld(), TriggerType.LIMIT_SWITCH, newMode, "IJ_WORLD"); 
+			}
 		}
 		ServerUtils.logDebug("{ItemMap} " + player.getName() + " has performed the LIMIT-SWITCH trigger.");
+	}
+	
+   /**
+	* Handles the checking of WorldGuard regions, 
+	* proceeding if the player has entered or exited a new region.
+	* 
+	* @param player - The player that has entered or exited a region.
+	*/
+	private void handleRegions(final Player player, final GameMode newMode) {
+		String regions = DependAPI.getDepends(false).getGuard().getRegionAtLocation(player.getLocation());
+		for (String region: Arrays.asList(regions.replace(" ", "").split(","))) {
+			if (region != null && !region.isEmpty()) {
+				ItemUtilities.getUtilities().setAuthenticating(player, player.getWorld(), TriggerType.LIMIT_SWITCH, newMode, region); 
+			}
+		}
 	}
 }
