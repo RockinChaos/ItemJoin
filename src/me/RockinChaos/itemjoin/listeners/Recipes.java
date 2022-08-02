@@ -170,70 +170,79 @@ public class Recipes implements Listener {
     	} else {
     		final ItemStack result = (craftInventory.getResult() != null ? craftInventory.getResult().clone() : new ItemStack(Material.AIR));
     		final boolean isLegacy = !ServerUtils.hasSpecificUpdate("1_13");
-    		boolean removed = false;
-    		int resultSize = 0;
-    		int ingredientSize = 0;
-    		int confirmations = 0;
-    		for (Character character: itemMap.getRecipe()) {
-    			if (character != 'X') {
-    				ingredientSize += 1;
-    			}
-    		}
-    		if (!isCrafted) {
-    			confirmations = this.getConfirmations(itemMap, inventoryClone);
-    		} else {
-    			boolean cycleShift = true;
-    			while (this.getConfirmations(itemMap, inventoryClone) == ingredientSize && cycleShift) {
-    				cycleShift = isShiftClick;
-    				for (int i = 0; i < inventoryClone.getSize(); i++) {
-    					final ItemStack item = inventoryClone.getItem(i);
-    					if (item != null) {
-    						for (Character ingredient: itemMap.getIngredients().keySet()) {
-    							final ItemRecipe itemRecipe = itemMap.getIngredients().get(ingredient);
-    							ItemMap ingredMap = ItemUtilities.getUtilities().getItemMap(null, itemRecipe.getMap(), null);
-    							if (itemMap.getRecipe().size() > i && itemMap.getRecipe().get(i) == ingredient) {
-    								if ((((ingredMap == null
-    										&& itemRecipe.getMaterial().equals(item.getType()) 
-    										&& (!isLegacy 
-    												|| (LegacyAPI.getDataValue(item) == itemRecipe.getData())))) 
-    										|| (ingredMap != null 
-    										&& ingredMap.isSimilar(item))) 
-    										&& item.getAmount() >= itemRecipe.getCount()) {
-    									int removal = (item.getAmount() - itemRecipe.getCount());
-    									if (removal <= 0) {
-    										craftInventory.setItem((i + 1), new ItemStack(Material.AIR));
-    										inventoryClone.setItem(i, new ItemStack(Material.AIR));
-    										removed = true;
-    									} else {
-    										craftInventory.getItem((i + 1)).setAmount(removal);
-    										inventoryClone.getItem(i).setAmount(removal);
-    										removed = true;
-    									}
-    								}
-    							}
-    						}
-    					}
-    				}
-    				resultSize++;
-    			}
-    		}
-    		if (!isCrafted && confirmations == ingredientSize) {
-    			craftInventory.setResult(itemMap.getItem((Player) view.getPlayer()));
-    			return true;
-    		} else if (!isCrafted) {
-    			craftInventory.setResult(new ItemStack(Material.AIR));
-    		} else if (isCrafted && removed) {
-    			if (resultSize > 0 && isShiftClick) {
-    				result.setAmount(resultSize);
-    			}
-    			event.setCancelled(true);
-    			if (isShiftClick) {
-    				view.getPlayer().getInventory().addItem(result);
-    			} else if (view.getPlayer().getOpenInventory().getCursor() != null && view.getPlayer().getOpenInventory().getCursor().isSimilar(result)) {
-    				view.getPlayer().getOpenInventory().getCursor().setAmount((view.getPlayer().getOpenInventory().getCursor().getAmount() + result.getAmount()));
-    			} else {
-    				view.getPlayer().getOpenInventory().setCursor(result);
-    			}
+    		boolean success = false;
+    		for (List<Character> recipe : itemMap.getRecipe()) {
+    			if (!success) {
+	    			boolean removed = false;
+	    			int resultSize = 0;
+	    			int ingredientSize = 0;
+	    			int confirmations = 0;
+		    		for (Character character: recipe) {
+		    			if (character != 'X') {
+		    				ingredientSize += 1;
+		    			}
+		    		}
+		    		if (!isCrafted) {
+		    			confirmations = this.getConfirmations(itemMap, inventoryClone, recipe);
+		    		} else {
+		    			boolean cycleShift = true;
+		    			while (this.getConfirmations(itemMap, inventoryClone, recipe) == ingredientSize && cycleShift) {
+		    				cycleShift = isShiftClick;
+		    				for (int i = 0; i < inventoryClone.getSize(); i++) {
+		    					final ItemStack item = inventoryClone.getItem(i);
+		    					if (item != null) {
+		    						for (Character ingredient: itemMap.getIngredients().keySet()) {
+		    							final ItemRecipe itemRecipe = itemMap.getIngredients().get(ingredient);
+		    							ItemMap ingredMap = ItemUtilities.getUtilities().getItemMap(null, itemRecipe.getMap(), null);
+		    							if (recipe.size() > i && recipe.get(i) == ingredient) {
+		    								if ((((ingredMap == null
+		    										&& itemRecipe.getMaterial().equals(item.getType()) 
+		    										&& (!isLegacy 
+		    												|| (LegacyAPI.getDataValue(item) == itemRecipe.getData())))) 
+		    										|| (ingredMap != null 
+		    										&& ingredMap.isSimilar(item))) 
+		    										&& item.getAmount() >= itemRecipe.getCount()) {
+		    									int removal = (item.getAmount() - itemRecipe.getCount());
+		    									if (removal <= 0) {
+		    										craftInventory.setItem((i + 1), new ItemStack(Material.AIR));
+		    										inventoryClone.setItem(i, new ItemStack(Material.AIR));
+		    										removed = true;
+		    									} else {
+		    										craftInventory.getItem((i + 1)).setAmount(removal);
+		    										inventoryClone.getItem(i).setAmount(removal);
+		    										removed = true;
+		    									}
+		    								}
+		    							}
+		    						}
+		    					}
+		    				}
+		    				resultSize++;
+		    			}
+		    		}
+		    		if (!isCrafted && confirmations == ingredientSize) {
+		    			success = true;
+		    			craftInventory.setResult(itemMap.getItem((Player) view.getPlayer()));
+		    			return true;
+		    		} else if (!isCrafted) {
+		    			craftInventory.setResult(new ItemStack(Material.AIR));
+		    		} else if (isCrafted && removed) {
+		    			if (resultSize > 0 && isShiftClick) {
+		    				result.setAmount(resultSize);
+		    			}
+		    			event.setCancelled(true);
+		    			if (isShiftClick) {
+		    				success = true;
+		    				view.getPlayer().getInventory().addItem(result);
+		    			} else if (view.getPlayer().getOpenInventory().getCursor() != null && view.getPlayer().getOpenInventory().getCursor().isSimilar(result)) {
+		    				success = true;
+		    				view.getPlayer().getOpenInventory().getCursor().setAmount((view.getPlayer().getOpenInventory().getCursor().getAmount() + result.getAmount()));
+		    			} else {
+		    				success = true;
+		    				view.getPlayer().getOpenInventory().setCursor(result);
+		    			}
+		    		}
+		    	}
     		}
     	}
     	return false;
@@ -246,7 +255,7 @@ public class Recipes implements Listener {
 	* @param inventoryClone - The a clone of CraftingInventory reference.
 	* @return If the loop should break.
 	*/
-    private int getConfirmations(final ItemMap itemMap, final Inventory inventoryClone) {
+    private int getConfirmations(final ItemMap itemMap, final Inventory inventoryClone, final List<Character> recipe) {
     	int confirmations = 0;
     	for (int i = 0; i < inventoryClone.getSize(); i++) {
     		final ItemStack item = inventoryClone.getItem(i);
@@ -254,7 +263,7 @@ public class Recipes implements Listener {
     			for (Character ingredient: itemMap.getIngredients().keySet()) {
     				final ItemRecipe itemRecipe = itemMap.getIngredients().get(ingredient);
     				ItemMap ingredMap = ItemUtilities.getUtilities().getItemMap(null, itemRecipe.getMap(), null);
-    				if (itemMap.getRecipe().size() > i && itemMap.getRecipe().get(i) == ingredient) {
+    				if (recipe.size() > i && recipe.get(i) == ingredient) {
     					if (((ingredMap == null && itemRecipe.getMaterial().equals(item.getType())) || (ingredMap != null && ingredMap.isSimilar(item))) && item.getAmount() >= itemRecipe.getCount()) {
     						confirmations += 1;
     					}

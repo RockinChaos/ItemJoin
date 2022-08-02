@@ -21,7 +21,6 @@ import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -155,7 +154,7 @@ public class ItemMap {
     private List <Pattern> bannerPatterns = new ArrayList<Pattern>();
     
     private Map<Character, ItemRecipe> ingredients = new HashMap < Character, ItemRecipe > ();
-    private List <Character> recipe = Arrays.asList( 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X' );
+    private List < List <Character> > recipe = new ArrayList<List<Character>>();
     
     private String leatherColor;
     private String leatherHex;
@@ -1190,7 +1189,17 @@ public class ItemMap {
     * @param recipe - The recipe pattern to be set.
     */
 	public void setRecipe(final List <Character> recipe) {
-		this.recipe = recipe;
+		this.recipe = new ArrayList< List<Character>>();
+		this.recipe.add(recipe);
+	}
+	
+   /**
+    * Adds the recipe pattern.
+    * 
+    * @param recipe - The recipe pattern to be added.
+    */
+	public void addRecipe(final List <Character> recipe) {
+		this.recipe.add(recipe);
 	}
 	
    /**
@@ -2551,7 +2560,7 @@ public class ItemMap {
     * 
     * @return The recipe pattern.
     */
-	public List<Character> getRecipe() {
+	public List<List<Character>> getRecipe() {
 		return this.recipe;
 	}
 	
@@ -5162,7 +5171,7 @@ public class ItemMap {
 			}
 			shape[i] = recipeList.get(i).replace("X", " ");
 		}
-		this.setRecipe(recipe);
+		this.addRecipe(recipe);
 		if ((shape[2].length() == 3 && shape[2].charAt(0) == ' ' && shape[2].charAt(1) == ' ' && shape[2].charAt(2) == ' ') || shape[2].isEmpty()) {
 			if (shape[0].length() == 3 && shape[0].charAt(2) == ' ' && shape[1].length() == 3 && shape[1].charAt(2) == ' ') {
 				shape = new String[] { shape[0].substring(0, shape[0].length() - 1), shape[1].substring(0, shape[1].length() - 1) };
@@ -5421,7 +5430,7 @@ public class ItemMap {
 				ingredientList.add(ingredient + ":" + (itemRecipe.getMaterial() != null ? itemRecipe.getMaterial().name() : itemRecipe.getMap()) + (itemRecipe.getData() > 0 ? (":" + itemRecipe.getData()) : "") + (itemRecipe.getCount() > 1 ? (":#" + itemRecipe.getCount()) : ""));
 			}
 			String recipeLine = "";
-			for (Character recipeCharacter: this.recipe) {
+			for (Character recipeCharacter: this.recipe.get(0)) {
 				recipeLine += recipeCharacter;
 				if (StringUtils.countCharacters(recipeLine) == 3) {
 					recipeTempList.add(recipeLine);

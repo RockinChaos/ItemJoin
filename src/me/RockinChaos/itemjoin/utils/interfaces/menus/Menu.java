@@ -7456,8 +7456,8 @@ public class Menu {
 				final int k = i;
 				String stack = "CHEST";
 				ItemStack stack1 = null;
-				if (itemMap.getRecipe().size() > i && itemMap.getRecipe().get(i) != 'X') {
-					final ItemRecipe itemRecipe = itemMap.getIngredients().get(itemMap.getRecipe().get(i));
+				if (itemMap.getRecipe().get(0).size() > i && itemMap.getRecipe().get(0).get(i) != 'X') {
+					final ItemRecipe itemRecipe = itemMap.getIngredients().get(itemMap.getRecipe().get(0).get(i));
 					final ItemMap copyMap = ItemUtilities.getUtilities().getItemMap(null, itemRecipe.getMap(), null);
 					if (copyMap != null) { 
 						stack1 = copyMap.getItemStack(player); 
@@ -7468,11 +7468,11 @@ public class Menu {
 				if (stack1 != null) {
 					stack1 = ItemHandler.addLore(stack1, "&9&lDISPLAY: &f" + stack1.getItemMeta().getDisplayName(), "&7", "&7*Create a recipe that can be used.");
 					ItemMeta meta = stack1.getItemMeta();
-					meta.setDisplayName(StringUtils.translateLayout((itemMap.getRecipe().size() > i ? "&e&l" + itemMap.getRecipe().get(i): "&e&lX"), player));
+					meta.setDisplayName(StringUtils.translateLayout((itemMap.getRecipe().get(0).size() > i ? "&e&l" + itemMap.getRecipe().get(0).get(i): "&e&lX"), player));
 					stack1.setItemMeta(meta);
 					
 					recipePane.addButton(new Button(stack1, event -> {
-						if ((itemMap.getRecipe().size() > k && itemMap.getRecipe().get(k) != 'X')) { setIngredients(player, itemMap, "AIR", k); } 
+						if ((itemMap.getRecipe().get(0).size() > k && itemMap.getRecipe().get(0).get(k) != 'X')) { setIngredients(player, itemMap, "AIR", k); } 
 						else { ingredientPane(player, itemMap, k); }
 					}));
 					if (i == 2) {
@@ -7486,8 +7486,8 @@ public class Menu {
 					}
 				} else {
 					recipePane.addButton(new Button(ItemHandler.getItem((stack.contains("#") ? stack.split("#")[0] : stack), (stack.contains("#") ? Integer.parseInt(stack.split("#")[1]) : 1), false, 
-							(itemMap.getRecipe().size() > i ? "&e&l" + itemMap.getRecipe().get(i): "&e&lX"), "&7", "&7*Create a recipe that can be used."), event -> {
-						if ((itemMap.getRecipe().size() > k && itemMap.getRecipe().get(k) != 'X')) { setIngredients(player, itemMap, "AIR", k); } 
+							(itemMap.getRecipe().get(0).size() > i ? "&e&l" + itemMap.getRecipe().get(0).get(i): "&e&lX"), "&7", "&7*Create a recipe that can be used."), event -> {
+						if ((itemMap.getRecipe().get(0).size() > k && itemMap.getRecipe().get(0).get(k) != 'X')) { setIngredients(player, itemMap, "AIR", k); } 
 						else { ingredientPane(player, itemMap, k); }
 					}));
 					if (i == 2) {
@@ -7622,7 +7622,7 @@ public class Menu {
     */
 	private static void setIngredients(final Player player, final ItemMap itemMap, final String material, final int position) {
 		Map<Character, ItemRecipe> ingredients = itemMap.getIngredients();
-		List < Character > recipe = itemMap.getRecipe();
+		List < Character > recipe = itemMap.getRecipe().get(0);
 		char character = 'A';
 		for (char alphabet = 'A'; alphabet <= 'Z'; alphabet++) {
 			if (alphabet != 'X' && !ingredients.containsKey(alphabet)) {
