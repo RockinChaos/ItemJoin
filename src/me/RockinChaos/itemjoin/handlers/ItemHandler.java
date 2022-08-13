@@ -252,7 +252,7 @@ public class ItemHandler {
     */
 	public static Material getMaterial(String material, String data) {
 		try {
-			boolean isLegacy = (data != null);
+			boolean isLegacy = (data != null && Integer.parseInt(data) > 0);
 			if (material.contains(":")) { String[] parts = material.split(":"); material = parts[0]; if (!parts[1].equalsIgnoreCase("0")) { data = parts[1]; isLegacy = true; } }
 			if (StringUtils.isInt(material) && !ServerUtils.hasSpecificUpdate("1_13")) {
 				return LegacyAPI.findMaterial(Integer.parseInt(material));
