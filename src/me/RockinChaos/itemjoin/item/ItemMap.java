@@ -3634,9 +3634,10 @@ public class ItemMap {
     * @return If the ItemStack is similar.
     */
 	public boolean isReal(final ItemStack item) {
+		final String nbtData = ItemHandler.getNBTData(item);
 		if (item != null && item.getType() != Material.AIR
 				&& (this.vanillaControl || this.vanillaStatus
-				|| (ItemHandler.dataTagsEnabled() && ItemHandler.getNBTData(item) != null && ItemHandler.getNBTData(item).equalsIgnoreCase(this.newNBTData))
+				|| (ItemHandler.dataTagsEnabled() && nbtData != null && this.newNBTData != null && nbtData.equalsIgnoreCase(this.newNBTData))
 				|| (this.legacySecret != null && item.hasItemMeta() && (ServerUtils.hasSpecificUpdate("1_14") || (!ServerUtils.hasSpecificUpdate("1_14") && item.getItemMeta().hasDisplayName())) 
 				&& StringUtils.colorDecode(item) != null && StringUtils.colorDecode(item).contains(this.legacySecret)))) {
 			return true;
