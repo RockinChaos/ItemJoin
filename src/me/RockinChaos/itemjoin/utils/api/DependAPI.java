@@ -240,14 +240,16 @@ public class DependAPI {
 			} catch (Exception e1) {
 				try {
 					netty = ReflectionUtils.getClass("net.skinsrestorer.api.SkinsRestorerAPI");
-					final Object skinsRestorer = netty.getMethod("getApi").invoke(null);
+					final Object skinsRestorer = netty.getMethod("getApi").invoke(null); 
 					final Object playerData = skinsRestorer.getClass().getMethod("getSkinName", String.class).invoke(skinsRestorer, owner);
 					final String ownerData = (playerData != null ? (String) playerData : owner);
 					final Object skinData = skinsRestorer.getClass().getMethod("getSkinData", String.class).invoke(skinsRestorer, ownerData);
 					return (skinData != null ? (String) skinData.getClass().getMethod("getValue").invoke(skinData) : null);
 				} catch (Exception e2) {
-					ServerUtils.sendDebugTrace(e2);
-					ServerUtils.logSevere("{DependAPI} [2] Unsupported SkinsRestorer version detected, unable to set the skull owner " + owner + ".");
+					if (!StringUtils.containsIgnoreCase(e2.getCause().getMessage(), "SkinStorage is not initialized. Is SkinsRestorer in proxy mode?") || !StringUtils.containsIgnoreCase(e2.getCause().getMessage(), "proxy mode")) {
+						ServerUtils.sendSevereTrace(e2);
+						ServerUtils.logSevere("{DependAPI} [2] Unsupported SkinsRestorer version detected, unable to set the skull owner " + owner + ".");
+					}
 				}
 			}
     	}
