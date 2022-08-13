@@ -361,6 +361,6 @@ items:
     - 'XGX'
     ingredients:
     - 'G:GOLD_INGOT'
-    - 'I:IRON_INGOT:3'
+    - 'I:IRON_INGOT:#3'
     - 'D:DIAMOND'
     triggers: DISABLED
