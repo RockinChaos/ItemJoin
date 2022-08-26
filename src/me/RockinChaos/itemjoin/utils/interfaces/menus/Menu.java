@@ -5455,27 +5455,64 @@ public class Menu {
 				}
 				itemMap.setEnabledRegions(enabledRegions);regionPane(player, itemMap);
 			}));
-			for (World world: Bukkit.getServer().getWorlds()) {
-				for (String region: DependAPI.getDepends(false).getGuard().getRegions(world).keySet()) {
+			for (final World world: Bukkit.getServer().getWorlds()) {
+				for (final String region: DependAPI.getDepends(false).getGuard().getRegions(world).keySet()) {
 					String regionMaterial = (ServerUtils.hasSpecificUpdate("1_13") ? "GRASS_BLOCK" : "2");
 					if (world.getEnvironment().equals(Environment.NETHER)) {
 						regionMaterial = "NETHERRACK";
 					} else if (world.getEnvironment().equals(Environment.THE_END)) {
 						regionMaterial = (ServerUtils.hasSpecificUpdate("1_13") ? "END_STONE" : "121");
 					}
-					regionPane.addButton(new Button(ItemHandler.getItem(regionMaterial, 1, itemMap.containsRegion(region), "&f&l" + region, "&7", "&a&lWORLD: &f" + world.getName(), "&7", "&7*Click to enable the", 
-							"&7custom item in this region.", "&9&lENABLED: &a" + (itemMap.containsRegion(region) + "").toUpperCase()), event -> {
-						if (itemMap.containsRegion(region)) {
+					regionPane.addButton(new Button(ItemHandler.getItem(regionMaterial, 1, itemMap.containsRegion(region) && itemMap.containsWorld(world.getName(), false), "&f&l" + region, "&7", "&a&lWORLD: &f" + world.getName(), "&7", "&7*Click to enable the", 
+							"&7custom item in this region.", "&9&lENABLED: &a" + ((itemMap.containsRegion(region) && itemMap.containsWorld(world.getName(), false)) + "").toUpperCase()), event -> {
+						if (itemMap.containsRegion(region) && itemMap.containsWorld(world.getName(), false)) {
 							enabledRegions.remove(region);
+							clearWorlds(itemMap);
 						} else {
-							enabledRegions.add(region);
+							clearWorlds(itemMap);
+							if (!itemMap.containsRegion(region)) {
+								enabledRegions.add(region);
+							}
+							if (!itemMap.containsWorld(world.getName(), false)) {
+								final List<String> worldList = itemMap.getEnabledWorlds();
+								worldList.add(world.getName().toUpperCase());
+								itemMap.setEnabledWorlds(worldList);
+							}
 						}
-						itemMap.setEnabledRegions(enabledRegions);regionPane(player, itemMap);
+						itemMap.setEnabledRegions(enabledRegions);
+						regionPane(player, itemMap);
 					}));
 				}
 			}
 		});
 		regionPane.open(player);
+	}
+	
+   /**
+    * Clears the worlds that are currently not used for any specific region list.
+    * 
+    * @param itemMap - The ItemMap currently being modified.
+    */
+	private static void clearWorlds(final ItemMap itemMap) {
+		for (final World worldRemoval: Bukkit.getServer().getWorlds()) {
+			if (itemMap.containsWorld(worldRemoval.getName(), false)) {
+				boolean hasRegion = false;
+				for (final String regionExists: DependAPI.getDepends(false).getGuard().getRegions(worldRemoval).keySet()) {
+					if (itemMap.containsRegion(regionExists)) {
+						hasRegion = true;
+					}
+				}
+			if (!hasRegion) {
+				final List<String> worldList = itemMap.getEnabledWorlds();
+					for (int i = 0; i < worldList.size(); i++) {
+						if (worldList.get(i).equalsIgnoreCase(worldRemoval.getName())) {
+							worldList.remove(i);
+						}
+					}
+					itemMap.setEnabledWorlds(worldList);
+				}
+			}
+		}
 	}
 	
    /**
