@@ -7577,7 +7577,7 @@ public class Menu {
 	private static void nbtPane(final Player player, final ItemMap itemMap) {
 		Interface nbtPane = new Interface(true, 2, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
-			Map<String, String> properties = itemMap.getNBTValues();
+			Map<Object, Object> properties = itemMap.getNBTValues();
 			nbtPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> creatingPane(player, itemMap)));
 				nbtPane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, true, "&e&l&nNew Property", "&7", "&7*Add a new NBT Property to the custom item."), event -> {
 					player.closeInventory();
@@ -7597,7 +7597,7 @@ public class Menu {
 					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
 					nbtPane(event.getPlayer(), itemMap);
 				}));
-				for (String key : properties.keySet()) {
+				for (Object key : properties.keySet()) {
 					nbtPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "COMMAND_BLOCK" : "137"), 1, false, "&f" + key + ":" + properties.get(key), "&7", "&7*Click to modify or delete", "&7this custom NBT Property."), event -> modifyProperty(player, itemMap, key)));
 				}
 		});
@@ -7611,10 +7611,10 @@ public class Menu {
     * @param player - The Player to have the Pane opened.
     * @param itemMap - The ItemMap currently being modified.
     */
-	private static void modifyProperty(final Player player, final ItemMap itemMap, final String key) {
+	private static void modifyProperty(final Player player, final ItemMap itemMap, final Object key) {
 		Interface modifyProperty = new Interface(false, 2, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
-			Map<String, String> properties = itemMap.getNBTValues();
+			Map<Object, Object> properties = itemMap.getNBTValues();
 			modifyProperty.addButton(new Button(fillerPaneGItem), 3);
 			modifyProperty.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, false, "&c&l&nModify", "&7", "&7*Modify this NBT Property.", "&7", "&9&lProperty: &a" + "&f" + key + ":" + properties.get(key)), event -> {
 				player.closeInventory();

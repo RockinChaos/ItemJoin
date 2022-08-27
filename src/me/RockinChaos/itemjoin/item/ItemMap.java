@@ -168,7 +168,7 @@ public class ItemMap {
 	private boolean customConsumable = false;
 	private Map < String, Integer > enchants = new HashMap < String, Integer > ();
 	
-	private Map < String, String > nbtProperty = new HashMap < String, String > ();
+	private Map < Object, Object > nbtProperty = new HashMap < Object, Object > ();
 	private List < Object > nbtProperties = new ArrayList < Object > ();
 	private Map < String, Long > playersOnInteractCooldown = new HashMap < String, Long > ();
 	private HashMap < String, Long > storedSpammedPlayers = new HashMap < String, Long > ();
@@ -1973,7 +1973,7 @@ public class ItemMap {
     * 
     * @oaram tags - The Object Tags to be set.
     */
-	public void setNBTProperties(final Map<String, String> tagValues, final List<Object> tags) {
+	public void setNBTProperties(final Map<Object, Object> tagValues, final List<Object> tags) {
 		this.nbtProperty = tagValues;
 		this.nbtProperties = tags;
 	}
@@ -1983,7 +1983,7 @@ public class ItemMap {
     * 
     * @oaram tags - The Object Tags to be set.
     */
-	public void setNBTValues(final Map<String, String> tagValues) {
+	public void setNBTValues(final Map<Object, Object> tagValues) {
 		this.nbtProperty = tagValues;
 	}
 	
@@ -2860,7 +2860,7 @@ public class ItemMap {
     * 
     * @return The NBT Values.
     */
-	public Map<String, String> getNBTValues() {
+	public Map<Object, Object> getNBTValues() {
 		return this.nbtProperty;
 	}
 	
@@ -4124,8 +4124,12 @@ public class ItemMap {
 					cacheTag.getClass().getMethod(MinecraftMethod.setString.getMethod(cacheTag, String.class, String.class), String.class, String.class).invoke(cacheTag, "ItemJoin Name", this.getConfigName());
 					cacheTag.getClass().getMethod(MinecraftMethod.setString.getMethod(cacheTag, String.class, String.class), String.class, String.class).invoke(cacheTag, "ItemJoin Slot", this.getItemValue());
 					if (this.nbtProperty != null && !this.nbtProperty.isEmpty()) {
-						for (String tag: this.nbtProperty.keySet()) {
-							cacheTag.getClass().getMethod(MinecraftMethod.setString.getMethod(cacheTag, String.class, String.class), String.class, String.class).invoke(cacheTag, tag, this.nbtProperty.get(tag));
+						for (Object tag: this.nbtProperty.keySet()) {
+							try {
+								cacheTag.getClass().getMethod(MinecraftMethod.setString.getMethod(cacheTag, String.class, String.class), String.class, String.class).invoke(cacheTag, tag, this.nbtProperty.get(tag));
+							} catch (Exception e) {
+								cacheTag.getClass().getMethod(MinecraftMethod.set.getMethod(cacheTag, String.class, ReflectionUtils.getMinecraftClass("NBTBase")), String.class, ReflectionUtils.getMinecraftClass("NBTBase")).invoke(cacheTag, tag, this.nbtProperty.get(tag));
+							}
 						}
 					}
 				} else { 
@@ -5475,7 +5479,7 @@ public class ItemMap {
 		}
 		if (this.nbtProperty != null && !this.nbtProperty.isEmpty()) { 
 			String propertyList = "";
-			for (String property : this.nbtProperty.keySet()) { propertyList += property + ":" + this.nbtProperty.get(property) + ", "; }
+			for (Object property : this.nbtProperty.keySet()) { propertyList += property + ":" + this.nbtProperty.get(property) + ", "; }
 			itemData.set("items." + this.configName + ".properties", propertyList.substring(0, propertyList.length() - 2)); 
 		}
 		if (this.disposableConditions != null && !this.disposableConditions.isEmpty()) { 

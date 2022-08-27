@@ -455,15 +455,37 @@ public class ItemDesigner {
 				itemMap.setNewNBTData(itemMap.getConfigName() + " " + itemMap.getItemValue(), tag);
 				if (itemMap.getNodeLocation().getString(".properties") != null && !itemMap.getNodeLocation().getString(".properties").isEmpty()) {
 					List<Object> tags = new ArrayList<Object>();
-					Map<String, String> tagValues = new HashMap<String, String>();
+					Map<Object, Object> tagValues = new HashMap<Object, Object>();
 					String[] properties = itemMap.getNodeLocation().getString(".properties").split(",");
 					for (String property: properties) {
 						String[] propertyParts = property.split(":");
 						String identifier = (propertyParts[0].startsWith(" ") ? propertyParts[0].substring(1) : propertyParts[0]);
+						Object tagList = null;
+						String value = propertyParts[1];
+						for (int i = 2; i < propertyParts.length; i++) {
+							value += ":" + propertyParts[i];
+						}
+						if (value.startsWith("[")) {
+							final List<String> listNBT = new ArrayList<String>();
+							value = value.replace("[", "").replace("]", "");
+							String[] valueParts = value.split("#");
+							for (String valuePart : valueParts) {
+								listNBT.add(valuePart);
+							}
+							tagList = ReflectionUtils.getMinecraftClass("NBTTagList").getConstructor().newInstance();
+							for (String nbt : listNBT) {
+								Object tagString = ReflectionUtils.getMinecraftClass("NBTTagString").getConstructor(String.class).newInstance(nbt.toString());
+								tagList.getClass().getMethod(MinecraftMethod.add.getMethod(tagList, ReflectionUtils.getMinecraftClass("NBTBase")), ReflectionUtils.getMinecraftClass("NBTBase")).invoke(tagList, tagString);
+							}
+						}
 						Object propertyTag = ReflectionUtils.getMinecraftClass("NBTTagCompound").getConstructor().newInstance();
-						propertyTag.getClass().getMethod(MinecraftMethod.setString.getMethod(propertyTag, String.class, String.class), String.class, String.class).invoke(propertyTag, identifier, propertyParts[1]);
+						propertyTag.getClass().getMethod(MinecraftMethod.setString.getMethod(propertyTag, String.class, String.class), String.class, String.class).invoke(propertyTag, identifier, value);
 						tags.add(propertyTag);
-						tagValues.put(identifier, propertyParts[1]);
+						if (tagList == null) {
+							tagValues.put(identifier, value);
+						} else {
+							tagValues.put(identifier, tagList);
+						}
 					}
 					itemMap.setNBTProperties(tagValues, tags);
 				}
