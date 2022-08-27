@@ -112,7 +112,7 @@ public class Recipes implements Listener {
     		int setSlot = 0;
     		for (int i = 0; i < event.getInventory().getSize(); i++) {
     			if (setSlot >= 9) { break; }
-    			else if (!checkMap.isSimilar(event.getInventory().getItem(i))) {
+    			else if (i > 0 || !checkMap.isSimilar(event.getInventory().getItem(i))) {
     				if (event.getInventory().getItem(i) != null ) {
     					inventoryClone.setItem(setSlot, event.getInventory().getItem(i).clone());
     				}
@@ -171,7 +171,7 @@ public class Recipes implements Listener {
     		final ItemStack result = (craftInventory.getResult() != null ? craftInventory.getResult().clone() : new ItemStack(Material.AIR));
     		final boolean isLegacy = !ServerUtils.hasSpecificUpdate("1_13");
     		boolean success = false;
-    		for (List<Character> recipe : itemMap.getRecipe()) {
+    		for (final List<Character> recipe : itemMap.getRecipe()) {
     			if (!success) {
 	    			boolean removed = false;
 	    			int resultSize = 0;
