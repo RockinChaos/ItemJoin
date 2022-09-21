@@ -847,13 +847,19 @@ public class ItemDesigner {
 				} else if (ConfigHandler.getConfig().getItemSection(ingredientParts[1]) != null && count >= 1) {
 					SchedulerUtils.runLater(40L, () -> {
 						try { 
-							if (ItemUtilities.getUtilities().getItemMap(null, ingredientParts[1], null) != null) {
-								final ItemStack itemStack = ItemUtilities.getUtilities().getItemMap(null, ingredientParts[1], null).getItem(null);
+							final ItemMap tempMap = ItemUtilities.getUtilities().getItemMap(null, ingredientParts[1], null);
+							if  (tempMap != null) {
+								final ItemStack itemStack = tempMap.getItem(null);
+								final int mapData = Integer.parseInt(tempMap.getDataValue() + "");
 								char character = 'X';
 								try { character = ingredientParts[0].charAt(0); } 
 								catch (Exception e) { ServerUtils.logWarn("{ItemDesigner} The character " + ingredientParts[0] + " for the custom recipe defined for the item " + itemMap.getConfigName() + " is not a valid character!"); }
-								shapedRecipe.setIngredient(character, itemStack.getType());
-								ingredientList.put(character, new ItemRecipe(ingredientParts[1], null, (byte)itemData, count));
+								if (mapData <= 0) {
+									shapedRecipe.setIngredient(character, itemStack.getType());
+									} else {
+									LegacyAPI.setIngredient(shapedRecipe, character, itemStack.getType(), (byte)mapData);
+								}
+								ingredientList.put(character, new ItemRecipe(ingredientParts[1], null, (byte)mapData, count));
 								if (!StringUtils.isRegistered(Recipes.class.getSimpleName())) {
 									ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Recipes(), ItemJoin.getInstance());
 								}
