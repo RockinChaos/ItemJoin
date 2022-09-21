@@ -171,13 +171,19 @@ public class Recipes implements Listener {
     		final ItemStack result = (craftInventory.getResult() != null ? craftInventory.getResult().clone() : new ItemStack(Material.AIR));
     		final boolean isLegacy = !ServerUtils.hasSpecificUpdate("1_13");
     		boolean success = false;
-    		for (final List<Character> recipe : itemMap.getRecipe()) {
+    		for (final List<Character> tempRecipe : itemMap.getRecipe()) {
     			if (!success) {
+    				final List<Character> recipe = new ArrayList<Character>();
 	    			boolean removed = false;
 	    			int resultSize = 0;
 	    			int ingredientSize = 0;
 	    			int confirmations = 0;
-		    		for (Character character: recipe) {
+		    		for (Character character: tempRecipe) {
+		    			if ((tempRecipe.size() < 9 && craftInventory.getSize() < 9) && character != 'X') { 
+		    				recipe.add(character); 
+		    			} else if (!(tempRecipe.size() < 9 && craftInventory.getSize() < 9)) {
+		    				recipe.add(character); 
+		    			}
 		    			if (character != 'X') {
 		    				ingredientSize += 1;
 		    			}
