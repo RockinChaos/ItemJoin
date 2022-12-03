@@ -8750,7 +8750,7 @@ public class Menu {
 		try {
 			SchedulerUtils.runAsync(() -> {
 				if (bool) { modifyMenu.add(PlayerHandler.getPlayerID(player)); } 
-				else { modifyMenu.remove(PlayerHandler.getPlayerID(player)); }
+				else if (modifyMenu.size() != 0 && modifyMenu.contains(PlayerHandler.getPlayerID(player))) { modifyMenu.remove(PlayerHandler.getPlayerID(player)); }
 			});
 		} catch (ArrayIndexOutOfBoundsException e) { }
 	}
