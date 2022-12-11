@@ -3601,7 +3601,7 @@ public class ItemMap {
     * @return If the ItemFlag is to be prevented.
     */
 	public boolean isAllowedItem(final Player player, final ItemStack item, final String findFlag) {
-		if (!Menu.isOpen(player) && this.isSimilar(item)) {
+		if (!Menu.isOpen(player) && this.isSimilar(player, item)) {
 			if (this.AllowOpBypass && player.isOp() || this.CreativeBypass && player.getGameMode() == GameMode.CREATIVE 
 					|| findFlag.equalsIgnoreCase("inventory-modify") && player.hasPermission("itemjoin.bypass.inventorymodify") 
 					&& ItemJoin.getInstance().getConfig().getBoolean("Permissions.Movement-Bypass")) {
@@ -3648,15 +3648,16 @@ public class ItemMap {
    /**
     * Checks if the ItemStack is similar to the defined ItemMap.
     * 
+    * @param player - The player being referenced.
     * @param item - The ItemStack being checked.
     * @return If the ItemStack is similar.
     */
-	public boolean isSimilar(final ItemStack item) {
+	public boolean isSimilar(final Player player, final ItemStack item) {
 		if ((item != null && item.getType() != Material.AIR && item.getType() == this.material) || (this.materialAnimated && item != null && item.getType() != Material.AIR && this.isMaterial(item))) {
 			if (this.vanillaControl || this.vanillaStatus || (ItemHandler.dataTagsEnabled() && ItemHandler.getNBTData(item) != null && ItemHandler.getNBTData(item).equalsIgnoreCase(this.newNBTData))
 				|| (this.legacySecret != null && item.hasItemMeta() && (ServerUtils.hasSpecificUpdate("1_14") || (!ServerUtils.hasSpecificUpdate("1_14") && item.getItemMeta().hasDisplayName())) 
 				&& StringUtils.colorDecode(item) != null && StringUtils.colorDecode(item).contains(this.legacySecret))) {
-				if (isEnchantSimilar(item) || !item.getItemMeta().hasEnchants() && enchants.isEmpty() || this.isItemChangable()) {
+				if (this.isEnchantSimilar(player, item) || !item.getItemMeta().hasEnchants() && this.enchants.isEmpty() || this.isItemChangable()) {
 					if (this.material.toString().toUpperCase().contains("BOOK") 
 							&& (this.isBookMeta(item) 
 							&& ((BookMeta) item.getItemMeta()).getPages().equals(((BookMeta) tempItem.getItemMeta()).getPages()) || this.isDynamic())
@@ -3709,20 +3710,24 @@ public class ItemMap {
    /**
     * Checks if the ItemStack Enchantments are similar.
     * 
+    * @param player - The player being referenced.
     * @param item - The ItemStack being checked.
     * @return If the ItemStack Enchantments are similar.
     */
-	private boolean isEnchantSimilar(final ItemStack item) {
-		if (item.getItemMeta().hasEnchants() && ((this.enchants != null && !this.enchants.isEmpty()) || this.glowing)) { 
-			ItemStack checkItem = new ItemStack(item.getType());
-			for (Entry<String, Integer> enchantments : this.enchants.entrySet()) {
-				if (enchantments.getKey() == null && DependAPI.getDepends(false).tokenEnchantEnabled() && TokenEnchantAPI.getInstance().getEnchantment(enchantments.getKey()) != null) {
-					TokenEnchantAPI.getInstance().enchant(null, checkItem, enchantments.getKey(), enchantments.getValue(), true, 0, true);
-				} else { 
-					checkItem.addUnsafeEnchantment(ItemHandler.getEnchantByName(enchantments.getKey()), enchantments.getValue()); }
+	private boolean isEnchantSimilar(final Player player, final ItemStack item) {
+		if (player != null) {
+			final Map <String, Integer> enchantList = ItemUtilities.getUtilities().getStatistics(player).getEnchantments(this);
+			if (item.getItemMeta().hasEnchants() && ((enchantList != null && !enchantList.isEmpty()) || this.glowing)) { 
+				ItemStack checkItem = new ItemStack(item.getType());
+				for (final Entry<String, Integer> enchantments : enchantList.entrySet()) {
+					if (enchantments.getKey() == null && DependAPI.getDepends(false).tokenEnchantEnabled() && TokenEnchantAPI.getInstance().getEnchantment(enchantments.getKey()) != null) {
+						TokenEnchantAPI.getInstance().enchant(null, checkItem, enchantments.getKey(), enchantments.getValue(), true, 0, true);
+					} else { 
+						checkItem.addUnsafeEnchantment(ItemHandler.getEnchantByName(enchantments.getKey()), enchantments.getValue()); }
+				}
+				return (this.glowing ? true : item.getItemMeta().getEnchants().equals(checkItem.getItemMeta().getEnchants()));
 			}
-			return (this.glowing ? true : item.getItemMeta().getEnchants().equals(checkItem.getItemMeta().getEnchants()));
-		}
+		} else { return true; }
 		return false;
 	}
 	
@@ -3777,28 +3782,28 @@ public class ItemMap {
     */
 	public boolean hasItem(final Player player, boolean ignoreCount) {
 		for (ItemStack inPlayerInventory: player.getInventory().getContents()) {
-			if (this.isSimilar(inPlayerInventory) && (ignoreCount || this.isCountSimilar(player, inPlayerInventory))) {
+			if (this.isSimilar(player, inPlayerInventory) && (ignoreCount || this.isCountSimilar(player, inPlayerInventory))) {
 				return true;
 			}
 		}
 		for (ItemStack equipInventory: player.getEquipment().getArmorContents()) {
-			if (this.isSimilar(equipInventory) && (ignoreCount || this.isCountSimilar(player, equipInventory))) {
+			if (this.isSimilar(player, equipInventory) && (ignoreCount || this.isCountSimilar(player, equipInventory))) {
 				return true;
 			}
 		}
 		if (ServerUtils.hasSpecificUpdate("1_9") 
-				&& this.isSimilar(player.getInventory().getItemInOffHand())
+				&& this.isSimilar(player, player.getInventory().getItemInOffHand())
 				&& (ignoreCount || this.isCountSimilar(player, player.getInventory().getItemInOffHand()))) {
 			return true;
 		}
 		if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
 			for (ItemStack craftInventory: player.getOpenInventory().getTopInventory()) {
-				if (this.isSimilar(craftInventory) && (ignoreCount || this.isCountSimilar(player, craftInventory))) {
+				if (this.isSimilar(player, craftInventory) && (ignoreCount || this.isCountSimilar(player, craftInventory))) {
 					return true;
 				}
 			}
 		}
-		return (player.getItemOnCursor() != null && player.getItemOnCursor().getType() != Material.AIR && this.isSimilar(player.getItemOnCursor()) && (ignoreCount || this.isCountSimilar(player, player.getItemOnCursor())));
+		return (player.getItemOnCursor() != null && player.getItemOnCursor().getType() != Material.AIR && this.isSimilar(player, player.getItemOnCursor()) && (ignoreCount || this.isCountSimilar(player, player.getItemOnCursor())));
 	}
 	
    /**
@@ -3924,8 +3929,9 @@ public class ItemMap {
     * @param player - The Player to have their TokenEnchant instance fetched.
     */
 	private void setEnchantments(final Player player) {
-		if (this.enchants != null && !this.enchants.isEmpty()) {
-			for (Entry<String, Integer> enchantments : this.enchants.entrySet()) {
+		final Map<String, Integer> enchantStats = (player != null ? ItemUtilities.getUtilities().getStatistics(player).getEnchantments(this) : null);
+		if (enchantStats != null && !enchantStats.isEmpty()) {
+			for (final Entry <String, Integer> enchantments : enchantStats.entrySet()) {
 				if (enchantments.getKey() == null && DependAPI.getDepends(false).tokenEnchantEnabled() && TokenEnchantAPI.getInstance().getEnchantment(enchantments.getKey()) != null) {
 					TokenEnchantAPI.getInstance().enchant(player, this.tempItem, enchantments.getKey(), enchantments.getValue(), true, 0, true);
 				} else { this.tempItem.addUnsafeEnchantment(ItemHandler.getEnchantByName(enchantments.getKey()), enchantments.getValue()); }
@@ -4489,31 +4495,31 @@ public class ItemMap {
 			}
 			
 			for (int k = 0; k < contents.length; k++) {
-				if (this.isSimilar(contents[k])) { inv.setItem(k, new ItemStack(Material.AIR)); }
+				if (this.isSimilar(player, contents[k])) { inv.setItem(k, new ItemStack(Material.AIR)); }
 			}
-			if (this.isSimilar(inv.getHelmet())) { inv.setHelmet(new ItemStack(Material.AIR)); }
-			if (this.isSimilar(inv.getChestplate())) { inv.setChestplate(new ItemStack(Material.AIR)); }
-			if (this.isSimilar(inv.getLeggings())) { inv.setLeggings(new ItemStack(Material.AIR)); }
-			if (this.isSimilar(inv.getBoots())) { inv.setBoots(new ItemStack(Material.AIR)); }
-			if (ServerUtils.hasSpecificUpdate("1_9") && this.isSimilar(PlayerHandler.getOffHandItem(player))) { PlayerHandler.setOffHandItem(player, new ItemStack(Material.AIR)); }
+			if (this.isSimilar(player, inv.getHelmet())) { inv.setHelmet(new ItemStack(Material.AIR)); }
+			if (this.isSimilar(player, inv.getChestplate())) { inv.setChestplate(new ItemStack(Material.AIR)); }
+			if (this.isSimilar(player, inv.getLeggings())) { inv.setLeggings(new ItemStack(Material.AIR)); }
+			if (this.isSimilar(player, inv.getBoots())) { inv.setBoots(new ItemStack(Material.AIR)); }
+			if (ServerUtils.hasSpecificUpdate("1_9") && this.isSimilar(player, PlayerHandler.getOffHandItem(player))) { PlayerHandler.setOffHandItem(player, new ItemStack(Material.AIR)); }
 			
 			if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
 				for (int k = 0; k < craftingContents.length; k++) {
-					if (this.isSimilar(craftingContents[k])) { craftView.setItem(k, new ItemStack(Material.AIR)); }
+					if (this.isSimilar(player, craftingContents[k])) { craftView.setItem(k, new ItemStack(Material.AIR)); }
 				}
 			}
 		} else {
 			for (int k = 0; k < contents.length; k++) {
-				if (this.isSimilar(contents[k])) { inv.setItem(k, ItemHandler.modifyItem(inv.getItem(k), false, amount[0])); return; }
+				if (this.isSimilar(player, contents[k])) { inv.setItem(k, ItemHandler.modifyItem(inv.getItem(k), false, amount[0])); return; }
 			}
-			if (this.isSimilar(inv.getHelmet())) { inv.setHelmet(ItemHandler.modifyItem(inv.getHelmet(), false, amount[0])); }
-			else if (this.isSimilar(inv.getChestplate())) { inv.setChestplate(ItemHandler.modifyItem(inv.getChestplate(), false, amount[0])); }
-			else if (this.isSimilar(inv.getLeggings())) { inv.setLeggings(ItemHandler.modifyItem(inv.getLeggings(), false, amount[0])); }
-			else if (this.isSimilar(inv.getBoots())) { inv.setBoots(ItemHandler.modifyItem(inv.getBoots(), false, amount[0])); }
-			else if (ServerUtils.hasSpecificUpdate("1_9") && this.isSimilar(PlayerHandler.getOffHandItem(player))) { PlayerHandler.setOffHandItem(player, ItemHandler.modifyItem(PlayerHandler.getOffHandItem(player), false, amount[0])); }
+			if (this.isSimilar(player, inv.getHelmet())) { inv.setHelmet(ItemHandler.modifyItem(inv.getHelmet(), false, amount[0])); }
+			else if (this.isSimilar(player, inv.getChestplate())) { inv.setChestplate(ItemHandler.modifyItem(inv.getChestplate(), false, amount[0])); }
+			else if (this.isSimilar(player, inv.getLeggings())) { inv.setLeggings(ItemHandler.modifyItem(inv.getLeggings(), false, amount[0])); }
+			else if (this.isSimilar(player, inv.getBoots())) { inv.setBoots(ItemHandler.modifyItem(inv.getBoots(), false, amount[0])); }
+			else if (ServerUtils.hasSpecificUpdate("1_9") && this.isSimilar(player, PlayerHandler.getOffHandItem(player))) { PlayerHandler.setOffHandItem(player, ItemHandler.modifyItem(PlayerHandler.getOffHandItem(player), false, amount[0])); }
 			else if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
 				for (int k = 0; k < craftingContents.length; k++) {
-					if (this.isSimilar(craftingContents[k])) { craftView.setItem(k, ItemHandler.modifyItem(player.getOpenInventory().getItem(k), false, amount[0])); return; }
+					if (this.isSimilar(player, craftingContents[k])) { craftView.setItem(k, ItemHandler.modifyItem(player.getOpenInventory().getItem(k), false, amount[0])); return; }
 				}
 			}
 		}
@@ -4963,15 +4969,15 @@ public class ItemMap {
 			if (!allItems) { this.setSubjectRemoval(true); }
 			SchedulerUtils.runLater(1L, () -> {
 				if (PlayerHandler.isCreativeMode(player)) { player.closeInventory(); }
-				if (itemMap.isSimilar(player.getItemOnCursor())) {
+				if (itemMap.isSimilar(player, player.getItemOnCursor())) {
 					player.setItemOnCursor(ItemHandler.modifyItem(player.getItemOnCursor(), allItems, 1));
 					if (!allItems) { this.setSubjectRemoval(false); }
 				} else {
 					int itemSlot = player.getInventory().getHeldItemSlot();
-					if (itemMap.isSimilar(player.getInventory().getItem(itemSlot))) { player.getInventory().setItem(itemSlot, ItemHandler.modifyItem(player.getInventory().getItem(itemSlot), allItems, 1)); if (!allItems) { this.setSubjectRemoval(false); }}
+					if (itemMap.isSimilar(player, player.getInventory().getItem(itemSlot))) { player.getInventory().setItem(itemSlot, ItemHandler.modifyItem(player.getInventory().getItem(itemSlot), allItems, 1)); if (!allItems) { this.setSubjectRemoval(false); }}
 					else { 
 						for (int i = 0; i < player.getInventory().getSize(); i++) {
-							if (itemMap.isSimilar(player.getInventory().getItem(i))) {
+							if (itemMap.isSimilar(player, player.getInventory().getItem(i))) {
 								player.getInventory().setItem(i, ItemHandler.modifyItem(player.getInventory().getItem(i), allItems, 1));
 								if (!allItems) { this.setSubjectRemoval(false); }
 								break;
@@ -4984,7 +4990,7 @@ public class ItemMap {
 						if (!allItems) { this.setSubjectRemoval(false); }
 					} else if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
 						for (int i = 0; i < player.getOpenInventory().getTopInventory().getSize(); i++) {
-							if (itemMap.isSimilar(player.getOpenInventory().getTopInventory().getItem(i))) {
+							if (itemMap.isSimilar(player, player.getOpenInventory().getTopInventory().getItem(i))) {
 								player.getOpenInventory().getTopInventory().setItem(i, ItemHandler.modifyItem(player.getOpenInventory().getTopInventory().getItem(i), allItems, 1));
 								if (!allItems) { this.setSubjectRemoval(false); }
 								break;

@@ -35,7 +35,6 @@ import org.bukkit.FireworkEffect.Type;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
@@ -63,7 +62,6 @@ import me.RockinChaos.itemjoin.utils.sql.DataObject.Table;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
-import com.vk2gpz.tokenenchant.api.TokenEnchantAPI;
 
 public class ItemDesigner {
 	
@@ -106,7 +104,6 @@ public class ItemDesigner {
 							this.setSkullDatabase(itemMap);
 							this.setUnbreaking(itemMap);
 							this.durabilityBar(itemMap);
-							this.setEnchantments(itemMap);
 							this.setMapImage(itemMap);
 							this.setJSONBookPages(itemMap);
 							this.setNBTData(itemMap);
@@ -349,44 +346,6 @@ public class ItemDesigner {
 			try {
 				itemMap.setDurabilityBar(true);
 			} catch (Exception e) { ServerUtils.sendDebugTrace(e); } }
-	}
-	
-   /**
-	* Sets the Custom Enchants to the Custom Item, 
-	* adding the specified enchantments to the item.
-	* 
-	* @param itemMap - The ItemMap being modified.
-	*/
-	private void setEnchantments(final ItemMap itemMap) {
-		if (itemMap.getNodeLocation().getString(".enchantment") != null) {
-			String enchantlist = itemMap.getNodeLocation().getString(".enchantment").replace(" ", "");
-			String[] enchantments = enchantlist.split(",");
-			Map < String, Integer > listEnchants = new HashMap < String, Integer > ();
-			for (String enchantment: enchantments) {
-				String[] parts = enchantment.split(":");
-				String name = parts[0].toUpperCase();
-				int level = 1;
-				Enchantment enchantName = ItemHandler.getEnchantByName(name);
-				if (StringUtils.containsIgnoreCase(enchantment, ":")) {
-					try {
-						level = Integer.parseInt(parts[1]);
-					} catch (NumberFormatException e) {
-						ServerUtils.logSevere("{ItemDesigner} An error occurred in the config, " + parts[1] + " is not a number and a number was expected!");
-						ServerUtils.logWarn("{ItemDesigner} Enchantment: " + parts[0] + " will now be enchanted by level 1.");
-						ServerUtils.sendDebugTrace(e);
-					}
-				}
-				if (enchantName != null) {
-					listEnchants.put(name, level);
-				} else if (enchantName == null && DependAPI.getDepends(false).tokenEnchantEnabled() && TokenEnchantAPI.getInstance().getEnchantment(name) != null) {
-					listEnchants.put(name, level);
-				} else if (enchantName == null && !DependAPI.getDepends(false).tokenEnchantEnabled()) {
-					ServerUtils.logSevere("{ItemDesigner} An error occurred in the config, " + name + " is not a proper enchant name!");
-					ServerUtils.logWarn("{ItemDesigner} Please see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/enchantments/Enchantment.html for a list of correct enchantment names.");
-				}
-			}
-			itemMap.setEnchantments(listEnchants);
-		}
 	}
 	
    /**
