@@ -55,6 +55,7 @@ public class ItemUtilities {
   	private List < ItemMap > craftingItems = new ArrayList < ItemMap >();
   	private List < ItemMap > protectItems = new ArrayList < ItemMap >();
 	private HashMap <Integer, Integer> failCount = new HashMap <Integer, Integer> ();
+	private HashMap <String, ItemStatistics> itemStats = new HashMap <String, ItemStatistics> ();
 	
 	private static ItemUtilities utilities;
 
@@ -84,7 +85,7 @@ public class ItemUtilities {
     */
 	public ItemMap getItemMap(final ItemStack itemStack, final String configName, final World world) {
 		for (ItemMap itemMap : this.getItems()) {
-			if (world != null && configName == null && itemMap.inWorld(world) && itemMap.isSimilar(itemStack)) {
+			if (world != null && configName == null && itemMap.inWorld(world) && itemMap.isSimilar(null, itemStack)) {
 				return itemMap;
 			} else if (configName != null && itemMap.getConfigName().equalsIgnoreCase(configName)) {
 				return itemMap;
@@ -229,6 +230,7 @@ public class ItemUtilities {
     * @param region - The region the Player is in.
     */
 	public void setItems(final Player player, final World world, final TriggerType type, final GameMode newMode, final String region) {
+		this.setStatistics(player);
 		this.safeSet(player, world, type, region);
 		if (this.getItemDelay() != 0 && type != TriggerType.LIMIT_SWITCH && type != TriggerType.REGION_ENTER && type != TriggerType.REGION_LEAVE) { 
 			SchedulerUtils.runLater(this.getItemDelay(), () -> {
@@ -276,6 +278,19 @@ public class ItemUtilities {
 		}
 		this.sendFailCount(player, session);
 		PlayerHandler.updateInventory(player, 15L);
+	}
+	
+   /**
+    * Sets the statistical information for the player for the listed ItemMap.
+    * 
+    * @param player - The Player that is having their items set.
+    */
+	private void setStatistics(final Player player) {
+		final ItemStatistics tempStats = new ItemStatistics(player, this.getItems());
+		if (this.itemStats != null && this.itemStats.containsKey(PlayerHandler.getPlayerID(player))) {
+			this.itemStats.remove(PlayerHandler.getPlayerID(player));
+		}
+		this.itemStats.put(PlayerHandler.getPlayerID(player), tempStats);
 	}
 	
    /**
@@ -891,7 +906,7 @@ public class ItemUtilities {
     * @return If the ItemStack is a protected ItemMap.
     */
 	public boolean isProtected(final int i, final ItemStack item) {
-			return !this.protectItems.isEmpty() && this.protectItems.get(i).isSimilar(item) && i == (this.protectItems.size() - 1);
+			return !this.protectItems.isEmpty() && this.protectItems.get(i).isSimilar(null, item) && i == (this.protectItems.size() - 1);
 	}
 	
    /**
@@ -928,7 +943,7 @@ public class ItemUtilities {
   				for (final ItemMap itemMap: this.getItems()) {
   					if (itemMap.getIngredients() != null && !itemMap.getIngredients().isEmpty()) {
   						itemRecipes = true;
-  						if (itemMap.isSimilar(result) || recipe.getKey().getKey().contains(itemMap.getConfigName())) {
+  						if (itemMap.isSimilar(null, result) || recipe.getKey().getKey().contains(itemMap.getConfigName())) {
   							backupItem = false;
   						}
   					}
@@ -1045,6 +1060,16 @@ public class ItemUtilities {
 		private final String name;
 		private TriggerType(String name) { this.name = name; }
 	}	
+	
+   /**
+    * Gets the instance of the ItemStatistics for the Player.
+    * 
+    * @param player - The player being referenced.
+    * @return The ItemStatistics instance.
+    */
+    public ItemStatistics getStatistics(final Player player) { 
+        return (player != null ? this.itemStats.get(PlayerHandler.getPlayerID(player)) : null); 
+    } 
 	
    /**
     * Gets the instance of the ItemUtilities.

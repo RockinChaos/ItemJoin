@@ -121,7 +121,7 @@ public class Consumes implements Listener {
 							}
 		 				} 
 		 				else { PlayerHandler.setMainHandItem(player, item); }
-					} else if (itemMap.isSimilar(PlayerHandler.getHandItem(player))) { 
+					} else if (itemMap.isSimilar(player, PlayerHandler.getHandItem(player))) { 
 						PlayerHandler.getHandItem(player).setAmount(itemMap.getCount(player)); 
 		 			} 
 				}
@@ -147,7 +147,7 @@ public class Consumes implements Listener {
 	 		if ((mainHandMap != null && !ItemUtilities.getUtilities().isAllowed(player, mainStack, "count-lock")) || (offHandMap != null && !ItemUtilities.getUtilities().isAllowed(player, offStack, "count-lock"))) {
 	 			if ((StringUtils.containsIgnoreCase(mainStack.getType().name(), "TOTEM") && mainHandMap != null) || (StringUtils.containsIgnoreCase(offStack.getType().name(), "TOTEM") && offHandMap != null)) {
 					SchedulerUtils.runLater(1L, () -> {
-		 				if (mainHandMap != null && mainHandMap.isSimilar(mainStack)) {
+		 				if (mainHandMap != null && mainHandMap.isSimilar(player, mainStack)) {
 		 					if (StringUtils.containsIgnoreCase(PlayerHandler.getMainHandItem(player).getType().name(), "TOTEM")) {
 		 						PlayerHandler.getMainHandItem(player).setAmount(mainHandMap.getCount(player));
 		 					} else if (StringUtils.containsIgnoreCase(PlayerHandler.getOffHandItem(player).getType().name(), "TOTEM")) {
@@ -158,7 +158,7 @@ public class Consumes implements Listener {
 		 					} else if (PlayerHandler.getOffHandItem(player).getType() == Material.AIR) {
 		 						PlayerHandler.setOffHandItem(player, mainStack);
 		 					}
-		 				} else if (offHandMap != null && offHandMap.isSimilar(offStack)) {
+		 				} else if (offHandMap != null && offHandMap.isSimilar(player, offStack)) {
 		 					if (StringUtils.containsIgnoreCase(PlayerHandler.getOffHandItem(player).getType().name(), "TOTEM")) {
 		 						PlayerHandler.getOffHandItem(player).setAmount(offHandMap.getCount(player));
 		 					} else if (StringUtils.containsIgnoreCase(PlayerHandler.getMainHandItem(player).getType().name(), "TOTEM")) {

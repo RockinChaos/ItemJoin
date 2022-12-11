@@ -127,7 +127,7 @@ public class Legacy_Consumes implements Listener {
 							}
 		 				} 
 		 				else { PlayerHandler.setMainHandItem(player, item); }
-					} else if (itemMap.isSimilar(PlayerHandler.getHandItem(player))) { 
+					} else if (itemMap.isSimilar(player, PlayerHandler.getHandItem(player))) { 
 						PlayerHandler.getHandItem(player).setAmount(itemMap.getCount(player)); 
 		 			} 
 				}

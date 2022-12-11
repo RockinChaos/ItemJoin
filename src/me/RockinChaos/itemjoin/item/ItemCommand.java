@@ -107,9 +107,9 @@ public class ItemCommand {
 	*/
 	private void taskOnHold(final Player player, final Player altPlayer, final String slot, final int cooldown, final ItemMap itemMap) {
     	this.cycleTask = SchedulerUtils.runAsyncAtInterval(cooldown, 0L, () -> {
-    		if (itemMap.isSimilar(PlayerHandler.getMainHandItem(player))) {
+    		if (itemMap.isSimilar(player, PlayerHandler.getMainHandItem(player))) {
     			this.sendDispatch(player, altPlayer, this.executorType, slot);
-    		} else if (itemMap.isSimilar(PlayerHandler.getOffHandItem(player))) {
+    		} else if (itemMap.isSimilar(player, PlayerHandler.getOffHandItem(player))) {
     			this.sendDispatch(player, altPlayer, this.executorType, slot);
     		} else { this.cancelTask(); }
     	});

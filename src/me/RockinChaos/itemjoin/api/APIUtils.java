@@ -39,10 +39,10 @@ public class APIUtils {
      * 
      * @param player - that will recieve the items.
      */
-	 public void setItems(Player player) {
+	 public void setItems(final Player player) {
 		final ItemMap probable = ChanceAPI.getChances().getRandom(player);
 		final int session = StringUtils.getRandom(1, 80000);
-		for (ItemMap item : ItemUtilities.getUtilities().getItems()) {
+		for (final ItemMap item : ItemUtilities.getUtilities().getItems()) {
 			if (item.inWorld(player.getWorld()) && ChanceAPI.getChances().isProbability(item, probable) && PlayerHandler.isEnabled(player, item.getConfigName())
 					&& item.isLimitMode(player.getGameMode()) && item.hasPermission(player, player.getWorld()) && ItemUtilities.getUtilities().isObtainable(player, item, session, TriggerType.DEFAULT)) {
 					item.giveTo(player);
@@ -60,7 +60,7 @@ public class APIUtils {
 	 * @param world - that the item is said to be in.
 	 * @return Boolean is a custom item.
 	 */
-	 public boolean isCustom(ItemStack item, World world) {
+	 public boolean isCustom(final ItemStack item, final World world) {
 		 ItemMap itemMap = this.getMap(item, world, null);
 		 if (itemMap != null) {
 			 return true;
@@ -75,8 +75,8 @@ public class APIUtils {
      * @param itemNode - that is the custom items config node.
 	 * @return ItemStack found custom item.
 	 */
-	public ItemStack getItemStack(Player player, String itemNode) {
-		ItemMap itemMap = this.getMap(null, null, itemNode);
+	public ItemStack getItemStack(final Player player, final String itemNode) {
+		final ItemMap itemMap = this.getMap(null, null, itemNode);
 	    if (itemMap != null) {
 	    	return itemMap.getItemStack(player);
 		}
@@ -90,8 +90,8 @@ public class APIUtils {
 	 * @param world - that the item is said to be in.
 	 * @return String node of the custom item.
 	 */
-	 public String getNode(ItemStack item, World world) {
-		 ItemMap itemMap = this.getMap(item, world, null);
+	 public String getNode(final ItemStack item, final World world) {
+		 final ItemMap itemMap = this.getMap(item, world, null);
 		 if (itemMap != null) {
 			 return itemMap.getConfigName();
 		 }
@@ -104,9 +104,9 @@ public class APIUtils {
 	 * @param itemNode - that is the custom items config node.
 	 * @return List of itemflags for the custom item.
 	 */
-	 public List <String> getItemflags(String itemNode) {
-		 ItemMap itemMap = this.getMap(null, null, itemNode);
-		 List <String> itemflags = new ArrayList<String>();
+	 public List <String> getItemflags(final String itemNode) {
+		 final ItemMap itemMap = this.getMap(null, null, itemNode);
+		 final List <String> itemflags = new ArrayList<String>();
 		 if (itemMap != null && itemMap.getItemFlags() != null && !itemMap.getItemFlags().isEmpty()) {
 			for (String itemflag : itemMap.getItemFlags().replace(" ", "").split(",")) {
 				itemflags.add(itemflag);
@@ -122,9 +122,9 @@ public class APIUtils {
 	 * @param itemNode - that is the custom items config node.
      * @return List of commands for the custom item.
 	 */
-	 public List <String> getCommands(String itemNode) {
-		 ItemMap itemMap = this.getMap(null, null, itemNode);
-		 List <String> commands = new ArrayList<String>();
+	 public List <String> getCommands(final String itemNode) {
+		 final ItemMap itemMap = this.getMap(null, null, itemNode);
+		 final List <String> commands = new ArrayList<String>();
 		 if (itemMap != null && itemMap.getCommands() != null && itemMap.getCommands().length > 0) {
 			for (ItemCommand command : itemMap.getCommands()) {
 				commands.add(command.getRawCommand());
@@ -140,11 +140,11 @@ public class APIUtils {
 	 * @param itemNode - that is the custom items config node.
 	 * @return List of triggers for the custom item.
 	 */
-	 public List <String> getTriggers(String itemNode) {
-		 ItemMap itemMap = this.getMap(null, null, itemNode);
-		 List <String> triggers = new ArrayList<String>();
+	 public List <String> getTriggers(final String itemNode) {
+		 final ItemMap itemMap = this.getMap(null, null, itemNode);
+		 final List <String> triggers = new ArrayList<String>();
 		 if (itemMap != null && itemMap.getTriggers() != null && !itemMap.getTriggers().isEmpty()) {
-			for (String trigger : itemMap.getTriggers().replace(" ", "").split(",")) {
+			for (final String trigger : itemMap.getTriggers().replace(" ", "").split(",")) {
 				triggers.add(trigger);
 			}
 			return triggers;
@@ -158,7 +158,7 @@ public class APIUtils {
 	 * @param itemNode - that is the custom items config node.
 	 * @return String of integer or custom slot for the custom item.
 	 */
-	 public String getSlot(String itemNode) {
+	 public String getSlot(final String itemNode) {
 		 ItemMap itemMap = this.getMap(null, null, itemNode);
 		 if (itemMap != null) {
 			 return itemMap.getSlot();
@@ -173,8 +173,8 @@ public class APIUtils {
 	 * @param itemNode - that is the custom items config node.
   	 * @return List of slots for the custom item.
      */
-	 public List<String> getMultipleSlots(String itemNode) {
-		 ItemMap itemMap = this.getMap(null, null, itemNode);
+	 public List<String> getMultipleSlots(final String itemNode) {
+		 final ItemMap itemMap = this.getMap(null, null, itemNode);
 		 if (itemMap != null) {
 			 return itemMap.getMultipleSlots();
 		 }
@@ -189,11 +189,11 @@ public class APIUtils {
 	 * @param itemNode - that is the custom items config node.
 	 * @return ItemMap that is the located custom item.
 	 */
-	 private ItemMap getMap(ItemStack item, World world, String itemNode) {
+	 private ItemMap getMap(final ItemStack item, final World world, final String itemNode) {
 		for (ItemMap itemMap: ItemUtilities.getUtilities().getItems()) {
-			if (world != null && itemMap.inWorld(world) && itemMap.isSimilar(item)) {
+			if (world != null && itemMap.inWorld(world) && itemMap.isSimilar(null, item)) {
 			    return itemMap;
-			} else if (world == null && itemMap.isSimilar(item)) {
+			} else if (world == null && itemMap.isSimilar(null, item)) {
 			 	return itemMap;
 			} else if (itemNode != null && world == null && item == null && itemMap.getConfigName().equalsIgnoreCase(itemNode)) {
 			 	return itemMap;

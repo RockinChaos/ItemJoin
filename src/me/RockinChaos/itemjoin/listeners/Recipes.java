@@ -100,8 +100,9 @@ public class Recipes implements Listener {
     public void onPrepareRecipe(final PrepareItemCraftEvent event) {
     	if (event.getRecipe() != null && event.getRecipe().getResult() != null 
     	 && event.getRecipe().getResult().getType() != Material.AIR && event.getView() != null && event.getView().getPlayer() != null) {
+    		final Player player = (Player) event.getView().getPlayer();
 	    	List<ItemMap> mapList = new ArrayList<ItemMap>();
-	    	ItemMap checkMap = ItemUtilities.getUtilities().getItemMap(event.getRecipe().getResult(), null, event.getView().getPlayer().getWorld());
+	    	ItemMap checkMap = ItemUtilities.getUtilities().getItemMap(event.getRecipe().getResult(), null, player.getWorld());
 	    	if (checkMap != null) { mapList.add(checkMap); } else { return; }
 	    	for (ItemMap itemMap : ItemUtilities.getUtilities().getItems()) {
 	    		if (itemMap != null && itemMap.getIngredients() != null && !itemMap.getIngredients().isEmpty()) {
@@ -112,7 +113,7 @@ public class Recipes implements Listener {
     		int setSlot = 0;
     		for (int i = 0; i < event.getInventory().getSize(); i++) {
     			if (setSlot >= 9) { break; }
-    			else if (i > 0 || !checkMap.isSimilar(event.getInventory().getItem(i))) {
+    			else if (i > 0 || !checkMap.isSimilar(player, event.getInventory().getItem(i))) {
     				if (event.getInventory().getItem(i) != null ) {
     					inventoryClone.setItem(setSlot, event.getInventory().getItem(i).clone());
     				}
@@ -142,7 +143,7 @@ public class Recipes implements Listener {
     		int setSlot = 0;
     		for (int i = 0; i < event.getInventory().getSize(); i++) {
     			if (setSlot >= 9) { break; }
-    			else if (!checkMap.isSimilar(event.getInventory().getItem(i))) {
+    			else if (!checkMap.isSimilar((Player) event.getView().getPlayer(), event.getInventory().getItem(i))) {
     				if (event.getInventory().getItem(i) != null) {
     					inventoryClone.setItem(setSlot, event.getInventory().getItem(i).clone());
     				}
@@ -189,10 +190,10 @@ public class Recipes implements Listener {
 		    			}
 		    		}
 		    		if (!isCrafted) {
-		    			confirmations = this.getConfirmations(itemMap, inventoryClone, recipe);
+		    			confirmations = this.getConfirmations(itemMap, (Player) view.getPlayer(), inventoryClone, recipe);
 		    		} else {
 		    			boolean cycleShift = true;
-		    			while (this.getConfirmations(itemMap, inventoryClone, recipe) == ingredientSize && cycleShift) {
+		    			while (this.getConfirmations(itemMap, (Player) view.getPlayer(), inventoryClone, recipe) == ingredientSize && cycleShift) {
 		    				cycleShift = isShiftClick;
 		    				for (int i = 0; i < inventoryClone.getSize(); i++) {
 		    					final ItemStack item = inventoryClone.getItem(i);
@@ -206,7 +207,7 @@ public class Recipes implements Listener {
 		    										&& (!isLegacy 
 		    												|| (LegacyAPI.getDataValue(item) == itemRecipe.getData())))) 
 		    										|| (ingredMap != null 
-		    										&& ingredMap.isSimilar(item))) 
+		    										&& ingredMap.isSimilar((Player) view.getPlayer(), item))) 
 		    										&& item.getAmount() >= itemRecipe.getCount()) {
 		    									int removal = (item.getAmount() - itemRecipe.getCount());
 		    									if (removal <= 0) {
@@ -258,10 +259,11 @@ public class Recipes implements Listener {
 	* Checks if the recipe is valid.
 	*
 	* @param itemMap - The itemMap being checked.
+	* @param player - The player being referenced.
 	* @param inventoryClone - The a clone of CraftingInventory reference.
 	* @return If the loop should break.
 	*/
-    private int getConfirmations(final ItemMap itemMap, final Inventory inventoryClone, final List<Character> recipe) {
+    private int getConfirmations(final ItemMap itemMap, final Player player, final Inventory inventoryClone, final List<Character> recipe) {
     	int confirmations = 0;
     	for (int i = 0; i < inventoryClone.getSize(); i++) {
     		final ItemStack item = inventoryClone.getItem(i);
@@ -270,7 +272,7 @@ public class Recipes implements Listener {
     				final ItemRecipe itemRecipe = itemMap.getIngredients().get(ingredient);
     				ItemMap ingredMap = ItemUtilities.getUtilities().getItemMap(null, itemRecipe.getMap(), null);
     				if (recipe.size() > i && recipe.get(i) == ingredient) {
-    					if (((ingredMap == null && itemRecipe.getMaterial().equals(item.getType())) || (ingredMap != null && ingredMap.isSimilar(item))) && item.getAmount() >= itemRecipe.getCount()) {
+    					if (((ingredMap == null && itemRecipe.getMaterial().equals(item.getType())) || (ingredMap != null && ingredMap.isSimilar(player, item))) && item.getAmount() >= itemRecipe.getCount()) {
     						confirmations += 1;
     					}
     				}

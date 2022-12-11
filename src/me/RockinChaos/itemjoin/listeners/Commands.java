@@ -286,7 +286,7 @@ public class Commands implements Listener {
 			final Player player = event.getPlayer();
 			final String action = Action.RIGHT_CLICK_BLOCK.name();
 			final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(PlayerHandler.getHandItem(player), null, player.getWorld());
-			if (itemMap != null && itemMap.isSimilar(item)) {
+			if (itemMap != null && itemMap.isSimilar(player, item)) {
 				this.runCommands(player, (event.getRightClicked() instanceof Player ? (Player)event.getRightClicked() : null), item, action, action.split("_")[0], String.valueOf(player.getInventory().getHeldItemSlot()));
 			}
 		}
@@ -306,7 +306,7 @@ public class Commands implements Listener {
 			final Player player = event.getPlayer();
 			final String action = Action.RIGHT_CLICK_BLOCK.name();
 			final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(PlayerHandler.getHandItem(player), null, player.getWorld());
-			if (itemMap != null && itemMap.isSimilar(item)) {
+			if (itemMap != null && itemMap.isSimilar(player, item)) {
 				this.runCommands(player, (event.getRightClicked() instanceof Player ? (Player)event.getRightClicked() : null), item, action, action.split("_")[0], String.valueOf(player.getInventory().getHeldItemSlot()));
 			}
 		}
@@ -324,7 +324,7 @@ public class Commands implements Listener {
 		final String action = event.getAction().name();
 		if (((PlayerHandler.isAdventureMode(player) && !action.contains("LEFT") || !PlayerHandler.isAdventureMode(player))) && !this.isDropEvent(event.getPlayer())) {
 			final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(PlayerHandler.getHandItem(player), null, player.getWorld());
-			if (!PlayerHandler.isMenuClick(player.getOpenInventory(), event.getAction()) && itemMap != null && itemMap.isSimilar(item)) {
+			if (!PlayerHandler.isMenuClick(player.getOpenInventory(), event.getAction()) && itemMap != null && itemMap.isSimilar(player, item)) {
 				long dupeDuration = (this.interactDupe != null && !this.interactDupe.isEmpty() && this.interactDupe.get(item) != null ? (((System.currentTimeMillis()) - this.interactDupe.get(item))) : -1);
 				if (dupeDuration == -1 || dupeDuration > 30) {
 					this.interactDupe.put(item, System.currentTimeMillis());

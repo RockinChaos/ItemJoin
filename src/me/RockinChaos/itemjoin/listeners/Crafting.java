@@ -138,7 +138,7 @@ public class Crafting implements Listener {
     		} else if (event.getSlot() == 0 && event.getSlotType() == SlotType.RESULT) {
     			if (craftingContents[0] != null && craftingContents[0].getType() != Material.AIR) {
     				for (ItemMap itemMap: ItemUtilities.getUtilities().getCraftingItems()) {
-    					if (!itemMap.isMovement() && itemMap.isSimilar(craftingContents[0])) {
+    					if (!itemMap.isMovement() && itemMap.isSimilar(player, craftingContents[0])) {
     						for (int i = 1; i <= 4; i++) { ItemHandler.returnCraftingItem(player, i, craftingContents[i].clone(), 1L); }
     						    SchedulerUtils.runLater(1L, () -> { 
     						    	player.getOpenInventory().getTopInventory().setItem(0, new ItemStack(Material.AIR));
@@ -148,7 +148,7 @@ public class Crafting implements Listener {
     				}
     			} else if (event.getCursor() != null && event.getCursor().getType() != Material.AIR) {
     				for (ItemMap itemMap: ItemUtilities.getUtilities().getCraftingItems()) {
-    					if (!itemMap.isMovement() && itemMap.isSimilar(event.getCursor())) {
+    					if (!itemMap.isMovement() && itemMap.isSimilar(player, event.getCursor())) {
     						ItemStack cursor = event.getCursor().clone();
     						player.setItemOnCursor(new ItemStack(Material.AIR));
     						ItemHandler.returnCraftingItem(player, 0, cursor, 1L);

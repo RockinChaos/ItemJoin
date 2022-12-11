@@ -631,6 +631,7 @@ public class StringUtils {
 			try { str = str.replace("%player_kills%", String.valueOf(player.getStatistic(Statistic.PLAYER_KILLS))); } catch (Exception e) { ServerUtils.sendDebugTrace(e); }
 			try { str = str.replace("%player_deaths%", String.valueOf(player.getStatistic(Statistic.DEATHS))); } catch (Exception e) { ServerUtils.sendDebugTrace(e); }
 			try { str = str.replace("%player_food%", String.valueOf(player.getFoodLevel())); } catch (Exception e) { ServerUtils.sendDebugTrace(e); }
+			try { str = str.replace("%player_level%", String.valueOf(player.getLevel())); } catch (Exception e) { ServerUtils.sendDebugTrace(e); }
 			try { 
 				final double health = (ServerUtils.hasSpecificUpdate("1_8") ? player.getHealth() : (double)player.getClass().getMethod("getHealth", double.class).invoke(player));
 				str = str.replace("%player_health%", String.valueOf(health)); 

@@ -47,7 +47,7 @@ public class Stackable implements Listener {
 		final int slot = event.getSlot();
 		if (event.getCurrentItem() != null && event.getCursor() != null && event.getCurrentItem().getType() != Material.AIR && event.getCursor().getType() != Material.AIR) {
 			final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(event.getCursor(), null, player.getWorld());
-			if (itemMap != null && itemMap.isSimilar(event.getCurrentItem()) && !ItemUtilities.getUtilities().isAllowed(player, event.getCursor(), "stackable")) {
+			if (itemMap != null && itemMap.isSimilar(player, event.getCurrentItem()) && !ItemUtilities.getUtilities().isAllowed(player, event.getCursor(), "stackable")) {
 				event.setCancelled(true);
 				ItemHandler.stackItems(player, event.getCursor(), event.getCurrentItem(), -1, false);
 			}
@@ -58,7 +58,7 @@ public class Stackable implements Listener {
 			if (itemMap != null && PlayerHandler.isCraftingInv(event.getView())) {
 				if (slot > 8) {
 					for (int i = 0; i < 8; i++) {
-						if (itemMap.isSimilar(player.getInventory().getItem(i))) {
+						if (itemMap.isSimilar(player, player.getInventory().getItem(i))) {
 							REMAINING_STACK_SIZE = ItemHandler.stackItems(player, event.getCurrentItem(), player.getInventory().getItem(i), slot, false);
 							if (REMAINING_STACK_SIZE <= 0) {
 								break;
@@ -67,7 +67,7 @@ public class Stackable implements Listener {
 					}
 				} else {
 					for (int i = 8; i < 36; i++) {
-						if (itemMap.isSimilar(player.getInventory().getItem(i))) {
+						if (itemMap.isSimilar(player, player.getInventory().getItem(i))) {
 							REMAINING_STACK_SIZE = ItemHandler.stackItems(player, event.getCurrentItem(), player.getInventory().getItem(i), slot, false);
 							if (REMAINING_STACK_SIZE <= 0) {
 								break;
@@ -78,7 +78,7 @@ public class Stackable implements Listener {
 			} else if (itemMap != null) {
 				if (rawSlot >= player.getOpenInventory().getTopInventory().getSize()) {
 					for (int i = 0; i < player.getOpenInventory().getTopInventory().getSize(); i++) {
-						if (itemMap.isSimilar(player.getOpenInventory().getTopInventory().getItem(i))) {
+						if (itemMap.isSimilar(player, player.getOpenInventory().getTopInventory().getItem(i))) {
 							REMAINING_STACK_SIZE = ItemHandler.stackItems(player, event.getCurrentItem(), player.getOpenInventory().getTopInventory().getItem(i), slot, false);
 							if (REMAINING_STACK_SIZE <= 0) {
 								break;
@@ -87,7 +87,7 @@ public class Stackable implements Listener {
 					}
 				} else {
 					for (int i = 0; i < player.getOpenInventory().getBottomInventory().getSize(); i++) {
-						if (itemMap.isSimilar(player.getOpenInventory().getBottomInventory().getItem(i))) {
+						if (itemMap.isSimilar(player, player.getOpenInventory().getBottomInventory().getItem(i))) {
 							REMAINING_STACK_SIZE = ItemHandler.stackItems(player, event.getCurrentItem(), player.getOpenInventory().getBottomInventory().getItem(i), slot, true);
 							if (REMAINING_STACK_SIZE <= 0) {
 								break;
@@ -109,7 +109,7 @@ public class Stackable implements Listener {
 			final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(event.getCursor(), null, player.getWorld());
 			if (itemMap != null) {
 				for (int i = 0; i < 36; i++) {
-					if (itemMap.isSimilar(player.getInventory().getItem(i))) {
+					if (itemMap.isSimilar(player, player.getInventory().getItem(i))) {
 						if (event.getCursor().getAmount() == 64) {
 							break;
 						} else if (player.getInventory().getItem(i).getAmount() != 64) {
@@ -118,7 +118,7 @@ public class Stackable implements Listener {
 					}
 				}
 				for (int i = 0; i < player.getOpenInventory().getTopInventory().getSize(); i++) {
-					if (itemMap.isSimilar(player.getOpenInventory().getTopInventory().getItem(i))) {
+					if (itemMap.isSimilar(player, player.getOpenInventory().getTopInventory().getItem(i))) {
 						if (event.getCursor().getAmount() == 64) {
 							break;
 						} else if (player.getOpenInventory().getTopInventory().getItem(i).getAmount() != 64) {
@@ -145,7 +145,7 @@ public class Stackable implements Listener {
 			int REMAINING_STACK_SIZE = item1.getAmount();
 			event.setCancelled(true);
 			for (int i = 0; i < 36; i++) {
-				if (itemMap != null && itemMap.isSimilar(player.getInventory().getItem(i))) {
+				if (itemMap != null && itemMap.isSimilar(player, player.getInventory().getItem(i))) {
 					REMAINING_STACK_SIZE = ItemHandler.stackItems(player, item1, player.getInventory().getItem(i), -2, false);
 					if (REMAINING_STACK_SIZE <= 0) {
 						break;
