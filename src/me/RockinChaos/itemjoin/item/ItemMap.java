@@ -3715,20 +3715,20 @@ public class ItemMap {
     * @return If the ItemStack Enchantments are similar.
     */
 	private boolean isEnchantSimilar(final Player player, final ItemStack item) {
-		if (player != null) {
+		if (player != null && item.getItemMeta().hasEnchants()) {
+			ItemStack checkItem = new ItemStack(item.getType());
 			final Map <String, Integer> enchantList = ItemUtilities.getUtilities().getStatistics(player).getEnchantments(this);
-			if (item.getItemMeta().hasEnchants() && ((enchantList != null && !enchantList.isEmpty()) || this.glowing)) { 
-				ItemStack checkItem = new ItemStack(item.getType());
+			if (enchantList != null && !enchantList.isEmpty()) {
 				for (final Entry<String, Integer> enchantments : enchantList.entrySet()) {
 					if (enchantments.getKey() == null && DependAPI.getDepends(false).tokenEnchantEnabled() && TokenEnchantAPI.getInstance().getEnchantment(enchantments.getKey()) != null) {
 						TokenEnchantAPI.getInstance().enchant(null, checkItem, enchantments.getKey(), enchantments.getValue(), true, 0, true);
 					} else { 
 						checkItem.addUnsafeEnchantment(ItemHandler.getEnchantByName(enchantments.getKey()), enchantments.getValue()); }
 				}
-				return (this.glowing ? true : item.getItemMeta().getEnchants().equals(checkItem.getItemMeta().getEnchants()));
 			}
-		} else { return true; }
-		return false;
+			return (this.glowing ? true : item.getItemMeta().getEnchants().equals(checkItem.getItemMeta().getEnchants()));
+		} 
+		return true;
 	}
 	
    /**

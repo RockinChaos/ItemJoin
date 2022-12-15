@@ -286,11 +286,10 @@ public class ItemUtilities {
     * @param player - The Player that is having their items set.
     */
 	private void setStatistics(final Player player) {
-		final ItemStatistics tempStats = new ItemStatistics(player, this.getItems());
 		if (this.itemStats != null && this.itemStats.containsKey(PlayerHandler.getPlayerID(player))) {
 			this.itemStats.remove(PlayerHandler.getPlayerID(player));
 		}
-		this.itemStats.put(PlayerHandler.getPlayerID(player), tempStats);
+		this.itemStats.put(PlayerHandler.getPlayerID(player), new ItemStatistics(player, this.getItems()));
 	}
 	
    /**
@@ -1068,6 +1067,9 @@ public class ItemUtilities {
     * @return The ItemStatistics instance.
     */
     public ItemStatistics getStatistics(final Player player) { 
+    	if (player != null && !this.itemStats.containsKey(PlayerHandler.getPlayerID(player))) {
+    		this.itemStats.put(PlayerHandler.getPlayerID(player), new ItemStatistics(player, this.getItems()));
+    	}
         return (player != null ? this.itemStats.get(PlayerHandler.getPlayerID(player)) : null); 
     } 
 	
