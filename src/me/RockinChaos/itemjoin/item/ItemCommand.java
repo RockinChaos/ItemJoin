@@ -291,7 +291,7 @@ public class ItemCommand {
 	*/
 	private void sendDispatch(final Player player, final Player altPlayer, final Executor cmdtype, final String slot) {
 		final World world = player.getWorld();
-		this.setPending(player, true); 
+		this.setPending(player, true);
 		SchedulerUtils.runLater(this.delay, () -> {
 			synchronized("IJ_DISPATCH") {
 				this.allowDispatch(player, world);
@@ -300,7 +300,7 @@ public class ItemCommand {
 					|| (this.actionType.equals(Action.ON_RECEIVE) && this.itemMap.hasItem(player, true)))) || (!this.actionType.equals(Action.ON_HOLD) && !this.actionType.equals(Action.ON_RECEIVE))) 
 					&& (((this.itemMap.getCommandSequence() == CommandSequence.REMAIN && cmdtype != Executor.SWAPITEM && cmdtype != Executor.DELAY && this.itemMap.hasItem(player, true)) 
 					|| ((this.itemMap.getCommandSequence() == CommandSequence.REMAIN && (cmdtype == Executor.SWAPITEM || cmdtype == Executor.DELAY))) || this.itemMap.getCommandSequence() != CommandSequence.REMAIN))
-					&& (player.isOnline() && player.getWorld() == world && !this.getExecute(player))) {
+					&& (player.isOnline() && (player.getWorld() == world || this.itemMap.inWorld(world)) && !this.getExecute(player))) {
 					switch (cmdtype) {
 						case CONSOLE: this.dispatchConsoleCommands(player, altPlayer); break;
 						case OP: this.dispatchOpCommands(player, altPlayer); break;
