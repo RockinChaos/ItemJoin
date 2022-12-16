@@ -8,9 +8,28 @@
 	<groupId>me.RockinChaos.itemjoin</groupId>
 	<artifactId>ItemJoin</artifactId>
 	<name>ItemJoin</name>
-	<version>5.2.6-SNAPSHOT</version>
 	<description>Get custom items on join.</description>
 	<url>https://www.spigotmc.org/resources/itemjoin.12661/</url>
+	
+	<version>5.2.6-SNAPSHOT</version>
+	
+	<properties>
+		<spigot.version>1.19.3-R0.1-SNAPSHOT</spigot.version>
+		
+		<authme.version>5.6.0-SNAPSHOT</authme.version>
+		<papi.version>2.10.9</papi.version>
+		<chestsort.version>11.0.0-SNAPSHOT</chestsort.version>
+		<skins.version>14.1.5</skins.version>
+		<authlib.version>1.5.21</authlib.version>
+		<worldguard.version>7.0.4-SNAPSHOT</worldguard.version>
+		<worldedit.version>7.2.0-SNAPSHOT</worldedit.version>
+		<citizens.version>2.0.27-SNAPSHOT</citizens.version>
+		<protocol.version>4.6.0</protocol.version>
+	
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<java.version>1.8</java.version>
+		<github.global.server>github</github.global.server>
+	</properties>
 	
 	<build>
 		<sourceDirectory>${project.basedir}</sourceDirectory>
@@ -204,21 +223,21 @@
 		<dependency>
 			<groupId>org.spigotmc</groupId>
 			<artifactId>spigot-api</artifactId>
-			<version>1.19.2-R0.1-SNAPSHOT</version>
+			<version>${spigot.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<!--PlaceholderAPI API-->
 		<dependency>
 			<groupId>me.clip</groupId>
 			<artifactId>placeholderapi</artifactId>
-			<version>2.10.9</version>
+			<version>${papi.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<!--AuthMe API-->
 		<dependency>
 			<groupId>fr.xephi</groupId>
 			<artifactId>authme</artifactId>
-			<version>5.6.0-SNAPSHOT</version>
+			<version>${authme.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<!--Vault API-->
@@ -246,29 +265,28 @@
 		<dependency>
 			<groupId>net.skinsrestorer</groupId>
 			<artifactId>skinsrestorer</artifactId>
-			<version>14.1.5</version>
+			<version>${skins.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<!--Citizens API-->
         <dependency>
             <groupId>net.citizensnpcs</groupId>
             <artifactId>citizens</artifactId>
-            <version>2.0.27-SNAPSHOT</version>
-            <type>jar</type>
+            <version>${citizens.version}</version>
        	    <scope>provided</scope>
         </dependency>
 		<!--ProtocolLib API-->
         <dependency>
             <groupId>com.comphenix.protocol</groupId>
             <artifactId>ProtocolLib</artifactId>
-            <version>4.6.0</version>
+            <version>${protocol.version}</version>
        	    <scope>provided</scope>
         </dependency>
 		<!--Mojang AuthLib API-->
 		<dependency>
 			<groupId>com.mojang</groupId>
 			<artifactId>authlib</artifactId>
-			<version>1.5.21</version>
+			<version>${authlib.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<!--bStats API-->
@@ -328,21 +346,21 @@
         <dependency>
             <groupId>de.jeff_media.chestsortapi</groupId>
             <artifactId>ChestSortAPI</artifactId>
-            <version>11.0.0-SNAPSHOT</version>
+            <version>${chestsort.version}</version>
        	    <scope>provided</scope>
         </dependency>
 		<!--WorldGuard API-->
 		<dependency>
 			<groupId>com.sk89q.worldguard</groupId>
 			<artifactId>worldguard-bukkit</artifactId>
-			<version>7.0.4-SNAPSHOT</version>
+			<version>${worldguard.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<!--WorldEdit API-->
 		<dependency>
 			<groupId>com.sk89q.worldedit</groupId>
 			<artifactId>worldedit-bukkit</artifactId>
-			<version>7.2.0-SNAPSHOT</version>
+			<version>${worldedit.version}</version>
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
@@ -375,10 +393,4 @@
 			<url>file://${env.JENKINS_HOME}/maven-public</url>
 		</repository>
 	</distributionManagement>
-	
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<java.version>1.8</java.version>
-		<github.global.server>github</github.global.server>
-	</properties>
 </project>
