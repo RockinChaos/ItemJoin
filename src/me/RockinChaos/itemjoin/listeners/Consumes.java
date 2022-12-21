@@ -27,13 +27,13 @@ import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 
-import me.RockinChaos.itemjoin.handlers.ItemHandler;
-import me.RockinChaos.itemjoin.handlers.PlayerHandler;
+import me.RockinChaos.core.handlers.ItemHandler;
+import me.RockinChaos.core.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
-import me.RockinChaos.itemjoin.utils.SchedulerUtils;
-import me.RockinChaos.itemjoin.utils.ServerUtils;
-import me.RockinChaos.itemjoin.utils.StringUtils;
+import me.RockinChaos.core.utils.SchedulerUtils;
+import me.RockinChaos.core.utils.ServerUtils;
+import me.RockinChaos.core.utils.StringUtils;
 
 public class Consumes implements Listener {
 

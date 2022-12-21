@@ -24,11 +24,11 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 
-import me.RockinChaos.itemjoin.handlers.PlayerHandler;
+import me.RockinChaos.itemjoin.ItemJoin;
+import me.RockinChaos.core.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.item.ItemUtilities.TriggerType;
-import me.RockinChaos.itemjoin.utils.ServerUtils;
-import me.RockinChaos.itemjoin.utils.api.DependAPI;
+import me.RockinChaos.core.utils.ServerUtils;
 
 public class LimitSwitch implements Listener {
 
@@ -44,7 +44,7 @@ public class LimitSwitch implements Listener {
 		final Player player = event.getPlayer();
 		final GameMode newMode = event.getNewGameMode();
 		if (PlayerHandler.isPlayer(player)) {
-			if (DependAPI.getDepends(false).getGuard().guardEnabled()) {
+			if (ItemJoin.getCore().getDependencies().getGuard().guardEnabled()) {
 				this.handleRegions(player, newMode);
 			} else { 
 				ItemUtilities.getUtilities().setAuthenticating(player, player.getWorld(), TriggerType.LIMIT_SWITCH, newMode, "IJ_WORLD"); 
@@ -60,7 +60,7 @@ public class LimitSwitch implements Listener {
 	* @param player - The player that has entered or exited a region.
 	*/
 	private void handleRegions(final Player player, final GameMode newMode) {
-		String regions = DependAPI.getDepends(false).getGuard().getRegionAtLocation(player.getLocation());
+		String regions = ItemJoin.getCore().getDependencies().getGuard().getRegionAtLocation(player.getLocation());
 		for (String region: Arrays.asList(regions.replace(" ", "").split(","))) {
 			if (region != null && !region.isEmpty()) {
 				ItemUtilities.getUtilities().setAuthenticating(player, player.getWorld(), TriggerType.LIMIT_SWITCH, newMode, region); 

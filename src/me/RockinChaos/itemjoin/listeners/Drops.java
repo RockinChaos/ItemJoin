@@ -20,12 +20,11 @@ package me.RockinChaos.itemjoin.listeners;
 import java.util.HashMap;
 import java.util.Map;
 
-import me.RockinChaos.itemjoin.handlers.ConfigHandler;
-import me.RockinChaos.itemjoin.handlers.PlayerHandler;
+import me.RockinChaos.core.handlers.PlayerHandler;
+import me.RockinChaos.itemjoin.item.ItemData;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
-import me.RockinChaos.itemjoin.utils.SchedulerUtils;
-import me.RockinChaos.itemjoin.utils.StringUtils;
-import me.RockinChaos.itemjoin.utils.api.LegacyAPI;
+import me.RockinChaos.core.utils.SchedulerUtils;
+import me.RockinChaos.core.utils.api.LegacyAPI;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -51,9 +50,8 @@ public class Drops implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	private void onGlobalDrop(PlayerDropItemEvent event) {
 		final Player player = event.getPlayer();
-		  if (StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("Self-Drops"), "TRUE", ",") || StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("Self-Drops"), player.getWorld().getName(), ",")
-		  	|| StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("Self-Drops"), "ALL", ",") || StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("Self-Drops"), "GLOBAL", ",")) {
-		  	if (ConfigHandler.getConfig().isPreventOP() && player.isOp() || ConfigHandler.getConfig().isPreventCreative() && PlayerHandler.isCreativeMode(player)) { } 
+		if (ItemData.getInfo().isPreventString(player, "Self-Drops")) {
+		  	if (ItemData.getInfo().isPreventBypass(player)) { } 
 		  	else { 
 		  		if (!player.isDead()) {
 		  			if (PlayerHandler.isCreativeMode(player)) { player.closeInventory(); } 
@@ -62,7 +60,7 @@ public class Drops implements Listener {
 					event.getItemDrop().remove();
 				} 
 		  	}
-		  }
+		}
 	}
 		
    /**
@@ -72,11 +70,10 @@ public class Drops implements Listener {
 	*/
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	private void onGlobalDeathDrops(PlayerDeathEvent event) {
-		Player player = event.getEntity();
+		final Player player = event.getEntity();
 		ItemUtilities.getUtilities().closeAnimations(player);
-		if (StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("Death-Drops"), "TRUE", ",") || StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("Death-Drops"), player.getWorld().getName(), ",")
-			  	|| StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("Death-Drops"), "ALL", ",") || StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("Death-Drops"), "GLOBAL", ",")) {
-		  	if (ConfigHandler.getConfig().isPreventOP() && player.isOp() || ConfigHandler.getConfig().isPreventCreative() && PlayerHandler.isCreativeMode(player)) { }
+		if (ItemData.getInfo().isPreventString(player, "Death-Drops")) {
+		  	if (ItemData.getInfo().isPreventBypass(player)) { }
 		  	else if (!LegacyAPI.getGameRule(player.getWorld(), "keepInventory")) {
 				for (int k = 0; k < player.getInventory().getSize(); k++) {
 					ItemStack stack = player.getInventory().getItem(k);

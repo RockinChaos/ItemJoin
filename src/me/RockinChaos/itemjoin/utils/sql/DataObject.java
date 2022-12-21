@@ -161,7 +161,34 @@ public class DataObject {
 	public void setTimeStamp(final String stamp) {
 		this.timeStamp = stamp;
 	}
+	
+   /**
+    * Gets the Table Name of the DataObject
+    * 
+    * @return The Table Name.
+    */	
+	public String getTableName() {
+		return this.table.tableName();
+	}
+	
+   /**
+    * Gets the Table Removal of the DataObject
+    * 
+    * @return The Table Removal.
+    */	
+	public String getTableRemoval() {
+		return this.table.removal();
+	}
 
+   /**
+    * Gets the Table Headers of the DataObject
+    * 
+    * @return The Table Headers.
+    */	
+	public String getTableHeaders() {
+		return this.table.headers();
+	}
+	
    /**
     * Gets the Table of the DataObject
     * 
@@ -279,11 +306,13 @@ public class DataObject {
    /**
     * Gets the Equal Data of the DataObject
     * 
-    * @param object1 - The DataObject being compared.
-    * @param object2 - The DataObject being compared.
+    * @param obj1 - The DataObject being compared.
+    * @param obj2 - The DataObject being compared.
     * @return If the data is equal.
     */	
-	public boolean equalsData(final DataObject object1, final DataObject object2) {
+	public boolean equalsData(final Object obj1, final Object obj2) {
+		final DataObject object1 = (DataObject) obj1;
+		final DataObject object2 = (DataObject) obj2;
 		if (object1 == null || object2 == null) { return false; }
 		if (object1.getTable().equals(Table.FIRST_JOIN)) {
 			if (object1.getPlayerId().equalsIgnoreCase(object2.getPlayerId()) && (object1.getItem().isEmpty() || object1.getItem().equalsIgnoreCase(object2.getItem()))) {

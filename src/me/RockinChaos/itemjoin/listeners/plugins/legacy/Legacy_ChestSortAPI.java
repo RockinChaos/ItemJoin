@@ -22,11 +22,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 
-import me.RockinChaos.itemjoin.handlers.ConfigHandler;
-import me.RockinChaos.itemjoin.handlers.PlayerHandler;
+import me.RockinChaos.itemjoin.item.ItemData;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
-import me.RockinChaos.itemjoin.utils.StringUtils;
-import me.RockinChaos.itemjoin.utils.interfaces.menus.Menu;
+import me.RockinChaos.itemjoin.utils.menus.Menu;
 
 public class Legacy_ChestSortAPI implements Listener {
 	
@@ -39,9 +37,8 @@ public class Legacy_ChestSortAPI implements Listener {
 	private void onChestSortEvent(de.jeff_media.ChestSortAPI.ChestSortEvent event) {
 		Player player = (Player) event.getPlayer();
 		if (player == null) { player = (Player) event.getInventory().getViewers().get(0); }
-	  	if (StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "TRUE", ",") || StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), player.getWorld().getName(), ",")
-		  			|| StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "ALL", ",") || StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "GLOBAL", ",")) {
-	  		if (ConfigHandler.getConfig().isPreventOP() && player.isOp() || ConfigHandler.getConfig().isPreventCreative() && PlayerHandler.isCreativeMode(player)) { } 
+	  	if (ItemData.getInfo().isPreventString(player, "itemMovement")) {
+	  		if (ItemData.getInfo().isPreventBypass(player)) { } 
 	  		else if (player.getOpenInventory().getTitle().contains("§") || player.getOpenInventory().getTitle().contains("&")) { }
 	  		else { event.setCancelled(true); }
 	  	}

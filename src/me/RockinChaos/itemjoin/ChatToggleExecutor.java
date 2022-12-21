@@ -20,14 +20,13 @@ package me.RockinChaos.itemjoin;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 
-import me.RockinChaos.itemjoin.handlers.PlayerHandler;
+import me.RockinChaos.core.handlers.PlayerHandler;
+import me.RockinChaos.itemjoin.item.ItemData;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
-import me.RockinChaos.itemjoin.utils.ServerUtils;
-import me.RockinChaos.itemjoin.utils.StringUtils;
-import me.RockinChaos.itemjoin.utils.api.LanguageAPI;
+import me.RockinChaos.core.utils.ServerUtils;
+import me.RockinChaos.core.utils.StringUtils;
 import me.RockinChaos.itemjoin.utils.sql.DataObject;
-import me.RockinChaos.itemjoin.utils.sql.SQL;
 import me.RockinChaos.itemjoin.utils.sql.DataObject.Table;
 
 public class ChatToggleExecutor implements CommandExecutor {
@@ -46,12 +45,12 @@ public class ChatToggleExecutor implements CommandExecutor {
 			final Player player = (Player)sender;
 			ItemMap itemMap = this.getCommandMap(player, command, args);
 			if (itemMap != null) {
-				DataObject dataObject = SQL.getData().getData(new DataObject(Table.ENABLED_PLAYERS, PlayerHandler.getPlayerID(player), "Global", itemMap.getConfigName(), String.valueOf(false)));
-				String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[1] = player.getName(); placeHolders[0] = player.getWorld().getName(); placeHolders[3] = itemMap.getConfigName();
+				DataObject dataObject = (DataObject) ItemJoin.getCore().getSQL().getData(new DataObject(Table.ENABLED_PLAYERS, PlayerHandler.getPlayerID(player), "Global", itemMap.getConfigName(), String.valueOf(false)));
+				String[] placeHolders = ItemJoin.getCore().getLang().newString(); placeHolders[1] = player.getName(); placeHolders[0] = player.getWorld().getName(); placeHolders[3] = itemMap.getConfigName();
 				if ((dataObject == null || Boolean.valueOf(dataObject.getEnabled()).equals(true)) && ((itemMap.getToggleNode() == null || itemMap.getToggleNode().isEmpty()) || (itemMap.getToggleNode() != null && !itemMap.getToggleNode().isEmpty() && sender.hasPermission(itemMap.getToggleNode())))) {
-					if (PlayerHandler.isEnabled(player, "ALL")) {
-						SQL.getData().removeData(new DataObject(Table.ENABLED_PLAYERS, PlayerHandler.getPlayerID(player), "Global", itemMap.getConfigName(), String.valueOf(true)));
-						SQL.getData().saveData(new DataObject(Table.ENABLED_PLAYERS, PlayerHandler.getPlayerID(player), "Global", itemMap.getConfigName(), String.valueOf(false))); {
+					if (ItemData.getInfo().isEnabled(player, "ALL")) {
+						ItemJoin.getCore().getSQL().removeData(new DataObject(Table.ENABLED_PLAYERS, PlayerHandler.getPlayerID(player), "Global", itemMap.getConfigName(), String.valueOf(true)));
+						ItemJoin.getCore().getSQL().saveData(new DataObject(Table.ENABLED_PLAYERS, PlayerHandler.getPlayerID(player), "Global", itemMap.getConfigName(), String.valueOf(false))); {
 							if (itemMap.hasItem(player, true)) {
 								itemMap.removeFrom(player);
 							}
@@ -60,11 +59,11 @@ public class ChatToggleExecutor implements CommandExecutor {
 							ServerUtils.messageSender(player, toggleMessage);
 						}
 					} else {
-						LanguageAPI.getLang(false).sendLangMessage("commands.disabled.togglePlayerFailed", sender, placeHolders);
+						ItemJoin.getCore().getLang().sendLangMessage("commands.disabled.togglePlayerFailed", sender, placeHolders);
 					}
 				} else if ((dataObject != null && Boolean.valueOf(dataObject.getEnabled()).equals(false)) && ((itemMap.getToggleNode() == null || itemMap.getToggleNode().isEmpty()) || (itemMap.getToggleNode() != null && !itemMap.getToggleNode().isEmpty() && sender.hasPermission(itemMap.getToggleNode())))) {
-					if (PlayerHandler.isEnabled(player, "ALL")) {
-						SQL.getData().removeData(new DataObject(Table.ENABLED_PLAYERS, PlayerHandler.getPlayerID(player), "Global", itemMap.getConfigName(), String.valueOf(false))); {
+					if (ItemData.getInfo().isEnabled(player, "ALL")) {
+						ItemJoin.getCore().getSQL().removeData(new DataObject(Table.ENABLED_PLAYERS, PlayerHandler.getPlayerID(player), "Global", itemMap.getConfigName(), String.valueOf(false))); {
 							if (!itemMap.hasItem(player, true)) {
 								itemMap.giveTo(player);
 							}
@@ -73,16 +72,16 @@ public class ChatToggleExecutor implements CommandExecutor {
 							ServerUtils.messageSender(player, toggleMessage);
 						}
 					} else {
-						LanguageAPI.getLang(false).sendLangMessage("commands.enabled.togglePlayerFailed", sender, placeHolders);
+						ItemJoin.getCore().getLang().sendLangMessage("commands.enabled.togglePlayerFailed", sender, placeHolders);
 					}
 				} else if (!(itemMap.getToggleNode() != null && !itemMap.getToggleNode().isEmpty() && sender.hasPermission(itemMap.getToggleNode()))) {
-					LanguageAPI.getLang(false).sendLangMessage("commands.default.noPermission", sender);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.default.noPermission", sender);
 				}
 			} else {
 				sender.sendMessage("Unknown command. Type \"/help\" for help.");	
 			}
 		} else {
-			LanguageAPI.getLang(false).sendLangMessage("commands.default.noPlayer", sender);
+			ItemJoin.getCore().getLang().sendLangMessage("commands.default.noPlayer", sender);
 		}
 		return true;
 	}

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package me.RockinChaos.itemjoin.utils.interfaces.menus;
+package me.RockinChaos.itemjoin.utils.menus;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -59,23 +59,21 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 
 import me.RockinChaos.itemjoin.ItemJoin;
-import me.RockinChaos.itemjoin.handlers.ConfigHandler;
-import me.RockinChaos.itemjoin.handlers.ItemHandler;
-import me.RockinChaos.itemjoin.handlers.PlayerHandler;
+import me.RockinChaos.core.handlers.ItemHandler;
+import me.RockinChaos.core.handlers.PlayerHandler;
+import me.RockinChaos.itemjoin.item.ItemData;
 import me.RockinChaos.itemjoin.item.ItemCommand;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemRecipe;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.item.ItemCommand.Action;
 import me.RockinChaos.itemjoin.item.ItemCommand.CommandSequence;
-import me.RockinChaos.itemjoin.utils.SchedulerUtils;
-import me.RockinChaos.itemjoin.utils.ServerUtils;
-import me.RockinChaos.itemjoin.utils.StringUtils;
-import me.RockinChaos.itemjoin.utils.api.DependAPI;
-import me.RockinChaos.itemjoin.utils.api.LanguageAPI;
-import me.RockinChaos.itemjoin.utils.api.LegacyAPI;
-import me.RockinChaos.itemjoin.utils.interfaces.Button;
-import me.RockinChaos.itemjoin.utils.interfaces.Interface;
+import me.RockinChaos.core.utils.SchedulerUtils;
+import me.RockinChaos.core.utils.ServerUtils;
+import me.RockinChaos.core.utils.StringUtils;
+import me.RockinChaos.core.utils.api.LegacyAPI;
+import me.RockinChaos.core.utils.interfaces.Button;
+import me.RockinChaos.core.utils.interfaces.Interface;
 import me.arcaniax.hdb.api.HeadDatabaseAPI;
 
 	
@@ -90,6 +88,7 @@ public class Menu {
 	private static ItemStack fillerPaneItem = ItemHandler.getItem("GLASS_PANE", 1, false, "&7", "");
 	private static ItemStack exitItem = ItemHandler.getItem("BARRIER", 1, false, "&c&l&nExit", "&7", "&7*Returns you to the game");
 	private static List<String> modifyMenu = new ArrayList<String>();
+	private static Button exitButton = new Button(exitItem, event -> Menu.startMenu(((Player)event.getWhoClicked())));
 
 //  ============================================== //
 //  			   Selection Menus      	       //
@@ -102,13 +101,13 @@ public class Menu {
     */
 	public static void startMenu(final CommandSender sender) {
 		final Player player = (Player) sender;
-		Interface pagedPane = new Interface(false, 1, GUIName, player);
+		Interface pagedPane = new Interface(false, 1, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			pagedPane.addButton(new Button(exitItem, event -> player.closeInventory()));
 			pagedPane.addButton(new Button(ItemHandler.getItem("ENDER_CHEST", 1, false, "&b&l&nConfig Settings", "&7", "&7*Change the GLOBAL plugin", "&7configuration settings."), event -> configSettings(player)));
 			pagedPane.addButton(new Button(fillerPaneBItem));
 			pagedPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "WRITABLE_BOOK" : "386"), 1, false, "&a&l&nCreate", "&7", "&7*Create a new item from scratch."),
-					event -> materialPane(player, new ItemMap("item_" + StringUtils.getPath(1), "ARBITRARY"), 0, 0)));
+					event -> materialPane(player, new ItemMap("item_" + ItemData.getInfo().getPath(1), "ARBITRARY"), 0, 0)));
 			pagedPane.addButton(new Button(ItemHandler.getItem("HOPPER", 1, false, "&e&l&nSave", "&7", "&7*Save an existing item as a custom item."), event -> startHopper(player)));
 			pagedPane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, false, "&c&l&nModify", "&7", "&7*Modify an existing custom item"), event -> startModify(player, null, 0)));
 			pagedPane.addButton(new Button(fillerPaneBItem));
@@ -124,110 +123,110 @@ public class Menu {
     * @param player - The Player to have the Pane opened.
     */
 	private static void itemSettings(final Player player) {
-		Interface itemPane = new Interface(false, 3, GUIName, player);
+		Interface itemPane = new Interface(false, 3, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			itemPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CLOCK" : "347"), 1, false, "&bTrigger Delay", "&7", "&7*This is the delay in half-seconds", "&7that ItemJoin will wait", "&7to give you the items.", "&7",
-					"&cNOTE: &7It is recommended to", "&7set this to 2 or 3 half-seconds.", "&9&lDELAY: &a" + String.valueOf(ConfigHandler.getConfig().getFile("items.yml").getString("items-Delay")).toUpperCase() + " half-second(s)"), 
+					"&cNOTE: &7It is recommended to", "&7set this to 2 or 3 half-seconds.", "&9&lDELAY: &a" + String.valueOf(ItemJoin.getCore().getConfig("items.yml").getString("items-Delay")).toUpperCase() + " half-second(s)"), 
 					event -> numberPane(player, 1)));
 			itemPane.addButton(new Button(fillerPaneBItem));
-			final String defaultTriggers = ConfigHandler.getConfig().getFile("config.yml").getString("Settings.Default-Triggers");
+			final String defaultTriggers = ItemJoin.getCore().getConfig("config.yml").getString("Settings.Default-Triggers");
 			itemPane.addButton(new Button(ItemHandler.getItem("REDSTONE", 1, false, 
 					"&bDefault Triggers", "&7", "&7*This will be the default", "&7triggers used if a custom", "&7item is defined without", "&7specifying any triggers.", 
 					"&9&lENABLED: &a" + String.valueOf((defaultTriggers != null && !defaultTriggers.isEmpty() && !StringUtils.containsIgnoreCase(defaultTriggers, "DISABLE")) ? defaultTriggers : "FALSE").toUpperCase()), 
 					event -> triggerPane(player, 0)));
 			itemPane.addButton(new Button(fillerPaneBItem));
-			itemPane.addButton(new Button(ItemHandler.getItem("COOKIE", 1, ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Obtain-Items"), 
+			itemPane.addButton(new Button(ItemHandler.getItem("COOKIE", 1, ItemJoin.getCore().getConfig("config.yml").getBoolean("Permissions.Obtain-Items"), 
 					"&bItem Permissions", "&7", "&7*If custom items should require", "&7the player to have specific", "&7permissions to receive the item.", 
-					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Obtain-Items")).toUpperCase()), 
+					"&9&lENABLED: &a" + String.valueOf(ItemJoin.getCore().getConfig("config.yml").getBoolean("Permissions.Obtain-Items")).toUpperCase()), 
 					event -> {
-						File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+						File fileFolder = new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
-						dataFile.set("Permissions.Obtain-Items", !ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Obtain-Items")); 	
-						ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-						ConfigHandler.getConfig().softReload();
+						dataFile.set("Permissions.Obtain-Items", !ItemJoin.getCore().getConfig("config.yml").getBoolean("Permissions.Obtain-Items")); 	
+						ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+						ItemData.getInfo().softReload();
 						SchedulerUtils.runLater(2L, () -> itemSettings(player));
 					}));
 			itemPane.addButton(new Button(fillerPaneBItem));
-			itemPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "PISTON" : "33"), 1, ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Obtain-Items-OP"), 
+			itemPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "PISTON" : "33"), 1, ItemJoin.getCore().getConfig("config.yml").getBoolean("Permissions.Obtain-Items-OP"), 
 					"&bItem Permissions &c&l[OP PLAYERS]", "&7", "&7*If custom items should require", "&7the &c&lOP player(s)&7 to have specific", "&7permissions to receive the item.", "&c&lNOTE: &7This only applies to &c&lOP player(s)&7.", 
-					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Obtain-Items-OP")).toUpperCase()), 
+					"&9&lENABLED: &a" + String.valueOf(ItemJoin.getCore().getConfig("config.yml").getBoolean("Permissions.Obtain-Items-OP")).toUpperCase()), 
 					event -> {
-						File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+						File fileFolder = new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
-						dataFile.set("Permissions.Obtain-Items-OP", !ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Obtain-Items-OP")); 	
-						ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-						ConfigHandler.getConfig().softReload();
+						dataFile.set("Permissions.Obtain-Items-OP", !ItemJoin.getCore().getConfig("config.yml").getBoolean("Permissions.Obtain-Items-OP")); 	
+						ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+						ItemData.getInfo().softReload();
 						SchedulerUtils.runLater(2L, () -> itemSettings(player));
 					}));
 			itemPane.addButton(new Button(fillerPaneBItem));
-			itemPane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, ConfigHandler.getConfig().getFile("items.yml").getBoolean("items-Overwrite"), 
+			itemPane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, ItemJoin.getCore().getConfig("items.yml").getBoolean("items-Overwrite"), 
 					"&bOverwrite", "&7", "&7*Setting this to true will allow", "&7all custom items to overwrite", "&7any custom or vanilla items.", "&7", "&cNOTE: &7If set to false, the", "&7overwrite itemflag will still", "&7function normally.",
-					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig().getFile("items.yml").getString("items-Overwrite")).toUpperCase()), event -> overwritePane(player)));
-			itemPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "OAK_FENCE" : "85"), 1, ConfigHandler.getConfig().getFile("items.yml").getBoolean("items-Spamming"), 
+					"&9&lENABLED: &a" + String.valueOf(ItemJoin.getCore().getConfig("items.yml").getString("items-Overwrite")).toUpperCase()), event -> overwritePane(player)));
+			itemPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "OAK_FENCE" : "85"), 1, ItemJoin.getCore().getConfig("items.yml").getBoolean("items-Spamming"), 
 					"&bSpamming", "&7", "&7*Setting this to false will prevent", "&7players from macro spamming", "&7the use of item commands.", "&7", "&cNOTE: &7It is recommended to", "&7leave this set to false.", 
-					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig().getFile("items.yml").getBoolean("items-Spamming")).toUpperCase()), 
+					"&9&lENABLED: &a" + String.valueOf(ItemJoin.getCore().getConfig("items.yml").getBoolean("items-Spamming")).toUpperCase()), 
 					event -> {
-						File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "items.yml");
+						File fileFolder = new File (ItemJoin.getCore().getPlugin().getDataFolder(), "items.yml");
 						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
-						dataFile.set("items-Spamming", !ConfigHandler.getConfig().getFile("items.yml").getBoolean("items-Spamming")); 	
-						ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "items.yml");
-						ConfigHandler.getConfig().softReload();
+						dataFile.set("items-Spamming", !ItemJoin.getCore().getConfig("items.yml").getBoolean("items-Spamming")); 	
+						ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "items.yml");
+						ItemData.getInfo().softReload();
 						SchedulerUtils.runLater(2L, () -> itemSettings(player));
 					}));
-			itemPane.addButton(new Button(ItemHandler.getItem("DIAMOND", 1, ConfigHandler.getConfig().getFile("items.yml").getBoolean("items-RestrictCount"), 
+			itemPane.addButton(new Button(ItemHandler.getItem("DIAMOND", 1, ItemJoin.getCore().getConfig("items.yml").getBoolean("items-RestrictCount"), 
 					"&bRestrict Count", "&7", "&7*Settings this to true will", "&7allow players to have their items", "&7refreshed (topped up) if they have", "&7used/consumed some of the given", "&7stack of custom items.", 
-					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig().getFile("items.yml").getBoolean("items-RestrictCount")).toUpperCase()), 
+					"&9&lENABLED: &a" + String.valueOf(ItemJoin.getCore().getConfig("items.yml").getBoolean("items-RestrictCount")).toUpperCase()), 
 					event -> {
-						File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "items.yml");
+						File fileFolder = new File (ItemJoin.getCore().getPlugin().getDataFolder(), "items.yml");
 						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
-						dataFile.set("items-RestrictCount", !ConfigHandler.getConfig().getFile("items.yml").getBoolean("items-RestrictCount")); 	
-						ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "items.yml");
-						ConfigHandler.getConfig().softReload();
+						dataFile.set("items-RestrictCount", !ItemJoin.getCore().getConfig("items.yml").getBoolean("items-RestrictCount")); 	
+						ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "items.yml");
+						ItemData.getInfo().softReload();
 						SchedulerUtils.runLater(2L, () -> itemSettings(player));
 					}));
-			itemPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "OAK_WOOD" : "17"), 1, ConfigHandler.getConfig().getFile("config.yml").getBoolean("General.Log-Commands"), 
+			itemPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "OAK_WOOD" : "17"), 1, ItemJoin.getCore().getConfig("config.yml").getBoolean("General.Log-Commands"), 
 					"&bLog Commands", "&7", "&7*If the plugin prevent CONSOLE", "&7from logging any executed", "&7comamnd from the custom items.", "&7This only works for item command(s).", 
-					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig().getFile("config.yml").getBoolean("General.Log-Commands")).toUpperCase()), 
+					"&9&lENABLED: &a" + String.valueOf(ItemJoin.getCore().getConfig("config.yml").getBoolean("General.Log-Commands")).toUpperCase()), 
 					event -> {
-						File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+						File fileFolder = new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
-						dataFile.set("General.Log-Commands", !ConfigHandler.getConfig().getFile("config.yml").getBoolean("General.Log-Commands")); 	
-						ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-						ConfigHandler.getConfig().softReload();
+						dataFile.set("General.Log-Commands", !ItemJoin.getCore().getConfig("config.yml").getBoolean("General.Log-Commands")); 	
+						ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+						ItemData.getInfo().softReload();
 						SchedulerUtils.runLater(2L, () -> itemSettings(player));
 					}));
-			itemPane.addButton(new Button(ItemHandler.getItem("IRON_HELMET", 1, ConfigHandler.getConfig().getFile("config.yml").getBoolean("Settings.HeldItem-Animations"), 
+			itemPane.addButton(new Button(ItemHandler.getItem("IRON_HELMET", 1, ItemJoin.getCore().getConfig("config.yml").getBoolean("Settings.HeldItem-Animations"), 
 					"&bHeld Item Animations", "&7", "&7*If the animate or dynamic", "&7itemflags should update the item", "&7while the player is holding the item.", "&7", 
 					"&7This essentially prevents the", "&7glitchy held item animation", "&7from the item constantly updating.", 
-					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig().getFile("config.yml").getBoolean("Settings.HeldItem-Animations")).toUpperCase()), 
+					"&9&lENABLED: &a" + String.valueOf(ItemJoin.getCore().getConfig("config.yml").getBoolean("Settings.HeldItem-Animations")).toUpperCase()), 
 					event -> {
-						File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+						File fileFolder = new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
-						dataFile.set("Settings.HeldItem-Animations", !ConfigHandler.getConfig().getFile("config.yml").getBoolean("Settings.HeldItem-Animations")); 	
-						ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-						ConfigHandler.getConfig().reloadConfigs(true);
+						dataFile.set("Settings.HeldItem-Animations", !ItemJoin.getCore().getConfig("config.yml").getBoolean("Settings.HeldItem-Animations")); 	
+						ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+						ItemJoin.getCore().getConfiguration().reloadFiles();
 						SchedulerUtils.runLater(2L, () -> itemSettings(player));
 					}));
-			final int heldSlot = ConfigHandler.getConfig().getFile("config.yml").getInt("Settings.HeldItem-Slot");
+			final int heldSlot = ItemJoin.getCore().getConfig("config.yml").getInt("Settings.HeldItem-Slot");
 			itemPane.addButton(new Button(ItemHandler.getItem("DIAMOND_SWORD", (heldSlot > 0 ? heldSlot : 1), false, 
 					"&bHeld Item Slot", "&7", "&7*This is the hotbar slot that", "&7the player will automatically", "&7have selected upon performing", "&7one of the held item triggers.", 
 					"&9&lSLOT: &a" + String.valueOf((heldSlot >= 0 ? heldSlot : "NONE"))), 
 					event -> numberPane(player, 2)));
-			final String heldTriggers = ConfigHandler.getConfig().getFile("config.yml").getString("Settings.HeldItem-Triggers");
+			final String heldTriggers = ItemJoin.getCore().getConfig("config.yml").getString("Settings.HeldItem-Triggers");
 			itemPane.addButton(new Button(ItemHandler.getItem("SUGAR", 1, false, 
 					"&bHeld Item Triggers", "&7", "&7*When these trigger(s)", "&7are performed, the held item", "&7slot will be set.", 
 					"&9&lENABLED: &a" + String.valueOf((heldTriggers != null && !heldTriggers.isEmpty() && !StringUtils.containsIgnoreCase(heldTriggers, "DISABLE")) ? heldTriggers : "FALSE").toUpperCase()), 
 					event -> triggerPane(player, 1)));
-			itemPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "ENCHANTING_TABLE" : "116"), 1, ConfigHandler.getConfig().getFile("config.yml").getBoolean("Settings.DataTags"), 
+			itemPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "ENCHANTING_TABLE" : "116"), 1, ItemJoin.getCore().getConfig("config.yml").getBoolean("Settings.DataTags"), 
 					"&bDataTags", "&7", "&7*If custom items should use", "&7data tags (NBTTags) to distinguish", "&7each custom item, making them unqiue.", 
 					"&c&lNOTE: &7This only works on Minecraft 1.8+", "&7It is recommended to keep", "&7this set to TRUE.", 
-					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig().getFile("config.yml").getBoolean("Settings.DataTags")).toUpperCase()), 
+					"&9&lENABLED: &a" + String.valueOf(ItemJoin.getCore().getConfig("config.yml").getBoolean("Settings.DataTags")).toUpperCase()), 
 					event -> {
-						File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+						File fileFolder = new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
-						dataFile.set("Settings.DataTags", !ConfigHandler.getConfig().getFile("config.yml").getBoolean("Settings.DataTags")); 	
-						ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-						ConfigHandler.getConfig().reloadConfigs(true);
+						dataFile.set("Settings.DataTags", !ItemJoin.getCore().getConfig("config.yml").getBoolean("Settings.DataTags")); 	
+						ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+						ItemJoin.getCore().getConfiguration().reloadFiles();
 						SchedulerUtils.runLater(2L, () -> itemSettings(player));
 					}));
 			itemPane.addButton(new Button(ItemHandler.getItem("LAVA_BUCKET", 1, false, 
@@ -249,91 +248,91 @@ public class Menu {
     * @param player - The Player to have the Pane opened.
     */
 	private static void configSettings(final Player player) {
-		Interface configPane = new Interface(false, 3, GUIName, player);
+		Interface configPane = new Interface(false, 3, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			configPane.addButton(new Button(fillerPaneBItem), 3);
 			configPane.addButton(new Button(ItemHandler.getItem("PAPER", 1, false, 
 					"&6Language", "&7", "&7*The selected lang.yml language.", "&7This is for messages sent", "&7from the plugin to the player.", 
-					"&9&lLANG: &a" + String.valueOf(ConfigHandler.getConfig().getFile("config.yml").getString("Language")).toUpperCase()), 
+					"&9&lLANG: &a" + String.valueOf(ItemJoin.getCore().getConfig("config.yml").getString("Language")).toUpperCase()), 
 					event -> languagePane(player)));
 			configPane.addButton(new Button(fillerPaneBItem));
-			configPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "COMMAND_BLOCK" : "137"), 1, ConfigHandler.getConfig().getFile("config.yml").getBoolean("Database.MySQL"), 
+			configPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "COMMAND_BLOCK" : "137"), 1, ItemJoin.getCore().getConfig("config.yml").getBoolean("Database.MySQL"), 
 					"&bMySQL Database", "&7", "&7*If the plugin should use", "&7a MySQL Database instead", "&7of the locale SQLite Database.",
-					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig().getFile("config.yml").getBoolean("Database.MySQL")).toUpperCase()), 
+					"&9&lENABLED: &a" + String.valueOf(ItemJoin.getCore().getConfig("config.yml").getBoolean("Database.MySQL")).toUpperCase()), 
 					event -> databasePane(player)));
 			configPane.addButton(new Button(fillerPaneBItem), 4);
-			configPane.addButton(new Button(ItemHandler.getItem("BUCKET", 1, ConfigHandler.getConfig().getFile("config.yml").getBoolean("General.CheckforUpdates"), 
+			configPane.addButton(new Button(ItemHandler.getItem("BUCKET", 1, ItemJoin.getCore().getConfig("config.yml").getBoolean("General.CheckforUpdates"), 
 					"&bCheck for Updates", "&7", "&7*If the plugin should check", "&7for updates at start-up.", "&7This includes the use of the", "&7/itemjoin updates/upgrade command(s).", 
-					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig().getFile("config.yml").getBoolean("General.CheckforUpdates")).toUpperCase()), 
+					"&9&lENABLED: &a" + String.valueOf(ItemJoin.getCore().getConfig("config.yml").getBoolean("General.CheckforUpdates")).toUpperCase()), 
 					event -> {
-						File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+						File fileFolder = new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
-						dataFile.set("General.CheckforUpdates", !ConfigHandler.getConfig().getFile("config.yml").getBoolean("General.CheckforUpdates")); 	
-						ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-						ConfigHandler.getConfig().softReload();
+						dataFile.set("General.CheckforUpdates", !ItemJoin.getCore().getConfig("config.yml").getBoolean("General.CheckforUpdates")); 	
+						ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+						ItemData.getInfo().softReload();
 						SchedulerUtils.runLater(2L, () -> configSettings(player));
 					}));
-			configPane.addButton(new Button(ItemHandler.getItem("COMPASS", 1, ConfigHandler.getConfig().getFile("config.yml").getBoolean("General.Metrics-Logging"), 
+			configPane.addButton(new Button(ItemHandler.getItem("COMPASS", 1, ItemJoin.getCore().getConfig("config.yml").getBoolean("General.Metrics-Logging"), 
 					"&bMetrics Logging", "&7", "&7*If the plugin is allowed", "&7to log plugin data such as", "&7the server(s) Java version.", "&7It is recommended to keep this", "&7set to true as it improves", "&7the quality of plugin updates.",
 					"&7", "&7You can view the logged data", "&7Here: https://bstats.org/plugin/bukkit/ItemJoin",
-					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig().getFile("config.yml").getBoolean("General.Metrics-Logging")).toUpperCase()), 
+					"&9&lENABLED: &a" + String.valueOf(ItemJoin.getCore().getConfig("config.yml").getBoolean("General.Metrics-Logging")).toUpperCase()), 
 					event -> {
-						File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+						File fileFolder = new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
-						dataFile.set("General.Metrics-Logging", !ConfigHandler.getConfig().getFile("config.yml").getBoolean("General.Metrics-Logging")); 	
-						ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-						ConfigHandler.getConfig().softReload();
+						dataFile.set("General.Metrics-Logging", !ItemJoin.getCore().getConfig("config.yml").getBoolean("General.Metrics-Logging")); 	
+						ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+						ItemData.getInfo().softReload();
 						SchedulerUtils.runLater(2L, () -> configSettings(player));
 					}));
-			configPane.addButton(new Button(ItemHandler.getItem("STICK", 1, ConfigHandler.getConfig().getFile("config.yml").getBoolean("General.Debugging"), 
+			configPane.addButton(new Button(ItemHandler.getItem("STICK", 1, ItemJoin.getCore().getConfig("config.yml").getBoolean("General.Debugging"), 
 					"&bDebugging", "&7", "&7*Allows for more detailed", "&7CONSOLE messages from the plugin.", "&7Typically only used by the", "&7plugin developer to determine", "&7issues or bugs with the plugin.", 
-					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig().getFile("config.yml").getBoolean("General.Debugging")).toUpperCase()), 
+					"&9&lENABLED: &a" + String.valueOf(ItemJoin.getCore().getConfig("config.yml").getBoolean("General.Debugging")).toUpperCase()), 
 					event -> {
-						File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+						File fileFolder = new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
-						dataFile.set("General.Debugging", !ConfigHandler.getConfig().getFile("config.yml").getBoolean("General.Debugging")); 	
-						ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-						ConfigHandler.getConfig().softReload();
+						dataFile.set("General.Debugging", !ItemJoin.getCore().getConfig("config.yml").getBoolean("General.Debugging")); 	
+						ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+						ItemData.getInfo().softReload();
 						SchedulerUtils.runLater(2L, () -> configSettings(player));
 					}));
-			configPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GRASS_BLOCK" : "2"), 1, ((ConfigHandler.getConfig().getFile("config.yml").getStringList("Active-Commands.commands").size() != 0 
-					&& !StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Active-Commands.enabled-worlds"), "DISABLED"))), 
+			configPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GRASS_BLOCK" : "2"), 1, ((ItemJoin.getCore().getConfig("config.yml").getStringList("Active-Commands.commands").size() != 0 
+					&& !StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.enabled-worlds"), "DISABLED"))), 
 					"&bActive Commands", "&7", "&7*Specify a list of commands", "&7to be executed upon performing a trigger.", "&7These commands are not related to", "&7custom items, rather the server itself.", 
-					"&9&lENABLED: &a" + ((ConfigHandler.getConfig().getFile("config.yml").getStringList("Active-Commands.commands").size() != 0 
-					&& !StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Active-Commands.enabled-worlds"), "DISABLED")) ? "YES" : "NO")), 
+					"&9&lENABLED: &a" + ((ItemJoin.getCore().getConfig("config.yml").getStringList("Active-Commands.commands").size() != 0 
+					&& !StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.enabled-worlds"), "DISABLED")) ? "YES" : "NO")), 
 					event -> activeCommands(player)));
-			configPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GOLDEN_APPLE" : "322"), 1, ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Commands-OP"), 
+			configPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GOLDEN_APPLE" : "322"), 1, ItemJoin.getCore().getConfig("config.yml").getBoolean("Permissions.Commands-OP"), 
 					"&bPlugin Commands &c&l[OP PLAYERS]", "&7", "&7*If the plugin should check", "&7if the OP player has the", "&7proper permissions set to", "&7use the plugin commands.", 
 					"&7OP Players will no longer get", "&7access to all plugin commands", "&7by default.",
-					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Commands-OP")).toUpperCase()), 
+					"&9&lENABLED: &a" + String.valueOf(ItemJoin.getCore().getConfig("config.yml").getBoolean("Permissions.Commands-OP")).toUpperCase()), 
 					event -> {
-						File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+						File fileFolder = new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
-						dataFile.set("Permissions.Commands-OP", !ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Commands-OP")); 	
-						ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-						ConfigHandler.getConfig().softReload();
+						dataFile.set("Permissions.Commands-OP", !ItemJoin.getCore().getConfig("config.yml").getBoolean("Permissions.Commands-OP")); 	
+						ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+						ItemData.getInfo().softReload();
 						SchedulerUtils.runLater(2L, () -> configSettings(player));
 					}));
-			configPane.addButton(new Button(ItemHandler.getItem("BOOK", 1, ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Commands-Get"), 
+			configPane.addButton(new Button(ItemHandler.getItem("BOOK", 1, ItemJoin.getCore().getConfig("config.yml").getBoolean("Permissions.Commands-Get"), 
 					"&bGet Commands", "&7", "&7*If the get and getAll", "&7commands should check for item", "&c&lpermissions &7before giving the item.",
-					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Commands-Get")).toUpperCase()), 
+					"&9&lENABLED: &a" + String.valueOf(ItemJoin.getCore().getConfig("config.yml").getBoolean("Permissions.Commands-Get")).toUpperCase()), 
 					event -> {
-						File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+						File fileFolder = new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
-						dataFile.set("Permissions.Commands-Get", !ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Commands-Get")); 	
-						ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-						ConfigHandler.getConfig().softReload();
+						dataFile.set("Permissions.Commands-Get", !ItemJoin.getCore().getConfig("config.yml").getBoolean("Permissions.Commands-Get")); 	
+						ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+						ItemData.getInfo().softReload();
 						SchedulerUtils.runLater(2L, () -> configSettings(player));
 					}));
-			configPane.addButton(new Button(ItemHandler.getItem("BEDROCK", 1, ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Movement-Bypass"), 
+			configPane.addButton(new Button(ItemHandler.getItem("BEDROCK", 1, ItemJoin.getCore().getConfig("config.yml").getBoolean("Permissions.Movement-Bypass"), 
 					"&bMovement Bypass", "&7", "&7*Enables the use of the", "&aitemjoin.bypass.inventorymodify", "&7permission-node, used to ignore", "&7the global itemMovement prevention", "&7or a custom items itemflag.", 
-					"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Movement-Bypass")).toUpperCase()), 
+					"&9&lENABLED: &a" + String.valueOf(ItemJoin.getCore().getConfig("config.yml").getBoolean("Permissions.Movement-Bypass")).toUpperCase()), 
 					event -> {
-						File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+						File fileFolder = new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
-						dataFile.set("Permissions.Movement-Bypass", !ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Movement-Bypass")); 	
-						ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-						ConfigHandler.getConfig().softReload();
+						dataFile.set("Permissions.Movement-Bypass", !ItemJoin.getCore().getConfig("config.yml").getBoolean("Permissions.Movement-Bypass")); 	
+						ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+						ItemData.getInfo().softReload();
 						SchedulerUtils.runLater(2L, () -> configSettings(player));
 					}));
 			configPane.addButton(new Button(fillerPaneBItem));
@@ -351,7 +350,7 @@ public class Menu {
     */
 	private static int failCycle = 0;
 	private static void startModify(final Player player, final ItemMap itemMap, final int k) {
-		Interface modifyPane = new Interface(true, 6, GUIName, player);
+		Interface modifyPane = new Interface(true, 6, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			try {
 				setPage(player, modifyPane, ItemUtilities.getUtilities().copyItems(), null, itemMap, k);
@@ -376,7 +375,7 @@ public class Menu {
     * @param player - The Player to have the Pane opened.
     */
 	private static void startHopper(Player player) {
-		Interface dragDrop = new Interface(false, 1, GUIName, player);
+		Interface dragDrop = new Interface(false, 1, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			dragDrop.allowClick(true);
 			dragDrop.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nMain Menu", "&7", "&7*Returns you to the main menu."), event -> startMenu(player)));
@@ -393,7 +392,7 @@ public class Menu {
 					if (playerInv.getLeggings() != null && playerInv.getLeggings().getType() != Material.AIR) { convertStack(player, playerInv.getLeggings(),"LEGGINGS"); }
 					if (playerInv.getBoots() != null && playerInv.getBoots().getType() != Material.AIR) { convertStack(player, playerInv.getBoots(), "BOOTS"); }
 					if (ServerUtils.hasSpecificUpdate("1_9") && PlayerHandler.getOffHandItem(player) != null && PlayerHandler.getOffHandItem(player).getType() != Material.AIR) { convertStack(player, PlayerHandler.getOffHandItem(player), "OFFHAND"); }
-					ConfigHandler.getConfig().reloadConfigs(true);
+					ItemJoin.getCore().getConfiguration().reloadFiles();
 					startMenu(player);
 				}
 			}));
@@ -421,7 +420,7 @@ public class Menu {
 					if (playerInv.getLeggings() != null && playerInv.getLeggings().getType() != Material.AIR) { convertStack(player, playerInv.getLeggings(),"LEGGINGS"); }
 					if (playerInv.getBoots() != null && playerInv.getBoots().getType() != Material.AIR) { convertStack(player, playerInv.getBoots(), "BOOTS"); }
 					if (ServerUtils.hasSpecificUpdate("1_9") && PlayerHandler.getOffHandItem(player) != null && PlayerHandler.getOffHandItem(player).getType() != Material.AIR) { convertStack(player, PlayerHandler.getOffHandItem(player), "OFFHAND"); }
-					ConfigHandler.getConfig().reloadConfigs(true);
+					ItemJoin.getCore().getConfiguration().reloadFiles();
 					startMenu(player);
 				}
 			}));
@@ -460,7 +459,7 @@ public class Menu {
 				if (contents.getContents().contains(itemMap.getConfigName())) { contentList.remove(itemMap.getConfigName()); } 
 				else { contentList.add(itemMap.getConfigName()); }
 				contents.setContents(contentList);
-				Interface contentsPane = new Interface(true, 6, GUIName, player);
+				Interface contentsPane = new Interface(true, 6, exitButton, GUIName, player);
 				SchedulerUtils.runAsync(() -> {
 					setPage(player, contentsPane, ItemUtilities.getUtilities().copyItems(), contents, refMap, k);
 				});
@@ -485,7 +484,7 @@ public class Menu {
 		} else if (itemMap != null) { 
 			modifyPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to the recipe menu."), event -> recipePane(player, itemMap)));
 		}
-		Interface craftingPane = new Interface(false, 4, GUIName, player);
+		Interface craftingPane = new Interface(false, 4, exitButton, GUIName, player);
 		craftingPane.addButton(new Button(fillerPaneGItem), 3);
 		currentItem = ItemUtilities.getUtilities().getItemMap("CRAFTING[1]", items);
 		if (currentItem != null) {
@@ -536,7 +535,7 @@ public class Menu {
 		craftingPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", lore), event -> modifyPane.open(player)));
 		craftingPane.addButton(new Button(fillerPaneBItem), 7);
 		craftingPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", lore), event -> modifyPane.open(player)));
-		Interface arbitraryPane = new Interface(true, 6, GUIName, player);
+		Interface arbitraryPane = new Interface(true, 6, exitButton, GUIName, player);
 		arbitraryPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", lore), event -> modifyPane.open(player)));
 		List < ItemMap > tempList = new ArrayList < ItemMap > ();
 		tempList.addAll(items);
@@ -624,7 +623,7 @@ public class Menu {
     * @param item - The ItemStack to be saved.
     */
 	private static void convertStack(final Player player, final ItemStack item, final String slot) {
-		ItemMap itemMap = new ItemMap("item_" + StringUtils.getPath(1), "ARBITRARY");
+		ItemMap itemMap = new ItemMap("item_" + ItemData.getInfo().getPath(1), "ARBITRARY");
 		itemMap.setMaterial(item.getType());
 		if (!ServerUtils.hasSpecificUpdate("1_13")) { itemMap.setDataValue((short)LegacyAPI.getDataValue(item)); }
 		itemMap.setCount(String.valueOf(item.getAmount()));
@@ -701,9 +700,9 @@ public class Menu {
 		else { 
 			itemMap.setSlot(slot);
 			itemMap.saveToConfig();
-			String[] placeHolders = LanguageAPI.getLang(false).newString();
+			String[] placeHolders = ItemJoin.getCore().getLang().newString();
 			placeHolders[3] = (item.hasItemMeta() && item.getItemMeta().hasDisplayName() ? item.getItemMeta().getDisplayName() : itemMap.getConfigName());
-			LanguageAPI.getLang(false).sendLangMessage("commands.menu.itemSaved", player, placeHolders);
+			ItemJoin.getCore().getLang().sendLangMessage("commands.menu.itemSaved", player, placeHolders);
 		}
 		itemMap.renderItemStack();
 	}
@@ -717,7 +716,7 @@ public class Menu {
     * @param item - The ItemStack currently being modified.
     */
 	private static void choicePane(final Player player, final ItemMap itemMap, final ItemStack item) {
-		Interface choicePane = new Interface(false, 3, GUIName, player);
+		Interface choicePane = new Interface(false, 3, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			choicePane.addButton(new Button(fillerPaneBItem), 4);
 			choicePane.addButton(new Button(item));
@@ -729,10 +728,10 @@ public class Menu {
 			choicePane.addButton(new Button(fillerPaneBItem));
 			choicePane.addButton(new Button(ItemHandler.getItem("REDSTONE", 1, true, "&c&lDelete", "&7", "&7*Delete this item.", "&7This will remove the item from the", "&7items.yml and will no longer be useable.", "&c&lWARNING: &7This &lCANNOT &7be undone!"), event -> {
 				itemMap.removeFromConfig();
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[3] = itemMap.getConfigName();
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.itemRemoved", player, placeHolders);
-				ConfigHandler.getConfig().reloadConfigs(true); {
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.itemRemoved", player, placeHolders);
+				ItemJoin.getCore().getConfiguration().reloadFiles(); {
 					SchedulerUtils.runLater(4L, () -> {
 						startModify(player, null, 0); 
 					});
@@ -754,7 +753,7 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void creatingPane(final Player player, final ItemMap itemMap) {
-		Interface creatingPane = new Interface(false, 5, GUIName, player);
+		Interface creatingPane = new Interface(false, 5, exitButton, GUIName, player);
 			SchedulerUtils.runAsync(() -> {
 			String slotList = "";
 			String slotString = "";
@@ -847,7 +846,7 @@ public class Menu {
 					!itemMap.getMultipleSlots().isEmpty() ? "&9&lSlot(s): &a" + slotList : "&9&lSLOT: &a" + itemMap.getSlot().toUpperCase())), event -> switchPane(player, itemMap, 1)));
 			creatingPane.addButton(new Button(ItemHandler.getItem("DIAMOND", itemMap.getCount(player), false, "&b&lCount", "&7", "&7*Set the amount of the", "&7item to be given.", "&9&lCOUNT: &a" + 
 					itemMap.getCount(player)), event -> countPane(player, itemMap)));
-			creatingPane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, false, "&b&lName", "&7", "&7*Set the name of the item.", "&9&lNAME: &f" + StringUtils.nullCheck(itemMap.getCustomName())), event -> {
+			creatingPane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, false, "&b&lName", "&7", "&7*Set the name of the item.", "&9&lNAME: &f" + StringUtils.nullCheck(itemMap.getCustomName())), event -> { // false - Temp identifier
 				if (itemMap.getDynamicNames() != null && itemMap.isAnimated()) {
 					animatedNamePane(player, itemMap);
 				} else {
@@ -856,18 +855,21 @@ public class Menu {
 						creatingPane(player, itemMap);
 					} else {
 						player.closeInventory();
-						String[] placeHolders = LanguageAPI.getLang(false).newString();
+						String[] placeHolders = ItemJoin.getCore().getLang().newString();
 						placeHolders[16] = "NAME";
 						placeHolders[15] = "&bUltimate Sword";
-						LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-						LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+						ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+						ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
+						//creatingPane.openTyping(player, ItemHandler.getItem("NAME_TAG", 1, false, ""), (itemMap.getCustomName() != null ? itemMap.getCustomName() : "&r"), "&cTest", "&b&nName the Item");
+						//creatingPane.allowClick(true);
 					}
 				}
 			}, event -> {
+				//ServerUtils.logDev("Typing Test" + event.getResult());
 				itemMap.setCustomName(StringUtils.restoreColor(event.getMessage()));
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "NAME";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				creatingPane(event.getPlayer(), itemMap);
 			}));
 			creatingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "WRITABLE_BOOK" : "386"), 1, false, "&b&lLore", "&7", "&7*Set the lore of the item.", "&9&lLORE: &f" + StringUtils.nullCheck(itemMap.getCustomLore().toString())), event -> {
@@ -878,9 +880,9 @@ public class Menu {
 				}
 			}, event -> {
 				itemMap.setCustomLore(StringUtils.split(StringUtils.restoreColor(event.getMessage())));
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "LORE";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				creatingPane(event.getPlayer(), itemMap);
 			}));
 			creatingPane.addButton(new Button(ItemHandler.setDurability(ItemHandler.getItem("DIAMOND_BOOTS", 1, false, "&e&lData", "&7", "&7*Set the damage or the", "&7custom texture of the item."), 160), event -> { dataPane(player, itemMap); }));
@@ -898,27 +900,27 @@ public class Menu {
 					creatingPane(player, itemMap);
 				} else {
 					player.closeInventory();
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "CUSTOM PERMISSION";
 					placeHolders[15] = "itemjoin.ultra";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 				}
 			}, event -> {
 				itemMap.setPerm(ChatColor.stripColor(event.getMessage()));
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "CUSTOM PERMISSION";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				creatingPane(event.getPlayer(), itemMap);
 			}));
 			creatingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "BEDROCK" : "7"), 1, false, "&b&lDisabled Worlds", "&7", "&7*Define the world(s) that the", "&7item will &l&nNOT&7 be given in.", 
 					"&9&lDISABLED-WORLDS: &a" + (StringUtils.nullCheck(itemMap.getDisabledWorlds().toString()) != "NONE" ? "&a" + disabledList : "NONE")), event -> worldPane(player, itemMap, 0)));
 			creatingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GRASS_BLOCK" : "2"), 1, false, "&b&lEnabled Worlds", "&7", "&7*Define the world(s) that the", "&7item will be given in.", 
 					"&9&lENABLED-WORLDS: &a" + (StringUtils.nullCheck(itemMap.getEnabledWorlds().toString()) != "NONE" ? "&a" + enabledList : "NONE")), event -> worldPane(player, itemMap, 1)));
-			creatingPane.addButton(new Button(ItemHandler.getItem("GOLD_BLOCK", 1, true, "&b&lEnabled Regions", "&7", "&7*Define the region(s) that the", "&7item will be given in.", (DependAPI.getDepends(false).getGuard().guardEnabled() ? 
-					"&9&lENABLED-REGIONS: &a" + (StringUtils.nullCheck(itemMap.getEnabledRegions().toString()) != "NONE" ? "&a" + regionList : "NONE") : ""), (DependAPI.getDepends(false).getGuard().guardEnabled() ? "" : "&7"), 
-					(DependAPI.getDepends(false).getGuard().guardEnabled() ? "" : "&c&lERROR: &7WorldGuard was NOT found."), (DependAPI.getDepends(false).getGuard().guardEnabled() ? "" : "&7This button will do nothing...")), event -> {
-				if (DependAPI.getDepends(false).getGuard().guardEnabled()) {
+			creatingPane.addButton(new Button(ItemHandler.getItem("GOLD_BLOCK", 1, true, "&b&lEnabled Regions", "&7", "&7*Define the region(s) that the", "&7item will be given in.", (ItemJoin.getCore().getDependencies().getGuard().guardEnabled() ? 
+					"&9&lENABLED-REGIONS: &a" + (StringUtils.nullCheck(itemMap.getEnabledRegions().toString()) != "NONE" ? "&a" + regionList : "NONE") : ""), (ItemJoin.getCore().getDependencies().getGuard().guardEnabled() ? "" : "&7"), 
+					(ItemJoin.getCore().getDependencies().getGuard().guardEnabled() ? "" : "&c&lERROR: &7WorldGuard was NOT found."), (ItemJoin.getCore().getDependencies().getGuard().guardEnabled() ? "" : "&7This button will do nothing...")), event -> {
+				if (ItemJoin.getCore().getDependencies().getGuard().guardEnabled()) {
 					regionPane(player, itemMap);
 				}
 			}));
@@ -971,24 +973,24 @@ public class Menu {
 						creatingPane(player, itemMap);
 					} else {
 						player.closeInventory();
-						String[] placeHolders = LanguageAPI.getLang(false).newString();
+						String[] placeHolders = ItemJoin.getCore().getLang().newString();
 						placeHolders[16] = "MAP IMAGE";
 						placeHolders[15] = "minecraft.png OR minecraft-dance.gif";
-						LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-						LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+						ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+						ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 					}
 				}, event -> {
 					itemMap.setMapImage(ChatColor.stripColor(event.getMessage()));
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "MAP IMAGE";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 					creatingPane(event.getPlayer(), itemMap);
 				}));
 			} else if (itemMap.getMaterial().toString().contains("ARROW") && !itemMap.getMaterial().toString().contains("TIPPED_ARROW")) {
 				creatingPane.addButton(new Button(ItemHandler.getItem("ENDER_PEARL", 1, false, "&e&lTeleport", "&7", "&7*Set the arrow to teleport", "&7the player upon landing.", "&9&lEnabled: &a" + String.valueOf(itemMap.isTeleport()).toUpperCase()),
 						event -> teleportPane(player, itemMap, 0)));
 			} else if (itemMap.getMaterial().toString().contains("CHARGE") || itemMap.getMaterial().toString().equalsIgnoreCase("FIREWORK_STAR")) {
-				Interface colorPane = new Interface(true, 6, GUIName, player);
+				Interface colorPane = new Interface(true, 6, exitButton, GUIName, player);
 				colorPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu"), event -> creatingPane(player, itemMap)));
 				for (DyeColor color: DyeColor.values()) {
 					colorPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GRAY_DYE" : "351:8"), 1, false, "&f" + color.name(), "&7", "&7*This will be the color", "&7of your firework charge."), event -> {
@@ -1017,7 +1019,7 @@ public class Menu {
 				}));
 			} else if (itemMap.getMaterial().toString().contains("SHULKER")) {
 				creatingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "PURPLE_SHULKER_BOX" : "229"), 1, false, "&a&lContents", "&7", "&7*Add existing custom items into", "&7the contents of this box.", "&9Enabled: &a" + (itemMap.getContents() != null && !itemMap.getContents().isEmpty() ? "YES" : "NONE")), event -> {
-					Interface contentsPane = new Interface(true, 6, GUIName, player);
+					Interface contentsPane = new Interface(true, 6, exitButton, GUIName, player);
 					SchedulerUtils.runAsync(() -> {
 						setPage(player, contentsPane, ItemUtilities.getUtilities().copyItems(), itemMap, null, 0);
 					});
@@ -1036,10 +1038,10 @@ public class Menu {
 			creatingPane.addButton(new Button(fillerPaneBItem), 3);
 			creatingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "LIME_WOOL" : "WOOL:5"), 1, false, "&a&l&nSave to Config", "&7", "&7*Saves the custom item", "&7settings to the items.yml file."), event -> {
 				itemMap.saveToConfig();
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[3] = itemMap.getConfigName();
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.itemSaved", player, placeHolders);
-				ConfigHandler.getConfig().reloadConfigs(true);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.itemSaved", player, placeHolders);
+				ItemJoin.getCore().getConfiguration().reloadFiles();
 				player.closeInventory();
 			}));
 			creatingPane.addButton(new Button(fillerPaneBItem), 3);
@@ -1056,17 +1058,17 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void returnConfirm(final Player player, final ItemMap itemMap) {
-		Interface returnPane = new Interface(false, 1, GUIName, player);
+		Interface returnPane = new Interface(false, 1, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			returnPane.addButton(new Button(fillerPaneBItem));
 			returnPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "RED_WOOL" : "WOOL:14"), 1, false, "&c&l&nMain Menu", "&7", "&7*Cancel and return to the", "&7main menu, all modified", "&7settings will be lost.", "&7", "&c&lWARNING: &cThis item has &lNOT&c been saved!"), event -> startMenu(player)));
 			returnPane.addButton(new Button(fillerPaneBItem), 2);
 			returnPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "LIME_WOOL" : "WOOL:5"), 1, false, "&a&l&nSave to Config", "&7", "&7*Saves the custom item", "&7settings to the items.yml file."), event -> {
 				itemMap.saveToConfig();
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[3] = itemMap.getConfigName();
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.itemSaved", player, placeHolders);
-				ConfigHandler.getConfig().reloadConfigs(true);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.itemSaved", player, placeHolders);
+				ItemJoin.getCore().getConfiguration().reloadFiles();
 				startMenu(player);
 			}));
 			returnPane.addButton(new Button(fillerPaneBItem), 2);
@@ -1090,7 +1092,7 @@ public class Menu {
     * @param stage - The type of selection Pane.
     */
 	private static void numberPane(final Player player, final int stage) {
-		Interface numberPane = new Interface((stage == 2 ? false : true), (stage == 2 ? 2 : 6), GUIName, player);
+		Interface numberPane = new Interface((stage == 2 ? false : true), (stage == 2 ? 2 : 6), exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			numberPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item settings menu."), event -> {
 				if (stage == 1) {
@@ -1104,31 +1106,31 @@ public class Menu {
 				if (stage == 1) {
 					numberPane.addButton(new Button(ItemHandler.getItem((i == 0 ? (ServerUtils.hasSpecificUpdate("1_13") ? "RED_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:14") : (ServerUtils.hasSpecificUpdate("1_13") ? "BLUE_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:11")), (i == 0 ? 1 : i), false, "&9&lDelay: &a&l" + i, "&7", 
 					"&7*Click to set the trigger", "&7delay for giving custom items.", "&aSecond(s): &e" + (i == 0 ? 0 : ((Double.parseDouble(String.valueOf(i))) / 2))), event -> {
-						File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "items.yml");
+						File fileFolder =  new File (ItemJoin.getCore().getPlugin().getDataFolder(), "items.yml");
 						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 						dataFile.set("items-Delay", k); 	
-						ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "items.yml");
-						ConfigHandler.getConfig().softReload();
+						ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "items.yml");
+						ItemData.getInfo().softReload();
 						SchedulerUtils.runLater(2L, () -> itemSettings(player));
 					}));
 				} else if (stage == 2) {
 					numberPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "BLUE_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:11"), (i == 0 ? 1 : i), false, "&9&lSlot: &a&l" + i + " &9&l[HOTBAR]", "&7", 
 					"&7*Click to set the held item slot", "&7that is automatically selected", "&7when performing a held item trigger.", "&aSlot: &e" + k), event -> {
-						File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+						File fileFolder =  new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 						dataFile.set("Settings.HeldItem-Slot", k); 	
-						ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-						ConfigHandler.getConfig().softReload();
+						ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+						ItemData.getInfo().softReload();
 						SchedulerUtils.runLater(2L, () -> itemSettings(player));
 					}));
 				} else if (stage == 3) {
 					numberPane.addButton(new Button(ItemHandler.getItem((i == 0 ? (ServerUtils.hasSpecificUpdate("1_13") ? "RED_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:14") : (ServerUtils.hasSpecificUpdate("1_13") ? "BLUE_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:11")), (i == 0 ? 1 : i), false, "&9&lDelay: &a&l" + i, "&7", 
 					"&7*Click to set the trigger", "&7delay for clearing items.", "&aSecond(s): &e" + (i == 0 ? 0 : (Double.parseDouble(String.valueOf(i))))), event -> {
-						File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+						File fileFolder =  new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 						dataFile.set("Clear-Items.Delay-Tick", k); 	
-						ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-						ConfigHandler.getConfig().softReload();
+						ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+						ItemData.getInfo().softReload();
 						SchedulerUtils.runLater(2L, () -> clearPane(player));
 					}));
 				} 
@@ -1148,19 +1150,19 @@ public class Menu {
     * @param player - The Player to have the Pane opened.
     */
 	private static void languagePane(final Player player) {
-		Interface languagePane = new Interface(false, 2, GUIName, player);
+		Interface languagePane = new Interface(false, 2, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
-			final String language = ConfigHandler.getConfig().getFile("config.yml").getString("Language").replace(" ", "");
+			final String language = ItemJoin.getCore().getConfig("config.yml").getString("Language").replace(" ", "");
 			languagePane.addButton(new Button(fillerPaneBItem));
 			languagePane.addButton(new Button(ItemHandler.getItem(ServerUtils.hasSpecificUpdate("1_13") ? "GRASS_BLOCK" : "2", 1, language.equalsIgnoreCase("ENGLISH"), "&6&l&nEnglish", "&7", 
 			"&7*Sets the messages sent by", "&7the plugin to the player", "&7to be written in &c&lEnglish&7.", "&7This is the type of lang.yml file", "&7generated in the plugin folder.", 
 			"&9&lENABLED: &a" + (language.equalsIgnoreCase("ENGLISH") + "").toUpperCase()), event -> {
 				if (!language.equalsIgnoreCase("ENGLISH")) {
-					File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+					File fileFolder =  new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 					dataFile.set("Language", "ENGLISH"); 	
-					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-					ConfigHandler.getConfig().softReload();
+					ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+					ItemData.getInfo().softReload();
 					SchedulerUtils.runLater(2L, () -> languagePane(player));
 				}
 			}));
@@ -1168,11 +1170,11 @@ public class Menu {
 			"&7*Sets the messages sent by", "&7the plugin to the player", "&7to be written in &c&lSpanish&7.", "&7This is the type of lang.yml file", "&7generated in the plugin folder.", 
 			"&9&lENABLED: &a" + (language.equalsIgnoreCase("SPANISH") + "").toUpperCase()), event -> {
 				if (!language.equalsIgnoreCase("SPANISH")) {
-					File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+					File fileFolder =  new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 					dataFile.set("Language", "SPANISH"); 	
-					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-					ConfigHandler.getConfig().softReload();
+					ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+					ItemData.getInfo().softReload();
 					SchedulerUtils.runLater(2L, () -> languagePane(player));
 				}
 			}));
@@ -1180,11 +1182,11 @@ public class Menu {
 			"&7*Sets the messages sent by", "&7the plugin to the player", "&7to be written in &c&lRussian&7.", "&7This is the type of lang.yml file", "&7generated in the plugin folder.", 
 			"&9&lENABLED: &a" + (language.equalsIgnoreCase("RUSSIAN") + "").toUpperCase()), event -> {
 				if (!language.equalsIgnoreCase("RUSSIAN")) {
-					File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+					File fileFolder =  new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 					dataFile.set("Language", "RUSSIAN"); 	
-					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-					ConfigHandler.getConfig().softReload();
+					ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+					ItemData.getInfo().softReload();
 					SchedulerUtils.runLater(2L, () -> languagePane(player));
 				}
 			}));
@@ -1193,11 +1195,11 @@ public class Menu {
 			"&7*Sets the messages sent by", "&7the plugin to the player", "&7to be written in &c&lFrench&7.", "&7This is the type of lang.yml file", "&7generated in the plugin folder.", 
 			"&9&lENABLED: &a" + (language.equalsIgnoreCase("FRENCH") + "").toUpperCase()), event -> {
 				if (!language.equalsIgnoreCase("FRENCH")) {
-					File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+					File fileFolder =  new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 					dataFile.set("Language", "FRENCH"); 	
-					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-					ConfigHandler.getConfig().softReload();
+					ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+					ItemData.getInfo().softReload();
 					SchedulerUtils.runLater(2L, () -> languagePane(player));
 				}
 			}));
@@ -1205,11 +1207,11 @@ public class Menu {
 			"&7*Sets the messages sent by", "&7the plugin to the player", "&7to be written in &c&lTraditional Chinese&7.", "&7This is the type of lang.yml file", "&7generated in the plugin folder.", 
 			"&9&lENABLED: &a" + (language.equalsIgnoreCase("TRADITIONALCHINESE") + "").toUpperCase()), event -> {
 				if (!language.equalsIgnoreCase("TRADITIONALCHINESE")) {
-					File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+					File fileFolder =  new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 					dataFile.set("Language", "TRADITIONAL CHINESE"); 	
-					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-					ConfigHandler.getConfig().softReload();
+					ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+					ItemData.getInfo().softReload();
 					SchedulerUtils.runLater(2L, () -> languagePane(player));
 				}
 			}));
@@ -1217,11 +1219,11 @@ public class Menu {
 			"&7*Sets the messages sent by", "&7the plugin to the player", "&7to be written in &c&lSimplified Chinese&7.", "&7This is the type of lang.yml file", "&7generated in the plugin folder.", 
 			"&9&lENABLED: &a" + (language.equalsIgnoreCase("SIMPLIFIEDCHINESE") + "").toUpperCase()), event -> {
 				if (!language.equalsIgnoreCase("SIMPLIFIEDCHINESE")) {
-					File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+					File fileFolder =  new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 					dataFile.set("Language", "SIMPLIFIED CHINESE"); 	
-					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-					ConfigHandler.getConfig().softReload();
+					ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+					ItemData.getInfo().softReload();
 					SchedulerUtils.runLater(2L, () -> languagePane(player));
 				}
 			}));
@@ -1239,17 +1241,17 @@ public class Menu {
     * @param player - The Player to have the Pane opened.
     */
 	private static void activeCommands(final Player player) {
-		Interface activePane = new Interface(false, 3, GUIName, player);
+		Interface activePane = new Interface(false, 3, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
-			final String triggers = ConfigHandler.getConfig().getFile("config.yml").getString("Active-Commands.triggers");
-			final String enabledList = ConfigHandler.getConfig().getFile("config.yml").getString("Active-Commands.enabled-worlds");
+			final String triggers = ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.triggers");
+			final String enabledList = ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.enabled-worlds");
 			activePane.addButton(new Button(fillerPaneBItem), 4);
-			activePane.addButton(new Button(ItemHandler.getItem("BOOK", 1, ConfigHandler.getConfig().getFile("config.yml").getStringList("Active-Commands.commands").size() != 0, "&b&l&nCommands", "&7", 
+			activePane.addButton(new Button(ItemHandler.getItem("BOOK", 1, ItemJoin.getCore().getConfig("config.yml").getStringList("Active-Commands.commands").size() != 0, "&b&l&nCommands", "&7", 
 			"&7*Specify a list of commands to be", "&7executed upon performing a trigger.", 
-			"&9&lENABLED: &a" + (ConfigHandler.getConfig().getFile("config.yml").getStringList("Active-Commands.commands").size() != 0 ? "YES" : "NO")), event -> altCommandPane(player, null, 4)));
+			"&9&lENABLED: &a" + (ItemJoin.getCore().getConfig("config.yml").getStringList("Active-Commands.commands").size() != 0 ? "YES" : "NO")), event -> altCommandPane(player, null, 4)));
 			activePane.addButton(new Button(fillerPaneBItem), 6);
 			activePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "REPEATER" : "356"), 1, false, "&a&lSequence", "&7", "&7*The order that the command lines", 
-					"&7will be executed in.", "&9&lCOMMANDS-SEQUENCE: &a" + StringUtils.nullCheck(ConfigHandler.getConfig().getFile("config.yml").getString("Active-Commands.commands-sequence") + "")), event -> sequencePane(player, null, 4)));
+					"&7will be executed in.", "&9&lCOMMANDS-SEQUENCE: &a" + StringUtils.nullCheck(ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.commands-sequence") + "")), event -> sequencePane(player, null, 4)));
 			activePane.addButton(new Button(fillerPaneBItem));
 			activePane.addButton(new Button(ItemHandler.getItem("REDSTONE", 1, false, 
 					"&bTriggers", "&7", "&7*This will be the triggers", "&7that will cause the command lines", "&7to execute.", 
@@ -1272,109 +1274,109 @@ public class Menu {
     * @param player - The Player to have the Pane opened.
     */
 	private static void databasePane(final Player player) {
-		Interface databasePane = new Interface(false, 3, GUIName, player);
+		Interface databasePane = new Interface(false, 3, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			databasePane.addButton(new Button(fillerPaneBItem), 4);
-			databasePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "COMMAND_BLOCK" : "137"), 1, ConfigHandler.getConfig().getFile("config.yml").getBoolean("Database.MySQL"), "&b&l&nMySQL", "&7", 
+			databasePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "COMMAND_BLOCK" : "137"), 1, ItemJoin.getCore().getConfig("config.yml").getBoolean("Database.MySQL"), "&b&l&nMySQL", "&7", 
 			"&7*If the plugin should use a", "&7MySQL connection instead of the", "&7local SQLite database inside", "&7the plugin folder.", "&7", "&c&lNote: &7Keep this set to false", "&7if you do not know what", "&7you are doing.", 
 			"&7", "&c&l&nWARNING: &7Changing this value requires", "&7a server restart for the", "&7changes to take affect.",  
-			"&9&lENABLED: &a" + String.valueOf(ConfigHandler.getConfig().getFile("config.yml").getBoolean("Database.MySQL")).toUpperCase()), 
+			"&9&lENABLED: &a" + String.valueOf(ItemJoin.getCore().getConfig("config.yml").getBoolean("Database.MySQL")).toUpperCase()), 
 				event -> {
-					File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+					File fileFolder = new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
-					dataFile.set("Database.MySQL", !ConfigHandler.getConfig().getFile("config.yml").getBoolean("Database.MySQL")); 	
-					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-					ConfigHandler.getConfig().softReload();
+					dataFile.set("Database.MySQL", !ItemJoin.getCore().getConfig("config.yml").getBoolean("Database.MySQL")); 	
+					ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+					ItemData.getInfo().softReload();
 					SchedulerUtils.runLater(2L, () -> databasePane(player));
 				}));
 			databasePane.addButton(new Button(fillerPaneBItem), 4);
 			databasePane.addButton(new Button(ItemHandler.getItem("PAPER", 1, false, "&a&lHost", "&7", 
-			"&7*Set the &c&lHost &7for", "&7the MySQL databse connection.", "&9&lHOST: &a" + ConfigHandler.getConfig().getFile("config.yml").getString("Database.host")), 
+			"&7*Set the &c&lHost &7for", "&7the MySQL databse connection.", "&9&lHOST: &a" + ItemJoin.getCore().getConfig("config.yml").getString("Database.host")), 
 				event -> {
 					player.closeInventory();
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "HOST ADDRESS";
 					placeHolders[15] = "localhost";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 				}, event -> {
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "HOST ADDRESS";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
-					File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
+					File fileFolder = new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 					dataFile.set("Database.host", ChatColor.stripColor(event.getMessage())); 	
-					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-					ConfigHandler.getConfig().softReload();
+					ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+					ItemData.getInfo().softReload();
 					SchedulerUtils.runLater(2L, () -> databasePane(player));
 				}));
 			databasePane.addButton(new Button(ItemHandler.getItem("STONE_BUTTON", 1, false, "&a&lPort", "&7", 
-			"&7*Set the &c&lPort &7for", "&7the MySQL databse connection.", "&9&lPORT: &a" + ConfigHandler.getConfig().getFile("config.yml").getString("Database.port")), 
+			"&7*Set the &c&lPort &7for", "&7the MySQL databse connection.", "&9&lPORT: &a" + ItemJoin.getCore().getConfig("config.yml").getString("Database.port")), 
 				event -> {
 					player.closeInventory();
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "ADDRESS PORT";
 					placeHolders[15] = "3306";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 				}, event -> {
 					if (StringUtils.isInt(ChatColor.stripColor(event.getMessage()))) {
-						String[] placeHolders = LanguageAPI.getLang(false).newString();
+						String[] placeHolders = ItemJoin.getCore().getLang().newString();
 						placeHolders[16] = "ADDRESS PORT";
-						LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
-						File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+						ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
+						File fileFolder = new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 						dataFile.set("Database.port", Integer.parseInt(ChatColor.stripColor(event.getMessage()))); 	
-						ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-						ConfigHandler.getConfig().softReload();
+						ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+						ItemData.getInfo().softReload();
 					} else {
-						String[] placeHolders = LanguageAPI.getLang(false).newString();
+						String[] placeHolders = ItemJoin.getCore().getLang().newString();
 						placeHolders[16] = ChatColor.stripColor(event.getMessage());
-						LanguageAPI.getLang(false).sendLangMessage("commands.menu.noInteger", player, placeHolders);
+						ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noInteger", player, placeHolders);
 					}
 					SchedulerUtils.runLater(2L, () -> databasePane(player));
 				}));
 			databasePane.addButton(new Button(fillerPaneBItem));
-			final String databaseString = (ConfigHandler.getConfig().getFile("config.yml").getString("Database.table") != null ? "Database.table" : "Database.database");
+			final String databaseString = (ItemJoin.getCore().getConfig("config.yml").getString("Database.table") != null ? "Database.table" : "Database.database");
 			databasePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "OAK_WOOD" : "17"), 1, false, "&a&lTable", "&7", 
-			"&7*Set the &c&lTable &7for", "&7the MySQL databse connection.", "&9&lTABLE: &a" + ConfigHandler.getConfig().getFile("config.yml").getString(databaseString)), 
+			"&7*Set the &c&lTable &7for", "&7the MySQL databse connection.", "&9&lTABLE: &a" + ItemJoin.getCore().getConfig("config.yml").getString(databaseString)), 
 				event -> {
 					player.closeInventory();
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "TABLE NAME";
 					placeHolders[15] = "ITEMJOIN_LOCAL";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 				}, event -> {
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "TABLE NAME";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
-					File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
+					File fileFolder = new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 					dataFile.set(databaseString, ChatColor.stripColor(event.getMessage())); 	
-					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-					ConfigHandler.getConfig().softReload();
+					ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+					ItemData.getInfo().softReload();
 					SchedulerUtils.runLater(2L, () -> databasePane(player));
 				}));
 			databasePane.addButton(new Button(fillerPaneBItem));
 			databasePane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, false, "&a&lPrefix", "&7", 
-			"&7*Set the &c&lTable &7for", "&7the MySQL databse connection.", "&9&lTABLE: &a" + ConfigHandler.getConfig().getFile("config.yml").getString("Database.prefix")), 
+			"&7*Set the &c&lTable &7for", "&7the MySQL databse connection.", "&9&lTABLE: &a" + ItemJoin.getCore().getConfig("config.yml").getString("Database.prefix")), 
 				event -> {
 					player.closeInventory();
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "TABLE PREFIX";
 					placeHolders[15] = "IJ_";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 				}, event -> {
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "TABLE PREFIX";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
-					File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
+					File fileFolder = new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 					dataFile.set("Database.prefix", ChatColor.stripColor(event.getMessage())); 	
-					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-					ConfigHandler.getConfig().softReload();
+					ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+					ItemData.getInfo().softReload();
 					SchedulerUtils.runLater(2L, () -> databasePane(player));
 				}));
 			databasePane.addButton(new Button(fillerPaneBItem));
@@ -1382,40 +1384,40 @@ public class Menu {
 			"&7*Set the &c&lUser &7for", "&7the MySQL databse connection.", "&9&lUSER: &a***********"), 
 				event -> {
 					player.closeInventory();
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "USER";
 					placeHolders[15] = "rockinchaos";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 				}, event -> {
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "USER";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
-					File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
+					File fileFolder = new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 					dataFile.set("Database.user", ChatColor.stripColor(event.getMessage())); 	
-					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-					ConfigHandler.getConfig().softReload();
+					ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+					ItemData.getInfo().softReload();
 					SchedulerUtils.runLater(2L, () -> databasePane(player));
 				}));
 			databasePane.addButton(new Button(ItemHandler.getItem("REDSTONE", 1, false, "&a&lPassword", "&7", 
 			"&7*Set the &c&lPassword &7for", "&7the MySQL databse connection.", "&9&lPORT: &a****"),  
 				event -> {
 					player.closeInventory();
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "PASSWORD";
 					placeHolders[15] = "cooldude6";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 				}, event -> {
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "PASSWORD";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
-					File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
+					File fileFolder = new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 					dataFile.set("Database.pass", ChatColor.stripColor(event.getMessage())); 	
-					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-					ConfigHandler.getConfig().softReload();
+					ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+					ItemData.getInfo().softReload();
 					SchedulerUtils.runLater(2L, () -> databasePane(player));
 				}));
 			databasePane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the config settings menu."), event -> configSettings(player)));
@@ -1431,13 +1433,13 @@ public class Menu {
     * @param player - The Player to have the Pane opened.
     */
 	private static void triggerPane(final Player player, final int stage) {
-		final Interface triggerPane = new Interface(false, 3, GUIName, player);
+		final Interface triggerPane = new Interface(false, 3, exitButton, GUIName, player);
 		final String triggerOption = (stage == 4 ? "&7*Executes the commands when the" : (stage == 0 ? "&7*Gives the custom item when the" : "&7*Sets the held item slot when the"));
 		final String triggerString = (stage == 4 ? "Active-Commands.triggers" : (stage == 0 ? "Settings.Default-Triggers" : "Settings.HeldItem-Triggers"));
 		SchedulerUtils.runAsync(() -> {
 			List<String> triggers = new ArrayList<String>();
 			try {
-				for (String trigger: ConfigHandler.getConfig().getFile("config.yml").getString(triggerString).replace(" ", "").split(",")) {
+				for (String trigger: ItemJoin.getCore().getConfig("config.yml").getString(triggerString).replace(" ", "").split(",")) {
 					if (trigger != null && !trigger.isEmpty()) {
 						triggers.add(trigger);
 					}
@@ -1458,11 +1460,11 @@ public class Menu {
 				} else if (StringUtils.containsValue(triggers, "DISABLE")) {
 					triggers.remove("DISABLE");
 				}
-				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+				File fileFolder =  new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 				dataFile.set(triggerString, triggers.toString().replace("[", "").replace("]", "")); 	
-				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-				ConfigHandler.getConfig().softReload();
+				ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+				ItemData.getInfo().softReload();
 				SchedulerUtils.runLater(2L, () -> triggerPane(player, stage));
 			}));
 			triggerPane.addButton(new Button(ItemHandler.getItem("STONE_SWORD", 1, StringUtils.containsValue(triggers, "FIRST-WORLD"), "&e&l&nFirst World", "&7", triggerOption, "&7player enters each of the defined", "&7worlds for the first time.", "&7", 
@@ -1479,11 +1481,11 @@ public class Menu {
 				} else if (StringUtils.containsValue(triggers, "DISABLE")) {
 					triggers.remove("DISABLE");
 				}
-				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+				File fileFolder =  new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 				dataFile.set(triggerString, triggers.toString().replace("[", "").replace("]", "")); 	
-				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-				ConfigHandler.getConfig().softReload();
+				ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+				ItemData.getInfo().softReload();
 				SchedulerUtils.runLater(2L, () -> triggerPane(player, stage));
 			}));
 			triggerPane.addButton(new Button(ItemHandler.getItem(ServerUtils.hasSpecificUpdate("1_13") ? "TOTEM_OF_UNDYING" : "322:1", 1, StringUtils.containsValue(triggers, "FIRST-LIFE"), "&e&l&nFirst Life", "&7", triggerOption, "&7player logs into the server", 
@@ -1500,11 +1502,11 @@ public class Menu {
 				} else if (StringUtils.containsValue(triggers, "DISABLE")) {
 					triggers.remove("DISABLE");
 				}
-				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+				File fileFolder =  new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 				dataFile.set(triggerString, triggers.toString().replace("[", "").replace("]", "")); 	
-				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-				ConfigHandler.getConfig().softReload();
+				ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+				ItemData.getInfo().softReload();
 				SchedulerUtils.runLater(2L, () -> triggerPane(player, stage));
 			}));
 			triggerPane.addButton(new Button(fillerPaneBItem), 3);
@@ -1526,11 +1528,11 @@ public class Menu {
 					triggers.remove("REGION-ACCESS");
 					triggers.remove("REGION-ENGRESS");
 				} 
-				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+				File fileFolder =  new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 				dataFile.set(triggerString, triggers.toString().replace("[", "").replace("]", "")); 	
-				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-				ConfigHandler.getConfig().softReload();
+				ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+				ItemData.getInfo().softReload();
 				SchedulerUtils.runLater(2L, () -> triggerPane(player, stage));
 			}));
 			triggerPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "OAK_SIGN" : "323"), 1, StringUtils.containsValue(triggers, "JOIN"), "&e&l&nJoin", "&7", triggerOption, "&7player logs into the server.", 
@@ -1547,11 +1549,11 @@ public class Menu {
 				} else if (StringUtils.containsValue(triggers, "DISABLE")) {
 					triggers.remove("DISABLE");
 				}
-				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+				File fileFolder =  new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 				dataFile.set(triggerString, triggers.toString().replace("[", "").replace("]", "")); 	
-				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-				ConfigHandler.getConfig().softReload();
+				ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+				ItemData.getInfo().softReload();
 				SchedulerUtils.runLater(2L, () -> triggerPane(player, stage));
 			}));
 			triggerPane.addButton(new Button(ItemHandler.getItem("DIAMOND", 1, StringUtils.containsValue(triggers, "RESPAWN"), "&e&l&nRespawn", "&7", triggerOption, "&7player respawns from a death event.", "&9&lENABLED: &a" + 
@@ -1568,11 +1570,11 @@ public class Menu {
 				} else if (StringUtils.containsValue(triggers, "DISABLE")) {
 					triggers.remove("DISABLE");
 				}
-				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+				File fileFolder =  new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 				dataFile.set(triggerString, triggers.toString().replace("[", "").replace("]", "")); 	
-				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-				ConfigHandler.getConfig().softReload();
+				ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+				ItemData.getInfo().softReload();
 				SchedulerUtils.runLater(2L, () -> triggerPane(player, stage));
 			}));
 			triggerPane.addButton(new Button(ItemHandler.getItem("STONE_BUTTON", 1, StringUtils.containsValue(triggers, "WORLD-SWITCH"), "&e&l&nWorld Switch", "&7", triggerOption, "&7player teleports to one", "&7of the specified worlds.", 
@@ -1589,11 +1591,11 @@ public class Menu {
 				} else if (StringUtils.containsValue(triggers, "DISABLE")) {
 					triggers.remove("DISABLE");
 				}
-				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+				File fileFolder =  new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 				dataFile.set(triggerString, triggers.toString().replace("[", "").replace("]", "")); 	
-				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-				ConfigHandler.getConfig().softReload();
+				ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+				ItemData.getInfo().softReload();
 				SchedulerUtils.runLater(2L, () -> triggerPane(player, stage));
 			}));
 			triggerPane.addButton(new Button(ItemHandler.getItem("LEVER", 1, StringUtils.containsValue(triggers, "GAMEMODE-SWITCH"), "&e&l&nGamemode Switch", "&7", triggerOption, "&7player changes gamemodes to any", "&7of the defined limit-modes.", 
@@ -1610,11 +1612,11 @@ public class Menu {
 				} else if (StringUtils.containsValue(triggers, "DISABLE")) {
 					triggers.remove("DISABLE");
 				}
-				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+				File fileFolder =  new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 				dataFile.set(triggerString, triggers.toString().replace("[", "").replace("]", "")); 	
-				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-				ConfigHandler.getConfig().softReload();
+				ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+				ItemData.getInfo().softReload();
 				SchedulerUtils.runLater(2L, () -> triggerPane(player, stage));
 			}));
 			triggerPane.addButton(new Button(ItemHandler.getItem("MINECART", 1, StringUtils.containsValue(triggers, "REGION-ENTER"), "&e&l&nRegion Enter", "&7", triggerOption, "&7player enters any of the enabled-regions.", "&9&lENABLED: &a" +
@@ -1633,11 +1635,11 @@ public class Menu {
 				} else if (StringUtils.containsValue(triggers, "DISABLE")) {
 					triggers.remove("DISABLE");
 				}
-				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+				File fileFolder =  new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 				dataFile.set(triggerString, triggers.toString().replace("[", "").replace("]", "")); 	
-				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-				ConfigHandler.getConfig().softReload();
+				ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+				ItemData.getInfo().softReload();
 				SchedulerUtils.runLater(2L, () -> triggerPane(player, stage));
 			}));
 			triggerPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "HOPPER_MINECRAFT" : "408"), 1, StringUtils.containsValue(triggers, "REGION-LEAVE"), "&e&l&nRegion Leave", "&7", triggerOption.replace("Gives", "Removes"), "&7player leaves any of the enabled-regions.", "&9&lENABLED: &a" +
@@ -1656,11 +1658,11 @@ public class Menu {
 				} else if (StringUtils.containsValue(triggers, "DISABLE")) {
 					triggers.remove("DISABLE");
 				}
-				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+				File fileFolder =  new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 				dataFile.set(triggerString, triggers.toString().replace("[", "").replace("]", "")); 	
-				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-				ConfigHandler.getConfig().softReload();
+				ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+				ItemData.getInfo().softReload();
 				SchedulerUtils.runLater(2L, () -> triggerPane(player, stage));
 			}));
 			triggerPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "TNT_MINECART" : "407"), 1, StringUtils.containsValue(triggers, "REGION-ACCESS"), "&e&l&nRegion Access", "&7", triggerOption, "&7player enters any of the enabled-regions", "&7and removes the item when leaving", "&7any of the enabled-regions.", "&9&lENABLED: &a" +
@@ -1679,11 +1681,11 @@ public class Menu {
 				} else if (StringUtils.containsValue(triggers, "DISABLE")) {
 					triggers.remove("DISABLE");
 				}
-				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+				File fileFolder =  new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 				dataFile.set(triggerString, triggers.toString().replace("[", "").replace("]", "")); 	
-				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-				ConfigHandler.getConfig().softReload();
+				ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+				ItemData.getInfo().softReload();
 				SchedulerUtils.runLater(2L, () -> triggerPane(player, stage));
 			}));
 			triggerPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CHEST_MINECART" : "342"), 1, StringUtils.containsValue(triggers, "REGION-ENGRESS"), "&e&l&nRegion Engress", "&7", triggerOption.replace("Gives", "Removes"), "&7player enters any of the enabled-regions", "&7and gives the item when leaving", "&7any of the enabled-regions.", "&9&lENABLED: &a" +
@@ -1702,11 +1704,11 @@ public class Menu {
 				} else if (StringUtils.containsValue(triggers, "DISABLE")) {
 					triggers.remove("DISABLE");
 				}
-				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+				File fileFolder =  new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 				dataFile.set(triggerString, triggers.toString().replace("[", "").replace("]", "")); 	
-				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-				ConfigHandler.getConfig().softReload();
+				ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+				ItemData.getInfo().softReload();
 				SchedulerUtils.runLater(2L, () -> triggerPane(player, stage));
 			}));
 			if (stage == 4) {
@@ -1730,10 +1732,10 @@ public class Menu {
     * @param player - The Player to have the Pane opened.
     */
 	private static void preventPane(final Player player) {
-		Interface preventPane = new Interface(false, 3, GUIName, player);
+		Interface preventPane = new Interface(false, 3, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			List<String> bypassList = new ArrayList<String>();
-			for (String bypass: ConfigHandler.getConfig().getFile("config.yml").getString("Prevent.Bypass").replace(" ", "").split(",")) {
+			for (String bypass: ItemJoin.getCore().getConfig("config.yml").getString("Prevent.Bypass").replace(" ", "").split(",")) {
 				if (bypass != null && !bypass.isEmpty()) {
 					bypassList.add(bypass);
 				}
@@ -1755,11 +1757,11 @@ public class Menu {
 						} else if (StringUtils.containsValue(bypassList, "DISABLE")) {
 							bypassList.remove("DISABLE");
 						}
-						File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+						File fileFolder = new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 						dataFile.set("Prevent.Bypass", bypassList.toString().replace("[", "").replace("]", "")); 	
-						ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-						ConfigHandler.getConfig().softReload();
+						ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+						ItemData.getInfo().softReload();
 						SchedulerUtils.runLater(2L, () -> preventPane(player));
 					}));
 			preventPane.addButton(new Button(fillerPaneBItem));
@@ -1779,43 +1781,43 @@ public class Menu {
 						} else if (StringUtils.containsValue(bypassList, "DISABLE")) {
 							bypassList.remove("DISABLE");
 						}
-						File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+						File fileFolder = new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 						dataFile.set("Prevent.Bypass", bypassList.toString().replace("[", "").replace("]", "")); 	
-						ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-						ConfigHandler.getConfig().softReload();
+						ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+						ItemData.getInfo().softReload();
 						SchedulerUtils.runLater(2L, () -> preventPane(player));
 					}));
 			preventPane.addButton(new Button(fillerPaneBItem), 3);
 			preventPane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, false, 
 					"&c&l&nPrevent Chat", "&7", "&7*Prevent players from being able", "&7to send chat messages.", "&7", "&7Useful if you are using BungeeChat.", 
-					"&9&lENABLED: &a" + (((ConfigHandler.getConfig().getFile("config.yml").getString("Prevent.Chat") != null &&
-					!StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Prevent.Chat"), "DISABLE")) ? 
-					ConfigHandler.getConfig().getFile("config.yml").getString("Prevent.Chat") : "FALSE")).toUpperCase()), 
+					"&9&lENABLED: &a" + (((ItemJoin.getCore().getConfig("config.yml").getString("Prevent.Chat") != null &&
+					!StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Prevent.Chat"), "DISABLE")) ? 
+					ItemJoin.getCore().getConfig("config.yml").getString("Prevent.Chat") : "FALSE")).toUpperCase()), 
 					event -> worldPane(player, "Prevent.Chat")));
 			preventPane.addButton(new Button(fillerPaneBItem));
 			preventPane.addButton(new Button(ItemHandler.getItem("CHEST", 1, false, 
 					"&c&l&nPrevent Pickups", "&7", "&7*Prevent players from picking up", "&7ANY items, not just custom items.", 
-					"&9&lENABLED: &a" + ((!StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Prevent.Pickups"), "DISABLE") ? 
-					ConfigHandler.getConfig().getFile("config.yml").getString("Prevent.Pickups") : "FALSE")).toUpperCase()), 
+					"&9&lENABLED: &a" + ((!StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Prevent.Pickups"), "DISABLE") ? 
+					ItemJoin.getCore().getConfig("config.yml").getString("Prevent.Pickups") : "FALSE")).toUpperCase()), 
 					event -> worldPane(player, "Prevent.Pickups")));
 			preventPane.addButton(new Button(fillerPaneBItem));
 			preventPane.addButton(new Button(ItemHandler.getItem("BEDROCK", 1, false, 
 					"&c&l&nPrevent Movement", "&7", "&7*Prevent players from moving", "&7ANY items around in their", "&7inventory, not just custom items.", 
-					"&9&lENABLED: &a" + ((!StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Prevent.itemMovement"), "DISABLE") ? 
-					ConfigHandler.getConfig().getFile("config.yml").getString("Prevent.itemMovement") : "FALSE")).toUpperCase()), 
+					"&9&lENABLED: &a" + ((!StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Prevent.itemMovement"), "DISABLE") ? 
+					ItemJoin.getCore().getConfig("config.yml").getString("Prevent.itemMovement") : "FALSE")).toUpperCase()), 
 					event -> worldPane(player, "Prevent.itemMovement")));
 			preventPane.addButton(new Button(fillerPaneBItem));
 			preventPane.addButton(new Button(ItemHandler.getItem("HOPPER", 1, false, 
 					"&c&l&nPrevent Drops", "&7", "&7*Prevent players from dropping", "&7ANY items, not just custom items.", 
-					"&9&lENABLED: &a" + ((!StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Prevent.Self-Drops"), "DISABLE") ? 
-					ConfigHandler.getConfig().getFile("config.yml").getString("Prevent.Self-Drops") : "FALSE")).toUpperCase()), 
+					"&9&lENABLED: &a" + ((!StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Prevent.Self-Drops"), "DISABLE") ? 
+					ItemJoin.getCore().getConfig("config.yml").getString("Prevent.Self-Drops") : "FALSE")).toUpperCase()), 
 					event -> worldPane(player, "Prevent.Self-Drops")));
 			preventPane.addButton(new Button(fillerPaneBItem));
 			preventPane.addButton(new Button(ItemHandler.getItem("BONE", 1, false, 
 					"&c&l&nPrevent Death Drops", "&7", "&7*Prevent players from dropping", "&7ANY items on death, not just custom items.", 
-					"&9&lENABLED: &a" + ((!StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Prevent.Death-Drops"), "DISABLE") ? 
-					ConfigHandler.getConfig().getFile("config.yml").getString("Prevent.Death-Drops") : "FALSE")).toUpperCase()), 
+					"&9&lENABLED: &a" + ((!StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Prevent.Death-Drops"), "DISABLE") ? 
+					ItemJoin.getCore().getConfig("config.yml").getString("Prevent.Death-Drops") : "FALSE")).toUpperCase()), 
 					event -> worldPane(player, "Prevent.Death-Drops")));
 			preventPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item settings menu."), event -> itemSettings(player)));
 			preventPane.addButton(new Button(fillerPaneBItem), 7);
@@ -1830,88 +1832,88 @@ public class Menu {
     * @param player - The Player to have the Pane opened.
     */
 	private static void clearPane(final Player player) {
-		Interface clearPane = new Interface(false, 3, GUIName, player);
+		Interface clearPane = new Interface(false, 3, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			clearPane.addButton(new Button(fillerPaneBItem), 3);
-			clearPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GRASS_BLOCK" : "2"), 1, ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("ALL"), 
+			clearPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GRASS_BLOCK" : "2"), 1, ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("ALL"), 
 					"&bType: &a&lALL", "&7", "&7*ALL items including other plugin(s)", "&7and vanilla items should be cleared", "&7upon performing a trigger.", 
-					"&9&lENABLED: &a" + (ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("ALL") + "").toUpperCase()), 
+					"&9&lENABLED: &a" + (ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("ALL") + "").toUpperCase()), 
 					event -> {
-						if (!ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("ALL")) {
-							File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+						if (!ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("ALL")) {
+							File fileFolder = new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 							FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 							dataFile.set("Clear-Items.Type", "ALL"); 	
-							ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-							ConfigHandler.getConfig().softReload();
+							ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+							ItemData.getInfo().softReload();
 							SchedulerUtils.runLater(2L, () -> clearPane(player));
 						}
 					}));
-			clearPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "DANDELION" : "37"), 1, ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("VANILLA"), 
+			clearPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "DANDELION" : "37"), 1, ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("VANILLA"), 
 					"&bType: &a&lVANILLA", "&7", "&7*Only Vanilla items", "&7NOT (Custom ItemJoin item)", "&7should be cleared upon", "&7performing a trigger.", 
-					"&9&lENABLED: &a" + (ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("VANILLA") + "").toUpperCase()), 
+					"&9&lENABLED: &a" + (ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("VANILLA") + "").toUpperCase()), 
 					event -> {
-						if (!ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("VANILLA")) {
-							File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+						if (!ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("VANILLA")) {
+							File fileFolder = new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 							FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 							dataFile.set("Clear-Items.Type", "VANILLA"); 	
-							ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-							ConfigHandler.getConfig().softReload();
+							ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+							ItemData.getInfo().softReload();
 							SchedulerUtils.runLater(2L, () -> clearPane(player));
 						}
 					}));
-			clearPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "PISTON" : "33"), 1, ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("ITEMJOIN"), 
+			clearPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "PISTON" : "33"), 1, ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("ITEMJOIN"), 
 					"&bType: &a&lITEMJOIN", "&7", "&7*Only ItemJoin (custom items)", "&7should be cleared upon", "&7performing a trigger.", 
-					"&9&lENABLED: &a" + (ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("ITEMJOIN") + "").toUpperCase()), 
+					"&9&lENABLED: &a" + (ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("ITEMJOIN") + "").toUpperCase()), 
 					event -> {
-						if (!ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("ITEMJOIN")) {
-							File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+						if (!ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Type").equalsIgnoreCase("ITEMJOIN")) {
+							File fileFolder = new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 							FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 							dataFile.set("Clear-Items.Type", "ITEMJOIN"); 	
-							ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-							ConfigHandler.getConfig().softReload();
+							ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+							ItemData.getInfo().softReload();
 							SchedulerUtils.runLater(2L, () -> clearPane(player));
 						}
 					}));
 			clearPane.addButton(new Button(fillerPaneBItem), 3);
 			clearPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "OAK_SIGN" : "323"), 1, false, 
 					"&c&l&nJoin", "&7", "&7*Clears the items from the", "&7player upon joining the server.", 
-					"&9&lENABLED: &a" + ((!StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Join"), "DISABLE") ? 
-					ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Join") : "FALSE")).toUpperCase()), 
+					"&9&lENABLED: &a" + ((!StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Join"), "DISABLE") ? 
+					ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Join") : "FALSE")).toUpperCase()), 
 					event -> worldPane(player, "Clear-Items.Join")));
 			clearPane.addButton(new Button(ItemHandler.getItem("LAVA_BUCKET", 1, false, 
 					"&c&l&nQuit", "&7", "&7*Clears the items from the", "&7player upon quiting the server.", 
-					"&9&lENABLED: &a" + ((!StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Quit"), "DISABLE") ? 
-					ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Quit") : "FALSE")).toUpperCase()), 
+					"&9&lENABLED: &a" + ((!StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Quit"), "DISABLE") ? 
+					ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Quit") : "FALSE")).toUpperCase()), 
 					event -> worldPane(player, "Clear-Items.Quit")));
 			clearPane.addButton(new Button(fillerPaneBItem));
 			clearPane.addButton(new Button(ItemHandler.getItem("STONE_BUTTON", 1, false, 
 					"&c&l&nWorld-Switch", "&7", "&7*Clears the items from the", "&7player upon changing worlds.", 
-					"&9&lENABLED: &a" + ((!StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.World-Switch"), "DISABLE") ? 
-					ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.World-Switch") : "FALSE")).toUpperCase()), 
+					"&9&lENABLED: &a" + ((!StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.World-Switch"), "DISABLE") ? 
+					ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.World-Switch") : "FALSE")).toUpperCase()), 
 					event -> worldPane(player, "Clear-Items.World-Switch")));
 			clearPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CLOCK" : "342"), 1, false, 
 					"&b&lClear Delay", "&7", "&7*The number of second(s)", "&7to wait before clearing", "&7items from the player inventory.", 
-					"&9&lDelay: &a" + (ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Delay-Tick") + "").toUpperCase()), 
+					"&9&lDelay: &a" + (ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Delay-Tick") + "").toUpperCase()), 
 					event -> numberPane(player, 3)));
 			clearPane.addButton(new Button(ItemHandler.getItem("MINECART", 1, false, 
 					"&c&l&nRegion-Enter", "&7", "&7*Clears the items from the", "&7player upon entering", "&7a WorldGuard region.", 
-					(DependAPI.getDepends(false).getGuard().guardEnabled() ? "&9&lENABLED: &a" + ((!StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Region-Enter"), "DISABLE") ? 
-					ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Region-Enter") : "FALSE")).toUpperCase() : ""), (DependAPI.getDepends(false).getGuard().guardEnabled() ? "" : "&7"), 
-					(DependAPI.getDepends(false).getGuard().guardEnabled() ? "" : "&c&lERROR: &7WorldGuard was NOT found."), (DependAPI.getDepends(false).getGuard().guardEnabled() ? "" : "&7This button will do nothing...")), 
+					(ItemJoin.getCore().getDependencies().getGuard().guardEnabled() ? "&9&lENABLED: &a" + ((!StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Region-Enter"), "DISABLE") ? 
+					ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Region-Enter") : "FALSE")).toUpperCase() : ""), (ItemJoin.getCore().getDependencies().getGuard().guardEnabled() ? "" : "&7"), 
+					(ItemJoin.getCore().getDependencies().getGuard().guardEnabled() ? "" : "&c&lERROR: &7WorldGuard was NOT found."), (ItemJoin.getCore().getDependencies().getGuard().guardEnabled() ? "" : "&7This button will do nothing...")), 
 					event -> {
-						if (DependAPI.getDepends(false).getGuard().guardEnabled()) {
+						if (ItemJoin.getCore().getDependencies().getGuard().guardEnabled()) {
 							worldPane(player, "Clear-Items.Region-Enter");
 						}
 					}));
 			clearPane.addButton(new Button(fillerPaneBItem));
 			clearPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "COMMAND_BLOCK" : "137"), 1, false, 
 					"&b&lOptions", "&7", "&7*Actions to apply to", "&7the clear items triggers", "&7such as OP bypass.", 
-					"&9&lENABLED: &a" + ((!StringUtils.containsIgnoreCase(ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Options"), "DISABLE") ? 
-					ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Options") : "FALSE")).toUpperCase()), 
+					"&9&lENABLED: &a" + ((!StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Options"), "DISABLE") ? 
+					ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Options") : "FALSE")).toUpperCase()), 
 					event -> optionPane(player)));
 			clearPane.addButton(new Button(ItemHandler.getItem("CHEST", 1, false, 
 					"&b&lBlackList", "&7", "&7*Materials, Slots, or Item Names", "&7to be blacklisted from being", "&7cleared upon performing a trigger.", 
-					"&9&lENABLED: &a" + (!ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Blacklist").isEmpty() + "").toUpperCase()), 
+					"&9&lENABLED: &a" + (!ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Blacklist").isEmpty() + "").toUpperCase()), 
 					event -> blacklistPane(player)));
 			clearPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item settings menu."), event -> itemSettings(player)));
 			clearPane.addButton(new Button(fillerPaneBItem), 7);
@@ -1926,9 +1928,9 @@ public class Menu {
     * @param player - The Player to have the Pane opened.
     */
 	private static void blacklistPane(final Player player) {
-		Interface blacklistPane = new Interface(false, 2, GUIName, player);
+		Interface blacklistPane = new Interface(false, 2, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
-			String[] blacklist = ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Blacklist").split(",");
+			String[] blacklist = ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Blacklist").split(",");
 			List<String> materials = new ArrayList<String>();
 			List<String> slots = new ArrayList<String>();
 			List<String> names = new ArrayList<String>();
@@ -1974,10 +1976,10 @@ public class Menu {
     * @param player - The Player to have the Pane opened.
     */
 	private static void blacklistMatPane(final Player player) {
-		Interface materialPane = new Interface(true, 6, GUIName, player);
+		Interface materialPane = new Interface(true, 6, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			materialPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the blacklist menu."), event -> blacklistPane(player)));
-			String[] blacklist = ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Blacklist").split(",");
+			String[] blacklist = ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Blacklist").split(",");
 			List<String> materials = new ArrayList<String>();
 			List<String> saveList = new ArrayList<String>();
 			try {
@@ -1995,11 +1997,11 @@ public class Menu {
 			} catch (Exception e) { }
 			materialPane.addButton(new Button(ItemHandler.getItem("STICK", 1, true, "&b&lBukkit Material", "&7", "&7*If you know the name", "&7of the BUKKIT material type", "&7simply click and type it."), event -> {
 				player.closeInventory();
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "BUKKIT MATERIAL";
 				placeHolders[15] = "IRON_SWORD";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				if (ItemHandler.getMaterial(ChatColor.stripColor(event.getMessage()), null) != null) {
 					if (!StringUtils.containsValue(materials, ChatColor.stripColor(event.getMessage()))) {
@@ -2010,19 +2012,19 @@ public class Menu {
 					for (String mat : materials) {
 						saveList.add("{id:" + mat + "}");
 					}
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "BUKKIT MATERIAL";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
-					File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
+					File fileFolder =  new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 					dataFile.set("Clear-Items.Blacklist", StringUtils.replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
-					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-					ConfigHandler.getConfig().softReload();
+					ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+					ItemData.getInfo().softReload();
 					SchedulerUtils.runLater(2L, () -> blacklistMatPane(player));
 				} else {
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = ChatColor.stripColor(event.getMessage());
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.noMaterial", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noMaterial", player, placeHolders);
 					blacklistMatPane(player);
 				}
 			}));
@@ -2039,11 +2041,11 @@ public class Menu {
 						for (String mat : materials) {
 							saveList.add("{id:" + mat + "}");
 						}
-						File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+						File fileFolder =  new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 						dataFile.set("Clear-Items.Blacklist", StringUtils.replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
-						ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-						ConfigHandler.getConfig().softReload();
+						ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+						ItemData.getInfo().softReload();
 						SchedulerUtils.runLater(2L, () -> blacklistMatPane(player));
 					}));
 				}
@@ -2059,11 +2061,11 @@ public class Menu {
     * @param player - The Player to have the Pane opened.
     */
 	private static void blacklistSlotPane(final Player player) {
-		Interface slotPane = new Interface(true, 6, GUIName, player);
-		Interface craftingPane = new Interface(false, 4, GUIName, player);
+		Interface slotPane = new Interface(true, 6, exitButton, GUIName, player);
+		Interface craftingPane = new Interface(false, 4, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			slotPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the blacklist menu."), event -> blacklistPane(player)));
-			String[] blacklist = ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Blacklist").split(",");
+			String[] blacklist = ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Blacklist").split(",");
 			List<String> slots = new ArrayList<String>();
 			List<String> saveList = new ArrayList<String>();
 			try {
@@ -2090,11 +2092,11 @@ public class Menu {
 				for (String slot : slots) {
 					saveList.add("{slot:" + slot + "}");
 				}
-				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+				File fileFolder =  new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 				dataFile.set("Clear-Items.Blacklist", StringUtils.replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
-				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-				ConfigHandler.getConfig().softReload();
+				ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+				ItemData.getInfo().softReload();
 				SchedulerUtils.runLater(2L, () -> blacklistSlotPane(player));
 			}));
 			craftingPane.addButton(new Button(fillerPaneGItem));
@@ -2108,11 +2110,11 @@ public class Menu {
 				for (String slot : slots) {
 					saveList.add("{slot:" + slot + "}");
 				}
-				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+				File fileFolder =  new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 				dataFile.set("Clear-Items.Blacklist", StringUtils.replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
-				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-				ConfigHandler.getConfig().softReload();
+				ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+				ItemData.getInfo().softReload();
 				SchedulerUtils.runLater(2L, () -> blacklistSlotPane(player));
 			}));
 			craftingPane.addButton(new Button(fillerPaneGItem), 10);
@@ -2126,11 +2128,11 @@ public class Menu {
 				for (String slot : slots) {
 					saveList.add("{slot:" + slot + "}");
 				}
-				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+				File fileFolder =  new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 				dataFile.set("Clear-Items.Blacklist", StringUtils.replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
-				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-				ConfigHandler.getConfig().softReload();
+				ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+				ItemData.getInfo().softReload();
 				SchedulerUtils.runLater(2L, () -> blacklistSlotPane(player));
 			}));
 			craftingPane.addButton(new Button(fillerPaneGItem), 4);
@@ -2144,11 +2146,11 @@ public class Menu {
 				for (String slot : slots) {
 					saveList.add("{slot:" + slot + "}");
 				}
-				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+				File fileFolder =  new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 				dataFile.set("Clear-Items.Blacklist", StringUtils.replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
-				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-				ConfigHandler.getConfig().softReload();
+				ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+				ItemData.getInfo().softReload();
 				SchedulerUtils.runLater(2L, () -> blacklistSlotPane(player));
 			}));
 			craftingPane.addButton(new Button(fillerPaneGItem));
@@ -2162,11 +2164,11 @@ public class Menu {
 				for (String slot : slots) {
 					saveList.add("{slot:" + slot + "}");
 				}
-				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+				File fileFolder =  new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 				dataFile.set("Clear-Items.Blacklist", StringUtils.replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
-				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-				ConfigHandler.getConfig().softReload();
+				ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+				ItemData.getInfo().softReload();
 				SchedulerUtils.runLater(2L, () -> blacklistSlotPane(player));
 			}));
 			craftingPane.addButton(new Button(fillerPaneGItem), 3);
@@ -2186,11 +2188,11 @@ public class Menu {
 				for (String slot : slots) {
 					saveList.add("{slot:" + slot + "}");
 				}
-				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+				File fileFolder =  new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 				dataFile.set("Clear-Items.Blacklist", StringUtils.replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
-				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-				ConfigHandler.getConfig().softReload();
+				ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+				ItemData.getInfo().softReload();
 				SchedulerUtils.runLater(2L, () -> blacklistSlotPane(player));
 			}));
 			slotPane.addButton(new Button(ItemHandler.getItem("LEATHER_CHESTPLATE", 1, StringUtils.containsValue(slots, "CHESTPLATE"), "&9&lSlot: &a&lCHESTPLATE", "&7", "&7*Click to prevent this slot", "&7from having its items cleared.",
@@ -2203,11 +2205,11 @@ public class Menu {
 				for (String slot : slots) {
 					saveList.add("{slot:" + slot + "}");
 				}
-				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+				File fileFolder =  new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 				dataFile.set("Clear-Items.Blacklist", StringUtils.replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
-				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-				ConfigHandler.getConfig().softReload();
+				ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+				ItemData.getInfo().softReload();
 				SchedulerUtils.runLater(2L, () -> blacklistSlotPane(player));
 			}));
 			slotPane.addButton(new Button(ItemHandler.getItem("LEATHER_LEGGINGS", 1, StringUtils.containsValue(slots, "LEGGINGS"), "&9&lSlot: &a&lLEGGINGS", "&7", "&7*Click to prevent this slot", "&7from having its items cleared.",
@@ -2220,11 +2222,11 @@ public class Menu {
 				for (String slot : slots) {
 					saveList.add("{slot:" + slot + "}");
 				}
-				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+				File fileFolder =  new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 				dataFile.set("Clear-Items.Blacklist", StringUtils.replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
-				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-				ConfigHandler.getConfig().softReload();
+				ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+				ItemData.getInfo().softReload();
 				SchedulerUtils.runLater(2L, () -> blacklistSlotPane(player));
 			}));
 			slotPane.addButton(new Button(ItemHandler.getItem("LEATHER_BOOTS", 1, StringUtils.containsValue(slots, "BOOTS"), "&9&lSlot: &a&lBOOTS", "&7", "&7*Click to prevent this slot", "&7from having its items cleared.", 
@@ -2237,11 +2239,11 @@ public class Menu {
 				for (String slot : slots) {
 					saveList.add("{slot:" + slot + "}");
 				}
-				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+				File fileFolder =  new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 				dataFile.set("Clear-Items.Blacklist", StringUtils.replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
-				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-				ConfigHandler.getConfig().softReload();
+				ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+				ItemData.getInfo().softReload();
 				SchedulerUtils.runLater(2L, () -> blacklistSlotPane(player));
 			}));
 			if (ServerUtils.hasSpecificUpdate("1_9")) {
@@ -2255,11 +2257,11 @@ public class Menu {
 					for (String slot : slots) {
 						saveList.add("{slot:" + slot + "}");
 					}
-					File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+					File fileFolder =  new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 					dataFile.set("Clear-Items.Blacklist", StringUtils.replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
-					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-					ConfigHandler.getConfig().softReload();
+					ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+					ItemData.getInfo().softReload();
 					SchedulerUtils.runLater(2L, () -> blacklistSlotPane(player));
 				}));
 			} else {
@@ -2278,11 +2280,11 @@ public class Menu {
 					for (String slotS : slots) {
 						saveList.add("{slot:" + slotS + "}");
 					}
-					File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+					File fileFolder =  new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 					dataFile.set("Clear-Items.Blacklist", StringUtils.replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
-					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-					ConfigHandler.getConfig().softReload();
+					ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+					ItemData.getInfo().softReload();
 					SchedulerUtils.runLater(2L, () -> blacklistSlotPane(player));
 				}));
 			}
@@ -2302,11 +2304,11 @@ public class Menu {
 					for (String slotS : slots) {
 						saveList.add("{slot:" + slotS + "}");
 					}
-					File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+					File fileFolder =  new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 					dataFile.set("Clear-Items.Blacklist", StringUtils.replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
-					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-					ConfigHandler.getConfig().softReload();
+					ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+					ItemData.getInfo().softReload();
 					SchedulerUtils.runLater(2L, () -> blacklistSlotPane(player));
 				}));
 			}
@@ -2323,10 +2325,10 @@ public class Menu {
     * @param player - The Player to have the Pane opened.
     */
 	private static void blacklistNamePane(final Player player) {
-		Interface namePane = new Interface(true, 2, GUIName, player);
+		Interface namePane = new Interface(true, 2, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			namePane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the blacklist menu."), event -> blacklistPane(player)));
-			String[] blacklist = ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Blacklist").split(",");
+			String[] blacklist = ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Blacklist").split(",");
 			List<String> names = new ArrayList<String>();
 			List<String> saveList = new ArrayList<String>();
 			try {
@@ -2345,11 +2347,11 @@ public class Menu {
 			namePane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, true, "&b&lAdd Name", "&7", "&7*Add an items display", "&7name to be blacklisted", "&7simply click and type it.", "&7", 
 				"&c&l&nNOTE:&7 Do NOT include any", "&7color codes as these are excluded."), event -> {
 				player.closeInventory();
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "ITEM NAME";
 				placeHolders[15] = "Ultra Item";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				if (!StringUtils.containsValue(names, ChatColor.stripColor(event.getMessage()))) {
 					names.add(ChatColor.stripColor(event.getMessage()));
@@ -2359,14 +2361,14 @@ public class Menu {
 				for (String name : names) {
 					saveList.add("{name:" + name + "}");
 				}
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "ITEM NAME";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
-				File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
+				File fileFolder =  new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 				FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 				dataFile.set("Clear-Items.Blacklist", StringUtils.replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
-				ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-				ConfigHandler.getConfig().softReload();
+				ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+				ItemData.getInfo().softReload();
 				SchedulerUtils.runLater(2L, () -> blacklistNamePane(player));
 			}));
 			for (String itemName : names) {
@@ -2376,11 +2378,11 @@ public class Menu {
 					for (String name : names) {
 						saveList.add("{name:" + name + "}");
 					}
-					File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+					File fileFolder =  new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 					dataFile.set("Clear-Items.Blacklist", StringUtils.replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", "")); 	
-					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-					ConfigHandler.getConfig().softReload();
+					ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+					ItemData.getInfo().softReload();
 					SchedulerUtils.runLater(2L, () -> blacklistNamePane(player));
 				}));
 			}
@@ -2394,9 +2396,9 @@ public class Menu {
     * @param player - The Player to have the Pane opened.
     */
 	private static void optionPane(final Player player) {
-		Interface optionPane = new Interface(false, 2, GUIName, player);
+		Interface optionPane = new Interface(false, 2, exitButton, GUIName, player);
 		List<String> optionList = new ArrayList<String>();
-		for (String option: ConfigHandler.getConfig().getFile("config.yml").getString("Clear-Items.Options").replace(" ", "").split(",")) {
+		for (String option: ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Options").replace(" ", "").split(",")) {
 			if (option != null && !option.isEmpty()) {
 				optionList.add(option);
 			}
@@ -2418,11 +2420,11 @@ public class Menu {
 						} else if (StringUtils.containsValue(optionList, "DISABLE")) {
 							optionList.remove("DISABLE");
 						}
-						File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+						File fileFolder = new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 						dataFile.set("Clear-Items.Options", optionList.toString().replace("[", "").replace("]", "")); 	
-						ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-						ConfigHandler.getConfig().softReload();
+						ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+						ItemData.getInfo().softReload();
 						SchedulerUtils.runLater(2L, () -> optionPane(player));
 					}));
 			optionPane.addButton(new Button(fillerPaneBItem));
@@ -2442,11 +2444,11 @@ public class Menu {
 						} else if (StringUtils.containsValue(optionList, "DISABLE")) {
 							optionList.remove("DISABLE");
 						}
-						File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+						File fileFolder = new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 						dataFile.set("Clear-Items.Options", optionList.toString().replace("[", "").replace("]", "")); 	
-						ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-						ConfigHandler.getConfig().softReload();
+						ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+						ItemData.getInfo().softReload();
 						SchedulerUtils.runLater(2L, () -> optionPane(player));
 					}));
 			optionPane.addButton(new Button(fillerPaneBItem));
@@ -2466,20 +2468,20 @@ public class Menu {
 						} else if (StringUtils.containsValue(optionList, "DISABLE")) {
 							optionList.remove("DISABLE");
 						}
-						File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+						File fileFolder = new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 						dataFile.set("Clear-Items.Options", optionList.toString().replace("[", "").replace("]", "")); 	
-						ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-						ConfigHandler.getConfig().softReload();
+						ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+						ItemData.getInfo().softReload();
 						SchedulerUtils.runLater(2L, () -> optionPane(player));
 					}));
 			optionPane.addButton(new Button(fillerPaneBItem));
-			optionPane.addButton(new Button(ItemHandler.getItem("GOLD_BLOCK", 1, (StringUtils.containsValue(optionList, "RETURN") && DependAPI.getDepends(false).getGuard().guardEnabled()), 
-					"&e&lReturn Regions", "&7*Returns the cleared player inventory", "&7when exiting a cleared region", "&7or entering a region which is", "&7not listed as clearable.", (DependAPI.getDepends(false).getGuard().guardEnabled() ? 
-					"&9&lENABLED: &a" + (StringUtils.containsValue(optionList, "RETURN") ? "true" : "false") : ""), (DependAPI.getDepends(false).getGuard().guardEnabled() ? "" : "&7"), 
-					(DependAPI.getDepends(false).getGuard().guardEnabled() ? "" : "&c&lERROR: &7WorldGuard was NOT found."), (DependAPI.getDepends(false).getGuard().guardEnabled() ? "" : "&7This button will do nothing...")), 
+			optionPane.addButton(new Button(ItemHandler.getItem("GOLD_BLOCK", 1, (StringUtils.containsValue(optionList, "RETURN") && ItemJoin.getCore().getDependencies().getGuard().guardEnabled()), 
+					"&e&lReturn Regions", "&7*Returns the cleared player inventory", "&7when exiting a cleared region", "&7or entering a region which is", "&7not listed as clearable.", (ItemJoin.getCore().getDependencies().getGuard().guardEnabled() ? 
+					"&9&lENABLED: &a" + (StringUtils.containsValue(optionList, "RETURN") ? "true" : "false") : ""), (ItemJoin.getCore().getDependencies().getGuard().guardEnabled() ? "" : "&7"), 
+					(ItemJoin.getCore().getDependencies().getGuard().guardEnabled() ? "" : "&c&lERROR: &7WorldGuard was NOT found."), (ItemJoin.getCore().getDependencies().getGuard().guardEnabled() ? "" : "&7This button will do nothing...")), 
 					event -> {
-						if (DependAPI.getDepends(false).getGuard().guardEnabled()) {
+						if (ItemJoin.getCore().getDependencies().getGuard().guardEnabled()) {
 							if (StringUtils.containsValue(optionList, "RETURN")) {
 								optionList.remove("RETURN");
 							} else {
@@ -2492,11 +2494,11 @@ public class Menu {
 							} else if (StringUtils.containsValue(optionList, "DISABLE")) {
 								optionList.remove("DISABLE");
 							}
-							File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+							File fileFolder = new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 							FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 							dataFile.set("Clear-Items.Options", optionList.toString().replace("[", "").replace("]", "")); 	
-							ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-							ConfigHandler.getConfig().softReload();
+							ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+							ItemData.getInfo().softReload();
 							SchedulerUtils.runLater(2L, () -> optionPane(player));
 						}
 					}));
@@ -2517,11 +2519,11 @@ public class Menu {
 						} else if (StringUtils.containsValue(optionList, "DISABLE")) {
 							optionList.remove("DISABLE");
 						}
-						File fileFolder = new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+						File fileFolder = new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 						dataFile.set("Clear-Items.Options", optionList.toString().replace("[", "").replace("]", "")); 	
-						ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-						ConfigHandler.getConfig().softReload();
+						ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+						ItemData.getInfo().softReload();
 						SchedulerUtils.runLater(2L, () -> optionPane(player));
 					}));
 			optionPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the clear settings."), event -> clearPane(player)));
@@ -2538,7 +2540,7 @@ public class Menu {
     * @param section - The world section type.
     */
 	private static void worldPane(final Player player, final String section) {
-		Interface preventPane = new Interface(true, 6, GUIName, player);
+		Interface preventPane = new Interface(true, 6, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			preventPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the prevent menu."), event -> { 
 				if (section.contains("Prevent")) {
@@ -2548,7 +2550,7 @@ public class Menu {
 				}
 			}));
 			List < String > enabledWorlds = new ArrayList < String > ();
-			String[] enabledParts = (ConfigHandler.getConfig().getFile("config.yml").getString(section) != null ? ConfigHandler.getConfig().getFile("config.yml").getString(section).replace(" ,  ", ",").replace(" , ", ",").replace(",  ", ",").replace(", ", ",").split(",") : new String[1]);
+			String[] enabledParts = (ItemJoin.getCore().getConfig("config.yml").getString(section) != null ? ItemJoin.getCore().getConfig("config.yml").getString(section).replace(" ,  ", ",").replace(" , ", ",").replace(",  ", ",").replace(", ", ",").split(",") : new String[1]);
 			for (String enabledWorld : enabledParts) {
 				if (enabledWorld != null && (enabledWorld.equalsIgnoreCase("ALL") || enabledWorld.equalsIgnoreCase("GLOBAL"))) {
 					enabledWorlds.add("ALL");
@@ -2560,18 +2562,18 @@ public class Menu {
 					}
 				}
 			}
-		    if (enabledWorlds.isEmpty() && ConfigHandler.getConfig().getFile("config.yml").getBoolean(section)) { enabledWorlds.add("ALL"); }
+		    if (enabledWorlds.isEmpty() && ItemJoin.getCore().getConfig("config.yml").getBoolean(section)) { enabledWorlds.add("ALL"); }
 			preventPane.addButton(new Button(ItemHandler.getItem("OBSIDIAN", 1, StringUtils.containsValue(enabledWorlds, "ALL"), "&a&l&nGLOBAL", "&7", "&7*Click to enable &lALL WORLDS.", 
 					"&9&lENABLED: &a" + (StringUtils.containsValue(enabledWorlds, "ALL") + "").toUpperCase()), event -> {
-					File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+					File fileFolder =  new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 					if (StringUtils.containsValue(enabledWorlds, "ALL")) {
 						dataFile.set(section, false); 
 					} else {
 						dataFile.set(section, true); 
 					}
-					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-					ConfigHandler.getConfig().softReload();
+					ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+					ItemData.getInfo().softReload();
 					SchedulerUtils.runLater(2L, () -> worldPane(player, section));
 			}));
 			for (World world: Bukkit.getServer().getWorlds()) {
@@ -2597,15 +2599,15 @@ public class Menu {
 					}
 					String worldList = "";
 					for (String worldName : enabledWorlds) { worldList += worldName + ", "; }
-					File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+					File fileFolder =  new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 					if (enabledWorlds.isEmpty()) {
 						dataFile.set(section, false); 
 					} else {
 						dataFile.set(section, worldList.substring(0, worldList.length() - 2)); 
 					}
-					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-					ConfigHandler.getConfig().softReload();
+					ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+					ItemData.getInfo().softReload();
 					SchedulerUtils.runLater(2L, () -> worldPane(player, section));
 				}));
 			}
@@ -2619,11 +2621,11 @@ public class Menu {
     * @param player - The Player to have the Pane opened.
     */
 	private static void overwritePane(final Player player) {
-		Interface overwritePane = new Interface(true, 6, GUIName, player);
+		Interface overwritePane = new Interface(true, 6, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			overwritePane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the configuration menu."), event -> itemSettings(player)));
 			List < String > enabledWorlds = new ArrayList < String > ();
-			String[] enabledParts = ConfigHandler.getConfig().getFile("items.yml").getString("items-Overwrite").replace(" ,  ", ",").replace(" , ", ",").replace(",  ", ",").replace(", ", ",").split(",");
+			String[] enabledParts = ItemJoin.getCore().getConfig("items.yml").getString("items-Overwrite").replace(" ,  ", ",").replace(" , ", ",").replace(",  ", ",").replace(", ", ",").split(",");
 			for (String enabledWorld : enabledParts) {
 				if (enabledWorld.equalsIgnoreCase("ALL") || enabledWorld.equalsIgnoreCase("GLOBAL")) {
 					enabledWorlds.add("ALL");
@@ -2635,18 +2637,18 @@ public class Menu {
 					}
 				}
 			}
-		    if (enabledWorlds.isEmpty() && ConfigHandler.getConfig().getFile("items.yml").getBoolean("items-Overwrite")) { enabledWorlds.add("ALL"); }
+		    if (enabledWorlds.isEmpty() && ItemJoin.getCore().getConfig("items.yml").getBoolean("items-Overwrite")) { enabledWorlds.add("ALL"); }
 			overwritePane.addButton(new Button(ItemHandler.getItem("OBSIDIAN", 1, StringUtils.containsValue(enabledWorlds, "ALL"), "&a&l&nGLOBAL", "&7", "&7*Click to enable item", "&7overwriting in &lALL WORLDS.", 
 					"&9&lENABLED: &a" + (StringUtils.containsValue(enabledWorlds, "ALL") + "").toUpperCase()), event -> {
-					File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "items.yml");
+					File fileFolder =  new File (ItemJoin.getCore().getPlugin().getDataFolder(), "items.yml");
 					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 					if (StringUtils.containsValue(enabledWorlds, "ALL")) {
 						dataFile.set("items-Overwrite", false); 
 					} else {
 						dataFile.set("items-Overwrite", true); 
 					}
-					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "items.yml");
-					ConfigHandler.getConfig().softReload();
+					ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "items.yml");
+					ItemData.getInfo().softReload();
 					SchedulerUtils.runLater(2L, () -> overwritePane(player));
 			}));
 			for (World world: Bukkit.getServer().getWorlds()) {
@@ -2672,15 +2674,15 @@ public class Menu {
 					}
 					String worldList = "";
 					for (String worldName : enabledWorlds) { worldList += worldName + ", "; }
-					File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "items.yml");
+					File fileFolder =  new File (ItemJoin.getCore().getPlugin().getDataFolder(), "items.yml");
 					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 					if (enabledWorlds.isEmpty()) {
 						dataFile.set("items-Overwrite", false); 
 					} else {
 						dataFile.set("items-Overwrite", worldList.substring(0, worldList.length() - 2)); 
 					}
-					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "items.yml");
-					ConfigHandler.getConfig().softReload();
+					ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "items.yml");
+					ItemData.getInfo().softReload();
 					SchedulerUtils.runLater(2L, () -> overwritePane(player));
 				}));
 			}
@@ -2718,7 +2720,7 @@ public class Menu {
     * @param stage - The stage of the modification.
     */
 	private static void materialPane(final Player player, final ItemMap itemMap, final int stage, final int position) {
-		Interface materialPane = new Interface(true, 6, GUIName, player);
+		Interface materialPane = new Interface(true, 6, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			if (stage != 0 && stage != 2 && stage != 3) {
 				materialPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> {
@@ -2735,15 +2737,15 @@ public class Menu {
 			}
 			materialPane.addButton(new Button(ItemHandler.getItem("STICK", 1, true, "&b&lBukkit Material", "&7", "&7*If you know the name", "&7of the BUKKIT material type", "&7simply click and type it."), event -> {
 				player.closeInventory();
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				if (stage == 2) {
 					placeHolders[16] = "ITEM COST";
 				} else {
 					placeHolders[16] = "BUKKIT MATERIAL";
 				}
 				placeHolders[15] = "IRON_SWORD";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				if (ItemHandler.getMaterial(ChatColor.stripColor(event.getMessage()), null) != null) {
 					if (stage == 2) {
@@ -2757,13 +2759,13 @@ public class Menu {
 							}	
 						}
 					}
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					if (stage == 2) {
 						placeHolders[16] = "ITEM COST";
 					} else {
 						placeHolders[16] = "BUKKIT MATERIAL";
 					}
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 					if (stage == 3) {
 						setIngredients(event.getPlayer(), itemMap, ItemHandler.getMaterial(ChatColor.stripColor(event.getMessage()), null).name(), position);
 					} else if (stage == 2) {
@@ -2772,9 +2774,9 @@ public class Menu {
 						creatingPane(event.getPlayer(), itemMap);
 					}
 				} else {
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = ChatColor.stripColor(event.getMessage());
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.noMaterial", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noMaterial", player, placeHolders);
 					materialPane(player, itemMap, stage, position);
 				}
 			}));
@@ -2836,7 +2838,7 @@ public class Menu {
     * @param stage - The stage in the modification.
     */
 	private static void switchPane(final Player player, final ItemMap itemMap, final int stage) {
-		Interface switchPane = new Interface(false, 1, GUIName, player);
+		Interface switchPane = new Interface(false, 1, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			if (stage == 0) {
 				switchPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you back to", "&7the material selection menu."), event -> materialPane(player, itemMap, 0, 0)));
@@ -2867,8 +2869,8 @@ public class Menu {
     * @param type - The type of slot being defined, single or multiple.
     */
 	private static void slotPane(final Player player, final ItemMap itemMap, final int stage, final int type) {
-		Interface slotPane = new Interface(false, 6, GUIName, player);
-		Interface craftingPane = new Interface(false, 4, GUIName, player);
+		Interface slotPane = new Interface(false, 6, exitButton, GUIName, player);
+		Interface craftingPane = new Interface(false, 4, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			craftingPane.addButton(new Button(fillerPaneGItem), 3);
 			craftingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CRAFTING_TABLE" : "58"), 1, (type > 0 ? StringUtils.containsValue(itemMap.getMultipleSlots(), "CRAFTING[1]") : false), "&9&lSlot: &7&lCRAFTING&a&l[1]", "&7", "&7*Click to set the custom item", 
@@ -3188,7 +3190,7 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void countPane(final Player player, final ItemMap itemMap) {
-		Interface countPane = new Interface(true, 6, GUIName, player);
+		Interface countPane = new Interface(true, 6, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			countPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> {
 				creatingPane(player, itemMap);
@@ -3211,7 +3213,7 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void dataPane(final Player player, final ItemMap itemMap) {
-		Interface dataPane = new Interface(false, 2, GUIName, player);
+		Interface dataPane = new Interface(false, 2, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			dataPane.addButton(new Button(fillerPaneBItem));
 			dataPane.addButton(new Button(ItemHandler.setDurability(ItemHandler.getItem("BOW", 1, false, "&b&lDamage", "&7", "&7*Set the damage of the item.", (itemMap.getMaterial().getMaxDurability() != 0 ? "&9&lDURABILITY: &a" + 
@@ -3263,28 +3265,28 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void durabilityDataPane(final Player player, final ItemMap itemMap) {
-		Interface texturePane = new Interface(true, 6, GUIName, player);
+		Interface texturePane = new Interface(true, 6, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			texturePane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> {
 				dataPane(player, itemMap);
 			}));
 			texturePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, "&e&lCustom Texture", "&7", "&7*Click to set a custom texture", "&7value for the item."), event -> {
 				player.closeInventory();
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "DURABILITY DATA";
 				placeHolders[15] = "1193";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				if (StringUtils.isInt(ChatColor.stripColor(event.getMessage()))) {
 					itemMap.setData(Integer.parseInt(ChatColor.stripColor(event.getMessage())));
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "DURABILITY DATA";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				} else {
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = ChatColor.stripColor(event.getMessage());
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.noInteger", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noInteger", player, placeHolders);
 				}
 				dataPane(event.getPlayer(), itemMap);
 			}));
@@ -3306,28 +3308,28 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void modelDataPane(final Player player, final ItemMap itemMap) {
-		Interface texturePane = new Interface(true, 6, GUIName, player);
+		Interface texturePane = new Interface(true, 6, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			texturePane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> {
 				dataPane(player, itemMap);
 			}));
 			texturePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, "&e&lCustom Model Data", "&7", "&7*Click to set the custom mode data", "&7value for the item."), event -> {
 				player.closeInventory();
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "MODEL DATA";
 				placeHolders[15] = "1193";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				if (StringUtils.isInt(ChatColor.stripColor(event.getMessage()))) {
 					itemMap.setModelData(Integer.parseInt(ChatColor.stripColor(event.getMessage())));
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "MODEL DATA";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				} else {
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = ChatColor.stripColor(event.getMessage());
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.noInteger", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noInteger", player, placeHolders);
 				}
 				dataPane(event.getPlayer(), itemMap);
 			}));
@@ -3349,28 +3351,28 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void damagePane(final Player player, final ItemMap itemMap) {
-		Interface damagePane = new Interface(true, 6, GUIName, player);
+		Interface damagePane = new Interface(true, 6, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			damagePane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> {
 				dataPane(player, itemMap);
 			}));
 			damagePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, "&e&lCustom Damage", "&7", "&7*Click to set a custom damage", "&7value for the item."), event -> {
 				player.closeInventory();
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "DAMAGE";
 				placeHolders[15] = "1893";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				if (StringUtils.isInt(ChatColor.stripColor(event.getMessage()))) {
 					itemMap.setDurability((short) Integer.parseInt(ChatColor.stripColor(event.getMessage())));
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "DAMAGE";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				} else {
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = ChatColor.stripColor(event.getMessage());
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.noInteger", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noInteger", player, placeHolders);
 				}
 				dataPane(event.getPlayer(), itemMap);
 			}));
@@ -3396,7 +3398,7 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void commandPane(final Player player, final ItemMap itemMap) {
-		Interface commandPane = new Interface(false, 3, GUIName, player);
+		Interface commandPane = new Interface(false, 3, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			commandPane.addButton(new Button(fillerPaneGItem), 4);
 			commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "WRITABLE_BOOK" : "386"), 1, false, "&e&lCommands", "&7", "&7*Click to define the custom command lines", "&7for the item and click type.", 
@@ -3454,14 +3456,14 @@ public class Menu {
 					commandPane(player, itemMap);
 				} else {
 					player.closeInventory();
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "COOLDOWN MESSAGE";
 					placeHolders[15] = "&cThis item is on cooldown for &a%timeleft% &cseconds..";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 				}
 			}, event -> {
-				itemMap.setCooldownMessage(ChatColor.stripColor(event.getMessage()));String[] placeHolders = LanguageAPI.getLang(false).newString();placeHolders[16] = "COOLDOWN MESSAGE";LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);commandPane(event.getPlayer(), itemMap);
+				itemMap.setCooldownMessage(ChatColor.stripColor(event.getMessage()));String[] placeHolders = ItemJoin.getCore().getLang().newString();placeHolders[16] = "COOLDOWN MESSAGE";ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);commandPane(event.getPlayer(), itemMap);
 			}));
 			commandPane.addButton(new Button(ItemHandler.getItem("JUKEBOX", 1, false, "&a&lSound", "&7", "&7*The sound that will be", "&7played after a successful", "&7command execution.", "&9&lCOMMANDS-SOUND: &a" + 
 			StringUtils.nullCheck(itemMap.getCommandSound() + ""), 
@@ -3507,7 +3509,7 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void actionPane(final Player player, final ItemMap itemMap) {
-		Interface clickPane = new Interface(false, 5, GUIName, player);
+		Interface clickPane = new Interface(false, 5, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			clickPane.addButton(new Button(fillerPaneGItem), 2);
 			clickPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "OAK_DOOR" : (ServerUtils.hasSpecificUpdate("1_8") ? "324" : "64")), 1, false, "&e&lInteract", "&7", "&7*Commands that will execute only", "&7when left and right clicking.", "&7", "&9&lCommands: &a" + 
@@ -3694,7 +3696,7 @@ public class Menu {
     * @param action - The action to be matched.
     */
 	private static void commandListPane(final Player player, final ItemMap itemMap, final Action action) {
-		Interface commandListPane = new Interface(true, 2, GUIName, player);
+		Interface commandListPane = new Interface(true, 2, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			commandListPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the click type menu."), event -> {
 				actionPane(player, itemMap);
@@ -3728,7 +3730,7 @@ public class Menu {
     * @param orderNumber - The current number that dictates the ItemCommands "place in line".
     */
 	private static void orderPane(final Player player, final ItemMap itemMap, final Action action, final ItemCommand command, final int orderNumber) {
-		Interface orderPane = new Interface(true, 2, GUIName, player);
+		Interface orderPane = new Interface(true, 2, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			orderPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the command modify menu."), event -> {
 				modifyCommandsPane(player, itemMap, action, command, orderNumber);
@@ -3772,7 +3774,7 @@ public class Menu {
     * @param orderNumber - The current number that dictates the ItemCommands "place in line".
     */
 	private static void modifyCommandsPane(final Player player, final ItemMap itemMap, final Action action, final ItemCommand command, final int orderNumber) {
-		Interface modPane = new Interface(false, 3, GUIName, player);
+		Interface modPane = new Interface(false, 3, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			modPane.addButton(new Button(fillerPaneGItem), 4);
 			modPane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, true, "&f" + command.getRawCommand(), "&7", "&7*You are modifying this command.", "&9&lOrder Number: &a" + orderNumber)));
@@ -3792,11 +3794,11 @@ public class Menu {
 							modifyCommandsPane(player, itemMap, action, command, orderNumber);
 						} else {
 							player.closeInventory();
-							String[] placeHolders = LanguageAPI.getLang(false).newString();
+							String[] placeHolders = ItemJoin.getCore().getLang().newString();
 							placeHolders[16] = "COMMAND IDENTIFIER";
 							placeHolders[15] = "winner";
-							LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-							LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+							ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+							ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 						}
 					}, event -> {
 						ItemCommand[] commands = itemMap.getCommands();
@@ -3806,19 +3808,19 @@ public class Menu {
 							}
 						}
 						itemMap.setCommands(commands);
-						String[] placeHolders = LanguageAPI.getLang(false).newString();
+						String[] placeHolders = ItemJoin.getCore().getLang().newString();
 						placeHolders[16] = "COMMAND IDENTIFIER";
-						LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+						ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 						commandListPane(event.getPlayer(), itemMap, action);
 					}));
 			modPane.addButton(new Button(fillerPaneGItem));
 			modPane.addButton(new Button(ItemHandler.getItem("PAPER", 1, false, "&fModify", "&7", "&7*Sets the command to", "&7another text entry."), event -> {
 				player.closeInventory();
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "MODIFIED COMMAND";
 				placeHolders[15] = "gamemode creative";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				ItemCommand[] commands = itemMap.getCommands();
 				for (ItemCommand Command: commands) {
@@ -3827,9 +3829,9 @@ public class Menu {
 					}
 				}
 				itemMap.setCommands(commands);
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "MODIFIED COMMAND";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				commandListPane(event.getPlayer(), itemMap, action);
 			}));
 			modPane.addButton(new Button(fillerPaneGItem));
@@ -3859,90 +3861,90 @@ public class Menu {
     * @param action - THe action to be matched,
     */
 	private static void executorPane(final Player player, final ItemMap itemMap, final Action action) {
-		Interface executorPane = new Interface(false, 2, GUIName, player);
+		Interface executorPane = new Interface(false, 2, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			executorPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GUNPOWDER" : "289"), 1, false, "&f")));
 			executorPane.addButton(new Button(ItemHandler.getItem("BOOK", 1, false, "&e&lPlayer", "&7", "&7*Executes the command", "&7as the player."), event -> {
 				player.closeInventory();
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "PLAYER COMMAND";placeHolders[15] = "spawn";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				modifyCommands(itemMap, ItemCommand.fromString("player: " + ChatColor.stripColor(event.getMessage()), action, itemMap, 0L, null), true);
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "PLAYER COMMAND";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				commandListPane(event.getPlayer(), itemMap, action);
 			}));
 			executorPane.addButton(new Button(ItemHandler.getItem("BOOK", 1, true, "&e&lOp", "&7", "&7*Executes the command as if the", "&7player has /op (admin permissions)."), event -> {
 				player.closeInventory();
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "OP COMMAND";
 				placeHolders[15] = "broadcast I am &cADMIN!";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				modifyCommands(itemMap, ItemCommand.fromString("op: " + ChatColor.stripColor(event.getMessage()), action, itemMap, 0L, null), true);
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "COMMAND LINE";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				commandListPane(event.getPlayer(), itemMap, action);
 			}));
 			executorPane.addButton(new Button(ItemHandler.getItem("EMERALD", 1, false, "&e&lConsole", "&7", "&7*Executes the command", "&7in the console window."), event -> {
 				player.closeInventory();
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "CONSOLE COMMAND";
 				placeHolders[15] = "gamemode creative %player%";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				modifyCommands(itemMap, ItemCommand.fromString("console: " + ChatColor.stripColor(event.getMessage()), action, itemMap, 0L, null), true);
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "OP COMMAND";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				commandListPane(event.getPlayer(), itemMap, action);
 			}));
 			executorPane.addButton(new Button(ItemHandler.getItem("HOPPER", 1, false, "&e&lServer", "&7", "&7*Switches the player to", "&7the defined server name.", "&7", "&7&lNote: &7This is the name", 
 					"&7defined in the BungeeCord config."), event -> {
 				player.closeInventory();
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "SERVER SWITCH";
 				placeHolders[15] = "survival";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				modifyCommands(itemMap, ItemCommand.fromString("server: " + ChatColor.stripColor(event.getMessage()), action, itemMap, 0L, null), true);
-				String[] placeHolders = LanguageAPI.getLang(false).newString();placeHolders[16] = "SERVER SWITCH";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();placeHolders[16] = "SERVER SWITCH";
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				commandListPane(event.getPlayer(), itemMap, action);
 			}));
 			executorPane.addButton(new Button(ItemHandler.getItem("OBSIDIAN", 1, false, "&e&lBungee", "&7", "&7*Executes a BungeeCord specific command."), event -> {
 				player.closeInventory();
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "BUNGEE COMMAND";
 				placeHolders[15] = "survival";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				modifyCommands(itemMap, ItemCommand.fromString("bungee: " + ChatColor.stripColor(event.getMessage()), action, itemMap, 0L, null), true);
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "BUNGEE COMMAND";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				commandListPane(event.getPlayer(), itemMap, action);
 			}));
 			executorPane.addButton(new Button(ItemHandler.getItem("PAPER", 1, false, "&e&lMessage", "&7", "&7*Sends the player a custom message."), event -> {
 				player.closeInventory();
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "MESSAGE";
 				placeHolders[15] = "&eWelcome to the Server!";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				modifyCommands(itemMap, ItemCommand.fromString("message: " + ChatColor.stripColor(event.getMessage()), action, itemMap, 0L, null), true);
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "MESSAGE";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				commandListPane(event.getPlayer(), itemMap, action);
 			}));
 			executorPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "REPEATER" : "356"), 1, false, "&e&lSwap-Item", "&7", "&7*Swaps the item to another defined item."), event -> swapPane(player, itemMap, action)));
@@ -3963,7 +3965,7 @@ public class Menu {
     * @param action - The action to be matched.
     */
 	private static void swapPane(final Player player, final ItemMap itemMap, final Action action) {
-		Interface swapPane = new Interface(true, 6, GUIName, player);
+		Interface swapPane = new Interface(true, 6, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			swapPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the executors menu."), event -> {
 				executorPane(player, itemMap, action);
@@ -3989,28 +3991,28 @@ public class Menu {
     * @param action - The action to be matched.
     */
 	private static void delayPane(final Player player, final ItemMap itemMap, final Action action) {
-		Interface delayPane = new Interface(true, 6, GUIName, player);
+		Interface delayPane = new Interface(true, 6, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			delayPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the executors menu."), event -> {
 				executorPane(player, itemMap, action);
 			}));
 			delayPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, "&e&lCustom Cooldown", "&7", "&7*Click to set a custom", "&7delay for the next command."), event -> {
 				player.closeInventory();
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "DELAY";
 				placeHolders[15] = "180";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				if (StringUtils.isInt(ChatColor.stripColor(event.getMessage()))) {
 					modifyCommands(itemMap, ItemCommand.fromString("delay: " + Integer.parseInt(ChatColor.stripColor(event.getMessage())), action, itemMap, Integer.parseInt(ChatColor.stripColor(event.getMessage())), null), true);
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "DELAY";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				} else {
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = ChatColor.stripColor(event.getMessage());
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.noInteger", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noInteger", player, placeHolders);
 				}
 				commandListPane(event.getPlayer(), itemMap, action);
 			}));
@@ -4033,28 +4035,28 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void cooldownPane(final Player player, final ItemMap itemMap) {
-		Interface cooldownPane = new Interface(true, 6, GUIName, player);
+		Interface cooldownPane = new Interface(true, 6, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			cooldownPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item commands menu."), event -> {
 				commandPane(player, itemMap);
 			}));
 			cooldownPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, "&e&lCustom Cooldown", "&7", "&7*Click to set a custom commands-cooldown", "&7value for the item."), event -> {
 				player.closeInventory();
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "COMMAND COOLDOWN";
 				placeHolders[15] = "180";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				if (StringUtils.isInt(ChatColor.stripColor(event.getMessage()))) {
 					itemMap.setCommandCooldown(Integer.parseInt(ChatColor.stripColor(event.getMessage())));
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "COMMAND COOLDOWN";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				} else {
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = ChatColor.stripColor(event.getMessage());
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.noInteger", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noInteger", player, placeHolders);
 				}
 				commandPane(event.getPlayer(), itemMap);
 			}));
@@ -4077,28 +4079,28 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void warmPane(final Player player, final ItemMap itemMap) {
-		Interface warmPane = new Interface(true, 6, GUIName, player);
+		Interface warmPane = new Interface(true, 6, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			warmPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item commands menu."), event -> {
 				commandPane(player, itemMap);
 			}));
 			warmPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, "&e&lCustom Warmup", "&7", "&7*Click to set a custom commands-warmup", "&7value for the item."), event -> {
 				player.closeInventory();
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "COMMAND WARMUP";
 				placeHolders[15] = "12";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				if (StringUtils.isInt(ChatColor.stripColor(event.getMessage()))) {
 					itemMap.setWarmDelay(Integer.parseInt(ChatColor.stripColor(event.getMessage())));
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "COMMAND WARMUP";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				} else {
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = ChatColor.stripColor(event.getMessage());
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.noInteger", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noInteger", player, placeHolders);
 				}
 				commandPane(event.getPlayer(), itemMap);
 			}));
@@ -4121,28 +4123,28 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void costPane(final Player player, final ItemMap itemMap) {
-		Interface costPane = new Interface(true, 6, GUIName, player);
+		Interface costPane = new Interface(true, 6, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			costPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item commands menu."), event -> {
 				commandPane(player, itemMap);
 			}));
 			costPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, "&e&lCustom Cost", "&7", "&7*Click to set a custom commands-cost", "&7value for the item."), event -> {
 				player.closeInventory();
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "COMMAND COST";
 				placeHolders[15] = "340";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				if (StringUtils.isInt(ChatColor.stripColor(event.getMessage()))) {
 					itemMap.setCommandCost(Integer.parseInt(ChatColor.stripColor(event.getMessage())));
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "COMMAND COST";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				} else {
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = ChatColor.stripColor(event.getMessage());
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.noInteger", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noInteger", player, placeHolders);
 				}
 				commandPane(event.getPlayer(), itemMap);
 			}));
@@ -4165,28 +4167,28 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void receivePane(final Player player, final ItemMap itemMap) {
-		Interface receivePane = new Interface(true, 6, GUIName, player);
+		Interface receivePane = new Interface(true, 6, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			receivePane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item commands menu."), event -> {
 				commandPane(player, itemMap);
 			}));
 			receivePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, "&e&lCustom Receive", "&7", "&7*Click to set a custom commands-receive", "&7value for the item."), event -> {
 				player.closeInventory();
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "COMMAND RECEIVE";
 				placeHolders[15] = "10";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				if (StringUtils.isInt(ChatColor.stripColor(event.getMessage()))) {
 					itemMap.setCommandReceive(Integer.parseInt(ChatColor.stripColor(event.getMessage())));
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "COMMAND RECEIVE";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				} else {
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = ChatColor.stripColor(event.getMessage());
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.noInteger", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noInteger", player, placeHolders);
 				}
 				commandPane(event.getPlayer(), itemMap);
 			}));
@@ -4209,18 +4211,18 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void sequencePane(final Player player, final ItemMap itemMap, final int stage) {
-		Interface sequencePane = new Interface(false, 2, GUIName, player);
+		Interface sequencePane = new Interface(false, 2, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			if (stage == 4) {
 				sequencePane.addButton(new Button(fillerPaneGItem));
 			} 
 			sequencePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CLOCK" : "347"), 1, false, "&a&lSequential", "&7", "&7*Executes the command lines", "&7in order from top to bottom."), event -> {
 				if (stage == 4) {
-					File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+					File fileFolder =  new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 					dataFile.set("Active-Commands.commands-sequence", "SEQUENTIAL"); 	
-					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-					ConfigHandler.getConfig().softReload();
+					ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+					ItemData.getInfo().softReload();
 					SchedulerUtils.runLater(2L, () -> activeCommands(player));
 				} else {
 					itemMap.setCommandSequence(CommandSequence.SEQUENTIAL);
@@ -4230,11 +4232,11 @@ public class Menu {
 			sequencePane.addButton(new Button(fillerPaneGItem));
 			sequencePane.addButton(new Button(ItemHandler.getItem("DIAMOND", 1, false, "&a&lRandom Single", "&7", "&7*Executes one of the command lines", "&7randomly with equal values."), event -> {
 				if (stage == 4) {
-					File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+					File fileFolder =  new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 					dataFile.set("Active-Commands.commands-sequence", "RANDOM_SINGLE"); 	
-					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-					ConfigHandler.getConfig().softReload();
+					ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+					ItemData.getInfo().softReload();
 					SchedulerUtils.runLater(2L, () -> activeCommands(player));
 				} else {
 					itemMap.setCommandSequence(CommandSequence.RANDOM_SINGLE);
@@ -4244,11 +4246,11 @@ public class Menu {
 			sequencePane.addButton(new Button(fillerPaneGItem));
 			sequencePane.addButton(new Button(ItemHandler.getItem("PAPER", 1, false, "&a&lRandom List", "&7", "&7*Randomly selects from a list", "&7of commands to execute."), event -> {
 				if (stage == 4) {
-					File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+					File fileFolder =  new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 					dataFile.set("Active-Commands.commands-sequence", "RANDOM_LIST"); 	
-					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-					ConfigHandler.getConfig().softReload();
+					ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+					ItemData.getInfo().softReload();
 					SchedulerUtils.runLater(2L, () -> activeCommands(player));
 				} else {
 					itemMap.setCommandSequence(CommandSequence.RANDOM_LIST);
@@ -4258,11 +4260,11 @@ public class Menu {
 			sequencePane.addButton(new Button(fillerPaneGItem));
 			sequencePane.addButton(new Button(ItemHandler.getItem("EMERALD", 1, false, "&a&lRandom", "&7", "&7*Executes each command line in a", "&7random order with equal values."), event -> {
 				if (stage == 4) {
-					File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+					File fileFolder =  new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 					dataFile.set("Active-Commands.commands-sequence", "RANDOM"); 	
-					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-					ConfigHandler.getConfig().softReload();
+					ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+					ItemData.getInfo().softReload();
 					SchedulerUtils.runLater(2L, () -> activeCommands(player));
 				} else {
 					itemMap.setCommandSequence(CommandSequence.RANDOM);
@@ -4299,7 +4301,7 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void soundPane(final Player player, final ItemMap itemMap, final int stage) {
-		Interface soundPane = new Interface(true, 6, GUIName, player);
+		Interface soundPane = new Interface(true, 6, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 				if (stage != 3) {
 					soundPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the teleport menu."), event -> teleportPane(player, itemMap, stage)));
@@ -4332,7 +4334,7 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void soundVolumePane(final Player player, final ItemMap itemMap, final int stage) {
-		Interface soundPane = new Interface(true, 6, GUIName, player);
+		Interface soundPane = new Interface(true, 6, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			if (stage != 3) {
 				soundPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the teleport menu."), event -> teleportPane(player, itemMap, stage)));
@@ -4341,11 +4343,11 @@ public class Menu {
 			}
 			soundPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, "&e&lCustom Volume", "&7", "&7*Click to set a custom sound volume value."), event -> {
 				player.closeInventory();
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "SOUND VOLUME";
 				placeHolders[15] = "1.4";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				if (StringUtils.isDouble(ChatColor.stripColor(event.getMessage()))) {
 					if (stage != 3) {
@@ -4354,13 +4356,13 @@ public class Menu {
 						itemMap.setCommandVolume(Double.parseDouble(ChatColor.stripColor(event.getMessage())));
 					}
 					soundPitchPane(player, itemMap, stage);
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "SOUND VOLUME";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				} else {
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = ChatColor.stripColor(event.getMessage());
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.noInteger", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noInteger", player, placeHolders);
 					soundVolumePane(event.getPlayer(), itemMap, stage);
 				}
 			}));
@@ -4387,7 +4389,7 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void soundPitchPane(final Player player, final ItemMap itemMap, final int stage) {
-		Interface soundPane = new Interface(true, 6, GUIName, player);
+		Interface soundPane = new Interface(true, 6, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			if (stage != 3) {
 				soundPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the teleport menu."), event -> teleportPane(player, itemMap, stage)));
@@ -4396,11 +4398,11 @@ public class Menu {
 			}
 			soundPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, "&e&lCustom Pitch", "&7", "&7*Click to set a custom sound pitch", "&7value for the command sound."), event -> {
 				player.closeInventory();
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "SOUND PITCH";
 				placeHolders[15] = "0.8";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				if (StringUtils.isDouble(ChatColor.stripColor(event.getMessage()))) {
 					if (stage != 3) {
@@ -4410,13 +4412,13 @@ public class Menu {
 						itemMap.setCommandPitch(Double.parseDouble(ChatColor.stripColor(event.getMessage())));
 						commandPane(player, itemMap);
 					}
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "SOUND PITCH";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				} else {
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = ChatColor.stripColor(event.getMessage());
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.noInteger", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noInteger", player, placeHolders);
 					soundPitchPane(event.getPlayer(), itemMap, stage);
 				}
 			}));
@@ -4444,7 +4446,7 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void particlePane(final Player player, final ItemMap itemMap, final int stage) {
-		Interface particlePane = new Interface(true, 6, GUIName, player);
+		Interface particlePane = new Interface(true, 6, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			if (stage != 3) {
 				particlePane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the teleport menu."), event -> {
@@ -4494,18 +4496,18 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void lifePane(final Player player, final ItemMap itemMap, final String particle, final int stage) {
-		Interface lifePane = new Interface(true, 6, GUIName, player);
+		Interface lifePane = new Interface(true, 6, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			lifePane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the particle menu."), event -> {
 				particlePane(player, itemMap, 3);
 			}));
 			lifePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, "&e&lCustom LifeTime", "&7", "&7*Click to set a lifetime (duration)", "&7value for particle effect."), event -> {
 				player.closeInventory();
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "PARTICLE LIFETIME";
 				placeHolders[15] = "170";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				if (StringUtils.isInt(ChatColor.stripColor(event.getMessage()))) {
 					if (stage == 0) {
@@ -4513,13 +4515,13 @@ public class Menu {
 					} else {
 						explosionPane(player, itemMap, particle, Integer.parseInt(ChatColor.stripColor(event.getMessage())));
 					}
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "PARTICLE LIFETIME";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				} else {
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = ChatColor.stripColor(event.getMessage());
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.noInteger", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noInteger", player, placeHolders);
 					particlePane(event.getPlayer(), itemMap, 3);
 				}
 			}));
@@ -4546,7 +4548,7 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void explosionPane(final Player player, final ItemMap itemMap, final String particle, final int lifetime) {
-		Interface patternPane = new Interface(true, 2, GUIName, player);
+		Interface patternPane = new Interface(true, 2, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			patternPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the particle menu."), event -> {
 				particlePane(player, itemMap, 3);
@@ -4567,7 +4569,7 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void colorParticlePane(final Player player, final ItemMap itemMap, final String particle, final int lifetime, final Type explosion, final DyeColor color1) {
-		Interface colorPane = new Interface(true, 6, GUIName, player);
+		Interface colorPane = new Interface(true, 6, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			colorPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the particle menu."), event -> {
 				particlePane(player, itemMap, 3);
@@ -4596,7 +4598,7 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void enchantPane(final Player player, final ItemMap itemMap) {
-		Interface enchantPane = new Interface(true, 6, GUIName, player);
+		Interface enchantPane = new Interface(true, 6, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			enchantPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> {
 				creatingPane(player, itemMap);
@@ -4631,30 +4633,30 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void enchantLevelPane(final Player player, final ItemMap itemMap, final Enchantment enchant) {
-		Interface enchantLevelPane = new Interface(true, 6, GUIName, player);
+		Interface enchantLevelPane = new Interface(true, 6, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			enchantLevelPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the enchant selection menu."), event -> {
 				enchantPane(player, itemMap);
 			}));
 			enchantLevelPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, "&e&lCustom Count", "&7", "&7*Click to set a custom damage", "&7value for the item."), event -> {
 				player.closeInventory();
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "ENCHANT LEVEL";
 				placeHolders[15] = "86";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				if (StringUtils.isInt(ChatColor.stripColor(event.getMessage()))) {
 					Map < String, Integer > enchantments = (itemMap.getEnchantments() != null) ? itemMap.getEnchantments() : new HashMap < String, Integer >();
 					enchantments.put(ItemHandler.getEnchantName(enchant).toUpperCase(), Integer.parseInt(ChatColor.stripColor(event.getMessage())));
 					itemMap.setEnchantments(enchantments);
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "ENCHANT LEVEL";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				} else {
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = ChatColor.stripColor(event.getMessage());
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.noInteger", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noInteger", player, placeHolders);
 				}
 				enchantPane(event.getPlayer(), itemMap);
 			}));
@@ -4680,7 +4682,7 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void flagPane(final Player player, final ItemMap itemMap) {
-		Interface flagPane = new Interface(true, 5, GUIName, player);
+		Interface flagPane = new Interface(true, 5, exitButton, GUIName, player);
 		flagPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> {
 			setItemFlags(itemMap);
 			creatingPane(player, itemMap);
@@ -5170,7 +5172,7 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void triggerPane(final Player player, final ItemMap itemMap) {
-		Interface triggerPane = new Interface(false, 3, GUIName, player);
+		Interface triggerPane = new Interface(false, 3, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			triggerPane.addButton(new Button(fillerPaneBItem), 3);
 			triggerPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "FILLED_MAP" : "MAP"), 1, itemMap.isOnlyFirstJoin(), "&e&l&nFirst Join", "&7", "&7*Gives the item when the", "&7player logs into the server", 
@@ -5344,7 +5346,7 @@ public class Menu {
     * @param stage - The type of selection Pane.
     */
 	private static void worldPane(final Player player, final ItemMap itemMap, final int stage) {
-		Interface worldPane = new Interface(true, 6, GUIName, player);
+		Interface worldPane = new Interface(true, 6, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			if (stage == 4) {
 				worldPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the active commands menu."), event -> {
@@ -5357,7 +5359,7 @@ public class Menu {
 			}
 			List < String > listWorlds = (stage == 4 ? new ArrayList<String>(): (stage == 0 ? itemMap.getDisabledWorlds() : itemMap.getEnabledWorlds()));
 			if (stage == 4) {
-				for (String world : ConfigHandler.getConfig().getFile("config.yml").getString("Active-Commands.enabled-worlds").replace(" ", "").split(",")) {
+				for (String world : ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.enabled-worlds").replace(" ", "").split(",")) {
 					listWorlds.add(world);
 				}
 			}
@@ -5371,11 +5373,11 @@ public class Menu {
 					listWorlds.add("GLOBAL");
 				}
 				if (stage == 4) {
-						File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+						File fileFolder =  new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 						dataFile.set("Active-Commands.enabled-worlds", (listWorlds.isEmpty() ? "DISABLED" : "GLOBAL")); 	
-						ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-						ConfigHandler.getConfig().softReload();
+						ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+						ItemData.getInfo().softReload();
 						SchedulerUtils.runLater(2L, () -> worldPane(player, itemMap, stage));
 				} else if (stage == 0) {
 					itemMap.setDisabledWorlds(listWorlds);
@@ -5413,11 +5415,11 @@ public class Menu {
 						if (!worldList.isEmpty()) {
 							worldList = worldList.substring(0, worldList.length() - 2);
 						}
-						File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+						File fileFolder =  new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 						dataFile.set("Active-Commands.enabled-worlds", worldList); 	
-						ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-						ConfigHandler.getConfig().softReload();
+						ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+						ItemData.getInfo().softReload();
 						SchedulerUtils.runLater(2L, () -> worldPane(player, itemMap, stage));
 					} else if (stage == 0) {
 						itemMap.setDisabledWorlds(listWorlds);
@@ -5440,7 +5442,7 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void regionPane(final Player player, final ItemMap itemMap) {
-		Interface regionPane = new Interface(true, 6, GUIName, player);
+		Interface regionPane = new Interface(true, 6, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			regionPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> {
 				creatingPane(player, itemMap);
@@ -5456,7 +5458,7 @@ public class Menu {
 				itemMap.setEnabledRegions(enabledRegions);regionPane(player, itemMap);
 			}));
 			for (final World world: Bukkit.getServer().getWorlds()) {
-				for (final String region: DependAPI.getDepends(false).getGuard().getRegions(world).keySet()) {
+				for (final String region: ItemJoin.getCore().getDependencies().getGuard().getRegions(world).keySet()) {
 					String regionMaterial = (ServerUtils.hasSpecificUpdate("1_13") ? "GRASS_BLOCK" : "2");
 					if (world.getEnvironment().equals(Environment.NETHER)) {
 						regionMaterial = "NETHERRACK";
@@ -5497,7 +5499,7 @@ public class Menu {
 		for (final World worldRemoval: Bukkit.getServer().getWorlds()) {
 			if (itemMap.containsWorld(worldRemoval.getName(), false)) {
 				boolean hasRegion = false;
-				for (final String regionExists: DependAPI.getDepends(false).getGuard().getRegions(worldRemoval).keySet()) {
+				for (final String regionExists: ItemJoin.getCore().getDependencies().getGuard().getRegions(worldRemoval).keySet()) {
 					if (itemMap.containsRegion(regionExists)) {
 						hasRegion = true;
 					}
@@ -5523,20 +5525,20 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void lorePane(final Player player, final ItemMap itemMap) {
-		Interface lorePane = new Interface(true, 2, GUIName, player);
+		Interface lorePane = new Interface(true, 2, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			lorePane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> creatingPane(player, itemMap)));
 			lorePane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, true, "&eNew Lore Line", "&7", "&7*Add a new lore line", "&7to the item lore."), event -> {
 				player.closeInventory();
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "LORE LINE";
 				placeHolders[15] = "&bThis is a new lore line.";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "LORE LINE";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				List<String> lore = new ArrayList<String>(); 
 				if (itemMap.getCustomLore() != null) {
 					lore = itemMap.getCustomLore(); 
@@ -5566,23 +5568,23 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void modifyLoreLinePane(final Player player, final ItemMap itemMap, final int position) {
-		Interface modifyLorePane = new Interface(false, 2, GUIName, player);
+		Interface modifyLorePane = new Interface(false, 2, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			modifyLorePane.addButton(new Button(fillerPaneGItem), 3);
 			modifyLorePane.addButton(new Button(ItemHandler.getItem("WRITABLE_BOOK", 1, false, "&e&l&nModify", "&7", "&7*Change the lore line.", "&9&lLore: &a" + itemMap.getCustomLore().get(position)), event -> {
 				player.closeInventory();
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "LORE LINE";
 				placeHolders[15] = "&bThis is a new lore line.";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				List <  String> lore = itemMap.getCustomLore();
 				lore.set(position, StringUtils.restoreColor(event.getMessage()));
 				itemMap.setCustomLore(lore);
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "LORE LINE";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				modifyLoreLinePane(event.getPlayer(), itemMap, position);
 			}));
 			modifyLorePane.addButton(new Button(fillerPaneGItem));
@@ -5612,7 +5614,7 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void animateMaterialPane(final Player player, final ItemMap itemMap) {
-		Interface animateMaterialPane = new Interface(true, 2, GUIName, player);
+		Interface animateMaterialPane = new Interface(true, 2, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			animateMaterialPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the animation menu."), event -> {
 				if (!itemMap.getDynamicMaterials().isEmpty()) {
@@ -5646,18 +5648,18 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void selectMaterialPane(final Player player, final ItemMap itemMap, final int position, final boolean isNew) {
-		Interface selectMaterialPane = new Interface(true, 6, GUIName, player);
+		Interface selectMaterialPane = new Interface(true, 6, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			selectMaterialPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the animated material menu."), event -> {
 				animateMaterialPane(player, itemMap);
 			}));
 			selectMaterialPane.addButton(new Button(ItemHandler.getItem("STICK", 1, true, "&b&lBukkit Material", "&7", "&7*If you know the name", "&7of the BUKKIT material type", "&7simply click and type it."), event -> {
 				player.closeInventory();
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "BUKKIT MATERIAL";
 				placeHolders[15] = "IRON_SWORD";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				if (ItemHandler.getMaterial(ChatColor.stripColor(event.getMessage()), null) != null) {
 					if (isNew) {
@@ -5668,13 +5670,13 @@ public class Menu {
 						itemMap.setDynamicMaterials(mats);
 						modifyMaterialPane(player, itemMap, position);
 					}
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "BUKKIT MATERIAL";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				} else {
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = ChatColor.stripColor(event.getMessage());
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.noMaterial", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noMaterial", player, placeHolders);
 					selectMaterialPane(player, itemMap, position, isNew);
 				}
 			}));
@@ -5726,21 +5728,21 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void durationMaterialPane(final Player player, final ItemMap itemMap, final int position, final boolean isNew, final String value) {
-		Interface durationPane = new Interface(true, 6, GUIName, player);
+		Interface durationPane = new Interface(true, 6, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			durationPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the animated menu."), event -> animateMaterialPane(player, itemMap)));
 			durationPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, "&e&lCustom Duration", "&7", "&7*Click to set a custom duration", "&7value for the animation."), event -> {
 				player.closeInventory();
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "ANIMATION DURATION";
 				placeHolders[15] = "110";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				if (StringUtils.isInt(ChatColor.stripColor(event.getMessage()))) {
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "ANIMATION DURATION";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 					List < String > mats = itemMap.getDynamicMaterials();
 					if (isNew) {
 						if (itemMap.getDynamicMaterials().isEmpty()) {
@@ -5757,9 +5759,9 @@ public class Menu {
 						modifyMaterialPane(player, itemMap, position);
 					}
 				} else {
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = ChatColor.stripColor(event.getMessage());
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.noInteger", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noInteger", player, placeHolders);
 					durationMaterialPane(player, itemMap, position, isNew, value);
 				}
 			}));
@@ -5795,7 +5797,7 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void modifyMaterialPane(final Player player, final ItemMap itemMap, final int position) {
-		Interface modifyMaterialPane = new Interface(false, 2, GUIName, player);
+		Interface modifyMaterialPane = new Interface(false, 2, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			modifyMaterialPane.addButton(new Button(fillerPaneGItem), 3);
 			modifyMaterialPane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, false, "&a&l&nMaterial", "&7", "&7*Change the animated material type.", "&9&lMaterial: &a" + ItemHandler.cutDelay(itemMap.getDynamicMaterials().get(position))),
@@ -5824,7 +5826,7 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void animatedNamePane(final Player player, final ItemMap itemMap) {
-		Interface animatedNamePane = new Interface(true, 2, GUIName, player);
+		Interface animatedNamePane = new Interface(true, 2, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			animatedNamePane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the animation menu."), event -> {
 				if (!itemMap.getDynamicNames().isEmpty()) {
@@ -5835,16 +5837,16 @@ public class Menu {
 			}));
 			animatedNamePane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, true, "&eNew Name Line", "&7", "&7*Add a new name line", "&7to be animated between."), event -> {
 				player.closeInventory();
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "NAME";
 				placeHolders[15] = "&bUltimate Sword";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				durationNamePane(player, itemMap, 0, true, StringUtils.restoreColor(event.getMessage()));
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "NAME";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 			}));
 			for (int i = 1; i <= itemMap.getDynamicNames().size(); i++) {
 				final int k = i;
@@ -5864,21 +5866,21 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void durationNamePane(final Player player, final ItemMap itemMap, final int position, final boolean isNew, final String value) {
-		Interface durationPane = new Interface(true, 6, GUIName, player);
+		Interface durationPane = new Interface(true, 6, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			durationPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the animated menu."), event -> animatedNamePane(player, itemMap)));
 			durationPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, "&e&lCustom Duration", "&7", "&7*Click to set a custom duration", "&7value for the animation."), event -> {
 				player.closeInventory();
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "ANIMATION DURATION";
 				placeHolders[15] = "110";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				if (StringUtils.isInt(ChatColor.stripColor(event.getMessage()))) {
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "ANIMATION DURATION";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 					List < String > names = itemMap.getDynamicNames();
 					if (isNew) {
 						if (itemMap.getDynamicNames().isEmpty() && itemMap.getCustomName() != null && !itemMap.getCustomName().isEmpty()) {
@@ -5895,9 +5897,9 @@ public class Menu {
 						modifyNamePane(player, itemMap, position);
 					}
 				} else {
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = ChatColor.stripColor(event.getMessage());
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.noInteger", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noInteger", player, placeHolders);
 					durationNamePane(player, itemMap, position, isNew, value);
 				}
 			}));
@@ -5933,23 +5935,23 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void modifyNamePane(final Player player, final ItemMap itemMap, final int position) {
-		Interface modifyNamePane = new Interface(false, 2, GUIName, player);
+		Interface modifyNamePane = new Interface(false, 2, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			modifyNamePane.addButton(new Button(fillerPaneGItem), 3);
 			modifyNamePane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, false, "&a&l&nName", "&7", "&7*Change the animated name line.", "&9&lName: &a" + ItemHandler.cutDelay(itemMap.getDynamicNames().get(position))), event -> {
 				player.closeInventory();
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "NAME";
 				placeHolders[15] = "&bUltimate Sword";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				List < String > names = itemMap.getDynamicNames();
 				names.set(position, "<delay:" + StringUtils.returnInteger(ItemHandler.getDelayFormat(names.get(position))) + ">" + StringUtils.restoreColor(event.getMessage()));
 				itemMap.setDynamicNames(names)
-				;String[] placeHolders = LanguageAPI.getLang(false).newString();
+				;String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "NAME";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				modifyNamePane(event.getPlayer(), itemMap, position);
 			}));
 			final Integer delay = StringUtils.returnInteger(ItemHandler.getDelayFormat(itemMap.getDynamicNames().get(position)));
@@ -5977,7 +5979,7 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void animatedLorePane(final Player player, final ItemMap itemMap) {
-		Interface animatedLorePane = new Interface(true, 2, GUIName, player);
+		Interface animatedLorePane = new Interface(true, 2, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			animatedLorePane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the animation menu."), event -> {
 				if (!itemMap.getDynamicLores().isEmpty()) {
@@ -5988,15 +5990,15 @@ public class Menu {
 			}));
 			animatedLorePane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, true, "&eNew Lore Line", "&7", "&7*Add a new lore line", "&7to be animated between."), event -> {
 				player.closeInventory();
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "ANIMATED LORE";
 				placeHolders[15] = "&bThis is line 1, &cThis is line 2, &6This is line 3";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "ANIMATED LORE";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				durationLorePane(event.getPlayer(), itemMap, 0, true, StringUtils.restoreColor(event.getMessage()));
 			}));
 			for (int i = 1; i <= itemMap.getDynamicLores().size(); i++) {
@@ -6017,21 +6019,21 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void durationLorePane(final Player player, final ItemMap itemMap, final int position, final boolean isNew, final String value) {
-		Interface durationPane = new Interface(true, 6, GUIName, player);
+		Interface durationPane = new Interface(true, 6, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			durationPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the animated menu."), event -> animatedLorePane(player, itemMap)));
 			durationPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, "&e&lCustom Duration", "&7", "&7*Click to set a custom duration", "&7value for the animation."), event -> {
 				player.closeInventory();
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "ANIMATION DURATION";
 				placeHolders[15] = "110";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				if (StringUtils.isInt(ChatColor.stripColor(event.getMessage()))) {
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "ANIMATION DURATION";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 					List < List < String >> lores = itemMap.getDynamicLores();
 					if (isNew) {
 						if (itemMap.getDynamicLores().isEmpty() && itemMap.getCustomLore() != null && !itemMap.getCustomLore().isEmpty()) {
@@ -6052,9 +6054,9 @@ public class Menu {
 						modifyLorePane(player, itemMap, position);
 					}
 				} else {
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = ChatColor.stripColor(event.getMessage());
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.noInteger", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noInteger", player, placeHolders);
 					durationLorePane(player, itemMap, position, isNew, value);
 				}
 			}));
@@ -6094,22 +6096,22 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void modifyLorePane(final Player player, final ItemMap itemMap, final int position) {
-		Interface modifyLorePane = new Interface(false, 2, GUIName, player);
+		Interface modifyLorePane = new Interface(false, 2, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			modifyLorePane.addButton(new Button(fillerPaneGItem), 3);
 			modifyLorePane.addButton(new Button(ItemHandler.getItem("WRITABLE_BOOK", 1, false, "&a&l&nLore", "&7", "&7*Change the animated lore line.", "&9&lLore: &a" + ItemHandler.cutDelay(itemMap.getDynamicLores().get(position))), event -> {
 				player.closeInventory();
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "ANIMATED LORE";
 				placeHolders[15] = "&bThis is line 1, &cThis is line 2, &6This is line 3";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				List < List < String >> lores = itemMap.getDynamicLores();
 				lores.set(position, StringUtils.split("<delay:" + StringUtils.returnInteger(ItemHandler.getDelayFormat(lores.get(position).get(0))) + ">" + StringUtils.restoreColor(event.getMessage())));
 				itemMap.setDynamicLores(lores);
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
-				placeHolders[16] = "ANIMATED LORE";LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
+				placeHolders[16] = "ANIMATED LORE";ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				modifyLorePane(event.getPlayer(), itemMap, position);
 			}));
 			final Integer delay = StringUtils.returnInteger(ItemHandler.getDelayFormat(itemMap.getDynamicLores().get(position).get(0)));
@@ -6137,7 +6139,7 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void animatedSkullPane(final Player player, final ItemMap itemMap, boolean owner) {
-		Interface animatedSkullPane = new Interface(true, 2, GUIName, player);
+		Interface animatedSkullPane = new Interface(true, 2, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			if (owner) {
 				animatedSkullPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the animation menu."), event -> {
@@ -6151,16 +6153,16 @@ public class Menu {
 				}));
 				animatedSkullPane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, true, "&eNew Skull Owner", "&7", "&7*Add a new skull owner", "&7to be animated between."), event -> {
 					player.closeInventory();
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "SKULL OWNER";
 					placeHolders[15] = "RockinChaos";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 				}, event -> {
 					durationSkullPane(player, itemMap, 0, true, ChatColor.stripColor(event.getMessage()), owner);
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "SKULL OWNER";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				}));
 				for (int i = 1; i <= itemMap.getDynamicOwners().size(); i++) {
 					final int k = i;
@@ -6180,16 +6182,16 @@ public class Menu {
 				}));
 				animatedSkullPane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, true, "&eNew Skull Texture", "&7", "&7*Add a new skull texture", "&7to be animated between."), event -> {
 					player.closeInventory();
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "SKULL TEXTURE";
 					placeHolders[15] = "eyJ0ZXh0dYMGQVlN2FjZmU3OSJ9fX0=";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 				}, event -> {
 					durationSkullPane(player, itemMap, 0, true, ChatColor.stripColor(event.getMessage()), owner);
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "SKULL TEXTURE";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				}));
 				for (int i = 1; i <= itemMap.getDynamicTextures().size(); i++) {
 					final int k = i;
@@ -6211,21 +6213,21 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void durationSkullPane(final Player player, final ItemMap itemMap, final int position, final boolean isNew, final String value, boolean owner) {
-		Interface durationPane = new Interface(true, 6, GUIName, player);
+		Interface durationPane = new Interface(true, 6, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			durationPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the animated menu."), event -> animatedSkullPane(player, itemMap, owner)));
 			durationPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, "&e&lCustom Duration", "&7", "&7*Click to set a custom duration", "&7value for the animation."), event -> {
 				player.closeInventory();
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "ANIMATION DURATION";
 				placeHolders[15] = "110";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				if (StringUtils.isInt(ChatColor.stripColor(event.getMessage()))) {
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "ANIMATION DURATION";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 					List < String > skulls = itemMap.getDynamicOwners();
 					if (!owner) {
 						skulls = itemMap.getDynamicTextures();
@@ -6251,9 +6253,9 @@ public class Menu {
 						modifySkullPane(player, itemMap, position, owner);
 					}
 				} else {
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = ChatColor.stripColor(event.getMessage());
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.noInteger", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noInteger", player, placeHolders);
 					durationSkullPane(player, itemMap, position, isNew, value, owner);
 				}
 			}));
@@ -6298,43 +6300,43 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void modifySkullPane(final Player player, final ItemMap itemMap, final int position, boolean owner) {
-		Interface modifySkullPane = new Interface(false, 2, GUIName, player);
+		Interface modifySkullPane = new Interface(false, 2, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			modifySkullPane.addButton(new Button(fillerPaneGItem), 3);
 			if (owner) {
 				modifySkullPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GOLDEN_HELMET" : "314"), 1, false, "&a&l&nSkull Owner", "&7", "&7*Change the animated skull owner.", "&9&lSkull Owner: &a" + 
 			ItemHandler.cutDelay(itemMap.getDynamicOwners().get(position))), event -> {
 					player.closeInventory();
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "SKULL OWNER";
 					placeHolders[15] = "RockinChaos";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 				}, event -> {
 					List < String > skulls = itemMap.getDynamicOwners();
 					skulls.set(position, "<delay:" + StringUtils.returnInteger(ItemHandler.getDelayFormat(skulls.get(position))) + ">" + ChatColor.stripColor(event.getMessage()));
 					itemMap.setDynamicOwners(skulls);
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "SKULL OWNER";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 					modifySkullPane(event.getPlayer(), itemMap, position, owner);
 				}));
 			} else {
 				modifySkullPane.addButton(new Button(ItemHandler.getItem("STRING", 1, false, "&a&l&nSkull Texture", "&7", "&7*Change the animated skull texture.", "&9&lSkull Texture: &a" + 
 			ItemHandler.cutDelay(itemMap.getDynamicTextures().get(position))), event -> {
 					player.closeInventory();
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "SKULL TEXTURE";
 					placeHolders[15] = "eyJ0ZXh0dYMGQVlN2FjZmU3OSJ9fX0=";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 				}, event -> {
 					List < String > skulls = itemMap.getDynamicTextures();
 					skulls.set(position, "<delay:" + StringUtils.returnInteger(ItemHandler.getDelayFormat(skulls.get(position))) + ">" + ChatColor.stripColor(event.getMessage()));
 					itemMap.setDynamicTextures(skulls);
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "SKULL TEXTURE";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 					modifySkullPane(event.getPlayer(), itemMap, position, owner);
 				}));
 			}
@@ -6371,7 +6373,7 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void animationPane(final Player player, final ItemMap itemMap) {
-		Interface animationPane = new Interface(false, 2, GUIName, player);
+		Interface animationPane = new Interface(false, 2, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			if (itemMap.getMaterial().toString().contains("PLAYER_HEAD") || itemMap.getMaterial().toString().contains("SKULL_ITEM")) {
 				animationPane.addButton(new Button(fillerPaneGItem), 2);
@@ -6411,7 +6413,7 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void limitPane(final Player player, final ItemMap itemMap) {
-		Interface limitPane = new Interface(false, 2, GUIName, player);
+		Interface limitPane = new Interface(false, 2, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			List < String > limitModes = new ArrayList < String > ();
 			if (StringUtils.containsIgnoreCase(itemMap.getLimitModes(), "ADVENTURE")) {
@@ -6467,7 +6469,7 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void probabilityPane(final Player player, final ItemMap itemMap) {
-		Interface probabilityPane = new Interface(true, 6, GUIName, player);
+		Interface probabilityPane = new Interface(true, 6, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			probabilityPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> {
 				creatingPane(player, itemMap);
@@ -6490,28 +6492,28 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void usePane(final Player player, final ItemMap itemMap) {
-		Interface usePane = new Interface(true, 6, GUIName, player);
+		Interface usePane = new Interface(true, 6, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			usePane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> {
 				creatingPane(player, itemMap);
 			}));
 			usePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, "&e&lCustom Usage", "&7", "&7*Click to set a custom usage cooldown", "&7value for the item."), event -> {
 				player.closeInventory();
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "USAGE COOLDOWN";
 				placeHolders[15] = "120";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				if (StringUtils.isInt(ChatColor.stripColor(event.getMessage()))) {
 					itemMap.setInteractCooldown(Integer.parseInt(ChatColor.stripColor(event.getMessage())));
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "USAGE COOLDOWN";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				} else {
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = ChatColor.stripColor(event.getMessage());
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.noInteger", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noInteger", player, placeHolders);
 				}
 				creatingPane(event.getPlayer(), itemMap);
 			}));
@@ -6534,7 +6536,7 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void dropsPane(final Player player, final ItemMap itemMap) {
-		Interface dropsPane = new Interface(false, 3, GUIName, player);
+		Interface dropsPane = new Interface(false, 3, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			String mobs = "";
 			String blocks = "";
@@ -6564,7 +6566,7 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void mobsPane(final Player player, final ItemMap itemMap) {
-		Interface dropsPane = new Interface(true, 6, GUIName, player);
+		Interface dropsPane = new Interface(true, 6, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			dropsPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the drop chances menu."), event -> dropsPane(player, itemMap)));
 			for (EntityType entity: EntityType.values()) {
@@ -6609,28 +6611,28 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void blocksPane(final Player player, final ItemMap itemMap) {
-		Interface blockPane = new Interface(true, 6, GUIName, player);
+		Interface blockPane = new Interface(true, 6, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			blockPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the drop chances menu."), event -> {
 				dropsPane(player, itemMap);
 			}));
 			blockPane.addButton(new Button(ItemHandler.getItem("STICK", 1, true, "&b&lBukkit Material", "&7", "&7*If you know the name", "&7of the BUKKIT material type", "&7simply click and type it."), event -> {
 				player.closeInventory();
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "BUKKIT MATERIAL";
 				placeHolders[15] = "IRON_SWORD";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				if (ItemHandler.getMaterial(ChatColor.stripColor(event.getMessage()), null) != null) {
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "BUKKIT MATERIAL";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 					chancePane(player, itemMap, null, ItemHandler.getMaterial(ChatColor.stripColor(event.getMessage()), null));
 				} else {
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = ChatColor.stripColor(event.getMessage());
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.noMaterial", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noMaterial", player, placeHolders);
 					blocksPane(player, itemMap);
 				}
 			}));
@@ -6721,7 +6723,7 @@ public class Menu {
     * @param entity - The Entity selected.
     */
 	private static void chancePane(final Player player, final ItemMap itemMap, final EntityType entity, final Material material) {
-		Interface chancePane = new Interface(true, 6, GUIName, player);
+		Interface chancePane = new Interface(true, 6, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			if (entity != null) {
 				chancePane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the mobs drop menu."), event -> {
@@ -6734,11 +6736,11 @@ public class Menu {
 			}
 			chancePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GRAY_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:7"), 1, false, "&e&lCustom Drop Chance", "&7", "&7*Click to set a custom drop chance", "&7value for the item."), event -> {
 				player.closeInventory();
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "DROP CHANCE";
 				placeHolders[15] = "0.001";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				if (StringUtils.isDouble(ChatColor.stripColor(event.getMessage()))) {
 					if (entity != null) { 
@@ -6750,13 +6752,13 @@ public class Menu {
 						blocksDrop.put(material, Double.parseDouble(ChatColor.stripColor(event.getMessage())));
 						itemMap.setBlocksDrop(blocksDrop);
 					}
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "DROP CHANCE";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				} else {
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = ChatColor.stripColor(event.getMessage());
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.noInteger", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noInteger", player, placeHolders);
 				}
 				if (entity != null) { mobsPane(event.getPlayer(), itemMap); }
 				else { blocksPane(event.getPlayer(), itemMap); }
@@ -6792,7 +6794,7 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void conditionsPane(final Player player, final ItemMap itemMap) {
-		Interface conditionsPane = new Interface(false, 2, GUIName, player);
+		Interface conditionsPane = new Interface(false, 2, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			conditionsPane.addButton(new Button(fillerPaneBItem), 3);
 			conditionsPane.addButton(new Button(ItemHandler.getItem("BOOK", 1, false, "&b&l&nCommand&b&l Conditions", "&7", "&7*Condition(s) that must be met", 
@@ -6818,7 +6820,7 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void commandActionPane(final Player player, final ItemMap itemMap) {
-		Interface commandPane = new Interface(false, 5, GUIName, player);
+		Interface commandPane = new Interface(false, 5, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			commandPane.addButton(new Button(fillerPaneGItem), 2);
 			commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "OAK_DOOR" : (ServerUtils.hasSpecificUpdate("1_8") ? "324" : "64")), 1, false, "&e&lInteract", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
@@ -6951,7 +6953,7 @@ public class Menu {
     * @param commandAction - The command action being referenced.
     */
 	private static void commandCPane(final Player player, final ItemMap itemMap, final Action commandAction) {
-		Interface conditionsPane = new Interface(true, 2, GUIName, player);
+		Interface conditionsPane = new Interface(true, 2, exitButton, GUIName, player);
 		conditionsPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the command actions menu."), event -> commandActionPane(player, itemMap)));
 		SchedulerUtils.runAsync(() -> {
 			final String commandIdent = commandAction.config().replace("-", " ").replace(".", "");
@@ -6965,16 +6967,16 @@ public class Menu {
 					commandCPane(player, itemMap, commandAction);
 				} else {
 					player.closeInventory();
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "COMMAND FAIL MESSAGE";
 					placeHolders[15] = "&cYou do not meet the conditions to execute this item command.";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 				}
 			}, event -> {
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "COMMAND FAIL MESSAGE";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				Map<String, String> messages = itemMap.getCommandMessages();
 				messages.put(commandAction.config(), ChatColor.stripColor(event.getMessage()));
 				itemMap.setCommandMessages(messages);
@@ -6984,15 +6986,15 @@ public class Menu {
 					"&7in order to execute the", "&7" + commandAction.config().replace("-", " ").replace(".", "") + " item commands."), 			
 			event -> {
 				player.closeInventory();
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "FIRST VALUE";
 				placeHolders[15] = "100";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "FIRST VALUE";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				addConditionPane(event.getPlayer(), itemMap, commandAction, commandAction.config(), ChatColor.stripColor(event.getMessage()));
 			}));
 			if (itemMap.getCommandConditions().get(commandAction.config()) != null) {
@@ -7020,7 +7022,7 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void disposableCPane(final Player player, final ItemMap itemMap) {
-		Interface conditionsPane = new Interface(true, 2, GUIName, player);
+		Interface conditionsPane = new Interface(true, 2, exitButton, GUIName, player);
 		conditionsPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item conditions menu."), event -> conditionsPane(player, itemMap)));
 		SchedulerUtils.runAsync(() -> {
 			conditionsPane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, (StringUtils.nullCheck(itemMap.getDisposableMessage()) != "NONE"), "&c&lDisposable Fail Message", "&7", "&7*An optional message to be", "&7sent when the player does not", "&7meet the disposable conditions.",
@@ -7031,31 +7033,31 @@ public class Menu {
 					disposableCPane(player, itemMap);
 				} else {
 					player.closeInventory();
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "DISPOSABLE FAIL MESSAGE";
 					placeHolders[15] = "&cYou do not meet the conditions to dispose of this item.";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 				}
 			}, event -> {
 				itemMap.setDisposableMessage(ChatColor.stripColor(event.getMessage()));
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "DISPOSABLE FAIL MESSAGE";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				disposableCPane(event.getPlayer(), itemMap);
 			}));
 			conditionsPane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, true, "&b&lAdd Condition", "&7", "&7*Condition(s) that must be met", "&7in order to dispose of the item."), 			
 			event -> {
 				player.closeInventory();
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "FIRST VALUE";
 				placeHolders[15] = "100";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "FIRST VALUE";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				addConditionPane(event.getPlayer(), itemMap, null, "disposable-conditions", ChatColor.stripColor(event.getMessage()));
 			}));
 			for (String condition: itemMap.getDisposableConditions()) {
@@ -7079,7 +7081,7 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void triggerCPane(final Player player, final ItemMap itemMap) {
-		Interface conditionsPane = new Interface(true, 2, GUIName, player);
+		Interface conditionsPane = new Interface(true, 2, exitButton, GUIName, player);
 		conditionsPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item conditions menu."), event -> conditionsPane(player, itemMap)));
 		SchedulerUtils.runAsync(() -> {
 			conditionsPane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, (StringUtils.nullCheck(itemMap.getTriggerMessage()) != "NONE"), "&c&lTrigger Fail Message", "&7", "&7*An optional message to be", "&7sent when the player does not", "&7meet the trigger conditions.",
@@ -7090,31 +7092,31 @@ public class Menu {
 					triggerCPane(player, itemMap);
 				} else {
 					player.closeInventory();
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "TRIGGER FAIL MESSAGE";
 					placeHolders[15] = "&cYou do not meet the conditions to receive this item.";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 				}
 			}, event -> {
 				itemMap.setTriggerMessage(ChatColor.stripColor(event.getMessage()));
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "TRIGGER FAIL MESSAGE";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				triggerCPane(event.getPlayer(), itemMap);
 			}));
 			conditionsPane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, true, "&b&lAdd Condition", "&7", "&7*Condition(s) that must be met", "&7in order to receive the item."), 			
 			event -> {
 				player.closeInventory();
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "FIRST VALUE";
 				placeHolders[15] = "100";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "FIRST VALUE";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				addConditionPane(event.getPlayer(), itemMap, null, "trigger-conditions", ChatColor.stripColor(event.getMessage()));
 			}));
 			for (String condition: itemMap.getTriggerConditions()) {
@@ -7139,21 +7141,21 @@ public class Menu {
     * @param condition - The condition currently being modified.
     */
 	private static void addConditionPane(final Player player, final ItemMap itemMap, final Action commandAction, final String condition1, final String value1) {
-		Interface conditionsPane = new Interface(false, 2, GUIName, player);
+		Interface conditionsPane = new Interface(false, 2, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			conditionsPane.addButton(new Button(fillerPaneBItem));
 			conditionsPane.addButton(new Button(ItemHandler.getItem("MINECART", 1, false, "&b&lEQUAL", "&7", "&7*The first value must be", "&7EQUAL to the second value", "&7for the condition to be met."),			
 			event -> {
 				player.closeInventory();
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "SECOND VALUE";
 				placeHolders[15] = "400";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "SECOND VALUE";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				List < String > conditions = (condition1.equalsIgnoreCase("disposable-conditions") ? itemMap.getDisposableConditions() : condition1.equalsIgnoreCase("trigger-conditions") ? itemMap.getTriggerConditions() : itemMap.getCommandConditions().get(condition1) != null ? itemMap.getCommandConditions().get(condition1) : new ArrayList < String > ());
 				conditions.add(value1 + ":" + "EQUAL" + ":" + ChatColor.stripColor(event.getMessage()));
 				if (condition1.equalsIgnoreCase("disposable-conditions")) {
@@ -7173,15 +7175,15 @@ public class Menu {
 			conditionsPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "OAK_FENCE" : "85"), 1, false, "&b&lNOTEQUAL", "&7", "&7*The first value must be", "&7NOTEQUAL to the second value", "&7for the condition to be met."), 
 			event -> {
 				player.closeInventory();
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "SECOND VALUE";
 				placeHolders[15] = "400";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "SECOND VALUE";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				List < String > conditions = (condition1.equalsIgnoreCase("disposable-conditions") ? itemMap.getDisposableConditions() : condition1.equalsIgnoreCase("trigger-conditions") ? itemMap.getTriggerConditions() : itemMap.getCommandConditions().get(condition1) != null ? itemMap.getCommandConditions().get(condition1) : new ArrayList < String > ());
 				conditions.add(value1 + ":" + "NOTEQUAL" + ":" + ChatColor.stripColor(event.getMessage()));
 				if (condition1.equalsIgnoreCase("disposable-conditions")) {
@@ -7201,15 +7203,15 @@ public class Menu {
 			conditionsPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "OAK_STAIRS" : "53"), 1, false, "&b&lOVER", "&7", "&7*The first value must be", "&7OVER the second value", "&7for the condition to be met.", "&7", "&c&l&nNOTE:&7 This only works if both", "&7values referenced are integers."), 
 			event -> {
 				player.closeInventory();
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "SECOND VALUE";
 				placeHolders[15] = "400";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "SECOND VALUE";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				List < String > conditions = (condition1.equalsIgnoreCase("disposable-conditions") ? itemMap.getDisposableConditions() : condition1.equalsIgnoreCase("trigger-conditions") ? itemMap.getTriggerConditions() : itemMap.getCommandConditions().get(condition1) != null ? itemMap.getCommandConditions().get(condition1) : new ArrayList < String > ());
 				conditions.add(value1 + ":" + "OVER" + ":" + ChatColor.stripColor(event.getMessage()));
 				if (condition1.equalsIgnoreCase("disposable-conditions")) {
@@ -7229,15 +7231,15 @@ public class Menu {
 			conditionsPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "OAK_BOAT" : "333"), 1, false, "&b&lUNDER", "&7", "&7*The first value must be", "&7UNDER to the second value", "&7for the condition to be met.", "&7", "&c&l&nNOTE:&7 This only works if both", "&7values referenced are integers."), 
 			event -> {
 				player.closeInventory();
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "SECOND VALUE";
 				placeHolders[15] = "400";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "SECOND VALUE";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				List < String > conditions = (condition1.equalsIgnoreCase("disposable-conditions") ? itemMap.getDisposableConditions() : condition1.equalsIgnoreCase("trigger-conditions") ? itemMap.getTriggerConditions() : itemMap.getCommandConditions().get(condition1) != null ? itemMap.getCommandConditions().get(condition1) : new ArrayList < String > ());
 				conditions.add(value1 + ":" + "UNDER" + ":" + ChatColor.stripColor(event.getMessage()));
 				if (condition1.equalsIgnoreCase("disposable-conditions")) {
@@ -7288,7 +7290,7 @@ public class Menu {
     * @param stage - The stage to be matched.
     */
 	private static void altCommandPane(final Player player, final ItemMap itemMap, final int stage) {
-		Interface commandListPane = new Interface(true, 2, GUIName, player);
+		Interface commandListPane = new Interface(true, 2, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			if (stage == 4) {
 				commandListPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the active commands menu."), event -> {
@@ -7301,32 +7303,32 @@ public class Menu {
 			}
 			commandListPane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, true, "&e&lNew Line", "&7", "&7*Add a new command to be executed."), event -> {
 				player.closeInventory();
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = (stage == 4 ? "ACTIVE COMMAND" : "TOGGLE COMMAND");
 				placeHolders[15] = (stage == 4 ? "gamemode creative %player%" : "pvp");
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				if (stage == 4) {
-					final List<String> commands = ConfigHandler.getConfig().getFile("config.yml").getStringList("Active-Commands.commands");
+					final List<String> commands = ItemJoin.getCore().getConfig("config.yml").getStringList("Active-Commands.commands");
 					commands.add(ChatColor.stripColor(event.getMessage()));
-					File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+					File fileFolder =  new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 					dataFile.set("Active-Commands.commands", commands); 	
-					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-					ConfigHandler.getConfig().softReload();
+					ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+					ItemData.getInfo().softReload();
 					SchedulerUtils.runLater(2L, () -> altCommandPane(player, itemMap, stage));
 				} else {
 					final List<String> toggleCommands = itemMap.getToggleCommands();
 					toggleCommands.add(ChatColor.stripColor(event.getMessage()));
 					itemMap.setToggleCommands(toggleCommands);
 				}
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = (stage == 4 ? "ACTIVE COMMAND" : "TOGGLE COMMAND");
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				altCommandPane(event.getPlayer(), itemMap, stage);
 			}));
-			final List<String> commandsList = (stage == 4 ? ConfigHandler.getConfig().getFile("config.yml").getStringList("Active-Commands.commands") : itemMap.getToggleCommands());
+			final List<String> commandsList = (stage == 4 ? ItemJoin.getCore().getConfig("config.yml").getStringList("Active-Commands.commands") : itemMap.getToggleCommands());
 			for (String command: commandsList) {
 				commandListPane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, false, "&f" + command, "&7", "&7*Click to &lmodify &7this command."), event -> {
 					modifyAltCommandsPane(player, itemMap, command, stage);
@@ -7346,28 +7348,28 @@ public class Menu {
     * @param stage - The stage to be matched.
     */
 	private static void modifyAltCommandsPane(final Player player, final ItemMap itemMap, final String command, final int stage) {
-		Interface modPane = new Interface(false, 3, GUIName, player);
+		Interface modPane = new Interface(false, 3, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			modPane.addButton(new Button(fillerPaneGItem), 4);
 			modPane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, true, "&f" + command, "&7", "&7*You are modifying this command.")));
 			modPane.addButton(new Button(fillerPaneGItem), 7);
 			modPane.addButton(new Button(ItemHandler.getItem("PAPER", 1, false, "&fModify", "&7", "&7*Sets the command to", "&7another text entry."), event -> {
 				player.closeInventory();
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = (stage == 4 ? "MODIFIED ACTIVE COMMAND" : "MODIFIED TOGGLE COMMAND");
 				placeHolders[15] = (stage == 4 ? "gamemode survival %player%" : "pvp on");
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				if (stage == 4) {
-					final List<String> commands = ConfigHandler.getConfig().getFile("config.yml").getStringList("Active-Commands.commands");
+					final List<String> commands = ItemJoin.getCore().getConfig("config.yml").getStringList("Active-Commands.commands");
 					commands.remove(command);
 					commands.add(ChatColor.stripColor(event.getMessage()));
-					File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+					File fileFolder =  new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 					dataFile.set("Active-Commands.commands", commands); 	
-					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-					ConfigHandler.getConfig().softReload();
+					ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+					ItemData.getInfo().softReload();
 					SchedulerUtils.runLater(2L, () -> altCommandPane(player, itemMap, stage));
 				} else {
 					final List<String> toggleCommands = itemMap.getToggleCommands();
@@ -7375,21 +7377,21 @@ public class Menu {
 					toggleCommands.add(ChatColor.stripColor(event.getMessage()));
 					itemMap.setToggleCommands(toggleCommands);
 				}
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = (stage == 4 ? "MODIFIED ACTIVE COMMAND" : "MODIFIED TOGGLE COMMAND");
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				altCommandPane(player, itemMap, stage);
 			}));
 			modPane.addButton(new Button(fillerPaneGItem));
 			modPane.addButton(new Button(ItemHandler.getItem("REDSTONE", 1, false, "&fDelete", "&7", "&7*Click to &cdelete &7this command."), event -> {
 				if (stage == 4) {
-					final List<String> commands = ConfigHandler.getConfig().getFile("config.yml").getStringList("Active-Commands.commands");
+					final List<String> commands = ItemJoin.getCore().getConfig("config.yml").getStringList("Active-Commands.commands");
 					commands.remove(command);
-					File fileFolder =  new File (ItemJoin.getInstance().getDataFolder(), "config.yml");
+					File fileFolder =  new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
 					FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 					dataFile.set("Active-Commands.commands", commands); 	
-					ConfigHandler.getConfig().saveFile(dataFile, fileFolder, "config.yml");
-					ConfigHandler.getConfig().softReload();
+					ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+					ItemData.getInfo().softReload();
 					SchedulerUtils.runLater(2L, () -> altCommandPane(player, itemMap, stage));
 				} else {
 					final List<String> toggleCommands = itemMap.getToggleCommands();
@@ -7422,7 +7424,7 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void togglePane(final Player player, final ItemMap itemMap) {
-		Interface togglePane = new Interface(false, 2, GUIName, player);
+		Interface togglePane = new Interface(false, 2, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			togglePane.addButton(new Button(fillerPaneBItem), 2);
 			togglePane.addButton(new Button(ItemHandler.getItem("BOOK", 1, false, "&e&lCommands", "&7", "&7*Define specific commands which", "&7players can use to enable or disable", "&7the custom item upon execution."), event -> altCommandPane(player, itemMap, 0)));
@@ -7435,17 +7437,17 @@ public class Menu {
 					togglePane(player, itemMap);
 				} else {
 					player.closeInventory();
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "TOGGLE MESSAGE";
 					placeHolders[15] = "&a%item% has been toggled!";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 				}
 			}, event -> {
 				itemMap.setToggleMessage(ChatColor.stripColor(event.getMessage()));
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "TOGGLE MESSAGE";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				togglePane(event.getPlayer(), itemMap);
 			}));
 			togglePane.addButton(new Button(fillerPaneBItem));
@@ -7457,17 +7459,17 @@ public class Menu {
 					togglePane(player, itemMap);
 				} else {
 					player.closeInventory();
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "TOGGLE PERMISSION";
 					placeHolders[15] = "itemjoin.toggle";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 				}
 			}, event -> {
 				itemMap.setTogglePerm(ChatColor.stripColor(event.getMessage()));
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "TOGGLE PERMISSION";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				togglePane(event.getPlayer(), itemMap);
 			}));
 			togglePane.addButton(new Button(fillerPaneBItem), 2);
@@ -7486,7 +7488,7 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void recipePane(final Player player, final ItemMap itemMap) {
-		Interface recipePane = new Interface(false, 4, GUIName, player);
+		Interface recipePane = new Interface(false, 4, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			recipePane.addButton(new Button(fillerPaneBItem), 3);
 			for (int i = 0; i < 9; i++) {
@@ -7553,7 +7555,7 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void ingredientPane(final Player player, final ItemMap itemMap, final int k) {
-		Interface ingredientPane = new Interface(false, 2, GUIName, player);
+		Interface ingredientPane = new Interface(false, 2, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			ingredientPane.addButton(new Button(fillerPaneBItem), 3);
 			ingredientPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GRASS_BLOCK" : "2"), 1, false, "&b&lMaterial", "&7", "&7*Select a material type", "&7to be defined in the recipe."), event -> materialPane(player, itemMap, 3, k)));
@@ -7575,26 +7577,26 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void nbtPane(final Player player, final ItemMap itemMap) {
-		Interface nbtPane = new Interface(true, 2, GUIName, player);
+		Interface nbtPane = new Interface(true, 2, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			Map<Object, Object> properties = itemMap.getNBTValues();
 			nbtPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> creatingPane(player, itemMap)));
 				nbtPane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, true, "&e&l&nNew Property", "&7", "&7*Add a new NBT Property to the custom item."), event -> {
 					player.closeInventory();
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "NBT PROPERTY";
 					placeHolders[15] = "TranslatableDisplayName:&aUltra &cItem";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 				}, event -> {
 					if (ChatColor.stripColor(event.getMessage()).contains(":")) {
 						String[] propertyParts = ChatColor.stripColor(event.getMessage()).split(":");
 						properties.put(propertyParts[0], propertyParts[1]);
 					}
 					itemMap.setNBTValues(properties);
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "NBT PROPERTY";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 					nbtPane(event.getPlayer(), itemMap);
 				}));
 				for (Object key : properties.keySet()) {
@@ -7612,17 +7614,17 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void modifyProperty(final Player player, final ItemMap itemMap, final Object key) {
-		Interface modifyProperty = new Interface(false, 2, GUIName, player);
+		Interface modifyProperty = new Interface(false, 2, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			Map<Object, Object> properties = itemMap.getNBTValues();
 			modifyProperty.addButton(new Button(fillerPaneGItem), 3);
 			modifyProperty.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, false, "&c&l&nModify", "&7", "&7*Modify this NBT Property.", "&7", "&9&lProperty: &a" + "&f" + key + ":" + properties.get(key)), event -> {
 				player.closeInventory();
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "NBT PROPERTY";
 				placeHolders[15] = "TranslatableDisplayName:&aUltra &cItem";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				if (ChatColor.stripColor(event.getMessage()).contains(":")) {
 					properties.remove(key);
@@ -7630,9 +7632,9 @@ public class Menu {
 					properties.put(propertyParts[0], propertyParts[1]);
 				}
 				itemMap.setNBTValues(properties);
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "NBT PROPERTY";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				nbtPane(event.getPlayer(), itemMap);
 			}));
 			modifyProperty.addButton(new Button(fillerPaneGItem));
@@ -7678,7 +7680,7 @@ public class Menu {
 		}
 		if (!StringUtils.containsIgnoreCase(material, "AIR") && !containsMaterial) {
 			final char finalCharacter = character;
-			Interface ingrPane = new Interface(true, 6, GUIName, player);
+			Interface ingrPane = new Interface(true, 6, exitButton, GUIName, player);
 			SchedulerUtils.runAsync(() -> {
 				ingrPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item recipe menu."), event -> {
 					creatingPane(player, itemMap);
@@ -7731,7 +7733,7 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void bannerPane(final Player player, final ItemMap itemMap) {
-		Interface bannerPane = new Interface(true, 6, GUIName, player);
+		Interface bannerPane = new Interface(true, 6, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			bannerPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> creatingPane(player, itemMap)));
 			for (PatternType pattern: PatternType.values()) {
@@ -7776,7 +7778,7 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void patternPane(final Player player, final ItemMap itemMap, final PatternType pattern) {
-		Interface colorPane = new Interface(true, 6, GUIName, player);
+		Interface colorPane = new Interface(true, 6, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			colorPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the banner patterns menu."), event -> bannerPane(player, itemMap)));
 			for (DyeColor color: DyeColor.values()) {
@@ -7796,7 +7798,7 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void potionPane(final Player player, final ItemMap itemMap, final int stage) {
-		Interface potionPane = new Interface(true, 6, GUIName, player);
+		Interface potionPane = new Interface(true, 6, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			if (stage != 1) {
 				potionPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> creatingPane(player, itemMap)));
@@ -7847,7 +7849,7 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void teleportPane(final Player player, final ItemMap itemMap, final int stage) {
-		Interface teleportPane = new Interface(false, 1, GUIName, player);
+		Interface teleportPane = new Interface(false, 1, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			if (stage == 1) {
 				teleportPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the other settings menu."), event -> { 
@@ -7912,26 +7914,26 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void levelPane(final Player player, final ItemMap itemMap, final PotionEffectType potion, final int stage) {
-		Interface levelPane = new Interface(true, 6, GUIName, player);
+		Interface levelPane = new Interface(true, 6, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			levelPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the potion effect menu."), event -> potionPane(player, itemMap, stage)));
 			levelPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, "&e&lCustom Level", "&7", "&7*Click to set a custom level (strength)", "&7value for the potion effect.", "&7", "&c&lNote: &7Any duration LONGER than", "&71800 seconds (30 minutes) will", "&7result in an infinite duration."), event -> {
 				player.closeInventory();
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "EFFECT LEVEL";
 				placeHolders[15] = "16";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				if (StringUtils.isInt(ChatColor.stripColor(event.getMessage()))) {
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "EFFECT LEVEL";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 					durationPane(event.getPlayer(), itemMap, potion, Integer.parseInt(ChatColor.stripColor(event.getMessage())), stage);
 				} else {
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = ChatColor.stripColor(event.getMessage());
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.noInteger", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noInteger", player, placeHolders);
 					levelPane(event.getPlayer(), itemMap, potion, stage);
 				}
 			}));
@@ -7953,26 +7955,26 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void durationPane(final Player player, final ItemMap itemMap, final PotionEffectType potion, int level, final int stage) {
-		Interface durationPane = new Interface(true, 6, GUIName, player);
+		Interface durationPane = new Interface(true, 6, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			durationPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the potion effect menu."), event -> potionPane(player, itemMap, stage)));
 			durationPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, "&e&lCustom Duration", "&7", "&7*Click to set a custom duration", "&7value for the potion effect."), event -> {
 				player.closeInventory();
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "EFFECT DURATION";
 				placeHolders[15] = "110";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				if (StringUtils.isInt(ChatColor.stripColor(event.getMessage()))) {
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "EFFECT DURATION";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 					potionPane(event.getPlayer(), itemMap, stage);
 				} else {
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = ChatColor.stripColor(event.getMessage());
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.noInteger", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noInteger", player, placeHolders);
 					durationPane(event.getPlayer(), itemMap, potion, level, stage);
 				}
 			}));
@@ -7996,26 +7998,26 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void powerPane(final Player player, final ItemMap itemMap) {
-		Interface powerPane = new Interface(true, 6, GUIName, player);
+		Interface powerPane = new Interface(true, 6, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			powerPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the special settings menu."), event -> otherPane(player, itemMap)));
 			powerPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, "&e&lCustom Power", "&7", "&7*Click to set a custom power", "&7value for the firework."), event -> {
 				player.closeInventory();
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "FIREWORK POWER";
 				placeHolders[15] = "96";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				if (StringUtils.isInt(ChatColor.stripColor(event.getMessage()))) {
 					itemMap.setFireworkPower(Integer.parseInt(ChatColor.stripColor(event.getMessage())));
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "FIREWORK POWER";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				} else {
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = ChatColor.stripColor(event.getMessage());
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.noInteger", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noInteger", player, placeHolders);
 				}
 				otherPane(player, itemMap);
 			}));
@@ -8038,7 +8040,7 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void colorPane(final Player player, final ItemMap itemMap) {
-		Interface colorPane = new Interface(true, 6, GUIName, player);
+		Interface colorPane = new Interface(true, 6, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			colorPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the special settings menu."), event -> otherPane(player, itemMap)));
 			for (DyeColor color: DyeColor.values()) {
@@ -8066,7 +8068,7 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void designPane(final Player player, final ItemMap itemMap) {
-		Interface designPane = new Interface(true, 2, GUIName, player);
+		Interface designPane = new Interface(true, 2, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			designPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the special settings menu."), event -> otherPane(player, itemMap)));
 			for (Type type: Type.values()) {
@@ -8091,7 +8093,7 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void pagePane(final Player player, final ItemMap itemMap) {
-		Interface pagePane = new Interface(true, 2, GUIName, player);
+		Interface pagePane = new Interface(true, 2, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			pagePane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the special settings menu."), event -> {
 				otherPane(player, itemMap);
@@ -8113,25 +8115,25 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void linePane(final Player player, final ItemMap itemMap, final boolean isNew, final int page) {
-		Interface linePane = new Interface(true, 2, GUIName, player);
+		Interface linePane = new Interface(true, 2, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			List < List < String > > pages = itemMap.getListPages();
 			linePane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the book pages menu."), event -> pagePane(player, itemMap)));
 			if (isNew) {
 				linePane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, true, "&e&l&nNew Line", "&7", "&7*Add a new line to the book page.", "&7", "&9&lPage: &a" + (page + 1)), event -> {
 					player.closeInventory();
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "PAGE LINE";
 					placeHolders[15] = "&eWelcome to the Server!";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 				}, event -> {
 					List < String > newPage = new ArrayList < String > ();
 					newPage.add(ChatColor.stripColor(event.getMessage()));pages.add(newPage);
 					itemMap.setListPages(pages);
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "PAGE LINE";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 					linePane(event.getPlayer(), itemMap, false, page);
 				}));
 			} else {
@@ -8144,18 +8146,18 @@ public class Menu {
 				if (selectPage.size() < 14) {
 					linePane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, true, "&e&l&nNew Line", "&7", "&7*Add a new line to the book page.", "&7", "&9&lLine: &a" + (selectPage.size() + 1) + "    &9&lPage: &a" + (page + 1)), event -> {
 						player.closeInventory();
-						String[] placeHolders = LanguageAPI.getLang(false).newString();
+						String[] placeHolders = ItemJoin.getCore().getLang().newString();
 						placeHolders[16] = "PAGE LINE";
 						placeHolders[15] = "&eWelcome to the Server!";
-						LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-						LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+						ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+						ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 					}, event -> {
 						selectPage.add(ChatColor.stripColor(event.getMessage()));
 						pages.set(page, selectPage);
 						itemMap.setListPages(pages);
-						String[] placeHolders = LanguageAPI.getLang(false).newString();
+						String[] placeHolders = ItemJoin.getCore().getLang().newString();
 						placeHolders[16] = "PAGE LINE";
-						LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+						ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 						linePane(event.getPlayer(), itemMap, false, page);
 					}));
 				}
@@ -8177,25 +8179,25 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void modifyPagesPane(final Player player, final ItemMap itemMap, final int line, final int page) {
-		Interface linePane = new Interface(false, 2, GUIName, player);
+		Interface linePane = new Interface(false, 2, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			List < List < String > > pages = itemMap.getListPages();
 			List < String > selectPage = pages.get(page);
 			linePane.addButton(new Button(fillerPaneGItem), 3);
 			linePane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, false, "&c&l&nModify", "&7", "&7*Modify this line in the page.", "&7", "&9&lLine: &a" + (line + 1) + "    &9&lPage: &a" + (page + 1)), event -> {
 				player.closeInventory();
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "PAGE LINE";
 				placeHolders[15] = "&eWelcome to the Server!";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				selectPage.set(line, ChatColor.stripColor(event.getMessage()));
 				pages.set(page, selectPage);
 				itemMap.setListPages(pages);
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "PAGE LINE";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				linePane(event.getPlayer(), itemMap, false, page);
 			}));
 			linePane.addButton(new Button(fillerPaneGItem));
@@ -8223,7 +8225,7 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void attributePane(final Player player, final ItemMap itemMap, final boolean isLeather) {
-		Interface attributePane = new Interface(true, 3, GUIName, player);
+		Interface attributePane = new Interface(true, 3, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			if (isLeather) {
 				attributePane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the other settings menu."), event -> otherPane(player, itemMap)));
@@ -8272,27 +8274,27 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void strengthPane(final Player player, final ItemMap itemMap, final String attribute, final boolean isLeather) {
-		Interface strengthPane = new Interface(true, 6, GUIName, player);
+		Interface strengthPane = new Interface(true, 6, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			strengthPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the custom attributes menu."), event -> attributePane(player, itemMap, isLeather)));
 			strengthPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, "&e&lCustom Strength", "&7", "&7*Click to set a custom strength", "&7value for the custom attribute."), event -> {
 				player.closeInventory();
-				String[] placeHolders = LanguageAPI.getLang(false).newString();
+				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[16] = "STRENGTH";
 				placeHolders[15] = "14.0";
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-				LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
 				if (StringUtils.isInt(ChatColor.stripColor(event.getMessage())) || StringUtils.isDouble(ChatColor.stripColor(event.getMessage()))) {
 					Map<String, Double> attributeList = itemMap.getAttributes();
 					attributeList.put(attribute, Double.parseDouble(ChatColor.stripColor(event.getMessage())));
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "STRENGTH";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 				} else {
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = ChatColor.stripColor(event.getMessage());
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.noInteger", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noInteger", player, placeHolders);
 				}
 				attributePane(event.getPlayer(), itemMap, isLeather);
 			}));
@@ -8316,7 +8318,7 @@ public class Menu {
     * @param itemMap - The ItemMap currently being modified.
     */
 	private static void otherPane(final Player player, final ItemMap itemMap) {
-		Interface otherPane = new Interface(false, 3, GUIName, player);
+		Interface otherPane = new Interface(false, 3, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
 			otherPane.addButton(new Button(fillerPaneGItem), 4);
 			otherPane.addButton(new Button(headerStack(player, itemMap)));
@@ -8332,17 +8334,17 @@ public class Menu {
 						otherPane(player, itemMap);
 					} else {
 						player.closeInventory();
-						String[] placeHolders = LanguageAPI.getLang(false).newString();
+						String[] placeHolders = ItemJoin.getCore().getLang().newString();
 						placeHolders[16] = "AUTHOR";
 						placeHolders[15] = "RockinChaos";
-						LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-						LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+						ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+						ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 					}
 				}, event -> {
 					itemMap.setAuthor(ChatColor.stripColor(event.getMessage()));
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "AUTHOR";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 					otherPane(event.getPlayer(), itemMap);
 				}));
 				otherPane.addButton(new Button(fillerPaneGItem), 3);
@@ -8368,19 +8370,19 @@ public class Menu {
 							otherPane(player, itemMap);
 						} else {
 							player.closeInventory();
-							String[] placeHolders = LanguageAPI.getLang(false).newString();
+							String[] placeHolders = ItemJoin.getCore().getLang().newString();
 							placeHolders[16] = "SKULL OWNER";
 							placeHolders[15] = "RockinChaos";
-							LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-							LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+							ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+							ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 						}
 					}
 				}, event -> {
 					itemMap.setSkull(ChatColor.stripColor(event.getMessage()));
 					itemMap.setSkullTexture(null);
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "SKULL OWNER";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 					otherPane(event.getPlayer(), itemMap);
 				}));
 				otherPane.addButton(new Button(fillerPaneGItem));
@@ -8395,19 +8397,19 @@ public class Menu {
 							otherPane(player, itemMap);
 						} else {
 							player.closeInventory();
-							String[] placeHolders = LanguageAPI.getLang(false).newString();
+							String[] placeHolders = ItemJoin.getCore().getLang().newString();
 							placeHolders[16] = "SKULL TEXTURE";
 							placeHolders[15] = "eyJ0ZXh0dYMGQVlN2FjZmU3OSJ9fX0=";
-							LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-							LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+							ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+							ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 						}
 					}
 				}, event -> {
 					itemMap.setSkullTexture(ChatColor.stripColor(event.getMessage()));
 					itemMap.setSkull(null);
-					String[] placeHolders = LanguageAPI.getLang(false).newString();
+					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "SKULL TEXTURE";
-					LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 					otherPane(event.getPlayer(), itemMap);
 				}));
 				otherPane.addButton(new Button(fillerPaneGItem));
@@ -8477,7 +8479,7 @@ public class Menu {
 						"&9&lColor(s): &a" + (StringUtils.nullCheck(colorList) != "NONE" ? colorList : "NONE")), event -> colorPane(player, itemMap)));
 				otherPane.addButton(new Button(fillerPaneGItem), 2);
 			} else if (itemMap.getMaterial().toString().contains("LEATHER_")) {
-				Interface colorPane = new Interface(true, 6, GUIName, player);
+				Interface colorPane = new Interface(true, 6, exitButton, GUIName, player);
 				colorPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the special settings menu."), event -> otherPane(player, itemMap)));
 				for (DyeColor color: DyeColor.values()) {
 					colorPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GRAY_DYE" : "351:8"), 1, false, "&f" + color.name(), "&7", "&7*This will be the color", "&7of your leather armor."), event -> {
@@ -8516,19 +8518,19 @@ public class Menu {
 						otherPane(player, itemMap);
 					} else {
 						player.closeInventory();
-						String[] placeHolders = LanguageAPI.getLang(false).newString();
+						String[] placeHolders = ItemJoin.getCore().getLang().newString();
 						placeHolders[16] = "HEX COLOR";
 						placeHolders[15] = "#033dfc";
-						LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputType", player, placeHolders);
-						LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputExample", player, placeHolders);
+						ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+						ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 					}
 				}, event -> {
 					if (itemMap.getLeatherHex() == null) {
 						itemMap.setLeatherHex(ChatColor.stripColor(event.getMessage()));
 						itemMap.setLeatherColor(null);
-						String[] placeHolders = LanguageAPI.getLang(false).newString();
+						String[] placeHolders = ItemJoin.getCore().getLang().newString();
 						placeHolders[16] = "HEX COLOR";
-						LanguageAPI.getLang(false).sendLangMessage("commands.menu.inputSet", player, placeHolders);
+						ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
 						otherPane(event.getPlayer(), itemMap);
 					}
 				}));

@@ -17,13 +17,11 @@
  */
 package me.RockinChaos.itemjoin.listeners.legacy;
 
-import me.RockinChaos.itemjoin.handlers.ConfigHandler;
-import me.RockinChaos.itemjoin.handlers.PlayerHandler;
-import me.RockinChaos.itemjoin.utils.StringUtils;
-
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+
+import me.RockinChaos.itemjoin.item.ItemData;
 
 /**
 * Handles the Pickup events for custom items.
@@ -41,10 +39,9 @@ public class Legacy_Pickups implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	private void Deprecated_onGlobalPickup(org.bukkit.event.player.PlayerPickupItemEvent event) {
 	  	Player player = event.getPlayer();
-  		if (StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("Pickups"), "TRUE", ",") || StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("Pickups"), player.getWorld().getName(), ",")
-	  			|| StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("Pickups"), "ALL", ",") || StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("Pickups"), "GLOBAL", ",")) {
-  			if (ConfigHandler.getConfig().isPreventOP() && player.isOp() || ConfigHandler.getConfig().isPreventCreative() && PlayerHandler.isCreativeMode(player)) { } 
-  			else { event.setCancelled(true); }
+	  	if (ItemData.getInfo().isPreventString(player, "Pickups")) {
+	  		if (ItemData.getInfo().isPreventBypass(player)) { } 
+	  		else { event.setCancelled(true); }
 	  	}
 	}
 }

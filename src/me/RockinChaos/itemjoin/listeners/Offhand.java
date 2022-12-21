@@ -23,11 +23,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 
-import me.RockinChaos.itemjoin.handlers.ConfigHandler;
-import me.RockinChaos.itemjoin.handlers.PlayerHandler;
+import me.RockinChaos.core.handlers.PlayerHandler;
+import me.RockinChaos.itemjoin.item.ItemData;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
-import me.RockinChaos.itemjoin.utils.ServerUtils;
-import me.RockinChaos.itemjoin.utils.StringUtils;
+import me.RockinChaos.core.utils.ServerUtils;
 
 public class Offhand implements Listener {
 	
@@ -39,10 +38,9 @@ public class Offhand implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	private void onGlobalHandModify(PlayerSwapHandItemsEvent event) {
 		if (ServerUtils.hasSpecificUpdate("1_9")) {
-			Player player = event.getPlayer();
-			if (StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "TRUE", ",") || StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), player.getWorld().getName(), ",")
-					|| StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "ALL", ",") || StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "GLOBAL", ",")) {
-				if (ConfigHandler.getConfig().isPreventOP() && player.isOp() || ConfigHandler.getConfig().isPreventCreative() && PlayerHandler.isCreativeMode(player)) { } 
+			final Player player = event.getPlayer();
+			if (ItemData.getInfo().isPreventString(player, "itemMovement")) {
+				if (ItemData.getInfo().isPreventBypass(player)) { } 
 				else if (player.getOpenInventory().getTitle().contains("§") || player.getOpenInventory().getTitle().contains("&")) { }
 				else { 
 					event.setCancelled(true); 

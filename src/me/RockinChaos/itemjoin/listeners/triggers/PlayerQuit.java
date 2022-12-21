@@ -21,12 +21,16 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.Inventory;
 
-import me.RockinChaos.itemjoin.handlers.ItemHandler;
-import me.RockinChaos.itemjoin.handlers.PlayerHandler;
+import me.RockinChaos.core.handlers.ItemHandler;
+import me.RockinChaos.core.handlers.PlayerHandler;
+import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.item.ItemUtilities.TriggerType;
-import me.RockinChaos.itemjoin.utils.ServerUtils;
+import me.RockinChaos.itemjoin.utils.sql.DataObject;
+import me.RockinChaos.itemjoin.utils.sql.DataObject.Table;
+import me.RockinChaos.core.utils.ServerUtils;
 
 public class PlayerQuit implements Listener {
 	
@@ -39,7 +43,10 @@ public class PlayerQuit implements Listener {
 	private void setQuit(PlayerQuitEvent event) {
 		Player player = event.getPlayer();
 		if (PlayerHandler.isPlayer(player)) {
-			ItemHandler.saveCraftItems(player); {
+			final Inventory inventory = ItemHandler.getCraftInventory(player); 
+			if (inventory != null) {
+				ItemJoin.getCore().getSQL().saveData(new DataObject(Table.RETURN_CRAFTITEMS, PlayerHandler.getPlayerID(player), "", ItemHandler.serializeInventory(inventory)));
+			} {
 				ItemUtilities.getUtilities().closeAnimations(player); {
 					ItemHandler.removeCraftItems(player); {
 						ItemUtilities.getUtilities().setAuthenticating(player, player.getWorld(), TriggerType.QUIT, player.getGameMode(), "GLOBAL");

@@ -29,12 +29,12 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.inventory.ItemStack;
 
-import me.RockinChaos.itemjoin.handlers.ItemHandler;
-import me.RockinChaos.itemjoin.handlers.PlayerHandler;
+import me.RockinChaos.core.handlers.ItemHandler;
+import me.RockinChaos.core.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
-import me.RockinChaos.itemjoin.utils.SchedulerUtils;
-import me.RockinChaos.itemjoin.utils.ServerUtils;
+import me.RockinChaos.core.utils.SchedulerUtils;
+import me.RockinChaos.core.utils.ServerUtils;
 import me.RockinChaos.itemjoin.utils.api.ItemAPI;
 
 public class Interact implements Listener {

@@ -9,10 +9,10 @@ import org.bukkit.entity.Player;
 
 import com.vk2gpz.tokenenchant.api.TokenEnchantAPI;
 
-import me.RockinChaos.itemjoin.handlers.ItemHandler;
-import me.RockinChaos.itemjoin.utils.ServerUtils;
-import me.RockinChaos.itemjoin.utils.StringUtils;
-import me.RockinChaos.itemjoin.utils.api.DependAPI;
+import me.RockinChaos.core.handlers.ItemHandler;
+import me.RockinChaos.core.utils.ServerUtils;
+import me.RockinChaos.core.utils.StringUtils;
+import me.RockinChaos.itemjoin.ItemJoin;
 
 public class ItemStatistics {
 	
@@ -62,9 +62,9 @@ public class ItemStatistics {
 				}
 				if (level > 0 && enchantName != null) {
 					listEnchants.put(name, level);
-				} else if (level > 0 && enchantName == null && DependAPI.getDepends(false).tokenEnchantEnabled() && TokenEnchantAPI.getInstance().getEnchantment(name) != null) {
+				} else if (level > 0 && enchantName == null && ItemJoin.getCore().getDependencies().tokenEnchantEnabled() && TokenEnchantAPI.getInstance().getEnchantment(name) != null) {
 					listEnchants.put(name, level);
-				} else if (level > 0 && enchantName == null && !DependAPI.getDepends(false).tokenEnchantEnabled()) {
+				} else if (level > 0 && enchantName == null && !ItemJoin.getCore().getDependencies().tokenEnchantEnabled()) {
 					ServerUtils.logSevere("{ItemStatistics} An error occurred in the config, " + name + " is not a proper enchant name!");
 					ServerUtils.logWarn("{ItemStatistics} Please see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/enchantments/Enchantment.html for a list of correct enchantment names.");
 				}

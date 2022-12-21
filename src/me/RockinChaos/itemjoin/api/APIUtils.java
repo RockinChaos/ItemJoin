@@ -24,13 +24,14 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import me.RockinChaos.itemjoin.handlers.PlayerHandler;
+import me.RockinChaos.core.handlers.PlayerHandler;
+import me.RockinChaos.itemjoin.ItemJoin;
+import me.RockinChaos.itemjoin.item.ItemData;
 import me.RockinChaos.itemjoin.item.ItemCommand;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.item.ItemUtilities.TriggerType;
-import me.RockinChaos.itemjoin.utils.StringUtils;
-import me.RockinChaos.itemjoin.utils.api.ChanceAPI;
+import me.RockinChaos.core.utils.StringUtils;
 
 public class APIUtils {
 	
@@ -40,10 +41,16 @@ public class APIUtils {
      * @param player - that will recieve the items.
      */
 	 public void setItems(final Player player) {
-		final ItemMap probable = ChanceAPI.getChances().getRandom(player);
+		ItemMap probable = null;
+		for (Object itemMap : ItemJoin.getCore().getChances().getItems().keySet()) {
+			if (((ItemMap)itemMap).hasItem(player, true)) {
+				probable = (ItemMap)itemMap;
+			}
+		}
+		if (probable == null) { probable = (ItemMap) ItemJoin.getCore().getChances().getRandom(player); }
 		final int session = StringUtils.getRandom(1, 80000);
 		for (final ItemMap item : ItemUtilities.getUtilities().getItems()) {
-			if (item.inWorld(player.getWorld()) && ChanceAPI.getChances().isProbability(item, probable) && PlayerHandler.isEnabled(player, item.getConfigName())
+			if (item.inWorld(player.getWorld()) && ((probable != null && item.getConfigName().equals(probable.getConfigName())) || item.getProbability() == -1) && ItemData.getInfo().isEnabled(player, item.getConfigName())
 					&& item.isLimitMode(player.getGameMode()) && item.hasPermission(player, player.getWorld()) && ItemUtilities.getUtilities().isObtainable(player, item, session, TriggerType.DEFAULT)) {
 					item.giveTo(player);
 			}

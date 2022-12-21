@@ -23,11 +23,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
-import me.RockinChaos.itemjoin.handlers.PlayerHandler;
+
+import me.RockinChaos.itemjoin.ItemJoin;
+import me.RockinChaos.core.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
-import me.RockinChaos.itemjoin.utils.SchedulerUtils;
-import me.RockinChaos.itemjoin.utils.api.DependAPI;
+import me.RockinChaos.core.utils.SchedulerUtils;
 import me.RockinChaos.itemjoin.utils.api.ItemAPI;
 
 public class Breaking implements Listener {
@@ -46,8 +47,8 @@ public class Breaking implements Listener {
 			for (ItemMap itemMap: ItemUtilities.getUtilities().getItems()) {
 				if (itemMap.blocksDrop() && block != null && material != Material.AIR && itemMap.getBlocksDrop().containsKey(material) 
 				 && itemMap.inWorld(player.getWorld()) && itemMap.isLimitMode(player.getGameMode()) && !PlayerHandler.isCreativeMode(player) && itemMap.hasPermission(player, player.getWorld()) && ItemAPI.isToolable(player, material) && Math.random() <= itemMap.getBlocksDrop().get(material)) {
-					for (String region : ((DependAPI.getDepends(false).getGuard().guardEnabled() && !itemMap.getEnabledRegions().isEmpty()) ? DependAPI.getDepends(false).getGuard().getRegionAtLocation(player.getLocation()).split(", ") : new String[]{"FALSE"})) {
-						if (!DependAPI.getDepends(false).getGuard().guardEnabled() || itemMap.getEnabledRegions().isEmpty() || itemMap.inRegion(region)) { 
+					for (String region : ((ItemJoin.getCore().getDependencies().getGuard().guardEnabled() && !itemMap.getEnabledRegions().isEmpty()) ? ItemJoin.getCore().getDependencies().getGuard().getRegionAtLocation(player.getLocation()).split(", ") : new String[]{"FALSE"})) {
+						if (!ItemJoin.getCore().getDependencies().getGuard().guardEnabled() || itemMap.getEnabledRegions().isEmpty() || itemMap.inRegion(region)) { 
 							SchedulerUtils.run(() -> block.getWorld().dropItemNaturally(block.getLocation(), itemMap.getItem(player)));
 						}
 					}

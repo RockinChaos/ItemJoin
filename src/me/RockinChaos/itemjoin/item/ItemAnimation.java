@@ -26,18 +26,19 @@ import java.util.UUID;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 
-import me.RockinChaos.itemjoin.handlers.ConfigHandler;
-import me.RockinChaos.itemjoin.handlers.ItemHandler;
-import me.RockinChaos.itemjoin.handlers.PlayerHandler;
+import me.RockinChaos.core.handlers.ItemHandler;
+import me.RockinChaos.core.handlers.PlayerHandler;
+import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.listeners.Clicking;
-import me.RockinChaos.itemjoin.utils.StringUtils;
-import me.RockinChaos.itemjoin.utils.api.LegacyAPI;
-import me.RockinChaos.itemjoin.utils.SchedulerUtils;
-import me.RockinChaos.itemjoin.utils.ServerUtils;
+import me.RockinChaos.core.utils.StringUtils;
+import me.RockinChaos.core.utils.api.LegacyAPI;
+import me.RockinChaos.core.utils.SchedulerUtils;
+import me.RockinChaos.core.utils.ServerUtils;
 
 public class ItemAnimation {
 	
@@ -207,7 +208,7 @@ public class ItemAnimation {
 			if (!stopAnimations) {
 				// ============== Animate Within the Player Inventory ============== //
 				for (ItemStack inPlayerInventory: player.getInventory().getContents()) {
-					boolean heldAnimations = ConfigHandler.getConfig().getFile("config.yml").getBoolean("Settings.HeldItem-Animations");
+					boolean heldAnimations = ItemJoin.getCore().getConfig("config.yml").getBoolean("Settings.HeldItem-Animations");
 					if (inPlayerInventory != null && itemMap.getTempItem() != null && itemMap.isReal(inPlayerInventory) && (heldAnimations || !itemMap.isReal(PlayerHandler.getHandItem(player)))) {
 						SchedulerUtils.run(() -> {
 							if (nameString != null) { setNameData(player, inPlayerInventory, nameString); } 
@@ -258,7 +259,9 @@ public class ItemAnimation {
 				if (StringUtils.getSlotConversion(itemMap.getSlot()) != -1 && !ServerUtils.hasSpecificUpdate("1_13")) {
 					LegacyAPI.updateInventory(player);
 				} else {
-					PlayerHandler.updateInventory(player, itemMap, 1L);
+					synchronized("IJ_ANIMATE") {
+						PlayerHandler.updateInventory(player, itemMap.getItemStack(player), 1L);
+					}
 				}
 				// ============== This has Concluded all Animations.. ============== //
 				if (!hasNext) { 
@@ -370,7 +373,8 @@ public class ItemAnimation {
 		if (ServerUtils.hasSpecificUpdate("1_8")) {
 			reviseItem.setItemMeta(this.itemMap.setJSONBookPages(player, reviseItem, pagesString).getItemMeta());
 		} else {
-			final ItemMeta itemMeta = LegacyAPI.setBookPages(player, reviseItem.getItemMeta(), pagesString, this.itemMap);
+			final ItemMeta itemMeta = LegacyAPI.setBookPages(player, reviseItem.getItemMeta(), pagesString);
+			this.itemMap.setPages(((BookMeta)itemMeta).getPages());
 			reviseItem.setItemMeta(itemMeta);
 		}
 	}

@@ -73,25 +73,21 @@ import com.vk2gpz.tokenenchant.api.TokenEnchantAPI;
 import me.RockinChaos.itemjoin.ChatToggleExecutor;
 import me.RockinChaos.itemjoin.ChatToggleTab;
 import me.RockinChaos.itemjoin.ItemJoin;
-import me.RockinChaos.itemjoin.handlers.ConfigHandler;
-import me.RockinChaos.itemjoin.handlers.ItemHandler;
-import me.RockinChaos.itemjoin.handlers.PermissionsHandler;
-import me.RockinChaos.itemjoin.handlers.PlayerHandler;
+import me.RockinChaos.core.handlers.ItemHandler;
+import me.RockinChaos.core.handlers.PermissionsHandler;
+import me.RockinChaos.core.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.item.ItemCommand.Action;
 import me.RockinChaos.itemjoin.item.ItemCommand.CommandSequence;
-import me.RockinChaos.itemjoin.utils.ReflectionUtils;
-import me.RockinChaos.itemjoin.utils.ReflectionUtils.MinecraftMethod;
-import me.RockinChaos.itemjoin.utils.SchedulerUtils;
-import me.RockinChaos.itemjoin.utils.ServerUtils;
-import me.RockinChaos.itemjoin.utils.api.DependAPI;
+import me.RockinChaos.core.utils.ReflectionUtils;
+import me.RockinChaos.core.utils.ReflectionUtils.MinecraftMethod;
+import me.RockinChaos.core.utils.SchedulerUtils;
+import me.RockinChaos.core.utils.ServerUtils;
 import me.RockinChaos.itemjoin.utils.api.EffectAPI;
-import me.RockinChaos.itemjoin.utils.api.LanguageAPI;
-import me.RockinChaos.itemjoin.utils.api.LegacyAPI;
-import me.RockinChaos.itemjoin.utils.StringUtils;
-import me.RockinChaos.itemjoin.utils.enchants.Glow;
-import me.RockinChaos.itemjoin.utils.interfaces.menus.Menu;
+import me.RockinChaos.core.utils.api.LegacyAPI;
+import me.RockinChaos.core.utils.StringUtils;
+import me.RockinChaos.core.utils.enchants.Glow;
+import me.RockinChaos.itemjoin.utils.menus.Menu;
 import me.RockinChaos.itemjoin.utils.sql.DataObject;
-import me.RockinChaos.itemjoin.utils.sql.SQL;
 import me.RockinChaos.itemjoin.utils.sql.DataObject.Table;
 import me.arcaniax.hdb.api.HeadDatabaseAPI;
 
@@ -319,9 +315,9 @@ public class ItemMap {
     * @param slot - The slot of the ItemMap.
     */
 	public ItemMap(final String internalName, final String slot) {
-        this.nodeLocation = ConfigHandler.getConfig().getItemSection(internalName);
+        this.nodeLocation = ItemJoin.getCore().getConfig("items.yml").getConfigurationSection("items").getConfigurationSection(internalName);
         this.configName = internalName;
-        this.setItemValue(ConfigHandler.getConfig().getItemID(slot));
+        this.setItemValue(ItemData.getInfo().getItemID(slot));
         this.setSlot(slot);
         if (ItemHandler.isCraftingSlot(slot)) { this.craftingItem = true; }
         
@@ -349,8 +345,8 @@ public class ItemMap {
 			this.setTogglePerm(this.nodeLocation.getString(".toggle-permission"));
 			this.setToggleMessage(this.nodeLocation.getString(".toggle-message"));
 	        this.setPerm(this.nodeLocation.getString(".permission-node"));
-	        this.setPermissionNeeded(ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Obtain-Items"));
-	    	this.setOPPermissionNeeded(ConfigHandler.getConfig().getFile("config.yml").getBoolean("Permissions.Obtain-Items-OP"));
+	        this.setPermissionNeeded(ItemJoin.getCore().getConfig("config.yml").getBoolean("Permissions.Obtain-Items"));
+	    	this.setOPPermissionNeeded(ItemJoin.getCore().getConfig("config.yml").getBoolean("Permissions.Obtain-Items-OP"));
         }
 	}
 	
@@ -563,7 +559,7 @@ public class ItemMap {
     * 
     */
 	private void setTriggers() {
-		final String defaultTriggers = ConfigHandler.getConfig().getFile("config.yml").getString("Settings.Default-Triggers");
+		final String defaultTriggers = ItemJoin.getCore().getConfig("config.yml").getString("Settings.Default-Triggers");
 		this.triggers = (this.nodeLocation.getString("triggers") != null ? this.nodeLocation.getString("triggers") : (defaultTriggers != null && !defaultTriggers.isEmpty() ? defaultTriggers : "JOIN"));
 		this.giveOnDisabled = StringUtils.splitIgnoreCase(this.triggers, "DISABLED", ",");
 		this.giveOnJoin = StringUtils.splitIgnoreCase(this.triggers, "JOIN", ",");
@@ -602,10 +598,10 @@ public class ItemMap {
 			String[] enabledParts = this.nodeLocation.getString(".enabled-regions").replace(" ,  ", ",").replace(" , ", ",").replace(",  ", ",").replace(", ", ",").split(",");
 			for (String region: enabledParts) {
 				this.enabledRegions.add(region); 
-				DependAPI.getDepends(false).getGuard().addLocaleRegion(region);
+				ItemJoin.getCore().getDependencies().getGuard().addLocaleRegion(region);
 			}
 		} else if (isGiveOnRegionEnter() || isGiveOnRegionLeave()) { 
-			DependAPI.getDepends(false).getGuard().addLocaleRegion("UNDEFINED"); 
+			ItemJoin.getCore().getDependencies().getGuard().addLocaleRegion("UNDEFINED"); 
 			this.enabledRegions.add("UNDEFINED"); }
 	}
 	
@@ -691,11 +687,11 @@ public class ItemMap {
     */
 	private void setPlayersOnCooldown() {
 		if (this.cooldownSeconds > 0) {
-			List<DataObject> dataList = SQL.getData().getDataList(new DataObject(Table.ON_COOLDOWN, null, null, this.getConfigName(), String.valueOf(this.getCommandCooldown()), null));
-			for (DataObject dataObject : dataList) {
+			List<Object> dataList = ItemJoin.getCore().getSQL().getDataList(new DataObject(Table.ON_COOLDOWN, null, null, this.getConfigName(), String.valueOf(this.getCommandCooldown()), null));
+			for (Object dataObject : dataList) {
 				if (dataObject != null) {
-					this.playersOnCooldown.put(dataObject.getPlayerId(), Long.parseLong(dataObject.getDuration()));
-					SQL.getData().removeData(new DataObject(Table.ON_COOLDOWN, null, null, this.getConfigName(), String.valueOf(this.getCommandCooldown()), null));
+					this.playersOnCooldown.put(((DataObject) dataObject).getPlayerId(), Long.parseLong(((DataObject) dataObject).getDuration()));
+					ItemJoin.getCore().getSQL().removeData(new DataObject(Table.ON_COOLDOWN, null, null, this.getConfigName(), String.valueOf(this.getCommandCooldown()), null));
 				}
 			}
 		}
@@ -2046,7 +2042,7 @@ public class ItemMap {
     			try {
     				Constructor<PluginCommand> pluginCommand = PluginCommand.class.getDeclaredConstructor(String.class, Plugin.class);
     				pluginCommand.setAccessible(true);
-    				cmd = (PluginCommand)pluginCommand.newInstance(new Object[]{(command.contains(" ") ? command.split(" ")[0] : command), ItemJoin.getInstance()});
+    				cmd = (PluginCommand)pluginCommand.newInstance(new Object[]{(command.contains(" ") ? command.split(" ")[0] : command), ItemJoin.getCore().getPlugin()});
     			} catch (Exception e) {
     				ServerUtils.sendDebugTrace(e);
     			}
@@ -2061,7 +2057,7 @@ public class ItemMap {
 		    try {
 		    	Constructor<PluginCommand> pluginCommand = PluginCommand.class.getDeclaredConstructor(String.class, Plugin.class);
 		    	pluginCommand.setAccessible(true);
-		    	cmd = (PluginCommand)pluginCommand.newInstance(new Object[]{(toggleSingle.contains(" ") ? toggleSingle.split(" ")[0] : toggleSingle), ItemJoin.getInstance()});
+		    	cmd = (PluginCommand)pluginCommand.newInstance(new Object[]{(toggleSingle.contains(" ") ? toggleSingle.split(" ")[0] : toggleSingle), ItemJoin.getCore().getPlugin()});
 		    } catch (Exception e) {
 		    	ServerUtils.sendDebugTrace(e);
 		    }
@@ -2870,7 +2866,7 @@ public class ItemMap {
     * @return The NBTData (Secret).
     */
 	public String getLegacySecret() {
-		if (!ItemHandler.dataTagsEnabled()) {
+		if (!ItemJoin.getCore().getData().dataTagsEnabled()) {
 			return this.legacySecret;
 		} else { return null; }
 	}
@@ -3028,7 +3024,7 @@ public class ItemMap {
     * @return If the Player has Permission.
     */
 	public boolean hasPermission(final Player player, final World world) {
-		String customPerm = PermissionsHandler.customPermissions(this.permissionNode, this.configName, world.getName());
+		String customPerm = PermissionsHandler.customPermissions(this.permissionNode, world.getName() + "." + this.configName);
 		if (!this.isPermissionNeeded() && !player.isOp() || (!this.isOPPermissionNeeded() && player.isOp())) {
 			return true;
 		} else if (this.isOPPermissionNeeded() && player.isOp()) {
@@ -3200,7 +3196,7 @@ public class ItemMap {
     * @return If the region is a enabled region.
     */
 	public Boolean inRegion(final String region) {
-		if (this.enabledRegions == null) { return false; }
+		if (this.enabledRegions == null || this.enabledRegions.isEmpty()) { return true; }
 			for (String compareRegion: this.enabledRegions) {
 				if (compareRegion.equalsIgnoreCase(region) || compareRegion.equalsIgnoreCase("UNDEFINED")) {
 					return true;
@@ -3604,7 +3600,7 @@ public class ItemMap {
 		if (!Menu.isOpen(player) && this.isSimilar(player, item)) {
 			if (this.AllowOpBypass && player.isOp() || this.CreativeBypass && player.getGameMode() == GameMode.CREATIVE 
 					|| findFlag.equalsIgnoreCase("inventory-modify") && player.hasPermission("itemjoin.bypass.inventorymodify") 
-					&& ItemJoin.getInstance().getConfig().getBoolean("Permissions.Movement-Bypass")) {
+					&& ItemJoin.getCore().getPlugin().getConfig().getBoolean("Permissions.Movement-Bypass")) {
 				return false;
 			} 
 			else if (findFlag.equals("cancel-events")) { return cancelEvents; } 
@@ -3634,10 +3630,10 @@ public class ItemMap {
     * @return If the ItemStack is similar.
     */
 	public boolean isReal(final ItemStack item) {
-		final String nbtData = ItemHandler.getNBTData(item);
+		final String nbtData = ItemHandler.getNBTData(item, ItemData.getInfo().getNBTList());
 		if (item != null && item.getType() != Material.AIR
 				&& (this.vanillaControl || this.vanillaStatus
-				|| (ItemHandler.dataTagsEnabled() && nbtData != null && this.newNBTData != null && nbtData.equalsIgnoreCase(this.newNBTData))
+				|| (ItemJoin.getCore().getData().dataTagsEnabled() && nbtData != null && this.newNBTData != null && nbtData.equalsIgnoreCase(this.newNBTData))
 				|| (this.legacySecret != null && item.hasItemMeta() && (ServerUtils.hasSpecificUpdate("1_14") || (!ServerUtils.hasSpecificUpdate("1_14") && item.getItemMeta().hasDisplayName())) 
 				&& StringUtils.colorDecode(item) != null && StringUtils.colorDecode(item).contains(this.legacySecret)))) {
 			return true;
@@ -3654,7 +3650,7 @@ public class ItemMap {
     */
 	public boolean isSimilar(final Player player, final ItemStack item) {
 		if ((item != null && item.getType() != Material.AIR && item.getType() == this.material) || (this.materialAnimated && item != null && item.getType() != Material.AIR && this.isMaterial(item))) {
-			if (this.vanillaControl || this.vanillaStatus || (ItemHandler.dataTagsEnabled() && ItemHandler.getNBTData(item) != null && ItemHandler.getNBTData(item).equalsIgnoreCase(this.newNBTData))
+			if (this.vanillaControl || this.vanillaStatus || (ItemJoin.getCore().getData().dataTagsEnabled() && ItemHandler.getNBTData(item, ItemData.getInfo().getNBTList()) != null && ItemHandler.getNBTData(item, ItemData.getInfo().getNBTList()).equalsIgnoreCase(this.newNBTData))
 				|| (this.legacySecret != null && item.hasItemMeta() && (ServerUtils.hasSpecificUpdate("1_14") || (!ServerUtils.hasSpecificUpdate("1_14") && item.getItemMeta().hasDisplayName())) 
 				&& StringUtils.colorDecode(item) != null && StringUtils.colorDecode(item).contains(this.legacySecret))) {
 				if (this.isEnchantSimilar(player, item) || !item.getItemMeta().hasEnchants() && this.enchants.isEmpty() || this.isItemChangable()) {
@@ -3720,7 +3716,7 @@ public class ItemMap {
 			final Map <String, Integer> enchantList = ItemUtilities.getUtilities().getStatistics(player).getEnchantments(this);
 			if (enchantList != null && !enchantList.isEmpty()) {
 				for (final Entry<String, Integer> enchantments : enchantList.entrySet()) {
-					if (enchantments.getKey() == null && DependAPI.getDepends(false).tokenEnchantEnabled() && TokenEnchantAPI.getInstance().getEnchantment(enchantments.getKey()) != null) {
+					if (enchantments.getKey() == null && ItemJoin.getCore().getDependencies().tokenEnchantEnabled() && TokenEnchantAPI.getInstance().getEnchantment(enchantments.getKey()) != null) {
 						TokenEnchantAPI.getInstance().enchant(null, checkItem, enchantments.getKey(), enchantments.getValue(), true, 0, true);
 					} else { 
 						checkItem.addUnsafeEnchantment(ItemHandler.getEnchantByName(enchantments.getKey()), enchantments.getValue()); }
@@ -3750,7 +3746,7 @@ public class ItemMap {
     * @return If the stack size is similar.
     */
 	public boolean isCountSimilar(final Player player, final ItemStack item) {
-		if (item.getAmount() == this.getCount(player) || ConfigHandler.getConfig().getFile("items.yml").getBoolean("items-RestrictCount") == false || this.isItemChangable()) {
+		if (item.getAmount() == this.getCount(player) || ItemJoin.getCore().getConfig("items.yml").getBoolean("items-RestrictCount") == false || this.isItemChangable()) {
 			return true;
 		}
 		return false;
@@ -3850,7 +3846,10 @@ public class ItemMap {
 			this.setFireChargeColor();
 			this.setDye(player);
 			this.setBookInfo(player);
-			LegacyAPI.setBookPages(player, this.tempMeta, this.bookPages, this);
+			if (this.bookPages != null && !this.bookPages.isEmpty()) {
+				final ItemMeta bookMeta = LegacyAPI.setBookPages(player, this.tempMeta, this.bookPages);
+				this.setPages(((BookMeta)bookMeta).getPages());
+			}
 			this.setAttributes();
 			this.setAttributeFlags();
 			this.setFlags();
@@ -3858,8 +3857,8 @@ public class ItemMap {
 			this.setContents(player);
 			this.tempItem.setItemMeta(this.tempMeta);
 			this.tempItem.setAmount(this.getCount(player));
-			LegacyAPI.setGlowing(this.tempItem, this);
-			LegacyAPI.setAttributes(this.tempItem, this);
+			this.setTempItem(LegacyAPI.setGlowing(this.tempItem));
+			this.setTempItem(LegacyAPI.setAttributes(this.tempItem, this.configName, this.attributes));
 		}
 		return this;
 	}
@@ -3932,7 +3931,7 @@ public class ItemMap {
 		final Map<String, Integer> enchantStats = (player != null ? ItemUtilities.getUtilities().getStatistics(player).getEnchantments(this) : null);
 		if (enchantStats != null && !enchantStats.isEmpty()) {
 			for (final Entry <String, Integer> enchantments : enchantStats.entrySet()) {
-				if (enchantments.getKey() == null && DependAPI.getDepends(false).tokenEnchantEnabled() && TokenEnchantAPI.getInstance().getEnchantment(enchantments.getKey()) != null) {
+				if (enchantments.getKey() == null && ItemJoin.getCore().getDependencies().tokenEnchantEnabled() && TokenEnchantAPI.getInstance().getEnchantment(enchantments.getKey()) != null) {
 					TokenEnchantAPI.getInstance().enchant(player, this.tempItem, enchantments.getKey(), enchantments.getValue(), true, 0, true);
 				} else { this.tempItem.addUnsafeEnchantment(ItemHandler.getEnchantByName(enchantments.getKey()), enchantments.getValue()); }
 			}
@@ -4121,7 +4120,7 @@ public class ItemMap {
     * 
     */
 	private void setNBTData() {
-		if (ItemHandler.dataTagsEnabled() && !this.isVanilla() && !this.isVanillaControl() && !this.isVanillaStatus()) {
+		if (ItemJoin.getCore().getData().dataTagsEnabled() && !this.isVanilla() && !this.isVanillaControl() && !this.isVanillaStatus()) {
 			try {
 				Class<?> itemClass = ReflectionUtils.getMinecraftClass("ItemStack");
 				Object nms = ReflectionUtils.getCraftBukkitClass("inventory.CraftItemStack").getMethod("asNMSCopy", ItemStack.class).invoke(null, this.tempItem);
@@ -4151,7 +4150,7 @@ public class ItemMap {
 				ServerUtils.logSevere("{ItemMap} An error has occured when setting NBTData to an item.");
 				ServerUtils.sendDebugTrace(e);
 			}
-		} else if (!ItemHandler.dataTagsEnabled()) {
+		} else if (!ItemJoin.getCore().getData().dataTagsEnabled()) {
 			this.tempItem = StringUtils.colorEncode(this.tempItem, this.legacySecret);
 		}
 	}
@@ -4242,7 +4241,7 @@ public class ItemMap {
 			try {
 				if (ServerUtils.hasSpecificUpdate("1_8")) {
 					GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
-					gameProfile.getProperties().put("textures", new Property("textures", new String(((this.skullOwner != null && DependAPI.getDepends(false).skinsRestorerEnabled()) ? DependAPI.getDepends(false).getSkinValue(StringUtils.translateLayout(this.skullOwner, player)) : StringUtils.toTextureUUID(player, this.configName, this.skullTexture)))));
+					gameProfile.getProperties().put("textures", new Property("textures", new String(((this.skullOwner != null && ItemJoin.getCore().getDependencies().skinsRestorerEnabled()) ? ItemJoin.getCore().getDependencies().getSkinValue(StringUtils.translateLayout(this.skullOwner, player)) : StringUtils.toTextureUUID(player, this.configName, this.skullTexture)))));
 					Field declaredField = this.tempMeta.getClass().getDeclaredField("profile");
 					declaredField.setAccessible(true);
 					declaredField.set(this.tempMeta, gameProfile);
@@ -4623,19 +4622,19 @@ public class ItemMap {
 	private void warmCycle(final Player player, final Player altPlayer, final ItemMap itemMap, final int warmCount, final Location location, final ItemStack itemCopy, final String action, final String clickType, final String slot) {
 		if (warmCount != 0) {
 			if (itemMap.warmDelay == warmCount) { 
-				String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = StringUtils.translateLayout(itemMap.getCustomName(), player); 
-				LanguageAPI.getLang(false).sendLangMessage("general.warmingUp", player, placeHolders); 
+				String[] placeHolders = ItemJoin.getCore().getLang().newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = StringUtils.translateLayout(itemMap.getCustomName(), player); 
+				ItemJoin.getCore().getLang().sendLangMessage("general.warmingUp", player, placeHolders); 
 				itemMap.addWarmPending(player); 
 			}
 			SchedulerUtils.runLater(20L, () -> {
 				if (itemMap.warmLocation(player, location, action)) {
-					String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = StringUtils.translateLayout(itemMap.getCustomName(), player); 
-					LanguageAPI.getLang(false).sendLangMessage("general.warmingTime", player, placeHolders);
+					String[] placeHolders = ItemJoin.getCore().getLang().newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = StringUtils.translateLayout(itemMap.getCustomName(), player); 
+					ItemJoin.getCore().getLang().sendLangMessage("general.warmingTime", player, placeHolders);
 					itemMap.warmCycle(player, altPlayer, itemMap, (warmCount - 1), location, itemCopy, action, clickType, slot);	
 				} else { 
 					itemMap.delWarmPending(player); 
-					String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = StringUtils.translateLayout(itemMap.getCustomName(), player); 
-					LanguageAPI.getLang(false).sendLangMessage("general.warmingHalted", player, placeHolders);
+					String[] placeHolders = ItemJoin.getCore().getLang().newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = StringUtils.translateLayout(itemMap.getCustomName(), player); 
+					ItemJoin.getCore().getLang().sendLangMessage("general.warmingHalted", player, placeHolders);
 				}
 			});
 		} else {
@@ -4652,8 +4651,8 @@ public class ItemMap {
 						itemMap.addPlayerOnCooldown(player);
 					}
 				} else {
-					String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = StringUtils.translateLayout(itemMap.getCustomName(), player); 
-					LanguageAPI.getLang(false).sendLangMessage("general.warmingHalted", player, placeHolders);
+					String[] placeHolders = ItemJoin.getCore().getLang().newString(); placeHolders[13] = warmCount + ""; placeHolders[0] = player.getWorld().getName(); placeHolders[3] = StringUtils.translateLayout(itemMap.getCustomName(), player); 
+					ItemJoin.getCore().getLang().sendLangMessage("general.warmingHalted", player, placeHolders);
 				}
 				if (itemMap.warmDelay != 0) { itemMap.delWarmPending(player); }
 			});
@@ -4799,13 +4798,13 @@ public class ItemMap {
     * @return If the Player has the required economy balance to execute the command.
     */
     private boolean isPlayerChargeable(final Player player, final boolean materialCost) {
-		if (DependAPI.getDepends(false).getVault().vaultEnabled() && !materialCost && !(this.cost < 0)) {
-			double balance = 0.0; try { balance = DependAPI.getDepends(false).getVault().getBalance(player); } catch (NullPointerException e) { }
+		if (ItemJoin.getCore().getDependencies().getVault().vaultEnabled() && !materialCost && !(this.cost < 0)) {
+			double balance = 0.0; try { balance = ItemJoin.getCore().getDependencies().getVault().getBalance(player); } catch (NullPointerException e) { }
 			if (balance >= this.cost || this.cost < 0) {
 				return true;
 			} else if (!(balance >= this.cost)) {
-				String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[6] = this.cost.toString(); placeHolders[5] = balance + "";
-				LanguageAPI.getLang(false).sendLangMessage("general.econFailed", player, placeHolders);
+				String[] placeHolders = ItemJoin.getCore().getLang().newString(); placeHolders[6] = this.cost.toString(); placeHolders[5] = balance + "";
+				ItemJoin.getCore().getLang().sendLangMessage("general.econFailed", player, placeHolders);
 				return false;
 			}
 		} else if (materialCost) {
@@ -4862,8 +4861,8 @@ public class ItemMap {
 			String formatCost = "";
 			for (String str : this.itemCost.toLowerCase().split("_")) { formatCost += str.substring(0, 1).toUpperCase() + str.substring(1) + " "; }
 			formatCost = formatCost.substring(0, formatCost.length() - 1);
-			String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[4] = formatCost; placeHolders[6] = this.cost == 0 ? "1" : this.cost.toString(); placeHolders[5] = foundAmount + "";
-			LanguageAPI.getLang(false).sendLangMessage("general.itemFailed", player, placeHolders);
+			String[] placeHolders = ItemJoin.getCore().getLang().newString(); placeHolders[4] = formatCost; placeHolders[6] = this.cost == 0 ? "1" : this.cost.toString(); placeHolders[5] = foundAmount + "";
+			ItemJoin.getCore().getLang().sendLangMessage("general.itemFailed", player, placeHolders);
 			return false;
 		}
 		return true;
@@ -4905,8 +4904,8 @@ public class ItemMap {
 		String formatCost = "";
 		for (String str : this.itemCost.toLowerCase().split("_")) { formatCost += str.substring(0, 1).toUpperCase() + str.substring(1) + " "; }
 		formatCost = formatCost.substring(0, formatCost.length() - 1);
-		String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[4] = formatCost; placeHolders[6] = this.cost.toString();
-		LanguageAPI.getLang(false).sendLangMessage("general.itemSuccess", player, placeHolders);
+		String[] placeHolders = ItemJoin.getCore().getLang().newString(); placeHolders[4] = formatCost; placeHolders[6] = this.cost.toString();
+		ItemJoin.getCore().getLang().sendLangMessage("general.itemSuccess", player, placeHolders);
     }
 	
    /**
@@ -4915,15 +4914,15 @@ public class ItemMap {
     * @param player - The Player to have their economy balance changed.
     */
     private void withdrawBalance(final Player player) {
-		if (DependAPI.getDepends(false).getVault().vaultEnabled()) {
+		if (ItemJoin.getCore().getDependencies().getVault().vaultEnabled()) {
 			double balance = 0.0;
-			try { balance = DependAPI.getDepends(false).getVault().getBalance(player); } catch (NullPointerException e) { }
+			try { balance = ItemJoin.getCore().getDependencies().getVault().getBalance(player); } catch (NullPointerException e) { }
 			int parseCost = this.cost;
 			if (balance >= parseCost) {
 				if (parseCost > 0) {
-					try { DependAPI.getDepends(false).getVault().withdrawBalance(player, parseCost); } catch (NullPointerException e) { ServerUtils.sendDebugTrace(e); }
-					String[] placeHolders = LanguageAPI.getLang(false).newString(); placeHolders[6] = this.cost.toString();
-					LanguageAPI.getLang(false).sendLangMessage("general.econSuccess", player, placeHolders);
+					try { ItemJoin.getCore().getDependencies().getVault().withdrawBalance(player, parseCost); } catch (NullPointerException e) { ServerUtils.sendDebugTrace(e); }
+					String[] placeHolders = ItemJoin.getCore().getLang().newString(); placeHolders[6] = this.cost.toString();
+					ItemJoin.getCore().getLang().sendLangMessage("general.econSuccess", player, placeHolders);
 				}
 			}
 		}
@@ -5036,7 +5035,7 @@ public class ItemMap {
     * @return If the Player is on Cooldown.
     */
 	private boolean onSpamCooldown(final Player player) {
-		boolean interactSpam = ConfigHandler.getConfig().getFile("items.yml").getBoolean("items-Spamming");
+		boolean interactSpam = ItemJoin.getCore().getConfig("items.yml").getBoolean("items-Spamming");
 		if (interactSpam != true) {
 			long playersCooldownList = 0L;
 			if (this.storedSpammedPlayers.containsKey(PlayerHandler.getPlayerID(player) + ".items." + this.configName)) {
@@ -5083,7 +5082,7 @@ public class ItemMap {
     * @return If the Player is on Cooldown.
     */
 	private boolean onCooldownTick(final Player player) {
-		if (!ConfigHandler.getConfig().getFile("items.yml").getBoolean("items-Spamming")) {
+		if (!ItemJoin.getCore().getConfig("items.yml").getBoolean("items-Spamming")) {
 			long playersCooldownList = 0L;
 			if (this.playersOnCooldownTick.containsKey(PlayerHandler.getPlayerID(player))) {
 				playersCooldownList = this.playersOnCooldownTick.get(PlayerHandler.getPlayerID(player));
@@ -5206,11 +5205,11 @@ public class ItemMap {
     * 
     */
 	public void removeFromConfig() {
-		File itemFile =  new File (ItemJoin.getInstance().getDataFolder(), "items.yml");
+		File itemFile =  new File (ItemJoin.getCore().getPlugin().getDataFolder(), "items.yml");
 		FileConfiguration itemData = YamlConfiguration.loadConfiguration(itemFile);
-		if (ConfigHandler.getConfig().getFile("items.yml").getString("items." + this.configName) != null) { itemData.set("items." + this.configName, null); } 
-		try { itemData.save(itemFile); ConfigHandler.getConfig().getSource("items.yml"); ConfigHandler.getConfig().getFile("items.yml").options().copyDefaults(false); } 
-		catch (Exception e) { ItemJoin.getInstance().getServer().getLogger().severe("Could not remove the custom item " + this.configName + " from the items.yml data file!"); ServerUtils.sendDebugTrace(e); }	
+		if (ItemJoin.getCore().getConfig("items.yml").getString("items." + this.configName) != null) { itemData.set("items." + this.configName, null); } 
+		try { itemData.save(itemFile); ItemJoin.getCore().getConfiguration().getSource("items.yml"); ItemJoin.getCore().getConfig("items.yml").options().copyDefaults(false); } 
+		catch (Exception e) { ItemJoin.getCore().getPlugin().getServer().getLogger().severe("Could not remove the custom item " + this.configName + " from the items.yml data file!"); ServerUtils.sendDebugTrace(e); }	
 	}
 	
    /**
@@ -5218,10 +5217,10 @@ public class ItemMap {
     * 
     */
 	public void saveToConfig() {
-		File itemFile =  new File (ItemJoin.getInstance().getDataFolder(), "items.yml");
+		File itemFile =  new File (ItemJoin.getCore().getPlugin().getDataFolder(), "items.yml");
 		FileConfiguration itemData = YamlConfiguration.loadConfiguration(itemFile);
 		this.renderItemStack();
-		if (ConfigHandler.getConfig().getFile("items.yml").getString("items." + this.configName) != null) { itemData.set("items." + this.configName, null); } 
+		if (ItemJoin.getCore().getConfig("items.yml").getString("items." + this.configName) != null) { itemData.set("items." + this.configName, null); } 
 		if (!(this.dynamicMaterials != null && !this.dynamicMaterials.isEmpty())) { itemData.set("items." + this.configName + ".id", this.material.toString().toUpperCase() + (this.dataValue != null && this.dataValue != 0 ? ":" + this.dataValue : "")); }
 		else if (this.dynamicMaterials != null && !this.dynamicMaterials.isEmpty()) { 
 			for (int i = 0; i < this.dynamicMaterials.size(); i++) {
@@ -5258,7 +5257,7 @@ public class ItemMap {
 			} else {
 				setName = this.customName.replace("§", "&");
 			}
-			if (setName.startsWith("&f") && (!ItemHandler.dataTagsEnabled() || !ServerUtils.hasSpecificUpdate("1_8"))) { setName = setName.substring(2, setName.length()); }
+			if (setName.startsWith("&f") && (!ItemJoin.getCore().getData().dataTagsEnabled() || !ServerUtils.hasSpecificUpdate("1_8"))) { setName = setName.substring(2, setName.length()); }
 				if (!ItemHandler.getMaterialName(this.tempItem).equalsIgnoreCase(setName)) { 
 					itemData.set("items." + this.configName + ".name", setName); 
 				}
@@ -5541,8 +5540,8 @@ public class ItemMap {
 				itemData.set("items." + this.configName + ".disabled-worlds", worldList.substring(0, worldList.length() - 2)); 
 			}
 		}
-		try { itemData.save(itemFile); ConfigHandler.getConfig().getSource("items.yml"); ConfigHandler.getConfig().getFile("items.yml").options().copyDefaults(false); } 
-		catch (Exception e) { ItemJoin.getInstance().getServer().getLogger().severe("Could not save the new custom item " + this.configName + " to the items.yml data file!"); ServerUtils.sendDebugTrace(e); }	
+		try { itemData.save(itemFile); ItemJoin.getCore().getConfiguration().getSource("items.yml"); ItemJoin.getCore().getConfig("items.yml").options().copyDefaults(false); } 
+		catch (Exception e) { ItemJoin.getCore().getPlugin().getServer().getLogger().severe("Could not save the new custom item " + this.configName + " to the items.yml data file!"); ServerUtils.sendDebugTrace(e); }	
 	}
 	
    /**

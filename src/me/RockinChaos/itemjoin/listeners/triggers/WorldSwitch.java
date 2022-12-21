@@ -22,10 +22,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 
-import me.RockinChaos.itemjoin.handlers.PlayerHandler;
+import me.RockinChaos.core.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.item.ItemUtilities.TriggerType;
-import me.RockinChaos.itemjoin.utils.ServerUtils;
+import me.RockinChaos.core.utils.ServerUtils;
 
 public class WorldSwitch implements Listener {
 	

@@ -36,14 +36,15 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
-import me.RockinChaos.itemjoin.handlers.ItemHandler;
-import me.RockinChaos.itemjoin.handlers.PlayerHandler;
-import me.RockinChaos.itemjoin.handlers.events.PlayerAutoCraftEvent;
+
+import me.RockinChaos.core.utils.protocol.events.PlayerAutoCraftEvent;
+import me.RockinChaos.core.handlers.ItemHandler;
+import me.RockinChaos.core.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
-import me.RockinChaos.itemjoin.utils.SchedulerUtils;
-import me.RockinChaos.itemjoin.utils.ServerUtils;
-import me.RockinChaos.itemjoin.utils.StringUtils;
+import me.RockinChaos.core.utils.SchedulerUtils;
+import me.RockinChaos.core.utils.ServerUtils;
+import me.RockinChaos.core.utils.StringUtils;
 
 public class Crafting implements Listener {
 	
@@ -106,7 +107,7 @@ public class Crafting implements Listener {
 	* @param event - InventoryCloseEvent
 	*/
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = false)
-    private void onCraftingClose(me.RockinChaos.itemjoin.handlers.events.InventoryCloseEvent event) {
+    private void onCraftingClose(me.RockinChaos.core.utils.protocol.events.InventoryCloseEvent event) {
 		if (ServerUtils.hasSpecificUpdate("1_8") && PlayerHandler.isCraftingInv(event.getView())) {
 			ServerUtils.logDebug("{CRAFTING} Protocol-Packet inventory was closed for the player " + event.getPlayer().getName() + ".");
 			this.closeDupe.put(PlayerHandler.getPlayerID(event.getPlayer()), System.currentTimeMillis());
@@ -290,7 +291,7 @@ public class Crafting implements Listener {
 					} else {
 						SchedulerUtils.runLater(1L, () -> { 
 							player.getOpenInventory().getTopInventory().setItem(0, new ItemStack(Material.AIR)); 
-							PlayerHandler.updateInventory(player, ItemUtilities.getUtilities().getItemMap(new ItemStack(Material.AIR), null, player.getWorld()), 1L);
+							PlayerHandler.updateInventory(player, ItemUtilities.getUtilities().getItemMap(new ItemStack(Material.AIR), null, player.getWorld()).getItemStack(player), 1L);
 						});
 					}
 				}
@@ -348,14 +349,14 @@ public class Crafting implements Listener {
 					final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(contents[i], null, player.getWorld());
 					if (contents != null && contents[i] != null && itemMap != null) {
 						player.getOpenInventory().getTopInventory().setItem(i, contents[i]);
-						PlayerHandler.updateInventory(player, itemMap, 1L);
+						PlayerHandler.updateInventory(player, itemMap.getItemStack(player), 1L);
 					}
 				}
 			} else { 
 				final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(contents[0], null, player.getWorld());
 				if (contents != null && contents[0] != null && itemMap != null) {
 					player.getOpenInventory().getTopInventory().setItem(0, contents[0]); 
-					PlayerHandler.updateInventory(player, ItemUtilities.getUtilities().getItemMap(contents[0], null, player.getWorld()), 1L);
+					PlayerHandler.updateInventory(player, ItemUtilities.getUtilities().getItemMap(contents[0], null, player.getWorld()).getItemStack(player), 1L);
 				}
 			}
 		});

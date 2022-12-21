@@ -17,15 +17,13 @@
  */
 package me.RockinChaos.itemjoin.listeners;
 
-import me.RockinChaos.itemjoin.handlers.ConfigHandler;
-import me.RockinChaos.itemjoin.handlers.PlayerHandler;
-import me.RockinChaos.itemjoin.utils.StringUtils;
-
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPickupItemEvent;
+
+import me.RockinChaos.itemjoin.item.ItemData;
 
 public class Pickups implements Listener {
 
@@ -36,12 +34,11 @@ public class Pickups implements Listener {
 	*/
 	@EventHandler(ignoreCancelled = true)
 	private void onGlobalPickup(EntityPickupItemEvent event) {
-	  	Entity entity = event.getEntity();
+	  	final Entity entity = event.getEntity();
 	  	if (entity instanceof Player) {
-	  		Player player = (Player) event.getEntity();
-	  		if (StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("Pickups"), "TRUE", ",") || StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("Pickups"), player.getWorld().getName(), ",")
-	  			|| StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("Pickups"), "ALL", ",") || StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("Pickups"), "GLOBAL", ",")) {
-	  			if (ConfigHandler.getConfig().isPreventOP() && player.isOp() || ConfigHandler.getConfig().isPreventCreative() && PlayerHandler.isCreativeMode(player)) { } 
+	  		final Player player = (Player) event.getEntity();
+	  		if (ItemData.getInfo().isPreventString(player, "Pickups")) {
+	  			if (ItemData.getInfo().isPreventBypass(player)) { } 
 	  			else { event.setCancelled(true); }
 	  		}
 	  	}

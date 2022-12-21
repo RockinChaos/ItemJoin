@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import me.RockinChaos.itemjoin.ItemJoin;
-import me.RockinChaos.itemjoin.utils.ServerUtils;
+import me.RockinChaos.core.utils.ServerUtils;
 
 public class GIF {
 
@@ -49,7 +49,7 @@ public class GIF {
     * @return The newly created GIFImage.
     */
     public GIF(File folder, String image) {
-    	GIFDecoder decoder = new GIFDecoder(ItemJoin.getInstance().getDataFolder(), image);
+    	GIFDecoder decoder = new GIFDecoder(ItemJoin.getCore().getPlugin().getDataFolder(), image);
         List<Frame> frames = IntStream.range(0, decoder.getFrameCount()).mapToObj((i) -> new Frame(decoder.getFrame(i), decoder.getDelay(i))).collect(Collectors.toList());
         this.frames = Collections.unmodifiableList(frames);
     }

@@ -28,7 +28,7 @@ import org.bukkit.map.MapCanvas;
 import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
 import me.RockinChaos.itemjoin.ItemJoin;
-import me.RockinChaos.itemjoin.utils.ServerUtils;
+import me.RockinChaos.core.utils.ServerUtils;
 
 public class Renderer extends MapRenderer {
 	
@@ -57,10 +57,10 @@ public class Renderer extends MapRenderer {
 		this.staticImage = image;
 		if (image != null && !image.equalsIgnoreCase("default.jpg")) {
 			try { 
-				this.imgCache = ImageIO.read(new File(ItemJoin.getInstance().getDataFolder(), String.valueOf(image)));
+				this.imgCache = ImageIO.read(new File(ItemJoin.getCore().getPlugin().getDataFolder(), String.valueOf(image)));
 			} catch (IOException e) { ServerUtils.sendDebugTrace(e); }
-		} else if (image != null && image.equalsIgnoreCase("default.jpg") && ItemJoin.getInstance().getResource("files/generated/default.jpg") != null) {
-			try { this.imgCache = ImageIO.read(ItemJoin.getInstance().getResource("files/generated/default.jpg"));
+		} else if (image != null && image.equalsIgnoreCase("default.jpg") && ItemJoin.getCore().getPlugin().getResource("files/generated/default.jpg") != null) {
+			try { this.imgCache = ImageIO.read(ItemJoin.getCore().getPlugin().getResource("files/generated/default.jpg"));
 			} catch (IOException e) { ServerUtils.sendDebugTrace(e); }
 		}
 	}
@@ -75,7 +75,7 @@ public class Renderer extends MapRenderer {
     * @param repeat - The number of times to repeat the GIF animation.
     */
     public Renderer(final String image, final int imageID, final int startFrame, final int repeat) {
-        this.gifImage = new GIF(ItemJoin.getInstance().getDataFolder(), image);
+        this.gifImage = new GIF(ItemJoin.getCore().getPlugin().getDataFolder(), image);
         this.currentFrame = startFrame;
         this.toRepeat = repeat;
         this.ticksToWait = (this.gifImage.get(this.currentFrame).getDelay() / 1000 * 20);

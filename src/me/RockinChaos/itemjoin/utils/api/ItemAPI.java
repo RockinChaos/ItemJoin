@@ -20,8 +20,8 @@ package me.RockinChaos.itemjoin.utils.api;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
-import me.RockinChaos.itemjoin.handlers.PlayerHandler;
-import me.RockinChaos.itemjoin.utils.StringUtils;
+import me.RockinChaos.core.handlers.PlayerHandler;
+import me.RockinChaos.core.utils.StringUtils;
 
 public class ItemAPI {
 	

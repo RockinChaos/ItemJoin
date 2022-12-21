@@ -29,12 +29,13 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
-import me.RockinChaos.itemjoin.handlers.PlayerHandler;
+import me.RockinChaos.itemjoin.ItemJoin;
+import me.RockinChaos.core.handlers.PlayerHandler;
+import me.RockinChaos.itemjoin.item.ItemData;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.item.ItemUtilities.TriggerType;
-import me.RockinChaos.itemjoin.utils.SchedulerUtils;
-import me.RockinChaos.itemjoin.utils.ServerUtils;
-import me.RockinChaos.itemjoin.utils.api.DependAPI;
+import me.RockinChaos.core.utils.SchedulerUtils;
+import me.RockinChaos.core.utils.ServerUtils;
 
 public class PlayerGuard implements Listener {
 	
@@ -52,7 +53,7 @@ public class PlayerGuard implements Listener {
 		final Player player = event.getPlayer();
 		if (PlayerHandler.isPlayer(player)) {
 			SchedulerUtils.runAsync(() -> {
-				if (PlayerHandler.isEnabled(player, "ALL")) {
+				if (ItemData.getInfo().isEnabled(player, "ALL")) {
 					this.handleRegions(player, player.getLocation(), true, (event.getFrom() == null ? player.getLocation() : event.getFrom()));
 				}
 			});
@@ -70,7 +71,7 @@ public class PlayerGuard implements Listener {
 	private void setRegionItems(PlayerTeleportEvent event) {
 		final Player player = event.getPlayer();
 		if (PlayerHandler.isPlayer(player)) {
-			if (PlayerHandler.isEnabled(player, "ALL")) {
+			if (ItemData.getInfo().isEnabled(player, "ALL")) {
 				this.handleRegions(player, event.getTo(), false, (event.getFrom() == null ? event.getTo() : event.getFrom()));
 			}
 		}
@@ -84,7 +85,7 @@ public class PlayerGuard implements Listener {
 	* @param player - The player that has entered or exited a region.
 	*/
 	private void handleRegions(final Player player, final Location location, final boolean async, final Location fromLocation) {
-		String regions = DependAPI.getDepends(false).getGuard().getRegionAtLocation(location);
+		String regions = ItemJoin.getCore().getDependencies().getGuard().getRegionAtLocation(location);
 		if (this.playerRegions.get(player) != null) {
 			List < String > regionSet = new ArrayList < String > (Arrays.asList(regions.replace(" ", "").split(",")));
 			List < String > playerSet = new ArrayList < String > (Arrays.asList(this.playerRegions.get(player).replace(" ", "").split(",")));
@@ -96,7 +97,7 @@ public class PlayerGuard implements Listener {
 			}
 			for (String region: playerSet) {
 				if (region != null && !region.isEmpty()) {
-					if (async) { 
+					if (async) {
 						SchedulerUtils.run(() -> ItemUtilities.getUtilities().setItems(player, (async ? fromLocation.getWorld() : location.getWorld()), TriggerType.REGION_LEAVE, player.getGameMode(), region));
 					} else {
 						ItemUtilities.getUtilities().setItems(player, (async ? fromLocation.getWorld() : location.getWorld()), TriggerType.REGION_LEAVE, player.getGameMode(), region);
@@ -105,7 +106,7 @@ public class PlayerGuard implements Listener {
 			}
 			for (String region: regionSet) {
 				if (region != null && !region.isEmpty()) {
-					if (async) { 
+					if (async) {
 						SchedulerUtils.run(() -> ItemUtilities.getUtilities().setItems(player, location.getWorld(), TriggerType.REGION_ENTER, player.getGameMode(), region));
 					} else {
 						ItemUtilities.getUtilities().setItems(player, location.getWorld(), TriggerType.REGION_ENTER, player.getGameMode(), region);
@@ -115,7 +116,7 @@ public class PlayerGuard implements Listener {
 		} else {
 			for (String region: Arrays.asList(regions.replace(" ", "").split(","))) {
 				if (region != null && !region.isEmpty()) {
-					if (async) { 
+					if (async) {
 						SchedulerUtils.run(() -> ItemUtilities.getUtilities().setItems(player, location.getWorld(), TriggerType.REGION_ENTER, player.getGameMode(), region));
 					} else {
 						ItemUtilities.getUtilities().setItems(player, location.getWorld(), TriggerType.REGION_ENTER, player.getGameMode(), region);

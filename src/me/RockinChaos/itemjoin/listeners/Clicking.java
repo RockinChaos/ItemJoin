@@ -36,15 +36,16 @@ import org.bukkit.event.inventory.InventoryType.SlotType;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
-import me.RockinChaos.itemjoin.handlers.ConfigHandler;
-import me.RockinChaos.itemjoin.handlers.ItemHandler;
-import me.RockinChaos.itemjoin.handlers.PlayerHandler;
-import me.RockinChaos.itemjoin.handlers.events.PlayerPickItemEvent;
+import me.RockinChaos.core.utils.protocol.events.PlayerPickItemEvent;
+import me.RockinChaos.core.handlers.ItemHandler;
+import me.RockinChaos.core.handlers.PlayerHandler;
+import me.RockinChaos.itemjoin.ItemJoin;
+import me.RockinChaos.itemjoin.item.ItemData;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
-import me.RockinChaos.itemjoin.utils.SchedulerUtils;
-import me.RockinChaos.itemjoin.utils.ServerUtils;
-import me.RockinChaos.itemjoin.utils.StringUtils;
+import me.RockinChaos.core.utils.SchedulerUtils;
+import me.RockinChaos.core.utils.ServerUtils;
+import me.RockinChaos.core.utils.StringUtils;
 
 public class Clicking implements Listener {
 
@@ -60,9 +61,8 @@ public class Clicking implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	private void onGlobalModify(InventoryClickEvent event) {
 		Player player = (Player) event.getWhoClicked();
-	  	if (StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "TRUE", ",") || StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), player.getWorld().getName(), ",")
-		  			|| StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "ALL", ",") || StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "GLOBAL", ",")) {
-	  		if (ConfigHandler.getConfig().isPreventOP() && player.isOp() || ConfigHandler.getConfig().isPreventCreative() && PlayerHandler.isCreativeMode(player)) { } 
+	  	if (ItemData.getInfo().isPreventString(player, "itemMovement")) {
+	  		if (ItemData.getInfo().isPreventBypass(player)) { } 
 	  		else if (player.getOpenInventory().getTitle().contains("§") || player.getOpenInventory().getTitle().contains("&")) { }
 	  		else { event.setCancelled(true); }
 	  	}
@@ -76,9 +76,8 @@ public class Clicking implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	private void onGlobalPickItem(PlayerPickItemEvent event) {
 		Player player = event.getPlayer();
-	  	if (StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "TRUE", ",") || StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), player.getWorld().getName(), ",")
-		  			|| StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "ALL", ",") || StringUtils.splitIgnoreCase(ConfigHandler.getConfig().getPrevent("itemMovement"), "GLOBAL", ",")) {
-	  		if (ConfigHandler.getConfig().isPreventOP() && player.isOp() || ConfigHandler.getConfig().isPreventCreative() && PlayerHandler.isCreativeMode(player)) { }
+	  	if (ItemData.getInfo().isPreventString(player, "itemMovement")) {
+	  		if (ItemData.getInfo().isPreventBypass(player)) { }
 	  		else { event.setCancelled(true); }
 	  	}
 	}
@@ -232,9 +231,9 @@ public class Clicking implements Listener {
 	*/
 	public boolean isCreativeDupe(final InventoryClickEvent event) {
 		if (PlayerHandler.isCreativeMode((Player) event.getWhoClicked()) && event.getCurrentItem() != null && event.getCursor() != null) {
-			String currentNBT = (ItemHandler.dataTagsEnabled() ? ItemHandler.getNBTData(event.getCurrentItem()) 
+			String currentNBT = (ItemJoin.getCore().getData().dataTagsEnabled() ? ItemHandler.getNBTData(event.getCurrentItem(), ItemData.getInfo().getNBTList()) 
 					: ((event.getCurrentItem().hasItemMeta() && event.getCurrentItem().getItemMeta().hasDisplayName()) ? StringUtils.colorDecode(event.getCurrentItem()) : null));
-			String cursorNBT = (ItemHandler.dataTagsEnabled() ? ItemHandler.getNBTData(event.getCursor()) 
+			String cursorNBT = (ItemJoin.getCore().getData().dataTagsEnabled() ? ItemHandler.getNBTData(event.getCursor(), ItemData.getInfo().getNBTList()) 
 					: ((event.getCursor().hasItemMeta() && event.getCursor().getItemMeta().hasDisplayName()) ? StringUtils.colorDecode(event.getCursor()) : null));
 			if (currentNBT != null && cursorNBT != null) {
 				return currentNBT.equalsIgnoreCase(cursorNBT);

@@ -43,21 +43,17 @@ import org.bukkit.map.MapView;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import me.RockinChaos.itemjoin.ItemJoin;
-import me.RockinChaos.itemjoin.handlers.ConfigHandler;
-import me.RockinChaos.itemjoin.handlers.ItemHandler;
-import me.RockinChaos.itemjoin.handlers.ItemHandler.JSONEvent;
+import me.RockinChaos.core.handlers.ItemHandler;
+import me.RockinChaos.core.handlers.ItemHandler.JSONEvent;
 import me.RockinChaos.itemjoin.listeners.Recipes;
-import me.RockinChaos.itemjoin.utils.ReflectionUtils;
-import me.RockinChaos.itemjoin.utils.SchedulerUtils;
-import me.RockinChaos.itemjoin.utils.ServerUtils;
-import me.RockinChaos.itemjoin.utils.StringUtils;
-import me.RockinChaos.itemjoin.utils.ReflectionUtils.MinecraftMethod;
-import me.RockinChaos.itemjoin.utils.api.ChanceAPI;
-import me.RockinChaos.itemjoin.utils.api.DependAPI;
-import me.RockinChaos.itemjoin.utils.api.LegacyAPI;
+import me.RockinChaos.core.utils.ReflectionUtils;
+import me.RockinChaos.core.utils.SchedulerUtils;
+import me.RockinChaos.core.utils.ServerUtils;
+import me.RockinChaos.core.utils.StringUtils;
+import me.RockinChaos.core.utils.ReflectionUtils.MinecraftMethod;
+import me.RockinChaos.core.utils.api.LegacyAPI;
 import me.RockinChaos.itemjoin.utils.images.Renderer;
 import me.RockinChaos.itemjoin.utils.sql.DataObject;
-import me.RockinChaos.itemjoin.utils.sql.SQL;
 import me.RockinChaos.itemjoin.utils.sql.DataObject.Table;
 
 import com.mojang.authlib.GameProfile;
@@ -72,7 +68,7 @@ public class ItemDesigner {
 	* 
 	*/
 	public ItemDesigner() {
-		if (ItemJoin.getInstance().isStarted()) {
+		if (ItemJoin.getCore().isStarted()) {
 			SchedulerUtils.runAsyncLater(2L, () -> {
 				this.registerItems();
 			});
@@ -88,9 +84,10 @@ public class ItemDesigner {
 	* 
 	*/
 	public void registerItems() {
-		if (ConfigHandler.getConfig().itemsExist()) {
-			for (String internalName: ConfigHandler.getConfig().getConfigurationSection().getKeys(false)) {
-				ConfigurationSection itemNode = ConfigHandler.getConfig().getItemSection(internalName);
+		final ConfigurationSection itemsList = ItemJoin.getCore().getConfig("items.yml").getConfigurationSection("items");
+		if (itemsList != null) {
+			for (String internalName: itemsList.getKeys(false)) {
+				ConfigurationSection itemNode = itemsList.getConfigurationSection(internalName);
 				if (this.isConfigurable(internalName, itemNode)) {
 					String slotList = ((itemNode.getString(".slot") != null && !itemNode.getString(".slot").isEmpty()) ? itemNode.getString(".slot") : "ARBITRARY");
 					String[] slots = slotList.replace(" ", "").split(",");
@@ -136,7 +133,7 @@ public class ItemDesigner {
 							itemMap.setContents();
 							ItemUtilities.getUtilities().addItem(itemMap);
 							ItemUtilities.getUtilities().addCraftingItem(itemMap);
-						    ConfigHandler.getConfig().registerListeners(itemMap);
+						    ItemData.getInfo().registerListeners(itemMap);
 						}
 					}
 				}
@@ -144,7 +141,10 @@ public class ItemDesigner {
 			SchedulerUtils.runLater(8L, () -> {
 				ItemUtilities.getUtilities().updateItems();
 			});
-		}	
+		} else {
+			ServerUtils.logWarn("{ItemDesigner} There are no items detected in the items.yml.");
+			ServerUtils.logWarn("{ItemDesigner} Try adding an item to the items section in the items.yml.");
+		}
 	}
 	
    /**
@@ -156,7 +156,7 @@ public class ItemDesigner {
 	* @return If the material is valid.
 	*/
 	private boolean isConfigurable(final String internalName, final ConfigurationSection itemNode) {
-		String id = ItemHandler.getMaterial(itemNode);
+		String id = this.getMaterial(itemNode);
 		String dataValue = null;
 		if (id != null) {
 			if (id.contains(":")) {
@@ -221,6 +221,29 @@ public class ItemDesigner {
 	}
 	
    /**
+    * Gets the material as defined in the ConfigurationSection.
+    * 
+    * @param itemNode - The node ConfigurationSection (location) of the config section.
+    * @return The material exactly as found in the Configuration Section, without any animation delay.
+    */
+	public String getMaterial(final ConfigurationSection itemNode) {
+		final ConfigurationSection matList = ItemJoin.getCore().getConfig("items.yml").getConfigurationSection(itemNode.getCurrentPath() + ".id");
+		String material = ItemHandler.cutDelay(itemNode.getString(".id"));
+		if (matList != null) {
+			final List<String> materials = new ArrayList<String>();
+			for (final String materialKey : matList.getKeys(false)) {
+				final String materialList = itemNode.getString(".id." + materialKey);
+				if (materialList != null) {
+					materials.add(materialList);
+				}
+			}
+			material = ItemHandler.cutDelay(itemNode.getString(".id." + matList.getKeys(false).iterator().next()));
+			return material;
+		}
+		return material;
+	}
+	
+   /**
 	* Sets the Custom Material to the Custom Item.
 	*
 	*@param itemMap - The ItemMap being modified.
@@ -238,17 +261,18 @@ public class ItemDesigner {
 	* @return The found Bukkit material.
 	*/
 	private Material getActualMaterial(final ItemMap itemMap) {
+		final ConfigurationSection matList = ItemJoin.getCore().getConfig("items.yml").getConfigurationSection(itemMap.getNodeLocation().getCurrentPath() + ".id");
 		String material = ItemHandler.cutDelay(itemMap.getNodeLocation().getString(".id"));
-		if (ConfigHandler.getConfig().getMaterialSection(itemMap.getNodeLocation()) != null) {
+		if (matList != null) {
 			List<String> materials = new ArrayList<String>();
-			for (String materialKey : ConfigHandler.getConfig().getMaterialSection(itemMap.getNodeLocation()).getKeys(false)) {
+			for (String materialKey : matList.getKeys(false)) {
 				String materialList = itemMap.getNodeLocation().getString(".id." + materialKey);
 				if (materialList != null) {
 					materials.add(materialList);
 				}
 			}
 			itemMap.setDynamicMaterials(materials);
-			material = ItemHandler.cutDelay(itemMap.getNodeLocation().getString(".id." + ConfigHandler.getConfig().getMaterialSection(itemMap.getNodeLocation()).getKeys(false).iterator().next()));
+			material = ItemHandler.cutDelay(itemMap.getNodeLocation().getString(".id." + matList.getKeys(false).iterator().next()));
 			final Material mat = ItemHandler.getMaterial(material, null);
 			if (material.contains(":") && !mat.name().equalsIgnoreCase("PLAYER_HEAD")) { String[] parts = material.split(":"); itemMap.setDataValue((short) Integer.parseInt(parts[1])); }
 			return mat;
@@ -264,7 +288,7 @@ public class ItemDesigner {
 	*@param itemMap - The ItemMap being modified.
 	*/
 	private void setSkullDatabase(final ItemMap itemMap) {
-		if (DependAPI.getDepends(false).databaseEnabled() && itemMap.getNodeLocation().getString(".skull-texture") != null) {
+		if (ItemJoin.getCore().getDependencies().databaseEnabled() && itemMap.getNodeLocation().getString(".skull-texture") != null) {
 			if (itemMap.getMaterial().toString().equalsIgnoreCase("SKULL_ITEM") || itemMap.getMaterial().toString().equalsIgnoreCase("PLAYER_HEAD")) {
 				if (itemMap.getNodeLocation().getString(".skull-owner") != null) {  ServerUtils.logWarn("{ItemDesigner} You cannot define a skull owner and a skull texture at the same time, remove one from the item."); return;  }
 				String skullTexture = getActualTexture(itemMap);
@@ -288,7 +312,7 @@ public class ItemDesigner {
 	* @return The found skull texture.
 	*/
 	private String getActualTexture(final ItemMap itemMap) {
-		ConfigurationSection textureSection = ConfigHandler.getConfig().getFile("items.yml").getConfigurationSection(itemMap.getNodeLocation().getCurrentPath() + ".skull-texture");
+		ConfigurationSection textureSection = ItemJoin.getCore().getConfig("items.yml").getConfigurationSection(itemMap.getNodeLocation().getCurrentPath() + ".skull-texture");
 		String texture = ItemHandler.cutDelay(itemMap.getNodeLocation().getString(".skull-texture"));
 		if (textureSection != null) {
 			List<String> textures = new ArrayList<String>();
@@ -358,8 +382,8 @@ public class ItemDesigner {
 		if (itemMap.getNodeLocation().getString(".custom-map-image") != null && StringUtils.containsIgnoreCase(itemMap.getMaterial().toString(), "MAP")) {
 			if (itemMap.getNodeLocation().getString(".map-id") != null && StringUtils.isInt(itemMap.getNodeLocation().getString(".map-id"))) { itemMap.setMapID(itemMap.getNodeLocation().getInt(".map-id")); }
 			itemMap.setMapImage(itemMap.getNodeLocation().getString(".custom-map-image"));
-			if (itemMap.getMapImage().equalsIgnoreCase("default.jpg") || new File(ItemJoin.getInstance().getDataFolder(), itemMap.getMapImage()).exists()) {
-				DataObject dataObject = SQL.getData().getData(new DataObject(Table.MAP_IDS, null, null, itemMap.getMapImage(), null));
+			if (itemMap.getMapImage().equalsIgnoreCase("default.jpg") || new File(ItemJoin.getCore().getPlugin().getDataFolder(), itemMap.getMapImage()).exists()) {
+				DataObject dataObject = (DataObject) ItemJoin.getCore().getSQL().getData(new DataObject(Table.MAP_IDS, null, null, itemMap.getMapImage(), null));
 				if (dataObject != null && (itemMap.getMapID() == -1 || (itemMap.getMapID() == Integer.parseInt(dataObject.getMapID())))) {
 					int mapID = Integer.parseInt(dataObject.getMapID());
 					MapRenderer imgPlatform = this.createRenderer(itemMap.getMapImage(), mapID);
@@ -376,7 +400,7 @@ public class ItemDesigner {
 					itemMap.setMapID(mapID);
 					itemMap.setMapView(view);
 					try { view.addRenderer(imgPlatform); } catch (NullPointerException e) { ServerUtils.sendDebugTrace(e); }
-					SQL.getData().saveData(new DataObject(Table.MAP_IDS, null, null, itemMap.getMapImage(), Integer.toString(itemMap.getMapID())));
+					ItemJoin.getCore().getSQL().saveData(new DataObject(Table.MAP_IDS, null, null, itemMap.getMapImage(), Integer.toString(itemMap.getMapID())));
 				}
 			}
 		} else if (itemMap.getNodeLocation().getString(".map-id") != null && StringUtils.isInt(itemMap.getNodeLocation().getString(".map-id")) && StringUtils.containsIgnoreCase(itemMap.getMaterial().toString(), "MAP")) {
@@ -406,7 +430,7 @@ public class ItemDesigner {
 	* @param itemMap - The ItemMap being modified.
 	*/
 	private void setNBTData(final ItemMap itemMap) {
-		if (ItemHandler.dataTagsEnabled() && !itemMap.isVanilla() && !itemMap.isVanillaControl() && !itemMap.isVanillaStatus()) {
+		if (ItemJoin.getCore().getData().dataTagsEnabled() && !itemMap.isVanilla() && !itemMap.isVanillaControl() && !itemMap.isVanillaStatus()) {
 			try {
 				Object tag = ReflectionUtils.getMinecraftClass("NBTTagCompound").getConstructor().newInstance();
 				tag.getClass().getMethod(MinecraftMethod.setString.getMethod(tag, String.class, String.class), String.class, String.class).invoke(tag, "ItemJoin Name", itemMap.getConfigName());
@@ -462,7 +486,7 @@ public class ItemDesigner {
 	* @param itemMap - The ItemMap being modified.
 	*/
 	private void setJSONBookPages(final ItemMap itemMap) {
-		ConfigurationSection pagesSection = ConfigHandler.getConfig().getFile("items.yml").getConfigurationSection(itemMap.getNodeLocation().getCurrentPath() + ".pages");
+		ConfigurationSection pagesSection = ItemJoin.getCore().getConfig("items.yml").getConfigurationSection(itemMap.getNodeLocation().getCurrentPath() + ".pages");
 		if (itemMap.getMaterial().toString().equalsIgnoreCase("WRITTEN_BOOK") && itemMap.getNodeLocation().getString(".pages") != null && pagesSection != null && ServerUtils.hasSpecificUpdate("1_8")) {
 			List < String > JSONPages = new ArrayList < String > ();
 			List < List < String > > rawPages = new ArrayList < List < String > > ();
@@ -483,7 +507,7 @@ public class ItemDesigner {
 										? (",\"" + jsonType.event + "\":{\"action\":\"" + jsonType.action + "\",\"value\":\"" + inputResult + "\"}") 
 										: ("," + "{\"" + jsonType.action + "\":\"" + inputResult + "\"")));
 									formatLine = formatLine.replace(jsonType.matchType + inputResult + ">", "<JSONEvent>");
-									ItemHandler.safteyCheckURL(itemMap, jsonType, inputResult);
+									ItemHandler.safteyCheckURL(itemMap.getConfigName(), jsonType, inputResult);
 								}
 							}
 						}
@@ -530,7 +554,7 @@ public class ItemDesigner {
 	*/
 	private void setName(final ItemMap itemMap) {
 		String name = getActualName(itemMap);
-		if ((ItemHandler.dataTagsEnabled() && ServerUtils.hasSpecificUpdate("1_8")) || (itemMap.isVanilla() && ServerUtils.hasSpecificUpdate("1_8"))) {
+		if ((ItemJoin.getCore().getData().dataTagsEnabled() && ServerUtils.hasSpecificUpdate("1_8")) || (itemMap.isVanilla() && ServerUtils.hasSpecificUpdate("1_8"))) {
 			itemMap.setCustomName(name);
 		} else {
 			itemMap.setCustomName("§f" + name);
@@ -544,7 +568,7 @@ public class ItemDesigner {
 	* @return The correctly formatted display name.
 	*/
 	private String getActualName(final ItemMap itemMap) {
-		ConfigurationSection nameSection = ConfigHandler.getConfig().getFile("items.yml").getConfigurationSection(itemMap.getNodeLocation().getCurrentPath() + ".name");
+		ConfigurationSection nameSection = ItemJoin.getCore().getConfig("items.yml").getConfigurationSection(itemMap.getNodeLocation().getCurrentPath() + ".name");
 		String name = itemMap.getNodeLocation().getString(".name");
 		try { ItemHandler.cutDelay(itemMap.getNodeLocation().getString(".name")); } catch (Exception e) { }
 		if (nameSection != null) {
@@ -589,7 +613,7 @@ public class ItemDesigner {
 	* @return The correctly formatted list of displayed lores.
 	*/
 	private List < String > getActualLore(final ItemMap itemMap) {
-		ConfigurationSection loreSection = ConfigHandler.getConfig().getFile("items.yml").getConfigurationSection(itemMap.getNodeLocation().getCurrentPath() + ".lore");
+		ConfigurationSection loreSection = ItemJoin.getCore().getConfig("items.yml").getConfigurationSection(itemMap.getNodeLocation().getCurrentPath() + ".lore");
 		List <String> lore = itemMap.getNodeLocation().getStringList(".lore");
 		if (loreSection != null) {
 			List<List<String>> lores = new ArrayList<List<String>>();
@@ -664,7 +688,7 @@ public class ItemDesigner {
 		if (itemMap.getNodeLocation().getString(".probability") != null) {
 			String percentageString = itemMap.getNodeLocation().getString(".probability").replace("%", "").replace("-", "").replace(" ", "");
 			int percentage = Integer.parseInt(percentageString);
-			if (!ChanceAPI.getChances().getItems().containsKey(itemMap)) { ChanceAPI.getChances().putItem(itemMap, percentage); }
+			if (!ItemJoin.getCore().getChances().getItems().containsKey(itemMap)) { ItemJoin.getCore().getChances().putItem(itemMap, percentage); }
 			itemMap.setProbability(percentage);
 			if (itemMap.getProbability() == 100) {
 				ServerUtils.logWarn("{ItemDesigner} An item cannot be defined with 100 percent probability, please check the wiki on this usage.");
@@ -735,7 +759,7 @@ public class ItemDesigner {
 	*/
 	private void setRecipe(final ItemMap itemMap) {
 		if (itemMap.getNodeLocation().getString(".recipe") != null) {
-			ConfigurationSection recipeSection = ConfigHandler.getConfig().getFile("items.yml").getConfigurationSection(itemMap.getNodeLocation().getCurrentPath() + ".recipe");
+			ConfigurationSection recipeSection = ItemJoin.getCore().getConfig("items.yml").getConfigurationSection(itemMap.getNodeLocation().getCurrentPath() + ".recipe");
 			Map<Character, ItemRecipe> ingredientList = new HashMap < Character, ItemRecipe > ();
 			List<String> recipe = itemMap.getNodeLocation().getStringList(".recipe");
 			if (recipeSection != null) {
@@ -759,7 +783,7 @@ public class ItemDesigner {
     * @return The finalized ingredients list.
 	*/
 	private Map<Character, ItemRecipe> addRecipe(final ItemMap itemMap, final List < String > recipe, final String identifier, final Map<Character, ItemRecipe> ingredientList) {
-		final ShapedRecipe shapedRecipe = (ServerUtils.hasSpecificUpdate("1_12") ? new ShapedRecipe(new NamespacedKey(ItemJoin.getInstance(), itemMap.getConfigName() + identifier), itemMap.getItem(null)) : LegacyAPI.newShapedRecipe(itemMap.getItem(null)));
+		final ShapedRecipe shapedRecipe = (ServerUtils.hasSpecificUpdate("1_12") ? new ShapedRecipe(new NamespacedKey(ItemJoin.getCore().getPlugin(), itemMap.getConfigName() + identifier), itemMap.getItem(null)) : LegacyAPI.newShapedRecipe(itemMap.getItem(null)));
 		String[] shape = itemMap.trimRecipe(recipe);
 		shapedRecipe.shape(shape);
 		if (itemMap.getNodeLocation().getString(".ingredients") != null) {
@@ -803,7 +827,7 @@ public class ItemDesigner {
 							ServerUtils.sendSevereTrace(e);
 						}
 					}
-				} else if (ConfigHandler.getConfig().getItemSection(ingredientParts[1]) != null && count >= 1) {
+				} else if (ItemJoin.getCore().getConfig("items.yml").getConfigurationSection("items").getConfigurationSection(ingredientParts[1]) != null && count >= 1) {
 					SchedulerUtils.runLater(40L, () -> {
 						try { 
 							final ItemMap tempMap = ItemUtilities.getUtilities().getItemMap(null, ingredientParts[1], null);
@@ -820,7 +844,7 @@ public class ItemDesigner {
 								}
 								ingredientList.put(character, new ItemRecipe(ingredientParts[1], null, (byte)mapData, count));
 								if (!StringUtils.isRegistered(Recipes.class.getSimpleName())) {
-									ItemJoin.getInstance().getServer().getPluginManager().registerEvents(new Recipes(), ItemJoin.getInstance());
+									ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new Recipes(), ItemJoin.getCore().getPlugin());
 								}
 							} else { ServerUtils.logWarn("{ItemDesigner} The material " + ingredientParts[1] + " for the custom recipe defined for the item " + itemMap.getConfigName() + " is not a proper material type OR custom item node!"); }
 							} catch (IllegalArgumentException e) {
@@ -871,7 +895,7 @@ public class ItemDesigner {
 	* @return The found skull owner.
 	*/
 	private String getActualOwner(final ItemMap itemMap) {
-		ConfigurationSection ownerSection = ConfigHandler.getConfig().getFile("items.yml").getConfigurationSection(itemMap.getNodeLocation().getCurrentPath() + ".skull-owner");
+		ConfigurationSection ownerSection = ItemJoin.getCore().getConfig("items.yml").getConfigurationSection(itemMap.getNodeLocation().getCurrentPath() + ".skull-owner");
 		String owner = ItemHandler.cutDelay(itemMap.getNodeLocation().getString(".skull-owner"));
 		if (ownerSection != null) {
 			List<String> owners = new ArrayList<String>();
@@ -1004,7 +1028,7 @@ public class ItemDesigner {
 	private void setTippedArrows(final ItemMap itemMap) {
 		String potionEffect = (itemMap.getNodeLocation().getString(".potion-effect") != null ? itemMap.getNodeLocation().getString(".potion-effect") : itemMap.getNodeLocation().getString(".potion-effects"));
 		if (potionEffect != null) {
-			if (ServerUtils.hasSpecificUpdate("1_9") && !ItemJoin.getInstance().getServer().getVersion().contains("(MC: 1.9)") && itemMap.getMaterial().toString().equalsIgnoreCase("TIPPED_ARROW")) {
+			if (ServerUtils.hasSpecificUpdate("1_9") && !ItemJoin.getCore().getPlugin().getServer().getVersion().contains("(MC: 1.9)") && itemMap.getMaterial().toString().equalsIgnoreCase("TIPPED_ARROW")) {
 				String effectList = potionEffect.replace(" ", "");
 				List <PotionEffect> potionEffectList = new ArrayList<PotionEffect>();
 				for (String effect: effectList.split(",")) {
@@ -1211,7 +1235,7 @@ public class ItemDesigner {
  	* @param itemMap - The ItemMap being modified.
  	*/
 	private void setLegacyBookPages(final ItemMap itemMap) {
-		ConfigurationSection pagesSection = ConfigHandler.getConfig().getFile("items.yml").getConfigurationSection(itemMap.getNodeLocation().getCurrentPath() + ".pages");
+		ConfigurationSection pagesSection = ItemJoin.getCore().getConfig("items.yml").getConfigurationSection(itemMap.getNodeLocation().getCurrentPath() + ".pages");
 		if (!ServerUtils.hasSpecificUpdate("1_8") && itemMap.getMaterial().toString().equalsIgnoreCase("WRITTEN_BOOK") 
 			&& itemMap.getNodeLocation().getString(".pages") != null && pagesSection != null) {
 			List < String > formattedPages = new ArrayList < String > ();

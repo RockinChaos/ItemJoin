@@ -29,15 +29,13 @@ import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
-import me.RockinChaos.itemjoin.handlers.ConfigHandler;
-import me.RockinChaos.itemjoin.handlers.ItemHandler;
-import me.RockinChaos.itemjoin.handlers.ItemHandler.JSONEvent;
-import me.RockinChaos.itemjoin.handlers.LogHandler;
-import me.RockinChaos.itemjoin.handlers.PlayerHandler;
-import me.RockinChaos.itemjoin.utils.SchedulerUtils;
-import me.RockinChaos.itemjoin.utils.ServerUtils;
-import me.RockinChaos.itemjoin.utils.StringUtils;
-import me.RockinChaos.itemjoin.utils.api.BungeeAPI;
+import me.RockinChaos.core.handlers.ItemHandler;
+import me.RockinChaos.core.handlers.ItemHandler.JSONEvent;
+import me.RockinChaos.core.handlers.PlayerHandler;
+import me.RockinChaos.core.utils.SchedulerUtils;
+import me.RockinChaos.core.utils.ServerUtils;
+import me.RockinChaos.core.utils.StringUtils;
+import me.RockinChaos.itemjoin.ItemJoin;
 
 public class ItemCommand {
 	
@@ -433,7 +431,7 @@ public class ItemCommand {
 						JSONBuilder.put(JSONBuilder.size(), ((jsonType != JSONEvent.TEXT) ? (",\"" + jsonType.event + "\":{\"action\":\"" 
 						+ jsonType.action + "\",\"value\":\"" + inputResult + "\"}") : ("," + "{\"" + jsonType.action + "\":\"" + inputResult + "\"")));
 						formatLine = formatLine.replace(jsonType.matchType + inputResult + ">", "<JSONEvent>");
-						ItemHandler.safteyCheckURL(itemMap, jsonType, inputResult);
+						ItemHandler.safteyCheckURL(itemMap.getConfigName(), jsonType, inputResult);
 					}
 				}
 			}
@@ -483,7 +481,7 @@ public class ItemCommand {
 		try { 
 			String[] values = new String[1];
 			if (altPlayer != null) { values[0] = altPlayer.getName(); }
-			BungeeAPI.getBungee(false).SwitchServers(player, StringUtils.translateLayout(this.command, player, values)); 
+			ItemJoin.getCore().getBungee().SwitchServers(player, StringUtils.translateLayout(this.command, player, values)); 
 		} 
 		catch (Exception e) {
 			ServerUtils.logSevere("{ItemCommand} There was an error executing an item's command to switch servers, if this continues report it to the developer.");
@@ -501,7 +499,7 @@ public class ItemCommand {
 		try { 
 			String[] values = new String[1];
 			if (altPlayer != null) { values[0] = altPlayer.getName(); }
-			BungeeAPI.getBungee(false).ExecuteCommand(player, StringUtils.translateLayout(this.command, player, values)); 
+			ItemJoin.getCore().getBungee().ExecuteCommand(player, StringUtils.translateLayout(this.command, player, values)); 
 		} 
 		catch (Exception e) {
 			ServerUtils.logSevere("{ItemCommand} There was an error executing an item's command to BungeeCord, if this continues report it to the developer.");
@@ -556,13 +554,13 @@ public class ItemCommand {
 	* @param logCommand - the command that wont be logged.
 	*/
 	private void setLoggable(final Player player, final String logCommand) {
-		if (!ConfigHandler.getConfig().getFile("config.yml").getBoolean("General.Log-Commands")) {
+		if (!ItemJoin.getCore().getConfig("config.yml").getBoolean("General.Log-Commands")) {
 			ArrayList < String > templist = new ArrayList < String > ();
-			if (LogHandler.getFilter(false).getHidden().get("commands-list") != null && !LogHandler.getFilter(false).getHidden().get("commands-list").contains(logCommand)) {
-				templist = LogHandler.getFilter(false).getHidden().get("commands-list");
+			if (ItemJoin.getCore().getFilter().getHidden().get("commands-list") != null && !ItemJoin.getCore().getFilter().getHidden().get("commands-list").contains(logCommand)) {
+				templist = ItemJoin.getCore().getFilter().getHidden().get("commands-list");
 			}
 			templist.add(logCommand);
-			LogHandler.getFilter(false).addHidden("commands-list", templist);
+			ItemJoin.getCore().getFilter().addHidden("commands-list", templist);
 		}
 	}
 	
@@ -621,7 +619,7 @@ public class ItemCommand {
 	* @return The list of ItemCommands relating to the specified ItemMap.
 	*/
 	public static ItemCommand[] arrayFromString(final ItemMap itemMap, final boolean isList) {
-		if (ConfigHandler.getConfig().getCommandsSection(itemMap.getNodeLocation()) == null) {
+		if (ItemJoin.getCore().getConfig("items.yml").getConfigurationSection(itemMap.getNodeLocation().getCurrentPath()) == null) {
 			return new ItemCommand[] {
 				new ItemCommand("", Action.DEFAULT, Executor.DEFAULT, null, 0L, null)
 			};
@@ -637,12 +635,13 @@ public class ItemCommand {
 	* @return The list of ItemCommands relating to the specified ItemMap.
 	*/
 	private static ItemCommand[] fromConfig(final ItemMap itemMap, final boolean isList) {
-		if (ConfigHandler.getConfig().getCommandsSection(itemMap.getNodeLocation()) != null) {
+		final ConfigurationSection commandsList = ItemJoin.getCore().getConfig("items.yml").getConfigurationSection(itemMap.getNodeLocation().getCurrentPath());
+		if (commandsList != null) {
 			final List < ItemCommand > arrayCommands = new ArrayList < ItemCommand > ();
-			Iterator < String > it = ConfigHandler.getConfig().getCommandsSection(itemMap.getNodeLocation()).getKeys(false).iterator();
+			Iterator < String > it = commandsList.getKeys(false).iterator();
 			while (it.hasNext()) {
 				String definition = it.next();
-				ConfigurationSection commandSection = ConfigHandler.getConfig().getFile("items.yml").getConfigurationSection(itemMap.getNodeLocation().getCurrentPath() + "." + definition);
+				ConfigurationSection commandSection = ItemJoin.getCore().getConfig("items.yml").getConfigurationSection(itemMap.getNodeLocation().getCurrentPath() + "." + definition);
 				if (isList && commandSection != null) {
 					for (String internalCommands: commandSection.getKeys(false)) {
 						arrayCommands.addAll(arrayFromConfig(itemMap, definition, internalCommands));
