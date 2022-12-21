@@ -11,7 +11,7 @@
 	<description>Get custom items on join.</description>
 	<url>https://www.spigotmc.org/resources/itemjoin.12661/</url>
 	
-	<version>5.2.6-SNAPSHOT</version>
+	<version>6.0.0-SNAPSHOT</version>
 	
 	<properties>
 		<spigot.version>1.19.3-R0.1-SNAPSHOT</spigot.version>
@@ -107,7 +107,7 @@
 				<artifactId>maven-shade-plugin</artifactId>
 				<version>3.2.1</version>
 				<configuration>
-					<finalName>ItemJoin-${project.version}-b${env.BUILD_NUMBER}</finalName>
+					<finalName>ItemJoin-${project.version}-TESTING-ONLY-NOT-PRODUCTION-b${env.BUILD_NUMBER}</finalName>
 				</configuration>
 				<executions>
 					<execution>
@@ -167,11 +167,6 @@
 			<id>teamvk-repo</id>
 			<url>https://raw.githubusercontent.com/TeamVK/maven-repository/master/release/</url>
 		</repository>
-		<!--NickAPI Repository-->
-        <repository>
-            <id>public</id>
-            <url>https://haoshoku.xyz:1234/repository/public/</url>
-        </repository>
 		<!--SkinsRestorer Repository-->
 		<repository>
 			<id>codemc-snapshots</id>
@@ -205,6 +200,13 @@
 	</repositories>
 	
 	<dependencies>
+		<!--ChaosCore Integration-->
+		<dependency>
+			<groupId>me.RockinChaos.core</groupId>
+			<artifactId>ChaosCore</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+			<scope>compile</scope>
+		</dependency>
 		<!--Netty API-->
 		<dependency>
 			<groupId>io.netty</groupId>
