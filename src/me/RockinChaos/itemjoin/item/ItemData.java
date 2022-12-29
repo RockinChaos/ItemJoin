@@ -849,6 +849,25 @@ public class ItemData {
 		ItemJoin.getCore().getConfiguration().reloadFiles();
 		this.registerPrevent();
 	}
+	
+   /**
+    * Harshly reloads the configuration files and reregisters events
+    * Usefully when reloading the plugin or deleting items.
+    * 
+    * @param silent - If any messages should be sent.
+    */
+	public void hardReload(final boolean silent) {
+		ItemData.getInfo().saveCooldowns();
+		ItemUtilities.getUtilities().closeAnimations();
+		ItemUtilities.getUtilities().delToggleCommands();
+		ItemUtilities.getUtilities().clearItems(); {
+			ItemJoin.getCore().getConfiguration().reloadFiles(); {
+				SchedulerUtils.run(() -> {
+					ItemData.getInfo().registerClasses(silent);
+				});
+			}
+		}
+	}
     
    /**
     * Gets the instance of the ItemData.
