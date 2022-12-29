@@ -403,7 +403,7 @@ public class ItemData {
 	 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- //
 	 // -=-=-=-=-=-=   Copy The Configuration Files to Disk and Load them into Memory.   =-=-=-=-=-=- //
 	 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- //
-		ItemJoin.getCore().getConfiguration().copyFiles(); // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- //
+		ItemJoin.getCore().getConfiguration().reloadFiles(); // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- //
 	 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- //
 		ItemJoin.getCore().getData().setDebug(ItemJoin.getCore().getConfig("config.yml").getBoolean("General.Debugging"));
 		ItemJoin.getCore().getData().setDataTags(ItemJoin.getCore().getConfig("config.yml").getBoolean("Settings.DataTags"));
@@ -846,7 +846,7 @@ public class ItemData {
     * 
     */
 	public void softReload() {
-		ItemJoin.getCore().getConfiguration().copyFiles();
+		ItemJoin.getCore().getConfiguration().reloadFiles();
 		this.registerPrevent();
 	}
     

@@ -204,7 +204,7 @@ public class Menu {
 						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 						dataFile.set("Settings.HeldItem-Animations", !ItemJoin.getCore().getConfig("config.yml").getBoolean("Settings.HeldItem-Animations")); 	
 						ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-						ItemJoin.getCore().getConfiguration().reloadFiles();
+						ItemData.getInfo().hardReload(true);
 						SchedulerUtils.runLater(2L, () -> itemSettings(player));
 					}));
 			final int heldSlot = ItemJoin.getCore().getConfig("config.yml").getInt("Settings.HeldItem-Slot");
@@ -226,7 +226,7 @@ public class Menu {
 						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
 						dataFile.set("Settings.DataTags", !ItemJoin.getCore().getConfig("config.yml").getBoolean("Settings.DataTags")); 	
 						ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-						ItemJoin.getCore().getConfiguration().reloadFiles();
+						ItemData.getInfo().hardReload(true);
 						SchedulerUtils.runLater(2L, () -> itemSettings(player));
 					}));
 			itemPane.addButton(new Button(ItemHandler.getItem("LAVA_BUCKET", 1, false, 
@@ -392,7 +392,7 @@ public class Menu {
 					if (playerInv.getLeggings() != null && playerInv.getLeggings().getType() != Material.AIR) { convertStack(player, playerInv.getLeggings(),"LEGGINGS"); }
 					if (playerInv.getBoots() != null && playerInv.getBoots().getType() != Material.AIR) { convertStack(player, playerInv.getBoots(), "BOOTS"); }
 					if (ServerUtils.hasSpecificUpdate("1_9") && PlayerHandler.getOffHandItem(player) != null && PlayerHandler.getOffHandItem(player).getType() != Material.AIR) { convertStack(player, PlayerHandler.getOffHandItem(player), "OFFHAND"); }
-					ItemJoin.getCore().getConfiguration().reloadFiles();
+					ItemData.getInfo().hardReload(true);
 					startMenu(player);
 				}
 			}));
@@ -420,7 +420,7 @@ public class Menu {
 					if (playerInv.getLeggings() != null && playerInv.getLeggings().getType() != Material.AIR) { convertStack(player, playerInv.getLeggings(),"LEGGINGS"); }
 					if (playerInv.getBoots() != null && playerInv.getBoots().getType() != Material.AIR) { convertStack(player, playerInv.getBoots(), "BOOTS"); }
 					if (ServerUtils.hasSpecificUpdate("1_9") && PlayerHandler.getOffHandItem(player) != null && PlayerHandler.getOffHandItem(player).getType() != Material.AIR) { convertStack(player, PlayerHandler.getOffHandItem(player), "OFFHAND"); }
-					ItemJoin.getCore().getConfiguration().reloadFiles();
+					ItemData.getInfo().hardReload(true);
 					startMenu(player);
 				}
 			}));
@@ -731,7 +731,7 @@ public class Menu {
 				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[3] = itemMap.getConfigName();
 				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.itemRemoved", player, placeHolders);
-				ItemJoin.getCore().getConfiguration().reloadFiles(); {
+				ItemData.getInfo().hardReload(true); {
 					SchedulerUtils.runLater(4L, () -> {
 						startModify(player, null, 0); 
 					});
@@ -1041,7 +1041,7 @@ public class Menu {
 				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[3] = itemMap.getConfigName();
 				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.itemSaved", player, placeHolders);
-				ItemJoin.getCore().getConfiguration().reloadFiles();
+				ItemData.getInfo().hardReload(true);
 				player.closeInventory();
 			}));
 			creatingPane.addButton(new Button(fillerPaneBItem), 3);
@@ -1068,7 +1068,7 @@ public class Menu {
 				String[] placeHolders = ItemJoin.getCore().getLang().newString();
 				placeHolders[3] = itemMap.getConfigName();
 				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.itemSaved", player, placeHolders);
-				ItemJoin.getCore().getConfiguration().reloadFiles();
+				ItemData.getInfo().hardReload(true);
 				startMenu(player);
 			}));
 			returnPane.addButton(new Button(fillerPaneBItem), 2);

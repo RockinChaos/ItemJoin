@@ -159,16 +159,7 @@ public class ChatExecutor implements CommandExecutor {
 			ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l&m]---------------&a&l[&e Help Menu 10/10 &a&l]&a&l&m--------------[");
 			ItemJoin.getCore().getLang().dispatchMessage(sender, "");
 		} else if (Execute.RELOAD.accept(sender, args, 0)) {
-			ItemData.getInfo().saveCooldowns();
-			ItemUtilities.getUtilities().closeAnimations();
-			ItemUtilities.getUtilities().delToggleCommands();
-			ItemUtilities.getUtilities().clearItems(); {
-				ItemJoin.getCore().getConfiguration().reloadFiles(); {
-					SchedulerUtils.runLater(25L, () -> {
-						ItemData.getInfo().registerClasses(false);
-					});
-				}
-			}
+			ItemData.getInfo().hardReload(false);
 			ItemJoin.getCore().getLang().sendLangMessage("commands.default.configReload", sender);
 		} else if (Execute.MENU.accept(sender, args, 0)) {
 			Menu.startMenu(sender);
