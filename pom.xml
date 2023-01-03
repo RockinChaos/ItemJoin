@@ -17,14 +17,9 @@
 		<spigot.version>1.19.3-R0.1-SNAPSHOT</spigot.version>
 		
 		<authme.version>5.6.0-SNAPSHOT</authme.version>
-		<papi.version>2.10.9</papi.version>
 		<chestsort.version>11.0.0-SNAPSHOT</chestsort.version>
-		<skins.version>14.1.5</skins.version>
 		<authlib.version>1.5.21</authlib.version>
 		<worldguard.version>7.0.4-SNAPSHOT</worldguard.version>
-		<worldedit.version>7.2.0-SNAPSHOT</worldedit.version>
-		<citizens.version>2.0.27-SNAPSHOT</citizens.version>
-		<protocol.version>4.6.0</protocol.version>
 	
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.8</java.version>
@@ -142,17 +137,12 @@
 			<id>spigot-repo</id>
 			<url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
 		</repository>
-		<!--PlaceholderAPI Repository-->
-		<repository>
-			<id>placeholderapi</id>
-			<url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
-		</repository>
 		<!--Mojang Repository-->
 		<repository>
 			<id>mojang</id>
 			<url>https://libraries.minecraft.net/</url>
 		</repository>
-		<!--AuthMe / bStats Repository-->
+		<!--AuthMe Repository-->
 		<repository>
 			<id>CodeMC</id>
 			<url>https://repo.codemc.org/repository/maven-public</url>
@@ -167,12 +157,7 @@
 			<id>teamvk-repo</id>
 			<url>https://raw.githubusercontent.com/TeamVK/maven-repository/master/release/</url>
 		</repository>
-		<!--SkinsRestorer Repository-->
-		<repository>
-			<id>codemc-snapshots</id>
-			<url>https://repo.codemc.org/repository/maven-snapshots/</url>
-		</repository>
-		<!--WorldGuard/WorldEdit Repository-->
+		<!--WorldGuard Repository-->
 		<repository>
 			<id>sk89q-repo</id>
 			<url>https://maven.enginehub.org/repo/</url>
@@ -182,16 +167,6 @@
 			<id>VaultAPI</id>
 			<url>https://ci.ender.zone/plugin/repository/everything/net/milkbowl/vault/</url>
 		</repository>
-		<!--Citizens Repository-->
-        <repository>
-            <id>everything</id>
-            <url>https://repo.citizensnpcs.co/</url>
-        </repository>
-		<!--ProtocolLib Repository-->
-        <repository>
-            <id>dmulloy2-repo</id>
-            <url>https://repo.dmulloy2.net/repository/public/</url>
-        </repository>
 		<!--CraftationGaming Repository-->
 		<repository>
 			<id>CraftationGaming</id>
@@ -207,32 +182,11 @@
 			<version>1.0.0-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
-		<!--Netty API-->
-		<dependency>
-			<groupId>io.netty</groupId>
-			<artifactId>netty-all</artifactId>
-			<version>4.1.65.Final</version>
-			<scope>provided</scope>
-		</dependency>
-		<!--Maven WorldUtils API-->
-		<dependency>
-			<groupId>commons-lang</groupId>
-			<artifactId>commons-lang</artifactId>
-			<version>2.6</version>
-			<scope>provided</scope>
-		</dependency>
 		<!--Spigot API-->
 		<dependency>
 			<groupId>org.spigotmc</groupId>
 			<artifactId>spigot-api</artifactId>
 			<version>${spigot.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<!--PlaceholderAPI API-->
-		<dependency>
-			<groupId>me.clip</groupId>
-			<artifactId>placeholderapi</artifactId>
-			<version>${papi.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<!--AuthMe API-->
@@ -263,39 +217,25 @@
 			<version>18.18.1</version>
 			<scope>provided</scope>
 		</dependency>
-		<!--SkinsRestorer API-->
+		<!--ChestSort API-->
+        <dependency>
+            <groupId>de.jeff_media.chestsortapi</groupId>
+            <artifactId>ChestSortAPI</artifactId>
+            <version>${chestsort.version}</version>
+       	    <scope>provided</scope>
+        </dependency>
+		<!--WorldGuard API-->
 		<dependency>
-			<groupId>net.skinsrestorer</groupId>
-			<artifactId>skinsrestorer</artifactId>
-			<version>${skins.version}</version>
+			<groupId>com.sk89q.worldguard</groupId>
+			<artifactId>worldguard-bukkit</artifactId>
+			<version>${worldguard.version}</version>
 			<scope>provided</scope>
 		</dependency>
-		<!--Citizens API-->
-        <dependency>
-            <groupId>net.citizensnpcs</groupId>
-            <artifactId>citizens</artifactId>
-            <version>${citizens.version}</version>
-       	    <scope>provided</scope>
-        </dependency>
-		<!--ProtocolLib API-->
-        <dependency>
-            <groupId>com.comphenix.protocol</groupId>
-            <artifactId>ProtocolLib</artifactId>
-            <version>${protocol.version}</version>
-       	    <scope>provided</scope>
-        </dependency>
 		<!--Mojang AuthLib API-->
 		<dependency>
 			<groupId>com.mojang</groupId>
 			<artifactId>authlib</artifactId>
 			<version>${authlib.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<!--bStats API-->
-		<dependency>
-			<groupId>org.bstats</groupId>
-			<artifactId>bstats-bukkit</artifactId>
-			<version>1.4</version>
 			<scope>provided</scope>
 		</dependency>
 		<!--Apache API-->
@@ -309,6 +249,20 @@
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-api</artifactId>
 			<version>2.17.1</version>
+			<scope>provided</scope>
+		</dependency>
+		<!--Netty API-->
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-all</artifactId>
+			<version>4.1.65.Final</version>
+			<scope>provided</scope>
+		</dependency>
+		<!--Maven WorldUtils API-->
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>2.6</version>
 			<scope>provided</scope>
 		</dependency>
 		<!--Google API-->
@@ -328,41 +282,6 @@
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
 			<version>2.8.9</version>
-			<scope>provided</scope>
-		</dependency>
-		<!--Nick API-->
-        <dependency>
-            <groupId>xyz.haoshoku.nick</groupId>
-            <artifactId>nickapi</artifactId>
-            <version>6.2.1-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-		<!--BetterNick API-->
-		<dependency>
-			<groupId>de.domedd.betternick</groupId>
-			<artifactId>BetterNick</artifactId>
-			<version>7.4-SNAPSHOT</version>
-			<scope>provided</scope>
-		</dependency>
-		<!--ChestSort API-->
-        <dependency>
-            <groupId>de.jeff_media.chestsortapi</groupId>
-            <artifactId>ChestSortAPI</artifactId>
-            <version>${chestsort.version}</version>
-       	    <scope>provided</scope>
-        </dependency>
-		<!--WorldGuard API-->
-		<dependency>
-			<groupId>com.sk89q.worldguard</groupId>
-			<artifactId>worldguard-bukkit</artifactId>
-			<version>${worldguard.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<!--WorldEdit API-->
-		<dependency>
-			<groupId>com.sk89q.worldedit</groupId>
-			<artifactId>worldedit-bukkit</artifactId>
-			<version>${worldedit.version}</version>
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
