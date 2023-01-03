@@ -417,7 +417,15 @@ public class ItemData {
 		ItemJoin.getCore().getDependencies().refresh();
 		SchedulerUtils.runAsync(() -> {
 			int customItems = (ItemJoin.getCore().getConfig("items.yml").getConfigurationSection("items") != null ? ItemJoin.getCore().getConfig("items.yml").getConfigurationSection("items").getKeys(false).size() : 0);
+			final String compileVersion = "${spigot.version}";
 			if (!silent) {
+				if (!compileVersion.equalsIgnoreCase("${spigot.version}") && ServerUtils.hasPreciseUpdate("compileVersion".split("-")[0].replace(".", "_"))) {
+					ServerUtils.logSevere("Detected a unsupported version of Minecraft!");
+					ServerUtils.logSevere("Attempting to run in NMS compatability mode...");
+					ServerUtils.logSevere("Things may not work as expected, please check for plugin updates.");
+				} else if (compileVersion.equalsIgnoreCase("${spigot.version}")) {
+					ServerUtils.logInfo("Running a developer version ... skipping NMS check.");
+				}
 				ItemJoin.getCore().getDependencies().sendUtilityDepends();
 				this.warnExploitUsers();
 				ServerUtils.logInfo(customItems + " Custom item(s) loaded!");
