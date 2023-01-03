@@ -284,17 +284,20 @@ public class ItemAnimation {
 	* @param nameString - The name to set to the item.
 	*/
 	private void setNameData(final Player player, final ItemStack reviseItem, final String nameString) {
-		final ItemMeta tempmeta = reviseItem.getItemMeta();
-		String itemData = "";
-		if (this.itemMap.getLegacySecret() != null && !this.itemMap.getLegacySecret().isEmpty()) {
-			final String encodeData = StringUtils.colorEncode(new ItemStack(Material.STICK), this.itemMap.getLegacySecret()).getItemMeta().getDisplayName();
-			if (encodeData != null && !encodeData.isEmpty()) {
-				itemData = "§r" + encodeData;
+		ItemMeta tempMeta = reviseItem.getItemMeta();
+		if (tempMeta != null) {
+			tempMeta = tempMeta.clone();
+			String itemData = "";
+			if (this.itemMap.getLegacySecret() != null && !this.itemMap.getLegacySecret().isEmpty()) {
+				final String encodeData = StringUtils.colorEncode(new ItemStack(Material.STICK), this.itemMap.getLegacySecret()).getItemMeta().getDisplayName();
+				if (encodeData != null && !encodeData.isEmpty()) {
+					itemData = "§r" + encodeData;
+				}
 			}
+			tempMeta.setDisplayName(StringUtils.translateLayout(ItemHandler.cutDelay(nameString), player) + itemData);
+			reviseItem.setItemMeta(tempMeta);
+			reviseItem.setAmount(this.itemMap.getCount(player)); // Temporary, implementation for a list of animated item count is planned.
 		}
-		tempmeta.setDisplayName(StringUtils.translateLayout(ItemHandler.cutDelay(nameString), player) + itemData);
-		reviseItem.setItemMeta(tempmeta);
-		reviseItem.setAmount(this.itemMap.getCount(player)); // Temporary, implementation for a list of animated item count is planned.
 	}
 	
    /**
@@ -305,16 +308,19 @@ public class ItemAnimation {
 	* @param loreString - The lore to set to the item.
 	*/
 	private void setLoreData(final Player player, final ItemStack reviseItem, final List<String> loreString) {
-		final ItemMeta tempmeta = reviseItem.getItemMeta();
-		final List < String > loreList = loreString;
-		final List < String > loreFormatList = new ArrayList < String > ();
-		for (int k = 0; k < loreList.size(); k++) {
-			String formatLore = ItemHandler.cutDelay(loreList.get(k));
-			formatLore = StringUtils.translateLayout(formatLore, player);
-			loreFormatList.add(formatLore);
+		ItemMeta tempMeta = reviseItem.getItemMeta();
+		if (tempMeta != null) {
+			tempMeta = tempMeta.clone();
+			final List < String > loreList = loreString;
+			final List < String > loreFormatList = new ArrayList < String > ();
+			for (int k = 0; k < loreList.size(); k++) {
+				String formatLore = ItemHandler.cutDelay(loreList.get(k));
+				formatLore = StringUtils.translateLayout(formatLore, player);
+				loreFormatList.add(formatLore);
+			}
+			tempMeta.setLore(loreFormatList);
+			reviseItem.setItemMeta(tempMeta);
 		}
-		tempmeta.setLore(loreFormatList);
-		reviseItem.setItemMeta(tempmeta);
 	}
 	
    /**
@@ -389,20 +395,23 @@ public class ItemAnimation {
 	*/
 	private void setSkull(final Player player, ItemStack reviseItem, final String ownerString, final String textureString) {
 		ItemMeta tempMeta = reviseItem.getItemMeta();
-		if (ownerString != null) {
-			tempMeta = ItemHandler.setSkullOwner(tempMeta, StringUtils.translateLayout(ItemHandler.cutDelay(ownerString), player));
-		} else if (textureString != null && !textureString.contains("hdb-") && !this.itemMap.isHeadDatabase()) {
-			try {
-				if (ServerUtils.hasSpecificUpdate("1_8")) {
-					final GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
-					gameProfile.getProperties().put("textures", new Property("textures", new String(ItemHandler.cutDelay(StringUtils.toTextureUUID(player, this.itemMap.getConfigName(), textureString)))));
-					final Field declaredField = tempMeta.getClass().getDeclaredField("profile");
-					declaredField.setAccessible(true);
-					declaredField.set(tempMeta, gameProfile);
-				}
-			} catch (Exception e) { ServerUtils.sendDebugTrace(e); }
+		if (tempMeta != null) {
+			tempMeta = tempMeta.clone();
+			if (ownerString != null) {
+				tempMeta = ItemHandler.setSkullOwner(tempMeta, StringUtils.translateLayout(ItemHandler.cutDelay(ownerString), player));
+			} else if (textureString != null && !textureString.contains("hdb-") && !this.itemMap.isHeadDatabase()) {
+				try {
+					if (ServerUtils.hasSpecificUpdate("1_8")) {
+						final GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
+						gameProfile.getProperties().put("textures", new Property("textures", new String(ItemHandler.cutDelay(StringUtils.toTextureUUID(player, this.itemMap.getConfigName(), textureString)))));
+						final Field declaredField = tempMeta.getClass().getDeclaredField("profile");
+						declaredField.setAccessible(true);
+						declaredField.set(tempMeta, gameProfile);
+					}
+				} catch (Exception e) { ServerUtils.sendDebugTrace(e); }
+			}
+			reviseItem.setItemMeta(tempMeta);
 		}
-		reviseItem.setItemMeta(tempMeta);
 	}
 	
    /**
