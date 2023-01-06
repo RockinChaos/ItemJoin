@@ -5367,9 +5367,10 @@ public class Menu {
 					(stage == 0 ? "disable" : "enable") + " the", "&7custom item in &lALL WORLDS.", (stage == 0 ? "&9&lDISABLED:" : "&9&lENABLED:") + " &a" + 
 					(stage == 4 ? (StringUtils.containsValue(listWorlds, "ALL") || StringUtils.containsValue(listWorlds, "GLOBAL")) : (itemMap.containsWorld("ALL", (stage == 0 ? true : false))) + "")), event -> {
 				if ((stage == 4 && (StringUtils.containsValue(listWorlds, "ALL") || StringUtils.containsValue(listWorlds, "GLOBAL"))) || (stage != 4 && itemMap.containsWorld("ALL", (stage == 0 ? true : false)))) {
-					listWorlds.remove("GLOBAL");
-					listWorlds.remove("ALL");
+					listWorlds.clear();
+					listWorlds.add("DISABLED");
 				} else {
+					listWorlds.clear();
 					listWorlds.add("GLOBAL");
 				}
 				if (stage == 4) {
@@ -5402,12 +5403,12 @@ public class Menu {
 					} else {
 						listWorlds.add(world.getName());
 					}
+					if (listWorlds.isEmpty()) {
+						listWorlds.add("DISABLED");
+					} else if (StringUtils.containsValue(listWorlds, "DISABLED") || StringUtils.containsValue(listWorlds, "DISABLE")) {
+						listWorlds.remove("DISABLED");
+					}
 					if (stage == 4) {
-						if (listWorlds.isEmpty()) {
-							listWorlds.add("DISABLED");
-						} else if (StringUtils.containsValue(listWorlds, "DISABLED") || StringUtils.containsValue(listWorlds, "DISABLE")) {
-							listWorlds.remove("DISABLED");
-						}
 						String worldList = "";
 						for (String worldString : listWorlds) {
 							worldList += worldString + ", ";

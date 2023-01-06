@@ -651,6 +651,8 @@ public class ItemMap {
 				for (String enabledWorld : enabledParts) {
 					if (enabledWorld.equalsIgnoreCase("ALL") || enabledWorld.equalsIgnoreCase("GLOBAL")) {
 						this.enabledWorlds.add("ALL");
+					} if (enabledWorld.equalsIgnoreCase("DISABLED") || enabledWorld.equalsIgnoreCase("DISABLE")) {
+						this.enabledWorlds.add("DISABLED");
 					} else {
 						for (World world: Bukkit.getServer().getWorlds()) {
 							if (enabledWorld.equalsIgnoreCase(world.getName())) {
@@ -5536,7 +5538,7 @@ public class ItemMap {
 		if (this.disabledWorlds != null && !this.disabledWorlds.isEmpty()) { 
 			String worldList = "";
 			for (String world : this.disabledWorlds) { worldList += world + ", "; }
-			if (!worldList.startsWith("ALL") && !worldList.startsWith("GLOBAL")) {
+			if (!worldList.startsWith("DISABLED") || !worldList.startsWith("DISABLE")) {
 				itemData.set("items." + this.configName + ".disabled-worlds", worldList.substring(0, worldList.length() - 2)); 
 			}
 		}
