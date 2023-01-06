@@ -182,8 +182,9 @@ public class Commands implements Listener {
 	@EventHandler(ignoreCancelled = false)
 	private void onEquip(PlayerInteractEvent event) {
 		final Player player = event.getPlayer();
+		final Action action = event.getAction();
 		final ItemStack item = (event.getItem() != null ? event.getItem().clone() : event.getItem());
-		if (item != null && item.getType() != Material.AIR && PlayerHandler.isCraftingInv(player.getOpenInventory()) && !PlayerHandler.isMenuClick(player.getOpenInventory(), event.getAction())) {
+		if (item != null && item.getType() != Material.AIR && (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK)&& PlayerHandler.isCraftingInv(player.getOpenInventory()) && !PlayerHandler.isMenuClick(player.getOpenInventory(), event.getAction())) {
 			final String[] itemType = (item.getType().name().equalsIgnoreCase("ELYTRA") ? "ELYTRA_CHESTPLATE".split("_") : 
 				(ItemHandler.isSkull(item.getType()) || StringUtils.splitIgnoreCase(item.getType().name(), "HEAD", "_") ? "SKULL_HELMET".split("_") : item.getType().name().split("_")));
 			if (itemType.length >= 2 && itemType[1] != null && !itemType[1].isEmpty() && StringUtils.isInt(StringUtils.getArmorSlot(itemType[1], true)) 
