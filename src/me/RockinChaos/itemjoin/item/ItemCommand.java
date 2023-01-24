@@ -641,12 +641,14 @@ public class ItemCommand {
 			Iterator < String > it = commandsList.getKeys(false).iterator();
 			while (it.hasNext()) {
 				String definition = it.next();
-				ConfigurationSection commandSection = ItemJoin.getCore().getConfig("items.yml").getConfigurationSection(itemMap.getNodeLocation().getCurrentPath() + "." + definition);
-				if (isList && commandSection != null) {
-					for (String internalCommands: commandSection.getKeys(false)) {
-						arrayCommands.addAll(arrayFromConfig(itemMap, definition, internalCommands));
-					}
-				} else { arrayCommands.addAll(arrayFromConfig(itemMap, definition, null)); }
+				if (isAction(definition)) {
+					ConfigurationSection commandSection = ItemJoin.getCore().getConfig("items.yml").getConfigurationSection(itemMap.getNodeLocation().getCurrentPath() + "." + definition);
+					if (isList && commandSection != null) {
+						for (String internalCommands: commandSection.getKeys(false)) {
+							arrayCommands.addAll(arrayFromConfig(itemMap, definition, internalCommands));
+						}
+					} else { arrayCommands.addAll(arrayFromConfig(itemMap, definition, null)); }
+				}
 			}
 			final ItemCommand[] commands = new ItemCommand[arrayCommands.size()];
 			for (int i = 0; i < arrayCommands.size(); ++i) { commands[i] = arrayCommands.get(i);}
@@ -672,6 +674,21 @@ public class ItemCommand {
 			arrayCommands.add(fromString(commandsList.get(i).trim(), getExactAction(itemMap, definition), itemMap, delay, internalCommands));
 		}
 		return arrayCommands;	
+	}
+	
+   /**
+	* Checks if the definition is an actual ItemCommand Action.
+	* 
+	* @param definition - the definition to be checked.
+	* @return If the definition Action was located.
+	*/
+	private static boolean isAction(final String definition) {
+		for (Action action : Action.values()) {
+			if (action.hasConfig(definition.toLowerCase())) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
    /**

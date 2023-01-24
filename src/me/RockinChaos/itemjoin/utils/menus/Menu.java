@@ -3402,7 +3402,7 @@ public class Menu {
 		SchedulerUtils.runAsync(() -> {
 			commandPane.addButton(new Button(fillerPaneGItem), 4);
 			commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "WRITABLE_BOOK" : "386"), 1, false, "&e&lCommands", "&7", "&7*Click to define the custom command lines", "&7for the item and click type.", 
-					"&7", "&9&lCommands: &a" + (itemMap.getCommands().length != 0 ? "YES" : "NONE")), event -> actionPane(player, itemMap)));
+					"&7", "&9&lCommands: &a" + (itemMap.getCommands().length > 0 ? "YES" : "NONE")), event -> actionPane(player, itemMap)));
 			commandPane.addButton(new Button(fillerPaneGItem), 4);
 			commandPane.addButton(new Button(ItemHandler.getItem("REDSTONE", 1, false, "&a&lParticle", "&7", "&7*Custom particle(s) that will be", "&7displayed when the commands", "&7are successfully executed.", "&9&lCOMMANDS-PARTICLE: &a" +
 					StringUtils.nullCheck(itemMap.getCommandParticle() + "")), event -> {
@@ -8643,13 +8643,13 @@ public class Menu {
 			}
 		}
 		boolean useCommands = true;
-		if (itemMap.getCommands().length == 1) {
+		if (itemMap.getCommands().length > 0) {
 			for (ItemCommand command : itemMap.getCommands()) {
 				if (command.getRawCommand().equalsIgnoreCase("default: ")) {
 					useCommands = false;
 				}
 			}
-		} else if (itemMap.getCommands().length == 0) { useCommands = false; }
+		} else if (!(itemMap.getCommands().length > 0)) { useCommands = false; }
 		boolean useToggle = itemMap.getToggleCommands() != null && !itemMap.getToggleCommands().isEmpty();
 		String mobs = "";
 		for (EntityType entity: itemMap.getMobsDrop().keySet()) { mobs += entity.name() + ", "; }
