@@ -124,6 +124,7 @@ public class ItemDesigner {
 							this.setLegacyBookPages(itemMap);
 							this.setAttributes(itemMap);
 							this.setAttributeFlags(itemMap);
+							this.setEnchantmentFlags(itemMap);
 							this.setFlags(itemMap);
 							this.setProbability(itemMap);
 							this.setMobsDrop(itemMap);
@@ -1303,6 +1304,18 @@ public class ItemDesigner {
 	private void setAttributeFlags(final ItemMap itemMap) {
 		if (ServerUtils.hasSpecificUpdate("1_8") && StringUtils.containsIgnoreCase(itemMap.getItemFlags(), "hide-attributes")) {
 			itemMap.setAttributesInfo(true);
+		}
+	}
+	
+    /**
+ 	* Sets the Enchantments of the Custom Item,
+ 	* shows or hides the Enchantments of the item.
+ 	* 
+ 	* @param itemMap - The ItemMap being modified.
+ 	*/
+	private void setEnchantmentFlags(final ItemMap itemMap) {
+		if (ServerUtils.hasSpecificUpdate("1_8") && StringUtils.containsIgnoreCase(itemMap.getItemFlags(), "hide-enchants")) {
+			itemMap.setEnchantmentsInfo(true);
 		}
 	}
 	

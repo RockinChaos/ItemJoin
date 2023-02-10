@@ -250,6 +250,7 @@ public class ItemMap {
 	private boolean overwritable = false;
 	private boolean blockPlacement = false;
 	private boolean hideAttributes = false;
+	private boolean hideEnchantments = false;
 	private boolean hideFlags = false;
 	private boolean hideDurability = false;
 	private boolean blockEquip = false;
@@ -1665,6 +1666,15 @@ public class ItemMap {
     */
 	public void setAttributesInfo(final boolean bool) {
 		this.hideAttributes = bool;
+	}
+	
+   /**
+    * Sets the Enchantments Flag.
+    * 
+    * @param bool - The value to be set.
+    */
+	public void setEnchantmentsInfo(final boolean bool) {
+		this.hideEnchantments = bool;
 	}
 	
    /**
@@ -3451,6 +3461,15 @@ public class ItemMap {
 	}
 	
    /**
+    * Checks if the Enchantments Flag is enabled.
+    * 
+    * @return If it is enabled.
+    */
+	public boolean isEnchantmentsInfo() {
+		return this.hideEnchantments;
+	}
+	
+   /**
     * Checks if the Attributes Flag is enabled.
     * 
     * @return If it is enabled.
@@ -3854,6 +3873,7 @@ public class ItemMap {
 			}
 			this.setAttributes();
 			this.setAttributeFlags();
+			this.setEnchantmentsFlags();
 			this.setFlags();
 			this.realGlow();
 			this.setContents(player);
@@ -4358,6 +4378,16 @@ public class ItemMap {
 	private void setAttributeFlags() {
 		if (ServerUtils.hasSpecificUpdate("1_8") && this.hideAttributes) {
 			this.tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ATTRIBUTES);
+		}
+	}
+	
+   /**
+    * Sets the Enchantments to the Temporary ItemMeta.
+    * 
+    */
+	private void setEnchantmentsFlags() {
+		if (ServerUtils.hasSpecificUpdate("1_8") && this.hideEnchantments) {
+			this.tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ENCHANTS);
 		}
 	}
 	
