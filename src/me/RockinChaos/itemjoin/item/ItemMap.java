@@ -4306,15 +4306,20 @@ public class ItemMap {
 	private void setDye(final Player player) {
 		if (this.leatherColor != null) {
 			String newColor;
-			if (this.leatherColor.contains("%")) {
+			if (this.leatherColor.startsWith("%")) {
 				newColor = StringUtils.translateLayout(this.leatherColor, player);
-				if (newColor.contains("#")) {
+				if (newColor.startsWith("#")) {
 					((LeatherArmorMeta) this.tempMeta).setColor(StringUtils.getColorFromHexColor(newColor));
 				} else {
 					try {
 						((LeatherArmorMeta) this.tempMeta).setColor(DyeColor.valueOf(newColor).getFireworkColor());
 					} catch (Exception e) {
-						((LeatherArmorMeta) this.tempMeta).setColor(StringUtils.getColorFromHexColor(newColor));
+						try {
+							((LeatherArmorMeta) this.tempMeta).setColor(StringUtils.getColorFromHexColor(newColor));
+						} catch (Exception e2) {
+							ServerUtils.logSevere("{ItemMap} Unable to find the defined color: " + newColor + " for the item " + this.configName);
+							ServerUtils.sendSevereTrace(e2);
+						}
 					}
 				}
 			} else {
