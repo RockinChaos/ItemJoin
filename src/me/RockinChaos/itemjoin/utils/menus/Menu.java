@@ -260,7 +260,7 @@ public class Menu {
 					"&bMySQL Database", "&7", "&7*If the plugin should use", "&7a MySQL Database instead", "&7of the locale SQLite Database.",
 					"&9&lENABLED: &a" + String.valueOf(ItemJoin.getCore().getConfig("config.yml").getBoolean("Database.MySQL")).toUpperCase()), 
 					event -> databasePane(player)));
-			configPane.addButton(new Button(fillerPaneBItem), 4);
+			configPane.addButton(new Button(fillerPaneBItem), 3);
 			configPane.addButton(new Button(ItemHandler.getItem("BUCKET", 1, ItemJoin.getCore().getConfig("config.yml").getBoolean("General.CheckforUpdates"), 
 					"&bCheck for Updates", "&7", "&7*If the plugin should check", "&7for updates at start-up.", "&7This includes the use of the", "&7/itemjoin updates/upgrade command(s).", 
 					"&9&lENABLED: &a" + String.valueOf(ItemJoin.getCore().getConfig("config.yml").getBoolean("General.CheckforUpdates")).toUpperCase()), 
@@ -295,6 +295,18 @@ public class Menu {
 						ItemData.getInfo().softReload();
 						SchedulerUtils.runLater(2L, () -> configSettings(player));
 					}));
+			configPane.addButton(new Button(ItemHandler.getItem("REDSTONE", 1, ItemJoin.getCore().getConfig("config.yml").getBoolean("General.ignoreErrors"), 
+					"&bIgnore Errors", "&7", "&7*Disables the sending of errors", "&7to all admins upon joining the server.", 
+					"&9&lENABLED: &a" + String.valueOf(ItemJoin.getCore().getConfig("config.yml").getBoolean("General.ignoreErrors")).toUpperCase()), 
+					event -> {
+						File fileFolder = new File (ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
+						FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
+						dataFile.set("General.ignoreErrors", !ItemJoin.getCore().getConfig("config.yml").getBoolean("General.ignoreErrors")); 	
+						ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+						ItemData.getInfo().softReload();
+						SchedulerUtils.runLater(2L, () -> configSettings(player));
+					}));
+			configPane.addButton(new Button(fillerPaneBItem));
 			configPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GRASS_BLOCK" : "2"), 1, ((ItemJoin.getCore().getConfig("config.yml").getStringList("Active-Commands.commands").size() != 0 
 					&& !StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.enabled-worlds"), "DISABLED"))), 
 					"&bActive Commands", "&7", "&7*Specify a list of commands", "&7to be executed upon performing a trigger.", "&7These commands are not related to", "&7custom items, rather the server itself.", 
@@ -335,7 +347,6 @@ public class Menu {
 						ItemData.getInfo().softReload();
 						SchedulerUtils.runLater(2L, () -> configSettings(player));
 					}));
-			configPane.addButton(new Button(fillerPaneBItem));
 			configPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the main menu."), event -> startMenu(player)));
 			configPane.addButton(new Button(fillerPaneBItem), 7);
 			configPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, "&c&l&nReturn", "&7", "&7*Returns you to the main menu."), event -> startMenu(player)));
@@ -4844,6 +4855,17 @@ public class Menu {
 				}
 				flagPane(player, itemMap);
 			}));
+			flagPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? (itemMap.isEnchantmentsInfo() ? "EXPERIENCE_BOTTLE" : "GLASS_BOTTLE") : (itemMap.isEnchantmentsInfo() ? "384" : "374")), 1, itemMap.isEnchantmentsInfo(), "&a&l&nHide Enchantments", "&7", 
+					"&a&lTrue&f: &7Hides all enchantments on an item.", "&7", 
+					"&c&lFalse&f:&7 The item will have enchantments visible.", "&7", 
+					"&9&lENABLED: &a" + (itemMap.isEnchantmentsInfo() + "").toUpperCase()), event -> {
+				if (itemMap.isEnchantmentsInfo()) {
+					itemMap.setEnchantmentsInfo(false);
+				} else {
+					itemMap.setEnchantmentsInfo(true);
+				}
+				flagPane(player, itemMap);
+			}));
 			flagPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "ENDER_EYE" : "381"), 1, itemMap.isAttributesInfo(), "&a&l&nHide Attributes", "&7", 
 					"&a&lTrue&f: &7Hides all attribute tags from the item", "&7such damage values, attack speed, hit points, etc.", "&7Typically this is the information that", "&7starts with (When in Main Hand:).", "&7", 
 					"&c&lFalse&f:&7 The item will have information tags visible.", "&7", 
@@ -5053,7 +5075,9 @@ public class Menu {
 					}
 					flagPane(player, itemMap);
 				}));
-			} else { flagPane.addButton(new Button(fillerPaneBItem)); }
+			} else {
+				flagPane.addButton(new Button(ItemHandler.getItem("ENDER_PEARL", 1, false, "&c&l&nX", "&7", "&c*Not Available")));
+			}
 			flagPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "ENCHANTING_TABLE" : "116"), 1, itemMap.isItemChangable(), "&a&l&nAllow Modifications", "&7", 
 					"&a&lTrue&f: &7Allows the players to modify the item", "&7while retaining all properties.", "&7",
 					"&c&lFalse&f: &7Item will not be modifiable.", "&7", 
@@ -5111,7 +5135,7 @@ public class Menu {
 				}
 				flagPane(player, itemMap);
 			}));
-			flagPane.addButton(new Button(fillerPaneBItem), 35);
+			flagPane.addButton(new Button(fillerPaneBItem), 34);
 		});
 		flagPane.open(player);
 	}
@@ -5129,6 +5153,7 @@ public class Menu {
 		if (itemMap.isIpLimted()) { itemflags += "IP-LIMIT, "; }
 		if (itemMap.isUnbreakable()) { itemflags += "UNBREAKABLE, "; }
 		if (itemMap.isAttributesInfo()) { itemflags += "HIDE-ATTRIBUTES, "; }
+		if (itemMap.isEnchantmentsInfo()) { itemflags += "HIDE-ENCHANTS, "; }
 		if (itemMap.isFlagsInfo()) { itemflags += "HIDE-FLAGS, "; }
 		if (itemMap.isDurabilityBar()) { itemflags += "HIDE-DURABILITY, "; }
 		if (itemMap.isPlaceable()) { itemflags += "PLACEMENT, "; }
