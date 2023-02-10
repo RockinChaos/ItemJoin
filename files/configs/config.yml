@@ -28,6 +28,7 @@ General:
   CheckforUpdates: true
   Metrics-Logging: true
   Log-Commands: true
+  ignoreErrors: false
   ignoreDepend: NONE
   Debugging: false
 

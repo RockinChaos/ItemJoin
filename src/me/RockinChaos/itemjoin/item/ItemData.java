@@ -406,6 +406,7 @@ public class ItemData {
 		ItemJoin.getCore().getConfiguration().reloadFiles(); // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- //
 	 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- //
 		ItemJoin.getCore().getData().setDebug(ItemJoin.getCore().getConfig("config.yml").getBoolean("General.Debugging"));
+		ItemJoin.getCore().getData().setIgnoreErrors(ItemJoin.getCore().getConfig("config.yml").getBoolean("General.ignoreErrors"));
 		ItemJoin.getCore().getData().setDataTags(ItemJoin.getCore().getConfig("config.yml").getBoolean("Settings.DataTags"));
 		ItemJoin.getCore().getData().setSQL(ItemJoin.getCore().getConfig("config.yml").getString("Database.MySQL") != null && ItemJoin.getCore().getConfig("config.yml").getBoolean("Database.MySQL"));
 		ItemJoin.getCore().getData().setTablePrefix(ItemJoin.getCore().getConfig("config.yml").getString("Database.prefix") != null ? ItemJoin.getCore().getConfig("config.yml").getString("Database.prefix") : "ij_");
