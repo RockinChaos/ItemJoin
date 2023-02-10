@@ -65,10 +65,10 @@ items:
     - '&7'
     - '&7Left-Click use spectator token.'
     interact-right:
-    - 'console: minecraft:gamemode creative %player%'
+    - 'player: minecraft:gamemode creative %player%'
     - 'message: &eYou have been set to creative mode.'
     interact-left:
-    - 'console: minecraft:gamemode spectator %player%'
+    - 'player: minecraft:gamemode spectator %player%'
     - 'message: &eYou have been set to spectator mode.'
     commands-sound: BLOCK_NOTE_BLOCK_PLING
     commands-cooldown: 2
