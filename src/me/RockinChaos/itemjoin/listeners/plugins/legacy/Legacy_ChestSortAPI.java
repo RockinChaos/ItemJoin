@@ -22,6 +22,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 
+import me.RockinChaos.core.utils.ServerUtils;
 import me.RockinChaos.itemjoin.item.ItemData;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.utils.menus.Menu;
@@ -37,23 +38,27 @@ public class Legacy_ChestSortAPI implements Listener {
 	private void onChestSortEvent(de.jeff_media.ChestSortAPI.ChestSortEvent event) {
 		Player player = (Player) event.getPlayer();
 		if (player == null) { player = (Player) event.getInventory().getViewers().get(0); }
-	  	if (ItemData.getInfo().isPreventString(player, "itemMovement")) {
-	  		if (ItemData.getInfo().isPreventBypass(player)) { } 
-	  		else if (player.getOpenInventory().getTitle().contains("§") || player.getOpenInventory().getTitle().contains("&")) { }
-	  		else { event.setCancelled(true); }
-	  	}
-	  	if (!event.isCancelled()) {
-			if (Menu.isOpen(player)) {
-				event.setCancelled(true);
-			} else {
-				try {
-					for (ItemStack item : event.getInventory().getContents()) {
-						if (!ItemUtilities.getUtilities().isAllowed(player, item, "inventory-modify")) {
-							event.setUnmovable(item);
+		if (player != null) {
+		  	if (ItemData.getInfo().isPreventString(player, "itemMovement")) {
+		  		if (ItemData.getInfo().isPreventBypass(player)) { } 
+		  		else if (player.getOpenInventory().getTitle().contains("§") || player.getOpenInventory().getTitle().contains("&")) { }
+		  		else { event.setCancelled(true); }
+		  	}
+		  	if (!event.isCancelled()) {
+				if (Menu.isOpen(player)) {
+					event.setCancelled(true);
+				} else {
+					try {
+						for (ItemStack item : event.getInventory().getContents()) {
+							if (!ItemUtilities.getUtilities().isAllowed(player, item, "inventory-modify")) {
+								event.setUnmovable(item);
+							}
 						}
-					}
-				} catch (NoSuchMethodError e) { }
-			}
-	  	}
+					} catch (NoSuchMethodError e) { }
+				}
+		  	}
+		} else {
+			ServerUtils.logDebug("{ChestSort_LEGACY} Unable to detect the specified player, sort event is unable to be checked!");
+		}
 	}
 }
