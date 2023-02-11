@@ -477,6 +477,8 @@ public class ItemData {
 		ItemJoin.getCore().getData().setPluginPrefix("&7[&eItemJoin&7]");
 		ItemJoin.getCore().getData().setConfig(ImmutableMap.of("config.yml", 8, "items.yml", 8, "lang.yml", 8));
 		ItemJoin.getCore().getData().setLanguages(Arrays.asList("English", "Spanish", "Russian", "French", "Dutch", "Portuguese", "Chinese", "SimplifiedChinese", "TraditionalChinese", "TwChinese", "CnChinese"));
+		ItemJoin.getCore().getData().setPermissions(Arrays.asList("itemjoin.use", "itemjoin.dump", "itemjoin.reload", "itemjoin.updates", "itemjoin.upgrade", "itemjoin.menu", "itemjoin.purge", "itemjoin.get", "itemjoin.get.others", 
+																  "itemjoin.remove", "itemjoin.remove.others", "itemjoin.disable", "itemjoin.disable.others", "itemjoin.enable", "itemjoin.enable.others", "itemjoin.list", "itemjoin.query"));
 		ItemJoin.getCore().getData().setAlterTables(this.getAlterTables());
 		ItemJoin.getCore().getData().setCreateTables(this.getCreateTables());
 		ItemJoin.getCore().getData().setUpdateConfig(this.generateItemsFile(), "items.yml");

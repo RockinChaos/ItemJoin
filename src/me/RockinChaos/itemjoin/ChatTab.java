@@ -123,6 +123,7 @@ public class ChatTab implements TabCompleter {
 			if (PermissionsHandler.hasPermission(sender, "itemjoin.get.others")) {  	commands.add("getOnline"); }
 			if (PermissionsHandler.hasPermission(sender, "itemjoin.remove")) { 	        commands.addAll(Arrays.asList("remove","removeAll")); }
 			if (PermissionsHandler.hasPermission(sender, "itemjoin.remove.others")) {   commands.add("removeOnline"); }
+			if (PermissionsHandler.hasPermission(sender, "itemjoin.dump")) { 		    commands.add("dump"); }
 			if (PermissionsHandler.hasPermission(sender, "itemjoin.reload")) { 		    commands.add("reload"); }
 			if (PermissionsHandler.hasPermission(sender, "itemjoin.menu")) { 			commands.add("menu"); }
 			if (PermissionsHandler.hasPermission(sender, "itemjoin.query")) { 			commands.add("query"); }

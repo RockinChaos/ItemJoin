@@ -19,6 +19,7 @@ permissions:
       default: false
       children:
           itemjoin.use: true
+          itemjoin.dump: true
           itemjoin.reload: true
           itemjoin.menu: true
           itemjoin.updates: true
@@ -41,6 +42,9 @@ permissions:
       default: true
    itemjoin.menu:
       description: Grants access to the menu command.
+      default: false
+   itemjoin.dump:
+      description: Grants access to the dump command.
       default: false
    itemjoin.reload:
       description: Grants access to the reload command.
