@@ -264,6 +264,7 @@ public class ItemMap {
 	private boolean alwaysGive = false;
 	private boolean autoRemove = false;
 	private boolean stackable = false;
+	private boolean notHat = false;
 	private boolean selectable = false;
 	private boolean CreativeBypass = false;
 	private boolean AllowOpBypass = false;
@@ -518,6 +519,7 @@ public class ItemMap {
 			this.alwaysGive = StringUtils.containsIgnoreCase(this.itemflags, "always-give");
 			this.autoRemove = StringUtils.containsIgnoreCase(this.itemflags, "auto-remove");
 			this.stackable = StringUtils.containsIgnoreCase(this.itemflags, "stackable");
+			this.notHat = StringUtils.containsIgnoreCase(this.itemflags, "not-hat");
 			this.selectable = StringUtils.containsIgnoreCase(this.itemflags, "selectable");
 			this.dynamic = StringUtils.containsIgnoreCase(this.itemflags, "dynamic");
 			this.animate = StringUtils.containsIgnoreCase(this.itemflags, "animate");
@@ -1603,6 +1605,15 @@ public class ItemMap {
     */
 	public void setStackable(final boolean bool) {
 		this.stackable = bool;
+	}
+	
+   /**
+    * Sets the Not Hat Flag.
+    * 
+    * @param bool - The value to be set.
+    */
+	public void setNotHat(final boolean bool) {
+		this.notHat = bool;
 	}
 	
    /**
@@ -3398,6 +3409,15 @@ public class ItemMap {
 	}
 	
    /**
+    * Checks if the Not Hat Flag is enabled.
+    * 
+    * @return If it is enabled.
+    */
+	public boolean isNotHat() {
+		return this.notHat;
+	}
+	
+   /**
     * Checks if the Selectable Flag is enabled.
     * 
     * @return If it is enabled.
@@ -3633,6 +3653,7 @@ public class ItemMap {
 			else if (findFlag.equals("inventory-close")) { return closeInventory; }
 			else if (findFlag.equals("item-store")) { return itemStore; } 
 			else if (findFlag.equals("stackable")) { return stackable; } 
+			else if (findFlag.equals("not-hat")) { return notHat; } 
 			else if (findFlag.equals("selectable")) { return selectable; } 
 			else if (findFlag.equals("item-modifiable")) { return itemModify; } 
 			else if (findFlag.equals("item-craftable")) { return noCrafting; } 

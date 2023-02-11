@@ -4743,6 +4743,17 @@ public class Menu {
 				}
 				flagPane(player, itemMap);
 			}));
+			flagPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "IRON_HELMET" : "306"), 1, itemMap.isNotHat(), "&a&l&nNot Hat", "&7", 
+					"&a&lTrue&f:&7 Prevents the item from being worn as a hat", "&7using the command /hat from plugins", "&7such as Essentials or CMI.", "&7",
+					"&c&lFalse&f:&7 Allows the item to be worn as a /hat.", "&7", 
+					"&9&lENABLED: &a" + (itemMap.isNotHat() + "").toUpperCase()), event -> {
+				if (itemMap.isNotHat()) {
+					itemMap.setNotHat(false);
+				} else {
+					itemMap.setNotHat(true);
+				}
+				flagPane(player, itemMap);
+			}));
 			flagPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "POPPY" : "38"), 1, itemMap.isInventoryClose(), "&a&l&nInventory Close", "&7", 
 					"&a&lTrue&f:&7 Closes the players current", "&7inventory when clicking the item.", "&7",
 					"&c&lFalse&f:&7 The current inventory will not", "&7be closed when clicking the item.", "&7", 
@@ -4799,7 +4810,7 @@ public class Menu {
 				}
 				flagPane(player, itemMap);
 			}));
-			flagPane.addButton(new Button(ItemHandler.getItem("LEATHER_HELMET", 1, itemMap.isVanillaStatus(), "&a&l&nVanilla Status", "&7", 
+			flagPane.addButton(new Button(ItemHandler.getItem("LEATHER_CHESTPLATE", 1, itemMap.isVanillaStatus(), "&a&l&nVanilla Status", "&7", 
 					"&a&lTrue&f: &7Allows the Vanilla itemflag to retain", "&7ItemJoin properties without", "&7making it only a ItemJoin specific item.", 
 					"&cNOTE: &7Useful for trying to implement", "&7ItemJoin items into other plugins.", "&7", 
 					"&c&lFalse&f:&7 The item will be given", "&7as a custom item, allowing all", "&7ItemJoin properties to continue working.", "&7", 
@@ -4910,7 +4921,7 @@ public class Menu {
 				}
 				flagPane(player, itemMap);
 			}));
-			flagPane.addButton(new Button(ItemHandler.getItem("DIAMOND_HELMET", 1, itemMap.isEquip(), "&a&l&nCancel Equip", "&7", 
+			flagPane.addButton(new Button(ItemHandler.getItem("DIAMOND_BOOTS", 1, itemMap.isEquip(), "&a&l&nCancel Equip", "&7", 
 					"&a&lTrue&f: &7Prevents the item from being", "&7moved or switched to armor slots.", "&7",	
 					"&c&lFalse&f:&7 Allows the item to be moved", "&7freely inside the players inventory.", "&7", 
 					"&9&lENABLED: &a" + (itemMap.isEquip() + "").toUpperCase()), event -> {
@@ -5135,7 +5146,7 @@ public class Menu {
 				}
 				flagPane(player, itemMap);
 			}));
-			flagPane.addButton(new Button(fillerPaneBItem), 34);
+			flagPane.addButton(new Button(fillerPaneBItem), 33);
 		});
 		flagPane.open(player);
 	}
@@ -5154,6 +5165,7 @@ public class Menu {
 		if (itemMap.isUnbreakable()) { itemflags += "UNBREAKABLE, "; }
 		if (itemMap.isAttributesInfo()) { itemflags += "HIDE-ATTRIBUTES, "; }
 		if (itemMap.isEnchantmentsInfo()) { itemflags += "HIDE-ENCHANTS, "; }
+		if (itemMap.isNotHat()) { itemflags += "NOT-HAT, "; }
 		if (itemMap.isFlagsInfo()) { itemflags += "HIDE-FLAGS, "; }
 		if (itemMap.isDurabilityBar()) { itemflags += "HIDE-DURABILITY, "; }
 		if (itemMap.isPlaceable()) { itemflags += "PLACEMENT, "; }

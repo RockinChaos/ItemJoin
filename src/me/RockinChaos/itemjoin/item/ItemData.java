@@ -64,6 +64,7 @@ import me.RockinChaos.itemjoin.listeners.Interface;
 import me.RockinChaos.itemjoin.listeners.Offhand;
 import me.RockinChaos.itemjoin.listeners.Pickups;
 import me.RockinChaos.itemjoin.listeners.Placement;
+import me.RockinChaos.itemjoin.listeners.Processes;
 import me.RockinChaos.itemjoin.listeners.Projectile;
 import me.RockinChaos.itemjoin.listeners.Recipes;
 import me.RockinChaos.itemjoin.listeners.Stackable;
@@ -576,6 +577,9 @@ public class ItemData {
 			ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new Stackable(), ItemJoin.getCore().getPlugin());
 		} else if (itemMap.isStackable()) {
 			LegacyAPI.registerStackable();
+		}
+		if (itemMap.isNotHat() && !StringUtils.isRegistered(Processes.class.getSimpleName())) {
+			ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new Processes(), ItemJoin.getCore().getPlugin());
 		}
 		if ((itemMap.isDeathKeepable() || itemMap.isDeathDroppable() || itemMap.isSelfDroppable()) && !StringUtils.isRegistered(Drops.class.getSimpleName())) {
 			ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new Drops(), ItemJoin.getCore().getPlugin());

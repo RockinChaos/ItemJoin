@@ -39,6 +39,7 @@ commands:
   item:
     noItemHeld: '%prefix% &cVocê não está segurando um item na sua mão!'
     noItem: '%prefix% &cO item &b%item% &cnão existe!'
+    badCommand: '%prefix% &cVocê não tem permissão para usar o comando &4&l%command%&c nesse item!'
   info:
     material: '&aID do Item (Tipo do material): &e&l%item%'
     data: '&aValor do Item (Tipo de dados): &e&l%item%'

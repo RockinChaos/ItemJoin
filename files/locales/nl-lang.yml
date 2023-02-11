@@ -39,6 +39,7 @@ commands:
   item:
     noItemHeld: '%prefix% &cJe hebt geen item in je hand!'
     noItem: '%prefix% &cHet item &b%item% &cbestaat niet!'
+    badCommand: '%prefix% &cJe mag het commando &4&l%command%&c niet gebruiken voor dat item!'
   info:
     material: '&aItem ID (Materiaal Type): &e&l%item%'
     data: '&aItem Waarde (Data Type): &e&l%item%'

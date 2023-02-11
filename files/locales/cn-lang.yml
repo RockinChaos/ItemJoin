@@ -39,6 +39,7 @@ commands:
   item:
     noItemHeld: '%prefix% &c你没有拿物品!'
     noItem: '%prefix% &c物品 &b%item% &c不存在!'
+    badCommand: '%prefix% &c你不能在该项目上使用命令 &4&l%command%&c!'
   info:
     material: '&a物品ID: &e&l%item%'
     data: '&a物品数字ID: &e&l%item%'

@@ -39,6 +39,7 @@ commands:
   item:
     noItemHeld: '%prefix% &fВы должны держать предмет в &aруке&f!'
     noItem: '%prefix% &fПредмет: &7[&a%item%&7] &cне найден!'
+    badCommand: '%prefix% &cВы не можете использовать команду &4&l%command%&c для этого предмета!'
   info:
     material: '&fID предмета &7(Тип материала)&f: &7[&a%item%&7]'
     data: '&fЗначение предмета &7(Под-тип материала)&f: &7[&a%item%&7]'
