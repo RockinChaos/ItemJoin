@@ -18,19 +18,14 @@
 package me.RockinChaos.itemjoin.item;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 import me.RockinChaos.core.handlers.ItemHandler;
-import me.RockinChaos.core.handlers.ItemHandler.JSONEvent;
 import me.RockinChaos.core.handlers.PlayerHandler;
 import me.RockinChaos.core.utils.SchedulerUtils;
 import me.RockinChaos.core.utils.ServerUtils;
@@ -329,7 +324,7 @@ public class ItemCommand {
 			} else {
 				String[] values = new String[1];
 				if (altPlayer != null) { values[0] = altPlayer.getName(); }
-				this.setLoggable(player, "/" + StringUtils.translateLayout(this.command, player, values));
+				ItemData.getInfo().setLoggable(player, "/" + StringUtils.translateLayout(this.command, player, values));
 				Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), StringUtils.translateLayout(this.command, player, values));
 			}
 		} catch (Exception e) {
@@ -354,7 +349,7 @@ public class ItemCommand {
 						player.setOp(true);
 						String[] values = new String[1];
 						if (altPlayer != null) { values[0] = altPlayer.getName(); }
-						this.setLoggable(player, "/" + StringUtils.translateLayout(this.command, player, values));
+						ItemData.getInfo().setLoggable(player, "/" + StringUtils.translateLayout(this.command, player, values));
 						player.chat("/" + StringUtils.translateLayout(this.command, player, values));
 					} catch (Exception e) {
 						ServerUtils.sendDebugTrace(e);
@@ -384,7 +379,7 @@ public class ItemCommand {
 			} else {
 				String[] values = new String[1];
 				if (altPlayer != null) { values[0] = altPlayer.getName(); }
-				this.setLoggable(player, "/" + StringUtils.translateLayout(this.command, player, values));
+				ItemData.getInfo().setLoggable(player, "/" + StringUtils.translateLayout(this.command, player, values));
 				player.chat("/" + StringUtils.translateLayout(this.command, player, values));
 			}
 		} catch (Exception e) {
@@ -403,72 +398,13 @@ public class ItemCommand {
 		try { 
 			String[] values = new String[1];
 			if (altPlayer != null) { values[0] = altPlayer.getName(); }
-			String jsonMessage = this.getJSONMessage(StringUtils.translateLayout(this.command, player, values));
+			String jsonMessage = ItemData.getInfo().getJSONMessage(StringUtils.translateLayout(this.command, player, values), this.itemMap.getConfigName());
 			Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(),"minecraft:tellraw " + player.getName() + " " + jsonMessage);
 		} 
 		catch (Exception e) {
 			ServerUtils.logSevere("{ItemCommand} There was an error executing an item's command to send a message, if this continues report it to the developer.");
 			ServerUtils.sendDebugTrace(e);
 		}
-	}
-	
-    /**
- 	* Sets the JSON String of the Message,
- 	* sending the message to the player with JSON Formatting.
- 	* 
- 	* @param message - The Message being modified.
- 	*/
-	private String getJSONMessage(final String message) {
-		String textBuilder = "[\"\"";
-		Map < Integer, String > JSONBuilder = new HashMap < Integer, String > ();
-		String formatLine = message;
-		if (ItemHandler.containsJSONEvent(formatLine)) {
-			while (ItemHandler.containsJSONEvent(formatLine)) {
-				for (JSONEvent jsonType: JSONEvent.values()) {
-					Matcher matchPattern = java.util.regex.Pattern.compile(jsonType.matchType + "(.*?)>").matcher(formatLine);
-					if (matchPattern.find()) {
-						String inputResult = matchPattern.group(1);
-						JSONBuilder.put(JSONBuilder.size(), ((jsonType != JSONEvent.TEXT) ? (",\"" + jsonType.event + "\":{\"action\":\"" 
-						+ jsonType.action + "\",\"value\":\"" + inputResult + "\"}") : ("," + "{\"" + jsonType.action + "\":\"" + inputResult + "\"")));
-						formatLine = formatLine.replace(jsonType.matchType + inputResult + ">", "<JSONEvent>");
-						ItemHandler.safteyCheckURL(itemMap.getConfigName(), jsonType, inputResult);
-					}
-				}
-			}
-			if (!formatLine.isEmpty() && formatLine.length() != 0 && !formatLine.trim().isEmpty()) {
-				boolean definingText = false;
-				String[] JSONEvents = formatLine.split("<JSONEvent>");
-				if (!(org.apache.commons.lang.StringUtils.countMatches(formatLine, "<JSONEvent>") <= JSONEvents.length)) {
-					String adjustLine = new String();
-					for (String s: formatLine.split("JSONEvent>")) {
-						adjustLine += s + "JSONEvent> ";
-					}
-					JSONEvents = adjustLine.split("<JSONEvent>");
-				}
-				for (int i = 0; i < JSONEvents.length; i++) {
-					if (!JSONEvents[i].isEmpty() && JSONEvents[i].length() != 0 && !JSONEvents[i].trim().isEmpty()) {
-						textBuilder += ((i == 0) ? "," : "},") + "{\"" + "text" + "\":\"" + JSONEvents[i] + ((JSONBuilder.get(i) != null 
-						&& JSONBuilder.get(i).contains("\"text\"")) ? "\"}" : "\"") + (JSONBuilder.get(i) != null ? JSONBuilder.get(i) : "");
-					} else if (JSONBuilder.get(i) != null) {
-						if (JSONBuilder.get(i).contains("\"text\"") && !definingText) {
-							textBuilder += JSONBuilder.get(i);
-							definingText = true;
-						} else if (JSONBuilder.get(i).contains("\"text\"") && definingText) {
-							textBuilder += "}" + JSONBuilder.get(i);
-							definingText = false;
-						} else {
-							textBuilder += JSONBuilder.get(i);
-						}
-					}
-				}
-				textBuilder += "}";
-			}
-		} else if (message.contains("raw:")) {
-			return message.replace("raw: ", "").replace("raw:", "");
-		} else {
-			textBuilder += "," + "{\"text\":\"" + formatLine + "\"}";
-		}
-		return textBuilder + "]";
 	}
 	
    /**
@@ -544,23 +480,6 @@ public class ItemCommand {
 		} catch (Exception e) {
 			ServerUtils.logSevere("{ItemCommand} There was an error executing an item's command to swap an items attributes, if this continues report it to the developer.");
 			ServerUtils.sendDebugTrace(e);
-		}
-	}
-	
-   /**
-	* Sets the executed command to be logged or "shown" in the console window.
-	* 
-	* @param player - player that is interacting with the custom items command.
-	* @param logCommand - the command that wont be logged.
-	*/
-	private void setLoggable(final Player player, final String logCommand) {
-		if (!ItemJoin.getCore().getConfig("config.yml").getBoolean("General.Log-Commands")) {
-			ArrayList < String > templist = new ArrayList < String > ();
-			if (ItemJoin.getCore().getFilter().getHidden().get("commands-list") != null && !ItemJoin.getCore().getFilter().getHidden().get("commands-list").contains(logCommand)) {
-				templist = ItemJoin.getCore().getFilter().getHidden().get("commands-list");
-			}
-			templist.add(logCommand);
-			ItemJoin.getCore().getFilter().addHidden("commands-list", templist);
 		}
 	}
 	
@@ -695,9 +614,9 @@ public class ItemCommand {
 	* Defines the Executor type for the command.
 	* 
 	*/
-	private enum Executor {
+	public enum Executor {
 		DEFAULT("default: ", 0), CONSOLE("console: ", 1), OP("op: ", 2), PLAYER("player: ", 3), 
-		SERVERSWITCH("server: ", 4), MESSAGE("message: ", 5), BUNGEE("bungee: ", 6), SWAPITEM("swap-item: ", 7), DELAY("delay: ", 8);
+		SERVERSWITCH("server: ", 4), MESSAGE("message: ", 5), BUNGEE("bungee: ", 6), SWAPITEM("swap-item: ", 7), DELAY("delay: ", 8), FIRSTJOIN("first-join:", 9);
 		
 		private final String name;
 		private Executor(final String name, final int intType) { this.name = name; }

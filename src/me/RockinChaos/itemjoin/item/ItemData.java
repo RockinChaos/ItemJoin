@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -33,6 +34,7 @@ import com.google.common.collect.ImmutableMap;
 
 import me.RockinChaos.core.handlers.ItemHandler;
 import me.RockinChaos.core.handlers.PlayerHandler;
+import me.RockinChaos.core.handlers.ItemHandler.JSONEvent;
 import me.RockinChaos.core.listeners.Interfaces;
 import me.RockinChaos.core.utils.ReflectionUtils;
 import me.RockinChaos.core.utils.SchedulerUtils;
@@ -220,6 +222,83 @@ public class ItemData {
 			return ItemJoin.getCore().getConfig("config.yml").getString("Settings.HeldItem-Triggers");
 		}
 		return "";
+	}
+	
+   /**
+	* Sets the executed command to be logged or "shown" in the console window.
+	* 
+	* @param player - player that is interacting with the custom items command.
+	* @param logCommand - the command that wont be logged.
+	*/
+	public void setLoggable(final Player player, final String logCommand) {
+		if (!ItemJoin.getCore().getConfig("config.yml").getBoolean("General.Log-Commands")) {
+			ArrayList < String > templist = new ArrayList < String > ();
+			if (ItemJoin.getCore().getFilter().getHidden().get("commands-list") != null && !ItemJoin.getCore().getFilter().getHidden().get("commands-list").contains(logCommand)) {
+				templist = ItemJoin.getCore().getFilter().getHidden().get("commands-list");
+			}
+			templist.add(logCommand);
+			ItemJoin.getCore().getFilter().addHidden("commands-list", templist);
+		}
+	}
+	
+    /**
+ 	* Sets the JSON String of the Message,
+ 	* sending the message to the player with JSON Formatting.
+ 	* 
+ 	* @param message - The Message being modified.
+ 	* @param configName - The interface being referenced.
+ 	*/
+	public String getJSONMessage(final String message, final String configName) {
+		String textBuilder = "[\"\"";
+		Map < Integer, String > JSONBuilder = new HashMap < Integer, String > ();
+		String formatLine = message;
+		if (ItemHandler.containsJSONEvent(formatLine)) {
+			while (ItemHandler.containsJSONEvent(formatLine)) {
+				for (JSONEvent jsonType: JSONEvent.values()) {
+					Matcher matchPattern = java.util.regex.Pattern.compile(jsonType.matchType + "(.*?)>").matcher(formatLine);
+					if (matchPattern.find()) {
+						String inputResult = matchPattern.group(1);
+						JSONBuilder.put(JSONBuilder.size(), ((jsonType != JSONEvent.TEXT) ? (",\"" + jsonType.event + "\":{\"action\":\"" 
+						+ jsonType.action + "\",\"value\":\"" + inputResult + "\"}") : ("," + "{\"" + jsonType.action + "\":\"" + inputResult + "\"")));
+						formatLine = formatLine.replace(jsonType.matchType + inputResult + ">", "<JSONEvent>");
+						ItemHandler.safteyCheckURL(configName, jsonType, inputResult);
+					}
+				}
+			}
+			if (!formatLine.isEmpty() && formatLine.length() != 0 && !formatLine.trim().isEmpty()) {
+				boolean definingText = false;
+				String[] JSONEvents = formatLine.split("<JSONEvent>");
+				if (!(org.apache.commons.lang.StringUtils.countMatches(formatLine, "<JSONEvent>") <= JSONEvents.length)) {
+					String adjustLine = new String();
+					for (String s: formatLine.split("JSONEvent>")) {
+						adjustLine += s + "JSONEvent> ";
+					}
+					JSONEvents = adjustLine.split("<JSONEvent>");
+				}
+				for (int i = 0; i < JSONEvents.length; i++) {
+					if (!JSONEvents[i].isEmpty() && JSONEvents[i].length() != 0 && !JSONEvents[i].trim().isEmpty()) {
+						textBuilder += ((i == 0) ? "," : "},") + "{\"" + "text" + "\":\"" + JSONEvents[i] + ((JSONBuilder.get(i) != null 
+						&& JSONBuilder.get(i).contains("\"text\"")) ? "\"}" : "\"") + (JSONBuilder.get(i) != null ? JSONBuilder.get(i) : "");
+					} else if (JSONBuilder.get(i) != null) {
+						if (JSONBuilder.get(i).contains("\"text\"") && !definingText) {
+							textBuilder += JSONBuilder.get(i);
+							definingText = true;
+						} else if (JSONBuilder.get(i).contains("\"text\"") && definingText) {
+							textBuilder += "}" + JSONBuilder.get(i);
+							definingText = false;
+						} else {
+							textBuilder += JSONBuilder.get(i);
+						}
+					}
+				}
+				textBuilder += "}";
+			}
+		} else if (message.contains("raw:")) {
+			return message.replace("raw: ", "").replace("raw:", "");
+		} else {
+			textBuilder += "," + "{\"text\":\"" + formatLine + "\"}";
+		}
+		return textBuilder + "]";
 	}
 	
    /**
