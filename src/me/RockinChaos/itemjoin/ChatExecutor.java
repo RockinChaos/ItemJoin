@@ -313,7 +313,7 @@ public class ChatExecutor implements CommandExecutor {
 	* 
 	*/
 	private void query(final CommandSender sender, final String[] args) {
-		final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(null, args[1], null);
+		final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(args[1]);
 		String[] placeHolders = ItemJoin.getCore().getLang().newString(); 
 		placeHolders[3] = (itemMap != null ? itemMap.getConfigName() : args[1]);
 		if (itemMap != null) {
@@ -577,7 +577,7 @@ public class ChatExecutor implements CommandExecutor {
 		int amount = (((args.length >= 3 && argsPlayer == null) || (args.length > 3)) && StringUtils.isInt(args[args.length - 1]) ? Integer.parseInt(args[args.length - 1]) : 0);
 		if (args.length >= 3 && !StringUtils.isInt(args[2]) && argsPlayer == null) { ItemJoin.getCore().getLang().sendLangMessage("commands.default.noTarget", sender, placeHolders); return; } else if (argsPlayer == null && sender instanceof Player) { argsPlayer = (Player)sender; }
 		boolean messageSent = false;
-		ItemMap itemMapExist = ItemUtilities.getUtilities().getItemMap(null, args[1], argsPlayer.getWorld());
+		ItemMap itemMapExist = ItemUtilities.getUtilities().getItemMap(args[1]);
 		if (itemMapExist == null) { ItemJoin.getCore().getLang().sendLangMessage("commands.item.noItem", sender, placeHolders); return; }
 		for (ItemMap itemMap: ItemUtilities.getUtilities().getItems()) {
 			if (itemMap.getConfigName().equalsIgnoreCase(args[1])) {
@@ -625,7 +625,7 @@ public class ChatExecutor implements CommandExecutor {
 		int amount = (args.length == 3 ? Integer.parseInt(args[2]) : 0);
 		PlayerHandler.forOnlinePlayers(argsPlayer -> {
 			boolean messageSent = false;
-			ItemMap itemMapExist = ItemUtilities.getUtilities().getItemMap(null, args[1], argsPlayer.getWorld());
+			ItemMap itemMapExist = ItemUtilities.getUtilities().getItemMap(args[1]);
 			if (itemMapExist == null) { ItemJoin.getCore().getLang().sendLangMessage("commands.item.noItem", sender, placeHolders); return; }
 			placeHolders[3] = StringUtils.translateLayout(itemMapExist.getCustomName(), argsPlayer); placeHolders[1] = sender.getName();
 			placeHolders[11] = (amount == 0 ? "&lAll" : Integer.toString(amount));

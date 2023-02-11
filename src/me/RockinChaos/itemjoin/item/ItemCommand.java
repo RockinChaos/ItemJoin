@@ -458,7 +458,7 @@ public class ItemCommand {
 					mapDisposable.add(this.itemMap);
 					for (ItemCommand command : this.itemMap.getCommands()) {
 						if (command.executorType == Executor.SWAPITEM && this.matchAction(command.actionType)) {
-							ItemMap commandMap = ItemUtilities.getUtilities().getItemMap(null, command.command, null);
+							ItemMap commandMap = ItemUtilities.getUtilities().getItemMap(command.command);
 							if (commandMap != null) {
 								if (!itemExists) { itemExists = commandMap.hasItem(player, true); }
 								mapDisposable.add(commandMap);

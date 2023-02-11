@@ -831,7 +831,7 @@ public class ItemDesigner {
 				} else if (ItemJoin.getCore().getConfig("items.yml").getConfigurationSection("items").getConfigurationSection(ingredientParts[1]) != null && count >= 1) {
 					SchedulerUtils.runLater(40L, () -> {
 						try { 
-							final ItemMap tempMap = ItemUtilities.getUtilities().getItemMap(null, ingredientParts[1], null);
+							final ItemMap tempMap = ItemUtilities.getUtilities().getItemMap(ingredientParts[1]);
 							if  (tempMap != null) {
 								final ItemStack itemStack = tempMap.getItem(null);
 								final int mapData = Integer.parseInt(tempMap.getDataValue() + "");

@@ -102,7 +102,7 @@ public class Recipes implements Listener {
     	 && event.getRecipe().getResult().getType() != Material.AIR && event.getView() != null && event.getView().getPlayer() != null) {
     		final Player player = (Player) event.getView().getPlayer();
 	    	List<ItemMap> mapList = new ArrayList<ItemMap>();
-	    	ItemMap checkMap = ItemUtilities.getUtilities().getItemMap(event.getRecipe().getResult(), null, player.getWorld());
+	    	ItemMap checkMap = ItemUtilities.getUtilities().getItemMap(event.getRecipe().getResult());
 	    	if (checkMap != null) { mapList.add(checkMap); } else { return; }
 	    	for (ItemMap itemMap : ItemUtilities.getUtilities().getItems()) {
 	    		if (itemMap != null && itemMap.getIngredients() != null && !itemMap.getIngredients().isEmpty()) {
@@ -137,7 +137,7 @@ public class Recipes implements Listener {
 	*/
     @EventHandler()
     public void onCraftRecipe(final CraftItemEvent event) {
-    	final ItemMap checkMap = ItemUtilities.getUtilities().getItemMap(event.getRecipe().getResult(), null, event.getView().getPlayer().getWorld());
+    	final ItemMap checkMap = ItemUtilities.getUtilities().getItemMap(event.getRecipe().getResult());
     	if (checkMap != null) {
     		final Inventory inventoryClone = Bukkit.createInventory(null, 18);
     		int setSlot = 0;
@@ -200,7 +200,7 @@ public class Recipes implements Listener {
 		    					if (item != null) {
 		    						for (Character ingredient: itemMap.getIngredients().keySet()) {
 		    							final ItemRecipe itemRecipe = itemMap.getIngredients().get(ingredient);
-		    							ItemMap ingredMap = ItemUtilities.getUtilities().getItemMap(null, itemRecipe.getMap(), null);
+		    							ItemMap ingredMap = ItemUtilities.getUtilities().getItemMap(itemRecipe.getMap());
 		    							if (recipe.size() > i && recipe.get(i) == ingredient) {
 		    								if ((((ingredMap == null
 		    										&& itemRecipe.getMaterial().equals(item.getType()) 
@@ -270,7 +270,7 @@ public class Recipes implements Listener {
     		if (item != null) {
     			for (Character ingredient: itemMap.getIngredients().keySet()) {
     				final ItemRecipe itemRecipe = itemMap.getIngredients().get(ingredient);
-    				ItemMap ingredMap = ItemUtilities.getUtilities().getItemMap(null, itemRecipe.getMap(), null);
+    				ItemMap ingredMap = ItemUtilities.getUtilities().getItemMap(itemRecipe.getMap());
     				if (recipe.size() > i && recipe.get(i) == ingredient) {
     					if (((ingredMap == null && itemRecipe.getMaterial().equals(item.getType())) || (ingredMap != null && ingredMap.isSimilar(player, item))) && item.getAmount() >= itemRecipe.getCount()) {
     						confirmations += 1;

@@ -46,14 +46,14 @@ public class Stackable implements Listener {
 		final int rawSlot = event.getRawSlot();
 		final int slot = event.getSlot();
 		if (event.getCurrentItem() != null && event.getCursor() != null && event.getCurrentItem().getType() != Material.AIR && event.getCursor().getType() != Material.AIR) {
-			final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(event.getCursor(), null, player.getWorld());
+			final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(event.getCursor());
 			if (itemMap != null && itemMap.isSimilar(player, event.getCurrentItem()) && !ItemUtilities.getUtilities().isAllowed(player, event.getCursor(), "stackable")) {
 				event.setCancelled(true);
 				ItemHandler.stackItems(player, event.getCursor(), event.getCurrentItem(), -1, false);
 			}
 		} else if (action.equals(InventoryAction.MOVE_TO_OTHER_INVENTORY) && event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR && !ItemUtilities.getUtilities().isAllowed(player, event.getCurrentItem(), "stackable")) {
 			event.setCancelled(true);
-			final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(event.getCurrentItem(), null, player.getWorld());
+			final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(event.getCurrentItem());
 			int REMAINING_STACK_SIZE = event.getCurrentItem().getAmount();
 			if (itemMap != null && PlayerHandler.isCraftingInv(event.getView())) {
 				if (slot > 8) {
@@ -99,14 +99,14 @@ public class Stackable implements Listener {
 			if (REMAINING_STACK_SIZE > 0) { event.setCancelled(false); }
 			PlayerHandler.updateInventory(player, 1L);
 		} else if (action != InventoryAction.PLACE_ONE && action != InventoryAction.COLLECT_TO_CURSOR && event.getCursor() != null && event.getCursor().getType() != Material.AIR && (event.getCurrentItem() == null || event.getCurrentItem().getType() == Material.AIR)) {
-			final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(event.getCursor(), null, player.getWorld());
+			final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(event.getCursor());
 			if (itemMap != null && !ItemUtilities.getUtilities().isAllowed(player, event.getCursor(), "stackable")) {
 				event.setCancelled(true);
 				player.getOpenInventory().setItem(rawSlot, player.getOpenInventory().getCursor().clone());
 				player.getOpenInventory().setCursor(new ItemStack(Material.AIR));
 			}
 		} else if (action == InventoryAction.COLLECT_TO_CURSOR && !ItemUtilities.getUtilities().isAllowed(player, event.getCursor(), "stackable")) {
-			final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(event.getCursor(), null, player.getWorld());
+			final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(event.getCursor());
 			if (itemMap != null) {
 				for (int i = 0; i < 36; i++) {
 					if (itemMap.isSimilar(player, player.getInventory().getItem(i))) {
@@ -141,7 +141,7 @@ public class Stackable implements Listener {
 		ItemStack item1 = event.getItem().getItemStack();
 		if (entity instanceof Player && item1 != null && item1.getType() != Material.AIR && !ItemUtilities.getUtilities().isAllowed((Player) event.getEntity(), item1, "stackable")) {
 			Player player = (Player) event.getEntity();
-			ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item1, null, player.getWorld());
+			ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item1);
 			int REMAINING_STACK_SIZE = item1.getAmount();
 			event.setCancelled(true);
 			for (int i = 0; i < 36; i++) {

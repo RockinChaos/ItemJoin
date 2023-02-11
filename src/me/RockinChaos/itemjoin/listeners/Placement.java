@@ -63,7 +63,7 @@ public class Placement implements Listener {
 	 	final int slot = player.getInventory().getHeldItemSlot();
 	 	if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK && !PlayerHandler.isCreativeMode(player)) {
 	 		if (!ItemUtilities.getUtilities().isAllowed(player, item, "count-lock")) {
-	 			ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item, null, player.getWorld());
+	 			ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item);
 	 			item.setAmount(itemMap.getCount(player));
 				SchedulerUtils.run(() -> {
 		 			if (StringUtils.containsIgnoreCase(item.getType().name(), "WATER") || StringUtils.containsIgnoreCase(item.getType().name(), "LAVA") || item.getType().name().equalsIgnoreCase("BUCKET") 
@@ -138,7 +138,7 @@ public class Placement implements Listener {
 	 			Player player = event.getPlayer();
 	 			if (PlayerHandler.isCreativeMode(player)) {
 	 				if (!ItemUtilities.getUtilities().isAllowed(player, item, "count-lock")) {
-	 					ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item, null, player.getWorld());
+	 					ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item);
 	 					if (itemMap != null) { 
 		 					if (PlayerHandler.getHandItem(player) == null || PlayerHandler.getHandItem(player).getAmount() <= 1) {
 		 						if (ServerUtils.hasSpecificUpdate("1_9")) { 

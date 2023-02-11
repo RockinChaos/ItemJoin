@@ -7535,7 +7535,7 @@ public class Menu {
 				ItemStack stack1 = null;
 				if (itemMap.getRecipe().get(0).size() > i && itemMap.getRecipe().get(0).get(i) != 'X') {
 					final ItemRecipe itemRecipe = itemMap.getIngredients().get(itemMap.getRecipe().get(0).get(i));
-					final ItemMap copyMap = ItemUtilities.getUtilities().getItemMap(null, itemRecipe.getMap(), null);
+					final ItemMap copyMap = ItemUtilities.getUtilities().getItemMap(itemRecipe.getMap());
 					if (copyMap != null) { 
 						stack1 = copyMap.getItemStack(player); 
 						stack1.setAmount(itemRecipe.getCount());
@@ -7726,7 +7726,7 @@ public class Menu {
 				for (int i = 1; i <= 64; i++) {
 					final int k = i;
 					ingrPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "BLUE_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:11"), k, false, "&9&lCount: &a&l" + k, "&7", "&7*Click to set the", "&7ingredient count (stack size)."), event -> {
-						ItemMap ingredMap = ItemUtilities.getUtilities().getItemMap(null, material, null);
+						ItemMap ingredMap = ItemUtilities.getUtilities().getItemMap(material);
 						if (ingredMap == null) {
 							ingredients.put(finalCharacter, new ItemRecipe(null, ItemHandler.getMaterial(material, null), (byte)0, k));
 						} else {

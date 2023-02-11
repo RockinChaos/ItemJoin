@@ -65,7 +65,7 @@ public class ItemUtilities {
     */
 	public boolean isAllowed(final Player player, final ItemStack item, final String itemflag) {
 		if (player == null || item == null) { return true; }
-		ItemMap itemMap = this.getItemMap(item, null, player.getWorld());
+		ItemMap itemMap = this.getItemMap(item);
 		if (itemMap != null && itemMap.isAllowedItem(player, item, itemflag)) {
 			return false;
 		}
@@ -74,17 +74,28 @@ public class ItemUtilities {
 	
    /**
     * Finds the matching ItemMap from the list of provided ItemMaps,
-    * that has the exact same ItemStack and world or config node name defined.
+    * that has the exact same ItemStack defined.
     * 
     * @param itemStack - The ItemStack to have its ItemMap located.
-    * @param configName - The config node name of the ItemMap.
-    * @param world - The world of the ItemMap.
     */
-	public ItemMap getItemMap(final ItemStack itemStack, final String configName, final World world) {
+	public ItemMap getItemMap(final ItemStack itemStack) {
 		for (ItemMap itemMap : this.getItems()) {
-			if (world != null && configName == null && itemMap.inWorld(world) && itemMap.isSimilar(null, itemStack)) {
+			if (itemMap.isSimilar(null, itemStack)) {
 				return itemMap;
-			} else if (configName != null && itemMap.getConfigName().equalsIgnoreCase(configName)) {
+			}
+		}
+		return null;
+	}
+	
+   /**
+    * Finds the matching ItemMap from the list of provided ItemMaps,
+    * that has the exact same config node name defined.
+    * 
+    * @param configName - The config node name of the ItemMap.
+    */
+	public ItemMap getItemMap(final String configName) {
+		for (ItemMap itemMap : this.getItems()) {
+			if (configName != null && itemMap.getConfigName().equalsIgnoreCase(configName)) {
 				return itemMap;
 			}
 		}

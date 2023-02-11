@@ -46,7 +46,7 @@ public class Consumes implements Listener {
 	private void onConsumeEffects(PlayerItemConsumeEvent event) {
 		ItemStack item = event.getItem();
 		Player player = event.getPlayer();
-		ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item, null, player.getWorld());
+		ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item);
 		if (itemMap != null && itemMap.getMaterial().isEdible() && itemMap.isCustomConsumable()) {
 			if (itemMap.getPotionEffect() != null && !itemMap.getPotionEffect().isEmpty()) {
 				for (PotionEffect potion: itemMap.getPotionEffect()) { player.addPotionEffect(potion); }
@@ -80,7 +80,7 @@ public class Consumes implements Listener {
 	private void onConsumeSkullEffects(PlayerInteractEvent event) {
 		final ItemStack item = event.getItem();
 		final Player player = event.getPlayer();
-		final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item, null, player.getWorld());
+		final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item);
 		if (itemMap != null && ItemHandler.isSkull(itemMap.getMaterial()) && itemMap.isCustomConsumable()) {
 			if (itemMap.getPotionEffect() != null && !itemMap.getPotionEffect().isEmpty()) {
 				for (PotionEffect potion: itemMap.getPotionEffect()) { player.addPotionEffect(potion); }
@@ -106,7 +106,7 @@ public class Consumes implements Listener {
 		ItemStack item = (event.getItem() != null ? event.getItem().clone() : event.getItem());
 		Player player = event.getPlayer();
 		if (!ItemUtilities.getUtilities().isAllowed(player, item, "count-lock")) {
-			ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item, null, player.getWorld());
+			ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item);
 			item.setAmount(itemMap.getCount(player));
 			SchedulerUtils.runLater(2L, () -> {
 				if (itemMap != null) { 
@@ -142,8 +142,8 @@ public class Consumes implements Listener {
 	 		final ItemStack mainStack = saveMainStack;
 	 		ItemStack saveOffStack = null; if (PlayerHandler.getOffHandItem(player) != null) { saveOffStack = PlayerHandler.getOffHandItem(player).clone(); }
 	 		final ItemStack offStack = saveOffStack;
-	 		ItemMap mainHandMap = ItemUtilities.getUtilities().getItemMap(mainStack, null, player.getWorld());
-	 		ItemMap offHandMap = ItemUtilities.getUtilities().getItemMap(offStack, null, player.getWorld());
+	 		ItemMap mainHandMap = ItemUtilities.getUtilities().getItemMap(mainStack);
+	 		ItemMap offHandMap = ItemUtilities.getUtilities().getItemMap(offStack);
 	 		if ((mainHandMap != null && !ItemUtilities.getUtilities().isAllowed(player, mainStack, "count-lock")) || (offHandMap != null && !ItemUtilities.getUtilities().isAllowed(player, offStack, "count-lock"))) {
 	 			if ((StringUtils.containsIgnoreCase(mainStack.getType().name(), "TOTEM") && mainHandMap != null) || (StringUtils.containsIgnoreCase(offStack.getType().name(), "TOTEM") && offHandMap != null)) {
 					SchedulerUtils.runLater(1L, () -> {

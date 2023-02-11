@@ -65,7 +65,7 @@ public class Projectile implements Listener {
 			for (int i = 0; i < player.getInventory().getSize(); i++) {
 				if (player.getInventory().getItem(i) != null && player.getInventory().getItem(i).getType() == Material.ARROW && event.getProjectile().getType().name().equalsIgnoreCase("ARROW")) {
 					ItemStack cloneStack = player.getInventory().getItem(i).clone();
-					ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(player.getInventory().getItem(i), null, player.getWorld());
+					ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(player.getInventory().getItem(i));
 					if (itemMap != null) { cloneStack.setAmount(itemMap.getCount(player)); }
 					map.put(i, cloneStack);
 				}
@@ -97,7 +97,7 @@ public class Projectile implements Listener {
         	if (this.arrowList.get(projectile.getEntityId()) != null && !ItemUtilities.getUtilities().isAllowed((Player)((Arrow)projectile).getShooter(), this.arrowList.get(projectile.getEntityId()), "teleport")) { 
 	            final Player player = (Player)((Arrow)projectile).getShooter();
 	            final Location location = ((Arrow)projectile).getLocation();
-	            final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(this.arrowList.get(projectile.getEntityId()), null, player.getWorld());
+	            final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(this.arrowList.get(projectile.getEntityId()));
 	            location.setPitch(player.getLocation().getPitch());
 	            location.setYaw(player.getLocation().getYaw());
 	            player.teleport(location);
@@ -134,7 +134,7 @@ public class Projectile implements Listener {
 			for (int i = 0; i < player.getInventory().getSize(); i++) {
 				if (player.getInventory().getItem(i) != null && player.getInventory().getItem(i).getType() == Material.ARROW) {
 					ItemStack cloneStack = player.getInventory().getItem(i).clone();
-					ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(player.getInventory().getItem(i), null, player.getWorld());
+					ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(player.getInventory().getItem(i));
 					if (itemMap != null) { cloneStack.setAmount(itemMap.getCount(player)); }
 					map.put(i, cloneStack);
 				}

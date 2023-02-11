@@ -293,7 +293,7 @@ public class Legacy_Commands implements Listener {
 			else { item = PlayerHandler.getPerfectHandItem(event.getPlayer(), ""); }
 			final Player player = event.getPlayer();
 			final String action = Action.RIGHT_CLICK_BLOCK.name();
-			final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(PlayerHandler.getHandItem(player), null, player.getWorld());
+			final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(PlayerHandler.getHandItem(player));
 			if (itemMap != null && itemMap.isSimilar(player, item)) {
 				this.runCommands(player, (event.getRightClicked() instanceof Player ? (Player)event.getRightClicked() : null), item, action, action.split("_")[0], String.valueOf(player.getInventory().getHeldItemSlot()));
 			}
@@ -312,7 +312,7 @@ public class Legacy_Commands implements Listener {
 		final ItemStack item = (event.getItem() != null ? event.getItem().clone() : (event.getAction() == Action.PHYSICAL ? PlayerHandler.getMainHandItem(player) : event.getItem()));
 		final String action = event.getAction().name();
 		if (((PlayerHandler.isAdventureMode(player) && !action.contains("LEFT") || !PlayerHandler.isAdventureMode(player))) && !this.isDropEvent(event.getPlayer())) {
-			final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(PlayerHandler.getHandItem(player), null, player.getWorld());
+			final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(PlayerHandler.getHandItem(player));
 			if (!PlayerHandler.isMenuClick(player.getOpenInventory(), event.getAction()) && itemMap != null && itemMap.isSimilar(player, item)) {
 				long dupeDuration = (this.interactDupe != null && !this.interactDupe.isEmpty() && this.interactDupe.get(item) != null ? (((System.currentTimeMillis()) - this.interactDupe.get(item))) : -1);
 				if (dupeDuration == -1 || dupeDuration > 30) {
@@ -406,7 +406,7 @@ public class Legacy_Commands implements Listener {
 	* @deprecated This is a LEGACY method, only use on Minecraft versions below 1.8.
 	*/
 	private void runCommands(final Player player, final Player altPlayer, final ItemStack item, final String action, final String clickType, final String slot) {
-		final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item, null, player.getWorld());
+		final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item);
 		if (itemMap != null && itemMap.inWorld(player.getWorld()) && itemMap.hasPermission(player, player.getWorld())) {
 			itemMap.executeCommands(player, altPlayer, item, action, clickType, (slot == null ? itemMap.getSlot() : slot));
 		}

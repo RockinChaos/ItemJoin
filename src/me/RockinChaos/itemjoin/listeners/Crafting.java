@@ -131,7 +131,7 @@ public class Crafting implements Listener {
     	if (PlayerHandler.isCraftingInv(view) && event.getSlot() <= 4) {
     		if (event.getSlot() != 0 && event.getSlotType() == SlotType.CRAFTING) {
     			if (craftingContents[0] != null && craftingContents[0].getType() != Material.AIR) {
-    				final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(craftingContents[0], null, player.getWorld());
+    				final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(craftingContents[0]);
     				if (itemMap != null && itemMap.isCraftingItem()) {
     					ItemHandler.returnCraftingItem(player, 0, craftingContents[0], 1L);
     				}
@@ -174,7 +174,7 @@ public class Crafting implements Listener {
     	final Player player = (Player) event.getPlayer();
     	final World world = player.getWorld();
     	final ItemStack itemCopy = event.getItemDrop().getItemStack().clone();
-    	final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(itemCopy, null, player.getWorld());
+    	final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(itemCopy);
     	double health = 1;
     	try { health = (ServerUtils.hasSpecificUpdate("1_8") ? player.getHealth() : (double)player.getClass().getMethod("getHealth", double.class).invoke(player)); } catch (Exception e) { health = (player.isDead() ? 0 : 1);  }
     	if (health > 0 && itemMap != null && itemMap.isCraftingItem()) {
@@ -262,7 +262,7 @@ public class Crafting implements Listener {
 				}
 				for (int i = 0; i <= 4; i++) {
 					if (isCrafting && i != 0 && inventory[i] != null && inventory[i].getType() != Material.AIR) {
-						ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(inventory[i], null, player.getWorld());
+						ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(inventory[i]);
 						if (itemMap == null || !itemMap.isCraftingItem() || !itemMap.isReal(inventory[i])) {
 							final int k = i;
 							final ItemStack drop = inventory[i].clone();
@@ -286,12 +286,12 @@ public class Crafting implements Listener {
 					}
 				}
 				if (isCrafting) {
-					if (!slotZero || (slotZero && ItemUtilities.getUtilities().getItemMap(inventory[0], null, null) != null)) {
+					if (!slotZero || (slotZero && ItemUtilities.getUtilities().getItemMap(inventory[0]) != null)) {
 						this.returnCrafting(player, inventory, 1L, !slotZero);
 					} else {
 						SchedulerUtils.runLater(1L, () -> { 
 							player.getOpenInventory().getTopInventory().setItem(0, new ItemStack(Material.AIR)); 
-							PlayerHandler.updateInventory(player, ItemUtilities.getUtilities().getItemMap(new ItemStack(Material.AIR), null, player.getWorld()).getItemStack(player), 1L);
+							PlayerHandler.updateInventory(player, new ItemStack(Material.AIR), 1L);
 						});
 					}
 				}
@@ -346,17 +346,17 @@ public class Crafting implements Listener {
 			if (!player.isOnline()) { return; } else if (!PlayerHandler.isCraftingInv(player.getOpenInventory())) { this.returnCrafting(player, contents, 10L, slotZero); return; }
 			if (!slotZero) {
 				for (int i = 4; i >= 0; i--) {
-					final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(contents[i], null, player.getWorld());
+					final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(contents[i]);
 					if (contents != null && contents[i] != null && itemMap != null) {
 						player.getOpenInventory().getTopInventory().setItem(i, contents[i]);
 						PlayerHandler.updateInventory(player, itemMap.getItemStack(player), 1L);
 					}
 				}
 			} else { 
-				final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(contents[0], null, player.getWorld());
+				final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(contents[0]);
 				if (contents != null && contents[0] != null && itemMap != null) {
 					player.getOpenInventory().getTopInventory().setItem(0, contents[0]); 
-					PlayerHandler.updateInventory(player, ItemUtilities.getUtilities().getItemMap(contents[0], null, player.getWorld()).getItemStack(player), 1L);
+					PlayerHandler.updateInventory(player, itemMap.getItemStack(player), 1L);
 				}
 			}
 		});

@@ -284,7 +284,7 @@ public class Clicking implements Listener {
 		Player player = (Player) event.getWhoClicked();
 		String itemflag = "inventory-modify";
     	if (event.getAction().toString().contains("PLACE_ALL") || event.getAction().toString().contains("PLACE_ONE")) {
-    		ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(event.getCursor(), null, player.getWorld());
+    		ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(event.getCursor());
     		if (itemMap != null && itemMap.isSimilar(player, cursorItem.get(PlayerHandler.getPlayerID(player)))) {
     		final int slot = event.getSlot();
     		event.setCancelled(true);
@@ -296,7 +296,7 @@ public class Clicking implements Listener {
 			ServerUtils.logDebug("{ItemMap} (Cursor_Place): Updated Animation Item."); 
     		}
     	} else if (event.getAction().toString().contains("SWAP_WITH_CURSOR")) {
-    		ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(event.getCursor(), null, player.getWorld());
+    		ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(event.getCursor());
     		if (itemMap != null && itemMap.isSimilar(player, cursorItem.get(PlayerHandler.getPlayerID(player))) && ItemUtilities.getUtilities().isAllowed(player, event.getCurrentItem(), itemflag)) {
     		final int slot = event.getSlot();
     		final ItemStack item = new ItemStack(event.getCurrentItem());

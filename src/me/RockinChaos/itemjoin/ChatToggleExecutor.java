@@ -94,7 +94,7 @@ public class ChatToggleExecutor implements CommandExecutor {
     * @return The found ItemMap, or null if it doesn't exist.
 	*/
 	private ItemMap getCommandMap(final Player player, final Command command, final String[] args) {
-		ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(null, command.getDescription(), player.getWorld());
+		ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(command.getDescription());
 		boolean canToggle = false;
 		for (String commands : itemMap.getToggleCommands()) {
 			if (!canToggle && commands.equalsIgnoreCase( command.getName())) {

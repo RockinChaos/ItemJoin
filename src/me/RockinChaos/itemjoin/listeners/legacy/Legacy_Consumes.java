@@ -50,7 +50,7 @@ public class Legacy_Consumes implements Listener {
 	private void onConsumeEffects(PlayerItemConsumeEvent event) {
 		ItemStack item = event.getItem();
 		Player player = event.getPlayer();
-		ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item, null, player.getWorld());
+		ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item);
 		if (itemMap != null && itemMap.getMaterial().isEdible() && itemMap.isCustomConsumable()) {
 			if (itemMap.getPotionEffect() != null && !itemMap.getPotionEffect().isEmpty()) {
 				for (PotionEffect potion: itemMap.getPotionEffect()) { player.addPotionEffect(potion); }
@@ -85,7 +85,7 @@ public class Legacy_Consumes implements Listener {
 	private void onConsumeSkullEffects(PlayerInteractEvent event) {
 		final ItemStack item = event.getItem();
 		final Player player = event.getPlayer();
-		final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item, null, player.getWorld());
+		final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item);
 		if (itemMap != null && ItemHandler.isSkull(itemMap.getMaterial()) && itemMap.isCustomConsumable()) {
 			if (itemMap.getPotionEffect() != null && !itemMap.getPotionEffect().isEmpty()) {
 				for (PotionEffect potion: itemMap.getPotionEffect()) { player.addPotionEffect(potion); }
@@ -112,7 +112,7 @@ public class Legacy_Consumes implements Listener {
 		ItemStack item = (event.getItem() != null ? event.getItem().clone() : event.getItem());
 		Player player = event.getPlayer();
 		if (!ItemUtilities.getUtilities().isAllowed(player, item, "count-lock")) {
-			ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item, null, player.getWorld());
+			ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item);
 			item.setAmount(itemMap.getCount(player));
 			SchedulerUtils.runLater(2L, () -> {
 				if (itemMap != null) { 

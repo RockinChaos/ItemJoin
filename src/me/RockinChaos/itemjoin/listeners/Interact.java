@@ -67,7 +67,7 @@ public class Interact implements Listener {
 	 	Player player = event.getPlayer();
 	 	ItemStack item = event.getItem();
 	 	if ((event.hasItem() && event.getAction() != Action.PHYSICAL) && ((ItemAPI.isPlaceable(event.getMaterial()) && event.getAction() == Action.RIGHT_CLICK_AIR) || event.getAction() == Action.RIGHT_CLICK_BLOCK)) {
-	 		ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item, null, player.getWorld());
+	 		ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item);
 	 		if (itemMap != null && itemMap.getInteractCooldown() != 0) {
 	 			long lockDuration = (this.interactLock != null && !this.interactLock.isEmpty() && this.interactLock.get(item) != null ? (((System.currentTimeMillis()) - this.interactLock.get(item))) : -1);
 	 			this.interactLock.put(item, System.currentTimeMillis());
