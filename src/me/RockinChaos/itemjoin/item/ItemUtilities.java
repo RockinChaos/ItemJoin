@@ -37,6 +37,7 @@ import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import me.RockinChaos.itemjoin.ItemJoin;
+import me.RockinChaos.itemjoin.item.ItemCommand.Executor;
 import me.RockinChaos.core.handlers.ItemHandler;
 import me.RockinChaos.core.handlers.PlayerHandler;
 import me.RockinChaos.core.utils.SchedulerUtils;
@@ -819,28 +820,113 @@ public class ItemUtilities {
     * 
     * @param player - The Player having the commands executed.
     */
-	public void triggerCommands(final Player player, TriggerType trigger) {
+	public void triggerCommands(final Player player, TriggerType triggerRef) {
 		if ((ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.enabled-worlds") != null && ItemJoin.getCore().getConfig("config.yml").getStringList("Active-Commands.commands") != null) 
 				&& (!ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.enabled-worlds").equalsIgnoreCase("DISABLED") || !ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.enabled-worlds").equalsIgnoreCase("FALSE"))
-				&& ((StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.triggers"), TriggerType.JOIN.name) && trigger.equals(TriggerType.JOIN))
-				|| (StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.triggers"), TriggerType.FIRST_JOIN.name) && trigger.equals(TriggerType.FIRST_JOIN))
-				|| (StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.triggers"), TriggerType.WORLD_SWITCH.name) && trigger.equals(TriggerType.WORLD_SWITCH))
-				|| (StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.triggers"), TriggerType.RESPAWN.name) && trigger.equals(TriggerType.RESPAWN)))) {
+				&& ((StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.triggers"), TriggerType.JOIN.name) && triggerRef.equals(TriggerType.JOIN))
+				|| (StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.triggers"), TriggerType.FIRST_JOIN.name) && triggerRef.equals(TriggerType.JOIN))
+				|| (StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.triggers"), TriggerType.WORLD_SWITCH.name) && triggerRef.equals(TriggerType.WORLD_SWITCH))
+				|| (StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.triggers"), TriggerType.RESPAWN.name) && triggerRef.equals(TriggerType.RESPAWN)))) {
 			String commandsWorlds = ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.enabled-worlds").replace(", ", ",");
+			TriggerType trigger = triggerRef;
+			if (StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.triggers"), TriggerType.FIRST_JOIN.name) && trigger.equals(TriggerType.JOIN)) { trigger = TriggerType.FIRST_JOIN; }
 			if (commandsWorlds == null) { commandsWorlds = "DISABLED"; }
 			String[] compareWorlds = commandsWorlds.split(",");
 			for (String compareWorld: compareWorlds) {
 				if (compareWorld.equalsIgnoreCase(player.getWorld().getName()) || compareWorld.equalsIgnoreCase("ALL") || compareWorld.equalsIgnoreCase("GLOBAL")) {
-					ArrayList < String > commandMap = new ArrayList < String >();
-					for (String cmd : ItemJoin.getCore().getConfig("config.yml").getStringList("Active-Commands.commands")) { commandMap.add(cmd); }
-					List<String> commandList = this.getRandomMap(commandMap, player);
+					ArrayList < String > commandArray = new ArrayList < String >();
+					for (String cmd : ItemJoin.getCore().getConfig("config.yml").getStringList("Active-Commands.commands")) { commandArray.add(cmd); }
+					List<String> commandList = this.getRandomMap(commandArray, player);
 					for (String commands: commandList) {
-						String formatCommand = StringUtils.translateLayout(commands, player).replace("first-join: ", "").replace("first-join:", "");
-						DataObject dataObject = (DataObject) ItemJoin.getCore().getSQL().getData(new DataObject(Table.FIRST_COMMANDS, PlayerHandler.getPlayerID(player), player.getWorld().getName(), formatCommand));
-						if (!(dataObject != null && (StringUtils.containsIgnoreCase(commands, "first-join:") || StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.triggers"), TriggerType.FIRST_JOIN.name)))) {
-							Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), formatCommand);
-							if (StringUtils.containsIgnoreCase(commands, "first-join:") || StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.triggers"), TriggerType.FIRST_JOIN.name)) {
-								ItemJoin.getCore().getSQL().saveData(new DataObject(Table.FIRST_COMMANDS, PlayerHandler.getPlayerID(player), player.getWorld().getName(), formatCommand));
+						final HashMap<Executor, String> commandMap = this.getCommandMap(commands);
+						for (Executor executor : commandMap.keySet()) {
+							final String formatCommand = StringUtils.translateLayout(commandMap.get(executor), player);
+							final DataObject dataObject = ((trigger.equals(TriggerType.FIRST_JOIN) || executor.equals(Executor.FIRSTJOIN)) ? (DataObject) ItemJoin.getCore().getSQL().getData(new DataObject(Table.FIRST_COMMANDS, PlayerHandler.getPlayerID(player), player.getWorld().getName(), formatCommand)): null);
+							if (dataObject == null) {
+								if (trigger.equals(TriggerType.FIRST_JOIN)) { ItemJoin.getCore().getSQL().saveData(new DataObject(Table.FIRST_COMMANDS, PlayerHandler.getPlayerID(player), player.getWorld().getName(), formatCommand)); }
+								if (executor.equals(Executor.DEFAULT) || executor.equals(Executor.CONSOLE) || executor.equals(Executor.FIRSTJOIN)) {
+									try {
+										if (StringUtils.containsIgnoreCase(formatCommand, "[close]")) {
+											PlayerHandler.safeInventoryClose(player);
+										} else {
+											ItemData.getInfo().setLoggable(player, "/" + formatCommand);
+											Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), formatCommand);
+										}
+									} catch (Exception e) {
+										ServerUtils.logSevere("{ItemUtilities} There was an error executing a command as console, if this continues report it to the developer.");
+										ServerUtils.sendDebugTrace(e);
+									}
+								} else if (executor.equals(Executor.OP)) {
+									try {
+										if (StringUtils.containsIgnoreCase(formatCommand, "[close]")) {
+											PlayerHandler.safeInventoryClose(player);
+										} else {
+											if (!player.isOp()) {
+												try {
+													player.setOp(true);
+													ItemData.getInfo().setLoggable(player, "/" + formatCommand);
+													player.chat("/" + formatCommand);
+												} catch (Exception e) {
+													ServerUtils.sendDebugTrace(e);
+													player.setOp(false);
+													ServerUtils.logSevere("{ItemUtilities} An critical error has occurred while setting " + player.getName() + " status on the OP list, to maintain server security they have been removed as an OP.");
+												} finally { player.setOp(false); }
+											} else {
+												try {
+													if (StringUtils.containsIgnoreCase(formatCommand, "[close]")) {
+														PlayerHandler.safeInventoryClose(player);
+													} else {
+														ItemData.getInfo().setLoggable(player, "/" + formatCommand);
+														player.chat("/" + formatCommand);
+													}
+												} catch (Exception e) {
+													ServerUtils.logSevere("{ItemUtilities} There was an error executing an item's command as a player, if this continues report it to the developer.");
+													ServerUtils.sendDebugTrace(e);
+												}
+											}
+										}
+									} catch (Exception e) {
+										ServerUtils.logSevere("{ItemUtilities} There was an error executing an item's command as an op, if this continues report it to the developer.");
+										ServerUtils.sendDebugTrace(e);
+									}
+								} else if (executor.equals(Executor.PLAYER)) {
+									try {
+										if (StringUtils.containsIgnoreCase(formatCommand, "[close]")) {
+											PlayerHandler.safeInventoryClose(player);
+										} else {
+											ItemData.getInfo().setLoggable(player, "/" + formatCommand);
+											player.chat("/" + formatCommand);
+										}
+									} catch (Exception e) {
+										ServerUtils.logSevere("{ItemUtilities} There was an error executing an item's command as a player, if this continues report it to the developer.");
+										ServerUtils.sendDebugTrace(e);
+									}
+								} else if (executor.equals(Executor.SERVERSWITCH)) {
+									try { 
+										ItemJoin.getCore().getBungee().SwitchServers(player, formatCommand); 
+									} 
+									catch (Exception e) {
+										ServerUtils.logSevere("{ItemUtilities} There was an error executing an item's command to switch servers, if this continues report it to the developer.");
+										ServerUtils.sendDebugTrace(e);
+									}
+								} else if (executor.equals(Executor.BUNGEE)) {
+									try { 
+										ItemJoin.getCore().getBungee().ExecuteCommand(player, formatCommand); 
+									} 
+									catch (Exception e) {
+										ServerUtils.logSevere("{ItemUtilities} There was an error executing an item's command to BungeeCord, if this continues report it to the developer.");
+										ServerUtils.sendDebugTrace(e);
+									}
+								} else if (executor.equals(Executor.MESSAGE)) {
+									try { 
+										String jsonMessage = ItemData.getInfo().getJSONMessage(formatCommand, "Active-Commands");
+										Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(),"minecraft:tellraw " + player.getName() + " " + jsonMessage);
+									} 
+									catch (Exception e) {
+										ServerUtils.logSevere("{ItemUtilities} There was an error executing an item's command to send a message, if this continues report it to the developer.");
+										ServerUtils.sendDebugTrace(e);
+									}
+								}
 							}
 						}
 					}
@@ -848,6 +934,30 @@ public class ItemUtilities {
 				}
 			}
 		}
+	}
+	
+   /**
+	* Gets the exact command line from the string input.
+	* 
+	* @param input - the raw command line input.
+	* @return The exact command mapping.
+	*/
+	private HashMap<Executor, String> getCommandMap(String input) {
+		input = input.trim();
+		Executor type = Executor.DEFAULT;
+		HashMap<Executor, String> commandMap = new HashMap<Executor, String>();
+		if (input.startsWith("default:")) { input = input.substring(8); type = Executor.DEFAULT; } 
+		else if (input.startsWith("console:")) { input = input.substring(8); type = Executor.CONSOLE; } 
+		else if (input.startsWith("op:")) { input = input.substring(3); type = Executor.OP; } 
+		else if (input.startsWith("player:")) { input = input.substring(7); type = Executor.PLAYER; } 
+		else if (input.startsWith("server:")) { input = input.substring(7); type = Executor.SERVERSWITCH; } 
+		else if (input.startsWith("bungee:")) { input = input.substring(7); type = Executor.BUNGEE; } 
+		else if (input.startsWith("message:")) { input = input.substring(8); type = Executor.MESSAGE; } 
+		else if (input.startsWith("first-join:")) { input = input.substring(11); type = Executor.FIRSTJOIN; }
+		input = input.trim();
+		input = StringUtils.colorFormat(input);
+		commandMap.put(type, input);
+		return commandMap;
 	}
 	
    /**
