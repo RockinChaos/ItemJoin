@@ -6,7 +6,7 @@ body:
   - type: input
     attributes:
       label: Server Version
-      description: Version and type of used server software where the resource is installed.
+      description: Version and type of the server software where the resource is installed.
       placeholder: PaperSpigot 1.19.3
     validations:
       required: true
@@ -22,7 +22,7 @@ body:
   - type: input
     attributes:
       label: Dump Information
-      description: The URL of the `/itemjoin dump` output, (type this command in-game or console).
+      description: The URL of `/itemjoin dump`, type this command in-game or console.
       placeholder: https://pastebin.com/NCBiLsjd
     validations:
       required: true
