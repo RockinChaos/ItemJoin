@@ -6,7 +6,7 @@ body:
   - type: input
     attributes:
       label: Server Version
-      description: Version and type of the server software where the resource is installed.
+      description: Version and type of server software where the resource is installed.
       placeholder: PaperSpigot 1.19.3
     validations:
       required: true
