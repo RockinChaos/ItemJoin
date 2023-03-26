@@ -675,11 +675,11 @@ public class ChatExecutor implements CommandExecutor {
 		}
 		ItemMap probable = null;
 		for (Object itemMap : ItemJoin.getCore().getChances().getItems().keySet()) {
-			if (((ItemMap)itemMap).hasItem(((Player) sender), true)) {
+			if (((ItemMap)itemMap).hasItem(argsPlayer, true)) {
 				probable = (ItemMap)itemMap;
 			}
 		}
-		if (probable == null) { probable = (ItemMap) ItemJoin.getCore().getChances().getRandom(((Player) sender)); }
+		if (probable == null) { probable = (ItemMap) ItemJoin.getCore().getChances().getRandom(argsPlayer); }
 		for (ItemMap itemMap: ItemUtilities.getUtilities().getItems()) {
 			if ((!remove ? (itemMap.inWorld(argsPlayer.getWorld()) && ((probable != null && itemMap.getConfigName().equals(probable.getConfigName())) || itemMap.getProbability() == -1)  && ItemUtilities.getUtilities().canOverwrite(argsPlayer, itemMap) && 
 				(!PermissionsHandler.permissionEnabled("Permissions.Commands-Get") || (itemMap.hasPermission(argsPlayer, argsPlayer.getWorld()) && PermissionsHandler.permissionEnabled("Permissions.Commands-Get")))) : remove)) {
