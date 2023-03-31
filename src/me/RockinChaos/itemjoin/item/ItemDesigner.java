@@ -497,7 +497,7 @@ public class ItemDesigner {
 				String textBuilder = "[\"\"";
 				for (int k = 0; k < pageList.size(); k++) {
 					Map < Integer, String > JSONBuilder = new HashMap < Integer, String > ();
-					String formatLine = pageList.get(k);
+					String formatLine = pageList.get(k).replace("\n", "\\n");
 					if (ItemHandler.containsJSONEvent(formatLine)) {
 						while (ItemHandler.containsJSONEvent(formatLine)) {
 							for (JSONEvent jsonType: JSONEvent.values()) {
