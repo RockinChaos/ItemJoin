@@ -78,6 +78,7 @@ import me.RockinChaos.itemjoin.listeners.triggers.PlayerGuard;
 import me.RockinChaos.itemjoin.listeners.triggers.PlayerJoin;
 import me.RockinChaos.itemjoin.listeners.triggers.PlayerLogin;
 import me.RockinChaos.itemjoin.listeners.triggers.PlayerQuit;
+import me.RockinChaos.itemjoin.listeners.triggers.PlayerTeleport;
 import me.RockinChaos.itemjoin.listeners.triggers.Respawn;
 import me.RockinChaos.itemjoin.listeners.triggers.WorldSwitch;
 import me.RockinChaos.itemjoin.utils.sql.DataObject;
@@ -600,6 +601,9 @@ public class ItemData {
 		}
 		if ((((!itemMap.isGiveOnDisabled() && itemMap.isGiveOnRespawn()) || itemMap.isDeathKeepable()) || itemMap.isAutoRemove()) && !StringUtils.isRegistered(Respawn.class.getSimpleName())) {
 			ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new Respawn(), ItemJoin.getCore().getPlugin());
+		}
+		if (((!itemMap.isGiveOnDisabled() && itemMap.isGiveOnTeleport()) || itemMap.isAutoRemove()) && !StringUtils.isRegistered(PlayerTeleport.class.getSimpleName())) {
+			ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new PlayerTeleport(), ItemJoin.getCore().getPlugin());
 		}
 		if (((!itemMap.isGiveOnDisabled() && itemMap.isGiveOnWorldSwitch()) || itemMap.isAutoRemove()) && !StringUtils.isRegistered(WorldSwitch.class.getSimpleName())) {
 			ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new WorldSwitch(), ItemJoin.getCore().getPlugin());

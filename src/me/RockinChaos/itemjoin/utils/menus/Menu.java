@@ -5211,7 +5211,7 @@ public class Menu {
 	private static void triggerPane(final Player player, final ItemMap itemMap) {
 		Interface triggerPane = new Interface(false, 3, exitButton, GUIName, player);
 		SchedulerUtils.runAsync(() -> {
-			triggerPane.addButton(new Button(fillerPaneBItem), 3);
+			triggerPane.addButton(new Button(fillerPaneBItem));
 			triggerPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "FILLED_MAP" : "MAP"), 1, itemMap.isOnlyFirstJoin(), "&e&l&nFirst Join", "&7", "&7*Gives the item when the", "&7player logs into the server", 
 					"&7for the first time only.", "&7This will overwrite any triggers", "&7such as respawn, and world-switch.", "&9&lENABLED: &a" + (itemMap.isOnlyFirstJoin() + "").toUpperCase()), event -> {
 				if (itemMap.isOnlyFirstJoin()) {
@@ -5221,6 +5221,7 @@ public class Menu {
 				}
 				triggerPane(player, itemMap);
 			}));
+			triggerPane.addButton(new Button(fillerPaneBItem));
 			triggerPane.addButton(new Button(ItemHandler.getItem("STONE_SWORD", 1, itemMap.isOnlyFirstWorld(), "&e&l&nFirst World", "&7", "&7*Gives the item when the", "&7player enters each of the defined", "&7worlds for the first time.", "&7", 
 					"&7This flag overwrites any triggers", "&7such as respawn, and join.", "&9&lENABLED: &a" + (itemMap.isOnlyFirstWorld() + "").toUpperCase()), event -> {
 				if (itemMap.isOnlyFirstWorld()) {
@@ -5230,6 +5231,7 @@ public class Menu {
 				}
 				triggerPane(player, itemMap);
 			}));
+			triggerPane.addButton(new Button(fillerPaneBItem));
 			triggerPane.addButton(new Button(ItemHandler.getItem(ServerUtils.hasSpecificUpdate("1_13") ? "TOTEM_OF_UNDYING" : "322:1", 1, itemMap.isOnlyFirstLife(), "&e&l&nFirst Life", "&7", "&7*Gives the item when the", "&7player logs into the server", 
 					"&7for the first time only,", "&7but will give the item", "&7EVERY TIME on player RESPAWN.", "&7This flag overwrites any triggers", "&7such as respawn, and join.", "&9&lENABLED: &a" + (itemMap.isOnlyFirstWorld() + "").toUpperCase()), event -> {
 				if (itemMap.isOnlyFirstWorld()) {
@@ -5239,7 +5241,7 @@ public class Menu {
 				}
 				triggerPane(player, itemMap);
 			}));
-			triggerPane.addButton(new Button(fillerPaneBItem), 3);
+			triggerPane.addButton(new Button(fillerPaneBItem));
 			triggerPane.addButton(new Button(ItemHandler.getItem("REDSTONE", 1, itemMap.isGiveOnDisabled(), "&c&l&nDISABLED", "&7", "&7*Prevents the item from given", "&7through the use of triggers.", "&7", "&7Useful to only get the item", 
 					"&7using &l/itemjoin get <item>", "&9&lENABLED: &a" + (itemMap.isGiveOnDisabled() + "").toUpperCase()), event -> {
 				if (itemMap.isGiveOnDisabled()) {
@@ -5260,12 +5262,22 @@ public class Menu {
 				}
 				triggerPane(player, itemMap);
 			}));
+			triggerPane.addButton(new Button(fillerPaneBItem));
 			triggerPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "OAK_SIGN" : "323"), 1, itemMap.isGiveOnJoin(), "&e&l&nJoin", "&7", "&7*Gives the item when the", "&7player logs into the server.", 
 					"&9&lENABLED: &a" + (itemMap.isGiveOnJoin() + "").toUpperCase()), event -> {
 				if (itemMap.isGiveOnJoin()) {
 					itemMap.setGiveOnJoin(false);
 				} else {
 					itemMap.setGiveOnJoin(true);
+				}
+				triggerPane(player, itemMap);
+			}));
+			triggerPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "ENDER_PEARL" : "368"), 1, itemMap.isGiveOnTeleport(), "&e&l&nTeleport", "&7", "&7*Gives the item when the", "&7player teleports to a new location.", 
+					"&9&lENABLED: &a" + (itemMap.isGiveOnTeleport() + "").toUpperCase()), event -> {
+				if (itemMap.isGiveOnTeleport()) {
+					itemMap.setGiveOnTeleport(false);
+				} else {
+					itemMap.setGiveOnTeleport(true);
 				}
 				triggerPane(player, itemMap);
 			}));
@@ -5363,6 +5375,7 @@ public class Menu {
 		if (itemMap.isOnlyFirstJoin()) { triggers += "FIRST-JOIN, "; }
 		if (itemMap.isOnlyFirstWorld()) { triggers += "FIRST-WORLD, "; }
 		if (itemMap.isOnlyFirstLife()) { triggers += "FIRST-LIFE, "; }
+		if (itemMap.isGiveOnTeleport() && !itemMap.isOnlyFirstJoin() && !itemMap.isOnlyFirstWorld()) { triggers += "TELEPORT, "; }
 		if (itemMap.isGiveOnRespawn() && !itemMap.isOnlyFirstJoin() && !itemMap.isOnlyFirstWorld()) { triggers += "RESPAWN, "; }
 		if (itemMap.isGiveOnWorldSwitch() && !itemMap.isOnlyFirstWorld()) { triggers += "WORLD-SWITCH, "; }
 		if (itemMap.isUseOnLimitSwitch()) { triggers += "GAMEMODE-SWITCH, "; }

@@ -280,6 +280,7 @@ public class ItemMap {
 //  ============================================== //
 	private boolean giveOnDisabled = false;
 	private boolean giveOnJoin = false;
+	private boolean giveOnTeleport = false;
 	private boolean giveOnRespawn = false;
 	private boolean giveOnWorldSwitch = false;
 	private boolean giveOnRegionEnter = false;
@@ -566,6 +567,7 @@ public class ItemMap {
 		this.triggers = (this.nodeLocation.getString("triggers") != null ? this.nodeLocation.getString("triggers") : (defaultTriggers != null && !defaultTriggers.isEmpty() ? defaultTriggers : "JOIN"));
 		this.giveOnDisabled = StringUtils.splitIgnoreCase(this.triggers, "DISABLED", ",");
 		this.giveOnJoin = StringUtils.splitIgnoreCase(this.triggers, "JOIN", ",");
+		this.giveOnTeleport = StringUtils.splitIgnoreCase(this.triggers, "TELEPORT", ",");
 		this.giveOnRespawn = StringUtils.splitIgnoreCase(this.triggers, "RESPAWN", ",");
 		this.giveOnWorldSwitch = StringUtils.splitIgnoreCase(this.triggers, "WORLD-CHANGE", ",") || StringUtils.splitIgnoreCase(this.triggers, "WORLD-SWITCH", ",");
 		this.giveOnRegionEnter = StringUtils.splitIgnoreCase(this.triggers, "REGION-ENTER", ",");
@@ -1262,6 +1264,7 @@ public class ItemMap {
 		if (bool && !this.giveOnRegionEnter && !this.giveOnRegionLeave && !this.giveOnRegionAccess && !this.giveOnRegionEgress) { 
 			this.giveOnJoin = true; 
 			this.giveOnRespawn = false; 
+			this.giveOnTeleport = false;
 		}
 	}
 	
@@ -1275,6 +1278,7 @@ public class ItemMap {
 		if (bool && !this.giveOnRegionEnter && !this.giveOnRegionLeave && !this.giveOnRegionAccess && !this.giveOnRegionEgress) { 
 			this.giveOnJoin = true; 
 			this.giveOnRespawn = true;
+			this.giveOnTeleport = false;
 		}
 	}
 	
@@ -1289,6 +1293,7 @@ public class ItemMap {
 			this.giveOnJoin = true; 
 			this.giveOnWorldSwitch = true; 
 			this.giveOnRespawn = false;
+			this.giveOnTeleport = false;
 		}
 	}
 	
@@ -1300,6 +1305,15 @@ public class ItemMap {
 	public void setGiveOnJoin(final boolean bool) {
 		this.giveOnJoin = bool;
 	}
+	
+   /**
+    * Sets the ItemStack to be given only on teleport.
+    * 
+    * @param bool - The value to be set.
+    */
+	public void setGiveOnTeleport(final boolean bool) {
+		this.giveOnTeleport = bool;
+	}	
 	
    /**
     * Sets the ItemStack to be given only on World Switch.
@@ -3087,6 +3101,15 @@ public class ItemMap {
     */
 	public boolean isGiveOnJoin() {
 		return this.giveOnJoin;
+	}
+	
+   /**
+    * Checks if give on teleport is enabled.
+    * 
+    * @return If it is enabled.
+    */
+	public boolean isGiveOnTeleport() {
+		return this.giveOnTeleport;
 	}
 	
    /**

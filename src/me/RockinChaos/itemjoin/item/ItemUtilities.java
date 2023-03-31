@@ -273,7 +273,8 @@ public class ItemUtilities {
 		if (type.equals(TriggerType.WORLD_SWITCH) || type.equals(TriggerType.JOIN)) { world = player.getWorld(); }
 		for (ItemMap item : this.getItems()) { 
 			item.setAnimations(player);
-			if (((((type.equals(TriggerType.JOIN) && item.isGiveOnJoin()) 
+			if (((((type.equals(TriggerType.JOIN) && item.isGiveOnJoin())
+			  || (type.equals(TriggerType.TELEPORT) && item.isGiveOnTeleport()) 
 			  || (type.equals(TriggerType.RESPAWN) && (item.isGiveOnRespawn() || item.isDeathKeepable()))
 			  || (type.equals(TriggerType.WORLD_SWITCH) && item.isGiveOnWorldSwitch())
 			  || (type.equals(TriggerType.LIMIT_SWITCH) && item.isUseOnLimitSwitch() && (region.equalsIgnoreCase("IJ_WORLD") || item.inRegion(region) || item.getEnabledRegions() == null || item.getEnabledRegions().isEmpty())))
@@ -320,13 +321,13 @@ public class ItemUtilities {
 		if (type.equals(TriggerType.QUIT)) { this.clearEvent(type, player, world.getName(), ""); }
 		if (this.getClearDelay() != 0) {
 			SchedulerUtils.runLater(this.getClearDelay(), () -> {
-				if (type.equals(TriggerType.JOIN) || type.equals(TriggerType.WORLD_SWITCH)) {
+				if (type.equals(TriggerType.JOIN) || type.equals(TriggerType.WORLD_SWITCH) || type.equals(TriggerType.TELEPORT)) {
 					this.clearEvent(type, player, player.getWorld().getName(), "");
 				}
 				this.triggerCommands(player, type);
 			});
 		} else {
-			if (type.equals(TriggerType.JOIN) || type.equals(TriggerType.WORLD_SWITCH) || type.equals(TriggerType.QUIT)) {
+			if (type.equals(TriggerType.JOIN) || type.equals(TriggerType.WORLD_SWITCH) || type.equals(TriggerType.TELEPORT) || type.equals(TriggerType.QUIT)) {
 				this.clearEvent(type, player, player.getWorld().getName(), "");
 			}
 			this.triggerCommands(player, type);
@@ -837,7 +838,8 @@ public class ItemUtilities {
 				&& ((StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.triggers"), TriggerType.JOIN.name) && triggerRef.equals(TriggerType.JOIN))
 				|| (StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.triggers"), TriggerType.FIRST_JOIN.name) && triggerRef.equals(TriggerType.JOIN))
 				|| (StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.triggers"), TriggerType.WORLD_SWITCH.name) && triggerRef.equals(TriggerType.WORLD_SWITCH))
-				|| (StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.triggers"), TriggerType.RESPAWN.name) && triggerRef.equals(TriggerType.RESPAWN)))) {
+				|| (StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.triggers"), TriggerType.RESPAWN.name) && triggerRef.equals(TriggerType.RESPAWN))
+				|| (StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.triggers"), TriggerType.TELEPORT.name) && triggerRef.equals(TriggerType.TELEPORT)))) {
 			String commandsWorlds = ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.enabled-worlds").replace(", ", ",");
 			TriggerType trigger = triggerRef;
 			if (StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.triggers"), TriggerType.FIRST_JOIN.name) && trigger.equals(TriggerType.JOIN)) { trigger = TriggerType.FIRST_JOIN; }
@@ -1174,6 +1176,7 @@ public class ItemUtilities {
 		JOIN("Join"),
 		QUIT("Quit"),
 		RESPAWN("Respawn"),
+		TELEPORT("Teleport"),
 		WORLD_SWITCH("World-Switch"),
 		LIMIT_SWITCH("Limit-Modes"),
 		REGION_ENTER("Region-Enter"),
