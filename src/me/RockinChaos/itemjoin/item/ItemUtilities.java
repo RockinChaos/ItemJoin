@@ -281,7 +281,7 @@ public class ItemUtilities {
 		      || ((((type.equals(TriggerType.REGION_ENTER) && (item.isGiveOnRegionEnter() || item.isGiveOnRegionAccess()))) 
 			  || (type.equals(TriggerType.REGION_LEAVE) && (item.isGiveOnRegionLeave() || item.isGiveOnRegionEgress()))) && item.inRegion(region))))
 			   && item.inWorld(world) && item.isLimitMode(gameMode) && ((probable != null && item.getConfigName().equals(probable.getConfigName())) || item.getProbability() == -1) 
-			   && item.conditionMet(player, "trigger-conditions") && ItemData.getInfo().isEnabled(player, item.getConfigName()) && item.hasPermission(player, world) 
+			   && item.conditionMet(player, "trigger-conditions", false) && ItemData.getInfo().isEnabled(player, item.getConfigName()) && item.hasPermission(player, world) 
 			   && this.isObtainable(player, item, session, type)) {
 				item.giveTo(player); 
 			} else if (((type.equals(TriggerType.LIMIT_SWITCH) && item.isUseOnLimitSwitch() && !item.isLimitMode(gameMode)) || (((type.equals(TriggerType.REGION_LEAVE) && (item.isGiveOnRegionAccess() 

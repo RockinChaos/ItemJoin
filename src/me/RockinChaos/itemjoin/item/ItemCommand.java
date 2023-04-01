@@ -143,7 +143,7 @@ public class ItemCommand {
 	* @return If the player is able to execute the command.
 	*/
 	public boolean canExecute(final Player player, final String action, final String clickType) {
-		if (this.command == null || this.command.length() == 0 || !this.actionType.hasClickType(clickType) || !this.actionType.hasAction(action) || !this.itemMap.conditionMet(player, this.actionType.config + "-conditions")) { return false; }
+		if (this.command == null || this.command.length() == 0 || !this.actionType.hasClickType(clickType) || !this.actionType.hasAction(action)) { return false; }
 		return true;
 	}
 	
@@ -158,6 +158,14 @@ public class ItemCommand {
 			return true;
 		}
 		return false;
+	}
+	
+   /**
+	* Gets the defined command action.
+	* 
+	*/
+	public Action getAction() {
+		return this.actionType;
 	}
 
    /**
@@ -662,7 +670,7 @@ public class ItemCommand {
 		ON_RECEIVE(".on-receive", "ON_RECEIVE", "RECEIVED"),
 		PHYSICAL(".physical", "PHYSICAL", "INTERACTED");
 		
-		private final String config;
+		public final String config;
 		private final String actions;
 		private final String clickType;
 		private Action(String Config, String Actions, String ClickType) { this.config = Config; this.actions = Actions; this.clickType = ClickType; }

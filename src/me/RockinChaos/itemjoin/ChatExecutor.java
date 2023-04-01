@@ -582,7 +582,7 @@ public class ChatExecutor implements CommandExecutor {
 		for (ItemMap itemMap: ItemUtilities.getUtilities().getItems()) {
 			if (itemMap.getConfigName().equalsIgnoreCase(args[1])) {
 				String customName = StringUtils.translateLayout(itemMap.getCustomName(), argsPlayer); placeHolders[3] = customName;
-				if ((remove && itemMap.hasItem(argsPlayer, true)) || (!remove && (itemMap.conditionMet(argsPlayer, "trigger-conditions") && (ItemUtilities.getUtilities().canOverwrite(argsPlayer, itemMap) && (amount != 0 || itemMap.isAlwaysGive() || !itemMap.hasItem(argsPlayer, false)))))) {
+				if ((remove && itemMap.hasItem(argsPlayer, true)) || (!remove && (itemMap.conditionMet(argsPlayer, "trigger-conditions", false) && (ItemUtilities.getUtilities().canOverwrite(argsPlayer, itemMap) && (amount != 0 || itemMap.isAlwaysGive() || !itemMap.hasItem(argsPlayer, false)))))) {
 					if (remove || !PermissionsHandler.permissionEnabled("Permissions.Commands-Get") || (itemMap.hasPermission(argsPlayer, argsPlayer.getWorld()) && PermissionsHandler.permissionEnabled("Permissions.Commands-Get"))) {
 						if (itemMap.isAlwaysGive() && (args.length < 2 || (!StringUtils.isInt(args[args.length - 1])))) { amount = itemMap.getCount(argsPlayer); }
 						if (StringUtils.getSlotConversion(itemMap.getSlot()) != 0 && PlayerHandler.isCraftingInv(argsPlayer.getOpenInventory()) && argsPlayer.getOpenInventory().getTopInventory().getItem(0) != null && !argsPlayer.getOpenInventory().getTopInventory().getItem(0).getType().equals(Material.AIR)) {
@@ -632,7 +632,7 @@ public class ChatExecutor implements CommandExecutor {
 			for (ItemMap itemMap: ItemUtilities.getUtilities().getItems()) {
 				if (itemMap.getConfigName().equalsIgnoreCase(args[1])) {
 					if (remove || !PermissionsHandler.permissionEnabled("Permissions.Commands-Get") || (itemMap.hasPermission(argsPlayer, argsPlayer.getWorld()) && PermissionsHandler.permissionEnabled("Permissions.Commands-Get"))) {
-						if ((remove && itemMap.hasItem(argsPlayer, true)) || (!remove && (itemMap.conditionMet(argsPlayer, "trigger-conditions") && (ItemUtilities.getUtilities().canOverwrite(argsPlayer, itemMap) && (amount != 0 || itemMap.isAlwaysGive() || !itemMap.hasItem(argsPlayer, false)))))) {
+						if ((remove && itemMap.hasItem(argsPlayer, true)) || (!remove && (itemMap.conditionMet(argsPlayer, "trigger-conditions", false) && (ItemUtilities.getUtilities().canOverwrite(argsPlayer, itemMap) && (amount != 0 || itemMap.isAlwaysGive() || !itemMap.hasItem(argsPlayer, false)))))) {
 							if (StringUtils.getSlotConversion(itemMap.getSlot()) != 0 && PlayerHandler.isCraftingInv(argsPlayer.getOpenInventory()) && argsPlayer.getOpenInventory().getTopInventory().getItem(0) != null && !argsPlayer.getOpenInventory().getTopInventory().getItem(0).getType().equals(Material.AIR)) {
 								ItemHandler.returnCraftingItem(argsPlayer, 0, argsPlayer.getOpenInventory().getTopInventory().getItem(0).clone(), 0L);
 							}
@@ -684,7 +684,7 @@ public class ChatExecutor implements CommandExecutor {
 			if ((!remove ? (itemMap.inWorld(argsPlayer.getWorld()) && ((probable != null && itemMap.getConfigName().equals(probable.getConfigName())) || itemMap.getProbability() == -1)  && ItemUtilities.getUtilities().canOverwrite(argsPlayer, itemMap) && 
 				(!PermissionsHandler.permissionEnabled("Permissions.Commands-Get") || (itemMap.hasPermission(argsPlayer, argsPlayer.getWorld()) && PermissionsHandler.permissionEnabled("Permissions.Commands-Get")))) : remove)) {
 				if ((remove && itemMap.hasItem(argsPlayer, true)) || ((!remove && !itemMap.hasItem(argsPlayer, false)) || (!remove && itemMap.isAlwaysGive()))) {
-					if (remove || (!remove && itemMap.conditionMet(argsPlayer, "trigger-conditions"))) {
+					if (remove || (!remove && itemMap.conditionMet(argsPlayer, "trigger-conditions", false))) {
 						if (remove) { itemMap.removeFrom(argsPlayer); } 
 						else { itemMap.giveTo(argsPlayer); }
 						if (!itemGiven) { itemGiven = true; }
