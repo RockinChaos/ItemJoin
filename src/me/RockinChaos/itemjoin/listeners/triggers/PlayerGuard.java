@@ -86,6 +86,7 @@ public class PlayerGuard implements Listener {
 	*/
 	private void handleRegions(final Player player, final Location location, final boolean async, final Location fromLocation) {
 		String regions = ItemJoin.getCore().getDependencies().getGuard().getRegionAtLocation(location);
+		List < String > regionSetFull = new ArrayList < String > (Arrays.asList(regions.replace(" ", "").split(",")));
 		if (this.playerRegions.get(player) != null) {
 			List < String > regionSet = new ArrayList < String > (Arrays.asList(regions.replace(" ", "").split(",")));
 			List < String > playerSet = new ArrayList < String > (Arrays.asList(this.playerRegions.get(player).replace(" ", "").split(",")));
@@ -98,18 +99,18 @@ public class PlayerGuard implements Listener {
 			for (String region: playerSet) {
 				if (region != null && !region.isEmpty()) {
 					if (async) {
-						SchedulerUtils.run(() -> ItemUtilities.getUtilities().setItems(player, (async ? fromLocation.getWorld() : location.getWorld()), TriggerType.REGION_LEAVE, player.getGameMode(), region));
+						SchedulerUtils.run(() -> ItemUtilities.getUtilities().setItems(player, (async ? fromLocation.getWorld() : location.getWorld()), TriggerType.REGION_LEAVE, player.getGameMode(), region, regionSetFull));
 					} else {
-						ItemUtilities.getUtilities().setItems(player, (async ? fromLocation.getWorld() : location.getWorld()), TriggerType.REGION_LEAVE, player.getGameMode(), region);
+						ItemUtilities.getUtilities().setItems(player, (async ? fromLocation.getWorld() : location.getWorld()), TriggerType.REGION_LEAVE, player.getGameMode(), region, regionSetFull);
 					}
 				}
 			}
 			for (String region: regionSet) {
 				if (region != null && !region.isEmpty()) {
 					if (async) {
-						SchedulerUtils.run(() -> ItemUtilities.getUtilities().setItems(player, location.getWorld(), TriggerType.REGION_ENTER, player.getGameMode(), region));
+						SchedulerUtils.run(() -> ItemUtilities.getUtilities().setItems(player, location.getWorld(), TriggerType.REGION_ENTER, player.getGameMode(), region, regionSetFull));
 					} else {
-						ItemUtilities.getUtilities().setItems(player, location.getWorld(), TriggerType.REGION_ENTER, player.getGameMode(), region);
+						ItemUtilities.getUtilities().setItems(player, location.getWorld(), TriggerType.REGION_ENTER, player.getGameMode(), region, regionSetFull);
 					}
 				}
 			}
@@ -117,9 +118,9 @@ public class PlayerGuard implements Listener {
 			for (String region: Arrays.asList(regions.replace(" ", "").split(","))) {
 				if (region != null && !region.isEmpty()) {
 					if (async) {
-						SchedulerUtils.run(() -> ItemUtilities.getUtilities().setItems(player, location.getWorld(), TriggerType.REGION_ENTER, player.getGameMode(), region));
+						SchedulerUtils.run(() -> ItemUtilities.getUtilities().setItems(player, location.getWorld(), TriggerType.REGION_ENTER, player.getGameMode(), region, regionSetFull));
 					} else {
-						ItemUtilities.getUtilities().setItems(player, location.getWorld(), TriggerType.REGION_ENTER, player.getGameMode(), region);
+						ItemUtilities.getUtilities().setItems(player, location.getWorld(), TriggerType.REGION_ENTER, player.getGameMode(), region, regionSetFull);
 					}
 				}
 			}

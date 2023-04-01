@@ -17,6 +17,8 @@
  */
 package me.RockinChaos.itemjoin.listeners.triggers;
 
+import java.util.Arrays;
+
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -39,7 +41,7 @@ public class PlayerTeleport implements Listener {
 	private void setJoinItems(PlayerTeleportEvent event) {
 		final Player player = event.getPlayer();
 		if (PlayerHandler.isPlayer(player)) {
-			ItemUtilities.getUtilities().setAuthenticating(player, event.getTo().getWorld(), TriggerType.TELEPORT, player.getGameMode(), "GLOBAL"); {
+			ItemUtilities.getUtilities().setAuthenticating(player, event.getTo().getWorld(), TriggerType.TELEPORT, player.getGameMode(), "GLOBAL", Arrays.asList("GLOBAL")); {
 				ServerUtils.sendErrorStatements(player);
 			}
 		}

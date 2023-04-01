@@ -200,9 +200,10 @@ public class ItemUtilities {
     * @param world - The World that the player is from.
     * @param type - The TriggerType that is being performed.
     * @param newMode - The GameMode of the Player.
-    * @param region - The region the Player is in.
+    * @param targetRegion - The region the Player is in.
+    * @param regions - The regions the Player is in.
     */
-	public void setAuthenticating(final Player player, final World world, TriggerType type, final GameMode newMode, final String region) {
+	public void setAuthenticating(final Player player, final World world, TriggerType type, final GameMode newMode, final String targetRegion, final List<String> regions) {
 		if (ItemJoin.getCore().getDependencies().authMeEnabled()) {
 			new BukkitRunnable() {
 				@Override
@@ -212,7 +213,7 @@ public class ItemUtilities {
 						if (fr.xephi.authme.api.v3.AuthMeApi.getInstance().isAuthenticated(player) 
 						|| (authMe.getPlugin().getConfig().getString("settings.registration.force") != null 
 					    && !authMe.getPlugin().getConfig().getBoolean("settings.registration.force"))) {
-							setItems(player, world, type, newMode, region);
+							setItems(player, world, type, newMode, targetRegion, regions);
 							this.cancel();
 						} else if (!player.isOnline()) {
 							this.cancel();
@@ -224,7 +225,7 @@ public class ItemUtilities {
 				}
 			}.runTaskTimer(ItemJoin.getCore().getPlugin(), 0, 20);
 		} else {
-			this.setItems(player, world, type, newMode, region);
+			this.setItems(player, world, type, newMode, targetRegion, regions);
 		}
 	}
 	
@@ -235,20 +236,21 @@ public class ItemUtilities {
     * @param world - The World that the player is from.
     * @param type - The TriggerType that is being performed.
     * @param newMode - The GameMode of the Player.
-    * @param region - The region the Player is in.
+    * @param targetRegion - The region the Player is in.
+    * @param regions - The regions the Player is in.
     */
-	public void setItems(final Player player, final World world, final TriggerType type, final GameMode newMode, final String region) {
+	public void setItems(final Player player, final World world, final TriggerType type, final GameMode newMode, final String targetRegion, final List<String> regions) {
 		this.setStatistics(player);
-		this.safeSet(player, world, type, region);
+		this.safeSet(player, world, type, targetRegion);
 		if (this.getItemDelay() != 0 && type != TriggerType.LIMIT_SWITCH && type != TriggerType.REGION_ENTER && type != TriggerType.REGION_LEAVE) {
 			SchedulerUtils.runLater(this.getItemDelay(), () -> {
 				ItemData.getInfo().restoreCraftItems(player, type); {
-					this.handleItems(player, world, type, newMode, region);
+					this.handleItems(player, world, type, newMode, targetRegion, regions);
 				}
 			});
 		} else {
 			ItemData.getInfo().restoreCraftItems(player, type); {
-				this.handleItems(player, world, type, newMode, region);
+				this.handleItems(player, world, type, newMode, targetRegion, regions);
 			}
 		}
 	}
@@ -259,9 +261,10 @@ public class ItemUtilities {
     * @param player - The Player that is having their items handled.
     * @param type - The TriggerType that is being performed.
     * @param newMode - The GameMode of the Player.
-    * @param region - The region the Player is in.
+    * @param targetRegion - The region the Player is in.
+    * @param regions - The regions the Player is in.
     */
-	private void handleItems(final Player player, World world, final TriggerType type, final GameMode gameMode, final String region) {
+	private void handleItems(final Player player, World world, final TriggerType type, final GameMode gameMode, final String targetRegion, final List<String> regions) {
 		ItemMap probable = null;
 		for (Object itemMap : ItemJoin.getCore().getChances().getItems().keySet()) {
 			if (((ItemMap)itemMap).hasItem(player, true)) {
@@ -273,19 +276,19 @@ public class ItemUtilities {
 		if (type.equals(TriggerType.WORLD_SWITCH) || type.equals(TriggerType.JOIN)) { world = player.getWorld(); }
 		for (ItemMap item : this.getItems()) { 
 			item.setAnimations(player);
-			if (((((type.equals(TriggerType.JOIN) && item.isGiveOnJoin())
+			if (((type.equals(TriggerType.JOIN) && item.isGiveOnJoin())
 			  || (type.equals(TriggerType.TELEPORT) && item.isGiveOnTeleport()) 
 			  || (type.equals(TriggerType.RESPAWN) && (item.isGiveOnRespawn() || item.isDeathKeepable()))
 			  || (type.equals(TriggerType.WORLD_SWITCH) && item.isGiveOnWorldSwitch())
-			  || (type.equals(TriggerType.LIMIT_SWITCH) && item.isUseOnLimitSwitch() && (region.equalsIgnoreCase("IJ_WORLD") || item.inRegion(region) || item.getEnabledRegions() == null || item.getEnabledRegions().isEmpty())))
-		      || ((((type.equals(TriggerType.REGION_ENTER) && (item.isGiveOnRegionEnter() || item.isGiveOnRegionAccess()))) 
-			  || (type.equals(TriggerType.REGION_LEAVE) && (item.isGiveOnRegionLeave() || item.isGiveOnRegionEgress()))) && item.inRegion(region))))
+			  || (type.equals(TriggerType.LIMIT_SWITCH) && item.isUseOnLimitSwitch() && (StringUtils.containsValue(regions,"IJ_WORLD") || item.inRegion(regions) || item.getEnabledRegions() == null || item.getEnabledRegions().isEmpty()))
+		      || (type.equals(TriggerType.REGION_ENTER) && (item.isGiveOnRegionEnter() || item.isGiveOnRegionAccess()) && item.inRegion(regions))
+			  || (type.equals(TriggerType.REGION_LEAVE) && (item.isGiveOnRegionLeave() || item.isGiveOnRegionEgress()) && item.inRegion(targetRegion) && !item.inRegion(regions)))
 			   && item.inWorld(world) && item.isLimitMode(gameMode) && ((probable != null && item.getConfigName().equals(probable.getConfigName())) || item.getProbability() == -1) 
 			   && item.conditionMet(player, "trigger-conditions", false) && ItemData.getInfo().isEnabled(player, item.getConfigName()) && item.hasPermission(player, world) 
 			   && this.isObtainable(player, item, session, type)) {
 				item.giveTo(player); 
 			} else if (((type.equals(TriggerType.LIMIT_SWITCH) && item.isUseOnLimitSwitch() && !item.isLimitMode(gameMode)) || (((type.equals(TriggerType.REGION_LEAVE) && (item.isGiveOnRegionAccess() 
-					|| !item.inRegion(region))) || (type.equals(TriggerType.REGION_ENTER) && (item.isGiveOnRegionEgress() || !item.inRegion(region)))))) && item.hasItem(player, false)) {
+					&& item.inRegion(targetRegion) && !item.inRegion(regions))) || (type.equals(TriggerType.REGION_ENTER) && (item.isGiveOnRegionEgress() && item.inRegion(targetRegion) && item.inRegion(regions)))))) && item.hasItem(player, false)) {
 				item.removeFrom(player);
 			} else if (item.isAutoRemove() && (!item.inWorld(world) || !item.isLimitMode(gameMode)) && item.hasItem(player, true)) {
 				item.removeFrom(player);
@@ -312,6 +315,7 @@ public class ItemUtilities {
     * 
     * @param player - The Player that is having their items set.
     * @param type - The TriggerType that is being performed.
+    * @param region - The region the Player is in.
     */
 	private void safeSet(final Player player, final World world, final TriggerType type, final String region) {
 		if (StringUtils.splitIgnoreCase(ItemData.getInfo().getHotbarTriggers(), type.name, ",")) { PlayerHandler.setHotbarSlot(player, ItemData.getInfo().getHotbarSlot()); }

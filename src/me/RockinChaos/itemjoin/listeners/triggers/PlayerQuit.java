@@ -17,6 +17,8 @@
  */
 package me.RockinChaos.itemjoin.listeners.triggers;
 
+import java.util.Arrays;
+
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -49,7 +51,7 @@ public class PlayerQuit implements Listener {
 			} {
 				ItemUtilities.getUtilities().closeAnimations(player); {
 					ItemHandler.removeCraftItems(player); {
-						ItemUtilities.getUtilities().setAuthenticating(player, player.getWorld(), TriggerType.QUIT, player.getGameMode(), "GLOBAL");
+						ItemUtilities.getUtilities().setAuthenticating(player, player.getWorld(), TriggerType.QUIT, player.getGameMode(), "GLOBAL", Arrays.asList("GLOBAL"));
 					}
 				}
 			}

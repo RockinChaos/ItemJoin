@@ -3252,6 +3252,23 @@ public class ItemMap {
 	}
 	
    /**
+    * Checks if any of the list of regions are an enabled region.
+    * 
+    * @return If any of the list of regions are a enabled region.
+    */
+	public Boolean inRegion(final List<String> regions) {
+		if (this.enabledRegions == null || this.enabledRegions.isEmpty()) { return true; }
+		for (String region : regions) {
+			for (String compareRegion: this.enabledRegions) {
+				if (compareRegion.equalsIgnoreCase(region) || compareRegion.equalsIgnoreCase("UNDEFINED")) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+   /**
     * Checks if Permissions are Required.
     * 
     * @return If Permissions are Required.
