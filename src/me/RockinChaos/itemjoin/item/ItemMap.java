@@ -64,7 +64,9 @@ import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.map.MapView;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionType;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
@@ -4340,8 +4342,13 @@ public class ItemMap {
 	private void setPotionEffects() {
 		if (this.effect != null && !this.effect.isEmpty() && !this.customConsumable) {
 			for (PotionEffect potion: this.effect) {
+				if (ServerUtils.hasSpecificUpdate("1_9")) {
+					((PotionMeta) this.tempMeta).setBasePotionData(new PotionData(PotionType.WATER));
+				}
 				((PotionMeta) this.tempMeta).addCustomEffect(potion, true);
 			}
+		} else if (ServerUtils.hasSpecificUpdate("1_9") && (this.getMaterial().toString().equalsIgnoreCase("POTION") || this.getMaterial().toString().equalsIgnoreCase("SPLASH_POTION") || this.getMaterial().toString().equalsIgnoreCase("LINGERING_POTION"))) {
+			((PotionMeta) this.tempMeta).setBasePotionData(new PotionData(PotionType.WATER));
 		}
 	}
 	
