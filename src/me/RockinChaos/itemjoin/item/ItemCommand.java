@@ -202,7 +202,6 @@ public class ItemCommand {
 	*/
 	public void setCommand(String input) {
 		input = input.trim();
-		input = StringUtils.colorFormat(input);
 		this.command = input;
 	}
 	
@@ -534,7 +533,6 @@ public class ItemCommand {
 		else if (input.startsWith("delay:")) { input = input.substring(6); type = Executor.DELAY; }
 			
 		input = input.trim();
-		input = StringUtils.colorFormat(input);
 		return new ItemCommand(input, action, type, itemMap, delay, listSection);
 	}
 	

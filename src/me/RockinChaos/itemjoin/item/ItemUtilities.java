@@ -972,7 +972,6 @@ public class ItemUtilities {
 		else if (input.startsWith("message:")) { input = input.substring(8); type = Executor.MESSAGE; } 
 		else if (input.startsWith("first-join:")) { input = input.substring(11); type = Executor.FIRSTJOIN; }
 		input = input.trim();
-		input = StringUtils.colorFormat(input);
 		commandMap.put(type, input);
 		return commandMap;
 	}
