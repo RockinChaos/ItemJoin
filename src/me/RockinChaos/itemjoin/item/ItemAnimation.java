@@ -260,7 +260,7 @@ public class ItemAnimation {
 					LegacyAPI.updateInventory(player);
 				} else {
 					synchronized("IJ_ANIMATE") {
-						PlayerHandler.updateInventory(player, itemMap.getItemStack(player), 1L);
+						PlayerHandler.updateInventory(player, itemMap.getItemStack(player).clone(), 1L);
 					}
 				}
 				// ============== This has Concluded all Animations.. ============== //
@@ -285,7 +285,7 @@ public class ItemAnimation {
 	*/
 	private void setNameData(final Player player, final ItemStack reviseItem, final String nameString) {
 		ItemMeta tempMeta = reviseItem.getItemMeta();
-		if (tempMeta != null) {
+		if (tempMeta != null && reviseItem != null && reviseItem.getType() != Material.AIR) {
 			tempMeta = tempMeta.clone();
 			String itemData = "";
 			if (this.itemMap.getLegacySecret() != null && !this.itemMap.getLegacySecret().isEmpty()) {
@@ -309,7 +309,7 @@ public class ItemAnimation {
 	*/
 	private void setLoreData(final Player player, final ItemStack reviseItem, final List<String> loreString) {
 		ItemMeta tempMeta = reviseItem.getItemMeta();
-		if (tempMeta != null) {
+		if (tempMeta != null && reviseItem != null && reviseItem.getType() != Material.AIR) {
 			tempMeta = tempMeta.clone();
 			final List < String > loreList = loreString;
 			final List < String > loreFormatList = new ArrayList < String > ();
@@ -334,7 +334,7 @@ public class ItemAnimation {
 		SchedulerUtils.runAsync(() -> {
 			Material mat = null;
 			String materialString = ItemHandler.cutDelay(material);
-			if (materialString.contains(":")) { 
+			if (materialString.contains(":") && reviseItem != null && reviseItem.getType() != Material.AIR) { 
 				final String[] parts = materialString.split(":");
 				if (ServerUtils.hasSpecificUpdate("1_13")) {
 					if (!StringUtils.isInt(parts[0])) { parts[0] = "LEGACY_" + parts[0]; }
@@ -376,12 +376,14 @@ public class ItemAnimation {
 	* @param pagesString - The book pages to set to the item.
 	*/
 	private void setPagesData(final Player player, final ItemStack reviseItem, final List<String> pagesString) {
-		if (ServerUtils.hasSpecificUpdate("1_8")) {
-			reviseItem.setItemMeta(this.itemMap.setJSONBookPages(player, reviseItem, pagesString).getItemMeta());
-		} else {
-			final ItemMeta itemMeta = LegacyAPI.setBookPages(player, reviseItem.getItemMeta(), pagesString);
-			this.itemMap.setPages(((BookMeta)itemMeta).getPages());
-			reviseItem.setItemMeta(itemMeta);
+		if (reviseItem != null && reviseItem.getType() != Material.AIR) {
+			if (ServerUtils.hasSpecificUpdate("1_8")) {
+				reviseItem.setItemMeta(this.itemMap.setJSONBookPages(player, reviseItem, pagesString).getItemMeta());
+			} else {
+				final ItemMeta itemMeta = LegacyAPI.setBookPages(player, reviseItem.getItemMeta(), pagesString);
+				this.itemMap.setPages(((BookMeta)itemMeta).getPages());
+				reviseItem.setItemMeta(itemMeta);
+			}
 		}
 	}
 
@@ -395,7 +397,7 @@ public class ItemAnimation {
 	*/
 	private void setSkull(final Player player, ItemStack reviseItem, final String ownerString, final String textureString) {
 		ItemMeta tempMeta = reviseItem.getItemMeta();
-		if (tempMeta != null) {
+		if (tempMeta != null && reviseItem != null && reviseItem.getType() != Material.AIR) {
 			tempMeta = tempMeta.clone();
 			if (ownerString != null) {
 				tempMeta = ItemHandler.setSkullOwner(tempMeta, StringUtils.translateLayout(ItemHandler.cutDelay(ownerString), player));
