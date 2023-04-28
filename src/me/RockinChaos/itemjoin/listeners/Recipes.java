@@ -201,24 +201,21 @@ public class Recipes implements Listener {
 		    						for (Character ingredient: itemMap.getIngredients().keySet()) {
 		    							final ItemRecipe itemRecipe = itemMap.getIngredients().get(ingredient);
 		    							ItemMap ingredMap = ItemUtilities.getUtilities().getItemMap(itemRecipe.getMap());
-		    							if (recipe.size() > i && recipe.get(i) == ingredient) {
-		    								if ((((ingredMap == null
-		    										&& itemRecipe.getMaterial().equals(item.getType()) 
-		    										&& (!isLegacy 
-		    												|| (LegacyAPI.getDataValue(item) == itemRecipe.getData())))) 
-		    										|| (ingredMap != null 
-		    										&& ingredMap.isSimilar((Player) view.getPlayer(), item))) 
-		    										&& item.getAmount() >= itemRecipe.getCount()) {
-		    									int removal = (item.getAmount() - itemRecipe.getCount());
-		    									if (removal <= 0) {
-		    										craftInventory.setItem((i + 1), new ItemStack(Material.AIR));
-		    										inventoryClone.setItem(i, new ItemStack(Material.AIR));
-		    										removed = true;
-		    									} else {
-		    										craftInventory.getItem((i + 1)).setAmount(removal);
-		    										inventoryClone.getItem(i).setAmount(removal);
-		    										removed = true;
-		    									}
+		    							if ((((ingredMap == null
+		    									&& itemRecipe.getMaterial().equals(item.getType()) 
+		    									&& (!isLegacy || (LegacyAPI.getDataValue(item) == itemRecipe.getData())))) 
+		    									|| (ingredMap != null 
+		    									&& ingredMap.isSimilar((Player) view.getPlayer(), item))) 
+		    									&& item.getAmount() >= itemRecipe.getCount()) {
+		    								int removal = (item.getAmount() - itemRecipe.getCount());
+		    								if (removal <= 0) {
+		    									craftInventory.setItem((i + 1), new ItemStack(Material.AIR));
+		    									inventoryClone.setItem(i, new ItemStack(Material.AIR));
+		    									removed = true;
+		    								} else {
+		    									craftInventory.getItem((i + 1)).setAmount(removal);
+		    									inventoryClone.getItem(i).setAmount(removal);
+		    									removed = true;
 		    								}
 		    							}
 		    						}
@@ -271,10 +268,8 @@ public class Recipes implements Listener {
     			for (Character ingredient: itemMap.getIngredients().keySet()) {
     				final ItemRecipe itemRecipe = itemMap.getIngredients().get(ingredient);
     				ItemMap ingredMap = ItemUtilities.getUtilities().getItemMap(itemRecipe.getMap());
-    				if (recipe.size() > i && recipe.get(i) == ingredient) {
-    					if (((ingredMap == null && itemRecipe.getMaterial().equals(item.getType())) || (ingredMap != null && ingredMap.isSimilar(player, item))) && item.getAmount() >= itemRecipe.getCount()) {
-    						confirmations += 1;
-    					}
+    				if (((ingredMap == null && itemRecipe.getMaterial().equals(item.getType())) || (ingredMap != null && ingredMap.isSimilar(player, item))) && item.getAmount() >= itemRecipe.getCount()) {
+    					confirmations += 1;
     				}
     			}
     		}
