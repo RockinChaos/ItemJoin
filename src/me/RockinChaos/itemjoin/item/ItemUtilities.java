@@ -395,7 +395,7 @@ public class ItemUtilities {
 			} if (ServerUtils.hasSpecificUpdate("1_9") && this.canClear(inventory.getItemInOffHand(), "OffHand", i, clearType)) {
 				PlayerHandler.setOffHandItem(player, new ItemStack(Material.AIR));
 			} if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
-				for (int k = 0; k < player.getOpenInventory().getTopInventory().getContents().length; k++) {
+				for (int k = 0; k < player.getOpenInventory().getTopInventory().getSize(); k++) {
 					if (this.canClear(player.getOpenInventory().getTopInventory().getItem(k), "CRAFTING[" + k + "]", i, clearType)) {
 						craftView.setItem(k, new ItemStack(Material.AIR));
 					}
