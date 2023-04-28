@@ -4516,26 +4516,29 @@ public class ItemMap {
     * 
     * @param player - The Player being referenced.
     * @param conditions - The condition list to be fetched.
+    * @param doCheck - If the conditions should be checked.
     * @param silent - If the condition message should be hidden.
     * @return If the condition was successfully met.
     */
-	public boolean conditionMet(final Player player, final String conditions, final boolean silent) {
+	public boolean conditionMet(final Player player, final String conditions, final boolean doCheck, final boolean silent) {
 		if (this.getConditions(conditions) != null && !this.getConditions(conditions).isEmpty()) {
-			for (String condition : this.getConditions(conditions)) {
-				String[] parts = (condition != null ? condition.split(":") : null);
-				if (parts != null && parts.length == 3) {
-					String value1 = (parts[0] != null && !StringUtils.isInt(parts[0]) ? StringUtils.translateLayout(parts[0], player) : parts[0]);
-					String operand = parts[1];
-					String value2 = (parts[2] != null && !StringUtils.isInt(parts[2]) ? StringUtils.translateLayout(parts[2], player) : parts[2]);
-					final boolean conditionMet = StringUtils.conditionMet(value1, operand, value2);
-					if (!conditionMet && !silent && this.getConditionMessage(conditions) != null && !this.getConditionMessage(conditions).isEmpty()) {
-						player.sendMessage(StringUtils.translateLayout(this.getConditionMessage(conditions), player));
-						ServerUtils.logDebug("{ItemMap} " + player.getName() + " has not met any of the " + conditions + "(s), for the Item: " + this.getConfigName() + "."); 
+			if (doCheck) {
+				for (String condition : this.getConditions(conditions)) {
+					String[] parts = (condition != null ? condition.split(":") : null);
+					if (parts != null && parts.length == 3) {
+						String value1 = (parts[0] != null && !StringUtils.isInt(parts[0]) ? StringUtils.translateLayout(parts[0], player) : parts[0]);
+						String operand = parts[1];
+						String value2 = (parts[2] != null && !StringUtils.isInt(parts[2]) ? StringUtils.translateLayout(parts[2], player) : parts[2]);
+						final boolean conditionMet = StringUtils.conditionMet(value1, operand, value2);
+						if (!conditionMet && !silent && this.getConditionMessage(conditions) != null && !this.getConditionMessage(conditions).isEmpty()) {
+							player.sendMessage(StringUtils.translateLayout(this.getConditionMessage(conditions), player));
+							ServerUtils.logDebug("{ItemMap} " + player.getName() + " has not met any of the " + conditions + "(s), for the Item: " + this.getConfigName() + "."); 
+						}
+						return conditionMet;
+					} else if (!(parts != null && parts.length == 3)) {
+						ServerUtils.logSevere("{ItemMap} The item " + this.getConfigName() + " has a " + conditions + " defined incorrectly!");
+						ServerUtils.logWarn("{ItemMap} The condition " + condition + " is not the proper format CONDITION:OPERAND:VALUE, the item may not function properly.");
 					}
-					return conditionMet;
-				} else if (!(parts != null && parts.length == 3)) {
-					ServerUtils.logSevere("{ItemMap} The item " + this.getConfigName() + " has a " + conditions + " defined incorrectly!");
-					ServerUtils.logWarn("{ItemMap} The condition " + condition + " is not the proper format CONDITION:OPERAND:VALUE, the item may not function properly.");
 				}
 			}
 		} else { return true; }
@@ -4755,10 +4758,10 @@ public class ItemMap {
     	final ItemCommand[] itemCommands = this.commands;
     	for (int i = 0; i < itemCommands.length; i++) {
     		if (!playerSuccess) { 
-    			boolean conditionLimited = !this.conditionMet(player, itemCommands[i].getAction().config + "-conditions", silentLimit);
-    			if (conditionLimited) { silentLimit = true; }
-    			playerSuccess = itemCommands[i].canExecute(player, action, clickType) && !conditionLimited; }
-			else { break; }
+    			playerSuccess = itemCommands[i].canExecute(player, action, clickType);
+    			boolean conditionLimited = !this.conditionMet(player, itemCommands[i].getAction().config + "-conditions", playerSuccess, silentLimit);
+    			if (conditionLimited) { silentLimit = true; playerSuccess = false; }
+    		} else { break; }
 		}
     	return playerSuccess;
     }
@@ -5037,7 +5040,7 @@ public class ItemMap {
     * @param allItems - If the item should not have its amount changed.
     */
 	public void removeDisposable(final Player player, final ItemMap itemMap, final ItemStack itemCopy, final boolean allItems) {
-		if (this.disposable && this.conditionMet(player, "disposable-conditions", false) || allItems) {
+		if (this.disposable && this.conditionMet(player, "disposable-conditions", true, false) || allItems) {
 			if (!allItems) { this.setSubjectRemoval(true); }
 			SchedulerUtils.runLater(1L, () -> {
 				if (PlayerHandler.isCreativeMode(player)) { player.closeInventory(); }
