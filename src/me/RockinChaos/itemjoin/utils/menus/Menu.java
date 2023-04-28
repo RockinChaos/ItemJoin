@@ -456,7 +456,12 @@ public class Menu {
 	private static void setButton(final Player player, final ItemMap itemMap, final Interface modifyPane, final ItemMap contents, final ItemMap refMap, final int k) {
 		final ItemStack item = itemMap.getTempItem().clone();
 		if (item.getType() == Material.AIR) { item.setType(fillerPaneItem.getType()); }
-		if (itemMap.isAnimated() || itemMap.isDynamic()) { setModifyMenu(true, player); itemMap.getAnimationHandler().get(player).setMenu(true, 0); }
+		if (itemMap.isAnimated() || itemMap.isDynamic()) { 
+			setModifyMenu(true, player); 
+			if (itemMap.getAnimationHandler().get(player) != null) {
+				itemMap.getAnimationHandler().get(player).setMenu(true, 0); 
+			}
+		}
 		String lore = (contents == null && refMap == null ? "&7*Click to modify this custom item." : refMap != null ? "&7*Click to set this custom item as an ingredient." : "&7*Click to add into the contents of " + contents.getConfigName() + ".");
 		String space = (contents == null ? "&6---------------------------" : "&6----------------------------------");
 		modifyPane.addButton(new Button(ItemHandler.addLore(item, "&7", space, lore, "&9&lNode: &a" + itemMap.getConfigName(), "&7", (contents != null ? "&9&lENABLED: " + (contents.getContents().contains(itemMap.getConfigName()) ? "&aYES" : "&aNO") : "")), event -> 
@@ -1331,7 +1336,7 @@ public class Menu {
 					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
 					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 				}, event -> {
-					if (StringUtils.isInt(ChatColor.stripColor(event.getMessage()))) {
+					if (StringUtils.isInt(StringUtils.translateLayout(ChatColor.stripColor(event.getMessage()), player))) {
 						String[] placeHolders = ItemJoin.getCore().getLang().newString();
 						placeHolders[16] = "ADDRESS PORT";
 						ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
@@ -2758,14 +2763,14 @@ public class Menu {
 				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
 				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
-				if (ItemHandler.getMaterial(ChatColor.stripColor(event.getMessage()), null) != null) {
+				if (ItemHandler.getMaterial(StringUtils.translateLayout(ChatColor.stripColor(event.getMessage()), player), null) != null) {
 					if (stage == 2) {
-						itemMap.setItemCost(ChatColor.stripColor(event.getMessage()).toUpperCase());
+						itemMap.setItemCost(StringUtils.translateLayout(ChatColor.stripColor(event.getMessage()), player).toUpperCase());
 					} else if (stage != 3) { 
 						itemMap.setMaterial(ItemHandler.getMaterial(ChatColor.stripColor(event.getMessage()), null)); 
 						if (!ServerUtils.hasSpecificUpdate("1_13") && ChatColor.stripColor(event.getMessage()).contains(":")) {
 							String[] dataValue = ChatColor.stripColor(event.getMessage()).split(":");
-							if (StringUtils.isInt(dataValue[1])) {
+							if (StringUtils.isInt(StringUtils.translateLayout(dataValue[1], player))) {
 								itemMap.setDataValue((short)Integer.parseInt(dataValue[1]));
 							}	
 						}
@@ -3289,7 +3294,7 @@ public class Menu {
 				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
 				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
-				if (StringUtils.isInt(ChatColor.stripColor(event.getMessage()))) {
+				if (StringUtils.isInt(StringUtils.translateLayout(ChatColor.stripColor(event.getMessage()), player))) {
 					itemMap.setData(Integer.parseInt(ChatColor.stripColor(event.getMessage())));
 					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "DURABILITY DATA";
@@ -3332,8 +3337,8 @@ public class Menu {
 				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
 				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
-				if (StringUtils.isInt(ChatColor.stripColor(event.getMessage()))) {
-					itemMap.setModelData(Integer.parseInt(ChatColor.stripColor(event.getMessage())));
+				if (StringUtils.isInt(StringUtils.translateLayout(ChatColor.stripColor(event.getMessage()), player))) {
+					itemMap.setModelData(ChatColor.stripColor(event.getMessage()));
 					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "MODEL DATA";
 					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
@@ -3347,7 +3352,7 @@ public class Menu {
 			for (int i = 1; i <= 2000; i++) {
 				final int k = i;
 				texturePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "PINK_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:6"), 1, false, "&9&lModel Data: &a&l" + k, "&7", "&7*Click to set the", "&7custom model data for the item."), event -> {
-					itemMap.setModelData(k); dataPane(player, itemMap);
+					itemMap.setModelData(String.valueOf(k)); dataPane(player, itemMap);
 				}));
 			}
 		});
@@ -3375,7 +3380,7 @@ public class Menu {
 				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
 				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
-				if (StringUtils.isInt(ChatColor.stripColor(event.getMessage()))) {
+				if (StringUtils.isInt(StringUtils.translateLayout(ChatColor.stripColor(event.getMessage()), player))) {
 					itemMap.setDurability((short) Integer.parseInt(ChatColor.stripColor(event.getMessage())));
 					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "DAMAGE";
@@ -3983,7 +3988,12 @@ public class Menu {
 			}));
 			for (ItemMap item : ItemUtilities.getUtilities().copyItems()) {
 				if (item.getNodeLocation() != itemMap.getNodeLocation()) {
-					if (itemMap.isAnimated() || itemMap.isDynamic()) { setModifyMenu(true, player); itemMap.getAnimationHandler().get(player).setMenu(true, 1); }
+					if (itemMap.isAnimated() || itemMap.isDynamic()) { 
+						setModifyMenu(true, player); 
+						if (itemMap.getAnimationHandler().get(player) != null) {
+							itemMap.getAnimationHandler().get(player).setMenu(true, 1); 
+						}
+					}
 					swapPane.addButton(new Button(ItemHandler.addLore(item.getTempItem(), "&7", "&6---------------------------", "&7*Click to set as a swap-item.", "&9&lNode: &a" + item.getConfigName(), "&7"), event -> { 
 					modifyCommands(itemMap, ItemCommand.fromString("swap-item: " + item.getConfigName(), action, itemMap, 0L, null), true);
 					commandListPane(player, itemMap, action); }));
@@ -4015,7 +4025,7 @@ public class Menu {
 				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
 				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
-				if (StringUtils.isInt(ChatColor.stripColor(event.getMessage()))) {
+				if (StringUtils.isInt(StringUtils.translateLayout(ChatColor.stripColor(event.getMessage()), player))) {
 					modifyCommands(itemMap, ItemCommand.fromString("delay: " + Integer.parseInt(ChatColor.stripColor(event.getMessage())), action, itemMap, Integer.parseInt(ChatColor.stripColor(event.getMessage())), null), true);
 					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "DELAY";
@@ -4059,7 +4069,7 @@ public class Menu {
 				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
 				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
-				if (StringUtils.isInt(ChatColor.stripColor(event.getMessage()))) {
+				if (StringUtils.isInt(StringUtils.translateLayout(ChatColor.stripColor(event.getMessage()), player))) {
 					itemMap.setCommandCooldown(Integer.parseInt(ChatColor.stripColor(event.getMessage())));
 					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "COMMAND COOLDOWN";
@@ -4103,7 +4113,7 @@ public class Menu {
 				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
 				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
-				if (StringUtils.isInt(ChatColor.stripColor(event.getMessage()))) {
+				if (StringUtils.isInt(StringUtils.translateLayout(ChatColor.stripColor(event.getMessage()), player))) {
 					itemMap.setWarmDelay(Integer.parseInt(ChatColor.stripColor(event.getMessage())));
 					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "COMMAND WARMUP";
@@ -4147,7 +4157,7 @@ public class Menu {
 				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
 				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
-				if (StringUtils.isInt(ChatColor.stripColor(event.getMessage()))) {
+				if (StringUtils.isInt(StringUtils.translateLayout(ChatColor.stripColor(event.getMessage()), player))) {
 					itemMap.setCommandCost(Integer.parseInt(ChatColor.stripColor(event.getMessage())));
 					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "COMMAND COST";
@@ -4191,7 +4201,7 @@ public class Menu {
 				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
 				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
-				if (StringUtils.isInt(ChatColor.stripColor(event.getMessage()))) {
+				if (StringUtils.isInt(StringUtils.translateLayout(ChatColor.stripColor(event.getMessage()), player))) {
 					itemMap.setCommandReceive(Integer.parseInt(ChatColor.stripColor(event.getMessage())));
 					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "COMMAND RECEIVE";
@@ -4520,7 +4530,7 @@ public class Menu {
 				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
 				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
-				if (StringUtils.isInt(ChatColor.stripColor(event.getMessage()))) {
+				if (StringUtils.isInt(StringUtils.translateLayout(ChatColor.stripColor(event.getMessage()), player))) {
 					if (stage == 0) {
 						itemMap.setCommandParticle(particle + ":" + ChatColor.stripColor(event.getMessage()));
 					} else {
@@ -4657,7 +4667,7 @@ public class Menu {
 				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
 				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
-				if (StringUtils.isInt(ChatColor.stripColor(event.getMessage()))) {
+				if (StringUtils.isInt(StringUtils.translateLayout(ChatColor.stripColor(event.getMessage()), player))) {
 					Map < String, Integer > enchantments = (itemMap.getEnchantments() != null) ? itemMap.getEnchantments() : new HashMap < String, Integer >();
 					enchantments.put(ItemHandler.getEnchantName(enchant).toUpperCase(), Integer.parseInt(ChatColor.stripColor(event.getMessage())));
 					itemMap.setEnchantments(enchantments);
@@ -5790,7 +5800,7 @@ public class Menu {
 				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
 				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
-				if (StringUtils.isInt(ChatColor.stripColor(event.getMessage()))) {
+				if (StringUtils.isInt(StringUtils.translateLayout(ChatColor.stripColor(event.getMessage()), player))) {
 					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "ANIMATION DURATION";
 					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
@@ -5928,7 +5938,7 @@ public class Menu {
 				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
 				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
-				if (StringUtils.isInt(ChatColor.stripColor(event.getMessage()))) {
+				if (StringUtils.isInt(StringUtils.translateLayout(ChatColor.stripColor(event.getMessage()), player))) {
 					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "ANIMATION DURATION";
 					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
@@ -6081,7 +6091,7 @@ public class Menu {
 				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
 				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
-				if (StringUtils.isInt(ChatColor.stripColor(event.getMessage()))) {
+				if (StringUtils.isInt(StringUtils.translateLayout(ChatColor.stripColor(event.getMessage()), player))) {
 					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "ANIMATION DURATION";
 					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
@@ -6275,7 +6285,7 @@ public class Menu {
 				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
 				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
-				if (StringUtils.isInt(ChatColor.stripColor(event.getMessage()))) {
+				if (StringUtils.isInt(StringUtils.translateLayout(ChatColor.stripColor(event.getMessage()), player))) {
 					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "ANIMATION DURATION";
 					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
@@ -6556,7 +6566,7 @@ public class Menu {
 				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
 				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
-				if (StringUtils.isInt(ChatColor.stripColor(event.getMessage()))) {
+				if (StringUtils.isInt(StringUtils.translateLayout(ChatColor.stripColor(event.getMessage()), player))) {
 					itemMap.setInteractCooldown(Integer.parseInt(ChatColor.stripColor(event.getMessage())));
 					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "USAGE COOLDOWN";
@@ -7976,7 +7986,7 @@ public class Menu {
 				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
 				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
-				if (StringUtils.isInt(ChatColor.stripColor(event.getMessage()))) {
+				if (StringUtils.isInt(StringUtils.translateLayout(ChatColor.stripColor(event.getMessage()), player))) {
 					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "EFFECT LEVEL";
 					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
@@ -8017,7 +8027,7 @@ public class Menu {
 				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
 				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
-				if (StringUtils.isInt(ChatColor.stripColor(event.getMessage()))) {
+				if (StringUtils.isInt(StringUtils.translateLayout(ChatColor.stripColor(event.getMessage()), player))) {
 					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "EFFECT DURATION";
 					ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
@@ -8060,7 +8070,7 @@ public class Menu {
 				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
 				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
-				if (StringUtils.isInt(ChatColor.stripColor(event.getMessage()))) {
+				if (StringUtils.isInt(StringUtils.translateLayout(ChatColor.stripColor(event.getMessage()), player))) {
 					itemMap.setFireworkPower(Integer.parseInt(ChatColor.stripColor(event.getMessage())));
 					String[] placeHolders = ItemJoin.getCore().getLang().newString();
 					placeHolders[16] = "FIREWORK POWER";
@@ -8336,7 +8346,7 @@ public class Menu {
 				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
 				ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
 			}, event -> {
-				if (StringUtils.isInt(ChatColor.stripColor(event.getMessage())) || StringUtils.isDouble(ChatColor.stripColor(event.getMessage()))) {
+				if (StringUtils.isInt(StringUtils.translateLayout(ChatColor.stripColor(event.getMessage()), player)) || StringUtils.isDouble(StringUtils.translateLayout(ChatColor.stripColor(event.getMessage()), player))) {
 					Map<String, Double> attributeList = itemMap.getAttributes();
 					attributeList.put(attribute, Double.parseDouble(ChatColor.stripColor(event.getMessage())));
 					String[] placeHolders = ItemJoin.getCore().getLang().newString();
