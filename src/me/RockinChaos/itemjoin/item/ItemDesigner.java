@@ -435,8 +435,7 @@ public class ItemDesigner {
 			try {
 				Object tag = ReflectionUtils.getMinecraftClass("NBTTagCompound").getConstructor().newInstance();
 				tag.getClass().getMethod(MinecraftMethod.setString.getMethod(tag, String.class, String.class), String.class, String.class).invoke(tag, "ItemJoin Name", itemMap.getConfigName());
-				tag.getClass().getMethod(MinecraftMethod.setString.getMethod(tag, String.class, String.class), String.class, String.class).invoke(tag, "ItemJoin Slot", itemMap.getItemValue());
-				itemMap.setNewNBTData(itemMap.getConfigName() + " " + itemMap.getItemValue(), tag);
+				itemMap.setNewNBTData(itemMap.getConfigName(), tag);
 				if (itemMap.getNodeLocation().getString(".properties") != null && !itemMap.getNodeLocation().getString(".properties").isEmpty()) {
 					List<Object> tags = new ArrayList<Object>();
 					Map<Object, Object> tagValues = new HashMap<Object, Object>();

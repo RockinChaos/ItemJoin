@@ -116,9 +116,6 @@ public class ItemMap {
 	private boolean moveNext = false;
 	private boolean dropFull = false;
 	
-	private String Arbitrary = null;
-	private String itemValue = null;
-	
 	private String count = "1";
 	private Map < String, Double > attributes = new HashMap < String, Double > ();
 	
@@ -315,14 +312,12 @@ public class ItemMap {
     * Creates a new ItemMap instance.
     * Typically used in the creation of items.
     * 
-    * @param designer - The ItemDesigner instance that is creating the ItemMap.
     * @param internalName - The node name of the ItemMap.
     * @param slot - The slot of the ItemMap.
     */
 	public ItemMap(final String internalName, final String slot) {
         this.nodeLocation = ItemJoin.getCore().getConfig("items.yml").getConfigurationSection("items").getConfigurationSection(internalName);
         this.configName = internalName;
-        this.setItemValue(ItemData.getInfo().getItemID(slot));
         this.setSlot(slot);
         if (ItemHandler.isCraftingSlot(slot)) { this.craftingItem = true; }
         
@@ -2032,24 +2027,6 @@ public class ItemMap {
 	}
 	
    /**
-    * Sets the Arbitrary.
-    * 
-    * @param arb - The Arbitrary to be set.
-    */
-	public void setArbitrary(final String arb) {
-		this.Arbitrary = arb;
-	}
-	
-   /**
-    * Sets the Item Value (Arbitrary ID).
-    * 
-    * @param str - The Item Value to be set.
-    */
-	public void setItemValue(final String str) {
-		this.itemValue = str;
-	}
-	
-   /**
     * Sets the ItemStack as Subject to Removal.
     * 
     * @param bool - The value to be set.
@@ -2222,6 +2199,7 @@ public class ItemMap {
     * @return The AnimationsHandlers.
     */
 	public Map<Player, ItemAnimation> getAnimationHandler() {
+		if (this.localeAnimations == null) {  this.localeAnimations = new HashMap < Player, ItemAnimation > (); }
 		return this.localeAnimations;
 	}
 	
@@ -2911,24 +2889,6 @@ public class ItemMap {
 	}
 	
    /**
-    * Gets the Arbitrary.
-    * 
-    * @return The Arbitrary.
-    */
-	public String getArbitrary() {
-		return this.Arbitrary;
-	}
-	
-   /**
-    * Gets the Item Value (Arbitrary ID).
-    * 
-    * @return The Item Value (Arbitrary ID).
-    */
-	public String getItemValue() {
-		return this.itemValue;
-	}
-	
-   /**
     * Gets the Interact Cooldown.
     * 
     * @return The Interact Cooldown.
@@ -3043,7 +3003,7 @@ public class ItemMap {
     * @return The NBTData format to be set to an item.
     */
 	public String getNBTFormat() {
-		return this.getItemValue() + this.getConfigName();
+		return this.getConfigName();
 	}
 	
    /**
@@ -4212,7 +4172,6 @@ public class ItemMap {
 				Object cacheTag = itemClass.getMethod(MinecraftMethod.getTag.getMethod(itemClass)).invoke(nms);
 				if (cacheTag != null) {
 					cacheTag.getClass().getMethod(MinecraftMethod.setString.getMethod(cacheTag, String.class, String.class), String.class, String.class).invoke(cacheTag, "ItemJoin Name", this.getConfigName());
-					cacheTag.getClass().getMethod(MinecraftMethod.setString.getMethod(cacheTag, String.class, String.class), String.class, String.class).invoke(cacheTag, "ItemJoin Slot", this.getItemValue());
 					if (this.nbtProperty != null && !this.nbtProperty.isEmpty()) {
 						for (Object tag: this.nbtProperty.keySet()) {
 							try {
@@ -4305,6 +4264,7 @@ public class ItemMap {
    /**
     * Sets the ItemStack Model Data.
     * 
+    * @param player - The Player to be used for placeholders.
     */
 	private void setModelData() {
 		if (this.modelData != null && this.modelData != 0) {

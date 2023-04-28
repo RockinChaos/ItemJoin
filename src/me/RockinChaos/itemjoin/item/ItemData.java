@@ -87,22 +87,6 @@ import me.RockinChaos.itemjoin.utils.sql.DataObject.Table;
 public class ItemData {
 	
 	private static ItemData info;
-    
-   /**
-    * Calculates the exact numer of arbitrary slots,
-    * assigning numbers to each slot to uniquely identify each item.
-    * 
-    * @param slot - The numerical or custom slot value.
-    * @return The exact slot ID to be set to the item.
-    */
-	private int ArbitraryID = 0;
-	public String getItemID(String slot) {
-		if (slot.equalsIgnoreCase("Arbitrary")) {
-			this.ArbitraryID += 1;
-			slot += this.ArbitraryID;
-		}
-		return slot;
-	}
 	
    /**
     * Gets the number of list pages.
@@ -142,7 +126,7 @@ public class ItemData {
     * 
     * @return The List of NBT Data specified for items.
     */
-	private List <String> nbtInfo = Arrays.asList("ItemJoin", "ItemJoin Name", "ItemJoin Slot");
+	private List <String> nbtInfo = Arrays.asList("ItemJoin", "ItemJoin Name");
     public List <String> getNBTList() {
     	return nbtInfo;
     }

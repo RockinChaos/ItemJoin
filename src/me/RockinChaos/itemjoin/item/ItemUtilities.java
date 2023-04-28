@@ -693,7 +693,7 @@ public class ItemUtilities {
 				player.getInventory().setItem(nextSlot, item);
 			} else if (CustomSlot.ARBITRARY.isSlot(itemMap.getSlot()) && player.getInventory().firstEmpty() != -1) {
 				isGiven = true;
-				player.getInventory().addItem(item);
+				player.getInventory().setItem(player.getInventory().firstEmpty(), item);
 			} else if (CustomSlot.HELMET.isSlot(itemMap.getSlot()) && (existingItem == null || overWrite)) {
 				isGiven = true;
 				player.getEquipment().setHelmet(item);
