@@ -674,7 +674,7 @@ public class ItemDesigner {
 	*/
 	private void setModelData(final ItemMap itemMap) {
 		if (ServerUtils.hasSpecificUpdate("1_14") && itemMap.getNodeLocation().getString(".model-data") != null) {
-			itemMap.setModelData(itemMap.getNodeLocation().getInt(".model-data"));
+			itemMap.setModelData(itemMap.getNodeLocation().getString(".model-data"));
 		}
 	}
 	

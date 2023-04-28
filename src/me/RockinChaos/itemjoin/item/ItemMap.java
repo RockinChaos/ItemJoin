@@ -121,7 +121,7 @@ public class ItemMap {
 	
 	private Short durability = null;
 	private Integer data = null;
-	private Integer modelData = null;
+	private String modelData = null;
 	
 	private String author;
 	private String title;
@@ -1049,7 +1049,7 @@ public class ItemMap {
     * 
     * @param data - The ItemStack Model Data to be set.
     */
-	public void setModelData(final Integer data) {
+	public void setModelData(final String data) {
 		this.modelData = data;
 	}
 	
@@ -2411,11 +2411,11 @@ public class ItemMap {
     * 
     * @return The ItemStack Model Data.
     */
-	public Integer getModelData() {
+	public String getModelData() {
 		if (this.modelData != null) {
 			return this.modelData;	
 		}
-		return 0;
+		return null;
 	}
 	
    /**
@@ -3883,7 +3883,7 @@ public class ItemMap {
 			this.setSkull(player);
 			this.setDurability();
 			this.setData();
-			this.setModelData();
+			this.setModelData(player);
 			this.setPotionEffects();
 			this.setBanners();
 			this.setFireworks();
@@ -4266,11 +4266,14 @@ public class ItemMap {
     * 
     * @param player - The Player to be used for placeholders.
     */
-	private void setModelData() {
-		if (this.modelData != null && this.modelData != 0) {
-			if (ServerUtils.hasSpecificUpdate("1_14")) {
-				this.tempMeta.setCustomModelData(this.modelData);
-			} else { ServerUtils.logWarn("{ItemMap} The item " + this.getConfigName() + " is using Custom Model Data which is not supported until Minecraft 1.14+."); }
+	private void setModelData(final Player player) {
+		if (modelData != null) {
+			final Integer modelData = Integer.parseInt(StringUtils.translateLayout(this.modelData, player));
+			if (modelData != 0) {
+				if (ServerUtils.hasSpecificUpdate("1_14")) {
+					this.tempMeta.setCustomModelData(modelData);
+				} else { ServerUtils.logWarn("{ItemMap} The item " + this.getConfigName() + " is using Custom Model Data which is not supported until Minecraft 1.14+."); }
+			}
 		}
 	}
 	
@@ -5313,7 +5316,7 @@ public class ItemMap {
 		if (this.getCount(null) > 1 && !this.count.contains("%")) { itemData.set("items." + this.configName + ".count", this.count); }
 		if (this.durability != null && this.durability > 0) { itemData.set("items." + this.configName + ".durability", this.durability); }
 		if (this.data != null && this.data > 0) { itemData.set("items." + this.configName + ".data", this.data); }
-		if (this.modelData != null && this.modelData > 0) { itemData.set("items." + this.configName + ".model-data", this.modelData); }
+		if (this.modelData != null && !this.modelData.isEmpty()) { itemData.set("items." + this.configName + ".model-data", this.modelData); }
 		if (this.author != null && !this.author.isEmpty()) { itemData.set("items." + this.configName + ".author", this.author.replace("§", "&")); }
 		if (this.customName != null && !this.customName.isEmpty() && (this.dynamicNames == null || this.dynamicNames.isEmpty())) { 
 			String setName = null;
