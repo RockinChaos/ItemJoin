@@ -11,10 +11,11 @@
 	<description>Get custom items on join.</description>
 	<url>https://www.spigotmc.org/resources/itemjoin.12661/</url>
 	
-	<version>6.0.0-SNAPSHOT</version>
+	<version>6.0.0-RELEASE</version>
 	
 	<properties>
-		<spigot.version>1.19.3-R0.1-SNAPSHOT</spigot.version>
+		<chaoscore.version>1.0.0-RELEASE</chaoscore.version>
+		<spigot.version>1.19.4-R0.1-SNAPSHOT</spigot.version>
 		
 		<authme.version>5.6.0-SNAPSHOT</authme.version>
 		<chestsort.version>11.0.0-SNAPSHOT</chestsort.version>
@@ -179,7 +180,7 @@
 		<dependency>
 			<groupId>me.RockinChaos.core</groupId>
 			<artifactId>ChaosCore</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
+			<version>${chaoscore.version}</version>
 			<scope>compile</scope>
 		</dependency>
 		<!--Spigot API-->
