@@ -62,7 +62,7 @@ public class Storable implements Listener {
 						|| invType.contains("HOPPER") || invType.contains("ANVIL") || invType.contains("WORKBENCH") || invType.contains("DISPENSER") || invType.contains("DROPPER")) && !ItemUtilities.getUtilities().isAllowed(player, item, "item-store")) {
 					event.setCancelled(true);
 					PlayerHandler.updateInventory(player, 1L);
-				} else if ((invType.contains("ENCHANTING") || invType.contains("ANVIL")) && !ItemUtilities.getUtilities().isAllowed(player, item, "item-modifiable")) {
+				} else if ((invType.contains("ENCHANTING") || invType.contains("ANVIL") || invType.contains("GRINDSTONE")) && !ItemUtilities.getUtilities().isAllowed(player, item, "item-modifiable")) {
 					event.setCancelled(true);
 					PlayerHandler.updateInventory(player, 1L);
 				}
@@ -89,7 +89,7 @@ public class Storable implements Listener {
 						event.setCancelled(true);
 						PlayerHandler.updateInventory(player, 1L);
 						break;
-					} else if ((invType.contains("ENCHANTING") || invType.contains("ANVIL")) && !ItemUtilities.getUtilities().isAllowed(player, item, "item-modifiable")) {
+					} else if ((invType.contains("ENCHANTING") || invType.contains("ANVIL") || invType.contains("GRINDSTONE")) && !ItemUtilities.getUtilities().isAllowed(player, item, "item-modifiable")) {
 						event.setCancelled(true);
 						PlayerHandler.updateInventory(player, 1L);
 						break;
