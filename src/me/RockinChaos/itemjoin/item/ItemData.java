@@ -499,12 +499,12 @@ public class ItemData {
 				ServerUtils.logInfo(customItems + " Custom item(s) loaded!");
 			}
 			this.registerPrevent();
-			if (isRunning) {
-				ItemJoin.getCore().getSQL().refresh(isRunning);
-			} else {
-				ItemJoin.getCore().getSQL();
-			} {
-				ItemJoin.getCore().getData().setDatabaseData(this.getDatabaseData());
+			ItemJoin.getCore().getData().setDatabaseData(this.getDatabaseData()); {
+				if (isRunning) {
+					ItemJoin.getCore().getSQL().refresh(isRunning);
+				} else {
+					ItemJoin.getCore().getSQL();
+				}
 			}
 		}); {
 				ItemDesigner.getDesigner(true); {
