@@ -3902,7 +3902,9 @@ public class ItemMap {
 			this.setContents(player);
 			this.tempItem.setItemMeta(this.tempMeta);
 			this.tempItem.setAmount(this.getCount(player));
-			this.setTempItem(LegacyAPI.setGlowing(this.tempItem));
+			if (this.isGlowing()) { 
+				this.setTempItem(LegacyAPI.setGlowing(this.tempItem));
+			}
 			this.setTempItem(LegacyAPI.setAttributes(this.tempItem, this.configName, this.attributes));
 		}
 		return this;
