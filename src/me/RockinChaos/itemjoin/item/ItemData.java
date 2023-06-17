@@ -29,7 +29,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-
 import com.google.common.collect.ImmutableMap;
 
 import me.RockinChaos.core.handlers.ItemHandler;
@@ -499,11 +498,17 @@ public class ItemData {
 				ServerUtils.logInfo(customItems + " Custom item(s) loaded!");
 			}
 			this.registerPrevent();
-			ItemJoin.getCore().getData().setDatabaseData(this.getDatabaseData()); {
-				if (isRunning) {
-					ItemJoin.getCore().getSQL().refresh(isRunning);
-				} else {
-					ItemJoin.getCore().getSQL();
+			if (isRunning) {
+				if (ItemJoin.getCore().getSQL().refresh(isRunning)); {
+					ItemJoin.getCore().getData().setDatabaseData(this.getDatabaseData()); {
+						ItemJoin.getCore().getSQL().load();
+					}
+				}
+			} else {
+				ItemJoin.getCore().getSQL(); {
+					ItemJoin.getCore().getData().setDatabaseData(this.getDatabaseData()); {
+						ItemJoin.getCore().getSQL().load();
+					}
 				}
 			}
 		}); {
