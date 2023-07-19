@@ -499,7 +499,7 @@ public class ItemData {
 			}
 			this.registerPrevent();
 			if (isRunning) {
-				if (ItemJoin.getCore().getSQL().refresh(isRunning)); {
+				if (ItemJoin.getCore().getSQL().refresh(isRunning)) {
 					ItemJoin.getCore().getData().setDatabaseData(this.getDatabaseData()); {
 						ItemJoin.getCore().getSQL().load();
 					}
