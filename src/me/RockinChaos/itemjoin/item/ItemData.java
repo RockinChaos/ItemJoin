@@ -86,6 +86,7 @@ import me.RockinChaos.itemjoin.utils.sql.DataObject.Table;
 public class ItemData {
 	
 	private static ItemData info;
+	private boolean glowExists = false;
 	
    /**
     * Gets the number of list pages.
@@ -443,7 +444,6 @@ public class ItemData {
 	    ItemJoin.getCore().getPlugin().getCommand("itemjoin").setTabCompleter(new ChatTab());
 		ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new Interfaces(), ItemJoin.getCore().getPlugin());
 		ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new Interface(), ItemJoin.getCore().getPlugin());
-		ItemJoin.getCore().getEnchants().registerGlow();
 	}
 	
    /**
@@ -651,6 +651,10 @@ public class ItemData {
 			ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new Stackable(), ItemJoin.getCore().getPlugin());
 		} else if (itemMap.isStackable()) {
 			LegacyAPI.registerStackable();
+		}
+		if (itemMap.isGlowing() && !this.glowExists) {
+			this.glowExists = true;
+			ItemJoin.getCore().getEnchants().registerGlow();
 		}
 		if (itemMap.isNotHat() && !StringUtils.isRegistered(Processes.class.getSimpleName())) {
 			ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new Processes(), ItemJoin.getCore().getPlugin());
