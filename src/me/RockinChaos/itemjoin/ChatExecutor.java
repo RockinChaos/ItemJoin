@@ -275,7 +275,7 @@ public class ChatExecutor implements CommandExecutor {
 	        final String lang = Files.asCharSource(new File(ItemJoin.getCore().getPlugin().getDataFolder() + "/" + ItemJoin.getCore().getLang().getFile()), StandardCharsets.UTF_8).read();
 	        final String latest = Files.asCharSource(new File("logs/latest.log"), StandardCharsets.UTF_8).read();
 	        final PasteAPI pasteURI = new PasteAPI("tA44oTOaBVviwH5v9y2zcmUKubKNRgZz", "# +- CONFIG -+ #\n " + config + " \n\n\n\n\n# +- CUSTOM ITEMS CONFIG -+ #\n\n\n\n\n " + items + " \n\n\n\n\n# +- LANGUAGE CONFIG -+ #\n\n\n\n\n " + lang + " \n\n\n\n\n# +- LATEST SERVER LOG -+ #\n\n\n\n\n " + latest);
-	        pasteURI.setPasteExpire("1M");
+	        pasteURI.setPasteExpire("1Y");
 	        sender.sendMessage(StringUtils.colorFormat("&7[&eItemJoin&7] &c&l&nDO NOT SHARE:&a " + pasteURI.getPaste()));
 		} catch (Exception e) { 
 			ServerUtils.logSevere("{ChatExecutor} Failed to execute the DUMP command.");
