@@ -4196,7 +4196,7 @@ public class ItemMap {
 				ServerUtils.logSevere("{ItemMap} An error has occured when setting NBTData to an item.");
 				ServerUtils.sendDebugTrace(e);
 			}
-		} else if (!ItemJoin.getCore().getData().dataTagsEnabled()) {
+		} else if (!ItemJoin.getCore().getData().dataTagsEnabled() && this.legacySecret != null && !this.legacySecret.isEmpty()) {
 			this.tempItem = StringUtils.colorEncode(this.tempItem, this.legacySecret);
 		}
 	}
