@@ -17,7 +17,6 @@
  */
 package me.RockinChaos.itemjoin.listeners;
 
-import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -100,13 +99,13 @@ public class Storable implements Listener {
 	}
 	
    /**
-	* Prevents the player from storing the custom item in an itemframe.
+	* Prevents the player from storing the custom item on entities.
 	* 
 	* @param event - PlayerInteractEntityEvent
 	*/
 	@EventHandler(ignoreCancelled = true)
-	private void onInteractItemFrame(PlayerInteractEntityEvent event) {
-		if (event.getRightClicked() instanceof ItemFrame) {
+	private void onInteractEntity(PlayerInteractEntityEvent event) {
+		if (event.getRightClicked().getType().name().equalsIgnoreCase("ITEM_FRAME") || event.getRightClicked().getType().name().equalsIgnoreCase("FOX") || event.getRightClicked().getType().name().equalsIgnoreCase("ALLAY")) {
 			ItemStack item;
 			if (ServerUtils.hasSpecificUpdate("1_9")) { item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().toString()); } 
 			else { item = PlayerHandler.getPerfectHandItem(event.getPlayer(), ""); }
@@ -119,23 +118,16 @@ public class Storable implements Listener {
 	}
 	
    /**
-	* Prevents the player from storing the custom item in an armor stand.
+	* Prevents the player from storing the custom item on entities.
 	* 
 	* @param event - PlayerInteractAtEntityEvent
 	*/
 	@EventHandler(ignoreCancelled = true)
-	private void onInteractArmorStand(PlayerInteractAtEntityEvent event) {
-		if (event.getRightClicked().toString().equalsIgnoreCase("CraftArmorStand")) {
+	private void onInteractAtEntity(PlayerInteractAtEntityEvent event) {
+		if (event.getRightClicked().getType().name().equalsIgnoreCase("ARMOR_STAND") || event.getRightClicked().getType().name().equalsIgnoreCase("FOX") || event.getRightClicked().getType().name().equalsIgnoreCase("ALLAY")) {
 			ItemStack item;
 			if (ServerUtils.hasSpecificUpdate("1_9")) { item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().toString()); } 
 			else { item = PlayerHandler.getPerfectHandItem(event.getPlayer(), ""); }
-			Player player = event.getPlayer();
-			if (!ItemUtilities.getUtilities().isAllowed(player, item, "item-store")) {
-				event.setCancelled(true);
-				PlayerHandler.updateInventory(player, 1L);
-			}
-		} if (ServerUtils.hasSpecificUpdate("1_14") && event.getRightClicked().toString().equalsIgnoreCase("CraftFox")) {
-			ItemStack item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().toString());;
 			Player player = event.getPlayer();
 			if (!ItemUtilities.getUtilities().isAllowed(player, item, "item-store")) {
 				event.setCancelled(true);
