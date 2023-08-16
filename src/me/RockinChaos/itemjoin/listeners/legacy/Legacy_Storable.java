@@ -17,7 +17,6 @@
  */
 package me.RockinChaos.itemjoin.listeners.legacy;
 
-import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -29,7 +28,6 @@ import org.bukkit.inventory.ItemStack;
 
 import me.RockinChaos.core.handlers.PlayerHandler;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
-import me.RockinChaos.core.utils.ServerUtils;
 import me.RockinChaos.core.utils.StringUtils;
 
 /**
@@ -102,17 +100,15 @@ public class Legacy_Storable implements Listener {
 	}
 	
    /**
-	* Prevents the player from storing the custom item in an itemframe.
+	* Prevents the player from storing the custom item on entities.
 	* 
 	* @param event - PlayerInteractEntityEvent
 	* @deprecated This is a LEGACY event, only use on Minecraft versions below 1.8.
 	*/
 	@EventHandler(ignoreCancelled = true)
-	private void onInteractItemFrame(PlayerInteractEntityEvent event) {
-		if (event.getRightClicked() instanceof ItemFrame) {
-			ItemStack item;
-			if (ServerUtils.hasSpecificUpdate("1_9")) { item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().toString()); } 
-			else { item = PlayerHandler.getPerfectHandItem(event.getPlayer(), ""); }
+	private void onInteractEntity(PlayerInteractEntityEvent event) {
+		if (event.getRightClicked().getType().name().equalsIgnoreCase("ITEM_FRAME")) {
+			ItemStack item = PlayerHandler.getPerfectHandItem(event.getPlayer(), "");
 			Player player = event.getPlayer();
 			if (!ItemUtilities.getUtilities().isAllowed(player, item, "item-store")) {
 				event.setCancelled(true);
