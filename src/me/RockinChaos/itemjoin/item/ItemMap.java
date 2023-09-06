@@ -3762,8 +3762,7 @@ public class ItemMap {
 				for (final Entry<String, Integer> enchantments : enchantList.entrySet()) {
 					if (enchantments.getKey() == null && ItemJoin.getCore().getDependencies().tokenEnchantEnabled() && TokenEnchantAPI.getInstance().getEnchantment(enchantments.getKey()) != null) {
 						TokenEnchantAPI.getInstance().enchant(null, checkItem, enchantments.getKey(), enchantments.getValue(), true, 0, true);
-					} else { 
-						checkItem.addUnsafeEnchantment(ItemHandler.getEnchantByName(enchantments.getKey()), enchantments.getValue()); }
+					} else { checkItem.addUnsafeEnchantment(ItemHandler.getEnchantByName(enchantments.getKey()), enchantments.getValue()); }
 				}
 			}
 			return (this.glowing ? true : item.getItemMeta().getEnchants().equals(checkItem.getItemMeta().getEnchants()));
@@ -4606,6 +4605,7 @@ public class ItemMap {
     */
 	public void giveTo(final Player player, int...amount) {
 		if (amount.length == 0) { amount = new int[]{0}; }
+		ItemUtilities.getUtilities().setStatistics(player);
 		if (this.CustomSlot != null && !this.CustomSlot.contains("%")) { ItemUtilities.getUtilities().setCustomSlots(player, this, amount[0]); } 
 		else { ItemUtilities.getUtilities().setInvSlots(player, this, amount[0]); }
 		this.setAnimations(player);

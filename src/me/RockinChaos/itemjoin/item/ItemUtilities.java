@@ -303,7 +303,7 @@ public class ItemUtilities {
     * 
     * @param player - The Player that is having their items set.
     */
-	private void setStatistics(final Player player) {
+	public void setStatistics(final Player player) {
 		if (this.itemStats != null && this.itemStats.containsKey(PlayerHandler.getPlayerID(player))) {
 			this.itemStats.remove(PlayerHandler.getPlayerID(player));
 		}
