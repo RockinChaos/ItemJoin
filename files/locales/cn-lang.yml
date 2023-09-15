@@ -33,7 +33,7 @@ commands:
     itemRemoved: '%prefix% &e%item% &c已删除.'
     noInteger: '%prefix% &c&l&n错误:&c 输入值 &4%input% &c不是整数!'
     noMaterial: '%prefix% &c&l&n错误:&c 输入值 &4%input% &c不是有效的物品ID!'
-    inputType: '%prefix% &a输入 &e%input% &athat you want to have on your item.'
+    inputType: '%prefix% &a输入 &e%input% &a您希望在您的物品上添加的内容。'
     inputSet: '%prefix% &a物品 &e%input% &a已设置!'
     inputExample: '%prefix% &a例子: %input_example%'
   item:
