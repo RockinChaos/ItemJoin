@@ -49,3 +49,7 @@ Temporary Items
 *.prefs
 /bin/
 .gitattributes
+.idea
+*.iml
+/target/
+/out/
