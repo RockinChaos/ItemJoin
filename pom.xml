@@ -51,6 +51,15 @@
 					<include>**/*.jpg</include>
 				</includes>
 			</resource>
+
+			<resource>
+				<targetPath>./src/main/resources</targetPath>
+				<filtering>true</filtering>
+				<directory>.</directory>
+				<includes>
+					<include>**/*.yml</include>
+				</includes>
+			</resource>
 			
 		</resources>
 		
