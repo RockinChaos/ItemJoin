@@ -53,9 +53,9 @@
 			</resource>
 
 			<resource>
-				<targetPath>./src/main/resources</targetPath>
+				<targetPath>.</targetPath>
 				<filtering>true</filtering>
-				<directory>.</directory>
+				<directory>./src/main/resources</directory>
 				<includes>
 					<include>**/*.yml</include>
 				</includes>
