@@ -486,7 +486,8 @@ public class ItemAnimation {
             } else if (textureString != null && !textureString.contains("hdb-") && !this.itemMap.isHeadDatabase()) {
                 try {
                     if (ServerUtils.hasSpecificUpdate("1_8")) {
-                        final GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
+                        final UUID uuid = UUID.randomUUID();
+                        final GameProfile gameProfile = new GameProfile(uuid, uuid.toString().replaceAll("_", "").replaceAll("-", ""));
                         gameProfile.getProperties().put("textures", new Property("textures", ItemHandler.cutDelay(StringUtils.toTextureUUID(player, this.itemMap.getConfigName(), textureString))));
                         final Field declaredField = tempMeta.getClass().getDeclaredField("profile");
                         declaredField.setAccessible(true);

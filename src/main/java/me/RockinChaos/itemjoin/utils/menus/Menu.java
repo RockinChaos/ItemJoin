@@ -8516,7 +8516,8 @@ public class Menu {
             } else if (itemMap.getSkullTexture() != null && !itemMap.isHeadDatabase()) {
                 try {
                     if (ServerUtils.hasSpecificUpdate("1_8") && itemMeta != null) {
-                        GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
+                        final UUID uuid = UUID.randomUUID();
+                        final GameProfile gameProfile = new GameProfile(uuid, uuid.toString().replaceAll("_", "").replaceAll("-", ""));
                         gameProfile.getProperties().put("textures", new Property("textures", itemMap.getSkullTexture()));
                         Field declaredField = itemMeta.getClass().getDeclaredField("profile");
                         declaredField.setAccessible(true);

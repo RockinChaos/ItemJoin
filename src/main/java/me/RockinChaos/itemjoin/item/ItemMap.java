@@ -3751,7 +3751,8 @@ public class ItemMap {
         } else if (this.skullTexture != null && !this.headDatabase) {
             try {
                 if (ServerUtils.hasSpecificUpdate("1_8")) {
-                    GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
+                    final UUID uuid = UUID.randomUUID();
+                    GameProfile gameProfile = new GameProfile(uuid, uuid.toString().replaceAll("_", "").replaceAll("-", ""));
                     gameProfile.getProperties().put("textures", new Property("textures", ((this.skullOwner != null && ItemJoin.getCore().getDependencies().skinsRestorerEnabled()) ? ItemJoin.getCore().getDependencies().getSkinValue(StringUtils.translateLayout(this.skullOwner, player)) : StringUtils.toTextureUUID(player, this.configName, this.skullTexture))));
                     Field declaredField = this.tempMeta.getClass().getDeclaredField("profile");
                     declaredField.setAccessible(true);
@@ -4032,7 +4033,7 @@ public class ItemMap {
                        mapmeta.setMapView(this.mapView);
                    }
                 } catch (NoSuchMethodError e) {
-                    mapmeta = LegacyAPI.setMapID(mapmeta, this.mapId);
+                    LegacyAPI.setMapID(mapmeta, this.mapId);
                 }
                 this.tempItem.setItemMeta(mapmeta);
             } else {

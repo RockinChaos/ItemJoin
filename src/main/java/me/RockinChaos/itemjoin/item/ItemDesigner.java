@@ -983,7 +983,8 @@ public class ItemDesigner {
                 }
                 String texture = this.getActualTexture(itemMap);
                 if (!StringUtils.containsIgnoreCase(texture, "hdb-")) {
-                    GameProfile gameProfile = new GameProfile(UUID.randomUUID(), null);
+                    final UUID uuid = UUID.randomUUID();
+                    GameProfile gameProfile = new GameProfile(uuid, uuid.toString().replaceAll("_", "").replaceAll("-", ""));
                     gameProfile.getProperties().put("textures", new Property("textures", texture));
                     try {
                         itemMap.setSkullTexture(texture);
