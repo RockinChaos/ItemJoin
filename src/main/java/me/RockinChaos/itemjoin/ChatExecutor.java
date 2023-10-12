@@ -290,7 +290,7 @@ public class ChatExecutor implements CommandExecutor {
      */
     private void dump(final CommandSender sender) {
         try {
-            final String pluginVersion = "&aItemJoin v" + ItemJoin.getCore().getPlugin().getDescription().getVersion() + "&e by RockinChaos";
+            final String pluginVersion = "ItemJoin v" + ItemJoin.getCore().getPlugin().getDescription().getVersion() + " by RockinChaos";
             final String serverVersion = Bukkit.getServer().getClass().getPackage().getName();
             final String config = Files.asCharSource(new File(ItemJoin.getCore().getPlugin().getDataFolder() + "/config.yml"), StandardCharsets.UTF_8).read();
             final String items = Files.asCharSource(new File(ItemJoin.getCore().getPlugin().getDataFolder() + "/items.yml"), StandardCharsets.UTF_8).read();
