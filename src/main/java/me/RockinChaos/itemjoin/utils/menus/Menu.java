@@ -25,7 +25,7 @@ import me.RockinChaos.core.utils.SchedulerUtils;
 import me.RockinChaos.core.utils.ServerUtils;
 import me.RockinChaos.core.utils.StringUtils;
 import me.RockinChaos.core.utils.api.LegacyAPI;
-import me.RockinChaos.core.utils.interfaces.Button;
+import me.RockinChaos.core.utils.interfaces.types.Button;
 import me.RockinChaos.core.utils.interfaces.Interface;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.item.*;
