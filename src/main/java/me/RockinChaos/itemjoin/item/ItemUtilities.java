@@ -1102,7 +1102,7 @@ public class ItemUtilities {
                 for (final ItemMap itemMap : this.getItems()) {
                     if (itemMap.getIngredients() != null && !itemMap.getIngredients().isEmpty()) {
                         itemRecipes = true;
-                        if (itemMap.isSimilar(null, result) || recipe.getKey().getKey().contains(itemMap.getConfigName())) {
+                        if (itemMap.isSimilar(null, result) || (ServerUtils.hasSpecificUpdate("1_12") && recipe.getKey().getKey().contains(itemMap.getConfigName()))) {
                             backupItem = false;
                         }
                     }
