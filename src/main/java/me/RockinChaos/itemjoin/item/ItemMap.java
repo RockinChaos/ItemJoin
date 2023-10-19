@@ -4586,7 +4586,16 @@ public class ItemMap implements Cloneable {
         }
         ItemUtilities.getUtilities().setStatistics(player);
         if (this.CustomSlot != null && !this.CustomSlot.contains("%")) {
-            ItemUtilities.getUtilities().setCustomSlots(player, this, amount[0]);
+            final int customAmount = amount[0];
+            if (!ServerUtils.hasSpecificUpdate("1_10")) {
+                /*
+                    A fix to prevent Arbitrary and addItem's from being accidentally overwritten by dedicated slots.
+                    This issue only occurs in 1.8 - 1.9.4.
+                 */
+                SchedulerUtils.runLater(2L, () -> ItemUtilities.getUtilities().setCustomSlots(player, this, customAmount));
+            } else {
+                ItemUtilities.getUtilities().setCustomSlots(player, this, customAmount);
+            }
         } else {
             ItemUtilities.getUtilities().setInvSlots(player, this, amount[0]);
         }
