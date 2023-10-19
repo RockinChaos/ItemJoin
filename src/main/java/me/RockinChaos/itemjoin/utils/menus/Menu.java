@@ -872,12 +872,7 @@ public class Menu {
                         creatingPane(player, itemMap);
                     } else {
                         ((Interface) Objects.requireNonNull(event.getInventory().getHolder())).onTyping((Player) event.getView().getPlayer());
-                        Menu.setTypingMenu(true, player, ((Interface) Objects.requireNonNull(event.getInventory().getHolder()))); 
-                        String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                        placeHolders[16] = "NAME";
-                        placeHolders[15] = "&bUltimate Sword";
-                        ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
-                        ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
+                        Menu.setTypingMenu(true, player, ((Interface) Objects.requireNonNull(event.getInventory().getHolder())));
                     }
                 }
             }, query -> query.onClose(stateSnapshot -> creatingPane(stateSnapshot.getPlayer(), itemMap))
@@ -887,16 +882,13 @@ public class Menu {
                     }
                     itemMap.setCustomName(StringUtils.restoreColor(stateSnapshot.getText()));
                     Menu.setTypingMenu(false, player, null);
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = "NAME";
-                    ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", stateSnapshot.getPlayer(), placeHolders);
                     creatingPane(stateSnapshot.getPlayer(), itemMap);
                     return Collections.singletonList(Query.ResponseAction.close());
                 })
-                .itemLeft(ItemHandler.getItem("NAME_TAG", 1, false, true, " ", "&cHow are you look at me!"))
-                .itemRight(ItemHandler.getItem("GOLD_NUGGET", 1, true, true, "&c&n&lTips", "&aType your answer into the query box!"))
-                .itemOutput(ItemHandler.getItem("IRON_INGOT", 1, false, true, "&bBetter start typing...", "&aThis is what I am!"))
-                .title("Enter your answer:"), 0));
+                .itemLeft(ItemHandler.getItem("NAME_TAG", 1, false, true, " ", "&bThis is what the raw data looks like."))
+                .itemRight(ItemHandler.getItem("GOLD_NUGGET", 1, true, true, "&c&n&lTips", "&aType your answer into the query box!", "&7", ItemJoin.getCore().getLang().getLangMessage("commands.menu.inputType").replace("%input%" ,"NAME").replace("%prefix% ", "").replace("%prefix%", ""), ItemJoin.getCore().getLang().getLangMessage("commands.menu.inputExample").replace("%input_example%" ,"&bUltimate Sword").replace("%prefix% ", "").replace("%prefix%", "")))
+                .itemOutput(ItemHandler.getItem("IRON_INGOT", 1, false, true, "&bStart typing...", "&aThis is what the text will look like."))
+                .title("Type the item name:"), 0));
             creatingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "WRITABLE_BOOK" : "386"), 1, false, false, "&b&lLore", "&7", "&7*Set the lore of the item.", "&9&lLORE: &f" + StringUtils.nullCheck(itemMap.getCustomLore().toString())), event -> {
                 if (itemMap.getDynamicLores() != null && !itemMap.getDynamicLores().isEmpty()) {
                     animatedLorePane(player, itemMap);
