@@ -872,7 +872,7 @@ public class Menu {
                         creatingPane(player, itemMap);
                     } else {
                         ((Interface) Objects.requireNonNull(event.getInventory().getHolder())).onTyping((Player) event.getView().getPlayer());
-                        Menu.setTypingMenu(true, player, ((Interface) Objects.requireNonNull(event.getInventory().getHolder())));
+                        Menu.setTypingMenu(true, player, ((Interface) Objects.requireNonNull(event.getInventory().getHolder()))); 
                         String[] placeHolders = ItemJoin.getCore().getLang().newString();
                         placeHolders[16] = "NAME";
                         placeHolders[15] = "&bUltimate Sword";
