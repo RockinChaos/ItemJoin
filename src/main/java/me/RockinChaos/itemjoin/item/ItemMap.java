@@ -829,7 +829,7 @@ public class ItemMap implements Cloneable {
         if (this.customName != null && !this.customName.equalsIgnoreCase(ItemHandler.getMaterialName(this.tempItem))) {
             if (this.legacySecret != null && !ServerUtils.hasSpecificUpdate("1_14")) {
                 final String itemData = this.tempMeta.getDisplayName();
-                this.tempMeta.setDisplayName(StringUtils.translateLayout(ItemHandler.cutDelay(this.customName), player) + "งr" + itemData);
+                this.tempMeta.setDisplayName(StringUtils.translateLayout(ItemHandler.cutDelay(this.customName), player) + "ยงr" + itemData);
             } else {
                 this.tempMeta.setDisplayName(StringUtils.translateLayout(ItemHandler.cutDelay(this.customName), player));
             }
@@ -5421,7 +5421,7 @@ public class ItemMap implements Cloneable {
             itemData.set("items." + this.configName + ".model-data", this.modelData);
         }
         if (this.author != null && !this.author.isEmpty()) {
-            itemData.set("items." + this.configName + ".author", this.author.replace("ง", "&"));
+            itemData.set("items." + this.configName + ".author", this.author.replace("ยง", "&"));
         }
         if (this.customName != null && !this.customName.isEmpty() && (this.dynamicNames == null || this.dynamicNames.isEmpty())) {
             String setName;
@@ -5433,9 +5433,9 @@ public class ItemMap implements Cloneable {
                 }
                 StringUtils.colorEncode(this.tempItem, this.legacySecret);
                 final String itemInfo = this.tempItem.getItemMeta().getDisplayName();
-                setName = this.customName.replace(itemInfo, "").replace("ง", "&");
+                setName = this.customName.replace(itemInfo, "").replace("ยง", "&");
             } else {
-                setName = this.customName.replace("ง", "&");
+                setName = this.customName.replace("ยง", "&");
             }
             if (setName.startsWith("&f") && (!ItemJoin.getCore().getData().dataTagsEnabled() || !ServerUtils.hasSpecificUpdate("1_8"))) {
                 setName = setName.substring(2);
@@ -5445,7 +5445,7 @@ public class ItemMap implements Cloneable {
             }
         } else if (this.dynamicNames != null && !this.dynamicNames.isEmpty()) {
             for (int i = 0; i < this.dynamicNames.size(); i++) {
-                itemData.set("items." + this.configName + ".name." + (i + 1), this.dynamicNames.get(i).replace("ง", "&"));
+                itemData.set("items." + this.configName + ".name." + (i + 1), this.dynamicNames.get(i).replace("ยง", "&"));
             }
         }
         if (this.customLore != null && !this.customLore.isEmpty() && (this.dynamicLores == null || this.dynamicLores.isEmpty())) {
@@ -5454,7 +5454,7 @@ public class ItemMap implements Cloneable {
             for (int i = 0; i < this.dynamicLores.size(); i++) {
                 List<String> lores = new ArrayList<>();
                 for (String lore : this.dynamicLores.get(i)) {
-                    lores.add(lore.replace("ง", "&"));
+                    lores.add(lore.replace("ยง", "&"));
                 }
                 itemData.set("items." + this.configName + ".lore." + (i + 1), lores);
             }
@@ -5463,7 +5463,7 @@ public class ItemMap implements Cloneable {
             for (int i = 0; i < this.listPages.size(); i++) {
                 List<String> pages = new ArrayList<>();
                 for (String page : this.listPages.get(i)) {
-                    pages.add(page.replace("ง", "&"));
+                    pages.add(page.replace("ยง", "&"));
                 }
                 itemData.set("items." + this.configName + ".pages." + (i + 1), pages);
             }
