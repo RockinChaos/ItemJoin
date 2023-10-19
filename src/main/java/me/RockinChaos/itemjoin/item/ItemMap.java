@@ -71,7 +71,7 @@ import java.lang.reflect.Field;
 import java.util.*;
 import java.util.Map.Entry;
 
-public class ItemMap {
+public class ItemMap implements Cloneable {
 
     private final Map<String, Long> playersOnInteractCooldown = new HashMap<>();
     private final HashMap<String, Long> storedSpammedPlayers = new HashMap<>();
@@ -4395,12 +4395,14 @@ public class ItemMap {
             return true;
         }
         if (this.enabledWorlds != null) {
-            for (String enabledWorld : this.enabledWorlds) {
-                if (enabledWorld.equalsIgnoreCase(world.getName())
-                        || enabledWorld.equalsIgnoreCase("ALL")
-                        || enabledWorld.equalsIgnoreCase("GLOBAL")
-                        || (enabledWorld.contains("*") && world.getName().toUpperCase().startsWith(enabledWorld.split("\\*")[0].toUpperCase()))) {
-                    return !this.isDisabled(world);
+            synchronized ("IJ_MAP") {
+                for (String enabledWorld : this.enabledWorlds) {
+                    if (enabledWorld.equalsIgnoreCase(world.getName())
+                            || enabledWorld.equalsIgnoreCase("ALL")
+                            || enabledWorld.equalsIgnoreCase("GLOBAL")
+                            || (enabledWorld.contains("*") && world.getName().toUpperCase().startsWith(enabledWorld.split("\\*")[0].toUpperCase()))) {
+                        return !this.isDisabled(world);
+                    }
                 }
             }
         }
