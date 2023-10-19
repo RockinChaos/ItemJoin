@@ -554,7 +554,7 @@ public class ItemData {
         if ((!StringUtils.splitIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Prevent." + "itemMovement"), "FALSE", ",") && !StringUtils.splitIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Prevent." + "itemMovement"), "DISABLED", ","))) {
             if (StringUtils.isRegistered(Clicking.class.getSimpleName())) {
                 ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new Clicking(), ItemJoin.getCore().getPlugin());
-                if (ServerUtils.hasSpecificUpdate("1_8") && !ItemJoin.getCore().getDependencies().protocolEnabled() && ProtocolManager.isHandling()) {
+                if (ServerUtils.hasSpecificUpdate("1_8") && !ItemJoin.getCore().getDependencies().protocolEnabled() && ProtocolManager.isDead()) {
                     ProtocolManager.handleProtocols();
                 } else if (ServerUtils.hasSpecificUpdate("1_8") && ItemJoin.getCore().getDependencies().protocolEnabled() && ProtocolAPI.isHandling()) {
                     ProtocolAPI.handleProtocols();
@@ -609,7 +609,7 @@ public class ItemData {
             PlayerHandler.cycleCrafting();
             runLater(40L, () -> {
                 forOnlinePlayers(player -> this.restoreCraftItems(player, TriggerType.DEFAULT));
-                if (ServerUtils.hasSpecificUpdate("1_8") && !ItemJoin.getCore().getDependencies().protocolEnabled() && ProtocolManager.isHandling()) {
+                if (ServerUtils.hasSpecificUpdate("1_8") && !ItemJoin.getCore().getDependencies().protocolEnabled() && ProtocolManager.isDead()) {
                     ProtocolManager.handleProtocols();
                 } else if (ServerUtils.hasSpecificUpdate("1_8") && ItemJoin.getCore().getDependencies().protocolEnabled() && ProtocolAPI.isHandling()) {
                     ProtocolAPI.handleProtocols();
@@ -623,7 +623,7 @@ public class ItemData {
         if ((itemMap.isMovement() || itemMap.isStackable() || itemMap.isEquip() || itemMap.isInventoryClose())) {
             if (StringUtils.isRegistered(Clicking.class.getSimpleName())) {
                 ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new Clicking(), ItemJoin.getCore().getPlugin());
-                if (ServerUtils.hasSpecificUpdate("1_8") && !ItemJoin.getCore().getDependencies().protocolEnabled() && ProtocolManager.isHandling()) {
+                if (ServerUtils.hasSpecificUpdate("1_8") && !ItemJoin.getCore().getDependencies().protocolEnabled() && ProtocolManager.isDead()) {
                     ProtocolManager.handleProtocols();
                 } else if (ServerUtils.hasSpecificUpdate("1_8") && ItemJoin.getCore().getDependencies().protocolEnabled() && ProtocolAPI.isHandling()) {
                     ProtocolAPI.handleProtocols();
