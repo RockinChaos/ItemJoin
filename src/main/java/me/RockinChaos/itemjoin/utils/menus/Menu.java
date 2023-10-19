@@ -25,8 +25,9 @@ import me.RockinChaos.core.utils.SchedulerUtils;
 import me.RockinChaos.core.utils.ServerUtils;
 import me.RockinChaos.core.utils.StringUtils;
 import me.RockinChaos.core.utils.api.LegacyAPI;
-import me.RockinChaos.core.utils.interfaces.types.Button;
 import me.RockinChaos.core.utils.interfaces.Interface;
+import me.RockinChaos.core.utils.interfaces.Query;
+import me.RockinChaos.core.utils.interfaces.types.Button;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.item.*;
 import me.RockinChaos.itemjoin.item.ItemCommand.Action;
@@ -66,6 +67,7 @@ public class Menu {
     private static final ItemStack fillerPaneItem = ItemHandler.getItem("GLASS_PANE", 1, false, false, "&7", "");
     private static final ItemStack exitItem = ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nExit", "&7", "&7*Returns you to the game");
     private static final List<String> modifyMenu = new ArrayList<>();
+    private static final Map<String, Interface> typingMenu = new HashMap<>();
     private static String GUIName = StringUtils.colorFormat("&7           &0&n ItemJoin Menu");
     private static int failCycle = 0;
 
@@ -869,7 +871,8 @@ public class Menu {
                         itemMap.setCustomName(null);
                         creatingPane(player, itemMap);
                     } else {
-                        player.closeInventory();
+                        ((Interface) Objects.requireNonNull(event.getInventory().getHolder())).onTyping((Player) event.getView().getPlayer());
+                        Menu.setTypingMenu(true, player, ((Interface) Objects.requireNonNull(event.getInventory().getHolder())));
                         String[] placeHolders = ItemJoin.getCore().getLang().newString();
                         placeHolders[16] = "NAME";
                         placeHolders[15] = "&bUltimate Sword";
@@ -877,13 +880,23 @@ public class Menu {
                         ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
                     }
                 }
-            }, event -> {
-                itemMap.setCustomName(StringUtils.restoreColor(event.getMessage()));
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "NAME";
-                ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
-                creatingPane(event.getPlayer(), itemMap);
-            }));
+            }, query -> query.onClose(stateSnapshot -> creatingPane(stateSnapshot.getPlayer(), itemMap))
+                .onClick((slot, stateSnapshot) -> {
+                    if (slot != Query.Slot.OUTPUT) {
+                        return Collections.emptyList();
+                    }
+                    itemMap.setCustomName(StringUtils.restoreColor(stateSnapshot.getText()));
+                    Menu.setTypingMenu(false, player, null);
+                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
+                    placeHolders[16] = "NAME";
+                    ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", stateSnapshot.getPlayer(), placeHolders);
+                    creatingPane(stateSnapshot.getPlayer(), itemMap);
+                    return Collections.singletonList(Query.ResponseAction.close());
+                })
+                .itemLeft(ItemHandler.getItem("NAME_TAG", 1, false, true, " ", "&cHow are you look at me!"))
+                .itemRight(ItemHandler.getItem("GOLD_NUGGET", 1, true, true, "&c&n&lTips", "&aType your answer into the query box!"))
+                .itemOutput(ItemHandler.getItem("IRON_INGOT", 1, false, true, "&bBetter start typing...", "&aThis is what I am!"))
+                .title("Enter your answer:"), 0));
             creatingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "WRITABLE_BOOK" : "386"), 1, false, false, "&b&lLore", "&7", "&7*Set the lore of the item.", "&9&lLORE: &f" + StringUtils.nullCheck(itemMap.getCustomLore().toString())), event -> {
                 if (itemMap.getDynamicLores() != null && !itemMap.getDynamicLores().isEmpty()) {
                     animatedLorePane(player, itemMap);
@@ -8557,6 +8570,8 @@ public class Menu {
         PlayerHandler.forOnlinePlayers(player -> {
             if (isOpen(player) || modifyMenu(player)) {
                 player.closeInventory();
+            } else if (typingMenu(player)) {
+                typingMenu.get(PlayerHandler.getPlayerID(player)).closeQuery(player);
             }
         });
     }
@@ -8581,6 +8596,25 @@ public class Menu {
     }
 
     /**
+     * Sets the Player to the Typing Menu.
+     *
+     * @param bool   - If the Player is in the Menu.
+     * @param player - The Player to be set to the Typing Menu.
+     */
+    public static void setTypingMenu(final boolean bool, final Player player, final Interface interFace) {
+        try {
+            SchedulerUtils.runAsync(() -> {
+                if (bool) {
+                    typingMenu.put(PlayerHandler.getPlayerID(player), interFace);
+                } else if (!typingMenu.isEmpty()) {
+                    typingMenu.remove(PlayerHandler.getPlayerID(player));
+                }
+            });
+        } catch (ArrayIndexOutOfBoundsException ignored) {
+        }
+    }
+
+    /**
      * Checks if the Player is in the Modify Menu.
      *
      * @param player - The Player to be checked.
@@ -8588,6 +8622,16 @@ public class Menu {
      */
     public static boolean modifyMenu(final Player player) {
         return modifyMenu.contains(PlayerHandler.getPlayerID(player));
+    }
+
+    /**
+     * Checks if the Player is in the typing Menu.
+     *
+     * @param player - The Player to be checked.
+     * @return If the Player is in the typing Menu.
+     */
+    public static boolean typingMenu(final Player player) {
+        return typingMenu.get(PlayerHandler.getPlayerID(player)) != null;
     }
 
 //  ==============================================================================================================================================================================================================================================================
