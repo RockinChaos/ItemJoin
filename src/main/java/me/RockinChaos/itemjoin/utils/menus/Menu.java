@@ -66,6 +66,7 @@ public class Menu {
     private static final ItemStack fillerPaneGItem = ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GRAY_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:7"), 1, false, false, "&7", "");
     private static final ItemStack fillerPaneItem = ItemHandler.getItem("GLASS_PANE", 1, false, false, "&7", "");
     private static final ItemStack exitItem = ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nExit", "&7", "&7*Returns you to the game");
+    private static final Button exitButton = new Button(exitItem, event -> Menu.startMenu(event.getWhoClicked()));
     private static final List<String> modifyMenu = new ArrayList<>();
     private static final Map<String, Interface> typingMenu = new HashMap<>();
     private static String GUIName = StringUtils.colorFormat("&7           &0&n ItemJoin Menu");
@@ -217,7 +218,7 @@ public class Menu {
             itemPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the main menu."), event -> startMenu(player)));
         });
         itemPane.open(player);
-    }    private static final Button exitButton = new Button(exitItem, event -> Menu.startMenu(event.getWhoClicked()));
+    }
 
 //  ============================================== //
 //  			   Selection Menus      	       //
