@@ -77,7 +77,7 @@ public class Clicking implements Listener {
     private void onGlobalModify(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
         if (ItemData.getInfo().isPreventString(player, "itemMovement")) {
-            if (!(ItemData.getInfo().isPreventBypass(player) && (player.getOpenInventory().getTitle().contains("§") || player.getOpenInventory().getTitle().contains("&")))) {
+            if (ItemData.getInfo().isPreventBypass(player) && !(player.getOpenInventory().getTitle().contains("§") || player.getOpenInventory().getTitle().contains("&"))) {
                 event.setCancelled(true);
             }
         }
