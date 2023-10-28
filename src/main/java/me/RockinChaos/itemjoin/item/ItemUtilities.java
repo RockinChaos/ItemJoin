@@ -280,6 +280,7 @@ public class ItemUtilities {
             if (((type.equals(TriggerType.JOIN) && item.isGiveOnJoin())
                     || (type.equals(TriggerType.TELEPORT) && item.isGiveOnTeleport())
                     || (type.equals(TriggerType.RESPAWN) && (item.isGiveOnRespawn() || item.isDeathKeepable()))
+                    || (type.equals(TriggerType.RESPAWN_POINT) && (item.isGiveOnRespawnPoint() || item.isGiveOnRespawn() || item.isDeathKeepable()))
                     || (type.equals(TriggerType.WORLD_SWITCH) && item.isGiveOnWorldSwitch())
                     || (type.equals(TriggerType.LIMIT_SWITCH) && item.isUseOnLimitSwitch() && (StringUtils.containsValue(regions, "IJ_WORLD") || item.inRegion(regions) || item.getEnabledRegions() == null || item.getEnabledRegions().isEmpty()))
                     || (type.equals(TriggerType.REGION_ENTER) && (item.isGiveOnRegionEnter() || item.isGiveOnRegionAccess()) && item.inRegion(regions))
@@ -486,7 +487,7 @@ public class ItemUtilities {
             DataObject firstJoin = (itemMap.isOnlyFirstLife() && type.equals(TriggerType.JOIN) || itemMap.isOnlyFirstJoin() ? (DataObject) ItemJoin.getCore().getSQL().getData(new DataObject(Table.FIRST_JOIN, PlayerHandler.getPlayerID(player), "", itemMap.getConfigName())) : null);
             DataObject firstWorld = itemMap.isOnlyFirstWorld() ? (DataObject) ItemJoin.getCore().getSQL().getData(new DataObject(Table.FIRST_WORLD, PlayerHandler.getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName())) : null;
             DataObject ipLimit = itemMap.isIpLimited() ? (DataObject) ItemJoin.getCore().getSQL().getData(new DataObject(Table.IP_LIMITS, PlayerHandler.getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName(), Objects.requireNonNull(player.getAddress()).getHostString())) : null;
-            if ((firstJoin == null || itemMap.isOnlyFirstLife() && type.equals(TriggerType.RESPAWN)) && firstWorld == null && (ipLimit == null || ipLimit.getPlayerId().equalsIgnoreCase(PlayerHandler.getPlayerID(player))) && this.canOverwrite(player, itemMap)) {
+            if ((firstJoin == null || itemMap.isOnlyFirstLife() && (type.equals(TriggerType.RESPAWN) || type.equals(TriggerType.RESPAWN_POINT))) && firstWorld == null && (ipLimit == null || ipLimit.getPlayerId().equalsIgnoreCase(PlayerHandler.getPlayerID(player))) && this.canOverwrite(player, itemMap)) {
                 return true;
             } else if (firstJoin == null && firstWorld == null && ipLimit == null) {
                 if (session != 0 && this.failCount.get(session) != null) {
@@ -857,7 +858,7 @@ public class ItemUtilities {
      * @param player - The Player having the commands executed.
      */
     public void triggerCommands(final Player player, TriggerType triggerRef) {
-        if (ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.enabled-worlds") != null && (!Objects.requireNonNull(ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.enabled-worlds")).equalsIgnoreCase("DISABLED") || !Objects.requireNonNull(ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.enabled-worlds")).equalsIgnoreCase("FALSE")) && (StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.triggers"), TriggerType.JOIN.name) && triggerRef.equals(TriggerType.JOIN) || StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.triggers"), TriggerType.FIRST_JOIN.name) && triggerRef.equals(TriggerType.JOIN) || StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.triggers"), TriggerType.WORLD_SWITCH.name) && triggerRef.equals(TriggerType.WORLD_SWITCH) || StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.triggers"), TriggerType.RESPAWN.name) && triggerRef.equals(TriggerType.RESPAWN) || StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.triggers"), TriggerType.TELEPORT.name) && triggerRef.equals(TriggerType.TELEPORT))) {
+        if (ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.enabled-worlds") != null && (!Objects.requireNonNull(ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.enabled-worlds")).equalsIgnoreCase("DISABLED") || !Objects.requireNonNull(ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.enabled-worlds")).equalsIgnoreCase("FALSE")) && (StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.triggers"), TriggerType.JOIN.name) && triggerRef.equals(TriggerType.JOIN) || StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.triggers"), TriggerType.FIRST_JOIN.name) && triggerRef.equals(TriggerType.JOIN) || StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.triggers"), TriggerType.WORLD_SWITCH.name) && triggerRef.equals(TriggerType.WORLD_SWITCH) || StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.triggers"), TriggerType.RESPAWN.name) && (triggerRef.equals(TriggerType.RESPAWN) || triggerRef.equals(TriggerType.RESPAWN_POINT)) || StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.triggers"), TriggerType.TELEPORT.name) && triggerRef.equals(TriggerType.TELEPORT))) {
             String commandsWorlds = Objects.requireNonNull(ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.enabled-worlds")).replace(", ", ",");
             TriggerType trigger = triggerRef;
             if (StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.triggers"), TriggerType.FIRST_JOIN.name) && trigger.equals(TriggerType.JOIN)) {
@@ -1230,6 +1231,7 @@ public class ItemUtilities {
         JOIN("Join"),
         QUIT("Quit"),
         RESPAWN("Respawn"),
+        RESPAWN_POINT("Respawn-Point"),
         TELEPORT("Teleport"),
         WORLD_SWITCH("World-Switch"),
         LIMIT_SWITCH("Limit-Modes"),

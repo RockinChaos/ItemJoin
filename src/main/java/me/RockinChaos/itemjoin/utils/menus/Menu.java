@@ -5058,7 +5058,7 @@ public class Menu {
      * @param itemMap - The ItemMap currently being modified.
      */
     private static void triggerPane(final Player player, final ItemMap itemMap) {
-        Interface triggerPane = new Interface(false, 3, exitButton, GUIName, player);
+        Interface triggerPane = new Interface(false, 4, exitButton, GUIName, player);
         SchedulerUtils.runAsync(() -> {
             triggerPane.addButton(new Button(fillerPaneBItem));
             triggerPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "FILLED_MAP" : "MAP"), 1, itemMap.isOnlyFirstJoin(), false, "&e&l&nFirst Join", "&7", "&7*Gives the item when the", "&7player logs into the server",
@@ -5089,6 +5089,7 @@ public class Menu {
                     itemMap.setOnlyFirstWorld(false);
                     itemMap.setOnlyFirstLife(false);
                     itemMap.setGiveOnRespawn(false);
+                    itemMap.setGiveOnRespawnPoint(false);
                     itemMap.setGiveOnWorldSwitch(false);
                     itemMap.setUseOnLimitSwitch(false);
                     itemMap.setGiveOnRegionEnter(false);
@@ -5105,14 +5106,23 @@ public class Menu {
                 itemMap.setGiveOnJoin(!itemMap.isGiveOnJoin());
                 triggerPane(player, itemMap);
             }));
+            triggerPane.addButton(new Button(fillerPaneBItem));
             triggerPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "ENDER_PEARL" : "368"), 1, itemMap.isGiveOnTeleport(), false, "&e&l&nTeleport", "&7", "&7*Gives the item when the", "&7player teleports to a new location.",
                     "&9&lENABLED: &a" + (itemMap.isGiveOnTeleport() + "").toUpperCase()), event -> {
                 itemMap.setGiveOnTeleport(!itemMap.isGiveOnTeleport());
                 triggerPane(player, itemMap);
             }));
+            triggerPane.addButton(new Button(ItemHandler.getItem("COAL", 1, itemMap.isGiveOnRespawnPoint(), false, "&e&l&nRespawn Point", "&7", "&7*Gives the item when the", "&7player respawns from a death event.", "&7", "&c&nException:&7 The item will not be given if", "&7spawning in a &lBED&7, &lANCHOR&7, or &lSPAWN-POINT&7.", "&9&lENABLED: &a" +
+                    (itemMap.isGiveOnRespawnPoint() + "").toUpperCase()), event -> {
+                itemMap.setGiveOnRespawnPoint(!itemMap.isGiveOnRespawnPoint());
+                itemMap.setGiveOnRespawn(false);
+                triggerPane(player, itemMap);
+            }));
+            triggerPane.addButton(new Button(fillerPaneBItem));
             triggerPane.addButton(new Button(ItemHandler.getItem("DIAMOND", 1, itemMap.isGiveOnRespawn(), false, "&e&l&nRespawn", "&7", "&7*Gives the item when the", "&7player respawns from a death event.", "&9&lENABLED: &a" +
                     (itemMap.isGiveOnRespawn() + "").toUpperCase()), event -> {
                 itemMap.setGiveOnRespawn(!itemMap.isGiveOnRespawn());
+                itemMap.setGiveOnRespawnPoint(false);
                 triggerPane(player, itemMap);
             }));
             triggerPane.addButton(new Button(ItemHandler.getItem("STONE_BUTTON", 1, itemMap.isGiveOnWorldSwitch(), false, "&e&l&nWorld Switch", "&7", "&7*Gives the item when the", "&7player teleports to one", "&7of the specified worlds.",
@@ -5120,11 +5130,13 @@ public class Menu {
                 itemMap.setGiveOnWorldSwitch(!itemMap.isGiveOnWorldSwitch());
                 triggerPane(player, itemMap);
             }));
+            triggerPane.addButton(new Button(fillerPaneBItem));
             triggerPane.addButton(new Button(ItemHandler.getItem("LEVER", 1, itemMap.isUseOnLimitSwitch(), false, "&e&l&nGamemode Switch", "&7", "&7*Gives the item when the", "&7player changes gamemodes to any", "&7of the defined limit-modes.",
                     "&9&lENABLED: &a" + (itemMap.isUseOnLimitSwitch() + "").toUpperCase()), event -> {
                 itemMap.setUseOnLimitSwitch(!itemMap.isUseOnLimitSwitch());
                 triggerPane(player, itemMap);
             }));
+            triggerPane.addButton(new Button(fillerPaneBItem));
             triggerPane.addButton(new Button(ItemHandler.getItem("MINECART", 1, itemMap.isGiveOnRegionEnter(), false, "&e&l&nRegion Enter", "&7", "&7*Gives the item when the", "&7player enters any of the enabled-regions.", "&9&lENABLED: &a" +
                     (itemMap.isGiveOnRegionEnter() + "").toUpperCase()), event -> {
                 if (itemMap.isGiveOnRegionEnter()) {
@@ -5136,6 +5148,7 @@ public class Menu {
                 }
                 triggerPane(player, itemMap);
             }));
+            triggerPane.addButton(new Button(fillerPaneBItem));
             triggerPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "HOPPER_MINECART" : "408"), 1, itemMap.isGiveOnRegionLeave(), false, "&e&l&nRegion Leave", "&7", "&7*Removes the item when the", "&7player leaves any of the enabled-regions.", "&9&lENABLED: &a" +
                     (itemMap.isGiveOnRegionLeave() + "").toUpperCase()), event -> {
                 if (itemMap.isGiveOnRegionLeave()) {
@@ -5147,6 +5160,7 @@ public class Menu {
                 }
                 triggerPane(player, itemMap);
             }));
+            triggerPane.addButton(new Button(fillerPaneBItem));
             triggerPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "TNT_MINECART" : "407"), 1, itemMap.isGiveOnRegionAccess(), false, "&e&l&nRegion Access", "&7", "&7*Gives the item when the", "&7player enters any of the enabled-regions", "&7and removes the item when leaving", "&7any of the enabled-regions.", "&9&lENABLED: &a" +
                     (itemMap.isGiveOnRegionAccess() + "").toUpperCase()), event -> {
                 if (itemMap.isGiveOnRegionAccess()) {
@@ -5158,6 +5172,7 @@ public class Menu {
                 }
                 triggerPane(player, itemMap);
             }));
+            triggerPane.addButton(new Button(fillerPaneBItem));
             triggerPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CHEST_MINECART" : "342"), 1, itemMap.isGiveOnRegionEgress(), false, "&e&l&nRegion Engress", "&7", "&7*Removes the item when the", "&7player enters any of the enabled-regions", "&7and gives the item when leaving", "&7any of the enabled-regions.", "&9&lENABLED: &a" +
                     (itemMap.isGiveOnRegionEgress() + "").toUpperCase()), event -> {
                 if (itemMap.isGiveOnRegionEgress()) {
@@ -5169,6 +5184,7 @@ public class Menu {
                 }
                 triggerPane(player, itemMap);
             }));
+            triggerPane.addButton(new Button(fillerPaneBItem));
             triggerPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu"), event -> {
                 setTriggers(itemMap);
                 creatingPane(player, itemMap);
@@ -5209,6 +5225,9 @@ public class Menu {
         }
         if (itemMap.isGiveOnRespawn() && !itemMap.isOnlyFirstJoin() && !itemMap.isOnlyFirstWorld()) {
             triggers += "RESPAWN, ";
+        }
+        if (itemMap.isGiveOnRespawnPoint() && !itemMap.isOnlyFirstJoin() && !itemMap.isOnlyFirstWorld()) {
+            triggers += "RESPAWN-POINT, ";
         }
         if (itemMap.isGiveOnWorldSwitch() && !itemMap.isOnlyFirstWorld()) {
             triggers += "WORLD-SWITCH, ";

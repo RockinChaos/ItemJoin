@@ -231,6 +231,7 @@ public class ItemMap implements Cloneable {
     private boolean giveOnJoin = false;
     private boolean giveOnTeleport = false;
     private boolean giveOnRespawn = false;
+    private boolean giveOnRespawnPoint = false;
     private boolean giveOnWorldSwitch = false;
     private boolean giveOnRegionEnter = false;
     private boolean giveOnRegionLeave = false;
@@ -519,6 +520,7 @@ public class ItemMap implements Cloneable {
         this.giveOnJoin = StringUtils.splitIgnoreCase(this.triggers, "JOIN", ",");
         this.giveOnTeleport = StringUtils.splitIgnoreCase(this.triggers, "TELEPORT", ",");
         this.giveOnRespawn = StringUtils.splitIgnoreCase(this.triggers, "RESPAWN", ",");
+        this.giveOnRespawnPoint = StringUtils.splitIgnoreCase(this.triggers, "RESPAWN-POINT", ",");
         this.giveOnWorldSwitch = StringUtils.splitIgnoreCase(this.triggers, "WORLD-CHANGE", ",") || StringUtils.splitIgnoreCase(this.triggers, "WORLD-SWITCH", ",");
         this.giveOnRegionEnter = StringUtils.splitIgnoreCase(this.triggers, "REGION-ENTER", ",");
         this.giveOnRegionLeave = StringUtils.splitIgnoreCase(this.triggers, "REGION-REMOVE", ",") || StringUtils.splitIgnoreCase(this.triggers, "REGION-EXIT", ",") || StringUtils.splitIgnoreCase(this.triggers, "REGION-LEAVE", ",");
@@ -2625,12 +2627,32 @@ public class ItemMap implements Cloneable {
     }
 
     /**
+     * Checks if you give on respawn point is enabled.
+     * Only gives the item if the player is NOT spawning in a bed, anchor, or spawn-point.
+     *
+     * @return If it is enabled.
+     */
+    public boolean isGiveOnRespawnPoint() {
+        return this.giveOnRespawnPoint;
+    }
+
+    /**
      * Sets the ItemStack to be given only on Respawn.
      *
      * @param bool - The value to be set.
      */
     public void setGiveOnRespawn(final boolean bool) {
         this.giveOnRespawn = bool;
+    }
+
+    /**
+     * Sets the ItemStack to be given only on Respawn Point.
+     * Only gives the item if the player is NOT spawning in a bed, anchor, or spawn-point.
+     *
+     * @param bool - The value to be set.
+     */
+    public void setGiveOnRespawnPoint(final boolean bool) {
+        this.giveOnRespawnPoint = bool;
     }
 
     /**
@@ -2742,6 +2764,7 @@ public class ItemMap implements Cloneable {
         if (bool && !this.giveOnRegionEnter && !this.giveOnRegionLeave && !this.giveOnRegionAccess && !this.giveOnRegionEgress) {
             this.giveOnJoin = true;
             this.giveOnRespawn = false;
+            this.giveOnRespawnPoint = false;
             this.giveOnTeleport = false;
         }
     }
@@ -2789,6 +2812,7 @@ public class ItemMap implements Cloneable {
             this.giveOnJoin = true;
             this.giveOnWorldSwitch = true;
             this.giveOnRespawn = false;
+            this.giveOnRespawnPoint = false;
             this.giveOnTeleport = false;
         }
     }
