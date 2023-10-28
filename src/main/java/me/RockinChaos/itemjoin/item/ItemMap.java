@@ -3711,9 +3711,9 @@ public class ItemMap implements Cloneable {
                     && StringUtils.colorDecode(item) != null && Objects.requireNonNull(StringUtils.colorDecode(item)).contains(this.legacySecret))) {
                 if (this.isEnchantSimilar(player, item) || !Objects.requireNonNull(item.getItemMeta()).hasEnchants() && this.enchants.isEmpty() || this.isItemChangeable()) {
                     if (this.material.toString().toUpperCase().contains("BOOK")
-                            && (this.isBookMeta(item)
+                            && (this.isBookMeta(player, item)
                             && ((BookMeta) Objects.requireNonNull(item.getItemMeta())).getPages().equals(((BookMeta) Objects.requireNonNull(tempItem.getItemMeta())).getPages()) || this.isDynamic())
-                            || this.material.toString().toUpperCase().contains("BOOK") && !this.isBookMeta(item) || !this.material.toString().toUpperCase().contains("BOOK") || this.isItemChangeable()) {
+                            || this.material.toString().toUpperCase().contains("BOOK") && !this.isBookMeta(player, item) || !this.material.toString().toUpperCase().contains("BOOK") || this.isItemChangeable()) {
                         return !this.vanillaControl || this.displayMeta(item);
                     }
                 }
@@ -3814,12 +3814,17 @@ public class ItemMap implements Cloneable {
     /**
      * Checks if the Book Meta is similar.
      *
+     * @param player - The Player being referenced.
      * @param item - The ItemStack being checked.
      * @return If the Book Meta is similar.
      */
-    private boolean isBookMeta(final ItemStack item) {
+    private boolean isBookMeta(final Player player, final ItemStack item) {
         try {
-            return ((BookMeta) Objects.requireNonNull(item.getItemMeta())).hasPages();
+            final boolean bookMeta = ((BookMeta) Objects.requireNonNull(item.getItemMeta())).hasPages();
+            if (bookMeta && this.material.toString().toUpperCase().contains("BOOK")) {
+                this.tempItem = this.setJSONBookPages(player, this.tempItem, this.bookPages);
+            }
+            return bookMeta;
         } catch (Exception e) {
             return false;
         }
@@ -3927,7 +3932,7 @@ public class ItemMap implements Cloneable {
             this.setFireChargeColor();
             this.setDye(player);
             this.setBookInfo(player);
-            if (this.bookPages != null && !this.bookPages.isEmpty()) {
+            if (!ServerUtils.hasSpecificUpdate("1_8") && this.bookPages != null && !this.bookPages.isEmpty()) {
                 final ItemMeta bookMeta = LegacyAPI.setBookPages(player, this.tempMeta, this.bookPages);
                 this.setPages(((BookMeta) bookMeta).getPages());
             }
