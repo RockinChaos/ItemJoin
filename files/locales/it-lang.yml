@@ -1,0 +1,127 @@
+# --{ =-=-=-=-=-=-=-=-=-= Traduzione Italiana di ItemJoin di Ale1x =-=-=-=-=-=-=-=-=-= }--
+# Se vuoi ch eun messaggio non venga inviato, lascia la riga vuota.
+
+# La modifica di ciò causerà la rottura e la rigenerazione del file.
+it-Version: 8
+
+# Prefisso che verrà mandato prima di ogni messaggio
+Prefix: '&7[&eItemJoin&7]'
+
+# Questi sono semplicemente messaggi generali inviati dagli utilizzi degli elementi plugin.
+general:
+  failedOverwrite: '%prefix% &cImpossibile darti &4%fail_count% &coggetti, non ti è permesso sovrascrivere gli oggetti!'
+  failedInventory: '%prefix% &cImpossibile darti &4%fail_count% &coggetti, il tuo inventario è pieno!'
+  econSuccess: '%prefix% &aComando eseguito con successo per &e$%cost%&a.'
+  econFailed: '%prefix% &cNon hai abbastanza per eseguire questo comando! \n%prefix% &cHai &4$%balance% &cdel richiesto &4$%cost%.'
+  itemSuccess: '%prefix% &aComando eseguito con successo per &e%cost% %item_type%(s)&a.'
+  itemFailed: '%prefix% &cNon hai abbastanza &4%item_type%&c per eseguire questo comando! \n%prefix% &cHai &4%balance% &cdel richiesto &4%cost% %item_type%&c.'
+  warmingUp: '%prefix% &aL''articolo [%item%&a] si sta scaldando...'
+  warmingTime: '%prefix% &aInizio esecuzione [%item%&a] in &2%time_left%&a secondi.'
+  warmingHalted: '%prefix% &cInizio dell''esecuzione di &4[&c%item%&4] &cannullato!'
+
+# Questi messaggi sono specifici dei comandi del plugin.
+commands:
+  default:
+    unknownCommand: '%prefix% &cComando sconosciuto, Vedi &l/ItemJoin help &cper un elenco di comandi.'
+    noPermission: '%prefix% &cNon hai il permesso di usare quel comando!'
+    configReload: '%prefix% &aConfigurazione(i) Ricaricate!'
+    noPlayer: '%prefix% &cDevi essere un giocatore per eseguire quel comando!'
+    noTarget: '%prefix% &cIl giocatore &c%target_player% &cnon è stato trovato!'
+  menu:
+    openMenu: '%prefix% &aMenu è stato aperto.'
+    itemSaved: '%prefix% &e%item% &aè stato salvato con successo.'
+    itemRemoved: '%prefix% &e%item% &cè stato rimosso con successo.'
+    noInteger: '%prefix% &c&l&nERRORE:&c Il valore inserito &4%input% &cnon è un valore intero!'
+    noMaterial: '%prefix% &c&l&nERRORE:&c Il valore inserito &4%input% &cnon è un materiale appropriato!'
+    inputType: '%prefix% &aDigita il &e%input% &ache vuoi avere sul tuo oggetto.'
+    inputSet: '%prefix% &aGli oggetti &e%input% &asono stati impostati con successo!'
+    inputExample: '%prefix% &aEsempio: %input_example%'
+  item:
+    noItemHeld: '%prefix% &cNon stai tenendo un oggetto in mano!'
+    noItem: '%prefix% &cL''oggetto &b%item% &cnon esiste!'
+    badCommand: '%prefix% &cNon ti è permesso usare il comando &4&l%command%&c su quell''oggetto!'
+  info:
+    material: '&aID dell''oggetto (Tipo di Materiale): &e&l%item%'
+    data: '&aDATA dell''oggetto (Tipo di Dati): &e&l%item%'
+  query:
+    node: '&aNodo: &e&l%item%'
+    material: '&aMateriale: &e&l%item_type%'
+    slot: '&aSlot: &e&l%item_slot%'
+    permission: '&aPermesso: %item_permission%'
+    badSyntax: '%prefix% &cUso scorretto! Sintassi: /itemjoin query <nome dell''oggetto>!'
+  list:
+    worldHeader: '&a&l%world%:'
+    itemRow: '&a&l   &a%item%'
+    noItems: '&c&l   &cNessun oggetto è definito per questo mondo.'
+  world:
+    worldFound: '&aTrovato il/le mondo/i:'
+    worldHeader: '&aTi trovi nel mondo:'
+    worldRow: '&e- %world%'
+  updates:
+    checkRequest: '%prefix% &4%player% ha richiesto di controllare gli aggiornamenti!'
+    updateRequest: '%prefix% &4%player% ha richiesto di forzare l''aggiornamento del plugin!'
+  get:
+    givenYou: '%prefix% &aTi è stato dato &b%amount%x &7[&e%item%&7]&a.'
+    givenYou_All: '%prefix% &aTi sono stati dati &btutti gli oggetti&a.'
+    givenTarget: '%prefix% &aHai dato a %target_player% &b%amount%x &7[&e%item%&7]&a.'
+    givenTarget_All: '%prefix% &aHai dato a %target_player% &btutti gli oggetti&a.'
+    givenOnline: '%prefix% &aHai dato l''oggetto &b%amount%x &7[&b%item%&7]&a ai giocatori &e%players%&c.'
+    targetTriedGive: '%prefix% &4%target_player% &cha provato a darti &7[&b%item%&7]&c ma esiste già nel tuo inventario!'
+    targetTriedGive_All: '%prefix% &4%target_player% &cha provato a darti &btutti gli oggetti &cma esistono già nel tuo inventario!'
+    failedInventory: '%prefix% &cHai già l''oggetto &7[&b%item%&7]&c!'
+    failedInventory_All: '%prefix% &cHai già &btutti gli oggetti&c!'
+    targetFailedInventory: '%prefix% &4%target_player% &cha già l''oggetto &7[&b%item%&7]&c!'
+    targetFailedInventory_All: '%prefix% &4%target_player% &cha già &btutti gli oggetti&c!'
+    onlineFailedInventory: '%prefix% &4Tutti i giocatori online &channo già l''oggetto &7[&b%item%&7]&c!'
+    targetNoPermission: '%prefix% &4%target_player% &cnon soddisfa i permessi per ricevere l''oggetto &7[&b%item%&7]&c.'
+    targetNoPermission_All: '%prefix% &4%target_player% &cmancavano i permessi per un oggetto, quindi &lnon sono stati forniti &loggetti &cpalla.'
+    noPermission: '%prefix% &cNon soddisfi i requisiti di autorizzazione per ricevere l''articolo &7[&b%item%&7]&c.'
+    noPermission_All: '%prefix% &cMancavano le autorizzazioni per un elemento, quindi &bnon sono stati concessi tutti gli elementi.'
+    usageSyntax: '%prefix% &cDovresti usare /ItemJoin get <nomeoggetto> <giocatore> come consolle.'
+    badSyntax: '%prefix% &cUtilizzo errato! Sintassi: /itemjoin get <nomeelemento> &lO &c/itemjoin get <nomeelemento> <importo>!'
+    badOnlineSyntax: '%prefix% &cUtilizzo errato! Sintassi: /itemjoin getOnline <nomeelemento> &lO &c/itemjoin getOnline <nomeelemento> <importo>!'
+  remove:
+    removedYou: '%prefix% &b%amount%x &7[&e%item%&7]&c è stato rimosso dal tuo inventario.'
+    removedYou_All: '%prefix% &bTutti gli articoli &asono stati rimossi dal tuo inventario.'
+    removedTarget: '%prefix% &cHai rimosso &b%amount%x &7[&e%item%&7]&c da &4%target_player%&c.'
+    removedTarget_All: '%prefix% &aHai rimosso &boggetti palla &ada &b%target_player%&a.'
+    removedOnline: '%prefix% &cHai rimosso l''oggetto &b%amount%x &7[&b%item%&7]&c dai giocatori &4%players%&c.'
+    targetTriedRemoval: '%prefix% &4%target_player% &ct ha provato a rimuovere &7[&b%item%&7]&c ma non esiste nel tuo inventario!'
+    targetTriedRemoval_All: '%prefix% &4%target_player% &ctho provato a rimuovere &boggetti palla &cma non ne hai nessuno nel tuo inventario!'
+    failedInventory: '%prefix% &cL''articolo &7[&e%item%&7] &cnon esiste nel tuo inventario!'
+    failedInventory_All: '%prefix% &cNessun &boggetto definito &cesiste nel tuo inventario!'
+    targetFailedInventory: '%prefix% &cL''oggetto &7[&e%item%&7] &cnon esiste in &4%target_player% &cinventory!'
+    targetFailedInventory_All: '%prefix% &bNessun elemento definito &cesiste nel &4%target_player% &cinventory!'
+    onlineFailedInventory: '%prefix% &cL''oggetto &b%item% &cnon esiste in nessuno degli &cininventari dei &4giocatori online.'
+    usageSyntax: '%prefix% &cDovresti usare /itemjoin remove <nomeoggetto> <giocatore> come consolle.'
+    badSyntax: '%prefix% &cUtilizzo errato! Sintassi: /itemjoin remove <nomeelemento>!'
+    badOnlineSyntax: '%prefix% &cUtilizzo errato! Sintassi: /itemjoin removeOnline <nomeelemento>!'
+  database:
+    purgeWarn: '%prefix% &aL''eliminazione del database eliminerà &cALL &a%purge_data% dati per &b%target_player%&a.'
+    purgeSuccess: '%prefix% &aHai eliminato il file del database dai dati %purge_data% per &b%target_player%&a!'
+    purgeConfirm: '%prefix% &aHai 5 secondi per digitare &e%command% &aancora per confermare che desideri eliminare il database.'
+    purgeTimeOut: '%prefix% &cNon hai confermato l''eliminazione del database entro &b5 secondi&c, l''eliminazione è stata annullata!'
+  enabled:
+    forPlayer: '%prefix% &aHai &eabilitato gli &oggetti palla &aper &e%target_player%&a.'
+    forTarget: '%prefix% &a%player% ha &eabilitato gli &boggetti palla &aper te.'
+    forPlayerFailed: '%prefix% &cGli elementi sono già stati &eabilitati &cper &e%player%&c.'
+    forPlayerWorld: '%prefix% &aHai &eabilitato &7[&e%world%&7] elementi &aper &e%player%&a.'
+    forTargetWorld: '%prefix% &a%player% ha &eabilitato &7[&e%world%&7] elementi per te.'
+    forPlayerWorldFailed: '%prefix% &cHai già &eabilitato &7[&e%world%&7] elementi &cper &e%player%&c.'
+    globalPlayers: '%prefix% &aHai &eabilitato gli &boggetti palla &aper &etutti i giocatori&a.'
+    globalPlayersFailed: '%prefix% &cGli elementi sono già stati &eabilitati &cper &etutti i giocatori&c.'
+    togglePlayerFailed: '%prefix% &cNon puoi abilitare l''elemento %item% poiché tutti gli elementi sono disabilitati per te a livello globale!'
+  disabled:
+    forPlayer: '%prefix% &aHai &edisabilitato gli &boggetti palla &aper &e%player%&a.'
+    forTarget: '%prefix% &a%player% ha &edisabilitato gli &boggetti palla &aper te.'
+    forPlayerFailed: '%prefix% &cGli elementi sono già stati &edisabilitati &cper &e%player%&c.'
+    forPlayerWorld: '%prefix% &aHai &edisattivato &7[&e%world%&7] elementi &aper &e%player%&a.'
+    forTargetWorld: '%prefix% &a%player% ha &eabilitato &7[&e%world%&7] elementi per te.'
+    forPlayerWorldFailed: '%prefix% &cHai già &disabilitato &7[&e%world%&7] elementi &cper &e%player%&c.'
+    globalPlayers: '%prefix% &aHai &disabilitato &boggetti palla &aper &etutti i giocatori&a.'
+    globalPlayersFailed: '%prefix% &cGli elementi sono già stati &edisabilitati &cper &etutti i giocatori&c.'
+    togglePlayerFailed: '%prefix% &cNon puoi disabilitare l''elemento %item% poiché tutti gli elementi sono disabilitati per te a livello globale!'
+
+# Questi segnaposto sono specifici dei messaggi del plugin.
+placeholders:
+  PLAYER_INTERACT: 'Sconosciuto'
