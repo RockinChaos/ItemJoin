@@ -3771,13 +3771,13 @@ public class ItemMap implements Cloneable {
      */
     private void setSkull(final Player player) {
         if (this.skullOwner != null) {
-            this.tempMeta = ItemHandler.setSkullOwner(this.tempMeta, StringUtils.translateLayout(this.skullOwner, player));
+            this.tempMeta = ItemHandler.setSkullOwner(this.tempMeta, player.getUniqueId(), StringUtils.translateLayout(this.skullOwner, player));
         } else if (this.skullTexture != null && !this.headDatabase) {
             try {
                 if (ServerUtils.hasSpecificUpdate("1_8")) {
                     final UUID uuid = UUID.randomUUID();
                     GameProfile gameProfile = new GameProfile(uuid, uuid.toString().replaceAll("_", "").replaceAll("-", ""));
-                    gameProfile.getProperties().put("textures", new Property("textures", ((this.skullOwner != null && ItemJoin.getCore().getDependencies().skinsRestorerEnabled()) ? ItemJoin.getCore().getDependencies().getSkinValue(StringUtils.translateLayout(this.skullOwner, player)) : StringUtils.toTextureUUID(player, this.configName, this.skullTexture))));
+                    gameProfile.getProperties().put("textures", new Property("textures", ((this.skullOwner != null && ItemJoin.getCore().getDependencies().skinsRestorerEnabled()) ? ItemJoin.getCore().getDependencies().getSkinValue(player.getUniqueId(), StringUtils.translateLayout(this.skullOwner, player)) : StringUtils.toTextureUUID(player, this.configName, this.skullTexture))));
                     Field declaredField = this.tempMeta.getClass().getDeclaredField("profile");
                     declaredField.setAccessible(true);
                     declaredField.set(this.tempMeta, gameProfile);
