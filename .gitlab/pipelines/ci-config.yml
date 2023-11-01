@@ -7,7 +7,7 @@ compile-deploy:
   stage: Build
   script:
     - 'mvn deploy -s .gitlab/pipelines/ci-settings.xml'
-    - 'mv target/*-b${CI_PIPELINE_ID}.jar ./'
+    - 'mv target/*-b${CI_PIPELINE_IID}.jar ./'
     - 'rm -rf ./target'
   cache:
     key: ${CI_COMMIT_REF_SLUG}
