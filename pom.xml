@@ -150,6 +150,11 @@
 			<id>CraftationGaming</id>
             <url>https://labs.craftationgaming.com/api/v4/projects/3/packages/maven</url>
 		</repository>
+		<!--CraftationGaming-Old (ChestSortAPI) Repository-->
+		<repository>
+			<id>CraftationGaming</id>
+			<url>https://raw.githubusercontent.com/RockinChaos/repository/maven-public/</url>
+		</repository>
 	</repositories>
 	
 	<dependencies>
