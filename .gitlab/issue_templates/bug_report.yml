@@ -1,0 +1,77 @@
+name: Bug Report
+description: Unwanted behavior that was not intended or expected.
+labels: ["Bug"]
+assignees: RockinChaos
+body:
+  - type: input
+    attributes:
+      label: Server Version
+      description: Version and type of server software where the resource is installed.
+      placeholder: PaperSpigot 1.19.3
+    validations:
+      required: true
+
+  - type: input
+    attributes:
+      label: Resource Version
+      description: Full version in numbers, "latest" is not a version.
+      placeholder: ItemJoin v6.0.0-b714-RELEASE
+    validations:
+      required: true
+
+  - type: input
+    attributes:
+      label: Dump Information
+      description: The URL of `/itemjoin dump`, type this command in-game or console.
+      placeholder: https://pastebin.com/NCBiLsjd
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Describe The Bug
+      description: A clear and concise description of what you see.
+      placeholder: After joining the server I see a bunch of red text appear in the console window.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Expected Behavior
+      description: A clear and concise description of what you expected to happen.
+      placeholder: There shouldn't be any red text in the console window.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Steps To Reproduce
+      description: What to do in order to reproduce this issue.
+      placeholder: |
+        1. Go to '...'
+        2. Click on '....'
+        3. Scroll down to '....'
+        4. See the error.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Additional Info
+      description: Any other info you want to provide, such as screenshots (highly recommended).
+    validations:
+      required: false
+
+  - type: checkboxes
+    attributes:
+      label: Checklist
+      description: Let's make sure this report is valid.
+      options:
+        - label: I am running latest version of this resource.
+          required: true
+        - label: I have read the wiki to make sure it's not an issue with configuration.
+          required: true
+        - label: I ticked all of these boxes without actually reading them.
+          required: false
+        - label: I have checked that my bug report is unique and a previous report does not exist.
+          required: true
