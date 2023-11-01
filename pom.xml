@@ -152,7 +152,7 @@
 		</repository>
 		<!--CraftationGaming-Old (ChestSortAPI) Repository-->
 		<repository>
-			<id>CraftationGaming</id>
+			<id>CraftationGaming-Old</id>
 			<url>https://raw.githubusercontent.com/RockinChaos/repository/maven-public/</url>
 		</repository>
 	</repositories>
