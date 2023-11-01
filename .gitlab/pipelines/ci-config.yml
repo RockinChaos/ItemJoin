@@ -17,7 +17,7 @@ compile-deploy:
     MAVEN_OPTS: '-Dmaven.repo.local=${CI_PROJECT_DIR}/.m2/repository'
   artifacts:
     paths:
-      - './*-b${CI_PIPELINE_ID}.jar'
+      - './*-b${CI_PIPELINE_IID}.jar'
   rules:
     - if: $CI_COMMIT_MESSAGE =~ /\[DEPLOY]/
     - if: $CI_PIPELINE_SOURCE == "web"
