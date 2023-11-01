@@ -1,5 +1,5 @@
 main: me.RockinChaos.itemjoin.ItemJoin
-version: ${project.version}-b${env.BUILD_NUMBER}
+version: ${project.version}-b${CI_PIPELINE_IID}
 name: ItemJoin
 author: RockinChaos
 load: STARTUP
