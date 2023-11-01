@@ -19,6 +19,6 @@ compile-deploy:
     paths:
       - './*-b${CI_PIPELINE_IID}.jar'
   rules:
-    - if: $CI_COMMIT_MESSAGE =~ /\[DEPLOY]/
+    - if: $CI_COMMIT_MESSAGE =~ /\DEPLOY/
     - if: $CI_PIPELINE_SOURCE == "web"
-    - if: $CI_PIPELINE_SOURCE == "trigger"
+    - if: $CI_PIPELINE_SOURCE == "api"
