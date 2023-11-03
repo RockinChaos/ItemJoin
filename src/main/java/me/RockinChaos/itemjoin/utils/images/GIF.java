@@ -25,9 +25,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class GIF {
@@ -41,8 +39,7 @@ public class GIF {
      */
     public GIF(String image) {
         GIFDecoder decoder = new GIFDecoder(ItemJoin.getCore().getPlugin().getDataFolder(), image);
-        List<Frame> frames = IntStream.range(0, decoder.getFrameCount()).mapToObj((i) -> new Frame(decoder.getFrame(i), decoder.getDelay(i))).collect(Collectors.toList());
-        this.frames = Collections.unmodifiableList(frames);
+        this.frames = IntStream.range(0, decoder.getFrameCount()).mapToObj((i) -> new Frame(decoder.getFrame(i), decoder.getDelay(i))).toList();
     }
 
     /**

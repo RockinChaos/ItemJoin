@@ -1096,8 +1096,7 @@ public class ItemUtilities {
         boolean itemRecipes = false;
         while (recipes.hasNext()) {
             final Recipe nextRecipe = recipes.next();
-            if (nextRecipe instanceof ShapedRecipe) {
-                final ShapedRecipe recipe = (ShapedRecipe) nextRecipe;
+            if (nextRecipe instanceof ShapedRecipe recipe) {
                 final ItemStack result = recipe.getResult();
                 boolean backupItem = true;
                 for (final ItemMap itemMap : this.getItems()) {
