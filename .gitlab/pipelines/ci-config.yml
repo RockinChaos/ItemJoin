@@ -1,10 +1,10 @@
 image: maven:latest
 
 stages:
-  - Build
+  - Compile and Deploy
 
-compile-deploy:
-  stage: Build
+build:
+  stage: Compile and Deploy
   script:
     - 'mvn deploy -s .gitlab/pipelines/ci-settings.xml'
     - 'mv target/*-b${CI_PIPELINE_IID}.jar ./'
