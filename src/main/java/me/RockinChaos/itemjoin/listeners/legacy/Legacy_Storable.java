@@ -34,6 +34,7 @@ import org.bukkit.inventory.ItemStack;
  *
  * @deprecated This is a LEGACY listener, only use on Minecraft versions below 1.8.
  */
+@Deprecated
 @SuppressWarnings("DeprecatedIsStillUsed")
 public class Legacy_Storable implements Listener {
 
@@ -43,6 +44,7 @@ public class Legacy_Storable implements Listener {
      * @param event - InventoryClickEvent
      * @deprecated This is a LEGACY event, only use on Minecraft versions below 1.8.
      */
+    @Deprecated
     @EventHandler(ignoreCancelled = true)
     private void onInventoryStore(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
@@ -80,6 +82,7 @@ public class Legacy_Storable implements Listener {
      * @param event - InventoryDragEvent
      * @deprecated This is a LEGACY event, only use on Minecraft versions below 1.8.
      */
+    @Deprecated
     @EventHandler(ignoreCancelled = true)
     private void onInventoryDragToStore(InventoryDragEvent event) {
         Player player = (Player) event.getWhoClicked();
@@ -110,6 +113,7 @@ public class Legacy_Storable implements Listener {
      * @param event - PlayerInteractEntityEvent
      * @deprecated This is a LEGACY event, only use on Minecraft versions below 1.8.
      */
+    @Deprecated
     @EventHandler(ignoreCancelled = true)
     private void onInteractEntity(PlayerInteractEntityEvent event) {
         if (event.getRightClicked().getType().name().equalsIgnoreCase("ITEM_FRAME")) {

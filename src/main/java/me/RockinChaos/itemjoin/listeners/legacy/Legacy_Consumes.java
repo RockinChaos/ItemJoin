@@ -39,6 +39,7 @@ import java.util.Objects;
  *
  * @deprecated This is a LEGACY listener, only use on Minecraft versions below 1.11.
  */
+@Deprecated
 @SuppressWarnings("DeprecatedIsStillUsed")
 public class Legacy_Consumes implements Listener {
 
@@ -48,6 +49,7 @@ public class Legacy_Consumes implements Listener {
      * @param event - PlayerItemConsumeEvent.
      * @deprecated This is a LEGACY event, only use on Minecraft versions below 1.11.
      */
+    @Deprecated
     @EventHandler(ignoreCancelled = true)
     private void onConsumeEffects(PlayerItemConsumeEvent event) {
         ItemStack item = event.getItem();
@@ -85,6 +87,7 @@ public class Legacy_Consumes implements Listener {
      * @param event - PlayerInteractEvent.
      * @deprecated This is a LEGACY event, only use on Minecraft versions below 1.11.
      */
+    @Deprecated
     @EventHandler()
     private void onConsumeSkullEffects(PlayerInteractEvent event) {
         final ItemStack item = event.getItem();
@@ -113,6 +116,7 @@ public class Legacy_Consumes implements Listener {
      * @param event - PlayerItemConsumeEvent.
      * @deprecated This is a LEGACY event, only use on Minecraft versions below 1.11.
      */
+    @Deprecated
     @EventHandler(ignoreCancelled = true)
     private void onPlayerConsumesItem(PlayerItemConsumeEvent event) {
         ItemStack item = event.getItem().clone();

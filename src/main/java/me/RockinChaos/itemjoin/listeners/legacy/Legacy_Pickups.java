@@ -27,6 +27,7 @@ import org.bukkit.event.Listener;
  *
  * @deprecated This is a LEGACY listener, only use on Minecraft versions below 1.12.
  */
+@Deprecated
 @SuppressWarnings("DeprecatedIsStillUsed")
 public class Legacy_Pickups implements Listener {
 
@@ -36,6 +37,7 @@ public class Legacy_Pickups implements Listener {
      * @param event - PlayerPickupItemEvent
      * @deprecated This is a LEGACY event, only use on Minecraft versions below 1.12.
      */
+    @Deprecated
     @EventHandler(ignoreCancelled = true)
     private void Deprecated_onGlobalPickup(org.bukkit.event.player.PlayerPickupItemEvent event) {
         Player player = event.getPlayer();

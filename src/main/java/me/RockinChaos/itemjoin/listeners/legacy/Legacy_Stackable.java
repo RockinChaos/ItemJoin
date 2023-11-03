@@ -36,6 +36,7 @@ import java.util.Objects;
  *
  * @deprecated This is a LEGACY listener, only use on Minecraft versions below 1.12.
  */
+@Deprecated
 @SuppressWarnings("DeprecatedIsStillUsed")
 public class Legacy_Stackable implements Listener {
 
@@ -143,6 +144,7 @@ public class Legacy_Stackable implements Listener {
      * @param event - PlayerPickupItemEvent
      * @deprecated This is a LEGACY event, only use on Minecraft versions below 1.12.
      */
+    @Deprecated
     @EventHandler(ignoreCancelled = true)
     private void onPickupStackable(org.bukkit.event.player.PlayerPickupItemEvent event) {
         Player player = event.getPlayer();

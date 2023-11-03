@@ -50,6 +50,7 @@ import java.util.Set;
  *
  * @deprecated This is a LEGACY listener, only use on Minecraft versions below 1.8.
  */
+@Deprecated
 @SuppressWarnings("DeprecatedIsStillUsed")
 public class Legacy_Commands implements Listener {
 
@@ -63,6 +64,7 @@ public class Legacy_Commands implements Listener {
      * @param event - InventoryClickEvent
      * @deprecated This is a LEGACY event, only use on Minecraft versions below 1.8.
      */
+    @Deprecated
     @EventHandler()
     private void onInventory(InventoryClickEvent event) {
         final ItemStack item = event.getCurrentItem();
@@ -78,6 +80,7 @@ public class Legacy_Commands implements Listener {
      * @param event - PlayerDeathEvent.
      * @deprecated This is a LEGACY event, only use on Minecraft versions below 1.8.
      */
+    @Deprecated
     @EventHandler(priority = EventPriority.LOW)
     private void onDeath(PlayerDeathEvent event) {
         for (ItemStack item : event.getDrops()) {
@@ -91,6 +94,7 @@ public class Legacy_Commands implements Listener {
      * @param event - PlayerItemConsumeEvent.
      * @deprecated This is a LEGACY event, only use on Minecraft versions below 1.8.
      */
+    @Deprecated
     @EventHandler(priority = EventPriority.LOW)
     private void onConsume(PlayerItemConsumeEvent event) {
         final ItemStack item = event.getItem();
@@ -103,6 +107,7 @@ public class Legacy_Commands implements Listener {
      * @param event - EntityShootBowEvent.
      * @deprecated This is a LEGACY event, only use on Minecraft versions below 1.8.
      */
+    @Deprecated
     @EventHandler(priority = EventPriority.LOW)
     private void onFire(EntityShootBowEvent event) {
         if (event.getEntity() instanceof Player) {
@@ -117,6 +122,7 @@ public class Legacy_Commands implements Listener {
      * @param event - PlayerItemHeldEvent
      * @deprecated This is a LEGACY event, only use on Minecraft versions below 1.8.
      */
+    @Deprecated
     @EventHandler()
     private void onHold(PlayerItemHeldEvent event) {
         final Player player = event.getPlayer();
@@ -131,6 +137,7 @@ public class Legacy_Commands implements Listener {
      * @param event - InventoryClickEvent
      * @deprecated This is a LEGACY event, only use on Minecraft versions below 1.8.
      */
+    @Deprecated
     @EventHandler()
     private void onEquipClick(InventoryClickEvent event) {
         final Player player = (Player) event.getWhoClicked();
@@ -164,6 +171,7 @@ public class Legacy_Commands implements Listener {
      * @param event - InventoryDragEvent
      * @deprecated This is a LEGACY event, only use on Minecraft versions below 1.8.
      */
+    @Deprecated
     @EventHandler()
     private void onEquipDrag(InventoryDragEvent event) {
         final Player player = (Player) event.getWhoClicked();
@@ -184,6 +192,7 @@ public class Legacy_Commands implements Listener {
      * @param event - PlayerInteractEvent
      * @deprecated This is a LEGACY event, only use on Minecraft versions below 1.8.
      */
+    @Deprecated
     @EventHandler()
     private void onEquip(PlayerInteractEvent event) {
         final Player player = event.getPlayer();
@@ -204,6 +213,7 @@ public class Legacy_Commands implements Listener {
      * @param event - EntityDamageByEntityEvent
      * @deprecated This is a LEGACY event, only use on Minecraft versions below 1.8.
      */
+    @Deprecated
     @EventHandler()
     public void onDamage(EntityDamageByEntityEvent event) {
         final Player player = ((event.getEntity() instanceof Player) ? (Player) event.getEntity() : (event.getDamager() instanceof Player) ? (Player) event.getDamager() : null);
@@ -289,6 +299,7 @@ public class Legacy_Commands implements Listener {
      * @param event - PlayerInteractEntityEvent
      * @deprecated This is a LEGACY event, only use on Minecraft versions below 1.8.
      */
+    @Deprecated
     @EventHandler()
     private void onEntity(PlayerInteractEntityEvent event) {
         if (event.getRightClicked() instanceof org.bukkit.entity.ItemFrame) {
@@ -313,6 +324,7 @@ public class Legacy_Commands implements Listener {
      * @param event - PlayerInteractEvent
      * @deprecated This is a LEGACY event, only use on Minecraft versions below 1.8.
      */
+    @Deprecated
     @EventHandler()
     private void onInteract(PlayerInteractEvent event) {
         final Player player = event.getPlayer();
@@ -336,6 +348,7 @@ public class Legacy_Commands implements Listener {
      * @param event - PlayerAnimationEvent
      * @deprecated This is a LEGACY event, only use on Minecraft versions below 1.8.
      */
+    @Deprecated
     @EventHandler()
     private void onSwingArm(PlayerAnimationEvent event) {
         final Player player = event.getPlayer();
@@ -352,6 +365,7 @@ public class Legacy_Commands implements Listener {
      * @param event - PlayerDropItemEvent
      * @deprecated This is a LEGACY event, only use on Minecraft versions below 1.8.
      */
+    @Deprecated
     @EventHandler()
     private void onHandDrop(PlayerDropItemEvent event) {
         if (!this.isDropEvent(event.getPlayer())) {
@@ -372,6 +386,7 @@ public class Legacy_Commands implements Listener {
      * @param slot      - The slot being checked.
      * @deprecated This is a LEGACY method, only use on Minecraft versions below 1.8.
      */
+    @Deprecated
     public void handleOnDamage(final Player player, final Player altPlayer, final String slot) {
         final ItemStack item = (slot.startsWith("CR") ? player.getOpenInventory().getTopInventory().getItem(Integer.parseInt(slot.replace("CR", ""))) : player.getInventory().getItem(Integer.parseInt(slot)));
         if (item != null && item.getType() != Material.AIR && PlayerHandler.isMenuClick(player.getOpenInventory(), Action.LEFT_CLICK_AIR)) {
@@ -390,6 +405,7 @@ public class Legacy_Commands implements Listener {
      * @param slot      - the slot the item originally resided in.
      * @deprecated This is a LEGACY method, only use on Minecraft versions below 1.8.
      */
+    @Deprecated
     private void equipCommands(final Player player, final Player altPlayer, final ItemStack item, final String action, String clickType, final String slot) {
         final String[] itemType = (item.getType().name().equalsIgnoreCase("ELYTRA") ? "ELYTRA_CHESTPLATE".split("_") :
                 (ItemHandler.isSkull(item.getType()) || StringUtils.splitIgnoreCase(item.getType().name(), "HEAD", "_") ? "SKULL_HELMET".split("_") : item.getType().name().split("_")));
@@ -410,6 +426,7 @@ public class Legacy_Commands implements Listener {
      * @param slot      - the slot the item originally resided in.
      * @deprecated This is a LEGACY method, only use on Minecraft versions below 1.8.
      */
+    @Deprecated
     private void runCommands(final Player player, final Player altPlayer, final ItemStack item, final String action, final String clickType, final String slot) {
         final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item);
         if (itemMap != null && itemMap.inWorld(player.getWorld()) && itemMap.hasPermission(player, player.getWorld())) {
@@ -424,6 +441,7 @@ public class Legacy_Commands implements Listener {
      * @return If the player has dropped the item.
      * @deprecated This is a LEGACY method, only use on Minecraft versions below 1.8.
      */
+    @Deprecated
     private boolean isDropEvent(final Player player) {
         return !((this.itemDrop.get(PlayerHandler.getPlayerID(player)) == null
                 || (this.itemDrop.get(PlayerHandler.getPlayerID(player)) != null
