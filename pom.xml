@@ -1,68 +1,70 @@
 <!-- ItemJoin build file -->
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	
-	<packaging>jar</packaging>
-	<groupId>me.RockinChaos.itemjoin</groupId>
-	<artifactId>ItemJoin</artifactId>
-	<name>ItemJoin</name>
-	<description>Get custom items on join.</description>
-	<url>https://www.spigotmc.org/resources/itemjoin.12661/</url>
-	
-	<version>6.0.3-SNAPSHOT</version>
-	
-	<properties>
-		<chaoscore.version>1.0.3-SNAPSHOT</chaoscore.version>
-		<spigot.version>1.20.2-R0.1-SNAPSHOT</spigot.version>
-		
-		<authme.version>5.6.0-SNAPSHOT</authme.version>
-		<chestsort.version>11.0.0-SNAPSHOT</chestsort.version>
-		<authlib.version>1.5.21</authlib.version>
-		<worldguard.version>7.0.4-SNAPSHOT</worldguard.version>
-	
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<java.version>1.8</java.version>
-		<github.global.server>github</github.global.server>
-	</properties>
-	
-	<build>
-		<sourceDirectory>${project.basedir}</sourceDirectory>
-		
-		<resources>
-		
-			<resource>
-				<targetPath>.</targetPath>
-				<filtering>true</filtering>
-				<directory>.</directory>
-				<includes>
-					<include>*.yml</include>
-					<include>LICENSE</include>
-				</includes>
-			</resource>
-			
-			<resource>
-				<targetPath>./files</targetPath>
-				<filtering>true</filtering>
-				<directory>./files</directory>
-				<includes>
-					<include>**/*.yml</include>
-					<include>**/*.jpg</include>
-				</includes>
-			</resource>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-			<resource>
-				<targetPath>.</targetPath>
-				<filtering>true</filtering>
-				<directory>./src/main/resources</directory>
-				<includes>
-					<include>**/*.yml</include>
-				</includes>
-			</resource>
-			
-		</resources>
-		
+    <packaging>jar</packaging>
+    <groupId>me.RockinChaos.itemjoin</groupId>
+    <artifactId>ItemJoin</artifactId>
+    <name>ItemJoin</name>
+    <description>Get custom items on join.</description>
+    <url>https://www.spigotmc.org/resources/itemjoin.12661/</url>
+
+    <version>6.0.3-SNAPSHOT</version>
+
+    <properties>
+        <chaoscore.version>1.0.3-SNAPSHOT</chaoscore.version>
+        <spigot.version>1.20.2-R0.1-SNAPSHOT</spigot.version>
+
+        <authme.version>5.6.0-SNAPSHOT</authme.version>
+        <chestsort.version>11.0.0-SNAPSHOT</chestsort.version>
+        <authlib.version>1.5.21</authlib.version>
+        <worldguard.version>7.0.4-SNAPSHOT</worldguard.version>
+
+        <build.version>${CI_PIPELINE_IID}</build.version>
+
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.version>1.8</java.version>
+        <github.global.server>github</github.global.server>
+    </properties>
+
+    <build>
+        <sourceDirectory>${project.basedir}</sourceDirectory>
+
+        <resources>
+
+            <resource>
+                <targetPath>.</targetPath>
+                <filtering>true</filtering>
+                <directory>.</directory>
+                <includes>
+                    <include>*.yml</include>
+                    <include>LICENSE</include>
+                </includes>
+            </resource>
+
+            <resource>
+                <targetPath>./files</targetPath>
+                <filtering>true</filtering>
+                <directory>./files</directory>
+                <includes>
+                    <include>**/*.yml</include>
+                    <include>**/*.jpg</include>
+                </includes>
+            </resource>
+
+            <resource>
+                <targetPath>.</targetPath>
+                <filtering>true</filtering>
+                <directory>./src/main/resources</directory>
+                <includes>
+                    <include>**/*.yml</include>
+                </includes>
+            </resource>
+
+        </resources>
+
         <plugins>
 
             <plugin>
@@ -80,7 +82,7 @@
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>3.2.1</version>
                 <configuration>
-                    <finalName>ItemJoin-${project.version}-b${CI_PIPELINE_IID}</finalName>
+                    <finalName>ItemJoin-${project.version}-b${build.version}</finalName>
                 </configuration>
                 <executions>
                     <execution>
@@ -108,177 +110,177 @@
         </plugins>
 
     </build>
-	
-	<repositories>
-		<!--Spigot Repository-->
-		<repository>
-			<id>spigot-repo</id>
-			<url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
-		</repository>
-		<!--Mojang Repository-->
-		<repository>
-			<id>mojang</id>
-			<url>https://libraries.minecraft.net/</url>
-		</repository>
-		<!--AuthMe Repository-->
-		<repository>
-			<id>CodeMC</id>
-			<url>https://repo.codemc.org/repository/maven-public</url>
-		</repository>
-		<!--TokenEnchant Repository-->
-		<repository>
-			<id>teamvk-repo</id>
-			<url>https://raw.githubusercontent.com/TeamVK/maven-repository/master/release/</url>
-		</repository>
-		<!--WorldGuard Repository-->
-		<repository>
-			<id>sk89q-repo</id>
-			<url>https://maven.enginehub.org/repo/</url>
-		</repository>
-		<!--Vault Repository-->
-		<repository>
-			<id>VaultAPI</id>
-			<url>https://ci.ender.zone/plugin/repository/everything/net/milkbowl/vault/</url>
-		</repository>
-		<!--CraftationGaming Repository-->
-		<repository>
-			<id>CraftationGaming</id>
+
+    <repositories>
+        <!--Spigot Repository-->
+        <repository>
+            <id>spigot-repo</id>
+            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+        </repository>
+        <!--Mojang Repository-->
+        <repository>
+            <id>mojang</id>
+            <url>https://libraries.minecraft.net/</url>
+        </repository>
+        <!--AuthMe Repository-->
+        <repository>
+            <id>CodeMC</id>
+            <url>https://repo.codemc.org/repository/maven-public</url>
+        </repository>
+        <!--TokenEnchant Repository-->
+        <repository>
+            <id>teamvk-repo</id>
+            <url>https://raw.githubusercontent.com/TeamVK/maven-repository/master/release/</url>
+        </repository>
+        <!--WorldGuard Repository-->
+        <repository>
+            <id>sk89q-repo</id>
+            <url>https://maven.enginehub.org/repo/</url>
+        </repository>
+        <!--Vault Repository-->
+        <repository>
+            <id>VaultAPI</id>
+            <url>https://ci.ender.zone/plugin/repository/everything/net/milkbowl/vault/</url>
+        </repository>
+        <!--CraftationGaming Repository-->
+        <repository>
+            <id>CraftationGaming</id>
             <url>https://labs.craftationgaming.com/api/v4/projects/3/packages/maven</url>
-		</repository>
-		<!--CraftationGaming-Old (ChestSortAPI) Repository-->
-		<repository>
-			<id>CraftationGaming-Old</id>
-			<url>https://raw.githubusercontent.com/RockinChaos/repository/maven-public/</url>
-		</repository>
-	</repositories>
-	
-	<dependencies>
-		<!--ChaosCore Integration-->
-		<dependency>
-			<groupId>me.RockinChaos.core</groupId>
-			<artifactId>ChaosCore</artifactId>
-			<version>${chaoscore.version}</version>
-			<scope>compile</scope>
-		</dependency>
-		<!--Spigot API-->
-		<dependency>
-			<groupId>org.spigotmc</groupId>
-			<artifactId>spigot-api</artifactId>
-			<version>${spigot.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<!--AuthMe API-->
-		<dependency>
-			<groupId>fr.xephi</groupId>
-			<artifactId>authme</artifactId>
-			<version>${authme.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<!--Vault API-->
-		<dependency>
-			<groupId>net.milkbowl.vault</groupId>
-			<artifactId>VaultAPI</artifactId>
-			<version>1.7</version>
-			<scope>provided</scope>
-		</dependency>
-		<!--HeadDatabase API-->
-		<dependency>
-			<groupId>com.arcaniax</groupId>
-			<artifactId>HeadDatabase-API</artifactId>
-			<version>1.3.1</version>
-			<scope>provided</scope>
-		</dependency>
-		<!--TokenEnchant API-->
-		<dependency>
-			<groupId>com.vk2gpz.tokenenchant</groupId>
-			<artifactId>TokenEnchantAPI</artifactId>
-			<version>18.37.1</version>
-			<scope>provided</scope>
-		</dependency>
-		<!--ChestSort API-->
+        </repository>
+        <!--CraftationGaming-Old (ChestSortAPI) Repository-->
+        <repository>
+            <id>CraftationGaming-Old</id>
+            <url>https://raw.githubusercontent.com/RockinChaos/repository/maven-public/</url>
+        </repository>
+    </repositories>
+
+    <dependencies>
+        <!--ChaosCore Integration-->
+        <dependency>
+            <groupId>me.RockinChaos.core</groupId>
+            <artifactId>ChaosCore</artifactId>
+            <version>${chaoscore.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <!--Spigot API-->
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-api</artifactId>
+            <version>${spigot.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <!--AuthMe API-->
+        <dependency>
+            <groupId>fr.xephi</groupId>
+            <artifactId>authme</artifactId>
+            <version>${authme.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <!--Vault API-->
+        <dependency>
+            <groupId>net.milkbowl.vault</groupId>
+            <artifactId>VaultAPI</artifactId>
+            <version>1.7</version>
+            <scope>provided</scope>
+        </dependency>
+        <!--HeadDatabase API-->
+        <dependency>
+            <groupId>com.arcaniax</groupId>
+            <artifactId>HeadDatabase-API</artifactId>
+            <version>1.3.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <!--TokenEnchant API-->
+        <dependency>
+            <groupId>com.vk2gpz.tokenenchant</groupId>
+            <artifactId>TokenEnchantAPI</artifactId>
+            <version>18.37.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <!--ChestSort API-->
         <dependency>
             <groupId>de.jeff_media.chestsortapi</groupId>
             <artifactId>ChestSortAPI</artifactId>
             <version>${chestsort.version}</version>
-       	    <scope>provided</scope>
+            <scope>provided</scope>
         </dependency>
-		<!--WorldGuard API-->
-		<dependency>
-			<groupId>com.sk89q.worldguard</groupId>
-			<artifactId>worldguard-bukkit</artifactId>
-			<version>${worldguard.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<!--Mojang AuthLib API-->
-		<dependency>
-			<groupId>com.mojang</groupId>
-			<artifactId>authlib</artifactId>
-			<version>${authlib.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<!--Apache API-->
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>2.7</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.logging.log4j</groupId>
-			<artifactId>log4j-api</artifactId>
-			<version>2.17.1</version>
-			<scope>provided</scope>
-		</dependency>
-		<!--Netty API-->
-		<dependency>
-			<groupId>io.netty</groupId>
-			<artifactId>netty-all</artifactId>
-			<version>4.1.65.Final</version>
-			<scope>provided</scope>
-		</dependency>
-		<!--Maven WorldUtils API-->
-		<dependency>
-			<groupId>commons-lang</groupId>
-			<artifactId>commons-lang</artifactId>
-			<version>2.6</version>
-			<scope>provided</scope>
-		</dependency>
-		<!--Google API-->
-		<dependency>
-			<groupId>com.googlecode.json-simple</groupId>
-			<artifactId>json-simple</artifactId>
-			<version>1.1.1</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-			<version>32.0.0-jre</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.google.code.gson</groupId>
-			<artifactId>gson</artifactId>
-			<version>2.8.9</version>
-			<scope>provided</scope>
-		</dependency>
-	</dependencies>
-	
-	<organization>
-		<name>ItemJoin</name>
-		<url>https://github.com/RockinChaos/ItemJoin</url>
-	</organization>
-	
-	<issueManagement>
-		<url>https://github.com/RockinChaos/ItemJoin/issues</url>
-		<system>Github</system>
-	</issueManagement>
-	
+        <!--WorldGuard API-->
+        <dependency>
+            <groupId>com.sk89q.worldguard</groupId>
+            <artifactId>worldguard-bukkit</artifactId>
+            <version>${worldguard.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <!--Mojang AuthLib API-->
+        <dependency>
+            <groupId>com.mojang</groupId>
+            <artifactId>authlib</artifactId>
+            <version>${authlib.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <!--Apache API-->
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.7</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>2.17.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <!--Netty API-->
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-all</artifactId>
+            <version>4.1.65.Final</version>
+            <scope>provided</scope>
+        </dependency>
+        <!--Maven WorldUtils API-->
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.6</version>
+            <scope>provided</scope>
+        </dependency>
+        <!--Google API-->
+        <dependency>
+            <groupId>com.googlecode.json-simple</groupId>
+            <artifactId>json-simple</artifactId>
+            <version>1.1.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>32.0.0-jre</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.8.9</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+    <organization>
+        <name>ItemJoin</name>
+        <url>https://github.com/RockinChaos/ItemJoin</url>
+    </organization>
+
+    <issueManagement>
+        <url>https://github.com/RockinChaos/ItemJoin/issues</url>
+        <system>Github</system>
+    </issueManagement>
+
     <ciManagement>
         <system>GitLab</system>
         <url>https://labs.craftationgaming.com/ChaosCore/</url>
     </ciManagement>
-	
+
     <distributionManagement>
         <repository>
             <id>gitlab-maven</id>
