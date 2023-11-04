@@ -1485,10 +1485,7 @@ public class ItemMap implements Cloneable {
      * @return The Probability.
      */
     public Integer getProbability() {
-        if (this.probability != null) {
-            return this.probability;
-        }
-        return 0;
+        return Objects.requireNonNullElse(this.probability, 0);
     }
 
     /**
