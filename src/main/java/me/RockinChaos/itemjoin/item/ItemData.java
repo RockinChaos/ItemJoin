@@ -425,7 +425,6 @@ public class ItemData {
      *
      * @param silent - If any messages should be sent.
      */
-    @SuppressWarnings("ConstantValue")
     public void registerClasses(final boolean silent) {
         final boolean isRunning = ItemJoin.getCore().isStarted();
         ServerUtils.clearErrorStatements();
@@ -459,14 +458,15 @@ public class ItemData {
         ItemJoin.getCore().getDependencies().refresh();
         runAsync(() -> {
             int customItems = (ItemJoin.getCore().getConfig("items.yml").getConfigurationSection("items") != null ? Objects.requireNonNull(ItemJoin.getCore().getConfig("items.yml").getConfigurationSection("items")).getKeys(false).size() : 0);
-            final String compileVersion = "${spigot.version}";
+            final String compileVersion = "${spigot.version}".split("-")[0].replace(".", "_");
+            final String serverVersion = ServerUtils.getVersion();
             if (!silent) {
-                if (!compileVersion.equalsIgnoreCase("${spigot.version}") && ServerUtils.hasPreciseUpdate("compileVersion".split("-")[0].replace(".", "_"))) {
+                if (StringUtils.containsIgnoreCase(compileVersion, "spigot_version")) {
+                    ServerUtils.logInfo("Running a developer version ... skipping NMS check.");
+                } else if (!compileVersion.equalsIgnoreCase(serverVersion) && ServerUtils.hasPreciseUpdate(compileVersion)) {
                     ServerUtils.logSevere("Detected a unsupported version of Minecraft!");
                     ServerUtils.logSevere("Attempting to run in NMS compatibility mode...");
                     ServerUtils.logSevere("Things may not work as expected, please check for plugin updates.");
-                } else if (compileVersion.equalsIgnoreCase("${spigot.version}")) {
-                    ServerUtils.logInfo("Running a developer version ... skipping NMS check.");
                 }
                 ItemJoin.getCore().getDependencies().sendUtilityDepends();
                 this.warnExploitUsers();
