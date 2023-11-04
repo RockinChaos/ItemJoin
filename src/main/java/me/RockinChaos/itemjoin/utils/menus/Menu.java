@@ -8537,7 +8537,7 @@ public class Menu {
         if (ItemHandler.isSkull(itemMap.getMaterial())) {
             ItemMeta itemMeta = item.getItemMeta();
             if (itemMap.getSkull() != null) {
-                ItemHandler.setSkullOwner(itemMeta, player.getUniqueId(), StringUtils.translateLayout(itemMap.getSkull(), player));
+                ItemHandler.setSkullOwner(itemMeta, player, StringUtils.translateLayout(itemMap.getSkull(), player));
             } else if (itemMap.getSkullTexture() != null && !itemMap.isHeadDatabase()) {
                 try {
                     if (ServerUtils.hasSpecificUpdate("1_8") && itemMeta != null) {

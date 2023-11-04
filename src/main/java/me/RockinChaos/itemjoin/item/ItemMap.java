@@ -3771,7 +3771,7 @@ public class ItemMap implements Cloneable {
      */
     private void setSkull(final Player player) {
         if (this.skullOwner != null) {
-            this.tempMeta = ItemHandler.setSkullOwner(this.tempMeta, player.getUniqueId(), StringUtils.translateLayout(this.skullOwner, player));
+            this.tempMeta = ItemHandler.setSkullOwner(this.tempMeta, player, StringUtils.translateLayout(this.skullOwner, player));
         } else if (this.skullTexture != null && !this.headDatabase) {
             try {
                 if (ServerUtils.hasSpecificUpdate("1_8")) {

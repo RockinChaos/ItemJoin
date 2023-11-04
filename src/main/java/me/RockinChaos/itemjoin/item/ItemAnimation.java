@@ -458,7 +458,7 @@ public class ItemAnimation {
         if (tempMeta != null && reviseItem.getType() != Material.AIR) {
             tempMeta = tempMeta.clone();
             if (ownerString != null) {
-                ItemHandler.setSkullOwner(tempMeta, player.getUniqueId(), StringUtils.translateLayout(ItemHandler.cutDelay(ownerString), player));
+                ItemHandler.setSkullOwner(tempMeta, player, StringUtils.translateLayout(ItemHandler.cutDelay(ownerString), player));
             } else if (textureString != null && !textureString.contains("hdb-") && !this.itemMap.isHeadDatabase()) {
                 try {
                     if (ServerUtils.hasSpecificUpdate("1_8")) {
