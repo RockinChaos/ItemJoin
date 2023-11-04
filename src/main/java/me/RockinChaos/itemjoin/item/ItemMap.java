@@ -4059,7 +4059,12 @@ public class ItemMap implements Cloneable {
                 MapMeta mapmeta = (MapMeta) this.tempItem.getItemMeta();
                 try {
                    if (mapmeta != null) {
-                       mapmeta.setMapView(this.mapView);
+                       try {
+                           mapmeta.setMapView(this.mapView);
+                       } catch (NullPointerException e) {
+                           ServerUtils.sendDebugTrace(e);
+                           ServerUtils.logWarn("{ItemMap} There was an issue rendering the custom map image for " + this.configName + ".");
+                       }
                    }
                 } catch (NoSuchMethodError e) {
                     LegacyAPI.setMapID(mapmeta, this.mapId);
