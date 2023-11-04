@@ -9,10 +9,6 @@ build:
     - 'mvn deploy -s .gitlab/pipelines/ci-settings.xml'
     - 'mv target/*-b${CI_PIPELINE_IID}.jar ./'
     - 'rm -rf ./target'
-  cache:
-    key: ${CI_COMMIT_REF_SLUG}
-    paths:
-      - '.m2/repository'
   variables:
     MAVEN_OPTS: '-Dmaven.repo.local=${CI_PROJECT_DIR}/.m2/repository'
   artifacts:
