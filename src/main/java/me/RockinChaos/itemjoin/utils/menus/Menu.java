@@ -5149,7 +5149,7 @@ public class Menu {
                 triggerPane(player, itemMap);
             }));
             triggerPane.addButton(new Button(fillerPaneBItem));
-            triggerPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "HOPPER_MINECART" : "408"), 1, itemMap.isGiveOnRegionLeave(), false, "&e&l&nRegion Leave", "&7", "&7*Removes the item when the", "&7player leaves any of the enabled-regions.", "&9&lENABLED: &a" +
+            triggerPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "HOPPER_MINECART" : "408"), 1, itemMap.isGiveOnRegionLeave(), false, "&e&l&nRegion Leave", "&7", "&7*Gives the item when the", "&7player leaves any of the enabled-regions.", "&9&lENABLED: &a" +
                     (itemMap.isGiveOnRegionLeave() + "").toUpperCase()), event -> {
                 if (itemMap.isGiveOnRegionLeave()) {
                     itemMap.setGiveOnRegionLeave(false);
