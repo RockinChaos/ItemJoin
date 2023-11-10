@@ -292,7 +292,7 @@ public class ItemUtilities {
             } else if (((type.equals(TriggerType.LIMIT_SWITCH) && item.isUseOnLimitSwitch() && !item.isLimitMode(gameMode)) || (((type.equals(TriggerType.REGION_LEAVE) && (item.isGiveOnRegionAccess()
                     && item.inRegion(targetRegion) && !item.inRegion(regions))) || (type.equals(TriggerType.REGION_ENTER) && (item.isGiveOnRegionEgress() && item.inRegion(targetRegion) && item.inRegion(regions)))))) && item.hasItem(player, false)) {
                 item.removeFrom(player);
-            } else if (item.isAutoRemove() && (!item.inWorld(world) || !item.isLimitMode(gameMode)) && item.hasItem(player, true)) {
+            } else if (item.isAutoRemove() && (!item.inWorld(world) || !item.isLimitMode(gameMode) || ((type.equals(TriggerType.REGION_ENTER) || type.equals(TriggerType.REGION_LEAVE)) && ((item.isGiveOnRegionLeave() && item.inRegion(targetRegion) && item.inRegion(regions)) || (item.isGiveOnRegionEnter() && item.inRegion(targetRegion) && !item.inRegion(regions))))) && item.hasItem(player, true)) {
                 item.removeFrom(player);
             }
         }
