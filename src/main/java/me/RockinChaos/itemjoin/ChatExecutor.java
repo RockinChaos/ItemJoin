@@ -47,10 +47,7 @@ import org.bukkit.inventory.ItemStack;
 import javax.annotation.Nonnull;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class ChatExecutor implements CommandExecutor {
 
@@ -660,8 +657,19 @@ public class ChatExecutor implements CommandExecutor {
             ItemJoin.getCore().getLang().sendLangMessage("commands.item.noItem", sender, placeHolders);
             return;
         }
+        final Map<String, Integer> arbitraryMap = new HashMap<>();
         for (ItemMap itemMap : ItemUtilities.getUtilities().getItems()) {
-            if (itemMap.getConfigName().equalsIgnoreCase(args[1]) && argsPlayer != null) {
+            if (itemMap.getConfigName().equalsIgnoreCase(args[1]) && (!arbitraryMap.containsKey(itemMap.getConfigName()) || arbitraryMap.get(itemMap.getConfigName()) != 0) && argsPlayer != null) {
+                if (itemMap.getSlot().equalsIgnoreCase("ARBITRARY") && !arbitraryMap.containsKey(itemMap.getConfigName())) {
+                    int arbitrary = ItemUtilities.getUtilities().getArbitrary(itemMap);
+                    int count = 0;
+                    for (ItemStack inPlayerInventory : argsPlayer.getInventory().getContents()) {
+                        if (itemMap.isSimilar(argsPlayer, inPlayerInventory)) {
+                            count++;
+                        }
+                    }
+                    arbitraryMap.put(itemMap.getConfigName(), (arbitrary - count));
+                }
                 String customName = StringUtils.translateLayout(itemMap.getCustomName(), argsPlayer);
                 placeHolders[3] = customName;
                 if ((remove && itemMap.hasItem(argsPlayer, true)) || (!remove && (itemMap.conditionMet(argsPlayer, "trigger-conditions", true, false) && (ItemUtilities.getUtilities().canOverwrite(argsPlayer, itemMap) && (amount != 0 || itemMap.isAlwaysGive() || !itemMap.hasItem(argsPlayer, false)))))) {
@@ -676,6 +684,10 @@ public class ChatExecutor implements CommandExecutor {
                             itemMap.removeFrom(argsPlayer, amount);
                         } else {
                             itemMap.giveTo(argsPlayer, amount);
+                            if (arbitraryMap.containsKey(itemMap.getConfigName())) {
+                                final int arbitraryCount = arbitraryMap.get(itemMap.getConfigName()) - 1;
+                                arbitraryMap.put(itemMap.getConfigName(), arbitraryCount);
+                            }
                         }
                         placeHolders[11] = Integer.toString((amount == 0 ? 1 : amount));
                         placeHolders[1] = sender.getName();
@@ -800,14 +812,29 @@ public class ChatExecutor implements CommandExecutor {
         if (probable == null) {
             probable = (ItemMap) ItemJoin.getCore().getChances().getRandom(argsPlayer);
         }
+        final Map<String, Integer> arbitraryMap = new HashMap<>();
         for (ItemMap itemMap : ItemUtilities.getUtilities().getItems()) {
-            if (remove || itemMap.inWorld(argsPlayer.getWorld()) && (probable != null && itemMap.getConfigName().equals(probable.getConfigName()) || itemMap.getProbability() == -1) && ItemUtilities.getUtilities().canOverwrite(argsPlayer, itemMap) && (!PermissionsHandler.permissionEnabled("Permissions.Commands-Get") || itemMap.hasPermission(argsPlayer, argsPlayer.getWorld()) && PermissionsHandler.permissionEnabled("Permissions.Commands-Get"))) {
+            if ((!arbitraryMap.containsKey(itemMap.getConfigName()) || arbitraryMap.get(itemMap.getConfigName()) != 0) && (remove || itemMap.inWorld(argsPlayer.getWorld()) && (probable != null && itemMap.getConfigName().equals(probable.getConfigName()) || itemMap.getProbability() == -1) && ItemUtilities.getUtilities().canOverwrite(argsPlayer, itemMap) && (!PermissionsHandler.permissionEnabled("Permissions.Commands-Get") || itemMap.hasPermission(argsPlayer, argsPlayer.getWorld()) && PermissionsHandler.permissionEnabled("Permissions.Commands-Get")))) {
+                if (itemMap.getSlot().equalsIgnoreCase("ARBITRARY") && !arbitraryMap.containsKey(itemMap.getConfigName())) {
+                    int arbitrary = ItemUtilities.getUtilities().getArbitrary(itemMap);
+                    int count = 0;
+                    for (ItemStack inPlayerInventory : argsPlayer.getInventory().getContents()) {
+                        if (itemMap.isSimilar(argsPlayer, inPlayerInventory)) {
+                            count++;
+                        }
+                    }
+                    arbitraryMap.put(itemMap.getConfigName(), (arbitrary - count));
+                }
                 if ((remove && itemMap.hasItem(argsPlayer, true)) || ((!remove && !itemMap.hasItem(argsPlayer, false)) || (!remove && itemMap.isAlwaysGive()))) {
                     if (remove || itemMap.conditionMet(argsPlayer, "trigger-conditions", true, false)) {
                         if (remove) {
                             itemMap.removeFrom(argsPlayer);
                         } else {
                             itemMap.giveTo(argsPlayer);
+                            if (arbitraryMap.containsKey(itemMap.getConfigName())) {
+                                final int arbitraryCount = arbitraryMap.get(itemMap.getConfigName()) - 1;
+                                arbitraryMap.put(itemMap.getConfigName(), arbitraryCount);
+                            }
                         }
                         if (!itemGiven) {
                             itemGiven = true;

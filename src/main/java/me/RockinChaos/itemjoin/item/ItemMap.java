@@ -3889,9 +3889,18 @@ public class ItemMap implements Cloneable {
      * @return If the Player already has the ItemMap.
      */
     public boolean hasItem(final Player player, boolean ignoreCount) {
+        int arbitrary = ItemUtilities.getUtilities().getArbitrary(this);
+        int count = 0;
         for (ItemStack inPlayerInventory : player.getInventory().getContents()) {
             if (this.isSimilar(player, inPlayerInventory) && (ignoreCount || this.isCountSimilar(player, inPlayerInventory))) {
-                return true;
+                if (this.getSlot().equalsIgnoreCase("ARBITRARY")) {
+                    count++;
+                    if (arbitrary == count) {
+                        return true;
+                    }
+                } else {
+                    return true;
+                }
             }
         }
         for (ItemStack equipInventory : Objects.requireNonNull(player.getEquipment()).getArmorContents()) {

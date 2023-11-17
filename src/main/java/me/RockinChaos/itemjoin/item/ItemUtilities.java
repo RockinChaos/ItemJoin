@@ -1170,6 +1170,25 @@ public class ItemUtilities {
     }
 
     /**
+     * Gets the current Arbitrary slots for the ItemMap.
+     *
+     * @param itemMap The itemMap having its arbitrary slots counted.
+     * @return The number of arbitrary slots for the ItemMap.
+     */
+    public int getArbitrary(final ItemMap itemMap) {
+        if (itemMap.getSlot().equalsIgnoreCase("ARBITRARY")) {
+            int arbitraryCount = 0;
+            for (ItemMap item : this.items) {
+                if (item.getSlot().equalsIgnoreCase("ARBITRARY") && item.getConfigName().equals(itemMap.getConfigName())) {
+                    arbitraryCount++;
+                }
+            }
+            return arbitraryCount;
+        }
+        return 0;
+    }
+
+    /**
      * Gets the current crafting ItemMap List.
      *
      * @return The current crafting ItemMap list.
