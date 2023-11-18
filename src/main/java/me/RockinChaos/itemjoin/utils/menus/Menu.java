@@ -970,7 +970,26 @@ public class Menu {
                             || (itemMap.getCommandConditions() != null && !itemMap.getCommandConditions().isEmpty()) ? "YES" : "NONE")), event -> conditionsPane(player, itemMap)));
             creatingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "REPEATER" : "356"), 1, false, false, "&b&lToggle", "&7", "&7*Specify command(s) players can", "&7execute to enable or disable the", "&7custom item for themselves.", "&9Enabled: &a" + (itemMap.getToggleCommands() != null && !itemMap.getToggleCommands().isEmpty() ? "YES" : "NONE")), event -> togglePane(player, itemMap)));
             creatingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CRAFTING_TABLE" : "58"), 1, false, false, "&b&lRecipe", "&7", "&7*Define the recipe to be", "&7able to craft this item.", "&9Enabled: &a" + (itemMap.getIngredients() != null && !itemMap.getIngredients().isEmpty() ? "YES" : "NONE")), event -> recipePane(player, itemMap)));
-            creatingPane.addButton(new Button(fillerPaneGItem));
+            if (ServerUtils.hasSpecificUpdate("1_20") && ItemHandler.isArmor(itemMap.getMaterial().toString())) {
+                String trimPattern = "NONE";
+                if (itemMap.getTrimPattern() != null && !itemMap.getTrimPattern().isEmpty()) {
+                    final Map.Entry<String,String> entry = itemMap.getTrimPattern().entrySet().iterator().next();
+                    trimPattern = entry.getKey() + ":" + entry.getValue();
+                }
+                final String trimEnabled = trimPattern;
+                creatingPane.addButton(new Button(ItemHandler.getItem("DUNE_ARMOR_TRIM_SMITHING_TEMPLATE", 1, false, true, "&b&lTrim Pattern", "&7", "&7*Define the pattern to be", "&7set to the armor.", "&9&lArmor Meta: &a" + trimPattern), event ->
+                {
+                    if (trimEnabled.equalsIgnoreCase("NONE")) {
+                        trimPane(player, itemMap);
+                    } else {
+                        final Map<String, String> trimMap = new HashMap<>();
+                        itemMap.setTrimPattern(trimMap);
+                        creatingPane(player, itemMap);
+                    }
+                }));
+            } else {
+                creatingPane.addButton(new Button(fillerPaneGItem));
+            }
             creatingPane.addButton(new Button(ItemHandler.getItem("GOLD_INGOT", 1, false, false, "&e&lDrop Chances", "&7", "&7*Define the drop chance for receiving", "&7this item from mobs or breaking blocks."), event -> dropsPane(player, itemMap)));
             creatingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "COMMAND_BLOCK" : "137"), 1, false, false, "&c&lNBT Properties", "&7", "&7*Define specific NBT Properties", "&7to be set to the item.", "&9Enabled: &a" + (itemMap.getNBTValues() != null && !itemMap.getNBTValues().isEmpty() ? "YES" : "NONE")), event -> nbtPane(player, itemMap)));
             if (itemMap.getMaterial().toString().contains("MAP")) {
@@ -1150,7 +1169,6 @@ public class Menu {
         Interface languagePane = new Interface(false, 2, exitButton, GUIName, player);
         SchedulerUtils.runAsync(() -> {
             final String language = Objects.requireNonNull(ItemJoin.getCore().getConfig("config.yml").getString("Language")).replace(" ", "");
-            languagePane.addButton(new Button(fillerPaneBItem));
             languagePane.addButton(new Button(ItemHandler.getItem(ServerUtils.hasSpecificUpdate("1_13") ? "GRASS_BLOCK" : "2", 1, language.equalsIgnoreCase("ENGLISH"), false, "&6&l&nEnglish", "&7",
                     "&7*Sets the messages sent by", "&7the plugin to the player", "&7to be written in &c&lEnglish&7.", "&7This is the type of lang.yml file", "&7generated in the plugin folder.",
                     "&9&lENABLED: &a" + (language.equalsIgnoreCase("ENGLISH") + "").toUpperCase()), event -> {
@@ -1187,7 +1205,6 @@ public class Menu {
                     SchedulerUtils.runLater(2L, () -> languagePane(player));
                 }
             }));
-            languagePane.addButton(new Button(fillerPaneBItem));
             languagePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "STONE_BRICKS" : "98"), 1, language.equalsIgnoreCase("FRENCH"), false, "&6&l&nFrench", "&7",
                     "&7*Sets the messages sent by", "&7the plugin to the player", "&7to be written in &c&lFrench&7.", "&7This is the type of lang.yml file", "&7generated in the plugin folder.",
                     "&9&lENABLED: &a" + (language.equalsIgnoreCase("FRENCH") + "").toUpperCase()), event -> {
@@ -1224,7 +1241,42 @@ public class Menu {
                     SchedulerUtils.runLater(2L, () -> languagePane(player));
                 }
             }));
-            languagePane.addButton(new Button(fillerPaneBItem));
+            languagePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GRAVEL" : "13"), 1, language.equalsIgnoreCase("PORTUGUESE"), false, "&6&l&nPortuguese", "&7",
+                    "&7*Sets the messages sent by", "&7the plugin to the player", "&7to be written in &c&lPortuguese&7.", "&7This is the type of lang.yml file", "&7generated in the plugin folder.",
+                    "&9&lENABLED: &a" + (language.equalsIgnoreCase("PORTUGUESE") + "").toUpperCase()), event -> {
+                if (!language.equalsIgnoreCase("PORTUGUESE")) {
+                    File fileFolder = new File(ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
+                    FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
+                    dataFile.set("Language", "PORTUGUESE");
+                    ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+                    ItemData.getInfo().softReload();
+                    SchedulerUtils.runLater(2L, () -> languagePane(player));
+                }
+            }));
+            languagePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "SANDSTONE" : "24"), 1, language.equalsIgnoreCase("DUTCH"), false, "&6&l&nDutch", "&7",
+                    "&7*Sets the messages sent by", "&7the plugin to the player", "&7to be written in &c&lDutch&7.", "&7This is the type of lang.yml file", "&7generated in the plugin folder.",
+                    "&9&lENABLED: &a" + (language.equalsIgnoreCase("DUTCH") + "").toUpperCase()), event -> {
+                if (!language.equalsIgnoreCase("DUTCH")) {
+                    File fileFolder = new File(ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
+                    FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
+                    dataFile.set("Language", "DUTCH");
+                    ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+                    ItemData.getInfo().softReload();
+                    SchedulerUtils.runLater(2L, () -> languagePane(player));
+                }
+            }));
+            languagePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "SMOOTH_STONE" : "43:8"), 1, language.equalsIgnoreCase("ITALIAN"), false, "&6&l&nItalian", "&7",
+                    "&7*Sets the messages sent by", "&7the plugin to the player", "&7to be written in &c&lItalian&7.", "&7This is the type of lang.yml file", "&7generated in the plugin folder.",
+                    "&9&lENABLED: &a" + (language.equalsIgnoreCase("ITALIAN") + "").toUpperCase()), event -> {
+                if (!language.equalsIgnoreCase("ITALIAN")) {
+                    File fileFolder = new File(ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
+                    FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
+                    dataFile.set("Language", "ITALIAN");
+                    ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+                    ItemData.getInfo().softReload();
+                    SchedulerUtils.runLater(2L, () -> languagePane(player));
+                }
+            }));
             languagePane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the config settings menu."), event -> configSettings(player)));
             languagePane.addButton(new Button(fillerPaneBItem), 7);
             languagePane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the config settings menu."), event -> configSettings(player)));
@@ -5324,7 +5376,7 @@ public class Menu {
                         for (String worldString : listWorlds) {
                             worldList.append(worldString).append(", ");
                         }
-                        if (worldList.length() > 0) {
+                        if (!worldList.isEmpty()) {
                             worldList = new StringBuilder(worldList.substring(0, worldList.length() - 2));
                         }
                         File fileFolder = new File(ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
@@ -6458,9 +6510,9 @@ public class Menu {
                 blocks.append(material.name()).append(", ");
             }
             dropsPane.addButton(new Button(fillerPaneBItem), 12);
-            dropsPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "ZOMBIE_SPAWN_EGG" : "383:54"), 1, false, false, "&b&lMobs Drop", "&7", "&7*Define mobs that are", "&7allowed to drop the item.", ((mobs.length() > 0) ? "&9&lMobs: &a" + mobs.substring(0, mobs.length() - 2) : "")), event -> mobsPane(player, itemMap)));
+            dropsPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "ZOMBIE_SPAWN_EGG" : "383:54"), 1, false, false, "&b&lMobs Drop", "&7", "&7*Define mobs that are", "&7allowed to drop the item.", ((!mobs.isEmpty()) ? "&9&lMobs: &a" + mobs.substring(0, mobs.length() - 2) : "")), event -> mobsPane(player, itemMap)));
             dropsPane.addButton(new Button(fillerPaneBItem));
-            dropsPane.addButton(new Button(ItemHandler.getItem("DIAMOND_ORE", 1, false, false, "&b&lBlocks Drop", "&7", "&7*Define blocks that are", "&7allowed to drop the item.", ((blocks.length() > 0) ? "&9&lBlocks: &a" + blocks.substring(0, blocks.length() - 2) : "")), event -> blocksPane(player, itemMap)));
+            dropsPane.addButton(new Button(ItemHandler.getItem("DIAMOND_ORE", 1, false, false, "&b&lBlocks Drop", "&7", "&7*Define blocks that are", "&7allowed to drop the item.", ((!blocks.isEmpty()) ? "&9&lBlocks: &a" + blocks.substring(0, blocks.length() - 2) : "")), event -> blocksPane(player, itemMap)));
             dropsPane.addButton(new Button(fillerPaneBItem), 3);
             dropsPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> creatingPane(player, itemMap)));
             dropsPane.addButton(new Button(fillerPaneBItem), 7);
@@ -7326,6 +7378,47 @@ public class Menu {
             togglePane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> creatingPane(player, itemMap)));
         });
         togglePane.open(player);
+    }
+
+    /**
+     * Opens the Pane for the Player.
+     * This Pane is for setting n custom armor trim material.
+     *
+     * @param player  - The Player to have the Pane opened.
+     * @param itemMap - The ItemMap currently being modified.
+     */
+    private static void trimPane(final Player player, final ItemMap itemMap) {
+        Interface trimPane = new Interface(true, 3, exitButton, GUIName, player);
+        SchedulerUtils.runAsync(() -> {
+            trimPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> creatingPane(player, itemMap)));
+            for (org.bukkit.inventory.meta.trim.TrimMaterial material : Objects.requireNonNull(ItemHandler.getTrimMaterials())) {
+                trimPane.addButton(new Button(ItemHandler.getItem(ItemHandler.TrimMaterial.valueOf(material.getKey().toString().replace("minecraft:", "").toUpperCase()).getMaterial().name(), 1, false, false, "&f" + org.apache.commons.lang.StringUtils.capitalize(material.getKey().toString().replace("minecraft:", "")), "&7", "&7*Click to set this as", "&7the armor trim material."), event -> trimPatternPane(player, itemMap, material)));
+            }
+        });
+        trimPane.open(player);
+    }
+
+    /**
+     * Opens the Pane for the Player.
+     * This Pane is for setting a custom armor trim pattern.
+     *
+     * @param player  - The Player to have the Pane opened.
+     * @param itemMap - The ItemMap currently being modified.
+     */
+    private static void trimPatternPane(final Player player, final ItemMap itemMap, final org.bukkit.inventory.meta.trim.TrimMaterial material) {
+        Interface trimPatternPane = new Interface(true, 3, exitButton, GUIName, player);
+        SchedulerUtils.runAsync(() -> {
+            trimPatternPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the trim material menu."), event -> trimPane(player, itemMap)));
+            for (org.bukkit.inventory.meta.trim.TrimPattern pattern : Objects.requireNonNull(ItemHandler.getTrimPatterns())) {
+                trimPatternPane.addButton(new Button(ItemHandler.getItem(ItemHandler.TrimPattern.valueOf(pattern.getKey().toString().replace("minecraft:", "").toUpperCase()).getMaterial().name(), 1, false, false, "&f" + org.apache.commons.lang.StringUtils.capitalize(pattern.getKey().toString().replace("minecraft:", "")), "&7", "&7*Click to set this as", "&7the armor trim pattern."), event -> {
+                    final Map <String, String> trimPattern = new HashMap<>();
+                    trimPattern.put(material.getKey().toString().replace("minecraft:", "").toUpperCase(), pattern.getKey().toString().replace("minecraft:", "").toUpperCase());
+                    itemMap.setTrimPattern(trimPattern);
+                    creatingPane(player, itemMap);
+                }));
+            }
+        });
+        trimPatternPane.open(player);
     }
 
     /**
@@ -8499,8 +8592,15 @@ public class Menu {
         for (Material material : itemMap.getBlocksDrop().keySet()) {
             blocks.append(material.name()).append(", ");
         }
+        String armorMeta = "";
+        if (ServerUtils.hasSpecificUpdate("1_20") && ItemHandler.isArmor(itemMap.getMaterial().toString())) {
+            if (itemMap.getTrimPattern() != null && !itemMap.getTrimPattern().isEmpty()) {
+                final Map.Entry<String, String> entry = itemMap.getTrimPattern().entrySet().iterator().next();
+                armorMeta = entry.getKey() + ":" + entry.getValue();
+            }
+        }
         try {
-            item = ItemHandler.getItem(itemMap.getMaterial().toString() + ((itemMap.getDataValue() != null && itemMap.getDataValue() != 0) ? ":" + itemMap.getDataValue() : ""), 1, false, false, "&7*&6&l&nItem Information", "&7", "&9&lNode: &a" + itemMap.getConfigName(), "&9&lMaterial: &a"
+            item = ItemHandler.getItem(itemMap.getMaterial().toString() + ((itemMap.getDataValue() != null && itemMap.getDataValue() != 0) ? ":" + itemMap.getDataValue() : ""), 1, false, true, "&7*&6&l&nItem Information", "&7", "&9&lNode: &a" + itemMap.getConfigName(), "&9&lMaterial: &a"
                             + itemMap.getMaterial().toString() + ((itemMap.getDataValue() != null && itemMap.getDataValue() != 0) ? ":" + itemMap.getDataValue() : ""),
                     (itemMap.getMultipleSlots() != null && !itemMap.getMultipleSlots().isEmpty() ? "&9&lSlot(s): &a" + slotList : "&9&lSlot: &a" + itemMap.getSlot().toUpperCase()), (itemMap.getCount(player) != 1 && itemMap.getCount(player) != 0) ? "&9&lCount: &a" + itemMap.getCount(player) : "",
                     ((!StringUtils.nullCheck(itemMap.getCustomName()).equals("NONE") && (itemMaterial != null && !itemMaterial.equalsIgnoreCase(itemMap.getCustomName()))) ? "&9&lName: &a" + itemMap.getCustomName() : ""), (!Objects.equals(StringUtils.nullCheck(itemMap.getCustomLore().toString()), "NONE") ? "&9&lLore: &a" + (StringUtils.nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",").length() > 40 ? StringUtils.nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",").substring(0, 40) : StringUtils.nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",")) : ""),
@@ -8520,8 +8620,8 @@ public class Menu {
                     (!StringUtils.nullCheck(itemMap.getInteractCooldown() + "&7").equals("NONE") ? "&9&lUse-Cooldown: &a" + itemMap.getInteractCooldown() : ""),
                     (!StringUtils.nullCheck(itemMap.getLeatherColor()).equals("NONE") ? "&9&lLeather Color: &a" + itemMap.getLeatherColor() : ""), (!Objects.equals(StringUtils.nullCheck(itemMap.getLeatherHex()), "NONE") ? "&9&lLeather Color: &a" + itemMap.getLeatherHex() : ""),
                     (!StringUtils.nullCheck(itemMap.getMapImage()).equals("NONE") ? "&9&lMap-Image: &a" + itemMap.getMapImage() : ""), (!Objects.equals(StringUtils.nullCheck(itemMap.getChargeColor() + ""), "NONE") ? "&9&lCharge Color: &a" + itemMap.getChargeColor() : ""),
-                    (!StringUtils.nullCheck(patternList.toString()).equals("NONE") ? "&9&lBanner Meta: &a" + patternList : ""), (!Objects.equals(StringUtils.nullCheck(potionList.toString()), "NONE") ? "&9&lPotion-Effects: &a" + potionList : ""), (itemMap.getIngredients() != null && !itemMap.getIngredients().isEmpty() ? "&9&lRecipe: &aYES" : ""),
-                    ((mobs.length() > 0) ? "&9&lMobs Drop: &a" + mobs.substring(0, mobs.length() - 2) : ""), ((blocks.length() > 0) ? "&9&lBlocks Drop: &a" + blocks.substring(0, blocks.length() - 2) : ""),
+                    (!StringUtils.nullCheck(patternList.toString()).equals("NONE") ? "&9&lBanner Meta: &a" + patternList : ""), (!StringUtils.nullCheck(armorMeta).equals("NONE") ? "&9&lArmor Meta: &a" + armorMeta : ""), (!Objects.equals(StringUtils.nullCheck(potionList.toString()), "NONE") ? "&9&lPotion-Effects: &a" + potionList : ""), (itemMap.getIngredients() != null && !itemMap.getIngredients().isEmpty() ? "&9&lRecipe: &aYES" : ""),
+                    ((!mobs.isEmpty()) ? "&9&lMobs Drop: &a" + mobs.substring(0, mobs.length() - 2) : ""), ((!blocks.isEmpty()) ? "&9&lBlocks Drop: &a" + blocks.substring(0, blocks.length() - 2) : ""),
                     (!StringUtils.nullCheck(itemMap.getCommandConditions() + "").equals("NONE") ? "&9&lCommand Conditions: &aYES" : ""), (!Objects.equals(StringUtils.nullCheck(itemMap.getDisposableConditions() + ""), "NONE") ? "&9&lDisposable Conditions: &aYES" : ""),
                     (!StringUtils.nullCheck(itemMap.getTriggerConditions() + "").equals("NONE") ? "&9&lTrigger Conditions: &aYES" : ""),
                     (!StringUtils.nullCheck(itemMap.getNBTValues() + "").equals("NONE") ? "&9&lNBT Properties: &aYES" : ""), (!StringUtils.nullCheck(itemMap.getContents() + "").equals("NONE") ? "&9&lContents: &aYES" : ""),
@@ -8557,6 +8657,12 @@ public class Menu {
                 item = (sk != null ? sk : item.clone());
             }
             item.setItemMeta(itemMeta);
+        }
+        if (ServerUtils.hasSpecificUpdate("1_20") && ItemHandler.isArmor(itemMap.getMaterial().toString())) {
+            if (itemMap.getTrimPattern() != null && !itemMap.getTrimPattern().isEmpty()) {
+                final Map.Entry<String, String> entry = itemMap.getTrimPattern().entrySet().iterator().next();
+                ItemHandler.setArmorTrim(item, entry.getKey(), entry.getValue());
+            }
         }
         item.setAmount(itemMap.getCount(player));
         return item;

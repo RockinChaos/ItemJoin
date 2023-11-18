@@ -53,10 +53,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.*;
 import org.bukkit.inventory.meta.*;
 import org.bukkit.inventory.meta.BookMeta.Generation;
 import org.bukkit.map.MapView;
@@ -120,6 +117,7 @@ public class ItemMap implements Cloneable {
     private boolean headDatabase = false;
     private List<PotionEffect> effect = new ArrayList<>();
     private List<Pattern> bannerPatterns = new ArrayList<>();
+    private Map<String, String> trimPattern = new HashMap<>();
     private Map<Character, ItemRecipe> ingredients = new HashMap<>();
     private List<List<Character>> recipe = new ArrayList<>();
     private String leatherColor;
@@ -1632,6 +1630,24 @@ public class ItemMap implements Cloneable {
      */
     public void setBannerPatterns(final List<Pattern> patterns) {
         this.bannerPatterns = patterns;
+    }
+
+    /**
+     * Gets the Armor Trim Pattern.
+     *
+     * @return The Armor Trim Pattern.
+     */
+    public Map<String, String> getTrimPattern() {
+        return this.trimPattern;
+    }
+
+    /**
+     * Sets the Armor Trim Pattern.
+     *
+     * @param pattern - The Armor Trim Pattern to be set.
+     */
+    public void setTrimPattern(final Map<String, String> pattern) {
+        this.trimPattern = pattern;
     }
 
     /**
@@ -3958,6 +3974,7 @@ public class ItemMap implements Cloneable {
             this.setModelData(player);
             this.setPotionEffects();
             this.setBanners();
+            this.setArmorTrim();
             this.setFireworks();
             this.setFireChargeColor();
             this.setDye(player);
@@ -4315,6 +4332,20 @@ public class ItemMap implements Cloneable {
     }
 
     /**
+     * Sets the ItemStack Armor Trim Pattern
+     */
+    private void setArmorTrim() {
+        if (this.trimPattern != null && !this.trimPattern.isEmpty()) {
+            final Map.Entry<String,String> entry = this.trimPattern.entrySet().iterator().next();
+            final org.bukkit.inventory.meta.trim.TrimMaterial trimMaterial = ItemHandler.getTrimMaterial(entry.getKey());
+            final org.bukkit.inventory.meta.trim.TrimPattern trimPattern = ItemHandler.getTrimPattern(entry.getValue());
+            if (trimMaterial != null && trimPattern != null) {
+                ((ArmorMeta) this.tempMeta).setTrim(new org.bukkit.inventory.meta.trim.ArmorTrim(trimMaterial, trimPattern));
+            }
+        }
+    }
+
+    /**
      * Sets the itemStack FireworkMeta.
      */
     private void setFireworks() {
@@ -4417,6 +4448,9 @@ public class ItemMap implements Cloneable {
             this.tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_PLACED_ON);
             this.tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_POTION_EFFECTS);
             this.tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_UNBREAKABLE);
+            if (ServerUtils.hasSpecificUpdate("1_20")) {
+                this.tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ARMOR_TRIM);
+            }
             if (ServerUtils.hasSpecificUpdate("1_17")) {
                 this.tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_DYE);
             }
@@ -5770,7 +5804,16 @@ public class ItemMap implements Cloneable {
             itemData.set("items." + this.configName + ".itemflags", this.itemflags);
         }
         if (this.triggers != null && !this.triggers.isEmpty()) {
-            itemData.set("items." + this.configName + ".triggers", this.triggers);
+            final String defaultTriggers = ItemJoin.getCore().getConfig("config.yml").getString("Settings.Default-Triggers");
+            final StringBuilder saveTriggers = new StringBuilder();
+            for (String trigger : this.triggers.replace(" ", "").split(",")) {
+                if (defaultTriggers == null || !defaultTriggers.toUpperCase().contains(trigger.toUpperCase())) {
+                    saveTriggers.append(trigger).append(", ");
+                }
+            }
+            if (!saveTriggers.isEmpty() || saveTriggers.toString().equals(this.triggers)) {
+                itemData.set("items." + this.configName + ".triggers", this.triggers);
+            }
         }
         if (this.limitModes != null && !this.limitModes.isEmpty()) {
             itemData.set("items." + this.configName + ".limit-modes", this.limitModes);
@@ -5815,6 +5858,10 @@ public class ItemMap implements Cloneable {
                 bannerList.append(pattern.getColor().name()).append(pattern.getPattern().name()).append(", ");
             }
             itemData.set("items." + this.configName + ".banner-meta", bannerList.substring(0, bannerList.length() - 2));
+        }
+        if (this.trimPattern != null && !this.trimPattern.isEmpty()) {
+            final Map.Entry<String,String> entry = this.trimPattern.entrySet().iterator().next();
+            itemData.set("items." + this.configName + ".trim-meta", entry.getKey().toUpperCase() + ":" + entry.getValue().toUpperCase());
         }
         if (this.recipe != null && !this.recipe.isEmpty() && this.ingredients != null && !this.ingredients.isEmpty()) {
             List<String> ingredientList = new ArrayList<>();

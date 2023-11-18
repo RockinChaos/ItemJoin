@@ -104,6 +104,7 @@ public class ItemDesigner {
                             this.setPotionEffects(itemMap);
                             this.setTippedArrows(itemMap);
                             this.setBanners(itemMap);
+                            this.setTrim(itemMap);
                             this.setFireworks(itemMap);
                             this.setFireChargeColor(itemMap);
                             this.setDye(itemMap);
@@ -1157,6 +1158,32 @@ public class ItemDesigner {
                 }
             }
             itemMap.setBannerPatterns(patterns);
+        }
+    }
+
+    /**
+     * Sets the Armor Trim Pattern of the Custom Item,
+     * adding the Custom Armor Trim Pattern to the item.
+     *
+     * @param itemMap - The ItemMap being modified.
+     */
+    private void setTrim(final ItemMap itemMap) {
+        if (itemMap.getNodeLocation().getString(".trim-meta") != null && ServerUtils.hasSpecificUpdate("1_20") && ItemHandler.isArmor(itemMap.getMaterial().toString())) {
+            String armorTrim = Objects.requireNonNull(itemMap.getNodeLocation().getString(".trim-meta")).replace(" ", "");
+            String[] armorSection = armorTrim.split(":");
+            final org.bukkit.inventory.meta.trim.TrimMaterial Material = ItemHandler.getTrimMaterial(armorSection[0].toUpperCase());
+            final org.bukkit.inventory.meta.trim.TrimPattern Pattern = ItemHandler.getTrimPattern(armorSection[1].toUpperCase());
+            Map<String, String> trimPattern = new HashMap<>();
+            if (Material != null && Pattern != null) {
+                trimPattern.put(armorSection[0].toUpperCase(), armorSection[1].toUpperCase());
+            } else if (Material == null) {
+                ServerUtils.logSevere("{ItemDesigner} An error occurred in the config, " + armorSection[0] + " is an incorrect armor trim material.");
+                ServerUtils.logWarn("{ItemDesigner} Please see: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/inventory/meta/trim/TrimMaterial.html for a list of correct material types.");
+            } else if (armorTrim.contains(":")) {
+                ServerUtils.logSevere("{ItemDesigner} An error occurred in the config, " + armorSection[1] + " is an incorrect armor trim pattern.");
+                ServerUtils.logWarn("{ItemDesigner} Please see: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/inventory/meta/trim/TrimPattern.html for a list of correct pattern types.");
+            }
+            itemMap.setTrimPattern(trimPattern);
         }
     }
 
