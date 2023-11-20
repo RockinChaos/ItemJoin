@@ -37,7 +37,7 @@ public class WorldSwitch implements Listener {
      * @param event - PlayerChangedWorldEvent
      */
     @EventHandler(ignoreCancelled = true)
-    private void setWorldSwitchItems(PlayerChangedWorldEvent event) {
+    private void setSwitchItems(PlayerChangedWorldEvent event) {
         final Player player = event.getPlayer();
         if (PlayerHandler.isPlayer(player)) {
             ItemUtilities.getUtilities().setAuthenticating(player, event.getFrom(), TriggerType.WORLD_SWITCH, player.getGameMode(), "GLOBAL", Collections.singletonList("GLOBAL"));

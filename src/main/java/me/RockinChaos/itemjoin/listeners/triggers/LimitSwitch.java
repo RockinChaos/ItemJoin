@@ -42,7 +42,7 @@ public class LimitSwitch implements Listener {
      * @param event - PlayerGameModeChangeEvent
      */
     @EventHandler(ignoreCancelled = true)
-    private void setGameModeItems(PlayerGameModeChangeEvent event) {
+    private void setModeItems(PlayerGameModeChangeEvent event) {
         final Player player = event.getPlayer();
         final GameMode newMode = event.getNewGameMode();
         if (PlayerHandler.isPlayer(player)) {
