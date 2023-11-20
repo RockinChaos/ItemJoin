@@ -21,13 +21,13 @@ import me.RockinChaos.core.handlers.PlayerHandler;
 import me.RockinChaos.core.utils.ServerUtils;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.item.ItemUtilities.TriggerType;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
 import java.util.Collections;
-import java.util.Objects;
 
 public class PlayerTeleport implements Listener {
 
@@ -38,10 +38,11 @@ public class PlayerTeleport implements Listener {
      * @param event - PlayerTeleportEvent
      */
     @EventHandler(ignoreCancelled = true)
-    private void setJoinItems(PlayerTeleportEvent event) {
+    private void setTeleportItems(PlayerTeleportEvent event) {
         final Player player = event.getPlayer();
-        if (PlayerHandler.isPlayer(player)) {
-            ItemUtilities.getUtilities().setAuthenticating(player, Objects.requireNonNull(event.getTo()).getWorld(), TriggerType.TELEPORT, player.getGameMode(), "GLOBAL", Collections.singletonList("GLOBAL"));
+        final Location toLocation = event.getTo();
+        if (PlayerHandler.isPlayer(player) && toLocation != null) {
+            ItemUtilities.getUtilities().setAuthenticating(player, toLocation.getWorld(), TriggerType.TELEPORT, player.getGameMode(), "GLOBAL", Collections.singletonList("GLOBAL"));
             {
                 ServerUtils.sendErrorStatements(player);
             }

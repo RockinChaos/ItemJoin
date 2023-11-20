@@ -30,6 +30,7 @@ import me.RockinChaos.itemjoin.utils.sql.DataObject.Table;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.*;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
@@ -452,6 +453,7 @@ public class ItemUtilities {
         }
         try {
             if (blacklist != null) {
+                final ItemMeta itemMeta = item.getItemMeta();
                 for (String value : blacklist) {
                     String valType = (StringUtils.containsIgnoreCase(value, "{id") ? "id" : (StringUtils.containsIgnoreCase(value, "{slot") ? "slot" : (StringUtils.containsIgnoreCase(value, "{name") ? "name" : "")));
                     String inputResult = org.apache.commons.lang.StringUtils.substringBetween(value, "{" + valType + ":", "}");
@@ -459,8 +461,8 @@ public class ItemUtilities {
                         return true;
                     } else if (valType.equalsIgnoreCase("slot") && slot.trim().equalsIgnoreCase(inputResult.trim())) {
                         return true;
-                    } else if (valType.equalsIgnoreCase("name") && item.hasItemMeta() && Objects.requireNonNull(item.getItemMeta()).hasDisplayName()
-                            && ChatColor.stripColor(item.getItemMeta().getDisplayName()).trim().equalsIgnoreCase(inputResult.trim())) {
+                    } else if (valType.equalsIgnoreCase("name") && itemMeta != null && itemMeta.hasDisplayName()
+                            && ChatColor.stripColor(itemMeta.getDisplayName()).trim().equalsIgnoreCase(inputResult.trim())) {
                         return true;
                     }
                 }
@@ -609,9 +611,15 @@ public class ItemUtilities {
             for (int i = 0; i <= 47; i++) {
                 for (int k = 0; k < (!protectItems.isEmpty() ? protectItems.size() : 1); k++) {
                     if (i <= 41 && inventory.getSize() >= i && ItemUtilities.getUtilities().canClear(inventory.getItem(i), String.valueOf(i), k, clearType)) {
-                        saveInventory.setItem(i, Objects.requireNonNull(inventory.getItem(i)).clone());
+                        final ItemStack item = inventory.getItem(i);
+                        if (item != null) {
+                            saveInventory.setItem(i, item.clone());
+                        }
                     } else if (i >= 42 && ItemUtilities.getUtilities().canClear(craftView.getItem(i - 42), "CRAFTING[" + (i - 42) + "]", k, clearType) && PlayerHandler.isCraftingInv(player.getOpenInventory())) {
-                        saveInventory.setItem(i, Objects.requireNonNull(craftView.getItem(i - 42)).clone());
+                        final ItemStack item = craftView.getItem(i - 42);
+                        if (item != null) {
+                            saveInventory.setItem(i, item.clone());
+                        }
                     }
                 }
             }
@@ -627,16 +635,20 @@ public class ItemUtilities {
      * @param world  - The world to be checked.
      */
     public void pasteReturnItems(final TriggerType type, final Player player, final String world) {
-        if (type == TriggerType.WORLD_SWITCH && StringUtils.splitIgnoreCase(Objects.requireNonNull(ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Options")).replace(" ", ""), "RETURN_SWITCH", ",")) {
-            DataObject dataObject = (DataObject) ItemJoin.getCore().getSQL().getData(new DataObject(Table.RETURN_SWITCH_ITEMS, PlayerHandler.getPlayerID(player), world, ""));
-            Inventory inventory = (dataObject != null ? ItemHandler.deserializeInventory(dataObject.getInventory64().replace(world + ".", "")) : null);
+        final String clearOptions = ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Options");
+        if (type == TriggerType.WORLD_SWITCH && clearOptions != null && !clearOptions.isEmpty() && StringUtils.splitIgnoreCase(clearOptions.replace(" ", ""), "RETURN_SWITCH", ",")) {
+            final DataObject dataObject = (DataObject) ItemJoin.getCore().getSQL().getData(new DataObject(Table.RETURN_SWITCH_ITEMS, PlayerHandler.getPlayerID(player), world, ""));
+            final Inventory inventory = (dataObject != null ? ItemHandler.deserializeInventory(dataObject.getInventory64().replace(world + ".", "")) : null);
             for (int i = 47; i >= 0; i--) {
-                if (inventory != null && inventory.getItem(i) != null && Objects.requireNonNull(inventory.getItem(i)).getType() != Material.AIR) {
-                    if (i <= 41) {
-                        player.getInventory().setItem(i, Objects.requireNonNull(inventory.getItem(i)).clone());
-                    } else if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
-                        player.getOpenInventory().getTopInventory().setItem(i - 42, Objects.requireNonNull(inventory.getItem(i)).clone());
-                        PlayerHandler.updateInventory(player, 1L);
+                if (inventory != null) {
+                    final ItemStack item = inventory.getItem(i);
+                    if (item != null && item.getType() != Material.AIR) {
+                        if (i <= 41) {
+                            player.getInventory().setItem(i, item.clone());
+                        } else if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
+                            player.getOpenInventory().getTopInventory().setItem(i - 42, item.clone());
+                            PlayerHandler.updateInventory(player, 1L);
+                        }
                     }
                 }
                 ItemJoin.getCore().getSQL().removeData(new DataObject(Table.RETURN_SWITCH_ITEMS, PlayerHandler.getPlayerID(player), world, ""));
@@ -709,12 +721,13 @@ public class ItemUtilities {
     public void setCustomSlots(final Player player, final ItemMap itemMap, final int size) {
         SchedulerUtils.run(() -> {
             boolean isGiven = false;
-            int craftSlot = StringUtils.getSlotConversion(itemMap.getSlot());
-            ItemStack existingItem = ItemHandler.getItem(player, itemMap.getSlot());
-            ItemStack item = itemMap.getItem(player).clone();
+            final int craftSlot = StringUtils.getSlotConversion(itemMap.getSlot());
+            final ItemStack existingItem = ItemHandler.getItem(player, itemMap.getSlot());
+            final ItemStack item = itemMap.getItem(player).clone();
+            final EntityEquipment equipment = player.getEquipment();
             this.shiftItem(player, itemMap);
-            int nextSlot = this.nextItem(player, itemMap);
-            boolean overWrite = itemMap.isOverwritable() || ItemJoin.getCore().getConfig("items.yml").getBoolean("items-Overwrite");
+            final int nextSlot = this.nextItem(player, itemMap);
+            final boolean overWrite = itemMap.isOverwritable() || ItemJoin.getCore().getConfig("items.yml").getBoolean("items-Overwrite");
             if (size > 1) {
                 item.setAmount(size);
             }
@@ -727,18 +740,18 @@ public class ItemUtilities {
             } else if (CustomSlot.ARBITRARY.isSlot(itemMap.getSlot()) && player.getInventory().firstEmpty() != -1) {
                 isGiven = true;
                 player.getInventory().setItem(player.getInventory().firstEmpty(), item);
-            } else if (CustomSlot.HELMET.isSlot(itemMap.getSlot()) && (existingItem == null || overWrite)) {
+            } else if (CustomSlot.HELMET.isSlot(itemMap.getSlot()) && (existingItem == null || overWrite) && equipment != null) {
                 isGiven = true;
-                Objects.requireNonNull(player.getEquipment()).setHelmet(item);
-            } else if (CustomSlot.CHESTPLATE.isSlot(itemMap.getSlot()) && (existingItem == null || overWrite)) {
+                equipment.setHelmet(item);
+            } else if (CustomSlot.CHESTPLATE.isSlot(itemMap.getSlot()) && (existingItem == null || overWrite) && equipment != null) {
                 isGiven = true;
-                Objects.requireNonNull(player.getEquipment()).setChestplate(item);
-            } else if (CustomSlot.LEGGINGS.isSlot(itemMap.getSlot()) && (existingItem == null || overWrite)) {
+                equipment.setChestplate(item);
+            } else if (CustomSlot.LEGGINGS.isSlot(itemMap.getSlot()) && (existingItem == null || overWrite) && equipment != null) {
                 isGiven = true;
-                Objects.requireNonNull(player.getEquipment()).setLeggings(item);
-            } else if (CustomSlot.BOOTS.isSlot(itemMap.getSlot()) && (existingItem == null || overWrite)) {
+                equipment.setLeggings(item);
+            } else if (CustomSlot.BOOTS.isSlot(itemMap.getSlot()) && (existingItem == null || overWrite) && equipment != null) {
                 isGiven = true;
-                Objects.requireNonNull(player.getEquipment()).setBoots(item);
+                equipment.setBoots(item);
             } else if (ServerUtils.hasSpecificUpdate("1_9") && CustomSlot.OFFHAND.isSlot(itemMap.getSlot()) && (existingItem == null || overWrite)) {
                 isGiven = true;
                 PlayerHandler.setOffHandItem(player, item);
@@ -785,8 +798,9 @@ public class ItemUtilities {
                     }
                 });
             } else if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
-                if (player.getOpenInventory().getTopInventory().getItem(0) != null && !Objects.requireNonNull(player.getOpenInventory().getTopInventory().getItem(0)).getType().equals(Material.AIR)) {
-                    ItemHandler.returnCraftingItem(player, 0, Objects.requireNonNull(player.getOpenInventory().getTopInventory().getItem(0)).clone(), 0L);
+                final ItemStack item = player.getOpenInventory().getTopInventory().getItem(0);
+                if (item != null && !item.getType().equals(Material.AIR)) {
+                    ItemHandler.returnCraftingItem(player, 0, item.clone(), 0L);
                 }
                 player.getOpenInventory().getTopInventory().setItem(craftSlot, itemStack);
             } else {
@@ -805,7 +819,8 @@ public class ItemUtilities {
         ItemStack existingItem = ItemHandler.getItem(player, itemMap.getSlot());
         if (itemMap.isMoveNext() && existingItem != null && player.getInventory().firstEmpty() != -1) {
             for (int i = 0; i <= 35; i++) {
-                if (player.getInventory().getItem(i) == null || Objects.requireNonNull(player.getInventory().getItem(i)).getType() == Material.AIR) {
+                final ItemStack itemMain = player.getInventory().getItem(i);
+                if (itemMain == null || itemMain.getType() == Material.AIR) {
                     player.getInventory().setItem(i, existingItem);
                     existingItem.setAmount(0);
                     existingItem.setType(Material.AIR);
@@ -813,7 +828,8 @@ public class ItemUtilities {
                     return;
                 } else if (i == 35) {
                     for (int k = 0; k == 0; k--) {
-                        if (player.getInventory().getItem(k) == null || Objects.requireNonNull(player.getInventory().getItem(k)).getType() == Material.AIR) {
+                        final ItemStack item = player.getInventory().getItem(k);
+                        if (item == null || item.getType() == Material.AIR) {
                             player.getInventory().setItem(k, existingItem);
                             existingItem.setAmount(0);
                             existingItem.setType(Material.AIR);
@@ -838,11 +854,13 @@ public class ItemUtilities {
         ItemStack existingItem = ItemHandler.getItem(player, itemMap.getSlot());
         if (itemMap.isGiveNext() && existingItem != null && player.getInventory().firstEmpty() != -1) {
             for (int i = 0; i <= 35; i++) {
-                if (player.getInventory().getItem(i) == null || Objects.requireNonNull(player.getInventory().getItem(i)).getType() == Material.AIR) {
+                final ItemStack itemMain = player.getInventory().getItem(i);
+                if (itemMain == null || itemMain.getType() == Material.AIR) {
                     return i;
                 } else if (i == 35) {
                     for (int k = 0; k == 0; k--) {
-                        if (player.getInventory().getItem(k) == null || Objects.requireNonNull(player.getInventory().getItem(k)).getType() == Material.AIR) {
+                        final ItemStack item = player.getInventory().getItem(k);
+                        if (item == null || item.getType() == Material.AIR) {
                             return k;
                         }
                     }
@@ -858,10 +876,12 @@ public class ItemUtilities {
      * @param player - The Player having the commands executed.
      */
     public void triggerCommands(final Player player, TriggerType triggerRef) {
-        if (ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.enabled-worlds") != null && (!Objects.requireNonNull(ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.enabled-worlds")).equalsIgnoreCase("DISABLED") || !Objects.requireNonNull(ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.enabled-worlds")).equalsIgnoreCase("FALSE")) && (StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.triggers"), TriggerType.JOIN.name) && triggerRef.equals(TriggerType.JOIN) || StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.triggers"), TriggerType.FIRST_JOIN.name) && triggerRef.equals(TriggerType.JOIN) || StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.triggers"), TriggerType.WORLD_SWITCH.name) && triggerRef.equals(TriggerType.WORLD_SWITCH) || StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.triggers"), TriggerType.RESPAWN.name) && (triggerRef.equals(TriggerType.RESPAWN) || triggerRef.equals(TriggerType.RESPAWN_POINT)) || StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.triggers"), TriggerType.TELEPORT.name) && triggerRef.equals(TriggerType.TELEPORT))) {
-            String commandsWorlds = Objects.requireNonNull(ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.enabled-worlds")).replace(", ", ",");
+        final String enableWorlds = ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.enabled-worlds");
+        final String triggers = ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.triggers");
+        if (enableWorlds != null && !enableWorlds.equalsIgnoreCase("DISABLED") && !enableWorlds.equalsIgnoreCase("FALSE") && (StringUtils.containsIgnoreCase(triggers, TriggerType.JOIN.name) && triggerRef.equals(TriggerType.JOIN) || StringUtils.containsIgnoreCase(triggers, TriggerType.FIRST_JOIN.name) && triggerRef.equals(TriggerType.JOIN) || StringUtils.containsIgnoreCase(triggers, TriggerType.WORLD_SWITCH.name) && triggerRef.equals(TriggerType.WORLD_SWITCH) || StringUtils.containsIgnoreCase(triggers, TriggerType.RESPAWN.name) && (triggerRef.equals(TriggerType.RESPAWN) || triggerRef.equals(TriggerType.RESPAWN_POINT)) || StringUtils.containsIgnoreCase(triggers, TriggerType.TELEPORT.name) && triggerRef.equals(TriggerType.TELEPORT))) {
+            String commandsWorlds = enableWorlds.replace(", ", ",");
             TriggerType trigger = triggerRef;
-            if (StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.triggers"), TriggerType.FIRST_JOIN.name) && trigger.equals(TriggerType.JOIN)) {
+            if (StringUtils.containsIgnoreCase(triggers, TriggerType.FIRST_JOIN.name) && trigger.equals(TriggerType.JOIN)) {
                 trigger = TriggerType.FIRST_JOIN;
             }
             String[] compareWorlds = commandsWorlds.split(",");

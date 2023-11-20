@@ -39,7 +39,6 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
-import java.util.Objects;
 
 public class Projectile implements Listener {
 
@@ -65,9 +64,10 @@ public class Projectile implements Listener {
             HashMap<Integer, ItemStack> map = new HashMap<>();
             Player player = (Player) event.getEntity();
             for (int i = 0; i < player.getInventory().getSize(); i++) {
-                if (player.getInventory().getItem(i) != null && Objects.requireNonNull(player.getInventory().getItem(i)).getType() == Material.ARROW && event.getProjectile().getType().name().equalsIgnoreCase("ARROW")) {
-                    ItemStack cloneStack = Objects.requireNonNull(player.getInventory().getItem(i)).clone();
-                    ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(player.getInventory().getItem(i));
+                final ItemStack item = player.getInventory().getItem(i);
+                if (item != null && item.getType() == Material.ARROW && event.getProjectile().getType().name().equalsIgnoreCase("ARROW")) {
+                    ItemStack cloneStack = item.clone();
+                    ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item);
                     if (itemMap != null) {
                         cloneStack.setAmount(itemMap.getCount(player));
                     }
@@ -76,7 +76,8 @@ public class Projectile implements Listener {
             }
             SchedulerUtils.runLater(2L, () -> {
                 for (Integer key : map.keySet()) {
-                    if (player.getInventory().getItem(key) == null || Objects.requireNonNull(player.getInventory().getItem(key)).getAmount() != map.get(key).getAmount()) {
+                    final ItemStack item = player.getInventory().getItem(key);
+                    if (item == null || item.getAmount() != map.get(key).getAmount()) {
                         this.arrowList.put(event.getProjectile().getEntityId(), map.get(key));
                         if (!ItemUtilities.getUtilities().isAllowed(player, map.get(key), "count-lock")) {
                             player.getInventory().setItem(key, map.get(key));
@@ -135,8 +136,9 @@ public class Projectile implements Listener {
         if ((event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) && item != null && item.getType().name().equalsIgnoreCase("CROSSBOW") && !PlayerHandler.isCreativeMode(player)) {
             HashMap<Integer, ItemStack> map = new HashMap<>();
             for (int i = 0; i < player.getInventory().getSize(); i++) {
-                if (player.getInventory().getItem(i) != null && Objects.requireNonNull(player.getInventory().getItem(i)).getType() == Material.ARROW) {
-                    ItemStack cloneStack = Objects.requireNonNull(player.getInventory().getItem(i)).clone();
+                final ItemStack invItem = player.getInventory().getItem(i);
+                if (invItem != null && invItem.getType() == Material.ARROW) {
+                    ItemStack cloneStack = invItem.clone();
                     ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(player.getInventory().getItem(i));
                     if (itemMap != null) {
                         cloneStack.setAmount(itemMap.getCount(player));
@@ -160,7 +162,8 @@ public class Projectile implements Listener {
             SchedulerUtils.runLater(26L, () -> {
                 boolean arrowReturned = false;
                 for (Integer key : map.keySet()) {
-                    if (player.getInventory().getItem(key) == null || Objects.requireNonNull(player.getInventory().getItem(key)).getAmount() != map.get(key).getAmount()) {
+                    final ItemStack item = player.getInventory().getItem(key);
+                    if (item == null || item.getAmount() != map.get(key).getAmount()) {
                         if (!ItemUtilities.getUtilities().isAllowed(player, map.get(key), "count-lock")) {
                             player.getInventory().setItem(key, map.get(key));
                             arrowReturned = true;

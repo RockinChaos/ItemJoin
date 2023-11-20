@@ -42,7 +42,6 @@ import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
-import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -144,8 +143,11 @@ public class Legacy_Commands implements Listener {
         final InventoryView view = event.getView();
         if (PlayerHandler.isCraftingInv(view)) {
             if (StringUtils.containsIgnoreCase(event.getAction().name(), "HOTBAR") && view.getBottomInventory().getSize() >= event.getHotbarButton() && event.getHotbarButton() >= 0
-                    && !event.getClick().name().equalsIgnoreCase("MIDDLE") && event.getSlotType() == SlotType.ARMOR && view.getBottomInventory().getItem(event.getHotbarButton()) != null && Objects.requireNonNull(view.getBottomInventory().getItem(event.getHotbarButton())).getType() != Material.AIR) {
-                this.equipCommands(player, null, Objects.requireNonNull(view.getBottomInventory().getItem(event.getHotbarButton())), "ON_EQUIP", "EQUIPPED", String.valueOf(event.getSlot()));
+                    && !event.getClick().name().equalsIgnoreCase("MIDDLE") && event.getSlotType() == SlotType.ARMOR) {
+                final ItemStack hotItem = view.getBottomInventory().getItem(event.getHotbarButton());
+                if (hotItem != null && hotItem.getType() != Material.AIR) {
+                    this.equipCommands(player, null, hotItem, "ON_EQUIP", "EQUIPPED", String.valueOf(event.getSlot()));
+                }
             }
             if (!event.getClick().name().equalsIgnoreCase("MIDDLE") && event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR) {
                 if (event.getSlotType() == SlotType.ARMOR) {

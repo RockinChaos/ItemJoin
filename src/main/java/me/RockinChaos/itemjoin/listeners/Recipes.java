@@ -40,7 +40,6 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class Recipes implements Listener {
 
@@ -54,9 +53,10 @@ public class Recipes implements Listener {
         Player player = (Player) event.getInventory().getHolder();
         if (player != null) {
             for (int i = 0; i < player.getOpenInventory().getTopInventory().getSize(); i++) {
-                if (player.getOpenInventory().getTopInventory().getItem(i) != null && Objects.requireNonNull(player.getOpenInventory().getTopInventory().getItem(i)).getType() != Material.AIR) {
-                    if (!ItemUtilities.getUtilities().isAllowed(player, player.getOpenInventory().getTopInventory().getItem(i), "item-craftable")) {
-                        ItemStack reAdd = Objects.requireNonNull(player.getOpenInventory().getTopInventory().getItem(i)).clone();
+                final ItemStack item = player.getOpenInventory().getTopInventory().getItem(i);
+                if (item != null && item.getType() != Material.AIR) {
+                    if (!ItemUtilities.getUtilities().isAllowed(player, item, "item-craftable")) {
+                        ItemStack reAdd = item.clone();
                         player.getOpenInventory().getTopInventory().setItem(i, null);
                         player.getInventory().addItem(reAdd);
                         PlayerHandler.updateInventory(player, 1L);
@@ -77,13 +77,13 @@ public class Recipes implements Listener {
         final boolean isAnvil = event.getInventory().getType().toString().contains("ANVIL");
         final boolean isGrindstone = event.getInventory().getType().toString().contains("GRINDSTONE");
         if (isAnvil || isGrindstone) {
-            Player player = (Player) event.getWhoClicked();
+            final Player player = (Player) event.getWhoClicked();
             int rSlot = event.getSlot();
-            if (rSlot == 2 && event.getInventory().getItem(1) != null &&
-                    Objects.requireNonNull(event.getInventory().getItem(1)).getType() != Material.AIR) {
+            final ItemStack invItem = event.getInventory().getItem(1);
+            if (rSlot == 2 && invItem != null && invItem.getType() != Material.AIR) {
                 ItemStack item = event.getInventory().getItem(2);
-                if ((isGrindstone || (!StringUtils.containsIgnoreCase(Objects.requireNonNull(event.getInventory().getItem(1)).getType().toString(), "PAPER") && !StringUtils.containsIgnoreCase(Objects.requireNonNull(event.getInventory().getItem(1)).getType().toString(), "NAME_TAG"))) &&
-                        !ItemUtilities.getUtilities().isAllowed(player, item, "item-repairable") || !ItemUtilities.getUtilities().isAllowed(player, event.getInventory().getItem(1), "item-repairable")) {
+                if ((isGrindstone || (!StringUtils.containsIgnoreCase(invItem.getType().toString(), "PAPER") && !StringUtils.containsIgnoreCase(invItem.getType().toString(), "NAME_TAG"))) &&
+                        !ItemUtilities.getUtilities().isAllowed(player, item, "item-repairable") || !ItemUtilities.getUtilities().isAllowed(player, invItem, "item-repairable")) {
                     event.setCancelled(true);
                     PlayerHandler.updateExperienceLevels(player);
                     PlayerHandler.updateInventory(player, 1L);
@@ -102,8 +102,8 @@ public class Recipes implements Listener {
         if (event.getRecipe() != null) {
             if (event.getRecipe().getResult().getType() != Material.AIR) {
                 final Player player = (Player) event.getView().getPlayer();
-                List<ItemMap> mapList = new ArrayList<>();
-                ItemMap checkMap = ItemUtilities.getUtilities().getItemMap(event.getRecipe().getResult());
+                final List<ItemMap> mapList = new ArrayList<>();
+                final ItemMap checkMap = ItemUtilities.getUtilities().getItemMap(event.getRecipe().getResult());
                 if (checkMap != null) {
                     mapList.add(checkMap);
                 } else {
@@ -117,11 +117,12 @@ public class Recipes implements Listener {
                 final Inventory inventoryClone = Bukkit.createInventory(null, 9);
                 int setSlot = 0;
                 for (int i = 0; i < event.getInventory().getSize(); i++) {
+                    final ItemStack item = event.getInventory().getItem(i);
                     if (setSlot >= 9) {
                         break;
-                    } else if (i > 0 || !checkMap.isSimilar(player, event.getInventory().getItem(i))) {
-                        if (event.getInventory().getItem(i) != null) {
-                            inventoryClone.setItem(setSlot, Objects.requireNonNull(event.getInventory().getItem(i)).clone());
+                    } else if (i > 0 || !checkMap.isSimilar(player, item)) {
+                        if (item != null) {
+                            inventoryClone.setItem(setSlot, item);
                         }
                         setSlot++;
                     }
@@ -151,11 +152,12 @@ public class Recipes implements Listener {
             final Inventory inventoryClone = Bukkit.createInventory(null, 18);
             int setSlot = 0;
             for (int i = 0; i < event.getInventory().getSize(); i++) {
+                final ItemStack item = event.getInventory().getItem(i);
                 if (setSlot >= 9) {
                     break;
-                } else if (!checkMap.isSimilar((Player) event.getView().getPlayer(), event.getInventory().getItem(i))) {
-                    if (event.getInventory().getItem(i) != null) {
-                        inventoryClone.setItem(setSlot, Objects.requireNonNull(event.getInventory().getItem(i)).clone());
+                } else if (!checkMap.isSimilar((Player) event.getView().getPlayer(), item)) {
+                    if (item != null) {
+                        inventoryClone.setItem(setSlot, item.clone());
                     }
                     setSlot++;
                 }
@@ -216,8 +218,11 @@ public class Recipes implements Listener {
                                                 craftInventory.setItem((i + 1), new ItemStack(Material.AIR));
                                                 inventoryClone.setItem(i, new ItemStack(Material.AIR));
                                             } else {
-                                                Objects.requireNonNull(craftInventory.getItem((i + 1))).setAmount(removal);
-                                                Objects.requireNonNull(inventoryClone.getItem(i)).setAmount(removal);
+                                                final ItemStack craftItem = craftInventory.getItem((i + 1));
+                                                if (craftItem != null) {
+                                                    craftItem.setAmount(removal);
+                                                    item.setAmount(removal);
+                                                }
                                             }
                                             removed = true;
                                         }

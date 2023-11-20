@@ -28,7 +28,6 @@ import org.bukkit.entity.Player;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 public class ItemStatistics {
 
@@ -56,8 +55,9 @@ public class ItemStatistics {
      * @param itemMap - The ItemMap being modified.
      */
     private void setEnchantments(final Player player, final ItemMap itemMap) {
-        if (itemMap.getNodeLocation().getString(".enchantment") != null) {
-            final String enchantList = Objects.requireNonNull(itemMap.getNodeLocation().getString(".enchantment")).replace(" ", "");
+        final String enchants = itemMap.getNodeLocation().getString(".enchantment");
+        if (enchants != null) {
+            final String enchantList = enchants.replace(" ", "");
             final String[] enchantments = enchantList.split(",");
             final Map<String, Integer> listEnchants = new HashMap<>();
             for (final String enchantment : enchantments) {

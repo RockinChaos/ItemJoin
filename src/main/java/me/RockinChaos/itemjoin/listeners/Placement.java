@@ -75,7 +75,8 @@ public class Placement implements Listener {
                             player.getInventory().setItem(slot, item);
                         }
                     } else {
-                        if (PlayerHandler.getHandItem(player) == null || Objects.requireNonNull(PlayerHandler.getHandItem(player)).getAmount() <= 1) {
+                        final ItemStack heldItem = PlayerHandler.getHandItem(player);
+                        if (heldItem == null || heldItem.getAmount() <= 1) {
                             if (ServerUtils.hasSpecificUpdate("1_9")) {
                                 if (Objects.equals(event.getHand(), EquipmentSlot.HAND)) {
                                     if (player.getInventory().getHeldItemSlot() == slot) {
@@ -93,8 +94,8 @@ public class Placement implements Listener {
                                     player.getInventory().setItem(slot, item);
                                 }
                             }
-                        } else if (itemMap.isSimilar(player, PlayerHandler.getHandItem(player))) {
-                            Objects.requireNonNull(PlayerHandler.getHandItem(player)).setAmount(itemMap.getCount(player));
+                        } else if (itemMap.isSimilar(player, heldItem)) {
+                            heldItem.setAmount(itemMap.getCount(player));
                         }
                     }
                 });
@@ -148,7 +149,8 @@ public class Placement implements Listener {
                     if (!ItemUtilities.getUtilities().isAllowed(player, item, "count-lock")) {
                         ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item);
                         if (itemMap != null) {
-                            if (PlayerHandler.getHandItem(player) == null || Objects.requireNonNull(PlayerHandler.getHandItem(player)).getAmount() <= 1) {
+                            final ItemStack heldItem = PlayerHandler.getHandItem(player);
+                            if (heldItem == null || heldItem.getAmount() <= 1) {
                                 if (ServerUtils.hasSpecificUpdate("1_9")) {
                                     if (event.getHand().equals(EquipmentSlot.HAND)) {
                                         PlayerHandler.setMainHandItem(player, item);
@@ -158,8 +160,8 @@ public class Placement implements Listener {
                                 } else {
                                     PlayerHandler.setMainHandItem(player, item);
                                 }
-                            } else if (itemMap.isSimilar(player, PlayerHandler.getHandItem(player))) {
-                                Objects.requireNonNull(PlayerHandler.getHandItem(player)).setAmount(itemMap.getCount(player));
+                            } else if (itemMap.isSimilar(player, heldItem)) {
+                                heldItem.setAmount(itemMap.getCount(player));
                             }
                         }
                     }

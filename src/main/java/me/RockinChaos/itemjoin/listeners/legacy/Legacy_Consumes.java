@@ -32,8 +32,6 @@ import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 
-import java.util.Objects;
-
 /**
  * Handles the Consumption events for custom items.
  *
@@ -125,11 +123,14 @@ public class Legacy_Consumes implements Listener {
             ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item);
             item.setAmount(itemMap.getCount(player));
             SchedulerUtils.runLater(2L, () -> {
-                if (PlayerHandler.getHandItem(player) == null || Objects.requireNonNull(PlayerHandler.getHandItem(player)).getAmount() <= 1) {
+                final ItemStack handItem = PlayerHandler.getHandItem(player);
+                if (handItem == null || handItem.getAmount() <= 1) {
                     if (ServerUtils.hasSpecificUpdate("1_9")) {
-                        if (PlayerHandler.getMainHandItem(player) != null && Objects.requireNonNull(PlayerHandler.getMainHandItem(player)).getType() != Material.AIR) {
+                        final ItemStack mainItem = PlayerHandler.getMainHandItem(player);
+                        final ItemStack offItem = PlayerHandler.getOffHandItem(player);
+                        if (mainItem != null && mainItem.getType() != Material.AIR) {
                             PlayerHandler.setMainHandItem(player, item);
-                        } else if (PlayerHandler.getOffHandItem(player) != null && Objects.requireNonNull(PlayerHandler.getOffHandItem(player)).getType() != Material.AIR) {
+                        } else if (offItem != null && offItem.getType() != Material.AIR) {
                             PlayerHandler.setOffHandItem(player, item);
                         } else {
                             itemMap.giveTo(player);
@@ -137,8 +138,8 @@ public class Legacy_Consumes implements Listener {
                     } else {
                         PlayerHandler.setMainHandItem(player, item);
                     }
-                } else if (itemMap.isSimilar(player, PlayerHandler.getHandItem(player))) {
-                    Objects.requireNonNull(PlayerHandler.getHandItem(player)).setAmount(itemMap.getCount(player));
+                } else if (itemMap.isSimilar(player, handItem)) {
+                    handItem.setAmount(itemMap.getCount(player));
                 }
             });
         }

@@ -71,11 +71,9 @@ public class ItemDesigner {
             for (String internalName : itemsList.getKeys(false)) {
                 ConfigurationSection itemNode = itemsList.getConfigurationSection(internalName);
                 if (this.isConfigurable(internalName, itemNode) && itemNode != null) {
-                    String slotList = ((itemNode.getString(".slot") != null && !Objects.requireNonNull(itemNode.getString(".slot")).isEmpty()) ? itemNode.getString(".slot") : "ARBITRARY");
-                    String[] slots = new String[0];
-                    if (slotList != null) {
-                        slots = slotList.replace(" ", "").split(",");
-                    }
+                    final String itemSlot = itemNode.getString(".slot");
+                    String slotList = ((itemSlot != null && !itemSlot.isEmpty()) ? itemSlot : "ARBITRARY");
+                    String[] slots = slotList.replace(" ", "").split(",");
                     for (String slot : slots) {
                         if (slot.startsWith("C[") || slot.startsWith("C(")) {
                             slot = slot.replace("C", "CRAFTING");
@@ -456,10 +454,11 @@ public class ItemDesigner {
                 Object tag = ReflectionUtils.getMinecraftClass("NBTTagCompound").getConstructor().newInstance();
                 tag.getClass().getMethod(MinecraftMethod.setString.getMethod(tag, String.class, String.class), String.class, String.class).invoke(tag, "ItemJoin Name", itemMap.getConfigName());
                 itemMap.setNewNBTData(itemMap.getConfigName(), tag);
-                if (itemMap.getNodeLocation().getString(".properties") != null && !Objects.requireNonNull(itemMap.getNodeLocation().getString(".properties")).isEmpty()) {
+                final String itemProperties = itemMap.getNodeLocation().getString(".properties");
+                if (itemProperties != null && !itemProperties.isEmpty()) {
                     List<Object> tags = new ArrayList<>();
                     Map<Object, Object> tagValues = new HashMap<>();
-                    String[] properties = Objects.requireNonNull(itemMap.getNodeLocation().getString(".properties")).split(",");
+                    String[] properties = itemProperties.split(",");
                     for (String property : properties) {
                         String[] propertyParts = property.split(":");
                         String identifier = (propertyParts[0].startsWith(" ") ? propertyParts[0].substring(1) : propertyParts[0]);
@@ -711,8 +710,9 @@ public class ItemDesigner {
      * @param itemMap - The ItemMap being modified.
      */
     private void setProbability(final ItemMap itemMap) {
-        if (itemMap.getNodeLocation().getString(".probability") != null) {
-            String percentageString = Objects.requireNonNull(itemMap.getNodeLocation().getString(".probability")).replace("%", "").replace("-", "").replace(" ", "");
+        final String probability = itemMap.getNodeLocation().getString(".probability");
+        if (probability != null) {
+            String percentageString = probability.replace("%", "").replace("-", "").replace(" ", "");
             int percentage = Integer.parseInt(percentageString);
             if (!ItemJoin.getCore().getChances().getItems().containsKey(itemMap)) {
                 ItemJoin.getCore().getChances().putItem(itemMap, percentage);
@@ -847,6 +847,7 @@ public class ItemDesigner {
                 final int count = getCount;
                 final int itemData = getData;
                 final Material material = ItemHandler.getMaterial(ingredientParts[1], String.valueOf(itemData));
+                final ConfigurationSection itemsPath = ItemJoin.getCore().getConfig("items.yml").getConfigurationSection("items");
                 if (material != null && count >= 1) {
                     try {
                         char character = 'X';
@@ -866,7 +867,7 @@ public class ItemDesigner {
                             ServerUtils.sendSevereTrace(e);
                         }
                     }
-                } else if (Objects.requireNonNull(ItemJoin.getCore().getConfig("items.yml").getConfigurationSection("items")).getConfigurationSection(ingredientParts[1]) != null && count >= 1) {
+                } else if (itemsPath != null && itemsPath.getConfigurationSection(ingredientParts[1]) != null && count >= 1) {
                     SchedulerUtils.runLater(40L, () -> {
                         try {
                             final ItemMap tempMap = ItemUtilities.getUtilities().getItemMap(ingredientParts[1]);
@@ -1135,8 +1136,9 @@ public class ItemDesigner {
      * @param itemMap - The ItemMap being modified.
      */
     private void setBanners(final ItemMap itemMap) {
-        if (itemMap.getNodeLocation().getString(".banner-meta") != null && ServerUtils.hasSpecificUpdate("1_8") && StringUtils.containsIgnoreCase(itemMap.getMaterial().toString(), "BANNER")) {
-            String bannerList = Objects.requireNonNull(itemMap.getNodeLocation().getString(".banner-meta")).replace(" ", "");
+        final String bannerMeta = itemMap.getNodeLocation().getString(".banner-meta");
+        if (bannerMeta != null && ServerUtils.hasSpecificUpdate("1_8") && StringUtils.containsIgnoreCase(itemMap.getMaterial().toString(), "BANNER")) {
+            String bannerList = bannerMeta.replace(" ", "");
             List<Pattern> patterns = new ArrayList<>();
             for (String banner : bannerList.split(",")) {
                 String[] bannerSection = banner.split(":");
@@ -1168,8 +1170,9 @@ public class ItemDesigner {
      * @param itemMap - The ItemMap being modified.
      */
     private void setTrim(final ItemMap itemMap) {
-        if (itemMap.getNodeLocation().getString(".trim-meta") != null && ServerUtils.hasSpecificUpdate("1_20") && ItemHandler.isArmor(itemMap.getMaterial().toString())) {
-            String armorTrim = Objects.requireNonNull(itemMap.getNodeLocation().getString(".trim-meta")).replace(" ", "");
+        final String trimMeta = itemMap.getNodeLocation().getString(".trim-meta");
+        if (trimMeta != null && ServerUtils.hasSpecificUpdate("1_20") && ItemHandler.isArmor(itemMap.getMaterial().toString())) {
+            String armorTrim = trimMeta.replace(" ", "");
             String[] armorSection = armorTrim.split(":");
             final org.bukkit.inventory.meta.trim.TrimMaterial Material = ItemHandler.getTrimMaterial(armorSection[0].toUpperCase());
             final org.bukkit.inventory.meta.trim.TrimPattern Pattern = ItemHandler.getTrimPattern(armorSection[1].toUpperCase());
@@ -1196,15 +1199,17 @@ public class ItemDesigner {
     private void setFireworks(final ItemMap itemMap) {
         if (itemMap.getNodeLocation().getString(".firework") != null) {
             if (itemMap.getMaterial().toString().equalsIgnoreCase("FIREWORK") || itemMap.getMaterial().toString().equalsIgnoreCase("FIREWORK_ROCKET")) {
-                if (itemMap.getNodeLocation().getString(".firework.type") != null) {
-                    String stringType = Objects.requireNonNull(itemMap.getNodeLocation().getString(".firework.type")).toUpperCase();
+                final String fireType = itemMap.getNodeLocation().getString(".firework.type");
+                final String fireColors = itemMap.getNodeLocation().getString(".firework.colors");
+                if (fireType != null) {
+                    String stringType = fireType.toUpperCase();
                     boolean flicker = itemMap.getNodeLocation().getBoolean(".firework.flicker");
                     boolean trail = itemMap.getNodeLocation().getBoolean(".firework.trail");
                     Type buildType = Type.valueOf(stringType);
                     List<Color> colors = new ArrayList<>();
                     List<DyeColor> saveColors = new ArrayList<>();
-                    if (itemMap.getNodeLocation().getString(".firework.colors") != null) {
-                        String colorList = Objects.requireNonNull(itemMap.getNodeLocation().getString(".firework.colors")).replace(" ", "");
+                    if (fireColors != null) {
+                        String colorList = fireColors.replace(" ", "");
                         for (String color : colorList.split(",")) {
                             try {
                                 colors.add(DyeColor.valueOf(color.toUpperCase()).getFireworkColor());
@@ -1241,10 +1246,10 @@ public class ItemDesigner {
      * @param itemMap - The ItemMap being modified.
      */
     private void setFireChargeColor(final ItemMap itemMap) {
-        if (itemMap.getNodeLocation().getString(".charge-color") != null) {
+        final String chargeColor = itemMap.getNodeLocation().getString(".charge-color");
+        if (chargeColor != null) {
             if (StringUtils.containsIgnoreCase(itemMap.getMaterial().toString(), "CHARGE") || StringUtils.containsIgnoreCase(itemMap.getMaterial().toString(), "STAR")) {
-                String color = Objects.requireNonNull(itemMap.getNodeLocation().getString(".charge-color")).toUpperCase();
-                itemMap.setChargeColor(DyeColor.valueOf(color));
+                itemMap.setChargeColor(DyeColor.valueOf(chargeColor.toUpperCase()));
             }
         }
     }

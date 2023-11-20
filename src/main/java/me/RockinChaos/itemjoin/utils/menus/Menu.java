@@ -46,6 +46,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.*;
@@ -372,10 +373,12 @@ public class Menu {
             dragDrop.allowClick(true);
             dragDrop.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nMain Menu", "&7", "&7*Returns you to the main menu."), event -> startMenu(player)));
             dragDrop.addButton(new Button(ItemHandler.getItem("CHEST", 1, false, false, "&a&lAutosave", "&7", "&7*Click me to save your whole", "&7inventory to the items.yml as-is,", "&7including current slot positions!", "&7", "&c&l[&nALL&c&l ITEMS]"), event -> {
-                PlayerInventory playerInv = event.getWhoClicked().getInventory();
+                final PlayerInventory playerInv = event.getWhoClicked().getInventory();
+                final ItemStack offItem = PlayerHandler.getOffHandItem(player);
                 for (int i = 0; i <= 35; i++) {
-                    if (playerInv.getItem(i) != null && Objects.requireNonNull(playerInv.getItem(i)).getType() != Material.AIR) {
-                        convertStack(player, Objects.requireNonNull(playerInv.getItem(i)), Integer.toString(i));
+                    final ItemStack item = playerInv.getItem(i);
+                    if (item != null && item.getType() != Material.AIR) {
+                        convertStack(player, item, Integer.toString(i));
                     }
                 }
                 if (playerInv.getHelmet() != null && playerInv.getHelmet().getType() != Material.AIR) {
@@ -390,16 +393,17 @@ public class Menu {
                 if (playerInv.getBoots() != null && playerInv.getBoots().getType() != Material.AIR) {
                     convertStack(player, playerInv.getBoots(), "BOOTS");
                 }
-                if (ServerUtils.hasSpecificUpdate("1_9") && PlayerHandler.getOffHandItem(player) != null && Objects.requireNonNull(PlayerHandler.getOffHandItem(player)).getType() != Material.AIR) {
-                    convertStack(player, Objects.requireNonNull(PlayerHandler.getOffHandItem(player)), "OFFHAND");
+                if (ServerUtils.hasSpecificUpdate("1_9") && offItem != null && offItem.getType() != Material.AIR) {
+                    convertStack(player, offItem, "OFFHAND");
                 }
                 ItemData.getInfo().hardReload(true);
                 startMenu(player);
             }));
             dragDrop.addButton(new Button(fillerPaneGItem), 2);
             dragDrop.addButton(new Button(ItemHandler.getItem("HOPPER", 1, false, false, "&a&lDrop an Item", "&7", "&7*Click an item from your inventory", "&7to save and drop it in this", "&7friendly little hopper!", "&7", "&a&l[&nSINGLE&a&l ITEM]"), event -> {
-                if (Objects.requireNonNull(event.getCursor()).getType() != Material.AIR) {
-                    ItemStack item = event.getCursor().clone();
+                final ItemStack cursorItem = event.getCursor();
+                if (cursorItem != null && cursorItem.getType() != Material.AIR) {
+                    final ItemStack item = cursorItem.clone();
                     event.getWhoClicked().setItemOnCursor(null);
                     event.getWhoClicked().getInventory().addItem(item);
                     convertStack(player, item, null);
@@ -408,10 +412,12 @@ public class Menu {
             }));
             dragDrop.addButton(new Button(fillerPaneGItem), 2);
             dragDrop.addButton(new Button(ItemHandler.getItem("CHEST", 1, false, false, "&a&lAutosave", "&7", "&7*Click me to save your whole", "&7inventory to the items.yml as-is,", "&7including current slot positions!", "&7", "&c&l[&nALL&c&l ITEMS]"), event -> {
-                PlayerInventory playerInv = event.getWhoClicked().getInventory();
+                final PlayerInventory playerInv = event.getWhoClicked().getInventory();
+                final ItemStack offItem = PlayerHandler.getOffHandItem(player);
                 for (int i = 0; i <= 35; i++) {
-                    if (playerInv.getItem(i) != null && Objects.requireNonNull(playerInv.getItem(i)).getType() != Material.AIR) {
-                        convertStack(player, Objects.requireNonNull(playerInv.getItem(i)), Integer.toString(i));
+                    final ItemStack item = playerInv.getItem(i);
+                    if (item != null && item.getType() != Material.AIR) {
+                        convertStack(player, item, Integer.toString(i));
                     }
                 }
                 if (playerInv.getHelmet() != null && playerInv.getHelmet().getType() != Material.AIR) {
@@ -426,8 +432,8 @@ public class Menu {
                 if (playerInv.getBoots() != null && playerInv.getBoots().getType() != Material.AIR) {
                     convertStack(player, playerInv.getBoots(), "BOOTS");
                 }
-                if (ServerUtils.hasSpecificUpdate("1_9") && PlayerHandler.getOffHandItem(player) != null && Objects.requireNonNull(PlayerHandler.getOffHandItem(player)).getType() != Material.AIR) {
-                    convertStack(player, Objects.requireNonNull(PlayerHandler.getOffHandItem(player)), "OFFHAND");
+                if (ServerUtils.hasSpecificUpdate("1_9") && offItem != null && offItem.getType() != Material.AIR) {
+                    convertStack(player, offItem, "OFFHAND");
                 }
                 ItemData.getInfo().hardReload(true);
                 startMenu(player);
@@ -645,13 +651,13 @@ public class Menu {
         }
         if (item.hasItemMeta()) {
             final ItemMeta itemMeta = item.getItemMeta();
-            if (itemMeta != null && item.getItemMeta().hasDisplayName()) {
-                itemMap.setCustomName(item.getItemMeta().getDisplayName().replace("�", "&"));
+            if (itemMeta != null && itemMeta.hasDisplayName()) {
+                itemMap.setCustomName(itemMeta.getDisplayName().replace("§", "&"));
             }
-            if (itemMeta != null && item.getItemMeta().hasLore()) {
+            if (itemMeta != null && itemMeta.getLore() != null) {
                 List<String> newLore = new ArrayList<>();
-                for (String lore : Objects.requireNonNull(item.getItemMeta().getLore())) {
-                    newLore.add(lore.replace("�", "&"));
+                for (String lore : itemMeta.getLore()) {
+                    newLore.add(lore.replace("§", "&"));
                 }
                 itemMap.setCustomLore(newLore);
             }
@@ -666,7 +672,10 @@ public class Menu {
         if (StringUtils.containsIgnoreCase(item.getType().toString(), "LEATHER_")) {
             final LeatherArmorMeta meta = (LeatherArmorMeta) item.getItemMeta();
             if (meta != null) {
-                itemMap.setLeatherColor(Objects.requireNonNull(DyeColor.getByColor(meta.getColor())).name());
+                final DyeColor dyeColor = DyeColor.getByColor(meta.getColor());
+                if (dyeColor != null) {
+                    itemMap.setLeatherColor(dyeColor.name());
+                }
             }
         } else if (item.getType().toString().equalsIgnoreCase("SKULL_ITEM") || item.getType().toString().equalsIgnoreCase("PLAYER_HEAD")) {
             if (!PlayerHandler.getSkullOwner(item).equalsIgnoreCase("NULL")) {
@@ -679,36 +688,42 @@ public class Menu {
         } else if (itemMap.getMaterial().toString().contains("BANNER")) {
             itemMap.setBannerPatterns(((BannerMeta) Objects.requireNonNull(item.getItemMeta())).getPatterns());
         } else if (itemMap.getMaterial().toString().equalsIgnoreCase("FIREWORK") || itemMap.getMaterial().toString().equalsIgnoreCase("FIREWORK_ROCKET")) {
-            List<DyeColor> colors = new ArrayList<>();
-            for (Color color : ((FireworkMeta) Objects.requireNonNull(item.getItemMeta())).getEffects().get(0).getColors()) {
-                colors.add(DyeColor.getByFireworkColor(color));
-            }
-            itemMap.setFirework(((FireworkMeta) item.getItemMeta()).getEffects().get(0));
-            itemMap.setFireworkColor(colors);
-            itemMap.setFireworkFlicker(((FireworkMeta) item.getItemMeta()).getEffects().get(0).hasFlicker());
-            itemMap.setFireworkTrail(((FireworkMeta) item.getItemMeta()).getEffects().get(0).hasTrail());
-            itemMap.setFireworkType(((FireworkMeta) item.getItemMeta()).getEffects().get(0).getType());
-            itemMap.setFireworkPower(((FireworkMeta) item.getItemMeta()).getPower());
-        } else if (itemMap.getMaterial() == Material.WRITTEN_BOOK) {
-            itemMap.setAuthor(Objects.requireNonNull(((BookMeta) Objects.requireNonNull(item.getItemMeta())).getAuthor()).replace("�", "&"));
-            itemMap.setTitle(Objects.requireNonNull(((BookMeta) item.getItemMeta()).getTitle()).replace("�", "&"));
-            if (ServerUtils.hasSpecificUpdate("1_10")) {
-                itemMap.setGeneration(((BookMeta) item.getItemMeta()).getGeneration());
-            }
-            List<String> newPages = new ArrayList<>();
-            for (String page : ((BookMeta) item.getItemMeta()).getPages()) {
-                newPages.add(page.replace("�", "&"));
-            }
-            itemMap.setPages(newPages);
-            List<List<String>> savePages = new ArrayList<>();
-            for (String page : ((BookMeta) item.getItemMeta()).getPages()) {
-                List<String> pageList = new ArrayList<>();
-                for (String splitPage : page.split("\n")) {
-                    pageList.add(splitPage.replace("�", "&"));
+            final ItemMeta itemMeta = item.getItemMeta();
+            if (itemMeta != null) {
+                List<DyeColor> colors = new ArrayList<>();
+                for (Color color : ((FireworkMeta) itemMeta).getEffects().get(0).getColors()) {
+                    colors.add(DyeColor.getByFireworkColor(color));
                 }
-                savePages.add(pageList);
+                itemMap.setFirework(((FireworkMeta) itemMeta).getEffects().get(0));
+                itemMap.setFireworkColor(colors);
+                itemMap.setFireworkFlicker(((FireworkMeta) itemMeta).getEffects().get(0).hasFlicker());
+                itemMap.setFireworkTrail(((FireworkMeta) itemMeta).getEffects().get(0).hasTrail());
+                itemMap.setFireworkType(((FireworkMeta) itemMeta).getEffects().get(0).getType());
+                itemMap.setFireworkPower(((FireworkMeta) itemMeta).getPower());
             }
-            itemMap.setListPages(savePages);
+        } else if (itemMap.getMaterial() == Material.WRITTEN_BOOK) {
+            final ItemMeta itemMeta = item.getItemMeta();
+            if (itemMeta != null) {
+                itemMap.setAuthor(Objects.requireNonNull(((BookMeta) itemMeta).getAuthor()).replace("§", "&"));
+                itemMap.setTitle(Objects.requireNonNull(((BookMeta) itemMeta).getTitle()).replace("§", "&"));
+                if (ServerUtils.hasSpecificUpdate("1_10")) {
+                    itemMap.setGeneration(((BookMeta) itemMeta).getGeneration());
+                }
+                List<String> newPages = new ArrayList<>();
+                for (String page : ((BookMeta) itemMeta).getPages()) {
+                    newPages.add(page.replace("§", "&"));
+                }
+                itemMap.setPages(newPages);
+                List<List<String>> savePages = new ArrayList<>();
+                for (String page : ((BookMeta) itemMeta).getPages()) {
+                    List<String> pageList = new ArrayList<>();
+                    for (String splitPage : page.split("\n")) {
+                        pageList.add(splitPage.replace("§", "&"));
+                    }
+                    savePages.add(pageList);
+                }
+                itemMap.setListPages(savePages);
+            }
         }
         if (slot == null) {
             switchPane(player, itemMap, 0);
@@ -865,15 +880,16 @@ public class Menu {
             creatingPane.addButton(new Button(ItemHandler.getItem("DIAMOND", itemMap.getCount(player), false, false, "&b&lCount", "&7", "&7*Set the amount of the", "&7item to be given.", "&9&lCOUNT: &a" +
                     itemMap.getCount(player)), event -> countPane(player, itemMap)));
             creatingPane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, false, false, "&b&lName", "&7", "&7*Set the name of the item.", "&9&lNAME: &f" + StringUtils.nullCheck(itemMap.getCustomName())), event -> { // false - Temp identifier
+                final InventoryHolder inventoryHolder = event.getInventory().getHolder();
                 if (itemMap.getDynamicNames() != null && itemMap.isAnimated()) {
                     animatedNamePane(player, itemMap);
                 } else {
                     if (!StringUtils.nullCheck(itemMap.getCustomName()).equals("NONE")) {
                         itemMap.setCustomName(null);
                         creatingPane(player, itemMap);
-                    } else {
-                        ((Interface) Objects.requireNonNull(event.getInventory().getHolder())).onTyping((Player) event.getView().getPlayer());
-                        Menu.setTypingMenu(true, player, ((Interface) Objects.requireNonNull(event.getInventory().getHolder())));
+                    } else if (inventoryHolder != null) {
+                        ((Interface) inventoryHolder).onTyping((Player) event.getView().getPlayer());
+                        Menu.setTypingMenu(true, player, ((Interface) inventoryHolder));
                     }
                 }
             }, query -> query.onClose(stateSnapshot -> creatingPane(stateSnapshot.getPlayer(), itemMap))
@@ -1168,7 +1184,8 @@ public class Menu {
     private static void languagePane(final Player player) {
         Interface languagePane = new Interface(false, 2, exitButton, GUIName, player);
         SchedulerUtils.runAsync(() -> {
-            final String language = Objects.requireNonNull(ItemJoin.getCore().getConfig("config.yml").getString("Language")).replace(" ", "");
+            final String lang = ItemJoin.getCore().getConfig("config.yml").getString("Language");
+            final String language = (lang != null && !lang.isEmpty()) ? lang.replace(" ", "") : "ENGLISH";
             languagePane.addButton(new Button(ItemHandler.getItem(ServerUtils.hasSpecificUpdate("1_13") ? "GRASS_BLOCK" : "2", 1, language.equalsIgnoreCase("ENGLISH"), false, "&6&l&nEnglish", "&7",
                     "&7*Sets the messages sent by", "&7the plugin to the player", "&7to be written in &c&lEnglish&7.", "&7This is the type of lang.yml file", "&7generated in the plugin folder.",
                     "&9&lENABLED: &a" + (language.equalsIgnoreCase("ENGLISH") + "").toUpperCase()), event -> {
@@ -1495,9 +1512,12 @@ public class Menu {
         SchedulerUtils.runAsync(() -> {
             List<String> triggers = new ArrayList<>();
             try {
-                for (String trigger : Objects.requireNonNull(ItemJoin.getCore().getConfig("config.yml").getString(triggerString)).replace(" ", "").split(",")) {
-                    if (trigger != null && !trigger.isEmpty()) {
-                        triggers.add(trigger);
+                final String triggerSet = ItemJoin.getCore().getConfig("config.yml").getString(triggerString);
+                if (triggerSet != null && !triggerSet.isEmpty()) {
+                    for (String trigger : triggerSet.replace(" ", "").split(",")) {
+                        if (trigger != null && !trigger.isEmpty()) {
+                            triggers.add(trigger);
+                        }
                     }
                 }
             } catch (Exception ignored) {
@@ -1791,10 +1811,13 @@ public class Menu {
     private static void preventPane(final Player player) {
         Interface preventPane = new Interface(false, 3, exitButton, GUIName, player);
         SchedulerUtils.runAsync(() -> {
-            List<String> bypassList = new ArrayList<>();
-            for (String bypass : Objects.requireNonNull(ItemJoin.getCore().getConfig("config.yml").getString("Prevent.Bypass")).replace(" ", "").split(",")) {
-                if (bypass != null && !bypass.isEmpty()) {
-                    bypassList.add(bypass);
+            final List<String> bypassList = new ArrayList<>();
+            final String bypassSet = ItemJoin.getCore().getConfig("config.yml").getString("Prevent.Bypass");
+            if (bypassSet != null) {
+                for (String bypass : bypassSet.replace(" ", "").split(",")) {
+                    if (bypass != null && !bypass.isEmpty()) {
+                        bypassList.add(bypass);
+                    }
                 }
             }
             preventPane.addButton(new Button(fillerPaneBItem), 3);
@@ -1846,35 +1869,34 @@ public class Menu {
                         SchedulerUtils.runLater(2L, () -> preventPane(player));
                     }));
             preventPane.addButton(new Button(fillerPaneBItem), 3);
+            final String chat = (ItemJoin.getCore().getConfig("config.yml").getString("Prevent.Chat") != null ? ItemJoin.getCore().getConfig("config.yml").getString("Prevent.Chat") : "DISABLE");
+            final String pickups = (ItemJoin.getCore().getConfig("config.yml").getString("Prevent.Pickups") != null ? ItemJoin.getCore().getConfig("config.yml").getString("Prevent.Pickups") : "DISABLE");
+            final String itemMovement = (ItemJoin.getCore().getConfig("config.yml").getString("Prevent.itemMovement") != null ? ItemJoin.getCore().getConfig("config.yml").getString("Prevent.itemMovement") : "DISABLE");
+            final String selfDrops = (ItemJoin.getCore().getConfig("config.yml").getString("Prevent.Self-Drops") != null ? ItemJoin.getCore().getConfig("config.yml").getString("Prevent.Self-Drops") : "DISABLE");
+            final String deathDrops = (ItemJoin.getCore().getConfig("config.yml").getString("Prevent.Death-Drops") != null ? ItemJoin.getCore().getConfig("config.yml").getString("Prevent.Death-Drops") : "DISABLE");
             preventPane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, false, false,
                     "&c&l&nPrevent Chat", "&7", "&7*Prevent players from being able", "&7to send chat messages.", "&7", "&7Useful if you are using BungeeChat.",
-                    "&9&lENABLED: &a" + ((Objects.requireNonNull((ItemJoin.getCore().getConfig("config.yml").getString("Prevent.Chat") != null &&
-                            !StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Prevent.Chat"), "DISABLE")) ?
-                            ItemJoin.getCore().getConfig("config.yml").getString("Prevent.Chat") : "FALSE"))).toUpperCase()),
+                    "&9&lENABLED: &a" + (((chat != null && !StringUtils.containsIgnoreCase(chat, "DISABLE")) ? chat : "FALSE")).toUpperCase()),
                     event -> worldPane(player, "Prevent.Chat")));
             preventPane.addButton(new Button(fillerPaneBItem));
             preventPane.addButton(new Button(ItemHandler.getItem("CHEST", 1, false, false,
                     "&c&l&nPrevent Pickups", "&7", "&7*Prevent players from picking up", "&7ANY items, not just custom items.",
-                    "&9&lENABLED: &a" + ((Objects.requireNonNull(!StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Prevent.Pickups"), "DISABLE") ?
-                            ItemJoin.getCore().getConfig("config.yml").getString("Prevent.Pickups") : "FALSE"))).toUpperCase()),
+                    "&9&lENABLED: &a" + (((pickups != null && !StringUtils.containsIgnoreCase(pickups, "DISABLE")) ? pickups : "FALSE")).toUpperCase()),
                     event -> worldPane(player, "Prevent.Pickups")));
             preventPane.addButton(new Button(fillerPaneBItem));
             preventPane.addButton(new Button(ItemHandler.getItem("BEDROCK", 1, false, false,
                     "&c&l&nPrevent Movement", "&7", "&7*Prevent players from moving", "&7ANY items around in their", "&7inventory, not just custom items.",
-                    "&9&lENABLED: &a" + ((Objects.requireNonNull(!StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Prevent.itemMovement"), "DISABLE") ?
-                            ItemJoin.getCore().getConfig("config.yml").getString("Prevent.itemMovement") : "FALSE"))).toUpperCase()),
+                    "&9&lENABLED: &a" + (((itemMovement != null && !StringUtils.containsIgnoreCase(itemMovement, "DISABLE")) ? itemMovement : "FALSE")).toUpperCase()),
                     event -> worldPane(player, "Prevent.itemMovement")));
             preventPane.addButton(new Button(fillerPaneBItem));
             preventPane.addButton(new Button(ItemHandler.getItem("HOPPER", 1, false, false,
                     "&c&l&nPrevent Drops", "&7", "&7*Prevent players from dropping", "&7ANY items, not just custom items.",
-                    "&9&lENABLED: &a" + ((Objects.requireNonNull(!StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Prevent.Self-Drops"), "DISABLE") ?
-                            ItemJoin.getCore().getConfig("config.yml").getString("Prevent.Self-Drops") : "FALSE"))).toUpperCase()),
+                    "&9&lENABLED: &a" + (((selfDrops != null && !StringUtils.containsIgnoreCase(selfDrops, "DISABLE")) ? selfDrops : "FALSE")).toUpperCase()),
                     event -> worldPane(player, "Prevent.Self-Drops")));
             preventPane.addButton(new Button(fillerPaneBItem));
             preventPane.addButton(new Button(ItemHandler.getItem("BONE", 1, false, false,
                     "&c&l&nPrevent Death Drops", "&7", "&7*Prevent players from dropping", "&7ANY items on death, not just custom items.",
-                    "&9&lENABLED: &a" + ((Objects.requireNonNull(!StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Prevent.Death-Drops"), "DISABLE") ?
-                            ItemJoin.getCore().getConfig("config.yml").getString("Prevent.Death-Drops") : "FALSE"))).toUpperCase()),
+                    "&9&lENABLED: &a" + (((deathDrops != null && !StringUtils.containsIgnoreCase(deathDrops, "DISABLE")) ? deathDrops : "FALSE")).toUpperCase()),
                     event -> worldPane(player, "Prevent.Death-Drops")));
             preventPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the item settings menu."), event -> itemSettings(player)));
             preventPane.addButton(new Button(fillerPaneBItem), 7);
@@ -1935,31 +1957,34 @@ public class Menu {
                         }));
                 clearPane.addButton(new Button(fillerPaneBItem), 3);
             }
+            final String join = (ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Join") != null ? ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Join") : "DISABLE");
+            final String quit = (ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Quit") != null ? ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Quit") : "DISABLE");
+            final String worldSwitch = (ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.World-Switch") != null ? ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.World-Switch") : "DISABLE");
+            final String regionEnter = (ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Region-Enter") != null ? ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Region-Enter") : "DISABLE");
+            final String delayTick = (ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Delay-Tick") != null ? ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Delay-Tick") : "DISABLE");
+            final String options = (ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Options") != null ? ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Options") : "DISABLE");
+            final String blackList = (ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Blacklist") != null ? ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Blacklist") : "DISABLE");
+            final boolean guardEnabled = ItemJoin.getCore().getDependencies().getGuard().guardEnabled();
             clearPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "OAK_SIGN" : "323"), 1, false, false,
                     "&c&l&nJoin", "&7", "&7*Clears the items from the", "&7player upon joining the server.",
-                    "&9&lENABLED: &a" + ((Objects.requireNonNull(!StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Join"), "DISABLE") ?
-                            ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Join") : "FALSE"))).toUpperCase()),
+                    "&9&lENABLED: &a" + (((join != null && !StringUtils.containsIgnoreCase(join, "DISABLE")) ? join : "FALSE")).toUpperCase()),
                     event -> worldPane(player, "Clear-Items.Join")));
             clearPane.addButton(new Button(ItemHandler.getItem("LAVA_BUCKET", 1, false, false,
                     "&c&l&nQuit", "&7", "&7*Clears the items from the", "&7player upon quiting the server.",
-                    "&9&lENABLED: &a" + ((Objects.requireNonNull(!StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Quit"), "DISABLE") ?
-                            ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Quit") : "FALSE"))).toUpperCase()),
+                    "&9&lENABLED: &a" + (((quit != null && !StringUtils.containsIgnoreCase(quit, "DISABLE")) ? quit : "FALSE")).toUpperCase()),
                     event -> worldPane(player, "Clear-Items.Quit")));
             clearPane.addButton(new Button(fillerPaneBItem));
             clearPane.addButton(new Button(ItemHandler.getItem("STONE_BUTTON", 1, false, false,
                     "&c&l&nWorld-Switch", "&7", "&7*Clears the items from the", "&7player upon changing worlds.",
-                    "&9&lENABLED: &a" + ((Objects.requireNonNull(!StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.World-Switch"), "DISABLE") ?
-                            ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.World-Switch") : "FALSE"))).toUpperCase()),
+                    "&9&lENABLED: &a" + (((worldSwitch != null && !StringUtils.containsIgnoreCase(worldSwitch, "DISABLE")) ? worldSwitch : "FALSE")).toUpperCase()),
                     event -> worldPane(player, "Clear-Items.World-Switch")));
             clearPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CLOCK" : "342"), 1, false, false,
                     "&b&lClear Delay", "&7", "&7*The number of second(s)", "&7to wait before clearing", "&7items from the player inventory.",
-                    "&9&lDelay: &a" + (Objects.requireNonNull(ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Delay-Tick"))).toUpperCase()),
+                    "&9&lDelay: &a" + (delayTick != null ? delayTick.toUpperCase() : "0")),
                     event -> numberPane(player, 3)));
             clearPane.addButton(new Button(ItemHandler.getItem("MINECART", 1, false, false,
                     "&c&l&nRegion-Enter", "&7", "&7*Clears the items from the", "&7player upon entering", "&7a WorldGuard region.",
-                    (ItemJoin.getCore().getDependencies().getGuard().guardEnabled() ? "&9&lENABLED: &a" + ((Objects.requireNonNull(!StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Region-Enter"), "DISABLE") ?
-                            ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Region-Enter") : "FALSE"))).toUpperCase() : ""), (ItemJoin.getCore().getDependencies().getGuard().guardEnabled() ? "" : "&7"),
-                    (ItemJoin.getCore().getDependencies().getGuard().guardEnabled() ? "" : "&c&lERROR: &7WorldGuard was NOT found."), (ItemJoin.getCore().getDependencies().getGuard().guardEnabled() ? "" : "&7This button will do nothing...")),
+                    (guardEnabled ? "&9&lENABLED: &a" + ((regionEnter != null && !StringUtils.containsIgnoreCase(regionEnter, "DISABLE") ? regionEnter : "FALSE")).toUpperCase() : ""), (guardEnabled ? "" : "&7"), (guardEnabled ? "" : "&c&lERROR: &7WorldGuard was NOT found."), (guardEnabled ? "" : "&7This button will do nothing...")),
                     event -> {
                         if (ItemJoin.getCore().getDependencies().getGuard().guardEnabled()) {
                             worldPane(player, "Clear-Items.Region-Enter");
@@ -1968,12 +1993,11 @@ public class Menu {
             clearPane.addButton(new Button(fillerPaneBItem));
             clearPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "COMMAND_BLOCK" : "137"), 1, false, false,
                     "&b&lOptions", "&7", "&7*Actions to apply to", "&7the clear items triggers", "&7such as OP bypass.",
-                    "&9&lENABLED: &a" + ((Objects.requireNonNull(!StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Options"), "DISABLE") ?
-                            ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Options") : "FALSE"))).toUpperCase()),
+                    "&9&lENABLED: &a" + (((options != null && !StringUtils.containsIgnoreCase(options, "DISABLE")) ? options : "FALSE")).toUpperCase()),
                     event -> optionPane(player)));
             clearPane.addButton(new Button(ItemHandler.getItem("CHEST", 1, false, false,
                     "&b&lBlackList", "&7", "&7*Materials, Slots, or Item Names", "&7to be blacklisted from being", "&7cleared upon performing a trigger.",
-                    "&9&lENABLED: &a" + (!Objects.requireNonNull(ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Blacklist")).isEmpty() + "").toUpperCase()),
+                    "&9&lENABLED: &a" + ((blackList != null && !blackList.isEmpty()) + "").toUpperCase()),
                     event -> blacklistPane(player)));
             clearPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the item settings menu."), event -> itemSettings(player)));
             clearPane.addButton(new Button(fillerPaneBItem), 7);
@@ -1990,24 +2014,25 @@ public class Menu {
     private static void blacklistPane(final Player player) {
         Interface blacklistPane = new Interface(false, 2, exitButton, GUIName, player);
         SchedulerUtils.runAsync(() -> {
-            String[] blacklist = Objects.requireNonNull(ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Blacklist")).split(",");
             List<String> materials = new ArrayList<>();
             List<String> slots = new ArrayList<>();
             List<String> names = new ArrayList<>();
             try {
-                for (String value : blacklist) {
-                    String valType = (StringUtils.containsIgnoreCase(value, "{id") ? "id" : (StringUtils.containsIgnoreCase(value, "{slot") ? "slot" : (StringUtils.containsIgnoreCase(value, "{name") ? "name" : "")));
-                    String inputResult = org.apache.commons.lang.StringUtils.substringBetween(value, "{" + valType + ":", "}");
-                    if (valType.equalsIgnoreCase("id") && ItemHandler.getMaterial(inputResult.trim(), null) != null) {
-                        materials.add(inputResult.trim().toUpperCase());
-                    } else if (valType.equalsIgnoreCase("slot")) {
-                        slots.add(inputResult.trim().toUpperCase());
-                    } else if (valType.equalsIgnoreCase("name")) {
-                        names.add(inputResult.trim());
+                final String blacklist = ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Blacklist");
+                if (blacklist != null) {
+                    for (String value : blacklist.split(",")) {
+                        String valType = (StringUtils.containsIgnoreCase(value, "{id") ? "id" : (StringUtils.containsIgnoreCase(value, "{slot") ? "slot" : (StringUtils.containsIgnoreCase(value, "{name") ? "name" : "")));
+                        String inputResult = org.apache.commons.lang.StringUtils.substringBetween(value, "{" + valType + ":", "}");
+                        if (valType.equalsIgnoreCase("id") && ItemHandler.getMaterial(inputResult.trim(), null) != null) {
+                            materials.add(inputResult.trim().toUpperCase());
+                        } else if (valType.equalsIgnoreCase("slot")) {
+                            slots.add(inputResult.trim().toUpperCase());
+                        } else if (valType.equalsIgnoreCase("name")) {
+                            names.add(inputResult.trim());
+                        }
                     }
                 }
-            } catch (Exception ignored) {
-            }
+            } catch (Exception ignored) { }
             blacklistPane.addButton(new Button(fillerPaneBItem), 3);
             blacklistPane.addButton(new Button(ItemHandler.getItem("DIAMOND_SWORD", 1, false, false,
                     "&b&l&nMaterials", "&7", "&7*The material to be blacklisted", "&7from being cleared.", "&7",
@@ -2038,21 +2063,22 @@ public class Menu {
         Interface materialPane = new Interface(true, 6, exitButton, GUIName, player);
         SchedulerUtils.runAsync(() -> {
             materialPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the blacklist menu."), event -> blacklistPane(player)));
-            String[] blacklist = Objects.requireNonNull(ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Blacklist")).split(",");
             List<String> materials = new ArrayList<>();
             List<String> saveList = new ArrayList<>();
             try {
-                for (String value : blacklist) {
-                    String valType = (StringUtils.containsIgnoreCase(value, "{id") ? "id" : (StringUtils.containsIgnoreCase(value, "{slot") ? "slot" : (StringUtils.containsIgnoreCase(value, "{name") ? "name" : "")));
-                    String inputResult = org.apache.commons.lang.StringUtils.substringBetween(value, "{" + valType + ":", "}");
-                    if (valType.equalsIgnoreCase("id") && ItemHandler.getMaterial(inputResult.trim(), null) != null) {
-                        materials.add(inputResult.trim().toUpperCase());
-                    } else if (!valType.equalsIgnoreCase("id") && !value.isEmpty()) {
-                        saveList.add(value.trim());
+                final String blacklist = ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Blacklist");
+                if (blacklist != null) {
+                    for (String value : blacklist.split(",")) {
+                        String valType = (StringUtils.containsIgnoreCase(value, "{id") ? "id" : (StringUtils.containsIgnoreCase(value, "{slot") ? "slot" : (StringUtils.containsIgnoreCase(value, "{name") ? "name" : "")));
+                        String inputResult = org.apache.commons.lang.StringUtils.substringBetween(value, "{" + valType + ":", "}");
+                        if (valType.equalsIgnoreCase("id") && ItemHandler.getMaterial(inputResult.trim(), null) != null) {
+                            materials.add(inputResult.trim().toUpperCase());
+                        } else if (!valType.equalsIgnoreCase("id") && !value.isEmpty()) {
+                            saveList.add(value.trim());
+                        }
                     }
                 }
-            } catch (Exception ignored) {
-            }
+            } catch (Exception ignored) { }
             materialPane.addButton(new Button(ItemHandler.getItem("STICK", 1, true, false, "&b&lBukkit Material", "&7", "&7*If you know the name", "&7of the BUKKIT material type", "&7simply click and type it."), event -> {
                 player.closeInventory();
                 String[] placeHolders = ItemJoin.getCore().getLang().newString();
@@ -2123,21 +2149,22 @@ public class Menu {
         Interface craftingPane = new Interface(false, 4, exitButton, GUIName, player);
         SchedulerUtils.runAsync(() -> {
             slotPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the blacklist menu."), event -> blacklistPane(player)));
-            String[] blacklist = Objects.requireNonNull(ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Blacklist")).split(",");
             List<String> slots = new ArrayList<>();
             List<String> saveList = new ArrayList<>();
             try {
-                for (String value : blacklist) {
-                    String valType = (StringUtils.containsIgnoreCase(value, "{id") ? "id" : (StringUtils.containsIgnoreCase(value, "{slot") ? "slot" : (StringUtils.containsIgnoreCase(value, "{name") ? "name" : "")));
-                    String inputResult = org.apache.commons.lang.StringUtils.substringBetween(value, "{" + valType + ":", "}");
-                    if (valType.equalsIgnoreCase("slot")) {
-                        slots.add(inputResult.trim().toUpperCase());
-                    } else if (!value.isEmpty()) {
-                        saveList.add(value.trim());
+                final String blacklist = ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Blacklist");
+                if (blacklist != null) {
+                    for (String value : blacklist.split(",")) {
+                        String valType = (StringUtils.containsIgnoreCase(value, "{id") ? "id" : (StringUtils.containsIgnoreCase(value, "{slot") ? "slot" : (StringUtils.containsIgnoreCase(value, "{name") ? "name" : "")));
+                        String inputResult = org.apache.commons.lang.StringUtils.substringBetween(value, "{" + valType + ":", "}");
+                        if (valType.equalsIgnoreCase("slot")) {
+                            slots.add(inputResult.trim().toUpperCase());
+                        } else if (!value.isEmpty()) {
+                            saveList.add(value.trim());
+                        }
                     }
                 }
-            } catch (Exception ignored) {
-            }
+            } catch (Exception ignored) { }
             craftingPane.addButton(new Button(fillerPaneGItem), 3);
             craftingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CRAFTING_TABLE" : "58"), 1, StringUtils.containsValue(slots, "CRAFTING[1]"), false, "&9&lSlot: &7&lCRAFTING&a&l[1]", "&7", "&7*Click to prevent this slot", "&7from having its items cleared.",
                     (StringUtils.containsValue(slots, "CRAFTING[1]") ? "&9&lENABLED: &aTRUE" : "")), event -> {
@@ -2385,21 +2412,22 @@ public class Menu {
         Interface namePane = new Interface(true, 2, exitButton, GUIName, player);
         SchedulerUtils.runAsync(() -> {
             namePane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the blacklist menu."), event -> blacklistPane(player)));
-            String[] blacklist = Objects.requireNonNull(ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Blacklist")).split(",");
             List<String> names = new ArrayList<>();
             List<String> saveList = new ArrayList<>();
             try {
-                for (String value : blacklist) {
-                    String valType = (StringUtils.containsIgnoreCase(value, "{id") ? "id" : (StringUtils.containsIgnoreCase(value, "{slot") ? "slot" : (StringUtils.containsIgnoreCase(value, "{name") ? "name" : "")));
-                    String inputResult = org.apache.commons.lang.StringUtils.substringBetween(value, "{" + valType + ":", "}");
-                    if (valType.equalsIgnoreCase("name")) {
-                        names.add(inputResult.trim().toUpperCase());
-                    } else if (!value.isEmpty()) {
-                        saveList.add(value.trim());
+                final String blacklist = ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Blacklist");
+                if (blacklist != null) {
+                    for (String value : blacklist.split(",")) {
+                        String valType = (StringUtils.containsIgnoreCase(value, "{id") ? "id" : (StringUtils.containsIgnoreCase(value, "{slot") ? "slot" : (StringUtils.containsIgnoreCase(value, "{name") ? "name" : "")));
+                        String inputResult = org.apache.commons.lang.StringUtils.substringBetween(value, "{" + valType + ":", "}");
+                        if (valType.equalsIgnoreCase("name")) {
+                            names.add(inputResult.trim().toUpperCase());
+                        } else if (!value.isEmpty()) {
+                            saveList.add(value.trim());
+                        }
                     }
                 }
-            } catch (Exception ignored) {
-            }
+            } catch (Exception ignored) { }
             namePane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, true, false, "&b&lAdd Name", "&7", "&7*Add an items display", "&7name to be blacklisted", "&7simply click and type it.", "&7",
                     "&c&l&nNOTE:&7 Do NOT include any", "&7color codes as these are excluded."), event -> {
                 player.closeInventory();
@@ -2454,9 +2482,12 @@ public class Menu {
     private static void optionPane(final Player player) {
         Interface optionPane = new Interface(false, 2, exitButton, GUIName, player);
         List<String> optionList = new ArrayList<>();
-        for (String option : Objects.requireNonNull(ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Options")).replace(" ", "").split(",")) {
-            if (option != null && !option.isEmpty()) {
-                optionList.add(option);
+        final String options = ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Options");
+        if (options != null) {
+            for (String option : options.replace(" ", "").split(",")) {
+                if (option != null && !option.isEmpty()) {
+                    optionList.add(option);
+                }
             }
         }
         SchedulerUtils.runAsync(() -> {
@@ -2686,14 +2717,17 @@ public class Menu {
         SchedulerUtils.runAsync(() -> {
             overwritePane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the configuration menu."), event -> itemSettings(player)));
             List<String> enabledWorlds = new ArrayList<>();
-            String[] enabledParts = Objects.requireNonNull(ItemJoin.getCore().getConfig("items.yml").getString("items-Overwrite")).replace(" ,  ", ",").replace(" , ", ",").replace(",  ", ",").replace(", ", ",").split(",");
-            for (String enabledWorld : enabledParts) {
-                if (enabledWorld.equalsIgnoreCase("ALL") || enabledWorld.equalsIgnoreCase("GLOBAL")) {
-                    enabledWorlds.add("ALL");
-                } else {
-                    for (World world : Bukkit.getServer().getWorlds()) {
-                        if (enabledWorld.equalsIgnoreCase(world.getName())) {
-                            enabledWorlds.add(world.getName());
+            final String overwrite = ItemJoin.getCore().getConfig("items.yml").getString("items-Overwrite");
+            if (overwrite != null) {
+                String[] enabledParts = overwrite.replace(" ,  ", ",").replace(" , ", ",").replace(",  ", ",").replace(", ", ",").split(",");
+                for (String enabledWorld : enabledParts) {
+                    if (enabledWorld.equalsIgnoreCase("ALL") || enabledWorld.equalsIgnoreCase("GLOBAL")) {
+                        enabledWorlds.add("ALL");
+                    } else {
+                        for (World world : Bukkit.getServer().getWorlds()) {
+                            if (enabledWorld.equalsIgnoreCase(world.getName())) {
+                                enabledWorlds.add(world.getName());
+                            }
                         }
                     }
                 }

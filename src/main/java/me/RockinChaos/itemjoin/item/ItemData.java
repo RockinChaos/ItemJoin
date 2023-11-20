@@ -43,6 +43,7 @@ import me.RockinChaos.itemjoin.utils.sql.DataObject;
 import me.RockinChaos.itemjoin.utils.sql.DataObject.Table;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -144,8 +145,10 @@ public class ItemData {
      * @return If the trigger type is enabled.
      */
     public boolean triggerEnabled(final String type) {
-        return ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.triggers") != null && StringUtils.containsIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.triggers"), type)
-                && (!Objects.requireNonNull(ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.enabled-worlds")).equalsIgnoreCase("DISABLED") && !Objects.requireNonNull(ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.enabled-worlds")).equalsIgnoreCase("FALSE"));
+        final String triggers = ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.triggers");
+        final String enabledWorlds = ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.enabled-worlds");
+        return StringUtils.containsIgnoreCase(triggers, type)
+                && (enabledWorlds != null && !enabledWorlds.equalsIgnoreCase("DISABLED") && !enabledWorlds.equalsIgnoreCase("FALSE"));
     }
 
     /**
@@ -155,8 +158,8 @@ public class ItemData {
      * @return If the clear type is enabled.
      */
     public boolean clearEnabled(final String type) {
-        return ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items." + type) != null
-                && !Objects.requireNonNull(ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items." + type)).equalsIgnoreCase("DISABLED") && !Objects.requireNonNull(ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items." + type)).equalsIgnoreCase("FALSE");
+        final String clearType = ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items." + type);
+        return clearType != null && !clearType.equalsIgnoreCase("DISABLED") && !clearType.equalsIgnoreCase("FALSE");
     }
 
     /**
@@ -165,9 +168,8 @@ public class ItemData {
      * @return The Integer hotbar value.
      */
     public int getHotbarSlot() {
-        if (ItemJoin.getCore().getConfig("config.yml").getString("Settings.HeldItem-Slot") != null
-                && !Objects.requireNonNull(ItemJoin.getCore().getConfig("config.yml").getString("Settings.HeldItem-Slot")).equalsIgnoreCase("DISABLED")
-                && StringUtils.isInt(ItemJoin.getCore().getConfig("config.yml").getString("Settings.HeldItem-Slot"))) {
+        final String heldItemSlot = ItemJoin.getCore().getConfig("config.yml").getString("Settings.HeldItem-Slot");
+        if (heldItemSlot != null && !heldItemSlot.equalsIgnoreCase("DISABLED") && StringUtils.isInt(heldItemSlot)) {
             return ItemJoin.getCore().getConfig("config.yml").getInt("Settings.HeldItem-Slot");
         }
         return -1;
@@ -179,10 +181,9 @@ public class ItemData {
      * @return The String list of hotbar triggers.
      */
     public String getHotbarTriggers() {
-        if (ItemJoin.getCore().getConfig("config.yml").getString("Settings.HeldItem-Triggers") != null
-                && !Objects.requireNonNull(ItemJoin.getCore().getConfig("config.yml").getString("Settings.HeldItem-Triggers")).equalsIgnoreCase("DISABLED")
-                && !Objects.requireNonNull(ItemJoin.getCore().getConfig("config.yml").getString("Settings.HeldItem-Triggers")).equalsIgnoreCase("FALSE")) {
-            return ItemJoin.getCore().getConfig("config.yml").getString("Settings.HeldItem-Triggers");
+        final String triggers = ItemJoin.getCore().getConfig("config.yml").getString("Settings.HeldItem-Triggers");
+        if (triggers != null && !triggers.equalsIgnoreCase("DISABLED") && !triggers.equalsIgnoreCase("FALSE")) {
+            return triggers;
         }
         return "";
     }
@@ -333,7 +334,8 @@ public class ItemData {
      */
     public void setPages() {
         runAsync(() -> {
-            final int customItems = (ItemJoin.getCore().getConfig("items.yml").getConfigurationSection("items") != null ? Objects.requireNonNull(ItemJoin.getCore().getConfig("items.yml").getConfigurationSection("items")).getKeys(false).size() : 0);
+            final ConfigurationSection itemsPath = ItemJoin.getCore().getConfig("items.yml").getConfigurationSection("items");
+            final int customItems = (itemsPath != null ? itemsPath.getKeys(false).size() : 0);
             if (customItems > 15) {
                 this.permissionLength = (int) Math.ceil((double) customItems / 15) + 1;
             }
@@ -457,7 +459,8 @@ public class ItemData {
         ItemJoin.getCore().getData().setSQLDatabase(ItemJoin.getCore().getConfig("config.yml").getString("Database.database"));
         ItemJoin.getCore().getDependencies().refresh();
         runAsync(() -> {
-            int customItems = (ItemJoin.getCore().getConfig("items.yml").getConfigurationSection("items") != null ? Objects.requireNonNull(ItemJoin.getCore().getConfig("items.yml").getConfigurationSection("items")).getKeys(false).size() : 0);
+            final ConfigurationSection itemsPath = ItemJoin.getCore().getConfig("items.yml").getConfigurationSection("items");
+            int customItems = (itemsPath != null ? itemsPath.getKeys(false).size() : 0);
             final String compileVersion = "${spigot.version}".split("-")[0].replace(".", "_");
             final String serverVersion = ServerUtils.getVersion();
             if (!silent) {
@@ -575,9 +578,8 @@ public class ItemData {
      * @param itemMap - The ItemMap that needs its events registered.
      */
     public void registerListeners(final ItemMap itemMap) {
-        if (((!itemMap.isGiveOnDisabled() && itemMap.isGiveOnJoin()) || itemMap.isAutoRemove() || (ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.enabled-worlds") != null
-                && (!Objects.requireNonNull(ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.enabled-worlds")).equalsIgnoreCase("DISABLED") || !Objects.requireNonNull(ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.enabled-worlds")).equalsIgnoreCase("FALSE"))))
-                && StringUtils.isRegistered(PlayerJoin.class.getSimpleName())) {
+        final String enabledWorlds = ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.enabled-worlds");
+        if (((!itemMap.isGiveOnDisabled() && itemMap.isGiveOnJoin()) || itemMap.isAutoRemove() || (enabledWorlds != null && (!enabledWorlds.equalsIgnoreCase("DISABLED") && !enabledWorlds.equalsIgnoreCase("FALSE")))) && StringUtils.isRegistered(PlayerJoin.class.getSimpleName())) {
             ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new PlayerJoin(), ItemJoin.getCore().getPlugin());
         }
         if ((((!itemMap.isGiveOnDisabled() && itemMap.isGiveOnRespawn()) || itemMap.isDeathKeepable()) || itemMap.isAutoRemove()) && StringUtils.isRegistered(Respawn.class.getSimpleName())) {

@@ -39,6 +39,7 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.inventory.InventoryType.SlotType;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.*;
 
@@ -156,13 +157,12 @@ public class Clicking implements Listener {
     @EventHandler()
     private void onEquipment(InventoryClickEvent event) {
         final Player player = (Player) event.getWhoClicked();
-        if (StringUtils.containsIgnoreCase(event.getAction().name(), "HOTBAR") && event.getView().getBottomInventory().getSize() >= event.getHotbarButton() && event.getHotbarButton() >= 0
-                && !event.getClick().name().equalsIgnoreCase("MIDDLE") && event.getSlotType() == SlotType.ARMOR && event.getView().getBottomInventory().getItem(event.getHotbarButton()) != null
-                && Objects.requireNonNull(event.getView().getBottomInventory().getItem(event.getHotbarButton())).getType() != Material.AIR
-                && this.isEquipment(Objects.requireNonNull(event.getView().getBottomInventory().getItem(event.getHotbarButton())), "EQUIPPED", String.valueOf(event.getSlot()))
-                && !ItemUtilities.getUtilities().isAllowed(player, event.getView().getBottomInventory().getItem(event.getHotbarButton()), "cancel-equip")) {
-            event.setCancelled(true);
-            PlayerHandler.updateInventory(player, 1L);
+        if (StringUtils.containsIgnoreCase(event.getAction().name(), "HOTBAR") && event.getView().getBottomInventory().getSize() >= event.getHotbarButton() && event.getHotbarButton() >= 0  && !event.getClick().name().equalsIgnoreCase("MIDDLE") && event.getSlotType() == SlotType.ARMOR) {
+            final ItemStack hotItem = event.getView().getBottomInventory().getItem(event.getHotbarButton());
+            if (hotItem != null && hotItem.getType() != Material.AIR && this.isEquipment(hotItem, "EQUIPPED", String.valueOf(event.getSlot())) && !ItemUtilities.getUtilities().isAllowed(player, hotItem, "cancel-equip")) {
+                event.setCancelled(true);
+                PlayerHandler.updateInventory(player, 1L);
+            }
         }
         if (!event.getClick().name().equalsIgnoreCase("MIDDLE") && event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR) {
             if (event.getSlotType() == SlotType.ARMOR
@@ -253,10 +253,11 @@ public class Clicking implements Listener {
      */
     public boolean isCreativeDupe(final InventoryClickEvent event) {
         if (PlayerHandler.isCreativeMode((Player) event.getWhoClicked()) && event.getCurrentItem() != null && event.getCursor() != null) {
+            final ItemMeta itemMeta = event.getCurrentItem().getItemMeta();
             String currentNBT = (ItemJoin.getCore().getData().dataTagsEnabled() ? ItemHandler.getNBTData(event.getCurrentItem(), ItemData.getInfo().getNBTList())
-                    : ((event.getCurrentItem().hasItemMeta() && Objects.requireNonNull(event.getCurrentItem().getItemMeta()).hasDisplayName()) ? StringUtils.colorDecode(event.getCurrentItem()) : null));
+                    : ((itemMeta != null && itemMeta.hasDisplayName()) ? StringUtils.colorDecode(event.getCurrentItem()) : null));
             String cursorNBT = (ItemJoin.getCore().getData().dataTagsEnabled() ? ItemHandler.getNBTData(event.getCursor(), ItemData.getInfo().getNBTList())
-                    : ((event.getCursor().hasItemMeta() && Objects.requireNonNull(event.getCursor().getItemMeta()).hasDisplayName()) ? StringUtils.colorDecode(event.getCursor()) : null));
+                    : ((itemMeta != null && itemMeta.hasDisplayName()) ? StringUtils.colorDecode(event.getCursor()) : null));
             if (currentNBT != null && cursorNBT != null) {
                 return currentNBT.equalsIgnoreCase(cursorNBT);
             }
@@ -321,9 +322,9 @@ public class Clicking implements Listener {
             }
         } else if (event.getAction().toString().contains("SWAP_WITH_CURSOR")) {
             ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(event.getCursor());
-            if (itemMap != null && itemMap.isSimilar(player, cursorItem.get(PlayerHandler.getPlayerID(player))) && ItemUtilities.getUtilities().isAllowed(player, event.getCurrentItem(), itemflag)) {
+            if (itemMap != null && event.getCurrentItem() != null && itemMap.isSimilar(player, cursorItem.get(PlayerHandler.getPlayerID(player))) && ItemUtilities.getUtilities().isAllowed(player, event.getCurrentItem(), itemflag)) {
                 final int slot = event.getSlot();
-                final ItemStack item = new ItemStack(Objects.requireNonNull(event.getCurrentItem()));
+                final ItemStack item = new ItemStack(event.getCurrentItem());
                 event.setCancelled(true);
                 player.setItemOnCursor(item);
                 if (event.getRawSlot() <= 4 && event.getInventory().getType() == InventoryType.CRAFTING || event.getInventory().getType() != InventoryType.CRAFTING && player.getOpenInventory().getTopInventory().getSize() - 1 >= event.getRawSlot()) {

@@ -677,8 +677,11 @@ public class ChatExecutor implements CommandExecutor {
                         if (itemMap.isAlwaysGive() && !StringUtils.isInt(args[args.length - 1])) {
                             amount = itemMap.getCount(argsPlayer);
                         }
-                        if (StringUtils.getSlotConversion(itemMap.getSlot()) != 0 && PlayerHandler.isCraftingInv(argsPlayer.getOpenInventory()) && argsPlayer.getOpenInventory().getTopInventory().getItem(0) != null && !Objects.requireNonNull(argsPlayer.getOpenInventory().getTopInventory().getItem(0)).getType().equals(Material.AIR)) {
-                            ItemHandler.returnCraftingItem(argsPlayer, 0, Objects.requireNonNull(argsPlayer.getOpenInventory().getTopInventory().getItem(0)).clone(), 0L);
+                        if (StringUtils.getSlotConversion(itemMap.getSlot()) != 0 && PlayerHandler.isCraftingInv(argsPlayer.getOpenInventory())) {
+                            final ItemStack topItem = argsPlayer.getOpenInventory().getTopInventory().getItem(0);
+                            if (topItem != null && !topItem.getType().equals(Material.AIR)) {
+                                ItemHandler.returnCraftingItem(argsPlayer, 0, topItem.clone(), 0L);
+                            }
                         }
                         if (remove) {
                             itemMap.removeFrom(argsPlayer, amount);
@@ -745,8 +748,11 @@ public class ChatExecutor implements CommandExecutor {
                 if (itemMap.getConfigName().equalsIgnoreCase(args[1])) {
                     if (remove || !PermissionsHandler.permissionEnabled("Permissions.Commands-Get") || (itemMap.hasPermission(argsPlayer, argsPlayer.getWorld()) && PermissionsHandler.permissionEnabled("Permissions.Commands-Get"))) {
                         if ((remove && itemMap.hasItem(argsPlayer, true)) || (!remove && (itemMap.conditionMet(argsPlayer, "trigger-conditions", true, false) && (ItemUtilities.getUtilities().canOverwrite(argsPlayer, itemMap) && (amount != 0 || itemMap.isAlwaysGive() || !itemMap.hasItem(argsPlayer, false)))))) {
-                            if (StringUtils.getSlotConversion(itemMap.getSlot()) != 0 && PlayerHandler.isCraftingInv(argsPlayer.getOpenInventory()) && argsPlayer.getOpenInventory().getTopInventory().getItem(0) != null && !Objects.requireNonNull(argsPlayer.getOpenInventory().getTopInventory().getItem(0)).getType().equals(Material.AIR)) {
-                                ItemHandler.returnCraftingItem(argsPlayer, 0, Objects.requireNonNull(argsPlayer.getOpenInventory().getTopInventory().getItem(0)).clone(), 0L);
+                            if (StringUtils.getSlotConversion(itemMap.getSlot()) != 0 && PlayerHandler.isCraftingInv(argsPlayer.getOpenInventory())) {
+                                final ItemStack topItem = argsPlayer.getOpenInventory().getTopInventory().getItem(0);
+                                if (topItem != null && !topItem.getType().equals(Material.AIR)) {
+                                    ItemHandler.returnCraftingItem(argsPlayer, 0, topItem.clone(), 0L);
+                                }
                             }
                             if (remove) {
                                 itemMap.removeFrom(argsPlayer, amount);
@@ -800,8 +806,11 @@ public class ChatExecutor implements CommandExecutor {
         }
         boolean itemGiven = false;
         boolean failedPermissions = false;
-        if (!remove && PlayerHandler.isCraftingInv(argsPlayer.getOpenInventory()) && argsPlayer.getOpenInventory().getTopInventory().getItem(0) != null && !Objects.requireNonNull(argsPlayer.getOpenInventory().getTopInventory().getItem(0)).getType().equals(Material.AIR)) {
-            ItemHandler.returnCraftingItem(argsPlayer, 0, Objects.requireNonNull(argsPlayer.getOpenInventory().getTopInventory().getItem(0)).clone(), 0L);
+        if (!remove && PlayerHandler.isCraftingInv(argsPlayer.getOpenInventory())) {
+            final ItemStack topItem = argsPlayer.getOpenInventory().getTopInventory().getItem(0);
+            if (topItem != null && !topItem.getType().equals(Material.AIR)) {
+                ItemHandler.returnCraftingItem(argsPlayer, 0, topItem.clone(), 0L);
+            }
         }
         ItemMap probable = null;
         for (Object itemMap : ItemJoin.getCore().getChances().getItems().keySet()) {

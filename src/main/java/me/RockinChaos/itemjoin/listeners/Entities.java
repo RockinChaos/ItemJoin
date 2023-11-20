@@ -21,13 +21,12 @@ import me.RockinChaos.core.utils.SchedulerUtils;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
+import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
-
-import java.util.Objects;
 
 public class Entities implements Listener {
 
@@ -45,8 +44,9 @@ public class Entities implements Listener {
                 if (itemMap.mobsDrop() && itemMap.getMobsDrop().containsKey(victim.getType()) && itemMap.inWorld(victim.getWorld())
                         && (killer == null || (itemMap.isLimitMode(killer.getGameMode()) && itemMap.hasPermission(killer, killer.getWorld()))) && Math.random() <= itemMap.getMobsDrop().get(victim.getType())) {
                     for (String region : ((ItemJoin.getCore().getDependencies().getGuard().guardEnabled() && !itemMap.getEnabledRegions().isEmpty()) ? ItemJoin.getCore().getDependencies().getGuard().getRegionAtLocation(victim.getLocation()).split(", ") : new String[]{"FALSE"})) {
-                        if (!ItemJoin.getCore().getDependencies().getGuard().guardEnabled() || itemMap.getEnabledRegions().isEmpty() || itemMap.inRegion(region)) {
-                            SchedulerUtils.run(() -> Objects.requireNonNull(victim.getLocation().getWorld()).dropItem(victim.getLocation(), itemMap.getItem((killer))));
+                        final World victimWorld = victim.getLocation().getWorld();
+                        if (victimWorld != null && (!ItemJoin.getCore().getDependencies().getGuard().guardEnabled() || itemMap.getEnabledRegions().isEmpty() || itemMap.inRegion(region))) {
+                            SchedulerUtils.run(() -> victimWorld.dropItem(victim.getLocation(), itemMap.getItem((killer))));
                         }
                     }
                 }

@@ -313,8 +313,9 @@ public class ItemMap implements Cloneable {
      * Sets the ItemMaps Multiple Slots.
      */
     private void setMultipleSlots() {
-        if (this.nodeLocation.getString(".slot") != null && !Objects.requireNonNull(this.nodeLocation.getString(".slot")).isEmpty() && Objects.requireNonNull(this.nodeLocation.getString(".slot")).contains(",")) {
-            String[] slots = Objects.requireNonNull(this.nodeLocation.getString(".slot")).replace(" ", "").split(",");
+        final String itemSlot = this.nodeLocation.getString(".slot");
+        if (itemSlot != null && itemSlot.contains(",")) {
+            String[] slots = itemSlot.replace(" ", "").split(",");
             for (String slot : slots) {
                 if (slot.startsWith("C[") || slot.startsWith("C(")) {
                     slot = slot.replace("C", "CRAFTING");
@@ -331,10 +332,12 @@ public class ItemMap implements Cloneable {
      * Sets the ItemMaps Commands Cost.
      */
     private void setCommandCost() {
-        if (this.nodeLocation.getString("commands-item") != null && !Objects.requireNonNull(this.nodeLocation.getString("commands-item")).isEmpty()) {
-            this.itemCost = this.nodeLocation.getString("commands-item");
+        final String commandItem = this.nodeLocation.getString("commands-item");
+        final String commandCost = this.nodeLocation.getString("commands-cost");
+        if (commandItem != null && !commandItem.isEmpty()) {
+            this.itemCost = commandItem;
         }
-        if (this.nodeLocation.getString("commands-cost") != null && StringUtils.isInt(this.nodeLocation.getString("commands-cost"))) {
+        if (commandCost != null && StringUtils.isInt(commandCost)) {
             this.cost = this.nodeLocation.getInt("commands-cost");
         }
     }
@@ -558,8 +561,9 @@ public class ItemMap implements Cloneable {
      * Sets the ItemMaps Enabled Regions.
      */
     private void setRegions() {
-        if (this.nodeLocation.getString(".enabled-regions") != null && !Objects.requireNonNull(this.nodeLocation.getString(".enabled-regions")).isEmpty()) {
-            String[] enabledParts = Objects.requireNonNull(this.nodeLocation.getString(".enabled-regions")).replace(" ,  ", ",").replace(" , ", ",").replace(",  ", ",").replace(", ", ",").split(",");
+        final String enabledRegions = this.nodeLocation.getString(".enabled-regions");
+        if (enabledRegions != null && !enabledRegions.isEmpty()) {
+            String[] enabledParts = enabledRegions.replace(" ,  ", ",").replace(" , ", ",").replace(",  ", ",").replace(", ", ",").split(",");
             for (String region : enabledParts) {
                 this.enabledRegions.add(region);
                 ItemJoin.getCore().getDependencies().getGuard().addLocaleRegion(region);
@@ -574,31 +578,40 @@ public class ItemMap implements Cloneable {
      * Sets the ItemMaps Conditions.
      */
     private void setConditions() {
-        if (this.nodeLocation.getString(".trigger-fail-message") != null && !Objects.requireNonNull(this.nodeLocation.getString(".trigger-fail-message")).isEmpty()) {
-            this.triggerMessage = this.nodeLocation.getString(".trigger-fail-message");
+        final String triggerMessage = this.nodeLocation.getString(".trigger-fail-message");
+        final String triggerConditions = this.nodeLocation.getString(".trigger-fail-message");
+        final List<String> triggerConditionsList = this.nodeLocation.getStringList(".trigger-fail-message");
+        final String disposableMessage = this.nodeLocation.getString(".disposable-fail-message");
+        final String disposableConditions = this.nodeLocation.getString(".disposable-conditions");
+        final List<String> disposableConditionsList = this.nodeLocation.getStringList(".disposable-conditions");
+        if (triggerMessage != null && !triggerMessage.isEmpty()) {
+            this.triggerMessage = triggerMessage;
         }
-        if (!this.nodeLocation.getStringList(".trigger-conditions").isEmpty()) {
-            this.triggerConditions = this.nodeLocation.getStringList(".trigger-conditions");
-        } else if (this.nodeLocation.getString(".trigger-conditions") != null && !Objects.requireNonNull(this.nodeLocation.getString(".trigger-conditions")).isEmpty()) {
-            this.triggerConditions.add(this.nodeLocation.getString(".trigger-conditions"));
+        if (!triggerConditionsList.isEmpty()) {
+            this.triggerConditions = triggerConditionsList;
+        } else if (triggerConditions != null && !triggerConditions.isEmpty()) {
+            this.triggerConditions.add(triggerConditions);
         }
-        if (this.nodeLocation.getString(".disposable-fail-message") != null && !Objects.requireNonNull(this.nodeLocation.getString(".disposable-fail-message")).isEmpty()) {
-            this.disposableMessage = this.nodeLocation.getString(".disposable-fail-message");
+        if (disposableMessage != null && !disposableMessage.isEmpty()) {
+            this.disposableMessage = disposableMessage;
         }
-        if (!this.nodeLocation.getStringList(".disposable-conditions").isEmpty()) {
-            this.disposableConditions = this.nodeLocation.getStringList(".disposable-conditions");
-        } else if (this.nodeLocation.getString(".disposable-conditions") != null && !Objects.requireNonNull(this.nodeLocation.getString(".disposable-conditions")).isEmpty()) {
-            this.disposableConditions.add(this.nodeLocation.getString(".disposable-conditions"));
+        if (!disposableConditionsList.isEmpty()) {
+            this.disposableConditions = disposableConditionsList;
+        } else if (disposableConditions != null && !disposableConditions.isEmpty()) {
+            this.disposableConditions.add(disposableConditions);
         }
         for (Action action : Action.values()) {
-            if (this.nodeLocation.getString(action.config() + "-fail-message") != null && !Objects.requireNonNull(this.nodeLocation.getString(action.config() + "-fail-message")).isEmpty()) {
-                this.commandMessages.put(action.config(), this.nodeLocation.getString(action.config() + "-fail-message"));
+            final String actionMessage = this.nodeLocation.getString(action.config() + "-fail-message");
+            final String actionConditions = this.nodeLocation.getString(action.config() + "-conditions");
+            final List<String> actionConditionsList = this.nodeLocation.getStringList(action.config() + "-conditions");
+            if (actionMessage != null && !actionMessage.isEmpty()) {
+                this.commandMessages.put(action.config(), actionMessage);
             }
-            if (!this.nodeLocation.getStringList(action.config() + "-conditions").isEmpty()) {
-                this.commandConditions.put(action.config(), this.nodeLocation.getStringList(action.config() + "-conditions"));
-            } else if (this.nodeLocation.getString(action.config() + "-conditions") != null && !Objects.requireNonNull(this.nodeLocation.getString(action.config() + "-conditions")).isEmpty()) {
+            if (!actionConditionsList.isEmpty()) {
+                this.commandConditions.put(action.config(), actionConditionsList);
+            } else if (actionConditions != null && !actionConditions.isEmpty()) {
                 List<String> commandCond = new ArrayList<>();
-                commandCond.add(this.nodeLocation.getString(action.config() + "-conditions"));
+                commandCond.add(actionConditions);
                 this.commandConditions.put(action.config(), commandCond);
             }
         }
@@ -609,8 +622,9 @@ public class ItemMap implements Cloneable {
      */
     private void setWorlds() {
         SchedulerUtils.run(() -> {
-            if (this.nodeLocation.getString(".enabled-worlds") != null && !Objects.requireNonNull(this.nodeLocation.getString(".enabled-worlds")).isEmpty()) {
-                String[] enabledParts = Objects.requireNonNull(this.nodeLocation.getString(".enabled-worlds")).replace(" ,  ", ",").replace(" , ", ",").replace(",  ", ",").replace(", ", ",").split(",");
+            final String enabledWorlds = this.nodeLocation.getString(".enabled-worlds");
+            if (enabledWorlds != null && !enabledWorlds.isEmpty()) {
+                String[] enabledParts = enabledWorlds.replace(" ,  ", ",").replace(" , ", ",").replace(",  ", ",").replace(", ", ",").split(",");
                 for (String enabledWorld : enabledParts) {
                     if (enabledWorld.equalsIgnoreCase("ALL") || enabledWorld.equalsIgnoreCase("GLOBAL")) {
                         this.enabledWorlds.add("ALL");
@@ -630,8 +644,9 @@ public class ItemMap implements Cloneable {
             } else {
                 this.enabledWorlds.add("ALL");
             }
-            if (this.nodeLocation.getString(".disabled-worlds") != null && !Objects.requireNonNull(this.nodeLocation.getString(".disabled-worlds")).isEmpty()) {
-                String[] disabledParts = Objects.requireNonNull(this.nodeLocation.getString(".disabled-worlds")).replace(" ,  ", ",").replace(" , ", ",").replace(",  ", ",").replace(", ", ",").split(",");
+            final String disabledWorlds = this.nodeLocation.getString(".disabled-worlds");
+            if (disabledWorlds != null && !disabledWorlds.isEmpty()) {
+                String[] disabledParts = disabledWorlds.replace(" ,  ", ",").replace(" , ", ",").replace(",  ", ",").replace(", ", ",").split(",");
                 for (String disabledWorld : disabledParts) {
                     if (disabledWorld.equalsIgnoreCase("ALL") || disabledWorld.equalsIgnoreCase("GLOBAL")) {
                         this.disabledWorlds.add("ALL");
@@ -3831,8 +3846,10 @@ public class ItemMap implements Cloneable {
      * @return If the ItemStack Enchantments are similar.
      */
     private boolean isEnchantSimilar(final Player player, final ItemStack item) {
-        if (player != null && Objects.requireNonNull(item.getItemMeta()).hasEnchants()) {
+        final ItemMeta itemMeta = item.getItemMeta();
+        if (player != null && itemMeta != null && itemMeta.hasEnchants()) {
             ItemStack checkItem = new ItemStack(item.getType());
+            final ItemMeta checkMeta = checkItem.getItemMeta();
             final Map<String, Integer> enchantList = ItemUtilities.getUtilities().getStatistics(player).getEnchantments(this);
             if (enchantList != null && !enchantList.isEmpty()) {
                 for (final Entry<String, Integer> enchantments : enchantList.entrySet()) {
@@ -3843,7 +3860,7 @@ public class ItemMap implements Cloneable {
                     }
                 }
             }
-            return (this.glowing || item.getItemMeta().getEnchants().equals(Objects.requireNonNull(checkItem.getItemMeta()).getEnchants()));
+            return (this.glowing || (checkMeta != null && itemMeta.getEnchants().equals(checkMeta.getEnchants())));
         }
         return true;
     }
@@ -5067,10 +5084,11 @@ public class ItemMap implements Cloneable {
             removeAmount = 1;
         }
         for (int i = 0; i < player.getInventory().getSize(); i++) {
-            if (player.getInventory().getItem(i) != null && Objects.requireNonNull(player.getInventory().getItem(i)).getType() == mat) {
-                if (Objects.requireNonNull(player.getInventory().getItem(i)).getAmount() < removeAmount) {
-                    removeAmount -= Objects.requireNonNull(player.getInventory().getItem(i)).getAmount();
-                    player.getInventory().setItem(i, ItemHandler.modifyItem(player.getInventory().getItem(i), false, Objects.requireNonNull(player.getInventory().getItem(i)).getAmount()));
+            final ItemStack item = player.getInventory().getItem(i);
+            if (item != null && item.getType() == mat) {
+                if (item.getAmount() < removeAmount) {
+                    removeAmount -= item.getAmount();
+                    player.getInventory().setItem(i, ItemHandler.modifyItem(item, false, item.getAmount()));
                 } else {
                     player.getInventory().setItem(i, ItemHandler.modifyItem(player.getInventory().getItem(i), false, removeAmount));
                     break;
@@ -5078,24 +5096,26 @@ public class ItemMap implements Cloneable {
             }
         }
         if (ServerUtils.hasSpecificUpdate("1_9")) {
-            if (player.getInventory().getItemInOffHand().getType() == mat) {
-                if (player.getInventory().getItemInOffHand().getAmount() < removeAmount) {
-                    removeAmount -= player.getInventory().getItemInOffHand().getAmount();
-                    PlayerHandler.setOffHandItem(player, ItemHandler.modifyItem(player.getInventory().getItemInOffHand(), false, player.getInventory().getItemInOffHand().getAmount()));
+            final ItemStack item = player.getInventory().getItemInOffHand();
+            if (item.getType() == mat) {
+                if (item.getAmount() < removeAmount) {
+                    removeAmount -= item.getAmount();
+                    PlayerHandler.setOffHandItem(player, ItemHandler.modifyItem(item, false, item.getAmount()));
                 } else {
-                    PlayerHandler.setOffHandItem(player, ItemHandler.modifyItem(player.getInventory().getItemInOffHand(), false, removeAmount));
+                    PlayerHandler.setOffHandItem(player, ItemHandler.modifyItem(item, false, removeAmount));
                 }
-                PlayerHandler.setOffHandItem(player, ItemHandler.modifyItem(player.getInventory().getItemInOffHand(), false, removeAmount));
+                PlayerHandler.setOffHandItem(player, ItemHandler.modifyItem(item, false, removeAmount));
             }
         }
         if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
             for (int i = 0; i < player.getOpenInventory().getTopInventory().getSize(); i++) {
-                if (player.getOpenInventory().getTopInventory().getItem(i) != null && Objects.requireNonNull(player.getOpenInventory().getTopInventory().getItem(i)).getType() == mat) {
-                    if (Objects.requireNonNull(player.getOpenInventory().getTopInventory().getItem(i)).getAmount() < removeAmount) {
-                        removeAmount -= Objects.requireNonNull(player.getOpenInventory().getTopInventory().getItem(i)).getAmount();
-                        player.getOpenInventory().getTopInventory().setItem(i, ItemHandler.modifyItem(player.getOpenInventory().getTopInventory().getItem(i), false, Objects.requireNonNull(player.getOpenInventory().getTopInventory().getItem(i)).getAmount()));
+                final ItemStack item = player.getOpenInventory().getTopInventory().getItem(i);
+                if (item != null && item.getType() == mat) {
+                    if (item.getAmount() < removeAmount) {
+                        removeAmount -= item.getAmount();
+                        player.getOpenInventory().getTopInventory().setItem(i, ItemHandler.modifyItem(item, false, item.getAmount()));
                     } else {
-                        player.getOpenInventory().getTopInventory().setItem(i, ItemHandler.modifyItem(player.getOpenInventory().getTopInventory().getItem(i), false, removeAmount));
+                        player.getOpenInventory().getTopInventory().setItem(i, ItemHandler.modifyItem(item, false, removeAmount));
                         break;
                     }
                 }

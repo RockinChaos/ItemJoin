@@ -346,7 +346,7 @@ public class ItemAnimation {
             if (this.itemMap.getLegacySecret() != null && !this.itemMap.getLegacySecret().isEmpty()) {
                 final String encodeData = Objects.requireNonNull(StringUtils.colorEncode(new ItemStack(Material.STICK), this.itemMap.getLegacySecret()).getItemMeta()).getDisplayName();
                 if (!encodeData.isEmpty()) {
-                    itemData = "�r" + encodeData;
+                    itemData = "§r" + encodeData;
                 }
             }
             tempMeta.setDisplayName(StringUtils.translateLayout(ItemHandler.cutDelay(nameString), player) + itemData);
