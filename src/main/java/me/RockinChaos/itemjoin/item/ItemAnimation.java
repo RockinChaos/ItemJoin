@@ -123,7 +123,7 @@ public class ItemAnimation {
         while (it.hasNext()) {
             final String name = it.next();
             final Integer delay = StringUtils.returnInteger(ItemHandler.getDelayFormat(name));
-            ticks = ticks + Objects.requireNonNullElse(delay, 180);
+            ticks = ticks + (delay != null ? delay : 180);
             this.AnimateTask(player, it.hasNext(), name, null, null, null, null, null, ticks, 0);
         }
     }
@@ -140,7 +140,7 @@ public class ItemAnimation {
         while (it.hasNext()) {
             final List<String> lore = it.next();
             final Integer delay = StringUtils.returnInteger(ItemHandler.getDelayFormat(lore.get(0)));
-            ticks = ticks + Objects.requireNonNullElse(delay, 180);
+            ticks = ticks + (delay != null ? delay : 180);
             this.AnimateTask(player, it.hasNext(), null, lore, null, null, null, null, ticks, position);
             position++;
         }
@@ -157,7 +157,7 @@ public class ItemAnimation {
         while (it.hasNext()) {
             final String mat = it.next();
             final Integer delay = StringUtils.returnInteger(ItemHandler.getDelayFormat(mat));
-            ticks = ticks + Objects.requireNonNullElse(delay, 180);
+            ticks = ticks + (delay != null ? delay : 180);
             this.AnimateTask(player, it.hasNext(), null, null, mat, null, null, null, ticks, 0);
         }
     }
@@ -170,7 +170,7 @@ public class ItemAnimation {
     private void pagesTasks(final Player player) {
         long ticks = 0;
         final Integer delay = StringUtils.returnInteger(ItemHandler.getDelayFormat(this.dynamicPages.get(0)));
-        ticks = ticks + Objects.requireNonNullElse(delay, 180);
+        ticks = ticks + (delay != null ? delay : 180);
         this.AnimateTask(player, false, null, null, null, null, null, this.dynamicPages, ticks, 0);
     }
 
@@ -185,7 +185,7 @@ public class ItemAnimation {
         while (it.hasNext()) {
             final String owner = it.next();
             final Integer delay = StringUtils.returnInteger(ItemHandler.getDelayFormat(owner));
-            ticks = ticks + Objects.requireNonNullElse(delay, 180);
+            ticks = ticks + (delay != null ? delay : 180);
             this.AnimateTask(player, it.hasNext(), null, null, null, owner, null, null, ticks, 0);
         }
     }
@@ -201,7 +201,7 @@ public class ItemAnimation {
         while (it.hasNext()) {
             final String texture = it.next();
             final Integer delay = StringUtils.returnInteger(ItemHandler.getDelayFormat(this.dynamicTextures.get(0)));
-            ticks = ticks + Objects.requireNonNullElse(delay, 180);
+            ticks = ticks + (delay != null ? delay : 180);
             this.AnimateTask(player, it.hasNext(), null, null, null, null, texture, null, ticks, 0);
         }
     }
