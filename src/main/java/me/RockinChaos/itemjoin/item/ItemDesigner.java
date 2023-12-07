@@ -1011,8 +1011,8 @@ public class ItemDesigner {
             List<PotionEffect> potionEffectList = new ArrayList<>();
             for (String potion : potionList.split(",")) {
                 String[] potionSection = potion.split(":");
-                PotionEffectType type = PotionEffectType.getByName(potionSection[0].toUpperCase());
-                if (PotionEffectType.getByName(potionSection[0].toUpperCase()) != null) {
+                PotionEffectType type = LegacyAPI.getEffectByName(potionSection[0]);
+                if (type != null) {
                     try {
                         int amplifier = 1;
                         if (StringUtils.containsIgnoreCase(potion, ":")) {
@@ -1022,9 +1022,7 @@ public class ItemDesigner {
                                 amplifier = Integer.parseInt(potionSection[1]);
                             }
                         }
-                        if (type != null) {
-                            potionEffectList.add(new PotionEffect(type, Integer.parseInt(potionSection[2]) * 20, amplifier));
-                        }
+                        potionEffectList.add(new PotionEffect(type, Integer.parseInt(potionSection[2]) * 20, amplifier));
                     } catch (NumberFormatException e) {
                         ServerUtils.logSevere("{ItemDesigner} An error occurred in the config, " + potionSection[1] + " is not a number and a number was expected.");
                         ServerUtils.logWarn("{ItemDesigner} Consumable Potion: " + potionSection[0] + " will now be set to level 1.");
@@ -1055,8 +1053,8 @@ public class ItemDesigner {
                 List<PotionEffect> potionEffectList = new ArrayList<>();
                 for (String potion : potionList.split(",")) {
                     String[] potionSection = potion.split(":");
-                    PotionEffectType type = PotionEffectType.getByName(potionSection[0].toUpperCase());
-                    if (PotionEffectType.getByName(potionSection[0].toUpperCase()) != null) {
+                    PotionEffectType type = LegacyAPI.getEffectByName(potionSection[0]);
+                    if (type != null) {
                         try {
                             int amplifier = 1;
                             if (StringUtils.containsIgnoreCase(potion, ":")) {
@@ -1066,9 +1064,7 @@ public class ItemDesigner {
                                     amplifier = Integer.parseInt(potionSection[1]);
                                 }
                             }
-                            if (type != null) {
-                                potionEffectList.add(new PotionEffect(type, Integer.parseInt(potionSection[2]) * 20, amplifier));
-                            }
+                            potionEffectList.add(new PotionEffect(type, Integer.parseInt(potionSection[2]) * 20, amplifier));
                         } catch (NumberFormatException e) {
                             ServerUtils.logSevere("{ItemDesigner} An error occurred in the config, " + potionSection[1] + " is not a number and a number was expected.");
                             ServerUtils.logWarn("{ItemDesigner} Custom Potion: " + potionSection[0] + " will now be set to level 1.");
@@ -1098,8 +1094,8 @@ public class ItemDesigner {
                 List<PotionEffect> potionEffectList = new ArrayList<>();
                 for (String effect : effectList.split(",")) {
                     String[] tippedSection = effect.split(":");
-                    PotionEffectType type = PotionEffectType.getByName(tippedSection[0].toUpperCase());
-                    if (PotionEffectType.getByName(tippedSection[0].toUpperCase()) != null) {
+                    PotionEffectType type = LegacyAPI.getEffectByName(tippedSection[0]);
+                    if (type != null) {
                         try {
                             int level = 1;
                             int duration;
@@ -1111,9 +1107,7 @@ public class ItemDesigner {
                                 }
                             }
                             duration = Integer.parseInt(tippedSection[2]);
-                            if (type != null) {
-                                potionEffectList.add(new PotionEffect(type, duration * 160, level));
-                            }
+                            potionEffectList.add(new PotionEffect(type, duration * 160, level));
                         } catch (NumberFormatException e) {
                             ServerUtils.logSevere("{ItemDesigner} An error occurred in the config, " + tippedSection[1] + " is not a number and a number was expected.");
                             ServerUtils.logWarn("{ItemDesigner} Tipped Effect: " + tippedSection[0] + " will now be set to level 1.");

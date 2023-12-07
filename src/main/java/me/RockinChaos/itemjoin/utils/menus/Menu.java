@@ -17,6 +17,7 @@
  */
 package me.RockinChaos.itemjoin.utils.menus;
 
+import com.google.common.collect.ImmutableList;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import me.RockinChaos.core.handlers.ItemHandler;
@@ -838,7 +839,7 @@ public class Menu {
             StringBuilder potionString = new StringBuilder();
             if (!StringUtils.nullCheck(itemMap.getPotionEffect().toString()).equals("NONE")) {
                 for (PotionEffect potions : itemMap.getPotionEffect()) {
-                    potionString.append(potions.getType().getName().toUpperCase()).append(":").append(potions.getAmplifier()).append(":").append(potions.getDuration()).append(", ");
+                    potionString.append((ServerUtils.hasPreciseUpdate("1_20_3") ? potions.getType().getKey().getKey().toUpperCase() : LegacyAPI.getEffectName(potions.getType()).toUpperCase())).append(":").append(potions.getAmplifier()).append(":").append(potions.getDuration()).append(", ");
                 }
                 for (String split : StringUtils.softSplit(StringUtils.nullCheck(potionString.substring(0, potionString.length())))) {
                     potionList.append("&a").append(split).append(" /n ");
@@ -4621,7 +4622,7 @@ public class Menu {
         Interface enchantPane = new Interface(true, 6, exitButton, GUIName, player);
         SchedulerUtils.runAsync(() -> {
             enchantPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> creatingPane(player, itemMap)));
-            for (Enchantment enchant : Enchantment.values()) {
+            for (Enchantment enchant : (ServerUtils.hasPreciseUpdate("1_20_3") ? ImmutableList.copyOf(Registry.ENCHANTMENT.iterator()) : LegacyAPI.getEnchants())) {
                 if (ItemHandler.getEnchantName(enchant) != null) {
                     boolean containsKey = itemMap.getEnchantments() != null && itemMap.getEnchantments().containsKey(ItemHandler.getEnchantName(enchant).toUpperCase());
                     ItemStack enchantItem = ItemHandler.getItem((containsKey ? "ENCHANTED_BOOK" : "BOOK"), 1, false, false, "&f" + ItemHandler.getEnchantName(enchant).toUpperCase(), "&7",
@@ -7781,19 +7782,19 @@ public class Menu {
             } else {
                 potionPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the other settings menu."), event -> otherPane(player, itemMap)));
             }
-            for (PotionEffectType potion : PotionEffectType.values()) {
+            for (PotionEffectType potion : (ServerUtils.hasPreciseUpdate("1_20_3") ? ImmutableList.copyOf(Registry.EFFECT.iterator()) : LegacyAPI.getEffects())) {
                 if (potion != null) {
                     String potionString = "NONE";
                     if (!StringUtils.nullCheck(itemMap.getPotionEffect().toString()).equals("NONE")) {
                         for (PotionEffect potions : itemMap.getPotionEffect()) {
                             if (potions.getType() == potion) {
-                                potionString = potions.getType().getName().toUpperCase() + ":" + potions.getAmplifier() + ":" + (potions.getDuration());
+                                potionString = ((ServerUtils.hasPreciseUpdate("1_20_3") ? potions.getType().getKey().getKey().toUpperCase() : LegacyAPI.getEffectName(potions.getType()).toUpperCase())) + ":" + potions.getAmplifier() + ":" + (potions.getDuration());
                                 break;
                             }
                         }
                     }
                     final String checkPotion = potionString;
-                    potionPane.addButton(new Button(ItemHandler.getItem("GLASS_BOTTLE", 1, (!checkPotion.equals("NONE")), false, "&f" + potion.getName(), "&7", "&7*Add this potion effect", "&7to the item.",
+                    potionPane.addButton(new Button(ItemHandler.getItem("GLASS_BOTTLE", 1, (!checkPotion.equals("NONE")), false, "&f" + ((ServerUtils.hasPreciseUpdate("1_20_3") ? potion.getKey().getKey() : LegacyAPI.getEffectName(potion))), "&7", "&7*Add this potion effect", "&7to the item.",
                             (!checkPotion.equals("NONE") ? "&9&lInformation: &a" + checkPotion : "")), event -> {
                         if (!checkPotion.equals("NONE")) {
                             List<PotionEffect> potionEffects = itemMap.getPotionEffect();
@@ -8322,7 +8323,7 @@ public class Menu {
                 StringBuilder potionString = new StringBuilder();
                 if (!StringUtils.nullCheck(itemMap.getPotionEffect().toString()).equals("NONE")) {
                     for (PotionEffect potions : itemMap.getPotionEffect()) {
-                        potionString.append(potions.getType().getName().toUpperCase()).append(":").append(potions.getAmplifier()).append(":").append(potions.getDuration()).append(", ");
+                        potionString.append((ServerUtils.hasPreciseUpdate("1_20_3") ? potions.getType().getKey().getKey().toUpperCase() : LegacyAPI.getEffectName(potions.getType()).toUpperCase())).append(":").append(potions.getAmplifier()).append(":").append(potions.getDuration()).append(", ");
                     }
                     for (String split : StringUtils.softSplit(StringUtils.nullCheck(potionString.toString()))) {
                         potionList.append("&a").append(split).append(" /n ");
@@ -8390,7 +8391,7 @@ public class Menu {
                 StringBuilder potionString = new StringBuilder();
                 if (!StringUtils.nullCheck(itemMap.getPotionEffect().toString()).equals("NONE")) {
                     for (PotionEffect potions : itemMap.getPotionEffect()) {
-                        potionString.append(potions.getType().getName().toUpperCase()).append(":").append(potions.getAmplifier()).append(":").append(potions.getDuration()).append(", ");
+                        potionString.append((ServerUtils.hasPreciseUpdate("1_20_3") ? potions.getType().getKey().getKey().toUpperCase() : LegacyAPI.getEffectName(potions.getType()).toUpperCase())).append(":").append(potions.getAmplifier()).append(":").append(potions.getDuration()).append(", ");
                     }
                     for (String split : StringUtils.softSplit(StringUtils.nullCheck(potionString.substring(0, potionString.length())))) {
                         potionList.append("&a").append(split).append(" /n ");
@@ -8571,7 +8572,7 @@ public class Menu {
         StringBuilder potionString = new StringBuilder();
         if (!StringUtils.nullCheck(itemMap.getPotionEffect().toString()).equals("NONE")) {
             for (PotionEffect potions : itemMap.getPotionEffect()) {
-                potionString.append(potions.getType().getName().toUpperCase()).append(":").append(potions.getAmplifier()).append(":").append(potions.getDuration()).append(", ");
+                potionString.append((ServerUtils.hasPreciseUpdate("1_20_3") ? potions.getType().getKey().getKey().toUpperCase() : LegacyAPI.getEffectName(potions.getType()).toUpperCase())).append(":").append(potions.getAmplifier()).append(":").append(potions.getDuration()).append(", ");
             }
             if (potionString.length() >= 2) {
                 for (String split : StringUtils.softSplit(StringUtils.nullCheck(potionString.substring(0, potionString.length() - 2)))) {

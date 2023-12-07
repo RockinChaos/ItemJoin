@@ -53,12 +53,14 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.*;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.*;
 import org.bukkit.inventory.meta.BookMeta.Generation;
 import org.bukkit.map.MapView;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionType;
 
@@ -3860,7 +3862,8 @@ public class ItemMap implements Cloneable {
                     }
                 }
             }
-            return (this.glowing || (checkMeta != null && itemMeta.getEnchants().equals(checkMeta.getEnchants())));
+            //return (this.glowing || (checkMeta != null && itemMeta.getEnchants().equals(checkMeta.getEnchants()))); -- temporarily ignore.
+            return true;
         }
         return true;
     }
@@ -4329,13 +4332,19 @@ public class ItemMap implements Cloneable {
     private void setPotionEffects() {
         if (this.effect != null && !this.effect.isEmpty() && !this.customConsumable) {
             for (PotionEffect potion : this.effect) {
-                if (ServerUtils.hasSpecificUpdate("1_9")) {
-                    ((PotionMeta) this.tempMeta).setBasePotionData(new PotionData(PotionType.WATER));
+                if (ServerUtils.hasPreciseUpdate("1_20_3")) {
+                    ((PotionMeta) tempMeta).setBasePotionType(PotionType.WATER);
+                } else if (ServerUtils.hasSpecificUpdate("1_9")) {
+                    LegacyAPI.setPotionData(((PotionMeta) tempMeta), PotionType.WATER);
                 }
                 ((PotionMeta) this.tempMeta).addCustomEffect(potion, true);
             }
         } else if (ServerUtils.hasSpecificUpdate("1_9") && (this.getMaterial().toString().equalsIgnoreCase("POTION") || this.getMaterial().toString().equalsIgnoreCase("SPLASH_POTION") || this.getMaterial().toString().equalsIgnoreCase("LINGERING_POTION"))) {
-            ((PotionMeta) this.tempMeta).setBasePotionData(new PotionData(PotionType.WATER));
+            if (ServerUtils.hasPreciseUpdate("1_20_3")) {
+                ((PotionMeta) tempMeta).setBasePotionType(PotionType.WATER);
+            } else if (ServerUtils.hasSpecificUpdate("1_9")) {
+                LegacyAPI.setPotionData(((PotionMeta) tempMeta), PotionType.WATER);
+            }
         }
     }
 
@@ -5937,7 +5946,7 @@ public class ItemMap implements Cloneable {
         if (this.effect != null && !this.effect.isEmpty()) {
             StringBuilder effectList = new StringBuilder();
             for (PotionEffect effects : this.effect) {
-                effectList.append(effects.getType().getName()).append(":").append(effects.getAmplifier()).append(":").append(effects.getDuration()).append(", ");
+                effectList.append((ServerUtils.hasPreciseUpdate("1_20_3") ? effects.getType().getKey().getKey() : LegacyAPI.getEffectName(effects.getType()))).append(":").append(effects.getAmplifier()).append(":").append(effects.getDuration()).append(", ");
             }
             itemData.set("items." + this.configName + ".potion-effects", effectList.substring(0, effectList.length() - 2));
         }
