@@ -60,7 +60,6 @@ public class ItemData {
 
     private static ItemData info;
     private final List<String> nbtInfo = Arrays.asList("ItemJoin", "ItemJoin Name");
-    private boolean glowExists = false;
     private int listLength = 1;
     private int permissionLength = 2;
 
@@ -650,10 +649,6 @@ public class ItemData {
             ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new Stackable(), ItemJoin.getCore().getPlugin());
         } else if (itemMap.isStackable()) {
             LegacyAPI.registerStackable();
-        }
-        if (itemMap.isGlowing() && !this.glowExists) {
-            this.glowExists = true;
-            ItemJoin.getCore().getEnchants().registerGlow();
         }
         if (itemMap.isNotHat() && StringUtils.isRegistered(Processes.class.getSimpleName())) {
             ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new Processes(), ItemJoin.getCore().getPlugin());

@@ -29,7 +29,6 @@ import me.RockinChaos.core.utils.SchedulerUtils;
 import me.RockinChaos.core.utils.ServerUtils;
 import me.RockinChaos.core.utils.StringUtils;
 import me.RockinChaos.core.utils.api.LegacyAPI;
-import me.RockinChaos.core.utils.enchants.Glow;
 import me.RockinChaos.itemjoin.ChatToggleExecutor;
 import me.RockinChaos.itemjoin.ChatToggleTab;
 import me.RockinChaos.itemjoin.ItemJoin;
@@ -50,7 +49,6 @@ import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
@@ -3978,6 +3976,7 @@ public class ItemMap implements Cloneable {
             this.setSkullDatabase();
             this.setUnbreaking();
             this.setEnchantments(player);
+            this.setGlowing();
             this.setMapImage();
             this.tempItem = this.setJSONBookPages(player, this.tempItem, this.bookPages);
             this.setNBTData();
@@ -4005,13 +4004,9 @@ public class ItemMap implements Cloneable {
             this.setAttributeFlags();
             this.setEnchantmentsFlags();
             this.setFlags();
-            this.realGlow();
             this.setContents(player);
             this.tempItem.setItemMeta(this.tempMeta);
             this.tempItem.setAmount(this.getCount(player));
-            if (this.isGlowing()) {
-                this.setTempItem(LegacyAPI.setGlowing(this.tempItem));
-            }
             this.setTempItem(LegacyAPI.setAttributes(this.tempItem, this.configName, this.attributes));
         }
         return this;
@@ -4020,15 +4015,9 @@ public class ItemMap implements Cloneable {
     /**
      * Sets the item to glow.
      */
-    private void realGlow() {
+    private void setGlowing() {
         if (this.glowing) {
-            if (ServerUtils.hasSpecificUpdate("1_13")) {
-                Glow glow = new Glow();
-                this.tempMeta.addEnchant(glow, 1, true);
-            } else if (!ServerUtils.hasSpecificUpdate("1_13") && ServerUtils.hasSpecificUpdate("1_11")) {
-                this.tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ENCHANTS);
-                this.tempMeta.addEnchant(Enchantment.LURE, 0, true);
-            }
+            ItemHandler.setGlowing(this.tempItem);
         }
     }
 
@@ -4465,10 +4454,12 @@ public class ItemMap implements Cloneable {
      * Sets the Flags to the Temporary ItemMeta.
      */
     private void setFlags() {
-        if (ServerUtils.hasSpecificUpdate("1_8") && this.hideFlags) {
+        if (this.hideFlags || this.glowing) {
+            this.tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ENCHANTS);
+        }
+        if (this.hideFlags) {
             this.tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ATTRIBUTES);
             this.tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_DESTROYS);
-            this.tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ENCHANTS);
             this.tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_PLACED_ON);
             this.tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_POTION_EFFECTS);
             this.tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_UNBREAKABLE);
