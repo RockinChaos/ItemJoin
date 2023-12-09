@@ -3850,8 +3850,7 @@ public class ItemMap implements Cloneable {
     private boolean isEnchantSimilar(final Player player, final ItemStack item) {
         final ItemMeta itemMeta = item.getItemMeta();
         if (player != null && itemMeta != null && itemMeta.hasEnchants()) {
-            ItemStack checkItem = new ItemStack(item.getType());
-            final ItemMeta checkMeta = checkItem.getItemMeta();
+            final ItemStack checkItem = new ItemStack(item.getType());
             final Map<String, Integer> enchantList = ItemUtilities.getUtilities().getStatistics(player).getEnchantments(this);
             if (enchantList != null && !enchantList.isEmpty()) {
                 for (final Entry<String, Integer> enchantments : enchantList.entrySet()) {
@@ -3862,8 +3861,7 @@ public class ItemMap implements Cloneable {
                     }
                 }
             }
-            //return (this.glowing || (checkMeta != null && itemMeta.getEnchants().equals(checkMeta.getEnchants()))); -- temporarily ignore.
-            return true;
+            return (this.glowing || (checkItem.getItemMeta() != null && itemMeta.getEnchants().equals(checkItem.getItemMeta().getEnchants())));
         }
         return true;
     }
