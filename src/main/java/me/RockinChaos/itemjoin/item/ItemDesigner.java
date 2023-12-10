@@ -510,7 +510,8 @@ public class ItemDesigner {
             for (String pageString : pagesSection.getKeys(false)) {
                 List<String> pageList = itemMap.getNodeLocation().getStringList(".pages." + pageString);
                 rawPages.add(pageList);
-                StringBuilder textBuilder = new StringBuilder("[\"\"");
+                StringBuilder textBuilder = new StringBuilder("{\"text\":\"\",\"extra\":[");
+                boolean firstIn = true;
                 for (String string : pageList) {
                     Map<Integer, String> JSONBuilder = new HashMap<>();
                     String formatLine = string.replace("\n", "\\n");
@@ -554,15 +555,22 @@ public class ItemDesigner {
                                     }
                                 }
                             }
-                            textBuilder.append("}," + "{\"text\":\"\\n\",\"color\":\"reset\"}");
+                            textBuilder.append("},{\"text\":\"\\n\"}");
+                            firstIn = false;
                         }
                     } else if (formatLine.contains("raw:")) {
-                        textBuilder.append(formatLine.replace("raw: ", "").replace("raw:", "").replace("[\"\"", "").replace("\"bold\":false}]", "\"bold\":false}").replace("\"bold\":true}]", "\"bold\":true}")).append(",").append("{\"text\":\"\\n\",\"color\":\"reset\"}");
+                        String format = (!firstIn ? "," : "") + formatLine.replace("raw: ", "").replace("raw:", "").replace("[\"\",", "").replace("[\"\"", "").replace("\"bold\":false}]", "\"bold\":false}").replace("\"bold\":true}]", "\"bold\":true}");
+                        if (format.endsWith("]")) {
+                            format = StringUtils.replaceLast(format, "]", "");
+                        }
+                        textBuilder.append(format).append(",{\"text\":\"\\n\"}");
+                        firstIn = false;
                     } else {
-                        textBuilder.append("," + "{\"text\":\"").append(formatLine).append("\"}").append(",").append("{\"text\":\"\\n\",\"color\":\"reset\"}");
+                        textBuilder.append(!firstIn ? "," : "").append("{\"text\":\"").append(formatLine).append("\"},{\"text\":\"\\n\"}");
+                        firstIn = false;
                     }
                 }
-                JSONPages.add(textBuilder + "]");
+                JSONPages.add(textBuilder + "]}");
             }
             itemMap.setPages(JSONPages);
             itemMap.setListPages(rawPages);
