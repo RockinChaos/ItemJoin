@@ -556,9 +556,9 @@ public class ItemData {
         if ((!StringUtils.splitIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Prevent." + "itemMovement"), "FALSE", ",") && !StringUtils.splitIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Prevent." + "itemMovement"), "DISABLED", ","))) {
             if (StringUtils.isRegistered(Clicking.class.getSimpleName())) {
                 ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new Clicking(), ItemJoin.getCore().getPlugin());
-                if (ServerUtils.hasSpecificUpdate("1_8") && !ItemJoin.getCore().getDependencies().protocolEnabled() && ProtocolManager.isDead()) {
+                if (!ItemJoin.getCore().getDependencies().protocolEnabled() && ProtocolManager.isDead()) {
                     ProtocolManager.handleProtocols();
-                } else if (ServerUtils.hasSpecificUpdate("1_8") && ItemJoin.getCore().getDependencies().protocolEnabled() && ProtocolAPI.isHandling()) {
+                } else if (ItemJoin.getCore().getDependencies().protocolEnabled() && ProtocolAPI.isHandling()) {
                     ProtocolAPI.handleProtocols();
                 }
             }
@@ -576,6 +576,7 @@ public class ItemData {
      *
      * @param itemMap - The ItemMap that needs its events registered.
      */
+    @SuppressWarnings("ConstantValue")
     public void registerListeners(final ItemMap itemMap) {
         final String enabledWorlds = ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.enabled-worlds");
         if (((!itemMap.isGiveOnDisabled() && itemMap.isGiveOnJoin()) || itemMap.isAutoRemove() || (enabledWorlds != null && (!enabledWorlds.equalsIgnoreCase("DISABLED") && !enabledWorlds.equalsIgnoreCase("FALSE")))) && StringUtils.isRegistered(PlayerJoin.class.getSimpleName())) {
@@ -610,9 +611,9 @@ public class ItemData {
             PlayerHandler.cycleCrafting();
             runLater(40L, () -> {
                 forOnlinePlayers(player -> this.restoreCraftItems(player, TriggerType.DEFAULT));
-                if (ServerUtils.hasSpecificUpdate("1_8") && !ItemJoin.getCore().getDependencies().protocolEnabled() && ProtocolManager.isDead()) {
+                if (!ItemJoin.getCore().getDependencies().protocolEnabled() && ProtocolManager.isDead()) {
                     ProtocolManager.handleProtocols();
-                } else if (ServerUtils.hasSpecificUpdate("1_8") && ItemJoin.getCore().getDependencies().protocolEnabled() && ProtocolAPI.isHandling()) {
+                } else if (ItemJoin.getCore().getDependencies().protocolEnabled() && ProtocolAPI.isHandling()) {
                     ProtocolAPI.handleProtocols();
                 }
             });
@@ -624,9 +625,9 @@ public class ItemData {
         if ((itemMap.isMovement() || itemMap.isStackable() || itemMap.isEquip() || itemMap.isInventoryClose())) {
             if (StringUtils.isRegistered(Clicking.class.getSimpleName())) {
                 ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new Clicking(), ItemJoin.getCore().getPlugin());
-                if (ServerUtils.hasSpecificUpdate("1_8") && !ItemJoin.getCore().getDependencies().protocolEnabled() && ProtocolManager.isDead()) {
+                if (!ItemJoin.getCore().getDependencies().protocolEnabled() && ProtocolManager.isDead()) {
                     ProtocolManager.handleProtocols();
-                } else if (ServerUtils.hasSpecificUpdate("1_8") && ItemJoin.getCore().getDependencies().protocolEnabled() && ProtocolAPI.isHandling()) {
+                } else if (ItemJoin.getCore().getDependencies().protocolEnabled() && ProtocolAPI.isHandling()) {
                     ProtocolAPI.handleProtocols();
                 }
             }
@@ -657,10 +658,8 @@ public class ItemData {
             ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new Drops(), ItemJoin.getCore().getPlugin());
         }
         if (itemMap.getCommands() != null && itemMap.getCommands().length != 0) {
-            if (ServerUtils.hasSpecificUpdate("1_8") && StringUtils.isRegistered(Commands.class.getSimpleName())) {
+            if (StringUtils.isRegistered(Commands.class.getSimpleName())) {
                 ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new Commands(), ItemJoin.getCore().getPlugin());
-            } else {
-                LegacyAPI.registerCommands();
             }
         }
         if ((itemMap.isCancelEvents() || itemMap.isSelectable() || itemMap.getInteractCooldown() != 0)) {
@@ -685,13 +684,10 @@ public class ItemData {
             ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new Recipes(), ItemJoin.getCore().getPlugin());
         }
         if (itemMap.isItemStore() || itemMap.isItemModify()) {
-            if (ServerUtils.hasSpecificUpdate("1_8") && StringUtils.isRegistered(Storable.class.getSimpleName())) {
+            if (StringUtils.isRegistered(Storable.class.getSimpleName())) {
                 ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new Storable(), ItemJoin.getCore().getPlugin());
-            } else {
-                LegacyAPI.registerStorable();
             }
         }
-        //noinspection ConstantValue
         if (itemMap.isMovement() && ServerUtils.hasSpecificUpdate("1_9") && ReflectionUtils.getBukkitClass("event.player.PlayerSwapHandItemsEvent") != null && StringUtils.isRegistered(Offhand.class.getSimpleName())) {
             ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new Offhand(), ItemJoin.getCore().getPlugin());
         }
@@ -785,7 +781,7 @@ public class ItemData {
                 itemsData.set("items.random-pane-1.id", "STAINED_GLASS_PANE:4");
                 itemsData.set("items.random-pane-2.id", "STAINED_GLASS_PANE:4");
                 itemsData.set("items.random-pane-3.id", "STAINED_GLASS_PANE:6");
-            } else if (ServerUtils.hasSpecificUpdate("1_8")) {
+            } else {
                 itemsData.set("items.devine-item.commands-sound", "NOTE_PLING");
                 itemsData.set("items.devine-item.attributes", null);
                 itemsData.set("items.map-item.id", "MAP");
@@ -800,42 +796,6 @@ public class ItemData {
                 itemsData.set("items.animated-panes.id.5", "<delay:20>STAINED_GLASS_PANE:1");
                 itemsData.set("items.animated-panes.id.6", "<delay:20>STAINED_GLASS_PANE:14");
                 itemsData.set("items.banner-item.id", "BANNER");
-                itemsData.set("items.animated-sign.id", "SIGN");
-                itemsData.set("items.skull-item.id", "SKULL_ITEM:3");
-                itemsData.set("items.potion-arrow.id", "ARROW");
-                itemsData.set("items.potion-arrow.name", "&fArrow");
-                itemsData.set("items.potion-arrow.potion-effect", null);
-                itemsData.set("items.firework-item.id", "FIREWORK");
-                itemsData.set("items.firework-item.firework.colors", "GRAY, WHITE, PURPLE, SILVER, GREEN");
-                itemsData.set("items.potion-apple.potion-effect", "JUMP:2:120, NIGHT_VISION:2:400, INVISIBILITY:1:410, REGENERATION:1:160");
-                itemsData.set("items.profile-item.id", "SKULL_ITEM:3");
-                itemsData.set("items.random-pane-1.id", "STAINED_GLASS_PANE:4");
-                itemsData.set("items.random-pane-2.id", "STAINED_GLASS_PANE:3");
-                itemsData.set("items.random-pane-3.id", "STAINED_GLASS_PANE:6");
-                itemsData.set("items.offhand-item", null);
-            } else if (ServerUtils.hasSpecificUpdate("1_7")) {
-                itemsData.set("items.devine-item.commands-sound", "NOTE_PLING");
-                itemsData.set("items.devine-item.attributes", null);
-                itemsData.set("items.map-item.id", "MAP");
-                itemsData.set("items.gamemode-token.id", "FIREWORK_CHARGE");
-                itemsData.set("items.gamemode-token.commands-sound", "NOTE_PLING");
-                itemsData.set("items.bungeecord-item.id", "STAINED_GLASS:12");
-                itemsData.set("items.bungeecord-item.commands-sound", "NOTE_PLING");
-                itemsData.set("items.animated-panes.id.1", "<delay:40>STAINED_GLASS_PANE:15");
-                itemsData.set("items.animated-panes.id.2", "<delay:20>STAINED_GLASS_PANE:11");
-                itemsData.set("items.animated-panes.id.3", "<delay:20>STAINED_GLASS_PANE:13");
-                itemsData.set("items.animated-panes.id.4", "<delay:20>STAINED_GLASS_PANE:2");
-                itemsData.set("items.animated-panes.id.5", "<delay:20>STAINED_GLASS_PANE:1");
-                itemsData.set("items.animated-panes.id.6", "<delay:20>STAINED_GLASS_PANE:14");
-                itemsData.set("items.banner-item", null);
-                itemsData.set("items.melooooon-item.id", 382);
-                itemsData.set("items.melooooon-item.slot", 20);
-                itemsData.set("items.melooooon-item.name", "&aWater Melooooon!");
-                itemsData.set("items.melooooon-item.interact.-", "'message: &aIts a Water Melooooon!'");
-                itemsData.set("items.melooooon-item.commands-sequence", "RANDOM");
-                itemsData.set("items.melooooon-item.itemflags", "hide-attributes, self-drops, CreativeBypass");
-                itemsData.set("items.melooooon-item.triggers", "join, respawn, world-change, region-enter");
-                itemsData.set("items.melooooon-item.enabled-worlds", "world, world_nether, world_the_end");
                 itemsData.set("items.animated-sign.id", "SIGN");
                 itemsData.set("items.skull-item.id", "SKULL_ITEM:3");
                 itemsData.set("items.potion-arrow.id", "ARROW");

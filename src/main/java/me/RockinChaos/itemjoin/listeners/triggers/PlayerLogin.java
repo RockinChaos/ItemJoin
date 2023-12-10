@@ -37,9 +37,9 @@ public class PlayerLogin implements Listener {
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     private void onPlayerPreLogin(AsyncPlayerPreLoginEvent event) {
         if (!ItemJoin.getCore().isStarted()) {
-            ServerUtils.logDebug("Processing pre-login for " + (ServerUtils.hasSpecificUpdate("1_8") ? event.getUniqueId() : "Legacy") + " - " + event.getName());
+            ServerUtils.logDebug("Processing pre-login for " + event.getUniqueId() + " - " + event.getName());
             this.enableLatch();
-            ServerUtils.logDebug("Accepted pre-login for " + (ServerUtils.hasSpecificUpdate("1_8") ? event.getUniqueId() : "Legacy") + " - " + event.getName());
+            ServerUtils.logDebug("Accepted pre-login for " + event.getUniqueId() + " - " + event.getName());
         }
     }
 
@@ -53,7 +53,7 @@ public class PlayerLogin implements Listener {
     public void onPlayerLogin(PlayerLoginEvent event) {
         final Player player = event.getPlayer();
         if (!ItemJoin.getCore().isStarted()) {
-            ServerUtils.logDebug("Denied login for " + (ServerUtils.hasSpecificUpdate("1_8") ? player.getUniqueId() : "Legacy") + " - " + player.getName() + ", server is still starting!");
+            ServerUtils.logDebug("Denied login for " + player.getUniqueId() + " - " + player.getName() + ", server is still starting!");
             event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "Timed out");
         }
     }

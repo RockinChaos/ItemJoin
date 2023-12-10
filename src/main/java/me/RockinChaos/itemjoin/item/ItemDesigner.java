@@ -109,7 +109,6 @@ public class ItemDesigner {
                             this.setBookAuthor(itemMap);
                             this.setBookTitle(itemMap);
                             this.setBookGeneration(itemMap);
-                            this.setLegacyBookPages(itemMap);
                             this.setAttributes(itemMap);
                             this.setAttributeFlags(itemMap);
                             this.setEnchantmentFlags(itemMap);
@@ -505,7 +504,7 @@ public class ItemDesigner {
      */
     private void setJSONBookPages(final ItemMap itemMap) {
         ConfigurationSection pagesSection = ItemJoin.getCore().getConfig("items.yml").getConfigurationSection(itemMap.getNodeLocation().getCurrentPath() + ".pages");
-        if (itemMap.getMaterial().toString().equalsIgnoreCase("WRITTEN_BOOK") && itemMap.getNodeLocation().getString(".pages") != null && pagesSection != null && ServerUtils.hasSpecificUpdate("1_8")) {
+        if (itemMap.getMaterial().toString().equalsIgnoreCase("WRITTEN_BOOK") && itemMap.getNodeLocation().getString(".pages") != null && pagesSection != null) {
             List<String> JSONPages = new ArrayList<>();
             List<List<String>> rawPages = new ArrayList<>();
             for (String pageString : pagesSection.getKeys(false)) {
@@ -578,10 +577,10 @@ public class ItemDesigner {
      */
     private void setName(final ItemMap itemMap) {
         String name = getActualName(itemMap);
-        if ((ItemJoin.getCore().getData().dataTagsEnabled() && ServerUtils.hasSpecificUpdate("1_8")) || (itemMap.isVanilla() && ServerUtils.hasSpecificUpdate("1_8"))) {
+        if (ItemJoin.getCore().getData().dataTagsEnabled() || itemMap.isVanilla()) {
             itemMap.setCustomName(name);
         } else {
-            itemMap.setCustomName("�f" + name);
+            itemMap.setCustomName("§f" + name);
         }
     }
 
@@ -977,7 +976,7 @@ public class ItemDesigner {
      * @param itemMap - The ItemMap being modified.
      */
     private void setSkullTexture(final ItemMap itemMap) {
-        if (ServerUtils.hasSpecificUpdate("1_8") && itemMap.getNodeLocation().getString(".skull-texture") != null) {
+        if (itemMap.getNodeLocation().getString(".skull-texture") != null) {
             if (itemMap.getMaterial().toString().equalsIgnoreCase("SKULL_ITEM") || itemMap.getMaterial().toString().equalsIgnoreCase("PLAYER_HEAD")) {
                 if (itemMap.getNodeLocation().getString(".skull-owner") != null) {
                     ServerUtils.logWarn("{ItemDesigner} You cannot define a skull owner and a skull texture at the same time, remove one from the item.");
@@ -1131,7 +1130,7 @@ public class ItemDesigner {
      */
     private void setBanners(final ItemMap itemMap) {
         final String bannerMeta = itemMap.getNodeLocation().getString(".banner-meta");
-        if (bannerMeta != null && ServerUtils.hasSpecificUpdate("1_8") && StringUtils.containsIgnoreCase(itemMap.getMaterial().toString(), "BANNER")) {
+        if (bannerMeta != null && StringUtils.containsIgnoreCase(itemMap.getMaterial().toString(), "BANNER")) {
             String bannerList = bannerMeta.replace(" ", "");
             List<Pattern> patterns = new ArrayList<>();
             for (String banner : bannerList.split(",")) {
@@ -1336,43 +1335,6 @@ public class ItemDesigner {
     }
 
     /**
-     * Sets the Legacy Book Pages of the Custom Book Item,
-     * adding the custom book pages to the item without any JSON Formatting.
-     *
-     * @param itemMap - The ItemMap being modified.
-     */
-    private void setLegacyBookPages(final ItemMap itemMap) {
-        ConfigurationSection pagesSection = ItemJoin.getCore().getConfig("items.yml").getConfigurationSection(itemMap.getNodeLocation().getCurrentPath() + ".pages");
-        if (!ServerUtils.hasSpecificUpdate("1_8") && itemMap.getMaterial().toString().equalsIgnoreCase("WRITTEN_BOOK")
-                && itemMap.getNodeLocation().getString(".pages") != null && pagesSection != null) {
-            List<String> formattedPages = new ArrayList<>();
-            List<List<String>> rawPages = new ArrayList<>();
-            for (String pageString : pagesSection.getKeys(false)) {
-                List<String> pageList = itemMap.getNodeLocation().getStringList(".pages." + pageString);
-                rawPages.add(pageList);
-                StringBuilder saveList = new StringBuilder();
-                for (String formatLine : pageList) {
-                    if (ItemHandler.containsJSONEvent(formatLine)) {
-                        for (JSONEvent jsonType : JSONEvent.values()) {
-                            Matcher matchPattern = java.util.regex.Pattern.compile(jsonType.matchType + "(.*?)>").matcher(formatLine);
-                            while (matchPattern.find()) {
-                                String inputResult = matchPattern.group(1);
-                                formatLine = formatLine.replace(jsonType.matchType + inputResult + ">", ((jsonType == JSONEvent.TEXT) ? inputResult : ""));
-                            }
-                        }
-                    } else if (formatLine.contains("raw:")) {
-                        formatLine = "";
-                    }
-                    saveList.append(formatLine).append("\n");
-                }
-                formattedPages.add(saveList.toString());
-            }
-            itemMap.setPages(formattedPages);
-            itemMap.setListPages(rawPages);
-        }
-    }
-
-    /**
      * Sets the Custom Attributes for the Custom Item.
      *
      * @param itemMap - The ItemMap being modified.
@@ -1410,7 +1372,7 @@ public class ItemDesigner {
      * @param itemMap - The ItemMap being modified.
      */
     private void setAttributeFlags(final ItemMap itemMap) {
-        if (ServerUtils.hasSpecificUpdate("1_8") && StringUtils.containsIgnoreCase(itemMap.getItemFlags(), "hide-attributes")) {
+        if (StringUtils.containsIgnoreCase(itemMap.getItemFlags(), "hide-attributes")) {
             itemMap.setAttributesInfo(true);
         }
     }
@@ -1422,7 +1384,7 @@ public class ItemDesigner {
      * @param itemMap - The ItemMap being modified.
      */
     private void setEnchantmentFlags(final ItemMap itemMap) {
-        if (ServerUtils.hasSpecificUpdate("1_8") && StringUtils.containsIgnoreCase(itemMap.getItemFlags(), "hide-enchants")) {
+        if (StringUtils.containsIgnoreCase(itemMap.getItemFlags(), "hide-enchants")) {
             itemMap.setEnchantmentsInfo(true);
         }
     }
@@ -1434,7 +1396,7 @@ public class ItemDesigner {
      * @param itemMap - The ItemMap being modified.
      */
     private void setFlags(final ItemMap itemMap) {
-        if (ServerUtils.hasSpecificUpdate("1_8") && StringUtils.containsIgnoreCase(itemMap.getItemFlags(), "hide-flags")) {
+        if (StringUtils.containsIgnoreCase(itemMap.getItemFlags(), "hide-flags")) {
             itemMap.setFlagsInfo(true);
         }
     }

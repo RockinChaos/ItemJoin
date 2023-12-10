@@ -30,7 +30,6 @@ import me.RockinChaos.itemjoin.listeners.Clicking;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.lang.reflect.Field;
@@ -433,15 +432,7 @@ public class ItemAnimation {
      */
     private void setPagesData(final Player player, final ItemStack reviseItem, final List<String> pagesString) {
         if (reviseItem != null && reviseItem.getType() != Material.AIR) {
-            if (ServerUtils.hasSpecificUpdate("1_8")) {
-                reviseItem.setItemMeta(this.itemMap.setJSONBookPages(player, reviseItem, pagesString).getItemMeta());
-            } else {
-                final ItemMeta itemMeta = LegacyAPI.setBookPages(player, reviseItem.getItemMeta(), pagesString);
-                if (itemMeta != null) {
-                    this.itemMap.setPages(((BookMeta) itemMeta).getPages());
-                }
-                reviseItem.setItemMeta(itemMeta);
-            }
+            reviseItem.setItemMeta(this.itemMap.setJSONBookPages(player, reviseItem, pagesString).getItemMeta());
         }
     }
 
@@ -461,14 +452,12 @@ public class ItemAnimation {
                 ItemHandler.setSkullOwner(tempMeta, player, StringUtils.translateLayout(ItemHandler.cutDelay(ownerString), player));
             } else if (textureString != null && !textureString.contains("hdb-") && !this.itemMap.isHeadDatabase()) {
                 try {
-                    if (ServerUtils.hasSpecificUpdate("1_8")) {
-                        final UUID uuid = UUID.randomUUID();
-                        final GameProfile gameProfile = new GameProfile(uuid, uuid.toString().replaceAll("_", "").replaceAll("-", ""));
-                        gameProfile.getProperties().put("textures", new Property("textures", ItemHandler.cutDelay(StringUtils.toTextureUUID(player, this.itemMap.getConfigName(), textureString))));
-                        final Field declaredField = tempMeta.getClass().getDeclaredField("profile");
-                        declaredField.setAccessible(true);
-                        declaredField.set(tempMeta, gameProfile);
-                    }
+                    final UUID uuid = UUID.randomUUID();
+                    final GameProfile gameProfile = new GameProfile(uuid, uuid.toString().replaceAll("_", "").replaceAll("-", ""));
+                    gameProfile.getProperties().put("textures", new Property("textures", ItemHandler.cutDelay(StringUtils.toTextureUUID(player, this.itemMap.getConfigName(), textureString))));
+                    final Field declaredField = tempMeta.getClass().getDeclaredField("profile");
+                    declaredField.setAccessible(true);
+                    declaredField.set(tempMeta, gameProfile);
                 } catch (Exception e) {
                     ServerUtils.sendDebugTrace(e);
                 }

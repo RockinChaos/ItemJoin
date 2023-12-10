@@ -50,32 +50,12 @@ public class LegacyAPI {
     }
 
     /**
-     * Registers the Legacy Interact Listener.
-     * Only called when the Server version is below 1.8.
-     */
-    public static void registerCommands() {
-        if (!ServerUtils.hasSpecificUpdate("1_8") && StringUtils.isRegistered(me.RockinChaos.itemjoin.listeners.legacy.Legacy_Commands.class.getSimpleName())) {
-            ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new me.RockinChaos.itemjoin.listeners.legacy.Legacy_Commands(), ItemJoin.getCore().getPlugin());
-        }
-    }
-
-    /**
      * Registers the Legacy Consumes Listener.
      * Only called when the Server version is below 1.11.
      */
     public static void registerConsumes() {
         if (!ServerUtils.hasSpecificUpdate("1_11") && StringUtils.isRegistered(me.RockinChaos.itemjoin.listeners.legacy.Legacy_Consumes.class.getSimpleName())) {
             ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new me.RockinChaos.itemjoin.listeners.legacy.Legacy_Consumes(), ItemJoin.getCore().getPlugin());
-        }
-    }
-
-    /**
-     * Registers the Legacy Storable Listener.
-     * Only called when the Server version is below 1.8.
-     */
-    public static void registerStorable() {
-        if (!ServerUtils.hasSpecificUpdate("1_8") && StringUtils.isRegistered(me.RockinChaos.itemjoin.listeners.legacy.Legacy_Storable.class.getSimpleName())) {
-            ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new me.RockinChaos.itemjoin.listeners.legacy.Legacy_Storable(), ItemJoin.getCore().getPlugin());
         }
     }
 }

@@ -3802,14 +3802,12 @@ public class ItemMap implements Cloneable {
             this.tempMeta = ItemHandler.setSkullOwner(this.tempMeta, player, StringUtils.translateLayout(this.skullOwner, player));
         } else if (this.skullTexture != null && !this.headDatabase) {
             try {
-                if (ServerUtils.hasSpecificUpdate("1_8")) {
-                    final UUID uuid = UUID.randomUUID();
-                    GameProfile gameProfile = new GameProfile(uuid, uuid.toString().replaceAll("_", "").replaceAll("-", ""));
-                    gameProfile.getProperties().put("textures", new Property("textures", ((this.skullOwner != null && ItemJoin.getCore().getDependencies().skinsRestorerEnabled()) ? ItemJoin.getCore().getDependencies().getSkinValue(player.getUniqueId(), StringUtils.translateLayout(this.skullOwner, player)) : StringUtils.toTextureUUID(player, this.configName, this.skullTexture))));
-                    Field declaredField = this.tempMeta.getClass().getDeclaredField("profile");
-                    declaredField.setAccessible(true);
-                    declaredField.set(this.tempMeta, gameProfile);
-                }
+                final UUID uuid = UUID.randomUUID();
+                GameProfile gameProfile = new GameProfile(uuid, uuid.toString().replaceAll("_", "").replaceAll("-", ""));
+                gameProfile.getProperties().put("textures", new Property("textures", ((this.skullOwner != null && ItemJoin.getCore().getDependencies().skinsRestorerEnabled()) ? ItemJoin.getCore().getDependencies().getSkinValue(player.getUniqueId(), StringUtils.translateLayout(this.skullOwner, player)) : StringUtils.toTextureUUID(player, this.configName, this.skullTexture))));
+                Field declaredField = this.tempMeta.getClass().getDeclaredField("profile");
+                declaredField.setAccessible(true);
+                declaredField.set(this.tempMeta, gameProfile);
             } catch (Exception e) {
                 ServerUtils.sendDebugTrace(e);
             }
@@ -3996,10 +3994,6 @@ public class ItemMap implements Cloneable {
             this.setFireChargeColor();
             this.setDye(player);
             this.setBookInfo(player);
-            if (!ServerUtils.hasSpecificUpdate("1_8") && this.bookPages != null && !this.bookPages.isEmpty()) {
-                final ItemMeta bookMeta = LegacyAPI.setBookPages(player, this.tempMeta, this.bookPages);
-                this.setPages(((BookMeta) bookMeta).getPages());
-            }
             this.setAttributes();
             this.setAttributeFlags();
             this.setEnchantmentsFlags();
@@ -4088,7 +4082,7 @@ public class ItemMap implements Cloneable {
             if (ServerUtils.hasSpecificUpdate("1_13")) {
                 MapMeta mapmeta = (MapMeta) this.tempItem.getItemMeta();
                 try {
-                   if (mapmeta != null) {
+                   if (mapmeta != null && this.mapView != null) {
                        try {
                            mapmeta.setMapView(this.mapView);
                        } catch (NullPointerException e) {
@@ -4115,7 +4109,7 @@ public class ItemMap implements Cloneable {
      * @return The updated ItemStack.
      */
     public ItemStack setJSONBookPages(final Player player, final ItemStack item, final List<String> pages) {
-        if (item.getType().toString().equalsIgnoreCase("WRITTEN_BOOK") && pages != null && !pages.isEmpty() && ServerUtils.hasSpecificUpdate("1_8")) {
+        if (item.getType().toString().equalsIgnoreCase("WRITTEN_BOOK") && pages != null && !pages.isEmpty()) {
             List<String> copyPages = new ArrayList<>(pages);
             copyPages.set(0, ItemHandler.cutDelay(copyPages.get(0)));
             Object localePages = null;
@@ -4436,7 +4430,7 @@ public class ItemMap implements Cloneable {
      * Sets the Attributes to the Temporary ItemMeta.
      */
     private void setAttributeFlags() {
-        if (ServerUtils.hasSpecificUpdate("1_8") && this.hideAttributes) {
+        if (this.hideAttributes) {
             this.tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ATTRIBUTES);
         }
     }
@@ -4445,7 +4439,7 @@ public class ItemMap implements Cloneable {
      * Sets the Enchantments to the Temporary ItemMeta.
      */
     private void setEnchantmentsFlags() {
-        if (ServerUtils.hasSpecificUpdate("1_8") && this.hideEnchantments) {
+        if (this.hideEnchantments) {
             this.tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ENCHANTS);
         }
     }
@@ -5529,7 +5523,7 @@ public class ItemMap implements Cloneable {
             } else {
                 setName = this.customName.replace("§", "&");
             }
-            if (setName.startsWith("&f") && (!ItemJoin.getCore().getData().dataTagsEnabled() || !ServerUtils.hasSpecificUpdate("1_8"))) {
+            if (setName.startsWith("&f") && !ItemJoin.getCore().getData().dataTagsEnabled()) {
                 setName = setName.substring(2);
             }
             if (!Objects.requireNonNull(ItemHandler.getMaterialName(this.tempItem)).equalsIgnoreCase(setName)) {
@@ -5829,7 +5823,7 @@ public class ItemMap implements Cloneable {
                     saveTriggers.append(trigger).append(", ");
                 }
             }
-            if (!saveTriggers.isEmpty() || saveTriggers.toString().equals(this.triggers)) {
+            if (!StringUtils.isEmpty(saveTriggers) || saveTriggers.toString().equals(this.triggers)) {
                 itemData.set("items." + this.configName + ".triggers", this.triggers);
             }
         }

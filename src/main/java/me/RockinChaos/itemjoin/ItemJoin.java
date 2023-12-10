@@ -57,17 +57,24 @@ public class ItemJoin extends JavaPlugin {
      */
     @Override
     public void onEnable() {
-        ItemData.getInfo().registerEvents();
-        {
-            ItemData.getInfo().registerClasses(false);
+        if (core.isEnabled()) {
+            ItemData.getInfo().registerEvents();
             {
-                SchedulerUtils.runAsync(() -> {
-                    core.getUpdater();
-                    {
-                        ServerUtils.logDebug("has been Enabled.");
-                    }
-                });
+                ItemData.getInfo().registerClasses(false);
+                {
+                    SchedulerUtils.runAsync(() -> {
+                        core.getUpdater();
+                        {
+                            ServerUtils.logDebug("has been Enabled.");
+                        }
+                    });
+                }
             }
+        } else {
+            ServerUtils.logSevere("detected incompatible server version.");
+            ServerUtils.logSevere("only Minecraft 1.8 and above is supported.");
+            ServerUtils.logSevere("disabling...");
+            core.getPlugin().getPluginLoader().disablePlugin(this);
         }
     }
 

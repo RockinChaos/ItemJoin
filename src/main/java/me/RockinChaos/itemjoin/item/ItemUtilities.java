@@ -1110,7 +1110,6 @@ public class ItemUtilities {
     /**
      * Clears any crafting recipes for the custom items.
      */
-    @SuppressWarnings("PatternVariableCanBeUsed")
     public void clearRecipes() {
         final List<Recipe> backupRecipes = new ArrayList<>();
         final Iterator<Recipe> recipes = Bukkit.getServer().recipeIterator();

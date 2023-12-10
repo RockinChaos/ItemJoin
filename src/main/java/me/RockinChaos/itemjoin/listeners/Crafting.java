@@ -97,7 +97,7 @@ public class Crafting implements Listener {
     @EventHandler(priority = EventPriority.LOW)
     private void onCraftingClose(org.bukkit.event.inventory.InventoryCloseEvent event) {
         long dupeDuration = !this.closeDupe.isEmpty() && this.closeDupe.get(PlayerHandler.getPlayerID((Player) event.getPlayer())) != null ? System.currentTimeMillis() - this.closeDupe.get(PlayerHandler.getPlayerID((Player) event.getPlayer())) : -1;
-        if (!ServerUtils.hasSpecificUpdate("1_8") || !PlayerHandler.isCraftingInv(event.getView()) || (PlayerHandler.isCraftingInv(event.getView()) && (dupeDuration == -1 || dupeDuration > 30))) {
+        if (!PlayerHandler.isCraftingInv(event.getView()) || (PlayerHandler.isCraftingInv(event.getView()) && (dupeDuration == -1 || dupeDuration > 30))) {
             ServerUtils.logDebug("{CRAFTING} Bukkit inventory was closed for the player " + event.getPlayer().getName() + ".");
             ItemStack[] topContents = ItemHandler.cloneContents(event.getView().getTopInventory().getContents());
             this.handleClose(slot -> event.getView().getTopInventory().setItem(slot, new ItemStack(Material.AIR)), (Player) event.getPlayer(), event.getView(), topContents, true);
@@ -111,7 +111,7 @@ public class Crafting implements Listener {
      */
     @EventHandler(priority = EventPriority.LOW)
     private void onCraftingClose(me.RockinChaos.core.utils.protocol.events.InventoryCloseEvent event) {
-        if (ServerUtils.hasSpecificUpdate("1_8") && PlayerHandler.isCraftingInv(event.getView())) {
+        if (PlayerHandler.isCraftingInv(event.getView())) {
             ServerUtils.logDebug("{CRAFTING} Protocol-Packet inventory was closed for the player " + event.getPlayer().getName() + ".");
             this.closeDupe.put(PlayerHandler.getPlayerID(event.getPlayer()), System.currentTimeMillis());
             this.handleClose(slot -> {
@@ -181,7 +181,7 @@ public class Crafting implements Listener {
         final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(itemCopy);
         double health;
         try {
-            health = (ServerUtils.hasSpecificUpdate("1_8") ? player.getHealth() : (double) player.getClass().getMethod("getHealth").invoke(player));
+            health = player.getHealth();
         } catch (Exception e) {
             health = (player.isDead() ? 0 : 1);
         }
@@ -277,7 +277,7 @@ public class Crafting implements Listener {
                             SchedulerUtils.run(() -> {
                                 double health;
                                 try {
-                                    health = (ServerUtils.hasSpecificUpdate("1_8") ? player.getHealth() : (double) player.getClass().getMethod("getHealth").invoke(player));
+                                    health = player.getHealth();
                                 } catch (Exception e) {
                                     health = (player.isDead() ? 0 : 1);
                                 }
@@ -312,7 +312,7 @@ public class Crafting implements Listener {
             SchedulerUtils.run(() -> {
                 double health;
                 try {
-                    health = (ServerUtils.hasSpecificUpdate("1_8") ? player.getHealth() : (double) player.getClass().getMethod("getHealth").invoke(player));
+                    health = player.getHealth();
                 } catch (Exception e) {
                     health = (player.isDead() ? 0 : 1);
                 }
