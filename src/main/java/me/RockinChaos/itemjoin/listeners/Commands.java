@@ -401,13 +401,12 @@ public class Commands implements Listener {
      * @param clickType - the clicking type that is being performed.
      * @param slot      - the slot the item originally resided in.
      */
-    private void equipCommands(final Player player, final ItemStack item, final String action, String clickType, final String slot) {
+    private void equipCommands(final Player player, final ItemStack item, final String action, final String clickType, final String slot) {
         final String[] itemType = (item.getType().name().equalsIgnoreCase("ELYTRA") ? "ELYTRA_CHESTPLATE".split("_") :
                 (ItemHandler.isSkull(item.getType()) || StringUtils.splitIgnoreCase(item.getType().name(), "HEAD", "_") ? "SKULL_HELMET".split("_") : item.getType().name().split("_")));
         if (itemType.length >= 2 && (itemType[1] != null && !itemType[1].isEmpty()
                 && (clickType.equalsIgnoreCase("SHIFT_EQUIPPED") || itemType[1].equalsIgnoreCase(StringUtils.getArmorSlot(slot, false))))) {
-            clickType = (clickType.equalsIgnoreCase("SHIFT_EQUIPPED") ? "EQUIPPED" : clickType);
-            this.runCommands(player, null, item, action, clickType, slot);
+            this.runCommands(player, null, item, action, (clickType.equalsIgnoreCase("SHIFT_EQUIPPED") ? "EQUIPPED" : clickType), slot);
         }
     }
 
@@ -422,9 +421,11 @@ public class Commands implements Listener {
      */
     private void runCommands(final Player player, final Player altPlayer, final ItemStack item, final String action, final String clickType, final String slot) {
         final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item);
-        if (itemMap != null && itemMap.inWorld(player.getWorld()) && itemMap.hasPermission(player, player.getWorld())) {
-            itemMap.executeCommands(player, altPlayer, item, action, clickType, (slot == null ? itemMap.getSlot() : slot));
-        }
+        SchedulerUtils.runAsync(() -> {
+            if (itemMap != null && itemMap.inWorld(player.getWorld()) && itemMap.hasPermission(player, player.getWorld())) {
+                itemMap.executeCommands(player, altPlayer, item, action, clickType, (slot == null ? itemMap.getSlot() : slot));
+            }
+        });
     }
 
     /**
