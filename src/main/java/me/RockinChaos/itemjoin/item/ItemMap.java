@@ -5782,7 +5782,7 @@ public class ItemMap implements Cloneable {
             for (Entry<String, Integer> enchantments : this.enchants.entrySet()) {
                 enchantList.append(enchantments.getKey()).append(":").append(enchantments.getValue()).append(", ");
             }
-            itemData.set("items." + this.configName + ".enchantment", enchantList.substring(0, enchantList.length() - 2));
+            itemData.set("items." + this.configName + ".enchantments", enchantList.substring(0, enchantList.length() - 2));
         }
         if (this.fireworkType != null) {
             itemData.set("items." + this.configName + ".firework.type", this.fireworkType.name());

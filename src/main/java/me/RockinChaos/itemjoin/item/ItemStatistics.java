@@ -22,6 +22,7 @@ import me.RockinChaos.core.handlers.ItemHandler;
 import me.RockinChaos.core.utils.ServerUtils;
 import me.RockinChaos.core.utils.StringUtils;
 import me.RockinChaos.itemjoin.ItemJoin;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 
@@ -55,7 +56,8 @@ public class ItemStatistics {
      * @param itemMap - The ItemMap being modified.
      */
     private void setEnchantments(final Player player, final ItemMap itemMap) {
-        final String enchants = itemMap.getNodeLocation().getString(".enchantment");
+        final ConfigurationSection itemNode = itemMap.getNodeLocation();
+        final String enchants = (itemNode.getString(".enchantments") != null ? itemNode.getString(".enchantments") : itemNode.getString(".enchantment"));
         if (enchants != null) {
             final String enchantList = enchants.replace(" ", "");
             final String[] enchantments = enchantList.split(",");
