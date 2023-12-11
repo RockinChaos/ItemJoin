@@ -43,11 +43,15 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
 
 import javax.annotation.Nonnull;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ChatExecutor implements CommandExecutor {
 
@@ -73,7 +77,7 @@ public class ChatExecutor implements CommandExecutor {
             ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
             ItemJoin.getCore().getLang().dispatchMessage(sender, ("&aItemJoin v" + ItemJoin.getCore().getPlugin().getDescription().getVersion() + "&e by RockinChaos"), "&bThis should be the version submitted to the developer \n&bwhen submitting a bug or feature request.", "https://github.com/RockinChaos/ItemJoin/issues", ClickAction.OPEN_URL);
             ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l/ItemJoin Help &7- &eThis help menu.", "&aExecuting this command shows this help menu!", "/itemjoin help", ClickAction.SUGGEST_COMMAND);
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l/ItemJoin Dump &7- &eGets a debug link for support.", "&aSends a pastebin link of their configuration files. \n&cThis should be sent to the plugin developer and NOT SHARED PUBLICLY.", "/itemjoin dump", ClickAction.SUGGEST_COMMAND);
+            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l/ItemJoin Dump &7- &eGets a debug link for support.", "&aSends a paste link of their configuration files. \n&cThis should be sent to the plugin developer and NOT SHARED PUBLICLY.", "/itemjoin dump", ClickAction.SUGGEST_COMMAND);
             ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l/ItemJoin Reload &7- &eReloads the .yml files.", "&aFully reloads the plugin, fetching \n&aany changes made to the .yml files. \n\n&aBe sure to save changes made to your .yml files!", "/itemjoin reload", ClickAction.SUGGEST_COMMAND);
             ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l/ItemJoin Updates &7- &eChecks for plugin updates.", "&aChecks to see if there are any updates available for this plugin.", "/itemjoin updates", ClickAction.SUGGEST_COMMAND);
             ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l/ItemJoin Upgrade &7- &eUpdates to latest version.", "&aAttempts to Upgrade this plugin to the latest version. \n&aYou will need to restart the server for this process to complete.", "/itemjoin upgrade", ClickAction.SUGGEST_COMMAND);
@@ -293,10 +297,15 @@ public class ChatExecutor implements CommandExecutor {
             final String items = Files.asCharSource(new File(ItemJoin.getCore().getPlugin().getDataFolder() + "/items.yml"), StandardCharsets.UTF_8).read();
             final String lang = Files.asCharSource(new File(ItemJoin.getCore().getPlugin().getDataFolder() + "/" + ItemJoin.getCore().getLang().getFile()), StandardCharsets.UTF_8).read();
             final String latest = Files.asCharSource(new File("logs/latest.log"), StandardCharsets.UTF_8).read();
-            final PasteAPI pasteURI = new PasteAPI("tA44oTOaBVviwH5v9y2zcmUKubKNRgZz",
+            final StringBuilder plugins = new StringBuilder();
+            for (Plugin plugin : ItemJoin.getCore().getPlugin().getServer().getPluginManager().getPlugins()) {
+                plugins.append(!StringUtils.isEmpty(plugins) ? ", " : "").append(plugin.getName());
+            }
+            final PasteAPI pasteURI = new PasteAPI(
                     "# +---------------------------------------------------------------------------------------------+ #\n" +
-                            "# Plugin Version: " + pluginVersion + "\n" +
-                            "# Server Version: " + serverVersion + "\n" +
+                            "# | Plugin Version: " + pluginVersion + "\n" +
+                            "# | Server Version: " + serverVersion + "\n" +
+                            "# | Plugins: " + plugins + "\n" +
                             "# +---------------------------------------------------------------------------------------------+ #\n" +
                             "# +-------------------------------------- CONFIG.YML FILE --------------------------------------+ #\n" +
                             "# +---------------------------------------------------------------------------------------------+ #\n" + config +
@@ -309,8 +318,11 @@ public class ChatExecutor implements CommandExecutor {
                             " \n\n\n\n\n# +---------------------------------------------------------------------------------------------+ #\n" +
                             "# +------------------------------------ SERVER LOG (LATEST) ------------------------------------+ #\n" +
                             "# +---------------------------------------------------------------------------------------------+ #\n" + latest);
-            pasteURI.setPasteExpire("1Y");
-            sender.sendMessage(StringUtils.colorFormat("&7[&eItemJoin&7] &c&l&nDO NOT SHARE:&a " + pasteURI.getPaste()));
+            final String pasteURL = pasteURI.getPaste();
+            ServerUtils.logInfo(sender.getName() + " has generated a debug paste at " + pasteURL);
+            if (!(sender instanceof ConsoleCommandSender)) {
+                sender.sendMessage(StringUtils.colorFormat("&7[&eItemJoin&7]&a " + pasteURL));
+            }
         } catch (Exception e) {
             ServerUtils.logSevere("{ChatExecutor} Failed to execute the DUMP command.");
             ServerUtils.sendSevereTrace(e);
