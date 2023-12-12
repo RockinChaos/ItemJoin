@@ -3621,7 +3621,6 @@ public class Menu {
                     listCommands(itemMap, Action.UN_EQUIP)), event -> commandListPane(player, itemMap, Action.UN_EQUIP)));
             clickPane.addButton(new Button(ItemHandler.getItem("TORCH", 1, false, false, "&e&lOn-Hold", "&7", "&7*Commands that will execute only", "&7when holding the item.", "&7", "&9&lCommands: &a" +
                     listCommands(itemMap, Action.ON_HOLD)), event -> commandListPane(player, itemMap, Action.ON_HOLD)));
-            clickPane.addButton(new Button(fillerPaneGItem));
             clickPane.addButton(new Button(ItemHandler.getItem("ARROW", 1, false, false, "&e&lOn-Fire", "&7", "&7*Commands that will execute only", "&7when an arrow or bow is fired.", "&7", "&9&lCommands: &a" +
                     listCommands(itemMap, Action.ON_FIRE)), event -> commandListPane(player, itemMap, Action.ON_FIRE)));
             clickPane.addButton(new Button(fillerPaneGItem));
@@ -3629,8 +3628,10 @@ public class Menu {
                     listCommands(itemMap, Action.ON_CONSUME)), event -> commandListPane(player, itemMap, Action.ON_CONSUME)));
             clickPane.addButton(new Button(ItemHandler.getItem("EMERALD", 1, false, false, "&e&lOn-Receive", "&7", "&7*Commands that will execute only", "&7when you are given the item.", "&7", "&9&lCommands: &a" +
                     listCommands(itemMap, Action.ON_RECEIVE)), event -> commandListPane(player, itemMap, Action.ON_RECEIVE)));
-            clickPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "SKELETON_SKULL" : "397"), 1, false, false, "&e&lOn-Death", "&7", "&7*Commands that will execute only", "&7when die with the", "&7item in your inventory.", "&7", "&9&lCommands: &a" +
+            clickPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "SKELETON_SKULL" : "397"), 1, false, false, "&e&lOn-Death", "&7", "&7*Commands that will execute only", "&7when dying with the", "&7item in your inventory.", "&7", "&9&lCommands: &a" +
                     listCommands(itemMap, Action.ON_DEATH)), event -> commandListPane(player, itemMap, Action.ON_DEATH)));
+            clickPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "PLAYER_HEAD" : "397:3"), 1, false, false, "&e&lOn-Kill", "&7", "&7*Commands that will execute only", "&7when killing a player with the", "&7item in your inventory.", "&7", "&9&lCommands: &a" +
+                    listCommands(itemMap, Action.ON_KILL)), event -> commandListPane(player, itemMap, Action.ON_KILL)));
             clickPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GLASS" : "20"), 1, false, false, "&e&lInteract-Air", "&7", "&7*Commands that will execute only", "&7when left and right", "&7clicking the air.", "&7", "&9&lCommands: &a" +
                     listCommands(itemMap, Action.INTERACT_AIR)), event -> commandListPane(player, itemMap, Action.INTERACT_AIR)));
             clickPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "LIGHT_BLUE_STAINED_GLASS" : "95:3"), 1, false, false, "&e&lInteract-Air-Left", "&7", "&7*Commands that will execute only", "&7when left clicking the air.", "&7", "&9&lCommands: &a" +
@@ -3901,7 +3902,6 @@ public class Menu {
     private static void executorPane(final Player player, final ItemMap itemMap, final Action action) {
         Interface executorPane = new Interface(false, 2, exitButton, GUIName, player);
         SchedulerUtils.runAsync(() -> {
-            executorPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GUNPOWDER" : "289"), 1, false, false, "&f")));
             executorPane.addButton(new Button(ItemHandler.getItem("BOOK", 1, false, false, "&e&lPlayer", "&7", "&7*Executes the command", "&7as the player."), event -> {
                 player.closeInventory();
                 String[] placeHolders = ItemJoin.getCore().getLang().newString();
@@ -3987,6 +3987,7 @@ public class Menu {
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 commandListPane(event.getPlayer(), itemMap, action);
             }));
+            executorPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "ANVIL" : "145"), 1, false, false, "&e&lDamage", "&7", "&7*Damages the item (x) amount."), event -> damageExecutorPane(player, itemMap, action)));
             executorPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "REPEATER" : "356"), 1, false, false, "&e&lSwap-Item", "&7", "&7*Swaps the item to another defined item."), event -> swapPane(player, itemMap, action)));
             executorPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CLOCK" : "347"), 1, false, false, "&e&lDelay", "&7", "&7*Adds a delay between command lines."), event -> delayPane(player, itemMap, action)));
             executorPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the command lines menu."), event -> commandListPane(player, itemMap, action)));
@@ -4067,6 +4068,49 @@ public class Menu {
             }
         });
         delayPane.open(player);
+    }
+
+    /**
+     * Opens the Pane for the Player.
+     * This Pane is for setting an items command damage amount.
+     *
+     * @param player  - The Player to have the Pane opened.
+     * @param itemMap - The ItemMap currently being modified.
+     * @param action  - The action to be matched.
+     */
+    private static void damageExecutorPane(final Player player, final ItemMap itemMap, final Action action) {
+        Interface damagePane = new Interface(true, 6, exitButton, GUIName, player);
+        SchedulerUtils.runAsync(() -> {
+            damagePane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the executors menu."), event -> executorPane(player, itemMap, action)));
+            damagePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, false, "&e&lCustom Cooldown", "&7", "&7*Click to set a custom", "&7delay for the next command."), event -> {
+                player.closeInventory();
+                String[] placeHolders = ItemJoin.getCore().getLang().newString();
+                placeHolders[16] = "DAMAGE";
+                placeHolders[15] = "180";
+                ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+                ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
+            }, event -> {
+                if (StringUtils.isInt(StringUtils.translateLayout(ChatColor.stripColor(event.getMessage()), player))) {
+                    modifyCommands(itemMap, ItemCommand.fromString("damage: " + Integer.parseInt(ChatColor.stripColor(event.getMessage())), action, itemMap, Integer.parseInt(ChatColor.stripColor(event.getMessage())), null), true);
+                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
+                    placeHolders[16] = "DAMAGE";
+                    ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
+                } else {
+                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
+                    placeHolders[16] = ChatColor.stripColor(event.getMessage());
+                    ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noInteger", player, placeHolders);
+                }
+                commandListPane(event.getPlayer(), itemMap, action);
+            }));
+            for (int i = 1; i <= 64; i++) {
+                final int k = i;
+                damagePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "LIGHT_GRAY_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:8"), k, false, false, "&9&lDamage: &a&l" + k, "&7", "&7*Click to set the", "&7damage the item should take."), event -> {
+                    modifyCommands(itemMap, ItemCommand.fromString("damage: " + k, action, itemMap, k, null), true);
+                    commandListPane(player, itemMap, action);
+                }));
+            }
+        });
+        damagePane.open(player);
     }
 
     /**
@@ -6831,7 +6875,6 @@ public class Menu {
                     "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.UN_EQUIP.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandCPane(player, itemMap, Action.UN_EQUIP)));
             commandPane.addButton(new Button(ItemHandler.getItem("TORCH", 1, false, false, "&e&lOn-Hold", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
                     "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.ON_HOLD.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandCPane(player, itemMap, Action.ON_HOLD)));
-            commandPane.addButton(new Button(fillerPaneGItem));
             commandPane.addButton(new Button(ItemHandler.getItem("ARROW", 1, false, false, "&e&lOn-Fire", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
                     "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.ON_FIRE.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandCPane(player, itemMap, Action.ON_FIRE)));
             commandPane.addButton(new Button(fillerPaneGItem));
@@ -6841,6 +6884,8 @@ public class Menu {
                     "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.ON_RECEIVE.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandCPane(player, itemMap, Action.ON_RECEIVE)));
             commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "SKELETON_SKULL" : "397"), 1, false, false, "&e&lOn-Death", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
                     "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.ON_DEATH.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandCPane(player, itemMap, Action.ON_DEATH)));
+            commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "PLAYER_HEAD" : "397:3"), 1, false, false, "&e&lOn-Kill", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.ON_KILL.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandCPane(player, itemMap, Action.ON_KILL)));
             commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GLASS" : "20"), 1, false, false, "&e&lInteract-Air", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
                     "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.INTERACT_AIR.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandCPane(player, itemMap, Action.INTERACT_AIR)));
             commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "LIGHT_BLUE_STAINED_GLASS" : "95:3"), 1, false, false, "&e&lInteract-Air-Left", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
