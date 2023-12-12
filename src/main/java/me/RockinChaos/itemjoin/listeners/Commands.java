@@ -65,14 +65,24 @@ public class Commands implements Listener {
     }
 
     /**
-     * Runs the on_death commands for the custom item upon player death.
+     * Runs the on_death and on_kill commands for the custom item upon player death.
      *
      * @param event - PlayerDeathEvent.
      */
     @EventHandler(priority = EventPriority.LOW)
     private void onDeath(PlayerDeathEvent event) {
+        final Player killer = event.getEntity().getKiller();
         for (ItemStack item : event.getDrops()) {
             this.runCommands(event.getEntity(), null, item, "ON_DEATH", "DEAD", null);
+        }
+        if (killer != null) {
+            for (ItemStack item : killer.getInventory()) {
+                this.runCommands(event.getEntity(), null, item, "ON_KILL", "KILLER", null);
+            }
+            if (PlayerHandler.isCraftingInv(killer.getOpenInventory()))
+                for (ItemStack item : killer.getOpenInventory().getTopInventory()) {
+                   this.runCommands(event.getEntity(), null, item, "ON_KILL", "KILLER", null);
+              }
         }
     }
 
@@ -181,13 +191,16 @@ public class Commands implements Listener {
         final Player player = event.getPlayer();
         final Action action = event.getAction();
         final ItemStack item = (event.getItem() != null ? event.getItem().clone() : event.getItem());
-        if (item != null && item.getType() != Material.AIR && (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) && PlayerHandler.isCraftingInv(player.getOpenInventory()) && PlayerHandler.isMenuClick(player.getOpenInventory(), event.getAction())) {
+        if (item != null && item.getType() != Material.AIR && PlayerHandler.isCraftingInv(player.getOpenInventory()) && PlayerHandler.isMenuClick(player.getOpenInventory(), event.getAction())) {
             final String[] itemType = (item.getType().name().equalsIgnoreCase("ELYTRA") ? "ELYTRA_CHESTPLATE".split("_") :
                     (ItemHandler.isSkull(item.getType()) || StringUtils.splitIgnoreCase(item.getType().name(), "HEAD", "_") ? "SKULL_HELMET".split("_") : item.getType().name().split("_")));
-            if (itemType.length >= 2 && itemType[1] != null && !itemType[1].isEmpty() && StringUtils.isInt(StringUtils.getArmorSlot(itemType[1], true))
-                    && player.getInventory().getItem(Integer.parseInt(StringUtils.getArmorSlot(itemType[1], true))) == null
-                    && (!itemType[0].equalsIgnoreCase("SKULL") || (!event.getAction().equals(Action.RIGHT_CLICK_AIR) && !event.getAction().equals(Action.RIGHT_CLICK_BLOCK)))) {
-                this.equipCommands(player, item, "ON_EQUIP", "EQUIPPED", StringUtils.getArmorSlot(itemType[1], true));
+            if (itemType.length >= 2 && itemType[1] != null && !itemType[1].isEmpty() && StringUtils.isInt(StringUtils.getArmorSlot(itemType[1], true)) && !itemType[0].equalsIgnoreCase("SKULL")) {
+                final ItemStack existingItem = player.getInventory().getItem(Integer.parseInt(StringUtils.getArmorSlot(itemType[1], true)));
+                if ((action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK)) {
+                    this.equipCommands(player, item, "ON_EQUIP", "EQUIPPED", StringUtils.getArmorSlot(itemType[1], true));
+                } else if ((action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) && existingItem != null && existingItem.getType() != Material.AIR) {
+                    this.equipCommands(player, item, "UN_EQUIP", "UNEQUIPPED", StringUtils.getArmorSlot(itemType[1], true));
+                }
             }
         }
     }
