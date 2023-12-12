@@ -651,6 +651,9 @@ public class ItemData {
         } else if (itemMap.isStackable()) {
             LegacyAPI.registerStackable();
         }
+        if (itemMap.isSplittable() && StringUtils.isRegistered(Splittable.class.getSimpleName())) {
+            ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new Splittable(), ItemJoin.getCore().getPlugin());
+        }
         if (itemMap.isNotHat() && StringUtils.isRegistered(Processes.class.getSimpleName())) {
             ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new Processes(), ItemJoin.getCore().getPlugin());
         }
