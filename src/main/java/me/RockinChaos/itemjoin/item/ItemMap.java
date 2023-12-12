@@ -215,6 +215,7 @@ public class ItemMap implements Cloneable {
     private boolean stackable = false;
     private boolean notHat = false;
     private boolean selectable = false;
+    private boolean splittable = false;
     private boolean CreativeBypass = false;
     private boolean AllowOpBypass = false;
     private boolean onlyFirstJoin = false;
@@ -476,6 +477,7 @@ public class ItemMap implements Cloneable {
             this.stackable = StringUtils.containsIgnoreCase(this.itemflags, "stackable");
             this.notHat = StringUtils.containsIgnoreCase(this.itemflags, "not-hat");
             this.selectable = StringUtils.containsIgnoreCase(this.itemflags, "selectable");
+            this.splittable = StringUtils.containsIgnoreCase(this.itemflags, "splittable");
             this.dynamic = StringUtils.containsIgnoreCase(this.itemflags, "dynamic");
             this.animate = StringUtils.containsIgnoreCase(this.itemflags, "animate");
             this.glowing = StringUtils.containsIgnoreCase(this.itemflags, "glowing") || StringUtils.containsIgnoreCase(this.itemflags, "glow");
@@ -3326,6 +3328,24 @@ public class ItemMap implements Cloneable {
     }
 
     /**
+     * Checks if the Splittable Flag is enabled.
+     *
+     * @return If it is enabled.
+     */
+    public boolean isSplittable() {
+        return this.splittable;
+    }
+
+    /**
+     * Sets the Splittable Flag.
+     *
+     * @param bool - The value to be set.
+     */
+    public void setSplittable(final boolean bool) {
+        this.splittable = bool;
+    }
+
+    /**
      * Checks if the Animate Flag is enabled.
      *
      * @return If it is enabled.
@@ -3717,6 +3737,8 @@ public class ItemMap implements Cloneable {
                 return notHat;
             } else if (findFlag.equals("selectable")) {
                 return selectable;
+            } else if (findFlag.equals("splittable")) {
+                return splittable;
             } else if (findFlag.equals("item-modifiable")) {
                 return itemModify;
             } else if (findFlag.equals("item-craftable")) {
@@ -4693,6 +4715,64 @@ public class ItemMap implements Cloneable {
     }
 
     /**
+     * Damages the current ItemMap.
+     *
+     * @param player - The Player to have their item damaged.
+     * @param slot   - The slot to have the item damaged
+     * @param damage   - The Integer amount to be damaged.
+     */
+    public void damageItem(final Player player, final String slot, final int damage) {
+        if ((!slot.startsWith("CH") && slot.startsWith("C")) || StringUtils.isInt(slot)) {
+            if (StringUtils.containsIgnoreCase(slot, "CRAFTING")) {
+                final int actualSlot = StringUtils.getSlotConversion(slot);
+                final ItemStack item = player.getOpenInventory().getTopInventory().getItem(actualSlot);
+                if (item != null && this.isSimilar(player, item)) {
+                    final ItemMeta itemMeta = item.getItemMeta();
+                    if (ServerUtils.hasSpecificUpdate("1_13") && itemMeta != null) {
+                        int newDamage = ((org.bukkit.inventory.meta.Damageable) itemMeta).getDamage() + damage;
+                        if (item.getType().getMaxDurability() > newDamage) {
+                            ((org.bukkit.inventory.meta.Damageable) itemMeta).setDamage(newDamage);
+                            item.setItemMeta(itemMeta);
+                        } else {
+                            player.getOpenInventory().getTopInventory().setItem(Integer.parseInt(slot), new ItemStack(Material.AIR));
+                        }
+                    } else if (itemMeta != null) {
+                        final int newDurability = LegacyAPI.getDurability(item) - damage;
+                        if (newDurability > 0) {
+                            LegacyAPI.setDurability(item, (short) newDurability);
+                        } else {
+                            player.getOpenInventory().getTopInventory().setItem(Integer.parseInt(slot), new ItemStack(Material.AIR));
+                        }
+                    }
+                    PlayerHandler.updateInventory(player, 1L);
+                }
+            } else {
+                final ItemStack item = player.getInventory().getItem(Integer.parseInt(slot));
+                if (item != null && this.isSimilar(player, item)) {
+                    final ItemMeta itemMeta = item.getItemMeta();
+                    if (ServerUtils.hasSpecificUpdate("1_13") && itemMeta != null) {
+                        int newDamage = ((org.bukkit.inventory.meta.Damageable) itemMeta).getDamage() + damage;
+                        if (item.getType().getMaxDurability() > newDamage) {
+                            ((org.bukkit.inventory.meta.Damageable) itemMeta).setDamage(newDamage);
+                            item.setItemMeta(itemMeta);
+                        } else {
+                            player.getInventory().setItem(Integer.parseInt(slot), new ItemStack(Material.AIR));
+                        }
+                    } else if (itemMeta != null) {
+                        final int newDurability = LegacyAPI.getDurability(item) - damage;
+                        if (newDurability > 0) {
+                            LegacyAPI.setDurability(item, (short) newDurability);
+                        } else {
+                            player.getInventory().setItem(Integer.parseInt(slot), new ItemStack(Material.AIR));
+                        }
+                    }
+                    PlayerHandler.updateInventory(player, 1L);
+                }
+            }
+        }
+    }
+
+    /**
      * Gives the Player the ItemMap.
      *
      * @param player - The Player to be given the item.
@@ -5588,6 +5668,7 @@ public class ItemMap implements Cloneable {
             Map<String, List<String>> unEquip = new HashMap<>();
             Map<String, List<String>> onHold = new HashMap<>();
             Map<String, List<String>> onDeath = new HashMap<>();
+            Map<String, List<String>> onKill = new HashMap<>();
             Map<String, List<String>> onDamage = new HashMap<>();
             Map<String, List<String>> onHit = new HashMap<>();
             Map<String, List<String>> onFire = new HashMap<>();
@@ -5637,6 +5718,8 @@ public class ItemMap implements Cloneable {
                     onHold = this.addMapCommand(onHold, command);
                 } else if (command.matchAction(ItemCommand.Action.ON_DEATH)) {
                     onDeath = this.addMapCommand(onDeath, command);
+                } else if (command.matchAction(ItemCommand.Action.ON_KILL)) {
+                    onKill = this.addMapCommand(onKill, command);
                 } else if (command.matchAction(ItemCommand.Action.ON_DAMAGE)) {
                     onDamage = this.addMapCommand(onDamage, command);
                 } else if (command.matchAction(ItemCommand.Action.ON_HIT)) {
@@ -5715,6 +5798,9 @@ public class ItemMap implements Cloneable {
             }
             if (!onDeath.isEmpty()) {
                 this.setMapCommand(itemData, onDeath, "on-death");
+            }
+            if (!onKill.isEmpty()) {
+                this.setMapCommand(itemData, onKill, "on-kill");
             }
             if (!onDamage.isEmpty()) {
                 this.setMapCommand(itemData, onDamage, "on-damage");

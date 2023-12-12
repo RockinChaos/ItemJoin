@@ -117,6 +117,9 @@ public class ItemCommand {
         } else if (input.startsWith("message:")) {
             input = input.substring(8);
             type = Executor.MESSAGE;
+        }  else if (input.startsWith("damage:")) {
+            input = input.substring(7);
+            type = Executor.DAMAGE;
         } else if (input.startsWith("swap-item:")) {
             input = input.substring(10);
             type = Executor.SWAPITEM;
@@ -467,6 +470,9 @@ public class ItemCommand {
                         case MESSAGE:
                             this.dispatchMessageCommands(player, altPlayer);
                             break;
+                        case DAMAGE:
+                            this.dispatchDamageCommands(player, slot);
+                            break;
                         case SERVERSWITCH:
                             this.dispatchServerCommands(player, altPlayer);
                             break;
@@ -595,6 +601,25 @@ public class ItemCommand {
     }
 
     /**
+     * Executes the ItemCommand as a damage count to the item.
+     *
+     * @param player    - player that is interacting with the custom items command.
+     * @param slot      - The slot being referenced.
+     */
+    private void dispatchDamageCommands(final Player player, final String slot) {
+        try {
+            if (StringUtils.isInt(this.command)) {
+                this.itemMap.damageItem(player, slot, Integer.parseInt(this.command));
+            } else {
+                ServerUtils.logSevere("{ItemCommand} The ItemMap " + this.itemMap.getConfigName() + " specified an invalid damage value of " + this.command + ".");
+            }
+        } catch (Exception e) {
+            ServerUtils.logSevere("{ItemCommand} There was an error executing an item's command to damage an item, if this continues report it to the developer.");
+            ServerUtils.sendDebugTrace(e);
+        }
+    }
+
+    /**
      * Sends the specified Player to the defined commands Bungee server.
      *
      * @param player    - player that is interacting with the custom items command.
@@ -636,6 +661,7 @@ public class ItemCommand {
      * Swaps the executed command item with the defined command item.
      *
      * @param player - player that is interacting with the custom items command.
+     * @param slot   - The slot being referenced.
      */
     private void dispatchSwapItem(final Player player, final String slot) {
         try {
@@ -679,7 +705,7 @@ public class ItemCommand {
      */
     public enum Executor {
         DEFAULT("default: "), CONSOLE("console: "), OP("op: "), PLAYER("player: "),
-        SERVERSWITCH("server: "), MESSAGE("message: "), BUNGEE("bungee: "), SWAPITEM("swap-item: "), DELAY("delay: "), FIRSTJOIN("first-join:");
+        SERVERSWITCH("server: "), MESSAGE("message: "), BUNGEE("bungee: "), SWAPITEM("swap-item: "), DELAY("delay: "), DAMAGE("damage: "), FIRSTJOIN("first-join:");
 
         private final String name;
 
@@ -722,6 +748,7 @@ public class ItemCommand {
         ON_HOLD(".on-hold", "ON_HOLD", "HELD"),
         ON_EQUIP(".on-equip", "ON_EQUIP", "EQUIPPED"),
         UN_EQUIP(".un-equip", "UN_EQUIP", "UNEQUIPPED"),
+        ON_KILL(".on-kill", "ON_KILL", "KILLER"),
         ON_DEATH(".on-death", "ON_DEATH", "DEAD"),
         ON_DAMAGE(".on-damage", "ON_DAMAGE", "DAMAGED"),
         ON_HIT(".on-hit", "ON_HIT", "HIT"),
