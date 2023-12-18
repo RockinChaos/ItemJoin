@@ -18,7 +18,6 @@
         <spigot.version>1.20.4-R0.1-SNAPSHOT</spigot.version>
 
         <authme.version>5.6.0-SNAPSHOT</authme.version>
-        <chestsort.version>11.0.0-SNAPSHOT</chestsort.version>
         <authlib.version>1.5.21</authlib.version>
         <worldguard.version>7.0.4-SNAPSHOT</worldguard.version>
 
@@ -142,15 +141,16 @@
             <id>VaultAPI</id>
             <url>https://ci.ender.zone/plugin/repository/everything/net/milkbowl/vault/</url>
         </repository>
-        <!--CraftationGaming Repository-->
+        <!--CraftationGaming-Old Repository-->
         <repository>
             <id>CraftationGaming</id>
             <url>https://labs.craftationgaming.com/api/v4/projects/3/packages/maven</url>
         </repository>
-        <!--CraftationGaming-Old (ChestSortAPI) Repository-->
+        <!--CraftationGaming Repository-->
         <repository>
-            <id>CraftationGaming-Old</id>
-            <url>https://raw.githubusercontent.com/RockinChaos/repository/maven-public/</url>
+            <id>CraftationGaming-snapshots</id>
+            <name>CraftationGaming Repository</name>
+            <url>https://repo.craftationgaming.com/snapshots</url>
         </repository>
     </repositories>
 
@@ -201,7 +201,7 @@
         <dependency>
             <groupId>de.jeff_media.chestsortapi</groupId>
             <artifactId>ChestSortAPI</artifactId>
-            <version>${chestsort.version}</version>
+            <version>11.0.0-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <!--WorldGuard API-->
