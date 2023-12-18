@@ -23,7 +23,7 @@ body:
     attributes:
       label: Dump Information
       description: The URL of `/itemjoin dump`, type this command in-game or console.
-      placeholder: https://pastebin.com/NCBiLsjd
+      placeholder: https://paste.craftationgaming.com/otorexogib
     validations:
       required: true
 
