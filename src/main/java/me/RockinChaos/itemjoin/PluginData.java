@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package me.RockinChaos.itemjoin.item;
+package me.RockinChaos.itemjoin;
 
 import com.google.common.collect.ImmutableMap;
 import me.RockinChaos.core.handlers.ItemHandler;
@@ -30,9 +30,9 @@ import me.RockinChaos.core.utils.api.MetricsAPI.SimplePie;
 import me.RockinChaos.core.utils.api.ProtocolAPI;
 import me.RockinChaos.core.utils.protocol.ProtocolManager;
 import me.RockinChaos.core.utils.sql.Database;
-import me.RockinChaos.itemjoin.ChatExecutor;
-import me.RockinChaos.itemjoin.ChatTab;
-import me.RockinChaos.itemjoin.ItemJoin;
+import me.RockinChaos.itemjoin.item.ItemDesigner;
+import me.RockinChaos.itemjoin.item.ItemMap;
+import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.item.ItemUtilities.TriggerType;
 import me.RockinChaos.itemjoin.listeners.*;
 import me.RockinChaos.itemjoin.listeners.plugins.ChestSortAPI;
@@ -56,9 +56,9 @@ import java.util.regex.Matcher;
 import static me.RockinChaos.core.handlers.PlayerHandler.forOnlinePlayers;
 import static me.RockinChaos.core.utils.SchedulerUtils.*;
 
-public class ItemData {
+public class PluginData {
 
-    private static ItemData info;
+    private static PluginData info;
     private final List<String> nbtInfo = Arrays.asList("ItemJoin", "ItemJoin Name");
     private int listLength = 1;
     private int permissionLength = 2;
@@ -68,9 +68,9 @@ public class ItemData {
      *
      * @return The ItemData instance.
      */
-    public static ItemData getInfo() {
+    public static PluginData getInfo() {
         if (info == null) {
-            info = new ItemData();
+            info = new PluginData();
         }
         return info;
     }
@@ -290,7 +290,7 @@ public class ItemData {
         if (!type.equals(TriggerType.QUIT)) {
             final DataObject dataObject = (DataObject) ItemJoin.getCore().getSQL().getData(new DataObject(Table.RETURN_CRAFTITEMS, PlayerHandler.getPlayerID(player), "", ""));
             final Inventory inventory = (dataObject != null ? ItemHandler.deserializeInventory(dataObject.getInventory64()) : null);
-            if (ItemHandler.restoreCraftItems(player, inventory)) {
+            if (dataObject != null && ItemHandler.restoreCraftItems(player, inventory)) {
                 ItemJoin.getCore().getSQL().removeData(dataObject);
             }
         }
@@ -365,7 +365,7 @@ public class ItemData {
         for (final Table tableEnum : Table.values()) {
             final String table = tableEnum.tableName();
             final List<HashMap<String, String>> selectTable = Database.getDatabase().queryTableData("SELECT * FROM " + ItemJoin.getCore().getData().getTablePrefix() + table, tableEnum.headers().replace("`", ""));
-            if (selectTable != null && !selectTable.isEmpty()) {
+            if (!selectTable.isEmpty()) {
                 for (final HashMap<String, String> sl1 : selectTable) {
                     DataObject dataObject = null;
                     if (tableEnum.equals(Table.FIRST_JOIN)) {
@@ -899,14 +899,14 @@ public class ItemData {
      * @param silent - If any messages should be sent.
      */
     public void hardReload(final boolean silent) {
-        ItemData.getInfo().saveCooldowns();
+        PluginData.getInfo().saveCooldowns();
         ItemUtilities.getUtilities().closeAnimations();
         ItemUtilities.getUtilities().delToggleCommands();
         ItemUtilities.getUtilities().clearItems();
         {
             ItemJoin.getCore().getConfiguration().reloadFiles();
             {
-                run(() -> ItemData.getInfo().registerClasses(silent));
+                run(() -> PluginData.getInfo().registerClasses(silent));
             }
         }
     }

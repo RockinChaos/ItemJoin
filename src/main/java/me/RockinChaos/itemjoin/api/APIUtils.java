@@ -20,8 +20,8 @@ package me.RockinChaos.itemjoin.api;
 import me.RockinChaos.core.handlers.PlayerHandler;
 import me.RockinChaos.core.utils.StringUtils;
 import me.RockinChaos.itemjoin.ItemJoin;
+import me.RockinChaos.itemjoin.PluginData;
 import me.RockinChaos.itemjoin.item.ItemCommand;
-import me.RockinChaos.itemjoin.item.ItemData;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.item.ItemUtilities.TriggerType;
@@ -52,7 +52,7 @@ public class APIUtils {
         }
         final int session = StringUtils.getRandom(1, 80000);
         for (final ItemMap item : ItemUtilities.getUtilities().getItems()) {
-            if (item.inWorld(player.getWorld()) && ((probable != null && item.getConfigName().equals(probable.getConfigName())) || item.getProbability() == -1) && ItemData.getInfo().isEnabled(player, item.getConfigName())
+            if (item.inWorld(player.getWorld()) && ((probable != null && item.getConfigName().equals(probable.getConfigName())) || item.getProbability() == -1) && PluginData.getInfo().isEnabled(player, item.getConfigName())
                     && item.isLimitMode(player.getGameMode()) && item.hasPermission(player, player.getWorld()) && ItemUtilities.getUtilities().isObtainable(player, item, session, TriggerType.DEFAULT)) {
                 item.giveTo(player);
             }

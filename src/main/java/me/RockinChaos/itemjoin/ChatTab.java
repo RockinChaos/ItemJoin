@@ -20,7 +20,6 @@ package me.RockinChaos.itemjoin;
 import me.RockinChaos.core.handlers.PermissionsHandler;
 import me.RockinChaos.core.handlers.PlayerHandler;
 import me.RockinChaos.core.utils.StringUtils;
-import me.RockinChaos.itemjoin.item.ItemData;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.utils.sql.DataObject;
@@ -30,6 +29,7 @@ import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
+import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 
 import javax.annotation.Nonnull;
@@ -56,16 +56,19 @@ public class ChatTab implements TabCompleter {
         if (args.length == 2 && args[0].equalsIgnoreCase("help") && PermissionsHandler.hasPermission(sender, "itemjoin.use")) {
             commands.addAll(Arrays.asList("2", "3", "4", "5", "6", "7", "8", "9"));
         } else if (args.length == 2 && args[0].equalsIgnoreCase("permissions") && PermissionsHandler.hasPermission(sender, "itemjoin.permissions")) {
-            for (int i = 1; i <= ItemData.getInfo().getPermissionPages(); i++) {
+            for (int i = 1; i <= PluginData.getInfo().getPermissionPages(); i++) {
                 commands.add(Integer.toString(i));
             }
         } else if (args.length == 2 && args[0].equalsIgnoreCase("list") && PermissionsHandler.hasPermission(sender, "itemjoin.list")) {
-            for (int i = 1; i <= ItemData.getInfo().getListPages(); i++) {
+            for (int i = 1; i <= PluginData.getInfo().getListPages(); i++) {
                 commands.add(Integer.toString(i));
             }
         } else if ((args.length == 2 || args.length == 3) && args[0].equalsIgnoreCase("purge") && PermissionsHandler.hasPermission(sender, "itemjoin.purge")) {
             if (args.length == 2) {
                 commands.addAll(Arrays.asList("map-ids", "first-join", "first-world", "ip-limits", "enabled-players", "first-commands"));
+            } else if (!args[1].equalsIgnoreCase("map-ids")) {
+                PlayerHandler.forOfflinePlayers(player -> commands.add(player.getName()));
+                PlayerHandler.forOnlinePlayers(player -> commands.add(player.getName()));
             } else {
                 List<Object> dataList = new ArrayList<>();
                 try {
@@ -73,8 +76,9 @@ public class ChatTab implements TabCompleter {
                 } catch (Exception ignored) {
                 }
                 for (Object dataObject : dataList) {
+                    final Player playerString = PlayerHandler.getPlayerString(((DataObject) dataObject).getPlayerId());
                     String objectString = (args[1].equalsIgnoreCase("map-ids") ? ((DataObject) dataObject).getMapIMG() :
-                            (PlayerHandler.getPlayerString(((DataObject) dataObject).getPlayerId()) != null ? PlayerHandler.getPlayerString(((DataObject) dataObject).getPlayerId()).getName() : ((DataObject) dataObject).getPlayerId()));
+                            (playerString != null ? playerString.getName() : ((DataObject) dataObject).getPlayerId()));
                     commands.add(objectString);
                 }
             }

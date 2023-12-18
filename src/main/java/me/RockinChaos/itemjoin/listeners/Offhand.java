@@ -19,7 +19,7 @@ package me.RockinChaos.itemjoin.listeners;
 
 import me.RockinChaos.core.handlers.PlayerHandler;
 import me.RockinChaos.core.utils.ServerUtils;
-import me.RockinChaos.itemjoin.item.ItemData;
+import me.RockinChaos.itemjoin.PluginData;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -38,8 +38,8 @@ public class Offhand implements Listener {
     private void onGlobalHandModify(PlayerSwapHandItemsEvent event) {
         if (ServerUtils.hasSpecificUpdate("1_9")) {
             final Player player = event.getPlayer();
-            if (ItemData.getInfo().isPreventString(player, "itemMovement")) {
-                if (!(ItemData.getInfo().isPreventBypass(player) && (player.getOpenInventory().getTitle().contains("§") || player.getOpenInventory().getTitle().contains("&")))) {
+            if (PluginData.getInfo().isPreventString(player, "itemMovement")) {
+                if (!(PluginData.getInfo().isPreventBypass(player) && (player.getOpenInventory().getTitle().contains("§") || player.getOpenInventory().getTitle().contains("&")))) {
                     event.setCancelled(true);
                     PlayerHandler.updateInventory(player, 1L);
                 }

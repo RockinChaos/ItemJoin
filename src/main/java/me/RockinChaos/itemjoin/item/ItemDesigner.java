@@ -28,7 +28,7 @@ import me.RockinChaos.core.utils.ServerUtils;
 import me.RockinChaos.core.utils.StringUtils;
 import me.RockinChaos.core.utils.api.LegacyAPI;
 import me.RockinChaos.itemjoin.ItemJoin;
-import me.RockinChaos.itemjoin.listeners.Recipes;
+import me.RockinChaos.itemjoin.PluginData;
 import me.RockinChaos.itemjoin.utils.images.Renderer;
 import me.RockinChaos.itemjoin.utils.sql.DataObject;
 import me.RockinChaos.itemjoin.utils.sql.DataObject.Table;
@@ -38,7 +38,6 @@ import org.bukkit.block.banner.Pattern;
 import org.bukkit.block.banner.PatternType;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.EntityType;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
@@ -121,7 +120,7 @@ public class ItemDesigner {
                             itemMap.setContents();
                             ItemUtilities.getUtilities().addItem(itemMap);
                             ItemUtilities.getUtilities().addCraftingItem(itemMap);
-                            ItemData.getInfo().registerListeners(itemMap);
+                            PluginData.getInfo().registerListeners(itemMap);
                         }
                     }
                 }
@@ -162,7 +161,7 @@ public class ItemDesigner {
                 ServerUtils.logSevere("{ItemDesigner} Your server is running MC " + ReflectionUtils.getServerVersion() + " and this version of Minecraft does not have the item LINGERING_POTION.");
                 ServerUtils.logWarn("{ItemDesigner} You are receiving this notice because the item(s) exists in your items.yml and will not be set, please remove the item(s) or update your server.");
                 return false;
-            } else if (ItemHandler.getMaterial(id, dataValue) == null) {
+            } else if (ItemHandler.getMaterial(id, dataValue) == Material.AIR) {
                 ServerUtils.logSevere("{ItemDesigner} The Item " + internalName + "'s Material 'ID' is invalid or does not exist.");
                 ServerUtils.logWarn("{ItemDesigner} The Item " + internalName + " will not be set!");
                 if (StringUtils.isInt(id)) {
@@ -253,14 +252,14 @@ public class ItemDesigner {
             itemMap.setDynamicMaterials(materials);
             material = ItemHandler.cutDelay(itemMap.getNodeLocation().getString(".id." + matList.getKeys(false).iterator().next()));
             final Material mat = ItemHandler.getMaterial(material, null);
-            if (mat != null && material.contains(":") && !mat.name().equalsIgnoreCase("PLAYER_HEAD")) {
+            if (material.contains(":") && !mat.name().equalsIgnoreCase("PLAYER_HEAD")) {
                 String[] parts = material.split(":");
                 itemMap.setDataValue((short) Integer.parseInt(parts[1]));
             }
             return mat;
         }
         final Material mat = ItemHandler.getMaterial(material, null);
-        if (mat != null && material.contains(":") && !mat.name().equalsIgnoreCase("PLAYER_HEAD")) {
+        if (material.contains(":") && !mat.name().equalsIgnoreCase("PLAYER_HEAD")) {
             String[] parts = material.split(":");
             itemMap.setDataValue((short) Integer.parseInt(parts[1]));
         }
@@ -316,7 +315,7 @@ public class ItemDesigner {
             }
             itemMap.setDynamicTextures(textures);
             return ItemHandler.cutDelay(textures.get(0));
-        } else if (texture != null && !texture.isEmpty()) {
+        } else if (!texture.isEmpty()) {
             if (itemMap.isDynamic() || itemMap.isAnimated()) {
                 List<String> textures = new ArrayList<>();
                 if (StringUtils.containsIgnoreCase(texture, "url-")) {
@@ -399,9 +398,7 @@ public class ItemDesigner {
                 } else {
                     MapView view = LegacyAPI.createMapView();
                     try {
-                        if (view != null) {
-                            view.removeRenderer(view.getRenderers().get(0));
-                        }
+                        view.removeRenderer(view.getRenderers().get(0));
                     } catch (NullPointerException e) {
                         ServerUtils.sendDebugTrace(e);
                     }
@@ -410,9 +407,7 @@ public class ItemDesigner {
                     itemMap.setMapID(mapID);
                     itemMap.setMapView(view);
                     try {
-                        if (view != null) {
-                            view.addRenderer(imgPlatform);
-                        }
+                        view.addRenderer(imgPlatform);
                     } catch (NullPointerException e) {
                         ServerUtils.sendDebugTrace(e);
                     }
@@ -771,7 +766,7 @@ public class ItemDesigner {
                 String[] blocksParts = blocksLine.replace(" ", "").split(":");
                 if (blocksParts[0] != null && blocksParts[1] != null && StringUtils.isDouble(blocksParts[1])) {
                     Material block = ItemHandler.getMaterial(blocksParts[0].toUpperCase(), null);
-                    if (block != null && block != Material.AIR) {
+                    if (block != Material.AIR) {
                         blocksDrop.put(block, Double.parseDouble(blocksParts[1]));
                     } else {
                         ServerUtils.logWarn("{ItemDesigner} The material " + blocksParts[0] + " is not a valid material type, please check the wiki on this usage.");
@@ -855,7 +850,7 @@ public class ItemDesigner {
                 final int itemData = getData;
                 final Material material = ItemHandler.getMaterial(ingredientParts[1], String.valueOf(itemData));
                 final ConfigurationSection itemsPath = ItemJoin.getCore().getConfig("items.yml").getConfigurationSection("items");
-                if (material != null && count >= 1) {
+                if (count >= 1) {
                     try {
                         char character = 'X';
                         try {
@@ -874,38 +869,10 @@ public class ItemDesigner {
                             ServerUtils.sendSevereTrace(e);
                         }
                     }
-                } else if (itemsPath != null && itemsPath.getConfigurationSection(ingredientParts[1]) != null && count >= 1) {
-                    SchedulerUtils.runLater(40L, () -> {
-                        try {
-                            final ItemMap tempMap = ItemUtilities.getUtilities().getItemMap(ingredientParts[1]);
-                            if (tempMap != null) {
-                                final ItemStack itemStack = tempMap.getItem(null);
-                                final int mapData = Integer.parseInt(tempMap.getDataValue() + "");
-                                char character = 'X';
-                                try {
-                                    character = ingredientParts[0].charAt(0);
-                                } catch (Exception e) {
-                                    ServerUtils.logWarn("{ItemDesigner} The character " + ingredientParts[0] + " for the custom recipe defined for the item " + itemMap.getConfigName() + " is not a valid character!");
-                                }
-                                if (mapData <= 0) {
-                                    shapedRecipe.setIngredient(character, itemStack.getType());
-                                } else {
-                                    LegacyAPI.setIngredient(shapedRecipe, character, itemStack.getType(), (byte) mapData);
-                                }
-                                ingredientList.put(character, new ItemRecipe(ingredientParts[1], null, (byte) mapData, count));
-                                if (StringUtils.isRegistered(Recipes.class.getSimpleName())) {
-                                    ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new Recipes(), ItemJoin.getCore().getPlugin());
-                                }
-                            } else {
-                                ServerUtils.logWarn("{ItemDesigner} The material " + ingredientParts[1] + " for the custom recipe defined for the item " + itemMap.getConfigName() + " is not a proper material type OR custom item node!");
-                            }
-                        } catch (IllegalArgumentException e) {
-                            if (!StringUtils.containsIgnoreCase(e.getMessage(), "Symbol does not appear")) {
-                                ServerUtils.sendSevereTrace(e);
-                            }
-                        }
-                    });
                 } else {
+                    if (itemsPath != null) {
+                        itemsPath.getConfigurationSection(ingredientParts[1]);
+                    }
                     ServerUtils.logWarn("{ItemDesigner} The material " + ingredientParts[1] + " for the custom recipe defined for the item " + itemMap.getConfigName() + " is not a proper material type OR custom item node!");
                 }
             }
@@ -967,7 +934,7 @@ public class ItemDesigner {
             itemMap.setDynamicOwners(owners);
             return ItemHandler.cutDelay(itemMap.getNodeLocation().getString(".skull-owner." + ownerSection.getKeys(false).iterator().next()));
         }
-        if (owner != null && !owner.isEmpty()) {
+        if (!owner.isEmpty()) {
             if (itemMap.isDynamic() || itemMap.isAnimated()) {
                 List<String> owners = new ArrayList<>();
                 owners.add(owner);

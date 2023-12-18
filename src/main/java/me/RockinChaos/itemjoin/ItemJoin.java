@@ -23,7 +23,6 @@ import me.RockinChaos.core.utils.ServerUtils;
 import me.RockinChaos.core.utils.protocol.ProtocolManager;
 import me.RockinChaos.core.utils.sql.Database;
 import me.RockinChaos.itemjoin.api.ItemJoinAPI;
-import me.RockinChaos.itemjoin.item.ItemData;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.utils.menus.Menu;
 import org.bukkit.Bukkit;
@@ -58,9 +57,9 @@ public class ItemJoin extends JavaPlugin {
     @Override
     public void onEnable() {
         if (core.isEnabled()) {
-            ItemData.getInfo().registerEvents();
+            PluginData.getInfo().registerEvents();
             {
-                ItemData.getInfo().registerClasses(false);
+                PluginData.getInfo().registerClasses(false);
                 {
                     SchedulerUtils.runAsync(() -> {
                         core.getUpdater();
@@ -70,11 +69,6 @@ public class ItemJoin extends JavaPlugin {
                     });
                 }
             }
-        } else {
-            ServerUtils.logSevere("detected incompatible server version.");
-            ServerUtils.logSevere("only Minecraft 1.8 and above is supported.");
-            ServerUtils.logSevere("disabling...");
-            core.getPlugin().getPluginLoader().disablePlugin(this);
         }
     }
 
@@ -85,8 +79,8 @@ public class ItemJoin extends JavaPlugin {
     public void onDisable() {
         Bukkit.getScheduler().cancelTasks(this);
         Menu.closeMenu();
-        ItemData.getInfo().saveCooldowns();
-        ItemData.getInfo().purgeCraftItems(true);
+        PluginData.getInfo().saveCooldowns();
+        PluginData.getInfo().purgeCraftItems(true);
         Database.getDatabase().closeConnection(true);
         ProtocolManager.closeProtocol();
         ItemUtilities.getUtilities().clearItems();

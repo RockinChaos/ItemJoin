@@ -17,7 +17,7 @@
  */
 package me.RockinChaos.itemjoin.listeners.legacy;
 
-import me.RockinChaos.itemjoin.item.ItemData;
+import me.RockinChaos.itemjoin.PluginData;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -41,8 +41,8 @@ public class Legacy_Pickups implements Listener {
     @EventHandler(ignoreCancelled = true)
     private void Deprecated_onGlobalPickup(org.bukkit.event.player.PlayerPickupItemEvent event) {
         Player player = event.getPlayer();
-        if (ItemData.getInfo().isPreventString(player, "Pickups")) {
-            if (ItemData.getInfo().isPreventBypass(player)) {
+        if (PluginData.getInfo().isPreventString(player, "Pickups")) {
+            if (PluginData.getInfo().isPreventBypass(player)) {
                 event.setCancelled(true);
             }
         }

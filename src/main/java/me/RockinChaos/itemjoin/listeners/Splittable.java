@@ -44,18 +44,18 @@ public class Splittable implements Listener {
         final ItemStack cursorItem = event.getCursor();
         final boolean isCreative = PlayerHandler.isCreativeMode(player);
         if (currentItem != null && currentItem.getType() != Material.AIR) {
-           if (action.equals(InventoryAction.PICKUP_HALF)) {
-               final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(currentItem);
-               if (itemMap != null && itemMap.isSimilar(player, currentItem) && !ItemUtilities.getUtilities().isAllowed(player, currentItem, "splittable")) {
-                   event.setCancelled(true);
-               }
-           } else if (action.equals(InventoryAction.PLACE_ALL) && isCreative && cursorItem != null && cursorItem.getType() != Material.AIR) {
-               final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(currentItem);
-               if (itemMap != null && itemMap.isSimilar(player, currentItem) && itemMap.isSimilar(player, cursorItem) && (currentItem.getAmount() / 2) == cursorItem.getAmount() && !ItemUtilities.getUtilities().isAllowed(player, currentItem, "splittable")) {
-                   event.setCancelled(true);
-                   player.closeInventory();
-               }
-           }
+            if (action.equals(InventoryAction.PICKUP_HALF)) {
+                final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(currentItem);
+                if (itemMap != null && itemMap.isSimilar(player, currentItem) && !ItemUtilities.getUtilities().isAllowed(player, currentItem, "splittable")) {
+                    event.setCancelled(true);
+                }
+            } else if (action.equals(InventoryAction.PLACE_ALL) && isCreative && cursorItem != null && cursorItem.getType() != Material.AIR) {
+                final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(currentItem);
+                if (itemMap != null && itemMap.isSimilar(player, currentItem) && itemMap.isSimilar(player, cursorItem) && (currentItem.getAmount() / 2) == cursorItem.getAmount() && !ItemUtilities.getUtilities().isAllowed(player, currentItem, "splittable")) {
+                    event.setCancelled(true);
+                    player.closeInventory();
+                }
+            }
         }
     }
 

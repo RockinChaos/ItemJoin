@@ -20,7 +20,6 @@ package me.RockinChaos.itemjoin;
 import me.RockinChaos.core.handlers.PlayerHandler;
 import me.RockinChaos.core.utils.ServerUtils;
 import me.RockinChaos.core.utils.StringUtils;
-import me.RockinChaos.itemjoin.item.ItemData;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.utils.sql.DataObject;
@@ -56,7 +55,7 @@ public class ChatToggleExecutor implements CommandExecutor {
                 placeHolders[0] = player.getWorld().getName();
                 placeHolders[3] = itemMap.getConfigName();
                 if ((dataObject == null || Boolean.valueOf(dataObject.getEnabled()).equals(true)) && ((itemMap.getToggleNode() == null || itemMap.getToggleNode().isEmpty()) || (itemMap.getToggleNode() != null && !itemMap.getToggleNode().isEmpty() && sender.hasPermission(itemMap.getToggleNode())))) {
-                    if (ItemData.getInfo().isEnabled(player, "ALL")) {
+                    if (PluginData.getInfo().isEnabled(player, "ALL")) {
                         ItemJoin.getCore().getSQL().removeData(new DataObject(Table.ENABLED_PLAYERS, PlayerHandler.getPlayerID(player), "Global", itemMap.getConfigName(), String.valueOf(true)));
                         ItemJoin.getCore().getSQL().saveData(new DataObject(Table.ENABLED_PLAYERS, PlayerHandler.getPlayerID(player), "Global", itemMap.getConfigName(), String.valueOf(false)));
                         {
@@ -71,7 +70,7 @@ public class ChatToggleExecutor implements CommandExecutor {
                         ItemJoin.getCore().getLang().sendLangMessage("commands.disabled.togglePlayerFailed", sender, placeHolders);
                     }
                 } else if ((dataObject != null && Boolean.valueOf(dataObject.getEnabled()).equals(false)) && ((itemMap.getToggleNode() == null || itemMap.getToggleNode().isEmpty()) || (itemMap.getToggleNode() != null && !itemMap.getToggleNode().isEmpty() && sender.hasPermission(itemMap.getToggleNode())))) {
-                    if (ItemData.getInfo().isEnabled(player, "ALL")) {
+                    if (PluginData.getInfo().isEnabled(player, "ALL")) {
                         ItemJoin.getCore().getSQL().removeData(new DataObject(Table.ENABLED_PLAYERS, PlayerHandler.getPlayerID(player), "Global", itemMap.getConfigName(), String.valueOf(false)));
                         {
                             if (!itemMap.hasItem(player, true)) {

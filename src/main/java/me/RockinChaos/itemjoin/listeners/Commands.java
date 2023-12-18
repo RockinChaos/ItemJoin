@@ -81,8 +81,8 @@ public class Commands implements Listener {
             }
             if (PlayerHandler.isCraftingInv(killer.getOpenInventory()))
                 for (ItemStack item : killer.getOpenInventory().getTopInventory()) {
-                   this.runCommands(event.getEntity(), null, item, "ON_KILL", "KILLER", null);
-              }
+                    this.runCommands(event.getEntity(), null, item, "ON_KILL", "KILLER", null);
+                }
         }
     }
 
@@ -191,7 +191,7 @@ public class Commands implements Listener {
         final Player player = event.getPlayer();
         final Action action = event.getAction();
         final ItemStack item = (event.getItem() != null ? event.getItem().clone() : event.getItem());
-        if (item != null && item.getType() != Material.AIR && PlayerHandler.isCraftingInv(player.getOpenInventory()) && PlayerHandler.isMenuClick(player.getOpenInventory(), event.getAction())) {
+        if (item != null && item.getType() != Material.AIR && PlayerHandler.isCraftingInv(player.getOpenInventory()) && !PlayerHandler.isMenuClick(player.getOpenInventory(), event.getAction())) {
             final String[] itemType = (item.getType().name().equalsIgnoreCase("ELYTRA") ? "ELYTRA_CHESTPLATE".split("_") :
                     (ItemHandler.isSkull(item.getType()) || StringUtils.splitIgnoreCase(item.getType().name(), "HEAD", "_") ? "SKULL_HELMET".split("_") : item.getType().name().split("_")));
             if (itemType.length >= 2 && itemType[1] != null && !itemType[1].isEmpty() && StringUtils.isInt(StringUtils.getArmorSlot(itemType[1], true)) && !itemType[0].equalsIgnoreCase("SKULL")) {
@@ -236,7 +236,7 @@ public class Commands implements Listener {
         if (player != null) {
             final ItemStack item = PlayerHandler.getHandItem(player);
             final int slot = player.getInventory().getHeldItemSlot();
-            if (item != null && item.getType() != Material.AIR && PlayerHandler.isMenuClick(player.getOpenInventory(), Action.LEFT_CLICK_AIR)) {
+            if (item.getType() != Material.AIR && !PlayerHandler.isMenuClick(player.getOpenInventory(), Action.LEFT_CLICK_AIR)) {
                 this.runCommands(player, (event.getEntity() instanceof Player ? (Player) event.getEntity() : null), item, "ON_HIT", "HIT", Integer.toString(slot));
             }
         }
@@ -252,14 +252,11 @@ public class Commands implements Listener {
         final Projectile projectile = event.getEntity();
         final Player player = (projectile.getShooter() instanceof Player ? (Player) projectile.getShooter() : null);
         if (player != null) {
-            ItemStack item = PlayerHandler.getMainHandItem(player);
-            if (item != null) {
-                item = item.clone();
-                if (item.getAmount() == 0) {
-                    item.setAmount(1);
-                }
-                this.projectileList.put(projectile.getEntityId(), item.clone());
+            ItemStack item = PlayerHandler.getMainHandItem(player).clone();
+            if (item.getAmount() == 0) {
+                item.setAmount(1);
             }
+            this.projectileList.put(projectile.getEntityId(), item.clone());
         }
     }
 
@@ -285,7 +282,7 @@ public class Commands implements Listener {
         this.projectileList.remove(event.getEntity().getEntityId());
         if (player != null && hitEntity != null) {
             final int slot = player.getInventory().getHeldItemSlot();
-            if (item != null && item.getType() != Material.AIR && PlayerHandler.isMenuClick(player.getOpenInventory(), Action.LEFT_CLICK_AIR)) {
+            if (item != null && item.getType() != Material.AIR && !PlayerHandler.isMenuClick(player.getOpenInventory(), Action.LEFT_CLICK_AIR)) {
                 this.runCommands(player, altPlayer, item, "ON_HIT", "HIT", Integer.toString(slot));
             }
         }
@@ -349,7 +346,7 @@ public class Commands implements Listener {
         final String action = event.getAction().name();
         if (((PlayerHandler.isAdventureMode(player) && !action.contains("LEFT") || !PlayerHandler.isAdventureMode(player))) && !this.isDropEvent(event.getPlayer())) {
             final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(PlayerHandler.getHandItem(player));
-            if (PlayerHandler.isMenuClick(player.getOpenInventory(), event.getAction()) && itemMap != null && itemMap.isSimilar(player, item)) {
+            if (!PlayerHandler.isMenuClick(player.getOpenInventory(), event.getAction()) && itemMap != null && itemMap.isSimilar(player, item)) {
                 long dupeDuration = !this.interactDupe.isEmpty() && this.interactDupe.get(item) != null ? System.currentTimeMillis() - this.interactDupe.get(item) : -1;
                 if (dupeDuration == -1 || dupeDuration > 30) {
                     this.interactDupe.put(item, System.currentTimeMillis());
@@ -368,7 +365,7 @@ public class Commands implements Listener {
     private void onSwingArm(PlayerAnimationEvent event) {
         final Player player = event.getPlayer();
         final ItemStack item = PlayerHandler.getHandItem(player);
-        if (PlayerHandler.isAdventureMode(player) && !this.isDropEvent(event.getPlayer()) && (PlayerHandler.isMenuClick(player.getOpenInventory(), Action.LEFT_CLICK_AIR) || PlayerHandler.isMenuClick(player.getOpenInventory(), Action.LEFT_CLICK_BLOCK))) {
+        if (PlayerHandler.isAdventureMode(player) && !this.isDropEvent(event.getPlayer()) && (!PlayerHandler.isMenuClick(player.getOpenInventory(), Action.LEFT_CLICK_AIR) || PlayerHandler.isMenuClick(player.getOpenInventory(), Action.LEFT_CLICK_BLOCK))) {
             this.runCommands(player, null, item, "LEFT_CLICK_AIR", "LEFT", String.valueOf(player.getInventory().getHeldItemSlot()));
         }
     }
@@ -400,7 +397,7 @@ public class Commands implements Listener {
      */
     public void handleOnDamage(final Player player, final Player altPlayer, final String slot) {
         final ItemStack item = (slot.startsWith("CR") ? player.getOpenInventory().getTopInventory().getItem(Integer.parseInt(slot.replace("CR", ""))) : player.getInventory().getItem(Integer.parseInt(slot)));
-        if (item != null && item.getType() != Material.AIR && PlayerHandler.isMenuClick(player.getOpenInventory(), Action.LEFT_CLICK_AIR)) {
+        if (item != null && item.getType() != Material.AIR && !PlayerHandler.isMenuClick(player.getOpenInventory(), Action.LEFT_CLICK_AIR)) {
             this.runCommands(player, altPlayer, item, "ON_DAMAGE", "DAMAGED", slot.replace("CR", ""));
         }
     }

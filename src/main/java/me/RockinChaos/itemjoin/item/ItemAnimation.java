@@ -397,13 +397,13 @@ public class ItemAnimation {
                     } else {
                         mat = LegacyAPI.getMaterial(Integer.parseInt(parts[0]), (byte) Integer.parseInt(parts[1]));
                     }
-                    if (mat != null && mat != Material.AIR) {
+                    if (mat != Material.AIR) {
                         final Material type = mat;
                         SchedulerUtils.run(() -> reviseItem.setType(type));
                     }
                 } else {
                     mat = ItemHandler.getMaterial(parts[0], null);
-                    if (mat != null && mat != Material.AIR) {
+                    if (mat != Material.AIR) {
                         final Material type = mat;
                         SchedulerUtils.run(() -> reviseItem.setType(type));
                     }
@@ -411,7 +411,7 @@ public class ItemAnimation {
                 }
             } else {
                 mat = ItemHandler.getMaterial(materialString, null);
-                if (mat != null && mat != Material.AIR) {
+                if (mat != Material.AIR) {
                     final Material type = mat;
                     SchedulerUtils.run(() -> {
                         if (reviseItem != null) {

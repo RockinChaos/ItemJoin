@@ -18,7 +18,7 @@
 package me.RockinChaos.itemjoin.listeners.plugins;
 
 import me.RockinChaos.core.utils.ServerUtils;
-import me.RockinChaos.itemjoin.item.ItemData;
+import me.RockinChaos.itemjoin.PluginData;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.utils.menus.Menu;
 import org.bukkit.entity.Player;
@@ -40,8 +40,8 @@ public class ChestSortAPI implements Listener {
             player = (Player) event.getInventory().getViewers().get(0);
         }
         if (player != null) {
-            if (ItemData.getInfo().isPreventString(player, "itemMovement")) {
-                if (!(ItemData.getInfo().isPreventBypass(player) && (player.getOpenInventory().getTitle().contains("§") || player.getOpenInventory().getTitle().contains("&")))) {
+            if (PluginData.getInfo().isPreventString(player, "itemMovement")) {
+                if (!(PluginData.getInfo().isPreventBypass(player) && (player.getOpenInventory().getTitle().contains("§") || player.getOpenInventory().getTitle().contains("&")))) {
                     event.setCancelled(true);
                 }
             }

@@ -113,13 +113,13 @@ public class Consumes implements Listener {
             item.setAmount(itemMap.getCount(player));
             SchedulerUtils.runLater(2L, () -> {
                 final ItemStack handItem = PlayerHandler.getHandItem(player);
-                if (handItem == null || handItem.getAmount() <= 1) {
+                if (handItem.getAmount() <= 1) {
                     if (ServerUtils.hasSpecificUpdate("1_9")) {
                         final ItemStack mainItem = PlayerHandler.getMainHandItem(player);
                         final ItemStack offItem = PlayerHandler.getOffHandItem(player);
-                        if (mainItem != null && mainItem.getType() != Material.AIR) {
+                        if (mainItem.getType() != Material.AIR) {
                             PlayerHandler.setMainHandItem(player, item);
-                        } else if (offItem != null && offItem.getType() != Material.AIR) {
+                        } else if (offItem.getType() != Material.AIR) {
                             PlayerHandler.setOffHandItem(player, item);
                         } else {
                             itemMap.giveTo(player);
@@ -143,43 +143,35 @@ public class Consumes implements Listener {
     private void onRefillTotem(EntityResurrectEvent event) {
         if (event.getEntity() instanceof Player) {
             Player player = (Player) event.getEntity();
-            ItemStack saveMainStack = PlayerHandler.getMainHandItem(player);
-            if (saveMainStack != null) {
-                saveMainStack = saveMainStack.clone();
-            }
-            final ItemStack mainStack = saveMainStack;
-            ItemStack saveOffStack = PlayerHandler.getOffHandItem(player);
-            if (saveOffStack != null) {
-                saveOffStack = saveOffStack.clone();
-            }
-            final ItemStack offStack = saveOffStack;
+            final ItemStack mainStack = PlayerHandler.getMainHandItem(player).clone();
+            final ItemStack offStack = PlayerHandler.getOffHandItem(player).clone();
             ItemMap mainHandMap = ItemUtilities.getUtilities().getItemMap(mainStack);
             ItemMap offHandMap = ItemUtilities.getUtilities().getItemMap(offStack);
             if ((mainHandMap != null && !ItemUtilities.getUtilities().isAllowed(player, mainStack, "count-lock")) || (offHandMap != null && !ItemUtilities.getUtilities().isAllowed(player, offStack, "count-lock"))) {
-                if ((mainStack != null && StringUtils.containsIgnoreCase(mainStack.getType().name(), "TOTEM") && mainHandMap != null) || (offStack != null && StringUtils.containsIgnoreCase(offStack.getType().name(), "TOTEM") && offHandMap != null)) {
+                if (StringUtils.containsIgnoreCase(mainStack.getType().name(), "TOTEM") && mainHandMap != null || StringUtils.containsIgnoreCase(offStack.getType().name(), "TOTEM") && offHandMap != null) {
                     SchedulerUtils.runLater(1L, () -> {
                         final ItemStack mainItem = PlayerHandler.getMainHandItem(player);
                         final ItemStack offItem = PlayerHandler.getOffHandItem(player);
                         if (mainHandMap != null && mainHandMap.isSimilar(player, mainStack)) {
-                            if (mainItem != null && StringUtils.containsIgnoreCase(mainItem.getType().name(), "TOTEM")) {
+                            if (StringUtils.containsIgnoreCase(mainItem.getType().name(), "TOTEM")) {
                                 mainItem.setAmount(mainHandMap.getCount(player));
-                            } else if (offItem != null && StringUtils.containsIgnoreCase(offItem.getType().name(), "TOTEM")) {
+                            } else if (StringUtils.containsIgnoreCase(offItem.getType().name(), "TOTEM")) {
                                 offItem.setAmount(mainHandMap.getCount(player));
                             }
-                            if (mainItem != null && mainItem.getType() == Material.AIR) {
+                            if (mainItem.getType() == Material.AIR) {
                                 PlayerHandler.setMainHandItem(player, mainStack);
-                            } else if (offItem != null && offItem.getType() == Material.AIR) {
+                            } else if (offItem.getType() == Material.AIR) {
                                 PlayerHandler.setOffHandItem(player, mainStack);
                             }
                         } else if (offHandMap != null && offHandMap.isSimilar(player, offStack)) {
-                            if (offItem != null && StringUtils.containsIgnoreCase(offItem.getType().name(), "TOTEM")) {
+                            if (StringUtils.containsIgnoreCase(offItem.getType().name(), "TOTEM")) {
                                 offItem.setAmount(offHandMap.getCount(player));
-                            } else if (mainItem != null && StringUtils.containsIgnoreCase(mainItem.getType().name(), "TOTEM")) {
+                            } else if (StringUtils.containsIgnoreCase(mainItem.getType().name(), "TOTEM")) {
                                 mainItem.setAmount(offHandMap.getCount(player));
                             }
-                            if (offItem != null && offItem.getType() == Material.AIR) {
+                            if (offItem.getType() == Material.AIR) {
                                 PlayerHandler.setOffHandItem(player, offStack);
-                            } else if (mainItem != null && mainItem.getType() == Material.AIR) {
+                            } else if (mainItem.getType() == Material.AIR) {
                                 PlayerHandler.setMainHandItem(player, offStack);
                             }
                         }

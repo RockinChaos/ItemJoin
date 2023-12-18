@@ -24,7 +24,7 @@ import me.RockinChaos.core.utils.ServerUtils;
 import me.RockinChaos.core.utils.StringUtils;
 import me.RockinChaos.core.utils.protocol.events.PlayerPickItemEvent;
 import me.RockinChaos.itemjoin.ItemJoin;
-import me.RockinChaos.itemjoin.item.ItemData;
+import me.RockinChaos.itemjoin.PluginData;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import org.bukkit.Bukkit;
@@ -77,8 +77,8 @@ public class Clicking implements Listener {
     @EventHandler(ignoreCancelled = true)
     private void onGlobalModify(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
-        if (ItemData.getInfo().isPreventString(player, "itemMovement")) {
-            if (ItemData.getInfo().isPreventBypass(player) && !(player.getOpenInventory().getTitle().contains("§") || player.getOpenInventory().getTitle().contains("&"))) {
+        if (PluginData.getInfo().isPreventString(player, "itemMovement")) {
+            if (PluginData.getInfo().isPreventBypass(player) && !(player.getOpenInventory().getTitle().contains("§") || player.getOpenInventory().getTitle().contains("&"))) {
                 event.setCancelled(true);
             }
         }
@@ -92,8 +92,8 @@ public class Clicking implements Listener {
     @EventHandler(ignoreCancelled = true)
     private void onGlobalPickItem(PlayerPickItemEvent event) {
         Player player = event.getPlayer();
-        if (ItemData.getInfo().isPreventString(player, "itemMovement")) {
-            if (ItemData.getInfo().isPreventBypass(player)) {
+        if (PluginData.getInfo().isPreventString(player, "itemMovement")) {
+            if (PluginData.getInfo().isPreventBypass(player)) {
                 event.setCancelled(true);
             }
         }
@@ -154,7 +154,7 @@ public class Clicking implements Listener {
     @EventHandler()
     private void onEquipment(InventoryClickEvent event) {
         final Player player = (Player) event.getWhoClicked();
-        if (StringUtils.containsIgnoreCase(event.getAction().name(), "HOTBAR") && event.getView().getBottomInventory().getSize() >= event.getHotbarButton() && event.getHotbarButton() >= 0  && !event.getClick().name().equalsIgnoreCase("MIDDLE") && event.getSlotType() == SlotType.ARMOR) {
+        if (StringUtils.containsIgnoreCase(event.getAction().name(), "HOTBAR") && event.getView().getBottomInventory().getSize() >= event.getHotbarButton() && event.getHotbarButton() >= 0 && !event.getClick().name().equalsIgnoreCase("MIDDLE") && event.getSlotType() == SlotType.ARMOR) {
             final ItemStack hotItem = event.getView().getBottomInventory().getItem(event.getHotbarButton());
             if (hotItem != null && hotItem.getType() != Material.AIR && this.isEquipment(hotItem, "EQUIPPED", String.valueOf(event.getSlot())) && !ItemUtilities.getUtilities().isAllowed(player, hotItem, "cancel-equip")) {
                 event.setCancelled(true);
@@ -216,7 +216,7 @@ public class Clicking implements Listener {
     private void onEquipmentClick(PlayerInteractEvent event) {
         final Player player = event.getPlayer();
         final ItemStack item = (event.getItem() != null ? event.getItem().clone() : event.getItem());
-        if (item != null && item.getType() != Material.AIR && PlayerHandler.isMenuClick(player.getOpenInventory(), event.getAction())) {
+        if (item != null && item.getType() != Material.AIR && !PlayerHandler.isMenuClick(player.getOpenInventory(), event.getAction())) {
             final String[] itemType = (item.getType().name().equalsIgnoreCase("ELYTRA") ? "ELYTRA_CHESTPLATE".split("_") : item.getType().name().split("_"));
             if (itemType.length >= 2 && itemType[1] != null && !itemType[1].isEmpty() && StringUtils.isInt(StringUtils.getArmorSlot(itemType[1], true))
                     && player.getInventory().getItem(Integer.parseInt(StringUtils.getArmorSlot(itemType[1], true))) == null
@@ -251,9 +251,9 @@ public class Clicking implements Listener {
     public boolean isCreativeDupe(final InventoryClickEvent event) {
         if (PlayerHandler.isCreativeMode((Player) event.getWhoClicked()) && event.getCurrentItem() != null && event.getCursor() != null) {
             final ItemMeta itemMeta = event.getCurrentItem().getItemMeta();
-            String currentNBT = (ItemJoin.getCore().getData().dataTagsEnabled() ? ItemHandler.getNBTData(event.getCurrentItem(), ItemData.getInfo().getNBTList())
+            String currentNBT = (ItemJoin.getCore().getData().dataTagsEnabled() ? ItemHandler.getNBTData(event.getCurrentItem(), PluginData.getInfo().getNBTList())
                     : ((itemMeta != null && itemMeta.hasDisplayName()) ? StringUtils.colorDecode(event.getCurrentItem()) : null));
-            String cursorNBT = (ItemJoin.getCore().getData().dataTagsEnabled() ? ItemHandler.getNBTData(event.getCursor(), ItemData.getInfo().getNBTList())
+            String cursorNBT = (ItemJoin.getCore().getData().dataTagsEnabled() ? ItemHandler.getNBTData(event.getCursor(), PluginData.getInfo().getNBTList())
                     : ((itemMeta != null && itemMeta.hasDisplayName()) ? StringUtils.colorDecode(event.getCursor()) : null));
             if (currentNBT != null && cursorNBT != null) {
                 return currentNBT.equalsIgnoreCase(cursorNBT);
@@ -269,8 +269,11 @@ public class Clicking implements Listener {
      */
     @EventHandler(ignoreCancelled = true)
     private void onPickItem(PlayerPickItemEvent event) {
+        if (event.getTargetBlock() == null) {
+            return;
+        }
         final Player player = event.getPlayer();
-        final ItemStack itemCopy = (event.getPickHand() != null ? event.getPickHand().clone() : event.getPickHand());
+        final ItemStack itemCopy = event.getPickHand().clone();
         final Material pickMaterial = event.getTargetBlock().getType();
         if (!ItemUtilities.getUtilities().isAllowed(player, itemCopy, "inventory-modify")) {
             for (int i = 0; i <= 8; i++) {
@@ -282,7 +285,7 @@ public class Clicking implements Listener {
             }
         } else {
             SchedulerUtils.run(() -> {
-                final ItemStack itemCopy_2 = (event.getPickHand() != null ? event.getPickHand().clone() : event.getPickHand());
+                final ItemStack itemCopy_2 = event.getPickHand().clone();
                 if (!ItemUtilities.getUtilities().isAllowed(player, itemCopy_2, "inventory-modify")) {
                     final int pickSlot = event.getPickSlot();
                     if (pickSlot != -1) {

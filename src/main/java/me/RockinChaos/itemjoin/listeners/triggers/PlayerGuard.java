@@ -21,7 +21,7 @@ import me.RockinChaos.core.handlers.PlayerHandler;
 import me.RockinChaos.core.utils.SchedulerUtils;
 import me.RockinChaos.core.utils.ServerUtils;
 import me.RockinChaos.itemjoin.ItemJoin;
-import me.RockinChaos.itemjoin.item.ItemData;
+import me.RockinChaos.itemjoin.PluginData;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.item.ItemUtilities.TriggerType;
 import org.bukkit.Location;
@@ -52,7 +52,7 @@ public class PlayerGuard implements Listener {
         final Player player = event.getPlayer();
         if (PlayerHandler.isPlayer(player)) {
             SchedulerUtils.runAsync(() -> {
-                if (ItemData.getInfo().isEnabled(player, "ALL")) {
+                if (PluginData.getInfo().isEnabled(player, "ALL")) {
                     event.getFrom();
                     this.handleRegions(player, player.getLocation(), true, event.getFrom());
                 }
@@ -71,7 +71,7 @@ public class PlayerGuard implements Listener {
     private void setRegionItems(PlayerTeleportEvent event) {
         final Player player = event.getPlayer();
         if (PlayerHandler.isPlayer(player)) {
-            if (ItemData.getInfo().isEnabled(player, "ALL")) {
+            if (PluginData.getInfo().isEnabled(player, "ALL")) {
                 event.getFrom();
                 this.handleRegions(player, event.getTo(), false, event.getFrom());
             }

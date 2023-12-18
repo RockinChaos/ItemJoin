@@ -29,10 +29,10 @@ public class ItemRecipe {
     /**
      * Creates a new ItemRecipe instance.
      *
-     * @param itemMap - The ItemMap being used.
-     * @param material - The Material for the Recipe.
+     * @param itemMap   - The ItemMap being used.
+     * @param material  - The Material for the Recipe.
      * @param dataValue - The Data-Value for the Recipe.
-     * @param count - The Amount of the item for the Recipe.
+     * @param count     - The Amount of the item for the Recipe.
      */
     public ItemRecipe(final String itemMap, final Material material, final byte dataValue, final int count) {
         this.itemMap = itemMap;

@@ -50,10 +50,10 @@ public class Interact implements Listener {
     private void onInteractCancel(PlayerInteractEvent event) {
         ItemStack item = event.getItem();
         Player player = event.getPlayer();
-        if ((PlayerHandler.isMenuClick(player.getOpenInventory(), event.getAction()) && (event.hasItem() && event.getAction() != Action.PHYSICAL && !ItemUtilities.getUtilities().isAllowed(player, item, "cancel-events")
+        if ((!PlayerHandler.isMenuClick(player.getOpenInventory(), event.getAction()) && (event.hasItem() && event.getAction() != Action.PHYSICAL && !ItemUtilities.getUtilities().isAllowed(player, item, "cancel-events")
                 || (event.getAction() != Action.PHYSICAL && event.getAction() != Action.LEFT_CLICK_AIR && ServerUtils.hasSpecificUpdate("1_9") && event.getHand() != null
                 && event.getHand().toString().equalsIgnoreCase("OFF_HAND") && !ItemUtilities.getUtilities().isAllowed(player, PlayerHandler.getMainHandItem(event.getPlayer()), "cancel-events"))))) {
-            if (ItemHandler.isBookQuill(item) || ItemHandler.isBookQuill(PlayerHandler.getMainHandItem(event.getPlayer()))) {
+            if ((item != null && ItemHandler.isBookQuill(item)) || ItemHandler.isBookQuill(PlayerHandler.getMainHandItem(event.getPlayer()))) {
                 player.closeInventory();
             }
             event.setUseItemInHand(Result.DENY);

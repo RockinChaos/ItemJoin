@@ -27,7 +27,6 @@ import me.RockinChaos.core.utils.ServerUtils;
 import me.RockinChaos.core.utils.StringUtils;
 import me.RockinChaos.core.utils.api.LegacyAPI;
 import me.RockinChaos.core.utils.api.PasteAPI;
-import me.RockinChaos.itemjoin.item.ItemData;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.utils.menus.Menu;
@@ -177,7 +176,7 @@ public class ChatExecutor implements CommandExecutor {
         } else if (Execute.DUMP.accept(sender, args, 0)) {
             this.dump(sender);
         } else if (Execute.RELOAD.accept(sender, args, 0)) {
-            ItemData.getInfo().hardReload(false);
+            PluginData.getInfo().hardReload(false);
             ItemJoin.getCore().getLang().sendLangMessage("commands.default.configReload", sender);
         } else if (Execute.MENU.accept(sender, args, 0)) {
             Menu.startMenu(sender);
@@ -336,7 +335,7 @@ public class ChatExecutor implements CommandExecutor {
      */
     private void info(final CommandSender sender) {
         final ItemStack handItem = PlayerHandler.getHandItem((Player) sender);
-        if (handItem != null && handItem.getType() != Material.AIR) {
+        if (handItem.getType() != Material.AIR) {
             ItemJoin.getCore().getLang().dispatchMessage(sender, " ");
             ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l&m]-----------------&a&l[&e Item Info &a&l]&a&l&m----------------[");
             ItemJoin.getCore().getLang().dispatchMessage(sender, "");
@@ -361,11 +360,11 @@ public class ChatExecutor implements CommandExecutor {
      * @param sender - Source of the command.
      * @param args   - Passed command arguments.
      */
-    private void query(final CommandSender sender, final String[] args) {
+    private void query(final @Nonnull CommandSender sender, final @Nonnull String[] args) {
         final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(args[1]);
         String[] placeHolders = ItemJoin.getCore().getLang().newString();
         placeHolders[3] = (itemMap != null ? itemMap.getConfigName() : args[1]);
-        if (itemMap != null && sender != null) {
+        if (itemMap != null) {
             placeHolders[4] = ((itemMap.getDynamicMaterials() == null || itemMap.getDynamicMaterials().isEmpty()) ? itemMap.getMaterial().name() : itemMap.getDynamicMaterials().toString().replace("[", "").replace("{", "").replace("]", "").replace("}", ""));
             placeHolders[17] = ((itemMap.getMultipleSlots() == null || itemMap.getMultipleSlots().isEmpty()) ? itemMap.getSlot() : itemMap.getMultipleSlots().toString().replace("[", "").replace("{", "").replace("]", "").replace("}", ""));
             if (sender instanceof Player) {
@@ -399,7 +398,7 @@ public class ChatExecutor implements CommandExecutor {
      */
     private void list(final CommandSender sender, final int page) {
         ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
-        int maxPage = ItemData.getInfo().getListPages();
+        int maxPage = PluginData.getInfo().getListPages();
         int lineCount = 0;
         boolean worldSent = false;
         for (World world : Bukkit.getWorlds()) {
@@ -455,7 +454,7 @@ public class ChatExecutor implements CommandExecutor {
      */
     private void permissions(final CommandSender sender, final int page) {
         ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
-        int maxPage = ItemData.getInfo().getPermissionPages();
+        int maxPage = PluginData.getInfo().getPermissionPages();
         if (page == 1) {
             ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.*") ? "&a[✔]" : "&c[✘]") + " ItemJoin.*");
             ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.all") ? "&a[✔]" : "&c[✘]") + " ItemJoin.All");
@@ -544,14 +543,14 @@ public class ChatExecutor implements CommandExecutor {
         }
         if (this.confirmationRequests.get(table + sender.getName()) != null && this.confirmationRequests.get(table + sender.getName()).equals(true)) {
             if (!table.equalsIgnoreCase("Database")) {
-                PlayerHandler.getPlayerID(PlayerHandler.getPlayerString(args));
+                final String playerId = PlayerHandler.getPlayerID(PlayerHandler.getPlayerString(args));
                 DataObject dataObject = (table.replace("-", "_").equalsIgnoreCase("map_ids")
                         ? new DataObject(Table.MAP_IDS, null, "", args, "") : (table.replace("-", "_").equalsIgnoreCase("first_join")
-                        ? new DataObject(Table.FIRST_JOIN, PlayerHandler.getPlayerID(PlayerHandler.getPlayerString(args)), "", "", "") : (table.replace("-", "_").equalsIgnoreCase("first_world")
-                        ? new DataObject(Table.FIRST_WORLD, PlayerHandler.getPlayerID(PlayerHandler.getPlayerString(args)), "", "", "") : (table.replace("-", "_").equalsIgnoreCase("ip_limits")
-                        ? new DataObject(Table.IP_LIMITS, PlayerHandler.getPlayerID(PlayerHandler.getPlayerString(args)), "", "", "") : (table.replace("-", "_").equalsIgnoreCase("enabled_players")
-                        ? new DataObject(Table.ENABLED_PLAYERS, PlayerHandler.getPlayerID(PlayerHandler.getPlayerString(args)), "", "", "", "") : (table.replace("-", "_").equalsIgnoreCase("first_commands")
-                        ? new DataObject(Table.FIRST_COMMANDS, PlayerHandler.getPlayerID(PlayerHandler.getPlayerString(args)), "", "", "") : null))))));
+                        ? new DataObject(Table.FIRST_JOIN, playerId, "", "", "") : (table.replace("-", "_").equalsIgnoreCase("first_world")
+                        ? new DataObject(Table.FIRST_WORLD, playerId, "", "", "") : (table.replace("-", "_").equalsIgnoreCase("ip_limits")
+                        ? new DataObject(Table.IP_LIMITS, playerId, "", "", "") : (table.replace("-", "_").equalsIgnoreCase("enabled_players")
+                        ? new DataObject(Table.ENABLED_PLAYERS, playerId, "", "", "", "") : (table.replace("-", "_").equalsIgnoreCase("first_commands")
+                        ? new DataObject(Table.FIRST_COMMANDS, playerId, "", "", "") : null))))));
                 if (dataObject != null) {
                     ItemJoin.getCore().getSQL().removeData(dataObject);
                 }
@@ -958,7 +957,7 @@ public class ChatExecutor implements CommandExecutor {
          * @param page - The page number to be expected.
          */
         private boolean hasSyntax(final String[] args, final int page) {
-            return args.length >= 2 && (args[1].equalsIgnoreCase(String.valueOf(page)) || page == 2 && StringUtils.isInt(args[1]) && Integer.parseInt(args[1]) != 0 && Integer.parseInt(args[1]) != 1 && (this.equals(Execute.PERMISSIONS) && Integer.parseInt(args[1]) <= ItemData.getInfo().getPermissionPages() || this.equals(Execute.LIST) && Integer.parseInt(args[1]) <= ItemData.getInfo().getListPages()) || page == 1 && this.equals(Execute.PERMISSIONS) && StringUtils.isInt(args[1]) && Integer.parseInt(args[1]) == 0 || !StringUtils.isInt(args[1]) && !this.equals(Execute.PURGE)) || args.length < 2 && !this.equals(Execute.GET) && !this.equals(Execute.GETONLINE) && !this.equals(Execute.REMOVE) && !this.equals(Execute.REMOVEONLINE) && !this.equals(Execute.QUERY) || this.equals(Execute.PURGE) && args.length >= 3 && (args[1].equalsIgnoreCase("map-ids") || args[1].equalsIgnoreCase("ip-limits") || args[1].equalsIgnoreCase("first-join") || args[1].equalsIgnoreCase("first-world") || args[1].equalsIgnoreCase("enabled-players") || args[1].equalsIgnoreCase("first-commands"));
+            return args.length >= 2 && (args[1].equalsIgnoreCase(String.valueOf(page)) || page == 2 && StringUtils.isInt(args[1]) && Integer.parseInt(args[1]) != 0 && Integer.parseInt(args[1]) != 1 && (this.equals(Execute.PERMISSIONS) && Integer.parseInt(args[1]) <= PluginData.getInfo().getPermissionPages() || this.equals(Execute.LIST) && Integer.parseInt(args[1]) <= PluginData.getInfo().getListPages()) || page == 1 && this.equals(Execute.PERMISSIONS) && StringUtils.isInt(args[1]) && Integer.parseInt(args[1]) == 0 || !StringUtils.isInt(args[1]) && !this.equals(Execute.PURGE)) || args.length < 2 && !this.equals(Execute.GET) && !this.equals(Execute.GETONLINE) && !this.equals(Execute.REMOVE) && !this.equals(Execute.REMOVEONLINE) && !this.equals(Execute.QUERY) || this.equals(Execute.PURGE) && args.length >= 3 && (args[1].equalsIgnoreCase("map-ids") || args[1].equalsIgnoreCase("ip-limits") || args[1].equalsIgnoreCase("first-join") || args[1].equalsIgnoreCase("first-world") || args[1].equalsIgnoreCase("enabled-players") || args[1].equalsIgnoreCase("first-commands"));
         }
 
         /**

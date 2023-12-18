@@ -76,7 +76,7 @@ public class Placement implements Listener {
                         }
                     } else {
                         final ItemStack heldItem = PlayerHandler.getHandItem(player);
-                        if (heldItem == null || heldItem.getAmount() <= 1) {
+                        if (heldItem.getAmount() <= 1) {
                             if (ServerUtils.hasSpecificUpdate("1_9")) {
                                 if (Objects.equals(event.getHand(), EquipmentSlot.HAND)) {
                                     if (player.getInventory().getHeldItemSlot() == slot) {
@@ -150,7 +150,7 @@ public class Placement implements Listener {
                         ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item);
                         if (itemMap != null) {
                             final ItemStack heldItem = PlayerHandler.getHandItem(player);
-                            if (heldItem == null || heldItem.getAmount() <= 1) {
+                            if (heldItem.getAmount() <= 1) {
                                 if (ServerUtils.hasSpecificUpdate("1_9")) {
                                     if (event.getHand().equals(EquipmentSlot.HAND)) {
                                         PlayerHandler.setMainHandItem(player, item);

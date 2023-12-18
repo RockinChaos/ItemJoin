@@ -20,7 +20,7 @@ package me.RockinChaos.itemjoin.listeners;
 import me.RockinChaos.core.handlers.PlayerHandler;
 import me.RockinChaos.core.utils.SchedulerUtils;
 import me.RockinChaos.core.utils.api.LegacyAPI;
-import me.RockinChaos.itemjoin.item.ItemData;
+import me.RockinChaos.itemjoin.PluginData;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -50,8 +50,8 @@ public class Drops implements Listener {
     @EventHandler(ignoreCancelled = true)
     private void onGlobalDrop(PlayerDropItemEvent event) {
         final Player player = event.getPlayer();
-        if (ItemData.getInfo().isPreventString(player, "Self-Drops")) {
-            if (ItemData.getInfo().isPreventBypass(player)) {
+        if (PluginData.getInfo().isPreventString(player, "Self-Drops")) {
+            if (PluginData.getInfo().isPreventBypass(player)) {
                 if (!player.isDead()) {
                     if (PlayerHandler.isCreativeMode(player)) {
                         player.closeInventory();
@@ -73,8 +73,8 @@ public class Drops implements Listener {
     private void onGlobalDeathDrops(PlayerDeathEvent event) {
         final Player player = event.getEntity();
         ItemUtilities.getUtilities().closeAnimations(player);
-        if (ItemData.getInfo().isPreventString(player, "Death-Drops")) {
-            if (ItemData.getInfo().isPreventBypass(player) && LegacyAPI.getGameRule(player.getWorld(), "keepInventory")) {
+        if (PluginData.getInfo().isPreventString(player, "Death-Drops")) {
+            if (PluginData.getInfo().isPreventBypass(player) && LegacyAPI.getGameRule(player.getWorld(), "keepInventory")) {
                 event.getDrops().clear();
             }
         }

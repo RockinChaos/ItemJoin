@@ -1,6 +1,6 @@
 package me.RockinChaos.itemjoin.listeners;
 
-import me.RockinChaos.itemjoin.item.ItemData;
+import me.RockinChaos.itemjoin.PluginData;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
@@ -15,8 +15,8 @@ public class Chat implements Listener {
      */
     @EventHandler()
     public void onChat(AsyncPlayerChatEvent event) {
-        if (!event.isCancelled() && (ItemData.getInfo().isPreventString(event.getPlayer(), "Chat"))) {
-            if (ItemData.getInfo().isPreventBypass(event.getPlayer())) {
+        if (!event.isCancelled() && (PluginData.getInfo().isPreventString(event.getPlayer(), "Chat"))) {
+            if (PluginData.getInfo().isPreventBypass(event.getPlayer())) {
                 event.setCancelled(true);
             }
         }

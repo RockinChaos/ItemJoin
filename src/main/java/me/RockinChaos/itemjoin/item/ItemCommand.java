@@ -23,6 +23,7 @@ import me.RockinChaos.core.utils.SchedulerUtils;
 import me.RockinChaos.core.utils.ServerUtils;
 import me.RockinChaos.core.utils.StringUtils;
 import me.RockinChaos.itemjoin.ItemJoin;
+import me.RockinChaos.itemjoin.PluginData;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
@@ -117,7 +118,7 @@ public class ItemCommand {
         } else if (input.startsWith("message:")) {
             input = input.substring(8);
             type = Executor.MESSAGE;
-        }  else if (input.startsWith("damage:")) {
+        } else if (input.startsWith("damage:")) {
             input = input.substring(7);
             type = Executor.DAMAGE;
         } else if (input.startsWith("swap-item:")) {
@@ -510,7 +511,7 @@ public class ItemCommand {
                 if (altPlayer != null) {
                     values[0] = altPlayer.getName();
                 }
-                ItemData.getInfo().setLoggable("/" + StringUtils.translateLayout(this.command, player, values));
+                PluginData.getInfo().setLoggable("/" + StringUtils.translateLayout(this.command, player, values));
                 Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), StringUtils.translateLayout(this.command, player, values));
             }
         } catch (Exception e) {
@@ -537,7 +538,7 @@ public class ItemCommand {
                         if (altPlayer != null) {
                             values[0] = altPlayer.getName();
                         }
-                        ItemData.getInfo().setLoggable("/" + StringUtils.translateLayout(this.command, player, values));
+                        PluginData.getInfo().setLoggable("/" + StringUtils.translateLayout(this.command, player, values));
                         player.chat("/" + StringUtils.translateLayout(this.command, player, values));
                     } catch (Exception e) {
                         ServerUtils.sendDebugTrace(e);
@@ -571,7 +572,7 @@ public class ItemCommand {
                 if (altPlayer != null) {
                     values[0] = altPlayer.getName();
                 }
-                ItemData.getInfo().setLoggable("/" + StringUtils.translateLayout(this.command, player, values));
+                PluginData.getInfo().setLoggable("/" + StringUtils.translateLayout(this.command, player, values));
                 player.chat("/" + StringUtils.translateLayout(this.command, player, values));
             }
         } catch (Exception e) {
@@ -592,7 +593,7 @@ public class ItemCommand {
             if (altPlayer != null) {
                 values[0] = altPlayer.getName();
             }
-            String jsonMessage = ItemData.getInfo().getJSONMessage(StringUtils.translateLayout(this.command, player, values), this.itemMap.getConfigName());
+            String jsonMessage = PluginData.getInfo().getJSONMessage(StringUtils.translateLayout(this.command, player, values), this.itemMap.getConfigName());
             Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "minecraft:tellraw " + player.getName() + " " + jsonMessage);
         } catch (Exception e) {
             ServerUtils.logSevere("{ItemCommand} There was an error executing an item's command to send a message, if this continues report it to the developer.");
@@ -603,8 +604,8 @@ public class ItemCommand {
     /**
      * Executes the ItemCommand as a damage count to the item.
      *
-     * @param player    - player that is interacting with the custom items command.
-     * @param slot      - The slot being referenced.
+     * @param player - player that is interacting with the custom items command.
+     * @param slot   - The slot being referenced.
      */
     private void dispatchDamageCommands(final Player player, final String slot) {
         try {

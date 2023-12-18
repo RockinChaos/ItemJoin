@@ -5,7 +5,7 @@
 # Modifying the Version will cause this file to break and regenerate.
 items-Version: 8
 
-# General options that apply to the custom items functionality.
+# General options that apply to the custom items' functionality.
 items-Delay: 2
 items-Overwrite: false
 items-Spamming: false
@@ -19,15 +19,15 @@ items:
     slot: 0
     name: '&bBlazefury'
     lore:
-    - '&7A devine sword.'
-    - '&7This sword is many millennium old...'
+      - '&7A devine sword.'
+      - '&7This sword is many millennium old...'
     interact:
-    - 'message: &eYou can send yourself custom messages!'
-    - 'console: say You can even execute more than one command!'
-    - 'delay: 10'
-    - 'player: say This is item slot 1.'
-    - 'op: say This command executes as if the player is op.'
-    - 'say Hello world!'
+      - 'message: &eYou can send yourself custom messages!'
+      - 'console: say You can even execute more than one command!'
+      - 'delay: 10'
+      - 'player: say This is item slot 1.'
+      - 'op: say This command executes as if the player is op.'
+      - 'say Hello world!'
     commands-sound: BLOCK_NOTE_BLOCK_PLING
     commands-particle: FIREWORK:BLACK:RED:BURST:10
     commands-sequence: SEQUENTIAL
@@ -48,8 +48,8 @@ items:
     slot: 2
     name: '&eMagical Cloth'
     lore:
-    - '&7Server promotions'
-    - '&7Directions or custom maps.'
+      - '&7Server promotions'
+      - '&7Directions or custom maps.'
     itemflags: item-store, unbreakable, hide-flags, death-drops, self-drops, CreativeBypass
     triggers: join, respawn, world-switch
     permission-node: itemjoin.map
@@ -61,15 +61,15 @@ items:
     count: 6
     name: '&aGamemode Token'
     lore:
-    - '&7Right-Click use creative token.'
-    - '&7'
-    - '&7Left-Click use spectator token.'
+      - '&7Right-Click use creative token.'
+      - '&7'
+      - '&7Left-Click use spectator token.'
     interact-right:
-    - 'player: minecraft:gamemode creative %player%'
-    - 'message: &eYou have been set to creative mode.'
+      - 'player: minecraft:gamemode creative %player%'
+      - 'message: &eYou have been set to creative mode.'
     interact-left:
-    - 'player: minecraft:gamemode spectator %player%'
-    - 'message: &eYou have been set to spectator mode.'
+      - 'player: minecraft:gamemode spectator %player%'
+      - 'message: &eYou have been set to spectator mode.'
     commands-sound: BLOCK_NOTE_BLOCK_PLING
     commands-cooldown: 2
     itemflags: item-store, death-drops, self-drops, hide-flags, disposable
@@ -82,52 +82,52 @@ items:
     slot: 6
     name: '&c&nCreating a Book'
     lore:
-    - '&7'
-    - '&7Useful for server rules'
-    - '&7and other server information.'
+      - '&7'
+      - '&7Useful for server rules'
+      - '&7and other server information.'
     pages:
       '1':
-      - '&aThanks for checking'
-      - '&aout &bItemJoin &aby'
-      - '<text:&b@RockinChaos#6746><open_url:https://discord.gg/D5FnJ7C><show_text:Click to visit the discord.>'
-      - ''
-      - '&0This is an example of'
-      - '    a &9custom book&0.'
-      - '&0-=-=-=-=-=-=-=-=-=-'
-      - ''
-      - '&0You can set an &cauthor&r'
-      - '&0and you can add text'
-      - '&0components using the'
-      - '&0format <<text:TYPE><show_text:Replace TYPE with the component type. \nExample: run_command, show_text, open_url.>:<text:VALUE><show_text:Replace VALUE with the text, url or command.>>.'
+        - '&aThanks for checking'
+        - '&aout &bItemJoin &aby'
+        - '<text:&b@RockinChaos#6746><open_url:https://discord.gg/D5FnJ7C><show_text:Click to visit the discord.>'
+        - ''
+        - '&0This is an example of'
+        - '    a &9custom book&0.'
+        - '&0-=-=-=-=-=-=-=-=-=-'
+        - ''
+        - '&0You can set an &cauthor&r'
+        - '&0and you can add text'
+        - '&0components using the'
+        - '&0format <<text:TYPE><show_text:Replace TYPE with the component type. \nExample: run_command, show_text, open_url.>:<text:VALUE><show_text:Replace VALUE with the text, url or command.>>.'
       '2':
-      - '&cHow do you specify a'
-      - '&cnew page number?'
-      - ''
-      - '&0As displayed to the'
-      - '&0left in the items.yml.'
-      - '&0Create a number to'
-      - '&0specify the new page.'
-      - '&cMakesure you put'
-      - '&ceach number in order.'
-      - ''
-      - '&aNote:&0 that you can'
-      - '&0only have &b14&0 lines '
-      - '&0per page.'
+        - '&cHow do you specify a'
+        - '&cnew page number?'
+        - ''
+        - '&0As displayed to the'
+        - '&0left in the items.yml.'
+        - '&0Create a number to'
+        - '&0specify the new page.'
+        - '&cMakesure you put'
+        - '&ceach number in order.'
+        - ''
+        - '&aNote:&0 that you can'
+        - '&0only have &b14&0 lines '
+        - '&0per page.'
       '3':
-      - '&0I still &nneed&r help&r!'
-      - ''
-      - '&0RockinChaos is always'
-      - '&0happy to help so feel'
-      - '&0free to reach out'
-      - '&0on <text:&adiscord.><open_url:https://discord.gg/D5FnJ7C><show_text:Click to visit the discord.>'
-      - ''
-      - '&0You can also visit'
-      - '&0the <text:&9wiki page><open_url:https://github.com/RockinChaos/ItemJoin/wiki><show_text:Click to view the wiki.> &rfor'
-      - '&0additional help on'
-      - '&0the plugin including'
-      - '<text:&9custom books.><open_url:https://github.com/RockinChaos/ItemJoin/wiki/Creating-Items#creating-a-custom-book><show_text:Click for additional \nhelp with creating books.>'
-      - ''
-      - 'raw: ["",{"text":"Visit Plugin Page!","color":"gold","clickEvent":{"action":"open_url","value":"https://www.spigotmc.org/resources/itemjoin.12661/"},"hoverEvent":{"action":"show_text","value":{"text":"","extra":[{"text":"Click to visit the spigot page.","color":"green"}]}}}]'
+        - '&0I still &nneed&r help&r!'
+        - ''
+        - '&0RockinChaos is always'
+        - '&0happy to help so feel'
+        - '&0free to reach out'
+        - '&0on <text:&adiscord.><open_url:https://discord.gg/D5FnJ7C><show_text:Click to visit the discord.>'
+        - ''
+        - '&0You can also visit'
+        - '&0the <text:&9wiki page><open_url:https://github.com/RockinChaos/ItemJoin/wiki><show_text:Click to view the wiki.> &rfor'
+        - '&0additional help on'
+        - '&0the plugin including'
+        - '<text:&9custom books.><open_url:https://github.com/RockinChaos/ItemJoin/wiki/Creating-Items#creating-a-custom-book><show_text:Click for additional \nhelp with creating books.>'
+        - ''
+        - 'raw: ["",{"text":"Visit Plugin Page!","color":"gold","clickEvent":{"action":"open_url","value":"https://www.spigotmc.org/resources/itemjoin.12661/"},"hoverEvent":{"action":"show_text","value":{"text":"","extra":[{"text":"Click to visit the spigot page.","color":"green"}]}}}]'
     itemflags: death-drops, self-drops
     triggers: join, respawn
     permission-node: itemjoin.book
@@ -138,8 +138,8 @@ items:
     slot: 8
     name: '&b%player%'
     lore:
-    - '&7Great for setting a players profile,'
-    - '&7as seen in mini-game servers.'
+      - '&7Great for setting a players profile,'
+      - '&7as seen in mini-game servers.'
     itemflags: death-drops, self-drops
     triggers: join, respawn, world-switch
     enabled-worlds: world, world_nether, world_the_end
@@ -162,10 +162,10 @@ items:
     slot: 20
     name: '&9Mighty Creeper'
     lore:
-    - '&7The creeper is our leader!'
+      - '&7The creeper is our leader!'
     interact:
-    - 'message: &bWhere is Herobrine?'
-    - 'message: &cWhere is your leader now...?'
+      - 'message: &bWhere is Herobrine?'
+      - 'message: &cWhere is your leader now...?'
     commands-sequence: RANDOM
     itemflags: inventory-modify, hide-flags, self-drops, CreativeBypass
     triggers: join, respawn, world-switch, region-enter
@@ -182,14 +182,14 @@ items:
       '6': <delay:40>&e&lS&f&lt&e&la&f&lt&e&li&f&ls&e&lt&f&li&e&lc&f&ls
     lore:
       '1':
-      - '<delay:60>&cMob Kills: %mob_kills%'
-      - '&cPlayer Kills: %player_kills%'
+        - '<delay:60>&cMob Kills: %mob_kills%'
+        - '&cPlayer Kills: %player_kills%'
       '2':
-      - '<delay:60>&cDeaths: %player_deaths%'
-      - '&cYour Location: %player_location%'
+        - '<delay:60>&cDeaths: %player_deaths%'
+        - '&cYour Location: %player_location%'
       '3':
-      - '<delay:60>&cHealth: %player_health%'
-      - '&cFood Level: %player_food%'
+        - '<delay:60>&cHealth: %player_health%'
+        - '&cFood Level: %player_food%'
     itemflags: animate, inventory-modify, self-drops, death-drops
     triggers: join, respawn, world-switch
     enabled-worlds: world, world_nether, world_the_end
@@ -198,13 +198,13 @@ items:
     slot: 24
     name: '&eSurvival Server'
     lore:
-    - '&7Click to go to the survival server!'
+      - '&7Click to go to the survival server!'
     interact:
-    - 'server: survival'
-    - 'message: &eSending you to the survival server!'
+      - 'server: survival'
+      - 'message: &eSending you to the survival server!'
     inventory:
-    - 'server: survival'
-    - 'message: &eSending you to the survival server!'
+      - 'server: survival'
+      - 'message: &eSending you to the survival server!'
     commands-sound: BLOCK_NOTE_BLOCK_PLING
     commands-cost: 10
     commands-cooldown: 2
@@ -228,7 +228,7 @@ items:
     slot: 29
     name: '&dSparkles'
     lore:
-    - '&7Right-Click me and watch me fly!'
+      - '&7Right-Click me and watch me fly!'
     firework:
       type: CREEPER
       flicker: true
@@ -251,7 +251,7 @@ items:
     slot: 33
     name: '&dAn Apple'
     lore:
-    - '&7This is not any ordinary apple.'
+      - '&7This is not any ordinary apple.'
     potion-effect: JUMP:2:120, NIGHT_VISION:2:400, GLOWING:1:410, REGENERATION:1:160
     itemflags: death-drops, self-drops
     triggers: join, respawn, world-switch
@@ -265,10 +265,10 @@ items:
       '2': <delay:100>eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTYxZGZkZGE3MTAyMmJmYWQ3OWVhYmJmYTU2YTE1MTE2NDdiMjAyYWQxMTM2ZmY5N2UzMWEwNmRiYWMxMGVjYiJ9fX0=
       '3': <delay:100>eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZGFmNjJkNjJkMGE5MzZmMDdmZGZjMWM2MDcyMTY4NzVjOTkzZTViZWViY2U5NTNlOWM4NzI0YTI1ZmNiYTBiYyJ9fX0=
     lore:
-    - '&7This is a custom textured skull.'
-    - '&7'
-    - '&7You can create your own skull texture'
-    - '&7and apply it to a skull item!'
+      - '&7This is a custom textured skull.'
+      - '&7'
+      - '&7You can create your own skull texture'
+      - '&7and apply it to a skull item!'
     itemflags: inventory-modify, animate, death-drops, self-drops
     triggers: join, respawn, world-switch
     enabled-worlds: world, world_nether, world_the_end
@@ -340,13 +340,13 @@ items:
     slot: ARBITRARY
     name: '&cStolen Sword'
     lore:
-    - '&7Pulled from the ashes of chaos.'
+      - '&7Pulled from the ashes of chaos.'
     mobs-drop:
-    - 'ZOMBIE:0.001'
-    - 'PIG:0.3'
+      - 'ZOMBIE:0.001'
+      - 'PIG:0.3'
     blocks-drop:
-    - 'DIAMOND_ORE:0.5'
-    - 'GOLD_ORE:0.19'
+      - 'DIAMOND_ORE:0.5'
+      - 'GOLD_ORE:0.19'
     triggers: DISABLED
     enabled-worlds: world, world_the_end
   recipe-item:
@@ -354,13 +354,13 @@ items:
     slot: ARBITRARY
     name: '&6Essence'
     lore:
-    - '&7Shhhh don''t tell anyone...'
+      - '&7Shhhh don''t tell anyone...'
     recipe:
-    - 'XGX'
-    - 'IDI'
-    - 'XGX'
+      - 'XGX'
+      - 'IDI'
+      - 'XGX'
     ingredients:
-    - 'G:GOLD_INGOT'
-    - 'I:IRON_INGOT:#3'
-    - 'D:DIAMOND'
+      - 'G:GOLD_INGOT'
+      - 'I:IRON_INGOT:#3'
+      - 'D:DIAMOND'
     triggers: DISABLED

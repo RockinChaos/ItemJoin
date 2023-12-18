@@ -30,9 +30,13 @@ import me.RockinChaos.core.utils.interfaces.Interface;
 import me.RockinChaos.core.utils.interfaces.Query;
 import me.RockinChaos.core.utils.interfaces.types.Button;
 import me.RockinChaos.itemjoin.ItemJoin;
-import me.RockinChaos.itemjoin.item.*;
+import me.RockinChaos.itemjoin.PluginData;
+import me.RockinChaos.itemjoin.item.ItemCommand;
 import me.RockinChaos.itemjoin.item.ItemCommand.Action;
 import me.RockinChaos.itemjoin.item.ItemCommand.CommandSequence;
+import me.RockinChaos.itemjoin.item.ItemMap;
+import me.RockinChaos.itemjoin.item.ItemRecipe;
+import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.arcaniax.hdb.api.HeadDatabaseAPI;
 import org.bukkit.*;
 import org.bukkit.FireworkEffect.Type;
@@ -68,8 +72,7 @@ public class Menu {
     private static final ItemStack fillerPaneGItem = ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GRAY_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:7"), 1, false, false, "&7", "");
     private static final ItemStack fillerPaneItem = ItemHandler.getItem("GLASS_PANE", 1, false, false, "&7", "");
     private static final ItemStack exitItem = ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nExit", "&7", "&7*Returns you to the game");
-    private static final Button exitButton = new Button(exitItem, event -> Menu.startMenu(event.getWhoClicked()));
-    private static final List<String> modifyMenu = new ArrayList<>();
+    private static final List<String> modifyMenu = new ArrayList<>();    private static final Button exitButton = new Button(exitItem, event -> Menu.startMenu(event.getWhoClicked()));
     private static final Map<String, Interface> typingMenu = new HashMap<>();
     private static String GUIName = StringUtils.colorFormat("&7           &0&n ItemJoin Menu");
     private static int failCycle = 0;
@@ -87,7 +90,7 @@ public class Menu {
             pagedPane.addButton(new Button(ItemHandler.getItem("ENDER_CHEST", 1, false, false, "&b&l&nConfig Settings", "&7", "&7*Change the GLOBAL plugin", "&7configuration settings."), event -> configSettings(player)));
             pagedPane.addButton(new Button(fillerPaneBItem));
             pagedPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "WRITABLE_BOOK" : "386"), 1, false, false, "&a&l&nCreate", "&7", "&7*Create a new item from scratch."),
-                    event -> materialPane(player, new ItemMap("item_" + ItemData.getInfo().getPath(1), "ARBITRARY"), 0, 0)));
+                    event -> materialPane(player, new ItemMap("item_" + PluginData.getInfo().getPath(1), "ARBITRARY"), 0, 0)));
             pagedPane.addButton(new Button(ItemHandler.getItem("HOPPER", 1, false, false, "&e&l&nSave", "&7", "&7*Save an existing item as a custom item."), event -> startHopper(player)));
             pagedPane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, false, false, "&c&l&nModify", "&7", "&7*Modify an existing custom item"), event -> startModify(player, null, 0)));
             pagedPane.addButton(new Button(fillerPaneBItem));
@@ -123,7 +126,7 @@ public class Menu {
                         FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                         dataFile.set("Permissions.Obtain-Items", !ItemJoin.getCore().getConfig("config.yml").getBoolean("Permissions.Obtain-Items"));
                         ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                        ItemData.getInfo().softReload();
+                        PluginData.getInfo().softReload();
                         SchedulerUtils.runLater(2L, () -> itemSettings(player));
                     }));
             itemPane.addButton(new Button(fillerPaneBItem));
@@ -135,7 +138,7 @@ public class Menu {
                         FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                         dataFile.set("Permissions.Obtain-Items-OP", !ItemJoin.getCore().getConfig("config.yml").getBoolean("Permissions.Obtain-Items-OP"));
                         ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                        ItemData.getInfo().softReload();
+                        PluginData.getInfo().softReload();
                         SchedulerUtils.runLater(2L, () -> itemSettings(player));
                     }));
             itemPane.addButton(new Button(fillerPaneBItem));
@@ -150,7 +153,7 @@ public class Menu {
                         FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                         dataFile.set("items-Spamming", !ItemJoin.getCore().getConfig("items.yml").getBoolean("items-Spamming"));
                         ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "items.yml");
-                        ItemData.getInfo().softReload();
+                        PluginData.getInfo().softReload();
                         SchedulerUtils.runLater(2L, () -> itemSettings(player));
                     }));
             itemPane.addButton(new Button(ItemHandler.getItem("DIAMOND", 1, ItemJoin.getCore().getConfig("items.yml").getBoolean("items-RestrictCount"), false,
@@ -161,7 +164,7 @@ public class Menu {
                         FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                         dataFile.set("items-RestrictCount", !ItemJoin.getCore().getConfig("items.yml").getBoolean("items-RestrictCount"));
                         ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "items.yml");
-                        ItemData.getInfo().softReload();
+                        PluginData.getInfo().softReload();
                         SchedulerUtils.runLater(2L, () -> itemSettings(player));
                     }));
             itemPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "OAK_WOOD" : "17"), 1, ItemJoin.getCore().getConfig("config.yml").getBoolean("General.Log-Commands"), false,
@@ -172,7 +175,7 @@ public class Menu {
                         FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                         dataFile.set("General.Log-Commands", !ItemJoin.getCore().getConfig("config.yml").getBoolean("General.Log-Commands"));
                         ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                        ItemData.getInfo().softReload();
+                        PluginData.getInfo().softReload();
                         SchedulerUtils.runLater(2L, () -> itemSettings(player));
                     }));
             itemPane.addButton(new Button(ItemHandler.getItem("IRON_HELMET", 1, ItemJoin.getCore().getConfig("config.yml").getBoolean("Settings.HeldItem-Animations"), false,
@@ -184,7 +187,7 @@ public class Menu {
                         FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                         dataFile.set("Settings.HeldItem-Animations", !ItemJoin.getCore().getConfig("config.yml").getBoolean("Settings.HeldItem-Animations"));
                         ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                        ItemData.getInfo().hardReload(true);
+                        PluginData.getInfo().hardReload(true);
                         SchedulerUtils.runLater(2L, () -> itemSettings(player));
                     }));
             final int heldSlot = ItemJoin.getCore().getConfig("config.yml").getInt("Settings.HeldItem-Slot");
@@ -206,7 +209,7 @@ public class Menu {
                         FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                         dataFile.set("Settings.DataTags", !ItemJoin.getCore().getConfig("config.yml").getBoolean("Settings.DataTags"));
                         ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                        ItemData.getInfo().hardReload(true);
+                        PluginData.getInfo().hardReload(true);
                         SchedulerUtils.runLater(2L, () -> itemSettings(player));
                     }));
             itemPane.addButton(new Button(ItemHandler.getItem("LAVA_BUCKET", 1, false, false,
@@ -221,10 +224,6 @@ public class Menu {
         });
         itemPane.open(player);
     }
-
-//  ============================================== //
-//  			   Selection Menus      	       //
-//	============================================== //
 
     /**
      * Opens the CONFIG SETTINGS PANE for the Player.
@@ -253,7 +252,7 @@ public class Menu {
                         FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                         dataFile.set("General.CheckforUpdates", !ItemJoin.getCore().getConfig("config.yml").getBoolean("General.CheckforUpdates"));
                         ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                        ItemData.getInfo().softReload();
+                        PluginData.getInfo().softReload();
                         SchedulerUtils.runLater(2L, () -> configSettings(player));
                     }));
             configPane.addButton(new Button(ItemHandler.getItem("COMPASS", 1, ItemJoin.getCore().getConfig("config.yml").getBoolean("General.Metrics-Logging"), false,
@@ -265,7 +264,7 @@ public class Menu {
                         FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                         dataFile.set("General.Metrics-Logging", !ItemJoin.getCore().getConfig("config.yml").getBoolean("General.Metrics-Logging"));
                         ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                        ItemData.getInfo().softReload();
+                        PluginData.getInfo().softReload();
                         SchedulerUtils.runLater(2L, () -> configSettings(player));
                     }));
             configPane.addButton(new Button(ItemHandler.getItem("STICK", 1, ItemJoin.getCore().getConfig("config.yml").getBoolean("General.Debugging"), false,
@@ -276,7 +275,7 @@ public class Menu {
                         FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                         dataFile.set("General.Debugging", !ItemJoin.getCore().getConfig("config.yml").getBoolean("General.Debugging"));
                         ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                        ItemData.getInfo().softReload();
+                        PluginData.getInfo().softReload();
                         SchedulerUtils.runLater(2L, () -> configSettings(player));
                     }));
             configPane.addButton(new Button(ItemHandler.getItem("REDSTONE", 1, ItemJoin.getCore().getConfig("config.yml").getBoolean("General.ignoreErrors"), false,
@@ -287,7 +286,7 @@ public class Menu {
                         FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                         dataFile.set("General.ignoreErrors", !ItemJoin.getCore().getConfig("config.yml").getBoolean("General.ignoreErrors"));
                         ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                        ItemData.getInfo().softReload();
+                        PluginData.getInfo().softReload();
                         SchedulerUtils.runLater(2L, () -> configSettings(player));
                     }));
             configPane.addButton(new Button(fillerPaneBItem));
@@ -306,7 +305,7 @@ public class Menu {
                         FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                         dataFile.set("Permissions.Commands-OP", !ItemJoin.getCore().getConfig("config.yml").getBoolean("Permissions.Commands-OP"));
                         ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                        ItemData.getInfo().softReload();
+                        PluginData.getInfo().softReload();
                         SchedulerUtils.runLater(2L, () -> configSettings(player));
                     }));
             configPane.addButton(new Button(ItemHandler.getItem("BOOK", 1, ItemJoin.getCore().getConfig("config.yml").getBoolean("Permissions.Commands-Get"), false,
@@ -317,7 +316,7 @@ public class Menu {
                         FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                         dataFile.set("Permissions.Commands-Get", !ItemJoin.getCore().getConfig("config.yml").getBoolean("Permissions.Commands-Get"));
                         ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                        ItemData.getInfo().softReload();
+                        PluginData.getInfo().softReload();
                         SchedulerUtils.runLater(2L, () -> configSettings(player));
                     }));
             configPane.addButton(new Button(ItemHandler.getItem("BEDROCK", 1, ItemJoin.getCore().getConfig("config.yml").getBoolean("Permissions.Movement-Bypass"), false,
@@ -328,7 +327,7 @@ public class Menu {
                         FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                         dataFile.set("Permissions.Movement-Bypass", !ItemJoin.getCore().getConfig("config.yml").getBoolean("Permissions.Movement-Bypass"));
                         ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                        ItemData.getInfo().softReload();
+                        PluginData.getInfo().softReload();
                         SchedulerUtils.runLater(2L, () -> configSettings(player));
                     }));
             configPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the main menu."), event -> startMenu(player)));
@@ -337,6 +336,10 @@ public class Menu {
         });
         configPane.open(player);
     }
+
+//  ============================================== //
+//  			   Selection Menus      	       //
+//	============================================== //
 
     /**
      * Opens the MODIFY PANE for the Player.
@@ -394,10 +397,10 @@ public class Menu {
                 if (playerInv.getBoots() != null && playerInv.getBoots().getType() != Material.AIR) {
                     convertStack(player, playerInv.getBoots(), "BOOTS");
                 }
-                if (ServerUtils.hasSpecificUpdate("1_9") && offItem != null && offItem.getType() != Material.AIR) {
+                if (ServerUtils.hasSpecificUpdate("1_9") && offItem.getType() != Material.AIR) {
                     convertStack(player, offItem, "OFFHAND");
                 }
-                ItemData.getInfo().hardReload(true);
+                PluginData.getInfo().hardReload(true);
                 startMenu(player);
             }));
             dragDrop.addButton(new Button(fillerPaneGItem), 2);
@@ -433,10 +436,10 @@ public class Menu {
                 if (playerInv.getBoots() != null && playerInv.getBoots().getType() != Material.AIR) {
                     convertStack(player, playerInv.getBoots(), "BOOTS");
                 }
-                if (ServerUtils.hasSpecificUpdate("1_9") && offItem != null && offItem.getType() != Material.AIR) {
+                if (ServerUtils.hasSpecificUpdate("1_9") && offItem.getType() != Material.AIR) {
                     convertStack(player, offItem, "OFFHAND");
                 }
-                ItemData.getInfo().hardReload(true);
+                PluginData.getInfo().hardReload(true);
                 startMenu(player);
             }));
             dragDrop.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nMain Menu", "&7", "&7*Returns you to the main menu."), event -> startMenu(player)));
@@ -641,7 +644,7 @@ public class Menu {
      * @param item   - The ItemStack to be saved.
      */
     private static void convertStack(final Player player, final ItemStack item, final String slot) {
-        ItemMap itemMap = new ItemMap("item_" + ItemData.getInfo().getPath(1), "ARBITRARY");
+        ItemMap itemMap = new ItemMap("item_" + PluginData.getInfo().getPath(1), "ARBITRARY");
         itemMap.setMaterial(item.getType());
         if (!ServerUtils.hasSpecificUpdate("1_13")) {
             itemMap.setDataValue((short) LegacyAPI.getDataValue(item));
@@ -681,7 +684,7 @@ public class Menu {
         } else if (item.getType().toString().equalsIgnoreCase("SKULL_ITEM") || item.getType().toString().equalsIgnoreCase("PLAYER_HEAD")) {
             if (!PlayerHandler.getSkullOwner(item).equalsIgnoreCase("NULL")) {
                 itemMap.setSkull(PlayerHandler.getSkullOwner(item));
-            } else if (!ItemHandler.getSkullTexture(item.getItemMeta()).isEmpty()) {
+            } else if (item.getItemMeta() != null && !ItemHandler.getSkullTexture(item.getItemMeta()).isEmpty()) {
                 itemMap.setSkullTexture(ItemHandler.getSkullTexture(item.getItemMeta()));
             }
         } else if (itemMap.getMaterial().toString().contains("CHARGE") || itemMap.getMaterial().toString().equalsIgnoreCase("FIREWORK_STAR")) {
@@ -738,12 +741,6 @@ public class Menu {
         itemMap.renderItemStack();
     }
 
-//  ===================================================================================================================================================================================================================
-
-//  ============================================== //
-//  			   Menu Utilities        	       //
-//  ============================================== //
-
     /**
      * Opens the Pane for the Player.
      * This Pane is for selecting item modification or deletion.
@@ -766,7 +763,7 @@ public class Menu {
                 String[] placeHolders = ItemJoin.getCore().getLang().newString();
                 placeHolders[3] = itemMap.getConfigName();
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.itemRemoved", player, placeHolders);
-                ItemData.getInfo().hardReload(true);
+                PluginData.getInfo().hardReload(true);
                 {
                     SchedulerUtils.runLater(4L, () -> startModify(player, null, 0));
                 }
@@ -778,6 +775,12 @@ public class Menu {
         });
         choicePane.open(player);
     }
+
+//  ===================================================================================================================================================================================================================
+
+//  ============================================== //
+//  			   Menu Utilities        	       //
+//  ============================================== //
 
     /**
      * Opens the Pane for the Player.
@@ -894,19 +897,19 @@ public class Menu {
                     }
                 }
             }, query -> query.onClose(stateSnapshot -> creatingPane(stateSnapshot.getPlayer(), itemMap))
-                .onClick((slot, stateSnapshot) -> {
-                    if (slot != Query.Slot.OUTPUT) {
-                        return Collections.emptyList();
-                    }
-                    itemMap.setCustomName(StringUtils.restoreColor(stateSnapshot.getText()));
-                    Menu.setTypingMenu(false, player, null);
-                    creatingPane(stateSnapshot.getPlayer(), itemMap);
-                    return Collections.singletonList(Query.ResponseAction.close());
-                })
-                .itemLeft(ItemHandler.getItem("NAME_TAG", 1, false, true, " ", "&bThis is what the raw data looks like."))
-                .itemRight(ItemHandler.getItem("GOLD_NUGGET", 1, true, true, "&c&n&lTips", "&aType your answer into the query box!", "&7", ItemJoin.getCore().getLang().getLangMessage("commands.menu.inputType").replace("%input%" ,"NAME").replace("%prefix% ", "").replace("%prefix%", ""), ItemJoin.getCore().getLang().getLangMessage("commands.menu.inputExample").replace("%input_example%" ,"&bUltimate Sword").replace("%prefix% ", "").replace("%prefix%", "")))
-                .itemOutput(ItemHandler.getItem("IRON_INGOT", 1, false, true, "&bStart typing...", "&aThis is what the text will look like."))
-                .title("Type the item name:"), 0));
+                    .onClick((slot, stateSnapshot) -> {
+                        if (slot != Query.Slot.OUTPUT) {
+                            return Collections.emptyList();
+                        }
+                        itemMap.setCustomName(StringUtils.restoreColor(stateSnapshot.getText()));
+                        Menu.setTypingMenu(false, player, null);
+                        creatingPane(stateSnapshot.getPlayer(), itemMap);
+                        return Collections.singletonList(Query.ResponseAction.close());
+                    })
+                    .itemLeft(ItemHandler.getItem("NAME_TAG", 1, false, true, " ", "&bThis is what the raw data looks like."))
+                    .itemRight(ItemHandler.getItem("GOLD_NUGGET", 1, true, true, "&c&n&lTips", "&aType your answer into the query box!", "&7", ItemJoin.getCore().getLang().getLangMessage("commands.menu.inputType").replace("%input%", "NAME").replace("%prefix% ", "").replace("%prefix%", ""), ItemJoin.getCore().getLang().getLangMessage("commands.menu.inputExample").replace("%input_example%", "&bUltimate Sword").replace("%prefix% ", "").replace("%prefix%", "")))
+                    .itemOutput(ItemHandler.getItem("IRON_INGOT", 1, false, true, "&bStart typing...", "&aThis is what the text will look like."))
+                    .title("Type the item name:"), 0));
             creatingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "WRITABLE_BOOK" : "386"), 1, false, false, "&b&lLore", "&7", "&7*Set the lore of the item.", "&9&lLORE: &f" + StringUtils.nullCheck(itemMap.getCustomLore().toString())), event -> {
                 if (itemMap.getDynamicLores() != null && !itemMap.getDynamicLores().isEmpty()) {
                     animatedLorePane(player, itemMap);
@@ -990,7 +993,7 @@ public class Menu {
             if (ServerUtils.hasSpecificUpdate("1_20") && ItemHandler.isArmor(itemMap.getMaterial().toString())) {
                 String trimPattern = "NONE";
                 if (itemMap.getTrimPattern() != null && !itemMap.getTrimPattern().isEmpty()) {
-                    final Map.Entry<String,String> entry = itemMap.getTrimPattern().entrySet().iterator().next();
+                    final Map.Entry<String, String> entry = itemMap.getTrimPattern().entrySet().iterator().next();
                     trimPattern = entry.getKey() + ":" + entry.getValue();
                 }
                 final String trimEnabled = trimPattern;
@@ -1081,7 +1084,7 @@ public class Menu {
                 String[] placeHolders = ItemJoin.getCore().getLang().newString();
                 placeHolders[3] = itemMap.getConfigName();
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.itemSaved", player, placeHolders);
-                ItemData.getInfo().hardReload(true);
+                PluginData.getInfo().hardReload(true);
                 player.closeInventory();
             }));
             creatingPane.addButton(new Button(fillerPaneBItem), 3);
@@ -1108,7 +1111,7 @@ public class Menu {
                 String[] placeHolders = ItemJoin.getCore().getLang().newString();
                 placeHolders[3] = itemMap.getConfigName();
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.itemSaved", player, placeHolders);
-                ItemData.getInfo().hardReload(true);
+                PluginData.getInfo().hardReload(true);
                 startMenu(player);
             }));
             returnPane.addButton(new Button(fillerPaneBItem), 2);
@@ -1143,7 +1146,7 @@ public class Menu {
                         FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                         dataFile.set("items-Delay", k);
                         ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "items.yml");
-                        ItemData.getInfo().softReload();
+                        PluginData.getInfo().softReload();
                         SchedulerUtils.runLater(2L, () -> itemSettings(player));
                     }));
                 } else if (stage == 2) {
@@ -1153,7 +1156,7 @@ public class Menu {
                         FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                         dataFile.set("Settings.HeldItem-Slot", k);
                         ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                        ItemData.getInfo().softReload();
+                        PluginData.getInfo().softReload();
                         SchedulerUtils.runLater(2L, () -> itemSettings(player));
                     }));
                 } else if (stage == 3) {
@@ -1163,7 +1166,7 @@ public class Menu {
                         FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                         dataFile.set("Clear-Items.Delay-Tick", k);
                         ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                        ItemData.getInfo().softReload();
+                        PluginData.getInfo().softReload();
                         SchedulerUtils.runLater(2L, () -> clearPane(player));
                     }));
                 }
@@ -1195,7 +1198,7 @@ public class Menu {
                     FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                     dataFile.set("Language", "ENGLISH");
                     ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                    ItemData.getInfo().softReload();
+                    PluginData.getInfo().softReload();
                     SchedulerUtils.runLater(2L, () -> languagePane(player));
                 }
             }));
@@ -1207,7 +1210,7 @@ public class Menu {
                     FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                     dataFile.set("Language", "SPANISH");
                     ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                    ItemData.getInfo().softReload();
+                    PluginData.getInfo().softReload();
                     SchedulerUtils.runLater(2L, () -> languagePane(player));
                 }
             }));
@@ -1219,7 +1222,7 @@ public class Menu {
                     FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                     dataFile.set("Language", "RUSSIAN");
                     ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                    ItemData.getInfo().softReload();
+                    PluginData.getInfo().softReload();
                     SchedulerUtils.runLater(2L, () -> languagePane(player));
                 }
             }));
@@ -1231,7 +1234,7 @@ public class Menu {
                     FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                     dataFile.set("Language", "FRENCH");
                     ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                    ItemData.getInfo().softReload();
+                    PluginData.getInfo().softReload();
                     SchedulerUtils.runLater(2L, () -> languagePane(player));
                 }
             }));
@@ -1243,7 +1246,7 @@ public class Menu {
                     FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                     dataFile.set("Language", "TRADITIONAL CHINESE");
                     ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                    ItemData.getInfo().softReload();
+                    PluginData.getInfo().softReload();
                     SchedulerUtils.runLater(2L, () -> languagePane(player));
                 }
             }));
@@ -1255,7 +1258,7 @@ public class Menu {
                     FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                     dataFile.set("Language", "SIMPLIFIED CHINESE");
                     ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                    ItemData.getInfo().softReload();
+                    PluginData.getInfo().softReload();
                     SchedulerUtils.runLater(2L, () -> languagePane(player));
                 }
             }));
@@ -1267,7 +1270,7 @@ public class Menu {
                     FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                     dataFile.set("Language", "PORTUGUESE");
                     ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                    ItemData.getInfo().softReload();
+                    PluginData.getInfo().softReload();
                     SchedulerUtils.runLater(2L, () -> languagePane(player));
                 }
             }));
@@ -1279,7 +1282,7 @@ public class Menu {
                     FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                     dataFile.set("Language", "DUTCH");
                     ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                    ItemData.getInfo().softReload();
+                    PluginData.getInfo().softReload();
                     SchedulerUtils.runLater(2L, () -> languagePane(player));
                 }
             }));
@@ -1291,7 +1294,7 @@ public class Menu {
                     FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                     dataFile.set("Language", "ITALIAN");
                     ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                    ItemData.getInfo().softReload();
+                    PluginData.getInfo().softReload();
                     SchedulerUtils.runLater(2L, () -> languagePane(player));
                 }
             }));
@@ -1335,13 +1338,6 @@ public class Menu {
         activePane.open(player);
     }
 
-
-// =======================================================================================================================================================================================================================================
-
-//  ============================================== //
-//                 Settings Menus      	           //
-//  ============================================== //
-
     /**
      * Opens the Pane for the Player.
      *
@@ -1360,7 +1356,7 @@ public class Menu {
                         FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                         dataFile.set("Database.MySQL", !ItemJoin.getCore().getConfig("config.yml").getBoolean("Database.MySQL"));
                         ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                        ItemData.getInfo().softReload();
+                        PluginData.getInfo().softReload();
                         SchedulerUtils.runLater(2L, () -> databasePane(player));
                     }));
             databasePane.addButton(new Button(fillerPaneBItem), 4);
@@ -1381,7 +1377,7 @@ public class Menu {
                 FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                 dataFile.set("Database.host", ChatColor.stripColor(event.getMessage()));
                 ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                ItemData.getInfo().softReload();
+                PluginData.getInfo().softReload();
                 SchedulerUtils.runLater(2L, () -> databasePane(player));
             }));
             databasePane.addButton(new Button(ItemHandler.getItem("STONE_BUTTON", 1, false, false, "&a&lPort", "&7",
@@ -1402,7 +1398,7 @@ public class Menu {
                     FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                     dataFile.set("Database.port", Integer.parseInt(ChatColor.stripColor(event.getMessage())));
                     ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                    ItemData.getInfo().softReload();
+                    PluginData.getInfo().softReload();
                 } else {
                     String[] placeHolders = ItemJoin.getCore().getLang().newString();
                     placeHolders[16] = ChatColor.stripColor(event.getMessage());
@@ -1429,7 +1425,7 @@ public class Menu {
                 FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                 dataFile.set(databaseString, ChatColor.stripColor(event.getMessage()));
                 ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                ItemData.getInfo().softReload();
+                PluginData.getInfo().softReload();
                 SchedulerUtils.runLater(2L, () -> databasePane(player));
             }));
             databasePane.addButton(new Button(fillerPaneBItem));
@@ -1450,7 +1446,7 @@ public class Menu {
                 FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                 dataFile.set("Database.prefix", ChatColor.stripColor(event.getMessage()));
                 ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                ItemData.getInfo().softReload();
+                PluginData.getInfo().softReload();
                 SchedulerUtils.runLater(2L, () -> databasePane(player));
             }));
             databasePane.addButton(new Button(fillerPaneBItem));
@@ -1471,7 +1467,7 @@ public class Menu {
                 FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                 dataFile.set("Database.user", ChatColor.stripColor(event.getMessage()));
                 ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                ItemData.getInfo().softReload();
+                PluginData.getInfo().softReload();
                 SchedulerUtils.runLater(2L, () -> databasePane(player));
             }));
             databasePane.addButton(new Button(ItemHandler.getItem("REDSTONE", 1, false, false, "&a&lPassword", "&7",
@@ -1491,7 +1487,7 @@ public class Menu {
                 FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                 dataFile.set("Database.pass", ChatColor.stripColor(event.getMessage()));
                 ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                ItemData.getInfo().softReload();
+                PluginData.getInfo().softReload();
                 SchedulerUtils.runLater(2L, () -> databasePane(player));
             }));
             databasePane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the config settings menu."), event -> configSettings(player)));
@@ -1500,6 +1496,13 @@ public class Menu {
         });
         databasePane.open(player);
     }
+
+
+// =======================================================================================================================================================================================================================================
+
+//  ============================================== //
+//                 Settings Menus      	           //
+//  ============================================== //
 
     /**
      * Opens the Pane for the Player.
@@ -1542,7 +1545,7 @@ public class Menu {
                 FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                 dataFile.set(triggerString, triggers.toString().replace("[", "").replace("]", ""));
                 ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                ItemData.getInfo().softReload();
+                PluginData.getInfo().softReload();
                 SchedulerUtils.runLater(2L, () -> triggerPane(player, stage));
             }));
             triggerPane.addButton(new Button(ItemHandler.getItem("STONE_SWORD", 1, StringUtils.containsValue(triggers, "FIRST-WORLD"), false, "&e&l&nFirst World", "&7", triggerOption, "&7player enters each of the defined", "&7worlds for the first time.", "&7",
@@ -1563,7 +1566,7 @@ public class Menu {
                 FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                 dataFile.set(triggerString, triggers.toString().replace("[", "").replace("]", ""));
                 ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                ItemData.getInfo().softReload();
+                PluginData.getInfo().softReload();
                 SchedulerUtils.runLater(2L, () -> triggerPane(player, stage));
             }));
             triggerPane.addButton(new Button(ItemHandler.getItem(ServerUtils.hasSpecificUpdate("1_13") ? "TOTEM_OF_UNDYING" : "322:1", 1, StringUtils.containsValue(triggers, "FIRST-LIFE"), false, "&e&l&nFirst Life", "&7", triggerOption, "&7player logs into the server",
@@ -1584,7 +1587,7 @@ public class Menu {
                 FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                 dataFile.set(triggerString, triggers.toString().replace("[", "").replace("]", ""));
                 ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                ItemData.getInfo().softReload();
+                PluginData.getInfo().softReload();
                 SchedulerUtils.runLater(2L, () -> triggerPane(player, stage));
             }));
             triggerPane.addButton(new Button(fillerPaneBItem), 3);
@@ -1610,7 +1613,7 @@ public class Menu {
                 FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                 dataFile.set(triggerString, triggers.toString().replace("[", "").replace("]", ""));
                 ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                ItemData.getInfo().softReload();
+                PluginData.getInfo().softReload();
                 SchedulerUtils.runLater(2L, () -> triggerPane(player, stage));
             }));
             triggerPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "OAK_SIGN" : "323"), 1, StringUtils.containsValue(triggers, "JOIN"), false, "&e&l&nJoin", "&7", triggerOption, "&7player logs into the server.",
@@ -1631,7 +1634,7 @@ public class Menu {
                 FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                 dataFile.set(triggerString, triggers.toString().replace("[", "").replace("]", ""));
                 ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                ItemData.getInfo().softReload();
+                PluginData.getInfo().softReload();
                 SchedulerUtils.runLater(2L, () -> triggerPane(player, stage));
             }));
             triggerPane.addButton(new Button(ItemHandler.getItem("DIAMOND", 1, StringUtils.containsValue(triggers, "RESPAWN"), false, "&e&l&nRespawn", "&7", triggerOption, "&7player respawns from a death event.", "&9&lENABLED: &a" +
@@ -1652,7 +1655,7 @@ public class Menu {
                 FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                 dataFile.set(triggerString, triggers.toString().replace("[", "").replace("]", ""));
                 ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                ItemData.getInfo().softReload();
+                PluginData.getInfo().softReload();
                 SchedulerUtils.runLater(2L, () -> triggerPane(player, stage));
             }));
             triggerPane.addButton(new Button(ItemHandler.getItem("STONE_BUTTON", 1, StringUtils.containsValue(triggers, "WORLD-SWITCH"), false, "&e&l&nWorld Switch", "&7", triggerOption, "&7player teleports to one", "&7of the specified worlds.",
@@ -1673,7 +1676,7 @@ public class Menu {
                 FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                 dataFile.set(triggerString, triggers.toString().replace("[", "").replace("]", ""));
                 ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                ItemData.getInfo().softReload();
+                PluginData.getInfo().softReload();
                 SchedulerUtils.runLater(2L, () -> triggerPane(player, stage));
             }));
             triggerPane.addButton(new Button(ItemHandler.getItem("LEVER", 1, StringUtils.containsValue(triggers, "GAMEMODE-SWITCH"), false, "&e&l&nGamemode Switch", "&7", triggerOption, "&7player changes gamemodes to any", "&7of the defined limit-modes.",
@@ -1694,7 +1697,7 @@ public class Menu {
                 FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                 dataFile.set(triggerString, triggers.toString().replace("[", "").replace("]", ""));
                 ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                ItemData.getInfo().softReload();
+                PluginData.getInfo().softReload();
                 SchedulerUtils.runLater(2L, () -> triggerPane(player, stage));
             }));
             triggerPane.addButton(new Button(ItemHandler.getItem("MINECART", 1, StringUtils.containsValue(triggers, "REGION-ENTER"), false, "&e&l&nRegion Enter", "&7", triggerOption, "&7player enters any of the enabled-regions.", "&9&lENABLED: &a" +
@@ -1717,7 +1720,7 @@ public class Menu {
                 FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                 dataFile.set(triggerString, triggers.toString().replace("[", "").replace("]", ""));
                 ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                ItemData.getInfo().softReload();
+                PluginData.getInfo().softReload();
                 SchedulerUtils.runLater(2L, () -> triggerPane(player, stage));
             }));
             triggerPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "HOPPER_MINECRAFT" : "408"), 1, StringUtils.containsValue(triggers, "REGION-LEAVE"), false, "&e&l&nRegion Leave", "&7", triggerOption.replace("Gives", "Removes"), "&7player leaves any of the enabled-regions.", "&9&lENABLED: &a" +
@@ -1740,7 +1743,7 @@ public class Menu {
                 FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                 dataFile.set(triggerString, triggers.toString().replace("[", "").replace("]", ""));
                 ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                ItemData.getInfo().softReload();
+                PluginData.getInfo().softReload();
                 SchedulerUtils.runLater(2L, () -> triggerPane(player, stage));
             }));
             triggerPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "TNT_MINECART" : "407"), 1, StringUtils.containsValue(triggers, "REGION-ACCESS"), false, "&e&l&nRegion Access", "&7", triggerOption, "&7player enters any of the enabled-regions", "&7and removes the item when leaving", "&7any of the enabled-regions.", "&9&lENABLED: &a" +
@@ -1763,7 +1766,7 @@ public class Menu {
                 FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                 dataFile.set(triggerString, triggers.toString().replace("[", "").replace("]", ""));
                 ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                ItemData.getInfo().softReload();
+                PluginData.getInfo().softReload();
                 SchedulerUtils.runLater(2L, () -> triggerPane(player, stage));
             }));
             triggerPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CHEST_MINECART" : "342"), 1, StringUtils.containsValue(triggers, "REGION-ENGRESS"), false, "&e&l&nRegion Engress", "&7", triggerOption.replace("Gives", "Removes"), "&7player enters any of the enabled-regions", "&7and gives the item when leaving", "&7any of the enabled-regions.", "&9&lENABLED: &a" +
@@ -1786,7 +1789,7 @@ public class Menu {
                 FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                 dataFile.set(triggerString, triggers.toString().replace("[", "").replace("]", ""));
                 ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                ItemData.getInfo().softReload();
+                PluginData.getInfo().softReload();
                 SchedulerUtils.runLater(2L, () -> triggerPane(player, stage));
             }));
             if (stage == 4) {
@@ -1842,7 +1845,7 @@ public class Menu {
                         FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                         dataFile.set("Prevent.Bypass", bypassList.toString().replace("[", "").replace("]", ""));
                         ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                        ItemData.getInfo().softReload();
+                        PluginData.getInfo().softReload();
                         SchedulerUtils.runLater(2L, () -> preventPane(player));
                     }));
             preventPane.addButton(new Button(fillerPaneBItem));
@@ -1866,7 +1869,7 @@ public class Menu {
                         FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                         dataFile.set("Prevent.Bypass", bypassList.toString().replace("[", "").replace("]", ""));
                         ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                        ItemData.getInfo().softReload();
+                        PluginData.getInfo().softReload();
                         SchedulerUtils.runLater(2L, () -> preventPane(player));
                     }));
             preventPane.addButton(new Button(fillerPaneBItem), 3);
@@ -1926,7 +1929,7 @@ public class Menu {
                                 FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                                 dataFile.set("Clear-Items.Type", "ALL");
                                 ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                                ItemData.getInfo().softReload();
+                                PluginData.getInfo().softReload();
                                 SchedulerUtils.runLater(2L, () -> clearPane(player));
                             }
                         }));
@@ -1939,7 +1942,7 @@ public class Menu {
                                 FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                                 dataFile.set("Clear-Items.Type", "VANILLA");
                                 ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                                ItemData.getInfo().softReload();
+                                PluginData.getInfo().softReload();
                                 SchedulerUtils.runLater(2L, () -> clearPane(player));
                             }
                         }));
@@ -1952,7 +1955,7 @@ public class Menu {
                                 FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                                 dataFile.set("Clear-Items.Type", "ITEMJOIN");
                                 ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                                ItemData.getInfo().softReload();
+                                PluginData.getInfo().softReload();
                                 SchedulerUtils.runLater(2L, () -> clearPane(player));
                             }
                         }));
@@ -2024,7 +2027,7 @@ public class Menu {
                     for (String value : blacklist.split(",")) {
                         String valType = (StringUtils.containsIgnoreCase(value, "{id") ? "id" : (StringUtils.containsIgnoreCase(value, "{slot") ? "slot" : (StringUtils.containsIgnoreCase(value, "{name") ? "name" : "")));
                         String inputResult = org.apache.commons.lang.StringUtils.substringBetween(value, "{" + valType + ":", "}");
-                        if (valType.equalsIgnoreCase("id") && ItemHandler.getMaterial(inputResult.trim(), null) != null) {
+                        if (valType.equalsIgnoreCase("id") && ItemHandler.getMaterial(inputResult.trim(), null) != Material.AIR) {
                             materials.add(inputResult.trim().toUpperCase());
                         } else if (valType.equalsIgnoreCase("slot")) {
                             slots.add(inputResult.trim().toUpperCase());
@@ -2033,7 +2036,8 @@ public class Menu {
                         }
                     }
                 }
-            } catch (Exception ignored) { }
+            } catch (Exception ignored) {
+            }
             blacklistPane.addButton(new Button(fillerPaneBItem), 3);
             blacklistPane.addButton(new Button(ItemHandler.getItem("DIAMOND_SWORD", 1, false, false,
                     "&b&l&nMaterials", "&7", "&7*The material to be blacklisted", "&7from being cleared.", "&7",
@@ -2072,14 +2076,15 @@ public class Menu {
                     for (String value : blacklist.split(",")) {
                         String valType = (StringUtils.containsIgnoreCase(value, "{id") ? "id" : (StringUtils.containsIgnoreCase(value, "{slot") ? "slot" : (StringUtils.containsIgnoreCase(value, "{name") ? "name" : "")));
                         String inputResult = org.apache.commons.lang.StringUtils.substringBetween(value, "{" + valType + ":", "}");
-                        if (valType.equalsIgnoreCase("id") && ItemHandler.getMaterial(inputResult.trim(), null) != null) {
+                        if (valType.equalsIgnoreCase("id") && ItemHandler.getMaterial(inputResult.trim(), null) != Material.AIR) {
                             materials.add(inputResult.trim().toUpperCase());
                         } else if (!valType.equalsIgnoreCase("id") && !value.isEmpty()) {
                             saveList.add(value.trim());
                         }
                     }
                 }
-            } catch (Exception ignored) { }
+            } catch (Exception ignored) {
+            }
             materialPane.addButton(new Button(ItemHandler.getItem("STICK", 1, true, false, "&b&lBukkit Material", "&7", "&7*If you know the name", "&7of the BUKKIT material type", "&7simply click and type it."), event -> {
                 player.closeInventory();
                 String[] placeHolders = ItemJoin.getCore().getLang().newString();
@@ -2088,7 +2093,7 @@ public class Menu {
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
             }, event -> {
-                if (ItemHandler.getMaterial(ChatColor.stripColor(event.getMessage()), null) != null) {
+                if (ItemHandler.getMaterial(ChatColor.stripColor(event.getMessage()), null) != Material.AIR) {
                     if (!StringUtils.containsValue(materials, ChatColor.stripColor(event.getMessage()))) {
                         materials.add(ChatColor.stripColor(event.getMessage()).toUpperCase());
                     } else {
@@ -2104,7 +2109,7 @@ public class Menu {
                     FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                     dataFile.set("Clear-Items.Blacklist", StringUtils.replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", ""));
                     ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                    ItemData.getInfo().softReload();
+                    PluginData.getInfo().softReload();
                     SchedulerUtils.runLater(2L, () -> blacklistMatPane(player));
                 } else {
                     String[] placeHolders = ItemJoin.getCore().getLang().newString();
@@ -2130,7 +2135,7 @@ public class Menu {
                         FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                         dataFile.set("Clear-Items.Blacklist", StringUtils.replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", ""));
                         ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                        ItemData.getInfo().softReload();
+                        PluginData.getInfo().softReload();
                         SchedulerUtils.runLater(2L, () -> blacklistMatPane(player));
                     }));
                 }
@@ -2165,7 +2170,8 @@ public class Menu {
                         }
                     }
                 }
-            } catch (Exception ignored) { }
+            } catch (Exception ignored) {
+            }
             craftingPane.addButton(new Button(fillerPaneGItem), 3);
             craftingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CRAFTING_TABLE" : "58"), 1, StringUtils.containsValue(slots, "CRAFTING[1]"), false, "&9&lSlot: &7&lCRAFTING&a&l[1]", "&7", "&7*Click to prevent this slot", "&7from having its items cleared.",
                     (StringUtils.containsValue(slots, "CRAFTING[1]") ? "&9&lENABLED: &aTRUE" : "")), event -> {
@@ -2181,7 +2187,7 @@ public class Menu {
                 FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                 dataFile.set("Clear-Items.Blacklist", StringUtils.replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", ""));
                 ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                ItemData.getInfo().softReload();
+                PluginData.getInfo().softReload();
                 SchedulerUtils.runLater(2L, () -> blacklistSlotPane(player));
             }));
             craftingPane.addButton(new Button(fillerPaneGItem));
@@ -2199,7 +2205,7 @@ public class Menu {
                 FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                 dataFile.set("Clear-Items.Blacklist", StringUtils.replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", ""));
                 ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                ItemData.getInfo().softReload();
+                PluginData.getInfo().softReload();
                 SchedulerUtils.runLater(2L, () -> blacklistSlotPane(player));
             }));
             craftingPane.addButton(new Button(fillerPaneGItem), 10);
@@ -2217,7 +2223,7 @@ public class Menu {
                 FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                 dataFile.set("Clear-Items.Blacklist", StringUtils.replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", ""));
                 ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                ItemData.getInfo().softReload();
+                PluginData.getInfo().softReload();
                 SchedulerUtils.runLater(2L, () -> blacklistSlotPane(player));
             }));
             craftingPane.addButton(new Button(fillerPaneGItem), 4);
@@ -2235,7 +2241,7 @@ public class Menu {
                 FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                 dataFile.set("Clear-Items.Blacklist", StringUtils.replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", ""));
                 ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                ItemData.getInfo().softReload();
+                PluginData.getInfo().softReload();
                 SchedulerUtils.runLater(2L, () -> blacklistSlotPane(player));
             }));
             craftingPane.addButton(new Button(fillerPaneGItem));
@@ -2253,7 +2259,7 @@ public class Menu {
                 FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                 dataFile.set("Clear-Items.Blacklist", StringUtils.replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", ""));
                 ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                ItemData.getInfo().softReload();
+                PluginData.getInfo().softReload();
                 SchedulerUtils.runLater(2L, () -> blacklistSlotPane(player));
             }));
             craftingPane.addButton(new Button(fillerPaneGItem), 3);
@@ -2277,7 +2283,7 @@ public class Menu {
                 FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                 dataFile.set("Clear-Items.Blacklist", StringUtils.replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", ""));
                 ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                ItemData.getInfo().softReload();
+                PluginData.getInfo().softReload();
                 SchedulerUtils.runLater(2L, () -> blacklistSlotPane(player));
             }));
             slotPane.addButton(new Button(ItemHandler.getItem("LEATHER_CHESTPLATE", 1, StringUtils.containsValue(slots, "CHESTPLATE"), false, "&9&lSlot: &a&lCHESTPLATE", "&7", "&7*Click to prevent this slot", "&7from having its items cleared.",
@@ -2294,7 +2300,7 @@ public class Menu {
                 FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                 dataFile.set("Clear-Items.Blacklist", StringUtils.replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", ""));
                 ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                ItemData.getInfo().softReload();
+                PluginData.getInfo().softReload();
                 SchedulerUtils.runLater(2L, () -> blacklistSlotPane(player));
             }));
             slotPane.addButton(new Button(ItemHandler.getItem("LEATHER_LEGGINGS", 1, StringUtils.containsValue(slots, "LEGGINGS"), false, "&9&lSlot: &a&lLEGGINGS", "&7", "&7*Click to prevent this slot", "&7from having its items cleared.",
@@ -2311,7 +2317,7 @@ public class Menu {
                 FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                 dataFile.set("Clear-Items.Blacklist", StringUtils.replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", ""));
                 ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                ItemData.getInfo().softReload();
+                PluginData.getInfo().softReload();
                 SchedulerUtils.runLater(2L, () -> blacklistSlotPane(player));
             }));
             slotPane.addButton(new Button(ItemHandler.getItem("LEATHER_BOOTS", 1, StringUtils.containsValue(slots, "BOOTS"), false, "&9&lSlot: &a&lBOOTS", "&7", "&7*Click to prevent this slot", "&7from having its items cleared.",
@@ -2328,7 +2334,7 @@ public class Menu {
                 FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                 dataFile.set("Clear-Items.Blacklist", StringUtils.replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", ""));
                 ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                ItemData.getInfo().softReload();
+                PluginData.getInfo().softReload();
                 SchedulerUtils.runLater(2L, () -> blacklistSlotPane(player));
             }));
             if (ServerUtils.hasSpecificUpdate("1_9")) {
@@ -2346,7 +2352,7 @@ public class Menu {
                     FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                     dataFile.set("Clear-Items.Blacklist", StringUtils.replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", ""));
                     ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                    ItemData.getInfo().softReload();
+                    PluginData.getInfo().softReload();
                     SchedulerUtils.runLater(2L, () -> blacklistSlotPane(player));
                 }));
             } else {
@@ -2369,7 +2375,7 @@ public class Menu {
                     FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                     dataFile.set("Clear-Items.Blacklist", StringUtils.replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", ""));
                     ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                    ItemData.getInfo().softReload();
+                    PluginData.getInfo().softReload();
                     SchedulerUtils.runLater(2L, () -> blacklistSlotPane(player));
                 }));
             }
@@ -2393,7 +2399,7 @@ public class Menu {
                     FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                     dataFile.set("Clear-Items.Blacklist", StringUtils.replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", ""));
                     ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                    ItemData.getInfo().softReload();
+                    PluginData.getInfo().softReload();
                     SchedulerUtils.runLater(2L, () -> blacklistSlotPane(player));
                 }));
             }
@@ -2428,7 +2434,8 @@ public class Menu {
                         }
                     }
                 }
-            } catch (Exception ignored) { }
+            } catch (Exception ignored) {
+            }
             namePane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, true, false, "&b&lAdd Name", "&7", "&7*Add an items display", "&7name to be blacklisted", "&7simply click and type it.", "&7",
                     "&c&l&nNOTE:&7 Do NOT include any", "&7color codes as these are excluded."), event -> {
                 player.closeInventory();
@@ -2453,7 +2460,7 @@ public class Menu {
                 FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                 dataFile.set("Clear-Items.Blacklist", StringUtils.replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", ""));
                 ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                ItemData.getInfo().softReload();
+                PluginData.getInfo().softReload();
                 SchedulerUtils.runLater(2L, () -> blacklistNamePane(player));
             }));
             for (String itemName : names) {
@@ -2467,7 +2474,7 @@ public class Menu {
                     FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                     dataFile.set("Clear-Items.Blacklist", StringUtils.replaceLast(saveList.toString().replaceFirst("\\[", ""), "]", ""));
                     ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                    ItemData.getInfo().softReload();
+                    PluginData.getInfo().softReload();
                     SchedulerUtils.runLater(2L, () -> blacklistNamePane(player));
                 }));
             }
@@ -2512,7 +2519,7 @@ public class Menu {
                         FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                         dataFile.set("Clear-Items.Options", optionList.toString().replace("[", "").replace("]", ""));
                         ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                        ItemData.getInfo().softReload();
+                        PluginData.getInfo().softReload();
                         SchedulerUtils.runLater(2L, () -> optionPane(player));
                     }));
             optionPane.addButton(new Button(fillerPaneBItem));
@@ -2536,7 +2543,7 @@ public class Menu {
                         FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                         dataFile.set("Clear-Items.Options", optionList.toString().replace("[", "").replace("]", ""));
                         ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                        ItemData.getInfo().softReload();
+                        PluginData.getInfo().softReload();
                         SchedulerUtils.runLater(2L, () -> optionPane(player));
                     }));
             optionPane.addButton(new Button(fillerPaneBItem));
@@ -2560,7 +2567,7 @@ public class Menu {
                         FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                         dataFile.set("Clear-Items.Options", optionList.toString().replace("[", "").replace("]", ""));
                         ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                        ItemData.getInfo().softReload();
+                        PluginData.getInfo().softReload();
                         SchedulerUtils.runLater(2L, () -> optionPane(player));
                     }));
             optionPane.addButton(new Button(fillerPaneBItem));
@@ -2586,7 +2593,7 @@ public class Menu {
                             FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                             dataFile.set("Clear-Items.Options", optionList.toString().replace("[", "").replace("]", ""));
                             ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                            ItemData.getInfo().softReload();
+                            PluginData.getInfo().softReload();
                             SchedulerUtils.runLater(2L, () -> optionPane(player));
                         }
                     }));
@@ -2611,7 +2618,7 @@ public class Menu {
                         FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                         dataFile.set("Clear-Items.Options", optionList.toString().replace("[", "").replace("]", ""));
                         ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                        ItemData.getInfo().softReload();
+                        PluginData.getInfo().softReload();
                         SchedulerUtils.runLater(2L, () -> optionPane(player));
                     }));
             optionPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the clear settings."), event -> clearPane(player)));
@@ -2664,7 +2671,7 @@ public class Menu {
                     dataFile.set(section, true);
                 }
                 ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                ItemData.getInfo().softReload();
+                PluginData.getInfo().softReload();
                 SchedulerUtils.runLater(2L, () -> worldPane(player, section));
             }));
             for (World world : Bukkit.getServer().getWorlds()) {
@@ -2700,7 +2707,7 @@ public class Menu {
                         dataFile.set(section, worldList.substring(0, worldList.length() - 2));
                     }
                     ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                    ItemData.getInfo().softReload();
+                    PluginData.getInfo().softReload();
                     SchedulerUtils.runLater(2L, () -> worldPane(player, section));
                 }));
             }
@@ -2746,7 +2753,7 @@ public class Menu {
                     dataFile.set("items-Overwrite", true);
                 }
                 ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "items.yml");
-                ItemData.getInfo().softReload();
+                PluginData.getInfo().softReload();
                 SchedulerUtils.runLater(2L, () -> overwritePane(player));
             }));
             for (World world : Bukkit.getServer().getWorlds()) {
@@ -2782,7 +2789,7 @@ public class Menu {
                         dataFile.set("items-Overwrite", worldList.substring(0, worldList.length() - 2));
                     }
                     ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "items.yml");
-                    ItemData.getInfo().softReload();
+                    PluginData.getInfo().softReload();
                     SchedulerUtils.runLater(2L, () -> overwritePane(player));
                 }));
             }
@@ -2833,7 +2840,7 @@ public class Menu {
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
             }, event -> {
-                if (ItemHandler.getMaterial(StringUtils.translateLayout(ChatColor.stripColor(event.getMessage()), player), null) != null) {
+                if (ItemHandler.getMaterial(StringUtils.translateLayout(ChatColor.stripColor(event.getMessage()), player), null) != Material.AIR) {
                     if (stage == 2) {
                         itemMap.setItemCost(StringUtils.translateLayout(ChatColor.stripColor(event.getMessage()), player).toUpperCase());
                     } else if (stage != 3) {
@@ -2948,12 +2955,6 @@ public class Menu {
         });
         switchPane.open(player);
     }
-
-// =======================================================================================================================================================================================================================================
-
-//  ============================================== //
-//             Item Definition Menus      	       //
-//  ============================================== //
 
     /**
      * Opens the Pane for the Player.
@@ -3277,6 +3278,12 @@ public class Menu {
             slotPane.open(player);
         }
     }
+
+// =======================================================================================================================================================================================================================================
+
+//  ============================================== //
+//             Item Definition Menus      	       //
+//  ============================================== //
 
     /**
      * Opens the Pane for the Player.
@@ -3695,10 +3702,6 @@ public class Menu {
         return commandReturn;
     }
 
-//  ============================================== //
-//               ItemCommand Menus        	       //
-//  ============================================== //
-
     /**
      * Modifies an existing ItemCommand or adds the new ItemCommand to the ItemMap.
      *
@@ -3719,6 +3722,10 @@ public class Menu {
         }
         itemMap.setCommands(commands);
     }
+
+//  ============================================== //
+//               ItemCommand Menus        	       //
+//  ============================================== //
 
     /**
      * Gets the number of commands for the action type.
@@ -4300,7 +4307,7 @@ public class Menu {
                     FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                     dataFile.set("Active-Commands.commands-sequence", "SEQUENTIAL");
                     ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                    ItemData.getInfo().softReload();
+                    PluginData.getInfo().softReload();
                     SchedulerUtils.runLater(2L, () -> activeCommands(player));
                 } else {
                     itemMap.setCommandSequence(CommandSequence.SEQUENTIAL);
@@ -4314,7 +4321,7 @@ public class Menu {
                     FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                     dataFile.set("Active-Commands.commands-sequence", "RANDOM_SINGLE");
                     ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                    ItemData.getInfo().softReload();
+                    PluginData.getInfo().softReload();
                     SchedulerUtils.runLater(2L, () -> activeCommands(player));
                 } else {
                     itemMap.setCommandSequence(CommandSequence.RANDOM_SINGLE);
@@ -4328,7 +4335,7 @@ public class Menu {
                     FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                     dataFile.set("Active-Commands.commands-sequence", "RANDOM_LIST");
                     ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                    ItemData.getInfo().softReload();
+                    PluginData.getInfo().softReload();
                     SchedulerUtils.runLater(2L, () -> activeCommands(player));
                 } else {
                     itemMap.setCommandSequence(CommandSequence.RANDOM_LIST);
@@ -4342,7 +4349,7 @@ public class Menu {
                     FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                     dataFile.set("Active-Commands.commands-sequence", "RANDOM");
                     ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                    ItemData.getInfo().softReload();
+                    PluginData.getInfo().softReload();
                     SchedulerUtils.runLater(2L, () -> activeCommands(player));
                 } else {
                     itemMap.setCommandSequence(CommandSequence.RANDOM);
@@ -4666,23 +4673,21 @@ public class Menu {
         Interface enchantPane = new Interface(true, 6, exitButton, GUIName, player);
         SchedulerUtils.runAsync(() -> {
             enchantPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> creatingPane(player, itemMap)));
-            for (Enchantment enchant : (ServerUtils.hasPreciseUpdate("1_20_3") ? ImmutableList.copyOf(Registry.ENCHANTMENT.iterator()) : LegacyAPI.getEnchants())) {
-                if (ItemHandler.getEnchantName(enchant) != null) {
-                    boolean containsKey = itemMap.getEnchantments() != null && itemMap.getEnchantments().containsKey(ItemHandler.getEnchantName(enchant).toUpperCase());
-                    ItemStack enchantItem = ItemHandler.getItem((containsKey ? "ENCHANTED_BOOK" : "BOOK"), 1, false, false, "&f" + ItemHandler.getEnchantName(enchant).toUpperCase(), "&7",
-                            "&7*Click to add this enchantment", "&7to the custom item.", "&7", "&9&lENABLED: &a" + (containsKey + "").toUpperCase(), (containsKey ? "&7" : ""),
-                            (containsKey ? "&9&lLEVEL: &a" + itemMap.getEnchantments().get(ItemHandler.getEnchantName(enchant).toUpperCase()) : ""));
-                    enchantPane.addButton(new Button(enchantItem, event -> {
-                        if (containsKey) {
-                            Map<String, Integer> enchantments = itemMap.getEnchantments();
-                            enchantments.remove(ItemHandler.getEnchantName(enchant).toUpperCase());
-                            itemMap.setEnchantments(enchantments);
-                            enchantPane(player, itemMap);
-                        } else {
-                            enchantLevelPane(player, itemMap, enchant);
-                        }
-                    }));
-                }
+            for (Enchantment enchant : ItemHandler.getEnchants()) {
+                boolean containsKey = itemMap.getEnchantments() != null && itemMap.getEnchantments().containsKey(ItemHandler.getEnchantName(enchant).toUpperCase());
+                ItemStack enchantItem = ItemHandler.getItem((containsKey ? "ENCHANTED_BOOK" : "BOOK"), 1, false, false, "&f" + ItemHandler.getEnchantName(enchant).toUpperCase(), "&7",
+                        "&7*Click to add this enchantment", "&7to the custom item.", "&7", "&9&lENABLED: &a" + (containsKey + "").toUpperCase(), (containsKey ? "&7" : ""),
+                        (containsKey ? "&9&lLEVEL: &a" + itemMap.getEnchantments().get(ItemHandler.getEnchantName(enchant).toUpperCase()) : ""));
+                enchantPane.addButton(new Button(enchantItem, event -> {
+                    if (containsKey) {
+                        Map<String, Integer> enchantments = itemMap.getEnchantments();
+                        enchantments.remove(ItemHandler.getEnchantName(enchant).toUpperCase());
+                        itemMap.setEnchantments(enchantments);
+                        enchantPane(player, itemMap);
+                    } else {
+                        enchantLevelPane(player, itemMap, enchant);
+                    }
+                }));
             }
         });
         enchantPane.open(player);
@@ -5049,8 +5054,6 @@ public class Menu {
         flagPane.open(player);
     }
 
-//  ============================================================================================================================================================================================================================================================
-
     /**
      * Sets the ItemFlags to the ItemMap.
      *
@@ -5180,6 +5183,8 @@ public class Menu {
         }
         itemMap.setItemFlags(itemflags);
     }
+
+//  ============================================================================================================================================================================================================================================================
 
     /**
      * Opens the Pane for the Player.
@@ -5420,7 +5425,7 @@ public class Menu {
                     FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                     dataFile.set("Active-Commands.enabled-worlds", (listWorlds.isEmpty() ? "DISABLED" : "GLOBAL"));
                     ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                    ItemData.getInfo().softReload();
+                    PluginData.getInfo().softReload();
                     SchedulerUtils.runLater(2L, () -> worldPane(player, itemMap, stage));
                 } else if (stage == 0) {
                     itemMap.setDisabledWorlds(listWorlds);
@@ -5462,7 +5467,7 @@ public class Menu {
                         FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                         dataFile.set("Active-Commands.enabled-worlds", worldList.toString());
                         ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                        ItemData.getInfo().softReload();
+                        PluginData.getInfo().softReload();
                         SchedulerUtils.runLater(2L, () -> worldPane(player, itemMap, stage));
                     } else if (stage == 0) {
                         itemMap.setDisabledWorlds(listWorlds);
@@ -5690,7 +5695,7 @@ public class Menu {
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
             }, event -> {
-                if (ItemHandler.getMaterial(ChatColor.stripColor(event.getMessage()), null) != null) {
+                if (ItemHandler.getMaterial(ChatColor.stripColor(event.getMessage()), null) != Material.AIR) {
                     if (isNew) {
                         durationMaterialPane(player, itemMap, position, true, ChatColor.stripColor(event.getMessage()).toUpperCase());
                     } else {
@@ -5824,10 +5829,6 @@ public class Menu {
         durationPane.open(player);
     }
 
-//  ============================================== //
-//           Animation Definition Menus            //
-//  ============================================== //
-
     /**
      * Opens the Pane for the Player.
      * This Pane is for modifying animated material.
@@ -5857,6 +5858,10 @@ public class Menu {
         });
         modifyMaterialPane.open(player);
     }
+
+//  ============================================== //
+//           Animation Definition Menus            //
+//  ============================================== //
 
     /**
      * Opens the Pane for the Player.
@@ -6568,8 +6573,6 @@ public class Menu {
         usePane.open(player);
     }
 
-//  ===========================================================================================================================================================================================================================================================
-
     /**
      * Opens the Pane for the Player.
      * This Pane is for setting the drop chances.
@@ -6599,6 +6602,8 @@ public class Menu {
         });
         dropsPane.open(player);
     }
+
+//  ===========================================================================================================================================================================================================================================================
 
     /**
      * Opens the Pane for the Player.
@@ -6664,7 +6669,7 @@ public class Menu {
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
             }, event -> {
-                if (ItemHandler.getMaterial(ChatColor.stripColor(event.getMessage()), null) != null) {
+                if (ItemHandler.getMaterial(ChatColor.stripColor(event.getMessage()), null) != Material.AIR) {
                     String[] placeHolders = ItemJoin.getCore().getLang().newString();
                     placeHolders[16] = "BUKKIT MATERIAL";
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
@@ -7298,7 +7303,7 @@ public class Menu {
                     FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                     dataFile.set("Active-Commands.commands", commands);
                     ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                    ItemData.getInfo().softReload();
+                    PluginData.getInfo().softReload();
                     SchedulerUtils.runLater(2L, () -> altCommandPane(player, itemMap, stage));
                 } else {
                     final List<String> toggleCommands = itemMap.getToggleCommands();
@@ -7349,7 +7354,7 @@ public class Menu {
                     FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                     dataFile.set("Active-Commands.commands", commands);
                     ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                    ItemData.getInfo().softReload();
+                    PluginData.getInfo().softReload();
                     SchedulerUtils.runLater(2L, () -> altCommandPane(player, itemMap, stage));
                 } else {
                     final List<String> toggleCommands = itemMap.getToggleCommands();
@@ -7371,7 +7376,7 @@ public class Menu {
                     FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                     dataFile.set("Active-Commands.commands", commands);
                     ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
-                    ItemData.getInfo().softReload();
+                    PluginData.getInfo().softReload();
                     SchedulerUtils.runLater(2L, () -> altCommandPane(player, itemMap, stage));
                 } else {
                     final List<String> toggleCommands = itemMap.getToggleCommands();
@@ -7491,7 +7496,7 @@ public class Menu {
             trimPatternPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the trim material menu."), event -> trimPane(player, itemMap)));
             for (org.bukkit.inventory.meta.trim.TrimPattern pattern : Objects.requireNonNull(ItemHandler.getTrimPatterns())) {
                 trimPatternPane.addButton(new Button(ItemHandler.getItem(ItemHandler.TrimPattern.valueOf(pattern.getKey().toString().replace("minecraft:", "").toUpperCase()).getMaterial().name(), 1, false, false, "&f" + org.apache.commons.lang.StringUtils.capitalize(pattern.getKey().toString().replace("minecraft:", "")), "&7", "&7*Click to set this as", "&7the armor trim pattern."), event -> {
-                    final Map <String, String> trimPattern = new HashMap<>();
+                    final Map<String, String> trimPattern = new HashMap<>();
                     trimPattern.put(material.getKey().toString().replace("minecraft:", "").toUpperCase(), pattern.getKey().toString().replace("minecraft:", "").toUpperCase());
                     itemMap.setTrimPattern(trimPattern);
                     creatingPane(player, itemMap);
@@ -8228,10 +8233,6 @@ public class Menu {
         linePane.open(player);
     }
 
-//  ============================================== //
-//                Book Pages Menus      	       //
-//  ============================================== //
-
     /**
      * Opens the Pane for the Player.
      * This Pane is for modifying item attributes.
@@ -8280,6 +8281,10 @@ public class Menu {
         });
         attributePane.open(player);
     }
+
+//  ============================================== //
+//                Book Pages Menus      	       //
+//  ============================================== //
 
     /**
      * Opens the Pane for the Player.
@@ -8552,8 +8557,6 @@ public class Menu {
         otherPane.open(player);
     }
 
-//  ==========================================================================================================================================================================================================================================================
-
     /**
      * Gets the Header ItemStack.
      *
@@ -8683,7 +8686,7 @@ public class Menu {
             item = ItemHandler.getItem(itemMap.getMaterial().toString() + ((itemMap.getDataValue() != null && itemMap.getDataValue() != 0) ? ":" + itemMap.getDataValue() : ""), 1, false, true, "&7*&6&l&nItem Information", "&7", "&9&lNode: &a" + itemMap.getConfigName(), "&9&lMaterial: &a"
                             + itemMap.getMaterial().toString() + ((itemMap.getDataValue() != null && itemMap.getDataValue() != 0) ? ":" + itemMap.getDataValue() : ""),
                     (itemMap.getMultipleSlots() != null && !itemMap.getMultipleSlots().isEmpty() ? "&9&lSlot(s): &a" + slotList : "&9&lSlot: &a" + itemMap.getSlot().toUpperCase()), (itemMap.getCount(player) != 1 && itemMap.getCount(player) != 0) ? "&9&lCount: &a" + itemMap.getCount(player) : "",
-                    ((!StringUtils.nullCheck(itemMap.getCustomName()).equals("NONE") && (itemMaterial != null && !itemMaterial.equalsIgnoreCase(itemMap.getCustomName()))) ? "&9&lName: &a" + itemMap.getCustomName() : ""), (!Objects.equals(StringUtils.nullCheck(itemMap.getCustomLore().toString()), "NONE") ? "&9&lLore: &a" + (StringUtils.nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",").length() > 40 ? StringUtils.nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",").substring(0, 40) : StringUtils.nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",")) : ""),
+                    ((!StringUtils.nullCheck(itemMap.getCustomName()).equals("NONE") && (!itemMaterial.equalsIgnoreCase(itemMap.getCustomName()))) ? "&9&lName: &a" + itemMap.getCustomName() : ""), (!Objects.equals(StringUtils.nullCheck(itemMap.getCustomLore().toString()), "NONE") ? "&9&lLore: &a" + (StringUtils.nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",").length() > 40 ? StringUtils.nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",").substring(0, 40) : StringUtils.nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",")) : ""),
                     (!StringUtils.nullCheck(itemMap.getDurability() + "&7").equals("NONE") ? "&9&lDurability: &a" + itemMap.getDurability() : ""), (!Objects.equals(StringUtils.nullCheck(itemMap.getData() + "&7"), "NONE") ? "&9&lTexture Data: &a" + itemMap.getData() : ""), (useCommands ? "&9&lCommands: &aYES" : ""), (useToggle ? "&9&lToggleable: &aYES" : ""),
                     (!StringUtils.nullCheck(itemMap.getItemCost()).equals("NONE") ? "&9&lCommands-Item: &a" + itemMap.getItemCost() : ""), (!Objects.equals(StringUtils.nullCheck(itemMap.getCommandCost() + "&7"), "NONE") ? "&9&lCommands-Cost: &a" + itemMap.getCommandCost() : ""),
                     (!StringUtils.nullCheck(itemMap.getCommandReceive() + "&7").equals("NONE") ? "&9&lCommands-Receive: &a" + itemMap.getCommandReceive() : ""),
@@ -8716,7 +8719,7 @@ public class Menu {
         }
         if (ItemHandler.isSkull(itemMap.getMaterial())) {
             ItemMeta itemMeta = item.getItemMeta();
-            if (itemMap.getSkull() != null) {
+            if (itemMap.getSkull() != null && itemMeta != null) {
                 ItemHandler.setSkullOwner(itemMeta, player, StringUtils.translateLayout(itemMap.getSkull(), player));
             } else if (itemMap.getSkullTexture() != null && !itemMap.isHeadDatabase()) {
                 try {
@@ -8747,6 +8750,8 @@ public class Menu {
         item.setAmount(itemMap.getCount(player));
         return item;
     }
+
+//  ==========================================================================================================================================================================================================================================================
 
     /**
      * Checks if the ItemMap is a special item.
@@ -8832,8 +8837,6 @@ public class Menu {
         return typingMenu.get(PlayerHandler.getPlayerID(player)) != null;
     }
 
-//  ==============================================================================================================================================================================================================================================================
-
     /**
      * Checks if the Player has the GUI Menu open.
      *
@@ -8846,4 +8849,8 @@ public class Menu {
         }
         return player != null && player.getOpenInventory().getTitle().equalsIgnoreCase(StringUtils.colorFormat(GUIName));
     }
+
+//  ==============================================================================================================================================================================================================================================================
+
+
 }

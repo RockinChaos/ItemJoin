@@ -85,7 +85,9 @@ public class GuardAPI {
                         PlayerHandler.updateInventory(player, 1L);
                     }
                 }
-                ItemJoin.getCore().getSQL().removeData(dataObject);
+                if (dataObject != null) {
+                    ItemJoin.getCore().getSQL().removeData(dataObject);
+                }
             }
         }
     }

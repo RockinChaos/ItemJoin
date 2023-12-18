@@ -166,7 +166,7 @@ public class GIF {
          * Creates new frame image from current data (and previous frames as specified by their disposition codes).
          */
         private void setPixels() {
-            int[] dest = ((DataBufferInt) this.image.getRaster().getDataBuffer()).getData();
+            int[] dataBuffer = ((DataBufferInt) this.image.getRaster().getDataBuffer()).getData();
             if (this.lastDispose > 0) {
                 if (this.lastDispose == 3) {
                     int n = this.frameCount - 2;
@@ -178,7 +178,7 @@ public class GIF {
                 }
                 if (this.lastImage != null) {
                     int[] prev = ((DataBufferInt) this.lastImage.getRaster().getDataBuffer()).getData();
-                    System.arraycopy(prev, 0, dest, 0, width * height);
+                    System.arraycopy(prev, 0, dataBuffer, 0, width * height);
                     if (this.lastDispose == 2) {
                         Graphics2D g = this.image.createGraphics();
                         Color c;
@@ -232,7 +232,7 @@ public class GIF {
                         int index = ((int) this.pixels[sx++]) & 0xff;
                         int c = this.act[index];
                         if (c != 0) {
-                            dest[dx] = c;
+                            dataBuffer[dx] = c;
                         }
                         dx++;
                     }

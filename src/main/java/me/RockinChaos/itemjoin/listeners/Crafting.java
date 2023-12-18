@@ -57,6 +57,9 @@ public class Crafting implements Listener {
      */
     @EventHandler(priority = EventPriority.LOW)
     private void onAutoCraft(PlayerAutoCraftEvent event) {
+        if (event.getContents() == null) {
+            return;
+        }
         ServerUtils.logDebug("{CRAFTING} Protocol-Packet auto recipe was triggered for the player " + event.getPlayer().getName() + ".");
         for (int i = 0; i <= 4; i++) {
             final ItemStack[] craftingContents = event.getContents().clone();

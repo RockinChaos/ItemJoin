@@ -6,99 +6,99 @@ load: STARTUP
 api-version: 1.13
 description: Get custom items on join.
 website: https://www.spigotmc.org/resources/itemjoin.12661/
-softdepend: [AuthMe, ExploitFixer, HeadDatabase, Hyperverse, Multiverse-Core, Multiverse-Inventories, MyWorlds, NickAPI, PerWorldInventory, PerWorldPlugins, PlaceholderAPI, ProtocolLib, SkinsRestorer, Citizens, ChestSort, TokenEnchant, Vault, WorldGuard, xInventories]
-          
+softdepend: [ AuthMe, ExploitFixer, HeadDatabase, Hyperverse, Multiverse-Core, Multiverse-Inventories, MyWorlds, NickAPI, PerWorldInventory, PerWorldPlugins, PlaceholderAPI, ProtocolLib, SkinsRestorer, Citizens, ChestSort, TokenEnchant, Vault, WorldGuard, xInventories ]
+
 permissions:
-   itemjoin.*:
-      description: Grants access to all aspects of the plugin, including every permission node.
-      default: false
-      children:
-          itemjoin.all: true
-   itemjoin.all:
-      description: Grants access to all aspects of the plugin, including every permission node.
-      default: false
-      children:
-          itemjoin.use: true
-          itemjoin.dump: true
-          itemjoin.reload: true
-          itemjoin.menu: true
-          itemjoin.updates: true
-          itemjoin.upgrade: true
-          itemjoin.permissions: true
-          itemjoin.query: true
-          itemjoin.list: true
-          itemjoin.purge: true
-          itemjoin.get: true
-          itemjoin.get.others: true
-          itemjoin.remove: true
-          itemjoin.remove.others: true
-          itemjoin.enable: true
-          itemjoin.enable.others: true
-          itemjoin.disable: true
-          itemjoin.disable.others: true
-          itemjoin.bypass.inventorymodify: false
-   itemjoin.use:
-      description: Grants access to basic plugin commands.
-      default: true
-   itemjoin.menu:
-      description: Grants access to the menu command.
-      default: false
-   itemjoin.dump:
-      description: Grants access to the dump command.
-      default: false
-   itemjoin.reload:
-      description: Grants access to the reload command.
-      default: false
-   itemjoin.updates:
-      description: Grants access to the updates command.
-      default: false
-   itemjoin.upgrade:
-      description: Grants access to the upgrade command.
-      default: false
-   itemjoin.permissions:
-      description: Grants access to the permissions command
-      default: true
-   itemjoin.query:
-      description: Grants access to the query command.
-      default: false
-   itemjoin.list:
-      description: Grants access to the list command.
-      default: false
-   itemjoin.purge:
-      description: Grants access to the purge command.
-      default: false
-   itemjoin.get:
-      description: Grants access to the basic get commands.
-      default: false
-   itemjoin.get.others:
-      description: Grants access to all get commands that could affect other players.
-      default: false
-   itemjoin.remove:
-      description: Grants access to the basic remove commands.
-      default: false
-   itemjoin.remove.others:
-      description: Grants access to all remove commands that could affect other players.
-      default: false
-   itemjoin.enable:
-      description: Grants access to the basic enable command.
-      default: false
-   itemjoin.enable.others:
-      description: Grants access to all enable commands that could affect other players individually.
-      default: false
-   itemjoin.disable:
-      description: Grants access to the basic disable command.
-      default: false
-   itemjoin.disable.others:
-      description: Grants access to all disable commands that could affect other players individually.
-      default: false
-   itemjoin.bypass.inventorymodify:
-      description: Players with this permission will bypass any item movement restrictions.
-      default: false
-      
+  itemjoin.*:
+    description: Grants access to all aspects of the plugin, including every permission node.
+    default: false
+    children:
+      itemjoin.all: true
+  itemjoin.all:
+    description: Grants access to all aspects of the plugin, including every permission node.
+    default: false
+    children:
+      itemjoin.use: true
+      itemjoin.dump: true
+      itemjoin.reload: true
+      itemjoin.menu: true
+      itemjoin.updates: true
+      itemjoin.upgrade: true
+      itemjoin.permissions: true
+      itemjoin.query: true
+      itemjoin.list: true
+      itemjoin.purge: true
+      itemjoin.get: true
+      itemjoin.get.others: true
+      itemjoin.remove: true
+      itemjoin.remove.others: true
+      itemjoin.enable: true
+      itemjoin.enable.others: true
+      itemjoin.disable: true
+      itemjoin.disable.others: true
+      itemjoin.bypass.inventorymodify: false
+  itemjoin.use:
+    description: Grants access to basic plugin commands.
+    default: true
+  itemjoin.menu:
+    description: Grants access to the menu command.
+    default: false
+  itemjoin.dump:
+    description: Grants access to the dump command.
+    default: false
+  itemjoin.reload:
+    description: Grants access to the reload command.
+    default: false
+  itemjoin.updates:
+    description: Grants access to the updates command.
+    default: false
+  itemjoin.upgrade:
+    description: Grants access to the upgrade command.
+    default: false
+  itemjoin.permissions:
+    description: Grants access to the permissions command
+    default: true
+  itemjoin.query:
+    description: Grants access to the query command.
+    default: false
+  itemjoin.list:
+    description: Grants access to the list command.
+    default: false
+  itemjoin.purge:
+    description: Grants access to the purge command.
+    default: false
+  itemjoin.get:
+    description: Grants access to the basic get commands.
+    default: false
+  itemjoin.get.others:
+    description: Grants access to all get commands that could affect other players.
+    default: false
+  itemjoin.remove:
+    description: Grants access to the basic remove commands.
+    default: false
+  itemjoin.remove.others:
+    description: Grants access to all remove commands that could affect other players.
+    default: false
+  itemjoin.enable:
+    description: Grants access to the basic enable command.
+    default: false
+  itemjoin.enable.others:
+    description: Grants access to all enable commands that could affect other players individually.
+    default: false
+  itemjoin.disable:
+    description: Grants access to the basic disable command.
+    default: false
+  itemjoin.disable.others:
+    description: Grants access to all disable commands that could affect other players individually.
+    default: false
+  itemjoin.bypass.inventorymodify:
+    description: Players with this permission will bypass any item movement restrictions.
+    default: false
+
 commands:
-   itemjoin:
-      description: Displays a menu giving credit to the author and the help menu command.
-      aliases: [ij]
-      usage: |
-          /itemjoin
-          Example: /itemjoin
+  itemjoin:
+    description: Displays a menu giving credit to the author and the help menu command.
+    aliases: [ ij ]
+    usage: |
+      /itemjoin
+      Example: /itemjoin

@@ -42,7 +42,7 @@ public class Processes implements Listener {
         final String command = event.getMessage();
         final Player player = event.getPlayer();
         final ItemStack item = PlayerHandler.getHandItem(player);
-        if (item != null && item.getType() != org.bukkit.Material.AIR && !command.isEmpty() && StringUtils.containsIgnoreCase(command, "hat")) {
+        if (item.getType() != org.bukkit.Material.AIR && !command.isEmpty() && StringUtils.containsIgnoreCase(command, "hat")) {
             final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item);
             if (itemMap != null && itemMap.isNotHat()) {
                 event.setMessage("itemjoin_blocked");

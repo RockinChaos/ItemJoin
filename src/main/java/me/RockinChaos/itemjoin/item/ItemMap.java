@@ -32,6 +32,7 @@ import me.RockinChaos.core.utils.api.LegacyAPI;
 import me.RockinChaos.itemjoin.ChatToggleExecutor;
 import me.RockinChaos.itemjoin.ChatToggleTab;
 import me.RockinChaos.itemjoin.ItemJoin;
+import me.RockinChaos.itemjoin.PluginData;
 import me.RockinChaos.itemjoin.item.ItemCommand.Action;
 import me.RockinChaos.itemjoin.item.ItemCommand.CommandSequence;
 import me.RockinChaos.itemjoin.utils.api.EffectAPI;
@@ -129,14 +130,14 @@ public class ItemMap implements Cloneable {
     private Integer interactCooldown = 0;
     private boolean customConsumable = false;
     private Map<String, Integer> enchants = new HashMap<>();
-//  ============================================== //
+    //  ============================================== //
     private Map<Object, Object> nbtProperty = new HashMap<>();
     private List<Object> nbtProperties = new ArrayList<>();
     //  ============================================== //
 //         Drop Chances for each item.          //
 //  ============================================== //
     private Map<EntityType, Double> mobsDrop = new HashMap<>();
-//  ============================================== //
+    //  ============================================== //
     private Map<Material, Double> blocksDrop = new HashMap<>();
     //  ============================================== //
 //         NBT Information for each item.          //
@@ -150,7 +151,7 @@ public class ItemMap implements Cloneable {
     private List<String> dynamicNames = new ArrayList<>();
     private List<List<String>> dynamicLores = new ArrayList<>();
     private List<String> dynamicMaterials = new ArrayList<>();
-//  ====================================================================================================== //
+    //  ====================================================================================================== //
     private List<String> dynamicOwners = new ArrayList<>();
     private List<String> dynamicTextures = new ArrayList<>();
     private boolean materialAnimated = false;
@@ -176,7 +177,7 @@ public class ItemMap implements Cloneable {
     private Map<String, List<String>> commandConditions = new HashMap<>();
     private String disposableMessage = null;
     private String triggerMessage = null;
-//  ============================================================================================= //
+    //  ============================================================================================= //
     private Map<String, String> commandMessages = new HashMap<>();
     //  ============================================== //
 //            Itemflags for each item.             //
@@ -221,7 +222,7 @@ public class ItemMap implements Cloneable {
     private boolean onlyFirstJoin = false;
     private boolean onlyFirstLife = false;
     private boolean onlyFirstWorld = false;
-//  ============================================== //
+    //  ============================================== //
     private boolean ipLimited = false;
     //  ============================================== //
 //             Triggers for each item.             //
@@ -238,7 +239,7 @@ public class ItemMap implements Cloneable {
     private boolean giveOnRegionEgress = false;
     private boolean useOnLimitSwitch = false;
     private String triggers = null;
-//  ============================================== //
+    //  ============================================== //
     private String limitModes = null;
     private String toggleNode = null;
     private String toggleMessage = null;
@@ -338,7 +339,7 @@ public class ItemMap implements Cloneable {
         if (commandItem != null && !commandItem.isEmpty()) {
             this.itemCost = commandItem;
         }
-        if (commandCost != null && StringUtils.isInt(commandCost)) {
+        if (StringUtils.isInt(commandCost)) {
             this.cost = this.nodeLocation.getInt("commands-cost");
         }
     }
@@ -1778,13 +1779,13 @@ public class ItemMap implements Cloneable {
                 } catch (Exception e) {
                     ServerUtils.sendDebugTrace(e);
                 }
-               if (cmd != null) {
-                   cmd.setDescription(this.configName);
-                   cmd.setExecutor(new ChatToggleExecutor());
-                   cmd.setTabCompleter(new ChatToggleTab());
-                   this.togglePlugins.add(cmd);
-                   commandList.add(command);
-               }
+                if (cmd != null) {
+                    cmd.setDescription(this.configName);
+                    cmd.setExecutor(new ChatToggleExecutor());
+                    cmd.setTabCompleter(new ChatToggleTab());
+                    this.togglePlugins.add(cmd);
+                    commandList.add(command);
+                }
             }
         } else if (toggleSingle != null && !toggleSingle.isEmpty() && !toggleSingle.equalsIgnoreCase(" ")) {
             PluginCommand cmd = null;
@@ -2657,6 +2658,15 @@ public class ItemMap implements Cloneable {
     }
 
     /**
+     * Sets the ItemStack to be given only on Respawn.
+     *
+     * @param bool - The value to be set.
+     */
+    public void setGiveOnRespawn(final boolean bool) {
+        this.giveOnRespawn = bool;
+    }
+
+    /**
      * Checks if you give on respawn point is enabled.
      * Only gives the item if the player is NOT spawning in a bed, anchor, or spawn-point.
      *
@@ -2664,15 +2674,6 @@ public class ItemMap implements Cloneable {
      */
     public boolean isGiveOnRespawnPoint() {
         return this.giveOnRespawnPoint;
-    }
-
-    /**
-     * Sets the ItemStack to be given only on Respawn.
-     *
-     * @param bool - The value to be set.
-     */
-    public void setGiveOnRespawn(final boolean bool) {
-        this.giveOnRespawn = bool;
     }
 
     /**
@@ -3763,12 +3764,12 @@ public class ItemMap implements Cloneable {
      * @return If the ItemStack is similar.
      */
     public boolean isReal(final ItemStack item) {
-        final String nbtData = ItemHandler.getNBTData(item, ItemData.getInfo().getNBTList());
-        return item != null && item.getType() != Material.AIR
+        final String nbtData = ItemHandler.getNBTData(item, PluginData.getInfo().getNBTList());
+        return item.getType() != Material.AIR
                 && (this.vanillaControl || this.vanillaStatus
                 || (ItemJoin.getCore().getData().dataTagsEnabled() && nbtData != null && nbtData.equalsIgnoreCase(this.newNBTData))
                 || (this.legacySecret != null && item.hasItemMeta() && (ServerUtils.hasSpecificUpdate("1_14") || (!ServerUtils.hasSpecificUpdate("1_14") && Objects.requireNonNull(item.getItemMeta()).hasDisplayName()))
-                && StringUtils.colorDecode(item) != null && Objects.requireNonNull(StringUtils.colorDecode(item)).contains(this.legacySecret)));
+                && Objects.requireNonNull(StringUtils.colorDecode(item)).contains(this.legacySecret)));
     }
 
     /**
@@ -3780,9 +3781,9 @@ public class ItemMap implements Cloneable {
      */
     public boolean isSimilar(final Player player, final ItemStack item) {
         if ((item != null && item.getType() != Material.AIR && item.getType() == this.material) || (this.materialAnimated && item != null && item.getType() != Material.AIR && this.isMaterial(item))) {
-            if (this.vanillaControl || this.vanillaStatus || (ItemJoin.getCore().getData().dataTagsEnabled() && ItemHandler.getNBTData(item, ItemData.getInfo().getNBTList()) != null && Objects.requireNonNull(ItemHandler.getNBTData(item, ItemData.getInfo().getNBTList())).equalsIgnoreCase(this.newNBTData))
+            if (this.vanillaControl || this.vanillaStatus || (ItemJoin.getCore().getData().dataTagsEnabled() && ItemHandler.getNBTData(item, PluginData.getInfo().getNBTList()) != null && Objects.requireNonNull(ItemHandler.getNBTData(item, PluginData.getInfo().getNBTList())).equalsIgnoreCase(this.newNBTData))
                     || (this.legacySecret != null && item.hasItemMeta() && (ServerUtils.hasSpecificUpdate("1_14") || (!ServerUtils.hasSpecificUpdate("1_14") && Objects.requireNonNull(item.getItemMeta()).hasDisplayName()))
-                    && StringUtils.colorDecode(item) != null && Objects.requireNonNull(StringUtils.colorDecode(item)).contains(this.legacySecret))) {
+                    && Objects.requireNonNull(StringUtils.colorDecode(item)).contains(this.legacySecret))) {
                 if (this.isEnchantSimilar(player, item) || !Objects.requireNonNull(item.getItemMeta()).hasEnchants() && this.enchants.isEmpty() || this.isItemChangeable()) {
                     if (this.material.toString().toUpperCase().contains("BOOK")
                             && (this.isBookMeta(player, item)
@@ -3888,7 +3889,7 @@ public class ItemMap implements Cloneable {
      * Checks if the Book Meta is similar.
      *
      * @param player - The Player being referenced.
-     * @param item - The ItemStack being checked.
+     * @param item   - The ItemStack being checked.
      * @return If the Book Meta is similar.
      */
     private boolean isBookMeta(final Player player, final ItemStack item) {
@@ -4104,14 +4105,14 @@ public class ItemMap implements Cloneable {
             if (ServerUtils.hasSpecificUpdate("1_13")) {
                 MapMeta mapmeta = (MapMeta) this.tempItem.getItemMeta();
                 try {
-                   if (mapmeta != null && this.mapView != null) {
-                       try {
-                           mapmeta.setMapView(this.mapView);
-                       } catch (NullPointerException e) {
-                           ServerUtils.sendDebugTrace(e);
-                           ServerUtils.logWarn("{ItemMap} There was an issue rendering the custom map image for " + this.configName + ".");
-                       }
-                   }
+                    if (mapmeta != null && this.mapView != null) {
+                        try {
+                            mapmeta.setMapView(this.mapView);
+                        } catch (NullPointerException e) {
+                            ServerUtils.sendDebugTrace(e);
+                            ServerUtils.logWarn("{ItemMap} There was an issue rendering the custom map image for " + this.configName + ".");
+                        }
+                    }
                 } catch (NoSuchMethodError e) {
                     LegacyAPI.setMapID(mapmeta, this.mapId);
                 }
@@ -4365,7 +4366,7 @@ public class ItemMap implements Cloneable {
      */
     private void setArmorTrim() {
         if (this.trimPattern != null && !this.trimPattern.isEmpty()) {
-            final Map.Entry<String,String> entry = this.trimPattern.entrySet().iterator().next();
+            final Map.Entry<String, String> entry = this.trimPattern.entrySet().iterator().next();
             final org.bukkit.inventory.meta.trim.TrimMaterial trimMaterial = ItemHandler.getTrimMaterial(entry.getKey());
             final org.bukkit.inventory.meta.trim.TrimPattern trimPattern = ItemHandler.getTrimPattern(entry.getValue());
             if (trimMaterial != null && trimPattern != null) {
@@ -4719,7 +4720,7 @@ public class ItemMap implements Cloneable {
      *
      * @param player - The Player to have their item damaged.
      * @param slot   - The slot to have the item damaged
-     * @param damage   - The Integer amount to be damaged.
+     * @param damage - The Integer amount to be damaged.
      */
     public void damageItem(final Player player, final String slot, final int damage) {
         if ((!slot.startsWith("CH") && slot.startsWith("C")) || StringUtils.isInt(slot)) {
@@ -4796,7 +4797,7 @@ public class ItemMap implements Cloneable {
                 player.getInventory().setItem(Integer.parseInt(slot), itemStack);
             }
         } else {
-            if (PlayerHandler.getMainHandItem(player) == null || Objects.requireNonNull(PlayerHandler.getMainHandItem(player)).getType() == Material.AIR) {
+            if (Objects.requireNonNull(PlayerHandler.getMainHandItem(player)).getType() == Material.AIR) {
                 PlayerHandler.setMainHandItem(player, itemStack);
             } else {
                 player.getInventory().addItem(itemStack);
@@ -4956,7 +4957,7 @@ public class ItemMap implements Cloneable {
      */
     private boolean getRandomMap(final ArrayList<ItemCommand> randomCommands, final ItemCommand[] itemCommands, final Player player, final Player altPlayer, final String action, final String clickType, final String slot) {
         ItemCommand dedicatedMap = (ItemCommand) StringUtils.randomEntry(randomCommands);
-        if (dedicatedMap != null && player != null && action != null && clickType != null && slot != null && itemCommands != null && !dedicatedMap.execute(player, altPlayer, action, clickType, slot, this)) {
+        if (player != null && action != null && clickType != null && slot != null && itemCommands != null && !dedicatedMap.execute(player, altPlayer, action, clickType, slot, this)) {
             return this.getRandomMap(randomCommands, itemCommands, player, altPlayer, action, clickType, slot);
         }
         return true;
@@ -4974,14 +4975,12 @@ public class ItemMap implements Cloneable {
      */
     private boolean getRandomAll(final ArrayList<ItemCommand> randomCommands, final ItemCommand[] itemCommands, final Player player, final Player altPlayer, final String action, final String clickType, final String slot) {
         ItemCommand dedicatedMap = (ItemCommand) StringUtils.randomEntry(randomCommands);
-        if (dedicatedMap != null && player != null && action != null && slot != null && itemCommands != null && !dedicatedMap.execute(player, altPlayer, action, clickType, slot, this)) {
+        if (player != null && action != null && slot != null && itemCommands != null && !dedicatedMap.execute(player, altPlayer, action, clickType, slot, this)) {
             randomCommands.remove(dedicatedMap);
             return this.getRandomAll(randomCommands, itemCommands, player, altPlayer, action, clickType, slot);
         }
-        if (dedicatedMap != null) {
-            randomCommands.remove(dedicatedMap);
-        }
-        if (dedicatedMap != null && player != null && action != null && slot != null && itemCommands != null && !randomCommands.isEmpty()) {
+        randomCommands.remove(dedicatedMap);
+        if (player != null && action != null && slot != null && itemCommands != null && !randomCommands.isEmpty()) {
             this.getRandomAll(randomCommands, itemCommands, player, altPlayer, action, clickType, slot);
         }
         return true;
@@ -5958,7 +5957,7 @@ public class ItemMap implements Cloneable {
             itemData.set("items." + this.configName + ".banner-meta", bannerList.substring(0, bannerList.length() - 2));
         }
         if (this.trimPattern != null && !this.trimPattern.isEmpty()) {
-            final Map.Entry<String,String> entry = this.trimPattern.entrySet().iterator().next();
+            final Map.Entry<String, String> entry = this.trimPattern.entrySet().iterator().next();
             itemData.set("items." + this.configName + ".trim-meta", entry.getKey().toUpperCase() + ":" + entry.getValue().toUpperCase());
         }
         if (this.recipe != null && !this.recipe.isEmpty() && this.ingredients != null && !this.ingredients.isEmpty()) {

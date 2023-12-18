@@ -17,7 +17,7 @@
  */
 package me.RockinChaos.itemjoin.listeners;
 
-import me.RockinChaos.itemjoin.item.ItemData;
+import me.RockinChaos.itemjoin.PluginData;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -36,8 +36,8 @@ public class Pickups implements Listener {
         final Entity entity = event.getEntity();
         if (entity instanceof Player) {
             final Player player = (Player) event.getEntity();
-            if (ItemData.getInfo().isPreventString(player, "Pickups")) {
-                if (ItemData.getInfo().isPreventBypass(player)) {
+            if (PluginData.getInfo().isPreventString(player, "Pickups")) {
+                if (PluginData.getInfo().isPreventBypass(player)) {
                     event.setCancelled(true);
                 }
             }

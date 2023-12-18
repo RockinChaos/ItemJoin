@@ -59,7 +59,7 @@ public class ItemAPI {
         for (Toolable tag : Toolable.values()) {
             String[] mats = material.name().split("_");
             if (tag.name().equalsIgnoreCase((tag.name().contains("_") ? material.name() : (mats.length > 1 ? mats[(mats.length - 1)] : mats[0])))) {
-                requiresTool = !(PlayerHandler.getMainHandItem(player) != null && StringUtils.containsIgnoreCase(Objects.requireNonNull(PlayerHandler.getMainHandItem(player)).getType().name(), "PICKAXE"));
+                requiresTool = !(StringUtils.containsIgnoreCase(Objects.requireNonNull(PlayerHandler.getMainHandItem(player)).getType().name(), "PICKAXE"));
             }
         }
         return !requiresTool;

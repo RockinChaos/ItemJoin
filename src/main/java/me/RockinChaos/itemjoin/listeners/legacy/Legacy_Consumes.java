@@ -124,13 +124,13 @@ public class Legacy_Consumes implements Listener {
             item.setAmount(itemMap.getCount(player));
             SchedulerUtils.runLater(2L, () -> {
                 final ItemStack handItem = PlayerHandler.getHandItem(player);
-                if (handItem == null || handItem.getAmount() <= 1) {
+                if (handItem.getAmount() <= 1) {
                     if (ServerUtils.hasSpecificUpdate("1_9")) {
                         final ItemStack mainItem = PlayerHandler.getMainHandItem(player);
                         final ItemStack offItem = PlayerHandler.getOffHandItem(player);
-                        if (mainItem != null && mainItem.getType() != Material.AIR) {
+                        if (mainItem.getType() != Material.AIR) {
                             PlayerHandler.setMainHandItem(player, item);
-                        } else if (offItem != null && offItem.getType() != Material.AIR) {
+                        } else if (offItem.getType() != Material.AIR) {
                             PlayerHandler.setOffHandItem(player, item);
                         } else {
                             itemMap.giveTo(player);
