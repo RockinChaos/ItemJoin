@@ -104,13 +104,13 @@ public class Recipes implements Listener {
                 final Player player = (Player) event.getView().getPlayer();
                 final List<ItemMap> mapList = new ArrayList<>();
                 final ItemMap checkMap = ItemUtilities.getUtilities().getItemMap(event.getRecipe().getResult());
-                if (checkMap != null) {
+                if (checkMap != null && checkMap.isRecipe()) {
                     mapList.add(checkMap);
                 } else {
                     return;
                 }
                 for (ItemMap itemMap : ItemUtilities.getUtilities().getItems()) {
-                    if (itemMap != null && itemMap.getIngredients() != null && !itemMap.getIngredients().isEmpty()) {
+                    if (itemMap != null && itemMap.isRecipe()) {
                         mapList.add(itemMap);
                     }
                 }
@@ -148,7 +148,7 @@ public class Recipes implements Listener {
     @EventHandler()
     public void onCraftRecipe(final CraftItemEvent event) {
         final ItemMap checkMap = ItemUtilities.getUtilities().getItemMap(event.getRecipe().getResult());
-        if (checkMap != null) {
+        if (checkMap != null && checkMap.isRecipe()) {
             final Inventory inventoryClone = Bukkit.createInventory(null, 18);
             int setSlot = 0;
             for (int i = 0; i < event.getInventory().getSize(); i++) {
