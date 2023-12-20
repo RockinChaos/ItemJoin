@@ -38,18 +38,7 @@
                 <filtering>true</filtering>
                 <directory>.</directory>
                 <includes>
-                    <include>*.yml</include>
                     <include>LICENSE</include>
-                </includes>
-            </resource>
-
-            <resource>
-                <targetPath>./files</targetPath>
-                <filtering>true</filtering>
-                <directory>./files</directory>
-                <includes>
-                    <include>**/*.yml</include>
-                    <include>**/*.jpg</include>
                 </includes>
             </resource>
 
@@ -59,6 +48,7 @@
                 <directory>./src/main/resources</directory>
                 <includes>
                     <include>**/*.yml</include>
+                    <include>**/*.jpg</include>
                 </includes>
             </resource>
 
