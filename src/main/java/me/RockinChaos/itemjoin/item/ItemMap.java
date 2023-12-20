@@ -1678,6 +1678,15 @@ public class ItemMap implements Cloneable {
     }
 
     /**
+     * Checks if the ItemMap is a recipe.
+     *
+     * @return If the ItemMap is a recipe.
+     */
+    public boolean isRecipe() {
+        return !this.ingredients.isEmpty() && !this.getRecipe().isEmpty();
+    }
+
+    /**
      * Sets the recipe ingredients.
      *
      * @param ingredientList - The recipe ingredients to be set.
