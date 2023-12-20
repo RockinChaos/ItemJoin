@@ -5049,7 +5049,14 @@ public class Menu {
                 itemMap.setSelectable(!itemMap.isSelectable());
                 flagPane(player, itemMap);
             }));
-            flagPane.addButton(new Button(fillerPaneBItem), 33);
+            flagPane.addButton(new Button(ItemHandler.getItem("DIRT", 64, itemMap.isSplittable(), false, "&a&l&nSplittable", "&7",
+                    "&a&lTrue&f: &7Prevents the item from being", "&7split into multiple stacks via", "&7right-click or click dragging.", "&7",
+                    "&c&lFalse&f: &7Allows the item to be split", "&7into multiple stacks.", "&7",
+                    "&9&lENABLED: &a" + (itemMap.isSplittable() + "").toUpperCase()), event -> {
+                itemMap.setSplittable(!itemMap.isSplittable());
+                flagPane(player, itemMap);
+            }));
+            flagPane.addButton(new Button(fillerPaneBItem), 32);
         });
         flagPane.open(player);
     }
@@ -5117,6 +5124,9 @@ public class Menu {
         }
         if (itemMap.isSelectable()) {
             itemflags += "SELECTABLE, ";
+        }
+        if (itemMap.isSplittable()) {
+            itemflags += "SPLITTABLE, ";
         }
         if (itemMap.isItemStore()) {
             itemflags += "ITEM-STORE, ";
