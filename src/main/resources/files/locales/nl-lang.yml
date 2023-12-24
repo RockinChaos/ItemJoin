@@ -110,6 +110,7 @@ commands:
     forPlayerWorldFailed: '%prefix% &cJe hebt al &7[&e%world%&7] items &eingschakeld &cvoor &e%player%&c.'
     globalPlayers: '%prefix% &aJe hebt &balle items &eingeschakeld &avoor &ealle spelers&a.'
     globalPlayersFailed: '%prefix% &cItems zijn al &eingeschakeld &cvoor &ealle spelers&c.'
+    toggleEnable: '%prefix% &aJe hebt het item &b%item%&a ingeschakeld en het wordt nu gegeven.'
     togglePlayerFailed: '%prefix% &cU kunt het item %item% niet inschakelen omdat alle items wereldwijd voor u zijn uitgeschakeld!'
   disabled:
     forPlayer: '%prefix% &aJe hebt &balle items &euitgeschakeld &avoor &e%player%&a.'
@@ -120,6 +121,7 @@ commands:
     forPlayerWorldFailed: '%prefix% &cJe hebt al &7[&e%world%&7] items &euitgeschakeld &cvoor &e%player%&c.'
     globalPlayers: '%prefix% &aJe hebt &balle items &euitgeschakeld &avoor &ealle spelers&a.'
     globalPlayersFailed: '%prefix% &cItems zijn al &euitgeschakeld &cvoor &ealle spelers&c.'
+    toggleDisable: '%prefix% &cJe hebt het item &b%item%&c uitgeschakeld en het wordt niet langer gegeven.'
     togglePlayerFailed: '%prefix% &cU kunt het item %item% niet uitschakelen omdat alle items wereldwijd voor u zijn uitgeschakeld!'
 
 # Deze placeholders zijn specifiek voor plugin messages

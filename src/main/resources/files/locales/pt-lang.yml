@@ -110,6 +110,7 @@ commands:
     forPlayerWorldFailed: '%prefix% &cVocê já &ehabilitou os itens &7[&e%world%&7] &cpara &e%player%&c.'
     globalPlayers: '%prefix% &aVocê &ehabilitou &btodos os itens &apara &etodos os jogadores&a.'
     globalPlayersFailed: '%prefix% &cOs itens já foram &ehabilitados &cpara &etodos os jogadores&c.'
+    toggleEnable: '%prefix% &aVocê ativou o item &b%item%&a e agora ele será fornecido.'
     togglePlayerFailed: '%prefix% &cVocê não pode habilitar o item %item% quando todos os itens estão desabilitados para você mundialmente!'
   disabled:
     forPlayer: '%prefix% &aVocê &edesabilitou &btodos os itens &apara &e%player%&a.'
@@ -120,6 +121,7 @@ commands:
     forPlayerWorldFailed: '%prefix% &cVocê já &edesabilitou os itens &7[&e%world%&7] &cpara &e%player%&c.'
     globalPlayers: '%prefix% &aVocê já &edesabilitou &btodos os itens &apara &etodos os jogadores&a.'
     globalPlayersFailed: '%prefix% &cOs itens já foram &edesabilitados &cpara &etodos os jogadores&c.'
+    toggleDisable: '%prefix% &cVocê desativou o item &b%item%&c e ele não será mais fornecido.'
     togglePlayerFailed: '%prefix% &cVocê não pode desabilitar o item %item% quando todos os itens estão desabilitados para você mundialmente!'
 
 # Esses espaços reservados são específicos para as mensagens do plug-in.

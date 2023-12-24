@@ -62,9 +62,12 @@ public class ChatToggleExecutor implements CommandExecutor {
                             if (itemMap.hasItem(player, true)) {
                                 itemMap.removeFrom(player);
                             }
-                            final String toggleMessage = (itemMap.getToggleMessage() != null ? StringUtils.translateLayout(itemMap.getToggleMessage(), player, placeHolders)
-                                    : StringUtils.translateLayout("&cYou have disabled the item " + itemMap.getConfigName() + " and it will no longer be given.", player));
-                            ServerUtils.messageSender(player, toggleMessage);
+                            final String toggleMessage = (itemMap.getToggleMessage() != null ? StringUtils.translateLayout(itemMap.getToggleMessage(), player, placeHolders): null);
+                            if (toggleMessage != null) {
+                                ServerUtils.messageSender(player, toggleMessage);
+                            } else {
+                                ItemJoin.getCore().getLang().sendLangMessage("commands.disabled.toggleDisable", player, placeHolders);
+                            }
                         }
                     } else {
                         ItemJoin.getCore().getLang().sendLangMessage("commands.disabled.togglePlayerFailed", sender, placeHolders);
@@ -76,9 +79,12 @@ public class ChatToggleExecutor implements CommandExecutor {
                             if (!itemMap.hasItem(player, true)) {
                                 itemMap.giveTo(player);
                             }
-                            final String toggleMessage = (itemMap.getToggleMessage() != null ? StringUtils.translateLayout(itemMap.getToggleMessage(), player, placeHolders)
-                                    : StringUtils.translateLayout("&aYou have enabled the item " + itemMap.getConfigName() + " and it will now be given.", player));
-                            ServerUtils.messageSender(player, toggleMessage);
+                            final String toggleMessage = (itemMap.getToggleMessage() != null ? StringUtils.translateLayout(itemMap.getToggleMessage(), player, placeHolders): null);
+                            if (toggleMessage != null) {
+                                ServerUtils.messageSender(player, toggleMessage);
+                            } else {
+                                ItemJoin.getCore().getLang().sendLangMessage("commands.enabled.toggleEnable", player, placeHolders);
+                            }
                         }
                     } else {
                         ItemJoin.getCore().getLang().sendLangMessage("commands.enabled.togglePlayerFailed", sender, placeHolders);

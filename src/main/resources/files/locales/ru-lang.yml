@@ -110,6 +110,7 @@ commands:
     forPlayerWorldFailed: '%prefix% &fВы уже &aвключили &fпредметы в мире &7[&e&l%world%&7] &fдля игрока &f&l%player%'
     globalPlayers: '%prefix% &fВы &aвключили &fвсе предметы &fдля всех игроков'
     globalPlayersFailed: '%prefix% &fПредметы уже &aвключены &fу всех игроков'
+    toggleEnable: '%prefix% &aВы включили элемент &b%item%&a, и теперь он будет предоставлен.'
     togglePlayerFailed: '%prefix% &cВы не можете включить элемент %item%, так как все элементы отключены для вас глобально!'
   disabled:
     forPlayer: '%prefix% &fВы &cвыключили &fвсе предметы игроку &f&l%player%'
@@ -120,6 +121,7 @@ commands:
     forPlayerWorldFailed: '%prefix% &cВы уже &cвыключили предметы в мире &7[&e&l%world%&7] &fигроку &f&l%player%'
     globalPlayers: '%prefix% &fВы &cвыключили &fвсе предметы &fдля всех игроков'
     globalPlayersFailed: '%prefix% &fПредметы уже &cотключены &fдля всех игроков'
+    toggleDisable: '%prefix% &cВы отключили предмет &b%item%&c и он больше не будет выдаваться.'
     togglePlayerFailed: '%prefix% &cВы не можете отключить элемент %item%, так как все элементы отключены для вас глобально!'
 
 # Эти заполнители относятся к сообщениям плагина.

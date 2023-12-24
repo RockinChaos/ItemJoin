@@ -110,6 +110,7 @@ commands:
     forPlayerWorldFailed: '%prefix% &cYa habías &aactivado &clos items de &7[&e%world%&7] &cpara &e%player%&c.'
     globalPlayers: '%prefix% &aHas &eactivado &btodos los items &apara &etodos los jugadores&a.'
     globalPlayersFailed: '%prefix% &cLos items ya estaban &eactivados &cpara &etodos los jugadores&c.'
+    toggleEnable: '%prefix% &aHa habilitado el elemento &b%item%&a y ahora se le entregará.'
     togglePlayerFailed: '%prefix% &c¡No puede habilitar el elemento %item% ya que todos los elementos están deshabilitados para usted en todo el mundo!'
   disabled:
     forPlayer: '%prefix% &aHas &edesactivado &btodos los items &apara &e%player%&a.'
@@ -120,6 +121,7 @@ commands:
     forPlayerWorldFailed: '%prefix% &cYa habías &edesactivado &clos items de &7[&e%world%&7] &cpara &e%player%&c.'
     globalPlayers: '%prefix% &aHas &edesactivado &btodos los items &apara &etodos los jugadores&a.'
     globalPlayersFailed: '%prefix% &cLos items ya estaban &edesactivados &cpara &etodos los jugadores&c.'
+    toggleDisable: '%prefix% &cHa desactivado el artículo &b%item%&c y ya no se entregará.'
     togglePlayerFailed: '%prefix% &c¡No puede deshabilitar el elemento %item% ya que todos los elementos están deshabilitados para usted en todo el mundo!'
 
 # Estos marcadores de posición son específicos de los mensajes del complemento.

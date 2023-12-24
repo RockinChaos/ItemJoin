@@ -110,6 +110,7 @@ commands:
     forPlayerWorldFailed: '%prefix% &e%player% &c的 &7[&e%world%&7] 物品&c已&e启用.'
     globalPlayers: '%prefix% &a你为&e所有玩家&e启用&a了&b所有物品&a.'
     globalPlayersFailed: '%prefix% &e所有玩家&c的物品已&e启用&c.'
+    toggleEnable: '%prefix% &a您已启用项目 &b%item%&a, 现在将给出该项目.'
     togglePlayerFailed: '%prefix% &c你无法启用物品 %item%&c, 因为所有物品已全局禁用!'
   disabled:
     forPlayer: '%prefix% &a你为 &e%target_player%&a &e禁用&a了&b所有物品&a.'
@@ -120,6 +121,7 @@ commands:
     forPlayerWorldFailed: '%prefix% &e%player% &c的 &7[&e%world%&7] 物品&c已&e禁用.'
     globalPlayers: '%prefix% &a你为&e所有玩家&e禁用&a了&b所有物品&a.'
     globalPlayersFailed: '%prefix% &e所有玩家&c的物品已&e禁用&c.'
+    toggleDisable: '%prefix% &c您已禁用该项目 &b%item%&c, 并且将不再提供该项目.'
     togglePlayerFailed: '%prefix% &c你无法禁用物品 %item%&c, 因为所有物品已全局禁用!'
 
 # 这些占位符可作用于插件的消息中.

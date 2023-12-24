@@ -110,6 +110,7 @@ commands:
     forPlayerWorldFailed: '%prefix% &cHai già &eabilitato &7[&e%world%&7] elementi &cper &e%player%&c.'
     globalPlayers: '%prefix% &aHai &eabilitato gli &boggetti palla &aper &etutti i giocatori&a.'
     globalPlayersFailed: '%prefix% &cGli elementi sono già stati &eabilitati &cper &etutti i giocatori&c.'
+    toggleEnable: '%prefix% &aHai abilitato l''elemento &b%item%&a e ora ti verrà fornito.'
     togglePlayerFailed: '%prefix% &cNon puoi abilitare l''elemento %item% poiché tutti gli elementi sono disabilitati per te a livello globale!'
   disabled:
     forPlayer: '%prefix% &aHai &edisabilitato gli &boggetti palla &aper &e%player%&a.'
@@ -120,6 +121,7 @@ commands:
     forPlayerWorldFailed: '%prefix% &cHai già &disabilitato &7[&e%world%&7] elementi &cper &e%player%&c.'
     globalPlayers: '%prefix% &aHai &disabilitato &boggetti palla &aper &etutti i giocatori&a.'
     globalPlayersFailed: '%prefix% &cGli elementi sono già stati &edisabilitati &cper &etutti i giocatori&c.'
+    toggleDisable: '%prefix% &cHai disabilitato l''oggetto &b%item%&c e non ti verrà più fornito.'
     togglePlayerFailed: '%prefix% &cNon puoi disabilitare l''elemento %item% poiché tutti gli elementi sono disabilitati per te a livello globale!'
 
 # Questi segnaposto sono specifici dei messaggi del plugin.

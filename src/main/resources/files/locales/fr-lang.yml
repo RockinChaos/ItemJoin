@@ -39,7 +39,7 @@ commands:
   item:
     noItemHeld: '%prefix% &cVous ne tenez pas d’objet dans votre main !'
     noItem: '%prefix% &cL’Item &b%item% &cn’existe pas !'
-    badCommand: '%prefix% &cVous n'êtes pas autorisé à utiliser la commande &4&l%command%&c sur cet élément !'
+    badCommand: '%prefix% &cVous n''êtes pas autorisé à utiliser la commande &4&l%command%&c sur cet élément !'
   info:
     material: '&aID de l’Item (Type du matériau): &e&l%item%'
     data: '&aValeur de l’Item (Type de données): &e&l%item%'
@@ -110,6 +110,7 @@ commands:
     forPlayerWorldFailed: '%prefix% &cVous avez déjà &eactivé les items dans &7[&e%world%&7] &cpour &e%player%&c.'
     globalPlayers: '%prefix% &aVous avez &eactivé &btous les items &apour &etous les joueurs&a.'
     globalPlayersFailed: '%prefix% &cLes items ont déja été &eactivé &cpour &etous les joueurs&c.'
+    toggleEnable: '%prefix% &aVous avez activé l''élément &b%item%&a et il vous sera désormais attribué.'
     togglePlayerFailed: '%prefix% &cVous ne pouvez pas activer l’élément %item% car tous les éléments sont désactivés pour vous globalement !'
   disabled:
     forPlayer: '%prefix% &aVous avez &edésactivé &btous les items &apour &e%player%&a.'
@@ -120,6 +121,7 @@ commands:
     forPlayerWorldFailed: '%prefix% &cVous avez déjà &edésactivé les items dans &7[&e%world%&7] &cpour &e%player%&c.'
     globalPlayers: '%prefix% &aVous avez &edésactivé &btous les items &apour &etous les joueurs&a.'
     globalPlayersFailed: '%prefix% &cLes items ont déja été &edésactivé &cpour &etous les joueurs&c.'
+    toggleDisable: '%prefix% &cVous avez désactivé l''élément &b%item%&c et il ne sera plus donné.'
     togglePlayerFailed: '%prefix% &cVous ne pouvez pas désactiver l’élément %item% car tous les éléments sont désactivés pour vous globalement !'
 
 # Ces espaces réservés sont spécifiques aux messages du plugin.

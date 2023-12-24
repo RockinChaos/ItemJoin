@@ -110,6 +110,7 @@ commands:
     forPlayerWorldFailed: '%prefix% &cYou have already &eenabled &7[&e%world%&7] items &cfor &e%player%&c.'
     globalPlayers: '%prefix% &aYou have &eenabled &ball items &afor &eall players&a.'
     globalPlayersFailed: '%prefix% &cItems have already been &eenabled &cfor &eall players&c.'
+    toggleEnable: '%prefix% &aYou have enabled the item &b%item%&a and it will now be given.'
     togglePlayerFailed: '%prefix% &cYou cannot enable the item %item% as all items are disabled for you globally!'
   disabled:
     forPlayer: '%prefix% &aYou have &edisabled &ball items &afor &e%player%&a.'
@@ -120,6 +121,7 @@ commands:
     forPlayerWorldFailed: '%prefix% &cYou have already &edisabled &7[&e%world%&7] items &cfor &e%player%&c.'
     globalPlayers: '%prefix% &aYou have &edisabled &ball items &afor &eall players&a.'
     globalPlayersFailed: '%prefix% &cItems have already been &edisabled &cfor &eall players&c.'
+    toggleDisable: '&cYou have disabled the item &b%item%&c and it will no longer be given.'
     togglePlayerFailed: '%prefix% &cYou cannot disable the item %item% as all items are disabled for you globally!'
 
 # These placeholders are specific to the plugin messages.
