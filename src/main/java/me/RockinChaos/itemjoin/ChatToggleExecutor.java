@@ -64,7 +64,7 @@ public class ChatToggleExecutor implements CommandExecutor {
                             }
                             final String toggleMessage = (itemMap.getToggleMessage() != null ? StringUtils.translateLayout(itemMap.getToggleMessage(), player, placeHolders): null);
                             if (toggleMessage != null) {
-                                ServerUtils.messageSender(player, toggleMessage);
+                                ServerUtils.messageSender(player, toggleMessage, false);
                             } else {
                                 ItemJoin.getCore().getLang().sendLangMessage("commands.disabled.toggleDisable", player, placeHolders);
                             }
@@ -81,7 +81,7 @@ public class ChatToggleExecutor implements CommandExecutor {
                             }
                             final String toggleMessage = (itemMap.getToggleMessage() != null ? StringUtils.translateLayout(itemMap.getToggleMessage(), player, placeHolders): null);
                             if (toggleMessage != null) {
-                                ServerUtils.messageSender(player, toggleMessage);
+                                ServerUtils.messageSender(player, toggleMessage, false);
                             } else {
                                 ItemJoin.getCore().getLang().sendLangMessage("commands.enabled.toggleEnable", player, placeHolders);
                             }
