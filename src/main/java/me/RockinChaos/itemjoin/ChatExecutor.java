@@ -42,15 +42,11 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.Plugin;
 
 import javax.annotation.Nonnull;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ChatExecutor implements CommandExecutor {
 
@@ -290,33 +286,12 @@ public class ChatExecutor implements CommandExecutor {
      */
     private void dump(final CommandSender sender) {
         try {
-            final String pluginVersion = "ItemJoin v" + ItemJoin.getCore().getPlugin().getDescription().getVersion() + " by RockinChaos";
-            final String serverVersion = Bukkit.getServer().getClass().getPackage().getName();
-            final String config = Files.asCharSource(new File(ItemJoin.getCore().getPlugin().getDataFolder() + "/config.yml"), StandardCharsets.UTF_8).read();
-            final String items = Files.asCharSource(new File(ItemJoin.getCore().getPlugin().getDataFolder() + "/items.yml"), StandardCharsets.UTF_8).read();
-            final String lang = Files.asCharSource(new File(ItemJoin.getCore().getPlugin().getDataFolder() + "/" + ItemJoin.getCore().getLang().getFile()), StandardCharsets.UTF_8).read();
-            final String latest = Files.asCharSource(new File("logs/latest.log"), StandardCharsets.UTF_8).read();
-            final StringBuilder plugins = new StringBuilder();
-            for (Plugin plugin : ItemJoin.getCore().getPlugin().getServer().getPluginManager().getPlugins()) {
-                plugins.append(!StringUtils.isEmpty(plugins) ? ", " : "").append(plugin.getName());
-            }
-            final PasteAPI pasteURI = new PasteAPI(
-                    "# +---------------------------------------------------------------------------------------------+ #\n" +
-                            "# | Plugin Version: " + pluginVersion + "\n" +
-                            "# | Server Version: " + serverVersion + "\n" +
-                            "# | Plugins: " + plugins + "\n" +
-                            "# +---------------------------------------------------------------------------------------------+ #\n" +
-                            "# +-------------------------------------- CONFIG.YML FILE --------------------------------------+ #\n" +
-                            "# +---------------------------------------------------------------------------------------------+ #\n" + config +
-                            " \n\n\n\n\n# +---------------------------------------------------------------------------------------------+ #\n" +
-                            "# +------------------------------- ITEMS.YML FILE (CUSTOM ITEMS) -------------------------------+ #\n" +
-                            "# +---------------------------------------------------------------------------------------------+ #\n" + items +
-                            " \n\n\n\n\n# +---------------------------------------------------------------------------------------------+ #\n" +
-                            "# +---------------------------------- LANG.YML FILE (LANGUAGE) ---------------------------------+ #\n" +
-                            "# +---------------------------------------------------------------------------------------------+ #\n" + lang +
-                            " \n\n\n\n\n# +---------------------------------------------------------------------------------------------+ #\n" +
-                            "# +------------------------------------ SERVER LOG (LATEST) ------------------------------------+ #\n" +
-                            "# +---------------------------------------------------------------------------------------------+ #\n" + latest);
+            final Map<String, String> files = new HashMap<>();
+            files.put("latest.log", Files.asCharSource(new File("logs/latest.log"), StandardCharsets.UTF_8).read());
+            files.put("config.yml", Files.asCharSource(new File(ItemJoin.getCore().getPlugin().getDataFolder() + "/config.yml"), StandardCharsets.UTF_8).read());
+            files.put("lang.yml", Files.asCharSource(new File(ItemJoin.getCore().getPlugin().getDataFolder() + "/" + ItemJoin.getCore().getLang().getFile()), StandardCharsets.UTF_8).read());
+            files.put("items.yml", Files.asCharSource(new File(ItemJoin.getCore().getPlugin().getDataFolder() + "/items.yml"), StandardCharsets.UTF_8).read());
+            final PasteAPI pasteURI = new PasteAPI(sender, Collections.singletonList("ExploitFixer"), files);
             final String pasteURL = pasteURI.getPaste();
             ServerUtils.logInfo(sender.getName() + " has generated a debug paste at " + pasteURL);
             if (!(sender instanceof ConsoleCommandSender)) {
