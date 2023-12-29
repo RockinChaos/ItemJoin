@@ -21,7 +21,7 @@
         <authlib.version>1.5.21</authlib.version>
         <worldguard.version>7.0.4-SNAPSHOT</worldguard.version>
 
-        <build.version>${CI_PIPELINE_IID}</build.version>
+        <build.version>${env.BUILD_NUMBER}</build.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>1.8</java.version>
@@ -131,12 +131,12 @@
             <id>VaultAPI</id>
             <url>https://ci.ender.zone/plugin/repository/everything/net/milkbowl/vault/</url>
         </repository>
-        <!--CraftationGaming-Old Repository-->
+        <!--CraftationGaming Repositories-->
         <repository>
-            <id>CraftationGaming</id>
-            <url>https://labs.craftationgaming.com/api/v4/projects/3/packages/maven</url>
+            <id>CraftationGaming-releases</id>
+            <name>CraftationGaming Repository</name>
+            <url>https://repo.craftationgaming.com/releases</url>
         </repository>
-        <!--CraftationGaming Repository-->
         <repository>
             <id>CraftationGaming-snapshots</id>
             <name>CraftationGaming Repository</name>
@@ -273,12 +273,12 @@
 
     <distributionManagement>
         <repository>
-            <id>gitlab-maven</id>
-            <url>${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/maven</url>
+            <id>CraftationGaming</id>
+            <url>https://repo.craftationgaming.com/releases</url>
         </repository>
         <snapshotRepository>
-            <id>gitlab-maven</id>
-            <url>${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/maven</url>
+            <id>CraftationGaming</id>
+            <url>https://repo.craftationgaming.com/snapshots</url>
         </snapshotRepository>
     </distributionManagement>
 </project>
