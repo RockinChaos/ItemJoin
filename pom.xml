@@ -131,16 +131,15 @@
             <id>VaultAPI</id>
             <url>https://ci.ender.zone/plugin/repository/everything/net/milkbowl/vault/</url>
         </repository>
-        <!--CraftationGaming Repositories-->
+        <!--ChestSortAPI Repository-->
         <repository>
-            <id>CraftationGaming-releases</id>
-            <name>CraftationGaming Repository</name>
-            <url>https://repo.craftationgaming.com/releases</url>
+            <id>CraftationGaming-other</id>
+            <url>https://repo.craftationgaming.com/other</url>
         </repository>
+        <!--ChaosCore Repository-->
         <repository>
-            <id>CraftationGaming-snapshots</id>
-            <name>CraftationGaming Repository</name>
-            <url>https://repo.craftationgaming.com/snapshots</url>
+            <id>CraftationGaming-chaos</id>
+            <url>https://repo.craftationgaming.com/chaos</url>
         </repository>
     </repositories>
 
@@ -274,11 +273,11 @@
     <distributionManagement>
         <repository>
             <id>CraftationGaming</id>
-            <url>https://repo.craftationgaming.com/releases</url>
+            <url>https://repo.craftationgaming.com/chaos</url>
         </repository>
         <snapshotRepository>
             <id>CraftationGaming</id>
-            <url>https://repo.craftationgaming.com/snapshots</url>
+            <url>https://repo.craftationgaming.com/chaos</url>
         </snapshotRepository>
     </distributionManagement>
 </project>
