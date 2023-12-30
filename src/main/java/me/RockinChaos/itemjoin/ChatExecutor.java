@@ -226,10 +226,14 @@ public class ChatExecutor implements CommandExecutor {
         } else if (Execute.REMOVEALL.accept(sender, args, 0)) {
             this.handleAllItems(sender, args, true);
         } else if (Execute.UPDATE.accept(sender, args, 0)) {
-            ItemJoin.getCore().getLang().sendLangMessage("commands.updates.checkRequest", sender);
-            SchedulerUtils.runAsync(() -> ItemJoin.getCore().getUpdater().checkUpdates(sender, false));
+            String[] placeHolders = ItemJoin.getCore().getLang().newString();
+            placeHolders[21] = sender.getName();
+            ItemJoin.getCore().getLang().sendLangMessage("commands.updates.checkRequest", Bukkit.getServer().getConsoleSender(), placeHolders);
+            SchedulerUtils.runAsync(() -> ItemJoin.getCore().getUpdater().checkUpdates(sender, true));
         } else if (Execute.UPGRADE.accept(sender, args, 0)) {
-            ItemJoin.getCore().getLang().sendLangMessage("commands.updates.updateRequest", sender);
+            String[] placeHolders = ItemJoin.getCore().getLang().newString();
+            placeHolders[21] = sender.getName();
+            ItemJoin.getCore().getLang().sendLangMessage("commands.updates.updateRequest", Bukkit.getServer().getConsoleSender(), placeHolders);
             SchedulerUtils.runAsync(() -> ItemJoin.getCore().getUpdater().forceUpdates(sender));
         } else if (executor == null) {
             ItemJoin.getCore().getLang().sendLangMessage("commands.default.unknownCommand", sender);

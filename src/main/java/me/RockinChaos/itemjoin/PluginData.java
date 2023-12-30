@@ -446,6 +446,7 @@ public class PluginData {
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- //
         ItemJoin.getCore().getConfiguration().reloadFiles(); // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- //
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- //
+        ItemJoin.getCore().getData().setCheckforUpdates(ItemJoin.getCore().getConfig("config.yml").getBoolean("General.CheckforUpdates"));
         ItemJoin.getCore().getData().setDebug(ItemJoin.getCore().getConfig("config.yml").getBoolean("General.Debugging"));
         ItemJoin.getCore().getData().setIgnoreErrors(ItemJoin.getCore().getConfig("config.yml").getBoolean("General.ignoreErrors"));
         ItemJoin.getCore().getData().setDataTags(ItemJoin.getCore().getConfig("config.yml").getBoolean("Settings.DataTags"));

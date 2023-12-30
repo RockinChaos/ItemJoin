@@ -48,7 +48,7 @@ public class ItemJoin extends JavaPlugin {
      */
     @Override
     public void onLoad() {
-        core = new Core(this, this.getFile(), this.getName(), false);
+        core = new Core(this, this.getFile(), this.getName());
     }
 
     /**
