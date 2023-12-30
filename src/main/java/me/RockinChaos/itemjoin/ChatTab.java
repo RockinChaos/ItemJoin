@@ -159,8 +159,8 @@ public class ChatTab implements TabCompleter {
             if (PermissionsHandler.hasPermission(sender, "itemjoin.updates")) {
                 commands.add("updates");
             }
-            if (PermissionsHandler.hasPermission(sender, "itemjoin.autoupdate")) {
-                commands.add("autoupdate");
+            if (PermissionsHandler.hasPermission(sender, "itemjoin.upgrade")) {
+                commands.add("upgrade");
             }
         }
         StringUtil.copyPartialMatches(args[(args.length - 1)], commands, completions);
