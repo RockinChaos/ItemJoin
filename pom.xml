@@ -80,6 +80,12 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
+                            <relocations>
+                                <relocation>
+                                    <pattern>me.RockinChaos.core</pattern>
+                                    <shadedPattern>me.RockinChaos.itemjoin.core</shadedPattern>
+                                </relocation>
+                            </relocations>
                             <filters>
                                 <filter>
                                     <artifact>*</artifact>
