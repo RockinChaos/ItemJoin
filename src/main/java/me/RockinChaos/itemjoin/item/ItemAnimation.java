@@ -17,8 +17,6 @@
  */
 package me.RockinChaos.itemjoin.item;
 
-import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.properties.Property;
 import me.RockinChaos.core.handlers.ItemHandler;
 import me.RockinChaos.core.handlers.PlayerHandler;
 import me.RockinChaos.core.utils.SchedulerUtils;
@@ -32,8 +30,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.lang.reflect.Field;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
 
 public class ItemAnimation {
 
@@ -451,16 +451,7 @@ public class ItemAnimation {
             if (ownerString != null) {
                 ItemHandler.setSkullOwner(tempMeta, player, StringUtils.translateLayout(ItemHandler.cutDelay(ownerString), player));
             } else if (textureString != null && !textureString.contains("hdb-") && !this.itemMap.isHeadDatabase()) {
-                try {
-                    final UUID uuid = UUID.randomUUID();
-                    final GameProfile gameProfile = new GameProfile(uuid, uuid.toString().replaceAll("_", "").replaceAll("-", ""));
-                    gameProfile.getProperties().put("textures", new Property("textures", ItemHandler.cutDelay(StringUtils.toTextureUUID(player, this.itemMap.getConfigName(), textureString))));
-                    final Field declaredField = tempMeta.getClass().getDeclaredField("profile");
-                    declaredField.setAccessible(true);
-                    declaredField.set(tempMeta, gameProfile);
-                } catch (Exception e) {
-                    ServerUtils.sendDebugTrace(e);
-                }
+                ItemHandler.setSkullTexture(player, tempMeta, ItemHandler.cutDelay(StringUtils.toTextureUUID(player, this.itemMap.getConfigName(), textureString)));
             }
             reviseItem.setItemMeta(tempMeta);
         }

@@ -17,8 +17,6 @@
  */
 package me.RockinChaos.itemjoin.item;
 
-import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.properties.Property;
 import com.vk2gpz.tokenenchant.api.TokenEnchantAPI;
 import me.RockinChaos.core.handlers.ItemHandler;
 import me.RockinChaos.core.handlers.PermissionsHandler;
@@ -3833,16 +3831,7 @@ public class ItemMap implements Cloneable {
         if (this.skullOwner != null) {
             this.tempMeta = ItemHandler.setSkullOwner(this.tempMeta, player, StringUtils.translateLayout(this.skullOwner, player));
         } else if (this.skullTexture != null && !this.headDatabase) {
-            try {
-                final UUID uuid = UUID.randomUUID();
-                GameProfile gameProfile = new GameProfile(uuid, uuid.toString().replaceAll("_", "").replaceAll("-", ""));
-                gameProfile.getProperties().put("textures", new Property("textures", ((this.skullOwner != null && ItemJoin.getCore().getDependencies().skinsRestorerEnabled()) ? ItemJoin.getCore().getDependencies().getSkinValue(player.getUniqueId(), StringUtils.translateLayout(this.skullOwner, player)) : StringUtils.toTextureUUID(player, this.configName, this.skullTexture))));
-                Field declaredField = this.tempMeta.getClass().getDeclaredField("profile");
-                declaredField.setAccessible(true);
-                declaredField.set(this.tempMeta, gameProfile);
-            } catch (Exception e) {
-                ServerUtils.sendDebugTrace(e);
-            }
+            this.tempMeta = ItemHandler.setSkullTexture(player, this.tempMeta, StringUtils.toTextureUUID(player, this.configName, this.skullTexture));
         }
     }
 
