@@ -60,8 +60,8 @@ This should look like `5.0.6-RELEASE` or `5.0.7-SNAPSHOT` as an example.
     <repositories>
     <!--CraftationGaming Repository-->
         <repository>
-            <id>CraftationGaming</id>
-            <url>https://raw.githubusercontent.com/RockinChaos/repository/maven-public/</url>
+            <id>CraftationGaming-chaos</id>
+            <url>https://repo.craftationgaming.com/chaos</url>
         </repository>
     </repositories>
     <dependencies>
