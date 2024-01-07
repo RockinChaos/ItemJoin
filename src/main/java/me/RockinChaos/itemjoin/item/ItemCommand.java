@@ -593,7 +593,7 @@ public class ItemCommand {
             if (altPlayer != null) {
                 values[0] = altPlayer.getName();
             }
-            String jsonMessage = PluginData.getInfo().getJSONMessage(StringUtils.translateLayout(this.command, player, values), this.itemMap.getConfigName());
+            String jsonMessage = StringUtils.translateLayout(PluginData.getInfo().getJSONMessage(this.command, this.itemMap.getConfigName()), player, values);
             Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "minecraft:tellraw " + player.getName() + " " + jsonMessage);
         } catch (Exception e) {
             ServerUtils.logSevere("{ItemCommand} There was an error executing an item's command to send a message, if this continues report it to the developer.");

@@ -220,8 +220,8 @@ public class PluginData {
                     Matcher matchPattern = java.util.regex.Pattern.compile(jsonType.matchType + "(.*?)>").matcher(formatLine);
                     if (matchPattern.find()) {
                         String inputResult = matchPattern.group(1);
-                        JSONBuilder.put(JSONBuilder.size(), ((jsonType != JSONEvent.TEXT) ? (",\"" + jsonType.event + "\":{\"action\":\""
-                                + jsonType.action + "\",\"value\":\"" + inputResult + "\"}") : ("," + "{\"" + jsonType.action + "\":\"" + inputResult + "\"")));
+                        JSONBuilder.put(JSONBuilder.size(), ((jsonType != JSONEvent.TEXT && jsonType != JSONEvent.COLOR) ? (",\"" + jsonType.event + "\":{\"action\":\""
+                                + jsonType.action + "\",\"value\":\"" + inputResult + "\"}") : ("," + (jsonType != JSONEvent.COLOR ? "{" : "") + "\"" + jsonType.action + "\":\"" + inputResult + "\"")));
                         formatLine = formatLine.replace(jsonType.matchType + inputResult + ">", "<JSONEvent>");
                         ItemHandler.safetyCheckURL(configName, jsonType, inputResult);
                     }
@@ -258,7 +258,20 @@ public class PluginData {
         } else if (message.contains("raw:")) {
             return message.replace("raw: ", "").replace("raw:", "");
         } else {
-            textBuilder.append("," + "{\"text\":\"").append(formatLine).append("\"}");
+            if (formatLine.contains("&#")) {
+                String[] hexFormat = formatLine.split("&#");
+                for (String line : hexFormat) {
+                    if (!line.isEmpty()) {
+                        if (line.length() > 6 && line.substring(0, 6).matches("^[0-9a-fA-F]+$")) {
+                            textBuilder.append("," + "{\"text\":\"").append(line.substring(6)).append("\",").append("\"color\":\"#").append(line, 0, 6).append("\"}");
+                        } else {
+                            textBuilder.append("," + "{\"text\":\"").append(line).append("\"}");
+                        }
+                    }
+                }
+            } else {
+                textBuilder.append("," + "{\"text\":\"").append(formatLine).append("\"}");
+            }
         }
         return textBuilder + "]";
     }
