@@ -845,7 +845,7 @@ public class ItemMap implements Cloneable {
         if (this.customName != null && !this.customName.equalsIgnoreCase(ItemHandler.getMaterialName(this.tempItem))) {
             if (this.legacySecret != null && !ServerUtils.hasSpecificUpdate("1_14")) {
                 final String itemData = this.tempMeta.getDisplayName();
-                this.tempMeta.setDisplayName(StringUtils.translateLayout(ItemHandler.cutDelay(this.customName), player) + "§r" + itemData);
+                this.tempMeta.setDisplayName(StringUtils.translateLayout(ItemHandler.cutDelay(this.customName), player) + ChatColor.COLOR_CHAR + "r" + itemData);
             } else {
                 this.tempMeta.setDisplayName(StringUtils.translateLayout(ItemHandler.cutDelay(this.customName), player));
             }
@@ -5584,7 +5584,7 @@ public class ItemMap implements Cloneable {
             itemData.set("items." + this.configName + ".model-data", this.modelData);
         }
         if (this.author != null && !this.author.isEmpty()) {
-            itemData.set("items." + this.configName + ".author", this.author.replace("§", "&"));
+            itemData.set("items." + this.configName + ".author", this.author.replace(ChatColor.COLOR_CHAR, '&'));
         }
         if (this.customName != null && !this.customName.isEmpty() && (this.dynamicNames == null || this.dynamicNames.isEmpty())) {
             String setName;
@@ -5596,9 +5596,9 @@ public class ItemMap implements Cloneable {
                 }
                 StringUtils.colorEncode(this.tempItem, this.legacySecret);
                 final String itemInfo = this.tempItem.getItemMeta().getDisplayName();
-                setName = this.customName.replace(itemInfo, "").replace("§", "&");
+                setName = this.customName.replace(itemInfo, "").replace(ChatColor.COLOR_CHAR, '&');
             } else {
-                setName = this.customName.replace("§", "&");
+                setName = this.customName.replace(ChatColor.COLOR_CHAR, '&');
             }
             if (setName.startsWith("&f") && !ItemJoin.getCore().getData().dataTagsEnabled()) {
                 setName = setName.substring(2);
@@ -5608,7 +5608,7 @@ public class ItemMap implements Cloneable {
             }
         } else if (this.dynamicNames != null && !this.dynamicNames.isEmpty()) {
             for (int i = 0; i < this.dynamicNames.size(); i++) {
-                itemData.set("items." + this.configName + ".name." + (i + 1), this.dynamicNames.get(i).replace("§", "&"));
+                itemData.set("items." + this.configName + ".name." + (i + 1), this.dynamicNames.get(i).replace(ChatColor.COLOR_CHAR, '&'));
             }
         }
         if (this.customLore != null && !this.customLore.isEmpty() && (this.dynamicLores == null || this.dynamicLores.isEmpty())) {
@@ -5617,7 +5617,7 @@ public class ItemMap implements Cloneable {
             for (int i = 0; i < this.dynamicLores.size(); i++) {
                 List<String> lores = new ArrayList<>();
                 for (String lore : this.dynamicLores.get(i)) {
-                    lores.add(lore.replace("§", "&"));
+                    lores.add(lore.replace(ChatColor.COLOR_CHAR, '&'));
                 }
                 itemData.set("items." + this.configName + ".lore." + (i + 1), lores);
             }
@@ -5626,7 +5626,7 @@ public class ItemMap implements Cloneable {
             for (int i = 0; i < this.listPages.size(); i++) {
                 List<String> pages = new ArrayList<>();
                 for (String page : this.listPages.get(i)) {
-                    pages.add(page.replace("§", "&"));
+                    pages.add(page.replace(ChatColor.COLOR_CHAR, '&'));
                 }
                 itemData.set("items." + this.configName + ".pages." + (i + 1), pages);
             }

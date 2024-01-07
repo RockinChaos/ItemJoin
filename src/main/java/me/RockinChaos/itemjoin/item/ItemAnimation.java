@@ -25,6 +25,7 @@ import me.RockinChaos.core.utils.StringUtils;
 import me.RockinChaos.core.utils.api.LegacyAPI;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.listeners.Clicking;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -345,7 +346,7 @@ public class ItemAnimation {
             if (this.itemMap.getLegacySecret() != null && !this.itemMap.getLegacySecret().isEmpty()) {
                 final String encodeData = Objects.requireNonNull(StringUtils.colorEncode(new ItemStack(Material.STICK), this.itemMap.getLegacySecret()).getItemMeta()).getDisplayName();
                 if (!encodeData.isEmpty()) {
-                    itemData = "§r" + encodeData;
+                    itemData = ChatColor.COLOR_CHAR + "r" + encodeData;
                 }
             }
             tempMeta.setDisplayName(StringUtils.translateLayout(ItemHandler.cutDelay(nameString), player) + itemData);

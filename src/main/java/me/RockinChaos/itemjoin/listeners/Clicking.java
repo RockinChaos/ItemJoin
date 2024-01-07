@@ -28,6 +28,7 @@ import me.RockinChaos.itemjoin.PluginData;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -78,7 +79,7 @@ public class Clicking implements Listener {
     private void onGlobalModify(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
         if (PluginData.getInfo().isPreventString(player, "itemMovement")) {
-            if (PluginData.getInfo().isPreventBypass(player) && !(player.getOpenInventory().getTitle().contains("§") || player.getOpenInventory().getTitle().contains("&"))) {
+            if (PluginData.getInfo().isPreventBypass(player) && !(player.getOpenInventory().getTitle().contains(String.valueOf(ChatColor.COLOR_CHAR)) || player.getOpenInventory().getTitle().contains("&"))) {
                 event.setCancelled(true);
             }
         }

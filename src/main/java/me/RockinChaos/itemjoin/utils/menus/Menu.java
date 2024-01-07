@@ -656,12 +656,12 @@ public class Menu {
         if (item.hasItemMeta()) {
             final ItemMeta itemMeta = item.getItemMeta();
             if (itemMeta != null && itemMeta.hasDisplayName()) {
-                itemMap.setCustomName(itemMeta.getDisplayName().replace("§", "&"));
+                itemMap.setCustomName(itemMeta.getDisplayName().replace(ChatColor.COLOR_CHAR, '&'));
             }
             if (itemMeta != null && itemMeta.getLore() != null) {
                 List<String> newLore = new ArrayList<>();
                 for (String lore : itemMeta.getLore()) {
-                    newLore.add(lore.replace("§", "&"));
+                    newLore.add(lore.replace(ChatColor.COLOR_CHAR, '&'));
                 }
                 itemMap.setCustomLore(newLore);
             }
@@ -708,21 +708,21 @@ public class Menu {
         } else if (itemMap.getMaterial() == Material.WRITTEN_BOOK) {
             final ItemMeta itemMeta = item.getItemMeta();
             if (itemMeta != null) {
-                itemMap.setAuthor(Objects.requireNonNull(((BookMeta) itemMeta).getAuthor()).replace("§", "&"));
-                itemMap.setTitle(Objects.requireNonNull(((BookMeta) itemMeta).getTitle()).replace("§", "&"));
+                itemMap.setAuthor(Objects.requireNonNull(((BookMeta) itemMeta).getAuthor()).replace(ChatColor.COLOR_CHAR, '&'));
+                itemMap.setTitle(Objects.requireNonNull(((BookMeta) itemMeta).getTitle()).replace(ChatColor.COLOR_CHAR, '&'));
                 if (ServerUtils.hasSpecificUpdate("1_10")) {
                     itemMap.setGeneration(((BookMeta) itemMeta).getGeneration());
                 }
                 List<String> newPages = new ArrayList<>();
                 for (String page : ((BookMeta) itemMeta).getPages()) {
-                    newPages.add(page.replace("§", "&"));
+                    newPages.add(page.replace(ChatColor.COLOR_CHAR, '&'));
                 }
                 itemMap.setPages(newPages);
                 List<List<String>> savePages = new ArrayList<>();
                 for (String page : ((BookMeta) itemMeta).getPages()) {
                     List<String> pageList = new ArrayList<>();
                     for (String splitPage : page.split("\n")) {
-                        pageList.add(splitPage.replace("§", "&"));
+                        pageList.add(splitPage.replace(ChatColor.COLOR_CHAR, '&'));
                     }
                     savePages.add(pageList);
                 }
