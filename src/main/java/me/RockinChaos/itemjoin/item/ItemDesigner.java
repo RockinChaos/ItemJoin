@@ -516,9 +516,9 @@ public class ItemDesigner {
                                 Matcher matchPattern = java.util.regex.Pattern.compile(jsonType.matchType + "(.*?)>").matcher(formatLine);
                                 if (matchPattern.find()) {
                                     String inputResult = matchPattern.group(1);
-                                    JSONBuilder.put(JSONBuilder.size(), ((jsonType != JSONEvent.TEXT)
+                                    JSONBuilder.put(JSONBuilder.size(), ((jsonType != JSONEvent.TEXT && jsonType != JSONEvent.COLOR)
                                             ? (",\"" + jsonType.event + "\":{\"action\":\"" + jsonType.action + "\",\"value\":\"" + inputResult + "\"}")
-                                            : ("," + "{\"" + jsonType.action + "\":\"" + inputResult + "\"")));
+                                            : ("," + (jsonType != JSONEvent.COLOR ? "{" : "") + "\"" + jsonType.action + "\":\"" + inputResult + "\"")));
                                     formatLine = formatLine.replace(jsonType.matchType + inputResult + ">", "<JSONEvent>");
                                     ItemHandler.safetyCheckURL(itemMap.getConfigName(), jsonType, inputResult);
                                 }
@@ -583,7 +583,7 @@ public class ItemDesigner {
         if (ItemJoin.getCore().getData().dataTagsEnabled() || itemMap.isVanilla()) {
             itemMap.setCustomName(name);
         } else {
-            itemMap.setCustomName("§f" + name);
+            itemMap.setCustomName(ChatColor.COLOR_CHAR + "f" + name);
         }
     }
 
