@@ -4903,13 +4903,6 @@ public class Menu {
                 itemMap.setEquip(!itemMap.isEquip());
                 flagPane(player, itemMap);
             }));
-            flagPane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, itemMap.isDynamic(), false, "&a&l&nDynamic", "&7",
-                    "&a&lTrue&f: &7Allows the item to dynamically", "&7update every 100 ticks", "&7Useful for updating placeholders.", "&7",
-                    "&c&lFalse&f: &7Item will not update its name, lore, etc.", "&7",
-                    "&9&lENABLED: &a" + (itemMap.isDynamic() + "").toUpperCase()), event -> {
-                itemMap.setDynamic(!itemMap.isDynamic());
-                flagPane(player, itemMap);
-            }));
             flagPane.addButton(new Button(ItemHandler.getItem("EGG", 1, itemMap.isAnimated(), false, "&a&l&nAnimate", "&7",
                     "&a&lTrue&f: &7Allows the item to animate between", "&7its different iterations defined", "&7under the animations tab.", "&7",
                     "&c&lFalse&f: &7Item will not animate.", "&7",
@@ -4928,6 +4921,20 @@ public class Menu {
                         itemMap.setDynamicNames(names);
                     }
                 }
+                flagPane(player, itemMap);
+            }));
+            flagPane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, itemMap.isDynamic(), false, "&a&l&nDynamic", "&7",
+                    "&a&lTrue&f: &7Allows the item to dynamically", "&7update every 100 ticks", "&7Useful for updating placeholders.", "&7",
+                    "&c&lFalse&f: &7Item will not update its name, lore, etc.", "&7",
+                    "&9&lENABLED: &a" + (itemMap.isDynamic() + "").toUpperCase()), event -> {
+                itemMap.setDynamic(!itemMap.isDynamic());
+                flagPane(player, itemMap);
+            }));
+            flagPane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 4, itemMap.isDynamicCount(), false, "&a&l&nDynamic Count", "&7",
+                    "&a&lTrue&f: &7When an item dynamically updates", "&7the items count will be reset to its default.", "&7Only functions with the dynamic or animate itemflag.", "&7",
+                    "&c&lFalse&f: &7The item will keep its existing count.", "&7",
+                    "&9&lENABLED: &a" + (itemMap.isDynamicCount() + "").toUpperCase()), event -> {
+                itemMap.setDynamicCount(!itemMap.isDynamicCount());
                 flagPane(player, itemMap);
             }));
             flagPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CHEST_MINECART" : "342"), 1, itemMap.isItemStore(), false, "&a&l&nItem Store", "&7",
@@ -5056,7 +5063,7 @@ public class Menu {
                 itemMap.setSplittable(!itemMap.isSplittable());
                 flagPane(player, itemMap);
             }));
-            flagPane.addButton(new Button(fillerPaneBItem), 32);
+            flagPane.addButton(new Button(fillerPaneBItem), 31);
         });
         flagPane.open(player);
     }
@@ -5112,6 +5119,9 @@ public class Menu {
         }
         if (itemMap.isDynamic()) {
             itemflags += "DYNAMIC, ";
+        }
+        if (itemMap.isDynamicCount()) {
+            itemflags += "DYNAMIC-COUNT, ";
         }
         if (itemMap.isAnimated()) {
             itemflags += "ANIMATE, ";
@@ -7544,7 +7554,7 @@ public class Menu {
                 if (stack1 != null) {
                     ItemMeta meta = stack1.getItemMeta();
                     if (meta != null) {
-                        stack1 = ItemHandler.addLore(stack1, "&9&lDISPLAY: &f" + meta.getDisplayName(), "&7", "&7*Create a recipe that can be used.");
+                        ItemHandler.addLore(stack1, "&9&lDISPLAY: &f" + meta.getDisplayName(), "&7", "&7*Create a recipe that can be used.");
                         meta.setDisplayName(StringUtils.translateLayout((itemMap.getRecipe().get(0).size() > i ? "&e&l" + itemMap.getRecipe().get(0).get(i) : "&e&lX"), player));
                         stack1.setItemMeta(meta);
 

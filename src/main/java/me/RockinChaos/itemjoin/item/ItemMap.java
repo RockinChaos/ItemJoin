@@ -194,6 +194,7 @@ public class ItemMap implements Cloneable {
     private boolean noRepairing = false;
     private boolean animate = false;
     private boolean dynamic = false;
+    private boolean dynamicCount = false;
     private boolean glowing = false;
     private boolean overwritable = false;
     private boolean blockPlacement = false;
@@ -462,46 +463,47 @@ public class ItemMap implements Cloneable {
     private void setItemflags() {
         if (this.nodeLocation.getString(".itemflags") != null) {
             this.itemflags = this.nodeLocation.getString(".itemflags");
-            this.vanillaItem = StringUtils.containsIgnoreCase(this.itemflags, "vanilla");
-            this.vanillaStatus = StringUtils.containsIgnoreCase(this.itemflags, "vanilla-status");
-            this.vanillaControl = StringUtils.containsIgnoreCase(this.itemflags, "vanilla-control");
-            this.disposable = StringUtils.containsIgnoreCase(this.itemflags, "disposable");
-            this.blockPlacement = StringUtils.containsIgnoreCase(this.itemflags, "placement");
-            this.blockMovement = StringUtils.containsIgnoreCase(this.itemflags, "inventory-modify") || StringUtils.containsIgnoreCase(this.itemflags, "inventory-close");
-            this.blockEquip = StringUtils.containsIgnoreCase(this.itemflags, "cancel-equip");
-            this.closeInventory = StringUtils.containsIgnoreCase(this.itemflags, "inventory-close");
-            this.itemChangeable = StringUtils.containsIgnoreCase(this.itemflags, "allow-modifications") || StringUtils.containsIgnoreCase(this.itemflags, "item-changeable");
-            this.alwaysGive = StringUtils.containsIgnoreCase(this.itemflags, "always-give");
-            this.autoRemove = StringUtils.containsIgnoreCase(this.itemflags, "auto-remove");
-            this.stackable = StringUtils.containsIgnoreCase(this.itemflags, "stackable");
-            this.notHat = StringUtils.containsIgnoreCase(this.itemflags, "not-hat");
-            this.selectable = StringUtils.containsIgnoreCase(this.itemflags, "selectable");
-            this.splittable = StringUtils.containsIgnoreCase(this.itemflags, "splittable");
-            this.dynamic = StringUtils.containsIgnoreCase(this.itemflags, "dynamic");
-            this.animate = StringUtils.containsIgnoreCase(this.itemflags, "animate");
-            this.glowing = StringUtils.containsIgnoreCase(this.itemflags, "glowing") || StringUtils.containsIgnoreCase(this.itemflags, "glow");
-            this.giveNext = StringUtils.containsIgnoreCase(this.itemflags, "give-next");
-            this.moveNext = StringUtils.containsIgnoreCase(this.itemflags, "move-next");
-            this.dropFull = StringUtils.containsIgnoreCase(this.itemflags, "drop-full");
-            this.itemStore = StringUtils.containsIgnoreCase(this.itemflags, "item-store");
-            this.itemModify = StringUtils.containsIgnoreCase(this.itemflags, "item-modifiable");
-            this.noCrafting = StringUtils.containsIgnoreCase(this.itemflags, "item-craftable");
-            this.noRepairing = StringUtils.containsIgnoreCase(this.itemflags, "item-repairable");
-            this.cancelEvents = StringUtils.containsIgnoreCase(this.itemflags, "cancel-events");
-            this.countLock = StringUtils.containsIgnoreCase(this.itemflags, "count-lock");
-            this.teleportArrow = StringUtils.containsIgnoreCase(this.itemflags, "teleport");
-            this.overwritable = StringUtils.containsIgnoreCase(this.itemflags, "overwrite");
-            this.ipLimited = StringUtils.containsIgnoreCase(this.itemflags, "ip-limit");
-            this.deathKeepable = StringUtils.containsIgnoreCase(this.itemflags, "death-keep");
-            this.deathDroppable = StringUtils.containsIgnoreCase(this.itemflags, "death-drops");
-            this.selfDroppable = StringUtils.containsIgnoreCase(this.itemflags, "self-drops");
+            this.vanillaItem = StringUtils.splitIgnoreCase(this.itemflags, "vanilla", ",");
+            this.vanillaStatus = StringUtils.splitIgnoreCase(this.itemflags, "vanilla-status", ",");
+            this.vanillaControl = StringUtils.splitIgnoreCase(this.itemflags, "vanilla-control", ",");
+            this.disposable = StringUtils.splitIgnoreCase(this.itemflags, "disposable", ",");
+            this.blockPlacement = StringUtils.splitIgnoreCase(this.itemflags, "placement", ",");
+            this.blockMovement = StringUtils.splitIgnoreCase(this.itemflags, "inventory-modify", ",") || StringUtils.splitIgnoreCase(this.itemflags, "inventory-close", ",");
+            this.blockEquip = StringUtils.splitIgnoreCase(this.itemflags, "cancel-equip", ",");
+            this.closeInventory = StringUtils.splitIgnoreCase(this.itemflags, "inventory-close", ",");
+            this.itemChangeable = StringUtils.splitIgnoreCase(this.itemflags, "item-changeable", ",");
+            this.alwaysGive = StringUtils.splitIgnoreCase(this.itemflags, "always-give", ",");
+            this.autoRemove = StringUtils.splitIgnoreCase(this.itemflags, "auto-remove", ",");
+            this.stackable = StringUtils.splitIgnoreCase(this.itemflags, "stackable", ",");
+            this.notHat = StringUtils.splitIgnoreCase(this.itemflags, "not-hat", ",");
+            this.selectable = StringUtils.splitIgnoreCase(this.itemflags, "selectable", ",");
+            this.splittable = StringUtils.splitIgnoreCase(this.itemflags, "splittable", ",");
+            this.animate = StringUtils.splitIgnoreCase(this.itemflags, "animate", ",");
+            this.dynamic = StringUtils.splitIgnoreCase(this.itemflags, "dynamic", ",");
+            this.dynamicCount = StringUtils.splitIgnoreCase(this.itemflags, "dynamic-count", ",");
+            this.glowing = StringUtils.splitIgnoreCase(this.itemflags, "glowing", ",");
+            this.giveNext = StringUtils.splitIgnoreCase(this.itemflags, "give-next", ",");
+            this.moveNext = StringUtils.splitIgnoreCase(this.itemflags, "move-next", ",");
+            this.dropFull = StringUtils.splitIgnoreCase(this.itemflags, "drop-full", ",");
+            this.itemStore = StringUtils.splitIgnoreCase(this.itemflags, "item-store", ",");
+            this.itemModify = StringUtils.splitIgnoreCase(this.itemflags, "item-modifiable", ",");
+            this.noCrafting = StringUtils.splitIgnoreCase(this.itemflags, "item-craftable", ",");
+            this.noRepairing = StringUtils.splitIgnoreCase(this.itemflags, "item-repairable", ",");
+            this.cancelEvents = StringUtils.splitIgnoreCase(this.itemflags, "cancel-events", ",");
+            this.countLock = StringUtils.splitIgnoreCase(this.itemflags, "count-lock", ",");
+            this.teleportArrow = StringUtils.splitIgnoreCase(this.itemflags, "teleport", ",");
+            this.overwritable = StringUtils.splitIgnoreCase(this.itemflags, "overwrite", ",");
+            this.ipLimited = StringUtils.splitIgnoreCase(this.itemflags, "ip-limit", ",");
+            this.deathKeepable = StringUtils.splitIgnoreCase(this.itemflags, "death-keep", ",");
+            this.deathDroppable = StringUtils.splitIgnoreCase(this.itemflags, "death-drops", ",");
+            this.selfDroppable = StringUtils.splitIgnoreCase(this.itemflags, "self-drops", ",");
 
             // Shared with Triggers //
-            this.setOnlyFirstJoin((StringUtils.containsIgnoreCase(this.itemflags, "first-join") || this.onlyFirstJoin));
-            this.setOnlyFirstLife((StringUtils.containsIgnoreCase(this.itemflags, "first-life") || this.onlyFirstLife));
-            this.onlyFirstWorld = (StringUtils.containsIgnoreCase(this.itemflags, "first-world") || this.onlyFirstWorld);
-            this.AllowOpBypass = (StringUtils.containsIgnoreCase(this.itemflags, "AllowOpBypass") || this.AllowOpBypass);
-            this.CreativeBypass = (StringUtils.containsIgnoreCase(this.itemflags, "CreativeBypass") || this.CreativeBypass);
+            this.setOnlyFirstJoin((StringUtils.splitIgnoreCase(this.itemflags, "first-join", ",") || this.onlyFirstJoin));
+            this.setOnlyFirstLife((StringUtils.splitIgnoreCase(this.itemflags, "first-life", ",") || this.onlyFirstLife));
+            this.onlyFirstWorld = (StringUtils.splitIgnoreCase(this.itemflags, "first-world", ",") || this.onlyFirstWorld);
+            this.AllowOpBypass = (StringUtils.splitIgnoreCase(this.itemflags, "AllowOpBypass", ",") || this.AllowOpBypass);
+            this.CreativeBypass = (StringUtils.splitIgnoreCase(this.itemflags, "CreativeBypass", ",") || this.CreativeBypass);
         }
     }
 
@@ -768,6 +770,15 @@ public class ItemMap implements Cloneable {
      */
     public void setAnimate(final boolean bool) {
         this.animate = bool;
+    }
+
+    /**
+     * Sets the Dynamic Count Flag.
+     *
+     * @param bool - The value to be set.
+     */
+    public void setDynamicCount(final boolean bool) {
+        this.dynamicCount = bool;
     }
 
     /**
@@ -3369,6 +3380,15 @@ public class ItemMap implements Cloneable {
      */
     public boolean isDynamic() {
         return this.dynamic;
+    }
+
+    /**
+     * Checks if the Dynamic Count Flag is enabled.
+     *
+     * @return If it is enabled.
+     */
+    public boolean isDynamicCount() {
+        return this.dynamicCount;
     }
 
     /**
