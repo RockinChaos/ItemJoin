@@ -407,6 +407,9 @@ public class ItemUtilities {
             if (this.canClear(inventory.getBoots(), "Boots", i, clearType)) {
                 inventory.setBoots(new ItemStack(Material.AIR));
             }
+            if (this.canClear(player.getItemOnCursor(), "Cursor", i, clearType)) {
+                player.setItemOnCursor(new ItemStack(Material.AIR));
+            }
             if (ServerUtils.hasSpecificUpdate("1_9") && this.canClear(inventory.getItemInOffHand(), "OffHand", i, clearType)) {
                 PlayerHandler.setOffHandItem(player, new ItemStack(Material.AIR));
             }

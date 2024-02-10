@@ -4659,6 +4659,9 @@ public class ItemMap implements Cloneable {
             if (this.isSimilar(player, inv.getBoots())) {
                 inv.setBoots(new ItemStack(Material.AIR));
             }
+            if (this.isSimilar(player, player.getItemOnCursor())) {
+                player.setItemOnCursor(new ItemStack(Material.AIR));
+            }
             if (ServerUtils.hasSpecificUpdate("1_9") && this.isSimilar(player, PlayerHandler.getOffHandItem(player))) {
                 PlayerHandler.setOffHandItem(player, new ItemStack(Material.AIR));
             }
@@ -4685,6 +4688,8 @@ public class ItemMap implements Cloneable {
                 inv.setLeggings(ItemHandler.modifyItem(inv.getLeggings(), false, amount[0]));
             } else if (this.isSimilar(player, inv.getBoots())) {
                 inv.setBoots(ItemHandler.modifyItem(inv.getBoots(), false, amount[0]));
+            } else if (this.isSimilar(player, player.getItemOnCursor())) {
+                player.setItemOnCursor(ItemHandler.modifyItem(player.getItemOnCursor(), false, amount[0]));
             } else if (ServerUtils.hasSpecificUpdate("1_9") && this.isSimilar(player, PlayerHandler.getOffHandItem(player))) {
                 PlayerHandler.setOffHandItem(player, ItemHandler.modifyItem(PlayerHandler.getOffHandItem(player), false, amount[0]));
             } else if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
