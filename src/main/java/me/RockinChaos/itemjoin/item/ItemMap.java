@@ -582,8 +582,8 @@ public class ItemMap implements Cloneable {
      */
     private void setConditions() {
         final String triggerMessage = this.nodeLocation.getString(".trigger-fail-message");
-        final String triggerConditions = this.nodeLocation.getString(".trigger-fail-message");
-        final List<String> triggerConditionsList = this.nodeLocation.getStringList(".trigger-fail-message");
+        final String triggerConditions = this.nodeLocation.getString(".trigger-conditions");
+        final List<String> triggerConditionsList = this.nodeLocation.getStringList(".trigger-conditions");
         final String disposableMessage = this.nodeLocation.getString(".disposable-fail-message");
         final String disposableConditions = this.nodeLocation.getString(".disposable-conditions");
         final List<String> disposableConditionsList = this.nodeLocation.getStringList(".disposable-conditions");
