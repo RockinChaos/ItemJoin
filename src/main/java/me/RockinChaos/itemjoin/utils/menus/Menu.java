@@ -3926,14 +3926,14 @@ public class Menu {
             executorPane.addButton(new Button(ItemHandler.getItem("BOOK", 1, true, false, "&e&lOp", "&7", "&7*Executes the command as if the", "&7player has /op (admin permissions)."), event -> {
                 player.closeInventory();
                 String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "OP COMMAND";
+                placeHolders[16] = "ADMIN COMMAND";
                 placeHolders[15] = "broadcast I am &cADMIN!";
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
             }, event -> {
                 modifyCommands(itemMap, ItemCommand.fromString("op: " + ChatColor.stripColor(event.getMessage()), action, itemMap, 0L, null), true);
                 String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "COMMAND LINE";
+                placeHolders[16] = "ADMIN COMMAND";
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 commandListPane(event.getPlayer(), itemMap, action);
             }));
@@ -3947,7 +3947,7 @@ public class Menu {
             }, event -> {
                 modifyCommands(itemMap, ItemCommand.fromString("console: " + ChatColor.stripColor(event.getMessage()), action, itemMap, 0L, null), true);
                 String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "OP COMMAND";
+                placeHolders[16] = "CONSOLE COMMAND";
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 commandListPane(event.getPlayer(), itemMap, action);
             }));
