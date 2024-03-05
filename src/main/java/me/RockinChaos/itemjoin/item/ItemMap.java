@@ -3792,7 +3792,7 @@ public class ItemMap implements Cloneable {
      */
     public boolean isReal(final ItemStack item) {
         final String nbtData = ItemHandler.getNBTData(item, PluginData.getInfo().getNBTList());
-        return item.getType() != Material.AIR
+        return item != null && item.getType() != Material.AIR
                 && (this.vanillaControl || this.vanillaStatus
                 || (ItemJoin.getCore().getData().dataTagsEnabled() && nbtData != null && nbtData.equalsIgnoreCase(this.newNBTData))
                 || (this.legacySecret != null && item.hasItemMeta() && (ServerUtils.hasSpecificUpdate("1_14") || (!ServerUtils.hasSpecificUpdate("1_14") && Objects.requireNonNull(item.getItemMeta()).hasDisplayName()))
