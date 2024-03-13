@@ -19,7 +19,7 @@ package me.RockinChaos.itemjoin.listeners;
 
 import me.RockinChaos.core.handlers.PlayerHandler;
 import me.RockinChaos.core.utils.ServerUtils;
-import me.RockinChaos.core.utils.StringUtils;
+import me.RockinChaos.core.utils.types.Hats;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
@@ -37,12 +37,12 @@ public class Processes implements Listener {
      *
      * @param event - PlayerCommandPreprocessEvent
      */
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onHat(final PlayerCommandPreprocessEvent event) {
         final String command = event.getMessage();
         final Player player = event.getPlayer();
         final ItemStack item = PlayerHandler.getHandItem(player);
-        if (item.getType() != org.bukkit.Material.AIR && !command.isEmpty() && StringUtils.containsIgnoreCase(command, "hat")) {
+        if (item.getType() != org.bukkit.Material.AIR && Hats.isHat(command)) {
             final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item);
             if (itemMap != null && itemMap.isNotHat()) {
                 event.setMessage("itemjoin_blocked");
