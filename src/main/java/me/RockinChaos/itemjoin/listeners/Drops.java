@@ -69,12 +69,13 @@ public class Drops implements Listener {
      *
      * @param event - PlayerDeathEvent.
      */
-    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     private void onGlobalDeathDrops(PlayerDeathEvent event) {
         final Player player = event.getEntity();
         ItemUtilities.getUtilities().closeAnimations(player);
         if (PluginData.getInfo().isPreventString(player, "Death-Drops")) {
             if (PluginData.getInfo().isPreventBypass(player) && LegacyAPI.getGameRule(player.getWorld(), "keepInventory")) {
+                event.getEntity().getInventory().clear();
                 event.getDrops().clear();
             }
         }
@@ -134,7 +135,7 @@ public class Drops implements Listener {
      *
      * @param event - PlayerItemConsumeEvent.
      */
-    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     private void onDeathDrops(PlayerDeathEvent event) {
         Player player = event.getEntity();
         ItemUtilities.getUtilities().closeAnimations(player);
@@ -142,6 +143,7 @@ public class Drops implements Listener {
             List<ItemStack> drops = new ArrayList<>(event.getDrops());
             for (final ItemStack stack : drops) {
                 if (stack != null && (!ItemUtilities.getUtilities().isAllowed(player, stack, "death-drops") || !ItemUtilities.getUtilities().isAllowed(player, stack, "death-keep"))) {
+                    event.getEntity().getInventory().remove(stack);
                     event.getDrops().remove(stack);
                 }
             }
