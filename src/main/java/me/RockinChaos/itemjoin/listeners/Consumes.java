@@ -46,7 +46,7 @@ public class Consumes implements Listener {
         ItemStack item = event.getItem();
         Player player = event.getPlayer();
         ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item);
-        if (itemMap != null && itemMap.getMaterial().isEdible() && itemMap.isCustomConsumable()) {
+        if (itemMap != null && itemMap.getMaterial().isEdible() && itemMap.isCustomConsumable() && itemMap.inWorld(event.getPlayer().getWorld())) {
             if (itemMap.getPotionEffect() != null && !itemMap.getPotionEffect().isEmpty()) {
                 for (PotionEffect potion : itemMap.getPotionEffect()) {
                     player.addPotionEffect(potion);
@@ -82,7 +82,7 @@ public class Consumes implements Listener {
         final ItemStack item = event.getItem();
         final Player player = event.getPlayer();
         final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item);
-        if (itemMap != null && ItemHandler.isSkull(itemMap.getMaterial()) && itemMap.isCustomConsumable()) {
+        if (itemMap != null && ItemHandler.isSkull(itemMap.getMaterial()) && itemMap.isCustomConsumable() && itemMap.inWorld(event.getPlayer().getWorld())) {
             if (itemMap.getPotionEffect() != null && !itemMap.getPotionEffect().isEmpty()) {
                 for (PotionEffect potion : itemMap.getPotionEffect()) {
                     player.addPotionEffect(potion);
