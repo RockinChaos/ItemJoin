@@ -82,22 +82,24 @@ public class ItemAnimation {
      */
     public void openAnimation(final Player player) {
         SchedulerUtils.runAsync(() -> {
-            if (this.dynamicNames != null) {
-                this.nameTasks(player);
-            }
-            if (this.dynamicLores != null) {
-                this.loreTasks(player);
-            }
-            if (this.dynamicMaterials != null) {
-                this.materialTasks(player);
-            }
-            if (this.dynamicPages != null) {
-                this.pagesTasks(player);
-            }
-            if (this.dynamicOwners != null) {
-                this.ownerTasks(player);
-            } else if (this.dynamicTextures != null) {
-                this.textureTasks(player);
+            if (!stopAnimations && player.isOnline() && !player.isDead()) {
+                if (this.dynamicNames != null) {
+                    this.nameTasks(player);
+                }
+                if (this.dynamicLores != null) {
+                    this.loreTasks(player);
+                }
+                if (this.dynamicMaterials != null) {
+                    this.materialTasks(player);
+                }
+                if (this.dynamicPages != null) {
+                    this.pagesTasks(player);
+                }
+                if (this.dynamicOwners != null) {
+                    this.ownerTasks(player);
+                } else if (this.dynamicTextures != null) {
+                    this.textureTasks(player);
+                }
             }
         });
     }
@@ -229,16 +231,18 @@ public class ItemAnimation {
                     boolean heldAnimations = ItemJoin.getCore().getConfig("config.yml").getBoolean("Settings.HeldItem-Animations");
                     if (inPlayerInventory != null && itemMap.getTempItem() != null && itemMap.isReal(inPlayerInventory) && (heldAnimations || !itemMap.isReal(PlayerHandler.getHandItem(player)))) {
                         SchedulerUtils.run(() -> {
-                            if (nameString != null) {
-                                setNameData(player, inPlayerInventory, nameString);
-                            } else if (loreString != null) {
-                                setLoreData(player, inPlayerInventory, loreString);
-                            } else if (materialString != null) {
-                                setMaterialData(inPlayerInventory, materialString);
-                            } else if (pagesString != null) {
-                                setPagesData(player, inPlayerInventory, pagesString);
-                            } else if (ownerString != null || textureString != null) {
-                                setSkull(player, inPlayerInventory, ownerString, textureString);
+                            if (!stopAnimations && player.isOnline() && !player.isDead()) {
+                                if (nameString != null) {
+                                    setNameData(player, inPlayerInventory, nameString);
+                                } else if (loreString != null) {
+                                    setLoreData(player, inPlayerInventory, loreString);
+                                } else if (materialString != null) {
+                                    setMaterialData(inPlayerInventory, materialString);
+                                } else if (pagesString != null) {
+                                    setPagesData(player, inPlayerInventory, pagesString);
+                                } else if (ownerString != null || textureString != null) {
+                                    setSkull(player, inPlayerInventory, ownerString, textureString);
+                                }
                             }
                         });
                     }
@@ -247,16 +251,18 @@ public class ItemAnimation {
                 for (ItemStack inPlayerInventory : player.getInventory().getArmorContents()) {
                     if (inPlayerInventory != null && itemMap.getTempItem() != null && itemMap.isReal(inPlayerInventory)) {
                         SchedulerUtils.run(() -> {
-                            if (nameString != null) {
-                                setNameData(player, inPlayerInventory, nameString);
-                            } else if (loreString != null) {
-                                setLoreData(player, inPlayerInventory, loreString);
-                            } else if (materialString != null) {
-                                setMaterialData(inPlayerInventory, materialString);
-                            } else if (pagesString != null) {
-                                setPagesData(player, inPlayerInventory, pagesString);
-                            } else if (ownerString != null || textureString != null) {
-                                setSkull(player, inPlayerInventory, ownerString, textureString);
+                            if (!stopAnimations && player.isOnline() && !player.isDead()) {
+                                if (nameString != null) {
+                                    setNameData(player, inPlayerInventory, nameString);
+                                } else if (loreString != null) {
+                                    setLoreData(player, inPlayerInventory, loreString);
+                                } else if (materialString != null) {
+                                    setMaterialData(inPlayerInventory, materialString);
+                                } else if (pagesString != null) {
+                                    setPagesData(player, inPlayerInventory, pagesString);
+                                } else if (ownerString != null || textureString != null) {
+                                    setSkull(player, inPlayerInventory, ownerString, textureString);
+                                }
                             }
                         });
                     }
@@ -265,20 +271,22 @@ public class ItemAnimation {
                 for (ItemStack inPlayerInventory : player.getOpenInventory().getTopInventory().getContents()) {
                     if (inPlayerInventory != null && itemMap.getTempItem() != null && itemMap.isReal(inPlayerInventory)) {
                         SchedulerUtils.run(() -> {
-                            if (nameString != null) {
-                                setNameData(player, inPlayerInventory, nameString);
-                            } else if (loreString != null) {
-                                if (menu) {
-                                    setLoreData(player, inPlayerInventory, menuLores.get(position));
-                                } else {
-                                    setLoreData(player, inPlayerInventory, loreString);
+                            if (!stopAnimations && player.isOnline() && !player.isDead()) {
+                                if (nameString != null) {
+                                    setNameData(player, inPlayerInventory, nameString);
+                                } else if (loreString != null) {
+                                    if (menu) {
+                                        setLoreData(player, inPlayerInventory, menuLores.get(position));
+                                    } else {
+                                        setLoreData(player, inPlayerInventory, loreString);
+                                    }
+                                } else if (materialString != null) {
+                                    setMaterialData(inPlayerInventory, materialString);
+                                } else if (pagesString != null) {
+                                    setPagesData(player, inPlayerInventory, pagesString);
+                                } else if (ownerString != null || textureString != null) {
+                                    setSkull(player, inPlayerInventory, ownerString, textureString);
                                 }
-                            } else if (materialString != null) {
-                                setMaterialData(inPlayerInventory, materialString);
-                            } else if (pagesString != null) {
-                                setPagesData(player, inPlayerInventory, pagesString);
-                            } else if (ownerString != null || textureString != null) {
-                                setSkull(player, inPlayerInventory, ownerString, textureString);
                             }
                         });
                     }
@@ -286,22 +294,24 @@ public class ItemAnimation {
                 // ============== Animate Within the Player's Cursor =============== //
                 if (player.getItemOnCursor().getType() != Material.AIR && itemMap.getTempItem() != null && itemMap.isReal(player.getItemOnCursor())) {
                     SchedulerUtils.run(() -> {
-                        ItemStack item = new ItemStack(player.getItemOnCursor());
-                        if (Clicking.getCursor(PlayerHandler.getPlayerID(player)) != null && itemMap.isReal(Clicking.getCursor(PlayerHandler.getPlayerID(player)))) {
-                            item = new ItemStack(Clicking.getCursor(PlayerHandler.getPlayerID(player)));
+                        if (!stopAnimations && player.isOnline() && !player.isDead()) {
+                            ItemStack item = new ItemStack(player.getItemOnCursor());
+                            if (Clicking.getCursor(PlayerHandler.getPlayerID(player)) != null && itemMap.isReal(Clicking.getCursor(PlayerHandler.getPlayerID(player)))) {
+                                item = new ItemStack(Clicking.getCursor(PlayerHandler.getPlayerID(player)));
+                            }
+                            if (nameString != null) {
+                                setNameData(player, player.getItemOnCursor(), nameString);
+                            } else if (loreString != null) {
+                                setLoreData(player, player.getItemOnCursor(), loreString);
+                            } else if (materialString != null) {
+                                setMaterialData(player.getItemOnCursor(), materialString);
+                            } else if (pagesString != null) {
+                                setPagesData(player, player.getItemOnCursor(), pagesString);
+                            } else if (ownerString != null || textureString != null) {
+                                setSkull(player, player.getItemOnCursor(), ownerString, textureString);
+                            }
+                            Clicking.putCursor(PlayerHandler.getPlayerID(player), item);
                         }
-                        if (nameString != null) {
-                            setNameData(player, player.getItemOnCursor(), nameString);
-                        } else if (loreString != null) {
-                            setLoreData(player, player.getItemOnCursor(), loreString);
-                        } else if (materialString != null) {
-                            setMaterialData(player.getItemOnCursor(), materialString);
-                        } else if (pagesString != null) {
-                            setPagesData(player, player.getItemOnCursor(), pagesString);
-                        } else if (ownerString != null || textureString != null) {
-                            setSkull(player, player.getItemOnCursor(), ownerString, textureString);
-                        }
-                        Clicking.putCursor(PlayerHandler.getPlayerID(player), item);
                     });
                 }
                 if (StringUtils.getSlotConversion(itemMap.getSlot()) != -1 && !ServerUtils.hasSpecificUpdate("1_13")) {
