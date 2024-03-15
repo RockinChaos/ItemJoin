@@ -224,8 +224,8 @@ public class ItemMap implements Cloneable {
     //  ============================================== //
     private boolean ipLimited = false;
     //  ============================================== //
-//             Triggers for each item.             //
-//  ============================================== //
+    //             Triggers for each item.             //
+    //  ============================================== //
     private boolean giveOnDisabled = false;
     private boolean giveOnJoin = false;
     private boolean giveOnTeleport = false;
