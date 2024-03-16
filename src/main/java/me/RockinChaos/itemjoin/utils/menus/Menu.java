@@ -3630,8 +3630,9 @@ public class Menu {
                     listCommands(itemMap, Action.ON_HOLD)), event -> commandListPane(player, itemMap, Action.ON_HOLD)));
             clickPane.addButton(new Button(ItemHandler.getItem("ARROW", 1, false, false, "&e&lOn-Fire", "&7", "&7*Commands that will execute only", "&7when an arrow or bow is fired.", "&7", "&9&lCommands: &a" +
                     listCommands(itemMap, Action.ON_FIRE)), event -> commandListPane(player, itemMap, Action.ON_FIRE)));
-            clickPane.addButton(new Button(fillerPaneGItem));
-            clickPane.addButton(new Button(ItemHandler.getItem("POTION", 1, false, false, "&e&lOn-Consume", "&7", "&7*Commands that will execute only", "&7when you consume an the item.", "&7", "&9&lCommands: &a" +
+            clickPane.addButton(new Button(ItemHandler.getItem("HOPPER", 1, false, false, "&e&lOn-Drop", "&7", "&7*Commands that will execute only", "&7when you drop the item.", "&7", "&9&lCommands: &a" +
+                    listCommands(itemMap, Action.ON_DROP)), event -> commandListPane(player, itemMap, Action.ON_DROP)));
+            clickPane.addButton(new Button(ItemHandler.getItem("POTION", 1, false, false, "&e&lOn-Consume", "&7", "&7*Commands that will execute only", "&7when you consume the item.", "&7", "&9&lCommands: &a" +
                     listCommands(itemMap, Action.ON_CONSUME)), event -> commandListPane(player, itemMap, Action.ON_CONSUME)));
             clickPane.addButton(new Button(ItemHandler.getItem("EMERALD", 1, false, false, "&e&lOn-Receive", "&7", "&7*Commands that will execute only", "&7when you are given the item.", "&7", "&9&lCommands: &a" +
                     listCommands(itemMap, Action.ON_RECEIVE)), event -> commandListPane(player, itemMap, Action.ON_RECEIVE)));
@@ -6902,7 +6903,8 @@ public class Menu {
                     "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.ON_HOLD.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandCPane(player, itemMap, Action.ON_HOLD)));
             commandPane.addButton(new Button(ItemHandler.getItem("ARROW", 1, false, false, "&e&lOn-Fire", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
                     "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.ON_FIRE.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandCPane(player, itemMap, Action.ON_FIRE)));
-            commandPane.addButton(new Button(fillerPaneGItem));
+            commandPane.addButton(new Button(ItemHandler.getItem("HOPPER", 1, false, false, "&e&lOn-Drop", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.ON_DROP.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandCPane(player, itemMap, Action.ON_DROP)));
             commandPane.addButton(new Button(ItemHandler.getItem("POTION", 1, false, false, "&e&lOn-Consume", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
                     "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.ON_CONSUME.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandCPane(player, itemMap, Action.ON_CONSUME)));
             commandPane.addButton(new Button(ItemHandler.getItem("EMERALD", 1, false, false, "&e&lOn-Receive", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",

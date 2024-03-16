@@ -755,6 +755,7 @@ public class ItemCommand {
         ON_HIT(".on-hit", "ON_HIT", "HIT"),
         ON_FIRE(".on-fire", "ON_FIRE", "FIRE"),
         ON_CONSUME(".on-consume", "ON_CONSUME", "CONSUME"),
+        ON_DROP(".on-drop", "ON_DROP", "DROP"),
         ON_RECEIVE(".on-receive", "ON_RECEIVE", "RECEIVED"),
         PHYSICAL(".physical", "PHYSICAL", "INTERACTED");
 

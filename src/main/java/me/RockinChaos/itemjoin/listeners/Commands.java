@@ -87,6 +87,17 @@ public class Commands implements Listener {
     }
 
     /**
+     * Runs the on_drops commands for the custom item upon item drop.
+     *
+     * @param event - PlayerDropItemEvent.
+     */
+    @EventHandler(priority = EventPriority.LOW)
+    private void onDrop(PlayerDropItemEvent event) {
+        final ItemStack item = event.getItemDrop().getItemStack();
+        this.runCommands(event.getPlayer(), null, item, "ON_DROP", "DROP", String.valueOf(event.getPlayer().getInventory().getHeldItemSlot()));
+    }
+
+    /**
      * Runs the on_consume commands for the custom item upon item consumption.
      *
      * @param event - PlayerItemConsumeEvent.

@@ -5695,6 +5695,7 @@ public class ItemMap implements Cloneable {
             Map<String, List<String>> onHit = new HashMap<>();
             Map<String, List<String>> onFire = new HashMap<>();
             Map<String, List<String>> onConsume = new HashMap<>();
+            Map<String, List<String>> onDrop = new HashMap<>();
             Map<String, List<String>> onReceive = new HashMap<>();
             Map<String, List<String>> physical = new HashMap<>();
             for (ItemCommand command : this.commands) {
@@ -5750,6 +5751,8 @@ public class ItemMap implements Cloneable {
                     onFire = this.addMapCommand(onFire, command);
                 } else if (command.matchAction(ItemCommand.Action.ON_CONSUME)) {
                     onConsume = this.addMapCommand(onConsume, command);
+                } else if (command.matchAction(ItemCommand.Action.ON_DROP)) {
+                    onDrop = this.addMapCommand(onDrop, command);
                 } else if (command.matchAction(ItemCommand.Action.ON_RECEIVE)) {
                     onReceive = this.addMapCommand(onReceive, command);
                 } else if (command.matchAction(ItemCommand.Action.PHYSICAL)) {
@@ -5835,6 +5838,9 @@ public class ItemMap implements Cloneable {
             }
             if (!onConsume.isEmpty()) {
                 this.setMapCommand(itemData, onConsume, "on-consume");
+            }
+            if (!onDrop.isEmpty()) {
+                this.setMapCommand(itemData, onDrop, "on-drop");
             }
             if (!onReceive.isEmpty()) {
                 this.setMapCommand(itemData, onReceive, "on-receive");
