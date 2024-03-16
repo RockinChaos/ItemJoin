@@ -21,6 +21,7 @@ import me.RockinChaos.core.handlers.PlayerHandler;
 import me.RockinChaos.core.utils.SchedulerUtils;
 import me.RockinChaos.core.utils.api.LegacyAPI;
 import me.RockinChaos.itemjoin.PluginData;
+import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -143,6 +144,26 @@ public class Drops implements Listener {
             List<ItemStack> drops = new ArrayList<>(event.getDrops());
             for (final ItemStack stack : drops) {
                 if (stack != null && (!ItemUtilities.getUtilities().isAllowed(player, stack, "death-drops") || !ItemUtilities.getUtilities().isAllowed(player, stack, "death-keep"))) {
+                    if (!ItemUtilities.getUtilities().isAllowed(player, stack, "death-keep")) {
+                        int slot = -1;
+                        final ItemStack keepItem = stack.clone();
+                        for (int inventory = 0; inventory < event.getEntity().getInventory().getSize(); inventory++) {
+                            ItemStack item = event.getEntity().getInventory().getItem(inventory);
+                            final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item);
+                            if (itemMap != null && itemMap.isSimilar(player, stack)) {
+                                slot = inventory;
+                                break;
+                            }
+                        }
+                        int setSlot = slot;
+                        SchedulerUtils.run(() -> {
+                            if (setSlot == -1) {
+                                player.getInventory().addItem(keepItem);
+                            } else {
+                                player.getInventory().setItem(setSlot, keepItem);
+                            }
+                        });
+                    }
                     event.getEntity().getInventory().remove(stack);
                     event.getDrops().remove(stack);
                 }
