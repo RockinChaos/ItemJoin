@@ -19,6 +19,7 @@ package me.RockinChaos.itemjoin.listeners;
 
 import me.RockinChaos.core.handlers.PlayerHandler;
 import me.RockinChaos.core.utils.SchedulerUtils;
+import me.RockinChaos.core.utils.ServerUtils;
 import me.RockinChaos.core.utils.api.LegacyAPI;
 import me.RockinChaos.itemjoin.PluginData;
 import me.RockinChaos.itemjoin.item.ItemMap;
@@ -162,6 +163,7 @@ public class Drops implements Listener {
                             } else {
                                 player.getInventory().setItem(setSlot, keepItem);
                             }
+                            ServerUtils.logDebug("{Drops} " + player.getName() + " has triggered the DEATH-KEEP itemflag for " + ItemUtilities.getUtilities().getItemMap(keepItem).getConfigName() + ".");
                         });
                     }
                     event.getEntity().getInventory().remove(stack);
