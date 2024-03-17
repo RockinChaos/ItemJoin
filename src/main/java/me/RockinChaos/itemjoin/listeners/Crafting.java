@@ -366,7 +366,7 @@ public class Crafting implements Listener {
                 this.returnCrafting(player, contents, 10L, slotZero);
                 return;
             }
-            if (!slotZero) {
+            if (!slotZero && contents != null) {
                 for (int i = 4; i >= 0; i--) {
                     final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(contents[i]);
                     if (contents[i] != null && itemMap != null) {
@@ -374,7 +374,7 @@ public class Crafting implements Listener {
                         PlayerHandler.updateInventory(player, itemMap.getItemStack(player), 1L);
                     }
                 }
-            } else {
+            } else if (contents != null) {
                 final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(contents[0]);
                 if (contents[0] != null && itemMap != null) {
                     player.getOpenInventory().getTopInventory().setItem(0, contents[0]);
