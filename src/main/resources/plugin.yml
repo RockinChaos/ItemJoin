@@ -4,6 +4,7 @@ name: ItemJoin
 author: RockinChaos
 load: STARTUP
 api-version: 1.13
+nms-version: ${spigot.version}
 description: Get custom items on join.
 website: https://www.spigotmc.org/resources/itemjoin.12661/
 softdepend: [ AuthMe, ExploitFixer, HeadDatabase, Hyperverse, Multiverse-Core, Multiverse-Inventories, MyWorlds, NickAPI, PerWorldInventory, PerWorldPlugins, PlaceholderAPI, ProtocolLib, SkinsRestorer, Citizens, ChestSort, TokenEnchant, Vault, WorldGuard, xInventories ]

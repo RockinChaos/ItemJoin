@@ -50,6 +50,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
 import java.io.File;
+import java.io.InputStreamReader;
 import java.util.*;
 import java.util.regex.Matcher;
 
@@ -474,7 +475,7 @@ public class PluginData {
         runAsync(() -> {
             final ConfigurationSection itemsPath = ItemJoin.getCore().getConfig("items.yml").getConfigurationSection("items");
             int customItems = (itemsPath != null ? itemsPath.getKeys(false).size() : 0);
-            final String compileVersion = "${spigot.version}".split("-")[0].replace(".", "_");
+            final String compileVersion = Objects.requireNonNull(YamlConfiguration.loadConfiguration(new InputStreamReader(Objects.requireNonNull(ItemJoin.getCore().getPlugin().getResource("plugin.yml")))).getString("nms-version")).split("-")[0].replace(".", "_");
             final String serverVersion = ServerUtils.getVersion();
             if (!silent) {
                 if (StringUtils.containsIgnoreCase(compileVersion, "spigot_version")) {
