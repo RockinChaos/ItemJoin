@@ -665,6 +665,9 @@ public class Menu {
                 }
                 itemMap.setCustomLore(newLore);
             }
+            if (ServerUtils.hasSpecificUpdate("1_14") && itemMeta != null && itemMeta.hasCustomModelData()) {
+                itemMap.setModelData(String.valueOf(itemMeta.getCustomModelData()));
+            }
             if (item.getItemMeta().hasEnchants()) {
                 Map<String, Integer> enchantList = new HashMap<>();
                 for (Enchantment e : item.getItemMeta().getEnchants().keySet()) {
@@ -3328,7 +3331,7 @@ public class Menu {
                 }
             }));
             dataPane.addButton(new Button(fillerPaneBItem), 2);
-            dataPane.addButton(new Button(ItemHandler.getItem("STICK", 1, false, false, "&a&lCustom Texture", "&7", "&7*Set the custom data of the item.", "&7This is the damage value assigned", "&7to the custom resource texture.", "&9&lDURABILITY DATA: &a" + StringUtils.nullCheck(itemMap.getData() + "&7")), event -> {
+            dataPane.addButton(new Button(ItemHandler.getItem("STICK", 1, false, false, "&a&lDamage Data", "&7", "&7*Set the custom data of the item.", "&7This is the damage value assigned", "&7to the custom resource texture.", (ServerUtils.hasSpecificUpdate("1_14") ? "&7" : ""), (ServerUtils.hasSpecificUpdate("1_14") ? "&c&l&nWARNING: &eThis setting is only for" : ""), (ServerUtils.hasSpecificUpdate("1_14") ? "&eMinecraft versions below 1.14." : ""), (ServerUtils.hasSpecificUpdate("1_14") ? "&eYou are using a newer version of Minecraft" : ""), (ServerUtils.hasSpecificUpdate("1_14") ? "&eso things may not function as expected." : ""), (ServerUtils.hasSpecificUpdate("1_14") ? "&7" : ""), (ServerUtils.hasSpecificUpdate("1_14") ? "&eIt is highly recommended to use &l&nModel Data." : ""), "&9&lDAMAGE DATA: &a" + StringUtils.nullCheck(itemMap.getData() + "&7")), event -> {
                 if (!StringUtils.nullCheck(itemMap.getData() + "&7").equals("NONE")) {
                     itemMap.setData(null);
                     dataPane(player, itemMap);
@@ -3337,9 +3340,9 @@ public class Menu {
                 }
             }));
             dataPane.addButton(new Button(fillerPaneBItem), 2);
-            dataPane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, false, false, "&e&lCustom Model Data", "&7", "&7*Set the custom model data of the item.",
+            dataPane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, false, false, "&e&lModel Data", "&7", "&7*Set the custom model data of the item.", "&7This is the custom texture.",
                     !ServerUtils.hasSpecificUpdate("1_14") ? "&c&l[ERROR] &7This version of Minecraft does" : "", !ServerUtils.hasSpecificUpdate("1_14") ? "&7not support custom model data." : "",
-                    !ServerUtils.hasSpecificUpdate("1_14") ? "&7This was implemented in 1.14+." : "", "&9&lTEXTURE DATA: &a" + StringUtils.nullCheck(itemMap.getModelData() + "&7")), event -> {
+                    !ServerUtils.hasSpecificUpdate("1_14") ? "&7This was implemented in 1.14+." : "", "&9&lMODEL DATA: &a" + StringUtils.nullCheck(itemMap.getModelData() + "&7")), event -> {
                 if (!StringUtils.nullCheck(itemMap.getModelData() + "&7").equals("NONE") && ServerUtils.hasSpecificUpdate("1_14")) {
                     itemMap.setModelData(null);
                     dataPane(player, itemMap);
@@ -8709,7 +8712,7 @@ public class Menu {
                             + itemMap.getMaterial().toString() + ((itemMap.getDataValue() != null && itemMap.getDataValue() != 0) ? ":" + itemMap.getDataValue() : ""),
                     (itemMap.getMultipleSlots() != null && !itemMap.getMultipleSlots().isEmpty() ? "&9&lSlot(s): &a" + slotList : "&9&lSlot: &a" + itemMap.getSlot().toUpperCase()), (itemMap.getCount(player) != 1 && itemMap.getCount(player) != 0) ? "&9&lCount: &a" + itemMap.getCount(player) : "",
                     ((!StringUtils.nullCheck(itemMap.getCustomName()).equals("NONE") && (!itemMaterial.equalsIgnoreCase(itemMap.getCustomName()))) ? "&9&lName: &a" + itemMap.getCustomName() : ""), (!Objects.equals(StringUtils.nullCheck(itemMap.getCustomLore().toString()), "NONE") ? "&9&lLore: &a" + (StringUtils.nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",").length() > 40 ? StringUtils.nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",").substring(0, 40) : StringUtils.nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",")) : ""),
-                    (!StringUtils.nullCheck(itemMap.getDurability() + "&7").equals("NONE") ? "&9&lDurability: &a" + itemMap.getDurability() : ""), (!Objects.equals(StringUtils.nullCheck(itemMap.getData() + "&7"), "NONE") ? "&9&lTexture Data: &a" + itemMap.getData() : ""), (useCommands ? "&9&lCommands: &aYES" : ""), (useToggle ? "&9&lToggleable: &aYES" : ""),
+                    (!StringUtils.nullCheck(itemMap.getDurability() + "&7").equals("NONE") ? "&9&lDurability: &a" + itemMap.getDurability() : ""), (!Objects.equals(StringUtils.nullCheck(itemMap.getData() + "&7"), "NONE") ? "&9&lTexture Data: &a" + itemMap.getData() : ""), (!Objects.equals(StringUtils.nullCheck(itemMap.getModelData() + "&7"), "NONE") ? "&9&LModel Data: &a" + itemMap.getModelData() : ""), (useCommands ? "&9&lCommands: &aYES" : ""), (useToggle ? "&9&lToggleable: &aYES" : ""),
                     (!StringUtils.nullCheck(itemMap.getItemCost()).equals("NONE") ? "&9&lCommands-Item: &a" + itemMap.getItemCost() : ""), (!Objects.equals(StringUtils.nullCheck(itemMap.getCommandCost() + "&7"), "NONE") ? "&9&lCommands-Cost: &a" + itemMap.getCommandCost() : ""),
                     (!StringUtils.nullCheck(itemMap.getCommandReceive() + "&7").equals("NONE") ? "&9&lCommands-Receive: &a" + itemMap.getCommandReceive() : ""),
                     (!StringUtils.nullCheck(itemMap.getCommandSequence() + "").equals("NONE") ? "&9&lCommands-Sequence: &a" + itemMap.getCommandSequence() : ""), (!Objects.equals(StringUtils.nullCheck(itemMap.getCommandCooldown() + "&7"), "NONE") ? "&9&lCommands-Cooldown: &a" + itemMap.getCommandCooldown() + " second(s)" : ""),
@@ -8738,6 +8741,32 @@ public class Menu {
                     (itemMap.getFireworkTrail() ? "&9&lFirework Trail: &aENABLED" : ""), (itemMap.getFireworkFlicker() ? "&9&lFirework Flicker: &aENABLED" : ""));
         } catch (Exception e) {
             ServerUtils.sendDebugTrace(e);
+        }
+        if (ServerUtils.hasSpecificUpdate("1_14") && itemMap.getModelData() != null) {
+            final int modelData = Integer.parseInt(StringUtils.translateLayout(itemMap.getModelData(), player));
+            ItemMeta itemMeta = item.getItemMeta();
+            if (modelData != 0 && itemMeta != null) {
+                itemMeta.setCustomModelData(modelData);
+                item.setItemMeta(itemMeta);
+            }
+        }
+        if (itemMap.getDurability() != null && (itemMap.getData() == null || itemMap.getData() == 0)) {
+            ItemMeta itemMeta = item.getItemMeta();
+            if (ServerUtils.hasSpecificUpdate("1_13") && itemMeta != null) {
+                ((org.bukkit.inventory.meta.Damageable) itemMeta).setDamage(itemMap.getDurability());
+                item.setItemMeta(itemMeta);
+            } else {
+                LegacyAPI.setDurability(item, itemMap.getDurability());
+            }
+        }
+        if (itemMap.getData() != null && itemMap.getData() > 0) {
+            ItemMeta itemMeta = item.getItemMeta();
+            if (ServerUtils.hasSpecificUpdate("1_13") && itemMeta != null) {
+                ((org.bukkit.inventory.meta.Damageable) itemMeta).setDamage(itemMap.getData());
+                item.setItemMeta(itemMeta);
+            } else {
+                LegacyAPI.setDurability(item, Short.parseShort(itemMap.getData() + ""));
+            }
         }
         if (ItemHandler.isSkull(itemMap.getMaterial())) {
             ItemMeta itemMeta = item.getItemMeta();

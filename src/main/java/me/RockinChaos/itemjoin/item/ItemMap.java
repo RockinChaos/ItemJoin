@@ -4339,7 +4339,7 @@ public class ItemMap implements Cloneable {
      * Sets the ItemStack Data.
      */
     private void setData() {
-        if (this.data != null) {
+        if (this.data != null && this.data > 0) {
             if (ServerUtils.hasSpecificUpdate("1_13")) {
                 ((org.bukkit.inventory.meta.Damageable) this.tempMeta).setDamage(this.data);
             } else {
