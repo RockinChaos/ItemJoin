@@ -819,7 +819,7 @@ public class ItemUtilities {
      */
     public void shiftItem(final Player player, final ItemMap itemMap) {
         ItemStack existingItem = ItemHandler.getItem(player, itemMap.getSlot());
-        if (itemMap.isMoveNext() && player.getInventory().firstEmpty() != -1) {
+        if (itemMap.isMoveNext() && !itemMap.isSimilar(player, existingItem) && player.getInventory().firstEmpty() != -1) {
             for (int i = 0; i <= 35; i++) {
                 final ItemStack itemMain = player.getInventory().getItem(i);
                 if (itemMain == null || itemMain.getType() == Material.AIR) {
