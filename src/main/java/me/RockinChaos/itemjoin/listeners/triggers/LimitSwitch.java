@@ -63,10 +63,14 @@ public class LimitSwitch implements Listener {
      */
     private void handleRegions(final Player player, final GameMode newMode) {
         final String regions = ItemJoin.getCore().getDependencies().getGuard().getRegionAtLocation(player.getLocation());
-        final List<String> regionSetFull = Arrays.asList(regions.replace(" ", "").split(","));
-        for (String region : regionSetFull) {
-            if (region != null && !region.isEmpty()) {
-                ItemUtilities.getUtilities().setAuthenticating(player, player.getWorld(), TriggerType.LIMIT_SWITCH, newMode, region, regionSetFull);
+        final List<String> regionSetFull = Arrays.asList(regions.replace(" ", "").trim().split(","));
+        if (regionSetFull.isEmpty() || regionSetFull.toString().replace("[", "").replace("]", "").isEmpty()) {
+            ItemUtilities.getUtilities().setAuthenticating(player, player.getWorld(), TriggerType.LIMIT_SWITCH, newMode, "IJ_WORLD", Collections.singletonList("IJ_WORLD"));
+        } else {
+            for (String region : regionSetFull) {
+                if (region != null && !region.isEmpty()) {
+                    ItemUtilities.getUtilities().setAuthenticating(player, player.getWorld(), TriggerType.LIMIT_SWITCH, newMode, region, regionSetFull);
+                }
             }
         }
     }
