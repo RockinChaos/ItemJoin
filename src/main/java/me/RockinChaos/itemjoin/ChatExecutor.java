@@ -40,6 +40,8 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -292,7 +294,10 @@ public class ChatExecutor implements CommandExecutor {
         try {
             final Map<String, String> files = new HashMap<>();
             files.put("latest.log", Files.asCharSource(new File("logs/latest.log"), StandardCharsets.UTF_8).read());
-            files.put("config.yml", Files.asCharSource(new File(ItemJoin.getCore().getPlugin().getDataFolder() + "/config.yml"), StandardCharsets.UTF_8).read());
+            FileConfiguration configData = YamlConfiguration.loadConfiguration(new File(ItemJoin.getCore().getPlugin().getDataFolder() + "/config.yml"));
+            configData.set("Database.user", "**********");
+            configData.set("Database.pass", "**********");
+            files.put("config.yml", configData.saveToString());
             files.put("lang.yml", Files.asCharSource(new File(ItemJoin.getCore().getPlugin().getDataFolder() + "/" + ItemJoin.getCore().getLang().getFile()), StandardCharsets.UTF_8).read());
             files.put("items.yml", Files.asCharSource(new File(ItemJoin.getCore().getPlugin().getDataFolder() + "/items.yml"), StandardCharsets.UTF_8).read());
             final PasteAPI pasteURI = new PasteAPI(sender, Collections.singletonList("ExploitFixer"), files);
