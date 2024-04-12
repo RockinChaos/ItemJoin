@@ -242,13 +242,13 @@ public class ItemUtilities {
             SchedulerUtils.runLater(this.getItemDelay(), () -> {
                 PluginData.getInfo().restoreCraftItems(player, type);
                 {
-                    this.handleItems(player, world, type, newMode, targetRegion, regions);
+                    this.handleItems(player, world, type, player.getGameMode(), targetRegion, regions);
                 }
             });
         } else {
             PluginData.getInfo().restoreCraftItems(player, type);
             {
-                this.handleItems(player, world, type, newMode, targetRegion, regions);
+                this.handleItems(player, world, type, (type == TriggerType.LIMIT_SWITCH ? newMode : player.getGameMode()), targetRegion, regions);
             }
         }
     }
