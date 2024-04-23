@@ -28,9 +28,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 
 public class LimitSwitch implements Listener {
 
@@ -47,31 +45,11 @@ public class LimitSwitch implements Listener {
         final GameMode newMode = event.getNewGameMode();
         if (PlayerHandler.isPlayer(player)) {
             if (ItemJoin.getCore().getDependencies().getGuard().guardEnabled()) {
-                this.handleRegions(player, newMode);
+                ItemUtilities.getUtilities().handleRegions(player, player.getWorld(), TriggerType.LIMIT_SWITCH, newMode);
             } else {
                 ItemUtilities.getUtilities().setAuthenticating(player, player.getWorld(), TriggerType.LIMIT_SWITCH, newMode, "IJ_WORLD", Collections.singletonList("IJ_WORLD"));
             }
         }
         ServerUtils.logDebug("{ItemMap} " + player.getName() + " has performed the LIMIT-SWITCH trigger.");
-    }
-
-    /**
-     * Handles the checking of WorldGuard regions,
-     * proceeding if the player has entered or exited a new region.
-     *
-     * @param player - The player that has entered or exited a region.
-     */
-    private void handleRegions(final Player player, final GameMode newMode) {
-        final String regions = ItemJoin.getCore().getDependencies().getGuard().getRegionAtLocation(player.getLocation());
-        final List<String> regionSetFull = Arrays.asList(regions.replace(" ", "").trim().split(","));
-        if (regionSetFull.isEmpty() || regionSetFull.toString().replace("[", "").replace("]", "").isEmpty()) {
-            ItemUtilities.getUtilities().setAuthenticating(player, player.getWorld(), TriggerType.LIMIT_SWITCH, newMode, "IJ_WORLD", Collections.singletonList("IJ_WORLD"));
-        } else {
-            for (String region : regionSetFull) {
-                if (region != null && !region.isEmpty()) {
-                    ItemUtilities.getUtilities().setAuthenticating(player, player.getWorld(), TriggerType.LIMIT_SWITCH, newMode, region, regionSetFull);
-                }
-            }
-        }
     }
 }

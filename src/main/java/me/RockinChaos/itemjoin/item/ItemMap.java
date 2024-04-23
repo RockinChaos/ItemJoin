@@ -250,6 +250,7 @@ public class ItemMap implements Cloneable {
     private List<String> contents = new ArrayList<>();
 
     private List<String> enabledRegions = new ArrayList<>();
+    private List<String> disabledRegions = new ArrayList<>();
     private List<String> enabledWorlds = new ArrayList<>();
     private List<String> disabledWorlds = new ArrayList<>();
 // ======================================================================================== //
@@ -575,6 +576,14 @@ public class ItemMap implements Cloneable {
             ItemJoin.getCore().getDependencies().getGuard().addLocaleRegion("UNDEFINED");
             this.enabledRegions.add("UNDEFINED");
         }
+        final String disabledRegions = this.nodeLocation.getString(".disabled-regions");
+        if (disabledRegions != null && !disabledRegions.isEmpty()) {
+            String[] disabledParts = disabledRegions.replace(" ,  ", ",").replace(" , ", ",").replace(",  ", ",").replace(", ", ",").split(",");
+            for (String region : disabledParts) {
+                this.disabledRegions.add(region);
+                ItemJoin.getCore().getDependencies().getGuard().addLocaleRegion(region);
+            }
+        }
     }
 
     /**
@@ -770,15 +779,6 @@ public class ItemMap implements Cloneable {
      */
     public void setAnimate(final boolean bool) {
         this.animate = bool;
-    }
-
-    /**
-     * Sets the Dynamic Count Flag.
-     *
-     * @param bool - The value to be set.
-     */
-    public void setDynamicCount(final boolean bool) {
-        this.dynamicCount = bool;
     }
 
     /**
@@ -1100,6 +1100,24 @@ public class ItemMap implements Cloneable {
      */
     public void setEnabledWorlds(final List<String> worlds) {
         this.enabledWorlds = worlds;
+    }
+
+    /**
+     * Gets the Disabled Regions.
+     *
+     * @return The Disabled Regions.
+     */
+    public List<String> getDisabledRegions() {
+        return this.disabledRegions;
+    }
+
+    /**
+     * Sets the Disabled Regions.
+     *
+     * @param regions - The Disabled Regions to be set.
+     */
+    public void setDisabledRegions(final List<String> regions) {
+        this.disabledRegions = regions;
     }
 
     /**
@@ -1687,21 +1705,21 @@ public class ItemMap implements Cloneable {
     }
 
     /**
-     * Checks if the ItemMap is a recipe.
-     *
-     * @return If the ItemMap is a recipe.
-     */
-    public boolean isRecipe() {
-        return !this.ingredients.isEmpty() && !this.getRecipe().isEmpty();
-    }
-
-    /**
      * Sets the recipe ingredients.
      *
      * @param ingredientList - The recipe ingredients to be set.
      */
     public void setIngredients(final Map<Character, ItemRecipe> ingredientList) {
         this.ingredients = ingredientList;
+    }
+
+    /**
+     * Checks if the ItemMap is a recipe.
+     *
+     * @return If the ItemMap is a recipe.
+     */
+    public boolean isRecipe() {
+        return !this.ingredients.isEmpty() && !this.getRecipe().isEmpty();
     }
 
     /**
@@ -2205,12 +2223,6 @@ public class ItemMap implements Cloneable {
         return this.skullOwner;
     }
 
-//  ================================================================================================================================================================================= //
-
-//  ====================== //
-//  ~ Accessor Functions ~ //
-//  ====================== //
-
     /**
      * Gets the Skull Texture.
      *
@@ -2219,6 +2231,12 @@ public class ItemMap implements Cloneable {
     public String getSkullTexture() {
         return this.skullTexture;
     }
+
+//  ================================================================================================================================================================================= //
+
+//  ====================== //
+//  ~ Accessor Functions ~ //
+//  ====================== //
 
     /**
      * Sets the Skull Texture.
@@ -2920,12 +2938,14 @@ public class ItemMap implements Cloneable {
      * @return If the region is an enabled region.
      */
     public Boolean inRegion(final String region) {
-        if (this.enabledRegions == null || this.enabledRegions.isEmpty()) {
+        if ((this.enabledRegions == null || this.enabledRegions.isEmpty()) && (this.disabledRegions == null || this.disabledRegions.isEmpty())) {
             return true;
         }
-        for (String compareRegion : this.enabledRegions) {
-            if (compareRegion.equalsIgnoreCase(region) || compareRegion.equalsIgnoreCase("UNDEFINED")) {
-                return true;
+        if (this.enabledRegions != null) {
+            for (String compareRegion : this.enabledRegions) {
+                if (compareRegion.equalsIgnoreCase(region) || compareRegion.equalsIgnoreCase("UNDEFINED")) {
+                    return !this.isDisabledRegion(region);
+                }
             }
         }
         return false;
@@ -2937,17 +2957,48 @@ public class ItemMap implements Cloneable {
      * @return If any of the list of regions are an enabled region.
      */
     public Boolean inRegion(final List<String> regions) {
-        if (this.enabledRegions == null || this.enabledRegions.isEmpty()) {
+        if ((this.enabledRegions == null || this.enabledRegions.isEmpty()) && (this.disabledRegions == null || this.disabledRegions.isEmpty())) {
             return true;
         }
+        int inRegion = 0;
         for (String region : regions) {
-            for (String compareRegion : this.enabledRegions) {
-                if (compareRegion.equalsIgnoreCase(region) || compareRegion.equalsIgnoreCase("UNDEFINED")) {
-                    return true;
+            if (this.enabledRegions != null) {
+                for (String compareRegion : this.enabledRegions) {
+                    if (compareRegion.equalsIgnoreCase(region) || compareRegion.equalsIgnoreCase("UNDEFINED")) {
+                        if (inRegion != 2) {
+                            inRegion = 1;
+                        }
+                    }
+                }
+            }
+            if (this.disabledRegions != null) {
+                for (String compareRegion : this.disabledRegions) {
+                    if (compareRegion.equalsIgnoreCase(region) || compareRegion.equalsIgnoreCase("UNDEFINED")) {
+                        if (inRegion != 2) {
+                            inRegion = !this.isDisabledRegion(compareRegion) ? inRegion : 2;
+                        }
+                    }
                 }
             }
         }
-        return false;
+        return (inRegion == 1);
+    }
+
+    /**
+     * Checks if the Region is a Disabled Region.
+     *
+     * @param region - The region to be checked.
+     * @return If the Region is a Disabled Region.
+     */
+    public boolean isDisabledRegion(final String region) {
+        boolean isDisabled = false;
+        for (String disabledRegion : this.disabledRegions) {
+            if (disabledRegion.equalsIgnoreCase(region)) {
+                isDisabled = true;
+                break;
+            }
+        }
+        return isDisabled;
     }
 
     /**
@@ -3383,6 +3434,15 @@ public class ItemMap implements Cloneable {
     }
 
     /**
+     * Sets the Dynamic Flag.
+     *
+     * @param bool - The value to be set.
+     */
+    public void setDynamic(final boolean bool) {
+        this.dynamic = bool;
+    }
+
+    /**
      * Checks if the Dynamic Count Flag is enabled.
      *
      * @return If it is enabled.
@@ -3392,12 +3452,12 @@ public class ItemMap implements Cloneable {
     }
 
     /**
-     * Sets the Dynamic Flag.
+     * Sets the Dynamic Count Flag.
      *
      * @param bool - The value to be set.
      */
-    public void setDynamic(final boolean bool) {
-        this.dynamic = bool;
+    public void setDynamicCount(final boolean bool) {
+        this.dynamicCount = bool;
     }
 
     /**
@@ -3717,11 +3777,12 @@ public class ItemMap implements Cloneable {
     /**
      * Checks if the String Region Name is an Enabled Region.
      *
-     * @param region - The name of the Region being checked.
+     * @param region     - The name of the Region being checked.
+     * @param isDisabled - If the regions being checked are Disabled.
      * @return If the Region is an Enabled Region.
      */
-    public boolean containsRegion(final String region) {
-        for (String enabledRegion : this.getEnabledRegions()) {
+    public boolean containsRegion(final String region, final boolean isDisabled) {
+        for (String enabledRegion : (isDisabled ? this.getDisabledRegions() : this.getEnabledRegions())) {
             if (enabledRegion.equalsIgnoreCase(region) || enabledRegion.equalsIgnoreCase("UNDEFINED")) {
                 return true;
             }
@@ -4525,7 +4586,7 @@ public class ItemMap implements Cloneable {
                             || enabledWorld.equalsIgnoreCase("ALL")
                             || enabledWorld.equalsIgnoreCase("GLOBAL")
                             || (enabledWorld.contains("*") && world.getName().toUpperCase().startsWith(enabledWorld.split("\\*")[0].toUpperCase()))) {
-                        return !this.isDisabled(world);
+                        return !this.isDisabledWorld(world);
                     }
                 }
             }
@@ -4539,7 +4600,7 @@ public class ItemMap implements Cloneable {
      * @param world - The world to be checked.
      * @return If the World is a Disabled World.
      */
-    public boolean isDisabled(final World world) {
+    public boolean isDisabledWorld(final World world) {
         boolean isDisabled = false;
         for (String disabledWorld : this.disabledWorlds) {
             if (disabledWorld.equalsIgnoreCase(world.getName())
@@ -6104,6 +6165,13 @@ public class ItemMap implements Cloneable {
                 regionList.append(region).append(", ");
             }
             itemData.set("items." + this.configName + ".enabled-regions", regionList.substring(0, regionList.length() - 2));
+        }
+        if (this.disabledRegions != null && !this.disabledRegions.isEmpty()) {
+            StringBuilder regionList = new StringBuilder();
+            for (String region : this.disabledRegions) {
+                regionList.append(region).append(", ");
+            }
+            itemData.set("items." + this.configName + ".disabled-regions", regionList.substring(0, regionList.length() - 2));
         }
         if (this.enabledWorlds != null && !this.enabledWorlds.isEmpty()) {
             StringBuilder worldList = new StringBuilder();

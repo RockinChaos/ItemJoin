@@ -279,20 +279,20 @@ public class ItemUtilities {
         }
         for (ItemMap item : this.getItems()) {
             item.setAnimations(player);
-            if (((type.equals(TriggerType.JOIN) && item.isGiveOnJoin())
-                    || (type.equals(TriggerType.TELEPORT) && item.isGiveOnTeleport())
-                    || (type.equals(TriggerType.RESPAWN) && (item.isGiveOnRespawn()))
-                    || (type.equals(TriggerType.RESPAWN_POINT) && (item.isGiveOnRespawnPoint() || item.isGiveOnRespawn()))
-                    || (type.equals(TriggerType.WORLD_SWITCH) && item.isGiveOnWorldSwitch())
-                    || (type.equals(TriggerType.LIMIT_SWITCH) && item.isUseOnLimitSwitch() && (StringUtils.containsValue(regions, "IJ_WORLD") || item.inRegion(regions) || item.getEnabledRegions() == null || item.getEnabledRegions().isEmpty()))
-                    || (type.equals(TriggerType.REGION_ENTER) && (item.isGiveOnRegionEnter() || item.isGiveOnRegionAccess()) && item.inRegion(regions))
-                    || (type.equals(TriggerType.REGION_LEAVE) && (item.isGiveOnRegionLeave() || item.isGiveOnRegionEgress()) && item.inRegion(targetRegion) && !item.inRegion(regions)))
+            if (((type.equals(TriggerType.JOIN) && item.isGiveOnJoin() && (StringUtils.containsValue(regions, "IJ_WORLD") || item.inRegion(regions)))
+                    || (type.equals(TriggerType.TELEPORT) && item.isGiveOnTeleport() && (StringUtils.containsValue(regions, "IJ_WORLD") || item.inRegion(regions)))
+                    || (type.equals(TriggerType.RESPAWN) && item.isGiveOnRespawn() && (StringUtils.containsValue(regions, "IJ_WORLD") || item.inRegion(regions)))
+                    || (type.equals(TriggerType.RESPAWN_POINT) && (item.isGiveOnRespawnPoint() || item.isGiveOnRespawn()) && (StringUtils.containsValue(regions, "IJ_WORLD") || item.inRegion(regions)))
+                    || (type.equals(TriggerType.WORLD_SWITCH) && item.isGiveOnWorldSwitch() && (StringUtils.containsValue(regions, "IJ_WORLD") || item.inRegion(regions)))
+                    || (type.name().startsWith("REGION") && (item.isGiveOnRegionEnter() || item.isGiveOnRegionAccess()) && item.inRegion(regions))
+                    || (type.name().startsWith("REGION") && (item.isGiveOnRegionLeave() || item.isGiveOnRegionEgress()) && item.inRegion(targetRegion) && !item.inRegion(regions))
+                    || (type.equals(TriggerType.LIMIT_SWITCH) && item.isUseOnLimitSwitch() && (StringUtils.containsValue(regions, "IJ_WORLD") || item.inRegion(regions))))
                     && item.inWorld(world) && item.isLimitMode(gameMode) && ((probable != null && item.getConfigName().equals(probable.getConfigName())) || item.getProbability() == -1)
                     && item.conditionMet(player, "trigger-conditions", true, false) && PluginData.getInfo().isEnabled(player, item.getConfigName()) && item.hasPermission(player, world)
                     && this.isObtainable(player, item, session, type)) {
                 item.giveTo(player);
-            } else if (((type.equals(TriggerType.LIMIT_SWITCH) && item.isUseOnLimitSwitch() && !item.isLimitMode(gameMode)) || (((type.equals(TriggerType.REGION_LEAVE) && (item.isGiveOnRegionAccess()
-                    && item.inRegion(targetRegion) && !item.inRegion(regions))) || (type.equals(TriggerType.REGION_ENTER) && (item.isGiveOnRegionEgress() && item.inRegion(targetRegion) && item.inRegion(regions)))))) && item.hasItem(player, false)) {
+            } else if (((type.equals(TriggerType.LIMIT_SWITCH) && item.isUseOnLimitSwitch() && !item.isLimitMode(gameMode)) || (((type.name().startsWith("REGION") && (item.isGiveOnRegionAccess()
+                    && ((item.inRegion(targetRegion) && !item.inRegion(regions)) || (!item.inRegion(targetRegion) && !item.inRegion(regions))))) || (type.name().startsWith("REGION") && (item.isGiveOnRegionEgress() && item.inRegion(targetRegion) && item.inRegion(regions)))))) && item.hasItem(player, false)) {
                 item.removeFrom(player);
             } else if (item.isAutoRemove() && (!item.inWorld(world) || !item.isLimitMode(gameMode) || ((type.equals(TriggerType.REGION_ENTER) || type.equals(TriggerType.REGION_LEAVE)) && ((item.isGiveOnRegionLeave() && item.inRegion(targetRegion) && item.inRegion(regions)) || (item.isGiveOnRegionEnter() && item.inRegion(targetRegion) && !item.inRegion(regions))))) && item.hasItem(player, true)) {
                 item.removeFrom(player);
@@ -300,6 +300,29 @@ public class ItemUtilities {
         }
         this.sendFailCount(player, session);
         PlayerHandler.updateInventory(player, 15L);
+    }
+
+    /**
+     * Handles the checking of WorldGuard regions,
+     * proceeding if the player has entered or exited a new region.
+     *
+     * @param player  - The player that has entered or exited a region.
+     * @param world   - The world of the Player.
+     * @param type    - The TriggerType.
+     * @param newMode - The current GameMode.
+     */
+    public void handleRegions(final Player player, final World world, final TriggerType type, final GameMode newMode) {
+        final String regions = ItemJoin.getCore().getDependencies().getGuard().getRegionAtLocation(player.getLocation());
+        final List<String> regionSetFull = Arrays.asList(regions.replace(" ", "").trim().split(","));
+        if (regionSetFull.isEmpty() || regionSetFull.toString().replace("[", "").replace("]", "").isEmpty()) {
+            ItemUtilities.getUtilities().setAuthenticating(player, world, type, newMode, "IJ_WORLD", Collections.singletonList("IJ_WORLD"));
+        } else {
+            for (String region : regionSetFull) {
+                if (region != null && !region.isEmpty()) {
+                    ItemUtilities.getUtilities().setAuthenticating(player, world, type, newMode, region, regionSetFull);
+                }
+            }
+        }
     }
 
     /**

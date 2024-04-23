@@ -19,6 +19,7 @@ package me.RockinChaos.itemjoin.listeners.triggers;
 
 import me.RockinChaos.core.handlers.PlayerHandler;
 import me.RockinChaos.core.utils.ServerUtils;
+import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.item.ItemUtilities.TriggerType;
 import org.bukkit.Location;
@@ -42,9 +43,10 @@ public class PlayerTeleport implements Listener {
         final Player player = event.getPlayer();
         final Location toLocation = event.getTo();
         if (PlayerHandler.isPlayer(player) && toLocation != null) {
-            ItemUtilities.getUtilities().setAuthenticating(player, toLocation.getWorld(), TriggerType.TELEPORT, player.getGameMode(), "GLOBAL", Collections.singletonList("GLOBAL"));
-            {
-                ServerUtils.sendErrorStatements(player);
+            if (ItemJoin.getCore().getDependencies().getGuard().guardEnabled()) {
+                ItemUtilities.getUtilities().handleRegions(player, toLocation.getWorld(), TriggerType.TELEPORT, player.getGameMode());
+            } else {
+                ItemUtilities.getUtilities().setAuthenticating(player, toLocation.getWorld(), TriggerType.TELEPORT, player.getGameMode(), "IJ_WORLD", Collections.singletonList("IJ_WORLD"));
             }
         }
         ServerUtils.logDebug("{ItemMap} " + player.getName() + " has performed the TELEPORT trigger.");

@@ -829,10 +829,16 @@ public class Menu {
                     enabledList.append("&a").append(split).append(" /n ");
                 }
             }
-            StringBuilder regionList = new StringBuilder();
+            StringBuilder enabledRegionList = new StringBuilder();
             if (!StringUtils.nullCheck(itemMap.getEnabledRegions().toString()).equals("NONE")) {
                 for (String split : StringUtils.softSplit(StringUtils.nullCheck(itemMap.getEnabledRegions().toString()))) {
-                    regionList.append("&a").append(split).append(" /n ");
+                    enabledRegionList.append("&a").append(split).append(" /n ");
+                }
+            }
+            StringBuilder disabledRegionList = new StringBuilder();
+            if (!StringUtils.nullCheck(itemMap.getDisabledRegions().toString()).equals("NONE")) {
+                for (String split : StringUtils.softSplit(StringUtils.nullCheck(itemMap.getDisabledRegions().toString()))) {
+                    disabledRegionList.append("&a").append(split).append(" /n ");
                 }
             }
             StringBuilder enchantList = new StringBuilder();
@@ -958,11 +964,18 @@ public class Menu {
                     "&9&lDISABLED-WORLDS: &a" + (!StringUtils.nullCheck(itemMap.getDisabledWorlds().toString()).equals("NONE") ? "&a" + disabledList : "NONE")), event -> worldPane(player, itemMap, 0)));
             creatingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GRASS_BLOCK" : "2"), 1, false, false, "&b&lEnabled Worlds", "&7", "&7*Define the world(s) that the", "&7item will be given in.",
                     "&9&lENABLED-WORLDS: &a" + (!StringUtils.nullCheck(itemMap.getEnabledWorlds().toString()).equals("NONE") ? "&a" + enabledList : "NONE")), event -> worldPane(player, itemMap, 1)));
-            creatingPane.addButton(new Button(ItemHandler.getItem("GOLD_BLOCK", 1, true, false, "&b&lEnabled Regions", "&7", "&7*Define the region(s) that the", "&7item will be given in.", (ItemJoin.getCore().getDependencies().getGuard().guardEnabled() ?
-                            "&9&lENABLED-REGIONS: &a" + (!StringUtils.nullCheck(itemMap.getEnabledRegions().toString()).equals("NONE") ? "&a" + regionList : "NONE") : ""), (ItemJoin.getCore().getDependencies().getGuard().guardEnabled() ? "" : "&7"),
+            creatingPane.addButton(new Button(ItemHandler.getItem("REDSTONE_BLOCK", 1, true, false, "&b&lDisabled Regions", "&7", "&7*Define the region(s) that the", "&7item will &l&nNOT&7 be given in.", (ItemJoin.getCore().getDependencies().getGuard().guardEnabled() ?
+                            "&9&lDISABLED-REGIONS: &a" + (!StringUtils.nullCheck(itemMap.getDisabledRegions().toString()).equals("NONE") ? "&a" + disabledRegionList : "NONE") : ""), (ItemJoin.getCore().getDependencies().getGuard().guardEnabled() ? "" : "&7"),
                     (ItemJoin.getCore().getDependencies().getGuard().guardEnabled() ? "" : "&c&lERROR: &7WorldGuard was NOT found."), (ItemJoin.getCore().getDependencies().getGuard().guardEnabled() ? "" : "&7This button will do nothing...")), event -> {
                 if (ItemJoin.getCore().getDependencies().getGuard().guardEnabled()) {
-                    regionPane(player, itemMap);
+                    regionPane(player, itemMap, 0);
+                }
+            }));
+            creatingPane.addButton(new Button(ItemHandler.getItem("GOLD_BLOCK", 1, true, false, "&b&lEnabled Regions", "&7", "&7*Define the region(s) that the", "&7item will be given in.", (ItemJoin.getCore().getDependencies().getGuard().guardEnabled() ?
+                            "&9&lENABLED-REGIONS: &a" + (!StringUtils.nullCheck(itemMap.getEnabledRegions().toString()).equals("NONE") ? "&a" + enabledRegionList : "NONE") : ""), (ItemJoin.getCore().getDependencies().getGuard().guardEnabled() ? "" : "&7"),
+                    (ItemJoin.getCore().getDependencies().getGuard().guardEnabled() ? "" : "&c&lERROR: &7WorldGuard was NOT found."), (ItemJoin.getCore().getDependencies().getGuard().guardEnabled() ? "" : "&7This button will do nothing...")), event -> {
+                if (ItemJoin.getCore().getDependencies().getGuard().guardEnabled()) {
+                    regionPane(player, itemMap, 1);
                 }
             }));
             creatingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "STICKY_PISTON" : "29"), 1, false, false, "&e&lAnimation Settings", "&7", "&7*Define animations for the item", "&7Example: Custom iterations for the",
@@ -987,11 +1000,11 @@ public class Menu {
                     usePane(player, itemMap);
                 }
             }));
-            creatingPane.addButton(new Button(fillerPaneGItem));
             creatingPane.addButton(new Button(ItemHandler.getItem("LAVA_BUCKET", 1, false, false, "&b&lConditions", "&7", "&7*Define conditions for triggers,", "&7commands, and the disposable itemflag.", "&9Enabled: &a" +
                     ((itemMap.getTriggerConditions() != null && !itemMap.getTriggerConditions().isEmpty()) || (itemMap.getDisposableConditions() != null && !itemMap.getDisposableConditions().isEmpty())
                             || (itemMap.getCommandConditions() != null && !itemMap.getCommandConditions().isEmpty()) ? "YES" : "NONE")), event -> conditionsPane(player, itemMap)));
             creatingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "REPEATER" : "356"), 1, false, false, "&b&lToggle", "&7", "&7*Specify command(s) players can", "&7execute to enable or disable the", "&7custom item for themselves.", "&9Enabled: &a" + (itemMap.getToggleCommands() != null && !itemMap.getToggleCommands().isEmpty() ? "YES" : "NONE")), event -> togglePane(player, itemMap)));
+            creatingPane.addButton(new Button(fillerPaneGItem));
             creatingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CRAFTING_TABLE" : "58"), 1, false, false, "&b&lRecipe", "&7", "&7*Define the recipe to be", "&7able to craft this item.", "&9Enabled: &a" + (itemMap.getIngredients() != null && !itemMap.getIngredients().isEmpty() ? "YES" : "NONE")), event -> recipePane(player, itemMap)));
             if (ServerUtils.hasSpecificUpdate("1_20") && ItemHandler.isArmor(itemMap.getMaterial().toString())) {
                 String trimPattern = "NONE";
@@ -1079,7 +1092,6 @@ public class Menu {
                     }
                 }));
             }
-            creatingPane.addButton(new Button(fillerPaneGItem));
             creatingPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nMain Menu", "&7", "&7*Cancel and return to the main menu.", "&7", "&c&lWARNING: &7This item has NOT been saved!"), event -> returnConfirm(player, itemMap)));
             creatingPane.addButton(new Button(fillerPaneBItem), 3);
             creatingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "LIME_WOOL" : "WOOL:5"), 1, false, false, "&a&l&nSave to Config", "&7", "&7*Saves the custom item", "&7settings to the items.yml file."), event -> {
@@ -5512,21 +5524,26 @@ public class Menu {
      *
      * @param player  - The Player to have the Pane opened.
      * @param itemMap - The ItemMap currently being modified.
+     * @param stage   - The type of selection Pane.
      */
-    private static void regionPane(final Player player, final ItemMap itemMap) {
+    private static void regionPane(final Player player, final ItemMap itemMap, final int stage) {
         Interface regionPane = new Interface(true, 6, exitButton, GUIName, player);
         SchedulerUtils.runAsync(() -> {
             regionPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> creatingPane(player, itemMap)));
-            List<String> enabledRegions = itemMap.getEnabledRegions();
-            regionPane.addButton(new Button(ItemHandler.getItem("OBSIDIAN", 1, itemMap.containsRegion("UNDEFINED"), false, "&c&l&nUNDEFINED", "&7", "&7*Click to enable the", "&7custom item in &lALL REGIONS.", "&9&lENABLED: &a" +
-                    (itemMap.containsRegion("UNDEFINED") + "").toUpperCase()), event -> {
-                if (itemMap.containsRegion("UNDEFINED")) {
-                    enabledRegions.remove("UNDEFINED");
+            List<String> regions = (stage == 0 ? itemMap.getDisabledRegions() : itemMap.getEnabledRegions());
+            regionPane.addButton(new Button(ItemHandler.getItem("OBSIDIAN", 1, itemMap.containsRegion("UNDEFINED", (stage == 0)), false, "&c&l&nUNDEFINED", "&7", "&7*Click to " + (stage == 0 ? "disable" : "enable") + " the", "&7custom item in &lALL REGIONS.", (stage == 0 ? "&9&lDISABLED: &a" : "&9&lENABLED: &a") +
+                    (itemMap.containsRegion("UNDEFINED", (stage == 0)) + "").toUpperCase()), event -> {
+                if (itemMap.containsRegion("UNDEFINED", (stage == 0))) {
+                    regions.remove("UNDEFINED");
                 } else {
-                    enabledRegions.add("UNDEFINED");
+                    regions.add("UNDEFINED");
                 }
-                itemMap.setEnabledRegions(enabledRegions);
-                regionPane(player, itemMap);
+                if (stage == 0) {
+                    itemMap.setDisabledRegions(regions);
+                } else {
+                    itemMap.setEnabledRegions(regions);
+                }
+                regionPane(player, itemMap, stage);
             }));
             for (final World world : Bukkit.getServer().getWorlds()) {
                 for (final String region : ItemJoin.getCore().getDependencies().getGuard().getRegions(world).keySet()) {
@@ -5536,15 +5553,15 @@ public class Menu {
                     } else if (world.getEnvironment().equals(Environment.THE_END)) {
                         regionMaterial = (ServerUtils.hasSpecificUpdate("1_13") ? "END_STONE" : "121");
                     }
-                    regionPane.addButton(new Button(ItemHandler.getItem(regionMaterial, 1, itemMap.containsRegion(region) && itemMap.containsWorld(world.getName(), false), false, "&f&l" + region, "&7", "&a&lWORLD: &f" + world.getName(), "&7", "&7*Click to enable the",
-                            "&7custom item in this region.", "&9&lENABLED: &a" + ((itemMap.containsRegion(region) && itemMap.containsWorld(world.getName(), false)) + "").toUpperCase()), event -> {
-                        if (itemMap.containsRegion(region) && itemMap.containsWorld(world.getName(), false)) {
-                            enabledRegions.remove(region);
-                            clearWorlds(itemMap);
+                    regionPane.addButton(new Button(ItemHandler.getItem(regionMaterial, 1, itemMap.containsRegion(region, (stage == 0)) && itemMap.containsWorld(world.getName(), false), false, "&f&l" + region, "&7", "&a&lWORLD: &f" + world.getName(), "&7", "&7*Click to " + (stage == 0 ? "disable" : "enable") + " the",
+                            "&7custom item in this region.", (stage == 0 ? "&9&lDISABLED: &a" : "&9&lENABLED: &a") + ((itemMap.containsRegion(region, (stage == 0)) && itemMap.containsWorld(world.getName(), false)) + "").toUpperCase()), event -> {
+                        if (itemMap.containsRegion(region, (stage == 0)) && itemMap.containsWorld(world.getName(), false)) {
+                            regions.remove(region);
+                            clearWorlds(itemMap, stage);
                         } else {
-                            clearWorlds(itemMap);
-                            if (!itemMap.containsRegion(region)) {
-                                enabledRegions.add(region);
+                            clearWorlds(itemMap, stage);
+                            if (!itemMap.containsRegion(region, (stage == 0))) {
+                                regions.add(region);
                             }
                             if (!itemMap.containsWorld(world.getName(), false)) {
                                 final List<String> worldList = itemMap.getEnabledWorlds();
@@ -5552,8 +5569,12 @@ public class Menu {
                                 itemMap.setEnabledWorlds(worldList);
                             }
                         }
-                        itemMap.setEnabledRegions(enabledRegions);
-                        regionPane(player, itemMap);
+                        if (stage == 0) {
+                            itemMap.setDisabledRegions(regions);
+                        } else {
+                            itemMap.setEnabledRegions(regions);
+                        }
+                        regionPane(player, itemMap, stage);
                     }));
                 }
             }
@@ -5565,13 +5586,14 @@ public class Menu {
      * Clears the worlds that are currently not used for any specific region list.
      *
      * @param itemMap - The ItemMap currently being modified.
+     * @param stage   - The type of selection Pane.
      */
-    private static void clearWorlds(final ItemMap itemMap) {
+    private static void clearWorlds(final ItemMap itemMap, final int stage) {
         for (final World worldRemoval : Bukkit.getServer().getWorlds()) {
             if (itemMap.containsWorld(worldRemoval.getName(), false)) {
                 boolean hasRegion = false;
                 for (final String regionExists : ItemJoin.getCore().getDependencies().getGuard().getRegions(worldRemoval).keySet()) {
-                    if (itemMap.containsRegion(regionExists)) {
+                    if (itemMap.containsRegion(regionExists, (stage == 0))) {
                         hasRegion = true;
                     }
                 }
@@ -8629,10 +8651,16 @@ public class Menu {
                 enabledList.append("&a").append(split).append(" /n ");
             }
         }
-        StringBuilder regionList = new StringBuilder();
+        StringBuilder enabledRegionList = new StringBuilder();
         if (!StringUtils.nullCheck(itemMap.getEnabledRegions().toString()).equals("NONE")) {
             for (String split : StringUtils.softSplit(StringUtils.nullCheck(itemMap.getEnabledRegions().toString()))) {
-                regionList.append("&a").append(split).append(" /n ");
+                enabledRegionList.append("&a").append(split).append(" /n ");
+            }
+        }
+        StringBuilder disabledRegionList = new StringBuilder();
+        if (!StringUtils.nullCheck(itemMap.getDisabledRegions().toString()).equals("NONE")) {
+            for (String split : StringUtils.softSplit(StringUtils.nullCheck(itemMap.getDisabledRegions().toString()))) {
+                disabledRegionList.append("&a").append(split).append(" /n ");
             }
         }
         StringBuilder enchantList = new StringBuilder();
@@ -8721,7 +8749,7 @@ public class Menu {
                     (!StringUtils.nullCheck(itemMap.getItemFlags()).equals("NONE") ? "&9&lItemflags: &a" + itemflagsList : ""), (!Objects.equals(StringUtils.nullCheck(itemMap.getTriggers()), "NONE") ? "&9&lTriggers: &a" + triggersList : ""),
                     (!StringUtils.nullCheck(itemMap.getPermissionNode()).equals("NONE") ? "&9&lPermission Node: &a" + itemMap.getPermissionNode() : ""),
                     (!StringUtils.nullCheck(itemMap.getDisabledWorlds().toString()).equals("NONE") ? "&9&lDisabled Worlds: &a" + disabledList : ""), (!Objects.equals(StringUtils.nullCheck(itemMap.getEnabledWorlds().toString()), "NONE") ? "&9&lEnabled Worlds: &a" + enabledList : ""),
-                    (!StringUtils.nullCheck(itemMap.getEnabledRegions().toString()).equals("NONE") ? "&9&lEnabled Regions: &a" + regionList : ""), (!itemMap.getDynamicMaterials().isEmpty() ? "&9&lMaterial Animations: &aYES" : ""),
+                    (!StringUtils.nullCheck(itemMap.getDisabledRegions().toString()).equals("NONE") ? "&9&lDisabled Regions: &a" + disabledRegionList : ""), (!StringUtils.nullCheck(itemMap.getEnabledRegions().toString()).equals("NONE") ? "&9&lEnabled Regions: &a" + enabledRegionList : ""), (!itemMap.getDynamicMaterials().isEmpty() ? "&9&lMaterial Animations: &aYES" : ""),
                     (!itemMap.getDynamicNames().isEmpty() ? "&9&lName Animations: &aYES" : ""), (!itemMap.getDynamicLores().isEmpty() ? "&9&lLore Animations: &aYES" : ""),
                     (!itemMap.getDynamicOwners().isEmpty() || !itemMap.getDynamicTextures().isEmpty() ? "&9&lSkull Animations: &aYES" : ""), (!Objects.equals(StringUtils.nullCheck(itemMap.getLimitModes()), "NONE") ? "&9&lLimit-Modes: &a" + itemMap.getLimitModes() : ""),
                     (!StringUtils.nullCheck(itemMap.getProbability() + "&a%").equals("NONE") ? "&9&lProbability: &a" + itemMap.getProbability() + "%" : ""),
