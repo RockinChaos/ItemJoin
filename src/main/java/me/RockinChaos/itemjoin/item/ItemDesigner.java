@@ -446,11 +446,9 @@ public class ItemDesigner {
         if (ItemJoin.getCore().getData().dataTagsEnabled() && !itemMap.isVanilla() && !itemMap.isVanillaControl() && !itemMap.isVanillaStatus()) {
             try {
                 Object tag = ReflectionUtils.getMinecraftClass("NBTTagCompound").getConstructor().newInstance();
-                tag.getClass().getMethod(MinecraftMethod.setString.getMethod(tag, String.class, String.class), String.class, String.class).invoke(tag, "ItemJoin Name", itemMap.getConfigName());
-                itemMap.setNewNBTData(itemMap.getConfigName(), tag);
+                tag.getClass().getMethod(MinecraftMethod.setString.getMethod(), String.class, String.class).invoke(tag, "ItemJoin Name", itemMap.getConfigName());
                 final String itemProperties = itemMap.getNodeLocation().getString(".properties");
                 if (itemProperties != null && !itemProperties.isEmpty()) {
-                    List<Object> tags = new ArrayList<>();
                     Map<Object, Object> tagValues = new HashMap<>();
                     String[] properties = itemProperties.split(",");
                     for (String property : properties) {
@@ -468,19 +466,18 @@ public class ItemDesigner {
                             tagList = ReflectionUtils.getMinecraftClass("NBTTagList").getConstructor().newInstance();
                             for (String nbt : listNBT) {
                                 Object tagString = ReflectionUtils.getMinecraftClass("NBTTagString").getConstructor(String.class).newInstance(nbt);
-                                tagList.getClass().getMethod(MinecraftMethod.add.getMethod(tagList, ReflectionUtils.getMinecraftClass("NBTBase")), ReflectionUtils.getMinecraftClass("NBTBase")).invoke(tagList, tagString);
+                                tagList.getClass().getMethod(MinecraftMethod.add.getMethod(), ReflectionUtils.getMinecraftClass("NBTBase")).invoke(tagList, tagString);
                             }
                         }
                         Object propertyTag = ReflectionUtils.getMinecraftClass("NBTTagCompound").getConstructor().newInstance();
-                        propertyTag.getClass().getMethod(MinecraftMethod.setString.getMethod(propertyTag, String.class, String.class), String.class, String.class).invoke(propertyTag, identifier, value.toString());
-                        tags.add(propertyTag);
+                        propertyTag.getClass().getMethod(MinecraftMethod.setString.getMethod(), String.class, String.class).invoke(propertyTag, identifier, value.toString());
                         if (tagList == null) {
                             tagValues.put(identifier, value.toString());
                         } else {
                             tagValues.put(identifier, tagList);
                         }
                     }
-                    itemMap.setNBTProperties(tagValues, tags);
+                    itemMap.setNBTProperties(tagValues);
                 }
             } catch (Exception e) {
                 ServerUtils.logSevere("{ItemDesigner} An error has occurred when setting NBTData to an item.");

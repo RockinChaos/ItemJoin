@@ -84,7 +84,12 @@ public class EffectAPI {
             detonationDelay = Integer.parseInt(projectileParts[4]);
         }
         FireworkEffect effect = FireworkEffect.builder().withColor(startColor).withFade(endColor).with(effectType).trail(true).flicker(true).build();
-        final Firework fw = (Firework) player.getWorld().spawnEntity(player.getLocation(), EntityType.FIREWORK);
+        final Firework fw;
+        if (!ServerUtils.hasPreciseUpdate("1_20_5")) {
+            fw = (Firework) player.getWorld().spawnEntity(player.getLocation(), EntityType.valueOf("FIREWORK"));
+        } else {
+            fw = (Firework) player.getWorld().spawnEntity(player.getLocation(), EntityType.FIREWORK_ROCKET);
+        }
         FireworkMeta meta = fw.getFireworkMeta();
         meta.addEffect(effect);
         meta.setPower(1);
