@@ -764,7 +764,11 @@ public class ItemUtilities {
                 player.getInventory().setItem(nextSlot, item);
             } else if (CustomSlot.ARBITRARY.isSlot(itemMap.getSlot()) && player.getInventory().firstEmpty() != -1) {
                 isGiven = true;
-                player.getInventory().addItem(item);
+                if (itemMap.getMultipleSlots() != null && !itemMap.getMultipleSlots().isEmpty()) {
+                    player.getInventory().setItem(player.getInventory().firstEmpty(), item);
+                } else {
+                    player.getInventory().addItem(item);
+                }
             } else if (CustomSlot.HELMET.isSlot(itemMap.getSlot()) && (existingItem.getType() == Material.AIR || overWrite)) {
                 isGiven = true;
                 Objects.requireNonNull(player.getEquipment()).setHelmet(item);
