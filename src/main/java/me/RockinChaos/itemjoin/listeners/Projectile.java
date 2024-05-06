@@ -20,6 +20,7 @@ package me.RockinChaos.itemjoin.listeners;
 import me.RockinChaos.core.handlers.PlayerHandler;
 import me.RockinChaos.core.utils.SchedulerUtils;
 import me.RockinChaos.core.utils.ServerUtils;
+import me.RockinChaos.core.utils.api.LegacyAPI;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import org.bukkit.Effect;
@@ -57,7 +58,7 @@ public class Projectile implements Listener {
             Player player = (Player) event.getEntity();
             this.arrowList.put(event.getProjectile().getEntityId(), item);
             if (!ItemUtilities.getUtilities().isAllowed(player, item, "count-lock")) {
-                event.setConsumeItem(false);
+                LegacyAPI.setConsumeItem(event, false);
                 PlayerHandler.updateInventory(player, 1L);
             }
         } else if (entity instanceof Player) {
