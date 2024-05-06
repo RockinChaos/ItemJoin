@@ -60,7 +60,7 @@ import static me.RockinChaos.core.utils.SchedulerUtils.*;
 public class PluginData {
 
     private static PluginData info;
-    private final List<String> nbtInfo = Arrays.asList("ItemJoin", "ItemJoin Name");
+    private final List<String> nbtInfo = Collections.singletonList("ItemJoin Name");
     private int listLength = 1;
     private int permissionLength = 2;
 
