@@ -50,12 +50,8 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.*;
 import org.bukkit.inventory.meta.*;
-import org.bukkit.inventory.meta.BookMeta.Generation;
 import org.bukkit.map.MapView;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
@@ -130,7 +126,6 @@ public class ItemMap implements Cloneable {
     private Map<String, Integer> enchants = new HashMap<>();
     //  ============================================== //
     private Map<Object, Object> nbtProperty = new HashMap<>();
-    private List<Object> nbtProperties = new ArrayList<>();
     //  ============================================== //
 //         Drop Chances for each item.          //
 //  ============================================== //
@@ -140,8 +135,6 @@ public class ItemMap implements Cloneable {
     //  ============================================== //
 //         NBT Information for each item.          //
 //  ============================================== //
-    private String newNBTData;
-    private Object newNBTTag;
     private String legacySecret;
     //  ============================================== //
 //     ItemAnimation Information for each item.    //
@@ -800,24 +793,12 @@ public class ItemMap implements Cloneable {
     }
 
     /**
-     * Sets the NBTData.
-     *
-     * @param nbt - The NBT Data to be set.
-     * @param tag - The Object Tag to be set.
-     */
-    public void setNewNBTData(final String nbt, final Object tag) {
-        this.newNBTData = nbt;
-        this.newNBTTag = tag;
-    }
-
-    /**
      * Sets the NBT Properties.
      *
-     * @param tags - The Object Tags to be set.
+     * @param tagValues - The Object Tags with their Values to be set.
      */
-    public void setNBTProperties(final Map<Object, Object> tagValues, final List<Object> tags) {
+    public void setNBTProperties(final Map<Object, Object> tagValues) {
         this.nbtProperty = tagValues;
-        this.nbtProperties = tags;
     }
 
     /**
@@ -2004,7 +1985,7 @@ public class ItemMap implements Cloneable {
      * @return The Book Generation.
      */
     public org.bukkit.inventory.meta.BookMeta.Generation getGeneration() {
-        return (Generation) this.generation;
+        return (BookMeta.Generation) this.generation;
     }
 
     /**
@@ -3855,7 +3836,7 @@ public class ItemMap implements Cloneable {
         final String nbtData = ItemHandler.getNBTData(item, PluginData.getInfo().getNBTList());
         return item != null && item.getType() != Material.AIR
                 && (this.vanillaControl || this.vanillaStatus
-                || (ItemJoin.getCore().getData().dataTagsEnabled() && nbtData != null && nbtData.equalsIgnoreCase(this.newNBTData))
+                || (ItemJoin.getCore().getData().dataTagsEnabled() && nbtData != null && nbtData.equalsIgnoreCase(this.getConfigName()))
                 || (this.legacySecret != null && item.hasItemMeta() && (ServerUtils.hasSpecificUpdate("1_14") || (!ServerUtils.hasSpecificUpdate("1_14") && Objects.requireNonNull(item.getItemMeta()).hasDisplayName()))
                 && Objects.requireNonNull(StringUtils.colorDecode(item)).contains(this.legacySecret)));
     }
@@ -3869,7 +3850,7 @@ public class ItemMap implements Cloneable {
      */
     public boolean isSimilar(final Player player, final ItemStack item) {
         if ((item != null && item.getType() != Material.AIR && item.getType() == this.material) || (this.materialAnimated && item != null && item.getType() != Material.AIR && this.isMaterial(item))) {
-            if (this.vanillaControl || this.vanillaStatus || (ItemJoin.getCore().getData().dataTagsEnabled() && ItemHandler.getNBTData(item, PluginData.getInfo().getNBTList()) != null && Objects.requireNonNull(ItemHandler.getNBTData(item, PluginData.getInfo().getNBTList())).equalsIgnoreCase(this.newNBTData))
+            if (this.vanillaControl || this.vanillaStatus || (ItemJoin.getCore().getData().dataTagsEnabled() && ItemHandler.getNBTData(item, PluginData.getInfo().getNBTList()) != null && Objects.requireNonNull(ItemHandler.getNBTData(item, PluginData.getInfo().getNBTList())).equalsIgnoreCase(this.getConfigName()))
                     || (this.legacySecret != null && item.hasItemMeta() && (ServerUtils.hasSpecificUpdate("1_14") || (!ServerUtils.hasSpecificUpdate("1_14") && Objects.requireNonNull(item.getItemMeta()).hasDisplayName()))
                     && Objects.requireNonNull(StringUtils.colorDecode(item)).contains(this.legacySecret))) {
                 if (this.isEnchantSimilar(player, item) || !Objects.requireNonNull(item.getItemMeta()).hasEnchants() && this.enchants.isEmpty() || this.isItemChangeable()) {
@@ -3975,7 +3956,7 @@ public class ItemMap implements Cloneable {
         try {
             final boolean bookMeta = ((BookMeta) Objects.requireNonNull(item.getItemMeta())).hasPages();
             if (bookMeta && this.material.toString().toUpperCase().contains("BOOK")) {
-                this.tempItem = this.setJSONBookPages(player, this.tempItem, this.bookPages);
+                this.setJSONBookPages(player);
             }
             return bookMeta;
         } catch (Exception e) {
@@ -4078,7 +4059,7 @@ public class ItemMap implements Cloneable {
             this.setEnchantments(player);
             this.setGlowing();
             this.setMapImage();
-            this.tempItem = this.setJSONBookPages(player, this.tempItem, this.bookPages);
+            this.setJSONBookPages(player);
             this.setNBTData();
             this.tempMeta = this.tempItem.getItemMeta();
         }
@@ -4096,6 +4077,7 @@ public class ItemMap implements Cloneable {
             this.setFireChargeColor();
             this.setDye(player);
             this.setBookInfo(player);
+            this.setUnbreakable();
             this.setAttributes();
             this.setAttributeFlags();
             this.setEnchantmentsFlags();
@@ -4132,21 +4114,30 @@ public class ItemMap implements Cloneable {
      * Sets the ItemStack as Unbreakable.
      */
     private void setUnbreaking() {
-        if (this.isUnbreakable() || this.hideDurability) {
+        if (!ServerUtils.hasPreciseUpdate("1_20_5") && (this.isUnbreakable() || this.hideDurability)) {
             try {
                 Class<?> craftItemStack = ReflectionUtils.getCraftBukkitClass("inventory.CraftItemStack");
                 Object nms = craftItemStack.getMethod("asNMSCopy", ItemStack.class).invoke(null, this.tempItem);
                 Class<?> itemClass = ReflectionUtils.getMinecraftClass("ItemStack");
-                Object tag = itemClass.getMethod(MinecraftMethod.getTag.getMethod(itemClass)).invoke(nms);
+                Object tag = itemClass.getMethod(MinecraftMethod.getTag.getMethod()).invoke(nms);
                 if (tag == null) {
                     tag = ReflectionUtils.getMinecraftClass("NBTTagCompound").getConstructor().newInstance();
                 }
-                tag.getClass().getMethod(MinecraftMethod.setInt.getMethod(tag, String.class, int.class), String.class, int.class).invoke(tag, "Unbreakable", 1);
-                nms.getClass().getMethod(MinecraftMethod.setTag.getMethod(nms, tag.getClass()), tag.getClass()).invoke(nms, tag);
+                tag.getClass().getMethod(MinecraftMethod.setInt.getMethod(), String.class, int.class).invoke(tag, "Unbreakable", 1);
+                nms.getClass().getMethod(MinecraftMethod.setTag.getMethod(), tag.getClass()).invoke(nms, tag);
                 this.tempItem = (ItemStack) craftItemStack.getMethod("asCraftMirror", nms.getClass()).invoke(null, nms);
             } catch (Exception e) {
                 ServerUtils.sendDebugTrace(e);
             }
+        }
+    }
+
+    /**
+     * Sets the ItemStack as Unbreakable.
+     */
+    private void setUnbreakable() {
+        if (ServerUtils.hasPreciseUpdate("1_20_5") && (this.isUnbreakable() || this.hideDurability)) {
+            this.tempMeta.setUnbreakable(true);
         }
     }
 
@@ -4206,6 +4197,17 @@ public class ItemMap implements Cloneable {
      * Sets the JSON Book Pages to the ItemStack.
      *
      * @param player - The Player being used for placeholders.
+     */
+    public void setJSONBookPages(final Player player) {
+        if (this.tempItem.getType().toString().equalsIgnoreCase("WRITTEN_BOOK") && this.bookPages != null && !this.bookPages.isEmpty()) {
+            this.tempItem = this.setJSONBookPages(player, this.tempItem, this.bookPages);
+        }
+    }
+
+    /**
+     * Sets the JSON Book Pages to the ItemStack.
+     *
+     * @param player - The Player being used for placeholders.
      * @param item   - The ItemStack to be updated.
      * @param pages  - The book pages to be set.
      * @return The updated ItemStack.
@@ -4220,7 +4222,9 @@ public class ItemMap implements Cloneable {
             } catch (Exception e) {
                 ServerUtils.sendDebugTrace(e);
             }
-            if (ServerUtils.hasSpecificUpdate("1_15")) {
+            if (ServerUtils.hasPreciseUpdate("1_20_5")) {
+                return this.set1_20_5JSONPages(player, item, copyPages);
+            } else if (ServerUtils.hasSpecificUpdate("1_15")) {
                 return this.set1_15JSONPages(player, item, localePages, copyPages);
             } else if (ServerUtils.hasSpecificUpdate("1_14")) {
                 return this.set1_14JSONPages(player, item, localePages, copyPages);
@@ -4247,7 +4251,7 @@ public class ItemMap implements Cloneable {
                 textComponent = StringUtils.translateLayout(textComponent, player);
                 Object TagString = ReflectionUtils.getMinecraftClass("NBTTagString").getConstructor(String.class).newInstance(textComponent);
                 Class<?> baseClass = ReflectionUtils.getMinecraftClass("NBTBase");
-                localePages.getClass().getMethod(MinecraftMethod.add.getMethod(localePages, baseClass), baseClass).invoke(localePages, TagString);
+                localePages.getClass().getMethod(MinecraftMethod.add.getMethod(), baseClass).invoke(localePages, TagString);
             } catch (Exception e) {
                 ServerUtils.sendDebugTrace(e);
             }
@@ -4277,7 +4281,7 @@ public class ItemMap implements Cloneable {
                 textComponent = StringUtils.translateLayout(textComponent, player);
                 Object TagString = ReflectionUtils.getMinecraftClass("NBTTagString").getConstructor(String.class).newInstance(textComponent);
                 Class<?> baseClass = ReflectionUtils.getMinecraftClass("NBTBase");
-                localePages.getClass().getMethod(MinecraftMethod.add.getMethod(localePages, int.class, baseClass), int.class, baseClass).invoke(localePages, 0, TagString);
+                localePages.getClass().getMethod(MinecraftMethod.add.getMethod(), int.class, baseClass).invoke(localePages, 0, TagString);
             } catch (Exception e) {
                 ServerUtils.sendDebugTrace(e);
             }
@@ -4307,14 +4311,41 @@ public class ItemMap implements Cloneable {
                 textComponent = StringUtils.translateLayout(textComponent, player);
                 Class<?> stringClass = ReflectionUtils.getMinecraftClass("NBTTagString");
                 Class<?> baseClass = ReflectionUtils.getMinecraftClass("NBTBase");
-                Object TagString = stringClass.getMethod(MinecraftMethod.getPage.getMethod(stringClass), String.class).invoke(null, textComponent);
-                localePages.getClass().getMethod(MinecraftMethod.add.getMethod(localePages, int.class, baseClass), int.class, baseClass).invoke(localePages, 0, TagString);
+                Object TagString = stringClass.getMethod(MinecraftMethod.getPage.getMethod(), String.class).invoke(null, textComponent);
+                localePages.getClass().getMethod(MinecraftMethod.add.getMethod(), int.class, baseClass).invoke(localePages, 0, TagString);
             } catch (Exception e) {
                 ServerUtils.sendDebugTrace(e);
             }
         }
         try {
             return this.invokePages(item, localePages);
+        } catch (Exception e) {
+            ServerUtils.sendDebugTrace(e);
+        }
+        return item;
+    }
+
+    /**
+     * Sets the JSON Book Pages to the ItemStack.
+     *
+     * @param player    - The Player being used for placeholders.
+     * @param item      - The ItemStack to be updated.
+     * @param copyPages - The book pages to be set.
+     * @return The updated ItemStack.
+     * @warn Method ONLY USED for Server Version 1.20.5
+     */
+    private ItemStack set1_20_5JSONPages(final Player player, final ItemStack item, final List<String> copyPages) {
+        try {
+            final List<net.md_5.bungee.api.chat.BaseComponent[]> pages = new ArrayList<>();
+            final BookMeta tempMeta = (BookMeta) item.getItemMeta();
+            for (String jsonComponent : copyPages) {
+                pages.add(net.md_5.bungee.chat.ComponentSerializer.parse(StringUtils.translateLayout(jsonComponent, player)));
+
+            }
+            if (tempMeta != null) {
+                tempMeta.spigot().setPages(pages);
+                item.setItemMeta(tempMeta);
+            }
         } catch (Exception e) {
             ServerUtils.sendDebugTrace(e);
         }
@@ -4334,12 +4365,12 @@ public class ItemMap implements Cloneable {
         Class<?> itemClass = ReflectionUtils.getMinecraftClass("ItemStack");
         Class<?> baseClass = ReflectionUtils.getMinecraftClass("NBTBase");
         Object nms = craftItemStack.getMethod("asNMSCopy", ItemStack.class).invoke(null, item);
-        Object tag = itemClass.getMethod(MinecraftMethod.getTag.getMethod(itemClass)).invoke(nms);
+        Object tag = itemClass.getMethod(MinecraftMethod.getTag.getMethod()).invoke(nms);
         if (tag == null) {
             tag = ReflectionUtils.getMinecraftClass("NBTTagCompound").getConstructor().newInstance();
         }
-        tag.getClass().getMethod(MinecraftMethod.set.getMethod(tag, String.class, baseClass), String.class, baseClass).invoke(tag, "pages", pages);
-        nms.getClass().getMethod(MinecraftMethod.setTag.getMethod(nms, tag.getClass()), tag.getClass()).invoke(nms, tag);
+        tag.getClass().getMethod(MinecraftMethod.set.getMethod(), String.class, baseClass).invoke(tag, "pages", pages);
+        nms.getClass().getMethod(MinecraftMethod.setTag.getMethod(), tag.getClass()).invoke(nms, tag);
         return ((ItemStack) craftItemStack.getMethod("asCraftMirror", nms.getClass()).invoke(null, nms));
     }
 
@@ -4349,31 +4380,20 @@ public class ItemMap implements Cloneable {
     private void setNBTData() {
         if (ItemJoin.getCore().getData().dataTagsEnabled() && !this.isVanilla() && !this.isVanillaControl() && !this.isVanillaStatus()) {
             try {
-                Class<?> itemClass = ReflectionUtils.getMinecraftClass("ItemStack");
-                Object nms = ReflectionUtils.getCraftBukkitClass("inventory.CraftItemStack").getMethod("asNMSCopy", ItemStack.class).invoke(null, this.tempItem);
-                Object cacheTag = itemClass.getMethod(MinecraftMethod.getTag.getMethod(itemClass)).invoke(nms);
-                if (cacheTag != null) {
-                    cacheTag.getClass().getMethod(MinecraftMethod.setString.getMethod(cacheTag, String.class, String.class), String.class, String.class).invoke(cacheTag, "ItemJoin Name", this.getConfigName());
-                    if (this.nbtProperty != null && !this.nbtProperty.isEmpty()) {
-                        for (Object tag : this.nbtProperty.keySet()) {
-                            String castTag = (String) tag;
-                            String castProperty = (String) this.nbtProperty.get(tag);
-                            try {
-                                cacheTag.getClass().getMethod(MinecraftMethod.setString.getMethod(cacheTag, String.class, String.class), String.class, String.class).invoke(cacheTag, castTag, castProperty);
-                            } catch (Exception e) {
-                                cacheTag.getClass().getMethod(MinecraftMethod.set.getMethod(cacheTag, String.class, ReflectionUtils.getMinecraftClass("NBTBase")), String.class, ReflectionUtils.getMinecraftClass("NBTBase")).invoke(cacheTag, castTag, castProperty);
-                            }
-                        }
-                    }
-                } else {
-                    nms.getClass().getMethod(MinecraftMethod.setTag.getMethod(nms, this.newNBTTag.getClass()), this.newNBTTag.getClass()).invoke(nms, this.newNBTTag);
-                    if (this.nbtProperties != null && !this.nbtProperties.isEmpty()) {
-                        for (Object tag : this.nbtProperties) {
-                            nms.getClass().getMethod(MinecraftMethod.setTag.getMethod(nms, tag.getClass()), tag.getClass()).invoke(nms, tag);
+                Object tagInstance = ReflectionUtils.getMinecraftClass("NBTTagCompound").getConstructor().newInstance();
+                tagInstance.getClass().getMethod(MinecraftMethod.setString.getMethod(), String.class, String.class).invoke(tagInstance, "ItemJoin Name", this.getConfigName());
+                if (this.nbtProperty != null && !this.nbtProperty.isEmpty()) {
+                    for (Object tag : this.nbtProperty.keySet()) {
+                        String castTag = (String) tag;
+                        String castProperty = (String) this.nbtProperty.get(tag);
+                        try {
+                            tagInstance.getClass().getMethod(MinecraftMethod.setString.getMethod(), String.class, String.class).invoke(tagInstance, castTag, castProperty);
+                        } catch (Exception e) {
+                            tagInstance.getClass().getMethod(MinecraftMethod.set.getMethod(), String.class, ReflectionUtils.getMinecraftClass("NBTBase")).invoke(tagInstance, castTag, castProperty);
                         }
                     }
                 }
-                this.tempItem = (ItemStack) ReflectionUtils.getCraftBukkitClass("inventory.CraftItemStack").getMethod("asCraftMirror", nms.getClass()).invoke(null, nms);
+                this.tempItem = ItemHandler.setNBTData(this.tempItem, tagInstance);
             } catch (Exception e) {
                 ServerUtils.logSevere("{ItemMap} An error has occurred when setting NBTData to an item.");
                 ServerUtils.sendDebugTrace(e);
@@ -4524,7 +4544,7 @@ public class ItemMap implements Cloneable {
         }
 
         if (this.generation != null && ServerUtils.hasSpecificUpdate("1_10")) {
-            ((BookMeta) this.tempMeta).setGeneration((Generation) this.generation);
+            ((BookMeta) this.tempMeta).setGeneration((BookMeta.Generation) this.generation);
         }
     }
 
@@ -4557,8 +4577,12 @@ public class ItemMap implements Cloneable {
             this.tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ATTRIBUTES);
             this.tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_DESTROYS);
             this.tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_PLACED_ON);
-            this.tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_POTION_EFFECTS);
             this.tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_UNBREAKABLE);
+            if (!ServerUtils.hasPreciseUpdate("1_20_5")) {
+                tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.valueOf("HIDE_POTION_EFFECTS"));
+            } else {
+                tempMeta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
+            }
             if (ServerUtils.hasSpecificUpdate("1_20")) {
                 this.tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ARMOR_TRIM);
             }
