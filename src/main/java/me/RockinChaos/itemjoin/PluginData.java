@@ -473,8 +473,6 @@ public class PluginData {
         ItemJoin.getCore().getData().setSQLDatabase(ItemJoin.getCore().getConfig("config.yml").getString("Database.database"));
         ItemJoin.getCore().getDependencies().refresh();
         runAsync(() -> {
-            final ConfigurationSection itemsPath = ItemJoin.getCore().getConfig("items.yml").getConfigurationSection("items");
-            int customItems = (itemsPath != null ? itemsPath.getKeys(false).size() : 0);
             final String compileVersion = Objects.requireNonNull(YamlConfiguration.loadConfiguration(new InputStreamReader(Objects.requireNonNull(ItemJoin.getCore().getPlugin().getResource("plugin.yml")))).getString("nms-version")).split("-")[0].replace(".", "_");
             final String serverVersion = ServerUtils.getVersion();
             if (!silent) {
@@ -487,7 +485,6 @@ public class PluginData {
                 }
                 ItemJoin.getCore().getDependencies().sendUtilityDepends();
                 this.warnExploitUsers();
-                ServerUtils.logInfo(customItems + " Custom item(s) loaded!");
             }
             this.registerPrevent();
             if (isRunning) {
@@ -514,6 +511,18 @@ public class PluginData {
                     ItemJoin.getCore().getData().setStarted(true);
                     forOnlinePlayers(player -> ItemUtilities.getUtilities().setStatistics(player));
                     this.setPages();
+                    final ConfigurationSection itemsPath = ItemJoin.getCore().getConfig("items.yml").getConfigurationSection("items");
+                    int loadedItems = 0;
+                    int customItems = 0;
+                    if (itemsPath != null) {
+                        customItems = itemsPath.getKeys(false).size();
+                        for (String configName : itemsPath.getKeys(false)) {
+                            if (ItemUtilities.getUtilities().getItemMap(configName) != null) {
+                                loadedItems++;
+                            }
+                        }
+                    }
+                    ServerUtils.logInfo(loadedItems + "/" + customItems + " Custom item(s) loaded!");
                 });
                 {
                     runAsyncLater(100L, () -> {
