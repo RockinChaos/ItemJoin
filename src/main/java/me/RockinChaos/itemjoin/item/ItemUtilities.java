@@ -315,11 +315,11 @@ public class ItemUtilities {
         final String regions = ItemJoin.getCore().getDependencies().getGuard().getRegionAtLocation(player.getLocation());
         final List<String> regionSetFull = Arrays.asList(regions.replace(" ", "").trim().split(","));
         if (regionSetFull.isEmpty() || regionSetFull.toString().replace("[", "").replace("]", "").isEmpty()) {
-            ItemUtilities.getUtilities().setAuthenticating(player, world, type, newMode, "IJ_WORLD", Collections.singletonList("IJ_WORLD"));
+            setAuthenticating(player, world, type, newMode, "IJ_WORLD", Collections.singletonList("IJ_WORLD"));
         } else {
             for (String region : regionSetFull) {
                 if (region != null && !region.isEmpty()) {
-                    ItemUtilities.getUtilities().setAuthenticating(player, world, type, newMode, region, regionSetFull);
+                    setAuthenticating(player, world, type, newMode, region, regionSetFull);
                 }
             }
         }
@@ -632,17 +632,17 @@ public class ItemUtilities {
      */
     public void saveReturnItems(final TriggerType type, final Player player, final String world, final Inventory craftView, final PlayerInventory inventory, final int clearType) {
         boolean doReturn = StringUtils.splitIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Options"), "RETURN_SWITCH", ",");
-        List<ItemMap> protectItems = ItemUtilities.getUtilities().getProtectItems();
+        List<ItemMap> protectItems = getProtectItems();
         if (type == TriggerType.WORLD_SWITCH && doReturn) {
             Inventory saveInventory = Bukkit.createInventory(null, 54);
             for (int i = 0; i <= 47; i++) {
                 for (int k = 0; k < (!protectItems.isEmpty() ? protectItems.size() : 1); k++) {
-                    if (i <= 41 && inventory.getSize() >= i && ItemUtilities.getUtilities().canClear(inventory.getItem(i), String.valueOf(i), k, clearType)) {
+                    if (i <= 41 && inventory.getSize() >= i && canClear(inventory.getItem(i), String.valueOf(i), k, clearType)) {
                         final ItemStack item = inventory.getItem(i);
                         if (item != null) {
                             saveInventory.setItem(i, item.clone());
                         }
-                    } else if (i >= 42 && ItemUtilities.getUtilities().canClear(craftView.getItem(i - 42), "CRAFTING[" + (i - 42) + "]", k, clearType) && PlayerHandler.isCraftingInv(player.getOpenInventory())) {
+                    } else if (i >= 42 && canClear(craftView.getItem(i - 42), "CRAFTING[" + (i - 42) + "]", k, clearType) && PlayerHandler.isCraftingInv(player.getOpenInventory())) {
                         final ItemStack item = craftView.getItem(i - 42);
                         if (item != null) {
                             saveInventory.setItem(i, item.clone());
