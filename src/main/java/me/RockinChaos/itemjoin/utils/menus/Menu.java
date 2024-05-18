@@ -8865,16 +8865,13 @@ public class Menu {
      * @param player - The Player to be set to the Modify Menu.
      */
     public static void setModifyMenu(final boolean bool, final Player player) {
-        try {
-            SchedulerUtils.runAsync(() -> {
-                if (bool) {
-                    modifyMenu.add(PlayerHandler.getPlayerID(player));
-                } else if (!modifyMenu.isEmpty()) {
-                    modifyMenu.remove(PlayerHandler.getPlayerID(player));
-                }
-            });
-        } catch (ArrayIndexOutOfBoundsException ignored) {
-        }
+        SchedulerUtils.run(() -> {
+            if (bool) {
+                modifyMenu.add(PlayerHandler.getPlayerID(player));
+            } else if (!modifyMenu.isEmpty()) {
+                modifyMenu.remove(PlayerHandler.getPlayerID(player));
+            }
+        });
     }
 
     /**
@@ -8884,16 +8881,13 @@ public class Menu {
      * @param player - The Player to be set to the Typing Menu.
      */
     public static void setTypingMenu(final boolean bool, final Player player, final Interface interFace) {
-        try {
-            SchedulerUtils.runAsync(() -> {
-                if (bool) {
-                    typingMenu.put(PlayerHandler.getPlayerID(player), interFace);
-                } else if (!typingMenu.isEmpty()) {
-                    typingMenu.remove(PlayerHandler.getPlayerID(player));
-                }
-            });
-        } catch (ArrayIndexOutOfBoundsException ignored) {
-        }
+        SchedulerUtils.run(() -> {
+            if (bool) {
+                typingMenu.put(PlayerHandler.getPlayerID(player), interFace);
+            } else if (!typingMenu.isEmpty()) {
+                typingMenu.remove(PlayerHandler.getPlayerID(player));
+            }
+        });
     }
 
     /**
