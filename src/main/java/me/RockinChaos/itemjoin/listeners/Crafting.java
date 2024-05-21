@@ -23,8 +23,10 @@ import me.RockinChaos.core.utils.SchedulerUtils;
 import me.RockinChaos.core.utils.ServerUtils;
 import me.RockinChaos.core.utils.StringUtils;
 import me.RockinChaos.core.utils.protocol.events.PlayerAutoCraftEvent;
+import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -42,13 +44,16 @@ import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.function.Consumer;
 
 public class Crafting implements Listener {
 
     private final HashMap<String, Long> closeDupe = new HashMap<>();
     private final HashMap<String, Boolean> pendingZero = new HashMap<>();
+    private final List<String> whiteList = Collections.singletonList("GraphicalQuests");
 
     /**
      * Prevents players from auto crafting with custom crafting items in their crafting slots.
@@ -67,13 +72,28 @@ public class Crafting implements Listener {
                 return;
             }
             for (ItemMap itemMap : ItemUtilities.getUtilities().getCraftingItems()) {
-                if (!event.isCancelled() && itemMap.isReal(craftingContents[i])) {
+                if (!event.isCancelled() && !this.hasRecipePlugin() && itemMap.isReal(craftingContents[i])) {
                     event.setCancelled(true);
                 } else if (event.isCancelled()) {
                     return;
                 }
             }
         }
+    }
+
+    /**
+     * Checks if another plugin has control over the Auto Recipe event.
+     * Attempts to prevent overriding another plugins event handling.
+     *
+     * @return If a recipe plugin exists.
+     */
+    private boolean hasRecipePlugin() {
+        for (String plugin : this.whiteList) {
+            if (Bukkit.getServer().getPluginManager().isPluginEnabled(plugin) && !StringUtils.containsIgnoreCase(ItemJoin.getCore().getDependencies().getIgnoreList(), plugin)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
