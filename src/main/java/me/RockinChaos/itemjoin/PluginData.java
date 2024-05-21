@@ -711,7 +711,7 @@ public class PluginData {
         if (((itemMap.isItemRepairable() || itemMap.isItemCraftable()) || (itemMap.getIngredients() != null || !itemMap.getIngredients().isEmpty())) && StringUtils.isRegistered(Recipes.class.getSimpleName())) {
             ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new Recipes(), ItemJoin.getCore().getPlugin());
         }
-        if (itemMap.isItemStore() || itemMap.isItemModify()) {
+        if (itemMap.isItemStore() || itemMap.isItemModify() || itemMap.isDisposable()) {
             if (StringUtils.isRegistered(Storable.class.getSimpleName())) {
                 ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new Storable(), ItemJoin.getCore().getPlugin());
             }

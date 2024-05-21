@@ -3801,6 +3801,8 @@ public class ItemMap implements Cloneable {
                 return closeInventory;
             } else if (findFlag.equals("item-store")) {
                 return itemStore;
+            }  else if (findFlag.equals("disposable")) {
+                return disposable;
             } else if (findFlag.equals("stackable")) {
                 return stackable;
             } else if (findFlag.equals("not-hat")) {
@@ -5412,7 +5414,7 @@ public class ItemMap implements Cloneable {
                         if (!allItems) {
                             this.setSubjectRemoval(false);
                         }
-                    } else if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
+                    } else if (this.isSubjectRemoval()) {
                         for (int i = 0; i < player.getOpenInventory().getTopInventory().getSize(); i++) {
                             if (itemMap.isSimilar(player, player.getOpenInventory().getTopInventory().getItem(i))) {
                                 player.getOpenInventory().getTopInventory().setItem(i, ItemHandler.modifyItem(player.getOpenInventory().getTopInventory().getItem(i), allItems, 1));

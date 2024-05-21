@@ -117,7 +117,7 @@ public class Storable implements Listener {
                 item = PlayerHandler.getPerfectHandItem(event.getPlayer(), "");
             }
             Player player = event.getPlayer();
-            if (!ItemUtilities.getUtilities().isAllowed(player, item, "item-store")) {
+            if (!ItemUtilities.getUtilities().isAllowed(player, item, "item-store") || !ItemUtilities.getUtilities().isAllowed(player, item, "disposable")) {
                 event.setCancelled(true);
                 PlayerHandler.updateInventory(player, 1L);
             }
@@ -139,7 +139,7 @@ public class Storable implements Listener {
                 item = PlayerHandler.getPerfectHandItem(event.getPlayer(), "");
             }
             Player player = event.getPlayer();
-            if (!ItemUtilities.getUtilities().isAllowed(player, item, "item-store")) {
+            if (!ItemUtilities.getUtilities().isAllowed(player, item, "item-store") || !ItemUtilities.getUtilities().isAllowed(player, item, "disposable")) {
                 event.setCancelled(true);
                 PlayerHandler.updateInventory(player, 1L);
             }
