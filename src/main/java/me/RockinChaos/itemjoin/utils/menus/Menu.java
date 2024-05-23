@@ -4558,7 +4558,7 @@ public class Menu {
                 particlePane.addButton(new Button(ItemHandler.getItem("SUGAR", 1, false, false, "&fFIREWORK_FAKE", "&7", "&7*Click to set the lifetime", "&7commands-particle of the item."), event -> lifePane(player, itemMap, "FIREWORK", 1)));
             }
             if (ServerUtils.hasSpecificUpdate("1_9")) {
-                for (org.bukkit.Particle particle : org.bukkit.Particle.values()) {
+                for (Particle particle : Particle.values()) {
                     if (stage != 3) {
                         particlePane.addButton(new Button(ItemHandler.getItem("SUGAR", 1, false, false, "&f" + particle.name(), "&7", "&7*Click to set the", "&7teleport-effect of the item."), event -> {
                             itemMap.setTeleportEffect(particle.name());
@@ -4569,7 +4569,7 @@ public class Menu {
                     }
                 }
             } else {
-                for (org.bukkit.Effect effect : org.bukkit.Effect.values()) {
+                for (Effect effect : Effect.values()) {
                     if (stage != 3) {
                         particlePane.addButton(new Button(ItemHandler.getItem("SUGAR", 1, false, false, "&f" + effect.name(), "&7", "&7*Click to set the", "&7teleport-effect of the item."), event -> {
                             itemMap.setTeleportEffect(effect.name());
@@ -7570,12 +7570,14 @@ public class Menu {
                 ItemStack stack1 = null;
                 if (itemMap.getRecipe().get(0).size() > i && itemMap.getRecipe().get(0).get(i) != 'X') {
                     final ItemRecipe itemRecipe = itemMap.getIngredients().get(itemMap.getRecipe().get(0).get(i));
-                    final ItemMap copyMap = ItemUtilities.getUtilities().getItemMap(itemRecipe.getMap());
-                    if (copyMap != null) {
-                        stack1 = copyMap.getItemStack(player);
-                        stack1.setAmount(itemRecipe.getCount());
-                    } else {
-                        stack = itemRecipe.getMaterial().name() + (itemRecipe.getData() > 0 ? (":" + itemRecipe.getData()) : "") + "#" + itemRecipe.getCount();
+                    if (itemRecipe != null) {
+                        final ItemMap copyMap = ItemUtilities.getUtilities().getItemMap(itemRecipe.getMap());
+                        if (copyMap != null) {
+                            stack1 = copyMap.getItemStack(player);
+                            stack1.setAmount(itemRecipe.getCount());
+                        } else {
+                            stack = itemRecipe.getMaterial().name() + (itemRecipe.getData() > 0 ? (":" + itemRecipe.getData()) : "") + "#" + itemRecipe.getCount();
+                        }
                     }
                 }
                 if (stack1 != null) {
@@ -7743,11 +7745,13 @@ public class Menu {
             }
         }
         boolean containsMaterial = false;
+        char existingCharacter = character;
         for (Character characters : ingredients.keySet()) {
             final ItemRecipe itemRecipe = ingredients.get(characters);
-            if (itemRecipe.getMaterial().name().equalsIgnoreCase(material)) {
+            if ((itemRecipe.getMaterial() != null && itemRecipe.getMaterial().name().equalsIgnoreCase(material)) || (itemRecipe.getMaterial() == null && itemRecipe.getMap().equalsIgnoreCase(material))) {
                 character = characters;
                 containsMaterial = true;
+                existingCharacter = characters;
                 break;
             }
         }
@@ -8781,7 +8785,6 @@ public class Menu {
         if (itemMap.getDurability() != null && (itemMap.getData() == null || itemMap.getData() == 0)) {
             ItemMeta itemMeta = item.getItemMeta();
             if (ServerUtils.hasSpecificUpdate("1_13") && itemMeta != null) {
-                ((org.bukkit.inventory.meta.Damageable) itemMeta).setDamage(itemMap.getDurability());
                 item.setItemMeta(itemMeta);
             } else {
                 LegacyAPI.setDurability(item, itemMap.getDurability());
@@ -8790,7 +8793,7 @@ public class Menu {
         if (itemMap.getData() != null && itemMap.getData() > 0) {
             ItemMeta itemMeta = item.getItemMeta();
             if (ServerUtils.hasSpecificUpdate("1_13") && itemMeta != null) {
-                ((org.bukkit.inventory.meta.Damageable) itemMeta).setDamage(itemMap.getData());
+                ((Damageable) itemMeta).setDamage(itemMap.getData());
                 item.setItemMeta(itemMeta);
             } else {
                 LegacyAPI.setDurability(item, Short.parseShort(itemMap.getData() + ""));
@@ -8804,7 +8807,7 @@ public class Menu {
                 try {
                     if (itemMeta != null) {
                         final UUID uuid = UUID.randomUUID();
-                        final GameProfile gameProfile = new GameProfile(uuid, uuid.toString().replaceAll("_", "").replaceAll("-", ""));
+                        final GameProfile gameProfile = new GameProfile(uuid, uuid.toString().replaceAll("_", "").replaceAll("-", "").substring(0, 16));
                         gameProfile.getProperties().put("textures", new Property("textures", itemMap.getSkullTexture()));
                         Field declaredField = itemMeta.getClass().getDeclaredField("profile");
                         declaredField.setAccessible(true);
