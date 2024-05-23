@@ -29,6 +29,7 @@ import me.RockinChaos.core.utils.StringUtils;
 import me.RockinChaos.core.utils.api.LegacyAPI;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.PluginData;
+import me.RockinChaos.itemjoin.listeners.Recipes;
 import me.RockinChaos.itemjoin.utils.images.Renderer;
 import me.RockinChaos.itemjoin.utils.sql.DataObject;
 import me.RockinChaos.itemjoin.utils.sql.DataObject.Table;
@@ -38,6 +39,7 @@ import org.bukkit.block.banner.Pattern;
 import org.bukkit.block.banner.PatternType;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.EntityType;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
@@ -532,7 +534,7 @@ public class ItemDesigner {
                                 JSONEvents = adjustLine.toString().split("<JSONEvent>");
                             }
                             for (int i = 0; i < JSONEvents.length; i++) {
-                                if (!JSONEvents[i].isEmpty() && !JSONEvents[i].isEmpty() && !JSONEvents[i].trim().isEmpty()) {
+                                if (!JSONEvents[i].isEmpty() && !JSONEvents[i].trim().isEmpty()) {
                                     textBuilder.append((i == 0) ? "," : "},").append("{\"").append("text").append("\":\"").append(JSONEvents[i]).append((JSONBuilder.get(i) != null && JSONBuilder.get(i).contains("\"text\""))
                                             ? "\"}" : "\"").append(JSONBuilder.get(i) != null ? JSONBuilder.get(i) : "");
                                 } else if (JSONBuilder.get(i) != null) {
@@ -847,7 +849,7 @@ public class ItemDesigner {
                 final int itemData = getData;
                 final Material material = ItemHandler.getMaterial(ingredientParts[1], String.valueOf(itemData));
                 final ConfigurationSection itemsPath = ItemJoin.getCore().getConfig("items.yml").getConfigurationSection("items");
-                if (count >= 1) {
+                if (material != Material.AIR && count >= 1) {
                     try {
                         char character = 'X';
                         try {
@@ -866,10 +868,38 @@ public class ItemDesigner {
                             ServerUtils.sendSevereTrace(e);
                         }
                     }
+                } else if (itemsPath != null && itemsPath.getConfigurationSection(ingredientParts[1]) != null && count >= 1) {
+                    SchedulerUtils.runLater(40L, () -> {
+                        try {
+                            final ItemMap tempMap = ItemUtilities.getUtilities().getItemMap(ingredientParts[1]);
+                            if (tempMap != null) {
+                                final ItemStack itemStack = tempMap.getItem(null);
+                                final int mapData = Integer.parseInt(tempMap.getDataValue() + "");
+                                char character = 'X';
+                                try {
+                                    character = ingredientParts[0].charAt(0);
+                                } catch (Exception e) {
+                                    ServerUtils.logWarn("{ItemDesigner} The character " + ingredientParts[0] + " for the custom recipe defined for the item " + itemMap.getConfigName() + " is not a valid character!");
+                                }
+                                if (mapData <= 0) {
+                                    shapedRecipe.setIngredient(character, itemStack.getType());
+                                } else {
+                                    LegacyAPI.setIngredient(shapedRecipe, character, itemStack.getType(), (byte) mapData);
+                                }
+                                ingredientList.put(character, new ItemRecipe(ingredientParts[1], null, (byte) mapData, count));
+                                if (StringUtils.isRegistered(Recipes.class.getSimpleName())) {
+                                    ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new Recipes(), ItemJoin.getCore().getPlugin());
+                                }
+                            } else {
+                                ServerUtils.logWarn("{ItemDesigner} The material " + ingredientParts[1] + " for the custom recipe defined for the item " + itemMap.getConfigName() + " is not a proper material type OR custom item node!");
+                            }
+                        } catch (IllegalArgumentException e) {
+                            if (!StringUtils.containsIgnoreCase(e.getMessage(), "Symbol does not appear")) {
+                                ServerUtils.sendSevereTrace(e);
+                            }
+                        }
+                    });
                 } else {
-                    if (itemsPath != null) {
-                        itemsPath.getConfigurationSection(ingredientParts[1]);
-                    }
                     ServerUtils.logWarn("{ItemDesigner} The material " + ingredientParts[1] + " for the custom recipe defined for the item " + itemMap.getConfigName() + " is not a proper material type OR custom item node!");
                 }
             }
@@ -957,7 +987,7 @@ public class ItemDesigner {
                 String texture = this.getActualTexture(itemMap);
                 if (!StringUtils.containsIgnoreCase(texture, "hdb-")) {
                     final UUID uuid = UUID.randomUUID();
-                    GameProfile gameProfile = new GameProfile(uuid, uuid.toString().replaceAll("_", "").replaceAll("-", ""));
+                    GameProfile gameProfile = new GameProfile(uuid, uuid.toString().replaceAll("_", "").replaceAll("-", "").substring(0, 16));
                     gameProfile.getProperties().put("textures", new Property("textures", texture));
                     try {
                         itemMap.setSkullTexture(texture);

@@ -7755,8 +7755,8 @@ public class Menu {
                 break;
             }
         }
-        if (!StringUtils.containsIgnoreCase(material, "AIR") && !containsMaterial) {
-            final char finalCharacter = character;
+        if (!StringUtils.containsIgnoreCase(material, "AIR")) {
+            final char finalCharacter = (!containsMaterial ? character : existingCharacter);
             Interface ingredPane = new Interface(true, 6, exitButton, GUIName, player);
             SchedulerUtils.runAsync(() -> {
                 ingredPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the item recipe menu."), event -> creatingPane(player, itemMap)));
@@ -8785,6 +8785,7 @@ public class Menu {
         if (itemMap.getDurability() != null && (itemMap.getData() == null || itemMap.getData() == 0)) {
             ItemMeta itemMeta = item.getItemMeta();
             if (ServerUtils.hasSpecificUpdate("1_13") && itemMeta != null) {
+                ((Damageable) itemMeta).setDamage(itemMap.getDurability());
                 item.setItemMeta(itemMeta);
             } else {
                 LegacyAPI.setDurability(item, itemMap.getDurability());
