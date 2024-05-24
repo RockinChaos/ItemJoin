@@ -237,6 +237,12 @@ public class ChatExecutor implements CommandExecutor {
             placeHolders[21] = sender.getName();
             ItemJoin.getCore().getLang().sendLangMessage("commands.updates.updateRequest", Bukkit.getServer().getConsoleSender(), placeHolders);
             SchedulerUtils.runAsync(() -> ItemJoin.getCore().getUpdater().forceUpdates(sender));
+        } else if (Execute.DEBUG.accept(sender, args, 0)) {
+            if (ServerUtils.devListening()) {
+                ItemJoin.getCore().getLang().dispatchMessage(sender, ItemJoin.getCore().getData().getPluginPrefix() + " &aYou are &nnow listening&a for debug messages.");
+            } else {
+                ItemJoin.getCore().getLang().dispatchMessage(sender, ItemJoin.getCore().getData().getPluginPrefix() + "&cYou are &nno longer&c listening for debug messages.");
+            }
         } else if (executor == null) {
             ItemJoin.getCore().getLang().sendLangMessage("commands.default.unknownCommand", sender);
         } else if (!executor.playerRequired(sender, args)) {
@@ -896,7 +902,8 @@ public class ChatExecutor implements CommandExecutor {
         REMOVEALL("removeAll", "itemjoin.remove, itemjoin.remove.others", true),
         REMOVEONLINE("removeOnline", "itemjoin.remove.others", false),
         UPDATE("update, updates", "itemjoin.updates", false),
-        UPGRADE("upgrade", "itemjoin.upgrade", false);
+        UPGRADE("upgrade", "itemjoin.upgrade", false),
+        DEBUG("debug", "itemjoin.use", true);
         private final String command;
         private final String permission;
         private final boolean player;
@@ -953,7 +960,7 @@ public class ChatExecutor implements CommandExecutor {
         public boolean hasPermission(final CommandSender sender, final String[] args) {
             String[] permissions = this.permission.replace(" ", "").split(",");
             boolean multiPerms = this.permission.contains(",");
-            return multiPerms && (!this.equals(Execute.GET) && !this.equals(Execute.REMOVE) && (args.length >= 2 && !StringUtils.isInt(args[1]) && PermissionsHandler.hasPermission(sender, permissions[1]) || (args.length < 2 || StringUtils.isInt(args[1])) && PermissionsHandler.hasPermission(sender, permissions[0])) || (this.equals(Execute.GET) || this.equals(Execute.REMOVE)) && (args.length == 3 && StringUtils.isInt(args[2]) || args.length == 2) && PermissionsHandler.hasPermission(sender, permissions[0]) || (args.length == 3 && !StringUtils.isInt(args[2]) || args.length >= 3) && PermissionsHandler.hasPermission(sender, permissions[1])) || !multiPerms && PermissionsHandler.hasPermission(sender, this.permission);
+            return (multiPerms && (!this.equals(Execute.GET) && !this.equals(Execute.REMOVE) && (args.length >= 2 && !StringUtils.isInt(args[1]) && PermissionsHandler.hasPermission(sender, permissions[1]) || (args.length < 2 || StringUtils.isInt(args[1])) && PermissionsHandler.hasPermission(sender, permissions[0])) || (this.equals(Execute.GET) || this.equals(Execute.REMOVE)) && (args.length == 3 && StringUtils.isInt(args[2]) || args.length == 2) && PermissionsHandler.hasPermission(sender, permissions[0]) || (args.length == 3 && !StringUtils.isInt(args[2]) || args.length >= 3) && PermissionsHandler.hasPermission(sender, permissions[1]))) || (!multiPerms && PermissionsHandler.hasPermission(sender, this.permission) && (!this.equals(Execute.DEBUG) || PermissionsHandler.isDeveloper(sender)));
         }
 
         /**
