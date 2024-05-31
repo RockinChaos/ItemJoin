@@ -256,7 +256,13 @@ public class ItemMap implements Cloneable {
      * @param slot         - The slot of the ItemMap.
      */
     public ItemMap(final String internalName, final String slot) {
-        this.nodeLocation = Objects.requireNonNull(ItemJoin.getCore().getConfig("items.yml").getConfigurationSection("items")).getConfigurationSection(internalName);
+        final ConfigurationSection itemsPath = ItemJoin.getCore().getConfig("items.yml").getConfigurationSection("items");
+        if (itemsPath != null) {
+            this.nodeLocation = itemsPath.getConfigurationSection(internalName);
+        } else {
+            this.nodeLocation = ItemJoin.getCore().getConfig("items.yml").createSection("items").getConfigurationSection(internalName);
+        }
+
         this.configName = internalName;
         this.setSlot(slot);
         if (ItemHandler.isCraftingSlot(slot)) {
