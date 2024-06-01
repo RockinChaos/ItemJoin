@@ -124,32 +124,32 @@ public class ItemMap implements Cloneable {
     private Integer interactCooldown = 0;
     private boolean customConsumable = false;
     private Map<String, Integer> enchants = new HashMap<>();
-    //  ============================================== //
+    /*  ============================================== */
     private Map<Object, Object> nbtProperty = new HashMap<>();
-    //  ============================================== //
-//         Drop Chances for each item.          //
-//  ============================================== //
+    /*  ==============================================
+               Drop Chances for each item.
+        ============================================== */
     private Map<EntityType, Double> mobsDrop = new HashMap<>();
-    //  ============================================== //
+    /*  ============================================== */
     private Map<Material, Double> blocksDrop = new HashMap<>();
-    //  ============================================== //
-//         NBT Information for each item.          //
-//  ============================================== //
+    /*  ==============================================
+               NBT Information for each item.
+        ============================================== */
     private String legacySecret;
-    //  ============================================== //
-//     ItemAnimation Information for each item.    //
-//  ============================================== //
+    /*  ==============================================
+           ItemAnimation Information for each item.
+        ============================================== */
     private List<String> dynamicNames = new ArrayList<>();
     private List<List<String>> dynamicLores = new ArrayList<>();
     private List<String> dynamicMaterials = new ArrayList<>();
-    //  ====================================================================================================== //
+    /*  ============================================== */
     private List<String> dynamicOwners = new ArrayList<>();
     private List<String> dynamicTextures = new ArrayList<>();
     private boolean materialAnimated = false;
     private Map<Player, ItemAnimation> localeAnimations = new HashMap<>();
-    //  ============================================== //
-//      ItemCommand Information for each item.     //
-//  ============================================== //
+    /*  ==============================================
+            ItemCommand Information for each item.
+        ============================================== */
     private ItemCommand[] commands = new ItemCommand[0];
     private Integer cooldownSeconds = 0;
     private Integer commandsReceive = 0;
@@ -168,11 +168,11 @@ public class ItemMap implements Cloneable {
     private Map<String, List<String>> commandConditions = new HashMap<>();
     private String disposableMessage = null;
     private String triggerMessage = null;
-    //  ============================================================================================= //
+    /*  ============================================== */
     private Map<String, String> commandMessages = new HashMap<>();
-    //  ============================================== //
-//            Itemflags for each item.             //
-//  ============================================== //
+    /*  ==============================================
+                  Itemflags for each item.
+        ============================================== */
     private String itemflags;
     private boolean vanillaItem = false;
     private boolean vanillaStatus = false;
@@ -214,11 +214,11 @@ public class ItemMap implements Cloneable {
     private boolean onlyFirstJoin = false;
     private boolean onlyFirstLife = false;
     private boolean onlyFirstWorld = false;
-    //  ============================================== //
+    /*  ============================================== */
     private boolean ipLimited = false;
-    //  ============================================== //
-    //             Triggers for each item.             //
-    //  ============================================== //
+    /*  ==============================================
+                   Triggers for each item.
+        ============================================== */
     private boolean giveOnDisabled = false;
     private boolean giveOnJoin = false;
     private boolean giveOnTeleport = false;
@@ -231,7 +231,7 @@ public class ItemMap implements Cloneable {
     private boolean giveOnRegionEgress = false;
     private boolean useOnLimitSwitch = false;
     private String triggers = null;
-    //  ============================================== //
+    /*  ============================================== */
     private String limitModes = null;
     private String toggleNode = null;
     private String toggleMessage = null;
@@ -246,7 +246,7 @@ public class ItemMap implements Cloneable {
     private List<String> disabledRegions = new ArrayList<>();
     private List<String> enabledWorlds = new ArrayList<>();
     private List<String> disabledWorlds = new ArrayList<>();
-// ======================================================================================== //
+    /*  ============================================== */
 
     /**
      * Creates a new ItemMap instance.
@@ -304,11 +304,11 @@ public class ItemMap implements Cloneable {
      */
     public ItemMap() {
     }
-//  ========================================================================================================= //
+/*  ========================================================================================================= */
 
-//  ============================================== //
-//   Setter functions for first ItemMap creation.  //
-//  ============================================== //
+/*  ==============================================
+     Setter functions for first ItemMap creation.
+    ============================================== */
 
     /**
      * Sets the ItemMaps Multiple Slots.
@@ -498,7 +498,7 @@ public class ItemMap implements Cloneable {
             this.deathDroppable = StringUtils.splitIgnoreCase(this.itemflags, "death-drops", ",");
             this.selfDroppable = StringUtils.splitIgnoreCase(this.itemflags, "self-drops", ",");
 
-            // Shared with Triggers //
+            /* Shared with Triggers */
             this.setOnlyFirstJoin((StringUtils.splitIgnoreCase(this.itemflags, "first-join", ",") || this.onlyFirstJoin));
             this.setOnlyFirstLife((StringUtils.splitIgnoreCase(this.itemflags, "first-life", ",") || this.onlyFirstLife));
             this.onlyFirstWorld = (StringUtils.splitIgnoreCase(this.itemflags, "first-world", ",") || this.onlyFirstWorld);
@@ -700,11 +700,11 @@ public class ItemMap implements Cloneable {
             this.tempItem = new ItemStack(this.material, 1);
         }
     }
-//  ======================================================================================================================================================================================== //
+/*  ======================================================================================================================================================================================== */
 
-//  ===================== //
-//  ~ Setting Functions ~ //
-//  ===================== //
+/*  =====================
+    ~ Setting Functions ~
+    ===================== */
 
     /**
      * Removes the Player from the AnimationHandler.
@@ -2219,11 +2219,11 @@ public class ItemMap implements Cloneable {
         return this.skullTexture;
     }
 
-//  ================================================================================================================================================================================= //
+/*  ================================================================================================================================================================================= */
 
-//  ====================== //
-//  ~ Accessor Functions ~ //
-//  ====================== //
+/*  ======================
+    ~ Accessor Functions ~
+    ====================== */
 
     /**
      * Sets the Skull Texture.
@@ -3920,12 +3920,12 @@ public class ItemMap implements Cloneable {
             return Objects.requireNonNull(item.getItemMeta().getLore()).toString().equalsIgnoreCase(Objects.requireNonNull(this.tempMeta.getLore()).toString());
         } else return this.tempMeta == null;
     }
-//  ================================================================================================================================================================================= //
+/*  ================================================================================================================================================================================= */
 
-//  ================================================================ //
-//                      ~ Player Item Updater ~                      //
-//  Method(s) update the ItemMap item for player specific variables. //
-//  ================================================================ //
+/*  ================================================================
+                       ~ Player Item Updater ~
+   Method(s) update the ItemMap item for player specific variables.
+   ================================================================ */
 
     /**
      * Checks if the ItemStack Enchantments are similar.
@@ -4606,7 +4606,7 @@ public class ItemMap implements Cloneable {
             }
         }
     }
-//  =========================================================================================================================================================== //
+/*  =========================================================================================================================================================== */
 
     /**
      * Checks if the World is an Enabled World.
