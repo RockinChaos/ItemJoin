@@ -274,6 +274,7 @@ public class ItemUtilities {
             probable = (ItemMap) ItemJoin.getCore().getChances().getRandom(player);
         }
         final int session = StringUtils.getRandom(1, 100000);
+        boolean hasActioned = false;
         if (type.equals(TriggerType.WORLD_SWITCH) || type.equals(TriggerType.JOIN)) {
             world = player.getWorld();
         }
@@ -291,15 +292,20 @@ public class ItemUtilities {
                     && item.conditionMet(player, "trigger-conditions", true, false) && PluginData.getInfo().isEnabled(player, item.getConfigName()) && item.hasPermission(player, world)
                     && this.isObtainable(player, item, session, type)) {
                 item.giveTo(player);
+                hasActioned = true;
             } else if (((type.equals(TriggerType.LIMIT_SWITCH) && item.isUseOnLimitSwitch() && !item.isLimitMode(gameMode)) || (((type.name().startsWith("REGION") && (item.isGiveOnRegionAccess()
                     && ((item.inRegion(targetRegion) && !item.inRegion(regions)) || (!item.inRegion(targetRegion) && !item.inRegion(regions))))) || (type.name().startsWith("REGION") && (item.isGiveOnRegionEgress() && item.inRegion(targetRegion) && item.inRegion(regions)))))) && item.hasItem(player, false)) {
                 item.removeFrom(player);
+                hasActioned = true;
             } else if (item.isAutoRemove() && (!item.inWorld(world) || !item.isLimitMode(gameMode) || ((type.equals(TriggerType.REGION_ENTER) || type.equals(TriggerType.REGION_LEAVE)) && ((item.isGiveOnRegionLeave() && item.inRegion(targetRegion) && item.inRegion(regions)) || (item.isGiveOnRegionEnter() && item.inRegion(targetRegion) && !item.inRegion(regions))))) && item.hasItem(player, true)) {
                 item.removeFrom(player);
+                hasActioned = true;
             }
         }
         this.sendFailCount(player, session);
-        PlayerHandler.updateInventory(player, 15L);
+        if (hasActioned) {
+            PlayerHandler.updateInventory(player, 15L);
+        }
     }
 
     /**
@@ -603,7 +609,7 @@ public class ItemUtilities {
      * @param session - The current set items session.
      */
     public void sendFailCount(final Player player, final int session) {
-        SchedulerUtils.run(() -> {
+        SchedulerUtils.runAsync(() -> {
             if (this.failCount.get(session) != null && this.failCount.get(session) != 0) {
                 String overWrite = ItemJoin.getCore().getConfig("items.yml").getString("items-Overwrite");
                 if ((overWrite != null && StringUtils.containsLocation(player.getWorld().getName(), overWrite.replace(" ", "")))) {
