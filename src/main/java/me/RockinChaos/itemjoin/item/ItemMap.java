@@ -4348,7 +4348,6 @@ public class ItemMap implements Cloneable {
             final BookMeta tempMeta = (BookMeta) item.getItemMeta();
             for (String jsonComponent : copyPages) {
                 pages.add(net.md_5.bungee.chat.ComponentSerializer.parse(StringUtils.translateLayout(jsonComponent, player)));
-
             }
             if (tempMeta != null) {
                 tempMeta.spigot().setPages(pages);
@@ -4388,7 +4387,15 @@ public class ItemMap implements Cloneable {
     private void setNBTData() {
         if (ItemJoin.getCore().getData().dataTagsEnabled() && !this.isVanilla() && !this.isVanillaControl() && !this.isVanillaStatus()) {
             try {
+                final Class<?> itemClass = ReflectionUtils.getMinecraftClass("ItemStack");
+                final Object nms = ReflectionUtils.getCraftBukkitClass("inventory.CraftItemStack").getMethod("asNMSCopy", ItemStack.class).invoke(null, this.tempItem);
                 Object tagInstance = ReflectionUtils.getMinecraftClass("NBTTagCompound").getConstructor().newInstance();
+                if (!ServerUtils.hasPreciseUpdate("1_20_5")) {
+                    final Object cacheTag = itemClass.getMethod(MinecraftMethod.getTag.getMethod()).invoke(nms);
+                    if (cacheTag != null) {
+                        tagInstance = cacheTag;
+                    }
+                }
                 tagInstance.getClass().getMethod(MinecraftMethod.setString.getMethod(), String.class, String.class).invoke(tagInstance, "ItemJoin Name", this.getConfigName());
                 if (this.nbtProperty != null && !this.nbtProperty.isEmpty()) {
                     for (Object tag : this.nbtProperty.keySet()) {
@@ -4930,7 +4937,7 @@ public class ItemMap implements Cloneable {
      */
     public void setAnimations(final Player player) {
         if (this.isAnimated() && this.getAnimationHandler().get(player) == null
-                || isDynamic() && this.getAnimationHandler().get(player) == null) {
+                || this.isDynamic() && this.getAnimationHandler().get(player) == null) {
             ItemAnimation Animator = new ItemAnimation(this);
             Animator.openAnimation(player);
             this.localeAnimations.put(player, Animator);
@@ -5713,7 +5720,7 @@ public class ItemMap implements Cloneable {
                     this.tempItem.setItemMeta(itemMeta);
                 }
                 StringUtils.colorEncode(this.tempItem, this.legacySecret);
-                final String itemInfo = this.tempItem.getItemMeta().getDisplayName();
+                final String itemInfo = Objects.requireNonNull(this.tempItem.getItemMeta()).getDisplayName();
                 setName = this.customName.replace(itemInfo, "").replace(ChatColor.COLOR_CHAR, '&');
             } else {
                 setName = this.customName.replace(ChatColor.COLOR_CHAR, '&');
