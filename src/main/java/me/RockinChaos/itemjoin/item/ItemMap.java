@@ -5189,7 +5189,7 @@ public class ItemMap implements Cloneable {
             } catch (NullPointerException ignored) {
             }
             final boolean balCost = (balance >= this.cost);
-            if (balCost || this.cost < 0) {
+            if (balCost || this.cost <= 0) {
                 return true;
             } else {
                 String[] placeHolders = ItemJoin.getCore().getLang().newString();
@@ -5258,7 +5258,7 @@ public class ItemMap implements Cloneable {
             formatCost = new StringBuilder(formatCost.substring(0, formatCost.length() - 1));
             String[] placeHolders = ItemJoin.getCore().getLang().newString();
             placeHolders[4] = formatCost.toString();
-            placeHolders[6] = this.cost == 0 ? "1" : this.cost.toString();
+            placeHolders[6] = String.valueOf(this.cost == 0 ? 1 : this.cost);
             placeHolders[5] = foundAmount + "";
             ItemJoin.getCore().getLang().sendLangMessage("general.itemFailed", player, placeHolders);
             return false;
@@ -5272,14 +5272,11 @@ public class ItemMap implements Cloneable {
      * @param player - The Player to have their Item Cost changed.
      */
     private void withdrawItemCost(final Player player) {
-        Material mat = ItemHandler.getMaterial(this.itemCost, null);
-        Integer removeAmount = this.cost;
-        if (this.cost == 0) {
-            removeAmount = 1;
-        }
+        final Material costMaterial = ItemHandler.getMaterial(this.itemCost, null);
+        int removeAmount = (this.cost == 0 ? 1 : this.cost);
         for (int i = 0; i < player.getInventory().getSize(); i++) {
             final ItemStack item = player.getInventory().getItem(i);
-            if (item != null && item.getType() == mat) {
+            if (item != null && item.getType() == costMaterial) {
                 if (item.getAmount() < removeAmount) {
                     removeAmount -= item.getAmount();
                     player.getInventory().setItem(i, ItemHandler.modifyItem(item, false, item.getAmount()));
@@ -5291,7 +5288,7 @@ public class ItemMap implements Cloneable {
         }
         if (ServerUtils.hasSpecificUpdate("1_9")) {
             final ItemStack item = player.getInventory().getItemInOffHand();
-            if (item.getType() == mat) {
+            if (item.getType() == costMaterial) {
                 if (item.getAmount() < removeAmount) {
                     removeAmount -= item.getAmount();
                     PlayerHandler.setOffHandItem(player, ItemHandler.modifyItem(item, false, item.getAmount()));
@@ -5304,7 +5301,7 @@ public class ItemMap implements Cloneable {
         if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
             for (int i = 0; i < player.getOpenInventory().getTopInventory().getSize(); i++) {
                 final ItemStack item = player.getOpenInventory().getTopInventory().getItem(i);
-                if (item != null && item.getType() == mat) {
+                if (item != null && item.getType() == costMaterial) {
                     if (item.getAmount() < removeAmount) {
                         removeAmount -= item.getAmount();
                         player.getOpenInventory().getTopInventory().setItem(i, ItemHandler.modifyItem(item, false, item.getAmount()));
@@ -5322,7 +5319,7 @@ public class ItemMap implements Cloneable {
         formatCost = new StringBuilder(formatCost.substring(0, formatCost.length() - 1));
         String[] placeHolders = ItemJoin.getCore().getLang().newString();
         placeHolders[4] = formatCost.toString();
-        placeHolders[6] = this.cost.toString();
+        placeHolders[6] = String.valueOf(this.cost == 0 ? 1 : this.cost);
         ItemJoin.getCore().getLang().sendLangMessage("general.itemSuccess", player, placeHolders);
     }
 
