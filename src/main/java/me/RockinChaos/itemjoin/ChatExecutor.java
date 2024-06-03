@@ -310,7 +310,7 @@ public class ChatExecutor implements CommandExecutor {
             final String pasteURL = pasteURI.getPaste();
             ServerUtils.logInfo(sender.getName() + " has generated a debug paste at " + pasteURL);
             if (!(sender instanceof ConsoleCommandSender)) {
-                sender.sendMessage(StringUtils.colorFormat("&7[&eItemJoin&7]&a " + pasteURL));
+                ItemJoin.getCore().getLang().dispatchMessage(sender, "%prefix% &a" + pasteURL, "&eClick me to copy the url.", pasteURL, ClickAction.OPEN_URL);
             }
         } catch (Exception e) {
             ServerUtils.logSevere("{ChatExecutor} Failed to execute the DUMP command.");
