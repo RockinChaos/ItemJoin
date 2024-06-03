@@ -1611,18 +1611,8 @@ public class Menu {
                     triggers.remove("DISABLED");
                     triggers.remove("DISABLE");
                 } else if (!(StringUtils.containsValue(triggers, "DISABLE") || StringUtils.containsValue(triggers, "DISABLED"))) {
+                    triggers.clear();
                     triggers.add("DISABLED");
-                    triggers.remove("JOIN");
-                    triggers.remove("FIRST-JOIN");
-                    triggers.remove("FIRST-WORLD");
-                    triggers.remove("FIRST-LIFE");
-                    triggers.remove("RESPAWN");
-                    triggers.remove("WORLD-SWITCH");
-                    triggers.remove("GAMEMODE-SWITCH");
-                    triggers.remove("REGION-ENTER");
-                    triggers.remove("REGION-LEAVE");
-                    triggers.remove("REGION-ACCESS");
-                    triggers.remove("REGION-ENGRESS");
                 }
                 File fileFolder = new File(ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
                 FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
