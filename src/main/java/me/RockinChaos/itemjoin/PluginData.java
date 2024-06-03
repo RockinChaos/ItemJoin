@@ -616,6 +616,10 @@ public class PluginData {
         if (((!itemMap.isGiveOnDisabled() && itemMap.isGiveOnWorldSwitch()) || itemMap.isAutoRemove()) && StringUtils.isRegistered(WorldSwitch.class.getSimpleName())) {
             ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new WorldSwitch(), ItemJoin.getCore().getPlugin());
         }
+        if (!itemMap.isGiveOnDisabled() && itemMap.isGiveOnPermissionSwitch() && StringUtils.isRegistered(PermissionSwitch.class.getSimpleName())) {
+            ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new PermissionSwitch(), ItemJoin.getCore().getPlugin());
+            ProtocolManager.handlePermissions();
+        }
         if (!itemMap.isGiveOnDisabled() && (itemMap.isGiveOnRegionEnter() || itemMap.isGiveOnRegionLeave() || itemMap.isGiveOnRegionAccess() || itemMap.isGiveOnRegionEgress())
                 && StringUtils.isRegistered(PlayerGuard.class.getSimpleName()) && ItemJoin.getCore().getDependencies().getGuard().guardEnabled()) {
             ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new PlayerGuard(), ItemJoin.getCore().getPlugin());

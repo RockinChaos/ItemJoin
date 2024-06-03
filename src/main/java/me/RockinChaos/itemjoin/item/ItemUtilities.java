@@ -285,6 +285,7 @@ public class ItemUtilities {
                     || (type.equals(TriggerType.RESPAWN) && item.isGiveOnRespawn() && (StringUtils.containsValue(regions, "IJ_WORLD") || item.inRegion(regions)))
                     || (type.equals(TriggerType.RESPAWN_POINT) && (item.isGiveOnRespawnPoint() || item.isGiveOnRespawn()) && (StringUtils.containsValue(regions, "IJ_WORLD") || item.inRegion(regions)))
                     || (type.equals(TriggerType.WORLD_SWITCH) && item.isGiveOnWorldSwitch() && (StringUtils.containsValue(regions, "IJ_WORLD") || item.inRegion(regions)))
+                    || (type.equals(TriggerType.PERMISSION_SWITCH) && item.isGiveOnPermissionSwitch() && (StringUtils.containsValue(regions, "IJ_WORLD") || item.inRegion(regions)))
                     || (type.name().startsWith("REGION") && (item.isGiveOnRegionEnter() || item.isGiveOnRegionAccess()) && item.inRegion(regions))
                     || (type.name().startsWith("REGION") && (item.isGiveOnRegionLeave() || item.isGiveOnRegionEgress()) && item.inRegion(targetRegion) && !item.inRegion(regions))
                     || (type.equals(TriggerType.LIMIT_SWITCH) && item.isUseOnLimitSwitch() && (StringUtils.containsValue(regions, "IJ_WORLD") || item.inRegion(regions))))
@@ -293,7 +294,7 @@ public class ItemUtilities {
                     && this.isObtainable(player, item, session, type)) {
                 item.giveTo(player);
                 hasActioned = true;
-            } else if (((type.equals(TriggerType.LIMIT_SWITCH) && item.isUseOnLimitSwitch() && !item.isLimitMode(gameMode)) || (((type.name().startsWith("REGION") && (item.isGiveOnRegionAccess()
+            } else if (((type.equals(TriggerType.LIMIT_SWITCH) && item.isUseOnLimitSwitch() && !item.isLimitMode(gameMode)) || (type.equals(TriggerType.PERMISSION_SWITCH) && !item.hasPermission(player, world)) || (((type.name().startsWith("REGION") && (item.isGiveOnRegionAccess()
                     && ((item.inRegion(targetRegion) && !item.inRegion(regions)) || (!item.inRegion(targetRegion) && !item.inRegion(regions))))) || (type.name().startsWith("REGION") && (item.isGiveOnRegionEgress() && item.inRegion(targetRegion) && item.inRegion(regions)))))) && item.hasItem(player, false)) {
                 item.removeFrom(player);
                 hasActioned = true;
@@ -1307,6 +1308,7 @@ public class ItemUtilities {
         RESPAWN_POINT("Respawn-Point"),
         TELEPORT("Teleport"),
         WORLD_SWITCH("World-Switch"),
+        PERMISSION_SWITCH("Permission-Switch"),
         LIMIT_SWITCH("Limit-Modes"),
         REGION_ENTER("Region-Enter"),
         REGION_LEAVE("Region-Leave"),

@@ -225,6 +225,7 @@ public class ItemMap implements Cloneable {
     private boolean giveOnRespawn = false;
     private boolean giveOnRespawnPoint = false;
     private boolean giveOnWorldSwitch = false;
+    private boolean giveOnPermissionSwitch = false;
     private boolean giveOnRegionEnter = false;
     private boolean giveOnRegionLeave = false;
     private boolean giveOnRegionAccess = false;
@@ -526,6 +527,7 @@ public class ItemMap implements Cloneable {
         this.giveOnRespawn = StringUtils.splitIgnoreCase(this.triggers, "RESPAWN", ",");
         this.giveOnRespawnPoint = StringUtils.splitIgnoreCase(this.triggers, "RESPAWN-POINT", ",");
         this.giveOnWorldSwitch = StringUtils.splitIgnoreCase(this.triggers, "WORLD-CHANGE", ",") || StringUtils.splitIgnoreCase(this.triggers, "WORLD-SWITCH", ",");
+        this.giveOnPermissionSwitch = StringUtils.splitIgnoreCase(this.triggers, "PERMISSION-CHANGE", ",") || StringUtils.splitIgnoreCase(this.triggers, "PERMISSION-SWITCH", ",") || StringUtils.splitIgnoreCase(this.triggers, "PERMISSIONS-CHANGE", ",") || StringUtils.splitIgnoreCase(this.triggers, "PERMISSIONS-SWITCH", ",");
         this.giveOnRegionEnter = StringUtils.splitIgnoreCase(this.triggers, "REGION-ENTER", ",");
         this.giveOnRegionLeave = StringUtils.splitIgnoreCase(this.triggers, "REGION-REMOVE", ",") || StringUtils.splitIgnoreCase(this.triggers, "REGION-EXIT", ",") || StringUtils.splitIgnoreCase(this.triggers, "REGION-LEAVE", ",");
         this.giveOnRegionAccess = StringUtils.splitIgnoreCase(this.triggers, "REGION-ACCESS", ",");
@@ -2669,6 +2671,24 @@ public class ItemMap implements Cloneable {
      */
     public void setGiveOnWorldSwitch(final boolean bool) {
         this.giveOnWorldSwitch = bool;
+    }
+
+    /**
+     * Checks if you give on permission switch is enabled.
+     *
+     * @return If it is enabled.
+     */
+    public boolean isGiveOnPermissionSwitch() {
+        return this.giveOnPermissionSwitch;
+    }
+
+    /**
+     * Sets the ItemStack to be given only on Permission Switch.
+     *
+     * @param bool - The value to be set.
+     */
+    public void setGiveOnPermissionSwitch(final boolean bool) {
+        this.giveOnPermissionSwitch = bool;
     }
 
     /**
