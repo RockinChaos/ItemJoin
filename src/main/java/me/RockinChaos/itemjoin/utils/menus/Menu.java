@@ -1722,7 +1722,7 @@ public class Menu {
                 } else {
                     triggers.add("REGION-ENTER");
                     triggers.add("REGION-ACCESS");
-                    triggers.add("REGION-ENGRESS");
+                    triggers.add("REGION-EGRESS");
                 }
                 if (triggers.isEmpty()) {
                     triggers.add("DISABLED");
@@ -1745,7 +1745,7 @@ public class Menu {
                 } else {
                     triggers.add("REGION-LEAVE");
                     triggers.remove("REGION-ACCESS");
-                    triggers.remove("REGION-ENGRESS");
+                    triggers.remove("REGION-EGRESS");
                 }
                 if (triggers.isEmpty()) {
                     triggers.add("DISABLED");
@@ -1784,12 +1784,12 @@ public class Menu {
                 PluginData.getInfo().softReload();
                 SchedulerUtils.runLater(2L, () -> triggerPane(player, stage));
             }));
-            triggerPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CHEST_MINECART" : "342"), 1, StringUtils.containsValue(triggers, "REGION-ENGRESS"), false, "&e&l&nRegion Engress", "&7", triggerOption.replace("Gives", "Removes"), "&7player enters any of the enabled-regions", "&7and gives the item when leaving", "&7any of the enabled-regions.", "&9&lENABLED: &a" +
-                    (StringUtils.containsValue(triggers, "REGION-ENGRESS") + "").toUpperCase()), event -> {
-                if (StringUtils.containsValue(triggers, "REGION-ENGRESS")) {
-                    triggers.remove("REGION-ENGRESS");
+            triggerPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CHEST_MINECART" : "342"), 1, StringUtils.containsValue(triggers, "REGION-EGRESS"), false, "&e&l&nRegion Egress", "&7", triggerOption.replace("Gives", "Removes"), "&7player enters any of the enabled-regions", "&7and gives the item when leaving", "&7any of the enabled-regions.", "&9&lENABLED: &a" +
+                    (StringUtils.containsValue(triggers, "REGION-EGRESS") + "").toUpperCase()), event -> {
+                if (StringUtils.containsValue(triggers, "REGION-EGRESS")) {
+                    triggers.remove("REGION-EGRESS");
                 } else {
-                    triggers.add("REGION-ENGRESS");
+                    triggers.add("REGION-EGRESS");
                     triggers.remove("REGION-ENTER");
                     triggers.remove("REGION-LEAVE");
                 }
@@ -5349,7 +5349,7 @@ public class Menu {
                 triggerPane(player, itemMap);
             }));
             triggerPane.addButton(new Button(fillerPaneBItem));
-            triggerPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CHEST_MINECART" : "342"), 1, itemMap.isGiveOnRegionEgress(), false, "&e&l&nRegion Engress", "&7", "&7*Removes the item when the", "&7player enters any of the enabled-regions", "&7and gives the item when leaving", "&7any of the enabled-regions.", "&9&lENABLED: &a" +
+            triggerPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CHEST_MINECART" : "342"), 1, itemMap.isGiveOnRegionEgress(), false, "&e&l&nRegion Egress", "&7", "&7*Removes the item when the", "&7player enters any of the enabled-regions", "&7and gives the item when leaving", "&7any of the enabled-regions.", "&9&lENABLED: &a" +
                     (itemMap.isGiveOnRegionEgress() + "").toUpperCase()), event -> {
                 if (itemMap.isGiveOnRegionEgress()) {
                     itemMap.setGiveOnRegionEgress(false);
