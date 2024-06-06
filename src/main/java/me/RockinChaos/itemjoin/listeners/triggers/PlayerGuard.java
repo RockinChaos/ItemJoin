@@ -88,9 +88,9 @@ public class PlayerGuard implements Listener {
                 for (final String region : new ArrayList<>(Arrays.asList(this.fromRegions.get(player).replace(" ", "").split(",")))) {
                     if (region != null && !region.isEmpty()) {
                         if (async) {
-                            SchedulerUtils.run(() -> ItemUtilities.getUtilities().setItems(player, fromLocation.getWorld(), TriggerType.REGION_LEAVE, player.getGameMode(), region, regions));
+                            SchedulerUtils.run(() -> ItemUtilities.getUtilities().setAuthenticating(player, fromLocation.getWorld(), TriggerType.REGION_LEAVE, player.getGameMode(), region, regions));
                         } else {
-                            ItemUtilities.getUtilities().setItems(player, location.getWorld(), TriggerType.REGION_LEAVE, player.getGameMode(), region, regions);
+                            ItemUtilities.getUtilities().setAuthenticating(player, location.getWorld(), TriggerType.REGION_LEAVE, player.getGameMode(), region, regions);
                         }
                     }
                 }
@@ -98,9 +98,9 @@ public class PlayerGuard implements Listener {
             for (final String region : regions) {
                 if (region != null && !region.isEmpty()) {
                     if (async) {
-                        SchedulerUtils.run(() -> ItemUtilities.getUtilities().setItems(player, location.getWorld(), TriggerType.REGION_ENTER, player.getGameMode(), region, regions));
+                        SchedulerUtils.run(() -> ItemUtilities.getUtilities().setAuthenticating(player, location.getWorld(), TriggerType.REGION_ENTER, player.getGameMode(), region, regions));
                     } else {
-                        ItemUtilities.getUtilities().setItems(player, location.getWorld(), TriggerType.REGION_ENTER, player.getGameMode(), region, regions);
+                        ItemUtilities.getUtilities().setAuthenticating(player, location.getWorld(), TriggerType.REGION_ENTER, player.getGameMode(), region, regions);
                     }
                 }
             }
