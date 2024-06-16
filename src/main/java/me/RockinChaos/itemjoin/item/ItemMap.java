@@ -4184,7 +4184,13 @@ public class ItemMap implements Cloneable {
                     } else {
                         slot = EquipmentSlot.valueOf(ItemHandler.getDesignatedSlot(this.material).toUpperCase());
                     }
-                    AttributeModifier modifier = new AttributeModifier(UUID.nameUUIDFromBytes((this.configName + attrib).getBytes()), attrib.toLowerCase().replace("_", "."), value, AttributeModifier.Operation.ADD_NUMBER, slot);
+                    AttributeModifier modifier;
+                    if (ServerUtils.hasSpecificUpdate("1_21")) {
+                        modifier = new AttributeModifier(Objects.requireNonNull(NamespacedKey.fromString(attrib.toLowerCase().replace("_", "."))), value, AttributeModifier.Operation.ADD_NUMBER, slot.getGroup());
+                    } else {
+                        modifier = LegacyAPI.getAttribute((this.configName + attrib), attrib, value, slot);
+                    }
+
                     if (this.tempMeta.getAttributeModifiers() == null || !this.tempMeta.getAttributeModifiers().containsValue(modifier)) {
                         this.tempMeta.addAttributeModifier(attribute, modifier);
                     }
