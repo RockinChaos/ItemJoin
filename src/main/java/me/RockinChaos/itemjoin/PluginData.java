@@ -651,7 +651,7 @@ public class PluginData {
             }
             ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new Crafting(), ItemJoin.getCore().getPlugin());
         }
-        if ((itemMap.isMovement() || itemMap.isStackable() || itemMap.isEquip() || itemMap.isInventoryClose())) {
+        if ((itemMap.isMovement() || itemMap.isEquip() || itemMap.isInventoryClose())) {
             if (StringUtils.isRegistered(Clicking.class.getSimpleName())) {
                 ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new Clicking(), ItemJoin.getCore().getPlugin());
                 if (!ItemJoin.getCore().getDependencies().protocolEnabled() && ProtocolManager.isDead()) {

@@ -121,7 +121,7 @@ public class Clicking implements Listener {
             }
             this.LegacyDropEvent(player);
             for (ItemStack item : items) {
-                if (!ItemUtilities.getUtilities().isAllowed(player, item, "inventory-modify") || (PlayerHandler.isCreativeMode(player) && PlayerHandler.isCraftingInv(event.getView()) && !ItemUtilities.getUtilities().isAllowed(player, item, "stackable"))) {
+                if (!ItemUtilities.getUtilities().isAllowed(player, item, "inventory-modify")) {
                     event.setCancelled(true);
                     if (player.getOpenInventory().getType().name().equalsIgnoreCase("CHEST") && !player.getOpenInventory().getTitle().equalsIgnoreCase("CHEST")) {
                         final ItemStack itemCopy = item.clone();
