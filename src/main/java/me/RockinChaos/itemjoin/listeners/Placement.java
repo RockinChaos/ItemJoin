@@ -31,6 +31,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Objects;
@@ -47,8 +48,10 @@ public class Placement implements Listener {
         ItemStack item = event.getItem();
         Player player = event.getPlayer();
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK && !ItemUtilities.getUtilities().isAllowed(player, item, "placement")) {
-            event.setCancelled(true);
-            PlayerHandler.updateInventory(player, 1L);
+            if (event.getClickedBlock() == null || !(event.getClickedBlock().getState() instanceof InventoryHolder) || event.getPlayer().isSneaking()) {
+                event.setCancelled(true);
+                PlayerHandler.updateInventory(player, 1L);
+            }
         }
     }
 
