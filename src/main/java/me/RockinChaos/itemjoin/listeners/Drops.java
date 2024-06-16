@@ -30,6 +30,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -42,7 +43,6 @@ public class Drops implements Listener {
 
     private final Map<String, Boolean> isDropping = new HashMap<>();
     private final Map<String, Boolean> possibleDropping = new HashMap<>();
-
 
     /**
      * Prevents the player from dropping all items.
@@ -61,6 +61,26 @@ public class Drops implements Listener {
                     event.setCancelled(true);
                 } else if (player.isDead()) {
                     event.getItemDrop().remove();
+                }
+            }
+        }
+    }
+
+    /**
+     * Prevents the player from dropping all items with an open InventoryView.
+     *
+     * @param event - InventoryClickEvent.
+     */
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    private void onGlobalClickDrop(InventoryClickEvent event) {
+        final Player player = (Player) event.getWhoClicked();
+        if (event.getSlotType() == InventoryType.SlotType.OUTSIDE && PluginData.getInfo().isPreventString(player, "Self-Drops")) {
+            if (PluginData.getInfo().isPreventBypass(player)) {
+                if (!player.isDead()) {
+                    if (PlayerHandler.isCreativeMode(player)) {
+                        player.closeInventory();
+                    }
+                    event.setCancelled(true);
                 }
             }
         }
@@ -107,6 +127,20 @@ public class Drops implements Listener {
             }
         } else if (player.isDead() && !ItemUtilities.getUtilities().isAllowed(player, item, "self-drops")) {
             event.getItemDrop().remove();
+        }
+    }
+
+    /**
+     * Prevents the player from dropping the custom item with an open InventoryView.
+     *
+     * @param event - InventoryClickEvent.
+     */
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    private void onClickDrop(InventoryClickEvent event) {
+        final ItemStack item = event.getCursor();
+        final Player player = (Player) event.getWhoClicked();
+        if (event.getSlotType() == InventoryType.SlotType.OUTSIDE && !player.isDead() && !ItemUtilities.getUtilities().isAllowed(player, item, "self-drops")) {
+            event.setCancelled(true);
         }
     }
 
