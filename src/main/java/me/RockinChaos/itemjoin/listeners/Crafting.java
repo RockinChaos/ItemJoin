@@ -62,17 +62,17 @@ public class Crafting implements Listener {
      */
     @EventHandler(priority = EventPriority.LOW)
     private void onAutoCraft(PlayerAutoCraftEvent event) {
-        if (event.getContents() == null) {
+        ItemStack[] craftingContents = event.getContents();
+        if (craftingContents == null) {
             return;
         }
         ServerUtils.logDebug("{CRAFTING} Protocol-Packet auto recipe was triggered for the player " + event.getPlayer().getName() + ".");
-        for (int i = 0; i <= 4; i++) {
-            final ItemStack[] craftingContents = event.getContents().clone();
+        for (ItemStack craftItem : craftingContents) {
             if (event.isCancelled()) {
                 return;
             }
             for (ItemMap itemMap : ItemUtilities.getUtilities().getCraftingItems()) {
-                if (!event.isCancelled() && !this.hasRecipePlugin() && itemMap.isReal(craftingContents[i])) {
+                if (!event.isCancelled() && !this.hasRecipePlugin() && itemMap.isReal(craftItem)) {
                     event.setCancelled(true);
                 } else if (event.isCancelled()) {
                     return;
