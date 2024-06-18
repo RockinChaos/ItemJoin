@@ -4723,11 +4723,11 @@ public class ItemMap implements Cloneable {
         if (this.getConditions(conditions) != null && !this.getConditions(conditions).isEmpty()) {
             if (doCheck) {
                 for (String condition : this.getConditions(conditions)) {
-                    String[] parts = (condition != null ? condition.split(":") : null);
+                    final String[] parts = (condition != null ? StringUtils.translateLayout(condition, player).split(":") : null);
                     if (parts != null && parts.length == 3) {
-                        String value1 = (parts[0] != null && !StringUtils.isInt(parts[0]) ? StringUtils.translateLayout(parts[0], player) : parts[0]);
+                        String value1 = parts[0];
                         String operand = parts[1];
-                        String value2 = (parts[2] != null && !StringUtils.isInt(parts[2]) ? StringUtils.translateLayout(parts[2], player) : parts[2]);
+                        String value2 = parts[2];
                         final boolean conditionMet = StringUtils.conditionMet(value1, operand, value2);
                         if (!conditionMet && !silent && this.getConditionMessage(conditions) != null && !this.getConditionMessage(conditions).isEmpty()) {
                             player.sendMessage(StringUtils.translateLayout(this.getConditionMessage(conditions), player));
