@@ -509,22 +509,20 @@ public class PluginData {
             {
                 runSingleAsync(() -> {
                     ItemJoin.getCore().getData().setStarted(true);
-                    runAsyncLater(10L, () -> {
-                        forOnlinePlayers(player -> ItemUtilities.getUtilities().setStatistics(player));
-                        this.setPages();
-                        final ConfigurationSection itemsPath = ItemJoin.getCore().getConfig("items.yml").getConfigurationSection("items");
-                        int loadedItems = 0;
-                        int customItems = 0;
-                        if (itemsPath != null) {
-                            customItems = itemsPath.getKeys(false).size();
-                            for (String configName : itemsPath.getKeys(false)) {
-                                if (ItemUtilities.getUtilities().getItemMap(configName) != null) {
-                                    loadedItems++;
-                                }
+                    forOnlinePlayers(player -> ItemUtilities.getUtilities().setStatistics(player));
+                    this.setPages();
+                    final ConfigurationSection itemsPath = ItemJoin.getCore().getConfig("items.yml").getConfigurationSection("items");
+                    int loadedItems = 0;
+                    int customItems = 0;
+                    if (itemsPath != null) {
+                        customItems = itemsPath.getKeys(false).size();
+                        for (String configName : itemsPath.getKeys(false)) {
+                            if (ItemUtilities.getUtilities().getItemMap(configName) != null) {
+                                loadedItems++;
                             }
                         }
-                        ServerUtils.logInfo(loadedItems + "/" + customItems + " Custom item(s) loaded!");
-                    });
+                    }
+                    ServerUtils.logInfo(loadedItems + "/" + customItems + " Custom item(s) loaded!");
                 });
                 {
                     runAsyncLater(100L, () -> {
