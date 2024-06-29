@@ -70,7 +70,7 @@ public class Interact implements Listener {
     private void onInteractCooldown(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         ItemStack item = event.getItem();
-        if ((event.hasItem() && event.getAction() != Action.PHYSICAL) && ((ItemAPI.isPlaceable(event.getMaterial()) && event.getAction() == Action.RIGHT_CLICK_AIR) || event.getAction() == Action.RIGHT_CLICK_BLOCK)) {
+        if ((event.hasItem() && event.getAction() != Action.PHYSICAL) && (((ItemAPI.isPlaceable(event.getMaterial()) || (player.getInventory().getChestplate() != null && player.getInventory().getChestplate().getType().name().equalsIgnoreCase("ELYTRA"))) && event.getAction() == Action.RIGHT_CLICK_AIR) || event.getAction() == Action.RIGHT_CLICK_BLOCK)) {
             ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item);
             if (itemMap != null && itemMap.getInteractCooldown() != 0) {
                 long lockDuration = !this.interactLock.isEmpty() && this.interactLock.get(item) != null ? System.currentTimeMillis() - this.interactLock.get(item) : -1;
