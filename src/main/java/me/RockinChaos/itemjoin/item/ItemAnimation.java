@@ -19,6 +19,7 @@ package me.RockinChaos.itemjoin.item;
 
 import me.RockinChaos.core.handlers.ItemHandler;
 import me.RockinChaos.core.handlers.PlayerHandler;
+import me.RockinChaos.core.utils.CompatUtils;
 import me.RockinChaos.core.utils.SchedulerUtils;
 import me.RockinChaos.core.utils.ServerUtils;
 import me.RockinChaos.core.utils.StringUtils;
@@ -268,7 +269,7 @@ public class ItemAnimation {
                     }
                 }
                 // ========== Animate Within the Player Crafting/Chests ============ //
-                for (ItemStack inPlayerInventory : player.getOpenInventory().getTopInventory().getContents()) {
+                for (ItemStack inPlayerInventory : CompatUtils.getTopInventory(player).getContents()) {
                     if (inPlayerInventory != null && itemMap.getTempItem() != null && itemMap.isReal(inPlayerInventory)) {
                         SchedulerUtils.run(() -> {
                             if (!stopAnimations && player.isOnline() && !player.isDead()) {

@@ -19,6 +19,7 @@ package me.RockinChaos.itemjoin.listeners;
 
 import me.RockinChaos.core.handlers.ItemHandler;
 import me.RockinChaos.core.handlers.PlayerHandler;
+import me.RockinChaos.core.utils.CompatUtils;
 import me.RockinChaos.core.utils.SchedulerUtils;
 import me.RockinChaos.core.utils.ServerUtils;
 import me.RockinChaos.core.utils.StringUtils;
@@ -41,7 +42,7 @@ import org.bukkit.event.inventory.InventoryType.SlotType;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
-import org.bukkit.inventory.InventoryView;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Collections;
@@ -121,9 +122,10 @@ public class Crafting implements Listener {
     private void onCraftingClose(org.bukkit.event.inventory.InventoryCloseEvent event) {
         long dupeDuration = !this.closeDupe.isEmpty() && this.closeDupe.get(PlayerHandler.getPlayerID((Player) event.getPlayer())) != null ? System.currentTimeMillis() - this.closeDupe.get(PlayerHandler.getPlayerID((Player) event.getPlayer())) : -1;
         if (!PlayerHandler.isCraftingInv(event.getView()) || (PlayerHandler.isCraftingInv(event.getView()) && (dupeDuration == -1 || dupeDuration > 30))) {
+            final Inventory topInventory = CompatUtils.getTopInventory(event.getView());
             ServerUtils.logDebug("{CRAFTING} Bukkit inventory was closed for the player " + event.getPlayer().getName() + ".");
-            ItemStack[] topContents = ItemHandler.cloneContents(event.getView().getTopInventory().getContents());
-            this.handleClose(slot -> event.getView().getTopInventory().setItem(slot, new ItemStack(Material.AIR)), (Player) event.getPlayer(), event.getView(), topContents, true);
+            ItemStack[] topContents = ItemHandler.cloneContents(topInventory.getContents());
+            this.handleClose(slot -> topInventory.setItem(slot, new ItemStack(Material.AIR)), (Player) event.getPlayer(), event.getView(), topContents, true);
         }
     }
 
@@ -153,10 +155,9 @@ public class Crafting implements Listener {
      */
     @EventHandler(priority = EventPriority.LOW)
     private void onCraftingClick(InventoryClickEvent event) {
-        final InventoryView view = event.getView();
         final Player player = (Player) event.getWhoClicked();
-        final ItemStack[] craftingContents = view.getTopInventory().getContents().clone();
-        if (PlayerHandler.isCraftingInv(view) && event.getSlot() <= 4) {
+        final ItemStack[] craftingContents = CompatUtils.getTopInventory(event.getView()).getContents().clone();
+        if (PlayerHandler.isCraftingInv(event.getView()) && event.getSlot() <= 4) {
             if (event.getSlot() != 0 && event.getSlotType() == SlotType.CRAFTING) {
                 if (craftingContents[0] != null && craftingContents[0].getType() != Material.AIR) {
                     final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(craftingContents[0]);
@@ -171,7 +172,7 @@ public class Crafting implements Listener {
                             for (int i = 1; i <= 4; i++) {
                                 ItemHandler.returnCraftingItem(player, i, craftingContents[i].clone(), 1L);
                             }
-                            SchedulerUtils.runLater(1L, () -> player.getOpenInventory().getTopInventory().setItem(0, new ItemStack(Material.AIR)));
+                            SchedulerUtils.runLater(1L, () -> CompatUtils.getTopInventory(player).setItem(0, new ItemStack(Material.AIR)));
                             break;
                         }
                     }
@@ -279,8 +280,9 @@ public class Crafting implements Listener {
      * @param view      - The view being referenced.
      * @param inventory - The inventory being handled.
      */
-    private void handleClose(final Consumer<Integer> input, final Player player, final InventoryView view, final ItemStack[] inventory, final boolean slotZero) {
+    private void handleClose(final Consumer<Integer> input, final Player player, final Object view, final ItemStack[] inventory, final boolean slotZero) {
         if (PlayerHandler.isCraftingInv(view)) {
+            final Inventory topInventory = CompatUtils.getTopInventory(player);
             if (ItemHandler.isContentsEmpty(inventory)) {
                 boolean isCrafting = false;
                 for (int i = 0; i <= 4; i++) {
@@ -305,7 +307,7 @@ public class Crafting implements Listener {
                                     health = (player.isDead() ? 0 : 1);
                                 }
                                 if (health > 0) {
-                                    player.getOpenInventory().getTopInventory().setItem(k, new ItemStack(Material.AIR));
+                                    topInventory.setItem(k, new ItemStack(Material.AIR));
                                     if (player.getInventory().firstEmpty() != -1) {
                                         player.getInventory().addItem(drop);
                                         ServerUtils.logDebug("{CRAFTING} An item was flagged as non-crafting, adding it back to the player " + player.getName());
@@ -325,7 +327,7 @@ public class Crafting implements Listener {
                         this.returnCrafting(player, inventory, 1L, !slotZero);
                     } else {
                         SchedulerUtils.runLater(1L, () -> {
-                            player.getOpenInventory().getTopInventory().setItem(0, new ItemStack(Material.AIR));
+                            topInventory.setItem(0, new ItemStack(Material.AIR));
                             PlayerHandler.updateInventory(player, new ItemStack(Material.AIR), 1L);
                         });
                     }
@@ -339,7 +341,7 @@ public class Crafting implements Listener {
                 } catch (Exception e) {
                     health = (player.isDead() ? 0 : 1);
                 }
-                if (health > 0 && PlayerHandler.isCraftingInv(player.getOpenInventory()) && PlayerHandler.getOpenCraftItems().containsKey(PlayerHandler.getPlayerID(player))) {
+                if (health > 0 && PlayerHandler.isCraftingInv(player) && PlayerHandler.getOpenCraftItems().containsKey(PlayerHandler.getPlayerID(player))) {
                     ItemStack[] openCraftContents = PlayerHandler.getOpenCraftItems().get(PlayerHandler.getPlayerID(player));
                     if (openCraftContents != null && openCraftContents.length != 0) {
                         this.returnCrafting(player, openCraftContents, 1L, false);
@@ -382,22 +384,23 @@ public class Crafting implements Listener {
         SchedulerUtils.runLater(delay, () -> {
             if (!player.isOnline()) {
                 return;
-            } else if (!PlayerHandler.isCraftingInv(player.getOpenInventory())) {
+            } else if (!PlayerHandler.isCraftingInv(player)) {
                 this.returnCrafting(player, contents, 10L, slotZero);
                 return;
             }
+            final Inventory topInventory = CompatUtils.getTopInventory(player);
             if (!slotZero && contents != null) {
                 for (int i = 4; i >= 0; i--) {
                     final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(contents[i]);
                     if (contents[i] != null && itemMap != null) {
-                        player.getOpenInventory().getTopInventory().setItem(i, contents[i]);
+                        topInventory.setItem(i, contents[i]);
                         PlayerHandler.updateInventory(player, itemMap.getItemStack(player), 1L);
                     }
                 }
             } else if (contents != null) {
                 final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(contents[0]);
                 if (contents[0] != null && itemMap != null) {
-                    player.getOpenInventory().getTopInventory().setItem(0, contents[0]);
+                    topInventory.setItem(0, contents[0]);
                     PlayerHandler.updateInventory(player, itemMap.getItemStack(player), 1L);
                 }
             }

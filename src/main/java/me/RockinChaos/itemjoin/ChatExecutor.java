@@ -22,6 +22,7 @@ import me.RockinChaos.core.handlers.ItemHandler;
 import me.RockinChaos.core.handlers.PermissionsHandler;
 import me.RockinChaos.core.handlers.PlayerHandler;
 import me.RockinChaos.core.utils.ChatComponent.ClickAction;
+import me.RockinChaos.core.utils.CompatUtils;
 import me.RockinChaos.core.utils.SchedulerUtils;
 import me.RockinChaos.core.utils.ServerUtils;
 import me.RockinChaos.core.utils.StringUtils;
@@ -678,8 +679,8 @@ public class ChatExecutor implements CommandExecutor {
                         if (itemMap.isAlwaysGive() && !StringUtils.isInt(args[args.length - 1])) {
                             amount = itemMap.getCount(argsPlayer);
                         }
-                        if (StringUtils.getSlotConversion(itemMap.getSlot()) != 0 && PlayerHandler.isCraftingInv(argsPlayer.getOpenInventory())) {
-                            final ItemStack topItem = argsPlayer.getOpenInventory().getTopInventory().getItem(0);
+                        if (StringUtils.getSlotConversion(itemMap.getSlot()) != 0 && PlayerHandler.isCraftingInv(argsPlayer)) {
+                            final ItemStack topItem = CompatUtils.getTopInventory(argsPlayer).getItem(0);
                             if (topItem != null && !topItem.getType().equals(Material.AIR)) {
                                 ItemHandler.returnCraftingItem(argsPlayer, 0, topItem.clone(), 0L);
                             }
@@ -749,8 +750,8 @@ public class ChatExecutor implements CommandExecutor {
                 if (itemMap.getConfigName().equalsIgnoreCase(args[1])) {
                     if (remove || !PermissionsHandler.permissionEnabled("Permissions.Commands-Get") || (itemMap.hasPermission(argsPlayer, argsPlayer.getWorld()) && PermissionsHandler.permissionEnabled("Permissions.Commands-Get"))) {
                         if ((remove && itemMap.hasItem(argsPlayer, true)) || (!remove && (itemMap.conditionMet(argsPlayer, "trigger-conditions", true, false) && (ItemUtilities.getUtilities().canOverwrite(argsPlayer, itemMap) && (amount != 0 || itemMap.isAlwaysGive() || !itemMap.hasItem(argsPlayer, false)))))) {
-                            if (StringUtils.getSlotConversion(itemMap.getSlot()) != 0 && PlayerHandler.isCraftingInv(argsPlayer.getOpenInventory())) {
-                                final ItemStack topItem = argsPlayer.getOpenInventory().getTopInventory().getItem(0);
+                            if (StringUtils.getSlotConversion(itemMap.getSlot()) != 0 && PlayerHandler.isCraftingInv(argsPlayer)) {
+                                final ItemStack topItem = CompatUtils.getTopInventory(argsPlayer).getItem(0);
                                 if (topItem != null && !topItem.getType().equals(Material.AIR)) {
                                     ItemHandler.returnCraftingItem(argsPlayer, 0, topItem.clone(), 0L);
                                 }
@@ -807,8 +808,8 @@ public class ChatExecutor implements CommandExecutor {
         }
         boolean itemGiven = false;
         boolean failedPermissions = false;
-        if (!remove && PlayerHandler.isCraftingInv(argsPlayer.getOpenInventory())) {
-            final ItemStack topItem = argsPlayer.getOpenInventory().getTopInventory().getItem(0);
+        if (!remove && PlayerHandler.isCraftingInv(argsPlayer)) {
+            final ItemStack topItem = CompatUtils.getTopInventory(argsPlayer).getItem(0);
             if (topItem != null && !topItem.getType().equals(Material.AIR)) {
                 ItemHandler.returnCraftingItem(argsPlayer, 0, topItem.clone(), 0L);
             }

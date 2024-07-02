@@ -18,6 +18,7 @@
 package me.RockinChaos.itemjoin.listeners;
 
 import me.RockinChaos.core.handlers.PlayerHandler;
+import me.RockinChaos.core.utils.CompatUtils;
 import me.RockinChaos.core.utils.ServerUtils;
 import me.RockinChaos.core.utils.StringUtils;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
@@ -29,6 +30,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 public class Storable implements Listener {
@@ -40,15 +42,16 @@ public class Storable implements Listener {
      */
     @EventHandler(ignoreCancelled = true)
     private void onInventoryStore(InventoryClickEvent event) {
-        Player player = (Player) event.getWhoClicked();
-        String invType = event.getView().getType().toString();
+        final Player player = (Player) event.getWhoClicked();
+        final String invType = CompatUtils.getInventoryType(event.getView()).toString();
+        final Inventory bottomInventory = CompatUtils.getBottomInventory(event);
         ItemStack item = null;
         if (StringUtils.containsIgnoreCase(event.getAction().name(), "HOTBAR")) {
-            if (event.getView().getBottomInventory().getSize() >= event.getHotbarButton() && (event.getHotbarButton() >= 0 || event.getHotbarButton() == -1)) {
+            if (bottomInventory.getSize() >= event.getHotbarButton() && (event.getHotbarButton() >= 0 || event.getHotbarButton() == -1)) {
                 if (event.getHotbarButton() == -1) {
                     item = PlayerHandler.getOffHandItem(player);
                 } else {
-                    item = event.getView().getBottomInventory().getItem(event.getHotbarButton());
+                    item = bottomInventory.getItem(event.getHotbarButton());
                 }
             }
             if (item == null) {
@@ -81,7 +84,7 @@ public class Storable implements Listener {
     @EventHandler(ignoreCancelled = true)
     private void onInventoryDragToStore(InventoryDragEvent event) {
         Player player = (Player) event.getWhoClicked();
-        String invType = event.getView().getType().toString();
+        String invType = CompatUtils.getInventoryType(event.getView()).toString();
         int inventorySize = event.getInventory().getSize();
         ItemStack item = event.getOldCursor();
         for (int i : event.getRawSlots()) {

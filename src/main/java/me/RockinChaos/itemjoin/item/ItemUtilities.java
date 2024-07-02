@@ -19,6 +19,7 @@ package me.RockinChaos.itemjoin.item;
 
 import me.RockinChaos.core.handlers.ItemHandler;
 import me.RockinChaos.core.handlers.PlayerHandler;
+import me.RockinChaos.core.utils.CompatUtils;
 import me.RockinChaos.core.utils.SchedulerUtils;
 import me.RockinChaos.core.utils.ServerUtils;
 import me.RockinChaos.core.utils.StringUtils;
@@ -420,10 +421,10 @@ public class ItemUtilities {
      */
     private void clearItems(final TriggerType type, final Player player, final String event, final String region, final int clearType) {
         this.protectItems = this.getProtectItems();
-        PlayerInventory inventory = player.getInventory();
-        Inventory craftView = player.getOpenInventory().getTopInventory();
-        GuardAPI.saveReturnItems(player, event, region, craftView, inventory, 0);
-        this.saveReturnItems(type, player, player.getWorld().getName(), craftView, inventory, 0);
+        final PlayerInventory inventory = player.getInventory();
+        final Inventory topInventory = CompatUtils.getTopInventory(player);
+        GuardAPI.saveReturnItems(player, event, region, topInventory, inventory, 0);
+        this.saveReturnItems(type, player, player.getWorld().getName(), topInventory, inventory, 0);
         for (int i = 0; i < (!this.protectItems.isEmpty() ? this.protectItems.size() : 1); i++) {
             if (this.canClear(inventory.getHelmet(), "Helmet", i, clearType)) {
                 inventory.setHelmet(new ItemStack(Material.AIR));
@@ -443,10 +444,10 @@ public class ItemUtilities {
             if (ServerUtils.hasSpecificUpdate("1_9") && this.canClear(inventory.getItemInOffHand(), "OffHand", i, clearType)) {
                 PlayerHandler.setOffHandItem(player, new ItemStack(Material.AIR));
             }
-            if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
-                for (int k = 0; k < player.getOpenInventory().getTopInventory().getSize(); k++) {
-                    if (this.canClear(player.getOpenInventory().getTopInventory().getItem(k), "CRAFTING[" + k + "]", i, clearType)) {
-                        craftView.setItem(k, new ItemStack(Material.AIR));
+            if (PlayerHandler.isCraftingInv(player)) {
+                for (int k = 0; k < topInventory.getSize(); k++) {
+                    if (this.canClear(topInventory.getItem(k), "CRAFTING[" + k + "]", i, clearType)) {
+                        topInventory.setItem(k, new ItemStack(Material.AIR));
                     }
                 }
             }
@@ -649,7 +650,7 @@ public class ItemUtilities {
                         if (item != null) {
                             saveInventory.setItem(i, item.clone());
                         }
-                    } else if (i >= 42 && canClear(craftView.getItem(i - 42), "CRAFTING[" + (i - 42) + "]", k, clearType) && PlayerHandler.isCraftingInv(player.getOpenInventory())) {
+                    } else if (i >= 42 && canClear(craftView.getItem(i - 42), "CRAFTING[" + (i - 42) + "]", k, clearType) && PlayerHandler.isCraftingInv(player)) {
                         final ItemStack item = craftView.getItem(i - 42);
                         if (item != null) {
                             saveInventory.setItem(i, item.clone());
@@ -679,8 +680,8 @@ public class ItemUtilities {
                     if (item != null && item.getType() != Material.AIR) {
                         if (i <= 41) {
                             player.getInventory().setItem(i, item.clone());
-                        } else if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
-                            player.getOpenInventory().getTopInventory().setItem(i - 42, item.clone());
+                        } else if (PlayerHandler.isCraftingInv(player)) {
+                            CompatUtils.getTopInventory(player).setItem(i - 42, item.clone());
                             PlayerHandler.updateInventory(player, 1L);
                         }
                     }
@@ -824,21 +825,22 @@ public class ItemUtilities {
      */
     private void setCraftingSlots(final Player player, final ItemStack itemStack, final int craftSlot, int attempts) {
         if (attempts != 0) {
+            final Inventory topInventory = CompatUtils.getTopInventory(player);
             if (craftSlot == 0) {
                 SchedulerUtils.runLater(2L, () -> {
-                    if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
-                        player.getOpenInventory().getTopInventory().setItem(craftSlot, itemStack);
+                    if (PlayerHandler.isCraftingInv(player)) {
+                        topInventory.setItem(craftSlot, itemStack);
                         PlayerHandler.updateInventory(player, 1L);
                     } else {
                         SchedulerUtils.runLater(20L, () -> this.setCraftingSlots(player, itemStack, craftSlot, (attempts - 1)));
                     }
                 });
-            } else if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
-                final ItemStack item = player.getOpenInventory().getTopInventory().getItem(0);
+            } else if (PlayerHandler.isCraftingInv(player)) {
+                final ItemStack item = topInventory.getItem(0);
                 if (item != null && !item.getType().equals(Material.AIR)) {
                     ItemHandler.returnCraftingItem(player, 0, item.clone(), 0L);
                 }
-                player.getOpenInventory().getTopInventory().setItem(craftSlot, itemStack);
+                topInventory.setItem(craftSlot, itemStack);
             } else {
                 SchedulerUtils.runLater(20L, () -> this.setCraftingSlots(player, itemStack, craftSlot, (attempts - 1)));
             }

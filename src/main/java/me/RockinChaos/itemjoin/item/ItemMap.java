@@ -21,11 +21,8 @@ import com.vk2gpz.tokenenchant.api.TokenEnchantAPI;
 import me.RockinChaos.core.handlers.ItemHandler;
 import me.RockinChaos.core.handlers.PermissionsHandler;
 import me.RockinChaos.core.handlers.PlayerHandler;
-import me.RockinChaos.core.utils.ReflectionUtils;
+import me.RockinChaos.core.utils.*;
 import me.RockinChaos.core.utils.ReflectionUtils.MinecraftMethod;
-import me.RockinChaos.core.utils.SchedulerUtils;
-import me.RockinChaos.core.utils.ServerUtils;
-import me.RockinChaos.core.utils.StringUtils;
 import me.RockinChaos.core.utils.api.LegacyAPI;
 import me.RockinChaos.itemjoin.ChatToggleExecutor;
 import me.RockinChaos.itemjoin.ChatToggleTab;
@@ -4054,8 +4051,8 @@ public class ItemMap implements Cloneable {
                 && (ignoreCount || this.isCountSimilar(player, player.getInventory().getItemInOffHand()))) {
             return true;
         }
-        if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
-            for (ItemStack craftInventory : player.getOpenInventory().getTopInventory()) {
+        if (PlayerHandler.isCraftingInv(player)) {
+            for (ItemStack craftInventory : CompatUtils.getTopInventory(player)) {
                 if (this.isSimilar(player, craftInventory) && (ignoreCount || this.isCountSimilar(player, craftInventory))) {
                     return true;
                 }
@@ -4185,12 +4182,11 @@ public class ItemMap implements Cloneable {
                         slot = EquipmentSlot.valueOf(ItemHandler.getDesignatedSlot(this.material).toUpperCase());
                     }
                     AttributeModifier modifier;
-                    //if (ServerUtils.hasSpecificUpdate("1_21")) {
-                    //    modifier = new AttributeModifier(Objects.requireNonNull(NamespacedKey.fromString(attrib.toLowerCase().replace("_", "."))), value, AttributeModifier.Operation.ADD_NUMBER, slot.getGroup());
-                    //} else {
+                    if (ServerUtils.hasSpecificUpdate("1_21")) {
+                        modifier = new AttributeModifier(Objects.requireNonNull(NamespacedKey.fromString(attrib.toLowerCase().replace("_", "."))), value, AttributeModifier.Operation.ADD_NUMBER, slot.getGroup());
+                    } else {
                         modifier = LegacyAPI.getAttribute((this.configName + attrib), attrib, value, slot);
-                    //}
-
+                    }
                     if (this.tempMeta.getAttributeModifiers() == null || !this.tempMeta.getAttributeModifiers().containsValue(modifier)) {
                         this.tempMeta.addAttributeModifier(attribute, modifier);
                     }
@@ -4756,10 +4752,10 @@ public class ItemMap implements Cloneable {
         if (amount.length == 0) {
             amount = new int[]{0};
         }
-        PlayerInventory inv = player.getInventory();
-        Inventory craftView = player.getOpenInventory().getTopInventory();
-        ItemStack[] contents = inv.getContents();
-        ItemStack[] craftingContents = player.getOpenInventory().getTopInventory().getContents();
+        final PlayerInventory inv = player.getInventory();
+        final Inventory topInventory = CompatUtils.getTopInventory(player);
+        final ItemStack[] contents = inv.getContents();
+        final ItemStack[] craftingContents = topInventory.getContents();
         this.updateItem(player);
         if (amount[0] == 0) {
             if (this.isAnimated() && this.getAnimationHandler().get(player) != null
@@ -4792,10 +4788,10 @@ public class ItemMap implements Cloneable {
                 PlayerHandler.setOffHandItem(player, new ItemStack(Material.AIR));
             }
 
-            if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
+            if (PlayerHandler.isCraftingInv(player)) {
                 for (int k = 0; k < craftingContents.length; k++) {
                     if (this.isSimilar(player, craftingContents[k])) {
-                        craftView.setItem(k, new ItemStack(Material.AIR));
+                        topInventory.setItem(k, new ItemStack(Material.AIR));
                     }
                 }
             }
@@ -4818,10 +4814,10 @@ public class ItemMap implements Cloneable {
                 player.setItemOnCursor(ItemHandler.modifyItem(player.getItemOnCursor(), false, amount[0]));
             } else if (ServerUtils.hasSpecificUpdate("1_9") && this.isSimilar(player, PlayerHandler.getOffHandItem(player))) {
                 PlayerHandler.setOffHandItem(player, ItemHandler.modifyItem(PlayerHandler.getOffHandItem(player), false, amount[0]));
-            } else if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
+            } else if (PlayerHandler.isCraftingInv(player)) {
                 for (int k = 0; k < craftingContents.length; k++) {
                     if (this.isSimilar(player, craftingContents[k])) {
-                        craftView.setItem(k, ItemHandler.modifyItem(player.getOpenInventory().getItem(k), false, amount[0]));
+                        topInventory.setItem(k, ItemHandler.modifyItem(CompatUtils.getItem(player, k), false, amount[0]));
                         return;
                     }
                 }
@@ -4875,7 +4871,8 @@ public class ItemMap implements Cloneable {
         if ((!slot.startsWith("CH") && slot.startsWith("C")) || StringUtils.isInt(slot)) {
             if (StringUtils.containsIgnoreCase(slot, "CRAFTING")) {
                 final int actualSlot = StringUtils.getSlotConversion(slot);
-                final ItemStack item = player.getOpenInventory().getTopInventory().getItem(actualSlot);
+                final Inventory topInventory = CompatUtils.getTopInventory(player);
+                final ItemStack item = topInventory.getItem(actualSlot);
                 if (item != null && this.isSimilar(player, item)) {
                     final ItemMeta itemMeta = item.getItemMeta();
                     if (ServerUtils.hasSpecificUpdate("1_13") && itemMeta != null) {
@@ -4884,14 +4881,14 @@ public class ItemMap implements Cloneable {
                             ((org.bukkit.inventory.meta.Damageable) itemMeta).setDamage(newDamage);
                             item.setItemMeta(itemMeta);
                         } else {
-                            player.getOpenInventory().getTopInventory().setItem(Integer.parseInt(slot), new ItemStack(Material.AIR));
+                            topInventory.setItem(Integer.parseInt(slot), new ItemStack(Material.AIR));
                         }
                     } else if (itemMeta != null) {
                         final int newDurability = LegacyAPI.getDurability(item) - damage;
                         if (newDurability > 0) {
                             LegacyAPI.setDurability(item, (short) newDurability);
                         } else {
-                            player.getOpenInventory().getTopInventory().setItem(Integer.parseInt(slot), new ItemStack(Material.AIR));
+                            topInventory.setItem(Integer.parseInt(slot), new ItemStack(Material.AIR));
                         }
                     }
                     PlayerHandler.updateInventory(player, 1L);
@@ -4932,15 +4929,16 @@ public class ItemMap implements Cloneable {
         ItemStack itemStack = this.getItem(player);
         if ((!slot.startsWith("CH") && slot.startsWith("C")) || StringUtils.isInt(slot)) {
             if (StringUtils.containsIgnoreCase(slot, "CRAFTING")) {
+                final Inventory topInventory = CompatUtils.getTopInventory(player);
                 if (StringUtils.getSlotConversion(slot) == 0) {
                     SchedulerUtils.runLater(1L, () -> {
-                        if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
-                            player.getOpenInventory().getTopInventory().setItem(StringUtils.getSlotConversion(slot), itemStack);
+                        if (PlayerHandler.isCraftingInv(player)) {
+                            topInventory.setItem(StringUtils.getSlotConversion(slot), itemStack);
                             PlayerHandler.updateInventory(player, 1L);
                         }
                     });
                 } else {
-                    player.getOpenInventory().getTopInventory().setItem(StringUtils.getSlotConversion(slot), itemStack);
+                    topInventory.setItem(StringUtils.getSlotConversion(slot), itemStack);
                 }
             } else {
                 player.getInventory().setItem(Integer.parseInt(slot), itemStack);
@@ -5263,8 +5261,8 @@ public class ItemMap implements Cloneable {
                     }
                 }
             }
-            if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
-                for (ItemStack craftInventory : player.getOpenInventory().getTopInventory()) {
+            if (PlayerHandler.isCraftingInv(player)) {
+                for (ItemStack craftInventory : CompatUtils.getTopInventory(player)) {
                     if (craftInventory != null && craftInventory.getType() == mat && craftInventory.getAmount() >= this.cost) {
                         if (craftInventory.getAmount() >= this.cost) {
                             return true;
@@ -5324,15 +5322,16 @@ public class ItemMap implements Cloneable {
                 PlayerHandler.setOffHandItem(player, ItemHandler.modifyItem(item, false, removeAmount));
             }
         }
-        if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
-            for (int i = 0; i < player.getOpenInventory().getTopInventory().getSize(); i++) {
-                final ItemStack item = player.getOpenInventory().getTopInventory().getItem(i);
+        if (PlayerHandler.isCraftingInv(player)) {
+            final Inventory topInventory = CompatUtils.getTopInventory(player);
+            for (int i = 0; i < topInventory.getSize(); i++) {
+                final ItemStack item = topInventory.getItem(i);
                 if (item != null && item.getType() == costMaterial) {
                     if (item.getAmount() < removeAmount) {
                         removeAmount -= item.getAmount();
-                        player.getOpenInventory().getTopInventory().setItem(i, ItemHandler.modifyItem(item, false, item.getAmount()));
+                        topInventory.setItem(i, ItemHandler.modifyItem(item, false, item.getAmount()));
                     } else {
-                        player.getOpenInventory().getTopInventory().setItem(i, ItemHandler.modifyItem(item, false, removeAmount));
+                        topInventory.setItem(i, ItemHandler.modifyItem(item, false, removeAmount));
                         break;
                     }
                 }
@@ -5451,9 +5450,10 @@ public class ItemMap implements Cloneable {
                             this.setSubjectRemoval(false);
                         }
                     } else if (this.isSubjectRemoval()) {
-                        for (int i = 0; i < player.getOpenInventory().getTopInventory().getSize(); i++) {
-                            if (itemMap.isSimilar(player, player.getOpenInventory().getTopInventory().getItem(i))) {
-                                player.getOpenInventory().getTopInventory().setItem(i, ItemHandler.modifyItem(player.getOpenInventory().getTopInventory().getItem(i), allItems, 1));
+                        final Inventory topInventory = CompatUtils.getTopInventory(player);
+                        for (int i = 0; i < topInventory.getSize(); i++) {
+                            if (itemMap.isSimilar(player, topInventory.getItem(i))) {
+                                topInventory.setItem(i, ItemHandler.modifyItem(CompatUtils.getTopInventory(player).getItem(i), allItems, 1));
                                 if (!allItems) {
                                     this.setSubjectRemoval(false);
                                 }

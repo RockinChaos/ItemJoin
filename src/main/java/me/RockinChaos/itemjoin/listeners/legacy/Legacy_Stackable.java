@@ -19,6 +19,7 @@ package me.RockinChaos.itemjoin.listeners.legacy;
 
 import me.RockinChaos.core.handlers.ItemHandler;
 import me.RockinChaos.core.handlers.PlayerHandler;
+import me.RockinChaos.core.utils.CompatUtils;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import org.bukkit.Material;
@@ -27,6 +28,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 /**
@@ -46,11 +48,13 @@ public class Legacy_Stackable implements Listener {
     @EventHandler(ignoreCancelled = true)
     private void onClickStackable(InventoryClickEvent event) {
         final Player player = (Player) event.getWhoClicked();
-        final ItemStack cursorItem = player.getOpenInventory().getCursor();
+        final ItemStack cursorItem = CompatUtils.getCursor(player);
         final InventoryAction action = event.getAction();
+        final Inventory topInventory = CompatUtils.getTopInventory(player);
+        final Inventory bottomInventory = CompatUtils.getBottomInventory(player);
         final int rawSlot = event.getRawSlot();
         final int slot = event.getSlot();
-        if (event.getCurrentItem() != null && cursorItem != null && event.getCurrentItem().getType() != Material.AIR && cursorItem.getType() != Material.AIR) {
+        if (event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR && cursorItem.getType() != Material.AIR) {
             final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(cursorItem);
             if (itemMap != null && itemMap.isSimilar(player, event.getCurrentItem()) && !ItemUtilities.getUtilities().isAllowed(player, cursorItem, "stackable")) {
                 event.setCancelled(true);
@@ -83,9 +87,9 @@ public class Legacy_Stackable implements Listener {
                     }
                 }
             } else if (itemMap != null) {
-                if (rawSlot >= player.getOpenInventory().getTopInventory().getSize()) {
-                    for (int i = 0; i < player.getOpenInventory().getTopInventory().getSize(); i++) {
-                        final ItemStack item = player.getOpenInventory().getTopInventory().getItem(i);
+                if (rawSlot >= topInventory.getSize()) {
+                    for (int i = 0; i < topInventory.getSize(); i++) {
+                        final ItemStack item = topInventory.getItem(i);
                         if (item != null && itemMap.isSimilar(player, item)) {
                             REMAINING_STACK_SIZE = ItemHandler.stackItems(player, event.getCurrentItem(), item, slot, false);
                             if (REMAINING_STACK_SIZE <= 0) {
@@ -94,8 +98,8 @@ public class Legacy_Stackable implements Listener {
                         }
                     }
                 } else {
-                    for (int i = 0; i < player.getOpenInventory().getBottomInventory().getSize(); i++) {
-                        final ItemStack item = player.getOpenInventory().getBottomInventory().getItem(i);
+                    for (int i = 0; i < bottomInventory.getSize(); i++) {
+                        final ItemStack item = bottomInventory.getItem(i);
                         if (item != null && itemMap.isSimilar(player, item)) {
                             REMAINING_STACK_SIZE = ItemHandler.stackItems(player, event.getCurrentItem(), item, slot, true);
                             if (REMAINING_STACK_SIZE <= 0) {
@@ -111,15 +115,15 @@ public class Legacy_Stackable implements Listener {
             PlayerHandler.updateInventory(player, 1L);
         } else if (action != InventoryAction.PLACE_ONE && action != InventoryAction.COLLECT_TO_CURSOR && cursorItem != null && cursorItem.getType() != Material.AIR && (event.getCurrentItem() == null || event.getCurrentItem().getType() == Material.AIR)) {
             final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(cursorItem);
-            final ItemStack openCursor = player.getOpenInventory().getCursor();
-            if (itemMap != null && openCursor != null && !ItemUtilities.getUtilities().isAllowed(player, cursorItem, "stackable")) {
+            final ItemStack openCursor = CompatUtils.getCursor(player);
+            if (itemMap != null && openCursor.getType() != Material.AIR && !ItemUtilities.getUtilities().isAllowed(player, cursorItem, "stackable")) {
                 event.setCancelled(true);
-                player.getOpenInventory().setItem(rawSlot, openCursor.clone());
-                player.getOpenInventory().setCursor(new ItemStack(Material.AIR));
+                CompatUtils.setItem(player, openCursor.clone(), rawSlot);
+                CompatUtils.setCursor(player, new ItemStack(Material.AIR));
             }
         } else if (action == InventoryAction.COLLECT_TO_CURSOR && !ItemUtilities.getUtilities().isAllowed(player, cursorItem, "stackable")) {
             final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(cursorItem);
-            if (itemMap != null && cursorItem != null) {
+            if (itemMap != null && cursorItem.getType() != Material.AIR ) {
                 for (int i = 0; i < 36; i++) {
                     final ItemStack item = player.getInventory().getItem(i);
                     if (item != null && itemMap.isSimilar(player, item)) {
@@ -130,8 +134,8 @@ public class Legacy_Stackable implements Listener {
                         }
                     }
                 }
-                for (int i = 0; i < player.getOpenInventory().getTopInventory().getSize(); i++) {
-                    final ItemStack item = player.getOpenInventory().getTopInventory().getItem(i);
+                for (int i = 0; i < topInventory.getSize(); i++) {
+                    final ItemStack item = topInventory.getItem(i);
                     if (item != null && itemMap.isSimilar(player, item)) {
                         if (cursorItem.getAmount() == 64) {
                             break;

@@ -22,6 +22,7 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import me.RockinChaos.core.handlers.ItemHandler;
 import me.RockinChaos.core.handlers.PlayerHandler;
+import me.RockinChaos.core.utils.CompatUtils;
 import me.RockinChaos.core.utils.SchedulerUtils;
 import me.RockinChaos.core.utils.ServerUtils;
 import me.RockinChaos.core.utils.StringUtils;
@@ -901,7 +902,7 @@ public class Menu {
                         itemMap.setCustomName(null);
                         creatingPane(player, itemMap);
                     } else if (inventoryHolder != null) {
-                        ((Interface) inventoryHolder).onTyping((Player) event.getView().getPlayer());
+                        ((Interface) inventoryHolder).onTyping(CompatUtils.getPlayer(event.getView()));
                         Menu.setTypingMenu(true, player, ((Interface) inventoryHolder));
                     }
                 }
@@ -8921,7 +8922,7 @@ public class Menu {
         if (GUIName == null) {
             GUIName = StringUtils.colorFormat("&7           &0&n ItemJoin Menu");
         }
-        return player != null && player.getOpenInventory().getTitle().equalsIgnoreCase(StringUtils.colorFormat(GUIName));
+        return player != null && CompatUtils.getInventoryTitle(player).equalsIgnoreCase(StringUtils.colorFormat(GUIName));
     }
 
 //  ==============================================================================================================================================================================================================================================================

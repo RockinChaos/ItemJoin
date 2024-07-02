@@ -19,6 +19,7 @@ package me.RockinChaos.itemjoin.listeners;
 
 import me.RockinChaos.core.handlers.ItemHandler;
 import me.RockinChaos.core.handlers.PlayerHandler;
+import me.RockinChaos.core.utils.CompatUtils;
 import me.RockinChaos.core.utils.SchedulerUtils;
 import me.RockinChaos.core.utils.ServerUtils;
 import me.RockinChaos.core.utils.StringUtils;
@@ -39,6 +40,7 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.inventory.InventoryType.SlotType;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -56,7 +58,7 @@ public class Clicking implements Listener {
      * @param player - that will have their item updated.
      * @return The HashMap containing the players and their current cursor items.
      */
-    public static ItemStack getCursor(String player) {
+    public static ItemStack getCursor(final String player) {
         return cursorItem.get(player);
     }
 
@@ -66,7 +68,7 @@ public class Clicking implements Listener {
      * @param player - that is having their item updated.
      * @param item   - that is being updated.
      */
-    public static void putCursor(String player, ItemStack item) {
+    public static void putCursor(final String player, final ItemStack item) {
         cursorItem.put(player, item);
     }
 
@@ -77,9 +79,9 @@ public class Clicking implements Listener {
      */
     @EventHandler(ignoreCancelled = true)
     private void onGlobalModify(InventoryClickEvent event) {
-        Player player = (Player) event.getWhoClicked();
+        final Player player = (Player) event.getWhoClicked();
         if (PluginData.getInfo().isPreventString(player, "itemMovement")) {
-            if (PluginData.getInfo().isPreventBypass(player) && !(player.getOpenInventory().getTitle().contains(String.valueOf(ChatColor.COLOR_CHAR)) || player.getOpenInventory().getTitle().contains("&"))) {
+            if (PluginData.getInfo().isPreventBypass(player) && !(CompatUtils.getInventoryTitle(player).contains(String.valueOf(ChatColor.COLOR_CHAR)) || CompatUtils.getInventoryTitle(player).contains("&"))) {
                 event.setCancelled(true);
             }
         }
@@ -92,7 +94,7 @@ public class Clicking implements Listener {
      */
     @EventHandler(ignoreCancelled = true)
     private void onGlobalPickItem(PlayerPickItemEvent event) {
-        Player player = event.getPlayer();
+        final Player player = event.getPlayer();
         if (PluginData.getInfo().isPreventString(player, "itemMovement")) {
             if (PluginData.getInfo().isPreventBypass(player)) {
                 event.setCancelled(true);
@@ -107,14 +109,16 @@ public class Clicking implements Listener {
      */
     @EventHandler(ignoreCancelled = true)
     private void onModify(InventoryClickEvent event) {
-        Player player = (Player) event.getWhoClicked();
-        List<ItemStack> items = new ArrayList<>();
+        final Player player = (Player) event.getWhoClicked();
+        final Inventory topInventory = CompatUtils.getTopInventory(player);
+        final Inventory bottomInventory = CompatUtils.getBottomInventory(player);
+        final List<ItemStack> items = new ArrayList<>();
         if (!this.isCreativeDupe(event)) {
             items.add(event.getCurrentItem());
             items.add(event.getCursor());
             if (StringUtils.containsIgnoreCase(event.getAction().name(), "HOTBAR")) {
-                if (event.getView().getBottomInventory().getSize() >= event.getHotbarButton() && event.getHotbarButton() >= 0) {
-                    items.add(event.getView().getBottomInventory().getItem(event.getHotbarButton()));
+                if (CompatUtils.getBottomInventory(event).getSize() >= event.getHotbarButton() && event.getHotbarButton() >= 0) {
+                    items.add(CompatUtils.getBottomInventory(event).getItem(event.getHotbarButton()));
                 } else if (ServerUtils.hasSpecificUpdate("1_9")) {
                     items.add(PlayerHandler.getOffHandItem(player));
                 }
@@ -123,13 +127,13 @@ public class Clicking implements Listener {
             for (ItemStack item : items) {
                 if (!ItemUtilities.getUtilities().isAllowed(player, item, "inventory-modify")) {
                     event.setCancelled(true);
-                    if (player.getOpenInventory().getType().name().equalsIgnoreCase("CHEST") && !player.getOpenInventory().getTitle().equalsIgnoreCase("CHEST")) {
+                    if (CompatUtils.getInventoryType(player).name().equalsIgnoreCase("CHEST") && !CompatUtils.getInventoryTitle(player).equalsIgnoreCase("CHEST")) {
                         final ItemStack itemCopy = item.clone();
                         SchedulerUtils.run(() -> {
-                            for (int i = 0; i < player.getOpenInventory().getTopInventory().getSize(); i++) {
-                                if (player.getOpenInventory().getTopInventory().getItem(i) != null && Objects.equals(player.getOpenInventory().getTopInventory().getItem(i), item)) {
-                                    player.getOpenInventory().getTopInventory().setItem(i, new ItemStack(Material.AIR));
-                                    player.getOpenInventory().getBottomInventory().setItem(event.getSlot(), itemCopy);
+                            for (int i = 0; i < topInventory.getSize(); i++) {
+                                if (topInventory.getItem(i) != null && Objects.equals(topInventory.getItem(i), item)) {
+                                    topInventory.setItem(i, new ItemStack(Material.AIR));
+                                    bottomInventory.setItem(event.getSlot(), itemCopy);
                                 }
                             }
                         });
@@ -155,8 +159,9 @@ public class Clicking implements Listener {
     @EventHandler()
     private void onEquipment(InventoryClickEvent event) {
         final Player player = (Player) event.getWhoClicked();
-        if (StringUtils.containsIgnoreCase(event.getAction().name(), "HOTBAR") && event.getView().getBottomInventory().getSize() >= event.getHotbarButton() && event.getHotbarButton() >= 0 && !event.getClick().name().equalsIgnoreCase("MIDDLE") && event.getSlotType() == SlotType.ARMOR) {
-            final ItemStack hotItem = event.getView().getBottomInventory().getItem(event.getHotbarButton());
+        final Inventory bottomInventory = CompatUtils.getBottomInventory(event);
+        if (StringUtils.containsIgnoreCase(event.getAction().name(), "HOTBAR") && bottomInventory.getSize() >= event.getHotbarButton() && event.getHotbarButton() >= 0 && !event.getClick().name().equalsIgnoreCase("MIDDLE") && event.getSlotType() == SlotType.ARMOR) {
+            final ItemStack hotItem = bottomInventory.getItem(event.getHotbarButton());
             if (hotItem != null && hotItem.getType() != Material.AIR && this.isEquipment(hotItem, "EQUIPPED", String.valueOf(event.getSlot())) && !ItemUtilities.getUtilities().isAllowed(player, hotItem, "cancel-equip")) {
                 event.setCancelled(true);
                 PlayerHandler.updateInventory(player, 1L);
@@ -217,7 +222,7 @@ public class Clicking implements Listener {
     private void onEquipmentClick(PlayerInteractEvent event) {
         final Player player = event.getPlayer();
         final ItemStack item = (event.getItem() != null ? event.getItem().clone() : event.getItem());
-        if (item != null && item.getType() != Material.AIR && !PlayerHandler.isMenuClick(player.getOpenInventory(), event.getAction())) {
+        if (item != null && item.getType() != Material.AIR && !PlayerHandler.isMenuClick(player, event.getAction())) {
             final String[] itemType = (item.getType().name().equalsIgnoreCase("ELYTRA") ? "ELYTRA_CHESTPLATE".split("_") : item.getType().name().split("_"));
             if (itemType.length >= 2 && itemType[1] != null && !itemType[1].isEmpty() && StringUtils.isInt(StringUtils.getArmorSlot(itemType[1], true))
                     && player.getInventory().getItem(Integer.parseInt(StringUtils.getArmorSlot(itemType[1], true))) == null
@@ -305,16 +310,16 @@ public class Clicking implements Listener {
      */
     @EventHandler(ignoreCancelled = true)
     private void onCursorAnimatedItem(InventoryClickEvent event) {
-        Player player = (Player) event.getWhoClicked();
-        String itemflag = "inventory-modify";
+        final Player player = (Player) event.getWhoClicked();
+        final Inventory topInventory = CompatUtils.getTopInventory(player);
         if (event.getAction().toString().contains("PLACE_ALL") || event.getAction().toString().contains("PLACE_ONE")) {
             ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(event.getCursor());
             if (itemMap != null && itemMap.isSimilar(player, cursorItem.get(PlayerHandler.getPlayerID(player)))) {
                 final int slot = event.getSlot();
                 event.setCancelled(true);
                 player.setItemOnCursor(new ItemStack(Material.AIR));
-                if (event.getRawSlot() <= 4 && event.getInventory().getType() == InventoryType.CRAFTING || event.getInventory().getType() != InventoryType.CRAFTING && player.getOpenInventory().getTopInventory().getSize() - 1 >= event.getRawSlot()) {
-                    player.getOpenInventory().getTopInventory().setItem(slot, cursorItem.get(PlayerHandler.getPlayerID(player)));
+                if (event.getRawSlot() <= 4 && event.getInventory().getType() == InventoryType.CRAFTING || event.getInventory().getType() != InventoryType.CRAFTING && topInventory.getSize() - 1 >= event.getRawSlot()) {
+                    topInventory.setItem(slot, cursorItem.get(PlayerHandler.getPlayerID(player)));
                 } else {
                     player.getInventory().setItem(slot, cursorItem.get(PlayerHandler.getPlayerID(player)));
                 }
@@ -323,13 +328,13 @@ public class Clicking implements Listener {
             }
         } else if (event.getAction().toString().contains("SWAP_WITH_CURSOR")) {
             ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(event.getCursor());
-            if (itemMap != null && event.getCurrentItem() != null && itemMap.isSimilar(player, cursorItem.get(PlayerHandler.getPlayerID(player))) && ItemUtilities.getUtilities().isAllowed(player, event.getCurrentItem(), itemflag)) {
+            if (itemMap != null && event.getCurrentItem() != null && itemMap.isSimilar(player, cursorItem.get(PlayerHandler.getPlayerID(player))) && ItemUtilities.getUtilities().isAllowed(player, event.getCurrentItem(), "inventory-modify")) {
                 final int slot = event.getSlot();
                 final ItemStack item = new ItemStack(event.getCurrentItem());
                 event.setCancelled(true);
                 player.setItemOnCursor(item);
-                if (event.getRawSlot() <= 4 && event.getInventory().getType() == InventoryType.CRAFTING || event.getInventory().getType() != InventoryType.CRAFTING && player.getOpenInventory().getTopInventory().getSize() - 1 >= event.getRawSlot()) {
-                    player.getOpenInventory().getTopInventory().setItem(slot, cursorItem.get(PlayerHandler.getPlayerID(player)));
+                if (event.getRawSlot() <= 4 && event.getInventory().getType() == InventoryType.CRAFTING || event.getInventory().getType() != InventoryType.CRAFTING && topInventory.getSize() - 1 >= event.getRawSlot()) {
+                    topInventory.setItem(slot, cursorItem.get(PlayerHandler.getPlayerID(player)));
                 } else {
                     player.getInventory().setItem(slot, cursorItem.get(PlayerHandler.getPlayerID(player)));
                 }

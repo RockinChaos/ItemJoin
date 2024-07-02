@@ -19,6 +19,7 @@ package me.RockinChaos.itemjoin.listeners;
 
 import me.RockinChaos.core.handlers.ItemHandler;
 import me.RockinChaos.core.handlers.PlayerHandler;
+import me.RockinChaos.core.utils.CompatUtils;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import org.bukkit.Material;
@@ -29,6 +30,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 public class Stackable implements Listener {
@@ -41,6 +43,8 @@ public class Stackable implements Listener {
     @EventHandler(ignoreCancelled = true)
     private void onClickStackable(InventoryClickEvent event) {
         final Player player = (Player) event.getWhoClicked();
+        final Inventory topInventory = CompatUtils.getTopInventory(player);
+        final Inventory bottomInventory = CompatUtils.getBottomInventory(player);
         final InventoryAction action = event.getAction();
         final ItemStack cursorItem = event.getCursor();
         final int rawSlot = event.getRawSlot();
@@ -88,9 +92,9 @@ public class Stackable implements Listener {
                     }
                 }
             } else if (itemMap != null) {
-                if (rawSlot >= player.getOpenInventory().getTopInventory().getSize()) {
-                    for (int i = 0; i < player.getOpenInventory().getTopInventory().getSize(); i++) {
-                        final ItemStack item = player.getOpenInventory().getTopInventory().getItem(i);
+                if (rawSlot >= topInventory.getSize()) {
+                    for (int i = 0; i < topInventory.getSize(); i++) {
+                        final ItemStack item = topInventory.getItem(i);
                         if (item != null && itemMap.isSimilar(player, item)) {
                             REMAINING_STACK_SIZE = ItemHandler.stackItems(player, event.getCurrentItem(), item, slot, false);
                             if (REMAINING_STACK_SIZE <= 0) {
@@ -99,8 +103,8 @@ public class Stackable implements Listener {
                         }
                     }
                 } else {
-                    for (int i = 0; i < player.getOpenInventory().getBottomInventory().getSize(); i++) {
-                        final ItemStack item = player.getOpenInventory().getBottomInventory().getItem(i);
+                    for (int i = 0; i < bottomInventory.getSize(); i++) {
+                        final ItemStack item = bottomInventory.getItem(i);
                         if (item != null && itemMap.isSimilar(player, item)) {
                             REMAINING_STACK_SIZE = ItemHandler.stackItems(player, event.getCurrentItem(), item, slot, true);
                             if (REMAINING_STACK_SIZE <= 0) {
@@ -118,8 +122,8 @@ public class Stackable implements Listener {
             final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(cursorItem);
             if (itemMap != null && !ItemUtilities.getUtilities().isAllowed(player, cursorItem, "stackable")) {
                 event.setCancelled(true);
-                player.getOpenInventory().setItem(rawSlot, cursorItem.clone());
-                player.getOpenInventory().setCursor(new ItemStack(Material.AIR));
+                CompatUtils.setItem(player, cursorItem.clone(), rawSlot);
+                CompatUtils.setCursor(player, new ItemStack(Material.AIR));
             }
         } else if (action == InventoryAction.COLLECT_TO_CURSOR && !ItemUtilities.getUtilities().isAllowed(player, cursorItem, "stackable")) {
             final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(cursorItem);
@@ -134,8 +138,8 @@ public class Stackable implements Listener {
                         }
                     }
                 }
-                for (int i = 0; i < player.getOpenInventory().getTopInventory().getSize(); i++) {
-                    final ItemStack item = player.getOpenInventory().getTopInventory().getItem(i);
+                for (int i = 0; i < topInventory.getSize(); i++) {
+                    final ItemStack item = topInventory.getItem(i);
                     if (item != null && itemMap.isSimilar(player, item)) {
                         if (cursorItem.getAmount() == 64) {
                             break;

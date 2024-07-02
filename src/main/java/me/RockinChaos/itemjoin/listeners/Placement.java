@@ -70,11 +70,12 @@ public class Placement implements Listener {
                 ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item);
                 item.setAmount(itemMap.getCount(player));
                 SchedulerUtils.run(() -> {
+                    final boolean isCraftingInv = PlayerHandler.isCraftingInv(player);
                     if (StringUtils.containsIgnoreCase(item.getType().name(), "WATER") || StringUtils.containsIgnoreCase(item.getType().name(), "LAVA") || item.getType().name().equalsIgnoreCase("BUCKET")
                             || StringUtils.containsIgnoreCase(item.getType().name(), "POTION")) {
                         if (player.getInventory().getHeldItemSlot() == slot) {
                             PlayerHandler.setMainHandItem(player, item);
-                        } else if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
+                        } else if (isCraftingInv) {
                             player.getInventory().setItem(slot, item);
                         }
                     } else {
@@ -84,7 +85,7 @@ public class Placement implements Listener {
                                 if (Objects.equals(event.getHand(), EquipmentSlot.HAND)) {
                                     if (player.getInventory().getHeldItemSlot() == slot) {
                                         PlayerHandler.setMainHandItem(player, item);
-                                    } else if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
+                                    } else if (isCraftingInv) {
                                         player.getInventory().setItem(slot, item);
                                     }
                                 } else if (Objects.equals(event.getHand(), EquipmentSlot.OFF_HAND)) {
@@ -93,7 +94,7 @@ public class Placement implements Listener {
                             } else {
                                 if (player.getInventory().getHeldItemSlot() == slot) {
                                     PlayerHandler.setMainHandItem(player, item);
-                                } else if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
+                                } else if (isCraftingInv) {
                                     player.getInventory().setItem(slot, item);
                                 }
                             }

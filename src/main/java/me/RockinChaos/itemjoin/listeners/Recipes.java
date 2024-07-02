@@ -18,6 +18,7 @@
 package me.RockinChaos.itemjoin.listeners;
 
 import me.RockinChaos.core.handlers.PlayerHandler;
+import me.RockinChaos.core.utils.CompatUtils;
 import me.RockinChaos.core.utils.ServerUtils;
 import me.RockinChaos.core.utils.StringUtils;
 import me.RockinChaos.core.utils.api.LegacyAPI;
@@ -35,7 +36,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -50,14 +50,15 @@ public class Recipes implements Listener {
      */
     @EventHandler(ignoreCancelled = true)
     private void onPlayerCraft(final PrepareItemCraftEvent event) {
-        Player player = (Player) event.getInventory().getHolder();
+        final Player player = (Player) event.getInventory().getHolder();
         if (player != null) {
-            for (int i = 0; i < player.getOpenInventory().getTopInventory().getSize(); i++) {
-                final ItemStack item = player.getOpenInventory().getTopInventory().getItem(i);
+            final Inventory topInventory = CompatUtils.getTopInventory(player);
+            for (int i = 0; i < topInventory.getSize(); i++) {
+                final ItemStack item = topInventory.getItem(i);
                 if (item != null && item.getType() != Material.AIR) {
                     if (!ItemUtilities.getUtilities().isAllowed(player, item, "item-craftable")) {
                         ItemStack reAdd = item.clone();
-                        player.getOpenInventory().getTopInventory().setItem(i, null);
+                        topInventory.setItem(i, null);
                         player.getInventory().addItem(reAdd);
                         PlayerHandler.updateInventory(player, 1L);
                         break;
@@ -101,7 +102,7 @@ public class Recipes implements Listener {
     public void onPrepareRecipe(final PrepareItemCraftEvent event) {
         if (event.getRecipe() != null) {
             if (event.getRecipe().getResult().getType() != Material.AIR) {
-                final Player player = (Player) event.getView().getPlayer();
+                final Player player = CompatUtils.getPlayer(event.getView());
                 final List<ItemMap> mapList = new ArrayList<>();
                 final ItemMap checkMap = ItemUtilities.getUtilities().getItemMap(event.getRecipe().getResult());
                 if (checkMap != null && checkMap.isRecipe()) {
@@ -129,12 +130,12 @@ public class Recipes implements Listener {
                 }
                 if (!mapList.isEmpty()) {
                     for (ItemMap itemMap : mapList) {
-                        if (this.handleRecipe(itemMap, event.getInventory(), inventoryClone, event.getView(), false, false, null)) {
+                        if (this.handleRecipe(itemMap, event.getInventory(), inventoryClone, player, false, false, null)) {
                             break;
                         }
                     }
                 } else {
-                    this.handleRecipe(checkMap, event.getInventory(), inventoryClone, event.getView(), false, false, null);
+                    this.handleRecipe(checkMap, event.getInventory(), inventoryClone, player, false, false, null);
                 }
             }
         }
@@ -155,14 +156,14 @@ public class Recipes implements Listener {
                 final ItemStack item = event.getInventory().getItem(i);
                 if (setSlot >= 9) {
                     break;
-                } else if (!checkMap.isSimilar((Player) event.getView().getPlayer(), item)) {
+                } else if (!checkMap.isSimilar(CompatUtils.getPlayer(event.getView()), item)) {
                     if (item != null) {
                         inventoryClone.setItem(setSlot, item.clone());
                     }
                     setSlot++;
                 }
             }
-            this.handleRecipe(checkMap, event.getInventory(), inventoryClone, event.getView(), true, event.isShiftClick(), event);
+            this.handleRecipe(checkMap, event.getInventory(), inventoryClone, CompatUtils.getPlayer(event.getView()), true, event.isShiftClick(), event);
         }
     }
 
@@ -172,13 +173,13 @@ public class Recipes implements Listener {
      * @param itemMap        - The itemMap being checked.
      * @param craftInventory - The direct CraftingInventory reference.
      * @param inventoryClone - The clone of CraftingInventory reference.
-     * @param view           - The inventory view of the CraftingInventory.
+     * @param player         - The player being referenced.
      * @param isCrafted      - If the event is a Crafted Event or Prepared Event.
      * @param isShiftClick   - If the Player is Shift-Clicking to craft.
      * @return If the loop should break.
      */
-    private boolean handleRecipe(final ItemMap itemMap, final CraftingInventory craftInventory, final Inventory inventoryClone, final InventoryView view, final boolean isCrafted, final boolean isShiftClick, final CraftItemEvent event) {
-        if (!itemMap.hasPermission((Player) view.getPlayer(), view.getPlayer().getWorld())) {
+    private boolean handleRecipe(final ItemMap itemMap, final CraftingInventory craftInventory, final Inventory inventoryClone, final Player player, final boolean isCrafted, final boolean isShiftClick, final CraftItemEvent event) {
+        if (!itemMap.hasPermission(player, player.getWorld())) {
             craftInventory.setResult(new ItemStack(Material.AIR));
         } else {
             final ItemStack result = (craftInventory.getResult() != null ? craftInventory.getResult().clone() : new ItemStack(Material.AIR));
@@ -196,10 +197,10 @@ public class Recipes implements Listener {
                         }
                     }
                     if (!isCrafted) {
-                        confirmations = this.getConfirmations(itemMap, (Player) view.getPlayer(), inventoryClone);
+                        confirmations = this.getConfirmations(itemMap, player, inventoryClone);
                     } else {
                         boolean cycleShift = true;
-                        while (this.getConfirmations(itemMap, (Player) view.getPlayer(), inventoryClone) == ingredientSize && cycleShift) {
+                        while (this.getConfirmations(itemMap, player, inventoryClone) == ingredientSize && cycleShift) {
                             cycleShift = isShiftClick;
                             for (int i = 0; i < inventoryClone.getSize(); i++) {
                                 final ItemStack item = inventoryClone.getItem(i);
@@ -211,7 +212,7 @@ public class Recipes implements Listener {
                                                 && itemRecipe.getMaterial().equals(item.getType())
                                                 && (!isLegacy || (LegacyAPI.getDataValue(item) == itemRecipe.getData()))))
                                                 || (ingredMap != null
-                                                && ingredMap.isSimilar((Player) view.getPlayer(), item)))
+                                                && ingredMap.isSimilar(player, item)))
                                                 && item.getAmount() >= itemRecipe.getCount()) {
                                             int removal = (item.getAmount() - itemRecipe.getCount());
                                             if (removal <= 0) {
@@ -233,7 +234,7 @@ public class Recipes implements Listener {
                         }
                     }
                     if (!isCrafted && confirmations == ingredientSize) {
-                        craftInventory.setResult(itemMap.getItem((Player) view.getPlayer()));
+                        craftInventory.setResult(itemMap.getItem(player));
                         return true;
                     } else if (!isCrafted) {
                         craftInventory.setResult(new ItemStack(Material.AIR));
@@ -244,13 +245,13 @@ public class Recipes implements Listener {
                         event.setCancelled(true);
                         if (isShiftClick) {
                             success = true;
-                            view.getPlayer().getInventory().addItem(result);
-                        } else if (view.getPlayer().getOpenInventory().getCursor() != null && view.getPlayer().getOpenInventory().getCursor().isSimilar(result)) {
+                            player.getInventory().addItem(result);
+                        } else if (CompatUtils.getCursor(player).getType() != Material.AIR && CompatUtils.getCursor(player).isSimilar(result)) {
                             success = true;
-                            view.getPlayer().getOpenInventory().getCursor().setAmount((view.getPlayer().getOpenInventory().getCursor().getAmount() + result.getAmount()));
+                            CompatUtils.getCursor(player).setAmount(CompatUtils.getCursor(player).getAmount() + result.getAmount());
                         } else {
                             success = true;
-                            view.getPlayer().getOpenInventory().setCursor(result);
+                            CompatUtils.setCursor(player, result);
                         }
                     }
                 }

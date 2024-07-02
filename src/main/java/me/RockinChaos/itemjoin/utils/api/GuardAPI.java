@@ -19,6 +19,7 @@ package me.RockinChaos.itemjoin.utils.api;
 
 import me.RockinChaos.core.handlers.ItemHandler;
 import me.RockinChaos.core.handlers.PlayerHandler;
+import me.RockinChaos.core.utils.CompatUtils;
 import me.RockinChaos.core.utils.StringUtils;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.item.ItemMap;
@@ -56,7 +57,7 @@ public class GuardAPI {
                 for (int k = 0; k < (!protectItems.isEmpty() ? protectItems.size() : 1); k++) {
                     if (i <= 41 && inventory.getSize() >= i && ItemUtilities.getUtilities().canClear(inventory.getItem(i), String.valueOf(i), k, clearType)) {
                         saveInventory.setItem(i, Objects.requireNonNull(inventory.getItem(i)).clone());
-                    } else if (i >= 42 && ItemUtilities.getUtilities().canClear(craftView.getItem(i - 42), "CRAFTING[" + (i - 42) + "]", k, clearType) && PlayerHandler.isCraftingInv(player.getOpenInventory())) {
+                    } else if (i >= 42 && ItemUtilities.getUtilities().canClear(craftView.getItem(i - 42), "CRAFTING[" + (i - 42) + "]", k, clearType) && PlayerHandler.isCraftingInv(player)) {
                         saveInventory.setItem(i, Objects.requireNonNull(craftView.getItem(i - 42)).clone());
                     }
                 }
@@ -80,8 +81,8 @@ public class GuardAPI {
                 if (inventory != null && inventory.getItem(i) != null && Objects.requireNonNull(inventory.getItem(i)).getType() != Material.AIR) {
                     if (i <= 41) {
                         player.getInventory().setItem(i, Objects.requireNonNull(inventory.getItem(i)).clone());
-                    } else if (PlayerHandler.isCraftingInv(player.getOpenInventory())) {
-                        player.getOpenInventory().getTopInventory().setItem(i - 42, Objects.requireNonNull(inventory.getItem(i)).clone());
+                    } else if (PlayerHandler.isCraftingInv(player)) {
+                        CompatUtils.getTopInventory(player).setItem(i - 42, Objects.requireNonNull(inventory.getItem(i)).clone());
                         PlayerHandler.updateInventory(player, 1L);
                     }
                 }
