@@ -547,7 +547,9 @@ public class ItemUtilities {
                 }
             }
         }
-        ServerUtils.logDebug("{ItemMap} " + player.getName() + " already has item: " + itemMap.getConfigName() + ".");
+        if (type != TriggerType.REGION_ENTER && type != TriggerType.REGION_LEAVE) {
+            ServerUtils.logDebug("{ItemMap} " + player.getName() + " already has item: " + itemMap.getConfigName() + ".");
+        }
         return false;
     }
 
