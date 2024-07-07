@@ -5077,7 +5077,7 @@ public class Menu {
                 itemMap.setSplittable(!itemMap.isSplittable());
                 flagPane(player, itemMap);
             }));
-            flagPane.addButton(new Button(fillerPaneBItem), 31);
+            flagPane.addButton(new Button(fillerPaneBItem), 30);
         });
         flagPane.open(player);
     }
