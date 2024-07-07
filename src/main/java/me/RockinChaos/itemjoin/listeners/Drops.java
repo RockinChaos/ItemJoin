@@ -190,7 +190,7 @@ public class Drops implements Listener {
                                 break;
                             }
                         }
-                        int setSlot = slot;
+                        final int setSlot = slot;
                         SchedulerUtils.run(() -> {
                             if (setSlot == -1) {
                                 player.getInventory().addItem(keepItem);
