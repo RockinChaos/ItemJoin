@@ -18,7 +18,9 @@
 package me.RockinChaos.itemjoin.listeners;
 
 import me.RockinChaos.core.handlers.PlayerHandler;
+import me.RockinChaos.core.utils.SchedulerUtils;
 import me.RockinChaos.core.utils.ServerUtils;
+import me.RockinChaos.core.utils.types.Clear;
 import me.RockinChaos.core.utils.types.Hats;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.item.ItemMap;
@@ -29,6 +31,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.Objects;
 
 public class Processes implements Listener {
 
@@ -53,6 +57,30 @@ public class Processes implements Listener {
                 placeHolders[3] = itemMap.getConfigName();
                 placeHolders[9] = command;
                 ItemJoin.getCore().getLang().sendLangMessage("commands.item.badCommand", player, placeHolders);
+            }
+        }
+    }
+
+    /**
+     * Prevents the player from clearing the custom item.
+     *
+     * @param event - PlayerCommandPreprocessEvent
+     */
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void onPlayerCommand(final PlayerCommandPreprocessEvent event) {
+        final String command = event.getMessage();
+        final Player player = event.getPlayer();
+        if (Clear.isClear(command)) {
+            for (int slot = 0; slot < player.getInventory().getSize(); slot++) {
+                final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(player.getInventory().getItem(slot));
+                if (itemMap != null && itemMap.isAllowedItem(player, player.getInventory().getItem(slot), "no-clear")) {
+                    final ItemStack keepItem = Objects.requireNonNull(player.getInventory().getItem(slot)).clone();
+                    final int setSlot = slot;
+                    SchedulerUtils.run(() -> {
+                        player.getInventory().setItem(setSlot, keepItem);
+                        ServerUtils.logDebug("{Processes} " + player.getName() + " has triggered the NO-CLEAR itemflag for " + ItemUtilities.getUtilities().getItemMap(keepItem).getConfigName() + ".");
+                    });
+                }
             }
         }
     }

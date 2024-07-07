@@ -204,6 +204,7 @@ public class ItemMap implements Cloneable {
     private boolean autoRemove = false;
     private boolean stackable = false;
     private boolean notHat = false;
+    private boolean noClear = false;
     private boolean selectable = false;
     private boolean splittable = false;
     private boolean CreativeBypass = false;
@@ -476,6 +477,7 @@ public class ItemMap implements Cloneable {
             this.autoRemove = StringUtils.splitIgnoreCase(this.itemflags, "auto-remove", ",");
             this.stackable = StringUtils.splitIgnoreCase(this.itemflags, "stackable", ",");
             this.notHat = StringUtils.splitIgnoreCase(this.itemflags, "not-hat", ",");
+            this.noClear = StringUtils.splitIgnoreCase(this.itemflags, "no-clear", ",");
             this.selectable = StringUtils.splitIgnoreCase(this.itemflags, "selectable", ",");
             this.splittable = StringUtils.splitIgnoreCase(this.itemflags, "splittable", ",");
             this.animate = StringUtils.splitIgnoreCase(this.itemflags, "animate", ",");
@@ -3404,6 +3406,24 @@ public class ItemMap implements Cloneable {
     }
 
     /**
+     * Checks if the No Clear Flag is enabled.
+     *
+     * @return If it is enabled.
+     */
+    public boolean isNoClear() {
+        return this.noClear;
+    }
+
+    /**
+     * Sets the No Clear Flag.
+     *
+     * @param bool - The value to be set.
+     */
+    public void setNoClear(final boolean bool) {
+        this.noClear = bool;
+    }
+
+    /**
      * Checks if the Selectable Flag is enabled.
      *
      * @return If it is enabled.
@@ -3850,6 +3870,8 @@ public class ItemMap implements Cloneable {
                 return stackable;
             } else if (findFlag.equals("not-hat")) {
                 return notHat;
+            }  else if (findFlag.equals("no-clear")) {
+                return noClear;
             } else if (findFlag.equals("selectable")) {
                 return selectable;
             } else if (findFlag.equals("splittable")) {
@@ -4202,7 +4224,7 @@ public class ItemMap implements Cloneable {
                         slot = EquipmentSlot.valueOf(ItemHandler.getDesignatedSlot(this.material).toUpperCase());
                     }
                     AttributeModifier modifier;
-                    if (ServerUtils.hasSpecificUpdate("1_21")) {
+                    if (ServerUtils.hasSpecificUpdate("1_21")) { // still experimental...
                         modifier = new AttributeModifier(Objects.requireNonNull(NamespacedKey.fromString(attrib.toLowerCase().replace("_", "."))), value, AttributeModifier.Operation.ADD_NUMBER, slot.getGroup());
                     } else {
                         modifier = LegacyAPI.getAttribute((this.configName + attrib), attrib, value, slot);

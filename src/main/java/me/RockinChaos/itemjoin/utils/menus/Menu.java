@@ -942,7 +942,7 @@ public class Menu {
             creatingPane.addButton(new Button(ItemHandler.getItem("REDSTONE", 1, false, false, "&b&lTriggers", "&7", "&7*When the players act upon these", "&7events, the item will be given.", "&9&lTRIGGERS: &a" +
                     (!StringUtils.nullCheck(itemMap.getTriggers()).equals("NONE") ? "&a" + triggersList : "NONE")), event -> triggerPane(player, itemMap)));
             creatingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "REDSTONE_TORCH" : "76"), 1, false, false, "&b&lPermission Node", "&7", "&7*Custom permission node that", "&7will be required by a permission", "&7plugin to receive the item.", "&7&lNote: &7Do NOT include",
-                    "&7any spaces or special characters", "&9&lPERMISSION-NODE: &a" + StringUtils.nullCheck(itemMap.getPermissionNode())), event -> {
+                    "&7any spaces or special characters.", "&7Setting this bypasses the", "&7config.yml Permissions Settings.", "&9&lPERMISSION-NODE: &a" + StringUtils.nullCheck(itemMap.getPermissionNode())), event -> {
                 if (!StringUtils.nullCheck(itemMap.getPermissionNode()).equals("NONE")) {
                     itemMap.setPerm(null);
                     creatingPane(player, itemMap);
@@ -4796,6 +4796,13 @@ public class Menu {
                 itemMap.setNotHat(!itemMap.isNotHat());
                 flagPane(player, itemMap);
             }));
+            flagPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "LAVA_BUCKET" : "327"), 1, itemMap.isNoClear(), false, "&a&l&nNo Clear", "&7",
+                    "&a&lTrue&f:&7 Prevents the item from being cleared", "&7using the command /clear from plugins", "&7such as Essentials or CMI.", "&7",
+                    "&c&lFalse&f:&7 Allows the item to be cleared.", "&7",
+                    "&9&lENABLED: &a" + (itemMap.isNoClear() + "").toUpperCase()), event -> {
+                itemMap.setNoClear(!itemMap.isNoClear());
+                flagPane(player, itemMap);
+            }));
             flagPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "POPPY" : "38"), 1, itemMap.isInventoryClose(), false, "&a&l&nInventory Close", "&7",
                     "&a&lTrue&f:&7 Closes the players current", "&7inventory when clicking the item.", "&7",
                     "&c&lFalse&f:&7 The current inventory will not", "&7be closed when clicking the item.", "&7",
@@ -5105,6 +5112,9 @@ public class Menu {
         }
         if (itemMap.isNotHat()) {
             itemflags += "NOT-HAT, ";
+        }
+        if (itemMap.isNoClear()) {
+            itemflags += "NO-CLEAR, ";
         }
         if (itemMap.isFlagsInfo()) {
             itemflags += "HIDE-FLAGS, ";

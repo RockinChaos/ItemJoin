@@ -598,6 +598,7 @@ public class PluginData {
 
     /**
      * Registers Events that are utilized by the specified ItemMap.
+     * Used to increase performance, registering only what is needed for the defined features.
      *
      * @param itemMap - The ItemMap that needs its events registered.
      */
@@ -683,7 +684,7 @@ public class PluginData {
         if (itemMap.isSplittable() && StringUtils.isRegistered(Splittable.class.getSimpleName())) {
             ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new Splittable(), ItemJoin.getCore().getPlugin());
         }
-        if (itemMap.isNotHat() && StringUtils.isRegistered(Processes.class.getSimpleName())) {
+        if ((itemMap.isNotHat() || itemMap.isNoClear()) && StringUtils.isRegistered(Processes.class.getSimpleName())) {
             ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new Processes(), ItemJoin.getCore().getPlugin());
         }
         if ((itemMap.isDeathKeepable() || itemMap.isDeathDroppable() || itemMap.isSelfDroppable()) && StringUtils.isRegistered(Drops.class.getSimpleName())) {
