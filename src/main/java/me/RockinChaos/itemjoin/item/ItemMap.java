@@ -237,6 +237,7 @@ public class ItemMap implements Cloneable {
     private String permissionNode = null;
     private boolean permissionNeeded = false;
     private boolean opPermissionNeeded = false;
+    private boolean cmdPermissionNeeded = false;
 
     private List<String> contents = new ArrayList<>();
 
@@ -291,8 +292,9 @@ public class ItemMap implements Cloneable {
             this.setTogglePerm(this.nodeLocation.getString(".toggle-permission"));
             this.setToggleMessage(this.nodeLocation.getString(".toggle-message"));
             this.setPerm(this.nodeLocation.getString(".permission-node"));
-            this.setPermissionNeeded(ItemJoin.getCore().getConfig("config.yml").getBoolean("Permissions.Obtain-Items"));
-            this.setOPPermissionNeeded(ItemJoin.getCore().getConfig("config.yml").getBoolean("Permissions.Obtain-Items-OP"));
+            this.setPermissionNeeded(this.permissionNode != null || ItemJoin.getCore().getConfig("config.yml").getBoolean("Permissions.Obtain-Items"));
+            this.setOPPermissionNeeded(this.permissionNode != null || ItemJoin.getCore().getConfig("config.yml").getBoolean("Permissions.Obtain-Items-OP"));
+            this.setCMDPermissionNeeded(this.permissionNode != null || ItemJoin.getCore().getConfig("config.yml").getBoolean("Permissions.Commands-Get"));
         }
     }
 
@@ -3039,6 +3041,24 @@ public class ItemMap implements Cloneable {
      */
     public void setOPPermissionNeeded(final boolean bool) {
         this.opPermissionNeeded = bool;
+    }
+
+    /**
+     * Checks if Command Permissions are Required.
+     *
+     * @return If Command Permissions are Required.
+     */
+    public boolean isCMDPermissionNeeded() {
+        return this.cmdPermissionNeeded;
+    }
+
+    /**
+     * Sets the Command Permissions to be Required.
+     *
+     * @param bool - The value to be set.
+     */
+    public void setCMDPermissionNeeded(final boolean bool) {
+        this.cmdPermissionNeeded = bool;
     }
 
     /**

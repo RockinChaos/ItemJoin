@@ -39,7 +39,6 @@ items:
     enchantment: FIRE_ASPECT:3, DAMAGE_ALL:5, DAMAGE_UNDEAD:5, KNOCKBACK:8
     itemflags: unbreakable, hide-flags, self-drops, death-drops, CreativeBypass
     triggers: join, respawn, world-switch, region-enter
-    permission-node: itemjoin.ultra
     enabled-regions: region1, region2
     enabled-worlds: world, world_nether, world_the_end
   map-item:
@@ -52,7 +51,6 @@ items:
       - '&7Directions or custom maps.'
     itemflags: item-store, unbreakable, hide-flags, death-drops, self-drops, CreativeBypass
     triggers: join, respawn, world-switch
-    permission-node: itemjoin.map
     enabled-worlds: ALL
   gamemode-token:
     id: FIREWORK_STAR
@@ -74,7 +72,6 @@ items:
     commands-cooldown: 2
     itemflags: item-store, death-drops, self-drops, hide-flags, disposable
     triggers: join, respawn, world-switch
-    permission-node: itemjoin.token
     enabled-worlds: world, world_nether, world_the_end
   book-item:
     id: WRITTEN_BOOK
@@ -130,7 +127,6 @@ items:
         - 'raw: ["",{"text":"Visit Plugin Page!","color":"gold","clickEvent":{"action":"open_url","value":"https://www.spigotmc.org/resources/itemjoin.12661/"},"hoverEvent":{"action":"show_text","value":{"text":"","extra":[{"text":"Click to visit the spigot page.","color":"green"}]}}}]'
     itemflags: death-drops, self-drops
     triggers: join, respawn
-    permission-node: itemjoin.book
     enabled-worlds: world
   profile-item:
     id: PLAYER_HEAD
@@ -211,7 +207,6 @@ items:
     enchantment: FIRE_ASPECT:3
     itemflags: inventory-modify, hide-flags, death-drops, self-drops
     triggers: join, respawn, world-switch
-    permission-node: itemjoin.bungee
     enabled-worlds: ALL
   potion-arrow:
     id: TIPPED_ARROW
@@ -348,6 +343,7 @@ items:
       - 'DIAMOND_ORE:0.5'
       - 'GOLD_ORE:0.19'
     triggers: DISABLED
+    permission-node: itemjoin.drop.sword
     enabled-worlds: world, world_the_end
   recipe-item:
     id: BEDROCK
@@ -364,3 +360,4 @@ items:
       - 'I:IRON_INGOT:#3'
       - 'D:DIAMOND'
     triggers: DISABLED
+    permission-node: itemjoin.recipe

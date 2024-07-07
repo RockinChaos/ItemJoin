@@ -446,6 +446,8 @@ public class ChatExecutor implements CommandExecutor {
     private void permissions(final CommandSender sender, final int page) {
         ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
         int maxPage = PluginData.getInfo().getPermissionPages();
+        final boolean opPermissionRequired = ItemJoin.getCore().getConfig("config.yml").getBoolean("Permissions.Obtain-Items-OP");
+        final boolean permissionRequired = ItemJoin.getCore().getConfig("config.yml").getBoolean("Permissions.Obtain-Items");
         if (page == 1) {
             ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.*") ? "&a[✔]" : "&c[✘]") + " ItemJoin.*");
             ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.all") ? "&a[✔]" : "&c[✘]") + " ItemJoin.All");
@@ -466,10 +468,10 @@ public class ChatExecutor implements CommandExecutor {
             ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.bypass.inventorymodify") ? "&a[✔]" : "&c[✘]") + " ItemJoin.Bypass.InventoryModify");
             for (World world : Bukkit.getWorlds()) {
                 ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin." + world.getName() + ".*")
-                        && ((ItemJoin.getCore().getConfig("config.yml").getBoolean("Permissions.Obtain-Items-OP") && sender.isOp()
-                        ? sender.isPermissionSet("itemjoin." + world.getName() + ".*") : !ItemJoin.getCore().getConfig("config.yml").getBoolean("Permissions.Obtain-Items-OP"))
-                        || (ItemJoin.getCore().getConfig("config.yml").getBoolean("Permissions.Obtain-Items") && !sender.isOp()
-                        ? sender.isPermissionSet("itemjoin." + world.getName() + ".*") : !ItemJoin.getCore().getConfig("config.yml").getBoolean("Permissions.Obtain-Items")))
+                        && ((opPermissionRequired && sender.isOp()
+                        ? sender.isPermissionSet("itemjoin." + world.getName() + ".*") : !opPermissionRequired)
+                        || (permissionRequired && !sender.isOp()
+                        ? sender.isPermissionSet("itemjoin." + world.getName() + ".*") : !permissionRequired))
                         ? "&a[✔]" : "&c[✘]") + " ItemJoin." + world.getName() + ".*");
             }
         } else if (page != 0) {
@@ -748,8 +750,9 @@ public class ChatExecutor implements CommandExecutor {
             placeHolders[11] = (amount == 0 ? "&lAll" : Integer.toString(amount));
             for (ItemMap itemMap : ItemUtilities.getUtilities().getItems()) {
                 if (itemMap.getConfigName().equalsIgnoreCase(args[1])) {
-                    if (remove || !PermissionsHandler.permissionEnabled("Permissions.Commands-Get") || (itemMap.hasPermission(argsPlayer, argsPlayer.getWorld()) && PermissionsHandler.permissionEnabled("Permissions.Commands-Get"))) {
-                        if ((remove && itemMap.hasItem(argsPlayer, true)) || (!remove && (itemMap.conditionMet(argsPlayer, "trigger-conditions", true, false) && (ItemUtilities.getUtilities().canOverwrite(argsPlayer, itemMap) && (amount != 0 || itemMap.isAlwaysGive() || !itemMap.hasItem(argsPlayer, false)))))) {
+                    if (remove || !itemMap.isCMDPermissionNeeded() || itemMap.hasPermission(argsPlayer, argsPlayer.getWorld())) {
+                        final boolean canGive = (!remove && (itemMap.conditionMet(argsPlayer, "trigger-conditions", true, false) && (amount != 0 || itemMap.isAlwaysGive() || !itemMap.hasItem(argsPlayer, false))));
+                        if ((remove && itemMap.hasItem(argsPlayer, true)) || (canGive && ItemUtilities.getUtilities().canOverwrite(argsPlayer, itemMap))) {
                             if (StringUtils.getSlotConversion(itemMap.getSlot()) != 0 && PlayerHandler.isCraftingInv(argsPlayer)) {
                                 final ItemStack topItem = CompatUtils.getTopInventory(argsPlayer).getItem(0);
                                 if (topItem != null && !topItem.getType().equals(Material.AIR)) {
@@ -825,7 +828,8 @@ public class ChatExecutor implements CommandExecutor {
         }
         final Map<String, Integer> arbitraryMap = new HashMap<>();
         for (ItemMap itemMap : ItemUtilities.getUtilities().getItems()) {
-            if ((!arbitraryMap.containsKey(itemMap.getConfigName()) || arbitraryMap.get(itemMap.getConfigName()) != 0) && (remove || itemMap.inWorld(argsPlayer.getWorld()) && (probable != null && itemMap.getConfigName().equals(probable.getConfigName()) || itemMap.getProbability() == -1) && ItemUtilities.getUtilities().canOverwrite(argsPlayer, itemMap) && (!PermissionsHandler.permissionEnabled("Permissions.Commands-Get") || itemMap.hasPermission(argsPlayer, argsPlayer.getWorld()) && PermissionsHandler.permissionEnabled("Permissions.Commands-Get")))) {
+            final boolean isAllowed = (!arbitraryMap.containsKey(itemMap.getConfigName()) || arbitraryMap.get(itemMap.getConfigName()) != 0) && (remove || itemMap.inWorld(argsPlayer.getWorld()) && (probable != null && itemMap.getConfigName().equals(probable.getConfigName()) || itemMap.getProbability() == -1) && (!itemMap.isCMDPermissionNeeded() || itemMap.hasPermission(argsPlayer, argsPlayer.getWorld())));
+            if (isAllowed && (remove || ItemUtilities.getUtilities().canOverwrite(argsPlayer, itemMap))) {
                 if (itemMap.getSlot().equalsIgnoreCase("ARBITRARY") && !arbitraryMap.containsKey(itemMap.getConfigName())) {
                     int arbitrary = ItemUtilities.getUtilities().getArbitrary(itemMap);
                     int count = 0;
