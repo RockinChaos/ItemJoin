@@ -674,10 +674,11 @@ public class ChatExecutor implements CommandExecutor {
                     }
                     arbitraryMap.put(itemMap.getConfigName(), (arbitrary - count));
                 }
-                String customName = StringUtils.translateLayout(itemMap.getCustomName(), argsPlayer);
+                final String customName = StringUtils.translateLayout(itemMap.getCustomName(), argsPlayer);
+                final boolean canGive = (!remove && (itemMap.conditionMet(argsPlayer, "trigger-conditions", true, false) && (amount != 0 || itemMap.isAlwaysGive() || !itemMap.hasItem(argsPlayer, false))));
                 placeHolders[3] = customName;
-                if ((remove && itemMap.hasItem(argsPlayer, true)) || (!remove && (itemMap.conditionMet(argsPlayer, "trigger-conditions", true, false) && (ItemUtilities.getUtilities().canOverwrite(argsPlayer, itemMap) && (amount != 0 || itemMap.isAlwaysGive() || !itemMap.hasItem(argsPlayer, false)))))) {
-                    if (remove || !PermissionsHandler.permissionEnabled("Permissions.Commands-Get") || (itemMap.hasPermission(argsPlayer, argsPlayer.getWorld()) && PermissionsHandler.permissionEnabled("Permissions.Commands-Get"))) {
+                if ((remove && itemMap.hasItem(argsPlayer, true)) || (canGive && ItemUtilities.getUtilities().canOverwrite(argsPlayer, itemMap))) {
+                    if (remove || !itemMap.isCMDPermissionNeeded() || itemMap.hasPermission(argsPlayer, argsPlayer.getWorld())) {
                         if (itemMap.isAlwaysGive() && !StringUtils.isInt(args[args.length - 1])) {
                             amount = itemMap.getCount(argsPlayer);
                         }
@@ -711,12 +712,32 @@ public class ChatExecutor implements CommandExecutor {
                     }
                 } else if (!messageSent && (args.length >= 3 && !StringUtils.isInt(args[2]) && !sender.getName().equalsIgnoreCase(argsPlayer.getName()))) {
                     placeHolders[1] = sender.getName();
-                    ItemJoin.getCore().getLang().sendLangMessage("commands." + (remove ? "remove.targetTriedRemoval" : "get.targetTriedGive"), argsPlayer, placeHolders);
-                    placeHolders[1] = argsPlayer.getName();
-                    ItemJoin.getCore().getLang().sendLangMessage("commands." + (remove ? "remove.targetFailedInventory" : "get.targetFailedInventory"), sender, placeHolders);
+                    if (canGive) {
+                        placeHolders[7] = String.valueOf(1);
+                        if (argsPlayer.getInventory().firstEmpty() == -1) {
+                            ItemJoin.getCore().getLang().sendLangMessage("general.failedInventory", argsPlayer, placeHolders);
+                        } else {
+                            ItemJoin.getCore().getLang().sendLangMessage("general.failedOverwrite", argsPlayer, placeHolders);
+                        }
+                        placeHolders[1] = argsPlayer.getName();
+                        ItemJoin.getCore().getLang().sendLangMessage("commands.get.targetNoPermission", sender, placeHolders);
+                    } else {
+                        ItemJoin.getCore().getLang().sendLangMessage("commands." + (remove ? "remove.targetTriedRemoval" : "get.targetTriedGive"), argsPlayer, placeHolders);
+                        placeHolders[1] = argsPlayer.getName();
+                        ItemJoin.getCore().getLang().sendLangMessage("commands." + (remove ? "remove.targetFailedInventory" : "get.targetFailedInventory"), sender, placeHolders);
+                    }
                 } else if (!messageSent) {
                     placeHolders[1] = sender.getName();
-                    ItemJoin.getCore().getLang().sendLangMessage("commands." + (remove ? "remove.failedInventory" : "get.failedInventory"), sender, placeHolders);
+                    if (canGive) {
+                        placeHolders[7] = String.valueOf(1);
+                        if (argsPlayer.getInventory().firstEmpty() == -1) {
+                            ItemJoin.getCore().getLang().sendLangMessage("general.failedInventory", argsPlayer, placeHolders);
+                        } else {
+                            ItemJoin.getCore().getLang().sendLangMessage("general.failedOverwrite", argsPlayer, placeHolders);
+                        }
+                    } else {
+                        ItemJoin.getCore().getLang().sendLangMessage("commands." + (remove ? "remove.failedInventory" : "get.failedInventory"), sender, placeHolders);
+                    }
                 }
                 if (!messageSent) {
                     messageSent = true;
@@ -773,7 +794,16 @@ public class ChatExecutor implements CommandExecutor {
                             PlayerHandler.quickCraftSave(argsPlayer);
                         } else if (!messageSent) {
                             if (!sender.getName().equalsIgnoreCase(argsPlayer.getName())) {
-                                ItemJoin.getCore().getLang().sendLangMessage("commands." + (remove ? "remove.targetTriedRemoval" : "get.targetTriedGive"), argsPlayer, placeHolders);
+                                if (canGive) {
+                                    placeHolders[7] = String.valueOf(1);
+                                    if (argsPlayer.getInventory().firstEmpty() == -1) {
+                                        ItemJoin.getCore().getLang().sendLangMessage("general.failedInventory", argsPlayer, placeHolders);
+                                    } else {
+                                        ItemJoin.getCore().getLang().sendLangMessage("general.failedOverwrite", argsPlayer, placeHolders);
+                                    }
+                                } else {
+                                    ItemJoin.getCore().getLang().sendLangMessage("commands." + (remove ? "remove.targetTriedRemoval" : "get.targetTriedGive"), argsPlayer, placeHolders);
+                                }
                             }
                             if (!failedPlayers.contains(argsPlayer.getName())) {
                                 failedPlayers.add(argsPlayer.getName());
@@ -810,6 +840,7 @@ public class ChatExecutor implements CommandExecutor {
             return;
         }
         boolean itemGiven = false;
+        int failedCount = 0;
         boolean failedPermissions = false;
         if (!remove && PlayerHandler.isCraftingInv(argsPlayer)) {
             final ItemStack topItem = CompatUtils.getTopInventory(argsPlayer).getItem(0);
@@ -859,9 +890,11 @@ public class ChatExecutor implements CommandExecutor {
                 }
             } else if (!failedPermissions && !itemMap.hasPermission(argsPlayer, argsPlayer.getWorld())) {
                 failedPermissions = true;
+            } else if (!remove && isAllowed && (!itemMap.hasItem(argsPlayer, false) || itemMap.isAlwaysGive())) {
+                failedCount++;
             }
         }
-        if (itemGiven) {
+        if (itemGiven && failedCount == 0) {
             failedPermissions = false;
             placeHolders[1] = sender.getName();
             ItemJoin.getCore().getLang().sendLangMessage("commands." + (remove ? "remove.removedYou_All" : "get.givenYou_All"), argsPlayer, placeHolders);
@@ -869,12 +902,23 @@ public class ChatExecutor implements CommandExecutor {
                 placeHolders[1] = argsPlayer.getName();
                 ItemJoin.getCore().getLang().sendLangMessage("commands." + (remove ? "remove.removedTarget_All" : "get.givenTarget_All"), sender, placeHolders);
             }
-        } else if (!failedPermissions) {
+        } else if (!failedPermissions && failedCount == 0) {
             placeHolders[1] = argsPlayer.getName();
             ItemJoin.getCore().getLang().sendLangMessage("commands." + (!sender.getName().equalsIgnoreCase(argsPlayer.getName()) ? (remove ? "remove.targetFailedInventory_All" : "get.targetFailedInventory_All") : (remove ? "remove.failedInventory_All" : "get.failedInventory_All")), sender, placeHolders);
             if (!sender.getName().equalsIgnoreCase(argsPlayer.getName())) {
                 placeHolders[1] = sender.getName();
                 ItemJoin.getCore().getLang().sendLangMessage("commands." + (remove ? "remove.targetTriedRemoval_All" : "get.targetFailedInventory_All"), argsPlayer, placeHolders);
+            }
+        } else if (failedCount > 0) {
+            placeHolders[7] = String.valueOf(failedCount);
+            if (argsPlayer.getInventory().firstEmpty() == -1) {
+                ItemJoin.getCore().getLang().sendLangMessage("general.failedInventory", argsPlayer, placeHolders);
+            } else {
+                ItemJoin.getCore().getLang().sendLangMessage("general.failedOverwrite", argsPlayer, placeHolders);
+            }
+            if (!sender.getName().equalsIgnoreCase(argsPlayer.getName())) {
+                placeHolders[1] = argsPlayer.getName();
+                ItemJoin.getCore().getLang().sendLangMessage("commands.get.targetNoPermission_All", sender, placeHolders);
             }
         }
         if (failedPermissions) {
