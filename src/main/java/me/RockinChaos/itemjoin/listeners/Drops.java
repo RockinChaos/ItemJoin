@@ -197,12 +197,14 @@ public class Drops implements Listener {
                             }
                         }
                         final int setSlot = slot;
+                        final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(keepItem);
                         SchedulerUtils.run(() -> {
                             if (setSlot == -1) {
                                 player.getInventory().addItem(keepItem);
                             } else {
                                 player.getInventory().setItem(setSlot, keepItem);
                             }
+                            itemMap.setAnimations(player);
                             ServerUtils.logDebug("{Drops} " + player.getName() + " has triggered the DEATH-KEEP itemflag for " + ItemUtilities.getUtilities().getItemMap(keepItem).getConfigName() + ".");
                         });
                     }
