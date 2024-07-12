@@ -19,7 +19,7 @@
 # Modifying the Version will cause this file to break and regenerate.
 config-Version: 8
 
-# At the moment, the available language translations are; English, Russian, French, Dutch, Spanish, Chinese, Traditional Chinese.
+# You can see the list of available languages here; https://github.com/RockinChaos/ItemJoin/wiki/Config.yml#language-english
 # If you want to contribute to a language translation please create a pull request; https://github.com/RockinChaos/ItemJoin/tree/master/src/main/resources/files/locales
 Language: 'English'
 
