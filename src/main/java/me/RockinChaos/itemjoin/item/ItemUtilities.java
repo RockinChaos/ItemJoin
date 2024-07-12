@@ -43,6 +43,7 @@ public class ItemUtilities {
     private final HashMap<String, ItemStatistics> itemStats = new HashMap<>();
     private List<ItemMap> items = new ArrayList<>();
     private List<ItemMap> craftingItems = new ArrayList<>();
+    private List<ItemMap> recipeItems = new ArrayList<>();
     private List<ItemMap> protectItems = new ArrayList<>();
 
     /**
@@ -1150,35 +1151,36 @@ public class ItemUtilities {
      * Clears any crafting recipes for the custom items.
      */
     public void clearRecipes() {
-        final List<Recipe> backupRecipes = new ArrayList<>();
-        final Iterator<Recipe> recipes = Bukkit.getServer().recipeIterator();
-        boolean itemRecipes = false;
-        while (recipes.hasNext()) {
-            final Recipe nextRecipe = recipes.next();
-            if (nextRecipe instanceof ShapedRecipe) {
-                final ShapedRecipe recipe = (ShapedRecipe) nextRecipe;
-                final ItemStack result = recipe.getResult();
-                boolean backupItem = true;
-                for (final ItemMap itemMap : this.getItems()) {
-                    if (itemMap.getIngredients() != null && !itemMap.getIngredients().isEmpty()) {
-                        itemRecipes = true;
-                        if (itemMap.isSimilar(null, result) || (ServerUtils.hasSpecificUpdate("1_12") && recipe.getKey().getKey().contains(itemMap.getConfigName()))) {
-                            backupItem = false;
+        if (!this.recipeItems.isEmpty()) {
+            final Iterator<Recipe> recipes = Bukkit.getServer().recipeIterator();
+            final List<Recipe> recipeList = new ArrayList<>();
+            if (!ServerUtils.hasSpecificUpdate("1_16")) {
+                Bukkit.getServer().recipeIterator().forEachRemaining(recipeList::add);
+            }
+            while (recipes.hasNext()) {
+                final Recipe nextRecipe = recipes.next();
+                if (nextRecipe instanceof ShapedRecipe) {
+                    final ItemStack result = nextRecipe.getResult();
+                    for (final ItemMap itemMap : this.recipeItems) {
+                        if (itemMap.isSimilar(null, result) || (ServerUtils.hasSpecificUpdate("1_12") && ((ShapedRecipe) nextRecipe).getKey().getKey().contains(itemMap.getConfigName()))) {
+                            if (recipeList.isEmpty()) {
+                                Bukkit.getServer().removeRecipe(((ShapedRecipe) nextRecipe).getKey());
+                            } else {
+                                recipeList.remove(nextRecipe);
+                            }
                         }
                     }
                 }
-                if (backupItem) {
-                    backupRecipes.add(recipe);
-                }
             }
-        }
-        if (itemRecipes) {
-            Bukkit.getServer().clearRecipes();
-            {
-                for (final Recipe recipe : backupRecipes) {
-                    try {
-                        Bukkit.getServer().addRecipe(recipe);
-                    } catch (IllegalStateException ignored) {
+
+            if (!recipeList.isEmpty()) {
+                Bukkit.getServer().clearRecipes();
+                {
+                    for (final Recipe recipe : recipeList) {
+                        try {
+                            Bukkit.getServer().addRecipe(recipe);
+                        } catch (IllegalStateException ignored) {
+                        }
                     }
                 }
             }
@@ -1215,6 +1217,17 @@ public class ItemUtilities {
     public void addCraftingItem(final ItemMap itemMap) {
         if (itemMap.isCraftingItem()) {
             this.craftingItems.add(itemMap);
+        }
+    }
+
+    /**
+     * Adds a new item to the rdecipe items List.
+     *
+     * @param itemMap - The recipe ItemMap to be added to the items List.
+     */
+    public void addRecipeItem(final ItemMap itemMap) {
+        if (itemMap.getIngredients() != null && !itemMap.getIngredients().isEmpty()) {
+            this.recipeItems.add(itemMap);
         }
     }
 
@@ -1263,6 +1276,7 @@ public class ItemUtilities {
         {
             this.items = new ArrayList<>();
             this.craftingItems = new ArrayList<>();
+            this.recipeItems = new ArrayList<>();
         }
     }
 

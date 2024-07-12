@@ -121,6 +121,7 @@ public class ItemDesigner {
 
                             itemMap.setContents();
                             ItemUtilities.getUtilities().addItem(itemMap);
+                            ItemUtilities.getUtilities().addRecipeItem(itemMap);
                             ItemUtilities.getUtilities().addCraftingItem(itemMap);
                             PluginData.getInfo().registerListeners(itemMap);
                         }
