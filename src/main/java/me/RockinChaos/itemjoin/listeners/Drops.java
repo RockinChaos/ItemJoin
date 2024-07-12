@@ -18,12 +18,14 @@
 package me.RockinChaos.itemjoin.listeners;
 
 import me.RockinChaos.core.handlers.PlayerHandler;
+import me.RockinChaos.core.utils.CompatUtils;
 import me.RockinChaos.core.utils.SchedulerUtils;
 import me.RockinChaos.core.utils.ServerUtils;
 import me.RockinChaos.core.utils.api.LegacyAPI;
 import me.RockinChaos.itemjoin.PluginData;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -32,12 +34,14 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Drops implements Listener {
 
@@ -96,8 +100,9 @@ public class Drops implements Listener {
         final Player player = event.getEntity();
         ItemUtilities.getUtilities().closeAnimations(player);
         if (PluginData.getInfo().isPreventString(player, "Death-Drops")) {
-            if (PluginData.getInfo().isPreventBypass(player) && LegacyAPI.getGameRule(player.getWorld(), "keepInventory")) {
-                event.getEntity().getInventory().clear();
+            if (PluginData.getInfo().isPreventBypass(player) && !LegacyAPI.hasGameRule(player.getWorld(), "keepInventory")) {
+                player.getInventory().clear();
+                CompatUtils.getTopInventory(player).clear();
                 event.getDrops().clear();
             }
         }
@@ -173,17 +178,18 @@ public class Drops implements Listener {
      */
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     private void onDeathDrops(PlayerDeathEvent event) {
-        Player player = event.getEntity();
+        final Player player = event.getEntity();
+        final Inventory topInventory = CompatUtils.getTopInventory(player);
         ItemUtilities.getUtilities().closeAnimations(player);
-        if (LegacyAPI.getGameRule(player.getWorld(), "keepInventory")) {
-            List<ItemStack> drops = new ArrayList<>(event.getDrops());
+        if (!LegacyAPI.hasGameRule(player.getWorld(), "keepInventory")) {
+            final List<ItemStack> drops = new ArrayList<>(event.getDrops());
             for (final ItemStack stack : drops) {
                 if (stack != null && (!ItemUtilities.getUtilities().isAllowed(player, stack, "death-drops") || !ItemUtilities.getUtilities().isAllowed(player, stack, "death-keep"))) {
                     if (!ItemUtilities.getUtilities().isAllowed(player, stack, "death-keep")) {
                         int slot = -1;
                         final ItemStack keepItem = stack.clone();
-                        for (int inventory = 0; inventory < event.getEntity().getInventory().getSize(); inventory++) {
-                            ItemStack item = event.getEntity().getInventory().getItem(inventory);
+                        for (int inventory = 0; inventory < player.getInventory().getSize(); inventory++) {
+                            final ItemStack item = player.getInventory().getItem(inventory);
                             final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item);
                             if (itemMap != null && itemMap.isSimilar(player, stack)) {
                                 slot = inventory;
@@ -200,8 +206,31 @@ public class Drops implements Listener {
                             ServerUtils.logDebug("{Drops} " + player.getName() + " has triggered the DEATH-KEEP itemflag for " + ItemUtilities.getUtilities().getItemMap(keepItem).getConfigName() + ".");
                         });
                     }
-                    event.getEntity().getInventory().remove(stack);
+                    player.getInventory().remove(stack);
                     event.getDrops().remove(stack);
+                }
+            }
+            if (!topInventory.isEmpty()) {
+                for (int craftInventory = 0; craftInventory < topInventory.getSize(); craftInventory++) {
+                    final ItemStack stack = topInventory.getItem(craftInventory);
+                    if (stack != null && (!ItemUtilities.getUtilities().isAllowed(player, stack, "death-drops") || !ItemUtilities.getUtilities().isAllowed(player, stack, "death-keep"))) {
+                        if (!ItemUtilities.getUtilities().isAllowed(player, stack, "death-keep")) {
+                            final ItemStack keepItem = stack.clone();
+                            final int setSlot = craftInventory;
+                            final AtomicInteger cycleTask = new AtomicInteger();
+                            cycleTask.set(SchedulerUtils.runAsyncAtInterval(20L, 40L, () -> {
+                                if (!player.isDead() && PlayerHandler.isCraftingInv(player)) {
+                                    SchedulerUtils.run(() -> {
+                                        final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(keepItem);
+                                        CompatUtils.getTopInventory(player).setItem(setSlot, keepItem);
+                                        itemMap.setAnimations(player);
+                                    });
+                                    Bukkit.getServer().getScheduler().cancelTask(cycleTask.get());
+                                }
+                            }));
+                        }
+                        topInventory.remove(stack);
+                    }
                 }
             }
         }
