@@ -199,13 +199,15 @@ public class Drops implements Listener {
                         final int setSlot = slot;
                         final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(keepItem);
                         SchedulerUtils.run(() -> {
-                            if (setSlot == -1) {
-                                player.getInventory().addItem(keepItem);
-                            } else {
-                                player.getInventory().setItem(setSlot, keepItem);
+                            if (player.isOnline()) {
+                                if (setSlot == -1) {
+                                    player.getInventory().addItem(keepItem);
+                                } else {
+                                    player.getInventory().setItem(setSlot, keepItem);
+                                }
+                                itemMap.setAnimations(player);
+                                ServerUtils.logDebug("{Drops} " + player.getName() + " has triggered the DEATH-KEEP itemflag for " + ItemUtilities.getUtilities().getItemMap(keepItem).getConfigName() + ".");
                             }
-                            itemMap.setAnimations(player);
-                            ServerUtils.logDebug("{Drops} " + player.getName() + " has triggered the DEATH-KEEP itemflag for " + ItemUtilities.getUtilities().getItemMap(keepItem).getConfigName() + ".");
                         });
                     }
                     player.getInventory().remove(stack);
@@ -221,7 +223,7 @@ public class Drops implements Listener {
                             final int setSlot = craftInventory;
                             final AtomicInteger cycleTask = new AtomicInteger();
                             cycleTask.set(SchedulerUtils.runAsyncAtInterval(20L, 40L, () -> {
-                                if (!player.isDead() && PlayerHandler.isCraftingInv(player)) {
+                                if (player.isOnline() && !player.isDead() && PlayerHandler.isCraftingInv(player)) {
                                     SchedulerUtils.run(() -> {
                                         final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(keepItem);
                                         CompatUtils.getTopInventory(player).setItem(setSlot, keepItem);
