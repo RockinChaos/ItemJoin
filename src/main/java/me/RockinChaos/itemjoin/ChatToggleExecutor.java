@@ -58,6 +58,7 @@ public class ChatToggleExecutor implements CommandExecutor {
                         ItemJoin.getCore().getSQL().removeData(new DataObject(Table.ENABLED_PLAYERS, PlayerHandler.getPlayerID(player), "Global", itemMap.getConfigName(), String.valueOf(true)));
                         ItemJoin.getCore().getSQL().saveData(new DataObject(Table.ENABLED_PLAYERS, PlayerHandler.getPlayerID(player), "Global", itemMap.getConfigName(), String.valueOf(false)));
                         {
+                            placeHolders.with(Holder.STATE, "off");
                             if (itemMap.hasItem(player, true)) {
                                 itemMap.removeFrom(player);
                             }
@@ -75,6 +76,7 @@ public class ChatToggleExecutor implements CommandExecutor {
                     if (PluginData.getInfo().isEnabled(player, "ALL")) {
                         ItemJoin.getCore().getSQL().removeData(new DataObject(Table.ENABLED_PLAYERS, PlayerHandler.getPlayerID(player), "Global", itemMap.getConfigName(), String.valueOf(false)));
                         {
+                            placeHolders.with(Holder.STATE, "on");
                             if (!itemMap.hasItem(player, true)) {
                                 itemMap.giveTo(player);
                             }
