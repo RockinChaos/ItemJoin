@@ -11,7 +11,7 @@ items-Overwrite: false
 items-Spamming: false
 items-RestrictCount: false
 
-# This is the section that the custom created items will be stored.
+# This is the section where the custom items created will be stored.
 # All created items should be saved under the 'items' section for each 'custom-item' subsection.
 items:
   devine-item:
